@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Photon Components</title>
+    <script src="./src/index.ts" type="module"></script>
+  </head>
+  <body style="margin: 0px">
+    <button onclick="openModal()">Prescribe</button>
+
+    <photon-client
+      id="7N9QZujlNJHL8EIPqXpu1wq8OuXqoxKb"
+      org="org_KzSVZBQixLRkqj5d"
+      domain="auth.boson.health"
+      audience="https://api.boson.health"
+      uri="https://api.boson.health/graphql"
+    >
+      <photon-dialog
+        id="photon-modal"
+        label="Send Prescription"
+        hide-footer="true"
+        width="800px"
+        overlay-close="true"
+        header="true"
+      >
+        <photon-prescribe-workflow
+          patient-id="pat_01GQGDNW09VRK2CQ0Q41H57RVK"
+          enable-order="true"
+        />
+      </photon-dialog>
+
+      <!-- This is what is implemented in boson  without the hide-templates flag-->
+      <!-- <photon-multirx-form-wrapper hide-templates="false"/> -->
+
+      <!-- To test the prescribe component only run this - idk who uses this but template creation doesnt work here so the add to templates option is hidden by default -->
+      <!-- <photon-prescribe-workflow
+          patient-id="pat_01G8VFW0X44YCW8KW7FW3FC0ZT"
+          template-ids="tmp_01GHEYTMGWZZV3TDMYWR2ZW0ZB,tmp_01GHEYV0YCZVJW34253HKMY042"
+        ></photon-prescribe-workflow> -->
+
+      <!-- <photon-update-patient-dialog
+          open="true"
+          patient-id="pat_01G8VFW0X44YCW8KW7FW3FC0ZT"
+        ></photon-update-patient-dialog> -->
+    </photon-client>
+  </body>
+  <script>
+    const modal = document.getElementById('photon-modal');
+
+    const openModal = () => {
+      modal.open = true;
+    };
+
+    document.addEventListener('photon-dialog-canceled', (e) => {
+      modal.open = false;
+    });
+
+    document.addEventListener('photon-order-created', (e) => {
+      console.log('ORDER INFO', e.detail);
+    });
+    document.addEventListener('photon-order-error', (e) => {
+      console.log('ORDER ERROR', e.detail);
+    });
+    document.addEventListener('photon-prescriptions-created', (e) => {
+      console.log('PRESCRIPTION(S) INFO', e.detail);
+    });
+    document.addEventListener('photon-prescriptions-error', (e) => {
+      console.log('PRESCRIPTION(S) ERROR', e.detail);
+    });
+  </script>
+</html>

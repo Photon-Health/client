@@ -1,0 +1,24 @@
+.dialog::part(overlay) {
+  background-color: rgba(0, 0, 0, 0.48);
+}
+
+.dialog::part(body) {
+  @apply pb-1;
+}
+
+.dialog::part(footer) {
+  @apply pt-0;
+}
+
+.hideFooter::part(footer) {
+  display: none;
+}
+
+.showHeader::part(body) {
+  padding-top: 0px;
+}
+
+.dialog::part(title) {
+  @apply font-sans;
+  @apply font-medium;
+}

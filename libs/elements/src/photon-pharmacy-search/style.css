@@ -1,0 +1,8 @@
+.invalid::part(base) {
+  @apply border-red-500;
+  @apply border-2;
+}
+
+.input::part(base) {
+  border-radius: var(--photon-border-radius, 0.5rem);
+}
