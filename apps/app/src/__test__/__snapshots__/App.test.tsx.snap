@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`App renders correctly 1`] = `
+Array [
+  <script
+    dangerouslySetInnerHTML={
+      Object {
+        "__html": "!(function(){try{var a=function(c){var v=\\"(prefers-color-scheme: dark)\\",h=window.matchMedia(v).matches?\\"dark\\":\\"light\\",r=c===\\"system\\"?h:c,o=document.documentElement,s=document.body,l=\\"chakra-ui-light\\",d=\\"chakra-ui-dark\\",i=r===\\"dark\\";return s.classList.add(i?d:l),s.classList.remove(i?l:d),o.style.colorScheme=r,o.dataset.theme=r,r},n=a,m=\\"light\\",e=\\"chakra-ui-color-mode\\",t=localStorage.getItem(e);t?a(t):localStorage.setItem(e,a(m))}catch(a){}})();",
+      }
+    }
+    id="chakra-script"
+  />,
+  <div
+    className="css-h74a88"
+  >
+    <div
+      aria-valuemax={100}
+      aria-valuemin={0}
+      className="chakra-progress css-120wkjd"
+      data-indeterminate=""
+      role="progressbar"
+    >
+      <svg
+        className="css-jf70f3"
+        viewBox="0 0 100 100"
+      >
+        <circle
+          className="chakra-progress__track css-1bhxzgy"
+          cx={50}
+          cy={50}
+          r={42}
+          strokeWidth="10px"
+        />
+        <circle
+          className="chakra-progress__indicator css-1b60oz0"
+          cx={50}
+          cy={50}
+          r={42}
+          strokeWidth="10px"
+        />
+      </svg>
+    </div>
+  </div>,
+]
+`;
