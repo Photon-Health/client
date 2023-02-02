@@ -10,6 +10,9 @@
       "/node_modules/@photonhealth/react"
     ]
   },
+  "dependencies": {
+    "@photonhealth/elements": "*"
+  },
   "browserslist": {
     "production": [
       ">0.2%",

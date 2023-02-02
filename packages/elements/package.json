@@ -90,16 +90,5 @@
       "require": "./dist/index.js"
     }
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Photon-Health/photon-webcomponents.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Photon-Health/photon-webcomponents/issues"
-  },
-  "homepage": "https://github.com/Photon-Health/photon-webcomponents#readme",
-  "workspaces": [
-    "packages/*"
-  ],
   "gitHead": "3283ed3794cd092af27cfc26db5ad4535853caf8"
 }

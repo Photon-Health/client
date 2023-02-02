@@ -52,7 +52,6 @@
     "react-test-renderer": "^18.2.0"
   },
   "dependencies": {
-    "@photonhealth/elements": "*",
     "@photonhealth/react": "^1.0.3",
     "@photonhealth/sdk": "^1.0.3",
     "react": "18.2.0",

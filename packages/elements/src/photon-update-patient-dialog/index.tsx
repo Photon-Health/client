@@ -14,8 +14,8 @@ customElement(
       reflect: true,
       notify: false,
       attribute: 'open',
-      parse: true,
-    },
+      parse: true
+    }
   },
   (
     props: {
@@ -49,15 +49,15 @@ customElement(
       ) {
         actions.registerValidator({
           key: 'address_street1',
-          validator: message(size(string(), 1, Infinity), 'Please enter a valid Street 1..'),
+          validator: message(size(string(), 1, Infinity), 'Please enter a valid Street 1..')
         });
         actions.registerValidator({
           key: 'address_city',
-          validator: message(size(string(), 1, Infinity), 'Please enter a valid City..'),
+          validator: message(size(string(), 1, Infinity), 'Please enter a valid City..')
         });
         actions.registerValidator({
           key: 'address_state',
-          validator: message(size(string(), 2, 2), 'Please enter a valid State..'),
+          validator: message(size(string(), 2, 2), 'Please enter a valid State..')
         });
         keys = [
           'phone',
@@ -65,7 +65,7 @@ customElement(
           'address_zip',
           'address_street1',
           'address_city',
-          'address_state',
+          'address_state'
         ];
       } else {
         const keysToRemove = ['address_street1', 'address_city', 'address_state'];
@@ -87,9 +87,9 @@ customElement(
           await updatePatientMutation({
             variables: {
               id: props.patientId,
-              preferredPharmacies: [store['preferredPharmacy']!.value],
+              preferredPharmacies: [store['preferredPharmacy']!.value]
             },
-            awaitRefetchQueries: false,
+            awaitRefetchQueries: false
           });
         } else if (
           !pStore.selectedPatient.data?.preferredPharmacies
@@ -100,16 +100,16 @@ customElement(
           await removePreferredPharmacyMutation({
             variables: {
               patientId: props.patientId,
-              pharmacyId: pStore.selectedPatient.data?.preferredPharmacies![0]!.id,
+              pharmacyId: pStore.selectedPatient.data?.preferredPharmacies![0]!.id
             },
-            awaitRefetchQueries: false,
+            awaitRefetchQueries: false
           });
           await updatePatientMutation({
             variables: {
               id: props.patientId,
-              preferredPharmacies: [store['preferredPharmacy']!.value],
+              preferredPharmacies: [store['preferredPharmacy']!.value]
             },
-            awaitRefetchQueries: false,
+            awaitRefetchQueries: false
           });
         }
       }
@@ -119,7 +119,7 @@ customElement(
           id: props.patientId,
           name: {
             first: store['firstName']!.value,
-            last: store['lastName']!.value,
+            last: store['lastName']!.value
           },
           gender: store['gender']!.value,
           email: store['email']!.value,
@@ -132,11 +132,11 @@ customElement(
                   city: store['address_city']!.value,
                   state: store['address_state']!.value,
                   postalCode: store['address_zip']!.value,
-                  country: 'US',
+                  country: 'US'
                 }
-              : undefined,
+              : undefined
         },
-        awaitRefetchQueries: false,
+        awaitRefetchQueries: false
       });
     };
 
@@ -145,8 +145,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          patientId: patientId,
-        },
+          patientId: patientId
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -155,7 +155,7 @@ customElement(
       const event = new CustomEvent('photon-patient-closed', {
         composed: true,
         bubbles: true,
-        detail: {},
+        detail: {}
       });
       ref?.dispatchEvent(event);
     };
