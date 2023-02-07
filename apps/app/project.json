@@ -6,14 +6,14 @@
   "projectType": "application",
   "targets": {
     "start": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
         "command": "env-cmd -f .env.boson react-app-rewired start"
       }
     },
     "build:boson": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
         "command": "env-cmd -f .env.boson react-app-rewired build",
@@ -21,7 +21,7 @@
       }
     },
     "build:neutron": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
         "command": "env-cmd -f .env.neutron react-app-rewired build",
@@ -29,7 +29,7 @@
       }
     },
     "build:photon": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
         "command": "env-cmd -f .env.photon react-app-rewired build",
@@ -37,21 +37,21 @@
       }
     },
     "test": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
         "command": "react-app-rewired test --watchAll=false"
       }
     },
     "lint": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
         "command": "npx eslint src/**/*.tsx src/**/*.ts"
       }
     },
     "lint:fix": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
         "command": "npx eslint src/**/*.tsx src/**/*.ts --fix"

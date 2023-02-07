@@ -4,7 +4,21 @@
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
-      "rules": {}
+      "rules": {
+        "react/react-in-jsx-scope": "off",
+        "import/prefer-default-export": "off",
+        "react/jsx-props-no-spreading": "off",
+        "react/function-component-definition": "off",
+        "react/no-unescaped-entities": "off",
+        "no-empty": "off",
+        "no-nested-ternary": "off",
+        "no-restricted-properties": "off",
+        "prefer-destructuring": "off",
+        "no-param-reassign": "off",
+        "no-await-in-loop": "off",
+        "no-plusplus": "off",
+        "no-underscore-dangle": "off"
+      }
     },
     {
       "files": ["*.ts", "*.tsx"],
