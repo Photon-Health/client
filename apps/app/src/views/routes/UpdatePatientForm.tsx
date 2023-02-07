@@ -5,7 +5,7 @@ import { ulid } from 'ulid';
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      'photon-update-patient-dialog': unknown;
+      'photon-patient-dialog': unknown;
     }
   }
 }
@@ -20,10 +20,14 @@ export const UpdatePatientForm = () => {
     if (ref.current) {
       ref.current.patientId = id;
       ref.current.open = true;
-      ref.current.addEventListener('photon-patient-updated', async () => {
-        navigate(`/patients?reload=${id}-${ulid()}`);
+      ref.current.addEventListener('photon-patient-updated', (e: any) => {
+        if (e?.detail?.createPrescription) {
+          navigate(`/prescriptions/new?patientId=${id}`);
+        } else {
+          navigate(`/patients?reload=${id}-${ulid()}`);
+        }
       });
-      ref.current.addEventListener('photon-patient-closed', async () => {
+      ref.current.addEventListener('photon-patient-closed', () => {
         navigate(`/patients`);
       });
     }
@@ -31,7 +35,7 @@ export const UpdatePatientForm = () => {
 
   return (
     <div>
-      <photon-update-patient-dialog ref={ref} patient />
+      <photon-patient-dialog ref={ref} patient />
     </div>
   );
 };

@@ -29,7 +29,7 @@ const dobToAge = require('dob-to-age');
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      'photon-update-patient-dialog': unknown;
+      'photon-patient-dialog': unknown;
     }
   }
 }
