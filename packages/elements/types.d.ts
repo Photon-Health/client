@@ -22,7 +22,8 @@ declare module 'solid-js' {
       'photon-phone-input': unknown;
       'photon-gender-input': unknown;
       'photon-sex-input': unknown;
-      'photon-update-patient-form': unknown;
+      'photon-patient-form': unknown;
+      'photon-patient-dialog': unknown;
       'photon-update-patient-dialog': unknown;
       'photon-prescribe-workflow': unknown;
       'sl-input': unknown;
