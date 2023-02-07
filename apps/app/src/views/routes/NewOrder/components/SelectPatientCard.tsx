@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
 import {
   Card,
   CardBody,
@@ -6,17 +6,17 @@ import {
   FormControl,
   FormErrorMessage,
   Heading
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { PatientSelect } from '../../../components/PatientSelect'
+import { PatientSelect } from '../../../components/PatientSelect';
 
 interface PatientCardProps {
-  errors: any
-  touched: any
+  errors: any;
+  touched: any;
 }
 
 export const SelectPatientCard = ({ errors, touched }: PatientCardProps) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   return (
     <Card bg="bg-surface">
       <CardHeader>
@@ -33,5 +33,5 @@ export const SelectPatientCard = ({ errors, touched }: PatientCardProps) => {
         </FormControl>
       </CardBody>
     </Card>
-  )
-}
+  );
+};

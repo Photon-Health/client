@@ -1,4 +1,4 @@
-import { SelectField } from './SelectField'
+import { SelectField } from './SelectField';
 
 const stateOptions = [
   { value: 'AL', label: 'Alabama' },
@@ -53,6 +53,6 @@ const stateOptions = [
   { value: 'WV', label: 'West Virginia' },
   { value: 'WI', label: 'Wisconsin' },
   { value: 'WY', label: 'Wyoming' }
-]
+];
 
-export const StateSelect = (props: any) => <SelectField {...props} options={stateOptions} />
+export const StateSelect = (props: any) => <SelectField {...props} options={stateOptions} />;

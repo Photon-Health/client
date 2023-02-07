@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -7,36 +7,36 @@ import {
   HStack,
   Text,
   useColorModeValue
-} from '@chakra-ui/react'
-import { usePhoton, types } from '@photonhealth/react'
-import { Pharmacy } from './Pharmacy'
+} from '@chakra-ui/react';
+import { usePhoton, types } from '@photonhealth/react';
+import { Pharmacy } from './Pharmacy';
 
 interface MailOrderProps {
-  location: string | undefined
-  setFieldValue: any
-  errors: any
-  touched: any
+  location: string | undefined;
+  setFieldValue: any;
+  errors: any;
+  touched: any;
 }
 
 export const MailOrder = ({ location, setFieldValue, errors, touched }: MailOrderProps) => {
-  const { getPharmacies } = usePhoton()
-  const { refetch } = getPharmacies({})
+  const { getPharmacies } = usePhoton();
+  const { refetch } = getPharmacies({});
 
-  const [pharmOptions, setPharmOptions] = useState<any>([])
+  const [pharmOptions, setPharmOptions] = useState<any>([]);
 
   const getPharmacyOptions = async () => {
     const result: any = await refetch({
       type: types.FulfillmentType.MailOrder
-    })
+    });
 
-    setPharmOptions(result.data.pharmacies)
-  }
+    setPharmOptions(result.data.pharmacies);
+  };
 
   useEffect(() => {
-    getPharmacyOptions()
-  }, [location])
+    getPharmacyOptions();
+  }, [location]);
 
-  const borderColor = useColorModeValue('gray.200', 'gray.700')
+  const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   return (
     <FormControl isInvalid={!!errors.pharmacyId && touched.pharmacyId}>
@@ -67,5 +67,5 @@ export const MailOrder = ({ location, setFieldValue, errors, touched }: MailOrde
         </Box>
       ))}
     </FormControl>
-  )
-}
+  );
+};

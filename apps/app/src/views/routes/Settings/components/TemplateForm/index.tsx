@@ -10,35 +10,35 @@ import {
   Textarea,
   Heading,
   useToast
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { RefObject, useEffect, useState } from 'react'
-import { Field, Formik } from 'formik'
+import { RefObject, useEffect, useState } from 'react';
+import { Field, Formik } from 'formik';
 
-import { OptionalText } from '../../../../components/OptionalText'
-import { DispenseUnitSelect } from '../../../../components/DispenseUnitSelect'
-import { CtaButtons } from './components/CtaButtons'
-import { Treatment } from './components/Treatment'
-import { DaysSupply } from './components/DaysSupply'
-import { RefillsInput } from './components/RefillsInput'
-import { DispenseQuantity } from './components/DispenseQuantity'
+import { OptionalText } from '../../../../components/OptionalText';
+import { DispenseUnitSelect } from '../../../../components/DispenseUnitSelect';
+import { CtaButtons } from './components/CtaButtons';
+import { Treatment } from './components/Treatment';
+import { DaysSupply } from './components/DaysSupply';
+import { RefillsInput } from './components/RefillsInput';
+import { DispenseQuantity } from './components/DispenseQuantity';
 
-import { TEMPLATE_INITIAL_VALUES, TEMPLATE_SCHEMA } from './utils'
+import { TEMPLATE_INITIAL_VALUES, TEMPLATE_SCHEMA } from './utils';
 
 interface TemplateFormProps {
-  edit?: boolean
-  loading: boolean
-  catalogs: any
-  createRxTemplateMutation: Function
-  updatePrescriptionTemplateMutation: Function
-  medicationSelectRef: RefObject<any>
-  quantityRef: RefObject<any>
-  unitRef: RefObject<any>
-  setDoseCalcVis: Function
-  isModal?: boolean
-  onClose: () => void
-  templateToEdit: any
-  setTemplateToEdit: any
+  edit?: boolean;
+  loading: boolean;
+  catalogs: any;
+  createRxTemplateMutation: Function;
+  updatePrescriptionTemplateMutation: Function;
+  medicationSelectRef: RefObject<any>;
+  quantityRef: RefObject<any>;
+  unitRef: RefObject<any>;
+  setDoseCalcVis: Function;
+  isModal?: boolean;
+  onClose: () => void;
+  templateToEdit: any;
+  setTemplateToEdit: any;
 }
 
 export const TemplateForm = ({
@@ -56,41 +56,41 @@ export const TemplateForm = ({
   templateToEdit,
   setTemplateToEdit
 }: TemplateFormProps) => {
-  const toast = useToast()
+  const toast = useToast();
 
-  const [initialValues, setInitialValues] = useState(TEMPLATE_INITIAL_VALUES)
+  const [initialValues, setInitialValues] = useState(TEMPLATE_INITIAL_VALUES);
 
   useEffect(() => {
     if (templateToEdit?.id) {
       const vals = {
         ...templateToEdit,
         refillsInput: templateToEdit.fillsAllowed > 0 ? templateToEdit.fillsAllowed - 1 : 0
-      }
-      setInitialValues(vals)
+      };
+      setInitialValues(vals);
     }
-  }, [templateToEdit?.id])
+  }, [templateToEdit?.id]);
 
   const handleCancel = (resetForm: any) => {
-    if (isModal) onClose()
+    if (isModal) onClose();
 
-    resetForm()
-    setInitialValues(TEMPLATE_INITIAL_VALUES) // added to get daysSuppply resetting
-    setTemplateToEdit(undefined)
-  }
+    resetForm();
+    setInitialValues(TEMPLATE_INITIAL_VALUES); // added to get daysSuppply resetting
+    setTemplateToEdit(undefined);
+  };
 
   const onSubmit = async (values: any, { validateForm, setSubmitting, resetForm }: any) => {
-    validateForm(values)
+    validateForm(values);
 
-    const variables = values
-    variables.treatmentId = values.treatment.id
+    const variables = values;
+    variables.treatmentId = values.treatment.id;
     if (values.treatment.__typename === 'MedicalEquipment') {
-      variables.daysSupply = undefined
-      variables.dispenseAsWritten = false
-      variables.dispenseUnit = 'Each'
-      variables.fillsAllowed = 1
+      variables.daysSupply = undefined;
+      variables.dispenseAsWritten = false;
+      variables.dispenseUnit = 'Each';
+      variables.fillsAllowed = 1;
     }
 
-    setSubmitting(true)
+    setSubmitting(true);
 
     const templateVariables: any = {
       catalogId: catalogs.catalogs?.[0]?.id,
@@ -104,50 +104,50 @@ export const TemplateForm = ({
       fillsAllowed: values.refillsInput ? parseInt(values.refillsInput, 10) + 1 : 1,
       // refillsInput gets submitted but graphQL doesn't use this for anything
       refillsInput: values.refillsInput ? parseInt(values.refillsInput, 10) : 0
-    }
+    };
 
     if (edit) {
-      templateVariables.templateId = templateToEdit.id
+      templateVariables.templateId = templateToEdit.id;
       updatePrescriptionTemplateMutation({
         variables: templateVariables,
         onCompleted: () => {
-          setSubmitting(false)
+          setSubmitting(false);
 
-          if (isModal) onClose()
+          if (isModal) onClose();
 
-          resetForm()
-          setInitialValues(TEMPLATE_INITIAL_VALUES)
-          setTemplateToEdit(undefined)
+          resetForm();
+          setInitialValues(TEMPLATE_INITIAL_VALUES);
+          setTemplateToEdit(undefined);
 
           toast({
             title: 'Template edited',
             status: 'success'
-          })
+          });
         }
-      })
+      });
     } else {
-      templateVariables.treatmentId = values.treatmentId
+      templateVariables.treatmentId = values.treatmentId;
       createRxTemplateMutation({
         variables: templateVariables,
         onCompleted: () => {
-          setSubmitting(false)
+          setSubmitting(false);
 
-          if (isModal) onClose()
+          if (isModal) onClose();
 
-          resetForm()
-          setInitialValues(TEMPLATE_INITIAL_VALUES)
-          setTemplateToEdit(undefined)
+          resetForm();
+          setInitialValues(TEMPLATE_INITIAL_VALUES);
+          setTemplateToEdit(undefined);
 
           toast({
             title: 'Template added',
             status: 'success'
-          })
+          });
         }
-      })
+      });
     }
 
-    setTimeout(() => setSubmitting(false), 5000)
-  }
+    setTimeout(() => setSubmitting(false), 5000);
+  };
 
   return (
     <Formik
@@ -166,7 +166,7 @@ export const TemplateForm = ({
         isSubmitting,
         resetForm
       }) => {
-        const hidden = values.treatment.__typename === 'MedicalEquipment'
+        const hidden = values.treatment.__typename === 'MedicalEquipment';
 
         return (
           <form onSubmit={handleSubmit} noValidate id="template-builder">
@@ -279,13 +279,13 @@ export const TemplateForm = ({
               )}
             </VStack>
           </form>
-        )
+        );
       }}
     </Formik>
-  )
-}
+  );
+};
 
 TemplateForm.defaultProps = {
   edit: false,
   isModal: false
-}
+};

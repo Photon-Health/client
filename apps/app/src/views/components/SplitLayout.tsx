@@ -1,10 +1,10 @@
-import { Box, Stack, useBreakpointValue, useColorMode } from '@chakra-ui/react'
+import { Box, Stack, useBreakpointValue, useColorMode } from '@chakra-ui/react';
 
 export const SplitLayout = (props: any) => {
-  const { children } = props
+  const { children } = props;
 
-  const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false })
-  const { colorMode } = useColorMode()
+  const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
+  const { colorMode } = useColorMode();
 
   return (
     <Stack
@@ -35,5 +35,5 @@ export const SplitLayout = (props: any) => {
         </Box>
       ) : null}
     </Stack>
-  )
-}
+  );
+};

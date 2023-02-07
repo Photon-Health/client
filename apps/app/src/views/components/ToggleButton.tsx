@@ -1,4 +1,4 @@
-import { Box, chakra, IconButton, IconButtonProps } from '@chakra-ui/react'
+import { Box, chakra, IconButton, IconButtonProps } from '@chakra-ui/react';
 
 const Bar = chakra('span', {
   baseStyle: {
@@ -12,10 +12,10 @@ const Bar = chakra('span', {
     insetStart: '0.125rem',
     transition: 'all 0.12s'
   }
-})
+});
 
 const ToggleIcon = (props: { active: boolean }) => {
-  const { active } = props
+  const { active } = props;
   return (
     <Box
       className="group"
@@ -31,15 +31,15 @@ const ToggleIcon = (props: { active: boolean }) => {
       <Bar top="0.4375rem" _groupActive={{ top: '0.6875rem', transform: 'rotate(45deg)' }} />
       <Bar bottom="0.4375rem" _groupActive={{ bottom: '0.6875rem', transform: 'rotate(-45deg)' }} />
     </Box>
-  )
-}
+  );
+};
 
 interface ToggleButtonProps extends IconButtonProps {
-  isOpen: boolean
+  isOpen: boolean;
 }
 
 export const ToggleButton = (props: ToggleButtonProps) => {
-  const { isOpen, ...iconButtonProps } = props
+  const { isOpen, ...iconButtonProps } = props;
   return (
     <IconButton
       position="relative"
@@ -50,5 +50,5 @@ export const ToggleButton = (props: ToggleButtonProps) => {
       icon={<ToggleIcon active={isOpen} />}
       {...iconButtonProps}
     />
-  )
-}
+  );
+};

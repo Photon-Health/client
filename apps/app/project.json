@@ -54,7 +54,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "npx eslint src/**/*.tsx src/**/*.ts --fix"
+        "command": "npx eslint src/**/*.tsx src/**/*.ts --fix && npx prettier --write src/**/*.{ts,tsx}"
       }
     }
   }

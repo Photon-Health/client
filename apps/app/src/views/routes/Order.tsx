@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom';
 
 import {
   Alert,
@@ -23,55 +23,55 @@ import {
   Tr,
   VStack,
   useBreakpointValue
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { usePhoton, types } from '@photonhealth/react'
+import { usePhoton, types } from '@photonhealth/react';
 
-import { FiArrowUpRight, FiCheck, FiClock, FiCopy, FiX } from 'react-icons/fi'
-import { Page } from '../components/Page'
-import PatientView from '../components/PatientView'
+import { FiArrowUpRight, FiCheck, FiClock, FiCopy, FiX } from 'react-icons/fi';
+import { Page } from '../components/Page';
+import PatientView from '../components/PatientView';
 
-import { formatAddress, formatDate, formatFills, formatPhone } from '../../utils'
+import { formatAddress, formatDate, formatFills, formatPhone } from '../../utils';
 
-import { ORDER_FULFILLMENT_COLOR_MAP, ORDER_FULFILLMENT_STATE_MAP } from './Orders'
+import { ORDER_FULFILLMENT_COLOR_MAP, ORDER_FULFILLMENT_STATE_MAP } from './Orders';
 
 const ORDER_FULFILLMENT_TYPE_MAP = {
   [types.FulfillmentType.PickUp]: 'Pick up',
   [types.FulfillmentType.MailOrder]: 'Mail order'
-}
+};
 
 const ORDER_STATE_MAP: object = {
   PLACED: 'Placed',
   PENDING: 'Pending',
   CANCELED: 'Canceled',
   COMPLETED: 'Completed'
-}
+};
 const ORDER_STATE_ICON_MAP: any = {
   PLACED: FiArrowUpRight,
   PENDING: FiClock,
   CANCELED: FiX,
   COMPLETED: FiCheck
-}
+};
 
 const FILL_STATE_MAP: object = {
   CANCELED: 'Canceled',
   NEW: 'New',
   SCHEDULED: 'Scheduled',
   SENT: 'Sent'
-}
+};
 const FILL_COLOR_MAP: object = {
   CANCELED: 'gray',
   NEW: 'green',
   SCHEDULED: 'orange',
   SENT: 'yellow'
-}
+};
 
 export const Order = () => {
-  const params = useParams()
-  const id = params.orderId
+  const params = useParams();
+  const id = params.orderId;
 
-  const { getOrder } = usePhoton()
-  const { order, loading, error } = getOrder({ id: id! })
+  const { getOrder } = usePhoton();
+  const { order, loading, error } = getOrder({ id: id! });
 
   if (error) {
     return (
@@ -79,11 +79,11 @@ export const Order = () => {
         <AlertIcon />
         {error.message}
       </Alert>
-    )
+    );
   }
 
-  const isMobile = useBreakpointValue({ base: true, sm: false })
-  const tableWidth = useBreakpointValue({ base: 'full', sm: '100%', md: '75%' })
+  const isMobile = useBreakpointValue({ base: true, sm: false });
+  const tableWidth = useBreakpointValue({ base: 'full', sm: '100%', md: '75%' });
 
   return (
     <Page kicker="Order" header={order ? formatFills(order.fills) : ''} loading={loading}>
@@ -389,7 +389,7 @@ export const Order = () => {
                         </HStack>
                       </Td>
                     </Tr>
-                  ) : null
+                  ) : null;
                 })}
               </Tbody>
             </Table>
@@ -399,5 +399,5 @@ export const Order = () => {
         )}
       </VStack>
     </Page>
-  )
-}
+  );
+};

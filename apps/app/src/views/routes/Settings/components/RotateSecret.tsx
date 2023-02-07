@@ -1,18 +1,18 @@
-import { Button, Alert, AlertIcon } from '@chakra-ui/react'
+import { Button, Alert, AlertIcon } from '@chakra-ui/react';
 
-import { usePhoton } from '@photonhealth/react'
+import { usePhoton } from '@photonhealth/react';
 
 interface RotateSecretProps {
-  clientId: string
+  clientId: string;
 }
 
 export const RotateSecret = (props: RotateSecretProps) => {
-  const { clientId } = props
-  const { rotateSecret } = usePhoton()
+  const { clientId } = props;
+  const { rotateSecret } = usePhoton();
   const [rotateSecretMutation, { loading, error }] = rotateSecret({
     refetchQueries: ['getClients'],
     awaitRefetchQueries: true
-  })
+  });
 
   return (
     <>
@@ -39,5 +39,5 @@ export const RotateSecret = (props: RotateSecretProps) => {
         </Alert>
       )}
     </>
-  )
-}
+  );
+};

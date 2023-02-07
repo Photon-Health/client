@@ -1,17 +1,17 @@
-import { IconButton, HStack, useColorMode } from '@chakra-ui/react'
-import { FiTrash } from 'react-icons/fi'
-import { usePhoton } from '@photonhealth/react'
+import { IconButton, HStack, useColorMode } from '@chakra-ui/react';
+import { FiTrash } from 'react-icons/fi';
+import { usePhoton } from '@photonhealth/react';
 
-import { CATALOG_TREATMENTS_FIELDS } from '../../../../model/fragments'
-import { confirmWrapper } from '../../../components/GuardDialog'
+import { CATALOG_TREATMENTS_FIELDS } from '../../../../model/fragments';
+import { confirmWrapper } from '../../../components/GuardDialog';
 
 export const TreatmentActions = (props: {
-  catalogId: string
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>
-  treatmentId: string
+  catalogId: string;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  treatmentId: string;
 }) => {
-  const { setLoading, catalogId, treatmentId } = props
-  const { removeFromCatalog } = usePhoton()
+  const { setLoading, catalogId, treatmentId } = props;
+  const { removeFromCatalog } = usePhoton();
 
   const [removeFromCatalogMutation] = removeFromCatalog({
     refetchQueries: ['getCatalog'],
@@ -22,9 +22,9 @@ export const TreatmentActions = (props: {
         CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
       }
     }
-  })
+  });
 
-  const { colorMode } = useColorMode()
+  const { colorMode } = useColorMode();
 
   return (
     <HStack spacing="0" justifyContent="flex-end">
@@ -39,20 +39,20 @@ export const TreatmentActions = (props: {
             confirmText: 'Yes, Cancel',
             darkMode: colorMode !== 'light',
             colorScheme: 'red'
-          })
+          });
           if (decision) {
-            setLoading(true)
+            setLoading(true);
             removeFromCatalogMutation({
               variables: {
                 catalogId,
                 treatmentId
               },
               onCompleted: () => setLoading(false)
-            })
+            });
           }
         }}
         aria-label="Delete Template"
       />
     </HStack>
-  )
-}
+  );
+};

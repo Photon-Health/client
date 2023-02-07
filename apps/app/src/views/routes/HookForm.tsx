@@ -1,5 +1,5 @@
-import * as yup from 'yup'
-import { Formik, Field } from 'formik'
+import * as yup from 'yup';
+import { Formik, Field } from 'formik';
 
 import {
   Alert,
@@ -18,13 +18,13 @@ import {
   SimpleGrid,
   Stack,
   VStack
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
 
-import React from 'react'
-import { usePhoton } from '@photonhealth/react'
-import { capitalizeFirst } from '../../utils'
+import React from 'react';
+import { usePhoton } from '@photonhealth/react';
+import { capitalizeFirst } from '../../utils';
 
 const hookSchema = yup.object({
   url: yup
@@ -37,35 +37,35 @@ const hookSchema = yup.object({
   sharedSecret: yup.string().matches(/^\S*$/, 'Secrets cannot contain any whitespace'),
   radioGroup: yup.string().required('Please select one of the options'),
   filters: yup.array()
-})
+});
 
 interface HookFormValues {
-  url: string
-  sharedSecret: string
-  radioGroup: string
-  filters: string[]
+  url: string;
+  sharedSecret: string;
+  radioGroup: string;
+  filters: string[];
 }
 
 export const HookForm = () => {
-  const [eventValue, setEventValue] = React.useState('')
+  const [eventValue, setEventValue] = React.useState('');
 
-  const { createWebhook } = usePhoton()
+  const { createWebhook } = usePhoton();
   const [createWebhookConfig, { loading, error }] = createWebhook({
     refetchQueries: ['getWebhooks'],
     awaitRefetchQueries: true
-  })
+  });
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const onClose = () => {
-    navigate('/settings')
-  }
+    navigate('/settings');
+  };
 
   const initialValues: HookFormValues = {
     url: '',
     sharedSecret: '',
     radioGroup: '',
     filters: []
-  }
+  };
 
   const allFilters = [
     'photon:order:created',
@@ -77,7 +77,7 @@ export const HookForm = () => {
     'photon:prescription:depleted',
     'photon:prescription:expired',
     'photon:prescription:active'
-  ]
+  ];
 
   return (
     <>
@@ -91,12 +91,12 @@ export const HookForm = () => {
         initialValues={initialValues}
         validationSchema={hookSchema}
         onSubmit={async (values, { validateForm }) => {
-          validateForm(values)
+          validateForm(values);
           if (eventValue === 'all') {
             // eslint-disable-next-line no-param-reassign
-            values.filters = allFilters
+            values.filters = allFilters;
           }
-          createWebhookConfig({ variables: values, onCompleted: onClose })
+          createWebhookConfig({ variables: values, onCompleted: onClose });
         }}
       >
         {({ setFieldValue, handleSubmit, errors, touched }) => {
@@ -135,7 +135,7 @@ export const HookForm = () => {
                       as={CheckboxGroup}
                       name="filters"
                       onChange={() => {
-                        setFieldValue('filters', [])
+                        setFieldValue('filters', []);
                       }}
                     >
                       <HStack alignItems="start" spacing={20}>
@@ -155,9 +155,9 @@ export const HookForm = () => {
                 Save
               </Button>
             </form>
-          )
+          );
         }}
       </Formik>
     </>
-  )
-}
+  );
+};

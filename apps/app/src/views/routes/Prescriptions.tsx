@@ -1,4 +1,4 @@
-import { Link as RouterLink, useSearchParams } from 'react-router-dom'
+import { Link as RouterLink, useSearchParams } from 'react-router-dom';
 
 import {
   Badge,
@@ -9,39 +9,39 @@ import {
   SkeletonText,
   Stack,
   Text
-} from '@chakra-ui/react'
-import { FiInfo, FiShoppingCart } from 'react-icons/fi'
+} from '@chakra-ui/react';
+import { FiInfo, FiShoppingCart } from 'react-icons/fi';
 
-import { useEffect, useState } from 'react'
-import { useDebounce } from 'use-debounce'
-import { usePhoton } from '@photonhealth/react'
-import { formatDate } from '../../utils'
+import { useEffect, useState } from 'react';
+import { useDebounce } from 'use-debounce';
+import { usePhoton } from '@photonhealth/react';
+import { formatDate } from '../../utils';
 
-import { Page } from '../components/Page'
-import { TablePage } from '../components/TablePage'
-import NameView from '../components/NameView'
-import PatientView from '../components/PatientView'
+import { Page } from '../components/Page';
+import { TablePage } from '../components/TablePage';
+import NameView from '../components/NameView';
+import PatientView from '../components/PatientView';
 
 interface MedViewProps {
-  name: string
+  name: string;
 }
 
 const MedView = (props: MedViewProps) => {
-  const { name } = props
+  const { name } = props;
   return (
     <Stack spacing="0">
       <Text fontWeight="medium">{name}</Text>
     </Stack>
-  )
-}
+  );
+};
 
 interface ActionsViewProps {
-  prescriptionId: string
-  patientId: string
+  prescriptionId: string;
+  patientId: string;
 }
 
 const ActionsView = (props: ActionsViewProps) => {
-  const { prescriptionId, patientId } = props
+  const { prescriptionId, patientId } = props;
   return (
     <HStack spacing="0">
       <IconButton
@@ -59,8 +59,8 @@ const ActionsView = (props: ActionsViewProps) => {
         to={`/orders/new?patientId=${patientId}&prescriptionIds=${prescriptionId}`}
       />
     </HStack>
-  )
-}
+  );
+};
 
 export const PRESCRIPTION_COLOR_MAP: object = {
   READY: 'green', // TODO: delete
@@ -70,7 +70,7 @@ export const PRESCRIPTION_COLOR_MAP: object = {
   EXPIRED: 'red',
   CANCELED: 'gray',
   ERROR: 'red'
-}
+};
 
 export const PRESCRIPTION_STATE_MAP: object = {
   READY: 'Active', // TODO: delete
@@ -80,17 +80,17 @@ export const PRESCRIPTION_STATE_MAP: object = {
   EXPIRED: 'Expired',
   CANCELED: 'Canceled',
   ERROR: 'Error'
-}
+};
 
 const renderRow = (rx: any) => {
-  const { id, patient } = rx
-  const med = rx.treatment
-  const extId = rx.externalId || <Text as="i">None</Text>
-  const prescriber = rx.prescriber.name.full
-  const writtenAt = formatDate(rx.writtenAt)
+  const { id, patient } = rx;
+  const med = rx.treatment;
+  const extId = rx.externalId || <Text as="i">None</Text>;
+  const prescriber = rx.prescriber.name.full;
+  const writtenAt = formatDate(rx.writtenAt);
 
-  const state = PRESCRIPTION_STATE_MAP[rx.state as keyof object] || ''
-  const stateColor = PRESCRIPTION_COLOR_MAP[rx.state as keyof object] || ''
+  const state = PRESCRIPTION_STATE_MAP[rx.state as keyof object] || '';
+  const stateColor = PRESCRIPTION_COLOR_MAP[rx.state as keyof object] || '';
 
   return {
     id,
@@ -115,8 +115,8 @@ const renderRow = (rx: any) => {
     prescriber: <NameView name={prescriber} />,
     writtenAt: <Text>{writtenAt}</Text>,
     actions: <ActionsView prescriptionId={id} patientId={rx.patient.id} />
-  }
-}
+  };
+};
 
 export const renderSkeletonRow = () => ({
   medication: <SkeletonText noOfLines={2} spacing="3" width="160px" />,
@@ -142,12 +142,12 @@ export const renderSkeletonRow = () => ({
       <Skeleton height="20px" width="20px" />
     </HStack>
   )
-})
+});
 
 export const Prescriptions = () => {
-  const [params] = useSearchParams()
-  const patientId = params.get('patientId')
-  const prescriberId = params.get('prescriberId')
+  const [params] = useSearchParams();
+  const patientId = params.get('patientId');
+  const prescriberId = params.get('prescriberId');
 
   const columns = [
     {
@@ -185,29 +185,29 @@ export const Prescriptions = () => {
       Header: '',
       accessor: 'actions'
     }
-  ]
+  ];
 
-  const { getPrescriptions } = usePhoton()
-  const [filterText, setFilterText] = useState('')
-  const [rows, setRows] = useState<any[]>([])
-  const [finished, setFinished] = useState<boolean>(false)
-  const [filterTextDebounce] = useDebounce(filterText, 250)
+  const { getPrescriptions } = usePhoton();
+  const [filterText, setFilterText] = useState('');
+  const [rows, setRows] = useState<any[]>([]);
+  const [finished, setFinished] = useState<boolean>(false);
+  const [filterTextDebounce] = useDebounce(filterText, 250);
 
   const { prescriptions, loading, error, refetch } = getPrescriptions({
     patientId,
     prescriberId,
     patientName: filterTextDebounce.length > 0 ? filterTextDebounce : null
-  })
+  });
 
   useEffect(() => {
     if (!loading) {
-      const preppedRows = prescriptions.filter((row) => row).map(renderRow)
-      setRows(preppedRows)
-      setFinished(prescriptions.length === 0)
+      const preppedRows = prescriptions.filter((row) => row).map(renderRow);
+      setRows(preppedRows);
+      setFinished(prescriptions.length === 0);
     }
-  }, [loading])
+  }, [loading]);
 
-  const skeletonRows = new Array(25).fill(0).map(renderSkeletonRow)
+  const skeletonRows = new Array(25).fill(0).map(renderSkeletonRow);
 
   return (
     <Page header="Prescriptions">
@@ -229,13 +229,13 @@ export const Prescriptions = () => {
             prescriberId: prescriberId || undefined,
             patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
             after: rows?.at(-1)?.id
-          })
+          });
           if (data?.prescriptions.length === 0) {
-            setFinished(true)
+            setFinished(true);
           }
-          setRows(rows.concat(data?.prescriptions.map(renderRow)))
+          setRows(rows.concat(data?.prescriptions.map(renderRow)));
         }}
       />
     </Page>
-  )
-}
+  );
+};

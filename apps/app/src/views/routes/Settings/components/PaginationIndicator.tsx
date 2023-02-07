@@ -1,9 +1,9 @@
-import { HStack, Button, Text } from '@chakra-ui/react'
+import { HStack, Button, Text } from '@chakra-ui/react';
 
 interface PaginationIndicatorProps {
-  pages: number
-  currentPage: number
-  setCurrentPage: (page: number) => void
+  pages: number;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
 }
 
 export function PaginationIndicator({
@@ -31,5 +31,5 @@ export function PaginationIndicator({
         ) : null
       )}
     </HStack>
-  )
+  );
 }

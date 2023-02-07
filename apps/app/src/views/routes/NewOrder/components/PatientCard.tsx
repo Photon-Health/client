@@ -10,20 +10,20 @@ import {
   SkeletonText,
   Text,
   useBreakpointValue
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { useNavigate } from 'react-router-dom'
-import { formatPhone } from '../../../../utils'
+import { useNavigate } from 'react-router-dom';
+import { formatPhone } from '../../../../utils';
 
 interface PatientCardProps {
-  loading: boolean
-  patient: any
+  loading: boolean;
+  patient: any;
 }
 
 export const PatientCard = ({ loading, patient }: PatientCardProps) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const isMobile = useBreakpointValue({ base: true, md: false })
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
     <Card bg="bg-surface">
@@ -144,5 +144,5 @@ export const PatientCard = ({ loading, patient }: PatientCardProps) => {
         </Grid>
       </CardBody>
     </Card>
-  )
-}
+  );
+};

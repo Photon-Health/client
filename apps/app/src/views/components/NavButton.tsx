@@ -1,18 +1,18 @@
-import { As, Button, ButtonProps, HStack, Icon, Text } from '@chakra-ui/react'
+import { As, Button, ButtonProps, HStack, Icon, Text } from '@chakra-ui/react';
 
-import { Link as RouterLink, useMatch, useResolvedPath } from 'react-router-dom'
+import { Link as RouterLink, useMatch, useResolvedPath } from 'react-router-dom';
 
 interface NavButtonProps extends ButtonProps {
-  icon: As
-  label: string
-  link: string
+  icon: As;
+  label: string;
+  link: string;
 }
 
 export const NavButton = (props: NavButtonProps) => {
-  const { icon, label, link, ...buttonProps } = props
+  const { icon, label, link, ...buttonProps } = props;
 
-  const resolved = useResolvedPath(link)
-  const isActive = useMatch({ path: resolved.pathname, end: true })
+  const resolved = useResolvedPath(link);
+  const isActive = useMatch({ path: resolved.pathname, end: true });
 
   return (
     <Button
@@ -28,5 +28,5 @@ export const NavButton = (props: NavButtonProps) => {
         {label && <Text>{label}</Text>}
       </HStack>
     </Button>
-  )
-}
+  );
+};

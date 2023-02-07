@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import {
   Button,
   Card,
@@ -14,26 +14,26 @@ import {
   CardBody,
   Checkbox,
   Text
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { types } from '@photonhealth/react'
+import { types } from '@photonhealth/react';
 
-import { LocationSearch } from '../../../../components/LocationSearch'
-import { LocalPickup } from './components/LocalPickup'
-import { MailOrder } from './components/MailOrder'
-import { Pharmacy } from './components/Pharmacy'
-import { Address } from '../../../../../models/general'
+import { LocationSearch } from '../../../../components/LocationSearch';
+import { LocalPickup } from './components/LocalPickup';
+import { MailOrder } from './components/MailOrder';
+import { Pharmacy } from './components/Pharmacy';
+import { Address } from '../../../../../models/general';
 
 interface SelectPharmacyCardProps {
-  patient: any
-  address: Address
-  onlyCurexa: boolean
-  errors: any
-  touched: any
-  pharmacyId: string
-  setFieldValue: any
-  updatePreferredPharmacy: boolean
-  setUpdatePreferredPharmacy: (value: boolean) => void
+  patient: any;
+  address: Address;
+  onlyCurexa: boolean;
+  errors: any;
+  touched: any;
+  pharmacyId: string;
+  setFieldValue: any;
+  updatePreferredPharmacy: boolean;
+  setUpdatePreferredPharmacy: (value: boolean) => void;
 }
 
 export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
@@ -47,29 +47,29 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
   updatePreferredPharmacy,
   setUpdatePreferredPharmacy
 }: SelectPharmacyCardProps) => {
-  const [latitude, setLatitude] = useState<number | undefined>(undefined)
-  const [longitude, setLongitude] = useState<number | undefined>(undefined)
-  const [location, setLocation] = useState('')
+  const [latitude, setLatitude] = useState<number | undefined>(undefined);
+  const [longitude, setLongitude] = useState<number | undefined>(undefined);
+  const [location, setLocation] = useState('');
 
-  const [selectedTab, setSelectedTab] = useState(onlyCurexa ? 1 : 0)
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [selectedTab, setSelectedTab] = useState(onlyCurexa ? 1 : 0);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleModalClose = ({
     loc = undefined,
     lat = undefined,
     lng = undefined
   }: {
-    loc: string | undefined
-    lat: number | undefined
-    lng: number | undefined
+    loc: string | undefined;
+    lat: number | undefined;
+    lng: number | undefined;
   }) => {
     if (lat && lng && loc) {
-      setLatitude(lat)
-      setLongitude(lng)
-      setLocation(loc)
+      setLatitude(lat);
+      setLongitude(lng);
+      setLocation(loc);
     }
-    onClose()
-  }
+    onClose();
+  };
 
   const tabsList = [
     {
@@ -104,25 +104,25 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
         />
       )
     }
-  ]
+  ];
 
   const handleTabChange = (index: number) => {
-    setFieldValue('fulfillmentType', tabsList[index].fulfillmentType)
-    setSelectedTab(index)
-  }
+    setFieldValue('fulfillmentType', tabsList[index].fulfillmentType);
+    setSelectedTab(index);
+  };
 
   useEffect(() => {
-    setLatitude(undefined)
-    setLongitude(undefined)
-    setLocation('')
-  }, [patient?.id])
+    setLatitude(undefined);
+    setLongitude(undefined);
+    setLocation('');
+  }, [patient?.id]);
 
-  const geocoder = new google.maps.Geocoder()
+  const geocoder = new google.maps.Geocoder();
   useEffect(() => {
     if (!address || !address.postalCode) {
-      setLatitude(undefined)
-      setLongitude(undefined)
-      setLocation('')
+      setLatitude(undefined);
+      setLongitude(undefined);
+      setLocation('');
     } else {
       geocoder
         .geocode({
@@ -132,19 +132,19 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
         })
         .then(({ results }) => {
           if (results) {
-            setLocation(results[0].formatted_address)
-            setLatitude(results[0].geometry.location.lat())
-            setLongitude(results[0].geometry.location.lng())
+            setLocation(results[0].formatted_address);
+            setLatitude(results[0].geometry.location.lat());
+            setLongitude(results[0].geometry.location.lng());
           }
         })
         .catch((err) => {
-          console.log('Error geocoding', err)
-        })
+          console.log('Error geocoding', err);
+        });
     }
-  }, [address])
+  }, [address]);
 
   const isPreferred =
-    pharmacyId && patient?.preferredPharmacies?.some(({ id }: { id: string }) => id === pharmacyId)
+    pharmacyId && patient?.preferredPharmacies?.some(({ id }: { id: string }) => id === pharmacyId);
 
   return (
     <Card bg="bg-surface">
@@ -192,5 +192,5 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
         </Tabs>
       )}
     </Card>
-  )
-}
+  );
+};

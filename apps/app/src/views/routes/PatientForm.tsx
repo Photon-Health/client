@@ -1,8 +1,8 @@
-import * as yup from 'yup'
-import { Formik, Field } from 'formik'
-import InputMask from 'react-input-mask'
-import parsePhoneNumber from 'libphonenumber-js'
-import dayjs from 'dayjs'
+import * as yup from 'yup';
+import { Formik, Field } from 'formik';
+import InputMask from 'react-input-mask';
+import parsePhoneNumber from 'libphonenumber-js';
+import dayjs from 'dayjs';
 
 import {
   Alert,
@@ -23,14 +23,14 @@ import {
   Text,
   useColorMode,
   VStack
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { FiUser } from 'react-icons/fi'
+import { FiUser } from 'react-icons/fi';
 
-import { useNavigate } from 'react-router-dom'
-import { usePhoton } from '@photonhealth/react'
-import { confirmWrapper } from '../components/GuardDialog'
-import { OptionalText } from '../components/OptionalText'
+import { useNavigate } from 'react-router-dom';
+import { usePhoton } from '@photonhealth/react';
+import { confirmWrapper } from '../components/GuardDialog';
+import { OptionalText } from '../components/OptionalText';
 
 const genderOptions = [
   'Male/Man',
@@ -40,9 +40,9 @@ const genderOptions = [
   'Genderqueer/Gender nonconforming',
   'Something else',
   'Decline to answer'
-]
+];
 
-const sexOptions = ['Male', 'Female', 'Unknown']
+const sexOptions = ['Male', 'Female', 'Unknown'];
 
 const patientSchema = yup.object({
   name: yup
@@ -69,31 +69,31 @@ const patientSchema = yup.object({
     .string()
     .email('Email should be something like name@email.com...')
     .required('Please enter an email address...')
-})
+});
 
 interface PatientFormValues {
   name: {
-    first: string
-    last: string
-  }
-  dateOfBirth: string
-  sex: typeof sexOptions[number]
-  gender?: typeof genderOptions[number]
-  phone: string
-  email: string
+    first: string;
+    last: string;
+  };
+  dateOfBirth: string;
+  sex: (typeof sexOptions)[number];
+  gender?: (typeof genderOptions)[number];
+  phone: string;
+  email: string;
 }
 
 export const PatientForm = () => {
-  const { createPatient } = usePhoton()
+  const { createPatient } = usePhoton();
   const [createPatientMutation, { loading, error }] = createPatient({
     refetchQueries: ['getPatients'],
     awaitRefetchQueries: true
-  })
+  });
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const onClose = () => {
-    navigate('/patients')
-  }
+    navigate('/patients');
+  };
 
   const initialValues: PatientFormValues = {
     name: {
@@ -105,12 +105,12 @@ export const PatientForm = () => {
     gender: '',
     phone: '',
     email: ''
-  }
+  };
 
-  const { colorMode } = useColorMode()
+  const { colorMode } = useColorMode();
 
   const onCancel = async (dirty: Boolean) => {
-    if (!dirty) onClose()
+    if (!dirty) onClose();
     else if (
       await confirmWrapper('Lose unsaved patient?', {
         description: 'You will not be able to recover unsaved patient information.',
@@ -119,9 +119,9 @@ export const PatientForm = () => {
         darkMode: colorMode !== 'light'
       })
     ) {
-      onClose()
+      onClose();
     }
-  }
+  };
 
   return (
     <Modal isOpen onClose={onClose} size="xl" closeOnOverlayClick={false} closeOnEsc={false}>
@@ -149,10 +149,10 @@ export const PatientForm = () => {
               const vars = {
                 ...values,
                 phone: parsePhoneNumber(values.phone, 'US')?.format('E.164') || values.phone
-              }
+              };
 
-              validateForm(vars)
-              createPatientMutation({ variables: vars, onCompleted: onClose })
+              validateForm(vars);
+              createPatientMutation({ variables: vars, onCompleted: onClose });
             }}
           >
             {({
@@ -190,9 +190,9 @@ export const PatientForm = () => {
                           onPaste={(e: any) => {
                             const paste = (
                               e.clipboardData || (window as any).clipboardData
-                            ).getData('text')
-                            const parsed = dayjs(paste).format('YYYY-MM-DD')
-                            setFieldValue('dateOfBirth', parsed)
+                            ).getData('text');
+                            const parsed = dayjs(paste).format('YYYY-MM-DD');
+                            setFieldValue('dateOfBirth', parsed);
                           }}
                         />
                         <FormErrorMessage>{errors.dateOfBirth}</FormErrorMessage>
@@ -208,20 +208,20 @@ export const PatientForm = () => {
                           onChange={handleChange}
                           onBlur={handleBlur}
                           onPaste={(e: any) => {
-                            e.preventDefault()
+                            e.preventDefault();
                             const paste = (
                               e.clipboardData || (window as any).clipboardData
-                            ).getData('text')
-                            const parsed = parsePhoneNumber(paste, 'US')
+                            ).getData('text');
+                            const parsed = parsePhoneNumber(paste, 'US');
                             const formatted = `(${parsed?.nationalNumber.slice(
                               0,
                               3
                             )}) ${parsed?.nationalNumber.slice(
                               3,
                               6
-                            )}-${parsed?.nationalNumber.slice(6)}`
-                            e.target.value = formatted
-                            setFieldValue('phone', parsed?.nationalNumber)
+                            )}-${parsed?.nationalNumber.slice(6)}`;
+                            e.target.value = formatted;
+                            setFieldValue('phone', parsed?.nationalNumber);
                           }}
                         />
                         <FormErrorMessage>{errors.phone}</FormErrorMessage>
@@ -234,12 +234,12 @@ export const PatientForm = () => {
                         </FormLabel>
                         <Field as={Select} name="gender" placeholder=" ">
                           {genderOptions.map((option) => {
-                            const lowercaseOption = option.toLowerCase()
+                            const lowercaseOption = option.toLowerCase();
                             return (
                               <option key={lowercaseOption} value={option}>
                                 {option}
                               </option>
-                            )
+                            );
                           })}
                           <FormErrorMessage>{errors.gender}</FormErrorMessage>
                         </Field>
@@ -248,13 +248,13 @@ export const PatientForm = () => {
                         <FormLabel htmlFor="sex">Sex at Birth</FormLabel>
                         <Field as={Select} name="sex" placeholder=" ">
                           {sexOptions.map((option) => {
-                            const lowercaseOption = option.toLowerCase()
-                            const uppercaseOption = option.toUpperCase()
+                            const lowercaseOption = option.toLowerCase();
+                            const uppercaseOption = option.toUpperCase();
                             return (
                               <option key={lowercaseOption} value={uppercaseOption}>
                                 {option}
                               </option>
-                            )
+                            );
                           })}
                         </Field>
                         <FormErrorMessage>{errors.sex}</FormErrorMessage>
@@ -290,11 +290,11 @@ export const PatientForm = () => {
                     </HStack>
                   </ModalFooter>
                 </form>
-              )
+              );
             }}
           </Formik>
         </ModalBody>
       </ModalContent>
     </Modal>
-  )
-}
+  );
+};

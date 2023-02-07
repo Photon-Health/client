@@ -9,15 +9,15 @@ import {
   AlertIcon,
   Container,
   Divider
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { usePhoton } from '@photonhealth/react'
+import { usePhoton } from '@photonhealth/react';
 
-import { ClientInfoCard } from './ClientInfoCard'
+import { ClientInfoCard } from './ClientInfoCard';
 
 export const Credentials = () => {
-  const { getClients } = usePhoton()
-  const { loading, error, clients } = getClients()
+  const { getClients } = usePhoton();
+  const { loading, error, clients } = getClients();
 
   return (
     <Box
@@ -60,7 +60,7 @@ export const Credentials = () => {
         )}
         <Stack spacing={6}>
           {clients.map((client: any) => {
-            return <ClientInfoCard key={client.id} client={client} />
+            return <ClientInfoCard key={client.id} client={client} />;
           })}
         </Stack>
         {error && (
@@ -71,5 +71,5 @@ export const Credentials = () => {
         )}
       </Container>
     </Box>
-  )
-}
+  );
+};

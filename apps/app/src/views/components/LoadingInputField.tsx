@@ -1,8 +1,8 @@
-import { FieldAttributes, Field } from 'formik'
-import { Input, InputGroup, InputRightElement, Spinner } from '@chakra-ui/react'
+import { FieldAttributes, Field } from 'formik';
+import { Input, InputGroup, InputRightElement, Spinner } from '@chakra-ui/react';
 
 export const LoadingInputField = (props: FieldAttributes<any>) => {
-  const { loading, displayOnly, disabled } = props
+  const { loading, displayOnly, disabled } = props;
 
   return (
     <InputGroup>
@@ -13,5 +13,5 @@ export const LoadingInputField = (props: FieldAttributes<any>) => {
         </InputRightElement>
       )}
     </InputGroup>
-  )
-}
+  );
+};

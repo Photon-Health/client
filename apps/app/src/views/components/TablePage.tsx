@@ -1,4 +1,4 @@
-import { ReactNode, useMemo, useCallback, useEffect, useRef, useState, ReactElement } from 'react'
+import { ReactNode, useMemo, useCallback, useEffect, useRef, useState, ReactElement } from 'react';
 import {
   Alert,
   AlertIcon,
@@ -21,39 +21,39 @@ import {
   Tr,
   useBreakpointValue,
   useColorModeValue
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import InfiniteScroll from 'react-infinite-scroll-component'
+import InfiniteScroll from 'react-infinite-scroll-component';
 
-import { FiSearch, FiPlus } from 'react-icons/fi'
-import { Outlet, Link as RouterLink } from 'react-router-dom'
+import { FiSearch, FiPlus } from 'react-icons/fi';
+import { Outlet, Link as RouterLink } from 'react-router-dom';
 
-import { Column, useTable, useSortBy } from 'react-table'
+import { Column, useTable, useSortBy } from 'react-table';
 
 interface TablePageProps {
-  loading?: boolean
-  error?: Error
-  data: Array<any>
-  columns: Array<Column>
-  enableSorting?: boolean
-  hideHeaders?: boolean
-  setFilterText: (filter: string) => void
-  filterText: string
-  fetchMoreData?: () => void
-  hasMore?: boolean
-  searchPlaceholder?: string
-  ctaText?: string
-  ctaColor?: string
-  ctaRoute?: string
-  ctaOnClick?: () => void
-  paginationIndicator?: Element | ReactElement
-  paginationActions?: Element | ReactElement
-  total?: number
-  useLoadingOverlay?: boolean
+  loading?: boolean;
+  error?: Error;
+  data: Array<any>;
+  columns: Array<Column>;
+  enableSorting?: boolean;
+  hideHeaders?: boolean;
+  setFilterText: (filter: string) => void;
+  filterText: string;
+  fetchMoreData?: () => void;
+  hasMore?: boolean;
+  searchPlaceholder?: string;
+  ctaText?: string;
+  ctaColor?: string;
+  ctaRoute?: string;
+  ctaOnClick?: () => void;
+  paginationIndicator?: Element | ReactElement;
+  paginationActions?: Element | ReactElement;
+  total?: number;
+  useLoadingOverlay?: boolean;
 }
 
 export const TablePage = (props: TablePageProps) => {
-  let { data, columns } = props
+  let { data, columns } = props;
   const {
     loading,
     error,
@@ -72,57 +72,57 @@ export const TablePage = (props: TablePageProps) => {
     paginationActions,
     total,
     useLoadingOverlay
-  } = props
+  } = props;
 
   const handleInputChange = useCallback(
     (e: any) => {
-      setFilterText(e.target.value)
+      setFilterText(e.target.value);
     },
     [setFilterText]
-  )
+  );
 
-  const isMobile = useBreakpointValue({ base: true, md: false })
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
-  data = useMemo(() => data, [data])
-  columns = useMemo(() => columns, [columns])
+  data = useMemo(() => data, [data]);
+  columns = useMemo(() => columns, [columns]);
 
-  const observableRef: any = useRef()
+  const observableRef: any = useRef();
 
-  const [hasObserver, setHasObserver] = useState(false)
-  const [fetch, setFetch] = useState(false)
-  const tableRef: any = useRef()
+  const [hasObserver, setHasObserver] = useState(false);
+  const [fetch, setFetch] = useState(false);
+  const tableRef: any = useRef();
 
   useEffect(() => {
     if (fetch) {
       if (fetchMoreData) {
-        fetchMoreData()
+        fetchMoreData();
       }
     }
-  }, [fetch, fetchMoreData])
+  }, [fetch, fetchMoreData]);
 
   const observer = new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting && data.length >= 25 && hasMore && fetchMoreData) {
-      setFetch(true)
+      setFetch(true);
     } else {
-      setFetch(false)
+      setFetch(false);
     }
-  })
+  });
 
   useEffect(() => {
     if (data.length > 0 && observableRef.current && !hasObserver) {
-      observer.observe(observableRef.current)
-      setHasObserver(true)
+      observer.observe(observableRef.current);
+      setHasObserver(true);
     }
-  }, [observableRef, data])
+  }, [observableRef, data]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable(
     // @ts-ignore
     { columns, data, disableSortBy: !enableSorting },
     useSortBy
-  )
+  );
 
   const ctaRouteColorTextUndefined =
-    ctaRoute === undefined || ctaColor === undefined || ctaText === undefined
+    ctaRoute === undefined || ctaColor === undefined || ctaText === undefined;
 
   return (
     <Box
@@ -233,7 +233,7 @@ export const TablePage = (props: TablePageProps) => {
                   // Loop over the table rows
                   rows.map((row) => {
                     // Prepare the row for display
-                    prepareRow(row)
+                    prepareRow(row);
                     return (
                       // Apply the row props
                       <Tr {...row.getRowProps()}>
@@ -258,11 +258,11 @@ export const TablePage = (props: TablePageProps) => {
                                   cell.render('Cell')
                                 }
                               </Td>
-                            )
+                            );
                           })
                         }
                       </Tr>
-                    )
+                    );
                   })
                 }
               </Tbody>
@@ -295,8 +295,8 @@ export const TablePage = (props: TablePageProps) => {
       </Stack>
       <Outlet />
     </Box>
-  )
-}
+  );
+};
 
 TablePage.defaultProps = {
   loading: false,
@@ -314,4 +314,4 @@ TablePage.defaultProps = {
   paginationActions: undefined,
   total: undefined,
   useLoadingOverlay: false
-}
+};

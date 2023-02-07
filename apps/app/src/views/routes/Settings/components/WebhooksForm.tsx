@@ -1,5 +1,5 @@
-import * as yup from 'yup'
-import { Formik, Field } from 'formik'
+import * as yup from 'yup';
+import { Formik, Field } from 'formik';
 
 import {
   Alert,
@@ -24,11 +24,11 @@ import {
   SimpleGrid,
   Stack,
   VStack
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import React, { useEffect } from 'react'
-import { usePhoton } from '@photonhealth/react'
-import { capitalizeFirst } from '../../../../utils'
+import React, { useEffect } from 'react';
+import { usePhoton } from '@photonhealth/react';
+import { capitalizeFirst } from '../../../../utils';
 
 const hookSchema = yup.object({
   url: yup
@@ -41,35 +41,35 @@ const hookSchema = yup.object({
   sharedSecret: yup.string().matches(/^\S*$/, 'Secrets cannot contain any whitespace'),
   radioGroup: yup.string().required('Please select one of the options'),
   filters: yup.array()
-})
+});
 
 interface WebhooksFormValues {
-  url: string
-  sharedSecret: string
-  radioGroup: string
-  filters: string[]
+  url: string;
+  sharedSecret: string;
+  radioGroup: string;
+  filters: string[];
 }
 
 interface WebhooksFormProps {
-  isOpen: boolean
-  close: () => void
+  isOpen: boolean;
+  close: () => void;
 }
 
 export const WebhooksForm = ({ isOpen, close }: WebhooksFormProps) => {
-  const [eventValue, setEventValue] = React.useState('')
+  const [eventValue, setEventValue] = React.useState('');
 
-  const { createWebhook } = usePhoton()
+  const { createWebhook } = usePhoton();
   const [createWebhookConfig, { loading, error }] = createWebhook({
     refetchQueries: ['getWebhooks'],
     awaitRefetchQueries: true
-  })
+  });
 
   const initialValues: WebhooksFormValues = {
     url: '',
     sharedSecret: '',
     radioGroup: '',
     filters: []
-  }
+  };
 
   const allFilters = [
     'photon:order:created',
@@ -81,11 +81,11 @@ export const WebhooksForm = ({ isOpen, close }: WebhooksFormProps) => {
     'photon:prescription:depleted',
     'photon:prescription:expired',
     'photon:prescription:active'
-  ]
+  ];
 
   useEffect(() => {
-    if (!isOpen) setEventValue('')
-  }, [isOpen])
+    if (!isOpen) setEventValue('');
+  }, [isOpen]);
 
   return (
     <Modal isOpen={isOpen} onClose={close} size="xl">
@@ -103,12 +103,12 @@ export const WebhooksForm = ({ isOpen, close }: WebhooksFormProps) => {
             initialValues={initialValues}
             validationSchema={hookSchema}
             onSubmit={async (values, { validateForm }) => {
-              validateForm(values)
+              validateForm(values);
               if (eventValue === 'all') {
                 // eslint-disable-next-line no-param-reassign
-                values.filters = allFilters
+                values.filters = allFilters;
               }
-              createWebhookConfig({ variables: values, onCompleted: close })
+              createWebhookConfig({ variables: values, onCompleted: close });
             }}
           >
             {({ setFieldValue, handleSubmit, errors, touched }) => {
@@ -155,7 +155,7 @@ export const WebhooksForm = ({ isOpen, close }: WebhooksFormProps) => {
                           as={CheckboxGroup}
                           name="filters"
                           onChange={() => {
-                            setFieldValue('filters', [])
+                            setFieldValue('filters', []);
                           }}
                         >
                           <HStack alignItems="start" spacing={20}>
@@ -180,11 +180,11 @@ export const WebhooksForm = ({ isOpen, close }: WebhooksFormProps) => {
                     </Button>
                   </ModalFooter>
                 </form>
-              )
+              );
             }}
           </Formik>
         </ModalBody>
       </ModalContent>
     </Modal>
-  )
-}
+  );
+};

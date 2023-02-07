@@ -1,14 +1,14 @@
-import * as React from 'react'
-import { render, RenderOptions } from '@testing-library/react'
-import { ChakraProvider, theme } from '@chakra-ui/react'
+import * as React from 'react';
+import { render, RenderOptions } from '@testing-library/react';
+import { ChakraProvider, theme } from '@chakra-ui/react';
 
 function AllProviders({ children }: { children?: React.ReactNode }) {
-  return <ChakraProvider theme={theme}>{children}</ChakraProvider>
+  return <ChakraProvider theme={theme}>{children}</ChakraProvider>;
 }
 
-AllProviders.defaultProps = { children: [] }
+AllProviders.defaultProps = { children: [] };
 
 const customRender = (ui: React.ReactElement, options?: RenderOptions) =>
-  render(ui, { wrapper: AllProviders, ...options })
+  render(ui, { wrapper: AllProviders, ...options });
 
-export { customRender as render }
+export { customRender as render };

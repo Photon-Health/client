@@ -1,4 +1,4 @@
-import { Button, HStack } from '@chakra-ui/react'
+import { Button, HStack } from '@chakra-ui/react';
 
 export const CtaButtons = ({
   edit,
@@ -24,4 +24,4 @@ export const CtaButtons = ({
       {edit ? 'Save Changes' : 'Create Template'}
     </Button>
   </HStack>
-)
+);

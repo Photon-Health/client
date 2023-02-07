@@ -1,4 +1,4 @@
-import { Link as RouterLink, useSearchParams } from 'react-router-dom'
+import { Link as RouterLink, useSearchParams } from 'react-router-dom';
 
 import {
   Badge,
@@ -14,17 +14,17 @@ import {
   SkeletonText,
   Text,
   useBreakpointValue
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { FiInfo } from 'react-icons/fi'
-import { useEffect, useState } from 'react'
-import { useDebounce } from 'use-debounce'
-import { usePhoton } from '@photonhealth/react'
-import { Page } from '../components/Page'
-import { TablePage } from '../components/TablePage'
-import PatientView from '../components/PatientView'
-import PharmacyNameView from '../components/PharmacyNameView'
-import { formatDate } from '../../utils'
+import { FiInfo } from 'react-icons/fi';
+import { useEffect, useState } from 'react';
+import { useDebounce } from 'use-debounce';
+import { usePhoton } from '@photonhealth/react';
+import { Page } from '../components/Page';
+import { TablePage } from '../components/TablePage';
+import PatientView from '../components/PatientView';
+import PharmacyNameView from '../components/PharmacyNameView';
+import { formatDate } from '../../utils';
 
 export const ORDER_FULFILLMENT_STATE_MAP: object = {
   SENT: 'Sent',
@@ -36,7 +36,7 @@ export const ORDER_FULFILLMENT_STATE_MAP: object = {
   FILLING: 'Filling',
   SHIPPED: 'Shipped',
   DELIVERED: 'Delivered'
-}
+};
 
 export const ORDER_FULFILLMENT_COLOR_MAP: object = {
   SENT: 'yellow',
@@ -48,14 +48,14 @@ export const ORDER_FULFILLMENT_COLOR_MAP: object = {
   FILLING: 'orange',
   SHIPPED: 'green',
   DELIVERED: 'gray'
-}
+};
 
 interface ActionsProps {
-  id: string
+  id: string;
 }
 
 const Actions = (props: ActionsProps) => {
-  const { id } = props
+  const { id } = props;
   return (
     <HStack spacing="0">
       <IconButton
@@ -67,17 +67,17 @@ const Actions = (props: ActionsProps) => {
         to={`/orders/${id}`}
       />
     </HStack>
-  )
-}
+  );
+};
 
 const renderRow = (order: any) => {
-  const { id, pharmacy, patient } = order
-  const extId = order.externalId || <Text as="i">None</Text>
+  const { id, pharmacy, patient } = order;
+  const extId = order.externalId || <Text as="i">None</Text>;
 
   const fills = order.fills.reduce((prev: string, cur: any) => {
-    const fill = cur.treatment.name
-    return prev ? `${prev}, ${fill}` : fill
-  }, '')
+    const fill = cur.treatment.name;
+    return prev ? `${prev}, ${fill}` : fill;
+  }, '');
 
   const pharmacyView = pharmacy?.name ? (
     <Popover>
@@ -106,19 +106,19 @@ const renderRow = (order: any) => {
     </Popover>
   ) : (
     <Text as="i">Pending</Text>
-  )
+  );
 
-  let state
-  let stateColor
+  let state;
+  let stateColor;
   if (order.fulfillment?.state) {
     if (ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof object]) {
-      state = ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof object]
-      stateColor = ORDER_FULFILLMENT_COLOR_MAP[order.fulfillment.state as keyof object]
+      state = ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof object];
+      stateColor = ORDER_FULFILLMENT_COLOR_MAP[order.fulfillment.state as keyof object];
     } else {
       // If state is not handled in the list, format the name and use a default color
-      const s = order.fulfillment.state
-      state = s[0].toUpperCase() + s.slice(1).toLowerCase()
-      stateColor = 'gray'
+      const s = order.fulfillment.state;
+      state = s[0].toUpperCase() + s.slice(1).toLowerCase();
+      stateColor = 'gray';
     }
   }
 
@@ -137,8 +137,8 @@ const renderRow = (order: any) => {
     patient: <PatientView patient={patient} />,
     pharmacy: pharmacyView,
     actions: <Actions id={id} />
-  }
-}
+  };
+};
 
 const renderSkeletonRow = (isMobile: boolean | undefined) =>
   isMobile
@@ -169,11 +169,11 @@ const renderSkeletonRow = (isMobile: boolean | undefined) =>
         createdAt: <SkeletonText noOfLines={1} />,
         externalId: <SkeletonText noOfLines={1} width="50px" />,
         actions: <SkeletonCircle size="5" />
-      }
+      };
 
 export const Orders = () => {
-  const [params] = useSearchParams()
-  const patientId = params.get('patientId')
+  const [params] = useSearchParams();
+  const patientId = params.get('patientId');
 
   const columns = [
     {
@@ -206,29 +206,29 @@ export const Orders = () => {
       Header: '',
       accessor: 'actions'
     }
-  ]
+  ];
 
-  const { getOrders } = usePhoton()
-  const [filterText, setFilterText] = useState('')
-  const [rows, setRows] = useState<any[]>([])
-  const [finished, setFinished] = useState(false)
-  const [filterTextDebounce] = useDebounce(filterText, 250)
+  const { getOrders } = usePhoton();
+  const [filterText, setFilterText] = useState('');
+  const [rows, setRows] = useState<any[]>([]);
+  const [finished, setFinished] = useState(false);
+  const [filterTextDebounce] = useDebounce(filterText, 250);
 
-  const isMobile = useBreakpointValue({ base: true, md: false })
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   const { orders, loading, error, refetch } = getOrders({
     patientId,
     patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
-  })
+  });
 
   useEffect(() => {
     if (!loading) {
-      setRows(orders.map(renderRow))
-      setFinished(orders.length === 0)
+      setRows(orders.map(renderRow));
+      setFinished(orders.length === 0);
     }
-  }, [loading])
+  }, [loading]);
 
-  const skeletonRows = new Array(25).fill(0).map(() => renderSkeletonRow(isMobile))
+  const skeletonRows = new Array(25).fill(0).map(() => renderSkeletonRow(isMobile));
 
   return (
     <Page header="Orders">
@@ -250,14 +250,14 @@ export const Orders = () => {
               patientId: patientId || undefined,
               patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
               after: rows?.at(-1)?.id
-            })
+            });
             if (data?.orders.length === 0) {
-              setFinished(true)
+              setFinished(true);
             }
-            setRows(rows.concat(data?.orders.map(renderRow)))
+            setRows(rows.concat(data?.orders.map(renderRow)));
           }
         }}
       />
     </Page>
-  )
-}
+  );
+};

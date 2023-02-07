@@ -7,20 +7,20 @@ import {
   MenuList,
   useColorMode,
   useBreakpointValue
-} from '@chakra-ui/react'
-import { FiEdit, FiEye, FiMoreVertical, FiTrash } from 'react-icons/fi'
+} from '@chakra-ui/react';
+import { FiEdit, FiEye, FiMoreVertical, FiTrash } from 'react-icons/fi';
 
-import { usePhoton } from '@photonhealth/react'
+import { usePhoton } from '@photonhealth/react';
 
-import { CATALOG_TREATMENTS_FIELDS } from '../../../../model/fragments'
-import { confirmWrapper } from '../../../components/GuardDialog'
+import { CATALOG_TREATMENTS_FIELDS } from '../../../../model/fragments';
+import { confirmWrapper } from '../../../components/GuardDialog';
 
 export const TemplateActions = (props: any) => {
-  const { template, setSingleView, catalogId, setLoading, setTemplateToEdit, setShowModal } = props
+  const { template, setSingleView, catalogId, setLoading, setTemplateToEdit, setShowModal } = props;
 
-  const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false })
+  const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
 
-  const { deletePrescriptionTemplate } = usePhoton()
+  const { deletePrescriptionTemplate } = usePhoton();
 
   const [deleteRxTemplateMutation] = deletePrescriptionTemplate({
     refetchQueries: ['getCatalog'],
@@ -31,14 +31,14 @@ export const TemplateActions = (props: any) => {
         CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
       }
     }
-  })
+  });
 
-  const { colorMode } = useColorMode()
+  const { colorMode } = useColorMode();
 
   const handleEdit = () => {
-    if (isMobileAndTablet) setShowModal.on()
-    setTemplateToEdit(template)
-  }
+    if (isMobileAndTablet) setShowModal.on();
+    setTemplateToEdit(template);
+  };
 
   return (
     <HStack justifyContent="flex-end">
@@ -66,16 +66,16 @@ export const TemplateActions = (props: any) => {
                 confirmText: 'Yes, Delete',
                 darkMode: colorMode !== 'light',
                 colorScheme: 'red'
-              })
+              });
               if (decision) {
-                setLoading(true)
+                setLoading(true);
                 await deleteRxTemplateMutation({
                   variables: {
                     catalogId,
                     templateId: template.id
                   },
                   onCompleted: () => setLoading(false)
-                })
+                });
               }
             }}
           >
@@ -84,5 +84,5 @@ export const TemplateActions = (props: any) => {
         </MenuList>
       </Menu>
     </HStack>
-  )
-}
+  );
+};

@@ -1,6 +1,6 @@
-import { Box, FormControl, FormLabel, HStack, FormErrorMessage } from '@chakra-ui/react'
+import { Box, FormControl, FormLabel, HStack, FormErrorMessage } from '@chakra-ui/react';
 
-import { MedicationSelect } from '../../../../../components/MedicationSelect'
+import { MedicationSelect } from '../../../../../components/MedicationSelect';
 
 export const Treatment = ({
   errors,
@@ -37,4 +37,4 @@ export const Treatment = ({
       <FormErrorMessage>{errors.treatment?.id}</FormErrorMessage>
     </FormControl>
   </HStack>
-)
+);

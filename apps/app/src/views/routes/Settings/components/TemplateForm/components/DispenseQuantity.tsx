@@ -8,18 +8,18 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { Field, FieldProps } from 'formik'
-import { BsCalculator } from 'react-icons/bs'
+import { Field, FieldProps } from 'formik';
+import { BsCalculator } from 'react-icons/bs';
 
 interface DispenseQuantityProps {
-  errors: any
-  touched: any
-  quantityRef: any
-  setFieldValue: any
-  hidden: boolean
-  setDoseCalcVis: any
+  errors: any;
+  touched: any;
+  quantityRef: any;
+  setFieldValue: any;
+  hidden: boolean;
+  setDoseCalcVis: any;
 }
 
 export const DispenseQuantity = ({
@@ -54,7 +54,7 @@ export const DispenseQuantity = ({
                 </NumberInputStepper>
               </NumberInput>
             </>
-          )
+          );
         }}
       </Field>
       <FormErrorMessage>{errors.dispenseQuantity}</FormErrorMessage>
@@ -67,5 +67,5 @@ export const DispenseQuantity = ({
         Dose Calculator
       </Button>
     </FormControl>
-  )
-}
+  );
+};

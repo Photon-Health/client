@@ -1,7 +1,7 @@
 // Not currently used, will be when post-prescribe is enabled
 
-import { Card, HStack, Link, Radio, Text, VStack } from '@chakra-ui/react'
-import { formatPhone } from '../../../../../../utils'
+import { Card, HStack, Link, Radio, Text, VStack } from '@chakra-ui/react';
+import { formatPhone } from '../../../../../../utils';
 
 export const SendToPatient = ({ patient }: any) => {
   return patient ? (
@@ -31,5 +31,5 @@ export const SendToPatient = ({ patient }: any) => {
     </VStack>
   ) : (
     <Text>Please select a patient to view this option</Text>
-  )
-}
+  );
+};

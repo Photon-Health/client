@@ -1,7 +1,7 @@
-import { Select, NoticeProps, chakraComponents } from 'chakra-react-select'
-import { useField, FieldAttributes } from 'formik'
-import { Button, Text, HStack, forwardRef } from '@chakra-ui/react'
-import { useEffect } from 'react'
+import { Select, NoticeProps, chakraComponents } from 'chakra-react-select';
+import { useField, FieldAttributes } from 'formik';
+import { Button, Text, HStack, forwardRef } from '@chakra-ui/react';
+import { useEffect } from 'react';
 
 const NoOptionsMessage =
   (
@@ -25,8 +25,8 @@ const NoOptionsMessage =
           </Button>
         </HStack>
       </chakraComponents.NoOptionsMessage>
-    )
-  }
+    );
+  };
 
 export const SelectField = forwardRef((props: FieldAttributes<any>, ref: any) => {
   const {
@@ -43,51 +43,51 @@ export const SelectField = forwardRef((props: FieldAttributes<any>, ref: any) =>
     fetchMoreData,
     hasMore,
     onFormPopulated
-  } = props
-  const [field, meta, { setValue, setTouched }] = useField(name)
+  } = props;
+  const [field, meta, { setValue, setTouched }] = useField(name);
 
   const fetchMore = () => {
     if (paginated && hasMore) {
-      fetchMoreData()
+      fetchMoreData();
     }
-  }
+  };
 
   useEffect(() => {
     if (onFormPopulated && meta.touched === false && meta.value.length > 0 && options.length > 0) {
       if (!options.map((y: any) => y.value).includes(meta.value)) {
-        onFormPopulated(meta.value)
+        onFormPopulated(meta.value);
       }
     }
-  }, [meta.touched, options])
+  }, [meta.touched, options]);
 
   const onChanged = (selected: any) => {
-    if (onChange && selected?.value) onChange(selected.value)
+    if (onChange && selected?.value) onChange(selected.value);
 
     if (!selected || !selected.value) {
-      setValue({ value: '', label: '' })
+      setValue({ value: '', label: '' });
     } else if (Array.isArray(selected)) {
-      const values = selected.map((s) => s.value)
-      setValue(values)
+      const values = selected.map((s) => s.value);
+      setValue(values);
     } else {
-      setValue(selected.value)
+      setValue(selected.value);
     }
-  }
+  };
 
-  const isEqual = (option: any) => option?.value === field.value
+  const isEqual = (option: any) => option?.value === field.value;
 
   const customNoOptions = NoOptionsMessage(
     () => onExpandedSearchClick(filterText),
     expandedSearchLabel,
     expandedSearchNoResultsLabel
-  )
+  );
 
   const handleSearch = (val: string) => {
     if (setFilterText) {
       if (val !== filterText) {
-        setFilterText(val)
+        setFilterText(val);
       }
     }
-  }
+  };
 
   return (
     <Select
@@ -107,5 +107,5 @@ export const SelectField = forwardRef((props: FieldAttributes<any>, ref: any) =>
           : { ...props.components }
       }
     />
-  )
-})
+  );
+});

@@ -1,4 +1,4 @@
-import { useField } from 'formik'
+import { useField } from 'formik';
 import {
   Box,
   Checkbox,
@@ -11,33 +11,33 @@ import {
   Thead,
   Tr,
   useColorModeValue
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { usePhoton } from '@photonhealth/react'
-import { useEffect, useRef, useState } from 'react'
-import { formatDate } from '../../utils'
-import { LoadingInputField } from './LoadingInputField'
+import { usePhoton } from '@photonhealth/react';
+import { useEffect, useRef, useState } from 'react';
+import { formatDate } from '../../utils';
+import { LoadingInputField } from './LoadingInputField';
 
 interface FillsSelectProps {
-  name: string
-  patientId: string
-  initialFills?: string[]
+  name: string;
+  patientId: string;
+  initialFills?: string[];
 }
 
 export const FillsSelect = (props: FillsSelectProps) => {
-  const { patientId, name, initialFills } = props
+  const { patientId, name, initialFills } = props;
 
-  const [, , { setValue }] = useField(name)
-  const [selected, setSelected] = useState<any[]>(initialFills ?? [])
+  const [, , { setValue }] = useField(name);
+  const [selected, setSelected] = useState<any[]>(initialFills ?? []);
 
-  const [finished, setFinished] = useState<boolean>(false)
-  const [options, setOptions] = useState<any[]>([])
+  const [finished, setFinished] = useState<boolean>(false);
+  const [options, setOptions] = useState<any[]>([]);
 
-  const { getPrescriptions } = usePhoton()
+  const { getPrescriptions } = usePhoton();
 
   const mapOption = (script: any) => {
-    const effective = formatDate(script.effectiveDate)
-    const expires = formatDate(script.expirationDate)
+    const effective = formatDate(script.effectiveDate);
+    const expires = formatDate(script.expirationDate);
     return {
       value: {
         treatmentId: script.treatment.id,
@@ -48,36 +48,36 @@ export const FillsSelect = (props: FillsSelectProps) => {
       fillsAllowed: `${script.fillsAllowed}`,
       effective: `${effective}`,
       expires: `${expires}`
-    }
-  }
+    };
+  };
   const { prescriptions, loading, error, refetch } = getPrescriptions({
     patientId,
     // @ts-ignore
     state: 'ACTIVE'
-  })
+  });
 
   const matchSelectedPatient = (prescription: { patient: { id: string } }) =>
-    prescription.patient.id === patientId
+    prescription.patient.id === patientId;
 
   useEffect(() => {
     if (!loading && patientId && prescriptions.every(matchSelectedPatient)) {
-      setOptions(prescriptions.map(mapOption))
-      setFinished(true)
+      setOptions(prescriptions.map(mapOption));
+      setFinished(true);
     }
-  }, [loading])
+  }, [loading]);
 
   useEffect(() => {
     if (!loading && patientId && prescriptions.every(matchSelectedPatient)) {
-      setOptions(prescriptions.map(mapOption))
-      setFinished(true)
+      setOptions(prescriptions.map(mapOption));
+      setFinished(true);
     }
-  }, [prescriptions])
+  }, [prescriptions]);
 
   useEffect(() => {
-    setValue(selected.map((prescriptionId) => ({ prescriptionId })))
-  }, [selected])
+    setValue(selected.map((prescriptionId) => ({ prescriptionId })));
+  }, [selected]);
 
-  if (error) return <Text color="red">{error.message}</Text>
+  if (error) return <Text color="red">{error.message}</Text>;
 
   const fetchMoreData = async () => {
     if (patientId && !loading) {
@@ -86,29 +86,29 @@ export const FillsSelect = (props: FillsSelectProps) => {
         // @ts-ignore
         state: 'ACTIVE',
         after: options?.at(-1)?.value.prescriptionId
-      })
+      });
       if (data?.prescriptions.length === 0) {
-        setFinished(true)
+        setFinished(true);
       }
       if (data.prescriptions.every(matchSelectedPatient)) {
-        setOptions([...new Set(options.concat(data?.prescriptions.map(mapOption)))])
-        setFinished(true)
+        setOptions([...new Set(options.concat(data?.prescriptions.map(mapOption)))]);
+        setFinished(true);
       }
     }
-  }
+  };
 
-  const listInnerRef = useRef<HTMLDivElement>(null)
+  const listInnerRef = useRef<HTMLDivElement>(null);
 
   const onScroll = () => {
     if (listInnerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current
+      const { scrollTop, scrollHeight, clientHeight } = listInnerRef.current;
       if (scrollTop + clientHeight === scrollHeight) {
-        fetchMoreData()
+        fetchMoreData();
       }
     }
-  }
+  };
 
-  const borderColor = useColorModeValue('gray.200', 'gray.700')
+  const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   if (patientId && !loading && finished) {
     return (
@@ -159,7 +159,7 @@ export const FillsSelect = (props: FillsSelectProps) => {
           </Text>
         )}
       </Box>
-    )
+    );
   }
 
   return (
@@ -168,9 +168,9 @@ export const FillsSelect = (props: FillsSelectProps) => {
       displayOnly
       loading={(patientId && loading) || (patientId && !finished) ? 1 : 0}
     />
-  )
-}
+  );
+};
 
 FillsSelect.defaultProps = {
   initialFills: []
-}
+};

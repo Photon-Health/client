@@ -5,14 +5,14 @@ import {
   Input,
   InputGroup,
   InputRightElement
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
 interface AppNameViewProps {
-  name: string
+  name: string;
 }
 
 export const AppNameView = (props: AppNameViewProps) => {
-  const { name } = props
+  const { name } = props;
 
   return (
     <FormControl id="app_name">
@@ -25,5 +25,5 @@ export const AppNameView = (props: AppNameViewProps) => {
         </InputRightElement>
       </InputGroup>
     </FormControl>
-  )
-}
+  );
+};

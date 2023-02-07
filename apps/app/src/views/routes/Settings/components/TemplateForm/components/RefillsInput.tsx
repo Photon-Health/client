@@ -7,15 +7,15 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { Field, FieldProps } from 'formik'
+import { Field, FieldProps } from 'formik';
 
 interface RefillsInputProps {
-  errors: any
-  touched: any
-  hidden: boolean
-  setFieldValue: any
+  errors: any;
+  touched: any;
+  hidden: boolean;
+  setFieldValue: any;
 }
 
 export const RefillsInput = ({ errors, touched, hidden, setFieldValue }: RefillsInputProps) => {
@@ -43,10 +43,10 @@ export const RefillsInput = ({ errors, touched, hidden, setFieldValue }: Refills
                 </NumberInputStepper>
               </NumberInput>
             </>
-          )
+          );
         }}
       </Field>
       <FormErrorMessage>{errors.refillsInput}</FormErrorMessage>
     </FormControl>
-  )
-}
+  );
+};

@@ -1,28 +1,28 @@
-import { ColorModeScript } from '@chakra-ui/react'
+import { ColorModeScript } from '@chakra-ui/react';
 
-import { Routes, Route, BrowserRouter } from 'react-router-dom'
+import { Routes, Route, BrowserRouter } from 'react-router-dom';
 
-import { AppState } from '@auth0/auth0-react'
-import { PhotonClient, PhotonProvider } from '@photonhealth/react'
+import { AppState } from '@auth0/auth0-react';
+import { PhotonClient, PhotonProvider } from '@photonhealth/react';
 
-import { Login } from './views/routes/Login'
-import { Logout } from './views/routes/Logout'
-import { Main } from './views/routes/Main'
-import { NotFound } from './views/routes/NotFound'
-import { Orders } from './views/routes/Orders'
-import { Order } from './views/routes/Order'
-import { Patient } from './views/routes/Patient'
-import { Prescription } from './views/routes/Prescription'
-import { PatientForm } from './views/routes/PatientForm'
-import { PrescriptionForm } from './views/routes/PrescriptionForm'
-import { Patients } from './views/routes/Patients'
-import { Prescriptions } from './views/routes/Prescriptions'
-import { Settings } from './views/routes/Settings'
-import { Support } from './views/routes/Support'
-import { UpdatePatientForm } from './views/routes/UpdatePatientForm'
-import { NewOrder } from './views/routes/NewOrder'
-import { auth0Config } from './configs/auth'
-import { AlertDisplay } from './views/components/AlertDisplay'
+import { Login } from './views/routes/Login';
+import { Logout } from './views/routes/Logout';
+import { Main } from './views/routes/Main';
+import { NotFound } from './views/routes/NotFound';
+import { Orders } from './views/routes/Orders';
+import { Order } from './views/routes/Order';
+import { Patient } from './views/routes/Patient';
+import { Prescription } from './views/routes/Prescription';
+import { PatientForm } from './views/routes/PatientForm';
+import { PrescriptionForm } from './views/routes/PrescriptionForm';
+import { Patients } from './views/routes/Patients';
+import { Prescriptions } from './views/routes/Prescriptions';
+import { Settings } from './views/routes/Settings';
+import { Support } from './views/routes/Support';
+import { UpdatePatientForm } from './views/routes/UpdatePatientForm';
+import { NewOrder } from './views/routes/NewOrder';
+import { auth0Config } from './configs/auth';
+import { AlertDisplay } from './views/components/AlertDisplay';
 
 const client = new PhotonClient({
   domain: auth0Config.domain,
@@ -30,11 +30,11 @@ const client = new PhotonClient({
   redirectURI: auth0Config.redirectUri,
   audience: auth0Config.audience,
   uri: process.env.REACT_APP_GRAPHQL_URI as string
-})
+});
 
 const onRedirectCallback = (appState?: AppState) => {
-  window.location.replace(appState?.returnTo || window.location.pathname)
-}
+  window.location.replace(appState?.returnTo || window.location.pathname);
+};
 
 export const App = () => {
   return (
@@ -74,5 +74,5 @@ export const App = () => {
         </Routes>
       </PhotonProvider>
     </BrowserRouter>
-  )
-}
+  );
+};

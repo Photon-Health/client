@@ -1,8 +1,8 @@
-import { VStack } from '@chakra-ui/react'
+import { VStack } from '@chakra-ui/react';
 
-import { Profile } from '../components/Profile'
-import { Webhooks } from '../components/Webhooks'
-import { Credentials } from '../components/Credentials'
+import { Profile } from '../components/Profile';
+import { Webhooks } from '../components/Webhooks';
+import { Credentials } from '../components/Credentials';
 
 export const UserTab = () => {
   return (
@@ -11,5 +11,5 @@ export const UserTab = () => {
       <Credentials />
       <Webhooks />
     </VStack>
-  )
-}
+  );
+};

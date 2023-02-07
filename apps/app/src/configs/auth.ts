@@ -1,4 +1,4 @@
-import { Auth0ProviderOptions } from '@auth0/auth0-react'
+import { Auth0ProviderOptions } from '@auth0/auth0-react';
 
 export const auth0Config: Auth0ProviderOptions = {
   domain: process.env.REACT_APP_AUTH0_DOMAIN as string,
@@ -6,4 +6,4 @@ export const auth0Config: Auth0ProviderOptions = {
   audience: process.env.REACT_APP_AUTH0_AUDIENCE as string,
   useRefreshTokens: true,
   redirectUri: window.location.origin
-}
+};

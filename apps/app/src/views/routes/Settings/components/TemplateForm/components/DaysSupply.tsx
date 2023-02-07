@@ -7,15 +7,15 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { Field, FieldProps } from 'formik'
+import { Field, FieldProps } from 'formik';
 
 interface DaysSupplyProps {
-  errors: any
-  touched: any
-  hidden: boolean
-  setFieldValue: any
+  errors: any;
+  touched: any;
+  hidden: boolean;
+  setFieldValue: any;
 }
 
 export const DaysSupply = ({ errors, touched, hidden, setFieldValue }: DaysSupplyProps) => {
@@ -43,10 +43,10 @@ export const DaysSupply = ({ errors, touched, hidden, setFieldValue }: DaysSuppl
                 </NumberInputStepper>
               </NumberInput>
             </>
-          )
+          );
         }}
       </Field>
       <FormErrorMessage>{errors.daysSupply}</FormErrorMessage>
     </FormControl>
-  )
-}
+  );
+};

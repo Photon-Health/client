@@ -1,22 +1,22 @@
-import { Divider, Flex, Heading, HStack, Stack, Text, VStack } from '@chakra-ui/react'
+import { Divider, Flex, Heading, HStack, Stack, Text, VStack } from '@chakra-ui/react';
 
 interface TemplateViewProps {
   template: {
     treatment: {
-      name: string
-    }
-    fillsAllowed?: number
-    dispenseUnit?: string
-    dispenseQuantity?: number
-    daysSupply?: number
-    dispenseAsWritten?: boolean
-    instructions?: string
-    notes?: string
-  }
+      name: string;
+    };
+    fillsAllowed?: number;
+    dispenseUnit?: string;
+    dispenseQuantity?: number;
+    daysSupply?: number;
+    dispenseAsWritten?: boolean;
+    instructions?: string;
+    notes?: string;
+  };
 }
 
 export const TemplateView = (props: TemplateViewProps) => {
-  const { template } = props
+  const { template } = props;
 
   return (
     <Stack
@@ -79,5 +79,5 @@ export const TemplateView = (props: TemplateViewProps) => {
         </VStack>
       </Flex>
     </Stack>
-  )
-}
+  );
+};

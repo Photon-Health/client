@@ -1,18 +1,18 @@
-import * as yup from 'yup'
-import { Formik } from 'formik'
+import * as yup from 'yup';
+import { Formik } from 'formik';
 
-import { useState } from 'react'
+import { useState } from 'react';
 
-import { Alert, AlertIcon, ModalCloseButton, useColorMode, VStack } from '@chakra-ui/react'
+import { Alert, AlertIcon, ModalCloseButton, useColorMode, VStack } from '@chakra-ui/react';
 
-import { types } from '@photonhealth/react'
+import { types } from '@photonhealth/react';
 
-import { confirmWrapper } from '../../../components/GuardDialog'
-import { PatientCard } from './PatientCard'
-import { SelectPatientCard } from './SelectPatientCard'
-import { SelectPrescriptionsCard } from './SelectPrescriptionsCard'
-import { SelectPharmacyCard } from './SelectPharmacyCard'
-import { PatientAddressCard } from './PatientAddressCard'
+import { confirmWrapper } from '../../../components/GuardDialog';
+import { PatientCard } from './PatientCard';
+import { SelectPatientCard } from './SelectPatientCard';
+import { SelectPrescriptionsCard } from './SelectPrescriptionsCard';
+import { SelectPharmacyCard } from './SelectPharmacyCard';
+import { PatientAddressCard } from './PatientAddressCard';
 
 const EMPTY_FORM_VALUES = {
   patientId: '',
@@ -28,7 +28,7 @@ const EMPTY_FORM_VALUES = {
     state: '',
     city: ''
   }
-}
+};
 
 const orderSchema = yup.object({
   patientId: yup.string().required('Please select a patient...'),
@@ -61,20 +61,20 @@ const orderSchema = yup.object({
       city: yup.string().required('Please enter a city...')
     })
     .required()
-})
+});
 
 interface OrderFormProps {
-  loading: boolean
-  patient: any
-  onClose: () => void
-  prescriptionIds: string
-  onlyCurexa: boolean
-  disableOrderCreation: boolean
-  createOrderMutation: any
-  updatePatientMutation: any
-  removePatientPreferredPharmacyMutation: any
-  showAddress: boolean
-  setShowAddress: any
+  loading: boolean;
+  patient: any;
+  onClose: () => void;
+  prescriptionIds: string;
+  onlyCurexa: boolean;
+  disableOrderCreation: boolean;
+  createOrderMutation: any;
+  updatePatientMutation: any;
+  removePatientPreferredPharmacyMutation: any;
+  showAddress: boolean;
+  setShowAddress: any;
 }
 
 export const OrderForm = ({
@@ -90,11 +90,11 @@ export const OrderForm = ({
   showAddress,
   setShowAddress
 }: OrderFormProps) => {
-  const { colorMode } = useColorMode()
-  const [updatePreferredPharmacy, setUpdatePreferredPharmacy] = useState(false)
+  const { colorMode } = useColorMode();
+  const [updatePreferredPharmacy, setUpdatePreferredPharmacy] = useState(false);
 
   const onCancel = async (dirty: Boolean) => {
-    if (!dirty) onClose()
+    if (!dirty) onClose();
     else if (
       await confirmWrapper('Lose unsaved order?', {
         description: 'You will not be able to recover unsaved order information.',
@@ -103,15 +103,15 @@ export const OrderForm = ({
         darkMode: colorMode !== 'light'
       })
     ) {
-      onClose()
+      onClose();
     }
-  }
+  };
 
-  let pharmacyId = ''
+  let pharmacyId = '';
   if (onlyCurexa && process.env.REACT_APP_CUREXA_ORG_ID) {
-    pharmacyId = process.env.REACT_APP_CUREXA_ORG_ID
+    pharmacyId = process.env.REACT_APP_CUREXA_ORG_ID;
   } else if (patient?.preferredPharmacies?.length > 0) {
-    pharmacyId = patient?.preferredPharmacies[0].id
+    pharmacyId = patient?.preferredPharmacies[0].id;
   }
 
   const initialValues = {
@@ -130,7 +130,7 @@ export const OrderForm = ({
       state: patient?.address?.state || '',
       city: patient?.address?.city || ''
     }
-  }
+  };
 
   return (
     <Formik
@@ -138,12 +138,12 @@ export const OrderForm = ({
       initialValues={initialValues}
       validationSchema={orderSchema}
       onSubmit={async (values, { validateForm, setSubmitting }) => {
-        validateForm(values)
+        validateForm(values);
 
         // To be extra confident that curexa is always used for weekend providers
         if (onlyCurexa) {
-          values.fulfillmentType = types.FulfillmentType.MailOrder
-          values.pharmacyId = process.env.REACT_APP_CUREXA_ORG_ID || values.pharmacyId
+          values.fulfillmentType = types.FulfillmentType.MailOrder;
+          values.pharmacyId = process.env.REACT_APP_CUREXA_ORG_ID || values.pharmacyId;
         }
 
         if (
@@ -154,8 +154,8 @@ export const OrderForm = ({
             darkMode: colorMode !== 'light'
           })
         ) {
-          setSubmitting(true)
-          createOrderMutation({ variables: values, onCompleted: onClose })
+          setSubmitting(true);
+          createOrderMutation({ variables: values, onCompleted: onClose });
 
           // if the user has selected to save the pharmacy as their preferred pharmacy
           if (updatePreferredPharmacy) {
@@ -166,7 +166,7 @@ export const OrderForm = ({
                   patientId: patient.id,
                   pharmacyId: patient?.preferredPharmacies[0].id
                 }
-              })
+              });
             }
             // add the new preferred pharmacy to the patient
             updatePatientMutation({
@@ -174,10 +174,10 @@ export const OrderForm = ({
                 id: patient.id,
                 preferredPharmacies: [values.pharmacyId]
               }
-            })
+            });
           }
         } else {
-          setSubmitting(false)
+          setSubmitting(false);
         }
       }}
     >
@@ -189,8 +189,8 @@ export const OrderForm = ({
               top="4"
               right="unset"
               onClick={async (e) => {
-                e.preventDefault()
-                await onCancel(dirty)
+                e.preventDefault();
+                await onCancel(dirty);
               }}
             />
 
@@ -235,8 +235,8 @@ export const OrderForm = ({
               />
             </VStack>
           </form>
-        )
+        );
       }}
     </Formik>
-  )
-}
+  );
+};

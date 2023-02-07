@@ -9,36 +9,36 @@ import {
   Stack,
   Text,
   useColorModeValue
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { FiLogIn } from 'react-icons/fi'
+import { FiLogIn } from 'react-icons/fi';
 
-import { useLocation } from 'react-router-dom'
-import { usePhoton } from '@photonhealth/react'
+import { useLocation } from 'react-router-dom';
+import { usePhoton } from '@photonhealth/react';
 
 export const SelectOrg = () => {
-  const location = useLocation()
+  const location = useLocation();
 
-  const from = `${(location.pathname || '/') + (location.search || '')}`
+  const from = `${(location.pathname || '/') + (location.search || '')}`;
 
-  const { login, logout, getOrganizations, setOrganization } = usePhoton()
-  const { organizations, loading } = getOrganizations()
+  const { login, logout, getOrganizations, setOrganization } = usePhoton();
+  const { organizations, loading } = getOrganizations();
 
   if (!loading) {
     if (organizations?.length === 0) {
-      logout({ returnTo: window.location.origin })
+      logout({ returnTo: window.location.origin });
     } else if (organizations?.length === 1) {
-      setOrganization(organizations[0].id)
+      setOrganization(organizations[0].id);
       login({
         appState: {
           returnTo: from
         }
-      })
+      });
     }
   }
 
   const orgs = (organizations || []).map((organization: any) => {
-    const { id, name } = organization
+    const { id, name } = organization;
 
     return (
       <Container key={name} variant="outline" padding={{ base: '0', md: '0' }}>
@@ -54,12 +54,12 @@ export const SelectOrg = () => {
               rightIcon={<FiLogIn />}
               value={id}
               onClick={() => {
-                setOrganization(id)
+                setOrganization(id);
                 login({
                   appState: {
                     returnTo: from
                   }
-                })
+                });
               }}
             >
               Select
@@ -67,8 +67,8 @@ export const SelectOrg = () => {
           </HStack>
         </Stack>
       </Container>
-    )
-  })
+    );
+  });
 
   return (
     <Box as="section" height="100vh" overflowY="auto">
@@ -110,5 +110,5 @@ export const SelectOrg = () => {
         </Box>
       )}
     </Box>
-  )
-}
+  );
+};

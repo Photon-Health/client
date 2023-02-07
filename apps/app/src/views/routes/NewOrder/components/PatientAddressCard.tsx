@@ -11,24 +11,24 @@ import {
   HStack,
   Text,
   VStack
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { StateSelect } from '../../../components/StateSelect'
-import { OptionalText } from '../../../components/OptionalText'
-import { LoadingInputField } from '../../../components/LoadingInputField'
+import { StateSelect } from '../../../components/StateSelect';
+import { OptionalText } from '../../../components/OptionalText';
+import { LoadingInputField } from '../../../components/LoadingInputField';
 
-import { formatAddress } from '../../../../utils'
+import { formatAddress } from '../../../../utils';
 
-import { Address } from '../../../../models/general'
+import { Address } from '../../../../models/general';
 
 interface PatientAddressCardProps {
-  address: Address
-  touched: any
-  errors: any
-  setFieldValue: (field: string, value: string) => void
-  loading: boolean
-  showAddress: boolean
-  setShowAddress: any
+  address: Address;
+  touched: any;
+  errors: any;
+  setFieldValue: (field: string, value: string) => void;
+  loading: boolean;
+  showAddress: boolean;
+  setShowAddress: any;
 }
 
 export const PatientAddressCard = ({
@@ -96,7 +96,7 @@ export const PatientAddressCard = ({
                   maxLength={5}
                   onChange={(e: any) => {
                     if (/^[0-9]+$/.test(e.target.value) || e.target.value === '') {
-                      setFieldValue('address.postalCode', e.target.value)
+                      setFieldValue('address.postalCode', e.target.value);
                     }
                   }}
                   loading={loading ? 1 : 0}
@@ -108,5 +108,5 @@ export const PatientAddressCard = ({
         )}
       </CardBody>
     </Card>
-  )
-}
+  );
+};

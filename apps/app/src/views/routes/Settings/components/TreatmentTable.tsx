@@ -5,11 +5,11 @@ import {
   SkeletonText,
   VStack,
   useBreakpointValue
-} from '@chakra-ui/react'
-import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons'
+} from '@chakra-ui/react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 
-import { TablePage } from '../../../components/TablePage'
-import { PaginationIndicator } from './PaginationIndicator'
+import { TablePage } from '../../../components/TablePage';
+import { PaginationIndicator } from './PaginationIndicator';
 
 const TREATMENT_COLUMNS = [
   {
@@ -21,7 +21,7 @@ const TREATMENT_COLUMNS = [
     Header: '',
     accessor: 'actions'
   }
-]
+];
 
 const renderSkeletonRow = (isMobile: boolean | undefined) => {
   return {
@@ -39,22 +39,22 @@ const renderSkeletonRow = (isMobile: boolean | undefined) => {
         <Skeleton height="20px" width="20px" />
       </HStack>
     )
-  }
-}
+  };
+};
 
 interface TreatmentTableProps {
-  isLoading: boolean
-  rows: any[]
-  filteredRows: any[]
-  pages: number
-  pageSize: number
-  currentPage: number
-  setCurrentPage: (page: number) => void
-  filterText: string
-  setFilterText: (filter: string) => void
+  isLoading: boolean;
+  rows: any[];
+  filteredRows: any[];
+  pages: number;
+  pageSize: number;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+  filterText: string;
+  setFilterText: (filter: string) => void;
   setShowModal: {
-    on: () => void
-  }
+    on: () => void;
+  };
 }
 
 export const TreatmentTable = ({
@@ -69,10 +69,10 @@ export const TreatmentTable = ({
   setFilterText,
   setShowModal
 }: TreatmentTableProps) => {
-  const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false })
+  const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
   const displayRows = isLoading
     ? new Array(isMobileAndTablet ? 3 : 10).fill(0).map(() => renderSkeletonRow(isMobileAndTablet))
-    : filteredRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    : filteredRows.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <TablePage
@@ -117,5 +117,5 @@ export const TreatmentTable = ({
       }
       total={rows.length}
     />
-  )
-}
+  );
+};

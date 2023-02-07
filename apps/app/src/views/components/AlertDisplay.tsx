@@ -1,13 +1,13 @@
-import { Badge, VStack } from '@chakra-ui/react'
-import { useStore } from '@nanostores/react'
-import { usePhoton } from '@photonhealth/react'
-import { alertStore, hiddenCount } from '../../stores/alert'
-import { Alert } from './Alert'
+import { Badge, VStack } from '@chakra-ui/react';
+import { useStore } from '@nanostores/react';
+import { usePhoton } from '@photonhealth/react';
+import { alertStore, hiddenCount } from '../../stores/alert';
+import { Alert } from './Alert';
 
 export const AlertDisplay = () => {
-  const { isLoading } = usePhoton()
-  const hidden = useStore(hiddenCount)
-  const errors = useStore(alertStore)
+  const { isLoading } = usePhoton();
+  const hidden = useStore(hiddenCount);
+  const errors = useStore(alertStore);
 
   return !isLoading ? (
     <VStack
@@ -30,5 +30,5 @@ export const AlertDisplay = () => {
         </Badge>
       ) : null}
     </VStack>
-  ) : null
-}
+  ) : null;
+};

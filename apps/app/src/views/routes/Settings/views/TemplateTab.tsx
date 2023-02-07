@@ -11,19 +11,19 @@ import {
   ModalBody,
   useBreakpointValue,
   useBoolean
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { useEffect, useRef, useState } from 'react'
-import { usePhoton } from '@photonhealth/react'
-import { useDebounce } from 'use-debounce'
+import { useEffect, useRef, useState } from 'react';
+import { usePhoton } from '@photonhealth/react';
+import { useDebounce } from 'use-debounce';
 
-import { CATALOG_TREATMENTS_FIELDS } from '../../../../model/fragments'
-import { DosageCalc } from '../../../components/DosageCalc'
-import { TemplateView } from '../../../components/TemplateView'
-import { SplitLayout } from '../../../components/SplitLayout'
-import { TemplateTable } from '../components/TemplateTable'
-import { TemplateForm } from '../components/TemplateForm'
-import { TemplateActions } from '../components/TemplateActions'
+import { CATALOG_TREATMENTS_FIELDS } from '../../../../model/fragments';
+import { DosageCalc } from '../../../components/DosageCalc';
+import { TemplateView } from '../../../components/TemplateView';
+import { SplitLayout } from '../../../components/SplitLayout';
+import { TemplateTable } from '../components/TemplateTable';
+import { TemplateForm } from '../components/TemplateForm';
+import { TemplateActions } from '../components/TemplateActions';
 
 const renderTemplateRow = (
   rx: any,
@@ -33,7 +33,7 @@ const renderTemplateRow = (
   setTemplateToEdit: any,
   setShowModal: any
 ) => {
-  const med = rx.treatment
+  const med = rx.treatment;
 
   return {
     template: (
@@ -61,21 +61,21 @@ const renderTemplateRow = (
         setTemplateToEdit={setTemplateToEdit}
       />
     )
-  }
-}
+  };
+};
 
 export const TemplateTab = (props: any) => {
-  const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false })
-  const { organization } = props
+  const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
+  const { organization } = props;
   const { getCatalog, getCatalogs, updatePrescriptionTemplate, createPrescriptionTemplate }: any =
-    usePhoton()
-  const catalogs = getCatalogs()
+    usePhoton();
+  const catalogs = getCatalogs();
   const catalog = getCatalog({
     id: catalogs.catalogs[0]?.id || '',
     fragment: { CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS },
     defer: true
-  })
-  const [catalogId, setCatalogId] = useState('')
+  });
+  const [catalogId, setCatalogId] = useState('');
 
   const [createRxTemplateMutation, { loading: loadingCreate, error: createError }] =
     createPrescriptionTemplate({
@@ -87,7 +87,7 @@ export const TemplateTab = (props: any) => {
           CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
         }
       }
-    })
+    });
   const [updatePrescriptionTemplateMutation, { loading: loadingUpdate, error: updateError }] =
     updatePrescriptionTemplate({
       refetchQueries: ['getCatalog'],
@@ -98,41 +98,41 @@ export const TemplateTab = (props: any) => {
           CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
         }
       }
-    })
+    });
 
-  const [rows, setRows] = useState<any[]>([])
-  const [filteredRows, setFilteredRows] = useState<any[]>([])
-  const [filterText, setFilterText] = useState('')
-  const [debouncedFilterText] = useDebounce(filterText, 250)
-  const [singleView, setSingleView] = useState<any>(undefined)
-  const [pages, setPages] = useState<number>(0)
-  const [currentPage, setCurrentPage] = useState<number>(1)
-  const [childLoading, setChildLoading] = useState<boolean>(false)
-  const [showModal, setShowModal] = useBoolean()
-  const [templateToEdit, setTemplateToEdit] = useState(undefined)
-  const pageSize = 10
+  const [rows, setRows] = useState<any[]>([]);
+  const [filteredRows, setFilteredRows] = useState<any[]>([]);
+  const [filterText, setFilterText] = useState('');
+  const [debouncedFilterText] = useDebounce(filterText, 250);
+  const [singleView, setSingleView] = useState<any>(undefined);
+  const [pages, setPages] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [childLoading, setChildLoading] = useState<boolean>(false);
+  const [showModal, setShowModal] = useBoolean();
+  const [templateToEdit, setTemplateToEdit] = useState(undefined);
+  const pageSize = 10;
 
   useEffect(() => {
     if (!catalogs.loading && catalogs.catalogs.length > 0) {
-      setCatalogId(catalogs.catalogs[0].id)
+      setCatalogId(catalogs.catalogs[0].id);
       catalog.query!({
         id: catalogs.catalogs[0].id,
         fragment: {
           CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
         }
-      })
+      });
     }
-  }, [catalogs.loading])
+  }, [catalogs.loading]);
 
   useEffect(() => {
     if (!catalog.loading && catalog.catalog) {
       const sorted = [...catalog.catalog.templates].sort((a: any, b: any) =>
         a.treatment.name.toLowerCase() > b.treatment.name.toLowerCase() ? 1 : -1
-      )
-      const preppedRows = sorted
-      setRows(preppedRows)
-      setPages(Math.ceil(preppedRows.length / pageSize))
-      setCurrentPage(1)
+      );
+      const preppedRows = sorted;
+      setRows(preppedRows);
+      setPages(Math.ceil(preppedRows.length / pageSize));
+      setCurrentPage(1);
       setFilteredRows(
         preppedRows.map((y: any) =>
           renderTemplateRow(
@@ -144,9 +144,9 @@ export const TemplateTab = (props: any) => {
             setShowModal
           )
         )
-      )
+      );
     }
-  }, [catalog.loading])
+  }, [catalog.loading]);
 
   useEffect(() => {
     if (debouncedFilterText.length === 0) {
@@ -159,10 +159,10 @@ export const TemplateTab = (props: any) => {
           setTemplateToEdit,
           setShowModal
         )
-      )
-      setFilteredRows(fRows)
-      setCurrentPage(1)
-      setPages(Math.ceil(fRows.length / pageSize))
+      );
+      setFilteredRows(fRows);
+      setCurrentPage(1);
+      setPages(Math.ceil(fRows.length / pageSize));
     } else {
       const fRows = rows
         .filter((x) => x.treatment.name.toLowerCase().includes(debouncedFilterText.toLowerCase()))
@@ -175,27 +175,27 @@ export const TemplateTab = (props: any) => {
             setTemplateToEdit,
             setShowModal
           )
-        )
-      setCurrentPage(1)
-      setPages(Math.ceil(fRows.length / pageSize))
-      setFilteredRows(fRows)
+        );
+      setCurrentPage(1);
+      setPages(Math.ceil(fRows.length / pageSize));
+      setFilteredRows(fRows);
     }
-  }, [debouncedFilterText])
+  }, [debouncedFilterText]);
 
-  const [doseCalcVis, setDoseCalcVis] = useState(false)
-  const quantityRef = useRef<HTMLInputElement>(null)
-  const medicationSelectRef = useRef<HTMLInputElement>(null)
-  const unitRef = useRef<HTMLSelectElement>(null)
+  const [doseCalcVis, setDoseCalcVis] = useState(false);
+  const quantityRef = useRef<HTMLInputElement>(null);
+  const medicationSelectRef = useRef<HTMLInputElement>(null);
+  const unitRef = useRef<HTMLSelectElement>(null);
 
   const isLoading =
-    catalogs.loading || catalog.loading || loadingCreate || loadingUpdate || childLoading
+    catalogs.loading || catalog.loading || loadingCreate || loadingUpdate || childLoading;
 
   return (
     <>
       <Modal
         isOpen={singleView !== undefined}
         onClose={() => {
-          setSingleView(undefined)
+          setSingleView(undefined);
         }}
         size="xl"
       >
@@ -282,5 +282,5 @@ export const TemplateTab = (props: any) => {
         </SplitLayout>
       </VStack>
     </>
-  )
-}
+  );
+};

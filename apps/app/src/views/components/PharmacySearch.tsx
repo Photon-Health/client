@@ -1,6 +1,6 @@
-import { useState, createRef, useEffect, RefObject } from 'react'
-import { AsyncSelect } from 'chakra-react-select'
-import { useField, FieldAttributes } from 'formik'
+import { useState, createRef, useEffect, RefObject } from 'react';
+import { AsyncSelect } from 'chakra-react-select';
+import { useField, FieldAttributes } from 'formik';
 
 import {
   Box,
@@ -12,65 +12,65 @@ import {
   InputRightElement,
   Spinner,
   Text
-} from '@chakra-ui/react'
-import { useDebounce } from 'use-debounce'
-import { usePhoton, types } from '@photonhealth/react'
-import { titleCase } from '../../utils'
+} from '@chakra-ui/react';
+import { useDebounce } from 'use-debounce';
+import { usePhoton, types } from '@photonhealth/react';
+import { titleCase } from '../../utils';
 
 export const PharmacySearch = (props: FieldAttributes<any>) => {
-  const { name, defaultSearch, errors, touched, patient, defaultSelection, loading } = props
-  const geocoder = new google.maps.Geocoder()
+  const { name, defaultSearch, errors, touched, patient, defaultSelection, loading } = props;
+  const geocoder = new google.maps.Geocoder();
   const [pharmacyOptions, setPharmacyOptions] = useState<
     {
-      value: any
-      label: string
+      value: any;
+      label: string;
     }[]
-  >([])
-  const [location, setLocation] = useState('')
-  const [formattedAddress, setFormattedAddress] = useState('')
-  const [customError, setCustomError] = useState('')
+  >([]);
+  const [location, setLocation] = useState('');
+  const [formattedAddress, setFormattedAddress] = useState('');
+  const [customError, setCustomError] = useState('');
 
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [isGeocoding, setIsGeocoding] = useState<boolean>(false)
-  const [isHidden, setIsHidden] = useState<boolean>(false)
-  const [showDefaultPharmacy, setShowDefaultPharmacy] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isGeocoding, setIsGeocoding] = useState<boolean>(false);
+  const [isHidden, setIsHidden] = useState<boolean>(false);
+  const [showDefaultPharmacy, setShowDefaultPharmacy] = useState<boolean>(false);
 
-  const { getPharmacies, getPharmacy } = usePhoton()
-  const { refetch } = getPharmacies({})
-  const { pharmacy } = getPharmacy({ id: defaultSelection })
+  const { getPharmacies, getPharmacy } = usePhoton();
+  const { refetch } = getPharmacies({});
+  const { pharmacy } = getPharmacy({ id: defaultSelection });
 
-  const [, , { setValue, setTouched }] = useField(name)
-  const ref: RefObject<any> = createRef()
+  const [, , { setValue, setTouched }] = useField(name);
+  const ref: RefObject<any> = createRef();
 
   const onChanged = (selected: any) => {
     if (selected == null) {
-      setValue('')
+      setValue('');
     } else {
-      setValue(selected.value)
+      setValue(selected.value);
     }
-  }
+  };
 
-  const [locationDebounce] = useDebounce(location, 800)
+  const [locationDebounce] = useDebounce(location, 800);
 
   const geocode = async (address: string): Promise<google.maps.GeocoderResult[]> => {
-    setIsGeocoding(true)
-    const data = await geocoder.geocode({ address })
-    return data.results
-  }
+    setIsGeocoding(true);
+    const data = await geocoder.geocode({ address });
+    return data.results;
+  };
 
   const pharmacyLatLngSearch = async (geocoderResult: google.maps.GeocoderResult[]) => {
-    setIsLoading(true)
-    setIsGeocoding(false)
-    const latitude = geocoderResult[0].geometry.location.lat()
-    const longitude = geocoderResult[0].geometry.location.lng()
-    const addressResult = geocoderResult[0].formatted_address
+    setIsLoading(true);
+    setIsGeocoding(false);
+    const latitude = geocoderResult[0].geometry.location.lat();
+    const longitude = geocoderResult[0].geometry.location.lng();
+    const addressResult = geocoderResult[0].formatted_address;
 
-    if (addressResult) setFormattedAddress(addressResult)
+    if (addressResult) setFormattedAddress(addressResult);
 
     if (!latitude || !longitude) {
-      setCustomError('An unexpected error occurred.')
-      const errorMessage = `An unexpected error occurred`
-      throw new Error(errorMessage) // stops execution
+      setCustomError('An unexpected error occurred.');
+      const errorMessage = `An unexpected error occurred`;
+      throw new Error(errorMessage); // stops execution
     }
     return refetch({
       location: {
@@ -78,8 +78,8 @@ export const PharmacySearch = (props: FieldAttributes<any>) => {
         longitude,
         radius: 20
       }
-    })
-  }
+    });
+  };
 
   const formatPharmacyOptions = (p: types.Pharmacy[]) => {
     const options = p.map((org: any) => {
@@ -87,112 +87,112 @@ export const PharmacySearch = (props: FieldAttributes<any>) => {
         value: org.id,
         label: `${org.name}, ${titleCase(org.address?.street1)}, ${titleCase(org.address?.city)}, 
               ${org.address?.state}`
-      }
-    })
-    return options
-  }
+      };
+    });
+    return options;
+  };
 
   async function setDefaultPharmacy(p: any) {
     try {
-      const pharmOptions = await formatPharmacyOptions([p])
+      const pharmOptions = await formatPharmacyOptions([p]);
       if (pharmOptions) {
-        setPharmacyOptions(pharmOptions)
-        setShowDefaultPharmacy(true)
-        setTouched(false)
-        setIsHidden(true)
-        setIsLoading(false)
+        setPharmacyOptions(pharmOptions);
+        setShowDefaultPharmacy(true);
+        setTouched(false);
+        setIsHidden(true);
+        setIsLoading(false);
       }
     } catch (e) {
-      setCustomError('Something unexpected occured')
-      setTouched(true)
-      setShowDefaultPharmacy(false)
-      setIsGeocoding(false)
-      setIsHidden(false)
-      setIsLoading(false)
+      setCustomError('Something unexpected occured');
+      setTouched(true);
+      setShowDefaultPharmacy(false);
+      setIsGeocoding(false);
+      setIsHidden(false);
+      setIsLoading(false);
     }
   }
 
   async function searchPharmacies(locationInput: string) {
     try {
-      const geocodeResponse = await geocode(locationInput)
-      const { data } = await pharmacyLatLngSearch(geocodeResponse)
-      const pharmOptions = await formatPharmacyOptions(data.pharmacies)
-      setPharmacyOptions(pharmOptions)
+      const geocodeResponse = await geocode(locationInput);
+      const { data } = await pharmacyLatLngSearch(geocodeResponse);
+      const pharmOptions = await formatPharmacyOptions(data.pharmacies);
+      setPharmacyOptions(pharmOptions);
       if (pharmOptions) {
-        setTouched(false)
-        setIsHidden(true)
-        setIsLoading(false)
+        setTouched(false);
+        setIsHidden(true);
+        setIsLoading(false);
       }
     } catch (e) {
-      setCustomError('Please enter a valid zip code or address...')
-      setTouched(true)
-      setIsGeocoding(false)
-      setIsHidden(false)
-      setIsLoading(false)
+      setCustomError('Please enter a valid zip code or address...');
+      setTouched(true);
+      setIsGeocoding(false);
+      setIsHidden(false);
+      setIsLoading(false);
     }
   }
 
   useEffect(() => {
     if (!location && !defaultSelection) {
-      setCustomError('')
-      setTouched(false)
-      setIsHidden(false)
+      setCustomError('');
+      setTouched(false);
+      setIsHidden(false);
     }
 
     if (locationDebounce) {
-      setCustomError('')
-      searchPharmacies(locationDebounce)
+      setCustomError('');
+      searchPharmacies(locationDebounce);
     }
-  }, [locationDebounce])
+  }, [locationDebounce]);
 
   useEffect(() => {
     if (ref.current && pharmacyOptions.length > 0) {
       if (defaultSelection && showDefaultPharmacy) {
-        ref.current.setValue(pharmacyOptions[0])
+        ref.current.setValue(pharmacyOptions[0]);
       } else {
-        ref.current.clearValue()
+        ref.current.clearValue();
       }
     }
-  }, [pharmacyOptions])
+  }, [pharmacyOptions]);
 
   useEffect(() => {
     const setDefault = async () => {
       if (pharmacy) {
-        await setDefaultPharmacy(pharmacy)
+        await setDefaultPharmacy(pharmacy);
       }
-    }
+    };
     if (!loading) {
       if (defaultSearch && !defaultSelection) {
-        setIsLoading(true)
-        setLocation(defaultSearch)
-        setShowDefaultPharmacy(false)
+        setIsLoading(true);
+        setLocation(defaultSearch);
+        setShowDefaultPharmacy(false);
       } else if (defaultSelection) {
-        setIsLoading(true)
-        setLocation('')
-        setDefault().catch(console.error)
-        setShowDefaultPharmacy(true)
+        setIsLoading(true);
+        setLocation('');
+        setDefault().catch(console.error);
+        setShowDefaultPharmacy(true);
       } else {
-        setLocation('')
-        setPharmacyOptions([])
-        setShowDefaultPharmacy(false)
-        setTouched(false)
-        setIsHidden(false)
-        setIsLoading(false)
+        setLocation('');
+        setPharmacyOptions([]);
+        setShowDefaultPharmacy(false);
+        setTouched(false);
+        setIsHidden(false);
+        setIsLoading(false);
       }
     }
-  }, [defaultSearch, defaultSelection, loading, pharmacy])
+  }, [defaultSearch, defaultSelection, loading, pharmacy]);
 
   const filterOptions = (inputValue: string) => {
     return pharmacyOptions.filter((i: any) =>
       i.label.toLowerCase().includes(inputValue.toLowerCase())
-    )
-  }
+    );
+  };
 
   const loadOptions = (inputValue: string, callback: (options: any) => void) => {
     setTimeout(() => {
-      callback(filterOptions(inputValue))
-    }, 1000)
-  }
+      callback(filterOptions(inputValue));
+    }, 1000);
+  };
 
   return (
     <>
@@ -238,11 +238,11 @@ export const PharmacySearch = (props: FieldAttributes<any>) => {
           <Button
             display="inline"
             onClick={() => {
-              setLocation('')
-              setPharmacyOptions([])
-              setShowDefaultPharmacy(false)
-              setIsHidden(false)
-              setCustomError('')
+              setLocation('');
+              setPharmacyOptions([]);
+              setShowDefaultPharmacy(false);
+              setIsHidden(false);
+              setCustomError('');
             }}
             size="xs"
           >
@@ -274,5 +274,5 @@ export const PharmacySearch = (props: FieldAttributes<any>) => {
         </>
       )}
     </>
-  )
-}
+  );
+};

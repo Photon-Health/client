@@ -1,4 +1,4 @@
-import { Box, Button, HStack, Progress, Stack, Text } from '@chakra-ui/react'
+import { Box, Button, HStack, Progress, Stack, Text } from '@chakra-ui/react';
 
 export const Onboarding = () => {
   return (
@@ -23,5 +23,5 @@ export const Onboarding = () => {
         </HStack>
       </Stack>
     </Box>
-  )
-}
+  );
+};

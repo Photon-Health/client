@@ -1,7 +1,7 @@
-import { chakra, HTMLChakraProps, useColorModeValue } from '@chakra-ui/react'
+import { chakra, HTMLChakraProps, useColorModeValue } from '@chakra-ui/react';
 
 export const Logo = (props: HTMLChakraProps<'svg'>) => {
-  const text = useColorModeValue('#273D52', 'white')
+  const text = useColorModeValue('#273D52', 'white');
   return (
     <chakra.svg
       color="accent"
@@ -23,5 +23,5 @@ export const Logo = (props: HTMLChakraProps<'svg'>) => {
         <circle cx="249.798" cy="5.202" r="5.202" />
       </g>
     </chakra.svg>
-  )
-}
+  );
+};

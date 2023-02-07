@@ -1,22 +1,22 @@
-import { forwardRef, Box, Text, VStack } from '@chakra-ui/react'
+import { forwardRef, Box, Text, VStack } from '@chakra-ui/react';
 
-import { GroupHeadingProps, OptionProps as SelectOptionProps } from 'chakra-react-select'
+import { GroupHeadingProps, OptionProps as SelectOptionProps } from 'chakra-react-select';
 
-import { useEffect, useImperativeHandle, useState } from 'react'
-import { usePhoton } from '@photonhealth/react'
-import { SelectField } from './SelectField'
+import { useEffect, useImperativeHandle, useState } from 'react';
+import { usePhoton } from '@photonhealth/react';
+import { SelectField } from './SelectField';
 
-import { CATALOG_TREATMENTS_FIELDS } from '../../model/fragments'
+import { CATALOG_TREATMENTS_FIELDS } from '../../model/fragments';
 
 interface OptionProps extends SelectOptionProps {
   data: {
-    selectGroupLabel: string
-    dispenseQuantity: number
-    dispenseUnit: string
-    daysSupply: number
-    fillsAllowed: number
-    instructions: string
-  }
+    selectGroupLabel: string;
+    dispenseQuantity: number;
+    dispenseUnit: string;
+    daysSupply: number;
+    fillsAllowed: number;
+    instructions: string;
+  };
 }
 
 const Option = ({ innerProps, label, data }: OptionProps) => (
@@ -44,7 +44,7 @@ const Option = ({ innerProps, label, data }: OptionProps) => (
       )}
     </Box>
   </VStack>
-)
+);
 
 const GroupHeading = ({ data }: GroupHeadingProps) => (
   <Box
@@ -59,16 +59,16 @@ const GroupHeading = ({ data }: GroupHeadingProps) => (
       {data.label}
     </Text>
   </Box>
-)
+);
 
 export const MedicationSelect = forwardRef((props: any, ref: any) => {
-  const { catalogId, linkedMedRef, onNotInCatalog, hideExpandedSearch } = props
-  const { getCatalog, addToCatalog } = usePhoton()
+  const { catalogId, linkedMedRef, onNotInCatalog, hideExpandedSearch } = props;
+  const { getCatalog, addToCatalog } = usePhoton();
   // By using a useState for options, we can hide options we don't want to show until
   // other conditions (loading) are true
   const [treatmentOptions, setTreatmentOptions] = useState<Array<{ value: string; label: string }>>(
     []
-  )
+  );
 
   const [addToCatalogMutation] = addToCatalog({
     refetchQueries: ['getCatalog'],
@@ -77,7 +77,7 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
       id: catalogId,
       fragment: { CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS }
     }
-  })
+  });
 
   useImperativeHandle(linkedMedRef, () => ({
     addToCatalog: ({ id, onComplete }: { id: string; onComplete: (data: any) => void }) => {
@@ -87,18 +87,18 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
           treatmentId: id
         },
         onCompleted: onComplete
-      })
+      });
     }
-  }))
+  }));
 
-  const [filterText, setFilterText] = useState('')
+  const [filterText, setFilterText] = useState('');
   const catalog = getCatalog({
     id: catalogId,
     fragment: { CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS }
-  })
+  });
 
   if (catalog.error?.message) {
-    return <Text color="red">{catalog.error.message}</Text>
+    return <Text color="red">{catalog.error.message}</Text>;
   }
 
   useEffect(() => {
@@ -107,18 +107,18 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
         value: med,
         label: `${med.name}`,
         selectGroupLabel: 'Treatments'
-      }))
+      }));
 
-      setTreatmentOptions(options)
+      setTreatmentOptions(options);
     }
-  }, [catalog.loading, catalogId])
+  }, [catalog.loading, catalogId]);
 
   const groupedOptions = [
     {
       label: 'Catalog',
       options: treatmentOptions
     }
-  ]
+  ];
 
   return (
     <SelectField
@@ -135,5 +135,5 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
       components={{ Option, GroupHeading }}
       isClearable
     />
-  )
-})
+  );
+});

@@ -19,28 +19,28 @@ import {
   Thead,
   Tr,
   useDisclosure
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { Outlet } from 'react-router-dom'
-import { usePhoton } from '@photonhealth/react'
-import { WebhooksForm } from './WebhooksForm'
+import { Outlet } from 'react-router-dom';
+import { usePhoton } from '@photonhealth/react';
+import { WebhooksForm } from './WebhooksForm';
 
 export const Webhooks = () => {
-  const { getWebhooks, deleteWebhook } = usePhoton()
-  const { loading, error, webhooks } = getWebhooks()
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { getWebhooks, deleteWebhook } = usePhoton();
+  const { loading, error, webhooks } = getWebhooks();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [onDeleteHandler, { loading: deleteLoading }] = deleteWebhook({
     refetchQueries: ['getWebhooks'],
     awaitRefetchQueries: true
-  })
+  });
 
   const onDelete = (id: string) => {
     // eslint-disable-next-line no-alert
     if (window.confirm("Are you sure? You can't undo this action afterwards.")) {
-      onDeleteHandler({ variables: { id } })
+      onDeleteHandler({ variables: { id } });
     }
-  }
+  };
   return (
     <Box
       py={{ base: '4', md: '8' }}
@@ -122,5 +122,5 @@ export const Webhooks = () => {
         </Stack>
       </Container>
     </Box>
-  )
-}
+  );
+};

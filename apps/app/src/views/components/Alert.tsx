@@ -1,7 +1,15 @@
-import { CheckCircleIcon, InfoIcon, WarningIcon } from '@chakra-ui/icons'
-import { Box, CloseButton, HStack, Stack, Text, useBreakpointValue, VStack } from '@chakra-ui/react'
-import { useEffect, useRef } from 'react'
-import { dismissAlert } from '../../stores/alert'
+import { CheckCircleIcon, InfoIcon, WarningIcon } from '@chakra-ui/icons';
+import {
+  Box,
+  CloseButton,
+  HStack,
+  Stack,
+  Text,
+  useBreakpointValue,
+  VStack
+} from '@chakra-ui/react';
+import { useEffect, useRef } from 'react';
+import { dismissAlert } from '../../stores/alert';
 
 export const Alert = ({
   id,
@@ -10,38 +18,38 @@ export const Alert = ({
   message,
   hide
 }: {
-  id: string
-  timeoutValue: number
-  type: 'info' | 'success' | 'error'
-  message: string
-  hide: boolean
+  id: string;
+  timeoutValue: number;
+  type: 'info' | 'success' | 'error';
+  message: string;
+  hide: boolean;
 }) => {
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let timer2: ReturnType<typeof setTimeout>
+    let timer2: ReturnType<typeof setTimeout>;
     const timer = setTimeout(() => {
       if (ref.current) {
-        ref.current.style.transition = 'visibility 0s 2s, opacity 2s linear'
-        ref.current.style.visibility = 'hidden'
-        ref.current.style.opacity = '0'
+        ref.current.style.transition = 'visibility 0s 2s, opacity 2s linear';
+        ref.current.style.visibility = 'hidden';
+        ref.current.style.opacity = '0';
         timer2 = setTimeout(() => {
           if (ref.current) {
-            ref.current.style.display = 'none'
-            dismissAlert(id)
+            ref.current.style.display = 'none';
+            dismissAlert(id);
           }
-        }, 2000)
+        }, 2000);
       }
-    }, timeoutValue - 2000)
+    }, timeoutValue - 2000);
     return () => {
-      clearTimeout(timer)
+      clearTimeout(timer);
       if (timer2) {
-        clearTimeout(timer2)
+        clearTimeout(timer2);
       }
-    }
-  }, [])
+    };
+  }, []);
 
-  const isMobile = useBreakpointValue({ base: true, md: false })
+  const isMobile = useBreakpointValue({ base: true, md: false });
   return (
     <Box
       display={hide ? 'none' : 'initial'}
@@ -106,5 +114,5 @@ export const Alert = ({
         )}
       </Stack>
     </Box>
-  )
-}
+  );
+};

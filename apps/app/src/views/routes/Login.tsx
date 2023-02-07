@@ -8,36 +8,36 @@ import {
   Stack,
   Text,
   useBreakpointValue
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { useLocation, useSearchParams, Navigate } from 'react-router-dom'
+import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
 
-import { usePhoton } from '@photonhealth/react'
-import { Logo } from '../components/Logo'
-import { Auth } from '../components/Auth'
+import { usePhoton } from '@photonhealth/react';
+import { Logo } from '../components/Logo';
+import { Auth } from '../components/Auth';
 
 export const Login = () => {
-  const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' })
+  const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });
 
-  const { isAuthenticated, login, error, isLoading } = usePhoton()
-  const location = useLocation() as any
+  const { isAuthenticated, login, error, isLoading } = usePhoton();
+  const location = useLocation() as any;
 
   // Handle invite with redirect, even if logged in
-  const [params] = useSearchParams()
-  const invite = params.get('invitation')
-  const org = params.get('organization')
+  const [params] = useSearchParams();
+  const invite = params.get('invitation');
+  const org = params.get('organization');
   if (invite && org) {
     login({
       organizationId: org,
       invitation: invite
-    })
+    });
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/" replace />;
   }
 
-  const from = `${(location.state?.from?.pathname || '/') + (location.state?.from?.search || '')}`
+  const from = `${(location.state?.from?.pathname || '/') + (location.state?.from?.search || '')}`;
 
   return (
     <Container maxW="md" py={{ base: '12', md: '24' }}>
@@ -65,5 +65,5 @@ export const Login = () => {
         </Stack>
       </Stack>
     </Container>
-  )
-}
+  );
+};

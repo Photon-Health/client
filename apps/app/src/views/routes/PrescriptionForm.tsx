@@ -1,51 +1,51 @@
-import { MutableRefObject, useEffect, useRef } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { MutableRefObject, useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      'photon-multirx-form-wrapper': unknown
+      'photon-multirx-form-wrapper': unknown;
     }
   }
 }
 
 export const PrescriptionForm = () => {
-  const ref: MutableRefObject<any> = useRef()
-  const [params] = useSearchParams()
-  const patientId = params.get('patientId') || ''
+  const ref: MutableRefObject<any> = useRef();
+  const [params] = useSearchParams();
+  const patientId = params.get('patientId') || '';
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const onClose = () => {
-    navigate('/prescriptions')
-  }
+    navigate('/prescriptions');
+  };
 
   useEffect(() => {
     if (ref.current) {
       ref.current.addEventListener('photon-prescriptions-created', (e: any) => {
         if (!e.detail.createdOrder) {
-          onClose()
+          onClose();
         }
         if (e.detail.createOrder) {
-          const searchParams = new URLSearchParams()
-          searchParams.append('patientId', e.detail.patientId)
-          searchParams.append('prescriptionIds', e.detail.prescriptionIds.join(','))
+          const searchParams = new URLSearchParams();
+          searchParams.append('patientId', e.detail.patientId);
+          searchParams.append('prescriptionIds', e.detail.prescriptionIds.join(','));
           navigate({
             pathname: '/orders/new',
             search: searchParams.toString()
-          })
+          });
         }
-      })
+      });
       ref.current.addEventListener('photon-prescriptions-closed', () => {
-        onClose()
-      })
+        onClose();
+      });
     }
-  }, [ref.current])
+  }, [ref.current]);
 
   useEffect(() => {
     if (patientId && ref.current) {
-      ref.current.patientId = patientId
+      ref.current.patientId = patientId;
     }
-  }, [ref.current, patientId])
+  }, [ref.current, patientId]);
 
   return (
     <div
@@ -60,5 +60,5 @@ export const PrescriptionForm = () => {
     >
       <photon-multirx-form-wrapper ref={ref} />
     </div>
-  )
-}
+  );
+};

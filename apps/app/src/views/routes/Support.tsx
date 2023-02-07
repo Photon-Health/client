@@ -1,6 +1,6 @@
-import { Box, Divider, Heading, Text, Stack, Link, HStack } from '@chakra-ui/react'
-import { HiTerminal } from 'react-icons/hi'
-import { Page } from '../components/Page'
+import { Box, Divider, Heading, Text, Stack, Link, HStack } from '@chakra-ui/react';
+import { HiTerminal } from 'react-icons/hi';
+import { Page } from '../components/Page';
 
 export const Support = () => (
   <Page header="Support">
@@ -27,4 +27,4 @@ export const Support = () => (
       </Box>
     </Stack>
   </Page>
-)
+);

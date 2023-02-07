@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import {
   Button,
   FormControl,
@@ -10,20 +10,20 @@ import {
   Tag,
   TagLeftIcon,
   TagLabel
-} from '@chakra-ui/react'
-import { FiMapPin } from 'react-icons/fi'
-import { usePhoton, types } from '@photonhealth/react'
-import { AsyncSelect } from 'chakra-react-select'
-import { RepeatIcon, StarIcon } from '@chakra-ui/icons'
-import { useSearchParams } from 'react-router-dom'
-import { titleCase } from '../../../../../../utils'
+} from '@chakra-ui/react';
+import { FiMapPin } from 'react-icons/fi';
+import { usePhoton, types } from '@photonhealth/react';
+import { AsyncSelect } from 'chakra-react-select';
+import { RepeatIcon, StarIcon } from '@chakra-ui/icons';
+import { useSearchParams } from 'react-router-dom';
+import { titleCase } from '../../../../../../utils';
 
 const formatPharmacyOptions = (p: types.Pharmacy[], preferredIds: string[], previousId = '') => {
   // grab preferred and previous pharmacies and put them at the top of the list
-  const preferredAndPreviousIds = [...preferredIds, previousId]
-  const filteredPreferred = p.filter((org: any) => preferredAndPreviousIds.includes(org.id))
-  const remainingPharmacies = p.filter((org: any) => !preferredAndPreviousIds.includes(org.id))
-  const newOrder = [...filteredPreferred, ...remainingPharmacies]
+  const preferredAndPreviousIds = [...preferredIds, previousId];
+  const filteredPreferred = p.filter((org: any) => preferredAndPreviousIds.includes(org.id));
+  const remainingPharmacies = p.filter((org: any) => !preferredAndPreviousIds.includes(org.id));
+  const newOrder = [...filteredPreferred, ...remainingPharmacies];
 
   const options = newOrder.map((org: any) => {
     return {
@@ -46,20 +46,20 @@ const formatPharmacyOptions = (p: types.Pharmacy[], preferredIds: string[], prev
           ) : null}
         </Text>
       )
-    }
-  })
-  return options
-}
+    };
+  });
+  return options;
+};
 
 interface LocalPickupProps {
-  location: string | undefined
-  latitude: number | undefined
-  longitude: number | undefined
-  onOpen: any
-  errors: any
-  touched: any
-  preferredPharmacyIds: string[]
-  setFieldValue: (field: string, value: string) => void
+  location: string | undefined;
+  latitude: number | undefined;
+  longitude: number | undefined;
+  onOpen: any;
+  errors: any;
+  touched: any;
+  preferredPharmacyIds: string[];
+  setFieldValue: (field: string, value: string) => void;
 }
 
 export const LocalPickup = (props: LocalPickupProps) => {
@@ -72,18 +72,18 @@ export const LocalPickup = (props: LocalPickupProps) => {
     touched,
     setFieldValue,
     preferredPharmacyIds
-  } = props
-  const [params] = useSearchParams()
-  const { getPharmacies, getOrders } = usePhoton()
-  const { refetch: refetchPharmacies } = getPharmacies({})
-  const patientId = params.get('patientId') || ''
+  } = props;
+  const [params] = useSearchParams();
+  const { getPharmacies, getOrders } = usePhoton();
+  const { refetch: refetchPharmacies } = getPharmacies({});
+  const patientId = params.get('patientId') || '';
 
   const { orders } = getOrders({
     patientId,
     first: 1
-  })
+  });
 
-  const [pharmOptions, setPharmOptions] = useState<any>([])
+  const [pharmOptions, setPharmOptions] = useState<any>([]);
 
   const getPharmacyOptions = async (inputValue?: string) => {
     const resultPharmacies: any = await refetchPharmacies({
@@ -94,29 +94,29 @@ export const LocalPickup = (props: LocalPickupProps) => {
         radius: 30
       },
       type: types.FulfillmentType.PickUp
-    })
+    });
 
     return formatPharmacyOptions(
       resultPharmacies.data.pharmacies,
       preferredPharmacyIds,
       orders?.[0]?.pharmacy?.id || ''
-    )
-  }
+    );
+  };
 
   useEffect(() => {
     const getDefaultPharmacyOptions = async () => {
       if (location) {
-        setPharmOptions(await getPharmacyOptions())
+        setPharmOptions(await getPharmacyOptions());
       }
-    }
-    getDefaultPharmacyOptions()
-  }, [location])
+    };
+    getDefaultPharmacyOptions();
+  }, [location]);
 
   const loadOptions = (inputValue: string, callback: (options: any) => void) => {
     setTimeout(async () => {
-      callback(await getPharmacyOptions(inputValue))
-    }, 500)
-  }
+      callback(await getPharmacyOptions(inputValue));
+    }, 500);
+  };
 
   return location ? (
     <>
@@ -146,7 +146,7 @@ export const LocalPickup = (props: LocalPickupProps) => {
           isClearable
           menuPlacement="auto"
           onChange={(data: any) => {
-            if (data?.value) setFieldValue('pharmacyId', data.value)
+            if (data?.value) setFieldValue('pharmacyId', data.value);
           }}
         />
         {errors ? <FormErrorMessage>Please select a pharmacy...</FormErrorMessage> : null}
@@ -162,5 +162,5 @@ export const LocalPickup = (props: LocalPickupProps) => {
         ) : null}
       </VStack>
     </FormControl>
-  )
-}
+  );
+};

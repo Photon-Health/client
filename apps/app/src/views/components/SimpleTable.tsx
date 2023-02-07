@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef } from 'react';
 import {
   Alert,
   AlertIcon,
@@ -13,33 +13,33 @@ import {
   Thead,
   Tr,
   TableContainer
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { Column, useTable, useSortBy } from 'react-table'
+import { Column, useTable, useSortBy } from 'react-table';
 
 interface SimpleTableProps {
-  loading?: boolean
-  error?: Error
-  data: Array<any>
-  columns: Array<Column>
-  hideHeaders?: boolean
-  useLoadingOverlay?: boolean
+  loading?: boolean;
+  error?: Error;
+  data: Array<any>;
+  columns: Array<Column>;
+  hideHeaders?: boolean;
+  useLoadingOverlay?: boolean;
 }
 
 export const SimpleTable = (props: SimpleTableProps) => {
-  let { data, columns } = props
-  const { loading, error, hideHeaders, useLoadingOverlay } = props
+  let { data, columns } = props;
+  const { loading, error, hideHeaders, useLoadingOverlay } = props;
 
-  data = useMemo(() => data, [data])
-  columns = useMemo(() => columns, [columns])
+  data = useMemo(() => data, [data]);
+  columns = useMemo(() => columns, [columns]);
 
-  const tableRef: any = useRef()
+  const tableRef: any = useRef();
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable(
     // @ts-ignore
     { columns, data },
     useSortBy
-  )
+  );
 
   return (
     <Stack
@@ -83,7 +83,7 @@ export const SimpleTable = (props: SimpleTableProps) => {
                 </Tr>
               ) : null}
               {rows.map((row) => {
-                prepareRow(row)
+                prepareRow(row);
                 return (
                   <Tr {...row.getRowProps()}>
                     {row.cells.map((cell) => {
@@ -110,10 +110,10 @@ export const SimpleTable = (props: SimpleTableProps) => {
                         >
                           {cell.render('Cell')}
                         </Td>
-                      )
+                      );
                     })}
                   </Tr>
-                )
+                );
               })}
             </Tbody>
           </Table>
@@ -126,12 +126,12 @@ export const SimpleTable = (props: SimpleTableProps) => {
         )}
       </Box>
     </Stack>
-  )
-}
+  );
+};
 
 SimpleTable.defaultProps = {
   loading: false,
   error: undefined,
   hideHeaders: false,
   useLoadingOverlay: false
-}
+};

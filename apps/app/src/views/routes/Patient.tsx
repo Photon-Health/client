@@ -1,4 +1,4 @@
-import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom'
+import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
 
 import {
   Alert,
@@ -20,48 +20,48 @@ import {
   Text,
   VStack,
   useBreakpointValue
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { FiCopy, FiEdit, FiPhone, FiMail, FiChevronRight, FiPlus } from 'react-icons/fi'
+import { FiCopy, FiEdit, FiPhone, FiMail, FiChevronRight, FiPlus } from 'react-icons/fi';
 
-import { usePhoton } from '@photonhealth/react'
-import { useEffect, useState } from 'react'
-import { formatDateLong, formatPhone, formatDate } from '../../utils'
+import { usePhoton } from '@photonhealth/react';
+import { useEffect, useState } from 'react';
+import { formatDateLong, formatPhone, formatDate } from '../../utils';
 
-import { Page } from '../components/Page'
+import { Page } from '../components/Page';
 
-import { PRESCRIPTION_STATE_MAP, PRESCRIPTION_COLOR_MAP } from './Prescriptions'
-import { ORDER_FULFILLMENT_STATE_MAP, ORDER_FULFILLMENT_COLOR_MAP } from './Orders'
+import { PRESCRIPTION_STATE_MAP, PRESCRIPTION_COLOR_MAP } from './Prescriptions';
+import { ORDER_FULFILLMENT_STATE_MAP, ORDER_FULFILLMENT_COLOR_MAP } from './Orders';
 
 export const Patient = () => {
-  const [loading, setLoading] = useState<boolean>(true)
-  const { patientId: id } = useParams()
+  const [loading, setLoading] = useState<boolean>(true);
+  const { patientId: id } = useParams();
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const { getPatient, getPrescriptions, getOrders } = usePhoton()
+  const { getPatient, getPrescriptions, getOrders } = usePhoton();
   const {
     loading: loadingPatient,
     error,
     patient,
     refetch: refetchPatient
-  } = getPatient({ id: id ?? '' })
+  } = getPatient({ id: id ?? '' });
   const {
     loading: loadingPrescriptions,
     prescriptions,
     refetch: refetchPrescriptions
-  } = getPrescriptions({ patientId: id })
-  const { loading: loadingOrders, orders, refetch: refetchOrders } = getOrders({ patientId: id })
+  } = getPrescriptions({ patientId: id });
+  const { loading: loadingOrders, orders, refetch: refetchOrders } = getOrders({ patientId: id });
 
   useEffect(() => {
-    setLoading(loadingPatient || loadingPrescriptions || loadingOrders)
-  }, [loadingPatient, loadingPrescriptions, loadingOrders])
+    setLoading(loadingPatient || loadingPrescriptions || loadingOrders);
+  }, [loadingPatient, loadingPrescriptions, loadingOrders]);
 
   const sexMap: object = {
     MALE: 'Male',
     FEMALE: 'Female',
     UNKNOWN: 'Unknown'
-  }
+  };
 
   if (error) {
     return (
@@ -69,20 +69,20 @@ export const Patient = () => {
         <AlertIcon />
         {error.message}
       </Alert>
-    )
+    );
   }
 
-  const isMobile = useBreakpointValue({ base: true, sm: false })
-  const tableWidth = useBreakpointValue({ base: 'full', sm: '100%', md: '75%' })
+  const isMobile = useBreakpointValue({ base: true, sm: false });
+  const tableWidth = useBreakpointValue({ base: 'full', sm: '100%', md: '75%' });
 
   useEffect(() => {
     const refetchData = async () => {
-      await refetchPatient({ id })
-      await refetchPrescriptions({ patientId: id })
-      await refetchOrders({ patientId: id })
-    }
-    refetchData()
-  }, [id])
+      await refetchPatient({ id });
+      await refetchPrescriptions({ patientId: id });
+      await refetchOrders({ patientId: id });
+    };
+    refetchData();
+  }, [id]);
 
   return (
     <Page loading={loading} kicker="Patient" header={patient?.name.full}>
@@ -342,9 +342,9 @@ export const Patient = () => {
               <Tbody>
                 {orders.map(({ id: orderId, fulfillment, fills, createdAt }, i) => {
                   const fillsFormatted = fills.reduce((prev: string, cur: any) => {
-                    const fill = cur.treatment.name
-                    return prev ? `${prev}, ${fill}` : fill
-                  }, '')
+                    const fill = cur.treatment.name;
+                    return prev ? `${prev}, ${fill}` : fill;
+                  }, '');
 
                   return i < 5 ? (
                     <Tr
@@ -380,7 +380,7 @@ export const Patient = () => {
                         </HStack>
                       </Td>
                     </Tr>
-                  ) : null
+                  ) : null;
                 })}
               </Tbody>
             </Table>
@@ -390,10 +390,10 @@ export const Patient = () => {
         )}
       </VStack>
     </Page>
-  )
-}
+  );
+};
 
 Patient.defaultProps = {
   loading: false,
   error: undefined
-}
+};

@@ -8,14 +8,14 @@ import {
   Stack,
   Text,
   useBreakpointValue
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { usePhoton } from '@photonhealth/react'
-import { SimpleTable } from '../../../components/SimpleTable'
+import { usePhoton } from '@photonhealth/react';
+import { SimpleTable } from '../../../components/SimpleTable';
 
 export const Profile = () => {
-  const { user, isLoading, getOrganization } = usePhoton()
-  const { organization, loading, error } = getOrganization()
+  const { user, isLoading, getOrganization } = usePhoton();
+  const { organization, loading, error } = getOrganization();
 
   const renderSkeletonRow = (isMobile: boolean | undefined) =>
     isMobile
@@ -26,10 +26,10 @@ export const Profile = () => {
       : {
           title: <Skeleton width="300px" height="20px" />,
           value: <Skeleton width="300px" height="20px" />
-        }
+        };
 
-  const isMobile = useBreakpointValue({ base: true, md: false })
-  const skeletonRows = new Array(4).fill(0).map(() => renderSkeletonRow(isMobile))
+  const isMobile = useBreakpointValue({ base: true, md: false });
+  const skeletonRows = new Array(4).fill(0).map(() => renderSkeletonRow(isMobile));
 
   const rows = [
     {
@@ -48,7 +48,7 @@ export const Profile = () => {
       title: 'Organization ID',
       value: organization?.id
     }
-  ]
+  ];
 
   const columns = [
     {
@@ -60,7 +60,7 @@ export const Profile = () => {
       Header: 'Values',
       accessor: 'value'
     }
-  ]
+  ];
 
   return (
     <Box
@@ -96,5 +96,5 @@ export const Profile = () => {
         </Stack>
       </Container>
     </Box>
-  )
-}
+  );
+};

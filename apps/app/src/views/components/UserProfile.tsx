@@ -1,9 +1,9 @@
-import { Avatar, Box, HStack, Text } from '@chakra-ui/react'
+import { Avatar, Box, HStack, Text } from '@chakra-ui/react';
 
-import { usePhoton } from '@photonhealth/react'
+import { usePhoton } from '@photonhealth/react';
 
 export const UserProfile = () => {
-  const { user } = usePhoton()
+  const { user } = usePhoton();
 
   return (
     <HStack spacing="3" ps="2">
@@ -17,5 +17,5 @@ export const UserProfile = () => {
         </Text>
       </Box>
     </HStack>
-  )
-}
+  );
+};

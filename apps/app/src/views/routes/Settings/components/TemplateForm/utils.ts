@@ -1,4 +1,4 @@
-import * as yup from 'yup'
+import * as yup from 'yup';
 
 export const TEMPLATE_SCHEMA = yup.object({
   treatment: yup
@@ -26,7 +26,7 @@ export const TEMPLATE_SCHEMA = yup.object({
   }),
   instructions: yup.string().min(1, 'Please enter instructions for the patient...'),
   notes: yup.string()
-})
+});
 
 export const TEMPLATE_INITIAL_VALUES = {
   treatment: {
@@ -43,4 +43,4 @@ export const TEMPLATE_INITIAL_VALUES = {
   daysSupply: 30,
   instructions: '',
   notes: ''
-}
+};

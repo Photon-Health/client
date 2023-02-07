@@ -1,6 +1,6 @@
-import { Text, Flex, Box, HStack, Button, ChakraProvider } from '@chakra-ui/react'
-import { confirmable, createConfirmation } from 'react-confirm'
-import theme from '../../configs/theme'
+import { Text, Flex, Box, HStack, Button, ChakraProvider } from '@chakra-ui/react';
+import { confirmable, createConfirmation } from 'react-confirm';
+import theme from '../../configs/theme';
 
 const GuardDialog = ({
   show,
@@ -8,10 +8,10 @@ const GuardDialog = ({
   confirmation,
   options
 }: {
-  show: boolean
-  proceed: Function
-  confirmation: string
-  options: Record<string, any>
+  show: boolean;
+  proceed: Function;
+  confirmation: string;
+  options: Record<string, any>;
 }) => {
   return (
     <ChakraProvider theme={theme}>
@@ -55,11 +55,11 @@ const GuardDialog = ({
         </Box>
       </Flex>
     </ChakraProvider>
-  )
-}
+  );
+};
 
-const confirm = createConfirmation(confirmable(GuardDialog))
+const confirm = createConfirmation(confirmable(GuardDialog));
 
 export function confirmWrapper(confirmation: string, options: Record<string, any>) {
-  return confirm({ confirmation, options })
+  return confirm({ confirmation, options });
 }

@@ -5,19 +5,19 @@ import {
   Input,
   InputGroup,
   InputRightElement
-} from '@chakra-ui/react'
-import { FiCopy } from 'react-icons/fi'
+} from '@chakra-ui/react';
+import { FiCopy } from 'react-icons/fi';
 
 interface ClientIdViewProps {
-  clientId: string
+  clientId: string;
 }
 
 export const ClientIdView = (props: ClientIdViewProps) => {
-  const { clientId } = props
+  const { clientId } = props;
 
   const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text)
-  }
+    navigator.clipboard.writeText(text);
+  };
   return (
     <FormControl id="client_id">
       <FormLabel>Client ID</FormLabel>
@@ -35,5 +35,5 @@ export const ClientIdView = (props: ClientIdViewProps) => {
         </InputRightElement>
       </InputGroup>
     </FormControl>
-  )
-}
+  );
+};

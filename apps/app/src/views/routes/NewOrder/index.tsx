@@ -1,5 +1,5 @@
-import { useEffect, useCallback, useState } from 'react'
-import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useEffect, useCallback, useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
 import {
   Alert,
@@ -16,42 +16,42 @@ import {
   Text,
   useBreakpointValue,
   useColorModeValue
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { FiShoppingCart } from 'react-icons/fi'
+import { FiShoppingCart } from 'react-icons/fi';
 
-import { usePhoton } from '@photonhealth/react'
+import { usePhoton } from '@photonhealth/react';
 
-import { PATIENT_FIELDS } from '../../../model/fragments'
-import { OrderForm } from './components/OrderForm'
+import { PATIENT_FIELDS } from '../../../model/fragments';
+import { OrderForm } from './components/OrderForm';
 
 export const NewOrder = () => {
-  const [params] = useSearchParams()
-  const patientId = params.get('patientId') || ''
-  const prescriptionIds = params.get('prescriptionIds') || ''
+  const [params] = useSearchParams();
+  const patientId = params.get('patientId') || '';
+  const prescriptionIds = params.get('prescriptionIds') || '';
 
   const { createOrder, getPatient, updatePatient, removePatientPreferredPharmacy, user } =
-    usePhoton()
+    usePhoton();
 
-  const peachyOrgId = process.env.REACT_APP_PEACHY_ORG_ID || ''
-  const weekendOrgId = process.env.REACT_APP_WEEKEND_ORG_ID || ''
-  const isPeachyUser = user.org_id === peachyOrgId
-  const isWeekendUser = user.org_id === weekendOrgId
+  const peachyOrgId = process.env.REACT_APP_PEACHY_ORG_ID || '';
+  const weekendOrgId = process.env.REACT_APP_WEEKEND_ORG_ID || '';
+  const isPeachyUser = user.org_id === peachyOrgId;
+  const isWeekendUser = user.org_id === weekendOrgId;
 
   const [createOrderMutation, { loading: loadingCreateOrder, error }] = createOrder({
     refetchQueries: ['getOrders'],
     awaitRefetchQueries: true
-  })
+  });
 
   const [updatePatientMutation] = updatePatient({
     refetchQueries: ['getPatient'],
     awaitRefetchQueries: true
-  })
+  });
 
   const [removePatientPreferredPharmacyMutation] = removePatientPreferredPharmacy({
     refetchQueries: ['getPatient'],
     awaitRefetchQueries: true
-  })
+  });
 
   /**
    * Used refetch here in place of "patients" directly on getPatient because in
@@ -62,57 +62,57 @@ export const NewOrder = () => {
   const { refetch } = getPatient({
     id: patientId || '',
     fragment: { PatientFields: PATIENT_FIELDS }
-  })
+  });
 
-  const [loadingPatient, setLoadingPatient] = useState(false)
-  const [patient, setPatient] = useState<any>(undefined)
+  const [loadingPatient, setLoadingPatient] = useState(false);
+  const [patient, setPatient] = useState<any>(undefined);
 
   const fetchPatient = async () => {
-    setLoadingPatient(true)
+    setLoadingPatient(true);
     const result = await refetch({
       id: patientId || '',
       fragment: { PatientFields: PATIENT_FIELDS }
-    })
+    });
     if (result) {
-      setPatient(result.data.patient)
+      setPatient(result.data.patient);
     }
-    setLoadingPatient(false)
-  }
+    setLoadingPatient(false);
+  };
 
   useEffect(() => {
     if (patientId) {
-      fetchPatient()
+      fetchPatient();
     } else {
-      setPatient(undefined)
+      setPatient(undefined);
     }
-  }, [patientId])
+  }, [patientId]);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const onClose = () => {
-    navigate('/orders')
-  }
+    navigate('/orders');
+  };
 
-  const [, updateState] = useState<object>()
-  const forceUpdate = useCallback(() => updateState({}), [])
+  const [, updateState] = useState<object>();
+  const forceUpdate = useCallback(() => updateState({}), []);
 
-  const [showAddress, setShowAddress] = useState(true)
+  const [showAddress, setShowAddress] = useState(true);
 
   useEffect(() => {
-    forceUpdate()
-  }, [patientId])
+    forceUpdate();
+  }, [patientId]);
 
   useEffect(() => {
     if (patientId && patient?.address) {
-      setShowAddress(false)
+      setShowAddress(false);
     } else {
-      setShowAddress(true)
+      setShowAddress(true);
     }
-  }, [patient?.address])
+  }, [patient?.address]);
 
-  const background = useColorModeValue('white', 'dark')
-  const bodyBackground = useColorModeValue('#f7f4f4', 'bg-canvas')
-  const border = useColorModeValue('gray.200', 'gray.800')
-  const isMobile = useBreakpointValue({ base: true, sm: false })
+  const background = useColorModeValue('white', 'dark');
+  const bodyBackground = useColorModeValue('#f7f4f4', 'bg-canvas');
+  const border = useColorModeValue('gray.200', 'gray.800');
+  const isMobile = useBreakpointValue({ base: true, sm: false });
 
   return (
     <Modal
@@ -186,5 +186,5 @@ export const NewOrder = () => {
         </ModalBody>
       </ModalContent>
     </Modal>
-  )
-}
+  );
+};

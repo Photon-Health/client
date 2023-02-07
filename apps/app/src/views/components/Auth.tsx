@@ -1,26 +1,26 @@
-import { Button, Stack } from '@chakra-ui/react'
-import { CopyIcon } from '@chakra-ui/icons'
+import { Button, Stack } from '@chakra-ui/react';
+import { CopyIcon } from '@chakra-ui/icons';
 
-import { usePhoton } from '@photonhealth/react'
+import { usePhoton } from '@photonhealth/react';
 
 interface AuthProps {
-  returnTo?: string
+  returnTo?: string;
 }
 
 export const Auth = (props: AuthProps) => {
-  const { returnTo } = props
-  const { isLoading, isAuthenticated, getToken, login, logout } = usePhoton()
+  const { returnTo } = props;
+  const { isLoading, isAuthenticated, getToken, login, logout } = usePhoton();
 
   const getAccessToken = async () => {
     try {
-      const token = await getToken()
-      navigator.clipboard.writeText(token)
+      const token = await getToken();
+      navigator.clipboard.writeText(token);
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
-  }
+  };
 
-  if (isLoading) return <Button isLoading loadingText="Loading" colorScheme="gray" />
+  if (isLoading) return <Button isLoading loadingText="Loading" colorScheme="gray" />;
 
   if (isAuthenticated)
     return (
@@ -38,20 +38,20 @@ export const Auth = (props: AuthProps) => {
         <Button
           colorScheme="brand"
           onClick={() => {
-            localStorage.removeItem('previouslyAuthed')
-            logout({ returnTo: window.location.origin })
+            localStorage.removeItem('previouslyAuthed');
+            logout({ returnTo: window.location.origin });
           }}
         >
           Log out
         </Button>
       </Stack>
-    )
+    );
 
   return (
     <Button colorScheme="blue" onClick={() => login({ appState: { returnTo } })}>
       Log in
     </Button>
-  )
-}
+  );
+};
 
-Auth.defaultProps = { returnTo: '/' }
+Auth.defaultProps = { returnTo: '/' };

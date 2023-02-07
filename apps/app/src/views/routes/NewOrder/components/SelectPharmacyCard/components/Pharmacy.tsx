@@ -1,34 +1,34 @@
-import { useState, useEffect } from 'react'
-import { Box, Skeleton, SkeletonText, Tag, Text, VStack } from '@chakra-ui/react'
-import { usePhoton, types } from '@photonhealth/react'
-import { formatAddress } from '../../../../../../utils'
+import { useState, useEffect } from 'react';
+import { Box, Skeleton, SkeletonText, Tag, Text, VStack } from '@chakra-ui/react';
+import { usePhoton, types } from '@photonhealth/react';
+import { formatAddress } from '../../../../../../utils';
 
 interface PharmacyProps {
-  pharmacyId: string
-  isPreferred?: boolean
-  showTags?: boolean
+  pharmacyId: string;
+  isPreferred?: boolean;
+  showTags?: boolean;
 }
 
 export const Pharmacy = ({ pharmacyId, isPreferred, showTags }: PharmacyProps) => {
-  const { getPharmacy } = usePhoton()
-  const { refetch, loading } = getPharmacy({ id: '' })
+  const { getPharmacy } = usePhoton();
+  const { refetch, loading } = getPharmacy({ id: '' });
 
-  const [pharmacy, setPharmacy] = useState<types.Pharmacy | undefined>(undefined)
+  const [pharmacy, setPharmacy] = useState<types.Pharmacy | undefined>(undefined);
 
   const getPharm = async () => {
-    const result = await refetch({ id: pharmacyId })
+    const result = await refetch({ id: pharmacyId });
     if (result) {
-      setPharmacy(result.data.pharmacy)
+      setPharmacy(result.data.pharmacy);
     }
-  }
+  };
 
   useEffect(() => {
     if (pharmacyId) {
-      getPharm()
+      getPharm();
     } else {
-      setPharmacy(undefined)
+      setPharmacy(undefined);
     }
-  }, [pharmacyId])
+  }, [pharmacyId]);
 
   if (loading || !pharmacy) {
     return (
@@ -37,7 +37,7 @@ export const Pharmacy = ({ pharmacyId, isPreferred, showTags }: PharmacyProps) =
         <SkeletonText noOfLines={1} width="150px" skeletonHeight="4" />
         <SkeletonText noOfLines={1} width="200px" skeletonHeight="4" />
       </VStack>
-    )
+    );
   }
 
   return (
@@ -64,10 +64,10 @@ export const Pharmacy = ({ pharmacyId, isPreferred, showTags }: PharmacyProps) =
       <Text>{pharmacy.name}</Text>
       {pharmacy?.address ? <Text color="gray.500">{formatAddress(pharmacy.address)}</Text> : null}
     </VStack>
-  )
-}
+  );
+};
 
 Pharmacy.defaultProps = {
   isPreferred: false,
   showTags: true
-}
+};

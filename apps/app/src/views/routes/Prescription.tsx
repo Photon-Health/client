@@ -1,6 +1,6 @@
-import { useParams, Link as RouterLink } from 'react-router-dom'
+import { useParams, Link as RouterLink } from 'react-router-dom';
 
-import { usePhoton } from '@photonhealth/react'
+import { usePhoton } from '@photonhealth/react';
 import {
   Alert,
   AlertIcon,
@@ -21,25 +21,25 @@ import {
   SkeletonCircle,
   SkeletonText,
   useBreakpointValue
-} from '@chakra-ui/react'
-import { FiCopy } from 'react-icons/fi'
-import { Page } from '../components/Page'
+} from '@chakra-ui/react';
+import { FiCopy } from 'react-icons/fi';
+import { Page } from '../components/Page';
 
-import { formatDate } from '../../utils'
+import { formatDate } from '../../utils';
 
-import { PRESCRIPTION_COLOR_MAP, PRESCRIPTION_STATE_MAP } from './Prescriptions'
+import { PRESCRIPTION_COLOR_MAP, PRESCRIPTION_STATE_MAP } from './Prescriptions';
 
-import PatientView from '../components/PatientView'
-import NameView from '../components/NameView'
+import PatientView from '../components/PatientView';
+import NameView from '../components/NameView';
 
 export const Prescription = () => {
-  const params = useParams()
-  const id = params.prescriptionId
+  const params = useParams();
+  const id = params.prescriptionId;
 
-  const { getPrescription } = usePhoton()
-  const { prescription, loading, error } = getPrescription({ id: id! })
+  const { getPrescription } = usePhoton();
+  const { prescription, loading, error } = getPrescription({ id: id! });
 
-  const rx = prescription || {}
+  const rx = prescription || {};
 
   if (error) {
     return (
@@ -47,7 +47,7 @@ export const Prescription = () => {
         <AlertIcon />
         {error.message}
       </Alert>
-    )
+    );
   }
 
   const {
@@ -59,17 +59,17 @@ export const Prescription = () => {
     fillsRemaining,
     daysSupply,
     instructions
-  } = rx
+  } = rx;
 
-  const state = PRESCRIPTION_STATE_MAP[rx.state as keyof object] || ''
-  const stateColor = PRESCRIPTION_COLOR_MAP[rx.state as keyof object] || ''
+  const state = PRESCRIPTION_STATE_MAP[rx.state as keyof object] || '';
+  const stateColor = PRESCRIPTION_COLOR_MAP[rx.state as keyof object] || '';
 
-  const writtenAt = formatDate(rx.writtenAt)
-  const effectiveDate = formatDate(rx.effectiveDate)
-  const expirationDate = formatDate(rx.expirationDate)
+  const writtenAt = formatDate(rx.writtenAt);
+  const effectiveDate = formatDate(rx.effectiveDate);
+  const expirationDate = formatDate(rx.expirationDate);
 
-  const isMobile = useBreakpointValue({ base: true, sm: false })
-  const tableWidth = useBreakpointValue({ base: 'full', sm: '100%', md: '75%' })
+  const isMobile = useBreakpointValue({ base: true, sm: false });
+  const tableWidth = useBreakpointValue({ base: 'full', sm: '100%', md: '75%' });
 
   return (
     <Page kicker="Prescription" header={prescription?.treatment.name} loading={loading}>
@@ -335,5 +335,5 @@ export const Prescription = () => {
         </HStack>
       </VStack>
     </Page>
-  )
-}
+  );
+};

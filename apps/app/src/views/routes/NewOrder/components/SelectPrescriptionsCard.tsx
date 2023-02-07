@@ -5,15 +5,15 @@ import {
   FormControl,
   FormErrorMessage,
   Heading
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { FillsSelect } from '../../../components/FillsSelect'
+import { FillsSelect } from '../../../components/FillsSelect';
 
 interface SelectPrescriptionsCardProps {
-  errors: any
-  touched: any
-  patientId: string
-  prescriptionIds: string[]
+  errors: any;
+  touched: any;
+  patientId: string;
+  prescriptionIds: string[];
 }
 
 export const SelectPrescriptionsCard = ({
@@ -38,5 +38,5 @@ export const SelectPrescriptionsCard = ({
         </FormControl>
       </CardBody>
     </Card>
-  )
-}
+  );
+};

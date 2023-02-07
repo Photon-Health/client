@@ -16,10 +16,10 @@ import {
   Text,
   useColorModeValue,
   Wrap
-} from '@chakra-ui/react'
-import { Field, Formik } from 'formik'
-import { useEffect, useState } from 'react'
-import { SelectField } from './SelectField'
+} from '@chakra-ui/react';
+import { Field, Formik } from 'formik';
+import { useEffect, useState } from 'react';
+import { SelectField } from './SelectField';
 
 const initialValues = {
   input: {
@@ -42,88 +42,88 @@ const initialValues = {
       unit: 'mL'
     }
   }
-}
+};
 
 const compatibleDosageWeight = (dosageUnit: string, weightUnit: string) => {
   if ((weightUnit === 'kg' || weightUnit === 'g') && dosageUnit.includes('kg')) {
-    return true
+    return true;
   }
   if ((weightUnit === 'lb' || weightUnit === 'oz') && dosageUnit.includes('lb')) {
-    return true
+    return true;
   }
-  return false
-}
+  return false;
+};
 
 const convertCompatibleWeight = (dosageUnit: string, weight: { value: number; unit: string }) => {
   if (dosageUnit.includes('kg') && weight.unit === 'oz') {
-    return (weight.value / 16) * 0.453592
+    return (weight.value / 16) * 0.453592;
   }
   if (dosageUnit.includes('kg') && weight.unit === 'lb') {
-    return weight.value * 0.453592
+    return weight.value * 0.453592;
   }
   if (dosageUnit.includes('lb') && weight.unit === 'kg') {
-    return weight.value * 2.20462
+    return weight.value * 2.20462;
   }
   if (dosageUnit.includes('lb') && weight.unit === 'g') {
-    return (weight.value / 1000) * 2.20462
+    return (weight.value / 1000) * 2.20462;
   }
-  return 0
-}
+  return 0;
+};
 
 const compatibleLiquid = (dosageUnit: string, liquidDosageUnit: string) => {
   if (liquidDosageUnit === 'mcg' && dosageUnit.split('/')[0] === 'mcg') {
-    return true
+    return true;
   }
   if (liquidDosageUnit === 'mg' && dosageUnit.split('/')[0] === 'mg') {
-    return true
+    return true;
   }
   if (liquidDosageUnit === 'g' && dosageUnit.split('/')[0] === 'g') {
-    return true
+    return true;
   }
-  return false
-}
+  return false;
+};
 
 const convertCompatibleLiquid = (dosageUnit: string, liquid: { value: number; unit: string }) => {
   if (dosageUnit.includes('mcg') && liquid.unit === 'mcg') {
-    return liquid.value / (1000 * 1000)
+    return liquid.value / (1000 * 1000);
   }
   if (dosageUnit.includes('mcg') && liquid.unit === 'g') {
-    return liquid.value * (1000 * 1000)
+    return liquid.value * (1000 * 1000);
   }
   if (dosageUnit.includes('mg') && liquid.unit === 'mcg') {
-    return liquid.value / 1000
+    return liquid.value / 1000;
   }
   if (dosageUnit.includes('mg') && liquid.unit === 'g') {
-    return liquid.value * 1000
+    return liquid.value * 1000;
   }
   if (dosageUnit.includes('g') && liquid.unit === 'mcg') {
-    return liquid.value / (1000 * 1000)
+    return liquid.value / (1000 * 1000);
   }
   if (dosageUnit.includes('g') && liquid.unit === 'mg') {
-    return liquid.value / 1000
+    return liquid.value / 1000;
   }
 
-  return 0
-}
+  return 0;
+};
 
 const calculateDosage = (
   dosage: {
-    value: number
-    unit: string
+    value: number;
+    unit: string;
   },
   weight: { value: number; unit: string }
 ) => {
   if (compatibleDosageWeight(dosage.unit, weight.unit) && weight.unit === 'g') {
-    return dosage.value * (weight.value / 1000)
+    return dosage.value * (weight.value / 1000);
   }
   if (compatibleDosageWeight(dosage.unit, weight.unit) && weight.unit === 'oz') {
-    return dosage.value * (weight.value / 16)
+    return dosage.value * (weight.value / 16);
   }
   if (compatibleDosageWeight(dosage.unit, weight.unit)) {
-    return dosage.value * weight.value
+    return dosage.value * weight.value;
   }
-  return dosage.value * convertCompatibleWeight(dosage.unit, weight)
-}
+  return dosage.value * convertCompatibleWeight(dosage.unit, weight);
+};
 
 const calculateLiquidDosage = (
   dosage: number,
@@ -138,13 +138,13 @@ const calculateLiquidDosage = (
     parseInt(drug.toString(), 10) === 0 ||
     window.isNaN(drug)
   ) {
-    return 0
+    return 0;
   }
   if (compatibleLiquid(dosage_unit, drug_unit)) {
-    return (dosage * volume) / drug
+    return (dosage * volume) / drug;
   }
-  return (dosage * volume) / convertCompatibleLiquid(dosage_unit, { value: drug, unit: drug_unit })
-}
+  return (dosage * volume) / convertCompatibleLiquid(dosage_unit, { value: drug, unit: drug_unit });
+};
 
 export const DosageCalc = ({
   isOpen,
@@ -153,27 +153,27 @@ export const DosageCalc = ({
   drugRef,
   unitRef
 }: {
-  isOpen: boolean
-  onClose: any
-  quantityRef: React.MutableRefObject<any>
-  drugRef: React.MutableRefObject<any>
-  unitRef: React.MutableRefObject<any>
+  isOpen: boolean;
+  onClose: any;
+  quantityRef: React.MutableRefObject<any>;
+  drugRef: React.MutableRefObject<any>;
+  unitRef: React.MutableRefObject<any>;
 }) => {
-  const background = useColorModeValue('white', 'dark')
-  const [dose, setDose] = useState<string | undefined>()
-  const [liquidDose, setLiquidDose] = useState<string | undefined>()
-  const [selectedMedication, setSelectedMedication] = useState<string>('')
+  const background = useColorModeValue('white', 'dark');
+  const [dose, setDose] = useState<string | undefined>();
+  const [liquidDose, setLiquidDose] = useState<string | undefined>();
+  const [selectedMedication, setSelectedMedication] = useState<string>('');
 
   useEffect(() => {
     if (drugRef.current) {
-      const val = drugRef.current?.getValue()
+      const val = drugRef.current?.getValue();
       if (val.length > 0) {
-        setSelectedMedication(val[0]?.label)
+        setSelectedMedication(val[0]?.label);
       } else {
-        setSelectedMedication('')
+        setSelectedMedication('');
       }
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   return (
     <Modal
@@ -202,12 +202,12 @@ export const DosageCalc = ({
             initialValues={initialValues}
             onSubmit={() => {}}
             validate={(values) => {
-              let dosage = calculateDosage(values.input.dosage, values.input.weight)
+              let dosage = calculateDosage(values.input.dosage, values.input.weight);
               if (
                 dosage.toString().split('.').length > 1 &&
                 dosage.toString().split('.')[1].length > 4
               ) {
-                dosage = parseFloat(dosage.toFixed(4))
+                dosage = parseFloat(dosage.toFixed(4));
               }
               let liquidDosage = calculateLiquidDosage(
                 dosage,
@@ -215,15 +215,15 @@ export const DosageCalc = ({
                 values.liquid_formation.drug_amount.value,
                 values.liquid_formation.drug_amount.unit,
                 values.liquid_formation.per_volume.value
-              )
+              );
               if (
                 liquidDosage.toString().split('.').length > 1 &&
                 liquidDosage.toString().split('.')[1].length > 4
               ) {
-                liquidDosage = parseFloat(liquidDosage.toFixed(4))
+                liquidDosage = parseFloat(liquidDosage.toFixed(4));
               }
-              setDose(`${dosage} ${values.input.dosage.unit.split('/')[0]}`)
-              setLiquidDose(`${liquidDosage} ${values.liquid_formation.per_volume.unit}`)
+              setDose(`${dosage} ${values.input.dosage.unit.split('/')[0]}`);
+              setLiquidDose(`${liquidDosage} ${values.liquid_formation.per_volume.unit}`);
             }}
           >
             {() => {
@@ -356,14 +356,14 @@ export const DosageCalc = ({
                             const inputValSetter = Object.getOwnPropertyDescriptor(
                               window.HTMLInputElement.prototype!,
                               'value'
-                            )!.set
+                            )!.set;
                             inputValSetter!.call(
                               quantityRef.current.children[0],
                               dose.split(' ')[0]
-                            )
-                            const ev = new Event('input', { bubbles: true })
-                            quantityRef.current.children[0].dispatchEvent(ev)
-                            onClose()
+                            );
+                            const ev = new Event('input', { bubbles: true });
+                            quantityRef.current.children[0].dispatchEvent(ev);
+                            onClose();
                           }
                         }}
                       >
@@ -384,20 +384,20 @@ export const DosageCalc = ({
                             const inputValSetter = Object.getOwnPropertyDescriptor(
                               window.HTMLInputElement.prototype!,
                               'value'
-                            )!.set
+                            )!.set;
                             inputValSetter!.call(
                               quantityRef.current.children[0],
                               liquidDose.split(' ')[1].includes('mL')
                                 ? liquidDose.split(' ')[0]
                                 : parseFloat(liquidDose.split(' ')[0]) * 1000
-                            )
-                            const ev = new Event('input', { bubbles: true })
-                            quantityRef.current.children[0].dispatchEvent(ev)
+                            );
+                            const ev = new Event('input', { bubbles: true });
+                            quantityRef.current.children[0].dispatchEvent(ev);
                             unitRef.current.setValue({
                               value: 'Milliliter',
                               label: 'Milliliter'
-                            })
-                            onClose()
+                            });
+                            onClose();
                           }
                         }}
                       >
@@ -406,12 +406,12 @@ export const DosageCalc = ({
                     </HStack>
                   </Box>
                 </Flex>
-              )
+              );
             }}
           </Formik>
         </ModalBody>
         <ModalFooter px="0" />
       </ModalContent>
     </Modal>
-  )
-}
+  );
+};

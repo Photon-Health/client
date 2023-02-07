@@ -1,4 +1,4 @@
-import { Container, Heading, Link, Stack, useBreakpointValue } from '@chakra-ui/react'
+import { Container, Heading, Link, Stack, useBreakpointValue } from '@chakra-ui/react';
 
 export const NotFound = () => (
   <Container maxW="md" py={{ base: '12', md: '24' }}>
@@ -11,4 +11,4 @@ export const NotFound = () => (
       </Link>
     </Stack>
   </Container>
-)
+);

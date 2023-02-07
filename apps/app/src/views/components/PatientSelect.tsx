@@ -1,33 +1,33 @@
-import { Text } from '@chakra-ui/react'
+import { Text } from '@chakra-ui/react';
 
-import { usePhoton } from '@photonhealth/react'
-import { useEffect, useState } from 'react'
-import { useDebounce } from 'use-debounce'
-import { SelectField } from './SelectField'
+import { usePhoton } from '@photonhealth/react';
+import { useEffect, useState } from 'react';
+import { useDebounce } from 'use-debounce';
+import { SelectField } from './SelectField';
 
-const mapOption = (patient: any) => ({ value: patient.id, label: patient.name.full })
+const mapOption = (patient: any) => ({ value: patient.id, label: patient.name.full });
 
 export const PatientSelect = (props: any) => {
-  const [filterText, setFilterText] = useState('')
-  const [options, setOptions] = useState<any[]>([])
-  const [finished, setFinished] = useState<boolean>(false)
-  const [filterTextDebounce] = useDebounce(filterText, 250)
-  const { getPatients, getPatient } = usePhoton()
+  const [filterText, setFilterText] = useState('');
+  const [options, setOptions] = useState<any[]>([]);
+  const [finished, setFinished] = useState<boolean>(false);
+  const [filterTextDebounce] = useDebounce(filterText, 250);
+  const { getPatients, getPatient } = usePhoton();
 
   const { patients, loading, error, refetch } = getPatients({
     name: filterTextDebounce.length > 0 ? filterTextDebounce : null
-  })
+  });
 
-  const patient = getPatient({ id: '' })
+  const patient = getPatient({ id: '' });
 
   useEffect(() => {
     if (!loading) {
-      setOptions(patients.map(mapOption))
-      setFinished(patients.length === 0)
+      setOptions(patients.map(mapOption));
+      setFinished(patients.length === 0);
     }
-  }, [loading])
+  }, [loading]);
 
-  if (error) return <Text color="red">{error.message}</Text>
+  if (error) return <Text color="red">{error.message}</Text>;
 
   return (
     <SelectField
@@ -39,9 +39,9 @@ export const PatientSelect = (props: any) => {
         if (x && x.length > 0 && !options.map((y: any) => y.value).includes(x)) {
           const patientData = await patient.refetch({
             id: x
-          })
+          });
           if (patientData.data) {
-            setOptions([...new Set(options.concat(mapOption(patientData.data?.patient)))])
+            setOptions([...new Set(options.concat(mapOption(patientData.data?.patient)))]);
           }
         }
       }}
@@ -52,12 +52,12 @@ export const PatientSelect = (props: any) => {
         const { data } = await refetch({
           name: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
           after: options?.at(-1)?.value
-        })
+        });
         if (data?.patients.length === 0) {
-          setFinished(true)
+          setFinished(true);
         }
-        setOptions([...new Set(options.concat(data?.patients.map(mapOption)))])
+        setOptions([...new Set(options.concat(data?.patients.map(mapOption)))]);
       }}
     />
-  )
-}
+  );
+};

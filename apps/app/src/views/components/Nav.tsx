@@ -16,21 +16,21 @@ import {
   useDisclosure,
   Divider,
   Stack
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { FiShoppingCart, FiSettings, FiUsers, FiMenu, FiHelpCircle } from 'react-icons/fi'
-import { TbPrescription } from 'react-icons/tb'
+import { FiShoppingCart, FiSettings, FiUsers, FiMenu, FiHelpCircle } from 'react-icons/fi';
+import { TbPrescription } from 'react-icons/tb';
 
-import { Link as RouterLink } from 'react-router-dom'
-import { usePhoton } from '@photonhealth/react'
-import { Logo } from './Logo'
-import { NavButton } from './NavButton'
-import { UserProfile } from './UserProfile'
+import { Link as RouterLink } from 'react-router-dom';
+import { usePhoton } from '@photonhealth/react';
+import { Logo } from './Logo';
+import { NavButton } from './NavButton';
+import { UserProfile } from './UserProfile';
 
 export const Nav = () => {
-  const { user } = usePhoton()
-  const isDesktop = useBreakpointValue({ base: false, lg: true })
-  const { isOpen, onClose, onToggle } = useDisclosure()
+  const { user } = usePhoton();
+  const isDesktop = useBreakpointValue({ base: false, lg: true });
+  const { isOpen, onClose, onToggle } = useDisclosure();
 
   return (
     <Box as="nav" bg="bg-surface" py="3" boxShadow={useColorModeValue('sm', 'sm-dark')}>
@@ -128,5 +128,5 @@ export const Nav = () => {
         </Flex>
       </Container>
     </Box>
-  )
-}
+  );
+};

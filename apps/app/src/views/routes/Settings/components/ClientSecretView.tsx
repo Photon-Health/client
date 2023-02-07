@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from 'react';
 
 import {
   Button,
@@ -10,21 +10,21 @@ import {
   Input,
   InputGroup,
   InputRightElement
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { FiCopy, FiEye, FiEyeOff } from 'react-icons/fi'
+import { FiCopy, FiEye, FiEyeOff } from 'react-icons/fi';
 
 interface ClientSecretViewProps {
-  clientSecret: string
+  clientSecret: string;
 }
 
 export const ClientSecretView = (props: ClientSecretViewProps) => {
-  const { clientSecret } = props
-  const [show, setShow] = useState(false)
-  const handleClick = () => setShow(!show)
+  const { clientSecret } = props;
+  const [show, setShow] = useState(false);
+  const handleClick = () => setShow(!show);
   const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text)
-  }
+    navigator.clipboard.writeText(text);
+  };
 
   return (
     <FormControl id="client_secret">
@@ -54,5 +54,5 @@ export const ClientSecretView = (props: ClientSecretViewProps) => {
       </InputGroup>
       <FormHelperText>The Client Secret is not base64 encoded.</FormHelperText>
     </FormControl>
-  )
-}
+  );
+};

@@ -1,17 +1,17 @@
-import { Button, VStack, Heading, HStack, ModalFooter, useToast } from '@chakra-ui/react'
-import { RefObject } from 'react'
-import { Formik } from 'formik'
+import { Button, VStack, Heading, HStack, ModalFooter, useToast } from '@chakra-ui/react';
+import { RefObject } from 'react';
+import { Formik } from 'formik';
 
-import { AdvancedDrugSearch } from '../../../components/AdvancedDrugSearch'
+import { AdvancedDrugSearch } from '../../../components/AdvancedDrugSearch';
 
 interface TreatmentFormProps {
-  loading: boolean
-  addToCatalogMutation: Function
-  catalogId: string
-  advSearchRef: RefObject<any>
-  submitRef: RefObject<any>
-  isModal?: boolean
-  onClose: () => void
+  loading: boolean;
+  addToCatalogMutation: Function;
+  catalogId: string;
+  advSearchRef: RefObject<any>;
+  submitRef: RefObject<any>;
+  isModal?: boolean;
+  onClose: () => void;
 }
 
 export const TreatmentForm = ({
@@ -23,7 +23,7 @@ export const TreatmentForm = ({
   isModal,
   onClose
 }: TreatmentFormProps) => {
-  const toast = useToast()
+  const toast = useToast();
 
   return (
     <Formik
@@ -35,13 +35,13 @@ export const TreatmentForm = ({
             treatmentId: advSearchRef.current.selected.id
           },
           onCompleted: () => {
-            if (isModal) onClose()
+            if (isModal) onClose();
             toast({
               title: 'Treatment added',
               status: 'success'
-            })
+            });
           }
-        })
+        });
       }}
     >
       {({ handleSubmit }) => {
@@ -91,12 +91,12 @@ export const TreatmentForm = ({
               )}
             </VStack>
           </form>
-        )
+        );
       }}
     </Formik>
-  )
-}
+  );
+};
 
 TreatmentForm.defaultProps = {
   isModal: false
-}
+};

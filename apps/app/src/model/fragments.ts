@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag'
+import { gql } from 'graphql-tag';
 
 export const CATALOG_TREATMENTS_FIELDS = gql`
   fragment CatalogTreatmentsFields on Catalog {
@@ -21,7 +21,7 @@ export const CATALOG_TREATMENTS_FIELDS = gql`
       }
     }
   }
-`
+`;
 export const PATIENT_FIELDS = gql`
   fragment PatientFields on Patient {
     id
@@ -59,4 +59,4 @@ export const PATIENT_FIELDS = gql`
       }
     }
   }
-`
+`;

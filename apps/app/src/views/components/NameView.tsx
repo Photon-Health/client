@@ -1,15 +1,15 @@
-import { Link as RouterLink } from 'react-router-dom'
-import { Avatar, Box, Button, HStack, Text } from '@chakra-ui/react'
+import { Link as RouterLink } from 'react-router-dom';
+import { Avatar, Box, Button, HStack, Text } from '@chakra-ui/react';
 
 interface NameViewProps {
-  name: string
-  sub?: string
-  isPatient?: boolean
-  patientId?: string
+  name: string;
+  sub?: string;
+  isPatient?: boolean;
+  patientId?: string;
 }
 
 const NameView = (props: NameViewProps) => {
-  const { name, sub, isPatient, patientId } = props
+  const { name, sub, isPatient, patientId } = props;
   return (
     <HStack spacing="3">
       <Avatar name={name} src="" boxSize="10" />
@@ -29,9 +29,9 @@ const NameView = (props: NameViewProps) => {
         <Text color="muted">{sub}</Text>
       </Box>
     </HStack>
-  )
-}
+  );
+};
 
-NameView.defaultProps = { sub: '', isPatient: false, patientId: '' }
+NameView.defaultProps = { sub: '', isPatient: false, patientId: '' };
 
-export default NameView
+export default NameView;
