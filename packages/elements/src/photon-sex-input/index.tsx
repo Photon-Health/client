@@ -13,15 +13,15 @@ type Sex = {
 const sexes: Sex[] = [
   {
     id: '1',
-    name: 'Male',
+    name: 'MALE',
   },
   {
     id: '2',
-    name: 'Female',
+    name: 'FEMALE',
   },
   {
     id: '3',
-    name: 'Unknown',
+    name: 'UNKNOWN',
   },
 ];
 

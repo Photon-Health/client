@@ -25,6 +25,7 @@ import { GraphQLError } from 'graphql';
 import { OrderCard } from './components/OrderCard';
 import { format } from 'date-fns';
 import gql from 'graphql-tag';
+import { PharmacyCard } from './components/PharmacyCard';
 
 const CATALOG_TREATMENTS_FIELDS = gql`
   fragment CatalogTreatmentsFields on Catalog {
@@ -58,6 +59,7 @@ customElement(
     hideSubmit: false,
     hideTemplates: true,
     enableOrder: false,
+    pharmacyId: undefined,
     loading: false,
   },
   (
@@ -67,6 +69,7 @@ customElement(
       hideSubmit: boolean;
       hideTemplates: boolean;
       enableOrder: boolean;
+      pharmacyId?: string;
       loading: boolean;
     },
     options
@@ -84,6 +87,7 @@ customElement(
     const client = usePhoton();
     const [showForm, setShowForm] = createSignal<boolean>(!props.templateIds);
     const [isLoading, setIsLoading] = createSignal<boolean>(true);
+    const [isLoadingTemplates, setIsLoadingTemplates] = createSignal<boolean>(false);
     const [hasError, setHasError] = createSignal<boolean>(false);
     const [authenticated, setAuthenticated] = createSignal<boolean>(
       client?.authentication.state.isAuthenticated || false
@@ -110,6 +114,7 @@ customElement(
 
     createEffect(async () => {
       if (props.templateIds && client) {
+        setIsLoadingTemplates(true);
         const ids = props.templateIds.split(',');
 
         // TODO: Should just get the template directly but not supported by the SDK
@@ -172,6 +177,7 @@ customElement(
             ],
           });
         }
+        setIsLoadingTemplates(false);
       }
     }, [client]);
 
@@ -285,7 +291,7 @@ customElement(
           const { data: data2, errors } = await orderMutation({
             variables: {
               patientId: store['patient']?.value.id,
-              pharmacyId: store['pharmacy']?.value.id,
+              pharmacyId: props?.pharmacyId || store['pharmacy']?.value.id,
               address: address,
               fills: data?.createPrescriptions.map((x) => ({ prescriptionId: x.id })),
             },
@@ -347,9 +353,16 @@ customElement(
                   store={store}
                 ></AddPrescriptionCard>
               </Show>
-              <DraftPrescriptionCard actions={actions} store={store}></DraftPrescriptionCard>
-              <Show when={props.enableOrder}>
+              <DraftPrescriptionCard
+                actions={actions}
+                store={store}
+                isLoading={isLoadingTemplates()}
+              ></DraftPrescriptionCard>
+              <Show when={props.enableOrder && !props.pharmacyId}>
                 <OrderCard store={store} actions={actions}></OrderCard>
+              </Show>
+              <Show when={props.enableOrder && props.pharmacyId}>
+                <PharmacyCard pharmacyId={props.pharmacyId}></PharmacyCard>
               </Show>
               <Show when={!props.hideSubmit}>
                 <div class="flex flex-row justify-end gap-2">

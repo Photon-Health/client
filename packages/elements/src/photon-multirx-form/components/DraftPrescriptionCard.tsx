@@ -4,12 +4,13 @@ import { size, array, any } from 'superstruct';
 
 const draftPrescriptionsValidator = message(
   size(array(any()), 1, Infinity),
-  'You must add atleast 1 Prescription'
+  'You must add at least 1 Prescription'
 );
 
 export const DraftPrescriptionCard = (props: {
   actions: Record<string, Function>;
   store: Record<string, any>;
+  isLoading: boolean;
 }) => {
   const [dialogOpen, setDialogOpen] = createSignal<boolean>(false);
   const [selectedDraft, setSelectedDraft] = createSignal<string | undefined>();
@@ -48,7 +49,9 @@ export const DraftPrescriptionCard = (props: {
       </photon-dialog>
       <div class="flex flex-col gap-3">
         <p class="font-sans text-l font-medium">Pending Prescriptions</p>
-        <Show when={(props.store['draftPrescriptions']?.value ?? []).length == 0}>
+        <Show
+          when={(props.store['draftPrescriptions']?.value ?? []).length === 0 && !props.isLoading}
+        >
           <div>
             <photon-card invalid={props.store['draftPrescriptions']?.error}>
               <p class="italic font-sans text-gray-500">No prescriptions pending</p>
@@ -58,6 +61,16 @@ export const DraftPrescriptionCard = (props: {
                 {props.store['draftPrescriptions']?.error}
               </p>
             </Show>
+          </div>
+        </Show>
+        <Show when={props.isLoading}>
+          <div>
+            <photon-card>
+              <div class="w-full flex justify-between">
+                <p class="italic font-sans text-gray-500">Loading Prescriptions...</p>
+                <sl-spinner style="font-size: 1rem;"></sl-spinner>
+              </div>
+            </photon-card>
           </div>
         </Show>
         <For each={props.store['draftPrescriptions']?.value ?? []}>

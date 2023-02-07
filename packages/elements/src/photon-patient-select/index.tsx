@@ -90,7 +90,7 @@ customElement(
           disabled={props.disabled}
           placeholder="Select patient..."
           invalid={props.invalid}
-          isLoading={store.patients.isLoading}
+          isLoading={store.patients.isLoading || store.selectedPatient.isLoading}
           hasMore={store.patients.data.length % 25 === 0 && !store.patients.finished}
           displayAccessor={(p) => p.name.full}
           onSearchChange={async (s: string) =>

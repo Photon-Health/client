@@ -20,7 +20,7 @@ const PhotonFormWrapper = ({
   titleIconName,
   form,
   onClosed,
-  checkShouldWarn = () => false
+  checkShouldWarn = () => false,
 }: PhotonFormWrapperProps) => {
   let ref: any;
   const [closeDialogOpen, setCloseDialogOpen] = createSignal<boolean>(false);

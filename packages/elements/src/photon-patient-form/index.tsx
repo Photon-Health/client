@@ -36,11 +36,11 @@ const getPatientAddress = (pStore: any, store: any) => {
 };
 
 customElement(
-  'photon-update-patient-form',
+  'photon-patient-form',
   {
     patientId: '',
   },
-  (props: { patientId: string }) => {
+  ({ patientId }: { patientId: string }) => {
     let ref: any;
     const client = usePhoton();
     const { store: pStore, actions: pActions } = PatientStore;
@@ -85,7 +85,9 @@ customElement(
     });
 
     onMount(() => {
-      pActions.getSelectedPatient(client!.getSDK(), props.patientId);
+      if (patientId) {
+        pActions.getSelectedPatient(client!.getSDK(), patientId);
+      }
     });
 
     const dispatchFormUpdated = (form: any) => {
@@ -180,7 +182,7 @@ customElement(
               <photon-text-input
                 class="flex-grow min-w-[40%]"
                 debounce-time="0"
-                disabled="true"
+                disabled={!!patientId}
                 invalid={store['firstName']?.error}
                 help-text={store['firstName']?.error}
                 label="First Name"
@@ -195,7 +197,7 @@ customElement(
               <photon-text-input
                 class="min-w-[48%]"
                 debounce-time="0"
-                disabled="true"
+                disabled={!!patientId}
                 invalid={store['lastName']?.error}
                 help-text={store['lastName']?.error}
                 label="Last Name"
@@ -213,7 +215,7 @@ customElement(
                 class="pb-3 flex-grow w-full xs:min-w-[40%]"
                 invalid={store['dateOfBirth']?.error}
                 help-text={store['dateOfBirth']?.error}
-                disabled="true"
+                disabled={!!patientId}
                 label="Date of Birth"
                 on:photon-datepicker-selected={async (e: any) => {
                   actions.updateFormValue({
@@ -262,14 +264,20 @@ customElement(
               <div class="flex-grow w-full xs:min-w-[40%]">
                 <photon-sex-input
                   label="Sex at Birth"
-                  disabled="true"
+                  disabled={!!patientId}
                   required="false"
                   help-text={store['sex']?.error}
                   invalid={store['sex']?.error !== undefined}
-                  on:photon-gender-selected={(e: any) => {
+                  on:photon-sex-selected={(e: any) => {
                     actions.updateFormValue({
                       key: 'sex',
                       value: e.detail.sex,
+                    });
+                  }}
+                  on:photon-sex-deselected={(e: any) => {
+                    actions.updateFormValue({
+                      key: 'sex',
+                      value: undefined,
                     });
                   }}
                   selected={pStore.selectedPatient.data?.sex}
@@ -377,7 +385,7 @@ customElement(
                 });
               }}
               address={getPatientAddress(pStore, store)}
-              patient-id={props.patientId}
+              patient-id={patientId}
               selected={pStore.selectedPatient.data?.preferredPharmacies?.[0]?.id}
             ></photon-pharmacy-search>
           </photon-card>
