@@ -1,6 +1,6 @@
 # Client Monorepo
 
-<a alt="photon logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://uploads-ssl.webflow.com/636c1da7b9e42c43e229900c/636c1da7b9e42caa79299017_header-logo.svg" width="45"></a>
+<a alt="photon logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://uploads-ssl.webflow.com/636c1da7b9e42c43e229900c/636c1da7b9e42caa79299017_header-logo.svg" width="100"></a>
 
 ## Getting started
 
