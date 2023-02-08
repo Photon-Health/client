@@ -4,7 +4,7 @@
 
 ## Getting started
 
-Install it all all
+Install it all
 
 ```
 npm i
