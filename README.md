@@ -4,6 +4,12 @@
 
 ## Getting started
 
+Install it all
+
+```
+npm i
+```
+
 In the root of this folder, look for your target in `apps/` or `packages/` and run in this format:
 
 ```
