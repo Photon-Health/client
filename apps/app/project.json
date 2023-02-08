@@ -10,7 +10,8 @@
       "options": {
         "cwd": "apps/app",
         "command": "env-cmd -f .env.boson react-app-rewired start"
-      }
+      },
+      "dependsOn": ["^build"]
     },
     "build:boson": {
       "executor": "nx:run-commands",
@@ -18,7 +19,8 @@
         "cwd": "apps/app",
         "command": "env-cmd -f .env.boson react-app-rewired build",
         "outputs": "dist/apps/app"
-      }
+      },
+      "dependsOn": ["^build"]
     },
     "build:neutron": {
       "executor": "nx:run-commands",
@@ -26,7 +28,8 @@
         "cwd": "apps/app",
         "command": "env-cmd -f .env.neutron react-app-rewired build",
         "outputs": "dist/apps/app"
-      }
+      },
+      "dependsOn": ["^build"]
     },
     "build:photon": {
       "executor": "nx:run-commands",
@@ -34,7 +37,8 @@
         "cwd": "apps/app",
         "command": "env-cmd -f .env.photon react-app-rewired build",
         "outputs": "dist/apps/app"
-      }
+      },
+      "dependsOn": ["^build"]
     },
     "test": {
       "executor": "nx:run-commands",
