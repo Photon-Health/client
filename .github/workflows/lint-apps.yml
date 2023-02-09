@@ -24,7 +24,7 @@ jobs:
         with:
           auto_fix: true
           eslint: true
-          eslint_dir: apps/app
+          eslint_dir: apps
           eslint_extensions: ts,tsx
           prettier: true
-          prettier_dir: apps/app
+          prettier_dir: apps
