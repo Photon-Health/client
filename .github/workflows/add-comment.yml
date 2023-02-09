@@ -1,0 +1,20 @@
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v5
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            let ref = "${{github.head_ref}}"
+            ref = ref.replace(/\//g, "_")
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `[Click here](https://app-${ref}.boson.health) to see your changes live`
+            })
