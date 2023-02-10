@@ -3,5 +3,14 @@
   "root": "packages/elements",
   "sourceRoot": "packages/elements/src",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "projectType": "package"
+  "projectType": "package",
+  "targets": {
+    "start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/elements",
+        "command": "vite --port 3000"
+      }
+    }
+  }
 }

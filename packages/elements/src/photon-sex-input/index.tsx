@@ -10,19 +10,19 @@ type Sex = {
   name: string;
 };
 
-const sexes: Sex[] = [
+export const sexes: Sex[] = [
   {
     id: '1',
-    name: 'MALE',
+    name: 'MALE'
   },
   {
     id: '2',
-    name: 'FEMALE',
+    name: 'FEMALE'
   },
   {
     id: '3',
-    name: 'UNKNOWN',
-  },
+    name: 'UNKNOWN'
+  }
 ];
 
 customElement(
@@ -34,7 +34,7 @@ customElement(
     invalid: false,
     helpText: undefined,
     disabled: false,
-    selected: undefined,
+    selected: undefined
   },
   (props: {
     label?: string;
@@ -52,8 +52,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          sex: sex,
-        },
+          sex: sex
+        }
       });
       ref?.dispatchEvent(event);
     };
