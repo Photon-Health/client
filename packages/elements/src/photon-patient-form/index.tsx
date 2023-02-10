@@ -1,6 +1,6 @@
 import { customElement } from 'solid-element';
 import { createEffect, onMount, Show } from 'solid-js';
-import { union, enums, size, string } from 'superstruct';
+import { enums, size, string, union } from 'superstruct';
 import { usePhoton } from '../context';
 import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
@@ -79,7 +79,7 @@ customElement(
     });
     actions.registerValidator({
       key: 'email',
-      validator: message(email(), 'Please enter a valid email...')
+      validator: message(union([email(), empty()]), 'Please enter a valid email...')
     });
     actions.registerValidator({
       key: 'address_zip',

@@ -59,7 +59,7 @@ customElement(
       createPrescription = false
     ) => {
       setLoading(true);
-      let keys: string[] = ['firstName', 'lastName', 'phone', 'sex', 'email'];
+      let keys: string[] = ['firstName', 'lastName', 'sex', 'email'];
 
       if (
         store['address_street1']?.value !== undefined ||
