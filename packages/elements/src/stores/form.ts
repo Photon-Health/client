@@ -9,7 +9,7 @@ export const createFormStore = (initalValue?: Record<string, any>) => {
     for (const key of Object.keys(initalValue)) {
       tmp[key] = {
         value: initalValue[key],
-        error: undefined,
+        error: undefined
       };
     }
     initalValue = tmp;
@@ -21,7 +21,7 @@ export const createFormStore = (initalValue?: Record<string, any>) => {
   const updateFormValue = ({ key, value }: { key: string; value: any }) => {
     setStore(key, {
       value: value,
-      error: undefined,
+      error: undefined
     });
   };
 
@@ -65,7 +65,7 @@ export const createFormStore = (initalValue?: Record<string, any>) => {
               for (const failure of (err as StructError).failures()) {
                 setStore(k, {
                   value: v?.value,
-                  error: failure.message,
+                  error: failure.message
                 });
               }
             }
@@ -92,7 +92,7 @@ export const createFormStore = (initalValue?: Record<string, any>) => {
       unRegisterValidator,
       validate,
       hasErrors,
-      reset,
-    },
+      reset
+    }
   };
 };

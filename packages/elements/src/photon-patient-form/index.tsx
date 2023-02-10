@@ -1,6 +1,6 @@
 import { customElement } from 'solid-element';
 import { createEffect, onMount, Show } from 'solid-js';
-import { union, size, string } from 'superstruct';
+import { union, enums, size, string } from 'superstruct';
 import { usePhoton } from '../context';
 import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
@@ -17,6 +17,7 @@ setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.82
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import { isZip } from '../utils';
+import { sexes } from '../photon-sex-input';
 
 const getPatientAddress = (pStore: any, store: any) => {
   const patientAddress = pStore.selectedPatient.data?.address;
@@ -38,7 +39,7 @@ const getPatientAddress = (pStore: any, store: any) => {
 customElement(
   'photon-patient-form',
   {
-    patientId: '',
+    patientId: ''
   },
   ({ patientId }: { patientId: string }) => {
     let ref: any;
@@ -58,30 +59,34 @@ customElement(
       address_city: undefined,
       address_state: undefined,
       address_zip: undefined,
-      preferredPharmacy: undefined,
+      preferredPharmacy: undefined
     });
     actions.registerValidator({
       key: 'firstName',
-      validator: message(size(string(), 1, Infinity), 'Please enter a first name...'),
+      validator: message(size(string(), 1, Infinity), 'Please enter a first name...')
     });
     actions.registerValidator({
       key: 'lastName',
-      validator: message(size(string(), 1, Infinity), 'Please enter a last name...'),
+      validator: message(size(string(), 1, Infinity), 'Please enter a last name...')
+    });
+    actions.registerValidator({
+      key: 'sex',
+      validator: message(enums(sexes.map((s) => s.name)), 'Please enter Sex at Birth...')
     });
     actions.registerValidator({
       key: 'phone',
-      validator: message(size(string(), 10, 12), 'Please enter a phone number...'),
+      validator: message(size(string(), 12), 'Please enter a valid phone number...')
     });
     actions.registerValidator({
       key: 'email',
-      validator: message(union([email(), empty()]), 'Please enter a valid email...'),
+      validator: message(email(), 'Please enter a valid email...')
     });
     actions.registerValidator({
       key: 'address_zip',
       validator: message(
         union([size(numericString(), 0, 10), empty()]),
         'Please enter a valid zip code...'
-      ),
+      )
     });
 
     onMount(() => {
@@ -102,61 +107,62 @@ customElement(
             actions.reset();
             pActions.reset();
             pharmActions.reset();
-          },
-        },
+          }
+        }
       });
       ref?.dispatchEvent(event);
     };
 
     createEffect(() => {
       if (pStore.selectedPatient.data) {
+        // if it's the update patient form, prefill the form with the patient's data
         actions.updateFormValue({
           key: 'firstName',
-          value: pStore.selectedPatient.data.name.first,
+          value: pStore.selectedPatient.data.name.first
         });
         actions.updateFormValue({
           key: 'lastName',
-          value: pStore.selectedPatient.data.name.last,
+          value: pStore.selectedPatient.data.name.last
         });
         actions.updateFormValue({
           key: 'phone',
-          value: pStore.selectedPatient.data.phone,
+          value: pStore.selectedPatient.data.phone
         });
         actions.updateFormValue({
           key: 'gender',
-          value: pStore.selectedPatient.data.gender,
+          value: pStore.selectedPatient.data.gender
         });
         actions.updateFormValue({
           key: 'sex',
-          value: pStore.selectedPatient.data.sex,
+          value: pStore.selectedPatient.data.sex
         });
         actions.updateFormValue({
           key: 'email',
-          value: pStore.selectedPatient.data.email,
+          value: pStore.selectedPatient.data.email
         });
         actions.updateFormValue({
           key: 'address_street1',
-          value: pStore.selectedPatient.data.address?.street1,
+          value: pStore.selectedPatient.data.address?.street1
         });
         actions.updateFormValue({
           key: 'address_street2',
-          value: pStore.selectedPatient.data.address?.street2,
+          value: pStore.selectedPatient.data.address?.street2
         });
         actions.updateFormValue({
           key: 'address_city',
-          value: pStore.selectedPatient.data.address?.city,
+          value: pStore.selectedPatient.data.address?.city
         });
         actions.updateFormValue({
           key: 'address_state',
-          value: pStore.selectedPatient.data.address?.state,
+          value: pStore.selectedPatient.data.address?.state
         });
         actions.updateFormValue({
           key: 'address_zip',
-          value: pStore.selectedPatient.data.address?.postalCode,
+          value: pStore.selectedPatient.data.address?.postalCode
         });
         actions.updateFormValue({
           key: 'preferredPharmacy',
-          value: pStore.selectedPatient.data.preferredPharmacies?.[0]?.id,
+          value: pStore.selectedPatient.data.preferredPharmacies?.[0]?.id
         });
       }
     });
@@ -189,7 +195,7 @@ customElement(
                 on:photon-input-changed={async (e: any) => {
                   actions.updateFormValue({
                     key: 'firstName',
-                    value: e.detail.input,
+                    value: e.detail.input
                   });
                 }}
                 value={store['firstName']?.value ?? pStore.selectedPatient.data?.name.first}
@@ -204,7 +210,7 @@ customElement(
                 on:photon-input-changed={async (e: any) => {
                   actions.updateFormValue({
                     key: 'lastName',
-                    value: e.detail.input,
+                    value: e.detail.input
                   });
                 }}
                 value={store['lastName']?.value ?? pStore.selectedPatient.data?.name.last}
@@ -220,7 +226,7 @@ customElement(
                 on:photon-datepicker-selected={async (e: any) => {
                   actions.updateFormValue({
                     key: 'dateOfBirth',
-                    value: e.detail.date,
+                    value: e.detail.date
                   });
                 }}
                 value={store['dateOfBirth']?.value ?? pStore.selectedPatient.data?.dateOfBirth}
@@ -233,7 +239,7 @@ customElement(
                 on:photon-phone-changed={async (e: any) => {
                   actions.updateFormValue({
                     key: 'phone',
-                    value: e.detail.phone,
+                    value: e.detail.phone
                   });
                 }}
                 value={store['phone']?.value ?? pStore.selectedPatient.data?.phone}
@@ -249,13 +255,13 @@ customElement(
                   on:photon-gender-selected={(e: any) => {
                     actions.updateFormValue({
                       key: 'gender',
-                      value: e.detail.gender,
+                      value: e.detail.gender
                     });
                   }}
                   on:photon-gender-deselected={(e: any) => {
                     actions.updateFormValue({
                       key: 'gender',
-                      value: undefined,
+                      value: undefined
                     });
                   }}
                   selected={pStore.selectedPatient.data?.gender}
@@ -271,13 +277,13 @@ customElement(
                   on:photon-sex-selected={(e: any) => {
                     actions.updateFormValue({
                       key: 'sex',
-                      value: e.detail.sex,
+                      value: e.detail.sex
                     });
                   }}
                   on:photon-sex-deselected={(e: any) => {
                     actions.updateFormValue({
                       key: 'sex',
-                      value: undefined,
+                      value: undefined
                     });
                   }}
                   selected={pStore.selectedPatient.data?.sex}
@@ -292,7 +298,7 @@ customElement(
               on:photon-input-changed={async (e: any) => {
                 actions.updateFormValue({
                   key: 'email',
-                  value: e.detail.input,
+                  value: e.detail.input
                 });
               }}
               value={store['email']?.value ?? pStore.selectedPatient.data?.email}
@@ -307,7 +313,7 @@ customElement(
               on:photon-input-changed={async (e: any) => {
                 actions.updateFormValue({
                   key: 'address_street1',
-                  value: e.detail.input,
+                  value: e.detail.input
                 });
               }}
               value={
@@ -323,7 +329,7 @@ customElement(
               on:photon-input-changed={async (e: any) => {
                 actions.updateFormValue({
                   key: 'address_street2',
-                  value: e.detail.input,
+                  value: e.detail.input
                 });
               }}
               value={
@@ -338,7 +344,7 @@ customElement(
               on:photon-input-changed={async (e: any) => {
                 actions.updateFormValue({
                   key: 'address_city',
-                  value: e.detail.input,
+                  value: e.detail.input
                 });
               }}
               value={store['address_city']?.value ?? pStore.selectedPatient.data?.address?.city}
@@ -353,7 +359,7 @@ customElement(
                 on:photon-state-selected={(e: any) => {
                   actions.updateFormValue({
                     key: 'address_state',
-                    value: e.detail.state,
+                    value: e.detail.state
                   });
                 }}
                 selected={store['state']?.value ?? pStore.selectedPatient.data?.address?.state}
@@ -367,7 +373,7 @@ customElement(
                 on:photon-input-changed={async (e: any) => {
                   actions.updateFormValue({
                     key: 'address_zip',
-                    value: e.detail.input,
+                    value: e.detail.input
                   });
                 }}
                 value={
@@ -381,7 +387,7 @@ customElement(
               on:photon-pharmacy-selected={(e: any) => {
                 actions.updateFormValue({
                   key: 'preferredPharmacy',
-                  value: e.detail.pharmacy.id,
+                  value: e.detail.pharmacy.id
                 });
               }}
               address={getPatientAddress(pStore, store)}
