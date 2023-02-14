@@ -1,0 +1,40 @@
+name: Lint
+
+on: push
+
+jobs:
+  run-linters:
+    name: Run linters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
+      - name: Install Node.js dependencies
+        run: npm ci
+
+      # - name: Run element linters
+      #   uses: wearerequired/lint-action@v2
+      #   with:
+      #     auto_fix: true
+      #     eslint: true
+      #     eslint_dir: packages/elements
+      #     eslint_extensions: ts,tsx
+      #     prettier: true
+      #     prettier_dir: packages/elements
+
+      - name: Run app linters
+        uses: wearerequired/lint-action@v2
+        with:
+          auto_fix: true
+          eslint: true
+          eslint_dir: apps/app
+          eslint_extensions: ts,tsx
+          prettier: true
+          prettier_dir: apps/app
