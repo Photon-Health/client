@@ -4,6 +4,7 @@ import { createSignal, For, onMount, Show } from 'solid-js';
 import { usePhoton } from '../context';
 import jwtDecode from 'jwt-decode';
 import PhotonFormWrapper from '../photon-form-wrapper';
+import { PatientStore } from '../stores/patient';
 
 const shouldWarn = (form: any) =>
   form()['notes']?.value.length > 0 ||
@@ -36,6 +37,7 @@ customElement(
     const [form, setForm] = createSignal<any>();
     const [actions, setActions] = createSignal<any>();
     const [continueSubmitOpen, setContinueSubmitOpen] = createSignal<boolean>(false);
+    const { actions: patientActions } = PatientStore;
 
     onMount(async () => {
       const token = await client!.getSDK().authentication.getAccessToken();
@@ -186,6 +188,7 @@ customElement(
           closeBody="You will not be able to recover unsaved prescriptions."
           onClosed={() => {
             dispatchClosed();
+            patientActions.clearSelectedPatient();
             props.open = false;
           }}
           checkShouldWarn={() => shouldWarn(form)}
