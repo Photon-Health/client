@@ -85,6 +85,7 @@
     "dob-to-age": "^1.0.0",
     "formik": "^2.2.9",
     "framer-motion": "^7.10.3",
+    "graphiql": "^2.2.0",
     "graphql": "^16.6.0",
     "graphql-tag": "^2.12.6",
     "jwt-decode": "^3.1.2",

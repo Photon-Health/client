@@ -1,0 +1,7 @@
+.graphiql-container {
+  height: 600px;
+}
+
+.graphiql-container .title {
+  display: none;
+}
