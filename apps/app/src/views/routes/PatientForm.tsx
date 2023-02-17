@@ -22,7 +22,7 @@ export const PatientForm = () => {
         if (e?.detail?.createPrescription) {
           navigate(`/prescriptions/new?patientId=${id}`);
         } else {
-          navigate(`/patients?reload=${id}-${ulid()}`);
+          navigate(`/patients`);
         }
       });
       ref.current.addEventListener('photon-patient-closed', () => {
