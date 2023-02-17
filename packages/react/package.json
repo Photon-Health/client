@@ -1,0 +1,40 @@
+{
+  "name": "@photonhealth/react",
+  "version": "1.0.5",
+  "main": "./dist/react.cjs.js",
+  "scripts": {
+    "build": "rimraf dist && vite build",
+    "prepublish": "npm run build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "react"
+  ],
+  "author": "",
+  "license": "ISC",
+  "exports": {
+    ".": {
+      "import": "./dist/react.es.js",
+      "require": "./dist/react.cjs.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Photon-Health/photon-sdk-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Photon-Health/photon-sdk-js/issues"
+  },
+  "homepage": "https://github.com/Photon-Health/photon-sdk-js#readme",
+  "description": "",
+  "gitHead": "f07f006f73fa496b866af4b6ed14ab2f0a9c58e8",
+  "devDependencies": {
+    "@types/react": "^18.0.26",
+    "@vitejs/plugin-react": "^2.0.1",
+    "rimraf": "^3.0.2",
+    "vite-plugin-dts": "^1.4.1"
+  }
+}
