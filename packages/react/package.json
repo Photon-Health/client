@@ -4,7 +4,7 @@
   "main": "./dist/react.cjs.js",
   "scripts": {
     "build": "rimraf dist && vite build",
-    "prepublish": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "publishConfig": {
     "access": "public"
