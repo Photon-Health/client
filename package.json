@@ -66,8 +66,6 @@
     "@emotion/styled": "^11.10.5",
     "@nanostores/persistent": "^0.7.0",
     "@nanostores/react": "^0.4.1",
-    "@photonhealth/react": "*",
-    "@photonhealth/sdk": "*",
     "@sentry/react": "^7.28.1",
     "@sentry/tracing": "^7.28.1",
     "@testing-library/jest-dom": "^5.16.5",
