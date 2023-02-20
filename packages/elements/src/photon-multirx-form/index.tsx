@@ -88,7 +88,6 @@ customElement(
     const [showForm, setShowForm] = createSignal<boolean>(!props.templateIds);
     const [isLoading, setIsLoading] = createSignal<boolean>(true);
     const [isLoadingTemplates, setIsLoadingTemplates] = createSignal<boolean>(false);
-    const [hasError, setHasError] = createSignal<boolean>(false);
     const [authorized, setAuthorized] = createSignal<boolean>(
       client?.authentication.state.isAuthorized || false
     );
@@ -108,9 +107,6 @@ customElement(
     createEffect(() => {
       setAuthorized(client?.authentication.state.isAuthorized || false);
     }, [client?.authentication.state.isAuthenticated]);
-    createEffect(() => {
-      setHasError(!!client?.authentication.state.error);
-    }, [client?.authentication.state.error]);
 
     createEffect(async () => {
       if (props.templateIds && client) {
@@ -331,7 +327,7 @@ customElement(
                 <sl-spinner style="font-size: 3rem;"></sl-spinner>
               </div>
             </Show>
-            <Show when={client && !authorized() && hasError()}>
+            <Show when={client && !authorized()}>
               <sl-alert variant="warning" open>
                 <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
                 <strong>You are not authorized to prescribe</strong>
