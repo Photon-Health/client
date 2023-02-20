@@ -24,10 +24,10 @@ jobs:
         with:
           auto_fix: true
           eslint: true
-          eslint_dir: packages/elements/src
+          eslint_dir: packages/sdk
           eslint_extensions: ts,tsx
           prettier: true
-          prettier_dir: packages/elements/src
+          prettier_dir: packages/sdk
 
       # - name: Run app linters
       #   uses: wearerequired/lint-action@v2
