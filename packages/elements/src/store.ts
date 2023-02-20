@@ -279,10 +279,8 @@ export class PhotonClientStore {
     this.setStore('authentication', {
       ...this.store.authentication,
       isAuthenticated: false,
-    });
-    this.setStore('authentication', {
-      ...this.store.authentication,
-      user: undefined,
+      isAuthorized: false,
+      user: undefined
     });
   }
   private async getPatients(args?: {
