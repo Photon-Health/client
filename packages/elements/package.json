@@ -1,6 +1,6 @@
 {
   "name": "@photonhealth/elements",
-  "version": "0.0.82",
+  "version": "0.0.85",
   "description": "",
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
@@ -65,7 +65,7 @@
   },
   "dependencies": {
     "@minht11/solid-virtual-container": "^0.2.1",
-    "@photonhealth/sdk": "^1.0.0",
+    "@photonhealth/sdk": "*",
     "@rollup/plugin-typescript": "^8.5.0",
     "@shoelace-style/shoelace": "^2.0.0-beta.82",
     "@solid-primitives/scheduled": "^1.2.0",

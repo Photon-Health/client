@@ -11,7 +11,9 @@
     ]
   },
   "dependencies": {
-    "@photonhealth/elements": "*"
+    "@photonhealth/elements": "*",
+    "@photonhealth/react": "*",
+    "@photonhealth/sdk": "*"
   },
   "browserslist": {
     "production": [
