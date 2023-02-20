@@ -28,6 +28,7 @@ jobs:
           eslint_extensions: ts,tsx
           prettier: true
           prettier_dir: packages/elements
+          path: packages/elements
 
       # - name: Run app linters
       #   uses: wearerequired/lint-action@v2
