@@ -23,6 +23,7 @@ import { LocalPickup } from './components/LocalPickup';
 import { MailOrder } from './components/MailOrder';
 import { Pharmacy } from './components/Pharmacy';
 import { Address } from '../../../../../models/general';
+import { SendToPatient } from './components/SendToPatient';
 
 interface SelectPharmacyCardProps {
   patient: any;
@@ -103,6 +104,12 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
           touched={touched}
         />
       )
+    },
+    {
+      name: 'Send to patient',
+      fulfillmentType: undefined,
+      isDisabled: false,
+      comp: <SendToPatient patient={patient} />
     }
   ];
 
