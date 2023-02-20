@@ -26,6 +26,7 @@ import { OrderCard } from './components/OrderCard';
 import { format } from 'date-fns';
 import gql from 'graphql-tag';
 import { PharmacyCard } from './components/PharmacyCard';
+import { PhotonAuthorized } from '../photon-authorized';
 
 const CATALOG_TREATMENTS_FIELDS = gql`
   fragment CatalogTreatmentsFields on Catalog {
@@ -88,7 +89,6 @@ customElement(
     const [showForm, setShowForm] = createSignal<boolean>(!props.templateIds);
     const [isLoading, setIsLoading] = createSignal<boolean>(true);
     const [isLoadingTemplates, setIsLoadingTemplates] = createSignal<boolean>(false);
-    const [hasError, setHasError] = createSignal<boolean>(false);
     const [authenticated, setAuthenticated] = createSignal<boolean>(
       client?.authentication.state.isAuthenticated || false
     );
@@ -108,9 +108,6 @@ customElement(
     createEffect(() => {
       setAuthenticated(client?.authentication.state.isAuthenticated || false);
     }, [client?.authentication.state.isAuthenticated]);
-    createEffect(() => {
-      setHasError(!!client?.authentication.state.error);
-    }, [client?.authentication.state.error]);
 
     createEffect(async () => {
       if (props.templateIds && client) {
@@ -331,14 +328,7 @@ customElement(
                 <sl-spinner style="font-size: 3rem;"></sl-spinner>
               </div>
             </Show>
-            <Show when={client && !authenticated() && hasError()}>
-              <sl-alert variant="warning" open>
-                <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-                <strong>You are not authorized to prescribe</strong>
-                <br />
-              </sl-alert>
-            </Show>
-            <Show when={client && authenticated()}>
+            <PhotonAuthorized>
               <PatientCard
                 actions={actions}
                 store={store}
@@ -384,7 +374,7 @@ customElement(
                   </photon-button>
                 </div>
               </Show>
-            </Show>
+            </PhotonAuthorized>
           </div>
         </div>
       </div>
