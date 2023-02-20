@@ -118,6 +118,11 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     setSelectedTab(index);
   };
 
+  const handleChangeBtnClick = () => {
+    setFieldValue('pharmacyId', '');
+    setUpdatePreferredPharmacy(false);
+  };
+
   useEffect(() => {
     setLatitude(undefined);
     setLongitude(undefined);
@@ -160,7 +165,7 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
         <HStack w="full" justify="space-between">
           <Heading size="xxs">{pharmacyId ? 'Pharmacy' : 'Select a Pharmacy'}</Heading>
           {pharmacyId ? (
-            <Button onClick={() => setFieldValue('pharmacyId', '')} size="xs">
+            <Button onClick={handleChangeBtnClick} size="xs">
               Change
             </Button>
           ) : null}

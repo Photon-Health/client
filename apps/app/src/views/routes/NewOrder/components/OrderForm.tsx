@@ -140,6 +140,8 @@ export const OrderForm = ({
       onSubmit={async (values, { validateForm, setSubmitting }) => {
         validateForm(values);
 
+        console.log(values, onlyCurexa, updatePreferredPharmacy);
+
         // To be extra confident that curexa is always used for weekend providers
         if (onlyCurexa) {
           values.fulfillmentType = types.FulfillmentType.MailOrder;
