@@ -19,22 +19,22 @@ jobs:
       - name: Install Node.js dependencies
         run: npm ci
 
-      # - name: Run element linters
-      #   uses: wearerequired/lint-action@v2
-      #   with:
-      #     auto_fix: true
-      #     eslint: true
-      #     eslint_dir: packages/elements
-      #     eslint_extensions: ts,tsx
-      #     prettier: true
-      #     prettier_dir: packages/elements
-
-      - name: Run app linters
+      - name: Run element linters
         uses: wearerequired/lint-action@v2
         with:
           auto_fix: true
           eslint: true
-          eslint_dir: apps/app
+          eslint_dir: packages/elements
           eslint_extensions: ts,tsx
           prettier: true
-          prettier_dir: apps/app
+          prettier_dir: packages/elements
+
+      # - name: Run app linters
+      #   uses: wearerequired/lint-action@v2
+      #   with:
+      #     auto_fix: true
+      #     eslint: true
+      #     eslint_dir: apps/app
+      #     eslint_extensions: ts,tsx
+      #     prettier: true
+      #     prettier_dir: apps/app
