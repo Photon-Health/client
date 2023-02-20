@@ -45,7 +45,7 @@ const orderSchema = yup.object({
       test: (arr) => arr?.length !== 0
     }),
   fulfillmentType: yup.string().nullable(),
-  pharmacyId: yup.string().required('Please select a pharmacy...'),
+  pharmacyId: yup.string().nullable(),
   address: yup
     .object({
       street1: yup.string().required('Please enter an address...'),
@@ -138,9 +138,9 @@ export const OrderForm = ({
       initialValues={initialValues}
       validationSchema={orderSchema}
       onSubmit={async (values, { validateForm, setSubmitting }) => {
+        console.log('here');
+        console.log(values, updatePreferredPharmacy);
         validateForm(values);
-
-        console.log(values, onlyCurexa, updatePreferredPharmacy);
 
         // To be extra confident that curexa is always used for weekend providers
         if (onlyCurexa) {

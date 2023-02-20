@@ -10,7 +10,7 @@ export const SendToPatient = ({ patient }: any) => {
       </Text>
       <Card mt={4} px={4} py={3} w="full">
         <HStack spacing={5}>
-          <Radio isChecked value="sdfd" onChange={() => {}} />
+          <Radio isChecked />
           <VStack align="start" spacing={0} wordBreak="break-all">
             {patient.name ? <Text fontWeight="medium">{patient.name.full}</Text> : null}
             {patient.phone ? (
