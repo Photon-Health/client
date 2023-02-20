@@ -45,7 +45,10 @@ const orderSchema = yup.object({
       test: (arr) => arr?.length !== 0
     }),
   fulfillmentType: yup.string().nullable(),
-  pharmacyId: yup.string().nullable(),
+  pharmacyId: yup.string().when('fulfillmentType', {
+    is: (fulfillmentType: types.FulfillmentType) => !!fulfillmentType,
+    then: yup.string().required()
+  }),
   address: yup
     .object({
       street1: yup.string().required('Please enter an address...'),
