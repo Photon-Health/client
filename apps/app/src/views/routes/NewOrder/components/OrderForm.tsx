@@ -141,8 +141,6 @@ export const OrderForm = ({
       initialValues={initialValues}
       validationSchema={orderSchema}
       onSubmit={async (values, { validateForm, setSubmitting }) => {
-        console.log('here');
-        console.log(values, updatePreferredPharmacy);
         validateForm(values);
 
         // To be extra confident that curexa is always used for weekend providers
