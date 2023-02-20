@@ -9,22 +9,36 @@ import { usePhoton } from '../context';
 
 export const PhotonAuthorized = (props: { children: JSXElement }) => {
   const client = usePhoton();
-  const [authorized, setAuthorized] = createSignal<boolean>(
-    client?.authentication.state.isAuthorized || false
-  );
   const [isLoading, setIsLoading] = createSignal<boolean>(
     client?.authentication.state.isLoading || false
   );
-  createEffect(() => {
-    setAuthorized(client?.authentication.state.isAuthorized || false);
-  });
+  const [authenticated, setAuthenticated] = createSignal<boolean>(
+    client?.authentication.state.isAuthenticated || false
+  );
+  const [authorized, setAuthorized] = createSignal<boolean>(
+    client?.authentication.state.isAuthorized || false
+  );
+
   createEffect(() => {
     setIsLoading(client?.authentication.state.isLoading || false);
+  });
+  createEffect(() => {
+    setAuthenticated(client?.authentication.state.isAuthenticated || false);
+  });
+  createEffect(() => {
+    setAuthorized(client?.authentication.state.isAuthorized || false);
   });
 
   return (
     <>
-      <Show when={client && !authorized() && !isLoading()}>
+      <Show when={client && !authenticated()}>
+        <sl-alert variant="warning" open>
+          <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+          <strong>You are not signed in</strong>
+          <br />
+        </sl-alert>
+      </Show>
+      <Show when={client && authenticated() && !authorized() && !isLoading()}>
         <sl-alert variant="warning" open>
           <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
           <strong>You are not authorized to prescribe</strong>
