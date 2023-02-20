@@ -26,6 +26,7 @@ import { OrderCard } from './components/OrderCard';
 import { format } from 'date-fns';
 import gql from 'graphql-tag';
 import { PharmacyCard } from './components/PharmacyCard';
+import { PhotonAuthorized } from '../photon-authorized';
 
 const CATALOG_TREATMENTS_FIELDS = gql`
   fragment CatalogTreatmentsFields on Catalog {
@@ -88,8 +89,8 @@ customElement(
     const [showForm, setShowForm] = createSignal<boolean>(!props.templateIds);
     const [isLoading, setIsLoading] = createSignal<boolean>(true);
     const [isLoadingTemplates, setIsLoadingTemplates] = createSignal<boolean>(false);
-    const [authorized, setAuthorized] = createSignal<boolean>(
-      client?.authentication.state.isAuthorized || false
+    const [authenticated, setAuthenticated] = createSignal<boolean>(
+      client?.authentication.state.isAuthenticated || false
     );
 
     createEffect(() => {
@@ -105,7 +106,7 @@ customElement(
       setIsLoading(client?.authentication.state.isLoading || false);
     }, [client?.authentication.state.isLoading]);
     createEffect(() => {
-      setAuthorized(client?.authentication.state.isAuthorized || false);
+      setAuthenticated(client?.authentication.state.isAuthenticated || false);
     }, [client?.authentication.state.isAuthenticated]);
 
     createEffect(async () => {
@@ -322,19 +323,12 @@ customElement(
         <style>{styles}</style>
         <div>
           <div class="flex flex-col gap-8">
-            <Show when={(!client || isLoading()) && !authorized()}>
+            <Show when={(!client || isLoading()) && !authenticated()}>
               <div class="w-full flex justify-center">
                 <sl-spinner style="font-size: 3rem;"></sl-spinner>
               </div>
             </Show>
-            <Show when={client && !authorized()}>
-              <sl-alert variant="warning" open>
-                <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-                <strong>You are not authorized to prescribe</strong>
-                <br />
-              </sl-alert>
-            </Show>
-            <Show when={client && authorized()}>
+            <PhotonAuthorized>
               <PatientCard
                 actions={actions}
                 store={store}
@@ -380,7 +374,7 @@ customElement(
                   </photon-button>
                 </div>
               </Show>
-            </Show>
+            </PhotonAuthorized>
           </div>
         </div>
       </div>
