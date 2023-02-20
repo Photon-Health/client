@@ -47,6 +47,7 @@ export class PhotonClientStore {
     state: {
       user: any;
       isAuthenticated: boolean;
+      isAuthorized: boolean;
       error?: string;
       isLoading: boolean;
     };
@@ -117,6 +118,7 @@ export class PhotonClientStore {
     const [store, setStore] = createStore<{
       authentication: {
         isAuthenticated: boolean;
+        isAuthorized: boolean;
         isLoading: boolean;
         error?: string;
         user: any;
@@ -152,6 +154,7 @@ export class PhotonClientStore {
     }>({
       authentication: {
         isAuthenticated: false,
+        isAuthorized: false,
         isLoading: true,
         error: undefined,
         user: undefined,
@@ -264,8 +267,6 @@ export class PhotonClientStore {
       ...this.store.authentication,
       user: user,
     });
-    this.setStore('authentication', {
-      ...this.store.authentication,
       isLoading: false,
     });
   }

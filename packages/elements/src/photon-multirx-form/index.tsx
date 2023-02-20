@@ -89,8 +89,8 @@ customElement(
     const [isLoading, setIsLoading] = createSignal<boolean>(true);
     const [isLoadingTemplates, setIsLoadingTemplates] = createSignal<boolean>(false);
     const [hasError, setHasError] = createSignal<boolean>(false);
-    const [authenticated, setAuthenticated] = createSignal<boolean>(
-      client?.authentication.state.isAuthenticated || false
+    const [authorized, setAuthorized] = createSignal<boolean>(
+      client?.authentication.state.isAuthorized || false
     );
 
     createEffect(() => {
@@ -106,7 +106,7 @@ customElement(
       setIsLoading(client?.authentication.state.isLoading || false);
     }, [client?.authentication.state.isLoading]);
     createEffect(() => {
-      setAuthenticated(client?.authentication.state.isAuthenticated || false);
+      setAuthorized(client?.authentication.state.isAuthorized || false);
     }, [client?.authentication.state.isAuthenticated]);
     createEffect(() => {
       setHasError(!!client?.authentication.state.error);
@@ -326,19 +326,19 @@ customElement(
         <style>{styles}</style>
         <div>
           <div class="flex flex-col gap-8">
-            <Show when={(!client || isLoading()) && !authenticated()}>
+            <Show when={(!client || isLoading()) && !authorized()}>
               <div class="w-full flex justify-center">
                 <sl-spinner style="font-size: 3rem;"></sl-spinner>
               </div>
             </Show>
-            <Show when={client && !authenticated() && hasError()}>
+            <Show when={client && !authorized() && hasError()}>
               <sl-alert variant="warning" open>
                 <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
                 <strong>You are not authorized to prescribe</strong>
                 <br />
               </sl-alert>
             </Show>
-            <Show when={client && authenticated()}>
+            <Show when={client && authorized()}>
               <PatientCard
                 actions={actions}
                 store={store}
