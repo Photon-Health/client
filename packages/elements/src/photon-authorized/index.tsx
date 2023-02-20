@@ -41,7 +41,12 @@ export const PhotonAuthorized = (props: { children: JSXElement }) => {
       <Show when={client && authenticated() && !authorized() && !isLoading()}>
         <sl-alert variant="warning" open>
           <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-          <strong>Something went wrong, please contact support at Photon Health</strong>
+          <strong>
+            Something went wrong, please contact support at Photon Health{' '}
+            <a style="text-decoration:underline" href="mailto:support@photon.health">
+              support@photon.health
+            </a>
+          </strong>
           <br />
         </sl-alert>
       </Show>
