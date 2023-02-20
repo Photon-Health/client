@@ -1,41 +1,34 @@
-import {
-  ApolloClient,
-  DocumentNode,
-  gql,
-  NormalizedCacheObject,
-} from "@apollo/client";
-import { ORGANIZATION_FIELDS } from "../fragments";
-import { makeQuery } from "../utils";
-import { Organization } from "../types";
+import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client';
+import { ORGANIZATION_FIELDS } from '../fragments';
+import { makeQuery } from '../utils';
+import { Organization } from '../types';
 
 /**
  * GetOrganization options
  * @param fragment Allows you to override the default query to request more fields
  */
- export interface GetOrganizationOptions {
-  fragment?: Record<string, DocumentNode>
+export interface GetOrganizationOptions {
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
  * GetOrganizations options
  * @param fragment Allows you to override the default query to request more fields
  */
- export interface GetOrganizationsOptions {
-  fragment?: Record<string, DocumentNode>
+export interface GetOrganizationsOptions {
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
-  * Contains various methods for Photon Auth0 Organizations
-  */
+ * Contains various methods for Photon Auth0 Organizations
+ */
 export class OrgQueryManager {
   private apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>;
 
   /**
    * @param apollo - An Apollo client instance
    */
-  constructor(
-    apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>
-  ) {
+  constructor(apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>) {
     this.apollo = apollo;
   }
 
@@ -46,7 +39,7 @@ export class OrgQueryManager {
    */
   public async getOrganization(
     { fragment }: GetOrganizationOptions = {
-      fragment: { OrganizationFields: ORGANIZATION_FIELDS },
+      fragment: { OrganizationFields: ORGANIZATION_FIELDS }
     }
   ) {
     if (!fragment) {
@@ -61,10 +54,7 @@ export class OrgQueryManager {
         }
       }
     `;
-    return makeQuery<{ organization: Organization }>(
-      this.apollo,
-      GET_ORGANIZATION
-    );
+    return makeQuery<{ organization: Organization }>(this.apollo, GET_ORGANIZATION);
   }
 
   /**
@@ -74,7 +64,7 @@ export class OrgQueryManager {
    */
   public async getOrganizations(
     { fragment }: GetOrganizationsOptions = {
-      fragment: { OrganizationFields: ORGANIZATION_FIELDS },
+      fragment: { OrganizationFields: ORGANIZATION_FIELDS }
     }
   ) {
     if (!fragment) {
@@ -89,9 +79,6 @@ export class OrgQueryManager {
         }
       }
     `;
-    return makeQuery<{ organizations: Organization[] }>(
-      this.apollo,
-      GET_ORGANIZATIONS
-    );
+    return makeQuery<{ organizations: Organization[] }>(this.apollo, GET_ORGANIZATIONS);
   }
 }

@@ -1,44 +1,36 @@
-import {
-  ApolloClient,
-  DocumentNode,
-  gql,
-  NormalizedCacheObject,
-} from "@apollo/client";
-import { WEBHOOK_CONFIG_FIELDS } from "../fragments";
-import { makeMutation, makeQuery } from "../utils";
-import { WebhookConfig } from "../types";
+import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client';
+import { WEBHOOK_CONFIG_FIELDS } from '../fragments';
+import { makeMutation, makeQuery } from '../utils';
+import { WebhookConfig } from '../types';
 
 /**
  * GetWebhooks options
  * @param fragment Allows you to override the default query to request more fields
  */
- export interface GetWebhooksOptions {
-  fragment?: Record<string, DocumentNode>
+export interface GetWebhooksOptions {
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
  * CreateWebhook options
  * @param fragment Allows you to override the default query to request more fields
  */
- export interface CreateWebhookOptions {
-  fragment?: Record<string, DocumentNode>
+export interface CreateWebhookOptions {
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
-  * Contains various methods for Photon Webhooks
-  */
+ * Contains various methods for Photon Webhooks
+ */
 export class WebhookQueryManager {
   private apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>;
 
   /**
    * @param apollo - An Apollo client instance
    */
-  constructor(
-    apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>
-  ) {
+  constructor(apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>) {
     this.apollo = apollo;
   }
-
 
   /**
    * Retrieves list of webhook associated with currently authenticated organization
@@ -47,7 +39,7 @@ export class WebhookQueryManager {
    */
   public async getWebhooks(
     { fragment }: GetWebhooksOptions = {
-      fragment: { WebhookFields: WEBHOOK_CONFIG_FIELDS },
+      fragment: { WebhookFields: WEBHOOK_CONFIG_FIELDS }
     }
   ) {
     if (!fragment) {
@@ -70,9 +62,7 @@ export class WebhookQueryManager {
    * @param options - Query options
    * @returns
    */
-  public createWebhook({
-    fragment,
-  }: CreateWebhookOptions) {
+  public createWebhook({ fragment }: CreateWebhookOptions) {
     if (!fragment) {
       fragment = { WebhookFields: WEBHOOK_CONFIG_FIELDS };
     }
@@ -103,7 +93,8 @@ export class WebhookQueryManager {
     const DELETE_WEBHOOK = gql`
       mutation deleteWebhookConfig($id: String!) {
         deleteWebhookConfig(id: $id)
-      }`;
+      }
+    `;
     return makeMutation<{ deleteWebhookConfig: boolean } | undefined | null>(
       this.apollo,
       DELETE_WEBHOOK

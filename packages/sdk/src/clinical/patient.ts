@@ -1,7 +1,7 @@
-import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client'
-import { PATIENT_FIELDS } from '../fragments'
-import { makeMutation, makeQuery } from '../utils'
-import { Patient } from '../types'
+import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client';
+import { PATIENT_FIELDS } from '../fragments';
+import { makeMutation, makeQuery } from '../utils';
+import { Patient } from '../types';
 
 /**
  * GetPatient options
@@ -9,8 +9,8 @@ import { Patient } from '../types'
  * @param fragment Allows you to override the default query to request more fields
  */
 export interface GetPatientOptions {
-  id?: string
-  fragment?: Record<string, DocumentNode>
+  id?: string;
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
@@ -21,10 +21,10 @@ export interface GetPatientOptions {
  * @param fragment Allows you to override the default query to request more fields
  */
 export interface GetPatientsOptions {
-  after?: string
-  first?: number
-  name?: string
-  fragment?: Record<string, DocumentNode>
+  after?: string;
+  first?: number;
+  name?: string;
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
@@ -32,7 +32,7 @@ export interface GetPatientsOptions {
  * @param fragment Allows you to override the default query to request more fields
  */
 export interface CreatePatientOptions {
-  fragment?: Record<string, DocumentNode>
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
@@ -40,7 +40,7 @@ export interface CreatePatientOptions {
  * @param fragment Allows you to override the default query to request more fields
  */
 export interface UpdatePatientOptions {
-  fragment?: Record<string, DocumentNode>
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
@@ -48,7 +48,7 @@ export interface UpdatePatientOptions {
  * @param fragment Allows you to override the default query to request more fields
  */
 export interface RemovePatientPreferredPharmacyOptions {
-  fragment?: Record<string, DocumentNode>
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
@@ -56,20 +56,20 @@ export interface RemovePatientPreferredPharmacyOptions {
  * @param fragment Allows you to override the default query to request more fields
  */
 export interface RemovePatientAllergyOptions {
-  fragment?: Record<string, DocumentNode>
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
  * Contains various methods for Photon Patients
  */
 export class PatientQueryManager {
-  private apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>
+  private apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>;
 
   /**
    * @param apollo - An Apollo client instance
    */
   constructor(apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>) {
-    this.apollo = apollo
+    this.apollo = apollo;
   }
 
   /**
@@ -84,9 +84,9 @@ export class PatientQueryManager {
     }
   ) {
     if (!fragment) {
-      fragment = { PatientFields: PATIENT_FIELDS }
+      fragment = { PatientFields: PATIENT_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment!)[0]
+    let [fName, fValue] = Object.entries(fragment!)[0];
     const GET_PATIENT = gql`
       ${fValue}
       query patient($id: ID!) {
@@ -94,8 +94,8 @@ export class PatientQueryManager {
           ...${fName}
         }
       }
-    `
-    return makeQuery<{ patient: Patient }>(this.apollo, GET_PATIENT, { id })
+    `;
+    return makeQuery<{ patient: Patient }>(this.apollo, GET_PATIENT, { id });
   }
 
   /**
@@ -110,12 +110,12 @@ export class PatientQueryManager {
     }
   ) {
     if (!fragment) {
-      fragment = { PatientFields: PATIENT_FIELDS }
+      fragment = { PatientFields: PATIENT_FIELDS };
     }
     if (!first) {
-      first = 25
+      first = 25;
     }
-    let [fName, fValue] = Object.entries(fragment!)[0]
+    let [fName, fValue] = Object.entries(fragment!)[0];
     const GET_PATIENTS = gql`
       ${fValue}
       query patients($after: ID, $name: String, $first: Int) {
@@ -123,12 +123,12 @@ export class PatientQueryManager {
           ...${fName}
         }
       }
-    `
+    `;
     return makeQuery<{ patients: Patient[] }>(this.apollo, GET_PATIENTS, {
       after,
       name,
       first
-    })
+    });
   }
 
   /**
@@ -138,9 +138,9 @@ export class PatientQueryManager {
    */
   public createPatient({ fragment }: CreatePatientOptions) {
     if (!fragment) {
-      fragment = { PatientFields: PATIENT_FIELDS }
+      fragment = { PatientFields: PATIENT_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0]
+    let [fName, fValue] = Object.entries(fragment)[0];
     const CREATE_PATIENT = gql`
       ${fValue}
       mutation createPatient(
@@ -171,8 +171,8 @@ export class PatientQueryManager {
         ) {
           ...${fName}
         }
-      }`
-    return makeMutation<{ createPatient: Patient } | undefined | null>(this.apollo, CREATE_PATIENT)
+      }`;
+    return makeMutation<{ createPatient: Patient } | undefined | null>(this.apollo, CREATE_PATIENT);
   }
 
   /**
@@ -182,9 +182,9 @@ export class PatientQueryManager {
    */
   public updatePatient({ fragment }: UpdatePatientOptions) {
     if (!fragment) {
-      fragment = { PatientFields: PATIENT_FIELDS }
+      fragment = { PatientFields: PATIENT_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0]
+    let [fName, fValue] = Object.entries(fragment)[0];
     const UPDATE_PATIENT = gql`
       ${fValue}
       mutation updatePatient(
@@ -213,8 +213,8 @@ export class PatientQueryManager {
         ) {
           ...${fName}
         }
-      }`
-    return makeMutation<{ updatePatient: Patient } | undefined | null>(this.apollo, UPDATE_PATIENT)
+      }`;
+    return makeMutation<{ updatePatient: Patient } | undefined | null>(this.apollo, UPDATE_PATIENT);
   }
 
   /**
@@ -224,9 +224,9 @@ export class PatientQueryManager {
    */
   public removePatientPreferredPharmacy({ fragment }: RemovePatientPreferredPharmacyOptions) {
     if (!fragment) {
-      fragment = { PatientFields: PATIENT_FIELDS }
+      fragment = { PatientFields: PATIENT_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0]
+    let [fName, fValue] = Object.entries(fragment)[0];
     const REMOVE_PATIENT_PREFERRED_PHARM = gql`
       ${fValue}
       mutation removePatientPreferredPharmacy(
@@ -239,11 +239,11 @@ export class PatientQueryManager {
         ) {
           ...${fName}
         }
-      }`
+      }`;
     return makeMutation<{ removePatientPreferredPharmacy: Patient } | undefined | null>(
       this.apollo,
       REMOVE_PATIENT_PREFERRED_PHARM
-    )
+    );
   }
 
   /**
@@ -253,9 +253,9 @@ export class PatientQueryManager {
    */
   public removePatientAllergy({ fragment }: RemovePatientAllergyOptions) {
     if (!fragment) {
-      fragment = { PatientFields: PATIENT_FIELDS }
+      fragment = { PatientFields: PATIENT_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0]
+    let [fName, fValue] = Object.entries(fragment)[0];
     const REMOVE_PATIENT_ALLERGY = gql`
       ${fValue}
       mutation removePatientAllergy(
@@ -268,10 +268,10 @@ export class PatientQueryManager {
         ) {
           ...${fName}
         }
-      }`
+      }`;
     return makeMutation<{ removePatientAllergy: Patient } | undefined | null>(
       this.apollo,
       REMOVE_PATIENT_ALLERGY
-    )
+    );
   }
 }

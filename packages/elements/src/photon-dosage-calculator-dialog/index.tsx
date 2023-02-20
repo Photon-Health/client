@@ -10,15 +10,15 @@ customElement(
       reflect: true,
       notify: false,
       attribute: 'open',
-      parse: true,
+      parse: true
     },
     medication: {
       value: undefined,
       reflect: true,
       notify: false,
       attribute: 'medication',
-      parse: true,
-    },
+      parse: true
+    }
   },
   (props: { open: boolean; medication?: Medication }) => {
     const client = usePhoton();
@@ -30,8 +30,8 @@ customElement(
         bubbles: true,
         detail: {
           value: value,
-          unit: unit,
-        },
+          unit: unit
+        }
       });
       ref?.dispatchEvent(event);
     };

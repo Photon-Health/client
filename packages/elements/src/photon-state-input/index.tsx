@@ -63,7 +63,7 @@ const states: State[] = [
   { id: '49', name: 'WA' },
   { id: '50', name: 'WV' },
   { id: '51', name: 'WI' },
-  { id: '52', name: 'WY' },
+  { id: '52', name: 'WY' }
 ];
 
 customElement(
@@ -75,7 +75,7 @@ customElement(
     invalid: false,
     helpText: undefined,
     disabled: false,
-    selected: undefined,
+    selected: undefined
   },
   (props: {
     label?: string;
@@ -94,8 +94,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          state: state,
-        },
+          state: state
+        }
       });
       ref?.dispatchEvent(event);
     };

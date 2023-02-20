@@ -1,39 +1,30 @@
-import {
-  ApolloClient,
-  DocumentNode,
-  gql,
-  NormalizedCacheObject,
-} from "@apollo/client";
-import { MEDICAL_EQUIPMENT_FIELDS } from "../fragments";
-import { makeQuery } from "../utils";
-import { MedicalEquipment } from "../types";
-
-
+import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client';
+import { MEDICAL_EQUIPMENT_FIELDS } from '../fragments';
+import { makeQuery } from '../utils';
+import { MedicalEquipment } from '../types';
 
 /**
  * GetMedicalEquipment options
  * @param string Filter medical equipment by name
  * @param fragment Allows you to override the default query to request more fields
  */
- export interface GetMedicalEquipmentOptions {
-  name?: String,
-  after?: String,
-  first?: Number,
-  fragment?: Record<string, DocumentNode>
+export interface GetMedicalEquipmentOptions {
+  name?: String;
+  after?: String;
+  first?: Number;
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
-  * Contains various methods for Photon Medical Equipment
-  */
+ * Contains various methods for Photon Medical Equipment
+ */
 export class MedicalEquipmentQueryManager {
   private apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>;
 
-   /**
+  /**
    * @param apollo - An Apollo client instance
    */
-  constructor(
-    apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>
-  ) {
+  constructor(apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>) {
     this.apollo = apollo;
   }
 
@@ -43,13 +34,8 @@ export class MedicalEquipmentQueryManager {
    * @returns
    */
   public async getMedicalEquipment(
-    {
-      name,
-      after,
-      first,
-      fragment
-    }: GetMedicalEquipmentOptions = {
-      fragment: { MedicalEquipmentFields: MEDICAL_EQUIPMENT_FIELDS },
+    { name, after, first, fragment }: GetMedicalEquipmentOptions = {
+      fragment: { MedicalEquipmentFields: MEDICAL_EQUIPMENT_FIELDS }
     }
   ) {
     if (!fragment) {
@@ -64,14 +50,10 @@ export class MedicalEquipmentQueryManager {
     }
   }
     `;
-    return makeQuery<{ medicalEquipment: MedicalEquipment[] }>(
-      this.apollo,
-      GET_MEDICAL_EQUIPMENT,
-      {
-        name,
-        after,
-        first
-      }
-    );
+    return makeQuery<{ medicalEquipment: MedicalEquipment[] }>(this.apollo, GET_MEDICAL_EQUIPMENT, {
+      name,
+      after,
+      first
+    });
   }
 }

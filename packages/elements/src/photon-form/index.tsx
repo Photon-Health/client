@@ -11,7 +11,7 @@ import { createSignal, Signal } from 'solid-js';
 customElement(
   'photon-form',
   {
-    submitLabel: undefined,
+    submitLabel: undefined
   },
   (
     props: {
@@ -31,8 +31,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          data: formData,
-        },
+          data: formData
+        }
       });
       outerRef?.dispatchEvent(event);
     };
@@ -41,7 +41,7 @@ customElement(
       const event = new CustomEvent('photon-submit-error', {
         composed: true,
         bubbles: true,
-        detail: {},
+        detail: {}
       });
       outerRef?.dispatchEvent(event);
     };

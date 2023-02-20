@@ -4,7 +4,7 @@ import '.';
 import type { PhoneInputProps } from '.';
 
 export default {
-  title: 'photon-phone-input',
+  title: 'photon-phone-input'
 } as Meta;
 
 const Template: Story<PhoneInputProps> = ({ label, required, invalid, helpText, disabled }) => {
@@ -20,5 +20,5 @@ PhoneInput.args = {
   required: true,
   invalid: false,
   helpText: 'This field is required',
-  disabled: false,
+  disabled: false
 };

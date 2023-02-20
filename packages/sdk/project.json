@@ -1,29 +1,29 @@
 {
-  "name": "elements",
-  "root": "packages/elements",
-  "sourceRoot": "packages/elements/src",
+  "name": "sdk",
+  "root": "packages/sdk",
+  "sourceRoot": "packages/sdk/src",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "package",
   "targets": {
     "start": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "packages/elements",
+        "cwd": "packages/sdk",
         "command": "vite --port 3000"
       }
     },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "packages/elements",
-        "command": "npx eslint src/**/*.{tsx,ts}"
+        "cwd": "packages/sdk",
+        "command": "npx eslint src/**/*.ts"
       }
     },
     "lint:fix": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "packages/elements",
-        "command": "npx eslint src/**/*.{tsx,ts} --fix && npx prettier --write src/**/*.{ts,tsx}"
+        "cwd": "packages/sdk",
+        "command": "npx eslint src/**/*.ts --fix && npx prettier --write src/**/*.ts"
       }
     }
   }

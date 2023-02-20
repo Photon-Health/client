@@ -27,7 +27,7 @@ customElement(
     hideFooter: false,
     disableSubmit: false,
     width: '500px',
-    overlayClose: false,
+    overlayClose: false
   },
   (props: {
     label?: string;
@@ -50,7 +50,7 @@ customElement(
         {
           composed: true,
           bubbles: true,
-          detail: {},
+          detail: {}
         }
       );
       ref?.dispatchEvent(event);
@@ -66,7 +66,7 @@ customElement(
           class="dialog"
           classList={{
             hideFooter: props.hideFooter,
-            showHeader: props.header,
+            showHeader: props.header
           }}
           style={`--width: ${props.width};`}
           ref={ref}
@@ -94,7 +94,7 @@ customElement(
           <div
             class="flex flex-col xs:flex-row justify-end gap-2"
             classList={{
-              hidden: props.hideFooter,
+              hidden: props.hideFooter
             }}
             slot="footer"
           >

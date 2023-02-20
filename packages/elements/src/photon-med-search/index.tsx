@@ -27,8 +27,9 @@ customElement('photon-med-search', {}, () => {
   const [formId, setFormId] = createSignal<string>('');
   const [products, setProducts] = createSignal<Medication[]>([]);
   const [addToCatalog, setAddToCatalog] = createSignal<boolean>(false);
-  const [selectedMedication, setSelectedMedication] =
-    createSignal<Medication | undefined>(undefined);
+  const [selectedMedication, setSelectedMedication] = createSignal<Medication | undefined>(
+    undefined
+  );
   const [catalogId, setCatalogId] = createSignal<string>('');
 
   const dispatchFormUpdated = (medication: Medication, addToCatalog: boolean) => {
@@ -38,8 +39,8 @@ customElement('photon-med-search', {}, () => {
       detail: {
         medication: medication,
         addToCatalog: addToCatalog,
-        catalogId: catalogId(),
-      },
+        catalogId: catalogId()
+      }
     });
     ref?.dispatchEvent(event);
   };
@@ -56,7 +57,7 @@ customElement('photon-med-search', {}, () => {
     if (id.length > 0) {
       untrack(async () => {
         const { data } = await client!.getSDK().clinical.searchMedication.getProducts({
-          id: id,
+          id: id
         });
         setAddToCatalog(false);
         setSelectedMedication(undefined);
