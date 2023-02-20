@@ -266,8 +266,8 @@ export class PhotonClientStore {
     this.setStore('authentication', {
       ...this.store.authentication,
       user: user,
-    });
       isLoading: false,
+      isAuthorized: authenticated && this.sdk.organization === user?.org_id
     });
   }
   private async login(args = {}) {
