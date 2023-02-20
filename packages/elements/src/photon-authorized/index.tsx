@@ -12,20 +12,26 @@ export const PhotonAuthorized = (props: { children: JSXElement }) => {
   const [authorized, setAuthorized] = createSignal<boolean>(
     client?.authentication.state.isAuthorized || false
   );
+  const [isLoading, setIsLoading] = createSignal<boolean>(
+    client?.authentication.state.isLoading || false
+  );
   createEffect(() => {
     setAuthorized(client?.authentication.state.isAuthorized || false);
-  }, [client?.authentication.state.isAuthenticated]);
+  });
+  createEffect(() => {
+    setIsLoading(client?.authentication.state.isLoading || false);
+  });
 
   return (
     <>
-      <Show when={client && !authorized()}>
+      <Show when={client && !authorized() && !isLoading()}>
         <sl-alert variant="warning" open>
           <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
           <strong>You are not authorized to prescribe</strong>
           <br />
         </sl-alert>
       </Show>
-      <Show when={client && authorized()}>{props.children}</Show>
+      <Show when={client && authorized() && !isLoading()}>{props.children}</Show>
     </>
   );
 };
