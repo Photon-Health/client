@@ -1,14 +1,7 @@
-import {
-  ApolloClient,
-  DocumentNode,
-  gql,
-  NormalizedCacheObject,
-} from "@apollo/client";
-import { MEDICATION_FIELDS } from "../fragments";
-import { makeQuery } from "../utils";
-import { Medication, MedicationFilter } from "../types";
-
-
+import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client';
+import { MEDICATION_FIELDS } from '../fragments';
+import { makeQuery } from '../utils';
+import { Medication, MedicationFilter } from '../types';
 
 /**
  * GetMedications options
@@ -17,25 +10,23 @@ import { Medication, MedicationFilter } from "../types";
  * @param code Filter medication by NDC/RxCUI
  * @param fragment Allows you to override the default query to request more fields
  */
- export interface GetMedicationsOptions {
-  filter?: MedicationFilter,
-  after?: String,
-  first?: Number,
-  fragment?: Record<string, DocumentNode>
+export interface GetMedicationsOptions {
+  filter?: MedicationFilter;
+  after?: String;
+  first?: Number;
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
-  * Contains various methods for Photon Medications
-  */
+ * Contains various methods for Photon Medications
+ */
 export class MedicationQueryManager {
   private apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>;
 
-   /**
+  /**
    * @param apollo - An Apollo client instance
    */
-  constructor(
-    apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>
-  ) {
+  constructor(apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>) {
     this.apollo = apollo;
   }
 
@@ -45,13 +36,8 @@ export class MedicationQueryManager {
    * @returns
    */
   public async getMedications(
-    {
-      filter,
-      after,
-      first,
-      fragment
-    }: GetMedicationsOptions = {
-      fragment: { MedicationFields: MEDICATION_FIELDS },
+    { filter, after, first, fragment }: GetMedicationsOptions = {
+      fragment: { MedicationFields: MEDICATION_FIELDS }
     }
   ) {
     if (!fragment) {
@@ -66,14 +52,10 @@ export class MedicationQueryManager {
     }
   }
     `;
-    return makeQuery<{ medications: Medication[] }>(
-      this.apollo,
-      GET_MEDICATIONS,
-      {
-        filter,
-        after,
-        first
-      }
-    );
+    return makeQuery<{ medications: Medication[] }>(this.apollo, GET_MEDICATIONS, {
+      filter,
+      after,
+      first
+    });
   }
 }

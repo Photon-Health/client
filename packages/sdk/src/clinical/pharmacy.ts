@@ -1,7 +1,7 @@
-import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client'
-import { PHARMACY_FIELDS } from '../fragments'
-import { makeQuery } from '../utils'
-import { FulfillmentType, LatLongSearch, Pharmacy } from '../types'
+import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client';
+import { PHARMACY_FIELDS } from '../fragments';
+import { makeQuery } from '../utils';
+import { FulfillmentType, LatLongSearch, Pharmacy } from '../types';
 
 /**
  * GetPharmacies options
@@ -11,12 +11,12 @@ import { FulfillmentType, LatLongSearch, Pharmacy } from '../types'
  * @param fragment Allows you to override the default query to request more fields
  */
 export interface GetPharmaciesOptions {
-  name?: string
-  location?: LatLongSearch
-  type?: FulfillmentType
-  after?: number
-  first?: number
-  fragment?: Record<string, DocumentNode>
+  name?: string;
+  location?: LatLongSearch;
+  type?: FulfillmentType;
+  after?: number;
+  first?: number;
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
@@ -25,21 +25,21 @@ export interface GetPharmaciesOptions {
  * @param fragment Allows you to override the default query to request more fields
  */
 export interface GetPharmacyOptions {
-  id?: string
-  fragment?: Record<string, DocumentNode>
+  id?: string;
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
  * Contains various methods for Photon Pharmacies
  */
 export class PharmacyQueryManager {
-  private apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>
+  private apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>;
 
   /**
    * @param apollo - An Apollo client instance
    */
   constructor(apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>) {
-    this.apollo = apollo
+    this.apollo = apollo;
   }
 
   /**
@@ -54,12 +54,12 @@ export class PharmacyQueryManager {
     }
   ) {
     if (!first) {
-      first = 100
+      first = 100;
     }
     if (!fragment) {
-      fragment = { PharmacyFields: PHARMACY_FIELDS }
+      fragment = { PharmacyFields: PHARMACY_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment!)[0]
+    let [fName, fValue] = Object.entries(fragment!)[0];
     const GET_PHARMACIES = gql`
       ${fValue}
       query pharmacies($name: String, $location: LatLongSearch, $type: FulfillmentType, $after: Int, $first: Int) {
@@ -67,14 +67,14 @@ export class PharmacyQueryManager {
           ...${fName}
         }
       }
-    `
+    `;
     return makeQuery<{ pharmacies: Pharmacy[] }>(this.apollo, GET_PHARMACIES, {
       name,
       location,
       type,
       after,
       first
-    })
+    });
   }
 
   /**
@@ -89,9 +89,9 @@ export class PharmacyQueryManager {
     }
   ) {
     if (!fragment) {
-      fragment = { PharmacyFields: PHARMACY_FIELDS }
+      fragment = { PharmacyFields: PHARMACY_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0]
+    let [fName, fValue] = Object.entries(fragment)[0];
     const GET_PHARMACY = gql`
           ${fValue}
           query pharmacy($id: ID!) {
@@ -99,7 +99,7 @@ export class PharmacyQueryManager {
               ...${fName}
             }
           }
-        `
-    return makeQuery<{ pharmacy: Pharmacy }>(this.apollo, GET_PHARMACY, { id: id })
+        `;
+    return makeQuery<{ pharmacy: Pharmacy }>(this.apollo, GET_PHARMACY, { id: id });
   }
 }

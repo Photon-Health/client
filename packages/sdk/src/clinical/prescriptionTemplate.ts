@@ -1,31 +1,31 @@
-import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client'
-import { PRESCRIPTION_TEMPLATE_FIELDS } from '../fragments'
-import { PrescriptionTemplate } from '../types'
-import { makeMutation } from '../utils'
+import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client';
+import { PRESCRIPTION_TEMPLATE_FIELDS } from '../fragments';
+import { PrescriptionTemplate } from '../types';
+import { makeMutation } from '../utils';
 
 export interface CreatePrescriptionTemplateOptions {
-  fragment?: Record<string, DocumentNode>
+  fragment?: Record<string, DocumentNode>;
 }
 
 export interface UpdatePrescriptionTemplateOptions {
-  fragment?: Record<string, DocumentNode>
+  fragment?: Record<string, DocumentNode>;
 }
 
 export interface DeletePrescriptionTemplateOptions {
-  fragment?: Record<string, DocumentNode>
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
  * Contains various methods for Photon Prescription Templates
  */
 export class PrescriptionTemplateQueryManager {
-  private apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>
+  private apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>;
 
   /**
    * @param apollo - An Apollo client instance
    */
   constructor(apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>) {
-    this.apollo = apollo
+    this.apollo = apollo;
   }
 
   /**
@@ -35,9 +35,9 @@ export class PrescriptionTemplateQueryManager {
    */
   public createPrescriptionTemplate({ fragment }: CreatePrescriptionTemplateOptions) {
     if (!fragment) {
-      fragment = { PrescriptionTemplateFields: PRESCRIPTION_TEMPLATE_FIELDS }
+      fragment = { PrescriptionTemplateFields: PRESCRIPTION_TEMPLATE_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0]
+    let [fName, fValue] = Object.entries(fragment)[0];
     const CREATE_PRESCRIPTION_TEMPLATE = gql`
         ${fValue}
         mutation createPrescriptionTemplate(
@@ -65,11 +65,11 @@ export class PrescriptionTemplateQueryManager {
             ...${fName}
         }
       }
-      `
+      `;
     return makeMutation<{ createPrescriptionTemplate: PrescriptionTemplate } | undefined | null>(
       this.apollo,
       CREATE_PRESCRIPTION_TEMPLATE
-    )
+    );
   }
 
   /**
@@ -79,9 +79,9 @@ export class PrescriptionTemplateQueryManager {
    */
   public updatePrescriptionTemplate({ fragment }: UpdatePrescriptionTemplateOptions) {
     if (!fragment) {
-      fragment = { PrescriptionTemplateFields: PRESCRIPTION_TEMPLATE_FIELDS }
+      fragment = { PrescriptionTemplateFields: PRESCRIPTION_TEMPLATE_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0]
+    let [fName, fValue] = Object.entries(fragment)[0];
     const UPDATE_PRESCRIPTION_TEMPLATE = gql`
         ${fValue}
         mutation updatePrescriptionTemplate(
@@ -109,11 +109,11 @@ export class PrescriptionTemplateQueryManager {
             ...${fName}
         }
       }
-      `
+      `;
     return makeMutation<{ updatePrescriptionTemplate: PrescriptionTemplate } | undefined | null>(
       this.apollo,
       UPDATE_PRESCRIPTION_TEMPLATE
-    )
+    );
   }
 
   /**
@@ -123,9 +123,9 @@ export class PrescriptionTemplateQueryManager {
    */
   public deletePrescriptionTemplate({ fragment }: DeletePrescriptionTemplateOptions) {
     if (!fragment) {
-      fragment = { PrescriptionTemplateFields: PRESCRIPTION_TEMPLATE_FIELDS }
+      fragment = { PrescriptionTemplateFields: PRESCRIPTION_TEMPLATE_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0]
+    let [fName, fValue] = Object.entries(fragment)[0];
     const DELETE_PRESCRIPTION_TEMPLATE = gql`
         ${fValue}
         mutation deletePrescriptionTemplate(
@@ -139,10 +139,10 @@ export class PrescriptionTemplateQueryManager {
             ...${fName}
         }
       }
-      `
+      `;
     return makeMutation<{ deletePrescriptionTemplate: PrescriptionTemplate } | undefined | null>(
       this.apollo,
       DELETE_PRESCRIPTION_TEMPLATE
-    )
+    );
   }
 }

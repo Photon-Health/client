@@ -65,31 +65,31 @@ const createPatientStore = () => {
       data: [],
       errors: [],
       isLoading: false,
-      finished: false,
+      finished: false
     },
     selectedPatient: {
       data: undefined,
       errors: [],
-      isLoading: false,
-    },
+      isLoading: false
+    }
   });
 
   const getSelectedPatient = async (client: PhotonClient, id: string) => {
     setStore('selectedPatient', {
       ...store.selectedPatient,
-      isLoading: true,
+      isLoading: true
     });
     const { data, errors } = await client.clinical.patient.getPatient({
       id,
       fragment: {
-        PatientOrderFields: PATIENT_ORDER_FIELDS,
-      },
+        PatientOrderFields: PATIENT_ORDER_FIELDS
+      }
     });
     setStore('selectedPatient', {
       ...store.selectedPatient,
       isLoading: false,
       data: data.patient,
-      errors: errors,
+      errors: errors
     });
   };
 
@@ -105,27 +105,27 @@ const createPatientStore = () => {
     }
     setStore('patients', {
       ...store.patients,
-      isLoading: true,
+      isLoading: true
     });
     const { data, errors } = await client.clinical.patient.getPatients({
       first: args.first,
       name: args.name,
       fragment: {
-        PatientOrderFields: PATIENT_ORDER_FIELDS,
-      },
+        PatientOrderFields: PATIENT_ORDER_FIELDS
+      }
     });
     setStore('patients', {
       ...store.patients,
       isLoading: false,
       errors: errors,
       data: data.patients,
-      finished: data.patients.length === 0,
+      finished: data.patients.length === 0
     });
     return (!errors || errors.length === 0) && data.patients.length > 0
       ? () =>
           fetchMorePatients(client, {
             ...args,
-            after: data.patients.at(-1)!.id,
+            after: data.patients.at(-1)!.id
           })
       : undefined;
   };
@@ -140,7 +140,7 @@ const createPatientStore = () => {
   ) => {
     setStore('patients', {
       ...store.patients,
-      isLoading: true,
+      isLoading: true
     });
     const { data, errors } = await client.clinical.patient.getPatients(args);
     setStore('patients', {
@@ -148,13 +148,13 @@ const createPatientStore = () => {
       isLoading: false,
       errors: errors,
       data: [...store.patients.data, ...data.patients],
-      finished: data.patients.length === 0,
+      finished: data.patients.length === 0
     });
     return (!errors || errors.length === 0) && data.patients.length > 0
       ? () =>
           fetchMorePatients(client, {
             ...args,
-            after: data.patients.at(-1)!.id,
+            after: data.patients.at(-1)!.id
           })
       : undefined;
   };
@@ -162,7 +162,7 @@ const createPatientStore = () => {
   const clearSelectedPatient = async () => {
     setStore('selectedPatient', {
       ...store.selectedPatient,
-      data: undefined,
+      data: undefined
     });
   };
 
@@ -171,12 +171,12 @@ const createPatientStore = () => {
       data: [],
       errors: [],
       isLoading: false,
-      finished: false,
+      finished: false
     });
     setStore('selectedPatient', {
       data: undefined,
       errors: [],
-      isLoading: false,
+      isLoading: false
     });
   };
 
@@ -186,8 +186,8 @@ const createPatientStore = () => {
       getPatients,
       getSelectedPatient,
       clearSelectedPatient,
-      reset,
-    },
+      reset
+    }
   };
 };
 

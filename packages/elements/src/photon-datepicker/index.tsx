@@ -22,7 +22,7 @@ customElement(
     required: false,
     invalid: false,
     helpText: undefined,
-    disabled: false,
+    disabled: false
   },
   (props: {
     label?: string;
@@ -40,8 +40,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          date: date,
-        },
+          date: date
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -69,7 +69,7 @@ customElement(
             }}
             disabled={props.disabled}
             classList={{
-              invalid: props.invalid,
+              invalid: props.invalid
             }}
             class="input"
             type="date"

@@ -19,7 +19,7 @@ customElement(
     formName: undefined,
     disabled: false,
     forceLabelSize: false,
-    selected: undefined,
+    selected: undefined
   },
   (props: {
     label?: string;
@@ -43,9 +43,9 @@ customElement(
         bubbles: true,
         detail: {
           dispenseUnit: {
-            name: dispenseUnit.name,
-          },
-        },
+            name: dispenseUnit.name
+          }
+        }
       });
       ref?.dispatchEvent(event);
     };

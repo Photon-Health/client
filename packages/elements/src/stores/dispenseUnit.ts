@@ -16,14 +16,14 @@ const createDispenseUnitStore = () => {
     dispenseUnits: {
       data: [],
       errors: [],
-      isLoading: false,
-    },
+      isLoading: false
+    }
   });
 
   const getDispenseUnits = async (client: PhotonClient) => {
     setStore('dispenseUnits', {
       ...store.dispenseUnits,
-      isLoading: true,
+      isLoading: true
     });
     const { data, errors } = await client.clinical.prescription.getDispenseUnits();
     setStore('dispenseUnits', {
@@ -31,17 +31,17 @@ const createDispenseUnitStore = () => {
       isLoading: false,
       data: data.dispenseUnits.map((x, idx) => ({
         id: idx.toString(),
-        ...x,
+        ...x
       })),
-      errors: errors,
+      errors: errors
     });
   };
 
   return {
     store,
     actions: {
-      getDispenseUnits,
-    },
+      getDispenseUnits
+    }
   };
 };
 

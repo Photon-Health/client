@@ -20,7 +20,7 @@ customElement(
     loadingText: undefined,
     full: false,
     variant: 'solid',
-    size: 'md',
+    size: 'md'
   },
   (props: {
     disabled: boolean;
@@ -35,7 +35,7 @@ customElement(
       const event = new CustomEvent('photon-clicked', {
         composed: true,
         bubbles: true,
-        detail: {},
+        detail: {}
       });
       ref?.dispatchEvent(event);
     };
@@ -59,7 +59,7 @@ customElement(
             'button--sm': props.size == 'sm',
             'button--xs': props.size == 'xs',
             'xs:w-fit': true,
-            'w-full': true || props.full,
+            'w-full': true || props.full
           }}
           class="rounded-lg font-sans transition ease-in-out delay-50 flex items-center gap-2"
         >
@@ -75,7 +75,7 @@ customElement(
                 class="w-[16px]"
                 classList={{
                   'spinner--solid': props.variant === 'solid',
-                  'spinner--outline': props.variant === 'outline',
+                  'spinner--outline': props.variant === 'outline'
                 }}
               ></sl-spinner>
             </div>

@@ -13,7 +13,7 @@ customElement(
   'photon-radio-card',
   {
     selected: false,
-    value: '',
+    value: ''
   },
   (props: { selected: boolean; value: any }) => {
     let ref: any;
@@ -23,8 +23,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          value: props.value,
-        },
+          value: props.value
+        }
       });
       ref?.dispatchEvent(event);
     };

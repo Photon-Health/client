@@ -1,29 +1,29 @@
 {
-  "name": "elements",
-  "root": "packages/elements",
-  "sourceRoot": "packages/elements/src",
+  "name": "react",
+  "root": "packages/react",
+  "sourceRoot": "packages/react/src",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "package",
   "targets": {
     "start": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "packages/elements",
+        "cwd": "packages/react",
         "command": "vite --port 3000"
       }
     },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "packages/elements",
-        "command": "npx eslint src/**/*.{tsx,ts}"
+        "cwd": "packages/react",
+        "command": "npx eslint src/*.{ts,tsx}"
       }
     },
     "lint:fix": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "packages/elements",
-        "command": "npx eslint src/**/*.{tsx,ts} --fix && npx prettier --write src/**/*.{ts,tsx}"
+        "cwd": "packages/react",
+        "command": "npx eslint src/*.{ts,tsx} --fix && npx prettier --write src/*.{ts,tsx}"
       }
     }
   }

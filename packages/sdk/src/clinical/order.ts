@@ -1,12 +1,7 @@
-import {
-  ApolloClient,
-  DocumentNode,
-  gql,
-  NormalizedCacheObject,
-} from "@apollo/client";
-import { ORDER_FIELDS } from "../fragments";
-import { makeMutation, makeQuery } from "../utils";
-import { Maybe, Order } from "../types";
+import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client';
+import { ORDER_FIELDS } from '../fragments';
+import { makeMutation, makeQuery } from '../utils';
+import { Maybe, Order } from '../types';
 
 /**
  * GetOrders options
@@ -52,9 +47,7 @@ export class OrderQueryManager {
   /**
    * @param apollo - An Apollo client instance
    */
-  constructor(
-    apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>
-  ) {
+  constructor(apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>) {
     this.apollo = apollo;
   }
 
@@ -66,7 +59,7 @@ export class OrderQueryManager {
   public async getOrders(
     { patientId, patientName, after, first, fragment }: GetOrdersOptions = {
       first: 25,
-      fragment: { OrderFields: ORDER_FIELDS },
+      fragment: { OrderFields: ORDER_FIELDS }
     }
   ) {
     if (!first) {
@@ -100,7 +93,7 @@ export class OrderQueryManager {
       patientId,
       patientName,
       after,
-      first,
+      first
     });
   }
 
@@ -111,8 +104,8 @@ export class OrderQueryManager {
    */
   public async getOrder(
     { id, fragment }: GetOrderOptions = {
-      id: "",
-      fragment: { OrderFields: ORDER_FIELDS },
+      id: '',
+      fragment: { OrderFields: ORDER_FIELDS }
     }
   ) {
     if (!fragment) {
@@ -160,9 +153,6 @@ export class OrderQueryManager {
         }
       }
     `;
-    return makeMutation<{ createOrder: Order } | undefined | null>(
-      this.apollo,
-      CREATE_ORDER
-    );
+    return makeMutation<{ createOrder: Order } | undefined | null>(this.apollo, CREATE_ORDER);
   }
 }

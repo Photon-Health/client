@@ -61,7 +61,7 @@ customElement(
     hideTemplates: true,
     enableOrder: false,
     pharmacyId: undefined,
-    loading: false,
+    loading: false
   },
   (
     props: {
@@ -83,7 +83,7 @@ customElement(
       draftPrescriptions: [],
       pharmacy: undefined,
       errors: [],
-      address: undefined,
+      address: undefined
     });
     const client = usePhoton();
     const [showForm, setShowForm] = createSignal<boolean>(!props.templateIds);
@@ -116,19 +116,19 @@ customElement(
 
         // TODO: Should just get the template directly but not supported by the SDK
         const {
-          data: { catalogs },
+          data: { catalogs }
         } = await client!.getSDK().clinical.catalog.getCatalogs();
         if (catalogs.length === 0) {
           console.error('No catalog set');
           return;
         }
         const {
-          data: { catalog },
+          data: { catalog }
         } = await client!.getSDK().clinical.catalog.getCatalog({
           id: catalogs[0].id,
           fragment: {
-            CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS,
-          },
+            CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
+          }
         });
         // Build a map for easy lookup
         const templateMap: { [key: string]: PrescriptionTemplate } = {};
@@ -169,9 +169,9 @@ customElement(
                 instructions: template.instructions,
                 notes: template.notes,
                 addToTemplates: false,
-                catalogId: undefined,
-              },
-            ],
+                catalogId: undefined
+              }
+            ]
           });
         }
         setIsLoadingTemplates(false);
@@ -183,8 +183,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          prescriptions: prescriptions,
-        },
+          prescriptions: prescriptions
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -194,8 +194,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          order: order,
-        },
+          order: order
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -205,8 +205,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          errors: errors,
-        },
+          errors: errors
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -216,8 +216,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          errors: errors,
-        },
+          errors: errors
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -229,8 +229,8 @@ customElement(
         detail: {
           canSubmit: canSubmit,
           form: store,
-          actions: actions,
-        },
+          actions: actions
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -245,7 +245,7 @@ customElement(
         setIsLoading(true);
         actions.updateFormValue({
           key: 'errors',
-          value: [],
+          value: []
         });
         const orderMutation = client!.getSDK().clinical.order.createOrder({});
         const rxMutation = client!.getSDK().clinical.prescription.createPrescriptions({});
@@ -262,16 +262,16 @@ customElement(
             patientId: store['patient']?.value.id,
             // +1 here because we're using the refillsInput
             fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
-            treatmentId: draft.treatment.id,
+            treatmentId: draft.treatment.id
           };
           prescriptions.push(args);
         }
         const { data, errors } = await rxMutation({
           variables: {
-            prescriptions,
+            prescriptions
           },
           refetchQueries: [],
-          awaitRefetchQueries: false,
+          awaitRefetchQueries: false
         });
         if (!props.enableOrder) {
           setIsLoading(false);
@@ -290,10 +290,10 @@ customElement(
               patientId: store['patient']?.value.id,
               pharmacyId: props?.pharmacyId || store['pharmacy']?.value.id,
               address: address,
-              fills: data?.createPrescriptions.map((x) => ({ prescriptionId: x.id })),
+              fills: data?.createPrescriptions.map((x) => ({ prescriptionId: x.id }))
             },
             refetchQueries: [],
-            awaitRefetchQueries: false,
+            awaitRefetchQueries: false
           });
           if (props.enableOrder) {
             setIsLoading(false);

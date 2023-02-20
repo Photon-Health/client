@@ -76,7 +76,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
       count: props.data.length,
       getScrollElement: () => listRef,
       estimateSize: () => 36.8,
-      overscan: 25,
+      overscan: 25
     })
   );
   const [lastIndex, setLastIndex] = createSignal();
@@ -121,8 +121,8 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
       composed: true,
       bubbles: true,
       detail: {
-        data: datum,
-      },
+        data: datum
+      }
     });
     ref?.dispatchEvent(event);
   };
@@ -131,7 +131,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
     const event = new CustomEvent('photon-data-unselected', {
       composed: true,
       bubbles: true,
-      detail: {},
+      detail: {}
     });
     ref?.dispatchEvent(event);
   };
@@ -154,7 +154,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
       count: props.hasMore ? props.data.length + 1 : props.data.length,
       getScrollElement: () => listRef,
       estimateSize: () => 36.8,
-      overscan: !props.fetchMore ? props.data.length : 25,
+      overscan: !props.fetchMore ? props.data.length : 25
     });
     setVirtualizer(virtualizer);
   });
@@ -219,7 +219,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
           classList={{
             invalid: props.invalid ?? false,
             input: true,
-            disabled: props.disabled ?? false,
+            disabled: props.disabled ?? false
           }}
           required={props.required}
           on:sl-input={(e: any) => {
@@ -239,7 +239,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             slot="help-text"
             class="text-red-500 pt-2 font-sans"
             classList={{
-              'h-[28px]': props.forceLabelSize,
+              'h-[28px]': props.forceLabelSize
             }}
           >
             {showHelpText(props.invalid ?? false)}
@@ -248,7 +248,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             slot="suffix"
             classList={{
               flex: true,
-              hidden: !props.isLoading,
+              hidden: !props.isLoading
             }}
           >
             <sl-spinner slot="suffix"></sl-spinner>
@@ -258,7 +258,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
               slot="suffix"
               classList={{
                 flex: true,
-                hidden: props.isLoading || selected() == undefined,
+                hidden: props.isLoading || selected() == undefined
               }}
             >
               <sl-icon
@@ -280,7 +280,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             slot="suffix"
             classList={{
               flex: true,
-              hidden: props.isLoading,
+              hidden: props.isLoading
             }}
           >
             <sl-icon name={open() ? 'chevron-up' : 'chevron-down'}></sl-icon>
@@ -293,13 +293,13 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             style={{
               'max-height': '200px',
               'min-height': '56px',
-              width: '100%',
+              width: '100%'
             }}
           >
             <div
               style={{
                 'min-height': `36.8px`,
-                width: '100%',
+                width: '100%'
               }}
               ref={listRef}
             >
@@ -334,7 +334,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                         }}
                         style={{
                           width: '100%',
-                          'min-height': `${vr.size}px`,
+                          'min-height': `${vr.size}px`
                         }}
                       >
                         {isLoaderRow ? (
@@ -349,7 +349,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                               'overflow-hidden': !props.showOverflow,
                               'overflow-ellipsis': !props.showOverflow,
                               'whitespace-nowrap': !props.showOverflow,
-                              'whitespace-normal': props.showOverflow,
+                              'whitespace-normal': props.showOverflow
                             }}
                           >
                             {props.displayAccessor(datum, true)}
@@ -369,7 +369,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                           hidden:
                             virtualizer()
                               .getVirtualItems()
-                              .filter((vr) => el.filter(props.data[vr.index])).length === 0,
+                              .filter((vr) => el.filter(props.data[vr.index])).length === 0
                         }}
                       >
                         {el.label}
@@ -405,7 +405,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                               }}
                               style={{
                                 width: '100%',
-                                'min-height': `${vr.size}px`,
+                                'min-height': `${vr.size}px`
                               }}
                             >
                               {isLoaderRow ? (

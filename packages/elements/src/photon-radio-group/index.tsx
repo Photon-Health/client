@@ -21,8 +21,8 @@ customElement('photon-radio-group', {}, () => {
       composed: true,
       bubbles: true,
       detail: {
-        value: value,
-      },
+        value: value
+      }
     });
     ref?.dispatchEvent(event);
   };

@@ -112,7 +112,7 @@ const calculateLiquidDosage = (
 customElement(
   'photon-dosage-calculator',
   {
-    medication: undefined,
+    medication: undefined
   },
   (props: { medication?: Medication }) => {
     let ref: any;
@@ -133,8 +133,8 @@ customElement(
         bubbles: true,
         detail: {
           value: Number(liquid ? liquidDoesResult().split(' ')[0] : doseResult().split(' ')[0]),
-          unit: liquid ? liquidDoesResult().split(' ')[1] : doseResult().split(' ')[1],
-        },
+          unit: liquid ? liquidDoesResult().split(' ')[1] : doseResult().split(' ')[1]
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -143,11 +143,11 @@ customElement(
       let dose = calculateDosage(
         {
           value: dosage(),
-          unit: dosageUnit(),
+          unit: dosageUnit()
         },
         {
           value: weight(),
-          unit: weightUnit(),
+          unit: weightUnit()
         }
       );
       if (dose.toString().split('.').length > 1 && dose.toString().split('.')[1].length > 4) {
@@ -176,7 +176,7 @@ customElement(
       liquidDosage,
       volume,
       liquidDosageUnit,
-      volumeUnit,
+      volumeUnit
     ]);
 
     return (

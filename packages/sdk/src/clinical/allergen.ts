@@ -1,12 +1,7 @@
-import {
-  ApolloClient,
-  DocumentNode,
-  gql,
-  NormalizedCacheObject,
-} from "@apollo/client";
-import { ALLERGEN_FIELDS } from "../fragments";
-import { makeQuery } from "../utils";
-import { Allergen, AllergenFilter } from "../types";
+import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client';
+import { ALLERGEN_FIELDS } from '../fragments';
+import { makeQuery } from '../utils';
+import { Allergen, AllergenFilter } from '../types';
 
 /**
  * GetAllergens options
@@ -27,9 +22,7 @@ export class AllergenQueryManager {
   /**
    * @param apollo - An Apollo client instance
    */
-  constructor(
-    apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>
-  ) {
+  constructor(apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>) {
     this.apollo = apollo;
   }
 
@@ -40,7 +33,7 @@ export class AllergenQueryManager {
    */
   public async getAllergens(
     { fragment, filter }: GetAllergensOptions = {
-      fragment: { AllergenFields: ALLERGEN_FIELDS },
+      fragment: { AllergenFields: ALLERGEN_FIELDS }
     }
   ) {
     if (!fragment) {
@@ -56,7 +49,7 @@ export class AllergenQueryManager {
         }
       `;
     return makeQuery<{ allergens: Allergen[] }>(this.apollo, GET_ALLERGENS, {
-      filter,
+      filter
     });
   }
 }
