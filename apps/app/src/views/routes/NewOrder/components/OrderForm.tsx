@@ -44,8 +44,11 @@ const orderSchema = yup.object({
       message: 'Please select at least one prescription to fill...',
       test: (arr) => arr?.length !== 0
     }),
-  fulfillmentType: yup.string().required(),
-  pharmacyId: yup.string().required('Please select a pharmacy...'),
+  fulfillmentType: yup.string().nullable(),
+  pharmacyId: yup.string().when('fulfillmentType', {
+    is: (fulfillmentType: types.FulfillmentType) => !!fulfillmentType,
+    then: yup.string().required()
+  }),
   address: yup
     .object({
       street1: yup.string().required('Please enter an address...'),
