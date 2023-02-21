@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "app:local": "concurrently \"npx nx run elements:build:watch\" \"npx nx run app:start\""
+    "app:local": "concurrently \"npx nx run elements:build:watch\" \"npx nx run app:start\"",
+    "lint": "npx nx run-many --target=lint",
+    "lint:fix": "npx nx run-many --target=lint:fix"
   },
   "private": true,
   "workspaces": [
@@ -66,8 +68,6 @@
     "@emotion/styled": "^11.10.5",
     "@nanostores/persistent": "^0.7.0",
     "@nanostores/react": "^0.4.1",
-    "@photonhealth/react": "^1.0.5",
-    "@photonhealth/sdk": "^1.0.5",
     "@sentry/react": "^7.28.1",
     "@sentry/tracing": "^7.28.1",
     "@testing-library/jest-dom": "^5.16.5",

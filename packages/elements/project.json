@@ -11,6 +11,20 @@
         "cwd": "packages/elements",
         "command": "vite --port 3000"
       }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/elements",
+        "command": "npx eslint src/**/*.{tsx,ts}"
+      }
+    },
+    "lint:fix": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/elements",
+        "command": "npx eslint src/**/*.{tsx,ts} --fix && npx prettier --write src/**/*.{ts,tsx}"
+      }
     }
   }
 }

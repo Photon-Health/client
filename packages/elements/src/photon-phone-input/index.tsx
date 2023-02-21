@@ -31,7 +31,7 @@ customElement(
     value: undefined,
     invalid: false,
     helpText: undefined,
-    disabled: false,
+    disabled: false
   },
   (props: PhoneInputProps) => {
     let ref: any;
@@ -41,8 +41,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          phone: phone,
-        },
+          phone: phone
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -68,7 +68,7 @@ customElement(
           ) : null}
           <sl-input
             classList={{
-              invalid: props.invalid,
+              invalid: props.invalid
             }}
             disabled={props.disabled}
             class="input"

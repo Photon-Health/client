@@ -4,7 +4,7 @@ customElement(
   'photon-update-patient-dialog',
   {
     patientId: '',
-    open: false,
+    open: false
   },
   (props: { patientId: string; open: boolean }) => {
     console.warn(

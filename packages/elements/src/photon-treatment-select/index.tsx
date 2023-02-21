@@ -21,7 +21,7 @@ customElement(
     disabled: false,
     formName: undefined,
     selected: undefined,
-    offCatalogOption: undefined,
+    offCatalogOption: undefined
   },
   (props: {
     label?: string;
@@ -49,8 +49,8 @@ customElement(
         bubbles: true,
         detail: {
           data: datum,
-          catalogId: store.catalogs.data![0].id,
-        },
+          catalogId: store.catalogs.data![0].id
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -61,11 +61,11 @@ customElement(
           ? [
               props.offCatalogOption as Treatment,
               ...store.catalogs.data[0].templates.map((x) => x as PrescriptionTemplate),
-              ...store.catalogs.data[0].treatments.map((x) => x as Treatment),
+              ...store.catalogs.data[0].treatments.map((x) => x as Treatment)
             ]
           : [
               ...store.catalogs.data[0].templates.map((x) => x as PrescriptionTemplate),
-              ...store.catalogs.data[0].treatments.map((x) => x as Treatment),
+              ...store.catalogs.data[0].treatments.map((x) => x as Treatment)
             ];
         if (filter.length === 0) {
           return data;
@@ -99,20 +99,20 @@ customElement(
                   return false;
                 }
                 return x.id === props.offCatalogOption?.id;
-              },
+              }
             },
             {
               label: 'Templates',
               filter: (x: Treatment | PrescriptionTemplate) => {
                 return x ? Object.keys(x).includes('treatment') : false;
-              },
+              }
             },
             {
               label: 'Catalog',
               filter: (x: Treatment | PrescriptionTemplate) => {
                 return x ? Object.keys(x).includes('name') : false;
-              },
-            },
+              }
+            }
           ]}
           label={props.label}
           disabled={props.disabled}

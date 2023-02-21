@@ -26,7 +26,7 @@ customElement(
     forceLabelSize: false,
     address: '',
     patientId: undefined,
-    geocodingApiKey: 'AIzaSyAvuwwE6g2Bsmih66nu4dB7-H7U1_7KQ6g',
+    geocodingApiKey: 'AIzaSyAvuwwE6g2Bsmih66nu4dB7-H7U1_7KQ6g'
   },
   (props: {
     label?: string;
@@ -56,8 +56,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          pharmacy,
-        },
+          pharmacy
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -66,7 +66,7 @@ customElement(
       const event = new CustomEvent('photon-pharmacy-removed', {
         composed: true,
         bubbles: true,
-        detail: {},
+        detail: {}
       });
       ref?.dispatchEvent(event);
     };
@@ -82,7 +82,7 @@ customElement(
           ...(store.preferredPharmacies.data ?? []).filter(
             (z) => z.id != store.selectedPharmacy.data?.id
           ),
-          ...filteredPharmacies,
+          ...filteredPharmacies
         ];
       } else {
         return [...(store.preferredPharmacies.data ?? []), ...filteredPharmacies];
@@ -235,8 +235,8 @@ customElement(
                         return (store.preferredPharmacies.data ?? [])
                           .map((x) => x.id)
                           .includes(y.id);
-                      },
-                    },
+                      }
+                    }
                   ]
                 : []),
               {
@@ -246,8 +246,8 @@ customElement(
                     return false;
                   }
                   return !(store.preferredPharmacies.data ?? []).map((x) => x.id).includes(x.id);
-                },
-              },
+                }
+              }
             ]}
             label={props.label}
             forceLabelSize={props.forceLabelSize}

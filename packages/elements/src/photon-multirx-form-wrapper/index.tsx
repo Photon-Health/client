@@ -25,7 +25,7 @@ customElement(
   {
     hideTemplates: false,
     patientId: undefined,
-    templateIds: undefined,
+    templateIds: undefined
   },
   (props: { hideTemplates?: boolean; patientId?: string; templateIds?: string }) => {
     let ref: any;
@@ -59,8 +59,8 @@ customElement(
         detail: {
           patientId,
           prescriptionIds,
-          createOrder,
-        },
+          createOrder
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -69,7 +69,7 @@ customElement(
       const event = new CustomEvent('photon-prescriptions-closed', {
         composed: true,
         bubbles: true,
-        detail: {},
+        detail: {}
       });
       ref?.dispatchEvent(event);
     };
@@ -83,7 +83,7 @@ customElement(
         setIsLoading(true);
         actions.updateFormValue({
           key: 'errors',
-          value: [],
+          value: []
         });
         const rxMutation = client!.getSDK().clinical.prescription.createPrescriptions({});
         const templateMutation = client!
@@ -105,9 +105,9 @@ customElement(
                   fillsAllowed: draft.refillsInput + 1,
                   daysSupply: draft.daysSupply,
                   instructions: draft.instructions,
-                  notes: draft.notes,
+                  notes: draft.notes
                 },
-                awaitRefetchQueries: false,
+                awaitRefetchQueries: false
               });
               if (errors) {
                 setSubmitErrors(errors);
@@ -128,7 +128,7 @@ customElement(
             // This is what is being sent to graphQL to create the prescription. We store the refill input as part of the drafted prescription under "refillsInput"
             // so a '+1' is needed in order to be passed in as the variable for fillsAllowed to accurately represent the total number of fills.
             fillsAllowed: draft.refillsInput + 1,
-            treatmentId: draft.treatment.id,
+            treatmentId: draft.treatment.id
           };
           prescriptions.push(args);
         }
@@ -138,10 +138,10 @@ customElement(
         try {
           const { data, errors } = await rxMutation({
             variables: {
-              prescriptions,
+              prescriptions
             },
             refetchQueries: [],
-            awaitRefetchQueries: false,
+            awaitRefetchQueries: false
           });
           if (errors) {
             setSubmitErrors(errors as readonly Error[]);

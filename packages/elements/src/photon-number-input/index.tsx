@@ -24,7 +24,7 @@ customElement(
     max: undefined,
     invalid: false,
     helpText: undefined,
-    disabled: false,
+    disabled: false
   },
   (props: {
     label?: string;
@@ -44,8 +44,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          input: input,
-        },
+          input: input
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -69,7 +69,7 @@ customElement(
           ) : null}
           <sl-input
             classList={{
-              invalid: props.invalid,
+              invalid: props.invalid
             }}
             disabled={props.disabled}
             class="input"

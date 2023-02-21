@@ -3,7 +3,7 @@ import '@shoelace-style/shoelace/dist/components/button/button';
 
 export default {
   title: 'photon-form-wrapper',
-  component: PhotonFormWrapper,
+  component: PhotonFormWrapper
 };
 
 const Template = ({
@@ -11,7 +11,7 @@ const Template = ({
   titleIconName,
   headerRight,
   form,
-  onClosed,
+  onClosed
 }: PhotonFormWrapperProps) => {
   return (
     <div class="w-full relative">
@@ -39,5 +39,5 @@ Primary.args = {
   form: <form>Form</form>,
   onClosed: () => {
     console.log('closed');
-  },
+  }
 };

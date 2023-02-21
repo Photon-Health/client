@@ -23,6 +23,7 @@ import { LocalPickup } from './components/LocalPickup';
 import { MailOrder } from './components/MailOrder';
 import { Pharmacy } from './components/Pharmacy';
 import { Address } from '../../../../../models/general';
+import { SendToPatient } from './components/SendToPatient';
 
 interface SelectPharmacyCardProps {
   patient: any;
@@ -103,12 +104,23 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
           touched={touched}
         />
       )
+    },
+    {
+      name: 'Send to patient',
+      fulfillmentType: undefined,
+      isDisabled: onlyCurexa,
+      comp: <SendToPatient patient={patient} />
     }
   ];
 
   const handleTabChange = (index: number) => {
     setFieldValue('fulfillmentType', tabsList[index].fulfillmentType);
     setSelectedTab(index);
+  };
+
+  const handleChangeBtnClick = () => {
+    setFieldValue('pharmacyId', '');
+    setUpdatePreferredPharmacy(false);
   };
 
   useEffect(() => {
@@ -153,7 +165,7 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
         <HStack w="full" justify="space-between">
           <Heading size="xxs">{pharmacyId ? 'Pharmacy' : 'Select a Pharmacy'}</Heading>
           {pharmacyId ? (
-            <Button onClick={() => setFieldValue('pharmacyId', '')} size="xs">
+            <Button onClick={handleChangeBtnClick} size="xs">
               Change
             </Button>
           ) : null}

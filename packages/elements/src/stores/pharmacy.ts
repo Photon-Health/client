@@ -45,18 +45,18 @@ const createPharmacyStore = () => {
       data: [],
       address: undefined,
       errors: [],
-      isLoading: false,
+      isLoading: false
     },
     selectedPharmacy: {
       data: undefined,
       errors: [],
-      isLoading: false,
+      isLoading: false
     },
     preferredPharmacies: {
       data: undefined,
       errors: [],
-      isLoading: false,
-    },
+      isLoading: false
+    }
   });
 
   const getPharmaciesByAddress = async (
@@ -75,14 +75,14 @@ const createPharmacyStore = () => {
         setStore('pharmacies', {
           ...store.pharmacies,
           address: addressResult,
-          errors: [],
+          errors: []
         });
       }
 
       if (!latitude || !longitude) {
         setStore('pharmacies', {
           ...store.pharmacies,
-          errors: [new Error('An unexpected error occured')],
+          errors: [new Error('An unexpected error occured')]
         });
         return;
       }
@@ -92,14 +92,14 @@ const createPharmacyStore = () => {
         location: {
           latitude,
           longitude,
-          radius: 20,
-        },
+          radius: 20
+        }
       });
     } catch (err) {
       console.log('ERR', err);
       setStore('pharmacies', {
         ...store.pharmacies,
-        errors: [new Error('The provided address seems invalid. Please revise and try again.')],
+        errors: [new Error('The provided address seems invalid. Please revise and try again.')]
       });
     }
   };
@@ -118,29 +118,29 @@ const createPharmacyStore = () => {
   ) => {
     setStore('pharmacies', {
       ...store.pharmacies,
-      isLoading: true,
+      isLoading: true
     });
     const { data, errors } = await client.clinical.pharmacy.getPharmacies({
       name: args.name,
       location: args.location,
       first: args.first,
-      type: 'PICK_UP' as FulfillmentType,
+      type: 'PICK_UP' as FulfillmentType
     });
     setStore('pharmacies', {
       ...store.pharmacies,
       isLoading: false,
       data: data.pharmacies,
-      errors: errors,
+      errors: errors
     });
   };
 
   const getPharmacy = async (client: PhotonClient, id: string) => {
     setStore('selectedPharmacy', {
       ...store.selectedPharmacy,
-      isLoading: true,
+      isLoading: true
     });
     const { data, errors } = await client.clinical.pharmacy.getPharmacy({
-      id: id,
+      id: id
     });
     if (
       (store.pharmacies.errors || []).filter(
@@ -149,33 +149,33 @@ const createPharmacyStore = () => {
     ) {
       setStore('pharmacies', {
         ...store.pharmacies,
-        errors: [],
+        errors: []
       });
     }
     setStore('selectedPharmacy', {
       ...store.selectedPharmacy,
       isLoading: false,
       data: data.pharmacy,
-      errors: errors,
+      errors: errors
     });
   };
 
   const getPreferredPharmacies = async (client: PhotonClient, id: string) => {
     setStore('preferredPharmacies', {
       ...store.preferredPharmacies,
-      isLoading: true,
+      isLoading: true
     });
     const { data, errors } = await client.clinical.patient.getPatient({
       id: id,
       fragment: {
-        PatientPharmacyFields: PATIENT_PHARMACY_FIELDS,
-      },
+        PatientPharmacyFields: PATIENT_PHARMACY_FIELDS
+      }
     });
     setStore('preferredPharmacies', {
       ...store.selectedPharmacy,
       isLoading: false,
       data: data.patient.preferredPharmacies?.map((x) => x as Pharmacy),
-      errors: errors,
+      errors: errors
     });
   };
 
@@ -183,7 +183,7 @@ const createPharmacyStore = () => {
     setStore('preferredPharmacies', {
       ...store.selectedPharmacy,
       data: [],
-      errors: [],
+      errors: []
     });
   };
 
@@ -191,7 +191,7 @@ const createPharmacyStore = () => {
     setStore('selectedPharmacy', {
       ...store.selectedPharmacy,
       data: undefined,
-      errors: [],
+      errors: []
     });
   };
 
@@ -200,17 +200,17 @@ const createPharmacyStore = () => {
       data: [],
       errors: [],
       address: undefined,
-      isLoading: false,
+      isLoading: false
     });
     setStore('selectedPharmacy', {
       data: undefined,
       errors: [],
-      isLoading: false,
+      isLoading: false
     });
     setStore('preferredPharmacies', {
       data: undefined,
       errors: [],
-      isLoading: false,
+      isLoading: false
     });
   };
 
@@ -223,8 +223,8 @@ const createPharmacyStore = () => {
       clearSelectedPharmacy,
       getPreferredPharmacies,
       clearPreferredPharmacies,
-      reset,
-    },
+      reset
+    }
   };
 };
 
