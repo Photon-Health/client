@@ -47,6 +47,7 @@ export class PhotonClientStore {
     state: {
       user: any;
       isAuthenticated: boolean;
+      isAuthorized: boolean;
       error?: string;
       isLoading: boolean;
     };
@@ -117,6 +118,7 @@ export class PhotonClientStore {
     const [store, setStore] = createStore<{
       authentication: {
         isAuthenticated: boolean;
+        isAuthorized: boolean;
         isLoading: boolean;
         error?: string;
         user: any;
@@ -152,6 +154,7 @@ export class PhotonClientStore {
     }>({
       authentication: {
         isAuthenticated: false,
+        isAuthorized: false,
         isLoading: true,
         error: undefined,
         user: undefined,
@@ -260,13 +263,12 @@ export class PhotonClientStore {
       isAuthenticated: authenticated,
     });
     const user = await this.sdk.authentication.getUser();
+    const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
     this.setStore('authentication', {
       ...this.store.authentication,
       user: user,
-    });
-    this.setStore('authentication', {
-      ...this.store.authentication,
       isLoading: false,
+      isAuthorized: authenticated && hasOrgs && this.sdk.organization === user.org_id
     });
   }
   private async login(args = {}) {
@@ -278,10 +280,8 @@ export class PhotonClientStore {
     this.setStore('authentication', {
       ...this.store.authentication,
       isAuthenticated: false,
-    });
-    this.setStore('authentication', {
-      ...this.store.authentication,
-      user: undefined,
+      isAuthorized: false,
+      user: undefined
     });
   }
   private async getPatients(args?: {

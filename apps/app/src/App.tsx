@@ -21,6 +21,7 @@ import { Settings } from './views/routes/Settings';
 import { Support } from './views/routes/Support';
 import { UpdatePatientForm } from './views/routes/UpdatePatientForm';
 import { NewOrder } from './views/routes/NewOrder';
+import { Playground } from './views/routes/Playground';
 import { auth0Config } from './configs/auth';
 import { AlertDisplay } from './views/components/AlertDisplay';
 
@@ -62,6 +63,7 @@ export const App = () => {
               <Route path=":orderId" element={<Order />} />
             </Route>
             <Route path="/support" element={<Support />} />
+            <Route path="/playground" element={<Playground />} />
             <Route path="/settings" element={<Settings />}>
               <Route path="user" />
               <Route path="templates" />

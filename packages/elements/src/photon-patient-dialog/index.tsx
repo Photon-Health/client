@@ -9,7 +9,7 @@ customElement(
   'photon-patient-dialog',
   {
     patientId: '',
-    open: false,
+    open: false
   },
   (props: { patientId: string; open: boolean }) => {
     let ref: any;
@@ -25,8 +25,8 @@ customElement(
         bubbles: true,
         detail: {
           patientId: patientId,
-          createPrescription,
-        },
+          createPrescription
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -37,8 +37,8 @@ customElement(
         bubbles: true,
         detail: {
           patientId: patientId,
-          createPrescription,
-        },
+          createPrescription
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -47,7 +47,7 @@ customElement(
       const event = new CustomEvent('photon-patient-closed', {
         composed: true,
         bubbles: true,
-        detail: {},
+        detail: {}
       });
       ref?.dispatchEvent(event);
     };
@@ -59,7 +59,8 @@ customElement(
       createPrescription = false
     ) => {
       setLoading(true);
-      let keys: string[] = [];
+      let keys: string[] = ['firstName', 'lastName', 'phone', 'sex', 'email'];
+
       if (
         store['address_street1']?.value !== undefined ||
         store['address_city']?.value !== undefined ||
@@ -68,31 +69,24 @@ customElement(
       ) {
         actions.registerValidator({
           key: 'address_street1',
-          validator: message(size(string(), 1, Infinity), 'Please enter a valid Street 1..'),
+          validator: message(size(string(), 1, Infinity), 'Please enter a valid Street 1..')
         });
         actions.registerValidator({
           key: 'address_city',
-          validator: message(size(string(), 1, Infinity), 'Please enter a valid City..'),
+          validator: message(size(string(), 1, Infinity), 'Please enter a valid City..')
         });
         actions.registerValidator({
           key: 'address_state',
-          validator: message(size(string(), 2, 2), 'Please enter a valid State..'),
+          validator: message(size(string(), 2, 2), 'Please enter a valid State..')
         });
-        keys = [
-          'phone',
-          'email',
-          'address_zip',
-          'address_street1',
-          'address_city',
-          'address_state',
-        ];
+        keys = [...keys, 'address_zip', 'address_street1', 'address_city', 'address_state'];
       } else {
         const keysToRemove = ['address_street1', 'address_city', 'address_state'];
         for (const key of keysToRemove) {
           actions.unRegisterValidator(key);
         }
-        keys = ['phone', 'email'];
       }
+
       actions.validate(keys);
       if (actions.hasErrors(keys)) {
         setLoading(false);
@@ -115,9 +109,9 @@ customElement(
         await removePreferredPharmacyMutation({
           variables: {
             patientId: props.patientId,
-            pharmacyId: pStore.selectedPatient.data?.preferredPharmacies![0]!.id,
+            pharmacyId: pStore.selectedPatient.data?.preferredPharmacies![0]!.id
           },
-          awaitRefetchQueries: false,
+          awaitRefetchQueries: false
         });
       }
 
@@ -125,7 +119,7 @@ customElement(
         ...(props?.patientId ? { id: props.patientId } : {}),
         name: {
           first: store['firstName']!.value,
-          last: store['lastName']!.value,
+          last: store['lastName']!.value
         },
         gender: store['gender']!.value,
         email: store['email']!.value,
@@ -140,12 +134,12 @@ customElement(
                 city: store['address_city']!.value,
                 state: store['address_state']!.value,
                 postalCode: store['address_zip']!.value,
-                country: 'US',
+                country: 'US'
               }
             : undefined,
         preferredPharmacies: store['preferredPharmacy']!.value
           ? [store['preferredPharmacy']!.value]
-          : [],
+          : []
       };
 
       if (props?.patientId) {
@@ -158,7 +152,7 @@ customElement(
         const createPatientMutation = client!.getSDK().clinical.patient.createPatient({});
         const patient = await createPatientMutation({
           variables: patientData,
-          awaitRefetchQueries: false,
+          awaitRefetchQueries: false
         });
         dispatchCreated(patient?.data?.createPatient?.id || '', createPrescription);
       }
