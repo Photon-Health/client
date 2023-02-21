@@ -23,7 +23,7 @@ customElement(
     formName: undefined,
     helpText: undefined,
     invalid: false,
-    disabled: false,
+    disabled: false
   },
   (props: {
     label?: string;
@@ -42,8 +42,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          value: value,
-        },
+          value: value
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -71,7 +71,7 @@ customElement(
               dispatchInputChanged(e.target.value);
             }}
             classList={{
-              invalid: props.invalid,
+              invalid: props.invalid
             }}
             class="input"
             disabled={props.disabled}

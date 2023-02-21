@@ -22,7 +22,7 @@ customElement(
     formName: undefined,
     disabled: false,
     forceLabelSize: false,
-    sdk: undefined,
+    sdk: undefined
   },
   (props: {
     label?: string;
@@ -50,8 +50,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          patient,
-        },
+          patient
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -60,7 +60,7 @@ customElement(
       if (store.selectedPatient.data) {
         return [
           store.selectedPatient.data,
-          ...store.patients.data.filter((x) => x.id !== store.selectedPatient.data!.id),
+          ...store.patients.data.filter((x) => x.id !== store.selectedPatient.data!.id)
         ];
       } else {
         return store.patients.data;
@@ -95,7 +95,7 @@ customElement(
           displayAccessor={(p) => p.name.full}
           onSearchChange={async (s: string) =>
             (fetchMore = await actions.getPatients(client!.getSDK(), {
-              name: s,
+              name: s
             }))
           }
           onOpen={async () => {

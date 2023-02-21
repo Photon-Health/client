@@ -20,7 +20,7 @@ customElement(
     required: false,
     disabled: false,
     checked: false,
-    tip: undefined,
+    tip: undefined
   },
   (props: {
     label?: string;
@@ -37,8 +37,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          checked,
-        },
+          checked
+        }
       });
       ref?.dispatchEvent(event);
     };

@@ -10,8 +10,8 @@ export default {
     helpText: { control: 'text' },
     catalogId: { control: 'text' },
     disabled: { control: 'boolean' },
-    formName: { control: 'text' },
-  },
+    formName: { control: 'text' }
+  }
 } as Meta;
 
 const Template: Story = ({
@@ -21,7 +21,7 @@ const Template: Story = ({
   helpText = undefined,
   catalogId = undefined,
   disabled = false,
-  formName = undefined,
+  formName = undefined
 }) => {
   const div = document.createElement('div');
   div.innerHTML = `
@@ -57,5 +57,5 @@ TreatmentSelect.args = {
   helpText: 'Select your medication in this dropdown',
   catalogId: '12345',
   disabled: 'false',
-  formName: 'form1',
+  formName: 'form1'
 };

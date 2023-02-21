@@ -4,7 +4,7 @@ import '.';
 
 export default {
   title: 'photon-multirx-form',
-  argTypes: {},
+  argTypes: {}
 } as Meta;
 
 export const PrescribeWorkflow = () => {

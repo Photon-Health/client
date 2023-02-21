@@ -26,6 +26,7 @@ import { OrderCard } from './components/OrderCard';
 import { format } from 'date-fns';
 import gql from 'graphql-tag';
 import { PharmacyCard } from './components/PharmacyCard';
+import { PhotonAuthorized } from '../photon-authorized';
 
 const CATALOG_TREATMENTS_FIELDS = gql`
   fragment CatalogTreatmentsFields on Catalog {
@@ -60,7 +61,7 @@ customElement(
     hideTemplates: true,
     enableOrder: false,
     pharmacyId: undefined,
-    loading: false,
+    loading: false
   },
   (
     props: {
@@ -82,13 +83,12 @@ customElement(
       draftPrescriptions: [],
       pharmacy: undefined,
       errors: [],
-      address: undefined,
+      address: undefined
     });
     const client = usePhoton();
     const [showForm, setShowForm] = createSignal<boolean>(!props.templateIds);
     const [isLoading, setIsLoading] = createSignal<boolean>(true);
     const [isLoadingTemplates, setIsLoadingTemplates] = createSignal<boolean>(false);
-    const [hasError, setHasError] = createSignal<boolean>(false);
     const [authenticated, setAuthenticated] = createSignal<boolean>(
       client?.authentication.state.isAuthenticated || false
     );
@@ -108,9 +108,6 @@ customElement(
     createEffect(() => {
       setAuthenticated(client?.authentication.state.isAuthenticated || false);
     }, [client?.authentication.state.isAuthenticated]);
-    createEffect(() => {
-      setHasError(!!client?.authentication.state.error);
-    }, [client?.authentication.state.error]);
 
     createEffect(async () => {
       if (props.templateIds && client) {
@@ -119,19 +116,19 @@ customElement(
 
         // TODO: Should just get the template directly but not supported by the SDK
         const {
-          data: { catalogs },
+          data: { catalogs }
         } = await client!.getSDK().clinical.catalog.getCatalogs();
         if (catalogs.length === 0) {
           console.error('No catalog set');
           return;
         }
         const {
-          data: { catalog },
+          data: { catalog }
         } = await client!.getSDK().clinical.catalog.getCatalog({
           id: catalogs[0].id,
           fragment: {
-            CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS,
-          },
+            CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
+          }
         });
         // Build a map for easy lookup
         const templateMap: { [key: string]: PrescriptionTemplate } = {};
@@ -172,9 +169,9 @@ customElement(
                 instructions: template.instructions,
                 notes: template.notes,
                 addToTemplates: false,
-                catalogId: undefined,
-              },
-            ],
+                catalogId: undefined
+              }
+            ]
           });
         }
         setIsLoadingTemplates(false);
@@ -186,8 +183,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          prescriptions: prescriptions,
-        },
+          prescriptions: prescriptions
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -197,8 +194,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          order: order,
-        },
+          order: order
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -208,8 +205,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          errors: errors,
-        },
+          errors: errors
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -219,8 +216,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          errors: errors,
-        },
+          errors: errors
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -232,8 +229,8 @@ customElement(
         detail: {
           canSubmit: canSubmit,
           form: store,
-          actions: actions,
-        },
+          actions: actions
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -248,7 +245,7 @@ customElement(
         setIsLoading(true);
         actions.updateFormValue({
           key: 'errors',
-          value: [],
+          value: []
         });
         const orderMutation = client!.getSDK().clinical.order.createOrder({});
         const rxMutation = client!.getSDK().clinical.prescription.createPrescriptions({});
@@ -265,16 +262,16 @@ customElement(
             patientId: store['patient']?.value.id,
             // +1 here because we're using the refillsInput
             fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
-            treatmentId: draft.treatment.id,
+            treatmentId: draft.treatment.id
           };
           prescriptions.push(args);
         }
         const { data, errors } = await rxMutation({
           variables: {
-            prescriptions,
+            prescriptions
           },
           refetchQueries: [],
-          awaitRefetchQueries: false,
+          awaitRefetchQueries: false
         });
         if (!props.enableOrder) {
           setIsLoading(false);
@@ -293,10 +290,10 @@ customElement(
               patientId: store['patient']?.value.id,
               pharmacyId: props?.pharmacyId || store['pharmacy']?.value.id,
               address: address,
-              fills: data?.createPrescriptions.map((x) => ({ prescriptionId: x.id })),
+              fills: data?.createPrescriptions.map((x) => ({ prescriptionId: x.id }))
             },
             refetchQueries: [],
-            awaitRefetchQueries: false,
+            awaitRefetchQueries: false
           });
           if (props.enableOrder) {
             setIsLoading(false);
@@ -331,14 +328,7 @@ customElement(
                 <sl-spinner style="font-size: 3rem;"></sl-spinner>
               </div>
             </Show>
-            <Show when={client && !authenticated() && hasError()}>
-              <sl-alert variant="warning" open>
-                <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-                <strong>You are not authorized to prescribe</strong>
-                <br />
-              </sl-alert>
-            </Show>
-            <Show when={client && authenticated()}>
+            <PhotonAuthorized>
               <PatientCard
                 actions={actions}
                 store={store}
@@ -384,7 +374,7 @@ customElement(
                   </photon-button>
                 </div>
               </Show>
-            </Show>
+            </PhotonAuthorized>
           </div>
         </div>
       </div>

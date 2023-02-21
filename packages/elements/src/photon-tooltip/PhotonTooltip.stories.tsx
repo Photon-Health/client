@@ -6,8 +6,8 @@ export default {
   argTypes: {
     tip: {
       control: {
-        type: 'text',
-      },
+        type: 'text'
+      }
     },
     placement: {
       control: {
@@ -24,11 +24,11 @@ export default {
           'bottom-end',
           'left',
           'left-start',
-          'left-end',
-        ],
-      },
-    },
-  },
+          'left-end'
+        ]
+      }
+    }
+  }
 };
 
 const Template = ({ tip, placement }: PhotonTooltipProps) => {
@@ -42,11 +42,11 @@ const Template = ({ tip, placement }: PhotonTooltipProps) => {
 export const Primary = Template.bind({});
 Primary.args = {
   tip: 'Yo, wots up?',
-  placement: 'right',
+  placement: 'right'
 };
 
 export const LongText = Template.bind({});
 LongText.args = {
   tip: 'This prescription will be filled generically unless this box is checked',
-  placement: 'right',
+  placement: 'right'
 };

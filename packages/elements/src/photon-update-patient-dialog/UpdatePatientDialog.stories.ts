@@ -6,7 +6,7 @@ import '.';
 
 export default {
   title: 'photon-update-patient-dialog',
-  argTypes: {},
+  argTypes: {}
 } as Meta;
 
 const Template: Story = ({ open }) => {
@@ -31,5 +31,5 @@ const Template: Story = ({ open }) => {
 
 export const UpdatePatientDialog = Template.bind({});
 UpdatePatientDialog.args = {
-  open: true,
+  open: true
 };

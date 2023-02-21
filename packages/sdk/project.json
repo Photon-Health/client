@@ -1,0 +1,30 @@
+{
+  "name": "sdk",
+  "root": "packages/sdk",
+  "sourceRoot": "packages/sdk/src",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "package",
+  "targets": {
+    "start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/sdk",
+        "command": "vite --port 3000"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/sdk",
+        "command": "npx eslint src/**/*.ts"
+      }
+    },
+    "lint:fix": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/sdk",
+        "command": "npx eslint src/**/*.ts --fix && npx prettier --write src/**/*.ts"
+      }
+    }
+  }
+}
