@@ -1,4 +1,3 @@
-import { createSignal } from 'solid-js';
 import { clsx } from 'clsx';
 
 type ButtonStyle =
@@ -35,7 +34,7 @@ interface ButtonProps {
 export default function Button({
   onClick,
   disabled = false,
-  style = 'primary',
+  style,
   size = 'md',
   isOutline,
   isActive,
@@ -58,8 +57,19 @@ export default function Button({
 
   const buttonClasses = clsx(
     'btn',
-    `btn-${style}`,
-    `btn-${size}`,
+    style === 'primary' && `btn-primary`,
+    style === 'secondary' && `btn-secondary`,
+    style === 'accent' && `btn-accent`,
+    style === 'info' && `btn-info`,
+    style === 'success' && `btn-success`,
+    style === 'warning' && `btn-warning`,
+    style === 'error' && `btn-error`,
+    style === 'ghost' && `btn-ghost`,
+    style === 'link' && `btn-link`,
+    size === 'lg' && `btn-lg`,
+    size === 'md' && `btn-md`,
+    size === 'sm' && `btn-sm`,
+    size === 'xs' && `btn-xs`,
     isOutline && 'btn-outline',
     isActive && 'btn-active',
     isDisabledVariant && 'btn-disabled',

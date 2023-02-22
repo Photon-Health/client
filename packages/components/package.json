@@ -1,6 +1,7 @@
 {
-  "name": "components",
+  "name": "@photonhealth/components",
   "private": "true",
+  "main": "dist/components.es.js",
   "scripts": {
     "start": "vite",
     "dev": "vite",
@@ -8,16 +9,18 @@
   },
   "type": "module",
   "devDependencies": {
-    "autoprefixer": "^10.4.2",
-    "postcss": "^8.4.7",
-    "vite": "^2.8.6",
-    "vite-plugin-solid": "^2.2.5"
+    "autoprefixer": "^10.4.13",
+    "postcss": "^8.4.21",
+    "vite": "^4.1.4",
+    "vite-plugin-dts": "^2.0.0-beta.3",
+    "vite-plugin-solid": "^2.5.0"
   },
   "dependencies": {
-    "tailwindcss": "^3.0.23",
+    "@tailwindcss/typography": "^0.5.9",
     "clsx": "^1.2.1",
-    "daisyui": "^2.50.2",
-    "solid-js": "^1.6.11"
+    "daisyui": "^2.51.0",
+    "solid-js": "^1.6.11",
+    "tailwindcss": "^3.2.7"
   },
   "engines": {
     "node": ">=16"
