@@ -1,12 +1,12 @@
-import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client'
-import { MEDICATION_FIELDS, SEARCH_MEDICATION_FIELDS } from '../fragments'
-import { makeQuery } from '../utils'
+import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client';
+import { MEDICATION_FIELDS, SEARCH_MEDICATION_FIELDS } from '../fragments';
+import { makeQuery } from '../utils';
 import {
   Medication,
   MedicationFilter,
   QueryMedicationConceptsArgs,
   SearchMedication
-} from '../types'
+} from '../types';
 
 /**
  * GetConceptOptions options
@@ -14,8 +14,8 @@ import {
  * @param fragment Allows you to override the default query to request more fields
  */
 export interface GetConceptOptions {
-  name: string
-  fragment?: Record<string, DocumentNode>
+  name: string;
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
@@ -24,8 +24,8 @@ export interface GetConceptOptions {
  * @param fragment Allows you to override the default query to request more fields
  */
 export interface GetStrengthsOptions {
-  id: string
-  fragment?: Record<string, DocumentNode>
+  id: string;
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
@@ -34,8 +34,8 @@ export interface GetStrengthsOptions {
  * @param fragment Allows you to override the default query to request more fields
  */
 export interface GetRoutesOptions {
-  id: string
-  fragment?: Record<string, DocumentNode>
+  id: string;
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
@@ -44,8 +44,8 @@ export interface GetRoutesOptions {
  * @param fragment Allows you to override the default query to request more fields
  */
 export interface GetFormsOptions {
-  id: string
-  fragment?: Record<string, DocumentNode>
+  id: string;
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
@@ -54,8 +54,8 @@ export interface GetFormsOptions {
  * @param fragment Allows you to override the default query to request more fields
  */
 export interface GetProductOptions {
-  id: string
-  fragment?: Record<string, DocumentNode>
+  id: string;
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
@@ -64,8 +64,8 @@ export interface GetProductOptions {
  * @param fragment Allows you to override the default query to request more fields
  */
 export interface GetProductOptions {
-  id: string
-  fragment?: Record<string, DocumentNode>
+  id: string;
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
@@ -74,21 +74,21 @@ export interface GetProductOptions {
  * @param fragment Allows you to override the default query to request more fields
  */
 export interface GetPackageOptions {
-  id: string
-  fragment?: Record<string, DocumentNode>
+  id: string;
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
  * Contains various methods for Photon Medications
  */
 export class SearchMedicationQueryManager {
-  private apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>
+  private apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>;
 
   /**
    * @param apollo - An Apollo client instance
    */
   constructor(apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>) {
-    this.apollo = apollo
+    this.apollo = apollo;
   }
 
   /**
@@ -98,9 +98,9 @@ export class SearchMedicationQueryManager {
    */
   public async getConcepts({ name, fragment }: GetConceptOptions) {
     if (!fragment) {
-      fragment = { SearchMedicationFields: SEARCH_MEDICATION_FIELDS }
+      fragment = { SearchMedicationFields: SEARCH_MEDICATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0]
+    let [fName, fValue] = Object.entries(fragment)[0];
     const GET_CONCEPTS = gql`
         ${fValue}
         query medicationConcepts($name: String!) {
@@ -108,10 +108,10 @@ export class SearchMedicationQueryManager {
             ...${fName}
       }
     }
-      `
+      `;
     return makeQuery<{ medicationConcepts: SearchMedication[] }>(this.apollo, GET_CONCEPTS, {
       name
-    })
+    });
   }
 
   /**
@@ -121,9 +121,9 @@ export class SearchMedicationQueryManager {
    */
   public async getStrengths({ id, fragment }: GetStrengthsOptions) {
     if (!fragment) {
-      fragment = { SearchMedicationFields: SEARCH_MEDICATION_FIELDS }
+      fragment = { SearchMedicationFields: SEARCH_MEDICATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0]
+    let [fName, fValue] = Object.entries(fragment)[0];
     const GET_STRENGTHS = gql`
           ${fValue}
           query medicationStrengths($id: String!) {
@@ -131,10 +131,10 @@ export class SearchMedicationQueryManager {
               ...${fName}
         }
       }
-        `
+        `;
     return makeQuery<{ medicationStrengths: SearchMedication[] }>(this.apollo, GET_STRENGTHS, {
       id
-    })
+    });
   }
 
   /**
@@ -144,9 +144,9 @@ export class SearchMedicationQueryManager {
    */
   public async getRoutes({ id, fragment }: GetRoutesOptions) {
     if (!fragment) {
-      fragment = { SearchMedicationFields: SEARCH_MEDICATION_FIELDS }
+      fragment = { SearchMedicationFields: SEARCH_MEDICATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0]
+    let [fName, fValue] = Object.entries(fragment)[0];
     const GET_ROUTES = gql`
               ${fValue}
               query medicationRoutes($id: String!) {
@@ -154,10 +154,10 @@ export class SearchMedicationQueryManager {
                   ...${fName}
             }
           }
-            `
+            `;
     return makeQuery<{ medicationRoutes: SearchMedication[] }>(this.apollo, GET_ROUTES, {
       id
-    })
+    });
   }
 
   /**
@@ -167,9 +167,9 @@ export class SearchMedicationQueryManager {
    */
   public async getForms({ id, fragment }: GetFormsOptions) {
     if (!fragment) {
-      fragment = { MedicationFields: MEDICATION_FIELDS }
+      fragment = { MedicationFields: MEDICATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0]
+    let [fName, fValue] = Object.entries(fragment)[0];
     const GET_FORMS = gql`
               ${fValue}
               query medicationForms($id: String!) {
@@ -177,10 +177,10 @@ export class SearchMedicationQueryManager {
                   ...${fName}
             }
           }
-            `
+            `;
     return makeQuery<{ medicationForms: Medication[] }>(this.apollo, GET_FORMS, {
       id
-    })
+    });
   }
 
   /**
@@ -190,9 +190,9 @@ export class SearchMedicationQueryManager {
    */
   public async getProducts({ id, fragment }: GetProductOptions) {
     if (!fragment) {
-      fragment = { MedicationFields: MEDICATION_FIELDS }
+      fragment = { MedicationFields: MEDICATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0]
+    let [fName, fValue] = Object.entries(fragment)[0];
     const GET_PRODUCTS = gql`
                   ${fValue}
                   query medicationProducts($id: String!) {
@@ -200,10 +200,10 @@ export class SearchMedicationQueryManager {
                       ...${fName}
                 }
               }
-                `
+                `;
     return makeQuery<{ medicationProducts: Medication[] }>(this.apollo, GET_PRODUCTS, {
       id
-    })
+    });
   }
 
   /**
@@ -213,9 +213,9 @@ export class SearchMedicationQueryManager {
    */
   public async getPackages({ id, fragment }: GetPackageOptions) {
     if (!fragment) {
-      fragment = { MedicationFields: MEDICATION_FIELDS }
+      fragment = { MedicationFields: MEDICATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0]
+    let [fName, fValue] = Object.entries(fragment)[0];
     const GET_PACKAGES = gql`
                   ${fValue}
                   query medicationPackages($id: String!) {
@@ -223,9 +223,9 @@ export class SearchMedicationQueryManager {
                       ...${fName}
                 }
               }
-                `
+                `;
     return makeQuery<{ medicationPackages: Medication[] }>(this.apollo, GET_PACKAGES, {
       id
-    })
+    });
   }
 }

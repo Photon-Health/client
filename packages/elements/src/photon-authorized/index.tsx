@@ -31,7 +31,7 @@ export const PhotonAuthorized = (props: { children: JSXElement }) => {
 
   return (
     <>
-      <Show when={client && !authenticated()}>
+      <Show when={client && !authenticated() && !isLoading()}>
         <sl-alert variant="warning" open>
           <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
           <strong>You are not signed in</strong>

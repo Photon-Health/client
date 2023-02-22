@@ -11,8 +11,8 @@ customElement(
       reflect: true,
       notify: false,
       attribute: 'open',
-      parse: true,
-    },
+      parse: true
+    }
   },
   (props: { open: boolean }) => {
     const client = usePhoton();
@@ -27,8 +27,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          medication: medication(),
-        },
+          medication: medication()
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -56,9 +56,9 @@ customElement(
               await addCatalogMutation({
                 variables: {
                   catalogId: catalogId(),
-                  treatmentId: medication()?.id,
+                  treatmentId: medication()?.id
                 },
-                awaitRefetchQueries: false,
+                awaitRefetchQueries: false
               });
             }
             dispatchMedicationSelected();

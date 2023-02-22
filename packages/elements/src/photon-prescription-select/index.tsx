@@ -19,7 +19,7 @@ customElement(
     helpText: undefined,
     disabled: false,
     formName: undefined,
-    patientId: undefined,
+    patientId: undefined
   },
   (
     props: {
@@ -44,8 +44,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          prescription,
-        },
+          prescription
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -80,8 +80,7 @@ customElement(
       if (f && props.formName) {
         validity[props.formName] = {
           valid: f.get(props.formName) != null,
-          errorMessage:
-            f.get(props.formName) != null ? undefined : 'You must select a prescription',
+          errorMessage: f.get(props.formName) != null ? undefined : 'You must select a prescription'
         };
         options.element.invalid = !validity[props.formName].valid;
         options.element.helpText = validity[props.formName].errorMessage;
@@ -90,7 +89,7 @@ customElement(
         const l = props.label.toLowerCase().replace(' ', '_');
         validity[l] = {
           valid: f.get(l) != null,
-          errorMessage: f.get(l) != null ? undefined : 'You must select a prescription',
+          errorMessage: f.get(l) != null ? undefined : 'You must select a prescription'
         };
         options.element.invalid = !validity[l].valid;
         options.element.helpText = validity[l].errorMessage;
@@ -140,7 +139,7 @@ customElement(
           onOpen={async () => {
             if (props.patientId) {
               await client?.clinical.prescriptions.getPrescriptions({
-                patientId: props.patientId,
+                patientId: props.patientId
               });
             }
           }}

@@ -39,33 +39,33 @@ const createCatalogStore = () => {
     catalogs: {
       data: [],
       errors: [],
-      isLoading: false,
-    },
+      isLoading: false
+    }
   });
 
   const getCatalogs = async (client: PhotonClient) => {
     setStore('catalogs', {
       ...store.catalogs,
-      isLoading: true,
+      isLoading: true
     });
     const { data, errors } = await client.clinical.catalog.getCatalogs({
       fragment: {
-        CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS,
-      },
+        CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
+      }
     });
     setStore('catalogs', {
       ...store.catalogs,
       isLoading: false,
       data: data.catalogs,
-      errors: errors,
+      errors: errors
     });
   };
 
   return {
     store,
     actions: {
-      getCatalogs,
-    },
+      getCatalogs
+    }
   };
 };
 

@@ -1,19 +1,14 @@
-import {
-  ApolloClient,
-  DocumentNode,
-  gql,
-  NormalizedCacheObject,
-} from "@apollo/client";
-import { CATALOG_FIELDS, MEDICATION_FIELDS } from "../fragments";
-import { makeMutation, makeQuery } from "../utils";
-import { Catalog, Treatment } from "../types";
+import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client';
+import { CATALOG_FIELDS, MEDICATION_FIELDS } from '../fragments';
+import { makeMutation, makeQuery } from '../utils';
+import { Catalog, Treatment } from '../types';
 
 /**
  * GetCatalogs options
  * @param fragment Allows you to override the default query to request more fields
  */
- export interface GetCatalogsOptions {
-  fragment?: Record<string, DocumentNode>
+export interface GetCatalogsOptions {
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
@@ -21,16 +16,16 @@ import { Catalog, Treatment } from "../types";
  * @param id The id of the catalog to fetch
  * @param fragment Allows you to override the default query to request more fields
  */
- export interface GetCatalogOptions {
-  id: string
-  fragment?: Record<string, DocumentNode>
+export interface GetCatalogOptions {
+  id: string;
+  fragment?: Record<string, DocumentNode>;
 }
 
 /**
  * AddToCatalogOptions options
  * @param fragment Allows you to override the default query to request more fields
  */
- export interface AddToCatalogOptions {
+export interface AddToCatalogOptions {
   fragment?: Record<string, DocumentNode>;
 }
 
@@ -38,22 +33,20 @@ import { Catalog, Treatment } from "../types";
  * RemoveFromCatalogOptions options
  * @param fragment Allows you to override the default query to request more fields
  */
- export interface RemoveFromCatalogOptions {
+export interface RemoveFromCatalogOptions {
   fragment?: Record<string, DocumentNode>;
 }
 
 /**
-  * Contains various methods for Photon Catalogs
-  */
+ * Contains various methods for Photon Catalogs
+ */
 export class CatalogQueryManager {
   private apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>;
 
   /**
    * @param apollo - An Apollo client instance
    */
-  constructor(
-    apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>
-  ) {
+  constructor(apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>) {
     this.apollo = apollo;
   }
 
@@ -64,7 +57,7 @@ export class CatalogQueryManager {
    */
   public async getCatalogs(
     { fragment }: GetCatalogsOptions = {
-      fragment: { CatalogFields: CATALOG_FIELDS },
+      fragment: { CatalogFields: CATALOG_FIELDS }
     }
   ) {
     if (!fragment) {
@@ -88,12 +81,9 @@ export class CatalogQueryManager {
    * @returns
    */
   public async getCatalog(
-    {
-      id,
-      fragment,
-    }: GetCatalogOptions = {
-      id: "",
-      fragment: { CatalogFields: CATALOG_FIELDS },
+    { id, fragment }: GetCatalogOptions = {
+      id: '',
+      fragment: { CatalogFields: CATALOG_FIELDS }
     }
   ) {
     if (!fragment) {
@@ -116,7 +106,7 @@ export class CatalogQueryManager {
    * @param options - Query options
    * @returns
    */
-   public addToCatalog({ fragment }: AddToCatalogOptions) {
+  public addToCatalog({ fragment }: AddToCatalogOptions) {
     if (!fragment) {
       fragment = { MedicationFields: MEDICATION_FIELDS };
     }
@@ -146,7 +136,7 @@ export class CatalogQueryManager {
    * @param options - Query options
    * @returns
    */
-   public removeFromCatalog({ fragment }: RemoveFromCatalogOptions) {
+  public removeFromCatalog({ fragment }: RemoveFromCatalogOptions) {
     if (!fragment) {
       fragment = { MedicationFields: MEDICATION_FIELDS };
     }

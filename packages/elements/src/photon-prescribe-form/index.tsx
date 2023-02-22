@@ -36,7 +36,7 @@ customElement('photon-prescribe-form', {}, (_, options) => {
     const event = new CustomEvent('photon-prescribe-success', {
       composed: true,
       bubbles: true,
-      detail: {},
+      detail: {}
     });
     ref?.dispatchEvent(event);
   };
@@ -45,7 +45,7 @@ customElement('photon-prescribe-form', {}, (_, options) => {
     const event = new CustomEvent('photon-prescribe-error', {
       composed: true,
       bubbles: true,
-      detail: {},
+      detail: {}
     });
     ref?.dispatchEvent(event);
   };
@@ -63,7 +63,7 @@ customElement('photon-prescribe-form', {}, (_, options) => {
       // fillsAllowed was not tested here because this form is deprecated. if used in the future, please confirm fillsAllowed is correct
       fillsAllowed: d.get('refills') + 1,
       instructions: d.get('patient_instructions'),
-      notes: d.get('pharmacy_note'),
+      notes: d.get('pharmacy_note')
     });
     formRef.setLoading(false);
     if (result!.errors && result!.errors.length > 0) {
@@ -113,7 +113,7 @@ customElement('photon-prescribe-form', {}, (_, options) => {
       <div
         classList={{
           'fade-out': success() || error(),
-          hidden: delayedSuccess() || delayedError(),
+          hidden: delayedSuccess() || delayedError()
         }}
       >
         <photon-form
@@ -201,7 +201,7 @@ customElement('photon-prescribe-form', {}, (_, options) => {
       <div
         classList={{
           'fade-in': success(),
-          hidden: !success(),
+          hidden: !success()
         }}
         class="flex flex-col items-center gap-4 p-4"
       >
@@ -213,7 +213,7 @@ customElement('photon-prescribe-form', {}, (_, options) => {
       <div
         classList={{
           'fade-in': error(),
-          hidden: !error(),
+          hidden: !error()
         }}
         class="flex flex-col items-center gap-4 p-4"
       >

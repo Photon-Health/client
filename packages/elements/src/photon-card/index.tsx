@@ -9,7 +9,7 @@ customElement(
   {
     invalid: false,
     title: null,
-    collapsable: false,
+    collapsable: false
   },
   (props: { invalid: boolean; title: string | null; collapsable: boolean }) => {
     const [isCollapsed, setIsCollapsed] = createSignal<boolean>(true);
@@ -38,7 +38,7 @@ customElement(
           class="rounded-lg bg-white p-4 shadow-card border border-gray-200"
           classList={{
             'border-red-500': props.invalid,
-            'border-2': props.invalid,
+            'border-2': props.invalid
           }}
         >
           {titleElement || collapsableElement ? (

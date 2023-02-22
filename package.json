@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "app:local": "concurrently \"npx nx run elements:build:watch\" \"npx nx run app:start\""
+    "app:local": "concurrently \"npx nx run elements:build:watch\" \"npx nx run app:start\"",
+    "lint": "npx nx run-many --target=lint",
+    "lint:fix": "npx nx run-many --target=lint:fix"
   },
   "private": true,
   "workspaces": [

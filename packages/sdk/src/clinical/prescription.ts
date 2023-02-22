@@ -1,12 +1,7 @@
-import {
-  ApolloClient,
-  DocumentNode,
-  gql,
-  NormalizedCacheObject,
-} from "@apollo/client";
-import { DISPENSE_UNIT_FIELDS, PRESCRIPTION_FIELDS } from "../fragments";
-import { DispenseUnit, Maybe, Prescription, PrescriptionState } from "../types";
-import { makeMutation, makeQuery } from "../utils";
+import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client';
+import { DISPENSE_UNIT_FIELDS, PRESCRIPTION_FIELDS } from '../fragments';
+import { DispenseUnit, Maybe, Prescription, PrescriptionState } from '../types';
+import { makeMutation, makeQuery } from '../utils';
 
 /**
  * GetPrescriptionsOptions options
@@ -63,9 +58,7 @@ export class PrescriptionQueryManager {
   /**
    * @param apollo - An Apollo client instance
    */
-  constructor(
-    apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>
-  ) {
+  constructor(apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>) {
     this.apollo = apollo;
   }
 
@@ -77,10 +70,10 @@ export class PrescriptionQueryManager {
       state,
       after,
       first,
-      fragment,
+      fragment
     }: GetPrescriptionsOptions = {
       first: 25,
-      fragment: { PrescriptionFields: PRESCRIPTION_FIELDS },
+      fragment: { PrescriptionFields: PRESCRIPTION_FIELDS }
     }
   ) {
     if (!fragment) {
@@ -114,17 +107,20 @@ export class PrescriptionQueryManager {
             }
           }
         `;
-    return makeQuery<{ prescriptions: Prescription[] }>(
-      this.apollo,
-      GET_PRESCRIPTIONS,
-      { patientId, patientName, prescriberId, state, after, first }
-    );
+    return makeQuery<{ prescriptions: Prescription[] }>(this.apollo, GET_PRESCRIPTIONS, {
+      patientId,
+      patientName,
+      prescriberId,
+      state,
+      after,
+      first
+    });
   }
 
   public async getPrescription(
     { id, fragment }: GetPrescriptionOptions = {
-      id: "",
-      fragment: { PrescriptionFields: PRESCRIPTION_FIELDS },
+      id: '',
+      fragment: { PrescriptionFields: PRESCRIPTION_FIELDS }
     }
   ) {
     if (!fragment) {
@@ -139,18 +135,14 @@ export class PrescriptionQueryManager {
             }
           }
         `;
-    return makeQuery<{ prescription: Prescription }>(
-      this.apollo,
-      GET_PRESCRIPTION,
-      {
-        id,
-      }
-    );
+    return makeQuery<{ prescription: Prescription }>(this.apollo, GET_PRESCRIPTION, {
+      id
+    });
   }
 
   public async getDispenseUnits(
     { fragment }: GetDispenseUnitOptions = {
-      fragment: { DispenseUnitFields: DISPENSE_UNIT_FIELDS },
+      fragment: { DispenseUnitFields: DISPENSE_UNIT_FIELDS }
     }
   ) {
     if (!fragment) {
@@ -165,11 +157,7 @@ export class PrescriptionQueryManager {
             }
           }
         `;
-    return makeQuery<{ dispenseUnits: DispenseUnit[] }>(
-      this.apollo,
-      GET_DISPENSE_UNITS,
-      {}
-    );
+    return makeQuery<{ dispenseUnits: DispenseUnit[] }>(this.apollo, GET_DISPENSE_UNITS, {});
   }
 
   public createPrescription({ fragment }: CreatePrescriptionOptions) {
@@ -210,9 +198,10 @@ export class PrescriptionQueryManager {
           ...${fName}
         }
       }`;
-    return makeMutation<
-      { createPrescription: Prescription } | undefined | null
-    >(this.apollo, CREATE_PRESCRIPTION);
+    return makeMutation<{ createPrescription: Prescription } | undefined | null>(
+      this.apollo,
+      CREATE_PRESCRIPTION
+    );
   }
 
   public createPrescriptions({ fragment }: CreatePrescriptionOptions) {
@@ -231,8 +220,9 @@ export class PrescriptionQueryManager {
           ...${fName}
         }
       }`;
-    return makeMutation<
-      { createPrescriptions: [Prescription] } | undefined | null
-    >(this.apollo, CREATE_PRESCRIPTIONS);
+    return makeMutation<{ createPrescriptions: [Prescription] } | undefined | null>(
+      this.apollo,
+      CREATE_PRESCRIPTIONS
+    );
   }
 }

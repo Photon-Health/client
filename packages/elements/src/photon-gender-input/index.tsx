@@ -13,32 +13,32 @@ type Gender = {
 const genders: Gender[] = [
   {
     id: '1',
-    name: 'Male/Man',
+    name: 'Male/Man'
   },
   {
     id: '2',
-    name: 'Female/Woman',
+    name: 'Female/Woman'
   },
   {
     id: '3',
-    name: 'TransMale/TransMan',
+    name: 'TransMale/TransMan'
   },
   {
     id: '4',
-    name: 'TransFemale/TransWoman',
+    name: 'TransFemale/TransWoman'
   },
   {
     id: '5',
-    name: 'Genderqueery/Gender nonconforming',
+    name: 'Genderqueery/Gender nonconforming'
   },
   {
     id: '6',
-    name: 'Something else',
+    name: 'Something else'
   },
   {
     id: '7',
-    name: 'Decline to answer',
-  },
+    name: 'Decline to answer'
+  }
 ];
 
 customElement(
@@ -50,7 +50,7 @@ customElement(
     invalid: false,
     helpText: undefined,
     disabled: false,
-    selected: undefined,
+    selected: undefined
   },
   (props: {
     label?: string;
@@ -76,8 +76,8 @@ customElement(
         composed: true,
         bubbles: true,
         detail: {
-          gender: gender,
-        },
+          gender: gender
+        }
       });
       ref?.dispatchEvent(event);
     };
@@ -86,7 +86,7 @@ customElement(
       const event = new CustomEvent('photon-gender-deselected', {
         composed: true,
         bubbles: true,
-        detail: {},
+        detail: {}
       });
       ref?.dispatchEvent(event);
     };

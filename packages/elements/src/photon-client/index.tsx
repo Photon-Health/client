@@ -27,71 +27,71 @@ customElement(
       value: undefined,
       reflect: false,
       notify: false,
-      parse: false,
+      parse: false
     },
     id: {
       attribute: 'id',
       value: undefined,
       reflect: false,
       notify: false,
-      parse: false,
+      parse: false
     },
     redirectUri: {
       attribute: 'redirect-uri',
       value: undefined,
       reflect: false,
       notify: false,
-      parse: false,
+      parse: false
     },
     redirectPath: {
       attribute: 'redirect-path',
       value: undefined,
       reflect: false,
       notify: false,
-      parse: false,
+      parse: false
     },
     org: {
       attribute: 'org',
       value: undefined,
       reflect: false,
       notify: false,
-      parse: false,
+      parse: false
     },
     audience: {
       attribute: 'audience',
       value: undefined,
       reflect: false,
       notify: false,
-      parse: false,
+      parse: false
     },
     uri: {
       attribute: 'uri',
       value: undefined,
       reflect: false,
       notify: false,
-      parse: false,
+      parse: false
     },
     developmentMode: {
       attribute: 'dev-mode',
       value: false,
       reflect: true,
       notify: false,
-      parse: true,
+      parse: true
     },
     errorMessage: {
       attribute: 'error-message',
       value: "Oh snap! There was an error loading. Please contact your site's administrator",
       reflect: false,
       notify: false,
-      parse: false,
+      parse: false
     },
     autoLogin: {
       attribute: 'auto-login',
       value: false,
       reflect: false,
       notify: false,
-      parse: true,
-    },
+      parse: true
+    }
   },
   ({
     domain,
@@ -103,7 +103,7 @@ customElement(
     errorMessage,
     audience,
     uri,
-    autoLogin,
+    autoLogin
   }: PhotonClientProps) => {
     let ref: any;
     const errs = validateProps({ id }, ['id']);
@@ -115,7 +115,7 @@ customElement(
       clientId: id!,
       redirectURI: redirectUri ? redirectUri : window.location.origin,
       organization: org,
-      developmentMode: developmentMode,
+      developmentMode: developmentMode
     });
     const client = new PhotonClientStore(sdk);
     if (developmentMode) {

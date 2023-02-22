@@ -8,15 +8,15 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'radio' },
-      options: ['solid', 'outline'],
+      options: ['solid', 'outline']
     },
     label: { control: 'text' },
     disabled: { control: 'boolean' },
     size: {
       control: { type: 'select' },
-      options: ['xs', 'sm', 'md', 'lg'],
-    },
-  },
+      options: ['xs', 'sm', 'md', 'lg']
+    }
+  }
 } as Meta;
 
 // More on component templates: https://storybook.js.org/docs/html/writing-stories/introduction#using-args
@@ -33,7 +33,7 @@ Solid.args = {
   variant: 'solid',
   label: 'Button',
   disabled: false,
-  size: 'md',
+  size: 'md'
 };
 
 export const Outline = Template.bind({});
@@ -41,5 +41,5 @@ Outline.args = {
   variant: 'outline',
   label: 'Button',
   disabled: false,
-  size: 'md',
+  size: 'md'
 };

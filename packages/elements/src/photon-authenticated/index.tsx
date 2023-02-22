@@ -24,8 +24,8 @@ customElement(
       value: undefined,
       reflect: false,
       notify: false,
-      parse: false,
-    },
+      parse: false
+    }
   },
   (props: { autoLogin: boolean; hideLoader: boolean; redirectPath?: string }) => {
     const client = usePhoton();
