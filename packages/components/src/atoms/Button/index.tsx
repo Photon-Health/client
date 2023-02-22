@@ -57,6 +57,7 @@ export default function Button({
 
   const buttonClasses = clsx(
     'btn',
+    // why so verbose? https://github.com/saadeghi/daisyui/discussions/1631#discussioncomment-5081856
     style === 'primary' && `btn-primary`,
     style === 'secondary' && `btn-secondary`,
     style === 'accent' && `btn-accent`,
