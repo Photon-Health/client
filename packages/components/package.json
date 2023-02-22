@@ -1,0 +1,25 @@
+{
+  "name": "components",
+  "private": "true",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "type": "module",
+  "devDependencies": {
+    "autoprefixer": "^10.4.2",
+    "postcss": "^8.4.7",
+    "vite": "^2.8.6",
+    "vite-plugin-solid": "^2.2.5"
+  },
+  "dependencies": {
+    "tailwindcss": "^3.0.23",
+    "clsx": "^1.2.1",
+    "daisyui": "^2.50.2",
+    "solid-js": "^1.6.11"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
