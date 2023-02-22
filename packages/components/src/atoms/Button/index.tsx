@@ -19,7 +19,7 @@ interface ButtonProps {
   size?: ButtonSize;
   isOutline?: boolean;
   isActive?: boolean;
-  isDisabledVariant?: boolean;
+  isDisabled?: boolean;
   isGlass?: boolean;
   isLoading?: boolean;
   hasNoAnimation?: boolean;
@@ -38,7 +38,7 @@ export default function Button({
   size = 'md',
   isOutline,
   isActive,
-  isDisabledVariant,
+  isDisabled,
   isGlass,
   isLoading,
   hasNoAnimation,
@@ -72,7 +72,7 @@ export default function Button({
     size === 'xs' && `btn-xs`,
     isOutline && 'btn-outline',
     isActive && 'btn-active',
-    isDisabledVariant && 'btn-disabled',
+    isDisabled && 'btn-disabled',
     isGlass && 'glass',
     isLoading && 'loading',
     hasNoAnimation && 'no-animation',

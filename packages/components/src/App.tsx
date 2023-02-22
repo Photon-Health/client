@@ -7,29 +7,60 @@ const App = () => {
 
       <h3>Styles</h3>
       <div class="flex flex-wrap items-center justify-left gap-2 overflow-x-hidden bg-top">
-        <Button style="primary">Primary Button</Button>
-        <Button style="secondary">Secondary Button</Button>
-        <Button style="accent">Accent Button</Button>
-        <Button style="info">Info Button</Button>
-        <Button style="success">Success Button</Button>
-        <Button style="warning">Warning Button</Button>
-        <Button style="error">Error Button</Button>
-        <Button style="ghost">Ghost Button</Button>
-        <Button style="link">Link Button</Button>
+        <Button style="primary">Primary</Button>
+        <Button style="secondary">Secondary</Button>
+        <Button style="accent">Accent</Button>
+        <Button style="info">Info</Button>
+        <Button style="success">Success</Button>
+        <Button style="warning">Warning</Button>
+        <Button style="error">Error</Button>
+        <Button style="ghost">Ghost</Button>
+        <Button style="link">Link</Button>
       </div>
       <h3>Sizes</h3>
       <div class="flex flex-wrap items-center justify-left gap-2 overflow-x-hidden bg-top">
         <Button style="primary" size="lg">
-          Large Button
+          Large
         </Button>
         <Button style="primary" size="md">
-          Medium Button
+          Medium
         </Button>
         <Button style="primary" size="sm">
-          Small Button
+          Small
         </Button>
         <Button style="primary" size="xs">
-          Extra Small Button
+          Extra Small
+        </Button>
+      </div>
+      <h3>Outline</h3>
+      <div class="flex flex-wrap items-center justify-left gap-2 overflow-x-hidden bg-top">
+        <Button style="primary" isOutline>
+          Primary
+        </Button>
+        <Button style="secondary" isOutline>
+          Secondary
+        </Button>
+        <Button style="accent" isOutline>
+          Accent
+        </Button>
+        <Button style="info" isOutline>
+          Info
+        </Button>
+        <Button style="success" isOutline>
+          Success
+        </Button>
+        <Button style="warning" isOutline>
+          Warning
+        </Button>
+        <Button style="error" isOutline>
+          Error
+        </Button>
+      </div>
+
+      <h3>Loading</h3>
+      <div class="flex flex-wrap items-center justify-left gap-2 overflow-x-hidden bg-top">
+        <Button isLoading isDisabled>
+          Loading
         </Button>
       </div>
     </article>
