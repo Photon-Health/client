@@ -44,7 +44,7 @@ export const PatientAddressCard = ({
     <Card bg="bg-surface">
       <CardHeader>
         <HStack w="full" justify="space-between">
-          <Heading size="xxs">Patient Address</Heading>
+          <Heading size="xxs">{!showAddress ? 'Patient Address' : 'Set Patient Address'}</Heading>
           {!showAddress ? (
             <Button onClick={() => setShowAddress(true)} size="xs">
               Change
