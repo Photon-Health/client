@@ -106,7 +106,7 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
       )
     },
     {
-      name: 'Send to patient',
+      name: 'Send to Patient',
       fulfillmentType: undefined,
       isDisabled: onlyCurexa,
       comp: <SendToPatient patient={patient} />
