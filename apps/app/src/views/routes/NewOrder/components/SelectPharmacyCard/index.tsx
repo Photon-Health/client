@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import {
-  Button,
   Card,
   CardHeader,
   Heading,
@@ -10,10 +9,7 @@ import {
   Tab,
   TabPanels,
   TabPanel,
-  useDisclosure,
-  CardBody,
-  Checkbox,
-  Text
+  useDisclosure
 } from '@chakra-ui/react';
 
 import { types } from '@photonhealth/react';
@@ -21,7 +17,6 @@ import { types } from '@photonhealth/react';
 import { LocationSearch } from '../../../../components/LocationSearch';
 import { LocalPickup } from './components/LocalPickup';
 import { MailOrder } from './components/MailOrder';
-import { Pharmacy } from './components/Pharmacy';
 import { Address } from '../../../../../models/general';
 import { SendToPatient } from './components/SendToPatient';
 
@@ -72,6 +67,11 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     onClose();
   };
 
+  const handleChangeBtnClick = () => {
+    setFieldValue('pharmacyId', '');
+    setUpdatePreferredPharmacy(false);
+  };
+
   const tabsList = [
     {
       name: 'Local Pickup',
@@ -85,12 +85,23 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
           onOpen={onOpen}
           errors={errors}
           touched={touched}
+          patient={patient}
+          pharmacyId={pharmacyId}
+          updatePreferredPharmacy={updatePreferredPharmacy}
+          setUpdatePreferredPharmacy={setUpdatePreferredPharmacy}
           preferredPharmacyIds={
             patient?.preferredPharmacies?.map((pharmacy: any) => pharmacy.id) || []
           }
           setFieldValue={setFieldValue}
+          handleChangeBtnClick={handleChangeBtnClick}
         />
       )
+    },
+    {
+      name: 'Send to Patient',
+      fulfillmentType: undefined,
+      isDisabled: onlyCurexa,
+      comp: <SendToPatient patient={patient} />
     },
     {
       name: 'Mail Order',
@@ -104,23 +115,12 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
           touched={touched}
         />
       )
-    },
-    {
-      name: 'Send to Patient',
-      fulfillmentType: undefined,
-      isDisabled: onlyCurexa,
-      comp: <SendToPatient patient={patient} />
     }
   ];
 
   const handleTabChange = (index: number) => {
     setFieldValue('fulfillmentType', tabsList[index].fulfillmentType);
     setSelectedTab(index);
-  };
-
-  const handleChangeBtnClick = () => {
-    setFieldValue('pharmacyId', '');
-    setUpdatePreferredPharmacy(false);
   };
 
   useEffect(() => {
@@ -155,54 +155,28 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     }
   }, [address]);
 
-  const isPreferred =
-    pharmacyId && patient?.preferredPharmacies?.some(({ id }: { id: string }) => id === pharmacyId);
-
   return (
     <Card bg="bg-surface">
       <LocationSearch isOpen={isOpen} onClose={handleModalClose} />
       <CardHeader>
         <HStack w="full" justify="space-between">
-          <Heading size="xxs">{pharmacyId ? 'Pharmacy' : 'Select a Pharmacy Option'}</Heading>
-          {pharmacyId ? (
-            <Button onClick={handleChangeBtnClick} size="xs">
-              Change
-            </Button>
-          ) : null}
+          <Heading size="xxs">Select a Pharmacy Option</Heading>
         </HStack>
       </CardHeader>
-      {pharmacyId ? (
-        <CardBody pt={0}>
-          <Pharmacy pharmacyId={pharmacyId} isPreferred={isPreferred} />
-          {isPreferred ? null : (
-            <Checkbox
-              pt={2}
-              isChecked={updatePreferredPharmacy}
-              onChange={(e) => setUpdatePreferredPharmacy(e.target.checked)}
-            >
-              Save as Patient's Preferred Pharmacy{' '}
-              <Text as="span" fontSize="xs" color="gray.400">
-                Optional
-              </Text>
-            </Checkbox>
-          )}
-        </CardBody>
-      ) : (
-        <Tabs index={selectedTab} onChange={handleTabChange} variant="enclosed">
-          <TabList px={5}>
-            {tabsList.map(({ isDisabled, name }) => (
-              <Tab key={`${name}-tab`} p={3} whiteSpace="nowrap" isDisabled={isDisabled}>
-                {name}
-              </Tab>
-            ))}
-          </TabList>
-          <TabPanels p={1}>
-            {tabsList.map(({ comp, name }) => (
-              <TabPanel key={`${name}-panel`}>{comp}</TabPanel>
-            ))}
-          </TabPanels>
-        </Tabs>
-      )}
+      <Tabs index={selectedTab} onChange={handleTabChange} variant="enclosed">
+        <TabList px={5}>
+          {tabsList.map(({ isDisabled, name }) => (
+            <Tab key={`${name}-tab`} p={3} whiteSpace="nowrap" isDisabled={isDisabled}>
+              {name}
+            </Tab>
+          ))}
+        </TabList>
+        <TabPanels p={1}>
+          {tabsList.map(({ comp, name }) => (
+            <TabPanel key={`${name}-panel`}>{comp}</TabPanel>
+          ))}
+        </TabPanels>
+      </Tabs>
     </Card>
   );
 };

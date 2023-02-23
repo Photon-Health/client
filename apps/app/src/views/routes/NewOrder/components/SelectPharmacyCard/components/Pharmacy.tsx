@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import {
   Box,
+  Button,
+  HStack,
   Skeleton,
   SkeletonText,
+  Spacer,
   Tag,
   TagLabel,
   TagLeftIcon,
@@ -18,9 +21,15 @@ interface PharmacyProps {
   pharmacyId: string;
   isPreferred?: boolean;
   showTags?: boolean;
+  handleChangeBtnClick?: any;
 }
 
-export const Pharmacy = ({ pharmacyId, isPreferred, showTags }: PharmacyProps) => {
+export const Pharmacy = ({
+  pharmacyId,
+  isPreferred,
+  showTags,
+  handleChangeBtnClick
+}: PharmacyProps) => {
   const { getPharmacy } = usePhoton();
   const { refetch, loading } = getPharmacy({ id: '' });
 
@@ -52,34 +61,45 @@ export const Pharmacy = ({ pharmacyId, isPreferred, showTags }: PharmacyProps) =
   }
 
   return (
-    <VStack align="start" spacing={0} wordBreak="break-all">
-      {showTags ? (
-        <Box>
-          {isPreferred ? (
-            <Tag size="sm" colorScheme="yellow" mb={1} me={2}>
-              <TagLeftIcon boxSize="12px" as={StarIcon} />
-              <TagLabel>Preferred</TagLabel>
-            </Tag>
-          ) : null}
-          {pharmacy?.fulfillmentTypes?.includes(types.FulfillmentType.MailOrder) ? (
-            <Tag size="sm" colorScheme="blue" mb={1}>
-              Mail Order
-            </Tag>
-          ) : null}
-          {pharmacy?.fulfillmentTypes?.includes(types.FulfillmentType.PickUp) ? (
-            <Tag size="sm" colorScheme="green" mb={1}>
-              Pick Up
-            </Tag>
-          ) : null}
-        </Box>
-      ) : null}
-      <Text>{pharmacy.name}</Text>
-      {pharmacy?.address ? <Text color="gray.500">{formatAddress(pharmacy.address)}</Text> : null}
-    </VStack>
+    <HStack>
+      <VStack align="start" spacing={0}>
+        {showTags ? (
+          <Box>
+            {isPreferred ? (
+              <Tag size="sm" colorScheme="yellow" mb={1} me={2}>
+                <TagLeftIcon boxSize="12px" as={StarIcon} />
+                <TagLabel>Preferred</TagLabel>
+              </Tag>
+            ) : null}
+            {pharmacy?.fulfillmentTypes?.includes(types.FulfillmentType.MailOrder) ? (
+              <Tag size="sm" colorScheme="blue" mb={1}>
+                Mail Order
+              </Tag>
+            ) : null}
+            {pharmacy?.fulfillmentTypes?.includes(types.FulfillmentType.PickUp) ? (
+              <Tag size="sm" colorScheme="green" mb={1}>
+                Pick Up
+              </Tag>
+            ) : null}
+          </Box>
+        ) : null}
+        <Text>{pharmacy.name}</Text>
+        {pharmacy?.address ? <Text color="gray.500">{formatAddress(pharmacy.address)}</Text> : null}
+      </VStack>
+      <Spacer />
+      <Box>
+        {handleChangeBtnClick ? (
+          <Button onClick={() => handleChangeBtnClick()} size="xs">
+            Change
+          </Button>
+        ) : null}
+      </Box>
+    </HStack>
   );
 };
 
 Pharmacy.defaultProps = {
   isPreferred: false,
-  showTags: true
+  showTags: true,
+  handleChangeBtnClick: undefined
 };
