@@ -96,6 +96,7 @@ export const LocalPickup = (props: LocalPickupProps) => {
     patientId,
     first: 1
   });
+  const previousId = orders?.[0]?.pharmacy?.id || '';
 
   const [pharmOptions, setPharmOptions] = useState<any>([]);
 
@@ -113,7 +114,7 @@ export const LocalPickup = (props: LocalPickupProps) => {
     return formatPharmacyOptions(
       resultPharmacies.data.pharmacies,
       preferredPharmacyIds,
-      orders?.[0]?.pharmacy?.id || ''
+      previousId
     );
   };
 
@@ -136,12 +137,14 @@ export const LocalPickup = (props: LocalPickupProps) => {
     const isPreferred =
       pharmacyId &&
       patient?.preferredPharmacies?.some(({ id }: { id: string }) => id === pharmacyId);
+    const isPrevious = previousId === pharmacyId;
 
     return (
       <CardBody p={0}>
         <Pharmacy
           pharmacyId={pharmacyId}
           isPreferred={isPreferred}
+          isPrevious={isPrevious}
           handleChangeBtnClick={handleChangeBtnClick}
         />
         {isPreferred ? null : (

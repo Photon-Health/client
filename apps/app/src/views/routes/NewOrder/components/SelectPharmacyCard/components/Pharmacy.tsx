@@ -12,7 +12,7 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react';
-import { StarIcon } from '@chakra-ui/icons';
+import { RepeatIcon, StarIcon } from '@chakra-ui/icons';
 import { usePhoton, types } from '@photonhealth/react';
 
 import { formatAddress } from '../../../../../../utils';
@@ -20,6 +20,7 @@ import { formatAddress } from '../../../../../../utils';
 interface PharmacyProps {
   pharmacyId: string;
   isPreferred?: boolean;
+  isPrevious?: boolean;
   showTags?: boolean;
   handleChangeBtnClick?: any;
 }
@@ -27,6 +28,7 @@ interface PharmacyProps {
 export const Pharmacy = ({
   pharmacyId,
   isPreferred,
+  isPrevious,
   showTags,
   handleChangeBtnClick
 }: PharmacyProps) => {
@@ -61,40 +63,50 @@ export const Pharmacy = ({
   }
 
   return (
-    <HStack>
-      <VStack align="start" spacing={0}>
-        {showTags ? (
-          <Box>
-            {isPreferred ? (
-              <Tag size="sm" colorScheme="yellow" mb={1} me={2}>
-                <TagLeftIcon boxSize="12px" as={StarIcon} />
-                <TagLabel>Preferred</TagLabel>
-              </Tag>
-            ) : null}
-            {pharmacy?.fulfillmentTypes?.includes(types.FulfillmentType.MailOrder) ? (
-              <Tag size="sm" colorScheme="blue" mb={1}>
-                Mail Order
-              </Tag>
-            ) : null}
-            {pharmacy?.fulfillmentTypes?.includes(types.FulfillmentType.PickUp) ? (
-              <Tag size="sm" colorScheme="green" mb={1}>
-                Pick Up
-              </Tag>
-            ) : null}
-          </Box>
-        ) : null}
-        <Text>{pharmacy.name}</Text>
-        {pharmacy?.address ? <Text color="gray.500">{formatAddress(pharmacy.address)}</Text> : null}
-      </VStack>
-      <Spacer />
-      <Box>
-        {handleChangeBtnClick ? (
-          <Button onClick={() => handleChangeBtnClick()} size="xs">
-            Change
-          </Button>
-        ) : null}
-      </Box>
-    </HStack>
+    <VStack align="start" spacing={0}>
+      {showTags ? (
+        <Box>
+          {isPreferred ? (
+            <Tag size="sm" colorScheme="yellow" mb={1} me={1}>
+              <TagLeftIcon boxSize="12px" as={StarIcon} />
+              <TagLabel>Preferred</TagLabel>
+            </Tag>
+          ) : null}
+          {isPrevious ? (
+            <Tag size="sm" colorScheme="green" mb={1} me={1}>
+              <TagLeftIcon boxSize="12px" as={RepeatIcon} />
+              <TagLabel>Previous</TagLabel>
+            </Tag>
+          ) : null}
+          {pharmacy?.fulfillmentTypes?.includes(types.FulfillmentType.MailOrder) ? (
+            <Tag size="sm" colorScheme="blue" mb={1}>
+              Mail Order
+            </Tag>
+          ) : null}
+          {pharmacy?.fulfillmentTypes?.includes(types.FulfillmentType.PickUp) ? (
+            <Tag size="sm" colorScheme="purple" mb={1}>
+              Pick Up
+            </Tag>
+          ) : null}
+        </Box>
+      ) : null}
+      <HStack w="full">
+        <VStack align="start" spacing={0}>
+          <Text>{pharmacy.name}</Text>
+          {pharmacy?.address ? (
+            <Text color="gray.500">{formatAddress(pharmacy.address)}</Text>
+          ) : null}
+        </VStack>
+        <Spacer />
+        <Box>
+          {handleChangeBtnClick ? (
+            <Button onClick={() => handleChangeBtnClick()} size="xs" ms="auto">
+              Change
+            </Button>
+          ) : null}
+        </Box>
+      </HStack>
+    </VStack>
   );
 };
 
