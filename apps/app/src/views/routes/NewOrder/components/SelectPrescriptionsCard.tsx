@@ -39,7 +39,7 @@ export const SelectPrescriptionsCard = ({
             <FormErrorMessage>{errors.fills}</FormErrorMessage>
           </FormControl>
         ) : (
-          <Text>Select a patient to view prescriptions.</Text>
+          <Text>Select a patient to view their prescriptions.</Text>
         )}
       </CardBody>
     </Card>
