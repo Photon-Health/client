@@ -163,7 +163,7 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
       <LocationSearch isOpen={isOpen} onClose={handleModalClose} />
       <CardHeader>
         <HStack w="full" justify="space-between">
-          <Heading size="xxs">{pharmacyId ? 'Pharmacy' : 'Select a Pharmacy'}</Heading>
+          <Heading size="xxs">{pharmacyId ? 'Pharmacy' : 'Select a Pharmacy Option'}</Heading>
           {pharmacyId ? (
             <Button onClick={handleChangeBtnClick} size="xs">
               Change
