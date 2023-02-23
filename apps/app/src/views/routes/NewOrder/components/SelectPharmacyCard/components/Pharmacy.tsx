@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Box, Skeleton, SkeletonText, Tag, Text, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Skeleton,
+  SkeletonText,
+  Tag,
+  TagLabel,
+  TagLeftIcon,
+  Text,
+  VStack
+} from '@chakra-ui/react';
+import { StarIcon } from '@chakra-ui/icons';
 import { usePhoton, types } from '@photonhealth/react';
+
 import { formatAddress } from '../../../../../../utils';
 
 interface PharmacyProps {
@@ -45,8 +56,9 @@ export const Pharmacy = ({ pharmacyId, isPreferred, showTags }: PharmacyProps) =
       {showTags ? (
         <Box>
           {isPreferred ? (
-            <Tag size="sm" colorScheme="orange" mb={1} me={2}>
-              Preferred
+            <Tag size="sm" colorScheme="yellow" mb={1} me={2}>
+              <TagLeftIcon boxSize="12px" as={StarIcon} />
+              <TagLabel>Preferred</TagLabel>
             </Tag>
           ) : null}
           {pharmacy?.fulfillmentTypes?.includes(types.FulfillmentType.MailOrder) ? (
