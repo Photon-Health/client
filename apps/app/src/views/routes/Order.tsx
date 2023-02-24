@@ -87,8 +87,6 @@ export const Order = () => {
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const tableWidth = useBreakpointValue({ base: 'full', sm: '100%', md: '75%' });
 
-  console.log(order.state);
-
   return (
     <Page kicker="Order" header={order ? formatFills(order.fills) : ''} loading={loading}>
       <VStack spacing={4} fontSize={{ base: 'md', md: 'lg' }} alignItems="start" w="100%" mt={0}>
