@@ -1,3 +1,3 @@
-import Button from './atoms/Button';
+import Button from './particles/Button';
 
 export { Button };

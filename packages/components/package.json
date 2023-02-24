@@ -5,10 +5,22 @@
   "scripts": {
     "start": "vite",
     "dev": "vite",
-    "build": "vite build && npx tailwindcss -i ./src/index.css -o ./dist/style.css"
+    "build": "vite build && npx tailwindcss -i ./src/index.css -o ./dist/style.css",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "type": "module",
   "devDependencies": {
+    "@storybook/addon-essentials": "^7.0.0-beta.19",
+    "@storybook/addon-interactions": "^7.0.0-beta.19",
+    "@storybook/addon-links": "^7.0.0-beta.19",
+    "@storybook/blocks": "^7.0.0-beta.19",
+    "@storybook/html": "^7.0.0-beta.19",
+    "@storybook/html-vite": "^7.0.0-beta.19",
+    "@storybook/testing-library": "^0.0.14-next.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "storybook": "^7.0.0-beta.19",
     "autoprefixer": "^10.4.13",
     "postcss": "^8.4.21",
     "vite": "^4.1.4",

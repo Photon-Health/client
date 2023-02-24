@@ -12,7 +12,7 @@ type ButtonVariant =
   | 'link';
 type ButtonSize = 'lg' | 'md' | 'sm' | 'xs';
 
-interface ButtonProps {
+export interface ButtonProps {
   onClick?: () => void;
   disabled?: boolean;
   variant?: ButtonVariant;

@@ -1,4 +1,4 @@
-import Button from './atoms/Button';
+import Button from './particles/Button';
 
 const App = () => {
   return (
