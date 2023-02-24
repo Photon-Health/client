@@ -7,7 +7,22 @@ setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.82
 import { createEffect, createSignal, JSXElement, Show } from 'solid-js';
 import { usePhoton } from '../context';
 
-export const PhotonAuthorized = (props: { children: JSXElement }) => {
+function checkHasPermission(subset: string[], superset: string[]) {
+  for (let i = 0; i < subset.length; i++) {
+    if (superset.indexOf(subset[i]) === -1) {
+      return false;
+    }
+  }
+  return true;
+}
+
+export const PhotonAuthorized = ({
+  children,
+  permissions = []
+}: {
+  children: JSXElement;
+  permissions?: string[];
+}) => {
   const client = usePhoton();
   const [isLoading, setIsLoading] = createSignal<boolean>(
     client?.authentication.state.isLoading || false
@@ -15,8 +30,9 @@ export const PhotonAuthorized = (props: { children: JSXElement }) => {
   const [authenticated, setAuthenticated] = createSignal<boolean>(
     client?.authentication.state.isAuthenticated || false
   );
-  const [authorized, setAuthorized] = createSignal<boolean>(
-    client?.authentication.state.isAuthorized || false
+  const [inOrg, setInOrg] = createSignal<boolean>(client?.authentication.state.isInOrg || false);
+  const [hasPermission, setHasPermission] = createSignal<boolean>(
+    checkHasPermission(permissions, client?.authentication.state.permissions || [])
   );
 
   createEffect(() => {
@@ -26,31 +42,38 @@ export const PhotonAuthorized = (props: { children: JSXElement }) => {
     setAuthenticated(client?.authentication.state.isAuthenticated || false);
   });
   createEffect(() => {
-    setAuthorized(client?.authentication.state.isAuthorized || false);
+    setInOrg(client?.authentication.state.isInOrg || false);
+  });
+  createEffect(() => {
+    setHasPermission(
+      checkHasPermission(permissions, client?.authentication.state.permissions || [])
+    );
   });
 
   return (
     <>
-      <Show when={client && !authenticated() && !isLoading()}>
-        <sl-alert variant="warning" open>
-          <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-          <strong>You are not signed in</strong>
-          <br />
-        </sl-alert>
+      <Show when={client && !isLoading()}>
+        <Show when={!authenticated()}>
+          <sl-alert variant="warning" open>
+            <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+            <strong>You are not signed in</strong>
+            <br />
+          </sl-alert>
+        </Show>
+        <Show when={authenticated() && (!inOrg() || !hasPermission())}>
+          <sl-alert variant="warning" open>
+            <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+            <strong>
+              Something went wrong, please contact support at Photon Health{' '}
+              <a style="text-decoration:underline" href="mailto:support@photon.health">
+                support@photon.health
+              </a>
+            </strong>
+            <br />
+          </sl-alert>
+        </Show>
+        <Show when={inOrg() && hasPermission()}>{children}</Show>
       </Show>
-      <Show when={client && authenticated() && !authorized() && !isLoading()}>
-        <sl-alert variant="warning" open>
-          <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-          <strong>
-            Something went wrong, please contact support at Photon Health{' '}
-            <a style="text-decoration:underline" href="mailto:support@photon.health">
-              support@photon.health
-            </a>
-          </strong>
-          <br />
-        </sl-alert>
-      </Show>
-      <Show when={client && authorized() && !isLoading()}>{props.children}</Show>
     </>
   );
 };
