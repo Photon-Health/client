@@ -5,9 +5,10 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.82/dist/');
 
 import { createEffect, createSignal, JSXElement, Show } from 'solid-js';
+import { Permission } from '../../types';
 import { usePhoton } from '../context';
 
-function checkHasPermission(subset: string[], superset: string[]) {
+function checkHasPermission(subset: Permission[], superset: Permission[]) {
   for (let i = 0; i < subset.length; i++) {
     if (superset.indexOf(subset[i]) === -1) {
       return false;
@@ -21,7 +22,7 @@ export const PhotonAuthorized = ({
   permissions = []
 }: {
   children: JSXElement;
-  permissions?: string[];
+  permissions?: Permission[];
 }) => {
   const client = usePhoton();
   const [isLoading, setIsLoading] = createSignal<boolean>(

@@ -49,7 +49,7 @@ export class PhotonClientStore {
       user: any;
       isAuthenticated: boolean;
       isInOrg: boolean;
-      permissions: string[];
+      permissions: Permission[];
       error?: string;
       isLoading: boolean;
     };
@@ -122,7 +122,7 @@ export class PhotonClientStore {
         isAuthenticated: boolean;
         isInOrg: boolean;
         isLoading: boolean;
-        permissions: string[];
+        permissions: Permission[];
         error?: string;
         user: any;
       };
@@ -270,7 +270,7 @@ export class PhotonClientStore {
     const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
 
     const token = await this.sdk.authentication.getAccessToken();
-    const { permissions }: { permissions: string[] } = jwtDecode(token);
+    const { permissions }: { permissions: Permission[] } = jwtDecode(token);
 
     this.setStore('authentication', {
       ...this.store.authentication,
