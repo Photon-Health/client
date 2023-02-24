@@ -68,7 +68,7 @@ interface LocalPickupProps {
   setUpdatePreferredPharmacy: any;
   preferredPharmacyIds: string[];
   setFieldValue: (field: string, value: string) => void;
-  handleChangeBtnClick: any;
+  resetSelection: any;
 }
 
 export const LocalPickup = (props: LocalPickupProps) => {
@@ -85,7 +85,7 @@ export const LocalPickup = (props: LocalPickupProps) => {
     setUpdatePreferredPharmacy,
     setFieldValue,
     preferredPharmacyIds,
-    handleChangeBtnClick
+    resetSelection
   } = props;
   const [params] = useSearchParams();
   const { getPharmacies, getOrders } = usePhoton();
@@ -145,7 +145,7 @@ export const LocalPickup = (props: LocalPickupProps) => {
           pharmacyId={pharmacyId}
           isPreferred={isPreferred}
           isPrevious={isPrevious}
-          handleChangeBtnClick={handleChangeBtnClick}
+          resetSelection={resetSelection}
         />
         {isPreferred ? null : (
           <Checkbox
