@@ -12,13 +12,15 @@ import {
   useDisclosure
 } from '@chakra-ui/react';
 
-import { types } from '@photonhealth/react';
+import { types, usePhoton } from '@photonhealth/react';
 
 import { LocationSearch } from '../../../../components/LocationSearch';
 import { LocalPickup } from './components/LocalPickup';
 import { MailOrder } from './components/MailOrder';
 import { Address } from '../../../../../models/general';
 import { SendToPatient } from './components/SendToPatient';
+
+const pharmacySelectionEnabledOrgs = [process.env.REACT_APP_MODERN_PEDIATRICS_ORG_ID];
 
 interface SelectPharmacyCardProps {
   patient: any;
@@ -49,6 +51,7 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
 
   const [selectedTab, setSelectedTab] = useState(onlyCurexa ? 1 : 0);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { user } = usePhoton();
 
   const handleModalClose = ({
     loc = undefined,
@@ -97,6 +100,16 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
         />
       )
     },
+    ...(pharmacySelectionEnabledOrgs.includes(user.org_id)
+      ? [
+          {
+            name: 'Send to Patient',
+            fulfillmentType: undefined,
+            isDisabled: onlyCurexa,
+            comp: <SendToPatient patient={patient} />
+          }
+        ]
+      : []),
     {
       name: 'Send to Patient',
       fulfillmentType: undefined,
