@@ -1,22 +1,26 @@
 import { useEffect, useState } from 'react';
 import {
   Button,
+  CardBody,
+  Checkbox,
   FormControl,
-  Text,
-  VStack,
-  Wrap,
-  WrapItem,
   FormErrorMessage,
   Tag,
   TagLeftIcon,
-  TagLabel
+  TagLabel,
+  Text,
+  VStack,
+  Wrap,
+  WrapItem
 } from '@chakra-ui/react';
 import { FiMapPin } from 'react-icons/fi';
 import { usePhoton, types } from '@photonhealth/react';
 import { AsyncSelect } from 'chakra-react-select';
 import { RepeatIcon, StarIcon } from '@chakra-ui/icons';
 import { useSearchParams } from 'react-router-dom';
+
 import { titleCase } from '../../../../../../utils';
+import { Pharmacy } from '../components/Pharmacy';
 
 const formatPharmacyOptions = (p: types.Pharmacy[], preferredIds: string[], previousId = '') => {
   // grab preferred and previous pharmacies and put them at the top of the list
@@ -33,13 +37,13 @@ const formatPharmacyOptions = (p: types.Pharmacy[], preferredIds: string[], prev
           {org.name}, {titleCase(org.address?.street1)}, {titleCase(org.address?.city)},{' '}
           {org.address?.state}{' '}
           {preferredIds.some((id) => id === org.id) ? (
-            <Tag size="sm" colorScheme="yellow" mt={1}>
+            <Tag size="sm" colorScheme="yellow" verticalAlign="text-center" me={1}>
               <TagLeftIcon boxSize="12px" as={StarIcon} />
               <TagLabel>Preferred</TagLabel>
             </Tag>
           ) : null}
           {previousId === org.id ? (
-            <Tag size="sm" colorScheme="green" mt={1}>
+            <Tag size="sm" colorScheme="green" verticalAlign="text-center">
               <TagLeftIcon boxSize="12px" as={RepeatIcon} />
               <TagLabel>Previous</TagLabel>
             </Tag>
@@ -58,8 +62,13 @@ interface LocalPickupProps {
   onOpen: any;
   errors: any;
   touched: any;
+  patient: any;
+  pharmacyId: string | undefined;
+  updatePreferredPharmacy: any;
+  setUpdatePreferredPharmacy: any;
   preferredPharmacyIds: string[];
   setFieldValue: (field: string, value: string) => void;
+  handleChangeBtnClick: any;
 }
 
 export const LocalPickup = (props: LocalPickupProps) => {
@@ -70,8 +79,13 @@ export const LocalPickup = (props: LocalPickupProps) => {
     longitude,
     errors,
     touched,
+    patient,
+    pharmacyId,
+    updatePreferredPharmacy,
+    setUpdatePreferredPharmacy,
     setFieldValue,
-    preferredPharmacyIds
+    preferredPharmacyIds,
+    handleChangeBtnClick
   } = props;
   const [params] = useSearchParams();
   const { getPharmacies, getOrders } = usePhoton();
@@ -82,6 +96,7 @@ export const LocalPickup = (props: LocalPickupProps) => {
     patientId,
     first: 1
   });
+  const previousId = orders?.[0]?.pharmacy?.id || '';
 
   const [pharmOptions, setPharmOptions] = useState<any>([]);
 
@@ -99,7 +114,7 @@ export const LocalPickup = (props: LocalPickupProps) => {
     return formatPharmacyOptions(
       resultPharmacies.data.pharmacies,
       preferredPharmacyIds,
-      orders?.[0]?.pharmacy?.id || ''
+      previousId
     );
   };
 
@@ -117,6 +132,36 @@ export const LocalPickup = (props: LocalPickupProps) => {
       callback(await getPharmacyOptions(inputValue));
     }, 500);
   };
+
+  if (pharmacyId) {
+    const isPreferred =
+      pharmacyId &&
+      patient?.preferredPharmacies?.some(({ id }: { id: string }) => id === pharmacyId);
+    const isPrevious = previousId === pharmacyId;
+
+    return (
+      <CardBody p={0}>
+        <Pharmacy
+          pharmacyId={pharmacyId}
+          isPreferred={isPreferred}
+          isPrevious={isPrevious}
+          handleChangeBtnClick={handleChangeBtnClick}
+        />
+        {isPreferred ? null : (
+          <Checkbox
+            pt={2}
+            isChecked={updatePreferredPharmacy}
+            onChange={(e) => setUpdatePreferredPharmacy(e.target.checked)}
+          >
+            Save as Preferred{' '}
+            <Text as="span" fontSize="xs" color="gray.400">
+              Optional
+            </Text>
+          </Checkbox>
+        )}
+      </CardBody>
+    );
+  }
 
   return location ? (
     <>
