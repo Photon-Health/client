@@ -100,7 +100,7 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
         />
       )
     },
-    ...(pharmacySelectionEnabledOrgs.includes(user.org_id)
+    ...(user && pharmacySelectionEnabledOrgs.includes(user.org_id)
       ? [
           {
             name: 'Send to Patient',
