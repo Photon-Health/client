@@ -1,6 +1,6 @@
 import { clsx } from 'clsx';
 
-type ButtonStyle =
+type ButtonVariant =
   | 'primary'
   | 'secondary'
   | 'accent'
@@ -15,7 +15,7 @@ type ButtonSize = 'lg' | 'md' | 'sm' | 'xs';
 interface ButtonProps {
   onClick?: () => void;
   disabled?: boolean;
-  style?: ButtonStyle;
+  variant?: ButtonVariant;
   size?: ButtonSize;
   isOutline?: boolean;
   isActive?: boolean;
@@ -34,7 +34,7 @@ interface ButtonProps {
 export default function Button({
   onClick,
   disabled = false,
-  style,
+  variant,
   size = 'md',
   isOutline,
   isActive,
@@ -58,15 +58,15 @@ export default function Button({
   const buttonClasses = clsx(
     'btn',
     // why so verbose? https://github.com/saadeghi/daisyui/discussions/1631#discussioncomment-5081856
-    style === 'primary' && `btn-primary`,
-    style === 'secondary' && `btn-secondary`,
-    style === 'accent' && `btn-accent`,
-    style === 'info' && `btn-info`,
-    style === 'success' && `btn-success`,
-    style === 'warning' && `btn-warning`,
-    style === 'error' && `btn-error`,
-    style === 'ghost' && `btn-ghost`,
-    style === 'link' && `btn-link`,
+    variant === 'primary' && `btn-primary`,
+    variant === 'secondary' && `btn-secondary`,
+    variant === 'accent' && `btn-accent`,
+    variant === 'info' && `btn-info`,
+    variant === 'success' && `btn-success`,
+    variant === 'warning' && `btn-warning`,
+    variant === 'error' && `btn-error`,
+    variant === 'ghost' && `btn-ghost`,
+    variant === 'link' && `btn-link`,
     size === 'lg' && `btn-lg`,
     size === 'md' && `btn-md`,
     size === 'sm' && `btn-sm`,

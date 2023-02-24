@@ -5,54 +5,54 @@ const App = () => {
     <article class="prose lg:prose-lg p-4">
       <h1 class="mb-0">Button</h1>
 
-      <h3>Styles</h3>
+      <h3>Variants</h3>
       <div class="flex flex-wrap items-center justify-left gap-2 overflow-x-hidden bg-top">
-        <Button style="primary">Primary</Button>
-        <Button style="secondary">Secondary</Button>
-        <Button style="accent">Accent</Button>
-        <Button style="info">Info</Button>
-        <Button style="success">Success</Button>
-        <Button style="warning">Warning</Button>
-        <Button style="error">Error</Button>
-        <Button style="ghost">Ghost</Button>
-        <Button style="link">Link</Button>
+        <Button variant="primary">Primary</Button>
+        <Button variant="secondary">Secondary</Button>
+        <Button variant="accent">Accent</Button>
+        <Button variant="info">Info</Button>
+        <Button variant="success">Success</Button>
+        <Button variant="warning">Warning</Button>
+        <Button variant="error">Error</Button>
+        <Button variant="ghost">Ghost</Button>
+        <Button variant="link">Link</Button>
       </div>
       <h3>Sizes</h3>
       <div class="flex flex-wrap items-center justify-left gap-2 overflow-x-hidden bg-top">
-        <Button style="primary" size="lg">
+        <Button variant="primary" size="lg">
           Large
         </Button>
-        <Button style="primary" size="md">
+        <Button variant="primary" size="md">
           Medium
         </Button>
-        <Button style="primary" size="sm">
+        <Button variant="primary" size="sm">
           Small
         </Button>
-        <Button style="primary" size="xs">
+        <Button variant="primary" size="xs">
           Extra Small
         </Button>
       </div>
       <h3>Outline</h3>
       <div class="flex flex-wrap items-center justify-left gap-2 overflow-x-hidden bg-top">
-        <Button style="primary" isOutline>
+        <Button variant="primary" isOutline>
           Primary
         </Button>
-        <Button style="secondary" isOutline>
+        <Button variant="secondary" isOutline>
           Secondary
         </Button>
-        <Button style="accent" isOutline>
+        <Button variant="accent" isOutline>
           Accent
         </Button>
-        <Button style="info" isOutline>
+        <Button variant="info" isOutline>
           Info
         </Button>
-        <Button style="success" isOutline>
+        <Button variant="success" isOutline>
           Success
         </Button>
-        <Button style="warning" isOutline>
+        <Button variant="warning" isOutline>
           Warning
         </Button>
-        <Button style="error" isOutline>
+        <Button variant="error" isOutline>
           Error
         </Button>
       </div>
