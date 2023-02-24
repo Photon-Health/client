@@ -157,7 +157,8 @@ export class PhotonClientStore {
     }>({
       authentication: {
         isAuthenticated: false,
-        isAuthorized: false,
+        isInOrg: false,
+        permissions: [],
         isLoading: true,
         error: undefined,
         user: undefined,
