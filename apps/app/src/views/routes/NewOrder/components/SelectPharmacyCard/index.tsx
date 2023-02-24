@@ -67,7 +67,7 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     onClose();
   };
 
-  const handleChangeBtnClick = () => {
+  const resetSelection = () => {
     setFieldValue('pharmacyId', '');
     setUpdatePreferredPharmacy(false);
   };
@@ -93,7 +93,7 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
             patient?.preferredPharmacies?.map((pharmacy: any) => pharmacy.id) || []
           }
           setFieldValue={setFieldValue}
-          handleChangeBtnClick={handleChangeBtnClick}
+          resetSelection={resetSelection}
         />
       )
     },
@@ -119,6 +119,7 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
   ];
 
   const handleTabChange = (index: number) => {
+    resetSelection();
     setFieldValue('fulfillmentType', tabsList[index].fulfillmentType);
     setSelectedTab(index);
   };
