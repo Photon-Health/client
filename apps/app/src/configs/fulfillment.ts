@@ -22,7 +22,10 @@ export const fulfillmentConfig = {
     mailOrder: false,
     mailOrderProviders: [],
     sendToPatient: true,
-    sendToPatientUsers: ['usr_01GBMTH3CTDFWECGK2QGCH66SR', 'usr_01GFBXC3D128A8J0FPR5Y4V6JE']
+    sendToPatientUsers: [
+      ...(process.env.REACT_APP_TIM_USER_ID ? [process.env.REACT_APP_TIM_USER_ID] : []),
+      ...(process.env.REACT_APP_SARA_USER_ID ? [process.env.REACT_APP_SARA_USER_ID] : [])
+    ]
   },
   // Peachy
   [process.env.REACT_APP_PEACHY_ORG_ID as string]: {
