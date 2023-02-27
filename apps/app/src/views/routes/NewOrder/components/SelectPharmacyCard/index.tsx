@@ -73,7 +73,6 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     setUpdatePreferredPharmacy(false);
   };
 
-  console.log(user);
   const tabsList = [
     {
       name: 'Local Pickup',
