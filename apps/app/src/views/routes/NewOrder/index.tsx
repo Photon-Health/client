@@ -25,6 +25,8 @@ import { usePhoton } from '@photonhealth/react';
 import { PATIENT_FIELDS } from '../../../model/fragments';
 import { OrderForm } from './components/OrderForm';
 
+import { fulfillmentConfig } from '../../../configs/fulfillment';
+
 export const NewOrder = () => {
   const [params] = useSearchParams();
   const patientId = params.get('patientId') || '';
@@ -32,11 +34,6 @@ export const NewOrder = () => {
 
   const { createOrder, getPatient, updatePatient, removePatientPreferredPharmacy, user } =
     usePhoton();
-
-  const peachyOrgId = process.env.REACT_APP_PEACHY_ORG_ID || '';
-  const weekendOrgId = process.env.REACT_APP_WEEKEND_ORG_ID || '';
-  const isPeachyUser = user.org_id === peachyOrgId;
-  const isWeekendUser = user.org_id === weekendOrgId;
 
   const [createOrderMutation, { loading: loadingCreateOrder, error }] = createOrder({
     refetchQueries: ['getOrders'],
@@ -114,6 +111,11 @@ export const NewOrder = () => {
   const border = useColorModeValue('gray.200', 'gray.800');
   const isMobile = useBreakpointValue({ base: true, sm: false });
 
+  const orderCreationEnabled =
+    typeof fulfillmentConfig[user.org_id]?.sendOrder !== 'undefined'
+      ? fulfillmentConfig[user.org_id]?.sendOrder
+      : fulfillmentConfig.default.sendOrder;
+
   return (
     <Modal
       isOpen
@@ -146,7 +148,7 @@ export const NewOrder = () => {
                 form="order-form"
                 isLoading={loadingCreateOrder}
                 loadingText="Sending"
-                disabled={isWeekendUser}
+                isDisabled={!orderCreationEnabled}
               >
                 Send Order
               </Button>
@@ -169,12 +171,11 @@ export const NewOrder = () => {
           <Flex justifyContent="center">
             <Box width={isMobile ? '100%' : 'xl'} padding={isMobile ? 4 : 8}>
               <OrderForm
+                user={user}
                 loading={loadingPatient}
                 patient={patient}
                 onClose={onClose}
                 prescriptionIds={prescriptionIds}
-                onlyCurexa={isPeachyUser}
-                disableOrderCreation={isWeekendUser}
                 createOrderMutation={createOrderMutation}
                 updatePatientMutation={updatePatientMutation}
                 removePatientPreferredPharmacyMutation={removePatientPreferredPharmacyMutation}

@@ -14,6 +14,8 @@ import { SelectPrescriptionsCard } from './SelectPrescriptionsCard';
 import { SelectPharmacyCard } from './SelectPharmacyCard';
 import { PatientAddressCard } from './PatientAddressCard';
 
+import { fulfillmentConfig } from '../../../../configs/fulfillment';
+
 const EMPTY_FORM_VALUES = {
   patientId: '',
   fills: [],
@@ -67,12 +69,11 @@ const orderSchema = yup.object({
 });
 
 interface OrderFormProps {
+  user: any;
   loading: boolean;
   patient: any;
   onClose: () => void;
   prescriptionIds: string;
-  onlyCurexa: boolean;
-  disableOrderCreation: boolean;
   createOrderMutation: any;
   updatePatientMutation: any;
   removePatientPreferredPharmacyMutation: any;
@@ -81,12 +82,11 @@ interface OrderFormProps {
 }
 
 export const OrderForm = ({
+  user,
   loading,
   patient,
   onClose,
   prescriptionIds,
-  onlyCurexa,
-  disableOrderCreation,
   createOrderMutation,
   updatePatientMutation,
   removePatientPreferredPharmacyMutation,
@@ -110,12 +110,7 @@ export const OrderForm = ({
     }
   };
 
-  let pharmacyId = '';
-  if (onlyCurexa && process.env.REACT_APP_CUREXA_ORG_ID) {
-    pharmacyId = process.env.REACT_APP_CUREXA_ORG_ID;
-  } else if (patient?.preferredPharmacies?.length > 0) {
-    pharmacyId = patient?.preferredPharmacies[0].id;
-  }
+  const pharmacyId = patient?.preferredPharmacies[0].id || '';
 
   const initialValues = {
     ...EMPTY_FORM_VALUES,
@@ -123,7 +118,7 @@ export const OrderForm = ({
     fills: prescriptionIds
       ? prescriptionIds.split(',').map((x: string) => ({ prescriptionId: x }))
       : [],
-    fulfillmentType: onlyCurexa ? 'MAIL_ORDER' : 'PICK_UP',
+    fulfillmentType: 'PICK_UP',
     pharmacyId,
     address: {
       street1: patient?.address?.street1 || '',
@@ -135,6 +130,13 @@ export const OrderForm = ({
     }
   };
 
+  const orderCreationEnabled =
+    // @ts-ignore
+    typeof fulfillmentConfig[user.org_id]?.sendOrder !== 'undefined'
+      ? // @ts-ignore
+        fulfillmentConfig[user.org_id]?.sendOrder
+      : fulfillmentConfig.default.sendOrder;
+
   return (
     <Formik
       enableReinitialize
@@ -142,12 +144,6 @@ export const OrderForm = ({
       validationSchema={orderSchema}
       onSubmit={async (values, { validateForm, setSubmitting }) => {
         validateForm(values);
-
-        // To be extra confident that curexa is always used for weekend providers
-        if (onlyCurexa) {
-          values.fulfillmentType = types.FulfillmentType.MailOrder;
-          values.pharmacyId = process.env.REACT_APP_CUREXA_ORG_ID || values.pharmacyId;
-        }
 
         if (
           await confirmWrapper('Send Order?', {
@@ -197,7 +193,7 @@ export const OrderForm = ({
               }}
             />
 
-            <Alert status="error" hidden={!disableOrderCreation}>
+            <Alert status="error" hidden={orderCreationEnabled} mb={5}>
               <AlertIcon />
               You are not allowed to create orders via the Photon App.
             </Alert>
@@ -219,11 +215,11 @@ export const OrderForm = ({
               />
 
               <SelectPharmacyCard
+                user={user}
                 updatePreferredPharmacy={updatePreferredPharmacy}
                 setUpdatePreferredPharmacy={setUpdatePreferredPharmacy}
                 pharmacyId={values.pharmacyId}
                 address={values.address}
-                onlyCurexa={onlyCurexa}
                 errors={errors}
                 touched={touched}
                 patient={patient}
