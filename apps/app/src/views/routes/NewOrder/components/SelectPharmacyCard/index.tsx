@@ -123,6 +123,7 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
           : fulfillmentConfig.default.mailOrder,
       comp: (
         <MailOrder
+          user={user}
           location={location}
           setFieldValue={setFieldValue}
           errors={errors}

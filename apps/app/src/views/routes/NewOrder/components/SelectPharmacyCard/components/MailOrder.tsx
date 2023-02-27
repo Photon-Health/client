@@ -10,15 +10,17 @@ import {
 } from '@chakra-ui/react';
 import { usePhoton, types } from '@photonhealth/react';
 import { Pharmacy } from './Pharmacy';
+import { fulfillmentConfig } from '../../../../../../configs/fulfillment';
 
 interface MailOrderProps {
+  user: any;
   location: string | undefined;
   setFieldValue: any;
   errors: any;
   touched: any;
 }
 
-export const MailOrder = ({ location, setFieldValue, errors, touched }: MailOrderProps) => {
+export const MailOrder = ({ user, location, setFieldValue, errors, touched }: MailOrderProps) => {
   const { getPharmacies } = usePhoton();
   const { refetch } = getPharmacies({});
 
@@ -29,7 +31,12 @@ export const MailOrder = ({ location, setFieldValue, errors, touched }: MailOrde
       type: types.FulfillmentType.MailOrder
     });
 
-    setPharmOptions(result.data.pharmacies);
+    const options = result.data.pharmacies.filter(({ id }: { id: string }) =>
+      // @ts-ignore
+      fulfillmentConfig[user.org_id].mailOrderProviders.includes(id)
+    );
+
+    setPharmOptions(options);
   };
 
   useEffect(() => {
@@ -42,7 +49,7 @@ export const MailOrder = ({ location, setFieldValue, errors, touched }: MailOrde
     <FormControl isInvalid={!!errors.pharmacyId && touched.pharmacyId}>
       <Text>Contact support to add additional mail order integrations.</Text>
       {errors ? <FormErrorMessage>Please select a pharmacy...</FormErrorMessage> : null}
-      {pharmOptions.map(({ id }: any) => (
+      {pharmOptions.map(({ id }: { id: string }) => (
         <Box
           mt={4}
           p={3}
