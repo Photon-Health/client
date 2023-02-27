@@ -4,7 +4,8 @@ export const fulfillmentConfig = {
     pickUp: true,
     mailOrder: true,
     mailOrderProviders: [process.env.REACT_APP_CUREXA_ORG_ID],
-    sendToPatient: true
+    sendToPatient: false,
+    sendToPatientUsers: [] // its weird to have this here, but its temporary and keeps ts from complaining
   },
   // Weekend Health
   [process.env.REACT_APP_WEEKEND_ORG_ID as string]: {

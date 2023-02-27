@@ -27,13 +27,31 @@ import { OrderForm } from './components/OrderForm';
 
 import { fulfillmentConfig } from '../../../configs/fulfillment';
 
+import jwtDecode from 'jwt-decode';
+
 export const NewOrder = () => {
   const [params] = useSearchParams();
   const patientId = params.get('patientId') || '';
   const prescriptionIds = params.get('prescriptionIds') || '';
 
-  const { createOrder, getPatient, updatePatient, removePatientPreferredPharmacy, user } =
+  const { createOrder, getPatient, updatePatient, removePatientPreferredPharmacy, user, getToken } =
     usePhoton();
+
+  const [auth0UserId, setAuth0UserId] = useState<string>('');
+  const getAuth0UserId = async () => {
+    const token = await getToken();
+
+    if (token) {
+      const decoded: { sub: string } = jwtDecode(token);
+      setAuth0UserId(decoded.sub);
+    }
+  };
+
+  useEffect(() => {
+    if (!auth0UserId) {
+      getAuth0UserId();
+    }
+  });
 
   const [createOrderMutation, { loading: loadingCreateOrder, error }] = createOrder({
     refetchQueries: ['getOrders'],
@@ -172,6 +190,7 @@ export const NewOrder = () => {
             <Box width={isMobile ? '100%' : 'xl'} padding={isMobile ? 4 : 8}>
               <OrderForm
                 user={user}
+                auth0UserId={auth0UserId}
                 loading={loadingPatient}
                 patient={patient}
                 onClose={onClose}

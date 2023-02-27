@@ -70,6 +70,7 @@ const orderSchema = yup.object({
 
 interface OrderFormProps {
   user: any;
+  auth0UserId: string;
   loading: boolean;
   patient: any;
   onClose: () => void;
@@ -83,6 +84,7 @@ interface OrderFormProps {
 
 export const OrderForm = ({
   user,
+  auth0UserId,
   loading,
   patient,
   onClose,
@@ -214,6 +216,7 @@ export const OrderForm = ({
 
               <SelectPharmacyCard
                 user={user}
+                auth0UserId={auth0UserId}
                 updatePreferredPharmacy={updatePreferredPharmacy}
                 setUpdatePreferredPharmacy={setUpdatePreferredPharmacy}
                 pharmacyId={values.pharmacyId}

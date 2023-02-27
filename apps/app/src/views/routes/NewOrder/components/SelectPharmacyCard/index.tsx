@@ -24,6 +24,7 @@ import { fulfillmentConfig } from '../../../../../configs/fulfillment';
 
 interface SelectPharmacyCardProps {
   user: any;
+  auth0UserId: string;
   patient: any;
   address: Address;
   errors: any;
@@ -36,6 +37,7 @@ interface SelectPharmacyCardProps {
 
 export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
   user,
+  auth0UserId,
   patient,
   address,
   errors,
@@ -107,7 +109,8 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
       enabled:
         typeof fulfillmentConfig[user.org_id] !== 'undefined'
           ? fulfillmentConfig[user.org_id].sendToPatient &&
-            fulfillmentConfig[user.org_id].sendToPatientUsers?.includes(user.id)
+            // @ts-ignore
+            fulfillmentConfig[user.org_id].sendToPatientUsers.includes(auth0UserId)
           : fulfillmentConfig.default.sendToPatient,
       comp: <SendToPatient patient={patient} />
     },
