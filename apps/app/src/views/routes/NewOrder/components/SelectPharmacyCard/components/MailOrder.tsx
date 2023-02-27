@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   Box,
   Button,
+  CardBody,
   FormControl,
   FormErrorMessage,
   HStack,
@@ -14,13 +15,23 @@ import { fulfillmentConfig } from '../../../../../../configs/fulfillment';
 
 interface MailOrderProps {
   user: any;
+  pharmacyId: string;
   location: string | undefined;
   setFieldValue: any;
   errors: any;
   touched: any;
+  resetSelection: any;
 }
 
-export const MailOrder = ({ user, location, setFieldValue, errors, touched }: MailOrderProps) => {
+export const MailOrder = ({
+  user,
+  pharmacyId,
+  location,
+  setFieldValue,
+  errors,
+  touched,
+  resetSelection
+}: MailOrderProps) => {
   const { getPharmacies } = usePhoton();
   const { refetch } = getPharmacies({});
 
@@ -44,6 +55,14 @@ export const MailOrder = ({ user, location, setFieldValue, errors, touched }: Ma
   }, [location]);
 
   const borderColor = useColorModeValue('gray.200', 'gray.700');
+
+  if (pharmacyId) {
+    return (
+      <CardBody p={0}>
+        <Pharmacy pharmacyId={pharmacyId} resetSelection={resetSelection} />
+      </CardBody>
+    );
+  }
 
   return (
     <FormControl isInvalid={!!errors.pharmacyId && touched.pharmacyId}>
