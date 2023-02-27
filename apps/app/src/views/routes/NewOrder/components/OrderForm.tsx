@@ -131,10 +131,8 @@ export const OrderForm = ({
   };
 
   const orderCreationEnabled =
-    // @ts-ignore
     typeof fulfillmentConfig[user.org_id]?.sendOrder !== 'undefined'
-      ? // @ts-ignore
-        fulfillmentConfig[user.org_id]?.sendOrder
+      ? fulfillmentConfig[user.org_id]?.sendOrder
       : fulfillmentConfig.default.sendOrder;
 
   return (
