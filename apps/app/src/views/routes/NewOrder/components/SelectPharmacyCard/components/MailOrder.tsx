@@ -42,9 +42,10 @@ export const MailOrder = ({
       type: types.FulfillmentType.MailOrder
     });
 
+    const fConfig = fulfillmentConfig[user.org_id] || fulfillmentConfig.default;
     const options = result.data.pharmacies.filter(({ id }: { id: string }) =>
       // @ts-ignore
-      fulfillmentConfig[user.org_id].mailOrderProviders.includes(id)
+      fConfig.mailOrderProviders.includes(id)
     );
 
     setPharmOptions(options);
