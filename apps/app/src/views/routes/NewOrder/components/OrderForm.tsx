@@ -119,7 +119,7 @@ export const OrderForm = ({
       ? prescriptionIds.split(',').map((x: string) => ({ prescriptionId: x }))
       : [],
     fulfillmentType: 'PICK_UP',
-    pharmacyId: patient?.preferredPharmacies[0].id || '',
+    pharmacyId: patient?.preferredPharmacies?.length > 0 ? patient.preferredPharmacies[0].id : '',
     address: {
       street1: patient?.address?.street1 || '',
       street2: patient?.address?.street2 || '',
