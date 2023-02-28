@@ -4,7 +4,7 @@ export const fulfillmentConfig = {
     pickUp: true,
     mailOrder: false,
     mailOrderProviders: [],
-    sendToPatient: false,
+    sendToPatient: true,
     sendToPatientUsers: [] // its weird to have this here, but its temporary and keeps ts from complaining
   },
   // Weekend Health
