@@ -3,9 +3,7 @@ export const fulfillmentConfig = {
     sendOrder: true,
     pickUp: true,
     mailOrder: false,
-    mailOrderProviders: [
-      ...(process.env.REACT_APP_CUREXA_ORG_ID ? [process.env.REACT_APP_CUREXA_ORG_ID] : [])
-    ],
+    mailOrderProviders: [],
     sendToPatient: false,
     sendToPatientUsers: [] // its weird to have this here, but its temporary and keeps ts from complaining
   },
