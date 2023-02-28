@@ -25,18 +25,33 @@ import { usePhoton } from '@photonhealth/react';
 import { PATIENT_FIELDS } from '../../../model/fragments';
 import { OrderForm } from './components/OrderForm';
 
+import { fulfillmentConfig } from '../../../configs/fulfillment';
+
+import jwtDecode from 'jwt-decode';
+
 export const NewOrder = () => {
   const [params] = useSearchParams();
   const patientId = params.get('patientId') || '';
   const prescriptionIds = params.get('prescriptionIds') || '';
 
-  const { createOrder, getPatient, updatePatient, removePatientPreferredPharmacy, user } =
+  const { createOrder, getPatient, updatePatient, removePatientPreferredPharmacy, user, getToken } =
     usePhoton();
 
-  const peachyOrgId = process.env.REACT_APP_PEACHY_ORG_ID || '';
-  const weekendOrgId = process.env.REACT_APP_WEEKEND_ORG_ID || '';
-  const isPeachyUser = user.org_id === peachyOrgId;
-  const isWeekendUser = user.org_id === weekendOrgId;
+  const [auth0UserId, setAuth0UserId] = useState<string>('');
+  const getAuth0UserId = async () => {
+    const token = await getToken();
+
+    if (token) {
+      const decoded: { sub: string } = jwtDecode(token);
+      setAuth0UserId(decoded.sub);
+    }
+  };
+
+  useEffect(() => {
+    if (!auth0UserId) {
+      getAuth0UserId();
+    }
+  });
 
   const [createOrderMutation, { loading: loadingCreateOrder, error }] = createOrder({
     refetchQueries: ['getOrders'],
@@ -114,6 +129,11 @@ export const NewOrder = () => {
   const border = useColorModeValue('gray.200', 'gray.800');
   const isMobile = useBreakpointValue({ base: true, sm: false });
 
+  const orderCreationEnabled =
+    typeof fulfillmentConfig[user.org_id]?.sendOrder !== 'undefined'
+      ? fulfillmentConfig[user.org_id]?.sendOrder
+      : fulfillmentConfig.default.sendOrder;
+
   return (
     <Modal
       isOpen
@@ -146,7 +166,7 @@ export const NewOrder = () => {
                 form="order-form"
                 isLoading={loadingCreateOrder}
                 loadingText="Sending"
-                disabled={isWeekendUser}
+                isDisabled={!orderCreationEnabled}
               >
                 Send Order
               </Button>
@@ -169,12 +189,12 @@ export const NewOrder = () => {
           <Flex justifyContent="center">
             <Box width={isMobile ? '100%' : 'xl'} padding={isMobile ? 4 : 8}>
               <OrderForm
+                user={user}
+                auth0UserId={auth0UserId}
                 loading={loadingPatient}
                 patient={patient}
                 onClose={onClose}
                 prescriptionIds={prescriptionIds}
-                onlyCurexa={isPeachyUser}
-                disableOrderCreation={isWeekendUser}
                 createOrderMutation={createOrderMutation}
                 updatePatientMutation={updatePatientMutation}
                 removePatientPreferredPharmacyMutation={removePatientPreferredPharmacyMutation}

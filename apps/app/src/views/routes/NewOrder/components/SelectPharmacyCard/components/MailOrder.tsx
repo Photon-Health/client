@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   Box,
   Button,
+  CardBody,
   FormControl,
   FormErrorMessage,
   HStack,
@@ -10,15 +11,27 @@ import {
 } from '@chakra-ui/react';
 import { usePhoton, types } from '@photonhealth/react';
 import { Pharmacy } from './Pharmacy';
+import { fulfillmentConfig } from '../../../../../../configs/fulfillment';
 
 interface MailOrderProps {
+  user: any;
+  pharmacyId: string;
   location: string | undefined;
   setFieldValue: any;
   errors: any;
   touched: any;
+  resetSelection: any;
 }
 
-export const MailOrder = ({ location, setFieldValue, errors, touched }: MailOrderProps) => {
+export const MailOrder = ({
+  user,
+  pharmacyId,
+  location,
+  setFieldValue,
+  errors,
+  touched,
+  resetSelection
+}: MailOrderProps) => {
   const { getPharmacies } = usePhoton();
   const { refetch } = getPharmacies({});
 
@@ -29,7 +42,13 @@ export const MailOrder = ({ location, setFieldValue, errors, touched }: MailOrde
       type: types.FulfillmentType.MailOrder
     });
 
-    setPharmOptions(result.data.pharmacies);
+    const fConfig = fulfillmentConfig[user.org_id] || fulfillmentConfig.default;
+    const options = result.data.pharmacies.filter(({ id }: { id: string }) =>
+      // @ts-ignore
+      fConfig.mailOrderProviders.includes(id)
+    );
+
+    setPharmOptions(options);
   };
 
   useEffect(() => {
@@ -38,11 +57,19 @@ export const MailOrder = ({ location, setFieldValue, errors, touched }: MailOrde
 
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
+  if (pharmacyId) {
+    return (
+      <CardBody p={0}>
+        <Pharmacy pharmacyId={pharmacyId} resetSelection={resetSelection} />
+      </CardBody>
+    );
+  }
+
   return (
     <FormControl isInvalid={!!errors.pharmacyId && touched.pharmacyId}>
       <Text>Contact support to add additional mail order integrations.</Text>
       {errors ? <FormErrorMessage>Please select a pharmacy...</FormErrorMessage> : null}
-      {pharmOptions.map(({ id }: any) => (
+      {pharmOptions.map(({ id }: { id: string }) => (
         <Box
           mt={4}
           p={3}

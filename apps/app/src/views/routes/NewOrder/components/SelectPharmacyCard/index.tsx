@@ -20,10 +20,13 @@ import { MailOrder } from './components/MailOrder';
 import { Address } from '../../../../../models/general';
 import { SendToPatient } from './components/SendToPatient';
 
+import { fulfillmentConfig } from '../../../../../configs/fulfillment';
+
 interface SelectPharmacyCardProps {
+  user: any;
+  auth0UserId: string;
   patient: any;
   address: Address;
-  onlyCurexa: boolean;
   errors: any;
   touched: any;
   pharmacyId: string;
@@ -33,9 +36,10 @@ interface SelectPharmacyCardProps {
 }
 
 export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
+  user,
+  auth0UserId,
   patient,
   address,
-  onlyCurexa,
   errors,
   touched,
   pharmacyId,
@@ -47,7 +51,6 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
   const [longitude, setLongitude] = useState<number | undefined>(undefined);
   const [location, setLocation] = useState('');
 
-  const [selectedTab, setSelectedTab] = useState(onlyCurexa ? 1 : 0);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleModalClose = ({
@@ -76,7 +79,10 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     {
       name: 'Local Pickup',
       fulfillmentType: types.FulfillmentType.PickUp,
-      isDisabled: onlyCurexa,
+      enabled:
+        typeof fulfillmentConfig[user.org_id] !== 'undefined'
+          ? fulfillmentConfig[user.org_id].pickUp
+          : fulfillmentConfig.default.pickUp,
       comp: (
         <LocalPickup
           location={location}
@@ -100,23 +106,36 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     {
       name: 'Send to Patient',
       fulfillmentType: undefined,
-      isDisabled: onlyCurexa,
+      enabled:
+        typeof fulfillmentConfig[user.org_id] !== 'undefined'
+          ? fulfillmentConfig[user.org_id].sendToPatient &&
+            // @ts-ignore
+            fulfillmentConfig[user.org_id].sendToPatientUsers.includes(auth0UserId)
+          : fulfillmentConfig.default.sendToPatient,
       comp: <SendToPatient patient={patient} />
     },
     {
       name: 'Mail Order',
       fulfillmentType: types.FulfillmentType.MailOrder,
-      isDisabled: !onlyCurexa,
+      enabled:
+        typeof fulfillmentConfig[user.org_id] !== 'undefined'
+          ? fulfillmentConfig[user.org_id].mailOrder
+          : fulfillmentConfig.default.mailOrder,
       comp: (
         <MailOrder
+          user={user}
+          pharmacyId={pharmacyId}
           location={location}
           setFieldValue={setFieldValue}
           errors={errors}
           touched={touched}
+          resetSelection={resetSelection}
         />
       )
     }
   ];
+
+  const [selectedTab, setSelectedTab] = useState(tabsList.findIndex((tab) => tab.enabled) || 0);
 
   const handleTabChange = (index: number) => {
     resetSelection();
@@ -166,8 +185,8 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
       </CardHeader>
       <Tabs index={selectedTab} onChange={handleTabChange} variant="enclosed">
         <TabList px={5}>
-          {tabsList.map(({ isDisabled, name }) => (
-            <Tab key={`${name}-tab`} p={3} whiteSpace="nowrap" isDisabled={isDisabled}>
+          {tabsList.map(({ enabled, name }) => (
+            <Tab key={`${name}-tab`} p={3} whiteSpace="nowrap" isDisabled={!enabled}>
               {name}
             </Tab>
           ))}
