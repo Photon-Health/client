@@ -17,8 +17,17 @@ export const DraftPrescriptionCard = (props: {
 
   props.actions.registerValidator({
     key: 'draftPrescriptions',
-    validator: draftPrescriptionsValidator,
+    validator: draftPrescriptionsValidator
   });
+
+  const editPrescription = (id: string) => {
+    const draft = props.store['draftPrescriptions'].value.find((x: any) => x.id === id);
+
+    props.actions.updateFormValue({
+      key: 'draftPrescriptions',
+      value: props.store['draftPrescriptions'].value.filter((x: any) => x.id !== id)
+    });
+  };
 
   return (
     <photon-card>
@@ -32,7 +41,7 @@ export const DraftPrescriptionCard = (props: {
             key: 'draftPrescriptions',
             value: props.store['draftPrescriptions'].value.filter(
               (x: any) => x.id !== selectedDraft()
-            ),
+            )
           });
           setDialogOpen(false);
           setSelectedDraft(undefined);
@@ -88,6 +97,13 @@ export const DraftPrescriptionCard = (props: {
                     </p>
                   </div>
                   <div>
+                    <sl-icon-button
+                      class="self-end text-xl edit-icon-button"
+                      name="pencil-square"
+                      onclick={() => {
+                        editPrescription(draft.id);
+                      }}
+                    ></sl-icon-button>
                     <sl-icon-button
                       class="self-end text-xl remove-icon-button"
                       name="trash3"
