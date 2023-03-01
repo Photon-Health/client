@@ -130,9 +130,9 @@ export const NewOrder = () => {
   const isMobile = useBreakpointValue({ base: true, sm: false });
 
   const orderCreationEnabled =
-    typeof fulfillmentConfig[user.org_id]?.sendOrder !== 'undefined'
-      ? fulfillmentConfig[user.org_id]?.sendOrder
-      : fulfillmentConfig.default.sendOrder;
+    typeof fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id]?.sendOrder !== 'undefined'
+      ? fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id]?.sendOrder
+      : fulfillmentConfig[process.env.REACT_APP_ENV_NAME].default.sendOrder;
 
   return (
     <Modal

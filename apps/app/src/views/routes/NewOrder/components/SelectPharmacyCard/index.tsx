@@ -80,9 +80,9 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
       name: 'Local Pickup',
       fulfillmentType: types.FulfillmentType.PickUp,
       enabled:
-        typeof fulfillmentConfig[user.org_id] !== 'undefined'
-          ? fulfillmentConfig[user.org_id].pickUp
-          : fulfillmentConfig.default.pickUp,
+        typeof fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id] !== 'undefined'
+          ? fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id].pickUp
+          : fulfillmentConfig[process.env.REACT_APP_ENV_NAME].default.pickUp,
       comp: (
         <LocalPickup
           location={location}
@@ -107,20 +107,22 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
       name: 'Send to Patient',
       fulfillmentType: undefined,
       enabled:
-        typeof fulfillmentConfig[user.org_id] !== 'undefined'
-          ? fulfillmentConfig[user.org_id].sendToPatient &&
+        typeof fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id] !== 'undefined'
+          ? fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id].sendToPatient &&
             // @ts-ignore
-            fulfillmentConfig[user.org_id].sendToPatientUsers.includes(auth0UserId)
-          : fulfillmentConfig.default.sendToPatient,
+            fulfillmentConfig[process.env.REACT_APP_ENV_NAME][
+              user.org_id
+            ].sendToPatientUsers.includes(auth0UserId)
+          : fulfillmentConfig[process.env.REACT_APP_ENV_NAME].default.sendToPatient,
       comp: <SendToPatient patient={patient} />
     },
     {
       name: 'Mail Order',
       fulfillmentType: types.FulfillmentType.MailOrder,
       enabled:
-        typeof fulfillmentConfig[user.org_id] !== 'undefined'
-          ? fulfillmentConfig[user.org_id].mailOrder
-          : fulfillmentConfig.default.mailOrder,
+        typeof fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id] !== 'undefined'
+          ? fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id].mailOrder
+          : fulfillmentConfig[process.env.REACT_APP_ENV_NAME].default.mailOrder,
       comp: (
         <MailOrder
           user={user}
