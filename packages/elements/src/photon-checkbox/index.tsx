@@ -79,7 +79,7 @@ customElement(
               }}
             ></sl-checkbox>
           )}
-          <p class="text-gray-500 text-sm font-medium pt-1 font-sans">
+          <p class="text-gray-500 text-sm font-medium font-sans">
             {props.label}
             <Show when={props.tip}>
               <PhotonTooltip tip={props.tip || ''} placement="right"></PhotonTooltip>
