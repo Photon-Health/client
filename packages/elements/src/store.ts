@@ -11,6 +11,7 @@ import {
 } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
 import { GraphQLError } from 'graphql';
+import jwtDecode from 'jwt-decode';
 
 const defaultOnRedirectCallback = (appState?: any): void => {
   window.location.replace(appState?.returnTo || window.location.pathname);
@@ -47,7 +48,8 @@ export class PhotonClientStore {
     state: {
       user: any;
       isAuthenticated: boolean;
-      isAuthorized: boolean;
+      isInOrg: boolean;
+      permissions: Permission[];
       error?: string;
       isLoading: boolean;
     };
@@ -118,8 +120,9 @@ export class PhotonClientStore {
     const [store, setStore] = createStore<{
       authentication: {
         isAuthenticated: boolean;
-        isAuthorized: boolean;
+        isInOrg: boolean;
         isLoading: boolean;
+        permissions: Permission[];
         error?: string;
         user: any;
       };
@@ -154,7 +157,8 @@ export class PhotonClientStore {
     }>({
       authentication: {
         isAuthenticated: false,
-        isAuthorized: false,
+        isInOrg: false,
+        permissions: [],
         isLoading: true,
         error: undefined,
         user: undefined,
@@ -264,11 +268,16 @@ export class PhotonClientStore {
     });
     const user = await this.sdk.authentication.getUser();
     const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
+
+    const token = await this.sdk.authentication.getAccessToken();
+    const { permissions }: { permissions: Permission[] } = jwtDecode(token);
+
     this.setStore('authentication', {
       ...this.store.authentication,
       user: user,
       isLoading: false,
-      isAuthorized: authenticated && hasOrgs && this.sdk.organization === user.org_id
+      isInOrg: authenticated && hasOrgs && this.sdk.organization === user.org_id,
+      permissions: permissions || []
     });
   }
   private async login(args = {}) {
@@ -280,7 +289,8 @@ export class PhotonClientStore {
     this.setStore('authentication', {
       ...this.store.authentication,
       isAuthenticated: false,
-      isAuthorized: false,
+      isInOrg: false,
+      permissions: [],
       user: undefined
     });
   }
