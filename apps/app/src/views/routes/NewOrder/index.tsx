@@ -129,10 +129,11 @@ export const NewOrder = () => {
   const border = useColorModeValue('gray.200', 'gray.800');
   const isMobile = useBreakpointValue({ base: true, sm: false });
 
+  const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
   const orderCreationEnabled =
-    typeof fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id]?.sendOrder !== 'undefined'
-      ? fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id]?.sendOrder
-      : fulfillmentConfig[process.env.REACT_APP_ENV_NAME].default.sendOrder;
+    typeof fulfillmentConfig[envName][user.org_id]?.sendOrder !== 'undefined'
+      ? fulfillmentConfig[envName][user.org_id]?.sendOrder
+      : fulfillmentConfig[envName].default.sendOrder;
 
   return (
     <Modal

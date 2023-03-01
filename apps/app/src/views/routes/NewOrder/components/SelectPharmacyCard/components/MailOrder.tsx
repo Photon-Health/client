@@ -42,11 +42,9 @@ export const MailOrder = ({
       type: types.FulfillmentType.MailOrder
     });
 
-    const fConfig =
-      fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id] ||
-      fulfillmentConfig[process.env.REACT_APP_ENV_NAME].default;
+    const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
+    const fConfig = fulfillmentConfig[envName][user.org_id] || fulfillmentConfig[envName].default;
     const options = result.data.pharmacies.filter(({ id }: { id: string }) =>
-      // @ts-ignore
       fConfig.mailOrderProviders.includes(id)
     );
 

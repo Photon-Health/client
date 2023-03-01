@@ -75,14 +75,16 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     setUpdatePreferredPharmacy(false);
   };
 
+  const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
+
   const tabsList = [
     {
       name: 'Local Pickup',
       fulfillmentType: types.FulfillmentType.PickUp,
       enabled:
-        typeof fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id] !== 'undefined'
-          ? fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id].pickUp
-          : fulfillmentConfig[process.env.REACT_APP_ENV_NAME].default.pickUp,
+        typeof fulfillmentConfig[envName][user.org_id] !== 'undefined'
+          ? fulfillmentConfig[envName][user.org_id].pickUp
+          : fulfillmentConfig[envName].default.pickUp,
       comp: (
         <LocalPickup
           location={location}
@@ -107,22 +109,19 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
       name: 'Send to Patient',
       fulfillmentType: undefined,
       enabled:
-        typeof fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id] !== 'undefined'
-          ? fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id].sendToPatient &&
-            // @ts-ignore
-            fulfillmentConfig[process.env.REACT_APP_ENV_NAME][
-              user.org_id
-            ].sendToPatientUsers.includes(auth0UserId)
-          : fulfillmentConfig[process.env.REACT_APP_ENV_NAME].default.sendToPatient,
+        typeof fulfillmentConfig[envName][user.org_id] !== 'undefined'
+          ? fulfillmentConfig[envName][user.org_id].sendToPatient &&
+            fulfillmentConfig[envName][user.org_id].sendToPatientUsers.includes(auth0UserId)
+          : fulfillmentConfig[envName].default.sendToPatient,
       comp: <SendToPatient patient={patient} />
     },
     {
       name: 'Mail Order',
       fulfillmentType: types.FulfillmentType.MailOrder,
       enabled:
-        typeof fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id] !== 'undefined'
-          ? fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id].mailOrder
-          : fulfillmentConfig[process.env.REACT_APP_ENV_NAME].default.mailOrder,
+        typeof fulfillmentConfig[envName][user.org_id] !== 'undefined'
+          ? fulfillmentConfig[envName][user.org_id].mailOrder
+          : fulfillmentConfig[envName].default.mailOrder,
       comp: (
         <MailOrder
           user={user}
