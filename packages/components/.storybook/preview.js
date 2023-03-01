@@ -15,7 +15,6 @@ export const decorators = [
     disposeStory?.();
 
     const solidRoot = document.createElement('div');
-
     disposeStory = render(Story, solidRoot);
 
     return solidRoot;
