@@ -14,7 +14,8 @@ import { SelectPrescriptionsCard } from './SelectPrescriptionsCard';
 import { SelectPharmacyCard } from './SelectPharmacyCard';
 import { PatientAddressCard } from './PatientAddressCard';
 
-import { fulfillmentConfig } from '../../../../configs/fulfillment';
+const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
+const { fulfillmentSettings } = require(`../../../../configs/fulfillment.${envName}.ts`);
 
 const EMPTY_FORM_VALUES = {
   patientId: '',
@@ -131,9 +132,9 @@ export const OrderForm = ({
   };
 
   const orderCreationEnabled =
-    typeof fulfillmentConfig[user.org_id]?.sendOrder !== 'undefined'
-      ? fulfillmentConfig[user.org_id]?.sendOrder
-      : fulfillmentConfig.default.sendOrder;
+    typeof fulfillmentSettings[user.org_id]?.sendOrder !== 'undefined'
+      ? fulfillmentSettings[user.org_id]?.sendOrder
+      : fulfillmentSettings.default.sendOrder;
 
   return (
     <Formik

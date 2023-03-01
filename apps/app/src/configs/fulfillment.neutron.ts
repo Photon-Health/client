@@ -1,11 +1,13 @@
-export const fulfillmentConfig = {
+import { FulfillmentSettings } from '../models/general';
+
+export const fulfillmentSettings: FulfillmentSettings = {
   default: {
     sendOrder: true,
     pickUp: true,
     mailOrder: false,
     mailOrderProviders: [],
-    sendToPatient: true,
-    sendToPatientUsers: [] // its weird to have this here, but its temporary and keeps ts from complaining
+    sendToPatient: false,
+    sendToPatientUsers: []
   },
   // Weekend Health
   [process.env.REACT_APP_WEEKEND_ORG_ID as string]: {
@@ -24,8 +26,7 @@ export const fulfillmentConfig = {
     mailOrderProviders: [],
     sendToPatient: true,
     sendToPatientUsers: [
-      ...(process.env.REACT_APP_TIM_USER_ID ? [process.env.REACT_APP_TIM_USER_ID] : []),
-      ...(process.env.REACT_APP_SARA_USER_ID ? [process.env.REACT_APP_SARA_USER_ID] : [])
+      ...(process.env.REACT_APP_TIM_USER_ID ? [process.env.REACT_APP_TIM_USER_ID] : [])
     ]
   },
   // Peachy
@@ -33,7 +34,9 @@ export const fulfillmentConfig = {
     sendOrder: true,
     pickUp: false,
     mailOrder: true,
-    mailOrderProviders: [process.env.REACT_APP_CUREXA_ORG_ID],
+    mailOrderProviders: [
+      ...(process.env.REACT_APP_CUREXA_ORG_ID ? [process.env.REACT_APP_CUREXA_ORG_ID] : [])
+    ],
     sendToPatient: false,
     sendToPatientUsers: []
   }

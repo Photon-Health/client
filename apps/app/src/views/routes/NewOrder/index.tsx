@@ -25,9 +25,10 @@ import { usePhoton } from '@photonhealth/react';
 import { PATIENT_FIELDS } from '../../../model/fragments';
 import { OrderForm } from './components/OrderForm';
 
-import { fulfillmentConfig } from '../../../configs/fulfillment';
-
 import jwtDecode from 'jwt-decode';
+
+const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
+const { fulfillmentSettings } = require(`../../../configs/fulfillment.${envName}.ts`);
 
 export const NewOrder = () => {
   const [params] = useSearchParams();
@@ -130,9 +131,9 @@ export const NewOrder = () => {
   const isMobile = useBreakpointValue({ base: true, sm: false });
 
   const orderCreationEnabled =
-    typeof fulfillmentConfig[user.org_id]?.sendOrder !== 'undefined'
-      ? fulfillmentConfig[user.org_id]?.sendOrder
-      : fulfillmentConfig.default.sendOrder;
+    typeof fulfillmentSettings[user.org_id]?.sendOrder !== 'undefined'
+      ? fulfillmentSettings[user.org_id]?.sendOrder
+      : fulfillmentSettings.default.sendOrder;
 
   return (
     <Modal
