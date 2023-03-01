@@ -131,9 +131,14 @@ export const OrderForm = ({
   };
 
   const orderCreationEnabled =
-    typeof fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id]?.sendOrder !== 'undefined'
-      ? fulfillmentConfig[process.env.REACT_APP_ENV_NAME][user.org_id]?.sendOrder
-      : fulfillmentConfig[process.env.REACT_APP_ENV_NAME].default.sendOrder;
+    typeof fulfillmentConfig[process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon'][
+      user.org_id
+    ]?.sendOrder !== 'undefined'
+      ? fulfillmentConfig[process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon'][
+          user.org_id
+        ]?.sendOrder
+      : fulfillmentConfig[process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon'].default
+          .sendOrder;
 
   return (
     <Formik
