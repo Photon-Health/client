@@ -1,4 +1,4 @@
-import { FulfillmentSettings } from './fulfillment.boson';
+import { FulfillmentSettings } from '../models/general';
 
 export const fulfillmentSettings: FulfillmentSettings = {
   default: {
