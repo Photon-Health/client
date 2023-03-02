@@ -14,5 +14,5 @@ export const Default: Story = {
 export default {
   title: 'Button',
   tags: ['autodocs'],
-  render: (props) => <Button {...props}></Button>
+  render: (props) => <Button {...props}>hello</Button>
 } as Meta<ComponentProps<typeof Button>>;
