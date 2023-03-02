@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import {
-  Button,
   Card,
   CardHeader,
   Heading,
@@ -10,10 +9,7 @@ import {
   Tab,
   TabPanels,
   TabPanel,
-  useDisclosure,
-  CardBody,
-  Checkbox,
-  Text
+  useDisclosure
 } from '@chakra-ui/react';
 
 import { types } from '@photonhealth/react';
@@ -21,14 +17,17 @@ import { types } from '@photonhealth/react';
 import { LocationSearch } from '../../../../components/LocationSearch';
 import { LocalPickup } from './components/LocalPickup';
 import { MailOrder } from './components/MailOrder';
-import { Pharmacy } from './components/Pharmacy';
 import { Address } from '../../../../../models/general';
 // import { SendToPatient } from './components/SendToPatient';
 
+const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
+const { fulfillmentSettings } = require(`../../../../../configs/fulfillment.${envName}.ts`);
+
 interface SelectPharmacyCardProps {
+  user: any;
+  auth0UserId: string;
   patient: any;
   address: Address;
-  onlyCurexa: boolean;
   errors: any;
   touched: any;
   pharmacyId: string;
@@ -38,9 +37,10 @@ interface SelectPharmacyCardProps {
 }
 
 export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
+  user,
+  auth0UserId,
   patient,
   address,
-  onlyCurexa,
   errors,
   touched,
   pharmacyId,
@@ -52,7 +52,6 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
   const [longitude, setLongitude] = useState<number | undefined>(undefined);
   const [location, setLocation] = useState('');
 
-  const [selectedTab, setSelectedTab] = useState(onlyCurexa ? 1 : 0);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleModalClose = ({
@@ -72,11 +71,21 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     onClose();
   };
 
+  const resetSelection = () => {
+    setFieldValue('pharmacyId', '');
+    setUpdatePreferredPharmacy(false);
+  };
+
+  const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
+
   const tabsList = [
     {
       name: 'Local Pickup',
       fulfillmentType: types.FulfillmentType.PickUp,
-      isDisabled: onlyCurexa,
+      enabled:
+        typeof fulfillmentSettings[user.org_id] !== 'undefined'
+          ? fulfillmentSettings[user.org_id].pickUp
+          : fulfillmentSettings.default.pickUp,
       comp: (
         <LocalPickup
           location={location}
@@ -85,23 +94,44 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
           onOpen={onOpen}
           errors={errors}
           touched={touched}
+          patient={patient}
+          pharmacyId={pharmacyId}
+          updatePreferredPharmacy={updatePreferredPharmacy}
+          setUpdatePreferredPharmacy={setUpdatePreferredPharmacy}
           preferredPharmacyIds={
             patient?.preferredPharmacies?.map((pharmacy: any) => pharmacy.id) || []
           }
           setFieldValue={setFieldValue}
+          resetSelection={resetSelection}
         />
       )
     },
     {
+      name: 'Send to Patient',
+      fulfillmentType: undefined,
+      enabled:
+        typeof fulfillmentSettings[user.org_id] !== 'undefined'
+          ? fulfillmentSettings[user.org_id].sendToPatient &&
+            fulfillmentSettings[user.org_id].sendToPatientUsers.includes(auth0UserId)
+          : fulfillmentSettings.default.sendToPatient,
+      comp: <SendToPatient patient={patient} />
+    },
+    {
       name: 'Mail Order',
       fulfillmentType: types.FulfillmentType.MailOrder,
-      isDisabled: !onlyCurexa,
+      enabled:
+        typeof fulfillmentSettings[user.org_id] !== 'undefined'
+          ? fulfillmentSettings[user.org_id].mailOrder
+          : fulfillmentSettings.default.mailOrder,
       comp: (
         <MailOrder
+          user={user}
+          pharmacyId={pharmacyId}
           location={location}
           setFieldValue={setFieldValue}
           errors={errors}
           touched={touched}
+          resetSelection={resetSelection}
         />
       )
     }
@@ -113,14 +143,12 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     // }
   ];
 
+  const [selectedTab, setSelectedTab] = useState(tabsList.findIndex((tab) => tab.enabled) || 0);
+
   const handleTabChange = (index: number) => {
+    resetSelection();
     setFieldValue('fulfillmentType', tabsList[index].fulfillmentType);
     setSelectedTab(index);
-  };
-
-  const handleChangeBtnClick = () => {
-    setFieldValue('pharmacyId', '');
-    setUpdatePreferredPharmacy(false);
   };
 
   useEffect(() => {
@@ -155,54 +183,28 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     }
   }, [address]);
 
-  const isPreferred =
-    pharmacyId && patient?.preferredPharmacies?.some(({ id }: { id: string }) => id === pharmacyId);
-
   return (
     <Card bg="bg-surface">
       <LocationSearch isOpen={isOpen} onClose={handleModalClose} />
       <CardHeader>
         <HStack w="full" justify="space-between">
-          <Heading size="xxs">{pharmacyId ? 'Pharmacy' : 'Select a Pharmacy'}</Heading>
-          {pharmacyId ? (
-            <Button onClick={handleChangeBtnClick} size="xs">
-              Change
-            </Button>
-          ) : null}
+          <Heading size="xxs">Select a Pharmacy Option</Heading>
         </HStack>
       </CardHeader>
-      {pharmacyId ? (
-        <CardBody pt={0}>
-          <Pharmacy pharmacyId={pharmacyId} isPreferred={isPreferred} />
-          {isPreferred ? null : (
-            <Checkbox
-              pt={2}
-              isChecked={updatePreferredPharmacy}
-              onChange={(e) => setUpdatePreferredPharmacy(e.target.checked)}
-            >
-              Save as Patient's Preferred Pharmacy{' '}
-              <Text as="span" fontSize="xs" color="gray.400">
-                Optional
-              </Text>
-            </Checkbox>
-          )}
-        </CardBody>
-      ) : (
-        <Tabs index={selectedTab} onChange={handleTabChange} variant="enclosed">
-          <TabList px={5}>
-            {tabsList.map(({ isDisabled, name }) => (
-              <Tab key={`${name}-tab`} p={3} whiteSpace="nowrap" isDisabled={isDisabled}>
-                {name}
-              </Tab>
-            ))}
-          </TabList>
-          <TabPanels p={1}>
-            {tabsList.map(({ comp, name }) => (
-              <TabPanel key={`${name}-panel`}>{comp}</TabPanel>
-            ))}
-          </TabPanels>
-        </Tabs>
-      )}
+      <Tabs index={selectedTab} onChange={handleTabChange} variant="enclosed">
+        <TabList px={5}>
+          {tabsList.map(({ enabled, name }) => (
+            <Tab key={`${name}-tab`} p={3} whiteSpace="nowrap" isDisabled={!enabled}>
+              {name}
+            </Tab>
+          ))}
+        </TabList>
+        <TabPanels p={1}>
+          {tabsList.map(({ comp, name }) => (
+            <TabPanel key={`${name}-panel`}>{comp}</TabPanel>
+          ))}
+        </TabPanels>
+      </Tabs>
     </Card>
   );
 };
