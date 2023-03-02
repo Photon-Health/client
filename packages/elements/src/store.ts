@@ -274,7 +274,7 @@ export class PhotonClientStore {
     try {
       const token = await this.sdk.authentication.getAccessToken();
       const decoded: { permissions: Permission[] } = jwtDecode(token);
-      permissions = decoded.permissions;
+      permissions = decoded?.permissions || [];
     } catch (err) {
       permissions = [];
     }
