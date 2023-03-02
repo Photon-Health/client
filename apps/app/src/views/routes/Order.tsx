@@ -27,7 +27,7 @@ import {
 
 import { usePhoton, types } from '@photonhealth/react';
 
-import { FiArrowUpRight, FiCheck, FiClock, FiCopy, FiX } from 'react-icons/fi';
+import { FiArrowUpRight, FiCheck, FiClock, FiCopy, FiCornerUpRight, FiX } from 'react-icons/fi';
 import { Page } from '../components/Page';
 import PatientView from '../components/PatientView';
 
@@ -42,12 +42,14 @@ const ORDER_FULFILLMENT_TYPE_MAP = {
 
 const ORDER_STATE_MAP: object = {
   PLACED: 'Placed',
+  ROUTING: 'Routing',
   PENDING: 'Pending',
   CANCELED: 'Canceled',
   COMPLETED: 'Completed'
 };
 const ORDER_STATE_ICON_MAP: any = {
   PLACED: FiArrowUpRight,
+  ROUTING: FiCornerUpRight,
   PENDING: FiClock,
   CANCELED: FiX,
   COMPLETED: FiCheck

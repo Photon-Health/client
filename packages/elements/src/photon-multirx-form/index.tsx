@@ -328,7 +328,7 @@ customElement(
                 <sl-spinner style="font-size: 3rem;"></sl-spinner>
               </div>
             </Show>
-            <PhotonAuthorized>
+            <PhotonAuthorized permissions={['write:prescription']}>
               <PatientCard
                 actions={actions}
                 store={store}

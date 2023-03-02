@@ -17,22 +17,22 @@ export const DraftPrescriptionCard = (props: {
 
   props.actions.registerValidator({
     key: 'draftPrescriptions',
-    validator: draftPrescriptionsValidator,
+    validator: draftPrescriptionsValidator
   });
 
   return (
     <photon-card>
       <photon-dialog
         open={dialogOpen()}
-        label="Lose pending prescription?"
-        confirm-text="Yes, Cancel"
-        cancel-text="No, Keep Editing"
+        label="Delete pending prescription?"
+        confirm-text="Yes, Delete"
+        cancel-text="No, Cancel"
         on:photon-dialog-confirmed={() => {
           props.actions.updateFormValue({
             key: 'draftPrescriptions',
             value: props.store['draftPrescriptions'].value.filter(
               (x: any) => x.id !== selectedDraft()
-            ),
+            )
           });
           setDialogOpen(false);
           setSelectedDraft(undefined);
@@ -43,8 +43,8 @@ export const DraftPrescriptionCard = (props: {
         }}
       >
         <p class="font-sans text-lg xs:text-base">
-          You have selected to remove a pending prescription. Continuing will remove it from the
-          list of prescriptions to be created.
+          Deleting this prescription will remove it from your pending prescriptions. This action
+          cannot be undone.
         </p>
       </photon-dialog>
       <div class="flex flex-col gap-3">
