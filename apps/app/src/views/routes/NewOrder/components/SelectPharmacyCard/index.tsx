@@ -76,8 +76,6 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     setUpdatePreferredPharmacy(false);
   };
 
-  const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
-
   const tabsList = [
     {
       name: 'Local Pickup',
