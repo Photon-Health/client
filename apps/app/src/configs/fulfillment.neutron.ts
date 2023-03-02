@@ -46,8 +46,9 @@ export const fulfillmentSettings: FulfillmentSettings = {
     pickUp: true,
     mailOrder: false,
     mailOrderProviders: [],
-    sendToPatient: true,
+    sendToPatient: false, // disabled for org
     sendToPatientUsers: [
+      // enabled for these users
       ...(process.env.REACT_APP_TIM_USER_ID ? [process.env.REACT_APP_TIM_USER_ID] : [])
     ]
   },

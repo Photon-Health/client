@@ -109,7 +109,7 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
       fulfillmentType: undefined,
       enabled:
         typeof fulfillmentSettings[user.org_id] !== 'undefined'
-          ? fulfillmentSettings[user.org_id].sendToPatient &&
+          ? fulfillmentSettings[user.org_id].sendToPatient ||
             fulfillmentSettings[user.org_id].sendToPatientUsers.includes(auth0UserId)
           : fulfillmentSettings.default.sendToPatient,
       comp: <SendToPatient patient={patient} />
