@@ -11,7 +11,7 @@ export const fulfillmentSettings: FulfillmentSettings = {
   },
   // Test Telehealth (us)
   [process.env.REACT_APP_TEST_ORG_ID as string]: {
-    sendOrder: false,
+    sendOrder: true,
     pickUp: true,
     mailOrder: true,
     mailOrderProviders: [
