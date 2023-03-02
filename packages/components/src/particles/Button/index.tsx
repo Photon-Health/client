@@ -1,52 +1,21 @@
 import { clsx } from 'clsx';
 
-type ButtonVariant =
-  | 'primary'
-  | 'secondary'
-  | 'accent'
-  | 'info'
-  | 'success'
-  | 'warning'
-  | 'error'
-  | 'ghost'
-  | 'link';
-type ButtonSize = 'lg' | 'md' | 'sm' | 'xs';
+type ButtonVariant = 'primary' | 'secondary';
+type ButtonSize = 'xl' | 'lg' | 'md' | 'sm' | 'xs';
 
 export interface ButtonProps {
   onClick?: () => void;
   disabled?: boolean;
   variant?: ButtonVariant;
   size?: ButtonSize;
-  isOutline?: boolean;
-  isActive?: boolean;
-  isDisabled?: boolean;
-  isGlass?: boolean;
-  isLoading?: boolean;
-  hasNoAnimation?: boolean;
-  isWide?: boolean;
-  isBlock?: boolean;
-  isCircle?: boolean;
-  isSquare?: boolean;
-  className?: string;
   children: string;
 }
 
 export default function Button({
   onClick,
   disabled = false,
-  variant,
+  variant = 'primary',
   size = 'md',
-  isOutline,
-  isActive,
-  isDisabled,
-  isGlass,
-  isLoading,
-  hasNoAnimation,
-  isWide,
-  isBlock,
-  isCircle,
-  isSquare,
-  className,
   children
 }: ButtonProps) {
   function handleClick() {
@@ -56,33 +25,21 @@ export default function Button({
   }
 
   const buttonClasses = clsx(
-    'btn',
-    // why so verbose? https://github.com/saadeghi/daisyui/discussions/1631#discussioncomment-5081856
-    variant === 'primary' && `btn-primary`,
-    variant === 'secondary' && `btn-secondary`,
-    variant === 'accent' && `btn-accent`,
-    variant === 'info' && `btn-info`,
-    variant === 'success' && `btn-success`,
-    variant === 'warning' && `btn-warning`,
-    variant === 'error' && `btn-error`,
-    variant === 'ghost' && `btn-ghost`,
-    variant === 'link' && `btn-link`,
-    size === 'lg' && `btn-lg`,
-    size === 'md' && `btn-md`,
-    size === 'sm' && `btn-sm`,
-    size === 'xs' && `btn-xs`,
-    isOutline && 'btn-outline',
-    isActive && 'btn-active',
-    isDisabled && 'btn-disabled',
-    isGlass && 'glass',
-    isLoading && 'loading',
-    hasNoAnimation && 'no-animation',
-    isWide && 'btn-wide',
-    isBlock && 'btn-block',
-    isCircle && 'btn-circle',
-    isSquare && 'btn-square',
-    disabled && 'disabled',
-    className
+    'rounded',
+    'text-white',
+    'shadow-sm',
+    'focus-visible:outline',
+    'focus-visible:outline-2',
+    'focus-visible:outline-offset-2',
+    variant === 'primary' ? 'bg-indigo-600' : 'bg-gray-400',
+    size === 'xl' && 'text-lg py-4 px-6',
+    size === 'lg' && 'text-base py-3 px-4',
+    size === 'md' && 'text-sm py-2 px-3',
+    size === 'sm' && 'text-xs py-1.5 px-2.5',
+    size === 'xs' && 'text-xs py-1 px-2',
+    disabled
+      ? 'opacity-50 cursor-not-allowed'
+      : 'hover:bg-indigo-500 focus-visible:outline-indigo-600'
   );
 
   return (

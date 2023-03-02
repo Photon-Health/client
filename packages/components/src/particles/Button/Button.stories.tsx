@@ -14,5 +14,19 @@ export const Default: Story = {
 export default {
   title: 'Button',
   tags: ['autodocs'],
+  argTypes: {
+    variant: {
+      options: ['primary', 'secondary'],
+      control: {
+        type: 'select'
+      }
+    },
+    size: {
+      options: ['xl', 'lg', 'md', 'sm', 'xs'],
+      control: {
+        type: 'select'
+      }
+    }
+  },
   render: (props) => <Button {...props}>hello</Button>
 } as Meta<ComponentProps<typeof Button>>;
