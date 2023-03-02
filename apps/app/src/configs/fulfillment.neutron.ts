@@ -9,6 +9,17 @@ export const fulfillmentSettings: FulfillmentSettings = {
     sendToPatient: false,
     sendToPatientUsers: []
   },
+  // Test Telehealth (us)
+  [process.env.REACT_APP_TEST_ORG_ID as string]: {
+    sendOrder: false,
+    pickUp: true,
+    mailOrder: true,
+    mailOrderProviders: [
+      ...(process.env.REACT_APP_CUREXA_ORG_ID ? [process.env.REACT_APP_CUREXA_ORG_ID] : [])
+    ],
+    sendToPatient: true,
+    sendToPatientUsers: []
+  },
   // Weekend Health
   [process.env.REACT_APP_WEEKEND_ORG_ID as string]: {
     sendOrder: false,
