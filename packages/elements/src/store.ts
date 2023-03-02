@@ -269,8 +269,14 @@ export class PhotonClientStore {
     const user = await this.sdk.authentication.getUser();
     const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
 
-    const token = await this.sdk.authentication.getAccessToken();
-    const { permissions }: { permissions: Permission[] } = jwtDecode(token);
+    let permissions: Permission[];
+    try {
+      const token = await this.sdk.authentication.getAccessToken();
+      const decoded: { permissions: Permission[] } = jwtDecode(token);
+      permissions = decoded.permissions;
+    } catch (err) {
+      permissions = [];
+    }
 
     this.setStore('authentication', {
       ...this.store.authentication,
