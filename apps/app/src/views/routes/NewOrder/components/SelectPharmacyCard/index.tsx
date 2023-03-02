@@ -18,7 +18,7 @@ import { LocationSearch } from '../../../../components/LocationSearch';
 import { LocalPickup } from './components/LocalPickup';
 import { MailOrder } from './components/MailOrder';
 import { Address } from '../../../../../models/general';
-// import { SendToPatient } from './components/SendToPatient';
+import { SendToPatient } from './components/SendToPatient';
 
 const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
 const { fulfillmentSettings } = require(`../../../../../configs/fulfillment.${envName}.ts`);
@@ -75,8 +75,6 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     setFieldValue('pharmacyId', '');
     setUpdatePreferredPharmacy(false);
   };
-
-  const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
 
   const tabsList = [
     {
@@ -135,12 +133,6 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
         />
       )
     }
-    // {
-    //   name: 'Send to patient',
-    //   fulfillmentType: undefined,
-    //   isDisabled: onlyCurexa,
-    //   comp: <SendToPatient patient={patient} />
-    // }
   ];
 
   const [selectedTab, setSelectedTab] = useState(tabsList.findIndex((tab) => tab.enabled) || 0);
