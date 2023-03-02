@@ -1,0 +1,54 @@
+name: Check and Publish Subpackages
+
+on:
+  push:
+    branches:
+      - boson
+
+jobs:
+  check-and-publish:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Check for updates
+        run: |
+          cd packages
+          for package in */; do
+            package=${package%/}
+            CURRENT_VERSION=$(npm ls | grep $package | awk '{print $2}' | sed 's/[^0-9.]//g')
+            LATEST_VERSION=$(npm view $package version)
+            echo "Package: $package"
+            echo "Current version: $CURRENT_VERSION"
+            echo "Latest version: $LATEST_VERSION"
+            if [[ "$CURRENT_VERSION" != "$LATEST_VERSION" ]]; then
+              echo "Version update found for $package. Publishing package..."
+              cd $package
+              npm publish
+              cd ..
+
+              # Create GitHub release tag
+              RELEASE_TAG="$package""_v""$LATEST_VERSION"
+              PR_TITLE=$(echo "${{ github.event.head_commit.message }}" | awk -F'[\r\n]+ ' '{print $1}')
+              PR_BODY=$(echo "${{ github.event.head_commit.message }}" | awk -F'[\r\n]+ ' '{print $2}')
+              echo "Creating release tag $RELEASE_TAG with title $PR_TITLE and body $PR_BODY"
+              curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/releases -d "{\"tag_name\":\"$RELEASE_TAG\",\"name\":\"$PR_TITLE\",\"body\":\"$PR_BODY\"}"
+            else
+              echo "Package $package is up-to-date. Skipping publish."
+            fi
+          done
