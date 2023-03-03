@@ -22,7 +22,67 @@ export const DraftPrescriptionCard = (props: {
 
   const editPrescription = (id: string) => {
     const draft = props.store['draftPrescriptions'].value.find((x: any) => x.id === id);
+    console.log('draft', draft);
+    //   props.actions.updateFormValue({
+    //     key: 'treatment',
+    //     value: e.detail.data.treatment
+    //   });
+    //   if (e.detail.data.dispenseAsWritten) {
+    //     props.actions.updateFormValue({
+    //       key: 'dispenseAsWritten',
+    //       value: e.detail.data.dispenseAsWritten
+    //     });
+    //   }
+    //   if (e.detail.data.dispenseQuantity) {
+    //     props.actions.updateFormValue({
+    //       key: 'dispenseQuantity',
+    //       value: Number(e.detail.data.dispenseQuantity)
+    //     });
+    //   }
+    //   if (e.detail.data.dispenseUnit) {
+    //     props.actions.updateFormValue({
+    //       key: 'dispenseUnit',
+    //       value: e.detail.data.dispenseUnit
+    //     });
+    //   }
+    //   if (e.detail.data.daysSupply) {
+    //     props.actions.updateFormValue({
+    //       key: 'daysSupply',
+    //       value: Number(e.detail.data.daysSupply)
+    //     });
+    //   }
+    //   // if a template is selected in the treatment dropdown, field needs to update to use the fillsAllowed value from the template.
+    //   // this is why there is a -1 here.
+    //   if (e.detail.data.fillsAllowed) {
+    //     props.actions.updateFormValue({
+    //       key: 'refillsInput',
+    //       value: Number(e.detail.data.fillsAllowed) - 1
+    //     });
+    //   }
+    //   if (e.detail.data.instructions) {
+    //     props.actions.updateFormValue({
+    //       key: 'instructions',
+    //       value: e.detail.data.instructions
+    //     });
+    //   }
+    //   if (e.detail.data.notes) {
+    //     props.actions.updateFormValue({
+    //       key: 'notes',
+    //       value: e.detail.data.notes
+    //     });
+    //   }
+    // } else {
+    //   props.actions.updateFormValue({
+    //     key: 'treatment',
+    //     value: e.detail.data
+    //   });
+    // }
+    // props.actions.updateFormValue({
+    //   key: 'catalogId',
+    //   value: e.detail.catalogId
+    // });
 
+    // remove the draft from the list
     props.actions.updateFormValue({
       key: 'draftPrescriptions',
       value: props.store['draftPrescriptions'].value.filter((x: any) => x.id !== id)
