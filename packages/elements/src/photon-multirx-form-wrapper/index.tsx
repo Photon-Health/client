@@ -195,7 +195,7 @@ customElement(
           title="New Prescriptions"
           titleIconName="prescription"
           headerRight={
-            <div class="flex flex-row sm:flex-col md:flex-col lg:flex-row gap-2 justify-end items-end">
+            <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
               <photon-button
                 size="sm"
                 variant="outline"
@@ -204,7 +204,7 @@ customElement(
                 loading={isLoading()}
                 on:photon-clicked={() => submitForm(form(), actions(), false)}
               >
-                Save prescriptions
+                <span className="text-xs lg:text-sm">Save prescriptions</span>
               </photon-button>
               <photon-button
                 size="sm"
@@ -215,7 +215,7 @@ customElement(
                   form()?.treatment?.value?.name ? setContinueSubmitOpen(true) : handleSubmit()
                 }
               >
-                Save and create order
+                <span className="text-xs lg:text-sm">Save and create order</span>
               </photon-button>
             </div>
           }
