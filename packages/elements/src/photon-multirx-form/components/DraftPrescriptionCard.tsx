@@ -8,6 +8,7 @@ const draftPrescriptionsValidator = message(
 );
 
 export const DraftPrescriptionCard = (props: {
+  prescriptionRef: HTMLDivElement | undefined;
   actions: Record<string, Function>;
   store: Record<string, any>;
   isLoading: boolean;
@@ -22,70 +23,74 @@ export const DraftPrescriptionCard = (props: {
 
   const editPrescription = (id: string) => {
     const draft = props.store['draftPrescriptions'].value.find((x: any) => x.id === id);
-    console.log('draft', draft);
-    //   props.actions.updateFormValue({
-    //     key: 'treatment',
-    //     value: e.detail.data.treatment
-    //   });
-    //   if (e.detail.data.dispenseAsWritten) {
-    //     props.actions.updateFormValue({
-    //       key: 'dispenseAsWritten',
-    //       value: e.detail.data.dispenseAsWritten
-    //     });
-    //   }
-    //   if (e.detail.data.dispenseQuantity) {
-    //     props.actions.updateFormValue({
-    //       key: 'dispenseQuantity',
-    //       value: Number(e.detail.data.dispenseQuantity)
-    //     });
-    //   }
-    //   if (e.detail.data.dispenseUnit) {
-    //     props.actions.updateFormValue({
-    //       key: 'dispenseUnit',
-    //       value: e.detail.data.dispenseUnit
-    //     });
-    //   }
-    //   if (e.detail.data.daysSupply) {
-    //     props.actions.updateFormValue({
-    //       key: 'daysSupply',
-    //       value: Number(e.detail.data.daysSupply)
-    //     });
-    //   }
-    //   // if a template is selected in the treatment dropdown, field needs to update to use the fillsAllowed value from the template.
-    //   // this is why there is a -1 here.
-    //   if (e.detail.data.fillsAllowed) {
-    //     props.actions.updateFormValue({
-    //       key: 'refillsInput',
-    //       value: Number(e.detail.data.fillsAllowed) - 1
-    //     });
-    //   }
-    //   if (e.detail.data.instructions) {
-    //     props.actions.updateFormValue({
-    //       key: 'instructions',
-    //       value: e.detail.data.instructions
-    //     });
-    //   }
-    //   if (e.detail.data.notes) {
-    //     props.actions.updateFormValue({
-    //       key: 'notes',
-    //       value: e.detail.data.notes
-    //     });
-    //   }
-    // } else {
-    //   props.actions.updateFormValue({
-    //     key: 'treatment',
-    //     value: e.detail.data
-    //   });
-    // }
-    // props.actions.updateFormValue({
-    //   key: 'catalogId',
-    //   value: e.detail.catalogId
-    // });
+
+    props.actions.updateFormValue({
+      key: 'treatment',
+      value: draft.treatment
+    });
+    if (draft.dispenseAsWritten) {
+      props.actions.updateFormValue({
+        key: 'dispenseAsWritten',
+        value: draft.dispenseAsWritten
+      });
+    }
+    if (draft.dispenseQuantity) {
+      props.actions.updateFormValue({
+        key: 'dispenseQuantity',
+        value: Number(draft.dispenseQuantity)
+      });
+    }
+    if (draft.dispenseUnit) {
+      props.actions.updateFormValue({
+        key: 'dispenseUnit',
+        value: draft.dispenseUnit
+      });
+    }
+    if (draft.daysSupply) {
+      props.actions.updateFormValue({
+        key: 'daysSupply',
+        value: Number(draft.daysSupply)
+      });
+    }
+    // if a template is selected in the treatment dropdown, field needs to update to use the fillsAllowed value from the template.
+    // this is why there is a -1 here.
+    if (draft.fillsAllowed) {
+      props.actions.updateFormValue({
+        key: 'refillsInput',
+        value: Number(draft.fillsAllowed) - 1
+      });
+    }
+    if (draft.instructions) {
+      props.actions.updateFormValue({
+        key: 'instructions',
+        value: draft.instructions
+      });
+    }
+    if (draft.notes) {
+      props.actions.updateFormValue({
+        key: 'notes',
+        value: draft.notes
+      });
+    }
+
+    props.actions.updateFormValue({
+      key: 'catalogId',
+      value: draft.catalogId
+    });
 
     // remove the draft from the list
     props.actions.updateFormValue({
       key: 'draftPrescriptions',
       value: props.store['draftPrescriptions'].value.filter((x: any) => x.id !== id)
+    });
+    console.log(props.prescriptionRef);
+
+    window.scrollTo({
+      behavior: 'smooth',
+      top:
+        (props.prescriptionRef?.getBoundingClientRect().top || 0) -
+        document.body.getBoundingClientRect().top -
+        70
     });
   };
 
@@ -147,7 +152,7 @@ export const DraftPrescriptionCard = (props: {
             return (
               <photon-card>
                 <div class="flex flex-row items-center">
-                  <div class="flex flex-col flex-grow" style="max-width: calc(100% - 36px);">
+                  <div class="flex flex-col flex-grow">
                     <p class="font-medium font-sans">{draft.treatment.name}</p>
                     <p class="font-normal text-gray-700 overflow-hidden whitespace-nowrap overflow-ellipsis font-sans">
                       {/* draft.refillsInput exists here because we are displaying the number of refills, not fills, the user entered into the form as part of the drafted prescription.
@@ -156,7 +161,7 @@ export const DraftPrescriptionCard = (props: {
                       {draft.instructions}
                     </p>
                   </div>
-                  <div>
+                  <div class="flex flex-row">
                     <sl-icon-button
                       class="self-end text-xl edit-icon-button"
                       name="pencil-square"
