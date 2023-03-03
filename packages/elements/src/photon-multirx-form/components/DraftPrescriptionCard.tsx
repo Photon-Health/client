@@ -1,6 +1,7 @@
 import { createSignal, For, Show } from 'solid-js';
 import { message } from '../../validators';
 import { size, array, any } from 'superstruct';
+import repopulateForm from '../util/repopulateForm';
 
 const draftPrescriptionsValidator = message(
   size(array(any()), 1, Infinity),
@@ -25,54 +26,7 @@ export const DraftPrescriptionCard = (props: {
 
   const editPrescription = () => {
     if (editDraft().treatment) {
-      props.actions.updateFormValue({
-        key: 'treatment',
-        value: editDraft().treatment
-      });
-      if (editDraft().dispenseAsWritten) {
-        props.actions.updateFormValue({
-          key: 'dispenseAsWritten',
-          value: editDraft().dispenseAsWritten
-        });
-      }
-      if (editDraft().dispenseQuantity) {
-        props.actions.updateFormValue({
-          key: 'dispenseQuantity',
-          value: Number(editDraft().dispenseQuantity)
-        });
-      }
-      if (editDraft().dispenseUnit) {
-        props.actions.updateFormValue({
-          key: 'dispenseUnit',
-          value: editDraft().dispenseUnit
-        });
-      }
-      if (editDraft().daysSupply) {
-        props.actions.updateFormValue({
-          key: 'daysSupply',
-          value: Number(editDraft().daysSupply)
-        });
-      }
-      // if a template is selected in the treatment dropdown, field needs to update to use the fillsAllowed value from the template.
-      // this is why there is a -1 here.
-      if (editDraft().fillsAllowed) {
-        props.actions.updateFormValue({
-          key: 'refillsInput',
-          value: Number(editDraft().fillsAllowed) - 1
-        });
-      }
-      if (editDraft().instructions) {
-        props.actions.updateFormValue({
-          key: 'instructions',
-          value: editDraft().instructions
-        });
-      }
-      if (editDraft().notes) {
-        props.actions.updateFormValue({
-          key: 'notes',
-          value: editDraft().notes
-        });
-      }
+      repopulateForm(props.actions, editDraft());
 
       props.actions.updateFormValue({
         key: 'catalogId',
