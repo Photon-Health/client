@@ -157,7 +157,7 @@ export const AddPrescriptionCard = (props: {
             ></photon-checkbox>
             <photon-med-search-dialog ref={medSearchRef}></photon-med-search-dialog>
           </div>
-          <div class="py-4 md:py-2">
+          <div class="py-4 md:py-2 text-right">
             <a
               class="font-sans text-gray-500 text-sm hover:text-black hover:cursor-pointer"
               onClick={() => (medSearchRef.open = true)}
