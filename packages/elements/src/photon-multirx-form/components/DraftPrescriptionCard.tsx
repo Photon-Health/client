@@ -13,91 +13,122 @@ export const DraftPrescriptionCard = (props: {
   store: Record<string, any>;
   isLoading: boolean;
 }) => {
-  const [dialogOpen, setDialogOpen] = createSignal<boolean>(false);
-  const [selectedDraft, setSelectedDraft] = createSignal<string | undefined>();
+  const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
+  const [editDialogOpen, setEditDialogOpen] = createSignal<boolean>(false);
+  const [editDraft, setEditDraft] = createSignal<any>(undefined);
+  const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
 
   props.actions.registerValidator({
     key: 'draftPrescriptions',
     validator: draftPrescriptionsValidator
   });
 
-  const editPrescription = (id: string) => {
+  const editPrescription = () => {
+    if (editDraft().treatment) {
+      props.actions.updateFormValue({
+        key: 'treatment',
+        value: editDraft().treatment
+      });
+      if (editDraft().dispenseAsWritten) {
+        props.actions.updateFormValue({
+          key: 'dispenseAsWritten',
+          value: editDraft().dispenseAsWritten
+        });
+      }
+      if (editDraft().dispenseQuantity) {
+        props.actions.updateFormValue({
+          key: 'dispenseQuantity',
+          value: Number(editDraft().dispenseQuantity)
+        });
+      }
+      if (editDraft().dispenseUnit) {
+        props.actions.updateFormValue({
+          key: 'dispenseUnit',
+          value: editDraft().dispenseUnit
+        });
+      }
+      if (editDraft().daysSupply) {
+        props.actions.updateFormValue({
+          key: 'daysSupply',
+          value: Number(editDraft().daysSupply)
+        });
+      }
+      // if a template is selected in the treatment dropdown, field needs to update to use the fillsAllowed value from the template.
+      // this is why there is a -1 here.
+      if (editDraft().fillsAllowed) {
+        props.actions.updateFormValue({
+          key: 'refillsInput',
+          value: Number(editDraft().fillsAllowed) - 1
+        });
+      }
+      if (editDraft().instructions) {
+        props.actions.updateFormValue({
+          key: 'instructions',
+          value: editDraft().instructions
+        });
+      }
+      if (editDraft().notes) {
+        props.actions.updateFormValue({
+          key: 'notes',
+          value: editDraft().notes
+        });
+      }
+
+      props.actions.updateFormValue({
+        key: 'catalogId',
+        value: editDraft().catalogId
+      });
+
+      // remove the draft from the list
+      props.actions.updateFormValue({
+        key: 'draftPrescriptions',
+        value: props.store['draftPrescriptions'].value.filter((x: any) => x.id !== editDraft().id)
+      });
+
+      window.scrollTo({
+        behavior: 'smooth',
+        top:
+          (props.prescriptionRef?.getBoundingClientRect().top || 0) -
+          document.body.getBoundingClientRect().top -
+          70
+      });
+    }
+  };
+
+  const checkEditPrescription = (id: string) => {
     const draft = props.store['draftPrescriptions'].value.find((x: any) => x.id === id);
+    setEditDraft(draft);
 
-    props.actions.updateFormValue({
-      key: 'treatment',
-      value: draft.treatment
-    });
-    if (draft.dispenseAsWritten) {
-      props.actions.updateFormValue({
-        key: 'dispenseAsWritten',
-        value: draft.dispenseAsWritten
-      });
+    if (!props.store['treatment'].value) {
+      editPrescription();
+    } else {
+      setEditDialogOpen(true);
     }
-    if (draft.dispenseQuantity) {
-      props.actions.updateFormValue({
-        key: 'dispenseQuantity',
-        value: Number(draft.dispenseQuantity)
-      });
-    }
-    if (draft.dispenseUnit) {
-      props.actions.updateFormValue({
-        key: 'dispenseUnit',
-        value: draft.dispenseUnit
-      });
-    }
-    if (draft.daysSupply) {
-      props.actions.updateFormValue({
-        key: 'daysSupply',
-        value: Number(draft.daysSupply)
-      });
-    }
-    // if a template is selected in the treatment dropdown, field needs to update to use the fillsAllowed value from the template.
-    // this is why there is a -1 here.
-    if (draft.fillsAllowed) {
-      props.actions.updateFormValue({
-        key: 'refillsInput',
-        value: Number(draft.fillsAllowed) - 1
-      });
-    }
-    if (draft.instructions) {
-      props.actions.updateFormValue({
-        key: 'instructions',
-        value: draft.instructions
-      });
-    }
-    if (draft.notes) {
-      props.actions.updateFormValue({
-        key: 'notes',
-        value: draft.notes
-      });
-    }
-
-    props.actions.updateFormValue({
-      key: 'catalogId',
-      value: draft.catalogId
-    });
-
-    // remove the draft from the list
-    props.actions.updateFormValue({
-      key: 'draftPrescriptions',
-      value: props.store['draftPrescriptions'].value.filter((x: any) => x.id !== id)
-    });
-    console.log(props.prescriptionRef);
-
-    window.scrollTo({
-      behavior: 'smooth',
-      top:
-        (props.prescriptionRef?.getBoundingClientRect().top || 0) -
-        document.body.getBoundingClientRect().top -
-        70
-    });
   };
 
   return (
     <photon-card>
       <photon-dialog
-        open={dialogOpen()}
+        open={editDialogOpen()}
+        label="Delete unadded prescription?"
+        confirm-text="Yes, Delete"
+        cancel-text="No, Cancel"
+        on:photon-dialog-confirmed={() => {
+          editPrescription();
+          setEditDialogOpen(false);
+          setEditDraft(undefined);
+        }}
+        on:photon-dialog-canceled={() => {
+          setEditDialogOpen(false);
+          setEditDraft(undefined);
+        }}
+      >
+        <p class="font-sans text-lg xs:text-base">
+          Deleting the unadded prescription will remove your updates from the form.
+        </p>
+      </photon-dialog>
+      <photon-dialog
+        open={deleteDialogOpen()}
         label="Delete pending prescription?"
         confirm-text="Yes, Delete"
         cancel-text="No, Cancel"
@@ -105,15 +136,15 @@ export const DraftPrescriptionCard = (props: {
           props.actions.updateFormValue({
             key: 'draftPrescriptions',
             value: props.store['draftPrescriptions'].value.filter(
-              (x: any) => x.id !== selectedDraft()
+              (x: any) => x.id !== deleteDraftId()
             )
           });
-          setDialogOpen(false);
-          setSelectedDraft(undefined);
+          setDeleteDialogOpen(false);
+          setDeleteDraftId(undefined);
         }}
         on:photon-dialog-canceled={() => {
-          setDialogOpen(false);
-          setSelectedDraft(undefined);
+          setDeleteDialogOpen(false);
+          setDeleteDraftId(undefined);
         }}
       >
         <p class="font-sans text-lg xs:text-base">
@@ -166,15 +197,15 @@ export const DraftPrescriptionCard = (props: {
                       class="self-end text-xl edit-icon-button"
                       name="pencil-square"
                       onclick={() => {
-                        editPrescription(draft.id);
+                        checkEditPrescription(draft.id);
                       }}
                     ></sl-icon-button>
                     <sl-icon-button
                       class="self-end text-xl remove-icon-button"
                       name="trash3"
                       onclick={() => {
-                        setDialogOpen(true);
-                        setSelectedDraft(draft.id);
+                        setDeleteDialogOpen(true);
+                        setDeleteDraftId(draft.id);
                       }}
                     ></sl-icon-button>
                   </div>
