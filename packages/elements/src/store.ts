@@ -12,6 +12,7 @@ import {
 import gql from 'graphql-tag';
 import { GraphQLError } from 'graphql';
 import jwtDecode from 'jwt-decode';
+import { Permission } from '../types';
 
 const defaultOnRedirectCallback = (appState?: any): void => {
   window.location.replace(appState?.returnTo || window.location.pathname);
@@ -269,8 +270,14 @@ export class PhotonClientStore {
     const user = await this.sdk.authentication.getUser();
     const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
 
-    const token = await this.sdk.authentication.getAccessToken();
-    const { permissions }: { permissions: Permission[] } = jwtDecode(token);
+    let permissions: Permission[];
+    try {
+      const token = await this.sdk.authentication.getAccessToken();
+      const decoded: { permissions: Permission[] } = jwtDecode(token);
+      permissions = decoded?.permissions || [];
+    } catch (err) {
+      permissions = [];
+    }
 
     this.setStore('authentication', {
       ...this.store.authentication,

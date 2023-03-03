@@ -11,7 +11,9 @@ import {
 } from '@chakra-ui/react';
 import { usePhoton, types } from '@photonhealth/react';
 import { Pharmacy } from './Pharmacy';
-import { fulfillmentConfig } from '../../../../../../configs/fulfillment';
+
+const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
+const { fulfillmentSettings } = require(`../../../../../../configs/fulfillment.${envName}.ts`);
 
 interface MailOrderProps {
   user: any;
@@ -42,9 +44,8 @@ export const MailOrder = ({
       type: types.FulfillmentType.MailOrder
     });
 
-    const fConfig = fulfillmentConfig[user.org_id] || fulfillmentConfig.default;
+    const fConfig = fulfillmentSettings[user.org_id] || fulfillmentSettings.default;
     const options = result.data.pharmacies.filter(({ id }: { id: string }) =>
-      // @ts-ignore
       fConfig.mailOrderProviders.includes(id)
     );
 
