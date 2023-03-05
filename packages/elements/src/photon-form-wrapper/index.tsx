@@ -79,7 +79,7 @@ const PhotonFormWrapper = ({
           </Show>
         </div>
       </div>
-      <div class="w-full h-full bg-[#f7f4f4] pt-28 xs:pt-28 lg:pt-20">
+      <div class="w-full min-h-screen bg-[#f7f4f4] pt-28 xs:pt-28 lg:pt-20">
         <div class="pt-4 pb-52 px-4 w-full h-full sm:w-[600px] xs:mx-auto">{form}</div>
       </div>
     </div>
