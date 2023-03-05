@@ -174,7 +174,7 @@ customElement(
             title={props?.patientId ? 'Update Patient' : 'Create Patient'}
             titleIconName={props?.patientId ? 'pencil-square' : 'person-plus'}
             headerRight={
-              <div class="flex space-x-2">
+              <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
                 <photon-button
                   size="sm"
                   variant="outline"
@@ -182,7 +182,7 @@ customElement(
                   loading={loading()}
                   onClick={() => submitForm(formStore(), actions(), selectedStore(), true)}
                 >
-                  Save and Create Prescription
+                  <span class="text-xs lg:text-sm">Save and Create Prescription</span>
                 </photon-button>
                 <photon-button
                   size="sm"
@@ -190,7 +190,7 @@ customElement(
                   loading={loading()}
                   onClick={() => submitForm(formStore(), actions(), selectedStore(), false)}
                 >
-                  Save
+                  <span class="text-xs lg:text-sm">Save</span>
                 </photon-button>
               </div>
             }

@@ -199,23 +199,21 @@ customElement(
               <photon-button
                 size="sm"
                 variant="outline"
-                loading-text="Save prescriptions"
                 disabled={!canSubmit() || !canWritePrescription()}
                 loading={isLoading()}
                 on:photon-clicked={() => submitForm(form(), actions(), false)}
               >
-                <span className="text-xs lg:text-sm">Save prescriptions</span>
+                <span class="text-xs lg:text-sm">Save prescriptions</span>
               </photon-button>
               <photon-button
                 size="sm"
-                loading-text="Save and create order"
                 disabled={!canSubmit() || !canWritePrescription()}
                 loading={isLoading()}
                 on:photon-clicked={() =>
                   form()?.treatment?.value?.name ? setContinueSubmitOpen(true) : handleSubmit()
                 }
               >
-                <span className="text-xs lg:text-sm">Save and create order</span>
+                <span class="text-xs lg:text-sm">Save and create order</span>
               </photon-button>
             </div>
           }
