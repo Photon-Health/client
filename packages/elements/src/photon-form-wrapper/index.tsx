@@ -68,7 +68,7 @@ const PhotonFormWrapper = ({
           </photon-button>
         </div>
         <div class="w-full md:w-3/5 flex flex-col md:flex-row">
-          <div class="mb-2 md:mb-0 flex justify-end md:justify-center items-center">
+          <div class="mb-2 md:mb-0 flex justify-center md:justify-center items-center">
             <Show when={titleIconName}>
               <sl-icon name={titleIconName} />
             </Show>
