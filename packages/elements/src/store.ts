@@ -279,11 +279,25 @@ export class PhotonClientStore {
       permissions = [];
     }
 
+    const isInOrg = authenticated && hasOrgs && this.sdk.organization === user.org_id;
+    if (user) {
+      Sentry.setUser({
+        email: user.email
+      });
+    }
+
+    Sentry.setContext('user', {
+      ...this.store.authentication,
+      user: user,
+      isLoading: false,
+      isInOrg: isInOrg,
+      permissions: permissions || []
+    });
     this.setStore('authentication', {
       ...this.store.authentication,
       user: user,
       isLoading: false,
-      isInOrg: authenticated && hasOrgs && this.sdk.organization === user.org_id,
+      isInOrg: isInOrg,
       permissions: permissions || []
     });
   }
