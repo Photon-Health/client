@@ -13,6 +13,7 @@ import gql from 'graphql-tag';
 import { GraphQLError } from 'graphql';
 import jwtDecode from 'jwt-decode';
 import { Permission } from '../types';
+import Sentry from '../sentry';
 
 const defaultOnRedirectCallback = (appState?: any): void => {
   window.location.replace(appState?.returnTo || window.location.pathname);
@@ -287,9 +288,8 @@ export class PhotonClientStore {
     }
 
     Sentry.setContext('user', {
-      ...this.store.authentication,
+      isAuthenticated: authenticated,
       user: user,
-      isLoading: false,
       isInOrg: isInOrg,
       permissions: permissions || []
     });
