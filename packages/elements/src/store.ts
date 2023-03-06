@@ -262,44 +262,48 @@ export class PhotonClientStore {
   }
 
   private async checkSession() {
-    await this.sdk.authentication.checkSession();
-    const authenticated = await this.sdk.authentication.isAuthenticated();
-    this.setStore('authentication', {
-      ...this.store.authentication,
-      isAuthenticated: authenticated,
-    });
-    const user = await this.sdk.authentication.getUser();
-    const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
-
-    let permissions: Permission[];
     try {
-      const token = await this.sdk.authentication.getAccessToken();
-      const decoded: { permissions: Permission[] } = jwtDecode(token);
-      permissions = decoded?.permissions || [];
-    } catch (err) {
-      permissions = [];
-    }
-
-    const isInOrg = authenticated && hasOrgs && this.sdk.organization === user.org_id;
-    if (user) {
-      Sentry.setUser({
-        email: user.email
+      await this.sdk.authentication.checkSession();
+      const authenticated = await this.sdk.authentication.isAuthenticated();
+      this.setStore('authentication', {
+        ...this.store.authentication,
+        isAuthenticated: authenticated
       });
-    }
+      const user = await this.sdk.authentication.getUser();
+      const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
 
-    Sentry.setContext('user', {
-      isAuthenticated: authenticated,
-      user: user,
-      isInOrg: isInOrg,
-      permissions: permissions || []
-    });
-    this.setStore('authentication', {
-      ...this.store.authentication,
-      user: user,
-      isLoading: false,
-      isInOrg: isInOrg,
-      permissions: permissions || []
-    });
+      let permissions: Permission[];
+      try {
+        const token = await this.sdk.authentication.getAccessToken();
+        const decoded: { permissions: Permission[] } = jwtDecode(token);
+        permissions = decoded?.permissions || [];
+      } catch (err) {
+        permissions = [];
+      }
+
+      const isInOrg = authenticated && hasOrgs && this.sdk.organization === user.org_id;
+      if (user) {
+        Sentry.setUser({
+          email: user.email
+        });
+      }
+
+      Sentry.setContext('user', {
+        isAuthenticated: authenticated,
+        user: user,
+        isInOrg: isInOrg,
+        permissions: permissions || []
+      });
+      this.setStore('authentication', {
+        ...this.store.authentication,
+        user: user,
+        isLoading: false,
+        isInOrg: isInOrg,
+        permissions: permissions || []
+      });
+    } catch (e) {
+      Sentry.captureException(e);
+    }
   }
   private async login(args = {}) {
     await this.sdk.authentication.login(args);
