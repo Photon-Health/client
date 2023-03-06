@@ -34,3 +34,7 @@ testem.log
 .DS_Store
 Thumbs.db
 .solid
+
+# Storybook
+storybook-static/
+build-storybook.log

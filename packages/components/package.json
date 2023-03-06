@@ -2,12 +2,14 @@
   "name": "@photonhealth/components",
   "private": "true",
   "main": "dist/components.es.js",
+  "version": "0.0.0",
   "scripts": {
     "start": "vite",
     "dev": "vite",
     "build": "vite build && npx tailwindcss -i ./src/index.css -o ./dist/style.css",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "chromatic": "npx chromatic --project-token=6f56cad5387d"
   },
   "type": "module",
   "devDependencies": {
@@ -19,6 +21,7 @@
     "@storybook/html-vite": "^7.0.0-beta.19",
     "@storybook/testing-library": "^0.0.14-next.1",
     "autoprefixer": "^10.4.13",
+    "chromatic": "^6.17.1",
     "postcss": "^8.4.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
