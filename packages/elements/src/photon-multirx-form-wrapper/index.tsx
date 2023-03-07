@@ -34,6 +34,7 @@ customElement(
     const [submitErrors, setSubmitErrors] = createSignal<readonly Error[]>([]);
     const [canWritePrescription, setCanWritePrescription] = createSignal<boolean>(false);
     const [isLoading, setIsLoading] = createSignal<boolean>(false);
+    const [isCreateOrder, setIsCreateOrder] = createSignal<boolean>(false);
     const [form, setForm] = createSignal<any>();
     const [actions, setActions] = createSignal<any>();
     const [continueSubmitOpen, setContinueSubmitOpen] = createSignal<boolean>(false);
@@ -75,6 +76,7 @@ customElement(
     };
 
     const submitForm = async (store: any, actions: any, createOrder: boolean) => {
+      setIsCreateOrder(createOrder);
       setSubmitErrors([]);
       const keys = ['patient', 'draftPrescriptions'];
       actions.validate(keys);
@@ -200,20 +202,20 @@ customElement(
                 size="sm"
                 variant="outline"
                 disabled={!canSubmit() || !canWritePrescription()}
-                loading={isLoading()}
+                loading={isLoading() && !isCreateOrder()}
                 on:photon-clicked={() => submitForm(form(), actions(), false)}
               >
-                <span class="text-xs lg:text-sm">Save prescriptions</span>
+                Save prescriptions
               </photon-button>
               <photon-button
                 size="sm"
                 disabled={!canSubmit() || !canWritePrescription()}
-                loading={isLoading()}
+                loading={isLoading() && isCreateOrder()}
                 on:photon-clicked={() =>
                   form()?.treatment?.value?.name ? setContinueSubmitOpen(true) : handleSubmit()
                 }
               >
-                <span class="text-xs lg:text-sm">Save and create order</span>
+                Save and create order
               </photon-button>
             </div>
           }

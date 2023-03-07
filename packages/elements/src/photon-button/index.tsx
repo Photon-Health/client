@@ -28,7 +28,7 @@ customElement(
     full: boolean;
     loadingText?: string;
     variant?: string;
-    size?: string;
+    size?: 'lg' | 'md' | 'sm' | 'xs';
   }) => {
     let ref: any;
     const dispatchClick = () => {
@@ -40,6 +40,17 @@ customElement(
       ref?.dispatchEvent(event);
     };
 
+    // default medium size
+    let textSize = 'text-sm lg:text-base';
+    if (props.size === 'lg') {
+      textSize = 'text-base lg:text-lg';
+    }
+    if (props.size === 'sm') {
+      textSize = 'text-xs lg:text-sm';
+    }
+    if (props.size === 'xs') {
+      textSize = 'text-xs';
+    }
     return (
       <>
         <style>{tailwind}</style>
@@ -76,7 +87,7 @@ customElement(
             </div>
           ) : null}
 
-          <p class="w-full">
+          <p class={`w-full ${textSize}`}>
             <slot></slot>
           </p>
           <slot name="postfix"></slot>
