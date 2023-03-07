@@ -288,7 +288,10 @@ export class PhotonClientStore {
         permissions: permissions || []
       });
     } catch (err) {
-      console.log('Error checking photon session: ', err);
+      this.setStore('authentication', {
+        ...this.store.authentication,
+        isLoading: false
+      });
     }
   }
   private async login(args = {}) {
