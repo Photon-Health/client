@@ -48,9 +48,11 @@ const PhotonFormWrapper = ({
 
       {/* Wrapper */}
       <div class="flex items-center px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full z-10 shadow-card">
-        <div class="md:w-1/3 flex justify-start">
+        <div class="md:w-2/5 flex justify-start">
           <photon-button
             class="close-button"
+            size="small"
+            circle
             on:click={() => {
               if (checkShouldWarn()) {
                 setCloseDialogOpen(true);
@@ -65,8 +67,8 @@ const PhotonFormWrapper = ({
             </div>
           </photon-button>
         </div>
-        <div class="w-full md:w-2/3 flex flex-col md:flex-row">
-          <div class="mb-2 md:mb-0 flex-1 flex justify-end md:justify-center items-center">
+        <div class="w-full md:w-3/5 flex flex-col md:flex-row">
+          <div class="mb-2 md:mb-0 flex justify-center md:justify-center items-center">
             <Show when={titleIconName}>
               <sl-icon name={titleIconName} />
             </Show>
@@ -77,7 +79,7 @@ const PhotonFormWrapper = ({
           </Show>
         </div>
       </div>
-      <div class="w-full h-full bg-[#f7f4f4] pt-28 xs:pt-28 lg:pt-20">
+      <div class="w-full min-h-screen bg-[#f7f4f4] pt-28 xs:pt-28 lg:pt-20">
         <div class="pt-4 pb-52 px-4 w-full h-full sm:w-[600px] xs:mx-auto">{form}</div>
       </div>
     </div>

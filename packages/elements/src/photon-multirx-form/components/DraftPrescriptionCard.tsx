@@ -1,6 +1,7 @@
 import { createSignal, For, Show } from 'solid-js';
 import { message } from '../../validators';
 import { size, array, any } from 'superstruct';
+import repopulateForm from '../util/repopulateForm';
 
 const draftPrescriptionsValidator = message(
   size(array(any()), 1, Infinity),
@@ -8,22 +9,81 @@ const draftPrescriptionsValidator = message(
 );
 
 export const DraftPrescriptionCard = (props: {
+  prescriptionRef: HTMLDivElement | undefined;
   actions: Record<string, Function>;
   store: Record<string, any>;
   isLoading: boolean;
 }) => {
-  const [dialogOpen, setDialogOpen] = createSignal<boolean>(false);
-  const [selectedDraft, setSelectedDraft] = createSignal<string | undefined>();
+  const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
+  const [editDialogOpen, setEditDialogOpen] = createSignal<boolean>(false);
+  const [editDraft, setEditDraft] = createSignal<any>(undefined);
+  const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
 
   props.actions.registerValidator({
     key: 'draftPrescriptions',
     validator: draftPrescriptionsValidator
   });
 
+  const editPrescription = () => {
+    if (editDraft().treatment) {
+      repopulateForm(props.actions, editDraft());
+
+      props.actions.updateFormValue({
+        key: 'catalogId',
+        value: editDraft().catalogId
+      });
+
+      // remove the draft from the list
+      props.actions.updateFormValue({
+        key: 'draftPrescriptions',
+        value: props.store['draftPrescriptions'].value.filter((x: any) => x.id !== editDraft().id)
+      });
+
+      window.scrollTo({
+        behavior: 'smooth',
+        top:
+          (props.prescriptionRef?.getBoundingClientRect().top || 0) -
+          document.body.getBoundingClientRect().top -
+          70
+      });
+    }
+  };
+
+  const checkEditPrescription = (id: string) => {
+    const draft = props.store['draftPrescriptions'].value.find((x: any) => x.id === id);
+    setEditDraft(draft);
+
+    if (!props.store['treatment'].value) {
+      editPrescription();
+    } else {
+      setEditDialogOpen(true);
+    }
+  };
+
   return (
     <photon-card>
       <photon-dialog
-        open={dialogOpen()}
+        open={editDialogOpen()}
+        label="Overwrite in progress prescription?"
+        confirm-text="Yes, Overwrite"
+        cancel-text="No, Cancel"
+        on:photon-dialog-confirmed={() => {
+          editPrescription();
+          setEditDialogOpen(false);
+          setEditDraft(undefined);
+        }}
+        on:photon-dialog-canceled={() => {
+          setEditDialogOpen(false);
+          setEditDraft(undefined);
+        }}
+      >
+        <p class="font-sans text-lg xs:text-base">
+          You are editing a prescription that has not been added. This will be overwritten if you
+          edit another prescription.
+        </p>
+      </photon-dialog>
+      <photon-dialog
+        open={deleteDialogOpen()}
         label="Delete pending prescription?"
         confirm-text="Yes, Delete"
         cancel-text="No, Cancel"
@@ -31,15 +91,15 @@ export const DraftPrescriptionCard = (props: {
           props.actions.updateFormValue({
             key: 'draftPrescriptions',
             value: props.store['draftPrescriptions'].value.filter(
-              (x: any) => x.id !== selectedDraft()
+              (x: any) => x.id !== deleteDraftId()
             )
           });
-          setDialogOpen(false);
-          setSelectedDraft(undefined);
+          setDeleteDialogOpen(false);
+          setDeleteDraftId(undefined);
         }}
         on:photon-dialog-canceled={() => {
-          setDialogOpen(false);
-          setSelectedDraft(undefined);
+          setDeleteDialogOpen(false);
+          setDeleteDraftId(undefined);
         }}
       >
         <p class="font-sans text-lg xs:text-base">
@@ -78,7 +138,7 @@ export const DraftPrescriptionCard = (props: {
             return (
               <photon-card>
                 <div class="flex flex-row items-center">
-                  <div class="flex flex-col flex-grow" style="max-width: calc(100% - 36px);">
+                  <div class="flex flex-col flex-grow">
                     <p class="font-medium font-sans">{draft.treatment.name}</p>
                     <p class="font-normal text-gray-700 overflow-hidden whitespace-nowrap overflow-ellipsis font-sans">
                       {/* draft.refillsInput exists here because we are displaying the number of refills, not fills, the user entered into the form as part of the drafted prescription.
@@ -87,13 +147,20 @@ export const DraftPrescriptionCard = (props: {
                       {draft.instructions}
                     </p>
                   </div>
-                  <div>
+                  <div class="flex flex-row">
+                    <sl-icon-button
+                      class="self-end text-xl edit-icon-button"
+                      name="pencil-square"
+                      onclick={() => {
+                        checkEditPrescription(draft.id);
+                      }}
+                    ></sl-icon-button>
                     <sl-icon-button
                       class="self-end text-xl remove-icon-button"
                       name="trash3"
                       onclick={() => {
-                        setDialogOpen(true);
-                        setSelectedDraft(draft.id);
+                        setDeleteDialogOpen(true);
+                        setDeleteDraftId(draft.id);
                       }}
                     ></sl-icon-button>
                   </div>
