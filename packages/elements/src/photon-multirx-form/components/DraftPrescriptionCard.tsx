@@ -78,7 +78,8 @@ export const DraftPrescriptionCard = (props: {
         }}
       >
         <p class="font-sans text-lg xs:text-base">
-          Deleting the unadded prescription will remove your updates from the form.
+          You are editing a prescription that has not been added. This will be overwritten if you
+          edit another prescription.
         </p>
       </photon-dialog>
       <photon-dialog
