@@ -64,8 +64,8 @@ export const DraftPrescriptionCard = (props: {
     <photon-card>
       <photon-dialog
         open={editDialogOpen()}
-        label="Delete unadded prescription?"
-        confirm-text="Yes, Delete"
+        label="Overwrite in progress prescription?"
+        confirm-text="Yes, Overwrite"
         cancel-text="No, Cancel"
         on:photon-dialog-confirmed={() => {
           editPrescription();
