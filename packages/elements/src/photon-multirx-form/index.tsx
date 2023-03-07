@@ -14,7 +14,7 @@ import tailwind from '../tailwind.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import styles from './style.css?inline';
-import { createEffect, createSignal, Show } from 'solid-js';
+import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
 import { Order, Prescription, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
@@ -315,6 +315,8 @@ customElement(
       );
     });
 
+    let prescriptionRef: HTMLDivElement | undefined;
+
     return (
       <div ref={ref}>
         <style>{tailwind}</style>
@@ -337,13 +339,16 @@ customElement(
                 enableOrder={props.enableOrder}
               ></PatientCard>
               <Show when={showForm()}>
-                <AddPrescriptionCard
-                  hideAddToTemplates={props.hideTemplates}
-                  actions={actions}
-                  store={store}
-                ></AddPrescriptionCard>
+                <div ref={prescriptionRef}>
+                  <AddPrescriptionCard
+                    hideAddToTemplates={props.hideTemplates}
+                    actions={actions}
+                    store={store}
+                  ></AddPrescriptionCard>
+                </div>
               </Show>
               <DraftPrescriptionCard
+                prescriptionRef={prescriptionRef}
                 actions={actions}
                 store={store}
                 isLoading={isLoadingTemplates()}
