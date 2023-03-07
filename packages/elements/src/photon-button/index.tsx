@@ -61,14 +61,9 @@ customElement(
             'xs:w-fit': true,
             'w-full': true || props.full
           }}
-          class="rounded-lg font-sans transition ease-in-out delay-50 flex items-center gap-2"
+          class="rounded-lg font-sans transition ease-in-out delay-50 flex items-center gap-1 lg:gap-2"
         >
           <slot name="suffix"></slot>
-          {!props.loading ? (
-            <p class="w-full">
-              <slot></slot>
-            </p>
-          ) : null}
           {props.loading ? (
             <div class="pt-[3px]">
               <sl-spinner
@@ -80,7 +75,10 @@ customElement(
               ></sl-spinner>
             </div>
           ) : null}
-          {props.loading && props.loadingText ? <p class="w-full">{props.loadingText}</p> : null}
+
+          <p class="w-full">
+            <slot></slot>
+          </p>
           <slot name="postfix"></slot>
         </button>
       </>
