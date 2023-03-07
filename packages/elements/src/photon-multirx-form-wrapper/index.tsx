@@ -154,6 +154,7 @@ customElement(
             data!.createPrescriptions.map((x) => x.id),
             store['patient']?.value.id
           );
+          patientActions.clearSelectedPatient();
         } catch (err) {
           setSubmitErrors([err as Error]);
         }
