@@ -1,7 +1,7 @@
 {
   "name": "@photonhealth/components",
   "private": "true",
-  "main": "dist/components.es.js",
+  "main": "dist/index.js",
   "version": "0.0.0",
   "scripts": {
     "start": "vite",
@@ -28,7 +28,7 @@
     "storybook": "^7.0.0-beta.19",
     "tw-colors": "^1.1.6",
     "vite": "^4.1.4",
-    "vite-plugin-dts": "^2.0.0-beta.3",
+    "vite-plugin-dts": "^2.1.0",
     "vite-plugin-solid": "^2.5.0"
   },
   "dependencies": {
