@@ -14,8 +14,10 @@ jobs:
         run: yarn
 
       - name: Publish to Chromatic
-        workingDir: packages/components
         uses: chromaui/action@v1
+        with: 
+          workingDir: packages/components
+
 
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
