@@ -49,8 +49,8 @@ export const fulfillmentSettings: FulfillmentSettings = {
     sendToPatient: false, // disabled for org
     sendToPatientUsers: [
       // enabled for these users
-      ...(process.env.REACT_APP_TIM_USER_ID ? [process.env.REACT_APP_TIM_USER_ID] : []),
-      ...(process.env.REACT_APP_RADO_USER_ID ? [process.env.REACT_APP_RADO_USER_ID] : [])
+      'google-oauth2|105026997775584560678', // tim
+      'google-oauth2|102619324588558849301' // rado
     ]
   },
   // Peachy
