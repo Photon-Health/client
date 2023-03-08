@@ -2,7 +2,7 @@ import Button from './particles/Button';
 
 const App = () => {
   return (
-    <article class="prose lg:prose-lg p-4">
+    <article class="prose lg:prose-lg p-4 theme-photon">
       {' '}
       <h1 class="mb-0">Buttons</h1>
       <h3>Variants</h3>
