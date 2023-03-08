@@ -89,7 +89,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   }, 250);
 
   const observer = new IntersectionObserver(async (a) => {
-    if (a.at(-1)?.isIntersecting && props.hasMore) {
+    if (a?.at(-1)?.isIntersecting && props.hasMore) {
       if (props.fetchMore) {
         await props.fetchMore(search());
       }
