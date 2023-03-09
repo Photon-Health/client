@@ -10,7 +10,8 @@
       "options": {
         "cwd": "packages/elements",
         "command": "vite --port 3000"
-      }
+      },
+      "dependsOn": ["^build"]
     },
     "lint": {
       "executor": "nx:run-commands",
