@@ -2,7 +2,7 @@ import { customElement } from 'solid-element';
 import { PhotonContext } from '../context';
 
 import { Client } from '@photonhealth/components';
-import { PhotonClientStore } from '../store';
+import { PhotonClientStore } from '../context';
 
 type PhotonClientProps = {
   domain?: string;
