@@ -236,12 +236,14 @@ customElement(
     };
 
     const submitForm = async (enableOrder: boolean) => {
+      console.log('submitting form?');
       const keys = enableOrder
         ? ['patient', 'draftPrescriptions', 'pharmacy', 'address']
         : ['patient', 'draftPrescriptions'];
       actions.validate(keys);
       const errorsPresent = actions.hasErrors(keys);
       if (!errorsPresent) {
+        console.log('-----');
         setIsLoading(true);
         actions.updateFormValue({
           key: 'errors',
@@ -316,6 +318,12 @@ customElement(
     });
 
     let prescriptionRef: HTMLDivElement | undefined;
+
+    createEffect(() => {
+      console.log('client', client);
+      console.log('isLoading', isLoading());
+      console.log('authenticated', authenticated());
+    });
 
     return (
       <div ref={ref}>

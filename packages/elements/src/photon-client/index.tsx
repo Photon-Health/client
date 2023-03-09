@@ -1,12 +1,8 @@
 import { customElement } from 'solid-element';
-import { createEffect, createSignal } from 'solid-js';
 import { PhotonContext } from '../context';
-import { hasAuthParams, validateProps } from '../utils';
-import { PhotonClient } from '@photonhealth/sdk';
-import { PhotonClientStore } from '../store';
-import { makeTimer } from '@solid-primitives/timer';
 
 import { Client } from '@photonhealth/components';
+import { PhotonClientStore } from '../store';
 
 type PhotonClientProps = {
   domain?: string;
@@ -109,16 +105,18 @@ customElement(
   }: PhotonClientProps) => {
     return (
       <Client
-        domain
-        id
-        redirectUri
-        redirectPath
-        org
-        developmentMode
-        errorMessage
-        audience
-        uri
-        autoLogin
+        domain={domain}
+        id={id}
+        redirectUri={redirectUri}
+        redirectPath={redirectPath}
+        org={org}
+        developmentMode={developmentMode}
+        errorMessage={errorMessage}
+        audience={audience}
+        uri={uri}
+        autoLogin={autoLogin}
+        context={PhotonContext}
+        clientStore={PhotonClientStore}
       >
         <slot></slot>
       </Client>

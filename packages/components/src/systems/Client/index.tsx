@@ -4,6 +4,7 @@ import { PhotonContext } from '../../context';
 import { PhotonClientStore } from '../../store';
 import { makeTimer } from '@solid-primitives/timer';
 import { hasAuthParams } from '../../utils/hasAuthParams';
+import Test from '../Test';
 
 type ClientProps = {
   domain?: string;
@@ -14,37 +15,26 @@ type ClientProps = {
   redirectPath?: string;
   org?: string;
   developmentMode?: boolean;
-  autoLogin: boolean;
-  children: JSXElement;
+  autoLogin?: boolean;
+  children?: JSXElement;
+  context?: any;
+  clientStore?: any;
 };
 
-export default function Client({
-  domain,
-  id,
-  redirectUri,
-  redirectPath,
-  org,
-  developmentMode = false,
-  audience,
-  uri,
-  autoLogin = false,
-  children
-}: ClientProps) {
-  let ref: HTMLDivElement | undefined;
-
+export default function Client(props: ClientProps) {
   const sdk = new PhotonClient({
-    domain: domain,
-    audience,
-    uri,
-    clientId: id!,
-    redirectURI: redirectUri ? redirectUri : window.location.origin,
-    organization: org,
-    developmentMode: developmentMode
+    domain: props.domain,
+    audience: props.audience,
+    uri: props.uri,
+    clientId: props.id!,
+    redirectURI: props.redirectUri ? props.redirectUri : window.location.origin,
+    organization: props.org,
+    developmentMode: props.developmentMode
   });
 
-  const store = new PhotonClientStore(sdk);
+  const store = props.clientStore ? new props.clientStore(sdk) : new PhotonClientStore(sdk);
 
-  if (developmentMode) {
+  if (props.developmentMode) {
     console.info('[PhotonClient]: Development mode enabled');
   }
 
@@ -52,7 +42,7 @@ export default function Client({
   createEffect(async () => {
     if (hasAuthParams() && store) {
       await store?.authentication.handleRedirect();
-      if (redirectPath) window.location.replace(redirectPath);
+      if (props.redirectPath) window.location.replace(props.redirectPath);
     } else if (store) {
       await store?.authentication.checkSession();
       disposeInterval = makeTimer(
@@ -64,21 +54,22 @@ export default function Client({
       );
     }
   });
+
   createEffect(async () => {
     if (!store?.authentication.state.isLoading) {
-      if (!store?.authentication.state.isAuthenticated && autoLogin) {
+      if (!store?.authentication.state.isAuthenticated && props.autoLogin) {
         const args: any = { appState: {} };
-        if (redirectPath) {
-          args.appState.returnTo = redirectPath;
+        if (props.redirectPath) {
+          args.appState.returnTo = props.redirectPath;
         }
         await store?.authentication.login(args);
       }
     }
   }, [store?.authentication.state.isAuthenticated, store?.authentication.state.isLoading]);
 
-  return (
-    <div ref={ref}>
-      <PhotonContext.Provider value={store}>{children}</PhotonContext.Provider>
-    </div>
-  );
+  const Provider = props.context.Provider || PhotonContext.Provider;
+  if (props.context) {
+    console.log('custom provider', props.context);
+  }
+  return <Provider value={store}>{props.children}</Provider>;
 }
