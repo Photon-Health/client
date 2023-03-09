@@ -2,7 +2,6 @@ import { createEffect, createSignal } from 'solid-js';
 import { usePhoton } from '../../context';
 
 export default function Test(props: { uP?: any }) {
-  console.log('custom uP?', props);
   const client = props.uP ? props.uP() : usePhoton();
   const [trigger, setTrigger] = createSignal(false);
 

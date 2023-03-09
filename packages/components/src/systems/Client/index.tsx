@@ -67,9 +67,7 @@ export default function Client(props: ClientProps) {
     }
   }, [store?.authentication.state.isAuthenticated, store?.authentication.state.isLoading]);
 
-  const Provider = props.context.Provider || PhotonContext.Provider;
-  if (props.context) {
-    console.log('custom provider', props.context);
-  }
+  const Provider = props.context?.Provider || PhotonContext.Provider;
+
   return <Provider value={store}>{props.children}</Provider>;
 }
