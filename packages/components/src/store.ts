@@ -1,6 +1,6 @@
 import { createStore } from 'solid-js/store';
 import { PhotonClient } from '@photonhealth/sdk';
-import {
+import type {
   Catalog,
   DispenseUnit,
   MutationCreatePrescriptionArgs,
