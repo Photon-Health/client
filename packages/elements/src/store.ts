@@ -1,5 +1,5 @@
 import { createStore } from 'solid-js/store';
-import { PhotonClient } from '@photonhealth/sdk';
+import { PhotonClient } from '@photonhealth/components';
 import {
   Catalog,
   DispenseUnit,

@@ -1,4 +1,4 @@
-import { PhotonClient } from '@photonhealth/sdk';
+import { PhotonClient } from '@photonhealth/components';
 import { GraphQLError } from 'graphql';
 import { createStore } from 'solid-js/store';
 import { DispenseUnit } from '@photonhealth/sdk/dist/types';
