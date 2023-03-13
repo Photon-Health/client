@@ -28,7 +28,7 @@ export const fulfillmentSettings: FulfillmentSettings = {
     sendToPatientUsers: [
       // enabled for these users
       'google-oauth2|105026997775584560678', // Tim
-      'google-oauth2|109153884033500835980' // Sara
+      'google-oauth2|109799643677672225463' // Julie
     ]
   },
   // Peachy
