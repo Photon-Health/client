@@ -16,20 +16,20 @@
   "devDependencies": {
     "@babel/core": "^7.18.9",
     "@babel/preset-env": "^7.18.9",
-    "@rollup/plugin-typescript": "^11.0.0",
-    "@types/node": "^18.15.1",
+    "@rollup/plugin-typescript": "^8.3.4",
+    "@types/node": "^18.6.3",
     "path": "^0.12.7",
-    "rimraf": "^4.4.0",
+    "rimraf": "^3.0.2",
     "tslib": "^2.4.0",
     "typedoc": "^0.23.10",
     "typescript": "^4.7.4",
-    "vite": "^4.1.4"
+    "vite": "^3.0.4"
   },
   "dependencies": {
     "@apollo/client": "^3.6.9",
     "@auth0/auth0-spa-js": "^1.22.2",
-    "@nanostores/react": "^0.4.1",
-    "nanostores": "^0.7.4"
+    "@nanostores/react": "^0.3.0",
+    "nanostores": "^0.6.0"
   },
   "exports": {
     ".": {
