@@ -99,7 +99,6 @@ export const createPharmacyStore = (cs?: typeof createStore) => {
         }
       });
     } catch (err) {
-      console.log('ERR', err);
       setStore('pharmacies', {
         ...store.pharmacies,
         errors: [new Error('The provided address seems invalid. Please revise and try again.')]

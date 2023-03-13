@@ -1,12 +1,8 @@
 import { customElement } from 'solid-element';
 import { PhotonContext } from '../context';
 
-import {
-  // PhotonClientStore,
-  Client
-} from '@photonhealth/components';
-import { PhotonClientStore } from '../store';
-// import { PhotonClientStore } from '../context';
+import { Client } from '@photonhealth/components';
+import { createStore } from 'solid-js/store';
 
 type PhotonClientProps = {
   domain?: string;
@@ -120,7 +116,7 @@ customElement(
         uri={uri}
         autoLogin={autoLogin}
         context={PhotonContext}
-        clientStore={PhotonClientStore}
+        createStore={createStore}
       >
         <slot></slot>
       </Client>

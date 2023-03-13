@@ -21,7 +21,7 @@ export default function Test(props: { uP?: any }) {
   });
 
   createEffect(async () => {
-    console.log('SElected patient through store actions', store.selectedPatient.data);
+    console.log('reacting to store changes', store.selectedPatient.data);
   });
 
   return (

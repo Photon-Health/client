@@ -4,7 +4,7 @@ import { PhotonContext } from '../../context';
 import { PhotonClientStore } from '../../store';
 import { makeTimer } from '@solid-primitives/timer';
 import { hasAuthParams } from '../../utils/hasAuthParams';
-import Test from '../Test';
+import { createStore } from 'solid-js/store';
 
 type ClientProps = {
   domain?: string;
@@ -18,7 +18,7 @@ type ClientProps = {
   autoLogin?: boolean;
   children?: JSXElement;
   context?: any;
-  clientStore?: any;
+  createStore?: typeof createStore;
 };
 
 export default function Client(props: ClientProps) {
@@ -32,7 +32,9 @@ export default function Client(props: ClientProps) {
     developmentMode: props.developmentMode
   });
 
-  const store = props.clientStore ? new props.clientStore(sdk) : new PhotonClientStore(sdk);
+  const store = props?.createStore
+    ? new PhotonClientStore(sdk, props.createStore)
+    : new PhotonClientStore(sdk);
 
   if (props.developmentMode) {
     console.info('[PhotonClient]: Development mode enabled');
