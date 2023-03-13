@@ -111,7 +111,7 @@ export const FillsSelect = (props: FillsSelectProps) => {
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   if (patientId && !loading && finished) {
-    return (
+    return options.length > 0 ? (
       <Box
         border="1px solid"
         borderColor={borderColor}
@@ -121,44 +121,42 @@ export const FillsSelect = (props: FillsSelectProps) => {
         onScroll={() => onScroll()}
         ref={listInnerRef}
       >
-        {options.length > 0 ? (
-          <Table size="sm">
-            <Tbody>
-              <CheckboxGroup size="lg" defaultValue={initialFills} onChange={setSelected}>
-                {/* TODO: We should really handle this a bit definitely from a semantic perspective */}
-                {options
-                  .filter((opt) => opt.fillsRemaining > 0)
-                  .map((opt: any) => (
-                    <Tr key={opt.value.prescriptionId + opt.value.treatmentId}>
-                      <Td paddingRight="0">
-                        <Checkbox size="lg" value={opt.value.prescriptionId} name={name} />
-                      </Td>
-                      <Td whiteSpace="pre-wrap">
-                        <Box minWidth={150} textOverflow="ellipsis">
-                          {opt.treatment}
-                        </Box>
-                      </Td>
-                      <Td isNumeric>{opt.fillsRemaining}</Td>
-                      <Td>{opt.effective}</Td>
-                    </Tr>
-                  ))}
-              </CheckboxGroup>
-            </Tbody>
-            <Thead position="sticky" top={0}>
-              <Tr borderTop="unset">
-                <Th borderTop="unset" />
-                <Th borderTop="unset">Treatment</Th>
-                <Th borderTop="unset">Fills</Th>
-                <Th borderTop="unset">Effective</Th>
-              </Tr>
-            </Thead>
-          </Table>
-        ) : (
-          <Text fontSize="1rem" paddingX="4" paddingY="2" color="gray.400">
-            The patient you selected has no prescriptions.
-          </Text>
-        )}
+        <Table size="sm">
+          <Tbody>
+            <CheckboxGroup size="lg" defaultValue={initialFills} onChange={setSelected}>
+              {/* TODO: We should really handle this a bit definitely from a semantic perspective */}
+              {options
+                .filter((opt) => opt.fillsRemaining > 0)
+                .map((opt: any) => (
+                  <Tr key={opt.value.prescriptionId + opt.value.treatmentId}>
+                    <Td paddingRight="0">
+                      <Checkbox size="lg" value={opt.value.prescriptionId} name={name} />
+                    </Td>
+                    <Td whiteSpace="pre-wrap">
+                      <Box minWidth={150} textOverflow="ellipsis">
+                        {opt.treatment}
+                      </Box>
+                    </Td>
+                    <Td isNumeric>{opt.fillsRemaining}</Td>
+                    <Td>{opt.effective}</Td>
+                  </Tr>
+                ))}
+            </CheckboxGroup>
+          </Tbody>
+          <Thead position="sticky" top={0}>
+            <Tr borderTop="unset">
+              <Th borderTop="unset" />
+              <Th borderTop="unset">Treatment</Th>
+              <Th borderTop="unset">Fills</Th>
+              <Th borderTop="unset">Effective</Th>
+            </Tr>
+          </Thead>
+        </Table>
       </Box>
+    ) : (
+      <Text fontSize="1rem" color="gray.400">
+        This patient has no prescriptions.
+      </Text>
     );
   }
 

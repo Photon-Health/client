@@ -13,7 +13,8 @@ import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?in
 import styles from './style.css?inline';
 
 import { format } from 'date-fns';
-import { onMount } from 'solid-js';
+import { onMount, createSignal } from 'solid-js';
+import formatDate from './formatDate';
 
 customElement(
   'photon-datepicker',
@@ -33,7 +34,9 @@ customElement(
     disabled: boolean;
   }) => {
     let ref: any;
-    const today = format(new Date(), 'yyyy-MM-dd').toString();
+    let inputRef: any;
+    // initialized with today's date
+    const [date, setDate] = createSignal(format(new Date(), 'yyyy-MM-dd').toString());
 
     const dispatchDateSelected = (date: string) => {
       const event = new CustomEvent('photon-datepicker-selected', {
@@ -47,7 +50,16 @@ customElement(
     };
 
     onMount(() => {
-      dispatchDateSelected(today);
+      dispatchDateSelected(date());
+      inputRef?.addEventListener('paste', (e: any) => {
+        const pasteText = e.clipboardData.getData('Text');
+        const formattedDate = formatDate(pasteText);
+
+        if (formattedDate) {
+          setDate(formattedDate);
+          dispatchDateSelected(formattedDate);
+        }
+      });
     });
 
     return (
@@ -64,6 +76,7 @@ customElement(
             </div>
           ) : null}
           <sl-input
+            ref={inputRef}
             on:sl-input={(e: any) => {
               dispatchDateSelected(e.target.value);
             }}
@@ -73,7 +86,7 @@ customElement(
             }}
             class="input"
             type="date"
-            value={today}
+            value={date()}
             help-text={props.helpText}
             invalid={props.invalid}
           ></sl-input>

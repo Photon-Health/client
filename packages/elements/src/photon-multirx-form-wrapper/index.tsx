@@ -34,6 +34,7 @@ customElement(
     const [submitErrors, setSubmitErrors] = createSignal<readonly Error[]>([]);
     const [canWritePrescription, setCanWritePrescription] = createSignal<boolean>(false);
     const [isLoading, setIsLoading] = createSignal<boolean>(false);
+    const [isCreateOrder, setIsCreateOrder] = createSignal<boolean>(false);
     const [form, setForm] = createSignal<any>();
     const [actions, setActions] = createSignal<any>();
     const [continueSubmitOpen, setContinueSubmitOpen] = createSignal<boolean>(false);
@@ -75,6 +76,7 @@ customElement(
     };
 
     const submitForm = async (store: any, actions: any, createOrder: boolean) => {
+      setIsCreateOrder(createOrder);
       setSubmitErrors([]);
       const keys = ['patient', 'draftPrescriptions'];
       actions.validate(keys);
@@ -152,6 +154,7 @@ customElement(
             data!.createPrescriptions.map((x) => x.id),
             store['patient']?.value.id
           );
+          patientActions.clearSelectedPatient();
         } catch (err) {
           setSubmitErrors([err as Error]);
         }
@@ -195,22 +198,20 @@ customElement(
           title="New Prescriptions"
           titleIconName="prescription"
           headerRight={
-            <div class="flex flex-row sm:flex-col md:flex-col lg:flex-row gap-2 justify-end items-end">
+            <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
               <photon-button
                 size="sm"
                 variant="outline"
-                loading-text="Save prescriptions"
                 disabled={!canSubmit() || !canWritePrescription()}
-                loading={isLoading()}
+                loading={isLoading() && !isCreateOrder()}
                 on:photon-clicked={() => submitForm(form(), actions(), false)}
               >
                 Save prescriptions
               </photon-button>
               <photon-button
                 size="sm"
-                loading-text="Save and create order"
                 disabled={!canSubmit() || !canWritePrescription()}
-                loading={isLoading()}
+                loading={isLoading() && isCreateOrder()}
                 on:photon-clicked={() =>
                   form()?.treatment?.value?.name ? setContinueSubmitOpen(true) : handleSubmit()
                 }

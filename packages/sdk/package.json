@@ -1,6 +1,6 @@
 {
   "name": "@photonhealth/sdk",
-  "version": "1.0.5",
+  "version": "1.0.8",
   "main": "src/lib.js",
   "scripts": {
     "build": "rimraf dist && vite build",
@@ -28,8 +28,8 @@
   "dependencies": {
     "@apollo/client": "^3.6.9",
     "@auth0/auth0-spa-js": "^1.22.2",
-    "@nanostores/react": "^0.3.0",
-    "nanostores": "^0.6.0"
+    "@nanostores/react": "^0.4.1",
+    "nanostores": "^0.7.4"
   },
   "exports": {
     ".": {

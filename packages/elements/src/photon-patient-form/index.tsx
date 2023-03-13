@@ -7,6 +7,7 @@ import { PatientStore } from '../stores/patient';
 import { PharmacyStore } from '../stores/pharmacy';
 import tailwind from '../tailwind.css?inline';
 import { email, empty, message, numericString } from '../validators';
+import { Button } from '@photonhealth/components';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/spinner/spinner';
@@ -184,7 +185,7 @@ customElement(
         </Show>
 
         <Show when={!pStore.selectedPatient.isLoading}>
-          <PhotonAuthorized>
+          <PhotonAuthorized permissions={['write:patient']}>
             <photon-card title="Personal">
               <div class="flex flex-col xs:flex-row xs:gap-4">
                 <photon-text-input
