@@ -79,15 +79,17 @@ customElement(
               }}
             ></sl-checkbox>
           )}
-          <p class="text-gray-500 text-sm font-medium pt-1 font-sans">
-            {props.label}
-            <Show when={props.tip}>
-              <PhotonTooltip tip={props.tip || ''} placement="right"></PhotonTooltip>
-            </Show>
-          </p>
-          <p class="text-gray-400 text-xs pt-1 pl-2 font-sans">
-            {props.required ? 'Required' : 'Optional'}
-          </p>
+          <div>
+            <p class="text-gray-500 text-sm font-medium font-sans">
+              {props.label}
+              <Show when={props.tip}>
+                <PhotonTooltip tip={props.tip || ''} placement="right"></PhotonTooltip>
+              </Show>
+            </p>
+            <p class="text-gray-400 text-xs font-sans">
+              {props.required ? 'Required' : 'Optional'}
+            </p>
+          </div>
         </div>
       </>
     );

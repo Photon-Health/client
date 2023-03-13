@@ -44,7 +44,7 @@ export const PatientAddressCard = ({
     <Card bg="bg-surface">
       <CardHeader>
         <HStack w="full" justify="space-between">
-          <Heading size="xxs">Patient Address</Heading>
+          <Heading size="xxs">{!showAddress ? 'Patient Address' : 'Set Patient Address'}</Heading>
           {!showAddress ? (
             <Button onClick={() => setShowAddress(true)} size="xs">
               Change
@@ -54,7 +54,7 @@ export const PatientAddressCard = ({
       </CardHeader>
       <CardBody pt={0}>
         {!showAddress ? (
-          <Text fontSize="14px">{formatAddress(address)}</Text>
+          <Text>{formatAddress(address)}</Text>
         ) : (
           <VStack spacing={6} align="stretch" alignSelf="flex-start">
             <FormControl isInvalid={!!errors.address?.street1 && touched.address?.street1}>

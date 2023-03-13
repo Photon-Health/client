@@ -3,6 +3,11 @@
   @apply text-red-500;
 }
 
+.edit-icon-button::part(base):hover,
+.edit-icon-button::part(base):focus {
+  @apply text-yellow-500;
+}
+
 .enable-switch {
   --width: 60px;
   --height: 32px;

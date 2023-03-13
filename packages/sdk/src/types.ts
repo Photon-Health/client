@@ -426,7 +426,8 @@ export enum OrderState {
   Completed = 'COMPLETED',
   Error = 'ERROR',
   Pending = 'PENDING',
-  Placed = 'PLACED'
+  Placed = 'PLACED',
+  Routing = 'ROUTING'
 }
 
 export enum OrgType {

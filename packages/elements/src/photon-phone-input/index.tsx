@@ -73,7 +73,12 @@ customElement(
             disabled={props.disabled}
             class="input"
             on:sl-input={(e: any) => {
-              dispatchPhoneChanged(parsePhoneNumber(e.target.value, 'US').format('E.164'));
+              try {
+                const parsed = parsePhoneNumber(e.target.value, 'US').format('E.164');
+                dispatchPhoneChanged(parsed);
+              } catch (e) {
+                dispatchPhoneChanged(e.target?.value || '');
+              }
             }}
             type="tel"
             invalid={props.invalid}

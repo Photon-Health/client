@@ -7,10 +7,12 @@ import {
   Patient,
   Prescription,
   PrescriptionTemplate,
-  Treatment,
+  Treatment
 } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
 import { GraphQLError } from 'graphql';
+import jwtDecode from 'jwt-decode';
+import { Permission } from '../types';
 
 const defaultOnRedirectCallback = (appState?: any): void => {
   window.location.replace(appState?.returnTo || window.location.pathname);
@@ -47,7 +49,8 @@ export class PhotonClientStore {
     state: {
       user: any;
       isAuthenticated: boolean;
-      isAuthorized: boolean;
+      isInOrg: boolean;
+      permissions: Permission[];
       error?: string;
       isLoading: boolean;
     };
@@ -118,8 +121,9 @@ export class PhotonClientStore {
     const [store, setStore] = createStore<{
       authentication: {
         isAuthenticated: boolean;
-        isAuthorized: boolean;
+        isInOrg: boolean;
         isLoading: boolean;
+        permissions: Permission[];
         error?: string;
         user: any;
       };
@@ -154,39 +158,40 @@ export class PhotonClientStore {
     }>({
       authentication: {
         isAuthenticated: false,
-        isAuthorized: false,
+        isInOrg: false,
+        permissions: [],
         isLoading: true,
         error: undefined,
-        user: undefined,
+        user: undefined
       },
       catalog: {
         isLoading: false,
         treatments: [],
-        templates: [],
+        templates: []
       },
       catalogs: {
         isLoading: false,
-        catalogs: [],
+        catalogs: []
       },
       dispenseUnits: {
         isLoading: false,
-        dispenseUnits: new Array<DispenseUnit & { id: string }>(),
+        dispenseUnits: new Array<DispenseUnit & { id: string }>()
       },
       patients: {
         isLoading: false,
         patients: [],
-        finished: false,
+        finished: false
       },
       patient: {
         isLoading: false,
-        patient: undefined,
+        patient: undefined
       },
       prescription: {
         isLoading: false,
         errors: [],
         error: undefined,
-        data: undefined,
-      },
+        data: undefined
+      }
     });
     this.setStore = setStore;
     this.store = store;
@@ -202,52 +207,52 @@ export class PhotonClientStore {
           if (err.message.includes('must be an organization id')) {
             this.setStore('authentication', {
               ...this.store.authentication,
-              error: 'The provided organization id is invalid or does not exist',
+              error: 'The provided organization id is invalid or does not exist'
             });
           } else if (errorMessage?.includes('is not part of the org')) {
             this.setStore('authentication', {
               ...this.store.authentication,
               error: 'User is not authorized',
-              isLoading: false,
+              isLoading: false
             });
           } else {
             this.setStore('authentication', {
               ...this.store.authentication,
-              error: err.message,
+              error: err.message
             });
           }
         }
       },
       checkSession: this.checkSession.bind(this),
       login: this.login.bind(this),
-      logout: this.logout.bind(this),
+      logout: this.logout.bind(this)
     };
     this.getSDK = this._getSDK.bind(this);
     this.clinical = {
       catalog: {
         state: store.catalog,
-        getCatalog: this.getCatalog.bind(this),
+        getCatalog: this.getCatalog.bind(this)
       },
       catalogs: {
         state: store.catalogs,
-        getCatalogs: this.getCatalogs.bind(this),
+        getCatalogs: this.getCatalogs.bind(this)
       },
       dispenseUnits: {
         state: store.dispenseUnits,
-        getDispenseUnits: this.getDispenseUnits.bind(this),
+        getDispenseUnits: this.getDispenseUnits.bind(this)
       },
       patients: {
         state: store.patients,
-        getPatients: this.getPatients.bind(this),
+        getPatients: this.getPatients.bind(this)
       },
       patient: {
         state: store.patient,
-        getPatient: this.getPatient.bind(this),
+        getPatient: this.getPatient.bind(this)
       },
       prescription: {
         state: store.prescription,
-        createPrescription: this.createPrescription.bind(this),
-      },
+        createPrescription: this.createPrescription.bind(this)
+      }
     };
   }
 
@@ -256,20 +261,38 @@ export class PhotonClientStore {
   }
 
   private async checkSession() {
-    await this.sdk.authentication.checkSession();
-    const authenticated = await this.sdk.authentication.isAuthenticated();
-    this.setStore('authentication', {
-      ...this.store.authentication,
-      isAuthenticated: authenticated,
-    });
-    const user = await this.sdk.authentication.getUser();
-    const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
-    this.setStore('authentication', {
-      ...this.store.authentication,
-      user: user,
-      isLoading: false,
-      isAuthorized: authenticated && hasOrgs && this.sdk.organization === user.org_id
-    });
+    try {
+      await this.sdk.authentication.checkSession();
+      const authenticated = await this.sdk.authentication.isAuthenticated();
+      this.setStore('authentication', {
+        ...this.store.authentication,
+        isAuthenticated: authenticated
+      });
+      const user = await this.sdk.authentication.getUser();
+      const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
+
+      let permissions: Permission[];
+      try {
+        const token = await this.sdk.authentication.getAccessToken();
+        const decoded: { permissions: Permission[] } = jwtDecode(token);
+        permissions = decoded?.permissions || [];
+      } catch (err) {
+        permissions = [];
+      }
+
+      this.setStore('authentication', {
+        ...this.store.authentication,
+        user: user,
+        isLoading: false,
+        isInOrg: authenticated && hasOrgs && this.sdk.organization === user.org_id,
+        permissions: permissions || []
+      });
+    } catch (err) {
+      this.setStore('authentication', {
+        ...this.store.authentication,
+        isLoading: false
+      });
+    }
   }
   private async login(args = {}) {
     await this.sdk.authentication.login(args);
@@ -280,7 +303,8 @@ export class PhotonClientStore {
     this.setStore('authentication', {
       ...this.store.authentication,
       isAuthenticated: false,
-      isAuthorized: false,
+      isInOrg: false,
+      permissions: [],
       user: undefined
     });
   }
@@ -295,63 +319,63 @@ export class PhotonClientStore {
     }
     this.setStore('patients', {
       ...this.store.patients,
-      isLoading: true,
+      isLoading: true
     });
     const { data } = await this.sdk.clinical.patient.getPatients(args);
     this.setStore('patients', {
       ...this.store.patients,
       isLoading: false,
       patients: args.clear ? data.patients : this.store.patients.patients.concat(data.patients),
-      finished: data.patients.length == 0,
+      finished: data.patients.length == 0
     });
   }
   private async getPatient(args: { id: string }) {
     this.setStore('patient', {
       ...this.store.patient,
-      isLoading: true,
+      isLoading: true
     });
     const { data } = await this.sdk.clinical.patient.getPatient(args);
     this.setStore('patient', {
       ...this.store.patient,
       isLoading: false,
-      patient: data.patient,
+      patient: data.patient
     });
     return data.patient;
   }
   private async getCatalog(args: { id: string }) {
     this.setStore('catalog', {
       ...this.store.catalog,
-      isLoading: true,
+      isLoading: true
     });
     const { data } = await this.sdk.clinical.catalog.getCatalog({
       id: args.id,
       fragment: {
-        CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS,
-      },
+        CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
+      }
     });
     this.setStore('catalog', {
       ...this.store.catalog,
       isLoading: false,
       treatments: data.catalog.treatments.map((x) => x!) || [],
-      templates: data.catalog.templates.map((x) => x!) || [],
+      templates: data.catalog.templates.map((x) => x!) || []
     });
   }
   private async getCatalogs() {
     this.setStore('catalogs', {
       ...this.store.catalogs,
-      isLoading: true,
+      isLoading: true
     });
     const { data } = await this.sdk.clinical.catalog.getCatalogs();
     this.setStore('catalogs', {
       ...this.store.catalogs,
       isLoading: false,
-      catalogs: data.catalogs,
+      catalogs: data.catalogs
     });
   }
   private async getDispenseUnits() {
     this.setStore('dispenseUnits', {
       ...this.store.dispenseUnits,
-      isLoading: true,
+      isLoading: true
     });
     const { data } = await this.sdk.clinical.prescription.getDispenseUnits();
     this.setStore('dispenseUnits', {
@@ -359,51 +383,51 @@ export class PhotonClientStore {
       isLoading: false,
       dispenseUnits: data.dispenseUnits.map((x, idx) => ({
         id: String(idx),
-        ...x,
-      })),
+        ...x
+      }))
     });
   }
   private async createPrescription(args: MutationCreatePrescriptionArgs) {
     this.setStore('prescription', {
       ...this.store.prescription,
-      isLoading: true,
+      isLoading: true
     });
     const createPrescriptionMutation = this.sdk.clinical.prescription.createPrescription({});
     try {
       const { data, errors } = await createPrescriptionMutation({
         variables: args,
         refetchQueries: [],
-        awaitRefetchQueries: false,
+        awaitRefetchQueries: false
       });
       if (errors && errors.length > 0) {
         this.setStore('prescription', {
           ...this.store.prescription,
-          errors: [...errors],
+          errors: [...errors]
         });
       }
       if (data?.createPrescription) {
         this.setStore('prescription', {
           ...this.store.prescription,
-          data: data.createPrescription,
+          data: data.createPrescription
         });
       }
       this.setStore('prescription', {
         ...this.store.prescription,
-        isLoading: false,
+        isLoading: false
       });
       return {
         data,
-        errors,
+        errors
       };
     } catch (e) {
       this.setStore('prescription', {
         ...this.store.prescription,
         error: e,
-        isLoading: false,
+        isLoading: false
       });
       return {
         data: null,
-        errors: [],
+        errors: []
       };
     }
   }

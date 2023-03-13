@@ -125,7 +125,7 @@ const createPatientStore = () => {
       ? () =>
           fetchMorePatients(client, {
             ...args,
-            after: data.patients.at(-1)!.id
+            after: data.patients?.at(-1)!.id
           })
       : undefined;
   };
@@ -154,7 +154,7 @@ const createPatientStore = () => {
       ? () =>
           fetchMorePatients(client, {
             ...args,
-            after: data.patients.at(-1)!.id
+            after: data.patients?.at(-1)!.id
           })
       : undefined;
   };

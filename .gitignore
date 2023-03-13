@@ -19,10 +19,6 @@ node_modules
 
 # IDE - VSCode
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
 
 # misc
 /.sass-cache
@@ -37,3 +33,8 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+.solid
+
+# Storybook
+storybook-static/
+build-storybook.log

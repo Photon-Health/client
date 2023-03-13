@@ -1,21 +1,23 @@
 {
-    "search.exclude": {
-      "**/types": true,
-      "**/dist": true,
-      "**/.next": true
-    },
-    "editor.formatOnSave": true,
-    "css.validate": false,
-    "[javascript]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[javascriptreact]": {
-      "editor.formatOnSave": false
-    },
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true,
-      "source.fixAll.stylelint": true
-    },
+  "search.exclude": {
+    "**/types": true,
+    "**/dist": true,
+    "**/.next": true
+  },
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "editor.formatOnSave": true,
+  "css.validate": false,
+  "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
-  
+  },
+  "[javascriptreact]": {
+    "editor.formatOnSave": false
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.fixAll.stylelint": true
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}

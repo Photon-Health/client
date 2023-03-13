@@ -15,6 +15,7 @@ customElement(
     let ref: any;
     const client = usePhoton();
     const [loading, setLoading] = createSignal(false);
+    const [isCreatePrescription, setIsCreatePrescription] = createSignal<boolean>(false);
     const [formStore, setFormStore] = createSignal<any>(undefined);
     const [selectedStore, setSelectedStore] = createSignal<any>(undefined);
     const [actions, setActions] = createSignal<any>(undefined);
@@ -58,6 +59,7 @@ customElement(
       pStore: any,
       createPrescription = false
     ) => {
+      setIsCreatePrescription(createPrescription);
       setLoading(true);
       let keys: string[] = ['firstName', 'lastName', 'phone', 'sex', 'email'];
 
@@ -174,12 +176,12 @@ customElement(
             title={props?.patientId ? 'Update Patient' : 'Create Patient'}
             titleIconName={props?.patientId ? 'pencil-square' : 'person-plus'}
             headerRight={
-              <div class="flex space-x-2">
+              <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
                 <photon-button
                   size="sm"
                   variant="outline"
                   disabled={loading()}
-                  loading={loading()}
+                  loading={loading() && isCreatePrescription()}
                   onClick={() => submitForm(formStore(), actions(), selectedStore(), true)}
                 >
                   Save and Create Prescription
@@ -187,7 +189,7 @@ customElement(
                 <photon-button
                   size="sm"
                   disabled={loading()}
-                  loading={loading()}
+                  loading={loading() && !isCreatePrescription()}
                   onClick={() => submitForm(formStore(), actions(), selectedStore(), false)}
                 >
                   Save

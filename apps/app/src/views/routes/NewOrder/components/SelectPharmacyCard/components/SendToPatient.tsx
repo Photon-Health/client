@@ -28,6 +28,6 @@ export const SendToPatient = ({ patient }: any) => {
       </Card>
     </VStack>
   ) : (
-    <Text>Please select a patient to view this option.</Text>
+    <Text>Select a patient to view this option.</Text>
   );
 };

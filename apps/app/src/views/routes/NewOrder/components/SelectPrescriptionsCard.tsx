@@ -4,7 +4,8 @@ import {
   CardHeader,
   FormControl,
   FormErrorMessage,
-  Heading
+  Heading,
+  Text
 } from '@chakra-ui/react';
 
 import { FillsSelect } from '../../../components/FillsSelect';
@@ -28,14 +29,18 @@ export const SelectPrescriptionsCard = ({
         <Heading size="xxs">Select Prescriptions</Heading>
       </CardHeader>
       <CardBody pt={0}>
-        <FormControl isInvalid={!!errors.fills && touched.fills}>
-          <FillsSelect
-            name="fills"
-            patientId={patientId}
-            initialFills={prescriptionIds || undefined}
-          />
-          <FormErrorMessage>{errors.fills}</FormErrorMessage>
-        </FormControl>
+        {patientId ? (
+          <FormControl isInvalid={!!errors.fills && touched.fills}>
+            <FillsSelect
+              name="fills"
+              patientId={patientId}
+              initialFills={prescriptionIds || undefined}
+            />
+            <FormErrorMessage>{errors.fills}</FormErrorMessage>
+          </FormControl>
+        ) : (
+          <Text>Select a patient to view their prescriptions.</Text>
+        )}
       </CardBody>
     </Card>
   );

@@ -88,7 +88,7 @@ customElement(
               <p class="text-xl font-sans font-medium">{props.label}</p>
             </slot>
           </Show>
-          <div class="font-sans py-4">
+          <div class={`font-sans ${!props.header ? 'py-4' : 'pb-4'}`}>
             <slot></slot>
           </div>
           <div
