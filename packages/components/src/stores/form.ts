@@ -1,7 +1,7 @@
 import { createStore } from 'solid-js/store';
 import { Struct, assert, StructError } from 'superstruct';
 
-export const createFormStore = (initalValue?: Record<string, any>) => {
+export const createFormStore = (initalValue?: Record<string, any>, cs?: typeof createStore) => {
   type StoreValue = { value: any; error?: string };
   const validators: Record<string, Array<Struct>> = {};
   if (initalValue) {
@@ -14,7 +14,11 @@ export const createFormStore = (initalValue?: Record<string, any>) => {
     }
     initalValue = tmp;
   }
-  const [store, setStore] = createStore<Record<string, StoreValue | undefined>>(
+
+  // TODO when we are no longer maintaining components inside of elements, we can remove this
+  // this fixes an issue where the reactivity is lost when using the store in elements
+  const _createStore = cs || createStore;
+  const [store, setStore] = _createStore<Record<string, StoreValue | undefined>>(
     initalValue ? initalValue : {}
   );
 

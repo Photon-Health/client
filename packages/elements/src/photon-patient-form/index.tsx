@@ -20,6 +20,7 @@ import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?in
 import { isZip } from '../utils';
 import { sexes } from '../photon-sex-input';
 import { PhotonAuthorized } from '../photon-authorized';
+import { createStore } from 'solid-js/store';
 
 const getPatientAddress = (pStore: any, store: any) => {
   const patientAddress = pStore.selectedPatient.data?.address;
@@ -48,21 +49,24 @@ customElement(
     const client = usePhoton();
     const { store: pStore, actions: pActions } = PatientStore;
     const { actions: pharmActions } = PharmacyStore;
-    const { store, actions } = createFormStore({
-      firstName: undefined,
-      lastName: undefined,
-      dateOfBirth: undefined,
-      phone: undefined,
-      gender: undefined,
-      sex: undefined,
-      email: undefined,
-      address_street1: undefined,
-      address_street2: undefined,
-      address_city: undefined,
-      address_state: undefined,
-      address_zip: undefined,
-      preferredPharmacy: undefined
-    });
+    const { store, actions } = createFormStore(
+      {
+        firstName: undefined,
+        lastName: undefined,
+        dateOfBirth: undefined,
+        phone: undefined,
+        gender: undefined,
+        sex: undefined,
+        email: undefined,
+        address_street1: undefined,
+        address_street2: undefined,
+        address_city: undefined,
+        address_state: undefined,
+        address_zip: undefined,
+        preferredPharmacy: undefined
+      },
+      createStore
+    );
     actions.registerValidator({
       key: 'firstName',
       validator: message(size(string(), 1, Infinity), 'Please enter a first name...')
@@ -187,7 +191,6 @@ customElement(
         <Show when={!pStore.selectedPatient.isLoading}>
           <PhotonAuthorized permissions={['write:patient']}>
             <photon-card title="Personal">
-              <Button onClick={() => console.log('clicked')}>aoeusthaoseunthaoe</Button>
               <div class="flex flex-col xs:flex-row xs:gap-4">
                 <photon-text-input
                   class="flex-grow min-w-[40%]"
