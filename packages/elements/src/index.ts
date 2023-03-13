@@ -29,5 +29,6 @@ import './photon-med-search-dialog';
 import './photon-dosage-calculator';
 import './photon-dosage-calculator-dialog';
 import './photon-multirx-form-wrapper';
+import './photon-audit';
 // import './photon-prescribe-form'
 // import './photon-form';

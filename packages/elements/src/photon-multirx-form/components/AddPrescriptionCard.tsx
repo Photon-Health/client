@@ -8,6 +8,7 @@ import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/button/button';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { createSignal, Show } from 'solid-js';
+import repopulateForm from '../util/repopulateForm';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.82/dist/');
 
@@ -20,7 +21,7 @@ const validators = {
     size(string(), 1, Infinity),
     'Please enter instructions for the patient...'
   ),
-  effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past"),
+  effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
 };
 
 export const AddPrescriptionCard = (props: {
@@ -38,7 +39,7 @@ export const AddPrescriptionCard = (props: {
   for (const [k, v] of Object.entries(validators)) {
     props.actions.registerValidator({
       key: k,
-      validator: v,
+      validator: v
     });
   }
 
@@ -46,7 +47,7 @@ export const AddPrescriptionCard = (props: {
     const event = new CustomEvent('photon-dosage-calculator-clicked', {
       composed: true,
       bubbles: true,
-      detail: {},
+      detail: {}
     });
     ref?.dispatchEvent(event);
   };
@@ -55,7 +56,7 @@ export const AddPrescriptionCard = (props: {
     const event = new CustomEvent('photon-advanced-search-clicked', {
       composed: true,
       bubbles: true,
-      detail: {},
+      detail: {}
     });
     ref?.dispatchEvent(event);
   };
@@ -68,7 +69,7 @@ export const AddPrescriptionCard = (props: {
           setOffCatalog(e.detail.medication);
           props.actions.updateFormValue({
             key: 'treatment',
-            value: e.detail.medication,
+            value: e.detail.medication
           });
         }}
       >
@@ -80,89 +81,46 @@ export const AddPrescriptionCard = (props: {
           off-catalog-option={offCatalog()}
           on:photon-treatment-selected={(e: any) => {
             if (e.detail.data.__typename === 'PrescriptionTemplate') {
-              props.actions.updateFormValue({
-                key: 'treatment',
-                value: e.detail.data.treatment,
-              });
-              if (e.detail.data.dispenseAsWritten) {
-                props.actions.updateFormValue({
-                  key: 'dispenseAsWritten',
-                  value: e.detail.data.dispenseAsWritten,
-                });
-              }
-              if (e.detail.data.dispenseQuantity) {
-                props.actions.updateFormValue({
-                  key: 'dispenseQuantity',
-                  value: Number(e.detail.data.dispenseQuantity),
-                });
-              }
-              if (e.detail.data.dispenseUnit) {
-                props.actions.updateFormValue({
-                  key: 'dispenseUnit',
-                  value: e.detail.data.dispenseUnit,
-                });
-              }
-              if (e.detail.data.daysSupply) {
-                props.actions.updateFormValue({
-                  key: 'daysSupply',
-                  value: Number(e.detail.data.daysSupply),
-                });
-              }
-              // if a template is selected in the treatment dropdown, field needs to update to use the fillsAllowed value from the template.
-              // this is why there is a -1 here.
-              if (e.detail.data.fillsAllowed) {
-                props.actions.updateFormValue({
-                  key: 'refillsInput',
-                  value: Number(e.detail.data.fillsAllowed) - 1,
-                });
-              }
-              if (e.detail.data.instructions) {
-                props.actions.updateFormValue({
-                  key: 'instructions',
-                  value: e.detail.data.instructions,
-                });
-              }
-              if (e.detail.data.notes) {
-                props.actions.updateFormValue({
-                  key: 'notes',
-                  value: e.detail.data.notes,
-                });
-              }
+              repopulateForm(props.actions, e.detail.data);
             } else {
               props.actions.updateFormValue({
                 key: 'treatment',
-                value: e.detail.data,
+                value: e.detail.data
               });
             }
             props.actions.updateFormValue({
               key: 'catalogId',
-              value: e.detail.catalogId,
+              value: e.detail.catalogId
             });
           }}
         ></photon-treatment-select>
-        <div class="flex flex-col-reverse xs:flex-row xs:items-center gap-2">
-          <photon-checkbox
-            label="Dispense as written"
-            tip="This prescription will be filled generically unless this box is checked"
-            form-name="daw"
-            class="flex-grow"
-            checked={props.store['dispenseAsWritten']?.value || false}
-            on:photon-checkbox-toggled={(e: any) =>
-              props.actions.updateFormValue({
-                key: 'dispenseAsWritten',
-                value: e.detail.checked,
-              })
-            }
-          ></photon-checkbox>
-          <photon-med-search-dialog ref={medSearchRef}></photon-med-search-dialog>
-          <a
-            class="font-sans text-gray-500 text-sm hover:text-black hover:cursor-pointer pt-1"
-            onClick={() => (medSearchRef.open = true)}
-          >
-            Advanced Search →
-          </a>
+        <div class="sm:grid sm:grid-cols-2 sm:gap-4">
+          <div>
+            <photon-checkbox
+              label="Dispense as written"
+              tip="This prescription will be filled generically unless this box is checked"
+              form-name="daw"
+              class="flex-grow"
+              checked={props.store['dispenseAsWritten']?.value || false}
+              on:photon-checkbox-toggled={(e: any) =>
+                props.actions.updateFormValue({
+                  key: 'dispenseAsWritten',
+                  value: e.detail.checked
+                })
+              }
+            ></photon-checkbox>
+            <photon-med-search-dialog ref={medSearchRef}></photon-med-search-dialog>
+          </div>
+          <div class="py-4 md:py-2 text-left sm:text-right">
+            <a
+              class="font-sans text-gray-500 text-sm hover:text-black hover:cursor-pointer"
+              onClick={() => (medSearchRef.open = true)}
+            >
+              Advanced Search →
+            </a>
+          </div>
         </div>
-        <div class="sm:max-w-[50%] sm:pr-2">
+        <div class="md:max-w-[50%] md:pr-2">
           <photon-datepicker
             label="Effective Date"
             invalid={props.store['effectiveDate']?.error ?? false}
@@ -171,13 +129,13 @@ export const AddPrescriptionCard = (props: {
             on:photon-datepicker-selected={(e: any) =>
               props.actions.updateFormValue({
                 key: 'effectiveDate',
-                value: e.detail.date,
+                value: e.detail.date
               })
             }
           ></photon-datepicker>
         </div>
-        <div class="flex flex-col sm:flex-wrap sm:flex-row sm:items-start sm:gap-x-4">
-          <div class="flex flex-col flex-1 flex-shrink md:max-w-[50%]">
+        <div class="sm:grid sm:grid-cols-2 sm:gap-4">
+          <div class="">
             <photon-number-input
               class="flex-grow flex-1"
               label="Quantity"
@@ -189,7 +147,7 @@ export const AddPrescriptionCard = (props: {
               on:photon-input-changed={(e: any) => {
                 props.actions.updateFormValue({
                   key: 'dispenseQuantity',
-                  value: Number(e.detail.input),
+                  value: Number(e.detail.input)
                 });
               }}
             ></photon-number-input>
@@ -199,12 +157,12 @@ export const AddPrescriptionCard = (props: {
               on:photon-dose-selected={(e: any) => {
                 props.actions.updateFormValue({
                   key: 'dispenseQuantity',
-                  value: Number(e.detail.value),
+                  value: Number(e.detail.value)
                 });
                 if (e.detail.unit === 'mL') {
                   props.actions.updateFormValue({
                     key: 'dispenseUnit',
-                    value: 'Milliliter',
+                    value: 'Milliliter'
                   });
                 }
               }}
@@ -221,7 +179,6 @@ export const AddPrescriptionCard = (props: {
             </photon-button>
           </div>
           <photon-dispense-units
-            class="flex-grow flex-shrink md:max-w-[50%] flex-1"
             label="Dispense Unit"
             required="true"
             force-label-size="true"
@@ -229,14 +186,14 @@ export const AddPrescriptionCard = (props: {
             on:photon-dispense-unit-selected={(e: any) =>
               props.actions.updateFormValue({
                 key: 'dispenseUnit',
-                value: e.detail.dispenseUnit.name,
+                value: e.detail.dispenseUnit.name
               })
             }
           ></photon-dispense-units>
         </div>
-        <div class="flex flex-col sm:flex-wrap sm:flex-row sm:items-center sm:gap-x-4">
+        <div class="sm:grid sm:grid-cols-2 sm:gap-4">
           <photon-number-input
-            class="flex-grow flex-shrink md:max-w-[50%] flex-1"
+            class="flex-grow flex-shrink flex-1"
             label="Days Supply"
             value={props.store['daysSupply']?.value ?? 30}
             invalid={props.store['daysSupply']?.error ?? false}
@@ -246,12 +203,12 @@ export const AddPrescriptionCard = (props: {
             on:photon-input-changed={(e: any) => {
               props.actions.updateFormValue({
                 key: 'daysSupply',
-                value: Number(e.detail.input),
+                value: Number(e.detail.input)
               });
             }}
           ></photon-number-input>
           <photon-number-input
-            class="flex-grow flex-shrink md:max-w-[50%] flex-1"
+            class="flex-grow flex-shrink flex-1"
             label="Refills"
             value={props.store['refillsInput']?.value ?? 0}
             required="true"
@@ -261,7 +218,7 @@ export const AddPrescriptionCard = (props: {
             on:photon-input-changed={(e: any) =>
               props.actions.updateFormValue({
                 key: 'refillsInput',
-                value: Number(e.detail.input),
+                value: Number(e.detail.input)
               })
             }
           ></photon-number-input>
@@ -276,7 +233,7 @@ export const AddPrescriptionCard = (props: {
           on:photon-textarea-changed={(e: any) =>
             props.actions.updateFormValue({
               key: 'instructions',
-              value: e.detail.value,
+              value: e.detail.value
             })
           }
           value={props.store['instructions']?.value}
@@ -287,7 +244,7 @@ export const AddPrescriptionCard = (props: {
           on:photon-textarea-changed={(e: any) =>
             props.actions.updateFormValue({
               key: 'notes',
-              value: e.detail.value,
+              value: e.detail.value
             })
           }
           value={props.store['notes']?.value}
@@ -301,7 +258,7 @@ export const AddPrescriptionCard = (props: {
               on:photon-checkbox-toggled={(e: any) =>
                 props.actions.updateFormValue({
                   key: 'addToTemplates',
-                  value: e.detail.checked,
+                  value: e.detail.checked
                 })
               }
             ></photon-checkbox>
@@ -316,7 +273,7 @@ export const AddPrescriptionCard = (props: {
                   'dispenseQuantity',
                   'daysSupply',
                   'refillsInput',
-                  'instructions',
+                  'instructions'
                 ];
                 props.actions.validate(keys);
                 const errorsPresent = props.actions.hasErrors(keys);
@@ -338,13 +295,13 @@ export const AddPrescriptionCard = (props: {
                         notes: props.store['notes'].value,
                         fillsAllowed: props.store['refillsInput'].value + 1,
                         addToTemplates: props.store['addToTemplates']?.value ?? false,
-                        catalogId: props.store['catalogId'].value ?? undefined,
-                      },
-                    ],
+                        catalogId: props.store['catalogId'].value ?? undefined
+                      }
+                    ]
                   });
                   props.actions.updateFormValue({
                     key: 'effectiveDate',
-                    value: format(new Date(), 'yyyy-MM-dd').toString(),
+                    value: format(new Date(), 'yyyy-MM-dd').toString()
                   });
                   props.actions.clearKeys([
                     'treatment',
@@ -354,36 +311,36 @@ export const AddPrescriptionCard = (props: {
                     'daysSupply',
                     'refillsInput',
                     'instructions',
-                    'notes',
+                    'notes'
                   ]);
                   setOffCatalog(undefined);
                   props.actions.updateFormValue({
                     key: 'treatment',
-                    value: undefined,
+                    value: undefined
                   });
                   props.actions.updateFormValue({
                     key: 'refillsInput',
-                    value: 0,
+                    value: 0
                   });
                   props.actions.updateFormValue({
                     key: 'dispenseAsWritten',
-                    value: false,
+                    value: false
                   });
                   props.actions.updateFormValue({
                     key: 'dispenseQuantity',
-                    value: 1,
+                    value: 1
                   });
                   props.actions.updateFormValue({
                     key: 'daysSupply',
-                    value: 30,
+                    value: 30
                   });
                   props.actions.updateFormValue({
                     key: 'instructions',
-                    value: '',
+                    value: ''
                   });
                   props.actions.updateFormValue({
                     key: 'notes',
-                    value: '',
+                    value: ''
                   });
                 }
               }}
