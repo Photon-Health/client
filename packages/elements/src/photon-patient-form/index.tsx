@@ -187,7 +187,6 @@ customElement(
         <Show when={!pStore.selectedPatient.isLoading}>
           <PhotonAuthorized permissions={['write:patient']}>
             <photon-card title="Personal">
-              <Button onClick={() => console.log('clicked')}>aoeusthaoseunthaoe</Button>
               <div class="flex flex-col xs:flex-row xs:gap-4">
                 <photon-text-input
                   class="flex-grow min-w-[40%]"
