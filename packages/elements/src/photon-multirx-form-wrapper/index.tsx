@@ -154,6 +154,7 @@ customElement(
             data!.createPrescriptions.map((x) => x.id),
             store['patient']?.value.id
           );
+          patientActions.clearSelectedPatient();
         } catch (err) {
           setSubmitErrors([err as Error]);
         }
@@ -210,6 +211,7 @@ customElement(
               <photon-button
                 size="sm"
                 disabled={!canSubmit() || !canWritePrescription()}
+                loading={isLoading() && isCreateOrder()}
                 on:photon-clicked={() =>
                   form()?.treatment?.value?.name ? setContinueSubmitOpen(true) : handleSubmit()
                 }
