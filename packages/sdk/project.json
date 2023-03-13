@@ -12,6 +12,13 @@
         "command": "vite --port 3000"
       }
     },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/sdk",
+        "command": "rimraf dist && vite build"
+      }
+    },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
