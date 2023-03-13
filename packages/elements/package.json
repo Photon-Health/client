@@ -68,7 +68,7 @@
     "libphonenumber-js": "^1.10.14",
     "solid-element": "^1.5.6",
     "solid-js": "^1.5.6",
-    "superstruct": "^0.16.7"
+    "superstruct": "^1.0.3"
   },
   "exports": {
     ".": {
