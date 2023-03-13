@@ -7,6 +7,7 @@ import { PatientStore } from '../stores/patient';
 import { PharmacyStore } from '../stores/pharmacy';
 import tailwind from '../tailwind.css?inline';
 import { email, empty, message, numericString } from '../validators';
+import { Button } from '@photonhealth/components';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/spinner/spinner';
