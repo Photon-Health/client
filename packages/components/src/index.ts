@@ -3,11 +3,11 @@ import Client from './systems/Client';
 import Test from './systems/Test';
 import { PhotonClientStore } from './store';
 import { PhotonClient } from '@photonhealth/sdk';
-import { CatalogStore } from './stores/catalog';
+import { createCatalogStore } from './stores/catalog';
 import { createFormStore } from './stores/form';
-import { PatientStore } from './stores/patient';
-import { PharmacyStore } from './stores/pharmacy';
-import { DispenseUnitStore } from './stores/dispenseUnit';
+import { createPatientStore } from './stores/patient';
+import { createPharmacyStore } from './stores/pharmacy';
+import { createDispenseUnitStore } from './stores/dispenseUnit';
 
 export {
   Button,
@@ -15,9 +15,9 @@ export {
   Test,
   PhotonClientStore,
   PhotonClient,
-  CatalogStore,
+  createCatalogStore,
   createFormStore,
-  PatientStore,
-  PharmacyStore,
-  DispenseUnitStore
+  createPatientStore,
+  createPharmacyStore,
+  createDispenseUnitStore
 };

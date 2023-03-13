@@ -28,8 +28,11 @@ const CATALOG_TREATMENTS_FIELDS = gql`
   }
 `;
 
-const createCatalogStore = () => {
-  const [store, setStore] = createStore<{
+export const createCatalogStore = (cs?: typeof createStore) => {
+  // TODO when we are no longer maintaining components inside of elements, we can remove this
+  // this fixes an issue where the reactivity is lost when using the store in elements
+  const _createStore = cs || createStore;
+  const [store, setStore] = _createStore<{
     catalogs: {
       data: Catalog[];
       errors: readonly GraphQLError[];
