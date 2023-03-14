@@ -98,6 +98,7 @@ export const OrderForm = ({
 }: OrderFormProps) => {
   const { colorMode } = useColorMode();
   const [updatePreferredPharmacy, setUpdatePreferredPharmacy] = useState(false);
+  const [updateAddress, setUpdateAddress] = useState(false);
 
   const onCancel = async (dirty: Boolean) => {
     if (!dirty) onClose();
@@ -155,6 +156,16 @@ export const OrderForm = ({
           setSubmitting(true);
           createOrderMutation({ variables: values, onCompleted: onClose });
 
+          // if the user has selected to set the customer's address
+          if (updateAddress) {
+            updatePatientMutation({
+              variables: {
+                id: patient.id,
+                address: { ...values.address }
+              }
+            });
+          }
+
           // if the user has selected to save the pharmacy as their preferred pharmacy
           if (updatePreferredPharmacy) {
             if (patient?.preferredPharmacies?.length > 0) {
@@ -211,6 +222,8 @@ export const OrderForm = ({
                 touched={touched}
                 showAddress={showAddress}
                 setShowAddress={setShowAddress}
+                updateAddress={updateAddress}
+                setUpdateAddress={setUpdateAddress}
               />
 
               <SelectPharmacyCard

@@ -46,6 +46,7 @@ interface TablePageProps {
   ctaColor?: string;
   ctaRoute?: string;
   ctaOnClick?: () => void;
+  filter?: Element | ReactElement;
   paginationIndicator?: Element | ReactElement;
   paginationActions?: Element | ReactElement;
   total?: number;
@@ -68,6 +69,7 @@ export const TablePage = (props: TablePageProps) => {
     ctaColor,
     ctaRoute,
     ctaOnClick,
+    filter,
     paginationIndicator,
     paginationActions,
     total,
@@ -145,17 +147,22 @@ export const TablePage = (props: TablePageProps) => {
                 {ctaText}
               </Button>
             )}
-            <InputGroup maxW={{ base: '100%', md: 'xs' }}>
-              <InputLeftElement pointerEvents="none">
-                <Icon as={FiSearch} color="muted" boxSize="5" />
-              </InputLeftElement>
-              <Input
-                type="text"
-                placeholder={searchPlaceholder}
-                onChange={handleInputChange}
-                value={filterText}
-              />
-            </InputGroup>
+            <Stack direction={{ base: 'column', md: 'row' }}>
+              <>
+                {filter ? filter : null}
+                <InputGroup maxW={{ base: '100%', md: 'xs' }} minWidth={300}>
+                  <InputLeftElement pointerEvents="none">
+                    <Icon as={FiSearch} color="muted" boxSize="5" />
+                  </InputLeftElement>
+                  <Input
+                    type="text"
+                    placeholder={searchPlaceholder}
+                    onChange={handleInputChange}
+                    value={filterText}
+                  />
+                </InputGroup>
+              </>
+            </Stack>
           </Stack>
         </Box>
         <Box overflowX="auto">
