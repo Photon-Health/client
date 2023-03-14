@@ -1,7 +1,8 @@
-import { Link as RouterLink, useSearchParams } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 
 import {
   Badge,
+  Select,
   HStack,
   IconButton,
   Skeleton,
@@ -21,6 +22,7 @@ import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
 import NameView from '../components/NameView';
 import PatientView from '../components/PatientView';
+import { types } from '@photonhealth/sdk';
 
 interface MedViewProps {
   name: string;
@@ -144,7 +146,25 @@ export const renderSkeletonRow = () => ({
   )
 });
 
+const convertStatusQuery = (status: string | null): types.PrescriptionState | undefined => {
+  if (!status) {
+    return undefined;
+  }
+  const isValidStatus = Object.values(types.PrescriptionState).includes(
+    status.toUpperCase() as types.PrescriptionState
+  );
+  return isValidStatus ? (status.toUpperCase() as types.PrescriptionState) : undefined;
+};
+
 export const Prescriptions = () => {
+  const location = useLocation();
+  const queryStatus = new URLSearchParams(location.search).get('status');
+  const navigate = useNavigate();
+
+  const [status, setStatus] = useState<types.PrescriptionState | undefined>(
+    convertStatusQuery(queryStatus)
+  );
+  const [filterChangeLoading, setFilterChangeLoading] = useState(false);
   const [params] = useSearchParams();
   const patientId = params.get('patientId');
   const prescriberId = params.get('prescriberId');
@@ -193,11 +213,14 @@ export const Prescriptions = () => {
   const [finished, setFinished] = useState<boolean>(false);
   const [filterTextDebounce] = useDebounce(filterText, 250);
 
-  const { prescriptions, loading, error, refetch } = getPrescriptions({
-    patientId,
-    prescriberId,
-    patientName: filterTextDebounce.length > 0 ? filterTextDebounce : null
-  });
+  const getPrescriptionsData = {
+    patientId: patientId || undefined,
+    prescriberId: prescriberId || undefined,
+    state: status,
+    patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
+  };
+
+  const { prescriptions, loading, error, refetch } = getPrescriptions(getPrescriptionsData);
 
   useEffect(() => {
     if (!loading) {
@@ -205,14 +228,31 @@ export const Prescriptions = () => {
       setRows(preppedRows);
       setFinished(prescriptions.length === 0);
     }
-  }, [loading]);
+  }, [loading, prescriptions]);
+
+  useEffect(() => {
+    navigate({
+      search: status ? `?status=${status}` : ''
+    });
+    async function refetchData() {
+      setRows([]);
+      setFilterChangeLoading(true);
+      const { data } = await refetch(getPrescriptionsData);
+      setFilterChangeLoading(false);
+      if (data?.prescriptions.length === 0) {
+        setFinished(true);
+      }
+      setRows(data?.prescriptions.map(renderRow));
+    }
+    refetchData();
+  }, [status, navigate]);
 
   const skeletonRows = new Array(25).fill(0).map(renderSkeletonRow);
 
   return (
     <Page header="Prescriptions">
       <TablePage
-        data={loading ? skeletonRows : rows}
+        data={loading || filterChangeLoading ? skeletonRows : rows}
         columns={columns}
         loading={loading}
         error={error}
@@ -223,11 +263,20 @@ export const Prescriptions = () => {
         setFilterText={setFilterText}
         hasMore={rows.length % 25 === 0 && !finished}
         searchPlaceholder="Search by patient name"
+        filter={
+          <Select
+            placeholder="No Filter"
+            onChange={(e) => setStatus((e.target.value as types.PrescriptionState) || undefined)}
+            value={status}
+          >
+            <option value={types.PrescriptionState.Active}>Status Active</option>
+            <option value={types.PrescriptionState.Depleted}>Status Depleted</option>
+            <option value={types.PrescriptionState.Expired}>Status Expired</option>
+          </Select>
+        }
         fetchMoreData={async () => {
           const { data } = await refetch({
-            patientId: patientId || undefined,
-            prescriberId: prescriberId || undefined,
-            patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
+            ...getPrescriptionsData,
             after: rows?.at(-1)?.id
           });
           if (data?.prescriptions.length === 0) {

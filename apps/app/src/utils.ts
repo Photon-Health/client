@@ -21,7 +21,8 @@ function formatDateLong(date: string | Date) {
   const options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'UTC'
   };
   return new Date(date)?.toLocaleDateString([], options);
 }
