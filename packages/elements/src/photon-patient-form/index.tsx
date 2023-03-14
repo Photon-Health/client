@@ -7,7 +7,6 @@ import { PatientStore } from '../stores/patient';
 import { PharmacyStore } from '../stores/pharmacy';
 import tailwind from '../tailwind.css?inline';
 import { email, empty, message, numericString } from '../validators';
-import { Button } from '@photonhealth/components';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/spinner/spinner';
@@ -94,6 +93,9 @@ customElement(
     onMount(() => {
       if (patientId) {
         pActions.getSelectedPatient(client!.getSDK(), patientId);
+      } else {
+        pActions.clearSelectedPatient();
+        actions.reset();
       }
     });
 
