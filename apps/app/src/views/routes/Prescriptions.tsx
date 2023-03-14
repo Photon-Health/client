@@ -2,6 +2,7 @@ import { Link as RouterLink, useSearchParams } from 'react-router-dom';
 
 import {
   Badge,
+  Select,
   HStack,
   IconButton,
   Skeleton,
@@ -21,6 +22,7 @@ import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
 import NameView from '../components/NameView';
 import PatientView from '../components/PatientView';
+import { types } from '@photonhealth/sdk';
 
 interface MedViewProps {
   name: string;
@@ -145,6 +147,7 @@ export const renderSkeletonRow = () => ({
 });
 
 export const Prescriptions = () => {
+  const [status, setStatus] = useState<types.PrescriptionState | undefined>(undefined);
   const [params] = useSearchParams();
   const patientId = params.get('patientId');
   const prescriberId = params.get('prescriberId');
@@ -196,6 +199,7 @@ export const Prescriptions = () => {
   const { prescriptions, loading, error, refetch } = getPrescriptions({
     patientId,
     prescriberId,
+    state: status,
     patientName: filterTextDebounce.length > 0 ? filterTextDebounce : null
   });
 
@@ -206,6 +210,10 @@ export const Prescriptions = () => {
       setFinished(prescriptions.length === 0);
     }
   }, [loading]);
+
+  useEffect(() => {
+    console.log('status changed', status);
+  }, [status]);
 
   const skeletonRows = new Array(25).fill(0).map(renderSkeletonRow);
 
@@ -223,11 +231,22 @@ export const Prescriptions = () => {
         setFilterText={setFilterText}
         hasMore={rows.length % 25 === 0 && !finished}
         searchPlaceholder="Search by patient name"
+        filter={
+          <Select
+            placeholder="No Filter"
+            onChange={(e) => setStatus((e.target.value as types.PrescriptionState) || undefined)}
+          >
+            <option value={types.PrescriptionState.Active}>Status Active</option>
+            <option value={types.PrescriptionState.Depleted}>Status Depleted</option>
+            <option value={types.PrescriptionState.Expired}>Status Expired</option>
+          </Select>
+        }
         fetchMoreData={async () => {
           const { data } = await refetch({
             patientId: patientId || undefined,
             prescriberId: prescriberId || undefined,
             patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
+            state: status,
             after: rows?.at(-1)?.id
           });
           if (data?.prescriptions.length === 0) {
