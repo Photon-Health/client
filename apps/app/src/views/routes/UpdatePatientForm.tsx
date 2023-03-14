@@ -35,7 +35,7 @@ export const UpdatePatientForm = () => {
 
   return (
     <div>
-      <photon-patient-dialog ref={ref} patient />
+      <photon-patient-dialog ref={ref} patient-id={id} />
     </div>
   );
 };
