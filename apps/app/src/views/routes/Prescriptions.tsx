@@ -233,6 +233,7 @@ export const Prescriptions = () => {
         searchPlaceholder="Search by patient name"
         filter={
           <Select
+            flexShrink={2}
             placeholder="No Filter"
             onChange={(e) => setStatus((e.target.value as types.PrescriptionState) || undefined)}
           >
