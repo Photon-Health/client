@@ -150,7 +150,7 @@ export const TablePage = (props: TablePageProps) => {
             <Stack direction={{ base: 'column', md: 'row' }}>
               <>
                 {filter ? filter : null}
-                <InputGroup maxW={{ base: '100%', md: 'xs' }}>
+                <InputGroup maxW={{ base: '100%', md: 'xs' }} minWidth={300}>
                   <InputLeftElement pointerEvents="none">
                     <Icon as={FiSearch} color="muted" boxSize="5" />
                   </InputLeftElement>
