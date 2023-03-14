@@ -1,6 +1,5 @@
 import { useRef, MutableRefObject, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ulid } from 'ulid';
 
 declare global {
   namespace JSX {
