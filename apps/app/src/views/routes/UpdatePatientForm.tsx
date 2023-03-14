@@ -1,6 +1,5 @@
 import { createRef, MutableRefObject, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ulid } from 'ulid';
 
 declare global {
   namespace JSX {
@@ -35,7 +34,7 @@ export const UpdatePatientForm = () => {
 
   return (
     <div>
-      <photon-patient-dialog ref={ref} patient />
+      <photon-patient-dialog ref={ref} patient-id={id} />
     </div>
   );
 };
