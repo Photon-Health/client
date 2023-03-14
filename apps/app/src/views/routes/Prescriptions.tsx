@@ -164,6 +164,7 @@ export const Prescriptions = () => {
   const [status, setStatus] = useState<types.PrescriptionState | undefined>(
     convertStatusQuery(queryStatus)
   );
+  const [filterChangeLoading, setFilterChangeLoading] = useState(false);
   const [params] = useSearchParams();
   const patientId = params.get('patientId');
   const prescriberId = params.get('prescriberId');
@@ -231,6 +232,22 @@ export const Prescriptions = () => {
     navigate({
       search: status ? `?status=${status}` : ''
     });
+    async function refetchData() {
+      setRows([]);
+      setFilterChangeLoading(true);
+      const { data } = await refetch({
+        patientId: patientId || undefined,
+        prescriberId: prescriberId || undefined,
+        patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
+        state: status
+      });
+      setFilterChangeLoading(false);
+      if (data?.prescriptions.length === 0) {
+        setFinished(true);
+      }
+      setRows(data?.prescriptions.map(renderRow));
+    }
+    refetchData();
   }, [status, navigate]);
 
   const skeletonRows = new Array(25).fill(0).map(renderSkeletonRow);
@@ -238,7 +255,7 @@ export const Prescriptions = () => {
   return (
     <Page header="Prescriptions">
       <TablePage
-        data={loading ? skeletonRows : rows}
+        data={loading || filterChangeLoading ? skeletonRows : rows}
         columns={columns}
         loading={loading}
         error={error}
