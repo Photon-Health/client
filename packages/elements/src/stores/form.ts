@@ -37,7 +37,7 @@ export const createFormStore = (initalValue?: Record<string, any>) => {
 
   const clearKeys = (keys: string[]) => {
     for (const key of keys) {
-      setStore(key, undefined);
+      setStore(key, { value: undefined, error: undefined });
     }
   };
 

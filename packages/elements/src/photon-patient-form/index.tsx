@@ -1,5 +1,5 @@
 import { customElement } from 'solid-element';
-import { createEffect, onMount, Show } from 'solid-js';
+import { createEffect, onCleanup, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
 import { usePhoton } from '../context';
 import { createFormStore } from '../stores/form';
@@ -173,6 +173,11 @@ customElement(
 
     createEffect(() => {
       dispatchFormUpdated(store);
+    });
+
+    onCleanup(() => {
+      pActions.clearSelectedPatient();
+      actions.reset();
     });
 
     return (
