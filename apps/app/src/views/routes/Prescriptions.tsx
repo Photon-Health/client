@@ -1,4 +1,4 @@
-import { Link as RouterLink, useSearchParams } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 
 import {
   Badge,
@@ -146,8 +146,24 @@ export const renderSkeletonRow = () => ({
   )
 });
 
+const convertStatusQuery = (status: string | null): types.PrescriptionState | undefined => {
+  if (!status) {
+    return undefined;
+  }
+  const isValidStatus = Object.values(types.PrescriptionState).includes(
+    status.toUpperCase() as types.PrescriptionState
+  );
+  return isValidStatus ? (status.toUpperCase() as types.PrescriptionState) : undefined;
+};
+
 export const Prescriptions = () => {
-  const [status, setStatus] = useState<types.PrescriptionState | undefined>(undefined);
+  const location = useLocation();
+  const queryStatus = new URLSearchParams(location.search).get('status');
+  const navigate = useNavigate();
+
+  const [status, setStatus] = useState<types.PrescriptionState | undefined>(
+    convertStatusQuery(queryStatus)
+  );
   const [params] = useSearchParams();
   const patientId = params.get('patientId');
   const prescriberId = params.get('prescriberId');
@@ -209,11 +225,13 @@ export const Prescriptions = () => {
       setRows(preppedRows);
       setFinished(prescriptions.length === 0);
     }
-  }, [loading]);
+  }, [loading, prescriptions]);
 
   useEffect(() => {
-    console.log('status changed', status);
-  }, [status]);
+    navigate({
+      search: status ? `?status=${status}` : ''
+    });
+  }, [status, navigate]);
 
   const skeletonRows = new Array(25).fill(0).map(renderSkeletonRow);
 
@@ -236,6 +254,7 @@ export const Prescriptions = () => {
             flexShrink={2}
             placeholder="No Filter"
             onChange={(e) => setStatus((e.target.value as types.PrescriptionState) || undefined)}
+            value={status}
           >
             <option value={types.PrescriptionState.Active}>Status Active</option>
             <option value={types.PrescriptionState.Depleted}>Status Depleted</option>
