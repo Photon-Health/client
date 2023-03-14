@@ -1,25 +1,25 @@
 import { createStore } from 'solid-js/store';
 import { Struct, assert, StructError } from 'superstruct';
 
-export const createFormStore = (initalValue?: Record<string, any>, cs?: typeof createStore) => {
+export const createFormStore = (initialValue?: Record<string, any>, cs?: typeof createStore) => {
   type StoreValue = { value: any; error?: string };
   const validators: Record<string, Array<Struct>> = {};
-  if (initalValue) {
+  if (initialValue) {
     const tmp: Record<string, any> = {};
-    for (const key of Object.keys(initalValue)) {
+    for (const key of Object.keys(initialValue)) {
       tmp[key] = {
-        value: initalValue[key],
+        value: initialValue[key],
         error: undefined
       };
     }
-    initalValue = tmp;
+    initialValue = tmp;
   }
 
   // TODO when we are no longer maintaining components inside of elements, we can remove this
   // this fixes an issue where the reactivity is lost when using the store in elements
   const _createStore = cs || createStore;
   const [store, setStore] = _createStore<Record<string, StoreValue | undefined>>(
-    initalValue ? initalValue : {}
+    initialValue || {}
   );
 
   const updateFormValue = ({ key, value }: { key: string; value: any }) => {
