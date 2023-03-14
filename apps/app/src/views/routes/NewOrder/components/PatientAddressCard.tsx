@@ -115,9 +115,6 @@ export const PatientAddressCard = ({
               onChange={(e) => setUpdateAddress(e.target.checked)}
             >
               Save as Patient’s Address{' '}
-              <Text as="span" fontSize="xs" color="gray.400">
-                Optional
-              </Text>
             </Checkbox>
           </VStack>
         )}
