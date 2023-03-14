@@ -213,12 +213,14 @@ export const Prescriptions = () => {
   const [finished, setFinished] = useState<boolean>(false);
   const [filterTextDebounce] = useDebounce(filterText, 250);
 
-  const { prescriptions, loading, error, refetch } = getPrescriptions({
-    patientId,
-    prescriberId,
+  const getPrescriptionsData = {
+    patientId: patientId || undefined,
+    prescriberId: prescriberId || undefined,
     state: status,
-    patientName: filterTextDebounce.length > 0 ? filterTextDebounce : null
-  });
+    patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
+  };
+
+  const { prescriptions, loading, error, refetch } = getPrescriptions(getPrescriptionsData);
 
   useEffect(() => {
     if (!loading) {
@@ -235,12 +237,7 @@ export const Prescriptions = () => {
     async function refetchData() {
       setRows([]);
       setFilterChangeLoading(true);
-      const { data } = await refetch({
-        patientId: patientId || undefined,
-        prescriberId: prescriberId || undefined,
-        patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
-        state: status
-      });
+      const { data } = await refetch(getPrescriptionsData);
       setFilterChangeLoading(false);
       if (data?.prescriptions.length === 0) {
         setFinished(true);
@@ -280,10 +277,7 @@ export const Prescriptions = () => {
         }
         fetchMoreData={async () => {
           const { data } = await refetch({
-            patientId: patientId || undefined,
-            prescriberId: prescriberId || undefined,
-            patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
-            state: status,
+            ...getPrescriptionsData,
             after: rows?.at(-1)?.id
           });
           if (data?.prescriptions.length === 0) {
