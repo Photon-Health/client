@@ -239,7 +239,11 @@ customElement(
                       value: e.detail.date
                     });
                   }}
-                  value={store['dateOfBirth']?.value ?? pStore.selectedPatient.data?.dateOfBirth}
+                  value={
+                    patientId
+                      ? pStore.selectedPatient.data?.dateOfBirth
+                      : store['dateOfBirth']?.value
+                  }
                 ></photon-datepicker>
                 <photon-phone-input
                   class="w-full xs:min-w-[48%]"
