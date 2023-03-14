@@ -12,7 +12,7 @@ import tailwind from '../tailwind.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import styles from './style.css?inline';
-import { onMount } from 'solid-js';
+import { createMemo, onMount } from 'solid-js';
 
 export interface PhoneInputProps {
   label?: string;
@@ -53,6 +53,17 @@ customElement(
       }
     });
 
+    const phoneValue = createMemo(() => {
+      if (props.value) {
+        if (props.value.length > 2) {
+          // throws a TOO_SHORT error if the number is under two digits, but three digits totally cool _eyeroll_
+          return new AsYouType('US').input(parsePhoneNumber(props.value, 'US').formatNational());
+        }
+        return props.value;
+      }
+      return '';
+    });
+
     return (
       <>
         <style>{tailwind}</style>
@@ -76,18 +87,14 @@ customElement(
               try {
                 const parsed = parsePhoneNumber(e.target.value, 'US').format('E.164');
                 dispatchPhoneChanged(parsed);
-              } catch (e) {
+              } catch {
                 dispatchPhoneChanged(e.target?.value || '');
               }
             }}
             type="tel"
             invalid={props.invalid}
             placeholder={'(   ) ___-____'}
-            value={
-              props.value
-                ? new AsYouType('US').input(parsePhoneNumber(props.value, 'US').formatNational())
-                : ''
-            }
+            value={phoneValue()}
           >
             <p slot="help-text" class="text-red-500 pt-2 h-[21px] font-sans">
               {props.helpText}
