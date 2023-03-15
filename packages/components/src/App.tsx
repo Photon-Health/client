@@ -1,5 +1,5 @@
 import Client from './systems/Client';
-import Test from './systems/Test';
+import PharmacySearch from './systems/PharmacySearch';
 
 const App = () => {
   return (
@@ -10,7 +10,7 @@ const App = () => {
       audience="https://api.boson.health"
       uri="https://api.boson.health/graphql"
     >
-      <Test />
+      <PharmacySearch />
     </Client>
   );
 };

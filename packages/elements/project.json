@@ -20,6 +20,14 @@
         "command": "npx eslint src/**/*.{tsx,ts}"
       }
     },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/elements",
+        "command": "rimraf dist && vite build"
+      },
+      "dependsOn": ["^build"]
+    },
     "lint:fix": {
       "executor": "nx:run-commands",
       "options": {

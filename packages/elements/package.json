@@ -7,7 +7,7 @@
   "scripts": {
     "start": "vite --port 3000",
     "build": "rimraf dist && NODE_ENV=development vite build",
-    "build:prod": "rimraf dist && vite build",
+    "build:prod": "npx nx run elements:build",
     "build:watch": "rimraf dist && vite build --watch",
     "prepublishOnly": "npm run build:prod",
     "upload-s3": "npm run upload-s3:package-json && npm run upload-s3:dist && npm run upload-s3:package-json-latest && npm run upload-s3:dist-latest",

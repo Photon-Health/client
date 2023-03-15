@@ -2,7 +2,7 @@ import { createEffect, createSignal } from 'solid-js';
 import { usePhoton } from '../../context';
 import { PatientStore } from '../../stores/patient';
 
-export default function Test(props: { uP?: any }) {
+export default function PharmacySearch(props: { uP?: any }) {
   const client = props.uP ? props.uP() : usePhoton();
   const [trigger, setTrigger] = createSignal(false);
   const { store, actions } = PatientStore;
