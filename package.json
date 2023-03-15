@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "app:local": "concurrently \"npx nx run elements:build:watch\" \"npx nx run app:start\"",
+    "patient": "npx nx run patient:start",
     "lint": "npx nx run-many --target=lint",
     "lint:fix": "npx nx run-many --target=lint:fix"
   },
