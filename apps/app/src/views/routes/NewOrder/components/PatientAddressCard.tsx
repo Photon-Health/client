@@ -3,6 +3,7 @@ import {
   Card,
   CardBody,
   CardHeader,
+  Checkbox,
   FormControl,
   FormErrorMessage,
   FormHelperText,
@@ -29,6 +30,8 @@ interface PatientAddressCardProps {
   loading: boolean;
   showAddress: boolean;
   setShowAddress: any;
+  updateAddress: boolean;
+  setUpdateAddress: (value: boolean) => void;
 }
 
 export const PatientAddressCard = ({
@@ -38,7 +41,9 @@ export const PatientAddressCard = ({
   setFieldValue,
   loading,
   showAddress,
-  setShowAddress
+  setShowAddress,
+  updateAddress,
+  setUpdateAddress
 }: PatientAddressCardProps) => {
   return (
     <Card bg="bg-surface">
@@ -104,6 +109,13 @@ export const PatientAddressCard = ({
                 <FormErrorMessage>{errors.address?.postalCode}</FormErrorMessage>
               </FormControl>
             </HStack>
+            <Checkbox
+              pt={2}
+              isChecked={updateAddress}
+              onChange={(e) => setUpdateAddress(e.target.checked)}
+            >
+              Save as Patient’s Address{' '}
+            </Checkbox>
           </VStack>
         )}
       </CardBody>

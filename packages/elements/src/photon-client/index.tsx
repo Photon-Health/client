@@ -1,6 +1,5 @@
 import { customElement } from 'solid-element';
 import { PhotonContext } from '../context';
-
 import { Client } from '@photonhealth/components';
 import { createStore } from 'solid-js/store';
 

@@ -1,5 +1,5 @@
 import { customElement } from 'solid-element';
-import { createEffect, onMount, Show } from 'solid-js';
+import { createEffect, onCleanup, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
 import { usePhoton } from '../context';
 import { createFormStore } from '../stores/form';
@@ -7,7 +7,6 @@ import { PatientStore } from '../stores/patient';
 import { PharmacyStore } from '../stores/pharmacy';
 import tailwind from '../tailwind.css?inline';
 import { email, empty, message, numericString } from '../validators';
-import { Button } from '@photonhealth/components';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/spinner/spinner';
@@ -98,6 +97,9 @@ customElement(
     onMount(() => {
       if (patientId) {
         pActions.getSelectedPatient(client!.getSDK(), patientId);
+      } else {
+        pActions.clearSelectedPatient();
+        actions.reset();
       }
     });
 
@@ -177,6 +179,11 @@ customElement(
       dispatchFormUpdated(store);
     });
 
+    onCleanup(() => {
+      pActions.clearSelectedPatient();
+      actions.reset();
+    });
+
     return (
       <div class="w-full h-full relative" ref={ref}>
         <style>{tailwind}</style>
@@ -236,7 +243,11 @@ customElement(
                       value: e.detail.date
                     });
                   }}
-                  value={store['dateOfBirth']?.value ?? pStore.selectedPatient.data?.dateOfBirth}
+                  value={
+                    patientId
+                      ? pStore.selectedPatient.data?.dateOfBirth
+                      : store['dateOfBirth']?.value
+                  }
                 ></photon-datepicker>
                 <photon-phone-input
                   class="w-full xs:min-w-[48%]"

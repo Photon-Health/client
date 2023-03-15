@@ -215,6 +215,7 @@ customElement(
                 on:photon-clicked={() =>
                   form()?.treatment?.value?.name ? setContinueSubmitOpen(true) : handleSubmit()
                 }
+                loading={isLoading() && isCreateOrder()}
               >
                 Save and create order
               </photon-button>
