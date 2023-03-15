@@ -6,9 +6,10 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "start": "vite --port 3000",
-    "build": "rimraf dist && vite build",
+    "build": "rimraf dist && NODE_ENV=development vite build",
+    "build:prod": "rimraf dist && vite build",
     "build:watch": "rimraf dist && vite build --watch",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build:prod",
     "upload-s3": "npm run upload-s3:package-json && npm run upload-s3:dist && npm run upload-s3:package-json-latest && npm run upload-s3:dist-latest",
     "upload-s3:package-json": "s3-deploy './package.json' --cwd './' --region 'us-east-1' --bucket 'cdn.rx.dev' --filePrefix $PREFIX",
     "upload-s3:dist": "s3-deploy './dist/**' --cwd './dist/' --region 'us-east-1' --bucket 'cdn.rx.dev' --filePrefix $PREFIX/dist",
