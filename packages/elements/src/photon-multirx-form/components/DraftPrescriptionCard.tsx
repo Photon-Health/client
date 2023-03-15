@@ -140,7 +140,7 @@ export const DraftPrescriptionCard = (props: {
                 <div class="flex flex-row items-center">
                   <div class="flex flex-col flex-grow">
                     <p class="font-medium font-sans">{draft.treatment.name}</p>
-                    <p class="font-normal text-gray-700 overflow-hidden whitespace-nowrap overflow-ellipsis font-sans">
+                    <p class="font-normal text-gray-700 overflow-hidden overflow-ellipsis font-sans">
                       {/* draft.refillsInput exists here because we are displaying the number of refills, not fills, the user entered into the form as part of the drafted prescription.
                        We have this stored under refillsInput. This should not have a "+1" unless we update this to show fills*/}
                       {draft.dispenseQuantity} {draft.dispenseUnit}, {draft.refillsInput} refills -{' '}
