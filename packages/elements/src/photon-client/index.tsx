@@ -5,6 +5,7 @@ import { hasAuthParams, validateProps } from '../utils';
 import { PhotonClient } from '@photonhealth/sdk';
 import { PhotonClientStore } from '../store';
 import { makeTimer } from '@solid-primitives/timer';
+import Sentry from '../../sentry';
 
 type PhotonClientProps = {
   domain?: string;
@@ -107,6 +108,16 @@ customElement(
   }: PhotonClientProps) => {
     let ref: any;
     const errs = validateProps({ id }, ['id']);
+
+    Sentry.setContext('photon-client', {
+      domain: domain,
+      audience,
+      uri,
+      clientId: id!,
+      redirectURI: redirectUri ? redirectUri : window.location.origin,
+      organization: org,
+      developmentMode: developmentMode
+    });
 
     const sdk = new PhotonClient({
       domain: domain,
