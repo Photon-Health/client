@@ -90,30 +90,19 @@ customElement(
       parse: true
     }
   },
-  ({
-    domain,
-    id,
-    redirectUri,
-    redirectPath,
-    org,
-    developmentMode,
-    errorMessage,
-    audience,
-    uri,
-    autoLogin
-  }: PhotonClientProps) => {
+  (props: PhotonClientProps) => {
     return (
       <Client
-        domain={domain}
-        id={id}
-        redirectUri={redirectUri}
-        redirectPath={redirectPath}
-        org={org}
-        developmentMode={developmentMode}
-        errorMessage={errorMessage}
-        audience={audience}
-        uri={uri}
-        autoLogin={autoLogin}
+        domain={props.domain}
+        id={props.id}
+        redirectUri={props.redirectUri}
+        redirectPath={props.redirectPath}
+        org={props.org}
+        developmentMode={props.developmentMode}
+        errorMessage={props.errorMessage}
+        audience={props.audience}
+        uri={props.uri}
+        autoLogin={props.autoLogin}
         context={PhotonContext}
         createStore={createStore}
       >
