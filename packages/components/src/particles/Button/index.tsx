@@ -1,28 +1,17 @@
 import { clsx } from 'clsx';
+import { JSX } from 'solid-js';
 
 type ButtonVariant = 'primary' | 'secondary';
 type ButtonSize = 'xl' | 'lg' | 'md' | 'sm' | 'xs';
 
-export interface ButtonProps {
-  onClick?: () => void;
+export interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
   disabled?: boolean;
   variant?: ButtonVariant;
   size?: ButtonSize;
-  children: string;
 }
 
-export default function Button({
-  onClick,
-  disabled = false,
-  variant = 'primary',
-  size = 'md',
-  children
-}: ButtonProps) {
-  function handleClick() {
-    if (!disabled && onClick) {
-      onClick();
-    }
-  }
+export default function Button(props: ButtonProps) {
+  const { disabled, size = 'md', variant = 'primary', children, ...buttonProps } = props;
 
   const buttonClasses = clsx(
     ['xl', 'lg', 'md'].includes(size) ? 'rounded-md' : 'rounded',
@@ -45,7 +34,7 @@ export default function Button({
   );
 
   return (
-    <button class={buttonClasses} type="button" disabled={disabled} onClick={handleClick}>
+    <button class={buttonClasses} type="button" disabled={disabled} {...buttonProps}>
       {children}
     </button>
   );
