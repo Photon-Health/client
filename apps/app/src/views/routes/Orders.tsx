@@ -63,7 +63,7 @@ export const ORDER_FULFILLMENT_TIP_MAP: OrderFulfillmentRecord = {
   SENT: 'Order sent to pharmacy',
   RECEIVED: 'Order received by pharmacy',
   READY: 'Order ready at pharmacy',
-  PICKED_UP: 'Order pciked up by patient',
+  PICKED_UP: 'Order picked up by patient',
   FILLING: 'Mail order being filled',
   SHIPPED: 'Mail order shipped',
   DELIVERED: 'Mail order delivered'
