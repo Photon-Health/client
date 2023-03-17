@@ -71,7 +71,7 @@ export const MedicationStrengthDropdown = (props: { disabled: boolean; medicatio
         placeholder="Select a strength..."
         isLoading={isLoading()}
         hasMore={false}
-        displayAccessor={(p) => p.name}
+        displayAccessor={(p) => p?.name || ''}
         onSearchChange={async (s: string) => setFilterText(s)}
         onHide={async () => {
           setFilterText('');
