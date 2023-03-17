@@ -45,5 +45,5 @@ phases:
 artifacts:
   files:
     - '**/*'
-  base-directory: '../../dist/apps/patient'
+  base-directory: 'dist/apps/patient'
   name: $OUTPUT_DIR
