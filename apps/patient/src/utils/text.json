@@ -35,7 +35,7 @@
   "status": {
     "title": "Filling your prescriptions",
     "heading": "Filling your prescriptions",
-    "subheading": "After your prescription is sent to a pharmacy, we'll send you updates on it's status.",
+    "subheading": "After your prescriptions are sent to a pharmacy, we'll send you updates on their status.",
     "pickup": "Pick Up:",
     "SENT": {
       "title": "Sent to pharmacy",
