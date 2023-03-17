@@ -92,7 +92,7 @@ customElement(
           invalid={props.invalid}
           isLoading={store.patients.isLoading || store.selectedPatient.isLoading}
           hasMore={store.patients.data.length % 25 === 0 && !store.patients.finished}
-          displayAccessor={(p) => p.name.full}
+          displayAccessor={(p) => p?.name?.full || ''}
           onSearchChange={async (s: string) =>
             (fetchMore = await actions.getPatients(client!.getSDK(), {
               name: s
