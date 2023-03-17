@@ -25,49 +25,7 @@ import { Nav } from '../components/Nav'
 import { PoweredBy } from '../components/PoweredBy'
 import t from '../utils/text.json'
 import { OrderContext } from './Main'
-
-const prescriptions = [
-  {
-    id: 'sdfsafafssd',
-    name: 'finasteride 1 MG Oral Tablet',
-    quantity: 30,
-    daysSupply: 30,
-    refills: 5,
-    substitutions: true,
-    expires: '12/05/23',
-    instructions: 'Lorem ipsum dolar sit met'
-  },
-  {
-    id: 'sdfsafafsdfsaffssd',
-    name: 'Flovent (Fluticasone 0.11 mg) Respiratory (inhalation) aerosol, metered',
-    quantity: 30,
-    daysSupply: 30,
-    refills: 5,
-    substitutions: true,
-    expires: '12/05/23',
-    instructions: 'Lorem ipsum dolar sit met'
-  },
-  {
-    id: 'sdfsaasgfdgfdfafssd',
-    name: 'Flovent (Fluticasone 0.11 mg) Respiratory (inhalation) aerosol, metered',
-    quantity: 30,
-    daysSupply: 30,
-    refills: 5,
-    substitutions: true,
-    expires: '12/05/23',
-    instructions: 'Lorem ipsum dolar sit met'
-  },
-  {
-    id: 'sdfsagfdgfafssd',
-    name: 'Flovent (Fluticasone 0.11 mg) Respiratory (inhalation) aerosol, metered',
-    quantity: 30,
-    daysSupply: 30,
-    refills: 5,
-    substitutions: true,
-    expires: '12/05/23',
-    instructions: 'Lorem ipsum dolar sit met'
-  }
-]
+import { prescriptions } from '../utils/demoPrescriptions'
 
 export const Review = () => {
   const order = useContext<Order>(OrderContext)
