@@ -13,6 +13,7 @@ import {
   SkeletonCircle,
   SkeletonText,
   Text,
+  Tooltip,
   useBreakpointValue
 } from '@chakra-ui/react';
 
@@ -26,28 +27,46 @@ import PatientView from '../components/PatientView';
 import PharmacyNameView from '../components/PharmacyNameView';
 import { formatDate } from '../../utils';
 
-export const ORDER_FULFILLMENT_STATE_MAP: object = {
-  SENT: 'Sent',
+type OrderFulfillmentState =
+  | 'SENT'
   // Pick Up
+  | 'RECEIVED'
+  | 'READY'
+  | 'PICKED_UP'
+  // Mail Order
+  | 'FILLING'
+  | 'SHIPPED'
+  | 'DELIVERED';
+type OrderFulfillmentRecord = Record<OrderFulfillmentState, string>;
+
+export const ORDER_FULFILLMENT_STATE_MAP: OrderFulfillmentRecord = {
+  SENT: 'Sent',
   RECEIVED: 'Received',
   READY: 'Ready',
   PICKED_UP: 'Picked up',
-  // Mail Order
   FILLING: 'Filling',
   SHIPPED: 'Shipped',
   DELIVERED: 'Delivered'
 };
 
-export const ORDER_FULFILLMENT_COLOR_MAP: object = {
+export const ORDER_FULFILLMENT_COLOR_MAP: OrderFulfillmentRecord = {
   SENT: 'yellow',
-  // Pick Up
   RECEIVED: 'orange',
   READY: 'green',
   PICKED_UP: 'gray',
-  // Mail Order
   FILLING: 'orange',
   SHIPPED: 'green',
   DELIVERED: 'gray'
+};
+
+export const ORDER_FULFILLMENT_TIP_MAP: OrderFulfillmentRecord = {
+  SENT: 'Order sent to pharmacy',
+  RECEIVED: 'Order received by pharmacy',
+  READY: 'Order ready at pharmacy',
+  PICKED_UP: 'Order pciked up by patient',
+  FILLING: 'Mail order being filled',
+  SHIPPED: 'Mail order shipped',
+  DELIVERED: 'Mail order delivered'
 };
 
 interface ActionsProps {
@@ -110,15 +129,19 @@ const renderRow = (order: any) => {
 
   let state;
   let stateColor;
+  let stateTip;
   if (order.fulfillment?.state) {
-    if (ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof object]) {
-      state = ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof object];
-      stateColor = ORDER_FULFILLMENT_COLOR_MAP[order.fulfillment.state as keyof object];
+    if (ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof OrderFulfillmentRecord]) {
+      state = ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof OrderFulfillmentRecord];
+      stateColor =
+        ORDER_FULFILLMENT_COLOR_MAP[order.fulfillment.state as keyof OrderFulfillmentRecord];
+      stateTip = ORDER_FULFILLMENT_TIP_MAP[order.fulfillment.state as keyof OrderFulfillmentRecord];
     } else {
       // If state is not handled in the list, format the name and use a default color
       const s = order.fulfillment.state;
       state = s[0].toUpperCase() + s.slice(1).toLowerCase();
       stateColor = 'gray';
+      stateTip = state;
     }
   }
 
@@ -128,9 +151,11 @@ const renderRow = (order: any) => {
     createdAt: formatDate(order.createdAt),
     fills: <Text fontWeight="medium">{fills}</Text>,
     fulfillmentStatus: order.fulfillment?.state ? (
-      <Badge size="sm" colorScheme={stateColor}>
-        {state}
-      </Badge>
+      <Tooltip label={stateTip}>
+        <Badge size="sm" colorScheme={stateColor}>
+          {state}
+        </Badge>
+      </Tooltip>
     ) : (
       <Text as="i">None</Text>
     ),
