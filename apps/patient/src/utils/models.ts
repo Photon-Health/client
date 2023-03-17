@@ -28,10 +28,10 @@ export interface Order {
 }
 
 export enum OrderState {
-  Canceled = 'CANCELED',
-  Completed = 'COMPLETED',
-  Error = 'ERROR',
+  Routing = 'ROUTING',
   Pending = 'PENDING',
   Placed = 'PLACED',
-  Routing = 'ROUTING'
+  Error = 'ERROR',
+  Completed = 'COMPLETED',
+  Canceled = 'CANCELED'
 }
