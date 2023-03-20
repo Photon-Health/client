@@ -9,7 +9,7 @@ interface AuthProps {
 
 export const Auth = (props: AuthProps) => {
   const { returnTo } = props;
-  const { isLoading, isAuthenticated, getToken, login, logout } = usePhoton();
+  const { user, isLoading, isAuthenticated, getToken, login, logout } = usePhoton();
 
   const getAccessToken = async () => {
     try {
@@ -39,7 +39,10 @@ export const Auth = (props: AuthProps) => {
           colorScheme="brand"
           onClick={() => {
             localStorage.removeItem('previouslyAuthed');
-            logout({ returnTo: window.location.origin });
+            logout({
+              returnTo: window.location.origin,
+              federated: user.org_id === process.env.REACT_APP_PEACHY_ORG_ID
+            });
           }}
         >
           Log out
