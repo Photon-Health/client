@@ -4,7 +4,7 @@ import { CopyIcon } from '@chakra-ui/icons';
 import { usePhoton } from '@photonhealth/react';
 
 const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
-const { logoutSettings } = require(`../../../../../configs/logout.${envName}.ts`);
+const { logoutSettings } = require(`../../configs/logout.${envName}.ts`);
 
 interface AuthProps {
   returnTo?: string;
