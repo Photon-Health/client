@@ -76,7 +76,7 @@ customElement(
           invalid={props.invalid}
           isLoading={false}
           hasMore={false}
-          displayAccessor={(p) => p.name}
+          displayAccessor={(p) => p?.name || ''}
           showOverflow={true}
           noDataMsg={''}
           optional={false}

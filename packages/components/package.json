@@ -1,11 +1,11 @@
 {
   "name": "@photonhealth/components",
   "private": "true",
-  "main": "dist/components.es.js",
+  "main": "dist/index.js",
   "version": "0.0.0",
   "scripts": {
     "start": "vite",
-    "dev": "vite",
+    "dev": "vite --port 3000",
     "build": "vite build && npx tailwindcss -i ./src/index.css -o ./dist/style.css",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
@@ -28,13 +28,18 @@
     "storybook": "^7.0.0-beta.19",
     "tw-colors": "^1.1.6",
     "vite": "^4.1.4",
-    "vite-plugin-dts": "^2.0.0-beta.3",
+    "vite-plugin-dts": "^2.1.0",
     "vite-plugin-solid": "^2.5.0"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.9",
+    "@photonhealth/sdk": "*",
     "clsx": "^1.2.1",
+    "graphql": "^16.6.0",
+    "graphql-tag": "^2.12.6",
+    "jwt-decode": "^3.1.2",
     "solid-js": "^1.6.11",
+    "superstruct": "^1.0.3",
     "tailwindcss": "^3.2.7"
   },
   "engines": {
