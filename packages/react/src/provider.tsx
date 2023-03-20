@@ -758,8 +758,8 @@ export const PhotonProvider = (opts: {
     });
   };
 
-  const logout = ({ returnTo }: { returnTo?: string }) =>
-    client.authentication.logout({ returnTo });
+  const logout = ({ returnTo, federated }: { returnTo?: string; federated?: boolean }) =>
+    client.authentication.logout({ returnTo, federated });
 
   const getToken = async ({ audience }: { audience?: string } = {}) => {
     try {
