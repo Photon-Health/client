@@ -11,11 +11,12 @@ export default function Input(props: InputProps) {
   const { children, type, error, ...inputProps } = props;
 
   return (
-    <div>
+    <>
+      <label for="email">Email</label>
       <input {...inputProps} classList={{ error: !!error }} />
       <Show when={!!error}>
         <p>{error}</p>
       </Show>
-    </div>
+    </>
   );
 }

@@ -7,14 +7,14 @@ import { PharmacyStore } from '../../stores/pharmacy';
 
 type PharmacySearchProps = {
   label?: string;
-  required: boolean;
-  invalid: boolean;
+  required?: boolean;
+  invalid?: boolean;
   helpText?: string;
-  selected: string;
+  selected?: string;
   formName?: string;
   disabled: boolean;
-  address: string;
-  forceLabelSize: boolean;
+  address?: string;
+  forceLabelSize?: boolean;
   patientId?: string;
   geocodingApiKey?: string;
   uP?: any;
