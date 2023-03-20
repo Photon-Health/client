@@ -71,7 +71,7 @@ export const MedicationRouteDropdown = (props: { disabled: boolean; medicationId
         placeholder="Select a route..."
         isLoading={isLoading()}
         hasMore={false}
-        displayAccessor={(p) => p.name}
+        displayAccessor={(p) => p?.name || ''}
         onSearchChange={async (s: string) => setFilterText(s)}
         onHide={async () => {
           setFilterText('');

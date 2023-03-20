@@ -27,23 +27,23 @@ phases:
           # Replace /'s
           OUTPUT_DIR=$(echo "$OUTPUT_DIR" | tr / _)
 
-          npm run build:boson
+          npx nx run app:build:boson
         fi
       # For photon and neutron save in folders named after the git hash
       - |
         if [ "$ENV" = "photon" ] ; then
-          export OUTPUT_DIR=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION)
-          npm run build:photon
+          export OUTPUT_DIR="photon"
+          npx nx run app:build:photon
         fi
       - |
         if [ "$ENV" = "neutron" ] ; then
-          export OUTPUT_DIR=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION)
-          npm run build:neutron
+          export OUTPUT_DIR="neutron"
+          npx nx run app:build:neutron
         fi
       - echo "OUTPUT_DIR set to '$OUTPUT_DIR'"
 
 artifacts:
   files:
     - '**/*'
-  base-directory: 'build'
+  base-directory: 'dist/apps/app'
   name: $OUTPUT_DIR

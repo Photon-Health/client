@@ -1,0 +1,65 @@
+{
+  "name": "patient",
+  "root": "apps/patient",
+  "sourceRoot": "apps/patient/src",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "targets": {
+    "start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "env-cmd -f .env.boson react-app-rewired start"
+      },
+      "dependsOn": ["^build"]
+    },
+    "build:boson": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "env-cmd -f .env.boson react-app-rewired build",
+        "outputs": "dist/apps/patient"
+      },
+      "dependsOn": ["^build"]
+    },
+    "build:neutron": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "env-cmd -f .env.neutron react-app-rewired build",
+        "outputs": "dist/apps/patient"
+      },
+      "dependsOn": ["^build"]
+    },
+    "build:photon": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "env-cmd -f .env.photon react-app-rewired build",
+        "outputs": "dist/apps/patient"
+      },
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "react-app-rewired test --watchAll=false"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "npx eslint src/**/*.{tsx,ts}"
+      }
+    },
+    "lint:fix": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "npx eslint src/**/*.{tsx,ts} --fix && npx prettier --write src/**/*.{ts,tsx}"
+      }
+    }
+  }
+}

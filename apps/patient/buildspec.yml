@@ -20,27 +20,30 @@ phases:
       - |
         if [ "$ENV" = "boson" ] ; then
           export OUTPUT_DIR=$(echo $CODEBUILD_WEBHOOK_HEAD_REF | sed -e "s/refs\/heads\///g")
+
           # Lowercase branch name
           OUTPUT_DIR=$(echo "$OUTPUT_DIR" | tr '[:upper:]' '[:lower:]')
-          # Replace /'s with _'s
+
+          # Replace /'s
           OUTPUT_DIR=$(echo "$OUTPUT_DIR" | tr / _)
-          npx nx run app:build:boson
+
+          npx nx run patient:build:boson
         fi
       # For photon and neutron save in folders named after the git hash
       - |
         if [ "$ENV" = "photon" ] ; then
           export OUTPUT_DIR="photon"
-          npx nx run app:build:photon
+          npx nx run patient:build:photon
         fi
       - |
         if [ "$ENV" = "neutron" ] ; then
           export OUTPUT_DIR="neutron"
-          npx nx run app:build:neutron
+          npx nx run patient:build:neutron
         fi
       - echo "OUTPUT_DIR set to '$OUTPUT_DIR'"
 
 artifacts:
   files:
     - '**/*'
-  base-directory: 'dist/apps/app'
+  base-directory: 'dist/apps/patient'
   name: $OUTPUT_DIR
