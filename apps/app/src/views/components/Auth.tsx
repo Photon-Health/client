@@ -3,6 +3,9 @@ import { CopyIcon } from '@chakra-ui/icons';
 
 import { usePhoton } from '@photonhealth/react';
 
+const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
+const { logoutSettings } = require(`../../../../../configs/logout.${envName}.ts`);
+
 interface AuthProps {
   returnTo?: string;
 }
@@ -39,10 +42,9 @@ export const Auth = (props: AuthProps) => {
           colorScheme="brand"
           onClick={() => {
             localStorage.removeItem('previouslyAuthed');
-            logout({
-              returnTo: window.location.origin,
-              federated: user.org_id === process.env.REACT_APP_PEACHY_ORG_ID
-            });
+            logout(
+              user.org_id in logoutSettings ? logoutSettings[user.org_id] : logoutSettings.default
+            );
           }}
         >
           Log out
