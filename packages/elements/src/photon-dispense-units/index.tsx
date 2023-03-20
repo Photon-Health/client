@@ -87,7 +87,7 @@ customElement(
               ? store.dispenseUnits.data?.filter((x) => x.name === props.selected)[0]
               : store.dispenseUnits.data?.[0]
           }
-          displayAccessor={(t) => t.name}
+          displayAccessor={(t) => t?.name || ''}
           onSearchChange={async (s: string) => {
             setFilter(s);
           }}

@@ -1,0 +1,59 @@
+{
+  "contactSupport": "Contact Support",
+  "review": {
+    "title": "Review prescriptions",
+    "heading": "Review your prescriptions",
+    "subheading": "Please review the prescriptions before you select a pharmacy. Reach out to your provider for any issues.",
+    "prescriber": "Prescriber",
+    "quantity": "Quantity",
+    "daysSupply": "Days supply",
+    "refills": "Refills",
+    "substitutions": "Substitutions",
+    "expires": "Expires",
+    "instructions": "Instructions",
+    "cta": "Search for a pharmacy"
+  },
+  "pharmacy": {
+    "title": "Select a pharmacy",
+    "heading": "Select a pharmacy",
+    "subheading": "We'll send your prescriptions to your selected pharmacy to be filled.",
+    "showing": "Showing pharmacies near:",
+    "setLocation": "Set search location",
+    "modal": {
+      "heading": "Set location",
+      "subheading": "Enter the zipcode or address where you'd like to search for a pharmacy.",
+      "currentLocation": "Use my current location",
+      "getting": "Getting current location",
+      "find": "Find a location",
+      "enter": "Enter a zipcode or address"
+    },
+    "sorted": "Sorted by distance",
+    "showMore": "Show more pharmacies",
+    "cta": "Select pharmacy",
+    "thankYou": "Thank you!"
+  },
+  "status": {
+    "title": "Filling your prescriptions",
+    "heading": "Filling your prescriptions",
+    "subheading": "After your prescriptions are sent to a pharmacy, we'll send you updates on their status.",
+    "pickup": "Pick Up:",
+    "SENT": {
+      "title": "Sent to pharmacy",
+      "description": "Your prescription fills have been sent to the pharmacy."
+    },
+    "RECEIVED": {
+      "title": "Received",
+      "description": "The pharmacy has received your order and is preparing to fill it."
+    },
+    "READY": {
+      "title": "Ready for Pick Up",
+      "description": "Your prescriptions are ready to be picked up."
+    },
+    "PICKED_UP": {
+      "title": "Picked Up",
+      "description": "Please notify us below when you've picked up your prescriptions."
+    },
+    "cta": "I picked up my prescriptions",
+    "thankYou": "Thank you!"
+  }
+}

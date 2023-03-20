@@ -47,7 +47,7 @@ export const WeightUnitsDropdown = () => {
         disabled={false}
         placeholder="Select a unit..."
         hasMore={false}
-        displayAccessor={(p) => p.name}
+        displayAccessor={(p) => p?.name || ''}
         onSearchChange={async (s: string) => setFilterText(s)}
         onHide={async () => {
           setFilterText('');

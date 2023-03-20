@@ -126,7 +126,7 @@ customElement(
           invalid={props.invalid}
           isLoading={client?.clinical.prescriptions.state.isLoading || false}
           hasMore={false}
-          displayAccessor={(t) => t.treatment.name}
+          displayAccessor={(t) => t?.treatment?.name || ''}
           onSearchChange={async (s: string) => {
             if (client?.clinical.prescriptions.state.prescriptions) {
               setData(
