@@ -143,25 +143,27 @@ customElement(
           ? [store['preferredPharmacy']!.value]
           : []
       };
-
-      if (props?.patientId) {
-        // if patientId is provided, update the patient.
-        const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
-        await updatePatientMutation({ variables: patientData, awaitRefetchQueries: false });
-        dispatchUpdate(props.patientId, createPrescription);
-      } else {
-        // otherwise, create a new patient
-        const createPatientMutation = client!.getSDK().clinical.patient.createPatient({});
-        const patient = await createPatientMutation({
-          variables: patientData,
-          awaitRefetchQueries: false
-        });
-        dispatchCreated(patient?.data?.createPatient?.id || '', createPrescription);
+      try {
+        if (props?.patientId) {
+          // if patientId is provided, update the patient.
+          const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
+          await updatePatientMutation({ variables: patientData, awaitRefetchQueries: false });
+          dispatchUpdate(props.patientId, createPrescription);
+        } else {
+          // otherwise, create a new patient
+          const createPatientMutation = client!.getSDK().clinical.patient.createPatient({});
+          const patient = await createPatientMutation({
+            variables: patientData,
+            awaitRefetchQueries: false
+          });
+          dispatchCreated(patient?.data?.createPatient?.id || '', createPrescription);
+        }
+        setLoading(false);
+        actions.resetStores();
+        props.open = false;
+      } catch (e) {
+        setLoading(false);
       }
-
-      setLoading(false);
-      actions.resetStores();
-      props.open = false;
     };
 
     return (
