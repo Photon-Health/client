@@ -178,7 +178,7 @@ export const Patients = () => {
 
   useEffect(() => {
     if (!loading) {
-      setRows(patients.map((x) => renderRow(x, setDisableScroll)));
+      setRows(patients.filter((x) => !!x).map((x) => renderRow(x, setDisableScroll)));
       setFinished(patients.length === 0);
     }
   }, [loading]);
