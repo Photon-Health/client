@@ -10,7 +10,8 @@
       "options": {
         "cwd": "packages/elements",
         "command": "vite --port 3000"
-      }
+      },
+      "dependsOn": ["^build"]
     },
     "lint": {
       "executor": "nx:run-commands",
@@ -18,6 +19,14 @@
         "cwd": "packages/elements",
         "command": "npx eslint src/**/*.{tsx,ts}"
       }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/elements",
+        "command": "rimraf dist && vite build"
+      },
+      "dependsOn": ["^build"]
     },
     "lint:fix": {
       "executor": "nx:run-commands",

@@ -9,7 +9,8 @@ import {
   SkeletonCircle,
   SkeletonText,
   Stack,
-  Text
+  Text,
+  Tooltip
 } from '@chakra-ui/react';
 import { FiInfo, FiShoppingCart } from 'react-icons/fi';
 
@@ -64,9 +65,29 @@ const ActionsView = (props: ActionsViewProps) => {
   );
 };
 
-export const PRESCRIPTION_COLOR_MAP: object = {
-  READY: 'green', // TODO: delete
-  PROCESSING: 'yellow', // TODO: delete
+type PrescriptionState =
+  | 'READY' // TODO: delete
+  | 'PROCESSING' // TODO: delete
+  | 'ACTIVE'
+  | 'DEPLETED'
+  | 'EXPIRED'
+  | 'CANCELED'
+  | 'ERROR';
+type PrescriptionStateRecord = Record<PrescriptionState, string>;
+
+export const PRESCRIPTION_STATE_MAP: PrescriptionStateRecord = {
+  READY: 'Active',
+  PROCESSING: 'Active',
+  ACTIVE: 'Active',
+  DEPLETED: 'Depleted',
+  EXPIRED: 'Expired',
+  CANCELED: 'Canceled',
+  ERROR: 'Error'
+};
+
+export const PRESCRIPTION_COLOR_MAP: PrescriptionStateRecord = {
+  READY: 'green',
+  PROCESSING: 'yellow',
   ACTIVE: 'green',
   DEPLETED: 'red',
   EXPIRED: 'red',
@@ -74,14 +95,14 @@ export const PRESCRIPTION_COLOR_MAP: object = {
   ERROR: 'red'
 };
 
-export const PRESCRIPTION_STATE_MAP: object = {
-  READY: 'Active', // TODO: delete
-  PROCESSING: 'Active', // TODO: delete
-  ACTIVE: 'Active',
-  DEPLETED: 'Depleted',
-  EXPIRED: 'Expired',
-  CANCELED: 'Canceled',
-  ERROR: 'Error'
+export const PRESCRIPTION_TIP_MAP: PrescriptionStateRecord = {
+  READY: 'Prescription has active fills',
+  PROCESSING: 'Prescription has active fills',
+  ACTIVE: 'Prescription has active fills',
+  DEPLETED: 'All fills depleted',
+  EXPIRED: 'Prescription has expired',
+  CANCELED: 'Prescription has been cancelled',
+  ERROR: 'There’s an error with prescription'
 };
 
 const renderRow = (rx: any) => {
@@ -91,8 +112,9 @@ const renderRow = (rx: any) => {
   const prescriber = rx.prescriber.name.full;
   const writtenAt = formatDate(rx.writtenAt);
 
-  const state = PRESCRIPTION_STATE_MAP[rx.state as keyof object] || '';
-  const stateColor = PRESCRIPTION_COLOR_MAP[rx.state as keyof object] || '';
+  const state = PRESCRIPTION_STATE_MAP[rx.state as keyof PrescriptionStateRecord] || '';
+  const stateColor = PRESCRIPTION_COLOR_MAP[rx.state as keyof PrescriptionStateRecord] || '';
+  const stateTip = PRESCRIPTION_TIP_MAP[rx.state as keyof PrescriptionStateRecord] || '';
 
   return {
     id,
@@ -110,9 +132,11 @@ const renderRow = (rx: any) => {
       </Text>
     ),
     status: (
-      <Badge size="sm" colorScheme={stateColor}>
-        {state}
-      </Badge>
+      <Tooltip label={stateTip}>
+        <Badge size="sm" colorScheme={stateColor}>
+          {state}
+        </Badge>
+      </Tooltip>
     ),
     prescriber: <NameView name={prescriber} />,
     writtenAt: <Text>{writtenAt}</Text>,

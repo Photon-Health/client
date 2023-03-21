@@ -1,6 +1,7 @@
+import { PhotonClientStore } from '@photonhealth/components';
 import { createContext, useContext } from 'solid-js';
-import { PhotonClientStore } from './store';
 
-export const PhotonContext = createContext<PhotonClientStore>();
+const PhotonContext = createContext<PhotonClientStore>();
+const usePhoton = () => useContext(PhotonContext);
 
-export const usePhoton = () => useContext(PhotonContext);
+export { usePhoton, PhotonContext, PhotonClientStore };

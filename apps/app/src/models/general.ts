@@ -17,3 +17,10 @@ export type FulfillmentSettings = {
     sendToPatientUsers: string[];
   };
 };
+
+export type LogoutSettings = {
+  [key: string]: {
+    returnTo?: string;
+    federated?: boolean;
+  };
+};
