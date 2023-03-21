@@ -1,9 +1,9 @@
 import { memo } from 'react'
 import {
+  Box,
   Card,
   CardBody,
   HStack,
-  Spacer,
   Tag,
   TagLabel,
   TagLeftIcon,
@@ -11,7 +11,10 @@ import {
   VStack
 } from '@chakra-ui/react'
 import { FiRotateCcw, FiStar } from 'react-icons/fi'
+import moment from 'moment'
 
+import { UNOPEN_BUSINESS_STATUS_MAP } from '../views/Pharmacy'
+import { Rating } from './Rating'
 import { formatAddress } from '../utils/general'
 import { Address } from '../utils/models'
 
@@ -26,9 +29,63 @@ interface PharmacyCardProps {
     address: Address
     name: string
     distance: number
+    rating?: string
+    businessStatus: string
+    hours?: {
+      open?: boolean
+      is24Hr?: boolean
+      opens?: string
+      closes?: string
+    }
   }
   selected: boolean
   onSelect: Function
+}
+
+const Metadata1 = ({ businessStatus, rating, hours }) => {
+  if (businessStatus in UNOPEN_BUSINESS_STATUS_MAP) {
+    return (
+      <Text fontSize="sm" color="red">
+        {UNOPEN_BUSINESS_STATUS_MAP[businessStatus]}
+      </Text>
+    )
+  }
+
+  if (!rating || !hours) {
+    return null
+  }
+
+  const { open, is24Hr, opens, closes } = hours
+
+  return (
+    <HStack>
+      {rating ? <Rating rating={rating} /> : null}
+      {rating ? <Text color="gray.400">&bull;</Text> : null}
+      <Text fontSize="sm" color={open ? 'green' : 'red'}>
+        {open ? 'Open' : 'Closed'}
+      </Text>
+      {!is24Hr ? <Text color="gray.400">&bull;</Text> : null}
+      {open && closes ? (
+        <Text fontSize="sm" color="gray.500">
+          Closes{' '}
+          {moment(closes, 'HHmm').format(moment(closes, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA')}
+        </Text>
+      ) : null}
+      {!open && opens ? (
+        <Text fontSize="sm" color="gray.500">
+          Opens {moment(opens, 'HHmm').format(moment(opens, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA')}
+        </Text>
+      ) : null}
+    </HStack>
+  )
+}
+
+const Metadata2 = ({ distance, address }) => {
+  return (
+    <Text fontSize="sm" color="gray.500" display="inline">
+      {distance?.toFixed(1)} mi &bull; {formatAddress(address)}
+    </Text>
+  )
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
@@ -36,6 +93,7 @@ export const PharmacyCard = memo(function PharmacyCard({
   selected,
   onSelect
 }: PharmacyCardProps) {
+  if (!pharmacy) return null
   return (
     <Card
       w="full"
@@ -47,7 +105,7 @@ export const PharmacyCard = memo(function PharmacyCard({
     >
       <CardBody p={4}>
         <HStack spacing={2}>
-          <VStack me="auto" align="start" spacing={1}>
+          <VStack me="auto" align="start" spacing={0}>
             {pharmacy.info ? (
               <Tag size="sm" colorScheme={INFO_COLOR_MAP[pharmacy.info]}>
                 <TagLeftIcon
@@ -57,13 +115,20 @@ export const PharmacyCard = memo(function PharmacyCard({
                 <TagLabel> {pharmacy.info}</TagLabel>
               </Tag>
             ) : null}
+            {pharmacy?.hours?.is24Hr ? (
+              <Tag size="sm" colorScheme="green">
+                <TagLabel>24 hr</TagLabel>
+              </Tag>
+            ) : null}
             <Text fontSize="md">{pharmacy.name}</Text>
-            <Text fontSize="sm" color="gray.500">
-              {formatAddress(pharmacy.address)}
-            </Text>
+
+            <Metadata1
+              businessStatus={pharmacy.businessStatus}
+              rating={pharmacy.rating}
+              hours={pharmacy.hours}
+            />
+            <Metadata2 distance={pharmacy.distance} address={pharmacy.address} />
           </VStack>
-          <Spacer />
-          <Text whiteSpace="nowrap">{pharmacy?.distance?.toFixed(1)} mi</Text>
         </HStack>
       </CardBody>
     </Card>

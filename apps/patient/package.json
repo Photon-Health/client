@@ -5,6 +5,7 @@
   "dependencies": {
     "chakra-react-select": "^4.6.0",
     "graphql-request": "^5.2.0",
+    "moment": "^2.29.4",
     "react-helmet": "^6.1.0",
     "tinycolor2": "^1.6.0"
   },

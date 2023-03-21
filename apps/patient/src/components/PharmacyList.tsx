@@ -1,9 +1,16 @@
-import { Button, SlideFade, VStack } from '@chakra-ui/react'
+import { Button, SlideFade, Text, VStack } from '@chakra-ui/react'
 
 import { PharmacyCard } from '../components/PharmacyCard'
 import t from '../utils/text.json'
 
-export const PharmacyList = ({ pharmacies, selectedId, handleSelect, handleShowMore }) => {
+export const PharmacyList = ({
+  pharmacies,
+  selectedId,
+  handleSelect,
+  handleShowMore,
+  loadingMore,
+  showingAllPharmacies
+}) => {
   return (
     <VStack spacing={6} align="span">
       <VStack align="span" spacing={3}>
@@ -17,16 +24,23 @@ export const PharmacyList = ({ pharmacies, selectedId, handleSelect, handleShowM
           </SlideFade>
         ))}
       </VStack>
-      {pharmacies?.length > 0 ? (
+      {!showingAllPharmacies && pharmacies?.length > 0 ? (
         <Button
           colorScheme="brand"
           color="brandLink"
           variant="link"
           textDecoration="none"
+          loadingText=""
+          isLoading={loadingMore}
           onClick={handleShowMore}
         >
           {t.pharmacy.showMore}
         </Button>
+      ) : null}
+      {showingAllPharmacies ? (
+        <Text color="gray.500" textAlign="center">
+          Showing all pharmacies
+        </Text>
       ) : null}
     </VStack>
   )

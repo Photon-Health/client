@@ -62,7 +62,7 @@
     "@auth0/auth0-react": "^1.12.0",
     "@chakra-ui/icons": "^2.0.15",
     "@chakra-ui/pro-theme": "^0.0.57",
-    "@chakra-ui/react": "^2.4.6",
+    "@chakra-ui/react": "^2.5.2",
     "@chakra-ui/theme-tools": "^2.0.16",
     "@datadog/browser-rum": "^4.28.1",
     "@emotion/react": "^11.10.5",
