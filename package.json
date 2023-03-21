@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "app:local": "concurrently \"npx nx run elements:build:watch\" \"npx nx run app:start\"",
+    "patient": "npx nx run patient:start",
     "lint": "npx nx run-many --target=lint",
     "lint:fix": "npx nx run-many --target=lint:fix"
   },
@@ -68,8 +69,9 @@
     "@emotion/styled": "^11.10.5",
     "@nanostores/persistent": "^0.7.0",
     "@nanostores/react": "^0.4.1",
-    "@sentry/react": "^7.28.1",
-    "@sentry/tracing": "^7.28.1",
+    "@sentry/browser": "^7.41.0",
+    "@sentry/react": "^7.41.0",
+    "@sentry/tracing": "^7.41.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.4.3",

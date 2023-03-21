@@ -112,7 +112,7 @@ customElement(
           invalid={props.invalid}
           isLoading={false}
           hasMore={false}
-          displayAccessor={(p) => p.name}
+          displayAccessor={(p) => p?.name || ''}
           showOverflow={true}
           onSearchChange={async (s: string) => {
             setFilter(s);
