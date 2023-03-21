@@ -19,6 +19,7 @@ customElement(
     const [formStore, setFormStore] = createSignal<any>(undefined);
     const [selectedStore, setSelectedStore] = createSignal<any>(undefined);
     const [actions, setActions] = createSignal<any>(undefined);
+    const [globalError, setGlobalError] = createSignal<string | undefined>(undefined);
 
     const dispatchUpdate = (patientId: string, createPrescription = false) => {
       const event = new CustomEvent('photon-patient-updated', {
@@ -59,6 +60,7 @@ customElement(
       pStore: any,
       createPrescription = false
     ) => {
+      setGlobalError(undefined);
       setIsCreatePrescription(createPrescription);
       setLoading(true);
       let keys: string[] = ['firstName', 'lastName', 'phone', 'sex', 'email'];
@@ -161,8 +163,9 @@ customElement(
         setLoading(false);
         actions.resetStores();
         props.open = false;
-      } catch (e) {
+      } catch (e: any) {
         setLoading(false);
+        setGlobalError(e?.message || 'An error occurred while saving the patient.');
       }
     };
 
@@ -199,15 +202,27 @@ customElement(
               </div>
             }
             form={
-              <photon-patient-form
-                slot="form"
-                on:photon-form-updated={(e: any) => {
-                  setFormStore(e.detail.form);
-                  setActions(Object.assign({}, e.detail.actions, { resetStores: e.detail.reset }));
-                  setSelectedStore(e.detail.selected);
-                }}
-                patient-id={props.patientId}
-              ></photon-patient-form>
+              <>
+                <Show when={globalError()}>
+                  <div
+                    class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+                    role="alert"
+                  >
+                    <span class="block sm:inline">{globalError()}</span>
+                  </div>
+                </Show>
+                <photon-patient-form
+                  slot="form"
+                  on:photon-form-updated={(e: any) => {
+                    setFormStore(e.detail.form);
+                    setActions(
+                      Object.assign({}, e.detail.actions, { resetStores: e.detail.reset })
+                    );
+                    setSelectedStore(e.detail.selected);
+                  }}
+                  patient-id={props.patientId}
+                ></photon-patient-form>
+              </>
             }
           ></PhotonFormWrapper>
         </Show>
