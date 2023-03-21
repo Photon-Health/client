@@ -27,6 +27,7 @@ import { format } from 'date-fns';
 import gql from 'graphql-tag';
 import { PharmacyCard } from './components/PharmacyCard';
 import { PhotonAuthorized } from '../photon-authorized';
+import { createStore } from 'solid-js/store';
 
 const CATALOG_TREATMENTS_FIELDS = gql`
   fragment CatalogTreatmentsFields on Catalog {
@@ -76,15 +77,18 @@ customElement(
     options
   ) => {
     let ref: any;
-    const { store, actions } = createFormStore({
-      dispenseAsWritten: false,
-      patient: undefined,
-      treatment: undefined,
-      draftPrescriptions: [],
-      pharmacy: undefined,
-      errors: [],
-      address: undefined
-    });
+    const { store, actions } = createFormStore(
+      {
+        dispenseAsWritten: false,
+        patient: undefined,
+        treatment: undefined,
+        draftPrescriptions: [],
+        pharmacy: undefined,
+        errors: [],
+        address: undefined
+      },
+      createStore
+    );
     const client = usePhoton();
     const [showForm, setShowForm] = createSignal<boolean>(!props.templateIds);
     const [isLoading, setIsLoading] = createSignal<boolean>(true);

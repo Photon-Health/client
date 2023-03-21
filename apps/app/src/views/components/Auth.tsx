@@ -3,13 +3,16 @@ import { CopyIcon } from '@chakra-ui/icons';
 
 import { usePhoton } from '@photonhealth/react';
 
+const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
+const { logoutSettings } = require(`../../configs/logout.${envName}.ts`);
+
 interface AuthProps {
   returnTo?: string;
 }
 
 export const Auth = (props: AuthProps) => {
   const { returnTo } = props;
-  const { isLoading, isAuthenticated, getToken, login, logout } = usePhoton();
+  const { user, isLoading, isAuthenticated, getToken, login, logout } = usePhoton();
 
   const getAccessToken = async () => {
     try {
@@ -39,7 +42,9 @@ export const Auth = (props: AuthProps) => {
           colorScheme="brand"
           onClick={() => {
             localStorage.removeItem('previouslyAuthed');
-            logout({ returnTo: window.location.origin });
+            logout(
+              user.org_id in logoutSettings ? logoutSettings[user.org_id] : logoutSettings.default
+            );
           }}
         >
           Log out

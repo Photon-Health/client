@@ -42,6 +42,7 @@ export interface LoginOptions {
  */
 export interface LogoutOptions {
   returnTo?: string;
+  federated?: boolean;
 }
 
 /**
@@ -109,12 +110,11 @@ export class AuthManager {
    * @param config - Logout configuration
    * @returns
    */
-  public async logout({ returnTo }: LogoutOptions): Promise<void> {
-    let opts: Auth0LogoutOptions = {};
-
-    if (returnTo) {
-      opts = Object.assign(opts, { returnTo });
-    }
+  public async logout({ returnTo, federated = false }: LogoutOptions): Promise<void> {
+    const opts: Auth0LogoutOptions = {
+      ...(returnTo ? { returnTo } : {}),
+      ...(federated ? { federated } : {})
+    };
 
     return this.authentication.logout(opts);
   }
