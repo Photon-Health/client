@@ -25,7 +25,7 @@
     "build:neutron": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "apps/app",
+        "cwd": "apps/patient",
         "command": "env-cmd -f .env.neutron react-app-rewired build",
         "outputs": "dist/apps/patient"
       },
@@ -34,7 +34,7 @@
     "build:photon": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "apps/app",
+        "cwd": "apps/patient",
         "command": "env-cmd -f .env.photon react-app-rewired build",
         "outputs": "dist/apps/patient"
       },
