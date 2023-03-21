@@ -72,6 +72,12 @@ export const Patient = () => {
     );
   }
 
+  useEffect(() => {
+    if (!patient) {
+      navigate('/patients');
+    }
+  }, [patient, navigate]);
+
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const tableWidth = useBreakpointValue({ base: 'full', sm: '100%', md: '75%' });
 
