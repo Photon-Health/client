@@ -1,19 +1,15 @@
 import { memo } from 'react'
-import {
-  Card,
-  CardBody,
-  HStack,
-  Spacer,
-  Tag,
-  TagLabel,
-  TagLeftIcon,
-  Text,
-  VStack
-} from '@chakra-ui/react'
+import { Card, CardBody, HStack, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@chakra-ui/react'
 import { FiRotateCcw, FiStar } from 'react-icons/fi'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 
+import { UNOPEN_BUSINESS_STATUS_MAP } from '../views/Pharmacy'
+import { Rating } from './Rating'
 import { formatAddress } from '../utils/general'
-import { Address } from '../utils/models'
+import { Pharmacy } from '../utils/models'
+
+dayjs.extend(customParseFormat)
 
 const INFO_COLOR_MAP = {
   Previous: 'green',
@@ -21,14 +17,53 @@ const INFO_COLOR_MAP = {
 }
 
 interface PharmacyCardProps {
-  pharmacy: {
-    info: string
-    address: Address
-    name: string
-    distance: number
-  }
+  pharmacy: Pharmacy
   selected: boolean
   onSelect: Function
+}
+
+const RatingHours = ({ businessStatus, rating, hours }) => {
+  if (businessStatus in UNOPEN_BUSINESS_STATUS_MAP) {
+    return (
+      <Text fontSize="sm" color="red">
+        {UNOPEN_BUSINESS_STATUS_MAP[businessStatus]}
+      </Text>
+    )
+  }
+
+  if (!rating || !hours) return null
+
+  const { open, is24Hr, opens, closes } = hours
+
+  return (
+    <HStack>
+      {rating ? <Rating rating={rating} /> : null}
+      {rating ? <Text color="gray.400">&bull;</Text> : null}
+      <Text fontSize="sm" color={open ? 'green' : 'red'}>
+        {open ? 'Open' : 'Closed'}
+      </Text>
+      {!is24Hr && (closes || opens) ? <Text color="gray.400">&bull;</Text> : null}
+      {open && closes ? (
+        <Text fontSize="sm" color="gray.500">
+          Closes {dayjs(closes, 'HHmm').format(dayjs(closes, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA')}
+        </Text>
+      ) : null}
+      {!open && opens ? (
+        <Text fontSize="sm" color="gray.500">
+          Opens {dayjs(opens, 'HHmm').format(dayjs(opens, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA')}
+        </Text>
+      ) : null}
+    </HStack>
+  )
+}
+
+const DistanceAddress = ({ distance, address }) => {
+  if (!distance || !address) return null
+  return (
+    <Text fontSize="sm" color="gray.500" display="inline">
+      {distance?.toFixed(1)} mi &bull; {formatAddress(address)}
+    </Text>
+  )
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
@@ -36,6 +71,7 @@ export const PharmacyCard = memo(function PharmacyCard({
   selected,
   onSelect
 }: PharmacyCardProps) {
+  if (!pharmacy) return null
   return (
     <Card
       w="full"
@@ -47,7 +83,7 @@ export const PharmacyCard = memo(function PharmacyCard({
     >
       <CardBody p={4}>
         <HStack spacing={2}>
-          <VStack me="auto" align="start" spacing={1}>
+          <VStack me="auto" align="start" spacing={0}>
             {pharmacy.info ? (
               <Tag size="sm" colorScheme={INFO_COLOR_MAP[pharmacy.info]}>
                 <TagLeftIcon
@@ -57,13 +93,20 @@ export const PharmacyCard = memo(function PharmacyCard({
                 <TagLabel> {pharmacy.info}</TagLabel>
               </Tag>
             ) : null}
+            {pharmacy?.hours?.is24Hr ? (
+              <Tag size="sm" colorScheme="green">
+                <TagLabel>24 hr</TagLabel>
+              </Tag>
+            ) : null}
             <Text fontSize="md">{pharmacy.name}</Text>
-            <Text fontSize="sm" color="gray.500">
-              {formatAddress(pharmacy.address)}
-            </Text>
+
+            <RatingHours
+              businessStatus={pharmacy.businessStatus}
+              rating={pharmacy.rating}
+              hours={pharmacy.hours}
+            />
+            <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
           </VStack>
-          <Spacer />
-          <Text whiteSpace="nowrap">{pharmacy?.distance?.toFixed(1)} mi</Text>
         </HStack>
       </CardBody>
     </Card>
