@@ -112,10 +112,7 @@ export class AuthManager {
       ...(federated ? { federated } : {})
     };
 
-    return this.authentication.logout({
-      returnTo: 'https://www.photon.health/yadayada',
-      federated // dats it
-    });
+    return this.authentication.logout(opts);
   }
 
   /**
