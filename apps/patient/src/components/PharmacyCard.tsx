@@ -22,7 +22,7 @@ interface PharmacyCardProps {
   onSelect: Function
 }
 
-const Metadata1 = ({ businessStatus, rating, hours }) => {
+const RatingHours = ({ businessStatus, rating, hours }) => {
   if (businessStatus in UNOPEN_BUSINESS_STATUS_MAP) {
     return (
       <Text fontSize="sm" color="red">
@@ -31,9 +31,7 @@ const Metadata1 = ({ businessStatus, rating, hours }) => {
     )
   }
 
-  if (!rating || !hours) {
-    return null
-  }
+  if (!rating || !hours) return null
 
   const { open, is24Hr, opens, closes } = hours
 
@@ -59,7 +57,8 @@ const Metadata1 = ({ businessStatus, rating, hours }) => {
   )
 }
 
-const Metadata2 = ({ distance, address }) => {
+const DistanceAddress = ({ distance, address }) => {
+  if (!distance || !address) return null
   return (
     <Text fontSize="sm" color="gray.500" display="inline">
       {distance?.toFixed(1)} mi &bull; {formatAddress(address)}
@@ -101,12 +100,12 @@ export const PharmacyCard = memo(function PharmacyCard({
             ) : null}
             <Text fontSize="md">{pharmacy.name}</Text>
 
-            <Metadata1
+            <RatingHours
               businessStatus={pharmacy.businessStatus}
               rating={pharmacy.rating}
               hours={pharmacy.hours}
             />
-            <Metadata2 distance={pharmacy.distance} address={pharmacy.address} />
+            <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
           </VStack>
         </HStack>
       </CardBody>
