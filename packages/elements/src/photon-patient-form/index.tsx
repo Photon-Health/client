@@ -100,7 +100,6 @@ customElement(
         pActions.getSelectedPatient(client!.getSDK(), patientId);
       } else {
         pActions.clearSelectedPatient();
-        actions.reset();
       }
     });
 
