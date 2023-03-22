@@ -15,7 +15,6 @@ export {
   PharmacySearch,
   PhotonClientStore,
   PhotonClient,
-  store,
   createCatalogStore,
   createFormStore,
   createPatientStore,
