@@ -25,7 +25,7 @@ export const PharmacyList = ({
           </SlideFade>
         ))}
       </VStack>
-      {!showingAllPharmacies && pharmacies?.length > 0 ? (
+      {!showingAllPharmacies && (pharmacies?.length > 0 || loadingMore) ? (
         <Button
           colorScheme="brand"
           color="brandLink"
