@@ -16,7 +16,9 @@ import {
 } from '@chakra-ui/react'
 import { FiCheck, FiMapPin } from 'react-icons/fi'
 import { Helmet } from 'react-helmet'
-import moment from 'moment'
+import dayjs from 'dayjs'
+import isoWeek from 'dayjs/plugin/isoWeek'
+import isBetween from 'dayjs/plugin/isBetween'
 
 import { formatAddress } from '../utils/general'
 
@@ -30,6 +32,9 @@ import { LocationModal } from '../components/LocationModal'
 import { PharmacyList } from '../components/PharmacyList'
 import { OrderContext } from './Main'
 import t from '../utils/text.json'
+
+dayjs.extend(isoWeek)
+dayjs.extend(isBetween)
 
 const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER']
 export const UNOPEN_BUSINESS_STATUS_MAP = {
@@ -51,7 +56,7 @@ const query = (method, data) =>
   })
 
 function getHours(hoursData) {
-  const now = moment()
+  const now = dayjs()
   const today = now.isoWeekday()
   let nextOpenTime = null
   let nextCloseTime = null
@@ -62,22 +67,22 @@ function getHours(hoursData) {
   if (hoursData && !is24Hr) {
     for (let i = 0; i < hoursData.length; i++) {
       const period = hoursData[i]
-      const open = moment(period.open.time, 'HHmm')
-      const close = moment(period.close.time, 'HHmm')
+      const open = period.open.time
+      const close = period.close.time
 
       if (period.open.day === today) {
         if (now.isBetween(open, close)) {
-          nextCloseTime = moment(period.close.time, 'HHmm').format('HHmm')
-          nextOpenTime = moment(hoursData[i + 1].open.time, 'HHmm').format('HHmm')
+          nextCloseTime = period.close.time
+          nextOpenTime = hoursData[i + 1].open.time
           break
         } else if (now.isBefore(open)) {
-          nextOpenTime = open.format('HHmm')
-          nextCloseTime = close.format('HHmm')
+          nextOpenTime = open
+          nextCloseTime = close
           break
         }
       } else if (period.open.day > today) {
-        nextOpenTime = open.format('HHmm')
-        nextCloseTime = close.format('HHmm')
+        nextOpenTime = open
+        nextCloseTime = close
         break
       }
     }

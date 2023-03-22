@@ -11,12 +11,15 @@ import {
   VStack
 } from '@chakra-ui/react'
 import { FiRotateCcw, FiStar } from 'react-icons/fi'
-import moment from 'moment'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 
 import { UNOPEN_BUSINESS_STATUS_MAP } from '../views/Pharmacy'
 import { Rating } from './Rating'
 import { formatAddress } from '../utils/general'
 import { Address } from '../utils/models'
+
+dayjs.extend(customParseFormat)
 
 const INFO_COLOR_MAP = {
   Previous: 'green',
@@ -67,13 +70,12 @@ const Metadata1 = ({ businessStatus, rating, hours }) => {
       {!is24Hr ? <Text color="gray.400">&bull;</Text> : null}
       {open && closes ? (
         <Text fontSize="sm" color="gray.500">
-          Closes{' '}
-          {moment(closes, 'HHmm').format(moment(closes, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA')}
+          Closes {dayjs(closes, 'HHmm').format(dayjs(closes, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA')}
         </Text>
       ) : null}
       {!open && opens ? (
         <Text fontSize="sm" color="gray.500">
-          Opens {moment(opens, 'HHmm').format(moment(opens, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA')}
+          Opens {dayjs(opens, 'HHmm').format(dayjs(opens, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA')}
         </Text>
       ) : null}
     </HStack>
