@@ -1,6 +1,48 @@
-// For now this is drilling down createStore into the exported component
-// because something isn't working with reactivity if I don't
-import { createDispenseUnitStore } from '@photonhealth/components';
+import { PhotonClient } from '@photonhealth/sdk';
+import { GraphQLError } from 'graphql';
 import { createStore } from 'solid-js/store';
+import { DispenseUnit } from '@photonhealth/sdk/dist/types';
 
-export const DispenseUnitStore = createDispenseUnitStore(createStore);
+export type StoreDispenseUnit = { id: string } & DispenseUnit;
+
+const createDispenseUnitStore = () => {
+  const [store, setStore] = createStore<{
+    dispenseUnits: {
+      data: StoreDispenseUnit[];
+      errors: readonly GraphQLError[];
+      isLoading: boolean;
+    };
+  }>({
+    dispenseUnits: {
+      data: [],
+      errors: [],
+      isLoading: false
+    }
+  });
+
+  const getDispenseUnits = async (client: PhotonClient) => {
+    setStore('dispenseUnits', {
+      ...store.dispenseUnits,
+      isLoading: true
+    });
+    const { data, errors } = await client.clinical.prescription.getDispenseUnits();
+    setStore('dispenseUnits', {
+      ...store.dispenseUnits,
+      isLoading: false,
+      data: data.dispenseUnits.map((x, idx) => ({
+        id: idx.toString(),
+        ...x
+      })),
+      errors: errors
+    });
+  };
+
+  return {
+    store,
+    actions: {
+      getDispenseUnits
+    }
+  };
+};
+
+export const DispenseUnitStore = createDispenseUnitStore();
