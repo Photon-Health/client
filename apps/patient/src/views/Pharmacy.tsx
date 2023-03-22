@@ -164,9 +164,9 @@ export const Pharmacy = () => {
     const limit = 3
     const offset = pharmacyOptions.length
 
-    let results: any
+    let pharmaciesResults: any
     try {
-      results = await graphQLClient.request(GET_PHARMACIES, { location, limit, offset })
+      pharmaciesResults = await graphQLClient.request(GET_PHARMACIES, { location, limit, offset })
     } catch (error) {
       console.error(JSON.stringify(error, undefined, 2))
       console.log(error)
@@ -176,21 +176,29 @@ export const Pharmacy = () => {
       }
     }
 
-    if (results?.pharmaciesByLocation.length > 0) {
-      for (let i = 0; i < results.pharmaciesByLocation.length; i++) {
-        const name = results.pharmaciesByLocation[i].name
-        const address = results.pharmaciesByLocation[i].address
-          ? formatAddress(results.pharmaciesByLocation[i].address)
+    if (pharmaciesResults?.pharmaciesByLocation.length > 0) {
+      for (let i = 0; i < pharmaciesResults.pharmaciesByLocation.length; i++) {
+        const name = pharmaciesResults.pharmaciesByLocation[i].name
+        const address = pharmaciesResults.pharmaciesByLocation[i].address
+          ? formatAddress(pharmaciesResults.pharmaciesByLocation[i].address)
           : ''
 
         const placeRequest = {
           query: name + ' ' + address,
           fields: ['place_id']
         }
-        const { response: place, status: placeStatus }: any = await query(
-          'findPlaceFromQuery',
-          placeRequest
-        )
+
+        let place, placeStatus
+        try {
+          const { response, status }: any = await query('findPlaceFromQuery', placeRequest)
+          place = response
+          placeStatus = status
+        } catch (error) {
+          console.error(JSON.stringify(error, undefined, 2))
+          console.log(error)
+
+          continue
+        }
 
         if (placeStatus === 'OK' && place[0].place_id) {
           const detailsRequest = {
@@ -203,13 +211,14 @@ export const Pharmacy = () => {
           )
 
           if (detailsStatus === 'OK') {
-            results.pharmaciesByLocation[i].businessStatus = details?.business_status || ''
-            results.pharmaciesByLocation[i].rating = details?.rating || undefined
+            pharmaciesResults.pharmaciesByLocation[i].businessStatus =
+              details?.business_status || ''
+            pharmaciesResults.pharmaciesByLocation[i].rating = details?.rating || undefined
 
             const openForBusiness = details?.business_status === 'OPERATIONAL'
             if (openForBusiness) {
               const { is24Hr, opens, closes } = getHours(details?.opening_hours?.periods)
-              results.pharmaciesByLocation[i].hours = {
+              pharmaciesResults.pharmaciesByLocation[i].hours = {
                 open: details?.opening_hours?.isOpen() || false,
                 is24Hr,
                 opens,
@@ -218,8 +227,8 @@ export const Pharmacy = () => {
             }
           }
         }
-        setPharmacyOptions([...pharmacyOptions, ...results.pharmaciesByLocation])
       }
+      setPharmacyOptions([...pharmacyOptions, ...pharmaciesResults.pharmaciesByLocation])
     }
 
     setLoadingMore(false)
