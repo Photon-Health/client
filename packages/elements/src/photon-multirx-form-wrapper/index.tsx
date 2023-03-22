@@ -38,6 +38,7 @@ customElement(
     const [form, setForm] = createSignal<any>();
     const [actions, setActions] = createSignal<any>();
     const [continueSubmitOpen, setContinueSubmitOpen] = createSignal<boolean>(false);
+    const [continueSaveOnly, setContinueSaveOnly] = createSignal<boolean>(false);
     const { actions: patientActions } = PatientStore;
 
     onMount(async () => {
@@ -162,8 +163,6 @@ customElement(
       }
     };
 
-    const handleSubmit = () => submitForm(form(), actions(), true);
-
     return (
       <div ref={ref}>
         <photon-dialog
@@ -173,7 +172,7 @@ customElement(
           cancel-text="Keep Editing"
           on:photon-dialog-confirmed={() => {
             setContinueSubmitOpen(false);
-            handleSubmit();
+            submitForm(form(), actions(), true);
           }}
           on:photon-dialog-canceled={() => {
             setContinueSubmitOpen(false);
@@ -183,6 +182,27 @@ customElement(
           <p class="font-sans text-lg xs:text-base">
             You have a prescription "{form()?.treatment?.value?.name}" that hasn't been added.
             Please add it or continue.
+          </p>
+        </photon-dialog>
+
+        <photon-dialog
+          label="Save prescriptions without an order?"
+          open={continueSaveOnly()}
+          confirm-text="Save and create order"
+          cancel-text="Yes, Save Only"
+          on:photon-dialog-confirmed={() => {
+            setContinueSaveOnly(false);
+            submitForm(form(), actions(), true);
+          }}
+          on:photon-dialog-canceled={() => {
+            setContinueSaveOnly(false);
+            submitForm(form(), actions(), false);
+          }}
+          width="500px"
+        >
+          <p class="font-sans text-lg xs:text-base">
+            You're about to save prescriptions without creating a pharmacy order. You can create an
+            order now, or at a later date.
           </p>
         </photon-dialog>
 
@@ -204,7 +224,7 @@ customElement(
                 variant="outline"
                 disabled={!canSubmit() || !canWritePrescription()}
                 loading={isLoading() && !isCreateOrder()}
-                on:photon-clicked={() => submitForm(form(), actions(), false)}
+                on:photon-clicked={() => setContinueSaveOnly(true)}
               >
                 Save prescriptions
               </photon-button>
@@ -213,7 +233,9 @@ customElement(
                 disabled={!canSubmit() || !canWritePrescription()}
                 loading={isLoading() && isCreateOrder()}
                 on:photon-clicked={() =>
-                  form()?.treatment?.value?.name ? setContinueSubmitOpen(true) : handleSubmit()
+                  form()?.treatment?.value?.name
+                    ? setContinueSubmitOpen(true)
+                    : submitForm(form(), actions(), true)
                 }
                 loading={isLoading() && isCreateOrder()}
               >
