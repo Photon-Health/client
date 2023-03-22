@@ -67,7 +67,7 @@ export const fulfillmentSettings: FulfillmentSettings = {
   // Summer Health
   [process.env.REACT_APP_SUMMER_HEALTH_ORG_ID as string]: {
     sendOrder: true,
-    pickUp: false,
+    pickUp: true,
     mailOrder: false,
     mailOrderProviders: [],
     sendToPatient: true,
