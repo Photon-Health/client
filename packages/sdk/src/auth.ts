@@ -107,11 +107,10 @@ export class AuthManager {
    * @returns
    */
   public async logout({ returnTo, federated = false }: LogoutOptions): Promise<void> {
-    let opts: Auth0LogoutOptions = {};
-
-    if (returnTo) {
-      opts = Object.assign(opts, { returnTo });
-    }
+    const opts: Auth0LogoutOptions = {
+      ...(returnTo ? { returnTo } : {}),
+      ...(federated ? { federated } : {})
+    };
 
     return this.authentication.logout({
       returnTo: 'https://www.photon.health/yadayada',
