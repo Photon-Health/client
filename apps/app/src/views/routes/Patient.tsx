@@ -114,7 +114,7 @@ export const Patient = () => {
               icon={<FiMail fontSize="1.2rem" />}
               aria-label="Edit Order"
               as={Link}
-              href={`mailto:${patient.email}`}
+              href={`mailto:${patient?.email}`}
               isExternal
               size="sm"
             />
