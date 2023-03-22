@@ -12,7 +12,7 @@ type PharmacySearchProps = {
   helpText?: string;
   selected?: string;
   formName?: string;
-  disabled: boolean;
+  disabled?: boolean;
   address?: string;
   forceLabelSize?: boolean;
   patientId?: string;
