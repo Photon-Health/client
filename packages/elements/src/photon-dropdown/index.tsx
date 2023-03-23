@@ -170,13 +170,13 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   });
 
   return (
-    <div ref={ref}>
+    <div ref={ref} class="md:py-2">
       <style>{tailwind}</style>
       <style>{shoelaceDarkStyles}</style>
       <style>{shoelaceLightStyles}</style>
       <style>{styles}</style>
       {props.label ? (
-        <div class="flex items-center pt-2 pb-2">
+        <div class="flex items-center pb-2">
           <p class="text-gray-700 text-sm font-sans">{props.label}</p>
           {props.required ? <p class="pl-1 text-red-500">*</p> : null}
           {props.optional ? <p class="text-gray-400 text-xs pl-2 font-sans">Optional</p> : null}
