@@ -239,7 +239,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             slot="help-text"
             class="text-red-500 pt-2 font-sans"
             classList={{
-              'h-[28px]': props.forceLabelSize
+              'h-[21px]': props.forceLabelSize
             }}
           >
             {showHelpText(props.invalid ?? false)}

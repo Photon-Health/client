@@ -64,7 +64,7 @@ export const AddPrescriptionCard = (props: {
   return (
     <photon-card ref={ref} title={'Add Prescription'}>
       <div
-        class="flex flex-col gap-3"
+        class="flex flex-col sm:gap-3"
         on:photon-medication-selected={(e: any) => {
           setOffCatalog(e.detail.medication);
           props.actions.updateFormValue({
