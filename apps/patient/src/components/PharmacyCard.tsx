@@ -33,7 +33,7 @@ const RatingHours = ({ businessStatus, rating, hours }) => {
 
   if (!rating || !hours) return null
 
-  const { open, is24Hr, opens, closes } = hours
+  const { open, is24Hr, opens, opensDay, closes } = hours
 
   return (
     <HStack>
@@ -51,6 +51,7 @@ const RatingHours = ({ businessStatus, rating, hours }) => {
       {!open && opens ? (
         <Text fontSize="sm" color="gray.500">
           Opens {dayjs(opens, 'HHmm').format(dayjs(opens, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA')}
+          {opensDay ? ` ${opensDay}` : ''}
         </Text>
       ) : null}
     </HStack>

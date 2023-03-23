@@ -55,16 +55,23 @@ const query = (method, data) =>
     })
   })
 
-function getHours(periods) {
+export const getHours = (
+  periods: { close: { day: number; time: string }; open: { day: number; time: string } }[],
+  currentTime: string
+) => {
   /**
    * There are 1-2 periods per day. For example CVS may have an hour off for
    * lunch so google will show two "periods" with the same "day", like
    * 0830-1200, 1300-2000.
+   *
+   * Todo:
+   *  - Add timezone support. Not urgent since user is usually in same tz as pharmacy.
    */
 
-  const now = dayjs()
+  const now = dayjs(currentTime, 'HHmm')
   const today = now.isoWeekday()
   let nextOpenTime = null
+  let nextOpenDay = null
   let nextCloseTime = null
   let is24Hr = false
 
@@ -73,31 +80,37 @@ function getHours(periods) {
   if (periods && !is24Hr) {
     for (let i = 0; i < periods.length; i++) {
       const period = periods[i]
-      const nextPeriod = i === periods.length - 1 ? periods[0] : periods[i + 1]
       const open = period.open.time
       const close = period.close.time
 
       if (period.open.day === today) {
-        if (now.isBetween(open, close)) {
-          nextCloseTime = period.close.time
-          nextOpenTime = nextPeriod.open.time
-          break
-        } else if (now.isBefore(open)) {
-          nextOpenTime = open
+        if (now.isBetween(dayjs(open, 'HHmm'), dayjs(close, 'HHmm'))) {
           nextCloseTime = close
-          break
+        } else if (!nextOpenTime && now.isBefore(open)) {
+          nextOpenTime = open
         }
-      } else if (period.open.day > today) {
-        nextOpenTime = open
-        nextCloseTime = close
-        break
       }
+    }
+
+    // after hours
+    if (!nextOpenTime) {
+      const indexOfLastCurrentDayPeriod = periods.lastIndexOf(
+        // clone to get around reverse-in-place
+        [...periods].reverse().find((per) => per.open.day === today)
+      )
+      const nextPeriod =
+        indexOfLastCurrentDayPeriod === periods.length - 1
+          ? periods[0]
+          : periods[indexOfLastCurrentDayPeriod + 1]
+      nextOpenTime = nextPeriod.open.time
+      nextOpenDay = dayjs().isoWeekday(nextPeriod.open.day).format('ddd')
     }
   }
 
   return {
     is24Hr,
     opens: nextOpenTime,
+    opensDay: nextOpenDay,
     closes: nextCloseTime
   }
 }
@@ -224,11 +237,16 @@ export const Pharmacy = () => {
 
             const openForBusiness = details?.business_status === 'OPERATIONAL'
             if (openForBusiness) {
-              const { is24Hr, opens, closes } = getHours(details?.opening_hours?.periods)
+              const currentTime = dayjs().format('HHmm')
+              const { is24Hr, opens, opensDay, closes } = getHours(
+                details?.opening_hours?.periods,
+                currentTime
+              )
               pharmaciesResults.pharmaciesByLocation[i].hours = {
                 open: details?.opening_hours?.isOpen() || false,
                 is24Hr,
                 opens,
+                opensDay,
                 closes
               }
             }
