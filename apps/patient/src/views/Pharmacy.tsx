@@ -96,7 +96,7 @@ export const getHours = (
     if (!nextOpenTime) {
       const indexOfLastCurrentDayPeriod = periods.lastIndexOf(
         // clone to get around reverse-in-place
-        [...periods].reverse().find((per) => per.open.day === today)
+        [...periods].reverse().find((per) => per.close.day === today)
       )
       const nextPeriod =
         indexOfLastCurrentDayPeriod === periods.length - 1
