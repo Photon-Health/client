@@ -35,7 +35,7 @@ customElement(
       <>
         <style>{tailwind}</style>
         <div
-          class="rounded-lg bg-white p-3 sm:p-4 shadow-card border border-gray-200"
+          class="rounded-lg bg-white p-4 shadow-card border border-gray-200"
           classList={{
             'border-red-500': props.invalid,
             'border-2': props.invalid

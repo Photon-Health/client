@@ -328,7 +328,7 @@ customElement(
         <style>{shoelaceLightStyles}</style>
         <style>{styles}</style>
         <div>
-          <div class="flex flex-col gap-4 md:gap-8">
+          <div class="flex flex-col gap-8">
             <Show when={(!client || isLoading()) && !authenticated()}>
               <div class="w-full flex justify-center">
                 <sl-spinner style="font-size: 3rem;"></sl-spinner>
