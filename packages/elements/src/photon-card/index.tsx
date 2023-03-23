@@ -17,7 +17,7 @@ customElement(
     let titleElement = null;
     let collapsableElement = null;
     if (props.title) {
-      titleElement = <p class="font-sans text-l font-medium">{props.title}</p>;
+      titleElement = <p class="font-sans text-l font-medium mb-2">{props.title}</p>;
     }
     if (props.collapsable) {
       collapsableElement = (
