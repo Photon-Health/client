@@ -64,7 +64,7 @@ export const AddPrescriptionCard = (props: {
   return (
     <photon-card ref={ref} title={'Add Prescription'}>
       <div
-        class="flex flex-col gap-2 sm:gap-3"
+        class="flex flex-col sm:gap-3"
         on:photon-medication-selected={(e: any) => {
           setOffCatalog(e.detail.medication);
           props.actions.updateFormValue({
@@ -94,7 +94,7 @@ export const AddPrescriptionCard = (props: {
             });
           }}
         ></photon-treatment-select>
-        <div class="flex flex-col sm:flex-none	sm:grid sm:grid-cols-2 sm:gap-4">
+        <div class="flex flex-col sm:flex-none sm:grid sm:grid-cols-2 sm:gap-4">
           <div class="order-last sm:order-first">
             <photon-checkbox
               label="Dispense as written"
@@ -120,7 +120,7 @@ export const AddPrescriptionCard = (props: {
             </a>
           </div>
         </div>
-        <div class="md:max-w-[50%] md:pr-2">
+        <div class="mt-2 sm:mt-0 md:max-w-[50%] md:pr-2">
           <photon-datepicker
             label="Effective Date"
             invalid={props.store['effectiveDate']?.error ?? false}
@@ -134,7 +134,7 @@ export const AddPrescriptionCard = (props: {
             }
           ></photon-datepicker>
         </div>
-        <div class="sm:grid sm:grid-cols-2 sm:gap-4">
+        <div class="mt-2 sm:mt-0 sm:grid sm:grid-cols-2 sm:gap-4">
           <div class="flex gap-2 sm:flex-col sm:gap-0">
             <photon-number-input
               class="flex-grow flex-1 w-2/5 sm:w-auto"
