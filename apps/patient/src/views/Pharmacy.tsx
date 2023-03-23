@@ -55,25 +55,32 @@ const query = (method, data) =>
     })
   })
 
-function getHours(hoursData) {
+function getHours(periods) {
+  /**
+   * There are 1-2 periods per day. For example CVS may have an hour off for
+   * lunch so google will show two "periods" with the same "day", like
+   * 0830-1200, 1300-2000.
+   */
+
   const now = dayjs()
   const today = now.isoWeekday()
   let nextOpenTime = null
   let nextCloseTime = null
   let is24Hr = false
 
-  if (hoursData?.length === 1) is24Hr = true
+  if (periods?.length === 1) is24Hr = true
 
-  if (hoursData && !is24Hr) {
-    for (let i = 0; i < hoursData.length; i++) {
-      const period = hoursData[i]
+  if (periods && !is24Hr) {
+    for (let i = 0; i < periods.length; i++) {
+      const period = periods[i]
+      const nextPeriod = i === periods.length - 1 ? periods[0] : periods[i + 1]
       const open = period.open.time
       const close = period.close.time
 
       if (period.open.day === today) {
         if (now.isBetween(open, close)) {
           nextCloseTime = period.close.time
-          nextOpenTime = hoursData[i + 1].open.time
+          nextOpenTime = nextPeriod.open.time
           break
         } else if (now.isBefore(open)) {
           nextOpenTime = open
