@@ -264,7 +264,7 @@ customElement(
                   )}
                 </For>
               </Show>
-              <div class="p-4 w-full h-full sm:w-[600px] xs:mx-auto">
+              <div class="px-3 md:p-4 w-full h-full sm:w-[600px] xs:mx-auto">
                 <photon-prescribe-workflow
                   hide-submit="true"
                   hide-templates={props.hideTemplates}
