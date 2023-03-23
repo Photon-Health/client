@@ -17,24 +17,18 @@ import {
 import { FiCheck, FiMapPin } from 'react-icons/fi'
 import { Helmet } from 'react-helmet'
 import dayjs from 'dayjs'
-import isoWeek from 'dayjs/plugin/isoWeek'
-import isBetween from 'dayjs/plugin/isBetween'
 
-import { formatAddress } from '../utils/general'
-
-import { graphQLClient } from '../configs/graphqlClient'
+import { formatAddress, getHours } from '../utils/general'
 import { GET_PHARMACIES } from '../utils/queries'
+import t from '../utils/text.json'
 import { SELECT_ORDER_PHARMACY } from '../utils/mutations'
+import { graphQLClient } from '../configs/graphqlClient'
 import { FixedFooter } from '../components/FixedFooter'
 import { Nav } from '../components/Nav'
 import { PoweredBy } from '../components/PoweredBy'
 import { LocationModal } from '../components/LocationModal'
 import { PharmacyList } from '../components/PharmacyList'
 import { OrderContext } from './Main'
-import t from '../utils/text.json'
-
-dayjs.extend(isoWeek)
-dayjs.extend(isBetween)
 
 const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER']
 export const UNOPEN_BUSINESS_STATUS_MAP = {
@@ -54,46 +48,6 @@ const query = (method, data) =>
       }
     })
   })
-
-function getHours(hoursData) {
-  const now = dayjs()
-  const today = now.isoWeekday()
-  let nextOpenTime = null
-  let nextCloseTime = null
-  let is24Hr = false
-
-  if (hoursData?.length === 1) is24Hr = true
-
-  if (hoursData && !is24Hr) {
-    for (let i = 0; i < hoursData.length; i++) {
-      const period = hoursData[i]
-      const open = period.open.time
-      const close = period.close.time
-
-      if (period.open.day === today) {
-        if (now.isBetween(open, close)) {
-          nextCloseTime = period.close.time
-          nextOpenTime = hoursData[i + 1].open.time
-          break
-        } else if (now.isBefore(open)) {
-          nextOpenTime = open
-          nextCloseTime = close
-          break
-        }
-      } else if (period.open.day > today) {
-        nextOpenTime = open
-        nextCloseTime = close
-        break
-      }
-    }
-  }
-
-  return {
-    is24Hr,
-    opens: nextOpenTime,
-    closes: nextCloseTime
-  }
-}
 
 export const Pharmacy = () => {
   const isMobile = useBreakpointValue({ base: true, md: false })
@@ -217,11 +171,16 @@ export const Pharmacy = () => {
 
             const openForBusiness = details?.business_status === 'OPERATIONAL'
             if (openForBusiness) {
-              const { is24Hr, opens, closes } = getHours(details?.opening_hours?.periods)
+              const currentTime = dayjs().format('HHmm')
+              const { is24Hr, opens, opensDay, closes } = getHours(
+                details?.opening_hours?.periods,
+                currentTime
+              )
               pharmaciesResults.pharmaciesByLocation[i].hours = {
                 open: details?.opening_hours?.isOpen() || false,
                 is24Hr,
                 opens,
+                opensDay,
                 closes
               }
             }

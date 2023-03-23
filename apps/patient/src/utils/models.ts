@@ -39,6 +39,7 @@ export interface Pharmacy {
     open?: boolean
     is24Hr?: boolean
     opens?: string
+    opensDay?: 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun'
     closes?: string
   }
 }
