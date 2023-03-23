@@ -16,19 +16,38 @@ import {
 } from '@chakra-ui/react'
 import { FiCheck, FiMapPin } from 'react-icons/fi'
 import { Helmet } from 'react-helmet'
+import dayjs from 'dayjs'
 
-import { graphQLClient } from '../configs/graphqlClient'
+import { formatAddress, getHours } from '../utils/general'
 import { GET_PHARMACIES } from '../utils/queries'
+import t from '../utils/text.json'
 import { SELECT_ORDER_PHARMACY } from '../utils/mutations'
+import { graphQLClient } from '../configs/graphqlClient'
 import { FixedFooter } from '../components/FixedFooter'
 import { Nav } from '../components/Nav'
 import { PoweredBy } from '../components/PoweredBy'
 import { LocationModal } from '../components/LocationModal'
 import { PharmacyList } from '../components/PharmacyList'
 import { OrderContext } from './Main'
-import t from '../utils/text.json'
 
 const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER']
+export const UNOPEN_BUSINESS_STATUS_MAP = {
+  CLOSED_TEMPORARILY: 'Closed Temporarily',
+  CLOSED_PERMANENTLY: 'Closed Permanently'
+}
+
+const placesService = new google.maps.places.PlacesService(document.createElement('div'))
+
+const query = (method, data) =>
+  new Promise((resolve, reject) => {
+    placesService[method](data, (response, status) => {
+      if (status === 'OK') {
+        resolve({ response, status })
+      } else {
+        reject({ response, status })
+      }
+    })
+  })
 
 export const Pharmacy = () => {
   const isMobile = useBreakpointValue({ base: true, md: false })
@@ -50,11 +69,21 @@ export const Pharmacy = () => {
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false)
 
+  const [loadingMore, setLoadingMore] = useState<boolean>(false)
+  const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false)
+
   const [latitude, setLatitude] = useState<number | undefined>(undefined)
   const [longitude, setLongitude] = useState<number | undefined>(undefined)
   const [location, setLocation] = useState<string>('')
 
   const toast = useToast()
+
+  const reset = () => {
+    setPharmacyOptions([])
+    setSelectedId('')
+    setShowFooter(false)
+    setShowingAllPharmacies(false)
+  }
 
   const handleModalClose = ({
     loc = undefined,
@@ -66,7 +95,7 @@ export const Pharmacy = () => {
     lng: number | undefined
   }) => {
     if (loc && loc !== location) {
-      setPharmacyOptions([])
+      reset()
     }
     if (lat && lng && loc) {
       setLocation(loc)
@@ -77,34 +106,91 @@ export const Pharmacy = () => {
   }
 
   const fetchPharmacies = async () => {
+    setLoadingMore(true)
+
+    graphQLClient.setHeader('x-photon-auth', token)
+
+    const location = {
+      latitude,
+      longitude,
+      radius: 25
+    }
+    const limit = 3
+    const offset = pharmacyOptions.length
+
+    let pharmaciesResults: any
     try {
-      graphQLClient.setHeader('x-photon-auth', token)
-
-      const location = {
-        latitude,
-        longitude,
-        radius: 25
-      }
-      const limit = 3
-      const offset = pharmacyOptions.length
-
-      const results: any = await graphQLClient.request(GET_PHARMACIES, { location, limit, offset })
-
-      if (results) {
-        setPharmacyOptions([...pharmacyOptions, ...results.pharmaciesByLocation])
-      }
+      pharmaciesResults = await graphQLClient.request(GET_PHARMACIES, { location, limit, offset })
     } catch (error) {
       console.error(JSON.stringify(error, undefined, 2))
       console.log(error)
 
-      if (error?.response?.errors) {
-        if (AUTH_HEADER_ERRORS.includes(error.response.errors[0].extensions.code)) {
-          navigate('/no-match')
-        } else {
-          setError(error.response.errors[0].message)
-        }
+      if (error?.response.errors[0].message === 'No pharmacies found near location') {
+        setShowingAllPharmacies(true)
       }
     }
+
+    if (pharmaciesResults?.pharmaciesByLocation.length > 0) {
+      for (let i = 0; i < pharmaciesResults.pharmaciesByLocation.length; i++) {
+        const name = pharmaciesResults.pharmaciesByLocation[i].name
+        const address = pharmaciesResults.pharmaciesByLocation[i].address
+          ? formatAddress(pharmaciesResults.pharmaciesByLocation[i].address)
+          : ''
+
+        const placeRequest = {
+          query: name + ' ' + address,
+          fields: ['place_id']
+        }
+
+        let place, placeStatus
+        try {
+          const { response, status }: any = await query('findPlaceFromQuery', placeRequest)
+          place = response
+          placeStatus = status
+        } catch (error) {
+          console.error(JSON.stringify(error, undefined, 2))
+          console.log(error)
+
+          continue
+        }
+
+        if (placeStatus === 'OK' && place[0].place_id) {
+          const detailsRequest = {
+            placeId: place[0].place_id,
+            fields: ['opening_hours', 'utc_offset_minutes', 'rating', 'business_status']
+          }
+          const { response: details, status: detailsStatus }: any = await query(
+            'getDetails',
+            detailsRequest
+          )
+
+          if (detailsStatus === 'OK') {
+            pharmaciesResults.pharmaciesByLocation[i].businessStatus =
+              details?.business_status || ''
+            pharmaciesResults.pharmaciesByLocation[i].rating = details?.rating || undefined
+
+            const openForBusiness = details?.business_status === 'OPERATIONAL'
+            if (openForBusiness) {
+              const currentTime = dayjs().format('HHmm')
+              const { is24Hr, opens, opensDay, closes } = getHours(
+                details?.opening_hours?.periods,
+                currentTime
+              )
+              pharmaciesResults.pharmaciesByLocation[i].hours = {
+                open: details?.opening_hours?.isOpen() || false,
+                is24Hr,
+                opens,
+                opensDay,
+                closes
+              }
+            }
+          }
+        }
+      }
+      setPharmacyOptions([...pharmacyOptions, ...pharmaciesResults.pharmaciesByLocation])
+    }
+
+    setLoadingMore(false)
   }
 
   const handleShowMore = () => {
@@ -232,6 +318,8 @@ export const Pharmacy = () => {
             selectedId={selectedId}
             handleSelect={handleSelect}
             handleShowMore={handleShowMore}
+            loadingMore={loadingMore}
+            showingAllPharmacies={showingAllPharmacies}
           />
         </VStack>
       </Container>

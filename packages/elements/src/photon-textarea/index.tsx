@@ -58,7 +58,7 @@ customElement(
         <style>{shoelaceDarkStyles}</style>
         <style>{shoelaceLightStyles}</style>
         <style>{styles}</style>
-        <div class="py-2 flex flex-col" ref={ref}>
+        <div class="sm:py-2 flex flex-col" ref={ref}>
           {props.label ? (
             <div class="flex items-center pb-2 font-sans">
               <p class="text-gray-700 text-sm">{props.label}</p>

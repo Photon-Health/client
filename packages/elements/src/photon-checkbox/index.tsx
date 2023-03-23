@@ -58,7 +58,7 @@ customElement(
         <style>{tailwind}</style>
         <style>{shoelaceDarkStyles}</style>
         <style>{shoelaceLightStyles}</style>
-        <div class="flex items-center py-2">
+        <div class="flex items-start py-2">
           {props.checked ? (
             <sl-checkbox
               ref={ref}
@@ -80,8 +80,8 @@ customElement(
             ></sl-checkbox>
           )}
           <div>
-            <p class="text-gray-500 text-sm font-medium font-sans">
-              {props.label}
+            <p class="flex items-center text-gray-500 text-sm font-medium font-sans">
+              <span class="mr-1">{props.label} </span>
               <Show when={props.tip}>
                 <PhotonTooltip tip={props.tip || ''} placement="right"></PhotonTooltip>
               </Show>
