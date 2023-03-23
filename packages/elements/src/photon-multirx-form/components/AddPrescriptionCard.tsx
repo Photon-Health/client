@@ -94,8 +94,8 @@ export const AddPrescriptionCard = (props: {
             });
           }}
         ></photon-treatment-select>
-        <div class="sm:grid sm:grid-cols-2 sm:gap-4">
-          <div>
+        <div class="flex flex-col sm:flex-none	sm:grid sm:grid-cols-2 sm:gap-4">
+          <div class="order-last sm:order-first">
             <photon-checkbox
               label="Dispense as written"
               tip="This prescription will be filled generically unless this box is checked"
@@ -111,7 +111,7 @@ export const AddPrescriptionCard = (props: {
             ></photon-checkbox>
             <photon-med-search-dialog ref={medSearchRef}></photon-med-search-dialog>
           </div>
-          <div class="py-4 md:py-2 text-left sm:text-right">
+          <div class="pb-4 md:py-2 text-left sm:text-right">
             <a
               class="font-sans text-gray-500 text-sm hover:text-black hover:cursor-pointer"
               onClick={() => (medSearchRef.open = true)}
