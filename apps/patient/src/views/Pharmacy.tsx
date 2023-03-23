@@ -17,24 +17,18 @@ import {
 import { FiCheck, FiMapPin } from 'react-icons/fi'
 import { Helmet } from 'react-helmet'
 import dayjs from 'dayjs'
-import isoWeek from 'dayjs/plugin/isoWeek'
-import isBetween from 'dayjs/plugin/isBetween'
 
-import { formatAddress } from '../utils/general'
-
-import { graphQLClient } from '../configs/graphqlClient'
+import { formatAddress, getHours } from '../utils/general'
 import { GET_PHARMACIES } from '../utils/queries'
+import t from '../utils/text.json'
 import { SELECT_ORDER_PHARMACY } from '../utils/mutations'
+import { graphQLClient } from '../configs/graphqlClient'
 import { FixedFooter } from '../components/FixedFooter'
 import { Nav } from '../components/Nav'
 import { PoweredBy } from '../components/PoweredBy'
 import { LocationModal } from '../components/LocationModal'
 import { PharmacyList } from '../components/PharmacyList'
 import { OrderContext } from './Main'
-import t from '../utils/text.json'
-
-dayjs.extend(isoWeek)
-dayjs.extend(isBetween)
 
 const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER']
 export const UNOPEN_BUSINESS_STATUS_MAP = {
@@ -54,66 +48,6 @@ const query = (method, data) =>
       }
     })
   })
-
-export const getHours = (
-  periods: { close: { day: number; time: string }; open: { day: number; time: string } }[],
-  currentTime: string
-) => {
-  /**
-   * There are 1-2 periods per day. For example CVS may have an hour off for
-   * lunch so google will show two "periods" with the same "day", like
-   * 0830-1200, 1300-2000.
-   *
-   * Todo:
-   *  - Add timezone support. Not urgent since user is usually in same tz as pharmacy.
-   */
-
-  const now = dayjs(currentTime, 'HHmm')
-  const today = now.isoWeekday()
-  let nextOpenTime = null
-  let nextOpenDay = null
-  let nextCloseTime = null
-  let is24Hr = false
-
-  if (periods?.length === 1) is24Hr = true
-
-  if (periods && !is24Hr) {
-    for (let i = 0; i < periods.length; i++) {
-      const period = periods[i]
-      const open = period.open.time
-      const close = period.close.time
-
-      if (period.open.day === today) {
-        if (now.isBetween(dayjs(open, 'HHmm'), dayjs(close, 'HHmm'))) {
-          nextCloseTime = close
-        } else if (!nextOpenTime && now.isBefore(open)) {
-          nextOpenTime = open
-        }
-      }
-    }
-
-    // after hours
-    if (!nextOpenTime) {
-      const indexOfLastCurrentDayPeriod = periods.lastIndexOf(
-        // clone to get around reverse-in-place
-        [...periods].reverse().find((per) => per.close.day === today)
-      )
-      const nextPeriod =
-        indexOfLastCurrentDayPeriod === periods.length - 1
-          ? periods[0]
-          : periods[indexOfLastCurrentDayPeriod + 1]
-      nextOpenTime = nextPeriod.open.time
-      nextOpenDay = dayjs().isoWeekday(nextPeriod.open.day).format('ddd')
-    }
-  }
-
-  return {
-    is24Hr,
-    opens: nextOpenTime,
-    opensDay: nextOpenDay,
-    closes: nextCloseTime
-  }
-}
 
 export const Pharmacy = () => {
   const isMobile = useBreakpointValue({ base: true, md: false })
