@@ -27,6 +27,23 @@ export interface Order {
   }
 }
 
+export interface Pharmacy {
+  id: string
+  address: Address
+  name: string
+  info: string
+  distance: number
+  rating?: string
+  businessStatus: string
+  hours?: {
+    open?: boolean
+    is24Hr?: boolean
+    opens?: string
+    opensDay?: 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun'
+    closes?: string
+  }
+}
+
 export enum OrderState {
   Canceled = 'CANCELED',
   Completed = 'COMPLETED',

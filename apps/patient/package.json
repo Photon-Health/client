@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "chakra-react-select": "^4.6.0",
+    "dayjs": "^1.11.7",
     "graphql-request": "^5.2.0",
     "react-helmet": "^6.1.0",
     "tinycolor2": "^1.6.0"
@@ -25,5 +26,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/google.maps": "^3.52.3"
   }
 }
