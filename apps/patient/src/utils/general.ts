@@ -51,7 +51,7 @@ export const getHours = (
       if (period.open.day === today) {
         if (now.isBetween(dayjs(open, 'HHmm'), dayjs(close, 'HHmm'))) {
           nextCloseTime = close
-        } else if (!nextOpenTime && now.isBefore(open)) {
+        } else if (!nextOpenTime && now.isBefore(dayjs(open, 'HHmm'))) {
           nextOpenTime = open
         }
       }
