@@ -38,6 +38,7 @@ interface SelectPharmacyCardProps {
 
 export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
   user,
+  auth0UserId,
   patient,
   address,
   errors,
@@ -104,7 +105,8 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     {
       name: 'Send to Patient',
       fulfillmentType: undefined,
-      enabled: settings.sendToPatient,
+      // @ts-ignore
+      enabled: settings.sendToPatient || settings.sendToPatientUsers.includes(auth0UserId),
       comp: <SendToPatient patient={patient} />
     },
     {
