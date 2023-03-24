@@ -20,6 +20,8 @@ import { MailOrder } from './components/MailOrder';
 import { Address } from '../../../../../models/general';
 import { SendToPatient } from './components/SendToPatient';
 
+import { FulfillmentSettings } from '../../../../../models/general';
+
 interface SelectPharmacyCardProps {
   user: any;
   auth0UserId: string;
@@ -31,11 +33,7 @@ interface SelectPharmacyCardProps {
   setFieldValue: any;
   updatePreferredPharmacy: boolean;
   setUpdatePreferredPharmacy: (value: boolean) => void;
-  enabledFulfillmentTypes: {
-    MAIL_ORDER: boolean;
-    PICK_UP: boolean;
-    sendToPatient: boolean;
-  };
+  settings: FulfillmentSettings;
 }
 
 export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
@@ -48,7 +46,7 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
   setFieldValue,
   updatePreferredPharmacy,
   setUpdatePreferredPharmacy,
-  enabledFulfillmentTypes
+  settings
 }: SelectPharmacyCardProps) => {
   const [latitude, setLatitude] = useState<number | undefined>(undefined);
   const [longitude, setLongitude] = useState<number | undefined>(undefined);
@@ -82,7 +80,7 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     {
       name: 'Local Pickup',
       fulfillmentType: types.FulfillmentType.PickUp,
-      enabled: enabledFulfillmentTypes[types.FulfillmentType.PickUp],
+      enabled: settings.pickUp,
       comp: (
         <LocalPickup
           location={location}
@@ -106,13 +104,13 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     {
       name: 'Send to Patient',
       fulfillmentType: undefined,
-      enabled: enabledFulfillmentTypes.sendToPatient,
+      enabled: settings.sendToPatient,
       comp: <SendToPatient patient={patient} />
     },
     {
       name: 'Mail Order',
       fulfillmentType: types.FulfillmentType.MailOrder,
-      enabled: enabledFulfillmentTypes[types.FulfillmentType.MailOrder],
+      enabled: settings.mailOrder,
       comp: (
         <MailOrder
           user={user}
