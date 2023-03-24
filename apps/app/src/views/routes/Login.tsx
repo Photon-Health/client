@@ -15,11 +15,11 @@ import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
 import { usePhoton } from '@photonhealth/react';
 import { Logo } from '../components/Logo';
 import { Auth } from '../components/Auth';
-import useQuery from '../../hooks/useQuery';
+import useQueryParams from '../../hooks/useQueryParams';
 
 export const Login = () => {
   const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });
-  const query = useQuery();
+  const query = useQueryParams();
 
   const { isAuthenticated, login, error, isLoading } = usePhoton();
   const location = useLocation() as any;
@@ -53,7 +53,7 @@ export const Login = () => {
             </Alert>
           )}
           <Stack spacing={{ base: '2', md: '3' }} textAlign="center">
-            <Heading size={breakpoint}>Lorg in to your account</Heading>
+            <Heading size={breakpoint}>Log in to your account</Heading>
             {query.get('auth0-orgs') === '0' ? (
               <Alert status="warning">
                 <AlertIcon />

@@ -7,7 +7,7 @@ import { Nav } from '../components/Nav';
 import { SelectOrg } from './SelectOrg';
 import { addAlert } from '../../stores/alert';
 import { auth0Config } from '../../configs/auth';
-import useQuery from '../../hooks/useQuery';
+import useQueryParams from '../../hooks/useQueryParams';
 
 declare global {
   namespace JSX {
@@ -18,7 +18,7 @@ declare global {
 }
 
 export const Main = () => {
-  const query = useQuery();
+  const query = useQueryParams();
 
   // Detect is browser is Safari
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
