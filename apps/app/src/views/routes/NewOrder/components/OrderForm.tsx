@@ -114,27 +114,22 @@ export const OrderForm = ({
     }
   };
 
-  const enabledFulfillmentTypes = {
-    [types.FulfillmentType.PickUp]:
-      typeof fulfillmentSettings[user.org_id] !== 'undefined'
-        ? fulfillmentSettings[user.org_id].pickUp
-        : fulfillmentSettings.default.pickUp,
-    [types.FulfillmentType.MailOrder]:
-      typeof fulfillmentSettings[user.org_id] !== 'undefined'
-        ? fulfillmentSettings[user.org_id].mailOrder
-        : fulfillmentSettings.default.mailOrder,
-    sendToPatient:
-      typeof fulfillmentSettings[user.org_id] !== 'undefined'
-        ? fulfillmentSettings[user.org_id].sendToPatient ||
-          fulfillmentSettings[user.org_id].sendToPatientUsers.includes(auth0UserId)
-        : fulfillmentSettings.default.sendToPatient
-  };
+  const settings =
+    typeof fulfillmentSettings[user.org_id] !== 'undefined'
+      ? fulfillmentSettings[user.org_id]
+      : fulfillmentSettings.default;
 
   let preferredPharmacy = '';
   if (patient?.preferredPharmacies?.length > 0) {
+    const enabledFulfillmentTypes = [
+      ...(settings.pickUp ? [types.FulfillmentType.PickUp] : []),
+      ...(settings.mailOrder ? [types.FulfillmentType.MailOrder] : []),
+      ...(settings.sendToPatient || settings.sendToPatientUsers.includes(auth0UserId)
+        ? ['sendToPatient']
+        : [])
+    ];
     const preferredPharmacyTypeIsEnabled = patient.preferredPharmacies[0]?.fulfillmentTypes.some(
-      // @ts-ignore
-      (type: string) => !!enabledFulfillmentTypes[type]
+      (type: string) => enabledFulfillmentTypes.includes(type)
     );
     if (preferredPharmacyTypeIsEnabled) {
       preferredPharmacy = patient.preferredPharmacies[0].id;
@@ -264,7 +259,7 @@ export const OrderForm = ({
                 touched={touched}
                 patient={patient}
                 setFieldValue={setFieldValue}
-                enabledFulfillmentTypes={enabledFulfillmentTypes}
+                settings={settings}
               />
 
               <SelectPrescriptionsCard
