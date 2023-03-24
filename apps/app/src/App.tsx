@@ -56,6 +56,7 @@ export const App = () => {
               <Route path="new" element={<PrescriptionForm />} />
               <Route path=":prescriptionId" element={<Prescription />} />
             </Route>
+            <Route path="/prescriptions/new" element={<PrescriptionForm />} />
             <Route path="/orders">
               <Route path="/orders" element={<Orders />} />
               <Route path="new" element={<NewOrder />} />

@@ -4,7 +4,7 @@ import { ChakraProvider } from '@chakra-ui/react';
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 
-import { datadogRum } from '@datadog/browser-rum';
+// import { datadogRum } from '@datadog/browser-rum';
 
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorker from './serviceWorker';
@@ -16,21 +16,21 @@ import pkg from '../package.json';
 
 import('@photonhealth/elements').catch(() => {});
 
-datadogRum.init({
-  applicationId: process.env.REACT_APP_DATADOG_RUM_APPLICATION_ID as string,
-  clientToken: process.env.REACT_APP_DATADOG_RUM_CLIENT_TOKEN as string,
-  site: 'datadoghq.com',
-  service: pkg.name,
-  env: process.env.REACT_APP_ENV_NAME,
-  version: pkg.version,
-  sampleRate: 100,
-  sessionReplaySampleRate: 100,
-  trackInteractions: true,
-  trackResources: true,
-  trackLongTasks: true
-});
+// datadogRum.init({
+//   applicationId: process.env.REACT_APP_DATADOG_RUM_APPLICATION_ID as string,
+//   clientToken: process.env.REACT_APP_DATADOG_RUM_CLIENT_TOKEN as string,
+//   site: 'datadoghq.com',
+//   service: pkg.name,
+//   env: process.env.REACT_APP_ENV_NAME,
+//   version: pkg.version,
+//   sampleRate: 100,
+//   sessionReplaySampleRate: 100,
+//   trackInteractions: true,
+//   trackResources: true,
+//   trackLongTasks: true
+// });
 
-datadogRum.startSessionReplayRecording();
+// datadogRum.startSessionReplayRecording();
 
 Sentry.init({
   dsn: 'https://d0b15af35bc44744a170b8a04d28a840@o1356305.ingest.sentry.io/6641717',
