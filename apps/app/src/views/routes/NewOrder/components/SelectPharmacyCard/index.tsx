@@ -20,9 +20,6 @@ import { MailOrder } from './components/MailOrder';
 import { Address } from '../../../../../models/general';
 import { SendToPatient } from './components/SendToPatient';
 
-const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
-const { fulfillmentSettings } = require(`../../../../../configs/fulfillment.${envName}.ts`);
-
 interface SelectPharmacyCardProps {
   user: any;
   auth0UserId: string;
@@ -34,11 +31,15 @@ interface SelectPharmacyCardProps {
   setFieldValue: any;
   updatePreferredPharmacy: boolean;
   setUpdatePreferredPharmacy: (value: boolean) => void;
+  enabledFulfillmentTypes: {
+    MAIL_ORDER: boolean;
+    PICK_UP: boolean;
+    sendToPatient: boolean;
+  };
 }
 
 export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
   user,
-  auth0UserId,
   patient,
   address,
   errors,
@@ -46,7 +47,8 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
   pharmacyId,
   setFieldValue,
   updatePreferredPharmacy,
-  setUpdatePreferredPharmacy
+  setUpdatePreferredPharmacy,
+  enabledFulfillmentTypes
 }: SelectPharmacyCardProps) => {
   const [latitude, setLatitude] = useState<number | undefined>(undefined);
   const [longitude, setLongitude] = useState<number | undefined>(undefined);
@@ -80,10 +82,7 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     {
       name: 'Local Pickup',
       fulfillmentType: types.FulfillmentType.PickUp,
-      enabled:
-        typeof fulfillmentSettings[user.org_id] !== 'undefined'
-          ? fulfillmentSettings[user.org_id].pickUp
-          : fulfillmentSettings.default.pickUp,
+      enabled: enabledFulfillmentTypes[types.FulfillmentType.PickUp],
       comp: (
         <LocalPickup
           location={location}
@@ -107,20 +106,13 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     {
       name: 'Send to Patient',
       fulfillmentType: undefined,
-      enabled:
-        typeof fulfillmentSettings[user.org_id] !== 'undefined'
-          ? fulfillmentSettings[user.org_id].sendToPatient ||
-            fulfillmentSettings[user.org_id].sendToPatientUsers.includes(auth0UserId)
-          : fulfillmentSettings.default.sendToPatient,
+      enabled: enabledFulfillmentTypes.sendToPatient,
       comp: <SendToPatient patient={patient} />
     },
     {
       name: 'Mail Order',
       fulfillmentType: types.FulfillmentType.MailOrder,
-      enabled:
-        typeof fulfillmentSettings[user.org_id] !== 'undefined'
-          ? fulfillmentSettings[user.org_id].mailOrder
-          : fulfillmentSettings.default.mailOrder,
+      enabled: enabledFulfillmentTypes[types.FulfillmentType.MailOrder],
       comp: (
         <MailOrder
           user={user}
