@@ -114,6 +114,28 @@ export const OrderForm = ({
     }
   };
 
+  const settings =
+    typeof fulfillmentSettings[user.org_id] !== 'undefined'
+      ? fulfillmentSettings[user.org_id]
+      : fulfillmentSettings.default;
+
+  let preferredPharmacy = '';
+  if (patient?.preferredPharmacies?.length > 0) {
+    const enabledFulfillmentTypes = [
+      ...(settings.pickUp ? [types.FulfillmentType.PickUp] : []),
+      ...(settings.mailOrder ? [types.FulfillmentType.MailOrder] : []),
+      ...(settings.sendToPatient || settings.sendToPatientUsers.includes(auth0UserId)
+        ? ['sendToPatient']
+        : [])
+    ];
+    const preferredPharmacyTypeIsEnabled = patient.preferredPharmacies[0]?.fulfillmentTypes.some(
+      (type: string) => enabledFulfillmentTypes.includes(type)
+    );
+    if (preferredPharmacyTypeIsEnabled) {
+      preferredPharmacy = patient.preferredPharmacies[0].id;
+    }
+  }
+
   const initialValues = {
     ...EMPTY_FORM_VALUES,
     patientId: patient?.id || '',
@@ -121,7 +143,7 @@ export const OrderForm = ({
       ? prescriptionIds.split(',').map((x: string) => ({ prescriptionId: x }))
       : [],
     fulfillmentType: 'PICK_UP',
-    pharmacyId: patient?.preferredPharmacies?.length > 0 ? patient.preferredPharmacies[0].id : '',
+    pharmacyId: preferredPharmacy,
     address: {
       street1: patient?.address?.street1 || '',
       street2: patient?.address?.street2 || '',
@@ -237,6 +259,7 @@ export const OrderForm = ({
                 touched={touched}
                 patient={patient}
                 setFieldValue={setFieldValue}
+                settings={settings}
               />
 
               <SelectPrescriptionsCard
