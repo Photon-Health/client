@@ -49,6 +49,7 @@ export const PATIENT_FIELDS = gql`
       id
       name
       phone
+      fulfillmentTypes
       address {
         city
         country
