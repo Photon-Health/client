@@ -5,5 +5,5 @@ export const auth0Config: Auth0ProviderOptions = {
   clientId: process.env.REACT_APP_AUTH0_CLIENT_ID as string,
   audience: process.env.REACT_APP_AUTH0_AUDIENCE as string,
   useRefreshTokens: true,
-  redirectUri: `${window.location.origin}?auth0_callback=true`
+  redirectUri: window.location.origin
 };
