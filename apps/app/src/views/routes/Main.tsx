@@ -65,7 +65,7 @@ export const Main = () => {
 
   if (!isAuthenticated && !isLoading) {
     // forwarding on the query param to the login page
-    const to = `/login${query.get('auth0-orgs') === '0' ? '?auth0-orgs=0' : ''}`;
+    const to = `/login${query.get('orgs') === '0' ? '?orgs=0' : ''}`;
     return <Navigate to={to} state={{ from: location }} replace />;
   }
 

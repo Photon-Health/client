@@ -28,7 +28,7 @@ export const SelectOrg = () => {
   useEffect(() => {
     if (!loading) {
       if (organizations?.length === 0) {
-        logout({ returnTo: `${window.location.origin}?auth0-orgs=0` });
+        logout({ returnTo: `${window.location.origin}?orgs=0` });
       } else if (organizations?.length === 1) {
         setOrganization(organizations[0].id);
         login({

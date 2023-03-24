@@ -54,7 +54,7 @@ export const Login = () => {
           )}
           <Stack spacing={{ base: '2', md: '3' }} textAlign="center">
             <Heading size={breakpoint}>Log in to your account</Heading>
-            {query.get('auth0-orgs') === '0' ? (
+            {query.get('orgs') === '0' ? (
               <Alert status="warning">
                 <AlertIcon />
                 You tried logging in with an account not associated with any organizations.
