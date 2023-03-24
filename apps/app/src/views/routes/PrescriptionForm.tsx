@@ -10,6 +10,9 @@ declare global {
 }
 
 export const PrescriptionForm = () => {
+  useEffect(() => {
+    console.log('here');
+  }, []);
   const ref: MutableRefObject<any> = useRef();
   const [params] = useSearchParams();
   const patientId = params.get('patientId') || '';
