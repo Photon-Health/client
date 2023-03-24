@@ -15,12 +15,7 @@ import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
 import { usePhoton } from '@photonhealth/react';
 import { Logo } from '../components/Logo';
 import { Auth } from '../components/Auth';
-import { useMemo } from 'react';
-
-function useQuery() {
-  const { search } = useLocation();
-  return useMemo(() => new URLSearchParams(search), [search]);
-}
+import useQuery from '../../hooks/useQuery';
 
 export const Login = () => {
   const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });

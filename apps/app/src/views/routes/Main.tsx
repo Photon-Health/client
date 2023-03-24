@@ -2,11 +2,12 @@ import { Outlet, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { Center, CircularProgress, Box } from '@chakra-ui/react';
 
 import { usePhoton } from '@photonhealth/react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Nav } from '../components/Nav';
 import { SelectOrg } from './SelectOrg';
 import { addAlert } from '../../stores/alert';
 import { auth0Config } from '../../configs/auth';
+import useQuery from '../../hooks/useQuery';
 
 declare global {
   namespace JSX {
@@ -14,11 +15,6 @@ declare global {
       'photon-client': unknown;
     }
   }
-}
-
-function useQuery() {
-  const { search } = useLocation();
-  return useMemo(() => new URLSearchParams(search), [search]);
 }
 
 export const Main = () => {
