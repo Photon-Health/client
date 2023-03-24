@@ -15,6 +15,7 @@ import { FiLogIn } from 'react-icons/fi';
 
 import { useLocation } from 'react-router-dom';
 import { usePhoton } from '@photonhealth/react';
+import { useEffect } from 'react';
 
 export const SelectOrg = () => {
   const location = useLocation();
@@ -24,18 +25,20 @@ export const SelectOrg = () => {
   const { login, logout, getOrganizations, setOrganization } = usePhoton();
   const { organizations, loading } = getOrganizations();
 
-  if (!loading) {
-    if (organizations?.length === 0) {
-      logout({ returnTo: window.location.origin });
-    } else if (organizations?.length === 1) {
-      setOrganization(organizations[0].id);
-      login({
-        appState: {
-          returnTo: from
-        }
-      });
+  useEffect(() => {
+    if (!loading) {
+      if (organizations?.length === 0) {
+        logout({ returnTo: `${window.location.origin}?auth0-orgs=0` });
+      } else if (organizations?.length === 1) {
+        setOrganization(organizations[0].id);
+        login({
+          appState: {
+            returnTo: from
+          }
+        });
+      }
     }
-  }
+  }, [organizations, loading]);
 
   const orgs = (organizations || []).map((organization: any) => {
     const { id, name } = organization;

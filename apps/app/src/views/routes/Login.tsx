@@ -15,9 +15,16 @@ import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
 import { usePhoton } from '@photonhealth/react';
 import { Logo } from '../components/Logo';
 import { Auth } from '../components/Auth';
+import { useMemo } from 'react';
+
+function useQuery() {
+  const { search } = useLocation();
+  return useMemo(() => new URLSearchParams(search), [search]);
+}
 
 export const Login = () => {
   const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });
+  const query = useQuery();
 
   const { isAuthenticated, login, error, isLoading } = usePhoton();
   const location = useLocation() as any;
@@ -51,7 +58,13 @@ export const Login = () => {
             </Alert>
           )}
           <Stack spacing={{ base: '2', md: '3' }} textAlign="center">
-            <Heading size={breakpoint}>Log in to your account</Heading>
+            <Heading size={breakpoint}>Lorg in to your account</Heading>
+            {query.get('auth0-orgs') === '0' ? (
+              <Alert status="warning">
+                <AlertIcon />
+                You tried logging in with an account not associated with any organizations.
+              </Alert>
+            ) : null}
             <HStack spacing="1" justify="center">
               <Text color="muted">{`Don't have an account?`}</Text>
               <Link color="teal.500" href="mailto:rado@photon.health">

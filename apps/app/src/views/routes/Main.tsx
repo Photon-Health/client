@@ -2,7 +2,7 @@ import { Outlet, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { Center, CircularProgress, Box } from '@chakra-ui/react';
 
 import { usePhoton } from '@photonhealth/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Nav } from '../components/Nav';
 import { SelectOrg } from './SelectOrg';
 import { addAlert } from '../../stores/alert';
@@ -16,7 +16,14 @@ declare global {
   }
 }
 
+function useQuery() {
+  const { search } = useLocation();
+  return useMemo(() => new URLSearchParams(search), [search]);
+}
+
 export const Main = () => {
+  const query = useQuery();
+
   // Detect is browser is Safari
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
   const { user, isAuthenticated, isLoading, error, clearError } = usePhoton();
@@ -61,7 +68,9 @@ export const Main = () => {
   }
 
   if (!isAuthenticated && !isLoading) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // forwarding on the query param to the login page
+    const to = `/login${query.get('auth0-orgs') === '0' ? '?auth0-orgs=0' : ''}`;
+    return <Navigate to={to} state={{ from: location }} replace />;
   }
 
   if (location.pathname === '/' && isAuthenticated) {
