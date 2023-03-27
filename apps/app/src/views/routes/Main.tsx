@@ -64,9 +64,8 @@ export const Main = () => {
   }
 
   if (!isAuthenticated && !isLoading) {
-    // forwarding on the query param to the login page
-    const to = `/login${query.get('orgs') === '0' ? '?orgs=0' : ''}`;
-    return <Navigate to={to} state={{ from: location }} replace />;
+    const queryString = query.toString() ? `?${query.toString()}` : '';
+    return <Navigate to={`/login${queryString}`} state={{ from: location }} replace />;
   }
 
   if (location.pathname === '/' && isAuthenticated) {
