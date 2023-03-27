@@ -64,8 +64,21 @@ export const Main = () => {
   }
 
   if (!isAuthenticated && !isLoading) {
+    const pathname = query.get('pathname');
     const queryString = query.toString() ? `?${query.toString()}` : '';
-    return <Navigate to={`/login${queryString}`} state={{ from: location }} replace />;
+
+    return (
+      <Navigate
+        to={`/login${queryString}`}
+        state={{
+          from: {
+            ...location,
+            ...(pathname ? { pathname } : {})
+          }
+        }}
+        replace
+      />
+    );
   }
 
   if (location.pathname === '/' && isAuthenticated) {

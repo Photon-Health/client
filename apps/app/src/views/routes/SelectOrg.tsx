@@ -29,7 +29,15 @@ export const SelectOrg = () => {
   useEffect(() => {
     if (!loading) {
       if (organizations?.length === 0) {
-        logout({ returnTo: `${window.location.origin}?orgs=0` });
+        const queryString = location.search.replace(/^\?/, '');
+        const searchParams = new URLSearchParams(queryString);
+        searchParams.append('orgs', '0');
+
+        if (location?.pathname && location?.pathname !== '/') {
+          searchParams.append('pathname', location.pathname);
+        }
+
+        logout({ returnTo: `${window.location.origin}?${searchParams.toString()}` });
       } else if (organizations?.length === 1) {
         setOrganization(organizations[0].id);
         login({
@@ -43,8 +51,8 @@ export const SelectOrg = () => {
 
   useEffect(() => {
     if (searchParams.has('orgs')) {
-      console.log('deleting orgs param');
       searchParams.delete('orgs');
+      searchParams.delete('pathname');
       setSearchParams(searchParams);
     }
   }, []);
