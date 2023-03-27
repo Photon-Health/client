@@ -25,9 +25,10 @@ export const Login = () => {
   const location = useLocation() as any;
 
   // Handle invite with redirect, even if logged in
-  const [params] = useSearchParams();
-  const invite = params.get('invitation');
-  const org = params.get('organization');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const invite = searchParams.get('invitation');
+  const org = searchParams.get('organization');
+
   if (invite && org) {
     login({
       organizationId: org,

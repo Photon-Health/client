@@ -13,12 +13,13 @@ import {
 
 import { FiLogIn } from 'react-icons/fi';
 
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { usePhoton } from '@photonhealth/react';
 import { useEffect } from 'react';
 
 export const SelectOrg = () => {
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const from = `${(location.pathname || '/') + (location.search || '')}`;
 
@@ -39,6 +40,14 @@ export const SelectOrg = () => {
       }
     }
   }, [organizations, loading]);
+
+  useEffect(() => {
+    if (searchParams.has('orgs')) {
+      console.log('deleting orgs param');
+      searchParams.delete('orgs');
+      setSearchParams(searchParams);
+    }
+  }, []);
 
   const orgs = (organizations || []).map((organization: any) => {
     const { id, name } = organization;
