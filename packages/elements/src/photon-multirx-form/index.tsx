@@ -92,6 +92,7 @@ customElement(
     const client = usePhoton();
     const [showForm, setShowForm] = createSignal<boolean>(!props.templateIds);
     const [isLoading, setIsLoading] = createSignal<boolean>(true);
+    const [isEditing, setIsEditing] = createSignal<boolean>(false);
     const [isLoadingTemplates, setIsLoadingTemplates] = createSignal<boolean>(false);
     const [authenticated, setAuthenticated] = createSignal<boolean>(
       client?.authentication.state.isAuthenticated || false
@@ -342,7 +343,7 @@ customElement(
                 client={client!}
                 enableOrder={props.enableOrder}
               ></PatientCard>
-              <Show when={showForm()}>
+              <Show when={showForm() || isEditing()}>
                 <div ref={prescriptionRef}>
                   <AddPrescriptionCard
                     hideAddToTemplates={props.hideTemplates}
@@ -356,6 +357,7 @@ customElement(
                 actions={actions}
                 store={store}
                 isLoading={isLoadingTemplates()}
+                setIsEditing={setIsEditing}
               ></DraftPrescriptionCard>
               <Show when={props.enableOrder && !props.pharmacyId}>
                 <OrderCard store={store} actions={actions}></OrderCard>
