@@ -101,6 +101,8 @@ export const Status = () => {
 
   const { fulfillment, pharmacy, organization } = order
 
+  const photonPhone = '5138663212'
+
   return (
     <Box>
       <Helmet>
@@ -122,7 +124,7 @@ export const Status = () => {
                 <AlertIcon />
                 <Text>
                   {t.status.chat.prompt}{' '}
-                  <Link href="sms:5138663212" textDecoration="underline">
+                  <Link href={`sms:${photonPhone}`} textDecoration="underline">
                     {t.status.chat.cta}
                   </Link>
                 </Text>
