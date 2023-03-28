@@ -99,7 +99,7 @@ export const Status = () => {
     )
   }
 
-  const { fulfillment, pharmacy, organization, state } = order
+  const { fulfillment, pharmacy, organization } = order
 
   return (
     <Box>
