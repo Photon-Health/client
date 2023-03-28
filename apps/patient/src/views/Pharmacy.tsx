@@ -12,9 +12,11 @@ import {
   Text,
   VStack,
   useBreakpointValue,
-  useToast
+  useToast,
+  Divider
 } from '@chakra-ui/react'
 import { FiCheck, FiMapPin } from 'react-icons/fi'
+
 import { Helmet } from 'react-helmet'
 import dayjs from 'dayjs'
 
@@ -27,7 +29,8 @@ import { FixedFooter } from '../components/FixedFooter'
 import { Nav } from '../components/Nav'
 import { PoweredBy } from '../components/PoweredBy'
 import { LocationModal } from '../components/LocationModal'
-import { PharmacyList } from '../components/PharmacyList'
+import { PickupOptions } from '../components/PickupOptions'
+import { MailOrderOptions } from '../components/MailOrderOptions'
 import { OrderContext } from './Main'
 
 const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER']
@@ -287,6 +290,7 @@ export const Pharmacy = () => {
             </Heading>
             <Text>{t.pharmacy.subheading}</Text>
           </VStack>
+
           <HStack justify="space-between" w="full">
             {location ? (
               <VStack w="full" align="start" spacing={1}>
@@ -306,21 +310,28 @@ export const Pharmacy = () => {
                 {t.pharmacy.setLocation}
               </Button>
             )}
-            {!isMobile && pharmacyOptions.length > 0 ? (
-              <Text size="sm" color="gray.500" whiteSpace="nowrap" alignSelf="flex-end">
-                {t.pharmacy.sorted}
-              </Text>
-            ) : null}
           </HStack>
 
-          <PharmacyList
-            pharmacies={pharmacyOptions}
-            selectedId={selectedId}
-            handleSelect={handleSelect}
-            handleShowMore={handleShowMore}
-            loadingMore={loadingMore}
-            showingAllPharmacies={showingAllPharmacies}
-          />
+          {location ? (
+            <VStack spacing={9} align="stretch">
+              <MailOrderOptions
+                capsule
+                location={location}
+                selectedId={selectedId}
+                handleSelect={handleSelect}
+              />
+
+              <PickupOptions
+                pharmacies={pharmacyOptions}
+                selectedId={selectedId}
+                handleSelect={handleSelect}
+                handleShowMore={handleShowMore}
+                loadingMore={loadingMore}
+                showingAllPharmacies={showingAllPharmacies}
+                isMobile={isMobile}
+              />
+            </VStack>
+          ) : null}
         </VStack>
       </Container>
 

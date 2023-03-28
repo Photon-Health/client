@@ -16,12 +16,6 @@ const INFO_COLOR_MAP = {
   Preferred: 'yellow'
 }
 
-interface PharmacyCardProps {
-  pharmacy: Pharmacy
-  selected: boolean
-  onSelect: Function
-}
-
 const RatingHours = ({ businessStatus, rating, hours }) => {
   if (businessStatus in UNOPEN_BUSINESS_STATUS_MAP) {
     return (
@@ -69,6 +63,12 @@ const DistanceAddress = ({ distance, address }) => {
   )
 }
 
+interface PharmacyCardProps {
+  pharmacy: Pharmacy
+  selected: boolean
+  onSelect: Function
+}
+
 export const PharmacyCard = memo(function PharmacyCard({
   pharmacy,
   selected,
@@ -78,39 +78,37 @@ export const PharmacyCard = memo(function PharmacyCard({
   return (
     <Card
       w="full"
-      backgroundColor="white"
+      bgColor="white"
       border="2px solid"
       borderColor={selected ? 'brand.600' : 'white'}
       cursor="pointer"
       onClick={() => onSelect()}
     >
       <CardBody p={4}>
-        <HStack spacing={2}>
-          <VStack me="auto" align="start" spacing={0}>
-            {pharmacy.info ? (
-              <Tag size="sm" colorScheme={INFO_COLOR_MAP[pharmacy.info]}>
-                <TagLeftIcon
-                  boxSize="12px"
-                  as={pharmacy.info === 'Previous' ? FiRotateCcw : FiStar}
-                />
-                <TagLabel> {pharmacy.info}</TagLabel>
-              </Tag>
-            ) : null}
-            {pharmacy?.hours?.is24Hr ? (
-              <Tag size="sm" colorScheme="green">
-                <TagLabel>24 hr</TagLabel>
-              </Tag>
-            ) : null}
-            <Text fontSize="md">{pharmacy.name}</Text>
+        <VStack me="auto" align="start" spacing={0}>
+          {pharmacy.info ? (
+            <Tag size="sm" colorScheme={INFO_COLOR_MAP[pharmacy.info]}>
+              <TagLeftIcon
+                boxSize="12px"
+                as={pharmacy.info === 'Previous' ? FiRotateCcw : FiStar}
+              />
+              <TagLabel> {pharmacy.info}</TagLabel>
+            </Tag>
+          ) : null}
+          {pharmacy?.hours?.is24Hr ? (
+            <Tag size="sm" colorScheme="green">
+              <TagLabel>24 hr</TagLabel>
+            </Tag>
+          ) : null}
+          <Text fontSize="md">{pharmacy.name}</Text>
 
-            <RatingHours
-              businessStatus={pharmacy.businessStatus}
-              rating={pharmacy.rating}
-              hours={pharmacy.hours}
-            />
-            <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
-          </VStack>
-        </HStack>
+          <RatingHours
+            businessStatus={pharmacy.businessStatus}
+            rating={pharmacy.rating}
+            hours={pharmacy.hours}
+          />
+          <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
+        </VStack>
       </CardBody>
     </Card>
   )
