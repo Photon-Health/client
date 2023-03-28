@@ -59,8 +59,8 @@ export const Status = () => {
           setTimeout(() => setShowFooter(false), 1000)
         } else {
           toast({
-            title: 'Unable to mark order as picked up',
-            description: 'Please refresh and try again',
+            title: t.status.pickupErrorToast.title,
+            description: t.status.pickupErrorToast.description,
             position: 'top',
             status: 'error',
             duration: 5000,

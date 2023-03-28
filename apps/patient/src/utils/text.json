@@ -58,6 +58,10 @@
       "description": "Please notify us below when you've picked up your prescriptions."
     },
     "cta": "I picked up my prescriptions",
-    "thankYou": "Thank you!"
+    "thankYou": "Thank you!",
+    "pickupErrorToast": {
+      "title": "Unable to mark order as picked up",
+      "description": "Please refresh and try again"
+    }
   }
 }
