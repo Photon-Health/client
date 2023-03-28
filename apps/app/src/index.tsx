@@ -14,7 +14,7 @@ import { App } from './App';
 
 import pkg from '../package.json';
 
-import('@photonhealth/webcomponents').catch(() => {});
+import('@photonhealth/elements').catch(() => {});
 
 datadogRum.init({
   applicationId: process.env.REACT_APP_DATADOG_RUM_APPLICATION_ID as string,
