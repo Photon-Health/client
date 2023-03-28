@@ -1,9 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import { ChakraProvider } from '@chakra-ui/react';
 
-import * as Sentry from '@sentry/react';
-import { BrowserTracing } from '@sentry/tracing';
-
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorker from './serviceWorker';
 
@@ -13,18 +10,6 @@ import { App } from './App';
 import pkg from '../package.json';
 
 import('@photonhealth/elements').catch(() => {});
-
-Sentry.init({
-  dsn: 'https://d0b15af35bc44744a170b8a04d28a840@o1356305.ingest.sentry.io/6641717',
-  integrations: [new BrowserTracing()],
-  environment: process.env.REACT_APP_ENV_NAME,
-  enabled: process.env.NODE_ENV !== 'development',
-
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
-  tracesSampleRate: 1.0
-});
 
 const container = document.getElementById('root')!;
 const root = createRoot(container); // createRoot(container!) if you use TypeScript
