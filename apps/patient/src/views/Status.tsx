@@ -101,7 +101,7 @@ export const Status = () => {
 
   const { fulfillment, pharmacy, organization } = order
 
-  const photonPhone = '5138663212'
+  const photonPhone: string = process.env.REACT_APP_TWILIO_SMS_NUMBER
 
   return (
     <Box>
