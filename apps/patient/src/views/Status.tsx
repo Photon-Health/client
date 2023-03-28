@@ -99,7 +99,7 @@ export const Status = () => {
     )
   }
 
-  const { fulfillment, pharmacy, organization } = order
+  const { fulfillment, pharmacy, organization, state } = order
 
   return (
     <Box>
@@ -117,6 +117,17 @@ export const Status = () => {
               {t.status.heading}
             </Heading>
             <Text>{t.status.subheading}</Text>
+            {fulfillment?.state === 'RECEIVED' || fulfillment?.state === 'READY' ? (
+              <Alert status="warning">
+                <AlertIcon />
+                <Text>
+                  {t.status.chat.prompt}{' '}
+                  <Link href="sms:5138663212" textDecoration="underline">
+                    {t.status.chat.cta}
+                  </Link>
+                </Text>
+              </Alert>
+            ) : null}
           </VStack>
           {pharmacy?.name && pharmacy?.address ? (
             <Box alignSelf="start">

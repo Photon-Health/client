@@ -37,6 +37,10 @@
     "heading": "Filling your prescriptions",
     "subheading": "After your prescriptions are sent to a pharmacy, we'll send you updates on their status.",
     "pickup": "Pick Up:",
+    "chat": {
+      "prompt": "At the pharmacy? Let us know if you're having any issues.",
+      "cta": "Text us now"
+    },
     "SENT": {
       "title": "Sent to pharmacy",
       "description": "Your prescription fills have been sent to the pharmacy."
