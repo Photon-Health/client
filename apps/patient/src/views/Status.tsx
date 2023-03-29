@@ -59,8 +59,8 @@ export const Status = () => {
           setTimeout(() => setShowFooter(false), 1000)
         } else {
           toast({
-            title: t.status.pickupErrorToast.title,
-            description: t.status.pickupErrorToast.description,
+            title: 'Unable to mark order as picked up',
+            description: 'Please refresh and try again',
             position: 'top',
             status: 'error',
             duration: 5000,
@@ -101,8 +101,6 @@ export const Status = () => {
 
   const { fulfillment, pharmacy, organization } = order
 
-  const photonPhone: string = process.env.REACT_APP_TWILIO_SMS_NUMBER
-
   return (
     <Box>
       <Helmet>
@@ -119,17 +117,6 @@ export const Status = () => {
               {t.status.heading}
             </Heading>
             <Text>{t.status.subheading}</Text>
-            {fulfillment?.state === 'RECEIVED' || fulfillment?.state === 'READY' ? (
-              <Alert status="warning">
-                <AlertIcon />
-                <Text>
-                  {t.status.chat.prompt}{' '}
-                  <Link href={`sms:${photonPhone}`} textDecoration="underline">
-                    {t.status.chat.cta}
-                  </Link>
-                </Text>
-              </Alert>
-            ) : null}
           </VStack>
           {pharmacy?.name && pharmacy?.address ? (
             <Box alignSelf="start">

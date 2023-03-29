@@ -15,20 +15,17 @@ import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
 import { usePhoton } from '@photonhealth/react';
 import { Logo } from '../components/Logo';
 import { Auth } from '../components/Auth';
-import useQueryParams from '../../hooks/useQueryParams';
 
 export const Login = () => {
   const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });
-  const query = useQueryParams();
 
   const { isAuthenticated, login, error, isLoading } = usePhoton();
   const location = useLocation() as any;
 
   // Handle invite with redirect, even if logged in
-  const [searchParams] = useSearchParams();
-  const invite = searchParams.get('invitation');
-  const org = searchParams.get('organization');
-
+  const [params] = useSearchParams();
+  const invite = params.get('invitation');
+  const org = params.get('organization');
   if (invite && org) {
     login({
       organizationId: org,
@@ -55,12 +52,6 @@ export const Login = () => {
           )}
           <Stack spacing={{ base: '2', md: '3' }} textAlign="center">
             <Heading size={breakpoint}>Log in to your account</Heading>
-            {query.get('orgs') === '0' ? (
-              <Alert status="warning">
-                <AlertIcon />
-                You tried logging in with an account not associated with any organizations.
-              </Alert>
-            ) : null}
             <HStack spacing="1" justify="center">
               <Text color="muted">{`Don't have an account?`}</Text>
               <Link color="teal.500" href="mailto:rado@photon.health">
