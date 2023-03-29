@@ -273,7 +273,12 @@ export class PhotonClientStore {
 
       let permissions: Permission[];
       try {
-        const token = await this.sdk.authentication.getAccessToken();
+        let token;
+        try {
+          token = await this.sdk.authentication.getAccessToken();
+        } catch (err) {
+          token = await this.sdk.authentication.getAccessTokenWithConsent();
+        }
         const decoded: { permissions: Permission[] } = jwtDecode(token);
         permissions = decoded?.permissions || [];
       } catch (err) {

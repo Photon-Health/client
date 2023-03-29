@@ -42,7 +42,13 @@ customElement(
     const { actions: patientActions } = PatientStore;
 
     onMount(async () => {
-      const token = await client!.getSDK().authentication.getAccessToken();
+      let token;
+      try {
+        token = await client!.getSDK().authentication.getAccessToken();
+      } catch (err) {
+        token = await client!.getSDK().authentication.getAccessTokenWithConsent();
+      }
+
       const decoded: { permissions: string[] } = jwtDecode(token);
 
       if (decoded.permissions?.includes('write:prescription')) {
