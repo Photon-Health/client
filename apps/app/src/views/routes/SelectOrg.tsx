@@ -13,29 +13,49 @@ import {
 
 import { FiLogIn } from 'react-icons/fi';
 
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { usePhoton } from '@photonhealth/react';
+import { useEffect } from 'react';
 
 export const SelectOrg = () => {
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const from = `${(location.pathname || '/') + (location.search || '')}`;
 
   const { login, logout, getOrganizations, setOrganization } = usePhoton();
   const { organizations, loading } = getOrganizations();
 
-  if (!loading) {
-    if (organizations?.length === 0) {
-      logout({ returnTo: window.location.origin });
-    } else if (organizations?.length === 1) {
-      setOrganization(organizations[0].id);
-      login({
-        appState: {
-          returnTo: from
+  useEffect(() => {
+    if (!loading) {
+      if (organizations?.length === 0) {
+        const queryString = location.search.replace(/^\?/, '');
+        const searchParams = new URLSearchParams(queryString);
+        searchParams.append('orgs', '0');
+
+        if (location?.pathname && location?.pathname !== '/') {
+          searchParams.append('pathname', location.pathname);
         }
-      });
+
+        logout({ returnTo: `${window.location.origin}?${searchParams.toString()}` });
+      } else if (organizations?.length === 1) {
+        setOrganization(organizations[0].id);
+        login({
+          appState: {
+            returnTo: from
+          }
+        });
+      }
     }
-  }
+  }, [organizations, loading]);
+
+  useEffect(() => {
+    if (searchParams.has('orgs')) {
+      searchParams.delete('orgs');
+      searchParams.delete('pathname');
+      setSearchParams(searchParams);
+    }
+  }, []);
 
   const orgs = (organizations || []).map((organization: any) => {
     const { id, name } = organization;
