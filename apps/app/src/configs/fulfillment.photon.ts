@@ -50,14 +50,5 @@ export const fulfillmentSettings: FulfillmentSettings = {
     mailOrderProviders: [],
     sendToPatient: true,
     sendToPatientUsers: []
-  },
-  // Reside Health
-  [process.env.REACT_APP_RESIDE_HEALTH_ORG_ID as string]: {
-    sendOrder: true,
-    pickUp: true,
-    mailOrder: false,
-    mailOrderProviders: [],
-    sendToPatient: true,
-    sendToPatientUsers: []
   }
 };
