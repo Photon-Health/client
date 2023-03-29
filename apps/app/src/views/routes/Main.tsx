@@ -7,7 +7,6 @@ import { Nav } from '../components/Nav';
 import { SelectOrg } from './SelectOrg';
 import { addAlert } from '../../stores/alert';
 import { auth0Config } from '../../configs/auth';
-import useQueryParams from '../../hooks/useQueryParams';
 
 declare global {
   namespace JSX {
@@ -18,8 +17,6 @@ declare global {
 }
 
 export const Main = () => {
-  const query = useQueryParams();
-
   // Detect is browser is Safari
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
   const { user, isAuthenticated, isLoading, error, clearError } = usePhoton();
@@ -64,21 +61,7 @@ export const Main = () => {
   }
 
   if (!isAuthenticated && !isLoading) {
-    const pathname = query.get('pathname');
-    const queryString = query.toString() ? `?${query.toString()}` : '';
-
-    return (
-      <Navigate
-        to={`/login${queryString}`}
-        state={{
-          from: {
-            ...location,
-            ...(pathname ? { pathname } : {})
-          }
-        }}
-        replace
-      />
-    );
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (location.pathname === '/' && isAuthenticated) {
