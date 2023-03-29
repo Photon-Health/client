@@ -5,6 +5,7 @@ import { PhotonClientStore } from '../../store';
 import { makeTimer } from '@solid-primitives/timer';
 import { hasAuthParams } from '../../utils/hasAuthParams';
 import { createStore } from 'solid-js/store';
+import Sentry from '../../../sentry';
 
 type ClientProps = {
   domain?: string;
@@ -22,6 +23,16 @@ type ClientProps = {
 };
 
 export default function Client(props: ClientProps) {
+  Sentry.setContext('photon-client', {
+    domain: props.domain,
+    audience: props.audience,
+    uri: props.uri,
+    clientId: props.id!,
+    redirectURI: props.redirectUri ? props.redirectUri : window.location.origin,
+    organization: props.org,
+    developmentMode: props.developmentMode
+  });
+
   const sdk = new PhotonClient({
     domain: props.domain,
     audience: props.audience,
