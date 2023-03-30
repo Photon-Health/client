@@ -143,15 +143,17 @@ export class AuthManager {
       ...(this.organization ? { organization: this.organization } : {})
     };
 
+    let token;
     try {
-      return this.authentication.getTokenSilently(opts);
+      token = await this.authentication.getTokenSilently(opts);
     } catch (e) {
       if ((e as Error).message.includes('Consent required')) {
-        return this.authentication.getTokenWithPopup(opts);
+        token = await this.authentication.getTokenWithPopup(opts);
       } else {
         throw e;
       }
     }
+    return token;
   }
 
   /**
