@@ -46,12 +46,8 @@ export const fulfillmentSettings: FulfillmentSettings = {
     pickUp: true,
     mailOrder: false,
     mailOrderProviders: [],
-    sendToPatient: false, // disabled for org
-    sendToPatientUsers: [
-      // enabled for these users
-      'google-oauth2|105026997775584560678', // tim
-      'google-oauth2|102619324588558849301' // rado
-    ]
+    sendToPatient: true, // enabled for org
+    sendToPatientUsers: []
   },
   // Peachy
   [process.env.REACT_APP_PEACHY_ORG_ID as string]: {
@@ -70,7 +66,7 @@ export const fulfillmentSettings: FulfillmentSettings = {
     pickUp: true,
     mailOrder: false,
     mailOrderProviders: [],
-    sendToPatient: true,
+    sendToPatient: true, // enabled for org
     sendToPatientUsers: []
   }
 };

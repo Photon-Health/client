@@ -1,6 +1,6 @@
 {
   "name": "@photonhealth/elements",
-  "version": "0.0.96",
+  "version": "0.0.98",
   "description": "",
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
@@ -33,7 +33,6 @@
     "@babel/core": "^7.18.13",
     "@csstools/postcss-sass": "^5.0.1",
     "@rollup/plugin-typescript": "^11.0.0",
-    "@types/google.maps": "^3.50.5",
     "@types/lodash": "^4.14.185",
     "@types/node": "^18.7.18",
     "@typescript-eslint/eslint-plugin": "^5.48.1",
