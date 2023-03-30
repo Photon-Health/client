@@ -14,7 +14,7 @@ import tailwind from '../tailwind.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import styles from './style.css?inline';
-import { createEffect, createSignal, Show } from 'solid-js';
+import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
 import { Order, Prescription, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
