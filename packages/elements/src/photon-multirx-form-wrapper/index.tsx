@@ -42,12 +42,7 @@ customElement(
     const { actions: patientActions } = PatientStore;
 
     onMount(async () => {
-      let token;
-      try {
-        token = await client!.getSDK().authentication.getAccessToken();
-      } catch (err) {
-        token = await client!.getSDK().authentication.getAccessTokenWithConsent();
-      }
+      const token = await client!.getSDK().authentication.getAccessToken();
 
       const decoded: { permissions: string[] } = jwtDecode(token);
 
