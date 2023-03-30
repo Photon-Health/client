@@ -20,15 +20,17 @@ import {
   Skeleton,
   SkeletonCircle,
   SkeletonText,
-  useBreakpointValue
+  useBreakpointValue,
+  useColorMode
 } from '@chakra-ui/react';
 import { FiCopy } from 'react-icons/fi';
-import { Page } from '../components/Page';
 
 import { formatDate } from '../../utils';
 
 import { PRESCRIPTION_COLOR_MAP, PRESCRIPTION_STATE_MAP } from './Prescriptions';
 
+import { Page } from '../components/Page';
+import { confirmWrapper } from '../components/GuardDialog';
 import PatientView from '../components/PatientView';
 import NameView from '../components/NameView';
 
@@ -70,21 +72,49 @@ export const Prescription = () => {
 
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const tableWidth = useBreakpointValue({ base: 'full', sm: '100%', md: '75%' });
+  const { colorMode } = useColorMode();
 
   return (
     <Page kicker="Prescription" header={prescription?.treatment.name} loading={loading}>
       <VStack spacing={4} fontSize={{ base: 'md', md: 'lg' }} alignItems="start" w="100%" mt={0}>
-        {loading ? (
-          <Skeleton width="130px" height="35px" borderRadius="md" />
-        ) : (
-          <Button
-            aria-label="New Order"
-            as={RouterLink}
-            to={`/orders/new?patientId=${patient.id}&prescriptionId=${id}`}
-          >
-            Create Order
-          </Button>
-        )}
+        <HStack>
+          {loading ? (
+            <Skeleton width="111px" height="32px" borderRadius="md" />
+          ) : (
+            <Button
+              size="sm"
+              aria-label="New Order"
+              as={RouterLink}
+              to={`/orders/new?patientId=${patient.id}&prescriptionId=${id}`}
+            >
+              Create Order
+            </Button>
+          )}
+          {loading ? (
+            <Skeleton width="156px" height="32px" borderRadius="md" />
+          ) : (
+            <Button
+              size="sm"
+              aria-label="Cancel Prescription"
+              onClick={async () => {
+                const decision = await confirmWrapper('Cancel this prescription?', {
+                  description: 'You will not be able to recover this prescription.',
+                  cancelText: "No, Don't Cancel",
+                  confirmText: 'Yes, Cancel',
+                  darkMode: colorMode !== 'light',
+                  colorScheme: 'red'
+                });
+                if (decision) {
+                  // set loading
+                  // cancel prescription mutation
+                  // on complete: loading false, refresh
+                }
+              }}
+            >
+              Cancel Prescription
+            </Button>
+          )}
+        </HStack>
 
         <Divider />
 

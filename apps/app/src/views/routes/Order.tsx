@@ -4,6 +4,7 @@ import {
   Alert,
   AlertIcon,
   Badge,
+  Button,
   Divider,
   HStack,
   IconButton,
@@ -22,7 +23,8 @@ import {
   Text,
   Tr,
   VStack,
-  useBreakpointValue
+  useBreakpointValue,
+  useColorMode
 } from '@chakra-ui/react';
 
 import { usePhoton, types } from '@photonhealth/react';
@@ -30,6 +32,7 @@ import { usePhoton, types } from '@photonhealth/react';
 import { FiArrowUpRight, FiCheck, FiClock, FiCopy, FiCornerUpRight, FiX } from 'react-icons/fi';
 import { Page } from '../components/Page';
 import PatientView from '../components/PatientView';
+import { confirmWrapper } from '../components/GuardDialog';
 
 import { formatAddress, formatDate, formatFills, formatPhone } from '../../utils';
 
@@ -86,10 +89,36 @@ export const Order = () => {
 
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const tableWidth = useBreakpointValue({ base: 'full', sm: '100%', md: '75%' });
+  const { colorMode } = useColorMode();
 
   return (
     <Page kicker="Order" header={order ? formatFills(order.fills) : ''} loading={loading}>
       <VStack spacing={4} fontSize={{ base: 'md', md: 'lg' }} alignItems="start" w="100%" mt={0}>
+        {loading ? (
+          <Skeleton width="112px" height="32px" borderRadius="md" />
+        ) : (
+          <Button
+            size="sm"
+            aria-label="Cancel Order"
+            onClick={async () => {
+              const decision = await confirmWrapper('Cancel this order?', {
+                description: 'You will not be able to recover this order.',
+                cancelText: "No, Don't Cancel",
+                confirmText: 'Yes, Cancel',
+                darkMode: colorMode !== 'light',
+                colorScheme: 'red'
+              });
+              if (decision) {
+                // set loading
+                // cancel order mutation
+                // on complete: loading false, refresh
+              }
+            }}
+          >
+            Cancel Order
+          </Button>
+        )}
+
         <Divider />
 
         <Stack direction="row" gap={3} w="full">
