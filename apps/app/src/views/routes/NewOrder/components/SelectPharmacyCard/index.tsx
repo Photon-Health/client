@@ -79,6 +79,13 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
 
   const tabsList = [
     {
+      name: 'Send to Patient',
+      fulfillmentType: undefined,
+      // @ts-ignore
+      enabled: settings.sendToPatient || settings.sendToPatientUsers.includes(auth0UserId),
+      comp: <SendToPatient patient={patient} />
+    },
+    {
       name: 'Local Pickup',
       fulfillmentType: types.FulfillmentType.PickUp,
       enabled: settings.pickUp,
@@ -101,13 +108,6 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
           resetSelection={resetSelection}
         />
       )
-    },
-    {
-      name: 'Send to Patient',
-      fulfillmentType: undefined,
-      // @ts-ignore
-      enabled: settings.sendToPatient || settings.sendToPatientUsers.includes(auth0UserId),
-      comp: <SendToPatient patient={patient} />
     },
     {
       name: 'Mail Order',
