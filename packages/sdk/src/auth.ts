@@ -135,16 +135,23 @@ export class AuthManager {
    */
   public async getAccessToken(
     { audience }: { audience?: string } = {
-      audience: this.audience,
+      audience: this.audience
     }
   ): Promise<string> {
-    let opts: GetTokenSilentlyOptions = { audience: audience || this.audience || undefined };
-    if (this.organization) {
-      opts = Object.assign(opts, {
-        organization: this.organization,
-      });
+    let opts: GetTokenSilentlyOptions | GetTokenWithPopupOptions = {
+      audience: audience || this.audience || undefined,
+      ...(this.organization ? { organization: this.organization } : {})
+    };
+
+    try {
+      return this.authentication.getTokenSilently(opts);
+    } catch (e) {
+      if ((e as Error).message.includes('Consent required')) {
+        return this.authentication.getTokenWithPopup(opts);
+      } else {
+        throw e;
+      }
     }
-    return this.authentication.getTokenSilently(opts);
   }
 
   /**
@@ -154,16 +161,14 @@ export class AuthManager {
    */
   public async getAccessTokenWithConsent(
     { audience }: { audience?: string } = {
-      audience: this.audience,
+      audience: this.audience
     }
   ): Promise<string> {
-    let opts: GetTokenWithPopupOptions = { audience: audience || this.audience || undefined };
+    let opts: GetTokenWithPopupOptions = {
+      audience: audience || this.audience || undefined,
+      ...(this.organization ? { organization: this.organization } : {})
+    };
 
-    if (this.organization) {
-      opts = Object.assign(opts, {
-        organization: this.organization,
-      });
-    }
     return this.authentication.getTokenWithPopup(opts);
   }
 
