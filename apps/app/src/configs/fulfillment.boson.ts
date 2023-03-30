@@ -8,7 +8,7 @@ export const fulfillmentSettings: FulfillmentSettings = {
     mailOrderProviders: [
       ...(process.env.REACT_APP_CUREXA_ORG_ID ? [process.env.REACT_APP_CUREXA_ORG_ID] : [])
     ],
-    sendToPatient: true,
+    sendToPatient: false,
     sendToPatientUsers: []
   }
 };
