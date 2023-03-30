@@ -12,15 +12,13 @@ import {
   useDisclosure
 } from '@chakra-ui/react';
 
-import { types } from '@photonhealth/react';
-
 import { LocationSearch } from '../../../../components/LocationSearch';
 import { LocalPickup } from './components/LocalPickup';
 import { MailOrder } from './components/MailOrder';
 import { Address } from '../../../../../models/general';
 import { SendToPatient } from './components/SendToPatient';
-
 import { FulfillmentSettings } from '../../../../../models/general';
+import { PharmacyOptions } from '../OrderForm';
 
 interface SelectPharmacyCardProps {
   user: any;
@@ -34,11 +32,11 @@ interface SelectPharmacyCardProps {
   updatePreferredPharmacy: boolean;
   setUpdatePreferredPharmacy: (value: boolean) => void;
   settings: FulfillmentSettings;
+  tabsList: PharmacyOptions;
 }
 
 export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
   user,
-  auth0UserId,
   patient,
   address,
   errors,
@@ -47,7 +45,7 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
   setFieldValue,
   updatePreferredPharmacy,
   setUpdatePreferredPharmacy,
-  settings
+  tabsList
 }: SelectPharmacyCardProps) => {
   const [latitude, setLatitude] = useState<number | undefined>(undefined);
   const [longitude, setLongitude] = useState<number | undefined>(undefined);
@@ -76,56 +74,6 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
     setFieldValue('pharmacyId', '');
     setUpdatePreferredPharmacy(false);
   };
-
-  const tabsList = [
-    {
-      name: 'Local Pickup',
-      fulfillmentType: types.FulfillmentType.PickUp,
-      enabled: settings.pickUp,
-      comp: (
-        <LocalPickup
-          location={location}
-          latitude={latitude}
-          longitude={longitude}
-          onOpen={onOpen}
-          errors={errors}
-          touched={touched}
-          patient={patient}
-          pharmacyId={pharmacyId}
-          updatePreferredPharmacy={updatePreferredPharmacy}
-          setUpdatePreferredPharmacy={setUpdatePreferredPharmacy}
-          preferredPharmacyIds={
-            patient?.preferredPharmacies?.map((pharmacy: any) => pharmacy.id) || []
-          }
-          setFieldValue={setFieldValue}
-          resetSelection={resetSelection}
-        />
-      )
-    },
-    {
-      name: 'Send to Patient',
-      fulfillmentType: undefined,
-      // @ts-ignore
-      enabled: settings.sendToPatient || settings.sendToPatientUsers.includes(auth0UserId),
-      comp: <SendToPatient patient={patient} />
-    },
-    {
-      name: 'Mail Order',
-      fulfillmentType: types.FulfillmentType.MailOrder,
-      enabled: settings.mailOrder,
-      comp: (
-        <MailOrder
-          user={user}
-          pharmacyId={pharmacyId}
-          location={location}
-          setFieldValue={setFieldValue}
-          errors={errors}
-          touched={touched}
-          resetSelection={resetSelection}
-        />
-      )
-    }
-  ];
 
   const [selectedTab, setSelectedTab] = useState(tabsList.findIndex((tab) => tab.enabled) || 0);
 
@@ -184,8 +132,40 @@ export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
           ))}
         </TabList>
         <TabPanels p={1}>
-          {tabsList.map(({ comp, name }) => (
-            <TabPanel key={`${name}-panel`}>{comp}</TabPanel>
+          {tabsList.map(({ name }) => (
+            <TabPanel key={`${name}-panel`}>
+              {name === 'Send to Patient' ? <SendToPatient patient={patient} /> : null}
+              {name === 'Local Pickup' ? (
+                <LocalPickup
+                  location={location}
+                  latitude={latitude}
+                  longitude={longitude}
+                  onOpen={onOpen}
+                  errors={errors}
+                  touched={touched}
+                  patient={patient}
+                  pharmacyId={pharmacyId}
+                  updatePreferredPharmacy={updatePreferredPharmacy}
+                  setUpdatePreferredPharmacy={setUpdatePreferredPharmacy}
+                  preferredPharmacyIds={
+                    patient?.preferredPharmacies?.map((pharmacy: any) => pharmacy.id) || []
+                  }
+                  setFieldValue={setFieldValue}
+                  resetSelection={resetSelection}
+                />
+              ) : null}
+              {name === 'Mail Order' ? (
+                <MailOrder
+                  user={user}
+                  pharmacyId={pharmacyId}
+                  location={location}
+                  setFieldValue={setFieldValue}
+                  errors={errors}
+                  touched={touched}
+                  resetSelection={resetSelection}
+                />
+              ) : null}
+            </TabPanel>
           ))}
         </TabPanels>
       </Tabs>

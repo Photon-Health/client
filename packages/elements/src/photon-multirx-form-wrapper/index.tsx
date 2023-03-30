@@ -43,6 +43,7 @@ customElement(
 
     onMount(async () => {
       const token = await client!.getSDK().authentication.getAccessToken();
+
       const decoded: { permissions: string[] } = jwtDecode(token);
 
       if (decoded.permissions?.includes('write:prescription')) {
