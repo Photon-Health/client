@@ -231,6 +231,7 @@ customElement(
               </div>
               <div class="flex flex-col xs:flex-row items-center xs:gap-4">
                 <photon-datepicker
+                  no-initial-date="true"
                   class="pb-3 flex-grow w-full xs:min-w-[40%]"
                   invalid={store['dateOfBirth']?.error}
                   help-text={store['dateOfBirth']?.error}
