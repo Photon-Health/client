@@ -49,7 +49,7 @@ customElement(
         bubbles: true,
         detail: {
           data: datum,
-          catalogId: store.catalogs.data![0].id
+          catalogId: store.catalogs.data![0]?.id || ''
         }
       });
       ref?.dispatchEvent(event);
