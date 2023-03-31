@@ -63,7 +63,7 @@ customElement(
       setGlobalError(undefined);
       setIsCreatePrescription(createPrescription);
       setLoading(true);
-      let keys: string[] = ['firstName', 'lastName', 'phone', 'sex', 'email'];
+      let keys: string[] = ['firstName', 'lastName', 'dateOfBirth', 'phone', 'sex', 'email'];
 
       if (
         store['address_street1']?.value !== undefined ||
