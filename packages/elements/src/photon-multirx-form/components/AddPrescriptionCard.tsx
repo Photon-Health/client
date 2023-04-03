@@ -64,7 +64,7 @@ export const AddPrescriptionCard = (props: {
   return (
     <photon-card ref={ref} title={'Add Prescription'}>
       <div
-        class="flex flex-col gap-3"
+        class="flex flex-col sm:gap-3"
         on:photon-medication-selected={(e: any) => {
           setOffCatalog(e.detail.medication);
           props.actions.updateFormValue({
@@ -94,8 +94,8 @@ export const AddPrescriptionCard = (props: {
             });
           }}
         ></photon-treatment-select>
-        <div class="sm:grid sm:grid-cols-2 sm:gap-4">
-          <div>
+        <div class="flex flex-col sm:flex-none sm:grid sm:grid-cols-2 sm:gap-4">
+          <div class="order-last sm:order-first">
             <photon-checkbox
               label="Dispense as written"
               tip="This prescription will be filled generically unless this box is checked"
@@ -111,7 +111,7 @@ export const AddPrescriptionCard = (props: {
             ></photon-checkbox>
             <photon-med-search-dialog ref={medSearchRef}></photon-med-search-dialog>
           </div>
-          <div class="py-4 md:py-2 text-left sm:text-right">
+          <div class="pb-4 md:py-2 text-left sm:text-right">
             <a
               class="font-sans text-gray-500 text-sm hover:text-black hover:cursor-pointer"
               onClick={() => (medSearchRef.open = true)}
@@ -120,7 +120,7 @@ export const AddPrescriptionCard = (props: {
             </a>
           </div>
         </div>
-        <div class="md:max-w-[50%] md:pr-2">
+        <div class="mt-2 sm:mt-0 md:max-w-[50%] md:pr-2">
           <photon-datepicker
             label="Effective Date"
             invalid={props.store['effectiveDate']?.error ?? false}
@@ -134,10 +134,10 @@ export const AddPrescriptionCard = (props: {
             }
           ></photon-datepicker>
         </div>
-        <div class="sm:grid sm:grid-cols-2 sm:gap-4">
-          <div class="">
+        <div class="mt-2 sm:mt-0 sm:grid sm:grid-cols-2 sm:gap-4">
+          <div class="flex items-end sm:items-stretch gap-2 sm:flex-col sm:gap-0">
             <photon-number-input
-              class="flex-grow flex-1"
+              class="flex-grow flex-1 w-2/5 sm:w-auto"
               label="Quantity"
               value={props.store['dispenseQuantity']?.value ?? 1}
               required="true"
@@ -167,16 +167,18 @@ export const AddPrescriptionCard = (props: {
                 }
               }}
             ></photon-dosage-calculator-dialog>
-            <photon-button
-              variant="outline"
-              class="w-fit"
-              on:photon-clicked={() => {
-                dosageCalculatorRef.open = true;
-              }}
-            >
-              <sl-icon slot="suffix" name="calculator"></sl-icon>
-              Dose Calculator
-            </photon-button>
+            <div class="pb-5 mb-0.5 w-3/5 sm:w-auto sm:pb-0 sm:mb-4">
+              <photon-button
+                variant="outline"
+                class="w-fit"
+                on:photon-clicked={() => {
+                  dosageCalculatorRef.open = true;
+                }}
+              >
+                <sl-icon slot="suffix" name="calculator"></sl-icon>
+                Dose Calculator
+              </photon-button>
+            </div>
           </div>
           <photon-dispense-units
             label="Dispense Unit"

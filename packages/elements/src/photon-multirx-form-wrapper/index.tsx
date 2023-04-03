@@ -43,6 +43,7 @@ customElement(
 
     onMount(async () => {
       const token = await client!.getSDK().authentication.getAccessToken();
+
       const decoded: { permissions: string[] } = jwtDecode(token);
 
       if (decoded.permissions?.includes('write:prescription')) {
@@ -264,7 +265,7 @@ customElement(
                   )}
                 </For>
               </Show>
-              <div class="p-4 w-full h-full sm:w-[600px] xs:mx-auto">
+              <div class="w-full h-full sm:w-[600px] xs:mx-auto">
                 <photon-prescribe-workflow
                   hide-submit="true"
                   hide-templates={props.hideTemplates}

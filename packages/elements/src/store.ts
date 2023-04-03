@@ -1,6 +1,6 @@
 import { createStore } from 'solid-js/store';
 import { PhotonClient } from '@photonhealth/sdk';
-import type {
+import {
   Catalog,
   DispenseUnit,
   MutationCreatePrescriptionArgs,
@@ -116,13 +116,9 @@ export class PhotonClientStore {
       }>;
     };
   };
-  public constructor(sdk: PhotonClient, cs?: typeof createStore) {
+  public constructor(sdk: PhotonClient) {
     this.sdk = sdk;
-
-    // TODO when we are no longer maintaining components inside of elements, we can remove this
-    // this fixes an issue where the reactivity is lost when using the store in elements
-    const _createStore = cs || createStore;
-    const [store, setStore] = _createStore<{
+    const [store, setStore] = createStore<{
       authentication: {
         isAuthenticated: boolean;
         isInOrg: boolean;
@@ -278,22 +274,21 @@ export class PhotonClientStore {
       let permissions: Permission[];
       try {
         const token = await this.sdk.authentication.getAccessToken();
+
         const decoded: { permissions: Permission[] } = jwtDecode(token);
         permissions = decoded?.permissions || [];
       } catch (err) {
         permissions = [];
       }
 
-      const isInOrg = authenticated && hasOrgs && this.sdk.organization === user.org_id;
-
       this.setStore('authentication', {
         ...this.store.authentication,
         user: user,
         isLoading: false,
-        isInOrg: isInOrg,
+        isInOrg: authenticated && hasOrgs && this.sdk.organization === user.org_id,
         permissions: permissions || []
       });
-    } catch (e) {
+    } catch (err) {
       this.setStore('authentication', {
         ...this.store.authentication,
         isLoading: false

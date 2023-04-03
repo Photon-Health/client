@@ -100,16 +100,18 @@ customElement('photon-med-search', {}, () => {
       <p class="font-sans text-lg text-gray-700 text-center pb-2">Advanced Medication Search</p>
       <div class="flex flex-col xs:flex-row gap-4">
         <MedicationNameDropdown></MedicationNameDropdown>
+      </div>
+      <div class="flex flex-col xs:flex-row gap-4">
         <MedicationStrengthDropdown
           medicationId={medicationId()}
           disabled={medicationId().length == 0}
         ></MedicationStrengthDropdown>
-      </div>
-      <div class="flex flex-col xs:flex-row gap-4">
         <MedicationRouteDropdown
           medicationId={strengthId()}
           disabled={strengthId().length == 0}
         ></MedicationRouteDropdown>
+      </div>
+      <div class="flex flex-col xs:flex-row gap-4">
         <MedicationFormDropdown
           medicationId={routeId()}
           disabled={routeId().length == 0}

@@ -70,7 +70,7 @@ customElement(
         <style>{shoelaceDarkStyles}</style>
         <style>{shoelaceLightStyles}</style>
         <style>{styles}</style>
-        <div class="py-2 flex flex-col font-sans" ref={ref}>
+        <div class="md:py-2 flex flex-col font-sans" ref={ref}>
           {props.label ? (
             <div class="flex items-center pb-2">
               <p class="text-gray-700 text-sm">{props.label}</p>
@@ -96,7 +96,7 @@ customElement(
             placeholder={'(   ) ___-____'}
             value={phoneValue()}
           >
-            <p slot="help-text" class="text-red-500 pt-2 h-[21px] font-sans">
+            <p slot="help-text" class="text-red-500 pt-1 h-[21px] font-sans">
               {props.helpText}
             </p>
           </sl-input>

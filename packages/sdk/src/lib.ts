@@ -24,9 +24,9 @@ export * as fragments from "./fragments";
  * @param uri The GraphQL endpoint of the Photon API
  */
 export interface PhotonClientOptions {
-  domain?: string
-  clientId: string
-  redirectURI?: string
+  domain?: string;
+  clientId: string;
+  redirectURI?: string;
   organization?: string;
   audience?: string;
   uri?: string;
@@ -93,17 +93,7 @@ export class PhotonClient {
   private constructApolloClient() {
     let apollo = new ApolloClient({
       link: setContext(async (_, { headers, ...rest }) => {
-        let token;
-
-        try {
-          token = await this.authentication.getAccessToken();
-        } catch (error) {
-          if ((error as Error).message.includes("Consent required")) {
-            token = await this.authentication.getAccessTokenWithConsent();
-          } else {
-            throw error;
-          }
-        }
+        const token = await this.authentication.getAccessToken();
 
         if (!token) {
           return { headers, ...rest };

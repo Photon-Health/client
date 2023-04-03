@@ -23,8 +23,8 @@ datadogRum.init({
   service: pkg.name,
   env: process.env.REACT_APP_ENV_NAME,
   version: pkg.version,
-  sampleRate: 100,
-  sessionReplaySampleRate: 100,
+  sampleRate: 10,
+  sessionReplaySampleRate: 10,
   trackInteractions: true,
   trackResources: true,
   trackLongTasks: true
@@ -37,11 +37,7 @@ Sentry.init({
   integrations: [new BrowserTracing()],
   environment: process.env.REACT_APP_ENV_NAME,
   enabled: process.env.NODE_ENV !== 'development',
-
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
-  tracesSampleRate: 1.0
+  tracesSampleRate: 0.2
 });
 
 const container = document.getElementById('root')!;

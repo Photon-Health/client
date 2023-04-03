@@ -24,7 +24,8 @@ customElement(
     invalid: false,
     helpText: undefined,
     disabled: false,
-    value: undefined
+    value: undefined,
+    noInitialDate: undefined
   },
   (props: {
     label?: string;
@@ -34,13 +35,13 @@ customElement(
     helpText?: string;
     disabled: boolean;
     value?: string;
+    noInitialDate?: boolean;
   }) => {
     let ref: any;
     let inputRef: any;
     // initialized with today's date
-    const [date, setDate] = createSignal(
-      props?.value || format(new Date(), 'yyyy-MM-dd').toString()
-    );
+    const initialDate = props?.noInitialDate ? '' : format(new Date(), 'yyyy-MM-dd').toString();
+    const [date, setDate] = createSignal(props?.value || initialDate);
 
     const dispatchDateSelected = (date: string) => {
       const event = new CustomEvent('photon-datepicker-selected', {
@@ -72,7 +73,7 @@ customElement(
         <style>{shoelaceDarkStyles}</style>
         <style>{shoelaceLightStyles}</style>
         <style>{styles}</style>
-        <div class="pb-2 flex flex-col" ref={ref}>
+        <div class="md:py-2  flex flex-col" ref={ref}>
           {props.label ? (
             <div class="flex items-center pb-2">
               <p class="text-gray-700 text-sm font-sans">{props.label}</p>
@@ -91,9 +92,11 @@ customElement(
             class="input"
             type="date"
             value={date()}
-            help-text={props.helpText}
             invalid={props.invalid}
           ></sl-input>
+          <p slot="help-text" class="text-sm text-red-500 pt-1 h-[21px] font-sans">
+            {props.helpText}
+          </p>
         </div>
       </>
     );

@@ -83,6 +83,12 @@ interface OrderFormProps {
   setShowAddress: any;
 }
 
+export type PharmacyOptions = {
+  name: string;
+  enabled: boolean;
+  fulfillmentType: types.FulfillmentType | undefined;
+}[];
+
 export const OrderForm = ({
   user,
   auth0UserId,
@@ -114,14 +120,52 @@ export const OrderForm = ({
     }
   };
 
+  const settings =
+    typeof fulfillmentSettings[user.org_id] !== 'undefined'
+      ? fulfillmentSettings[user.org_id]
+      : fulfillmentSettings.default;
+
+  const sendToPatientEnabled =
+    settings.sendToPatient || settings.sendToPatientUsers.includes(auth0UserId);
+
+  const pharmacyOptions: PharmacyOptions = [
+    {
+      name: 'Send to Patient',
+      fulfillmentType: undefined,
+      enabled: sendToPatientEnabled
+    },
+    {
+      name: 'Local Pickup',
+      fulfillmentType: types.FulfillmentType.PickUp,
+      enabled: settings.pickUp
+    },
+    {
+      name: 'Mail Order',
+      fulfillmentType: types.FulfillmentType.MailOrder,
+      enabled: settings.mailOrder
+    }
+  ];
+
+  /**
+   * If send to patient is enabled, that takes precedence over default pharmacy. Otherwise
+   * default to fulfillmentType of preferredPharmacy, if no preferred then first enabled tab.
+   *  */
+  const preferredPharmacy =
+    patient?.preferredPharmacies?.length > 0 ? patient.preferredPharmacies[0] : null;
+  const initialFulfillmentType = sendToPatientEnabled
+    ? ''
+    : preferredPharmacy?.fulfillmentTypes.length > 0 ||
+      pharmacyOptions.findIndex((option) => option.enabled);
+  const initialPharmacyId = sendToPatientEnabled ? '' : preferredPharmacy?.id || '';
+
   const initialValues = {
     ...EMPTY_FORM_VALUES,
     patientId: patient?.id || '',
     fills: prescriptionIds
       ? prescriptionIds.split(',').map((x: string) => ({ prescriptionId: x }))
       : [],
-    fulfillmentType: 'PICK_UP',
-    pharmacyId: patient?.preferredPharmacies?.length > 0 ? patient.preferredPharmacies[0].id : '',
+    fulfillmentType: initialFulfillmentType,
+    pharmacyId: initialPharmacyId,
     address: {
       street1: patient?.address?.street1 || '',
       street2: patient?.address?.street2 || '',
@@ -131,11 +175,6 @@ export const OrderForm = ({
       city: patient?.address?.city || ''
     }
   };
-
-  const orderCreationEnabled =
-    typeof fulfillmentSettings[user.org_id]?.sendOrder !== 'undefined'
-      ? fulfillmentSettings[user.org_id]?.sendOrder
-      : fulfillmentSettings.default.sendOrder;
 
   return (
     <Formik
@@ -203,7 +242,7 @@ export const OrderForm = ({
               }}
             />
 
-            <Alert status="error" hidden={orderCreationEnabled} mb={5}>
+            <Alert status="error" hidden={settings.sendOrder} mb={5}>
               <AlertIcon />
               You are not allowed to create orders via the Photon App.
             </Alert>
@@ -237,6 +276,8 @@ export const OrderForm = ({
                 touched={touched}
                 patient={patient}
                 setFieldValue={setFieldValue}
+                settings={settings}
+                tabsList={pharmacyOptions}
               />
 
               <SelectPrescriptionsCard
