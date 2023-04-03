@@ -96,7 +96,7 @@ customElement(
             placeholder={'(   ) ___-____'}
             value={phoneValue()}
           >
-            <p slot="help-text" class="text-red-500 pt-2 h-[21px] font-sans">
+            <p slot="help-text" class="text-red-500 pt-1 h-[21px] font-sans">
               {props.helpText}
             </p>
           </sl-input>
