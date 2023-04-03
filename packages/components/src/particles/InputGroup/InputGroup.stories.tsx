@@ -24,7 +24,7 @@ export const MultipleInputs: InputGroupStory = {
         />
       </div>
       <div>
-        <InputGroup label="Quantity" inputType="number" />
+        <InputGroup label="Quantity" inputType="number" contextText="Optional" />
       </div>
       <div>
         <InputGroup
@@ -35,8 +35,9 @@ export const MultipleInputs: InputGroupStory = {
       </div>
       <div>
         <InputGroup
-          label="Default Value"
+          label="Disabled Input"
           inputProps={{ placeholder: 'you@example.com', value: 'example@example.com' }}
+          disabled
         />
       </div>
     </div>
