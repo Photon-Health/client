@@ -165,7 +165,7 @@ export const Order = () => {
             isDisabled={order.fulfillment?.type !== types.FulfillmentType.MailOrder}
             onClick={async () => {
               const decision = await confirmWrapper('Cancel this order?', {
-                description: 'You will not be able to recover this order.',
+                description: 'You will not be able to undo this action.',
                 cancelText: "No, Don't Cancel",
                 confirmText: 'Yes, Cancel',
                 darkMode: colorMode !== 'light',

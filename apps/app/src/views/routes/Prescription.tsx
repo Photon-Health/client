@@ -133,7 +133,7 @@ export const Prescription = () => {
               isDisabled={rx.state !== 'ACTIVE'}
               onClick={async () => {
                 const decision = await confirmWrapper('Cancel this prescription?', {
-                  description: 'You will not be able to recover this prescription.',
+                  description: 'You will not be able to undo this action.',
                   cancelText: "No, Don't Cancel",
                   confirmText: 'Yes, Cancel',
                   darkMode: colorMode !== 'light',
