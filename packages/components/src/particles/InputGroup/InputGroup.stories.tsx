@@ -12,8 +12,39 @@ export const Default: InputGroupStory = {
   }
 };
 
-export default {
+export const MultipleInputs: InputGroupStory = {
+  render: () => (
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <InputGroup
+          label="Email"
+          helpText="We'll only use this for spam."
+          inputProps={{ placeholder: 'you@example.com' }}
+        />
+      </div>
+      <div>
+        <InputGroup label="Quantity" inputType="number" />
+      </div>
+      <div>
+        <InputGroup
+          label="Invalid Email"
+          error="Not a valid email address."
+          inputProps={{ placeholder: 'you@example.com' }}
+        />
+      </div>
+      <div>
+        <InputGroup
+          label="Default Value"
+          inputProps={{ placeholder: 'you@example.com', value: 'example@example.com' }}
+        />
+      </div>
+    </div>
+  )
+};
+
+const meta: Meta<ComponentProps<typeof InputGroup>> = {
   title: 'InputGroup',
+  component: InputGroup,
   tags: ['autodocs'],
   argTypes: {
     label: {
@@ -34,12 +65,7 @@ export default {
         type: 'text'
       }
     }
-  },
-  render: (props) => {
-    return (
-      <div>
-        <InputGroup {...props} />
-      </div>
-    );
   }
-} as Meta<ComponentProps<typeof InputGroup>>;
+};
+
+export default meta;

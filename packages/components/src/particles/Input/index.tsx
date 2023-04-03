@@ -2,9 +2,7 @@ import { JSX } from 'solid-js';
 import clsx from 'clsx';
 
 export interface InputProps extends JSX.InputHTMLAttributes<HTMLInputElement> {
-  error?: string;
-  id?: string;
-  placeholder?: string;
+  error?: boolean;
 }
 
 export default function Input(props: InputProps) {
