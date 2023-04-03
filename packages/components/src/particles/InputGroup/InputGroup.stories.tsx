@@ -13,6 +13,7 @@ export const Default: InputGroupStory = {
 };
 
 export const MultipleInputs: InputGroupStory = {
+  // @ts-ignore
   render: () => (
     <div class="grid grid-cols-2 gap-4">
       <div>
@@ -44,6 +45,7 @@ export const MultipleInputs: InputGroupStory = {
 
 const meta: Meta<ComponentProps<typeof InputGroup>> = {
   title: 'InputGroup',
+  // @ts-ignore
   component: InputGroup,
   tags: ['autodocs'],
   argTypes: {
