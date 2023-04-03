@@ -170,7 +170,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   });
 
   return (
-    <div ref={ref} class="md:py-2">
+    <div ref={ref}>
       <style>{tailwind}</style>
       <style>{shoelaceDarkStyles}</style>
       <style>{shoelaceLightStyles}</style>
