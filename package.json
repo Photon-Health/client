@@ -83,6 +83,7 @@
     "framer-motion": "^10.10.0",
     "graphiql": "^2.4.1",
     "graphql": "^16.6.0",
+    "graphql-request": "^5.2.0",
     "graphql-tag": "^2.12.6",
     "jwt-decode": "^3.1.2",
     "libphonenumber-js": "^1.10.24",

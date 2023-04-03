@@ -32,6 +32,11 @@ export const settings = {
     [process.env.REACT_APP_RESIDE_HEALTH_ORG_ID as string]: {
       logo: 'reside_health_logo.webp',
       accentColor: '#0c3276'
+    },
+    // Radish Health
+    [process.env.REACT_APP_RADISH_HEALTH_ORG_ID as string]: {
+      logo: 'radish_health_logo.svg',
+      accentColor: '#84a98c'
     }
   }
 }
