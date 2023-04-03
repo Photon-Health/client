@@ -9,7 +9,7 @@ export const Default: InputStory = {
   args: {
     type: 'text',
     placeholder: 'like@this.com',
-    error: ''
+    error: false
   }
 };
 

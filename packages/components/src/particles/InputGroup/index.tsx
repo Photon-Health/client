@@ -7,10 +7,11 @@ export interface InputGroupProps {
   helpText?: string;
   inputType?: string;
   inputProps?: Omit<InputProps, 'id'>;
+  disabled?: boolean;
 }
 
 export default function InputGroup(props: InputGroupProps) {
-  const { label, error, helpText, inputType, inputProps } = props;
+  const { label, error, helpText, inputType, inputProps, disabled } = props;
   const [forId] = createSignal(`input-${Math.random().toString(36).slice(2, 11)}`);
   const ariaDescribedBy = error ? `${forId()}-error` : helpText ? `${forId()}-help` : undefined;
 
@@ -26,6 +27,7 @@ export default function InputGroup(props: InputGroupProps) {
         aria-describedby={ariaDescribedBy}
         {...inputProps}
         error={!!error}
+        disabled={disabled}
       />
       <div class="h-6">
         <p class={`mt-1 text-sm ${error ? 'text-red-600' : 'text-gray-500'}`} id={ariaDescribedBy}>
