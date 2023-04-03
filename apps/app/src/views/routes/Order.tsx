@@ -24,7 +24,8 @@ import {
   Tr,
   VStack,
   useBreakpointValue,
-  useColorMode
+  useColorMode,
+  useToast
 } from '@chakra-ui/react';
 import { gql, GraphQLClient } from 'graphql-request';
 import { usePhoton, types } from '@photonhealth/react';
@@ -46,8 +47,8 @@ export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI
 });
 
 export const CANCEL_ORDER = gql`
-  mutation cancel($orderId: ID!) {
-    cancelOrder(orderId: $orderId) {
+  mutation cancel($id: ID!) {
+    cancelOrder(id: $id) {
       id
     }
   }
@@ -87,6 +88,7 @@ const FILL_COLOR_MAP: object = {
 };
 
 export const Order = () => {
+  const toast = useToast();
   const params = useParams();
   const id = params.orderId;
 
@@ -104,8 +106,10 @@ export const Order = () => {
   };
 
   useEffect(() => {
-    getAccessToken();
-  }, []);
+    if (!accessToken) {
+      getAccessToken();
+    }
+  }, [accessToken]);
 
   if (error) {
     return (
@@ -170,7 +174,13 @@ export const Order = () => {
               if (decision) {
                 graphQLClient.setHeader('authorization', accessToken);
                 const res = await graphQLClient.request(CANCEL_ORDER, { id });
-                console.log(res);
+                if (res) {
+                  toast({
+                    title: 'Order canceled',
+                    status: 'success',
+                    duration: 5000
+                  });
+                }
               }
             }}
           >

@@ -21,7 +21,8 @@ import {
   SkeletonCircle,
   SkeletonText,
   useBreakpointValue,
-  useColorMode
+  useColorMode,
+  useToast
 } from '@chakra-ui/react';
 import { FiCopy } from 'react-icons/fi';
 import { gql, GraphQLClient } from 'graphql-request';
@@ -51,6 +52,7 @@ export const CANCEL_PRESCRIPTION = gql`
 `;
 
 export const Prescription = () => {
+  const toast = useToast();
   const params = useParams();
   const id = params.prescriptionId;
 
@@ -70,8 +72,10 @@ export const Prescription = () => {
   };
 
   useEffect(() => {
-    getAccessToken();
-  }, []);
+    if (!accessToken) {
+      getAccessToken();
+    }
+  }, [accessToken]);
 
   if (error) {
     return (
@@ -126,7 +130,7 @@ export const Prescription = () => {
             <Button
               size="sm"
               aria-label="Cancel Prescription"
-              isDisabled={state !== 'ACTIVE'}
+              isDisabled={rx.state !== 'ACTIVE'}
               onClick={async () => {
                 const decision = await confirmWrapper('Cancel this prescription?', {
                   description: 'You will not be able to recover this prescription.',
@@ -138,7 +142,13 @@ export const Prescription = () => {
                 if (decision) {
                   graphQLClient.setHeader('authorization', accessToken);
                   const res = await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
-                  console.log(res);
+                  if (res) {
+                    toast({
+                      title: 'Prescription canceled',
+                      status: 'success',
+                      duration: 5000
+                    });
+                  }
                 }
               }}
             >
