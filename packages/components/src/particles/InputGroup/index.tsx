@@ -1,12 +1,26 @@
 import { createSignal, Show } from 'solid-js';
 import Input, { InputProps } from '../Input';
 
+export type InputType =
+  | 'button'
+  | 'checkbox'
+  | 'date'
+  | 'datetime-local'
+  | 'email'
+  | 'file'
+  | 'hidden'
+  | 'number'
+  | 'password'
+  | 'submit'
+  | 'tel'
+  | 'text';
+
 export interface InputGroupProps {
   label: string;
   error?: string;
   contextText?: string;
   helpText?: string;
-  inputType?: string;
+  inputType?: InputType;
   inputProps?: Omit<InputProps, 'id'>;
   disabled?: boolean;
 }

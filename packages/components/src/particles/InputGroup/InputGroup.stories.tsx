@@ -19,6 +19,7 @@ export const MultipleInputs: InputGroupStory = {
       <div>
         <InputGroup
           label="Email"
+          inputType="email"
           helpText="We'll only use this for spam."
           inputProps={{ placeholder: 'you@example.com' }}
         />
