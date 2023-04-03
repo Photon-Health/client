@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-
+import { useState, useEffect } from 'react';
 import {
   Alert,
   AlertIcon,
@@ -26,10 +26,10 @@ import {
   useBreakpointValue,
   useColorMode
 } from '@chakra-ui/react';
-
+import { gql, GraphQLClient } from 'graphql-request';
 import { usePhoton, types } from '@photonhealth/react';
-
 import { FiArrowUpRight, FiCheck, FiClock, FiCopy, FiCornerUpRight, FiX } from 'react-icons/fi';
+
 import { Page } from '../components/Page';
 import PatientView from '../components/PatientView';
 import { confirmWrapper } from '../components/GuardDialog';
@@ -37,6 +37,21 @@ import { confirmWrapper } from '../components/GuardDialog';
 import { formatAddress, formatDate, formatFills, formatPhone } from '../../utils';
 
 import { ORDER_FULFILLMENT_COLOR_MAP, ORDER_FULFILLMENT_STATE_MAP } from './Orders';
+
+export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
+  jsonSerializer: {
+    parse: JSON.parse,
+    stringify: JSON.stringify
+  }
+});
+
+export const CANCEL_ORDER = gql`
+  mutation cancel($orderId: ID!) {
+    cancelOrder(orderId: $orderId) {
+      id
+    }
+  }
+`;
 
 const ORDER_FULFILLMENT_TYPE_MAP = {
   [types.FulfillmentType.PickUp]: 'Pick up',
@@ -75,8 +90,22 @@ export const Order = () => {
   const params = useParams();
   const id = params.orderId;
 
-  const { getOrder } = usePhoton();
+  const { getOrder, getToken } = usePhoton();
   const { order, loading, error } = getOrder({ id: id! });
+  const [accessToken, setAccessToken] = useState('');
+
+  const getAccessToken = async () => {
+    try {
+      const token = await getToken();
+      setAccessToken(token);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    getAccessToken();
+  }, []);
 
   if (error) {
     return (
@@ -129,6 +158,7 @@ export const Order = () => {
           <Button
             size="sm"
             aria-label="Cancel Order"
+            isDisabled={order.fulfillment?.type !== types.FulfillmentType.MailOrder}
             onClick={async () => {
               const decision = await confirmWrapper('Cancel this order?', {
                 description: 'You will not be able to recover this order.',
@@ -138,9 +168,9 @@ export const Order = () => {
                 colorScheme: 'red'
               });
               if (decision) {
-                // set loading
-                // cancel order mutation
-                // on complete: loading false, refresh
+                graphQLClient.setHeader('authorization', accessToken);
+                const res = await graphQLClient.request(CANCEL_ORDER, { id });
+                console.log(res);
               }
             }}
           >

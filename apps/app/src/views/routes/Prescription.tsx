@@ -1,5 +1,5 @@
 import { useParams, Link as RouterLink } from 'react-router-dom';
-
+import { useState, useEffect } from 'react';
 import { usePhoton } from '@photonhealth/react';
 import {
   Alert,
@@ -24,6 +24,7 @@ import {
   useColorMode
 } from '@chakra-ui/react';
 import { FiCopy } from 'react-icons/fi';
+import { gql, GraphQLClient } from 'graphql-request';
 
 import { formatDate } from '../../utils';
 
@@ -34,14 +35,43 @@ import { confirmWrapper } from '../components/GuardDialog';
 import PatientView from '../components/PatientView';
 import NameView from '../components/NameView';
 
+export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
+  jsonSerializer: {
+    parse: JSON.parse,
+    stringify: JSON.stringify
+  }
+});
+
+export const CANCEL_PRESCRIPTION = gql`
+  mutation cancel($id: ID!) {
+    cancelPrescription(id: $id) {
+      id
+    }
+  }
+`;
+
 export const Prescription = () => {
   const params = useParams();
   const id = params.prescriptionId;
 
-  const { getPrescription } = usePhoton();
+  const { getPrescription, getToken } = usePhoton();
   const { prescription, loading, error } = getPrescription({ id: id! });
+  const [accessToken, setAccessToken] = useState('');
 
   const rx = prescription || {};
+
+  const getAccessToken = async () => {
+    try {
+      const token = await getToken();
+      setAccessToken(token);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    getAccessToken();
+  }, []);
 
   if (error) {
     return (
@@ -96,6 +126,7 @@ export const Prescription = () => {
             <Button
               size="sm"
               aria-label="Cancel Prescription"
+              isDisabled={state !== 'ACTIVE'}
               onClick={async () => {
                 const decision = await confirmWrapper('Cancel this prescription?', {
                   description: 'You will not be able to recover this prescription.',
@@ -105,9 +136,9 @@ export const Prescription = () => {
                   colorScheme: 'red'
                 });
                 if (decision) {
-                  // set loading
-                  // cancel prescription mutation
-                  // on complete: loading false, refresh
+                  graphQLClient.setHeader('authorization', accessToken);
+                  const res = await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
+                  console.log(res);
                 }
               }}
             >
