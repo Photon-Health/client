@@ -1,22 +1,28 @@
-import { clsx } from 'clsx';
-import { JSX, Show } from 'solid-js';
+import { createSignal } from 'solid-js';
+import Input, { InputProps } from '../Input';
 
-export interface InputProps extends JSX.InputHTMLAttributes<HTMLInputElement> {
+export interface InputGroupProps {
+  label: string;
   error?: string;
-  required: boolean;
-  optional: boolean;
+  helpText?: string;
+  inputProps?: Omit<InputProps, 'id'>;
 }
 
-export default function Input(props: InputProps) {
-  const { children, type, error, ...inputProps } = props;
+export default function InputGroup(props: InputGroupProps) {
+  const { label, error, helpText, inputProps } = props;
+  const [forId] = createSignal(`input-${Math.random().toString(36).slice(2, 11)}`);
 
   return (
     <>
-      <label for="email">Email</label>
-      <input {...inputProps} classList={{ error: !!error }} />
-      <Show when={!!error}>
-        <p>{error}</p>
-      </Show>
+      <label class="block text-sm font-medium leading-6 text-gray-900 mb-1" for={forId()}>
+        {label}
+      </label>
+      <Input id={forId()} {...inputProps} error={error} />
+      <div class="h-6">
+        <p class={`mt-1 text-sm ${error ? 'text-red-600' : 'text-gray-500'}`}>
+          {error || helpText}
+        </p>
+      </div>
     </>
   );
 }

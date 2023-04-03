@@ -1,29 +1,24 @@
-import { clsx } from 'clsx';
-import { JSX, Show } from 'solid-js';
+import { JSX } from 'solid-js';
+import clsx from 'clsx';
 
 export interface InputProps extends JSX.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
   error?: string;
-  required: boolean;
-  optional: boolean;
+  id?: string;
+  placeholder?: string;
 }
 
 export default function Input(props: InputProps) {
-  const { children, type, error, ...inputProps } = props;
+  const { error, ...inputProps } = props;
 
-  return (
-    <div>
-      <label for="email" class="block text-sm font-medium leading-6 text-gray-900">
-        {props.label}
-      </label>
-      <input
-        {...inputProps}
-        class="mt-2 block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-        placeholder="you@example.com"
-      />
-      <Show when={!!error}>
-        <p>{error}</p>
-      </Show>
-    </div>
+  const inputClass = clsx(
+    'block w-full rounded-md border-0 py-1.5 px-2 shadow-sm ring-1 ring-inset sm:text-sm sm:leading-6 focus:outline-none',
+    {
+      'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-2 focus:ring-inset focus:ring-red-500':
+        !!error,
+      'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600':
+        !error
+    }
   );
+
+  return <input {...inputProps} class={inputClass} />;
 }
