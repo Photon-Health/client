@@ -191,6 +191,8 @@ export class PatientQueryManager {
         $id: ID!
         $externalId: ID
         $name: NameInput
+        $dateOfBirth: AWSDate
+        $sex: SexType
         $gender: String
         $email: AWSEmail
         $phone: AWSPhone
@@ -203,6 +205,8 @@ export class PatientQueryManager {
           id: $id
           externalId: $externalId
           name: $name
+          dateOfBirth: $dateOfBirth
+          sex: $sex
           gender: $gender
           email: $email
           phone: $phone

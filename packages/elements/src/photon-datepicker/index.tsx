@@ -73,7 +73,7 @@ customElement(
         <style>{shoelaceDarkStyles}</style>
         <style>{shoelaceLightStyles}</style>
         <style>{styles}</style>
-        <div class="pb-2 flex flex-col" ref={ref}>
+        <div class="md:py-2  flex flex-col" ref={ref}>
           {props.label ? (
             <div class="flex items-center pb-2">
               <p class="text-gray-700 text-sm font-sans">{props.label}</p>
@@ -92,9 +92,11 @@ customElement(
             class="input"
             type="date"
             value={date()}
-            help-text={props.helpText}
             invalid={props.invalid}
           ></sl-input>
+          <p slot="help-text" class="text-sm text-red-500 pt-1 h-[21px] font-sans">
+            {props.helpText}
+          </p>
         </div>
       </>
     );
