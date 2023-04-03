@@ -237,7 +237,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
         >
           <p
             slot="help-text"
-            class="text-red-500 pt-2 font-sans"
+            class="text-red-500 pt-1 font-sans"
             classList={{
               'h-[21px]': props.forceLabelSize
             }}
