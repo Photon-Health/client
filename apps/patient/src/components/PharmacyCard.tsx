@@ -36,7 +36,7 @@ const RatingHours = ({ businessStatus, rating, hours }) => {
   const { open, is24Hr, opens, opensDay, closes } = hours
 
   return (
-    <HStack>
+    <HStack w="full" whiteSpace="nowrap" overflow="hidden">
       {rating ? <Rating rating={rating} /> : null}
       {rating ? <Text color="gray.400">&bull;</Text> : null}
       <Text fontSize="sm" color={open ? 'green' : 'red'}>
@@ -51,7 +51,7 @@ const RatingHours = ({ businessStatus, rating, hours }) => {
         </Text>
       ) : null}
       {!open && opens ? (
-        <Text fontSize="sm" color="gray.500">
+        <Text fontSize="sm" color="gray.500" isTruncated>
           Opens {dayjs(opens, 'HHmm').format(dayjs(opens, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA')}
           {opensDay ? ` ${opensDay}` : ''}
         </Text>
@@ -84,9 +84,9 @@ export const PharmacyCard = memo(function PharmacyCard({
       cursor="pointer"
       onClick={() => onSelect()}
     >
-      <CardBody p={4}>
+      <CardBody p={3}>
         <HStack spacing={2}>
-          <VStack me="auto" align="start" spacing={0}>
+          <VStack align="start" w="full" spacing={0}>
             {pharmacy.info ? (
               <Tag size="sm" colorScheme={INFO_COLOR_MAP[pharmacy.info]}>
                 <TagLeftIcon
