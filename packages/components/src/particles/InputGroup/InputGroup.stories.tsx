@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/html';
 import type { ComponentProps } from 'solid-js';
 import InputGroup, { InputGroupProps } from '.';
+import Input from '../Input';
 
 type InputGroupStory = StoryObj<InputGroupProps>;
 
@@ -9,7 +10,13 @@ export const Default: InputGroupStory = {
     label: 'Email',
     error: '',
     helpText: "We'll only use this for spam."
-  }
+  },
+  // @ts-ignore
+  render: (props) => (
+    <InputGroup {...props}>
+      <Input type="email" placeholder="your@email.com" />
+    </InputGroup>
+  )
 };
 
 export const MultipleInputs: InputGroupStory = {
@@ -17,29 +24,24 @@ export const MultipleInputs: InputGroupStory = {
   render: () => (
     <div class="grid grid-cols-2 gap-4">
       <div>
-        <InputGroup
-          label="Email"
-          inputType="email"
-          helpText="We'll only use this for spam."
-          inputProps={{ placeholder: 'you@example.com' }}
-        />
+        <InputGroup label="Email" helpText="We'll only use this for spam.">
+          <Input type="email" placeholder="you@example.com" />
+        </InputGroup>
       </div>
       <div>
-        <InputGroup label="Quantity" inputType="number" contextText="Optional" />
+        <InputGroup label="Quantity" contextText="Optional">
+          <Input type="number" />
+        </InputGroup>
       </div>
       <div>
-        <InputGroup
-          label="Invalid Email"
-          error="Not a valid email address."
-          inputProps={{ placeholder: 'you@example.com' }}
-        />
+        <InputGroup label="Invalid Email" error="Not a valid email address.">
+          <Input type="email" placeholder="you@example.com" error />
+        </InputGroup>
       </div>
       <div>
-        <InputGroup
-          label="Disabled Input"
-          inputProps={{ placeholder: 'you@example.com', value: 'example@example.com' }}
-          disabled
-        />
+        <InputGroup label="Disabled Input" disabled>
+          <Input placeholder="you@example.com" value="example@example.com" disabled />
+        </InputGroup>
       </div>
     </div>
   )
