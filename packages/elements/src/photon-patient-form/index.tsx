@@ -72,7 +72,7 @@ customElement(
     });
     actions.registerValidator({
       key: 'dateOfBirth',
-      validator: message(notFutureDate, 'Date of birth cannot be in the future.')
+      validator: message(union([notFutureDate, empty()]), 'Please enter a valid date of birth.')
     });
     actions.registerValidator({
       key: 'sex',
@@ -201,7 +201,6 @@ customElement(
                 <photon-text-input
                   class="flex-grow min-w-[40%]"
                   debounce-time="0"
-                  disabled={!!patientId}
                   invalid={store['firstName']?.error}
                   help-text={store['firstName']?.error}
                   label="First Name"
@@ -216,7 +215,6 @@ customElement(
                 <photon-text-input
                   class="min-w-[48%]"
                   debounce-time="0"
-                  disabled={!!patientId}
                   invalid={store['lastName']?.error}
                   help-text={store['lastName']?.error}
                   label="Last Name"
@@ -235,7 +233,6 @@ customElement(
                   class="flex-grow w-full xs:min-w-[40%]"
                   invalid={store['dateOfBirth']?.error}
                   help-text={store['dateOfBirth']?.error}
-                  disabled={!!patientId}
                   label="Date of Birth"
                   on:photon-datepicker-selected={async (e: any) => {
                     actions.updateFormValue({
@@ -288,7 +285,6 @@ customElement(
                 <div class="flex-grow w-full xs:min-w-[40%]">
                   <photon-sex-input
                     label="Sex at Birth"
-                    disabled={!!patientId}
                     required="false"
                     help-text={store['sex']?.error}
                     invalid={store['sex']?.error !== undefined}
