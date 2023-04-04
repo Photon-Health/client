@@ -1,12 +1,11 @@
-// https://www.solidjs.com/tutorial/bindings_directives
 import { onCleanup } from 'solid-js';
 
-type ClickOutsideAccessor = () => (() => void) | null | undefined;
+type ClickOutsideAccessor = () => boolean;
 
 export default function clickOutside(el: HTMLElement, accessor: ClickOutsideAccessor): void {
   const onClick = (e: MouseEvent) => {
     if (!el.contains(e.target as Node)) {
-      accessor()?.();
+      accessor();
     }
   };
 
