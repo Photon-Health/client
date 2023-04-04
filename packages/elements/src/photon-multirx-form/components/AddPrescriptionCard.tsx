@@ -139,7 +139,7 @@ export const AddPrescriptionCard = (props: {
             <photon-number-input
               class="flex-grow flex-1 w-2/5 sm:w-auto"
               label="Quantity"
-              value={props.store['dispenseQuantity']?.value ?? 1}
+              value={props.store['dispenseQuantity']?.value ?? 0}
               required="true"
               min={1}
               invalid={props.store['dispenseQuantity']?.error ?? false}
@@ -330,7 +330,7 @@ export const AddPrescriptionCard = (props: {
                   });
                   props.actions.updateFormValue({
                     key: 'dispenseQuantity',
-                    value: 1
+                    value: 0
                   });
                   props.actions.updateFormValue({
                     key: 'daysSupply',
