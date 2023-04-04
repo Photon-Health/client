@@ -46,7 +46,7 @@ const RatingHours = ({ businessStatus, rating, hours }) => {
         <Text color="gray.400">&bull;</Text>
       ) : null}
       {open && closes ? (
-        <Text fontSize="sm" color="gray.500">
+        <Text fontSize="sm" color="gray.500" isTruncated>
           Closes {dayjs(closes, 'HHmm').format(dayjs(closes, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA')}
         </Text>
       ) : null}
