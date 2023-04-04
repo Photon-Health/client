@@ -39,7 +39,7 @@ customElement(
   }) => {
     let ref: any;
 
-    const dispatchInputChanged = (input: number) => {
+    const dispatchInputChanged = (input: number | undefined) => {
       const event = new CustomEvent('photon-input-changed', {
         composed: true,
         bubbles: true,
@@ -51,7 +51,7 @@ customElement(
     };
 
     onMount(() => {
-      dispatchInputChanged(props.value ?? 0);
+      dispatchInputChanged(props.value);
     });
 
     return (
