@@ -1,4 +1,4 @@
-import { JSX, createSignal, Show, children, createEffect } from 'solid-js';
+import { JSX, createSignal, Show, children, createEffect, createUniqueId } from 'solid-js';
 
 export interface InputGroupProps {
   label: string;
@@ -11,7 +11,7 @@ export interface InputGroupProps {
 
 export default function InputGroup(props: InputGroupProps) {
   const { label, error, contextText, helpText } = props;
-  const [forId] = createSignal(`input-${Math.random().toString(36).slice(2, 11)}`);
+  const [forId] = createSignal(`input-${createUniqueId()}`);
   const ariaDescribedBy = error ? `${forId()}-error` : helpText ? `${forId()}-help` : undefined;
 
   const resolved = children(() => props?.children);

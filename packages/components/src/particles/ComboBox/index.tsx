@@ -1,4 +1,4 @@
-import { createSignal, For, onMount, Show } from 'solid-js';
+import { createSignal, createUniqueId, For, onMount, Show } from 'solid-js';
 import { Icon } from 'solid-heroicons';
 import { chevronUpDown } from 'solid-heroicons/solid';
 import clickOutside from '../../utils/clickOutside';
@@ -15,6 +15,8 @@ export default function ComboBox(props: ComboBoxProps) {
     { id: 4, name: 'Jill' }
   ]);
   let inputContainer: HTMLElement;
+
+  const dropdownId = createUniqueId();
 
   onMount(() => {
     clickOutside(inputContainer!, () => setOpen(false));
@@ -35,10 +37,13 @@ export default function ComboBox(props: ComboBoxProps) {
         <Show when={open()}>
           <ul class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
             <For each={filteredPeople()}>
-              {(person) => (
+              {(person, index) => (
                 <li
-                  class="relative cursor-default select-none py-2 pl-3 pr-9 text-gray-900"
+                  class="relative cursor-default select-none py-2 pl-3 pr-9 text-gray-900 hover:bg-indigo-600 hover:text-white"
                   onClick={() => console.log('selecting ', person.name)}
+                  id={`option-${index()}-${dropdownId}`}
+                  role="option"
+                  tabindex="-1"
                 >
                   <span class="block truncate">{person.name}</span>
                 </li>
