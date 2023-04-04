@@ -139,7 +139,7 @@ export const AddPrescriptionCard = (props: {
             <photon-number-input
               class="flex-grow flex-1 w-2/5 sm:w-auto"
               label="Quantity"
-              value={props.store['dispenseQuantity']?.value ?? 1}
+              value={props.store['dispenseQuantity']?.value ?? null}
               required="true"
               min={1}
               invalid={props.store['dispenseQuantity']?.error ?? false}
@@ -167,7 +167,7 @@ export const AddPrescriptionCard = (props: {
                 }
               }}
             ></photon-dosage-calculator-dialog>
-            <div class="pb-5 mb-0.5 w-3/5 sm:w-auto sm:pb-0 sm:mb-4">
+            <div class="pb-5 mb-0.5 w-3/5 sm:w-auto sm:pb-0 sm:pt-1 sm:mb-4">
               <photon-button
                 variant="outline"
                 class="w-fit"
@@ -197,7 +197,7 @@ export const AddPrescriptionCard = (props: {
           <photon-number-input
             class="flex-grow flex-shrink flex-1"
             label="Days Supply"
-            value={props.store['daysSupply']?.value ?? 30}
+            value={props.store['daysSupply']?.value ?? null}
             invalid={props.store['daysSupply']?.error ?? false}
             help-text={props.store['daysSupply']?.error}
             required="true"
@@ -330,11 +330,11 @@ export const AddPrescriptionCard = (props: {
                   });
                   props.actions.updateFormValue({
                     key: 'dispenseQuantity',
-                    value: 1
+                    value: null
                   });
                   props.actions.updateFormValue({
                     key: 'daysSupply',
-                    value: 30
+                    value: null
                   });
                   props.actions.updateFormValue({
                     key: 'instructions',
