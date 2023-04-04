@@ -31,29 +31,31 @@ const RatingHours = ({ businessStatus, rating, hours }) => {
     )
   }
 
-  if (!rating || !hours) return null
-
-  const { open, is24Hr, opens, opensDay, closes } = hours
-
   return (
-    <HStack>
+    <HStack w="full" whiteSpace="nowrap" overflow="hidden">
       {rating ? <Rating rating={rating} /> : null}
       {rating ? <Text color="gray.400">&bull;</Text> : null}
-      <Text fontSize="sm" color={open ? 'green' : 'red'}>
-        {open ? 'Open' : 'Closed'}
+      <Text fontSize="sm" color={hours?.open ? 'green' : 'red'}>
+        {hours?.open ? 'Open' : 'Closed'}
       </Text>
-      {!is24Hr && ((open && closes) || (!open && opens)) ? (
+      {!hours?.is24Hr && ((hours?.open && hours?.closes) || (!hours?.open && hours?.opens)) ? (
         <Text color="gray.400">&bull;</Text>
       ) : null}
-      {open && closes ? (
-        <Text fontSize="sm" color="gray.500">
-          Closes {dayjs(closes, 'HHmm').format(dayjs(closes, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA')}
+      {hours?.open && hours?.closes ? (
+        <Text fontSize="sm" color="gray.500" isTruncated>
+          Closes{' '}
+          {dayjs(hours?.closes, 'HHmm').format(
+            dayjs(hours?.closes, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA'
+          )}
         </Text>
       ) : null}
-      {!open && opens ? (
-        <Text fontSize="sm" color="gray.500">
-          Opens {dayjs(opens, 'HHmm').format(dayjs(opens, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA')}
-          {opensDay ? ` ${opensDay}` : ''}
+      {!hours?.open && hours?.opens ? (
+        <Text fontSize="sm" color="gray.500" isTruncated>
+          Opens{' '}
+          {dayjs(hours?.opens, 'HHmm').format(
+            dayjs(hours?.opens, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA'
+          )}
+          {hours?.opensDay ? ` ${hours?.opensDay}` : ''}
         </Text>
       ) : null}
     </HStack>
@@ -84,9 +86,9 @@ export const PharmacyCard = memo(function PharmacyCard({
       cursor="pointer"
       onClick={() => onSelect()}
     >
-      <CardBody p={4}>
+      <CardBody p={3}>
         <HStack spacing={2}>
-          <VStack me="auto" align="start" spacing={0}>
+          <VStack align="start" w="full" spacing={0}>
             {pharmacy.info ? (
               <Tag size="sm" colorScheme={INFO_COLOR_MAP[pharmacy.info]}>
                 <TagLeftIcon
