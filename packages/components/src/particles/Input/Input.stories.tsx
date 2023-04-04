@@ -31,9 +31,9 @@ export default {
       }
     },
     error: {
-      defaultValue: '',
+      defaultValue: false,
       control: {
-        type: 'text'
+        type: 'boolean'
       }
     }
   },
