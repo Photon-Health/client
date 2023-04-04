@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/html';
 import type { ComponentProps } from 'solid-js';
 import InputGroup, { InputGroupProps } from '.';
 import Input from '../Input';
+import ComboBox from '../ComboBox';
 
 type InputGroupStory = StoryObj<InputGroupProps>;
 
@@ -39,8 +40,13 @@ export const MultipleInputs: InputGroupStory = {
         </InputGroup>
       </div>
       <div>
-        <InputGroup label="Disabled Input" disabled>
+        <InputGroup label="Disabled Input">
           <Input placeholder="you@example.com" value="example@example.com" disabled />
+        </InputGroup>
+      </div>
+      <div>
+        <InputGroup label="Select Name">
+          <ComboBox />
         </InputGroup>
       </div>
     </div>
