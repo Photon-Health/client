@@ -1,4 +1,4 @@
-import { JSX, Show, createEffect, splitProps } from 'solid-js';
+import { JSX, Show, createComputed, createEffect, createMemo, splitProps } from 'solid-js';
 import { Icon } from 'solid-heroicons';
 import { envelope, chevronUpDown } from 'solid-heroicons/solid';
 import clsx from 'clsx';
@@ -10,23 +10,20 @@ export interface InputProps extends JSX.InputHTMLAttributes<HTMLInputElement> {
 
 export default function Input(props: InputProps) {
   const [local, inputProps] = splitProps(props, ['error']);
-
   const [state] = useInputGroup();
 
-  const inputClass = clsx(
-    'block w-full rounded-md border-0 py-1.5 px-2 shadow-sm ring-1 ring-inset sm:text-sm sm:leading-6 focus:outline-none',
-    {
-      'pl-10': inputProps.type === 'email',
-      'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-2 focus:ring-inset focus:ring-red-500':
-        !!local.error && !inputProps.disabled,
-      'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600':
-        !local.error && !inputProps.disabled,
-      'cursor-not-allowed bg-gray-50 text-gray-500 ring-gray-200': inputProps.disabled
-    }
-  );
-
-  createEffect(() => {
-    console.log('WOT', state.error);
+  const inputClass = createMemo(() => {
+    return clsx(
+      'block w-full rounded-md border-0 py-1.5 px-2 shadow-sm ring-1 ring-inset sm:text-sm sm:leading-6 focus:outline-none',
+      {
+        'pl-10': inputProps.type === 'email',
+        'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-2 focus:ring-inset focus:ring-red-500':
+          (!!local.error || !!state.error) && !inputProps.disabled,
+        'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600':
+          (!local.error || !state.error) && !inputProps.disabled,
+        'cursor-not-allowed bg-gray-50 text-gray-500 ring-gray-200': inputProps.disabled
+      }
+    );
   });
 
   return (
@@ -37,7 +34,7 @@ export default function Input(props: InputProps) {
             <Icon path={envelope} class="h-5 w-5 text-gray-400" />
           </div>
         </Show>
-        <input id={state?.id} {...inputProps} class={inputClass} />
+        <input id={state?.id} {...inputProps} class={inputClass()} />
       </div>
     </>
   );

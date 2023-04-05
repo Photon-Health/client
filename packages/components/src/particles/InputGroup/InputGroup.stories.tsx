@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/html';
-import type { ComponentProps } from 'solid-js';
+import { ComponentProps, createSignal } from 'solid-js';
 import InputGroup, { InputGroupProps } from '.';
 import ComboBox from '../ComboBox';
 import Input from '../Input';

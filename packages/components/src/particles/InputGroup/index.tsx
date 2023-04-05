@@ -64,11 +64,12 @@ function InputGroupWrapper(props: InputGroupProps) {
     : undefined;
 
   createEffect(() => {
+    console.log('????', props.error);
     setError(props.error || '');
   });
 
   return (
-    <InputGroupProvider error={props.error}>
+    <>
       <div class="flex justify-between">
         <label class="block text-sm font-medium leading-6 text-gray-900 mb-1" for={state.id}>
           {props.label}
@@ -90,7 +91,7 @@ function InputGroupWrapper(props: InputGroupProps) {
           {props.error || props.helpText}
         </p>
       </div>
-    </InputGroupProvider>
+    </>
   );
 }
 
