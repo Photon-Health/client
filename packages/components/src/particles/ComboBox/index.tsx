@@ -1,13 +1,18 @@
 import { createSignal, createUniqueId, For, onMount, Show } from 'solid-js';
 import { Icon } from 'solid-heroicons';
-import { chevronUpDown } from 'solid-heroicons/solid';
+import { chevronUpDown, check } from 'solid-heroicons/solid';
 import clickOutside from '../../utils/clickOutside';
 import Input from '../Input';
 
-export interface ComboBoxProps {}
+export interface ComboBoxProps {
+  value: any;
+  onChange: (value: any) => void;
+}
 
 export default function ComboBox(props: ComboBoxProps) {
   const [open, setOpen] = createSignal(false);
+  const [selected, setSelected] = createSignal<any>();
+
   const [filteredPeople] = createSignal([
     { id: 1, name: 'John' },
     { id: 2, name: 'Jane' },
@@ -40,12 +45,20 @@ export default function ComboBox(props: ComboBoxProps) {
               {(person, index) => (
                 <li
                   class="relative cursor-default select-none py-2 pl-3 pr-9 text-gray-900 hover:bg-indigo-600 hover:text-white"
-                  onClick={() => console.log('selecting ', person.name)}
+                  onClick={() => {
+                    setSelected(person);
+                    setOpen(false);
+                  }}
                   id={`option-${index()}-${dropdownId}`}
                   role="option"
                   tabindex="-1"
                 >
                   <span class="block truncate">{person.name}</span>
+                  <Show when={selected()?.id === person.id}>
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-4">
+                      <Icon path={check} class="h-5 w-5 text-indigo-600" />
+                    </span>
+                  </Show>
                 </li>
               )}
             </For>
