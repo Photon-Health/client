@@ -1,6 +1,6 @@
-import { JSX, Show, createComputed, createEffect, createMemo, splitProps } from 'solid-js';
+import { JSX, Show, createMemo, splitProps } from 'solid-js';
 import { Icon } from 'solid-heroicons';
-import { envelope, chevronUpDown } from 'solid-heroicons/solid';
+import { envelope } from 'solid-heroicons/solid';
 import clsx from 'clsx';
 import { useInputGroup } from '../InputGroup';
 

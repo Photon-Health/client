@@ -1,6 +1,5 @@
 import { JSX, Show, createUniqueId, createContext, useContext, createEffect } from 'solid-js';
 import { createStore } from 'solid-js/store';
-import Input, { InputProps } from '../Input';
 
 export interface InputGroupProps {
   label: string;
