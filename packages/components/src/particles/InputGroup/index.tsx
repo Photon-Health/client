@@ -64,7 +64,6 @@ function InputGroupWrapper(props: InputGroupProps) {
     : undefined;
 
   createEffect(() => {
-    console.log('????', props.error);
     setError(props.error || '');
   });
 
