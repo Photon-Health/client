@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/html';
 import type { ComponentProps } from 'solid-js';
 import InputGroup, { InputGroupProps } from '.';
 import ComboBox from '../ComboBox';
+import Input from '../Input';
 
 type InputGroupStory = StoryObj<InputGroupProps>;
 
@@ -14,7 +15,7 @@ export const Default: InputGroupStory = {
   // @ts-ignore
   render: (props) => (
     <InputGroup {...props}>
-      <InputGroup.Input type="email" placeholder="you@example.com" />
+      <Input type="email" placeholder="you@example.com" />
     </InputGroup>
   )
 };
@@ -23,11 +24,21 @@ export const MultipleInputs: InputGroupStory = {
   // @ts-ignore
   render: () => (
     <div class="grid grid-cols-2 gap-4">
-      <div>
-        <InputGroup label="Invalid Email" error="Not a valid email address.">
-          <InputGroup.Input type="email" placeholder="you@example.com" />
-        </InputGroup>
-      </div>
+      <InputGroup label="Email" helpText="We'll only use this for spam.">
+        <Input type="email" placeholder="you@example.com" />
+      </InputGroup>
+      <InputGroup label="Quantity" contextText="Optional">
+        <Input type="number" />
+      </InputGroup>
+      <InputGroup label="Invalid Email" error="Not a valid email address.">
+        <Input type="email" placeholder="you@example.com" />
+      </InputGroup>
+      <InputGroup label="Disabled Input">
+        <Input placeholder="you@example.com" value="example@example.com" disabled />
+      </InputGroup>
+      <InputGroup label="Select Name">
+        <ComboBox />
+      </InputGroup>
     </div>
   )
 };

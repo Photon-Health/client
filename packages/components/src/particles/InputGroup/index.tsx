@@ -1,4 +1,4 @@
-import { JSX, Show, createEffect, createUniqueId, createContext, useContext } from 'solid-js';
+import { JSX, Show, createUniqueId, createContext, useContext, createEffect } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import Input, { InputProps } from '../Input';
 
@@ -17,7 +17,6 @@ interface InputGroupState {
 }
 
 interface InputGroupActions {
-  setId: (id: string) => void;
   setError: (error: string) => void;
 }
 
@@ -25,29 +24,22 @@ type InputGroupContextValue = [InputGroupState, InputGroupActions];
 
 export const InputGroupContext = createContext<InputGroupContextValue>([
   { id: '', error: '' },
-  {
-    setId: () => {},
-    setError: () => {}
-  }
+  { setError: () => {} }
 ]);
 
 interface CounterProviderProps {
-  id?: string;
   error?: string;
   children?: JSX.Element;
 }
 
 export function InputGroupProvider(props: CounterProviderProps) {
   const [state, setState] = createStore<InputGroupState>({
-    id: props.id || '',
+    id: `input-${createUniqueId()}`,
     error: props.error || ''
   });
   const inputGroup: InputGroupContextValue = [
     state,
     {
-      setId(id: string) {
-        setState('id', id);
-      },
       setError(error: string) {
         setState('error', error);
       }
@@ -59,47 +51,57 @@ export function InputGroupProvider(props: CounterProviderProps) {
   );
 }
 
-function InputGroupInput(props: InputProps) {
-  const [state] = useContext(InputGroupContext);
-  console.log('state', state);
-  return <Input id={state.id} error={!!state.error} {...props} />;
+export function useInputGroup() {
+  return useContext(InputGroupContext);
 }
 
-function InputGroup(props: InputGroupProps) {
-  const { label, error, contextText, helpText, children } = props;
-  const [state, { setId, setError }] = useContext(InputGroupContext);
-  setId(`input-${createUniqueId()}`);
-  const ariaDescribedBy = error ? `${state.id}-error` : helpText ? `${state.id}-help` : undefined;
+function InputGroupWrapper(props: InputGroupProps) {
+  const [state, { setError }] = useContext(InputGroupContext);
+  const ariaDescribedBy = props.error
+    ? `${state.id}-error`
+    : props.helpText
+    ? `${state.id}-help`
+    : undefined;
 
   createEffect(() => {
-    console.log('error', props?.error);
-    setError(props?.error || '');
+    setError(props.error || '');
   });
 
   return (
-    <InputGroupProvider>
+    <InputGroupProvider error={props.error}>
       <div class="flex justify-between">
         <label class="block text-sm font-medium leading-6 text-gray-900 mb-1" for={state.id}>
-          {label}
+          {props.label}
         </label>
-        <Show when={!!contextText}>
+        <Show when={!!props.contextText}>
           <span class="text-sm leading-6 text-gray-500" id="email-optional">
-            {contextText}
+            {props.contextText}
           </span>
         </Show>
       </div>
 
-      {children}
+      {props.children}
 
       <div class="h-6">
-        <p class={`mt-1 text-sm ${error ? 'text-red-600' : 'text-gray-500'}`} id={ariaDescribedBy}>
-          {error || helpText}
+        <p
+          class={`mt-1 text-sm ${props.error ? 'text-red-600' : 'text-gray-500'}`}
+          id={ariaDescribedBy}
+        >
+          {props.error || props.helpText}
         </p>
       </div>
-    </>
+    </InputGroupProvider>
   );
 }
 
-InputGroup.Input = InputGroupInput;
+export function InputGroup(props: InputGroupProps) {
+  return (
+    <div>
+      <InputGroupProvider error={props.error}>
+        <InputGroupWrapper {...props}>{props.children}</InputGroupWrapper>
+      </InputGroupProvider>
+    </div>
+  );
+}
 
 export default InputGroup;
