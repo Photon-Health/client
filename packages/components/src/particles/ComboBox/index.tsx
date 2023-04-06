@@ -8,7 +8,7 @@ import clsx from 'clsx';
 
 interface ComboBoxState {
   open: boolean;
-  selected: any;
+  selected: { id: string; value: string } | {};
   active: string;
 }
 
@@ -21,14 +21,14 @@ interface ComboBoxActions {
 type ComboBoxContextValue = [ComboBoxState, ComboBoxActions];
 
 export const ComboBoxContext = createContext<ComboBoxContextValue>([
-  { open: false, selected: null, active: '' },
+  { open: false, selected: {}, active: '' },
   { setOpen: () => {}, setSelected: () => {}, setActive: () => {} }
 ]);
 
 export function ComboBoxProvider(props: { children?: JSX.Element }) {
   const [state, setState] = createStore<ComboBoxState>({
     open: false,
-    selected: null,
+    selected: {},
     active: ''
   });
   const comboBox: ComboBoxContextValue = [
@@ -55,6 +55,7 @@ export function useComboBox() {
 
 export interface ComboOptionProps {
   key: string;
+  value: string;
   children?: JSX.Element;
 }
 
@@ -76,11 +77,11 @@ function ComboOption(props: ComboOptionProps) {
       class={optionClass()}
       role="option"
       tabindex="-1"
-      onClick={() => setSelected(props.key)}
+      onClick={() => setSelected({ id: props.key, value: props.value })}
       onMouseEnter={() => setActive(props.key)}
     >
       <span class="block truncate">{props.children}</span>
-      <Show when={state.selected === props.key}>
+      <Show when={state.selected?.id === props.key}>
         <span class="absolute inset-y-0 right-0 flex items-center pr-4">
           <Icon path={check} class={iconClass()} />
         </span>
@@ -108,7 +109,7 @@ function ComboBoxWrapper(props: ComboBoxWrapperProps) {
     <div>
       <div class="relative">
         <div ref={inputContainer! as HTMLDivElement}>
-          <Input type="text" />
+          <Input type="text" value={state?.selected?.value || ''} />
         </div>
         <button
           class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"

@@ -43,7 +43,11 @@ export const MultipleInputs: InputGroupStory = {
         <InputGroup label="Select Name" helpText="So many options">
           <ComboBox>
             <For each={people()}>
-              {(person) => <ComboBox.Option key={person.id}>{person.name}</ComboBox.Option>}
+              {(person) => (
+                <ComboBox.Option key={person.id} value={person.name}>
+                  {person.name}
+                </ComboBox.Option>
+              )}
             </For>
           </ComboBox>
         </InputGroup>
