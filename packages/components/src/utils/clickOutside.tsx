@@ -1,6 +1,6 @@
 import { onCleanup } from 'solid-js';
 
-type ClickOutsideAccessor = () => boolean;
+type ClickOutsideAccessor = () => void;
 
 export default function clickOutside(el: HTMLElement, accessor: ClickOutsideAccessor): void {
   const onClick = (e: MouseEvent) => {

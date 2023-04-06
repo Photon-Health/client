@@ -1,12 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/html';
-import type { ComponentProps } from 'solid-js';
+import { ComponentProps, For, createSignal } from 'solid-js';
 import ComboBox, { ComboBoxProps } from '.';
+import { randomNames } from '../../sampleData/randomNames';
 
 type InputGroupStory = StoryObj<ComboBoxProps>;
-
-export const Default: InputGroupStory = {
-  args: {}
-};
 
 const meta: Meta<ComponentProps<typeof ComboBox>> = {
   title: 'ComboBox',
@@ -17,3 +14,16 @@ const meta: Meta<ComponentProps<typeof ComboBox>> = {
 };
 
 export default meta;
+
+export const Default: InputGroupStory = {
+  // @ts-ignore
+  render: (args) => {
+    const [people] = createSignal(randomNames);
+
+    return (
+      <ComboBox {...args}>
+        <For each={people()}>{(person) => <ComboBox.Option>{person}</ComboBox.Option>}</For>
+      </ComboBox>
+    );
+  }
+};

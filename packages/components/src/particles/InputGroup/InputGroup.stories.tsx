@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/html';
-import { ComponentProps, createSignal } from 'solid-js';
+import { ComponentProps, For, createSignal } from 'solid-js';
 import InputGroup, { InputGroupProps } from '.';
 import ComboBox from '../ComboBox';
 import Input from '../Input';
+import { randomNames } from '../../sampleData/randomNames';
 
 type InputGroupStory = StoryObj<InputGroupProps>;
 
@@ -22,25 +23,45 @@ export const Default: InputGroupStory = {
 
 export const MultipleInputs: InputGroupStory = {
   // @ts-ignore
-  render: () => (
-    <div class="grid grid-cols-2 gap-4">
-      <InputGroup label="Email" helpText="We'll only use this for spam.">
-        <Input type="email" placeholder="you@example.com" />
-      </InputGroup>
-      <InputGroup label="Quantity" contextText="Optional">
-        <Input type="number" />
-      </InputGroup>
-      <InputGroup label="Invalid Email" error="Not a valid email address.">
-        <Input type="email" placeholder="you@example.com" />
-      </InputGroup>
-      <InputGroup label="Disabled Input">
-        <Input placeholder="you@example.com" value="example@example.com" disabled />
-      </InputGroup>
-      <InputGroup label="Select Name">
-        <ComboBox />
-      </InputGroup>
-    </div>
-  )
+  render: () => {
+    const [value, setValue] = createSignal(false);
+    const [people, setPeople] = createSignal(randomNames);
+    return (
+      <div class="grid grid-cols-2 gap-4">
+        <InputGroup label="Email" helpText="We'll only use this for spam.">
+          <Input type="email" placeholder="you@example.com" />
+        </InputGroup>
+        <InputGroup label="Quantity" contextText="Optional">
+          <Input type="number" />
+        </InputGroup>
+        <InputGroup label="Invalid Email" error="Not a valid email address.">
+          <Input type="email" placeholder="you@example.com" />
+        </InputGroup>
+        <InputGroup label="Disabled Input">
+          <Input placeholder="you@example.com" value="example@example.com" disabled />
+        </InputGroup>
+        <InputGroup label="Select Name" helpText="So many options">
+          <ComboBox>
+            <For each={people()}>{(person) => <ComboBox.Option>{person}</ComboBox.Option>}</For>
+          </ComboBox>
+        </InputGroup>
+        <InputGroup
+          label="Interactive Input"
+          helpText="Type 'yes' to see an error."
+          contextText='Go ahead, try "yes"'
+          error={value() ? 'Yes, there is an error.' : ''}
+        >
+          <Input
+            type="type"
+            placeholder="Are you going to type 'yes'?"
+            onInput={(e) => {
+              setValue((e.target as HTMLInputElement).value === 'yes');
+            }}
+          />
+        </InputGroup>
+      </div>
+    );
+  }
 };
 
 const meta: Meta<ComponentProps<typeof InputGroup>> = {

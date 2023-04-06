@@ -67,7 +67,7 @@ function InputGroupWrapper(props: InputGroupProps) {
   });
 
   return (
-    <>
+    <div>
       <div class="flex justify-between">
         <label class="block text-sm font-medium leading-6 text-gray-900 mb-1" for={state.id}>
           {props.label}
@@ -89,17 +89,15 @@ function InputGroupWrapper(props: InputGroupProps) {
           {props.error || props.helpText}
         </p>
       </div>
-    </>
+    </div>
   );
 }
 
 export function InputGroup(props: InputGroupProps) {
   return (
-    <div>
-      <InputGroupProvider error={props.error}>
-        <InputGroupWrapper {...props}>{props.children}</InputGroupWrapper>
-      </InputGroupProvider>
-    </div>
+    <InputGroupProvider error={props.error}>
+      <InputGroupWrapper {...props}>{props.children}</InputGroupWrapper>
+    </InputGroupProvider>
   );
 }
 
