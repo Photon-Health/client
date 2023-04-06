@@ -27,6 +27,16 @@ export const settings = {
     [process.env.REACT_APP_MODERN_RITUAL_ORG_ID as string]: {
       logo: 'modern_ritual_logo.webp',
       accentColor: '#202a36'
+    },
+    // Reside Health
+    [process.env.REACT_APP_RESIDE_HEALTH_ORG_ID as string]: {
+      logo: 'reside_health_logo.webp',
+      accentColor: '#0c3276'
+    },
+    // Radish Health
+    [process.env.REACT_APP_RADISH_HEALTH_ORG_ID as string]: {
+      logo: 'red_radish_logo.svg',
+      accentColor: '#ba4a71'
     }
   }
 }

@@ -6,7 +6,7 @@ import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
 import { PharmacyStore } from '../stores/pharmacy';
 import tailwind from '../tailwind.css?inline';
-import { email, empty, message, numericString } from '../validators';
+import { email, empty, message, numericString, notFutureDate } from '../validators';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/spinner/spinner';
@@ -19,7 +19,6 @@ import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?in
 import { isZip } from '../utils';
 import { sexes } from '../photon-sex-input';
 import { PhotonAuthorized } from '../photon-authorized';
-import { createStore } from 'solid-js/store';
 
 const getPatientAddress = (pStore: any, store: any) => {
   const patientAddress = pStore.selectedPatient.data?.address;
@@ -48,43 +47,44 @@ customElement(
     const client = usePhoton();
     const { store: pStore, actions: pActions } = PatientStore;
     const { actions: pharmActions } = PharmacyStore;
-    const { store, actions } = createFormStore(
-      {
-        firstName: undefined,
-        lastName: undefined,
-        dateOfBirth: undefined,
-        phone: undefined,
-        gender: undefined,
-        sex: undefined,
-        email: undefined,
-        address_street1: undefined,
-        address_street2: undefined,
-        address_city: undefined,
-        address_state: undefined,
-        address_zip: undefined,
-        preferredPharmacy: undefined
-      },
-      createStore
-    );
+    const { store, actions } = createFormStore({
+      firstName: undefined,
+      lastName: undefined,
+      dateOfBirth: undefined,
+      phone: undefined,
+      gender: undefined,
+      sex: undefined,
+      email: undefined,
+      address_street1: undefined,
+      address_street2: undefined,
+      address_city: undefined,
+      address_state: undefined,
+      address_zip: undefined,
+      preferredPharmacy: undefined
+    });
     actions.registerValidator({
       key: 'firstName',
-      validator: message(size(string(), 1, Infinity), 'Please enter a first name...')
+      validator: message(size(string(), 1, Infinity), 'Please enter a first name.')
     });
     actions.registerValidator({
       key: 'lastName',
-      validator: message(size(string(), 1, Infinity), 'Please enter a last name...')
+      validator: message(size(string(), 1, Infinity), 'Please enter a last name.')
+    });
+    actions.registerValidator({
+      key: 'dateOfBirth',
+      validator: message(union([notFutureDate, empty()]), 'Please enter a valid date of birth.')
     });
     actions.registerValidator({
       key: 'sex',
-      validator: message(enums(sexes.map((s) => s.name)), 'Please enter Sex at Birth...')
+      validator: message(enums(sexes.map((s) => s.name)), 'Please enter Sex at Birth.')
     });
     actions.registerValidator({
       key: 'phone',
-      validator: message(size(string(), 12), 'Please enter a valid phone number...')
+      validator: message(size(string(), 12), 'Please enter a valid phone number.')
     });
     actions.registerValidator({
       key: 'email',
-      validator: message(union([email(), empty()]), 'Please enter a valid email...')
+      validator: message(union([email(), empty()]), 'Please enter a valid email.')
     });
     actions.registerValidator({
       key: 'address_zip',
@@ -201,7 +201,6 @@ customElement(
                 <photon-text-input
                   class="flex-grow min-w-[40%]"
                   debounce-time="0"
-                  disabled={!!patientId}
                   invalid={store['firstName']?.error}
                   help-text={store['firstName']?.error}
                   label="First Name"
@@ -216,7 +215,6 @@ customElement(
                 <photon-text-input
                   class="min-w-[48%]"
                   debounce-time="0"
-                  disabled={!!patientId}
                   invalid={store['lastName']?.error}
                   help-text={store['lastName']?.error}
                   label="Last Name"
@@ -231,10 +229,10 @@ customElement(
               </div>
               <div class="flex flex-col xs:flex-row items-center xs:gap-4">
                 <photon-datepicker
-                  class="pb-3 flex-grow w-full xs:min-w-[40%]"
+                  no-initial-date="true"
+                  class="flex-grow w-full xs:min-w-[40%]"
                   invalid={store['dateOfBirth']?.error}
                   help-text={store['dateOfBirth']?.error}
-                  disabled={!!patientId}
                   label="Date of Birth"
                   on:photon-datepicker-selected={async (e: any) => {
                     actions.updateFormValue({
@@ -287,7 +285,6 @@ customElement(
                 <div class="flex-grow w-full xs:min-w-[40%]">
                   <photon-sex-input
                     label="Sex at Birth"
-                    disabled={!!patientId}
                     required="false"
                     help-text={store['sex']?.error}
                     invalid={store['sex']?.error !== undefined}
