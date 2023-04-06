@@ -12,8 +12,8 @@ export default function Input(props: InputProps) {
   const [local, inputProps] = splitProps(props, ['error']);
   const [state] = useInputGroup();
 
-  const inputClass = createMemo(() => {
-    return clsx(
+  const inputClass = createMemo(() =>
+    clsx(
       'block w-full rounded-md border-0 py-1.5 px-2 shadow-sm ring-1 ring-inset sm:text-sm sm:leading-6 focus:outline-none',
       {
         'pl-10': inputProps.type === 'email',
@@ -23,8 +23,8 @@ export default function Input(props: InputProps) {
           (!local.error || !state.error) && !inputProps.disabled,
         'cursor-not-allowed bg-gray-50 text-gray-500 ring-gray-200': inputProps.disabled
       }
-    );
-  });
+    )
+  );
 
   return (
     <>

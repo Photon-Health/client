@@ -1,31 +1,35 @@
-import { onMount, Show, JSX, useContext, createContext } from 'solid-js';
+import { onMount, Show, JSX, useContext, createContext, createMemo } from 'solid-js';
 import { Icon } from 'solid-heroicons';
-import { chevronUpDown } from 'solid-heroicons/solid';
+import { chevronUpDown, check } from 'solid-heroicons/solid';
 import clickOutside from '../../utils/clickOutside';
 import Input from '../Input';
 import { createStore } from 'solid-js/store';
+import clsx from 'clsx';
 
 interface ComboBoxState {
   open: boolean;
   selected: any;
+  active: string;
 }
 
 interface ComboBoxActions {
   setOpen: (open: boolean) => void;
   setSelected: (selected: any) => void;
+  setActive: (active: string) => void;
 }
 
 type ComboBoxContextValue = [ComboBoxState, ComboBoxActions];
 
 export const ComboBoxContext = createContext<ComboBoxContextValue>([
-  { open: false, selected: null },
-  { setOpen: () => {}, setSelected: () => {} }
+  { open: false, selected: null, active: '' },
+  { setOpen: () => {}, setSelected: () => {}, setActive: () => {} }
 ]);
 
 export function ComboBoxProvider(props: { children?: JSX.Element }) {
   const [state, setState] = createStore<ComboBoxState>({
     open: false,
-    selected: null
+    selected: null,
+    active: ''
   });
   const comboBox: ComboBoxContextValue = [
     state,
@@ -35,6 +39,9 @@ export function ComboBoxProvider(props: { children?: JSX.Element }) {
       },
       setSelected(selected: any) {
         setState('selected', selected);
+      },
+      setActive(active: string) {
+        setState('active', active);
       }
     }
   ];
@@ -47,22 +54,37 @@ export function useComboBox() {
 }
 
 export interface ComboOptionProps {
+  key: string;
   children?: JSX.Element;
 }
 
 function ComboOption(props: ComboOptionProps) {
+  const [state, { setSelected, setActive }] = useContext(ComboBoxContext);
+
+  const optionClass = createMemo(() =>
+    clsx('relative cursor-default select-none py-2 pl-3 pr-9 text-gray-900', {
+      'bg-indigo-600 text-white': state.active === props.key
+    })
+  );
+
+  const iconClass = createMemo(() =>
+    clsx('h-5 w-5', state.active === props.key ? 'text-white' : 'text-indigo-600')
+  );
+
   return (
     <li
-      class="relative cursor-default select-none py-2 pl-3 pr-9 text-gray-900 hover:bg-indigo-600 hover:text-white"
+      class={optionClass()}
       role="option"
       tabindex="-1"
+      onClick={() => setSelected(props.key)}
+      onMouseEnter={() => setActive(props.key)}
     >
       <span class="block truncate">{props.children}</span>
-      {/* <Show when={selected()?.id === person.id}>
+      <Show when={state.selected === props.key}>
         <span class="absolute inset-y-0 right-0 flex items-center pr-4">
-          <Icon path={check} class="h-5 w-5 text-indigo-600" />
+          <Icon path={check} class={iconClass()} />
         </span>
-      </Show> */}
+      </Show>
     </li>
   );
 }

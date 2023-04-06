@@ -22,7 +22,9 @@ export const Default: InputGroupStory = {
 
     return (
       <ComboBox {...args}>
-        <For each={people()}>{(person) => <ComboBox.Option>{person}</ComboBox.Option>}</For>
+        <For each={people()}>
+          {(person) => <ComboBox.Option key={person.id}>{person.name}</ComboBox.Option>}
+        </For>
       </ComboBox>
     );
   }
