@@ -8,7 +8,9 @@ const App = () => {
 
   return (
     <div class="w-1/2 p-10">
-      <Spinner />
+      <div class="mb-4">
+        <Spinner />
+      </div>
       <InputGroup
         label="Interactive Input"
         helpText="Type 'yes' to see an error."
