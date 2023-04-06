@@ -43,6 +43,10 @@ export const Status = () => {
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false)
 
+  const isCourier: boolean =
+    courier === 'true' || order?.pharmacy?.id === process.env.REACT_APP_CAPSULE_PHARMACY_ID
+  const fulfillmentType = isCourier ? 'courier' : 'pickup'
+
   const toast = useToast()
 
   const markOrderAsPickedUp = async () => {
@@ -60,8 +64,8 @@ export const Status = () => {
           setTimeout(() => setShowFooter(false), 1000)
         } else {
           toast({
-            title: t.status.pickupErrorToast.title,
-            description: t.status.pickupErrorToast.description,
+            title: t.status[fulfillmentType].errorToast.title,
+            description: t.status[fulfillmentType].errorToast.description,
             position: 'top',
             status: 'error',
             duration: 5000,
@@ -103,8 +107,9 @@ export const Status = () => {
   const { fulfillment, pharmacy, organization } = order
 
   const photonPhone: string = process.env.REACT_APP_TWILIO_SMS_NUMBER
-  const isCourier: boolean =
-    courier === 'true' || pharmacy?.id === process.env.REACT_APP_CAPSULE_PHARMACY_ID
+
+  const showChatAlert =
+    !isCourier && (fulfillment?.state === 'RECEIVED' || fulfillment?.state === 'READY')
 
   return (
     <Box>
@@ -122,22 +127,22 @@ export const Status = () => {
               {t.status.heading}
             </Heading>
             <Text>{t.status.subheading}</Text>
-            {fulfillment?.state === 'RECEIVED' || fulfillment?.state === 'READY' ? (
+            {showChatAlert ? (
               <Alert status="warning">
                 <AlertIcon />
                 <Text>
-                  {t.status.chat.prompt}{' '}
+                  {t.status.pickup.chat.prompt}{' '}
                   <Link href={`sms:${photonPhone}`} textDecoration="underline">
-                    {t.status.chat.cta}
+                    {t.status.pickup.chat.cta}
                   </Link>
                 </Text>
               </Alert>
             ) : null}
           </VStack>
-          {pharmacy?.name && pharmacy?.address ? (
+          {!isCourier && pharmacy?.name && pharmacy?.address ? (
             <Box alignSelf="start">
               <Text display="inline" color="gray.500">
-                {t.status.pickup}
+                {t.status.pickup.pickup}
               </Text>
               <Link
                 href={`http://maps.google.com/?q=${pharmacy.name}, ${formatAddress(
@@ -170,7 +175,7 @@ export const Status = () => {
             onClick={!successfullySubmitted ? markOrderAsPickedUp : undefined}
             isLoading={submitting}
           >
-            {successfullySubmitted ? t.status.thankYou : t.status.cta}
+            {successfullySubmitted ? t.status.thankYou : t.status[fulfillmentType].cta}
           </Button>
           <PoweredBy />
         </Container>

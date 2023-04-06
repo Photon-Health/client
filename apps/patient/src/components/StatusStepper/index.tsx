@@ -14,6 +14,7 @@ export const StatusStepper = ({ status, isCourier }: Props) => {
   const initialStepIdx = pickupStates.findIndex((state) => state === status)
   const currentStep = initialStepIdx + 1
   const states = isCourier ? courierStates : pickupStates
+  const fulfillmentType = isCourier ? 'courier' : 'pickup'
 
   return (
     <Box>
@@ -24,10 +25,8 @@ export const StatusStepper = ({ status, isCourier }: Props) => {
               <Step
                 key={state}
                 cursor="pointer"
-                title={t.status[isCourier ? 'courierStates' : 'pickupStates'][state].title}
-                description={
-                  t.status[isCourier ? 'courierStates' : 'pickupStates'][state].description
-                }
+                title={t.status[fulfillmentType].states[state].title}
+                description={t.status[fulfillmentType].states[state].description}
                 isActive={currentStep === id}
                 isCompleted={currentStep > id}
                 isLastStep={states.length === id + 1}
