@@ -79,6 +79,8 @@ export const Pharmacy = () => {
   const [longitude, setLongitude] = useState<number | undefined>(undefined)
   const [location, setLocation] = useState<string>('')
 
+  const [enableCourier, setEnableCourier] = useState<boolean>(false)
+
   const toast = useToast()
 
   const reset = () => {
@@ -104,6 +106,12 @@ export const Pharmacy = () => {
       setLocation(loc)
       setLatitude(lat)
       setLongitude(lng)
+
+      const inAustinTX = /Austin.*(?:TX|Texas)/.test(loc)
+      const isMoPed = order?.organization?.id === process.env.REACT_APP_MODERN_PEDIATRICS_ORG_ID
+      if (inAustinTX && isMoPed) {
+        setEnableCourier(true)
+      }
     }
     setLocationModalOpen(false)
   }
@@ -317,12 +325,14 @@ export const Pharmacy = () => {
 
           {location ? (
             <VStack spacing={9} align="stretch">
-              <CourierOptions
-                capsule
-                location={location}
-                selectedId={selectedId}
-                handleSelect={handleSelect}
-              />
+              {enableCourier ? (
+                <CourierOptions
+                  capsule
+                  location={location}
+                  selectedId={selectedId}
+                  handleSelect={handleSelect}
+                />
+              ) : null}
 
               <PickupOptions
                 pharmacies={pharmacyOptions}
