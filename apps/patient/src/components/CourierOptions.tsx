@@ -1,5 +1,7 @@
 import { Card, CardBody, Heading, Image, SlideFade, Text, VStack } from '@chakra-ui/react'
 
+import t from '../utils/text.json'
+
 // @ts-ignore
 import capsuleLogo from '../assets/capsule_logo.png'
 
@@ -10,14 +12,15 @@ interface Props {
   handleSelect: Function
 }
 
-export const MailOrderOptions = ({ capsule, location, selectedId, handleSelect }: Props) => {
+export const CourierOptions = ({ capsule, location, selectedId, handleSelect }: Props) => {
   if (!location) return null
 
-  const mailOrderOptions = [
+  const courierOptions = [
     {
       id: process.env.REACT_APP_CAPSULE_PHARMACY_ID,
       logo: capsuleLogo,
-      enabled: capsule
+      enabled: capsule,
+      description: 'Specialty medications delivered.'
     }
     // add additional mail order options here
   ]
@@ -27,15 +30,16 @@ export const MailOrderOptions = ({ capsule, location, selectedId, handleSelect }
       <VStack spacing={3} align="span" w="full">
         <VStack spacing={1} align="start">
           <Heading as="h5" size="sm">
-            Delivery
+            {t.pharmacy.courier.heading}
           </Heading>
-          <Text>Your prescriptions delivered to your door.</Text>
+          <Text>{t.pharmacy.courier.subheading}</Text>
         </VStack>
 
-        {mailOrderOptions.map((ph) => {
+        {courierOptions.map((ph) => {
           if (!ph.enabled) return null
           return (
             <Card
+              key={`courier-pharmacy-${ph.id}`}
               w="full"
               bgColor="white"
               cursor="pointer"
@@ -43,11 +47,11 @@ export const MailOrderOptions = ({ capsule, location, selectedId, handleSelect }
               border="2px solid"
               borderColor={selectedId === ph.id ? 'brand.600' : 'white'}
             >
-              <CardBody p={4}>
+              <CardBody p={3}>
                 <VStack me="auto" align="start" spacing={2}>
                   <Image src={ph.logo} width="auto" height="25px" />
                   <Text fontSize="sm" color="gray.500">
-                    Specialty medications delivered.
+                    {ph.description}
                   </Text>
                 </VStack>
               </CardBody>
@@ -59,6 +63,6 @@ export const MailOrderOptions = ({ capsule, location, selectedId, handleSelect }
   )
 }
 
-MailOrderOptions.defaultProps = {
+CourierOptions.defaultProps = {
   capsule: false
 }

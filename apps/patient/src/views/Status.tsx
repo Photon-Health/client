@@ -35,6 +35,7 @@ export const Status = () => {
   const [searchParams] = useSearchParams()
   const orderId = searchParams.get('orderId')
   const token = searchParams.get('token')
+  const courier = searchParams.get('courier')
 
   const [showFooter, setShowFooter] = useState<boolean>(order?.state === OrderState.Placed)
 
@@ -102,6 +103,8 @@ export const Status = () => {
   const { fulfillment, pharmacy, organization } = order
 
   const photonPhone: string = process.env.REACT_APP_TWILIO_SMS_NUMBER
+  const isCourier: boolean =
+    courier === 'true' || pharmacy?.id === process.env.REACT_APP_CAPSULE_PHARMACY_ID
 
   return (
     <Box>
@@ -151,6 +154,7 @@ export const Status = () => {
             </Box>
           ) : null}
           <StatusStepper
+            isCourier={isCourier}
             status={successfullySubmitted ? 'PICKED_UP' : fulfillment?.state || 'SENT'}
           />
         </VStack>

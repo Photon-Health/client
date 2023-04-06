@@ -30,7 +30,7 @@ import { Nav } from '../components/Nav'
 import { PoweredBy } from '../components/PoweredBy'
 import { LocationModal } from '../components/LocationModal'
 import { PickupOptions } from '../components/PickupOptions'
-import { MailOrderOptions } from '../components/MailOrderOptions'
+import { CourierOptions } from '../components/CourierOptions'
 import { OrderContext } from './Main'
 
 const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER']
@@ -226,7 +226,10 @@ export const Pharmacy = () => {
           setSuccessfullySubmitted(true)
           setTimeout(() => {
             setShowFooter(false)
-            navigate(`/status?orderId=${order.id}&token=${token}`)
+            const selectedCourier = selectedId === process.env.REACT_APP_CAPSULE_PHARMACY_ID
+            navigate(
+              `/status?orderId=${order.id}&token=${token}${selectedCourier ? '&courier=true' : ''}`
+            )
           }, 1000)
         } else {
           toast({
@@ -314,7 +317,7 @@ export const Pharmacy = () => {
 
           {location ? (
             <VStack spacing={9} align="stretch">
-              <MailOrderOptions
+              <CourierOptions
                 capsule
                 location={location}
                 selectedId={selectedId}

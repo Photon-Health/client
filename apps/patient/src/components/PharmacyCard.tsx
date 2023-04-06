@@ -87,23 +87,22 @@ export const PharmacyCard = memo(function PharmacyCard({
       onClick={() => onSelect()}
     >
       <CardBody p={3}>
-        <HStack spacing={2}>
-          <VStack align="start" w="full" spacing={0}>
-            {pharmacy.info ? (
-              <Tag size="sm" colorScheme={INFO_COLOR_MAP[pharmacy.info]}>
-                <TagLeftIcon
-                  boxSize="12px"
-                  as={pharmacy.info === 'Previous' ? FiRotateCcw : FiStar}
-                />
-                <TagLabel> {pharmacy.info}</TagLabel>
-              </Tag>
-            ) : null}
-            {pharmacy?.hours?.is24Hr ? (
-              <Tag size="sm" colorScheme="green">
-                <TagLabel>24 hr</TagLabel>
-              </Tag>
-            ) : null}
-            <Text fontSize="md">{pharmacy.name}</Text>
+        <VStack align="start" w="full" spacing={0}>
+          {pharmacy.info ? (
+            <Tag size="sm" colorScheme={INFO_COLOR_MAP[pharmacy.info]}>
+              <TagLeftIcon
+                boxSize="12px"
+                as={pharmacy.info === 'Previous' ? FiRotateCcw : FiStar}
+              />
+              <TagLabel> {pharmacy.info}</TagLabel>
+            </Tag>
+          ) : null}
+          {pharmacy?.hours?.is24Hr ? (
+            <Tag size="sm" colorScheme="green">
+              <TagLabel>24 hr</TagLabel>
+            </Tag>
+          ) : null}
+          <Text fontSize="md">{pharmacy.name}</Text>
 
           <RatingHours
             businessStatus={pharmacy.businessStatus}

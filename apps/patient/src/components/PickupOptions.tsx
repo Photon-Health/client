@@ -19,13 +19,13 @@ export const PickupOptions = ({
         <SlideFade offsetY="60px" in={true}>
           <VStack spacing={1} align="start">
             <Heading as="h5" size="sm">
-              Pick Up
+              {t.pharmacy.pickup.heading}
             </Heading>
             <HStack justify="space-between" w="full">
-              <Text>Your prescriptions at a nearby location.</Text>
+              <Text>{t.pharmacy.pickup.subheading}</Text>
               {!isMobile && pharmacies.length > 0 ? (
                 <Text size="sm" color="gray.500" whiteSpace="nowrap" alignSelf="flex-end">
-                  {t.pharmacy.sorted}
+                  {t.pharmacy.pickup.sorted}
                 </Text>
               ) : null}
             </HStack>
@@ -35,7 +35,7 @@ export const PickupOptions = ({
 
       <VStack align="span" spacing={3}>
         {pharmacies.map((pharmacy: Pharmacy, i: number) => (
-          <SlideFade offsetY="60px" in={true}>
+          <SlideFade offsetY="60px" in={true} key={`pickup-pharmacy-${pharmacy.id}-${i}`}>
             <PharmacyCard
               pharmacy={pharmacy}
               selected={selectedId === pharmacy.id}
@@ -55,12 +55,12 @@ export const PickupOptions = ({
           onClick={handleShowMore}
           p={3}
         >
-          {t.pharmacy.showMore}
+          {t.pharmacy.pickup.showMore}
         </Button>
       ) : null}
       {showingAllPharmacies ? (
         <Text color="gray.500" textAlign="center">
-          Showing all pharmacies
+          {t.pharmacy.pickup.showingAll}
         </Text>
       ) : null}
     </VStack>
