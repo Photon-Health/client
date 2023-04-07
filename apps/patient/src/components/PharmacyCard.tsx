@@ -16,12 +16,6 @@ const INFO_COLOR_MAP = {
   Preferred: 'yellow'
 }
 
-interface PharmacyCardProps {
-  pharmacy: Pharmacy
-  selected: boolean
-  onSelect: Function
-}
-
 const RatingHours = ({ businessStatus, rating, hours }) => {
   if (businessStatus in UNOPEN_BUSINESS_STATUS_MAP) {
     return (
@@ -31,29 +25,31 @@ const RatingHours = ({ businessStatus, rating, hours }) => {
     )
   }
 
-  if (!rating || !hours) return null
-
-  const { open, is24Hr, opens, opensDay, closes } = hours
-
   return (
-    <HStack>
+    <HStack w="full" whiteSpace="nowrap" overflow="hidden">
       {rating ? <Rating rating={rating} /> : null}
       {rating ? <Text color="gray.400">&bull;</Text> : null}
-      <Text fontSize="sm" color={open ? 'green' : 'red'}>
-        {open ? 'Open' : 'Closed'}
+      <Text fontSize="sm" color={hours?.open ? 'green' : 'red'}>
+        {hours?.open ? 'Open' : 'Closed'}
       </Text>
-      {!is24Hr && ((open && closes) || (!open && opens)) ? (
+      {!hours?.is24Hr && ((hours?.open && hours?.closes) || (!hours?.open && hours?.opens)) ? (
         <Text color="gray.400">&bull;</Text>
       ) : null}
-      {open && closes ? (
-        <Text fontSize="sm" color="gray.500">
-          Closes {dayjs(closes, 'HHmm').format(dayjs(closes, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA')}
+      {hours?.open && hours?.closes ? (
+        <Text fontSize="sm" color="gray.500" isTruncated>
+          Closes{' '}
+          {dayjs(hours?.closes, 'HHmm').format(
+            dayjs(hours?.closes, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA'
+          )}
         </Text>
       ) : null}
-      {!open && opens ? (
-        <Text fontSize="sm" color="gray.500">
-          Opens {dayjs(opens, 'HHmm').format(dayjs(opens, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA')}
-          {opensDay ? ` ${opensDay}` : ''}
+      {!hours?.open && hours?.opens ? (
+        <Text fontSize="sm" color="gray.500" isTruncated>
+          Opens{' '}
+          {dayjs(hours?.opens, 'HHmm').format(
+            dayjs(hours?.opens, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA'
+          )}
+          {hours?.opensDay ? ` ${hours?.opensDay}` : ''}
         </Text>
       ) : null}
     </HStack>
@@ -69,6 +65,12 @@ const DistanceAddress = ({ distance, address }) => {
   )
 }
 
+interface PharmacyCardProps {
+  pharmacy: Pharmacy
+  selected: boolean
+  onSelect: Function
+}
+
 export const PharmacyCard = memo(function PharmacyCard({
   pharmacy,
   selected,
@@ -78,39 +80,37 @@ export const PharmacyCard = memo(function PharmacyCard({
   return (
     <Card
       w="full"
-      backgroundColor="white"
+      bgColor="white"
       border="2px solid"
       borderColor={selected ? 'brand.600' : 'white'}
       cursor="pointer"
       onClick={() => onSelect()}
     >
-      <CardBody p={4}>
-        <HStack spacing={2}>
-          <VStack me="auto" align="start" spacing={0}>
-            {pharmacy.info ? (
-              <Tag size="sm" colorScheme={INFO_COLOR_MAP[pharmacy.info]}>
-                <TagLeftIcon
-                  boxSize="12px"
-                  as={pharmacy.info === 'Previous' ? FiRotateCcw : FiStar}
-                />
-                <TagLabel> {pharmacy.info}</TagLabel>
-              </Tag>
-            ) : null}
-            {pharmacy?.hours?.is24Hr ? (
-              <Tag size="sm" colorScheme="green">
-                <TagLabel>24 hr</TagLabel>
-              </Tag>
-            ) : null}
-            <Text fontSize="md">{pharmacy.name}</Text>
+      <CardBody p={3}>
+        <VStack align="start" w="full" spacing={0}>
+          {pharmacy.info ? (
+            <Tag size="sm" colorScheme={INFO_COLOR_MAP[pharmacy.info]}>
+              <TagLeftIcon
+                boxSize="12px"
+                as={pharmacy.info === 'Previous' ? FiRotateCcw : FiStar}
+              />
+              <TagLabel> {pharmacy.info}</TagLabel>
+            </Tag>
+          ) : null}
+          {pharmacy?.hours?.is24Hr ? (
+            <Tag size="sm" colorScheme="green">
+              <TagLabel>24 hr</TagLabel>
+            </Tag>
+          ) : null}
+          <Text fontSize="md">{pharmacy.name}</Text>
 
-            <RatingHours
-              businessStatus={pharmacy.businessStatus}
-              rating={pharmacy.rating}
-              hours={pharmacy.hours}
-            />
-            <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
-          </VStack>
-        </HStack>
+          <RatingHours
+            businessStatus={pharmacy.businessStatus}
+            rating={pharmacy.rating}
+            hours={pharmacy.hours}
+          />
+          <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
+        </VStack>
       </CardBody>
     </Card>
   )
