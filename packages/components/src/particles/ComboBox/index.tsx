@@ -6,7 +6,8 @@ import {
   createContext,
   createMemo,
   createEffect,
-  splitProps
+  splitProps,
+  createSignal
 } from 'solid-js';
 import { Icon } from 'solid-heroicons';
 import { chevronUpDown, check } from 'solid-heroicons/solid';
@@ -21,6 +22,7 @@ interface ComboBoxState {
   selected: { id: string; value: string } | {};
   active: string;
   loading: boolean;
+  typing: boolean;
 }
 
 interface ComboBoxActions {
@@ -28,13 +30,20 @@ interface ComboBoxActions {
   setSelected: (selected: any) => void;
   setActive: (active: string) => void;
   setLoading: (loading: boolean) => void;
+  setTyping: (typing: boolean) => void;
 }
 
 type ComboBoxContextValue = [ComboBoxState, ComboBoxActions];
 
 export const ComboBoxContext = createContext<ComboBoxContextValue>([
-  { open: false, selected: {}, active: '', loading: false },
-  { setOpen: () => {}, setSelected: () => {}, setActive: () => {}, setLoading: () => {} }
+  { open: false, selected: {}, active: '', loading: false, typing: false },
+  {
+    setOpen: () => {},
+    setSelected: () => {},
+    setActive: () => {},
+    setLoading: () => {},
+    setTyping: () => {}
+  }
 ]);
 
 export function ComboBoxProvider(props: { children?: JSX.Element }) {
@@ -42,7 +51,8 @@ export function ComboBoxProvider(props: { children?: JSX.Element }) {
     open: false,
     selected: {},
     active: '',
-    loading: false
+    loading: false,
+    typing: false
   });
   const comboBox: ComboBoxContextValue = [
     state,
@@ -58,6 +68,9 @@ export function ComboBoxProvider(props: { children?: JSX.Element }) {
       },
       setLoading(loading: boolean) {
         setState('loading', loading);
+      },
+      setTyping(typing: boolean) {
+        setState('typing', typing);
       }
     }
   ];
@@ -124,11 +137,26 @@ function ComboOption(props: ComboOptionProps) {
 
 function ComboInput(props: InputProps) {
   const [state, { setOpen }] = useContext(ComboBoxContext);
-  const [local, restInput] = splitProps(props, ['onInput']);
+  const [local, restInput] = splitProps(props, ['onInput', 'value']);
+  const [selectedLocalValue, setLocalSelectedValue] = createSignal('');
   let inputContainer: HTMLElement;
 
   onMount(() => {
-    clickOutside(inputContainer!, () => setOpen(false));
+    clickOutside(inputContainer!, () => {
+      setOpen(false);
+    });
+  });
+
+  createEffect(() => {
+    if (state.selected?.value) {
+      setLocalSelectedValue(state.selected.value);
+    }
+    if (state.typing) {
+      setLocalSelectedValue('');
+    }
+    if (!state.open) {
+      setLocalSelectedValue(state.selected?.value || '');
+    }
   });
 
   return (
@@ -136,9 +164,11 @@ function ComboInput(props: InputProps) {
       <div ref={inputContainer! as HTMLDivElement}>
         <Input
           {...restInput}
+          value={selectedLocalValue()}
           onInput={(e) => {
             // @ts-ignore
             local?.onInput(e);
+            setLocalSelectedValue(e.target?.value);
             setOpen(true);
           }}
         />
