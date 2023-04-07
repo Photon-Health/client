@@ -1,4 +1,13 @@
-import { onMount, Show, JSX, useContext, createContext, createMemo, createEffect } from 'solid-js';
+import {
+  onMount,
+  Show,
+  JSX,
+  useContext,
+  createContext,
+  createMemo,
+  createEffect,
+  splitProps
+} from 'solid-js';
 import { Icon } from 'solid-heroicons';
 import { chevronUpDown, check } from 'solid-heroicons/solid';
 import clickOutside from '../../utils/clickOutside';
@@ -113,12 +122,9 @@ function ComboOption(props: ComboOptionProps) {
   );
 }
 
-export interface ComboInputProps {
-  loading?: boolean;
-}
-
-function ComboInput(props: InputProps & ComboInputProps) {
+function ComboInput(props: InputProps) {
   const [state, { setOpen }] = useContext(ComboBoxContext);
+  const [local, restInput] = splitProps(props, ['onInput']);
   let inputContainer: HTMLElement;
 
   onMount(() => {
@@ -128,7 +134,14 @@ function ComboInput(props: InputProps & ComboInputProps) {
   return (
     <>
       <div ref={inputContainer! as HTMLDivElement}>
-        <Input {...props} />
+        <Input
+          {...restInput}
+          onInput={(e) => {
+            // @ts-ignore
+            local?.onInput(e);
+            setOpen(true);
+          }}
+        />
       </div>
       <button
         class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
