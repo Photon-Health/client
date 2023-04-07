@@ -27,8 +27,17 @@
       "find": "Find a location",
       "enter": "Enter a zipcode or address"
     },
-    "sorted": "Sorted by distance",
-    "showMore": "Show more pharmacies",
+    "courier": {
+      "heading": "Courier Delivery",
+      "subheading": "Your prescriptions delivered to your door."
+    },
+    "pickup": {
+      "heading": "Pick Up",
+      "subheading": "Your prescriptions at a nearby location.",
+      "sorted": "Sorted by distance",
+      "showMore": "Show more pharmacies",
+      "showingAll": "Showing all pharmacies"
+    },
     "cta": "Select pharmacy",
     "thankYou": "Thank you!"
   },
@@ -36,32 +45,61 @@
     "title": "Filling your prescriptions",
     "heading": "Filling your prescriptions",
     "subheading": "After your prescriptions are sent to a pharmacy, we'll send you updates on their status.",
-    "pickup": "Pick Up:",
-    "chat": {
-      "prompt": "At the pharmacy? Let us know if you're having any issues.",
-      "cta": "Text us now"
+    "pickup": {
+      "pickup": "Pick Up:",
+      "chat": {
+        "prompt": "At the pharmacy? Let us know if you're having any issues.",
+        "cta": "Text us now"
+      },
+      "states": {
+        "SENT": {
+          "title": "Sent to Pharmacy",
+          "description": "Your prescription fills have been sent to the pharmacy."
+        },
+        "RECEIVED": {
+          "title": "Received",
+          "description": "The pharmacy has received your order and is preparing to fill it."
+        },
+        "READY": {
+          "title": "Ready for Pick Up",
+          "description": "Your prescriptions are ready to be picked up."
+        },
+        "PICKED_UP": {
+          "title": "Picked Up",
+          "description": "Please notify us below when you've picked up your prescriptions."
+        }
+      },
+      "cta": "I picked up my prescriptions",
+      "errorToast": {
+        "title": "Unable to mark order as picked up",
+        "description": "Please refresh and try again"
+      }
     },
-    "SENT": {
-      "title": "Sent to Pharmacy",
-      "description": "Your prescription fills have been sent to the pharmacy."
+    "courier": {
+      "states": {
+        "SENT": {
+          "title": "Sent to Pharmacy",
+          "description": "Your prescription fills have been sent to the pharmacy."
+        },
+        "FILLING": {
+          "title": "Filling your prescriptions",
+          "description": "The pharmacy has received your order and is filling it."
+        },
+        "DELIVERING": {
+          "title": "Delivering",
+          "description": "Your prescriptions are being delivered."
+        },
+        "DELIVERED": {
+          "title": "Delivered",
+          "description": "Your prescriptions have arrived at their destination."
+        }
+      },
+      "cta": "I received my prescriptions",
+      "errorToast": {
+        "title": "Unable to mark order as delivered",
+        "description": "Please refresh and try again"
+      }
     },
-    "RECEIVED": {
-      "title": "Received",
-      "description": "The pharmacy has received your order and is preparing to fill it."
-    },
-    "READY": {
-      "title": "Ready for Pick Up",
-      "description": "Your prescriptions are ready to be picked up."
-    },
-    "PICKED_UP": {
-      "title": "Picked Up",
-      "description": "Please notify us below when you've picked up your prescriptions."
-    },
-    "cta": "I picked up my prescriptions",
-    "thankYou": "Thank you!",
-    "pickupErrorToast": {
-      "title": "Unable to mark order as picked up",
-      "description": "Please refresh and try again"
-    }
+    "thankYou": "Thank you!"
   }
 }

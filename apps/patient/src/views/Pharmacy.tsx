@@ -12,9 +12,11 @@ import {
   Text,
   VStack,
   useBreakpointValue,
-  useToast
+  useToast,
+  Divider
 } from '@chakra-ui/react'
 import { FiCheck, FiMapPin } from 'react-icons/fi'
+
 import { Helmet } from 'react-helmet'
 import dayjs from 'dayjs'
 
@@ -27,7 +29,8 @@ import { FixedFooter } from '../components/FixedFooter'
 import { Nav } from '../components/Nav'
 import { PoweredBy } from '../components/PoweredBy'
 import { LocationModal } from '../components/LocationModal'
-import { PharmacyList } from '../components/PharmacyList'
+import { PickupOptions } from '../components/PickupOptions'
+import { CourierOptions } from '../components/CourierOptions'
 import { OrderContext } from './Main'
 
 const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER']
@@ -76,6 +79,8 @@ export const Pharmacy = () => {
   const [longitude, setLongitude] = useState<number | undefined>(undefined)
   const [location, setLocation] = useState<string>('')
 
+  const [enableCourier, setEnableCourier] = useState<boolean>(false)
+
   const toast = useToast()
 
   const reset = () => {
@@ -101,6 +106,12 @@ export const Pharmacy = () => {
       setLocation(loc)
       setLatitude(lat)
       setLongitude(lng)
+
+      const inAustinTX = /Austin.*(?:TX|Texas)/.test(loc)
+      const isMoPed = order?.organization?.id === process.env.REACT_APP_MODERN_PEDIATRICS_ORG_ID
+      if (inAustinTX && isMoPed) {
+        setEnableCourier(true)
+      }
     }
     setLocationModalOpen(false)
   }
@@ -223,7 +234,10 @@ export const Pharmacy = () => {
           setSuccessfullySubmitted(true)
           setTimeout(() => {
             setShowFooter(false)
-            navigate(`/status?orderId=${order.id}&token=${token}`)
+            const selectedCourier = selectedId === process.env.REACT_APP_CAPSULE_PHARMACY_ID
+            navigate(
+              `/status?orderId=${order.id}&token=${token}${selectedCourier ? '&courier=true' : ''}`
+            )
           }, 1000)
         } else {
           toast({
@@ -287,6 +301,7 @@ export const Pharmacy = () => {
             </Heading>
             <Text>{t.pharmacy.subheading}</Text>
           </VStack>
+
           <HStack justify="space-between" w="full">
             {location ? (
               <VStack w="full" align="start" spacing={1}>
@@ -306,21 +321,30 @@ export const Pharmacy = () => {
                 {t.pharmacy.setLocation}
               </Button>
             )}
-            {!isMobile && pharmacyOptions.length > 0 ? (
-              <Text size="sm" color="gray.500" whiteSpace="nowrap" alignSelf="flex-end">
-                {t.pharmacy.sorted}
-              </Text>
-            ) : null}
           </HStack>
 
-          <PharmacyList
-            pharmacies={pharmacyOptions}
-            selectedId={selectedId}
-            handleSelect={handleSelect}
-            handleShowMore={handleShowMore}
-            loadingMore={loadingMore}
-            showingAllPharmacies={showingAllPharmacies}
-          />
+          {location ? (
+            <VStack spacing={9} align="stretch">
+              {enableCourier ? (
+                <CourierOptions
+                  capsule
+                  location={location}
+                  selectedId={selectedId}
+                  handleSelect={handleSelect}
+                />
+              ) : null}
+
+              <PickupOptions
+                pharmacies={pharmacyOptions}
+                selectedId={selectedId}
+                handleSelect={handleSelect}
+                handleShowMore={handleShowMore}
+                loadingMore={loadingMore}
+                showingAllPharmacies={showingAllPharmacies}
+                isMobile={isMobile}
+              />
+            </VStack>
+          ) : null}
         </VStack>
       </Container>
 

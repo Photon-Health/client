@@ -35,8 +35,8 @@ export const settings = {
     },
     // Radish Health
     [process.env.REACT_APP_RADISH_HEALTH_ORG_ID as string]: {
-      logo: 'radish_health_logo.svg',
-      accentColor: '#84a98c'
+      logo: 'red_radish_logo.svg',
+      accentColor: '#ba4a71'
     }
   }
 }
