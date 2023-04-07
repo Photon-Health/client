@@ -1,8 +1,8 @@
 import { clsx } from 'clsx';
 import { JSX, mergeProps } from 'solid-js';
 
-type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
-type ButtonSize = 'xl' | 'lg' | 'md' | 'sm' | 'xs';
+export type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
+export type ButtonSize = 'xl' | 'lg' | 'md' | 'sm' | 'xs';
 
 export interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;

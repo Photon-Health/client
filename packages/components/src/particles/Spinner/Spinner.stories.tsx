@@ -14,8 +14,8 @@ export const MultipleInputs: SpinnerStory = {
   // @ts-ignore
   render: () => (
     <div class="flex gap-4">
-      <Spinner size="s" />
-      <Spinner size="m" />
+      <Spinner size="sm" />
+      <Spinner size="md" />
       <Spinner size="lg" />
       <Spinner size="xl" />
     </div>
@@ -27,7 +27,7 @@ export default {
   tags: ['autodocs'],
   argTypes: {
     size: {
-      options: ['s', 'm', 'lg', 'xl'],
+      options: ['sm', 'md', 'lg', 'xl'],
       defaultValue: 'lg',
       control: {
         type: 'select'

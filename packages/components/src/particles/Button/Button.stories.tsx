@@ -1,5 +1,5 @@
-import Button, { ButtonProps } from '../Button';
-
+import Button, { ButtonProps, ButtonVariant, ButtonSize } from '../Button';
+import { For } from 'solid-js/web';
 import type { Meta, StoryObj } from '@storybook/html';
 import type { ComponentProps } from 'solid-js';
 
@@ -22,59 +22,24 @@ export const Default: Story = {
 export const ButtonBonanza: Story = {
   // @ts-ignore
   render: () => {
+    const variants: ButtonVariant[] = ['primary', 'secondary', 'tertiary'];
+    const sizes: ButtonSize[] = ['xs', 'sm', 'md', 'lg', 'xl'];
+
     return (
       <>
-        <div class="flex items-start gap-8 mb-20">
-          <Button variant="primary" size="xs">
-            Button Text
-          </Button>
-          <Button variant="primary" size="sm">
-            Button Text
-          </Button>
-          <Button variant="primary" size="md">
-            Button Text
-          </Button>
-          <Button variant="primary" size="lg">
-            Button Text
-          </Button>
-          <Button variant="primary" size="xl">
-            Button Text
-          </Button>
-        </div>
-        <div class="flex items-start gap-8 mb-20">
-          <Button variant="secondary" size="xs">
-            Button Text
-          </Button>
-          <Button variant="secondary" size="sm">
-            Button Text
-          </Button>
-          <Button variant="secondary" size="md">
-            Button Text
-          </Button>
-          <Button variant="secondary" size="lg">
-            Button Text
-          </Button>
-          <Button variant="secondary" size="xl">
-            Button Text
-          </Button>
-        </div>
-        <div class="flex items-start gap-8 mb-20">
-          <Button variant="tertiary" size="xs">
-            Button Text
-          </Button>
-          <Button variant="tertiary" size="sm">
-            Button Text
-          </Button>
-          <Button variant="tertiary" size="md">
-            Button Text
-          </Button>
-          <Button variant="tertiary" size="lg">
-            Button Text
-          </Button>
-          <Button variant="tertiary" size="xl">
-            Button Text
-          </Button>
-        </div>
+        <For each={variants}>
+          {(variant) => (
+            <div class="flex items-start gap-8 mb-20">
+              <For each={sizes}>
+                {(size) => (
+                  <Button variant={variant} size={size}>
+                    Button Text
+                  </Button>
+                )}
+              </For>
+            </div>
+          )}
+        </For>
       </>
     );
   }
