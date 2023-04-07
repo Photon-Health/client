@@ -39,12 +39,15 @@ export const MultipleInputs: InputGroupStory = {
         <InputGroup label="Email" helpText="We'll only use this for spam.">
           <Input type="email" placeholder="you@example.com" />
         </InputGroup>
+
         <InputGroup label="Quantity" contextText="Optional">
           <Input type="number" />
         </InputGroup>
+
         <InputGroup label="Invalid Email" error="Not a valid email address.">
           <Input type="email" placeholder="you@example.com" />
         </InputGroup>
+
         <InputGroup label="Disabled Input">
           <Input placeholder="you@example.com" value="example@example.com" disabled />
         </InputGroup>
@@ -63,11 +66,13 @@ export const MultipleInputs: InputGroupStory = {
             </ComboBox.Options>
           </ComboBox>
         </InputGroup>
+
         <InputGroup label="Loading ComboBox">
           <ComboBox loading>
             <ComboBox.Input />
           </ComboBox>
         </InputGroup>
+
         <InputGroup
           label="Interactive Input"
           helpText="Type 'yes' to see an error."

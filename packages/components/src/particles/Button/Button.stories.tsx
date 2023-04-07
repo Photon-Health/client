@@ -19,6 +19,67 @@ export const Default: Story = {
   }
 };
 
+export const ButtonBonanza: Story = {
+  // @ts-ignore
+  render: () => {
+    return (
+      <>
+        <div class="flex items-start gap-8 mb-20">
+          <Button variant="primary" size="xs">
+            Button Text
+          </Button>
+          <Button variant="primary" size="sm">
+            Button Text
+          </Button>
+          <Button variant="primary" size="md">
+            Button Text
+          </Button>
+          <Button variant="primary" size="lg">
+            Button Text
+          </Button>
+          <Button variant="primary" size="xl">
+            Button Text
+          </Button>
+        </div>
+        <div class="flex items-start gap-8 mb-20">
+          <Button variant="secondary" size="xs">
+            Button Text
+          </Button>
+          <Button variant="secondary" size="sm">
+            Button Text
+          </Button>
+          <Button variant="secondary" size="md">
+            Button Text
+          </Button>
+          <Button variant="secondary" size="lg">
+            Button Text
+          </Button>
+          <Button variant="secondary" size="xl">
+            Button Text
+          </Button>
+        </div>
+        <div class="flex items-start gap-8 mb-20">
+          <Button variant="tertiary" size="xs">
+            Button Text
+          </Button>
+          <Button variant="tertiary" size="sm">
+            Button Text
+          </Button>
+          <Button variant="tertiary" size="md">
+            Button Text
+          </Button>
+          <Button variant="tertiary" size="lg">
+            Button Text
+          </Button>
+          <Button variant="tertiary" size="xl">
+            Button Text
+          </Button>
+        </div>
+      </>
+    );
+  }
+};
+
 export default {
   title: 'Button',
   tags: ['autodocs'],

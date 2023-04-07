@@ -10,6 +10,7 @@ export interface InputProps extends JSX.InputHTMLAttributes<HTMLInputElement> {
 
 export default function Input(props: InputProps) {
   const [local, inputProps] = splitProps(props, ['error']);
+
   const [state] = useInputGroup();
 
   const inputClass = createMemo(() =>
