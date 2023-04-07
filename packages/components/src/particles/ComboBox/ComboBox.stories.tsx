@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/html';
-import { ComponentProps, For, createSignal } from 'solid-js';
+import { ComponentProps, For, createMemo, createSignal } from 'solid-js';
 import ComboBox, { ComboBoxProps } from '.';
 import { randomNames } from '../../sampleData/randomNames';
 
@@ -18,13 +18,27 @@ export default meta;
 export const Default: InputGroupStory = {
   // @ts-ignore
   render: (args) => {
-    const [people] = createSignal(randomNames);
+    const [query, setQuery] = createSignal('');
+    const filteredPeople = createMemo(() => {
+      return query() === ''
+        ? randomNames
+        : randomNames.filter((person) => {
+            return person.name.toLowerCase().includes(query().toLowerCase());
+          });
+    });
 
     return (
       <ComboBox {...args}>
-        <For each={people()}>
-          {(person) => <ComboBox.Option key={person.id}>{person.name}</ComboBox.Option>}
-        </For>
+        <ComboBox.Input />
+        <ComboBox.Options>
+          <For each={filteredPeople()}>
+            {(person) => (
+              <ComboBox.Option key={person.id} value={person.name}>
+                {person.name}
+              </ComboBox.Option>
+            )}
+          </For>
+        </ComboBox.Options>
       </ComboBox>
     );
   }

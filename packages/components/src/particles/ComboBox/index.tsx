@@ -1,35 +1,39 @@
-import { onMount, Show, JSX, useContext, createContext, createMemo } from 'solid-js';
+import { onMount, Show, JSX, useContext, createContext, createMemo, createEffect } from 'solid-js';
 import { Icon } from 'solid-heroicons';
 import { chevronUpDown, check } from 'solid-heroicons/solid';
 import clickOutside from '../../utils/clickOutside';
-import Input from '../Input';
+import Input, { InputProps } from '../Input';
 import { createStore } from 'solid-js/store';
 import clsx from 'clsx';
+import Spinner from '../Spinner';
 
 interface ComboBoxState {
   open: boolean;
   selected: { id: string; value: string } | {};
   active: string;
+  loading: boolean;
 }
 
 interface ComboBoxActions {
   setOpen: (open: boolean) => void;
   setSelected: (selected: any) => void;
   setActive: (active: string) => void;
+  setLoading: (loading: boolean) => void;
 }
 
 type ComboBoxContextValue = [ComboBoxState, ComboBoxActions];
 
 export const ComboBoxContext = createContext<ComboBoxContextValue>([
-  { open: false, selected: {}, active: '' },
-  { setOpen: () => {}, setSelected: () => {}, setActive: () => {} }
+  { open: false, selected: {}, active: '', loading: false },
+  { setOpen: () => {}, setSelected: () => {}, setActive: () => {}, setLoading: () => {} }
 ]);
 
 export function ComboBoxProvider(props: { children?: JSX.Element }) {
   const [state, setState] = createStore<ComboBoxState>({
     open: false,
     selected: {},
-    active: ''
+    active: '',
+    loading: false
   });
   const comboBox: ComboBoxContextValue = [
     state,
@@ -42,6 +46,9 @@ export function ComboBoxProvider(props: { children?: JSX.Element }) {
       },
       setActive(active: string) {
         setState('active', active);
+      },
+      setLoading(loading: boolean) {
+        setState('loading', loading);
       }
     }
   ];
@@ -51,6 +58,22 @@ export function ComboBoxProvider(props: { children?: JSX.Element }) {
 
 export function useComboBox() {
   return useContext(ComboBoxContext);
+}
+
+function ComboOptions(props: { children?: JSX.Element }) {
+  const [state] = useContext(ComboBoxContext);
+
+  return (
+    <Show when={state.open}>
+      <ul
+        class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
+        role="listbox"
+        tabindex="-1"
+      >
+        {props.children}
+      </ul>
+    </Show>
+  );
 }
 
 export interface ComboOptionProps {
@@ -90,15 +113,12 @@ function ComboOption(props: ComboOptionProps) {
   );
 }
 
-export interface ComboBoxWrapperProps {
-  children?: JSX.Element;
-  value?: any;
-  onChange?: (value: any) => void;
+export interface ComboInputProps {
+  loading?: boolean;
 }
 
-function ComboBoxWrapper(props: ComboBoxWrapperProps) {
+function ComboInput(props: InputProps & ComboInputProps) {
   const [state, { setOpen }] = useContext(ComboBoxContext);
-
   let inputContainer: HTMLElement;
 
   onMount(() => {
@@ -106,28 +126,44 @@ function ComboBoxWrapper(props: ComboBoxWrapperProps) {
   });
 
   return (
-    <div>
-      <div class="relative">
-        <div ref={inputContainer! as HTMLDivElement}>
-          <Input type="text" value={state?.selected?.value || ''} />
-        </div>
-        <button
-          class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
-          onClick={() => setOpen(!state.open)}
-        >
-          <Icon path={chevronUpDown} class="h-5 w-5 text-gray-400" />
-        </button>
-        <Show when={state.open}>
-          <ul class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-            {props.children}
-          </ul>
-        </Show>
+    <>
+      <div ref={inputContainer! as HTMLDivElement}>
+        <Input {...props} />
       </div>
-    </div>
+      <button
+        class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
+        onClick={() => setOpen(!state.open)}
+      >
+        <Show when={!state.loading} fallback={<Spinner size="s" />}>
+          <Icon path={chevronUpDown} class="h-5 w-5 text-gray-400" />
+        </Show>
+      </button>
+    </>
   );
 }
 
-export function ComboBox(props: ComboBoxWrapperProps) {
+export interface ComboBoxProps {
+  children?: JSX.Element;
+  value?: any;
+  onChange?: (value: any) => void;
+  loading?: boolean;
+}
+
+function ComboBoxWrapper(props: ComboBoxProps) {
+  const [state, { setLoading }] = useContext(ComboBoxContext);
+
+  onMount(() => {
+    setLoading(props.loading || false);
+  });
+
+  createEffect(() => {
+    setLoading(props.loading || false);
+  });
+
+  return <div class="relative">{props.children}</div>;
+}
+
+export function ComboBox(props: ComboBoxProps) {
   return (
     <ComboBoxProvider>
       <ComboBoxWrapper {...props}>{props.children}</ComboBoxWrapper>
@@ -135,6 +171,8 @@ export function ComboBox(props: ComboBoxWrapperProps) {
   );
 }
 
+ComboBox.Input = ComboInput;
+ComboBox.Options = ComboOptions;
 ComboBox.Option = ComboOption;
 
 export default ComboBox;

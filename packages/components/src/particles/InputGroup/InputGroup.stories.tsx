@@ -26,6 +26,7 @@ export const MultipleInputs: InputGroupStory = {
   render: () => {
     const [value, setValue] = createSignal(false);
     const [people, setPeople] = createSignal(randomNames);
+
     return (
       <div class="grid grid-cols-2 gap-4">
         <InputGroup label="Email" helpText="We'll only use this for spam.">
