@@ -129,6 +129,7 @@ export const Pharmacy = () => {
     const limit = 3
     const offset = pharmacyOptions.length
 
+    // Get pharmacies from our list
     let pharmaciesResults: any
     try {
       pharmaciesResults = await graphQLClient.request(GET_PHARMACIES, { location, limit, offset })
@@ -153,6 +154,7 @@ export const Pharmacy = () => {
           fields: ['place_id']
         }
 
+        // Search for google place
         let place, placeStatus
         try {
           const { response, status }: any = await query('findPlaceFromQuery', placeRequest)
@@ -165,6 +167,7 @@ export const Pharmacy = () => {
           continue
         }
 
+        // Search for google place details
         if (placeStatus === 'OK' && place[0].place_id) {
           const detailsRequest = {
             placeId: place[0].place_id,
