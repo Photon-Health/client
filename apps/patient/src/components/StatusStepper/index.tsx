@@ -2,11 +2,20 @@ import { Box, Center, Container, Stack } from '@chakra-ui/react'
 import { Step } from './components/Step'
 import t from '../../utils/text.json'
 
-export const states = ['SENT', 'RECEIVED', 'READY', 'PICKED_UP']
+export const pickupStates = ['SENT', 'RECEIVED', 'READY', 'PICKED_UP']
+export const courierStates = ['SENT', 'FILLING', 'DELIVERING', 'DELIVERED']
 
-export const StatusStepper = ({ status }) => {
-  const initialStepIdx = states.findIndex((state) => state === status)
+interface Props {
+  status: string
+  isCourier?: boolean
+}
+
+export const StatusStepper = ({ status, isCourier }: Props) => {
+  const initialStepIdx = pickupStates.findIndex((state) => state === status)
   const currentStep = initialStepIdx + 1
+  const states = isCourier ? courierStates : pickupStates
+  const fulfillmentType = isCourier ? 'courier' : 'pickup'
+
   return (
     <Box>
       <Container px={0} pt={0}>
@@ -16,8 +25,8 @@ export const StatusStepper = ({ status }) => {
               <Step
                 key={state}
                 cursor="pointer"
-                title={t.status[state].title}
-                description={t.status[state].description}
+                title={t.status[fulfillmentType].states[state].title}
+                description={t.status[fulfillmentType].states[state].description}
                 isActive={currentStep === id}
                 isCompleted={currentStep > id}
                 isLastStep={states.length === id + 1}
@@ -28,4 +37,8 @@ export const StatusStepper = ({ status }) => {
       </Container>
     </Box>
   )
+}
+
+StatusStepper.defaultProps = {
+  isCourier: false
 }
