@@ -29,7 +29,7 @@ export const Default: InputGroupStory = {
 
     return (
       <ComboBox {...args}>
-        <ComboBox.Input />
+        <ComboBox.Input onInput={(e) => setQuery((e.target as HTMLInputElement).value)} />
         <ComboBox.Options>
           <For each={filteredPeople()}>
             {(person) => (

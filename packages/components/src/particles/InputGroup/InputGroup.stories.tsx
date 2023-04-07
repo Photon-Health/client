@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/html';
-import { ComponentProps, For, createSignal } from 'solid-js';
+import { ComponentProps, For, createSignal, createMemo } from 'solid-js';
 import InputGroup, { InputGroupProps } from '.';
 import ComboBox from '../ComboBox';
 import Input from '../Input';
@@ -25,7 +25,14 @@ export const MultipleInputs: InputGroupStory = {
   // @ts-ignore
   render: () => {
     const [value, setValue] = createSignal(false);
-    const [people, setPeople] = createSignal(randomNames);
+    const [query, setQuery] = createSignal('');
+    const filteredPeople = createMemo(() => {
+      return query() === ''
+        ? randomNames
+        : randomNames.filter((person) => {
+            return person.name.toLowerCase().includes(query().toLowerCase());
+          });
+    });
 
     return (
       <div class="grid grid-cols-2 gap-4">
@@ -41,15 +48,24 @@ export const MultipleInputs: InputGroupStory = {
         <InputGroup label="Disabled Input">
           <Input placeholder="you@example.com" value="example@example.com" disabled />
         </InputGroup>
+
         <InputGroup label="Select Name" helpText="So many options">
           <ComboBox>
-            <For each={people()}>
-              {(person) => (
-                <ComboBox.Option key={person.id} value={person.name}>
-                  {person.name}
-                </ComboBox.Option>
-              )}
-            </For>
+            <ComboBox.Input onInput={(e) => setQuery((e.target as HTMLInputElement).value)} />
+            <ComboBox.Options>
+              <For each={filteredPeople()}>
+                {(person) => (
+                  <ComboBox.Option key={person.id} value={person.name}>
+                    {person.name}
+                  </ComboBox.Option>
+                )}
+              </For>
+            </ComboBox.Options>
+          </ComboBox>
+        </InputGroup>
+        <InputGroup label="Loading ComboBox">
+          <ComboBox loading>
+            <ComboBox.Input />
           </ComboBox>
         </InputGroup>
         <InputGroup
