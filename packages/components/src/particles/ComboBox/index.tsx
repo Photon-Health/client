@@ -177,7 +177,7 @@ function ComboInput(props: InputProps) {
         class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
         onClick={() => setOpen(!state.open)}
       >
-        <Show when={!state.loading} fallback={<Spinner size="s" />}>
+        <Show when={!state.loading} fallback={<Spinner size="sm" />}>
           <Icon path={chevronUpDown} class="h-5 w-5 text-gray-400" />
         </Show>
       </button>
