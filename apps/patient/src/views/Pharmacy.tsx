@@ -11,9 +11,7 @@ import {
   Link,
   Text,
   VStack,
-  useBreakpointValue,
-  useToast,
-  Divider
+  useToast
 } from '@chakra-ui/react'
 import { FiCheck, FiMapPin } from 'react-icons/fi'
 
@@ -53,7 +51,6 @@ const query = (method, data) =>
   })
 
 export const Pharmacy = () => {
-  const isMobile = useBreakpointValue({ base: true, md: false })
   const order = useContext(OrderContext)
 
   const navigate = useNavigate()
@@ -111,7 +108,6 @@ export const Pharmacy = () => {
       const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(loc)
       const patientAddressInAustinTX =
         order?.address?.city === 'Austin' && order?.address?.state === 'TX'
-
       const isMoPed = order?.organization?.id === process.env.REACT_APP_MODERN_PEDIATRICS_ORG_ID
       if (searchingInAustinTX && patientAddressInAustinTX && isMoPed) {
         setEnableCourier(true)
