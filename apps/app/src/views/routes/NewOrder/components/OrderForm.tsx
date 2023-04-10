@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import { Formik } from 'formik';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Alert, AlertIcon, ModalCloseButton, useColorMode, VStack } from '@chakra-ui/react';
 
@@ -13,6 +13,7 @@ import { SelectPatientCard } from './SelectPatientCard';
 import { SelectPrescriptionsCard } from './SelectPrescriptionsCard';
 import { SelectPharmacyCard } from './SelectPharmacyCard';
 import { PatientAddressCard } from './PatientAddressCard';
+import usePrevious from '../../../../hooks/usePrevious';
 
 const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
 const { fulfillmentSettings } = require(`../../../../configs/fulfillment.${envName}.ts`);
@@ -100,6 +101,7 @@ export const OrderForm = ({
   showAddress,
   setShowAddress
 }: OrderFormProps) => {
+  const previousLoading = usePrevious(loading);
   const { colorMode } = useColorMode();
   const [updatePreferredPharmacy, setUpdatePreferredPharmacy] = useState(false);
   const [updateAddress, setUpdateAddress] = useState(false);
@@ -227,7 +229,22 @@ export const OrderForm = ({
         }
       }}
     >
-      {({ values, setFieldValue, handleSubmit, dirty, errors, touched, setTouched }) => {
+      {({
+        values,
+        setFieldValue,
+        handleSubmit,
+        dirty,
+        errors,
+        touched,
+        setTouched,
+        validateForm
+      }) => {
+        useEffect(() => {
+          if (previousLoading && !loading) {
+            validateForm();
+          }
+        }, [loading, previousLoading]);
+
         return (
           <form onSubmit={handleSubmit} noValidate id="order-form">
             <ModalCloseButton
