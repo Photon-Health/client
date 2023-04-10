@@ -21,6 +21,7 @@ import { LoadingInputField } from '../../../components/LoadingInputField';
 import { formatAddress } from '../../../../utils';
 
 import { Address } from '../../../../models/general';
+import { useEffect } from 'react';
 
 interface PatientAddressCardProps {
   address: Address;
@@ -32,6 +33,7 @@ interface PatientAddressCardProps {
   setShowAddress: any;
   updateAddress: boolean;
   setUpdateAddress: (value: boolean) => void;
+  setTouched: (fields: { [field: string]: boolean }, shouldValidate?: boolean) => void;
 }
 
 export const PatientAddressCard = ({
@@ -43,8 +45,23 @@ export const PatientAddressCard = ({
   showAddress,
   setShowAddress,
   updateAddress,
-  setUpdateAddress
+  setUpdateAddress,
+  setTouched
 }: PatientAddressCardProps) => {
+  useEffect(() => {
+    const errorKeys = Object.keys(errors?.address || {});
+    if (errorKeys?.length > 0 && !showAddress) {
+      setShowAddress(true);
+      setTouched({
+        ...touched,
+        address: errorKeys.reduce((acc: { [key: string]: boolean }, key) => {
+          acc[key] = true;
+          return acc;
+        }, {})
+      });
+    }
+  }, [errors, setShowAddress, setTouched, showAddress, touched]);
+
   return (
     <Card bg="bg-surface">
       <CardHeader>
@@ -98,9 +115,9 @@ export const PatientAddressCard = ({
                 <FormLabel htmlFor="address.postalCode">Zip Code</FormLabel>
                 <LoadingInputField
                   name="address.postalCode"
-                  maxLength={5}
+                  maxLength={10}
                   onChange={(e: any) => {
-                    if (/^[0-9]+$/.test(e.target.value) || e.target.value === '') {
+                    if (/^[0-9-]+$/.test(e.target.value) || e.target.value === '') {
                       setFieldValue('address.postalCode', e.target.value);
                     }
                   }}

@@ -6,7 +6,7 @@ import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
 import { PharmacyStore } from '../stores/pharmacy';
 import tailwind from '../tailwind.css?inline';
-import { email, empty, message, numericString, notFutureDate } from '../validators';
+import { email, empty, message, zipString, notFutureDate } from '../validators';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/spinner/spinner';
@@ -88,10 +88,7 @@ customElement(
     });
     actions.registerValidator({
       key: 'address_zip',
-      validator: message(
-        union([size(numericString(), 0, 10), empty()]),
-        'Please enter a valid zip code...'
-      )
+      validator: message(union([zipString(), empty()]), 'Please enter a valid zip code...')
     });
 
     onMount(() => {

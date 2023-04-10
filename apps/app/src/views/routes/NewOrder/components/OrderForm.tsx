@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import { Formik } from 'formik';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Alert, AlertIcon, ModalCloseButton, useColorMode, VStack } from '@chakra-ui/react';
 
@@ -13,6 +13,7 @@ import { SelectPatientCard } from './SelectPatientCard';
 import { SelectPrescriptionsCard } from './SelectPrescriptionsCard';
 import { SelectPharmacyCard } from './SelectPharmacyCard';
 import { PatientAddressCard } from './PatientAddressCard';
+import usePrevious from '../../../../hooks/usePrevious';
 
 const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
 const { fulfillmentSettings } = require(`../../../../configs/fulfillment.${envName}.ts`);
@@ -59,9 +60,7 @@ const orderSchema = yup.object({
       postalCode: yup
         .string()
         .required('Please enter a zip code...')
-        .matches(/^[0-9]+$/, 'Must be only digits')
-        .min(5, 'Must be exactly 5 digits')
-        .max(5, 'Must be exactly 5 digits'),
+        .matches(/^\d{5}(-\d{4})?$/, 'Must be a valid zip code...'),
       country: yup.string().required('Please enter a country...'),
       state: yup.string().required('Please enter a state...'),
       city: yup.string().required('Please enter a city...')
@@ -102,6 +101,7 @@ export const OrderForm = ({
   showAddress,
   setShowAddress
 }: OrderFormProps) => {
+  const previousLoading = usePrevious(loading);
   const { colorMode } = useColorMode();
   const [updatePreferredPharmacy, setUpdatePreferredPharmacy] = useState(false);
   const [updateAddress, setUpdateAddress] = useState(false);
@@ -229,7 +229,22 @@ export const OrderForm = ({
         }
       }}
     >
-      {({ values, setFieldValue, handleSubmit, dirty, errors, touched }) => {
+      {({
+        values,
+        setFieldValue,
+        handleSubmit,
+        dirty,
+        errors,
+        touched,
+        setTouched,
+        validateForm
+      }) => {
+        useEffect(() => {
+          if (previousLoading && !loading) {
+            validateForm();
+          }
+        }, [loading, previousLoading]);
+
         return (
           <form onSubmit={handleSubmit} noValidate id="order-form">
             <ModalCloseButton
@@ -263,6 +278,7 @@ export const OrderForm = ({
                 setShowAddress={setShowAddress}
                 updateAddress={updateAddress}
                 setUpdateAddress={setUpdateAddress}
+                setTouched={setTouched}
               />
 
               <SelectPharmacyCard
