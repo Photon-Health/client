@@ -1,9 +1,10 @@
-import { createMemo, createSignal } from 'solid-js';
+import { createSignal } from 'solid-js';
 import PharmacySearch from './systems/PharmacySearch';
-import { randomNames } from './sampleData/randomNames';
 import Client from './systems/Client';
 
 const App = () => {
+  const [pharmacy, setPharmacy] = createSignal<any>();
+
   return (
     <Client
       id="7N9QZujlNJHL8EIPqXpu1wq8OuXqoxKb"
@@ -14,7 +15,12 @@ const App = () => {
     >
       <div class="p-5" style={{ width: '600px' }}>
         <div class="p-5 border border-gray-300 rounded-md">
-          <PharmacySearch />
+          <PharmacySearch setPharmacy={setPharmacy} />
+        </div>
+      </div>
+      <div class="p-5" style={{ width: '600px' }}>
+        <div class="p-5 border border-gray-300 rounded-md">
+          {pharmacy()?.id || 'No pharmacy selected'}
         </div>
       </div>
     </Client>

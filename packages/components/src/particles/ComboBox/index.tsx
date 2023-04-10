@@ -165,6 +165,7 @@ function ComboInput(props: InputProps) {
         <Input
           {...restInput}
           value={selectedLocalValue()}
+          onClick={() => setOpen(!state.open)}
           onInput={(e) => {
             // @ts-ignore
             local?.onInput(e);
@@ -190,6 +191,7 @@ export interface ComboBoxProps {
   value?: any;
   onChange?: (value: any) => void;
   loading?: boolean;
+  setSelected?: (selected: any) => void;
 }
 
 function ComboBoxWrapper(props: ComboBoxProps) {
@@ -201,6 +203,12 @@ function ComboBoxWrapper(props: ComboBoxProps) {
 
   createEffect(() => {
     setLoading(props.loading || false);
+  });
+
+  createEffect(() => {
+    if (props.setSelected) {
+      props.setSelected(state.selected);
+    }
   });
 
   return <div class="relative">{props.children}</div>;

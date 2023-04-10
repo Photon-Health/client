@@ -12,6 +12,7 @@ export interface PharmacyProps {
   address?: string;
   patientId?: string;
   geocodingApiKey?: string;
+  setPharmacy?: (pharmacy: any) => void;
 }
 
 export default function PharmacySearch(props: PharmacyProps) {
@@ -20,7 +21,6 @@ export default function PharmacySearch(props: PharmacyProps) {
   const [address, setAddress] = createSignal(props.address || '');
   const [addressError, setAddressError] = createSignal('');
   const [query, setQuery] = createSignal('');
-  const [location, setLocation] = createSignal<google.maps.GeocoderResult>();
   let geocoder: google.maps.Geocoder | undefined;
 
   onMount(async () => {
@@ -57,10 +57,6 @@ export default function PharmacySearch(props: PharmacyProps) {
         });
   });
 
-  createEffect(() => {
-    console.log('pharmacies', store.pharmacies);
-  });
-
   return (
     <div>
       <Show when={!hasFoundPharmacies()}>
@@ -82,7 +78,7 @@ export default function PharmacySearch(props: PharmacyProps) {
             </div>
           }
         >
-          <ComboBox>
+          <ComboBox setSelected={props?.setPharmacy}>
             <ComboBox.Input onInput={(e) => setQuery((e.target as HTMLInputElement).value)} />
             <ComboBox.Options>
               <For each={filteredPharmacies()}>
