@@ -115,9 +115,9 @@ export const PatientAddressCard = ({
                 <FormLabel htmlFor="address.postalCode">Zip Code</FormLabel>
                 <LoadingInputField
                   name="address.postalCode"
-                  maxLength={5}
+                  maxLength={10}
                   onChange={(e: any) => {
-                    if (/^[0-9]+$/.test(e.target.value) || e.target.value === '') {
+                    if (/^[0-9-]+$/.test(e.target.value) || e.target.value === '') {
                       setFieldValue('address.postalCode', e.target.value);
                     }
                   }}

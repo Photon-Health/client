@@ -59,9 +59,7 @@ const orderSchema = yup.object({
       postalCode: yup
         .string()
         .required('Please enter a zip code...')
-        .matches(/^[0-9]+$/, 'Must be only digits')
-        .min(5, 'Must be exactly 5 digits')
-        .max(5, 'Must be exactly 5 digits'),
+        .matches(/^\d{5}(-\d{4})?$/, 'Must be a valid zip code...'),
       country: yup.string().required('Please enter a country...'),
       state: yup.string().required('Please enter a state...'),
       city: yup.string().required('Please enter a city...')
