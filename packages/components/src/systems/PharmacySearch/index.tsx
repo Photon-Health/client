@@ -18,6 +18,7 @@ export interface PharmacyProps {
 export default function PharmacySearch(props: PharmacyProps) {
   const client = usePhoton();
   const { store, actions } = PharmacyStore;
+  const [selected, setSelected] = createSignal<any>();
   const [address, setAddress] = createSignal(props.address || '');
   const [addressError, setAddressError] = createSignal('');
   const [query, setQuery] = createSignal('');
@@ -57,11 +58,22 @@ export default function PharmacySearch(props: PharmacyProps) {
         });
   });
 
+  createEffect(() => {
+    if (selected()?.id) {
+      setQuery('');
+      props?.setPharmacy?.(selected());
+    }
+  });
+
   return (
     <div>
       <Show when={!hasFoundPharmacies()}>
         <form onSubmit={handleAddressSubmit}>
-          <InputGroup label="Enter an address or zip code" error={addressError()}>
+          <InputGroup
+            label="Enter an address or zip code"
+            error={addressError()}
+            loading={store.pharmacies?.isLoading || false}
+          >
             <Input type="text" value={address()} onInput={(e) => setAddress(e.target?.value)} />
           </InputGroup>
         </form>
@@ -72,13 +84,22 @@ export default function PharmacySearch(props: PharmacyProps) {
           helpText={
             <div>
               Showing Pharmacies near {store?.pharmacies?.address || '...'}{' '}
-              <Button size="xs" variant="secondary" onClick={() => actions.clearPharmacies()}>
+              <Button
+                size="xs"
+                variant="secondary"
+                onClick={() => {
+                  if (props?.setPharmacy) {
+                    props.setPharmacy(undefined);
+                  }
+                  actions.clearPharmacies();
+                }}
+              >
                 change
               </Button>
             </div>
           }
         >
-          <ComboBox setSelected={props?.setPharmacy}>
+          <ComboBox setSelected={setSelected}>
             <ComboBox.Input onInput={(e) => setQuery((e.target as HTMLInputElement).value)} />
             <ComboBox.Options>
               <For each={filteredPharmacies()}>

@@ -52,6 +52,10 @@ export const MultipleInputs: InputGroupStory = {
           <Input placeholder="you@example.com" value="example@example.com" disabled />
         </InputGroup>
 
+        <InputGroup label="Loading Input" loading>
+          <Input placeholder="...fetching" />
+        </InputGroup>
+
         <InputGroup label="Select Name" helpText="So many options">
           <ComboBox>
             <ComboBox.Input onInput={(e) => setQuery((e.target as HTMLInputElement).value)} />
@@ -67,9 +71,9 @@ export const MultipleInputs: InputGroupStory = {
           </ComboBox>
         </InputGroup>
 
-        <InputGroup label="Loading ComboBox">
-          <ComboBox loading>
-            <ComboBox.Input />
+        <InputGroup label="Loading ComboBox" loading>
+          <ComboBox>
+            <ComboBox.Input placeholder="...fetching combo" />
           </ComboBox>
         </InputGroup>
 

@@ -2,16 +2,14 @@
 
 ## Storybook
 
-Referencing this [project](https://github.com/elite174/storybook-solid-js).
-
-To make HMR work for your component you need to render it as JSX:
+Run Storybook and then have a look at `localhost:6006`
 
 ```
-// Correct! HMR works!
-// Let's assume that this is storybook meta object
-export default {
-  // ...
-  render: (props) => <Counter {...props} />,
-  // ...
-} as Meta<ComponentProps<typeof Counter>>;
+npm run storybook
+```
+
+Run the local app to see the pharmacy search in action at `localhost:3000`
+
+```
+npm run start
 ```

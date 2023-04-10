@@ -10,7 +10,7 @@ export const Default: SpinnerStory = {
   }
 };
 
-export const MultipleInputs: SpinnerStory = {
+export const MultipleSpinners: SpinnerStory = {
   // @ts-ignore
   render: () => (
     <div class="flex gap-4">

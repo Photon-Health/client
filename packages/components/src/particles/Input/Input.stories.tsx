@@ -13,6 +13,19 @@ export const Default: InputStory = {
   }
 };
 
+export const InputOptions: InputStory = {
+  // @ts-ignore
+  render: () => {
+    return (
+      <div class="flex flex-col gap-8" style={{ 'max-width': '500px' }}>
+        <Input type="text" placeholder="text" />
+        <Input type="email" placeholder="email" />
+        <Input type="text" placeholder="...loading" loading />
+      </div>
+    );
+  }
+};
+
 export default {
   title: 'Input',
   tags: ['autodocs'],

@@ -16,12 +16,12 @@ import Input, { InputProps } from '../Input';
 import { createStore } from 'solid-js/store';
 import clsx from 'clsx';
 import Spinner from '../Spinner';
+import { useInputGroup } from '../InputGroup';
 
 interface ComboBoxState {
   open: boolean;
   selected: { id: string; value: string } | {};
   active: string;
-  loading: boolean;
   typing: boolean;
 }
 
@@ -29,19 +29,17 @@ interface ComboBoxActions {
   setOpen: (open: boolean) => void;
   setSelected: (selected: any) => void;
   setActive: (active: string) => void;
-  setLoading: (loading: boolean) => void;
   setTyping: (typing: boolean) => void;
 }
 
 type ComboBoxContextValue = [ComboBoxState, ComboBoxActions];
 
 export const ComboBoxContext = createContext<ComboBoxContextValue>([
-  { open: false, selected: {}, active: '', loading: false, typing: false },
+  { open: false, selected: {}, active: '', typing: false },
   {
     setOpen: () => {},
     setSelected: () => {},
     setActive: () => {},
-    setLoading: () => {},
     setTyping: () => {}
   }
 ]);
@@ -51,7 +49,6 @@ export function ComboBoxProvider(props: { children?: JSX.Element }) {
     open: false,
     selected: {},
     active: '',
-    loading: false,
     typing: false
   });
   const comboBox: ComboBoxContextValue = [
@@ -65,9 +62,6 @@ export function ComboBoxProvider(props: { children?: JSX.Element }) {
       },
       setActive(active: string) {
         setState('active', active);
-      },
-      setLoading(loading: boolean) {
-        setState('loading', loading);
       },
       setTyping(typing: boolean) {
         setState('typing', typing);
@@ -136,7 +130,8 @@ function ComboOption(props: ComboOptionProps) {
 }
 
 function ComboInput(props: InputProps) {
-  const [state, { setOpen }] = useContext(ComboBoxContext);
+  const [comboState, { setOpen }] = useComboBox();
+  const [inputGroupState] = useInputGroup();
   const [local, restInput] = splitProps(props, ['onInput', 'value']);
   const [selectedLocalValue, setLocalSelectedValue] = createSignal('');
   let inputContainer: HTMLElement;
@@ -148,14 +143,14 @@ function ComboInput(props: InputProps) {
   });
 
   createEffect(() => {
-    if (state.selected?.value) {
-      setLocalSelectedValue(state.selected.value);
+    if (comboState.selected?.value) {
+      setLocalSelectedValue(comboState.selected.value);
     }
-    if (state.typing) {
+    if (comboState.typing) {
       setLocalSelectedValue('');
     }
-    if (!state.open) {
-      setLocalSelectedValue(state.selected?.value || '');
+    if (!comboState.open) {
+      setLocalSelectedValue(comboState.selected?.value || '');
     }
   });
 
@@ -165,7 +160,7 @@ function ComboInput(props: InputProps) {
         <Input
           {...restInput}
           value={selectedLocalValue()}
-          onClick={() => setOpen(!state.open)}
+          onClick={() => setOpen(!comboState.open)}
           onInput={(e) => {
             // @ts-ignore
             local?.onInput(e);
@@ -176,9 +171,9 @@ function ComboInput(props: InputProps) {
       </div>
       <button
         class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
-        onClick={() => setOpen(!state.open)}
+        onClick={() => setOpen(!comboState.open)}
       >
-        <Show when={!state.loading} fallback={<Spinner size="sm" />}>
+        <Show when={!inputGroupState.loading}>
           <Icon path={chevronUpDown} class="h-5 w-5 text-gray-400" />
         </Show>
       </button>
@@ -195,15 +190,7 @@ export interface ComboBoxProps {
 }
 
 function ComboBoxWrapper(props: ComboBoxProps) {
-  const [state, { setLoading }] = useContext(ComboBoxContext);
-
-  onMount(() => {
-    setLoading(props.loading || false);
-  });
-
-  createEffect(() => {
-    setLoading(props.loading || false);
-  });
+  const [state] = useComboBox();
 
   createEffect(() => {
     if (props.setSelected) {
