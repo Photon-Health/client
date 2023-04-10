@@ -35,6 +35,11 @@ export const numericString = () =>
     return /^\d+$/.test(value as string);
   });
 
+export const zipString = () =>
+  refine(string(), 'zipString', (value) => {
+    return /^\d{5}(-\d{4})?$/.test(value as string);
+  });
+
 export const email = () =>
   refine(string(), 'email', (value) => {
     if (value.length === 0) {
