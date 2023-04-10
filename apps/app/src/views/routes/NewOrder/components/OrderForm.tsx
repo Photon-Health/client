@@ -229,7 +229,7 @@ export const OrderForm = ({
         }
       }}
     >
-      {({ values, setFieldValue, handleSubmit, dirty, errors, touched }) => {
+      {({ values, setFieldValue, handleSubmit, dirty, errors, touched, setTouched }) => {
         return (
           <form onSubmit={handleSubmit} noValidate id="order-form">
             <ModalCloseButton
@@ -263,6 +263,7 @@ export const OrderForm = ({
                 setShowAddress={setShowAddress}
                 updateAddress={updateAddress}
                 setUpdateAddress={setUpdateAddress}
+                setTouched={setTouched}
               />
 
               <SelectPharmacyCard

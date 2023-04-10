@@ -21,6 +21,7 @@ import { LoadingInputField } from '../../../components/LoadingInputField';
 import { formatAddress } from '../../../../utils';
 
 import { Address } from '../../../../models/general';
+import { useEffect } from 'react';
 
 interface PatientAddressCardProps {
   address: Address;
@@ -32,6 +33,7 @@ interface PatientAddressCardProps {
   setShowAddress: any;
   updateAddress: boolean;
   setUpdateAddress: (value: boolean) => void;
+  setTouched: (fields: { [field: string]: boolean }, shouldValidate?: boolean) => void;
 }
 
 export const PatientAddressCard = ({
@@ -44,7 +46,23 @@ export const PatientAddressCard = ({
   setShowAddress,
   updateAddress,
   setUpdateAddress
+  setUpdateAddress,
+  setTouched
 }: PatientAddressCardProps) => {
+  useEffect(() => {
+    const errorKeys = Object.keys(errors?.address || {});
+    if (errorKeys?.length > 0 && !showAddress) {
+      setShowAddress(true);
+      setTouched({
+        ...touched,
+        address: errorKeys.reduce((acc: { [key: string]: boolean }, key) => {
+          acc[key] = true;
+          return acc;
+        }, {})
+      });
+    }
+  }, [errors]);
+
   return (
     <Card bg="bg-surface">
       <CardHeader>
