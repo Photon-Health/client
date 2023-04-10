@@ -4,16 +4,6 @@ import { randomNames } from './sampleData/randomNames';
 import Client from './systems/Client';
 
 const App = () => {
-  const [value, setValue] = createSignal(false);
-  const [query, setQuery] = createSignal('');
-  const filteredPeople = createMemo(() => {
-    return query() === ''
-      ? randomNames
-      : randomNames.filter((person) => {
-          return person.name.toLowerCase().includes(query().toLowerCase());
-        });
-  });
-
   return (
     <Client
       id="7N9QZujlNJHL8EIPqXpu1wq8OuXqoxKb"

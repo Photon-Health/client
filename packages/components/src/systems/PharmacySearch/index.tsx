@@ -6,6 +6,7 @@ import { PharmacyStore } from '../../stores/pharmacy';
 import { usePhoton } from '../../context';
 import ComboBox from '../../particles/ComboBox';
 import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter';
+import Button from '../../particles/Button';
 
 export interface PharmacyProps {
   address?: string;
@@ -18,6 +19,7 @@ export default function PharmacySearch(props: PharmacyProps) {
   const { store, actions } = PharmacyStore;
   const [address, setAddress] = createSignal(props.address || '');
   const [addressError, setAddressError] = createSignal('');
+  const [query, setQuery] = createSignal('');
   const [location, setLocation] = createSignal<google.maps.GeocoderResult>();
   let geocoder: google.maps.Geocoder | undefined;
 
@@ -43,6 +45,22 @@ export default function PharmacySearch(props: PharmacyProps) {
 
   const hasFoundPharmacies = createMemo(() => store.pharmacies.data.length > 0);
 
+  const filteredPharmacies = createMemo(() => {
+    if (!hasFoundPharmacies()) {
+      return [];
+    }
+
+    return query() === ''
+      ? store.pharmacies.data
+      : store.pharmacies.data.filter((pharmacy) => {
+          return pharmacy.name.toLowerCase().includes(query().toLowerCase());
+        });
+  });
+
+  createEffect(() => {
+    console.log('pharmacies', store.pharmacies);
+  });
+
   return (
     <div>
       <Show when={!hasFoundPharmacies()}>
@@ -53,11 +71,21 @@ export default function PharmacySearch(props: PharmacyProps) {
         </form>
       </Show>
       <Show when={hasFoundPharmacies()}>
-        <InputGroup label="Select a pharmacy">
+        <InputGroup
+          label="Select a pharmacy"
+          helpText={
+            <div>
+              Showing Pharmacies near {store?.pharmacies?.address || '...'}{' '}
+              <Button size="xs" variant="secondary" onClick={() => actions.clearPharmacies()}>
+                change
+              </Button>
+            </div>
+          }
+        >
           <ComboBox>
-            <ComboBox.Input />
+            <ComboBox.Input onInput={(e) => setQuery((e.target as HTMLInputElement).value)} />
             <ComboBox.Options>
-              <For each={store.pharmacies.data}>
+              <For each={filteredPharmacies()}>
                 {(pharmacy) => {
                   const formattedAddress = `${capitalizeFirstLetter(
                     pharmacy.address?.street1 || ''
@@ -78,6 +106,7 @@ export default function PharmacySearch(props: PharmacyProps) {
             </ComboBox.Options>
           </ComboBox>
         </InputGroup>
+        <div></div>
       </Show>
     </div>
   );

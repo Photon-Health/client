@@ -5,7 +5,7 @@ export interface InputGroupProps {
   label: string;
   error?: string;
   contextText?: string;
-  helpText?: string;
+  helpText?: string | JSX.Element;
   disabled?: boolean;
   children?: JSX.Element;
 }
