@@ -1,9 +1,7 @@
-import { For, createMemo, createSignal } from 'solid-js';
-import Input from './particles/Input';
-import InputGroup from './particles/InputGroup';
-import Spinner from './particles/Spinner';
+import { createMemo, createSignal } from 'solid-js';
+import PharmacySearch from './systems/PharmacySearch';
 import { randomNames } from './sampleData/randomNames';
-import ComboBox from './particles/ComboBox';
+import Client from './systems/Client';
 
 const App = () => {
   const [value, setValue] = createSignal(false);
@@ -17,40 +15,19 @@ const App = () => {
   });
 
   return (
-    <div class="w-96 p-10">
-      <div class="mb-4">
-        <Spinner />
+    <Client
+      id="7N9QZujlNJHL8EIPqXpu1wq8OuXqoxKb"
+      org="org_KzSVZBQixLRkqj5d"
+      domain="auth.boson.health"
+      audience="https://api.boson.health"
+      uri="https://api.boson.health/graphql"
+    >
+      <div class="p-5" style={{ width: '600px' }}>
+        <div class="p-5 border border-gray-300 rounded-md">
+          <PharmacySearch address="11221" />
+        </div>
       </div>
-      <InputGroup
-        label="Interactive Input"
-        helpText="Type 'yes' to see an error."
-        contextText='Go ahead, try "yes"'
-        error={value() ? 'Yes, there is an error.' : ''}
-      >
-        <Input
-          type="type"
-          placeholder="Are you going to type 'yes'?"
-          onInput={(e) => {
-            setValue((e.target as HTMLInputElement).value === 'yes');
-          }}
-        />
-      </InputGroup>
-
-      <InputGroup label="Combo Box" helpText="Select someone's name">
-        <ComboBox>
-          <ComboBox.Input onInput={(e) => setQuery((e.target as HTMLInputElement).value)} />
-          <ComboBox.Options>
-            <For each={filteredPeople()}>
-              {(person) => (
-                <ComboBox.Option key={person.id} value={person.name}>
-                  {person.name}
-                </ComboBox.Option>
-              )}
-            </For>
-          </ComboBox.Options>
-        </ComboBox>
-      </InputGroup>
-    </div>
+    </Client>
   );
 };
 

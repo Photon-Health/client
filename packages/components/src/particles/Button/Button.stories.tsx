@@ -72,10 +72,9 @@ export default {
     }
   },
   render: (props) => {
-    const { theme, ...rest } = props;
     return (
-      <div class={theme}>
-        <Button {...rest}>Hello</Button>
+      <div>
+        <Button {...props}>Hello</Button>
       </div>
     );
   }
