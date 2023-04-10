@@ -24,7 +24,7 @@ const App = () => {
     >
       <div class="p-5" style={{ width: '600px' }}>
         <div class="p-5 border border-gray-300 rounded-md">
-          <PharmacySearch address="11221" />
+          <PharmacySearch />
         </div>
       </div>
     </Client>

@@ -1,9 +1,11 @@
-import { Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
+import { For, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
 import InputGroup from '../../particles/InputGroup';
 import Input from '../../particles/Input';
 import loadGoogleScript from '../../utils/loadGoogleScript';
 import { PharmacyStore } from '../../stores/pharmacy';
 import { usePhoton } from '../../context';
+import ComboBox from '../../particles/ComboBox';
+import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter';
 
 export interface PharmacyProps {
   address?: string;
@@ -34,29 +36,48 @@ export default function PharmacySearch(props: PharmacyProps) {
     });
   });
 
-  createEffect(() => {
-    console.log(store.pharmacies.data);
-    console.log(location());
-  });
+  const handleAddressSubmit = async (e: Event) => {
+    e.preventDefault();
+    await actions.getPharmaciesByAddress(client!.getSDK(), geocoder!, String(address()));
+  };
 
   const hasFoundPharmacies = createMemo(() => store.pharmacies.data.length > 0);
 
   return (
     <div>
       <Show when={!hasFoundPharmacies()}>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            console.log('handling', address());
-          }}
-        >
+        <form onSubmit={handleAddressSubmit}>
           <InputGroup label="Enter an address or zip code" error={addressError()}>
             <Input type="text" value={address()} onInput={(e) => setAddress(e.target?.value)} />
           </InputGroup>
         </form>
       </Show>
       <Show when={hasFoundPharmacies()}>
-        <div>Location: {location()?.formatted_address}</div>
+        <InputGroup label="Select a pharmacy">
+          <ComboBox>
+            <ComboBox.Input />
+            <ComboBox.Options>
+              <For each={store.pharmacies.data}>
+                {(pharmacy) => {
+                  const formattedAddress = `${capitalizeFirstLetter(
+                    pharmacy.address?.street1 || ''
+                  )}, ${capitalizeFirstLetter(pharmacy.address?.city || '')}, ${
+                    pharmacy.address?.state
+                  }`;
+                  return (
+                    <ComboBox.Option
+                      key={pharmacy.id}
+                      value={`${pharmacy.name}, ${formattedAddress}`}
+                    >
+                      <div>{pharmacy.name}</div>
+                      <div class="text-xs">{formattedAddress}</div>
+                    </ComboBox.Option>
+                  );
+                }}
+              </For>
+            </ComboBox.Options>
+          </ComboBox>
+        </InputGroup>
       </Show>
     </div>
   );
