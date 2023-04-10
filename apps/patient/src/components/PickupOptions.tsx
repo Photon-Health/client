@@ -11,11 +11,12 @@ export const PickupOptions = ({
   handleShowMore,
   loadingMore,
   showingAllPharmacies,
-  isMobile
+  isMobile,
+  courierEnabled
 }) => {
   return (
     <VStack spacing={3} align="span" w="full">
-      {pharmacies?.length > 0 ? (
+      {pharmacies?.length > 0 && courierEnabled ? (
         <SlideFade offsetY="60px" in={true}>
           <VStack spacing={1} align="start">
             <Heading as="h5" size="sm">

@@ -350,6 +350,7 @@ export const Pharmacy = () => {
                 loadingMore={loadingMore}
                 showingAllPharmacies={showingAllPharmacies}
                 isMobile={isMobile}
+                courierEnabled={enableCourier}
               />
             </VStack>
           ) : null}
