@@ -45,7 +45,6 @@ export const PatientAddressCard = ({
   showAddress,
   setShowAddress,
   updateAddress,
-  setUpdateAddress
   setUpdateAddress,
   setTouched
 }: PatientAddressCardProps) => {
