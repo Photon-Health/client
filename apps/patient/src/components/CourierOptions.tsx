@@ -1,4 +1,13 @@
-import { Card, CardBody, Heading, HStack, Image, SlideFade, Text, VStack } from '@chakra-ui/react'
+import {
+  Card,
+  CardBody,
+  Heading,
+  Image,
+  SlideFade,
+  Text,
+  VStack,
+  useBreakpointValue
+} from '@chakra-ui/react'
 
 import t from '../utils/text.json'
 
@@ -20,6 +29,8 @@ export const CourierOptions = ({
   handleSelect,
   patientAddress
 }: Props) => {
+  const isMobile = useBreakpointValue({ base: true, md: false })
+
   if (!location) return null
 
   const courierOptions = [
@@ -33,8 +44,8 @@ export const CourierOptions = ({
   ]
 
   return (
-    <SlideFade offsetY="60px" in={true}>
-      <VStack spacing={3} align="span" w="full">
+    <VStack spacing={3} align="span" w="full">
+      <SlideFade offsetY="60px" in={true}>
         <VStack spacing={1} align="start">
           <Heading as="h5" size="sm">
             {t.pharmacy.courier.heading}
@@ -43,21 +54,23 @@ export const CourierOptions = ({
             {t.pharmacy.courier.subheading} {patientAddress}
           </Text>
         </VStack>
+      </SlideFade>
 
-        {courierOptions.map((ph) => {
-          if (!ph.enabled) return null
-          return (
+      {courierOptions.map((ph) => {
+        if (!ph.enabled) return null
+        return (
+          <SlideFade offsetY="60px" in={true}>
             <Card
               key={`courier-pharmacy-${ph.id}`}
-              w="full"
               bgColor="white"
               cursor="pointer"
               onClick={() => handleSelect(ph.id)}
               border="2px solid"
               borderColor={selectedId === ph.id ? 'brand.600' : 'white'}
+              mx={isMobile ? -3 : undefined}
             >
               <CardBody p={3}>
-                <VStack me="auto" align="start" spacing={2}>
+                <VStack align="start" spacing={2}>
                   <Image src={ph.logo} width="auto" height="25px" />
                   <Text fontSize="sm" color="gray.500">
                     {ph.description}
@@ -65,10 +78,10 @@ export const CourierOptions = ({
                 </VStack>
               </CardBody>
             </Card>
-          )
-        })}
-      </VStack>
-    </SlideFade>
+          </SlideFade>
+        )
+      })}
+    </VStack>
   )
 }
 

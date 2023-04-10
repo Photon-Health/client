@@ -111,6 +111,7 @@ export const Pharmacy = () => {
       const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(loc)
       const patientAddressInAustinTX =
         order?.address?.city === 'Austin' && order?.address?.state === 'TX'
+
       const isMoPed = order?.organization?.id === process.env.REACT_APP_MODERN_PEDIATRICS_ORG_ID
       if (searchingInAustinTX && patientAddressInAustinTX && isMoPed) {
         setEnableCourier(true)
@@ -349,7 +350,6 @@ export const Pharmacy = () => {
                 handleShowMore={handleShowMore}
                 loadingMore={loadingMore}
                 showingAllPharmacies={showingAllPharmacies}
-                isMobile={isMobile}
                 courierEnabled={enableCourier}
               />
             </VStack>
