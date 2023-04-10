@@ -20,7 +20,7 @@ const App = () => {
       </div>
       <div class="p-5" style={{ width: '600px' }}>
         <div class="p-5 border border-gray-300 rounded-md">
-          {pharmacy()?.id ? 'No pharmacy selected' : pharmacy()?.value}
+          {pharmacy()?.id || 'No pharmacy selected'}
         </div>
       </div>
     </Client>
