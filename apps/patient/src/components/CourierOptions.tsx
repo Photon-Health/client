@@ -1,4 +1,4 @@
-import { Card, CardBody, Heading, Image, SlideFade, Text, VStack } from '@chakra-ui/react'
+import { Card, CardBody, Heading, HStack, Image, SlideFade, Text, VStack } from '@chakra-ui/react'
 
 import t from '../utils/text.json'
 
@@ -10,9 +10,16 @@ interface Props {
   location: string
   selectedId: string
   handleSelect: Function
+  patientAddress: string
 }
 
-export const CourierOptions = ({ capsule, location, selectedId, handleSelect }: Props) => {
+export const CourierOptions = ({
+  capsule,
+  location,
+  selectedId,
+  handleSelect,
+  patientAddress
+}: Props) => {
   if (!location) return null
 
   const courierOptions = [
@@ -20,7 +27,7 @@ export const CourierOptions = ({ capsule, location, selectedId, handleSelect }: 
       id: process.env.REACT_APP_CAPSULE_PHARMACY_ID,
       logo: capsuleLogo,
       enabled: capsule,
-      description: 'Specialty medications delivered.'
+      description: 'Free, same-day prescription delivery.'
     }
     // add additional mail order options here
   ]
@@ -32,7 +39,9 @@ export const CourierOptions = ({ capsule, location, selectedId, handleSelect }: 
           <Heading as="h5" size="sm">
             {t.pharmacy.courier.heading}
           </Heading>
-          <Text>{t.pharmacy.courier.subheading}</Text>
+          <Text size="sm">
+            {t.pharmacy.courier.subheading} {patientAddress}
+          </Text>
         </VStack>
 
         {courierOptions.map((ph) => {

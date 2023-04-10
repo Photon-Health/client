@@ -88,6 +88,7 @@ export const Pharmacy = () => {
     setSelectedId('')
     setShowFooter(false)
     setShowingAllPharmacies(false)
+    setEnableCourier(false)
   }
 
   const handleModalClose = ({
@@ -107,9 +108,11 @@ export const Pharmacy = () => {
       setLatitude(lat)
       setLongitude(lng)
 
-      const inAustinTX = /Austin.*(?:TX|Texas)/.test(loc)
+      const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(loc)
+      const patientAddressInAustinTX =
+        order?.address?.city === 'Austin' && order?.address?.state === 'TX'
       const isMoPed = order?.organization?.id === process.env.REACT_APP_MODERN_PEDIATRICS_ORG_ID
-      if (inAustinTX && isMoPed) {
+      if (searchingInAustinTX && patientAddressInAustinTX && isMoPed) {
         setEnableCourier(true)
       }
     }
@@ -285,7 +288,7 @@ export const Pharmacy = () => {
     )
   }
 
-  const { organization } = order
+  const { organization, address } = order
 
   return (
     <Box>
@@ -314,6 +317,7 @@ export const Pharmacy = () => {
                   display="inline"
                   color="brandLink"
                   fontWeight="medium"
+                  size="sm"
                 >
                   <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
                   {location}
@@ -334,6 +338,7 @@ export const Pharmacy = () => {
                   location={location}
                   selectedId={selectedId}
                   handleSelect={handleSelect}
+                  patientAddress={formatAddress(address)}
                 />
               ) : null}
 
