@@ -60,7 +60,7 @@ export const PatientAddressCard = ({
         }, {})
       });
     }
-  }, [errors]);
+  }, [errors, setShowAddress, setTouched, showAddress, touched]);
 
   return (
     <Card bg="bg-surface">
