@@ -38,6 +38,7 @@ export const UNOPEN_BUSINESS_STATUS_MAP = {
 }
 
 const placesService = new google.maps.places.PlacesService(document.createElement('div'))
+const geocoder = new google.maps.Geocoder()
 
 const query = (method, data) =>
   new Promise((resolve, reject) => {
@@ -72,9 +73,9 @@ export const Pharmacy = () => {
   const [loadingMore, setLoadingMore] = useState<boolean>(false)
   const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false)
 
-  const [latitude, setLatitude] = useState<number | undefined>(undefined)
-  const [longitude, setLongitude] = useState<number | undefined>(undefined)
-  const [location, setLocation] = useState<string>('')
+  const [location, setLocation] = useState<string>(
+    order?.address ? formatAddress(order.address) : ''
+  )
 
   const [enableCourier, setEnableCourier] = useState<boolean>(false)
 
@@ -97,33 +98,43 @@ export const Pharmacy = () => {
     lat: number | undefined
     lng: number | undefined
   }) => {
-    if (loc && loc !== location) {
-      reset()
-    }
-    if (lat && lng && loc) {
-      setLocation(loc)
-      setLatitude(lat)
-      setLongitude(lng)
+    if (loc && loc !== location) reset()
+    if (lat && lng && loc) setLocation(loc)
+    setLocationModalOpen(false)
+  }
 
-      const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(loc)
-      const patientAddressInAustinTX =
-        order?.address?.city === 'Austin' && order?.address?.state === 'TX'
-      const isMoPed = order?.organization?.id === process.env.REACT_APP_MODERN_PEDIATRICS_ORG_ID
-      if (searchingInAustinTX && patientAddressInAustinTX && isMoPed) {
-        setEnableCourier(true)
+  const geocode = async (address: string) => {
+    const data = await geocoder.geocode({ address })
+    if (data?.results) {
+      return {
+        loc: data.results[0].formatted_address,
+        lat: data.results[0].geometry.location.lat(),
+        lng: data.results[0].geometry.location.lng()
       }
     }
-    setLocationModalOpen(false)
   }
 
   const fetchPharmacies = async () => {
     setLoadingMore(true)
 
+    const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(location)
+    const patientAddressInAustinTX = true
+    const isMoPed = order?.organization?.id === process.env.REACT_APP_MODERN_PEDIATRICS_ORG_ID
+    if (searchingInAustinTX && patientAddressInAustinTX && isMoPed) {
+      setEnableCourier(true)
+    }
+
     graphQLClient.setHeader('x-photon-auth', token)
 
-    const location = {
-      latitude,
-      longitude,
+    const { loc, lat, lng } = await geocode(location)
+
+    if (!loc || !lat || !lng) return
+
+    setLocation(loc)
+
+    const locationData = {
+      latitude: lat,
+      longitude: lng,
       radius: 25
     }
     const limit = 3
@@ -132,7 +143,11 @@ export const Pharmacy = () => {
     // Get pharmacies from our list
     let pharmaciesResults: any
     try {
-      pharmaciesResults = await graphQLClient.request(GET_PHARMACIES, { location, limit, offset })
+      pharmaciesResults = await graphQLClient.request(GET_PHARMACIES, {
+        location: locationData,
+        limit,
+        offset
+      })
     } catch (error) {
       console.error(JSON.stringify(error, undefined, 2))
       console.log(error)
@@ -271,10 +286,10 @@ export const Pharmacy = () => {
   }
 
   useEffect(() => {
-    if (latitude && longitude) {
+    if (location) {
       fetchPharmacies()
     }
-  }, [latitude, longitude])
+  }, [location])
 
   if (error) {
     return (
