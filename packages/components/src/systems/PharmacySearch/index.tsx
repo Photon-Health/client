@@ -1,4 +1,4 @@
-import { For, Show, createMemo, createSignal, onMount } from 'solid-js';
+import { For, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
 import InputGroup from '../../particles/InputGroup';
 import Input from '../../particles/Input';
 import loadGoogleScript from '../../utils/loadGoogleScript';
@@ -18,6 +18,7 @@ export interface PharmacyProps {
 export default function PharmacySearch(props: PharmacyProps) {
   const client = usePhoton();
   const { store, actions } = PharmacyStore;
+  const [selected, setSelected] = createSignal<any>();
   const [address, setAddress] = createSignal(props.address || '');
   const [addressError, setAddressError] = createSignal('');
   const [query, setQuery] = createSignal('');
@@ -57,6 +58,13 @@ export default function PharmacySearch(props: PharmacyProps) {
         });
   });
 
+  createEffect(() => {
+    if (selected()?.id) {
+      setQuery('');
+      props?.setPharmacy?.(selected());
+    }
+  });
+
   return (
     <div>
       <Show when={!hasFoundPharmacies()}>
@@ -91,7 +99,7 @@ export default function PharmacySearch(props: PharmacyProps) {
             </div>
           }
         >
-          <ComboBox setSelected={props?.setPharmacy}>
+          <ComboBox setSelected={setSelected}>
             <ComboBox.Input onInput={(e) => setQuery((e.target as HTMLInputElement).value)} />
             <ComboBox.Options>
               <For each={filteredPharmacies()}>
