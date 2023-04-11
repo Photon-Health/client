@@ -15,7 +15,7 @@ export default function Button(props: ButtonProps) {
   const buttonClasses = clsx('font-semibold shadow-sm', {
     'rounded-md': ['xl', 'lg', 'md'].includes(merged.size),
     rounded: !['xl', 'lg', 'md'].includes(merged.size),
-    'text-white bg-indigo-600 hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2':
+    'text-white bg-indigo-600 hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:bg-indigo-500':
       merged.variant === 'primary',
     'rounded bg-white text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50':
       merged.variant === 'secondary',
@@ -25,8 +25,7 @@ export default function Button(props: ButtonProps) {
     'text-sm px-2.5 py-1.5': merged.size === 'md',
     'text-sm px-2 py-1': merged.size === 'sm',
     'text-xs px-2 py-1': merged.size === 'xs',
-    'opacity-50 cursor-not-allowed': merged.disabled,
-    'hover:bg-primary500 focus-visible:outline-primary600': !merged.disabled
+    'opacity-50 cursor-not-allowed': merged.disabled
   });
 
   return (
