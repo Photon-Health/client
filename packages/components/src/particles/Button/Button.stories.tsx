@@ -29,7 +29,7 @@ export const ButtonBonanza: Story = {
       <>
         <For each={variants}>
           {(variant) => (
-            <div class="flex items-start gap-8 mb-20">
+            <div class="flex items-start gap-6 mb-10">
               <For each={sizes}>
                 {(size) => (
                   <Button variant={variant} size={size}>
@@ -40,6 +40,15 @@ export const ButtonBonanza: Story = {
             </div>
           )}
         </For>
+        <div class="flex items-start gap-6 mb-10">
+          <For each={variants}>
+            {(variant) => (
+              <Button variant={variant} disabled>
+                Disabled
+              </Button>
+            )}
+          </For>
+        </div>
       </>
     );
   }
