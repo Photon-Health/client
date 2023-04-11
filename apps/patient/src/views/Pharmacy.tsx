@@ -132,7 +132,7 @@ export const Pharmacy = () => {
     const patientAddressInAustinTX =
       order?.address?.city === 'Austin' && order?.address?.state === 'TX'
     const isMoPed = order?.organization?.id === process.env.REACT_APP_MODERN_PEDIATRICS_ORG_ID
-    if (true) {
+    if (searchingInAustinTX && patientAddressInAustinTX && isMoPed) {
       setEnableCourier(true)
     }
 
