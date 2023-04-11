@@ -5,14 +5,6 @@ export const GET_ORDER = gql`
     order(id: $id) {
       id
       state
-      address {
-        street1
-        street2
-        city
-        state
-        country
-        postalCode
-      }
       organization {
         id
         name
