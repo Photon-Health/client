@@ -1,5 +1,15 @@
 import { memo } from 'react'
-import { Card, CardBody, HStack, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@chakra-ui/react'
+import {
+  Card,
+  CardBody,
+  HStack,
+  Tag,
+  TagLabel,
+  TagLeftIcon,
+  Text,
+  VStack,
+  useBreakpointValue
+} from '@chakra-ui/react'
 import { FiRotateCcw, FiStar } from 'react-icons/fi'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -76,15 +86,17 @@ export const PharmacyCard = memo(function PharmacyCard({
   selected,
   onSelect
 }: PharmacyCardProps) {
+  const isMobile = useBreakpointValue({ base: true, md: false })
+
   if (!pharmacy) return null
   return (
     <Card
-      w="full"
       bgColor="white"
       border="2px solid"
       borderColor={selected ? 'brand.600' : 'white'}
       cursor="pointer"
       onClick={() => onSelect()}
+      mx={isMobile ? -3 : undefined}
     >
       <CardBody p={3}>
         <VStack align="start" w="full" spacing={0}>

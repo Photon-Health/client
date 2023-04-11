@@ -28,8 +28,8 @@
       "enter": "Enter a zipcode or address"
     },
     "courier": {
-      "heading": "Courier Delivery",
-      "subheading": "Your prescriptions delivered to your door."
+      "heading": "Delivery",
+      "subheading": "Courier delivery to"
     },
     "pickup": {
       "heading": "Pick Up",
