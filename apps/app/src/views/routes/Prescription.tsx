@@ -10,6 +10,7 @@ import {
   IconButton,
   Stack,
   HStack,
+  Link,
   Table,
   TableContainer,
   Tbody,
@@ -22,7 +23,9 @@ import {
   SkeletonText,
   useBreakpointValue,
   useColorMode,
-  useToast
+  useToast,
+  AlertTitle,
+  AlertDescription
 } from '@chakra-ui/react';
 import { FiCopy } from 'react-icons/fi';
 import { gql, GraphQLClient } from 'graphql-request';
@@ -77,15 +80,6 @@ export const Prescription = () => {
     }
   }, [accessToken]);
 
-  if (error) {
-    return (
-      <Alert status="error">
-        <AlertIcon />
-        {error.message}
-      </Alert>
-    );
-  }
-
   const {
     prescriber,
     patient,
@@ -107,6 +101,30 @@ export const Prescription = () => {
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const tableWidth = useBreakpointValue({ base: 'full', sm: '100%', md: '75%' });
   const { colorMode } = useColorMode();
+
+  if (error || (!loading && !prescription)) {
+    return (
+      <Alert
+        status="warning"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        textAlign="center"
+        height="200px"
+      >
+        <AlertIcon />
+        <AlertTitle mt={4} mb={1} fontSize="lg">
+          Unknown Prescription
+        </AlertTitle>
+        <AlertDescription maxWidth="sm">
+          <div>Looks like we can't find a prescription with that ID.</div>
+          <Link textDecoration="underline" fontSize="md" href="/prescriptions">
+            Go back to prescriptions.
+          </Link>
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <Page kicker="Prescription" header={prescription?.treatment.name} loading={loading}>
