@@ -59,9 +59,8 @@ export const CourierOptions = ({
       {courierOptions.map((ph) => {
         if (!ph.enabled) return null
         return (
-          <SlideFade offsetY="60px" in={true}>
+          <SlideFade offsetY="60px" in={true} key={`courier-pharmacy-${ph.id}`}>
             <Card
-              key={`courier-pharmacy-${ph.id}`}
               bgColor="white"
               cursor="pointer"
               onClick={() => handleSelect(ph.id)}

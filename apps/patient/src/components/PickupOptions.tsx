@@ -19,7 +19,6 @@ export const PickupOptions = ({
   handleShowMore,
   loadingMore,
   showingAllPharmacies,
-
   courierEnabled
 }) => {
   const isMobile = useBreakpointValue({ base: true, md: false })
@@ -44,7 +43,7 @@ export const PickupOptions = ({
         </SlideFade>
       ) : null}
 
-      <VStack align="span" spacing={3}>
+      <VStack align="span" spacing={2}>
         {pharmacies.map((pharmacy: Pharmacy, i: number) => (
           <SlideFade offsetY="60px" in={true} key={`pickup-pharmacy-${pharmacy.id}-${i}`}>
             <PharmacyCard

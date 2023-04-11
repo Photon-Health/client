@@ -76,6 +76,8 @@ export const Pharmacy = () => {
   const [location, setLocation] = useState<string>(
     order?.address ? formatAddress(order.address) : ''
   )
+  const [latitude, setLatitude] = useState<number | undefined>(undefined)
+  const [longitude, setLongitude] = useState<number | undefined>(undefined)
 
   const [enableCourier, setEnableCourier] = useState<boolean>(false)
 
@@ -98,8 +100,16 @@ export const Pharmacy = () => {
     lat: number | undefined
     lng: number | undefined
   }) => {
-    if (loc && loc !== location) reset()
-    if (lat && lng && loc) setLocation(loc)
+    // Reset view if search location changes
+    if (loc && loc !== location) {
+      if (lat && lng) {
+        reset()
+        setLocation(loc)
+        setLatitude(lat)
+        setLongitude(lng)
+      }
+    }
+
     setLocationModalOpen(false)
   }
 
@@ -117,21 +127,34 @@ export const Pharmacy = () => {
   const fetchPharmacies = async () => {
     setLoadingMore(true)
 
+    // Courier option limited to MoPed in Austin, TX
     const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(location)
-    const patientAddressInAustinTX = true
+    const patientAddressInAustinTX =
+      order?.address?.city === 'Austin' && order?.address?.state === 'TX'
     const isMoPed = order?.organization?.id === process.env.REACT_APP_MODERN_PEDIATRICS_ORG_ID
-    if (searchingInAustinTX && patientAddressInAustinTX && isMoPed) {
+    if (true) {
       setEnableCourier(true)
     }
 
-    graphQLClient.setHeader('x-photon-auth', token)
+    // On initializing, we won't have lat/lng
+    let loc: string = location
+    let lat: number = latitude
+    let lng: number = longitude
+    if (!lat || !lng) {
+      const geo = await geocode(location)
+      if (!geo) return
 
-    const { loc, lat, lng } = await geocode(location)
+      loc = geo.loc
+      lat = geo.lat
+      lng = geo.lng
 
-    if (!loc || !lat || !lng) return
+      // Save location data for show more pharmacies
+      setLocation(loc)
+      setLatitude(lat)
+      setLongitude(lng)
+    }
 
-    setLocation(loc)
-
+    // Get pharmacies from our internal list
     const locationData = {
       latitude: lat,
       longitude: lng,
@@ -140,7 +163,8 @@ export const Pharmacy = () => {
     const limit = 3
     const offset = pharmacyOptions.length
 
-    // Get pharmacies from our list
+    graphQLClient.setHeader('x-photon-auth', token)
+
     let pharmaciesResults: any
     try {
       pharmaciesResults = await graphQLClient.request(GET_PHARMACIES, {
@@ -159,21 +183,20 @@ export const Pharmacy = () => {
 
     if (pharmaciesResults?.pharmaciesByLocation.length > 0) {
       for (let i = 0; i < pharmaciesResults.pharmaciesByLocation.length; i++) {
+        // Search for google place
         const name = pharmaciesResults.pharmaciesByLocation[i].name
         const address = pharmaciesResults.pharmaciesByLocation[i].address
           ? formatAddress(pharmaciesResults.pharmaciesByLocation[i].address)
           : ''
-
         const placeRequest = {
           query: name + ' ' + address,
           fields: ['place_id']
         }
 
-        // Search for google place
-        let place, placeStatus
+        let placeId, placeStatus
         try {
           const { response, status }: any = await query('findPlaceFromQuery', placeRequest)
-          place = response
+          placeId = response[0]?.place_id
           placeStatus = status
         } catch (error) {
           console.error(JSON.stringify(error, undefined, 2))
@@ -183,9 +206,10 @@ export const Pharmacy = () => {
         }
 
         // Search for google place details
-        if (placeStatus === 'OK' && place[0].place_id) {
+        if (placeStatus === 'OK' && placeId) {
           const detailsRequest = {
-            placeId: place[0].place_id,
+            placeId,
+            // 'getDetails' requires utc_offset_minutes to provide isOpen()
             fields: ['opening_hours', 'utc_offset_minutes', 'rating', 'business_status']
           }
           const { response: details, status: detailsStatus }: any = await query(
