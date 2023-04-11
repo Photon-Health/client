@@ -6,27 +6,29 @@ export interface InputGroupProps {
   error?: string;
   contextText?: string;
   helpText?: string | JSX.Element;
-  disabled?: boolean;
   children?: JSX.Element;
   loading?: boolean;
+  disabled?: boolean;
 }
 
 interface InputGroupState {
   id: string;
   error: string;
   loading: boolean;
+  disabled: boolean;
 }
 
 interface InputGroupActions {
   setError: (error: string) => void;
   setLoading: (loading: boolean) => void;
+  setDisabled: (disabled: boolean) => void;
 }
 
 type InputGroupContextValue = [InputGroupState, InputGroupActions];
 
 export const InputGroupContext = createContext<InputGroupContextValue>([
-  { id: '', error: '', loading: false },
-  { setError: () => {}, setLoading: () => {} }
+  { id: '', error: '', loading: false, disabled: false },
+  { setError: () => {}, setLoading: () => {}, setDisabled: () => {} }
 ]);
 
 interface CounterProviderProps {
@@ -38,7 +40,8 @@ export function InputGroupProvider(props: CounterProviderProps) {
   const [state, setState] = createStore<InputGroupState>({
     id: `input-${createUniqueId()}`,
     error: props.error || '',
-    loading: false
+    loading: false,
+    disabled: false
   });
   const inputGroup: InputGroupContextValue = [
     state,
@@ -48,6 +51,9 @@ export function InputGroupProvider(props: CounterProviderProps) {
       },
       setLoading(loading: boolean) {
         setState('loading', loading);
+      },
+      setDisabled(disabled: boolean) {
+        setState('disabled', disabled);
       }
     }
   ];
@@ -62,7 +68,7 @@ export function useInputGroup() {
 }
 
 function InputGroupWrapper(props: InputGroupProps) {
-  const [state, { setError, setLoading }] = useContext(InputGroupContext);
+  const [state, { setError, setLoading, setDisabled }] = useContext(InputGroupContext);
   const ariaDescribedBy = props.error
     ? `${state.id}-error`
     : props.helpText
@@ -75,6 +81,10 @@ function InputGroupWrapper(props: InputGroupProps) {
 
   createEffect(() => {
     setLoading(props.loading || false);
+  });
+
+  createEffect(() => {
+    setDisabled(props.disabled || false);
   });
 
   return (

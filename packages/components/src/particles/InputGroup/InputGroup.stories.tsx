@@ -71,9 +71,9 @@ export const MultipleInputs: InputGroupStory = {
           </ComboBox>
         </InputGroup>
 
-        <InputGroup label="Loading ComboBox">
-          <ComboBox loading>
-            <ComboBox.Input />
+        <InputGroup label="Loading ComboBox" loading>
+          <ComboBox>
+            <ComboBox.Input placeholder="...fetching combo" />
           </ComboBox>
         </InputGroup>
 
