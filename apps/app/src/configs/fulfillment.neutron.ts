@@ -66,7 +66,18 @@ export const fulfillmentSettings: FulfillmentSettings = {
     pickUp: true,
     mailOrder: false,
     mailOrderProviders: [],
-    sendToPatient: true, // enabled for org
+    sendToPatient: true,
+    sendToPatientUsers: []
+  },
+  // MisterRx
+  [process.env.REACT_APP_MISTERRX_ORG_ID as string]: {
+    sendOrder: true,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [
+      ...(process.env.REACT_APP_CUREXA_ORG_ID ? [process.env.REACT_APP_CUREXA_ORG_ID] : [])
+    ],
+    sendToPatient: false,
     sendToPatientUsers: []
   }
 };
