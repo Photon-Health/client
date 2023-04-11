@@ -37,6 +37,11 @@ export const settings = {
     [process.env.REACT_APP_RADISH_HEALTH_ORG_ID as string]: {
       logo: 'red_radish_logo.svg',
       accentColor: '#ba4a71'
+    },
+    // River Health
+    [process.env.REACT_APP_RIVER_HEALTH_ORG_ID as string]: {
+      logo: 'river_health_logo.svg',
+      accentColor: '#2faef3'
     }
   }
 }

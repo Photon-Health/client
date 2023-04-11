@@ -1,12 +1,4 @@
-import {
-  Button,
-  Heading,
-  HStack,
-  SlideFade,
-  Text,
-  VStack,
-  useBreakpointValue
-} from '@chakra-ui/react'
+import { Button, Heading, HStack, SlideFade, Text, VStack } from '@chakra-ui/react'
 
 import { PharmacyCard } from './PharmacyCard'
 import t from '../utils/text.json'
@@ -19,13 +11,11 @@ export const PickupOptions = ({
   handleShowMore,
   loadingMore,
   showingAllPharmacies,
-  courierEnabled
+  isMobile
 }) => {
-  const isMobile = useBreakpointValue({ base: true, md: false })
-
   return (
     <VStack spacing={3} align="span" w="full">
-      {pharmacies?.length > 0 && courierEnabled ? (
+      {pharmacies?.length > 0 ? (
         <SlideFade offsetY="60px" in={true}>
           <VStack spacing={1} align="start">
             <Heading as="h5" size="sm">
@@ -43,7 +33,7 @@ export const PickupOptions = ({
         </SlideFade>
       ) : null}
 
-      <VStack align="span" spacing={2}>
+      <VStack align="span" spacing={3}>
         {pharmacies.map((pharmacy: Pharmacy, i: number) => (
           <SlideFade offsetY="60px" in={true} key={`pickup-pharmacy-${pharmacy.id}-${i}`}>
             <PharmacyCard
