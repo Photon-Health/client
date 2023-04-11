@@ -3,6 +3,7 @@ import { Icon } from 'solid-heroicons';
 import { envelope } from 'solid-heroicons/solid';
 import clsx from 'clsx';
 import { useInputGroup } from '../InputGroup';
+import Spinner from '../Spinner';
 
 export interface InputProps extends JSX.InputHTMLAttributes<HTMLInputElement> {
   error?: boolean;
@@ -36,6 +37,11 @@ export default function Input(props: InputProps) {
           </div>
         </Show>
         <input id={state?.id} {...inputProps} class={inputClass()} />
+        <Show when={state.loading}>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pl-3">
+            <Spinner size="sm" />
+          </div>
+        </Show>
       </div>
     </>
   );

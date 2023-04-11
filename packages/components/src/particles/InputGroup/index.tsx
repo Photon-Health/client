@@ -8,22 +8,25 @@ export interface InputGroupProps {
   helpText?: string | JSX.Element;
   disabled?: boolean;
   children?: JSX.Element;
+  loading?: boolean;
 }
 
 interface InputGroupState {
   id: string;
   error: string;
+  loading: boolean;
 }
 
 interface InputGroupActions {
   setError: (error: string) => void;
+  setLoading: (loading: boolean) => void;
 }
 
 type InputGroupContextValue = [InputGroupState, InputGroupActions];
 
 export const InputGroupContext = createContext<InputGroupContextValue>([
-  { id: '', error: '' },
-  { setError: () => {} }
+  { id: '', error: '', loading: false },
+  { setError: () => {}, setLoading: () => {} }
 ]);
 
 interface CounterProviderProps {
@@ -34,13 +37,17 @@ interface CounterProviderProps {
 export function InputGroupProvider(props: CounterProviderProps) {
   const [state, setState] = createStore<InputGroupState>({
     id: `input-${createUniqueId()}`,
-    error: props.error || ''
+    error: props.error || '',
+    loading: false
   });
   const inputGroup: InputGroupContextValue = [
     state,
     {
       setError(error: string) {
         setState('error', error);
+      },
+      setLoading(loading: boolean) {
+        setState('loading', loading);
       }
     }
   ];
@@ -55,7 +62,7 @@ export function useInputGroup() {
 }
 
 function InputGroupWrapper(props: InputGroupProps) {
-  const [state, { setError }] = useContext(InputGroupContext);
+  const [state, { setError, setLoading }] = useContext(InputGroupContext);
   const ariaDescribedBy = props.error
     ? `${state.id}-error`
     : props.helpText
@@ -64,6 +71,10 @@ function InputGroupWrapper(props: InputGroupProps) {
 
   createEffect(() => {
     setError(props.error || '');
+  });
+
+  createEffect(() => {
+    setLoading(props.loading || false);
   });
 
   return (

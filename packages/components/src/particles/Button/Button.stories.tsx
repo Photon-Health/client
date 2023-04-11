@@ -2,6 +2,7 @@ import Button, { ButtonProps, ButtonVariant, ButtonSize } from '../Button';
 import { For } from 'solid-js/web';
 import type { Meta, StoryObj } from '@storybook/html';
 import type { ComponentProps } from 'solid-js';
+import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter';
 
 type Theme = {
   theme: 'theme-photon' | 'theme-weekend';
@@ -33,7 +34,7 @@ export const ButtonBonanza: Story = {
               <For each={sizes}>
                 {(size) => (
                   <Button variant={variant} size={size}>
-                    Button Text
+                    {capitalizeFirstLetter(variant)} {capitalizeFirstLetter(size)} Button
                   </Button>
                 )}
               </For>

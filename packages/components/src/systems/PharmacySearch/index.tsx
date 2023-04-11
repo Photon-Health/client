@@ -1,4 +1,4 @@
-import { For, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
+import { For, Show, createMemo, createSignal, onMount } from 'solid-js';
 import InputGroup from '../../particles/InputGroup';
 import Input from '../../particles/Input';
 import loadGoogleScript from '../../utils/loadGoogleScript';
@@ -61,7 +61,11 @@ export default function PharmacySearch(props: PharmacyProps) {
     <div>
       <Show when={!hasFoundPharmacies()}>
         <form onSubmit={handleAddressSubmit}>
-          <InputGroup label="Enter an address or zip code" error={addressError()}>
+          <InputGroup
+            label="Enter an address or zip code"
+            error={addressError()}
+            loading={store.pharmacies?.isLoading || false}
+          >
             <Input type="text" value={address()} onInput={(e) => setAddress(e.target?.value)} />
           </InputGroup>
         </form>
@@ -72,7 +76,16 @@ export default function PharmacySearch(props: PharmacyProps) {
           helpText={
             <div>
               Showing Pharmacies near {store?.pharmacies?.address || '...'}{' '}
-              <Button size="xs" variant="secondary" onClick={() => actions.clearPharmacies()}>
+              <Button
+                size="xs"
+                variant="secondary"
+                onClick={() => {
+                  if (props?.setPharmacy) {
+                    props.setPharmacy(undefined);
+                  }
+                  actions.clearPharmacies();
+                }}
+              >
                 change
               </Button>
             </div>

@@ -13,6 +13,18 @@ export const Default: InputStory = {
   }
 };
 
+export const InputOptions: InputStory = {
+  // @ts-ignore
+  render: () => {
+    return (
+      <>
+        <Input type="text" placeholder="text" />
+        <Input type="email" placeholder="email" />
+      </>
+    );
+  }
+};
+
 export default {
   title: 'Input',
   tags: ['autodocs'],
