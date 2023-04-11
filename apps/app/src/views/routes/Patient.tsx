@@ -3,6 +3,8 @@ import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   Alert,
   AlertIcon,
+  AlertTitle,
+  AlertDescription,
   Badge,
   Box,
   Button,
@@ -63,21 +65,6 @@ export const Patient = () => {
     UNKNOWN: 'Unknown'
   };
 
-  if (error) {
-    return (
-      <Alert status="error">
-        <AlertIcon />
-        {error.message}
-      </Alert>
-    );
-  }
-
-  useEffect(() => {
-    if (!loading && !patient) {
-      navigate('/patients');
-    }
-  }, [patient, loading, navigate]);
-
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const tableWidth = useBreakpointValue({ base: 'full', sm: '100%', md: '75%' });
 
@@ -89,6 +76,30 @@ export const Patient = () => {
     };
     refetchData();
   }, [id]);
+
+  if (error || (!loading && !patient)) {
+    return (
+      <Alert
+        status="warning"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        textAlign="center"
+        height="200px"
+      >
+        <AlertIcon />
+        <AlertTitle mt={4} mb={1} fontSize="lg">
+          Unknown Patient
+        </AlertTitle>
+        <AlertDescription maxWidth="sm">
+          <div>Looks like we can't find a patient with that ID. </div>
+          <Link textDecoration="underline" fontSize="md" href="/patients">
+            Go back to patients.
+          </Link>
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <Page loading={loading} kicker="Patient" header={patient?.name.full}>

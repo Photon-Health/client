@@ -2,7 +2,9 @@ import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import {
   Alert,
+  AlertDescription,
   AlertIcon,
+  AlertTitle,
   Badge,
   Button,
   Divider,
@@ -111,15 +113,6 @@ export const Order = () => {
     }
   }, [accessToken]);
 
-  if (error) {
-    return (
-      <Alert status="error">
-        <AlertIcon />
-        {error.message}
-      </Alert>
-    );
-  }
-
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const rightColWidth = '75%';
   const { colorMode } = useColorMode();
@@ -152,6 +145,30 @@ export const Order = () => {
       </HStack>
     );
   };
+
+  if (error || (!loading && !order)) {
+    return (
+      <Alert
+        status="warning"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        textAlign="center"
+        height="200px"
+      >
+        <AlertIcon />
+        <AlertTitle mt={4} mb={1} fontSize="lg">
+          Unknown Order
+        </AlertTitle>
+        <AlertDescription maxWidth="sm">
+          <div>Looks like we can't find an order with that ID. </div>
+          <Link textDecoration="underline" fontSize="md" href="/orders">
+            Go back to orders.
+          </Link>
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <Page kicker="Order" header={order ? formatFills(order.fills) : ''} loading={loading}>
