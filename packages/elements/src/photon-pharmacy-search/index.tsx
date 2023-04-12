@@ -259,9 +259,9 @@ customElement(
             isLoading={store.pharmacies.isLoading || store.selectedPharmacy.isLoading}
             hasMore={false}
             displayAccessor={(p) =>
-              `${p.name}, ${toTitleCase(p.address?.street1 || '')}, ${toTitleCase(
-                p.address?.city || ''
-              )}, ${p.address?.state || ''}`
+              `${p?.name || ''}, ${toTitleCase(p?.address?.street1 || '')}, ${toTitleCase(
+                p?.address?.city || ''
+              )}, ${p?.address?.state || ''}`
             }
             showOverflow={true}
             onSearchChange={async (s: string) => {

@@ -1,5 +1,5 @@
 import { useParams, Link as RouterLink } from 'react-router-dom';
-
+import { useState, useEffect } from 'react';
 import { usePhoton } from '@photonhealth/react';
 import {
   Alert,
@@ -10,6 +10,7 @@ import {
   IconButton,
   Stack,
   HStack,
+  Link,
   Table,
   TableContainer,
   Tbody,
@@ -20,35 +21,64 @@ import {
   Skeleton,
   SkeletonCircle,
   SkeletonText,
-  useBreakpointValue
+  useBreakpointValue,
+  useColorMode,
+  useToast,
+  AlertTitle,
+  AlertDescription
 } from '@chakra-ui/react';
 import { FiCopy } from 'react-icons/fi';
-import { Page } from '../components/Page';
+import { gql, GraphQLClient } from 'graphql-request';
 
 import { formatDate } from '../../utils';
 
 import { PRESCRIPTION_COLOR_MAP, PRESCRIPTION_STATE_MAP } from './Prescriptions';
 
+import { Page } from '../components/Page';
+import { confirmWrapper } from '../components/GuardDialog';
 import PatientView from '../components/PatientView';
 import NameView from '../components/NameView';
 
+export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
+  jsonSerializer: {
+    parse: JSON.parse,
+    stringify: JSON.stringify
+  }
+});
+
+export const CANCEL_PRESCRIPTION = gql`
+  mutation cancel($id: ID!) {
+    cancelPrescription(id: $id) {
+      id
+    }
+  }
+`;
+
 export const Prescription = () => {
+  const toast = useToast();
   const params = useParams();
   const id = params.prescriptionId;
 
-  const { getPrescription } = usePhoton();
+  const { getPrescription, getToken } = usePhoton();
   const { prescription, loading, error } = getPrescription({ id: id! });
+  const [accessToken, setAccessToken] = useState('');
 
   const rx = prescription || {};
 
-  if (error) {
-    return (
-      <Alert status="error">
-        <AlertIcon />
-        {error.message}
-      </Alert>
-    );
-  }
+  const getAccessToken = async () => {
+    try {
+      const token = await getToken();
+      setAccessToken(token);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    if (!accessToken) {
+      getAccessToken();
+    }
+  }, [accessToken]);
 
   const {
     prescriber,
@@ -70,21 +100,80 @@ export const Prescription = () => {
 
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const tableWidth = useBreakpointValue({ base: 'full', sm: '100%', md: '75%' });
+  const { colorMode } = useColorMode();
+
+  if (error || (!loading && !prescription)) {
+    return (
+      <Alert
+        status="warning"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        textAlign="center"
+        height="200px"
+      >
+        <AlertIcon />
+        <AlertTitle mt={4} mb={1} fontSize="lg">
+          Unknown Prescription
+        </AlertTitle>
+        <AlertDescription maxWidth="sm">
+          <div>Looks like we can't find a prescription with that ID.</div>
+          <Link textDecoration="underline" fontSize="md" href="/prescriptions">
+            Go back to prescriptions.
+          </Link>
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <Page kicker="Prescription" header={prescription?.treatment.name} loading={loading}>
       <VStack spacing={4} fontSize={{ base: 'md', md: 'lg' }} alignItems="start" w="100%" mt={0}>
-        {loading ? (
-          <Skeleton width="130px" height="35px" borderRadius="md" />
-        ) : (
-          <Button
-            aria-label="New Order"
-            as={RouterLink}
-            to={`/orders/new?patientId=${patient.id}&prescriptionId=${id}`}
-          >
-            Create Order
-          </Button>
-        )}
+        <HStack>
+          {loading ? (
+            <Skeleton width="111px" height="32px" borderRadius="md" />
+          ) : (
+            <Button
+              size="sm"
+              aria-label="New Order"
+              as={RouterLink}
+              to={`/orders/new?patientId=${patient.id}&prescriptionId=${id}`}
+            >
+              Create Order
+            </Button>
+          )}
+          {loading ? (
+            <Skeleton width="156px" height="32px" borderRadius="md" />
+          ) : (
+            <Button
+              size="sm"
+              aria-label="Cancel Prescription"
+              isDisabled={rx.state !== 'ACTIVE'}
+              onClick={async () => {
+                const decision = await confirmWrapper('Cancel this prescription?', {
+                  description: 'You will not be able to undo this action.',
+                  cancelText: "No, Don't Cancel",
+                  confirmText: 'Yes, Cancel',
+                  darkMode: colorMode !== 'light',
+                  colorScheme: 'red'
+                });
+                if (decision) {
+                  graphQLClient.setHeader('authorization', accessToken);
+                  const res = await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
+                  if (res) {
+                    toast({
+                      title: 'Prescription canceled',
+                      status: 'success',
+                      duration: 5000
+                    });
+                  }
+                }
+              }}
+            >
+              Cancel Prescription
+            </Button>
+          )}
+        </HStack>
 
         <Divider />
 

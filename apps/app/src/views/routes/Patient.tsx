@@ -3,6 +3,8 @@ import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   Alert,
   AlertIcon,
+  AlertTitle,
+  AlertDescription,
   Badge,
   Box,
   Button,
@@ -63,15 +65,6 @@ export const Patient = () => {
     UNKNOWN: 'Unknown'
   };
 
-  if (error) {
-    return (
-      <Alert status="error">
-        <AlertIcon />
-        {error.message}
-      </Alert>
-    );
-  }
-
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const tableWidth = useBreakpointValue({ base: 'full', sm: '100%', md: '75%' });
 
@@ -84,10 +77,34 @@ export const Patient = () => {
     refetchData();
   }, [id]);
 
+  if (error || (!loading && !patient)) {
+    return (
+      <Alert
+        status="warning"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        textAlign="center"
+        height="200px"
+      >
+        <AlertIcon />
+        <AlertTitle mt={4} mb={1} fontSize="lg">
+          Unknown Patient
+        </AlertTitle>
+        <AlertDescription maxWidth="sm">
+          <div>Looks like we can't find a patient with that ID. </div>
+          <Link textDecoration="underline" fontSize="md" href="/patients">
+            Go back to patients.
+          </Link>
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
     <Page loading={loading} kicker="Patient" header={patient?.name.full}>
       <VStack spacing={4} align="justify-start">
-        {loading ? (
+        {loading && !patient ? (
           <HStack>
             <Skeleton width="32px" height="32px" borderRadius={6} />
             <Skeleton width="32px" height="32px" borderRadius={6} />
@@ -100,7 +117,7 @@ export const Patient = () => {
               icon={<FiPhone fontSize="1.2rem" />}
               aria-label="Edit Order"
               as={Link}
-              href={`tel:${patient.phone}`}
+              href={`tel:${patient?.phone}`}
               isExternal
               size="sm"
             />
@@ -108,7 +125,7 @@ export const Patient = () => {
               icon={<FiMail fontSize="1.2rem" />}
               aria-label="Edit Order"
               as={Link}
-              href={`mailto:${patient.email}`}
+              href={`mailto:${patient?.email}`}
               isExternal
               size="sm"
             />
@@ -149,119 +166,136 @@ export const Patient = () => {
             Edit
           </Button>
         </HStack>
-
-        <TableContainer w={tableWidth}>
-          <Table bg="transparent">
-            <Tbody>
-              <Tr>
-                <Td px={0} py={2} border="none">
-                  <Text fontSize="md">Date of Birth</Text>
-                </Td>
-                <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                  {loading ? (
-                    <SkeletonText noOfLines={1} width="130px" ms={isMobile ? 'auto' : undefined} />
-                  ) : (
-                    <Text fontSize="md">{formatDateLong(patient.dateOfBirth)}</Text>
-                  )}
-                </Td>
-              </Tr>
-              <Tr>
-                <Td px={0} py={2} border="none">
-                  <Text fontSize="md">Sex</Text>
-                </Td>
-                <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                  {loading ? (
-                    <SkeletonText noOfLines={1} width="50px" ms={isMobile ? 'auto' : undefined} />
-                  ) : (
-                    <Text fontSize="md">{sexMap[patient.sex as keyof object]} </Text>
-                  )}
-                </Td>
-              </Tr>
-              <Tr>
-                <Td px={0} py={2} border="none">
-                  <Text fontSize="md">Gender</Text>
-                </Td>
-                <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                  {loading ? (
-                    <SkeletonText noOfLines={1} width="50px" ms={isMobile ? 'auto' : undefined} />
-                  ) : (
-                    <Text fontSize="md">{patient.gender}</Text>
-                  )}
-                </Td>
-              </Tr>
-              <Tr>
-                <Td px={0} py={2} border="none">
-                  <Text fontSize="md">Phone number</Text>
-                </Td>
-                <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                  {loading ? (
-                    <SkeletonText noOfLines={1} width="120px" ms={isMobile ? 'auto' : undefined} />
-                  ) : (
-                    <Link
-                      fontSize="md"
-                      href={`tel:${patient.phone}`}
-                      isExternal
-                      textDecoration="underline"
-                    >
-                      {formatPhone(patient.phone)}
-                    </Link>
-                  )}
-                </Td>
-              </Tr>
-              <Tr>
-                <Td px={0} py={2} border="none">
-                  <Text fontSize="md">Email</Text>
-                </Td>
-                <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                  {loading ? (
-                    <SkeletonText noOfLines={1} width="150px" ms={isMobile ? 'auto' : undefined} />
-                  ) : (
-                    <Link
-                      fontSize="md"
-                      href={`mailto:${patient.email}`}
-                      isExternal
-                      textDecoration="underline"
-                    >
-                      {patient.email}
-                    </Link>
-                  )}
-                </Td>
-              </Tr>
-              <Tr>
-                <Td px={0} py={2} border="none">
-                  <Text fontSize="md">Id</Text>
-                </Td>
-                <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                  {loading ? (
-                    <SkeletonText noOfLines={1} width="150px" ms={isMobile ? 'auto' : undefined} />
-                  ) : (
-                    <HStack spacing={2} justifyContent={isMobile ? 'end' : 'start'}>
-                      <Text
-                        fontSize="md"
-                        whiteSpace={isMobile ? 'nowrap' : undefined}
-                        overflow={isMobile ? 'hidden' : undefined}
-                        textOverflow={isMobile ? 'ellipsis' : undefined}
-                        maxWidth={isMobile ? '130px' : undefined}
-                      >
-                        {id}
-                      </Text>
-                      <IconButton
-                        variant="ghost"
-                        color="gray.500"
-                        aria-label="Copy external id"
-                        minW="fit-content"
-                        py={0}
-                        _hover={{ backgroundColor: 'transparent' }}
-                        icon={<FiCopy size="1.3em" />}
-                        onClick={() => navigator.clipboard.writeText(id || '')}
+        {!loading && patient ? (
+          <TableContainer w={tableWidth}>
+            <Table bg="transparent">
+              <Tbody>
+                <Tr>
+                  <Td px={0} py={2} border="none">
+                    <Text fontSize="md">Date of Birth</Text>
+                  </Td>
+                  <Td pe={0} py={2} isNumeric={isMobile} border="none">
+                    {loading ? (
+                      <SkeletonText
+                        noOfLines={1}
+                        width="130px"
+                        ms={isMobile ? 'auto' : undefined}
                       />
-                    </HStack>
-                  )}
-                </Td>
-              </Tr>
-            </Tbody>
-          </Table>
-        </TableContainer>
+                    ) : (
+                      <Text fontSize="md">{formatDateLong(patient.dateOfBirth)}</Text>
+                    )}
+                  </Td>
+                </Tr>
+                <Tr>
+                  <Td px={0} py={2} border="none">
+                    <Text fontSize="md">Sex</Text>
+                  </Td>
+                  <Td pe={0} py={2} isNumeric={isMobile} border="none">
+                    {loading ? (
+                      <SkeletonText noOfLines={1} width="50px" ms={isMobile ? 'auto' : undefined} />
+                    ) : (
+                      <Text fontSize="md">{sexMap[patient.sex as keyof object]} </Text>
+                    )}
+                  </Td>
+                </Tr>
+                <Tr>
+                  <Td px={0} py={2} border="none">
+                    <Text fontSize="md">Gender</Text>
+                  </Td>
+                  <Td pe={0} py={2} isNumeric={isMobile} border="none">
+                    {loading ? (
+                      <SkeletonText noOfLines={1} width="50px" ms={isMobile ? 'auto' : undefined} />
+                    ) : (
+                      <Text fontSize="md">{patient.gender}</Text>
+                    )}
+                  </Td>
+                </Tr>
+                <Tr>
+                  <Td px={0} py={2} border="none">
+                    <Text fontSize="md">Phone number</Text>
+                  </Td>
+                  <Td pe={0} py={2} isNumeric={isMobile} border="none">
+                    {loading ? (
+                      <SkeletonText
+                        noOfLines={1}
+                        width="120px"
+                        ms={isMobile ? 'auto' : undefined}
+                      />
+                    ) : (
+                      <Link
+                        fontSize="md"
+                        href={`tel:${patient.phone}`}
+                        isExternal
+                        textDecoration="underline"
+                      >
+                        {formatPhone(patient.phone)}
+                      </Link>
+                    )}
+                  </Td>
+                </Tr>
+                <Tr>
+                  <Td px={0} py={2} border="none">
+                    <Text fontSize="md">Email</Text>
+                  </Td>
+                  <Td pe={0} py={2} isNumeric={isMobile} border="none">
+                    {loading ? (
+                      <SkeletonText
+                        noOfLines={1}
+                        width="150px"
+                        ms={isMobile ? 'auto' : undefined}
+                      />
+                    ) : (
+                      <Link
+                        fontSize="md"
+                        href={`mailto:${patient.email}`}
+                        isExternal
+                        textDecoration="underline"
+                      >
+                        {patient.email}
+                      </Link>
+                    )}
+                  </Td>
+                </Tr>
+                <Tr>
+                  <Td px={0} py={2} border="none">
+                    <Text fontSize="md">Id</Text>
+                  </Td>
+                  <Td pe={0} py={2} isNumeric={isMobile} border="none">
+                    {loading ? (
+                      <SkeletonText
+                        noOfLines={1}
+                        width="150px"
+                        ms={isMobile ? 'auto' : undefined}
+                      />
+                    ) : (
+                      <HStack spacing={2} justifyContent={isMobile ? 'end' : 'start'}>
+                        <Text
+                          fontSize="md"
+                          whiteSpace={isMobile ? 'nowrap' : undefined}
+                          overflow={isMobile ? 'hidden' : undefined}
+                          textOverflow={isMobile ? 'ellipsis' : undefined}
+                          maxWidth={isMobile ? '130px' : undefined}
+                        >
+                          {id}
+                        </Text>
+                        <IconButton
+                          variant="ghost"
+                          color="gray.500"
+                          aria-label="Copy external id"
+                          minW="fit-content"
+                          py={0}
+                          _hover={{ backgroundColor: 'transparent' }}
+                          icon={<FiCopy size="1.3em" />}
+                          onClick={() => navigator.clipboard.writeText(id || '')}
+                        />
+                      </HStack>
+                    )}
+                  </Td>
+                </Tr>
+              </Tbody>
+            </Table>
+          </TableContainer>
+        ) : null}
 
         <Divider />
 

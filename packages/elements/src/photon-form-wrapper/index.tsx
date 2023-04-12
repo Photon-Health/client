@@ -26,7 +26,7 @@ const PhotonFormWrapper = ({
   const [closeDialogOpen, setCloseDialogOpen] = createSignal<boolean>(false);
 
   return (
-    <div ref={ref} class="absolute top-0 left-0 w-full z-10">
+    <div ref={ref} class="fixed top-0 left-0 w-full h-screen z-10 overflow-y-scroll">
       <style>{tailwind}</style>
 
       {/* Close Wrapper Modal */}
@@ -79,8 +79,10 @@ const PhotonFormWrapper = ({
           </Show>
         </div>
       </div>
-      <div class="w-full min-h-screen bg-[#f7f4f4] pt-28 xs:pt-28 lg:pt-20">
-        <div class="pt-4 pb-52 px-4 w-full h-full sm:w-[600px] xs:mx-auto">{form}</div>
+      <div class="overflow-y-scroll w-full min-h-screen bg-[#f7f4f4] pt-28 xs:pt-28 lg:pt-20">
+        <div class="px-4 pb-24 md:pt-4 md:pb-52 md:px-4 w-full h-full sm:w-[600px] xs:mx-auto">
+          {form}
+        </div>
       </div>
     </div>
   );

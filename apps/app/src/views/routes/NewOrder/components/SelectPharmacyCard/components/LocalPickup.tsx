@@ -102,7 +102,6 @@ export const LocalPickup = (props: LocalPickupProps) => {
 
   const getPharmacyOptions = async (inputValue?: string) => {
     const resultPharmacies: any = await refetchPharmacies({
-      name: inputValue?.toUpperCase() || undefined,
       location: {
         latitude,
         longitude,
@@ -111,11 +110,13 @@ export const LocalPickup = (props: LocalPickupProps) => {
       type: types.FulfillmentType.PickUp
     });
 
-    return formatPharmacyOptions(
-      resultPharmacies.data.pharmacies,
-      preferredPharmacyIds,
-      previousId
-    );
+    const filteredPharmacies = inputValue
+      ? resultPharmacies.data.pharmacies.filter((pharmacy: any) =>
+          pharmacy.name.toLowerCase().startsWith(inputValue.toLowerCase())
+        )
+      : resultPharmacies.data.pharmacies;
+
+    return formatPharmacyOptions(filteredPharmacies, preferredPharmacyIds, previousId);
   };
 
   useEffect(() => {

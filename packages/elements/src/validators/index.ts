@@ -12,6 +12,14 @@ export const between = (min: number, max: number, inclusive = true) =>
     );
   });
 
+export const notFutureDate = define('NotFutureDate', (value) => {
+  const valueDate = new Date(value as string);
+  if (!(valueDate instanceof Date)) return false;
+
+  const now = new Date();
+  return valueDate <= now;
+});
+
 export const afterDate = (date: Date, parser = (v: string) => parse(v, 'yyyy-MM-dd', new Date())) =>
   define('between', function isAfter(value) {
     return (
@@ -25,6 +33,11 @@ export const numericString = () =>
       return true;
     }
     return /^\d+$/.test(value as string);
+  });
+
+export const zipString = () =>
+  refine(string(), 'zipString', (value) => {
+    return /^\d{5}(-\d{4})?$/.test(value as string);
   });
 
 export const email = () =>

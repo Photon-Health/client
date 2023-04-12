@@ -5,8 +5,8 @@ import {
   LogoutOptions as Auth0LogoutOptions,
   RedirectLoginOptions,
   RedirectLoginResult,
-  User,
-} from "@auth0/auth0-spa-js";
+  User
+} from '@auth0/auth0-spa-js';
 
 const CODE_RE = /[?&]code=[^&]+/;
 const STATE_RE = /[?&]state=[^&]+/;
@@ -42,6 +42,7 @@ export interface LoginOptions {
  */
 export interface LogoutOptions {
   returnTo?: string;
+  federated?: boolean;
 }
 
 /**
@@ -69,7 +70,7 @@ export class AuthManager {
   constructor({
     authentication,
     organization,
-    audience = "https://api.photon.health",
+    audience = 'https://api.photon.health'
   }: AuthManagerOptions) {
     this.authentication = authentication;
     this.organization = organization;
@@ -81,16 +82,12 @@ export class AuthManager {
    * @param config - Login configuration
    * @returns
    */
-  public async login({
-    organizationId,
-    invitation,
-    appState,
-  }: LoginOptions): Promise<void> {
-    let opts: RedirectLoginOptions<any> = { redirectMethod: "assign" };
+  public async login({ organizationId, invitation, appState }: LoginOptions): Promise<void> {
+    let opts: RedirectLoginOptions<any> = { redirectMethod: 'assign' };
 
     if (organizationId || this.organization) {
       opts = Object.assign(opts, {
-        organization: organizationId || this.organization,
+        organization: organizationId || this.organization
       });
     }
     if (invitation) {
@@ -109,12 +106,11 @@ export class AuthManager {
    * @param config - Logout configuration
    * @returns
    */
-  public async logout({ returnTo }: LogoutOptions): Promise<void> {
-    let opts: Auth0LogoutOptions = {};
-
-    if (returnTo) {
-      opts = Object.assign(opts, { returnTo });
-    }
+  public async logout({ returnTo, federated = false }: LogoutOptions): Promise<void> {
+    const opts: Auth0LogoutOptions = {
+      ...(returnTo ? { returnTo } : {}),
+      ...(federated ? { federated } : {})
+    };
 
     return this.authentication.logout(opts);
   }
@@ -124,8 +120,9 @@ export class AuthManager {
    * @returns boolean
    */
   public hasAuthParams(searchParams = window.location.search): boolean {
-    return (CODE_RE.test(searchParams) || ERROR_RE.test(searchParams)) &&
-      STATE_RE.test(searchParams);
+    return (
+      (CODE_RE.test(searchParams) || ERROR_RE.test(searchParams)) && STATE_RE.test(searchParams)
+    );
   }
 
   /**
@@ -135,16 +132,25 @@ export class AuthManager {
    */
   public async getAccessToken(
     { audience }: { audience?: string } = {
-      audience: this.audience,
+      audience: this.audience
     }
   ): Promise<string> {
-    let opts: GetTokenSilentlyOptions = { audience: audience || this.audience || undefined };
-    if (this.organization) {
-      opts = Object.assign(opts, {
-        organization: this.organization,
-      });
+    let opts: GetTokenSilentlyOptions | GetTokenWithPopupOptions = {
+      audience: audience || this.audience || undefined,
+      ...(this.organization ? { organization: this.organization } : {})
+    };
+
+    let token;
+    try {
+      token = await this.authentication.getTokenSilently(opts);
+    } catch (e) {
+      if ((e as Error).message.includes('Consent required')) {
+        token = await this.authentication.getTokenWithPopup(opts);
+      } else {
+        throw e;
+      }
     }
-    return this.authentication.getTokenSilently(opts);
+    return token;
   }
 
   /**
@@ -154,16 +160,14 @@ export class AuthManager {
    */
   public async getAccessTokenWithConsent(
     { audience }: { audience?: string } = {
-      audience: this.audience,
+      audience: this.audience
     }
   ): Promise<string> {
-    let opts: GetTokenWithPopupOptions = { audience: audience || this.audience || undefined };
+    let opts: GetTokenWithPopupOptions = {
+      audience: audience || this.audience || undefined,
+      ...(this.organization ? { organization: this.organization } : {})
+    };
 
-    if (this.organization) {
-      opts = Object.assign(opts, {
-        organization: this.organization,
-      });
-    }
     return this.authentication.getTokenWithPopup(opts);
   }
 

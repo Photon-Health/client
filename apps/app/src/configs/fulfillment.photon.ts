@@ -24,15 +24,40 @@ export const fulfillmentSettings: FulfillmentSettings = {
     pickUp: true,
     mailOrder: false,
     mailOrderProviders: [],
-    sendToPatient: false, // disabled for org
-    sendToPatientUsers: [
-      // enabled for these users
-      'google-oauth2|105026997775584560678', // Tim
-      'google-oauth2|109799643677672225463' // Julie
-    ]
+    sendToPatient: true, // enabled for org
+    sendToPatientUsers: []
   },
   // Peachy
   [process.env.REACT_APP_PEACHY_ORG_ID as string]: {
+    sendOrder: true,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [
+      ...(process.env.REACT_APP_CUREXA_ORG_ID ? [process.env.REACT_APP_CUREXA_ORG_ID] : [])
+    ],
+    sendToPatient: false,
+    sendToPatientUsers: []
+  },
+  // Summer Health
+  [process.env.REACT_APP_SUMMER_HEALTH_ORG_ID as string]: {
+    sendOrder: true,
+    pickUp: true,
+    mailOrder: false,
+    mailOrderProviders: [],
+    sendToPatient: true, // enabled for org
+    sendToPatientUsers: []
+  },
+  // Reside Health
+  [process.env.REACT_APP_RESIDE_HEALTH_ORG_ID as string]: {
+    sendOrder: true,
+    pickUp: true,
+    mailOrder: false,
+    mailOrderProviders: [],
+    sendToPatient: true, // enabled for org
+    sendToPatientUsers: []
+  },
+  // MisterRx
+  [process.env.REACT_APP_MISTERRX_ORG_ID as string]: {
     sendOrder: true,
     pickUp: false,
     mailOrder: true,

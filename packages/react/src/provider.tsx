@@ -758,8 +758,8 @@ export const PhotonProvider = (opts: {
     });
   };
 
-  const logout = ({ returnTo }: { returnTo?: string }) =>
-    client.authentication.logout({ returnTo });
+  const logout = ({ returnTo, federated }: { returnTo?: string; federated?: boolean }) =>
+    client.authentication.logout({ returnTo, federated });
 
   const getToken = async ({ audience }: { audience?: string } = {}) => {
     try {
@@ -770,18 +770,7 @@ export const PhotonProvider = (opts: {
       });
       return token;
     } catch (e) {
-      if ((e as Error).message.includes('Consent required')) {
-        const token = await client.authentication.getAccessTokenWithConsent({
-          audience
-        });
-        dispatch({
-          type: 'GET_ACCESS_TOKEN_COMPLETE',
-          user: await client.authentication.getUser()
-        });
-        return token;
-      } else {
-        throw e;
-      }
+      throw e;
     }
   };
   /// Utilities

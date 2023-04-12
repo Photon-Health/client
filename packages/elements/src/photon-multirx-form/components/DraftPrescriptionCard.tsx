@@ -13,6 +13,7 @@ export const DraftPrescriptionCard = (props: {
   actions: Record<string, Function>;
   store: Record<string, any>;
   isLoading: boolean;
+  setIsEditing: (isEditing: boolean) => void;
 }) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = createSignal<boolean>(false);
@@ -54,6 +55,7 @@ export const DraftPrescriptionCard = (props: {
     setEditDraft(draft);
 
     if (!props.store['treatment'].value) {
+      props.setIsEditing(true);
       editPrescription();
     } else {
       setEditDialogOpen(true);

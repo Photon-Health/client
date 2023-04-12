@@ -1,0 +1,29 @@
+{
+  "name": "patient",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "chakra-react-select": "^4.6.0",
+    "dayjs": "^1.11.7",
+    "react-helmet": "^6.1.0",
+    "tinycolor2": "^1.6.0"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
