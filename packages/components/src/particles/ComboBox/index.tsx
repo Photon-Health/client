@@ -15,7 +15,6 @@ import clickOutside from '../../utils/clickOutside';
 import Input, { InputProps } from '../Input';
 import { createStore } from 'solid-js/store';
 import clsx from 'clsx';
-import Spinner from '../Spinner';
 import { useInputGroup } from '../InputGroup';
 
 interface ComboBoxState {
