@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/html';
 import { ComponentProps, createSignal } from 'solid-js';
-import { Icon } from 'solid-heroicons';
-import { check } from 'solid-heroicons/solid';
+import Icon from '../Icon';
 import Dialog, { DialogProps } from '.';
 import Button from '../Button';
 
@@ -31,7 +30,7 @@ export const Default: DialogStory = {
         </div>
         <Dialog open={isSmallOpen()} onClose={() => setIsSmallOpen(false)}>
           <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-            <Icon path={check} class="h-6 w-6 text-green-600" aria-hidden="true" />
+            <Icon name="check" class="text-green-600" />
           </div>
           <div class="mt-3 text-center sm:mt-5">
             <h2>Prescription Sent</h2>
@@ -47,7 +46,7 @@ export const Default: DialogStory = {
         </Dialog>
         <Dialog size="lg" open={isLargeOpen()} onClose={() => setIsLargeOpen(false)}>
           <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-            <Icon path={check} class="h-6 w-6 text-green-600" aria-hidden="true" />
+            <Icon name="check" class="text-green-600" />
           </div>
           <div class="mt-3 text-center sm:mt-5">
             <h2>Prescription Sent</h2>
@@ -76,7 +75,7 @@ export const SmallOpen: DialogStory = {
       <>
         <Dialog open={true} onClose={() => {}}>
           <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-            <Icon path={check} class="h-6 w-6 text-green-600" aria-hidden="true" />
+            <Icon name="check" class="text-green-600" />
           </div>
           <div class="mt-3 text-center sm:mt-5">
             <h2>Prescription Sent</h2>
@@ -102,7 +101,7 @@ export const LargeOpen: DialogStory = {
       <>
         <Dialog size="lg" open={true} onClose={() => {}}>
           <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-            <Icon path={check} class="h-6 w-6 text-green-600" aria-hidden="true" />
+            <Icon name="check" class="text-green-600" />
           </div>
           <div class="mt-3 text-center sm:mt-5">
             <h2>Prescription Sent</h2>

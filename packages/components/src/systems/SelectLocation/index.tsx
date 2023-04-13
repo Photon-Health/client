@@ -1,6 +1,5 @@
 import { createSignal } from 'solid-js';
-import { Icon } from 'solid-heroicons';
-import { mapPin } from 'solid-heroicons/solid';
+import Icon from '../../particles/Icon';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
 import InputGroup from '../../particles/InputGroup';
@@ -40,7 +39,7 @@ export default function SelectLocation() {
               loading() ? (
                 <Spinner size="sm" />
               ) : (
-                <Icon path={mapPin} class="h-4 w-4" aria-hidden="true" />
+                <Icon name="mapPin" class="h-4 w-4" aria-hidden="true" />
               )
             }
           >

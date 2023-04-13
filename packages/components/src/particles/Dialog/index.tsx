@@ -1,7 +1,6 @@
 import { JSX, Show, mergeProps } from 'solid-js';
 import { Transition } from 'solid-transition-group';
-import { Icon } from 'solid-heroicons';
-import { xMark } from 'solid-heroicons/solid';
+import Icon from '../Icon';
 import createTransition from '../../utils/createTransition';
 import clsx from 'clsx';
 
@@ -75,7 +74,7 @@ function Dialog(props: DialogProps) {
                       onClick={merged.onClose}
                     >
                       <span class="sr-only">Close</span>
-                      <Icon path={xMark} class="h-6 w-6" aria-hidden="true" />
+                      <Icon name="xMark" class="h-6 w-6" aria-hidden="true" />
                     </button>
                   </div>
                 </Show>

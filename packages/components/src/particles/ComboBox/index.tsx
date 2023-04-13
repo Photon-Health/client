@@ -9,8 +9,7 @@ import {
   splitProps,
   createSignal
 } from 'solid-js';
-import { Icon } from 'solid-heroicons';
-import { chevronUpDown, check } from 'solid-heroicons/solid';
+import Icon from '../Icon';
 import clickOutside from '../../utils/clickOutside';
 import Input, { InputProps } from '../Input';
 import { createStore } from 'solid-js/store';
@@ -107,7 +106,7 @@ function ComboOption(props: ComboOptionProps) {
   );
 
   const iconClass = createMemo(() =>
-    clsx('h-5 w-5', state.active === props.key ? 'text-white' : 'text-indigo-600')
+    clsx(state.active === props.key ? 'text-white' : 'text-indigo-600')
   );
 
   return (
@@ -121,7 +120,7 @@ function ComboOption(props: ComboOptionProps) {
       <span class="block truncate">{props.children}</span>
       <Show when={state.selected?.id === props.key}>
         <span class="absolute inset-y-0 right-0 flex items-center pr-4">
-          <Icon path={check} class={iconClass()} />
+          <Icon name="check" class={iconClass()} />
         </span>
       </Show>
     </li>
@@ -173,7 +172,7 @@ function ComboInput(props: InputProps) {
         onClick={() => setOpen(!comboState.open)}
       >
         <Show when={!inputGroupState.loading}>
-          <Icon path={chevronUpDown} class="h-5 w-5 text-gray-400" />
+          <Icon name="chevronUpDown" class="text-gray-400" />
         </Show>
       </button>
     </>
