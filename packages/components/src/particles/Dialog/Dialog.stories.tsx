@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/html';
 import { ComponentProps, createSignal } from 'solid-js';
 import Dialog, { DialogProps } from '.';
+import Button from '../Button';
 
 type DialogStory = StoryObj<DialogProps>;
 
@@ -21,9 +22,9 @@ export const Default: DialogStory = {
 
     return (
       <>
-        <button onClick={() => setIsOpen(true)}>Open Dialog</button>
+        <Button onClick={() => setIsOpen(true)}>Open Dialog</Button>
         <Dialog open={isOpen()} onClose={() => setIsOpen(false)}>
-          Hello
+          <Dialog.Panel>Hello</Dialog.Panel>
         </Dialog>
       </>
     );
