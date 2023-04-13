@@ -1,6 +1,7 @@
 import { createSignal } from 'solid-js';
 import PharmacySearch from './systems/PharmacySearch';
 import Client from './systems/Client';
+import SelectLocation from './systems/SelectLocation';
 
 const App = () => {
   const [pharmacy, setPharmacy] = createSignal<any>();
@@ -18,9 +19,11 @@ const App = () => {
           <PharmacySearch setPharmacy={setPharmacy} />
         </div>
       </div>
+
       <div class="p-5" style={{ width: '600px' }}>
         <div class="p-5 border border-gray-300 rounded-md">
-          {pharmacy()?.id || 'No pharmacy selected'}
+          <p class="pb-5">SelectLocation Component</p>
+          <SelectLocation />
         </div>
       </div>
     </Client>

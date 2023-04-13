@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import { JSX, mergeProps, splitProps } from 'solid-js';
+import { JSX, Show, mergeProps, splitProps } from 'solid-js';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
 export type ButtonSize = 'xl' | 'lg' | 'md' | 'sm' | 'xs';
@@ -7,11 +7,12 @@ export type ButtonSize = 'xl' | 'lg' | 'md' | 'sm' | 'xs';
 export interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
+  iconLeft?: JSX.Element;
 }
 
 export default function Button(props: ButtonProps) {
   const merged = mergeProps({ variant: 'primary', size: 'lg' }, props);
-  const [otherProps, buttonProps] = splitProps(merged, ['variant', 'size', 'children']);
+  const [otherProps, buttonProps] = splitProps(merged, ['variant', 'size', 'children', 'iconLeft']);
 
   const buttonClasses = clsx('font-semibold shadow-sm', {
     'rounded-md': ['xl', 'lg', 'md'].includes(otherProps.size),
@@ -26,11 +27,13 @@ export default function Button(props: ButtonProps) {
     'text-sm px-2.5 py-1.5': otherProps.size === 'md',
     'text-sm px-2 py-1': otherProps.size === 'sm',
     'text-xs px-2 py-1': otherProps.size === 'xs',
-    'opacity-50 cursor-not-allowed': buttonProps.disabled
+    'opacity-50 cursor-not-allowed': buttonProps.disabled,
+    'justify-center inline-flex items-center gap-x-1.5': otherProps?.iconLeft
   });
 
   return (
-    <button class={buttonClasses} type="button" {...buttonProps}>
+    <button {...buttonProps} class={buttonClasses} type="button">
+      <Show when={otherProps?.iconLeft}>{otherProps?.iconLeft}</Show>
       {merged.children}
     </button>
   );
