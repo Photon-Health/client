@@ -181,6 +181,15 @@ export const createPharmacyStore = (cs?: typeof createStore) => {
     });
   };
 
+  const clearPharmacies = () => {
+    setStore('pharmacies', {
+      ...store.pharmacies,
+      data: [],
+      errors: [],
+      address: undefined
+    });
+  };
+
   const clearPreferredPharmacies = () => {
     setStore('preferredPharmacies', {
       ...store.selectedPharmacy,
@@ -225,6 +234,7 @@ export const createPharmacyStore = (cs?: typeof createStore) => {
       clearSelectedPharmacy,
       getPreferredPharmacies,
       clearPreferredPharmacies,
+      clearPharmacies,
       reset
     }
   };

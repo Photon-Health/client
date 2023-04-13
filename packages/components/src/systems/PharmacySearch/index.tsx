@@ -1,32 +1,130 @@
-import { createEffect, createSignal } from 'solid-js';
+import { For, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
+import InputGroup from '../../particles/InputGroup';
+import Input from '../../particles/Input';
+import loadGoogleScript from '../../utils/loadGoogleScript';
+import { PharmacyStore } from '../../stores/pharmacy';
 import { usePhoton } from '../../context';
-import { PatientStore } from '../../stores/patient';
+import ComboBox from '../../particles/ComboBox';
+import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter';
+import Button from '../../particles/Button';
 
-export default function PharmacySearch(props: { uP?: any }) {
-  const client = props.uP ? props.uP() : usePhoton();
-  const [trigger, setTrigger] = createSignal(false);
-  const { store, actions } = PatientStore;
+export interface PharmacyProps {
+  address?: string;
+  patientId?: string;
+  geocodingApiKey?: string;
+  setPharmacy?: (pharmacy: any) => void;
+}
 
-  createEffect(async () => {
-    if (trigger()) {
-      setTrigger(false);
-      const data = await client?.clinical.patient.getPatient({
-        id: 'pat_01GQGDNW09VRK2CQ0Q41H57RVK'
-      });
+export default function PharmacySearch(props: PharmacyProps) {
+  const client = usePhoton();
+  const { store, actions } = PharmacyStore;
+  const [selected, setSelected] = createSignal<any>();
+  const [address, setAddress] = createSignal(props.address || '');
+  const [addressError, setAddressError] = createSignal('');
+  const [query, setQuery] = createSignal('');
+  let geocoder: google.maps.Geocoder | undefined;
 
-      console.log('fetch patient from sdk', data);
+  onMount(async () => {
+    loadGoogleScript({
+      onLoad: async () => {
+        geocoder = new google.maps.Geocoder();
 
-      await actions.getSelectedPatient(client!.getSDK(), 'pat_01GQGDNW09VRK2CQ0Q41H57RVK');
-    }
+        if (props.address) {
+          await actions.getPharmaciesByAddress(client!.getSDK(), geocoder!, String(address()));
+        }
+      },
+      onError: (err) => {
+        setAddressError(err);
+      }
+    });
   });
 
-  createEffect(async () => {
-    console.log('reacting to store changes', store.selectedPatient.data);
+  const handleAddressSubmit = async (e: Event) => {
+    e.preventDefault();
+    await actions.getPharmaciesByAddress(client!.getSDK(), geocoder!, String(address()));
+  };
+
+  const hasFoundPharmacies = createMemo(() => store.pharmacies.data.length > 0);
+
+  const filteredPharmacies = createMemo(() => {
+    if (!hasFoundPharmacies()) {
+      return [];
+    }
+
+    return query() === ''
+      ? store.pharmacies.data
+      : store.pharmacies.data.filter((pharmacy) => {
+          return pharmacy.name.toLowerCase().includes(query().toLowerCase());
+        });
+  });
+
+  createEffect(() => {
+    if (selected()?.id) {
+      setQuery('');
+      props?.setPharmacy?.(selected());
+    }
   });
 
   return (
     <div>
-      <button onClick={() => setTrigger(!trigger())}>Trigger</button>
+      <Show when={!hasFoundPharmacies()}>
+        <form onSubmit={handleAddressSubmit}>
+          <InputGroup
+            label="Enter an address or zip code"
+            error={addressError()}
+            loading={store.pharmacies?.isLoading || false}
+          >
+            <Input type="text" value={address()} onInput={(e) => setAddress(e.target?.value)} />
+          </InputGroup>
+        </form>
+      </Show>
+      <Show when={hasFoundPharmacies()}>
+        <InputGroup
+          label="Select a pharmacy"
+          helpText={
+            <div>
+              Showing Pharmacies near {store?.pharmacies?.address || '...'}{' '}
+              <Button
+                size="xs"
+                variant="secondary"
+                onClick={() => {
+                  if (props?.setPharmacy) {
+                    props.setPharmacy(undefined);
+                  }
+                  actions.clearPharmacies();
+                }}
+              >
+                change
+              </Button>
+            </div>
+          }
+        >
+          <ComboBox setSelected={setSelected}>
+            <ComboBox.Input onInput={(e) => setQuery((e.target as HTMLInputElement).value)} />
+            <ComboBox.Options>
+              <For each={filteredPharmacies()}>
+                {(pharmacy) => {
+                  const formattedAddress = `${capitalizeFirstLetter(
+                    pharmacy.address?.street1 || ''
+                  )}, ${capitalizeFirstLetter(pharmacy.address?.city || '')}, ${
+                    pharmacy.address?.state
+                  }`;
+                  return (
+                    <ComboBox.Option
+                      key={pharmacy.id}
+                      value={`${pharmacy.name}, ${formattedAddress}`}
+                    >
+                      <div>{pharmacy.name}</div>
+                      <div class="text-xs">{formattedAddress}</div>
+                    </ComboBox.Option>
+                  );
+                }}
+              </For>
+            </ComboBox.Options>
+          </ComboBox>
+        </InputGroup>
+        <div></div>
+      </Show>
     </div>
   );
 }
