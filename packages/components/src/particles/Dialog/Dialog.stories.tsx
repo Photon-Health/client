@@ -18,13 +18,20 @@ export default meta;
 export const Default: DialogStory = {
   // @ts-ignore
   render: (args) => {
-    const [isOpen, setIsOpen] = createSignal(false);
+    const [isSmallOpen, setIsSmallOpen] = createSignal(false);
+    const [isLargeOpen, setIsLargeOpen] = createSignal(false);
 
     return (
       <>
-        <Button onClick={() => setIsOpen(true)}>Open Dialog</Button>
-        <Dialog open={isOpen()} onClose={() => setIsOpen(false)}>
-          <Dialog.Panel>Hello</Dialog.Panel>
+        <div class="flex gap-4">
+          <Button onClick={() => setIsSmallOpen(true)}>Open Regular Dialog</Button>
+          <Button onClick={() => setIsLargeOpen(true)}>Open Larger Dialog</Button>
+        </div>
+        <Dialog open={isSmallOpen()} onClose={() => setIsSmallOpen(false)}>
+          Hello hi
+        </Dialog>
+        <Dialog size="lg" open={isLargeOpen()} onClose={() => setIsLargeOpen(false)}>
+          Hello hi
         </Dialog>
       </>
     );
