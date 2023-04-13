@@ -1,6 +1,7 @@
 import { JSX, Show, mergeProps } from 'solid-js';
 import { Transition } from 'solid-transition-group';
-import Button from '../Button';
+import { Icon } from 'solid-heroicons';
+import { xMark } from 'solid-heroicons/solid';
 import createTransition from '../../utils/createTransition';
 import clsx from 'clsx';
 
@@ -9,7 +10,7 @@ const transitionDuration = 100;
 export interface DialogProps {
   open: boolean;
   size?: 'md' | 'lg';
-  onClose: () => void;
+  onClose?: () => void;
   children?: JSX.Element;
 }
 
@@ -66,8 +67,19 @@ function Dialog(props: DialogProps) {
           <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
               <div class={panelClasses}>
+                <Show when={merged?.onClose}>
+                  <div class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
+                    <button
+                      type="button"
+                      class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                      onClick={merged.onClose}
+                    >
+                      <span class="sr-only">Close</span>
+                      <Icon path={xMark} class="h-6 w-6" aria-hidden="true" />
+                    </button>
+                  </div>
+                </Show>
                 {merged.children}
-                <Button onClick={() => merged.onClose()}>Close</Button>
               </div>
             </div>
           </div>
