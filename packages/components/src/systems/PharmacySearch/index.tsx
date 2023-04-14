@@ -50,8 +50,8 @@ export default function PharmacySearch(props: PharmacyProps) {
         <InputGroup
           label="Select a pharmacy"
           helpText={
-            <div
-              class="cursor-pointer text-indigo-500 hover:text-indigo-700 flex items-center"
+            <button
+              class="text-indigo-500 hover:text-indigo-700 flex items-center bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
               onClick={() => {
                 if (props?.setPharmacy) {
                   props.setPharmacy(undefined);
@@ -60,7 +60,7 @@ export default function PharmacySearch(props: PharmacyProps) {
               }}
             >
               <Icon name="mapPin" size="sm" /> {store?.pharmacies?.address || '...'}{' '}
-            </div>
+            </button>
           }
         >
           <ComboBox setSelected={setSelected}>
