@@ -65,7 +65,7 @@ export const createPharmacyStore = (cs?: typeof createStore) => {
   const getPharmaciesByAddress = async (
     client: PhotonClient,
     geocoder: google.maps.Geocoder,
-    address?: string | { lat: number; lng: number },
+    address: string | { lat: number; lng: number },
     name?: string
   ) => {
     try {
