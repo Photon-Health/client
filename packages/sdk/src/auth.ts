@@ -5,8 +5,8 @@ import {
   LogoutOptions as Auth0LogoutOptions,
   RedirectLoginOptions,
   RedirectLoginResult,
-  User,
-} from "@auth0/auth0-spa-js";
+  User
+} from '@auth0/auth0-spa-js';
 
 const CODE_RE = /[?&]code=[^&]+/;
 const STATE_RE = /[?&]state=[^&]+/;
@@ -70,7 +70,7 @@ export class AuthManager {
   constructor({
     authentication,
     organization,
-    audience = "https://api.photon.health",
+    audience = 'https://api.photon.health'
   }: AuthManagerOptions) {
     this.authentication = authentication;
     this.organization = organization;
@@ -82,16 +82,12 @@ export class AuthManager {
    * @param config - Login configuration
    * @returns
    */
-  public async login({
-    organizationId,
-    invitation,
-    appState,
-  }: LoginOptions): Promise<void> {
-    let opts: RedirectLoginOptions<any> = { redirectMethod: "assign" };
+  public async login({ organizationId, invitation, appState }: LoginOptions): Promise<void> {
+    let opts: RedirectLoginOptions<any> = { redirectMethod: 'assign' };
 
     if (organizationId || this.organization) {
       opts = Object.assign(opts, {
-        organization: organizationId || this.organization,
+        organization: organizationId || this.organization
       });
     }
     if (invitation) {
@@ -124,8 +120,9 @@ export class AuthManager {
    * @returns boolean
    */
   public hasAuthParams(searchParams = window.location.search): boolean {
-    return (CODE_RE.test(searchParams) || ERROR_RE.test(searchParams)) &&
-      STATE_RE.test(searchParams);
+    return (
+      (CODE_RE.test(searchParams) || ERROR_RE.test(searchParams)) && STATE_RE.test(searchParams)
+    );
   }
 
   /**
