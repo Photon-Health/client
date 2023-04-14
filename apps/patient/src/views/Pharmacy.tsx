@@ -12,8 +12,7 @@ import {
   Text,
   VStack,
   useBreakpointValue,
-  useToast,
-  Divider
+  useToast
 } from '@chakra-ui/react'
 import { FiCheck, FiMapPin } from 'react-icons/fi'
 
@@ -40,6 +39,7 @@ export const UNOPEN_BUSINESS_STATUS_MAP = {
 }
 
 const placesService = new google.maps.places.PlacesService(document.createElement('div'))
+const geocoder = new google.maps.Geocoder()
 
 const query = (method, data) =>
   new Promise((resolve, reject) => {
@@ -53,7 +53,6 @@ const query = (method, data) =>
   })
 
 export const Pharmacy = () => {
-  const isMobile = useBreakpointValue({ base: true, md: false })
   const order = useContext(OrderContext)
 
   const navigate = useNavigate()
@@ -77,7 +76,9 @@ export const Pharmacy = () => {
 
   const [latitude, setLatitude] = useState<number | undefined>(undefined)
   const [longitude, setLongitude] = useState<number | undefined>(undefined)
-  const [location, setLocation] = useState<string>('')
+  const [location, setLocation] = useState<string>(
+    order?.address ? formatAddress(order.address) : ''
+  )
 
   const [enableCourier, setEnableCourier] = useState<boolean>(false)
 
@@ -88,6 +89,7 @@ export const Pharmacy = () => {
     setSelectedId('')
     setShowFooter(false)
     setShowingAllPharmacies(false)
+    setEnableCourier(false)
   }
 
   const handleModalClose = ({
@@ -99,44 +101,81 @@ export const Pharmacy = () => {
     lat: number | undefined
     lng: number | undefined
   }) => {
+    // Reset view if search location changes
     if (loc && loc !== location) {
-      reset()
-    }
-    if (lat && lng && loc) {
-      setLocation(loc)
-      setLatitude(lat)
-      setLongitude(lng)
-
-      const inAustinTX = /Austin.*(?:TX|Texas)/.test(loc)
-      const isMoPed = order?.organization?.id === process.env.REACT_APP_MODERN_PEDIATRICS_ORG_ID
-      if (inAustinTX && isMoPed) {
-        setEnableCourier(true)
+      if (lat && lng) {
+        reset()
+        setLocation(loc)
+        setLatitude(lat)
+        setLongitude(lng)
       }
     }
+
     setLocationModalOpen(false)
+  }
+
+  const geocode = async (address: string) => {
+    const data = await geocoder.geocode({ address })
+    if (data?.results) {
+      return {
+        loc: data.results[0].formatted_address,
+        lat: data.results[0].geometry.location.lat(),
+        lng: data.results[0].geometry.location.lng()
+      }
+    }
   }
 
   const fetchPharmacies = async () => {
     setLoadingMore(true)
 
-    graphQLClient.setHeader('x-photon-auth', token)
+    // Courier option limited to MoPed in Austin, TX
+    const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(location)
+    const patientAddressInAustinTX =
+      order?.address?.city === 'Austin' && order?.address?.state === 'TX'
+    const isMoPed = order?.organization?.id === process.env.REACT_APP_MODERN_PEDIATRICS_ORG_ID
+    if (searchingInAustinTX && patientAddressInAustinTX && isMoPed) {
+      setEnableCourier(true)
+    }
 
-    const location = {
-      latitude,
-      longitude,
+    // On initializing, we won't have lat/lng
+    let loc: string = location
+    let lat: number = latitude
+    let lng: number = longitude
+    if (!lat || !lng) {
+      const geo = await geocode(location)
+      if (!geo) return
+
+      loc = geo.loc
+      lat = geo.lat
+      lng = geo.lng
+
+      // Save location data for show more pharmacies
+      setLocation(loc)
+      setLatitude(lat)
+      setLongitude(lng)
+    }
+
+    // Get pharmacies from our internal list
+    const locationData = {
+      latitude: lat,
+      longitude: lng,
       radius: 25
     }
     const limit = 3
     const offset = pharmacyOptions.length
 
-    // Get pharmacies from our list
+    graphQLClient.setHeader('x-photon-auth', token)
+
     let pharmaciesResults: any
     try {
-      pharmaciesResults = await graphQLClient.request(GET_PHARMACIES, { location, limit, offset })
+      pharmaciesResults = await graphQLClient.request(GET_PHARMACIES, {
+        location: locationData,
+        limit,
+        offset
+      })
     } catch (error) {
       console.error(JSON.stringify(error, undefined, 2))
       console.log(error)
-
       if (error?.response.errors[0].message === 'No pharmacies found near location') {
         setShowingAllPharmacies(true)
       }
@@ -144,45 +183,42 @@ export const Pharmacy = () => {
 
     if (pharmaciesResults?.pharmaciesByLocation.length > 0) {
       for (let i = 0; i < pharmaciesResults.pharmaciesByLocation.length; i++) {
+        // Search for google place
         const name = pharmaciesResults.pharmaciesByLocation[i].name
         const address = pharmaciesResults.pharmaciesByLocation[i].address
           ? formatAddress(pharmaciesResults.pharmaciesByLocation[i].address)
           : ''
-
         const placeRequest = {
           query: name + ' ' + address,
           fields: ['place_id']
         }
 
-        // Search for google place
-        let place, placeStatus
+        let placeId, placeStatus
         try {
           const { response, status }: any = await query('findPlaceFromQuery', placeRequest)
-          place = response
+          placeId = response[0]?.place_id
           placeStatus = status
         } catch (error) {
           console.error(JSON.stringify(error, undefined, 2))
           console.log(error)
-
           continue
         }
 
         // Search for google place details
-        if (placeStatus === 'OK' && place[0].place_id) {
+        if (placeStatus === 'OK' && placeId) {
           const detailsRequest = {
-            placeId: place[0].place_id,
+            placeId,
+            // 'getDetails' requires utc_offset_minutes to provide isOpen()
             fields: ['opening_hours', 'utc_offset_minutes', 'rating', 'business_status']
           }
           const { response: details, status: detailsStatus }: any = await query(
             'getDetails',
             detailsRequest
           )
-
           if (detailsStatus === 'OK') {
             pharmaciesResults.pharmaciesByLocation[i].businessStatus =
               details?.business_status || ''
             pharmaciesResults.pharmaciesByLocation[i].rating = details?.rating || undefined
-
             const openForBusiness = details?.business_status === 'OPERATIONAL'
             if (openForBusiness) {
               const currentTime = dayjs().format('HHmm')
@@ -203,7 +239,6 @@ export const Pharmacy = () => {
       }
       setPharmacyOptions([...pharmacyOptions, ...pharmaciesResults.pharmaciesByLocation])
     }
-
     setLoadingMore(false)
   }
 
@@ -271,10 +306,10 @@ export const Pharmacy = () => {
   }
 
   useEffect(() => {
-    if (latitude && longitude) {
+    if (location) {
       fetchPharmacies()
     }
-  }, [latitude, longitude])
+  }, [location])
 
   if (error) {
     return (
@@ -285,7 +320,7 @@ export const Pharmacy = () => {
     )
   }
 
-  const { organization } = order
+  const { organization, address } = order
 
   return (
     <Box>
@@ -314,6 +349,7 @@ export const Pharmacy = () => {
                   display="inline"
                   color="brandLink"
                   fontWeight="medium"
+                  size="sm"
                 >
                   <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
                   {location}
@@ -334,6 +370,7 @@ export const Pharmacy = () => {
                   location={location}
                   selectedId={selectedId}
                   handleSelect={handleSelect}
+                  patientAddress={formatAddress(address)}
                 />
               ) : null}
 
@@ -344,7 +381,7 @@ export const Pharmacy = () => {
                 handleShowMore={handleShowMore}
                 loadingMore={loadingMore}
                 showingAllPharmacies={showingAllPharmacies}
-                isMobile={isMobile}
+                courierEnabled={enableCourier}
               />
             </VStack>
           ) : null}
