@@ -5,6 +5,7 @@ import ComboBox from '../../particles/ComboBox';
 import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter';
 import SelectLocation from '../SelectLocation';
 import Icon from '../../particles/Icon';
+import Button from '../../particles/Button';
 
 export interface PharmacyProps {
   address?: string;
@@ -50,17 +51,18 @@ export default function PharmacySearch(props: PharmacyProps) {
         <InputGroup
           label="Select a pharmacy"
           helpText={
-            <button
-              class="text-indigo-500 hover:text-indigo-700 flex items-center bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+            <Button
+              variant="naked"
               onClick={() => {
                 if (props?.setPharmacy) {
                   props.setPharmacy(undefined);
                 }
                 actions.clearPharmacies();
               }}
+              iconLeft={<Icon name="mapPin" size="sm" />}
             >
-              <Icon name="mapPin" size="sm" /> {store?.pharmacies?.address || '...'}{' '}
-            </button>
+              {store?.pharmacies?.address || '...'}{' '}
+            </Button>
           }
         >
           <ComboBox setSelected={setSelected}>
