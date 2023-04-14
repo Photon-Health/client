@@ -1,7 +1,6 @@
 import { createSignal } from 'solid-js';
 import PharmacySearch from './systems/PharmacySearch';
 import Client from './systems/Client';
-import SelectLocation from './systems/SelectLocation';
 
 const App = () => {
   const [pharmacy, setPharmacy] = createSignal<any>();
