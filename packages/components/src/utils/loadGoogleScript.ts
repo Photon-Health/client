@@ -4,7 +4,7 @@ interface LoadGoogleScriptOptions {
 }
 
 export default function loadGoogleScript({ onLoad, onError }: LoadGoogleScriptOptions) {
-  if (window.google && window.google.maps) {
+  if (window?.google?.maps) {
     onLoad();
   } else {
     const script = document.createElement('script');

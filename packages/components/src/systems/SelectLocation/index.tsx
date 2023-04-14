@@ -78,7 +78,7 @@ export default function SelectLocation() {
             onClick={getCurrentLocation}
             iconLeft={loadingNavigator() ? <Spinner size="sm" /> : <Icon name="mapPin" size="sm" />}
           >
-            {loadingNavigator() ? 'Getting current location' : 'Use my Current Location'}
+            {loadingNavigator() ? 'Getting Current Location' : 'Use my Current Location'}
           </Button>
           {navigatorError() && (
             <p class="text-sm text-red-500 mt-2 text-center">Could not get current location</p>
