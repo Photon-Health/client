@@ -3,7 +3,7 @@ import InputGroup from '../../particles/InputGroup';
 import { PharmacyStore } from '../../stores/pharmacy';
 import ComboBox from '../../particles/ComboBox';
 import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter';
-import SelectLocation from '../SelectLocation';
+import LocationSelect from '../LocationSelect';
 import Icon from '../../particles/Icon';
 import Button from '../../particles/Button';
 
@@ -44,7 +44,7 @@ export default function PharmacySearch(props: PharmacyProps) {
     <div>
       <Show when={!hasFoundPharmacies()}>
         <InputGroup label="Select a location">
-          <SelectLocation />
+          <LocationSelect />
         </InputGroup>
       </Show>
       <Show when={hasFoundPharmacies()}>

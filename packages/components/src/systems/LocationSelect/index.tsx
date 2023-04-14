@@ -10,7 +10,7 @@ import loadGoogleScript from '../../utils/loadGoogleScript';
 import { PharmacyStore } from '../../stores/pharmacy';
 import { usePhoton } from '../../context';
 
-export default function SelectLocation() {
+export default function LocationSelect() {
   const client = usePhoton();
   const [open, setOpen] = createSignal(false);
   const [address, setAddress] = createSignal('');
