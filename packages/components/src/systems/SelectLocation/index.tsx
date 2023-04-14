@@ -17,6 +17,7 @@ export default function SelectLocation() {
   const { store, actions } = PharmacyStore;
   const [loadingNavigator, setLoadingNavigator] = createSignal(false);
   const [loadingSearch, setLoadingSearch] = createSignal(false);
+  const [navigatorError, setNavigatorError] = createSignal(false);
   let geocoder: google.maps.Geocoder | undefined;
 
   onMount(async () => {
@@ -30,31 +31,31 @@ export default function SelectLocation() {
   const handleAddressSubmit = async (e: Event) => {
     e.preventDefault();
     setLoadingSearch(true);
+    setNavigatorError(false);
     await actions.getPharmaciesByAddress(client!.getSDK(), geocoder!, String(address()));
     setLoadingSearch(false);
   };
 
   const getCurrentLocation = async () => {
     setLoadingNavigator(true);
+    setNavigatorError(false);
     try {
       const {
         coords: { latitude, longitude }
       } = await getNavigatorLocation({ timeout: 5000 });
-      console.log(latitude, longitude);
 
       await actions.getPharmaciesByAddress(client!.getSDK(), geocoder!, {
         lat: latitude,
         lng: longitude
       });
     } catch {
-      console.warn('Could not get current location');
+      setNavigatorError(true);
     }
     setLoadingNavigator(false);
   };
 
   createEffect(() => {
     if (store.pharmacies.data.length > 0) {
-      console.log(store.pharmacies.data.length);
       setOpen(false);
     }
   });
@@ -79,6 +80,9 @@ export default function SelectLocation() {
           >
             {loadingNavigator() ? 'Getting current location' : 'Use my Current Location'}
           </Button>
+          {navigatorError() && (
+            <p class="text-sm text-red-500 mt-2 text-center">Could not get current location</p>
+          )}
         </div>
         <div class="flex items-center gap-2 py-2">
           <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700 w-full" />
