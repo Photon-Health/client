@@ -19,13 +19,6 @@ const App = () => {
           <PharmacySearch setPharmacy={setPharmacy} />
         </div>
       </div>
-
-      <div class="p-5" style={{ width: '600px' }}>
-        <div class="p-5 border border-gray-300 rounded-md">
-          <p class="pb-5">SelectLocation Component</p>
-          <SelectLocation />
-        </div>
-      </div>
     </Client>
   );
 };
