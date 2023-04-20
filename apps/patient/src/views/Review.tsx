@@ -1,4 +1,5 @@
 import { useContext } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
   Accordion,
   AccordionItem,
@@ -15,7 +16,6 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react'
-import { Link as RouterLink } from 'react-router-dom'
 import { FaPrescription } from 'react-icons/fa'
 import { Helmet } from 'react-helmet'
 
@@ -30,7 +30,16 @@ import { prescriptions } from '../utils/demoPrescriptions'
 export const Review = () => {
   const order = useContext<Order>(OrderContext)
 
-  const { organization } = order
+  const navigate = useNavigate()
+
+  const [searchParams] = useSearchParams()
+  const token = searchParams.get('token')
+
+  const { organization, patient } = order
+
+  const handleCtaClick = () => {
+    navigate(`/pharmacy?orderId=${order.id}&token=${token}`)
+  }
 
   return (
     <Box>
@@ -38,24 +47,34 @@ export const Review = () => {
         <title>{t.review.title}</title>
       </Helmet>
 
-      <Nav header={organization.name} />
+      <Nav header={organization.name} orgId={organization.id} />
 
-      <Container>
-        <VStack spacing={6} align="start" pt={5} bgColor="rgb(247, 244, 244)" h="110vh">
+      <Container pb={32}>
+        <VStack spacing={6} align="span" pt={5}>
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
               {t.review.heading}
             </Heading>
             <Text>{t.review.subheading}</Text>
           </VStack>
-          <Box alignSelf="start">
-            <Text display="inline" color="gray.500">
-              {t.review.prescriber}
-            </Text>
-            <Text display="inline" ms={3}>
-              Dr. Tim Porter
-            </Text>
-          </Box>
+          <VStack spacing={1} align="start">
+            <HStack>
+              <Text display="inline" color="gray.500">
+                {t.review.patient}
+              </Text>
+              <Text display="inline" ms={3}>
+                {patient.name.full}
+              </Text>
+            </HStack>
+            <HStack>
+              <Text display="inline" color="gray.500">
+                {t.review.prescriber}
+              </Text>
+              <Text display="inline" ms={3}>
+                Dr. Tim Porter
+              </Text>
+            </HStack>
+          </VStack>
 
           <Accordion allowToggle defaultIndex={[0]}>
             {prescriptions.map(
@@ -116,7 +135,7 @@ export const Review = () => {
                               <Text color="gray.500">{t.review.expires}</Text>
                               <Text>{expires}</Text>
                             </HStack>
-                            <HStack w="full">
+                            <HStack w="full" align="start">
                               <Text color="gray.500">{t.review.instructions}</Text>
                               <Text>{instructions}</Text>
                             </HStack>
@@ -134,7 +153,7 @@ export const Review = () => {
 
       <FixedFooter show={true}>
         <Container as={VStack} w="full">
-          <Button size="lg" w="full" variant="brand" as={RouterLink} to="/pharmacy">
+          <Button size="lg" w="full" variant="brand" onClick={handleCtaClick}>
             {t.review.cta}
           </Button>
           <PoweredBy />

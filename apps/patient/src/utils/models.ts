@@ -22,8 +22,12 @@ export interface Order {
     id: string
     name: string
   }
+  fills: any
   patient: {
     id: string
+    name: {
+      full: string
+    }
   }
 }
 

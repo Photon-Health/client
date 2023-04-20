@@ -11,7 +11,6 @@ import {
   Link,
   Text,
   VStack,
-  useBreakpointValue,
   useToast
 } from '@chakra-ui/react'
 import { FiCheck, FiMapPin } from 'react-icons/fi'
@@ -320,7 +319,11 @@ export const Pharmacy = () => {
     )
   }
 
-  const { organization, address } = order
+  const { organization, address, pharmacy, id } = order
+
+  if (pharmacy?.id) {
+    navigate(`/status?orderId=${id}&token=${token}`)
+  }
 
   return (
     <Box>

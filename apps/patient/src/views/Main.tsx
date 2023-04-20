@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, createContext } from 'react'
-import { Outlet, useSearchParams, useNavigate, useLocation } from 'react-router-dom'
+import { Outlet, useSearchParams, useNavigate } from 'react-router-dom'
 import { Alert, AlertIcon, Center, CircularProgress } from '@chakra-ui/react'
 import { ChakraProvider } from '@chakra-ui/react'
 
@@ -12,6 +12,7 @@ import theme from '../configs/theme'
 const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER']
 
 export const OrderContext = createContext(null)
+export const GeneralContext = createContext(null)
 
 export const Main = () => {
   const [searchParams] = useSearchParams()
@@ -19,11 +20,9 @@ export const Main = () => {
   const token = searchParams.get('token')
 
   const [order, setOrder] = useState<Order | undefined>(undefined)
-
   const [error, setError] = useState<string | undefined>(undefined)
 
   const navigate = useNavigate()
-  const location = useLocation()
 
   if (!orderId || !token) {
     console.error('Missing orderId or token in search params')
@@ -49,7 +48,9 @@ export const Main = () => {
         )
         if (isMissingPharmacyError) {
           setOrder(error.response.data.order)
-          navigate(`/pharmacy?orderId=${orderId}&token=${token}`)
+          navigate(`/review?orderId=${error.response.data.order.id}&token=${token}`, {
+            replace: true
+          })
         } else {
           if (AUTH_HEADER_ERRORS.includes(error.response.errors[0].extensions.code)) {
             navigate('/no-match')
@@ -86,10 +87,6 @@ export const Main = () => {
         </Center>
       </ChakraProvider>
     )
-  }
-
-  if (location.pathname !== '/status' && order?.pharmacy?.id) {
-    navigate(`/status?orderId=${orderId}&token=${token}`, { replace: true })
   }
 
   return (
