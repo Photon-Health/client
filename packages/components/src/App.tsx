@@ -1,5 +1,6 @@
 import { createSignal } from 'solid-js';
 import PharmacySearch from './systems/PharmacySearch';
+import DoseCalculator from './systems/DoseCalculator';
 import Client from './systems/Client';
 
 const App = () => {
@@ -16,6 +17,12 @@ const App = () => {
       <div class="p-5" style={{ width: '600px' }}>
         <div class="p-5 border border-gray-300 rounded-md">
           <PharmacySearch setPharmacy={setPharmacy} />
+        </div>
+      </div>
+
+      <div class="p-5" style={{ width: '600px' }}>
+        <div class="p-5 border border-gray-300 rounded-md">
+          <DoseCalculator />
         </div>
       </div>
     </Client>
