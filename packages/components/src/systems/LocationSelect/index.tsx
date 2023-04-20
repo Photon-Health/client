@@ -63,7 +63,7 @@ export default function LocationSelect() {
   return (
     <div>
       <Button onClick={() => setOpen(true)}>Set Search Location</Button>
-      <Dialog open={open()} onClose={() => setOpen(false)}>
+      <Dialog open={open()} setClose={() => setOpen(false)}>
         <div class="mt-3 text-center sm:mt-5">
           <h2>Set Location</h2>
           <div class="mt-2">
