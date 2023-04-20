@@ -16,9 +16,14 @@ import { createStore } from 'solid-js/store';
 import clsx from 'clsx';
 import { useInputGroup } from '../InputGroup';
 
+type ObjectWithID = {
+  id: string;
+  [key: string]: any;
+};
+
 interface ComboBoxState {
   open: boolean;
-  selected: any;
+  selected: ObjectWithID | null;
   active: string;
   typing: boolean;
 }
@@ -33,7 +38,7 @@ interface ComboBoxActions {
 type ComboBoxContextValue = [ComboBoxState, ComboBoxActions];
 
 export const ComboBoxContext = createContext<ComboBoxContextValue>([
-  { open: false, selected: {}, active: '', typing: false },
+  { open: false, selected: null, active: '', typing: false },
   {
     setOpen: () => {},
     setSelected: () => {},
@@ -45,7 +50,7 @@ export const ComboBoxContext = createContext<ComboBoxContextValue>([
 export function ComboBoxProvider(props: { children?: JSX.Element }) {
   const [state, setState] = createStore<ComboBoxState>({
     open: false,
-    selected: {},
+    selected: null,
     active: '',
     typing: false
   });
@@ -159,17 +164,21 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
     }
   });
 
+  const value = createMemo(
+    () => selectedLocalValue() || (state.selected && props.displayValue(state.selected)) || ''
+  );
+
   return (
     <>
       <div ref={inputContainer! as HTMLDivElement}>
         <Input
           {...restInput}
-          value={selectedLocalValue() || props.displayValue(state.selected)}
+          value={value()}
           onClick={() => setOpen(!comboState.open)}
           onInput={(e) => {
             // @ts-ignore
             local?.onInput(e);
-            setLocalSelectedValue(e.target?.value);
+            setLocalSelectedValue((e.target as HTMLInputElement).value);
             setOpen(true);
           }}
         />
