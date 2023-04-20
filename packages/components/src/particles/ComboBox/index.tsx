@@ -93,6 +93,7 @@ function ComboOptions(props: { children?: JSX.Element }) {
 export interface ComboOptionProps {
   key: string;
   value: string;
+  value: any;
   children?: JSX.Element;
 }
 
@@ -101,12 +102,12 @@ function ComboOption(props: ComboOptionProps) {
 
   const optionClass = createMemo(() =>
     clsx('relative cursor-default select-none py-2 pl-3 pr-9 text-gray-900', {
-      'bg-indigo-600 text-white': state.active === props.key
+      'bg-blue-600 text-white': state.active === props.key
     })
   );
 
   const iconClass = createMemo(() =>
-    clsx(state.active === props.key ? 'text-white' : 'text-indigo-600')
+    clsx(state.active === props.key ? 'text-white' : 'text-blue-600')
   );
 
   return (

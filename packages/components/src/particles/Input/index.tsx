@@ -23,7 +23,7 @@ export default function Input(props: InputProps) {
         'pl-10': inputProps.type === 'email',
         'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-2 focus:ring-inset focus:ring-red-500':
           !!error && !disabled,
-        'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600':
+        'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600':
           !error && !disabled,
         'cursor-not-allowed bg-gray-50 text-gray-500 ring-gray-200': inputProps.disabled
       }

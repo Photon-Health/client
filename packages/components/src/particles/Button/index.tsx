@@ -25,12 +25,12 @@ export default function Button(props: ButtonProps) {
     'px-2.5 py-1.5': otherProps.size === 'md' && otherProps.variant !== 'naked',
     'px-2 py-1':
       (otherProps.size === 'sm' || otherProps.size === 'xs') && otherProps.variant !== 'naked',
-    'text-white bg-indigo-600 hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:bg-indigo-500':
+    'text-white bg-blue-600 hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:bg-blue-500':
       otherProps.variant === 'primary',
     'rounded bg-white text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50':
       otherProps.variant === 'secondary',
-    'bg-indigo-50 text-indigo-600 hover:bg-indigo-100': otherProps.variant === 'tertiary',
-    'text-indigo-600 hover:text-indigo-500 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300':
+    'bg-blue-50 text-blue-600 hover:bg-blue-100': otherProps.variant === 'tertiary',
+    'text-blue-600 hover:text-blue-500 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300':
       otherProps.variant === 'naked',
     'opacity-50 cursor-not-allowed': buttonProps.disabled,
     'justify-center inline-flex items-center gap-x-1.5': otherProps?.iconLeft
