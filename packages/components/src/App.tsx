@@ -1,13 +1,24 @@
-import { createSignal } from 'solid-js';
+import { For, createEffect, createMemo, createSignal } from 'solid-js';
 import PharmacySearch from './systems/PharmacySearch';
 import DoseCalculator from './systems/DoseCalculator';
 import Client from './systems/Client';
 import Button from './particles/Button';
 import Icon from './particles/Icon';
+import { randomNames } from './sampleData/randomNames';
+import ComboBox from './particles/ComboBox';
 
 const App = () => {
   const [pharmacy, setPharmacy] = createSignal<any>();
   const [doseOpen, setDoseOpen] = createSignal(false);
+  const [query, setQuery] = createSignal('');
+  const rando = randomNames.slice(0, 3);
+  const filteredPeople = createMemo(() => {
+    return query() === ''
+      ? rando
+      : rando.filter((person) => {
+          return person.name.toLowerCase().includes(query().toLowerCase());
+        });
+  });
 
   return (
     <Client
@@ -19,6 +30,26 @@ const App = () => {
     >
       <div class="p-5 w-full sm:max-w-lg">
         <div class="p-5 border border-gray-300 rounded-md">
+          <ComboBox>
+            <ComboBox.Input
+              onInput={(e) => setQuery((e.target as HTMLInputElement).value)}
+              displayValue={(person) => person.name}
+            />
+            <ComboBox.Options>
+              <For each={filteredPeople()}>
+                {(person) => (
+                  <ComboBox.Option key={person.id} value={person}>
+                    {person.name}
+                  </ComboBox.Option>
+                )}
+              </For>
+            </ComboBox.Options>
+          </ComboBox>
+        </div>
+      </div>
+
+      <div class="p-5 w-full sm:max-w-lg">
+        <div class="p-5 border border-gray-300 rounded-md">
           <PharmacySearch setPharmacy={setPharmacy} />
         </div>
       </div>
@@ -28,6 +59,7 @@ const App = () => {
           <Button onClick={() => setDoseOpen(true)}>
             <Icon name="calculator" size="sm" />
           </Button>
+
           <DoseCalculator open={doseOpen()} setClose={() => setDoseOpen(false)} />
         </div>
       </div>

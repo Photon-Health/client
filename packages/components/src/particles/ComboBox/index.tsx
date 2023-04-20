@@ -18,7 +18,7 @@ import { useInputGroup } from '../InputGroup';
 
 interface ComboBoxState {
   open: boolean;
-  selected: { id: string; value: string } | {};
+  selected: any;
   active: string;
   typing: boolean;
 }
@@ -92,7 +92,6 @@ function ComboOptions(props: { children?: JSX.Element }) {
 
 export interface ComboOptionProps {
   key: string;
-  value: string;
   value: any;
   children?: JSX.Element;
 }
@@ -106,16 +105,18 @@ function ComboOption(props: ComboOptionProps) {
     })
   );
 
-  const iconClass = createMemo(() =>
-    clsx(state.active === props.key ? 'text-white' : 'text-blue-600')
-  );
+  const iconClass = createMemo(() => {
+    console.log(props.children, state.active === props.key);
+    console.log(clsx(state.active === props.key ? 'text-white' : 'text-blue-600'));
+    return clsx(state.active === props.key ? 'text-white' : 'text-blue-600');
+  });
 
   return (
     <li
       class={optionClass()}
       role="option"
       tabindex="-1"
-      onClick={() => setSelected({ id: props.key, value: props.value })}
+      onClick={() => setSelected(props.value)}
       onMouseEnter={() => setActive(props.key)}
     >
       <span class="block truncate">{props.children}</span>
@@ -128,11 +129,16 @@ function ComboOption(props: ComboOptionProps) {
   );
 }
 
-function ComboInput(props: InputProps) {
+interface ComboBoxInputProps {
+  displayValue: (item: any) => string;
+}
+
+function ComboInput(props: ComboBoxInputProps & InputProps) {
   const [comboState, { setOpen }] = useComboBox();
   const [inputGroupState] = useInputGroup();
   const [local, restInput] = splitProps(props, ['onInput', 'value']);
   const [selectedLocalValue, setLocalSelectedValue] = createSignal('');
+  const [state] = useComboBox();
   let inputContainer: HTMLElement;
 
   onMount(() => {
@@ -158,7 +164,7 @@ function ComboInput(props: InputProps) {
       <div ref={inputContainer! as HTMLDivElement}>
         <Input
           {...restInput}
-          value={selectedLocalValue()}
+          value={selectedLocalValue() || props.displayValue(state.selected)}
           onClick={() => setOpen(!comboState.open)}
           onInput={(e) => {
             // @ts-ignore
@@ -189,11 +195,17 @@ export interface ComboBoxProps {
 }
 
 function ComboBoxWrapper(props: ComboBoxProps) {
-  const [state] = useComboBox();
+  const [state, { setSelected }] = useComboBox();
 
   createEffect(() => {
     if (props.setSelected) {
       props.setSelected(state.selected);
+    }
+  });
+
+  createEffect(() => {
+    if (props.value) {
+      setSelected(props.value);
     }
   });
 
