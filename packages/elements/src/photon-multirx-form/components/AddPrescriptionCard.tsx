@@ -175,7 +175,13 @@ export const AddPrescriptionCard = (props: {
                   dosageCalculatorRef.open = true;
                 }}
               >
-                <sl-icon name="calculator"></sl-icon>
+                <button
+                  onClick={() => {
+                    dosageCalculatorRef.open = true;
+                  }}
+                >
+                  <sl-icon name="calculator"></sl-icon>
+                </button>
               </photon-button>
               <div style={{ height: '23px' }} class="pt-1"></div>
             </div>
