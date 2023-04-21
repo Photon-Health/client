@@ -1,6 +1,5 @@
 import { JSX, Show, createMemo, splitProps } from 'solid-js';
-import { Icon } from 'solid-heroicons';
-import { envelope } from 'solid-heroicons/solid';
+import Icon from '../Icon';
 import clsx from 'clsx';
 import { useInputGroup } from '../InputGroup';
 import Spinner from '../Spinner';
@@ -36,7 +35,7 @@ export default function Input(props: InputProps) {
       <div class="relative rounded-md shadow-sm">
         <Show when={inputProps.type === 'email'}>
           <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Icon path={envelope} class="h-5 w-5 text-gray-400" />
+            <Icon name="envelope" class="h-5 w-5 text-gray-400" size="sm" />
           </div>
         </Show>
         <input id={state?.id} {...inputProps} class={inputClass()} />

@@ -125,6 +125,9 @@ export const PRESCRIPTION_FIELDS = gql`
 export const FILL_FIELDS = gql`
   fragment FillFields on Fill {
     id
+    prescription {
+      id
+    }
     treatment {
       name
     }
