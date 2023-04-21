@@ -13,6 +13,11 @@ export const settings = {
       logo: 'photon',
       accentColor: '#b35724'
     },
+    // NewCo (us)
+    [process.env.REACT_APP_NEWCO_ORG_ID as string]: {
+      logo: 'newco_logo.png',
+      accentColor: '#69348F'
+    },
     // Modern Pediatrics
     [process.env.REACT_APP_MODERN_PEDIATRICS_ORG_ID as string]: {
       logo: 'modern_pediatrics_logo.png',
