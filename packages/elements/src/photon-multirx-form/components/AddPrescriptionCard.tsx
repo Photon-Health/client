@@ -135,7 +135,7 @@ export const AddPrescriptionCard = (props: {
           ></photon-datepicker>
         </div>
         <div class="mt-2 sm:mt-0 sm:grid sm:grid-cols-2 sm:gap-4">
-          <div class="flex items-end sm:items-stretch gap-2 sm:flex-col sm:gap-0">
+          <div class="flex items-end gap-1">
             <photon-number-input
               class="flex-grow flex-1 w-2/5 sm:w-auto"
               label="Quantity"
@@ -167,7 +167,7 @@ export const AddPrescriptionCard = (props: {
                 }
               }}
             ></photon-dosage-calculator-dialog>
-            <div class="pb-5 mb-0.5 w-3/5 sm:w-auto sm:pb-0 sm:pt-1 sm:mb-4">
+            <div>
               <photon-button
                 variant="outline"
                 class="w-fit"
@@ -175,9 +175,15 @@ export const AddPrescriptionCard = (props: {
                   dosageCalculatorRef.open = true;
                 }}
               >
-                <sl-icon slot="suffix" name="calculator"></sl-icon>
-                Dose Calculator
+                <button
+                  onClick={() => {
+                    dosageCalculatorRef.open = true;
+                  }}
+                >
+                  <sl-icon name="calculator"></sl-icon>
+                </button>
               </photon-button>
+              <div style={{ height: '23px' }} class="pt-1"></div>
             </div>
           </div>
           <photon-dispense-units

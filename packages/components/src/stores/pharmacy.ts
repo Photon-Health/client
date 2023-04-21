@@ -65,11 +65,14 @@ export const createPharmacyStore = (cs?: typeof createStore) => {
   const getPharmaciesByAddress = async (
     client: PhotonClient,
     geocoder: google.maps.Geocoder,
-    address: string,
+    address: string | { lat: number; lng: number },
     name?: string
   ) => {
     try {
-      const data = await geocoder.geocode({ address });
+      const data = await geocoder.geocode({
+        ...(typeof address === 'string' ? { address } : { location: address })
+      });
+
       const latitude = data.results[0].geometry.location.lat();
       const longitude = data.results[0].geometry.location.lng();
       const addressResult = data.results[0].formatted_address;

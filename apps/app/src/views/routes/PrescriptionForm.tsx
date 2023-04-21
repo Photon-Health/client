@@ -13,6 +13,7 @@ export const PrescriptionForm = () => {
   const ref: MutableRefObject<any> = useRef();
   const [params] = useSearchParams();
   const patientId = params.get('patientId') || '';
+  const templateIds = params.get('templateIds') || '';
 
   const navigate = useNavigate();
   const onClose = () => {
@@ -58,7 +59,7 @@ export const PrescriptionForm = () => {
         zIndex: 15
       }}
     >
-      <photon-multirx-form-wrapper ref={ref} />
+      <photon-multirx-form-wrapper ref={ref} template-ids={templateIds} />
     </div>
   );
 };
