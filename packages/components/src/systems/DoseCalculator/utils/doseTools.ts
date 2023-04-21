@@ -1,5 +1,20 @@
 export type WeightUnit = 'kgs' | 'g' | 'lbs' | 'oz';
 export type DosageUnit = 'kg' | 'lb' | 'mcg' | 'mg' | 'g';
+export type LiquidUnit = 'mcg' | 'mg' | 'g';
+
+type ConversionFactors = {
+  [key in DosageUnit]: {
+    [key in WeightUnit | LiquidUnit]?: number;
+  };
+};
+
+const conversionFactors: ConversionFactors = {
+  kg: { oz: (1 / 16) * 0.453592, lbs: 0.453592, kgs: 1, g: 1 / 1000 },
+  lb: { kgs: 2.20462, g: 2.20462 / 1000, lbs: 1, oz: 1 / 16 },
+  mcg: { mcg: 1, mg: 1 / 1000, g: 1 / (1000 * 1000) },
+  mg: { mcg: 1000, mg: 1, g: 1 / 1000 },
+  g: { mcg: 1000 * 1000, mg: 1000, g: 1 }
+};
 
 export interface Weight {
   value: number;
@@ -10,7 +25,6 @@ export interface Dosage {
   value: number;
   unit: DosageUnit;
 }
-export type LiquidUnit = 'mcg' | 'mg' | 'g';
 
 export interface Liquid {
   value: number;
@@ -20,20 +34,6 @@ export interface Liquid {
 export const compatibleDosageWeight = (dosageUnit: DosageUnit, weightUnit: WeightUnit): boolean =>
   ((weightUnit === 'kgs' || weightUnit === 'g') && dosageUnit === 'kg') ||
   ((weightUnit === 'lbs' || weightUnit === 'oz') && dosageUnit === 'lb');
-
-interface ConversionFactors {
-  [key: string]: {
-    [key: string]: number;
-  };
-}
-
-const conversionFactors: ConversionFactors = {
-  kg: { oz: (1 / 16) * 0.453592, lbs: 0.453592 },
-  lb: { kgs: 2.20462, g: 2.20462 / 1000 },
-  mcg: { mcg: 1, g: 1000 * 1000 },
-  mg: { mcg: 1 / 1000, g: 1000 },
-  g: { mcg: 1 / (1000 * 1000), mg: 1 / 1000 }
-};
 
 export const convertCompatibleWeight = (dosageUnit: DosageUnit, weight: Weight): number => {
   return dosageUnit in conversionFactors && weight.unit in conversionFactors[dosageUnit]

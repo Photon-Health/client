@@ -33,7 +33,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           <div class="flex items-center gap-2">
             <Input />
             <ComboBox>
-              <ComboBox.Input />
+              <ComboBox.Input displayValue={() => ''} />
               <ComboBox.Options>
                 <For each={doseUnits.map((d, i) => ({ id: i, name: d }))}>
                   {(unit) => (
@@ -46,7 +46,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
             </ComboBox>
             <p>per</p>
             <ComboBox>
-              <ComboBox.Input />
+              <ComboBox.Input displayValue={() => ''} />
               <ComboBox.Options>
                 <For each={doseFrequency.map((d, i) => ({ id: i, name: d }))}>
                   {(time) => (
@@ -64,7 +64,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           <div class="flex gap-2">
             <Input />
             <ComboBox>
-              <ComboBox.Input />
+              <ComboBox.Input displayValue={() => ''} />
               <ComboBox.Options>
                 <For each={doseUnits.map((d, i) => ({ id: i, name: d }))}>
                   {(unit) => (
@@ -83,7 +83,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           <div class="flex gap-2">
             <Input />
             <ComboBox>
-              <ComboBox.Input />
+              <ComboBox.Input displayValue={() => ''} />
               <ComboBox.Options>
                 <For each={doseUnits.map((d, i) => ({ id: i, name: d }))}>
                   {(unit) => (
@@ -100,7 +100,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           <div class="flex gap-2">
             <Input />
             <ComboBox>
-              <ComboBox.Input />
+              <ComboBox.Input displayValue={() => ''} />
               <ComboBox.Options>
                 <For each={doseUnits.map((d, i) => ({ id: i, name: d }))}>
                   {(unit) => (
