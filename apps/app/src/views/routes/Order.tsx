@@ -468,19 +468,26 @@ export const Order = () => {
           <TableContainer w="full">
             <Table bg="transparent" size="sm">
               <Tbody>
-                {order.fills.map(({ id: fillId, state, treatment }, i) => {
+                {order.fills.map((fill: any, i: number) => {
                   return i < 5 ? (
-                    <Tr key={fillId}>
+                    <Tr key={fill.id}>
                       <Td px={0} py={3} whiteSpace="pre-wrap" borderColor="gray.200">
                         <HStack w="full" justify="space-between">
                           <VStack alignItems="start">
-                            <Text>{treatment.name}</Text>
+                            <HStack>
+                              <Link
+                                color="blue.500"
+                                href={`/prescriptions/${fill?.prescription?.id}`}
+                              >
+                                <Text>{fill.treatment.name}</Text>
+                              </Link>
+                            </HStack>
                             <HStack>
                               <Badge
                                 size="sm"
-                                colorScheme={FILL_COLOR_MAP[state as keyof object] || ''}
+                                colorScheme={FILL_COLOR_MAP[fill.state as keyof object] || ''}
                               >
-                                {FILL_STATE_MAP[state as keyof object] || ''}
+                                {FILL_STATE_MAP[fill.state as keyof object] || ''}
                               </Badge>
                             </HStack>
                           </VStack>

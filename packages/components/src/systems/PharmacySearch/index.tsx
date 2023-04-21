@@ -1,11 +1,10 @@
 import { For, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
 import InputGroup from '../../particles/InputGroup';
-import Input from '../../particles/Input';
-import loadGoogleScript from '../../utils/loadGoogleScript';
 import { PharmacyStore } from '../../stores/pharmacy';
-import { usePhoton } from '../../context';
 import ComboBox from '../../particles/ComboBox';
 import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter';
+import LocationSelect from '../LocationSelect';
+import Icon from '../../particles/Icon';
 import Button from '../../particles/Button';
 
 export interface PharmacyProps {
@@ -16,33 +15,9 @@ export interface PharmacyProps {
 }
 
 export default function PharmacySearch(props: PharmacyProps) {
-  const client = usePhoton();
   const { store, actions } = PharmacyStore;
   const [selected, setSelected] = createSignal<any>();
-  const [address, setAddress] = createSignal(props.address || '');
-  const [addressError, setAddressError] = createSignal('');
   const [query, setQuery] = createSignal('');
-  let geocoder: google.maps.Geocoder | undefined;
-
-  onMount(async () => {
-    loadGoogleScript({
-      onLoad: async () => {
-        geocoder = new google.maps.Geocoder();
-
-        if (props.address) {
-          await actions.getPharmaciesByAddress(client!.getSDK(), geocoder!, String(address()));
-        }
-      },
-      onError: (err) => {
-        setAddressError(err);
-      }
-    });
-  });
-
-  const handleAddressSubmit = async (e: Event) => {
-    e.preventDefault();
-    await actions.getPharmaciesByAddress(client!.getSDK(), geocoder!, String(address()));
-  };
 
   const hasFoundPharmacies = createMemo(() => store.pharmacies.data.length > 0);
 
@@ -68,35 +43,26 @@ export default function PharmacySearch(props: PharmacyProps) {
   return (
     <div>
       <Show when={!hasFoundPharmacies()}>
-        <form onSubmit={handleAddressSubmit}>
-          <InputGroup
-            label="Enter an address or zip code"
-            error={addressError()}
-            loading={store.pharmacies?.isLoading || false}
-          >
-            <Input type="text" value={address()} onInput={(e) => setAddress(e.target?.value)} />
-          </InputGroup>
-        </form>
+        <InputGroup label="Select a location">
+          <LocationSelect />
+        </InputGroup>
       </Show>
       <Show when={hasFoundPharmacies()}>
         <InputGroup
           label="Select a pharmacy"
           helpText={
-            <div>
-              Showing Pharmacies near {store?.pharmacies?.address || '...'}{' '}
-              <Button
-                size="xs"
-                variant="secondary"
-                onClick={() => {
-                  if (props?.setPharmacy) {
-                    props.setPharmacy(undefined);
-                  }
-                  actions.clearPharmacies();
-                }}
-              >
-                change
-              </Button>
-            </div>
+            <Button
+              variant="naked"
+              onClick={() => {
+                if (props?.setPharmacy) {
+                  props.setPharmacy(undefined);
+                }
+                actions.clearPharmacies();
+              }}
+              iconLeft={<Icon name="mapPin" size="sm" />}
+            >
+              {store?.pharmacies?.address || '...'}{' '}
+            </Button>
           }
         >
           <ComboBox setSelected={setSelected}>
