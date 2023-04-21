@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import {
   Alert,
@@ -6,6 +6,7 @@ import {
   AlertIcon,
   AlertTitle,
   Badge,
+  Box,
   Button,
   Divider,
   HStack,
@@ -31,7 +32,15 @@ import {
 } from '@chakra-ui/react';
 import { gql, GraphQLClient } from 'graphql-request';
 import { usePhoton, types } from '@photonhealth/react';
-import { FiArrowUpRight, FiCheck, FiClock, FiCopy, FiCornerUpRight, FiX } from 'react-icons/fi';
+import {
+  FiArrowUpRight,
+  FiCheck,
+  FiClock,
+  FiCopy,
+  FiCornerUpRight,
+  FiX,
+  FiChevronRight
+} from 'react-icons/fi';
 
 import { Page } from '../components/Page';
 import PatientView from '../components/PatientView';
@@ -93,6 +102,7 @@ export const Order = () => {
   const toast = useToast();
   const params = useParams();
   const id = params.orderId;
+  const navigate = useNavigate();
 
   const { getOrder, getToken } = usePhoton();
   const { order, loading, error } = getOrder({ id: id! });
@@ -463,24 +473,23 @@ export const Order = () => {
         <Text color="gray.500" fontWeight="medium" fontSize="sm">
           Fills
         </Text>
-
         {order?.fills.length > 0 ? (
           <TableContainer w="full">
             <Table bg="transparent" size="sm">
               <Tbody>
                 {order.fills.map((fill: any, i: number) => {
                   return i < 5 ? (
-                    <Tr key={fill.id}>
+                    <Tr
+                      key={fill.id}
+                      onClick={() => navigate(`/prescriptions/${fill?.prescription?.id}`)}
+                      _hover={{ backgroundColor: 'gray.100' }}
+                      cursor="pointer"
+                    >
                       <Td px={0} py={3} whiteSpace="pre-wrap" borderColor="gray.200">
                         <HStack w="full" justify="space-between">
                           <VStack alignItems="start">
                             <HStack>
-                              <Link
-                                color="blue.500"
-                                href={`/prescriptions/${fill?.prescription?.id}`}
-                              >
-                                <Text>{fill.treatment.name}</Text>
-                              </Link>
+                              <Text>{fill.treatment.name}</Text>
                             </HStack>
                             <HStack>
                               <Badge
@@ -491,6 +500,9 @@ export const Order = () => {
                               </Badge>
                             </HStack>
                           </VStack>
+                          <Box alignItems="end">
+                            <FiChevronRight size="1.3em" />
+                          </Box>
                         </HStack>
                       </Td>
                     </Tr>
