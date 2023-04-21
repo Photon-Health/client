@@ -475,17 +475,12 @@ export const Order = () => {
                         <HStack w="full" justify="space-between">
                           <VStack alignItems="start">
                             <HStack>
-                              <Text>{fill.treatment.name}</Text>
-                              {fill?.prescription?.id ? (
-                                <Text size="xs">
-                                  <Link
-                                    color="blue.500"
-                                    href={`/prescriptions/${fill?.prescription?.id}`}
-                                  >
-                                    View Prescription
-                                  </Link>
-                                </Text>
-                              ) : null}
+                              <Link
+                                color="blue.500"
+                                href={`/prescriptions/${fill?.prescription?.id}`}
+                              >
+                                <Text>{fill.treatment.name}</Text>
+                              </Link>
                             </HStack>
                             <HStack>
                               <Badge
