@@ -1,5 +1,5 @@
-export type WeightUnit = 'kgs' | 'g' | 'lbs' | 'oz';
 export type DosageUnit = 'kg' | 'lb' | 'mcg' | 'mg' | 'g';
+export type WeightUnit = 'kgs' | 'g' | 'lbs' | 'oz';
 export type LiquidUnit = 'mcg' | 'mg' | 'g';
 
 export interface Weight {

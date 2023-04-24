@@ -106,8 +106,6 @@ function ComboOption(props: ComboOptionProps) {
   );
 
   const iconClass = createMemo(() => {
-    console.log(props.children, state.active === props.key);
-    console.log(clsx(state.active === props.key ? 'text-white' : 'text-blue-600'));
     return clsx(state.active === props.key ? 'text-white' : 'text-blue-600');
   });
 
