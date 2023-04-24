@@ -11,7 +11,6 @@ import {
   Link,
   Text,
   VStack,
-  useBreakpointValue,
   useToast
 } from '@chakra-ui/react'
 import { FiCheck, FiMapPin } from 'react-icons/fi'
@@ -366,7 +365,7 @@ export const Pharmacy = () => {
             <VStack spacing={9} align="stretch">
               {enableCourier ? (
                 <CourierOptions
-                  capsule
+                  alto
                   location={location}
                   selectedId={selectedId}
                   handleSelect={handleSelect}
