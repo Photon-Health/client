@@ -26,8 +26,8 @@ interface Props {
 }
 
 export const CourierOptions = ({
-  alto,
-  capsule,
+  alto = false,
+  capsule = false,
   location,
   selectedId,
   handleSelect,
@@ -92,9 +92,4 @@ export const CourierOptions = ({
       })}
     </VStack>
   )
-}
-
-CourierOptions.defaultProps = {
-  capsule: false,
-  alto: false
 }
