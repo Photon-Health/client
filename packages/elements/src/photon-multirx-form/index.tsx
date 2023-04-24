@@ -14,7 +14,7 @@ import tailwind from '../tailwind.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import styles from './style.css?inline';
-import { createEffect, createSignal, onMount, Show } from 'solid-js';
+import { createEffect, createSignal, Show } from 'solid-js';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
 import { Order, Prescription, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
@@ -62,7 +62,8 @@ customElement(
     hideTemplates: true,
     enableOrder: false,
     pharmacyId: undefined,
-    loading: false
+    loading: false,
+    address: undefined
   },
   (
     props: {
@@ -73,6 +74,14 @@ customElement(
       enableOrder: boolean;
       pharmacyId?: string;
       loading: boolean;
+      address?: {
+        city: string;
+        postalCode: string;
+        state: string;
+        street1: string;
+        street2?: string;
+        country?: string;
+      };
     },
     options
   ) => {
@@ -287,14 +296,16 @@ customElement(
         }
         dispatchPrescriptionsCreated(data!.createPrescriptions);
         if (props.enableOrder) {
-          const address = Object.assign({}, store['patient']?.value.address);
-          delete address['__typename'];
-          delete address['name'];
+          const { __typename, name, ...patientAddress } =
+            (store['patient']?.value || {})?.address || {};
+
           const { data: data2, errors } = await orderMutation({
             variables: {
               patientId: store['patient']?.value.id,
               pharmacyId: props?.pharmacyId || store['pharmacy']?.value.id,
-              address: address,
+              address: props.address
+                ? { street2: '', country: 'US', ...props.address }
+                : patientAddress,
               fills: data?.createPrescriptions.map((x) => ({ prescriptionId: x.id }))
             },
             refetchQueries: [],
@@ -342,6 +353,7 @@ customElement(
                 patientId={props.patientId}
                 client={client!}
                 enableOrder={props.enableOrder}
+                hideAddress={!!props.address}
               ></PatientCard>
               <Show when={showForm() || isEditing()}>
                 <div ref={prescriptionRef}>

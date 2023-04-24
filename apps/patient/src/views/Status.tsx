@@ -44,7 +44,10 @@ export const Status = () => {
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false)
 
   const isCourier: boolean =
-    courier === 'true' || order?.pharmacy?.id === process.env.REACT_APP_CAPSULE_PHARMACY_ID
+    courier === 'true' ||
+    [process.env.REACT_APP_CAPSULE_PHARMACY_ID, process.env.REACT_APP_ALTO_PHARMACY_ID].includes(
+      order?.pharmacy?.id
+    )
   const fulfillmentType = isCourier ? 'courier' : 'pickup'
 
   const toast = useToast()
@@ -104,7 +107,7 @@ export const Status = () => {
     )
   }
 
-  const { fulfillment, pharmacy, organization } = order
+  const { fulfillment, pharmacy, organization, address } = order
 
   const photonPhone: string = process.env.REACT_APP_TWILIO_SMS_NUMBER
 
@@ -161,6 +164,7 @@ export const Status = () => {
           <StatusStepper
             isCourier={isCourier}
             status={successfullySubmitted ? 'PICKED_UP' : fulfillment?.state || 'SENT'}
+            patientAddress={formatAddress(address)}
           />
         </VStack>
       </Container>

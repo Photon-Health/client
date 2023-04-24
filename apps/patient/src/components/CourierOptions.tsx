@@ -13,9 +13,12 @@ import t from '../utils/text.json'
 
 // @ts-ignore
 import capsuleLogo from '../assets/capsule_logo.png'
+// @ts-ignore
+import altoLogo from '../assets/alto_logo.svg'
 
 interface Props {
-  capsule: boolean
+  alto?: boolean
+  capsule?: boolean
   location: string
   selectedId: string
   handleSelect: Function
@@ -23,7 +26,8 @@ interface Props {
 }
 
 export const CourierOptions = ({
-  capsule,
+  alto = false,
+  capsule = false,
   location,
   selectedId,
   handleSelect,
@@ -38,13 +42,19 @@ export const CourierOptions = ({
       id: process.env.REACT_APP_CAPSULE_PHARMACY_ID,
       logo: capsuleLogo,
       enabled: capsule,
-      description: 'Free, same-day prescription delivery.'
+      description: 'Free, same-day prescription delivery.' // on their website
+    },
+    {
+      id: process.env.REACT_APP_ALTO_PHARMACY_ID,
+      logo: altoLogo,
+      enabled: alto,
+      description: 'Free same-day delivery' // on their website
     }
-    // add additional mail order options here
+    // add additional courier options here
   ]
 
   return (
-    <VStack spacing={3} align="span" w="full">
+    <VStack spacing={2} align="span" w="full">
       <SlideFade offsetY="60px" in={true}>
         <VStack spacing={1} align="start">
           <Heading as="h5" size="sm">
@@ -82,8 +92,4 @@ export const CourierOptions = ({
       })}
     </VStack>
   )
-}
-
-CourierOptions.defaultProps = {
-  capsule: false
 }
