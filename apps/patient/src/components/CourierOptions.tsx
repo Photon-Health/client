@@ -17,8 +17,8 @@ import capsuleLogo from '../assets/capsule_logo.png'
 import altoLogo from '../assets/alto_logo.svg'
 
 interface Props {
-  alto: boolean
-  capsule: boolean
+  alto?: boolean
+  capsule?: boolean
   location: string
   selectedId: string
   handleSelect: Function

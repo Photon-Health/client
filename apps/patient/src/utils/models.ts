@@ -10,6 +10,7 @@ export interface Address {
 export interface Order {
   id: string
   state: OrderState
+  address: Address
   fulfillment: {
     state: string
   }
