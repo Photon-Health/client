@@ -13,6 +13,8 @@ import t from '../utils/text.json'
 
 // @ts-ignore
 import capsuleLogo from '../assets/capsule_logo.png'
+// @ts-ignore
+import amazonPharmacyLogo from '../assets/amazon_pharmacy.png'
 
 interface Props {
   capsule: boolean
@@ -37,8 +39,14 @@ export const CourierOptions = ({
     {
       id: process.env.REACT_APP_CAPSULE_PHARMACY_ID,
       logo: capsuleLogo,
-      enabled: capsule,
+      enabled: false,
       description: 'Free, same-day prescription delivery.'
+    },
+    {
+      id: process.env.REACT_APP_AMAZON_PHARMACY_ID,
+      logo: amazonPharmacyLogo,
+      enabled: true,
+      description: 'Save time. Save money. Stay healthy.'
     }
     // add additional mail order options here
   ]
@@ -70,7 +78,7 @@ export const CourierOptions = ({
             >
               <CardBody p={3}>
                 <VStack align="start" spacing={2}>
-                  <Image src={ph.logo} width="auto" height="25px" />
+                  <Image src={ph.logo} width="auto" height="30px" />
                   <Text fontSize="sm" color="gray.500">
                     {ph.description}
                   </Text>
