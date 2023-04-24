@@ -353,6 +353,7 @@ customElement(
                 patientId={props.patientId}
                 client={client!}
                 enableOrder={props.enableOrder}
+                hideAddress={!!props.address}
               ></PatientCard>
               <Show when={showForm() || isEditing()}>
                 <div ref={prescriptionRef}>
