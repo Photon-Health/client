@@ -1,11 +1,9 @@
 import { For, createSignal } from 'solid-js';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
-import Icon from '../../particles/Icon';
 import Input from '../../particles/Input';
 import ComboBox from '../../particles/ComboBox';
 import InputGroup from '../../particles/InputGroup';
-import { DosageUnit } from './utils/doseTools';
 
 export interface DoseCalculatorProps {
   open: boolean;
@@ -13,12 +11,18 @@ export interface DoseCalculatorProps {
   medication?: string;
 }
 
-const doseUnits = ['mcg/kg', 'mg/kg', 'g/kg'];
-const doseFrequency = ['day', 'week'];
+type DosageUnit = 'mcg/kg' | 'mg/kg' | 'g/kg';
+type DoseFrequency = 'day' | 'week';
+type WeightUnit = 'lbs' | 'kg';
+
+const dosageUnits: DosageUnit[] = ['mcg/kg', 'mg/kg', 'g/kg'];
+const dosageFrequencies: DoseFrequency[] = ['day', 'week'];
+const weightUnits: WeightUnit[] = ['lbs', 'kg'];
 
 export default function DoseCalculator(props: DoseCalculatorProps) {
   const [dosage, setDosage] = createSignal<number>(0);
-  const [dosageUnit, setDosageUnit] = createSignal<DosageUnit>('mg/kg');
+  const [dosageUnit, setDosageUnit] = createSignal<DosageUnit>(dosageUnits[0]);
+  const [dosageFrequency, setDosageFrequency] = createSignal<string>(dosageFrequencies[0]);
 
   const [weight, setWeight] = createSignal<number>(0);
   const [weightUnit, setWeightUnit] = createSignal<string>('lbs');
@@ -37,12 +41,10 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
     <Dialog open={props.open} setClose={props.setClose} size="lg">
       <h2>Calculate Dose Quantity</h2>
       <p>Enter desired dosage and patient weight to calculate total and dose quantity.</p>
-
       <div class="mt-4">
         <h3>Selected Medication</h3>
         <p>{props?.medication || 'None Selected'}</p>
       </div>
-
       <div class="mt-4">
         <h3>Dosage Inputs</h3>
 
@@ -53,10 +55,11 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               value={dosage()}
               onInput={(e) => setDosage(e.currentTarget.valueAsNumber)}
             />
-            <ComboBox>
-              <ComboBox.Input displayValue={() => ''} />
+            {dosageUnit()}
+            <ComboBox value={dosageUnit()}>
+              <ComboBox.Input displayValue={(unit) => unit.name} />
               <ComboBox.Options>
-                <For each={doseUnits.map((d, i) => ({ id: i, name: d }))}>
+                <For each={dosageUnits.map((d, i) => ({ id: i, name: d }))}>
                   {(unit) => (
                     <ComboBox.Option key={unit.id.toString()} value={unit.name}>
                       {unit.name}
@@ -69,10 +72,10 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
             <ComboBox>
               <ComboBox.Input displayValue={() => ''} />
               <ComboBox.Options>
-                <For each={doseFrequency.map((d, i) => ({ id: i, name: d }))}>
-                  {(time) => (
-                    <ComboBox.Option key={time.id.toString()} value={time.name}>
-                      {time.name}
+                <For each={dosageFrequencies.map((d, i) => ({ id: i, name: d }))}>
+                  {(frequency) => (
+                    <ComboBox.Option key={frequency.id.toString()} value={frequency.name}>
+                      {frequency.name}
                     </ComboBox.Option>
                   )}
                 </For>
@@ -194,7 +197,12 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           </InputGroup>
         </div>
       </div>
-      {/* ... */}
+      <div class="flex gap-4 justify-end">
+        <Button variant="secondary" onClick={props.setClose}>
+          Cancel
+        </Button>
+        <Button>Autofill</Button>
+      </div>{' '}
     </Dialog>
   );
 }
