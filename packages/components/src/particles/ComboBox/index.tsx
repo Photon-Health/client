@@ -167,7 +167,7 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
           onInput={(e) => {
             // @ts-ignore
             local?.onInput(e);
-            setLocalSelectedValue((e.target as HTMLInputElement).value);
+            setLocalSelectedValue(e.currentTarget.value);
             setOpen(true);
           }}
         />

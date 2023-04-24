@@ -60,7 +60,7 @@ export const MultipleInputs: InputGroupStory = {
           <ComboBox>
             <ComboBox.Input
               displayValue={(person) => person.name}
-              onInput={(e) => setQuery((e.target as HTMLInputElement).value)}
+              onInput={(e) => setQuery(e.currentTarget.value)}
             />
             <ComboBox.Options>
               <For each={filteredPeople()}>
@@ -90,7 +90,7 @@ export const MultipleInputs: InputGroupStory = {
             type="type"
             placeholder="Are you going to type 'yes'?"
             onInput={(e) => {
-              setValue((e.target as HTMLInputElement).value === 'yes');
+              setValue(e.currentTarget.value === 'yes');
             }}
           />
         </InputGroup>

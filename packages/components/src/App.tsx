@@ -32,7 +32,7 @@ const App = () => {
         <div class="p-5 border border-gray-300 rounded-md">
           <ComboBox>
             <ComboBox.Input
-              onInput={(e) => setQuery((e.target as HTMLInputElement).value)}
+              onInput={(e) => setQuery(e.currentTarget.value)}
               displayValue={(person) => person.name}
             />
             <ComboBox.Options>

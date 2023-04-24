@@ -77,7 +77,7 @@ export default function PharmacySearch(props: PharmacyProps) {
         >
           <ComboBox value={store.pharmacies.data?.[0] || undefined} setSelected={setSelected}>
             <ComboBox.Input
-              onInput={(e) => setQuery((e.target as HTMLInputElement).value)}
+              onInput={(e) => setQuery(e.currentTarget.value)}
               displayValue={(pharmacy) => `${pharmacy.name}, ${formattedAddress(pharmacy)}`}
             />
             <ComboBox.Options>
