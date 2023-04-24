@@ -42,13 +42,13 @@ export const CourierOptions = ({
       id: process.env.REACT_APP_CAPSULE_PHARMACY_ID,
       logo: capsuleLogo,
       enabled: capsule,
-      description: 'Free, same-day prescription delivery.'
+      description: 'Free, same-day prescription delivery.' // on their website
     },
     {
       id: process.env.REACT_APP_ALTO_PHARMACY_ID,
       logo: altoLogo,
       enabled: alto,
-      description: 'Free same-day delivery'
+      description: 'Free same-day delivery' // on their website
     }
     // add additional courier options here
   ]
