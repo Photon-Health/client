@@ -52,19 +52,26 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
 
   const dose = createMemo(() => {
     const factor = conversionFactors[dosageUnit().name][weightUnit().name];
-    const dose = factor * dosage() * weight();
-    return round(dose, 4);
+    return factor * dosage() * weight();
   });
 
   const liquidDose = createMemo(() => {
+    if (!liquidConcentration() || parseInt(liquidConcentration().toString(), 10) === 0) {
+      return 0;
+    }
     const factor = conversionFactors[dosageUnit().name][liquidUnit().name];
-    const liquidDose = (dose() * perVolume()) / (liquidConcentration() * factor);
-    return round(liquidDose, 4);
+    return (dose() * perVolume()) / (liquidConcentration() * factor);
   });
 
-  const singleDose = createMemo(() => dose() / dosesPerDay());
-  const singleLiquidDose = createMemo(() => liquidDose() / dosesPerDay());
-  const totalQuantity = createMemo(() => dose() * daysSupply());
+  const singleDose = createMemo(
+    () => `${round(dose() / dosesPerDay(), 4)} ${dosageUnit().name.split('/')[0]}`
+  );
+  const singleLiquidDose = createMemo(
+    () => `${round(liquidDose() / dosesPerDay(), 4)} ${perVolumeUnit().name}`
+  );
+  const totalQuantity = createMemo(
+    () => `${round(dose() * daysSupply(), 4)} ${dosageUnit().name.split('/')[0]}`
+  );
 
   return (
     <Dialog open={props.open} setClose={props.setClose} size="lg">
