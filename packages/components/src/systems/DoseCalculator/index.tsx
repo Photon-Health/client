@@ -6,6 +6,8 @@ import InputGroup from '../../particles/InputGroup';
 import UnitSelect from './components/UnitSelect';
 import conversionFactors from './utils/conversionFactors';
 
+const round = (num: number, places: number) => parseFloat(num.toFixed(places));
+
 type DosageUnit = 'mcg/kg' | 'mg/kg' | 'g/kg';
 type WeightUnit = 'lbs' | 'kg';
 type DosageFrequency = 'day' | 'week';
@@ -45,33 +47,28 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
     liquidVolumesMap[0]
   );
 
-  const [daysSupply, setDaysSupply] = createSignal<number>(0);
-  const [dosesPerDay, setDosesPerDay] = createSignal<number>(0);
-
-  const [singleDose, setSingleDose] = createSignal<number>(0);
-  const [singleLiquidDose, setSingleLiquidDose] = createSignal<number>(0);
-  const [totalQuantity, setTotalQuantity] = createSignal<number>(0);
+  const [daysSupply, setDaysSupply] = createSignal<number>(1);
+  const [dosesPerDay, setDosesPerDay] = createSignal<number>(1);
 
   const dose = createMemo(() => {
     const factor = conversionFactors[dosageUnit().name][weightUnit().name];
     const dose = factor * dosage() * weight();
-    return parseFloat(dose.toFixed(4));
+    return round(dose, 4);
   });
 
   const liquidDose = createMemo(() => {
-    if (!liquidConcentration() || parseInt(liquidConcentration().toString(), 10) === 0) {
-      return 0;
-    }
     const factor = conversionFactors[dosageUnit().name][liquidUnit().name];
     const liquidDose = (dose() * perVolume()) / (liquidConcentration() * factor);
-    return parseFloat(liquidDose.toFixed(4));
+    return round(liquidDose, 4);
   });
+
+  const singleDose = createMemo(() => dose() / dosesPerDay());
+  const singleLiquidDose = createMemo(() => liquidDose() / dosesPerDay());
+  const totalQuantity = createMemo(() => dose() * daysSupply());
 
   return (
     <Dialog open={props.open} setClose={props.setClose} size="lg">
-      <h2>
-        {dose()} {liquidDose()}
-      </h2>
+      <h2>Calculate Dose Quantity</h2>
       <p>Enter desired dosage and patient weight to calculate total and dose quantity.</p>
 
       <div class="mt-4">
@@ -175,30 +172,15 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
         <h3>Dosage</h3>
         <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Single Dose">
-            <Input
-              type="number"
-              value={singleDose()}
-              onInput={(e) => setSingleDose(e.currentTarget.valueAsNumber)}
-              disabled
-            />
+            <Input type="text" value={singleDose()} disabled />
           </InputGroup>
           <InputGroup label="Single Liquid Dose">
-            <Input
-              type="number"
-              value={singleLiquidDose()}
-              onInput={(e) => setSingleLiquidDose(e.currentTarget.valueAsNumber)}
-              disabled
-            />
+            <Input type="text" value={singleLiquidDose()} disabled />
           </InputGroup>
         </div>
         <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Total Quantity">
-            <Input
-              type="number"
-              value={totalQuantity()}
-              onInput={(e) => setTotalQuantity(e.currentTarget.valueAsNumber)}
-              disabled
-            />
+            <Input type="text" value={totalQuantity()} disabled />
           </InputGroup>
         </div>
       </div>
