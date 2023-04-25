@@ -194,15 +194,12 @@ export interface ComboBoxProps {
 function ComboBoxWrapper(props: ComboBoxProps) {
   const [state, { setSelected }] = useComboBox();
 
-  createEffect(() => {
-    if (props.setSelected) {
-      props.setSelected(state.selected);
-    }
-  });
-
   onMount(() => {
     if (props.value) {
       setSelected(props.value);
+    }
+    if (props.setSelected) {
+      props.setSelected(state.selected);
     }
   });
 

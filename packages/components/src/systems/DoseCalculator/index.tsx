@@ -12,28 +12,71 @@ export interface DoseCalculatorProps {
 }
 
 type DosageUnit = 'mcg/kg' | 'mg/kg' | 'g/kg';
-type DosageUnitRecord = { id: number; name: DosageUnit };
-type DoseFrequency = 'day' | 'week';
+type DosageFrequency = 'day' | 'week';
 type WeightUnit = 'lbs' | 'kg';
+type LiquidUnit = 'mcg' | 'mg' | 'g';
+type LiquidVolume = 'mL' | 'L';
+
+type RecordWithId<T> = { id: string; name: T };
+const arrayToRecord = <T extends {}>(arr: T[]): RecordWithId<T>[] =>
+  arr.map((a, i) => ({ id: i.toString(), name: a }));
 
 const dosageUnits: DosageUnit[] = ['mcg/kg', 'mg/kg', 'g/kg'];
-const dosageUnitsMap: DosageUnitRecord[] = dosageUnits.map((d, i) => ({
-  id: i,
-  name: d
-}));
-const dosageFrequencies: DoseFrequency[] = ['day', 'week'];
+const dosageUnitsMap: RecordWithId<DosageUnit>[] = arrayToRecord(dosageUnits);
+const dosageFrequencies: DosageFrequency[] = ['day', 'week'];
+const dosageFrequenciesMap: RecordWithId<DosageFrequency>[] = arrayToRecord(dosageFrequencies);
+
 const weightUnits: WeightUnit[] = ['lbs', 'kg'];
+const weightUnitsMap: RecordWithId<WeightUnit>[] = arrayToRecord(weightUnits);
+
+const liquidUnits: LiquidUnit[] = ['mcg', 'mg', 'g'];
+const liquidUnitsMap: RecordWithId<LiquidUnit>[] = arrayToRecord(liquidUnits);
+const liquidVolumes: LiquidVolume[] = ['mL', 'L'];
+const liquidVolumesMap: RecordWithId<LiquidVolume>[] = arrayToRecord(liquidVolumes);
+
+function UnitSelect<T extends string>({
+  value,
+  setSelected,
+  options
+}: {
+  value: RecordWithId<T>;
+  setSelected: (value: RecordWithId<T>) => void;
+  options: RecordWithId<T>[];
+}) {
+  const displayValue = (unit: RecordWithId<any>) => unit.name;
+
+  return (
+    <ComboBox value={value} setSelected={setSelected}>
+      <ComboBox.Input displayValue={displayValue} />
+      <ComboBox.Options>
+        <For each={options}>
+          {(unit) => (
+            <ComboBox.Option key={unit.id} value={unit}>
+              {unit.name}
+            </ComboBox.Option>
+          )}
+        </For>
+      </ComboBox.Options>
+    </ComboBox>
+  );
+}
 
 export default function DoseCalculator(props: DoseCalculatorProps) {
   const [dosage, setDosage] = createSignal<number>(0);
-  const [dosageUnit, setDosageUnit] = createSignal<DosageUnitRecord>(dosageUnitsMap[0]);
-  const [dosageFrequency, setDosageFrequency] = createSignal<string>(dosageFrequencies[0]);
+  const [dosageUnit, setDosageUnit] = createSignal<RecordWithId<DosageUnit>>(dosageUnitsMap[0]);
+  const [dosageFrequency, setDosageFrequency] = createSignal<RecordWithId<DosageFrequency>>(
+    dosageFrequenciesMap[0]
+  );
 
   const [weight, setWeight] = createSignal<number>(0);
-  const [weightUnit, setWeightUnit] = createSignal<string>('lbs');
+  const [weightUnit, setWeightUnit] = createSignal<RecordWithId<WeightUnit>>(weightUnitsMap[0]);
 
   const [liquidConcentration, setLiquidConcentration] = createSignal<number>(0);
+  const [liquidUnit, setLiquidUnit] = createSignal<RecordWithId<LiquidUnit>>(liquidUnitsMap[0]);
   const [perVolume, setPerVolume] = createSignal<number>(0);
+  const [perVolumeUnit, setPerVolumeUnit] = createSignal<RecordWithId<LiquidVolume>>(
+    liquidVolumesMap[0]
+  );
 
   const [daysSupply, setDaysSupply] = createSignal<number>(0);
   const [dosesPerDay, setDosesPerDay] = createSignal<number>(0);
@@ -41,6 +84,8 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
   const [singleDose, setSingleDose] = createSignal<number>(0);
   const [singleLiquidDose, setSingleLiquidDose] = createSignal<number>(0);
   const [totalQuantity, setTotalQuantity] = createSignal<number>(0);
+
+  const displayValue = (unit: RecordWithId<any>) => unit.name;
 
   return (
     <Dialog open={props.open} setClose={props.setClose} size="lg">
@@ -60,32 +105,13 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               value={dosage()}
               onInput={(e) => setDosage(e.currentTarget.valueAsNumber)}
             />
-            {dosageUnit()}
-            <ComboBox value={dosageUnit()}>
-              <ComboBox.Input displayValue={(unit) => unit.name} />
-              <ComboBox.Options>
-                <For each={dosageUnitsMap}>
-                  {(unit) => (
-                    <ComboBox.Option key={unit.id.toString()} value={unit.name}>
-                      {unit.name}
-                    </ComboBox.Option>
-                  )}
-                </For>
-              </ComboBox.Options>
-            </ComboBox>
+            <UnitSelect value={dosageUnit()} setSelected={setDosageUnit} options={dosageUnitsMap} />
             <p>per</p>
-            <ComboBox>
-              <ComboBox.Input displayValue={() => ''} />
-              <ComboBox.Options>
-                <For each={dosageFrequencies.map((d, i) => ({ id: i, name: d }))}>
-                  {(frequency) => (
-                    <ComboBox.Option key={frequency.id.toString()} value={frequency.name}>
-                      {frequency.name}
-                    </ComboBox.Option>
-                  )}
-                </For>
-              </ComboBox.Options>
-            </ComboBox>
+            <UnitSelect
+              value={dosageFrequency()}
+              setSelected={setDosageFrequency}
+              options={dosageFrequenciesMap}
+            />
           </div>
         </InputGroup>
 
@@ -96,18 +122,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               value={weight()}
               onInput={(e) => setWeight(e.currentTarget.valueAsNumber)}
             />
-            <ComboBox>
-              <ComboBox.Input displayValue={() => ''} />
-              <ComboBox.Options>
-                <For each={doseUnits.map((d, i) => ({ id: i, name: d }))}>
-                  {(unit) => (
-                    <ComboBox.Option key={unit.id.toString()} value={unit.name}>
-                      {unit.name}
-                    </ComboBox.Option>
-                  )}
-                </For>
-              </ComboBox.Options>
-            </ComboBox>
+            <UnitSelect value={weightUnit()} setSelected={setWeightUnit} options={weightUnitsMap} />
           </div>
         </InputGroup>
       </div>
@@ -119,18 +134,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               value={liquidConcentration()}
               onInput={(e) => setLiquidConcentration(e.currentTarget.valueAsNumber)}
             />
-            <ComboBox>
-              <ComboBox.Input displayValue={() => ''} />
-              <ComboBox.Options>
-                <For each={doseUnits.map((d, i) => ({ id: i, name: d }))}>
-                  {(unit) => (
-                    <ComboBox.Option key={unit.id.toString()} value={unit}>
-                      {unit.name}
-                    </ComboBox.Option>
-                  )}
-                </For>
-              </ComboBox.Options>
-            </ComboBox>
+            <UnitSelect value={liquidUnit()} setSelected={setLiquidUnit} options={liquidUnitsMap} />
           </div>
         </InputGroup>
         <InputGroup label="Per Volume">
@@ -140,18 +144,11 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               value={perVolume()}
               onInput={(e) => setPerVolume(e.currentTarget.valueAsNumber)}
             />
-            <ComboBox>
-              <ComboBox.Input displayValue={() => ''} />
-              <ComboBox.Options>
-                <For each={doseUnits.map((d, i) => ({ id: i, name: d }))}>
-                  {(unit) => (
-                    <ComboBox.Option key={unit.id.toString()} value={unit.name}>
-                      {unit.name}
-                    </ComboBox.Option>
-                  )}
-                </For>
-              </ComboBox.Options>
-            </ComboBox>
+            <UnitSelect
+              value={perVolumeUnit()}
+              setSelected={setPerVolumeUnit}
+              options={liquidVolumesMap}
+            />
           </div>
         </InputGroup>
       </div>
