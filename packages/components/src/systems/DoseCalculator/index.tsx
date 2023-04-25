@@ -1,16 +1,10 @@
-import { createEffect, createSignal } from 'solid-js';
+import { createMemo, createSignal } from 'solid-js';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
 import Input from '../../particles/Input';
 import InputGroup from '../../particles/InputGroup';
 import UnitSelect from './components/UnitSelect';
-import conversionFactors from './utils/conversionFactons';
-
-export interface DoseCalculatorProps {
-  open: boolean;
-  setClose: () => {};
-  medication?: string;
-}
+import conversionFactors from './utils/conversionFactors';
 
 type DosageUnit = 'mcg/kg' | 'mg/kg' | 'g/kg';
 type WeightUnit = 'lbs' | 'kg';
@@ -27,6 +21,12 @@ const dosageFrequenciesMap: RecordWithId<DosageFrequency>[] = arrayToRecordMap([
 const weightUnitsMap: RecordWithId<WeightUnit>[] = arrayToRecordMap(['lbs', 'kg']);
 const liquidUnitsMap: RecordWithId<LiquidUnit>[] = arrayToRecordMap(['mcg', 'mg', 'g']);
 const liquidVolumesMap: RecordWithId<LiquidVolume>[] = arrayToRecordMap(['mL', 'L']);
+
+export interface DoseCalculatorProps {
+  open: boolean;
+  setClose: () => {};
+  medication?: string;
+}
 
 export default function DoseCalculator(props: DoseCalculatorProps) {
   const [dosage, setDosage] = createSignal<number>(0);
@@ -52,23 +52,35 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
   const [singleLiquidDose, setSingleLiquidDose] = createSignal<number>(0);
   const [totalQuantity, setTotalQuantity] = createSignal<number>(0);
 
-  createEffect(() => {
-    const dose = conversionFactors[dosageUnit().name][weightUnit().name] * dosage() * weight();
+  const dose = createMemo(() => {
+    const factor = conversionFactors[dosageUnit().name][weightUnit().name];
+    const dose = factor * dosage() * weight();
+    return parseFloat(dose.toFixed(4));
+  });
 
-    console.log(dose);
+  const liquidDose = createMemo(() => {
+    if (!liquidConcentration() || parseInt(liquidConcentration().toString(), 10) === 0) {
+      return 0;
+    }
+    const factor = conversionFactors[dosageUnit().name][liquidUnit().name];
+    const liquidDose = (dose() * perVolume()) / (liquidConcentration() * factor);
+    return parseFloat(liquidDose.toFixed(4));
   });
 
   return (
     <Dialog open={props.open} setClose={props.setClose} size="lg">
-      <h2>Calculate Dose Quantity</h2>
+      <h2>
+        {dose()} {liquidDose()}
+      </h2>
       <p>Enter desired dosage and patient weight to calculate total and dose quantity.</p>
+
       <div class="mt-4">
         <h3>Selected Medication</h3>
         <p>{props?.medication || 'None Selected'}</p>
       </div>
+
       <div class="mt-4">
         <h3>Dosage Inputs</h3>
-
         <InputGroup label="Dose">
           <div class="grid grid-cols-2 gap-4">
             <div class="grid grid-cols-2 gap-2">
@@ -95,7 +107,6 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
             </div>
           </div>
         </InputGroup>
-
         <InputGroup label="Patient Weight">
           <div class="grid grid-cols-2 gap-4">
             <div class="grid grid-cols-2 gap-2">
@@ -139,6 +150,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           </div>
         </InputGroup>
       </div>
+
       <div class="mt-4">
         <h3>Frequency</h3>
         <div class="grid grid-cols-2 gap-4">
@@ -158,6 +170,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           </InputGroup>
         </div>
       </div>
+
       <div class="mt-4">
         <h3>Dosage</h3>
         <div class="grid grid-cols-2 gap-4">
@@ -189,6 +202,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           </InputGroup>
         </div>
       </div>
+
       <div class="flex gap-4 justify-end">
         <Button variant="secondary" onClick={props.setClose}>
           Cancel
