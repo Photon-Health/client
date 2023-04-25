@@ -17,7 +17,7 @@ function Dialog(props: DialogProps) {
   const merged = mergeProps({ size: 'md', open: false }, props);
 
   const panelClasses = clsx(
-    'relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 w-full sm:p-6',
+    'relative transform rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 w-full sm:p-6',
     {
       'sm:max-w-lg': merged.size === 'lg',
       'sm:max-w-sm': merged.size === 'md'

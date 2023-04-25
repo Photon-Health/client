@@ -12,16 +12,21 @@ export interface DoseCalculatorProps {
 }
 
 type DosageUnit = 'mcg/kg' | 'mg/kg' | 'g/kg';
+type DosageUnitRecord = { id: number; name: DosageUnit };
 type DoseFrequency = 'day' | 'week';
 type WeightUnit = 'lbs' | 'kg';
 
 const dosageUnits: DosageUnit[] = ['mcg/kg', 'mg/kg', 'g/kg'];
+const dosageUnitsMap: DosageUnitRecord[] = dosageUnits.map((d, i) => ({
+  id: i,
+  name: d
+}));
 const dosageFrequencies: DoseFrequency[] = ['day', 'week'];
 const weightUnits: WeightUnit[] = ['lbs', 'kg'];
 
 export default function DoseCalculator(props: DoseCalculatorProps) {
   const [dosage, setDosage] = createSignal<number>(0);
-  const [dosageUnit, setDosageUnit] = createSignal<DosageUnit>(dosageUnits[0]);
+  const [dosageUnit, setDosageUnit] = createSignal<DosageUnitRecord>(dosageUnitsMap[0]);
   const [dosageFrequency, setDosageFrequency] = createSignal<string>(dosageFrequencies[0]);
 
   const [weight, setWeight] = createSignal<number>(0);
@@ -59,7 +64,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
             <ComboBox value={dosageUnit()}>
               <ComboBox.Input displayValue={(unit) => unit.name} />
               <ComboBox.Options>
-                <For each={dosageUnits.map((d, i) => ({ id: i, name: d }))}>
+                <For each={dosageUnitsMap}>
                   {(unit) => (
                     <ComboBox.Option key={unit.id.toString()} value={unit.name}>
                       {unit.name}
@@ -119,7 +124,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               <ComboBox.Options>
                 <For each={doseUnits.map((d, i) => ({ id: i, name: d }))}>
                   {(unit) => (
-                    <ComboBox.Option key={unit.id.toString()} value={unit.name}>
+                    <ComboBox.Option key={unit.id.toString()} value={unit}>
                       {unit.name}
                     </ComboBox.Option>
                   )}
