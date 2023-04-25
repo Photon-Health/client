@@ -35,7 +35,7 @@ export const Review = () => {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token')
 
-  const { organization, patient } = order
+  const { organization, patient, fills } = order
 
   const handleCtaClick = () => {
     navigate(`/pharmacy?orderId=${order.id}&token=${token}`)
@@ -66,87 +66,62 @@ export const Review = () => {
                 {patient.name.full}
               </Text>
             </HStack>
-            <HStack>
-              <Text display="inline" color="gray.500">
-                {t.review.prescriber}
-              </Text>
-              <Text display="inline" ms={3}>
-                Dr. Tim Porter
-              </Text>
-            </HStack>
           </VStack>
 
           <Accordion allowToggle defaultIndex={[0]}>
-            {prescriptions.map(
-              ({
-                id,
-                name,
-                quantity,
-                daysSupply,
-                refills,
-                substitutions,
-                expires,
-                instructions
-              }) => {
-                return (
-                  <AccordionItem border="none" mb={3} key={id}>
-                    <Card w="full" backgroundColor="white">
-                      <CardBody p={0}>
-                        <HStack>
-                          <AccordionButton
-                            p={5}
-                            _expanded={{ bg: 'transparent' }}
-                            _focus={{ bg: 'transparent' }}
-                          >
-                            <HStack me="auto">
-                              <Box me={2}>
-                                <FaPrescription size="1.3em" />
-                              </Box>
-                              <Text align="start">{name}</Text>
-                            </HStack>
-                            <Box>
-                              <AccordionIcon />
+            {fills.map(({ id, treatment, prescription }) => {
+              return (
+                <AccordionItem border="none" mb={3} key={id}>
+                  <Card w="full" backgroundColor="white">
+                    <CardBody p={0}>
+                      <HStack>
+                        <AccordionButton
+                          p={5}
+                          _expanded={{ bg: 'transparent' }}
+                          _focus={{ bg: 'transparent' }}
+                        >
+                          <HStack me="auto">
+                            <Box me={2}>
+                              <FaPrescription size="1.3em" />
                             </Box>
-                          </AccordionButton>
-                        </HStack>
-                        <AccordionPanel mt={0} p={5} borderTop="1px" borderColor="gray.100">
-                          <VStack align="span">
-                            <HStack>
-                              <HStack w="50%">
-                                <Text color="gray.500">{t.review.quantity}</Text>
-                                <Text>{quantity}</Text>
-                              </HStack>
-                              <HStack w="50%">
-                                <Text color="gray.500">{t.review.daysSupply}</Text>
-                                <Text>{daysSupply}</Text>
-                              </HStack>
+                            <Text align="start">{treatment.name}</Text>
+                          </HStack>
+                          <Box>
+                            <AccordionIcon />
+                          </Box>
+                        </AccordionButton>
+                      </HStack>
+                      <AccordionPanel mt={0} p={5} borderTop="1px" borderColor="gray.100">
+                        <VStack align="span">
+                          <HStack>
+                            <HStack w="50%">
+                              <Text color="gray.500">{t.review.quantity}</Text>
+                              <Text>{prescription.dispenseQuantity}</Text>
                             </HStack>
-                            <HStack>
-                              <HStack w="50%">
-                                <Text color="gray.500">{t.review.refills}</Text>
-                                <Text>{refills}</Text>
-                              </HStack>
-                              <HStack w="50%">
-                                <Text color="gray.500">{t.review.substitutions}</Text>
-                                <Text>{substitutions ? 'Yes' : 'No'}</Text>
-                              </HStack>
+                            <HStack w="50%">
+                              <Text color="gray.500">{t.review.daysSupply}</Text>
+                              <Text>{prescription.daysSupply}</Text>
                             </HStack>
-                            <HStack w="full">
-                              <Text color="gray.500">{t.review.expires}</Text>
-                              <Text>{expires}</Text>
-                            </HStack>
-                            <HStack w="full" align="start">
-                              <Text color="gray.500">{t.review.instructions}</Text>
-                              <Text>{instructions}</Text>
-                            </HStack>
-                          </VStack>
-                        </AccordionPanel>
-                      </CardBody>
-                    </Card>
-                  </AccordionItem>
-                )
-              }
-            )}
+                          </HStack>
+                          <HStack w="full">
+                            <Text color="gray.500">{t.review.refills}</Text>
+                            <Text>{prescription.fillsAllowed - 1}</Text>
+                          </HStack>
+                          <HStack w="full">
+                            <Text color="gray.500">{t.review.expires}</Text>
+                            <Text>{prescription.expirationDate}</Text>
+                          </HStack>
+                          <HStack w="full" align="start">
+                            <Text color="gray.500">{t.review.instructions}</Text>
+                            <Text>{prescription.instructions}</Text>
+                          </HStack>
+                        </VStack>
+                      </AccordionPanel>
+                    </CardBody>
+                  </Card>
+                </AccordionItem>
+              )
+            })}
           </Accordion>
         </VStack>
       </Container>

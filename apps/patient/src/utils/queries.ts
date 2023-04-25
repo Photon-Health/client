@@ -57,11 +57,6 @@ export const GET_ORDER = gql`
           fillsRemaining
           instructions
           notes
-          prescriber {
-            name {
-              full
-            }
-          }
         }
       }
       patient {
