@@ -18,21 +18,21 @@ type LiquidUnit = 'mcg' | 'mg' | 'g';
 type LiquidVolume = 'mL' | 'L';
 
 type RecordWithId<T> = { id: string; name: T };
-const arrayToRecord = <T extends {}>(arr: T[]): RecordWithId<T>[] =>
+const arrayToRecordMap = <T extends {}>(arr: T[]): RecordWithId<T>[] =>
   arr.map((a, i) => ({ id: i.toString(), name: a }));
 
 const dosageUnits: DosageUnit[] = ['mcg/kg', 'mg/kg', 'g/kg'];
-const dosageUnitsMap: RecordWithId<DosageUnit>[] = arrayToRecord(dosageUnits);
+const dosageUnitsMap: RecordWithId<DosageUnit>[] = arrayToRecordMap(dosageUnits);
 const dosageFrequencies: DosageFrequency[] = ['day', 'week'];
-const dosageFrequenciesMap: RecordWithId<DosageFrequency>[] = arrayToRecord(dosageFrequencies);
+const dosageFrequenciesMap: RecordWithId<DosageFrequency>[] = arrayToRecordMap(dosageFrequencies);
 
 const weightUnits: WeightUnit[] = ['lbs', 'kg'];
-const weightUnitsMap: RecordWithId<WeightUnit>[] = arrayToRecord(weightUnits);
+const weightUnitsMap: RecordWithId<WeightUnit>[] = arrayToRecordMap(weightUnits);
 
 const liquidUnits: LiquidUnit[] = ['mcg', 'mg', 'g'];
-const liquidUnitsMap: RecordWithId<LiquidUnit>[] = arrayToRecord(liquidUnits);
+const liquidUnitsMap: RecordWithId<LiquidUnit>[] = arrayToRecordMap(liquidUnits);
 const liquidVolumes: LiquidVolume[] = ['mL', 'L'];
-const liquidVolumesMap: RecordWithId<LiquidVolume>[] = arrayToRecord(liquidVolumes);
+const liquidVolumesMap: RecordWithId<LiquidVolume>[] = arrayToRecordMap(liquidVolumes);
 
 function UnitSelect<T extends string>({
   value,
@@ -43,11 +43,9 @@ function UnitSelect<T extends string>({
   setSelected: (value: RecordWithId<T>) => void;
   options: RecordWithId<T>[];
 }) {
-  const displayValue = (unit: RecordWithId<any>) => unit.name;
-
   return (
     <ComboBox value={value} setSelected={setSelected}>
-      <ComboBox.Input displayValue={displayValue} />
+      <ComboBox.Input displayValue={(unit: RecordWithId<any>) => unit.name} />
       <ComboBox.Options>
         <For each={options}>
           {(unit) => (
@@ -84,8 +82,6 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
   const [singleDose, setSingleDose] = createSignal<number>(0);
   const [singleLiquidDose, setSingleLiquidDose] = createSignal<number>(0);
   const [totalQuantity, setTotalQuantity] = createSignal<number>(0);
-
-  const displayValue = (unit: RecordWithId<any>) => unit.name;
 
   return (
     <Dialog open={props.open} setClose={props.setClose} size="lg">
@@ -204,7 +200,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           Cancel
         </Button>
         <Button>Autofill</Button>
-      </div>{' '}
+      </div>
     </Dialog>
   );
 }
