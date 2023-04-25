@@ -95,30 +95,46 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
         <h3>Dosage Inputs</h3>
 
         <InputGroup label="Dose">
-          <div class="flex items-center gap-2">
-            <Input
-              type="number"
-              value={dosage()}
-              onInput={(e) => setDosage(e.currentTarget.valueAsNumber)}
-            />
-            <UnitSelect value={dosageUnit()} setSelected={setDosageUnit} options={dosageUnitsMap} />
-            <p>per</p>
-            <UnitSelect
-              value={dosageFrequency()}
-              setSelected={setDosageFrequency}
-              options={dosageFrequenciesMap}
-            />
+          <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 gap-2">
+              <Input
+                type="number"
+                value={dosage()}
+                onInput={(e) => setDosage(e.currentTarget.valueAsNumber)}
+              />
+              <UnitSelect
+                value={dosageUnit()}
+                setSelected={setDosageUnit}
+                options={dosageUnitsMap}
+              />
+            </div>
+            <div class="flex gap-4 items-center">
+              <p>per</p>
+              <div class="grow">
+                <UnitSelect
+                  value={dosageFrequency()}
+                  setSelected={setDosageFrequency}
+                  options={dosageFrequenciesMap}
+                />
+              </div>
+            </div>
           </div>
         </InputGroup>
 
         <InputGroup label="Patient Weight">
-          <div class="flex gap-2">
-            <Input
-              type="number"
-              value={weight()}
-              onInput={(e) => setWeight(e.currentTarget.valueAsNumber)}
-            />
-            <UnitSelect value={weightUnit()} setSelected={setWeightUnit} options={weightUnitsMap} />
+          <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 gap-2">
+              <Input
+                type="number"
+                value={weight()}
+                onInput={(e) => setWeight(e.currentTarget.valueAsNumber)}
+              />
+              <UnitSelect
+                value={weightUnit()}
+                setSelected={setWeightUnit}
+                options={weightUnitsMap}
+              />
+            </div>
           </div>
         </InputGroup>
       </div>
@@ -150,7 +166,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
       </div>
       <div class="mt-4">
         <h3>Frequency</h3>
-        <div class="flex gap-2">
+        <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Days Supply">
             <Input
               type="number"
@@ -169,7 +185,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
       </div>
       <div class="mt-4">
         <h3>Dosage</h3>
-        <div class="flex gap-2">
+        <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Single Dose">
             <Input
               type="number"
@@ -185,7 +201,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
             />
           </InputGroup>
         </div>
-        <div class="flex gap-2">
+        <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Total Quantity">
             <Input
               type="number"
