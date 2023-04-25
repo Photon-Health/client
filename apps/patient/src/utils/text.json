@@ -88,7 +88,7 @@
         },
         "DELIVERING": {
           "title": "Delivering",
-          "description": "Your prescriptions are being delivered."
+          "description": "Your prescriptions are being delivered to "
         },
         "DELIVERED": {
           "title": "Delivered",
