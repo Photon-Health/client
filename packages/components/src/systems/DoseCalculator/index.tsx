@@ -1,9 +1,9 @@
-import { For, createSignal } from 'solid-js';
+import { createEffect, createSignal } from 'solid-js';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
 import Input from '../../particles/Input';
-import ComboBox from '../../particles/ComboBox';
 import InputGroup from '../../particles/InputGroup';
+import UnitSelect from './components/UnitSelect';
 
 export interface DoseCalculatorProps {
   open: boolean;
@@ -12,12 +12,12 @@ export interface DoseCalculatorProps {
 }
 
 type DosageUnit = 'mcg/kg' | 'mg/kg' | 'g/kg';
-type DosageFrequency = 'day' | 'week';
 type WeightUnit = 'lbs' | 'kg';
+type DosageFrequency = 'day' | 'week';
 type LiquidUnit = 'mcg' | 'mg' | 'g';
 type LiquidVolume = 'mL' | 'L';
 
-type RecordWithId<T> = { id: string; name: T };
+export type RecordWithId<T> = { id: string; name: T };
 const arrayToRecordMap = <T extends {}>(arr: T[]): RecordWithId<T>[] =>
   arr.map((a, i) => ({ id: i.toString(), name: a }));
 
@@ -34,30 +34,35 @@ const liquidUnitsMap: RecordWithId<LiquidUnit>[] = arrayToRecordMap(liquidUnits)
 const liquidVolumes: LiquidVolume[] = ['mL', 'L'];
 const liquidVolumesMap: RecordWithId<LiquidVolume>[] = arrayToRecordMap(liquidVolumes);
 
-function UnitSelect<T extends string>({
-  value,
-  setSelected,
-  options
+const conversionFactors = {
+  'mcg/kg': {
+    lbs: 0.453592,
+    kg: 1
+  },
+  'mg/kg': {
+    lbs: 0.453592,
+    kg: 1
+  },
+  'g/kg': {
+    lbs: 0.453592,
+    kg: 1
+  }
+};
+
+const calculateDosage = ({
+  dosage,
+  dosageUnit,
+  weight,
+  weightUnit
 }: {
-  value: RecordWithId<T>;
-  setSelected: (value: RecordWithId<T>) => void;
-  options: RecordWithId<T>[];
-}) {
-  return (
-    <ComboBox value={value} setSelected={setSelected}>
-      <ComboBox.Input displayValue={(unit: RecordWithId<any>) => unit.name} />
-      <ComboBox.Options>
-        <For each={options}>
-          {(unit) => (
-            <ComboBox.Option key={unit.id} value={unit}>
-              {unit.name}
-            </ComboBox.Option>
-          )}
-        </For>
-      </ComboBox.Options>
-    </ComboBox>
-  );
-}
+  dosage: number;
+  dosageUnit: DosageUnit;
+  weight: number;
+  weightUnit: WeightUnit;
+}) => {
+  const conversionFactor = conversionFactors[dosageUnit][weightUnit];
+  return dosage * conversionFactor * weight;
+};
 
 export default function DoseCalculator(props: DoseCalculatorProps) {
   const [dosage, setDosage] = createSignal<number>(0);
@@ -82,6 +87,17 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
   const [singleDose, setSingleDose] = createSignal<number>(0);
   const [singleLiquidDose, setSingleLiquidDose] = createSignal<number>(0);
   const [totalQuantity, setTotalQuantity] = createSignal<number>(0);
+
+  createEffect(() => {
+    const dose = calculateDosage({
+      dosage: dosage(),
+      dosageUnit: dosageUnit().name,
+      weight: weight(),
+      weightUnit: weightUnit().name
+    });
+
+    console.log(dose);
+  });
 
   return (
     <Dialog open={props.open} setClose={props.setClose} size="lg">
@@ -191,6 +207,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               type="number"
               value={singleDose()}
               onInput={(e) => setSingleDose(e.currentTarget.valueAsNumber)}
+              disabled
             />
           </InputGroup>
           <InputGroup label="Single Liquid Dose">
@@ -198,6 +215,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               type="number"
               value={singleLiquidDose()}
               onInput={(e) => setSingleLiquidDose(e.currentTarget.valueAsNumber)}
+              disabled
             />
           </InputGroup>
         </div>
@@ -207,6 +225,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               type="number"
               value={totalQuantity()}
               onInput={(e) => setTotalQuantity(e.currentTarget.valueAsNumber)}
+              disabled
             />
           </InputGroup>
         </div>
