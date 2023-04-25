@@ -4,6 +4,7 @@ import Dialog from '../../particles/Dialog';
 import Input from '../../particles/Input';
 import InputGroup from '../../particles/InputGroup';
 import UnitSelect from './components/UnitSelect';
+import conversionFactors from './utils/conversionFactons';
 
 export interface DoseCalculatorProps {
   open: boolean;
@@ -21,48 +22,11 @@ export type RecordWithId<T> = { id: string; name: T };
 const arrayToRecordMap = <T extends {}>(arr: T[]): RecordWithId<T>[] =>
   arr.map((a, i) => ({ id: i.toString(), name: a }));
 
-const dosageUnits: DosageUnit[] = ['mcg/kg', 'mg/kg', 'g/kg'];
-const dosageUnitsMap: RecordWithId<DosageUnit>[] = arrayToRecordMap(dosageUnits);
-const dosageFrequencies: DosageFrequency[] = ['day', 'week'];
-const dosageFrequenciesMap: RecordWithId<DosageFrequency>[] = arrayToRecordMap(dosageFrequencies);
-
-const weightUnits: WeightUnit[] = ['lbs', 'kg'];
-const weightUnitsMap: RecordWithId<WeightUnit>[] = arrayToRecordMap(weightUnits);
-
-const liquidUnits: LiquidUnit[] = ['mcg', 'mg', 'g'];
-const liquidUnitsMap: RecordWithId<LiquidUnit>[] = arrayToRecordMap(liquidUnits);
-const liquidVolumes: LiquidVolume[] = ['mL', 'L'];
-const liquidVolumesMap: RecordWithId<LiquidVolume>[] = arrayToRecordMap(liquidVolumes);
-
-const conversionFactors = {
-  'mcg/kg': {
-    lbs: 0.453592,
-    kg: 1
-  },
-  'mg/kg': {
-    lbs: 0.453592,
-    kg: 1
-  },
-  'g/kg': {
-    lbs: 0.453592,
-    kg: 1
-  }
-};
-
-const calculateDosage = ({
-  dosage,
-  dosageUnit,
-  weight,
-  weightUnit
-}: {
-  dosage: number;
-  dosageUnit: DosageUnit;
-  weight: number;
-  weightUnit: WeightUnit;
-}) => {
-  const conversionFactor = conversionFactors[dosageUnit][weightUnit];
-  return dosage * conversionFactor * weight;
-};
+const dosageUnitsMap: RecordWithId<DosageUnit>[] = arrayToRecordMap(['mcg/kg', 'mg/kg', 'g/kg']);
+const dosageFrequenciesMap: RecordWithId<DosageFrequency>[] = arrayToRecordMap(['day', 'week']);
+const weightUnitsMap: RecordWithId<WeightUnit>[] = arrayToRecordMap(['lbs', 'kg']);
+const liquidUnitsMap: RecordWithId<LiquidUnit>[] = arrayToRecordMap(['mcg', 'mg', 'g']);
+const liquidVolumesMap: RecordWithId<LiquidVolume>[] = arrayToRecordMap(['mL', 'L']);
 
 export default function DoseCalculator(props: DoseCalculatorProps) {
   const [dosage, setDosage] = createSignal<number>(0);
@@ -89,12 +53,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
   const [totalQuantity, setTotalQuantity] = createSignal<number>(0);
 
   createEffect(() => {
-    const dose = calculateDosage({
-      dosage: dosage(),
-      dosageUnit: dosageUnit().name,
-      weight: weight(),
-      weightUnit: weightUnit().name
-    });
+    const dose = conversionFactors[dosageUnit().name][weightUnit().name] * dosage() * weight();
 
     console.log(dose);
   });
