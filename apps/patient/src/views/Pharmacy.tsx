@@ -323,11 +323,7 @@ export const Pharmacy = () => {
     )
   }
 
-  const { organization, address, pharmacy, id } = order
-
-  if (pharmacy?.id) {
-    navigate(`/status?orderId=${id}&token=${token}`)
-  }
+  const { organization, address } = order
 
   return (
     <Box>
