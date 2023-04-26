@@ -48,15 +48,10 @@ export const GET_ORDER = gql`
         prescription {
           id
           daysSupply
-          dispenseAsWritten
           dispenseQuantity
-          dispenseUnit
-          effectiveDate
           expirationDate
           fillsAllowed
-          fillsRemaining
           instructions
-          notes
         }
       }
       patient {

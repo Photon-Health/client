@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, createContext } from 'react'
-import { Outlet, useSearchParams, useNavigate } from 'react-router-dom'
+import { Outlet, useSearchParams, useNavigate, useLocation } from 'react-router-dom'
 import { Alert, AlertIcon, Center, CircularProgress } from '@chakra-ui/react'
 import { ChakraProvider } from '@chakra-ui/react'
 
@@ -23,6 +23,7 @@ export const Main = () => {
   const [error, setError] = useState<string | undefined>(undefined)
 
   const navigate = useNavigate()
+  const location = useLocation()
 
   if (!orderId || !token) {
     console.error('Missing orderId or token in search params')
@@ -35,6 +36,13 @@ export const Main = () => {
       const results: any = await graphQLClient.request(GET_ORDER, { id: orderId })
       if (results) {
         setOrder(results.order)
+
+        const isMissingPharmacy = !results.order?.pharmacy?.id
+        if (isMissingPharmacy) {
+          navigate(`/review?orderId=${results.order.id}&token=${token}`, {
+            replace: true
+          })
+        }
       }
     } catch (error) {
       console.error(JSON.stringify(error, undefined, 2))
@@ -87,6 +95,10 @@ export const Main = () => {
         </Center>
       </ChakraProvider>
     )
+  }
+
+  if (location.pathname !== '/status' && order?.pharmacy?.id) {
+    navigate(`/status?orderId=${orderId}&token=${token}`, { replace: true })
   }
 
   return (

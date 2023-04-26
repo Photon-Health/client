@@ -20,6 +20,9 @@ export const formatAddress = (address: Address) => {
   )}, ${state} ${postalCode}`
 }
 
+// Format date to local date string (MM/DD/YYYY)
+export const formatDate = (date: string | Date) => new Date(date)?.toLocaleDateString()
+
 export const getHours = (
   periods: { close: { day: number; time: string }; open: { day: number; time: string } }[],
   currentTime: string
