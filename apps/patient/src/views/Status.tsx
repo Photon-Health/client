@@ -14,9 +14,10 @@ import {
 import { Helmet } from 'react-helmet'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { FiCheck, FiMapPin } from 'react-icons/fi'
+import { types } from '@photonhealth/react'
 
 import { formatAddress } from '../utils/general'
-import { Order, OrderState } from '../utils/models'
+import { Order } from '../utils/models'
 import { MARK_ORDER_AS_PICKED_UP } from '../utils/mutations'
 import { Nav } from '../components/Nav'
 import { StatusStepper } from '../components/StatusStepper'
@@ -37,7 +38,7 @@ export const Status = () => {
   const token = searchParams.get('token')
   const courier = searchParams.get('courier')
 
-  const [showFooter, setShowFooter] = useState<boolean>(order?.state === OrderState.Placed)
+  const [showFooter, setShowFooter] = useState<boolean>(order?.state === types.OrderState.Placed)
 
   const [error, setError] = useState(undefined)
   const [submitting, setSubmitting] = useState<boolean>(false)
@@ -174,7 +175,8 @@ export const Status = () => {
           <Button
             size="lg"
             w="full"
-            variant="brand"
+            variant={successfullySubmitted ? undefined : 'brand'}
+            colorScheme={successfullySubmitted ? 'green' : undefined}
             leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
             onClick={!successfullySubmitted ? markOrderAsPickedUp : undefined}
             isLoading={submitting}

@@ -396,7 +396,8 @@ export const Pharmacy = () => {
           <Button
             size="lg"
             w="full"
-            variant="brand"
+            variant={successfullySubmitted ? undefined : 'brand'}
+            colorScheme={successfullySubmitted ? 'green' : undefined}
             leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
             onClick={!successfullySubmitted ? handleSubmit : undefined}
             isLoading={submitting}
