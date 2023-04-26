@@ -14,15 +14,11 @@ type DosageFrequency = 'day' | 'week';
 type LiquidUnit = 'mcg' | 'mg' | 'g';
 type LiquidVolume = 'mL' | 'L';
 
-export type RecordWithId<T> = { id: string; name: T };
-const arrayToRecordMap = <T extends {}>(arr: T[]): RecordWithId<T>[] =>
-  arr.map((a, i) => ({ id: i.toString(), name: a }));
-
-const dosageUnitsMap: RecordWithId<DosageUnit>[] = arrayToRecordMap(['mcg/kg', 'mg/kg', 'g/kg']);
-const dosageFrequenciesMap: RecordWithId<DosageFrequency>[] = arrayToRecordMap(['day', 'week']);
-const weightUnitsMap: RecordWithId<WeightUnit>[] = arrayToRecordMap(['lbs', 'kg']);
-const liquidUnitsMap: RecordWithId<LiquidUnit>[] = arrayToRecordMap(['mcg', 'mg', 'g']);
-const liquidVolumesMap: RecordWithId<LiquidVolume>[] = arrayToRecordMap(['mL', 'L']);
+const dosageUnits: DosageUnit[] = ['mcg/kg', 'mg/kg', 'g/kg'];
+const dosageFrequencies: DosageFrequency[] = ['day', 'week'];
+const weightUnits: WeightUnit[] = ['lbs', 'kg'];
+const liquidUnits: LiquidUnit[] = ['mcg', 'mg', 'g'];
+const liquidVolumes: LiquidVolume[] = ['mL', 'L'];
 
 export interface DoseCalculatorProps {
   open: boolean;
@@ -32,26 +28,22 @@ export interface DoseCalculatorProps {
 
 export default function DoseCalculator(props: DoseCalculatorProps) {
   const [dosage, setDosage] = createSignal<number>(0);
-  const [dosageUnit, setDosageUnit] = createSignal<RecordWithId<DosageUnit>>(dosageUnitsMap[0]);
-  const [dosageFrequency, setDosageFrequency] = createSignal<RecordWithId<DosageFrequency>>(
-    dosageFrequenciesMap[0]
-  );
+  const [dosageUnit, setDosageUnit] = createSignal<DosageUnit>(dosageUnits[0]);
+  const [dosageFrequency, setDosageFrequency] = createSignal<DosageFrequency>(dosageFrequencies[0]);
 
   const [weight, setWeight] = createSignal<number>(0);
-  const [weightUnit, setWeightUnit] = createSignal<RecordWithId<WeightUnit>>(weightUnitsMap[0]);
+  const [weightUnit, setWeightUnit] = createSignal<WeightUnit>(weightUnits[0]);
 
   const [liquidConcentration, setLiquidConcentration] = createSignal<number>(0);
-  const [liquidUnit, setLiquidUnit] = createSignal<RecordWithId<LiquidUnit>>(liquidUnitsMap[0]);
+  const [liquidUnit, setLiquidUnit] = createSignal<LiquidUnit>(liquidUnits[0]);
   const [perVolume, setPerVolume] = createSignal<number>(0);
-  const [perVolumeUnit, setPerVolumeUnit] = createSignal<RecordWithId<LiquidVolume>>(
-    liquidVolumesMap[0]
-  );
+  const [perVolumeUnit, setPerVolumeUnit] = createSignal<LiquidVolume>(liquidVolumes[0]);
 
   const [daysSupply, setDaysSupply] = createSignal<number>(1);
   const [dosesPerDay, setDosesPerDay] = createSignal<number>(1);
 
   const dose = createMemo(() => {
-    const factor = conversionFactors[dosageUnit().name][weightUnit().name];
+    const factor = conversionFactors[dosageUnit()][weightUnit()];
     return factor * dosage() * weight();
   });
 
@@ -59,19 +51,22 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
     if (!liquidConcentration() || parseInt(liquidConcentration().toString(), 10) === 0) {
       return 0;
     }
-    const factor = conversionFactors[dosageUnit().name][liquidUnit().name];
+    const factor = conversionFactors[dosageUnit()][liquidUnit()];
     return (dose() * perVolume()) / (liquidConcentration() * factor);
   });
 
-  const singleDose = createMemo(
-    () => `${round(dose() / dosesPerDay(), 4)} ${dosageUnit().name.split('/')[0]}`
-  );
-  const singleLiquidDose = createMemo(
-    () => `${round(liquidDose() / dosesPerDay(), 4)} ${perVolumeUnit().name}`
-  );
-  const totalQuantity = createMemo(
-    () => `${round(dose() * daysSupply(), 4)} ${dosageUnit().name.split('/')[0]}`
-  );
+  const singleDose = createMemo(() => {
+    const amount = dose() / dosesPerDay();
+    return `${round(amount, 4)} ${dosageUnit().split('/')[0]}`;
+  });
+  const singleLiquidDose = createMemo(() => {
+    const amount = liquidDose() / dosesPerDay();
+    return `${round(amount, 4)} ${perVolumeUnit()}`;
+  });
+  const totalQuantity = createMemo(() => {
+    const amount = dose() * daysSupply();
+    return `${round(amount, 4)} ${dosageUnit().split('/')[0]}`;
+  });
 
   return (
     <Dialog open={props.open} setClose={props.setClose} size="lg">
@@ -93,20 +88,12 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
                 value={dosage()}
                 onInput={(e) => setDosage(e.currentTarget.valueAsNumber)}
               />
-              <UnitSelect
-                value={dosageUnit()}
-                setSelected={setDosageUnit}
-                options={dosageUnitsMap}
-              />
+              <UnitSelect setSelected={setDosageUnit} options={dosageUnits} />
             </div>
             <div class="flex gap-4 items-center">
-              <p>per</p>
+              <p>per {dosageUnit()}</p>
               <div class="grow">
-                <UnitSelect
-                  value={dosageFrequency()}
-                  setSelected={setDosageFrequency}
-                  options={dosageFrequenciesMap}
-                />
+                <UnitSelect setSelected={setDosageFrequency} options={dosageFrequencies} />
               </div>
             </div>
           </div>
@@ -119,11 +106,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
                 value={weight()}
                 onInput={(e) => setWeight(e.currentTarget.valueAsNumber)}
               />
-              <UnitSelect
-                value={weightUnit()}
-                setSelected={setWeightUnit}
-                options={weightUnitsMap}
-              />
+              <UnitSelect setSelected={setWeightUnit} options={weightUnits} />
             </div>
           </div>
         </InputGroup>
@@ -136,7 +119,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               value={liquidConcentration()}
               onInput={(e) => setLiquidConcentration(e.currentTarget.valueAsNumber)}
             />
-            <UnitSelect value={liquidUnit()} setSelected={setLiquidUnit} options={liquidUnitsMap} />
+            <UnitSelect setSelected={setLiquidUnit} options={liquidUnits} />
           </div>
         </InputGroup>
         <InputGroup label="Per Volume">
@@ -146,11 +129,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               value={perVolume()}
               onInput={(e) => setPerVolume(e.currentTarget.valueAsNumber)}
             />
-            <UnitSelect
-              value={perVolumeUnit()}
-              setSelected={setPerVolumeUnit}
-              options={liquidVolumesMap}
-            />
+            <UnitSelect setSelected={setPerVolumeUnit} options={liquidVolumes} />
           </div>
         </InputGroup>
       </div>

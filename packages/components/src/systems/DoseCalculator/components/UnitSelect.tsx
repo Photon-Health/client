@@ -1,21 +1,24 @@
 import { For } from 'solid-js';
 import ComboBox from '../../../particles/ComboBox';
-import { RecordWithId } from '..';
+
+export type RecordWithId<T> = { id: string; name: T };
+const arrayToRecordMap = <T extends {}>(arr: T[]): RecordWithId<T>[] =>
+  arr.map((a, i) => ({ id: i.toString(), name: a }));
 
 function UnitSelect<T extends string>({
-  value,
   setSelected,
   options
 }: {
-  value: RecordWithId<T>;
-  setSelected: (value: RecordWithId<T>) => void;
-  options: RecordWithId<T>[];
+  setSelected: (value: T) => void;
+  options: T[];
 }) {
+  const optionsWithIds = arrayToRecordMap(options);
+
   return (
-    <ComboBox value={value} setSelected={setSelected}>
+    <ComboBox value={optionsWithIds[0]} setSelected={(unit) => setSelected(unit.name)}>
       <ComboBox.Input displayValue={(unit: RecordWithId<any>) => unit.name} />
       <ComboBox.Options>
-        <For each={options}>
+        <For each={optionsWithIds}>
           {(unit) => (
             <ComboBox.Option key={unit.id} value={unit}>
               {unit.name}
