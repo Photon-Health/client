@@ -12,7 +12,6 @@ import theme from '../configs/theme'
 const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER']
 
 export const OrderContext = createContext(null)
-export const GeneralContext = createContext(null)
 
 export const Main = () => {
   const [searchParams] = useSearchParams()
