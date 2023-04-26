@@ -57,15 +57,15 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
 
   const singleDose = createMemo(() => {
     const amount = dose() / dosesPerDay();
-    return `${round(amount, 4)} ${dosageUnit().split('/')[0]}`;
+    return `${round(amount, 1)} ${dosageUnit().split('/')[0]}`;
   });
   const singleLiquidDose = createMemo(() => {
     const amount = liquidDose() / dosesPerDay();
-    return `${round(amount, 4)} ${perVolumeUnit()}`;
+    return `${round(amount, 1)} ${perVolumeUnit()}`;
   });
   const totalQuantity = createMemo(() => {
     const amount = dose() * daysSupply();
-    return `${round(amount, 4)} ${dosageUnit().split('/')[0]}`;
+    return `${round(amount, 1)} ${dosageUnit().split('/')[0]}`;
   });
 
   return (
