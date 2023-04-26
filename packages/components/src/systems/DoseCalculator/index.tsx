@@ -10,12 +10,12 @@ const round = (num: number, places: number) => parseFloat(num.toFixed(places));
 
 type DosageUnit = 'mcg/kg' | 'mg/kg' | 'g/kg';
 type WeightUnit = 'lbs' | 'kg';
-type DosageFrequency = 'day' | 'week';
+type DosageFrequency = 'day' | 'dose';
 type LiquidUnit = 'mcg' | 'mg' | 'g';
 type LiquidVolume = 'mL' | 'L';
 
 const dosageUnits: DosageUnit[] = ['mcg/kg', 'mg/kg', 'g/kg'];
-const dosageFrequencies: DosageFrequency[] = ['day', 'week'];
+const dosageFrequencies: DosageFrequency[] = ['day', 'dose'];
 const weightUnits: WeightUnit[] = ['lbs', 'kg'];
 const liquidUnits: LiquidUnit[] = ['mcg', 'mg', 'g'];
 const liquidVolumes: LiquidVolume[] = ['mL', 'L'];
@@ -56,15 +56,16 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
   });
 
   const singleDose = createMemo(() => {
-    const amount = dose() / dosesPerDay();
+    const amount = dosageFrequency() === 'day' ? dose() / dosesPerDay() : dose();
     return `${round(amount, 1)} ${dosageUnit().split('/')[0]}`;
   });
   const singleLiquidDose = createMemo(() => {
-    const amount = liquidDose() / dosesPerDay();
+    const amount = dosageFrequency() === 'day' ? liquidDose() / dosesPerDay() : liquidDose();
     return `${round(amount, 1)} ${perVolumeUnit()}`;
   });
   const totalQuantity = createMemo(() => {
-    const amount = dose() * daysSupply();
+    const amount =
+      dosageFrequency() === 'day' ? dose() * daysSupply() : dose() * daysSupply() * dosesPerDay();
     return `${round(amount, 1)} ${dosageUnit().split('/')[0]}`;
   });
 
