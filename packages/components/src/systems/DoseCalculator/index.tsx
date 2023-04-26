@@ -88,10 +88,10 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
                 value={dosage()}
                 onInput={(e) => setDosage(e.currentTarget.valueAsNumber)}
               />
-              <UnitSelect setSelected={setDosageUnit} options={dosageUnits} />
+              <UnitSelect setSelected={setDosageUnit} options={dosageUnits} initialIdx={1} />
             </div>
             <div class="flex gap-4 items-center">
-              <p>per {dosageUnit()}</p>
+              <p>per</p>
               <div class="grow">
                 <UnitSelect setSelected={setDosageFrequency} options={dosageFrequencies} />
               </div>
@@ -119,7 +119,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               value={liquidConcentration()}
               onInput={(e) => setLiquidConcentration(e.currentTarget.valueAsNumber)}
             />
-            <UnitSelect setSelected={setLiquidUnit} options={liquidUnits} />
+            <UnitSelect setSelected={setLiquidUnit} options={liquidUnits} initialIdx={1} />
           </div>
         </InputGroup>
         <InputGroup label="Per Volume">

@@ -5,17 +5,18 @@ export type RecordWithId<T> = { id: string; name: T };
 const arrayToRecordMap = <T extends {}>(arr: T[]): RecordWithId<T>[] =>
   arr.map((a, i) => ({ id: i.toString(), name: a }));
 
-function UnitSelect<T extends string>({
-  setSelected,
-  options
-}: {
+function UnitSelect<T extends string>(props: {
   setSelected: (value: T) => void;
   options: T[];
+  initialIdx?: number;
 }) {
-  const optionsWithIds = arrayToRecordMap(options);
+  const optionsWithIds = arrayToRecordMap(props.options);
 
   return (
-    <ComboBox value={optionsWithIds[0]} setSelected={(unit) => setSelected(unit.name)}>
+    <ComboBox
+      value={optionsWithIds[props.initialIdx || 0]}
+      setSelected={(unit) => props.setSelected(unit.name)}
+    >
       <ComboBox.Input displayValue={(unit: RecordWithId<any>) => unit.name} />
       <ComboBox.Options>
         <For each={optionsWithIds}>
