@@ -11,7 +11,6 @@ import {
   Link,
   Text,
   VStack,
-  useBreakpointValue,
   useToast
 } from '@chakra-ui/react'
 import { FiCheck, FiMapPin } from 'react-icons/fi'
@@ -21,6 +20,7 @@ import dayjs from 'dayjs'
 
 import { formatAddress, getHours } from '../utils/general'
 import { GET_PHARMACIES } from '../utils/queries'
+import { Order } from '../utils/models'
 import t from '../utils/text.json'
 import { SELECT_ORDER_PHARMACY } from '../utils/mutations'
 import { graphQLClient } from '../configs/graphqlClient'
@@ -53,7 +53,7 @@ const query = (method, data) =>
   })
 
 export const Pharmacy = () => {
-  const order = useContext(OrderContext)
+  const order = useContext<Order>(OrderContext)
 
   const navigate = useNavigate()
 
@@ -272,7 +272,10 @@ export const Pharmacy = () => {
           setSuccessfullySubmitted(true)
           setTimeout(() => {
             setShowFooter(false)
-            const selectedCourier = selectedId === process.env.REACT_APP_CAPSULE_PHARMACY_ID
+            const selectedCourier = [
+              process.env.REACT_APP_CAPSULE_PHARMACY_ID,
+              process.env.REACT_APP_ALTO_PHARMACY_ID
+            ].includes(selectedId)
             navigate(
               `/status?orderId=${order.id}&token=${token}${selectedCourier ? '&courier=true' : ''}`
             )
@@ -366,7 +369,7 @@ export const Pharmacy = () => {
             <VStack spacing={9} align="stretch">
               {enableCourier ? (
                 <CourierOptions
-                  capsule
+                  alto
                   location={location}
                   selectedId={selectedId}
                   handleSelect={handleSelect}
@@ -393,7 +396,8 @@ export const Pharmacy = () => {
           <Button
             size="lg"
             w="full"
-            variant="brand"
+            variant={successfullySubmitted ? undefined : 'brand'}
+            colorScheme={successfullySubmitted ? 'green' : undefined}
             leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
             onClick={!successfullySubmitted ? handleSubmit : undefined}
             isLoading={submitting}

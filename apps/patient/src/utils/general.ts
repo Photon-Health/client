@@ -1,7 +1,7 @@
-import { Address } from './models'
 import dayjs from 'dayjs'
 import isoWeek from 'dayjs/plugin/isoWeek'
 import isBetween from 'dayjs/plugin/isBetween'
+import { types } from '@photonhealth/react'
 
 dayjs.extend(isoWeek)
 dayjs.extend(isBetween)
@@ -13,12 +13,15 @@ export const titleCase = (str: string) =>
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
 
-export const formatAddress = (address: Address) => {
+export const formatAddress = (address: types.Address) => {
   const { city, postalCode, state, street1, street2 } = address
   return `${titleCase(street1)}${street2 ? `, ${titleCase(street2)}` : ''}, ${titleCase(
     city
   )}, ${state} ${postalCode}`
 }
+
+// Format date to local date string (MM/DD/YYYY)
+export const formatDate = (date: string | Date) => new Date(date)?.toLocaleDateString()
 
 export const getHours = (
   periods: { close: { day: number; time: string }; open: { day: number; time: string } }[],

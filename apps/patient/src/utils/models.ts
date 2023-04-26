@@ -1,35 +1,15 @@
-export interface Address {
-  city: string
-  country: string
-  postalCode: string
-  state: string
-  street1: string
-  street2?: string
-}
+import { types } from '@photonhealth/react'
 
-export interface Order {
-  id: string
-  state: OrderState
-  fulfillment: {
-    state: string
-  }
-  pharmacy: {
-    id: string
-    address: Address
-    name: string
-  }
+export interface Order extends types.Order {
   organization: {
     id: string
     name: string
-  }
-  patient: {
-    id: string
   }
 }
 
 export interface Pharmacy {
   id: string
-  address: Address
+  address: types.Address
   name: string
   info: string
   distance: number
@@ -42,13 +22,4 @@ export interface Pharmacy {
     opensDay?: 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun'
     closes?: string
   }
-}
-
-export enum OrderState {
-  Canceled = 'CANCELED',
-  Completed = 'COMPLETED',
-  Error = 'ERROR',
-  Pending = 'PENDING',
-  Placed = 'PLACED',
-  Routing = 'ROUTING'
 }

@@ -55,7 +55,7 @@ export const PatientCard = (props: {
           selected={props.store['patient']?.value?.id ?? props.patientId}
           sdk={props.client!.getSDK()}
         ></photon-patient-select>
-        <Show when={props.store['patient']?.value?.id && props.enableOrder}>
+        <Show when={props.store['patient']?.value?.id && props.enableOrder && !props.hideAddress}>
           <photon-patient-dialog
             open={dialogOpen()}
             on:photon-patient-updated={() => {

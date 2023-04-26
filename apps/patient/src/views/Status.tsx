@@ -14,9 +14,10 @@ import {
 import { Helmet } from 'react-helmet'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { FiCheck, FiMapPin } from 'react-icons/fi'
+import { types } from '@photonhealth/react'
 
 import { formatAddress } from '../utils/general'
-import { Order, OrderState } from '../utils/models'
+import { Order } from '../utils/models'
 import { MARK_ORDER_AS_PICKED_UP } from '../utils/mutations'
 import { Nav } from '../components/Nav'
 import { StatusStepper } from '../components/StatusStepper'
@@ -37,14 +38,17 @@ export const Status = () => {
   const token = searchParams.get('token')
   const courier = searchParams.get('courier')
 
-  const [showFooter, setShowFooter] = useState<boolean>(order?.state === OrderState.Placed)
+  const [showFooter, setShowFooter] = useState<boolean>(order?.state === types.OrderState.Placed)
 
   const [error, setError] = useState(undefined)
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false)
 
   const isCourier: boolean =
-    courier === 'true' || order?.pharmacy?.id === process.env.REACT_APP_CAPSULE_PHARMACY_ID
+    courier === 'true' ||
+    [process.env.REACT_APP_CAPSULE_PHARMACY_ID, process.env.REACT_APP_ALTO_PHARMACY_ID].includes(
+      order?.pharmacy?.id
+    )
   const fulfillmentType = isCourier ? 'courier' : 'pickup'
 
   const toast = useToast()
@@ -104,7 +108,7 @@ export const Status = () => {
     )
   }
 
-  const { fulfillment, pharmacy, organization } = order
+  const { fulfillment, pharmacy, organization, address } = order
 
   const photonPhone: string = process.env.REACT_APP_TWILIO_SMS_NUMBER
 
@@ -161,6 +165,7 @@ export const Status = () => {
           <StatusStepper
             isCourier={isCourier}
             status={successfullySubmitted ? 'PICKED_UP' : fulfillment?.state || 'SENT'}
+            patientAddress={formatAddress(address)}
           />
         </VStack>
       </Container>
@@ -170,7 +175,8 @@ export const Status = () => {
           <Button
             size="lg"
             w="full"
-            variant="brand"
+            variant={successfullySubmitted ? undefined : 'brand'}
+            colorScheme={successfullySubmitted ? 'green' : undefined}
             leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
             onClick={!successfullySubmitted ? markOrderAsPickedUp : undefined}
             isLoading={submitting}

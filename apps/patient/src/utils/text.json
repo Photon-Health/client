@@ -4,6 +4,7 @@
     "title": "Review prescriptions",
     "heading": "Review your prescriptions",
     "subheading": "Please review the prescriptions before you select a pharmacy. Reach out to your provider for any issues.",
+    "patient": "Patient",
     "prescriber": "Prescriber",
     "quantity": "Quantity",
     "daysSupply": "Days supply",
@@ -87,7 +88,7 @@
         },
         "DELIVERING": {
           "title": "Delivering",
-          "description": "Your prescriptions are being delivered."
+          "description": "Your prescriptions are being delivered to "
         },
         "DELIVERED": {
           "title": "Delivered",
