@@ -79,15 +79,15 @@
     "courier": {
       "states": {
         "SENT": {
-          "title": "Sent to Pharmacy",
+          "title": "Sent to pharmacy",
           "description": "Your prescription fills have been sent to the pharmacy."
         },
         "FILLING": {
           "title": "Filling your prescriptions",
           "description": "The pharmacy has received your order and is filling it."
         },
-        "DELIVERING": {
-          "title": "Delivering",
+        "IN_TRANSIT": {
+          "title": "In transit",
           "description": "Your prescriptions are being delivered to "
         },
         "DELIVERED": {

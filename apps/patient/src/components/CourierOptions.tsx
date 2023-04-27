@@ -1,26 +1,10 @@
-import {
-  Card,
-  CardBody,
-  Heading,
-  Image,
-  SlideFade,
-  Text,
-  VStack,
-  useBreakpointValue
-} from '@chakra-ui/react'
+import { Heading, SlideFade, Text, VStack } from '@chakra-ui/react'
 
 import t from '../utils/text.json'
-
-// @ts-ignore
-import capsuleLogo from '../assets/capsule_logo.png'
-// @ts-ignore
-import amazonPharmacyLogo from '../assets/amazon_pharmacy.png'
-// @ts-ignore
-import altoLogo from '../assets/alto_logo.svg'
+import { CourierPharmacyCard } from './CourierPharmacyCard'
 
 interface Props {
-  alto?: boolean
-  capsule?: boolean
+  options: string[]
   location: string
   selectedId: string
   handleSelect: Function
@@ -28,38 +12,13 @@ interface Props {
 }
 
 export const CourierOptions = ({
-  alto = false,
-  capsule = false,
+  options,
   location,
   selectedId,
   handleSelect,
   patientAddress
 }: Props) => {
-  const isMobile = useBreakpointValue({ base: true, md: false })
-
   if (!location) return null
-
-  const courierOptions = [
-    {
-      id: process.env.REACT_APP_CAPSULE_PHARMACY_ID,
-      logo: capsuleLogo,
-      enabled: false,
-      description: 'Free, same-day prescription delivery.' // on their website
-    },
-    {
-      id: process.env.REACT_APP_AMAZON_PHARMACY_ID,
-      logo: amazonPharmacyLogo,
-      enabled: true,
-      description: 'Save time. Save money. Stay healthy.' // on their website
-    },
-    {
-      id: process.env.REACT_APP_ALTO_PHARMACY_ID,
-      logo: altoLogo,
-      enabled: alto,
-      description: 'Free same-day delivery' // on their website
-    }
-    // add additional courier options here
-  ]
 
   return (
     <VStack spacing={2} align="span" w="full">
@@ -74,30 +33,9 @@ export const CourierOptions = ({
         </VStack>
       </SlideFade>
 
-      {courierOptions.map((ph) => {
-        if (!ph.enabled) return null
-        return (
-          <SlideFade offsetY="60px" in={true} key={`courier-pharmacy-${ph.id}`}>
-            <Card
-              bgColor="white"
-              cursor="pointer"
-              onClick={() => handleSelect(ph.id)}
-              border="2px solid"
-              borderColor={selectedId === ph.id ? 'brand.600' : 'white'}
-              mx={isMobile ? -3 : undefined}
-            >
-              <CardBody p={3}>
-                <VStack align="start" spacing={2}>
-                  <Image src={ph.logo} width="auto" height="30px" />
-                  <Text fontSize="sm" color="gray.500">
-                    {ph.description}
-                  </Text>
-                </VStack>
-              </CardBody>
-            </Card>
-          </SlideFade>
-        )
-      })}
+      {options.map((id) => (
+        <CourierPharmacyCard pharmacyId={id} selectedId={selectedId} handleSelect={handleSelect} />
+      ))}
     </VStack>
   )
 }

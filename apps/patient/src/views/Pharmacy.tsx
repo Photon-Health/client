@@ -31,6 +31,9 @@ import { LocationModal } from '../components/LocationModal'
 import { PickupOptions } from '../components/PickupOptions'
 import { CourierOptions } from '../components/CourierOptions'
 import { OrderContext } from './Main'
+import { getSettings } from '@client/settings'
+
+const settings = getSettings(process.env.REACT_APP_ENV_NAME)
 
 const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER']
 export const UNOPEN_BUSINESS_STATUS_MAP = {
@@ -325,6 +328,11 @@ export const Pharmacy = () => {
 
   const { organization, address } = order
 
+  const courierOptions =
+    organization.id in settings
+      ? settings[organization.id].courierProviders
+      : settings.default.courierProviders
+
   return (
     <Box>
       <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />
@@ -369,7 +377,7 @@ export const Pharmacy = () => {
             <VStack spacing={9} align="stretch">
               {enableCourier ? (
                 <CourierOptions
-                  alto
+                  options={courierOptions}
                   location={location}
                   selectedId={selectedId}
                   handleSelect={handleSelect}

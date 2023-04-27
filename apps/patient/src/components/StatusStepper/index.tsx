@@ -1,10 +1,9 @@
 import { Box, Center, Container, Stack } from '@chakra-ui/react'
 import { Step } from './components/Step'
 import t from '../../utils/text.json'
-import { formatAddress } from '../../utils/general'
 
 export const pickupStates = ['SENT', 'RECEIVED', 'READY', 'PICKED_UP']
-export const courierStates = ['SENT', 'FILLING', 'DELIVERING', 'DELIVERED']
+export const courierStates = ['SENT', 'FILLING', 'IN_TRANSIT', 'DELIVERED']
 
 interface Props {
   status: string
@@ -26,7 +25,7 @@ export const StatusStepper = ({ status, isCourier, patientAddress }: Props) => {
             {states.map((state, id) => {
               const title = t.status[fulfillmentType].states[state].title
               const description =
-                state === 'DELIVERING'
+                state === 'IN_TRANSIT'
                   ? `${t.status[fulfillmentType].states[state].description}${patientAddress}.` // show delivery address on courier
                   : t.status[fulfillmentType].states[state].description
 
