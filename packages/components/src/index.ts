@@ -1,7 +1,7 @@
 import Button from './particles/Button';
-
 import Client from './systems/Client';
 import PharmacySearch from './systems/PharmacySearch';
+import DoseCalculator from './systems/DoseCalculator';
 import { PhotonClientStore } from './store';
 import { PhotonClient } from '@photonhealth/sdk';
 import { createCatalogStore } from './stores/catalog';
@@ -13,6 +13,7 @@ import { createDispenseUnitStore } from './stores/dispenseUnit';
 export {
   Button,
   Client,
+  DoseCalculator,
   PharmacySearch,
   PhotonClientStore,
   PhotonClient,
