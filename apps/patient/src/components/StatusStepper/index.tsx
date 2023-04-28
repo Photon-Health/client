@@ -16,8 +16,10 @@ interface Props {
 }
 
 export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props) => {
+  // Get step index from pickup since those are the only states we actually have
+  const initialStepIdx = STATES.pickup.findIndex((state) => state === status)
+  // Map index to faux states
   const states = STATES[fulfillmentType]
-  const initialStepIdx = states.findIndex((state) => state === status)
   const currentStep = initialStepIdx + 1
 
   return (
