@@ -36,7 +36,12 @@ export const BrandedOptions = ({
       </SlideFade>
 
       {options.map((id) => (
-        <BrandedPharmacyCard pharmacyId={id} selectedId={selectedId} handleSelect={handleSelect} />
+        <BrandedPharmacyCard
+          key={id}
+          pharmacyId={id}
+          selectedId={selectedId}
+          handleSelect={handleSelect}
+        />
       ))}
     </VStack>
   )
