@@ -52,7 +52,7 @@ export const neutron: {
     logo: 'newco_logo.png',
     accentColor: '#69348F',
     mailOrderNavigate: false,
-    mailOrderNavigateProviders: [],
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
     sendToPatient: true
   },
   // Demo (demo's)
