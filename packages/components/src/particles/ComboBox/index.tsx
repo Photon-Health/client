@@ -169,6 +169,7 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
             setLocalSelectedValue(e.currentTarget.value);
             setOpen(true);
           }}
+          autoComplete="off"
         />
       </div>
       <button
