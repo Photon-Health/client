@@ -30,7 +30,7 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
             {states.map((state, id) => {
               const title = t.status[fulfillmentType].states[state].title
               const description =
-                state === 'IN_TRANSIT' || state === 'DELIVERING'
+                state === 'IN_TRANSIT' || state === 'SHIPPED'
                   ? `${t.status[fulfillmentType].states[state].description}${patientAddress}.` // show delivery address on courier
                   : t.status[fulfillmentType].states[state].description
 
