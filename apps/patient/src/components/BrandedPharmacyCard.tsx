@@ -39,8 +39,6 @@ const PHARMACY_BRANDING = {
 export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Props) => {
   const isMobile = useBreakpointValue({ base: true, md: false })
 
-  console.log(pharmacyId)
-
   const { logo, description } = PHARMACY_BRANDING[pharmacyId]
 
   if (!logo || !description) return null
