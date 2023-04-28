@@ -86,8 +86,6 @@ export const Pharmacy = () => {
     order?.address ? formatAddress(order.address) : ''
   )
 
-  // const [enableCourier, setEnableCourier] = useState<boolean>(false)
-
   const toast = useToast()
 
   const reset = () => {
@@ -95,7 +93,6 @@ export const Pharmacy = () => {
     setSelectedId('')
     setShowFooter(false)
     setShowingAllPharmacies(false)
-    // setEnableCourier(false)
   }
 
   const handleModalClose = ({
@@ -133,14 +130,6 @@ export const Pharmacy = () => {
 
   const fetchPharmacies = async () => {
     setLoadingMore(true)
-
-    // // Courier option limited to MoPed in Austin, TX
-    // const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(location)
-    // const patientAddressInAustinTX =
-    //   order?.address?.city === 'Austin' && order?.address?.state === 'TX'
-    // if (searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier) {
-    //   setEnableCourier(true)
-    // }
 
     // On initializing, we won't have lat/lng
     let loc: string = location
