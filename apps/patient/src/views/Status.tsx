@@ -14,9 +14,10 @@ import {
 import { Helmet } from 'react-helmet'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { FiCheck, FiMapPin } from 'react-icons/fi'
+import { types } from '@photonhealth/react'
 
-import { formatAddress } from '../utils/general'
-import { Order, OrderState } from '../utils/models'
+import { formatAddress, getFullfillmentType } from '../utils/general'
+import { Order } from '../utils/models'
 import { MARK_ORDER_AS_PICKED_UP } from '../utils/mutations'
 import { Nav } from '../components/Nav'
 import { StatusStepper } from '../components/StatusStepper'
@@ -25,8 +26,13 @@ import { PoweredBy } from '../components/PoweredBy'
 import { OrderContext } from './Main'
 import { graphQLClient } from '../configs/graphqlClient'
 import t from '../utils/text.json'
+import { getSettings } from '@client/settings'
+
+const settings = getSettings(process.env.REACT_APP_ENV_NAME)
 
 const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER']
+
+const PHOTON_PHONE_NUMBER: string = process.env.REACT_APP_TWILIO_SMS_NUMBER
 
 export const Status = () => {
   const navigate = useNavigate()
@@ -35,20 +41,19 @@ export const Status = () => {
   const [searchParams] = useSearchParams()
   const orderId = searchParams.get('orderId')
   const token = searchParams.get('token')
-  const courier = searchParams.get('courier')
+  const type = searchParams.get('type')
 
-  const [showFooter, setShowFooter] = useState<boolean>(order?.state === OrderState.Placed)
+  const [showFooter, setShowFooter] = useState<boolean>(order?.state === types.OrderState.Placed)
 
   const [error, setError] = useState(undefined)
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false)
 
-  const isCourier: boolean =
-    courier === 'true' ||
-    [process.env.REACT_APP_CAPSULE_PHARMACY_ID, process.env.REACT_APP_ALTO_PHARMACY_ID].includes(
-      order?.pharmacy?.id
-    )
-  const fulfillmentType = isCourier ? 'courier' : 'pickup'
+  const { fulfillment, pharmacy, organization, address } = order
+
+  const orgSettings =
+    order?.organization?.id in settings ? settings[order.organization.id] : settings.default
+  const fulfillmentType = getFullfillmentType(orgSettings, order?.pharmacy?.id, type)
 
   const toast = useToast()
 
@@ -107,12 +112,8 @@ export const Status = () => {
     )
   }
 
-  const { fulfillment, pharmacy, organization, address } = order
-
-  const photonPhone: string = process.env.REACT_APP_TWILIO_SMS_NUMBER
-
-  const showChatAlert =
-    !isCourier && (fulfillment?.state === 'RECEIVED' || fulfillment?.state === 'READY')
+  // Only show "Text us now" prompt if pickup and RECEIVED or READY
+  const showChatAlert = fulfillment?.state === 'RECEIVED' || fulfillment?.state === 'READY'
 
   return (
     <Box>
@@ -135,14 +136,14 @@ export const Status = () => {
                 <AlertIcon />
                 <Text>
                   {t.status.pickup.chat.prompt}{' '}
-                  <Link href={`sms:${photonPhone}`} textDecoration="underline">
+                  <Link href={`sms:${PHOTON_PHONE_NUMBER}`} textDecoration="underline">
                     {t.status.pickup.chat.cta}
                   </Link>
                 </Text>
               </Alert>
             ) : null}
           </VStack>
-          {!isCourier && pharmacy?.name && pharmacy?.address ? (
+          {fulfillmentType !== ('mailOrder' || 'courier') && pharmacy?.name && pharmacy?.address ? (
             <Box alignSelf="start">
               <Text display="inline" color="gray.500">
                 {t.status.pickup.pickup}
@@ -162,7 +163,7 @@ export const Status = () => {
             </Box>
           ) : null}
           <StatusStepper
-            isCourier={isCourier}
+            fulfillmentType={fulfillmentType}
             status={successfullySubmitted ? 'PICKED_UP' : fulfillment?.state || 'SENT'}
             patientAddress={formatAddress(address)}
           />
@@ -174,7 +175,8 @@ export const Status = () => {
           <Button
             size="lg"
             w="full"
-            variant="brand"
+            variant={successfullySubmitted ? undefined : 'brand'}
+            colorScheme={successfullySubmitted ? 'green' : undefined}
             leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
             onClick={!successfullySubmitted ? markOrderAsPickedUp : undefined}
             isLoading={submitting}

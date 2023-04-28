@@ -32,8 +32,33 @@ export const GET_ORDER = gql`
           postalCode
         }
       }
+      fills {
+        id
+        treatment {
+          ... on Medication {
+            id
+            name
+            strength
+          }
+          ... on MedicalEquipment {
+            id
+            name
+          }
+        }
+        prescription {
+          id
+          daysSupply
+          dispenseQuantity
+          expirationDate
+          fillsAllowed
+          instructions
+        }
+      }
       patient {
         id
+        name {
+          full
+        }
       }
     }
   }
