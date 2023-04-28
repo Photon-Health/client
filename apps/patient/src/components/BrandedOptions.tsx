@@ -1,9 +1,10 @@
 import { Heading, SlideFade, Text, VStack } from '@chakra-ui/react'
 
 import t from '../utils/text.json'
-import { CourierPharmacyCard } from './CourierPharmacyCard'
+import { BrandedPharmacyCard } from './BrandedPharmacyCard'
 
 interface Props {
+  type: 'mailOrder' | 'courier'
   options: string[]
   location: string
   selectedId: string
@@ -11,7 +12,8 @@ interface Props {
   patientAddress: string
 }
 
-export const CourierOptions = ({
+export const BrandedOptions = ({
+  type,
   options,
   location,
   selectedId,
@@ -25,16 +27,16 @@ export const CourierOptions = ({
       <SlideFade offsetY="60px" in={true}>
         <VStack spacing={1} align="start">
           <Heading as="h5" size="sm">
-            {t.pharmacy.courier.heading}
+            {t.pharmacy[type].heading}
           </Heading>
           <Text size="sm">
-            {t.pharmacy.courier.subheading} {patientAddress}
+            {t.pharmacy[type].subheading} {patientAddress}
           </Text>
         </VStack>
       </SlideFade>
 
       {options.map((id) => (
-        <CourierPharmacyCard pharmacyId={id} selectedId={selectedId} handleSelect={handleSelect} />
+        <BrandedPharmacyCard pharmacyId={id} selectedId={selectedId} handleSelect={handleSelect} />
       ))}
     </VStack>
   )

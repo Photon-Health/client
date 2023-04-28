@@ -16,6 +16,8 @@ const defaultSettings: OrganizationSettings = {
   pickUp: true,
   mailOrder: false,
   mailOrderProviders: [],
+  mailOrderNavigate: false,
+  mailOrderNavigateProviders: [],
   sendToPatient: false,
   sendToPatientUsers: [],
   courier: false,
@@ -49,11 +51,9 @@ export const neutron: {
     ...defaultSettings,
     logo: 'newco_logo.png',
     accentColor: '#69348F',
-    mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
-    sendToPatient: true,
-    courier: true,
-    courierProviders: [AMAZON_PHARMACY_ID]
+    mailOrderNavigate: false,
+    mailOrderNavigateProviders: [],
+    sendToPatient: true
   },
   // Demo (demo's)
   org_TY5GFYPIRo3xQGYM: {

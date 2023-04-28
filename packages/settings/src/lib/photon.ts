@@ -15,6 +15,8 @@ const defaultSettings: OrganizationSettings = {
   pickUp: true,
   mailOrder: false,
   mailOrderProviders: [],
+  mailOrderNavigate: false,
+  mailOrderNavigateProviders: [],
   sendToPatient: false,
   sendToPatientUsers: [],
   courier: false,
@@ -90,6 +92,7 @@ export const photon: {
   org_pxcJ7Dlclcsg0OJw: {
     ...defaultSettings,
     logo: 'zzpeds_logo.png',
-    accentColor: '#5271ff'
+    accentColor: '#5271ff',
+    sendToPatient: true
   }
 };

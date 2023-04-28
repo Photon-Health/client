@@ -32,6 +32,10 @@
       "heading": "Delivery",
       "subheading": "Courier delivery to"
     },
+    "mailOrder": {
+      "heading": "Delivery",
+      "subheading": "Ship to"
+    },
     "pickup": {
       "heading": "Pick Up",
       "subheading": "Your prescriptions at a nearby location.",
@@ -98,6 +102,31 @@
       "cta": "I received my prescriptions",
       "errorToast": {
         "title": "Unable to mark order as delivered",
+        "description": "Please refresh and try again"
+      }
+    },
+    "mailOrder": {
+      "states": {
+        "SENT": {
+          "title": "Sent to pharmacy",
+          "description": "Your prescription fills have been sent to the pharmacy."
+        },
+        "FILLING": {
+          "title": "Filling your prescriptions",
+          "description": "The pharmacy has received your order and is filling it."
+        },
+        "DELIVERING": {
+          "title": "Delivering",
+          "description": "Your prescriptions are being delivered to "
+        },
+        "SHIPPED": {
+          "title": "Shipped",
+          "description": "Your prescriptions have arrived at their destination."
+        }
+      },
+      "cta": "I received my prescriptions",
+      "errorToast": {
+        "title": "Unable to mark order as shipped",
         "description": "Please refresh and try again"
       }
     },

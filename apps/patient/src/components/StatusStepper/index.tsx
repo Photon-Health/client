@@ -1,21 +1,24 @@
 import { Box, Center, Container, Stack } from '@chakra-ui/react'
 import { Step } from './components/Step'
 import t from '../../utils/text.json'
+import { FulfillmentType } from '../../utils/models'
 
-export const pickupStates = ['SENT', 'RECEIVED', 'READY', 'PICKED_UP']
-export const courierStates = ['SENT', 'FILLING', 'IN_TRANSIT', 'DELIVERED']
+export const STATES = {
+  courier: ['SENT', 'FILLING', 'IN_TRANSIT', 'DELIVERED'],
+  pickup: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'],
+  mailOrder: ['SENT', 'FILLING', 'DELIVERING', 'SHIPPED']
+}
 
 interface Props {
+  fulfillmentType: FulfillmentType
   status: string
-  isCourier?: boolean
   patientAddress?: string
 }
 
-export const StatusStepper = ({ status, isCourier, patientAddress }: Props) => {
-  const initialStepIdx = pickupStates.findIndex((state) => state === status)
+export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props) => {
+  const states = STATES[fulfillmentType]
+  const initialStepIdx = states.findIndex((state) => state === status)
   const currentStep = initialStepIdx + 1
-  const states = isCourier ? courierStates : pickupStates
-  const fulfillmentType = isCourier ? 'courier' : 'pickup'
 
   return (
     <Box>
@@ -25,7 +28,7 @@ export const StatusStepper = ({ status, isCourier, patientAddress }: Props) => {
             {states.map((state, id) => {
               const title = t.status[fulfillmentType].states[state].title
               const description =
-                state === 'IN_TRANSIT'
+                state === 'IN_TRANSIT' || state === 'DELIVERING'
                   ? `${t.status[fulfillmentType].states[state].description}${patientAddress}.` // show delivery address on courier
                   : t.status[fulfillmentType].states[state].description
 
@@ -49,6 +52,5 @@ export const StatusStepper = ({ status, isCourier, patientAddress }: Props) => {
 }
 
 StatusStepper.defaultProps = {
-  isCourier: false,
   patientAddress: undefined
 }

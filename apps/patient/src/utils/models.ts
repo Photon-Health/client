@@ -23,3 +23,5 @@ export interface Pharmacy {
     closes?: string
   }
 }
+
+export type FulfillmentType = 'mailOrder' | 'courier' | 'pickup'

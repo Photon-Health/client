@@ -9,6 +9,8 @@
  * @param pickUp Toggle fulfillment pickup pharmacy options
  * @param mailOrder Toggle fulfillment mail order pharmacy options
  * @param mailOrderProviders Fulfillment mail order pharmacy options
+ * @param mailOrderNavigate Toggle fulfillment mail order pharmacy options for Navigate
+ * @param mailOrderNavigateProviders Fulfillment mail order pharmacy options for Navigate
  * @param sendToPatient Toggle ability to send to patient for pharmacy selection
  * @param sendToPatientUsers Limit ability to send to patient to specific users
  * @param returnTo Logout redirect
@@ -25,6 +27,8 @@ export type OrganizationSettings = {
   pickUp?: boolean;
   mailOrder?: boolean;
   mailOrderProviders?: string[];
+  mailOrderNavigate?: boolean;
+  mailOrderNavigateProviders?: string[];
   sendToPatient?: boolean;
   sendToPatientUsers?: string[];
   returnTo?: string;
