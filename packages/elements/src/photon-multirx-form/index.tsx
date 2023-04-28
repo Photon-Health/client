@@ -15,6 +15,7 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import styles from './style.css?inline';
 import { createEffect, createSignal, Show } from 'solid-js';
+import type { FormError } from '../stores/form';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
 import { Order, Prescription, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
@@ -100,6 +101,7 @@ customElement(
     );
     const client = usePhoton();
     const [showForm, setShowForm] = createSignal<boolean>(!props.templateIds);
+    const [errors, setErrors] = createSignal<FormError[]>([]);
     const [isLoading, setIsLoading] = createSignal<boolean>(true);
     const [isEditing, setIsEditing] = createSignal<boolean>(false);
     const [isLoadingTemplates, setIsLoadingTemplates] = createSignal<boolean>(false);
@@ -250,12 +252,13 @@ customElement(
     };
 
     const submitForm = async (enableOrder: boolean) => {
+      setErrors([]);
       const keys = enableOrder
         ? ['patient', 'draftPrescriptions', 'pharmacy', 'address']
         : ['patient', 'draftPrescriptions'];
       actions.validate(keys);
-      const errorsPresent = actions.hasErrors(keys);
-      if (!errorsPresent) {
+      const errors = actions.getErrors(keys);
+      if (errors.length === 0) {
         setIsLoading(true);
         actions.updateFormValue({
           key: 'errors',
@@ -320,6 +323,8 @@ customElement(
           }
           dispatchOrderCreated(data2!.createOrder);
         }
+      } else {
+        setErrors(errors);
       }
     };
 
@@ -378,6 +383,22 @@ customElement(
                 <PharmacyCard pharmacyId={props.pharmacyId}></PharmacyCard>
               </Show>
               <Show when={!props.hideSubmit}>
+                {/* We're hiding this alert message if enable-order is set, a rough way to let us know this is not in the App.
+                The issue we're having is when props are passed and cards are hidden, the form is not showing validation errors. */}
+                <Show when={errors().length > 0 && props.enableOrder}>
+                  <div class="m-3">
+                    {errors().map(({ key, error }) => (
+                      <sl-alert variant="warning" open>
+                        <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
+                        <strong>Error with {key}: </strong>
+                        <br />
+                        {error}
+                        <br />
+                        {JSON.stringify(store?.[key]?.value || {})}
+                      </sl-alert>
+                    ))}
+                  </div>
+                </Show>
                 <div class="flex flex-row justify-end gap-2">
                   <Show when={!showForm()}>
                     <photon-button
