@@ -391,6 +391,8 @@ customElement(
                         <strong>Error with {key}: </strong>
                         <br />
                         {error}
+                        <br />
+                        {JSON.stringify(store?.[key]?.value || {})}
                       </sl-alert>
                     ))}
                   </div>
