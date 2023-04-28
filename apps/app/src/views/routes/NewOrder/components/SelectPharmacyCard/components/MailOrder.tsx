@@ -11,9 +11,10 @@ import {
 } from '@chakra-ui/react';
 import { usePhoton, types } from '@photonhealth/react';
 import { Pharmacy } from './Pharmacy';
+import { getSettings } from '@client/settings';
 
 const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
-const { fulfillmentSettings } = require(`../../../../../../configs/fulfillment.${envName}.ts`);
+const settings = getSettings(envName);
 
 interface MailOrderProps {
   user: any;
@@ -37,6 +38,8 @@ export const MailOrder = ({
   const { getPharmacies } = usePhoton();
   const { refetch } = getPharmacies({});
 
+  const orgSettings = user.org_id in settings ? settings[user.org_id] : settings.default;
+
   const [pharmOptions, setPharmOptions] = useState<any>([]);
 
   const getPharmacyOptions = async () => {
@@ -44,9 +47,9 @@ export const MailOrder = ({
       type: types.FulfillmentType.MailOrder
     });
 
-    const fConfig = fulfillmentSettings[user.org_id] || fulfillmentSettings.default;
+    const mailOrderProviders = orgSettings.mailOrderProviders as string[];
     const options = result.data.pharmacies.filter(({ id }: { id: string }) =>
-      fConfig.mailOrderProviders.includes(id)
+      mailOrderProviders.includes(id)
     );
 
     setPharmOptions(options);
