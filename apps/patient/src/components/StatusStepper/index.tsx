@@ -1,22 +1,26 @@
 import { Box, Center, Container, Stack } from '@chakra-ui/react'
 import { Step } from './components/Step'
 import t from '../../utils/text.json'
-import { formatAddress } from '../../utils/general'
+import { FulfillmentType } from '../../utils/models'
 
-export const pickupStates = ['SENT', 'RECEIVED', 'READY', 'PICKED_UP']
-export const courierStates = ['SENT', 'FILLING', 'DELIVERING', 'DELIVERED']
+export const STATES = {
+  pickup: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'],
+  courier: ['SENT', 'FILLING', 'IN_TRANSIT', 'DELIVERED'],
+  mailOrder: ['SENT', 'PROCESSING', 'SHIPPED', 'DELIVERED']
+}
 
 interface Props {
+  fulfillmentType: FulfillmentType
   status: string
-  isCourier?: boolean
   patientAddress?: string
 }
 
-export const StatusStepper = ({ status, isCourier, patientAddress }: Props) => {
-  const initialStepIdx = pickupStates.findIndex((state) => state === status)
+export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props) => {
+  // Get step index from pickup since those are the only states we actually have
+  const initialStepIdx = STATES.pickup.findIndex((state) => state === status)
+  // Map index to faux states
+  const states = STATES[fulfillmentType]
   const currentStep = initialStepIdx + 1
-  const states = isCourier ? courierStates : pickupStates
-  const fulfillmentType = isCourier ? 'courier' : 'pickup'
 
   return (
     <Box>
@@ -26,7 +30,7 @@ export const StatusStepper = ({ status, isCourier, patientAddress }: Props) => {
             {states.map((state, id) => {
               const title = t.status[fulfillmentType].states[state].title
               const description =
-                state === 'DELIVERING'
+                state === 'IN_TRANSIT' || state === 'SHIPPED'
                   ? `${t.status[fulfillmentType].states[state].description}${patientAddress}.` // show delivery address on courier
                   : t.status[fulfillmentType].states[state].description
 
@@ -50,6 +54,5 @@ export const StatusStepper = ({ status, isCourier, patientAddress }: Props) => {
 }
 
 StatusStepper.defaultProps = {
-  isCourier: false,
   patientAddress: undefined
 }

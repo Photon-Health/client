@@ -16,8 +16,10 @@ import {
 } from '@chakra-ui/react'
 import { FiHelpCircle, FiRefreshCw } from 'react-icons/fi'
 import t from '../utils/text.json'
-import { settings } from '../configs/settings'
 import { Logo as PhotonLogo } from './Logo'
+import { getSettings } from '@client/settings'
+
+const settings = getSettings(process.env.REACT_APP_ENV_NAME)
 
 interface NavProps {
   header: string
@@ -43,7 +45,7 @@ export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
 
   useEffect(() => {
     if (orgId) {
-      const theme = orgId in settings.themes ? settings.themes[orgId] : settings.themes.default
+      const theme = orgId in settings ? settings[orgId] : settings.default
       fetchLogo(theme.logo)
     }
   }, [orgId])
@@ -56,7 +58,7 @@ export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
             logo === 'photon' ? (
               <PhotonLogo />
             ) : (
-              <Image src={logo} width="auto" height="auto" maxW="45%" maxH="40px" />
+              <Image src={logo} width="auto" height="auto" maxW="45%" maxH="35px" />
             )
           ) : (
             <Text

@@ -29,8 +29,11 @@ import { Nav } from '../components/Nav'
 import { PoweredBy } from '../components/PoweredBy'
 import { LocationModal } from '../components/LocationModal'
 import { PickupOptions } from '../components/PickupOptions'
-import { CourierOptions } from '../components/CourierOptions'
+import { BrandedOptions } from '../components/BrandedOptions'
 import { OrderContext } from './Main'
+import { getSettings } from '@client/settings'
+
+const settings = getSettings(process.env.REACT_APP_ENV_NAME)
 
 const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER']
 export const UNOPEN_BUSINESS_STATUS_MAP = {
@@ -54,6 +57,9 @@ const query = (method, data) =>
 
 export const Pharmacy = () => {
   const order = useContext<Order>(OrderContext)
+
+  const orgSettings =
+    order?.organization?.id in settings ? settings[order.organization.id] : settings.default
 
   const navigate = useNavigate()
 
@@ -80,8 +86,6 @@ export const Pharmacy = () => {
     order?.address ? formatAddress(order.address) : ''
   )
 
-  const [enableCourier, setEnableCourier] = useState<boolean>(false)
-
   const toast = useToast()
 
   const reset = () => {
@@ -89,7 +93,6 @@ export const Pharmacy = () => {
     setSelectedId('')
     setShowFooter(false)
     setShowingAllPharmacies(false)
-    setEnableCourier(false)
   }
 
   const handleModalClose = ({
@@ -127,15 +130,6 @@ export const Pharmacy = () => {
 
   const fetchPharmacies = async () => {
     setLoadingMore(true)
-
-    // Courier option limited to MoPed in Austin, TX
-    const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(location)
-    const patientAddressInAustinTX =
-      order?.address?.city === 'Austin' && order?.address?.state === 'TX'
-    const isMoPed = order?.organization?.id === process.env.REACT_APP_MODERN_PEDIATRICS_ORG_ID
-    if (searchingInAustinTX && patientAddressInAustinTX && isMoPed) {
-      setEnableCourier(true)
-    }
 
     // On initializing, we won't have lat/lng
     let loc: string = location
@@ -272,13 +266,15 @@ export const Pharmacy = () => {
           setSuccessfullySubmitted(true)
           setTimeout(() => {
             setShowFooter(false)
-            const selectedCourier = [
-              process.env.REACT_APP_CAPSULE_PHARMACY_ID,
-              process.env.REACT_APP_ALTO_PHARMACY_ID
-            ].includes(selectedId)
-            navigate(
-              `/status?orderId=${order.id}&token=${token}${selectedCourier ? '&courier=true' : ''}`
-            )
+
+            let type = 'pickup'
+            if (orgSettings.courierProviders.includes(selectedId)) {
+              type = 'courier'
+            } else if (orgSettings.mailOrderNavigateProviders.includes(selectedId)) {
+              type = 'mailOrder'
+            }
+
+            navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`)
           }, 1000)
         } else {
           toast({
@@ -323,7 +319,11 @@ export const Pharmacy = () => {
     )
   }
 
-  const { organization, address } = order
+  // Courier option limited to MoPed in Austin, TX
+  const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(location)
+  const patientAddressInAustinTX =
+    order?.address?.city === 'Austin' && order?.address?.state === 'TX'
+  const enableCourier = searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier
 
   return (
     <Box>
@@ -332,7 +332,7 @@ export const Pharmacy = () => {
         <title>{t.pharmacy.title}</title>
       </Helmet>
 
-      <Nav header={organization.name} orgId={organization.id} />
+      <Nav header={order.organization.name} orgId={order.organization.id} />
 
       <Container pb={showFooter ? 32 : 8}>
         <VStack spacing={6} align="span" pt={5}>
@@ -368,12 +368,23 @@ export const Pharmacy = () => {
           {location ? (
             <VStack spacing={9} align="stretch">
               {enableCourier ? (
-                <CourierOptions
-                  alto
+                <BrandedOptions
+                  type="courier"
+                  options={orgSettings.courierProviders}
                   location={location}
                   selectedId={selectedId}
                   handleSelect={handleSelect}
-                  patientAddress={formatAddress(address)}
+                  patientAddress={formatAddress(order?.address)}
+                />
+              ) : null}
+              {orgSettings.mailOrderNavigate ? (
+                <BrandedOptions
+                  type="mailOrder"
+                  options={orgSettings.mailOrderNavigateProviders}
+                  location={location}
+                  selectedId={selectedId}
+                  handleSelect={handleSelect}
+                  patientAddress={formatAddress(order?.address)}
                 />
               ) : null}
 
@@ -384,7 +395,7 @@ export const Pharmacy = () => {
                 handleShowMore={handleShowMore}
                 loadingMore={loadingMore}
                 showingAllPharmacies={showingAllPharmacies}
-                courierEnabled={enableCourier}
+                courierEnabled={enableCourier || orgSettings.mailOrderNavigate}
               />
             </VStack>
           ) : null}
@@ -396,7 +407,8 @@ export const Pharmacy = () => {
           <Button
             size="lg"
             w="full"
-            variant="brand"
+            variant={successfullySubmitted ? undefined : 'brand'}
+            colorScheme={successfullySubmitted ? 'green' : undefined}
             leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
             onClick={!successfullySubmitted ? handleSubmit : undefined}
             isLoading={submitting}

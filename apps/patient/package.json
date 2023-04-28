@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@photonhealth/react": "^1.0.13",
     "chakra-react-select": "^4.6.0",
     "dayjs": "^1.11.7",
     "react-helmet": "^6.1.0",
