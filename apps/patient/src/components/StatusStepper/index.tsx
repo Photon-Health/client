@@ -4,9 +4,9 @@ import t from '../../utils/text.json'
 import { FulfillmentType } from '../../utils/models'
 
 export const STATES = {
-  courier: ['SENT', 'FILLING', 'IN_TRANSIT', 'DELIVERED'],
   pickup: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'],
-  mailOrder: ['SENT', 'FILLING', 'DELIVERING', 'SHIPPED']
+  courier: ['SENT', 'FILLING', 'IN_TRANSIT', 'DELIVERED'],
+  mailOrder: ['SENT', 'PROCESSING', 'SHIPPED', 'DELIVERED']
 }
 
 interface Props {

@@ -8,17 +8,14 @@ import {
   useBreakpointValue
 } from '@chakra-ui/react'
 
-// @ts-ignore
 import capsuleLogo from '../assets/capsule_logo.png'
-// @ts-ignore
 import amazonPharmacyLogo from '../assets/amazon_pharmacy.png'
-// @ts-ignore
 import altoLogo from '../assets/alto_logo.svg'
 
 interface Props {
   pharmacyId: string
   selectedId: string
-  handleSelect: Function
+  handleSelect: (id: string) => void
 }
 
 const PHARMACY_BRANDING = {

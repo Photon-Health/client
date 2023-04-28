@@ -92,7 +92,7 @@
         },
         "IN_TRANSIT": {
           "title": "In transit",
-          "description": "Your prescriptions are being delivered to "
+          "description": "Your prescriptions are on their way to "
         },
         "DELIVERED": {
           "title": "Delivered",
@@ -111,16 +111,16 @@
           "title": "Sent to pharmacy",
           "description": "Your prescription fills have been sent to the pharmacy."
         },
-        "FILLING": {
-          "title": "Filling your prescriptions",
+        "PROCESSING": {
+          "title": "Processing your prescriptions",
           "description": "The pharmacy has received your order and is filling it."
-        },
-        "DELIVERING": {
-          "title": "Delivering",
-          "description": "Your prescriptions are being delivered to "
         },
         "SHIPPED": {
           "title": "Shipped",
+          "description": "Your prescriptions are being delivered to "
+        },
+        "DELIVERED": {
+          "title": "Delivered",
           "description": "Your prescriptions have arrived at their destination."
         }
       },

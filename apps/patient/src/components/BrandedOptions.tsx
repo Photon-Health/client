@@ -8,7 +8,7 @@ interface Props {
   options: string[]
   location: string
   selectedId: string
-  handleSelect: Function
+  handleSelect: (id: string) => void
   patientAddress: string
 }
 
