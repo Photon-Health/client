@@ -47,6 +47,8 @@ export const PatientCard = (props: {
               value: e.detail.patient,
             });
             if (props.enableOrder && !props.hideAddress) {
+              // update address in the scenario where you want to allow send order
+              // but the address hasn't been manually overridden
               props.actions.updateFormValue({
                 key: 'address',
                 value: e.detail.patient.address,
