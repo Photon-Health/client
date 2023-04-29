@@ -14,7 +14,7 @@ import tailwind from '../tailwind.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import styles from './style.css?inline';
-import { createEffect, createSignal, Show } from 'solid-js';
+import { createEffect, onMount, createSignal, Show } from 'solid-js';
 import type { FormError } from '../stores/form';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
@@ -108,6 +108,15 @@ customElement(
     const [authenticated, setAuthenticated] = createSignal<boolean>(
       client?.authentication.state.isAuthenticated || false
     );
+
+    onMount(() => {
+      if (props.address) {
+        actions.updateFormValue({
+          key: 'address',
+          value: props.address
+        });
+      }
+    });
 
     createEffect(() => {
       if (
@@ -302,13 +311,15 @@ customElement(
           const { __typename, name, ...patientAddress } =
             (store['patient']?.value || {})?.address || {};
 
+          const address = store.address
+            ? { street2: '', country: 'US', ...props.address }
+            : patientAddress;
+
           const { data: data2, errors } = await orderMutation({
             variables: {
               patientId: store['patient']?.value.id,
               pharmacyId: props?.pharmacyId || store['pharmacy']?.value.id,
-              address: props.address
-                ? { street2: '', country: 'US', ...props.address }
-                : patientAddress,
+              address,
               fills: data?.createPrescriptions.map((x) => ({ prescriptionId: x.id }))
             },
             refetchQueries: [],

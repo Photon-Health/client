@@ -17,6 +17,7 @@ export const PatientCard = (props: {
   patientId?: string;
   client?: PhotonClientStore;
   enableOrder?: boolean;
+  hideAddress?: boolean;
 }) => {
   const [dialogOpen, setDialogOpen] = createSignal(false);
   const { actions } = PatientStore;
@@ -45,7 +46,7 @@ export const PatientCard = (props: {
               key: 'patient',
               value: e.detail.patient,
             });
-            if (props.enableOrder) {
+            if (props.enableOrder && !props.hideAddress) {
               props.actions.updateFormValue({
                 key: 'address',
                 value: e.detail.patient.address,
