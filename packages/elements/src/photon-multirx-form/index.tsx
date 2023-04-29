@@ -310,9 +310,9 @@ customElement(
         dispatchPrescriptionsCreated(data!.createPrescriptions);
         if (props.enableOrder) {
           // remove unnecessary fields, and add country and street2 if missing
-          const { __typename, name, ...patientAddress } =
-            store?.address?.value || (store['patient']?.value || {})?.address || {};
-          const address = { street2: '', country: 'US', ...patientAddress };
+          const patientAddress = store?.address?.value ?? store?.patient?.value?.address ?? {};
+          const { __typename, name, ...filteredPatientAddress } = patientAddress;
+          const address = { street2: '', country: 'US', ...filteredPatientAddress };
 
           const { data: data2, errors } = await orderMutation({
             variables: {
