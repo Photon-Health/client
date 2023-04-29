@@ -111,6 +111,7 @@ customElement(
 
     onMount(() => {
       if (props.address) {
+        // if manually overriding address, update the store on mount
         actions.updateFormValue({
           key: 'address',
           value: props.address
@@ -308,12 +309,10 @@ customElement(
         }
         dispatchPrescriptionsCreated(data!.createPrescriptions);
         if (props.enableOrder) {
+          // remove unnecessary fields, and add country and street2 if missing
           const { __typename, name, ...patientAddress } =
-            (store['patient']?.value || {})?.address || {};
-
-          const address = store.address
-            ? { street2: '', country: 'US', ...props.address }
-            : patientAddress;
+            store?.address?.value || (store['patient']?.value || {})?.address || {};
+          const address = { street2: '', country: 'US', ...patientAddress };
 
           const { data: data2, errors } = await orderMutation({
             variables: {
