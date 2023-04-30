@@ -25,6 +25,7 @@
     "@nrwl/webpack": "15.6.3",
     "@nrwl/workspace": "15.6.3",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
+    "@rollup/plugin-terser": "^0.4.1",
     "@svgr/webpack": "^6.1.2",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
@@ -56,7 +57,8 @@
     "jest-environment-jsdom": "28.1.1",
     "nx": "15.6.3",
     "prettier": "^2.8.1",
-    "react-test-renderer": "^18.2.0"
+    "react-test-renderer": "^18.2.0",
+    "rollup-plugin-terser": "^7.0.2"
   },
   "dependencies": {
     "@apollo/client": "^3.7.10",

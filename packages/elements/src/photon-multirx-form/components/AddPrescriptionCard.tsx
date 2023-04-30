@@ -3,7 +3,7 @@ import { record, string, any, number, min, size } from 'superstruct';
 import { format } from 'date-fns';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
 import { DoseCalculator } from '@photonhealth/components';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
+// import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/icon/icon';
@@ -48,7 +48,7 @@ export const AddPrescriptionCard = (props: {
 
   return (
     <photon-card ref={ref} title={'Add Prescription'}>
-      <style>{photonStyles}</style>
+      {/* <style>{photonStyles}</style> */}
       <div
         class="flex flex-col sm:gap-3"
         on:photon-medication-selected={(e: any) => {

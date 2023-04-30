@@ -5,6 +5,7 @@ import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
 import '@shoelace-style/shoelace/dist/components/alert/alert';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/switch/switch';
+import '@shoelace-style/shoelace/dist/components/spinner/spinner.js';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.82/dist/');
@@ -341,63 +342,7 @@ customElement(
         <style>{styles}</style>
         <div>
           <div class="flex flex-col gap-8">
-            <Show when={(!client || isLoading()) && !authenticated()}>
-              <div class="w-full flex justify-center">
-                <sl-spinner style="font-size: 3rem;"></sl-spinner>
-              </div>
-            </Show>
-            <PhotonAuthorized permissions={['write:prescription']}>
-              <PatientCard
-                actions={actions}
-                store={store}
-                patientId={props.patientId}
-                client={client!}
-                enableOrder={props.enableOrder}
-                hideAddress={!!props.address}
-              ></PatientCard>
-              <Show when={showForm() || isEditing()}>
-                <div ref={prescriptionRef}>
-                  <AddPrescriptionCard
-                    hideAddToTemplates={props.hideTemplates}
-                    actions={actions}
-                    store={store}
-                  ></AddPrescriptionCard>
-                </div>
-              </Show>
-              <DraftPrescriptionCard
-                prescriptionRef={prescriptionRef}
-                actions={actions}
-                store={store}
-                isLoading={isLoadingTemplates()}
-                setIsEditing={setIsEditing}
-              ></DraftPrescriptionCard>
-              <Show when={props.enableOrder && !props.pharmacyId}>
-                <OrderCard store={store} actions={actions}></OrderCard>
-              </Show>
-              <Show when={props.enableOrder && props.pharmacyId}>
-                <PharmacyCard pharmacyId={props.pharmacyId}></PharmacyCard>
-              </Show>
-              <Show when={!props.hideSubmit}>
-                <div class="flex flex-row justify-end gap-2">
-                  <Show when={!showForm()}>
-                    <photon-button
-                      class="w-full xs:w-fit"
-                      variant="outline"
-                      on:photon-clicked={async () => setShowForm(true)}
-                    >
-                      {'Add Prescription'}
-                    </photon-button>
-                  </Show>
-                  <photon-button
-                    class="w-full xs:w-fit"
-                    loading={isLoading()}
-                    on:photon-clicked={async () => await submitForm(props.enableOrder)}
-                  >
-                    {props.enableOrder ? 'Send Order' : 'Save Prescriptions'}
-                  </photon-button>
-                </div>
-              </Show>
-            </PhotonAuthorized>
+            {/* <sl-spinner style="font-size: 3rem;"></sl-spinner> */}
           </div>
         </div>
       </div>
