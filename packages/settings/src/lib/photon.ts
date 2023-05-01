@@ -17,7 +17,7 @@ const defaultSettings: OrganizationSettings = {
   mailOrderProviders: [],
   mailOrderNavigate: false,
   mailOrderNavigateProviders: [],
-  sendToPatient: false,
+  sendToPatient: true,
   sendToPatientUsers: [],
   courier: false,
   courierProviders: [],
@@ -44,7 +44,6 @@ export const photon: {
     ...defaultSettings,
     logo: 'modern_pediatrics_logo.png',
     accentColor: '#3f7a9c',
-    sendToPatient: true,
     courier: true,
     courierProviders: [ALTO_ID]
   },
@@ -52,21 +51,20 @@ export const photon: {
   org_66nHWvQRtHbjZt4A: {
     ...defaultSettings,
     logo: 'summer_health_logo.svg',
-    accentColor: '#ffc21f',
-    sendToPatient: true
+    accentColor: '#ffc21f'
   },
   // Modern Ritual
   org_IWmodVdrQYpqh5x2: {
     ...defaultSettings,
     logo: 'modern_ritual_logo.webp',
-    accentColor: '#202a36'
+    accentColor: '#202a36',
+    sendToPatient: false
   },
   // Reside Health
   org_8fwLMYQGxj6Bg70X: {
     ...defaultSettings,
     logo: 'reside_health_logo.webp',
-    accentColor: '#0c3276',
-    sendToPatient: true
+    accentColor: '#0c3276'
   },
   // Radish Health
   org_tHroj0b67F08q1yw: {
@@ -86,13 +84,21 @@ export const photon: {
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    federated: true
+    federated: true,
+    sendToPatient: false
   },
   // ZZPeds
   org_pxcJ7Dlclcsg0OJw: {
     ...defaultSettings,
     logo: 'zzpeds_logo.png',
-    accentColor: '#5271ff',
-    sendToPatient: true
+    accentColor: '#5271ff'
+  },
+  // MisterRx
+  org_Frco5TQQFDHqS7xY: {
+    ...defaultSettings,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_ID],
+    sendToPatient: false
   }
 };
