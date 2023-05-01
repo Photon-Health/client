@@ -21,6 +21,7 @@ import {
 import { FiShoppingCart } from 'react-icons/fi';
 
 import { usePhoton } from '@photonhealth/react';
+import { getSettings } from '@client/settings';
 
 import { PATIENT_FIELDS } from '../../../model/fragments';
 import { OrderForm } from './components/OrderForm';
@@ -28,7 +29,7 @@ import { OrderForm } from './components/OrderForm';
 import jwtDecode from 'jwt-decode';
 
 const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
-const { fulfillmentSettings } = require(`../../../configs/fulfillment.${envName}.ts`);
+const settings = getSettings(envName);
 
 export const NewOrder = () => {
   const [params] = useSearchParams();
@@ -37,6 +38,8 @@ export const NewOrder = () => {
 
   const { createOrder, getPatient, updatePatient, removePatientPreferredPharmacy, user, getToken } =
     usePhoton();
+
+  const orgSettings = user.org_id in settings ? settings[user.org_id] : settings.default;
 
   const [auth0UserId, setAuth0UserId] = useState<string>('');
   const getAuth0UserId = async () => {
@@ -130,11 +133,6 @@ export const NewOrder = () => {
   const border = useColorModeValue('gray.200', 'gray.800');
   const isMobile = useBreakpointValue({ base: true, sm: false });
 
-  const orderCreationEnabled =
-    typeof fulfillmentSettings[user.org_id]?.sendOrder !== 'undefined'
-      ? fulfillmentSettings[user.org_id]?.sendOrder
-      : fulfillmentSettings.default.sendOrder;
-
   return (
     <Modal
       isOpen
@@ -167,7 +165,7 @@ export const NewOrder = () => {
                 form="order-form"
                 isLoading={loadingCreateOrder}
                 loadingText="Sending"
-                isDisabled={!orderCreationEnabled}
+                isDisabled={!orgSettings.sendOrder}
               >
                 Send Order
               </Button>
