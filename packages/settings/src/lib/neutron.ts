@@ -18,7 +18,7 @@ const defaultSettings: OrganizationSettings = {
   mailOrderProviders: [],
   mailOrderNavigate: false,
   mailOrderNavigateProviders: [],
-  sendToPatient: false,
+  sendToPatient: true,
   sendToPatientUsers: [],
   courier: false,
   courierProviders: [],
@@ -42,7 +42,6 @@ export const neutron: {
     accentColor: '#b35724',
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    sendToPatient: true,
     courier: true,
     courierProviders: [ALTO_ID]
   },
@@ -52,15 +51,13 @@ export const neutron: {
     logo: 'newco_logo.png',
     accentColor: '#69348F',
     mailOrderNavigate: true,
-    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
-    sendToPatient: true
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
   },
   // Demo (demo's)
   org_TY5GFYPIRo3xQGYM: {
     ...defaultSettings,
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
-    sendToPatient: true
+    mailOrderProviders: [CUREXA_ID]
   },
   // Weekend Health
   org_u93EDGhy5I4Ia5Bb: {
@@ -72,7 +69,6 @@ export const neutron: {
     ...defaultSettings,
     logo: 'modern_pediatrics_logo.png',
     accentColor: '#3f7a9c',
-    sendToPatient: true, // enabled for org
     courier: true,
     courierProviders: [ALTO_ID]
   },
@@ -80,14 +76,14 @@ export const neutron: {
   org_jr5fT3Mh4zCFsVQA: {
     ...defaultSettings,
     logo: 'summer_health_logo.svg',
-    accentColor: '#ffc21f',
-    sendToPatient: true
+    accentColor: '#ffc21f'
   },
   // Modern Ritual
   org_0WP4tWCftMEM7K2q: {
     ...defaultSettings,
     logo: 'modern_ritual_logo.webp',
-    accentColor: '#202a36'
+    accentColor: '#202a36',
+    sendToPatient: false
   },
   // Radish Health
   org_kBuUKySvfFeWLovJ: {
@@ -104,6 +100,17 @@ export const neutron: {
   // Peachy
   org_O2SLIoyyVTNXG5nX: {
     ...defaultSettings,
-    federated: true
+    federated: true,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_ID],
+    sendToPatient: false
+  },
+  // MisterRx
+  org_BBTs0RfOHqjpOO92: {
+    ...defaultSettings,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_ID],
+    sendToPatient: false
   }
 };
