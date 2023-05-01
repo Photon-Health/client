@@ -1,10 +1,3 @@
-import { afterDate, message } from '../../validators';
-import { record, string, any, number, min, size } from 'superstruct';
-import { format } from 'date-fns';
-import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
-import { DoseCalculator } from '@photonhealth/components';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
-
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/button/button';
@@ -13,6 +6,13 @@ import { createSignal, Show } from 'solid-js';
 import repopulateForm from '../util/repopulateForm';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.82/dist/');
+
+import { afterDate, message } from '../../validators';
+import { record, string, any, number, min, size } from 'superstruct';
+import { format } from 'date-fns';
+import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
+import { DoseCalculator } from '@photonhealth/components';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 const validators = {
   treatment: message(record(string(), any()), 'Please select a treatment...'),
