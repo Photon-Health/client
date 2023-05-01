@@ -17,6 +17,7 @@ export const PatientCard = (props: {
   patientId?: string;
   client?: PhotonClientStore;
   enableOrder?: boolean;
+  hideAddress?: boolean;
 }) => {
   const [dialogOpen, setDialogOpen] = createSignal(false);
   const { actions } = PatientStore;
@@ -45,7 +46,9 @@ export const PatientCard = (props: {
               key: 'patient',
               value: e.detail.patient,
             });
-            if (props.enableOrder) {
+            if (props.enableOrder && !props.hideAddress) {
+              // update address in the scenario where you want to allow send order
+              // but the address hasn't been manually overridden
               props.actions.updateFormValue({
                 key: 'address',
                 value: e.detail.patient.address,

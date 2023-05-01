@@ -6,21 +6,3 @@ export interface Address {
   state: string;
   city: string;
 }
-
-export type FulfillmentSettings = {
-  [key: string]: {
-    sendOrder: boolean;
-    pickUp: boolean;
-    mailOrder: boolean;
-    mailOrderProviders: string[];
-    sendToPatient: boolean;
-    sendToPatientUsers: string[];
-  };
-};
-
-export type LogoutSettings = {
-  [key: string]: {
-    returnTo?: string;
-    federated?: boolean;
-  };
-};
