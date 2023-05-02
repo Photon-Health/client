@@ -60,7 +60,7 @@ customElement(
       if (store.selectedPatient.data) {
         return [
           store.selectedPatient.data,
-          ...store.patients.data.filter((x) => x.id !== store.selectedPatient.data!.id)
+          ...store.patients.data.filter((x) => x?.id !== store.selectedPatient.data!.id)
         ];
       } else {
         return store.patients.data;
