@@ -1,8 +1,9 @@
 import { message } from '../../validators';
 import { string, any, record } from 'superstruct';
-import { createSignal, Show } from 'solid-js';
+import { createSignal, onMount, Show, createEffect } from 'solid-js';
 import { PatientStore } from '../../stores/patient';
 import { PhotonClientStore } from '../../store';
+import { formatDate } from '../../utils';
 
 const patientValidator = message(record(string(), any()), 'Please select a patient...');
 
@@ -20,44 +21,78 @@ export const PatientCard = (props: {
   hideAddress?: boolean;
 }) => {
   const [dialogOpen, setDialogOpen] = createSignal(false);
-  const { actions } = PatientStore;
+  const { actions, store } = PatientStore;
 
   props.actions.registerValidator({
     key: 'patient',
-    validator: patientValidator,
+    validator: patientValidator
   });
 
   if (props.enableOrder) {
     props.actions.registerValidator({
       key: 'address',
-      validator: patientAddressValidator,
+      validator: patientAddressValidator
     });
   }
+
+  const updatePatient = (e: any) => {
+    props.actions.updateFormValue({
+      key: 'patient',
+      value: e.detail.patient
+    });
+    if (props.enableOrder && !props.hideAddress) {
+      // update address when you want to allow send order
+      // but the address hasn't been manually overridden
+      props.actions.updateFormValue({
+        key: 'address',
+        value: e.detail.patient.address
+      });
+    }
+  };
+
+  onMount(() => {
+    if (props?.patientId) {
+      // fetch patient on mount when patientId is passed
+      actions.getSelectedPatient(props.client!.getSDK(), props.patientId);
+    }
+  });
+
+  createEffect(() => {
+    if (store?.selectedPatient?.data && props?.patientId) {
+      // update patient when passed-in patient (patientId) is fetched
+      updatePatient({ detail: { patient: store?.selectedPatient?.data } });
+    }
+  });
 
   return (
     <photon-card>
       <div class="flex flex-col gap-3">
-        <p class="font-sans text-l font-medium">Select Patient</p>
-        <photon-patient-select
-          invalid={props.store['patient']?.error ?? false}
-          help-text={props.store['patient']?.error}
-          on:photon-patient-selected={(e: any) => {
-            props.actions.updateFormValue({
-              key: 'patient',
-              value: e.detail.patient,
-            });
-            if (props.enableOrder && !props.hideAddress) {
-              // update address in the scenario where you want to allow send order
-              // but the address hasn't been manually overridden
-              props.actions.updateFormValue({
-                key: 'address',
-                value: e.detail.patient.address,
-              });
-            }
-          }}
-          selected={props.store['patient']?.value?.id ?? props.patientId}
-          sdk={props.client!.getSDK()}
-        ></photon-patient-select>
+        <p class="font-sans text-l font-medium">
+          {props?.patientId ? 'Patient' : 'Select Patient'}
+        </p>
+        {/* Show Dropdown when no patientId is passed */}
+        <Show when={!props?.patientId}>
+          <photon-patient-select
+            invalid={props.store['patient']?.error ?? false}
+            help-text={props.store['patient']?.error}
+            on:photon-patient-selected={updatePatient}
+            selected={props.store['patient']?.value?.id ?? props.patientId}
+            sdk={props.client!.getSDK()}
+          ></photon-patient-select>
+        </Show>
+        {/* Show Patient Name when patientId is passed */}
+        <Show when={props?.patientId}>
+          <Show
+            when={store?.selectedPatient?.data?.id}
+            fallback={<sl-spinner style="font-size: 1rem;"></sl-spinner>}
+          >
+            <p class="font-sans text-gray-700">
+              {store?.selectedPatient?.data?.name?.full},{' '}
+              {formatDate(store?.selectedPatient?.data?.dateOfBirth || '')}
+            </p>
+          </Show>
+        </Show>
+
         <Show when={props.store['patient']?.value?.id && props.enableOrder && !props.hideAddress}>
           <photon-patient-dialog
             open={dialogOpen()}
@@ -90,7 +125,7 @@ export const PatientCard = (props: {
                   'p-2': props.store['address']!.error,
                   'border-red-500': props.store['address']!.error,
                   'border-2': props.store['address']!.error,
-                  rounded: props.store['address']!.error,
+                  rounded: props.store['address']!.error
                 }}
               >
                 Please edit patient and add address

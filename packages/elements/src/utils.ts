@@ -25,3 +25,10 @@ export const toTitleCase = (str: string) => {
 export const isZip = (zip: string) => {
   return /^\d+$/.test(zip) && zip.length >= 5;
 };
+
+// Takes a date string in the format 'YYYY-MM-DD'
+// and returns it in the format 'MM-DD-YYYY'.
+export const formatDate = (dateString: string) => {
+  const [year, month, day] = dateString.split('-');
+  return `${month}-${day}-${year}`;
+};

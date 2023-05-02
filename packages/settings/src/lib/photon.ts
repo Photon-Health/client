@@ -82,6 +82,8 @@ export const photon: {
   // Peachy
   org_vTC7G2EAuHgac90E: {
     ...defaultSettings,
+    logo: 'peachy_logo.png',
+    accentColor: '#1D1D1F',
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
