@@ -58,11 +58,9 @@ export const PatientCard = (props: {
   });
 
   createEffect(() => {
-    if (store?.selectedPatient?.data) {
-      if (store?.selectedPatient?.data?.id !== props.store['patient']?.value?.id) {
-        // update patient when selected patient changes
-        updatePatient({ detail: { patient: store?.selectedPatient?.data } });
-      }
+    if (store?.selectedPatient?.data && props?.patientId) {
+      // update patient when passed-in patient (patientId) is fetched
+      updatePatient({ detail: { patient: store?.selectedPatient?.data } });
     }
   });
 
