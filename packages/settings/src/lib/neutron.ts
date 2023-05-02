@@ -1,6 +1,7 @@
 import { OrganizationSettings } from '../types';
 
 const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
+const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
 const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
 const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 
@@ -41,7 +42,7 @@ export const neutron: {
     logo: 'photon',
     accentColor: '#b35724',
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
+    mailOrderProviders: [CUREXA_ID, CAREPOINT_ID],
     courier: true,
     courierProviders: [ALTO_ID]
   },
