@@ -42,7 +42,7 @@ export const neutron: {
     logo: 'photon',
     accentColor: '#b35724',
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
+    mailOrderProviders: [CUREXA_ID, CAREPOINT_ID],
     courier: true,
     courierProviders: [ALTO_ID]
   },
