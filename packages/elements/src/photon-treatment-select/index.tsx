@@ -109,8 +109,8 @@ customElement(
           isLoading={client?.clinical.catalog.state.isLoading || false}
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
-          displayAccessor={(t: Treatment | PrescriptionTemplate, groupAccess: boolean) => {
-            return 'name' in t && !('treatment' in t) ? (
+          displayAccessor={(t: Treatment | PrescriptionTemplate, groupAccess: boolean) =>
+            t.__typename !== 'PrescriptionTemplate' ? (
               t.name
             ) : groupAccess ? (
               <>
@@ -126,8 +126,8 @@ customElement(
               </>
             ) : (
               t.treatment.name
-            );
-          }}
+            )
+          }
           onSearchChange={async (s: string) => setFilter(s)}
           onOpen={async () => {
             if (store.catalogs.data.length === 0) {
