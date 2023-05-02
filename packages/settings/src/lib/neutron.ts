@@ -101,6 +101,8 @@ export const neutron: {
   // Peachy
   org_O2SLIoyyVTNXG5nX: {
     ...defaultSettings,
+    logo: 'peachy_logo.png',
+    accentColor: '#1D1D1F',
     federated: true,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
