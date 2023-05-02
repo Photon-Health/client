@@ -2,17 +2,15 @@ import { Button, Stack } from '@chakra-ui/react';
 import { CopyIcon } from '@chakra-ui/icons';
 
 import { usePhoton } from '@photonhealth/react';
+import { getSettings } from '@client/settings';
 
 const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
-const { logoutSettings } = require(`../../configs/logout.${envName}.ts`);
+const settings = getSettings(envName);
 
-interface AuthProps {
-  returnTo?: string;
-}
-
-export const Auth = (props: AuthProps) => {
-  const { returnTo } = props;
+export const Auth = () => {
   const { user, isLoading, isAuthenticated, getToken, login, logout } = usePhoton();
+
+  const orgSettings = user?.org_id in settings ? settings[user?.org_id] : settings.default;
 
   const getAccessToken = async () => {
     try {
@@ -42,9 +40,7 @@ export const Auth = (props: AuthProps) => {
           colorScheme="brand"
           onClick={() => {
             localStorage.removeItem('previouslyAuthed');
-            logout(
-              user.org_id in logoutSettings ? logoutSettings[user.org_id] : logoutSettings.default
-            );
+            logout({ returnTo: orgSettings.returnTo, federated: orgSettings.federated });
           }}
         >
           Log out
@@ -53,7 +49,10 @@ export const Auth = (props: AuthProps) => {
     );
 
   return (
-    <Button colorScheme="blue" onClick={() => login({ appState: { returnTo } })}>
+    <Button
+      colorScheme="blue"
+      onClick={() => login({ appState: { returnTo: orgSettings.returnTo } })}
+    >
       Log in
     </Button>
   );

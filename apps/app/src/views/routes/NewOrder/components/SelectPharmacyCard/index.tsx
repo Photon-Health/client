@@ -17,7 +17,6 @@ import { LocalPickup } from './components/LocalPickup';
 import { MailOrder } from './components/MailOrder';
 import { Address } from '../../../../../models/general';
 import { SendToPatient } from './components/SendToPatient';
-import { FulfillmentSettings } from '../../../../../models/general';
 import { PharmacyOptions } from '../OrderForm';
 
 interface SelectPharmacyCardProps {
@@ -31,7 +30,6 @@ interface SelectPharmacyCardProps {
   setFieldValue: any;
   updatePreferredPharmacy: boolean;
   setUpdatePreferredPharmacy: (value: boolean) => void;
-  settings: FulfillmentSettings;
   tabsList: PharmacyOptions;
 }
 

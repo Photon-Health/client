@@ -1,5 +1,6 @@
 import { createStore } from 'solid-js/store';
 import { Struct, assert, StructError } from 'superstruct';
+export type FormError = { key: string; error: string };
 
 export const createFormStore = (initalValue?: Record<string, any>) => {
   type StoreValue = { value: any; error?: string };
@@ -33,6 +34,16 @@ export const createFormStore = (initalValue?: Record<string, any>) => {
       }
     }
     return errors > 0;
+  };
+
+  const getErrors = (keys: string[]): FormError[] => {
+    let errors: FormError[] = [];
+    for (const member in store) {
+      if (keys.includes(member) && store[member]?.error) {
+        errors = [...errors, { key: member, error: store[member]?.error ?? '' }];
+      }
+    }
+    return errors;
   };
 
   const clearKeys = (keys: string[]) => {
@@ -92,6 +103,7 @@ export const createFormStore = (initalValue?: Record<string, any>) => {
       unRegisterValidator,
       validate,
       hasErrors,
+      getErrors,
       reset
     }
   };
