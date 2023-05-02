@@ -59,7 +59,7 @@ export const PrescriptionForm = () => {
         zIndex: 15
       }}
     >
-      <photon-multirx-form-wrapper ref={ref} template-ids={templateIds} />
+      <photon-multirx-form-wrapper ref={ref} template-ids={templateIds} patient-id={patientId} />
     </div>
   );
 };
