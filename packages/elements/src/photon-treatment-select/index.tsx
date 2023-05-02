@@ -90,15 +90,20 @@ customElement(
             {
               label: 'Off Catalog',
               filter: (t: Treatment | PrescriptionTemplate) =>
-                props.offCatalogOption && t.id === props.offCatalogOption.id
+                t &&
+                typeof t === 'object' &&
+                props.offCatalogOption &&
+                t.id === props.offCatalogOption.id
             },
             {
               label: 'Templates',
-              filter: (t: Treatment | PrescriptionTemplate) => 'treatment' in t
+              filter: (t: Treatment | PrescriptionTemplate) =>
+                t && typeof t === 'object' && 'treatment' in t
             },
             {
               label: 'Catalog',
-              filter: (t: Treatment | PrescriptionTemplate) => 'name' in t && !('treatment' in t)
+              filter: (t: Treatment | PrescriptionTemplate) =>
+                t && typeof t === 'object' && 'name' in t && !('treatment' in t)
             }
           ]}
           label={props.label}
