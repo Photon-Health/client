@@ -54,7 +54,6 @@
     "vite-plugin-static-copy": "^0.13.1"
   },
   "dependencies": {
-    "@photonhealth/components": "*",
     "@photonhealth/sdk": "*",
     "@shoelace-style/shoelace": "^2.4.0",
     "@solid-primitives/scheduled": "^1.2.0",

@@ -1,4 +1,4 @@
-import Button, { ButtonProps, ButtonVariant, ButtonSize } from '../Button';
+import Button, { ButtonProps, ButtonVariant, ButtonSize } from '.';
 import { For } from 'solid-js/web';
 import type { Meta, StoryObj } from '@storybook/html';
 import type { ComponentProps } from 'solid-js';

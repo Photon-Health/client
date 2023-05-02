@@ -11,8 +11,8 @@ import { afterDate, message } from '../../validators';
 import { record, string, any, number, min, size } from 'superstruct';
 import { format } from 'date-fns';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
-import { DoseCalculator } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import DoseCalculator from '../../components/systems/DoseCalculator';
 
 const validators = {
   treatment: message(record(string(), any()), 'Please select a treatment...'),
