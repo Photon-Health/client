@@ -1,6 +1,6 @@
 import { message } from '../../validators';
 import { string, any, record } from 'superstruct';
-import { createSignal, onMount, Show } from 'solid-js';
+import { createSignal, onMount, Show, createEffect } from 'solid-js';
 import { PatientStore } from '../../stores/patient';
 import { PhotonClientStore } from '../../store';
 import { formatDate } from '../../utils';
@@ -57,13 +57,21 @@ export const PatientCard = (props: {
     }
   });
 
+  createEffect(() => {
+    if (store?.selectedPatient?.data) {
+      if (store?.selectedPatient?.data?.id !== props.store['patient']?.value?.id) {
+        // update patient when selected patient changes
+        updatePatient({ detail: { patient: store?.selectedPatient?.data } });
+      }
+    }
+  });
+
   return (
     <photon-card>
       <div class="flex flex-col gap-3">
         <p class="font-sans text-l font-medium">
           {props?.patientId ? 'Patient' : 'Select Patient'}
         </p>
-
         {/* Show Dropdown when no patientId is passed */}
         <Show when={!props?.patientId}>
           <photon-patient-select
@@ -74,14 +82,13 @@ export const PatientCard = (props: {
             sdk={props.client!.getSDK()}
           ></photon-patient-select>
         </Show>
-
         {/* Show Patient Name when patientId is passed */}
         <Show when={props?.patientId}>
           <Show
             when={store?.selectedPatient?.data?.id}
             fallback={<sl-spinner style="font-size: 1rem;"></sl-spinner>}
           >
-            <p class="font-sans text-sm">
+            <p class="font-sans text-gray-700">
               {store?.selectedPatient?.data?.name?.full},{' '}
               {formatDate(store?.selectedPatient?.data?.dateOfBirth || '')}
             </p>
