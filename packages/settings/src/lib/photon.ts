@@ -2,6 +2,7 @@ import { OrganizationSettings } from '../types';
 
 const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
 const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
+const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
 
 /**
  * All orgs inherit from default settings, so updates
@@ -81,6 +82,8 @@ export const photon: {
   // Peachy
   org_vTC7G2EAuHgac90E: {
     ...defaultSettings,
+    logo: 'peachy_logo.png',
+    accentColor: '#1D1D1F',
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
