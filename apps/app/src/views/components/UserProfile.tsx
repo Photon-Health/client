@@ -7,7 +7,11 @@ export const UserProfile = () => {
 
   return (
     <HStack spacing="3" ps="2">
-      <Avatar name={user?.name} src={user?.image} boxSize="10" />
+      <Avatar
+        name={typeof user?.name === 'string' ? user.name : ''}
+        src={typeof user?.image === 'string' ? user.image : ''}
+        boxSize="10"
+      />
       <Box>
         <Text fontWeight="medium" fontSize="sm">
           {user?.name}
