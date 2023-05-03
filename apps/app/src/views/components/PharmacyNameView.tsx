@@ -19,7 +19,7 @@ const PharmacyNameView = (props: PharmacyNameViewProps) => {
   const { name, phone, address } = props;
   return (
     <HStack spacing="3">
-      <Avatar name={name} src="" boxSize="10" />
+      <Avatar name={typeof name === 'string' ? name : ''} src="" boxSize="10" />
       <Box>
         <Text fontWeight="medium" color="black">
           {name}

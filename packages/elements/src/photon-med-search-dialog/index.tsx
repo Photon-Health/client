@@ -53,13 +53,17 @@ customElement(
             setLoading(true);
             if (addToCatalog()) {
               const addCatalogMutation = client!.getSDK().clinical.catalog.addToCatalog({});
-              await addCatalogMutation({
-                variables: {
-                  catalogId: catalogId(),
-                  treatmentId: medication()?.id
-                },
-                awaitRefetchQueries: false
-              });
+              try {
+                await addCatalogMutation({
+                  variables: {
+                    catalogId: catalogId(),
+                    treatmentId: medication()?.id
+                  },
+                  awaitRefetchQueries: false
+                });
+              } catch (e) {
+                console.log('Error adding to catalog: ', e?.message);
+              }
             }
             dispatchMedicationSelected();
             setLoading(false);

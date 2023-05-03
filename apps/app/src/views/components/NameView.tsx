@@ -12,7 +12,7 @@ const NameView = (props: NameViewProps) => {
   const { name, sub, isPatient, patientId } = props;
   return (
     <HStack spacing="3">
-      <Avatar name={name} src="" boxSize="10" />
+      <Avatar name={typeof name === 'string' ? name : ''} src="" boxSize="10" />
       <Box>
         {isPatient ? (
           <Button
