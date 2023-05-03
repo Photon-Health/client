@@ -61,8 +61,8 @@ customElement(
                   },
                   awaitRefetchQueries: false
                 });
-              } catch {
-                // do nothing, this is expected if medication exists in catalog
+              } catch (e) {
+                console.log('Error adding to catalog: ', e?.message);
               }
             }
             dispatchMedicationSelected();
