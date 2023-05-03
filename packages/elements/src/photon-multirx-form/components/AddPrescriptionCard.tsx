@@ -11,7 +11,6 @@ import { afterDate, message } from '../../validators';
 import { record, string, any, number, min, size } from 'superstruct';
 import { format } from 'date-fns';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import DoseCalculator from '../../components/systems/DoseCalculator';
 
 const validators = {
@@ -48,7 +47,6 @@ export const AddPrescriptionCard = (props: {
 
   return (
     <photon-card ref={ref} title={'Add Prescription'}>
-      <style>{photonStyles}</style>
       <div
         class="flex flex-col sm:gap-3"
         on:photon-medication-selected={(e: any) => {
