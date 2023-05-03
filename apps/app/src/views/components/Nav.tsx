@@ -56,7 +56,11 @@ export const Nav = () => {
                 <NavButton label="" icon={FiHelpCircle} link="/support" />
               </ButtonGroup>
               <Tooltip label={user?.name} aria-label={user?.name}>
-                <Avatar name={user?.name} src={user?.image} boxSize="10" />
+                <Avatar
+                  name={typeof user?.name === 'string' ? user.name : ''}
+                  src={typeof user?.image === 'string' ? user.image : ''}
+                  boxSize="10"
+                />
               </Tooltip>
             </HStack>
           ) : (
