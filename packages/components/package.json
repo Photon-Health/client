@@ -39,7 +39,6 @@
     "graphql-tag": "^2.12.6",
     "jwt-decode": "^3.1.2",
     "solid-heroicons": "^3.1.1",
-    "solid-js": "^1.6.11",
     "solid-transition-group": "^0.2.2",
     "superstruct": "^1.0.3"
   },
