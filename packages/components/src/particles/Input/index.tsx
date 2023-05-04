@@ -38,7 +38,7 @@ export default function Input(props: InputProps) {
             <Icon name="envelope" class="h-5 w-5 text-gray-400" size="sm" />
           </div>
         </Show>
-        <input id={state?.id} {...inputProps} class={inputClass()} />
+        <input id={state?.id} {...inputProps} class={inputClass()} autocomplete="off" />
         <Show when={state.loading || inputProps.loading}>
           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pl-3">
             <Spinner size="sm" />
