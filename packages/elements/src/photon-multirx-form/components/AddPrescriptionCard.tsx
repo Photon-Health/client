@@ -12,7 +12,7 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 import { createSignal, Show } from 'solid-js';
 import repopulateForm from '../util/repopulateForm';
 
-setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.82/dist/');
+setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 const validators = {
   treatment: message(record(string(), any()), 'Please select a treatment...'),
