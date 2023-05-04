@@ -23,7 +23,7 @@ const liquidVolumes: LiquidVolume[] = ['mL', 'L'];
 export interface DoseCalculatorProps {
   open: boolean;
   setClose: () => {};
-  medication?: string;
+  medicationName?: string;
 }
 
 export default function DoseCalculator(props: DoseCalculatorProps) {
@@ -46,7 +46,6 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
     const factor = conversionFactors[dosageUnit()][weightUnit()];
     return factor * dosage() * weight();
   });
-
   const liquidDose = createMemo(() => {
     if (!liquidConcentration() || parseInt(liquidConcentration().toString(), 10) === 0) {
       return 0;
@@ -55,19 +54,16 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
     return (dose() * perVolume()) / (liquidConcentration() * factor);
   });
 
-  const singleDose = createMemo(() => {
-    const amount = dosageFrequency() === 'day' ? dose() / dosesPerDay() : dose();
-    return `${round(amount, 1)} ${dosageUnit().split('/')[0]}`;
-  });
-  const singleLiquidDose = createMemo(() => {
-    const amount = dosageFrequency() === 'day' ? liquidDose() / dosesPerDay() : liquidDose();
-    return `${round(amount, 1)} ${perVolumeUnit()}`;
-  });
-  const totalQuantity = createMemo(() => {
-    const amount =
-      dosageFrequency() === 'day' ? dose() * daysSupply() : dose() * daysSupply() * dosesPerDay();
-    return `${round(amount, 1)} ${dosageUnit().split('/')[0]}`;
-  });
+  const singleDose = createMemo(() =>
+    dosageFrequency() === 'day' ? dose() / dosesPerDay() : dose()
+  );
+  const totalQuantity = createMemo(() => singleDose() * daysSupply() * dosesPerDay());
+  const solidUnit = createMemo(() => dosageUnit().split('/')[0]);
+
+  const singleLiquidDose = createMemo(() =>
+    dosageFrequency() === 'day' ? liquidDose() / dosesPerDay() : liquidDose()
+  );
+  const totalLiquidQuantity = createMemo(() => singleLiquidDose() * daysSupply() * dosesPerDay());
 
   return (
     <Dialog open={props.open} setClose={props.setClose} size="lg">
@@ -76,7 +72,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
 
       <div class="mt-4">
         <h3>Selected Medication</h3>
-        <p>{props?.medication || 'None Selected'}</p>
+        <p>{props?.medicationName || 'None Selected'}</p>
       </div>
 
       <div class="mt-4">
@@ -138,7 +134,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
       <div class="mt-4">
         <h3>Frequency</h3>
         <div class="grid grid-cols-2 gap-4">
-          <InputGroup label="Days Supply">
+          <InputGroup label="Duration in Days">
             <Input
               type="number"
               value={daysSupply()}
@@ -159,15 +155,26 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
         <h3>Dosage</h3>
         <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Single Dose">
-            <Input type="text" value={singleDose()} disabled />
+            <Input type="text" value={`${round(singleDose(), 1)} ${solidUnit()}`} disabled />
           </InputGroup>
           <InputGroup label="Single Liquid Dose">
-            <Input type="text" value={singleLiquidDose()} disabled />
+            <Input
+              type="text"
+              value={`${round(singleLiquidDose(), 1)} ${perVolumeUnit()}`}
+              disabled
+            />
           </InputGroup>
         </div>
         <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Total Quantity">
-            <Input type="text" value={totalQuantity()} disabled />
+            <Input type="text" value={`${round(totalQuantity(), 1)} ${solidUnit()}`} disabled />
+          </InputGroup>
+          <InputGroup label="Total Liquid Quantity">
+            <Input
+              type="text"
+              value={`${round(totalLiquidQuantity(), 1)} ${perVolumeUnit()}`}
+              disabled
+            />
           </InputGroup>
         </div>
       </div>

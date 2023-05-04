@@ -32,7 +32,6 @@ export const AddPrescriptionCard = (props: {
   store: Record<string, any>;
 }) => {
   let medSearchRef: any;
-  let dosageCalculatorRef: any;
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit, setDispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
@@ -140,6 +139,7 @@ export const AddPrescriptionCard = (props: {
             <DoseCalculator
               open={openDoseCalculator()}
               setClose={() => setOpenDoseCalculator(false)}
+              medicationName={props.store['treatment']?.value?.name}
             ></DoseCalculator>
             <div>
               <photon-button
