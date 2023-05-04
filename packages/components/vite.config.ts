@@ -16,6 +16,9 @@ export default defineConfig({
       name: 'components',
       fileName: 'index'
     },
-    target: 'esnext'
+    target: 'esnext',
+    rollupOptions: {
+      external: ['solid-js']
+    }
   }
 });
