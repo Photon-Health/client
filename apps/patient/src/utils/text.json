@@ -14,6 +14,21 @@
     "instructions": "Instructions",
     "cta": "Search for a pharmacy"
   },
+  "readyBy": {
+    "title": "Ready by",
+    "heading": "When do you want this ready by?",
+    "subheading": "We'll do our best ensure your prescription(s) are ready by your selected time.",
+    "options": [
+      "As soon as possible",
+      "12:00 pm",
+      "2:00 pm",
+      "4:00 pm",
+      "6:00 pm",
+      "After hours",
+      "Tomorrow"
+    ],
+    "cta": "Select a pharmacy"
+  },
   "pharmacy": {
     "title": "Select a pharmacy",
     "heading": "Select a pharmacy",
