@@ -38,7 +38,7 @@ export const Review = () => {
   const { organization, patient, fills } = order
 
   const handleCtaClick = () => {
-    navigate(`/pharmacy?orderId=${order.id}&token=${token}`)
+    navigate(`/ready?orderId=${order.id}&token=${token}`)
   }
 
   return (
