@@ -6,7 +6,7 @@ import InputGroup from '../../particles/InputGroup';
 import UnitSelect from './components/UnitSelect';
 import conversionFactors from './utils/conversionFactors';
 
-const round = (num: number, places: number) => parseFloat(num.toFixed(places));
+const round = (num: number) => parseFloat(num.toFixed(1));
 
 type DosageUnit = 'mcg/kg' | 'mg/kg' | 'g/kg';
 type WeightUnit = 'lbs' | 'kg';
@@ -17,13 +17,18 @@ type LiquidVolume = 'mL' | 'L';
 const dosageUnits: DosageUnit[] = ['mcg/kg', 'mg/kg', 'g/kg'];
 const dosageFrequencies: DosageFrequency[] = ['day', 'dose'];
 const weightUnits: WeightUnit[] = ['lbs', 'kg'];
-const liquidUnits: LiquidUnit[] = ['mcg', 'mg', 'g'];
+const liquidConcentrationUnits: LiquidUnit[] = ['mcg', 'mg', 'g'];
 const liquidVolumes: LiquidVolume[] = ['mL', 'L'];
 
 export interface DoseCalculatorProps {
   open: boolean;
-  setClose: () => {};
+  onClose: () => {};
   medicationName?: string;
+  setAutocompleteValues: (data: {
+    liquidDose: number;
+    totalLiquid: number;
+    unit: LiquidVolume;
+  }) => void;
 }
 
 export default function DoseCalculator(props: DoseCalculatorProps) {
@@ -35,7 +40,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
   const [weightUnit, setWeightUnit] = createSignal<WeightUnit>(weightUnits[0]);
 
   const [liquidConcentration, setLiquidConcentration] = createSignal<number>(0);
-  const [liquidUnit, setLiquidUnit] = createSignal<LiquidUnit>(liquidUnits[0]);
+  const [liquidUnit, setLiquidUnit] = createSignal<LiquidUnit>(liquidConcentrationUnits[0]);
   const [perVolume, setPerVolume] = createSignal<number>(0);
   const [perVolumeUnit, setPerVolumeUnit] = createSignal<LiquidVolume>(liquidVolumes[0]);
 
@@ -66,7 +71,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
   const totalLiquidQuantity = createMemo(() => singleLiquidDose() * daysSupply() * dosesPerDay());
 
   return (
-    <Dialog open={props.open} setClose={props.setClose} size="lg">
+    <Dialog open={props.open} onClose={props.onClose} size="lg">
       <h2>Calculate Dose Quantity</h2>
       <p>Enter desired dosage and patient weight to calculate total and dose quantity.</p>
 
@@ -116,7 +121,11 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               value={liquidConcentration()}
               onInput={(e) => setLiquidConcentration(e.currentTarget.valueAsNumber)}
             />
-            <UnitSelect setSelected={setLiquidUnit} options={liquidUnits} initialIdx={1} />
+            <UnitSelect
+              setSelected={setLiquidUnit}
+              options={liquidConcentrationUnits}
+              initialIdx={1}
+            />
           </div>
         </InputGroup>
         <InputGroup label="Per Volume">
@@ -155,24 +164,20 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
         <h3>Dosage</h3>
         <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Single Dose">
-            <Input type="text" value={`${round(singleDose(), 1)} ${solidUnit()}`} disabled />
+            <Input type="text" value={`${round(singleDose())} ${solidUnit()}`} disabled />
           </InputGroup>
           <InputGroup label="Single Liquid Dose">
-            <Input
-              type="text"
-              value={`${round(singleLiquidDose(), 1)} ${perVolumeUnit()}`}
-              disabled
-            />
+            <Input type="text" value={`${round(singleLiquidDose())} ${perVolumeUnit()}`} disabled />
           </InputGroup>
         </div>
         <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Total Quantity">
-            <Input type="text" value={`${round(totalQuantity(), 1)} ${solidUnit()}`} disabled />
+            <Input type="text" value={`${round(totalQuantity())} ${solidUnit()}`} disabled />
           </InputGroup>
           <InputGroup label="Total Liquid Quantity">
             <Input
               type="text"
-              value={`${round(totalLiquidQuantity(), 1)} ${perVolumeUnit()}`}
+              value={`${round(totalLiquidQuantity())} ${perVolumeUnit()}`}
               disabled
             />
           </InputGroup>
@@ -180,10 +185,21 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
       </div>
 
       <div class="flex gap-4 justify-end">
-        <Button variant="secondary" onClick={props.setClose}>
+        <Button variant="secondary" onClick={props.onClose}>
           Cancel
         </Button>
-        <Button>Autofill</Button>
+        <Button
+          onClick={() => {
+            props.setAutocompleteValues({
+              liquidDose: round(singleLiquidDose()),
+              totalLiquid: round(totalLiquidQuantity()),
+              unit: perVolumeUnit()
+            });
+            props.onClose();
+          }}
+        >
+          Autofill
+        </Button>
       </div>
     </Dialog>
   );

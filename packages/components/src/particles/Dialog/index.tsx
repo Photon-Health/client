@@ -9,7 +9,7 @@ const transitionDuration = 100;
 export interface DialogProps {
   open: boolean;
   size?: 'md' | 'lg';
-  setClose?: () => void;
+  onClose?: () => void;
   children?: JSX.Element;
 }
 
@@ -66,12 +66,12 @@ function Dialog(props: DialogProps) {
           <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
               <div class={panelClasses}>
-                <Show when={merged?.setClose}>
+                <Show when={merged?.onClose}>
                   <div class="absolute right-0 top-0 pr-4 pt-4 sm:block">
                     <button
                       type="button"
                       class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                      onClick={merged.setClose}
+                      onClick={merged.onClose}
                     >
                       <span class="sr-only">Close</span>
                       <Icon name="xMark" class="h-6 w-6" aria-hidden="true" />

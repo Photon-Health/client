@@ -28,7 +28,7 @@ export const Default: DialogStory = {
           <Button onClick={() => setIsSmallOpen(true)}>Open Regular Dialog</Button>
           <Button onClick={() => setIsLargeOpen(true)}>Open Larger Dialog</Button>
         </div>
-        <Dialog open={isSmallOpen()} setClose={() => setIsSmallOpen(false)}>
+        <Dialog open={isSmallOpen()} onClose={() => setIsSmallOpen(false)}>
           <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
             <Icon name="check" class="text-green-600" />
           </div>
@@ -44,7 +44,7 @@ export const Default: DialogStory = {
             <Button onClick={() => setIsSmallOpen(false)}>Close</Button>
           </div>
         </Dialog>
-        <Dialog size="lg" open={isLargeOpen()} setClose={() => setIsLargeOpen(false)}>
+        <Dialog size="lg" open={isLargeOpen()} onClose={() => setIsLargeOpen(false)}>
           <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
             <Icon name="check" class="text-green-600" />
           </div>
@@ -73,7 +73,7 @@ export const SmallOpen: DialogStory = {
   render: (args) => {
     return (
       <>
-        <Dialog open={true} setClose={() => {}}>
+        <Dialog open={true} onClose={() => {}}>
           <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
             <Icon name="check" class="text-green-600" />
           </div>
@@ -99,7 +99,7 @@ export const LargeOpen: DialogStory = {
   render: (args) => {
     return (
       <>
-        <Dialog size="lg" open={true} setClose={() => {}}>
+        <Dialog size="lg" open={true} onClose={() => {}}>
           <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
             <Icon name="check" class="text-green-600" />
           </div>

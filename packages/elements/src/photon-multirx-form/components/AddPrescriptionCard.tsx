@@ -138,8 +138,24 @@ export const AddPrescriptionCard = (props: {
             ></photon-number-input>
             <DoseCalculator
               open={openDoseCalculator()}
-              setClose={() => setOpenDoseCalculator(false)}
+              onClose={() => setOpenDoseCalculator(false)}
               medicationName={props.store['treatment']?.value?.name}
+              setAutocompleteValues={({ liquidDose, totalLiquid, unit }) => {
+                props.actions.updateFormValue({
+                  key: 'dispenseQuantity',
+                  value: Number(totalLiquid)
+                });
+                props.actions.updateFormValue({
+                  key: 'instructions',
+                  value: `${liquidDose} ${unit} ${props.store['instructions']?.value}`
+                });
+                if (unit === 'mL') {
+                  props.actions.updateFormValue({
+                    key: 'dispenseUnit',
+                    value: 'Milliliter'
+                  });
+                }
+              }}
             ></DoseCalculator>
             <div>
               <photon-button

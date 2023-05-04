@@ -60,7 +60,13 @@ const App = () => {
             <Icon name="calculator" size="sm" />
           </Button>
 
-          <DoseCalculator open={doseOpen()} setClose={() => setDoseOpen(false)} />
+          <DoseCalculator
+            open={doseOpen()}
+            onClose={() => setDoseOpen(false)}
+            setAutocompleteValues={({ liquidDose, totalLiquid, unit }) => {
+              console.log(liquidDose, totalLiquid, unit);
+            }}
+          />
         </div>
       </div>
     </Client>
