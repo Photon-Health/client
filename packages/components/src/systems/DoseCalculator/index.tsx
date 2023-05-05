@@ -166,13 +166,14 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           <InputGroup label="Single Dose">
             <Input type="text" value={`${round(singleDose())} ${solidUnit()}`} disabled />
           </InputGroup>
-          <InputGroup label="Single Liquid Dose">
-            <Input type="text" value={`${round(singleLiquidDose())} ${perVolumeUnit()}`} disabled />
-          </InputGroup>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Total Quantity">
             <Input type="text" value={`${round(totalQuantity())} ${solidUnit()}`} disabled />
+          </InputGroup>
+        </div>
+        <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700 w-full" />
+        <div class="grid grid-cols-2 gap-4">
+          <InputGroup label="Single Liquid Dose">
+            <Input type="text" value={`${round(singleLiquidDose())} ${perVolumeUnit()}`} disabled />
           </InputGroup>
           <InputGroup label="Total Liquid Quantity">
             <Input
@@ -197,6 +198,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
             });
             props.onClose();
           }}
+          disabled={totalLiquidQuantity() === 0}
         >
           Autofill
         </Button>
