@@ -56,7 +56,7 @@ export const ReadyBy = () => {
 
           <VStack spacing={3} w="full">
             {t.readyBy.options.map((option, i) => {
-              const isDisabled = i !== (0 | 5 | 6) && currentTimeIsAfterOption(option)
+              const isDisabled = i !== (0 | 6) && currentTimeIsAfterOption(option)
               return (
                 <Button
                   key={option}
