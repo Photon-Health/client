@@ -1,11 +1,11 @@
-import { For, createEffect, createMemo, createSignal } from 'solid-js';
-import PharmacySearch from './systems/PharmacySearch';
-import DoseCalculator from './systems/DoseCalculator';
-import Client from './systems/Client';
-import Button from './particles/Button';
-import Icon from './particles/Icon';
-import { randomNames } from './sampleData/randomNames';
-import ComboBox from './particles/ComboBox';
+import { For, createMemo, createSignal } from 'solid-js';
+import PharmacySearch from '../src/systems/PharmacySearch';
+import DoseCalculator from '../src/systems/DoseCalculator';
+import Client from '../src/systems/Client';
+import Button from '../src/particles/Button';
+import Icon from '../src/particles/Icon';
+import { randomNames } from '../src/sampleData/randomNames';
+import ComboBox from '../src/particles/ComboBox';
 
 const App = () => {
   const [pharmacy, setPharmacy] = createSignal<any>();

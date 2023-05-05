@@ -54,6 +54,9 @@
     "solid-transition-group": "^0.2.2",
     "superstruct": "^1.0.3"
   },
+  "peerDependencies": {
+    "solid-js": "1.6.11"
+  },
   "engines": {
     "node": ">=16"
   }
