@@ -27,11 +27,20 @@ export const ReadyBy = () => {
     navigate(`/pharmacy?orderId=${order.id}&token=${token}`)
   }
 
-  const checkAfter = (checkTime: string) => {
+  const currentTimeIsAfterOption = (option: string): boolean => {
     const currentTime = dayjs()
-    const checkTimeDayjs = dayjs(checkTime, 'h:mm a')
-    return currentTime.isAfter(checkTimeDayjs)
+
+    const afterHoursOption = t.readyBy.options[5]
+    if (option === afterHoursOption) {
+      const checkTimeDayjs = dayjs('6:00 pm', 'h:mm a')
+      return currentTime.isAfter(checkTimeDayjs)
+    } else {
+      const checkTimeDayjs = dayjs(option, 'h:mm a')
+      return currentTime.isAfter(checkTimeDayjs)
+    }
   }
+
+  const showFooter = typeof selected !== 'undefined'
 
   return (
     <Box>
@@ -41,7 +50,7 @@ export const ReadyBy = () => {
 
       <Nav header={organization.name} orgId={organization.id} />
 
-      <Container>
+      <Container pb={showFooter ? 32 : 8}>
         <VStack spacing={7} pt={5} align="span">
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
@@ -51,11 +60,11 @@ export const ReadyBy = () => {
           </VStack>
 
           <VStack spacing={3} w="full">
-            {t.readyBy.options.map((text, i) => {
-              const isDisabled = i !== (0 | 5 | 6) && checkAfter(text)
+            {t.readyBy.options.map((option, i) => {
+              const isDisabled = i !== (0 | 5 | 6) && currentTimeIsAfterOption(option)
               return (
                 <Button
-                  key={text}
+                  key={option}
                   bgColor={selected === i ? 'gray.700' : undefined}
                   _active={
                     !isDisabled
@@ -71,7 +80,7 @@ export const ReadyBy = () => {
                   onClick={() => setSelected(i)}
                   isDisabled={isDisabled}
                 >
-                  {text}
+                  {option}
                 </Button>
               )
             })}
@@ -79,7 +88,7 @@ export const ReadyBy = () => {
         </VStack>
       </Container>
 
-      <FixedFooter show={typeof selected !== 'undefined'}>
+      <FixedFooter show={showFooter}>
         <Container as={VStack} w="full">
           <Button size="lg" w="full" variant="brand" onClick={handleCtaClick}>
             {t.readyBy.cta}
