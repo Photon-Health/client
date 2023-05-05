@@ -31,7 +31,7 @@ export const ReadyBy = () => {
   const { organization } = order
 
   const [selected, setSelected] = useState(undefined)
-  const showFooter = !!selected
+  const showFooter = typeof selected !== 'undefined'
 
   const handleCtaClick = () => {
     navigate(`/pharmacy?orderId=${order.id}&token=${token}`)
