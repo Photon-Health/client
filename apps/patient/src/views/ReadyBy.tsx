@@ -11,6 +11,15 @@ import { PoweredBy } from '../components/PoweredBy'
 import t from '../utils/text.json'
 import { OrderContext } from './Main'
 
+const currentTimeIsAfterOption = (option: string): boolean => {
+  const currentTime = dayjs()
+  const afterHoursOption = t.readyBy.options[5]
+  const afterHoursStarts = '6:00 pm'
+  const timetoCheck = option === afterHoursOption ? afterHoursStarts : option
+  const timetoCheckDayjs = dayjs(timetoCheck, 'h:mm a')
+  return currentTime.isAfter(timetoCheckDayjs)
+}
+
 export const ReadyBy = () => {
   const order = useContext<Order>(OrderContext)
 
@@ -22,21 +31,11 @@ export const ReadyBy = () => {
   const { organization } = order
 
   const [selected, setSelected] = useState(undefined)
+  const showFooter = !!selected
 
   const handleCtaClick = () => {
     navigate(`/pharmacy?orderId=${order.id}&token=${token}`)
   }
-
-  const currentTimeIsAfterOption = (option: string): boolean => {
-    const currentTime = dayjs()
-    const afterHoursOption = t.readyBy.options[5]
-    const afterHoursStarts = '6:00 pm'
-    const timetoCheck = option === afterHoursOption ? afterHoursStarts : option
-    const timetoCheckDayjs = dayjs(timetoCheck, 'h:mm a')
-    return currentTime.isAfter(timetoCheckDayjs)
-  }
-
-  const showFooter = typeof selected !== 'undefined'
 
   return (
     <Box>
