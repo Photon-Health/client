@@ -29,15 +29,11 @@ export const ReadyBy = () => {
 
   const currentTimeIsAfterOption = (option: string): boolean => {
     const currentTime = dayjs()
-
     const afterHoursOption = t.readyBy.options[5]
-    if (option === afterHoursOption) {
-      const checkTimeDayjs = dayjs('6:00 pm', 'h:mm a')
-      return currentTime.isAfter(checkTimeDayjs)
-    } else {
-      const checkTimeDayjs = dayjs(option, 'h:mm a')
-      return currentTime.isAfter(checkTimeDayjs)
-    }
+    const afterHoursStarts = '6:00 pm'
+    const timetoCheck = option === afterHoursOption ? afterHoursStarts : option
+    const timetoCheckDayjs = dayjs(timetoCheck, 'h:mm a')
+    return currentTime.isAfter(timetoCheckDayjs)
   }
 
   const showFooter = typeof selected !== 'undefined'
