@@ -22,7 +22,7 @@ const liquidVolumes: LiquidVolume[] = ['mL', 'L'];
 
 export interface DoseCalculatorProps {
   open: boolean;
-  onClose: () => {};
+  onClose: () => void;
   medicationName?: string;
   setAutocompleteValues: (data: {
     liquidDose: number;

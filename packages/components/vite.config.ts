@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
 import path from 'node:path';
@@ -20,5 +21,20 @@ export default defineConfig({
     rollupOptions: {
       external: ['solid-js']
     }
+  },
+  test: {
+    environment: 'jsdom',
+    transformMode: {
+      web: [/\.[jt]sx?$/]
+    },
+    // solid needs to be inline to work around
+    // a resolution issue in vitest:
+    deps: {
+      inline: [/solid-js/]
+    },
+    // if you have few tests, try commenting one
+    // or both out to improve performance:
+    threads: false,
+    isolate: false
   }
 });
