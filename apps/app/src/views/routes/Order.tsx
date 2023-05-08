@@ -189,7 +189,10 @@ export const Order = () => {
           <Button
             size="sm"
             aria-label="Cancel Order"
-            isDisabled={order.fulfillment?.type !== types.FulfillmentType.MailOrder}
+            isDisabled={
+              order.fulfillment?.type !== types.FulfillmentType.MailOrder ||
+              order.state === types.OrderState.Canceled
+            }
             onClick={async () => {
               const decision = await confirmWrapper('Cancel this order?', {
                 description: 'You will not be able to undo this action.',

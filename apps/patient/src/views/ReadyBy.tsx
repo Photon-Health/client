@@ -11,6 +11,15 @@ import { PoweredBy } from '../components/PoweredBy'
 import t from '../utils/text.json'
 import { OrderContext } from './Main'
 
+const currentTimeIsAfterOption = (option: string): boolean => {
+  const currentTime = dayjs()
+  const afterHoursOption = t.readyBy.options[5]
+  const afterHoursStarts = '6:00 pm'
+  const timetoCheck = option === afterHoursOption ? afterHoursStarts : option
+  const timetoCheckDayjs = dayjs(timetoCheck, 'h:mm a')
+  return currentTime.isAfter(timetoCheckDayjs)
+}
+
 export const ReadyBy = () => {
   const order = useContext<Order>(OrderContext)
 
@@ -22,15 +31,10 @@ export const ReadyBy = () => {
   const { organization } = order
 
   const [selected, setSelected] = useState(undefined)
+  const showFooter = typeof selected !== 'undefined'
 
   const handleCtaClick = () => {
     navigate(`/pharmacy?orderId=${order.id}&token=${token}`)
-  }
-
-  const checkAfter = (checkTime: string) => {
-    const currentTime = dayjs()
-    const checkTimeDayjs = dayjs(checkTime, 'h:mm a')
-    return currentTime.isAfter(checkTimeDayjs)
   }
 
   return (
@@ -41,7 +45,7 @@ export const ReadyBy = () => {
 
       <Nav header={organization.name} orgId={organization.id} />
 
-      <Container>
+      <Container pb={showFooter ? 32 : 8}>
         <VStack spacing={7} pt={5} align="span">
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
@@ -51,11 +55,11 @@ export const ReadyBy = () => {
           </VStack>
 
           <VStack spacing={3} w="full">
-            {t.readyBy.options.map((text, i) => {
-              const isDisabled = i !== (0 | 5 | 6) && checkAfter(text)
+            {t.readyBy.options.map((option, i) => {
+              const isDisabled = i !== (0 | 6) && currentTimeIsAfterOption(option)
               return (
                 <Button
-                  key={text}
+                  key={option}
                   bgColor={selected === i ? 'gray.700' : undefined}
                   _active={
                     !isDisabled
@@ -71,7 +75,7 @@ export const ReadyBy = () => {
                   onClick={() => setSelected(i)}
                   isDisabled={isDisabled}
                 >
-                  {text}
+                  {option}
                 </Button>
               )
             })}
@@ -79,7 +83,7 @@ export const ReadyBy = () => {
         </VStack>
       </Container>
 
-      <FixedFooter show={typeof selected !== 'undefined'}>
+      <FixedFooter show={showFooter}>
         <Container as={VStack} w="full">
           <Button size="lg" w="full" variant="brand" onClick={handleCtaClick}>
             {t.readyBy.cta}
