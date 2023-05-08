@@ -103,6 +103,7 @@ export const neutron: {
     ...defaultSettings,
     logo: 'peachy_logo.png',
     accentColor: '#1D1D1F',
+    pickUp: false,
     federated: true,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
