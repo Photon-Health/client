@@ -7,7 +7,7 @@ import '../../../../../node_modules/@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import DoseCalculator from '.';
 
-describe('App', () => {
+describe('DoseCalculator', () => {
   it('should render the app', () => {
     const { getByText } = render(() => (
       <DoseCalculator open={true} onClose={() => {}} setAutocompleteValues={() => {}} />
@@ -15,7 +15,7 @@ describe('App', () => {
     expect(getByText('Calculate Dose Quantity')).toBeInTheDocument();
   });
 
-  it('should set input values correctly', async () => {
+  it('should calculate "Amoxicillin 200 MG in 5mL Oral Suspension, 20lbs, 80 mg/kg" correctly', async () => {
     const medicationName = 'Amoxicillin 200 MG in 5mL Oral Suspension, 20lbs, 80 mg/kg';
     const setAutocompleteValuesMock = vi.fn();
 
