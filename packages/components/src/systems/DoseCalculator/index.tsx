@@ -82,62 +82,72 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
 
       <div class="mt-4">
         <h3>Dosage Inputs</h3>
-        <InputGroup label="Dose">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-2 gap-2">
+            <InputGroup label="Dose">
               <Input
                 type="number"
                 value={dosage()}
                 onInput={(e) => setDosage(e.currentTarget.valueAsNumber)}
               />
+            </InputGroup>
+            <InputGroup label="Dose Unit">
               <UnitSelect setSelected={setDosageUnit} options={dosageUnits} initialIdx={1} />
-            </div>
+            </InputGroup>
+          </div>
+          <InputGroup label="Dose Frequency">
             <div class="flex gap-4 items-center">
               <p>per</p>
               <div class="grow">
                 <UnitSelect setSelected={setDosageFrequency} options={dosageFrequencies} />
               </div>
             </div>
-          </div>
-        </InputGroup>
-        <InputGroup label="Patient Weight">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="grid grid-cols-2 gap-2">
+          </InputGroup>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-2 gap-2">
+            <InputGroup label="Patient Weight">
               <Input
                 type="number"
                 value={weight()}
                 onInput={(e) => setWeight(e.currentTarget.valueAsNumber)}
               />
+            </InputGroup>
+            <InputGroup label="Patient Weight Unit">
               <UnitSelect setSelected={setWeightUnit} options={weightUnits} />
-            </div>
+            </InputGroup>
           </div>
-        </InputGroup>
+        </div>
       </div>
       <div class="flex gap-4 mt-4">
-        <InputGroup label="Liquid Concentration">
-          <div class="flex gap-2">
+        <div class="flex gap-2">
+          <InputGroup label="Liquid Concentration">
             <Input
               type="number"
               value={liquidConcentration()}
               onInput={(e) => setLiquidConcentration(e.currentTarget.valueAsNumber)}
             />
+          </InputGroup>
+          <InputGroup label="Liquid Concentration Unit">
             <UnitSelect
               setSelected={setLiquidUnit}
               options={liquidConcentrationUnits}
               initialIdx={1}
             />
-          </div>
-        </InputGroup>
-        <InputGroup label="Per Volume">
-          <div class="flex gap-2">
+          </InputGroup>
+        </div>
+        <div class="flex gap-2">
+          <InputGroup label="Per Volume">
             <Input
               type="number"
               value={perVolume()}
               onInput={(e) => setPerVolume(e.currentTarget.valueAsNumber)}
             />
+          </InputGroup>
+          <InputGroup label="Per Volume Unit">
             <UnitSelect setSelected={setPerVolumeUnit} options={liquidVolumes} />
-          </div>
-        </InputGroup>
+          </InputGroup>
+        </div>
       </div>
 
       <div class="mt-4">
