@@ -20,7 +20,8 @@ import {
 import { FiInfo } from 'react-icons/fi';
 import { useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
-import { usePhoton } from '@photonhealth/react';
+import { usePhoton, types } from '@photonhealth/react';
+
 import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
 import PatientView from '../components/PatientView';
@@ -127,22 +128,17 @@ const renderRow = (order: any) => {
     <Text as="i">Pending</Text>
   );
 
-  let state;
-  let stateColor;
-  let stateTip;
-  if (order.fulfillment?.state) {
-    if (ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof OrderFulfillmentRecord]) {
-      state = ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof OrderFulfillmentRecord];
-      stateColor =
-        ORDER_FULFILLMENT_COLOR_MAP[order.fulfillment.state as keyof OrderFulfillmentRecord];
-      stateTip = ORDER_FULFILLMENT_TIP_MAP[order.fulfillment.state as keyof OrderFulfillmentRecord];
-    } else {
-      // If state is not handled in the list, format the name and use a default color
-      const s = order.fulfillment.state;
-      state = s[0].toUpperCase() + s.slice(1).toLowerCase();
-      stateColor = 'gray';
-      stateTip = state;
-    }
+  let status,
+    statusColor = 'gray',
+    statusTip;
+  if (order.state === types.OrderState.Canceled) {
+    status = 'Canceled';
+    statusTip = 'Order canceled';
+  } else if (order.fulfillment?.state) {
+    const key = order.fulfillment.state as OrderFulfillmentState;
+    status = ORDER_FULFILLMENT_STATE_MAP[key] || key;
+    statusTip = ORDER_FULFILLMENT_TIP_MAP[key] || status;
+    statusColor = ORDER_FULFILLMENT_COLOR_MAP[key] || statusColor;
   }
 
   return {
@@ -150,10 +146,10 @@ const renderRow = (order: any) => {
     externalId: extId,
     createdAt: formatDate(order.createdAt),
     fills: <Text fontWeight="medium">{fills}</Text>,
-    fulfillmentStatus: order.fulfillment?.state ? (
-      <Tooltip label={stateTip}>
-        <Badge size="sm" colorScheme={stateColor}>
-          {state}
+    status: order.fulfillment?.state ? (
+      <Tooltip label={statusTip}>
+        <Badge size="sm" colorScheme={statusColor}>
+          {status}
         </Badge>
       </Tooltip>
     ) : (
@@ -175,7 +171,7 @@ const renderSkeletonRow = (isMobile: boolean | undefined) =>
             <SkeletonText noOfLines={2} width="150px" />
           </HStack>
         ),
-        fulfillmentStatus: <SkeletonText noOfLines={1} />,
+        status: <SkeletonText noOfLines={1} />,
         pharmacy: <SkeletonText noOfLines={1} />,
         createdAt: <SkeletonText noOfLines={1} />,
         externalId: <SkeletonText noOfLines={1} width="50px" />,
@@ -189,7 +185,7 @@ const renderSkeletonRow = (isMobile: boolean | undefined) =>
             <SkeletonText noOfLines={2} width="150px" />
           </HStack>
         ),
-        fulfillmentStatus: <SkeletonText noOfLines={1} />,
+        status: <SkeletonText noOfLines={1} />,
         pharmacy: <SkeletonText noOfLines={1} />,
         createdAt: <SkeletonText noOfLines={1} />,
         externalId: <SkeletonText noOfLines={1} width="50px" />,
@@ -212,8 +208,8 @@ export const Orders = () => {
       width: 'wrap'
     },
     {
-      Header: 'Fulfillment Status',
-      accessor: 'fulfillmentStatus'
+      Header: 'Status',
+      accessor: 'status'
     },
     {
       Header: 'Pharmacy',
