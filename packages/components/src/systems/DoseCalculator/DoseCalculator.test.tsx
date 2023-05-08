@@ -19,7 +19,7 @@ describe('App', () => {
     const medicationName = 'Amoxicillin 200 MG in 5mL Oral Suspension, 20lbs, 80 mg/kg';
     const setAutocompleteValuesMock = vi.fn();
 
-    const { getByText, getByLabelText } = render(() => (
+    const { getByText, getByLabelText, container } = render(() => (
       <DoseCalculator
         open={true}
         onClose={() => {}}
@@ -36,9 +36,12 @@ describe('App', () => {
     await userEvent.type(getByLabelText('Patient Weight'), '20');
     await userEvent.type(getByLabelText('Liquid Concentration'), '200');
     await userEvent.type(getByLabelText('Per Volume'), '5');
+    await userEvent.clear(getByLabelText('Duration in Days'));
     await userEvent.type(getByLabelText('Duration in Days'), '10');
+    await userEvent.clear(getByLabelText('Doses per Day'));
     await userEvent.type(getByLabelText('Doses per Day'), '2');
 
+    // console.log(container.innerHTML);
     await userEvent.click(getByText('Autofill'));
 
     expect(setAutocompleteValuesMock).toHaveBeenCalledTimes(1);
