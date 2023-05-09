@@ -20,7 +20,7 @@ import { FaPrescription } from 'react-icons/fa'
 import { Helmet } from 'react-helmet'
 
 import { Order } from '../utils/models'
-import { formatDate } from '../utils/general'
+import { formatDate, countFillsAndRemoveDuplicates } from '../utils/general'
 import { FixedFooter } from '../components/FixedFooter'
 import { Nav } from '../components/Nav'
 import { PoweredBy } from '../components/PoweredBy'
@@ -40,6 +40,8 @@ export const Review = () => {
   const handleCtaClick = () => {
     navigate(`/ready?orderId=${order.id}&token=${token}`)
   }
+
+  const flattenedFills = countFillsAndRemoveDuplicates(fills)
 
   return (
     <Box>
@@ -69,7 +71,7 @@ export const Review = () => {
           </VStack>
 
           <Accordion allowToggle defaultIndex={[0]}>
-            {fills.map(({ id, treatment, prescription }) => (
+            {flattenedFills.map(({ id, treatment, prescription, count }) => (
               <AccordionItem border="none" mb={3} key={id}>
                 <Card w="full" backgroundColor="white">
                   <CardBody p={0}>
@@ -105,7 +107,7 @@ export const Review = () => {
                         <HStack>
                           <HStack w="50%">
                             <Text color="gray.500">{t.review.refills}</Text>
-                            <Text>{prescription.fillsAllowed - 1}</Text>
+                            <Text>{count - 1}</Text>
                           </HStack>
                           <HStack w="50%">
                             <Text color="gray.500">{t.review.expires}</Text>
