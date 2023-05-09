@@ -123,14 +123,14 @@ export const countFillsAndRemoveDuplicates = (fills: types.Fill[]): FillWithCoun
   const result = []
 
   for (let fill of fills) {
-    const str = fill.treatment.name
+    const str = fill.treatment.id
 
     if (count[str]) {
       // Increment count if treatment name already exists
       count[str]++
 
       // Update count on existing object in result array
-      const existingFill = result.find((o) => o.treatment.name === str)
+      const existingFill = result.find((o) => o.treatment.id === str)
       if (existingFill) {
         existingFill.count = count[str]
       }
