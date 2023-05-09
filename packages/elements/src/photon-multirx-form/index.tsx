@@ -158,7 +158,7 @@ customElement(
         });
         // Build a map for easy lookup
         const templateMap: { [key: string]: PrescriptionTemplate } = {};
-        catalog.templates.forEach((template) => {
+        catalog.templates.forEach((template: PrescriptionTemplate) => {
           if (template) templateMap[template.id] = template;
         });
         for (let i = 0; i < ids.length; i++) {
