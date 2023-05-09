@@ -94,10 +94,19 @@ const renderRow = (order: any) => {
   const { id, pharmacy, patient } = order;
   const extId = order.externalId || <Text as="i">None</Text>;
 
-  const fills = order.fills.reduce((prev: string, cur: any) => {
-    const fill = cur.treatment.name;
-    return prev ? `${prev}, ${fill}` : fill;
-  }, '');
+  const fills = order.fills
+    .reduce((prev: any[], curr: any) => {
+      // Remove duplicates based on prescription id
+      const exists = prev.some((fill) => fill.prescription.id === curr.prescription.id);
+      if (!exists) {
+        prev.push(curr);
+      }
+      return prev;
+    }, [])
+    .reduce((prev: string, cur: any) => {
+      const fill = cur.treatment.name;
+      return prev ? `${prev}, ${fill}` : fill;
+    }, '');
 
   const pharmacyView = pharmacy?.name ? (
     <Popover>
@@ -146,6 +155,7 @@ const renderRow = (order: any) => {
     externalId: extId,
     createdAt: formatDate(order.createdAt),
     fills: <Text fontWeight="medium">{fills}</Text>,
+    fills: <Text fontWeight="medium">{fills} HI</Text>,
     status: order.fulfillment?.state ? (
       <Tooltip label={statusTip}>
         <Badge size="sm" colorScheme={statusColor}>
