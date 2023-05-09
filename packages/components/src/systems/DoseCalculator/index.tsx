@@ -48,14 +48,14 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
   const [dosesPerDay, setDosesPerDay] = createSignal<number>(1);
 
   const dose = createMemo(() => {
-    const factor = conversionFactors[dosageUnit()][weightUnit()];
+    const factor = conversionFactors.weight[weightUnit()];
     return factor * dosage() * weight();
   });
   const liquidDose = createMemo(() => {
     if (!liquidConcentration() || parseInt(liquidConcentration().toString(), 10) === 0) {
       return 0;
     }
-    const factor = conversionFactors[dosageUnit()][liquidUnit()];
+    const factor = conversionFactors.liquid[dosageUnit()][liquidUnit()];
     return (dose() * perVolume()) / (liquidConcentration() * factor);
   });
 
