@@ -95,11 +95,11 @@ const renderRow = (order: any) => {
   const extId = order.externalId || <Text as="i">None</Text>;
 
   const fills = order.fills
-    .reduce((prev: any[], curr: any) => {
+    .reduce((prev: any[], cur: any) => {
       // Remove duplicates based on prescription id
-      const exists = prev.some((fill) => fill.prescription.id === curr.prescription.id);
+      const exists = prev.some((fill) => fill.prescription.id === cur.prescription.id);
       if (!exists) {
-        prev.push(curr);
+        prev.push(cur);
       }
       return prev;
     }, [])
