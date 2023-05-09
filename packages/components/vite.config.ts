@@ -27,6 +27,9 @@ export default defineConfig({
     transformMode: {
       web: [/\.[jt]sx?$/]
     },
+    // vitest can't seem to find jest-dom, it looks
+    // locally but not at the root node_modules
+    setupFiles: ['../../node_modules/@testing-library/jest-dom/extend-expect.js'],
     // solid needs to be inline to work around
     // a resolution issue in vitest:
     deps: {

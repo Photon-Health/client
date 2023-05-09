@@ -1,9 +1,6 @@
 import { render } from '@solidjs/testing-library';
 import { describe, expect, it, vi } from 'vitest';
-// TODO
-// "Error: Cannot find module /client/packages/components/node_modules/@testing-library/jest-dom/extend-expect.js"
-// Vite isn't looking for this file in the right place, hard coding for now
-import '../../../../../node_modules/@testing-library/jest-dom';
+import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import DoseCalculator from '.';
 
