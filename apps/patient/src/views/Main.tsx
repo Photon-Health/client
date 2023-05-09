@@ -19,7 +19,6 @@ export const Main = () => {
   const token = searchParams.get('token')
 
   const [order, setOrder] = useState<Order | undefined>(undefined)
-
   const [error, setError] = useState<string | undefined>(undefined)
 
   const navigate = useNavigate()
@@ -36,6 +35,13 @@ export const Main = () => {
       const results: any = await graphQLClient.request(GET_ORDER, { id: orderId })
       if (results) {
         setOrder(results.order)
+
+        const isMissingPharmacy = !results.order?.pharmacy?.id
+        if (isMissingPharmacy) {
+          navigate(`/review?orderId=${results.order.id}&token=${token}`, {
+            replace: true
+          })
+        }
       }
     } catch (error) {
       console.error(JSON.stringify(error, undefined, 2))
@@ -49,7 +55,9 @@ export const Main = () => {
         )
         if (isMissingPharmacyError) {
           setOrder(error.response.data.order)
-          navigate(`/pharmacy?orderId=${orderId}&token=${token}`)
+          navigate(`/review?orderId=${error.response.data.order.id}&token=${token}`, {
+            replace: true
+          })
         } else {
           if (AUTH_HEADER_ERRORS.includes(error.response.errors[0].extensions.code)) {
             navigate('/no-match')

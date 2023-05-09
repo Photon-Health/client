@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Alert, AlertIcon, ModalCloseButton, useColorMode, VStack } from '@chakra-ui/react';
 
 import { types } from '@photonhealth/react';
+import { getSettings } from '@client/settings';
 
 import { confirmWrapper } from '../../../components/GuardDialog';
 import { PatientCard } from './PatientCard';
@@ -15,7 +16,7 @@ import { SelectPharmacyCard } from './SelectPharmacyCard';
 import { PatientAddressCard } from './PatientAddressCard';
 
 const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
-const { fulfillmentSettings } = require(`../../../../configs/fulfillment.${envName}.ts`);
+const settings = getSettings(envName);
 
 const EMPTY_FORM_VALUES = {
   patientId: '',
@@ -104,6 +105,8 @@ export const OrderForm = ({
   const [updatePreferredPharmacy, setUpdatePreferredPharmacy] = useState(false);
   const [updateAddress, setUpdateAddress] = useState(false);
 
+  const orgSettings = user.org_id in settings ? settings[user.org_id] : settings.default;
+
   const onCancel = async (dirty: Boolean) => {
     if (!dirty) onClose();
     else if (
@@ -118,13 +121,9 @@ export const OrderForm = ({
     }
   };
 
-  const settings =
-    typeof fulfillmentSettings[user.org_id] !== 'undefined'
-      ? fulfillmentSettings[user.org_id]
-      : fulfillmentSettings.default;
-
+  const sendToPatientUsers = orgSettings.sendToPatientUsers as string[];
   const sendToPatientEnabled =
-    settings.sendToPatient || settings.sendToPatientUsers.includes(auth0UserId);
+    orgSettings.sendToPatient || sendToPatientUsers.includes(auth0UserId);
 
   const pharmacyOptions: PharmacyOptions = [
     {
@@ -135,12 +134,12 @@ export const OrderForm = ({
     {
       name: 'Local Pickup',
       fulfillmentType: types.FulfillmentType.PickUp,
-      enabled: settings.pickUp
+      enabled: orgSettings.pickUp as boolean
     },
     {
       name: 'Mail Order',
       fulfillmentType: types.FulfillmentType.MailOrder,
-      enabled: settings.mailOrder
+      enabled: orgSettings.mailOrder as boolean
     }
   ];
 
@@ -240,7 +239,7 @@ export const OrderForm = ({
               }}
             />
 
-            <Alert status="error" hidden={settings.sendOrder} mb={5}>
+            <Alert status="error" hidden={orgSettings.sendOrder} mb={5}>
               <AlertIcon />
               You are not allowed to create orders via the Photon App.
             </Alert>
@@ -275,7 +274,6 @@ export const OrderForm = ({
                 touched={touched}
                 patient={patient}
                 setFieldValue={setFieldValue}
-                settings={settings}
                 tabsList={pharmacyOptions}
               />
 
