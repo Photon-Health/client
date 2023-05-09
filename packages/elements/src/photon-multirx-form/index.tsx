@@ -130,10 +130,10 @@ customElement(
     });
     createEffect(() => {
       setIsLoading(client?.authentication.state.isLoading || false);
-    }, [client?.authentication.state.isLoading]);
+    });
     createEffect(() => {
       setAuthenticated(client?.authentication.state.isAuthenticated || false);
-    }, [client?.authentication.state.isAuthenticated]);
+    });
 
     createEffect(async () => {
       if (props.templateIds && client) {
@@ -202,7 +202,7 @@ customElement(
         }
         setIsLoadingTemplates(false);
       }
-    }, [client]);
+    });
 
     const dispatchPrescriptionsCreated = (prescriptions: Prescription[]) => {
       const event = new CustomEvent('photon-prescriptions-created', {
