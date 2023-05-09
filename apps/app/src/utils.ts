@@ -49,19 +49,9 @@ function formatAddress(address: FormatAddressProps) {
 }
 
 function formatFills(fills: any) {
-  return fills
-    .reduce((prev: any[], cur: any) => {
-      // Remove duplicates based on prescription id
-      const exists = prev.some((fill) => fill.prescription.id === cur.prescription.id);
-      if (!exists) {
-        prev.push(cur);
-      }
-      return prev;
-    }, [])
-    .reduce((prev: string, cur: any) => {
-      const fill = cur.treatment.name;
-      return prev ? `${prev}, ${fill}` : fill;
-    }, '');
+  const treatmentNames = new Set();
+  fills.forEach((fill: any) => treatmentNames.add(fill.treatment.name));
+  return Array.from(treatmentNames).join(', ');
 }
 
 function capitalizeFirst(str: string) {
