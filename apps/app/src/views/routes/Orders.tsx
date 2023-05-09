@@ -155,7 +155,6 @@ const renderRow = (order: any) => {
     externalId: extId,
     createdAt: formatDate(order.createdAt),
     fills: <Text fontWeight="medium">{fills}</Text>,
-    fills: <Text fontWeight="medium">{fills} HI</Text>,
     status: order.fulfillment?.state ? (
       <Tooltip label={statusTip}>
         <Badge size="sm" colorScheme={statusColor}>
