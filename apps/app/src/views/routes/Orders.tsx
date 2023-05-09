@@ -26,7 +26,7 @@ import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
 import PatientView from '../components/PatientView';
 import PharmacyNameView from '../components/PharmacyNameView';
-import { formatDate } from '../../utils';
+import { formatDate, formatFills } from '../../utils';
 
 type OrderFulfillmentState =
   | 'SENT'
@@ -94,19 +94,7 @@ const renderRow = (order: any) => {
   const { id, pharmacy, patient } = order;
   const extId = order.externalId || <Text as="i">None</Text>;
 
-  const fills = order.fills
-    .reduce((prev: any[], cur: any) => {
-      // Remove duplicates based on prescription id
-      const exists = prev.some((fill) => fill.prescription.id === cur.prescription.id);
-      if (!exists) {
-        prev.push(cur);
-      }
-      return prev;
-    }, [])
-    .reduce((prev: string, cur: any) => {
-      const fill = cur.treatment.name;
-      return prev ? `${prev}, ${fill}` : fill;
-    }, '');
+  const fills = formatFills(order.fills);
 
   const pharmacyView = pharmacy?.name ? (
     <Popover>
