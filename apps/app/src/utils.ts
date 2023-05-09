@@ -49,10 +49,9 @@ function formatAddress(address: FormatAddressProps) {
 }
 
 function formatFills(fills: any) {
-  return fills.reduce((prev: string, cur: any) => {
-    const fill = cur.treatment.name;
-    return prev ? `${prev}, ${fill}` : fill;
-  }, '');
+  const treatmentNames = new Set();
+  fills.forEach((fill: any) => treatmentNames.add(fill.treatment.name));
+  return Array.from(treatmentNames).join(', ');
 }
 
 function capitalizeFirst(str: string) {
