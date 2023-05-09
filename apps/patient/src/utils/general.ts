@@ -112,3 +112,34 @@ export const getFullfillmentType = (
   // Fallback to pickup
   return 'pickup'
 }
+
+/**
+ * Flatten the returned fills array and count each unique
+ * fill by treatment name
+ */
+type FillWithCount = types.Fill & { count: number }
+export const countFillsAndRemoveDuplicates = (fills: types.Fill[]): FillWithCount[] => {
+  const count = {}
+  const result = []
+
+  for (let fill of fills) {
+    const str = fill.treatment.name
+
+    if (count[str]) {
+      // Increment count if treatment name already exists
+      count[str]++
+
+      // Update count on existing object in result array
+      const existingFill = result.find((o) => o.treatment.name === str)
+      if (existingFill) {
+        existingFill.count = count[str]
+      }
+    } else {
+      // Add new treatment name and count if it does not exist
+      count[str] = 1
+      const fillWithCount: FillWithCount = { ...fill, count: count[str] }
+      result.push(fillWithCount)
+    }
+  }
+  return result
+}
