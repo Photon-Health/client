@@ -6,10 +6,10 @@ import dts from 'vite-plugin-dts';
 
 export default defineConfig({
   plugins: [
-    solidPlugin(),
-    dts({
-      insertTypesEntry: true
-    })
+    solidPlugin()
+    // dts({
+    //   insertTypesEntry: true
+    // })
   ],
   build: {
     lib: {
