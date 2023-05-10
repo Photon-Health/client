@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { Icon as SolidIcon } from 'solid-heroicons';
-import * as icons from 'solid-heroicons/solid';
+import * as icons from 'solid-heroicons/outline';
 import { createMemo, mergeProps } from 'solid-js';
 
 export const allIconNames: IconName[] = Object.keys(icons) as IconName[];
