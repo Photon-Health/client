@@ -13,8 +13,10 @@
   div,
   li,
   a,
-  ul {
+  ul,
+  input {
     @apply font-sans;
+    @apply font-light;
     @apply text-gray-900;
     @apply leading-relaxed;
   }
@@ -25,12 +27,12 @@
   h5,
   h6,
   label {
-    @apply font-semibold;
+    @apply font-medium;
     @apply leading-tight;
   }
   h1 {
     @apply text-3xl;
-    @apply my-3;
+    @apply my-2;
   }
   h2 {
     @apply text-2xl;
@@ -38,7 +40,7 @@
   }
   h3 {
     @apply text-xl;
-    @apply my-2;
+    @apply my-1;
   }
   h4 {
     @apply text-lg;

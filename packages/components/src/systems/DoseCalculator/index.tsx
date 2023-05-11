@@ -3,6 +3,7 @@ import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
 import Input from '../../particles/Input';
 import InputGroup from '../../particles/InputGroup';
+import Icon from '../../particles/Icon';
 import UnitSelect from './components/UnitSelect';
 import conversionFactors from './utils/conversionFactors';
 
@@ -72,19 +73,30 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
 
   return (
     <Dialog open={props.open} onClose={props.onClose} size="lg">
-      <h2>Calculate Dose Quantity</h2>
+      <div class="flex items-center">
+        <Icon name="calculator" class="mr-2" />
+        <h2>Calculate Dose Quantity</h2>
+      </div>
       <p>Enter desired dosage and patient weight to calculate total and dose quantity.</p>
 
-      <div class="mt-4">
-        <h3>Selected Medication</h3>
-        <p>{props?.medicationName || 'None Selected'}</p>
+      <div class="my-8">
+        <div class="flex items-center">
+          <Icon name="pencilSquare" class="mr-2" />
+          <h3>Selected Medication</h3>
+        </div>
+        <p class={!props?.medicationName ? '@apply text-gray-400' : ''}>
+          {props?.medicationName || 'None Selected'}
+        </p>
       </div>
 
       <div class="mt-4">
-        <h3>Dosage Inputs</h3>
+        <div class="flex items-center">
+          <Icon name="beaker" class="mr-2" />
+          <h3>Dosage Inputs</h3>
+        </div>
         <InputGroup label="Dose">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 gap-4 sm:gap-2">
               <Input
                 type="number"
                 value={dosage()}
@@ -101,8 +113,8 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           </div>
         </InputGroup>
         <InputGroup label="Patient Weight">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 gap-4 sm:gap-2">
               <Input
                 type="number"
                 value={weight()}
@@ -113,9 +125,9 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           </div>
         </InputGroup>
       </div>
-      <div class="flex gap-4 mt-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
         <InputGroup label="Liquid Concentration">
-          <div class="flex gap-2">
+          <div class="flex gap-4 sm:gap-2">
             <Input
               type="number"
               value={liquidConcentration()}
@@ -129,7 +141,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           </div>
         </InputGroup>
         <InputGroup label="Per Volume">
-          <div class="flex gap-2">
+          <div class="flex gap-4 sm:gap-2">
             <Input
               type="number"
               value={perVolume()}
@@ -141,7 +153,10 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
       </div>
 
       <div class="mt-4">
-        <h3>Frequency</h3>
+        <div class="flex items-center">
+          <Icon name="clock" class="mr-2" />
+          <h3>Frequency</h3>
+        </div>
         <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Duration in Days">
             <Input
@@ -161,7 +176,10 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
       </div>
 
       <div class="mt-4">
-        <h3>Dosage</h3>
+        <div class="flex items-center">
+          <Icon name="chartPie" class="mr-2" />
+          <h3>Dosage</h3>
+        </div>
         <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Single Dose">
             <Input type="text" value={`${round(singleDose())} ${solidUnit()}`} readonly copy />
