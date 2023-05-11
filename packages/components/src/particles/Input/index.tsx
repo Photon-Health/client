@@ -19,19 +19,24 @@ export default function Input(props: InputProps) {
   const inputClass = createMemo(() => {
     const disabled = state.disabled || inputProps.disabled;
     const error = local.error || state.error;
+    const readonly = inputProps.readonly || inputProps.readOnly;
     return clsx(
       'block w-full rounded-md border-0 py-1.5 px-2 shadow-sm ring-1 ring-inset sm:text-sm sm:leading-6 focus:outline-none',
       {
         'pl-10': inputProps.type === 'email',
-        'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-2 focus:ring-inset focus:ring-red-500':
+        'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-inset focus:ring-red-500':
           !!error && !disabled,
-        'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600':
+        'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-inset focus:ring-blue-600':
           !error && !disabled,
-        'cursor-not-allowed bg-gray-50 text-gray-500 ring-gray-200': inputProps.disabled
+        'focus:ring-2': !readonly,
+        'cursor-not-allowed bg-gray-50 text-gray-500 ring-gray-200': inputProps.disabled,
+        'focus:ring-1 focus:ring-1  focus:outline-0 focus:ring-gray-300 bg-gray-50 text-gray-500 ring-gray-200':
+          readonly
       }
     );
   });
-
+  // block w-full rounded-md border-0 py-1.5 px-2 shadow-sm ring-1 ring-inset sm:text-sm sm:leading-6 focus:outline-none text-gray-900 ring-gray-300
+  // placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 focus:ring-1 focus:ring-1  focus:outline-0 focus:ring-gray-300 bg-gray-50 text-gray-500 ring-gray-200
   createEffect(() => {
     if (copied()) {
       setTimeout(() => {

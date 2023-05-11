@@ -93,7 +93,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               <UnitSelect setSelected={setDosageUnit} options={dosageUnits} initialIdx={1} />
             </div>
             <div class="flex gap-4 items-center">
-              <p>per</p>
+              <div>per</div>
               <div class="grow">
                 <UnitSelect setSelected={setDosageFrequency} options={dosageFrequencies} />
               </div>
@@ -164,22 +164,28 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
         <h3>Dosage</h3>
         <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Single Dose">
-            <Input type="text" value={`${round(singleDose())} ${solidUnit()}`} disabled />
+            <Input type="text" value={`${round(singleDose())} ${solidUnit()}`} readonly copy />
           </InputGroup>
           <InputGroup label="Total Quantity">
-            <Input type="text" value={`${round(totalQuantity())} ${solidUnit()}`} disabled />
+            <Input type="text" value={`${round(totalQuantity())} ${solidUnit()}`} readonly copy />
           </InputGroup>
         </div>
         <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700 w-full" />
         <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Single Liquid Dose">
-            <Input type="text" value={`${round(singleLiquidDose())} ${perVolumeUnit()}`} disabled />
+            <Input
+              type="text"
+              value={`${round(singleLiquidDose())} ${perVolumeUnit()}`}
+              readonly
+              copy
+            />
           </InputGroup>
           <InputGroup label="Total Liquid Quantity">
             <Input
               type="text"
               value={`${round(totalLiquidQuantity())} ${perVolumeUnit()}`}
-              disabled
+              readonly
+              copy
             />
           </InputGroup>
         </div>

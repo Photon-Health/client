@@ -21,9 +21,9 @@ const App = () => {
   });
 
   return (
-    <>
-      <div class="p-5 w-full sm:max-w-lg">
-        <h1 class="text-2xl">Photon Component Systems</h1>
+    <div class="sm:max-w-lg p-4">
+      <div>
+        <h1>Photon Component Systems</h1>
       </div>
       <Client
         id="7N9QZujlNJHL8EIPqXpu1wq8OuXqoxKb"
@@ -32,9 +32,9 @@ const App = () => {
         audience="https://api.boson.health"
         uri="https://api.boson.health/graphql"
       >
-        <div class="p-5 w-full sm:max-w-lg">
-          <div class="p-5 border border-gray-300 rounded-md">
-            <h1 class="text-lg pb-4">ComboBox</h1>
+        <div class="mb-10">
+          <div>
+            <h2>ComboBox</h2>
             <ComboBox>
               <ComboBox.Input
                 onInput={(e) => setQuery(e.currentTarget.value)}
@@ -53,16 +53,16 @@ const App = () => {
           </div>
         </div>
 
-        <div class="p-5 w-full sm:max-w-lg">
-          <div class="p-5 border border-gray-300 rounded-md">
-            <h1 class="text-lg pb-4">Pharmacy Search</h1>
+        <div class="mb-10">
+          <div>
+            <h2>Pharmacy Search</h2>
             <PharmacySearch setPharmacy={setPharmacy} />
           </div>
         </div>
 
-        <div class="p-5 w-full sm:max-w-lg">
-          <div class="p-5 border border-gray-300 rounded-md">
-            <h1 class="text-lg pb-4">Dose Calculator</h1>
+        <div class="mb-10">
+          <div>
+            <h2>Dose Calculator</h2>
             <Button onClick={() => setDoseOpen(true)}>
               <Icon name="calculator" size="sm" />
             </Button>
@@ -77,7 +77,7 @@ const App = () => {
           </div>
         </div>
       </Client>
-    </>
+    </div>
   );
 };
 
