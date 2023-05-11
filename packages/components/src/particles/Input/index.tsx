@@ -10,6 +10,17 @@ export interface InputProps extends JSX.InputHTMLAttributes<HTMLInputElement> {
   copy?: boolean;
 }
 
+function valueToString(value: string | number | string[] | undefined): string {
+  if (typeof value === 'string') {
+    return value;
+  } else if (typeof value === 'number') {
+    return value.toString();
+  } else if (Array.isArray(value)) {
+    return value.join(', ');
+  }
+  return '';
+}
+
 export default function Input(props: InputProps) {
   const [local, inputProps] = splitProps(props, ['error', 'copy']);
   const [copied, setCopied] = createSignal(false);
@@ -63,7 +74,7 @@ export default function Input(props: InputProps) {
           <div class="absolute inset-y-0 right-0 flex items-center pr-3">
             <button
               onClick={() => {
-                navigator.clipboard.writeText(inputProps?.value);
+                navigator.clipboard.writeText(valueToString(inputProps?.value));
                 setCopied(true);
               }}
             >

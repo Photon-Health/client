@@ -4,6 +4,8 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import DoseCalculator from '.';
 
+const user = userEvent.setup();
+
 describe('DoseCalculator', () => {
   it('should render the app', () => {
     const { getByText } = render(() => (
@@ -29,16 +31,16 @@ describe('DoseCalculator', () => {
     expect(getByText(medicationName)).toBeInTheDocument();
 
     // Set input values
-    await userEvent.type(getByLabelText('Dose'), '90');
-    await userEvent.type(getByLabelText('Patient Weight'), '20');
-    await userEvent.type(getByLabelText('Liquid Concentration'), '200');
-    await userEvent.type(getByLabelText('Per Volume'), '5');
-    await userEvent.clear(getByLabelText('Duration in Days'));
-    await userEvent.type(getByLabelText('Duration in Days'), '10');
-    await userEvent.clear(getByLabelText('Doses per Day'));
-    await userEvent.type(getByLabelText('Doses per Day'), '2');
+    await user.type(getByLabelText('Dose'), '90');
+    await user.type(getByLabelText('Patient Weight'), '20');
+    await user.type(getByLabelText('Liquid Concentration'), '200');
+    await user.type(getByLabelText('Per Volume'), '5');
+    await user.clear(getByLabelText('Duration in Days'));
+    await user.type(getByLabelText('Duration in Days'), '10');
+    await user.clear(getByLabelText('Doses per Day'));
+    await user.type(getByLabelText('Doses per Day'), '2');
 
-    await userEvent.click(getByText('Autofill'));
+    await user.click(getByText('Autofill'));
 
     expect(setAutocompleteValuesMock).toHaveBeenCalledTimes(1);
     expect(setAutocompleteValuesMock).toHaveBeenCalledWith({
@@ -51,7 +53,7 @@ describe('DoseCalculator', () => {
   it('should calculate "cefdinir 250 mg / 5 ml common dose is 300 mg, 2x per day for 10 days" correctly', async () => {
     const setAutocompleteValuesMock = vi.fn();
 
-    const { getByText, getByLabelText, container } = render(() => (
+    const { getByText, getByLabelText, getByDisplayValue, getAllByRole, container } = render(() => (
       <DoseCalculator
         open={true}
         onClose={() => {}}
@@ -60,21 +62,28 @@ describe('DoseCalculator', () => {
     ));
 
     // Set input values
-    await userEvent.type(getByLabelText('Dose'), '90');
-    await userEvent.type(getByLabelText('Patient Weight'), '20');
-    await userEvent.type(getByLabelText('Liquid Concentration'), '200');
-    await userEvent.type(getByLabelText('Per Volume'), '5');
-    await userEvent.clear(getByLabelText('Duration in Days'));
-    await userEvent.type(getByLabelText('Duration in Days'), '10');
-    await userEvent.clear(getByLabelText('Doses per Day'));
-    await userEvent.type(getByLabelText('Doses per Day'), '2');
+    await user.type(getByLabelText('Dose'), '7');
 
-    await userEvent.click(getByText('Autofill'));
+    // select dose from the dropdown
+    const dayOrDoseComboInput = getByDisplayValue('day');
+    await user.click(dayOrDoseComboInput);
+    const option = getAllByRole('option').find((option) => option.textContent === 'dose');
+    await user.click(option as HTMLElement);
+
+    await user.type(getByLabelText('Patient Weight'), '20');
+    await user.type(getByLabelText('Liquid Concentration'), '250');
+    await user.type(getByLabelText('Per Volume'), '5');
+    await user.clear(getByLabelText('Duration in Days'));
+    await user.type(getByLabelText('Duration in Days'), '10');
+    await user.clear(getByLabelText('Doses per Day'));
+    await user.type(getByLabelText('Doses per Day'), '2');
+
+    await user.click(getByText('Autofill'));
 
     expect(setAutocompleteValuesMock).toHaveBeenCalledTimes(1);
     expect(setAutocompleteValuesMock).toHaveBeenCalledWith({
-      liquidDose: 0,
-      totalLiquid: 0,
+      liquidDose: 1.3,
+      totalLiquid: 25.4,
       unit: 'mL'
     });
   });
@@ -82,7 +91,7 @@ describe('DoseCalculator', () => {
   it('should calculate "dexamethasone 1 MG in 1mL concentrate for Oral suspension" correctly', async () => {
     const setAutocompleteValuesMock = vi.fn();
 
-    const { getByText, getByLabelText, container } = render(() => (
+    const { getByText, getByLabelText, getAllByRole, getByDisplayValue } = render(() => (
       <DoseCalculator
         open={true}
         onClose={() => {}}
@@ -91,21 +100,29 @@ describe('DoseCalculator', () => {
     ));
 
     // Set input values
-    await userEvent.type(getByLabelText('Dose'), '90');
-    await userEvent.type(getByLabelText('Patient Weight'), '20');
-    await userEvent.type(getByLabelText('Liquid Concentration'), '200');
-    await userEvent.type(getByLabelText('Per Volume'), '5');
-    await userEvent.clear(getByLabelText('Duration in Days'));
-    await userEvent.type(getByLabelText('Duration in Days'), '10');
-    await userEvent.clear(getByLabelText('Doses per Day'));
-    await userEvent.type(getByLabelText('Doses per Day'), '2');
+    await user.type(getByLabelText('Dose'), '0.6');
 
-    await userEvent.click(getByText('Autofill'));
+    // select dose from the dropdown
+    const dayOrDoseComboInput = getByDisplayValue('day');
+    await user.click(dayOrDoseComboInput);
+    const option = getAllByRole('option').find((option) => option.textContent === 'dose');
+    await user.click(option as HTMLElement);
 
+    await user.type(getByLabelText('Patient Weight'), '20');
+    await user.type(getByLabelText('Liquid Concentration'), '1');
+    await user.type(getByLabelText('Per Volume'), '1');
+    await user.clear(getByLabelText('Duration in Days'));
+    await user.type(getByLabelText('Duration in Days'), '1');
+    await user.clear(getByLabelText('Doses per Day'));
+    await user.type(getByLabelText('Doses per Day'), '1');
+
+    await user.click(getByText('Autofill'));
+    expect((getByLabelText('Single Dose') as HTMLInputElement).value).toEqual('5.4 mg');
+    expect((getByLabelText('Total Quantity') as HTMLInputElement).value).toEqual('5.4 mg');
     expect(setAutocompleteValuesMock).toHaveBeenCalledTimes(1);
     expect(setAutocompleteValuesMock).toHaveBeenCalledWith({
-      liquidDose: 0,
-      totalLiquid: 0,
+      liquidDose: 5.4,
+      totalLiquid: 5.4,
       unit: 'mL'
     });
   });

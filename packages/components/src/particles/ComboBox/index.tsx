@@ -164,8 +164,10 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
           value={selectedLocalValue()}
           onClick={() => setOpen(!state.open)}
           onInput={(e) => {
-            // @ts-ignore
-            local?.onInput(e);
+            if (local?.onInput) {
+              // @ts-ignore
+              local?.onInput(e);
+            }
             setLocalSelectedValue(e.currentTarget.value);
             setOpen(true);
           }}
