@@ -69,9 +69,7 @@ export const neutron: {
   org_XiV8H4uCFu6QFUov: {
     ...defaultSettings,
     logo: 'modern_pediatrics_logo.png',
-    accentColor: '#3f7a9c',
-    courier: true,
-    courierProviders: [ALTO_ID]
+    accentColor: '#3f7a9c'
   },
   // Summer Health
   org_jr5fT3Mh4zCFsVQA: {
