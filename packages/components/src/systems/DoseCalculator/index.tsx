@@ -89,7 +89,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
         </p>
       </div>
 
-      <div class="mt-4">
+      <section class="mt-8">
         <div class="flex items-center">
           <Icon name="beaker" class="mr-2" />
           <h3>Dosage Inputs</h3>
@@ -124,35 +124,35 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
             </div>
           </div>
         </InputGroup>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-        <InputGroup label="Liquid Concentration">
-          <div class="flex gap-4 sm:gap-2">
-            <Input
-              type="number"
-              value={liquidConcentration()}
-              onInput={(e) => setLiquidConcentration(e.currentTarget.valueAsNumber)}
-            />
-            <UnitSelect
-              setSelected={setLiquidUnit}
-              options={liquidConcentrationUnits}
-              initialIdx={1}
-            />
-          </div>
-        </InputGroup>
-        <InputGroup label="Per Volume">
-          <div class="flex gap-4 sm:gap-2">
-            <Input
-              type="number"
-              value={perVolume()}
-              onInput={(e) => setPerVolume(e.currentTarget.valueAsNumber)}
-            />
-            <UnitSelect setSelected={setPerVolumeUnit} options={liquidVolumes} />
-          </div>
-        </InputGroup>
-      </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 sm:gap-4">
+          <InputGroup label="Liquid Concentration">
+            <div class="flex gap-4 sm:gap-2">
+              <Input
+                type="number"
+                value={liquidConcentration()}
+                onInput={(e) => setLiquidConcentration(e.currentTarget.valueAsNumber)}
+              />
+              <UnitSelect
+                setSelected={setLiquidUnit}
+                options={liquidConcentrationUnits}
+                initialIdx={1}
+              />
+            </div>
+          </InputGroup>
+          <InputGroup label="Per Volume">
+            <div class="flex gap-4 sm:gap-2">
+              <Input
+                type="number"
+                value={perVolume()}
+                onInput={(e) => setPerVolume(e.currentTarget.valueAsNumber)}
+              />
+              <UnitSelect setSelected={setPerVolumeUnit} options={liquidVolumes} />
+            </div>
+          </InputGroup>
+        </div>
+      </section>
 
-      <div class="mt-4">
+      <section class="mt-8">
         <div class="flex items-center">
           <Icon name="clock" class="mr-2" />
           <h3>Frequency</h3>
@@ -173,9 +173,9 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
             />
           </InputGroup>
         </div>
-      </div>
+      </section>
 
-      <div class="mt-4">
+      <section class="mt-8">
         <div class="flex items-center">
           <Icon name="chartPie" class="mr-2" />
           <h3>Dosage</h3>
@@ -188,7 +188,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
             <Input type="text" value={`${round(totalQuantity())} ${solidUnit()}`} readonly copy />
           </InputGroup>
         </div>
-        <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700 w-full" />
+        <hr class="h-px mb-4 bg-gray-200 border-0 dark:bg-gray-700 w-full" />
         <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Single Liquid Dose">
             <Input
@@ -207,9 +207,9 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
             />
           </InputGroup>
         </div>
-      </div>
+      </section>
 
-      <div class="flex gap-4 justify-end">
+      <div class="mt-8 flex gap-4 justify-end">
         <Button variant="secondary" onClick={props.onClose}>
           Cancel
         </Button>
