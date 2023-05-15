@@ -16,8 +16,6 @@
       audience="https://api.boson.health"
       uri="https://api.boson.health/graphql"
     >
-      <photon-audit></photon-audit>
-      <photon-pharmacy-search></photon-pharmacy-search>
       <!-- <photon-dialog
         id="photon-modal"
         label="Send Prescription"
@@ -37,11 +35,11 @@
       <!-- <photon-multirx-form-wrapper hide-templates="false" /> -->
 
       <!-- To test the prescribe component only run this - idk who uses this but template creation doesnt work here so the add to templates option is hidden by default -->
-      <!-- <photon-prescribe-workflow
+      <div>
+        <photon-prescribe-workflow
           patient-id="pat_01G8VFW0X44YCW8KW7FW3FC0ZT"
-          template-ids="tmp_01GHEYTMGWZZV3TDMYWR2ZW0ZB,tmp_01GHEYV0YCZVJW34253HKMY042"
-        ></photon-prescribe-workflow> -->
-      <pharmacy-search></pharmacy-search>
+        ></photon-prescribe-workflow>
+      </div>
       <!-- <photon-patient-dialog
         open="true"
         patient-id="pat_01G8VFW0X44YCW8KW7FW3FC0ZT"

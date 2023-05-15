@@ -73,7 +73,7 @@ type PrescriptionState =
   | 'EXPIRED'
   | 'CANCELED'
   | 'ERROR';
-type PrescriptionStateRecord = Record<PrescriptionState, string>;
+export type PrescriptionStateRecord = Record<PrescriptionState, string>;
 
 export const PRESCRIPTION_STATE_MAP: PrescriptionStateRecord = {
   READY: 'Active',
@@ -98,9 +98,9 @@ export const PRESCRIPTION_COLOR_MAP: PrescriptionStateRecord = {
 export const PRESCRIPTION_TIP_MAP: PrescriptionStateRecord = {
   READY: 'Prescription has active fills',
   PROCESSING: 'Prescription has active fills',
-  ACTIVE: 'Prescription has active fills',
-  DEPLETED: 'All fills depleted',
-  EXPIRED: 'Prescription has expired',
+  ACTIVE: 'Prescription has unused fills',
+  DEPLETED: 'All fills have been sent to a pharmacy',
+  EXPIRED: 'All fills have passed prescription expiration date',
   CANCELED: 'Prescription has been cancelled',
   ERROR: 'There’s an error with prescription'
 };
