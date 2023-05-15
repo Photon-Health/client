@@ -17,6 +17,7 @@ import {
   Td,
   Tr,
   Text,
+  Tooltip,
   VStack,
   Skeleton,
   SkeletonCircle,
@@ -32,7 +33,12 @@ import { gql, GraphQLClient } from 'graphql-request';
 
 import { formatDate } from '../../utils';
 
-import { PRESCRIPTION_COLOR_MAP, PRESCRIPTION_STATE_MAP } from './Prescriptions';
+import {
+  PRESCRIPTION_COLOR_MAP,
+  PRESCRIPTION_STATE_MAP,
+  PRESCRIPTION_TIP_MAP,
+  PrescriptionStateRecord
+} from './Prescriptions';
 
 import { Page } from '../components/Page';
 import { confirmWrapper } from '../components/GuardDialog';
@@ -91,8 +97,9 @@ export const Prescription = () => {
     instructions
   } = rx;
 
-  const state = PRESCRIPTION_STATE_MAP[rx.state as keyof object] || '';
-  const stateColor = PRESCRIPTION_COLOR_MAP[rx.state as keyof object] || '';
+  const state = PRESCRIPTION_STATE_MAP[rx.state as keyof PrescriptionStateRecord] || '';
+  const stateColor = PRESCRIPTION_COLOR_MAP[rx.state as keyof PrescriptionStateRecord] || '';
+  const stateTip = PRESCRIPTION_TIP_MAP[rx.state as keyof PrescriptionStateRecord] || '';
 
   const writtenAt = formatDate(rx.writtenAt);
   const effectiveDate = formatDate(rx.effectiveDate);
@@ -244,7 +251,9 @@ export const Prescription = () => {
                       ms={isMobile ? 'auto' : undefined}
                     />
                   ) : (
-                    <Badge colorScheme={stateColor}>{state}</Badge>
+                    <Tooltip label={stateTip}>
+                      <Badge colorScheme={stateColor}>{state}</Badge>
+                    </Tooltip>
                   )}
                 </Td>
               </Tr>

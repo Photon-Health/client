@@ -73,7 +73,7 @@ type PrescriptionState =
   | 'EXPIRED'
   | 'CANCELED'
   | 'ERROR';
-type PrescriptionStateRecord = Record<PrescriptionState, string>;
+export type PrescriptionStateRecord = Record<PrescriptionState, string>;
 
 export const PRESCRIPTION_STATE_MAP: PrescriptionStateRecord = {
   READY: 'Active',
