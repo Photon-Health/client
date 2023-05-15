@@ -135,7 +135,7 @@ export const AddPrescriptionCard = (props: {
           ></photon-datepicker>
         </div>
         <div class="mt-2 sm:mt-0 sm:grid sm:grid-cols-2 sm:gap-4">
-          <div class="flex items-end gap-1">
+          <div>
             <photon-number-input
               class="flex-grow flex-1 w-2/5 sm:w-auto"
               label="Quantity"
