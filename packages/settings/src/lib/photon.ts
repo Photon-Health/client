@@ -1,8 +1,8 @@
 import { OrganizationSettings } from '../types';
 
-const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
+// const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
 const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
-const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
+// const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
 
 /**
  * All orgs inherit from default settings, so updates
@@ -46,7 +46,7 @@ export const photon: {
     logo: 'modern_pediatrics_logo.png',
     accentColor: '#3f7a9c',
     courier: true,
-    courierProviders: [ALTO_ID]
+    courierProviders: []
   },
   // Summer Health
   org_66nHWvQRtHbjZt4A: {
