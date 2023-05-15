@@ -8,15 +8,12 @@ export interface SpinnerProps {
 export default function Spinner(props: SpinnerProps) {
   const mergedProps = mergeProps({ size: 'lg' }, props);
 
-  const spinnerClasses = clsx(
-    'mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-indigo-600',
-    {
-      'w-4 h-4': mergedProps.size === 'sm',
-      'w-6 h-6': mergedProps.size === 'md',
-      'w-8 h-8': mergedProps.size === 'lg',
-      'w-12 h-12': mergedProps.size === 'xl'
-    }
-  );
+  const spinnerClasses = clsx('mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600', {
+    'w-4 h-4': mergedProps.size === 'sm',
+    'w-6 h-6': mergedProps.size === 'md',
+    'w-8 h-8': mergedProps.size === 'lg',
+    'w-12 h-12': mergedProps.size === 'xl'
+  });
 
   return (
     <div role="status">
