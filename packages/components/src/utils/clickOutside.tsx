@@ -4,7 +4,7 @@ type ClickOutsideAccessor = () => void;
 
 export default function clickOutside(el: HTMLElement, accessor: ClickOutsideAccessor): void {
   const onClick = (e: MouseEvent) => {
-    if (!el.contains(e.target as Node)) {
+    if (!el?.contains(e.target as Node)) {
       accessor();
     }
   };

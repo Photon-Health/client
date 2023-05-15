@@ -11,6 +11,20 @@
         "cwd": "packages/components",
         "command": "vite build && npx tailwindcss -i ./src/index.css -o ./dist/style.css"
       }
+    },
+    "test-watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/components",
+        "command": "vitest"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/components",
+        "command": "vitest run"
+      }
     }
   }
 }
