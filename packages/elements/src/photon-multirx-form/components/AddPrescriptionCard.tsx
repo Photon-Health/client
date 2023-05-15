@@ -150,6 +150,7 @@ export const AddPrescriptionCard = (props: {
                   value: Number(e.detail.input)
                 });
               }}
+              style="width:100px"
             ></photon-number-input>
             <photon-dosage-calculator-dialog
               ref={dosageCalculatorRef}
