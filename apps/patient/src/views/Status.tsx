@@ -43,7 +43,10 @@ export const Status = () => {
   const token = searchParams.get('token')
   const type = searchParams.get('type')
 
-  const [showFooter, setShowFooter] = useState<boolean>(order?.state === types.OrderState.Placed)
+  const [showFooter, setShowFooter] = useState<boolean>(
+    order?.state === types.OrderState.Placed &&
+      order?.fulfillment?.type !== types.FulfillmentType.MailOrder
+  )
 
   const [error, setError] = useState(undefined)
   const [submitting, setSubmitting] = useState<boolean>(false)
