@@ -44,9 +44,7 @@ export const photon: {
   org_2utnNgp5NGCy9wOb: {
     ...defaultSettings,
     logo: 'modern_pediatrics_logo.png',
-    accentColor: '#3f7a9c',
-    courier: true,
-    courierProviders: []
+    accentColor: '#3f7a9c'
   },
   // Summer Health
   org_66nHWvQRtHbjZt4A: {
