@@ -135,7 +135,7 @@ export const AddPrescriptionCard = (props: {
           ></photon-datepicker>
         </div>
         <div class="mt-2 sm:mt-0 sm:grid sm:grid-cols-2 sm:gap-4">
-          <div>
+          <div class="flex items-end gap-1">
             <photon-number-input
               class="flex-grow flex-1 w-2/5 sm:w-auto"
               label="Quantity"
@@ -150,6 +150,7 @@ export const AddPrescriptionCard = (props: {
                   value: Number(e.detail.input)
                 });
               }}
+              style="width:100px"
             ></photon-number-input>
             <photon-dosage-calculator-dialog
               ref={dosageCalculatorRef}
