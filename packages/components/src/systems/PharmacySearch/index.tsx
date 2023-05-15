@@ -11,7 +11,7 @@ export interface PharmacyProps {
   address?: string;
   patientId?: string;
   geocodingApiKey?: string;
-  setPharmacy?: (pharmacy: any) => void;
+  setPharmacy: (pharmacy: any) => void;
 }
 
 export default function PharmacySearch(props: PharmacyProps) {
@@ -33,12 +33,27 @@ export default function PharmacySearch(props: PharmacyProps) {
         });
   });
 
+  const handleResetAddress = () => {
+    if (props?.setPharmacy) {
+      props.setPharmacy(undefined);
+    }
+    actions.clearPharmacies();
+  };
+
   createEffect(() => {
     if (selected()?.id) {
       setQuery('');
       props?.setPharmacy?.(selected());
     }
   });
+
+  const formattedAddress = (pharmacy: {
+    id: string;
+    address: { street1: string; city: string; state: string };
+  }) =>
+    `${capitalizeFirstLetter(pharmacy.address?.street1 || '')}, ${capitalizeFirstLetter(
+      pharmacy.address?.city || ''
+    )}, ${pharmacy.address?.state}`;
 
   return (
     <div>
@@ -53,35 +68,25 @@ export default function PharmacySearch(props: PharmacyProps) {
           helpText={
             <Button
               variant="naked"
-              onClick={() => {
-                if (props?.setPharmacy) {
-                  props.setPharmacy(undefined);
-                }
-                actions.clearPharmacies();
-              }}
+              onClick={handleResetAddress}
               iconLeft={<Icon name="mapPin" size="sm" />}
             >
               {store?.pharmacies?.address || '...'}{' '}
             </Button>
           }
         >
-          <ComboBox setSelected={setSelected}>
-            <ComboBox.Input onInput={(e) => setQuery((e.target as HTMLInputElement).value)} />
+          <ComboBox value={store.pharmacies.data?.[0] || undefined} setSelected={setSelected}>
+            <ComboBox.Input
+              onInput={(e) => setQuery(e.currentTarget.value)}
+              displayValue={(pharmacy) => `${pharmacy.name}, ${formattedAddress(pharmacy)}`}
+            />
             <ComboBox.Options>
               <For each={filteredPharmacies()}>
                 {(pharmacy) => {
-                  const formattedAddress = `${capitalizeFirstLetter(
-                    pharmacy.address?.street1 || ''
-                  )}, ${capitalizeFirstLetter(pharmacy.address?.city || '')}, ${
-                    pharmacy.address?.state
-                  }`;
                   return (
-                    <ComboBox.Option
-                      key={pharmacy.id}
-                      value={`${pharmacy.name}, ${formattedAddress}`}
-                    >
+                    <ComboBox.Option key={pharmacy.id} value={pharmacy}>
                       <div>{pharmacy.name}</div>
-                      <div class="text-xs">{formattedAddress}</div>
+                      <div class="text-xs">{formattedAddress(pharmacy)}</div>
                     </ComboBox.Option>
                   );
                 }}
@@ -89,7 +94,6 @@ export default function PharmacySearch(props: PharmacyProps) {
             </ComboBox.Options>
           </ComboBox>
         </InputGroup>
-        <div></div>
       </Show>
     </div>
   );

@@ -23,7 +23,7 @@ const PhotonFormWrapper = ({
   checkShouldWarn = () => false
 }: PhotonFormWrapperProps) => {
   let ref: any;
-  const [closeDialogOpen, setCloseDialogOpen] = createSignal<boolean>(false);
+  const [closeDialogOpen, onCloseDialogOpen] = createSignal<boolean>(false);
 
   return (
     <div ref={ref} class="fixed top-0 left-0 w-full h-screen z-10 overflow-y-scroll">
@@ -36,11 +36,11 @@ const PhotonFormWrapper = ({
         confirm-text="Yes, Close"
         cancel-text="Keep Editing"
         on:photon-dialog-confirmed={() => {
-          setCloseDialogOpen(false);
+          onCloseDialogOpen(false);
           onClosed();
         }}
         on:photon-dialog-canceled={() => {
-          setCloseDialogOpen(false);
+          onCloseDialogOpen(false);
         }}
       >
         <p class="font-sans text-lg xs:text-base">{closeBody}</p>
@@ -55,7 +55,7 @@ const PhotonFormWrapper = ({
             circle
             on:click={() => {
               if (checkShouldWarn()) {
-                setCloseDialogOpen(true);
+                onCloseDialogOpen(true);
               } else {
                 onClosed();
               }
