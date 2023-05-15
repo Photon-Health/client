@@ -105,6 +105,8 @@ export const neutron: {
     federated: true,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [CUREXA_ID],
     sendToPatient: false
   },
   // MisterRx
