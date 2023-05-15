@@ -6,7 +6,7 @@ import { FulfillmentType } from '../../utils/models'
 export const STATES = {
   pickup: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'],
   courier: ['SENT', 'FILLING', 'IN_TRANSIT', 'DELIVERED'],
-  mailOrder: ['SENT', 'FILLING', 'SHIPPED', 'DELIVERED']
+  mailOrder: ['SENT', 'PROCESSING', 'SHIPPED', 'DELIVERED']
 }
 
 interface Props {
@@ -16,11 +16,11 @@ interface Props {
 }
 
 export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props) => {
-  // We don't have courier states, so get index from pickup and fake it
-  const key = fulfillmentType === 'courier' ? 'pickup' : fulfillmentType
-  const initialStepIdx = STATES[key].findIndex((state) => state === status)
-  const states = STATES[fulfillmentType] // map index to faux states
-  const activeStep = initialStepIdx + 1 // step to do next
+  // Get step index from pickup since those are the only states we actually have
+  const initialStepIdx = STATES.pickup.findIndex((state) => state === status)
+  // Map index to faux states
+  const states = STATES[fulfillmentType]
+  const currentStep = initialStepIdx + 1
 
   return (
     <Box>
@@ -40,8 +40,8 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
                   cursor="pointer"
                   title={title}
                   description={description}
-                  isActive={activeStep === id}
-                  isCompleted={activeStep > id}
+                  isActive={currentStep === id}
+                  isCompleted={currentStep > id}
                   isLastStep={states.length === id + 1}
                 />
               )

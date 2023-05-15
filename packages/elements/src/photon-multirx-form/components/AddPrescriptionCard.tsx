@@ -2,6 +2,8 @@ import { afterDate, message } from '../../validators';
 import { record, string, any, number, min, size } from 'superstruct';
 import { format } from 'date-fns';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
+import { DoseCalculator } from '@photonhealth/components';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/icon/icon';
@@ -10,7 +12,7 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 import { createSignal, Show } from 'solid-js';
 import repopulateForm from '../util/repopulateForm';
 
-setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.82/dist/');
+setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 const validators = {
   treatment: message(record(string(), any()), 'Please select a treatment...'),
@@ -30,9 +32,9 @@ export const AddPrescriptionCard = (props: {
   store: Record<string, any>;
 }) => {
   let medSearchRef: any;
-  let dosageCalculatorRef: any;
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit, setDispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
+  const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
 
   let ref: any;
 
@@ -43,26 +45,9 @@ export const AddPrescriptionCard = (props: {
     });
   }
 
-  const dispatchDosageCalculatorClicked = () => {
-    const event = new CustomEvent('photon-dosage-calculator-clicked', {
-      composed: true,
-      bubbles: true,
-      detail: {}
-    });
-    ref?.dispatchEvent(event);
-  };
-
-  const dispatchAdvSearchClicked = () => {
-    const event = new CustomEvent('photon-advanced-search-clicked', {
-      composed: true,
-      bubbles: true,
-      detail: {}
-    });
-    ref?.dispatchEvent(event);
-  };
-
   return (
     <photon-card ref={ref} title={'Add Prescription'}>
+      <style>{photonStyles}</style>
       <div
         class="flex flex-col sm:gap-3"
         on:photon-medication-selected={(e: any) => {
@@ -152,35 +137,34 @@ export const AddPrescriptionCard = (props: {
               }}
               style="width:100px"
             ></photon-number-input>
-            <photon-dosage-calculator-dialog
-              ref={dosageCalculatorRef}
-              medication={props.store['treatment']?.value ?? undefined}
-              on:photon-dose-selected={(e: any) => {
+            <DoseCalculator
+              open={openDoseCalculator()}
+              onClose={() => setOpenDoseCalculator(false)}
+              medicationName={props.store['treatment']?.value?.name}
+              setAutocompleteValues={({ liquidDose, totalLiquid, unit }) => {
                 props.actions.updateFormValue({
                   key: 'dispenseQuantity',
-                  value: Number(e.detail.value)
+                  value: Number(totalLiquid)
                 });
-                if (e.detail.unit === 'mL') {
+                props.actions.updateFormValue({
+                  key: 'instructions',
+                  value: `${liquidDose} ${unit} ${props.store['instructions']?.value}`
+                });
+                if (unit === 'mL') {
                   props.actions.updateFormValue({
                     key: 'dispenseUnit',
                     value: 'Milliliter'
                   });
                 }
               }}
-            ></photon-dosage-calculator-dialog>
+            ></DoseCalculator>
             <div>
               <photon-button
                 variant="outline"
                 class="w-fit"
-                on:photon-clicked={() => {
-                  dosageCalculatorRef.open = true;
-                }}
+                on:photon-clicked={() => setOpenDoseCalculator(true)}
               >
-                <button
-                  onClick={() => {
-                    dosageCalculatorRef.open = true;
-                  }}
-                >
+                <button onClick={() => setOpenDoseCalculator(true)}>
                   <sl-icon name="calculator"></sl-icon>
                 </button>
               </photon-button>

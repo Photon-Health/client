@@ -1,16 +1,6 @@
 import { JSX, Show, createUniqueId, createContext, useContext, createEffect } from 'solid-js';
 import { createStore } from 'solid-js/store';
 
-export interface InputGroupProps {
-  label: string;
-  error?: string;
-  contextText?: string;
-  helpText?: string | JSX.Element;
-  children?: JSX.Element;
-  loading?: boolean;
-  disabled?: boolean;
-}
-
 interface InputGroupState {
   id: string;
   error: string;
@@ -65,6 +55,16 @@ export function InputGroupProvider(props: CounterProviderProps) {
 
 export function useInputGroup() {
   return useContext(InputGroupContext);
+}
+
+export interface InputGroupProps {
+  label: string;
+  error?: string;
+  contextText?: string;
+  helpText?: string | JSX.Element;
+  children?: JSX.Element;
+  loading?: boolean;
+  disabled?: boolean;
 }
 
 function InputGroupWrapper(props: InputGroupProps) {
