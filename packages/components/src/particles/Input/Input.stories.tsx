@@ -21,6 +21,8 @@ export const InputOptions: InputStory = {
         <Input type="text" placeholder="text" />
         <Input type="email" placeholder="email" />
         <Input type="text" placeholder="...loading" loading />
+        <Input type="text" value="Copy Me!" copy readonly />
+        <Input type="text" value="I'm disabled" disabled />
       </div>
     );
   }

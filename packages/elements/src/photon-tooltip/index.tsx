@@ -3,7 +3,7 @@ import '@shoelace-style/shoelace/dist/components/tooltip/tooltip';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 
-setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.82/dist/');
+setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 import tailwind from '../tailwind.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
