@@ -6,6 +6,7 @@ type IconStory = StoryObj<ComponentProps<typeof Icon>>;
 
 const meta: Meta<ComponentProps<typeof Icon>> = {
   title: 'Icon',
+  // @ts-ignore
   component: Icon,
   argTypes: {}
 };

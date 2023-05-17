@@ -18,6 +18,7 @@ export const GET_ORDER = gql`
         name
       }
       fulfillment {
+        type
         state
       }
       pharmacy {

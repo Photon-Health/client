@@ -3,13 +3,61 @@
 @tailwind utilities;
 
 @layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  div,
+  li,
+  a,
+  ul,
+  input {
+    @apply font-sans;
+    @apply font-light;
+    @apply text-gray-900;
+    @apply leading-relaxed;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  label {
+    @apply font-medium;
+    @apply leading-tight;
+  }
   h1 {
-    @apply text-2xl;
+    @apply text-3xl;
+    @apply my-2;
   }
   h2 {
-    @apply text-xl;
+    @apply text-2xl;
+    @apply my-2;
   }
   h3 {
+    @apply text-xl;
+    @apply my-1;
+  }
+  h4 {
     @apply text-lg;
+    @apply my-1;
+  }
+  h5 {
+    @apply text-base;
+    @apply my-1;
+  }
+  h6,
+  label {
+    @apply text-sm;
+    @apply my-1;
+  }
+  p {
+    @apply my-2;
+  }
+  div {
   }
 }

@@ -7,7 +7,7 @@ import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/switch/switch';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 
-setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.82/dist/');
+setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 //Styles
 import { createEffect, createSignal, For, onMount, Show, untrack } from 'solid-js';
