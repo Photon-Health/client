@@ -114,6 +114,6 @@ export const photon: {
   org_TVIFBLp7zkkDGeQI: {
     ...defaultSettings,
     logo: 'bold_health_logo.svg',
-    accentColor: '#5e7bfd'
+    accentColor: '#25532b'
   }
 };
