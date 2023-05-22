@@ -45,6 +45,10 @@ export const GET_ORDER = gql`
             id
             name
           }
+          ... on Compound {
+            id
+            name
+          }
         }
         prescription {
           id
