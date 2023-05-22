@@ -22,14 +22,15 @@ function valueToString(value: string | number | string[] | undefined): string {
 }
 
 export default function Input(props: InputProps) {
-  const [local, inputProps] = splitProps(props, ['error', 'copy']);
+  const [nonNativeProps, nativeProps] = splitProps(props, ['error', 'copy']);
+  const [handler, inputProps] = splitProps(nativeProps, ['onInput']);
   const [copied, setCopied] = createSignal(false);
 
   const [state] = useInputGroup();
 
   const inputClass = createMemo(() => {
     const disabled = state.disabled || inputProps.disabled;
-    const error = local.error || state.error;
+    const error = nonNativeProps.error || state.error;
     const readonly = inputProps.readonly || inputProps.readOnly;
     return clsx(
       'block w-full rounded-md border-0 py-1.5 px-2 shadow-sm ring-1 ring-inset sm:text-sm sm:leading-6 focus:outline-none',
@@ -46,8 +47,16 @@ export default function Input(props: InputProps) {
       }
     );
   });
-  // block w-full rounded-md border-0 py-1.5 px-2 shadow-sm ring-1 ring-inset sm:text-sm sm:leading-6 focus:outline-none text-gray-900 ring-gray-300
-  // placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 focus:ring-1 focus:ring-1  focus:outline-0 focus:ring-gray-300 bg-gray-50 text-gray-500 ring-gray-200
+
+  const handleInput = (e: Event) => {
+    // We're intercepting number input handlers with this function in order to prevent mobile browsers
+    // from clearing the input when "." is typed.
+    const target = e.currentTarget as HTMLInputElement;
+    if (!isNaN(target.valueAsNumber)) {
+      handler.onInput(e);
+    }
+  };
+
   createEffect(() => {
     if (copied()) {
       setTimeout(() => {
@@ -64,13 +73,19 @@ export default function Input(props: InputProps) {
             <Icon name="envelope" class="h-5 w-5 text-gray-400" size="sm" />
           </div>
         </Show>
-        <input id={state?.id} {...inputProps} class={inputClass()} autocomplete="off" />
+        <input
+          id={state?.id}
+          onInput={inputProps.type === 'number' ? handleInput : handler.onInput}
+          {...inputProps}
+          class={inputClass()}
+          autocomplete="off"
+        />
         <Show when={state.loading || inputProps.loading}>
           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1">
             <Spinner size="sm" />
           </div>
         </Show>
-        <Show when={local.copy}>
+        <Show when={nonNativeProps.copy}>
           <div class="absolute inset-y-0 right-0 flex items-center pr-3">
             <button
               onClick={() => {

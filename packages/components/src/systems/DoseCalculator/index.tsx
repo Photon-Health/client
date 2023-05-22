@@ -32,17 +32,6 @@ export interface DoseCalculatorProps {
   }) => void;
 }
 
-type SignalSetter = (v: number) => void;
-
-const handleInput: (setter: SignalSetter) => (e: Event) => void = (setter) => (e) => {
-  // We're handling number inputs with this function in order to prevent mobile browsers
-  // from clearing the input when "." is typed.
-  const target = e.currentTarget as HTMLInputElement;
-  if (!isNaN(target.valueAsNumber)) {
-    setter(target.valueAsNumber);
-  }
-};
-
 export default function DoseCalculator(props: DoseCalculatorProps) {
   const [dosage, setDosage] = createSignal<number>(0);
   const [dosageUnit, setDosageUnit] = createSignal<DosageUnit>(dosageUnits[0]);
@@ -112,7 +101,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
                 type="number"
                 inputmode="decimal"
                 value={dosage()}
-                onInput={handleInput(setDosage)}
+                onInput={(e: Event) => setDosage(e.currentTarget?.valueAsNumber)}
               />
               <UnitSelect setSelected={setDosageUnit} options={dosageUnits} initialIdx={1} />
             </div>
@@ -131,7 +120,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
                 type="number"
                 inputmode="decimal"
                 value={weight()}
-                onInput={handleInput(setWeight)}
+                onInput={(e: Event) => setWeight(e.currentTarget?.valueAsNumber)}
               />
               <UnitSelect setSelected={setWeightUnit} options={weightUnits} />
             </div>
@@ -144,7 +133,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
                 type="number"
                 inputmode="decimal"
                 value={liquidConcentration()}
-                onInput={handleInput(setLiquidConcentration)}
+                onInput={(e: Event) => setLiquidConcentration(e.currentTarget?.valueAsNumber)}
               />
               <UnitSelect
                 setSelected={setLiquidUnit}
@@ -159,7 +148,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
                 type="number"
                 inputmode="decimal"
                 value={perVolume()}
-                onInput={handleInput(setPerVolume)}
+                onInput={(e: Event) => setPerVolume(e.currentTarget?.valueAsNumber)}
               />
               <UnitSelect setSelected={setPerVolumeUnit} options={liquidVolumes} />
             </div>
@@ -178,7 +167,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               type="number"
               inputmode="decimal"
               value={daysSupply()}
-              onInput={handleInput(setDaysSupply)}
+              onInput={(e: Event) => setDaysSupply(e.currentTarget?.valueAsNumber)}
             />
           </InputGroup>
           <InputGroup label="Doses per Day">
@@ -186,7 +175,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               type="number"
               inputmode="decimal"
               value={dosesPerDay()}
-              onInput={handleInput(setDosesPerDay)}
+              onInput={(e: Event) => setDosesPerDay(e.currentTarget?.valueAsNumber)}
             />
           </InputGroup>
         </div>
