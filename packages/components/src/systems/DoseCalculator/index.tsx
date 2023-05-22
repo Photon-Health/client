@@ -35,10 +35,9 @@ export interface DoseCalculatorProps {
 type SignalSetter = (v: number) => void;
 
 const handleInput: (setter: SignalSetter) => (e: Event) => void = (setter) => (e) => {
-  const target = e.target as HTMLInputElement;
-  const val = parseFloat(target.value);
-  if (!isNaN(val)) {
-    setter(val);
+  const target = e.currentTarget as HTMLInputElement;
+  if (!isNaN(target.valueAsNumber)) {
+    setter(target.valueAsNumber);
   }
 };
 
@@ -108,7 +107,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="grid grid-cols-2 gap-4 sm:gap-2">
               <Input
-                type="text"
+                type="number"
                 inputmode="decimal"
                 value={isNaN(dosage()) ? 0 : dosage()}
                 onInput={handleInput(setDosage)}
@@ -127,7 +126,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="grid grid-cols-2 gap-4 sm:gap-2">
               <Input
-                type="text"
+                type="number"
                 inputmode="decimal"
                 value={isNaN(weight()) ? 0 : weight()}
                 onInput={handleInput(setWeight)}
@@ -140,7 +139,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           <InputGroup label="Liquid Concentration">
             <div class="flex gap-4 sm:gap-2">
               <Input
-                type="text"
+                type="number"
                 inputmode="decimal"
                 value={isNaN(liquidConcentration()) ? 0 : liquidConcentration()}
                 onInput={handleInput(setLiquidConcentration)}
@@ -155,7 +154,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           <InputGroup label="Per Volume">
             <div class="flex gap-4 sm:gap-2">
               <Input
-                type="text"
+                type="number"
                 inputmode="decimal"
                 value={isNaN(perVolume()) ? 0 : perVolume()}
                 onInput={handleInput(setPerVolume)}
@@ -174,7 +173,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
         <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Duration in Days">
             <Input
-              type="text"
+              type="number"
               inputmode="decimal"
               value={isNaN(daysSupply()) ? 0 : daysSupply()}
               onInput={handleInput(setDaysSupply)}
@@ -182,7 +181,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           </InputGroup>
           <InputGroup label="Doses per Day">
             <Input
-              type="text"
+              type="number"
               inputmode="decimal"
               value={isNaN(dosesPerDay()) ? 0 : dosesPerDay()}
               onInput={handleInput(setDosesPerDay)}
