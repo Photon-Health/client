@@ -109,7 +109,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               <Input
                 type="number"
                 inputmode="decimal"
-                value={isNaN(dosage()) ? 0 : dosage()}
+                value={dosage()}
                 onInput={handleInput(setDosage)}
               />
               <UnitSelect setSelected={setDosageUnit} options={dosageUnits} initialIdx={1} />
@@ -128,7 +128,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               <Input
                 type="number"
                 inputmode="decimal"
-                value={isNaN(weight()) ? 0 : weight()}
+                value={weight()}
                 onInput={handleInput(setWeight)}
               />
               <UnitSelect setSelected={setWeightUnit} options={weightUnits} />
@@ -141,7 +141,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               <Input
                 type="number"
                 inputmode="decimal"
-                value={isNaN(liquidConcentration()) ? 0 : liquidConcentration()}
+                value={liquidConcentration()}
                 onInput={handleInput(setLiquidConcentration)}
               />
               <UnitSelect
@@ -156,7 +156,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               <Input
                 type="number"
                 inputmode="decimal"
-                value={isNaN(perVolume()) ? 0 : perVolume()}
+                value={perVolume()}
                 onInput={handleInput(setPerVolume)}
               />
               <UnitSelect setSelected={setPerVolumeUnit} options={liquidVolumes} />
@@ -175,7 +175,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
             <Input
               type="number"
               inputmode="decimal"
-              value={isNaN(daysSupply()) ? 0 : daysSupply()}
+              value={daysSupply()}
               onInput={handleInput(setDaysSupply)}
             />
           </InputGroup>
@@ -183,7 +183,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
             <Input
               type="number"
               inputmode="decimal"
-              value={isNaN(dosesPerDay()) ? 0 : dosesPerDay()}
+              value={dosesPerDay()}
               onInput={handleInput(setDosesPerDay)}
             />
           </InputGroup>
