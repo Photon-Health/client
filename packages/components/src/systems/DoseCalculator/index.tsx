@@ -32,6 +32,16 @@ export interface DoseCalculatorProps {
   }) => void;
 }
 
+type SignalSetter = (v: number) => void;
+
+const handleInput: (setter: SignalSetter) => (e: Event) => void = (setter) => (e) => {
+  const target = e.target as HTMLInputElement;
+  const val = parseFloat(target.value);
+  if (!isNaN(val)) {
+    setter(val);
+  }
+};
+
 export default function DoseCalculator(props: DoseCalculatorProps) {
   const [dosage, setDosage] = createSignal<number>(0);
   const [dosageUnit, setDosageUnit] = createSignal<DosageUnit>(dosageUnits[0]);
@@ -101,7 +111,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
                 type="text"
                 inputmode="decimal"
                 value={isNaN(dosage()) ? 0 : dosage()}
-                onInput={(e) => setDosage(parseInt(e.currentTarget.value, 10))}
+                onInput={handleInput(setDosage)}
               />
               <UnitSelect setSelected={setDosageUnit} options={dosageUnits} initialIdx={1} />
             </div>
@@ -120,7 +130,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
                 type="text"
                 inputmode="decimal"
                 value={isNaN(weight()) ? 0 : weight()}
-                onInput={(e) => setWeight(parseInt(e.currentTarget.value, 10))}
+                onInput={handleInput(setWeight)}
               />
               <UnitSelect setSelected={setWeightUnit} options={weightUnits} />
             </div>
@@ -133,7 +143,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
                 type="text"
                 inputmode="decimal"
                 value={isNaN(liquidConcentration()) ? 0 : liquidConcentration()}
-                onInput={(e) => setLiquidConcentration(parseInt(e.currentTarget.value, 10))}
+                onInput={handleInput(setLiquidConcentration)}
               />
               <UnitSelect
                 setSelected={setLiquidUnit}
@@ -148,7 +158,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
                 type="text"
                 inputmode="decimal"
                 value={isNaN(perVolume()) ? 0 : perVolume()}
-                onInput={(e) => setPerVolume(parseInt(e.currentTarget.value, 10))}
+                onInput={handleInput(setPerVolume)}
               />
               <UnitSelect setSelected={setPerVolumeUnit} options={liquidVolumes} />
             </div>
@@ -167,7 +177,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               type="text"
               inputmode="decimal"
               value={isNaN(daysSupply()) ? 0 : daysSupply()}
-              onInput={(e) => setDaysSupply(parseInt(e.currentTarget.value, 10))}
+              onInput={handleInput(setDaysSupply)}
             />
           </InputGroup>
           <InputGroup label="Doses per Day">
@@ -175,7 +185,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               type="text"
               inputmode="decimal"
               value={isNaN(dosesPerDay()) ? 0 : dosesPerDay()}
-              onInput={(e) => setDosesPerDay(parseInt(e.currentTarget.value, 10))}
+              onInput={handleInput(setDosesPerDay)}
             />
           </InputGroup>
         </div>
