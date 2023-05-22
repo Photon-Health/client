@@ -98,9 +98,10 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="grid grid-cols-2 gap-4 sm:gap-2">
               <Input
-                type="number"
-                value={dosage()}
-                onInput={(e) => setDosage(e.currentTarget.valueAsNumber)}
+                type="text"
+                inputmode="decimal"
+                value={isNaN(dosage()) ? 0 : dosage()}
+                onInput={(e) => setDosage(parseInt(e.currentTarget.value, 10))}
               />
               <UnitSelect setSelected={setDosageUnit} options={dosageUnits} initialIdx={1} />
             </div>
@@ -116,9 +117,10 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="grid grid-cols-2 gap-4 sm:gap-2">
               <Input
-                type="number"
-                value={weight()}
-                onInput={(e) => setWeight(e.currentTarget.valueAsNumber)}
+                type="text"
+                inputmode="decimal"
+                value={isNaN(weight()) ? 0 : weight()}
+                onInput={(e) => setWeight(parseInt(e.currentTarget.value, 10))}
               />
               <UnitSelect setSelected={setWeightUnit} options={weightUnits} />
             </div>
@@ -128,9 +130,10 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           <InputGroup label="Liquid Concentration">
             <div class="flex gap-4 sm:gap-2">
               <Input
-                type="number"
-                value={liquidConcentration()}
-                onInput={(e) => setLiquidConcentration(e.currentTarget.valueAsNumber)}
+                type="text"
+                inputmode="decimal"
+                value={isNaN(liquidConcentration()) ? 0 : liquidConcentration()}
+                onInput={(e) => setLiquidConcentration(parseInt(e.currentTarget.value, 10))}
               />
               <UnitSelect
                 setSelected={setLiquidUnit}
@@ -142,9 +145,10 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
           <InputGroup label="Per Volume">
             <div class="flex gap-4 sm:gap-2">
               <Input
-                type="number"
-                value={perVolume()}
-                onInput={(e) => setPerVolume(e.currentTarget.valueAsNumber)}
+                type="text"
+                inputmode="decimal"
+                value={isNaN(perVolume()) ? 0 : perVolume()}
+                onInput={(e) => setPerVolume(parseInt(e.currentTarget.value, 10))}
               />
               <UnitSelect setSelected={setPerVolumeUnit} options={liquidVolumes} />
             </div>
@@ -160,16 +164,18 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
         <div class="grid grid-cols-2 gap-4">
           <InputGroup label="Duration in Days">
             <Input
-              type="number"
-              value={daysSupply()}
-              onInput={(e) => setDaysSupply(e.currentTarget.valueAsNumber)}
+              type="text"
+              inputmode="decimal"
+              value={isNaN(daysSupply()) ? 0 : daysSupply()}
+              onInput={(e) => setDaysSupply(parseInt(e.currentTarget.value, 10))}
             />
           </InputGroup>
           <InputGroup label="Doses per Day">
             <Input
-              type="number"
-              value={dosesPerDay()}
-              onInput={(e) => setDosesPerDay(e.currentTarget.valueAsNumber)}
+              type="text"
+              inputmode="decimal"
+              value={isNaN(dosesPerDay()) ? 0 : dosesPerDay()}
+              onInput={(e) => setDosesPerDay(parseInt(e.currentTarget.value, 10))}
             />
           </InputGroup>
         </div>
