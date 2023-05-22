@@ -103,5 +103,17 @@ export const photon: {
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
     sendToPatient: false
+  },
+  // Mishe
+  org_kLRbIfgsTXHmXDcj: {
+    ...defaultSettings,
+    logo: 'mishe_logo.svg',
+    accentColor: '#652D92'
+  },
+  // Bold Health
+  org_TVIFBLp7zkkDGeQI: {
+    ...defaultSettings,
+    logo: 'bold_health_logo.svg',
+    accentColor: '#25532b'
   }
 };
