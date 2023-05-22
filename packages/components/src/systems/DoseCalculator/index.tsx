@@ -35,6 +35,8 @@ export interface DoseCalculatorProps {
 type SignalSetter = (v: number) => void;
 
 const handleInput: (setter: SignalSetter) => (e: Event) => void = (setter) => (e) => {
+  // We're handling number inputs with this function in order to prevent mobile browsers
+  // from clearing the input when "." is typed.
   const target = e.currentTarget as HTMLInputElement;
   if (!isNaN(target.valueAsNumber)) {
     setter(target.valueAsNumber);
