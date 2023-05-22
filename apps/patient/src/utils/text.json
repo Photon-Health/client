@@ -73,7 +73,7 @@
       },
       "states": {
         "SENT": {
-          "title": "Sent to Pharmacy",
+          "title": "Sent",
           "description": "Your prescription fills have been sent to the pharmacy."
         },
         "RECEIVED": {
@@ -81,7 +81,7 @@
           "description": "The pharmacy has received your order and is preparing to fill it."
         },
         "READY": {
-          "title": "Ready for Pick Up",
+          "title": "Ready",
           "description": "Your prescriptions are ready to be picked up."
         },
         "PICKED_UP": {
@@ -98,11 +98,11 @@
     "courier": {
       "states": {
         "SENT": {
-          "title": "Sent to pharmacy",
+          "title": "Sent",
           "description": "Your prescription fills have been sent to the pharmacy."
         },
         "FILLING": {
-          "title": "Filling your prescriptions",
+          "title": "Filling",
           "description": "The pharmacy has received your order and is filling it."
         },
         "IN_TRANSIT": {
@@ -123,11 +123,11 @@
     "mailOrder": {
       "states": {
         "SENT": {
-          "title": "Sent to pharmacy",
+          "title": "Sent",
           "description": "Your prescription fills have been sent to the pharmacy."
         },
         "FILLING": {
-          "title": "Filling your prescriptions",
+          "title": "Processing",
           "description": "The pharmacy has received your order and is filling it."
         },
         "SHIPPED": {
