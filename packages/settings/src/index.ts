@@ -2,7 +2,7 @@ import { boson } from './lib/boson';
 import { neutron } from './lib/neutron';
 import { photon } from './lib/photon';
 
-export function getSettings(environment: 'boson' | 'neutron' | 'photon') {
+export function getSettings(environment: string) {
   switch (environment) {
     case 'boson':
       return boson;
