@@ -118,7 +118,8 @@ const initOrder = (
   ];
 
   // Initialize fulfillment
-  let initialFulfillmentType: any = '';
+  type FulfillmentOrEmpty = types.FulfillmentType | '' | null | undefined;
+  let initialFulfillmentType: FulfillmentOrEmpty = '';
   let initialPharmacyId = '';
 
   // Send to patient takes precedence over preferred pharmacy
@@ -127,16 +128,11 @@ const initOrder = (
 
     if (preferredPharmacy) {
       // If preferred pharmacy has an enabled fulfillment type, make that the initial tab
-      const enabledTypes: string[] = fulfillmentOptions.reduce((acc: any, curr: any) => {
-        if (curr.enabled && curr.fulfillmentType) {
-          return [...acc, curr.fulfillmentType];
-        }
-        return [...acc];
-      }, []);
-      initialFulfillmentType =
-        preferredPharmacy?.fulfillmentTypes && preferredPharmacy?.fulfillmentTypes.length > 0
-          ? preferredPharmacy?.fulfillmentTypes?.find((type: any) => enabledTypes.includes(type))
-          : '';
+      const enabledTypes: FulfillmentOrEmpty[] = fulfillmentOptions
+        .filter((option) => option.enabled && option.fulfillmentType)
+        .map((option) => option.fulfillmentType);
+      const pharmacyTypes = preferredPharmacy?.fulfillmentTypes || [];
+      initialFulfillmentType = pharmacyTypes.find((type) => enabledTypes.includes(type)) || '';
 
       if (initialFulfillmentType) {
         initialPharmacyId = preferredPharmacy.id;
