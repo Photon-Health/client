@@ -17,7 +17,7 @@ import { LocalPickup } from './components/LocalPickup';
 import { MailOrder } from './components/MailOrder';
 import { Address } from '../../../../../models/general';
 import { SendToPatient } from './components/SendToPatient';
-import { PharmacyOptions } from '../OrderForm';
+import { FulfillmentOptions } from '../OrderForm';
 
 interface SelectPharmacyCardProps {
   user: any;
@@ -30,7 +30,7 @@ interface SelectPharmacyCardProps {
   setFieldValue: any;
   updatePreferredPharmacy: boolean;
   setUpdatePreferredPharmacy: (value: boolean) => void;
-  tabsList: PharmacyOptions;
+  tabsList: FulfillmentOptions;
 }
 
 export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
