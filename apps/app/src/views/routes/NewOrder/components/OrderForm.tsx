@@ -72,7 +72,7 @@ interface OrderFormProps {
   user: any;
   auth0UserId: string;
   loading: boolean;
-  patient: any;
+  patient: types.Patient;
   onClose: () => void;
   prescriptionIds: string;
   createOrderMutation: any;
@@ -82,11 +82,88 @@ interface OrderFormProps {
   setShowAddress: any;
 }
 
-export type PharmacyOptions = {
+export type FulfillmentOptions = {
   name: string;
   enabled: boolean;
   fulfillmentType: types.FulfillmentType | undefined;
 }[];
+
+const initOrder = (
+  orgSettings: any,
+  patient: types.Patient,
+  prescriptionIds: string,
+  auth0UserId: string
+) => {
+  // Create fulfillment options
+  const sendToPatientUsers = orgSettings.sendToPatientUsers as string[];
+  const sendToPatientEnabled =
+    orgSettings.sendToPatient || sendToPatientUsers.includes(auth0UserId);
+
+  const fulfillmentOptions: FulfillmentOptions = [
+    {
+      name: 'Send to Patient',
+      fulfillmentType: undefined,
+      enabled: sendToPatientEnabled
+    },
+    {
+      name: 'Local Pickup',
+      fulfillmentType: types.FulfillmentType.PickUp,
+      enabled: orgSettings.pickUp as boolean
+    },
+    {
+      name: 'Mail Order',
+      fulfillmentType: types.FulfillmentType.MailOrder,
+      enabled: orgSettings.mailOrder as boolean
+    }
+  ];
+
+  // Initialize fulfillment
+  let initialFulfillmentType: any = '';
+  let initialPharmacyId = '';
+
+  // Send to patient takes precedence over preferred pharmacy
+  if (!sendToPatientEnabled && (orgSettings.pickUp || orgSettings.mailOrder)) {
+    const preferredPharmacy = patient?.preferredPharmacies?.[0];
+
+    if (preferredPharmacy) {
+      // If preferred pharmacy has an enabled fulfillment type, make that the initial tab
+      const enabledTypes: string[] = fulfillmentOptions.reduce((acc: any, curr: any) => {
+        if (curr.enabled && curr.fulfillmentType) {
+          return [...acc, curr.fulfillmentType];
+        }
+        return [...acc];
+      }, []);
+      initialFulfillmentType =
+        preferredPharmacy?.fulfillmentTypes && preferredPharmacy?.fulfillmentTypes.length > 0
+          ? preferredPharmacy?.fulfillmentTypes?.find((type: any) => enabledTypes.includes(type))
+          : '';
+
+      if (initialFulfillmentType) {
+        initialPharmacyId = preferredPharmacy.id;
+      }
+    }
+  }
+
+  const initialFormValues: any = {
+    ...EMPTY_FORM_VALUES,
+    patientId: patient?.id || '',
+    fills: prescriptionIds
+      ? prescriptionIds.split(',').map((x: string) => ({ prescriptionId: x }))
+      : [],
+    fulfillmentType: initialFulfillmentType,
+    pharmacyId: initialPharmacyId,
+    address: {
+      street1: patient?.address?.street1 || '',
+      street2: patient?.address?.street2 || '',
+      postalCode: patient?.address?.postalCode || '',
+      country: patient?.address?.country || 'US',
+      state: patient?.address?.state || '',
+      city: patient?.address?.city || ''
+    }
+  };
+
+  return { initialFormValues, fulfillmentOptions };
+};
 
 export const OrderForm = ({
   user,
@@ -107,6 +184,13 @@ export const OrderForm = ({
 
   const orgSettings = user.org_id in settings ? settings[user.org_id] : settings.default;
 
+  const { initialFormValues, fulfillmentOptions } = initOrder(
+    orgSettings,
+    patient,
+    prescriptionIds,
+    auth0UserId
+  );
+
   const onCancel = async (dirty: Boolean) => {
     if (!dirty) onClose();
     else if (
@@ -121,62 +205,10 @@ export const OrderForm = ({
     }
   };
 
-  const sendToPatientUsers = orgSettings.sendToPatientUsers as string[];
-  const sendToPatientEnabled =
-    orgSettings.sendToPatient || sendToPatientUsers.includes(auth0UserId);
-
-  const pharmacyOptions: PharmacyOptions = [
-    {
-      name: 'Send to Patient',
-      fulfillmentType: undefined,
-      enabled: sendToPatientEnabled
-    },
-    {
-      name: 'Local Pickup',
-      fulfillmentType: types.FulfillmentType.PickUp,
-      enabled: orgSettings.pickUp as boolean
-    },
-    {
-      name: 'Mail Order',
-      fulfillmentType: types.FulfillmentType.MailOrder,
-      enabled: orgSettings.mailOrder as boolean
-    }
-  ];
-
-  /**
-   * If send to patient is enabled, that takes precedence over default pharmacy. Otherwise
-   * default to fulfillmentType of preferredPharmacy, if no preferred then first enabled tab.
-   *  */
-  const preferredPharmacy =
-    patient?.preferredPharmacies?.length > 0 ? patient.preferredPharmacies[0] : null;
-  const initialFulfillmentType = sendToPatientEnabled
-    ? ''
-    : preferredPharmacy?.fulfillmentTypes.length > 0 ||
-      pharmacyOptions.findIndex((option) => option.enabled);
-  const initialPharmacyId = sendToPatientEnabled ? '' : preferredPharmacy?.id || '';
-
-  const initialValues = {
-    ...EMPTY_FORM_VALUES,
-    patientId: patient?.id || '',
-    fills: prescriptionIds
-      ? prescriptionIds.split(',').map((x: string) => ({ prescriptionId: x }))
-      : [],
-    fulfillmentType: initialFulfillmentType,
-    pharmacyId: initialPharmacyId,
-    address: {
-      street1: patient?.address?.street1 || '',
-      street2: patient?.address?.street2 || '',
-      postalCode: patient?.address?.postalCode || '',
-      country: patient?.address?.country || 'US',
-      state: patient?.address?.state || '',
-      city: patient?.address?.city || ''
-    }
-  };
-
   return (
     <Formik
       enableReinitialize
-      initialValues={initialValues}
+      initialValues={initialFormValues}
       validationSchema={orderSchema}
       onSubmit={async (values, { validateForm, setSubmitting }) => {
         validateForm(values);
@@ -204,12 +236,12 @@ export const OrderForm = ({
 
           // if the user has selected to save the pharmacy as their preferred pharmacy
           if (updatePreferredPharmacy) {
-            if (patient?.preferredPharmacies?.length > 0) {
+            if (patient?.preferredPharmacies && patient?.preferredPharmacies?.length > 0) {
               // remove the current preferred pharmacy
               removePatientPreferredPharmacyMutation({
                 variables: {
                   patientId: patient.id,
-                  pharmacyId: patient?.preferredPharmacies[0].id
+                  pharmacyId: patient?.preferredPharmacies?.[0]?.id
                 }
               });
             }
@@ -274,7 +306,7 @@ export const OrderForm = ({
                 touched={touched}
                 patient={patient}
                 setFieldValue={setFieldValue}
-                tabsList={pharmacyOptions}
+                tabsList={fulfillmentOptions}
               />
 
               <SelectPrescriptionsCard
