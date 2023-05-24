@@ -1,27 +1,22 @@
-# # .github/workflows/chromatic.yml
-# name: 'Chromatic'
+name: 'Chromatic'
 
-# on: push
+on: push
 
-# jobs:
-#   chromatic-deployment:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v2
-#         with:
-#           fetch-depth: 0
-#       - name: Setup Node.js
-#         uses: actions/setup-node@v2
-#         with:
-#           node-version: '16'
-#       - name: Install dependencies
-#         run: yarn
-
-#       - name: Publish to Chromatic
-#         uses: chromaui/action@v1
-#         with:
-#           workingDir: packages/components
-#           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-#           exitZeroOnChanges: true
+jobs:
+  chromatic-deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Specify Node Version
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install dependencies
+        run: npm ci
+      - name: Build Storybook
+        run: npx nx run components:build-storybook
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          storybookBuildDir: packages/components/storybook-static
