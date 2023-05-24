@@ -169,36 +169,37 @@ customElement(
           }
           if (
             // minimum template fields required to create a prescription
-            !template.treatment ||
-            !template.dispenseQuantity ||
-            !template.dispenseUnit ||
-            !template.fillsAllowed ||
-            !template.instructions
+            !template?.treatment ||
+            !template?.dispenseQuantity ||
+            !template?.dispenseUnit ||
+            !template?.fillsAllowed ||
+            !template?.instructions
           ) {
             console.error(`Template is missing required prescription details ${templateId}`);
+          } else {
+            actions.updateFormValue({
+              key: 'draftPrescriptions',
+              value: [
+                ...(store['draftPrescriptions']?.value || []),
+                {
+                  id: String(Math.random()),
+                  effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
+                  treatment: template.treatment,
+                  dispenseAsWritten: template.dispenseAsWritten,
+                  dispenseQuantity: template.dispenseQuantity,
+                  dispenseUnit: template.dispenseUnit,
+                  daysSupply: template.daysSupply,
+                  // when we pre-populate draft prescriptions using template ID's, we need need to update the value for refills here
+                  refillsInput: template.fillsAllowed ? template.fillsAllowed - 1 : 0,
+                  fillsAllowed: template.fillsAllowed,
+                  instructions: template.instructions,
+                  notes: template.notes,
+                  addToTemplates: false,
+                  catalogId: undefined
+                }
+              ]
+            });
           }
-          actions.updateFormValue({
-            key: 'draftPrescriptions',
-            value: [
-              ...(store['draftPrescriptions']?.value || []),
-              {
-                id: String(Math.random()),
-                effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
-                treatment: template.treatment,
-                dispenseAsWritten: template.dispenseAsWritten,
-                dispenseQuantity: template.dispenseQuantity,
-                dispenseUnit: template.dispenseUnit,
-                daysSupply: template.daysSupply,
-                // when we pre-populate draft prescriptions using template ID's, we need need to update the value for refills here
-                refillsInput: template.fillsAllowed ? template.fillsAllowed - 1 : 0,
-                fillsAllowed: template.fillsAllowed,
-                instructions: template.instructions,
-                notes: template.notes,
-                addToTemplates: false,
-                catalogId: undefined
-              }
-            ]
-          });
         }
         setIsLoadingTemplates(false);
       }
