@@ -18,7 +18,7 @@ describe('DoseCalculator', () => {
     const medicationName = 'Amoxicillin 200 MG in 5mL Oral Suspension, 20lbs, 80 mg/kg';
     const setAutocompleteValuesMock = vi.fn();
 
-    const { getByText, getByLabelText, container } = render(() => (
+    const { getByText, getByLabelText } = render(() => (
       <DoseCalculator
         open={true}
         onClose={() => {}}
@@ -53,7 +53,7 @@ describe('DoseCalculator', () => {
   it('should calculate "cefdinir 250 mg / 5 ml common dose is 300 mg, 2x per day for 10 days" correctly', async () => {
     const setAutocompleteValuesMock = vi.fn();
 
-    const { getByText, getByLabelText, getByDisplayValue, getAllByRole, container } = render(() => (
+    const { getByText, getByLabelText, getByDisplayValue, getAllByRole } = render(() => (
       <DoseCalculator
         open={true}
         onClose={() => {}}
