@@ -27,7 +27,7 @@ jobs:
         run: |
           git fetch
           PACKAGES=""
-          for file in $(git diff --name-only HEAD~1...HEAD | grep '/package.json'); do
+          for file in $(git diff --name-only HEAD~1...HEAD | grep '/package.json' | grep '/packages/'); do
             if git diff HEAD~1...HEAD -- $file | grep '\"version\"'; then
               PACKAGE_PATH=$(dirname $file)
               PACKAGES="$PACKAGES $PACKAGE_PATH"
