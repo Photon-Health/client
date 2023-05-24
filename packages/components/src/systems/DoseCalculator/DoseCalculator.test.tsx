@@ -18,7 +18,7 @@ describe('DoseCalculator', () => {
     const medicationName = 'Amoxicillin 200 MG in 5mL Oral Suspension, 20lbs, 80 mg/kg';
     const setAutocompleteValuesMock = vi.fn();
 
-    const { getByText, getByLabelText, container } = render(() => (
+    const { getByText, getByLabelText } = render(() => (
       <DoseCalculator
         open={true}
         onClose={() => {}}
@@ -53,7 +53,7 @@ describe('DoseCalculator', () => {
   it('should calculate "cefdinir 250 mg / 5 ml common dose is 300 mg, 2x per day for 10 days" correctly', async () => {
     const setAutocompleteValuesMock = vi.fn();
 
-    const { getByText, getByLabelText, getByDisplayValue, getAllByRole, container } = render(() => (
+    const { getByText, getByLabelText, getByDisplayValue, getAllByRole } = render(() => (
       <DoseCalculator
         open={true}
         onClose={() => {}}
@@ -125,5 +125,24 @@ describe('DoseCalculator', () => {
       totalLiquid: 5.4,
       unit: 'mL'
     });
+  });
+
+  it('should not return NaN or Infinity', async () => {
+    const { getByText, getByLabelText, container } = render(() => (
+      <DoseCalculator open={true} onClose={() => {}} setAutocompleteValues={() => {}} />
+    ));
+
+    // Set input values
+    await user.type(getByLabelText('Dose'), '90');
+    await user.type(getByLabelText('Patient Weight'), '20');
+    await user.type(getByLabelText('Liquid Concentration'), '200');
+    await user.type(getByLabelText('Per Volume'), '5');
+    await user.clear(getByLabelText('Duration in Days'));
+    await user.type(getByLabelText('Duration in Days'), '10');
+    await user.clear(getByLabelText('Doses per Day'));
+    await user.type(getByLabelText('Doses per Day'), '0');
+
+    const autofillButton = getByText('Autofill');
+    expect(autofillButton).toBeDisabled();
   });
 });
