@@ -47,6 +47,7 @@ export const PickupOptions = ({
         {pharmacies.map((pharmacy: Pharmacy, i: number) => (
           <SlideFade offsetY="60px" in={true} key={`pickup-pharmacy-${pharmacy.id}-${i}`}>
             <PharmacyCard
+              index={i}
               pharmacy={pharmacy}
               selected={selectedId === pharmacy.id}
               onSelect={() => handleSelect(pharmacy.id)}

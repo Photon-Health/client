@@ -50,9 +50,7 @@ export const neutron: {
   org_YiUudCToTSrjOuow: {
     ...defaultSettings,
     logo: 'newco_logo.png',
-    accentColor: '#69348F',
-    mailOrderNavigate: true,
-    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
+    accentColor: '#69348F'
   },
   // Demo (demo's)
   org_TY5GFYPIRo3xQGYM: {
