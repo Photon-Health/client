@@ -3,6 +3,7 @@ import {
   Card,
   CardBody,
   HStack,
+  Image,
   Tag,
   TagLabel,
   TagLeftIcon,
@@ -18,6 +19,8 @@ import { UNOPEN_BUSINESS_STATUS_MAP } from '../views/Pharmacy'
 import { Rating } from './Rating'
 import { formatAddress } from '../utils/general'
 import { Pharmacy } from '../utils/models'
+
+import walgreens from '../assets/walgreens_logo.png'
 
 dayjs.extend(customParseFormat)
 
@@ -76,12 +79,14 @@ const DistanceAddress = ({ distance, address }) => {
 }
 
 interface PharmacyCardProps {
+  index: number
   pharmacy: Pharmacy
   selected: boolean
   onSelect: Function
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
+  index,
   pharmacy,
   selected,
   onSelect
@@ -89,6 +94,9 @@ export const PharmacyCard = memo(function PharmacyCard({
   const isMobile = useBreakpointValue({ base: true, md: false })
 
   if (!pharmacy) return null
+
+  const isWalgreens = pharmacy.name === 'Walgreens' || pharmacy.name === 'Walgreens Pharmacy'
+
   return (
     <Card
       bgColor="white"
@@ -109,12 +117,24 @@ export const PharmacyCard = memo(function PharmacyCard({
               <TagLabel> {pharmacy.info}</TagLabel>
             </Tag>
           ) : null}
+          {/* For the walgreens demo, surface first walgreens as preferred */}
+          {isWalgreens && index === 0 ? (
+            <Tag size="sm" colorScheme="green" mb={1}>
+              <TagLeftIcon boxSize="12px" as={FiStar} />
+              <TagLabel> Preferred</TagLabel>
+            </Tag>
+          ) : null}
           {pharmacy?.hours?.is24Hr ? (
             <Tag size="sm" colorScheme="green">
               <TagLabel>24 hr</TagLabel>
             </Tag>
           ) : null}
-          <Text fontSize="md">{pharmacy.name}</Text>
+          <HStack>
+            {pharmacy.name === ('Walgreens' || 'Walgreens Pharmacy') ? (
+              <Image src={walgreens} width="22px" />
+            ) : null}
+            <Text fontSize="md">{pharmacy.name}</Text>
+          </HStack>
 
           <RatingHours
             businessStatus={pharmacy.businessStatus}
