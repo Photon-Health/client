@@ -126,4 +126,23 @@ describe('DoseCalculator', () => {
       unit: 'mL'
     });
   });
+
+  it('should not return NaN or Infinity', async () => {
+    const { getByText, getByLabelText, container } = render(() => (
+      <DoseCalculator open={true} onClose={() => {}} setAutocompleteValues={() => {}} />
+    ));
+
+    // Set input values
+    await user.type(getByLabelText('Dose'), '90');
+    await user.type(getByLabelText('Patient Weight'), '20');
+    await user.type(getByLabelText('Liquid Concentration'), '200');
+    await user.type(getByLabelText('Per Volume'), '5');
+    await user.clear(getByLabelText('Duration in Days'));
+    await user.type(getByLabelText('Duration in Days'), '10');
+    await user.clear(getByLabelText('Doses per Day'));
+    await user.type(getByLabelText('Doses per Day'), '0');
+
+    const autofillButton = getByText('Autofill');
+    expect(autofillButton).toBeDisabled();
+  });
 });
