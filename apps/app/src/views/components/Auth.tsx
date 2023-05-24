@@ -7,14 +7,14 @@ import { getSettings } from '@client/settings';
 const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
 const settings = getSettings(envName);
 
-  const { user, isLoading, isAuthenticated, getToken, login, logout } = usePhoton();
 interface AuthProps {
   returnTo?: string;
 }
 
-  const orgSettings = user?.org_id in settings ? settings[user?.org_id] : settings.default;
 export const Auth = (props: AuthProps) => {
   const { returnTo } = props;
+  const { user, isLoading, isAuthenticated, getToken, login, logout } = usePhoton();
+  const orgSettings = user?.org_id in settings ? settings[user?.org_id] : settings.default;
 
   const getAccessToken = async () => {
     try {
