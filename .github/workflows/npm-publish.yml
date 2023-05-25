@@ -25,6 +25,11 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Set Git User
+        run: |
+          git config --global user.name "Photon Health"
+          git config --global user.email "hello@photon.health"
+
       - name: Check for version updates
         id: check
         run: |
