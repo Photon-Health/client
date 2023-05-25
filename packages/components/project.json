@@ -25,6 +25,13 @@
         "cwd": "packages/components",
         "command": "vitest run"
       }
+    },
+    "build-storybook": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/components",
+        "command": "storybook build"
+      }
     }
   }
 }
