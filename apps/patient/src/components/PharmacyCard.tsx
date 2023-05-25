@@ -3,7 +3,6 @@ import {
   Card,
   CardBody,
   HStack,
-  Image,
   Tag,
   TagLabel,
   TagLeftIcon,
@@ -20,9 +19,7 @@ import { Rating } from './Rating';
 import { formatAddress } from '../utils/general';
 import { Pharmacy } from '../utils/models';
 
-import walgreens from '../assets/walgreens_logo.png';
-
-dayjs.extend(customParseFormat);
+dayjs.extend(customParseFormat)
 
 const INFO_COLOR_MAP = {
   Previous: 'green',
@@ -79,14 +76,12 @@ const DistanceAddress = ({ distance, address }) => {
 };
 
 interface PharmacyCardProps {
-  index: number;
-  pharmacy: Pharmacy;
-  selected: boolean;
-  onSelect: Function;
+  pharmacy: Pharmacy
+  selected: boolean
+  onSelect: Function
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
-  index,
   pharmacy,
   selected,
   onSelect
@@ -94,8 +89,6 @@ export const PharmacyCard = memo(function PharmacyCard({
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   if (!pharmacy) return null;
-
-  const isWalgreens = pharmacy.name === 'Walgreens' || pharmacy.name === 'Walgreens Pharmacy';
 
   return (
     <Card
@@ -117,25 +110,12 @@ export const PharmacyCard = memo(function PharmacyCard({
               <TagLabel> {pharmacy.info}</TagLabel>
             </Tag>
           ) : null}
-          {/* For the walgreens demo, surface first walgreens as preferred */}
-          {isWalgreens && index === 0 ? (
-            <Tag size="sm" colorScheme="green" mb={1}>
-              <TagLeftIcon boxSize="12px" as={FiStar} />
-              <TagLabel> Preferred</TagLabel>
-            </Tag>
-          ) : null}
           {pharmacy?.hours?.is24Hr ? (
             <Tag size="sm" colorScheme="green">
               <TagLabel>24 hr</TagLabel>
             </Tag>
           ) : null}
-          <HStack>
-            {pharmacy.name === ('Walgreens' || 'Walgreens Pharmacy') ? (
-              <Image src={walgreens} width="22px" />
-            ) : null}
-            <Text fontSize="md">{pharmacy.name}</Text>
-          </HStack>
-
+          <Text fontSize="md">{pharmacy.name}</Text>
           <RatingHours
             businessStatus={pharmacy.businessStatus}
             rating={pharmacy.rating}
