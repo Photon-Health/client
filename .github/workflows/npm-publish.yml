@@ -1,0 +1,64 @@
+name: Publish Packages
+
+on:
+  push:
+    branches:
+      - boson
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          ref: boson
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Check for version updates
+        id: check
+        run: |
+          PACKAGES=""
+          for file in $(git diff --name-only HEAD~1...HEAD | grep '/package.json' | grep 'packages/'); do
+            if git diff HEAD~1...HEAD -- $file | grep '\"version\"'; then
+              PACKAGE_PATH=$(dirname $file)
+              PACKAGES="$PACKAGES $PACKAGE_PATH"
+            fi
+          done
+          echo $PACKAGES
+          echo "::set-output name=packages::$PACKAGES"
+
+      - name: Publish changed packages
+        run: |
+          PACKAGES="${{ steps.check.outputs.packages }}"
+          if [ -z "$PACKAGES" ]
+          then
+              echo "No package updates found."
+          else
+              echo "Package updates found: $PACKAGES"
+              for PACKAGE in $PACKAGES
+              do
+                  echo "Publishing $PACKAGE..."
+                  cd $PACKAGE && npm publish && cd -
+
+                  echo "Creating GitHub release for $PACKAGE..."
+                  PACKAGE_NAME=$(basename $PACKAGE)
+                  PACKAGE_VERSION=$(node -p "require('./$PACKAGE/package.json').version")
+                  PACKAGE_TAG="${PACKAGE_NAME}_v${PACKAGE_VERSION}"
+                  PACKAGE_BODY="TODO FILL OUT RELEASE NOTES for $PACKAGE_NAME v$PACKAGE_VERSION"
+                  git tag -a $PACKAGE_TAG -m "$PACKAGE_BODY"
+                  git push origin $PACKAGE_TAG
+              done
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
