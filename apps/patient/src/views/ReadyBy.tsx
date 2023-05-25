@@ -1,41 +1,41 @@
-import { useContext, useState } from 'react'
-import { Box, Button, Container, Heading, Text, VStack } from '@chakra-ui/react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Helmet } from 'react-helmet'
-import dayjs from 'dayjs'
+import { useContext, useState } from 'react';
+import { Box, Button, Container, Heading, Text, VStack } from '@chakra-ui/react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
+import dayjs from 'dayjs';
 
-import { Order } from '../utils/models'
-import { FixedFooter } from '../components/FixedFooter'
-import { Nav } from '../components/Nav'
-import { PoweredBy } from '../components/PoweredBy'
-import t from '../utils/text.json'
-import { OrderContext } from './Main'
+import { Order } from '../utils/models';
+import { FixedFooter } from '../components/FixedFooter';
+import { Nav } from '../components/Nav';
+import { PoweredBy } from '../components/PoweredBy';
+import t from '../utils/text.json';
+import { OrderContext } from './Main';
 
 const currentTimeIsAfterOption = (option: string): boolean => {
-  const currentTime = dayjs()
-  const afterHoursOption = t.readyBy.options[5]
-  const afterHoursStarts = '6:00 pm'
-  const timetoCheck = option === afterHoursOption ? afterHoursStarts : option
-  const timetoCheckDayjs = dayjs(timetoCheck, 'h:mm a')
-  return currentTime.isAfter(timetoCheckDayjs)
-}
+  const currentTime = dayjs();
+  const afterHoursOption = t.readyBy.options[5];
+  const afterHoursStarts = '6:00 pm';
+  const timetoCheck = option === afterHoursOption ? afterHoursStarts : option;
+  const timetoCheckDayjs = dayjs(timetoCheck, 'h:mm a');
+  return currentTime.isAfter(timetoCheckDayjs);
+};
 
 export const ReadyBy = () => {
-  const order = useContext<Order>(OrderContext)
+  const order = useContext<Order>(OrderContext);
 
-  const [searchParams] = useSearchParams()
-  const token = searchParams.get('token')
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const { organization } = order
+  const { organization } = order;
 
-  const [selected, setSelected] = useState(undefined)
-  const showFooter = typeof selected !== 'undefined'
+  const [selected, setSelected] = useState(undefined);
+  const showFooter = typeof selected !== 'undefined';
 
   const handleCtaClick = () => {
-    navigate(`/pharmacy?orderId=${order.id}&token=${token}`)
-  }
+    navigate(`/pharmacy?orderId=${order.id}&token=${token}`);
+  };
 
   return (
     <Box>
@@ -56,7 +56,7 @@ export const ReadyBy = () => {
 
           <VStack spacing={3} w="full">
             {t.readyBy.options.map((option, i) => {
-              const isDisabled = i !== (0 | 6) && currentTimeIsAfterOption(option)
+              const isDisabled = i !== (0 | 6) && currentTimeIsAfterOption(option);
               return (
                 <Button
                   key={option}
@@ -77,7 +77,7 @@ export const ReadyBy = () => {
                 >
                   {option}
                 </Button>
-              )
+              );
             })}
           </VStack>
         </VStack>
@@ -92,5 +92,5 @@ export const ReadyBy = () => {
         </Container>
       </FixedFooter>
     </Box>
-  )
-}
+  );
+};

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -13,42 +13,42 @@ import {
   Spacer,
   Text,
   useColorModeValue
-} from '@chakra-ui/react'
-import { FiHelpCircle, FiRefreshCw } from 'react-icons/fi'
-import t from '../utils/text.json'
-import { Logo as PhotonLogo } from './Logo'
-import { getSettings } from '@client/settings'
+} from '@chakra-ui/react';
+import { FiHelpCircle, FiRefreshCw } from 'react-icons/fi';
+import t from '../utils/text.json';
+import { Logo as PhotonLogo } from './Logo';
+import { getSettings } from '@client/settings';
 
-const settings = getSettings(process.env.REACT_APP_ENV_NAME)
+const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
 interface NavProps {
-  header: string
-  showRefresh: boolean
-  orgId?: string
+  header: string;
+  showRefresh: boolean;
+  orgId?: string;
 }
 
 export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
-  const [logo, setLogo] = useState(undefined)
+  const [logo, setLogo] = useState(undefined);
 
   const fetchLogo = async (fileName: string) => {
     if (fileName === 'photon') {
-      setLogo('photon')
+      setLogo('photon');
     } else {
       try {
-        const response = await import(`../assets/${fileName}`)
-        setLogo(response.default)
+        const response = await import(`../assets/${fileName}`);
+        setLogo(response.default);
       } catch (e) {
-        console.error(e)
+        console.error(e);
       }
     }
-  }
+  };
 
   useEffect(() => {
     if (orgId) {
-      const theme = orgId in settings ? settings[orgId] : settings.default
-      fetchLogo(theme.logo)
+      const theme = orgId in settings ? settings[orgId] : settings.default;
+      fetchLogo(theme.logo);
     }
-  }, [orgId])
+  }, [orgId]);
 
   return (
     <Box as="nav" bg="white" boxShadow={useColorModeValue('sm', 'sm-dark')}>
@@ -100,10 +100,10 @@ export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
         </HStack>
       </Container>
     </Box>
-  )
-}
+  );
+};
 
 Nav.defaultProps = {
   showRefresh: false,
   orgId: undefined
-}
+};

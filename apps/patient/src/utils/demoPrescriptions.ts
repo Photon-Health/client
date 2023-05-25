@@ -31,4 +31,4 @@ export const prescriptions = [
     expires: '05/06/23',
     instructions: 'Crush 1 tablet and mix with food once a day'
   }
-]
+];

@@ -16,8 +16,8 @@ export const MedicationNameDropdown = () => {
       composed: true,
       bubbles: true,
       detail: {
-        medicationId: id,
-      },
+        medicationId: id
+      }
     });
     ref?.dispatchEvent(event);
   };
@@ -29,7 +29,7 @@ export const MedicationNameDropdown = () => {
         const id = String(Math.random());
         setUid(id);
         const { data } = await client!.getSDK().clinical.searchMedication.getConcepts({
-          name: filterText(),
+          name: filterText()
         });
         if (id === uid()) {
           setData(data.medicationConcepts ?? []);

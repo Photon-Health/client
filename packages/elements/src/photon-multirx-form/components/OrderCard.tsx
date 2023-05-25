@@ -13,7 +13,7 @@ export const OrderCard = (props: {
 }) => {
   props.actions.registerValidator({
     key: 'pharmacy',
-    validator: pharmacyValidator,
+    validator: pharmacyValidator
   });
 
   return (
@@ -43,13 +43,13 @@ export const OrderCard = (props: {
               on:photon-pharmacy-selected={(e: any) => {
                 props.actions.updateFormValue({
                   key: 'pharmacy',
-                  value: e.detail.pharmacy,
+                  value: e.detail.pharmacy
                 });
               }}
               on:photon-pharmacy-removed={(e: any) => {
                 props.actions.updateFormValue({
                   key: 'pharmacy',
-                  value: undefined,
+                  value: undefined
                 });
               }}
               address={

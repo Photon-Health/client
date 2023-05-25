@@ -1,16 +1,16 @@
-import { BoxProps, Divider, Stack, Text } from '@chakra-ui/react'
-import { StepCircle } from './StepCircle'
+import { BoxProps, Divider, Stack, Text } from '@chakra-ui/react';
+import { StepCircle } from './StepCircle';
 
 interface StepProps extends BoxProps {
-  title: string
-  description: string
-  isCompleted: boolean
-  isActive: boolean
-  isLastStep: boolean
+  title: string;
+  description: string;
+  isCompleted: boolean;
+  isActive: boolean;
+  isLastStep: boolean;
 }
 
 export const Step = (props: StepProps) => {
-  const { isActive, isCompleted, isLastStep, title, description } = props
+  const { isActive, isCompleted, isLastStep, title, description } = props;
 
   return (
     <Stack spacing="4" direction="row">
@@ -29,5 +29,5 @@ export const Step = (props: StepProps) => {
         <Text color="muted">{description}</Text>
       </Stack>
     </Stack>
-  )
-}
+  );
+};

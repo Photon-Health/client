@@ -1,20 +1,20 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import "./index.css";
-import App from "./App";
-import reportWebVitals from "./reportWebVitals";
-import { ChakraProvider } from "@chakra-ui/react";
-import { PhotonClient, PhotonProvider } from "@photonhealth/react";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+import { ChakraProvider } from '@chakra-ui/react';
+import { PhotonClient, PhotonProvider } from '@photonhealth/react';
 
 const client = new PhotonClient({
   domain: process.env.REACT_APP_DOMAIN,
   clientId: process.env.REACT_APP_CLIENT_ID,
   redirectURI: window.location.origin,
-  audience: "https://api.boson.health",
-  uri: "https://api.boson.health/graphql",
+  audience: 'https://api.boson.health',
+  uri: 'https://api.boson.health/graphql'
 });
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
+const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <ChakraProvider>
     <PhotonProvider client={client}>
