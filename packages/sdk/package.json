@@ -1,9 +1,9 @@
 {
   "name": "@photonhealth/sdk",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "main": "dist/lib.js",
   "scripts": {
-    "build": "rimraf dist && vite build",
+    "build": "npx nx run sdk:build",
     "docs": "find src -name \"*.ts\" | xargs npx typedoc --out docs",
     "prepublishOnly": "npm run build"
   },

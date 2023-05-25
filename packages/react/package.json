@@ -1,9 +1,9 @@
 {
   "name": "@photonhealth/react",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "main": "dist/react.cjs.js",
   "scripts": {
-    "build": "rimraf dist && vite build",
+    "build": "npx nx run react:build",
     "prepublishOnly": "npm run build"
   },
   "publishConfig": {
