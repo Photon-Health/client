@@ -141,7 +141,11 @@ export const AddPrescriptionCard = (props: {
               open={openDoseCalculator()}
               onClose={() => setOpenDoseCalculator(false)}
               medicationName={props.store['treatment']?.value?.name}
-              setAutocompleteValues={({ liquidDose, totalLiquid, unit }) => {
+              setAutocompleteValues={({ liquidDose, totalLiquid, unit, days }) => {
+                props.actions.updateFormValue({
+                  key: 'daysSupply',
+                  value: Number(days)
+                });
                 props.actions.updateFormValue({
                   key: 'dispenseQuantity',
                   value: Number(totalLiquid)

@@ -44,6 +44,7 @@ describe('DoseCalculator', () => {
 
     expect(setAutocompleteValuesMock).toHaveBeenCalledTimes(1);
     expect(setAutocompleteValuesMock).toHaveBeenCalledWith({
+      days: 10,
       liquidDose: 10.2,
       totalLiquid: 204.1,
       unit: 'mL'
@@ -82,6 +83,7 @@ describe('DoseCalculator', () => {
 
     expect(setAutocompleteValuesMock).toHaveBeenCalledTimes(1);
     expect(setAutocompleteValuesMock).toHaveBeenCalledWith({
+      days: 10,
       liquidDose: 1.3,
       totalLiquid: 25.4,
       unit: 'mL'
@@ -121,6 +123,7 @@ describe('DoseCalculator', () => {
     expect((getByLabelText('Total Quantity') as HTMLInputElement).value).toEqual('5.4 mg');
     expect(setAutocompleteValuesMock).toHaveBeenCalledTimes(1);
     expect(setAutocompleteValuesMock).toHaveBeenCalledWith({
+      days: 1,
       liquidDose: 5.4,
       totalLiquid: 5.4,
       unit: 'mL'
