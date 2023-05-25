@@ -1,5 +1,5 @@
-import { useContext } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useContext } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Accordion,
   AccordionItem,
@@ -15,33 +15,33 @@ import {
   HStack,
   Text,
   VStack
-} from '@chakra-ui/react'
-import { FaPrescription } from 'react-icons/fa'
-import { Helmet } from 'react-helmet'
+} from '@chakra-ui/react';
+import { FaPrescription } from 'react-icons/fa';
+import { Helmet } from 'react-helmet';
 
-import { Order } from '../utils/models'
-import { formatDate, countFillsAndRemoveDuplicates } from '../utils/general'
-import { FixedFooter } from '../components/FixedFooter'
-import { Nav } from '../components/Nav'
-import { PoweredBy } from '../components/PoweredBy'
-import t from '../utils/text.json'
-import { OrderContext } from './Main'
+import { Order } from '../utils/models';
+import { formatDate, countFillsAndRemoveDuplicates } from '../utils/general';
+import { FixedFooter } from '../components/FixedFooter';
+import { Nav } from '../components/Nav';
+import { PoweredBy } from '../components/PoweredBy';
+import t from '../utils/text.json';
+import { OrderContext } from './Main';
 
 export const Review = () => {
-  const order = useContext<Order>(OrderContext)
+  const order = useContext<Order>(OrderContext);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const [searchParams] = useSearchParams()
-  const token = searchParams.get('token')
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
 
-  const { organization, patient, fills } = order
+  const { organization, patient, fills } = order;
 
   const handleCtaClick = () => {
-    navigate(`/ready?orderId=${order.id}&token=${token}`)
-  }
+    navigate(`/ready?orderId=${order.id}&token=${token}`);
+  };
 
-  const flattenedFills = countFillsAndRemoveDuplicates(fills)
+  const flattenedFills = countFillsAndRemoveDuplicates(fills);
 
   return (
     <Box>
@@ -137,5 +137,5 @@ export const Review = () => {
         </Container>
       </FixedFooter>
     </Box>
-  )
-}
+  );
+};

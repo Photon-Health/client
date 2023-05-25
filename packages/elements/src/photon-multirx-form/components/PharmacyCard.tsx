@@ -8,7 +8,7 @@ export const PharmacyCard = ({ pharmacyId }: { pharmacyId: string | undefined })
   createEffect(async () => {
     if (pharmacyId && client) {
       const { data } = await client.getSDK().clinical.pharmacy.getPharmacy({
-        id: pharmacyId,
+        id: pharmacyId
       });
       setPharmacy(data.pharmacy);
     }

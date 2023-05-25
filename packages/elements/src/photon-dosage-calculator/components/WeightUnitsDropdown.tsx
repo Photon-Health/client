@@ -8,12 +8,12 @@ type WeightUnit = {
 const units: WeightUnit[] = [
   {
     id: 'lbs',
-    name: 'lbs',
+    name: 'lbs'
   },
   {
     id: 'kgs',
-    name: 'kgs',
-  },
+    name: 'kgs'
+  }
 ];
 
 export const WeightUnitsDropdown = () => {
@@ -24,8 +24,8 @@ export const WeightUnitsDropdown = () => {
       composed: true,
       bubbles: true,
       detail: {
-        unit: unit,
-      },
+        unit: unit
+      }
     });
     ref?.dispatchEvent(event);
   };

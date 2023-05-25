@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect } from 'react';
 import {
   Alert,
   AlertIcon,
@@ -10,69 +10,69 @@ import {
   Text,
   VStack,
   useToast
-} from '@chakra-ui/react'
-import { Helmet } from 'react-helmet'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { FiCheck, FiMapPin } from 'react-icons/fi'
-import { types } from '@photonhealth/react'
+} from '@chakra-ui/react';
+import { Helmet } from 'react-helmet';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { FiCheck, FiMapPin } from 'react-icons/fi';
+import { types } from '@photonhealth/react';
 
-import { formatAddress, getFullfillmentType } from '../utils/general'
-import { Order } from '../utils/models'
-import { MARK_ORDER_AS_PICKED_UP } from '../utils/mutations'
-import { Nav } from '../components/Nav'
-import { StatusStepper } from '../components/StatusStepper'
-import { FixedFooter } from '../components/FixedFooter'
-import { PoweredBy } from '../components/PoweredBy'
-import { OrderContext } from './Main'
-import { graphQLClient } from '../configs/graphqlClient'
-import t from '../utils/text.json'
-import { getSettings } from '@client/settings'
+import { formatAddress, getFullfillmentType } from '../utils/general';
+import { Order } from '../utils/models';
+import { MARK_ORDER_AS_PICKED_UP } from '../utils/mutations';
+import { Nav } from '../components/Nav';
+import { StatusStepper } from '../components/StatusStepper';
+import { FixedFooter } from '../components/FixedFooter';
+import { PoweredBy } from '../components/PoweredBy';
+import { OrderContext } from './Main';
+import { graphQLClient } from '../configs/graphqlClient';
+import t from '../utils/text.json';
+import { getSettings } from '@client/settings';
 
-const settings = getSettings(process.env.REACT_APP_ENV_NAME)
+const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
-const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER']
+const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
 
-const PHOTON_PHONE_NUMBER: string = process.env.REACT_APP_TWILIO_SMS_NUMBER
+const PHOTON_PHONE_NUMBER: string = process.env.REACT_APP_TWILIO_SMS_NUMBER;
 
 export const Status = () => {
-  const navigate = useNavigate()
-  const order = useContext<Order>(OrderContext)
+  const navigate = useNavigate();
+  const order = useContext<Order>(OrderContext);
 
-  const [searchParams] = useSearchParams()
-  const orderId = searchParams.get('orderId')
-  const token = searchParams.get('token')
-  const type = searchParams.get('type')
+  const [searchParams] = useSearchParams();
+  const orderId = searchParams.get('orderId');
+  const token = searchParams.get('token');
+  const type = searchParams.get('type');
 
   const [showFooter, setShowFooter] = useState<boolean>(
     order?.state === types.OrderState.Placed &&
       order?.fulfillment?.type !== types.FulfillmentType.MailOrder
-  )
+  );
 
-  const [error, setError] = useState(undefined)
-  const [submitting, setSubmitting] = useState<boolean>(false)
-  const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false)
+  const [error, setError] = useState(undefined);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
 
-  const { fulfillment, pharmacy, organization, address } = order
+  const { fulfillment, pharmacy, organization, address } = order;
 
   const orgSettings =
-    order?.organization?.id in settings ? settings[order.organization.id] : settings.default
-  const fulfillmentType = getFullfillmentType(orgSettings, order?.pharmacy?.id, type)
+    order?.organization?.id in settings ? settings[order.organization.id] : settings.default;
+  const fulfillmentType = getFullfillmentType(orgSettings, order?.pharmacy?.id, type);
 
-  const toast = useToast()
+  const toast = useToast();
 
   const markOrderAsPickedUp = async () => {
     try {
-      setSubmitting(true)
+      setSubmitting(true);
 
-      graphQLClient.setHeader('x-photon-auth', token)
+      graphQLClient.setHeader('x-photon-auth', token);
       const results: any = await graphQLClient.request(MARK_ORDER_AS_PICKED_UP, {
         markOrderAsPickedUpId: orderId
-      })
+      });
 
       setTimeout(() => {
         if (results?.markOrderAsPickedUp) {
-          setSuccessfullySubmitted(true)
-          setTimeout(() => setShowFooter(false), 1000)
+          setSuccessfullySubmitted(true);
+          setTimeout(() => setShowFooter(false), 1000);
         } else {
           toast({
             title: t.status[fulfillmentType].errorToast.title,
@@ -81,30 +81,30 @@ export const Status = () => {
             status: 'error',
             duration: 5000,
             isClosable: true
-          })
+          });
         }
-        setSubmitting(false)
-      }, 1000)
+        setSubmitting(false);
+      }, 1000);
     } catch (error) {
-      console.error(JSON.stringify(error, undefined, 2))
+      console.error(JSON.stringify(error, undefined, 2));
 
       if (error?.response?.errors) {
         if (AUTH_HEADER_ERRORS.includes(error.response.errors[0].extensions.code)) {
-          navigate('/no-match')
+          navigate('/no-match');
         } else {
-          setError(error.response.errors[0].message)
+          setError(error.response.errors[0].message);
         }
       }
     }
-  }
+  };
 
   useEffect(() => {
     if (!order?.fulfillment) {
       setTimeout(() => {
-        window.location.reload()
-      }, 60000)
+        window.location.reload();
+      }, 60000);
     }
-  }, [order?.fulfillment])
+  }, [order?.fulfillment]);
 
   if (error) {
     return (
@@ -112,11 +112,11 @@ export const Status = () => {
         <AlertIcon />
         {error}
       </Alert>
-    )
+    );
   }
 
   // Only show "Text us now" prompt if pickup and RECEIVED or READY
-  const showChatAlert = fulfillment?.state === 'RECEIVED' || fulfillment?.state === 'READY'
+  const showChatAlert = fulfillment?.state === 'RECEIVED' || fulfillment?.state === 'READY';
 
   return (
     <Box>
@@ -190,5 +190,5 @@ export const Status = () => {
         </Container>
       </FixedFooter>
     </Box>
-  )
-}
+  );
+};

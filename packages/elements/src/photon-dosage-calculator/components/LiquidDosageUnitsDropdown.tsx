@@ -8,16 +8,16 @@ type LiquidDosageUnit = {
 const units: LiquidDosageUnit[] = [
   {
     id: 'mg',
-    name: 'mg',
+    name: 'mg'
   },
   {
     id: 'mcg',
-    name: 'mcg',
+    name: 'mcg'
   },
   {
     id: 'g',
-    name: 'g',
-  },
+    name: 'g'
+  }
 ];
 
 export const LiquidDosageUnitsDropdown = () => {
@@ -28,8 +28,8 @@ export const LiquidDosageUnitsDropdown = () => {
       composed: true,
       bubbles: true,
       detail: {
-        unit: unit,
-      },
+        unit: unit
+      }
     });
     ref?.dispatchEvent(event);
   };

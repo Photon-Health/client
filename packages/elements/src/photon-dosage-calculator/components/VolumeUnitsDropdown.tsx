@@ -8,12 +8,12 @@ type VolumeUnit = {
 const units: VolumeUnit[] = [
   {
     id: 'mL',
-    name: 'mL',
+    name: 'mL'
   },
   {
     id: 'L',
-    name: 'L',
-  },
+    name: 'L'
+  }
 ];
 
 export const VolumeUnitsDropdown = () => {
@@ -24,8 +24,8 @@ export const VolumeUnitsDropdown = () => {
       composed: true,
       bubbles: true,
       detail: {
-        unit: unit,
-      },
+        unit: unit
+      }
     });
     ref?.dispatchEvent(event);
   };

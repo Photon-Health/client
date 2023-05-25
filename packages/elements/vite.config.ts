@@ -16,38 +16,38 @@ export default defineConfig({
       targets: [
         {
           src: resolvePath('node_modules/@shoelace-style/shoelace/dist/assets'),
-          dest: resolvePath('dist/shoelace'),
-        },
-      ],
+          dest: resolvePath('dist/shoelace')
+        }
+      ]
     }),
     typescript({
       target: 'esnext',
       rootDir: resolvePath('./src'),
       declaration: true,
       declarationDir: resolvePath('./dist'),
-      exclude: resolvePath('./node_modules/**'),
-    }),
+      exclude: resolvePath('./node_modules/**')
+    })
   ],
   build: {
     lib: {
       entry: resolvePath('src/index.ts'),
       name: 'photon-webcomponents',
       formats: ['es', 'cjs'],
-      fileName: '[name]',
+      fileName: '[name]'
     },
     rollupOptions: {
       output: {
         dir: './dist',
         preserveModules: false,
-        inlineDynamicImports: true,
+        inlineDynamicImports: true
       },
       plugins: [
         replace({
-          'process.env.NODE_ENV': JSON.stringify('production'),
-        }),
-      ],
+          'process.env.NODE_ENV': JSON.stringify('production')
+        })
+      ]
     },
     target: 'esnext',
-    minify: true,
-  },
+    minify: true
+  }
 });

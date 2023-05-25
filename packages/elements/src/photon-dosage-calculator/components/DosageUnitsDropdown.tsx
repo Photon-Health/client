@@ -8,16 +8,16 @@ type DosageUnit = {
 const units: DosageUnit[] = [
   {
     id: 'mcg/kg',
-    name: 'mcg/kg',
+    name: 'mcg/kg'
   },
   {
     id: 'mg/kg',
-    name: 'mg/kg',
+    name: 'mg/kg'
   },
   {
     id: 'g/kg',
-    name: 'g/kg',
-  },
+    name: 'g/kg'
+  }
 ];
 
 export const DosageUnitsDropdown = () => {
@@ -28,8 +28,8 @@ export const DosageUnitsDropdown = () => {
       composed: true,
       bubbles: true,
       detail: {
-        unit: unit,
-      },
+        unit: unit
+      }
     });
     ref?.dispatchEvent(event);
   };

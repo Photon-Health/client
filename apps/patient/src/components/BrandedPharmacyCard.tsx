@@ -6,16 +6,16 @@ import {
   Text,
   VStack,
   useBreakpointValue
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import capsuleLogo from '../assets/capsule_logo.png'
-import amazonPharmacyLogo from '../assets/amazon_pharmacy.png'
-import altoLogo from '../assets/alto_logo.svg'
+import capsuleLogo from '../assets/capsule_logo.png';
+import amazonPharmacyLogo from '../assets/amazon_pharmacy.png';
+import altoLogo from '../assets/alto_logo.svg';
 
 interface Props {
-  pharmacyId: string
-  selectedId: string
-  handleSelect: (id: string) => void
+  pharmacyId: string;
+  selectedId: string;
+  handleSelect: (id: string) => void;
 }
 
 const PHARMACY_BRANDING = {
@@ -31,14 +31,14 @@ const PHARMACY_BRANDING = {
     logo: altoLogo,
     description: 'Free same-day delivery'
   }
-}
+};
 
 export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Props) => {
-  const isMobile = useBreakpointValue({ base: true, md: false })
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
-  const { logo, description } = PHARMACY_BRANDING[pharmacyId]
+  const { logo, description } = PHARMACY_BRANDING[pharmacyId];
 
-  if (!logo || !description) return null
+  if (!logo || !description) return null;
 
   return (
     <SlideFade offsetY="60px" in={true} key={`courier-pharmacy-${pharmacyId}`}>
@@ -60,5 +60,5 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
         </CardBody>
       </Card>
     </SlideFade>
-  )
-}
+  );
+};
