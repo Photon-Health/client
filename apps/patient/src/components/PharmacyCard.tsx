@@ -19,7 +19,7 @@ import { Rating } from './Rating';
 import { formatAddress } from '../utils/general';
 import { Pharmacy } from '../utils/models';
 
-dayjs.extend(customParseFormat)
+dayjs.extend(customParseFormat);
 
 const INFO_COLOR_MAP = {
   Previous: 'green',
@@ -76,9 +76,9 @@ const DistanceAddress = ({ distance, address }) => {
 };
 
 interface PharmacyCardProps {
-  pharmacy: Pharmacy
-  selected: boolean
-  onSelect: Function
+  pharmacy: Pharmacy;
+  selected: boolean;
+  onSelect: Function;
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
