@@ -12,7 +12,6 @@ import t from '../utils/text.json';
 import { OrderContext } from './Main';
 
 const checkDisabled = (option: string): boolean => {
-  if (option === 'tomorrow') return false;
   const currentTime = dayjs();
   const afterHoursOption = t.readyBy.options[5];
   const afterHoursStarts = '6:00 pm';
