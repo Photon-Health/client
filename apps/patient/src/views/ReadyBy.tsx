@@ -11,7 +11,7 @@ import { PoweredBy } from '../components/PoweredBy';
 import t from '../utils/text.json';
 import { OrderContext } from './Main';
 
-const currentTimeIsAfterOption = (option: string): boolean => {
+const checkDisabled = (option: string): boolean => {
   const currentTime = dayjs();
   const afterHoursOption = t.readyBy.options[5];
   const afterHoursStarts = '6:00 pm';
@@ -56,7 +56,7 @@ export const ReadyBy = () => {
 
           <VStack spacing={3} w="full">
             {t.readyBy.options.map((option, i) => {
-              const isDisabled = i !== (0 | 6) && currentTimeIsAfterOption(option);
+              const isDisabled = checkDisabled(option);
               return (
                 <Button
                   key={option}

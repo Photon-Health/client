@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import isBetween from 'dayjs/plugin/isBetween';
-import { types } from '@photonhealth/react';
+import { types } from 'packages/sdk';
 import { FulfillmentType } from './models';
 
 dayjs.extend(isoWeek);
