@@ -37,7 +37,7 @@ export const MedicationNameDropdown = () => {
         setIsLoading(false);
       });
     }
-  }, [filterText]);
+  });
 
   return (
     <div
@@ -60,7 +60,7 @@ export const MedicationNameDropdown = () => {
         }}
         noDataMsg={'No medications found'}
         required={false}
-      ></PhotonDropdown>
+      />
     </div>
   );
 };

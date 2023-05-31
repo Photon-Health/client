@@ -12,6 +12,16 @@ import { PharmacyCard } from './PharmacyCard';
 import t from '../utils/text.json';
 import { Pharmacy } from '../utils/models';
 
+interface PickupOptionsProps {
+  pharmacies: Pharmacy[];
+  selectedId: string;
+  handleSelect: (id: string) => void;
+  handleShowMore: () => void;
+  loadingMore: boolean;
+  showingAllPharmacies: boolean;
+  courierEnabled: boolean;
+}
+
 export const PickupOptions = ({
   pharmacies,
   selectedId,
@@ -20,7 +30,7 @@ export const PickupOptions = ({
   loadingMore,
   showingAllPharmacies,
   courierEnabled
-}) => {
+}: PickupOptionsProps) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (

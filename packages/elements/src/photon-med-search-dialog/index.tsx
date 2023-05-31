@@ -73,7 +73,7 @@ customElement(
             props.open = false;
           }}
         >
-          <photon-med-search></photon-med-search>
+          <photon-med-search />
         </photon-dialog>
       </div>
     );

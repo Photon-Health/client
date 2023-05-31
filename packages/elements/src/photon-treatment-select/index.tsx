@@ -146,7 +146,7 @@ customElement(
               : 'No treatments found'
           }
           helpText={props.helpText}
-        ></PhotonDropdown>
+        />
       </div>
     );
   }

@@ -1,5 +1,5 @@
 import { PhotonClient } from '@photonhealth/sdk';
-import { Pharmacy } from '@photonhealth/sdk/dist/types';
+import { Pharmacy, FulfillmentType } from '@photonhealth/sdk/dist/types';
 import { GraphQLError } from 'graphql';
 import { createStore } from 'solid-js/store';
 import gql from 'graphql-tag';

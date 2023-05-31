@@ -86,7 +86,7 @@ export class PatientQueryManager {
     if (!fragment) {
       fragment = { PatientFields: PATIENT_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment!)[0];
+    const [fName, fValue] = Object.entries(fragment!)[0];
     const GET_PATIENT = gql`
       ${fValue}
       query patient($id: ID!) {
@@ -115,7 +115,7 @@ export class PatientQueryManager {
     if (!first) {
       first = 25;
     }
-    let [fName, fValue] = Object.entries(fragment!)[0];
+    const [fName, fValue] = Object.entries(fragment!)[0];
     const GET_PATIENTS = gql`
       ${fValue}
       query patients($after: ID, $name: String, $first: Int) {
@@ -140,7 +140,7 @@ export class PatientQueryManager {
     if (!fragment) {
       fragment = { PatientFields: PATIENT_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const CREATE_PATIENT = gql`
       ${fValue}
       mutation createPatient(
@@ -184,7 +184,7 @@ export class PatientQueryManager {
     if (!fragment) {
       fragment = { PatientFields: PATIENT_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const UPDATE_PATIENT = gql`
       ${fValue}
       mutation updatePatient(
@@ -230,7 +230,7 @@ export class PatientQueryManager {
     if (!fragment) {
       fragment = { PatientFields: PATIENT_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const REMOVE_PATIENT_PREFERRED_PHARM = gql`
       ${fValue}
       mutation removePatientPreferredPharmacy(
@@ -259,7 +259,7 @@ export class PatientQueryManager {
     if (!fragment) {
       fragment = { PatientFields: PATIENT_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const REMOVE_PATIENT_ALLERGY = gql`
       ${fValue}
       mutation removePatientAllergy(

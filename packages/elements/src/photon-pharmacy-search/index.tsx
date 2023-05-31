@@ -211,7 +211,7 @@ customElement(
               actions.clearSelectedPharmacy();
               setUserOverrode(false);
             }}
-          ></photon-text-input>
+          />
         </Show>
         <Show
           when={
@@ -287,7 +287,7 @@ customElement(
                 ? store.preferredPharmacies.data?.[0]
                 : undefined
             }
-          ></PhotonDropdown>
+          />
         </Show>
       </div>
     );

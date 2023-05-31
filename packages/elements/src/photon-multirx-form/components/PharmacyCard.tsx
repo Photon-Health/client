@@ -1,14 +1,14 @@
 import { createEffect, createSignal, Show } from 'solid-js';
 import { usePhoton } from '../../context';
 
-export const PharmacyCard = ({ pharmacyId }: { pharmacyId: string | undefined }) => {
+export const PharmacyCard = (props: { pharmacyId: string | undefined }) => {
   const client = usePhoton();
-  const [pharmacy, setPharmacy] = createSignal({});
+  const [pharmacy, setPharmacy] = createSignal({ name: '' });
 
   createEffect(async () => {
-    if (pharmacyId && client) {
+    if (props.pharmacyId && client) {
       const { data } = await client.getSDK().clinical.pharmacy.getPharmacy({
-        id: pharmacyId
+        id: props.pharmacyId
       });
       setPharmacy(data.pharmacy);
     }
@@ -20,7 +20,7 @@ export const PharmacyCard = ({ pharmacyId }: { pharmacyId: string | undefined })
           <p class="font-sans text-l font-medium flex-grow">Selected Pharmacy</p>
         </div>
         <Show when={!pharmacy()}>
-          <sl-spinner style="font-size: 1rem;"></sl-spinner>
+          <sl-spinner style={{ 'font-size': '1rem' }} />
         </Show>
 
         <Show when={pharmacy()}>

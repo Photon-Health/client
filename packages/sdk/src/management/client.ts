@@ -42,7 +42,7 @@ export class ClientQueryManager {
       fragment: { ClientFields: CLIENT_FIELDS }
     }
   ) {
-    let [fName, fValue] = Object.entries(fragment!)[0];
+    const [fName, fValue] = Object.entries(fragment!)[0];
     const GET_CLIENTS = gql`
           ${fValue}
           query clients {
@@ -63,7 +63,7 @@ export class ClientQueryManager {
     if (!fragment) {
       fragment = { ClientFields: CLIENT_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const ROTATE_SECRET = gql`
       ${fValue}
       mutation rotateSecret(

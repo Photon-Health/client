@@ -46,7 +46,7 @@ export const MedicationStrengthDropdown = (props: { disabled: boolean; medicatio
         setIsLoading(false);
       });
     }
-  }, [props.medicationId]);
+  });
 
   const actionRef: any = {};
 
@@ -78,7 +78,7 @@ export const MedicationStrengthDropdown = (props: { disabled: boolean; medicatio
         }}
         noDataMsg={'No strengths found'}
         required={false}
-      ></PhotonDropdown>
+      />
     </div>
   );
 };

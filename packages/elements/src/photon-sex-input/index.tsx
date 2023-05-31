@@ -82,7 +82,7 @@ customElement(
           optional={false}
           helpText={props.helpText}
           selectedData={sexes.filter((x) => x.name.toUpperCase() === props.selected)?.[0]}
-        ></PhotonDropdown>
+        />
       </div>
     );
   }

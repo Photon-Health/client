@@ -46,7 +46,7 @@ export const MedicationRouteDropdown = (props: { disabled: boolean; medicationId
         setIsLoading(false);
       });
     }
-  }, [props.medicationId]);
+  });
 
   const actionRef: any = {};
 
@@ -78,7 +78,7 @@ export const MedicationRouteDropdown = (props: { disabled: boolean; medicationId
         }}
         noDataMsg={'No routes found'}
         required={false}
-      ></PhotonDropdown>
+      />
     </div>
   );
 };

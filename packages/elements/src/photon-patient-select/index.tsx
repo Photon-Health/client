@@ -39,7 +39,7 @@ customElement(
     //context
     const client = usePhoton();
     const { store, actions } = PatientStore;
-    let fetchMore: Function | undefined;
+    let fetchMore: (...args: any) => any | undefined;
 
     onMount(() => {
       actions.reset();
@@ -106,7 +106,7 @@ customElement(
           onHide={async () => {
             fetchMore = await actions.getPatients(client!.getSDK());
           }}
-          fetchMore={async (s: string) => {
+          fetchMore={async () => {
             if (fetchMore) {
               fetchMore = await fetchMore();
             }
@@ -114,7 +114,7 @@ customElement(
           noDataMsg={'No patients found'}
           helpText={props.helpText}
           selectedData={store.selectedPatient.data}
-        ></PhotonDropdown>
+        />
       </div>
     );
   }

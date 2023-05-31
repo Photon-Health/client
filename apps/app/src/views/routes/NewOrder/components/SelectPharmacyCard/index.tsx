@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
   Card,
   CardHeader,
@@ -33,7 +33,7 @@ interface SelectPharmacyCardProps {
   tabsList: FulfillmentOptions;
 }
 
-export const SelectPharmacyCard: React.FC<SelectPharmacyCardProps> = ({
+export const SelectPharmacyCard: FC<SelectPharmacyCardProps> = ({
   user,
   patient,
   address,

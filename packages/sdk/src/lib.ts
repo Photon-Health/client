@@ -83,13 +83,13 @@ export class PhotonClient {
       organization: this.organization,
       audience: this.audience
     });
-    let apollo = this.constructApolloClient();
+    const apollo = this.constructApolloClient();
     this.clinical = new ClinicalQueryManager(apollo);
     this.management = new ManagementQueryManager(apollo);
   }
 
   private constructApolloClient() {
-    let apollo = new ApolloClient({
+    const apollo = new ApolloClient({
       link: setContext(async (_, { headers, ...rest }) => {
         const token = await this.authentication.getAccessToken();
 

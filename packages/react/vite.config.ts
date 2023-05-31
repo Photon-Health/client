@@ -15,6 +15,7 @@ export default defineConfig({
   ],
   build: {
     lib: {
+      // eslint-disable-next-line
       entry: path.resolve(__dirname, 'src/index.ts'),
       name: 'react',
       formats: ['es', 'cjs'],

@@ -262,7 +262,7 @@ export const Pharmacy = () => {
       });
 
       setTimeout(() => {
-        if (!!results?.selectOrderPharmacy) {
+        if (results?.selectOrderPharmacy) {
           setSuccessfullySubmitted(true);
           setTimeout(() => {
             setShowFooter(false);

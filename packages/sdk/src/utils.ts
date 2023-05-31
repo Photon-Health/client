@@ -24,7 +24,7 @@ export async function makeQuery<T = any>(
   variables: object = {},
   fetchPolicy?: FetchPolicy
 ): Promise<MakeQueryReturn<T>> {
-  let result = await apollo.query({
+  const result = await apollo.query({
     query,
     variables,
     fetchPolicy

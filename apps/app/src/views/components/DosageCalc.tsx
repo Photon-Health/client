@@ -18,7 +18,7 @@ import {
   Wrap
 } from '@chakra-ui/react';
 import { Field, Formik } from 'formik';
-import { useEffect, useState } from 'react';
+import { MutableRefObject, useEffect, useState } from 'react';
 import { SelectField } from './SelectField';
 
 const initialValues = {
@@ -155,9 +155,9 @@ export const DosageCalc = ({
 }: {
   isOpen: boolean;
   onClose: any;
-  quantityRef: React.MutableRefObject<any>;
-  drugRef: React.MutableRefObject<any>;
-  unitRef: React.MutableRefObject<any>;
+  quantityRef: MutableRefObject<any>;
+  drugRef: MutableRefObject<any>;
+  unitRef: MutableRefObject<any>;
 }) => {
   const background = useColorModeValue('white', 'dark');
   const [dose, setDose] = useState<string | undefined>();
