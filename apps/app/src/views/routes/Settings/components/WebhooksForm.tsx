@@ -26,7 +26,7 @@ import {
   VStack
 } from '@chakra-ui/react';
 
-import React, { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePhoton } from '@photonhealth/react';
 import { capitalizeFirst } from '../../../../utils';
 
@@ -56,7 +56,7 @@ interface WebhooksFormProps {
 }
 
 export const WebhooksForm = ({ isOpen, close }: WebhooksFormProps) => {
-  const [eventValue, setEventValue] = React.useState('');
+  const [eventValue, setEventValue] = useState('');
 
   const { createWebhook } = usePhoton();
   const [createWebhookConfig, { loading, error }] = createWebhook({
@@ -162,7 +162,7 @@ export const WebhooksForm = ({ isOpen, close }: WebhooksFormProps) => {
                           <HStack alignItems="start" spacing={20}>
                             <SimpleGrid columns={[2]} spacing={3}>
                               {allFilters.map((filter) => (
-                                <Field as={Checkbox} name="filters" value={filter}>
+                                <Field as={Checkbox} name="filters" value={filter} key={filter}>
                                   {capitalizeFirst(filter.split(':').slice(1).join(' '))}
                                 </Field>
                               ))}

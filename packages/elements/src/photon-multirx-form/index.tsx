@@ -14,7 +14,7 @@ import tailwind from '../tailwind.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import styles from './style.css?inline';
-import { createEffect, onMount, createSignal, Show } from 'solid-js';
+import { createEffect, onMount, createSignal, Show, For } from 'solid-js';
 import type { FormError } from '../stores/form';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
@@ -130,10 +130,10 @@ customElement(
     });
     createEffect(() => {
       setIsLoading(client?.authentication.state.isLoading || false);
-    }, [client?.authentication.state.isLoading]);
+    });
     createEffect(() => {
       setAuthenticated(client?.authentication.state.isAuthenticated || false);
-    }, [client?.authentication.state.isAuthenticated]);
+    });
 
     createEffect(async () => {
       if (props.templateIds && client) {
@@ -169,40 +169,41 @@ customElement(
           }
           if (
             // minimum template fields required to create a prescription
-            !template.treatment ||
-            !template.dispenseQuantity ||
-            !template.dispenseUnit ||
-            !template.fillsAllowed ||
-            !template.instructions
+            !template?.treatment ||
+            !template?.dispenseQuantity ||
+            !template?.dispenseUnit ||
+            !template?.fillsAllowed ||
+            !template?.instructions
           ) {
             console.error(`Template is missing required prescription details ${templateId}`);
+          } else {
+            actions.updateFormValue({
+              key: 'draftPrescriptions',
+              value: [
+                ...(store['draftPrescriptions']?.value || []),
+                {
+                  id: String(Math.random()),
+                  effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
+                  treatment: template.treatment,
+                  dispenseAsWritten: template.dispenseAsWritten,
+                  dispenseQuantity: template.dispenseQuantity,
+                  dispenseUnit: template.dispenseUnit,
+                  daysSupply: template.daysSupply,
+                  // when we pre-populate draft prescriptions using template ID's, we need need to update the value for refills here
+                  refillsInput: template.fillsAllowed ? template.fillsAllowed - 1 : 0,
+                  fillsAllowed: template.fillsAllowed,
+                  instructions: template.instructions,
+                  notes: template.notes,
+                  addToTemplates: false,
+                  catalogId: undefined
+                }
+              ]
+            });
           }
-          actions.updateFormValue({
-            key: 'draftPrescriptions',
-            value: [
-              ...(store['draftPrescriptions']?.value || []),
-              {
-                id: String(Math.random()),
-                effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
-                treatment: template.treatment,
-                dispenseAsWritten: template.dispenseAsWritten,
-                dispenseQuantity: template.dispenseQuantity,
-                dispenseUnit: template.dispenseUnit,
-                daysSupply: template.daysSupply,
-                // when we pre-populate draft prescriptions using template ID's, we need need to update the value for refills here
-                refillsInput: template.fillsAllowed ? template.fillsAllowed - 1 : 0,
-                fillsAllowed: template.fillsAllowed,
-                instructions: template.instructions,
-                notes: template.notes,
-                addToTemplates: false,
-                catalogId: undefined
-              }
-            ]
-          });
         }
         setIsLoadingTemplates(false);
       }
-    }, [client]);
+    });
 
     const dispatchPrescriptionsCreated = (prescriptions: Prescription[]) => {
       const event = new CustomEvent('photon-prescriptions-created', {
@@ -358,7 +359,7 @@ customElement(
           <div class="flex flex-col gap-8">
             <Show when={(!client || isLoading()) && !authenticated()}>
               <div class="w-full flex justify-center">
-                <sl-spinner style="font-size: 3rem;"></sl-spinner>
+                <sl-spinner style={{ 'font-size': '3rem' }} />
               </div>
             </Show>
             <PhotonAuthorized permissions={['write:prescription']}>
@@ -369,14 +370,14 @@ customElement(
                 client={client!}
                 enableOrder={props.enableOrder}
                 hideAddress={!!props.address}
-              ></PatientCard>
+              />
               <Show when={showForm() || isEditing()}>
                 <div ref={prescriptionRef}>
                   <AddPrescriptionCard
                     hideAddToTemplates={props.hideTemplates}
                     actions={actions}
                     store={store}
-                  ></AddPrescriptionCard>
+                  />
                 </div>
               </Show>
               <DraftPrescriptionCard
@@ -385,28 +386,30 @@ customElement(
                 store={store}
                 isLoading={isLoadingTemplates()}
                 setIsEditing={setIsEditing}
-              ></DraftPrescriptionCard>
+              />
               <Show when={props.enableOrder && !props.pharmacyId}>
-                <OrderCard store={store} actions={actions}></OrderCard>
+                <OrderCard store={store} actions={actions} />
               </Show>
               <Show when={props.enableOrder && props.pharmacyId}>
-                <PharmacyCard pharmacyId={props.pharmacyId}></PharmacyCard>
+                <PharmacyCard pharmacyId={props.pharmacyId} />
               </Show>
               <Show when={!props.hideSubmit}>
                 {/* We're hiding this alert message if enable-order is set, a rough way to let us know this is not in the App.
                 The issue we're having is when props are passed and cards are hidden, the form is not showing validation errors. */}
                 <Show when={errors().length > 0 && props.enableOrder}>
                   <div class="m-3">
-                    {errors().map(({ key, error }) => (
-                      <sl-alert variant="warning" open>
-                        <sl-icon slot="icon" name="exclamation-triangle"></sl-icon>
-                        <strong>Error with {key}: </strong>
-                        <br />
-                        {error}
-                        <br />
-                        {JSON.stringify(store?.[key]?.value || {})}
-                      </sl-alert>
-                    ))}
+                    <For each={errors()} fallback={<div>No errors...</div>}>
+                      {({ key, error }: { key: string; error: string }) => (
+                        <sl-alert variant="warning" open>
+                          <sl-icon slot="icon" name="exclamation-triangle" />
+                          <strong>Error with {key}: </strong>
+                          <br />
+                          {error}
+                          <br />
+                          {JSON.stringify(store?.[key]?.value || {})}
+                        </sl-alert>
+                      )}
+                    </For>
                   </div>
                 </Show>
                 <div class="flex flex-row justify-end gap-2">

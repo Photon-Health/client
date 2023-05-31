@@ -499,17 +499,17 @@ export interface PhotonClientContextInterface {
     after
   }: {
     filter?: MedicationFilter;
-    first?: Number;
-    after?: String;
+    first?: number;
+    after?: string;
   }) => GetMedicationReturn;
   getMedicalEquipment: ({
     name,
     first,
     after
   }: {
-    name?: String;
-    first?: Number;
-    after?: String;
+    name?: string;
+    first?: number;
+    after?: string;
   }) => GetMedicalEquipmentReturn;
   getAllergens: ({ filter }: { filter?: AllergenFilter }) => GetAllergensReturn;
   getPharmacy: ({ id }: { id: string }) => {
@@ -695,7 +695,7 @@ export const PhotonProvider = (opts: {
     isLoading: true
   });
 
-  const functionLookup: Record<string, Function> = {};
+  const functionLookup: Record<string, (...args: any) => any> = {};
 
   useEffect(() => {
     const initialize = async () => {
@@ -704,7 +704,7 @@ export const PhotonProvider = (opts: {
           const { appState } = await client.authentication.handleRedirect();
           onRedirectCallback(appState);
         } catch (e) {
-          let message = (e as Error).message;
+          const message = (e as Error).message;
           dispatch({ type: 'ERROR', error: message });
         }
       }
@@ -721,7 +721,7 @@ export const PhotonProvider = (opts: {
     try {
       await client.authentication.handleRedirect(url);
     } catch (e) {
-      let message = (e as Error).message;
+      const message = (e as Error).message;
       dispatch({ type: 'ERROR', error: message });
     }
     dispatch({
@@ -770,7 +770,7 @@ export const PhotonProvider = (opts: {
       });
       return token;
     } catch (e) {
-      throw e;
+      console.error(e);
     }
   };
   /// Utilities
@@ -946,6 +946,7 @@ export const PhotonProvider = (opts: {
 
   const createPatient = ({
     refetchQueries = undefined,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     awaitRefetchQueries = false
   }: {
     refetchQueries?: string[];
@@ -1319,17 +1320,13 @@ export const PhotonProvider = (opts: {
     error: undefined
   });
 
-  const fetchDispenseUnits = action(
-    getDispenseUnitsStore,
-    'fetchDispenseUnits',
-    async (store, { id }) => {
-      store.setKey('loading', true);
-      const { data, error } = await client.clinical.prescription.getDispenseUnits({});
-      store.setKey('dispenseUnits', data?.dispenseUnits || undefined);
-      store.setKey('error', error);
-      store.setKey('loading', false);
-    }
-  );
+  const fetchDispenseUnits = action(getDispenseUnitsStore, 'fetchDispenseUnits', async (store) => {
+    store.setKey('loading', true);
+    const { data, error } = await client.clinical.prescription.getDispenseUnits({});
+    store.setKey('dispenseUnits', data?.dispenseUnits || undefined);
+    store.setKey('error', error);
+    store.setKey('loading', false);
+  });
 
   const getDispenseUnits = () => {
     const { dispenseUnits, loading, error } = useStore(getDispenseUnitsStore);
@@ -2197,7 +2194,7 @@ export const PhotonProvider = (opts: {
   };
 
   const deleteWebhookStore = map<{
-    deleteWebhook?: Boolean;
+    deleteWebhook?: boolean;
     loading: boolean;
     error?: GraphQLError;
   }>({

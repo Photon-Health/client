@@ -9,9 +9,9 @@ import { MedicalEquipment } from '../types';
  * @param fragment Allows you to override the default query to request more fields
  */
 export interface GetMedicalEquipmentOptions {
-  name?: String;
-  after?: String;
-  first?: Number;
+  name?: string;
+  after?: string;
+  first?: number;
   fragment?: Record<string, DocumentNode>;
 }
 
@@ -41,7 +41,7 @@ export class MedicalEquipmentQueryManager {
     if (!fragment) {
       fragment = { MedicalEquipmentFields: MEDICAL_EQUIPMENT_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_MEDICAL_EQUIPMENT = gql`
       ${fValue}
       query medicalEquipment($name: String, $after: ID, $first: Int) {

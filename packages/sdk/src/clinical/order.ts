@@ -1,7 +1,7 @@
 import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client';
 import { ORDER_FIELDS } from '../fragments';
 import { makeMutation, makeQuery } from '../utils';
-import { Maybe, Order } from '../types';
+import { Order } from '../types';
 
 /**
  * GetOrders options
@@ -68,7 +68,7 @@ export class OrderQueryManager {
     if (!fragment) {
       fragment = { OrderFields: ORDER_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_ORDERS = gql`
         ${fValue}
         query orders(
@@ -111,7 +111,7 @@ export class OrderQueryManager {
     if (!fragment) {
       fragment = { OrderFields: ORDER_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_ORDER = gql`
         ${fValue}
         query order($id: ID!) {
@@ -132,7 +132,7 @@ export class OrderQueryManager {
     if (!fragment) {
       fragment = { OrderFields: ORDER_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const CREATE_ORDER = gql`
       ${fValue}
       mutation createOrder(

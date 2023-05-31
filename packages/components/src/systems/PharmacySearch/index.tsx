@@ -1,4 +1,4 @@
-import { For, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
+import { For, Show, createEffect, createMemo, createSignal } from 'solid-js';
 import InputGroup from '../../particles/InputGroup';
 import { PharmacyStore } from '../../stores/pharmacy';
 import ComboBox from '../../particles/ComboBox';

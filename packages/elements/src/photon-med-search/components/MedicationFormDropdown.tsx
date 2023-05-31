@@ -15,8 +15,8 @@ export const MedicationFormDropdown = (props: { disabled: boolean; medicationId:
       composed: true,
       bubbles: true,
       detail: {
-        formId: id,
-      },
+        formId: id
+      }
     });
     ref?.dispatchEvent(event);
   };
@@ -25,7 +25,7 @@ export const MedicationFormDropdown = (props: { disabled: boolean; medicationId:
     const event = new CustomEvent('photon-form-deselected', {
       composed: true,
       bubbles: true,
-      detail: {},
+      detail: {}
     });
     ref?.dispatchEvent(event);
   };
@@ -38,7 +38,7 @@ export const MedicationFormDropdown = (props: { disabled: boolean; medicationId:
         const id = String(Math.random());
         setUid(id);
         const { data } = await client!.getSDK().clinical.searchMedication.getForms({
-          id: props.medicationId,
+          id: props.medicationId
         });
         if (id === uid()) {
           setData(data.medicationForms ?? []);
@@ -46,7 +46,7 @@ export const MedicationFormDropdown = (props: { disabled: boolean; medicationId:
         setIsLoading(false);
       });
     }
-  }, [props.medicationId]);
+  });
 
   const actionRef: any = {};
 
@@ -78,7 +78,7 @@ export const MedicationFormDropdown = (props: { disabled: boolean; medicationId:
         }}
         noDataMsg={'No forms found'}
         required={false}
-      ></PhotonDropdown>
+      />
     </div>
   );
 };

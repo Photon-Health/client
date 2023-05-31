@@ -3,13 +3,13 @@ import { useField, FieldAttributes } from 'formik';
 import { Button, Text, HStack, forwardRef } from '@chakra-ui/react';
 import { useEffect } from 'react';
 
-const NoOptionsMessage =
-  (
-    onExpandedSearchClick: () => void,
-    expandedSearchLabel: string,
-    expandedSearchNoResultsLabel: string
-  ) =>
-  ({ children, ...props }: NoticeProps) => {
+const NoOptionsMessage = (
+  onExpandedSearchClick: () => void,
+  expandedSearchLabel: string,
+  expandedSearchNoResultsLabel: string
+) => {
+  // eslint-disable no-unused-vars
+  const Message = ({ children, ...props }: NoticeProps) => {
     return (
       <chakraComponents.NoOptionsMessage {...props}>
         <Text>{expandedSearchNoResultsLabel}</Text>
@@ -27,6 +27,10 @@ const NoOptionsMessage =
       </chakraComponents.NoOptionsMessage>
     );
   };
+  Message.displayName = 'NoOptionsMessage';
+
+  return Message;
+};
 
 export const SelectField = forwardRef((props: FieldAttributes<any>, ref: any) => {
   const {
@@ -109,3 +113,4 @@ export const SelectField = forwardRef((props: FieldAttributes<any>, ref: any) =>
     />
   );
 });
+SelectField.displayName = 'SelectField';

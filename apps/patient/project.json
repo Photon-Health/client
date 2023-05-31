@@ -51,14 +51,14 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "npx eslint src/**/*.{tsx,ts}"
+        "command": "npx eslint . --ext .tsx,.ts --quiet"
       }
     },
     "lint:fix": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "npx eslint src/**/*.{tsx,ts} --fix && npx prettier --write src/**/*.{ts,tsx}"
+        "command": "npx eslint . --ext .tsx,.ts --fix && npx prettier --write src/**/*.{ts,tsx}"
       }
     }
   }

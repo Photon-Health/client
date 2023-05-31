@@ -57,7 +57,7 @@ export const FillsSelect = (props: FillsSelectProps) => {
   });
 
   const matchSelectedPatient = (prescription: { patient: { id: string } }) =>
-    prescription.patient.id === patientId;
+    prescription?.patient.id === patientId;
 
   useEffect(() => {
     if (!loading && patientId && prescriptions.every(matchSelectedPatient)) {

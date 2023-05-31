@@ -26,6 +26,4 @@ import './photon-med-search';
 import './photon-radio-card';
 import './photon-radio-group';
 import './photon-med-search-dialog';
-import './photon-dosage-calculator';
-import './photon-dosage-calculator-dialog';
 import './photon-multirx-form-wrapper';

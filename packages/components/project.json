@@ -25,6 +25,27 @@
         "cwd": "packages/components",
         "command": "vitest run"
       }
+    },
+    "build-storybook": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/components",
+        "command": "storybook build"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/components",
+        "command": "npx eslint . --ext .tsx,.ts --quiet"
+      }
+    },
+    "lint:fix": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/sdk",
+        "command": "npx eslint src/**/*.ts --fix && npx prettier --write src/**/*.ts"
+      }
     }
   }
 }

@@ -1,15 +1,15 @@
-import { Heading, SlideFade, Text, VStack } from '@chakra-ui/react'
+import { Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
 
-import t from '../utils/text.json'
-import { BrandedPharmacyCard } from './BrandedPharmacyCard'
+import t from '../utils/text.json';
+import { BrandedPharmacyCard } from './BrandedPharmacyCard';
 
 interface Props {
-  type: 'mailOrder' | 'courier'
-  options: string[]
-  location: string
-  selectedId: string
-  handleSelect: (id: string) => void
-  patientAddress: string
+  type: 'mailOrder' | 'courier';
+  options: string[];
+  location: string;
+  selectedId: string;
+  handleSelect: (id: string) => void;
+  patientAddress: string;
 }
 
 export const BrandedOptions = ({
@@ -20,7 +20,7 @@ export const BrandedOptions = ({
   handleSelect,
   patientAddress
 }: Props) => {
-  if (!location) return null
+  if (!location) return null;
 
   return (
     <VStack spacing={2} align="span" w="full">
@@ -44,5 +44,5 @@ export const BrandedOptions = ({
         />
       ))}
     </VStack>
-  )
-}
+  );
+};

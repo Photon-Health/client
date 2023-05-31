@@ -42,7 +42,7 @@ customElement(
   {
     patientId: ''
   },
-  ({ patientId }: { patientId: string }) => {
+  (props: { patientId: string }) => {
     let ref: any;
     const client = usePhoton();
     const { store: pStore, actions: pActions } = PatientStore;
@@ -92,8 +92,8 @@ customElement(
     });
 
     onMount(() => {
-      if (patientId) {
-        pActions.getSelectedPatient(client!.getSDK(), patientId);
+      if (props.patientId) {
+        pActions.getSelectedPatient(client!.getSDK(), props.patientId);
       } else {
         pActions.clearSelectedPatient();
       }
@@ -187,7 +187,7 @@ customElement(
         <style>{shoelaceLightStyles}</style>
         <Show when={pStore.selectedPatient.isLoading}>
           <div class="flex align-center justify-center h-screen">
-            <sl-spinner style="font-size: 3rem;" class="mt-8"></sl-spinner>
+            <sl-spinner style={{ 'font-size': '3rem' }} class="mt-8" />
           </div>
         </Show>
 
@@ -208,7 +208,7 @@ customElement(
                     });
                   }}
                   value={store['firstName']?.value ?? pStore.selectedPatient.data?.name.first}
-                ></photon-text-input>
+                />
                 <photon-text-input
                   class="min-w-[48%]"
                   debounce-time="0"
@@ -222,7 +222,7 @@ customElement(
                     });
                   }}
                   value={store['lastName']?.value ?? pStore.selectedPatient.data?.name.last}
-                ></photon-text-input>
+                />
               </div>
               <div class="flex flex-col xs:flex-row items-center xs:gap-4">
                 <photon-datepicker
@@ -238,11 +238,11 @@ customElement(
                     });
                   }}
                   value={
-                    patientId
+                    props.patientId
                       ? pStore.selectedPatient.data?.dateOfBirth
                       : store['dateOfBirth']?.value
                   }
-                ></photon-datepicker>
+                />
                 <photon-phone-input
                   class="w-full xs:min-w-[48%]"
                   invalid={store['phone']?.error}
@@ -255,7 +255,7 @@ customElement(
                     });
                   }}
                   value={store['phone']?.value ?? pStore.selectedPatient.data?.phone}
-                ></photon-phone-input>
+                />
               </div>
               <div class="flex flex-col xs:flex-row justify-between xs:gap-4">
                 <div class="flex-grow w-full xs:min-w-[40%]">
@@ -270,14 +270,14 @@ customElement(
                         value: e.detail.gender
                       });
                     }}
-                    on:photon-gender-deselected={(e: any) => {
+                    on:photon-gender-deselected={() => {
                       actions.updateFormValue({
                         key: 'gender',
                         value: undefined
                       });
                     }}
                     selected={pStore.selectedPatient.data?.gender}
-                  ></photon-gender-input>
+                  />
                 </div>
                 <div class="flex-grow w-full xs:min-w-[40%]">
                   <photon-sex-input
@@ -291,14 +291,14 @@ customElement(
                         value: e.detail.sex
                       });
                     }}
-                    on:photon-sex-deselected={(e: any) => {
+                    on:photon-sex-deselected={() => {
                       actions.updateFormValue({
                         key: 'sex',
                         value: undefined
                       });
                     }}
                     selected={pStore.selectedPatient.data?.sex}
-                  ></photon-sex-input>
+                  />
                 </div>
               </div>
               <photon-text-input
@@ -313,7 +313,7 @@ customElement(
                   });
                 }}
                 value={store['email']?.value ?? pStore.selectedPatient.data?.email}
-              ></photon-text-input>
+              />
               <hr class="py-2" />
               <p class="font-sans text-lg flex-grow">Address</p>
               <photon-text-input
@@ -330,7 +330,7 @@ customElement(
                 value={
                   store['address_street1']?.value ?? pStore.selectedPatient.data?.address?.street1
                 }
-              ></photon-text-input>
+              />
               <photon-text-input
                 debounce-time="0"
                 invalid={store['address_street2']?.error}
@@ -346,7 +346,7 @@ customElement(
                 value={
                   store['address_street2']?.value ?? pStore.selectedPatient.data?.address?.street2
                 }
-              ></photon-text-input>
+              />
               <photon-text-input
                 debounce-time="0"
                 invalid={store['address_city']?.error}
@@ -359,7 +359,7 @@ customElement(
                   });
                 }}
                 value={store['address_city']?.value ?? pStore.selectedPatient.data?.address?.city}
-              ></photon-text-input>
+              />
               <div class="flex gap-4 pb-5 xs:pb-2">
                 <photon-state-input
                   class="flex-grow min-w-[40%]"
@@ -374,7 +374,7 @@ customElement(
                     });
                   }}
                   selected={store['state']?.value ?? pStore.selectedPatient.data?.address?.state}
-                ></photon-state-input>
+                />
                 <photon-text-input
                   debounce-time="0"
                   class="flex-grow min-w-[40%]"
@@ -390,7 +390,7 @@ customElement(
                   value={
                     store['address_zip']?.value ?? pStore.selectedPatient.data?.address?.postalCode
                   }
-                ></photon-text-input>
+                />
               </div>
               <hr class="py-2" />
               <p class="font-sans text-lg flex-grow">Preferred Local Pharmacy</p>
@@ -402,9 +402,9 @@ customElement(
                   });
                 }}
                 address={getPatientAddress(pStore, store)}
-                patient-id={patientId}
+                patient-id={props.patientId}
                 selected={pStore.selectedPatient.data?.preferredPharmacies?.[0]?.id}
-              ></photon-pharmacy-search>
+              />
             </photon-card>
           </PhotonAuthorized>
         </Show>

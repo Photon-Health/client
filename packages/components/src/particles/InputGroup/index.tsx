@@ -18,7 +18,17 @@ type InputGroupContextValue = [InputGroupState, InputGroupActions];
 
 export const InputGroupContext = createContext<InputGroupContextValue>([
   { id: '', error: '', loading: false, disabled: false },
-  { setError: () => {}, setLoading: () => {}, setDisabled: () => {} }
+  {
+    setError: () => {
+      // init method, do nothing.
+    },
+    setLoading: () => {
+      // init method, do nothing.
+    },
+    setDisabled: () => {
+      // init method, do nothing.
+    }
+  }
 ]);
 
 interface CounterProviderProps {

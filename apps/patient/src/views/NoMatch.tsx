@@ -1,4 +1,4 @@
-import { Center, Heading, Text, VStack } from '@chakra-ui/react'
+import { Center, Heading, Text, VStack } from '@chakra-ui/react';
 
 export const NoMatch = () => {
   return (
@@ -8,5 +8,5 @@ export const NoMatch = () => {
         <Text>We couldn't find what you're looking for.</Text>
       </VStack>
     </Center>
-  )
-}
+  );
+};

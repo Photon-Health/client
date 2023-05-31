@@ -26,11 +26,14 @@ export interface DoseCalculatorProps {
   onClose: () => void;
   medicationName?: string;
   setAutocompleteValues: (data: {
+    days: number;
     liquidDose: number;
     totalLiquid: number;
     unit: LiquidVolume;
   }) => void;
 }
+
+const sanitizeValue = (value: number): number => (isNaN(value) || !isFinite(value) ? 0 : value);
 
 export default function DoseCalculator(props: DoseCalculatorProps) {
   const [dosage, setDosage] = createSignal<number>(0);
@@ -61,15 +64,19 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
   });
 
   const singleDose = createMemo(() =>
-    dosageFrequency() === 'day' ? dose() / dosesPerDay() : dose()
+    sanitizeValue(dosageFrequency() === 'day' ? dose() / dosesPerDay() : dose())
   );
-  const totalQuantity = createMemo(() => singleDose() * daysSupply() * dosesPerDay());
+  const totalQuantity = createMemo(() =>
+    sanitizeValue(singleDose() * daysSupply() * dosesPerDay())
+  );
   const solidUnit = createMemo(() => dosageUnit().split('/')[0]);
 
   const singleLiquidDose = createMemo(() =>
-    dosageFrequency() === 'day' ? liquidDose() / dosesPerDay() : liquidDose()
+    sanitizeValue(dosageFrequency() === 'day' ? liquidDose() / dosesPerDay() : liquidDose())
   );
-  const totalLiquidQuantity = createMemo(() => singleLiquidDose() * daysSupply() * dosesPerDay());
+  const totalLiquidQuantity = createMemo(() =>
+    sanitizeValue(singleLiquidDose() * daysSupply() * dosesPerDay())
+  );
 
   return (
     <Dialog open={props.open} onClose={props.onClose} size="lg">
@@ -222,6 +229,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
         <Button
           onClick={() => {
             props.setAutocompleteValues({
+              days: daysSupply(),
               liquidDose: round(singleLiquidDose()),
               totalLiquid: round(totalLiquidQuantity()),
               unit: perVolumeUnit()
