@@ -12,7 +12,7 @@ import {
   UseRadioProps,
   useStyleConfig
 } from '@chakra-ui/react';
-import React from 'react';
+import { Children, cloneElement, isValidElement, ReactElement, useMemo } from 'react';
 
 export const CheckIcon = createIcon({
   displayName: 'CheckIcon',
@@ -44,12 +44,12 @@ export const RadioCardGroup = <T extends string>(props: RadioCardGroupProps<T>) 
     onChange
   });
 
-  const cards = React.useMemo(
+  const cards = useMemo(
     () =>
-      React.Children.toArray(children)
-        .filter<React.ReactElement<RadioCardProps>>(React.isValidElement)
+      Children.toArray(children)
+        .filter<ReactElement<RadioCardProps>>(isValidElement)
         .map((card) => {
-          return React.cloneElement(card, {
+          return cloneElement(card, {
             radioProps: getRadioProps({
               value: card.props.value
             })

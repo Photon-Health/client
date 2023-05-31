@@ -32,7 +32,7 @@ customElement(
           <>
             <button
               disabled={client.authentication.state.isLoading}
-              onclick={async () => {
+              onClick={async () => {
                 const args: any = { appState: {} };
                 if (props.redirectPath) {
                   args.appState.returnTo = props.redirectPath;

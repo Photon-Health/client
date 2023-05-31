@@ -65,6 +65,7 @@ const ConceptSelect = forwardRef((props: any, ref) => {
     </FormControl>
   );
 });
+ConceptSelect.displayName = 'ConceptSelect';
 
 const StrengthSelect = (props: any) => {
   const { drugbankPCID, setDrugbankPCID, isDisabled } = props;
@@ -429,6 +430,7 @@ export const AdvancedDrugSearch = forwardRef(
     );
   }
 );
+AdvancedDrugSearch.displayName = 'AdvancedDrugSearch';
 
 AdvancedDrugSearch.defaultProps = {
   hideAddToCatalog: false,

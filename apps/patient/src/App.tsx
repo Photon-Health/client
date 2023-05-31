@@ -1,11 +1,11 @@
-import { Routes, Route, BrowserRouter } from 'react-router-dom'
+import { Routes, Route, BrowserRouter } from 'react-router-dom';
 
-import { Main } from './views/Main'
-import { Status } from './views/Status'
-import { NoMatch } from './views/NoMatch'
-import { Pharmacy } from './views/Pharmacy'
-import { Review } from './views/Review'
-import { ReadyBy } from './views/ReadyBy'
+import { Main } from './views/Main';
+import { Status } from './views/Status';
+import { NoMatch } from './views/NoMatch';
+import { Pharmacy } from './views/Pharmacy';
+import { Review } from './views/Review';
+import { ReadyBy } from './views/ReadyBy';
 
 export const App = () => {
   return (
@@ -20,5 +20,5 @@ export const App = () => {
         <Route path="*" element={<NoMatch />} />
       </Routes>
     </BrowserRouter>
-  )
-}
+  );
+};

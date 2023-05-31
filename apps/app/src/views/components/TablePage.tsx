@@ -195,12 +195,12 @@ export const TablePage = (props: TablePageProps) => {
                   // Loop over the header rows
                   headerGroups.map((headerGroup) => (
                     // Apply the header row props
-                    <Tr {...headerGroup.getHeaderGroupProps()}>
+                    <Tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
                       {
                         // Loop over the headers in each row
                         headerGroup.headers.map((column) => (
                           // Apply the header cell props
-                          <Th {...column.getHeaderProps()}>
+                          <Th {...column.getHeaderProps()} key={column.id}>
                             {
                               // Render the header
                               column.render('Header')
@@ -243,23 +243,22 @@ export const TablePage = (props: TablePageProps) => {
                     prepareRow(row);
                     return (
                       // Apply the row props
-                      <Tr {...row.getRowProps()}>
+                      <Tr {...row.getRowProps()} key={row.id}>
                         {
                           // Loop over the rows cells
                           row.cells.map((cell) => {
                             // Apply the cell props
+                            const { key, ...otherCellProps } = cell.getCellProps(
+                              cell.column.width === 'wrap'
+                                ? {
+                                    style: {
+                                      whiteSpace: 'pre-wrap'
+                                    }
+                                  }
+                                : {}
+                            );
                             return (
-                              <Td
-                                {...cell.getCellProps(
-                                  cell.column.width === 'wrap'
-                                    ? {
-                                        style: {
-                                          whiteSpace: 'pre-wrap'
-                                        }
-                                      }
-                                    : {}
-                                )}
-                              >
+                              <Td key={key} {...otherCellProps}>
                                 {
                                   // Render the cell contents
                                   cell.render('Cell')

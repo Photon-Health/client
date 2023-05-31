@@ -1,18 +1,12 @@
-import {
-  Auth0Client
-} from "@auth0/auth0-spa-js";
-import {
-  ApolloClient,
-  InMemoryCache,
-  HttpLink
-} from "@apollo/client";
-import { setContext } from "@apollo/client/link/context/index.js";
-import { AuthManager } from "./auth";
-import { ClinicalQueryManager } from "./clinical";
-import { ManagementQueryManager } from "./management";
+import { Auth0Client } from '@auth0/auth0-spa-js';
+import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context/index.js';
+import { AuthManager } from './auth';
+import { ClinicalQueryManager } from './clinical';
+import { ManagementQueryManager } from './management';
 
-export * as types from "./types";
-export * as fragments from "./fragments";
+export * as types from './types';
+export * as fragments from './fragments';
 
 /**
  * Configuration options for Photon SDK
@@ -33,14 +27,14 @@ export interface PhotonClientOptions {
   developmentMode?: boolean;
 }
 
-export class PhotonClient {  
-  private organization?: string
+export class PhotonClient {
+  private organization?: string;
 
-  private audience?: string
+  private audience?: string;
 
-  private uri?: string
+  private uri?: string;
 
-  private auth0Client: Auth0Client
+  private auth0Client: Auth0Client;
 
   /**
    * Authentication functionality of the SDK
@@ -50,12 +44,12 @@ export class PhotonClient {
   /**
    * Clinical API functionality of the SDK
    */
-  public clinical: ClinicalQueryManager
+  public clinical: ClinicalQueryManager;
 
   /**
    * Management API functionality of the SDK
    */
-  public management: ManagementQueryManager
+  public management: ManagementQueryManager;
 
   /**
    * Constructs a new PhotonSDK instance
@@ -67,31 +61,35 @@ export class PhotonClient {
     clientId,
     redirectURI,
     organization,
-    audience = "https://api.photon.health",
-    uri = "https://api.photon.health/graphql",
+    audience = 'https://api.photon.health',
+    uri = 'https://api.photon.health/graphql',
     developmentMode = false
   }: PhotonClientOptions) {
     this.auth0Client = new Auth0Client({
-      domain: domain ? domain : developmentMode ? "auth.neutron.health" : "auth.photon.health",
+      domain: domain ? domain : developmentMode ? 'auth.neutron.health' : 'auth.photon.health',
       client_id: clientId,
       redirect_uri: redirectURI,
-      cacheLocation: "memory",
+      cacheLocation: 'memory'
     });
-    this.audience = audience
-    this.uri = uri
+    this.audience = audience;
+    this.uri = uri;
     if (developmentMode) {
-      this.audience = "https://api.neutron.health"
-      this.uri = "https://api.neutron.health/graphql"
+      this.audience = 'https://api.neutron.health';
+      this.uri = 'https://api.neutron.health/graphql';
     }
     this.organization = organization;
-    this.authentication = new AuthManager({ authentication: this.auth0Client, organization: this.organization, audience: this.audience });
-    let apollo = this.constructApolloClient();
+    this.authentication = new AuthManager({
+      authentication: this.auth0Client,
+      organization: this.organization,
+      audience: this.audience
+    });
+    const apollo = this.constructApolloClient();
     this.clinical = new ClinicalQueryManager(apollo);
     this.management = new ManagementQueryManager(apollo);
   }
 
   private constructApolloClient() {
-    let apollo = new ApolloClient({
+    const apollo = new ApolloClient({
       link: setContext(async (_, { headers, ...rest }) => {
         const token = await this.authentication.getAccessToken();
 
@@ -103,32 +101,36 @@ export class PhotonClient {
           ...rest,
           headers: {
             ...headers,
-            authorization: token,
-          },
+            authorization: token
+          }
         };
       }).concat(
         new HttpLink({
-          uri: this.uri,
+          uri: this.uri
         })
       ),
       defaultOptions: {
         query: {
           fetchPolicy: 'network-only',
-          errorPolicy: "all",
-        },
+          errorPolicy: 'all'
+        }
       },
-      cache: new InMemoryCache(),
+      cache: new InMemoryCache()
     });
-    return apollo
+    return apollo;
   }
 
   /**
    * Sets the organization ID to use
    * @returns PhotonSDK
    */
-   public setOrganization(organizationId: string) {
+  public setOrganization(organizationId: string) {
     this.organization = organizationId;
-    this.authentication = new AuthManager({ authentication: this.auth0Client, organization: organizationId, audience: this.audience });
+    this.authentication = new AuthManager({
+      authentication: this.auth0Client,
+      organization: organizationId,
+      audience: this.audience
+    });
     return this;
   }
 }

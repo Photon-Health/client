@@ -232,7 +232,6 @@ customElement(
               <photon-button
                 size="sm"
                 disabled={!canSubmit() || !canWritePrescription()}
-                loading={isLoading() && isCreateOrder()}
                 on:photon-clicked={() =>
                   form()?.treatment?.value?.name
                     ? setContinueSubmitOpen(true)
@@ -256,8 +255,8 @@ customElement(
                             slot="icon"
                             name="exclamation-octagon"
                             class="text-red-500"
-                            style="font-size: 24px;"
-                          ></sl-icon>
+                            style={{ 'font-size': '24px' }}
+                          />
                           <p class="font-sans">{error.message}</p>
                         </div>
                       </sl-alert>
@@ -277,11 +276,11 @@ customElement(
                     setActions(e.detail.actions);
                     setForm(e.detail.form);
                   }}
-                ></photon-prescribe-workflow>
+                />
               </div>
             </div>
           }
-        ></PhotonFormWrapper>
+        />
       </div>
     );
   }

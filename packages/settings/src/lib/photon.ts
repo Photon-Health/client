@@ -115,5 +115,11 @@ export const photon: {
     ...defaultSettings,
     logo: 'bold_health_logo.svg',
     accentColor: '#25532b'
+  },
+  // Piction Health
+  org_v5It8IoY0RH1Rw80: {
+    ...defaultSettings,
+    logo: 'piction_health_logo.svg',
+    accentColor: '#3377e2'
   }
 };

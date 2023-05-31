@@ -1,4 +1,4 @@
-import { gql } from 'graphql-request'
+import { gql } from 'graphql-request';
 
 export const GET_ORDER = gql`
   query order($id: ID!) {
@@ -67,7 +67,7 @@ export const GET_ORDER = gql`
       }
     }
   }
-`
+`;
 
 export const GET_PHARMACIES = gql`
   query GetPharmaciesByLocation($location: LatLongSearch!, $limit: Int, $offset: Int) {
@@ -85,4 +85,4 @@ export const GET_PHARMACIES = gql`
       distance
     }
   }
-`
+`;

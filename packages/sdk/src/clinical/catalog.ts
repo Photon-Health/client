@@ -63,7 +63,7 @@ export class CatalogQueryManager {
     if (!fragment) {
       fragment = { CatalogFields: CATALOG_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_CATALOGS = gql`
       ${fValue}
       query catalogs {
@@ -89,7 +89,7 @@ export class CatalogQueryManager {
     if (!fragment) {
       fragment = { CatalogFields: CATALOG_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_CATALOG = gql`
       ${fValue}
       query catalog($id: ID) {
@@ -110,7 +110,7 @@ export class CatalogQueryManager {
     if (!fragment) {
       fragment = { MedicationFields: MEDICATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const ADD_TO_CATALOG = gql`
       ${fValue}
       mutation addToCatalog(
@@ -140,7 +140,7 @@ export class CatalogQueryManager {
     if (!fragment) {
       fragment = { MedicationFields: MEDICATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const REMOVE_FROM_CATALOG = gql`
       ${fValue}
       mutation removeFromCatalog(

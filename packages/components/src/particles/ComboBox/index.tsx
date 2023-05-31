@@ -35,10 +35,18 @@ type ComboBoxContextValue = [ComboBoxState, ComboBoxActions];
 export const ComboBoxContext = createContext<ComboBoxContextValue>([
   { open: false, selected: {}, active: '', typing: false },
   {
-    setOpen: () => {},
-    setSelected: () => {},
-    setActive: () => {},
-    setTyping: () => {}
+    setOpen: () => {
+      // Init method, do nothing.
+    },
+    setSelected: () => {
+      // Init method, do nothing.
+    },
+    setActive: () => {
+      // Init method, do nothing.
+    },
+    setTyping: () => {
+      // Init method, do nothing.
+    }
   }
 ]);
 

@@ -8,7 +8,7 @@ import { randomNames } from '../src/sampleData/randomNames';
 import ComboBox from '../src/particles/ComboBox';
 
 const App = () => {
-  const [pharmacy, setPharmacy] = createSignal<any>();
+  const [setPharmacy] = createSignal<any>();
   const [doseOpen, setDoseOpen] = createSignal(false);
   const [query, setQuery] = createSignal('');
   const rando = randomNames.slice(0, 3);

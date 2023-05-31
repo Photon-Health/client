@@ -27,7 +27,7 @@ customElement(
             setIsCollapsed(!isCollapsed());
           }}
           class="self-start"
-        ></sl-icon-button>
+        />
       );
     }
 
@@ -47,7 +47,7 @@ customElement(
               {collapsableElement}
             </div>
           ) : null}
-          {props.collapsable && isCollapsed() ? null : <slot></slot>}
+          {props.collapsable && isCollapsed() ? null : <slot />}
         </div>
       </>
     );

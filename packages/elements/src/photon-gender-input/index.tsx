@@ -97,7 +97,7 @@ customElement(
         on:photon-data-selected={(e: any) => {
           dispatchGenderSelected(e.detail.data.name);
         }}
-        on:photon-data-unselected={(e: any) => {
+        on:photon-data-unselected={() => {
           dispatchGenderDeselected();
         }}
       >
@@ -124,7 +124,7 @@ customElement(
           optional={!props.required}
           helpText={props.helpText}
           selectedData={genders.filter((x) => x.name === props.selected)?.[0]}
-        ></PhotonDropdown>
+        />
       </div>
     );
   }

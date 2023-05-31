@@ -221,10 +221,10 @@ customElement(
                     setSelectedStore(e.detail.selected);
                   }}
                   patient-id={props.patientId}
-                ></photon-patient-form>
+                />
               </>
             }
-          ></PhotonFormWrapper>
+          />
         </Show>
       </div>
     );

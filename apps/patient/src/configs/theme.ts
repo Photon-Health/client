@@ -1,15 +1,15 @@
-import { extendTheme } from '@chakra-ui/react'
-import tinycolor from 'tinycolor2'
-import { getSettings } from '@client/settings'
+import { extendTheme } from '@chakra-ui/react';
+import tinycolor from 'tinycolor2';
+import { getSettings } from '@client/settings';
 
-const settings = getSettings(process.env.REACT_APP_ENV_NAME)
+const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
 function generateChakraTheme(key = undefined) {
-  const { accentColor } = key in settings ? settings[key] : settings.default
+  const { accentColor } = key in settings ? settings[key] : settings.default;
 
-  const color = tinycolor(accentColor)
-  const textColor = color.isLight() ? 'gray.800' : 'white'
-  const brandLinkColor = color.isLight() ? color.clone().darken(10).toHexString() : accentColor
+  const color = tinycolor(accentColor);
+  const textColor = color.isLight() ? 'gray.800' : 'white';
+  const brandLinkColor = color.isLight() ? color.clone().darken(10).toHexString() : accentColor;
 
   const colors = {
     brand: {
@@ -25,7 +25,7 @@ function generateChakraTheme(key = undefined) {
       900: color.clone().darken(30).toHexString()
     },
     brandLink: brandLinkColor
-  }
+  };
 
   const disabledStyles = {
     opacity: 0.4,
@@ -33,7 +33,7 @@ function generateChakraTheme(key = undefined) {
     boxShadow: 'none',
     bg: 'brand.300',
     color: 'gray.900'
-  }
+  };
 
   const overrides = {
     colors,
@@ -66,11 +66,11 @@ function generateChakraTheme(key = undefined) {
         }
       }
     }
-  }
+  };
 
-  return extendTheme(overrides)
+  return extendTheme(overrides);
 }
 
-const theme = generateChakraTheme
+const theme = generateChakraTheme;
 
-export default theme
+export default theme;

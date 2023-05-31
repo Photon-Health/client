@@ -10,8 +10,6 @@ customElement(
     console.warn(
       'photon-update-patient-dialog will be deprecated soon. Please use photon-patient-dialog instead.'
     );
-    return (
-      <photon-patient-dialog patient-id={props.patientId} open={props.open}></photon-patient-dialog>
-    );
+    return <photon-patient-dialog patient-id={props.patientId} open={props.open} />;
   }
 );

@@ -1,11 +1,11 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client';
 
 export const ORGANIZATION_FIELDS = gql`
   fragment OrganizationFields on Organization {
     id
     name
   }
-`
+`;
 
 export const PATIENT_FIELDS = gql`
   fragment PatientFields on Patient {
@@ -31,7 +31,7 @@ export const PATIENT_FIELDS = gql`
       street2
     }
   }
-`
+`;
 
 export const ALLERGEN_FIELDS = gql`
   fragment AllergenFields on Allergen {
@@ -39,14 +39,14 @@ export const ALLERGEN_FIELDS = gql`
     name
     rxcui
   }
-`
+`;
 
 export const CATALOG_FIELDS = gql`
   fragment CatalogFields on Catalog {
     id
     name
   }
-`
+`;
 
 export const MEDICATION_FIELDS = gql`
   fragment MedicationFields on Medication {
@@ -56,21 +56,21 @@ export const MEDICATION_FIELDS = gql`
     schedule
     controlled
   }
-`
+`;
 
 export const SEARCH_MEDICATION_FIELDS = gql`
   fragment SearchMedicationFields on SearchMedication {
     id
     name
   }
-`
+`;
 
 export const MEDICAL_EQUIPMENT_FIELDS = gql`
   fragment MedicalEquipmentFields on MedicalEquipment {
     id
     name
   }
-`
+`;
 
 export const CATALOG_TREATMENT_FIELDS = gql`
   fragment CatalogTreatmentFields on Catalog {
@@ -79,13 +79,13 @@ export const CATALOG_TREATMENT_FIELDS = gql`
       name
     }
   }
-`
+`;
 
 export const DISPENSE_UNIT_FIELDS = gql`
   fragment DispenseUnitFields on DispenseUnit {
     name
   }
-`
+`;
 
 export const PRESCRIPTION_FIELDS = gql`
   fragment PrescriptionFields on Prescription {
@@ -120,7 +120,7 @@ export const PRESCRIPTION_FIELDS = gql`
     expirationDate
     writtenAt
   }
-`
+`;
 
 export const FILL_FIELDS = gql`
   fragment FillFields on Fill {
@@ -135,7 +135,7 @@ export const FILL_FIELDS = gql`
     requestedAt
     filledAt
   }
-`
+`;
 
 export const ORDER_FIELDS = gql`
   ${PATIENT_FIELDS}
@@ -171,7 +171,7 @@ export const ORDER_FIELDS = gql`
     }
     createdAt
   }
-`
+`;
 
 export const WEBHOOK_CONFIG_FIELDS = gql`
   fragment WebhookFields on WebhookConfig {
@@ -180,7 +180,7 @@ export const WEBHOOK_CONFIG_FIELDS = gql`
     filters
     url
   }
-`
+`;
 
 export const CLIENT_FIELDS = gql`
   fragment ClientFields on Client {
@@ -189,7 +189,7 @@ export const CLIENT_FIELDS = gql`
     secret
     appType
   }
-`
+`;
 
 export const PHARMACY_FIELDS = gql`
   fragment PharmacyFields on Pharmacy {
@@ -207,7 +207,7 @@ export const PHARMACY_FIELDS = gql`
       street2
     }
   }
-`
+`;
 
 export const PRESCRIPTION_TEMPLATE_FIELDS = gql`
   fragment PrescriptionTemplateFields on PrescriptionTemplate {
@@ -224,4 +224,4 @@ export const PRESCRIPTION_TEMPLATE_FIELDS = gql`
       name
     }
   }
-`
+`;

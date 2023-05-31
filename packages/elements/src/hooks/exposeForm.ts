@@ -12,7 +12,7 @@ export function exposeForm(
     if (ref()) {
       el['reportValidity'] = () => ref().reportValidity();
     }
-  }, [ref]);
+  });
 
   el['addForm'] = (formData: Map<string, any>) => {
     setForm(formData);

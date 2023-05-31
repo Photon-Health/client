@@ -1,4 +1,4 @@
-const repopulateForm = (actions: Record<string, Function>, draft: any) => {
+const repopulateForm = (actions: Record<string, (...args: any) => any>, draft: any) => {
   actions.updateFormValue({
     key: 'treatment',
     value: draft.treatment

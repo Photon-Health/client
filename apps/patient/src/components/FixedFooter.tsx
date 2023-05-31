@@ -1,9 +1,9 @@
-import { Box, Slide } from '@chakra-ui/react'
-import { ReactNode } from 'react'
+import { Box, Slide } from '@chakra-ui/react';
+import { ReactNode } from 'react';
 
 interface FixedFooterProps {
-  children: ReactNode
-  show?: boolean
+  children: ReactNode;
+  show?: boolean;
 }
 
 export const FixedFooter = ({ children, show }: FixedFooterProps) => {
@@ -13,9 +13,9 @@ export const FixedFooter = ({ children, show }: FixedFooterProps) => {
         {children}
       </Box>
     </Slide>
-  )
-}
+  );
+};
 
 FixedFooter.defaultProps = {
   show: false
-}
+};

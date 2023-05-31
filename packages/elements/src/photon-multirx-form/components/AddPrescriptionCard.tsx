@@ -28,12 +28,12 @@ const validators = {
 
 export const AddPrescriptionCard = (props: {
   hideAddToTemplates: boolean;
-  actions: Record<string, Function>;
+  actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
 }) => {
   let medSearchRef: any;
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
-  const [dispenseUnit, setDispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
+  const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
 
   let ref: any;
@@ -78,7 +78,7 @@ export const AddPrescriptionCard = (props: {
               value: e.detail.catalogId
             });
           }}
-        ></photon-treatment-select>
+        />
         <div class="flex flex-col sm:flex-none sm:grid sm:grid-cols-2 sm:gap-4">
           <div class="order-last sm:order-first">
             <photon-checkbox
@@ -93,8 +93,8 @@ export const AddPrescriptionCard = (props: {
                   value: e.detail.checked
                 })
               }
-            ></photon-checkbox>
-            <photon-med-search-dialog ref={medSearchRef}></photon-med-search-dialog>
+            />
+            <photon-med-search-dialog ref={medSearchRef} />
           </div>
           <div class="pb-4 md:py-2 text-left sm:text-right">
             <a
@@ -117,7 +117,7 @@ export const AddPrescriptionCard = (props: {
                 value: e.detail.date
               })
             }
-          ></photon-datepicker>
+          />
         </div>
         <div class="mt-2 sm:mt-0 sm:grid sm:grid-cols-2 sm:gap-4">
           <div class="flex items-end gap-1">
@@ -130,18 +130,25 @@ export const AddPrescriptionCard = (props: {
               invalid={props.store['dispenseQuantity']?.error ?? false}
               help-text={props.store['dispenseQuantity']?.error}
               on:photon-input-changed={(e: any) => {
-                props.actions.updateFormValue({
-                  key: 'dispenseQuantity',
-                  value: Number(e.detail.input)
-                });
+                const target = e.currentTarget as HTMLInputElement;
+                if (!isNaN(target.valueAsNumber)) {
+                  props.actions.updateFormValue({
+                    key: 'dispenseQuantity',
+                    value: Number(e.detail.input)
+                  });
+                }
               }}
-              style="width:100px"
-            ></photon-number-input>
+              style={{ width: '100px' }}
+            />
             <DoseCalculator
               open={openDoseCalculator()}
               onClose={() => setOpenDoseCalculator(false)}
               medicationName={props.store['treatment']?.value?.name}
-              setAutocompleteValues={({ liquidDose, totalLiquid, unit }) => {
+              setAutocompleteValues={({ liquidDose, totalLiquid, unit, days }) => {
+                props.actions.updateFormValue({
+                  key: 'daysSupply',
+                  value: Number(days)
+                });
                 props.actions.updateFormValue({
                   key: 'dispenseQuantity',
                   value: Number(totalLiquid)
@@ -157,7 +164,7 @@ export const AddPrescriptionCard = (props: {
                   });
                 }
               }}
-            ></DoseCalculator>
+            />
             <div>
               <photon-button
                 variant="outline"
@@ -165,10 +172,10 @@ export const AddPrescriptionCard = (props: {
                 on:photon-clicked={() => setOpenDoseCalculator(true)}
               >
                 <button onClick={() => setOpenDoseCalculator(true)}>
-                  <sl-icon name="calculator"></sl-icon>
+                  <sl-icon name="calculator" />
                 </button>
               </photon-button>
-              <div style={{ height: '23px' }} class="pt-1"></div>
+              <div style={{ height: '23px' }} class="pt-1" />
             </div>
           </div>
           <photon-dispense-units
@@ -182,7 +189,7 @@ export const AddPrescriptionCard = (props: {
                 value: e.detail.dispenseUnit.name
               })
             }
-          ></photon-dispense-units>
+          />
         </div>
         <div class="sm:grid sm:grid-cols-2 sm:gap-4">
           <photon-number-input
@@ -199,7 +206,7 @@ export const AddPrescriptionCard = (props: {
                 value: Number(e.detail.input)
               });
             }}
-          ></photon-number-input>
+          />
           <photon-number-input
             class="flex-grow flex-shrink flex-1"
             label="Refills"
@@ -214,7 +221,7 @@ export const AddPrescriptionCard = (props: {
                 value: Number(e.detail.input)
               })
             }
-          ></photon-number-input>
+          />
         </div>
         <photon-textarea
           label="Patient Instructions (SIG)"
@@ -230,7 +237,7 @@ export const AddPrescriptionCard = (props: {
             })
           }
           value={props.store['instructions']?.value}
-        ></photon-textarea>
+        />
         <photon-textarea
           label="Pharmacy Note"
           placeholder="Enter pharmacy note"
@@ -241,7 +248,7 @@ export const AddPrescriptionCard = (props: {
             })
           }
           value={props.store['notes']?.value}
-        ></photon-textarea>
+        />
         <div class="flex flex-col xs:flex-row gap-2">
           <Show when={!props.hideAddToTemplates}>
             <photon-checkbox
@@ -254,7 +261,7 @@ export const AddPrescriptionCard = (props: {
                   value: e.detail.checked
                 })
               }
-            ></photon-checkbox>
+            />
           </Show>
           <div class="flex flex-grow justify-end">
             <photon-button

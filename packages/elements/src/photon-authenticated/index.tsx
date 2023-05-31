@@ -54,7 +54,7 @@ customElement(
       } else {
         setIsLoading(true);
       }
-    }, [client?.authentication.state.isAuthenticated, client?.authentication.state.isLoading]);
+    });
 
     return (
       <>
@@ -62,14 +62,14 @@ customElement(
         <style>{shoelaceDarkStyles}</style>
         <style>{shoelaceLightStyles}</style>
         <Show when={client && authenticated()}>
-          <slot></slot>
+          <slot />
         </Show>
         <Show when={client && !authenticated() && !isLoading() && !props.autoLogin}>
-          <photon-login redirect-path={props.redirectPath}></photon-login>
+          <photon-login redirect-path={props.redirectPath} />
         </Show>
         <Show when={client && isLoading() && !props.hideLoader}>
           <div class="w-full flex justify-center">
-            <sl-spinner style="font-size: 3rem;"></sl-spinner>
+            <sl-spinner style={{ 'font-size': '3rem' }} />
           </div>
         </Show>
       </>

@@ -59,7 +59,7 @@ export class PharmacyQueryManager {
     if (!fragment) {
       fragment = { PharmacyFields: PHARMACY_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment!)[0];
+    const [fName, fValue] = Object.entries(fragment!)[0];
     const GET_PHARMACIES = gql`
       ${fValue}
       query pharmacies($name: String, $location: LatLongSearch, $type: FulfillmentType, $after: Int, $first: Int) {
@@ -91,7 +91,7 @@ export class PharmacyQueryManager {
     if (!fragment) {
       fragment = { PharmacyFields: PHARMACY_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_PHARMACY = gql`
           ${fValue}
           query pharmacy($id: ID!) {

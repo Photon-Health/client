@@ -1,10 +1,4 @@
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useMemo,
-  useState,
-} from "react";
+import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
 
 interface Helpers {
   goToNextStep: () => void;
@@ -23,10 +17,7 @@ interface UseStepProps {
 export const useStep = (props: UseStepProps): [number, Helpers] => {
   const { maxStep, initialStep = 0 } = props;
   const [currentStep, setCurrentStep] = useState(initialStep);
-  const canGoToNextStep = useMemo(
-    () => currentStep + 1 <= maxStep,
-    [currentStep, maxStep]
-  );
+  const canGoToNextStep = useMemo(() => currentStep + 1 <= maxStep, [currentStep, maxStep]);
   const canGoToPrevStep = useMemo(() => currentStep - 1 >= 0, [currentStep]);
 
   const setStep = useCallback(
@@ -36,7 +27,7 @@ export const useStep = (props: UseStepProps): [number, Helpers] => {
         setCurrentStep(newStep);
         return;
       }
-      throw new Error("Step not valid");
+      throw new Error('Step not valid');
     },
     [maxStep, currentStep]
   );
@@ -65,7 +56,7 @@ export const useStep = (props: UseStepProps): [number, Helpers] => {
       canGoToNextStep,
       canGoToPrevStep,
       setStep,
-      reset,
-    },
+      reset
+    }
   ];
 };

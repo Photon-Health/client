@@ -42,7 +42,7 @@ export const boson: {
     logo: 'photon',
     accentColor: '#b35724',
     mailOrderNavigate: true,
-    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID, CUREXA_ID]
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
   },
   // NewCo (demo's)
   org_w85CgjUjCi52yvOz: {

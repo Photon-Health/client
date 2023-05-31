@@ -48,11 +48,11 @@ export default function Input(props: InputProps) {
     );
   });
 
-  const handleInput = (e: Event) => {
+  const handleInput = (e: InputEvent & { currentTarget: HTMLInputElement; target: Element }) => {
     // We're intercepting number input handlers with this function in order to prevent mobile browsers
     // from clearing the input when "." is typed.
     const target = e.currentTarget as HTMLInputElement;
-    if (!isNaN(target.valueAsNumber)) {
+    if (!isNaN(target.valueAsNumber) && typeof handler.onInput === 'function') {
       handler.onInput(e);
     }
   };
