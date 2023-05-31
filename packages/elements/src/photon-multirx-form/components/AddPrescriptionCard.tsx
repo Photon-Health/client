@@ -287,7 +287,7 @@ export const AddPrescriptionCard = (props: {
                         effectiveDate: props.store['effectiveDate'].value,
                         treatment: props.store['treatment'].value,
                         dispenseAsWritten: props.store['dispenseAsWritten'].value,
-                        dispenseQuantity: props.store['dispenseQuantity']?.value,
+                        dispenseQuantity: props.store['dispenseQuantity'].value,
                         dispenseUnit: props.store['dispenseUnit'].value,
                         daysSupply: props.store['daysSupply'].value,
                         refillsInput: props.store['refillsInput'].value,
@@ -299,7 +299,6 @@ export const AddPrescriptionCard = (props: {
                       }
                     ]
                   });
-                  console.log('form updated');
                   props.actions.updateFormValue({
                     key: 'effectiveDate',
                     value: format(new Date(), 'yyyy-MM-dd').toString()
