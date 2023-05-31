@@ -45,7 +45,7 @@ export class OrgQueryManager {
     if (!fragment) {
       fragment = { OrganizationFields: ORGANIZATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment!)[0];
+    const [fName, fValue] = Object.entries(fragment!)[0];
     const GET_ORGANIZATION = gql`
       ${fValue}
       query organization {
@@ -70,7 +70,7 @@ export class OrgQueryManager {
     if (!fragment) {
       fragment = { OrganizationFields: ORGANIZATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment!)[0];
+    const [fName, fValue] = Object.entries(fragment!)[0];
     const GET_ORGANIZATIONS = gql`
       ${fValue}
       query organizations {

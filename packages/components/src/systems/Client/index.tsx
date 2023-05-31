@@ -40,14 +40,13 @@ export default function Client(props: ClientProps) {
     console.info('[PhotonClient]: Development mode enabled');
   }
 
-  let disposeInterval;
   createEffect(async () => {
     if (hasAuthParams() && store) {
       await store?.authentication.handleRedirect();
       if (props.redirectPath) window.location.replace(props.redirectPath);
     } else if (store) {
       await store?.authentication.checkSession();
-      disposeInterval = makeTimer(
+      makeTimer(
         async () => {
           await store?.authentication.checkSession();
         },

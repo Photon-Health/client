@@ -11,7 +11,7 @@ import {
   useBreakpointValue,
   useBoolean
 } from '@chakra-ui/react';
-import { useEffect, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { usePhoton } from '@photonhealth/react';
 import { useDebounce } from 'use-debounce';
 
@@ -32,7 +32,7 @@ const MedView = (props: MedViewProps) => {
 
 const renderTreatmentRow = (
   med: any,
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  setLoading: Dispatch<SetStateAction<boolean>>,
   treatmentId: string,
   catalogId: string
 ) => {

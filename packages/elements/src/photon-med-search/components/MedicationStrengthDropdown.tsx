@@ -15,8 +15,8 @@ export const MedicationStrengthDropdown = (props: { disabled: boolean; medicatio
       composed: true,
       bubbles: true,
       detail: {
-        strengthId: id,
-      },
+        strengthId: id
+      }
     });
     ref?.dispatchEvent(event);
   };
@@ -25,7 +25,7 @@ export const MedicationStrengthDropdown = (props: { disabled: boolean; medicatio
     const event = new CustomEvent('photon-strength-deselected', {
       composed: true,
       bubbles: true,
-      detail: {},
+      detail: {}
     });
     ref?.dispatchEvent(event);
   };
@@ -38,7 +38,7 @@ export const MedicationStrengthDropdown = (props: { disabled: boolean; medicatio
         const id = String(Math.random());
         setUid(id);
         const { data } = await client!.getSDK().clinical.searchMedication.getStrengths({
-          id: props.medicationId,
+          id: props.medicationId
         });
         if (id === uid()) {
           setData(data.medicationStrengths ?? []);
@@ -46,7 +46,7 @@ export const MedicationStrengthDropdown = (props: { disabled: boolean; medicatio
         setIsLoading(false);
       });
     }
-  }, [props.medicationId]);
+  });
 
   const actionRef: any = {};
 
@@ -78,7 +78,7 @@ export const MedicationStrengthDropdown = (props: { disabled: boolean; medicatio
         }}
         noDataMsg={'No strengths found'}
         required={false}
-      ></PhotonDropdown>
+      />
     </div>
   );
 };

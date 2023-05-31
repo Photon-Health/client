@@ -26,6 +26,7 @@ export interface DoseCalculatorProps {
   onClose: () => void;
   medicationName?: string;
   setAutocompleteValues: (data: {
+    days: number;
     liquidDose: number;
     totalLiquid: number;
     unit: LiquidVolume;
@@ -228,6 +229,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
         <Button
           onClick={() => {
             props.setAutocompleteValues({
+              days: daysSupply(),
               liquidDose: round(singleLiquidDose()),
               totalLiquid: round(totalLiquidQuantity()),
               unit: perVolumeUnit()

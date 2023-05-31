@@ -10,6 +10,6 @@ export function useSlot(ref: Accessor<HTMLSlotElement | undefined>) {
     };
 
     return ref()?.addEventListener('slotchange', handler);
-  }, [ref]);
+  });
   return children;
 }

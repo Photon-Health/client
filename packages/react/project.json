@@ -16,7 +16,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/react",
-        "command": "npx eslint src/*.{ts,tsx}"
+        "command": "npx eslint . --ext .tsx,.ts --quiet"
       }
     },
     "build": {

@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo } from 'react';
 import {
   Card,
   CardBody,
@@ -9,30 +9,43 @@ import {
   Text,
   VStack,
   useBreakpointValue
-} from '@chakra-ui/react'
-import { FiRotateCcw, FiStar } from 'react-icons/fi'
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
+} from '@chakra-ui/react';
+import { FiRotateCcw, FiStar } from 'react-icons/fi';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { types } from '@photonhealth/react';
 
-import { UNOPEN_BUSINESS_STATUS_MAP } from '../views/Pharmacy'
-import { Rating } from './Rating'
-import { formatAddress } from '../utils/general'
-import { Pharmacy } from '../utils/models'
+import { UNOPEN_BUSINESS_STATUS_MAP } from '../views/Pharmacy';
+import { Rating } from './Rating';
+import { formatAddress } from '../utils/general';
+import { Pharmacy } from '../utils/models';
 
-dayjs.extend(customParseFormat)
+dayjs.extend(customParseFormat);
 
 const INFO_COLOR_MAP = {
   Previous: 'green',
   Preferred: 'yellow'
+};
+
+interface RatingHoursProps {
+  businessStatus: string;
+  rating: string;
+  hours: {
+    open?: boolean;
+    opens?: string;
+    opensDay?: string;
+    closes?: string;
+    is24Hr?: boolean;
+  };
 }
 
-const RatingHours = ({ businessStatus, rating, hours }) => {
+const RatingHours = ({ businessStatus, rating, hours }: RatingHoursProps) => {
   if (businessStatus in UNOPEN_BUSINESS_STATUS_MAP) {
     return (
       <Text fontSize="sm" color="red">
         {UNOPEN_BUSINESS_STATUS_MAP[businessStatus]}
       </Text>
-    )
+    );
   }
 
   return (
@@ -63,22 +76,27 @@ const RatingHours = ({ businessStatus, rating, hours }) => {
         </Text>
       ) : null}
     </HStack>
-  )
+  );
+};
+
+interface DistanceAddressProps {
+  distance?: number;
+  address?: types.Address;
 }
 
-const DistanceAddress = ({ distance, address }) => {
-  if (!distance || !address) return null
+const DistanceAddress = ({ distance, address }: DistanceAddressProps) => {
+  if (!distance || !address) return null;
   return (
     <Text fontSize="sm" color="gray.500" display="inline">
       {distance?.toFixed(1)} mi &bull; {formatAddress(address)}
     </Text>
-  )
-}
+  );
+};
 
 interface PharmacyCardProps {
-  pharmacy: Pharmacy
-  selected: boolean
-  onSelect: Function
+  pharmacy: Pharmacy;
+  selected: boolean;
+  onSelect: Function;
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
@@ -86,9 +104,9 @@ export const PharmacyCard = memo(function PharmacyCard({
   selected,
   onSelect
 }: PharmacyCardProps) {
-  const isMobile = useBreakpointValue({ base: true, md: false })
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
-  if (!pharmacy) return null
+  if (!pharmacy) return null;
 
   return (
     <Card
@@ -125,5 +143,5 @@ export const PharmacyCard = memo(function PharmacyCard({
         </VStack>
       </CardBody>
     </Card>
-  )
-})
+  );
+});

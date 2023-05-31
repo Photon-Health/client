@@ -135,7 +135,7 @@ export class AuthManager {
       audience: this.audience
     }
   ): Promise<string> {
-    let opts: GetTokenSilentlyOptions | GetTokenWithPopupOptions = {
+    const opts: GetTokenSilentlyOptions | GetTokenWithPopupOptions = {
       audience: audience || this.audience || undefined,
       ...(this.organization ? { organization: this.organization } : {})
     };
@@ -163,7 +163,7 @@ export class AuthManager {
       audience: this.audience
     }
   ): Promise<string> {
-    let opts: GetTokenWithPopupOptions = {
+    const opts: GetTokenWithPopupOptions = {
       audience: audience || this.audience || undefined,
       ...(this.organization ? { organization: this.organization } : {})
     };
@@ -188,7 +188,7 @@ export class AuthManager {
     try {
       return this.authentication.handleRedirectCallback(url);
     } catch (err) {
-      throw err;
+      console.error(err);
     }
   }
 

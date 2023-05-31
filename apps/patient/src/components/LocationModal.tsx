@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from 'react';
 import {
   Button,
   Divider,
@@ -11,73 +11,73 @@ import {
   ModalCloseButton,
   Text,
   VStack
-} from '@chakra-ui/react'
-import { FiTarget } from 'react-icons/fi'
-import { AsyncSelect } from 'chakra-react-select'
+} from '@chakra-ui/react';
+import { FiTarget } from 'react-icons/fi';
+import { AsyncSelect } from 'chakra-react-select';
 
-import t from '../utils/text.json'
+import t from '../utils/text.json';
 
 const formatLocationOptions = (p: any) => {
   const options = p.map((org: any) => {
     return {
       value: org.place_id,
       label: org.description
-    }
-  })
-  return options
-}
+    };
+  });
+  return options;
+};
 
-const autocompleteService = new google.maps.places.AutocompleteService()
-const geocoder = new google.maps.Geocoder()
+const autocompleteService = new google.maps.places.AutocompleteService();
+const geocoder = new google.maps.Geocoder();
 
 export const LocationModal = ({ isOpen, onClose }: any) => {
-  const [gettingCurrentLocation, setGettingCurrentLocation] = useState<boolean>(false)
+  const [gettingCurrentLocation, setGettingCurrentLocation] = useState<boolean>(false);
 
   const searchForLocations = async (inputValue: string) => {
     const request = {
       input: inputValue,
       types: ['geocode'],
       componentRestrictions: { country: 'us' }
-    }
-    const opts = await autocompleteService.getPlacePredictions(request)
-    return formatLocationOptions(opts.predictions)
-  }
+    };
+    const opts = await autocompleteService.getPlacePredictions(request);
+    return formatLocationOptions(opts.predictions);
+  };
 
   const geocode = async (address: string) => {
-    const data = await geocoder.geocode({ address })
+    const data = await geocoder.geocode({ address });
     if (data?.results) {
       onClose({
         loc: data.results[0].formatted_address,
         lat: data.results[0].geometry.location.lat(),
         lng: data.results[0].geometry.location.lng()
-      })
+      });
     }
-  }
+  };
 
   const getCurrentLocation = async () => {
-    setGettingCurrentLocation(true)
+    setGettingCurrentLocation(true);
     if (navigator.geolocation) {
       await navigator.geolocation.getCurrentPosition(async (pos) => {
-        const lat = pos.coords.latitude
-        const lng = pos.coords.longitude
-        const data = await geocoder.geocode({ location: { lat, lng } })
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const data = await geocoder.geocode({ location: { lat, lng } });
         onClose({
           loc: data.results[0].formatted_address,
           lat: data.results[0].geometry.location.lat(),
           lng: data.results[0].geometry.location.lng()
-        })
-        setGettingCurrentLocation(false)
-      })
+        });
+        setGettingCurrentLocation(false);
+      });
     } else {
-      setGettingCurrentLocation(false)
+      setGettingCurrentLocation(false);
     }
-  }
+  };
 
   const loadOptions = (inputValue: string, callback: (options: any) => void) => {
     setTimeout(async () => {
-      callback(await searchForLocations(inputValue))
-    }, 1000)
-  }
+      callback(await searchForLocations(inputValue));
+    }, 1000);
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={() => onClose({})}>
@@ -118,7 +118,7 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
                 menuPlacement="auto"
                 onChange={async (val) => {
                   if (val) {
-                    await geocode(val.label)
+                    await geocode(val.label);
                   }
                 }}
               />
@@ -127,5 +127,5 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
         </ModalBody>
       </ModalContent>
     </Modal>
-  )
-}
+  );
+};

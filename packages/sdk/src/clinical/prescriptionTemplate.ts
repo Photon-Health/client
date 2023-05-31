@@ -37,7 +37,7 @@ export class PrescriptionTemplateQueryManager {
     if (!fragment) {
       fragment = { PrescriptionTemplateFields: PRESCRIPTION_TEMPLATE_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const CREATE_PRESCRIPTION_TEMPLATE = gql`
         ${fValue}
         mutation createPrescriptionTemplate(
@@ -81,7 +81,7 @@ export class PrescriptionTemplateQueryManager {
     if (!fragment) {
       fragment = { PrescriptionTemplateFields: PRESCRIPTION_TEMPLATE_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const UPDATE_PRESCRIPTION_TEMPLATE = gql`
         ${fValue}
         mutation updatePrescriptionTemplate(
@@ -125,7 +125,7 @@ export class PrescriptionTemplateQueryManager {
     if (!fragment) {
       fragment = { PrescriptionTemplateFields: PRESCRIPTION_TEMPLATE_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const DELETE_PRESCRIPTION_TEMPLATE = gql`
         ${fValue}
         mutation deletePrescriptionTemplate(

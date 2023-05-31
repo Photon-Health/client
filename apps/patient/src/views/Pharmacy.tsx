@@ -1,5 +1,5 @@
-import { useState, useEffect, useContext } from 'react'
-import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useState, useEffect, useContext } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   Alert,
   AlertIcon,
@@ -12,141 +12,141 @@ import {
   Text,
   VStack,
   useToast
-} from '@chakra-ui/react'
-import { FiCheck, FiMapPin } from 'react-icons/fi'
+} from '@chakra-ui/react';
+import { FiCheck, FiMapPin } from 'react-icons/fi';
 
-import { Helmet } from 'react-helmet'
-import dayjs from 'dayjs'
+import { Helmet } from 'react-helmet';
+import dayjs from 'dayjs';
 
-import { formatAddress, getHours } from '../utils/general'
-import { GET_PHARMACIES } from '../utils/queries'
-import { Order } from '../utils/models'
-import t from '../utils/text.json'
-import { SELECT_ORDER_PHARMACY } from '../utils/mutations'
-import { graphQLClient } from '../configs/graphqlClient'
-import { FixedFooter } from '../components/FixedFooter'
-import { Nav } from '../components/Nav'
-import { PoweredBy } from '../components/PoweredBy'
-import { LocationModal } from '../components/LocationModal'
-import { PickupOptions } from '../components/PickupOptions'
-import { BrandedOptions } from '../components/BrandedOptions'
-import { OrderContext } from './Main'
-import { getSettings } from '@client/settings'
+import { formatAddress, getHours } from '../utils/general';
+import { GET_PHARMACIES } from '../utils/queries';
+import { Order } from '../utils/models';
+import t from '../utils/text.json';
+import { SELECT_ORDER_PHARMACY } from '../utils/mutations';
+import { graphQLClient } from '../configs/graphqlClient';
+import { FixedFooter } from '../components/FixedFooter';
+import { Nav } from '../components/Nav';
+import { PoweredBy } from '../components/PoweredBy';
+import { LocationModal } from '../components/LocationModal';
+import { PickupOptions } from '../components/PickupOptions';
+import { BrandedOptions } from '../components/BrandedOptions';
+import { OrderContext } from './Main';
+import { getSettings } from '@client/settings';
 
-const settings = getSettings(process.env.REACT_APP_ENV_NAME)
+const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
-const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER']
+const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
 export const UNOPEN_BUSINESS_STATUS_MAP = {
   CLOSED_TEMPORARILY: 'Closed Temporarily',
   CLOSED_PERMANENTLY: 'Closed Permanently'
-}
+};
 
-const placesService = new google.maps.places.PlacesService(document.createElement('div'))
-const geocoder = new google.maps.Geocoder()
+const placesService = new google.maps.places.PlacesService(document.createElement('div'));
+const geocoder = new google.maps.Geocoder();
 
 const query = (method, data) =>
   new Promise((resolve, reject) => {
     placesService[method](data, (response, status) => {
       if (status === 'OK') {
-        resolve({ response, status })
+        resolve({ response, status });
       } else {
-        reject({ response, status })
+        reject({ response, status });
       }
-    })
-  })
+    });
+  });
 
 export const Pharmacy = () => {
-  const order = useContext<Order>(OrderContext)
+  const order = useContext<Order>(OrderContext);
 
   const orgSettings =
-    order?.organization?.id in settings ? settings[order.organization.id] : settings.default
+    order?.organization?.id in settings ? settings[order.organization.id] : settings.default;
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const [searchParams] = useSearchParams()
-  const token = searchParams.get('token')
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
 
-  const [pharmacyOptions, setPharmacyOptions] = useState([])
+  const [pharmacyOptions, setPharmacyOptions] = useState([]);
 
-  const [showFooter, setShowFooter] = useState<boolean>(false)
+  const [showFooter, setShowFooter] = useState<boolean>(false);
 
-  const [selectedId, setSelectedId] = useState<string>('')
-  const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false)
+  const [selectedId, setSelectedId] = useState<string>('');
+  const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
 
-  const [error, setError] = useState<string | undefined>(undefined)
-  const [submitting, setSubmitting] = useState<boolean>(false)
-  const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false)
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
 
-  const [loadingMore, setLoadingMore] = useState<boolean>(false)
-  const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false)
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
+  const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
 
-  const [latitude, setLatitude] = useState<number | undefined>(undefined)
-  const [longitude, setLongitude] = useState<number | undefined>(undefined)
+  const [latitude, setLatitude] = useState<number | undefined>(undefined);
+  const [longitude, setLongitude] = useState<number | undefined>(undefined);
   const [location, setLocation] = useState<string>(
     order?.address ? formatAddress(order.address) : ''
-  )
+  );
 
-  const toast = useToast()
+  const toast = useToast();
 
   const reset = () => {
-    setPharmacyOptions([])
-    setSelectedId('')
-    setShowFooter(false)
-    setShowingAllPharmacies(false)
-  }
+    setPharmacyOptions([]);
+    setSelectedId('');
+    setShowFooter(false);
+    setShowingAllPharmacies(false);
+  };
 
   const handleModalClose = ({
     loc = undefined,
     lat = undefined,
     lng = undefined
   }: {
-    loc: string | undefined
-    lat: number | undefined
-    lng: number | undefined
+    loc: string | undefined;
+    lat: number | undefined;
+    lng: number | undefined;
   }) => {
     // Reset view if search location changes
     if (loc && loc !== location) {
       if (lat && lng) {
-        reset()
-        setLocation(loc)
-        setLatitude(lat)
-        setLongitude(lng)
+        reset();
+        setLocation(loc);
+        setLatitude(lat);
+        setLongitude(lng);
       }
     }
 
-    setLocationModalOpen(false)
-  }
+    setLocationModalOpen(false);
+  };
 
   const geocode = async (address: string) => {
-    const data = await geocoder.geocode({ address })
+    const data = await geocoder.geocode({ address });
     if (data?.results) {
       return {
         loc: data.results[0].formatted_address,
         lat: data.results[0].geometry.location.lat(),
         lng: data.results[0].geometry.location.lng()
-      }
+      };
     }
-  }
+  };
 
   const fetchPharmacies = async () => {
-    setLoadingMore(true)
+    setLoadingMore(true);
 
     // On initializing, we won't have lat/lng
-    let loc: string = location
-    let lat: number = latitude
-    let lng: number = longitude
+    let loc: string = location;
+    let lat: number = latitude;
+    let lng: number = longitude;
     if (!lat || !lng) {
-      const geo = await geocode(location)
-      if (!geo) return
+      const geo = await geocode(location);
+      if (!geo) return;
 
-      loc = geo.loc
-      lat = geo.lat
-      lng = geo.lng
+      loc = geo.loc;
+      lat = geo.lat;
+      lng = geo.lng;
 
       // Save location data for show more pharmacies
-      setLocation(loc)
-      setLatitude(lat)
-      setLongitude(lng)
+      setLocation(loc);
+      setLatitude(lat);
+      setLongitude(lng);
     }
 
     // Get pharmacies from our internal list
@@ -154,48 +154,48 @@ export const Pharmacy = () => {
       latitude: lat,
       longitude: lng,
       radius: 25
-    }
-    const limit = 3
-    const offset = pharmacyOptions.length
+    };
+    const limit = 3;
+    const offset = pharmacyOptions.length;
 
-    graphQLClient.setHeader('x-photon-auth', token)
+    graphQLClient.setHeader('x-photon-auth', token);
 
-    let pharmaciesResults: any
+    let pharmaciesResults: any;
     try {
       pharmaciesResults = await graphQLClient.request(GET_PHARMACIES, {
         location: locationData,
         limit,
         offset
-      })
+      });
     } catch (error) {
-      console.error(JSON.stringify(error, undefined, 2))
-      console.log(error)
+      console.error(JSON.stringify(error, undefined, 2));
+      console.log(error);
       if (error?.response.errors[0].message === 'No pharmacies found near location') {
-        setShowingAllPharmacies(true)
+        setShowingAllPharmacies(true);
       }
     }
 
     if (pharmaciesResults?.pharmaciesByLocation.length > 0) {
       for (let i = 0; i < pharmaciesResults.pharmaciesByLocation.length; i++) {
         // Search for google place
-        const name = pharmaciesResults.pharmaciesByLocation[i].name
+        const name = pharmaciesResults.pharmaciesByLocation[i].name;
         const address = pharmaciesResults.pharmaciesByLocation[i].address
           ? formatAddress(pharmaciesResults.pharmaciesByLocation[i].address)
-          : ''
+          : '';
         const placeRequest = {
           query: name + ' ' + address,
           fields: ['place_id']
-        }
+        };
 
-        let placeId, placeStatus
+        let placeId, placeStatus;
         try {
-          const { response, status }: any = await query('findPlaceFromQuery', placeRequest)
-          placeId = response[0]?.place_id
-          placeStatus = status
+          const { response, status }: any = await query('findPlaceFromQuery', placeRequest);
+          placeId = response[0]?.place_id;
+          placeStatus = status;
         } catch (error) {
-          console.error(JSON.stringify(error, undefined, 2))
-          console.log(error)
-          continue
+          console.error(JSON.stringify(error, undefined, 2));
+          console.log(error);
+          continue;
         }
 
         // Search for google place details
@@ -204,78 +204,78 @@ export const Pharmacy = () => {
             placeId,
             // 'getDetails' requires utc_offset_minutes to provide isOpen()
             fields: ['opening_hours', 'utc_offset_minutes', 'rating', 'business_status']
-          }
+          };
           const { response: details, status: detailsStatus }: any = await query(
             'getDetails',
             detailsRequest
-          )
+          );
           if (detailsStatus === 'OK') {
             pharmaciesResults.pharmaciesByLocation[i].businessStatus =
-              details?.business_status || ''
-            pharmaciesResults.pharmaciesByLocation[i].rating = details?.rating || undefined
-            const openForBusiness = details?.business_status === 'OPERATIONAL'
+              details?.business_status || '';
+            pharmaciesResults.pharmaciesByLocation[i].rating = details?.rating || undefined;
+            const openForBusiness = details?.business_status === 'OPERATIONAL';
             if (openForBusiness) {
-              const currentTime = dayjs().format('HHmm')
+              const currentTime = dayjs().format('HHmm');
               const { is24Hr, opens, opensDay, closes } = getHours(
                 details?.opening_hours?.periods,
                 currentTime
-              )
+              );
               pharmaciesResults.pharmaciesByLocation[i].hours = {
                 open: details?.opening_hours?.isOpen() || false,
                 is24Hr,
                 opens,
                 opensDay,
                 closes
-              }
+              };
             }
           }
         }
       }
-      setPharmacyOptions([...pharmacyOptions, ...pharmaciesResults.pharmaciesByLocation])
+      setPharmacyOptions([...pharmacyOptions, ...pharmaciesResults.pharmaciesByLocation]);
     }
-    setLoadingMore(false)
-  }
+    setLoadingMore(false);
+  };
 
   const handleShowMore = () => {
-    fetchPharmacies()
-  }
+    fetchPharmacies();
+  };
 
   const handleSelect = (pharmacyId: string) => {
-    setSelectedId(pharmacyId)
-    setShowFooter(true)
-  }
+    setSelectedId(pharmacyId);
+    setShowFooter(true);
+  };
 
   const handleSubmit = async () => {
     if (!selectedId) {
-      console.error('No selectedId. Cannot set pharmacy on order.')
-      return
+      console.error('No selectedId. Cannot set pharmacy on order.');
+      return;
     }
 
     try {
-      setSubmitting(true)
+      setSubmitting(true);
 
-      graphQLClient.setHeader('x-photon-auth', token)
+      graphQLClient.setHeader('x-photon-auth', token);
       const results: any = await graphQLClient.request(SELECT_ORDER_PHARMACY, {
         orderId: order.id,
         pharmacyId: selectedId,
         patientId: order.patient.id
-      })
+      });
 
       setTimeout(() => {
-        if (!!results?.selectOrderPharmacy) {
-          setSuccessfullySubmitted(true)
+        if (results?.selectOrderPharmacy) {
+          setSuccessfullySubmitted(true);
           setTimeout(() => {
-            setShowFooter(false)
+            setShowFooter(false);
 
-            let type = 'pickup'
+            let type = 'pickup';
             if (orgSettings.courierProviders.includes(selectedId)) {
-              type = 'courier'
+              type = 'courier';
             } else if (orgSettings.mailOrderNavigateProviders.includes(selectedId)) {
-              type = 'mailOrder'
+              type = 'mailOrder';
             }
 
-            navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`)
-          }, 1000)
+            navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
+          }, 1000);
         } else {
           toast({
             title: 'Unable to submit pharmacy selection',
@@ -284,31 +284,31 @@ export const Pharmacy = () => {
             status: 'error',
             duration: 5000,
             isClosable: true
-          })
+          });
         }
-        setSubmitting(false)
-      }, 1000)
+        setSubmitting(false);
+      }, 1000);
     } catch (error) {
-      setSubmitting(false)
+      setSubmitting(false);
 
-      console.log(error)
-      console.error(JSON.stringify(error, undefined, 2))
+      console.log(error);
+      console.error(JSON.stringify(error, undefined, 2));
 
       if (error?.response?.errors) {
         if (AUTH_HEADER_ERRORS.includes(error.response.errors[0].extensions.code)) {
-          navigate('/no-match')
+          navigate('/no-match');
         } else {
-          setError(error.response.errors[0].message)
+          setError(error.response.errors[0].message);
         }
       }
     }
-  }
+  };
 
   useEffect(() => {
     if (location) {
-      fetchPharmacies()
+      fetchPharmacies();
     }
-  }, [location])
+  }, [location]);
 
   if (error) {
     return (
@@ -316,14 +316,14 @@ export const Pharmacy = () => {
         <AlertIcon />
         {error}
       </Alert>
-    )
+    );
   }
 
   // Courier option limited to MoPed in Austin, TX
-  const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(location)
+  const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(location);
   const patientAddressInAustinTX =
-    order?.address?.city === 'Austin' && order?.address?.state === 'TX'
-  const enableCourier = searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier
+    order?.address?.city === 'Austin' && order?.address?.state === 'TX';
+  const enableCourier = searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier;
 
   return (
     <Box>
@@ -419,5 +419,5 @@ export const Pharmacy = () => {
         </Container>
       </FixedFooter>
     </Box>
-  )
-}
+  );
+};

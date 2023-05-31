@@ -1,6 +1,6 @@
 import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client';
 import { DISPENSE_UNIT_FIELDS, PRESCRIPTION_FIELDS } from '../fragments';
-import { DispenseUnit, Maybe, Prescription, PrescriptionState } from '../types';
+import { DispenseUnit, Prescription, PrescriptionState } from '../types';
 import { makeMutation, makeQuery } from '../utils';
 
 /**
@@ -82,7 +82,7 @@ export class PrescriptionQueryManager {
     if (!first) {
       first = 25;
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_PRESCRIPTIONS = gql`
           ${fValue}
           query prescriptions(
@@ -126,7 +126,7 @@ export class PrescriptionQueryManager {
     if (!fragment) {
       fragment = { PrescriptionFields: PRESCRIPTION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_PRESCRIPTION = gql`
           ${fValue}
           query prescription($id: ID!) {
@@ -148,7 +148,7 @@ export class PrescriptionQueryManager {
     if (!fragment) {
       fragment = { DispenseUnitFields: DISPENSE_UNIT_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_DISPENSE_UNITS = gql`
           ${fValue}
           query dispenseUnits {
@@ -164,7 +164,7 @@ export class PrescriptionQueryManager {
     if (!fragment) {
       fragment = { PrescriptionFields: PRESCRIPTION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const CREATE_PRESCRIPTION = gql`
       ${fValue}
       mutation createPrescription(
@@ -208,7 +208,7 @@ export class PrescriptionQueryManager {
     if (!fragment) {
       fragment = { PrescriptionFields: PRESCRIPTION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const CREATE_PRESCRIPTIONS = gql`
       ${fValue}
       mutation createPrescriptions(

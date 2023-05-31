@@ -64,13 +64,13 @@ customElement('photon-med-search', {}, () => {
         setProducts(data.medicationProducts);
       });
     }
-  }, [medicationId, strengthId, routeId, formId]);
+  });
 
   createEffect(() => {
     if (selectedMedication()) {
       dispatchFormUpdated(selectedMedication()!, addToCatalog());
     }
-  }, [selectedMedication, addToCatalog]);
+  });
 
   return (
     <div
@@ -81,41 +81,35 @@ customElement('photon-med-search', {}, () => {
       on:photon-strength-selected={(e: any) => {
         setStrengthId(e.detail.strengthId);
       }}
-      on:photon-strength-deselected={(e: any) => {
+      on:photon-strength-deselected={() => {
         setStrengthId('');
       }}
       on:photon-route-selected={(e: any) => {
         setRouteId(e.detail.routeId);
       }}
-      on:photon-route-deselected={(e: any) => {
+      on:photon-route-deselected={() => {
         setRouteId('');
       }}
       on:photon-form-selected={(e: any) => {
         setFormId(e.detail.formId);
       }}
-      on:photon-form-deselected={(e: any) => {
+      on:photon-form-deselected={() => {
         setFormId('');
       }}
     >
       <p class="font-sans text-lg text-gray-700 text-center pb-2">Advanced Medication Search</p>
       <div class="flex flex-col xs:flex-row gap-4">
-        <MedicationNameDropdown></MedicationNameDropdown>
+        <MedicationNameDropdown />
       </div>
       <div class="flex flex-col xs:flex-row gap-4">
         <MedicationStrengthDropdown
           medicationId={medicationId()}
           disabled={medicationId().length == 0}
-        ></MedicationStrengthDropdown>
-        <MedicationRouteDropdown
-          medicationId={strengthId()}
-          disabled={strengthId().length == 0}
-        ></MedicationRouteDropdown>
+        />
+        <MedicationRouteDropdown medicationId={strengthId()} disabled={strengthId().length == 0} />
       </div>
       <div class="flex flex-col xs:flex-row gap-4">
-        <MedicationFormDropdown
-          medicationId={routeId()}
-          disabled={routeId().length == 0}
-        ></MedicationFormDropdown>
+        <MedicationFormDropdown medicationId={routeId()} disabled={routeId().length == 0} />
       </div>
       <hr class="my-8" />
       <p class="font-sans text-gray-700 pb-4">Select a medication:</p>
@@ -152,7 +146,7 @@ customElement('photon-med-search', {}, () => {
           label="Add Medication to Catalog"
           disabled={!selectedMedication()}
           checked={addToCatalog()}
-        ></photon-checkbox>
+        />
       </Show>
     </div>
   );

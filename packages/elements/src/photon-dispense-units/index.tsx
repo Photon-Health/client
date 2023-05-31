@@ -96,7 +96,7 @@ customElement(
           }}
           noDataMsg={'No dispense units found'}
           helpText={props.helpText}
-        ></PhotonDropdown>
+        />
       </div>
     );
   }

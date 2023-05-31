@@ -88,13 +88,13 @@ customElement('photon-prescribe-form', {}, (_, options) => {
     if (delayedSuccess()) {
       dispatchSuccess();
     }
-  }, [delayedSuccess]);
+  });
 
   createEffect(() => {
     if (delayedError()) {
       dispatchError();
     }
-  }, [delayedError]);
+  });
 
   options.element['resetForm'] = () => {
     formRef.resetForm();
@@ -121,7 +121,7 @@ customElement('photon-prescribe-form', {}, (_, options) => {
           submit-label="Create Prescription"
           on:photon-submit-success={async (e: any) => await submitForm(e.detail.data)}
         >
-          <photon-patient-select label="Patient" required="true"></photon-patient-select>
+          <photon-patient-select label="Patient" required="true" />
           <photon-treatment-select
             label="Treatment"
             required="true"
@@ -152,9 +152,9 @@ customElement('photon-prescribe-form', {}, (_, options) => {
                 formRef.updateForm(formData);
               }
             }}
-          ></photon-treatment-select>
-          <photon-checkbox label="Dispense as written" form-name="daw"></photon-checkbox>
-          <photon-datepicker label="Effective Date" required="true"></photon-datepicker>
+          />
+          <photon-checkbox label="Dispense as written" form-name="daw" />
+          <photon-datepicker label="Effective Date" required="true" />
           <div class="flex flex-col sm:flex-wrap sm:flex-row sm:items-center sm:gap-x-4">
             <photon-number-input
               class="flex-grow flex-shrink md:max-w-[50%] flex-1"
@@ -162,13 +162,13 @@ customElement('photon-prescribe-form', {}, (_, options) => {
               min="1"
               value="1"
               required="true"
-            ></photon-number-input>
+            />
             <photon-dispense-units
               class="flex-grow flex-shrink md:max-w-[50%] flex-1"
               label="Dispense Unit"
               required="true"
               force-label-size="true"
-            ></photon-dispense-units>
+            />
           </div>
           <div class="flex flex-col sm:flex-wrap sm:flex-row sm:items-center sm:gap-x-4">
             <photon-number-input
@@ -177,25 +177,22 @@ customElement('photon-prescribe-form', {}, (_, options) => {
               min="0"
               value="30"
               required="true"
-            ></photon-number-input>
+            />
             <photon-number-input
               class="flex-grow flex-shrink md:max-w-[50%] flex-1"
               label="Refills"
               min="0"
               value="0"
               required="true"
-            ></photon-number-input>
+            />
           </div>
           <photon-textarea
             label="Patient Instructions (SIG)"
             form-name="patient_instructions"
             required="true"
             placeholder="Enter patient instructions"
-          ></photon-textarea>
-          <photon-textarea
-            label="Pharmacy Note"
-            placeholder="Enter pharmacy note"
-          ></photon-textarea>
+          />
+          <photon-textarea label="Pharmacy Note" placeholder="Enter pharmacy note" />
         </photon-form>
       </div>
       <div
@@ -205,7 +202,7 @@ customElement('photon-prescribe-form', {}, (_, options) => {
         }}
         class="flex flex-col items-center gap-4 p-4"
       >
-        <sl-icon name="check-circle" class="text-green-500 text-7xl"></sl-icon>
+        <sl-icon name="check-circle" class="text-green-500 text-7xl" />
         <p class="text-gray-700">
           Prescription {client?.clinical.prescription.state.data?.id} successfully created
         </p>
@@ -217,7 +214,7 @@ customElement('photon-prescribe-form', {}, (_, options) => {
         }}
         class="flex flex-col items-center gap-4 p-4"
       >
-        <sl-icon name="x-circle" class="text-red-500 text-7xl"></sl-icon>
+        <sl-icon name="x-circle" class="text-red-500 text-7xl" />
         <p class="text-gray-700">
           We received the following error while creating your prescription:
         </p>
@@ -237,7 +234,7 @@ customElement('photon-prescribe-form', {}, (_, options) => {
             setError(false);
           }}
         >
-          <sl-icon slot="suffix" name="arrow-left-short"></sl-icon>
+          <sl-icon slot="suffix" name="arrow-left-short" />
           Go back
         </photon-button>
       </div>

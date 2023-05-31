@@ -48,7 +48,7 @@ customElement('photon-radio-group', {}, () => {
     >
       <style>{tailwind}</style>
       <div class="flex flex-col gap-3">
-        <slot ref={(r) => setSlotRef(r)}></slot>
+        <slot ref={(r) => setSlotRef(r)} />
       </div>
     </div>
   );

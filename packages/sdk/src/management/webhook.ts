@@ -45,7 +45,7 @@ export class WebhookQueryManager {
     if (!fragment) {
       fragment = { WebhookFields: WEBHOOK_CONFIG_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment!)[0];
+    const [fName, fValue] = Object.entries(fragment!)[0];
     const GET_WEBHOOKS = gql`
       ${fValue}
       query webhooks {
@@ -66,7 +66,7 @@ export class WebhookQueryManager {
     if (!fragment) {
       fragment = { WebhookFields: WEBHOOK_CONFIG_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const CREATE_WEBHOOK = gql`
       ${fValue}
       mutation createWebhook(
