@@ -54,7 +54,7 @@ const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
             circle
             on:click={() => {
               if (props.checkShouldWarn()) {
-                props.onCloseDialogOpen(true);
+                onCloseDialogOpen(true);
               } else {
                 props.onClosed();
               }
