@@ -130,11 +130,11 @@ export const AddPrescriptionCard = (props: {
               invalid={props.store['dispenseQuantity']?.error ?? false}
               help-text={props.store['dispenseQuantity']?.error}
               on:photon-input-changed={(e: any) => {
-                const target = e.currentTarget as HTMLInputElement;
-                if (!isNaN(target.valueAsNumber)) {
+                const inputValue = Number(e.detail.input);
+                if (!isNaN(inputValue)) {
                   props.actions.updateFormValue({
                     key: 'dispenseQuantity',
-                    value: Number(e.detail.input)
+                    value: inputValue
                   });
                 }
               }}
@@ -287,7 +287,7 @@ export const AddPrescriptionCard = (props: {
                         effectiveDate: props.store['effectiveDate'].value,
                         treatment: props.store['treatment'].value,
                         dispenseAsWritten: props.store['dispenseAsWritten'].value,
-                        dispenseQuantity: props.store['dispenseQuantity'].value,
+                        dispenseQuantity: props.store['dispenseQuantity']?.value,
                         dispenseUnit: props.store['dispenseUnit'].value,
                         daysSupply: props.store['daysSupply'].value,
                         refillsInput: props.store['refillsInput'].value,
@@ -299,6 +299,7 @@ export const AddPrescriptionCard = (props: {
                       }
                     ]
                   });
+                  console.log('form updated');
                   props.actions.updateFormValue({
                     key: 'effectiveDate',
                     value: format(new Date(), 'yyyy-MM-dd').toString()
