@@ -4,10 +4,11 @@ import { usePhoton } from '@photonhealth/react';
 
 import { CATALOG_TREATMENTS_FIELDS } from '../../../../model/fragments';
 import { confirmWrapper } from '../../../components/GuardDialog';
+import { Dispatch, SetStateAction } from 'react';
 
 export const TreatmentActions = (props: {
   catalogId: string;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setLoading: Dispatch<SetStateAction<boolean>>;
   treatmentId: string;
 }) => {
   const { setLoading, catalogId, treatmentId } = props;

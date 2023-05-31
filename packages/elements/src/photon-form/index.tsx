@@ -21,7 +21,7 @@ customElement(
   ) => {
     let outerRef: any;
     const [ref, setRef]: Signal<HTMLSlotElement | undefined> = createSignal(undefined);
-    const [invalid, setInvalid] = createSignal(false);
+    const [invalid] = createSignal(false);
     const [loading, setLoading] = createSignal(false);
     const children = useSlot(ref);
     let formData = new Map<string, any>();
@@ -56,11 +56,7 @@ customElement(
         formData.set('setLoading', (loading: boolean) => {
           setLoading(loading);
         });
-        formData.set('checkValidity', () => checkValidity());
         const photonEls: any[] = [];
-        children.forEach((x: any) => {
-          collectPhotonElements(x, photonEls);
-        });
         photonEls.forEach((x) => {
           if (x['addForm']) {
             x.addForm(formData);
@@ -75,14 +71,13 @@ customElement(
         <style>{shoelaceDarkStyles}</style>
         <style>{shoelaceLightStyles}</style>
         <div class="flex flex-col">
-          <slot ref={(r) => setRef(r)}></slot>
+          <slot ref={(r) => setRef(r)} />
           <div class="flex xs:self-end pb-4">
             <photon-button
               class="flex-grow"
               disabled={invalid()}
               loading={loading()}
               on:photon-clicked={() => {
-                checkValidity();
                 if (invalid()) {
                   dispatchError();
                 } else {

@@ -39,7 +39,7 @@ export class AllergenQueryManager {
     if (!fragment) {
       fragment = { AllergenFields: ALLERGEN_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_ALLERGENS = gql`
         ${fValue}
         query allergens($filter: AllergenFilter) {

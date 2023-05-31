@@ -46,7 +46,7 @@ export const MedicationFormDropdown = (props: { disabled: boolean; medicationId:
         setIsLoading(false);
       });
     }
-  }, [props.medicationId]);
+  });
 
   const actionRef: any = {};
 
@@ -78,7 +78,7 @@ export const MedicationFormDropdown = (props: { disabled: boolean; medicationId:
         }}
         noDataMsg={'No forms found'}
         required={false}
-      ></PhotonDropdown>
+      />
     </div>
   );
 };

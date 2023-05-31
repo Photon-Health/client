@@ -1,7 +1,7 @@
 import { customElement } from 'solid-element';
 import { createEffect, createSignal } from 'solid-js';
 import { PhotonContext } from '../context';
-import { hasAuthParams, validateProps } from '../utils';
+import { hasAuthParams } from '../utils';
 import { PhotonClient } from '@photonhealth/sdk';
 import { PhotonClientStore } from '../store';
 import { makeTimer } from '@solid-primitives/timer';
@@ -95,7 +95,6 @@ customElement(
   },
   (props: PhotonClientProps) => {
     let ref: any;
-    const errs = validateProps({ id: props.id }, ['id']);
 
     const sdk = new PhotonClient({
       domain: props.domain,
@@ -112,14 +111,13 @@ customElement(
     }
     const [store] = createSignal<PhotonClientStore>(client);
 
-    let disposeInterval;
     createEffect(async () => {
       if (hasAuthParams() && store()) {
         await store()?.authentication.handleRedirect();
         if (props.redirectPath) window.location.replace(props.redirectPath);
       } else if (store()) {
         await store()?.authentication.checkSession();
-        disposeInterval = makeTimer(
+        makeTimer(
           async () => {
             await store()?.authentication.checkSession();
           },
@@ -138,12 +136,12 @@ customElement(
           await store()?.authentication.login(args);
         }
       }
-    }, [store()?.authentication.state.isAuthenticated, store()?.authentication.state.isLoading]);
+    });
 
     return (
       <div ref={ref}>
         <PhotonContext.Provider value={store()}>
-          <slot></slot>
+          <slot />
         </PhotonContext.Provider>
       </div>
     );

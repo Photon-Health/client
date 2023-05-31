@@ -8,6 +8,7 @@ setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/')
 import tailwind from '../tailwind.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
+import { mergeProps } from 'solid-js';
 
 export type TooltipPlacements =
   | 'top'
@@ -27,14 +28,19 @@ export type PhotonTooltipProps = {
   placement?: TooltipPlacements;
 };
 
-const PhotonTooltip = ({ tip, placement = 'top' }: PhotonTooltipProps) => {
+const PhotonTooltip = (p: PhotonTooltipProps) => {
+  const props = mergeProps({ placement: 'top' }, p);
   return (
     <>
       <style>{tailwind}</style>
       <style>{shoelaceDarkStyles}</style>
       <style>{shoelaceLightStyles}</style>
-      <sl-tooltip content={tip} placement={placement} style="--max-width: 200px;">
-        <sl-icon name="info-circle"></sl-icon>
+      <sl-tooltip
+        content={props.tip}
+        placement={props.placement}
+        style={{ '--max-width': '200px' }}
+      >
+        <sl-icon name="info-circle" />
       </sl-tooltip>
     </>
   );

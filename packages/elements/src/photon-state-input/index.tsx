@@ -137,7 +137,7 @@ customElement(
           optional={false}
           helpText={props.helpText}
           selectedData={states.filter((x) => x.name === props.selected)?.[0]}
-        ></PhotonDropdown>
+        />
       </div>
     );
   }

@@ -45,8 +45,6 @@ declare module 'solid-js' {
       'photon-radio-group': unknown;
       'photon-med-search': unknown;
       'photon-med-search-dialog': unknown;
-      'photon-dosage-calculator': unknown;
-      'photon-dosage-calculator-dialog': unknown;
       'photon-multirx-form': unknown;
     }
   }

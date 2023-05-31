@@ -5,7 +5,7 @@ function formatDate(dateString: string) {
     return '';
   }
 
-  let [month, day, year] = dateParts.map((part) => parseInt(part));
+  const [month, day, year] = dateParts.map((part) => parseInt(part));
   if (isNaN(month) || isNaN(day) || isNaN(year)) {
     return '';
   }

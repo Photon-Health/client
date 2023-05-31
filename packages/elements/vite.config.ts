@@ -5,9 +5,8 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 import typescript from '@rollup/plugin-typescript';
 import replace from '@rollup/plugin-replace';
 
+// eslint-disable-next-line
 const resolvePath = (str: string) => path.resolve(__dirname, str);
-
-const isExternal = (id: string) => !id.startsWith('.') && !path.isAbsolute(id);
 
 export default defineConfig({
   plugins: [

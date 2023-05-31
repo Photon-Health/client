@@ -122,7 +122,7 @@ export const countFillsAndRemoveDuplicates = (fills: types.Fill[]): FillWithCoun
   const count = {};
   const result = [];
 
-  for (let fill of fills) {
+  for (const fill of fills) {
     const str = fill.treatment.id;
 
     if (count[str]) {

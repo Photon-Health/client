@@ -1,12 +1,7 @@
 import { ApolloClient, DocumentNode, gql, NormalizedCacheObject } from '@apollo/client';
 import { MEDICATION_FIELDS, SEARCH_MEDICATION_FIELDS } from '../fragments';
 import { makeQuery } from '../utils';
-import {
-  Medication,
-  MedicationFilter,
-  QueryMedicationConceptsArgs,
-  SearchMedication
-} from '../types';
+import { Medication, SearchMedication } from '../types';
 
 /**
  * GetConceptOptions options
@@ -100,7 +95,7 @@ export class SearchMedicationQueryManager {
     if (!fragment) {
       fragment = { SearchMedicationFields: SEARCH_MEDICATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_CONCEPTS = gql`
         ${fValue}
         query medicationConcepts($name: String!) {
@@ -123,7 +118,7 @@ export class SearchMedicationQueryManager {
     if (!fragment) {
       fragment = { SearchMedicationFields: SEARCH_MEDICATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_STRENGTHS = gql`
           ${fValue}
           query medicationStrengths($id: String!) {
@@ -146,7 +141,7 @@ export class SearchMedicationQueryManager {
     if (!fragment) {
       fragment = { SearchMedicationFields: SEARCH_MEDICATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_ROUTES = gql`
               ${fValue}
               query medicationRoutes($id: String!) {
@@ -169,7 +164,7 @@ export class SearchMedicationQueryManager {
     if (!fragment) {
       fragment = { MedicationFields: MEDICATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_FORMS = gql`
               ${fValue}
               query medicationForms($id: String!) {
@@ -192,7 +187,7 @@ export class SearchMedicationQueryManager {
     if (!fragment) {
       fragment = { MedicationFields: MEDICATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_PRODUCTS = gql`
                   ${fValue}
                   query medicationProducts($id: String!) {
@@ -215,7 +210,7 @@ export class SearchMedicationQueryManager {
     if (!fragment) {
       fragment = { MedicationFields: MEDICATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_PACKAGES = gql`
                   ${fValue}
                   query medicationPackages($id: String!) {

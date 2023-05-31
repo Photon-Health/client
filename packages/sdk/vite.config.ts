@@ -2,6 +2,7 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import typescript from '@rollup/plugin-typescript';
 
+// eslint-disable-next-line
 const resolvePath = (str: string) => path.resolve(__dirname, str);
 
 const isExternal = (id: string) => !id.startsWith('.') && !path.isAbsolute(id);

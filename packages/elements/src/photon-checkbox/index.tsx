@@ -64,26 +64,26 @@ customElement(
               ref={ref}
               checked
               disabled={props.disabled}
-              on:sl-change={(e: any) => {
+              on:sl-change={() => {
                 dispatchChecked(!checked());
                 setChecked(!checked());
               }}
-            ></sl-checkbox>
+            />
           ) : (
             <sl-checkbox
               ref={ref}
               disabled={props.disabled}
-              on:sl-change={(e: any) => {
+              on:sl-change={() => {
                 dispatchChecked(!checked());
                 setChecked(!checked());
               }}
-            ></sl-checkbox>
+            />
           )}
           <div>
             <p class="flex items-center text-gray-500 text-sm font-medium font-sans">
               <span class="mr-1">{props.label} </span>
               <Show when={props.tip}>
-                <PhotonTooltip tip={props.tip || ''} placement="right"></PhotonTooltip>
+                <PhotonTooltip tip={props.tip || ''} placement="right" />
               </Show>
             </p>
             <p class="text-gray-400 text-xs font-sans">
