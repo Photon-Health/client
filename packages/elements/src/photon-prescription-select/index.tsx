@@ -65,14 +65,14 @@ customElement(
 
     createEffect(() => {
       setData(client?.clinical.prescriptions.state.prescriptions || []);
-    }, [client?.clinical.prescriptions.state.prescriptions.length]);
+    });
 
     createEffect(() => {
       const f = form();
       if (f) {
         f.get('setLoading')(client?.clinical.prescriptions.state.isLoading);
       }
-    }, [client?.clinical.prescriptions.state.isLoading]);
+    });
 
     options.element['reportValidity'] = () => {
       const validity: Record<string, any> = {};
@@ -152,7 +152,7 @@ customElement(
               : 'No prescriptions found'
           }
           helpText={props.helpText}
-        ></PhotonDropdown>
+        />
       </div>
     );
   }

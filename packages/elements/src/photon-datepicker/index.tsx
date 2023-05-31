@@ -93,7 +93,7 @@ customElement(
             type="date"
             value={date()}
             invalid={props.invalid}
-          ></sl-input>
+          />
           <p slot="help-text" class="text-sm text-red-500 pt-1 h-[21px] font-sans">
             {props.helpText}
           </p>

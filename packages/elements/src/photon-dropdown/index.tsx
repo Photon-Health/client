@@ -29,20 +29,20 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   placeholder?: string;
   forceLabelSize?: boolean;
   invalid?: boolean;
-  onSearchChange?: Function;
+  onSearchChange?: (search: string) => void;
   displayAccessor: (selected: T, groupDisplay: boolean) => string | JSXElement;
   disabled?: boolean;
-  onOpen?: Function;
-  onHide?: Function;
+  onOpen?: () => void;
+  onHide?: () => void;
   isLoading: boolean;
   hasMore: boolean;
   noDataMsg?: string;
   helpText?: string;
-  fetchMore?: Function;
+  fetchMore?: () => void;
   selectedData?: T | undefined;
   groups?: Array<{
     label: string;
-    filter: Function;
+    filter: () => void;
   }>;
   showOverflow?: boolean;
   optional?: boolean;
@@ -251,7 +251,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
               hidden: !props.isLoading
             }}
           >
-            <sl-spinner slot="suffix"></sl-spinner>
+            <sl-spinner slot="suffix" />
           </div>
           <Show when={props.clearable}>
             <div
@@ -273,7 +273,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                   dispatchDeselect();
                   dropdownRef.hide();
                 }}
-              ></sl-icon>
+              />
             </div>
           </Show>
           <div
@@ -283,7 +283,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
               hidden: props.isLoading
             }}
           >
-            <sl-icon name={open() ? 'chevron-up' : 'chevron-down'}></sl-icon>
+            <sl-icon name={open() ? 'chevron-up' : 'chevron-down'} />
           </div>
         </sl-input>
         <div class="border border-gray-200 dropdown-container overflow-hidden relative">
@@ -304,9 +304,8 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
               ref={listRef}
             >
               <Show when={props.data.length > 0 && !props.groups}>
-                {virtualizer()
-                  .getVirtualItems()
-                  .map((vr: any) => {
+                <For each={virtualizer().getVirtualItems()} fallback={<div>Loading...</div>}>
+                  {(vr: any) => {
                     const isLoaderRow = vr.index > props.data.length - 1;
                     const datum = props.data[vr.index];
                     return (
@@ -316,7 +315,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                             ? 'selected default'
                             : 'default'
                         }
-                        onclick={() => {
+                        onClick={() => {
                           if (!isLoaderRow) {
                             // @ts-ignore
                             setSelected(datum);
@@ -357,7 +356,8 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                         )}
                       </sl-menu-item>
                     );
-                  })}
+                  }}
+                </For>
               </Show>
               <Show when={props.data.length > 0 && props.groups && props.groups.length > 0}>
                 <For each={props.groups || []}>
@@ -374,20 +374,18 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                       >
                         {el.label}
                       </sl-menu-item>
-                      {virtualizer()
-                        .getVirtualItems()
-                        .filter((vr) => el.filter(props.data[vr.index]))
-                        .map((vr: any) => {
+                      <For each={virtualizer().getVirtualItems()} fallback={<div>Loading...</div>}>
+                        {(vr: any) => {
                           const isLoaderRow = vr.index > props.data.length - 1;
                           const datum = props.data[vr.index];
                           return (
                             <sl-menu-item
                               class={
                                 datum && datum.id === selected()?.id && !isLoaderRow
-                                  ? 'selected default group-member'
-                                  : 'default group-member'
+                                  ? 'selected default'
+                                  : 'default'
                               }
-                              onclick={() => {
+                              onClick={() => {
                                 if (!isLoaderRow) {
                                   // @ts-ignore
                                   setSelected(datum);
@@ -417,13 +415,21 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                                   </p>
                                 )
                               ) : (
-                                <p class="overflow-hidden overflow-ellipsis whitespace-nowrap">
+                                <p
+                                  classList={{
+                                    'overflow-hidden': !props.showOverflow,
+                                    'overflow-ellipsis': !props.showOverflow,
+                                    'whitespace-nowrap': !props.showOverflow,
+                                    'whitespace-normal': props.showOverflow
+                                  }}
+                                >
                                   {props.displayAccessor(datum, true)}
                                 </p>
                               )}
                             </sl-menu-item>
                           );
-                        })}
+                        }}
+                      </For>
                     </>
                   )}
                 </For>

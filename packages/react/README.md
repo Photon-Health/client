@@ -3,6 +3,7 @@
 > React integration for the Photon JavaScript SDK
 
 ## Installation
+
 ```
 npm install @photonhealth/react
 ```

@@ -25,6 +25,11 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Set Git User
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+
       - name: Check for version updates
         id: check
         run: |

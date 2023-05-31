@@ -35,9 +35,9 @@ customElement(
         <photon-card on:click={() => dispatchSelected()}>
           <div class="flex items-center gap-2">
             <p class="font-sans flex-grow text-gray-600 text-sm">
-              <slot></slot>
+              <slot />
             </p>
-            <input type="radio" checked={props.selected}></input>
+            <input type="radio" checked={props.selected} />
           </div>
         </photon-card>
       </div>

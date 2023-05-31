@@ -60,7 +60,7 @@ customElement(
         <button
           ref={ref}
           disabled={props.disabled || props.loading}
-          onclick={() => dispatchClick()}
+          onClick={() => dispatchClick()}
           classList={{
             button: true,
             'button--solid': props.variant === 'solid',
@@ -74,7 +74,7 @@ customElement(
           }}
           class="rounded-lg font-sans transition ease-in-out delay-50 flex items-center gap-1 lg:gap-2"
         >
-          <slot name="suffix"></slot>
+          <slot name="suffix" />
           {props.loading ? (
             <div class="pt-[3px]">
               <sl-spinner
@@ -83,14 +83,14 @@ customElement(
                   'spinner--solid': props.variant === 'solid',
                   'spinner--outline': props.variant === 'outline'
                 }}
-              ></sl-spinner>
+              />
             </div>
           ) : null}
 
           <p class={`w-full ${textSize}`}>
-            <slot></slot>
+            <slot />
           </p>
-          <slot name="postfix"></slot>
+          <slot name="postfix" />
         </button>
       </>
     );

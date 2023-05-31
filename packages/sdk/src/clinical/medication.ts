@@ -12,8 +12,8 @@ import { Medication, MedicationFilter } from '../types';
  */
 export interface GetMedicationsOptions {
   filter?: MedicationFilter;
-  after?: String;
-  first?: Number;
+  after?: string;
+  first?: number;
   fragment?: Record<string, DocumentNode>;
 }
 
@@ -43,7 +43,7 @@ export class MedicationQueryManager {
     if (!fragment) {
       fragment = { MedicationFields: MEDICATION_FIELDS };
     }
-    let [fName, fValue] = Object.entries(fragment)[0];
+    const [fName, fValue] = Object.entries(fragment)[0];
     const GET_MEDICATIONS = gql`
       ${fValue}
       query medications($filter: MedicationFilter, $after: ID, $first: Int) {

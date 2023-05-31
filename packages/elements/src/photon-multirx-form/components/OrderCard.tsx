@@ -9,11 +9,11 @@ const pharmacyValidator = message(
 
 export const OrderCard = (props: {
   store: Record<string, any>;
-  actions: Record<string, Function>;
+  actions: Record<string, (...args: any) => any>;
 }) => {
   props.actions.registerValidator({
     key: 'pharmacy',
-    validator: pharmacyValidator,
+    validator: pharmacyValidator
   });
 
   return (
@@ -43,13 +43,13 @@ export const OrderCard = (props: {
               on:photon-pharmacy-selected={(e: any) => {
                 props.actions.updateFormValue({
                   key: 'pharmacy',
-                  value: e.detail.pharmacy,
+                  value: e.detail.pharmacy
                 });
               }}
-              on:photon-pharmacy-removed={(e: any) => {
+              on:photon-pharmacy-removed={() => {
                 props.actions.updateFormValue({
                   key: 'pharmacy',
-                  value: undefined,
+                  value: undefined
                 });
               }}
               address={
@@ -62,7 +62,7 @@ export const OrderCard = (props: {
                   : ''
               }
               selected={props.store['patient']!.value.preferredPharmacies?.[0]?.id ?? ''}
-            ></photon-pharmacy-search>
+            />
           </div>
         </Show>
       </div>

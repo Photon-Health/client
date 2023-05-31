@@ -52,9 +52,11 @@ export const SimpleTable = (props: SimpleTableProps) => {
           <Table {...getTableProps()} ref={tableRef} variant="unstyled" size="lg">
             <Thead hidden={hideHeaders}>
               {headerGroups.map((headerGroup) => (
-                <Tr {...headerGroup.getHeaderGroupProps()}>
+                <Tr {...headerGroup.getHeaderGroupProps()} key={headerGroup?.id}>
                   {headerGroup.headers.map((column) => (
-                    <Th {...column.getHeaderProps()}>{column.render('Header')}</Th>
+                    <Th {...column.getHeaderProps()} key={column?.id}>
+                      {column.render('Header')}
+                    </Th>
                   ))}
                 </Tr>
               ))}
@@ -85,29 +87,28 @@ export const SimpleTable = (props: SimpleTableProps) => {
               {rows.map((row) => {
                 prepareRow(row);
                 return (
-                  <Tr {...row.getRowProps()}>
+                  <Tr {...row.getRowProps()} key={row?.id}>
                     {row.cells.map((cell) => {
+                      const { key, ...otherCellProps } = cell.getCellProps(
+                        cell.column.width === 'wrap'
+                          ? {
+                              style: {
+                                whiteSpace: 'pre-wrap',
+                                paddingLeft: '0',
+                                paddingTop: '1',
+                                paddingBottom: '0'
+                              }
+                            }
+                          : {
+                              style: {
+                                paddingLeft: '0',
+                                paddingTop: '1',
+                                paddingBottom: '0'
+                              }
+                            }
+                      );
                       return (
-                        <Td
-                          {...cell.getCellProps(
-                            cell.column.width === 'wrap'
-                              ? {
-                                  style: {
-                                    whiteSpace: 'pre-wrap',
-                                    paddingLeft: '0',
-                                    paddingTop: '1',
-                                    paddingBottom: '0'
-                                  }
-                                }
-                              : {
-                                  style: {
-                                    paddingLeft: '0',
-                                    paddingTop: '1',
-                                    paddingBottom: '0'
-                                  }
-                                }
-                          )}
-                        >
+                        <Td key={key} {...otherCellProps}>
                           {cell.render('Cell')}
                         </Td>
                       );

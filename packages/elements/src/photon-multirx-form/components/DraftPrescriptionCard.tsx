@@ -10,7 +10,7 @@ const draftPrescriptionsValidator = message(
 
 export const DraftPrescriptionCard = (props: {
   prescriptionRef: HTMLDivElement | undefined;
-  actions: Record<string, Function>;
+  actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
   isLoading: boolean;
   setIsEditing: (isEditing: boolean) => void;
@@ -130,7 +130,7 @@ export const DraftPrescriptionCard = (props: {
             <photon-card>
               <div class="w-full flex justify-between">
                 <p class="italic font-sans text-gray-500">Loading Prescriptions...</p>
-                <sl-spinner style="font-size: 1rem;"></sl-spinner>
+                <sl-spinner style={{ 'font-size': '1rem' }} />
               </div>
             </photon-card>
           </div>
@@ -153,18 +153,18 @@ export const DraftPrescriptionCard = (props: {
                     <sl-icon-button
                       class="self-end text-xl edit-icon-button"
                       name="pencil-square"
-                      onclick={() => {
+                      onClick={() => {
                         checkEditPrescription(draft.id);
                       }}
-                    ></sl-icon-button>
+                    />
                     <sl-icon-button
                       class="self-end text-xl remove-icon-button"
                       name="trash3"
-                      onclick={() => {
+                      onClick={() => {
                         setDeleteDialogOpen(true);
                         setDeleteDraftId(draft.id);
                       }}
-                    ></sl-icon-button>
+                    />
                   </div>
                 </div>
               </photon-card>

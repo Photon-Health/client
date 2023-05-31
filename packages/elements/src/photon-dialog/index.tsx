@@ -89,7 +89,7 @@ customElement(
             </slot>
           </Show>
           <div class={`font-sans ${!props.header ? 'py-4' : 'pb-4'}`}>
-            <slot></slot>
+            <slot />
           </div>
           <div
             class="flex flex-col xs:flex-row justify-end gap-2"

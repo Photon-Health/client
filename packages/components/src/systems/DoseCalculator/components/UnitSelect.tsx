@@ -1,8 +1,8 @@
 import { For } from 'solid-js';
 import ComboBox from '../../../particles/ComboBox';
 
-export type RecordWithId<T> = { id: string; name: T };
-const arrayToRecordMap = <T extends {}>(arr: T[]): RecordWithId<T>[] =>
+export type RecordWithId = { id: string; name: string };
+const arrayToRecordMap = (arr: string[]): RecordWithId[] =>
   arr.map((a, i) => ({ id: i.toString(), name: a }));
 
 function UnitSelect<T extends string>(props: {
@@ -17,7 +17,7 @@ function UnitSelect<T extends string>(props: {
       value={optionsWithIds[props.initialIdx || 0]}
       setSelected={(unit) => props.setSelected(unit.name)}
     >
-      <ComboBox.Input displayValue={(unit: RecordWithId<any>) => unit.name} />
+      <ComboBox.Input displayValue={(unit: RecordWithId) => unit.name} />
       <ComboBox.Options>
         <For each={optionsWithIds}>
           {(unit) => (

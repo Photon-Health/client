@@ -14,7 +14,7 @@ const patientAddressValidator = message(
 
 export const PatientCard = (props: {
   store: Record<string, any>;
-  actions: Record<string, Function>;
+  actions: Record<string, (...args: any) => any>;
   patientId?: string;
   client?: PhotonClientStore;
   enableOrder?: boolean;
@@ -78,13 +78,13 @@ export const PatientCard = (props: {
             on:photon-patient-selected={updatePatient}
             selected={props.store['patient']?.value?.id ?? props.patientId}
             sdk={props.client!.getSDK()}
-          ></photon-patient-select>
+          />
         </Show>
         {/* Show Patient Name when patientId is passed */}
         <Show when={props?.patientId}>
           <Show
             when={store?.selectedPatient?.data?.id}
-            fallback={<sl-spinner style="font-size: 1rem;"></sl-spinner>}
+            fallback={<sl-spinner style={{ 'font-size': '1rem' }} />}
           >
             <p class="font-sans text-gray-700">
               {store?.selectedPatient?.data?.name?.full},{' '}
@@ -100,7 +100,7 @@ export const PatientCard = (props: {
               actions.getSelectedPatient(props.client!.getSDK(), props.store['patient']?.value?.id);
             }}
             patient-id={props.store['patient'].value.id}
-          ></photon-patient-dialog>
+          />
           <Show when={props.store['patient']?.value}>
             <p class="font-sans text-sm font-medium">Patient Address</p>
             <Show when={props.store['patient']!.value.address}>

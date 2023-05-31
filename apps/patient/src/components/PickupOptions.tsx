@@ -6,11 +6,21 @@ import {
   Text,
   VStack,
   useBreakpointValue
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 
-import { PharmacyCard } from './PharmacyCard'
-import t from '../utils/text.json'
-import { Pharmacy } from '../utils/models'
+import { PharmacyCard } from './PharmacyCard';
+import t from '../utils/text.json';
+import { Pharmacy } from '../utils/models';
+
+interface PickupOptionsProps {
+  pharmacies: Pharmacy[];
+  selectedId: string;
+  handleSelect: (id: string) => void;
+  handleShowMore: () => void;
+  loadingMore: boolean;
+  showingAllPharmacies: boolean;
+  courierEnabled: boolean;
+}
 
 export const PickupOptions = ({
   pharmacies,
@@ -20,8 +30,8 @@ export const PickupOptions = ({
   loadingMore,
   showingAllPharmacies,
   courierEnabled
-}) => {
-  const isMobile = useBreakpointValue({ base: true, md: false })
+}: PickupOptionsProps) => {
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
     <VStack spacing={3} align="span" w="full">
@@ -74,5 +84,5 @@ export const PickupOptions = ({
         </Text>
       ) : null}
     </VStack>
-  )
-}
+  );
+};

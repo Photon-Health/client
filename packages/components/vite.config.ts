@@ -2,7 +2,7 @@
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
 import path from 'node:path';
-import dts from 'vite-plugin-dts';
+// import dts from 'vite-plugin-dts';
 
 export default defineConfig({
   plugins: [
@@ -15,6 +15,7 @@ export default defineConfig({
   ],
   build: {
     lib: {
+      // eslint-disable-next-line
       entry: path.resolve(__dirname, 'src/index.ts'),
       name: 'components',
       fileName: 'index'
