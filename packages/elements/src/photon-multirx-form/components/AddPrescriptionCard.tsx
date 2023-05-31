@@ -130,10 +130,13 @@ export const AddPrescriptionCard = (props: {
               invalid={props.store['dispenseQuantity']?.error ?? false}
               help-text={props.store['dispenseQuantity']?.error}
               on:photon-input-changed={(e: any) => {
-                props.actions.updateFormValue({
-                  key: 'dispenseQuantity',
-                  value: Number(e.detail.input)
-                });
+                const target = e.currentTarget as HTMLInputElement;
+                if (!isNaN(target.valueAsNumber)) {
+                  props.actions.updateFormValue({
+                    key: 'dispenseQuantity',
+                    value: Number(e.detail.input)
+                  });
+                }
               }}
               style={{ width: '100px' }}
             />
