@@ -22,7 +22,7 @@ export async function makeQuery<T = any>(
   apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>,
   query: DocumentNode,
   variables: object = {},
-  fetchPolicy?: FetchPolicy
+  fetchPolicy: FetchPolicy = 'network-only'
 ): Promise<MakeQueryReturn<T>> {
   const result = await apollo.query({
     query,
