@@ -1,0 +1,23 @@
+name: Check Types
+
+on: push
+
+jobs:
+  run-linters:
+    name: Run type check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install Node.js dependencies
+        run: npm ci
+
+      - name: Run Lint
+        run: npx nx run-many --all --target=tsc

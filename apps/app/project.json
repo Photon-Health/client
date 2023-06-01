@@ -60,6 +60,13 @@
         "cwd": "apps/app",
         "command": "npx eslint . --ext .tsx,.ts --fix && npx prettier --write src/**/*.{ts,tsx}"
       }
+    },
+    "tsc": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "npx tsc --noEmit"
+      }
     }
   }
 }
