@@ -1,5 +1,5 @@
 import { Auth0Client } from '@auth0/auth0-spa-js';
-import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
+import { ApolloClient, InMemoryCache, HttpLink, NormalizedCacheObject } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context/index.js';
 import { AuthManager } from './auth';
 import { ClinicalQueryManager } from './clinical';
@@ -52,6 +52,11 @@ export class PhotonClient {
   public management: ManagementQueryManager;
 
   /**
+   * Apollo client instance
+   */
+  public apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>;
+
+  /**
    * Constructs a new PhotonSDK instance
    * @param config - Photon SDK configuration options
    * @remarks - Note, that organization is optional for scenarios in which a provider supports more than themselves.
@@ -83,9 +88,10 @@ export class PhotonClient {
       organization: this.organization,
       audience: this.audience
     });
-    const apollo = this.constructApolloClient();
-    this.clinical = new ClinicalQueryManager(apollo);
-    this.management = new ManagementQueryManager(apollo);
+
+    this.apollo = this.constructApolloClient();
+    this.clinical = new ClinicalQueryManager(this.apollo);
+    this.management = new ManagementQueryManager(this.apollo);
   }
 
   private constructApolloClient() {
@@ -111,7 +117,7 @@ export class PhotonClient {
       ),
       defaultOptions: {
         query: {
-          fetchPolicy: 'network-only',
+          fetchPolicy: 'cache-first',
           errorPolicy: 'all'
         }
       },
