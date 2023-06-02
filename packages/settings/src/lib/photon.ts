@@ -75,7 +75,9 @@ export const photon: {
   org_jScrLol7ZMSfExSR: {
     ...defaultSettings,
     logo: 'river_health_logo.svg',
-    accentColor: '#2faef3'
+    accentColor: '#2faef3',
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_ID]
   },
   // Peachy
   org_vTC7G2EAuHgac90E: {
