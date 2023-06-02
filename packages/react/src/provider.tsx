@@ -1332,7 +1332,7 @@ export const PhotonProvider = (opts: {
     const { dispenseUnits, loading, error } = useStore(getDispenseUnitsStore);
 
     useEffect(() => {
-      fetchDispenseUnits({});
+      fetchDispenseUnits();
     }, []);
 
     return {

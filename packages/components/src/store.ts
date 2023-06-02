@@ -273,6 +273,7 @@ export class PhotonClientStore {
         isAuthenticated: authenticated
       });
       const user = await this.sdk.authentication.getUser();
+      // @ts-ignore TODO: store will be updated soon, so this will change
       const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
 
       let permissions: Permission[];
@@ -284,6 +285,7 @@ export class PhotonClientStore {
         permissions = [];
       }
 
+      // @ts-ignore TODO store will be updated soon, so this will change
       const isInOrg = authenticated && hasOrgs && this.sdk.organization === user.org_id;
 
       this.setStore('authentication', {
