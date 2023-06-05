@@ -72,6 +72,7 @@ export const MailOrder = ({
   return (
     <FormControl isInvalid={!!errors.pharmacyId && touched.pharmacyId}>
       <Text>Contact support to add additional mail order integrations.</Text>
+      {errors ? <FormErrorMessage>Please select a pharmacy...</FormErrorMessage> : null}
       {pharmOptions.map(({ id }: { id: string }) => (
         <Box
           mt={4}
@@ -96,7 +97,6 @@ export const MailOrder = ({
           </HStack>
         </Box>
       ))}
-      {errors ? <FormErrorMessage>Please select a pharmacy...</FormErrorMessage> : null}
     </FormControl>
   );
 };

@@ -24,8 +24,15 @@
     "lint:fix": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "packages/sdk",
+        "cwd": "packages/settings",
         "command": "npx eslint src/**/*.ts --fix && npx prettier --write src/**/*.ts"
+      }
+    },
+    "tsc": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/settings",
+        "command": "npx tsc --noEmit"
       }
     }
   },

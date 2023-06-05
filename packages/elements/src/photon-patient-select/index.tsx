@@ -39,7 +39,7 @@ customElement(
     //context
     const client = usePhoton();
     const { store, actions } = PatientStore;
-    let fetchMore: (...args: any) => any | undefined;
+    let fetchMore: unknown;
 
     onMount(() => {
       actions.reset();
@@ -108,6 +108,7 @@ customElement(
           }}
           fetchMore={async () => {
             if (fetchMore) {
+              // @ts-ignore
               fetchMore = await fetchMore();
             }
           }}

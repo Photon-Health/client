@@ -126,24 +126,17 @@ const initOrder = (
   if (!sendToPatientEnabled && (orgSettings.pickUp || orgSettings.mailOrder)) {
     const preferredPharmacy = patient?.preferredPharmacies?.[0];
 
-    const enabledFulfillmentTypes: FulfillmentOrEmpty[] = fulfillmentOptions
-      .filter((option) => option.enabled && option.fulfillmentType)
-      .map((option) => option.fulfillmentType);
-
     if (preferredPharmacy) {
       // If preferred pharmacy has an enabled fulfillment type, make that the initial tab
-      const preferedPharmacyFulfillmentTypes = preferredPharmacy?.fulfillmentTypes || [];
-      const preferredTypeIsEnabled = preferedPharmacyFulfillmentTypes.find((type) =>
-        enabledFulfillmentTypes.includes(type)
-      );
+      const enabledTypes: FulfillmentOrEmpty[] = fulfillmentOptions
+        .filter((option) => option.enabled && option.fulfillmentType)
+        .map((option) => option.fulfillmentType);
+      const pharmacyTypes = preferredPharmacy?.fulfillmentTypes || [];
+      initialFulfillmentType = pharmacyTypes.find((type) => enabledTypes.includes(type)) || '';
 
-      if (preferredTypeIsEnabled) {
-        initialFulfillmentType = preferedPharmacyFulfillmentTypes[0];
+      if (initialFulfillmentType) {
         initialPharmacyId = preferredPharmacy.id;
       }
-    }
-    if (!initialFulfillmentType) {
-      initialFulfillmentType = enabledFulfillmentTypes[0];
     }
   }
 

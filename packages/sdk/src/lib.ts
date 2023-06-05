@@ -28,7 +28,7 @@ export interface PhotonClientOptions {
 }
 
 export class PhotonClient {
-  private organization?: string;
+  public organization?: string;
 
   private audience?: string;
 
