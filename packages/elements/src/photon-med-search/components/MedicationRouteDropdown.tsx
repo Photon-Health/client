@@ -7,7 +7,7 @@ export const MedicationRouteDropdown = (props: { disabled: boolean; medicationId
   const client = usePhoton();
   const [uid, setUid] = createSignal<string>();
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
-  const [setFilterText] = createSignal<string>('');
+  const [filterText, setFilterText] = createSignal<string>('');
   const [data, setData] = createSignal<SearchMedication[]>([]);
 
   const dispatchRouteSelected = (id: string) => {

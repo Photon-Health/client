@@ -61,7 +61,7 @@ customElement(
                   },
                   awaitRefetchQueries: false
                 });
-              } catch (e) {
+              } catch (e: any) {
                 console.log('Error adding to catalog: ', e?.message);
               }
             }

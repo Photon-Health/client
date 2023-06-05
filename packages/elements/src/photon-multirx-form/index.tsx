@@ -87,18 +87,15 @@ customElement(
     options
   ) => {
     let ref: any;
-    const { store, actions } = createFormStore(
-      {
-        dispenseAsWritten: false,
-        patient: undefined,
-        treatment: undefined,
-        draftPrescriptions: [],
-        pharmacy: undefined,
-        errors: [],
-        address: undefined
-      },
-      createStore
-    );
+    const { store, actions } = createFormStore({
+      dispenseAsWritten: false,
+      patient: undefined,
+      treatment: undefined,
+      draftPrescriptions: [],
+      pharmacy: undefined,
+      errors: [],
+      address: undefined
+    });
     const client = usePhoton();
     const [showForm, setShowForm] = createSignal<boolean>(!props.templateIds);
     const [errors, setErrors] = createSignal<FormError[]>([]);

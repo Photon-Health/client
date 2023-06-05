@@ -42,7 +42,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   selectedData?: T | undefined;
   groups?: Array<{
     label: string;
-    filter: () => void;
+    filter: (arr: any) => void;
   }>;
   showOverflow?: boolean;
   optional?: boolean;
@@ -91,7 +91,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   const observer = new IntersectionObserver(async (a) => {
     if (a?.at(-1)?.isIntersecting && props.hasMore) {
       if (props.fetchMore) {
-        await props.fetchMore(search());
+        await props.fetchMore();
       }
     }
   });

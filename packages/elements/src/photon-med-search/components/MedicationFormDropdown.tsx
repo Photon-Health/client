@@ -7,7 +7,7 @@ export const MedicationFormDropdown = (props: { disabled: boolean; medicationId:
   const client = usePhoton();
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
   const [uid, setUid] = createSignal<string>();
-  const [setFilterText] = createSignal<string>('');
+  const [filterText, setFilterText] = createSignal<string>('');
   const [data, setData] = createSignal<Medication[]>([]);
 
   const dispatchFormSelected = (id: string) => {
