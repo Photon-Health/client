@@ -19,5 +19,8 @@ jobs:
       - name: Install Node.js dependencies
         run: npm ci
 
+      - name: Build Packages
+        run: npx nx run-many --all --target=build
+
       - name: Run Lint
         run: npx nx run-many --all --target=tsc

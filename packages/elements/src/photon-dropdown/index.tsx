@@ -68,7 +68,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
 
   //signals
   const [open, setOpen] = createSignal(false);
-  const [search, setSearch] = createSignal('');
   const [selected, setSelected] = createSignal<T>();
   const [selectedIndex, setSelectedIndex] = createSignal(-1);
   const [virtualizer, setVirtualizer] = createSignal(
@@ -82,7 +81,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   const [lastIndex, setLastIndex] = createSignal();
 
   const debounceSearch = debounce(async (s: string) => {
-    setSearch(s);
     if (props.onSearchChange) {
       await props.onSearchChange(s);
     }
@@ -191,7 +189,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
         on:sl-hide={async () => {
           if (!selected()) {
             inputRef.value = '';
-            setSearch('');
             if (props.onHide) {
               await props.onHide();
             }

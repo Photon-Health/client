@@ -28,7 +28,6 @@ import { format } from 'date-fns';
 import gql from 'graphql-tag';
 import { PharmacyCard } from './components/PharmacyCard';
 import { PhotonAuthorized } from '../photon-authorized';
-import { createStore } from 'solid-js/store';
 
 const CATALOG_TREATMENTS_FIELDS = gql`
   fragment CatalogTreatmentsFields on Catalog {

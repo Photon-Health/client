@@ -7,7 +7,6 @@ export const MedicationRouteDropdown = (props: { disabled: boolean; medicationId
   const client = usePhoton();
   const [uid, setUid] = createSignal<string>();
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
-  const [filterText, setFilterText] = createSignal<string>('');
   const [data, setData] = createSignal<SearchMedication[]>([]);
 
   const dispatchRouteSelected = (id: string) => {
@@ -72,10 +71,6 @@ export const MedicationRouteDropdown = (props: { disabled: boolean; medicationId
         isLoading={isLoading()}
         hasMore={false}
         displayAccessor={(p) => p?.name || ''}
-        onSearchChange={async (s: string) => setFilterText(s)}
-        onHide={async () => {
-          setFilterText('');
-        }}
         noDataMsg={'No routes found'}
         required={false}
       />
