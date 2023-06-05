@@ -13,8 +13,8 @@ import { OrderContext } from './Main';
 
 const checkDisabled = (option: string): boolean => {
   const currentTime = dayjs();
-  const timetoCheckDayjs = dayjs(option, 'h:mm a');
-  return currentTime.isAfter(timetoCheckDayjs);
+  const timetoCheckDayJs = dayjs(option, 'h:mm a');
+  return currentTime.isAfter(timetoCheckDayJs);
 };
 
 export const ReadyBy = () => {
