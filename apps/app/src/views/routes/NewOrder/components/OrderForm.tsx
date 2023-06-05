@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 import { Alert, AlertIcon, ModalCloseButton, useColorMode, VStack } from '@chakra-ui/react';
 
-import { types } from 'packages/sdk';
+import { types } from '@photonhealth/react';
 import { getSettings } from '@client/settings';
 
 import { confirmWrapper } from '../../../components/GuardDialog';
