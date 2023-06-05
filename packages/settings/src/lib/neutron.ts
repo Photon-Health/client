@@ -92,7 +92,9 @@ export const neutron: {
   org_U3ofDUVRsNTYt7d8: {
     ...defaultSettings,
     logo: 'river_health_logo.svg',
-    accentColor: '#2faef3'
+    accentColor: '#2faef3',
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_ID]
   },
   // Peachy
   org_O2SLIoyyVTNXG5nX: {
