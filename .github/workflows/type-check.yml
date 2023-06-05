@@ -22,5 +22,5 @@ jobs:
       - name: Build Packages
         run: npx nx run-many --all --target=build
 
-      - name: Run Lint
+      - name: Run Type Check
         run: npx nx run-many --all --target=tsc
