@@ -7,7 +7,6 @@ export const MedicationStrengthDropdown = (props: { disabled: boolean; medicatio
   const client = usePhoton();
   const [uid, setUid] = createSignal<string>();
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
-  const [setFilterText] = createSignal<string>('');
   const [data, setData] = createSignal<SearchMedication[]>([]);
 
   const dispatchStrengthSelected = (id: string) => {
@@ -72,10 +71,6 @@ export const MedicationStrengthDropdown = (props: { disabled: boolean; medicatio
         isLoading={isLoading()}
         hasMore={false}
         displayAccessor={(p) => p?.name || ''}
-        onSearchChange={async (s: string) => setFilterText(s)}
-        onHide={async () => {
-          setFilterText('');
-        }}
         noDataMsg={'No strengths found'}
         required={false}
       />

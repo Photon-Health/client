@@ -2,16 +2,14 @@
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
 import path from 'node:path';
-// import dts from 'vite-plugin-dts';
+import dts from 'vite-plugin-dts';
 
 export default defineConfig({
   plugins: [
+    dts({
+      insertTypesEntry: true
+    }),
     solidPlugin()
-    // TODO: this is not working, it's not generating the types as expected,
-    // generates a file that points to a file that doesn't exist
-    // dts({
-    //   insertTypesEntry: true
-    // })
   ],
   build: {
     lib: {

@@ -18,5 +18,5 @@
       "@client/settings": ["packages/settings/src/index.ts"]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": ["node_modules", "tmp", "dist"]
 }

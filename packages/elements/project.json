@@ -34,6 +34,13 @@
         "cwd": "packages/elements",
         "command": "npx eslint . --ext .tsx,.ts --fix && npx prettier --write src/**/*.{ts,tsx}"
       }
+    },
+    "tsc": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/elements",
+        "command": "npx tsc --noEmit"
+      }
     }
   }
 }
