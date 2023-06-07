@@ -43,7 +43,7 @@
       "heading": "Delivery",
       "subheading": "Ship to"
     },
-    "PICKUP": {
+    "PICK_UP": {
       "heading": "Pick Up",
       "subheading": "Your prescriptions at a nearby location.",
       "sorted": "Sorted by distance",
@@ -57,7 +57,7 @@
     "title": "Filling your prescriptions",
     "heading": "Filling your prescriptions",
     "subheading": "After your prescriptions are sent to a pharmacy, we'll send you updates on their status.",
-    "PICKUP": {
+    "PICK_UP": {
       "pickup": "Pick Up:",
       "chat": {
         "prompt": "At the pharmacy? Let us know if you're having any issues.",

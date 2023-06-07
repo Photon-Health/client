@@ -4,7 +4,7 @@ import t from '../../utils/text.json';
 import { ExtendedFulfillmentType } from '../../utils/models';
 
 export const STATES = {
-  PICKUP: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'],
+  PICK_UP: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'],
   COURIER: ['SENT', 'FILLING', 'IN_TRANSIT', 'DELIVERED'],
   MAIL_ORDER: ['SENT', 'FILLING', 'SHIPPED', 'DELIVERED']
 };
@@ -17,7 +17,7 @@ interface Props {
 
 export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props) => {
   // We don't have courier states, so get index from pickup and fake it
-  const key = fulfillmentType === 'COURIER' ? 'PICKUP' : fulfillmentType;
+  const key = fulfillmentType === 'COURIER' ? 'PICK_UP' : fulfillmentType;
   const initialStepIdx = STATES[key].findIndex((state) => state === status);
   const states = STATES[fulfillmentType]; // map index to faux states
   const activeStep = initialStepIdx + 1; // step to do next

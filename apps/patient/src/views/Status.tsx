@@ -51,7 +51,7 @@ export const Status = () => {
 
   const { fulfillment, pharmacy, organization, address } = order;
 
-  const fulfillmentType = getFulfillmentType(fulfillment, type);
+  const fulfillmentType = getFulfillmentType(pharmacy?.id, fulfillment, type);
 
   const toast = useToast();
 
@@ -133,9 +133,9 @@ export const Status = () => {
               <Alert status="warning">
                 <AlertIcon />
                 <Text>
-                  {t.status.PICKUP.chat.prompt}{' '}
+                  {t.status.PICK_UP.chat.prompt}{' '}
                   <Link href={`sms:${PHOTON_PHONE_NUMBER}`} textDecoration="underline">
-                    {t.status.PICKUP.chat.cta}
+                    {t.status.PICK_UP.chat.cta}
                   </Link>
                 </Text>
               </Alert>
@@ -146,7 +146,7 @@ export const Status = () => {
           pharmacy?.address ? (
             <Box alignSelf="start">
               <Text display="inline" color="gray.500">
-                {t.status.PICKUP.pickup}
+                {t.status.PICK_UP.pickup}
               </Text>
               <Link
                 href={`http://maps.google.com/?q=${pharmacy.name}, ${formatAddress(
