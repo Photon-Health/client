@@ -18,9 +18,10 @@ import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
 
+import { types } from '@photonhealth/sdk';
 import { formatAddress, getHours } from '../utils/general';
 import { GET_PHARMACIES } from '../utils/queries';
-import { Order } from '../utils/models';
+import { ExtendedFulfillmentType, Order } from '../utils/models';
 import t from '../utils/text.json';
 import { SELECT_ORDER_PHARMACY } from '../utils/mutations';
 import { graphQLClient } from '../configs/graphqlClient';
@@ -267,11 +268,11 @@ export const Pharmacy = () => {
           setTimeout(() => {
             setShowFooter(false);
 
-            let type = 'pickup';
+            let type: ExtendedFulfillmentType = types.FulfillmentType.PickUp;
             if (orgSettings.courierProviders.includes(selectedId)) {
-              type = 'courier';
+              type = 'COURIER';
             } else if (orgSettings.mailOrderNavigateProviders.includes(selectedId)) {
-              type = 'mailOrder';
+              type = types.FulfillmentType.MailOrder;
             }
 
             navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
@@ -369,7 +370,7 @@ export const Pharmacy = () => {
             <VStack spacing={9} align="stretch">
               {enableCourier ? (
                 <BrandedOptions
-                  type="courier"
+                  type="COURIER"
                   options={orgSettings.courierProviders}
                   location={location}
                   selectedId={selectedId}
@@ -379,7 +380,7 @@ export const Pharmacy = () => {
               ) : null}
               {orgSettings.mailOrderNavigate ? (
                 <BrandedOptions
-                  type="mailOrder"
+                  type={types.FulfillmentType.MailOrder}
                   options={orgSettings.mailOrderNavigateProviders}
                   location={location}
                   selectedId={selectedId}
