@@ -77,9 +77,7 @@ export const photon: {
     logo: 'river_health_logo.svg',
     accentColor: '#2faef3',
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
-    mailOrderNavigate: true,
-    mailOrderNavigateProviders: [CUREXA_ID]
+    mailOrderProviders: [CUREXA_ID]
   },
   // Peachy
   org_vTC7G2EAuHgac90E: {
@@ -89,8 +87,6 @@ export const photon: {
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    mailOrderNavigate: true,
-    mailOrderNavigateProviders: [CUREXA_ID],
     federated: true,
     sendToPatient: false
   },
