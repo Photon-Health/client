@@ -16,7 +16,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { types } from '@photonhealth/react';
 
-import { formatAddress, getFullfillmentType } from '../utils/general';
+import { formatAddress, getFulfillmentType } from '../utils/general';
 import { Order } from '../utils/models';
 import { MARK_ORDER_AS_PICKED_UP } from '../utils/mutations';
 import { Nav } from '../components/Nav';
@@ -26,9 +26,6 @@ import { PoweredBy } from '../components/PoweredBy';
 import { OrderContext } from './Main';
 import { graphQLClient } from '../configs/graphqlClient';
 import t from '../utils/text.json';
-import { getSettings } from '@client/settings';
-
-const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
 const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
 
@@ -54,9 +51,7 @@ export const Status = () => {
 
   const { fulfillment, pharmacy, organization, address } = order;
 
-  const orgSettings =
-    order?.organization?.id in settings ? settings[order.organization.id] : settings.default;
-  const fulfillmentType = getFullfillmentType(orgSettings, order?.pharmacy?.id, type);
+  const fulfillmentType = getFulfillmentType(pharmacy?.id, fulfillment, type);
 
   const toast = useToast();
 
@@ -138,18 +133,20 @@ export const Status = () => {
               <Alert status="warning">
                 <AlertIcon />
                 <Text>
-                  {t.status.pickup.chat.prompt}{' '}
+                  {t.status.PICK_UP.chat.prompt}{' '}
                   <Link href={`sms:${PHOTON_PHONE_NUMBER}`} textDecoration="underline">
-                    {t.status.pickup.chat.cta}
+                    {t.status.PICK_UP.chat.cta}
                   </Link>
                 </Text>
               </Alert>
             ) : null}
           </VStack>
-          {fulfillmentType !== ('mailOrder' || 'courier') && pharmacy?.name && pharmacy?.address ? (
+          {fulfillmentType !== ('MAIL_ORDER' || 'COURIER') &&
+          pharmacy?.name &&
+          pharmacy?.address ? (
             <Box alignSelf="start">
               <Text display="inline" color="gray.500">
-                {t.status.pickup.pickup}
+                {t.status.PICK_UP.pickup}
               </Text>
               <Link
                 href={`http://maps.google.com/?q=${pharmacy.name}, ${formatAddress(

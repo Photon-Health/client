@@ -6,6 +6,7 @@ import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter';
 import LocationSelect from '../LocationSelect';
 import Icon from '../../particles/Icon';
 import Button from '../../particles/Button';
+import { Pharmacy } from '@photonhealth/sdk/dist/types';
 
 export interface PharmacyProps {
   address?: string;
@@ -47,10 +48,7 @@ export default function PharmacySearch(props: PharmacyProps) {
     }
   });
 
-  const formattedAddress = (pharmacy: {
-    id: string;
-    address: { street1: string; city: string; state: string };
-  }) =>
+  const formattedAddress = (pharmacy: Pharmacy) =>
     `${capitalizeFirstLetter(pharmacy.address?.street1 || '')}, ${capitalizeFirstLetter(
       pharmacy.address?.city || ''
     )}, ${pharmacy.address?.state}`;

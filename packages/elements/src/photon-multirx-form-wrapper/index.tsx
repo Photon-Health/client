@@ -213,7 +213,6 @@ customElement(
           onClosed={() => {
             dispatchClosed();
             patientActions.clearSelectedPatient();
-            props.open = false;
           }}
           checkShouldWarn={() => shouldWarn(form)}
           title="New Prescriptions"

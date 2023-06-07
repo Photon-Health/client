@@ -42,7 +42,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   selectedData?: T | undefined;
   groups?: Array<{
     label: string;
-    filter: () => void;
+    filter: (arr: any) => void;
   }>;
   showOverflow?: boolean;
   optional?: boolean;
@@ -68,7 +68,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
 
   //signals
   const [open, setOpen] = createSignal(false);
-  const [search, setSearch] = createSignal('');
   const [selected, setSelected] = createSignal<T>();
   const [selectedIndex, setSelectedIndex] = createSignal(-1);
   const [virtualizer, setVirtualizer] = createSignal(
@@ -82,7 +81,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   const [lastIndex, setLastIndex] = createSignal();
 
   const debounceSearch = debounce(async (s: string) => {
-    setSearch(s);
     if (props.onSearchChange) {
       await props.onSearchChange(s);
     }
@@ -91,7 +89,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   const observer = new IntersectionObserver(async (a) => {
     if (a?.at(-1)?.isIntersecting && props.hasMore) {
       if (props.fetchMore) {
-        await props.fetchMore(search());
+        await props.fetchMore();
       }
     }
   });
@@ -191,7 +189,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
         on:sl-hide={async () => {
           if (!selected()) {
             inputRef.value = '';
-            setSearch('');
             if (props.onHide) {
               await props.onHide();
             }

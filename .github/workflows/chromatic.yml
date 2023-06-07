@@ -7,14 +7,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+
       - name: Specify Node Version
         uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Install dependencies
+
+      - name: Install Node.js dependencies
         run: npm ci
+
+      - name: Build Packages
+        run: npx nx run-many --all --target=build
+
       - name: Build Storybook
         run: npx nx run components:build-storybook
+
       - name: Publish to Chromatic
         uses: chromaui/action@v1
         with:

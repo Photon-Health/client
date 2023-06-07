@@ -32,6 +32,13 @@
         "cwd": "packages/react",
         "command": "npx eslint src/*.{ts,tsx} --fix && npx prettier --write src/*.{ts,tsx}"
       }
+    },
+    "tsc": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/react",
+        "command": "npx tsc --noEmit"
+      }
     }
   }
 }

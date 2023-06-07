@@ -87,8 +87,6 @@ export const photon: {
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    mailOrderNavigate: true,
-    mailOrderNavigateProviders: [CUREXA_ID],
     federated: true,
     sendToPatient: false
   },
