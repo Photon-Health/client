@@ -24,4 +24,4 @@ export interface Pharmacy {
   };
 }
 
-export type FulfillmentType = 'mailOrder' | 'courier' | 'pickup';
+export type ExtendedFulfillmentType = types.FulfillmentType | 'COURIER';

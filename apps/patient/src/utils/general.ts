@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import isBetween from 'dayjs/plugin/isBetween';
 import { types } from 'packages/sdk';
-import { FulfillmentType } from './models';
+import { ExtendedFulfillmentType } from './models';
 
 dayjs.extend(isoWeek);
 dayjs.extend(isBetween);
@@ -85,32 +85,30 @@ export const getHours = (
 };
 
 /**
- * We can't simply use the order fulfillment type since we don't have the "courier"
- * type yet. Also there is a ~30s delay before order fulfillment is created
- * after pharmacy selection, so a query param is needed.
+ * There is a delay before order fulfillment is created, so a query
+ * param is used to assume fulfillment type coming from pharmacy selection.
  */
-export const getFullfillmentType = (
-  orgSettings: any,
-  pharmacyId?: string,
+export const getFulfillmentType = (
+  fulfillment?: types.OrderFulfillment,
   param?: string
-): FulfillmentType => {
-  // Prioritize pharmacyId over query param
-  if (pharmacyId) {
-    if (orgSettings.mailOrderNavigateProviders.includes(pharmacyId)) {
-      return 'mailOrder';
-    }
-    if (orgSettings.courierProviders.includes(pharmacyId)) {
-      return 'courier';
-    }
+): ExtendedFulfillmentType => {
+  // Prioritize order fulfillment type
+  if (fulfillment?.type) {
+    return fulfillment.type;
   }
-  // Next use query param if it's set
-  const fulfillmentTypes: FulfillmentType[] = ['courier', 'mailOrder', 'pickup'];
-  const fType = fulfillmentTypes.find((val) => val === param);
-  if (fType) {
-    return fType;
+
+  // Next, try query param if it's set
+  const fulfillmentTypes: ExtendedFulfillmentType[] = [
+    ...Object.values(types.FulfillmentType),
+    'COURIER' as ExtendedFulfillmentType
+  ];
+  const foundType = fulfillmentTypes.find((val) => val === param);
+  if (foundType) {
+    return foundType;
   }
+
   // Fallback to pickup
-  return 'pickup';
+  return types.FulfillmentType.PickUp;
 };
 
 /**

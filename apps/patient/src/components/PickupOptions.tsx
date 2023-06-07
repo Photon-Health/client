@@ -39,13 +39,13 @@ export const PickupOptions = ({
         <SlideFade offsetY="60px" in={true}>
           <VStack spacing={1} align="start">
             <Heading as="h5" size="sm">
-              {t.pharmacy.pickup.heading}
+              {t.pharmacy.PICKUP.heading}
             </Heading>
             <HStack justify="space-between" w="full">
-              <Text>{t.pharmacy.pickup.subheading}</Text>
+              <Text>{t.pharmacy.PICKUP.subheading}</Text>
               {!isMobile && pharmacies.length > 0 ? (
                 <Text size="sm" color="gray.500" whiteSpace="nowrap" alignSelf="flex-end">
-                  {t.pharmacy.pickup.sorted}
+                  {t.pharmacy.PICKUP.sorted}
                 </Text>
               ) : null}
             </HStack>
@@ -75,12 +75,12 @@ export const PickupOptions = ({
           onClick={handleShowMore}
           p={3}
         >
-          {t.pharmacy.pickup.showMore}
+          {t.pharmacy.PICKUP.showMore}
         </Button>
       ) : null}
       {showingAllPharmacies ? (
         <Text color="gray.500" textAlign="center">
-          {t.pharmacy.pickup.showingAll}
+          {t.pharmacy.PICKUP.showingAll}
         </Text>
       ) : null}
     </VStack>

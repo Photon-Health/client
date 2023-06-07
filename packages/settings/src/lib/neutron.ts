@@ -95,7 +95,6 @@ export const neutron: {
     accentColor: '#2faef3',
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    mailOrderNavigate: true,
     mailOrderNavigateProviders: [CUREXA_ID]
   },
   // Peachy
@@ -107,8 +106,6 @@ export const neutron: {
     federated: true,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    mailOrderNavigate: true,
-    mailOrderNavigateProviders: [CUREXA_ID],
     sendToPatient: false
   },
   // MisterRx
