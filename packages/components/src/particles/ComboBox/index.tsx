@@ -220,6 +220,12 @@ function ComboBoxWrapper(props: ComboBoxProps) {
     }
   });
 
+  createEffect(() => {
+    if (props.value) {
+      setSelected(props.value);
+    }
+  });
+
   return <div class="relative">{props.children}</div>;
 }
 

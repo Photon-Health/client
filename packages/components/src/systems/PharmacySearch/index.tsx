@@ -1,12 +1,28 @@
 import { For, Show, createEffect, createMemo, createSignal } from 'solid-js';
+import { gql } from '@apollo/client';
+import { Pharmacy } from '@photonhealth/sdk/dist/types';
 import InputGroup from '../../particles/InputGroup';
-import { PharmacyStore } from '../../stores/pharmacy';
 import ComboBox from '../../particles/ComboBox';
 import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter';
-import LocationSelect from '../LocationSelect';
+import LocationSelect, { Location } from '../LocationSelect';
 import Icon from '../../particles/Icon';
 import Button from '../../particles/Button';
-import { Pharmacy } from '@photonhealth/sdk/dist/types';
+
+import { usePhoton } from '../../context';
+
+const GetPharmaciesQuery = gql`
+  query GetPharmacies($location: LatLongSearch!) {
+    pharmacies(location: $location) {
+      id
+      name
+      address {
+        street1
+        city
+        state
+      }
+    }
+  }
+`;
 
 export interface PharmacyProps {
   address?: string;
@@ -16,30 +32,49 @@ export interface PharmacyProps {
 }
 
 export default function PharmacySearch(props: PharmacyProps) {
-  const { store, actions } = PharmacyStore;
+  const client = usePhoton();
   const [selected, setSelected] = createSignal<any>();
   const [query, setQuery] = createSignal('');
+  const [location, setLocation] = createSignal<Location | null>(null);
+  const [pharmacies, setPharmacies] = createSignal<Pharmacy[] | null>(null);
+  const [fetching, setFetching] = createSignal(false);
+  const [openLocationSearch, setOpenLocationSearch] = createSignal(false);
 
-  const hasFoundPharmacies = createMemo(() => store.pharmacies.data.length > 0);
+  async function fetchPharmacies() {
+    const { data } = await client!.sdk.apollo.query({
+      query: GetPharmaciesQuery,
+      variables: {
+        location: { latitude: location()?.latitude, longitude: location()?.longitude, radius: 20 }
+      }
+    });
+
+    if (data?.pharmacies?.length > 0) {
+      setPharmacies(data.pharmacies);
+    }
+
+    setFetching(false);
+  }
+
+  createEffect(() => {
+    // If user selects a location, fetch pharmacies
+    if (location()?.latitude && location()?.longitude) {
+      setPharmacies(null);
+      setFetching(true);
+      fetchPharmacies();
+    }
+  });
 
   const filteredPharmacies = createMemo(() => {
-    if (!hasFoundPharmacies()) {
+    if (pharmacies() === null || pharmacies()?.length === 0) {
       return [];
     }
 
     return query() === ''
-      ? store.pharmacies.data
-      : store.pharmacies.data.filter((pharmacy) => {
+      ? pharmacies()
+      : pharmacies()?.filter((pharmacy) => {
           return pharmacy.name.toLowerCase().includes(query().toLowerCase());
-        });
+        }) || [];
   });
-
-  const handleResetAddress = () => {
-    if (props?.setPharmacy) {
-      props.setPharmacy(undefined);
-    }
-    actions.clearPharmacies();
-  };
 
   createEffect(() => {
     if (selected()?.id) {
@@ -55,28 +90,36 @@ export default function PharmacySearch(props: PharmacyProps) {
 
   return (
     <div>
-      <Show when={!hasFoundPharmacies()}>
+      <LocationSelect
+        setLocation={setLocation}
+        open={openLocationSearch()}
+        setOpen={setOpenLocationSearch}
+      />
+      <Show when={!pharmacies() && !fetching()}>
         <InputGroup label="Select a location">
-          <LocationSelect />
+          <Button onClick={() => setOpenLocationSearch(true)}>Set Search Location</Button>
         </InputGroup>
       </Show>
-      <Show when={hasFoundPharmacies()}>
+      <Show when={pharmacies() || fetching()}>
         <InputGroup
           label="Select a pharmacy"
           helpText={
             <Button
               variant="naked"
-              onClick={handleResetAddress}
+              onClick={() => setOpenLocationSearch(true)}
               iconLeft={<Icon name="mapPin" size="sm" />}
             >
-              {store?.pharmacies?.address || '...'}{' '}
+              {location()?.address || '...'}{' '}
             </Button>
           }
+          loading={fetching()}
         >
-          <ComboBox value={store.pharmacies.data?.[0] || undefined} setSelected={setSelected}>
+          <ComboBox value={pharmacies()?.[0] || undefined} setSelected={setSelected}>
             <ComboBox.Input
               onInput={(e) => setQuery(e.currentTarget.value)}
-              displayValue={(pharmacy) => `${pharmacy.name}, ${formattedAddress(pharmacy)}`}
+              displayValue={(pharmacy) =>
+                pharmacy?.name ? `${pharmacy.name}, ${formattedAddress(pharmacy)}` : ''
+              }
             />
             <ComboBox.Options>
               <For each={filteredPharmacies()}>
