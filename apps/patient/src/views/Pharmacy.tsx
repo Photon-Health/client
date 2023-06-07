@@ -18,7 +18,7 @@ import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
 
-import { types } from 'packages/sdk';
+import { types } from '@photonhealth/sdk';
 import { formatAddress, getHours } from '../utils/general';
 import { GET_PHARMACIES } from '../utils/queries';
 import { ExtendedFulfillmentType, Order } from '../utils/models';

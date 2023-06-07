@@ -1,4 +1,4 @@
-import { types } from 'packages/sdk';
+import { types } from '@photonhealth/sdk';
 
 export interface Order extends types.Order {
   organization: {
