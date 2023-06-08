@@ -9,6 +9,7 @@ const isExternal = (id: string) => !id.startsWith('.') && !path.isAbsolute(id);
 
 export default defineConfig({
   plugins: [
+    // @ts-ignore TODO vite should have first class typescript support ...
     typescript({
       target: 'es6',
       rootDir: resolvePath('./src'),

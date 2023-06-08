@@ -8,6 +8,7 @@ export interface InputProps extends JSX.InputHTMLAttributes<HTMLInputElement> {
   error?: boolean;
   loading?: boolean;
   copy?: boolean;
+  onInput?: JSX.EventHandlerUnion<HTMLInputElement, InputEvent>;
 }
 
 function valueToString(value: string | number | string[] | undefined): string {
@@ -48,7 +49,7 @@ export default function Input(props: InputProps) {
     );
   });
 
-  const handleInput = (e: InputEvent & { currentTarget: HTMLInputElement; target: Element }) => {
+  const handleInput: JSX.EventHandlerUnion<HTMLInputElement, InputEvent> = (e) => {
     // We're intercepting number input handlers with this function in order to prevent mobile browsers
     // from clearing the input when "." is typed.
     const target = e.currentTarget as HTMLInputElement;

@@ -8,6 +8,8 @@
     "jsxImportSource": "solid-js",
     "jsx": "preserve",
     "strict": true,
-    "resolveJsonModule": true
-  }
+    "resolveJsonModule": true,
+    "declaration": true
+  },
+  "exclude": ["node_modules", "tmp", "dist"]
 }

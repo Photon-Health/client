@@ -99,7 +99,11 @@ export default function LocationSelect() {
                 : ''
             }
           >
-            <Input type="text" value={address()} onInput={(e) => setAddress(e.target?.value)} />
+            <Input
+              type="text"
+              value={address()}
+              onInput={(e) => setAddress(e.currentTarget.value)}
+            />
           </InputGroup>
         </form>
       </Dialog>
