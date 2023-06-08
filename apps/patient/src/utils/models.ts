@@ -1,4 +1,4 @@
-import { types } from 'packages/sdk';
+import { types } from '@photonhealth/sdk';
 
 export interface Order extends types.Order {
   organization: {
@@ -24,4 +24,4 @@ export interface Pharmacy {
   };
 }
 
-export type FulfillmentType = 'mailOrder' | 'courier' | 'pickup';
+export type ExtendedFulfillmentType = types.FulfillmentType | 'COURIER';
