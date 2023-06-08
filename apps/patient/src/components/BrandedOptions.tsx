@@ -1,10 +1,12 @@
 import { Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
 
+import { types } from 'packages/react/dist';
+import { ExtendedFulfillmentType } from '../utils/models';
 import t from '../utils/text.json';
 import { BrandedPharmacyCard } from './BrandedPharmacyCard';
 
 interface Props {
-  type: 'mailOrder' | 'courier';
+  type: Exclude<ExtendedFulfillmentType, types.FulfillmentType.PickUp>;
   options: string[];
   location: string;
   selectedId: string;

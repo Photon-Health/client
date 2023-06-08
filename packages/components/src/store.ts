@@ -12,7 +12,7 @@ import type {
 import gql from 'graphql-tag';
 import { GraphQLError } from 'graphql';
 import jwtDecode from 'jwt-decode';
-import { Permission } from '../types';
+import { Permission } from './types';
 
 const defaultOnRedirectCallback = (appState?: any): void => {
   window.location.replace(appState?.returnTo || window.location.pathname);
@@ -273,6 +273,7 @@ export class PhotonClientStore {
         isAuthenticated: authenticated
       });
       const user = await this.sdk.authentication.getUser();
+      // @ts-ignore TODO: store will be updated soon, so this will change
       const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
 
       let permissions: Permission[];
@@ -284,6 +285,7 @@ export class PhotonClientStore {
         permissions = [];
       }
 
+      // @ts-ignore TODO store will be updated soon, so this will change
       const isInOrg = authenticated && hasOrgs && this.sdk.organization === user.org_id;
 
       this.setStore('authentication', {

@@ -114,25 +114,37 @@ customElement(
           isLoading={client?.clinical.catalog.state.isLoading || false}
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
-          displayAccessor={(t: Treatment | PrescriptionTemplate, groupAccess: boolean) =>
-            t.__typename !== 'PrescriptionTemplate' ? (
-              t.name
-            ) : groupAccess ? (
-              <>
-                <p class="overflow-hidden whitespace-nowrap overflow-ellipsis">
-                  {t?.name ? `${t.name}: ` : ''}
-                  {t.treatment.name}
-                </p>
-                <p class="font-normal pl-4 overflow-hidden whitespace-nowrap overflow-ellipsis">
-                  QTY: {t.dispenseQuantity} {t.dispenseUnit} | Days Supply: {t.daysSupply} |{' '}
-                  {/* A "-1" is needed here because in the UI we are displaying the number of refills, not fills. We get this from the templates in the catalog */}
-                  Refills: {t.fillsAllowed ? t.fillsAllowed - 1 : 0} | Sig: {t.instructions}
-                </p>
-              </>
-            ) : (
-              t.treatment.name
-            )
-          }
+          displayAccessor={(t: Treatment | PrescriptionTemplate, groupAccess: boolean) => {
+            // TODO when we have generated types we can fix this
+            // @ts-ignore
+            if (t?.__typename !== 'PrescriptionTemplate') {
+              // @ts-ignore
+              return t.name;
+            } else {
+              if (groupAccess) {
+                return (
+                  <>
+                    <p class="overflow-hidden whitespace-nowrap overflow-ellipsis">
+                      {/* @ts-ignore */}
+                      {t?.name ? `${t.name}: ` : ''}
+                      {/* @ts-ignore */}
+                      {t.treatment.name}
+                    </p>
+                    <p class="font-normal pl-4 overflow-hidden whitespace-nowrap overflow-ellipsis">
+                      {/* @ts-ignore */}
+                      QTY: {t.dispenseQuantity} {t.dispenseUnit} | Days Supply: {t.daysSupply} |{' '}
+                      {/* A "-1" is needed here because in the UI we are displaying the number of refills, not fills. We get this from the templates in the catalog */}
+                      {/* @ts-ignore */}
+                      Refills: {t.fillsAllowed ? t.fillsAllowed - 1 : 0} | Sig: {t.instructions}
+                    </p>
+                  </>
+                );
+              } else {
+                // @ts-ignore
+                return t.treatment.name;
+              }
+            }
+          }}
           onSearchChange={async (s: string) => setFilter(s)}
           onOpen={async () => {
             if (store.catalogs.data.length === 0) {

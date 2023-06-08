@@ -34,6 +34,7 @@ declare module 'solid-js' {
       'sl-icon': unknown;
       'sl-dialog': unknown;
       'photon-dialog': unknown;
+      'sl-tooltip': unknown;
       'sl-icon-button': unknown;
       'sl-switch': unknown;
       'sl-checkbox': unknown;
