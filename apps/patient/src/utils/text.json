@@ -138,5 +138,7 @@
       }
     },
     "thankYou": "Thank you!"
-  }
+  },
+  "canceled": "This order has been canceled.",
+  "noMatch": "We couldn't find what you're looking for."
 }

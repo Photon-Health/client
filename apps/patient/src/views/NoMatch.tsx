@@ -1,12 +1,18 @@
-import { Center, Heading, Text, VStack } from '@chakra-ui/react';
+import { Center, Text, VStack } from '@chakra-ui/react';
+import { MdSearch } from 'react-icons/md';
+import t from '../utils/text.json';
+import { ChakraProvider } from '@chakra-ui/react';
+import theme from '../configs/theme';
 
 export const NoMatch = () => {
   return (
-    <Center h="100vh">
-      <VStack>
-        <Heading>Oops!</Heading>
-        <Text>We couldn't find what you're looking for.</Text>
-      </VStack>
-    </Center>
+    <ChakraProvider theme={theme()}>
+      <Center h="100vh">
+        <VStack>
+          <MdSearch size="2em" />
+          <Text>{t.noMatch}</Text>
+        </VStack>
+      </Center>
+    </ChakraProvider>
   );
 };
