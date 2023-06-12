@@ -8,6 +8,7 @@ import { GET_ORDER } from '../utils/queries';
 import { graphQLClient } from '../configs/graphqlClient';
 
 import theme from '../configs/theme';
+import { types } from '@photonhealth/react';
 
 const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
 
@@ -24,9 +25,11 @@ export const Main = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  if (!orderId || !token) {
-    console.error('Missing orderId or token in search params');
-    navigate('/no-match');
+  if (location.pathname !== '/canceled') {
+    if (!orderId || !token) {
+      console.error('Missing orderId or token in search params');
+      navigate('/no-match');
+    }
   }
 
   const fetchOrder = useCallback(async () => {
@@ -35,6 +38,10 @@ export const Main = () => {
       const results: any = await graphQLClient.request(GET_ORDER, { id: orderId });
       if (results) {
         setOrder(results.order);
+
+        if (results?.order.state === types.OrderState.Canceled) {
+          navigate('/canceled', { replace: true });
+        }
 
         const isMissingPharmacy = !results.order?.pharmacy?.id;
         if (isMissingPharmacy) {
@@ -46,6 +53,10 @@ export const Main = () => {
     } catch (error) {
       console.error(JSON.stringify(error, undefined, 2));
       console.log(error);
+
+      if (error?.response?.data?.order.state === types.OrderState.Canceled) {
+        navigate('/canceled', { replace: true });
+      }
 
       if (error?.response?.errors) {
         const isMissingPharmacyError = error.response.errors.some(
@@ -96,7 +107,7 @@ export const Main = () => {
     );
   }
 
-  if (location.pathname !== '/status' && order?.pharmacy?.id) {
+  if (location.pathname !== ('/status' && '/canceled') && order?.pharmacy?.id) {
     navigate(`/status?orderId=${orderId}&token=${token}`, { replace: true });
   }
 
