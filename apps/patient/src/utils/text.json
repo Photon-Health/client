@@ -139,6 +139,12 @@
     },
     "thankYou": "Thank you!"
   },
-  "canceled": "This order has been canceled.",
-  "noMatch": "We couldn't find what you're looking for."
+  "canceled": {
+    "heading": "This order has been canceled.",
+    "subheading": "If you have any questions, please text us at +1 (513) 866-3212."
+  },
+  "noMatch": {
+    "heading": "We couldn't find what you're looking for.",
+    "subheading": "If you have any questions, please text us at +1 (513) 866-3212."
+  }
 }

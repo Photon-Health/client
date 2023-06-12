@@ -1,7 +1,6 @@
-import { Center, Text, VStack } from '@chakra-ui/react';
+import { Center, Heading, Text, VStack, ChakraProvider } from '@chakra-ui/react';
 import { MdSearch } from 'react-icons/md';
 import t from '../utils/text.json';
-import { ChakraProvider } from '@chakra-ui/react';
 import theme from '../configs/theme';
 
 export const NoMatch = () => {
@@ -10,7 +9,10 @@ export const NoMatch = () => {
       <Center h="100vh">
         <VStack>
           <MdSearch size="2em" />
-          <Text>{t.noMatch}</Text>
+          <Heading as="h4" size="md" textAlign="center">
+            {t.noMatch.heading}
+          </Heading>
+          <Text textAlign="center">{t.noMatch.subheading}</Text>
         </VStack>
       </Center>
     </ChakraProvider>
