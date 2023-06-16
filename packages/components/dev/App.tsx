@@ -6,6 +6,7 @@ import Button from '../src/particles/Button';
 import Icon from '../src/particles/Icon';
 import { randomNames } from '../src/sampleData/randomNames';
 import ComboBox from '../src/particles/ComboBox';
+import PharmacySelect from '../src/systems/PharmacySelect';
 
 const App = () => {
   const [setPharmacy] = createSignal<any>();
@@ -75,6 +76,10 @@ const App = () => {
               }}
             />
           </div>
+        </div>
+
+        <div class="mb-10">
+          <PharmacySelect />
         </div>
       </Client>
     </div>
