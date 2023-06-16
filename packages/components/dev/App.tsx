@@ -79,7 +79,11 @@ const App = () => {
         </div>
 
         <div class="mb-10">
+          <h2>Pharmacy Select</h2>
           <PharmacySelect />
+
+          <h4>With Mail Order</h4>
+          <PharmacySelect mailOrderPharmacyIds={['aoeu', '1234']} />
         </div>
       </Client>
     </div>
