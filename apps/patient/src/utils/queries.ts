@@ -20,6 +20,7 @@ export const GET_ORDER = gql`
       fulfillment {
         type
         state
+        trackingNumber
       }
       pharmacy {
         id
