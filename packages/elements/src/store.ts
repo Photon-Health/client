@@ -42,7 +42,7 @@ const CATALOG_TREATMENTS_FIELDS = gql`
 `;
 
 export class PhotonClientStore {
-  private sdk: PhotonClient;
+  public readonly sdk: PhotonClient;
   private setStore;
   private store;
   public authentication: {

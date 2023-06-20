@@ -48,7 +48,6 @@ customElement(
           cancel-text="Back"
           confirm-text="Select Medication"
           disable-submit={!medication()}
-          width={'min-content'}
           on:photon-dialog-confirmed={async () => {
             setLoading(true);
             if (addToCatalog()) {
