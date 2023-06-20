@@ -106,6 +106,8 @@ customElement('photon-med-search', {}, () => {
           medicationId={medicationId()}
           disabled={medicationId().length == 0}
         />
+      </div>
+      <div class="flex flex-col xs:flex-row gap-4">
         <MedicationRouteDropdown medicationId={strengthId()} disabled={strengthId().length == 0} />
       </div>
       <div class="flex flex-col xs:flex-row gap-4">
