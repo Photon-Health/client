@@ -53,9 +53,13 @@ export const MedicationNameDropdown = () => {
         placeholder="Enter a medication name..."
         isLoading={isLoading()}
         hasMore={false}
-        displayAccessor={(p) => (
-          <p class="text-sm whitespace-normal leading-snug mb-2">{p?.name || ''}</p>
-        )}
+        displayAccessor={(p, groupAccess) =>
+          groupAccess ? (
+            <p class="text-sm whitespace-normal leading-snug mb-2">{p?.name || ''}</p>
+          ) : (
+            p?.name || ''
+          )
+        }
         onSearchChange={async (s: string) => setFilterText(s)}
         onHide={async () => {
           setFilterText('');
