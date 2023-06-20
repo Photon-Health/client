@@ -17,8 +17,11 @@
   input {
     @apply font-sans;
     @apply font-light;
-    @apply text-gray-900;
     @apply leading-relaxed;
+  }
+  body,
+  html {
+    @apply text-gray-900;
   }
   h1,
   h2,

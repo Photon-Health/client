@@ -124,13 +124,13 @@ customElement(
               if (groupAccess) {
                 return (
                   <>
-                    <p class="overflow-hidden whitespace-nowrap overflow-ellipsis">
+                    <p class="text-sm whitespace-normal leading-snug">
                       {/* @ts-ignore */}
                       {t?.name ? `${t.name}: ` : ''}
                       {/* @ts-ignore */}
                       {t.treatment.name}
                     </p>
-                    <p class="font-normal pl-4 overflow-hidden whitespace-nowrap overflow-ellipsis">
+                    <p class="text-xs text-gray-500 overflow-hidden whitespace-nowrap overflow-ellipsis mb-2">
                       {/* @ts-ignore */}
                       QTY: {t.dispenseQuantity} {t.dispenseUnit} | Days Supply: {t.daysSupply} |{' '}
                       {/* A "-1" is needed here because in the UI we are displaying the number of refills, not fills. We get this from the templates in the catalog */}
