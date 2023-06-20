@@ -31,7 +31,13 @@
     "no-undef": "error",
     "no-console": "off"
   },
-  "ignorePatterns": ["**/dist/**", "**/*.test.tsx", "**/*.test.ts", "**/*.stories.tsx"],
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/*.test.tsx",
+    "**/*.test.ts",
+    "**/*.stories.tsx",
+    "**/storybook-static/*"
+  ],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx"],
