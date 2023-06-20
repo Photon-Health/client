@@ -119,7 +119,7 @@ customElement(
             // @ts-ignore
             if (t?.__typename !== 'PrescriptionTemplate') {
               // @ts-ignore
-              return t.name;
+              return <p class="text-sm whitespace-normal leading-snug mb-2">{t.name}</p>;
             } else {
               if (groupAccess) {
                 return (
