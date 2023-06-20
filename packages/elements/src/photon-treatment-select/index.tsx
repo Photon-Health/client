@@ -118,8 +118,13 @@ customElement(
             // TODO when we have generated types we can fix this
             // @ts-ignore
             if (t?.__typename !== 'PrescriptionTemplate') {
-              // @ts-ignore
-              return <p class="text-sm whitespace-normal leading-snug mb-2">{t.name}</p>;
+              if (groupAccess) {
+                // @ts-ignore
+                return <p class="text-sm whitespace-normal leading-snug mb-2">{t.name}</p>;
+              } else {
+                // @ts-ignore
+                return t?.name || '';
+              }
             } else {
               if (groupAccess) {
                 return (
