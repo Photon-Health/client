@@ -113,6 +113,7 @@
       }
     },
     "MAIL_ORDER": {
+      "trackingNumber": "Tracking #:",
       "states": {
         "SENT": {
           "title": "Sent",
