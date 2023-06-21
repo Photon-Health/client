@@ -141,7 +141,7 @@ export const Status = () => {
               </Alert>
             ) : null}
           </VStack>
-          {fulfillmentType === types.FulfillmentType.MailOrder && pharmacy?.name ? (
+          {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
             <Box alignSelf="start">
               <Text display="inline" color="gray.500">
                 {t.status.MAIL_ORDER.trackingNumber}
