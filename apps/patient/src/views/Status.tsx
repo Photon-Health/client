@@ -14,7 +14,7 @@ import {
 import { Helmet } from 'react-helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
-import { types } from '@photonhealth/react';
+import { types } from '@photonhealth/sdk';
 
 import { formatAddress, getFulfillmentType } from '../utils/general';
 import { Order } from '../utils/models';
@@ -141,7 +141,17 @@ export const Status = () => {
               </Alert>
             ) : null}
           </VStack>
-          {fulfillmentType !== ('MAIL_ORDER' || 'COURIER') &&
+          {fulfillmentType === types.FulfillmentType.MailOrder && pharmacy?.name ? (
+            <Box alignSelf="start">
+              <Text display="inline" color="gray.500">
+                {t.status.MAIL_ORDER.trackingNumber}
+              </Text>
+              <Text display="inline" ms={2}>
+                {fulfillment.trackingNumber}
+              </Text>
+            </Box>
+          ) : null}
+          {fulfillmentType !== (types.FulfillmentType.MailOrder || 'COURIER') &&
           pharmacy?.name &&
           pharmacy?.address ? (
             <Box alignSelf="start">
