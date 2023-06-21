@@ -8,7 +8,7 @@ import { GET_ORDER } from '../utils/queries';
 import { graphQLClient } from '../configs/graphqlClient';
 
 import theme from '../configs/theme';
-import { types } from '@photonhealth/react';
+import { types } from '@photonhealth/sdk';
 
 const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
 

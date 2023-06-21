@@ -13,7 +13,7 @@ import {
 import { FiRotateCcw, FiStar } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { types } from '@photonhealth/react';
+import { types } from '@photonhealth/sdk';
 
 import { UNOPEN_BUSINESS_STATUS_MAP } from '../views/Pharmacy';
 import { Rating } from './Rating';
