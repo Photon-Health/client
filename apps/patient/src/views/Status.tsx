@@ -147,7 +147,7 @@ export const Status = () => {
                 {t.status.MAIL_ORDER.trackingNumber}
               </Text>
               <Text display="inline" ms={2}>
-                asdfasfafdsfafsadfsaf
+                {fulfillment.trackingNumber}
               </Text>
             </Box>
           ) : null}
