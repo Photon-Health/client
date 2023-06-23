@@ -41,32 +41,29 @@ export const Loading: TextStory = {
   render: () => {
     return (
       <div class="max-w-md flex flex-col items-start">
-        <Text size="lg" loading={true} sampleLoadingText="this is some Loading text">
+        Loading Text
+        <Text size="lg" loading sampleLoadingText="this is some Loading text">
+          This is a text
+        </Text>
+        <Text size="md" loading sampleLoadingText="Here is some much much longer loading text">
+          This is a text
+        </Text>
+        <Text size="sm" loading sampleLoadingText="shorter">
+          This is a text
+        </Text>
+        Selected Loading Text
+        <Text size="lg" selected color="gray" loading sampleLoadingText="this is some Loading text">
           This is a text
         </Text>
         <Text
           size="md"
-          loading={true}
+          selected
+          loading
           sampleLoadingText="Here is some much much longer loading text"
         >
           This is a text
         </Text>
-        <Text size="sm" loading={true} sampleLoadingText="shorter">
-          This is a text
-        </Text>
-
-        <Text size="lg" color="gray" loading={true} sampleLoadingText="this is some Loading text">
-          This is a text
-        </Text>
-        <Text
-          size="md"
-          color="gray"
-          loading={true}
-          sampleLoadingText="Here is some much much longer loading text"
-        >
-          This is a text
-        </Text>
-        <Text size="sm" color="gray" loading={true} sampleLoadingText="shorter">
+        <Text size="sm" selected loading sampleLoadingText="shorter">
           This is a text
         </Text>
       </div>

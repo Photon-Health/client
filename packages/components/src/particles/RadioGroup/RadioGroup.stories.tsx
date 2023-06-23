@@ -39,3 +39,29 @@ export const Default: RadioGroupStory = {
     );
   }
 };
+
+export const Selected: RadioGroupStory = {
+  // @ts-ignore
+  render: () => {
+    const pharmacies = [
+      { id: '1234', name: 'Walmart', address: '123 Main St' },
+      { id: '5678', name: 'Walgreens', address: '456 Main St' },
+      { id: '9012', name: 'CVS', address: '789 Main St' }
+    ];
+
+    return (
+      <div class="max-w-md">
+        <RadioGroup label="Pharmacies" initSelected={pharmacies[1].id}>
+          {pharmacies.map(({ id, name, address }) => (
+            <RadioGroup.Option value={id}>
+              <div>
+                <div class="mr-4">{name}</div>
+                <div class="text-sm text-slate-500">{address}</div>
+              </div>
+            </RadioGroup.Option>
+          ))}
+        </RadioGroup>
+      </div>
+    );
+  }
+};

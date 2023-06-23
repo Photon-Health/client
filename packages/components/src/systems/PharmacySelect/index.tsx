@@ -24,9 +24,10 @@ export default function PharmacySelect(props: PharmacySelectProps) {
           activeTab={tab()}
           setActiveTab={(newTab: string) => setTab(newTab)}
         />
+
         <div class="pt-4">
           {tab() === 'Send to Patient' && (
-            <RadioGroup label="Patients">
+            <RadioGroup label="Patients" initSelected={props?.patientIds?.[0]}>
               <For each={props?.patientIds || []}>
                 {(id) => (
                   <RadioGroup.Option value={id}>
@@ -40,6 +41,7 @@ export default function PharmacySelect(props: PharmacySelectProps) {
           {tab() === 'Local Pickup' && (
             <PharmacySearch
               setPharmacy={(pharmacy) => {
+                // TODO set pharmacy
                 console.log(pharmacy);
               }}
             />

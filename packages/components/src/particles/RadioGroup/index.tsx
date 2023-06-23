@@ -9,6 +9,7 @@ RadioGroup Context
 interface RadioGroupState {
   selected: string | undefined;
   options: string[];
+  fieldsetLabel: string;
 }
 
 interface RadioGroupActions {
@@ -19,17 +20,18 @@ interface RadioGroupActions {
 type RadioGroupContextValue = [RadioGroupState, RadioGroupActions];
 
 export const RadioGroupContext = createContext<RadioGroupContextValue>([
-  { selected: '', options: [] },
+  { selected: '', options: [], fieldsetLabel: '' },
   {
     addOption: () => undefined,
     setSelected: () => undefined
   }
 ]);
 
-export function RadioGroupProvider(props: { children?: JSXElement }) {
+export function RadioGroupProvider(props: { label: string; children?: JSXElement }) {
   const [state, setState] = createStore<RadioGroupState>({
     selected: undefined,
-    options: []
+    options: [],
+    fieldsetLabel: props.label // providing initial value so eslint warning is fine
   });
 
   const radioGroup: RadioGroupContextValue = [
@@ -71,12 +73,14 @@ function Option(props: RadioGroupOptionProps) {
   });
 
   const selected = createMemo(() => state.selected === props.value);
+
   // TODO why is the onclick on Card not working?
   return (
     <div onClick={() => actions.setSelected(props.value)} class="cursor-pointer">
       <Card selected={selected()}>
         <div class="flex justify-between items-center">
           {props.children}
+
           <div>
             <Show when={selected()}>
               <Icon name="checkCircle" class="text-blue-600" />
@@ -89,7 +93,7 @@ function Option(props: RadioGroupOptionProps) {
             </label>
             <input
               type="radio"
-              name="mail-order"
+              name={state.fieldsetLabel}
               value={props.value}
               checked={selected()}
               class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600 sr-only"
@@ -106,10 +110,19 @@ RadioGroup Root
 */
 export interface RadioGroupProps {
   label: string;
+  initSelected?: string;
   children: JSXElement;
 }
 
 function RadioGroupRoot(props: RadioGroupProps) {
+  const [, actions] = useRadioGroup();
+
+  onMount(() => {
+    if (props.initSelected) {
+      actions.setSelected(props.initSelected);
+    }
+  });
+
   return (
     <fieldset>
       <legend class="sr-only">{props.label}</legend>
@@ -120,7 +133,7 @@ function RadioGroupRoot(props: RadioGroupProps) {
 
 function RadioGroup(props: RadioGroupProps) {
   return (
-    <RadioGroupProvider>
+    <RadioGroupProvider label={props.label || ''}>
       <RadioGroupRoot {...props}>{props.children}</RadioGroupRoot>
     </RadioGroupProvider>
   );

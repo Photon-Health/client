@@ -9,6 +9,7 @@ export interface TextProps {
   size?: TextSize;
   class?: string;
   loading?: boolean;
+  selected?: boolean;
   children?: JSXElement | string;
   sampleLoadingText?: string;
   color?: TextColor;
@@ -24,7 +25,9 @@ export default function Text(props: TextProps) {
       'text-lg leading-snug	': merged.size === 'lg',
       'text-black': !props.loading && merged.color === 'black',
       'text-slate-500': !props.loading && merged.color === 'gray',
-      'text-transparent bg-gray-100 box-border rounded-md': props.loading
+      'text-transparent box-border rounded-md': props.loading,
+      'bg-gray-100': !props.selected && props.loading,
+      'bg-blue-100': props.selected && props.loading
     })
   );
   return (

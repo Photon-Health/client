@@ -80,7 +80,7 @@ const App = () => {
 
         <div class="mb-10">
           <h2>Pharmacy Select</h2>
-          <PharmacySelect />
+          <PharmacySelect patientIds={['pat_01H28NXFX27PSADPYPR5JHTCD7']} />
 
           <h4 class="mt-8">With Mail Order</h4>
           <PharmacySelect
