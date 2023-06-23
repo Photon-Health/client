@@ -1,13 +1,11 @@
 import { Pharmacy } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
-import { createSignal, JSXElement, onMount } from 'solid-js';
+import { createSignal, onMount } from 'solid-js';
 import { usePhoton } from '../../context';
-import Card from '../../particles/Card';
+import Text from '../../particles/Text';
 
-interface MailOrderCardProps {
+interface MailOrderPharmacyProps {
   pharmacyId: string;
-  children: JSXElement;
-  selected?: boolean;
 }
 
 const GetPharmacyQuery = gql`
@@ -24,7 +22,7 @@ const GetPharmacyQuery = gql`
   }
 `;
 
-export function MailOrderCard(props: MailOrderCardProps) {
+export function MailOrderPharmacy(props: MailOrderPharmacyProps) {
   const client = usePhoton();
   const [pharmacy, setPharmacy] = createSignal<Pharmacy | null>(null);
 
@@ -44,19 +42,15 @@ export function MailOrderCard(props: MailOrderCardProps) {
   });
 
   return (
-    <Card selected={props?.selected}>
-      <div class="flex justify-between items-center">
-        <div>
-          <label class="sr-only" for={props?.pharmacyId}>
-            {pharmacy()?.name}
-          </label>
-          <div>{pharmacy()?.name}</div>
-          <div class="text-sm text-slate-500">
-            {pharmacy()?.address?.city}, {pharmacy()?.address?.state}
-          </div>
-        </div>
-        <div>{props.children}</div>
-      </div>
-    </Card>
+    <div class="flex flex-col items-start">
+      <Text loading={!pharmacy()} sampleLoadingText="Loading Name">
+        {pharmacy()?.name}
+      </Text>
+      <Text loading={!pharmacy()} color="gray" size="sm" sampleLoadingText="111 222 3333">
+        <span>
+          {pharmacy()?.address?.city}, {pharmacy()?.address?.state}
+        </span>
+      </Text>
+    </div>
   );
 }

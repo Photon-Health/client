@@ -1,11 +1,14 @@
-import { createMemo, createSignal } from 'solid-js';
+import { createMemo, createSignal, For } from 'solid-js';
 import Card from '../../particles/Card';
+import RadioGroup from '../../particles/RadioGroup';
 import Tabs from '../../particles/Tabs';
-import { MailOrderSelect } from '../MailOrderSelect';
 import PharmacySearch from '../PharmacySearch';
+import { MailOrderPharmacy } from './MailOrderPharmacy';
+import { PatientDetails } from './PatientDetails';
 
 interface PharmacySelectProps {
   mailOrderPharmacyIds?: string[];
+  patientIds?: string[];
 }
 
 export default function PharmacySelect(props: PharmacySelectProps) {
@@ -21,8 +24,18 @@ export default function PharmacySelect(props: PharmacySelectProps) {
           activeTab={tab()}
           setActiveTab={(newTab: string) => setTab(newTab)}
         />
-        <div class="py-4">
-          {tab() === 'Send to Patient' && <div>Send to Patient</div>}
+        <div class="pt-4">
+          {tab() === 'Send to Patient' && (
+            <RadioGroup label="Patients">
+              <For each={props?.patientIds || []}>
+                {(id) => (
+                  <RadioGroup.Option value={id}>
+                    <PatientDetails patientId={id} />
+                  </RadioGroup.Option>
+                )}
+              </For>
+            </RadioGroup>
+          )}
 
           {tab() === 'Local Pickup' && (
             <PharmacySearch
@@ -33,7 +46,15 @@ export default function PharmacySelect(props: PharmacySelectProps) {
           )}
 
           {tab() === 'Mail Order' && (
-            <MailOrderSelect pharmacyIds={props?.mailOrderPharmacyIds || []} />
+            <RadioGroup label="Pharmacies">
+              <For each={props?.mailOrderPharmacyIds || []}>
+                {(id) => (
+                  <RadioGroup.Option value={id}>
+                    <MailOrderPharmacy pharmacyId={id} />
+                  </RadioGroup.Option>
+                )}
+              </For>
+            </RadioGroup>
           )}
         </div>
       </div>

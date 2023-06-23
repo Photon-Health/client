@@ -84,6 +84,7 @@ const App = () => {
 
           <h4 class="mt-8">With Mail Order</h4>
           <PharmacySelect
+            patientIds={['pat_01H28NXFX27PSADPYPR5JHTCD7']}
             mailOrderPharmacyIds={[
               'phr_01GA9HPVBVJ0E65P819FD881N0',
               'phr_01GCA54GVKA06C905DETQ9SY98'
