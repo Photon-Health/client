@@ -225,7 +225,8 @@ export const OrderForm = ({
           })
         ) {
           setSubmitting(true);
-          createOrderMutation({ variables: values, onCompleted: onClose });
+          console.log('!!', values);
+          createOrderMutation({ variables: {}, onCompleted: onClose });
 
           // if the user has selected to set the customer's address
           if (updateAddress) {

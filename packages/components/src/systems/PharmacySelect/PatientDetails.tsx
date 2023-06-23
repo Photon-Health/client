@@ -29,17 +29,19 @@ export function PatientDetails(props: PatientDetailsProps) {
   const [patient, setPatient] = createSignal<Patient | null>(null);
 
   async function fetchPatient() {
+    console.log('fetching patient');
     const { data } = await client!.sdk.apollo.query({
       query: GetPatientQuery,
       variables: { id: props.patientId }
     });
-
+    console.log('data', data);
     if (data?.patient) {
       setPatient(data.patient);
     }
   }
 
   onMount(() => {
+    console.log('------');
     fetchPatient();
   });
 

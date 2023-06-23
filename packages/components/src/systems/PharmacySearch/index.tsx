@@ -9,6 +9,7 @@ import Icon from '../../particles/Icon';
 import Button from '../../particles/Button';
 
 import { usePhoton } from '../../context';
+import { types } from '@photonhealth/sdk';
 
 const GetPharmaciesQuery = gql`
   query GetPharmacies($location: LatLongSearch!) {
@@ -28,7 +29,7 @@ export interface PharmacyProps {
   address?: string;
   patientId?: string;
   geocodingApiKey?: string;
-  setPharmacy: (pharmacy: any) => void;
+  setPharmacy: (pharmacy: types.Pharmacy) => void;
 }
 
 export default function PharmacySearch(props: PharmacyProps) {
