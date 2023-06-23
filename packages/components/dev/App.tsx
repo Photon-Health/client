@@ -80,7 +80,11 @@ const App = () => {
 
         <div class="mb-10">
           <h2>Pharmacy Select</h2>
-          <PharmacySelect patientIds={['pat_01H28NXFX27PSADPYPR5JHTCD7']} />
+          <PharmacySelect
+            patientIds={['pat_01H28NXFX27PSADPYPR5JHTCD7']}
+            setFufillmentType={(t) => console.log('fulfillmentType: ', t)}
+            setPharmacyId={(p) => console.log('pharmacyId: ', p)}
+          />
 
           <h4 class="mt-8">With Mail Order</h4>
           <PharmacySelect
@@ -89,6 +93,8 @@ const App = () => {
               'phr_01GA9HPVBVJ0E65P819FD881N0',
               'phr_01GCA54GVKA06C905DETQ9SY98'
             ]}
+            setPharmacyId={(p) => console.log('pharmacyId: ', p)}
+            setFufillmentType={(t) => console.log('fulfillmentType: ', t)}
           />
         </div>
       </Client>

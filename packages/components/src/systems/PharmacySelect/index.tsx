@@ -1,4 +1,5 @@
-import { createMemo, createSignal, For } from 'solid-js';
+import { types } from '@photonhealth/sdk';
+import { createMemo, createSignal, For, onMount } from 'solid-js';
 import Card from '../../particles/Card';
 import RadioGroup from '../../particles/RadioGroup';
 import Tabs from '../../particles/Tabs';
@@ -9,12 +10,39 @@ import { PatientDetails } from './PatientDetails';
 interface PharmacySelectProps {
   mailOrderPharmacyIds?: string[];
   patientIds?: string[];
+  setFufillmentType: (type: types.FulfillmentType | undefined) => void;
+  setPharmacyId: (id: string | undefined) => void;
 }
 
+export type FulfillmentOptions = {
+  name: string;
+  fulfillmentType: types.FulfillmentType | undefined;
+}[];
+
+const fulfillmentOptions: FulfillmentOptions = [
+  {
+    name: 'Send to Patient',
+    fulfillmentType: undefined
+  },
+  {
+    name: 'Local Pickup',
+    fulfillmentType: types.FulfillmentType.PickUp
+  },
+  {
+    name: 'Mail Order',
+    fulfillmentType: types.FulfillmentType.MailOrder
+  }
+];
+
 export default function PharmacySelect(props: PharmacySelectProps) {
-  const tabs = ['Send to Patient', 'Local Pickup', 'Mail Order'];
+  const tabs = fulfillmentOptions.map((option) => option.name);
   const [tab, setTab] = createSignal(tabs[0]);
   const hasMailOrder = createMemo(() => (props?.mailOrderPharmacyIds?.length || 0) > 0);
+
+  onMount(() => {
+    // sets the initial fulfillment type to 'Send to Patient'
+    props.setFufillmentType(fulfillmentOptions[0].fulfillmentType);
+  });
 
   return (
     <Card>
@@ -22,7 +50,12 @@ export default function PharmacySelect(props: PharmacySelectProps) {
         <Tabs
           tabs={hasMailOrder() ? tabs : tabs.slice(0, -1)}
           activeTab={tab()}
-          setActiveTab={(newTab: string) => setTab(newTab)}
+          setActiveTab={(newTab: string) => {
+            setTab(newTab);
+            props.setFufillmentType(
+              fulfillmentOptions.find((option) => option.name === newTab)?.fulfillmentType
+            );
+          }}
         />
 
         <div class="pt-4">
