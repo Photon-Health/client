@@ -23,7 +23,7 @@ import { formatAddress, getHours } from '../utils/general';
 import { GET_PHARMACIES } from '../utils/queries';
 import { ExtendedFulfillmentType, Order } from '../utils/models';
 import t from '../utils/text.json';
-import { SELECT_ORDER_PHARMACY } from '../utils/mutations';
+import { SELECT_ORDER_PHARMACY, SET_PREFERRED_PHARMACY } from '../utils/mutations';
 import { graphQLClient } from '../configs/graphqlClient';
 import { FixedFooter } from '../components/FixedFooter';
 import { Nav } from '../components/Nav';
@@ -305,6 +305,35 @@ export const Pharmacy = () => {
     }
   };
 
+  const setPreferredPharmacy = async (patientId: string, pharmacyId: string) => {
+    if (!pharmacyId) return;
+
+    graphQLClient.setHeader('x-photon-auth', token);
+
+    try {
+      await graphQLClient.request(SET_PREFERRED_PHARMACY, {
+        patientId,
+        pharmacyId
+      });
+    } catch (error) {
+      console.error(JSON.stringify(error, undefined, 2));
+      console.log(error);
+
+      toast({
+        title: 'Unable to set preferred pharmacy',
+        description: 'Please refresh and try again',
+        position: 'top',
+        status: 'error',
+        duration: 5000,
+        isClosable: true
+      });
+    }
+  };
+
+  const handleSetPreferredPharmacy = (id: string) => {
+    setPreferredPharmacy(order.patient.id, id);
+  };
+
   useEffect(() => {
     if (location) {
       fetchPharmacies();
@@ -394,6 +423,7 @@ export const Pharmacy = () => {
                 selectedId={selectedId}
                 handleSelect={handleSelect}
                 handleShowMore={handleShowMore}
+                handleSetPreferred={handleSetPreferredPharmacy}
                 loadingMore={loadingMore}
                 showingAllPharmacies={showingAllPharmacies}
                 courierEnabled={enableCourier || orgSettings.mailOrderNavigate}

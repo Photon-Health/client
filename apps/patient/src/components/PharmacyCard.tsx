@@ -2,13 +2,17 @@ import { memo } from 'react';
 import {
   Card,
   CardBody,
+  Collapse,
   HStack,
   Tag,
   TagLabel,
   TagLeftIcon,
   Text,
   VStack,
-  useBreakpointValue
+  useBreakpointValue,
+  Divider,
+  Checkbox,
+  CardFooter
 } from '@chakra-ui/react';
 import { FiRotateCcw, FiStar } from 'react-icons/fi';
 import dayjs from 'dayjs';
@@ -97,12 +101,14 @@ interface PharmacyCardProps {
   pharmacy: Pharmacy;
   selected: boolean;
   onSelect: Function;
+  onSetPreferred: () => void;
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
   pharmacy,
   selected,
-  onSelect
+  onSelect,
+  onSetPreferred
 }: PharmacyCardProps) {
   const isMobile = useBreakpointValue({ base: true, md: false });
 
@@ -142,6 +148,12 @@ export const PharmacyCard = memo(function PharmacyCard({
           <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
         </VStack>
       </CardBody>
+      <Collapse in={selected} animateOpacity>
+        <Divider />
+        <CardFooter p={3}>
+          <Checkbox onChange={onSetPreferred}>Make this my preferred pharmacy</Checkbox>
+        </CardFooter>
+      </Collapse>
     </Card>
   );
 });

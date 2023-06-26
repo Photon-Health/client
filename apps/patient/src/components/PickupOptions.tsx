@@ -17,6 +17,7 @@ interface PickupOptionsProps {
   selectedId: string;
   handleSelect: (id: string) => void;
   handleShowMore: () => void;
+  handleSetPreferred: (id: string) => void;
   loadingMore: boolean;
   showingAllPharmacies: boolean;
   courierEnabled: boolean;
@@ -27,6 +28,7 @@ export const PickupOptions = ({
   selectedId,
   handleSelect,
   handleShowMore,
+  handleSetPreferred,
   loadingMore,
   showingAllPharmacies,
   courierEnabled
@@ -60,6 +62,7 @@ export const PickupOptions = ({
               pharmacy={pharmacy}
               selected={selectedId === pharmacy.id}
               onSelect={() => handleSelect(pharmacy.id)}
+              onSetPreferred={() => handleSetPreferred(pharmacy.id)}
             />
           </SlideFade>
         ))}
