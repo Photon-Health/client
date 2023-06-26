@@ -38,7 +38,7 @@ export const Review = () => {
   const { organization, patient, fills } = order;
 
   const handleCtaClick = () => {
-    navigate(`/ready?orderId=${order.id}&token=${token}`);
+    navigate(`/pharmacy?orderId=${order.id}&token=${token}`);
   };
 
   const flattenedFills = countFillsAndRemoveDuplicates(fills);
