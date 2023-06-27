@@ -27,11 +27,12 @@ export const RadioGroupContext = createContext<RadioGroupContextValue>([
   }
 ]);
 
-export function RadioGroupProvider(props: { label: string; children?: JSXElement }) {
+export function RadioGroupProvider(props: RadioGroupProps) {
+  // providing initial values, so eslint warnings are kosher
   const [state, setState] = createStore<RadioGroupState>({
-    selected: undefined,
+    selected: props.initSelected,
     options: [],
-    fieldsetLabel: props.label // providing initial value so eslint warning is fine
+    fieldsetLabel: props.label
   });
 
   const radioGroup: RadioGroupContextValue = [
@@ -42,6 +43,7 @@ export function RadioGroupProvider(props: { label: string; children?: JSXElement
       },
       setSelected(selected: string) {
         setState('selected', selected);
+        props.setSelected(selected);
       }
     }
   ];
@@ -112,6 +114,7 @@ export interface RadioGroupProps {
   label: string;
   initSelected?: string;
   children: JSXElement;
+  setSelected: (selected: string) => void;
 }
 
 function RadioGroupRoot(props: RadioGroupProps) {
@@ -133,7 +136,7 @@ function RadioGroupRoot(props: RadioGroupProps) {
 
 function RadioGroup(props: RadioGroupProps) {
   return (
-    <RadioGroupProvider label={props.label || ''}>
+    <RadioGroupProvider {...props}>
       <RadioGroupRoot {...props}>{props.children}</RadioGroupRoot>
     </RadioGroupProvider>
   );

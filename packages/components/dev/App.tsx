@@ -7,6 +7,7 @@ import Icon from '../src/particles/Icon';
 import { randomNames } from '../src/sampleData/randomNames';
 import ComboBox from '../src/particles/ComboBox';
 import PharmacySelect from '../src/systems/PharmacySelect';
+import Card from '../src/particles/Card';
 
 const App = () => {
   const [setPharmacy] = createSignal<any>();
@@ -78,25 +79,28 @@ const App = () => {
           </div>
         </div>
 
-        <div class="mb-10">
-          <h2>Pharmacy Select</h2>
+        <h2>Pharmacy Select</h2>
+        <Card class="mb-10">
           <PharmacySelect
             patientIds={['pat_01H28NXFX27PSADPYPR5JHTCD7']}
+            localPickup
             setFufillmentType={(t) => console.log('fulfillmentType: ', t)}
             setPharmacyId={(p) => console.log('pharmacyId: ', p)}
           />
-
-          <h4 class="mt-8">With Mail Order</h4>
+        </Card>
+        <h4 class="mt-8">With Mail Order</h4>
+        <Card class="mb-10">
           <PharmacySelect
             patientIds={['pat_01H28NXFX27PSADPYPR5JHTCD7']}
+            localPickup
             mailOrderPharmacyIds={[
               'phr_01GA9HPVBVJ0E65P819FD881N0',
               'phr_01GCA54GVKA06C905DETQ9SY98'
             ]}
-            setPharmacyId={(p) => console.log('pharmacyId: ', p)}
-            setFufillmentType={(t) => console.log('fulfillmentType: ', t)}
+            setPharmacyId={(p) => console.log('pharmacyId! ', p)}
+            setFufillmentType={(t) => console.log('fulfillmentType! ', t)}
           />
-        </div>
+        </Card>
       </Client>
     </div>
   );
