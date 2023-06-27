@@ -8,8 +8,8 @@ import LocationSelect, { Location } from '../LocationSelect';
 import Icon from '../../particles/Icon';
 import Button from '../../particles/Button';
 
-import { usePhoton } from '../../context';
 import { types } from '@photonhealth/sdk';
+import { usePhotonClient } from '../SDKProvider';
 
 const GetPharmaciesQuery = gql`
   query GetPharmacies($location: LatLongSearch!) {
@@ -33,7 +33,7 @@ export interface PharmacyProps {
 }
 
 export default function PharmacySearch(props: PharmacyProps) {
-  const client = usePhoton();
+  const client = usePhotonClient();
   const [selected, setSelected] = createSignal<any>();
   const [query, setQuery] = createSignal('');
   const [location, setLocation] = createSignal<Location | null>(null);
@@ -42,7 +42,8 @@ export default function PharmacySearch(props: PharmacyProps) {
   const [openLocationSearch, setOpenLocationSearch] = createSignal(false);
 
   async function fetchPharmacies() {
-    const { data } = await client!.sdk.apollo.query({
+    console.log('client', client);
+    const { data } = await client!.apollo.query({
       query: GetPharmaciesQuery,
       variables: {
         location: { latitude: location()?.latitude, longitude: location()?.longitude, radius: 20 }

@@ -1,4 +1,4 @@
-import { For, createMemo, createSignal } from 'solid-js';
+import { For, createMemo, createSignal, createEffect } from 'solid-js';
 import PharmacySearch from '../src/systems/PharmacySearch';
 import DoseCalculator from '../src/systems/DoseCalculator';
 import Client from '../src/systems/Client';
@@ -13,6 +13,7 @@ const App = () => {
   const [setPharmacy] = createSignal<any>();
   const [doseOpen, setDoseOpen] = createSignal(false);
   const [query, setQuery] = createSignal('');
+  const [patientIds, setPatientIds] = createSignal<string[]>([]);
   const rando = randomNames.slice(0, 3);
   const filteredPeople = createMemo(() => {
     return query() === ''
@@ -20,6 +21,12 @@ const App = () => {
       : rando.filter((person) => {
           return person.name.toLowerCase().includes(query().toLowerCase());
         });
+  });
+
+  createEffect(() => {
+    setTimeout(() => {
+      setPatientIds(['pat_01H28NXFX27PSADPYPR5JHTCD7']);
+    }, 2000);
   });
 
   return (
@@ -80,19 +87,21 @@ const App = () => {
         </div>
 
         <h2>Pharmacy Select</h2>
-        <Card class="mb-10">
+        <Card>
           <PharmacySelect
-            patientIds={['pat_01H28NXFX27PSADPYPR5JHTCD7']}
-            localPickup
+            patientIds={patientIds()}
+            displayLocalPickup
+            displaySendToPatient
             setFufillmentType={(t) => console.log('fulfillmentType: ', t)}
             setPharmacyId={(p) => console.log('pharmacyId: ', p)}
           />
         </Card>
         <h4 class="mt-8">With Mail Order</h4>
-        <Card class="mb-10">
+        <Card>
           <PharmacySelect
             patientIds={['pat_01H28NXFX27PSADPYPR5JHTCD7']}
-            localPickup
+            displayLocalPickup
+            displaySendToPatient
             mailOrderPharmacyIds={[
               'phr_01GA9HPVBVJ0E65P819FD881N0',
               'phr_01GCA54GVKA06C905DETQ9SY98'

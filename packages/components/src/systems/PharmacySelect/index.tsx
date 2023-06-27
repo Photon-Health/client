@@ -1,6 +1,5 @@
 import { types } from '@photonhealth/sdk';
-import { createSignal, For, onMount } from 'solid-js';
-import Card from '../../particles/Card';
+import { createMemo, createSignal, For, onMount } from 'solid-js';
 import RadioGroup from '../../particles/RadioGroup';
 import Tabs from '../../particles/Tabs';
 import PharmacySearch from '../PharmacySearch';
@@ -19,9 +18,10 @@ export type FulfillmentOptions = {
 }[];
 
 interface PharmacySelectProps {
-  mailOrderPharmacyIds?: string[]; // implicitly displays Mail Order option
-  patientIds?: string[]; // implicitly displays Send to Patient option
-  localPickup?: boolean; // declaritively displays Local Pickup option
+  displaySendToPatient?: boolean; // declaritively displays Send to Patient tab
+  displayLocalPickup?: boolean; // declaritively displays Local Pickup tab
+  mailOrderPharmacyIds?: string[]; // implicitly displays Mail Order tab
+  patientIds?: string[];
   setFufillmentType: (type: types.FulfillmentType | undefined) => void;
   setPharmacyId: (id: string | undefined) => void;
   setPatientId?: (id: string | undefined) => void;
@@ -54,9 +54,9 @@ export default function PharmacySelect(props: PharmacySelectProps) {
     .filter((option) => {
       switch (option.fulfillmentType) {
         case SendToPatientEnum.sendToPatient:
-          return props.patientIds !== undefined;
+          return props.displaySendToPatient !== undefined;
         case types.FulfillmentType.PickUp:
-          return props.localPickup === true;
+          return props.displayLocalPickup === true;
         case types.FulfillmentType.MailOrder:
           return props.mailOrderPharmacyIds !== undefined;
         default:
@@ -70,6 +70,8 @@ export default function PharmacySelect(props: PharmacySelectProps) {
     // sets the initial fulfillment type to 'Send to Patient'
     props.setFufillmentType(parseFulfillmentType(fulfillmentOptions[0].fulfillmentType));
   });
+
+  const patientCount = createMemo(() => props?.patientIds?.length || 0);
 
   return (
     <div>
@@ -85,25 +87,30 @@ export default function PharmacySelect(props: PharmacySelectProps) {
 
       <div class="pt-4">
         {tab() === 'Send to Patient' && (
-          <RadioGroup
-            label="Patients"
-            initSelected={props?.patientIds?.[0]}
-            setSelected={(patientId) => {
-              // for now, there is only one patient, but in the future we
-              // might want to support selecting between multiple patients
-              if (props.setPatientId) {
-                props.setPatientId(patientId);
-              }
-            }}
-          >
-            <For each={props?.patientIds || []}>
-              {(id) => (
-                <RadioGroup.Option value={id}>
-                  <PatientDetails patientId={id} />
-                </RadioGroup.Option>
-              )}
-            </For>
-          </RadioGroup>
+          <>
+            {patientCount() > 0 && (
+              <RadioGroup
+                label="Patients"
+                initSelected={props?.patientIds?.[0]}
+                setSelected={(patientId) => {
+                  // for now, there is only one patient, but in the future we
+                  // might want to support selecting between multiple patients
+                  if (props.setPatientId) {
+                    props.setPatientId(patientId);
+                  }
+                }}
+              >
+                <For each={props?.patientIds || []}>
+                  {(id) => (
+                    <RadioGroup.Option value={id}>
+                      <PatientDetails patientId={id} />
+                    </RadioGroup.Option>
+                  )}
+                </For>
+              </RadioGroup>
+            )}
+            {patientCount() === 0 && <div>Please add a patient.</div>}
+          </>
         )}
 
         {tab() === 'Local Pickup' && (

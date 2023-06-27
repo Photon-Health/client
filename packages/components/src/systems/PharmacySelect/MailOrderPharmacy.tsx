@@ -1,8 +1,8 @@
 import { Pharmacy } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
 import { createSignal, onMount } from 'solid-js';
-import { usePhoton } from '../../context';
 import Text from '../../particles/Text';
+import { usePhotonClient } from '../SDKProvider';
 
 interface MailOrderPharmacyProps {
   pharmacyId: string;
@@ -23,11 +23,11 @@ const GetPharmacyQuery = gql`
 `;
 
 export function MailOrderPharmacy(props: MailOrderPharmacyProps) {
-  const client = usePhoton();
+  const client = usePhotonClient();
   const [pharmacy, setPharmacy] = createSignal<Pharmacy | null>(null);
 
   async function fetchPharmacy() {
-    const { data } = await client!.sdk.apollo.query({
+    const { data } = await client!.apollo.query({
       query: GetPharmacyQuery,
       variables: { id: props.pharmacyId }
     });

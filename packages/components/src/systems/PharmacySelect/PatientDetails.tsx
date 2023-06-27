@@ -1,9 +1,9 @@
 import { Patient } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
 import { createMemo, createSignal, onMount } from 'solid-js';
-import { usePhoton } from '../../context';
 import { useRadioGroup } from '../../particles/RadioGroup';
 import Text from '../../particles/Text';
+import { usePhotonClient } from '../SDKProvider';
 
 interface PatientDetailsProps {
   patientId: string;
@@ -25,11 +25,11 @@ const GetPatientQuery = gql`
 
 export function PatientDetails(props: PatientDetailsProps) {
   const [state] = useRadioGroup();
-  const client = usePhoton();
+  const client = usePhotonClient();
   const [patient, setPatient] = createSignal<Patient | null>(null);
 
   async function fetchPatient() {
-    const { data } = await client!.sdk.apollo.query({
+    const { data } = await client!.apollo.query({
       query: GetPatientQuery,
       variables: { id: props.patientId }
     });
