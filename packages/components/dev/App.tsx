@@ -14,6 +14,8 @@ const App = () => {
   const [doseOpen, setDoseOpen] = createSignal(false);
   const [query, setQuery] = createSignal('');
   const [patientIds, setPatientIds] = createSignal<string[]>([]);
+  const [timedAddress, setTimedAddress] = createSignal<string>('');
+
   const rando = randomNames.slice(0, 3);
   const filteredPeople = createMemo(() => {
     return query() === ''
@@ -26,6 +28,7 @@ const App = () => {
   createEffect(() => {
     setTimeout(() => {
       setPatientIds(['pat_01H28NXFX27PSADPYPR5JHTCD7']);
+      setTimedAddress('Bellville, Texas');
     }, 2000);
   });
 
@@ -66,6 +69,10 @@ const App = () => {
           <div>
             <h2>Pharmacy Search</h2>
             <PharmacySearch setPharmacy={setPharmacy} />
+            <h2>Pharmacy Search Initialized with Address</h2>
+            <PharmacySearch setPharmacy={setPharmacy} address="11221" />
+            <h2>Pharmacy Search set with Address after 2 seconds</h2>
+            <PharmacySearch setPharmacy={setPharmacy} address={timedAddress()} />
           </div>
         </div>
 

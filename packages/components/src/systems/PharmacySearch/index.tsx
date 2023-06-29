@@ -1,15 +1,18 @@
-import { For, Show, createEffect, createMemo, createSignal } from 'solid-js';
+import { For, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
 import { gql } from '@apollo/client';
 import { Pharmacy } from '@photonhealth/sdk/dist/types';
 import InputGroup from '../../particles/InputGroup';
 import ComboBox from '../../particles/ComboBox';
 import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter';
-import LocationSelect, { Location } from '../LocationSelect';
+import LocationSelect from '../LocationSelect';
 import Icon from '../../particles/Icon';
 import Button from '../../particles/Button';
 
 import { types } from '@photonhealth/sdk';
 import { usePhotonClient } from '../SDKProvider';
+import getLocation, { Location } from '../../utils/getLocation';
+import getNavigatorLocation from '../../utils/getNavigatorLocation';
+import loadGoogleScript from '../../utils/loadGoogleScript';
 
 const GetPharmaciesQuery = gql`
   query GetPharmacies($location: LatLongSearch!) {
@@ -40,9 +43,9 @@ export default function PharmacySearch(props: PharmacyProps) {
   const [pharmacies, setPharmacies] = createSignal<Pharmacy[] | null>(null);
   const [fetching, setFetching] = createSignal(false);
   const [openLocationSearch, setOpenLocationSearch] = createSignal(false);
+  const [geocoder, setGeocoder] = createSignal<google.maps.Geocoder | undefined>();
 
   async function fetchPharmacies() {
-    console.log('client', client);
     const { data } = await client!.apollo.query({
       query: GetPharmaciesQuery,
       variables: {
@@ -79,6 +82,7 @@ export default function PharmacySearch(props: PharmacyProps) {
   });
 
   createEffect(() => {
+    // if user selects a pharmacy from the drop down, set the pharmacy
     if (selected()?.id) {
       setQuery('');
       props?.setPharmacy?.(selected());
@@ -89,6 +93,34 @@ export default function PharmacySearch(props: PharmacyProps) {
     `${capitalizeFirstLetter(pharmacy.address?.street1 || '')}, ${capitalizeFirstLetter(
       pharmacy.address?.city || ''
     )}, ${pharmacy.address?.state}`;
+
+  async function getAndSetLocation(address: string, geocoder: google.maps.Geocoder) {
+    const location = await getLocation(address || '', geocoder);
+    setLocation(location);
+  }
+
+  onMount(() => {
+    if (props?.address) {
+      setFetching(true);
+    }
+
+    loadGoogleScript({
+      onLoad: async () => {
+        const geo = new google.maps.Geocoder();
+        setGeocoder(geo);
+        if (props?.address) {
+          getAndSetLocation(props.address || '', geo);
+        }
+      }
+    });
+  });
+
+  createEffect(() => {
+    if (props?.address) {
+      setFetching(true);
+      getAndSetLocation(props.address, geocoder()!);
+    }
+  });
 
   return (
     <div>
@@ -124,16 +156,21 @@ export default function PharmacySearch(props: PharmacyProps) {
               }
             />
             <ComboBox.Options>
-              <For each={filteredPharmacies()}>
-                {(pharmacy) => {
-                  return (
-                    <ComboBox.Option key={pharmacy.id} value={pharmacy}>
-                      <div>{pharmacy.name}</div>
-                      <div class="text-xs">{formattedAddress(pharmacy)}</div>
-                    </ComboBox.Option>
-                  );
-                }}
-              </For>
+              <Show when={(filteredPharmacies()?.length || 0) > 0}>
+                <For each={filteredPharmacies()}>
+                  {(pharmacy) => {
+                    return (
+                      <ComboBox.Option key={pharmacy.id} value={pharmacy}>
+                        <div>{pharmacy.name}</div>
+                        <div class="text-xs">{formattedAddress(pharmacy)}</div>
+                      </ComboBox.Option>
+                    );
+                  }}
+                </For>
+              </Show>
+              <Show when={filteredPharmacies()?.length === 0}>
+                <div class="p-4">No pharmacy matches that search</div>
+              </Show>
             </ComboBox.Options>
           </ComboBox>
         </InputGroup>
