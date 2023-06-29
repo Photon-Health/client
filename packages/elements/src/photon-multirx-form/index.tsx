@@ -314,7 +314,8 @@ customElement(
           const { data: data2, errors } = await orderMutation({
             variables: {
               patientId: store['patient']?.value.id,
-              pharmacyId: props?.pharmacyId || store['pharmacy']?.value.id,
+              pharmacyId: props?.pharmacyId || store['pharmacy']?.value || '',
+              fulfillmentType: store['fulfillmentType']?.value || '',
               address,
               fills: data?.createPrescriptions.map((x) => ({ prescriptionId: x.id }))
             },

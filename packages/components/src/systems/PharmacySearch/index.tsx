@@ -11,7 +11,6 @@ import Button from '../../particles/Button';
 import { types } from '@photonhealth/sdk';
 import { usePhotonClient } from '../SDKProvider';
 import getLocation, { Location } from '../../utils/getLocation';
-import getNavigatorLocation from '../../utils/getNavigatorLocation';
 import loadGoogleScript from '../../utils/loadGoogleScript';
 
 const GetPharmaciesQuery = gql`
@@ -116,6 +115,7 @@ export default function PharmacySearch(props: PharmacyProps) {
   });
 
   createEffect(() => {
+    // if address is set later in lifecycle, fetch
     if (props?.address) {
       setFetching(true);
       getAndSetLocation(props.address, geocoder()!);

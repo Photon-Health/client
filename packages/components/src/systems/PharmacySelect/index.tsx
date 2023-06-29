@@ -22,6 +22,7 @@ interface PharmacySelectProps {
   displayLocalPickup?: boolean; // declaritively displays Local Pickup tab
   mailOrderPharmacyIds?: string[]; // implicitly displays Mail Order tab
   patientIds?: string[];
+  address?: string;
   setFufillmentType: (type: types.FulfillmentType | undefined) => void;
   setPharmacyId: (id: string | undefined) => void;
   setPatientId?: (id: string | undefined) => void;
@@ -118,6 +119,7 @@ export default function PharmacySelect(props: PharmacySelectProps) {
             setPharmacy={(pharmacy) => {
               props.setPharmacyId(pharmacy.id);
             }}
+            address={props?.address || ''}
           />
         )}
 

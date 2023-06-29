@@ -1,25 +1,22 @@
-import { createEffect, createMemo, Show } from 'solid-js';
-import { message } from '../../validators';
-import { record, string, any } from 'superstruct';
+import { createMemo } from 'solid-js';
 import { PharmacySelect } from '@photonhealth/components';
-
-const pharmacyValidator = message(
-  record(string(), any()),
-  'Please select or search for a pharmacy...'
-);
 
 export const OrderCard = (props: {
   store: Record<string, any>;
   actions: Record<string, (...args: any) => any>;
 }) => {
-  props.actions.registerValidator({
-    key: 'pharmacy',
-    validator: pharmacyValidator
-  });
-
   const patientIds = createMemo(() =>
     props.store['patient']?.value ? [props.store['patient']?.value?.id] : []
   );
+
+  const address = createMemo(() => {
+    const address = props.store['patient']?.value?.address;
+    return address
+      ? `${address.street1} ${address.street2 || ''} ${address.city}, ${address.state} ${
+          address.postalCode
+        }`
+      : '';
+  });
 
   return (
     <photon-card>
@@ -30,9 +27,19 @@ export const OrderCard = (props: {
         displaySendToPatient
         displayLocalPickup
         patientIds={patientIds()}
-        mailOrderPharmacyIds={['phr_01GA9HPVBVJ0E65P819FD881N0', 'phr_01GCA54GVKA06C905DETQ9SY98']}
-        setFufillmentType={(t: any) => console.log('fulfillmentType: ', t)}
-        setPharmacyId={(p: any) => console.log('pharmacyId: ', p)}
+        address={address()}
+        setFufillmentType={(type: string | undefined) => {
+          props.actions.updateFormValue({
+            key: 'fulfillmentType',
+            value: type || ''
+          });
+        }}
+        setPharmacyId={(id: string) => {
+          props.actions.updateFormValue({
+            key: 'pharmacy',
+            value: id
+          });
+        }}
       />
     </photon-card>
   );

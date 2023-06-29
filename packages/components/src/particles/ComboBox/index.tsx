@@ -85,7 +85,6 @@ function ComboOptions(props: { children?: JSX.Element }) {
       const rect = ref.getBoundingClientRect();
       const spaceBelow = window.innerHeight - rect.bottom;
       const spaceAbove = rect.top;
-      console.log(spaceAbove, spaceBelow, spaceBelow > spaceAbove ? 'bottom' : 'top');
       return spaceBelow > spaceAbove ? 'bottom' : 'top';
     }
     return 'bottom';
