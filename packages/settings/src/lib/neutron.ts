@@ -94,7 +94,7 @@ export const neutron: {
     logo: 'river_health_logo.svg',
     accentColor: '#2faef3',
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID]
+    mailOrderProviders: [CAREPOINT_ID]
   },
   // Peachy
   org_O2SLIoyyVTNXG5nX: {
