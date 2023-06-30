@@ -1,6 +1,6 @@
 import { For, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
 import { gql } from '@apollo/client';
-import { Order, Pharmacy } from '@photonhealth/sdk/dist/types';
+import { Pharmacy } from '@photonhealth/sdk/dist/types';
 import InputGroup from '../../particles/InputGroup';
 import ComboBox from '../../particles/ComboBox';
 import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter';
@@ -13,7 +13,6 @@ import { usePhotonClient } from '../SDKProvider';
 import getLocation, { Location } from '../../utils/getLocation';
 import loadGoogleScript from '../../utils/loadGoogleScript';
 import Badge from '../../particles/Badge';
-import { createSign } from 'crypto';
 
 const GetPharmaciesQuery = gql`
   query GetPharmacies($location: LatLongSearch!) {
