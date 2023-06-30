@@ -142,7 +142,7 @@ function ComboOption(props: ComboOptionProps) {
       <span class="block truncate">{props.children}</span>
       <Show when={state.selected?.id === props.key}>
         <span class="absolute inset-y-0 right-0 flex items-center pr-4">
-          <Icon name="check" class={iconClass()} />
+          <Icon name="checkCircle" class={iconClass()} />
         </span>
       </Show>
     </li>

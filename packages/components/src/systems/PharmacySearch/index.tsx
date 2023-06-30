@@ -1,6 +1,6 @@
 import { For, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
 import { gql } from '@apollo/client';
-import { Pharmacy } from '@photonhealth/sdk/dist/types';
+import { Order, Pharmacy } from '@photonhealth/sdk/dist/types';
 import InputGroup from '../../particles/InputGroup';
 import ComboBox from '../../particles/ComboBox';
 import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter';
@@ -12,6 +12,8 @@ import { types } from '@photonhealth/sdk';
 import { usePhotonClient } from '../SDKProvider';
 import getLocation, { Location } from '../../utils/getLocation';
 import loadGoogleScript from '../../utils/loadGoogleScript';
+import Badge from '../../particles/Badge';
+import { createSign } from 'crypto';
 
 const GetPharmaciesQuery = gql`
   query GetPharmacies($location: LatLongSearch!) {
@@ -43,6 +45,16 @@ const GetPreferredPharmaciesQuery = gql`
   }
 `;
 
+const GetLastOrder = gql`
+  query GetLastOrder($id: ID!) {
+    orders(filter: { patientId: $id }, first: 1) {
+      pharmacy {
+        id
+      }
+    }
+  }
+`;
+
 export interface PharmacyProps {
   address?: string;
   patientId?: string;
@@ -64,6 +76,7 @@ export default function PharmacySearch(props: PharmacyProps) {
   const [fetching, setFetching] = createSignal(false);
   const [openLocationSearch, setOpenLocationSearch] = createSignal(false);
   const [geocoder, setGeocoder] = createSignal<google.maps.Geocoder | undefined>();
+  const [previousId, setPreviousId] = createSignal<string | null>(null);
 
   async function fetchPharmacies() {
     const { data } = await client!.apollo.query({
@@ -74,27 +87,48 @@ export default function PharmacySearch(props: PharmacyProps) {
     });
 
     if (data?.pharmacies?.length > 0) {
-      setPharmacies(data.pharmacies);
+      setPharmacies(data.pharmacies.map((ph: Pharmacy) => ({ ...ph, preferred: false })));
     }
     setFetching(false);
   }
-  async function fetchPreferredPharmacies(patientId: string) {
-    const { data } = await client!.apollo.query({
+
+  async function fetchPreferredAndPrevious(patientId: string) {
+    const { data: preferredData } = await client!.apollo.query({
       query: GetPreferredPharmaciesQuery,
       variables: { id: patientId }
     });
+    const { data: previousData } = await client!.apollo.query({
+      query: GetLastOrder,
+      variables: { id: patientId }
+    });
 
-    if (data?.patient?.preferredPharmacies?.length > 0) {
+    if (preferredData?.patient?.preferredPharmacies?.length > 0) {
       setPreferredPharmacies(
-        data?.patient?.preferredPharmacies.map((ph: Pharmacy) => ({ ...ph, preferred: true }))
+        preferredData?.patient?.preferredPharmacies.map((ph: Pharmacy) => ({
+          ...ph,
+          preferred: true
+        }))
       );
+    }
+    if (previousData?.orders?.length > 0) {
+      setPreviousId(previousData?.orders?.[0].pharmacy.id);
     }
     setFetching(false);
   }
 
   const mergedPharmacies = createMemo(() => {
-    const allPharmacies = [...preferredPharmacies(), ...(pharmacies() || [])];
+    const localPharmacies = pharmacies() || [];
+    // -- verify preferred pharmacy is included in local pharmacy search
+    // e.g. I live in Brooklyn where my preferred pharm is, but if I'm traveling in Texas,
+    // I don't want my Brooklyn preferred to show up in the Texas list
+    const crossoverPreferredPharmacies = preferredPharmacies().filter((preferredPharmacy) =>
+      localPharmacies.some((regularPharmacy) => regularPharmacy.id === preferredPharmacy.id)
+    );
+
+    // -- merge preferred and local lists and remove duplicates
+    const allPharmacies = [...crossoverPreferredPharmacies, ...localPharmacies];
     const ids = allPharmacies.map((pharmacy) => pharmacy.id);
+
     // could optimize with Set, but fine for amount of pharms
     return allPharmacies.filter((pharmacy, index) => ids.indexOf(pharmacy.id) === index);
   });
@@ -157,7 +191,7 @@ export default function PharmacySearch(props: PharmacyProps) {
   createEffect(() => {
     // if patient id, fetch preferred Pharmacies
     if (props?.patientId) {
-      fetchPreferredPharmacies(props?.patientId);
+      fetchPreferredAndPrevious(props?.patientId);
     }
   });
 
@@ -193,14 +227,28 @@ export default function PharmacySearch(props: PharmacyProps) {
               {location()?.address || '...'}{' '}
             </Button>
           }
+          contextText={
+            <div class="flex gap-x-1">
+              <Show when={selected()?.preferred}>
+                <Badge size="sm" color="blue">
+                  Preferred
+                </Badge>
+              </Show>
+              <Show when={previousId() === selected()?.id}>
+                <Badge size="sm" color="green">
+                  Previous
+                </Badge>
+              </Show>
+            </div>
+          }
           loading={fetching()}
         >
-          <ComboBox value={pharmacies()?.[0] || undefined} setSelected={setSelected}>
+          <ComboBox value={mergedPharmacies()?.[0] || undefined} setSelected={setSelected}>
             <ComboBox.Input
               onInput={(e) => setQuery(e.currentTarget.value)}
-              displayValue={(pharmacy) =>
-                pharmacy?.name ? `${pharmacy.name}, ${formattedAddress(pharmacy)}` : ''
-              }
+              displayValue={(pharmacy) => {
+                return pharmacy?.name ? `${pharmacy.name}, ${formattedAddress(pharmacy)}` : '';
+              }}
             />
             <ComboBox.Options>
               <Show when={(filteredPharmacies()?.length || 0) > 0}>
@@ -208,16 +256,20 @@ export default function PharmacySearch(props: PharmacyProps) {
                   {(pharmacy) => {
                     return (
                       <ComboBox.Option key={pharmacy.id} value={pharmacy}>
-                        <div>
+                        <div class="flex gap-x-1 items-center">
                           {pharmacy.name}{' '}
-                          {pharmacy.preferred ? (
-                            <span class="text-xs py-px px-1 bg-blue-500 text-white rounded">
+                          <Show when={pharmacy.preferred}>
+                            <Badge size="sm" color="blue">
                               Preferred
-                            </span>
-                          ) : (
-                            ''
-                          )}
+                            </Badge>
+                          </Show>
+                          <Show when={previousId() === pharmacy.id}>
+                            <Badge size="sm" color="green">
+                              Previous
+                            </Badge>
+                          </Show>
                         </div>
+
                         <div class="text-xs">{formattedAddress(pharmacy)}</div>
                       </ComboBox.Option>
                     );
