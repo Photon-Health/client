@@ -82,6 +82,9 @@ export default function PharmacySelect(props: PharmacySelectProps) {
         setActiveTab={(newTab: string) => {
           setTab(newTab);
           const type = fulfillmentOptions.find((option) => option.name === newTab)?.fulfillmentType;
+
+          // @ts-ignore
+          // TODO fix this typing
           props.setFufillmentType(parseFulfillmentType(type));
         }}
       />
@@ -120,6 +123,7 @@ export default function PharmacySelect(props: PharmacySelectProps) {
               props.setPharmacyId(pharmacy.id);
             }}
             address={props?.address || ''}
+            patientId={props?.patientIds?.[0]}
           />
         )}
 

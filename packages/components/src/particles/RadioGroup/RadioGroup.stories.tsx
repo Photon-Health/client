@@ -25,7 +25,7 @@ export const Default: RadioGroupStory = {
 
     return (
       <div class="max-w-md">
-        <RadioGroup label="Pharmacies">
+        <RadioGroup label="Pharmacies" setSelected={(s) => console.log('selected: ', s)}>
           {pharmacies.map(({ id, name, address }) => (
             <RadioGroup.Option value={id}>
               <div>
@@ -51,7 +51,11 @@ export const Selected: RadioGroupStory = {
 
     return (
       <div class="max-w-md">
-        <RadioGroup label="Pharmacies" initSelected={pharmacies[1].id}>
+        <RadioGroup
+          label="Pharmacies"
+          setSelected={(s) => console.log('selected: ', s)}
+          initSelected={pharmacies[1].id}
+        >
           {pharmacies.map(({ id, name, address }) => (
             <RadioGroup.Option value={id}>
               <div>

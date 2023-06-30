@@ -106,13 +106,14 @@ const App = () => {
         <h4 class="mt-8">With Mail Order</h4>
         <Card>
           <PharmacySelect
-            patientIds={['pat_01H28NXFX27PSADPYPR5JHTCD7']}
+            patientIds={['pat_01GQ0XFBHSH3YXN936A2D2SD7Y']}
             displayLocalPickup
             displaySendToPatient
             mailOrderPharmacyIds={[
               'phr_01GA9HPVBVJ0E65P819FD881N0',
               'phr_01GCA54GVKA06C905DETQ9SY98'
             ]}
+            address="11221"
             setPharmacyId={(p) => console.log('pharmacyId! ', p)}
             setFufillmentType={(t) => console.log('fulfillmentType! ', t)}
           />

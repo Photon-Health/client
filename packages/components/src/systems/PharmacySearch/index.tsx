@@ -27,6 +27,22 @@ const GetPharmaciesQuery = gql`
   }
 `;
 
+const GetPreferredPharmaciesQuery = gql`
+  query GetPatient($id: ID!) {
+    patient(id: $id) {
+      preferredPharmacies {
+        id
+        name
+        address {
+          street1
+          city
+          state
+        }
+      }
+    }
+  }
+`;
+
 export interface PharmacyProps {
   address?: string;
   patientId?: string;
@@ -34,12 +50,17 @@ export interface PharmacyProps {
   setPharmacy: (pharmacy: types.Pharmacy) => void;
 }
 
+interface PharmacyExtended extends Pharmacy {
+  preferred: boolean | undefined;
+}
+
 export default function PharmacySearch(props: PharmacyProps) {
   const client = usePhotonClient();
   const [selected, setSelected] = createSignal<any>();
   const [query, setQuery] = createSignal('');
   const [location, setLocation] = createSignal<Location | null>(null);
-  const [pharmacies, setPharmacies] = createSignal<Pharmacy[] | null>(null);
+  const [pharmacies, setPharmacies] = createSignal<PharmacyExtended[] | null>(null);
+  const [preferredPharmacies, setPreferredPharmacies] = createSignal<PharmacyExtended[]>([]);
   const [fetching, setFetching] = createSignal(false);
   const [openLocationSearch, setOpenLocationSearch] = createSignal(false);
   const [geocoder, setGeocoder] = createSignal<google.maps.Geocoder | undefined>();
@@ -55,9 +76,28 @@ export default function PharmacySearch(props: PharmacyProps) {
     if (data?.pharmacies?.length > 0) {
       setPharmacies(data.pharmacies);
     }
-
     setFetching(false);
   }
+  async function fetchPreferredPharmacies(patientId: string) {
+    const { data } = await client!.apollo.query({
+      query: GetPreferredPharmaciesQuery,
+      variables: { id: patientId }
+    });
+
+    if (data?.patient?.preferredPharmacies?.length > 0) {
+      setPreferredPharmacies(
+        data?.patient?.preferredPharmacies.map((ph: Pharmacy) => ({ ...ph, preferred: true }))
+      );
+    }
+    setFetching(false);
+  }
+
+  const mergedPharmacies = createMemo(() => {
+    const allPharmacies = [...preferredPharmacies(), ...(pharmacies() || [])];
+    const ids = allPharmacies.map((pharmacy) => pharmacy.id);
+    // could optimize with Set, but fine for amount of pharms
+    return allPharmacies.filter((pharmacy, index) => ids.indexOf(pharmacy.id) === index);
+  });
 
   createEffect(() => {
     // If user selects a location, fetch pharmacies
@@ -69,13 +109,13 @@ export default function PharmacySearch(props: PharmacyProps) {
   });
 
   const filteredPharmacies = createMemo(() => {
-    if (pharmacies() === null || pharmacies()?.length === 0) {
+    if (mergedPharmacies() === null || mergedPharmacies()?.length === 0) {
       return [];
     }
 
     return query() === ''
-      ? pharmacies()
-      : pharmacies()?.filter((pharmacy) => {
+      ? mergedPharmacies()
+      : mergedPharmacies()?.filter((pharmacy) => {
           return pharmacy.name.toLowerCase().includes(query().toLowerCase());
         }) || [];
   });
@@ -112,6 +152,13 @@ export default function PharmacySearch(props: PharmacyProps) {
         }
       }
     });
+  });
+
+  createEffect(() => {
+    // if patient id, fetch preferred Pharmacies
+    if (props?.patientId) {
+      fetchPreferredPharmacies(props?.patientId);
+    }
   });
 
   createEffect(() => {
@@ -161,7 +208,16 @@ export default function PharmacySearch(props: PharmacyProps) {
                   {(pharmacy) => {
                     return (
                       <ComboBox.Option key={pharmacy.id} value={pharmacy}>
-                        <div>{pharmacy.name}</div>
+                        <div>
+                          {pharmacy.name}{' '}
+                          {pharmacy.preferred ? (
+                            <span class="text-xs py-px px-1 bg-blue-500 text-white rounded">
+                              Preferred
+                            </span>
+                          ) : (
+                            ''
+                          )}
+                        </div>
                         <div class="text-xs">{formattedAddress(pharmacy)}</div>
                       </ComboBox.Option>
                     );
