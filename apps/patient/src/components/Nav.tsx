@@ -91,7 +91,7 @@ export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
             />
             <MenuList>
               <MenuItem>
-                <Link href="mailto:support@photon.health" style={{ textDecoration: 'none' }}>
+                <Link href="sms:+15138663212" style={{ textDecoration: 'none' }}>
                   {t.contactSupport}
                 </Link>
               </MenuItem>
