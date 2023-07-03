@@ -34,6 +34,30 @@ import { BrandedOptions } from '../components/BrandedOptions';
 import { OrderContext } from './Main';
 import { getSettings } from '@client/settings';
 
+const AUSTIN_INDIE_PHARMACY_IDS: string[] = [
+  'phr_01G9CM8JJ03N4VPPDKR4KV4YKR', // Tarrytown Pharmacy
+  'phr_01G9CM8MFENM6P96F94RQWBMAY', // Northwest Hills Pharmacy at Davenport
+  // People's pharmacies (4)
+  'phr_01G9CM8MTAFDSKSJ5P3680FFBG',
+  'phr_01G9CM90JXBT4JPDQZAMEVRQ5K',
+  'phr_01G9CM8M2D23133Q9T91K3NQE5',
+  'phr_01G9CM8TFRJNZ5CYW1PV3Z4Z9C',
+  'phr_01G9CM8W0RD2YRWX8F64NJB4JM', // East Austin Medicine Shop
+  'phr_01GFVHFPSTYPWPMGQ4Y0ZMEEP0', // Martin's Wellness & Compounding Pharmacy at Lamar Plaza Drug Store
+  // Martin's Wellness Dripping Springs Pharmacy
+  'phr_01G9CM8WDPTAPXX8RWFSFTDZRW', // Brodie Lane Pharmacy
+  // MedSavers Pharmacy
+  'phr_01GA9HPXHZY0NS2WBWEF52GKFM', // Gus's Drug
+  'phr_01G9CM8J8CDW1TVNY9MMNBF1QM', // 38th Street Pharmacy
+  'phr_01G9CM92EYZVK3FZ25JMYKRNR5', // Austin Compounding Pharmacy
+  'phr_01GA9HPXJPCEXYEBVGFYT17066', // Buda Drug Store
+  'phr_01G9CM92S2ES1TJD8DH1VTEBZJ', // Auro Pharmacy
+  'phr_01GA9HPXD5ZM86MASCK625ZQJF', // Lake Hills Pharmacy
+  'phr_01GA9HPXEQH5V38D5G11EKADNY', // Manor Pharmacy
+  'phr_01G9CM940NTXPBR0HQ7042T5CA', // Alive And Well Pharmacy
+  'phr_01GSB2FQ4F2D2JBJW58AGCP2V0' // Solutions Pharmacy
+];
+
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
 const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
@@ -325,6 +349,13 @@ export const Pharmacy = () => {
   const patientAddressInAustinTX =
     order?.address?.city === 'Austin' && order?.address?.state === 'TX';
   const enableCourier = searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier;
+
+  // -----create featured indie pharmacy list
+  // -----in austin?
+  // yes, get 15 pharmacies
+  // if 1-3 indies in list, float to top
+  // show more just tack on like usual
+  // no, as usual
 
   return (
     <Box>
