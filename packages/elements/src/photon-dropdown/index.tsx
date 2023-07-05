@@ -371,7 +371,12 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                       >
                         {el.label}
                       </sl-menu-item>
-                      <For each={virtualizer().getVirtualItems()} fallback={<div>Loading...</div>}>
+                      <For
+                        each={virtualizer()
+                          .getVirtualItems()
+                          .filter((vr) => el.filter(props.data[vr.index]))}
+                        fallback={<div>Loading...</div>}
+                      >
                         {(vr: any) => {
                           const isLoaderRow = vr.index > props.data.length - 1;
                           const datum = props.data[vr.index];
