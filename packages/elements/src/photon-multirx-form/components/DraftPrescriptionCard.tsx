@@ -62,6 +62,28 @@ export const DraftPrescriptionCard = (props: {
     }
   };
 
+  const handleEditConfirm = () => {
+    editPrescription();
+    setEditDialogOpen(false);
+    setEditDraft(undefined);
+  };
+  const handleEditCancel = () => {
+    setEditDialogOpen(false);
+    setEditDraft(undefined);
+  };
+  const handleDeleteConfirm = () => {
+    props.actions.updateFormValue({
+      key: 'draftPrescriptions',
+      value: props.store['draftPrescriptions'].value.filter((x: any) => x.id !== deleteDraftId())
+    });
+    setDeleteDialogOpen(false);
+    setDeleteDraftId(undefined);
+  };
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setDeleteDraftId(undefined);
+  };
+
   return (
     <photon-card>
       <photon-dialog
@@ -69,15 +91,9 @@ export const DraftPrescriptionCard = (props: {
         label="Overwrite in progress prescription?"
         confirm-text="Yes, Overwrite"
         cancel-text="No, Cancel"
-        on:photon-dialog-confirmed={() => {
-          editPrescription();
-          setEditDialogOpen(false);
-          setEditDraft(undefined);
-        }}
-        on:photon-dialog-canceled={() => {
-          setEditDialogOpen(false);
-          setEditDraft(undefined);
-        }}
+        on:photon-dialog-confirmed={handleEditConfirm}
+        on:photon-dialog-canceled={handleEditCancel}
+        on:photon-dialog-alt={handleEditCancel}
       >
         <p class="font-sans text-lg xs:text-base">
           You are editing a prescription that has not been added. This will be overwritten if you
@@ -89,20 +105,9 @@ export const DraftPrescriptionCard = (props: {
         label="Delete pending prescription?"
         confirm-text="Yes, Delete"
         cancel-text="No, Cancel"
-        on:photon-dialog-confirmed={() => {
-          props.actions.updateFormValue({
-            key: 'draftPrescriptions',
-            value: props.store['draftPrescriptions'].value.filter(
-              (x: any) => x.id !== deleteDraftId()
-            )
-          });
-          setDeleteDialogOpen(false);
-          setDeleteDraftId(undefined);
-        }}
-        on:photon-dialog-canceled={() => {
-          setDeleteDialogOpen(false);
-          setDeleteDraftId(undefined);
-        }}
+        on:photon-dialog-confirmed={handleDeleteConfirm}
+        on:photon-dialog-canceled={handleDeleteCancel}
+        on:photon-dialog-alt={handleDeleteCancel}
       >
         <p class="font-sans text-lg xs:text-base">
           Deleting this prescription will remove it from your pending prescriptions. This action
