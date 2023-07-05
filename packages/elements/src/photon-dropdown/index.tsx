@@ -375,7 +375,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                         each={virtualizer()
                           .getVirtualItems()
                           .filter((vr) => el.filter(props.data[vr.index]))}
-                        fallback={<div>Loading...</div>}
                       >
                         {(vr: any) => {
                           const isLoaderRow = vr.index > props.data.length - 1;
