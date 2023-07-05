@@ -3,6 +3,7 @@ import { createEffect, createSignal } from 'solid-js';
 import { PhotonContext } from '../context';
 import { hasAuthParams } from '../utils';
 import { PhotonClient } from '@photonhealth/sdk';
+import { SDKProvider } from '@photonhealth/components';
 import { PhotonClientStore } from '../store';
 import { makeTimer } from '@solid-primitives/timer';
 
@@ -141,7 +142,9 @@ customElement(
     return (
       <div ref={ref}>
         <PhotonContext.Provider value={store()}>
-          <slot />
+          <SDKProvider client={sdk}>
+            <slot />
+          </SDKProvider>
         </PhotonContext.Provider>
       </div>
     );
