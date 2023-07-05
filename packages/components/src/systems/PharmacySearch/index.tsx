@@ -246,7 +246,9 @@ export default function PharmacySearch(props: PharmacyProps) {
             <ComboBox.Input
               onInput={(e) => setQuery(e.currentTarget.value)}
               displayValue={(pharmacy) => {
-                return pharmacy?.name ? `${pharmacy.name}, ${formattedAddress(pharmacy)}` : '';
+                return pharmacy?.name
+                  ? `${pharmacy.name}, ${capitalizeFirstLetter(pharmacy.address?.street1 || '')}`
+                  : '';
               }}
             />
             <ComboBox.Options>
