@@ -153,6 +153,8 @@ export const Pharmacy = () => {
     }
   };
 
+  const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(location);
+
   const fetchPharmacies = async () => {
     setLoadingMore(true);
 
@@ -180,12 +182,13 @@ export const Pharmacy = () => {
       longitude: lng,
       radius: 25
     };
-    const limit = 3;
+    const featureIndiePharmacies = searchingInAustinTX;
+    const limit = featureIndiePharmacies ? 15 : 3;
     const offset = pharmacyOptions.length;
 
     graphQLClient.setHeader('x-photon-auth', token);
 
-    let pharmaciesResults: any;
+    let pharmaciesResults: { pharmaciesByLocation: Pharmacy[] };
     try {
       pharmaciesResults = await graphQLClient.request(GET_PHARMACIES, {
         location: locationData,
@@ -201,18 +204,44 @@ export const Pharmacy = () => {
     }
 
     if (pharmaciesResults?.pharmaciesByLocation.length > 0) {
-      for (let i = 0; i < pharmaciesResults.pharmaciesByLocation.length; i++) {
+      type EnrichedPharmacy = Pharmacy &
+        Partial<{
+          businessStatus: string | undefined;
+          rating: number | undefined;
+          hours: object | undefined;
+        }>;
+      let newPharmacies: EnrichedPharmacy[] = pharmaciesResults.pharmaciesByLocation;
+
+      // Prioritize indie pharmacies
+      if (featureIndiePharmacies) {
+        // Custom sorting function
+        const sortPharmacies = (a, b) => {
+          const aIsIndependent = AUSTIN_INDIE_PHARMACY_IDS.includes(a.id);
+          const bIsIndependent = AUSTIN_INDIE_PHARMACY_IDS.includes(b.id);
+
+          if (aIsIndependent && !bIsIndependent) {
+            return -1; // a comes before b
+          } else if (!aIsIndependent && bIsIndependent) {
+            return 1; // b comes before a
+          } else {
+            return 0; // no change in order
+          }
+        };
+
+        newPharmacies = newPharmacies.sort(sortPharmacies);
+      }
+
+      for (let i = 0; i < newPharmacies.length; i++) {
         // Search for google place
-        const name = pharmaciesResults.pharmaciesByLocation[i].name;
-        const address = pharmaciesResults.pharmaciesByLocation[i].address
-          ? formatAddress(pharmaciesResults.pharmaciesByLocation[i].address)
-          : '';
+        const name = newPharmacies[i].name;
+        const address = newPharmacies[i].address ? formatAddress(newPharmacies[i].address) : '';
         const placeRequest = {
           query: name + ' ' + address,
           fields: ['place_id']
         };
 
-        let placeId, placeStatus;
+        let placeId: string;
+        let placeStatus: string;
         try {
           const { response, status }: any = await query('findPlaceFromQuery', placeRequest);
           placeId = response[0]?.place_id;
@@ -235,9 +264,8 @@ export const Pharmacy = () => {
             detailsRequest
           );
           if (detailsStatus === 'OK') {
-            pharmaciesResults.pharmaciesByLocation[i].businessStatus =
-              details?.business_status || '';
-            pharmaciesResults.pharmaciesByLocation[i].rating = details?.rating || undefined;
+            newPharmacies[i].businessStatus = details?.business_status || '';
+            newPharmacies[i].rating = details?.rating || undefined;
             const openForBusiness = details?.business_status === 'OPERATIONAL';
             if (openForBusiness) {
               const currentTime = dayjs().format('HHmm');
@@ -245,7 +273,7 @@ export const Pharmacy = () => {
                 details?.opening_hours?.periods,
                 currentTime
               );
-              pharmaciesResults.pharmaciesByLocation[i].hours = {
+              newPharmacies[i].hours = {
                 open: details?.opening_hours?.isOpen() || false,
                 is24Hr,
                 opens,
@@ -256,7 +284,7 @@ export const Pharmacy = () => {
           }
         }
       }
-      setPharmacyOptions([...pharmacyOptions, ...pharmaciesResults.pharmaciesByLocation]);
+      setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
     }
     setLoadingMore(false);
   };
@@ -345,14 +373,13 @@ export const Pharmacy = () => {
   }
 
   // Courier option limited to MoPed in Austin, TX
-  const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(location);
   const patientAddressInAustinTX =
     order?.address?.city === 'Austin' && order?.address?.state === 'TX';
   const enableCourier = searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier;
 
   // -----create featured indie pharmacy list
   // -----in austin?
-  // yes, get 15 pharmacies
+  // -----yes, get 15 pharmacies
   // if 1-3 indies in list, float to top
   // show more just tack on like usual
   // no, as usual
