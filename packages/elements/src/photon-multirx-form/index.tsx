@@ -61,6 +61,9 @@ customElement(
     hideSubmit: false,
     hideTemplates: true,
     enableOrder: false,
+    enableLocalPickup: false,
+    enableSendToPatient: false,
+    mailOrderIds: undefined,
     pharmacyId: undefined,
     loading: false,
     address: undefined
@@ -72,6 +75,9 @@ customElement(
       hideSubmit: boolean;
       hideTemplates: boolean;
       enableOrder: boolean;
+      enableLocalPickup: boolean;
+      enableSendToPatient: boolean;
+      mailOrderIds?: string;
       pharmacyId?: string;
       loading: boolean;
       address?: {
@@ -385,7 +391,13 @@ customElement(
                 setIsEditing={setIsEditing}
               />
               <Show when={props.enableOrder && !props.pharmacyId}>
-                <OrderCard store={store} actions={actions} />
+                <OrderCard
+                  store={store}
+                  actions={actions}
+                  enableLocalPickup={props.enableLocalPickup}
+                  enableSendToPatient={props.enableSendToPatient}
+                  mailOrderIds={props.mailOrderIds}
+                />
               </Show>
               <Show when={props.enableOrder && props.pharmacyId}>
                 <PharmacyCard pharmacyId={props.pharmacyId} />

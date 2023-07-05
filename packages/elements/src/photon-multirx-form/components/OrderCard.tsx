@@ -4,6 +4,9 @@ import { PharmacySelect } from '@photonhealth/components';
 export const OrderCard = (props: {
   store: Record<string, any>;
   actions: Record<string, (...args: any) => any>;
+  enableLocalPickup: boolean;
+  enableSendToPatient: boolean;
+  mailOrderIds?: string;
 }) => {
   const patientIds = createMemo(() =>
     props.store['patient']?.value ? [props.store['patient']?.value?.id] : []
@@ -24,8 +27,12 @@ export const OrderCard = (props: {
         <p class="font-sans text-l font-medium flex-grow">Select Pharmacy</p>
       </div>
       <PharmacySelect
-        displaySendToPatient
-        displayLocalPickup
+        enableSendToPatient={props.enableSendToPatient}
+        // Defaults to Local Pickup if nothing is set
+        enableLocalPickup={
+          props.enableLocalPickup || (!props?.enableSendToPatient && !props?.mailOrderIds)
+        }
+        mailOrderPharmacyIds={props.mailOrderIds ? props.mailOrderIds.split(',') : undefined}
         patientIds={patientIds()}
         address={address()}
         setFufillmentType={(type: string | undefined) => {

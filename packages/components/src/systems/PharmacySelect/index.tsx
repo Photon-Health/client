@@ -18,8 +18,8 @@ export type FulfillmentOptions = {
 }[];
 
 interface PharmacySelectProps {
-  displaySendToPatient?: boolean; // declaritively displays Send to Patient tab
-  displayLocalPickup?: boolean; // declaritively displays Local Pickup tab
+  enableSendToPatient?: boolean; // declaritively displays Send to Patient tab
+  enableLocalPickup?: boolean; // declaritively displays Local Pickup tab
   mailOrderPharmacyIds?: string[]; // implicitly displays Mail Order tab
   patientIds?: string[];
   address?: string;
@@ -55,9 +55,9 @@ export default function PharmacySelect(props: PharmacySelectProps) {
     .filter((option) => {
       switch (option.fulfillmentType) {
         case SendToPatientEnum.sendToPatient:
-          return props.displaySendToPatient !== undefined;
+          return props.enableSendToPatient === true;
         case types.FulfillmentType.PickUp:
-          return props.displayLocalPickup === true;
+          return props.enableLocalPickup === true;
         case types.FulfillmentType.MailOrder:
           return props.mailOrderPharmacyIds !== undefined;
         default:

@@ -97,8 +97,8 @@ const App = () => {
         <Card>
           <PharmacySelect
             patientIds={patientIds()}
-            displayLocalPickup
-            displaySendToPatient
+            enableLocalPickup
+            enableSendToPatient
             setFufillmentType={(t) => console.log('fulfillmentType: ', t)}
             setPharmacyId={(p) => console.log('pharmacyId: ', p)}
           />
@@ -107,8 +107,8 @@ const App = () => {
         <Card>
           <PharmacySelect
             patientIds={['pat_01GQ0XFBHSH3YXN936A2D2SD7Y']}
-            displayLocalPickup
-            displaySendToPatient
+            enableLocalPickup
+            enableSendToPatient
             mailOrderPharmacyIds={[
               'phr_01GA9HPVBVJ0E65P819FD881N0',
               'phr_01GCA54GVKA06C905DETQ9SY98'
