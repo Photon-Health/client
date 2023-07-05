@@ -316,34 +316,7 @@ export const AddPrescriptionCard = (props: {
                     'notes'
                   ]);
                   setOffCatalog(undefined);
-                  props.actions.updateFormValue({
-                    key: 'treatment',
-                    value: undefined
-                  });
-                  props.actions.updateFormValue({
-                    key: 'refillsInput',
-                    value: 0
-                  });
-                  props.actions.updateFormValue({
-                    key: 'dispenseAsWritten',
-                    value: false
-                  });
-                  props.actions.updateFormValue({
-                    key: 'dispenseQuantity',
-                    value: null
-                  });
-                  props.actions.updateFormValue({
-                    key: 'daysSupply',
-                    value: null
-                  });
-                  props.actions.updateFormValue({
-                    key: 'instructions',
-                    value: ''
-                  });
-                  props.actions.updateFormValue({
-                    key: 'notes',
-                    value: ''
-                  });
+                  clearForm(props.actions);
                 }
               }}
             >
