@@ -11,6 +11,7 @@ import '@shoelace-style/shoelace/dist/components/button/button';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { createSignal, Show } from 'solid-js';
 import repopulateForm from '../util/repopulateForm';
+import clearForm from '../util/clearForm';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -65,6 +66,7 @@ export const AddPrescriptionCard = (props: {
           help-text={props.store['treatment']?.error}
           off-catalog-option={offCatalog()}
           on:photon-treatment-selected={(e: any) => {
+            clearForm(props.actions);
             if (e.detail.data.__typename === 'PrescriptionTemplate') {
               repopulateForm(props.actions, e.detail.data);
             } else {
@@ -314,34 +316,7 @@ export const AddPrescriptionCard = (props: {
                     'notes'
                   ]);
                   setOffCatalog(undefined);
-                  props.actions.updateFormValue({
-                    key: 'treatment',
-                    value: undefined
-                  });
-                  props.actions.updateFormValue({
-                    key: 'refillsInput',
-                    value: 0
-                  });
-                  props.actions.updateFormValue({
-                    key: 'dispenseAsWritten',
-                    value: false
-                  });
-                  props.actions.updateFormValue({
-                    key: 'dispenseQuantity',
-                    value: null
-                  });
-                  props.actions.updateFormValue({
-                    key: 'daysSupply',
-                    value: null
-                  });
-                  props.actions.updateFormValue({
-                    key: 'instructions',
-                    value: ''
-                  });
-                  props.actions.updateFormValue({
-                    key: 'notes',
-                    value: ''
-                  });
+                  clearForm(props.actions);
                 }
               }}
             >

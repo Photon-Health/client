@@ -24,6 +24,12 @@ const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
   let ref: any;
   const [closeDialogOpen, onCloseDialogOpen] = createSignal<boolean>(false);
 
+  const handleConfirm = () => {
+    onCloseDialogOpen(false);
+    props.onClosed();
+  };
+  const handleCancel = () => onCloseDialogOpen(false);
+
   return (
     <div ref={ref} class="fixed top-0 left-0 w-full h-screen z-10 overflow-y-scroll">
       <style>{tailwind}</style>
@@ -34,13 +40,9 @@ const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
         open={closeDialogOpen()}
         confirm-text="Yes, Close"
         cancel-text="Keep Editing"
-        on:photon-dialog-confirmed={() => {
-          onCloseDialogOpen(false);
-          props.onClosed();
-        }}
-        on:photon-dialog-canceled={() => {
-          onCloseDialogOpen(false);
-        }}
+        on:photon-dialog-confirmed={handleConfirm}
+        on:photon-dialog-canceled={handleCancel}
+        on:photon-dialog-alt={handleCancel}
       >
         <p class="font-sans text-lg xs:text-base">{props.closeBody}</p>
       </photon-dialog>
