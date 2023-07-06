@@ -34,7 +34,7 @@ export default function Input(props: InputProps) {
     const error = nonNativeProps.error || state.error;
     const readonly = inputProps.readonly || inputProps.readOnly;
     return clsx(
-      'block w-full rounded-md border-0 py-1.5 px-2 shadow-sm ring-1 ring-inset sm:text-sm sm:leading-6 focus:outline-none',
+      'block w-full rounded-md border-0 py-1.5 px-2 shadow-sm ring-1 ring-inset text-sm sm:text-base sm:leading-6 focus:outline-none',
       {
         'pl-10': inputProps.type === 'email',
         'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-inset focus:ring-red-500':

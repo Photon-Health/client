@@ -33,6 +33,30 @@ customElement(
       ref?.dispatchEvent(event);
     };
 
+    const handleConfirm = async () => {
+      setLoading(true);
+      if (addToCatalog()) {
+        const addCatalogMutation = client!.getSDK().clinical.catalog.addToCatalog({});
+        try {
+          await addCatalogMutation({
+            variables: {
+              catalogId: catalogId(),
+              treatmentId: medication()?.id
+            },
+            awaitRefetchQueries: false
+          });
+        } catch (e: any) {
+          console.log('Error adding to catalog: ', e?.message);
+        }
+      }
+      dispatchMedicationSelected();
+      setLoading(false);
+      props.open = false;
+    };
+    const handleCancel = () => {
+      props.open = false;
+    };
+
     return (
       <div
         ref={ref}
@@ -48,29 +72,9 @@ customElement(
           cancel-text="Back"
           confirm-text="Select Medication"
           disable-submit={!medication()}
-          on:photon-dialog-confirmed={async () => {
-            setLoading(true);
-            if (addToCatalog()) {
-              const addCatalogMutation = client!.getSDK().clinical.catalog.addToCatalog({});
-              try {
-                await addCatalogMutation({
-                  variables: {
-                    catalogId: catalogId(),
-                    treatmentId: medication()?.id
-                  },
-                  awaitRefetchQueries: false
-                });
-              } catch (e: any) {
-                console.log('Error adding to catalog: ', e?.message);
-              }
-            }
-            dispatchMedicationSelected();
-            setLoading(false);
-            props.open = false;
-          }}
-          on:photon-dialog-canceled={() => {
-            props.open = false;
-          }}
+          on:photon-dialog-confirmed={handleConfirm}
+          on:photon-dialog-canceled={handleCancel}
+          on:photon-dialog-alt={handleCancel}
         >
           <photon-med-search />
         </photon-dialog>
