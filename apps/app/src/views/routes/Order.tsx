@@ -33,6 +33,7 @@ import {
 import { gql, GraphQLClient } from 'graphql-request';
 import { usePhoton, types } from '@photonhealth/react';
 import {
+  FiAlertTriangle,
   FiArrowUpRight,
   FiCheck,
   FiClock,
@@ -77,7 +78,8 @@ export const ORDER_STATE_ICON_MAP: any = {
   ROUTING: FiCornerUpRight,
   PENDING: FiClock,
   CANCELED: FiX,
-  COMPLETED: FiCheck
+  COMPLETED: FiCheck,
+  ERROR: FiAlertTriangle
 };
 const FILL_STATE_MAP: object = {
   CANCELED: 'Canceled',
