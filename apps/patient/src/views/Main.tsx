@@ -48,6 +48,10 @@ export const Main = () => {
           navigate(`/review?orderId=${results.order.id}&token=${token}`, {
             replace: true
           });
+        } else {
+          navigate(`/status?orderId=${results.order.id}&token=${token}`, {
+            replace: true
+          });
         }
       }
     } catch (error) {
@@ -105,10 +109,6 @@ export const Main = () => {
         </Center>
       </ChakraProvider>
     );
-  }
-
-  if (location.pathname !== ('/status' && '/canceled') && order?.pharmacy?.id) {
-    navigate(`/status?orderId=${orderId}&token=${token}`, { replace: true });
   }
 
   return (
