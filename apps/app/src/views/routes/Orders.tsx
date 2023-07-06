@@ -133,20 +133,6 @@ const renderRow = (order: Order) => {
   let statusColor = 'gray';
   let statusTip = '';
   let statusIcon;
-  // if (order.state === types.OrderState.Canceled) {
-  //   status = 'Canceled';
-  //   statusTip = 'Order canceled';
-  //   statusIcon = ORDER_STATE_ICON_MAP[order.state];
-  // } else if (order.state === types.OrderState.Routing) {
-  //   status = 'Routing';
-  //   statusTip = 'Order waiting on patient pharmacy selection';
-  //   statusIcon = ORDER_STATE_ICON_MAP[order.state];
-  // } else if (order.fulfillment?.state) {
-  //   const key = order.fulfillment.state as OrderFulfillmentState;
-  //   status = ORDER_FULFILLMENT_STATE_MAP[key] || key;
-  //   statusTip = ORDER_FULFILLMENT_TIP_MAP[key] || status;
-  //   statusColor = ORDER_FULFILLMENT_COLOR_MAP[key] || statusColor;
-  // }
 
   if (order.fulfillment?.state) {
     const key = order.fulfillment.state as OrderFulfillmentState;
@@ -167,9 +153,6 @@ const renderRow = (order: Order) => {
     fills: <Text fontWeight="medium">{fills}</Text>,
     status: (
       <Tooltip label={statusTip}>
-        {/* <Badge size="sm" colorScheme={statusColor}>
-          {status}
-        </Badge> */}
         <Tag size="sm" borderRadius="full" colorScheme={statusColor}>
           {statusIcon ? <TagLeftIcon boxSize="12px" as={statusIcon} /> : null}
           <TagLabel>{status}</TagLabel>
