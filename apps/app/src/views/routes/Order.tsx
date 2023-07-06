@@ -10,6 +10,7 @@ import {
   Button,
   Card,
   CardBody,
+  CardHeader,
   Divider,
   HStack,
   IconButton,
@@ -223,6 +224,12 @@ export const Order = () => {
   return (
     <Page header="Order" buttons={buttons}>
       <Card>
+        <CardHeader>
+          <Text fontWeight="medium">
+            {loading ? <Skeleton height="30px" width="250px" /> : formatFills(order.fills)}
+          </Text>
+        </CardHeader>
+        <Divider color="gray.100" />
         <CardBody>
           <VStack
             spacing={4}
@@ -231,12 +238,6 @@ export const Order = () => {
             w="100%"
             mt={0}
           >
-            <Text fontWeight="medium">
-              {loading ? <Skeleton height="30px" width="250px" /> : formatFills(order.fills)}
-            </Text>
-
-            <Divider />
-
             <Stack direction="row" gap={3} w="full">
               <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
                 <Text color="gray.500" fontWeight="medium" fontSize="sm">

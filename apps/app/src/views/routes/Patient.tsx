@@ -10,6 +10,7 @@ import {
   Button,
   Card,
   CardBody,
+  CardHeader,
   Divider,
   HStack,
   IconButton,
@@ -178,14 +179,14 @@ export const Patient = () => {
   return (
     <Page header="Patient" buttons={buttons}>
       <Card>
+        <CardHeader>
+          <Text fontWeight="medium">
+            {loading ? <Skeleton height="30px" width="250px" /> : patient?.name.full}
+          </Text>
+        </CardHeader>
+        <Divider color="gray.100" />
         <CardBody>
           <VStack spacing={4} align="justify-start">
-            <Text fontWeight="medium">
-              {loading ? <Skeleton height="30px" width="250px" /> : patient?.name.full}
-            </Text>
-
-            <Divider />
-
             <HStack w="full" justify="space-between">
               <Text color="gray.500" fontWeight="medium" fontSize="sm">
                 Information

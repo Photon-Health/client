@@ -8,6 +8,7 @@ import {
   Button,
   Card,
   CardBody,
+  CardHeader,
   Divider,
   IconButton,
   Stack,
@@ -197,6 +198,12 @@ export const Prescription = () => {
   return (
     <Page header="Prescription" buttons={buttons}>
       <Card>
+        <CardHeader>
+          <Text fontWeight="medium">
+            {loading ? <Skeleton height="30px" width="250px" /> : prescription?.treatment.name}
+          </Text>
+        </CardHeader>
+        <Divider color="gray.100" />
         <CardBody>
           <VStack
             spacing={4}
@@ -205,12 +212,6 @@ export const Prescription = () => {
             w="100%"
             mt={0}
           >
-            <Text fontWeight="medium">
-              {loading ? <Skeleton height="30px" width="250px" /> : prescription?.treatment.name}
-            </Text>
-
-            <Divider />
-
             <Stack direction="row" gap={3} w="full">
               <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
                 <Text color="gray.500" fontWeight="medium" fontSize="sm">
