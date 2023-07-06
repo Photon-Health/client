@@ -3,7 +3,7 @@ import { OrganizationSettings } from '../types';
 const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
 const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
 const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
-// const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
+const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 
 /**
  * All orgs inherit from default settings, so updates
@@ -49,8 +49,10 @@ export const neutron: {
   // NewCo (demo's)
   org_YiUudCToTSrjOuow: {
     ...defaultSettings,
-    logo: 'newco_logo.png',
-    accentColor: '#69348F'
+    logo: 'newco_logo.svg',
+    accentColor: '#69348F',
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
   },
   // Demo (demo's)
   org_TY5GFYPIRo3xQGYM: {
