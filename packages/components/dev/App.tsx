@@ -1,4 +1,4 @@
-import { For, createMemo, createSignal } from 'solid-js';
+import { For, createMemo, createSignal, createEffect } from 'solid-js';
 import PharmacySearch from '../src/systems/PharmacySearch';
 import DoseCalculator from '../src/systems/DoseCalculator';
 import Client from '../src/systems/Client';
@@ -6,11 +6,16 @@ import Button from '../src/particles/Button';
 import Icon from '../src/particles/Icon';
 import { randomNames } from '../src/sampleData/randomNames';
 import ComboBox from '../src/particles/ComboBox';
+import PharmacySelect from '../src/systems/PharmacySelect';
+import Card from '../src/particles/Card';
 
 const App = () => {
   const [setPharmacy] = createSignal<any>();
   const [doseOpen, setDoseOpen] = createSignal(false);
   const [query, setQuery] = createSignal('');
+  const [patientIds, setPatientIds] = createSignal<string[]>([]);
+  const [timedAddress, setTimedAddress] = createSignal<string>('');
+
   const rando = randomNames.slice(0, 3);
   const filteredPeople = createMemo(() => {
     return query() === ''
@@ -18,6 +23,13 @@ const App = () => {
       : rando.filter((person) => {
           return person.name.toLowerCase().includes(query().toLowerCase());
         });
+  });
+
+  createEffect(() => {
+    setTimeout(() => {
+      setPatientIds(['pat_01H28NXFX27PSADPYPR5JHTCD7']);
+      setTimedAddress('Bellville, Texas');
+    }, 2000);
   });
 
   return (
@@ -57,6 +69,10 @@ const App = () => {
           <div>
             <h2>Pharmacy Search</h2>
             <PharmacySearch setPharmacy={setPharmacy} />
+            <h2>Pharmacy Search Initialized with Address</h2>
+            <PharmacySearch setPharmacy={setPharmacy} address="11221" />
+            <h2>Pharmacy Search set with Address after 2 seconds</h2>
+            <PharmacySearch setPharmacy={setPharmacy} address={timedAddress()} />
           </div>
         </div>
 
@@ -76,6 +92,32 @@ const App = () => {
             />
           </div>
         </div>
+
+        <h2>Pharmacy Select</h2>
+        <Card>
+          <PharmacySelect
+            patientIds={patientIds()}
+            enableLocalPickup
+            enableSendToPatient
+            setFufillmentType={(t) => console.log('fulfillmentType: ', t)}
+            setPharmacyId={(p) => console.log('pharmacyId: ', p)}
+          />
+        </Card>
+        <h4 class="mt-8">With Mail Order</h4>
+        <Card>
+          <PharmacySelect
+            patientIds={['pat_01GQ0XFBHSH3YXN936A2D2SD7Y']}
+            enableLocalPickup
+            enableSendToPatient
+            mailOrderPharmacyIds={[
+              'phr_01GA9HPVBVJ0E65P819FD881N0',
+              'phr_01GCA54GVKA06C905DETQ9SY98'
+            ]}
+            address="11221"
+            setPharmacyId={(p) => console.log('pharmacyId! ', p)}
+            setFufillmentType={(t) => console.log('fulfillmentType! ', t)}
+          />
+        </Card>
       </Client>
     </div>
   );

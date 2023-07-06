@@ -18,7 +18,7 @@ import { useInputGroup } from '../InputGroup';
 
 interface ComboBoxState {
   open: boolean;
-  selected: any;
+  selected: any; // TODO should update this to a generic T
   active: string;
   typing: boolean;
 }
@@ -35,18 +35,10 @@ type ComboBoxContextValue = [ComboBoxState, ComboBoxActions];
 export const ComboBoxContext = createContext<ComboBoxContextValue>([
   { open: false, selected: {}, active: '', typing: false },
   {
-    setOpen: () => {
-      // Init method, do nothing.
-    },
-    setSelected: () => {
-      // Init method, do nothing.
-    },
-    setActive: () => {
-      // Init method, do nothing.
-    },
-    setTyping: () => {
-      // Init method, do nothing.
-    }
+    setOpen: () => undefined,
+    setSelected: () => undefined,
+    setActive: () => undefined,
+    setTyping: () => undefined
   }
 ]);
 
@@ -84,17 +76,39 @@ export function useComboBox() {
 
 function ComboOptions(props: { children?: JSX.Element }) {
   const [state] = useContext(ComboBoxContext);
+  let ref: HTMLDivElement;
 
+  const calculateDropdownPosition = createMemo(() => {
+    // this defaults to the dropdown being below the input, but if it's near
+    // the bottom of the viewport it will go above
+    if (state.open && ref?.getBoundingClientRect) {
+      const rect = ref.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      return spaceBelow > spaceAbove ? 'bottom' : 'top';
+    }
+    return 'bottom';
+  });
+
+  const classes = createMemo(() => {
+    return clsx(
+      'absolute z-10 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm',
+      {
+        'bottom-full mb-1': calculateDropdownPosition() === 'top',
+        'top-full mt-1': calculateDropdownPosition() === 'bottom'
+      }
+    );
+  });
+
+  // ref! => https://github.com/solidjs/solid/issues/116#issuecomment-1487981714
   return (
-    <Show when={state.open}>
-      <ul
-        class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
-        role="listbox"
-        tabindex="-1"
-      >
-        {props.children}
-      </ul>
-    </Show>
+    <div ref={ref!}>
+      <Show when={state.open}>
+        <ul class={classes()} role="listbox" tabindex="-1">
+          {props.children}
+        </ul>
+      </Show>
+    </div>
   );
 }
 
@@ -128,7 +142,7 @@ function ComboOption(props: ComboOptionProps) {
       <span class="block truncate">{props.children}</span>
       <Show when={state.selected?.id === props.key}>
         <span class="absolute inset-y-0 right-0 flex items-center pr-4">
-          <Icon name="check" class={iconClass()} />
+          <Icon name="checkCircle" class={iconClass()} />
         </span>
       </Show>
     </li>
