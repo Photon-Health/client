@@ -30,6 +30,7 @@ import PatientView from '../components/PatientView';
 import PharmacyNameView from '../components/PharmacyNameView';
 import { formatDate, formatFills } from '../../utils';
 import { ORDER_STATE_MAP, ORDER_STATE_ICON_MAP } from './Order';
+import { Order } from 'packages/sdk/dist/types';
 
 type OrderFulfillmentState =
   | 'SENT'
@@ -93,7 +94,7 @@ const Actions = (props: ActionsProps) => {
   );
 };
 
-const renderRow = (order: any) => {
+const renderRow = (order: Order) => {
   const { id, pharmacy, patient } = order;
   const extId = order.externalId || <Text as="i">None</Text>;
 
@@ -119,7 +120,7 @@ const renderRow = (order: any) => {
           <PharmacyNameView
             name={pharmacy.name}
             phone={pharmacy.phone}
-            address={pharmacy.address}
+            address={order?.pharmacy?.address}
           />
         </PopoverBody>
       </PopoverContent>
@@ -153,7 +154,7 @@ const renderRow = (order: any) => {
     statusTip = ORDER_FULFILLMENT_TIP_MAP[key] || status;
     statusColor = ORDER_FULFILLMENT_COLOR_MAP[key] || statusColor;
   } else {
-    const key = order.state as OrderState;
+    const key = order.state as types.OrderState;
     status = ORDER_STATE_MAP[key];
     statusTip = 'Order waiting on patient pharmacy selection';
     statusIcon = ORDER_STATE_ICON_MAP[key];

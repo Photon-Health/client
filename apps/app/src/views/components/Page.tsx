@@ -16,6 +16,8 @@ export const Page = (props: PageProps) => {
   const { loading, kicker, subheader, header, buttons, children, disableScroll } = props;
   return (
     <Container py="8" flex="1" height={disableScroll ? window.innerHeight - 64 : '100%'}>
+      {/* <Card> */}
+      {/* <CardBody> */}
       <Stack spacing={{ base: kicker ? '3' : '8', lg: kicker ? '3' : '6' }}>
         <Stack
           spacing="4"
@@ -36,6 +38,8 @@ export const Page = (props: PageProps) => {
         </Stack>
         {children}
       </Stack>
+      {/* </CardBody> */}
+      {/* </Card> */}
     </Container>
   );
 };
