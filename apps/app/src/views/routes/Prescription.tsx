@@ -6,6 +6,8 @@ import {
   AlertIcon,
   Badge,
   Button,
+  Card,
+  CardBody,
   Divider,
   IconButton,
   Stack,
@@ -26,7 +28,9 @@ import {
   useColorMode,
   useToast,
   AlertTitle,
-  AlertDescription
+  AlertDescription,
+  Wrap,
+  WrapItem
 } from '@chakra-ui/react';
 import { FiCopy } from 'react-icons/fi';
 import { gql, GraphQLClient } from 'graphql-request';
@@ -133,305 +137,366 @@ export const Prescription = () => {
     );
   }
 
-  return (
-    <Page kicker="Prescription" header={prescription?.treatment.name} loading={loading}>
-      <VStack spacing={4} fontSize={{ base: 'md', md: 'lg' }} alignItems="start" w="100%" mt={0}>
-        <HStack>
-          {loading ? (
-            <Skeleton width="111px" height="32px" borderRadius="md" />
-          ) : (
-            <Button
-              size="sm"
-              aria-label="New Order"
-              as={RouterLink}
-              to={`/orders/new?patientId=${patient.id}&prescriptionId=${id}`}
-            >
-              Create Order
-            </Button>
-          )}
-          {loading ? (
-            <Skeleton width="156px" height="32px" borderRadius="md" />
-          ) : (
-            <Button
-              size="sm"
-              aria-label="Cancel Prescription"
-              isDisabled={rx.state !== 'ACTIVE'}
-              onClick={async () => {
-                const decision = await confirmWrapper('Cancel this prescription?', {
-                  description: 'You will not be able to undo this action.',
-                  cancelText: "No, Don't Cancel",
-                  confirmText: 'Yes, Cancel',
-                  darkMode: colorMode !== 'light',
-                  colorScheme: 'red'
-                });
-                if (decision) {
-                  graphQLClient.setHeader('authorization', accessToken);
-                  const res = await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
-                  if (res) {
-                    toast({
-                      title: 'Prescription canceled',
-                      status: 'success',
-                      duration: 5000
-                    });
-                  }
+  const buttons =
+    loading && !patient ? (
+      <Wrap>
+        <WrapItem>
+          <Skeleton width="111px" height="42px" borderRadius="md" />
+        </WrapItem>
+        <WrapItem>
+          <Skeleton width="156px" height="42px" borderRadius="md" />
+        </WrapItem>
+      </Wrap>
+    ) : (
+      <Wrap>
+        <WrapItem>
+          <Button
+            aria-label="Cancel Prescription"
+            isDisabled={rx.state !== 'ACTIVE'}
+            onClick={async () => {
+              const decision = await confirmWrapper('Cancel this prescription?', {
+                description: 'You will not be able to undo this action.',
+                cancelText: "No, Don't Cancel",
+                confirmText: 'Yes, Cancel',
+                darkMode: colorMode !== 'light',
+                colorScheme: 'red'
+              });
+              if (decision) {
+                graphQLClient.setHeader('authorization', accessToken);
+                const res = await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
+                if (res) {
+                  toast({
+                    title: 'Prescription canceled',
+                    status: 'success',
+                    duration: 5000
+                  });
                 }
-              }}
-            >
-              Cancel Prescription
-            </Button>
-          )}
-        </HStack>
+              }
+            }}
+            variant="outline"
+            borderColor="blue.500"
+            textColor="blue.500"
+            colorScheme="blue"
+          >
+            Cancel Prescription
+          </Button>
+        </WrapItem>
+        <WrapItem>
+          <Button
+            aria-label="New Order"
+            as={RouterLink}
+            to={`/orders/new?patientId=${patient.id}&prescriptionId=${id}`}
+            colorScheme="blue"
+          >
+            Create Order
+          </Button>
+        </WrapItem>
+      </Wrap>
+    );
 
-        <Divider />
+  return (
+    <Page header="Prescription" buttons={buttons}>
+      <Card>
+        <CardBody>
+          <VStack
+            spacing={4}
+            fontSize={{ base: 'md', md: 'lg' }}
+            alignItems="start"
+            w="100%"
+            mt={0}
+          >
+            <Text fontWeight="medium">
+              {loading ? <Skeleton height="30px" width="250px" /> : prescription?.treatment.name}
+            </Text>
 
-        <Stack direction="row" gap={3} w="full">
-          <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
+            <Divider />
+
+            <Stack direction="row" gap={3} w="full">
+              <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
+                <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                  Patient
+                </Text>
+                {loading ? (
+                  <HStack alignContent="center" w="150px" display="flex">
+                    <SkeletonCircle size="10" />
+                    <SkeletonText noOfLines={1} flexGrow={1} />
+                  </HStack>
+                ) : (
+                  <PatientView patient={patient} />
+                )}
+              </VStack>
+
+              <Divider orientation="vertical" height="auto" />
+
+              <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
+                <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                  Prescriber
+                </Text>
+                {loading ? (
+                  <HStack alignContent="center" w="150px" display="flex">
+                    <SkeletonCircle size="10" />
+                    <SkeletonText noOfLines={1} flexGrow={1} />
+                  </HStack>
+                ) : (
+                  <NameView name={prescriber?.name?.full} />
+                )}
+              </VStack>
+            </Stack>
+
+            <Divider />
+
             <Text color="gray.500" fontWeight="medium" fontSize="sm">
-              Patient
+              Instructions
             </Text>
-            {loading ? (
-              <HStack alignContent="center" w="150px" display="flex">
-                <SkeletonCircle size="10" />
-                <SkeletonText noOfLines={1} flexGrow={1} />
-              </HStack>
-            ) : (
-              <PatientView patient={patient} />
-            )}
-          </VStack>
+            <HStack>
+              {loading ? (
+                <SkeletonText noOfLines={1} width="200px" pt={2} />
+              ) : (
+                <Text fontSize="md">{instructions}</Text>
+              )}
+            </HStack>
 
-          <Divider orientation="vertical" height="auto" />
+            <Divider />
 
-          <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
             <Text color="gray.500" fontWeight="medium" fontSize="sm">
-              Prescriber
+              Prescription Details
             </Text>
-            {loading ? (
-              <HStack alignContent="center" w="150px" display="flex">
-                <SkeletonCircle size="10" />
-                <SkeletonText noOfLines={1} flexGrow={1} />
-              </HStack>
-            ) : (
-              <NameView name={prescriber?.name?.full} />
-            )}
+
+            <TableContainer w={tableWidth}>
+              <Table bg="transparent">
+                <Tbody>
+                  <Tr>
+                    <Td ps={0} py={2} border="none">
+                      <Text fontSize="md">Status</Text>
+                    </Td>
+                    <Td pe={0} py={2} isNumeric={isMobile} border="none">
+                      {loading ? (
+                        <Skeleton
+                          width="70px"
+                          height="24px"
+                          borderRadius="xl"
+                          ms={isMobile ? 'auto' : undefined}
+                        />
+                      ) : (
+                        <Tooltip label={stateTip}>
+                          <Badge colorScheme={stateColor}>{state}</Badge>
+                        </Tooltip>
+                      )}
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td ps={0} py={2} border="none">
+                      <Text fontSize="md">Quantity</Text>
+                    </Td>
+                    <Td pe={0} py={2} isNumeric={isMobile} border="none">
+                      {loading ? (
+                        <SkeletonText
+                          noOfLines={1}
+                          width="100px"
+                          ms={isMobile ? 'auto' : undefined}
+                        />
+                      ) : (
+                        <Text fontSize="md">
+                          {dispenseQuantity} ct / {daysSupply} day
+                        </Text>
+                      )}
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td ps={0} py={2} border="none">
+                      <Text fontSize="md">Fills Remaining</Text>
+                    </Td>
+                    <Td pe={0} py={2} isNumeric={isMobile} border="none">
+                      {loading ? (
+                        <SkeletonText
+                          noOfLines={1}
+                          width="30px"
+                          ms={isMobile ? 'auto' : undefined}
+                        />
+                      ) : (
+                        <Text fontSize="md">{fillsRemaining}</Text>
+                      )}
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td ps={0} py={2} border="none">
+                      <Text fontSize="md">Fills Allowed</Text>
+                    </Td>
+                    <Td pe={0} py={2} isNumeric={isMobile} border="none">
+                      {loading ? (
+                        <SkeletonText
+                          noOfLines={1}
+                          width="30px"
+                          ms={isMobile ? 'auto' : undefined}
+                        />
+                      ) : (
+                        <Text fontSize="md">{fillsAllowed}</Text>
+                      )}
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td ps={0} py={2} border="none">
+                      <Text fontSize="md">Effective Date</Text>
+                    </Td>
+                    <Td pe={0} py={2} isNumeric={isMobile} border="none">
+                      {loading ? (
+                        <SkeletonText
+                          noOfLines={1}
+                          width="100px"
+                          ms={isMobile ? 'auto' : undefined}
+                        />
+                      ) : (
+                        <Text fontSize="md">{effectiveDate}</Text>
+                      )}
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td ps={0} py={2} border="none">
+                      <Text fontSize="md">Expiration</Text>
+                    </Td>
+                    <Td pe={0} py={2} isNumeric={isMobile} border="none">
+                      {loading ? (
+                        <SkeletonText
+                          noOfLines={1}
+                          width="100px"
+                          ms={isMobile ? 'auto' : undefined}
+                        />
+                      ) : (
+                        <Text fontSize="md">{expirationDate}</Text>
+                      )}
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td ps={0} py={2} border="none">
+                      <Text fontSize="md">Written</Text>
+                    </Td>
+                    <Td pe={0} py={2} isNumeric={isMobile} border="none">
+                      {loading ? (
+                        <SkeletonText
+                          noOfLines={1}
+                          width="100px"
+                          ms={isMobile ? 'auto' : undefined}
+                        />
+                      ) : (
+                        <Text fontSize="md">{writtenAt}</Text>
+                      )}
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td ps={0} py={2} border="none">
+                      <Text fontSize="md">Dispense As Written</Text>
+                    </Td>
+                    <Td pe={0} py={2} isNumeric={isMobile} border="none">
+                      {loading ? (
+                        <SkeletonText
+                          noOfLines={1}
+                          width="50px"
+                          ms={isMobile ? 'auto' : undefined}
+                        />
+                      ) : (
+                        <Text fontSize="md">{dispenseAsWritten ? 'Yes' : 'No'}</Text>
+                      )}
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td px={0} py={2} border="none">
+                      <Text fontSize="md">Id</Text>
+                    </Td>
+                    <Td pe={0} py={2} isNumeric={isMobile} border="none">
+                      {loading ? (
+                        <SkeletonText
+                          noOfLines={1}
+                          width="150px"
+                          ms={isMobile ? 'auto' : undefined}
+                        />
+                      ) : (
+                        <HStack spacing={2} justifyContent={isMobile ? 'end' : 'start'}>
+                          <Text
+                            fontSize="md"
+                            whiteSpace={isMobile ? 'nowrap' : undefined}
+                            overflow={isMobile ? 'hidden' : undefined}
+                            textOverflow={isMobile ? 'ellipsis' : undefined}
+                            maxWidth={isMobile ? '130px' : undefined}
+                          >
+                            {id}
+                          </Text>
+                          <IconButton
+                            variant="ghost"
+                            color="gray.500"
+                            aria-label="Copy external id"
+                            minW="fit-content"
+                            py={0}
+                            _hover={{ backgroundColor: 'transparent' }}
+                            icon={<FiCopy size="1.3em" />}
+                            onClick={() => navigator.clipboard.writeText(id || '')}
+                          />
+                        </HStack>
+                      )}
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td ps={0} py={2} border="none">
+                      <Text fontSize="md">External ID</Text>
+                    </Td>
+                    <Td pe={0} py={2} isNumeric={isMobile} border="none">
+                      {loading ? (
+                        <SkeletonText
+                          noOfLines={1}
+                          width="65px"
+                          ms={isMobile ? 'auto' : undefined}
+                        />
+                      ) : rx.externalId ? (
+                        <HStack spacing={2} justifyContent={isMobile ? 'end' : 'start'}>
+                          <Text
+                            fontSize="md"
+                            whiteSpace={isMobile ? 'nowrap' : undefined}
+                            overflow={isMobile ? 'hidden' : undefined}
+                            textOverflow={isMobile ? 'ellipsis' : undefined}
+                            maxWidth={isMobile ? '130px' : undefined}
+                          >
+                            {rx.externalId}
+                          </Text>
+                          <IconButton
+                            variant="ghost"
+                            color="gray.500"
+                            aria-label="Copy external id"
+                            minW="fit-content"
+                            py={0}
+                            _hover={{ backgroundColor: 'transparent' }}
+                            icon={<FiCopy size="1.3em" />}
+                            onClick={() => navigator.clipboard.writeText(rx.externalId || '')}
+                          />
+                        </HStack>
+                      ) : (
+                        <Text fontSize="md" as="i">
+                          None
+                        </Text>
+                      )}
+                    </Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            </TableContainer>
+
+            <Divider />
+
+            <Text color="gray.500" fontWeight="medium" fontSize="sm">
+              Notes
+            </Text>
+            <HStack>
+              {loading ? (
+                <SkeletonText noOfLines={1} width="200px" pt={2} />
+              ) : rx.notes ? (
+                <Text fontSize="md">{rx.notes}</Text>
+              ) : (
+                <Text fontSize="md" as="i">
+                  None
+                </Text>
+              )}
+            </HStack>
           </VStack>
-        </Stack>
-
-        <Divider />
-
-        <Text color="gray.500" fontWeight="medium" fontSize="sm">
-          Instructions
-        </Text>
-        <HStack>
-          {loading ? (
-            <SkeletonText noOfLines={1} width="200px" pt={2} />
-          ) : (
-            <Text fontSize="md">{instructions}</Text>
-          )}
-        </HStack>
-
-        <Divider />
-
-        <Text color="gray.500" fontWeight="medium" fontSize="sm">
-          Prescription Details
-        </Text>
-
-        <TableContainer w={tableWidth}>
-          <Table bg="transparent">
-            <Tbody>
-              <Tr>
-                <Td ps={0} py={2} border="none">
-                  <Text fontSize="md">Status</Text>
-                </Td>
-                <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                  {loading ? (
-                    <Skeleton
-                      width="70px"
-                      height="24px"
-                      borderRadius="xl"
-                      ms={isMobile ? 'auto' : undefined}
-                    />
-                  ) : (
-                    <Tooltip label={stateTip}>
-                      <Badge colorScheme={stateColor}>{state}</Badge>
-                    </Tooltip>
-                  )}
-                </Td>
-              </Tr>
-              <Tr>
-                <Td ps={0} py={2} border="none">
-                  <Text fontSize="md">Quantity</Text>
-                </Td>
-                <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                  {loading ? (
-                    <SkeletonText noOfLines={1} width="100px" ms={isMobile ? 'auto' : undefined} />
-                  ) : (
-                    <Text fontSize="md">
-                      {dispenseQuantity} ct / {daysSupply} day
-                    </Text>
-                  )}
-                </Td>
-              </Tr>
-              <Tr>
-                <Td ps={0} py={2} border="none">
-                  <Text fontSize="md">Fills Remaining</Text>
-                </Td>
-                <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                  {loading ? (
-                    <SkeletonText noOfLines={1} width="30px" ms={isMobile ? 'auto' : undefined} />
-                  ) : (
-                    <Text fontSize="md">{fillsRemaining}</Text>
-                  )}
-                </Td>
-              </Tr>
-              <Tr>
-                <Td ps={0} py={2} border="none">
-                  <Text fontSize="md">Fills Allowed</Text>
-                </Td>
-                <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                  {loading ? (
-                    <SkeletonText noOfLines={1} width="30px" ms={isMobile ? 'auto' : undefined} />
-                  ) : (
-                    <Text fontSize="md">{fillsAllowed}</Text>
-                  )}
-                </Td>
-              </Tr>
-              <Tr>
-                <Td ps={0} py={2} border="none">
-                  <Text fontSize="md">Effective Date</Text>
-                </Td>
-                <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                  {loading ? (
-                    <SkeletonText noOfLines={1} width="100px" ms={isMobile ? 'auto' : undefined} />
-                  ) : (
-                    <Text fontSize="md">{effectiveDate}</Text>
-                  )}
-                </Td>
-              </Tr>
-              <Tr>
-                <Td ps={0} py={2} border="none">
-                  <Text fontSize="md">Expiration</Text>
-                </Td>
-                <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                  {loading ? (
-                    <SkeletonText noOfLines={1} width="100px" ms={isMobile ? 'auto' : undefined} />
-                  ) : (
-                    <Text fontSize="md">{expirationDate}</Text>
-                  )}
-                </Td>
-              </Tr>
-              <Tr>
-                <Td ps={0} py={2} border="none">
-                  <Text fontSize="md">Written</Text>
-                </Td>
-                <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                  {loading ? (
-                    <SkeletonText noOfLines={1} width="100px" ms={isMobile ? 'auto' : undefined} />
-                  ) : (
-                    <Text fontSize="md">{writtenAt}</Text>
-                  )}
-                </Td>
-              </Tr>
-              <Tr>
-                <Td ps={0} py={2} border="none">
-                  <Text fontSize="md">Dispense As Written</Text>
-                </Td>
-                <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                  {loading ? (
-                    <SkeletonText noOfLines={1} width="50px" ms={isMobile ? 'auto' : undefined} />
-                  ) : (
-                    <Text fontSize="md">{dispenseAsWritten ? 'Yes' : 'No'}</Text>
-                  )}
-                </Td>
-              </Tr>
-              <Tr>
-                <Td px={0} py={2} border="none">
-                  <Text fontSize="md">Id</Text>
-                </Td>
-                <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                  {loading ? (
-                    <SkeletonText noOfLines={1} width="150px" ms={isMobile ? 'auto' : undefined} />
-                  ) : (
-                    <HStack spacing={2} justifyContent={isMobile ? 'end' : 'start'}>
-                      <Text
-                        fontSize="md"
-                        whiteSpace={isMobile ? 'nowrap' : undefined}
-                        overflow={isMobile ? 'hidden' : undefined}
-                        textOverflow={isMobile ? 'ellipsis' : undefined}
-                        maxWidth={isMobile ? '130px' : undefined}
-                      >
-                        {id}
-                      </Text>
-                      <IconButton
-                        variant="ghost"
-                        color="gray.500"
-                        aria-label="Copy external id"
-                        minW="fit-content"
-                        py={0}
-                        _hover={{ backgroundColor: 'transparent' }}
-                        icon={<FiCopy size="1.3em" />}
-                        onClick={() => navigator.clipboard.writeText(id || '')}
-                      />
-                    </HStack>
-                  )}
-                </Td>
-              </Tr>
-              <Tr>
-                <Td ps={0} py={2} border="none">
-                  <Text fontSize="md">External ID</Text>
-                </Td>
-                <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                  {loading ? (
-                    <SkeletonText noOfLines={1} width="65px" ms={isMobile ? 'auto' : undefined} />
-                  ) : rx.externalId ? (
-                    <HStack spacing={2} justifyContent={isMobile ? 'end' : 'start'}>
-                      <Text
-                        fontSize="md"
-                        whiteSpace={isMobile ? 'nowrap' : undefined}
-                        overflow={isMobile ? 'hidden' : undefined}
-                        textOverflow={isMobile ? 'ellipsis' : undefined}
-                        maxWidth={isMobile ? '130px' : undefined}
-                      >
-                        {rx.externalId}
-                      </Text>
-                      <IconButton
-                        variant="ghost"
-                        color="gray.500"
-                        aria-label="Copy external id"
-                        minW="fit-content"
-                        py={0}
-                        _hover={{ backgroundColor: 'transparent' }}
-                        icon={<FiCopy size="1.3em" />}
-                        onClick={() => navigator.clipboard.writeText(rx.externalId || '')}
-                      />
-                    </HStack>
-                  ) : (
-                    <Text fontSize="md" as="i">
-                      None
-                    </Text>
-                  )}
-                </Td>
-              </Tr>
-            </Tbody>
-          </Table>
-        </TableContainer>
-
-        <Divider />
-
-        <Text color="gray.500" fontWeight="medium" fontSize="sm">
-          Notes
-        </Text>
-        <HStack>
-          {loading ? (
-            <SkeletonText noOfLines={1} width="200px" pt={2} />
-          ) : rx.notes ? (
-            <Text fontSize="md">{rx.notes}</Text>
-          ) : (
-            <Text fontSize="md" as="i">
-              None
-            </Text>
-          )}
-        </HStack>
-      </VStack>
+        </CardBody>
+      </Card>
     </Page>
   );
 };
