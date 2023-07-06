@@ -70,14 +70,14 @@ const ORDER_FULFILLMENT_TYPE_MAP = {
   [types.FulfillmentType.MailOrder]: 'Mail order'
 };
 
-const ORDER_STATE_MAP: object = {
+export const ORDER_STATE_MAP: any = {
   PLACED: 'Placed',
   ROUTING: 'Routing',
   PENDING: 'Pending',
   CANCELED: 'Canceled',
   COMPLETED: 'Completed'
 };
-const ORDER_STATE_ICON_MAP: any = {
+export const ORDER_STATE_ICON_MAP: any = {
   PLACED: FiArrowUpRight,
   ROUTING: FiCornerUpRight,
   PENDING: FiClock,
