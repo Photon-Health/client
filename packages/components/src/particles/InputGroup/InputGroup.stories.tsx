@@ -4,6 +4,7 @@ import InputGroup, { InputGroupProps } from '.';
 import ComboBox from '../ComboBox';
 import Input from '../Input';
 import { randomNames } from '../../sampleData/randomNames';
+import Badge from '../Badge';
 
 type InputGroupStory = StoryObj<InputGroupProps>;
 
@@ -48,7 +49,14 @@ export const MultipleInputs: InputGroupStory = {
           <Input type="email" placeholder="you@example.com" />
         </InputGroup>
 
-        <InputGroup label="Disabled Input">
+        <InputGroup
+          label="Disabled Input"
+          contextText={
+            <Badge size="sm" color="yellow">
+              Disabled
+            </Badge>
+          }
+        >
           <Input placeholder="you@example.com" value="example@example.com" disabled />
         </InputGroup>
 

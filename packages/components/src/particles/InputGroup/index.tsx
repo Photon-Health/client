@@ -1,4 +1,12 @@
-import { JSX, Show, createUniqueId, createContext, useContext, createEffect } from 'solid-js';
+import {
+  JSX,
+  Show,
+  createUniqueId,
+  createContext,
+  useContext,
+  createEffect,
+  createMemo
+} from 'solid-js';
 import { createStore } from 'solid-js/store';
 
 interface InputGroupState {
@@ -70,7 +78,7 @@ export function useInputGroup() {
 export interface InputGroupProps {
   label: string;
   error?: string;
-  contextText?: string;
+  contextText?: string | JSX.Element;
   helpText?: string | JSX.Element;
   children?: JSX.Element;
   loading?: boolean;
@@ -97,16 +105,21 @@ function InputGroupWrapper(props: InputGroupProps) {
     setDisabled(props.disabled || false);
   });
 
+  const isContextTextString = createMemo(() => typeof props?.contextText === 'string');
+
   return (
     <div>
-      <div class="flex justify-between">
+      <div class="flex justify-between items-center">
         <label class="block text-sm font-medium leading-6 text-gray-900 mb-1" for={state.id}>
           {props.label}
         </label>
         <Show when={!!props.contextText}>
-          <span class="text-sm leading-6 text-gray-500" id="email-optional">
-            {props.contextText}
-          </span>
+          <Show when={isContextTextString}>
+            <span class="text-xs leading-6 text-gray-500" id="email-optional">
+              {props.contextText}
+            </span>
+          </Show>
+          <Show when={!isContextTextString}>{props.contextText}</Show>
         </Show>
       </div>
 
