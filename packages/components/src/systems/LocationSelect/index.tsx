@@ -7,15 +7,7 @@ import Input from '../../particles/Input';
 import Spinner from '../../particles/Spinner';
 import getNavigatorLocation from '../../utils/getNavigatorLocation';
 import loadGoogleScript from '../../utils/loadGoogleScript';
-
-export interface Coordinates {
-  latitude: number;
-  longitude: number;
-}
-
-export interface Location extends Coordinates {
-  address: string;
-}
+import getLocation, { Location } from '../../utils/getLocation';
 
 interface LocationSelectProps {
   open: boolean;
@@ -38,26 +30,12 @@ export default function LocationSelect(props: LocationSelectProps) {
     });
   });
 
-  const getLocation = async (addressOrLocation: string | Coordinates): Promise<Location> => {
-    const data = await geocoder!.geocode({
-      ...(typeof addressOrLocation === 'string'
-        ? { address: addressOrLocation }
-        : { location: { lat: addressOrLocation.latitude, lng: addressOrLocation.longitude } })
-    });
-
-    const latitude = data.results[0].geometry.location.lat();
-    const longitude = data.results[0].geometry.location.lng();
-    const formattedAddress = data.results[0].formatted_address;
-
-    return { latitude, longitude, address: formattedAddress };
-  };
-
   const handleAddressSubmit = async (e: Event) => {
     // get location with address
     e.preventDefault();
     setLoadingSearch(true);
     setNavigatorError(false);
-    const location = await getLocation(address());
+    const location = await getLocation(address(), geocoder!);
     props.setLocation(location);
     setLoadingSearch(false);
     props.setOpen(false);
@@ -71,7 +49,7 @@ export default function LocationSelect(props: LocationSelectProps) {
       const {
         coords: { latitude, longitude }
       } = await getNavigatorLocation({ timeout: 5000 });
-      const location = await getLocation({ latitude, longitude });
+      const location = await getLocation({ latitude, longitude }, geocoder!);
       props.setLocation(location);
       props.setOpen(false);
     } catch {
