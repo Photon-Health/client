@@ -22,7 +22,7 @@ import {
 import { FiInfo } from 'react-icons/fi';
 import { useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
-import { usePhoton } from '@photonhealth/react';
+import { usePhoton, types } from '@photonhealth/react';
 
 import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
