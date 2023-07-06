@@ -120,7 +120,7 @@ const renderRow = (order: Order) => {
           <PharmacyNameView
             name={pharmacy.name}
             phone={pharmacy.phone}
-            address={order?.pharmacy?.address}
+            address={pharmacy?.address}
           />
         </PopoverBody>
       </PopoverContent>
