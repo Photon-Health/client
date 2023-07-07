@@ -4,6 +4,7 @@ const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
 const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
 const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
 const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
+const HONEYBEE_PHARMACY_ID = 'phr_01GA9HPXNE3TGEWPK91YY8Z4TS';
 
 /**
  * All orgs inherit from default settings, so updates
@@ -115,6 +116,14 @@ export const neutron: {
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
+    sendToPatient: false
+  },
+  // Emily's Test environment (us)
+  org_KPfcKzFtfzD3ISxW: {
+    ...defaultSettings,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [HONEYBEE_PHARMACY_ID],
     sendToPatient: false
   }
 };
