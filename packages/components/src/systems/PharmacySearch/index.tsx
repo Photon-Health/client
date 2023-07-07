@@ -1,4 +1,4 @@
-import { For, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
+import { For, Show, createEffect, createMemo, createSignal, onMount, onCleanup } from 'solid-js';
 import { gql } from '@apollo/client';
 import { Pharmacy } from '@photonhealth/sdk/dist/types';
 import InputGroup from '../../particles/InputGroup';
@@ -13,6 +13,7 @@ import { usePhotonClient } from '../SDKProvider';
 import getLocation, { Location } from '../../utils/getLocation';
 import loadGoogleScript from '../../utils/loadGoogleScript';
 import Badge from '../../particles/Badge';
+import Checkbox from '../../particles/Checkbox';
 
 const GetPharmaciesQuery = gql`
   query GetPharmacies($location: LatLongSearch!) {
@@ -59,6 +60,7 @@ export interface PharmacyProps {
   patientId?: string;
   geocodingApiKey?: string;
   setPharmacy: (pharmacy: types.Pharmacy) => void;
+  setPreferred?: (shouldSetPreferred: boolean) => void;
 }
 
 interface PharmacyExtended extends Pharmacy {
@@ -283,6 +285,14 @@ export default function PharmacySearch(props: PharmacyProps) {
             </ComboBox.Options>
           </ComboBox>
         </InputGroup>
+        <Show when={!fetching() && !selected()?.preferred}>
+          <Checkbox
+            id="set-preferred-pharmacy"
+            mainText="Set as preferred pharmacy"
+            checked
+            onChange={(isChecked) => props?.setPreferred?.(isChecked)}
+          />
+        </Show>
       </Show>
     </div>
   );

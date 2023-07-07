@@ -122,11 +122,12 @@ export default function PharmacySelect(props: PharmacySelectProps) {
 
         {tab() === 'Local Pickup' && (
           <PharmacySearch
+            address={props?.address || ''}
+            patientId={props?.patientIds?.[0]}
             setPharmacy={(pharmacy) => {
               props.setPharmacyId(pharmacy.id);
             }}
-            address={props?.address || ''}
-            patientId={props?.patientIds?.[0]}
+            setPreferred={(shouldSetPreferred) => console.log(shouldSetPreferred)}
           />
         )}
 
