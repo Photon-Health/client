@@ -9,6 +9,7 @@ import { Auth } from '../../components/Auth';
 import { TemplateTab } from './views/TemplateTab';
 import { TreatmentTab } from './views/TreatmentTab';
 import { UserTab } from './views/UserTab';
+import TypeformTab from './views/TypeformTab';
 
 const buttons = (
   <HStack>
@@ -36,6 +37,9 @@ export const Settings = () => {
       case '/settings/catalog':
         setTabIndex(2);
         break;
+      case '/settings/newprovider':
+        setTabIndex(3);
+        break;
       default:
         navigate('/settings/user');
         break;
@@ -54,6 +58,9 @@ export const Settings = () => {
       case 2:
         navigate('/settings/catalog');
         break;
+      case 3:
+        navigate('/settings/newprovider');
+        break;
       default:
         break;
     }
@@ -66,6 +73,7 @@ export const Settings = () => {
           <Tab>User</Tab>
           <Tab>Templates</Tab>
           <Tab>Catalog</Tab>
+          <Tab>Add New Provider</Tab>
         </TabList>
         <TabPanels>
           <TabPanel display="flex" flexDir="column" gap="4" px={0}>
@@ -77,6 +85,9 @@ export const Settings = () => {
           </TabPanel>
           <TabPanel display="flex" flexDir="column" gap="4">
             <TreatmentTab organization={organization} />
+          </TabPanel>
+          <TabPanel display="flex" flexDir="column" gap="4">
+            <TypeformTab />
           </TabPanel>
         </TabPanels>
       </Tabs>

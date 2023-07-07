@@ -67,6 +67,7 @@ export const App = () => {
               <Route path="user" />
               <Route path="templates" />
               <Route path="catalog" />
+              <Route path="newprovider" />
             </Route>
           </Route>
           <Route path="/login" element={<Login />} />
