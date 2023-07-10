@@ -1,7 +1,6 @@
 import { Link as RouterLink, useSearchParams } from 'react-router-dom';
 
 import {
-  Badge,
   HStack,
   IconButton,
   Popover,
@@ -12,6 +11,9 @@ import {
   PopoverTrigger,
   SkeletonCircle,
   SkeletonText,
+  Tag,
+  TagLeftIcon,
+  TagLabel,
   Text,
   Tooltip,
   useBreakpointValue
@@ -27,6 +29,8 @@ import { TablePage } from '../components/TablePage';
 import PatientView from '../components/PatientView';
 import PharmacyNameView from '../components/PharmacyNameView';
 import { formatDate, formatFills } from '../../utils';
+import { ORDER_STATE_MAP, ORDER_STATE_ICON_MAP } from './Order';
+import { Order } from 'packages/sdk/dist/types';
 
 type OrderFulfillmentState =
   | 'SENT'
@@ -90,7 +94,7 @@ const Actions = (props: ActionsProps) => {
   );
 };
 
-const renderRow = (order: any) => {
+const renderRow = (order: Order) => {
   const { id, pharmacy, patient } = order;
   const extId = order.externalId || <Text as="i">None</Text>;
 
@@ -116,26 +120,30 @@ const renderRow = (order: any) => {
           <PharmacyNameView
             name={pharmacy.name}
             phone={pharmacy.phone}
-            address={pharmacy.address}
+            address={pharmacy?.address}
           />
         </PopoverBody>
       </PopoverContent>
     </Popover>
   ) : (
-    <Text as="i">Pending</Text>
+    <Text as="i">Pending selection</Text>
   );
 
-  let status,
-    statusColor = 'gray',
-    statusTip;
-  if (order.state === types.OrderState.Canceled) {
-    status = 'Canceled';
-    statusTip = 'Order canceled';
-  } else if (order.fulfillment?.state) {
+  let status = '';
+  let statusColor = 'gray';
+  let statusTip = '';
+  let statusIcon;
+
+  if (order.fulfillment?.state) {
     const key = order.fulfillment.state as OrderFulfillmentState;
-    status = ORDER_FULFILLMENT_STATE_MAP[key] || key;
+    status = ORDER_FULFILLMENT_STATE_MAP[key];
     statusTip = ORDER_FULFILLMENT_TIP_MAP[key] || status;
     statusColor = ORDER_FULFILLMENT_COLOR_MAP[key] || statusColor;
+  } else {
+    const key = order.state as types.OrderState;
+    status = ORDER_STATE_MAP[key];
+    statusTip = 'Order waiting on patient pharmacy selection';
+    statusIcon = ORDER_STATE_ICON_MAP[key];
   }
 
   return {
@@ -143,14 +151,13 @@ const renderRow = (order: any) => {
     externalId: extId,
     createdAt: formatDate(order.createdAt),
     fills: <Text fontWeight="medium">{fills}</Text>,
-    status: order.fulfillment?.state ? (
+    status: (
       <Tooltip label={statusTip}>
-        <Badge size="sm" colorScheme={statusColor}>
-          {status}
-        </Badge>
+        <Tag size="sm" borderRadius="full" colorScheme={statusColor}>
+          {statusIcon ? <TagLeftIcon boxSize="12px" as={statusIcon} /> : null}
+          <TagLabel>{status}</TagLabel>
+        </Tag>
       </Tooltip>
-    ) : (
-      <Text as="i">None</Text>
     ),
     patient: <PatientView patient={patient} />,
     pharmacy: pharmacyView,
