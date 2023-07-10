@@ -36,6 +36,7 @@ import {
 import { gql, GraphQLClient } from 'graphql-request';
 import { usePhoton, types } from '@photonhealth/react';
 import {
+  FiAlertTriangle,
   FiArrowUpRight,
   FiCheck,
   FiClock,
@@ -44,22 +45,17 @@ import {
   FiX,
   FiChevronRight
 } from 'react-icons/fi';
-
 import { Page } from '../components/Page';
 import PatientView from '../components/PatientView';
 import { confirmWrapper } from '../components/GuardDialog';
-
 import { formatAddress, formatDate, formatFills, formatPhone } from '../../utils';
-
 import { ORDER_FULFILLMENT_COLOR_MAP, ORDER_FULFILLMENT_STATE_MAP } from './Orders';
-
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
     parse: JSON.parse,
     stringify: JSON.stringify
   }
 });
-
 export const CANCEL_ORDER = gql`
   mutation cancel($id: ID!) {
     cancelOrder(id: $id) {
@@ -67,27 +63,27 @@ export const CANCEL_ORDER = gql`
     }
   }
 `;
-
 const ORDER_FULFILLMENT_TYPE_MAP = {
   [types.FulfillmentType.PickUp]: 'Pick up',
   [types.FulfillmentType.MailOrder]: 'Mail order'
 };
 
-const ORDER_STATE_MAP: object = {
+export const ORDER_STATE_MAP: { [key in types.OrderState]: string } = {
   PLACED: 'Placed',
   ROUTING: 'Routing',
   PENDING: 'Pending',
   CANCELED: 'Canceled',
-  COMPLETED: 'Completed'
+  COMPLETED: 'Completed',
+  ERROR: 'Error'
 };
-const ORDER_STATE_ICON_MAP: any = {
+export const ORDER_STATE_ICON_MAP: any = {
   PLACED: FiArrowUpRight,
   ROUTING: FiCornerUpRight,
   PENDING: FiClock,
   CANCELED: FiX,
-  COMPLETED: FiCheck
+  COMPLETED: FiCheck,
+  ERROR: FiAlertTriangle
 };
-
 const FILL_STATE_MAP: object = {
   CANCELED: 'Canceled',
   NEW: 'New',
@@ -100,17 +96,14 @@ const FILL_COLOR_MAP: object = {
   SCHEDULED: 'orange',
   SENT: 'yellow'
 };
-
 export const Order = () => {
   const toast = useToast();
   const params = useParams();
   const id = params.orderId;
   const navigate = useNavigate();
-
   const { getOrder, getToken } = usePhoton();
   const { order, loading, error } = getOrder({ id: id! });
   const [accessToken, setAccessToken] = useState('');
-
   const getAccessToken = async () => {
     try {
       const token = await getToken();
@@ -119,17 +112,14 @@ export const Order = () => {
       console.error(e);
     }
   };
-
   useEffect(() => {
     if (!accessToken) {
       getAccessToken();
     }
   }, [accessToken]);
-
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const rightColWidth = '75%';
   const { colorMode } = useColorMode();
-
   const CopyText = ({ text }: { text: string }) => {
     if (!text) return null;
     return (
@@ -158,7 +148,6 @@ export const Order = () => {
       </HStack>
     );
   };
-
   if (error || (!loading && !order)) {
     return (
       <Alert
