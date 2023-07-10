@@ -1,18 +1,12 @@
 import { Avatar, Box, HStack, Link, Text } from '@chakra-ui/react';
+import { Address } from 'packages/sdk/dist/types';
 
 import { formatPhone, formatAddress } from '../../utils';
 
 interface PharmacyNameViewProps {
   name: string;
   phone?: string;
-  address?: {
-    city: string;
-    country: string;
-    postalCode: string;
-    state: string;
-    street1: string;
-    street2: string;
-  };
+  address?: Address | null | undefined;
 }
 
 const PharmacyNameView = (props: PharmacyNameViewProps) => {
