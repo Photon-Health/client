@@ -78,8 +78,6 @@ jobs:
           else
               for PACKAGE in $PACKAGES
               do
-                  echo "Building $PACKAGE for S3..."
-
                   PACKAGE_NAME=$(basename $PACKAGE)
 
                   if [[ "$PACKAGE_NAME" == "elements" ]]
