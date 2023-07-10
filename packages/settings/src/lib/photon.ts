@@ -121,5 +121,13 @@ export const photon: {
     ...defaultSettings,
     logo: 'piction_health_logo.png',
     accentColor: '#3377e2'
+  },
+  // Xyon Health
+  org_Y0EPcd3p5eqG4iZs: {
+    ...defaultSettings,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_ID],
+    sendToPatient: false
   }
 };
