@@ -102,6 +102,9 @@ export default function PharmacySelect(props: PharmacySelectProps) {
                   if (props.setPatientId) {
                     props.setPatientId(patientId);
                   }
+                  if (props.setPharmacyId) {
+                    props.setPharmacyId(undefined);
+                  }
                 }}
               >
                 <For each={props?.patientIds || []}>
@@ -130,6 +133,7 @@ export default function PharmacySelect(props: PharmacySelectProps) {
         {tab() === 'Mail Order' && (
           <RadioGroup
             label="Pharmacies"
+            initSelected={props?.mailOrderPharmacyIds?.[0]}
             setSelected={(pharmacyId) => props.setPharmacyId(pharmacyId)}
           >
             <For each={props?.mailOrderPharmacyIds || []}>
