@@ -85,7 +85,7 @@ jobs:
                       echo "Package updates found for Elements"
                       cd $PACKAGE && npm run build:prod
                       
-                      PACKAGE_VERSION=$(node -p "require('./$PACKAGE/package.json').version")
+                      PACKAGE_VERSION=$(node -p "require('./package.json').version")
                       PREFIX="elements/v${PACKAGE_VERSION}"
                       PREFIX_LATEST="elements/@latest"
                       AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
