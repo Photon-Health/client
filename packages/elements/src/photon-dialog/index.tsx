@@ -12,7 +12,8 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import styles from './style.css?inline';
 import { Show } from 'solid-js';
-// import styles from "./style.css?inline";
+
+type Proceed = 'photon-dialog-confirmed' | 'photon-dialog-alt' | 'photon-dialog-canceled';
 
 customElement(
   'photon-dialog',
@@ -44,15 +45,12 @@ customElement(
   }) => {
     let ref: any;
 
-    const dispatchDecision = (proceed: boolean) => {
-      const event = new CustomEvent(
-        proceed ? 'photon-dialog-confirmed' : 'photon-dialog-canceled',
-        {
-          composed: true,
-          bubbles: true,
-          detail: {}
-        }
-      );
+    const dispatchDecision = (proceed: Proceed) => {
+      const event = new CustomEvent(proceed, {
+        composed: true,
+        bubbles: true,
+        detail: {}
+      });
       ref?.dispatchEvent(event);
     };
 
@@ -79,7 +77,7 @@ customElement(
             } else if (e.detail.source === 'keyboard') {
               e.preventDefault();
             } else {
-              dispatchDecision(false);
+              dispatchDecision('photon-dialog-canceled');
             }
           }}
         >
@@ -102,7 +100,7 @@ customElement(
               variant="outline"
               disabled={props.disableButtons || props.loading}
               on:photon-clicked={() => {
-                dispatchDecision(false);
+                dispatchDecision('photon-dialog-alt');
               }}
             >
               {props.cancelText}
@@ -111,7 +109,7 @@ customElement(
               disabled={props.disableButtons || props.disableSubmit}
               loading={props.loading}
               on:photon-clicked={() => {
-                dispatchDecision(true);
+                dispatchDecision('photon-dialog-confirmed');
               }}
             >
               {props.confirmText}

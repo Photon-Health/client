@@ -2,7 +2,7 @@ import { OrganizationSettings } from '../types';
 
 // const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
 const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
-// const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
+const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
 
 /**
  * All orgs inherit from default settings, so updates
@@ -77,7 +77,7 @@ export const photon: {
     logo: 'river_health_logo.svg',
     accentColor: '#2faef3',
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID]
+    mailOrderProviders: [CAREPOINT_ID]
   },
   // Peachy
   org_vTC7G2EAuHgac90E: {
@@ -121,5 +121,13 @@ export const photon: {
     ...defaultSettings,
     logo: 'piction_health_logo.png',
     accentColor: '#3377e2'
+  },
+  // Xyon Health
+  org_Y0EPcd3p5eqG4iZs: {
+    ...defaultSettings,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_ID],
+    sendToPatient: false
   }
 };

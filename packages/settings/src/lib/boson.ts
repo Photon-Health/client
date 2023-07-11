@@ -47,8 +47,8 @@ export const boson: {
   // NewCo (demo's)
   org_w85CgjUjCi52yvOz: {
     ...defaultSettings,
-    logo: 'newco_logo.png',
-    accentColor: '#69348F',
+    logo: 'newco_logo.svg',
+    accentColor: '#506ef5',
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
   }

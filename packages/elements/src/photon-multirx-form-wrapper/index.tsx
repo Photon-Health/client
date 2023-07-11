@@ -164,6 +164,12 @@ customElement(
       }
     };
 
+    const handleUnsavedConfirm = () => {
+      setContinueSubmitOpen(false);
+      submitForm(form(), actions(), true);
+    };
+    const handleUnsavedCancel = () => setContinueSubmitOpen(false);
+
     return (
       <div ref={ref}>
         <photon-dialog
@@ -171,13 +177,9 @@ customElement(
           open={continueSubmitOpen()}
           confirm-text="Yes, Continue"
           cancel-text="Keep Editing"
-          on:photon-dialog-confirmed={() => {
-            setContinueSubmitOpen(false);
-            submitForm(form(), actions(), true);
-          }}
-          on:photon-dialog-canceled={() => {
-            setContinueSubmitOpen(false);
-          }}
+          on:photon-dialog-confirmed={handleUnsavedConfirm}
+          on:photon-dialog-canceled={handleUnsavedCancel}
+          on:photon-dialog-alt={handleUnsavedCancel}
           width="500px"
         >
           <p class="font-sans text-lg xs:text-base">
@@ -196,6 +198,9 @@ customElement(
             submitForm(form(), actions(), true);
           }}
           on:photon-dialog-canceled={() => {
+            setContinueSaveOnly(false);
+          }}
+          on:photon-dialog-alt={() => {
             setContinueSaveOnly(false);
             submitForm(form(), actions(), false);
           }}

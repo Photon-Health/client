@@ -21,6 +21,8 @@ import { getSettings } from '@client/settings';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
+const PHOTON_PHONE_NUMBER = '+15138663212';
+
 interface NavProps {
   header: string;
   showRefresh: boolean;
@@ -91,7 +93,7 @@ export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
             />
             <MenuList>
               <MenuItem>
-                <Link href="mailto:support@photon.health" style={{ textDecoration: 'none' }}>
+                <Link href={`sms:${PHOTON_PHONE_NUMBER}`} style={{ textDecoration: 'none' }}>
                   {t.contactSupport}
                 </Link>
               </MenuItem>
