@@ -219,24 +219,26 @@ export default function PharmacySearch(props: PharmacyProps) {
       </Show>
       <Show when={pharmacies() || fetchingPharmacies()}>
         <InputGroup
-          label="Select a pharmacy"
-          helpText={
-            <Button
-              variant="naked"
-              onClick={() => setOpenLocationSearch(true)}
-              iconLeft={<Icon name="mapPin" size="sm" />}
-            >
-              {location()?.address || '...'}{' '}
-            </Button>
+          label={
+            <div class="flex items-center">
+              <label class="mr-2">Showing near:</label>
+              <Button
+                variant="naked"
+                onClick={() => setOpenLocationSearch(true)}
+                iconLeft={<Icon name="mapPin" size="sm" />}
+              >
+                {location()?.address || 'Set a location'}{' '}
+              </Button>
+            </div>
           }
-          contextText={
+          helpText={
             <div class="flex gap-x-1">
               <Show when={selected()?.preferred}>
                 <Badge size="sm" color="blue">
                   Preferred
                 </Badge>
               </Show>
-              <Show when={previousId() === selected()?.id}>
+              <Show when={previousId() === selected()?.id && !selected()?.preferred}>
                 <Badge size="sm" color="green">
                   Previous
                 </Badge>
@@ -267,7 +269,7 @@ export default function PharmacySearch(props: PharmacyProps) {
                               Preferred
                             </Badge>
                           </Show>
-                          <Show when={previousId() === pharmacy.id}>
+                          <Show when={previousId() === pharmacy.id && !pharmacy.preferred}>
                             <Badge size="sm" color="green">
                               Previous
                             </Badge>
