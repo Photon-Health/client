@@ -1,4 +1,4 @@
-import { For, Show, createEffect, createMemo, createSignal, onMount, onCleanup } from 'solid-js';
+import { For, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
 import { gql } from '@apollo/client';
 import { Pharmacy } from '@photonhealth/sdk/dist/types';
 import InputGroup from '../../particles/InputGroup';
