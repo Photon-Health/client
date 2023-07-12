@@ -24,8 +24,8 @@ export const PharmacyCard = (props: { pharmacyId: string | undefined }) => {
         </div>
 
         <Show when={pharmacy()}>
-          <RadioGroup label="Pharmacies" initSelected={props?.pharmacyId}>
-            <RadioGroup.Option value={props?.pharmacyId}>
+          <RadioGroup label="Pharmacies" initSelected={props?.pharmacyId || ''}>
+            <RadioGroup.Option value={props?.pharmacyId || ''}>
               <div class="flex flex-col items-start">
                 <Text loading={!pharmacy()} sampleLoadingText="Loading Name">
                   {pharmacy()?.name}
