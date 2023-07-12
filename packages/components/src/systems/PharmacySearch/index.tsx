@@ -104,7 +104,6 @@ export default function PharmacySearch(props: PharmacyProps) {
       query: GetLastOrder,
       variables: { id: patientId }
     });
-
     if (preferredData?.patient?.preferredPharmacies?.length > 0) {
       setPreferredPharmacies(
         preferredData?.patient?.preferredPharmacies.map((ph: Pharmacy) => ({
@@ -114,7 +113,7 @@ export default function PharmacySearch(props: PharmacyProps) {
       );
     }
     if (previousData?.orders?.length > 0) {
-      setPreviousId(previousData?.orders?.[0].pharmacy.id);
+      setPreviousId(previousData?.orders?.[0]?.pharmacy?.id);
     }
     setFetchingPreferred(false);
   }

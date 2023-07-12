@@ -322,7 +322,11 @@ customElement(
           const { __typename, name, ...filteredPatientAddress } = patientAddress;
           const address = { street2: '', country: 'US', ...filteredPatientAddress };
 
-          if (store['updatePreferredPharmacy']?.value) {
+          if (
+            store['updatePreferredPharmacy']?.value &&
+            store['pharmacy']?.value &&
+            store['fulfillmentType']?.value === 'PICK_UP'
+          ) {
             const patient = store['patient']?.value;
             if (patient?.preferredPharmacies && patient?.preferredPharmacies?.length > 0) {
               // remove the current preferred pharmacy
@@ -330,7 +334,8 @@ customElement(
                 variables: {
                   patientId: patient.id,
                   pharmacyId: patient?.preferredPharmacies?.[0]?.id
-                }
+                },
+                awaitRefetchQueries: false
               });
             }
             // add the new preferred pharmacy to the patient
@@ -338,7 +343,8 @@ customElement(
               variables: {
                 id: patient.id,
                 preferredPharmacies: [store['pharmacy']?.value]
-              }
+              },
+              awaitRefetchQueries: false
             });
           }
 
