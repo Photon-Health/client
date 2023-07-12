@@ -74,7 +74,8 @@ export default function PharmacySearch(props: PharmacyProps) {
   const [location, setLocation] = createSignal<Location | null>(null);
   const [pharmacies, setPharmacies] = createSignal<PharmacyExtended[] | null>(null);
   const [preferredPharmacies, setPreferredPharmacies] = createSignal<PharmacyExtended[]>([]);
-  const [fetching, setFetching] = createSignal(false);
+  const [fetchingPharmacies, setFetchingPharmacies] = createSignal(true);
+  const [fetchingPreferred, setFetchingPreferred] = createSignal(true);
   const [openLocationSearch, setOpenLocationSearch] = createSignal(false);
   const [geocoder, setGeocoder] = createSignal<google.maps.Geocoder | undefined>();
   const [previousId, setPreviousId] = createSignal<string | null>(null);
@@ -90,10 +91,11 @@ export default function PharmacySearch(props: PharmacyProps) {
     if (data?.pharmacies?.length > 0) {
       setPharmacies(data.pharmacies.map((ph: Pharmacy) => ({ ...ph, preferred: false })));
     }
-    setFetching(false);
+    setFetchingPharmacies(false);
   }
 
   async function fetchPreferredAndPrevious(patientId: string) {
+    setFetchingPreferred(true);
     const { data: preferredData } = await client!.apollo.query({
       query: GetPreferredPharmaciesQuery,
       variables: { id: patientId }
@@ -114,7 +116,7 @@ export default function PharmacySearch(props: PharmacyProps) {
     if (previousData?.orders?.length > 0) {
       setPreviousId(previousData?.orders?.[0].pharmacy.id);
     }
-    setFetching(false);
+    setFetchingPreferred(false);
   }
 
   const mergedPharmacies = createMemo(() => {
@@ -138,7 +140,7 @@ export default function PharmacySearch(props: PharmacyProps) {
     // If user selects a location, fetch pharmacies
     if (location()?.latitude && location()?.longitude) {
       setPharmacies(null);
-      setFetching(true);
+      setFetchingPharmacies(true);
       fetchPharmacies();
     }
   });
@@ -175,7 +177,7 @@ export default function PharmacySearch(props: PharmacyProps) {
 
   onMount(() => {
     if (props?.address) {
-      setFetching(true);
+      setFetchingPharmacies(true);
     }
 
     loadGoogleScript({
@@ -199,7 +201,7 @@ export default function PharmacySearch(props: PharmacyProps) {
   createEffect(() => {
     // if address is set later in lifecycle, fetch
     if (props?.address) {
-      setFetching(true);
+      setFetchingPharmacies(true);
       getAndSetLocation(props.address, geocoder()!);
     }
   });
@@ -211,12 +213,12 @@ export default function PharmacySearch(props: PharmacyProps) {
         open={openLocationSearch()}
         setOpen={setOpenLocationSearch}
       />
-      <Show when={!pharmacies() && !fetching()}>
+      <Show when={!pharmacies() && !fetchingPharmacies()}>
         <InputGroup label="Select a location">
           <Button onClick={() => setOpenLocationSearch(true)}>Set Search Location</Button>
         </InputGroup>
       </Show>
-      <Show when={pharmacies() || fetching()}>
+      <Show when={pharmacies() || fetchingPharmacies()}>
         <InputGroup
           label="Select a pharmacy"
           helpText={
@@ -242,7 +244,7 @@ export default function PharmacySearch(props: PharmacyProps) {
               </Show>
             </div>
           }
-          loading={fetching()}
+          loading={fetchingPharmacies()}
         >
           <ComboBox value={mergedPharmacies()?.[0] || undefined} setSelected={setSelected}>
             <ComboBox.Input
@@ -285,11 +287,15 @@ export default function PharmacySearch(props: PharmacyProps) {
             </ComboBox.Options>
           </ComboBox>
         </InputGroup>
-        <Show when={!fetching() && !selected()?.preferred}>
+        <Show
+          when={
+            !fetchingPharmacies() && !fetchingPreferred() && !!selected() && !selected()?.preferred
+          }
+        >
           <Checkbox
             id="set-preferred-pharmacy"
             mainText="Set as preferred pharmacy"
-            checked
+            checked={false}
             onChange={(isChecked) => props?.setPreferred?.(isChecked)}
           />
         </Show>

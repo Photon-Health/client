@@ -44,66 +44,6 @@ const App = () => {
         audience="https://api.boson.health"
         uri="https://api.boson.health/graphql"
       >
-        <div class="mb-10">
-          <div>
-            <h2>ComboBox</h2>
-            <ComboBox>
-              <ComboBox.Input
-                onInput={(e) => setQuery(e.currentTarget.value)}
-                displayValue={(person) => person.name}
-              />
-              <ComboBox.Options>
-                <For each={filteredPeople()}>
-                  {(person) => (
-                    <ComboBox.Option key={person.id} value={person}>
-                      {person.name}
-                    </ComboBox.Option>
-                  )}
-                </For>
-              </ComboBox.Options>
-            </ComboBox>
-          </div>
-        </div>
-
-        <div class="mb-10">
-          <div>
-            <h2>Pharmacy Search</h2>
-            <PharmacySearch setPharmacy={setPharmacy} />
-            <h2>Pharmacy Search Initialized with Address</h2>
-            <PharmacySearch setPharmacy={setPharmacy} address="11221" />
-            <h2>Pharmacy Search set with Address after 2 seconds</h2>
-            <PharmacySearch setPharmacy={setPharmacy} address={timedAddress()} />
-          </div>
-        </div>
-
-        <div class="mb-10">
-          <div>
-            <h2>Dose Calculator</h2>
-            <Button onClick={() => setDoseOpen(true)}>
-              <Icon name="calculator" size="sm" />
-            </Button>
-
-            <DoseCalculator
-              open={doseOpen()}
-              onClose={() => setDoseOpen(false)}
-              setAutocompleteValues={({ liquidDose, totalLiquid, unit }) => {
-                console.log(liquidDose, totalLiquid, unit);
-              }}
-            />
-          </div>
-        </div>
-
-        <h2>Pharmacy Select</h2>
-        <Card>
-          <PharmacySelect
-            patientIds={patientIds()}
-            enableLocalPickup
-            enableSendToPatient
-            setFufillmentType={(t) => console.log('fulfillmentType: ', t)}
-            setPharmacyId={(p) => console.log('pharmacyId: ', p)}
-          />
-        </Card>
-        <h4 class="mt-8">With Mail Order</h4>
         <Card>
           <PharmacySelect
             patientIds={['pat_01GQ0XFBHSH3YXN936A2D2SD7Y']}

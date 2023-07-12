@@ -26,6 +26,7 @@ interface PharmacySelectProps {
   setFufillmentType: (type: types.FulfillmentType | undefined) => void;
   setPharmacyId: (id: string | undefined) => void;
   setPatientId?: (id: string | undefined) => void;
+  setPreferredPharmacy?: (shouldSet: boolean) => void;
 }
 
 const fulfillmentOptions: FulfillmentOptions = [
@@ -127,7 +128,7 @@ export default function PharmacySelect(props: PharmacySelectProps) {
             setPharmacy={(pharmacy) => {
               props.setPharmacyId(pharmacy.id);
             }}
-            setPreferred={(shouldSetPreferred) => console.log(shouldSetPreferred)}
+            setPreferred={(shouldSetPreferred) => props?.setPreferredPharmacy?.(shouldSetPreferred)}
           />
         )}
 
