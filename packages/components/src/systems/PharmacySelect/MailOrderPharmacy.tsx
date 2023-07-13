@@ -46,7 +46,7 @@ export function MailOrderPharmacy(props: MailOrderPharmacyProps) {
       <Text loading={!pharmacy()} sampleLoadingText="Loading Name">
         {pharmacy()?.name}
       </Text>
-      <Text loading={!pharmacy()} color="gray" size="sm" sampleLoadingText="111 222 3333">
+      <Text loading={!pharmacy()} color="gray" size="sm" sampleLoadingText="Cityville, ST">
         <span>
           {pharmacy()?.address?.city}, {pharmacy()?.address?.state}
         </span>
