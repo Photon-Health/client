@@ -61,9 +61,40 @@ jobs:
                   PACKAGE_VERSION=$(node -p "require('./$PACKAGE/package.json').version")
                   PACKAGE_TAG="${PACKAGE_NAME}_v${PACKAGE_VERSION}"
                   PACKAGE_BODY="TODO FILL OUT RELEASE NOTES for $PACKAGE_NAME v$PACKAGE_VERSION"
+
                   git tag -a $PACKAGE_TAG -m "$PACKAGE_BODY"
                   git push origin $PACKAGE_TAG
               done
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Upload to S3
+        run: |
+          PACKAGES="${{ steps.check.outputs.packages }}"
+          if [ -z "$PACKAGES" ]
+          then
+              echo "No package updates found. Skipping S3 upload."
+          else
+              for PACKAGE in $PACKAGES
+              do
+                  PACKAGE_NAME=$(basename $PACKAGE)
+
+                  if [[ "$PACKAGE_NAME" == "elements" ]]
+                  then
+                      echo "Package updates found for Elements"
+                      cd $PACKAGE && npm run build:prod
+                      
+                      PACKAGE_VERSION=$(node -p "require('./package.json').version")
+                      PREFIX="elements/v${PACKAGE_VERSION}"
+                      PREFIX_LATEST="elements/@latest"
+                      AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
+                      AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+
+                      echo "Uploading Elements to S3..."
+                      npm run upload-s3
+
+                      cd -
+                  fi
+              done
+          fi
