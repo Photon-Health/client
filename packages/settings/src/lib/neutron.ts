@@ -125,5 +125,11 @@ export const neutron: {
     mailOrder: true,
     mailOrderProviders: [HONEYBEE_PHARMACY_ID],
     sendToPatient: false
+  },
+  // Blueberry Pediatrics
+  org_vISrdMELQC3MhOFb: {
+    ...defaultSettings,
+    logo: 'blueberry_logo.png',
+    accentColor: '#235AFF'
   }
 };
