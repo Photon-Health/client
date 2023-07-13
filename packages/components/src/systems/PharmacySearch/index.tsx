@@ -74,7 +74,7 @@ export default function PharmacySearch(props: PharmacyProps) {
   const [location, setLocation] = createSignal<Location | null>(null);
   const [pharmacies, setPharmacies] = createSignal<PharmacyExtended[] | null>(null);
   const [preferredPharmacies, setPreferredPharmacies] = createSignal<PharmacyExtended[]>([]);
-  const [fetchingPharmacies, setFetchingPharmacies] = createSignal(true);
+  const [fetchingPharmacies, setFetchingPharmacies] = createSignal(false);
   const [fetchingPreferred, setFetchingPreferred] = createSignal(true);
   const [openLocationSearch, setOpenLocationSearch] = createSignal(false);
   const [geocoder, setGeocoder] = createSignal<google.maps.Geocoder | undefined>();
@@ -212,94 +212,89 @@ export default function PharmacySearch(props: PharmacyProps) {
         open={openLocationSearch()}
         setOpen={setOpenLocationSearch}
       />
-      <Show when={!pharmacies() && !fetchingPharmacies()}>
-        <InputGroup label="Select a location">
-          <Button onClick={() => setOpenLocationSearch(true)}>Set Search Location</Button>
-        </InputGroup>
-      </Show>
-      <Show when={pharmacies() || fetchingPharmacies()}>
-        <InputGroup
-          label={
-            <div class="flex items-center">
-              <label class="mr-2">Showing near:</label>
-              <Button
-                variant="naked"
-                onClick={() => setOpenLocationSearch(true)}
-                iconLeft={<Icon name="mapPin" size="sm" />}
-              >
-                {location()?.address || 'Set a location'}{' '}
-              </Button>
-            </div>
-          }
-          helpText={
-            <div class="flex gap-x-1">
-              <Show when={selected()?.preferred}>
-                <Badge size="sm" color="blue">
-                  Preferred
-                </Badge>
-              </Show>
-              <Show when={previousId() === selected()?.id && !selected()?.preferred}>
-                <Badge size="sm" color="green">
-                  Previous
-                </Badge>
-              </Show>
-            </div>
-          }
-          loading={fetchingPharmacies()}
-        >
-          <ComboBox value={mergedPharmacies()?.[0] || undefined} setSelected={setSelected}>
-            <ComboBox.Input
-              onInput={(e) => setQuery(e.currentTarget.value)}
-              displayValue={(pharmacy) => {
-                return pharmacy?.name
-                  ? `${pharmacy.name}, ${capitalizeFirstLetter(pharmacy.address?.street1 || '')}`
-                  : '';
-              }}
-            />
-            <ComboBox.Options>
-              <Show when={(filteredPharmacies()?.length || 0) > 0}>
-                <For each={filteredPharmacies()}>
-                  {(pharmacy) => {
-                    return (
-                      <ComboBox.Option key={pharmacy.id} value={pharmacy}>
-                        <div class="flex gap-x-1 items-center">
-                          {pharmacy.name}{' '}
-                          <Show when={pharmacy.preferred}>
-                            <Badge size="sm" color="blue">
-                              Preferred
-                            </Badge>
-                          </Show>
-                          <Show when={previousId() === pharmacy.id && !pharmacy.preferred}>
-                            <Badge size="sm" color="green">
-                              Previous
-                            </Badge>
-                          </Show>
-                        </div>
 
-                        <div class="text-xs">{formattedAddress(pharmacy)}</div>
-                      </ComboBox.Option>
-                    );
-                  }}
-                </For>
-              </Show>
-              <Show when={filteredPharmacies()?.length === 0}>
-                <div class="p-4">No pharmacy matches that search</div>
-              </Show>
-            </ComboBox.Options>
-          </ComboBox>
-        </InputGroup>
-        <Show
-          when={
-            !fetchingPharmacies() && !fetchingPreferred() && !!selected() && !selected()?.preferred
-          }
-        >
-          <Checkbox
-            id="set-preferred-pharmacy"
-            mainText="Set as preferred pharmacy"
-            checked={false}
-            onChange={(isChecked) => props?.setPreferred?.(isChecked)}
+      <InputGroup
+        label={
+          <div class="flex items-center">
+            <label class="mr-1">Showing near:</label>
+            <Button
+              variant="naked"
+              class="text-left"
+              onClick={() => setOpenLocationSearch(true)}
+              iconLeft={<Icon name="mapPin" size="sm" />}
+            >
+              {location()?.address || 'Set a location'}{' '}
+            </Button>
+          </div>
+        }
+        helpText={
+          <div class="flex gap-x-1">
+            <Show when={selected()?.preferred}>
+              <Badge size="sm" color="blue">
+                Preferred
+              </Badge>
+            </Show>
+            <Show when={previousId() === selected()?.id && !selected()?.preferred}>
+              <Badge size="sm" color="green">
+                Previous
+              </Badge>
+            </Show>
+          </div>
+        }
+        loading={fetchingPharmacies()}
+      >
+        <ComboBox value={mergedPharmacies()?.[0] || undefined} setSelected={setSelected}>
+          <ComboBox.Input
+            onInput={(e) => setQuery(e.currentTarget.value)}
+            displayValue={(pharmacy) => {
+              return pharmacy?.name
+                ? `${pharmacy.name}, ${capitalizeFirstLetter(pharmacy.address?.street1 || '')}`
+                : '';
+            }}
           />
-        </Show>
+          <ComboBox.Options>
+            <Show when={(filteredPharmacies()?.length || 0) > 0}>
+              <For each={filteredPharmacies()}>
+                {(pharmacy) => {
+                  return (
+                    <ComboBox.Option key={pharmacy.id} value={pharmacy}>
+                      <div class="flex gap-x-1 items-center">
+                        {pharmacy.name}{' '}
+                        <Show when={pharmacy.preferred}>
+                          <Badge size="sm" color="blue">
+                            Preferred
+                          </Badge>
+                        </Show>
+                        <Show when={previousId() === pharmacy.id && !pharmacy.preferred}>
+                          <Badge size="sm" color="green">
+                            Previous
+                          </Badge>
+                        </Show>
+                      </div>
+
+                      <div class="text-xs">{formattedAddress(pharmacy)}</div>
+                    </ComboBox.Option>
+                  );
+                }}
+              </For>
+            </Show>
+            <Show when={filteredPharmacies()?.length === 0}>
+              <div class="p-4">No pharmacy matches that search</div>
+            </Show>
+          </ComboBox.Options>
+        </ComboBox>
+      </InputGroup>
+      <Show
+        when={
+          !fetchingPharmacies() && !fetchingPreferred() && !!selected() && !selected()?.preferred
+        }
+      >
+        <Checkbox
+          id="set-preferred-pharmacy"
+          mainText="Set as preferred pharmacy"
+          checked={false}
+          onChange={(isChecked) => props?.setPreferred?.(isChecked)}
+        />
       </Show>
     </div>
   );
