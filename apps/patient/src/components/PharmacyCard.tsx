@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import {
+  Button,
   Card,
   CardBody,
   Collapse,
@@ -11,7 +12,6 @@ import {
   VStack,
   useBreakpointValue,
   Divider,
-  Checkbox,
   CardFooter
 } from '@chakra-ui/react';
 import { FiRotateCcw, FiStar } from 'react-icons/fi';
@@ -99,6 +99,8 @@ const DistanceAddress = ({ distance, address }: DistanceAddressProps) => {
 
 interface PharmacyCardProps {
   pharmacy: Pharmacy;
+  preferred: boolean;
+  settingPreferred: boolean;
   selected: boolean;
   onSelect: Function;
   onSetPreferred: () => void;
@@ -106,6 +108,8 @@ interface PharmacyCardProps {
 
 export const PharmacyCard = memo(function PharmacyCard({
   pharmacy,
+  preferred,
+  settingPreferred,
   selected,
   onSelect,
   onSetPreferred
@@ -135,8 +139,14 @@ export const PharmacyCard = memo(function PharmacyCard({
             </Tag>
           ) : null}
           {pharmacy?.hours?.is24Hr ? (
-            <Tag size="sm" colorScheme="green">
+            <Tag size="sm" colorScheme="blue">
               <TagLabel>24 hr</TagLabel>
+            </Tag>
+          ) : null}
+          {preferred ? (
+            <Tag size="sm" colorScheme="yellow">
+              <TagLeftIcon boxSize="12px" as={FiStar} />
+              <TagLabel> Preferred</TagLabel>
             </Tag>
           ) : null}
           <Text fontSize="md">{pharmacy.name}</Text>
@@ -148,10 +158,20 @@ export const PharmacyCard = memo(function PharmacyCard({
           <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
         </VStack>
       </CardBody>
-      <Collapse in={selected} animateOpacity>
+      <Collapse in={selected && !preferred} animateOpacity>
         <Divider />
-        <CardFooter p={3}>
-          <Checkbox onChange={onSetPreferred}>Make this my preferred pharmacy</Checkbox>
+        <CardFooter p={2}>
+          <Button
+            mx="auto"
+            size="sm"
+            variant="ghost"
+            colorScheme="brand"
+            onClick={onSetPreferred}
+            isLoading={settingPreferred}
+            leftIcon={<FiStar />}
+          >
+            Make this my preferred pharmacy
+          </Button>
         </CardFooter>
       </Collapse>
     </Card>

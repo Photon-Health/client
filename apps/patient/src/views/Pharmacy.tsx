@@ -67,6 +67,8 @@ export const Pharmacy = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
 
+  const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
+  const [settingPreferred, setSettingPreferred] = useState<boolean>(false);
   const [pharmacyOptions, setPharmacyOptions] = useState([]);
 
   const [showFooter, setShowFooter] = useState<boolean>(false);
@@ -308,25 +310,52 @@ export const Pharmacy = () => {
   const setPreferredPharmacy = async (patientId: string, pharmacyId: string) => {
     if (!pharmacyId) return;
 
+    setSettingPreferred(true);
+
     graphQLClient.setHeader('x-photon-auth', token);
 
     try {
-      await graphQLClient.request(SET_PREFERRED_PHARMACY, {
-        patientId,
-        pharmacyId
-      });
+      const result: { setPreferredPharmacy: boolean } = await graphQLClient.request(
+        SET_PREFERRED_PHARMACY,
+        {
+          patientId,
+          pharmacyId
+        }
+      );
+
+      setTimeout(() => {
+        if (result?.setPreferredPharmacy) {
+          setSettingPreferred(false);
+          setPreferredPharmacyId(pharmacyId);
+
+          toast({
+            title: 'Set preferred pharmacy',
+            position: 'top',
+            status: 'success',
+            duration: 2000,
+            isClosable: true
+          });
+        } else {
+          setSettingPreferred(false);
+          toast({
+            title: 'Unable to set preferred pharmacy',
+            description: 'Please refresh and try again',
+            position: 'top',
+            status: 'error',
+            duration: 5000,
+            isClosable: true
+          });
+        }
+      }, 750);
     } catch (error) {
+      setSettingPreferred(false);
+
       console.error(JSON.stringify(error, undefined, 2));
       console.log(error);
 
-      toast({
-        title: 'Unable to set preferred pharmacy',
-        description: 'Please refresh and try again',
-        position: 'top',
-        status: 'error',
-        duration: 5000,
-        isClosable: true
-      });
+      if (error?.response?.errors) {
+        setError(error.response.errors[0].message);
+      }
     }
   };
 
@@ -420,6 +449,8 @@ export const Pharmacy = () => {
 
               <PickupOptions
                 pharmacies={pharmacyOptions}
+                preferredPharmacy={preferredPharmacyId}
+                settingPreferred={settingPreferred}
                 selectedId={selectedId}
                 handleSelect={handleSelect}
                 handleShowMore={handleShowMore}
