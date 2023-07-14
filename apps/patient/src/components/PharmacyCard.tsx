@@ -132,7 +132,7 @@ export const PharmacyCard = memo(function PharmacyCard({
               <TagLabel> Preferred</TagLabel>
             </Tag>
           ) : null}
-          {previous ? (
+          {previous && !preferred ? (
             <Tag size="sm" colorScheme="blue">
               <TagLeftIcon boxSize="12px" as={FiRotateCcw} />
               <TagLabel> Previous</TagLabel>
