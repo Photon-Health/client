@@ -66,7 +66,7 @@ export const Pharmacy = () => {
   const token = searchParams.get('token');
 
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
-  const [settingPreferred, setSettingPreferred] = useState<boolean>(false);
+  const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
   const [pharmacyOptions, setPharmacyOptions] = useState([]);
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<string>('');
@@ -303,7 +303,7 @@ export const Pharmacy = () => {
   const setPreferredPharmacy = async (patientId: string, pharmacyId: string) => {
     if (!pharmacyId) return;
 
-    setSettingPreferred(true);
+    setSavingPreferred(true);
 
     graphQLClient.setHeader('x-photon-auth', token);
 
@@ -318,7 +318,7 @@ export const Pharmacy = () => {
 
       setTimeout(() => {
         if (result?.setPreferredPharmacy) {
-          setSettingPreferred(false);
+          setSavingPreferred(false);
           setPreferredPharmacyId(pharmacyId);
 
           toast({
@@ -329,7 +329,7 @@ export const Pharmacy = () => {
             isClosable: true
           });
         } else {
-          setSettingPreferred(false);
+          setSavingPreferred(false);
           toast({
             title: 'Unable to set preferred pharmacy',
             description: 'Please refresh and try again',
@@ -341,7 +341,7 @@ export const Pharmacy = () => {
         }
       }, 750);
     } catch (error) {
-      setSettingPreferred(false);
+      setSavingPreferred(false);
 
       console.error(JSON.stringify(error, undefined, 2));
       console.log(error);
@@ -443,7 +443,7 @@ export const Pharmacy = () => {
               <PickupOptions
                 pharmacies={pharmacyOptions}
                 preferredPharmacy={preferredPharmacyId}
-                settingPreferred={settingPreferred}
+                savingPreferred={savingPreferred}
                 selectedId={selectedId}
                 handleSelect={handleSelect}
                 handleShowMore={handleShowMore}

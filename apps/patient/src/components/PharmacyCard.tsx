@@ -26,11 +26,6 @@ import { Pharmacy } from '../utils/models';
 
 dayjs.extend(customParseFormat);
 
-const INFO_COLOR_MAP = {
-  Previous: 'green',
-  Preferred: 'yellow'
-};
-
 interface RatingHoursProps {
   businessStatus: string;
   rating: string;
@@ -99,8 +94,9 @@ const DistanceAddress = ({ distance, address }: DistanceAddressProps) => {
 
 interface PharmacyCardProps {
   pharmacy: Pharmacy;
-  preferred: boolean;
-  settingPreferred: boolean;
+  preferred?: boolean;
+  previous?: boolean;
+  savingPreferred: boolean;
   selected: boolean;
   onSelect: Function;
   onSetPreferred: () => void;
@@ -109,7 +105,8 @@ interface PharmacyCardProps {
 export const PharmacyCard = memo(function PharmacyCard({
   pharmacy,
   preferred,
-  settingPreferred,
+  previous,
+  savingPreferred,
   selected,
   onSelect,
   onSetPreferred
@@ -129,24 +126,21 @@ export const PharmacyCard = memo(function PharmacyCard({
     >
       <CardBody p={3}>
         <VStack align="start" w="full" spacing={0}>
-          {pharmacy.info ? (
-            <Tag size="sm" colorScheme={INFO_COLOR_MAP[pharmacy.info]}>
-              <TagLeftIcon
-                boxSize="12px"
-                as={pharmacy.info === 'Previous' ? FiRotateCcw : FiStar}
-              />
-              <TagLabel> {pharmacy.info}</TagLabel>
-            </Tag>
-          ) : null}
-          {pharmacy?.hours?.is24Hr ? (
-            <Tag size="sm" colorScheme="blue">
-              <TagLabel>24 hr</TagLabel>
-            </Tag>
-          ) : null}
           {preferred ? (
             <Tag size="sm" colorScheme="yellow">
               <TagLeftIcon boxSize="12px" as={FiStar} />
               <TagLabel> Preferred</TagLabel>
+            </Tag>
+          ) : null}
+          {previous ? (
+            <Tag size="sm" colorScheme="blue">
+              <TagLeftIcon boxSize="12px" as={FiRotateCcw} />
+              <TagLabel> Previous</TagLabel>
+            </Tag>
+          ) : null}
+          {pharmacy?.hours?.is24Hr ? (
+            <Tag size="sm" colorScheme="green">
+              <TagLabel>24 hr</TagLabel>
             </Tag>
           ) : null}
           <Text fontSize="md">{pharmacy.name}</Text>
@@ -167,7 +161,7 @@ export const PharmacyCard = memo(function PharmacyCard({
             variant="ghost"
             colorScheme="brand"
             onClick={onSetPreferred}
-            isLoading={settingPreferred}
+            isLoading={savingPreferred}
             leftIcon={<FiStar />}
           >
             Make this my preferred pharmacy
