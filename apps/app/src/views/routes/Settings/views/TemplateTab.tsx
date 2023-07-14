@@ -34,15 +34,22 @@ const renderTemplateRow = (
   setShowModal: any
 ) => {
   const med = rx.treatment;
-
+  const templateName = rx.name ? (
+    <>
+      <Text as="b" fontSize="md">
+        {rx.name}:
+      </Text>{' '}
+      {med.name}
+    </>
+  ) : (
+    med.name
+  );
   return {
     template: (
       <>
-        <Text as="b" fontWeight={500}>
-          {med.name}
-        </Text>
+        <Text fontSize="md">{templateName}</Text>
         <Box ps={4}>
-          <Text fontSize="sm" textOverflow="ellipsis" overflow="hidden">
+          <Text fontSize="sm" textOverflow="ellipsis" overflow="hidden" color="gray.500">
             QTY: {rx.dispenseQuantity} {rx.dispenseUnit}&nbsp;|&nbsp;Days Supply:&nbsp;
             {rx.daysSupply}
             {/* We need a -1 here becuause we are intentionally displaying Refills, not fills in the template UI */}
