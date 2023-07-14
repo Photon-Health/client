@@ -3,16 +3,16 @@ import {
   Button,
   Card,
   CardBody,
+  CardFooter,
   Collapse,
+  Divider,
   HStack,
   Tag,
   TagLabel,
   TagLeftIcon,
   Text,
   VStack,
-  useBreakpointValue,
-  Divider,
-  CardFooter
+  useBreakpointValue
 } from '@chakra-ui/react';
 import { FiRotateCcw, FiStar } from 'react-icons/fi';
 import dayjs from 'dayjs';

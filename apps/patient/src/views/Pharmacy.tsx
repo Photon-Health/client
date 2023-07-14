@@ -14,10 +14,8 @@ import {
   useToast
 } from '@chakra-ui/react';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
-
 import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
-
 import { types } from '@photonhealth/sdk';
 import { formatAddress, getHours } from '../utils/general';
 import { GET_PHARMACIES } from '../utils/queries';
@@ -70,19 +68,14 @@ export const Pharmacy = () => {
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [settingPreferred, setSettingPreferred] = useState<boolean>(false);
   const [pharmacyOptions, setPharmacyOptions] = useState([]);
-
   const [showFooter, setShowFooter] = useState<boolean>(false);
-
   const [selectedId, setSelectedId] = useState<string>('');
   const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
-
   const [error, setError] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
-
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
-
   const [latitude, setLatitude] = useState<number | undefined>(undefined);
   const [longitude, setLongitude] = useState<number | undefined>(undefined);
   const [location, setLocation] = useState<string>(
