@@ -34,6 +34,7 @@ export const TEMPLATE_INITIAL_VALUES = {
     name: '',
     __typename: ''
   },
+  name: '',
   treatmentId: '',
   dispenseAsWritten: false,
   dispenseQuantity: 1,
