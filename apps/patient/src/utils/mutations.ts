@@ -11,3 +11,9 @@ export const SELECT_ORDER_PHARMACY = gql`
     selectOrderPharmacy(orderId: $orderId, pharmacyId: $pharmacyId, patientId: $patientId)
   }
 `;
+
+export const SET_PREFERRED_PHARMACY = gql`
+  mutation SetPreferredPharmacy($pharmacyId: String, $patientId: String) {
+    setPreferredPharmacy(pharmacyId: $pharmacyId, patientId: $patientId)
+  }
+`;
