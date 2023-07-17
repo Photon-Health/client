@@ -41,6 +41,12 @@ export const OrderCard = (props: {
             value: type || ''
           });
         }}
+        setPreferredPharmacy={(shouldSet = false) => {
+          props.actions.updateFormValue({
+            key: 'updatePreferredPharmacy',
+            value: shouldSet
+          });
+        }}
         setPharmacyId={(id: string | undefined) => {
           // TODO need to fix types coming from components, shouldn't have to do the above
           props.actions.updateFormValue({

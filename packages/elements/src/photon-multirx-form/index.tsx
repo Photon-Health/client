@@ -278,8 +278,13 @@ customElement(
           value: []
         });
         const orderMutation = client!.getSDK().clinical.order.createOrder({});
+        const removePatientPreferredPharmacyMutation = client!
+          .getSDK()
+          .clinical.patient.removePatientPreferredPharmacy({});
+        const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
         const rxMutation = client!.getSDK().clinical.prescription.createPrescriptions({});
         const prescriptions = [];
+
         for (const draft of store['draftPrescriptions']!.value) {
           const args = {
             daysSupply: draft.daysSupply,
@@ -316,6 +321,32 @@ customElement(
           const patientAddress = store?.address?.value ?? store?.patient?.value?.address ?? {};
           const { __typename, name, ...filteredPatientAddress } = patientAddress;
           const address = { street2: '', country: 'US', ...filteredPatientAddress };
+
+          if (
+            store['updatePreferredPharmacy']?.value &&
+            store['pharmacy']?.value &&
+            store['fulfillmentType']?.value === 'PICK_UP'
+          ) {
+            const patient = store['patient']?.value;
+            if (patient?.preferredPharmacies && patient?.preferredPharmacies?.length > 0) {
+              // remove the current preferred pharmacy
+              removePatientPreferredPharmacyMutation({
+                variables: {
+                  patientId: patient.id,
+                  pharmacyId: patient?.preferredPharmacies?.[0]?.id
+                },
+                awaitRefetchQueries: false
+              });
+            }
+            // add the new preferred pharmacy to the patient
+            updatePatientMutation({
+              variables: {
+                id: patient.id,
+                preferredPharmacies: [store['pharmacy']?.value]
+              },
+              awaitRefetchQueries: false
+            });
+          }
 
           const { data: data2, errors } = await orderMutation({
             variables: {

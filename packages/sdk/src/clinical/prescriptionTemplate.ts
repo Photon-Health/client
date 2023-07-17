@@ -49,7 +49,8 @@ export class PrescriptionTemplateQueryManager {
           $fillsAllowed: Int,
           $daysSupply: Int,
           $instructions: String,
-          $notes: String
+          $notes: String,
+          $name: String
         ) {
           createPrescriptionTemplate(
             catalogId: $catalogId
@@ -61,6 +62,7 @@ export class PrescriptionTemplateQueryManager {
             daysSupply: $daysSupply
             instructions: $instructions
             notes: $notes
+            name: $name
         ) {
             ...${fName}
         }
@@ -93,7 +95,8 @@ export class PrescriptionTemplateQueryManager {
           $fillsAllowed: Int,
           $daysSupply: Int,
           $instructions: String,
-          $notes: String
+          $notes: String,
+          $name: String
         ) {
           updatePrescriptionTemplate(
             catalogId: $catalogId
@@ -105,6 +108,7 @@ export class PrescriptionTemplateQueryManager {
             daysSupply: $daysSupply
             instructions: $instructions
             notes: $notes
+            name: $name
         ) {
             ...${fName}
         }

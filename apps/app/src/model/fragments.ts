@@ -7,6 +7,7 @@ export const CATALOG_TREATMENTS_FIELDS = gql`
       name
     }
     templates {
+      name
       id
       daysSupply
       dispenseAsWritten
