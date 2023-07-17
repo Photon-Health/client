@@ -202,6 +202,7 @@ export const TemplateForm = ({
 
                 <Input
                   type="text"
+                  maxLength={50}
                   value={values.name}
                   onChange={(val: ChangeEvent<HTMLInputElement>) =>
                     setFieldValue('name', val.target.value)
