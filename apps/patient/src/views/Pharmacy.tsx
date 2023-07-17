@@ -14,14 +14,16 @@ import {
   useToast
 } from '@chakra-ui/react';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
+
 import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
+
 import { types } from '@photonhealth/sdk';
 import { formatAddress, getHours } from '../utils/general';
 import { GET_PHARMACIES } from '../utils/queries';
 import { ExtendedFulfillmentType, Order } from '../utils/models';
 import t from '../utils/text.json';
-import { SELECT_ORDER_PHARMACY, SET_PREFERRED_PHARMACY } from '../utils/mutations';
+import { SELECT_ORDER_PHARMACY } from '../utils/mutations';
 import { graphQLClient } from '../configs/graphqlClient';
 import { FixedFooter } from '../components/FixedFooter';
 import { Nav } from '../components/Nav';
@@ -65,17 +67,20 @@ export const Pharmacy = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
 
-  const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
-  const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
   const [pharmacyOptions, setPharmacyOptions] = useState([]);
+
   const [showFooter, setShowFooter] = useState<boolean>(false);
+
   const [selectedId, setSelectedId] = useState<string>('');
   const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
+
   const [error, setError] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
+
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
+
   const [latitude, setLatitude] = useState<number | undefined>(undefined);
   const [longitude, setLongitude] = useState<number | undefined>(undefined);
   const [location, setLocation] = useState<string>(
@@ -300,62 +305,6 @@ export const Pharmacy = () => {
     }
   };
 
-  const setPreferredPharmacy = async (patientId: string, pharmacyId: string) => {
-    if (!pharmacyId) return;
-
-    setSavingPreferred(true);
-
-    graphQLClient.setHeader('x-photon-auth', token);
-
-    try {
-      const result: { setPreferredPharmacy: boolean } = await graphQLClient.request(
-        SET_PREFERRED_PHARMACY,
-        {
-          patientId,
-          pharmacyId
-        }
-      );
-
-      setTimeout(() => {
-        if (result?.setPreferredPharmacy) {
-          setSavingPreferred(false);
-          setPreferredPharmacyId(pharmacyId);
-
-          toast({
-            title: 'Set preferred pharmacy',
-            position: 'top',
-            status: 'success',
-            duration: 2000,
-            isClosable: true
-          });
-        } else {
-          setSavingPreferred(false);
-          toast({
-            title: 'Unable to set preferred pharmacy',
-            description: 'Please refresh and try again',
-            position: 'top',
-            status: 'error',
-            duration: 5000,
-            isClosable: true
-          });
-        }
-      }, 750);
-    } catch (error) {
-      setSavingPreferred(false);
-
-      console.error(JSON.stringify(error, undefined, 2));
-      console.log(error);
-
-      if (error?.response?.errors) {
-        setError(error.response.errors[0].message);
-      }
-    }
-  };
-
-  const handleSetPreferredPharmacy = (id: string) => {
-    setPreferredPharmacy(order.patient.id, id);
-  };
-
   useEffect(() => {
     if (location) {
       fetchPharmacies();
@@ -442,12 +391,9 @@ export const Pharmacy = () => {
 
               <PickupOptions
                 pharmacies={pharmacyOptions}
-                preferredPharmacy={preferredPharmacyId}
-                savingPreferred={savingPreferred}
                 selectedId={selectedId}
                 handleSelect={handleSelect}
                 handleShowMore={handleShowMore}
-                handleSetPreferred={handleSetPreferredPharmacy}
                 loadingMore={loadingMore}
                 showingAllPharmacies={showingAllPharmacies}
                 courierEnabled={enableCourier || orgSettings.mailOrderNavigate}
