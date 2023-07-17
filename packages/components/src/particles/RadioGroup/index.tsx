@@ -43,7 +43,9 @@ export function RadioGroupProvider(props: RadioGroupProps) {
       },
       setSelected(selected: string) {
         setState('selected', selected);
-        props.setSelected(selected);
+        if (props?.setSelected) {
+          props.setSelected(selected);
+        }
       }
     }
   ];
@@ -114,7 +116,7 @@ export interface RadioGroupProps {
   label: string;
   initSelected?: string;
   children: JSXElement;
-  setSelected: (selected: string) => void;
+  setSelected?: (selected: string) => void;
 }
 
 function RadioGroupRoot(props: RadioGroupProps) {

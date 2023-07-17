@@ -76,7 +76,7 @@ export function useInputGroup() {
 }
 
 export interface InputGroupProps {
-  label: string;
+  label: string | JSX.Element;
   error?: string;
   contextText?: string | JSX.Element;
   helpText?: string | JSX.Element;
@@ -105,14 +105,18 @@ function InputGroupWrapper(props: InputGroupProps) {
     setDisabled(props.disabled || false);
   });
 
+  const isLabelString = createMemo(() => typeof props.label === 'string');
   const isContextTextString = createMemo(() => typeof props?.contextText === 'string');
 
   return (
     <div>
       <div class="flex justify-between items-center">
-        <label class="block text-sm font-medium leading-6 text-gray-900 mb-1" for={state.id}>
-          {props.label}
-        </label>
+        <Show when={isLabelString()}>
+          <label class="block text-sm font-medium leading-6 text-gray-900 mb-1" for={state.id}>
+            {props.label}
+          </label>
+        </Show>
+        <Show when={!isLabelString()}>{props.label}</Show>
         <Show when={!!props.contextText}>
           <Show when={isContextTextString}>
             <span class="text-xs leading-6 text-gray-500" id="email-optional">
