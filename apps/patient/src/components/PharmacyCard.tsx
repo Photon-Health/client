@@ -1,7 +1,11 @@
 import { memo } from 'react';
 import {
+  Button,
   Card,
   CardBody,
+  CardFooter,
+  Collapse,
+  Divider,
   HStack,
   Tag,
   TagLabel,
@@ -21,11 +25,6 @@ import { formatAddress } from '../utils/general';
 import { Pharmacy } from '../utils/models';
 
 dayjs.extend(customParseFormat);
-
-const INFO_COLOR_MAP = {
-  Previous: 'green',
-  Preferred: 'yellow'
-};
 
 interface RatingHoursProps {
   businessStatus: string;
@@ -95,14 +94,22 @@ const DistanceAddress = ({ distance, address }: DistanceAddressProps) => {
 
 interface PharmacyCardProps {
   pharmacy: Pharmacy;
+  preferred?: boolean;
+  previous?: boolean;
+  savingPreferred: boolean;
   selected: boolean;
   onSelect: Function;
+  onSetPreferred: () => void;
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
   pharmacy,
+  preferred,
+  previous,
+  savingPreferred,
   selected,
-  onSelect
+  onSelect,
+  onSetPreferred
 }: PharmacyCardProps) {
   const isMobile = useBreakpointValue({ base: true, md: false });
 
@@ -119,13 +126,16 @@ export const PharmacyCard = memo(function PharmacyCard({
     >
       <CardBody p={3}>
         <VStack align="start" w="full" spacing={0}>
-          {pharmacy.info ? (
-            <Tag size="sm" colorScheme={INFO_COLOR_MAP[pharmacy.info]}>
-              <TagLeftIcon
-                boxSize="12px"
-                as={pharmacy.info === 'Previous' ? FiRotateCcw : FiStar}
-              />
-              <TagLabel> {pharmacy.info}</TagLabel>
+          {preferred ? (
+            <Tag size="sm" colorScheme="yellow">
+              <TagLeftIcon boxSize="12px" as={FiStar} />
+              <TagLabel> Preferred</TagLabel>
+            </Tag>
+          ) : null}
+          {previous && !preferred ? (
+            <Tag size="sm" colorScheme="blue">
+              <TagLeftIcon boxSize="12px" as={FiRotateCcw} />
+              <TagLabel> Previous</TagLabel>
             </Tag>
           ) : null}
           {pharmacy?.hours?.is24Hr ? (
@@ -142,6 +152,22 @@ export const PharmacyCard = memo(function PharmacyCard({
           <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
         </VStack>
       </CardBody>
+      <Collapse in={selected && !preferred} animateOpacity>
+        <Divider />
+        <CardFooter p={2}>
+          <Button
+            mx="auto"
+            size="sm"
+            variant="ghost"
+            colorScheme="brand"
+            onClick={onSetPreferred}
+            isLoading={savingPreferred}
+            leftIcon={<FiStar />}
+          >
+            Make this my preferred pharmacy
+          </Button>
+        </CardFooter>
+      </Collapse>
     </Card>
   );
 });
