@@ -1,5 +1,5 @@
 import { useParams, Link as RouterLink } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { usePhoton } from '@photonhealth/react';
 import {
   Alert,
@@ -54,7 +54,7 @@ import { confirmWrapper } from '../components/GuardDialog';
 import PatientView from '../components/PatientView';
 import NameView from '../components/NameView';
 import { Fill, Maybe } from 'packages/sdk/dist/types';
-import { FILL_COLOR_MAP, FILL_STATE_MAP } from './Order';
+import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
@@ -200,6 +200,17 @@ export const Prescription = () => {
         </WrapItem>
       </Wrap>
     );
+
+  const orders = useMemo(() => {
+    if (!prescription) return [];
+
+    const orderIds = new Set();
+    return prescription.fills.filter((fill: any) => {
+      if (orderIds.has(fill.order.id)) return false;
+      orderIds.add(fill.order.id);
+      return true;
+    });
+  }, [prescription]);
 
   return (
     <Page header="Prescription" buttons={buttons}>
@@ -502,7 +513,7 @@ export const Prescription = () => {
               )}
             </HStack>
 
-            {prescription?.fills && prescription?.fills?.length === 0 ? null : (
+            {orders.length === 0 ? null : (
               <>
                 <Divider />
 
@@ -510,7 +521,7 @@ export const Prescription = () => {
                   Orders
                 </Text>
                 <VStack spacing={4} w="full">
-                  {prescription?.fills?.map((fill: Maybe<Fill>) => {
+                  {orders.map((fill: Maybe<Fill>) => {
                     if (!fill) return null;
                     const address = fill?.order?.pharmacy?.address;
                     const addressString = address
@@ -533,14 +544,15 @@ export const Prescription = () => {
                                 <LinkOverlay href={`/orders/${fill?.order?.id}`}>
                                   <HStack spacing={2}>
                                     <Text fontSize="md">
-                                      {fill?.order?.pharmacy?.name || 'Pharmacy not set'}
+                                      {fill?.order?.pharmacy?.name ||
+                                        'Pharmacy not been selected by the patient.'}
                                     </Text>
-                                    <Badge
-                                      size="sm"
-                                      colorScheme={FILL_COLOR_MAP[fill.state as keyof object] || ''}
-                                    >
-                                      {FILL_STATE_MAP[fill.state as keyof object] || ''}
-                                    </Badge>
+                                    <OrderStatusBadge
+                                      fulfillmentState={
+                                        fill?.order?.fulfillment?.state as OrderFulfillmentState
+                                      }
+                                      orderState={fill?.order?.state}
+                                    />
                                   </HStack>
                                 </LinkOverlay>
                               </HStack>
