@@ -61,6 +61,9 @@ customElement(
     hideSubmit: false,
     hideTemplates: true,
     enableOrder: false,
+    enableLocalPickup: false,
+    enableSendToPatient: false,
+    mailOrderIds: undefined,
     pharmacyId: undefined,
     loading: false,
     address: undefined
@@ -72,6 +75,9 @@ customElement(
       hideSubmit: boolean;
       hideTemplates: boolean;
       enableOrder: boolean;
+      enableLocalPickup: boolean;
+      enableSendToPatient: boolean;
+      mailOrderIds?: string;
       pharmacyId?: string;
       loading: boolean;
       address?: {
@@ -272,8 +278,13 @@ customElement(
           value: []
         });
         const orderMutation = client!.getSDK().clinical.order.createOrder({});
+        const removePatientPreferredPharmacyMutation = client!
+          .getSDK()
+          .clinical.patient.removePatientPreferredPharmacy({});
+        const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
         const rxMutation = client!.getSDK().clinical.prescription.createPrescriptions({});
         const prescriptions = [];
+
         for (const draft of store['draftPrescriptions']!.value) {
           const args = {
             daysSupply: draft.daysSupply,
@@ -311,10 +322,37 @@ customElement(
           const { __typename, name, ...filteredPatientAddress } = patientAddress;
           const address = { street2: '', country: 'US', ...filteredPatientAddress };
 
+          if (
+            store['updatePreferredPharmacy']?.value &&
+            store['pharmacy']?.value &&
+            store['fulfillmentType']?.value === 'PICK_UP'
+          ) {
+            const patient = store['patient']?.value;
+            if (patient?.preferredPharmacies && patient?.preferredPharmacies?.length > 0) {
+              // remove the current preferred pharmacy
+              removePatientPreferredPharmacyMutation({
+                variables: {
+                  patientId: patient.id,
+                  pharmacyId: patient?.preferredPharmacies?.[0]?.id
+                },
+                awaitRefetchQueries: false
+              });
+            }
+            // add the new preferred pharmacy to the patient
+            updatePatientMutation({
+              variables: {
+                id: patient.id,
+                preferredPharmacies: [store['pharmacy']?.value]
+              },
+              awaitRefetchQueries: false
+            });
+          }
+
           const { data: data2, errors } = await orderMutation({
             variables: {
               patientId: store['patient']?.value.id,
-              pharmacyId: props?.pharmacyId || store['pharmacy']?.value.id,
+              pharmacyId: props?.pharmacyId || store['pharmacy']?.value || '',
+              fulfillmentType: store['fulfillmentType']?.value || '',
               address,
               fills: data?.createPrescriptions.map((x) => ({ prescriptionId: x.id }))
             },
@@ -384,7 +422,13 @@ customElement(
                 setIsEditing={setIsEditing}
               />
               <Show when={props.enableOrder && !props.pharmacyId}>
-                <OrderCard store={store} actions={actions} />
+                <OrderCard
+                  store={store}
+                  actions={actions}
+                  enableLocalPickup={props.enableLocalPickup}
+                  enableSendToPatient={props.enableSendToPatient}
+                  mailOrderIds={props.mailOrderIds}
+                />
               </Show>
               <Show when={props.enableOrder && props.pharmacyId}>
                 <PharmacyCard pharmacyId={props.pharmacyId} />

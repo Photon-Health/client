@@ -9,10 +9,11 @@ import {
   ModalFooter,
   Textarea,
   Heading,
-  useToast
+  useToast,
+  Input
 } from '@chakra-ui/react';
 
-import { RefObject, useEffect, useState } from 'react';
+import { ChangeEvent, RefObject, useEffect, useState } from 'react';
 import { Field, Formik } from 'formik';
 
 import { OptionalText } from '../../../../components/OptionalText';
@@ -93,6 +94,7 @@ export const TemplateForm = ({
     setSubmitting(true);
 
     const templateVariables: any = {
+      name: values.name || '',
       catalogId: catalogs.catalogs?.[0]?.id,
       daysSupply: values.daysSupply ? parseInt(values.daysSupply, 10) : 0,
       dispenseAsWritten: values.dispenseAsWritten,
@@ -127,6 +129,7 @@ export const TemplateForm = ({
       });
     } else {
       templateVariables.treatmentId = values.treatmentId;
+
       createRxTemplateMutation({
         variables: templateVariables,
         onCompleted: () => {
@@ -190,6 +193,22 @@ export const TemplateForm = ({
                 medicationSelectRef={medicationSelectRef}
                 catalogs={catalogs}
               />
+
+              <FormControl>
+                <FormLabel>
+                  Template Name
+                  <OptionalText />
+                </FormLabel>
+
+                <Input
+                  type="text"
+                  maxLength={50}
+                  value={values.name}
+                  onChange={(val: ChangeEvent<HTMLInputElement>) =>
+                    setFieldValue('name', val.target.value)
+                  }
+                />
+              </FormControl>
 
               <FormControl>
                 <Field

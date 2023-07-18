@@ -5,6 +5,7 @@ import { PhotonClientStore } from '../../store';
 import { makeTimer } from '@solid-primitives/timer';
 import { hasAuthParams } from '../../utils/hasAuthParams';
 import { createStore } from 'solid-js/store';
+import SDKProvider from '../SDKProvider';
 
 type ClientProps = {
   domain?: string;
@@ -66,9 +67,13 @@ export default function Client(props: ClientProps) {
         await store?.authentication.login(args);
       }
     }
-  }, [store?.authentication.state.isAuthenticated, store?.authentication.state.isLoading]);
+  });
 
   const Provider = props.context?.Provider || PhotonContext.Provider;
 
-  return <Provider value={store}>{props.children}</Provider>;
+  return (
+    <Provider value={store}>
+      <SDKProvider client={sdk}>{props.children}</SDKProvider>
+    </Provider>
+  );
 }
