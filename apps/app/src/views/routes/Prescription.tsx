@@ -1,5 +1,5 @@
 import { useParams, Link as RouterLink } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { usePhoton } from '@photonhealth/react';
 import {
   Alert,
@@ -31,10 +31,14 @@ import {
   AlertTitle,
   AlertDescription,
   Wrap,
-  WrapItem
+  WrapItem,
+  Box,
+  LinkBox,
+  LinkOverlay
 } from '@chakra-ui/react';
-import { FiCopy } from 'react-icons/fi';
+import { FiChevronRight, FiCopy } from 'react-icons/fi';
 import { gql, GraphQLClient } from 'graphql-request';
+import dayjs from 'dayjs';
 
 import { formatDate } from '../../utils';
 
@@ -49,6 +53,8 @@ import { Page } from '../components/Page';
 import { confirmWrapper } from '../components/GuardDialog';
 import PatientView from '../components/PatientView';
 import NameView from '../components/NameView';
+import { Fill, Maybe } from 'packages/sdk/dist/types';
+import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
@@ -194,6 +200,17 @@ export const Prescription = () => {
         </WrapItem>
       </Wrap>
     );
+
+  const orders = useMemo(() => {
+    if (!prescription) return [];
+
+    const orderIds = new Set();
+    return prescription.fills.filter((fill: any) => {
+      if (orderIds.has(fill.order.id)) return false;
+      orderIds.add(fill.order.id);
+      return true;
+    });
+  }, [prescription]);
 
   return (
     <Page header="Prescription" buttons={buttons}>
@@ -495,6 +512,70 @@ export const Prescription = () => {
                 </Text>
               )}
             </HStack>
+
+            {orders.length === 0 ? null : (
+              <>
+                <Divider />
+
+                <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                  Orders
+                </Text>
+                <VStack spacing={4} w="full">
+                  {orders.map((fill: Maybe<Fill>) => {
+                    if (!fill) return null;
+                    const address = fill?.order?.pharmacy?.address;
+                    const addressString = address
+                      ? `${address?.street1}, ${address?.city}, ${address?.state} ${address?.postalCode}`
+                      : '';
+                    return (
+                      <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
+                        <Card
+                          variant="outline"
+                          p={[2, 3]}
+                          w="full"
+                          shadow="none"
+                          _hover={{
+                            backgroundColor: 'gray.50'
+                          }}
+                        >
+                          <HStack justifyContent="space-between">
+                            <VStack alignItems="start">
+                              <HStack>
+                                <LinkOverlay href={`/orders/${fill?.order?.id}`}>
+                                  <HStack spacing={2}>
+                                    <Text
+                                      fontSize="md"
+                                      as={fill?.order?.pharmacy?.name ? undefined : 'i'}
+                                    >
+                                      {fill?.order?.pharmacy?.name || 'Pending Selection'}
+                                    </Text>
+                                    <OrderStatusBadge
+                                      fulfillmentState={
+                                        fill?.order?.fulfillment?.state as OrderFulfillmentState
+                                      }
+                                      orderState={fill?.order?.state}
+                                    />
+                                  </HStack>
+                                </LinkOverlay>
+                              </HStack>
+                              <Text fontSize="sm" color="gray.500">
+                                {addressString}
+                                {addressString ? <br /> : null}
+                                Created:{' '}
+                                {dayjs(fill?.order?.createdAt).format('MMM D, YYYY, h:mm A')}
+                              </Text>
+                            </VStack>
+                            <Box alignItems="end">
+                              <FiChevronRight size="1.3em" />
+                            </Box>
+                          </HStack>
+                        </Card>
+                      </LinkBox>
+                    );
+                  })}
+                </VStack>
+              </>
+            )}
           </VStack>
         </CardBody>
       </Card>
