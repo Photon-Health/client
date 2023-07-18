@@ -545,7 +545,7 @@ export const Prescription = () => {
                                   <HStack spacing={2}>
                                     <Text fontSize="md">
                                       {fill?.order?.pharmacy?.name ||
-                                        'Pharmacy has not been selected by the patient.'}
+                                        'Waiting for pharmacy selection'}
                                     </Text>
                                     <OrderStatusBadge
                                       fulfillmentState={
