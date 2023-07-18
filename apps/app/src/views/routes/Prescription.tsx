@@ -543,9 +543,11 @@ export const Prescription = () => {
                               <HStack>
                                 <LinkOverlay href={`/orders/${fill?.order?.id}`}>
                                   <HStack spacing={2}>
-                                    <Text fontSize="md">
-                                      {fill?.order?.pharmacy?.name ||
-                                        'Waiting for pharmacy selection'}
+                                    <Text
+                                      fontSize="md"
+                                      as={fill?.order?.pharmacy?.name ? undefined : 'i'}
+                                    >
+                                      {fill?.order?.pharmacy?.name || 'Pending Selection'}
                                     </Text>
                                     <OrderStatusBadge
                                       fulfillmentState={
