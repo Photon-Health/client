@@ -545,7 +545,7 @@ export const Prescription = () => {
                                   <HStack spacing={2}>
                                     <Text fontSize="md">
                                       {fill?.order?.pharmacy?.name ||
-                                        'Pharmacy not been selected by the patient.'}
+                                        'Pharmacy has not been selected by the patient.'}
                                     </Text>
                                     <OrderStatusBadge
                                       fulfillmentState={
@@ -558,8 +558,8 @@ export const Prescription = () => {
                               </HStack>
                               <Text fontSize="sm" color="gray.500">
                                 {addressString}
-                                <br />
-                                Created At:{' '}
+                                {addressString ? <br /> : null}
+                                Created:{' '}
                                 {dayjs(fill?.order?.createdAt).format('MMM D, YYYY, h:mm A')}
                               </Text>
                             </VStack>

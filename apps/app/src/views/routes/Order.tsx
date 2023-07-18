@@ -5,7 +5,6 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
-  Badge,
   Box,
   Button,
   Card,
@@ -520,12 +519,13 @@ export const Order = () => {
                               </LinkOverlay>
                             </HStack>
                             <HStack>
-                              <Badge
-                                size="sm"
-                                colorScheme={FILL_COLOR_MAP[fill.state as keyof object] || ''}
-                              >
-                                {FILL_STATE_MAP[fill.state as keyof object] || ''}
-                              </Badge>
+                              <Text fontSize="sm" color="gray.500">
+                                Fill ID: {fill.id}
+                              </Text>
+                              <OrderStatusBadge
+                                fulfillmentState={order.fulfillment?.state as OrderFulfillmentState}
+                                orderState={order.state}
+                              />
                             </HStack>
                           </VStack>
 

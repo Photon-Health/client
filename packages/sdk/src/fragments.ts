@@ -96,6 +96,7 @@ export const FILL_PRESCRIPTION_FIELDS = gql`
     order {
       id
       createdAt
+      state
       fulfillment {
         state
       }
