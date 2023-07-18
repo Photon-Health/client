@@ -518,15 +518,19 @@ export const Order = () => {
                                 <Text>{fill.treatment.name}</Text>
                               </LinkOverlay>
                             </HStack>
-                            <HStack>
-                              <Text fontSize="sm" color="gray.500">
+                            <Stack direction={['column', 'row']}>
+                              <Text fontSize="xs" color="gray.500">
                                 Fill ID: {fill.id}
                               </Text>
-                              <OrderStatusBadge
-                                fulfillmentState={order.fulfillment?.state as OrderFulfillmentState}
-                                orderState={order.state}
-                              />
-                            </HStack>
+                              <div>
+                                <OrderStatusBadge
+                                  fulfillmentState={
+                                    order.fulfillment?.state as OrderFulfillmentState
+                                  }
+                                  orderState={order.state}
+                                />
+                              </div>
+                            </Stack>
                           </VStack>
 
                           <Box alignItems="end">
