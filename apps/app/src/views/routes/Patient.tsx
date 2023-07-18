@@ -38,7 +38,7 @@ import { formatDateLong, formatPhone, formatDate } from '../../utils';
 import { Page } from '../components/Page';
 
 import { PRESCRIPTION_STATE_MAP, PRESCRIPTION_COLOR_MAP } from './Prescriptions';
-import { ORDER_FULFILLMENT_STATE_MAP, ORDER_FULFILLMENT_COLOR_MAP } from './Orders';
+import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 
 export const Patient = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -421,7 +421,7 @@ export const Patient = () => {
               <TableContainer>
                 <Table bg="transparent" size="sm">
                   <Tbody>
-                    {orders.map(({ id: orderId, fulfillment, fills, createdAt }, i) => {
+                    {orders.map(({ id: orderId, fulfillment, fills, createdAt, state }, i) => {
                       const fillsFormatted = fills.reduce((prev: string, cur: any) => {
                         const fill = cur.treatment.name;
                         return prev ? `${prev}, ${fill}` : fill;
@@ -439,20 +439,10 @@ export const Patient = () => {
                               <VStack alignItems="start">
                                 <Text>{fillsFormatted}</Text>
                                 <HStack>
-                                  {fulfillment?.state ? (
-                                    <Badge
-                                      size="sm"
-                                      colorScheme={
-                                        ORDER_FULFILLMENT_COLOR_MAP[
-                                          fulfillment.state as keyof object
-                                        ] || ''
-                                      }
-                                    >
-                                      {ORDER_FULFILLMENT_STATE_MAP[
-                                        fulfillment.state as keyof object
-                                      ] || ''}
-                                    </Badge>
-                                  ) : null}
+                                  <OrderStatusBadge
+                                    fulfillmentState={fulfillment?.state as OrderFulfillmentState}
+                                    orderState={state}
+                                  />
                                   <Text>{formatDate(createdAt)}</Text>
                                 </HStack>
                               </VStack>
