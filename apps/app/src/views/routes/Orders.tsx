@@ -11,68 +11,22 @@ import {
   PopoverTrigger,
   SkeletonCircle,
   SkeletonText,
-  Tag,
-  TagLeftIcon,
-  TagLabel,
   Text,
-  Tooltip,
   useBreakpointValue
 } from '@chakra-ui/react';
 
 import { FiInfo } from 'react-icons/fi';
 import { useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
-import { usePhoton, types } from '@photonhealth/react';
+import { usePhoton } from '@photonhealth/react';
 
 import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
 import PatientView from '../components/PatientView';
 import PharmacyNameView from '../components/PharmacyNameView';
 import { formatDate, formatFills } from '../../utils';
-import { ORDER_STATE_MAP, ORDER_STATE_ICON_MAP } from './Order';
 import { Order } from 'packages/sdk/dist/types';
-
-type OrderFulfillmentState =
-  | 'SENT'
-  // Pick Up
-  | 'RECEIVED'
-  | 'READY'
-  | 'PICKED_UP'
-  // Mail Order
-  | 'FILLING'
-  | 'SHIPPED'
-  | 'DELIVERED';
-type OrderFulfillmentRecord = Record<OrderFulfillmentState, string>;
-
-export const ORDER_FULFILLMENT_STATE_MAP: OrderFulfillmentRecord = {
-  SENT: 'Sent',
-  RECEIVED: 'Received',
-  READY: 'Ready',
-  PICKED_UP: 'Picked up',
-  FILLING: 'Filling',
-  SHIPPED: 'Shipped',
-  DELIVERED: 'Delivered'
-};
-
-export const ORDER_FULFILLMENT_COLOR_MAP: OrderFulfillmentRecord = {
-  SENT: 'yellow',
-  RECEIVED: 'orange',
-  READY: 'green',
-  PICKED_UP: 'gray',
-  FILLING: 'orange',
-  SHIPPED: 'green',
-  DELIVERED: 'gray'
-};
-
-export const ORDER_FULFILLMENT_TIP_MAP: OrderFulfillmentRecord = {
-  SENT: 'Order sent to pharmacy',
-  RECEIVED: 'Order received by pharmacy',
-  READY: 'Order ready at pharmacy',
-  PICKED_UP: 'Order picked up by patient',
-  FILLING: 'Mail order being filled',
-  SHIPPED: 'Mail order shipped',
-  DELIVERED: 'Mail order delivered'
-};
+import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 
 interface ActionsProps {
   id: string;
@@ -129,35 +83,16 @@ const renderRow = (order: Order) => {
     <Text as="i">Pending selection</Text>
   );
 
-  let status = '';
-  let statusColor = 'gray';
-  let statusTip = '';
-  let statusIcon;
-
-  if (order.fulfillment?.state) {
-    const key = order.fulfillment.state as OrderFulfillmentState;
-    status = ORDER_FULFILLMENT_STATE_MAP[key];
-    statusTip = ORDER_FULFILLMENT_TIP_MAP[key] || status;
-    statusColor = ORDER_FULFILLMENT_COLOR_MAP[key] || statusColor;
-  } else {
-    const key = order.state as types.OrderState;
-    status = ORDER_STATE_MAP[key];
-    statusTip = 'Order waiting on patient pharmacy selection';
-    statusIcon = ORDER_STATE_ICON_MAP[key];
-  }
-
   return {
     id,
     externalId: extId,
     createdAt: formatDate(order.createdAt),
     fills: <Text fontWeight="medium">{fills}</Text>,
     status: (
-      <Tooltip label={statusTip}>
-        <Tag size="sm" borderRadius="full" colorScheme={statusColor}>
-          {statusIcon ? <TagLeftIcon boxSize="12px" as={statusIcon} /> : null}
-          <TagLabel>{status}</TagLabel>
-        </Tag>
-      </Tooltip>
+      <OrderStatusBadge
+        fulfillmentState={order.fulfillment?.state as OrderFulfillmentState}
+        orderState={order.state}
+      />
     ),
     patient: <PatientView patient={patient} />,
     pharmacy: pharmacyView,

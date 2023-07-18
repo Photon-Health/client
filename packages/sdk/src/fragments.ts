@@ -87,10 +87,42 @@ export const DISPENSE_UNIT_FIELDS = gql`
   }
 `;
 
+export const FILL_PRESCRIPTION_FIELDS = gql`
+  fragment FillFields on Fill {
+    id
+    state
+    requestedAt
+    filledAt
+    order {
+      id
+      createdAt
+      state
+      fulfillment {
+        state
+      }
+      pharmacy {
+        id
+        name
+        address {
+          street1
+          street2
+          city
+          state
+          postalCode
+        }
+      }
+    }
+  }
+`;
+
 export const PRESCRIPTION_FIELDS = gql`
+  ${FILL_PRESCRIPTION_FIELDS}
   fragment PrescriptionFields on Prescription {
     id
     externalId
+    fills {
+      ...FillFields
+    }
     prescriber {
       id
       name {
