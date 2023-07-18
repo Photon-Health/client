@@ -31,10 +31,14 @@ import {
   AlertTitle,
   AlertDescription,
   Wrap,
-  WrapItem
+  WrapItem,
+  Box,
+  LinkBox,
+  LinkOverlay
 } from '@chakra-ui/react';
-import { FiCopy } from 'react-icons/fi';
+import { FiChevronRight, FiCopy } from 'react-icons/fi';
 import { gql, GraphQLClient } from 'graphql-request';
+import dayjs from 'dayjs';
 
 import { formatDate } from '../../utils';
 
@@ -49,6 +53,8 @@ import { Page } from '../components/Page';
 import { confirmWrapper } from '../components/GuardDialog';
 import PatientView from '../components/PatientView';
 import NameView from '../components/NameView';
+import { Fill, Maybe } from 'packages/sdk/dist/types';
+import { FILL_COLOR_MAP, FILL_STATE_MAP } from './Order';
 
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
@@ -495,6 +501,67 @@ export const Prescription = () => {
                 </Text>
               )}
             </HStack>
+
+            {prescription?.fills && prescription?.fills?.length === 0 ? null : (
+              <>
+                <Divider />
+
+                <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                  Orders
+                </Text>
+                <VStack spacing={4} w="full">
+                  {prescription?.fills?.map((fill: Maybe<Fill>) => {
+                    if (!fill) return null;
+                    const address = fill?.order?.pharmacy?.address;
+                    const addressString = address
+                      ? `${address?.street1}, ${address?.city}, ${address?.state} ${address?.postalCode}`
+                      : '';
+                    return (
+                      <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
+                        <Card
+                          variant="outline"
+                          p={[2, 3]}
+                          w="full"
+                          shadow="none"
+                          _hover={{
+                            backgroundColor: 'gray.50'
+                          }}
+                        >
+                          <HStack justifyContent="space-between">
+                            <VStack alignItems="start">
+                              <HStack>
+                                <LinkOverlay href={`/orders/${fill?.order?.id}`}>
+                                  <HStack spacing={2}>
+                                    <Text fontSize="md">
+                                      {fill?.order?.pharmacy?.name || 'Pharmacy not set'}
+                                    </Text>
+                                    <Badge
+                                      size="sm"
+                                      colorScheme={FILL_COLOR_MAP[fill.state as keyof object] || ''}
+                                    >
+                                      {FILL_STATE_MAP[fill.state as keyof object] || ''}
+                                    </Badge>
+                                  </HStack>
+                                </LinkOverlay>
+                              </HStack>
+                              <Text fontSize="sm" color="gray.500">
+                                {addressString}
+                                <br />
+                                Created At:{' '}
+                                {dayjs(fill?.order?.createdAt).format('MMM D, YYYY, h:mm A')}
+                              </Text>
+                            </VStack>
+                            <Box alignItems="end">
+                              <FiChevronRight size="1.3em" />
+                            </Box>
+                          </HStack>
+                        </Card>
+                      </LinkBox>
+                    );
+                  })}
+                </VStack>
+              </>
+            )}
           </VStack>
         </CardBody>
       </Card>

@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import {
   Alert,
@@ -31,7 +31,9 @@ import {
   VStack,
   useBreakpointValue,
   useColorMode,
-  useToast
+  useToast,
+  LinkBox,
+  LinkOverlay
 } from '@chakra-ui/react';
 import { gql, GraphQLClient } from 'graphql-request';
 import { usePhoton, types } from '@photonhealth/react';
@@ -84,13 +86,13 @@ export const ORDER_STATE_ICON_MAP: any = {
   COMPLETED: FiCheck,
   ERROR: FiAlertTriangle
 };
-const FILL_STATE_MAP: object = {
+export const FILL_STATE_MAP: object = {
   CANCELED: 'Canceled',
   NEW: 'New',
   SCHEDULED: 'Scheduled',
   SENT: 'Sent'
 };
-const FILL_COLOR_MAP: object = {
+export const FILL_COLOR_MAP: object = {
   CANCELED: 'gray',
   NEW: 'green',
   SCHEDULED: 'orange',
@@ -100,7 +102,6 @@ export const Order = () => {
   const toast = useToast();
   const params = useParams();
   const id = params.orderId;
-  const navigate = useNavigate();
   const { getOrder, getToken } = usePhoton();
   const { order, loading, error } = getOrder({ id: id! });
   const [accessToken, setAccessToken] = useState('');
@@ -520,43 +521,45 @@ export const Order = () => {
               Fills
             </Text>
             {order?.fills.length > 0 ? (
-              <TableContainer w="full">
-                <Table bg="transparent" size="sm">
-                  <Tbody>
-                    {order.fills.map((fill: any, i: number) => {
-                      return i < 5 ? (
-                        <Tr
-                          key={fill.id}
-                          onClick={() => navigate(`/prescriptions/${fill?.prescription?.id}`)}
-                          _hover={{ backgroundColor: 'gray.100' }}
-                          cursor="pointer"
-                        >
-                          <Td px={0} py={3} whiteSpace="pre-wrap" borderColor="gray.200">
-                            <HStack w="full" justify="space-between">
-                              <VStack alignItems="start">
-                                <HStack>
-                                  <Text>{fill.treatment.name}</Text>
-                                </HStack>
-                                <HStack>
-                                  <Badge
-                                    size="sm"
-                                    colorScheme={FILL_COLOR_MAP[fill.state as keyof object] || ''}
-                                  >
-                                    {FILL_STATE_MAP[fill.state as keyof object] || ''}
-                                  </Badge>
-                                </HStack>
-                              </VStack>
-                              <Box alignItems="end">
-                                <FiChevronRight size="1.3em" />
-                              </Box>
+              <>
+                {order.fills.map((fill: any, i: number) => {
+                  return i < 5 ? (
+                    <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
+                      <Card
+                        variant="outline"
+                        p={[2, 3]}
+                        w="full"
+                        shadow="none"
+                        _hover={{
+                          backgroundColor: 'gray.50'
+                        }}
+                      >
+                        <HStack justifyContent="space-between">
+                          <VStack alignItems="start">
+                            <HStack>
+                              <LinkOverlay href={`/prescriptions/${fill?.prescription?.id}`}>
+                                <Text>{fill.treatment.name}</Text>
+                              </LinkOverlay>
                             </HStack>
-                          </Td>
-                        </Tr>
-                      ) : null;
-                    })}
-                  </Tbody>
-                </Table>
-              </TableContainer>
+                            <HStack>
+                              <Badge
+                                size="sm"
+                                colorScheme={FILL_COLOR_MAP[fill.state as keyof object] || ''}
+                              >
+                                {FILL_STATE_MAP[fill.state as keyof object] || ''}
+                              </Badge>
+                            </HStack>
+                          </VStack>
+
+                          <Box alignItems="end">
+                            <FiChevronRight size="1.3em" />
+                          </Box>
+                        </HStack>
+                      </Card>
+                    </LinkBox>
+                  ) : null;
+                })}
+              </>
             ) : (
               <Text as="i">No fills</Text>
             )}
