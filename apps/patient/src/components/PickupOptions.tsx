@@ -14,19 +14,25 @@ import { Pharmacy } from '../utils/models';
 
 interface PickupOptionsProps {
   pharmacies: Pharmacy[];
+  preferredPharmacy: string;
+  savingPreferred: boolean;
   selectedId: string;
   handleSelect: (id: string) => void;
   handleShowMore: () => void;
+  handleSetPreferred: (id: string) => void;
   loadingMore: boolean;
   showingAllPharmacies: boolean;
   courierEnabled: boolean;
 }
 
 export const PickupOptions = ({
+  preferredPharmacy,
+  savingPreferred,
   pharmacies,
   selectedId,
   handleSelect,
   handleShowMore,
+  handleSetPreferred,
   loadingMore,
   showingAllPharmacies,
   courierEnabled
@@ -58,8 +64,11 @@ export const PickupOptions = ({
           <SlideFade offsetY="60px" in={true} key={`pickup-pharmacy-${pharmacy.id}-${i}`}>
             <PharmacyCard
               pharmacy={pharmacy}
+              preferred={pharmacy.id === preferredPharmacy}
+              savingPreferred={savingPreferred}
               selected={selectedId === pharmacy.id}
               onSelect={() => handleSelect(pharmacy.id)}
+              onSetPreferred={() => handleSetPreferred(pharmacy.id)}
             />
           </SlideFade>
         ))}
