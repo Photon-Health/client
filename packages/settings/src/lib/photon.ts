@@ -129,5 +129,11 @@ export const photon: {
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
     sendToPatient: false
+  },
+  // Ognomy
+  org_2B1yxV6yS9ROqV1g: {
+    ...defaultSettings,
+    logo: 'ognomy_logo.webp',
+    accentColor: '#0a7ade'
   }
 };
