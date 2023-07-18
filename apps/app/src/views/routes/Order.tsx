@@ -1,11 +1,10 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Alert,
   AlertDescription,
   AlertIcon,
   AlertTitle,
-  Badge,
   Box,
   Button,
   Card,
@@ -21,9 +20,6 @@ import {
   Stack,
   Table,
   TableContainer,
-  Tag,
-  TagLabel,
-  TagLeftIcon,
   Tbody,
   Td,
   Text,
@@ -31,25 +27,18 @@ import {
   VStack,
   useBreakpointValue,
   useColorMode,
-  useToast
+  useToast,
+  LinkBox,
+  LinkOverlay
 } from '@chakra-ui/react';
 import { gql, GraphQLClient } from 'graphql-request';
 import { usePhoton, types } from '@photonhealth/react';
-import {
-  FiAlertTriangle,
-  FiArrowUpRight,
-  FiCheck,
-  FiClock,
-  FiCopy,
-  FiCornerUpRight,
-  FiX,
-  FiChevronRight
-} from 'react-icons/fi';
+import { FiCopy, FiChevronRight } from 'react-icons/fi';
 import { Page } from '../components/Page';
 import PatientView from '../components/PatientView';
 import { confirmWrapper } from '../components/GuardDialog';
 import { formatAddress, formatDate, formatFills, formatPhone } from '../../utils';
-import { ORDER_FULFILLMENT_COLOR_MAP, ORDER_FULFILLMENT_STATE_MAP } from './Orders';
+import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
     parse: JSON.parse,
@@ -63,44 +52,28 @@ export const CANCEL_ORDER = gql`
     }
   }
 `;
-const ORDER_FULFILLMENT_TYPE_MAP = {
+export const ORDER_FULFILLMENT_TYPE_MAP = {
   [types.FulfillmentType.PickUp]: 'Pick up',
   [types.FulfillmentType.MailOrder]: 'Mail order'
 };
 
-export const ORDER_STATE_MAP: { [key in types.OrderState]: string } = {
-  PLACED: 'Placed',
-  ROUTING: 'Routing',
-  PENDING: 'Pending',
-  CANCELED: 'Canceled',
-  COMPLETED: 'Completed',
-  ERROR: 'Error'
-};
-export const ORDER_STATE_ICON_MAP: any = {
-  PLACED: FiArrowUpRight,
-  ROUTING: FiCornerUpRight,
-  PENDING: FiClock,
-  CANCELED: FiX,
-  COMPLETED: FiCheck,
-  ERROR: FiAlertTriangle
-};
-const FILL_STATE_MAP: object = {
+export const FILL_STATE_MAP: object = {
   CANCELED: 'Canceled',
   NEW: 'New',
   SCHEDULED: 'Scheduled',
   SENT: 'Sent'
 };
-const FILL_COLOR_MAP: object = {
+export const FILL_COLOR_MAP: object = {
   CANCELED: 'gray',
   NEW: 'green',
   SCHEDULED: 'orange',
   SENT: 'yellow'
 };
+
 export const Order = () => {
   const toast = useToast();
   const params = useParams();
   const id = params.orderId;
-  const navigate = useNavigate();
   const { getOrder, getToken } = usePhoton();
   const { order, loading, error } = getOrder({ id: id! });
   const [accessToken, setAccessToken] = useState('');
@@ -210,6 +183,17 @@ export const Order = () => {
     </Button>
   );
 
+  const prescriptions = useMemo(() => {
+    if (!order) return [];
+
+    const rxIds = new Set();
+    return order.fills.filter((fill: any) => {
+      if (rxIds.has(fill.prescription.id)) return false;
+      rxIds.add(fill.prescription.id);
+      return true;
+    });
+  }, [order]);
+
   return (
     <Page header="Order" buttons={buttons}>
       <Card>
@@ -265,10 +249,10 @@ export const Order = () => {
                           ms={isMobile ? 'auto' : undefined}
                         />
                       ) : (
-                        <Tag size="sm" borderRadius="full">
-                          <TagLeftIcon boxSize="12px" as={ORDER_STATE_ICON_MAP[order.state]} />
-                          <TagLabel>{ORDER_STATE_MAP[order.state as keyof object] || ''}</TagLabel>
-                        </Tag>
+                        <OrderStatusBadge
+                          fulfillmentState={order.fulfillment?.state as OrderFulfillmentState}
+                          orderState={order.state}
+                        />
                       )}
                     </Td>
                   </Tr>
@@ -376,16 +360,10 @@ export const Order = () => {
                           ms={isMobile ? 'auto' : undefined}
                         />
                       ) : order.fulfillment?.state ? (
-                        <Badge
-                          size="sm"
-                          colorScheme={
-                            ORDER_FULFILLMENT_COLOR_MAP[order.fulfillment.state as keyof object] ||
-                            ''
-                          }
-                        >
-                          {ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof object] ||
-                            ''}
-                        </Badge>
+                        <OrderStatusBadge
+                          fulfillmentState={order.fulfillment?.state as OrderFulfillmentState}
+                          orderState={order.state}
+                        />
                       ) : null}
                     </Td>
                   </Tr>
@@ -519,44 +497,51 @@ export const Order = () => {
             <Text color="gray.500" fontWeight="medium" fontSize="sm">
               Fills
             </Text>
-            {order?.fills.length > 0 ? (
-              <TableContainer w="full">
-                <Table bg="transparent" size="sm">
-                  <Tbody>
-                    {order.fills.map((fill: any, i: number) => {
-                      return i < 5 ? (
-                        <Tr
-                          key={fill.id}
-                          onClick={() => navigate(`/prescriptions/${fill?.prescription?.id}`)}
-                          _hover={{ backgroundColor: 'gray.100' }}
-                          cursor="pointer"
-                        >
-                          <Td px={0} py={3} whiteSpace="pre-wrap" borderColor="gray.200">
-                            <HStack w="full" justify="space-between">
-                              <VStack alignItems="start">
-                                <HStack>
-                                  <Text>{fill.treatment.name}</Text>
-                                </HStack>
-                                <HStack>
-                                  <Badge
-                                    size="sm"
-                                    colorScheme={FILL_COLOR_MAP[fill.state as keyof object] || ''}
-                                  >
-                                    {FILL_STATE_MAP[fill.state as keyof object] || ''}
-                                  </Badge>
-                                </HStack>
-                              </VStack>
-                              <Box alignItems="end">
-                                <FiChevronRight size="1.3em" />
-                              </Box>
+            {prescriptions.length > 0 ? (
+              <>
+                {prescriptions.map((fill: any, i: number) => {
+                  return i < 5 ? (
+                    <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
+                      <Card
+                        variant="outline"
+                        p={[2, 3]}
+                        w="full"
+                        shadow="none"
+                        _hover={{
+                          backgroundColor: 'gray.50'
+                        }}
+                      >
+                        <HStack justifyContent="space-between">
+                          <VStack alignItems="start">
+                            <HStack>
+                              <LinkOverlay href={`/prescriptions/${fill?.prescription?.id}`}>
+                                <Text>{fill.treatment.name}</Text>
+                              </LinkOverlay>
                             </HStack>
-                          </Td>
-                        </Tr>
-                      ) : null;
-                    })}
-                  </Tbody>
-                </Table>
-              </TableContainer>
+                            <Stack direction={['column', 'row']}>
+                              <Text fontSize="xs" color="gray.500">
+                                Fill ID: {fill.id}
+                              </Text>
+                              <div>
+                                <OrderStatusBadge
+                                  fulfillmentState={
+                                    order.fulfillment?.state as OrderFulfillmentState
+                                  }
+                                  orderState={order.state}
+                                />
+                              </div>
+                            </Stack>
+                          </VStack>
+
+                          <Box alignItems="end">
+                            <FiChevronRight size="1.3em" />
+                          </Box>
+                        </HStack>
+                      </Card>
+                    </LinkBox>
+                  ) : null;
+                })}
+              </>
             ) : (
               <Text as="i">No fills</Text>
             )}
