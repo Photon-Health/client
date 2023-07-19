@@ -29,7 +29,8 @@ import {
   useColorMode,
   useToast,
   LinkBox,
-  LinkOverlay
+  LinkOverlay,
+  Badge
 } from '@chakra-ui/react';
 import { gql, GraphQLClient } from 'graphql-request';
 import { usePhoton, types } from '@photonhealth/react';
@@ -38,7 +39,11 @@ import { Page } from '../components/Page';
 import PatientView from '../components/PatientView';
 import { confirmWrapper } from '../components/GuardDialog';
 import { formatAddress, formatDate, formatFills, formatPhone } from '../../utils';
-import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
+import OrderStatusBadge, {
+  OrderFulfillmentState,
+  ORDER_FULFILLMENT_COLOR_MAP,
+  ORDER_FULFILLMENT_STATE_MAP
+} from '../components/OrderStatusBadge';
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
     parse: JSON.parse,
@@ -360,10 +365,16 @@ export const Order = () => {
                           ms={isMobile ? 'auto' : undefined}
                         />
                       ) : order.fulfillment?.state ? (
-                        <OrderStatusBadge
-                          fulfillmentState={order.fulfillment?.state as OrderFulfillmentState}
-                          orderState={order.state}
-                        />
+                        <Badge
+                          size="sm"
+                          colorScheme={
+                            ORDER_FULFILLMENT_COLOR_MAP[order.fulfillment.state as keyof object] ||
+                            ''
+                          }
+                        >
+                          {ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof object] ||
+                            ''}
+                        </Badge>
                       ) : null}
                     </Td>
                   </Tr>
