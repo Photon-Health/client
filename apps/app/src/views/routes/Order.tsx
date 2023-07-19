@@ -30,7 +30,10 @@ import {
   useToast,
   LinkBox,
   LinkOverlay,
-  Badge
+  Badge,
+  Tag,
+  TagLeftIcon,
+  TagLabel
 } from '@chakra-ui/react';
 import { gql, GraphQLClient } from 'graphql-request';
 import { usePhoton, types } from '@photonhealth/react';
@@ -39,10 +42,11 @@ import { Page } from '../components/Page';
 import PatientView from '../components/PatientView';
 import { confirmWrapper } from '../components/GuardDialog';
 import { formatAddress, formatDate, formatFills, formatPhone } from '../../utils';
-import OrderStatusBadge, {
-  OrderFulfillmentState,
+import {
   ORDER_FULFILLMENT_COLOR_MAP,
-  ORDER_FULFILLMENT_STATE_MAP
+  ORDER_FULFILLMENT_STATE_MAP,
+  ORDER_STATE_ICON_MAP,
+  ORDER_STATE_MAP
 } from '../components/OrderStatusBadge';
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
@@ -254,10 +258,10 @@ export const Order = () => {
                           ms={isMobile ? 'auto' : undefined}
                         />
                       ) : (
-                        <OrderStatusBadge
-                          fulfillmentState={order.fulfillment?.state as OrderFulfillmentState}
-                          orderState={order.state}
-                        />
+                        <Tag size="sm" borderRadius="full">
+                          <TagLeftIcon boxSize="12px" as={ORDER_STATE_ICON_MAP[order.state]} />
+                          <TagLabel>{ORDER_STATE_MAP[order.state as keyof object] || ''}</TagLabel>
+                        </Tag>
                       )}
                     </Td>
                   </Tr>
@@ -533,14 +537,6 @@ export const Order = () => {
                               <Text fontSize="xs" color="gray.500">
                                 Fill ID: {fill.id}
                               </Text>
-                              <div>
-                                <OrderStatusBadge
-                                  fulfillmentState={
-                                    order.fulfillment?.state as OrderFulfillmentState
-                                  }
-                                  orderState={order.state}
-                                />
-                              </div>
                             </Stack>
                           </VStack>
 
