@@ -130,6 +130,14 @@ export const photon: {
     mailOrderProviders: [CUREXA_ID],
     sendToPatient: false
   },
+  // Osei Tutu (Xyon Health)
+  org_WeSplxuyqxdIph1f: {
+    ...defaultSettings,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_ID],
+    sendToPatient: false
+  },
   // Ognomy
   org_2B1yxV6yS9ROqV1g: {
     ...defaultSettings,
