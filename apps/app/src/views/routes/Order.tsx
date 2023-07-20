@@ -45,6 +45,7 @@ import { formatAddress, formatDate, formatFills, formatPhone } from '../../utils
 import {
   ORDER_FULFILLMENT_COLOR_MAP,
   ORDER_FULFILLMENT_STATE_MAP,
+  ORDER_STATE_COLOR_MAP,
   ORDER_STATE_ICON_MAP,
   ORDER_STATE_MAP
 } from '../components/OrderStatusBadge';
@@ -64,19 +65,6 @@ export const CANCEL_ORDER = gql`
 export const ORDER_FULFILLMENT_TYPE_MAP = {
   [types.FulfillmentType.PickUp]: 'Pick up',
   [types.FulfillmentType.MailOrder]: 'Mail order'
-};
-
-export const FILL_STATE_MAP: object = {
-  CANCELED: 'Canceled',
-  NEW: 'New',
-  SCHEDULED: 'Scheduled',
-  SENT: 'Sent'
-};
-export const FILL_COLOR_MAP: object = {
-  CANCELED: 'gray',
-  NEW: 'green',
-  SCHEDULED: 'orange',
-  SENT: 'yellow'
 };
 
 export const Order = () => {
@@ -164,8 +152,7 @@ export const Order = () => {
       textColor="blue.500"
       colorScheme="blue"
       isDisabled={
-        order.fulfillment?.type !== types.FulfillmentType.MailOrder ||
-        order.state === types.OrderState.Canceled
+        order.state === types.OrderState.Canceled || order.state === types.OrderState.Completed
       }
       onClick={async () => {
         const decision = await confirmWrapper('Cancel this order?', {
@@ -258,7 +245,11 @@ export const Order = () => {
                           ms={isMobile ? 'auto' : undefined}
                         />
                       ) : (
-                        <Tag size="sm" borderRadius="full">
+                        <Tag
+                          size="sm"
+                          borderRadius="full"
+                          colorScheme={ORDER_STATE_COLOR_MAP[order.state]}
+                        >
                           <TagLeftIcon boxSize="12px" as={ORDER_STATE_ICON_MAP[order.state]} />
                           <TagLabel>{ORDER_STATE_MAP[order.state as keyof object] || ''}</TagLabel>
                         </Tag>
