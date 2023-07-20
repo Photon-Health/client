@@ -308,14 +308,16 @@ export const Prescriptions = () => {
           </Select>
         }
         fetchMoreData={async () => {
-          const { data } = await refetch({
-            ...getPrescriptionsData,
-            after: rows?.at(-1)?.id
-          });
-          if (data?.prescriptions.length === 0) {
-            setFinished(true);
+          if (refetch && !loading) {
+            const { data } = await refetch({
+              ...getPrescriptionsData,
+              after: rows?.at(-1)?.id
+            });
+            if (data?.prescriptions.length === 0) {
+              setFinished(true);
+            }
+            setRows(rows.concat(data?.prescriptions.map(renderRow)));
           }
-          setRows(rows.concat(data?.prescriptions.map(renderRow)));
         }}
       />
     </Page>
