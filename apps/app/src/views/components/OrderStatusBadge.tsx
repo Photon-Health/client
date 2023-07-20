@@ -1,5 +1,8 @@
 import { Tag, TagLabel, TagLeftIcon, Tooltip } from '@chakra-ui/react';
-import { OrderState } from 'packages/sdk/dist/types';
+// STRANGE BUG TODO: when I had the following line and try to do orderState === OrderState.Placed I get:
+// "Module not found: Error: Can't resolve 'packages/sdk/dist/types'", when I remove it's all good
+// import { OrderState } from 'packages/sdk/dist/types';
+import { types } from '@photonhealth/react';
 import {
   FiAlertTriangle,
   FiArrowUpRight,
@@ -21,7 +24,7 @@ export type OrderFulfillmentState =
   | 'DELIVERED';
 type OrderFulfillmentRecord = Record<OrderFulfillmentState, string>;
 
-export const ORDER_STATE_MAP: { [key in OrderState]: string } = {
+export const ORDER_STATE_MAP: { [key in types.OrderState]: string } = {
   PLACED: 'Placed',
   ROUTING: 'Routing',
   PENDING: 'Pending',
@@ -69,9 +72,27 @@ export const ORDER_FULFILLMENT_TIP_MAP: OrderFulfillmentRecord = {
   DELIVERED: 'Mail order delivered'
 };
 
+export const ORDER_STATE_TIP_MAP: { [key in types.OrderState]: string } = {
+  PLACED: 'Order has been placed',
+  ROUTING: 'Order waiting on patient pharmacy selection',
+  PENDING: 'Order is pending',
+  CANCELED: 'Order has been canceled',
+  COMPLETED: 'Order has been completed',
+  ERROR: 'Order has an error'
+};
+
+export const ORDER_STATE_COLOR_MAP: { [key in types.OrderState]: string } = {
+  PLACED: 'yellow',
+  ROUTING: 'gray',
+  PENDING: 'yellow',
+  CANCELED: 'red',
+  COMPLETED: 'green',
+  ERROR: 'red'
+};
+
 interface OrderStatusBadgeProps {
   fulfillmentState?: OrderFulfillmentState;
-  orderState?: OrderState;
+  orderState?: types.OrderState;
 }
 
 function OrderStatusBadge({ fulfillmentState, orderState }: OrderStatusBadgeProps) {
@@ -84,16 +105,18 @@ function OrderStatusBadge({ fulfillmentState, orderState }: OrderStatusBadgeProp
     return null;
   }
 
-  if (fulfillmentState) {
+  if (orderState === types.OrderState.Placed && fulfillmentState) {
+    // if (orderState === OrderState.Placed && fulfillmentState) {
     const key = fulfillmentState;
     status = ORDER_FULFILLMENT_STATE_MAP[key];
     statusTip = ORDER_FULFILLMENT_TIP_MAP[key] || status;
     statusColor = ORDER_FULFILLMENT_COLOR_MAP[key] || statusColor;
   } else {
-    const key = orderState as OrderState;
+    const key = orderState as types.OrderState;
     status = ORDER_STATE_MAP[key];
-    statusTip = 'Order waiting on patient pharmacy selection';
+    statusTip = ORDER_STATE_TIP_MAP[key] || status;
     statusIcon = ORDER_STATE_ICON_MAP[key];
+    statusColor = ORDER_STATE_COLOR_MAP[key] || statusColor;
   }
 
   return (
