@@ -186,7 +186,7 @@ export const Orders = () => {
       setRows(orders.map(renderRow));
       setFinished(orders.length === 0);
     }
-  }, [loading]);
+  }, [loading, orders]);
 
   const skeletonRows = new Array(25).fill(0).map(() => renderSkeletonRow(isMobile));
 
