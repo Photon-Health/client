@@ -247,7 +247,7 @@ customElement(
                   class="w-full xs:min-w-[48%]"
                   invalid={store['phone']?.error}
                   help-text={store['phone']?.error}
-                  label="Phone Number"
+                  label="Cell Phone Number"
                   on:photon-phone-changed={async (e: any) => {
                     actions.updateFormValue({
                       key: 'phone',
