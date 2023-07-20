@@ -525,13 +525,6 @@ export const Pharmacy = () => {
     order?.address?.city === 'Austin' && order?.address?.state === 'TX';
   const enableCourier = searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier;
 
-  // -----create featured indie pharmacy list
-  // -----in austin?
-  // -----yes, get 15 pharmacies
-  // if 1-3 indies in list, float to top
-  // show more just tack on like usual
-  // no, as usual
-
   return (
     <Box>
       <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />
