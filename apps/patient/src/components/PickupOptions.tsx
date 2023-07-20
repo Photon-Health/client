@@ -11,6 +11,7 @@ import {
 import { PharmacyCard } from './PharmacyCard';
 import t from '../utils/text.json';
 import { Pharmacy } from '../utils/models';
+import { AUSTIN_INDIE_PHARMACY_IDS } from '../views/Pharmacy';
 
 interface PickupOptionsProps {
   pharmacies: Pharmacy[];
@@ -65,6 +66,7 @@ export const PickupOptions = ({
             <PharmacyCard
               pharmacy={pharmacy}
               preferred={pharmacy.id === preferredPharmacy}
+              goodService={AUSTIN_INDIE_PHARMACY_IDS.includes(pharmacy.id)}
               savingPreferred={savingPreferred}
               selected={selectedId === pharmacy.id}
               onSelect={() => handleSelect(pharmacy.id)}

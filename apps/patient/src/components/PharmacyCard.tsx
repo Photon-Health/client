@@ -14,7 +14,7 @@ import {
   VStack,
   useBreakpointValue
 } from '@chakra-ui/react';
-import { FiRotateCcw, FiStar } from 'react-icons/fi';
+import { FiRotateCcw, FiStar, FiThumbsUp } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { types } from '@photonhealth/sdk';
@@ -96,6 +96,7 @@ interface PharmacyCardProps {
   pharmacy: Pharmacy;
   preferred?: boolean;
   previous?: boolean;
+  goodService?: boolean;
   savingPreferred: boolean;
   selected: boolean;
   onSelect: Function;
@@ -106,6 +107,7 @@ export const PharmacyCard = memo(function PharmacyCard({
   pharmacy,
   preferred,
   previous,
+  goodService,
   savingPreferred,
   selected,
   onSelect,
@@ -125,7 +127,7 @@ export const PharmacyCard = memo(function PharmacyCard({
       mx={isMobile ? -3 : undefined}
     >
       <CardBody p={3}>
-        <VStack align="start" w="full" spacing={0}>
+        <VStack align="start" w="full" spacing={1}>
           {preferred ? (
             <Tag size="sm" colorScheme="yellow">
               <TagLeftIcon boxSize="12px" as={FiStar} />
@@ -138,18 +140,26 @@ export const PharmacyCard = memo(function PharmacyCard({
               <TagLabel> Previous</TagLabel>
             </Tag>
           ) : null}
+          {goodService ? (
+            <Tag size="sm" colorScheme="purple">
+              <TagLeftIcon boxSize="12px" as={FiThumbsUp} />
+              <TagLabel> Good service</TagLabel>
+            </Tag>
+          ) : null}
           {pharmacy?.hours?.is24Hr ? (
             <Tag size="sm" colorScheme="green">
               <TagLabel>24 hr</TagLabel>
             </Tag>
           ) : null}
-          <Text fontSize="md">{pharmacy.name}</Text>
-          <RatingHours
-            businessStatus={pharmacy.businessStatus}
-            rating={pharmacy.rating}
-            hours={pharmacy.hours}
-          />
-          <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
+          <VStack align="start" w="full" spacing={0}>
+            <Text fontSize="md">{pharmacy.name}</Text>
+            <RatingHours
+              businessStatus={pharmacy.businessStatus}
+              rating={pharmacy.rating}
+              hours={pharmacy.hours}
+            />
+            <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
+          </VStack>
         </VStack>
       </CardBody>
       <Collapse in={selected && !preferred} animateOpacity>
