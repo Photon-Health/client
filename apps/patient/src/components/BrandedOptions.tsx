@@ -1,6 +1,6 @@
 import { Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
 
-import { types } from '@photonhealth/sdk';
+import { types } from '@photonhealth/react';
 import { ExtendedFulfillmentType } from '../utils/models';
 import t from '../utils/text.json';
 import { BrandedPharmacyCard } from './BrandedPharmacyCard';

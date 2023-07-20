@@ -17,12 +17,12 @@ import {
 import { FiRotateCcw, FiStar, FiThumbsUp } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { types } from '@photonhealth/sdk';
+import { types } from '@photonhealth/react';
+import { Pharmacy as PharmacyType } from '../utils/models';
 
 import { UNOPEN_BUSINESS_STATUS_MAP } from '../views/Pharmacy';
 import { Rating } from './Rating';
 import { formatAddress } from '../utils/general';
-import { Pharmacy } from '../utils/models';
 
 dayjs.extend(customParseFormat);
 
@@ -93,7 +93,7 @@ const DistanceAddress = ({ distance, address }: DistanceAddressProps) => {
 };
 
 interface PharmacyCardProps {
-  pharmacy: Pharmacy;
+  pharmacy: PharmacyType;
   preferred?: boolean;
   previous?: boolean;
   goodService?: boolean;
