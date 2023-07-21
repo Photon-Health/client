@@ -10,7 +10,6 @@ const CopyText = ({ text }: { text: string }) => {
         whiteSpace={{ base: 'nowrap', sm: 'normal' }}
         overflow={{ base: 'hidden', sm: 'visible' }}
         textOverflow={{ base: 'ellipsis', sm: 'clip' }}
-        maxWidth={{ base: '100px', sm: 'none' }}
       >
         {text}
       </Text>
