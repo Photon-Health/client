@@ -143,19 +143,26 @@ export const Status = () => {
           </VStack>
           {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
             <Box alignSelf="start">
-              <Text display="inline" color="gray.500">
+              <Text display="inline" color="gray.600">
                 {t.status.MAIL_ORDER.trackingNumber}
               </Text>
-              <Text display="inline" ms={2}>
+              <Link
+                href={`https://google.com/search?q=${fulfillment.trackingNumber}`}
+                display="inline"
+                ms={2}
+                color="brandLink"
+                fontWeight="medium"
+                target="_blank"
+              >
                 {fulfillment.trackingNumber}
-              </Text>
+              </Link>
             </Box>
           ) : null}
           {fulfillmentType !== (types.FulfillmentType.MailOrder || 'COURIER') &&
           pharmacy?.name &&
           pharmacy?.address ? (
             <Box alignSelf="start">
-              <Text display="inline" color="gray.500">
+              <Text display="inline" color="gray.600">
                 {t.status.PICK_UP.pickup}
               </Text>
               <Link
@@ -166,6 +173,7 @@ export const Status = () => {
                 ms={2}
                 color="brandLink"
                 fontWeight="medium"
+                target="_blank"
               >
                 <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
                 {pharmacy.name}, {pharmacy.address ? formatAddress(pharmacy.address) : ''}
