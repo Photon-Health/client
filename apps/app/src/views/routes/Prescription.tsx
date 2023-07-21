@@ -256,7 +256,9 @@ export const Prescription = () => {
             </Stack>
 
             <Divider />
-
+            <Text color="gray.500" fontWeight="medium" fontSize="sm">
+              Prescription Details
+            </Text>
             <InfoGrid name="Instructions">
               {loading ? (
                 <SkeletonText noOfLines={1} width="100px" />
