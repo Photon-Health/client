@@ -34,7 +34,27 @@ import { getSettings } from '@client/settings';
 import { Pharmacy as PharmacyType } from '../utils/models';
 
 export const AUSTIN_INDIE_PHARMACY_IDS: string[] = [
-  // ...pharmacy id's list...
+  'phr_01G9CM8JJ03N4VPPDKR4KV4YKR', // Tarrytown Pharmacy
+  'phr_01G9CM8MFENM6P96F94RQWBMAY', // Northwest Hills Pharmacy at Davenport
+  // People's pharmacies (4)
+  'phr_01G9CM8MTAFDSKSJ5P3680FFBG',
+  'phr_01G9CM90JXBT4JPDQZAMEVRQ5K',
+  'phr_01G9CM8M2D23133Q9T91K3NQE5',
+  'phr_01G9CM8TFRJNZ5CYW1PV3Z4Z9C',
+  'phr_01G9CM8W0RD2YRWX8F64NJB4JM', // East Austin Medicine Shop
+  'phr_01GFVHFPSTYPWPMGQ4Y0ZMEEP0', // Martin's Wellness & Compounding Pharmacy at Lamar Plaza Drug Store
+  // Martin's Wellness Dripping Springs Pharmacy
+  'phr_01G9CM8WDPTAPXX8RWFSFTDZRW', // Brodie Lane Pharmacy
+  // MedSavers Pharmacy
+  'phr_01GA9HPXHZY0NS2WBWEF52GKFM', // Gus's Drug
+  'phr_01G9CM8J8CDW1TVNY9MMNBF1QM', // 38th Street Pharmacy
+  'phr_01G9CM92EYZVK3FZ25JMYKRNR5', // Austin Compounding Pharmacy
+  'phr_01GA9HPXJPCEXYEBVGFYT17066', // Buda Drug Store
+  'phr_01G9CM92S2ES1TJD8DH1VTEBZJ', // Auro Pharmacy
+  'phr_01GA9HPXD5ZM86MASCK625ZQJF', // Lake Hills Pharmacy
+  'phr_01GA9HPXEQH5V38D5G11EKADNY', // Manor Pharmacy
+  'phr_01G9CM940NTXPBR0HQ7042T5CA', // Alive And Well Pharmacy
+  'phr_01GSB2FQ4F2D2JBJW58AGCP2V0' // Solutions Pharmacy
 ];
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
@@ -198,6 +218,7 @@ export const Pharmacy = () => {
 
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
+  const [fetchedPharmacies, setFetchedPharmacies] = useState([]);
   const [pharmacyOptions, setPharmacyOptions] = useState([]);
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<string>('');
@@ -308,44 +329,45 @@ export const Pharmacy = () => {
       newPharmacies.sort(sortIndiesFirst);
     }
 
-    // Enrich first 3 since we only show 3 at a time
-    for (let i = 0; i < 3; i++) {
-      await enrichPharmacy(newPharmacies[i]);
-    }
+    setFetchedPharmacies(newPharmacies);
 
-    setPharmacyOptions(newPharmacies);
+    // Enrich first 3 since we only show 3 at a time
+    const enrichedPharmacies: PharmacyType[] = await Promise.all(
+      pharmaciesResult.slice(0, 3).map(enrichPharmacy)
+    );
+    setPharmacyOptions(enrichedPharmacies);
+
     setLoadingPharmacies(false);
   };
 
   const handleShowMore = async () => {
     setLoadingPharmacies(true);
 
-    let totalEnrichedPharmacies = 0;
-
     const updatedOptions = [...pharmacyOptions];
 
-    // Enrich existing pharmacies if we already have them
-    for (let i = 0; i < updatedOptions.length; i++) {
-      if (totalEnrichedPharmacies === 3) break;
+    let totalNewEnriched = 0;
 
-      if (!updatedOptions[i].enriched) {
-        totalEnrichedPharmacies = ++totalEnrichedPharmacies; // Increment counter
-        await enrichPharmacy(updatedOptions[i]);
+    // Enrich existing pharmacies if we already have them
+    if (pharmacyOptions.length < fetchedPharmacies.length) {
+      const startIndex = pharmacyOptions.length;
+      for (let i = startIndex; i < startIndex + 3; i++) {
+        if (totalNewEnriched === 3) break;
+        const newPharmacy = fetchedPharmacies[i];
+        await enrichPharmacy(newPharmacy);
+        updatedOptions.push(newPharmacy);
+        totalNewEnriched = ++totalNewEnriched; // Increment counter
       }
     }
 
-    if (totalEnrichedPharmacies >= 3) {
+    if (totalNewEnriched >= 3) {
       // Break early and return enriched pharmacies
       setPharmacyOptions([...updatedOptions]);
       setLoadingPharmacies(false);
       return;
     }
 
-    const pharmaciesToGet = 3 - totalEnrichedPharmacies;
-    const totalEnriched = updatedOptions.reduce(
-      (count, pharm) => count + (pharm.enriched ? 1 : 0),
-      0
-    );
+    const pharmaciesToGet = 3 - totalNewEnriched;
+    const totalEnriched = updatedOptions.length;
 
     // Get pharmacies from photon db
     const pharmaciesResult = await getPharmacies(
@@ -384,13 +406,8 @@ export const Pharmacy = () => {
       return;
     }
 
-    // Add new pharmacies
-    // const newPharmacies: PharmacyType[] = pharmaciesResult;
+    setFetchedPharmacies([...fetchedPharmacies, ...pharmaciesResult]);
 
-    // Enrich new pharmacies
-    // for (let i = 0; i < newPharmacies.length; i++) {
-    //   await enrichPharmacy(newPharmacies[i]);
-    // }
     const enrichedPharmacies: PharmacyType[] = await Promise.all(
       pharmaciesResult.map(enrichPharmacy)
     );
