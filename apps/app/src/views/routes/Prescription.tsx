@@ -10,7 +10,6 @@ import {
   CardBody,
   CardHeader,
   Divider,
-  IconButton,
   Stack,
   HStack,
   Link,
@@ -31,7 +30,7 @@ import {
   LinkBox,
   LinkOverlay
 } from '@chakra-ui/react';
-import { FiChevronRight, FiCopy } from 'react-icons/fi';
+import { FiChevronRight } from 'react-icons/fi';
 import { gql, GraphQLClient } from 'graphql-request';
 import dayjs from 'dayjs';
 
