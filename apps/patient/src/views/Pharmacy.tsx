@@ -34,27 +34,7 @@ import { getSettings } from '@client/settings';
 import { Pharmacy as PharmacyType } from '../utils/models';
 
 export const AUSTIN_INDIE_PHARMACY_IDS: string[] = [
-  'phr_01G9CM8JJ03N4VPPDKR4KV4YKR', // Tarrytown Pharmacy
-  'phr_01G9CM8MFENM6P96F94RQWBMAY', // Northwest Hills Pharmacy at Davenport
-  // People's pharmacies (4)
-  'phr_01G9CM8MTAFDSKSJ5P3680FFBG',
-  'phr_01G9CM90JXBT4JPDQZAMEVRQ5K',
-  'phr_01G9CM8M2D23133Q9T91K3NQE5',
-  'phr_01G9CM8TFRJNZ5CYW1PV3Z4Z9C',
-  'phr_01G9CM8W0RD2YRWX8F64NJB4JM', // East Austin Medicine Shop
-  'phr_01GFVHFPSTYPWPMGQ4Y0ZMEEP0', // Martin's Wellness & Compounding Pharmacy at Lamar Plaza Drug Store
-  // Martin's Wellness Dripping Springs Pharmacy
-  'phr_01G9CM8WDPTAPXX8RWFSFTDZRW', // Brodie Lane Pharmacy
-  // MedSavers Pharmacy
-  'phr_01GA9HPXHZY0NS2WBWEF52GKFM', // Gus's Drug
-  'phr_01G9CM8J8CDW1TVNY9MMNBF1QM', // 38th Street Pharmacy
-  'phr_01G9CM92EYZVK3FZ25JMYKRNR5', // Austin Compounding Pharmacy
-  'phr_01GA9HPXJPCEXYEBVGFYT17066', // Buda Drug Store
-  'phr_01G9CM92S2ES1TJD8DH1VTEBZJ', // Auro Pharmacy
-  'phr_01GA9HPXD5ZM86MASCK625ZQJF', // Lake Hills Pharmacy
-  'phr_01GA9HPXEQH5V38D5G11EKADNY', // Manor Pharmacy
-  'phr_01G9CM940NTXPBR0HQ7042T5CA', // Alive And Well Pharmacy
-  'phr_01GSB2FQ4F2D2JBJW58AGCP2V0' // Solutions Pharmacy
+  // ...pharmacy id's list...
 ];
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
@@ -68,7 +48,7 @@ export const UNOPEN_BUSINESS_STATUS_MAP = {
 const placesService = new google.maps.places.PlacesService(document.createElement('div'));
 const geocoder = new google.maps.Geocoder();
 
-const query = (method, data) =>
+const query = (method: string, data: object) =>
   new Promise((resolve, reject) => {
     placesService[method](data, (response, status) => {
       if (status === 'OK') {
@@ -90,7 +70,16 @@ const geocode = async (address: string) => {
   }
 };
 
-const getPharmacies = async (searchParams, limit, offset, token) => {
+const getPharmacies = async (
+  searchParams: {
+    latitude: number;
+    longitude: number;
+    radius: number;
+  },
+  limit: number,
+  offset: number,
+  token: string
+) => {
   graphQLClient.setHeader('x-photon-auth', token);
 
   try {
@@ -104,16 +93,23 @@ const getPharmacies = async (searchParams, limit, offset, token) => {
     );
     return query.pharmaciesByLocation;
   } catch (error) {
-    if (error?.response.errors[0].message === 'No pharmacies found near location') {
-      console.log(error); // Just log so we don't get bugged in DataDog
+    if (
+      error?.response?.errors &&
+      error.response.errors[0].message === 'No pharmacies found near location'
+    ) {
+      const { message } = error.response.errors[0];
+      console.log(message);
+      return message;
     } else {
       console.error(JSON.stringify(error, undefined, 2));
+      return error;
     }
-    return error;
   }
 };
 
-const enrichPharmacy = async (p) => {
+const enrichPharmacy = async (p: PharmacyType) => {
+  p.enriched = true; // Set this at beginning in case we need to break early
+
   // Get place from Google
   const name = p.name;
   const address = p.address ? formatAddress(p.address) : '';
@@ -162,14 +158,16 @@ const enrichPharmacy = async (p) => {
 
   if (detailsStatus !== 'OK') {
     console.log('Could not find place details');
-    return p; // Break early if details not found
+    return p; // Break early if place details not found
   }
 
   p.businessStatus = details?.business_status || '';
   p.rating = details?.rating || undefined;
 
   const openForBusiness = details?.business_status === 'OPERATIONAL';
-  if (!openForBusiness) return p;
+  if (!openForBusiness) {
+    return p; // Don't need hours for non-operational business
+  }
 
   const currentTime = dayjs().format('HHmm');
   const { is24Hr, opens, opensDay, closes } = getHours(
@@ -216,6 +214,7 @@ export const Pharmacy = () => {
   );
 
   const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(location);
+  const featureIndiesWithinRadius = 3; // miles
 
   const toast = useToast();
 
@@ -268,7 +267,7 @@ export const Pharmacy = () => {
         longitude: lng,
         radius: 25
       },
-      searchingInAustinTX ? 20 : 3,
+      searchingInAustinTX ? 30 : 3,
       0,
       token
     );
@@ -293,12 +292,14 @@ export const Pharmacy = () => {
 
     // Prioritize indie pharmacies in Austin, TX
     if (searchingInAustinTX) {
-      const sortIndiesFirst = (a: types.Pharmacy, b: types.Pharmacy) => {
-        const aIsIndependent = AUSTIN_INDIE_PHARMACY_IDS.includes(a.id);
-        const bIsIndependent = AUSTIN_INDIE_PHARMACY_IDS.includes(b.id);
-        if (aIsIndependent && !bIsIndependent) {
+      const sortIndiesFirst = (a: PharmacyType, b: PharmacyType) => {
+        const featurePharmacy = (p: PharmacyType) =>
+          AUSTIN_INDIE_PHARMACY_IDS.includes(p.id) && p.distance < featureIndiesWithinRadius;
+        const featureA = featurePharmacy(a);
+        const featureB = featurePharmacy(b);
+        if (featureA && !featureB) {
           return -1; // a comes before b
-        } else if (!aIsIndependent && bIsIndependent) {
+        } else if (!featureA && featureB) {
           return 1; // b comes before a
         } else {
           return 0; // no change in order
@@ -309,8 +310,6 @@ export const Pharmacy = () => {
 
     // Enrich first 3 since we only show 3 at a time
     for (let i = 0; i < 3; i++) {
-      newPharmacies[i].enriched = true;
-
       await enrichPharmacy(newPharmacies[i]);
     }
 
@@ -323,24 +322,30 @@ export const Pharmacy = () => {
 
     let totalEnrichedPharmacies = 0;
 
-    // Enrich existing pharmacies if we already have them
-    for (let i = 0; i < pharmacyOptions.length; i++) {
-      if (!pharmacyOptions[i].enriched) {
-        // Increment counter
-        totalEnrichedPharmacies = ++totalEnrichedPharmacies;
+    const updatedOptions = [...pharmacyOptions];
 
-        await enrichPharmacy(pharmacyOptions[i]);
+    // Enrich existing pharmacies if we already have them
+    for (let i = 0; i < updatedOptions.length; i++) {
+      if (totalEnrichedPharmacies === 3) break;
+
+      if (!updatedOptions[i].enriched) {
+        totalEnrichedPharmacies = ++totalEnrichedPharmacies; // Increment counter
+        await enrichPharmacy(updatedOptions[i]);
       }
     }
 
     if (totalEnrichedPharmacies >= 3) {
       // Break early and return enriched pharmacies
-      setPharmacyOptions(pharmacyOptions);
+      setPharmacyOptions([...updatedOptions]);
       setLoadingPharmacies(false);
+      return;
     }
 
     const pharmaciesToGet = 3 - totalEnrichedPharmacies;
-    const totalEnriched = pharmacyOptions.length;
+    const totalEnriched = updatedOptions.reduce(
+      (count, pharm) => count + (pharm.enriched ? 1 : 0),
+      0
+    );
 
     // Get pharmacies from photon db
     const pharmaciesResult = await getPharmacies(
@@ -360,28 +365,37 @@ export const Pharmacy = () => {
         title: pharmaciesResult,
         position: 'top',
         status: 'warning',
-        duration: 5000,
+        duration: 3000,
         isClosable: true
       });
       return;
     }
     if (!pharmaciesResult) {
-      console.log('Could not find pharmacies');
+      console.log('Could not find pharmacies.');
       setLoadingPharmacies(false);
+      toast({
+        title: 'Could not find pharmacies',
+        description: 'Please refresh and try again',
+        position: 'top',
+        status: 'error',
+        duration: 3000,
+        isClosable: true
+      });
       return;
     }
 
     // Add new pharmacies
-    const newPharmacies: PharmacyType[] = pharmaciesResult;
+    // const newPharmacies: PharmacyType[] = pharmaciesResult;
 
     // Enrich new pharmacies
-    for (let i = 0; i < newPharmacies.length; i++) {
-      newPharmacies[i].enriched = true;
+    // for (let i = 0; i < newPharmacies.length; i++) {
+    //   await enrichPharmacy(newPharmacies[i]);
+    // }
+    const enrichedPharmacies: PharmacyType[] = await Promise.all(
+      pharmaciesResult.map(enrichPharmacy)
+    );
 
-      await enrichPharmacy(newPharmacies[i]);
-    }
-
-    setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
+    setPharmacyOptions([...updatedOptions, ...enrichedPharmacies]);
     setLoadingPharmacies(false);
   };
 
