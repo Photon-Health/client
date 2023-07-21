@@ -1,7 +1,19 @@
-import { Box, Center, Container, Stack } from '@chakra-ui/react';
-import { Step } from './components/Step';
-import t from '../../utils/text.json';
-import { ExtendedFulfillmentType } from '../../utils/models';
+import {
+  Box,
+  Center,
+  Container,
+  Step,
+  Stepper,
+  StepIcon,
+  StepIndicator,
+  StepStatus,
+  StepTitle,
+  StepDescription,
+  StepNumber,
+  StepSeparator
+} from '@chakra-ui/react';
+import t from '../utils/text.json';
+import { ExtendedFulfillmentType } from '../utils/models';
 
 export const STATES = {
   PICK_UP: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'],
@@ -26,7 +38,14 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
     <Box>
       <Container px={0} pt={0}>
         <Center>
-          <Stack spacing="0">
+          <Stepper
+            index={activeStep}
+            orientation="vertical"
+            height="400px"
+            gap="0"
+            size="lg"
+            colorScheme="green"
+          >
             {states.map((state, id) => {
               const title = t.status[fulfillmentType].states[state].title;
               const description =
@@ -35,18 +54,23 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
                   : t.status[fulfillmentType].states[state].description;
 
               return (
-                <Step
-                  key={state}
-                  cursor="pointer"
-                  title={title}
-                  description={description}
-                  isActive={activeStep === id}
-                  isCompleted={activeStep > id}
-                  isLastStep={states.length === id + 1}
-                />
+                <Step key={id}>
+                  <StepIndicator>
+                    <StepStatus
+                      complete={<StepIcon />}
+                      incomplete={<StepNumber />}
+                      active={<StepNumber />}
+                    />
+                  </StepIndicator>
+                  <Box ml={1}>
+                    <StepTitle>{title}</StepTitle>
+                    <StepDescription>{description}</StepDescription>
+                  </Box>
+                  <StepSeparator />
+                </Step>
               );
             })}
-          </Stack>
+          </Stepper>
         </Center>
       </Container>
     </Box>
