@@ -30,7 +30,6 @@ import {
   useToast,
   LinkBox,
   LinkOverlay,
-  Badge,
   Tag,
   TagLeftIcon,
   TagLabel
@@ -360,16 +359,19 @@ export const Order = () => {
                           ms={isMobile ? 'auto' : undefined}
                         />
                       ) : order.fulfillment?.state ? (
-                        <Badge
+                        <Tag
                           size="sm"
+                          borderRadius="full"
                           colorScheme={
                             ORDER_FULFILLMENT_COLOR_MAP[order.fulfillment.state as keyof object] ||
                             ''
                           }
                         >
-                          {ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof object] ||
-                            ''}
-                        </Badge>
+                          <TagLabel>
+                            {ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof object] ||
+                              ''}
+                          </TagLabel>
+                        </Tag>
                       ) : null}
                     </Td>
                   </Tr>
