@@ -128,8 +128,6 @@ const getPharmacies = async (
 };
 
 const enrichPharmacy = async (p: PharmacyType) => {
-  p.enriched = true; // Set this at beginning in case we need to break early
-
   // Get place from Google
   const name = p.name;
   const address = p.address ? formatAddress(p.address) : '';

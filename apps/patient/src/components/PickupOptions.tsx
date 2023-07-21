@@ -61,21 +61,19 @@ export const PickupOptions = ({
       ) : null}
 
       <VStack align="span" spacing={2}>
-        {pharmacies.map((pharmacy: PharmacyType, i: number) =>
-          pharmacy.enriched ? (
-            <SlideFade offsetY="60px" in={true} key={`pickup-pharmacy-${pharmacy.id}-${i}`}>
-              <PharmacyCard
-                pharmacy={pharmacy}
-                preferred={pharmacy.id === preferredPharmacy}
-                goodService={AUSTIN_INDIE_PHARMACY_IDS.includes(pharmacy.id)}
-                savingPreferred={savingPreferred}
-                selected={selectedId === pharmacy.id}
-                onSelect={() => handleSelect(pharmacy.id)}
-                onSetPreferred={() => handleSetPreferred(pharmacy.id)}
-              />
-            </SlideFade>
-          ) : null
-        )}
+        {pharmacies.map((pharmacy: PharmacyType, i: number) => (
+          <SlideFade offsetY="60px" in={true} key={`pickup-pharmacy-${pharmacy.id}-${i}`}>
+            <PharmacyCard
+              pharmacy={pharmacy}
+              preferred={pharmacy.id === preferredPharmacy}
+              goodService={AUSTIN_INDIE_PHARMACY_IDS.includes(pharmacy.id)}
+              savingPreferred={savingPreferred}
+              selected={selectedId === pharmacy.id}
+              onSelect={() => handleSelect(pharmacy.id)}
+              onSetPreferred={() => handleSetPreferred(pharmacy.id)}
+            />
+          </SlideFade>
+        ))}
       </VStack>
       {!showingAllPharmacies && (pharmacies?.length > 0 || loadingMore) ? (
         <Button
