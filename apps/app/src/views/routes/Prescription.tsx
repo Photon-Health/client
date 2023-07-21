@@ -51,6 +51,7 @@ import NameView from '../components/NameView';
 import { Fill, Maybe } from 'packages/sdk/dist/types';
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 import InfoGrid from '../components/InfoGrid';
+import CopyText from '../components/CopyText';
 
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
@@ -422,19 +423,7 @@ export const Prescription = () => {
               {loading ? (
                 <SkeletonText noOfLines={1} width="150px" />
               ) : (
-                <HStack spacing={2}>
-                  <Text fontSize="md">{id}</Text>
-                  <IconButton
-                    variant="ghost"
-                    color="gray.500"
-                    aria-label="Copy external id"
-                    minW="fit-content"
-                    py={0}
-                    _hover={{ backgroundColor: 'transparent' }}
-                    icon={<FiCopy size="1.3em" />}
-                    onClick={() => navigator.clipboard.writeText(id || '')}
-                  />
-                </HStack>
+                <CopyText text={id || ''} />
               )}
             </InfoGrid>
 
@@ -442,20 +431,7 @@ export const Prescription = () => {
               {loading ? (
                 <SkeletonText noOfLines={1} width="65px" />
               ) : rx.externalId ? (
-                <HStack spacing={2}>
-                  <Text fontSize="md">{rx.externalId}</Text>
-                  <IconButton
-                    variant="ghost"
-                    color="gray.500"
-                    aria-label="Copy external id"
-                    minW="fit-content"
-                    py={0}
-                    size="sm"
-                    _hover={{ backgroundColor: 'transparent' }}
-                    icon={<FiCopy size="1.3em" />}
-                    onClick={() => navigator.clipboard.writeText(rx.externalId || '')}
-                  />
-                </HStack>
+                <CopyText text={rx.externalId || ''} />
               ) : (
                 <Text fontSize="md" as="i">
                   None
