@@ -12,18 +12,12 @@ import {
   CardHeader,
   Divider,
   HStack,
-  IconButton,
   Link,
   Skeleton,
   SkeletonCircle,
   SkeletonText,
   Stack,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
   Text,
-  Tr,
   VStack,
   useBreakpointValue,
   useColorMode,
@@ -37,7 +31,7 @@ import {
 } from '@chakra-ui/react';
 import { gql, GraphQLClient } from 'graphql-request';
 import { usePhoton, types } from '@photonhealth/react';
-import { FiCopy, FiChevronRight } from 'react-icons/fi';
+import { FiChevronRight } from 'react-icons/fi';
 import { Page } from '../components/Page';
 import PatientView from '../components/PatientView';
 import { confirmWrapper } from '../components/GuardDialog';
@@ -48,6 +42,8 @@ import {
   ORDER_STATE_ICON_MAP,
   ORDER_STATE_MAP
 } from '../components/OrderStatusBadge';
+import InfoGrid from '../components/InfoGrid';
+import CopyText from '../components/CopyText';
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
     parse: JSON.parse,
@@ -100,36 +96,8 @@ export const Order = () => {
     }
   }, [accessToken]);
   const isMobile = useBreakpointValue({ base: true, sm: false });
-  const rightColWidth = '75%';
   const { colorMode } = useColorMode();
-  const CopyText = ({ text }: { text: string }) => {
-    if (!text) return null;
-    return (
-      <HStack spacing={2} justifyContent={isMobile ? 'end' : 'start'}>
-        <Text
-          fontSize="md"
-          whiteSpace={isMobile ? 'nowrap' : undefined}
-          overflow={isMobile ? 'hidden' : undefined}
-          textOverflow={isMobile ? 'ellipsis' : undefined}
-          maxWidth={isMobile ? '100px' : undefined}
-        >
-          {text}
-        </Text>
-        <IconButton
-          variant="ghost"
-          color="gray.500"
-          aria-label="Copy external id"
-          minW="fit-content"
-          h="fit-content"
-          py={0}
-          my={0}
-          _hover={{ backgroundColor: 'transparent' }}
-          icon={<FiCopy size="1.3em" />}
-          onClick={() => navigator.clipboard.writeText(text || '')}
-        />
-      </HStack>
-    );
-  };
+
   if (error || (!loading && !order)) {
     return (
       <Alert
@@ -160,9 +128,9 @@ export const Order = () => {
     <Button
       aria-label="Cancel Order"
       variant="outline"
-      borderColor="blue.500"
-      textColor="blue.500"
-      colorScheme="blue"
+      borderColor="red.500"
+      textColor="red.500"
+      colorScheme="red"
       isDisabled={
         order.fulfillment?.type !== types.FulfillmentType.MailOrder ||
         order.state === types.OrderState.Canceled
@@ -242,88 +210,48 @@ export const Order = () => {
               Details
             </Text>
 
-            <TableContainer w="full">
-              <Table bg="transparent">
-                <Tbody>
-                  <Tr>
-                    <Td px={0} py={2} border="none">
-                      <Text fontSize="md">Order Status</Text>
-                    </Td>
-                    <Td pe={0} py={2} isNumeric={isMobile} border="none" w={rightColWidth}>
-                      {loading ? (
-                        <Skeleton
-                          width="70px"
-                          height="24px"
-                          borderRadius="xl"
-                          ms={isMobile ? 'auto' : undefined}
-                        />
-                      ) : (
-                        <Tag size="sm" borderRadius="full">
-                          <TagLeftIcon boxSize="12px" as={ORDER_STATE_ICON_MAP[order.state]} />
-                          <TagLabel>{ORDER_STATE_MAP[order.state as keyof object] || ''}</TagLabel>
-                        </Tag>
-                      )}
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td px={0} py={2} border="none">
-                      <Text fontSize="md">Id</Text>
-                    </Td>
-                    <Td pe={0} py={2} isNumeric={isMobile} border="none" w={rightColWidth}>
-                      {loading ? (
-                        <SkeletonText
-                          noOfLines={1}
-                          width="150px"
-                          ms={isMobile ? 'auto' : undefined}
-                        />
-                      ) : order.id ? (
-                        <CopyText text={order.id} />
-                      ) : (
-                        <Text fontSize="md" as="i">
-                          None
-                        </Text>
-                      )}
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td px={0} py={2} border="none">
-                      <Text fontSize="md">External Id</Text>
-                    </Td>
-                    <Td pe={0} py={2} isNumeric={isMobile} border="none" w={rightColWidth}>
-                      {loading ? (
-                        <SkeletonText
-                          noOfLines={1}
-                          width="150px"
-                          ms={isMobile ? 'auto' : undefined}
-                        />
-                      ) : order.externalId ? (
-                        <CopyText text={order.externalId} />
-                      ) : (
-                        <Text fontSize="md" as="i">
-                          None
-                        </Text>
-                      )}
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td px={0} py={2} border="none">
-                      <Text fontSize="md">Created At</Text>
-                    </Td>
-                    <Td pe={0} py={2} isNumeric={isMobile} border="none" w={rightColWidth}>
-                      {loading ? (
-                        <SkeletonText
-                          noOfLines={1}
-                          width="125px"
-                          ms={isMobile ? 'auto' : undefined}
-                        />
-                      ) : (
-                        <Text fontSize="md">{formatDate(order.createdAt)}</Text>
-                      )}
-                    </Td>
-                  </Tr>
-                </Tbody>
-              </Table>
-            </TableContainer>
+            <InfoGrid name="Order Status">
+              {loading ? (
+                <Skeleton width="70px" height="24px" borderRadius="xl" />
+              ) : (
+                <Tag size="sm" borderRadius="full">
+                  <TagLeftIcon boxSize="12px" as={ORDER_STATE_ICON_MAP[order.state]} />
+                  <TagLabel>{ORDER_STATE_MAP[order.state as keyof object] || ''}</TagLabel>
+                </Tag>
+              )}
+            </InfoGrid>
+
+            <InfoGrid name="Id">
+              {loading ? (
+                <SkeletonText noOfLines={1} width="150px" />
+              ) : order.id ? (
+                <CopyText text={order.id} />
+              ) : (
+                <Text fontSize="md" as="i">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
+
+            <InfoGrid name="External Id">
+              {loading ? (
+                <SkeletonText noOfLines={1} width="150px" />
+              ) : order.externalId ? (
+                <CopyText text={order.externalId} />
+              ) : (
+                <Text fontSize="md" as="i">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
+
+            <InfoGrid name="Created At">
+              {loading ? (
+                <SkeletonText noOfLines={1} width="125px" />
+              ) : (
+                <Text fontSize="md">{formatDate(order.createdAt)}</Text>
+              )}
+            </InfoGrid>
 
             <Divider />
 
@@ -331,181 +259,105 @@ export const Order = () => {
               Fulfillment
             </Text>
 
-            <TableContainer w="full">
-              <Table bg="transparent">
-                <Tbody>
-                  <Tr>
-                    <Td px={0} py={2} border="none">
-                      <Text fontSize="md">Type</Text>
-                    </Td>
-                    <Td pe={0} py={2} isNumeric={isMobile} border="none" w={rightColWidth}>
-                      {loading ? (
-                        <SkeletonText
-                          noOfLines={1}
-                          width="100px"
-                          ms={isMobile ? 'auto' : undefined}
-                        />
-                      ) : order.fulfillment ? (
-                        <Text fontSize="md">
-                          {ORDER_FULFILLMENT_TYPE_MAP[order.fulfillment.type]}
-                        </Text>
-                      ) : (
-                        <Text fontSize="md" as="i">
-                          None
-                        </Text>
-                      )}
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td px={0} py={2} border="none">
-                      <Text fontSize="md">Fulfillment Status</Text>
-                    </Td>
-                    <Td pe={0} py={2} isNumeric={isMobile} border="none" w={rightColWidth}>
-                      {loading ? (
-                        <Skeleton
-                          width="70px"
-                          height="24px"
-                          borderRadius="xl"
-                          ms={isMobile ? 'auto' : undefined}
-                        />
-                      ) : order.fulfillment?.state ? (
-                        <Badge
-                          size="sm"
-                          colorScheme={
-                            ORDER_FULFILLMENT_COLOR_MAP[order.fulfillment.state as keyof object] ||
-                            ''
-                          }
-                        >
-                          {ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof object] ||
-                            ''}
-                        </Badge>
-                      ) : null}
-                    </Td>
-                  </Tr>
-                  {!loading && order.fulfillment?.type === 'MAIL_ORDER' ? (
-                    <>
-                      <Tr>
-                        <Td px={0} py={2} border="none">
-                          <Text fontSize="md">Carrier</Text>
-                        </Td>
-                        <Td pe={0} py={2} isNumeric={isMobile} border="none" w={rightColWidth}>
-                          {order.fulfillment?.carrier ? (
-                            <Text fontSize="md">{order.fulfillment.carrier}</Text>
-                          ) : (
-                            <Text fontSize="md" as="i">
-                              None
-                            </Text>
-                          )}
-                        </Td>
-                      </Tr>
-                      <Tr>
-                        <Td px={0} py={2} border="none">
-                          <Text fontSize="md">Tracking Number</Text>
-                        </Td>
-                        <Td pe={0} py={2} isNumeric={isMobile} border="none" w={rightColWidth}>
-                          {order.fulfillment?.trackingNumber ? (
-                            <Text fontSize="md">{order.fulfillment.trackingNumber}</Text>
-                          ) : (
-                            <Text fontSize="md" as="i">
-                              None
-                            </Text>
-                          )}
-                        </Td>
-                      </Tr>
-                    </>
-                  ) : null}
-                  <Tr>
-                    <Td px={0} py={2} border="none">
-                      <Text fontSize="md">Pharmacy Id</Text>
-                    </Td>
-                    <Td pe={0} py={2} isNumeric={isMobile} border="none" w={rightColWidth}>
-                      {loading ? (
-                        <SkeletonText
-                          noOfLines={1}
-                          width="100px"
-                          ms={isMobile ? 'auto' : undefined}
-                        />
-                      ) : order?.pharmacy?.id ? (
-                        <CopyText text={order.pharmacy.id} />
-                      ) : (
-                        <Text fontSize="md" as="i">
-                          None
-                        </Text>
-                      )}
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td px={0} py={2} border="none">
-                      <Text fontSize="md">Pharmacy Name</Text>
-                    </Td>
-                    <Td pe={0} py={2} isNumeric={isMobile} border="none" w={rightColWidth}>
-                      {loading ? (
-                        <SkeletonText
-                          noOfLines={1}
-                          width="100px"
-                          ms={isMobile ? 'auto' : undefined}
-                        />
-                      ) : order?.pharmacy?.name ? (
-                        <Text fontSize="md">{order.pharmacy.name}</Text>
-                      ) : (
-                        <Text fontSize="md" as="i">
-                          None
-                        </Text>
-                      )}
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td px={0} py={2} border="none" verticalAlign="top">
-                      <Text fontSize="md">Pharmacy Address</Text>
-                    </Td>
-                    <Td
-                      pe={0}
-                      py={2}
-                      isNumeric={isMobile}
-                      border="none"
-                      whiteSpace="normal"
-                      w={rightColWidth}
-                    >
-                      {loading ? (
-                        <SkeletonText
-                          noOfLines={1}
-                          width="100px"
-                          ms={isMobile ? 'auto' : undefined}
-                        />
-                      ) : order?.pharmacy?.address ? (
-                        <Text fontSize="md">{formatAddress(order.pharmacy.address)}</Text>
-                      ) : (
-                        <Text fontSize="md" as="i">
-                          None
-                        </Text>
-                      )}
-                    </Td>
-                  </Tr>
-                  <Tr>
-                    <Td px={0} py={2} border="none">
-                      <Text fontSize="md">Pharmacy Phone</Text>
-                    </Td>
-                    <Td pe={0} py={2} isNumeric={isMobile} border="none" w={rightColWidth}>
-                      {loading ? (
-                        <SkeletonText
-                          noOfLines={1}
-                          width="100px"
-                          ms={isMobile ? 'auto' : undefined}
-                        />
-                      ) : order?.pharmacy?.phone ? (
-                        <Link fontSize="md" href={`tel:${order.pharmacy.phone}`} isExternal>
-                          {formatPhone(order.pharmacy.phone)}
-                        </Link>
-                      ) : (
-                        <Text fontSize="md" as="i">
-                          None
-                        </Text>
-                      )}
-                    </Td>
-                  </Tr>
-                </Tbody>
-              </Table>
-            </TableContainer>
+            <InfoGrid name="Type">
+              {loading ? (
+                <SkeletonText noOfLines={1} width="100px" />
+              ) : order.fulfillment ? (
+                <Text fontSize="md">{ORDER_FULFILLMENT_TYPE_MAP[order.fulfillment.type]}</Text>
+              ) : (
+                <Text fontSize="md" as="i">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
+
+            <InfoGrid name="Fulfillment Status">
+              {loading ? (
+                <Skeleton width="70px" height="24px" borderRadius="xl" />
+              ) : order.fulfillment?.state ? (
+                <Badge
+                  size="sm"
+                  colorScheme={
+                    ORDER_FULFILLMENT_COLOR_MAP[order.fulfillment.state as keyof object] || ''
+                  }
+                >
+                  {ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof object] || ''}
+                </Badge>
+              ) : null}
+            </InfoGrid>
+
+            {!loading && order.fulfillment?.type === 'MAIL_ORDER' ? (
+              <>
+                <InfoGrid name="Carrier">
+                  {order.fulfillment?.carrier ? (
+                    <Text fontSize="md">{order.fulfillment.carrier}</Text>
+                  ) : (
+                    <Text fontSize="md" as="i">
+                      None
+                    </Text>
+                  )}
+                </InfoGrid>
+                <InfoGrid name="Tracking Number">
+                  {order.fulfillment?.trackingNumber ? (
+                    <Text fontSize="md">{order.fulfillment.trackingNumber}</Text>
+                  ) : (
+                    <Text fontSize="md" as="i">
+                      None
+                    </Text>
+                  )}
+                </InfoGrid>
+              </>
+            ) : null}
+
+            <InfoGrid name="Pharmacy Id">
+              {loading ? (
+                <SkeletonText noOfLines={1} width="100px" />
+              ) : order?.pharmacy?.id ? (
+                <CopyText text={order.pharmacy.id} />
+              ) : (
+                <Text fontSize="md" as="i">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
+
+            <InfoGrid name="Pharmacy Name">
+              {loading ? (
+                <SkeletonText noOfLines={1} width="100px" />
+              ) : order?.pharmacy?.name ? (
+                <Text fontSize="md">{order.pharmacy.name}</Text>
+              ) : (
+                <Text fontSize="md" as="i">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
+
+            <InfoGrid name="Pharmacy Address">
+              {loading ? (
+                <SkeletonText noOfLines={1} width="100px" />
+              ) : order?.pharmacy?.address ? (
+                <Text fontSize="md">{formatAddress(order.pharmacy.address)}</Text>
+              ) : (
+                <Text fontSize="md" as="i">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
+
+            <InfoGrid name="Pharmacy Phone">
+              {loading ? (
+                <SkeletonText noOfLines={1} width="100px" />
+              ) : order?.pharmacy?.phone ? (
+                <Link fontSize="md" href={`tel:${order.pharmacy.phone}`} isExternal>
+                  {formatPhone(order.pharmacy.phone)}
+                </Link>
+              ) : (
+                <Text fontSize="md" as="i">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
 
             <Divider />
 
