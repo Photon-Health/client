@@ -146,7 +146,6 @@ export const Status = () => {
               <Text display="inline" color="gray.600">
                 {t.status.MAIL_ORDER.trackingNumber}
               </Text>
-              <Text display="inline" ms={2}></Text>
               <Link
                 href={`https://google.com/search?q=${fulfillment.trackingNumber}`}
                 display="inline"
