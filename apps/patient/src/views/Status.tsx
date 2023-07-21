@@ -152,6 +152,7 @@ export const Status = () => {
                 ms={2}
                 color="brandLink"
                 fontWeight="medium"
+                target="_blank"
               >
                 {fulfillment.trackingNumber}
               </Link>
@@ -172,6 +173,7 @@ export const Status = () => {
                 ms={2}
                 color="brandLink"
                 fontWeight="medium"
+                target="_blank"
               >
                 <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
                 {pharmacy.name}, {pharmacy.address ? formatAddress(pharmacy.address) : ''}
