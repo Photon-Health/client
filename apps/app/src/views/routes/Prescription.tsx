@@ -28,7 +28,8 @@ import {
   WrapItem,
   Box,
   LinkBox,
-  LinkOverlay
+  LinkOverlay,
+  Show
 } from '@chakra-ui/react';
 import { FiChevronRight } from 'react-icons/fi';
 import { gql, GraphQLClient } from 'graphql-request';
@@ -237,8 +238,9 @@ export const Prescription = () => {
                   <PatientView patient={patient} />
                 )}
               </VStack>
-
-              <Divider orientation="vertical" height="auto" />
+              <Show above="sm">
+                <Divider orientation="vertical" height="auto" />
+              </Show>
 
               <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
                 <Text color="gray.500" fontWeight="medium" fontSize="sm">
