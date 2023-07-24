@@ -11,10 +11,10 @@ import {
 import { PharmacyCard } from './PharmacyCard';
 import t from '../utils/text.json';
 import { AUSTIN_INDIE_PHARMACY_IDS } from '../views/Pharmacy';
-import { Pharmacy as PharmacyType } from '../utils/models';
+import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 
 interface PickupOptionsProps {
-  pharmacies: PharmacyType[];
+  pharmacies: EnrichedPharmacy[];
   preferredPharmacy: string;
   savingPreferred: boolean;
   selectedId: string;
@@ -61,7 +61,7 @@ export const PickupOptions = ({
       ) : null}
 
       <VStack align="span" spacing={2}>
-        {pharmacies.map((pharmacy: PharmacyType, i: number) => (
+        {pharmacies.map((pharmacy: EnrichedPharmacy, i: number) => (
           <SlideFade offsetY="60px" in={true} key={`pickup-pharmacy-${pharmacy.id}-${i}`}>
             <PharmacyCard
               pharmacy={pharmacy}

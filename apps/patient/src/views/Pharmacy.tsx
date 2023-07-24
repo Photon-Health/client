@@ -31,7 +31,7 @@ import { PickupOptions } from '../components/PickupOptions';
 import { BrandedOptions } from '../components/BrandedOptions';
 import { OrderContext } from './Main';
 import { getSettings } from '@client/settings';
-import { Pharmacy as PharmacyType } from '../utils/models';
+import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 
 export const AUSTIN_INDIE_PHARMACY_IDS: string[] = [
   'phr_01G9CM8JJ03N4VPPDKR4KV4YKR', // Tarrytown Pharmacy
@@ -114,12 +114,14 @@ const geocode = async (address: string) => {
   }
 };
 
-const sortIndiePharmaciesFirst = (list: PharmacyType[], distance: number, limit: number) => {
+const sortIndiePharmaciesFirst = (list: EnrichedPharmacy[], distance: number, limit: number) => {
   const featuredPharmacies = list
-    .filter((p: PharmacyType) => AUSTIN_INDIE_PHARMACY_IDS.includes(p.id) && p.distance < distance)
+    .filter(
+      (p: EnrichedPharmacy) => AUSTIN_INDIE_PHARMACY_IDS.includes(p.id) && p.distance < distance
+    )
     .slice(0, limit);
   const otherPharmacies = list.filter(
-    (p: PharmacyType) => !featuredPharmacies.some((f) => f.id === p.id)
+    (p: EnrichedPharmacy) => !featuredPharmacies.some((f) => f.id === p.id)
   );
   return featuredPharmacies.concat(otherPharmacies);
 };
@@ -167,7 +169,7 @@ const getPharmacies = async (
  * @param {Pharmacy} p - The Pharmacy object to enrich with additional details.
  * @returns {Promise<Pharmacy>} - A Promise that resolves to the enriched Pharmacy object.
  */
-const addRatingsAndHours = async (p: PharmacyType) => {
+const addRatingsAndHours = async (p: EnrichedPharmacy) => {
   // Get place from Google
   const name = p.name;
   const address = p.address ? formatAddress(p.address) : '';
@@ -364,7 +366,7 @@ export const Pharmacy = () => {
     setFetchedPharmacies(pharmaciesResult);
 
     // Prepare pharmacies to show
-    let newPharmacies: PharmacyType[] = pharmaciesResult;
+    let newPharmacies: EnrichedPharmacy[] = pharmaciesResult;
 
     // Feature pharmacies
     newPharmacies = sortIndiePharmaciesFirst(
@@ -374,7 +376,7 @@ export const Pharmacy = () => {
     );
 
     // We only show 3 at a time, so just enrish those 3
-    const enrichedPharmacies: PharmacyType[] = await Promise.all(
+    const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
       newPharmacies.slice(0, 3).map(addRatingsAndHours)
     );
     setPharmacyOptions(enrichedPharmacies);
@@ -450,7 +452,7 @@ export const Pharmacy = () => {
       }
     }
 
-    const enrichedPharmacies: PharmacyType[] = await Promise.all(
+    const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
       pharmaciesResult.map(addRatingsAndHours)
     );
 
