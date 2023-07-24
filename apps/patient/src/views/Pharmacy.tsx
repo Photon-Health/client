@@ -160,6 +160,13 @@ const getPharmacies = async (
   }
 };
 
+/**
+ * Adds ratings and hours to the Pharmacy object using Google Place API.
+ * If the details are not found or an error occurs during the process, the original Pharmacy object is returned.
+ *
+ * @param {Pharmacy} p - The Pharmacy object to enrich with additional details.
+ * @returns {Promise<Pharmacy>} - A Promise that resolves to the enriched Pharmacy object.
+ */
 const enrichPharmacy = async (p: PharmacyType) => {
   // Get place from Google
   const name = p.name;
@@ -320,30 +327,37 @@ export const Pharmacy = () => {
     setLongitude(lng);
 
     // Get pharmacies from photon db
-    const pharmaciesResult = await getPharmacies(
-      {
-        latitude: lat,
-        longitude: lng,
-        radius: 25
-      },
-      30, // Set high to ensure indie's are found. Request time increase is minimal.
-      0,
-      token
-    );
-    if (pharmaciesResult === 'No pharmacies found near location') {
-      setLoadingPharmacies(false);
-      toast({
-        title: pharmaciesResult,
-        position: 'top',
-        status: 'warning',
-        duration: 5000,
-        isClosable: true
-      });
-      return;
-    }
-    if (!pharmaciesResult) {
-      setLoadingPharmacies(false);
-      return;
+    let pharmaciesResult: types.Pharmacy[];
+    try {
+      // Get pharmacies from photon db
+      pharmaciesResult = await getPharmacies(
+        {
+          latitude: lat,
+          longitude: lng,
+          radius: 25
+        },
+        30, // Set high to ensure indie's are found. Request time increase is minimal.
+        0,
+        token
+      );
+      if (!pharmaciesResult || pharmaciesResult.length === 0) {
+        setLoadingPharmacies(false);
+        return;
+      }
+    } catch (error) {
+      if (error.message === 'No pharmacies found near location') {
+        setLoadingPharmacies(false);
+        toast({
+          title: error.message,
+          position: 'top',
+          status: 'warning',
+          duration: 5000,
+          isClosable: true
+        });
+      } else {
+        console.error(JSON.stringify(error, undefined, 2));
+        console.log(error);
+      }
     }
 
     // Save in case we fetched more than we initially showed
@@ -402,40 +416,36 @@ export const Pharmacy = () => {
     const totalEnriched = updatedOptions.length;
 
     // Get pharmacies from our db
-    const pharmaciesResult = await getPharmacies(
-      {
-        latitude,
-        longitude,
-        radius: 25
-      },
-      pharmaciesToGet,
-      totalEnriched,
-      token
-    );
-    if (pharmaciesResult === 'No pharmacies found near location') {
-      console.log('No pharmacies found near location');
-      setLoadingPharmacies(false);
-      toast({
-        title: pharmaciesResult,
-        position: 'top',
-        status: 'warning',
-        duration: 3000,
-        isClosable: true
-      });
-      return;
-    }
-    if (!pharmaciesResult) {
-      console.log('Could not find pharmacies.');
-      setLoadingPharmacies(false);
-      toast({
-        title: 'Could not find pharmacies',
-        description: 'Please refresh and try again',
-        position: 'top',
-        status: 'error',
-        duration: 3000,
-        isClosable: true
-      });
-      return;
+    let pharmaciesResult: types.Pharmacy[];
+    try {
+      pharmaciesResult = await getPharmacies(
+        {
+          latitude,
+          longitude,
+          radius: 25
+        },
+        pharmaciesToGet,
+        totalEnriched,
+        token
+      );
+      if (!pharmaciesResult || pharmaciesResult.length === 0) {
+        setLoadingPharmacies(false);
+        return;
+      }
+    } catch (error) {
+      if (error.message === 'No pharmacies found near location') {
+        setLoadingPharmacies(false);
+        toast({
+          title: error.message,
+          position: 'top',
+          status: 'warning',
+          duration: 5000,
+          isClosable: true
+        });
+      } else {
+        console.error(JSON.stringify(error, undefined, 2));
+        console.log(error);
+      }
     }
 
     const enrichedPharmacies: PharmacyType[] = await Promise.all(
