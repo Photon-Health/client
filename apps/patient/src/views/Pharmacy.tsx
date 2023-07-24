@@ -307,7 +307,7 @@ export const Pharmacy = () => {
         longitude: lng,
         radius: 25
       },
-      searchingInAustinTX ? 30 : 3,
+      30, // Set high to ensure indie's are found. Request time increase is minimal.
       0,
       token
     );
