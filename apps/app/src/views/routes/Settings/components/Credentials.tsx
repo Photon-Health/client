@@ -1,3 +1,4 @@
+import { CopyIcon } from '@chakra-ui/icons';
 import {
   Box,
   CircularProgress,
@@ -8,7 +9,9 @@ import {
   Alert,
   AlertIcon,
   Container,
-  Divider
+  Divider,
+  Button,
+  HStack
 } from '@chakra-ui/react';
 
 import { usePhoton } from '@photonhealth/react';
@@ -16,9 +19,16 @@ import { usePhoton } from '@photonhealth/react';
 import { ClientInfoCard } from './ClientInfoCard';
 
 export const Credentials = () => {
-  const { getClients } = usePhoton();
+  const { getClients, getToken } = usePhoton();
   const { loading, error, clients } = getClients();
-
+  const getAccessToken = async () => {
+    try {
+      const token = await getToken();
+      navigator.clipboard.writeText(token);
+    } catch (e) {
+      console.error(e);
+    }
+  };
   return (
     <Box
       py={{ base: '4', md: '8' }}
@@ -31,9 +41,22 @@ export const Credentials = () => {
       <Container padding={{ base: '0', md: '0' }}>
         <Box>
           <Stack paddingBottom={5}>
-            <Text fontSize="xl" fontWeight="medium">
-              API Credentials
-            </Text>
+            <HStack justify="space-between">
+              <Text fontSize="xl" fontWeight="medium">
+                API Credentials
+              </Text>
+
+              <Button
+                borderColor="blue.500"
+                textColor="blue.500"
+                colorScheme="blue"
+                rightIcon={<CopyIcon />}
+                variant="outline"
+                onClick={getAccessToken}
+              >
+                Auth Token
+              </Button>
+            </HStack>
             <Divider />
             <Text color="muted" fontSize="md">
               You can execute a client credentials exchange to obtain auth tokens for your
