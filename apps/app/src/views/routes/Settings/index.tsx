@@ -73,7 +73,7 @@ export const Settings = () => {
         break;
     }
   };
-  console.log('organization', organization);
+
   return (
     <Page
       header="Settings"
