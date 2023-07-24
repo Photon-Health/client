@@ -43,9 +43,9 @@ export const AUSTIN_INDIE_PHARMACY_IDS: string[] = [
   'phr_01G9CM8TFRJNZ5CYW1PV3Z4Z9C',
   'phr_01G9CM8W0RD2YRWX8F64NJB4JM', // East Austin Medicine Shop
   'phr_01GFVHFPSTYPWPMGQ4Y0ZMEEP0', // Martin's Wellness & Compounding Pharmacy at Lamar Plaza Drug Store
-  // Martin's Wellness Dripping Springs Pharmacy
+  'phr_01H5Z4ZYBP0PSBE0EQZDNPY6ZQ', // Martin's Wellness Dripping Springs Pharmacy
   'phr_01G9CM8WDPTAPXX8RWFSFTDZRW', // Brodie Lane Pharmacy
-  // MedSavers Pharmacy
+  'phr_01H5Z4ZYBP0PSBE0EQZDNPY6ZR', // MedSavers Pharmacy
   'phr_01GA9HPXHZY0NS2WBWEF52GKFM', // Gus's Drug
   'phr_01G9CM8J8CDW1TVNY9MMNBF1QM', // 38th Street Pharmacy
   'phr_01G9CM92EYZVK3FZ25JMYKRNR5', // Austin Compounding Pharmacy
