@@ -25,8 +25,7 @@ import {
   Text,
   VStack,
   Wrap,
-  WrapItem,
-  useBreakpointValue
+  WrapItem
 } from '@chakra-ui/react';
 
 import { FiEdit, FiPhone, FiMail, FiChevronRight, FiPlus } from 'react-icons/fi';
@@ -71,8 +70,6 @@ export const Patient = () => {
     FEMALE: 'Female',
     UNKNOWN: 'Unknown'
   };
-
-  const isMobile = useBreakpointValue({ base: true, sm: false });
 
   useEffect(() => {
     const refetchData = async () => {
@@ -208,7 +205,7 @@ export const Patient = () => {
               <>
                 <InfoGrid name="Date of Birth">
                   {loading ? (
-                    <SkeletonText noOfLines={1} width="130px" ms={isMobile ? 'auto' : undefined} />
+                    <SkeletonText noOfLines={1} width="130px" />
                   ) : (
                     <Text fontSize="md">{formatDateLong(patient.dateOfBirth)}</Text>
                   )}
@@ -216,7 +213,7 @@ export const Patient = () => {
 
                 <InfoGrid name="Sex">
                   {loading ? (
-                    <SkeletonText noOfLines={1} width="50px" ms={isMobile ? 'auto' : undefined} />
+                    <SkeletonText noOfLines={1} width="50px" />
                   ) : (
                     <Text fontSize="md">{sexMap[patient.sex as keyof object]} </Text>
                   )}
@@ -224,7 +221,7 @@ export const Patient = () => {
 
                 <InfoGrid name="Gender">
                   {loading ? (
-                    <SkeletonText noOfLines={1} width="50px" ms={isMobile ? 'auto' : undefined} />
+                    <SkeletonText noOfLines={1} width="50px" />
                   ) : (
                     <Text fontSize="md">{patient.gender}</Text>
                   )}
@@ -233,7 +230,7 @@ export const Patient = () => {
                 <InfoGrid name="Cell Phone Number">
                   {' '}
                   {loading ? (
-                    <SkeletonText noOfLines={1} width="120px" ms={isMobile ? 'auto' : undefined} />
+                    <SkeletonText noOfLines={1} width="120px" />
                   ) : (
                     <Link
                       fontSize="md"
@@ -248,7 +245,7 @@ export const Patient = () => {
 
                 <InfoGrid name="Email">
                   {loading ? (
-                    <SkeletonText noOfLines={1} width="150px" ms={isMobile ? 'auto' : undefined} />
+                    <SkeletonText noOfLines={1} width="150px" />
                   ) : (
                     <Link
                       fontSize="md"
@@ -263,7 +260,7 @@ export const Patient = () => {
 
                 <InfoGrid name="Id">
                   {loading ? (
-                    <SkeletonText noOfLines={1} width="150px" ms={isMobile ? 'auto' : undefined} />
+                    <SkeletonText noOfLines={1} width="150px" />
                   ) : (
                     <CopyText text={id || ''} />
                   )}
