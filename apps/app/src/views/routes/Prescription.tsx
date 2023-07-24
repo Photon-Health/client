@@ -175,7 +175,6 @@ export const Prescription = () => {
 
   const orders = useMemo(() => {
     if (!prescription) return [];
-    console.log('prescription', prescription);
     const orderIds = new Set();
     return prescription.fills.filter((fill: any) => {
       if (orderIds.has(fill.order.id)) return false;
@@ -185,7 +184,6 @@ export const Prescription = () => {
   }, [prescription]);
 
   if (error || (!loading && !prescription)) {
-    console.log('____');
     return (
       <Alert
         status="warning"
