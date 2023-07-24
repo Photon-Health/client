@@ -74,9 +74,10 @@ export const Prescription = () => {
   const id = params.prescriptionId;
 
   const { getPrescription, getToken } = usePhoton();
+
   const { prescription, loading, error } = getPrescription({ id: id! });
   const [accessToken, setAccessToken] = useState('');
-
+  console.log('prescription', prescription, loading, error);
   const rx = prescription || {};
 
   const getAccessToken = async () => {
@@ -115,30 +116,6 @@ export const Prescription = () => {
 
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const { colorMode } = useColorMode();
-
-  if (error || (!loading && !prescription)) {
-    return (
-      <Alert
-        status="warning"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        textAlign="center"
-        height="200px"
-      >
-        <AlertIcon />
-        <AlertTitle mt={4} mb={1} fontSize="lg">
-          Unknown Prescription
-        </AlertTitle>
-        <AlertDescription maxWidth="sm">
-          <div>Looks like we can't find a prescription with that ID.</div>
-          <Link textDecoration="underline" fontSize="md" href="/prescriptions">
-            Go back to prescriptions.
-          </Link>
-        </AlertDescription>
-      </Alert>
-    );
-  }
 
   const buttons =
     loading && !patient ? (
@@ -187,7 +164,7 @@ export const Prescription = () => {
           <Button
             aria-label="New Order"
             as={RouterLink}
-            to={`/orders/new?patientId=${patient.id}&prescriptionId=${id}`}
+            to={`/orders/new?patientId=${patient?.id || ''}&prescriptionId=${id}`}
             colorScheme="blue"
           >
             Create Order
@@ -198,7 +175,7 @@ export const Prescription = () => {
 
   const orders = useMemo(() => {
     if (!prescription) return [];
-
+    console.log('prescription', prescription);
     const orderIds = new Set();
     return prescription.fills.filter((fill: any) => {
       if (orderIds.has(fill.order.id)) return false;
@@ -207,12 +184,37 @@ export const Prescription = () => {
     });
   }, [prescription]);
 
+  if (error || (!loading && !prescription)) {
+    console.log('____');
+    return (
+      <Alert
+        status="warning"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        textAlign="center"
+        height="200px"
+      >
+        <AlertIcon />
+        <AlertTitle mt={4} mb={1} fontSize="lg">
+          Unknown Prescription
+        </AlertTitle>
+        <AlertDescription maxWidth="sm">
+          <div>Looks like we can't find a prescription with that ID.</div>
+          <Link textDecoration="underline" fontSize="md" href="/prescriptions">
+            Go back to prescriptions.
+          </Link>
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
     <Page header="Prescription" buttons={buttons}>
       <Card>
         <CardHeader>
           <Text fontWeight="medium">
-            {loading ? <Skeleton height="30px" width="250px" /> : prescription?.treatment.name}
+            {loading ? <Skeleton height="30px" width="250px" /> : prescription?.treatment?.name}
           </Text>
         </CardHeader>
         <Divider color="gray.100" />
