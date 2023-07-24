@@ -17,7 +17,7 @@ import {
 import { FiRotateCcw, FiStar, FiThumbsUp } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { types } from '@photonhealth/react';
+import { types } from '@photonhealth/sdk';
 import { Pharmacy as PharmacyType } from '../utils/models';
 
 import { UNOPEN_BUSINESS_STATUS_MAP } from '../views/Pharmacy';
