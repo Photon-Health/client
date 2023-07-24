@@ -25,20 +25,21 @@ import {
   Text,
   VStack,
   Wrap,
-  WrapItem,
-  useBreakpointValue
+  WrapItem
 } from '@chakra-ui/react';
 
-import { FiCopy, FiEdit, FiPhone, FiMail, FiChevronRight, FiPlus } from 'react-icons/fi';
+import { FiEdit, FiPhone, FiMail, FiChevronRight, FiPlus } from 'react-icons/fi';
 
 import { usePhoton } from '@photonhealth/react';
 import { useEffect, useState } from 'react';
-import { formatDateLong, formatPhone, formatDate } from '../../utils';
+import { formatDateLong, formatPhone, formatDate, formatFills } from '../../utils';
 
 import { Page } from '../components/Page';
 
 import { PRESCRIPTION_STATE_MAP, PRESCRIPTION_COLOR_MAP } from './Prescriptions';
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
+import InfoGrid from '../components/InfoGrid';
+import CopyText from '../components/CopyText';
 
 export const Patient = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -69,9 +70,6 @@ export const Patient = () => {
     FEMALE: 'Female',
     UNKNOWN: 'Unknown'
   };
-
-  const isMobile = useBreakpointValue({ base: true, sm: false });
-  const tableWidth = useBreakpointValue({ base: 'full', sm: '100%', md: '75%' });
 
   useEffect(() => {
     const refetchData = async () => {
@@ -204,142 +202,70 @@ export const Patient = () => {
               </Button>
             </HStack>
             {!loading && patient ? (
-              <TableContainer w={tableWidth}>
-                <Table bg="transparent">
-                  <Tbody>
-                    <Tr>
-                      <Td px={0} py={2} border="none">
-                        <Text fontSize="md">Date of Birth</Text>
-                      </Td>
-                      <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                        {loading ? (
-                          <SkeletonText
-                            noOfLines={1}
-                            width="130px"
-                            ms={isMobile ? 'auto' : undefined}
-                          />
-                        ) : (
-                          <Text fontSize="md">{formatDateLong(patient.dateOfBirth)}</Text>
-                        )}
-                      </Td>
-                    </Tr>
-                    <Tr>
-                      <Td px={0} py={2} border="none">
-                        <Text fontSize="md">Sex</Text>
-                      </Td>
-                      <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                        {loading ? (
-                          <SkeletonText
-                            noOfLines={1}
-                            width="50px"
-                            ms={isMobile ? 'auto' : undefined}
-                          />
-                        ) : (
-                          <Text fontSize="md">{sexMap[patient.sex as keyof object]} </Text>
-                        )}
-                      </Td>
-                    </Tr>
-                    <Tr>
-                      <Td px={0} py={2} border="none">
-                        <Text fontSize="md">Gender</Text>
-                      </Td>
-                      <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                        {loading ? (
-                          <SkeletonText
-                            noOfLines={1}
-                            width="50px"
-                            ms={isMobile ? 'auto' : undefined}
-                          />
-                        ) : (
-                          <Text fontSize="md">{patient.gender}</Text>
-                        )}
-                      </Td>
-                    </Tr>
-                    <Tr>
-                      <Td px={0} py={2} border="none">
-                        <Text fontSize="md">Phone number</Text>
-                      </Td>
-                      <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                        {loading ? (
-                          <SkeletonText
-                            noOfLines={1}
-                            width="120px"
-                            ms={isMobile ? 'auto' : undefined}
-                          />
-                        ) : (
-                          <Link
-                            fontSize="md"
-                            href={`tel:${patient.phone}`}
-                            isExternal
-                            textDecoration="underline"
-                          >
-                            {formatPhone(patient.phone)}
-                          </Link>
-                        )}
-                      </Td>
-                    </Tr>
-                    <Tr>
-                      <Td px={0} py={2} border="none">
-                        <Text fontSize="md">Email</Text>
-                      </Td>
-                      <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                        {loading ? (
-                          <SkeletonText
-                            noOfLines={1}
-                            width="150px"
-                            ms={isMobile ? 'auto' : undefined}
-                          />
-                        ) : (
-                          <Link
-                            fontSize="md"
-                            href={`mailto:${patient.email}`}
-                            isExternal
-                            textDecoration="underline"
-                          >
-                            {patient.email}
-                          </Link>
-                        )}
-                      </Td>
-                    </Tr>
-                    <Tr>
-                      <Td px={0} py={2} border="none">
-                        <Text fontSize="md">Id</Text>
-                      </Td>
-                      <Td pe={0} py={2} isNumeric={isMobile} border="none">
-                        {loading ? (
-                          <SkeletonText
-                            noOfLines={1}
-                            width="150px"
-                            ms={isMobile ? 'auto' : undefined}
-                          />
-                        ) : (
-                          <HStack spacing={2} justifyContent={isMobile ? 'end' : 'start'}>
-                            <Text
-                              fontSize="md"
-                              whiteSpace={isMobile ? 'nowrap' : undefined}
-                              overflow={isMobile ? 'hidden' : undefined}
-                              textOverflow={isMobile ? 'ellipsis' : undefined}
-                              maxWidth={isMobile ? '130px' : undefined}
-                            >
-                              {id}
-                            </Text>
-                            <IconButton
-                              variant="ghost"
-                              color="gray.500"
-                              aria-label="Copy external id"
-                              minW="fit-content"
-                              py={0}
-                              _hover={{ backgroundColor: 'transparent' }}
-                              icon={<FiCopy size="1.3em" />}
-                              onClick={() => navigator.clipboard.writeText(id || '')}
-                            />
-                          </HStack>
-                        )}
-                      </Td>
-                    </Tr>
-                  </Tbody>
-                </Table>
-              </TableContainer>
+              <>
+                <InfoGrid name="Date of Birth">
+                  {loading ? (
+                    <SkeletonText skeletonHeight={5} noOfLines={1} width="130px" />
+                  ) : (
+                    <Text fontSize="md">{formatDateLong(patient.dateOfBirth)}</Text>
+                  )}
+                </InfoGrid>
+
+                <InfoGrid name="Sex">
+                  {loading ? (
+                    <SkeletonText skeletonHeight={5} noOfLines={1} width="50px" />
+                  ) : (
+                    <Text fontSize="md">{sexMap[patient.sex as keyof object]} </Text>
+                  )}
+                </InfoGrid>
+
+                <InfoGrid name="Gender">
+                  {loading ? (
+                    <SkeletonText skeletonHeight={5} noOfLines={1} width="50px" />
+                  ) : (
+                    <Text fontSize="md">{patient.gender}</Text>
+                  )}
+                </InfoGrid>
+
+                <InfoGrid name="Cell Phone Number">
+                  {' '}
+                  {loading ? (
+                    <SkeletonText skeletonHeight={5} noOfLines={1} width="120px" />
+                  ) : (
+                    <Link
+                      fontSize="md"
+                      href={`tel:${patient.phone}`}
+                      isExternal
+                      textDecoration="underline"
+                    >
+                      {formatPhone(patient.phone)}
+                    </Link>
+                  )}
+                </InfoGrid>
+
+                <InfoGrid name="Email">
+                  {loading ? (
+                    <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
+                  ) : (
+                    <Link
+                      fontSize="md"
+                      href={`mailto:${patient.email}`}
+                      isExternal
+                      textDecoration="underline"
+                    >
+                      {patient.email}
+                    </Link>
+                  )}
+                </InfoGrid>
+
+                <InfoGrid name="Id">
+                  {loading ? (
+                    <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
+                  ) : (
+                    <CopyText text={id || ''} />
+                  )}
+                </InfoGrid>
+              </>
             ) : null}
 
             <Divider />
@@ -422,10 +348,7 @@ export const Patient = () => {
                 <Table bg="transparent" size="sm">
                   <Tbody>
                     {orders.map(({ id: orderId, fulfillment, fills, createdAt, state }, i) => {
-                      const fillsFormatted = fills.reduce((prev: string, cur: any) => {
-                        const fill = cur.treatment.name;
-                        return prev ? `${prev}, ${fill}` : fill;
-                      }, '');
+                      const fillsFormatted = formatFills(fills);
 
                       return i < 5 ? (
                         <Tr

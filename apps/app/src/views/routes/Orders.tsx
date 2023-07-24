@@ -186,7 +186,7 @@ export const Orders = () => {
       setRows(orders.map(renderRow));
       setFinished(orders.length === 0);
     }
-  }, [loading]);
+  }, [loading, orders]);
 
   const skeletonRows = new Array(25).fill(0).map(() => renderSkeletonRow(isMobile));
 
@@ -205,7 +205,7 @@ export const Orders = () => {
         hasMore={rows.length % 25 === 0 && !finished}
         searchPlaceholder="Search by patient name"
         fetchMoreData={async () => {
-          if (refetch) {
+          if (refetch && !loading) {
             const { data } = await refetch({
               patientId: patientId || undefined,
               patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
