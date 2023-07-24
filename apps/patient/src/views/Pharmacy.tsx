@@ -167,7 +167,7 @@ const getPharmacies = async (
  * @param {Pharmacy} p - The Pharmacy object to enrich with additional details.
  * @returns {Promise<Pharmacy>} - A Promise that resolves to the enriched Pharmacy object.
  */
-const enrichPharmacy = async (p: PharmacyType) => {
+const addRatingsAndHours = async (p: PharmacyType) => {
   // Get place from Google
   const name = p.name;
   const address = p.address ? formatAddress(p.address) : '';
@@ -373,9 +373,9 @@ export const Pharmacy = () => {
       FEATURED_PHARMACIES_LIMIT
     );
 
-    // Only enrich the first 3 to save time
+    // We only show 3 at a time, so just enrish those 3
     const enrichedPharmacies: PharmacyType[] = await Promise.all(
-      newPharmacies.slice(0, 3).map(enrichPharmacy)
+      newPharmacies.slice(0, 3).map(addRatingsAndHours)
     );
     setPharmacyOptions(enrichedPharmacies);
 
@@ -399,7 +399,7 @@ export const Pharmacy = () => {
       for (let i = startIndex; i < endIndex; i++) {
         if (totalNewEnriched === 3) break;
         const newPharmacy = fetchedPharmacies[i];
-        await enrichPharmacy(newPharmacy);
+        await addRatingsAndHours(newPharmacy);
         updatedOptions.push(newPharmacy);
         totalNewEnriched = ++totalNewEnriched; // Increment counter
       }
@@ -449,7 +449,7 @@ export const Pharmacy = () => {
     }
 
     const enrichedPharmacies: PharmacyType[] = await Promise.all(
-      pharmaciesResult.map(enrichPharmacy)
+      pharmaciesResult.map(addRatingsAndHours)
     );
 
     setPharmacyOptions([...updatedOptions, ...enrichedPharmacies]);
