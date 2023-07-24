@@ -64,6 +64,8 @@ export const UNOPEN_BUSINESS_STATUS_MAP = {
   CLOSED_TEMPORARILY: 'Closed Temporarily',
   CLOSED_PERMANENTLY: 'Closed Permanently'
 };
+const FEATURE_INDIES_WITHIN_RADIUS = 2; // miles
+const FEATURED_PHARMACIES_LIMIT = 3;
 
 const placesService = new google.maps.places.PlacesService(document.createElement('div'));
 const geocoder = new google.maps.Geocoder();
@@ -90,6 +92,16 @@ const geocode = async (address: string) => {
   } else {
     throw new Error('Failed to geocode the address.');
   }
+};
+
+const sortIndiePharmaciesFirst = (list: PharmacyType[], distance: number, limit: number) => {
+  const featuredPharmacies = list
+    .filter((p: PharmacyType) => AUSTIN_INDIE_PHARMACY_IDS.includes(p.id))
+    .slice(0, limit);
+  const otherPharmacies = list.filter(
+    (p: PharmacyType) => !featuredPharmacies.some((f) => f.id === p.id)
+  );
+  return featuredPharmacies.concat(otherPharmacies);
 };
 
 const getPharmacies = async (
@@ -235,7 +247,6 @@ export const Pharmacy = () => {
   );
 
   const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(location);
-  const featureIndiesWithinRadius = 3; // miles
 
   const toast = useToast();
 
@@ -316,32 +327,22 @@ export const Pharmacy = () => {
       return;
     }
 
-    // Add new pharmacies
-    const newPharmacies: PharmacyType[] = pharmaciesResult;
+    // Save in case we fetched more than we initially showed
+    setFetchedPharmacies(pharmaciesResult);
 
-    // Prioritize indie pharmacies in Austin, TX
-    if (searchingInAustinTX) {
-      const sortIndiesFirst = (a: PharmacyType, b: PharmacyType) => {
-        const featurePharmacy = (p: PharmacyType) =>
-          AUSTIN_INDIE_PHARMACY_IDS.includes(p.id) && p.distance < featureIndiesWithinRadius;
-        const featureA = featurePharmacy(a);
-        const featureB = featurePharmacy(b);
-        if (featureA && !featureB) {
-          return -1; // a comes before b
-        } else if (!featureA && featureB) {
-          return 1; // b comes before a
-        } else {
-          return 0; // no change in order
-        }
-      };
-      newPharmacies.sort(sortIndiesFirst);
-    }
+    // Prepare pharmacies to show
+    let newPharmacies: PharmacyType[] = pharmaciesResult;
 
-    setFetchedPharmacies(newPharmacies);
+    // Feature pharmacies
+    newPharmacies = sortIndiePharmaciesFirst(
+      newPharmacies,
+      FEATURE_INDIES_WITHIN_RADIUS,
+      FEATURED_PHARMACIES_LIMIT
+    );
 
-    // Enrich first 3 since we only show 3 at a time
+    // Only enrich the first 3 to save time
     const enrichedPharmacies: PharmacyType[] = await Promise.all(
-      pharmaciesResult.slice(0, 3).map(enrichPharmacy)
+      newPharmacies.slice(0, 3).map(enrichPharmacy)
     );
     setPharmacyOptions(enrichedPharmacies);
 
