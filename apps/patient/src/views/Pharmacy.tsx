@@ -387,9 +387,11 @@ export const Pharmacy = () => {
 
     const updatedOptions = [...pharmacyOptions];
 
-    let totalNewEnriched = 0;
-
-    // Enrich existing pharmacies if we already have them
+    /**
+     * Initially we fetched a list of pharmacies from our db, if some
+     * of those haven't received ratings/hours, enrich those first
+     *  */
+    let countExistingEnriched = 0;
     if (pharmacyOptions.length < fetchedPharmacies.length) {
       const startIndex = pharmacyOptions.length;
       const endIndex =
@@ -397,22 +399,22 @@ export const Pharmacy = () => {
           ? fetchedPharmacies.length - 1
           : startIndex + 3;
       for (let i = startIndex; i < endIndex; i++) {
-        if (totalNewEnriched === 3) break;
+        if (countExistingEnriched === 3) break;
         const newPharmacy = fetchedPharmacies[i];
         await addRatingsAndHours(newPharmacy);
         updatedOptions.push(newPharmacy);
-        totalNewEnriched = ++totalNewEnriched; // Increment counter
+        countExistingEnriched = ++countExistingEnriched; // Increment counter
       }
     }
 
-    if (totalNewEnriched >= 3) {
+    if (countExistingEnriched >= 3) {
       // Break early and return enriched pharmacies
       setPharmacyOptions([...updatedOptions]);
       setLoadingPharmacies(false);
       return;
     }
 
-    const pharmaciesToGet = 3 - totalNewEnriched;
+    const pharmaciesToGet = 3 - countExistingEnriched;
     const totalEnriched = updatedOptions.length;
 
     // Get pharmacies from our db
