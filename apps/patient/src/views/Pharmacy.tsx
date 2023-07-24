@@ -68,8 +68,6 @@ const FEATURE_INDIES_WITHIN_RADIUS = 2; // miles
 const FEATURED_PHARMACIES_LIMIT = 3;
 
 const placesService = new google.maps.places.PlacesService(document.createElement('div'));
-const geocoder = new google.maps.Geocoder();
-
 const query = (method: string, data: object) =>
   new Promise((resolve, reject) => {
     placesService[method](data, (response, status) => {
@@ -81,16 +79,36 @@ const query = (method: string, data: object) =>
     });
   });
 
+const geocoder: google.maps.Geocoder = new google.maps.Geocoder();
 const geocode = async (address: string) => {
-  const data = await geocoder.geocode({ address });
-  if (data?.results) {
-    return {
-      address: data.results[0].formatted_address,
-      lat: data.results[0].geometry.location.lat(),
-      lng: data.results[0].geometry.location.lng()
-    };
-  } else {
-    throw new Error('Failed to geocode the address.');
+  const request: google.maps.GeocoderRequest = { address };
+
+  try {
+    const response: google.maps.GeocoderResponse = await geocoder.geocode(request);
+
+    const result = response.results?.[0];
+    if (result?.geometry?.location) {
+      return {
+        address: result.formatted_address,
+        lat: result.geometry.location.lat(),
+        lng: result.geometry.location.lng()
+      };
+    } else {
+      throw new Error('No results found for the provided address.');
+    }
+  } catch (error) {
+    // Handle specific error cases based on the error message
+    if (error instanceof Error && error.message === 'UNKNOWN_ERROR') {
+      throw new Error('Unknown server error occurred.');
+    } else if (error instanceof Error && error.message === 'OVER_QUERY_LIMIT') {
+      throw new Error('Exceeded the query limit. Please try again later.');
+    } else if (error instanceof Error && error.message === 'REQUEST_DENIED') {
+      throw new Error('Geocoding request denied. Check your API key and permissions.');
+    } else if (error instanceof Error && error.message === 'INVALID_REQUEST') {
+      throw new Error('Invalid geocoding request.');
+    } else {
+      throw error; // Re-throw any other unexpected errors
+    }
   }
 };
 
