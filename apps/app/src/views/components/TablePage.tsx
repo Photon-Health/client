@@ -90,7 +90,6 @@ export const TablePage = (props: TablePageProps) => {
 
   const observableRef: any = useRef();
 
-  const [hasObserver, setHasObserver] = useState(false);
   const [fetch, setFetch] = useState(false);
   const tableRef: any = useRef();
 
@@ -102,20 +101,25 @@ export const TablePage = (props: TablePageProps) => {
     }
   }, [fetch, fetchMoreData]);
 
-  const observer = new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting && data.length >= 25 && hasMore && fetchMoreData) {
-      setFetch(true);
-    } else {
-      setFetch(false);
-    }
-  });
-
   useEffect(() => {
-    if (data.length > 0 && observableRef.current && !hasObserver) {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0]?.isIntersecting) {
+        setFetch(true);
+      } else {
+        setFetch(false);
+      }
+    });
+
+    if (observableRef.current) {
       observer.observe(observableRef.current);
-      setHasObserver(true);
     }
-  }, [observableRef, data]);
+
+    return () => {
+      if (observableRef.current) {
+        observer.unobserve(observableRef.current);
+      }
+    };
+  }, [data, hasMore, fetchMoreData, observableRef.current]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable(
     // @ts-ignore
