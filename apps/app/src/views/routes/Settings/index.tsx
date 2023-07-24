@@ -1,4 +1,4 @@
-import { HStack, TabPanel, TabPanels, Tab, TabList, Tabs } from '@chakra-ui/react';
+import { HStack, TabPanel, TabPanels, Tab, TabList, Tabs, Button, Link } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { usePhoton } from '@photonhealth/react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -9,9 +9,24 @@ import { Auth } from '../../components/Auth';
 import { TemplateTab } from './views/TemplateTab';
 import { TreatmentTab } from './views/TreatmentTab';
 import { UserTab } from './views/UserTab';
+import { AddIcon } from '@chakra-ui/icons';
 
-const buttons = (
+const Buttons = ({ orgId, orgName }: { orgId: string; orgName: string }) => (
   <HStack>
+    <Link
+      href={`https://fxr8djfdbq8.typeform.com/to/awCi4YTp#org_id=${orgId}&org_name=${orgName}`}
+      isExternal
+    >
+      <Button
+        borderColor="blue.500"
+        textColor="blue.500"
+        colorScheme="blue"
+        rightIcon={<AddIcon />}
+        variant="outline"
+      >
+        Add a Provider
+      </Button>
+    </Link>
     <Auth />
     <ColorModeSwitcher />
   </HStack>
@@ -60,7 +75,15 @@ export const Settings = () => {
   };
 
   return (
-    <Page header="Settings" buttons={buttons}>
+    <Page
+      header="Settings"
+      buttons={
+        <Buttons
+          orgId={organization?.organization?.id}
+          orgName={organization?.organization?.name}
+        />
+      }
+    >
       <Tabs index={tabIndex} onChange={handleTabsChange}>
         <TabList>
           <Tab>User</Tab>
