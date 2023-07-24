@@ -23,6 +23,7 @@ import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
 import PatientView from '../components/PatientView';
 import ContactView from '../components/ContactView';
+import { Patient } from 'packages/sdk/dist/types';
 
 const dobToAge = require('dob-to-age');
 
@@ -211,7 +212,13 @@ export const Patients = () => {
           if (data?.patients.length === 0) {
             setFinished(true);
           }
-          setRows(rows.concat(data?.patients.map((x) => renderRow(x, setDisableScroll))));
+          setRows(
+            rows.concat(
+              data?.patients
+                .filter((p: Patient) => !!p) // some nulls are sneaking in
+                .map((x: Patient) => renderRow(x, setDisableScroll))
+            )
+          );
         }}
       />
     </Page>

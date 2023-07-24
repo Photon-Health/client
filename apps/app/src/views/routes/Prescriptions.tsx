@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { FiInfo, FiShoppingCart } from 'react-icons/fi';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { usePhoton } from '@photonhealth/react';
 import { formatDate } from '../../utils';
@@ -254,10 +254,12 @@ export const Prescriptions = () => {
     }
   }, [loading, prescriptions]);
 
+  const firstUpdate = useRef(true);
   useEffect(() => {
-    navigate({
-      search: status ? `?status=${status}` : ''
-    });
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
+    }
     async function refetchData() {
       setRows([]);
       setFilterChangeLoading(true);
@@ -268,7 +270,14 @@ export const Prescriptions = () => {
       }
       setRows(data?.prescriptions.map(renderRow));
     }
-    refetchData();
+
+    if (status) {
+      navigate({
+        search: status ? `?status=${status}` : ''
+      });
+
+      refetchData();
+    }
   }, [status, navigate]);
 
   const skeletonRows = new Array(25).fill(0).map(renderSkeletonRow);
@@ -299,14 +308,16 @@ export const Prescriptions = () => {
           </Select>
         }
         fetchMoreData={async () => {
-          const { data } = await refetch({
-            ...getPrescriptionsData,
-            after: rows?.at(-1)?.id
-          });
-          if (data?.prescriptions.length === 0) {
-            setFinished(true);
+          if (refetch && !loading) {
+            const { data } = await refetch({
+              ...getPrescriptionsData,
+              after: rows?.at(-1)?.id
+            });
+            if (data?.prescriptions.length === 0) {
+              setFinished(true);
+            }
+            setRows(rows.concat(data?.prescriptions.map(renderRow)));
           }
-          setRows(rows.concat(data?.prescriptions.map(renderRow)));
         }}
       />
     </Page>
