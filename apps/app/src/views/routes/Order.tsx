@@ -98,6 +98,56 @@ export const Order = () => {
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const { colorMode } = useColorMode();
 
+  const buttons =
+    loading || !order ? (
+      <Skeleton width="130px" height="42px" borderRadius="md" />
+    ) : (
+      <Button
+        aria-label="Cancel Order"
+        variant="outline"
+        borderColor="red.500"
+        textColor="red.500"
+        colorScheme="red"
+        isDisabled={
+          order.fulfillment?.type !== types.FulfillmentType.MailOrder ||
+          order.state === types.OrderState.Canceled
+        }
+        onClick={async () => {
+          const decision = await confirmWrapper('Cancel this order?', {
+            description: 'You will not be able to undo this action.',
+            cancelText: "No, Don't Cancel",
+            confirmText: 'Yes, Cancel',
+            darkMode: colorMode !== 'light',
+            colorScheme: 'red'
+          });
+          if (decision) {
+            graphQLClient.setHeader('authorization', accessToken);
+            const res = await graphQLClient.request(CANCEL_ORDER, { id });
+            if (res) {
+              toast({
+                title: 'Order canceled',
+                status: 'success',
+                duration: 5000
+              });
+            }
+          }
+        }}
+      >
+        Cancel Order
+      </Button>
+    );
+
+  const prescriptions = useMemo(() => {
+    if (!order) return [];
+
+    const rxIds = new Set();
+    return order.fills.filter((fill: any) => {
+      if (rxIds.has(fill.prescription.id)) return false;
+      rxIds.add(fill.prescription.id);
+      return true;
+    });
+  }, [order]);
+
   if (error || (!loading && !order)) {
     return (
       <Alert
@@ -121,55 +171,6 @@ export const Order = () => {
       </Alert>
     );
   }
-
-  const buttons = loading ? (
-    <Skeleton width="130px" height="42px" borderRadius="md" />
-  ) : (
-    <Button
-      aria-label="Cancel Order"
-      variant="outline"
-      borderColor="red.500"
-      textColor="red.500"
-      colorScheme="red"
-      isDisabled={
-        order.fulfillment?.type !== types.FulfillmentType.MailOrder ||
-        order.state === types.OrderState.Canceled
-      }
-      onClick={async () => {
-        const decision = await confirmWrapper('Cancel this order?', {
-          description: 'You will not be able to undo this action.',
-          cancelText: "No, Don't Cancel",
-          confirmText: 'Yes, Cancel',
-          darkMode: colorMode !== 'light',
-          colorScheme: 'red'
-        });
-        if (decision) {
-          graphQLClient.setHeader('authorization', accessToken);
-          const res = await graphQLClient.request(CANCEL_ORDER, { id });
-          if (res) {
-            toast({
-              title: 'Order canceled',
-              status: 'success',
-              duration: 5000
-            });
-          }
-        }
-      }}
-    >
-      Cancel Order
-    </Button>
-  );
-
-  const prescriptions = useMemo(() => {
-    if (!order) return [];
-
-    const rxIds = new Set();
-    return order.fills.filter((fill: any) => {
-      if (rxIds.has(fill.prescription.id)) return false;
-      rxIds.add(fill.prescription.id);
-      return true;
-    });
-  }, [order]);
 
   return (
     <Page header="Order" buttons={buttons}>
