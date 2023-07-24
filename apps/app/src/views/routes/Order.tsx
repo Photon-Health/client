@@ -196,7 +196,7 @@ export const Order = () => {
                 {loading ? (
                   <HStack alignContent="center" w="150px" display="flex">
                     <SkeletonCircle size="10" />
-                    <SkeletonText noOfLines={2} flexGrow={1} />
+                    <SkeletonText skeletonHeight={5} noOfLines={2} flexGrow={1} />
                   </HStack>
                 ) : (
                   <PatientView patient={order.patient} />
@@ -223,7 +223,7 @@ export const Order = () => {
 
             <InfoGrid name="Id">
               {loading ? (
-                <SkeletonText noOfLines={1} width="150px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
               ) : order.id ? (
                 <CopyText text={order.id} />
               ) : (
@@ -235,7 +235,7 @@ export const Order = () => {
 
             <InfoGrid name="External Id">
               {loading ? (
-                <SkeletonText noOfLines={1} width="150px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
               ) : order.externalId ? (
                 <CopyText text={order.externalId} />
               ) : (
@@ -247,7 +247,7 @@ export const Order = () => {
 
             <InfoGrid name="Created At">
               {loading ? (
-                <SkeletonText noOfLines={1} width="125px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="125px" />
               ) : (
                 <Text fontSize="md">{formatDate(order.createdAt)}</Text>
               )}
@@ -261,7 +261,7 @@ export const Order = () => {
 
             <InfoGrid name="Type">
               {loading ? (
-                <SkeletonText noOfLines={1} width="100px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : order.fulfillment ? (
                 <Text fontSize="md">{ORDER_FULFILLMENT_TYPE_MAP[order.fulfillment.type]}</Text>
               ) : (
@@ -311,7 +311,7 @@ export const Order = () => {
 
             <InfoGrid name="Pharmacy Id">
               {loading ? (
-                <SkeletonText noOfLines={1} width="100px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : order?.pharmacy?.id ? (
                 <CopyText text={order.pharmacy.id} />
               ) : (
@@ -323,7 +323,7 @@ export const Order = () => {
 
             <InfoGrid name="Pharmacy Name">
               {loading ? (
-                <SkeletonText noOfLines={1} width="100px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : order?.pharmacy?.name ? (
                 <Text fontSize="md">{order.pharmacy.name}</Text>
               ) : (
@@ -335,7 +335,7 @@ export const Order = () => {
 
             <InfoGrid name="Pharmacy Address">
               {loading ? (
-                <SkeletonText noOfLines={1} width="100px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : order?.pharmacy?.address ? (
                 <Text fontSize="md">{formatAddress(order.pharmacy.address)}</Text>
               ) : (
@@ -347,7 +347,7 @@ export const Order = () => {
 
             <InfoGrid name="Pharmacy Phone">
               {loading ? (
-                <SkeletonText noOfLines={1} width="100px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : order?.pharmacy?.phone ? (
                 <Link fontSize="md" href={`tel:${order.pharmacy.phone}`} isExternal>
                   {formatPhone(order.pharmacy.phone)}

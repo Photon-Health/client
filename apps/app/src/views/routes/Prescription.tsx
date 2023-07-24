@@ -232,7 +232,7 @@ export const Prescription = () => {
                 {loading ? (
                   <HStack alignContent="center" w="150px" display="flex">
                     <SkeletonCircle size="10" />
-                    <SkeletonText noOfLines={1} flexGrow={1} />
+                    <SkeletonText skeletonHeight={5} noOfLines={1} flexGrow={1} />
                   </HStack>
                 ) : (
                   <PatientView patient={patient} />
@@ -249,7 +249,7 @@ export const Prescription = () => {
                 {loading ? (
                   <HStack alignContent="center" w="150px" display="flex">
                     <SkeletonCircle size="10" />
-                    <SkeletonText noOfLines={1} flexGrow={1} />
+                    <SkeletonText skeletonHeight={5} noOfLines={1} flexGrow={1} />
                   </HStack>
                 ) : (
                   <NameView name={prescriber?.name?.full} />
@@ -263,7 +263,7 @@ export const Prescription = () => {
             </Text>
             <InfoGrid name="Instructions">
               {loading ? (
-                <SkeletonText noOfLines={1} width="100px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
               ) : (
                 <Text fontSize="md">{instructions}</Text>
               )}
@@ -271,7 +271,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Pharmacy Notes">
               {loading ? (
-                <SkeletonText noOfLines={1} width="100px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
               ) : (
                 <Text
                   fontSize="md"
@@ -285,7 +285,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Status">
               {loading ? (
-                <SkeletonText noOfLines={1} width="100px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Tooltip label={stateTip}>
                   <Badge colorScheme={stateColor}>{state}</Badge>
@@ -295,7 +295,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Quantity">
               {loading ? (
-                <SkeletonText noOfLines={1} width="100px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text fontSize="md">
                   {dispenseQuantity} ct / {daysSupply} day
@@ -305,7 +305,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Fills Remaining">
               {loading ? (
-                <SkeletonText noOfLines={1} width="100px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="20px" />
               ) : (
                 <Text fontSize="md">{fillsRemaining}</Text>
               )}
@@ -313,7 +313,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Fills Allowed">
               {loading ? (
-                <SkeletonText noOfLines={1} width="100px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="20px" />
               ) : (
                 <Text fontSize="md">{fillsAllowed}</Text>
               )}
@@ -321,7 +321,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Effective Date">
               {loading ? (
-                <SkeletonText noOfLines={1} width="100px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text fontSize="md">{effectiveDate}</Text>
               )}
@@ -329,7 +329,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Expiration">
               {loading ? (
-                <SkeletonText noOfLines={1} width="100px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text fontSize="md">{expirationDate}</Text>
               )}
@@ -337,7 +337,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Written">
               {loading ? (
-                <SkeletonText noOfLines={1} width="100px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text fontSize="md">{writtenAt}</Text>
               )}
@@ -345,7 +345,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Dispense As Written">
               {loading ? (
-                <SkeletonText noOfLines={1} width="100px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="50px" />
               ) : (
                 <Text fontSize="md">{dispenseAsWritten ? 'Yes' : 'No'}</Text>
               )}
@@ -422,7 +422,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Id">
               {loading ? (
-                <SkeletonText noOfLines={1} width="150px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
               ) : (
                 <CopyText text={id || ''} />
               )}
@@ -430,7 +430,7 @@ export const Prescription = () => {
 
             <InfoGrid name="External Id">
               {loading ? (
-                <SkeletonText noOfLines={1} width="65px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="65px" />
               ) : rx.externalId ? (
                 <CopyText text={rx.externalId || ''} />
               ) : (

@@ -32,7 +32,7 @@ import { FiEdit, FiPhone, FiMail, FiChevronRight, FiPlus } from 'react-icons/fi'
 
 import { usePhoton } from '@photonhealth/react';
 import { useEffect, useState } from 'react';
-import { formatDateLong, formatPhone, formatDate } from '../../utils';
+import { formatDateLong, formatPhone, formatDate, formatFills } from '../../utils';
 
 import { Page } from '../components/Page';
 
@@ -205,7 +205,7 @@ export const Patient = () => {
               <>
                 <InfoGrid name="Date of Birth">
                   {loading ? (
-                    <SkeletonText noOfLines={1} width="130px" />
+                    <SkeletonText skeletonHeight={5} noOfLines={1} width="130px" />
                   ) : (
                     <Text fontSize="md">{formatDateLong(patient.dateOfBirth)}</Text>
                   )}
@@ -213,7 +213,7 @@ export const Patient = () => {
 
                 <InfoGrid name="Sex">
                   {loading ? (
-                    <SkeletonText noOfLines={1} width="50px" />
+                    <SkeletonText skeletonHeight={5} noOfLines={1} width="50px" />
                   ) : (
                     <Text fontSize="md">{sexMap[patient.sex as keyof object]} </Text>
                   )}
@@ -221,7 +221,7 @@ export const Patient = () => {
 
                 <InfoGrid name="Gender">
                   {loading ? (
-                    <SkeletonText noOfLines={1} width="50px" />
+                    <SkeletonText skeletonHeight={5} noOfLines={1} width="50px" />
                   ) : (
                     <Text fontSize="md">{patient.gender}</Text>
                   )}
@@ -230,7 +230,7 @@ export const Patient = () => {
                 <InfoGrid name="Cell Phone Number">
                   {' '}
                   {loading ? (
-                    <SkeletonText noOfLines={1} width="120px" />
+                    <SkeletonText skeletonHeight={5} noOfLines={1} width="120px" />
                   ) : (
                     <Link
                       fontSize="md"
@@ -245,7 +245,7 @@ export const Patient = () => {
 
                 <InfoGrid name="Email">
                   {loading ? (
-                    <SkeletonText noOfLines={1} width="150px" />
+                    <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
                   ) : (
                     <Link
                       fontSize="md"
@@ -260,7 +260,7 @@ export const Patient = () => {
 
                 <InfoGrid name="Id">
                   {loading ? (
-                    <SkeletonText noOfLines={1} width="150px" />
+                    <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
                   ) : (
                     <CopyText text={id || ''} />
                   )}
@@ -348,10 +348,7 @@ export const Patient = () => {
                 <Table bg="transparent" size="sm">
                   <Tbody>
                     {orders.map(({ id: orderId, fulfillment, fills, createdAt, state }, i) => {
-                      const fillsFormatted = fills.reduce((prev: string, cur: any) => {
-                        const fill = cur.treatment.name;
-                        return prev ? `${prev}, ${fill}` : fill;
-                      }, '');
+                      const fillsFormatted = formatFills(fills);
 
                       return i < 5 ? (
                         <Tr
