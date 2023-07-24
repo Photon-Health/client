@@ -64,7 +64,7 @@ export const UNOPEN_BUSINESS_STATUS_MAP = {
   CLOSED_TEMPORARILY: 'Closed Temporarily',
   CLOSED_PERMANENTLY: 'Closed Permanently'
 };
-const FEATURE_INDIES_WITHIN_RADIUS = 2; // miles
+const FEATURE_INDIES_WITHIN_RADIUS = 3; // miles
 const FEATURED_PHARMACIES_LIMIT = 3;
 
 const placesService = new google.maps.places.PlacesService(document.createElement('div'));
@@ -97,24 +97,26 @@ const geocode = async (address: string) => {
       throw new Error('No results found for the provided address.');
     }
   } catch (error) {
-    // Handle specific error cases based on the error message
-    if (error instanceof Error && error.message === 'UNKNOWN_ERROR') {
-      throw new Error('Unknown server error occurred.');
-    } else if (error instanceof Error && error.message === 'OVER_QUERY_LIMIT') {
-      throw new Error('Exceeded the query limit. Please try again later.');
-    } else if (error instanceof Error && error.message === 'REQUEST_DENIED') {
-      throw new Error('Geocoding request denied. Check your API key and permissions.');
-    } else if (error instanceof Error && error.message === 'INVALID_REQUEST') {
-      throw new Error('Invalid geocoding request.');
-    } else {
-      throw error; // Re-throw any other unexpected errors
+    switch (error.message) {
+      case google.maps.GeocoderStatus.UNKNOWN_ERROR:
+        throw new Error('Unknown server error occurred.');
+      case google.maps.GeocoderStatus.OVER_QUERY_LIMIT:
+        throw new Error('Exceeded the query limit. Please try again later.');
+      case google.maps.GeocoderStatus.ZERO_RESULTS:
+        throw new Error('No result was found.');
+      case google.maps.GeocoderStatus.REQUEST_DENIED:
+        throw new Error('Geocoding request denied. Check your API key and permissions.');
+      case google.maps.GeocoderStatus.INVALID_REQUEST:
+        throw new Error('Invalid geocoding request.');
+      default:
+        throw error; // Re-throw any other unexpected errors
     }
   }
 };
 
 const sortIndiePharmaciesFirst = (list: PharmacyType[], distance: number, limit: number) => {
   const featuredPharmacies = list
-    .filter((p: PharmacyType) => AUSTIN_INDIE_PHARMACY_IDS.includes(p.id))
+    .filter((p: PharmacyType) => AUSTIN_INDIE_PHARMACY_IDS.includes(p.id) && p.distance < distance)
     .slice(0, limit);
   const otherPharmacies = list.filter(
     (p: PharmacyType) => !featuredPharmacies.some((f) => f.id === p.id)
