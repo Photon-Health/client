@@ -87,6 +87,8 @@ const geocode = async (address: string) => {
       lat: data.results[0].geometry.location.lat(),
       lng: data.results[0].geometry.location.lng()
     };
+  } else {
+    throw new Error('Failed to geocode the address.');
   }
 };
 
@@ -270,11 +272,19 @@ export const Pharmacy = () => {
     setLoadingPharmacies(true);
 
     // Perform geocode to get lat/lng
-    const { address, lat, lng } = await geocode(location);
+    let locationData: { address: string; lat: number; lng: number };
+    try {
+      locationData = await geocode(location);
+    } catch (error) {
+      console.error('Geocoding error:', error);
+    }
+
+    const { address, lat, lng } = locationData;
     if (!address || !lat || !lng) {
       setLoadingPharmacies(false);
       return;
     }
+
     setLocation(address);
     setLatitude(lat);
     setLongitude(lng);
@@ -367,7 +377,7 @@ export const Pharmacy = () => {
     const pharmaciesToGet = 3 - totalNewEnriched;
     const totalEnriched = updatedOptions.length;
 
-    // Get pharmacies from photon db
+    // Get pharmacies from our db
     const pharmaciesResult = await getPharmacies(
       {
         latitude,
