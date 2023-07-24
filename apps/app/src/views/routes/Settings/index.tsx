@@ -24,7 +24,7 @@ const Buttons = ({ orgId, orgName }: { orgId: string; orgName: string }) => (
         rightIcon={<AddIcon />}
         variant="outline"
       >
-        Add a New Provider
+        Add a Provider
       </Button>
     </Link>
     <Auth />
