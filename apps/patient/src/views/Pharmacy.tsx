@@ -145,18 +145,17 @@ const getPharmacies = async (
         offset
       }
     );
-    return query.pharmaciesByLocation;
-  } catch (error) {
-    if (
-      error?.response?.errors &&
-      error.response.errors[0].message === 'No pharmacies found near location'
-    ) {
-      const { message } = error.response.errors[0];
-      console.log(message);
-      return message;
+    if (query?.pharmaciesByLocation?.length > 0) {
+      return query.pharmaciesByLocation;
     } else {
-      console.error(JSON.stringify(error, undefined, 2));
-      return error;
+      throw new Error('No pharmacies found near location');
+    }
+  } catch (error) {
+    if (error?.response?.errors?.[0].message === 'No pharmacies found near location') {
+      const { message } = error.response.errors[0];
+      throw new Error(message);
+    } else {
+      throw error;
     }
   }
 };
