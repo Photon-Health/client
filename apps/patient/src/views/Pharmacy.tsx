@@ -359,7 +359,11 @@ export const Pharmacy = () => {
     // Enrich existing pharmacies if we already have them
     if (pharmacyOptions.length < fetchedPharmacies.length) {
       const startIndex = pharmacyOptions.length;
-      for (let i = startIndex; i < startIndex + 3; i++) {
+      const endIndex =
+        fetchedPharmacies.length - 1 < startIndex + 3
+          ? fetchedPharmacies.length - 1
+          : startIndex + 3;
+      for (let i = startIndex; i < endIndex; i++) {
         if (totalNewEnriched === 3) break;
         const newPharmacy = fetchedPharmacies[i];
         await enrichPharmacy(newPharmacy);
@@ -414,8 +418,6 @@ export const Pharmacy = () => {
       });
       return;
     }
-
-    setFetchedPharmacies([...fetchedPharmacies, ...pharmaciesResult]);
 
     const enrichedPharmacies: PharmacyType[] = await Promise.all(
       pharmaciesResult.map(enrichPharmacy)
