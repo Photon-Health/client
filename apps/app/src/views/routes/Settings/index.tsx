@@ -14,7 +14,7 @@ import { AddIcon } from '@chakra-ui/icons';
 const Buttons = ({ orgId, orgName }: { orgId: string; orgName: string }) => (
   <HStack>
     <Link
-      href={`https://fxr8djfdbq8.typeform.com/to/awCi4YTp#org_id=${orgId}&org_name=${orgName}`}
+      href={`https://fxr8djfdbq8.typeform.com/to/awCi4YTp#org_id=${orgId}&org_name=${orgName}&env=${process.env.REACT_APP_ENV_NAME}`}
       isExternal
     >
       <Button
