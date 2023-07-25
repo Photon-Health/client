@@ -65,7 +65,7 @@ export const UNOPEN_BUSINESS_STATUS_MAP = {
   CLOSED_PERMANENTLY: 'Closed Permanently'
 };
 const FEATURE_INDIES_WITHIN_RADIUS = 3; // miles
-const FEATURED_PHARMACIES_LIMIT = 3;
+const FEATURED_PHARMACIES_LIMIT = 2;
 
 const placesService = new google.maps.places.PlacesService(document.createElement('div'));
 const query = (method: string, data: object) =>
@@ -258,7 +258,7 @@ export const Pharmacy = () => {
 
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
-  const [fetchedPharmacies, setFetchedPharmacies] = useState([]);
+  const [initialPharmacies, setInitialPharmacies] = useState<EnrichedPharmacy[]>([]);
   const [pharmacyOptions, setPharmacyOptions] = useState([]);
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<string>('');
@@ -363,20 +363,17 @@ export const Pharmacy = () => {
       }
     }
 
-    // Save in case we fetched more than we initially showed
-    setFetchedPharmacies(pharmaciesResult);
-
-    // Prepare pharmacies to show
-    let newPharmacies: EnrichedPharmacy[] = pharmaciesResult;
-
-    // Feature pharmacies
-    newPharmacies = sortIndiePharmaciesFirst(
-      newPharmacies,
+    // Sort initial list of pharmacies
+    const newPharmacies: EnrichedPharmacy[] = sortIndiePharmaciesFirst(
+      pharmaciesResult,
       FEATURE_INDIES_WITHIN_RADIUS,
       FEATURED_PHARMACIES_LIMIT
     );
 
-    // We only show 3 at a time, so just enrish those 3
+    // Save in case we fetched more than we initially show
+    setInitialPharmacies(newPharmacies);
+
+    // We only show 3 at a time, so just enrich the first 3
     const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
       newPharmacies.slice(0, 3).map(addRatingsAndHours)
     );
@@ -395,7 +392,7 @@ export const Pharmacy = () => {
      * of those haven't received ratings/hours, enrich those first
      *  */
     const MAX_ENRICHMENT = 3; // Maximum number of pharmacies to enrich at a time
-    const pharmaciesToEnrich = fetchedPharmacies.slice(
+    const pharmaciesToEnrich = initialPharmacies.slice(
       pharmacyOptions.length,
       pharmacyOptions.length + MAX_ENRICHMENT
     );
@@ -451,7 +448,7 @@ export const Pharmacy = () => {
     const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
       pharmaciesResult.map(addRatingsAndHours)
     );
-    newPharmacies.push(enrichedPharmacies);
+    newPharmacies.push(...enrichedPharmacies);
 
     setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
     setLoadingPharmacies(false);
