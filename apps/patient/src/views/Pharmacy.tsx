@@ -65,7 +65,7 @@ export const UNOPEN_BUSINESS_STATUS_MAP = {
   CLOSED_PERMANENTLY: 'Closed Permanently'
 };
 const FEATURE_INDIES_WITHIN_RADIUS = 3; // miles
-const FEATURED_PHARMACIES_LIMIT = 3;
+const FEATURED_PHARMACIES_LIMIT = 2;
 
 const placesService = new google.maps.places.PlacesService(document.createElement('div'));
 const query = (method: string, data: object) =>
