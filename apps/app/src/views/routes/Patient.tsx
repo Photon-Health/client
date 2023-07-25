@@ -227,7 +227,7 @@ export const Patient = () => {
                   )}
                 </InfoGrid>
 
-                <InfoGrid name="Cell Phone Number">
+                <InfoGrid name="Mobile Number">
                   {' '}
                   {loading ? (
                     <SkeletonText skeletonHeight={5} noOfLines={1} width="120px" />
