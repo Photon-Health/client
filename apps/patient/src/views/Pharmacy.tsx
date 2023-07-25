@@ -448,7 +448,7 @@ export const Pharmacy = () => {
     const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
       pharmaciesResult.map(addRatingsAndHours)
     );
-    newPharmacies.push(enrichedPharmacies);
+    newPharmacies.push(...enrichedPharmacies);
 
     setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
     setLoadingPharmacies(false);
