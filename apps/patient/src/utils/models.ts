@@ -7,14 +7,14 @@ export interface Order extends types.Order {
   };
 }
 
-export interface Pharmacy {
+export interface Pharmacy extends types.Pharmacy {
   id: string;
-  address: types.Address;
+  address?: types.Address;
   name: string;
-  info: string;
-  distance: number;
-  rating?: string;
-  businessStatus: string;
+  info?: string | undefined;
+  distance?: number | undefined;
+  rating?: string | undefined;
+  businessStatus?: string | undefined;
   hours?: {
     open?: boolean;
     is24Hr?: boolean;
@@ -22,6 +22,7 @@ export interface Pharmacy {
     opensDay?: 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun';
     closes?: string;
   };
+  enriched?: boolean | undefined;
 }
 
 export type ExtendedFulfillmentType = types.FulfillmentType | 'COURIER';
