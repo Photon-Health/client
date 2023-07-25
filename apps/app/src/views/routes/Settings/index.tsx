@@ -11,22 +11,33 @@ import { TreatmentTab } from './views/TreatmentTab';
 import { UserTab } from './views/UserTab';
 import { AddIcon } from '@chakra-ui/icons';
 
+const AddProviderButton = ({ disabled = false }: { disabled?: boolean }) => (
+  <Button
+    borderColor="blue.500"
+    textColor="blue.500"
+    colorScheme="blue"
+    rightIcon={<AddIcon />}
+    variant="outline"
+    disabled={disabled}
+    opacity={disabled ? 0.2 : 1}
+  >
+    Add a Provider
+  </Button>
+);
+
 const Buttons = ({ orgId, orgName }: { orgId: string; orgName: string }) => (
   <HStack>
-    <Link
-      href={`https://fxr8djfdbq8.typeform.com/to/awCi4YTp#org_id=${orgId}&org_name=${orgName}`}
-      isExternal
-    >
-      <Button
-        borderColor="blue.500"
-        textColor="blue.500"
-        colorScheme="blue"
-        rightIcon={<AddIcon />}
-        variant="outline"
+    {orgId ? (
+      <Link
+        href={`https://fxr8djfdbq8.typeform.com/to/awCi4YTp#org_id=${orgId}&org_name=${orgName}&env=${process.env.REACT_APP_ENV_NAME}`}
+        isExternal
       >
-        Add a Provider
-      </Button>
-    </Link>
+        <AddProviderButton />
+      </Link>
+    ) : (
+      <AddProviderButton disabled />
+    )}
+
     <Auth />
     <ColorModeSwitcher />
   </HStack>
