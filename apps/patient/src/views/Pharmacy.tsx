@@ -356,6 +356,7 @@ export const Pharmacy = () => {
           duration: 5000,
           isClosable: true
         });
+        return;
       } else {
         console.error(JSON.stringify(error, undefined, 2));
         console.log(error);
@@ -387,37 +388,32 @@ export const Pharmacy = () => {
   const handleShowMore = async () => {
     setLoadingPharmacies(true);
 
-    const updatedOptions = [...pharmacyOptions];
+    const newPharmacies = [];
 
     /**
      * Initially we fetched a list of pharmacies from our db, if some
      * of those haven't received ratings/hours, enrich those first
      *  */
-    let countExistingEnriched = 0;
-    if (pharmacyOptions.length < fetchedPharmacies.length) {
-      const startIndex = pharmacyOptions.length;
-      const endIndex =
-        fetchedPharmacies.length - 1 < startIndex + 3
-          ? fetchedPharmacies.length - 1
-          : startIndex + 3;
-      for (let i = startIndex; i < endIndex; i++) {
-        if (countExistingEnriched === 3) break;
-        const newPharmacy = fetchedPharmacies[i];
-        await addRatingsAndHours(newPharmacy);
-        updatedOptions.push(newPharmacy);
-        countExistingEnriched = ++countExistingEnriched; // Increment counter
-      }
+    const MAX_ENRICHMENT = 3; // Maximum number of pharmacies to enrich at a time
+    const pharmaciesToEnrich = fetchedPharmacies.slice(
+      pharmacyOptions.length,
+      pharmacyOptions.length + MAX_ENRICHMENT
+    );
+
+    for (const newPharmacy of pharmaciesToEnrich) {
+      await addRatingsAndHours(newPharmacy);
+      newPharmacies.push(newPharmacy);
     }
 
-    if (countExistingEnriched >= 3) {
+    if (newPharmacies.length === MAX_ENRICHMENT) {
       // Break early and return enriched pharmacies
-      setPharmacyOptions([...updatedOptions]);
+      setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
       setLoadingPharmacies(false);
       return;
     }
 
-    const pharmaciesToGet = 3 - countExistingEnriched;
-    const totalEnriched = updatedOptions.length;
+    const pharmaciesToGet = MAX_ENRICHMENT - newPharmacies.length;
+    const totalEnriched = pharmacyOptions.length + newPharmacies.length;
 
     // Get pharmacies from our db
     let pharmaciesResult: types.Pharmacy[];
@@ -455,8 +451,9 @@ export const Pharmacy = () => {
     const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
       pharmaciesResult.map(addRatingsAndHours)
     );
+    newPharmacies.push(enrichedPharmacies);
 
-    setPharmacyOptions([...updatedOptions, ...enrichedPharmacies]);
+    setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
     setLoadingPharmacies(false);
   };
 
