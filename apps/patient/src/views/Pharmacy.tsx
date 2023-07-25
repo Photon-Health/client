@@ -191,7 +191,7 @@ const addRatingsAndHours = async (p: EnrichedPharmacy) => {
 
   if (placeStatus !== 'OK' || !placeId) {
     console.log('Could not find Google place');
-    return p; // Break early if place not found
+    return p; // Break early if place isn't found
   }
 
   // Get place details from Google
