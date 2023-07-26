@@ -80,7 +80,7 @@ customElement(
     });
     actions.registerValidator({
       key: 'phone',
-      validator: message(size(string(), 12), 'Please enter a valid phone number.')
+      validator: message(size(string(), 12), 'Please enter a valid mobile number.')
     });
     actions.registerValidator({
       key: 'email',
@@ -247,7 +247,7 @@ customElement(
                   class="w-full xs:min-w-[48%]"
                   invalid={store['phone']?.error}
                   help-text={store['phone']?.error}
-                  label="Cell Phone Number"
+                  label="Mobile Number"
                   on:photon-phone-changed={async (e: any) => {
                     actions.updateFormValue({
                       key: 'phone',
