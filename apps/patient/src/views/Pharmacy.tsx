@@ -31,6 +31,31 @@ import { PickupOptions } from '../components/PickupOptions';
 import { BrandedOptions } from '../components/BrandedOptions';
 import { OrderContext } from './Main';
 import { getSettings } from '@client/settings';
+import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+
+export const AUSTIN_INDIE_PHARMACY_IDS: string[] = [
+  'phr_01G9CM8JJ03N4VPPDKR4KV4YKR', // Tarrytown Pharmacy
+  'phr_01G9CM8MFENM6P96F94RQWBMAY', // Northwest Hills Pharmacy at Davenport
+  // People's pharmacies (4)
+  'phr_01G9CM8MTAFDSKSJ5P3680FFBG',
+  'phr_01G9CM90JXBT4JPDQZAMEVRQ5K',
+  'phr_01G9CM8M2D23133Q9T91K3NQE5',
+  'phr_01G9CM8TFRJNZ5CYW1PV3Z4Z9C',
+  'phr_01G9CM8W0RD2YRWX8F64NJB4JM', // East Austin Medicine Shop
+  'phr_01GFVHFPSTYPWPMGQ4Y0ZMEEP0', // Martin's Wellness & Compounding Pharmacy at Lamar Plaza Drug Store
+  'phr_01H5Z4ZYBP0PSBE0EQZDNPY6ZQ', // Martin's Wellness Dripping Springs Pharmacy
+  'phr_01G9CM8WDPTAPXX8RWFSFTDZRW', // Brodie Lane Pharmacy
+  'phr_01H5Z4ZYBP0PSBE0EQZDNPY6ZR', // MedSavers Pharmacy
+  'phr_01GA9HPXHZY0NS2WBWEF52GKFM', // Gus's Drug
+  'phr_01G9CM8J8CDW1TVNY9MMNBF1QM', // 38th Street Pharmacy
+  'phr_01G9CM92EYZVK3FZ25JMYKRNR5', // Austin Compounding Pharmacy
+  'phr_01GA9HPXJPCEXYEBVGFYT17066', // Buda Drug Store
+  'phr_01G9CM92S2ES1TJD8DH1VTEBZJ', // Auro Pharmacy
+  'phr_01GA9HPXD5ZM86MASCK625ZQJF', // Lake Hills Pharmacy
+  'phr_01GA9HPXEQH5V38D5G11EKADNY', // Manor Pharmacy
+  'phr_01G9CM940NTXPBR0HQ7042T5CA', // Alive And Well Pharmacy
+  'phr_01GSB2FQ4F2D2JBJW58AGCP2V0' // Solutions Pharmacy
+];
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
@@ -39,11 +64,11 @@ export const UNOPEN_BUSINESS_STATUS_MAP = {
   CLOSED_TEMPORARILY: 'Closed Temporarily',
   CLOSED_PERMANENTLY: 'Closed Permanently'
 };
+const FEATURE_INDIES_WITHIN_RADIUS = 3; // miles
+const FEATURED_PHARMACIES_LIMIT = 2;
 
 const placesService = new google.maps.places.PlacesService(document.createElement('div'));
-const geocoder = new google.maps.Geocoder();
-
-const query = (method, data) =>
+const query = (method: string, data: object) =>
   new Promise((resolve, reject) => {
     placesService[method](data, (response, status) => {
       if (status === 'OK') {
@@ -53,6 +78,172 @@ const query = (method, data) =>
       }
     });
   });
+
+const geocoder: google.maps.Geocoder = new google.maps.Geocoder();
+const geocode = async (address: string) => {
+  const request: google.maps.GeocoderRequest = { address };
+
+  try {
+    const response: google.maps.GeocoderResponse = await geocoder.geocode(request);
+
+    const result = response.results?.[0];
+    if (result?.geometry?.location) {
+      return {
+        address: result.formatted_address,
+        lat: result.geometry.location.lat(),
+        lng: result.geometry.location.lng()
+      };
+    } else {
+      throw new Error('No results found for the provided address.');
+    }
+  } catch (error) {
+    switch (error.message) {
+      case google.maps.GeocoderStatus.UNKNOWN_ERROR:
+        throw new Error('Unknown server error occurred.');
+      case google.maps.GeocoderStatus.OVER_QUERY_LIMIT:
+        throw new Error('Exceeded the query limit. Please try again later.');
+      case google.maps.GeocoderStatus.ZERO_RESULTS:
+        throw new Error('No result was found.');
+      case google.maps.GeocoderStatus.REQUEST_DENIED:
+        throw new Error('Geocoding request denied. Check your API key and permissions.');
+      case google.maps.GeocoderStatus.INVALID_REQUEST:
+        throw new Error('Invalid geocoding request.');
+      default:
+        throw error; // Re-throw any other unexpected errors
+    }
+  }
+};
+
+const sortIndiePharmaciesFirst = (list: EnrichedPharmacy[], distance: number, limit: number) => {
+  const featuredPharmacies = list
+    .filter(
+      (p: EnrichedPharmacy) => AUSTIN_INDIE_PHARMACY_IDS.includes(p.id) && p.distance < distance
+    )
+    .slice(0, limit);
+  const otherPharmacies = list.filter(
+    (p: EnrichedPharmacy) => !featuredPharmacies.some((f) => f.id === p.id)
+  );
+  return featuredPharmacies.concat(otherPharmacies);
+};
+
+const getPharmacies = async (
+  searchParams: {
+    latitude: number;
+    longitude: number;
+    radius: number;
+  },
+  limit: number,
+  offset: number,
+  token: string
+) => {
+  graphQLClient.setHeader('x-photon-auth', token);
+
+  try {
+    const query: { pharmaciesByLocation: types.Pharmacy[] } = await graphQLClient.request(
+      GET_PHARMACIES,
+      {
+        location: searchParams,
+        limit,
+        offset
+      }
+    );
+    if (query?.pharmaciesByLocation?.length > 0) {
+      return query.pharmaciesByLocation;
+    } else {
+      throw new Error('No pharmacies found near location');
+    }
+  } catch (error) {
+    if (error?.response?.errors?.[0].message === 'No pharmacies found near location') {
+      const { message } = error.response.errors[0];
+      throw new Error(message);
+    } else {
+      throw error;
+    }
+  }
+};
+
+/**
+ * Adds ratings and hours to the Pharmacy object using Google Place API.
+ * If the details are not found or an error occurs during the process, the original Pharmacy object is returned.
+ *
+ * @param {Pharmacy} p - The Pharmacy object to enrich with additional details.
+ * @returns {Promise<Pharmacy>} - A Promise that resolves to the enriched Pharmacy object.
+ */
+const addRatingsAndHours = async (p: EnrichedPharmacy) => {
+  // Get place from Google
+  const name = p.name;
+  const address = p.address ? formatAddress(p.address) : '';
+  const placeRequest = {
+    query: name + ' ' + address,
+    fields: ['place_id']
+  };
+  let placeId: string;
+  let placeStatus: string;
+  try {
+    const { response, status }: any = await query('findPlaceFromQuery', placeRequest);
+    placeId = response[0]?.place_id;
+    placeStatus = status;
+  } catch (error) {
+    console.error(JSON.stringify(error, undefined, 2));
+    console.log(error);
+    return p;
+  }
+
+  if (placeStatus !== 'OK' || !placeId) {
+    console.log('Could not find Google place');
+    return p; // Break early if place isn't found
+  }
+
+  // Get place details from Google
+  const detailsRequest = {
+    placeId,
+    fields: [
+      'opening_hours',
+      'utc_offset_minutes', // this gives us isOpen()
+      'rating',
+      'business_status'
+    ]
+  };
+  let details: any;
+  let detailsStatus: string;
+  try {
+    const { response, status }: any = await query('getDetails', detailsRequest);
+    details = response;
+    detailsStatus = status;
+  } catch (error) {
+    console.error(JSON.stringify(error, undefined, 2));
+    console.log(error);
+    return p;
+  }
+
+  if (detailsStatus !== 'OK') {
+    console.log('Could not find place details');
+    return p; // Break early if place details not found
+  }
+
+  p.businessStatus = details?.business_status || '';
+  p.rating = details?.rating || undefined;
+
+  const openForBusiness = details?.business_status === 'OPERATIONAL';
+  if (!openForBusiness) {
+    return p; // Don't need hours for non-operational business
+  }
+
+  const currentTime = dayjs().format('HHmm');
+  const { is24Hr, opens, opensDay, closes } = getHours(
+    details?.opening_hours?.periods,
+    currentTime
+  );
+  p.hours = {
+    open: details?.opening_hours?.isOpen() || false,
+    is24Hr,
+    opens,
+    opensDay,
+    closes
+  };
+
+  return p;
+};
 
 export const Pharmacy = () => {
   const order = useContext<Order>(OrderContext);
@@ -67,6 +258,7 @@ export const Pharmacy = () => {
 
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
+  const [initialPharmacies, setInitialPharmacies] = useState<EnrichedPharmacy[]>([]);
   const [pharmacyOptions, setPharmacyOptions] = useState([]);
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<string>('');
@@ -74,13 +266,15 @@ export const Pharmacy = () => {
   const [error, setError] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
-  const [loadingMore, setLoadingMore] = useState<boolean>(false);
+  const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(false);
   const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
   const [latitude, setLatitude] = useState<number | undefined>(undefined);
   const [longitude, setLongitude] = useState<number | undefined>(undefined);
   const [location, setLocation] = useState<string>(
     order?.address ? formatAddress(order.address) : ''
   );
+
+  const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(location);
 
   const toast = useToast();
 
@@ -113,127 +307,151 @@ export const Pharmacy = () => {
     setLocationModalOpen(false);
   };
 
-  const geocode = async (address: string) => {
-    const data = await geocoder.geocode({ address });
-    if (data?.results) {
-      return {
-        loc: data.results[0].formatted_address,
-        lat: data.results[0].geometry.location.lat(),
-        lng: data.results[0].geometry.location.lng()
-      };
-    }
-  };
+  const initialize = async () => {
+    setLoadingPharmacies(true);
 
-  const fetchPharmacies = async () => {
-    setLoadingMore(true);
-
-    // On initializing, we won't have lat/lng
-    let loc: string = location;
-    let lat: number = latitude;
-    let lng: number = longitude;
-    if (!lat || !lng) {
-      const geo = await geocode(location);
-      if (!geo) return;
-
-      loc = geo.loc;
-      lat = geo.lat;
-      lng = geo.lng;
-
-      // Save location data for show more pharmacies
-      setLocation(loc);
-      setLatitude(lat);
-      setLongitude(lng);
-    }
-
-    // Get pharmacies from our internal list
-    const locationData = {
-      latitude: lat,
-      longitude: lng,
-      radius: 25
-    };
-    const limit = 3;
-    const offset = pharmacyOptions.length;
-
-    graphQLClient.setHeader('x-photon-auth', token);
-
-    let pharmaciesResults: any;
+    // Perform geocode to get lat/lng
+    let locationData: { address: string; lat: number; lng: number };
     try {
-      pharmaciesResults = await graphQLClient.request(GET_PHARMACIES, {
-        location: locationData,
-        limit,
-        offset
-      });
+      locationData = await geocode(location);
     } catch (error) {
-      console.error(JSON.stringify(error, undefined, 2));
-      console.log(error);
-      if (error?.response.errors[0].message === 'No pharmacies found near location') {
-        setShowingAllPharmacies(true);
+      console.error('Geocoding error:', error);
+    }
+
+    const { address, lat, lng } = locationData;
+    if (!address || !lat || !lng) {
+      setLoadingPharmacies(false);
+      return;
+    }
+
+    setLocation(address);
+    setLatitude(lat);
+    setLongitude(lng);
+
+    // Get pharmacies from photon db
+    let pharmaciesResult: types.Pharmacy[];
+    try {
+      // Get pharmacies from photon db
+      pharmaciesResult = await getPharmacies(
+        {
+          latitude: lat,
+          longitude: lng,
+          radius: 25
+        },
+        30, // Set high to ensure indie's are found. Request time increase is minimal.
+        0,
+        token
+      );
+      if (!pharmaciesResult || pharmaciesResult.length === 0) {
+        setLoadingPharmacies(false);
+        return;
+      }
+    } catch (error) {
+      if (error.message === 'No pharmacies found near location') {
+        setLoadingPharmacies(false);
+        toast({
+          title: error.message,
+          position: 'top',
+          status: 'warning',
+          duration: 5000,
+          isClosable: true
+        });
+        return;
+      } else {
+        console.error(JSON.stringify(error, undefined, 2));
+        console.log(error);
       }
     }
 
-    if (pharmaciesResults?.pharmaciesByLocation.length > 0) {
-      for (let i = 0; i < pharmaciesResults.pharmaciesByLocation.length; i++) {
-        // Search for google place
-        const name = pharmaciesResults.pharmaciesByLocation[i].name;
-        const address = pharmaciesResults.pharmaciesByLocation[i].address
-          ? formatAddress(pharmaciesResults.pharmaciesByLocation[i].address)
-          : '';
-        const placeRequest = {
-          query: name + ' ' + address,
-          fields: ['place_id']
-        };
+    // Sort initial list of pharmacies
+    const newPharmacies: EnrichedPharmacy[] = sortIndiePharmaciesFirst(
+      pharmaciesResult,
+      FEATURE_INDIES_WITHIN_RADIUS,
+      FEATURED_PHARMACIES_LIMIT
+    );
 
-        let placeId, placeStatus;
-        try {
-          const { response, status }: any = await query('findPlaceFromQuery', placeRequest);
-          placeId = response[0]?.place_id;
-          placeStatus = status;
-        } catch (error) {
-          console.error(JSON.stringify(error, undefined, 2));
-          console.log(error);
-          continue;
-        }
+    // Save in case we fetched more than we initially show
+    setInitialPharmacies(newPharmacies);
 
-        // Search for google place details
-        if (placeStatus === 'OK' && placeId) {
-          const detailsRequest = {
-            placeId,
-            // 'getDetails' requires utc_offset_minutes to provide isOpen()
-            fields: ['opening_hours', 'utc_offset_minutes', 'rating', 'business_status']
-          };
-          const { response: details, status: detailsStatus }: any = await query(
-            'getDetails',
-            detailsRequest
-          );
-          if (detailsStatus === 'OK') {
-            pharmaciesResults.pharmaciesByLocation[i].businessStatus =
-              details?.business_status || '';
-            pharmaciesResults.pharmaciesByLocation[i].rating = details?.rating || undefined;
-            const openForBusiness = details?.business_status === 'OPERATIONAL';
-            if (openForBusiness) {
-              const currentTime = dayjs().format('HHmm');
-              const { is24Hr, opens, opensDay, closes } = getHours(
-                details?.opening_hours?.periods,
-                currentTime
-              );
-              pharmaciesResults.pharmaciesByLocation[i].hours = {
-                open: details?.opening_hours?.isOpen() || false,
-                is24Hr,
-                opens,
-                opensDay,
-                closes
-              };
-            }
-          }
-        }
-      }
-      setPharmacyOptions([...pharmacyOptions, ...pharmaciesResults.pharmaciesByLocation]);
-    }
-    setLoadingMore(false);
+    // We only show 3 at a time, so just enrich the first 3
+    const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
+      newPharmacies.slice(0, 3).map(addRatingsAndHours)
+    );
+    setPharmacyOptions(enrichedPharmacies);
+
+    setLoadingPharmacies(false);
   };
 
-  const handleShowMore = () => {
-    fetchPharmacies();
+  const handleShowMore = async () => {
+    setLoadingPharmacies(true);
+
+    const newPharmacies = [];
+
+    /**
+     * Initially we fetched a list of pharmacies from our db, if some
+     * of those haven't received ratings/hours, enrich those first
+     *  */
+    const MAX_ENRICHMENT = 3; // Maximum number of pharmacies to enrich at a time
+    const pharmaciesToEnrich = initialPharmacies.slice(
+      pharmacyOptions.length,
+      pharmacyOptions.length + MAX_ENRICHMENT
+    );
+
+    for (const newPharmacy of pharmaciesToEnrich) {
+      await addRatingsAndHours(newPharmacy);
+      newPharmacies.push(newPharmacy);
+    }
+
+    if (newPharmacies.length === MAX_ENRICHMENT) {
+      // Break early and return enriched pharmacies
+      setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
+      setLoadingPharmacies(false);
+      return;
+    }
+
+    const pharmaciesToGet = MAX_ENRICHMENT - newPharmacies.length;
+    const totalEnriched = pharmacyOptions.length + newPharmacies.length;
+
+    // Get pharmacies from our db
+    let pharmaciesResult: types.Pharmacy[];
+    try {
+      pharmaciesResult = await getPharmacies(
+        {
+          latitude,
+          longitude,
+          radius: 25
+        },
+        pharmaciesToGet,
+        totalEnriched,
+        token
+      );
+      if (!pharmaciesResult || pharmaciesResult.length === 0) {
+        setLoadingPharmacies(false);
+        return;
+      }
+    } catch (error) {
+      if (error.message === 'No pharmacies found near location') {
+        setLoadingPharmacies(false);
+        toast({
+          title: error.message,
+          position: 'top',
+          status: 'warning',
+          duration: 5000,
+          isClosable: true
+        });
+      } else {
+        console.error(JSON.stringify(error, undefined, 2));
+        console.log(error);
+      }
+    }
+
+    const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
+      pharmaciesResult.map(addRatingsAndHours)
+    );
+    newPharmacies.push(...enrichedPharmacies);
+
+    setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
+    setLoadingPharmacies(false);
   };
 
   const handleSelect = (pharmacyId: string) => {
@@ -358,7 +576,7 @@ export const Pharmacy = () => {
 
   useEffect(() => {
     if (location) {
-      fetchPharmacies();
+      initialize();
     }
   }, [location]);
 
@@ -372,7 +590,6 @@ export const Pharmacy = () => {
   }
 
   // Courier option limited to MoPed in Austin, TX
-  const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(location);
   const patientAddressInAustinTX =
     order?.address?.city === 'Austin' && order?.address?.state === 'TX';
   const enableCourier = searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier;
@@ -448,7 +665,7 @@ export const Pharmacy = () => {
                 handleSelect={handleSelect}
                 handleShowMore={handleShowMore}
                 handleSetPreferred={handleSetPreferredPharmacy}
-                loadingMore={loadingMore}
+                loadingMore={loadingPharmacies}
                 showingAllPharmacies={showingAllPharmacies}
                 courierEnabled={enableCourier || orgSettings.mailOrderNavigate}
               />
