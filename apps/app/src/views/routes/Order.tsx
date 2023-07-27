@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
 import {
   Alert,
@@ -21,7 +21,6 @@ import {
   VStack,
   useBreakpointValue,
   useColorMode,
-  useToast,
   LinkBox,
   LinkOverlay,
   Tag,
@@ -100,7 +99,7 @@ const CancelOrderAlert = ({
     return (
       <Alert status="warning">
         <AlertIcon />
-        This order may have been picked up, but we can cancel the remaining fills. Continue?
+        This order may have been picked up, but we can cancel the remaining fills.
       </Alert>
     );
   }
@@ -108,12 +107,14 @@ const CancelOrderAlert = ({
 };
 
 export const Order = () => {
-  const toast = useToast();
   const params = useParams();
   const id = params.orderId;
   const { getOrder, getToken } = usePhoton();
   const { order, loading, error } = getOrder({ id: id! });
   const [accessToken, setAccessToken] = useState('');
+  const [canceling, setCanceling] = useState(false);
+
+  const navigate = useNavigate();
   const getAccessToken = async () => {
     try {
       const token = await getToken();
@@ -426,6 +427,8 @@ export const Order = () => {
               textColor="red.500"
               colorScheme="red"
               size="sm"
+              isLoading={canceling}
+              loadingText="Canceling..."
               isDisabled={
                 loading ||
                 order.state === types.OrderState.Canceled ||
@@ -440,15 +443,10 @@ export const Order = () => {
                   colorScheme: 'red'
                 });
                 if (decision) {
+                  setCanceling(true);
                   graphQLClient.setHeader('authorization', accessToken);
-                  const res = await graphQLClient.request(CANCEL_ORDER, { id });
-                  if (res) {
-                    toast({
-                      title: 'Order canceled',
-                      status: 'success',
-                      duration: 5000
-                    });
-                  }
+                  await graphQLClient.request(CANCEL_ORDER, { id });
+                  navigate(0);
                 }
               }}
             >
