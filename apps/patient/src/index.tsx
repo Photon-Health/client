@@ -18,7 +18,8 @@ datadogRum.init({
   sessionReplaySampleRate: 100,
   trackUserInteractions: true,
   trackResources: true,
-  trackLongTasks: true
+  trackLongTasks: true,
+  defaultPrivacyLevel: 'mask-user-input'
 });
 
 datadogRum.startSessionReplayRecording();

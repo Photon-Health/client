@@ -153,6 +153,7 @@ export const Status = () => {
                 color="brandLink"
                 fontWeight="medium"
                 target="_blank"
+                data-dd-privacy="mask"
               >
                 {fulfillment.trackingNumber}
               </Link>
