@@ -69,6 +69,24 @@ export const ORDER_FULFILLMENT_TIP_MAP: OrderFulfillmentRecord = {
   DELIVERED: 'Mail order delivered'
 };
 
+export const ORDER_STATE_TIP_MAP: { [key in OrderState]: string } = {
+  PLACED: 'Order has been placed',
+  ROUTING: 'Order waiting on patient pharmacy selection',
+  PENDING: 'Order is pending',
+  CANCELED: 'Order has been canceled',
+  COMPLETED: 'Order has been completed',
+  ERROR: 'Order has an error'
+};
+
+export const ORDER_STATE_COLOR_MAP: { [key in OrderState]: string } = {
+  PLACED: 'yellow',
+  ROUTING: 'gray',
+  PENDING: 'yellow',
+  CANCELED: 'red',
+  COMPLETED: 'green',
+  ERROR: 'red'
+};
+
 interface OrderStatusBadgeProps {
   fulfillmentState?: OrderFulfillmentState;
   orderState?: OrderState;
@@ -84,7 +102,7 @@ function OrderStatusBadge({ fulfillmentState, orderState }: OrderStatusBadgeProp
     return null;
   }
 
-  if (fulfillmentState) {
+  if (orderState === 'PLACED' && fulfillmentState) {
     const key = fulfillmentState;
     status = ORDER_FULFILLMENT_STATE_MAP[key];
     statusTip = ORDER_FULFILLMENT_TIP_MAP[key] || status;
@@ -92,8 +110,9 @@ function OrderStatusBadge({ fulfillmentState, orderState }: OrderStatusBadgeProp
   } else {
     const key = orderState as OrderState;
     status = ORDER_STATE_MAP[key];
-    statusTip = 'Order waiting on patient pharmacy selection';
+    statusTip = ORDER_STATE_TIP_MAP[key] || status;
     statusIcon = ORDER_STATE_ICON_MAP[key];
+    statusColor = ORDER_STATE_COLOR_MAP[key] || statusColor;
   }
 
   return (

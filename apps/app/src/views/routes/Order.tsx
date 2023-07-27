@@ -24,7 +24,6 @@ import {
   useToast,
   LinkBox,
   LinkOverlay,
-  Badge,
   Tag,
   TagLeftIcon,
   TagLabel
@@ -37,13 +36,16 @@ import PatientView from '../components/PatientView';
 import { confirmWrapper } from '../components/GuardDialog';
 import { formatAddress, formatDate, formatFills, formatPhone } from '../../utils';
 import {
+  OrderFulfillmentState,
   ORDER_FULFILLMENT_COLOR_MAP,
   ORDER_FULFILLMENT_STATE_MAP,
+  ORDER_STATE_COLOR_MAP,
   ORDER_STATE_ICON_MAP,
   ORDER_STATE_MAP
 } from '../components/OrderStatusBadge';
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
+import { OrderState } from 'packages/sdk/dist/types';
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
     parse: JSON.parse,
@@ -62,17 +64,47 @@ export const ORDER_FULFILLMENT_TYPE_MAP = {
   [types.FulfillmentType.MailOrder]: 'Mail order'
 };
 
-export const FILL_STATE_MAP: object = {
-  CANCELED: 'Canceled',
-  NEW: 'New',
-  SCHEDULED: 'Scheduled',
-  SENT: 'Sent'
-};
-export const FILL_COLOR_MAP: object = {
-  CANCELED: 'gray',
-  NEW: 'green',
-  SCHEDULED: 'orange',
-  SENT: 'yellow'
+const CancelOrderAlert = ({
+  orderState,
+  fulfillmentState
+}: {
+  orderState: OrderState;
+  fulfillmentState: OrderFulfillmentState;
+}) => {
+  if (orderState === 'CANCELED') {
+    return (
+      <Alert colorScheme="gray">
+        <AlertIcon />
+        This order has been canceled
+      </Alert>
+    );
+  }
+  if (orderState === 'COMPLETED') {
+    return (
+      <Alert colorScheme="gray">
+        <AlertIcon />
+        This order has been completed
+      </Alert>
+    );
+  }
+  if (fulfillmentState === 'PICKED_UP') {
+    return (
+      <Alert status="warning">
+        <AlertIcon />
+        This order has been picked up, but we can cancel the remaining fills. Please call the
+        pharmacy.
+      </Alert>
+    );
+  }
+  if (fulfillmentState === 'RECEIVED' || fulfillmentState === 'READY') {
+    return (
+      <Alert status="warning">
+        <AlertIcon />
+        This order may have been picked up, but we can cancel the remaining fills. Continue?
+      </Alert>
+    );
+  }
+  return null;
 };
 
 export const Order = () => {
@@ -97,45 +129,6 @@ export const Order = () => {
   }, [accessToken]);
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const { colorMode } = useColorMode();
-
-  const buttons =
-    loading || !order ? (
-      <Skeleton width="130px" height="42px" borderRadius="md" />
-    ) : (
-      <Button
-        aria-label="Cancel Order"
-        variant="outline"
-        borderColor="red.500"
-        textColor="red.500"
-        colorScheme="red"
-        isDisabled={
-          order.fulfillment?.type !== types.FulfillmentType.MailOrder ||
-          order.state === types.OrderState.Canceled
-        }
-        onClick={async () => {
-          const decision = await confirmWrapper('Cancel this order?', {
-            description: 'You will not be able to undo this action.',
-            cancelText: "No, Don't Cancel",
-            confirmText: 'Yes, Cancel',
-            darkMode: colorMode !== 'light',
-            colorScheme: 'red'
-          });
-          if (decision) {
-            graphQLClient.setHeader('authorization', accessToken);
-            const res = await graphQLClient.request(CANCEL_ORDER, { id });
-            if (res) {
-              toast({
-                title: 'Order canceled',
-                status: 'success',
-                duration: 5000
-              });
-            }
-          }
-        }}
-      >
-        Cancel Order
-      </Button>
-    );
 
   const prescriptions = useMemo(() => {
     if (!order) return [];
@@ -173,7 +166,7 @@ export const Order = () => {
   }
 
   return (
-    <Page header="Order" buttons={buttons}>
+    <Page header="Order">
       <Card>
         <CardHeader>
           <Text fontWeight="medium">
@@ -215,7 +208,11 @@ export const Order = () => {
               {loading ? (
                 <Skeleton width="70px" height="24px" borderRadius="xl" />
               ) : (
-                <Tag size="sm" borderRadius="full">
+                <Tag
+                  size="sm"
+                  borderRadius="full"
+                  colorScheme={ORDER_STATE_COLOR_MAP[order.state as OrderState]}
+                >
                   <TagLeftIcon boxSize="12px" as={ORDER_STATE_ICON_MAP[order.state]} />
                   <TagLabel>{ORDER_STATE_MAP[order.state as keyof object] || ''}</TagLabel>
                 </Tag>
@@ -276,14 +273,17 @@ export const Order = () => {
               {loading ? (
                 <Skeleton width="70px" height="24px" borderRadius="xl" />
               ) : order.fulfillment?.state ? (
-                <Badge
+                <Tag
                   size="sm"
+                  borderRadius="full"
                   colorScheme={
                     ORDER_FULFILLMENT_COLOR_MAP[order.fulfillment.state as keyof object] || ''
                   }
                 >
-                  {ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof object] || ''}
-                </Badge>
+                  <TagLabel>
+                    {ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof object] || ''}
+                  </TagLabel>
+                </Tag>
               ) : null}
             </InfoGrid>
 
@@ -405,6 +405,55 @@ export const Order = () => {
             ) : (
               <Text as="i">No fills</Text>
             )}
+
+            <Divider />
+
+            <Text color="gray.500" fontWeight="medium" fontSize="sm">
+              Actions
+            </Text>
+
+            {!loading ? (
+              <CancelOrderAlert
+                orderState={order.state as OrderState}
+                fulfillmentState={order?.fulfillment?.state as OrderFulfillmentState}
+              />
+            ) : null}
+
+            <Button
+              aria-label="Cancel Order"
+              variant="outline"
+              borderColor="red.500"
+              textColor="red.500"
+              colorScheme="red"
+              size="sm"
+              isDisabled={
+                loading ||
+                order.state === types.OrderState.Canceled ||
+                order.state === types.OrderState.Completed
+              }
+              onClick={async () => {
+                const decision = await confirmWrapper('Cancel this order?', {
+                  description: 'You will not be able to undo this action.',
+                  cancelText: "No, Don't Cancel",
+                  confirmText: 'Yes, Cancel',
+                  darkMode: colorMode !== 'light',
+                  colorScheme: 'red'
+                });
+                if (decision) {
+                  graphQLClient.setHeader('authorization', accessToken);
+                  const res = await graphQLClient.request(CANCEL_ORDER, { id });
+                  if (res) {
+                    toast({
+                      title: 'Order canceled',
+                      status: 'success',
+                      duration: 5000
+                    });
+                  }
+                }
+              }}
+            >
+              Cancel Order
+            </Button>
           </VStack>
         </CardBody>
       </Card>

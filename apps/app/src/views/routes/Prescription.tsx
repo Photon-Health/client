@@ -24,8 +24,6 @@ import {
   useToast,
   AlertTitle,
   AlertDescription,
-  Wrap,
-  WrapItem,
   Box,
   LinkBox,
   LinkOverlay,
@@ -52,6 +50,7 @@ import { Fill, Maybe } from 'packages/sdk/dist/types';
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
+import { PlusIcon } from '@graphiql/react';
 
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
@@ -117,62 +116,6 @@ export const Prescription = () => {
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const { colorMode } = useColorMode();
 
-  const buttons =
-    loading && !patient ? (
-      <Wrap>
-        <WrapItem>
-          <Skeleton width="111px" height="42px" borderRadius="md" />
-        </WrapItem>
-        <WrapItem>
-          <Skeleton width="156px" height="42px" borderRadius="md" />
-        </WrapItem>
-      </Wrap>
-    ) : (
-      <Wrap>
-        <WrapItem>
-          <Button
-            aria-label="Cancel Prescription"
-            isDisabled={rx.state !== 'ACTIVE'}
-            onClick={async () => {
-              const decision = await confirmWrapper('Cancel this prescription?', {
-                description: 'You will not be able to undo this action.',
-                cancelText: "No, Don't Cancel",
-                confirmText: 'Yes, Cancel',
-                darkMode: colorMode !== 'light',
-                colorScheme: 'red'
-              });
-              if (decision) {
-                graphQLClient.setHeader('authorization', accessToken);
-                const res = await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
-                if (res) {
-                  toast({
-                    title: 'Prescription canceled',
-                    status: 'success',
-                    duration: 5000
-                  });
-                }
-              }
-            }}
-            variant="outline"
-            textColor="red.500"
-            colorScheme="red"
-          >
-            Cancel Prescription
-          </Button>
-        </WrapItem>
-        <WrapItem>
-          <Button
-            aria-label="New Order"
-            as={RouterLink}
-            to={`/orders/new?patientId=${patient?.id || ''}&prescriptionId=${id}`}
-            colorScheme="blue"
-          >
-            Create Order
-          </Button>
-        </WrapItem>
-      </Wrap>
-    );
-
   const orders = useMemo(() => {
     if (!prescription) return [];
     const orderIds = new Set();
@@ -208,7 +151,7 @@ export const Prescription = () => {
   }
 
   return (
-    <Page header="Prescription" buttons={buttons}>
+    <Page header="Prescription">
       <Card>
         <CardHeader>
           <Text fontWeight="medium">
@@ -350,71 +293,90 @@ export const Prescription = () => {
                 <Text fontSize="md">{dispenseAsWritten ? 'Yes' : 'No'}</Text>
               )}
             </InfoGrid>
-
-            {orders.length === 0 ? null : (
+            <Divider />
+            <HStack justifyContent="space-between" width="100%">
+              <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                Orders
+              </Text>
+              {loading ? null : (
+                <Button
+                  leftIcon={<PlusIcon />}
+                  aria-label="New Order"
+                  as={RouterLink}
+                  to={`/orders/new?patientId=${patient?.id || ''}&prescriptionId=${id}`}
+                  colorScheme="blue"
+                  size="sm"
+                >
+                  Create Order
+                </Button>
+              )}
+            </HStack>
+            {loading ? (
+              <SkeletonText skeletonHeight={5} noOfLines={1} width="100%" />
+            ) : (
               <>
-                <Divider />
-
-                <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                  Orders
-                </Text>
-                <VStack spacing={4} w="full">
-                  {orders.map((fill: Maybe<Fill>) => {
-                    if (!fill) return null;
-                    const address = fill?.order?.pharmacy?.address;
-                    const addressString = address
-                      ? `${address?.street1}, ${address?.city}, ${address?.state} ${address?.postalCode}`
-                      : '';
-                    return (
-                      <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
-                        <Card
-                          variant="outline"
-                          p={[2, 3]}
-                          w="full"
-                          shadow="none"
-                          _hover={{
-                            backgroundColor: 'gray.50'
-                          }}
-                        >
-                          <HStack justifyContent="space-between">
-                            <VStack alignItems="start">
-                              <HStack>
-                                <LinkOverlay href={`/orders/${fill?.order?.id}`}>
-                                  <HStack spacing={2}>
-                                    <Text
-                                      fontSize="md"
-                                      as={fill?.order?.pharmacy?.name ? undefined : 'i'}
-                                    >
-                                      {fill?.order?.pharmacy?.name || 'Pending Selection'}
-                                    </Text>
-                                    <OrderStatusBadge
-                                      fulfillmentState={
-                                        fill?.order?.fulfillment?.state as OrderFulfillmentState
-                                      }
-                                      orderState={fill?.order?.state}
-                                    />
+                {orders.length === 0 ? (
+                  <Text>No orders for this prescription</Text>
+                ) : (
+                  <>
+                    <VStack spacing={4} w="full">
+                      {orders.map((fill: Maybe<Fill>) => {
+                        if (!fill) return null;
+                        const address = fill?.order?.pharmacy?.address;
+                        const addressString = address
+                          ? `${address?.street1}, ${address?.city}, ${address?.state} ${address?.postalCode}`
+                          : '';
+                        return (
+                          <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
+                            <Card
+                              variant="outline"
+                              p={[2, 3]}
+                              w="full"
+                              shadow="none"
+                              _hover={{
+                                backgroundColor: 'gray.50'
+                              }}
+                            >
+                              <HStack justifyContent="space-between">
+                                <VStack alignItems="start">
+                                  <HStack>
+                                    <LinkOverlay href={`/orders/${fill?.order?.id}`}>
+                                      <HStack spacing={2}>
+                                        <Text
+                                          fontSize="md"
+                                          as={fill?.order?.pharmacy?.name ? undefined : 'i'}
+                                        >
+                                          {fill?.order?.pharmacy?.name || 'Pending Selection'}
+                                        </Text>
+                                        <OrderStatusBadge
+                                          fulfillmentState={
+                                            fill?.order?.fulfillment?.state as OrderFulfillmentState
+                                          }
+                                          orderState={fill?.order?.state}
+                                        />
+                                      </HStack>
+                                    </LinkOverlay>
                                   </HStack>
-                                </LinkOverlay>
+                                  <Text fontSize="sm" color="gray.500">
+                                    {addressString}
+                                    {addressString ? <br /> : null}
+                                    Created:{' '}
+                                    {dayjs(fill?.order?.createdAt).format('MMM D, YYYY, h:mm A')}
+                                  </Text>
+                                </VStack>
+                                <Box alignItems="end">
+                                  <FiChevronRight size="1.3em" />
+                                </Box>
                               </HStack>
-                              <Text fontSize="sm" color="gray.500">
-                                {addressString}
-                                {addressString ? <br /> : null}
-                                Created:{' '}
-                                {dayjs(fill?.order?.createdAt).format('MMM D, YYYY, h:mm A')}
-                              </Text>
-                            </VStack>
-                            <Box alignItems="end">
-                              <FiChevronRight size="1.3em" />
-                            </Box>
-                          </HStack>
-                        </Card>
-                      </LinkBox>
-                    );
-                  })}
-                </VStack>
+                            </Card>
+                          </LinkBox>
+                        );
+                      })}
+                    </VStack>
+                  </>
+                )}
               </>
             )}
-
             <Divider />
             <Text color="gray.500" fontWeight="medium" fontSize="sm">
               Advanced
@@ -439,6 +401,44 @@ export const Prescription = () => {
                 </Text>
               )}
             </InfoGrid>
+
+            <Divider />
+
+            <Text color="gray.500" fontWeight="medium" fontSize="sm">
+              Actions
+            </Text>
+            {loading ? null : (
+              <Button
+                aria-label="Cancel Prescription"
+                isDisabled={rx.state !== 'ACTIVE'}
+                onClick={async () => {
+                  const decision = await confirmWrapper('Cancel this prescription?', {
+                    description: 'You will not be able to undo this action.',
+                    cancelText: "No, Don't Cancel",
+                    confirmText: 'Yes, Cancel',
+                    darkMode: colorMode !== 'light',
+                    colorScheme: 'red'
+                  });
+                  if (decision) {
+                    graphQLClient.setHeader('authorization', accessToken);
+                    const res = await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
+                    if (res) {
+                      toast({
+                        title: 'Prescription canceled',
+                        status: 'success',
+                        duration: 5000
+                      });
+                    }
+                  }
+                }}
+                variant="outline"
+                textColor="red.500"
+                colorScheme="red"
+                size="sm"
+              >
+                Cancel Prescription
+              </Button>
+            )}
           </VStack>
         </CardBody>
       </Card>
