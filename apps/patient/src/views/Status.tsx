@@ -27,7 +27,8 @@ import { OrderContext } from './Main';
 import { graphQLClient } from '../configs/graphqlClient';
 import t from '../utils/text.json';
 import { PharmacyCard } from '../components/PharmacyCard';
-import { addRatingsAndHours } from './Pharmacy';
+import { addRatingsAndHours } from '../utils/general';
+import { AUTH_HEADER_ERRORS } from '../api/internal';
 
 const PHOTON_PHONE_NUMBER: string = process.env.REACT_APP_TWILIO_SMS_NUMBER;
 

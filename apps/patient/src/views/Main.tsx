@@ -9,6 +9,7 @@ import { graphQLClient } from '../configs/graphqlClient';
 
 import theme from '../configs/theme';
 import { types } from '@photonhealth/sdk';
+import { AUTH_HEADER_ERRORS } from '../api/internal';
 
 export const OrderContext = createContext(null);
 

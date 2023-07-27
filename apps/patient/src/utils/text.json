@@ -23,8 +23,14 @@
   },
   "pharmacy": {
     "title": "Select a pharmacy",
-    "heading": "Select a pharmacy",
-    "subheading": "We'll send your prescriptions to your selected pharmacy to be filled.",
+    "heading": {
+      "original": "Select a pharmacy",
+      "reroute": "Change pharmacy"
+    },
+    "subheading": {
+      "original": "We'll send your prescriptions to your selected pharmacy to be filled.",
+      "reroute": "We'll cancel your prescriptions at the original pharmacy and send them to your new one to be filled."
+    },
     "showing": "Showing pharmacies near:",
     "setLocation": "Set search location",
     "modal": {

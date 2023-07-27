@@ -1,9 +1,18 @@
 import { types } from 'packages/sdk/dist/lib';
 
 import { graphQLClient } from '../configs/graphqlClient';
-import { GET_PHARMACIES, MARK_ORDER_AS_PICKED_UP } from '../utils/graphql';
+import {
+  GET_PHARMACIES,
+  MARK_ORDER_AS_PICKED_UP,
+  SELECT_ORDER_PHARMACY,
+  SET_PREFERRED_PHARMACY
+} from '../utils/graphql';
 
 export const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
+
+/**
+ * Queries
+ */
 
 export const getPharmacies = async (
   searchParams: {
@@ -18,7 +27,7 @@ export const getPharmacies = async (
   graphQLClient.setHeader('x-photon-auth', token);
 
   try {
-    const query: { pharmaciesByLocation: types.Pharmacy[] } = await graphQLClient.request(
+    const response: { pharmaciesByLocation: types.Pharmacy[] } = await graphQLClient.request(
       GET_PHARMACIES,
       {
         location: searchParams,
@@ -26,8 +35,8 @@ export const getPharmacies = async (
         offset
       }
     );
-    if (query?.pharmaciesByLocation?.length > 0) {
-      return query.pharmaciesByLocation;
+    if (response?.pharmaciesByLocation?.length > 0) {
+      return response.pharmaciesByLocation;
     } else {
       throw new Error('No pharmacies found near location');
     }
@@ -41,15 +50,19 @@ export const getPharmacies = async (
   }
 };
 
+/**
+ * Mutations
+ */
+
 export const markOrderAsPickedUp = async (orderId: string, token: string) => {
   graphQLClient.setHeader('x-photon-auth', token);
 
   try {
-    const query: { markOrderAsPickedUp: boolean } = await graphQLClient.request(
+    const response: { markOrderAsPickedUp: boolean } = await graphQLClient.request(
       MARK_ORDER_AS_PICKED_UP,
       { markOrderAsPickedUpId: orderId }
     );
-    if (query?.markOrderAsPickedUp) {
+    if (response?.markOrderAsPickedUp) {
       return true;
     } else {
       throw new Error('Unable to mark order as picked up');
@@ -58,6 +71,59 @@ export const markOrderAsPickedUp = async (orderId: string, token: string) => {
     if (error?.response?.errors) {
       const { message } = error.response.errors[0];
       throw new Error(message);
+    }
+  }
+};
+
+export const setPreferredPharmacy = async (
+  patientId: string,
+  pharmacyId: string,
+  token: string
+) => {
+  graphQLClient.setHeader('x-photon-auth', token);
+
+  try {
+    const response: { setPreferredPharmacy: boolean } = await graphQLClient.request(
+      SET_PREFERRED_PHARMACY,
+      {
+        patientId,
+        pharmacyId
+      }
+    );
+
+    if (response?.setPreferredPharmacy) {
+      return true;
+    } else {
+      throw new Error('Unable to set preferred pharmacy');
+    }
+  } catch (error) {
+    if (error?.response?.errors) {
+      throw new Error(error.response.errors[0].message);
+    }
+  }
+};
+
+export const selectOrderPharmacy = async (orderId, pharmacyId, patientId, token: string) => {
+  graphQLClient.setHeader('x-photon-auth', token);
+
+  try {
+    const response: { selectOrderPharmacy: boolean } = await graphQLClient.request(
+      SELECT_ORDER_PHARMACY,
+      {
+        orderId,
+        pharmacyId,
+        patientId
+      }
+    );
+
+    if (response?.selectOrderPharmacy) {
+      return true;
+    } else {
+      throw new Error('Unable to select pharmacy');
+    }
+  } catch (error) {
+    if (error?.response?.errors) {
+      throw new Error(error.response.errors[0].message);
     }
   }
 };

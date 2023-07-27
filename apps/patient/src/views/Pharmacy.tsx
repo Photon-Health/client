@@ -15,9 +15,8 @@ import {
 } from '@chakra-ui/react';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { Helmet } from 'react-helmet';
-import dayjs from 'dayjs';
 import { types } from '@photonhealth/sdk';
-import { formatAddress, getHours } from '../utils/general';
+import { formatAddress, addRatingsAndHours } from '../utils/general';
 import { ExtendedFulfillmentType, Order } from '../utils/models';
 import t from '../utils/text.json';
 import { SELECT_ORDER_PHARMACY, SET_PREFERRED_PHARMACY } from '../utils/graphql';
@@ -32,64 +31,18 @@ import { OrderContext } from './Main';
 import { getSettings } from '@client/settings';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { FEATURED_PHARMACIES } from '../utils/featuredPharmacies';
-import { getPharmacies } from '../utils/api';
+import { getPharmacies, AUTH_HEADER_ERRORS } from '../api/internal';
+import { geocode } from '../api/external';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
-const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
 export const UNOPEN_BUSINESS_STATUS_MAP = {
   CLOSED_TEMPORARILY: 'Closed Temporarily',
   CLOSED_PERMANENTLY: 'Closed Permanently'
 };
 const FEATURE_INDIES_WITHIN_RADIUS = 3; // miles
 const FEATURED_PHARMACIES_LIMIT = 2;
-
-const placesService = new google.maps.places.PlacesService(document.createElement('div'));
-const query = (method: string, data: object) =>
-  new Promise((resolve, reject) => {
-    placesService[method](data, (response, status) => {
-      if (status === 'OK') {
-        resolve({ response, status });
-      } else {
-        reject({ response, status });
-      }
-    });
-  });
-
-const geocoder: google.maps.Geocoder = new google.maps.Geocoder();
-const geocode = async (address: string) => {
-  const request: google.maps.GeocoderRequest = { address };
-
-  try {
-    const response: google.maps.GeocoderResponse = await geocoder.geocode(request);
-
-    const result = response.results?.[0];
-    if (result?.geometry?.location) {
-      return {
-        address: result.formatted_address,
-        lat: result.geometry.location.lat(),
-        lng: result.geometry.location.lng()
-      };
-    } else {
-      throw new Error('No results found for the provided address.');
-    }
-  } catch (error) {
-    switch (error.message) {
-      case google.maps.GeocoderStatus.UNKNOWN_ERROR:
-        throw new Error('Unknown server error occurred.');
-      case google.maps.GeocoderStatus.OVER_QUERY_LIMIT:
-        throw new Error('Exceeded the query limit. Please try again later.');
-      case google.maps.GeocoderStatus.ZERO_RESULTS:
-        throw new Error('No result was found.');
-      case google.maps.GeocoderStatus.REQUEST_DENIED:
-        throw new Error('Geocoding request denied. Check your API key and permissions.');
-      case google.maps.GeocoderStatus.INVALID_REQUEST:
-        throw new Error('Invalid geocoding request.');
-      default:
-        throw error; // Re-throw any other unexpected errors
-    }
-  }
-};
+const MAX_ENRICHMENT = 3; // Maximum number of pharmacies to enrich at a time
 
 const sortIndiePharmaciesFirst = (list: EnrichedPharmacy[], distance: number, limit: number) => {
   const featuredPharmacies = list
@@ -99,89 +52,6 @@ const sortIndiePharmaciesFirst = (list: EnrichedPharmacy[], distance: number, li
     (p: EnrichedPharmacy) => !featuredPharmacies.some((f) => f.id === p.id)
   );
   return featuredPharmacies.concat(otherPharmacies);
-};
-
-/**
- * Adds ratings and hours to the Pharmacy object using Google Place API.
- * If the details are not found or an error occurs during the process, the original Pharmacy object is returned.
- *
- * @param {Pharmacy} p - The Pharmacy object to enrich with additional details.
- * @returns {Promise<Pharmacy>} - A Promise that resolves to the enriched Pharmacy object.
- */
-export const addRatingsAndHours = async (p: EnrichedPharmacy) => {
-  // Get place from Google
-  const name = p.name;
-  const address = p.address ? formatAddress(p.address) : '';
-  const placeRequest = {
-    query: name + ' ' + address,
-    fields: ['place_id']
-  };
-  let placeId: string;
-  let placeStatus: string;
-  try {
-    const { response, status }: any = await query('findPlaceFromQuery', placeRequest);
-    placeId = response[0]?.place_id;
-    placeStatus = status;
-  } catch (error) {
-    console.error(JSON.stringify(error, undefined, 2));
-    console.log(error);
-    return p;
-  }
-
-  if (placeStatus !== 'OK' || !placeId) {
-    console.log('Could not find Google place');
-    return p; // Break early if place isn't found
-  }
-
-  // Get place details from Google
-  const detailsRequest = {
-    placeId,
-    fields: [
-      'opening_hours',
-      'utc_offset_minutes', // this gives us isOpen()
-      'rating',
-      'business_status'
-    ]
-  };
-  let details: any;
-  let detailsStatus: string;
-  try {
-    const { response, status }: any = await query('getDetails', detailsRequest);
-    details = response;
-    detailsStatus = status;
-  } catch (error) {
-    console.error(JSON.stringify(error, undefined, 2));
-    console.log(error);
-    return p;
-  }
-
-  if (detailsStatus !== 'OK') {
-    console.log('Could not find place details');
-    return p; // Break early if place details not found
-  }
-
-  p.businessStatus = details?.business_status || '';
-  p.rating = details?.rating || undefined;
-
-  const openForBusiness = details?.business_status === 'OPERATIONAL';
-  if (!openForBusiness) {
-    return p; // Don't need hours for non-operational business
-  }
-
-  const currentTime = dayjs().format('HHmm');
-  const { is24Hr, opens, opensDay, closes } = getHours(
-    details?.opening_hours?.periods,
-    currentTime
-  );
-  p.hours = {
-    open: details?.opening_hours?.isOpen() || false,
-    is24Hr,
-    opens,
-    opensDay,
-    closes
-  };
-
-  return p;
 };
 
 export const Pharmacy = () => {
@@ -194,6 +64,7 @@ export const Pharmacy = () => {
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
+  const isReroute = searchParams.get('reroute');
 
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
@@ -314,7 +185,7 @@ export const Pharmacy = () => {
 
     // We only show 3 at a time, so just enrich the first 3
     const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
-      newPharmacies.slice(0, 3).map(addRatingsAndHours)
+      newPharmacies.slice(0, MAX_ENRICHMENT).map(addRatingsAndHours)
     );
     setPharmacyOptions(enrichedPharmacies);
 
@@ -330,7 +201,6 @@ export const Pharmacy = () => {
      * Initially we fetched a list of pharmacies from our db, if some
      * of those haven't received ratings/hours, enrich those first
      *  */
-    const MAX_ENRICHMENT = 3; // Maximum number of pharmacies to enrich at a time
     const pharmaciesToEnrich = initialPharmacies.slice(
       pharmacyOptions.length,
       pharmacyOptions.length + MAX_ENRICHMENT
@@ -457,7 +327,7 @@ export const Pharmacy = () => {
     }
   };
 
-  const setPreferredPharmacy = async (patientId: string, pharmacyId: string) => {
+  const handleSetPreferredPharmacy = async (pharmacyId: string) => {
     if (!pharmacyId) return;
 
     setSavingPreferred(true);
@@ -468,7 +338,7 @@ export const Pharmacy = () => {
       const result: { setPreferredPharmacy: boolean } = await graphQLClient.request(
         SET_PREFERRED_PHARMACY,
         {
-          patientId,
+          patientId: order.patient.id,
           pharmacyId
         }
       );
@@ -509,10 +379,6 @@ export const Pharmacy = () => {
     }
   };
 
-  const handleSetPreferredPharmacy = (id: string) => {
-    setPreferredPharmacy(order.patient.id, id);
-  };
-
   useEffect(() => {
     if (location) {
       initialize();
@@ -528,10 +394,11 @@ export const Pharmacy = () => {
     );
   }
 
-  // Courier option limited to MoPed in Austin, TX
   const patientAddressInAustinTX =
     order?.address?.city === 'Austin' && order?.address?.state === 'TX';
-  const enableCourier = searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier;
+  const enableCourier = searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier; // Courier limited to MoPed in Austin, TX
+  const heading = isReroute ? t.pharmacy.heading.reroute : t.pharmacy.heading.original;
+  const subheading = isReroute ? t.pharmacy.subheading.reroute : t.pharmacy.subheading.original;
 
   return (
     <Box>
@@ -546,9 +413,9 @@ export const Pharmacy = () => {
         <VStack spacing={6} align="span" pt={5}>
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
-              {t.pharmacy.heading}
+              {heading}
             </Heading>
-            <Text>{t.pharmacy.subheading}</Text>
+            <Text>{subheading}</Text>
           </VStack>
 
           <HStack justify="space-between" w="full">

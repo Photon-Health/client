@@ -3,6 +3,7 @@ import isoWeek from 'dayjs/plugin/isoWeek';
 import isBetween from 'dayjs/plugin/isBetween';
 import { types } from '@photonhealth/sdk';
 import { ExtendedFulfillmentType } from './models';
+import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 
 dayjs.extend(isoWeek);
 dayjs.extend(isBetween);
@@ -187,4 +188,98 @@ export const countFillsAndRemoveDuplicates = (fills: types.Fill[]): FillWithCoun
     }
   }
   return result;
+};
+
+/**
+ * Adds ratings and hours to the Pharmacy object using Google Place API.
+ * If the details are not found or an error occurs during the process, the original Pharmacy object is returned.
+ *
+ * @param {Pharmacy} p - The Pharmacy object to enrich with additional details.
+ * @returns {Promise<Pharmacy>} - A Promise that resolves to the enriched Pharmacy object.
+ */
+const placesService = new google.maps.places.PlacesService(document.createElement('div'));
+const query = (method: string, data: object) =>
+  new Promise((resolve, reject) => {
+    placesService[method](data, (response, status) => {
+      if (status === 'OK') {
+        resolve({ response, status });
+      } else {
+        reject({ response, status });
+      }
+    });
+  });
+export const addRatingsAndHours = async (p: EnrichedPharmacy) => {
+  // Get place from Google
+  const name = p.name;
+  const address = p.address ? formatAddress(p.address) : '';
+  const placeRequest = {
+    query: name + ' ' + address,
+    fields: ['place_id']
+  };
+  let placeId: string;
+  let placeStatus: string;
+  try {
+    const { response, status }: any = await query('findPlaceFromQuery', placeRequest);
+    placeId = response[0]?.place_id;
+    placeStatus = status;
+  } catch (error) {
+    console.error(JSON.stringify(error, undefined, 2));
+    console.log(error);
+    return p;
+  }
+
+  if (placeStatus !== 'OK' || !placeId) {
+    console.log('Could not find Google place');
+    return p; // Break early if place isn't found
+  }
+
+  // Get place details from Google
+  const detailsRequest = {
+    placeId,
+    fields: [
+      'opening_hours',
+      'utc_offset_minutes', // this gives us isOpen()
+      'rating',
+      'business_status'
+    ]
+  };
+  let details: any;
+  let detailsStatus: string;
+  try {
+    const { response, status }: any = await query('getDetails', detailsRequest);
+    details = response;
+    detailsStatus = status;
+  } catch (error) {
+    console.error(JSON.stringify(error, undefined, 2));
+    console.log(error);
+    return p;
+  }
+
+  if (detailsStatus !== 'OK') {
+    console.log('Could not find place details');
+    return p; // Break early if place details not found
+  }
+
+  p.businessStatus = details?.business_status || '';
+  p.rating = details?.rating || undefined;
+
+  const openForBusiness = details?.business_status === 'OPERATIONAL';
+  if (!openForBusiness) {
+    return p; // Don't need hours for non-operational business
+  }
+
+  const currentTime = dayjs().format('HHmm');
+  const { is24Hr, opens, opensDay, closes } = getHours(
+    details?.opening_hours?.periods,
+    currentTime
+  );
+  p.hours = {
+    open: details?.opening_hours?.isOpen() || false,
+    is24Hr,
+    opens,
+    opensDay,
+    closes
+  };
+
+  return p;
 };
