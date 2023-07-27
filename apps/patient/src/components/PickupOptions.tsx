@@ -10,7 +10,7 @@ import {
 
 import { PharmacyCard } from './PharmacyCard';
 import t from '../utils/text.json';
-import { AUSTIN_INDIE_PHARMACY_IDS } from '../views/Pharmacy';
+import { FEATURED_PHARMACIES } from '../utils/featuredPharmacies';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 
 interface PickupOptionsProps {
@@ -66,7 +66,7 @@ export const PickupOptions = ({
             <PharmacyCard
               pharmacy={pharmacy}
               preferred={pharmacy.id === preferredPharmacy}
-              goodService={AUSTIN_INDIE_PHARMACY_IDS.includes(pharmacy.id)}
+              goodService={FEATURED_PHARMACIES.includes(pharmacy.id)}
               savingPreferred={savingPreferred}
               selected={selectedId === pharmacy.id}
               onSelect={() => handleSelect(pharmacy.id)}

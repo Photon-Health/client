@@ -4,13 +4,11 @@ import { Alert, AlertIcon, Center, CircularProgress } from '@chakra-ui/react';
 import { ChakraProvider } from '@chakra-ui/react';
 
 import { Order } from '../utils/models';
-import { GET_ORDER } from '../utils/queries';
+import { GET_ORDER } from '../utils/graphql';
 import { graphQLClient } from '../configs/graphqlClient';
 
 import theme from '../configs/theme';
 import { types } from '@photonhealth/sdk';
-
-const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
 
 export const OrderContext = createContext(null);
 

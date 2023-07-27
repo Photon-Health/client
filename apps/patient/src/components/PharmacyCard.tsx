@@ -14,7 +14,8 @@ import {
   VStack,
   useBreakpointValue
 } from '@chakra-ui/react';
-import { FiRotateCcw, FiStar, FiThumbsUp } from 'react-icons/fi';
+import { FiRotateCcw, FiStar, FiThumbsUp, FiRefreshCcw, FiNavigation } from 'react-icons/fi';
+// import { PiSwap } from 'react-icons/';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { types } from '@photonhealth/sdk';
@@ -84,10 +85,11 @@ interface DistanceAddressProps {
 }
 
 const DistanceAddress = ({ distance, address }: DistanceAddressProps) => {
-  if (!distance || !address) return null;
+  if (!address) return null;
   return (
     <Text fontSize="sm" color="gray.500" display="inline">
-      {distance?.toFixed(1)} mi &bull; {formatAddress(address)}
+      {distance ? `${distance.toFixed(1)} mi &bull; ` : ''}
+      {formatAddress(address)}
     </Text>
   );
 };
@@ -100,7 +102,9 @@ interface PharmacyCardProps {
   savingPreferred: boolean;
   selected: boolean;
   onSelect: Function;
-  onSetPreferred: () => void;
+  onSetPreferred?: () => void;
+  onChangePharmacy?: () => void;
+  onGetDirections?: () => void;
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
@@ -111,7 +115,9 @@ export const PharmacyCard = memo(function PharmacyCard({
   savingPreferred,
   selected,
   onSelect,
-  onSetPreferred
+  onChangePharmacy,
+  onSetPreferred,
+  onGetDirections
 }: PharmacyCardProps) {
   const isMobile = useBreakpointValue({ base: true, md: false });
 
@@ -121,7 +127,7 @@ export const PharmacyCard = memo(function PharmacyCard({
     <Card
       bgColor="white"
       border="2px solid"
-      borderColor={selected ? 'brand.600' : 'white'}
+      borderColor={selected ? 'white' : 'white'}
       cursor="pointer"
       onClick={() => onSelect()}
       mx={isMobile ? -3 : undefined}
@@ -165,17 +171,43 @@ export const PharmacyCard = memo(function PharmacyCard({
       <Collapse in={selected && !preferred} animateOpacity>
         <Divider />
         <CardFooter p={2}>
-          <Button
-            mx="auto"
-            size="sm"
-            variant="ghost"
-            colorScheme="brand"
-            onClick={onSetPreferred}
-            isLoading={savingPreferred}
-            leftIcon={<FiStar />}
-          >
-            Make this my preferred pharmacy
-          </Button>
+          {onSetPreferred ? (
+            <Button
+              mx="auto"
+              size="sm"
+              variant="ghost"
+              colorScheme="brand"
+              onClick={onSetPreferred}
+              isLoading={savingPreferred}
+              leftIcon={<FiStar />}
+            >
+              Make this my preferred pharmacy
+            </Button>
+          ) : null}
+          {onChangePharmacy ? (
+            <Button
+              mx="auto"
+              size="sm"
+              variant="ghost"
+              colorScheme="brand"
+              onClick={onChangePharmacy}
+              leftIcon={<FiRefreshCcw />}
+            >
+              Change pharmacy
+            </Button>
+          ) : null}
+          {onGetDirections ? (
+            <Button
+              mx="auto"
+              size="sm"
+              variant="ghost"
+              colorScheme="brand"
+              onClick={onGetDirections}
+              leftIcon={<FiNavigation />}
+            >
+              Get directions
+            </Button>
+          ) : null}
         </CardFooter>
       </Collapse>
     </Card>

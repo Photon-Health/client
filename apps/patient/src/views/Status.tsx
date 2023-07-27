@@ -13,12 +13,12 @@ import {
 } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { FiCheck, FiMapPin } from 'react-icons/fi';
+import { FiCheck } from 'react-icons/fi';
 import { types } from '@photonhealth/sdk';
 
 import { formatAddress, getFulfillmentType } from '../utils/general';
 import { Order } from '../utils/models';
-import { MARK_ORDER_AS_PICKED_UP } from '../utils/mutations';
+import { MARK_ORDER_AS_PICKED_UP } from '../utils/graphql';
 import { Nav } from '../components/Nav';
 import { StatusStepper } from '../components/StatusStepper';
 import { FixedFooter } from '../components/FixedFooter';
@@ -26,8 +26,8 @@ import { PoweredBy } from '../components/PoweredBy';
 import { OrderContext } from './Main';
 import { graphQLClient } from '../configs/graphqlClient';
 import t from '../utils/text.json';
-
-const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
+import { PharmacyCard } from '../components/PharmacyCard';
+import { addRatingsAndHours } from './Pharmacy';
 
 const PHOTON_PHONE_NUMBER: string = process.env.REACT_APP_TWILIO_SMS_NUMBER;
 
@@ -48,6 +48,7 @@ export const Status = () => {
   const [error, setError] = useState(undefined);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
+  const [p, setP] = useState(undefined);
 
   const { fulfillment, pharmacy, organization, address } = order;
 
@@ -55,7 +56,7 @@ export const Status = () => {
 
   const toast = useToast();
 
-  const markOrderAsPickedUp = async () => {
+  const handleMarkOrderAsPickedUp = async () => {
     try {
       setSubmitting(true);
 
@@ -93,6 +94,11 @@ export const Status = () => {
     }
   };
 
+  const handleGetDirections = () => {
+    const url = `http://maps.google.com/?q=${pharmacy.name}, ${formatAddress(pharmacy.address)}`;
+    window.open(url, '_blank').focus();
+  };
+
   useEffect(() => {
     if (!order?.fulfillment) {
       setTimeout(() => {
@@ -100,6 +106,17 @@ export const Status = () => {
       }, 60000);
     }
   }, [order?.fulfillment]);
+
+  const prep = async (thing) => {
+    await addRatingsAndHours(thing);
+    setP(thing);
+  };
+
+  useEffect(() => {
+    if (pharmacy) {
+      prep(pharmacy);
+    }
+  }, [pharmacy]);
 
   if (error) {
     return (
@@ -158,7 +175,24 @@ export const Status = () => {
               </Link>
             </Box>
           ) : null}
-          {fulfillmentType !== (types.FulfillmentType.MailOrder || 'COURIER') &&
+          {p ? (
+            <Box width="full">
+              <PharmacyCard
+                pharmacy={p}
+                preferred={false}
+                previous={false}
+                goodService={false}
+                savingPreferred={false}
+                selected={true}
+                onSelect={() => {}}
+                onChangePharmacy={() =>
+                  navigate(`/pharmacy?orderId=${order.id}&token=${token}&reroute=true`)
+                }
+                onGetDirections={handleGetDirections}
+              />
+            </Box>
+          ) : null}
+          {/* {fulfillmentType !== (types.FulfillmentType.MailOrder || 'COURIER') &&
           pharmacy?.name &&
           pharmacy?.address ? (
             <Box alignSelf="start">
@@ -179,7 +213,7 @@ export const Status = () => {
                 {pharmacy.name}, {pharmacy.address ? formatAddress(pharmacy.address) : ''}
               </Link>
             </Box>
-          ) : null}
+          ) : null} */}
           <StatusStepper
             fulfillmentType={fulfillmentType}
             status={successfullySubmitted ? 'PICKED_UP' : fulfillment?.state || 'SENT'}
@@ -196,7 +230,7 @@ export const Status = () => {
             variant={successfullySubmitted ? undefined : 'brand'}
             colorScheme={successfullySubmitted ? 'green' : undefined}
             leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
-            onClick={!successfullySubmitted ? markOrderAsPickedUp : undefined}
+            onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
             isLoading={submitting}
           >
             {successfullySubmitted ? t.status.thankYou : t.status[fulfillmentType].cta}

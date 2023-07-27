@@ -32,11 +32,11 @@ import { OrderContext } from './Main';
 import { getSettings } from '@client/settings';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { FEATURED_PHARMACIES } from '../utils/featuredPharmacies';
-import { getPharmacies } from '../utils/api';
+import { getPharmacies } from '../api/internal';
+import { geocode } from '../api/external';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
-const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
 export const UNOPEN_BUSINESS_STATUS_MAP = {
   CLOSED_TEMPORARILY: 'Closed Temporarily',
   CLOSED_PERMANENTLY: 'Closed Permanently'
@@ -55,41 +55,6 @@ const query = (method: string, data: object) =>
       }
     });
   });
-
-const geocoder: google.maps.Geocoder = new google.maps.Geocoder();
-const geocode = async (address: string) => {
-  const request: google.maps.GeocoderRequest = { address };
-
-  try {
-    const response: google.maps.GeocoderResponse = await geocoder.geocode(request);
-
-    const result = response.results?.[0];
-    if (result?.geometry?.location) {
-      return {
-        address: result.formatted_address,
-        lat: result.geometry.location.lat(),
-        lng: result.geometry.location.lng()
-      };
-    } else {
-      throw new Error('No results found for the provided address.');
-    }
-  } catch (error) {
-    switch (error.message) {
-      case google.maps.GeocoderStatus.UNKNOWN_ERROR:
-        throw new Error('Unknown server error occurred.');
-      case google.maps.GeocoderStatus.OVER_QUERY_LIMIT:
-        throw new Error('Exceeded the query limit. Please try again later.');
-      case google.maps.GeocoderStatus.ZERO_RESULTS:
-        throw new Error('No result was found.');
-      case google.maps.GeocoderStatus.REQUEST_DENIED:
-        throw new Error('Geocoding request denied. Check your API key and permissions.');
-      case google.maps.GeocoderStatus.INVALID_REQUEST:
-        throw new Error('Invalid geocoding request.');
-      default:
-        throw error; // Re-throw any other unexpected errors
-    }
-  }
-};
 
 const sortIndiePharmaciesFirst = (list: EnrichedPharmacy[], distance: number, limit: number) => {
   const featuredPharmacies = list
@@ -184,7 +149,7 @@ export const addRatingsAndHours = async (p: EnrichedPharmacy) => {
   return p;
 };
 
-export const Pharmacy = () => {
+export const Reroute = () => {
   const order = useContext<Order>(OrderContext);
 
   const orgSettings =
