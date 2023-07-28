@@ -70,6 +70,9 @@ const CancelOrderAlert = ({
   orderState: OrderState;
   fulfillmentState: OrderFulfillmentState;
 }) => {
+  // TODO: Revisit, tried `if (orderState === OrderState.Canceled)` but it gives the error when I run app in dev:
+  // "Module not found: Error: Can't resolve 'packages/sdk/dist/types'..."
+  // We're using OrderState elsewhere in this file, so I'm not sure why it's not working here
   if (orderState === 'CANCELED') {
     return (
       <Alert colorScheme="gray">
