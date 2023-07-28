@@ -417,7 +417,7 @@ export const Order = () => {
             </Text>
             <Text>
               Cancelling an order will send a cancellation notification to the pharmacy for any
-              fills sent.
+              fills already sent to the pharmacy.
             </Text>
             {!loading ? (
               <CancelOrderAlert
