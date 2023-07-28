@@ -49,7 +49,6 @@ import { Fill, Maybe } from 'packages/sdk/dist/types';
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
-import { format } from 'path';
 
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
@@ -324,7 +323,7 @@ export const Prescription = () => {
                         const addressString = formatAddress(address as FormatAddressProps);
                         return (
                           <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
-                            <Cards
+                            <Card
                               variant="outline"
                               p={[2, 3]}
                               w="full"
@@ -364,7 +363,7 @@ export const Prescription = () => {
                                   <FiChevronRight size="1.3em" />
                                 </Box>
                               </HStack>
-                            </Cards>
+                            </Card>
                           </LinkBox>
                         );
                       })}
