@@ -124,7 +124,7 @@ export const Patient = () => {
       <Wrap>
         <WrapItem>
           <IconButton
-            icon={<FiPhone fontSize="1.2rem" />}
+            icon={<FiPhone />}
             aria-label="Edit Order"
             as={Link}
             href={`tel:${patient?.phone}`}
@@ -133,11 +133,12 @@ export const Patient = () => {
             borderColor="blue.500"
             textColor="blue.500"
             colorScheme="blue"
+            size="sm"
           />
         </WrapItem>
         <WrapItem>
           <IconButton
-            icon={<FiMail fontSize="1.2rem" />}
+            icon={<FiMail />}
             aria-label="Edit Order"
             as={Link}
             href={`mailto:${patient?.email}`}
@@ -146,6 +147,7 @@ export const Patient = () => {
             borderColor="blue.500"
             textColor="blue.500"
             colorScheme="blue"
+            size="sm"
           />
         </WrapItem>
         <WrapItem>
@@ -154,6 +156,7 @@ export const Patient = () => {
             as={RouterLink}
             to={`/prescriptions/new?patientId=${id}`}
             colorScheme="blue"
+            size="sm"
           >
             Create Prescriptions
           </Button>
@@ -167,6 +170,7 @@ export const Patient = () => {
             borderColor="blue.500"
             textColor="blue.500"
             colorScheme="blue"
+            size="sm"
           >
             Create Order
           </Button>
@@ -197,6 +201,10 @@ export const Patient = () => {
                 as={RouterLink}
                 to={`/patients/update/${id}`}
                 leftIcon={<FiEdit />}
+                variant="outline"
+                borderColor="orange.500"
+                textColor="orange.500"
+                colorScheme="orange"
               >
                 Edit
               </Button>
@@ -275,14 +283,14 @@ export const Patient = () => {
                 Prescriptions
               </Text>
               <Button
-                size="sm"
-                fontSize="sm"
-                aria-label="New Prescriptions"
+                leftIcon={<FiPlus />}
+                aria-label="New Order"
                 as={RouterLink}
                 to={`/prescriptions/new?patientId=${id}`}
-                leftIcon={<FiPlus />}
+                colorScheme="blue"
+                size="sm"
               >
-                New
+                Create Prescription
               </Button>
             </HStack>
             {prescriptions.length > 0 ? (
@@ -333,14 +341,14 @@ export const Patient = () => {
                 Orders
               </Text>
               <Button
-                size="sm"
-                fontSize="sm"
+                leftIcon={<FiPlus />}
                 aria-label="New Order"
                 as={RouterLink}
                 to={`/orders/new?patientId=${id}`}
-                leftIcon={<FiPlus />}
+                colorScheme="blue"
+                size="sm"
               >
-                New
+                Create Order
               </Button>
             </HStack>
             {orders.length > 0 ? (

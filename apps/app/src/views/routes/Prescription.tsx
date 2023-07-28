@@ -29,7 +29,7 @@ import {
   LinkOverlay,
   Show
 } from '@chakra-ui/react';
-import { FiChevronRight } from 'react-icons/fi';
+import { FiChevronRight, FiPlus } from 'react-icons/fi';
 import { gql, GraphQLClient } from 'graphql-request';
 import dayjs from 'dayjs';
 
@@ -50,7 +50,6 @@ import { Fill, Maybe } from 'packages/sdk/dist/types';
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
-import { PlusIcon } from '@graphiql/react';
 
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
@@ -300,7 +299,7 @@ export const Prescription = () => {
               </Text>
               {loading ? null : (
                 <Button
-                  leftIcon={<PlusIcon />}
+                  leftIcon={<FiPlus />}
                   aria-label="New Order"
                   as={RouterLink}
                   to={`/orders/new?patientId=${patient?.id || ''}&prescriptionId=${id}`}
