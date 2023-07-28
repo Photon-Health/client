@@ -408,6 +408,12 @@ export const Prescription = () => {
               Canceling a prescription will prevent any team member from adding the prescription
               fills in a new order.
             </Text>
+            {rx.state !== 'ACTIVE' && (
+              <Alert colorScheme="gray">
+                <AlertIcon />
+                This prescription has been canceled
+              </Alert>
+            )}
             <Button
               aria-label="Cancel Prescription"
               isDisabled={loading || rx.state !== 'ACTIVE'}
