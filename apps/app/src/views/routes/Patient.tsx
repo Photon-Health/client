@@ -193,21 +193,22 @@ export const Patient = () => {
               <Text color="gray.500" fontWeight="medium" fontSize="sm">
                 Information
               </Text>
-
-              <Button
-                size="sm"
-                fontSize="sm"
-                aria-label="Edit patient details"
-                as={RouterLink}
-                to={`/patients/update/${id}`}
-                leftIcon={<FiEdit />}
-                variant="outline"
-                borderColor="orange.500"
-                textColor="orange.500"
-                colorScheme="orange"
-              >
-                Edit
-              </Button>
+              {!loading ? (
+                <Button
+                  size="sm"
+                  fontSize="sm"
+                  aria-label="Edit patient details"
+                  as={RouterLink}
+                  to={`/patients/update/${id}`}
+                  leftIcon={<FiEdit />}
+                  variant="outline"
+                  borderColor="orange.500"
+                  textColor="orange.500"
+                  colorScheme="orange"
+                >
+                  Edit
+                </Button>
+              ) : null}
             </HStack>
             {!loading && patient ? (
               <>
@@ -282,16 +283,18 @@ export const Patient = () => {
               <Text color="gray.500" fontWeight="medium" fontSize="sm">
                 Prescriptions
               </Text>
-              <Button
-                leftIcon={<FiPlus />}
-                aria-label="New Order"
-                as={RouterLink}
-                to={`/prescriptions/new?patientId=${id}`}
-                colorScheme="blue"
-                size="sm"
-              >
-                Create Prescription
-              </Button>
+              {!loading ? (
+                <Button
+                  leftIcon={<FiPlus />}
+                  aria-label="New Order"
+                  as={RouterLink}
+                  to={`/prescriptions/new?patientId=${id}`}
+                  colorScheme="blue"
+                  size="sm"
+                >
+                  Create Prescription
+                </Button>
+              ) : null}
             </HStack>
             {prescriptions.length > 0 ? (
               <TableContainer>
@@ -340,16 +343,18 @@ export const Patient = () => {
               <Text color="gray.500" fontWeight="medium" fontSize="sm">
                 Orders
               </Text>
-              <Button
-                leftIcon={<FiPlus />}
-                aria-label="New Order"
-                as={RouterLink}
-                to={`/orders/new?patientId=${id}`}
-                colorScheme="blue"
-                size="sm"
-              >
-                Create Order
-              </Button>
+              {!loading ? (
+                <Button
+                  leftIcon={<FiPlus />}
+                  aria-label="New Order"
+                  as={RouterLink}
+                  to={`/orders/new?patientId=${id}`}
+                  colorScheme="blue"
+                  size="sm"
+                >
+                  Create Order
+                </Button>
+              ) : null}
             </HStack>
             {orders.length > 0 ? (
               <TableContainer>
