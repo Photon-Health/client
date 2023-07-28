@@ -403,7 +403,7 @@ export const Prescription = () => {
               Actions
             </Text>
             <Text>
-              Cancelling a prescription will prevent any team member from adding the prescription
+              Canceling a prescription will prevent any team member from adding the prescription
               fills in a new order.
             </Text>
             <Button
