@@ -1,4 +1,4 @@
-import { useParams, Link as RouterLink } from 'react-router-dom';
+import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
 import { usePhoton } from '@photonhealth/react';
 import {
@@ -21,7 +21,6 @@ import {
   SkeletonText,
   useBreakpointValue,
   useColorMode,
-  useToast,
   AlertTitle,
   AlertDescription,
   Box,
@@ -67,15 +66,14 @@ export const CANCEL_PRESCRIPTION = gql`
 `;
 
 export const Prescription = () => {
-  const toast = useToast();
   const params = useParams();
   const id = params.prescriptionId;
 
   const { getPrescription, getToken } = usePhoton();
-
+  const navigate = useNavigate();
   const { prescription, loading, error } = getPrescription({ id: id! });
   const [accessToken, setAccessToken] = useState('');
-  console.log('prescription', prescription, loading, error);
+  const [canceling, setCanceling] = useState(false);
   const rx = prescription || {};
 
   const getAccessToken = async () => {
@@ -406,38 +404,37 @@ export const Prescription = () => {
             <Text color="gray.500" fontWeight="medium" fontSize="sm">
               Actions
             </Text>
-            {loading ? null : (
-              <Button
-                aria-label="Cancel Prescription"
-                isDisabled={rx.state !== 'ACTIVE'}
-                onClick={async () => {
-                  const decision = await confirmWrapper('Cancel this prescription?', {
-                    description: 'You will not be able to undo this action.',
-                    cancelText: "No, Don't Cancel",
-                    confirmText: 'Yes, Cancel',
-                    darkMode: colorMode !== 'light',
-                    colorScheme: 'red'
-                  });
-                  if (decision) {
-                    graphQLClient.setHeader('authorization', accessToken);
-                    const res = await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
-                    if (res) {
-                      toast({
-                        title: 'Prescription canceled',
-                        status: 'success',
-                        duration: 5000
-                      });
-                    }
-                  }
-                }}
-                variant="outline"
-                textColor="red.500"
-                colorScheme="red"
-                size="sm"
-              >
-                Cancel Prescription
-              </Button>
-            )}
+            <Text>
+              Cancelling a prescription will prevent any user from adding the prescription fills in
+              a new order.
+            </Text>
+            <Button
+              aria-label="Cancel Prescription"
+              isDisabled={loading || rx.state !== 'ACTIVE'}
+              isLoading={canceling}
+              loadingText="Canceling..."
+              onClick={async () => {
+                const decision = await confirmWrapper('Cancel this prescription?', {
+                  description: 'You will not be able to undo this action.',
+                  cancelText: "No, Don't Cancel",
+                  confirmText: 'Yes, Cancel',
+                  darkMode: colorMode !== 'light',
+                  colorScheme: 'red'
+                });
+                if (decision) {
+                  setCanceling(true);
+                  graphQLClient.setHeader('authorization', accessToken);
+                  await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
+                  navigate(0);
+                }
+              }}
+              variant="outline"
+              textColor="red.500"
+              colorScheme="red"
+              size="sm"
+            >
+              Cancel Prescription
+            </Button>
           </VStack>
         </CardBody>
       </Card>

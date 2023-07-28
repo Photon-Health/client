@@ -412,7 +412,10 @@ export const Order = () => {
             <Text color="gray.500" fontWeight="medium" fontSize="sm">
               Actions
             </Text>
-
+            <Text>
+              Cancelling an order will send a cancellation notification to the pharmacy for any
+              fills sent.
+            </Text>
             {!loading ? (
               <CancelOrderAlert
                 orderState={order.state as OrderState}
