@@ -300,7 +300,9 @@ export const Prescription = () => {
                   leftIcon={<FiPlus />}
                   aria-label="New Order"
                   as={RouterLink}
-                  to={`/orders/new?patientId=${patient?.id || ''}&prescriptionId=${id}`}
+                  to={`/orders/new?prescriptionId=${id}${
+                    patient?.id ? `&patientId=${patient?.id}` : ''
+                  }`}
                   colorScheme="blue"
                   size="sm"
                 >
