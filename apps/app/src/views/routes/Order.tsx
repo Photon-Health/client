@@ -90,7 +90,7 @@ const CancelOrderAlert = ({
     return (
       <Alert status="warning">
         <AlertIcon />
-        This order has been picked up, but we can cancel the remaining fills. Please call the
+        This order has been picked up, but we can't cancel the remaining fills. Please call the
         pharmacy.
       </Alert>
     );
