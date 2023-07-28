@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -12,6 +12,7 @@ import {
 import { usePhoton, types } from '@photonhealth/react';
 import { Pharmacy } from './Pharmacy';
 import { getSettings } from '@client/settings';
+import { useIsVisible } from 'apps/app/src/hooks/useIsIntersecting';
 
 const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
 const settings = getSettings(envName);
@@ -35,6 +36,8 @@ export const MailOrder = ({
   touched,
   resetSelection
 }: MailOrderProps) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const isVisible = useIsVisible(ref);
   const { getPharmacies } = usePhoton();
   const { refetch } = getPharmacies({});
 
@@ -59,44 +62,50 @@ export const MailOrder = ({
     getPharmacyOptions();
   }, [location]);
 
+  useEffect(() => {
+    if (isVisible && pharmOptions?.length === 1 && !pharmacyId) {
+      setFieldValue('pharmacyId', pharmOptions[0].id);
+    }
+  }, [isVisible, pharmOptions, pharmacyId]);
+
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
-  if (pharmacyId) {
-    return (
-      <CardBody p={0}>
-        <Pharmacy pharmacyId={pharmacyId} resetSelection={resetSelection} />
-      </CardBody>
-    );
-  }
-
   return (
-    <FormControl isInvalid={!!errors.pharmacyId && touched.pharmacyId}>
-      <Text>Contact support to add additional mail order integrations.</Text>
-      {pharmOptions.map(({ id }: { id: string }) => (
-        <Box
-          mt={4}
-          p={3}
-          border="1px"
-          borderColor={borderColor}
-          cursor="pointer"
-          borderRadius={5}
-          key={id}
-          onClick={() => setFieldValue('pharmacyId', id)}
-        >
-          <HStack w="full" justify="space-between">
-            <Pharmacy pharmacyId={id} showTags={false} />
-            <Button
-              display="inline"
-              size="xs"
-              minW="fit-content"
+    <Box ref={ref}>
+      {pharmacyId ? (
+        <CardBody p={0}>
+          <Pharmacy pharmacyId={pharmacyId} resetSelection={resetSelection} />
+        </CardBody>
+      ) : (
+        <FormControl isInvalid={!!errors.pharmacyId && touched.pharmacyId} ref={ref}>
+          <Text>Contact support to add additional mail order integrations.</Text>
+          {pharmOptions.map(({ id }: { id: string }) => (
+            <Box
+              mt={4}
+              p={3}
+              border="1px"
+              borderColor={borderColor}
+              cursor="pointer"
+              borderRadius={5}
+              key={id}
               onClick={() => setFieldValue('pharmacyId', id)}
             >
-              Select
-            </Button>
-          </HStack>
-        </Box>
-      ))}
-      {errors ? <FormErrorMessage>Please select a pharmacy...</FormErrorMessage> : null}
-    </FormControl>
+              <HStack w="full" justify="space-between">
+                <Pharmacy pharmacyId={id} showTags={false} />
+                <Button
+                  display="inline"
+                  size="xs"
+                  minW="fit-content"
+                  onClick={() => setFieldValue('pharmacyId', id)}
+                >
+                  Select
+                </Button>
+              </HStack>
+            </Box>
+          ))}
+          {errors ? <FormErrorMessage>Please select a pharmacy...</FormErrorMessage> : null}
+        </FormControl>
+      )}
+    </Box>
   );
 };
