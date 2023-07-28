@@ -32,7 +32,7 @@ import { FiChevronRight, FiPlus } from 'react-icons/fi';
 import { gql, GraphQLClient } from 'graphql-request';
 import dayjs from 'dayjs';
 
-import { formatDate } from '../../utils';
+import { formatAddress, FormatAddressProps, formatDate } from '../../utils';
 
 import {
   PRESCRIPTION_COLOR_MAP,
@@ -49,6 +49,7 @@ import { Fill, Maybe } from 'packages/sdk/dist/types';
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
+import { format } from 'path';
 
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
@@ -320,12 +321,10 @@ export const Prescription = () => {
                       {orders.map((fill: Maybe<Fill>) => {
                         if (!fill) return null;
                         const address = fill?.order?.pharmacy?.address;
-                        const addressString = address
-                          ? `${address?.street1}, ${address?.city}, ${address?.state} ${address?.postalCode}`
-                          : '';
+                        const addressString = formatAddress(address as FormatAddressProps);
                         return (
                           <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
-                            <Card
+                            <Cards
                               variant="outline"
                               p={[2, 3]}
                               w="full"
@@ -365,7 +364,7 @@ export const Prescription = () => {
                                   <FiChevronRight size="1.3em" />
                                 </Box>
                               </HStack>
-                            </Card>
+                            </Cards>
                           </LinkBox>
                         );
                       })}
