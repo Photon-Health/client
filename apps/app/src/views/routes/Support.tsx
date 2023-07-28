@@ -41,7 +41,7 @@ export const Support = () => (
         <Stack alignItems="flex-start">
           <Box paddingBottom={2}>
             <Heading size="xxs">Contact Us</Heading>
-            <Text>
+            <Text mt={1}>
               We’re here to help! Contact{' '}
               <Link color="teal.500" href="mailto:support@photon.health">
                 support
@@ -51,17 +51,19 @@ export const Support = () => (
           </Box>
           <Divider />
           <Box>
-            <Heading size="xxs">Helpful resources</Heading>
-            <VStack align="start">
-              {resources.map((resource) => (
-                <Link color="teal.500" href={resource.link} key={resource.text}>
-                  <HStack>
-                    {resource.icon}
-                    <Text>{resource.text}</Text>
-                  </HStack>
-                </Link>
-              ))}
-            </VStack>
+            <Heading size="xxs">Helpful Resources</Heading>
+            <Text mt={2}>
+              <VStack align="start">
+                {resources.map((resource) => (
+                  <Link color="teal.500" href={resource.link} key={resource.text}>
+                    <HStack>
+                      {resource.icon}
+                      <Text>{resource.text}</Text>
+                    </HStack>
+                  </Link>
+                ))}
+              </VStack>
+            </Text>
           </Box>
         </Stack>
       </CardBody>
