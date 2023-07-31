@@ -20,10 +20,8 @@ import { formatAddress, getFulfillmentType, addRatingsAndHours } from '../utils/
 import { Order, Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import { OrderContext } from './Main';
-import { graphQLClient } from '../configs/graphqlClient';
 import * as TOAST_CONFIG from '../configs/toast';
-import { MARK_ORDER_AS_PICKED_UP } from '../graphql';
-import { AUTH_HEADER_ERRORS } from '../api';
+import { markOrderAsPickedUp } from '../api';
 
 const PHOTON_PHONE_NUMBER: string = process.env.REACT_APP_TWILIO_SMS_NUMBER;
 
@@ -41,7 +39,6 @@ export const Status = () => {
       order?.fulfillment?.type !== types.FulfillmentType.MailOrder
   );
 
-  const [error, setError] = useState(undefined);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
   const [enrichedPharmacy, setEnrichedPharmacy] = useState<EnrichedPharmacy | undefined>(undefined);
@@ -53,16 +50,13 @@ export const Status = () => {
   const toast = useToast();
 
   const handleMarkOrderAsPickedUp = async () => {
-    try {
-      setSubmitting(true);
+    setSubmitting(true);
 
-      graphQLClient.setHeader('x-photon-auth', token);
-      const results: any = await graphQLClient.request(MARK_ORDER_AS_PICKED_UP, {
-        markOrderAsPickedUpId: orderId
-      });
+    try {
+      const result: boolean = await markOrderAsPickedUp(orderId, token);
 
       setTimeout(() => {
-        if (results?.markOrderAsPickedUp) {
+        if (result) {
           setSuccessfullySubmitted(true);
           setTimeout(() => setShowFooter(false), 1000);
         } else {
@@ -75,15 +69,15 @@ export const Status = () => {
         setSubmitting(false);
       }, 1000);
     } catch (error) {
-      console.error(JSON.stringify(error, undefined, 2));
+      toast({
+        title: t.status[fulfillmentType].errorToast.title,
+        description: t.status[fulfillmentType].errorToast.description,
+        ...TOAST_CONFIG.ERROR
+      });
 
-      if (error?.response?.errors) {
-        if (AUTH_HEADER_ERRORS.includes(error.response.errors[0].extensions.code)) {
-          navigate('/no-match');
-        } else {
-          setError(error.response.errors[0].message);
-        }
-      }
+      setSubmitting(false);
+
+      console.error(JSON.stringify(error, undefined, 2));
     }
   };
 
@@ -115,15 +109,6 @@ export const Status = () => {
       initializePharmacy(pharmacy);
     }
   }, [pharmacy]);
-
-  if (error) {
-    return (
-      <Alert status="error">
-        <AlertIcon />
-        {error}
-      </Alert>
-    );
-  }
 
   // Only show "Text us now" prompt if pickup and RECEIVED or READY
   const showChatAlert = fulfillment?.state === 'RECEIVED' || fulfillment?.state === 'READY';
