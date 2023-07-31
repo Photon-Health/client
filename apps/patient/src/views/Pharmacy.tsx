@@ -160,10 +160,7 @@ export const Pharmacy = () => {
       const toastMsg = error?.message === noPharmaciesErr ? noPharmaciesErr : genericError;
       toast({
         title: toastMsg,
-        position: 'top',
-        status: 'warning',
-        duration: 5000,
-        isClosable: true
+        ...TOAST_CONFIG.WARNING
       });
 
       setLoadingPharmacies(false);
@@ -316,7 +313,6 @@ export const Pharmacy = () => {
     } else {
       try {
         const result = await selectOrderPharmacy(order.id, selectedId, order.patient.id, token);
-
         setTimeout(() => {
           if (result) {
             setSuccessfullySubmitted(true);
