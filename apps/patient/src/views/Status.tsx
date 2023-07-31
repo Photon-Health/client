@@ -17,7 +17,7 @@ import { FiCheck } from 'react-icons/fi';
 import { types } from '@photonhealth/sdk';
 
 import { formatAddress, getFulfillmentType } from '../utils/general';
-import { Order } from '../utils/models';
+import { Order, Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { MARK_ORDER_AS_PICKED_UP } from '../utils/graphql';
 import { Nav } from '../components/Nav';
 import { StatusStepper } from '../components/StatusStepper';
@@ -50,7 +50,7 @@ export const Status = () => {
   const [error, setError] = useState(undefined);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
-  const [p, setP] = useState(undefined);
+  const [enrichedPharmacy, setEnrichedPharmacy] = useState<EnrichedPharmacy | undefined>(undefined);
 
   const { fulfillment, pharmacy, organization, address } = order;
 
@@ -106,14 +106,19 @@ export const Status = () => {
     }
   }, [order?.fulfillment]);
 
-  const prep = async (thing) => {
-    await addRatingsAndHours(thing);
-    setP(thing);
+  const initializePharmacy = async (p: EnrichedPharmacy) => {
+    await addRatingsAndHours(p);
+    setEnrichedPharmacy(p);
   };
 
   useEffect(() => {
-    if (pharmacy) {
-      prep(pharmacy);
+    // Show the pharmacy with ratings + hours if not mail order or courier
+    const showEnrichedPharmacy =
+      fulfillmentType !== (types.FulfillmentType.MailOrder || 'COURIER') &&
+      pharmacy?.name &&
+      pharmacy?.address;
+    if (showEnrichedPharmacy) {
+      initializePharmacy(pharmacy);
     }
   }, [pharmacy]);
 
@@ -157,6 +162,17 @@ export const Status = () => {
               </Alert>
             ) : null}
           </VStack>
+          {enrichedPharmacy ? (
+            <Box width="full">
+              <PharmacyCard
+                pharmacy={enrichedPharmacy}
+                onChangePharmacy={() =>
+                  navigate(`/pharmacy?orderId=${order.id}&token=${token}&reroute=true`)
+                }
+                onGetDirections={handleGetDirections}
+              />
+            </Box>
+          ) : null}
           {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
             <Box alignSelf="start">
               <Text display="inline" color="gray.600">
@@ -174,45 +190,6 @@ export const Status = () => {
               </Link>
             </Box>
           ) : null}
-          {p ? (
-            <Box width="full">
-              <PharmacyCard
-                pharmacy={p}
-                preferred={false}
-                previous={false}
-                goodService={false}
-                savingPreferred={false}
-                selected={true}
-                onSelect={() => {}}
-                onChangePharmacy={() =>
-                  navigate(`/pharmacy?orderId=${order.id}&token=${token}&reroute=true`)
-                }
-                onGetDirections={handleGetDirections}
-              />
-            </Box>
-          ) : null}
-          {/* {fulfillmentType !== (types.FulfillmentType.MailOrder || 'COURIER') &&
-          pharmacy?.name &&
-          pharmacy?.address ? (
-            <Box alignSelf="start">
-              <Text display="inline" color="gray.600">
-                {t.status.PICK_UP.pickup}
-              </Text>
-              <Link
-                href={`http://maps.google.com/?q=${pharmacy.name}, ${formatAddress(
-                  pharmacy.address
-                )}`}
-                display="inline"
-                ms={2}
-                color="brandLink"
-                fontWeight="medium"
-                target="_blank"
-              >
-                <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
-                {pharmacy.name}, {pharmacy.address ? formatAddress(pharmacy.address) : ''}
-              </Link>
-            </Box>
-          ) : null} */}
           <StatusStepper
             fulfillmentType={fulfillmentType}
             status={successfullySubmitted ? 'PICKED_UP' : fulfillment?.state || 'SENT'}

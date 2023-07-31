@@ -15,7 +15,6 @@ import {
   useBreakpointValue
 } from '@chakra-ui/react';
 import { FiRotateCcw, FiStar, FiThumbsUp, FiRefreshCcw, FiNavigation } from 'react-icons/fi';
-// import { PiSwap } from 'react-icons/';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { types } from '@photonhealth/sdk';
@@ -99,9 +98,9 @@ interface PharmacyCardProps {
   preferred?: boolean;
   previous?: boolean;
   goodService?: boolean;
-  savingPreferred: boolean;
-  selected: boolean;
-  onSelect: Function;
+  savingPreferred?: boolean;
+  selected?: boolean;
+  onSelect?: () => void;
   onSetPreferred?: () => void;
   onChangePharmacy?: () => void;
   onGetDirections?: () => void;
@@ -109,11 +108,11 @@ interface PharmacyCardProps {
 
 export const PharmacyCard = memo(function PharmacyCard({
   pharmacy,
-  preferred,
-  previous,
-  goodService,
-  savingPreferred,
-  selected,
+  preferred = false,
+  previous = false,
+  goodService = false,
+  savingPreferred = false,
+  selected = false,
   onSelect,
   onChangePharmacy,
   onSetPreferred,
