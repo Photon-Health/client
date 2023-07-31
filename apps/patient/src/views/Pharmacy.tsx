@@ -1,8 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
-  Alert,
-  AlertIcon,
   Box,
   Button,
   Container,
@@ -16,10 +14,11 @@ import {
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { Helmet } from 'react-helmet';
 import { types } from '@photonhealth/sdk';
+import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, addRatingsAndHours } from '../utils/general';
 import { ExtendedFulfillmentType, Order } from '../utils/models';
 import { text as t } from '../utils/text';
-import { SELECT_ORDER_PHARMACY, SET_PREFERRED_PHARMACY } from '../utils/graphql';
+import { SET_PREFERRED_PHARMACY } from '../utils/graphql';
 import { graphQLClient } from '../configs/graphqlClient';
 import { FixedFooter } from '../components/FixedFooter';
 import { Nav } from '../components/Nav';
@@ -31,12 +30,7 @@ import { OrderContext } from './Main';
 import { getSettings } from '@client/settings';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { FEATURED_PHARMACIES } from '../utils/featuredPharmacies';
-import {
-  getPharmacies,
-  rerouteOrder,
-  // selectOrderPharmacy,
-  AUTH_HEADER_ERRORS
-} from '../api/internal';
+import { getPharmacies, rerouteOrder, selectOrderPharmacy } from '../api/internal';
 import { geocode } from '../api/external';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
@@ -78,7 +72,6 @@ export const Pharmacy = () => {
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<string>('');
   const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
-  const [error, setError] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
   const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(false);
@@ -162,20 +155,23 @@ export const Pharmacy = () => {
         return;
       }
     } catch (error) {
-      if (error.message === 'No pharmacies found near location') {
-        setLoadingPharmacies(false);
-        toast({
-          title: error.message,
-          position: 'top',
-          status: 'warning',
-          duration: 5000,
-          isClosable: true
-        });
-        return;
-      } else {
-        console.error(JSON.stringify(error, undefined, 2));
-        console.log(error);
-      }
+      const noPharmaciesErr = 'No pharmacies found near location';
+      const genericError = 'Unable to get pharmacies';
+      const toastMsg = error?.message === noPharmaciesErr ? noPharmaciesErr : genericError;
+      toast({
+        title: toastMsg,
+        position: 'top',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true
+      });
+
+      setLoadingPharmacies(false);
+
+      console.error(JSON.stringify(error, undefined, 2));
+      console.log(error);
+
+      return;
     }
 
     // Sort initial list of pharmacies
@@ -247,11 +243,8 @@ export const Pharmacy = () => {
       if (error.message === 'No pharmacies found near location') {
         setLoadingPharmacies(false);
         toast({
-          title: error.message,
-          position: 'top',
-          status: 'warning',
-          duration: 5000,
-          isClosable: true
+          title: 'No pharmacies found near location',
+          ...TOAST_CONFIG.WARNING
         });
       } else {
         console.error(JSON.stringify(error, undefined, 2));
@@ -283,27 +276,38 @@ export const Pharmacy = () => {
 
     if (isReroute) {
       try {
-        const result = await rerouteOrder(order.id, selectedId, token);
-        if (result) {
-          setSuccessfullySubmitted(true);
-          setTimeout(() => {
-            setShowFooter(false);
+        const result = await rerouteOrder(order.id, selectedId, order.patient.id, token);
+        setTimeout(() => {
+          if (result) {
+            setSuccessfullySubmitted(true);
+            setTimeout(() => {
+              setShowFooter(false);
 
-            let type: ExtendedFulfillmentType = types.FulfillmentType.PickUp;
-            if (orgSettings.courierProviders.includes(selectedId)) {
-              type = 'COURIER';
-            } else if (orgSettings.mailOrderNavigateProviders.includes(selectedId)) {
-              type = types.FulfillmentType.MailOrder;
-            }
+              let type: ExtendedFulfillmentType = types.FulfillmentType.PickUp;
+              if (orgSettings.courierProviders.includes(selectedId)) {
+                type = 'COURIER';
+              } else if (orgSettings.mailOrderNavigateProviders.includes(selectedId)) {
+                type = types.FulfillmentType.MailOrder;
+              }
 
-            navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
-          }, 1000);
-          setSubmitting(false);
-        } else {
-          setSubmitting(false);
-          console.error('error');
-        }
+              navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
+            }, 1000);
+          } else {
+            toast({
+              title: 'Unable to reroute order',
+              description: 'Please refresh and try again',
+              ...TOAST_CONFIG.ERROR
+            });
+          }
+        }, 1000);
+        setSubmitting(false);
       } catch (error) {
+        toast({
+          title: 'Unable to reroute order',
+          description: 'Please refresh and try again',
+          ...TOAST_CONFIG.ERROR
+        });
+
         setSubmitting(false);
 
         console.log(error);
@@ -311,14 +315,10 @@ export const Pharmacy = () => {
       }
     } else {
       try {
-        const results: any = await graphQLClient.request(SELECT_ORDER_PHARMACY, {
-          orderId: order.id,
-          pharmacyId: selectedId,
-          patientId: order.patient.id
-        });
+        const result = await selectOrderPharmacy(order.id, selectedId, order.patient.id, token);
 
         setTimeout(() => {
-          if (results?.selectOrderPharmacy) {
+          if (result) {
             setSuccessfullySubmitted(true);
             setTimeout(() => {
               setShowFooter(false);
@@ -336,27 +336,22 @@ export const Pharmacy = () => {
             toast({
               title: 'Unable to submit pharmacy selection',
               description: 'Please refresh and try again',
-              position: 'top',
-              status: 'error',
-              duration: 5000,
-              isClosable: true
+              ...TOAST_CONFIG.ERROR
             });
           }
           setSubmitting(false);
         }, 1000);
       } catch (error) {
+        toast({
+          title: 'Unable to submit pharmacy selection',
+          description: 'Please refresh and try again',
+          ...TOAST_CONFIG.ERROR
+        });
+
         setSubmitting(false);
 
         console.log(error);
         console.error(JSON.stringify(error, undefined, 2));
-
-        if (error?.response?.errors) {
-          if (AUTH_HEADER_ERRORS.includes(error.response.errors[0].extensions.code)) {
-            navigate('/no-match');
-          } else {
-            setError(error.response.errors[0].message);
-          }
-        }
       }
     }
   };
@@ -379,37 +374,31 @@ export const Pharmacy = () => {
 
       setTimeout(() => {
         if (result?.setPreferredPharmacy) {
-          setSavingPreferred(false);
           setPreferredPharmacyId(pharmacyId);
-
           toast({
             title: 'Set preferred pharmacy',
-            position: 'top',
-            status: 'success',
-            duration: 2000,
-            isClosable: true
+            ...TOAST_CONFIG.SUCCESS
           });
         } else {
-          setSavingPreferred(false);
           toast({
             title: 'Unable to set preferred pharmacy',
             description: 'Please refresh and try again',
-            position: 'top',
-            status: 'error',
-            duration: 5000,
-            isClosable: true
+            ...TOAST_CONFIG.ERROR
           });
         }
+        setSavingPreferred(false);
       }, 750);
     } catch (error) {
       setSavingPreferred(false);
 
+      toast({
+        title: 'Unable to set preferred pharmacy',
+        description: 'Please refresh and try again',
+        ...TOAST_CONFIG.ERROR
+      });
+
       console.error(JSON.stringify(error, undefined, 2));
       console.log(error);
-
-      if (error?.response?.errors) {
-        setError(error.response.errors[0].message);
-      }
     }
   };
 
@@ -418,15 +407,6 @@ export const Pharmacy = () => {
       initialize();
     }
   }, [location]);
-
-  if (error) {
-    return (
-      <Alert status="error">
-        <AlertIcon />
-        {error}
-      </Alert>
-    );
-  }
 
   const patientAddressInAustinTX =
     order?.address?.city === 'Austin' && order?.address?.state === 'TX';

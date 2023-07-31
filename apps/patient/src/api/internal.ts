@@ -76,13 +76,19 @@ export const markOrderAsPickedUp = async (orderId: string, token: string) => {
   }
 };
 
-export const rerouteOrder = async (orderId, pharmacyId, token: string) => {
+export const rerouteOrder = async (
+  orderId: string,
+  pharmacyId: string,
+  patientId: string,
+  token: string
+) => {
   graphQLClient.setHeader('x-photon-auth', token);
 
   try {
     const response: { rerouteOrder: boolean } = await graphQLClient.request(REROUTE_ORDER, {
       orderId,
-      pharmacyId
+      pharmacyId,
+      patientId
     });
     if (response?.rerouteOrder) {
       return true;

@@ -25,6 +25,7 @@ import { FixedFooter } from '../components/FixedFooter';
 import { PoweredBy } from '../components/PoweredBy';
 import { OrderContext } from './Main';
 import { graphQLClient } from '../configs/graphqlClient';
+import * as TOAST_CONFIG from '../configs/toast';
 import { text as t } from '../utils/text';
 import { PharmacyCard } from '../components/PharmacyCard';
 import { addRatingsAndHours } from '../utils/general';
@@ -74,10 +75,7 @@ export const Status = () => {
           toast({
             title: t.status[fulfillmentType].errorToast.title,
             description: t.status[fulfillmentType].errorToast.description,
-            position: 'top',
-            status: 'error',
-            duration: 5000,
-            isClosable: true
+            ...TOAST_CONFIG.ERROR
           });
         }
         setSubmitting(false);
