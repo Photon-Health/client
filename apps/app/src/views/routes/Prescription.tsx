@@ -45,7 +45,7 @@ import { Page } from '../components/Page';
 import { confirmWrapper } from '../components/GuardDialog';
 import PatientView from '../components/PatientView';
 import NameView from '../components/NameView';
-import { Fill, Maybe } from 'packages/sdk/dist/types';
+import { types } from '@photonhealth/sdk';
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
@@ -303,6 +303,7 @@ export const Prescription = () => {
                   to={`/orders/new?prescriptionId=${id}${
                     patient?.id ? `&patientId=${patient?.id}` : ''
                   }`}
+                  isDisabled={rx.state === types.PrescriptionState.Depleted}
                   colorScheme="blue"
                   size="sm"
                 >
@@ -319,7 +320,7 @@ export const Prescription = () => {
                 ) : (
                   <>
                     <VStack spacing={4} w="full">
-                      {orders.map((fill: Maybe<Fill>) => {
+                      {orders.map((fill: types.Maybe<types.Fill>) => {
                         if (!fill) return null;
                         const address = fill?.order?.pharmacy?.address;
                         const addressString = formatAddress(address as FormatAddressProps);
