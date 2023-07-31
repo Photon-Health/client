@@ -24,7 +24,7 @@ import { formatDate, countFillsAndRemoveDuplicates } from '../utils/general';
 import { FixedFooter } from '../components/FixedFooter';
 import { Nav } from '../components/Nav';
 import { PoweredBy } from '../components/PoweredBy';
-import t from '../utils/text.json';
+import { text as t } from '../utils/text';
 import { OrderContext } from './Main';
 
 export const Review = () => {

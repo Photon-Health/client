@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react';
 
 import { PharmacyCard } from './PharmacyCard';
-import t from '../utils/text.json';
+import { text as t } from '../utils/text';
 import { FEATURED_PHARMACIES } from '../utils/featuredPharmacies';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 

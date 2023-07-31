@@ -18,7 +18,7 @@ import { Helmet } from 'react-helmet';
 import { types } from '@photonhealth/sdk';
 import { formatAddress, addRatingsAndHours } from '../utils/general';
 import { ExtendedFulfillmentType, Order } from '../utils/models';
-import t from '../utils/text.json';
+import { text as t } from '../utils/text';
 import { SELECT_ORDER_PHARMACY, SET_PREFERRED_PHARMACY } from '../utils/graphql';
 import { graphQLClient } from '../configs/graphqlClient';
 import { FixedFooter } from '../components/FixedFooter';
@@ -398,7 +398,9 @@ export const Pharmacy = () => {
     order?.address?.city === 'Austin' && order?.address?.state === 'TX';
   const enableCourier = searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier; // Courier limited to MoPed in Austin, TX
   const heading = isReroute ? t.pharmacy.heading.reroute : t.pharmacy.heading.original;
-  const subheading = isReroute ? t.pharmacy.subheading.reroute : t.pharmacy.subheading.original;
+  const subheading = isReroute
+    ? t.pharmacy.subheading.reroute(order.pharmacy.name)
+    : t.pharmacy.subheading.original;
 
   return (
     <Box>

@@ -12,7 +12,7 @@ import {
   StepNumber,
   StepSeparator
 } from '@chakra-ui/react';
-import t from '../utils/text.json';
+import { text as t } from '../utils/text';
 import { ExtendedFulfillmentType } from '../utils/models';
 
 export const STATES = {

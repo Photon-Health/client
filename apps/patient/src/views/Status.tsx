@@ -25,7 +25,7 @@ import { FixedFooter } from '../components/FixedFooter';
 import { PoweredBy } from '../components/PoweredBy';
 import { OrderContext } from './Main';
 import { graphQLClient } from '../configs/graphqlClient';
-import t from '../utils/text.json';
+import { text as t } from '../utils/text';
 import { PharmacyCard } from '../components/PharmacyCard';
 import { addRatingsAndHours } from '../utils/general';
 import { AUTH_HEADER_ERRORS } from '../api/internal';
