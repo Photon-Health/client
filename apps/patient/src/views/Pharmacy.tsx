@@ -30,7 +30,12 @@ import { OrderContext } from './Main';
 import { getSettings } from '@client/settings';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { FEATURED_PHARMACIES } from '../utils/featuredPharmacies';
-import { getPharmacies, rerouteOrder, selectOrderPharmacy } from '../api/internal';
+import {
+  getPharmacies,
+  rerouteOrder,
+  selectOrderPharmacy,
+  setPreferredPharmacy
+} from '../api/internal';
 import { geocode } from '../api/external';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
@@ -319,19 +324,10 @@ export const Pharmacy = () => {
 
     setSavingPreferred(true);
 
-    graphQLClient.setHeader('x-photon-auth', token);
-
     try {
-      const result: { setPreferredPharmacy: boolean } = await graphQLClient.request(
-        SET_PREFERRED_PHARMACY,
-        {
-          patientId: order.patient.id,
-          pharmacyId
-        }
-      );
-
+      const result: boolean = await setPreferredPharmacy(order.patient.id, pharmacyId, token);
       setTimeout(() => {
-        if (result?.setPreferredPharmacy) {
+        if (result) {
           setPreferredPharmacyId(pharmacyId);
           toast({
             title: 'Set preferred pharmacy',
@@ -347,13 +343,13 @@ export const Pharmacy = () => {
         setSavingPreferred(false);
       }, 750);
     } catch (error) {
-      setSavingPreferred(false);
-
       toast({
         title: 'Unable to set preferred pharmacy',
         description: 'Please refresh and try again',
         ...TOAST_CONFIG.ERROR
       });
+
+      setSavingPreferred(false);
 
       console.error(JSON.stringify(error, undefined, 2));
       console.log(error);
