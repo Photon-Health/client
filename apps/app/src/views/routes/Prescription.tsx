@@ -1,4 +1,4 @@
-import { useParams, Link as RouterLink } from 'react-router-dom';
+import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
 import { usePhoton } from '@photonhealth/react';
 import {
@@ -21,21 +21,18 @@ import {
   SkeletonText,
   useBreakpointValue,
   useColorMode,
-  useToast,
   AlertTitle,
   AlertDescription,
-  Wrap,
-  WrapItem,
   Box,
   LinkBox,
   LinkOverlay,
   Show
 } from '@chakra-ui/react';
-import { FiChevronRight } from 'react-icons/fi';
+import { FiChevronRight, FiPlus } from 'react-icons/fi';
 import { gql, GraphQLClient } from 'graphql-request';
 import dayjs from 'dayjs';
 
-import { formatDate } from '../../utils';
+import { formatAddress, FormatAddressProps, formatDate } from '../../utils';
 
 import {
   PRESCRIPTION_COLOR_MAP,
@@ -48,7 +45,7 @@ import { Page } from '../components/Page';
 import { confirmWrapper } from '../components/GuardDialog';
 import PatientView from '../components/PatientView';
 import NameView from '../components/NameView';
-import { Fill, Maybe } from 'packages/sdk/dist/types';
+import { types } from '@photonhealth/sdk';
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
@@ -69,15 +66,14 @@ export const CANCEL_PRESCRIPTION = gql`
 `;
 
 export const Prescription = () => {
-  const toast = useToast();
   const params = useParams();
   const id = params.prescriptionId;
 
   const { getPrescription, getToken } = usePhoton();
-
+  const navigate = useNavigate();
   const { prescription, loading, error } = getPrescription({ id: id! });
   const [accessToken, setAccessToken] = useState('');
-  console.log('prescription', prescription, loading, error);
+  const [canceling, setCanceling] = useState(false);
   const rx = prescription || {};
 
   const getAccessToken = async () => {
@@ -117,62 +113,6 @@ export const Prescription = () => {
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const { colorMode } = useColorMode();
 
-  const buttons =
-    loading && !patient ? (
-      <Wrap>
-        <WrapItem>
-          <Skeleton width="111px" height="42px" borderRadius="md" />
-        </WrapItem>
-        <WrapItem>
-          <Skeleton width="156px" height="42px" borderRadius="md" />
-        </WrapItem>
-      </Wrap>
-    ) : (
-      <Wrap>
-        <WrapItem>
-          <Button
-            aria-label="Cancel Prescription"
-            isDisabled={rx.state !== 'ACTIVE'}
-            onClick={async () => {
-              const decision = await confirmWrapper('Cancel this prescription?', {
-                description: 'You will not be able to undo this action.',
-                cancelText: "No, Don't Cancel",
-                confirmText: 'Yes, Cancel',
-                darkMode: colorMode !== 'light',
-                colorScheme: 'red'
-              });
-              if (decision) {
-                graphQLClient.setHeader('authorization', accessToken);
-                const res = await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
-                if (res) {
-                  toast({
-                    title: 'Prescription canceled',
-                    status: 'success',
-                    duration: 5000
-                  });
-                }
-              }
-            }}
-            variant="outline"
-            textColor="red.500"
-            colorScheme="red"
-          >
-            Cancel Prescription
-          </Button>
-        </WrapItem>
-        <WrapItem>
-          <Button
-            aria-label="New Order"
-            as={RouterLink}
-            to={`/orders/new?patientId=${patient?.id || ''}&prescriptionId=${id}`}
-            colorScheme="blue"
-          >
-            Create Order
-          </Button>
-        </WrapItem>
-      </Wrap>
-    );
-
   const orders = useMemo(() => {
     if (!prescription) return [];
     const orderIds = new Set();
@@ -208,7 +148,7 @@ export const Prescription = () => {
   }
 
   return (
-    <Page header="Prescription" buttons={buttons}>
+    <Page header="Prescription">
       <Card>
         <CardHeader>
           <Text fontWeight="medium">
@@ -350,71 +290,91 @@ export const Prescription = () => {
                 <Text fontSize="md">{dispenseAsWritten ? 'Yes' : 'No'}</Text>
               )}
             </InfoGrid>
-
-            {orders.length === 0 ? null : (
+            <Divider />
+            <HStack justifyContent="space-between" width="100%">
+              <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                Orders
+              </Text>
+              {loading ? null : (
+                <Button
+                  leftIcon={<FiPlus />}
+                  aria-label="New Order"
+                  as={RouterLink}
+                  to={`/orders/new?prescriptionId=${id}${
+                    patient?.id ? `&patientId=${patient?.id}` : ''
+                  }`}
+                  isDisabled={rx.state === types.PrescriptionState.Depleted}
+                  colorScheme="blue"
+                  size="sm"
+                >
+                  Create Order
+                </Button>
+              )}
+            </HStack>
+            {loading ? (
+              <SkeletonText skeletonHeight={5} noOfLines={1} width="100%" />
+            ) : (
               <>
-                <Divider />
-
-                <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                  Orders
-                </Text>
-                <VStack spacing={4} w="full">
-                  {orders.map((fill: Maybe<Fill>) => {
-                    if (!fill) return null;
-                    const address = fill?.order?.pharmacy?.address;
-                    const addressString = address
-                      ? `${address?.street1}, ${address?.city}, ${address?.state} ${address?.postalCode}`
-                      : '';
-                    return (
-                      <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
-                        <Card
-                          variant="outline"
-                          p={[2, 3]}
-                          w="full"
-                          shadow="none"
-                          _hover={{
-                            backgroundColor: 'gray.50'
-                          }}
-                        >
-                          <HStack justifyContent="space-between">
-                            <VStack alignItems="start">
-                              <HStack>
-                                <LinkOverlay href={`/orders/${fill?.order?.id}`}>
-                                  <HStack spacing={2}>
-                                    <Text
-                                      fontSize="md"
-                                      as={fill?.order?.pharmacy?.name ? undefined : 'i'}
-                                    >
-                                      {fill?.order?.pharmacy?.name || 'Pending Selection'}
-                                    </Text>
-                                    <OrderStatusBadge
-                                      fulfillmentState={
-                                        fill?.order?.fulfillment?.state as OrderFulfillmentState
-                                      }
-                                      orderState={fill?.order?.state}
-                                    />
+                {orders.length === 0 ? (
+                  <Text>No orders for this prescription</Text>
+                ) : (
+                  <>
+                    <VStack spacing={4} w="full">
+                      {orders.map((fill: types.Maybe<types.Fill>) => {
+                        if (!fill) return null;
+                        const address = fill?.order?.pharmacy?.address;
+                        const addressString = formatAddress(address as FormatAddressProps);
+                        return (
+                          <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
+                            <Card
+                              variant="outline"
+                              p={[2, 3]}
+                              w="full"
+                              shadow="none"
+                              _hover={{
+                                backgroundColor: 'gray.50'
+                              }}
+                            >
+                              <HStack justifyContent="space-between">
+                                <VStack alignItems="start">
+                                  <HStack>
+                                    <LinkOverlay href={`/orders/${fill?.order?.id}`}>
+                                      <HStack spacing={2}>
+                                        <Text
+                                          fontSize="md"
+                                          as={fill?.order?.pharmacy?.name ? undefined : 'i'}
+                                        >
+                                          {fill?.order?.pharmacy?.name || 'Pending Selection'}
+                                        </Text>
+                                        <OrderStatusBadge
+                                          fulfillmentState={
+                                            fill?.order?.fulfillment?.state as OrderFulfillmentState
+                                          }
+                                          orderState={fill?.order?.state}
+                                        />
+                                      </HStack>
+                                    </LinkOverlay>
                                   </HStack>
-                                </LinkOverlay>
+                                  <Text fontSize="sm" color="gray.500">
+                                    {addressString}
+                                    {addressString ? <br /> : null}
+                                    Created:{' '}
+                                    {dayjs(fill?.order?.createdAt).format('MMM D, YYYY, h:mm A')}
+                                  </Text>
+                                </VStack>
+                                <Box alignItems="end">
+                                  <FiChevronRight size="1.3em" />
+                                </Box>
                               </HStack>
-                              <Text fontSize="sm" color="gray.500">
-                                {addressString}
-                                {addressString ? <br /> : null}
-                                Created:{' '}
-                                {dayjs(fill?.order?.createdAt).format('MMM D, YYYY, h:mm A')}
-                              </Text>
-                            </VStack>
-                            <Box alignItems="end">
-                              <FiChevronRight size="1.3em" />
-                            </Box>
-                          </HStack>
-                        </Card>
-                      </LinkBox>
-                    );
-                  })}
-                </VStack>
+                            </Card>
+                          </LinkBox>
+                        );
+                      })}
+                    </VStack>
+                  </>
+                )}
               </>
             )}
-
             <Divider />
             <Text color="gray.500" fontWeight="medium" fontSize="sm">
               Advanced
@@ -439,6 +399,49 @@ export const Prescription = () => {
                 </Text>
               )}
             </InfoGrid>
+
+            <Divider />
+
+            <Text color="gray.500" fontWeight="medium" fontSize="sm">
+              Actions
+            </Text>
+            <Text>
+              Canceling a prescription will prevent any team member from adding the prescription
+              fills in a new order.
+            </Text>
+            {rx.state !== 'ACTIVE' && (
+              <Alert colorScheme="gray">
+                <AlertIcon />
+                This prescription has been canceled
+              </Alert>
+            )}
+            <Button
+              aria-label="Cancel Prescription"
+              isDisabled={loading || rx.state !== 'ACTIVE'}
+              isLoading={canceling}
+              loadingText="Canceling..."
+              onClick={async () => {
+                const decision = await confirmWrapper('Cancel this prescription?', {
+                  description: 'You will not be able to undo this action.',
+                  cancelText: "No, Don't Cancel",
+                  confirmText: 'Yes, Cancel',
+                  darkMode: colorMode !== 'light',
+                  colorScheme: 'red'
+                });
+                if (decision) {
+                  setCanceling(true);
+                  graphQLClient.setHeader('authorization', accessToken);
+                  await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
+                  navigate(0);
+                }
+              }}
+              variant="outline"
+              textColor="red.500"
+              colorScheme="red"
+              size="sm"
+            >
+              Cancel Prescription
+            </Button>
           </VStack>
         </CardBody>
       </Card>

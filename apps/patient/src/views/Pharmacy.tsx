@@ -622,6 +622,7 @@ export const Pharmacy = () => {
                   color="brandLink"
                   fontWeight="medium"
                   size="sm"
+                  data-dd-privacy="mask"
                 >
                   <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
                   {location}
