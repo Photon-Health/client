@@ -4,6 +4,7 @@ import { graphQLClient } from '../configs/graphqlClient';
 import {
   GET_PHARMACIES,
   MARK_ORDER_AS_PICKED_UP,
+  REROUTE_ORDER,
   SELECT_ORDER_PHARMACY,
   SET_PREFERRED_PHARMACY
 } from '../utils/graphql';
@@ -75,6 +76,57 @@ export const markOrderAsPickedUp = async (orderId: string, token: string) => {
   }
 };
 
+export const rerouteOrder = async (orderId, pharmacyId, token: string) => {
+  graphQLClient.setHeader('x-photon-auth', token);
+
+  try {
+    const response: { rerouteOrder: boolean } = await graphQLClient.request(REROUTE_ORDER, {
+      orderId,
+      pharmacyId
+    });
+    if (response?.rerouteOrder) {
+      return true;
+    } else {
+      throw new Error('Unable to reroute order');
+    }
+  } catch (error) {
+    if (error?.response?.errors) {
+      const { message } = error.response.errors[0];
+      throw new Error(message);
+    }
+  }
+};
+
+export const selectOrderPharmacy = async (
+  orderId: string,
+  pharmacyId: string,
+  patientId: string,
+  token: string
+) => {
+  graphQLClient.setHeader('x-photon-auth', token);
+
+  try {
+    const response: { selectOrderPharmacy: boolean } = await graphQLClient.request(
+      SELECT_ORDER_PHARMACY,
+      {
+        orderId,
+        pharmacyId,
+        patientId
+      }
+    );
+
+    if (response?.selectOrderPharmacy) {
+      return true;
+    } else {
+      throw new Error('Unable to select pharmacy');
+    }
+  } catch (error) {
+    if (error?.response?.errors) {
+      throw new Error(error.response.errors[0].message);
+    }
+  }
+};
+
 export const setPreferredPharmacy = async (
   patientId: string,
   pharmacyId: string,
@@ -95,31 +147,6 @@ export const setPreferredPharmacy = async (
       return true;
     } else {
       throw new Error('Unable to set preferred pharmacy');
-    }
-  } catch (error) {
-    if (error?.response?.errors) {
-      throw new Error(error.response.errors[0].message);
-    }
-  }
-};
-
-export const selectOrderPharmacy = async (orderId, pharmacyId, patientId, token: string) => {
-  graphQLClient.setHeader('x-photon-auth', token);
-
-  try {
-    const response: { selectOrderPharmacy: boolean } = await graphQLClient.request(
-      SELECT_ORDER_PHARMACY,
-      {
-        orderId,
-        pharmacyId,
-        patientId
-      }
-    );
-
-    if (response?.selectOrderPharmacy) {
-      return true;
-    } else {
-      throw new Error('Unable to select pharmacy');
     }
   } catch (error) {
     if (error?.response?.errors) {

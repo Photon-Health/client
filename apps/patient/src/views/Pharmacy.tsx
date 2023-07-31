@@ -31,7 +31,12 @@ import { OrderContext } from './Main';
 import { getSettings } from '@client/settings';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { FEATURED_PHARMACIES } from '../utils/featuredPharmacies';
-import { getPharmacies, AUTH_HEADER_ERRORS } from '../api/internal';
+import {
+  getPharmacies,
+  rerouteOrder,
+  // selectOrderPharmacy,
+  AUTH_HEADER_ERRORS
+} from '../api/internal';
 import { geocode } from '../api/external';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
@@ -274,18 +279,12 @@ export const Pharmacy = () => {
       return;
     }
 
-    try {
-      setSubmitting(true);
+    setSubmitting(true);
 
-      graphQLClient.setHeader('x-photon-auth', token);
-      const results: any = await graphQLClient.request(SELECT_ORDER_PHARMACY, {
-        orderId: order.id,
-        pharmacyId: selectedId,
-        patientId: order.patient.id
-      });
-
-      setTimeout(() => {
-        if (results?.selectOrderPharmacy) {
+    if (isReroute) {
+      try {
+        const result = await rerouteOrder(order.id, selectedId, token);
+        if (result) {
           setSuccessfullySubmitted(true);
           setTimeout(() => {
             setShowFooter(false);
@@ -299,29 +298,64 @@ export const Pharmacy = () => {
 
             navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
           }, 1000);
+          setSubmitting(false);
         } else {
-          toast({
-            title: 'Unable to submit pharmacy selection',
-            description: 'Please refresh and try again',
-            position: 'top',
-            status: 'error',
-            duration: 5000,
-            isClosable: true
-          });
+          setSubmitting(false);
+          console.error('error');
         }
+      } catch (error) {
         setSubmitting(false);
-      }, 1000);
-    } catch (error) {
-      setSubmitting(false);
 
-      console.log(error);
-      console.error(JSON.stringify(error, undefined, 2));
+        console.log(error);
+        console.error(JSON.stringify(error, undefined, 2));
+      }
+    } else {
+      try {
+        const results: any = await graphQLClient.request(SELECT_ORDER_PHARMACY, {
+          orderId: order.id,
+          pharmacyId: selectedId,
+          patientId: order.patient.id
+        });
 
-      if (error?.response?.errors) {
-        if (AUTH_HEADER_ERRORS.includes(error.response.errors[0].extensions.code)) {
-          navigate('/no-match');
-        } else {
-          setError(error.response.errors[0].message);
+        setTimeout(() => {
+          if (results?.selectOrderPharmacy) {
+            setSuccessfullySubmitted(true);
+            setTimeout(() => {
+              setShowFooter(false);
+
+              let type: ExtendedFulfillmentType = types.FulfillmentType.PickUp;
+              if (orgSettings.courierProviders.includes(selectedId)) {
+                type = 'COURIER';
+              } else if (orgSettings.mailOrderNavigateProviders.includes(selectedId)) {
+                type = types.FulfillmentType.MailOrder;
+              }
+
+              navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
+            }, 1000);
+          } else {
+            toast({
+              title: 'Unable to submit pharmacy selection',
+              description: 'Please refresh and try again',
+              position: 'top',
+              status: 'error',
+              duration: 5000,
+              isClosable: true
+            });
+          }
+          setSubmitting(false);
+        }, 1000);
+      } catch (error) {
+        setSubmitting(false);
+
+        console.log(error);
+        console.error(JSON.stringify(error, undefined, 2));
+
+        if (error?.response?.errors) {
+          if (AUTH_HEADER_ERRORS.includes(error.response.errors[0].extensions.code)) {
+            navigate('/no-match');
+          } else {
+            setError(error.response.errors[0].message);
+          }
         }
       }
     }
