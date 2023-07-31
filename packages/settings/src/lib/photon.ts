@@ -143,5 +143,11 @@ export const photon: {
     ...defaultSettings,
     logo: 'ognomy_logo.webp',
     accentColor: '#0a7ade'
+  },
+  // Carbon Health
+  org_Dye8T9VAM1GHjjzS: {
+    ...defaultSettings,
+    logo: 'carbon_health_logo.svg',
+    accentColor: '#000000'
   }
 };
