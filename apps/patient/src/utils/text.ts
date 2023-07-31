@@ -31,7 +31,7 @@ export const text = {
     subheading: {
       original: "We'll send your prescriptions to your selected pharmacy to be filled.",
       reroute: (originalPharmacyName: string) =>
-        `We'll cancel your prescriptions at ${originalPharmacyName} and send them to your new one to be filled.`
+        `We'll cancel your prescriptions at ${originalPharmacyName} and send them to your new pharmacy to be filled.`
     },
     showing: 'Showing pharmacies near:',
     setLocation: 'Set search location',
