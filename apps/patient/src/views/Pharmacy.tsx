@@ -271,84 +271,46 @@ export const Pharmacy = () => {
 
     setSubmitting(true);
 
-    if (isReroute) {
-      try {
-        const result = await rerouteOrder(order.id, selectedId, order.patient.id, token);
-        setTimeout(() => {
-          if (result) {
-            setSuccessfullySubmitted(true);
-            setTimeout(() => {
-              setShowFooter(false);
+    try {
+      const result = isReroute
+        ? await rerouteOrder(order.id, selectedId, order.patient.id, token)
+        : await selectOrderPharmacy(order.id, selectedId, order.patient.id, token);
 
-              let type: ExtendedFulfillmentType = types.FulfillmentType.PickUp;
-              if (orgSettings.courierProviders.includes(selectedId)) {
-                type = 'COURIER';
-              } else if (orgSettings.mailOrderNavigateProviders.includes(selectedId)) {
-                type = types.FulfillmentType.MailOrder;
-              }
+      setTimeout(() => {
+        if (result) {
+          setSuccessfullySubmitted(true);
+          setTimeout(() => {
+            setShowFooter(false);
 
-              navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
-            }, 1000);
-          } else {
-            toast({
-              title: 'Unable to reroute order',
-              description: 'Please refresh and try again',
-              ...TOAST_CONFIG.ERROR
-            });
-          }
-        }, 1000);
-        setSubmitting(false);
-      } catch (error) {
-        toast({
-          title: 'Unable to reroute order',
-          description: 'Please refresh and try again',
-          ...TOAST_CONFIG.ERROR
-        });
+            let type: ExtendedFulfillmentType = types.FulfillmentType.PickUp;
+            if (orgSettings.courierProviders.includes(selectedId)) {
+              type = 'COURIER';
+            } else if (orgSettings.mailOrderNavigateProviders.includes(selectedId)) {
+              type = types.FulfillmentType.MailOrder;
+            }
 
-        setSubmitting(false);
+            navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
+          }, 1000);
+        } else {
+          toast({
+            title: isReroute ? 'Unable to reroute order' : 'Unable to submit pharmacy selection',
+            description: 'Please refresh and try again',
+            ...TOAST_CONFIG.ERROR
+          });
+        }
+      }, 1000);
+      setSubmitting(false);
+    } catch (error) {
+      toast({
+        title: isReroute ? 'Unable to reroute order' : 'Unable to submit pharmacy selection',
+        description: 'Please refresh and try again',
+        ...TOAST_CONFIG.ERROR
+      });
 
-        console.log(error);
-        console.error(JSON.stringify(error, undefined, 2));
-      }
-    } else {
-      try {
-        const result = await selectOrderPharmacy(order.id, selectedId, order.patient.id, token);
-        setTimeout(() => {
-          if (result) {
-            setSuccessfullySubmitted(true);
-            setTimeout(() => {
-              setShowFooter(false);
+      setSubmitting(false);
 
-              let type: ExtendedFulfillmentType = types.FulfillmentType.PickUp;
-              if (orgSettings.courierProviders.includes(selectedId)) {
-                type = 'COURIER';
-              } else if (orgSettings.mailOrderNavigateProviders.includes(selectedId)) {
-                type = types.FulfillmentType.MailOrder;
-              }
-
-              navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
-            }, 1000);
-          } else {
-            toast({
-              title: 'Unable to submit pharmacy selection',
-              description: 'Please refresh and try again',
-              ...TOAST_CONFIG.ERROR
-            });
-          }
-          setSubmitting(false);
-        }, 1000);
-      } catch (error) {
-        toast({
-          title: 'Unable to submit pharmacy selection',
-          description: 'Please refresh and try again',
-          ...TOAST_CONFIG.ERROR
-        });
-
-        setSubmitting(false);
-
-        console.log(error);
-        console.error(JSON.stringify(error, undefined, 2));
-      }
+      console.log(error);
+      console.error(JSON.stringify(error, undefined, 2));
     }
   };
 
