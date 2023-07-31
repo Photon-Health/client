@@ -18,8 +18,6 @@ import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, addRatingsAndHours } from '../utils/general';
 import { ExtendedFulfillmentType, Order } from '../utils/models';
 import { text as t } from '../utils/text';
-import { SET_PREFERRED_PHARMACY } from '../utils/graphql';
-import { graphQLClient } from '../configs/graphqlClient';
 import { FixedFooter } from '../components/FixedFooter';
 import { Nav } from '../components/Nav';
 import { PoweredBy } from '../components/PoweredBy';
@@ -29,14 +27,14 @@ import { BrandedOptions } from '../components/BrandedOptions';
 import { OrderContext } from './Main';
 import { getSettings } from '@client/settings';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { FEATURED_PHARMACIES } from '../utils/featuredPharmacies';
+import { FEATURED_PHARMACIES } from '../data/featuredPharmacies';
 import {
+  geocode,
   getPharmacies,
   rerouteOrder,
   selectOrderPharmacy,
   setPreferredPharmacy
-} from '../api/internal';
-import { geocode } from '../api/external';
+} from '../api';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 

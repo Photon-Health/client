@@ -4,7 +4,7 @@ import { Alert, AlertIcon, Center, CircularProgress } from '@chakra-ui/react';
 import { ChakraProvider } from '@chakra-ui/react';
 
 import { Order } from '../utils/models';
-import { GET_ORDER } from '../utils/graphql';
+import { GET_ORDER } from '../graphql';
 import { graphQLClient } from '../configs/graphqlClient';
 
 import theme from '../configs/theme';

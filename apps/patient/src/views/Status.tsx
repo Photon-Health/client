@@ -15,21 +15,15 @@ import { Helmet } from 'react-helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiCheck } from 'react-icons/fi';
 import { types } from '@photonhealth/sdk';
-
-import { formatAddress, getFulfillmentType } from '../utils/general';
+import { FixedFooter, Nav, PharmacyCard, PoweredBy, StatusStepper } from '../components';
+import { formatAddress, getFulfillmentType, addRatingsAndHours } from '../utils/general';
 import { Order, Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { MARK_ORDER_AS_PICKED_UP } from '../utils/graphql';
-import { Nav } from '../components/Nav';
-import { StatusStepper } from '../components/StatusStepper';
-import { FixedFooter } from '../components/FixedFooter';
-import { PoweredBy } from '../components/PoweredBy';
+import { text as t } from '../utils/text';
 import { OrderContext } from './Main';
 import { graphQLClient } from '../configs/graphqlClient';
 import * as TOAST_CONFIG from '../configs/toast';
-import { text as t } from '../utils/text';
-import { PharmacyCard } from '../components/PharmacyCard';
-import { addRatingsAndHours } from '../utils/general';
-import { AUTH_HEADER_ERRORS } from '../api/internal';
+import { MARK_ORDER_AS_PICKED_UP } from '../graphql';
+import { AUTH_HEADER_ERRORS } from '../api';
 
 const PHOTON_PHONE_NUMBER: string = process.env.REACT_APP_TWILIO_SMS_NUMBER;
 

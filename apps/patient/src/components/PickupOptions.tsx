@@ -10,7 +10,7 @@ import {
 
 import { PharmacyCard } from './PharmacyCard';
 import { text as t } from '../utils/text';
-import { FEATURED_PHARMACIES } from '../utils/featuredPharmacies';
+import { FEATURED_PHARMACIES } from '../data/featuredPharmacies';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 
 interface PickupOptionsProps {

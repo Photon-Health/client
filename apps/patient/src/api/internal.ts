@@ -7,7 +7,7 @@ import {
   REROUTE_ORDER,
   SELECT_ORDER_PHARMACY,
   SET_PREFERRED_PHARMACY
-} from '../utils/graphql';
+} from '../graphql';
 
 export const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
 
