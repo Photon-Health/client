@@ -32,7 +32,7 @@ function formatPhone(phone: string) {
   return parsePhoneNumber(phone, 'US')?.formatNational();
 }
 
-interface FormatAddressProps {
+export interface FormatAddressProps {
   city: string;
   country: string;
   postalCode: string;
@@ -41,7 +41,8 @@ interface FormatAddressProps {
   street2?: any;
 }
 
-function formatAddress(address: FormatAddressProps) {
+function formatAddress(address: FormatAddressProps | undefined) {
+  if (!address) return '';
   const { city, postalCode, state, street1, street2 } = address;
   return `${titleCase(street1)}${street2 ? `, ${titleCase(street2)}` : ''}, ${titleCase(
     city
