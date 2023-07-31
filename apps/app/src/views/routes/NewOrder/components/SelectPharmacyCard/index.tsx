@@ -12,20 +12,20 @@ import {
   useDisclosure
 } from '@chakra-ui/react';
 
-import { LocationSearch } from '../../../../components/LocationSearch';
+import { LocationResults, LocationSearch } from '../../../../components/LocationSearch';
 import { LocalPickup } from './components/LocalPickup';
 import { MailOrder } from './components/MailOrder';
 import { Address } from '../../../../../models/general';
 import { SendToPatient } from './components/SendToPatient';
 import { FulfillmentOptions } from '../OrderForm';
+import { formatAddress } from 'apps/app/src/utils';
 
 interface SelectPharmacyCardProps {
   user: any;
-  auth0UserId: string;
   patient: any;
-  address: Address;
-  errors: any;
-  touched: any;
+  address?: Address;
+  errors?: any;
+  touched?: any;
   pharmacyId: string;
   setFieldValue: any;
   updatePreferredPharmacy: boolean;
@@ -51,15 +51,7 @@ export const SelectPharmacyCard: FC<SelectPharmacyCardProps> = ({
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const handleModalClose = ({
-    loc = undefined,
-    lat = undefined,
-    lng = undefined
-  }: {
-    loc: string | undefined;
-    lat: number | undefined;
-    lng: number | undefined;
-  }) => {
+  const handleModalClose = ({ loc, lat, lng }: LocationResults) => {
     if (lat && lng && loc) {
       setLatitude(lat);
       setLongitude(lng);
@@ -88,6 +80,7 @@ export const SelectPharmacyCard: FC<SelectPharmacyCardProps> = ({
   }, [patient?.id]);
 
   const geocoder = new google.maps.Geocoder();
+
   useEffect(() => {
     if (!address || !address.postalCode) {
       setLatitude(undefined);
@@ -95,11 +88,7 @@ export const SelectPharmacyCard: FC<SelectPharmacyCardProps> = ({
       setLocation('');
     } else {
       geocoder
-        .geocode({
-          address: `${address.street1} ${address.street2 || ''} ${address.city}, ${address.state} ${
-            address.postalCode
-          }`
-        })
+        .geocode({ address: formatAddress(address) })
         .then(({ results }) => {
           if (results) {
             setLocation(results[0].formatted_address);

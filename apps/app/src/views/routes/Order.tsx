@@ -25,7 +25,15 @@ import {
   LinkOverlay,
   Tag,
   TagLeftIcon,
-  TagLabel
+  TagLabel,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter
 } from '@chakra-ui/react';
 import { gql, GraphQLClient } from 'graphql-request';
 import { usePhoton, types } from '@photonhealth/react';
@@ -45,6 +53,8 @@ import {
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
 import { OrderState } from 'packages/sdk/dist/types';
+import { LocalPickup } from './NewOrder/components/SelectPharmacyCard/components/LocalPickup';
+import { LocationResults, LocationSearch } from '../components/LocationSearch';
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
     parse: JSON.parse,
@@ -113,7 +123,19 @@ export const Order = () => {
   const { order, loading, error } = getOrder({ id: id! });
   const [accessToken, setAccessToken] = useState('');
   const [canceling, setCanceling] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const {
+    isOpen: isOpenLocation,
+    onOpen: onOpenLocation,
+    onClose: onCloseLocation
+  } = useDisclosure();
+  const [location, setLocation] = useState<LocationResults>({
+    lat: undefined,
+    lng: undefined,
+    loc: ''
+  });
+  const geocoder = new google.maps.Geocoder();
   const navigate = useNavigate();
   const getAccessToken = async () => {
     try {
@@ -141,6 +163,25 @@ export const Order = () => {
       return true;
     });
   }, [order]);
+
+  useEffect(() => {
+    const address = order?.patient?.address;
+    if (!address) return;
+    geocoder
+      .geocode({ address: formatAddress(address) })
+      .then(({ results }) => {
+        if (results) {
+          setLocation({
+            loc: results[0].formatted_address,
+            lat: results[0].geometry.location.lat(),
+            lng: results[0].geometry.location.lng()
+          });
+        }
+      })
+      .catch((err) => {
+        console.log('Error geocoding', err);
+      });
+  }, [order?.patient?.address]);
 
   if (error || (!loading && !order)) {
     return (
@@ -206,18 +247,68 @@ export const Order = () => {
             </Text>
 
             <InfoGrid name="Order Status">
-              {loading ? (
-                <Skeleton width="70px" height="24px" borderRadius="xl" />
-              ) : (
-                <Tag
-                  size="sm"
-                  borderRadius="full"
-                  colorScheme={ORDER_STATE_COLOR_MAP[order.state as OrderState]}
-                >
-                  <TagLeftIcon boxSize="12px" as={ORDER_STATE_ICON_MAP[order.state]} />
-                  <TagLabel>{ORDER_STATE_MAP[order.state as keyof object] || ''}</TagLabel>
-                </Tag>
-              )}
+              <HStack>
+                {loading ? (
+                  <Skeleton width="70px" height="24px" borderRadius="xl" />
+                ) : (
+                  <Tag
+                    size="sm"
+                    borderRadius="full"
+                    colorScheme={ORDER_STATE_COLOR_MAP[order.state as OrderState]}
+                  >
+                    <TagLeftIcon boxSize="12px" as={ORDER_STATE_ICON_MAP[order.state]} />
+                    <TagLabel>{ORDER_STATE_MAP[order.state as keyof object] || ''}</TagLabel>
+                  </Tag>
+                )}
+                {order?.state === types.OrderState.Routing ? (
+                  <>
+                    <Button onClick={onOpen} size="xs" colorScheme="blue">
+                      Select a Pharmacy
+                    </Button>
+                    <LocationSearch
+                      isOpen={isOpenLocation}
+                      onClose={({ loc, lat, lng }) => {
+                        if (loc && lat && lng) {
+                          setLocation({ loc, lat, lng });
+                        }
+                        onCloseLocation();
+                      }}
+                    />
+                    <Modal isOpen={isOpen} onClose={onClose}>
+                      <ModalOverlay />
+                      <ModalContent>
+                        <ModalHeader>Select a Pharmacy</ModalHeader>
+                        <ModalCloseButton />
+
+                        <ModalBody>
+                          <LocalPickup
+                            location={location.loc}
+                            latitude={location.lat}
+                            longitude={location.lng}
+                            onOpen={onOpenLocation}
+                            patient={order.patient}
+                            pharmacyId=""
+                            updatePreferredPharmacy={false}
+                            setUpdatePreferredPharmacy={() => {}}
+                            preferredPharmacyIds={[]}
+                            setFieldValue={() => {}}
+                            resetSelection={() => {}}
+                          />
+                        </ModalBody>
+
+                        <ModalFooter>
+                          <Button variant="solid" size="sm" mr={3} onClick={onClose}>
+                            Close
+                          </Button>
+                          <Button variant="solid" colorScheme="blue" size="sm" disabled>
+                            Set Pharmacy
+                          </Button>
+                        </ModalFooter>
+                      </ModalContent>
+                    </Modal>
+                  </>
+                ) : null}
+              </HStack>
             </InfoGrid>
 
             <InfoGrid name="Id">
