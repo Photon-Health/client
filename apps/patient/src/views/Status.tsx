@@ -145,6 +145,7 @@ export const Status = () => {
             <Box width="full">
               <PharmacyCard
                 pharmacy={enrichedPharmacy}
+                selected={true}
                 onChangePharmacy={() =>
                   navigate(`/pharmacy?orderId=${order.id}&token=${token}&reroute=true`)
                 }
