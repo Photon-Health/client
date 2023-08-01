@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import {
+  Box,
   Button,
   Card,
   CardBody,
@@ -87,7 +88,12 @@ const DistanceAddress = ({ distance, address }: DistanceAddressProps) => {
   if (!address) return null;
   return (
     <Text fontSize="sm" color="gray.500" display="inline">
-      {distance ? `${distance.toFixed(1)} mi &bull; ` : ''}
+      {distance ? `${distance.toFixed(1)} mi` : ''}
+      {distance && (
+        <Box as="span" display="inline" mx={2}>
+          &bull;
+        </Box>
+      )}
       {formatAddress(address)}
     </Text>
   );
