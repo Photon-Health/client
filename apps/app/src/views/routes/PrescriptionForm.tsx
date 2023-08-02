@@ -14,6 +14,7 @@ export const PrescriptionForm = () => {
   const [params] = useSearchParams();
   const patientId = params.get('patientId') || '';
   const templateIds = params.get('templateIds') || '';
+  const prescriptionIds = params.get('prescriptionIds') || '';
 
   const navigate = useNavigate();
   const onClose = () => {
@@ -59,7 +60,13 @@ export const PrescriptionForm = () => {
         zIndex: 15
       }}
     >
-      <photon-multirx-form-wrapper ref={ref} template-ids={templateIds} patient-id={patientId} />
+      {prescriptionIds}
+      <photon-multirx-form-wrapper
+        ref={ref}
+        template-ids={templateIds}
+        patient-id={patientId}
+        prescription-ids={prescriptionIds}
+      />
     </div>
   );
 };

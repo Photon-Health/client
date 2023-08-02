@@ -58,6 +58,7 @@ customElement(
   {
     patientId: undefined,
     templateIds: undefined,
+    prescriptionIds: undefined,
     hideSubmit: false,
     hideTemplates: true,
     enableOrder: false,
@@ -72,6 +73,7 @@ customElement(
     props: {
       patientId?: string;
       templateIds?: string;
+      prescriptionIds?: string;
       hideSubmit: boolean;
       hideTemplates: boolean;
       enableOrder: boolean;
@@ -102,7 +104,9 @@ customElement(
       address: undefined
     });
     const client = usePhoton();
-    const [showForm, setShowForm] = createSignal<boolean>(!props.templateIds);
+    const [showForm, setShowForm] = createSignal<boolean>(
+      !props.templateIds && !props.prescriptionIds
+    );
     const [errors, setErrors] = createSignal<FormError[]>([]);
     const [isLoading, setIsLoading] = createSignal<boolean>(true);
     const [isEditing, setIsEditing] = createSignal<boolean>(false);
@@ -137,73 +141,110 @@ customElement(
       setAuthenticated(client?.authentication.state.isAuthenticated || false);
     });
 
-    createEffect(async () => {
-      if (props.templateIds && client) {
-        setIsLoadingTemplates(true);
-        const ids = props.templateIds.split(',');
+    const generateDraftPrescription = (prescription: Prescription | PrescriptionTemplate) => ({
+      id: String(Math.random()),
+      effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
+      treatment: prescription.treatment,
+      dispenseAsWritten: prescription.dispenseAsWritten,
+      dispenseQuantity: prescription.dispenseQuantity,
+      dispenseUnit: prescription.dispenseUnit,
+      daysSupply: prescription.daysSupply,
+      // when we pre-populate draft prescriptions using template ID's, we need need to update the value for refills here
+      refillsInput: prescription.fillsAllowed ? prescription.fillsAllowed - 1 : 0,
+      fillsAllowed: prescription.fillsAllowed,
+      instructions: prescription.instructions,
+      notes: prescription.notes,
+      addToTemplates: false,
+      catalogId: undefined
+    });
 
-        // TODO: Should just get the template directly but not supported by the SDK
-        const {
-          data: { catalogs }
-        } = await client!.getSDK().clinical.catalog.getCatalogs();
-        if (catalogs.length === 0) {
-          console.error('No catalog set');
-          return;
+    const fetchAndDisplayTemplates = async () => {
+      setIsLoadingTemplates(true);
+      const ids = props?.templateIds?.split(',') || [];
+      if (ids.length === 0) {
+        return null;
+      }
+      // TODO: Should just get the template directly but not supported by the SDK
+      const {
+        data: { catalogs }
+      } = await client!.getSDK().clinical.catalog.getCatalogs();
+      if (catalogs.length === 0) {
+        console.error('No catalog set');
+        return;
+      }
+      const {
+        data: { catalog }
+      } = await client!.getSDK().clinical.catalog.getCatalog({
+        id: catalogs[0].id,
+        fragment: {
+          CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
         }
-        const {
-          data: { catalog }
-        } = await client!.getSDK().clinical.catalog.getCatalog({
-          id: catalogs[0].id,
-          fragment: {
-            CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
-          }
-        });
-        // Build a map for easy lookup
-        const templateMap: { [key: string]: PrescriptionTemplate } = {};
-        catalog.templates.forEach((template) => {
-          if (template) templateMap[template.id] = template;
-        });
-        for (let i = 0; i < ids.length; i++) {
-          const templateId = ids[i];
-          const template = templateMap[templateId];
-          if (!template) {
-            console.error(`Invalid template id ${templateId}`);
-          }
-          if (
-            // minimum template fields required to create a prescription
-            !template?.treatment ||
-            !template?.dispenseQuantity ||
-            !template?.dispenseUnit ||
-            !template?.fillsAllowed ||
-            !template?.instructions
-          ) {
-            console.error(`Template is missing required prescription details ${templateId}`);
-          } else {
-            actions.updateFormValue({
-              key: 'draftPrescriptions',
-              value: [
-                ...(store['draftPrescriptions']?.value || []),
-                {
-                  id: String(Math.random()),
-                  effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
-                  treatment: template.treatment,
-                  dispenseAsWritten: template.dispenseAsWritten,
-                  dispenseQuantity: template.dispenseQuantity,
-                  dispenseUnit: template.dispenseUnit,
-                  daysSupply: template.daysSupply,
-                  // when we pre-populate draft prescriptions using template ID's, we need need to update the value for refills here
-                  refillsInput: template.fillsAllowed ? template.fillsAllowed - 1 : 0,
-                  fillsAllowed: template.fillsAllowed,
-                  instructions: template.instructions,
-                  notes: template.notes,
-                  addToTemplates: false,
-                  catalogId: undefined
-                }
-              ]
-            });
-          }
+      });
+      // Build a map for easy lookup
+      const templateMap: { [key: string]: PrescriptionTemplate } = {};
+      catalog.templates.forEach((template) => {
+        if (template) templateMap[template.id] = template;
+      });
+      for (let i = 0; i < ids.length; i++) {
+        const templateId = ids[i];
+        const template = templateMap[templateId];
+        if (!template) {
+          console.error(`Invalid template id ${templateId}`);
         }
-        setIsLoadingTemplates(false);
+        if (
+          // minimum template fields required to create a prescription
+          !template?.treatment ||
+          !template?.dispenseQuantity ||
+          !template?.dispenseUnit ||
+          !template?.fillsAllowed ||
+          !template?.instructions
+        ) {
+          console.error(`Template is missing required prescription details ${templateId}`);
+        } else {
+          actions.updateFormValue({
+            key: 'draftPrescriptions',
+            value: [
+              ...(store['draftPrescriptions']?.value || []),
+              generateDraftPrescription(template)
+            ]
+          });
+        }
+      }
+      setIsLoadingTemplates(false);
+    };
+
+    const fetchAndDisplayPrescriptions = async () => {
+      setIsLoadingTemplates(true);
+      const ids = props?.prescriptionIds?.split(',') || [];
+      if (ids.length === 0) {
+        return null;
+      }
+
+      try {
+        const prescriptions = await Promise.all(
+          ids.map((id) => client!.getSDK().clinical.prescription.getPrescription({ id }))
+        );
+
+        prescriptions.forEach(({ data: { prescription } }) => {
+          actions.updateFormValue({
+            key: 'draftPrescriptions',
+            value: [
+              ...(store['draftPrescriptions']?.value || []),
+              generateDraftPrescription(prescription)
+            ]
+          });
+        });
+      } catch (e) {
+        console.error(e);
+      }
+      setIsLoadingTemplates(false);
+    };
+
+    createEffect(() => {
+      if (props.templateIds && client) {
+        fetchAndDisplayTemplates();
+      } else if (props.prescriptionIds && client) {
+        fetchAndDisplayPrescriptions();
       }
     });
 
@@ -455,7 +496,7 @@ customElement(
                 <div class="flex flex-row justify-end gap-2">
                   <Show when={!showForm()}>
                     <photon-button
-                      class="w-full xs:w-fit"
+                      class="min-w-min"
                       variant="outline"
                       on:photon-clicked={async () => setShowForm(true)}
                     >
@@ -463,7 +504,7 @@ customElement(
                     </photon-button>
                   </Show>
                   <photon-button
-                    class="w-full xs:w-fit"
+                    class="min-w-min"
                     loading={isLoading()}
                     on:photon-clicked={async () => await submitForm(props.enableOrder)}
                   >

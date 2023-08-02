@@ -1,4 +1,4 @@
-import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
 import { usePhoton } from '@photonhealth/react';
 import {
@@ -28,7 +28,7 @@ import {
   LinkOverlay,
   Show
 } from '@chakra-ui/react';
-import { FiChevronRight, FiPlus } from 'react-icons/fi';
+import { FiChevronRight, FiPlus, FiRepeat } from 'react-icons/fi';
 import { gql, GraphQLClient } from 'graphql-request';
 import dayjs from 'dayjs';
 
@@ -198,9 +198,30 @@ export const Prescription = () => {
             </Stack>
 
             <Divider />
-            <Text color="gray.500" fontWeight="medium" fontSize="sm">
-              Prescription Details
-            </Text>
+            <HStack justifyContent="space-between" width="100%">
+              <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                Prescription Details
+              </Text>
+              <Button
+                leftIcon={<FiRepeat />}
+                aria-label="Duplicate Prescription"
+                onClick={() => {
+                  if (!(loading || rx.state === types.PrescriptionState.Active)) {
+                    navigate(
+                      `/prescriptions/new?prescriptionIds=${id}${
+                        patient?.id ? `&patientId=${patient?.id}` : ''
+                      }`
+                    );
+                  }
+                }}
+                isDisabled={loading || rx.state === types.PrescriptionState.Active}
+                colorScheme="blue"
+                size="sm"
+                role="link"
+              >
+                Duplicate Prescription
+              </Button>
+            </HStack>
             <InfoGrid name="Instructions">
               {loading ? (
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
@@ -299,13 +320,19 @@ export const Prescription = () => {
                 <Button
                   leftIcon={<FiPlus />}
                   aria-label="New Order"
-                  as={RouterLink}
-                  to={`/orders/new?prescriptionId=${id}${
-                    patient?.id ? `&patientId=${patient?.id}` : ''
-                  }`}
+                  onClick={() => {
+                    if (rx.state !== types.PrescriptionState.Depleted) {
+                      navigate(
+                        `/orders/new?prescriptionId=${id}${
+                          patient?.id ? `&patientId=${patient?.id}` : ''
+                        }`
+                      );
+                    }
+                  }}
                   isDisabled={rx.state === types.PrescriptionState.Depleted}
                   colorScheme="blue"
                   size="sm"
+                  role="link"
                 >
                   Create Order
                 </Button>
