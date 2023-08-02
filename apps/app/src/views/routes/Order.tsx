@@ -33,7 +33,8 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  ModalFooter
+  ModalFooter,
+  Show
 } from '@chakra-ui/react';
 import { gql, GraphQLClient } from 'graphql-request';
 import { usePhoton, types } from '@photonhealth/react';
@@ -44,8 +45,6 @@ import { confirmWrapper } from '../components/GuardDialog';
 import { formatAddress, formatDate, formatFills, formatPhone } from '../../utils';
 import {
   OrderFulfillmentState,
-  ORDER_FULFILLMENT_COLOR_MAP,
-  ORDER_FULFILLMENT_STATE_MAP,
   ORDER_STATE_COLOR_MAP,
   ORDER_STATE_ICON_MAP,
   ORDER_STATE_MAP
@@ -212,9 +211,30 @@ export const Order = () => {
     <Page header="Order">
       <Card>
         <CardHeader>
-          <Text fontWeight="medium">
-            {loading ? <Skeleton height="30px" width="250px" /> : formatFills(order.fills)}
-          </Text>
+          <Stack direction={{ base: 'column', md: 'row' }} justify="space-between" width="full">
+            <Stack
+              direction={{ base: 'column', md: 'row' }}
+              align={{ base: 'start', md: 'stretch' }}
+              spacing={2}
+            >
+              <Text fontWeight="medium">
+                {loading ? <Skeleton height="30px" width="250px" /> : formatFills(order.fills)}
+              </Text>
+              {loading ? (
+                <Skeleton width="70px" height="24px" borderRadius="xl" />
+              ) : (
+                <Tag
+                  size="sm"
+                  borderRadius="full"
+                  colorScheme={ORDER_STATE_COLOR_MAP[order.state as OrderState]}
+                >
+                  <TagLeftIcon boxSize="12px" as={ORDER_STATE_ICON_MAP[order.state]} />
+                  <TagLabel>{ORDER_STATE_MAP[order.state as keyof object] || ''}</TagLabel>
+                </Tag>
+              )}
+            </Stack>
+            <CopyText size="xs" text={order?.id} />
+          </Stack>
         </CardHeader>
         <Divider color="gray.100" />
         <CardBody>
@@ -225,7 +245,7 @@ export const Order = () => {
             w="100%"
             mt={0}
           >
-            <Stack direction="row" gap={3} w="full">
+            <Stack direction={{ base: 'column', sm: 'row' }} gap={3} w="full">
               <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
                 <Text color="gray.500" fontWeight="medium" fontSize="sm">
                   Patient
@@ -239,166 +259,175 @@ export const Order = () => {
                   <PatientView patient={order.patient} />
                 )}
               </VStack>
+
+              <Show above="sm">
+                <Divider orientation="vertical" height="auto" />
+              </Show>
+
+              <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
+                <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                  Created At
+                </Text>
+
+                {loading ? (
+                  <SkeletonText skeletonHeight={5} noOfLines={1} width="125px" />
+                ) : (
+                  <Text fontSize="md">{formatDate(order.createdAt)}</Text>
+                )}
+              </VStack>
+              {order?.externalId ? (
+                <>
+                  <Show above="sm">
+                    <Divider orientation="vertical" height="auto" />
+                  </Show>
+                  <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
+                    <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                      External Id
+                    </Text>
+
+                    <CopyText text={order?.externalId} size="xs" />
+                  </VStack>
+                </>
+              ) : null}
             </Stack>
 
+            <Stack
+              direction={{ base: 'column', md: 'row' }}
+              align={{ base: 'start', md: 'stretch' }}
+              pt={5}
+              justify="space-between"
+              width="full"
+            >
+              <Text fontWeight="medium" fontSize="md">
+                Pharmacy Information
+              </Text>
+              {order?.state === types.OrderState.Routing ? (
+                <>
+                  <Button onClick={onOpen} size="xs" colorScheme="blue">
+                    Select a Pharmacy
+                  </Button>
+                  <LocationSearch
+                    isOpen={isOpenLocation}
+                    onClose={({ loc, lat, lng }) => {
+                      if (loc && lat && lng) {
+                        setLocation({ loc, lat, lng });
+                      }
+                      onCloseLocation();
+                    }}
+                  />
+                  <Modal isOpen={isOpen} onClose={onClose}>
+                    <ModalOverlay />
+                    <ModalContent>
+                      <ModalHeader>Select a Pharmacy</ModalHeader>
+                      <ModalCloseButton />
+
+                      <ModalBody>
+                        <LocalPickup
+                          location={location.loc}
+                          latitude={location.lat}
+                          longitude={location.lng}
+                          onOpen={onOpenLocation}
+                          patient={order.patient}
+                          pharmacyId=""
+                          updatePreferredPharmacy={false}
+                          setUpdatePreferredPharmacy={() => {}}
+                          preferredPharmacyIds={[]}
+                          setFieldValue={(_, id) => {
+                            setPharmacyId(id);
+                          }}
+                          resetSelection={() => {}}
+                        />
+                      </ModalBody>
+
+                      <ModalFooter>
+                        <Button
+                          aria-label="Close Pharmacy Select Modal"
+                          variant="solid"
+                          size="sm"
+                          mr={3}
+                          onClick={() => {
+                            setPharmacyId('');
+                            onClose();
+                          }}
+                        >
+                          Close
+                        </Button>
+                        <Button
+                          aria-label="Set Pharmacy"
+                          variant="solid"
+                          colorScheme="blue"
+                          size="sm"
+                          isDisabled={!pharmacyId}
+                          onClick={() => {
+                            setPharmacyId('');
+                            onClose();
+                          }}
+                        >
+                          Set Pharmacy
+                        </Button>
+                      </ModalFooter>
+                    </ModalContent>
+                  </Modal>
+                </>
+              ) : null}
+            </Stack>
             <Divider />
 
-            <Text color="gray.500" fontWeight="medium" fontSize="sm">
-              Details
-            </Text>
+            {order?.state === types.OrderState.Routing ? (
+              <Alert colorScheme="gray">
+                <AlertIcon />
+                This order is pending pharmacy selection, please select a pharmacy if needed.
+              </Alert>
+            ) : null}
 
-            <InfoGrid name="Order Status">
-              <HStack>
-                {loading ? (
-                  <Skeleton width="70px" height="24px" borderRadius="xl" />
-                ) : (
-                  <Tag
-                    size="sm"
-                    borderRadius="full"
-                    colorScheme={ORDER_STATE_COLOR_MAP[order.state as OrderState]}
-                  >
-                    <TagLeftIcon boxSize="12px" as={ORDER_STATE_ICON_MAP[order.state]} />
-                    <TagLabel>{ORDER_STATE_MAP[order.state as keyof object] || ''}</TagLabel>
-                  </Tag>
-                )}
-                {order?.state === types.OrderState.Routing ? (
-                  <>
-                    <Button onClick={onOpen} size="xs" colorScheme="blue">
-                      Select a Pharmacy
-                    </Button>
-                    <LocationSearch
-                      isOpen={isOpenLocation}
-                      onClose={({ loc, lat, lng }) => {
-                        if (loc && lat && lng) {
-                          setLocation({ loc, lat, lng });
-                        }
-                        onCloseLocation();
-                      }}
-                    />
-                    <Modal isOpen={isOpen} onClose={onClose}>
-                      <ModalOverlay />
-                      <ModalContent>
-                        <ModalHeader>Select a Pharmacy</ModalHeader>
-                        <ModalCloseButton />
+            <InfoGrid name="Name">
+              {loading ? (
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+              ) : order?.pharmacy?.name ? (
+                <Text fontSize="md">{order.pharmacy.name}</Text>
+              ) : (
+                <Text fontSize="md" as="i">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
 
-                        <ModalBody>
-                          <LocalPickup
-                            location={location.loc}
-                            latitude={location.lat}
-                            longitude={location.lng}
-                            onOpen={onOpenLocation}
-                            patient={order.patient}
-                            pharmacyId=""
-                            updatePreferredPharmacy={false}
-                            setUpdatePreferredPharmacy={() => {}}
-                            preferredPharmacyIds={[]}
-                            setFieldValue={(_, id) => {
-                              setPharmacyId(id);
-                            }}
-                            resetSelection={() => {}}
-                          />
-                        </ModalBody>
+            <InfoGrid name="Phone">
+              {loading ? (
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+              ) : order?.pharmacy?.phone ? (
+                <Link fontSize="md" href={`tel:${order.pharmacy.phone}`} isExternal>
+                  {formatPhone(order.pharmacy.phone)}
+                </Link>
+              ) : (
+                <Text fontSize="md" as="i">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
 
-                        <ModalFooter>
-                          <Button
-                            aria-label="Close Pharmacy Select Modal"
-                            variant="solid"
-                            size="sm"
-                            mr={3}
-                            onClick={() => {
-                              setPharmacyId('');
-                              onClose();
-                            }}
-                          >
-                            Close
-                          </Button>
-                          <Button
-                            aria-label="Set Pharmacy"
-                            variant="solid"
-                            colorScheme="blue"
-                            size="sm"
-                            isDisabled={!pharmacyId}
-                            onClick={() => {
-                              setPharmacyId('');
-                              onClose();
-                            }}
-                          >
-                            Set Pharmacy
-                          </Button>
-                        </ModalFooter>
-                      </ModalContent>
-                    </Modal>
-                  </>
-                ) : null}
-              </HStack>
+            <InfoGrid name="Address">
+              {loading ? (
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+              ) : order?.pharmacy?.address ? (
+                <Text fontSize="md">{formatAddress(order.pharmacy.address)}</Text>
+              ) : (
+                <Text fontSize="md" as="i">
+                  None
+                </Text>
+              )}
             </InfoGrid>
 
             <InfoGrid name="Id">
               {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
-              ) : order.id ? (
-                <CopyText text={order.id} />
-              ) : (
-                <Text fontSize="md" as="i">
-                  None
-                </Text>
-              )}
-            </InfoGrid>
-
-            <InfoGrid name="External Id">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
-              ) : order.externalId ? (
-                <CopyText text={order.externalId} />
-              ) : (
-                <Text fontSize="md" as="i">
-                  None
-                </Text>
-              )}
-            </InfoGrid>
-
-            <InfoGrid name="Created At">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="125px" />
-              ) : (
-                <Text fontSize="md">{formatDate(order.createdAt)}</Text>
-              )}
-            </InfoGrid>
-
-            <Divider />
-
-            <Text color="gray.500" fontWeight="medium" fontSize="sm">
-              Fulfillment
-            </Text>
-
-            <InfoGrid name="Type">
-              {loading ? (
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-              ) : order.fulfillment ? (
-                <Text fontSize="md">{ORDER_FULFILLMENT_TYPE_MAP[order.fulfillment.type]}</Text>
+              ) : order?.pharmacy?.id ? (
+                <CopyText text={order.pharmacy.id} />
               ) : (
                 <Text fontSize="md" as="i">
                   None
                 </Text>
               )}
-            </InfoGrid>
-
-            <InfoGrid name="Fulfillment Status">
-              {loading ? (
-                <Skeleton width="70px" height="24px" borderRadius="xl" />
-              ) : order.fulfillment?.state ? (
-                <Tag
-                  size="sm"
-                  borderRadius="full"
-                  colorScheme={
-                    ORDER_FULFILLMENT_COLOR_MAP[order.fulfillment.state as keyof object] || ''
-                  }
-                >
-                  <TagLabel>
-                    {ORDER_FULFILLMENT_STATE_MAP[order.fulfillment.state as keyof object] || ''}
-                  </TagLabel>
-                </Tag>
-              ) : null}
             </InfoGrid>
 
             {!loading && order.fulfillment?.type === 'MAIL_ORDER' ? (
@@ -424,61 +453,10 @@ export const Order = () => {
               </>
             ) : null}
 
-            <InfoGrid name="Pharmacy Id">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-              ) : order?.pharmacy?.id ? (
-                <CopyText text={order.pharmacy.id} />
-              ) : (
-                <Text fontSize="md" as="i">
-                  None
-                </Text>
-              )}
-            </InfoGrid>
-
-            <InfoGrid name="Pharmacy Name">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-              ) : order?.pharmacy?.name ? (
-                <Text fontSize="md">{order.pharmacy.name}</Text>
-              ) : (
-                <Text fontSize="md" as="i">
-                  None
-                </Text>
-              )}
-            </InfoGrid>
-
-            <InfoGrid name="Pharmacy Address">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-              ) : order?.pharmacy?.address ? (
-                <Text fontSize="md">{formatAddress(order.pharmacy.address)}</Text>
-              ) : (
-                <Text fontSize="md" as="i">
-                  None
-                </Text>
-              )}
-            </InfoGrid>
-
-            <InfoGrid name="Pharmacy Phone">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-              ) : order?.pharmacy?.phone ? (
-                <Link fontSize="md" href={`tel:${order.pharmacy.phone}`} isExternal>
-                  {formatPhone(order.pharmacy.phone)}
-                </Link>
-              ) : (
-                <Text fontSize="md" as="i">
-                  None
-                </Text>
-              )}
-            </InfoGrid>
-
-            <Divider />
-
-            <Text color="gray.500" fontWeight="medium" fontSize="sm">
-              Fills
+            <Text fontWeight="medium" fontSize="md" pt={5}>
+              Prescription Fills
             </Text>
+            <Divider />
             {prescriptions.length > 0 ? (
               <>
                 {prescriptions.map((fill: any, i: number) => {
@@ -493,7 +471,7 @@ export const Order = () => {
                           backgroundColor: 'gray.50'
                         }}
                       >
-                        <HStack justifyContent="space-between">
+                        <HStack justify="space-between" width="full">
                           <VStack alignItems="start">
                             <HStack>
                               <LinkOverlay href={`/prescriptions/${fill?.prescription?.id}`}>
@@ -517,57 +495,68 @@ export const Order = () => {
                 })}
               </>
             ) : (
-              <Text as="i">No fills</Text>
+              <Text as="i" fontSize="sm" color="gray.500">
+                No fills
+              </Text>
             )}
+            <Stack
+              direction={{ base: 'column', md: 'row' }}
+              align={{ base: 'start', md: 'stretch' }}
+              pt={5}
+              justify="space-between"
+              width="full"
+              spacing={10}
+            >
+              <VStack align="start">
+                <Text fontWeight="medium" fontSize="md">
+                  Actions
+                </Text>
+                <Text fontSize="sm">
+                  Canceling an order will send a cancellation notification to the pharmacy for any
+                  fills already sent to the pharmacy.
+                </Text>
+              </VStack>
 
-            <Divider />
-
-            <Text color="gray.500" fontWeight="medium" fontSize="sm">
-              Actions
-            </Text>
-            <Text>
-              Canceling an order will send a cancellation notification to the pharmacy for any fills
-              already sent to the pharmacy.
-            </Text>
+              <Button
+                aria-label="Cancel Order"
+                variant="outline"
+                borderColor="red.500"
+                textColor="red.500"
+                colorScheme="red"
+                size="sm"
+                isLoading={canceling}
+                loadingText="Canceling..."
+                isDisabled={
+                  loading ||
+                  order.state === types.OrderState.Canceled ||
+                  order.state === types.OrderState.Completed
+                }
+                onClick={async () => {
+                  const decision = await confirmWrapper('Cancel this order?', {
+                    description: 'You will not be able to undo this action.',
+                    cancelText: "No, Don't Cancel",
+                    confirmText: 'Yes, Cancel',
+                    darkMode: colorMode !== 'light',
+                    colorScheme: 'red'
+                  });
+                  if (decision) {
+                    setCanceling(true);
+                    graphQLClient.setHeader('authorization', accessToken);
+                    await graphQLClient.request(CANCEL_ORDER, { id });
+                    navigate(0);
+                  }
+                }}
+              >
+                Cancel Order
+              </Button>
+            </Stack>
             {!loading ? (
               <CancelOrderAlert
                 orderState={order.state as OrderState}
                 fulfillmentState={order?.fulfillment?.state as OrderFulfillmentState}
               />
             ) : null}
-
-            <Button
-              aria-label="Cancel Order"
-              variant="outline"
-              borderColor="red.500"
-              textColor="red.500"
-              colorScheme="red"
-              size="sm"
-              isLoading={canceling}
-              loadingText="Canceling..."
-              isDisabled={
-                loading ||
-                order.state === types.OrderState.Canceled ||
-                order.state === types.OrderState.Completed
-              }
-              onClick={async () => {
-                const decision = await confirmWrapper('Cancel this order?', {
-                  description: 'You will not be able to undo this action.',
-                  cancelText: "No, Don't Cancel",
-                  confirmText: 'Yes, Cancel',
-                  darkMode: colorMode !== 'light',
-                  colorScheme: 'red'
-                });
-                if (decision) {
-                  setCanceling(true);
-                  graphQLClient.setHeader('authorization', accessToken);
-                  await graphQLClient.request(CANCEL_ORDER, { id });
-                  navigate(0);
-                }
-              }}
-            >
-              Cancel Order
-            </Button>
+            <Divider />
           </VStack>
         </CardBody>
       </Card>

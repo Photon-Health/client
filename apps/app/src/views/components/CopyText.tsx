@@ -1,12 +1,12 @@
 import { HStack, IconButton, Text } from '@chakra-ui/react';
 import { FiCopy } from 'react-icons/fi';
 
-const CopyText = ({ text }: { text: string }) => {
+const CopyText = ({ text, size = 'md' }: { text: string; size?: 'xs' | 'sm' | 'md' }) => {
   if (!text) return null;
   return (
     <HStack spacing={2}>
       <Text
-        fontSize="md"
+        fontSize={size}
         whiteSpace={{ base: 'nowrap', sm: 'normal' }}
         overflow={{ base: 'hidden', sm: 'visible' }}
         textOverflow={{ base: 'ellipsis', sm: 'clip' }}
@@ -21,6 +21,7 @@ const CopyText = ({ text }: { text: string }) => {
         h="fit-content"
         py={0}
         my={0}
+        size={size}
         _hover={{ backgroundColor: 'transparent' }}
         icon={<FiCopy size="1.3em" />}
         onClick={() => navigator.clipboard.writeText(text || '')}
