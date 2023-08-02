@@ -409,10 +409,10 @@ export const Prescription = () => {
               Canceling a prescription will prevent any team member from adding the prescription
               fills in a new order.
             </Text>
-            {rx.state !== 'ACTIVE' && (
+            {rx?.state && rx.state !== 'ACTIVE' && (
               <Alert colorScheme="gray">
                 <AlertIcon />
-                This prescription has been canceled
+                This prescription has been {rx?.state?.toLowerCase()}
               </Alert>
             )}
             <Button
