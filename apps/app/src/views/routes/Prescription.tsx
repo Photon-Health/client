@@ -147,6 +147,8 @@ export const Prescription = () => {
     );
   }
 
+  const canDuplicate = !(loading || rx.state === types.PrescriptionState.Canceled);
+
   return (
     <Page header="Prescription">
       <Card>
@@ -206,7 +208,7 @@ export const Prescription = () => {
                 leftIcon={<FiRepeat />}
                 aria-label="Duplicate Prescription"
                 onClick={() => {
-                  if (!(loading || rx.state === types.PrescriptionState.Active)) {
+                  if (canDuplicate) {
                     navigate(
                       `/prescriptions/new?prescriptionIds=${id}${
                         patient?.id ? `&patientId=${patient?.id}` : ''
@@ -214,7 +216,7 @@ export const Prescription = () => {
                     );
                   }
                 }}
-                isDisabled={loading || rx.state === types.PrescriptionState.Active}
+                isDisabled={!canDuplicate}
                 colorScheme="blue"
                 size="sm"
                 role="link"
