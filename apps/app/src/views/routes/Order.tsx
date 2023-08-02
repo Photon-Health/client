@@ -124,6 +124,7 @@ export const Order = () => {
   const [accessToken, setAccessToken] = useState('');
   const [canceling, setCanceling] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [pharmacyId, setPharmacyId] = useState('');
 
   const {
     isOpen: isOpenLocation,
@@ -291,16 +292,37 @@ export const Order = () => {
                             updatePreferredPharmacy={false}
                             setUpdatePreferredPharmacy={() => {}}
                             preferredPharmacyIds={[]}
-                            setFieldValue={() => {}}
+                            setFieldValue={(_, id) => {
+                              setPharmacyId(id);
+                            }}
                             resetSelection={() => {}}
                           />
                         </ModalBody>
 
                         <ModalFooter>
-                          <Button variant="solid" size="sm" mr={3} onClick={onClose}>
+                          <Button
+                            aria-label="Close Pharmacy Select Modal"
+                            variant="solid"
+                            size="sm"
+                            mr={3}
+                            onClick={() => {
+                              setPharmacyId('');
+                              onClose();
+                            }}
+                          >
                             Close
                           </Button>
-                          <Button variant="solid" colorScheme="blue" size="sm" disabled>
+                          <Button
+                            aria-label="Set Pharmacy"
+                            variant="solid"
+                            colorScheme="blue"
+                            size="sm"
+                            isDisabled={!pharmacyId}
+                            onClick={() => {
+                              setPharmacyId('');
+                              onClose();
+                            }}
+                          >
                             Set Pharmacy
                           </Button>
                         </ModalFooter>

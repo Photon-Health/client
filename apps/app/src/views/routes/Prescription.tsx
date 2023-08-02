@@ -96,6 +96,7 @@ export const Prescription = () => {
     patient,
     dispenseAsWritten,
     dispenseQuantity,
+    dispenseUnit,
     fillsAllowed,
     fillsRemaining,
     daysSupply,
@@ -238,7 +239,7 @@ export const Prescription = () => {
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text fontSize="md">
-                  {dispenseQuantity} ct / {daysSupply} day
+                  {dispenseQuantity} {dispenseUnit} / {daysSupply} day
                 </Text>
               )}
             </InfoGrid>
