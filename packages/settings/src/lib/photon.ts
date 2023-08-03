@@ -149,5 +149,11 @@ export const photon: {
     ...defaultSettings,
     logo: 'carbon_health_logo.svg',
     accentColor: '#000000'
+  },
+  // Sana Care
+  org_boRh5PcUzFhvyiue: {
+    ...defaultSettings,
+    logo: 'sana_care_logo.png',
+    accentColor: '#FBCC45'
   }
 };
