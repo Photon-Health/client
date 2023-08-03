@@ -583,7 +583,8 @@ export type PrescriptionInput = {
 export enum PrescriptionState {
   Active = 'ACTIVE',
   Depleted = 'DEPLETED',
-  Expired = 'EXPIRED'
+  Expired = 'EXPIRED',
+  Canceled = 'CANCELED'
 }
 
 export type PrescriptionTemplate = {
