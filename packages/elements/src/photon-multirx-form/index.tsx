@@ -18,13 +18,7 @@ import { createEffect, onMount, createSignal, Show, For } from 'solid-js';
 import type { FormError } from '../stores/form';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
-import {
-  Order,
-  Patient,
-  Prescription,
-  PrescriptionTemplate,
-  SexType
-} from '@photonhealth/sdk/dist/types';
+import { Order, Prescription, PrescriptionTemplate, SexType } from '@photonhealth/sdk/dist/types';
 import { AddPrescriptionCard } from './components/AddPrescriptionCard';
 import { PatientCard } from './components/PatientCard';
 import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
