@@ -1,4 +1,4 @@
-import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
 import { usePhoton } from '@photonhealth/react';
 import {
@@ -28,7 +28,7 @@ import {
   LinkOverlay,
   Show
 } from '@chakra-ui/react';
-import { FiChevronRight, FiPlus } from 'react-icons/fi';
+import { FiChevronRight, FiPlus, FiRepeat } from 'react-icons/fi';
 import { gql, GraphQLClient } from 'graphql-request';
 import dayjs from 'dayjs';
 
@@ -147,13 +147,37 @@ export const Prescription = () => {
     );
   }
 
+  const canDuplicate = !(loading || rx.state === types.PrescriptionState.Canceled);
+  const canCreateOrder = rx.state === types.PrescriptionState.Active;
+
   return (
     <Page header="Prescription">
       <Card>
         <CardHeader>
-          <Text fontWeight="medium">
-            {loading ? <Skeleton height="30px" width="250px" /> : prescription?.treatment?.name}
-          </Text>
+          <Stack direction={{ base: 'column', md: 'row' }} justify="space-between" width="full">
+            <Text fontWeight="medium">
+              {loading ? <Skeleton height="30px" width="250px" /> : prescription?.treatment?.name}
+            </Text>
+            <Button
+              leftIcon={<FiRepeat />}
+              aria-label="Duplicate Prescription"
+              onClick={() => {
+                if (canDuplicate) {
+                  navigate(
+                    `/prescriptions/new?prescriptionIds=${id}${
+                      patient?.id ? `&patientId=${patient?.id}` : ''
+                    }`
+                  );
+                }
+              }}
+              isDisabled={!canDuplicate}
+              colorScheme="blue"
+              size="sm"
+              role="link"
+            >
+              Duplicate Prescription
+            </Button>
+          </Stack>
         </CardHeader>
         <Divider color="gray.100" />
         <CardBody>
@@ -198,9 +222,11 @@ export const Prescription = () => {
             </Stack>
 
             <Divider />
+
             <Text color="gray.500" fontWeight="medium" fontSize="sm">
               Prescription Details
             </Text>
+
             <InfoGrid name="Instructions">
               {loading ? (
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
@@ -299,13 +325,19 @@ export const Prescription = () => {
                 <Button
                   leftIcon={<FiPlus />}
                   aria-label="New Order"
-                  as={RouterLink}
-                  to={`/orders/new?prescriptionId=${id}${
-                    patient?.id ? `&patientId=${patient?.id}` : ''
-                  }`}
-                  isDisabled={rx.state === types.PrescriptionState.Depleted}
+                  onClick={() => {
+                    if (canCreateOrder) {
+                      navigate(
+                        `/orders/new?prescriptionId=${id}${
+                          patient?.id ? `&patientId=${patient?.id}` : ''
+                        }`
+                      );
+                    }
+                  }}
+                  isDisabled={!canCreateOrder}
                   colorScheme="blue"
                   size="sm"
+                  role="link"
                 >
                   Create Order
                 </Button>
@@ -409,10 +441,10 @@ export const Prescription = () => {
               Canceling a prescription will prevent any team member from adding the prescription
               fills in a new order.
             </Text>
-            {rx.state !== 'ACTIVE' && (
+            {rx?.state && rx.state !== 'ACTIVE' && (
               <Alert colorScheme="gray">
                 <AlertIcon />
-                This prescription has been canceled
+                This prescription has been {rx?.state?.toLowerCase()}
               </Alert>
             )}
             <Button

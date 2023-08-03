@@ -1,6 +1,6 @@
 import { createMemo } from 'solid-js';
 import { PharmacySelect } from '@photonhealth/components';
-
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
 export const OrderCard = (props: {
   store: Record<string, any>;
   actions: Record<string, (...args: any) => any>;
@@ -23,6 +23,7 @@ export const OrderCard = (props: {
 
   return (
     <photon-card>
+      <style>{photonStyles}</style>
       <div class="flex flex-row">
         <p class="font-sans text-l font-medium flex-grow">Select Pharmacy</p>
       </div>
