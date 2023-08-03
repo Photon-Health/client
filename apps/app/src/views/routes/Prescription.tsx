@@ -148,6 +148,7 @@ export const Prescription = () => {
   }
 
   const canDuplicate = !(loading || rx.state === types.PrescriptionState.Canceled);
+  const canCreateOrder = rx.state === types.PrescriptionState.Active;
 
   return (
     <Page header="Prescription">
@@ -323,7 +324,7 @@ export const Prescription = () => {
                   leftIcon={<FiPlus />}
                   aria-label="New Order"
                   onClick={() => {
-                    if (rx.state !== types.PrescriptionState.Depleted) {
+                    if (canCreateOrder) {
                       navigate(
                         `/orders/new?prescriptionId=${id}${
                           patient?.id ? `&patientId=${patient?.id}` : ''
@@ -331,7 +332,7 @@ export const Prescription = () => {
                       );
                     }
                   }}
-                  isDisabled={rx.state === types.PrescriptionState.Depleted}
+                  isDisabled={!canCreateOrder}
                   colorScheme="blue"
                   size="sm"
                   role="link"
