@@ -57,6 +57,7 @@ customElement(
   'photon-prescribe-workflow',
   {
     patientId: undefined,
+    patient: undefined,
     templateIds: undefined,
     prescriptionIds: undefined,
     hideSubmit: false,
@@ -254,6 +255,82 @@ customElement(
         fetchAndDisplayTemplates();
       } else if (props.prescriptionIds && client) {
         fetchAndDisplayPrescriptions();
+      }
+    });
+
+    const setPatientToForm = (patient: any) => {
+      // set up patient and return
+      actions.updateFormValue({
+        key: 'patient',
+        value: patient
+      });
+      if (patient?.address) {
+        actions.updateFormValue({
+          key: 'address',
+          value: patient?.address
+        });
+      }
+    };
+
+    const fetchOrCreatePatient = async () => {
+      const { data } = await client!.getSDK().clinical.patient.getPatients({
+        name: `${props?.patient?.firstName} ${props?.patient?.lastName}`
+      });
+
+      if (data.patients.length > 0) {
+        // Patient already exists
+        const patient = data.patients.find(
+          (patient) => props?.patient?.externalId === patient.externalId
+        );
+
+        if (patient) {
+          return setPatientToForm(patient);
+        }
+      }
+
+      // Else create patient
+      const createPatientMutation = client!.getSDK().clinical.patient.createPatient({});
+      const mutation = await createPatientMutation({
+        variables: {
+          externalId: props?.patient?.externalId,
+          name: {
+            first: props?.patient?.firstName,
+            last: props?.patient?.lastName
+          },
+          sex: props?.patient?.sex,
+          dateOfBirth: props?.patient?.dateOfBirth,
+          phone: props?.patient?.phone,
+          email: props?.patient?.email || '',
+          ...(props?.address
+            ? {
+                address: {
+                  street1: props?.address?.street1,
+                  street2: props?.address?.street2,
+                  city: props?.address?.city,
+                  state: props?.address?.state,
+                  postalCode: props?.address?.postalCode,
+                  country: props?.address?.country || 'US'
+                }
+              }
+            : {})
+        },
+        awaitRefetchQueries: false
+      });
+      if (mutation?.data?.createPatient) {
+        return setPatientToForm(mutation?.data?.createPatient);
+      } else {
+        return console.error('Error creating patient', mutation?.errors);
+      }
+    };
+
+    createEffect(() => {
+      if (props.patient && client) {
+        if (props.patientId) {
+          console.error('Cannot set both patient and patientId');
+          return;
+        }
+
+        fetchOrCreatePatient();
       }
     });
 
