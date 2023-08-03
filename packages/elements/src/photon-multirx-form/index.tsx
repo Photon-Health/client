@@ -18,7 +18,13 @@ import { createEffect, onMount, createSignal, Show, For } from 'solid-js';
 import type { FormError } from '../stores/form';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
-import { Order, Prescription, PrescriptionTemplate, SexType } from '@photonhealth/sdk/dist/types';
+import {
+  Order,
+  Patient,
+  Prescription,
+  PrescriptionTemplate,
+  SexType
+} from '@photonhealth/sdk/dist/types';
 import { AddPrescriptionCard } from './components/AddPrescriptionCard';
 import { PatientCard } from './components/PatientCard';
 import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
@@ -53,6 +59,25 @@ const CATALOG_TREATMENTS_FIELDS = gql`
   }
 `;
 
+export interface PrescribePatient {
+  externalId: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  sex: SexType;
+  phone: string;
+  email?: string;
+}
+
+export interface PrescribeAddress {
+  city: string;
+  postalCode: string;
+  state: string;
+  street1: string;
+  street2?: string;
+  country?: string;
+}
+
 customElement(
   'photon-prescribe-workflow',
   {
@@ -73,15 +98,7 @@ customElement(
   (
     props: {
       patientId?: string;
-      patient?: {
-        externalId: string;
-        firstName: string;
-        lastName: string;
-        dateOfBirth: string;
-        sex: SexType;
-        phone: string;
-        email?: string;
-      };
+      patient?: PrescribePatient;
       templateIds?: string;
       prescriptionIds?: string;
       hideSubmit: boolean;
@@ -92,14 +109,7 @@ customElement(
       mailOrderIds?: string;
       pharmacyId?: string;
       loading: boolean;
-      address?: {
-        city: string;
-        postalCode: string;
-        state: string;
-        street1: string;
-        street2?: string;
-        country?: string;
-      };
+      address?: PrescribeAddress;
     },
     options
   ) => {
@@ -255,82 +265,6 @@ customElement(
         fetchAndDisplayTemplates();
       } else if (props.prescriptionIds && client) {
         fetchAndDisplayPrescriptions();
-      }
-    });
-
-    const setPatientToForm = (patient: any) => {
-      // set up patient and return
-      actions.updateFormValue({
-        key: 'patient',
-        value: patient
-      });
-      if (patient?.address) {
-        actions.updateFormValue({
-          key: 'address',
-          value: patient?.address
-        });
-      }
-    };
-
-    const fetchOrCreatePatient = async () => {
-      const { data } = await client!.getSDK().clinical.patient.getPatients({
-        name: `${props?.patient?.firstName} ${props?.patient?.lastName}`
-      });
-
-      if (data.patients.length > 0) {
-        // Patient already exists
-        const patient = data.patients.find(
-          (patient) => props?.patient?.externalId === patient.externalId
-        );
-
-        if (patient) {
-          return setPatientToForm(patient);
-        }
-      }
-
-      // Else create patient
-      const createPatientMutation = client!.getSDK().clinical.patient.createPatient({});
-      const mutation = await createPatientMutation({
-        variables: {
-          externalId: props?.patient?.externalId,
-          name: {
-            first: props?.patient?.firstName,
-            last: props?.patient?.lastName
-          },
-          sex: props?.patient?.sex,
-          dateOfBirth: props?.patient?.dateOfBirth,
-          phone: props?.patient?.phone,
-          email: props?.patient?.email || '',
-          ...(props?.address
-            ? {
-                address: {
-                  street1: props?.address?.street1,
-                  street2: props?.address?.street2,
-                  city: props?.address?.city,
-                  state: props?.address?.state,
-                  postalCode: props?.address?.postalCode,
-                  country: props?.address?.country || 'US'
-                }
-              }
-            : {})
-        },
-        awaitRefetchQueries: false
-      });
-      if (mutation?.data?.createPatient) {
-        return setPatientToForm(mutation?.data?.createPatient);
-      } else {
-        return console.error('Error creating patient', mutation?.errors);
-      }
-    };
-
-    createEffect(() => {
-      if (props.patient && client) {
-        if (props.patientId) {
-          console.error('Cannot set both patient and patientId');
-          return;
-        }
-
-        fetchOrCreatePatient();
       }
     });
 
@@ -527,7 +461,8 @@ customElement(
               <PatientCard
                 actions={actions}
                 store={store}
-                patientId={props.patientId}
+                patientId={props?.patientId}
+                patient={props?.patient}
                 client={client!}
                 enableOrder={props.enableOrder}
                 hideAddress={!!props.address}

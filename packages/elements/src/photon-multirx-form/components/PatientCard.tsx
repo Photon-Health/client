@@ -1,9 +1,10 @@
 import { message } from '../../validators';
 import { string, any, record } from 'superstruct';
-import { createSignal, onMount, Show, createEffect } from 'solid-js';
+import { createSignal, onMount, Show, createEffect, createMemo } from 'solid-js';
 import { PatientStore } from '../../stores/patient';
 import { PhotonClientStore } from '../../store';
 import { formatDate } from '../../utils';
+import { PrescribeAddress, PrescribePatient } from '..';
 
 const patientValidator = message(record(string(), any()), 'Please select a patient...');
 
@@ -16,6 +17,8 @@ export const PatientCard = (props: {
   store: Record<string, any>;
   actions: Record<string, (...args: any) => any>;
   patientId?: string;
+  patient?: PrescribePatient;
+  address?: PrescribeAddress;
   client?: PhotonClientStore;
   enableOrder?: boolean;
   hideAddress?: boolean;
@@ -50,15 +53,71 @@ export const PatientCard = (props: {
     }
   };
 
+  const fetchOrCreatePatient = async () => {
+    const { data } = await props.client!.getSDK().clinical.patient.getPatients({
+      name: `${props?.patient?.firstName} ${props?.patient?.lastName}`
+    });
+
+    if (data.patients.length > 0) {
+      // Patient already exists
+      const patient = data.patients.find(
+        (patient) => props?.patient?.externalId === patient.externalId
+      );
+
+      if (patient) {
+        return actions.setSelectedPatient(patient);
+      }
+    }
+
+    // Else create patient
+    const createPatientMutation = props.client!.getSDK().clinical.patient.createPatient({});
+    const mutation = await createPatientMutation({
+      variables: {
+        externalId: props?.patient?.externalId,
+        name: {
+          first: props?.patient?.firstName,
+          last: props?.patient?.lastName
+        },
+        sex: props?.patient?.sex,
+        dateOfBirth: props?.patient?.dateOfBirth,
+        phone: props?.patient?.phone,
+        email: props?.patient?.email || '',
+        ...(props?.address
+          ? {
+              address: {
+                street1: props?.address?.street1,
+                street2: props?.address?.street2,
+                city: props?.address?.city,
+                state: props?.address?.state,
+                postalCode: props?.address?.postalCode,
+                country: props?.address?.country || 'US'
+              }
+            }
+          : {})
+      },
+      awaitRefetchQueries: false
+    });
+    if (mutation?.data?.createPatient) {
+      return actions.setSelectedPatient(mutation?.data?.createPatient);
+    }
+    console.error('Error creating patient', mutation?.errors || '');
+  };
+
   onMount(() => {
     if (props?.patientId) {
       // fetch patient on mount when patientId is passed
-      actions.getSelectedPatient(props.client!.getSDK(), props.patientId);
+      return actions.getSelectedPatient(props.client!.getSDK(), props.patientId);
+    }
+    if (props?.patient) {
+      // fetch or create patient when patient is passed
+      return fetchOrCreatePatient();
     }
   });
 
+  const hasProvidedPatient = createMemo(() => props?.patientId || props?.patient);
+
   createEffect(() => {
-    if (store?.selectedPatient?.data && props?.patientId) {
+    if (store?.selectedPatient?.data && hasProvidedPatient()) {
       // update patient when passed-in patient (patientId) is fetched
       updatePatient({ detail: { patient: store?.selectedPatient?.data } });
     }
@@ -68,10 +127,10 @@ export const PatientCard = (props: {
     <photon-card>
       <div class="flex flex-col gap-3">
         <p class="font-sans text-l font-medium">
-          {props?.patientId ? 'Patient' : 'Select Patient'}
+          {hasProvidedPatient() ? 'Patient' : 'Select Patient'}
         </p>
-        {/* Show Dropdown when no patientId is passed */}
-        <Show when={!props?.patientId}>
+        {/* Show Dropdown when no patient is passed */}
+        <Show when={!hasProvidedPatient()}>
           <photon-patient-select
             invalid={props.store['patient']?.error ?? false}
             help-text={props.store['patient']?.error}
@@ -80,8 +139,8 @@ export const PatientCard = (props: {
             sdk={props.client!.getSDK()}
           />
         </Show>
-        {/* Show Patient Name when patientId is passed */}
-        <Show when={props?.patientId}>
+        {/* Show Patient Name when patient is passed */}
+        <Show when={hasProvidedPatient()}>
           <Show
             when={store?.selectedPatient?.data?.id}
             fallback={<sl-spinner style={{ 'font-size': '1rem' }} />}
