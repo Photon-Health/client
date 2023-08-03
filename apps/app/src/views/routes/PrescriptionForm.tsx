@@ -60,7 +60,6 @@ export const PrescriptionForm = () => {
         zIndex: 15
       }}
     >
-      {prescriptionIds}
       <photon-multirx-form-wrapper
         ref={ref}
         template-ids={templateIds}
