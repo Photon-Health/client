@@ -297,14 +297,15 @@ export const Order = () => {
               pt={5}
               justify="space-between"
               width="full"
+              alignItems={{ base: 'start', md: 'center' }}
             >
               <Text fontWeight="medium" fontSize="md">
                 Pharmacy Information
               </Text>
               {order?.state === types.OrderState.Routing ? (
                 <>
-                  <Button onClick={onOpen} size="xs" colorScheme="blue">
-                    Select a Pharmacy
+                  <Button onClick={onOpen} size="sm" colorScheme="blue">
+                    Select Pharmacy
                   </Button>
                   <LocationSearch
                     isOpen={isOpenLocation}
@@ -505,7 +506,7 @@ export const Order = () => {
               pt={5}
               justify="space-between"
               width="full"
-              spacing={10}
+              spacing={{ base: 4, md: 10 }}
             >
               <VStack align="start">
                 <Text fontWeight="medium" fontSize="md">

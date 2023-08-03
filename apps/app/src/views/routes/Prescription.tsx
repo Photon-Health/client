@@ -156,28 +156,23 @@ export const Prescription = () => {
       <Card>
         <CardHeader>
           <Stack direction={{ base: 'column', md: 'row' }} justify="space-between" width="full">
-            <Text fontWeight="medium">
-              {loading ? <Skeleton height="30px" width="250px" /> : prescription?.treatment?.name}
-            </Text>
-            <Button
-              leftIcon={<FiRepeat />}
-              aria-label="Duplicate Prescription"
-              onClick={() => {
-                if (canDuplicate) {
-                  navigate(
-                    `/prescriptions/new?prescriptionIds=${id}${
-                      patient?.id ? `&patientId=${patient?.id}` : ''
-                    }`
-                  );
-                }
-              }}
-              isDisabled={!canDuplicate}
-              colorScheme="blue"
-              size="sm"
-              role="link"
+            <Stack
+              direction={{ base: 'column', md: 'row' }}
+              align={{ base: 'start', md: 'center' }}
+              spacing={2}
             >
-              Duplicate Prescription
-            </Button>
+              <Text fontWeight="medium">
+                {loading ? <Skeleton height="30px" width="250px" /> : prescription?.treatment?.name}
+              </Text>
+              {loading ? (
+                <Skeleton width="70px" height="24px" borderRadius="xl" />
+              ) : (
+                <Tooltip label={stateTip}>
+                  <Badge colorScheme={stateColor}>{state}</Badge>
+                </Tooltip>
+              )}
+            </Stack>
+            <CopyText size="xs" text={id || ''} />
           </Stack>
         </CardHeader>
         <Divider color="gray.100" />
@@ -203,6 +198,22 @@ export const Prescription = () => {
                   <PatientView patient={patient} />
                 )}
               </VStack>
+
+              <Show above="sm">
+                <Divider orientation="vertical" height="auto" />
+              </Show>
+
+              <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
+                <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                  Written
+                </Text>
+                {loading ? (
+                  <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                ) : (
+                  <Text fontSize="md">{writtenAt}</Text>
+                )}
+              </VStack>
+
               <Show above="sm">
                 <Divider orientation="vertical" height="auto" />
               </Show>
@@ -222,11 +233,39 @@ export const Prescription = () => {
               </VStack>
             </Stack>
 
-            <Divider />
+            <Stack
+              direction={{ base: 'column', md: 'row' }}
+              align={{ base: 'start', md: 'stretch' }}
+              pt={5}
+              justify="space-between"
+              width="full"
+              alignItems={{ base: 'start', md: 'center' }}
+            >
+              <Text fontWeight="medium" fontSize="md">
+                Prescription
+              </Text>
+              <Button
+                leftIcon={<FiRepeat />}
+                aria-label="Duplicate Prescription"
+                onClick={() => {
+                  if (canDuplicate) {
+                    navigate(
+                      `/prescriptions/new?prescriptionIds=${id}${
+                        patient?.id ? `&patientId=${patient?.id}` : ''
+                      }`
+                    );
+                  }
+                }}
+                isDisabled={!canDuplicate}
+                colorScheme="blue"
+                size="sm"
+                role="link"
+              >
+                Renew
+              </Button>
+            </Stack>
 
-            <Text color="gray.500" fontWeight="medium" fontSize="sm">
-              Prescription Details
-            </Text>
+            <Divider />
 
             <InfoGrid name="Instructions">
               {loading ? (
@@ -247,16 +286,6 @@ export const Prescription = () => {
                 >
                   {rx?.notes ? rx.notes : 'None'}
                 </Text>
-              )}
-            </InfoGrid>
-
-            <InfoGrid name="Status">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-              ) : (
-                <Tooltip label={stateTip}>
-                  <Badge colorScheme={stateColor}>{state}</Badge>
-                </Tooltip>
               )}
             </InfoGrid>
 
@@ -299,14 +328,6 @@ export const Prescription = () => {
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text fontSize="md">{expirationDate}</Text>
-              )}
-            </InfoGrid>
-
-            <InfoGrid name="Written">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-              ) : (
-                <Text fontSize="md">{writtenAt}</Text>
               )}
             </InfoGrid>
 
