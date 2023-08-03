@@ -464,6 +464,7 @@ customElement(
                 patientId={props?.patientId}
                 patient={props?.patient}
                 client={client!}
+                address={props?.address}
                 enableOrder={props.enableOrder}
                 hideAddress={!!props.address}
               />
