@@ -162,7 +162,7 @@ customElement(
       setIsLoadingTemplates(true);
       const ids = props?.templateIds?.split(',') || [];
       if (ids.length === 0) {
-        return null;
+        return;
       }
       // TODO: Should just get the template directly but not supported by the SDK
       const {
@@ -217,7 +217,7 @@ customElement(
       setIsLoadingTemplates(true);
       const ids = props?.prescriptionIds?.split(',') || [];
       if (ids.length === 0) {
-        return null;
+        return;
       }
 
       try {
