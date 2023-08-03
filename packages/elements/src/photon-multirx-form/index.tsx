@@ -18,7 +18,7 @@ import { createEffect, onMount, createSignal, Show, For } from 'solid-js';
 import type { FormError } from '../stores/form';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
-import { Order, Prescription, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
+import { Order, Prescription, PrescriptionTemplate, SexType } from '@photonhealth/sdk/dist/types';
 import { AddPrescriptionCard } from './components/AddPrescriptionCard';
 import { PatientCard } from './components/PatientCard';
 import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
@@ -71,6 +71,15 @@ customElement(
   (
     props: {
       patientId?: string;
+      patient?: {
+        externalId: string;
+        firstName: string;
+        lastName: string;
+        dateOfBirth: string;
+        sex: SexType;
+        phone: string;
+        email?: string;
+      };
       templateIds?: string;
       hideSubmit: boolean;
       hideTemplates: boolean;
