@@ -154,9 +154,30 @@ export const Prescription = () => {
     <Page header="Prescription">
       <Card>
         <CardHeader>
-          <Text fontWeight="medium">
-            {loading ? <Skeleton height="30px" width="250px" /> : prescription?.treatment?.name}
-          </Text>
+          <Stack direction={{ base: 'column', md: 'row' }} justify="space-between" width="full">
+            <Text fontWeight="medium">
+              {loading ? <Skeleton height="30px" width="250px" /> : prescription?.treatment?.name}
+            </Text>
+            <Button
+              leftIcon={<FiRepeat />}
+              aria-label="Duplicate Prescription"
+              onClick={() => {
+                if (canDuplicate) {
+                  navigate(
+                    `/prescriptions/new?prescriptionIds=${id}${
+                      patient?.id ? `&patientId=${patient?.id}` : ''
+                    }`
+                  );
+                }
+              }}
+              isDisabled={!canDuplicate}
+              colorScheme="blue"
+              size="sm"
+              role="link"
+            >
+              Duplicate Prescription
+            </Button>
+          </Stack>
         </CardHeader>
         <Divider color="gray.100" />
         <CardBody>
@@ -201,30 +222,11 @@ export const Prescription = () => {
             </Stack>
 
             <Divider />
-            <HStack justifyContent="space-between" width="100%">
-              <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                Prescription Details
-              </Text>
-              <Button
-                leftIcon={<FiRepeat />}
-                aria-label="Duplicate Prescription"
-                onClick={() => {
-                  if (canDuplicate) {
-                    navigate(
-                      `/prescriptions/new?prescriptionIds=${id}${
-                        patient?.id ? `&patientId=${patient?.id}` : ''
-                      }`
-                    );
-                  }
-                }}
-                isDisabled={!canDuplicate}
-                colorScheme="blue"
-                size="sm"
-                role="link"
-              >
-                Duplicate Prescription
-              </Button>
-            </HStack>
+
+            <Text color="gray.500" fontWeight="medium" fontSize="sm">
+              Prescription Details
+            </Text>
+
             <InfoGrid name="Instructions">
               {loading ? (
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
