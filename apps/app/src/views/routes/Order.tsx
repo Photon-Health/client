@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
 import {
   Alert,
@@ -36,7 +36,6 @@ import {
   ModalFooter,
   Show
 } from '@chakra-ui/react';
-import { gql, GraphQLClient } from 'graphql-request';
 import { usePhoton, types } from '@photonhealth/react';
 import { FiChevronRight } from 'react-icons/fi';
 import { Page } from '../components/Page';
@@ -55,19 +54,92 @@ import { OrderState } from 'packages/sdk/dist/types';
 import { LocalPickup } from './NewOrder/components/SelectPharmacyCard/components/LocalPickup';
 import { LocationResults, LocationSearch } from '../components/LocationSearch';
 import SectionTitleRow from '../components/SectionTitleRow';
-export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
-  jsonSerializer: {
-    parse: JSON.parse,
-    stringify: JSON.stringify
-  }
-});
-export const CANCEL_ORDER = gql`
-  mutation cancel($id: ID!) {
-    cancelOrder(id: $id) {
+import { gql, useMutation, useQuery } from '@apollo/client';
+
+const GET_ORDER = gql`
+  query GetOrder($id: ID!) {
+    order(id: $id) {
+      __typename
       id
+      externalId
+      state
+      fills {
+        id
+        prescription {
+          id
+        }
+        treatment {
+          name
+        }
+        state
+        requestedAt
+        filledAt
+      }
+      patient {
+        id
+        externalId
+        name {
+          full
+        }
+        dateOfBirth
+        sex
+        gender
+        email
+        phone
+        address {
+          name {
+            full
+          }
+          city
+          country
+          postalCode
+          state
+          street1
+          street2
+        }
+      }
+      pharmacy {
+        id
+        name
+        phone
+        address {
+          city
+          country
+          postalCode
+          state
+          street1
+          street2
+        }
+      }
+      fulfillment {
+        type
+        state
+        carrier
+        trackingNumber
+      }
+      createdAt
     }
   }
 `;
+const CANCEL_ORDER = gql`
+  mutation cancel($id: ID!) {
+    cancelOrder(id: $id) {
+      __typename
+      id
+      state
+    }
+  }
+`;
+const UPDATE_ORDER_PHARMACY = gql`
+  mutation UpdateOrderPharmacy($id: ID!) {
+    updateOrder(id: $id) {
+      __typename
+      id
+      externalId
+    }
+  }
+`;
+
 export const ORDER_FULFILLMENT_TYPE_MAP = {
   [types.FulfillmentType.PickUp]: 'Pick up',
   [types.FulfillmentType.MailOrder]: 'Mail order'
@@ -119,13 +191,36 @@ const CancelOrderAlert = ({
 export const Order = () => {
   const params = useParams();
   const id = params.orderId;
-  const { getOrder, getToken } = usePhoton();
-  const { order, loading, error } = getOrder({ id: id! });
+  const { getToken } = usePhoton();
   const [accessToken, setAccessToken] = useState('');
-  const [canceling, setCanceling] = useState(false);
+  const [updating, setUpdating] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [pharmacyId, setPharmacyId] = useState('');
-
+  const { data, loading, error } = useQuery(GET_ORDER, { variables: { id: id! } });
+  const [cancelOrder] = useMutation(CANCEL_ORDER, {
+    update: (cache) => {
+      // TODO manually updating, this can be automatic
+      // but current mutation returns wrong data https://www.notion.so/photons/Successful-Cancel-Order-Returns-Incorrect-State-6bca56ec94cf49d88246730f002500fd?pvs=4
+      const existingOrder: { order: types.Order } | null = cache.readQuery({
+        query: GET_ORDER,
+        variables: { id: id! }
+      });
+      if (existingOrder && existingOrder.order) {
+        cache.writeQuery({
+          query: GET_ORDER,
+          data: {
+            order: {
+              ...existingOrder?.order,
+              state: types.OrderState.Canceled
+            }
+          },
+          variables: { id: id! }
+        });
+      }
+    }
+  });
+  const [updateOrderPharmacy] = useMutation(UPDATE_ORDER_PHARMACY);
+  const order = data?.order;
   const {
     isOpen: isOpenLocation,
     onOpen: onOpenLocation,
@@ -137,7 +232,6 @@ export const Order = () => {
     loc: ''
   });
   const geocoder = new google.maps.Geocoder();
-  const navigate = useNavigate();
   const getAccessToken = async () => {
     try {
       const token = await getToken();
@@ -351,9 +445,15 @@ export const Order = () => {
                             variant="solid"
                             colorScheme="blue"
                             size="sm"
+                            isLoading={updating}
+                            loadingText="Setting Pharmacy..."
                             isDisabled={!pharmacyId}
-                            onClick={() => {
+                            onClick={async () => {
+                              setUpdating(true);
+                              console.log('SETTING PHARMACY', pharmacyId);
+                              await updateOrderPharmacy({ variables: { id } });
                               setPharmacyId('');
+                              setUpdating(false);
                               onClose();
                             }}
                           >
@@ -503,7 +603,7 @@ export const Order = () => {
                   textColor="red.500"
                   colorScheme="red"
                   size="sm"
-                  isLoading={canceling}
+                  isLoading={updating}
                   loadingText="Canceling..."
                   isDisabled={
                     loading ||
@@ -519,10 +619,9 @@ export const Order = () => {
                       colorScheme: 'red'
                     });
                     if (decision) {
-                      setCanceling(true);
-                      graphQLClient.setHeader('authorization', accessToken);
-                      await graphQLClient.request(CANCEL_ORDER, { id });
-                      navigate(0);
+                      setUpdating(true);
+                      await cancelOrder({ variables: { id } });
+                      setUpdating(false);
                     }
                   }}
                 >

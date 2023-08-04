@@ -23,7 +23,7 @@ const SectionTitleRow: React.FC<SectionTitleRowProps> = ({
         alignItems={{ base: 'start', md: 'center' }}
       >
         <VStack align="start" spacing={0}>
-          <Text fontWeight="medium" fontSize="md">
+          <Text fontWeight="medium" fontSize="lg">
             {headerText}
           </Text>
           {subHeaderText ? <Text fontSize="sm">{subHeaderText}</Text> : null}
