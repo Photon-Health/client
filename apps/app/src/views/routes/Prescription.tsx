@@ -48,6 +48,7 @@ import { types } from '@photonhealth/sdk';
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
+import SectionTitleRow from '../components/SectionTitleRow';
 
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
@@ -233,39 +234,30 @@ export const Prescription = () => {
               </VStack>
             </Stack>
 
-            <Stack
-              direction={{ base: 'column', md: 'row' }}
-              align={{ base: 'start', md: 'stretch' }}
-              pt={5}
-              justify="space-between"
-              width="full"
-              alignItems={{ base: 'start', md: 'center' }}
-            >
-              <Text fontWeight="medium" fontSize="md">
-                Prescription
-              </Text>
-              <Button
-                leftIcon={<FiRepeat />}
-                aria-label="Duplicate Prescription"
-                onClick={() => {
-                  if (canDuplicate) {
-                    navigate(
-                      `/prescriptions/new?prescriptionIds=${id}${
-                        patient?.id ? `&patientId=${patient?.id}` : ''
-                      }`
-                    );
-                  }
-                }}
-                isDisabled={!canDuplicate}
-                colorScheme="blue"
-                size="sm"
-                role="link"
-              >
-                Renew
-              </Button>
-            </Stack>
-
-            <Divider />
+            <SectionTitleRow
+              headerText="Prescription"
+              rightElement={
+                <Button
+                  leftIcon={<FiRepeat />}
+                  aria-label="Duplicate Prescription"
+                  onClick={() => {
+                    if (canDuplicate) {
+                      navigate(
+                        `/prescriptions/new?prescriptionIds=${id}${
+                          patient?.id ? `&patientId=${patient?.id}` : ''
+                        }`
+                      );
+                    }
+                  }}
+                  isDisabled={!canDuplicate}
+                  colorScheme="blue"
+                  size="sm"
+                  role="link"
+                >
+                  Renew
+                </Button>
+              }
+            />
 
             <InfoGrid name="Instructions">
               {loading ? (
@@ -351,38 +343,33 @@ export const Prescription = () => {
               )}
             </InfoGrid>
 
-            <HStack justifyContent="space-between" width="100%" pt={5}>
-              <VStack align="start" spacing={0}>
-                <Text fontWeight="medium" fontSize="md">
-                  Related Orders
-                </Text>
-                <Text fontSize="sm">
-                  Below are orders that include fills from this prescription.
-                </Text>
-              </VStack>
-              {loading ? null : (
-                <Button
-                  leftIcon={<FiPlus />}
-                  aria-label="New Order"
-                  onClick={() => {
-                    if (canCreateOrder) {
-                      navigate(
-                        `/orders/new?prescriptionId=${id}${
-                          patient?.id ? `&patientId=${patient?.id}` : ''
-                        }`
-                      );
-                    }
-                  }}
-                  isDisabled={!canCreateOrder}
-                  colorScheme="blue"
-                  size="sm"
-                  role="link"
-                >
-                  Create Order
-                </Button>
-              )}
-            </HStack>
-            <Divider />
+            <SectionTitleRow
+              headerText="Related Orders"
+              subHeaderText="Below are orders that include fills from this prescription."
+              rightElement={
+                loading ? undefined : (
+                  <Button
+                    leftIcon={<FiPlus />}
+                    aria-label="New Order"
+                    onClick={() => {
+                      if (canCreateOrder) {
+                        navigate(
+                          `/orders/new?prescriptionId=${id}${
+                            patient?.id ? `&patientId=${patient?.id}` : ''
+                          }`
+                        );
+                      }
+                    }}
+                    isDisabled={!canCreateOrder}
+                    colorScheme="blue"
+                    size="sm"
+                    role="link"
+                  >
+                    Create Order
+                  </Button>
+                )
+              }
+            />
 
             {loading ? (
               <SkeletonText skeletonHeight={5} noOfLines={1} width="100%" />
@@ -449,51 +436,40 @@ export const Prescription = () => {
               </>
             )}
 
-            <Stack
-              direction={{ base: 'column', md: 'row' }}
-              align={{ base: 'start', md: 'stretch' }}
-              pt={5}
-              justify="space-between"
-              width="full"
-              spacing={{ base: 4, md: 10 }}
-            >
-              <VStack align="start" spacing={0}>
-                <Text fontWeight="medium" fontSize="md">
-                  Actions
-                </Text>
-                <Text fontSize="sm">
-                  Canceling a prescription will prevent any team member from adding the prescription
-                  fills in a new order.
-                </Text>
-              </VStack>
-              <Button
-                aria-label="Cancel Prescription"
-                isDisabled={loading || rx.state !== 'ACTIVE'}
-                isLoading={canceling}
-                loadingText="Canceling..."
-                onClick={async () => {
-                  const decision = await confirmWrapper('Cancel this prescription?', {
-                    description: 'You will not be able to undo this action.',
-                    cancelText: "No, Don't Cancel",
-                    confirmText: 'Yes, Cancel',
-                    darkMode: colorMode !== 'light',
-                    colorScheme: 'red'
-                  });
-                  if (decision) {
-                    setCanceling(true);
-                    graphQLClient.setHeader('authorization', accessToken);
-                    await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
-                    navigate(0);
-                  }
-                }}
-                variant="outline"
-                textColor="red.500"
-                colorScheme="red"
-                size="sm"
-              >
-                Cancel Prescription
-              </Button>
-            </Stack>
+            <SectionTitleRow
+              headerText="Actions"
+              subHeaderText="Canceling a prescription will prevent any team member from adding the prescription
+                  fills in a new order."
+              rightElement={
+                <Button
+                  aria-label="Cancel Prescription"
+                  isDisabled={loading || rx.state !== 'ACTIVE'}
+                  isLoading={canceling}
+                  loadingText="Canceling..."
+                  onClick={async () => {
+                    const decision = await confirmWrapper('Cancel this prescription?', {
+                      description: 'You will not be able to undo this action.',
+                      cancelText: "No, Don't Cancel",
+                      confirmText: 'Yes, Cancel',
+                      darkMode: colorMode !== 'light',
+                      colorScheme: 'red'
+                    });
+                    if (decision) {
+                      setCanceling(true);
+                      graphQLClient.setHeader('authorization', accessToken);
+                      await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
+                      navigate(0);
+                    }
+                  }}
+                  variant="outline"
+                  textColor="red.500"
+                  colorScheme="red"
+                  size="sm"
+                >
+                  Cancel Prescription
+                </Button>
+              }
+            />
 
             {rx?.state && rx.state !== 'ACTIVE' && (
               <Alert colorScheme="gray">
@@ -501,7 +477,6 @@ export const Prescription = () => {
                 This prescription has been {rx?.state?.toLowerCase()}
               </Alert>
             )}
-            <Divider />
           </VStack>
         </CardBody>
       </Card>

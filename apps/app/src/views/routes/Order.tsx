@@ -54,6 +54,7 @@ import CopyText from '../components/CopyText';
 import { OrderState } from 'packages/sdk/dist/types';
 import { LocalPickup } from './NewOrder/components/SelectPharmacyCard/components/LocalPickup';
 import { LocationResults, LocationSearch } from '../components/LocationSearch';
+import SectionTitleRow from '../components/SectionTitleRow';
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
     parse: JSON.parse,
@@ -291,88 +292,80 @@ export const Order = () => {
               ) : null}
             </Stack>
 
-            <Stack
-              direction={{ base: 'column', md: 'row' }}
-              align={{ base: 'start', md: 'stretch' }}
-              pt={5}
-              justify="space-between"
-              width="full"
-              alignItems={{ base: 'start', md: 'center' }}
-            >
-              <Text fontWeight="medium" fontSize="md">
-                Pharmacy Information
-              </Text>
-              {order?.state === types.OrderState.Routing ? (
-                <>
-                  <Button onClick={onOpen} size="sm" colorScheme="blue">
-                    Select Pharmacy
-                  </Button>
-                  <LocationSearch
-                    isOpen={isOpenLocation}
-                    onClose={({ loc, lat, lng }) => {
-                      if (loc && lat && lng) {
-                        setLocation({ loc, lat, lng });
-                      }
-                      onCloseLocation();
-                    }}
-                  />
-                  <Modal isOpen={isOpen} onClose={onClose}>
-                    <ModalOverlay />
-                    <ModalContent>
-                      <ModalHeader>Select a Pharmacy</ModalHeader>
-                      <ModalCloseButton />
+            <SectionTitleRow
+              headerText="Pharmacy Information"
+              rightElement={
+                order?.state === types.OrderState.Routing ? (
+                  <>
+                    <Button onClick={onOpen} size="sm" colorScheme="blue">
+                      Select Pharmacy
+                    </Button>
+                    <LocationSearch
+                      isOpen={isOpenLocation}
+                      onClose={({ loc, lat, lng }) => {
+                        if (loc && lat && lng) {
+                          setLocation({ loc, lat, lng });
+                        }
+                        onCloseLocation();
+                      }}
+                    />
+                    <Modal isOpen={isOpen} onClose={onClose}>
+                      <ModalOverlay />
+                      <ModalContent>
+                        <ModalHeader>Select a Pharmacy</ModalHeader>
+                        <ModalCloseButton />
 
-                      <ModalBody>
-                        <LocalPickup
-                          location={location.loc}
-                          latitude={location.lat}
-                          longitude={location.lng}
-                          onOpen={onOpenLocation}
-                          patient={order.patient}
-                          pharmacyId=""
-                          updatePreferredPharmacy={false}
-                          setUpdatePreferredPharmacy={() => {}}
-                          preferredPharmacyIds={[]}
-                          setFieldValue={(_, id) => {
-                            setPharmacyId(id);
-                          }}
-                          resetSelection={() => {}}
-                        />
-                      </ModalBody>
+                        <ModalBody>
+                          <LocalPickup
+                            location={location.loc}
+                            latitude={location.lat}
+                            longitude={location.lng}
+                            onOpen={onOpenLocation}
+                            patient={order.patient}
+                            pharmacyId=""
+                            updatePreferredPharmacy={false}
+                            setUpdatePreferredPharmacy={() => {}}
+                            preferredPharmacyIds={[]}
+                            setFieldValue={(_, id) => {
+                              setPharmacyId(id);
+                            }}
+                            resetSelection={() => {}}
+                          />
+                        </ModalBody>
 
-                      <ModalFooter>
-                        <Button
-                          aria-label="Close Pharmacy Select Modal"
-                          variant="solid"
-                          size="sm"
-                          mr={3}
-                          onClick={() => {
-                            setPharmacyId('');
-                            onClose();
-                          }}
-                        >
-                          Close
-                        </Button>
-                        <Button
-                          aria-label="Set Pharmacy"
-                          variant="solid"
-                          colorScheme="blue"
-                          size="sm"
-                          isDisabled={!pharmacyId}
-                          onClick={() => {
-                            setPharmacyId('');
-                            onClose();
-                          }}
-                        >
-                          Set Pharmacy
-                        </Button>
-                      </ModalFooter>
-                    </ModalContent>
-                  </Modal>
-                </>
-              ) : null}
-            </Stack>
-            <Divider />
+                        <ModalFooter>
+                          <Button
+                            aria-label="Close Pharmacy Select Modal"
+                            variant="solid"
+                            size="sm"
+                            mr={3}
+                            onClick={() => {
+                              setPharmacyId('');
+                              onClose();
+                            }}
+                          >
+                            Close
+                          </Button>
+                          <Button
+                            aria-label="Set Pharmacy"
+                            variant="solid"
+                            colorScheme="blue"
+                            size="sm"
+                            isDisabled={!pharmacyId}
+                            onClick={() => {
+                              setPharmacyId('');
+                              onClose();
+                            }}
+                          >
+                            Set Pharmacy
+                          </Button>
+                        </ModalFooter>
+                      </ModalContent>
+                    </Modal>
+                  </>
+                ) : undefined
+              }
+            />
 
             {order?.state === types.OrderState.Routing ? (
               <Alert colorScheme="gray">
@@ -454,10 +447,8 @@ export const Order = () => {
               </>
             ) : null}
 
-            <Text fontWeight="medium" fontSize="md" pt={5}>
-              Prescription Fills
-            </Text>
-            <Divider />
+            <SectionTitleRow headerText="Prescription Fills" />
+
             {prescriptions.length > 0 ? (
               <>
                 {prescriptions.map((fill: any, i: number) => {
@@ -500,64 +491,52 @@ export const Order = () => {
                 No fills
               </Text>
             )}
-            <Stack
-              direction={{ base: 'column', md: 'row' }}
-              align={{ base: 'start', md: 'stretch' }}
-              pt={5}
-              justify="space-between"
-              width="full"
-              spacing={{ base: 4, md: 10 }}
-            >
-              <VStack align="start" spacing={0}>
-                <Text fontWeight="medium" fontSize="md">
-                  Actions
-                </Text>
-                <Text fontSize="sm">
-                  Canceling an order will send a cancellation notification to the pharmacy for any
-                  fills already sent to the pharmacy.
-                </Text>
-              </VStack>
 
-              <Button
-                aria-label="Cancel Order"
-                variant="outline"
-                borderColor="red.500"
-                textColor="red.500"
-                colorScheme="red"
-                size="sm"
-                isLoading={canceling}
-                loadingText="Canceling..."
-                isDisabled={
-                  loading ||
-                  order.state === types.OrderState.Canceled ||
-                  order.state === types.OrderState.Completed
-                }
-                onClick={async () => {
-                  const decision = await confirmWrapper('Cancel this order?', {
-                    description: 'You will not be able to undo this action.',
-                    cancelText: "No, Don't Cancel",
-                    confirmText: 'Yes, Cancel',
-                    darkMode: colorMode !== 'light',
-                    colorScheme: 'red'
-                  });
-                  if (decision) {
-                    setCanceling(true);
-                    graphQLClient.setHeader('authorization', accessToken);
-                    await graphQLClient.request(CANCEL_ORDER, { id });
-                    navigate(0);
+            <SectionTitleRow
+              headerText="Actions"
+              subHeaderText="Canceling an order will send a cancellation notification to the pharmacy for any fills already sent to the pharmacy."
+              rightElement={
+                <Button
+                  aria-label="Cancel Order"
+                  variant="outline"
+                  borderColor="red.500"
+                  textColor="red.500"
+                  colorScheme="red"
+                  size="sm"
+                  isLoading={canceling}
+                  loadingText="Canceling..."
+                  isDisabled={
+                    loading ||
+                    order.state === types.OrderState.Canceled ||
+                    order.state === types.OrderState.Completed
                   }
-                }}
-              >
-                Cancel Order
-              </Button>
-            </Stack>
+                  onClick={async () => {
+                    const decision = await confirmWrapper('Cancel this order?', {
+                      description: 'You will not be able to undo this action.',
+                      cancelText: "No, Don't Cancel",
+                      confirmText: 'Yes, Cancel',
+                      darkMode: colorMode !== 'light',
+                      colorScheme: 'red'
+                    });
+                    if (decision) {
+                      setCanceling(true);
+                      graphQLClient.setHeader('authorization', accessToken);
+                      await graphQLClient.request(CANCEL_ORDER, { id });
+                      navigate(0);
+                    }
+                  }}
+                >
+                  Cancel Order
+                </Button>
+              }
+            />
+
             {!loading ? (
               <CancelOrderAlert
                 orderState={order.state as OrderState}
                 fulfillmentState={order?.fulfillment?.state as OrderFulfillmentState}
               />
             ) : null}
-            <Divider />
           </VStack>
         </CardBody>
       </Card>
