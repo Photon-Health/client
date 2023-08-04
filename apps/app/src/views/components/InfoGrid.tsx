@@ -15,7 +15,7 @@ function InfoGrid({ name, children }: InfoGridProps) {
       mb={{ base: 2, md: 0 }}
     >
       <GridItem colSpan={1}>
-        <Text fontSize="xs" color="gray.500" style={{ lineHeight: '24px' }}>
+        <Text fontSize="sm" color="gray.500" style={{ lineHeight: '24px' }}>
           {name}
         </Text>
       </GridItem>

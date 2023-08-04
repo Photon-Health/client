@@ -508,7 +508,7 @@ export const Order = () => {
               width="full"
               spacing={{ base: 4, md: 10 }}
             >
-              <VStack align="start">
+              <VStack align="start" spacing={0}>
                 <Text fontWeight="medium" fontSize="md">
                   Actions
                 </Text>

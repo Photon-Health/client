@@ -19,7 +19,6 @@ import {
   Skeleton,
   SkeletonCircle,
   SkeletonText,
-  useBreakpointValue,
   useColorMode,
   AlertTitle,
   AlertDescription,
@@ -111,7 +110,6 @@ export const Prescription = () => {
   const effectiveDate = formatDate(rx.effectiveDate);
   const expirationDate = formatDate(rx.expirationDate);
 
-  const isMobile = useBreakpointValue({ base: true, sm: false });
   const { colorMode } = useColorMode();
 
   const orders = useMemo(() => {
@@ -185,7 +183,7 @@ export const Prescription = () => {
             mt={0}
           >
             <Stack direction={{ base: 'column', sm: 'row' }} gap={3} w="full">
-              <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
+              <VStack align="start" borderRadius={6}>
                 <Text color="gray.500" fontWeight="medium" fontSize="sm">
                   Patient
                 </Text>
@@ -203,22 +201,24 @@ export const Prescription = () => {
                 <Divider orientation="vertical" height="auto" />
               </Show>
 
-              <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
+              <VStack align="start" borderRadius={6}>
                 <Text color="gray.500" fontWeight="medium" fontSize="sm">
                   Written
                 </Text>
-                {loading ? (
-                  <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-                ) : (
-                  <Text fontSize="md">{writtenAt}</Text>
-                )}
+                <Stack alignItems="center" justifyContent="center" height="100%">
+                  {loading ? (
+                    <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                  ) : (
+                    <Text fontSize="md">{writtenAt}</Text>
+                  )}
+                </Stack>
               </VStack>
 
               <Show above="sm">
                 <Divider orientation="vertical" height="auto" />
               </Show>
 
-              <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
+              <VStack align="start" borderRadius={6}>
                 <Text color="gray.500" fontWeight="medium" fontSize="sm">
                   Prescriber
                 </Text>
@@ -338,11 +338,28 @@ export const Prescription = () => {
                 <Text fontSize="md">{dispenseAsWritten ? 'Yes' : 'No'}</Text>
               )}
             </InfoGrid>
-            <Divider />
-            <HStack justifyContent="space-between" width="100%">
-              <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                Orders
-              </Text>
+
+            <InfoGrid name="External Id">
+              {loading ? (
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="65px" />
+              ) : rx.externalId ? (
+                <CopyText text={rx.externalId || ''} />
+              ) : (
+                <Text fontSize="md" as="i">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
+
+            <HStack justifyContent="space-between" width="100%" pt={5}>
+              <VStack align="start" spacing={0}>
+                <Text fontWeight="medium" fontSize="md">
+                  Related Orders
+                </Text>
+                <Text fontSize="sm">
+                  Below are orders that include fills from this prescription.
+                </Text>
+              </VStack>
               {loading ? null : (
                 <Button
                   leftIcon={<FiPlus />}
@@ -365,6 +382,8 @@ export const Prescription = () => {
                 </Button>
               )}
             </HStack>
+            <Divider />
+
             {loading ? (
               <SkeletonText skeletonHeight={5} noOfLines={1} width="100%" />
             ) : (
@@ -429,73 +448,60 @@ export const Prescription = () => {
                 )}
               </>
             )}
-            <Divider />
-            <Text color="gray.500" fontWeight="medium" fontSize="sm">
-              Advanced
-            </Text>
 
-            <InfoGrid name="Id">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
-              ) : (
-                <CopyText text={id || ''} />
-              )}
-            </InfoGrid>
-
-            <InfoGrid name="External Id">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="65px" />
-              ) : rx.externalId ? (
-                <CopyText text={rx.externalId || ''} />
-              ) : (
-                <Text fontSize="md" as="i">
-                  None
+            <Stack
+              direction={{ base: 'column', md: 'row' }}
+              align={{ base: 'start', md: 'stretch' }}
+              pt={5}
+              justify="space-between"
+              width="full"
+              spacing={{ base: 4, md: 10 }}
+            >
+              <VStack align="start" spacing={0}>
+                <Text fontWeight="medium" fontSize="md">
+                  Actions
                 </Text>
-              )}
-            </InfoGrid>
+                <Text fontSize="sm">
+                  Canceling a prescription will prevent any team member from adding the prescription
+                  fills in a new order.
+                </Text>
+              </VStack>
+              <Button
+                aria-label="Cancel Prescription"
+                isDisabled={loading || rx.state !== 'ACTIVE'}
+                isLoading={canceling}
+                loadingText="Canceling..."
+                onClick={async () => {
+                  const decision = await confirmWrapper('Cancel this prescription?', {
+                    description: 'You will not be able to undo this action.',
+                    cancelText: "No, Don't Cancel",
+                    confirmText: 'Yes, Cancel',
+                    darkMode: colorMode !== 'light',
+                    colorScheme: 'red'
+                  });
+                  if (decision) {
+                    setCanceling(true);
+                    graphQLClient.setHeader('authorization', accessToken);
+                    await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
+                    navigate(0);
+                  }
+                }}
+                variant="outline"
+                textColor="red.500"
+                colorScheme="red"
+                size="sm"
+              >
+                Cancel Prescription
+              </Button>
+            </Stack>
 
-            <Divider />
-
-            <Text color="gray.500" fontWeight="medium" fontSize="sm">
-              Actions
-            </Text>
-            <Text>
-              Canceling a prescription will prevent any team member from adding the prescription
-              fills in a new order.
-            </Text>
             {rx?.state && rx.state !== 'ACTIVE' && (
               <Alert colorScheme="gray">
                 <AlertIcon />
                 This prescription has been {rx?.state?.toLowerCase()}
               </Alert>
             )}
-            <Button
-              aria-label="Cancel Prescription"
-              isDisabled={loading || rx.state !== 'ACTIVE'}
-              isLoading={canceling}
-              loadingText="Canceling..."
-              onClick={async () => {
-                const decision = await confirmWrapper('Cancel this prescription?', {
-                  description: 'You will not be able to undo this action.',
-                  cancelText: "No, Don't Cancel",
-                  confirmText: 'Yes, Cancel',
-                  darkMode: colorMode !== 'light',
-                  colorScheme: 'red'
-                });
-                if (decision) {
-                  setCanceling(true);
-                  graphQLClient.setHeader('authorization', accessToken);
-                  await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
-                  navigate(0);
-                }
-              }}
-              variant="outline"
-              textColor="red.500"
-              colorScheme="red"
-              size="sm"
-            >
-              Cancel Prescription
-            </Button>
+            <Divider />
           </VStack>
         </CardBody>
       </Card>
