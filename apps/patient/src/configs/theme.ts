@@ -9,7 +9,7 @@ function generateChakraTheme(key = undefined) {
 
   const color = tinycolor(accentColor);
   const textColor = color.isLight() ? 'gray.800' : 'white';
-  const brandLinkColor = color.isLight() ? color.clone().darken(10).toHexString() : accentColor;
+  const linkColor = '#4299e1'; // Chakra blue.400
 
   const colors = {
     brand: {
@@ -24,7 +24,7 @@ function generateChakraTheme(key = undefined) {
       800: color.clone().darken(20).toHexString(),
       900: color.clone().darken(30).toHexString()
     },
-    brandLink: brandLinkColor
+    link: linkColor
   };
 
   const disabledStyles = {
