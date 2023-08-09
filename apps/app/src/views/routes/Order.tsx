@@ -86,6 +86,14 @@ const CancelOrderAlert = ({
       </Alert>
     );
   }
+  if (fulfillmentState === 'SHIPPED') {
+    return (
+      <Alert colorScheme="gray">
+        <AlertIcon />
+        This order has been shipped
+      </Alert>
+    );
+  }
   if (fulfillmentState === 'PICKED_UP') {
     return (
       <Alert status="warning">
@@ -435,7 +443,8 @@ export const Order = () => {
               isDisabled={
                 loading ||
                 order.state === types.OrderState.Canceled ||
-                order.state === types.OrderState.Completed
+                order.state === types.OrderState.Completed ||
+                order?.fulfillment?.state === 'SHIPPED'
               }
               onClick={async () => {
                 const decision = await confirmWrapper('Cancel this order?', {
