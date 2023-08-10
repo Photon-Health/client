@@ -4,12 +4,7 @@ import { Permission } from 'packages/sdk/dist/types';
 import { useEffect, useState } from 'react';
 
 function checkHasPermission(subset: Permission[], superset: Permission[]) {
-  for (let i = 0; i < subset.length; i++) {
-    if (superset.indexOf(subset[i]) === -1) {
-      return false;
-    }
-  }
-  return true;
+  return subset.every((permission) => superset.includes(permission));
 }
 
 const usePermissions = (permissions: Permission[]) => {
