@@ -78,7 +78,7 @@ export const PickupOptions = ({
       {!showingAllPharmacies && (pharmacies?.length > 0 || loadingMore) ? (
         <Button
           colorScheme="brand"
-          color="brandLink"
+          color="link"
           variant="link"
           textDecoration="none"
           loadingText=""

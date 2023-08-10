@@ -393,9 +393,10 @@ export const Pharmacy = () => {
                 <Link
                   onClick={() => setLocationModalOpen(true)}
                   display="inline"
-                  color="brandLink"
+                  color="link"
                   fontWeight="medium"
                   size="sm"
+                  data-dd-privacy="mask"
                 >
                   <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
                   {location}

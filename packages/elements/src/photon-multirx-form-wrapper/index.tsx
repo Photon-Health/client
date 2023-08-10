@@ -25,9 +25,15 @@ customElement(
   {
     hideTemplates: false,
     patientId: undefined,
-    templateIds: undefined
+    templateIds: undefined,
+    prescriptionIds: undefined
   },
-  (props: { hideTemplates?: boolean; patientId?: string; templateIds?: string }) => {
+  (props: {
+    hideTemplates?: boolean;
+    patientId?: string;
+    templateIds?: string;
+    prescriptionIds?: string;
+  }) => {
     let ref: any;
     const client = usePhoton();
     const [canSubmit, setCanSubmit] = createSignal<boolean>(false);
@@ -275,6 +281,7 @@ customElement(
                   loading={isLoading()}
                   patient-id={props.patientId}
                   template-ids={props.templateIds}
+                  prescription-ids={props.prescriptionIds}
                   on:photon-form-validate={(e: any) => {
                     setCanSubmit(e.detail.canSubmit);
                     setActions(e.detail.actions);

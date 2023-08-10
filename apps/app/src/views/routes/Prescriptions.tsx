@@ -41,25 +41,29 @@ const MedView = (props: MedViewProps) => {
 interface ActionsViewProps {
   prescriptionId: string;
   patientId: string;
+  disableCreateOrder: boolean;
 }
 
 const ActionsView = (props: ActionsViewProps) => {
-  const { prescriptionId, patientId } = props;
+  const { prescriptionId, patientId, disableCreateOrder = false } = props;
   return (
     <HStack spacing="0">
       <IconButton
         icon={<FiInfo fontSize="1.25rem" />}
         variant="ghost"
         aria-label="View prescription details"
+        title="View prescription details"
         as={RouterLink}
         to={`/prescriptions/${prescriptionId}`}
       />
       <IconButton
         icon={<FiShoppingCart fontSize="1.25rem" />}
         variant="ghost"
-        aria-label="New Order"
+        aria-label="Create Order"
+        title="Create Order"
         as={RouterLink}
         to={`/orders/new?patientId=${patientId}&prescriptionIds=${prescriptionId}`}
+        isDisabled={disableCreateOrder}
       />
     </HStack>
   );
@@ -140,7 +144,13 @@ const renderRow = (rx: any) => {
     ),
     prescriber: <NameView name={prescriber} />,
     writtenAt: <Text>{writtenAt}</Text>,
-    actions: <ActionsView prescriptionId={id} patientId={rx.patient.id} />
+    actions: (
+      <ActionsView
+        prescriptionId={id}
+        patientId={rx.patient.id}
+        disableCreateOrder={rx.state === types.PrescriptionState.Depleted}
+      />
+    )
   };
 };
 

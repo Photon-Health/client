@@ -48,10 +48,10 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
           >
             {states.map((state, id) => {
               const title = t.status[fulfillmentType].states[state].title;
-              const description =
-                state === 'IN_TRANSIT' || state === 'SHIPPED'
-                  ? `${t.status[fulfillmentType].states[state].description}${patientAddress}.` // show delivery address on courier
-                  : t.status[fulfillmentType].states[state].description;
+              const isDelivery = state === 'IN_TRANSIT' || state === 'SHIPPED';
+              const description = isDelivery
+                ? `${t.status[fulfillmentType].states[state].description}${patientAddress}.`
+                : t.status[fulfillmentType].states[state].description;
 
               return (
                 <Step key={id}>
@@ -64,7 +64,9 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
                   </StepIndicator>
                   <Box ml={1}>
                     <StepTitle>{title}</StepTitle>
-                    <StepDescription>{description}</StepDescription>
+                    <StepDescription data-dd-privacy={isDelivery ? 'mask' : undefined}>
+                      {description}
+                    </StepDescription>
                   </Box>
                   <StepSeparator />
                 </Step>

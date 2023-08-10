@@ -64,7 +64,7 @@ export const Review = () => {
               <Text display="inline" color="gray.500">
                 {t.review.patient}
               </Text>
-              <Text display="inline" ms={3}>
+              <Text display="inline" ms={3} data-dd-privacy="mask">
                 {patient.name.full}
               </Text>
             </HStack>
@@ -85,7 +85,9 @@ export const Review = () => {
                           <Box me={2}>
                             <FaPrescription size="1.3em" />
                           </Box>
-                          <Text align="start">{treatment.name}</Text>
+                          <Text align="start" data-dd-privacy="mask">
+                            {treatment.name}
+                          </Text>
                         </HStack>
                         <Box>
                           <AccordionIcon />
@@ -97,26 +99,28 @@ export const Review = () => {
                         <HStack>
                           <HStack w="50%">
                             <Text color="gray.500">{t.review.quantity}</Text>
-                            <Text>{prescription.dispenseQuantity}</Text>
+                            <Text data-dd-privacy="mask">{prescription.dispenseQuantity}</Text>
                           </HStack>
                           <HStack w="50%">
                             <Text color="gray.500">{t.review.daysSupply}</Text>
-                            <Text>{prescription.daysSupply}</Text>
+                            <Text data-dd-privacy="mask">{prescription.daysSupply}</Text>
                           </HStack>
                         </HStack>
                         <HStack>
                           <HStack w="50%">
                             <Text color="gray.500">{t.review.refills}</Text>
-                            <Text>{count - 1}</Text>
+                            <Text data-dd-privacy="mask">{count - 1}</Text>
                           </HStack>
                           <HStack w="50%">
                             <Text color="gray.500">{t.review.expires}</Text>
-                            <Text>{formatDate(prescription.expirationDate)}</Text>
+                            <Text data-dd-privacy="mask">
+                              {formatDate(prescription.expirationDate)}
+                            </Text>
                           </HStack>
                         </HStack>
                         <HStack w="full" align="start">
                           <Text color="gray.500">{t.review.instructions}</Text>
-                          <Text>{prescription.instructions}</Text>
+                          <Text data-dd-privacy="mask">{prescription.instructions}</Text>
                         </HStack>
                       </VStack>
                     </AccordionPanel>

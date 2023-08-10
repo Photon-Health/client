@@ -139,29 +139,31 @@ export const PharmacyCard = memo(function PharmacyCard({
     >
       <CardBody p={3}>
         <VStack align="start" w="full" spacing={1}>
-          {preferred ? (
-            <Tag size="sm" colorScheme="yellow">
-              <TagLeftIcon boxSize="12px" as={FiStar} />
-              <TagLabel> Preferred</TagLabel>
-            </Tag>
-          ) : null}
-          {previous && !preferred ? (
-            <Tag size="sm" colorScheme="blue">
-              <TagLeftIcon boxSize="12px" as={FiRotateCcw} />
-              <TagLabel> Previous</TagLabel>
-            </Tag>
-          ) : null}
-          {goodService ? (
-            <Tag size="sm" colorScheme="purple">
-              <TagLeftIcon boxSize="12px" as={FiThumbsUp} />
-              <TagLabel> Good service</TagLabel>
-            </Tag>
-          ) : null}
-          {pharmacy?.hours?.is24Hr ? (
-            <Tag size="sm" colorScheme="green">
-              <TagLabel>24 hr</TagLabel>
-            </Tag>
-          ) : null}
+          <HStack spacing={2}>
+            {preferred ? (
+              <Tag size="sm" colorScheme="yellow">
+                <TagLeftIcon boxSize="12px" as={FiStar} />
+                <TagLabel> Preferred</TagLabel>
+              </Tag>
+            ) : null}
+            {previous && !preferred ? (
+              <Tag size="sm" colorScheme="blue">
+                <TagLeftIcon boxSize="12px" as={FiRotateCcw} />
+                <TagLabel> Previous</TagLabel>
+              </Tag>
+            ) : null}
+            {goodService ? (
+              <Tag size="sm" colorScheme="purple">
+                <TagLeftIcon boxSize="12px" as={FiThumbsUp} />
+                <TagLabel> Good service</TagLabel>
+              </Tag>
+            ) : null}
+            {pharmacy?.hours?.is24Hr ? (
+              <Tag size="sm" colorScheme="green">
+                <TagLabel>24 hr</TagLabel>
+              </Tag>
+            ) : null}
+          </HStack>
           <VStack align="start" w="full" spacing={0}>
             <Text fontSize="md">{pharmacy.name}</Text>
             <RatingHours
@@ -181,7 +183,7 @@ export const PharmacyCard = memo(function PharmacyCard({
               mx="auto"
               size="sm"
               variant="ghost"
-              colorScheme="brand"
+              color="link"
               onClick={onSetPreferred}
               isLoading={savingPreferred}
               leftIcon={<FiStar />}
