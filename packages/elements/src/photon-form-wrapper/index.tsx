@@ -48,8 +48,8 @@ const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
       </photon-dialog>
 
       {/* Wrapper */}
-      <div class="flex items-center px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full z-10 shadow-card">
-        <div class="md:w-2/5 flex justify-start">
+      <div class="flex flex-col md:flex-row items-center px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full z-10 shadow-card">
+        <div class="flex justify-start md:flex-1 absolute md:static left-4">
           <photon-button
             class="close-button"
             size="small"
@@ -63,18 +63,18 @@ const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
             }}
             variant="naked"
           >
-            <div class="text-black text-3xl">
+            <div class="text-black text-xl md:text-3xl">
               <sl-icon style={{ display: 'block' }} name="x" />
             </div>
           </photon-button>
         </div>
-        <div class="w-full md:w-3/5 flex flex-col md:flex-row">
-          <div class="mb-2 md:mb-0 flex justify-center md:justify-center items-center">
-            <Show when={props.titleIconName}>
-              <sl-icon name={props.titleIconName} />
-            </Show>
-            <p class="ml-1 font-sans text-xl font-medium">{props.title}</p>
-          </div>
+        <div class="mb-2 md:mb-0 flex flex-0 md:flex-1 justify-center md:justify-center items-center">
+          <Show when={props.titleIconName}>
+            <sl-icon name={props.titleIconName} />
+          </Show>
+          <p class="ml-1 font-sans text-sm md:text-xl font-medium">{props.title}</p>
+        </div>
+        <div class="flex flex-col md:flex-row flex-1">
           <Show when={props.headerRight}>
             <div class="flex-1 flex justify-end">{props.headerRight}</div>
           </Show>
