@@ -1,5 +1,5 @@
 import { Center, CircularProgress } from '@chakra-ui/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import GraphiQL from 'graphiql';
 import { usePhoton } from '@photonhealth/react';
 
@@ -27,8 +27,11 @@ export const Playground = () => {
     fetchToken();
   }, [getToken]);
 
-  if (token) {
-    const fetcher = async (graphQLParams: any) => {
+  // useMemo to create the fetcher function
+  const fetcher = useMemo(() => {
+    if (!token) return; // Do not create fetcher if token is not available
+
+    return async (graphQLParams: any) => {
       const resp = await fetch(process.env.REACT_APP_GRAPHQL_URI as string, {
         method: 'POST',
         headers: {
@@ -41,7 +44,9 @@ export const Playground = () => {
       });
       return resp.json().catch(() => resp.text());
     };
+  }, [token]);
 
+  if (token && fetcher) {
     return (
       <div style={{ height: 'calc(100vh - 64px)' }}>
         <GraphiQL
