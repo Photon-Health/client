@@ -1,5 +1,5 @@
 import { Center, CircularProgress } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import GraphiQL from 'graphiql';
 import { usePhoton } from '@photonhealth/react';
 
@@ -17,7 +17,15 @@ query MyQuery {
 export const Playground = () => {
   const { getToken } = usePhoton();
   const [token, setToken] = useState('');
-  getToken().then(setToken);
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const fetchedToken = await getToken();
+      setToken(fetchedToken);
+    };
+
+    fetchToken();
+  }, [getToken]);
 
   if (token) {
     const fetcher = async (graphQLParams: any) => {
