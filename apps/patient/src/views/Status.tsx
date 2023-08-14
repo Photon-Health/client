@@ -94,7 +94,7 @@ export const Status = () => {
     }
   }, [order?.fulfillment]);
 
-  const initializePharmacy = async (p: EnrichedPharmacy) => {
+  const initializePharmacy = async (p: types.Pharmacy) => {
     await addRatingsAndHours(p);
     setEnrichedPharmacy(p);
   };

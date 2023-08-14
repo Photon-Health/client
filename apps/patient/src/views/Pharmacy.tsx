@@ -196,21 +196,15 @@ export const Pharmacy = () => {
   const handleShowMore = async () => {
     setLoadingPharmacies(true);
 
-    const newPharmacies = [];
-
     /**
      * Initially we fetched a list of pharmacies from our db, if some
      * of those haven't received ratings/hours, enrich those first
      *  */
-    const pharmaciesToEnrich = initialPharmacies.slice(
-      pharmacyOptions.length,
-      pharmacyOptions.length + MAX_ENRICHMENT
+    const newPharmacies: EnrichedPharmacy[] = await Promise.all(
+      initialPharmacies
+        .slice(pharmacyOptions.length, pharmacyOptions.length + MAX_ENRICHMENT)
+        .map(addRatingsAndHours)
     );
-
-    for (const newPharmacy of pharmaciesToEnrich) {
-      await addRatingsAndHours(newPharmacy);
-      newPharmacies.push(newPharmacy);
-    }
 
     if (newPharmacies.length === MAX_ENRICHMENT) {
       // Break early and return enriched pharmacies

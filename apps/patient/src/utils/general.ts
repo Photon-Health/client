@@ -4,6 +4,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 import { types } from '@photonhealth/sdk';
 import { ExtendedFulfillmentType } from './models';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { getPlaceId, getPlaceDetails } from '../api';
 
 dayjs.extend(isoWeek);
 dayjs.extend(isBetween);
@@ -190,97 +191,55 @@ export const countFillsAndRemoveDuplicates = (fills: types.Fill[]): FillWithCoun
   return result;
 };
 
-/**
- * Adds ratings and hours to the Pharmacy object using Google Place API.
- * If the details are not found or an error occurs during the process, the original Pharmacy object is returned.
- *
- * @param {Pharmacy} p - The Pharmacy object to enrich with additional details.
- * @returns {Promise<Pharmacy>} - A Promise that resolves to the enriched Pharmacy object.
- */
-const placesService = new google.maps.places.PlacesService(document.createElement('div'));
-const query = (method: string, data: object) =>
-  new Promise((resolve, reject) => {
-    placesService[method](data, (response, status) => {
-      if (status === 'OK') {
-        resolve({ response, status });
-      } else {
-        reject({ response, status });
+const enrichPharmacy = async (pharmacy: types.Pharmacy): Promise<EnrichedPharmacy> => {
+  try {
+    const placeId = await getPlaceId(pharmacy);
+    if (!placeId) {
+      return pharmacy;
+    }
+
+    const placeDetails = await getPlaceDetails(placeId);
+    if (!placeDetails) {
+      return pharmacy;
+    }
+
+    const enrichedPharmacyInfo = {
+      ...pharmacy,
+      businessStatus: placeDetails.business_status || '',
+      rating: placeDetails.rating || undefined
+    };
+
+    if (enrichedPharmacyInfo.businessStatus !== 'OPERATIONAL') {
+      return enrichedPharmacyInfo;
+    }
+
+    const currentTime = dayjs().format('HHmm');
+    const { is24Hr, opens, opensDay, closes } = getHours(
+      placeDetails.opening_hours?.periods,
+      currentTime
+    );
+
+    return {
+      ...enrichedPharmacyInfo,
+      hours: {
+        open: placeDetails.opening_hours?.isOpen() || false,
+        is24Hr,
+        opens,
+        opensDay,
+        closes
       }
-    });
-  });
-export const addRatingsAndHours = async (p: types.Pharmacy): Promise<EnrichedPharmacy> => {
-  const enrichedPharmacy: EnrichedPharmacy = Object.create(p);
-
-  // Get place from Google
-  const address = enrichedPharmacy.address ? formatAddress(enrichedPharmacy.address) : '';
-  const placeRequest = {
-    query: enrichedPharmacy.name + ' ' + address,
-    fields: ['place_id']
-  };
-  let placeId: string;
-  let placeStatus: string;
-  try {
-    const { response, status }: any = await query('findPlaceFromQuery', placeRequest);
-    placeId = response[0]?.place_id;
-    placeStatus = status;
+    };
   } catch (error) {
-    console.error(JSON.stringify(error, undefined, 2));
-    console.log(error);
-    return enrichedPharmacy;
+    throw new Error('Failed to enrich pharmacy data: ' + error.message);
   }
+};
 
-  if (placeStatus !== 'OK' || !placeId) {
-    console.log('Could not find Google place');
-    return enrichedPharmacy; // Break early if place isn't found
-  }
-
-  // Get place details from Google
-  const detailsRequest = {
-    placeId,
-    fields: [
-      'opening_hours',
-      'utc_offset_minutes', // this gives us isOpen()
-      'rating',
-      'business_status'
-    ]
-  };
-  let details: any;
-  let detailsStatus: string;
+export const addRatingsAndHours = async (pharmacy: types.Pharmacy): Promise<EnrichedPharmacy> => {
   try {
-    const { response, status }: any = await query('getDetails', detailsRequest);
-    details = response;
-    detailsStatus = status;
-  } catch (error) {
-    console.error(JSON.stringify(error, undefined, 2));
-    console.log(error);
+    const enrichedPharmacy = await enrichPharmacy(pharmacy);
+    console.log(enrichedPharmacy);
     return enrichedPharmacy;
+  } catch (error) {
+    throw new Error('Failed to add ratings and hours: ' + error.message);
   }
-
-  if (detailsStatus !== 'OK') {
-    console.log('Could not find place details');
-    return p; // Break early if place details not found
-  }
-
-  enrichedPharmacy.businessStatus = details?.business_status || '';
-  enrichedPharmacy.rating = details?.rating || undefined;
-
-  const openForBusiness = details?.business_status === 'OPERATIONAL';
-  if (!openForBusiness) {
-    return enrichedPharmacy; // Don't need hours for non-operational business
-  }
-
-  const currentTime = dayjs().format('HHmm');
-  const { is24Hr, opens, opensDay, closes } = getHours(
-    details?.opening_hours?.periods,
-    currentTime
-  );
-  enrichedPharmacy.hours = {
-    open: details?.opening_hours?.isOpen() || false,
-    is24Hr,
-    opens,
-    opensDay,
-    closes
-  };
-
-  return enrichedPharmacy;
 };

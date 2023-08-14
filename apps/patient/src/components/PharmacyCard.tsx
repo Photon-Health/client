@@ -29,7 +29,7 @@ dayjs.extend(customParseFormat);
 
 interface RatingHoursProps {
   businessStatus: string;
-  rating: string;
+  rating: number;
   hours: {
     open?: boolean;
     opens?: string;
