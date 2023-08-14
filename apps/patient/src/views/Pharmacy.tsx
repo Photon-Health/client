@@ -135,7 +135,7 @@ export const Pharmacy = () => {
 
       setShowingAllPharmacies(true);
 
-      console.error('Geocoding error:', error);
+      console.log('Geocoding error:', error);
 
       return;
     }
@@ -179,8 +179,7 @@ export const Pharmacy = () => {
 
       setLoadingPharmacies(false);
 
-      console.error(JSON.stringify(error, undefined, 2));
-      console.log(error);
+      console.log('Get pharmacies error: ', error);
 
       return;
     }
@@ -252,7 +251,6 @@ export const Pharmacy = () => {
           ...TOAST_CONFIG.WARNING
         });
       } else {
-        console.error(JSON.stringify(error, undefined, 2));
         console.log(error);
       }
     }
@@ -317,7 +315,6 @@ export const Pharmacy = () => {
 
       setSubmitting(false);
 
-      console.log(error);
       console.error(JSON.stringify(error, undefined, 2));
     }
   };
@@ -355,7 +352,6 @@ export const Pharmacy = () => {
       setSavingPreferred(false);
 
       console.error(JSON.stringify(error, undefined, 2));
-      console.log(error);
     }
   };
 

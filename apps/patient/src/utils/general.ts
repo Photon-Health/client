@@ -230,7 +230,7 @@ const enrichPharmacy = async (pharmacy: types.Pharmacy): Promise<EnrichedPharmac
       }
     };
   } catch (error) {
-    console.error('Failed to enrich pharmacy data: ' + error.message);
+    console.log('Failed to enrich pharmacy data: ' + error.message);
     return pharmacy;
   }
 };
@@ -240,7 +240,7 @@ export const addRatingsAndHours = async (pharmacy: types.Pharmacy): Promise<Enri
     const enrichedPharmacy = await enrichPharmacy(pharmacy);
     return enrichedPharmacy;
   } catch (error) {
-    console.error('Failed to add ratings and hours: ' + error.message);
+    console.log('Failed to add ratings and hours: ' + error.message);
     return pharmacy;
   }
 };

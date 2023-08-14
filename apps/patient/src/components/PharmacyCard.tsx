@@ -52,9 +52,11 @@ const RatingHours = ({ businessStatus, rating, hours }: RatingHoursProps) => {
     <HStack w="full" whiteSpace="nowrap" overflow="hidden">
       {rating ? <Rating rating={rating} /> : null}
       {rating ? <Text color="gray.400">&bull;</Text> : null}
-      <Text fontSize="sm" color={hours?.open ? 'green' : 'red'}>
-        {hours?.open ? 'Open' : 'Closed'}
-      </Text>
+      {hours?.open !== undefined ? (
+        <Text fontSize="sm" color={hours?.open ? 'green' : 'red'}>
+          {hours?.open ? 'Open' : 'Closed'}
+        </Text>
+      ) : null}
       {!hours?.is24Hr && ((hours?.open && hours?.closes) || (!hours?.open && hours?.opens)) ? (
         <Text color="gray.400">&bull;</Text>
       ) : null}
