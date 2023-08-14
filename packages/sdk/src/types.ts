@@ -872,3 +872,19 @@ export type WebhookConfig = {
   name?: Maybe<Scalars['String']>;
   url?: Maybe<Scalars['String']>;
 };
+
+export type Permission =
+  | 'read:patient'
+  | 'write:patient'
+  | 'read:prescription'
+  | 'write:prescription'
+  | 'read:order'
+  | 'write:order'
+  | 'read:allergy'
+  | 'read:client'
+  | 'read:webhook_config'
+  | 'write:webhook_config'
+  | 'update:client_keys'
+  | 'read:organization'
+  | 'create:invite'
+  | 'write:roles';
