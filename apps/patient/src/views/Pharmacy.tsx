@@ -44,7 +44,7 @@ export const UNOPEN_BUSINESS_STATUS_MAP = {
 };
 const FEATURE_INDIES_WITHIN_RADIUS = 3; // miles
 const FEATURED_PHARMACIES_LIMIT = 2;
-const MAX_ENRICHMENT = 3; // Maximum number of pharmacies to enrich at a time
+const MAX_ENRICHMENT = 5; // Maximum number of pharmacies to enrich at a time
 
 const sortIndiePharmaciesFirst = (list: EnrichedPharmacy[], distance: number, limit: number) => {
   const featuredPharmacies = list
