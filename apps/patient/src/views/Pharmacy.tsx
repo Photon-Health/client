@@ -184,7 +184,7 @@ export const Pharmacy = () => {
     // Save in case we fetched more than we initially show
     setInitialPharmacies(newPharmacies);
 
-    // We only show 3 at a time, so just enrich the first 3
+    // We only show add a few at a time, so just enrich the first group of pharmacies
     const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
       newPharmacies.slice(0, MAX_ENRICHMENT).map(addRatingsAndHours)
     );
