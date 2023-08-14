@@ -90,6 +90,7 @@ export const Pharmacy = () => {
   const toast = useToast();
 
   const reset = () => {
+    setInitialPharmacies([]);
     setPharmacyOptions([]);
     setSelectedId('');
     setShowFooter(false);
@@ -135,6 +136,8 @@ export const Pharmacy = () => {
       setShowingAllPharmacies(true);
 
       console.error('Geocoding error:', error);
+
+      return;
     }
 
     const { address, lat, lng } = locationData;
