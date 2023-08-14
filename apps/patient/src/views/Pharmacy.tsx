@@ -126,6 +126,14 @@ export const Pharmacy = () => {
     try {
       locationData = await geocode(location);
     } catch (error) {
+      toast({
+        title: 'Invalid location',
+        description: 'Please update your location and try again',
+        ...TOAST_CONFIG.ERROR
+      });
+
+      setShowingAllPharmacies(true);
+
       console.error('Geocoding error:', error);
     }
 
