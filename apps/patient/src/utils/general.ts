@@ -208,12 +208,13 @@ const query = (method: string, data: object) =>
       }
     });
   });
-export const addRatingsAndHours = async (p: EnrichedPharmacy) => {
+export const addRatingsAndHours = async (p: types.Pharmacy): Promise<EnrichedPharmacy> => {
+  const enrichedPharmacy: EnrichedPharmacy = Object.create(p);
+
   // Get place from Google
-  const name = p.name;
-  const address = p.address ? formatAddress(p.address) : '';
+  const address = enrichedPharmacy.address ? formatAddress(enrichedPharmacy.address) : '';
   const placeRequest = {
-    query: name + ' ' + address,
+    query: enrichedPharmacy.name + ' ' + address,
     fields: ['place_id']
   };
   let placeId: string;
@@ -225,12 +226,12 @@ export const addRatingsAndHours = async (p: EnrichedPharmacy) => {
   } catch (error) {
     console.error(JSON.stringify(error, undefined, 2));
     console.log(error);
-    return p;
+    return enrichedPharmacy;
   }
 
   if (placeStatus !== 'OK' || !placeId) {
     console.log('Could not find Google place');
-    return p; // Break early if place isn't found
+    return enrichedPharmacy; // Break early if place isn't found
   }
 
   // Get place details from Google
@@ -252,7 +253,7 @@ export const addRatingsAndHours = async (p: EnrichedPharmacy) => {
   } catch (error) {
     console.error(JSON.stringify(error, undefined, 2));
     console.log(error);
-    return p;
+    return enrichedPharmacy;
   }
 
   if (detailsStatus !== 'OK') {
@@ -260,12 +261,12 @@ export const addRatingsAndHours = async (p: EnrichedPharmacy) => {
     return p; // Break early if place details not found
   }
 
-  p.businessStatus = details?.business_status || '';
-  p.rating = details?.rating || undefined;
+  enrichedPharmacy.businessStatus = details?.business_status || '';
+  enrichedPharmacy.rating = details?.rating || undefined;
 
   const openForBusiness = details?.business_status === 'OPERATIONAL';
   if (!openForBusiness) {
-    return p; // Don't need hours for non-operational business
+    return enrichedPharmacy; // Don't need hours for non-operational business
   }
 
   const currentTime = dayjs().format('HHmm');
@@ -273,7 +274,7 @@ export const addRatingsAndHours = async (p: EnrichedPharmacy) => {
     details?.opening_hours?.periods,
     currentTime
   );
-  p.hours = {
+  enrichedPharmacy.hours = {
     open: details?.opening_hours?.isOpen() || false,
     is24Hr,
     opens,
@@ -281,5 +282,5 @@ export const addRatingsAndHours = async (p: EnrichedPharmacy) => {
     closes
   };
 
-  return p;
+  return enrichedPharmacy;
 };
