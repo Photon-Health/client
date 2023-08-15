@@ -65,7 +65,7 @@ export const text = {
     title: 'Filling your prescriptions',
     heading: 'Filling your prescriptions',
     subheading:
-      "After your prescriptions are sent to the below pharmacy, we'll send you updates on their status.",
+      "After your prescriptions are sent to the pharmacy, we'll send you updates on their status.",
     PICK_UP: {
       pickup: 'Pick Up:',
       chat: {
