@@ -2,18 +2,35 @@ import { types } from 'packages/sdk/dist/lib';
 
 import { graphQLClient } from '../configs/graphqlClient';
 import {
+  GET_ORDER,
   GET_PHARMACIES,
   MARK_ORDER_AS_PICKED_UP,
   REROUTE_ORDER,
   SELECT_ORDER_PHARMACY,
   SET_PREFERRED_PHARMACY
 } from '../graphql';
+import { Order } from '../utils/models';
 
 export const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
 
 /**
  * Queries
  */
+
+export const getOrder = async (orderId: string) => {
+  try {
+    const response: { order: Order } = await graphQLClient.request(GET_ORDER, {
+      id: orderId
+    });
+    if (response.order) {
+      return response.order;
+    } else {
+      throw new Error('No order found');
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 
 export const getPharmacies = async (
   searchParams: {
