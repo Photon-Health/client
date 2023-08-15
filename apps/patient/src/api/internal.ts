@@ -22,11 +22,8 @@ export const getPharmacies = async (
     radius: number;
   },
   limit: number,
-  offset: number,
-  token: string
+  offset: number
 ) => {
-  graphQLClient.setHeader('x-photon-auth', token);
-
   try {
     const response: { pharmaciesByLocation: types.Pharmacy[] } = await graphQLClient.request(
       GET_PHARMACIES,
@@ -55,9 +52,7 @@ export const getPharmacies = async (
  * Mutations
  */
 
-export const markOrderAsPickedUp = async (orderId: string, token: string) => {
-  graphQLClient.setHeader('x-photon-auth', token);
-
+export const markOrderAsPickedUp = async (orderId: string) => {
   try {
     const response: { markOrderAsPickedUp: boolean } = await graphQLClient.request(
       MARK_ORDER_AS_PICKED_UP,
@@ -76,14 +71,7 @@ export const markOrderAsPickedUp = async (orderId: string, token: string) => {
   }
 };
 
-export const rerouteOrder = async (
-  orderId: string,
-  pharmacyId: string,
-  patientId: string,
-  token: string
-) => {
-  graphQLClient.setHeader('x-photon-auth', token);
-
+export const rerouteOrder = async (orderId: string, pharmacyId: string, patientId: string) => {
   try {
     const response: { rerouteOrder: boolean } = await graphQLClient.request(REROUTE_ORDER, {
       orderId,
@@ -106,11 +94,8 @@ export const rerouteOrder = async (
 export const selectOrderPharmacy = async (
   orderId: string,
   pharmacyId: string,
-  patientId: string,
-  token: string
+  patientId: string
 ) => {
-  graphQLClient.setHeader('x-photon-auth', token);
-
   try {
     const response: { selectOrderPharmacy: boolean } = await graphQLClient.request(
       SELECT_ORDER_PHARMACY,
@@ -133,13 +118,7 @@ export const selectOrderPharmacy = async (
   }
 };
 
-export const setPreferredPharmacy = async (
-  patientId: string,
-  pharmacyId: string,
-  token: string
-) => {
-  graphQLClient.setHeader('x-photon-auth', token);
-
+export const setPreferredPharmacy = async (patientId: string, pharmacyId: string) => {
   try {
     const response: { setPreferredPharmacy: boolean } = await graphQLClient.request(
       SET_PREFERRED_PHARMACY,

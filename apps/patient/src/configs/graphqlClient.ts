@@ -6,3 +6,9 @@ export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_API
     stringify: JSON.stringify
   }
 });
+
+export const setAuthHeader = (token: string) => {
+  graphQLClient.setHeaders({
+    'x-photon-auth': token
+  });
+};

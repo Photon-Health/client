@@ -53,7 +53,7 @@ export const Status = () => {
     setSubmitting(true);
 
     try {
-      const result: boolean = await markOrderAsPickedUp(orderId, token);
+      const result: boolean = await markOrderAsPickedUp(orderId);
 
       setTimeout(() => {
         if (result) {

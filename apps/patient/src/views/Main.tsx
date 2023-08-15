@@ -8,6 +8,7 @@ import { GET_ORDER } from '../graphql';
 import { graphQLClient } from '../configs/graphqlClient';
 
 import theme from '../configs/theme';
+import { setAuthHeader } from '../configs/graphqlClient';
 import { types } from '@photonhealth/sdk';
 import { AUTH_HEADER_ERRORS } from '../api/internal';
 
@@ -17,6 +18,10 @@ export const Main = () => {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('orderId');
   const token = searchParams.get('token');
+
+  if (token) {
+    setAuthHeader(token);
+  }
 
   const [order, setOrder] = useState<Order | undefined>(undefined);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -33,7 +38,6 @@ export const Main = () => {
 
   const fetchOrder = useCallback(async () => {
     try {
-      graphQLClient.setHeader('x-photon-auth', token);
       const results: any = await graphQLClient.request(GET_ORDER, { id: orderId });
       if (results) {
         setOrder(results.order);

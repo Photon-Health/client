@@ -161,8 +161,7 @@ export const Pharmacy = () => {
           radius: 25
         },
         30, // Set high to ensure indie's are found. Request time increase is minimal.
-        0,
-        token
+        0
       );
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
         setLoadingPharmacies(false);
@@ -236,8 +235,7 @@ export const Pharmacy = () => {
           radius: 25
         },
         pharmaciesToGet,
-        totalEnriched,
-        token
+        totalEnriched
       );
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
         setLoadingPharmacies(false);
@@ -279,8 +277,8 @@ export const Pharmacy = () => {
 
     try {
       const result = isReroute
-        ? await rerouteOrder(order.id, selectedId, order.patient.id, token)
-        : await selectOrderPharmacy(order.id, selectedId, order.patient.id, token);
+        ? await rerouteOrder(order.id, selectedId, order.patient.id)
+        : await selectOrderPharmacy(order.id, selectedId, order.patient.id);
 
       setTimeout(() => {
         if (result) {
@@ -325,7 +323,7 @@ export const Pharmacy = () => {
     setSavingPreferred(true);
 
     try {
-      const result: boolean = await setPreferredPharmacy(order.patient.id, pharmacyId, token);
+      const result: boolean = await setPreferredPharmacy(order.patient.id, pharmacyId);
       setTimeout(() => {
         if (result) {
           setPreferredPharmacyId(pharmacyId);
