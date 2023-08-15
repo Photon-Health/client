@@ -52,8 +52,8 @@ export const text = {
       subheading: 'Ship to'
     },
     PICK_UP: {
-      heading: 'Pick Up',
-      subheading: 'Your prescriptions at a nearby location.',
+      heading: 'Local Pickup',
+      subheading: 'Get your prescriptions at a nearby pharmacy.',
       sorted: 'Sorted by distance',
       showMore: 'Show more pharmacies',
       showingAll: 'Showing all pharmacies'
