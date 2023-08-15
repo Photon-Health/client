@@ -58,7 +58,6 @@ export const Main = () => {
         }
       }
     } catch (error) {
-      console.error(JSON.stringify(error, undefined, 2));
       console.log(error);
 
       if (error?.response?.data?.order.state === types.OrderState.Canceled) {

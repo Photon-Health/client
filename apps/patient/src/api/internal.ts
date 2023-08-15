@@ -40,8 +40,7 @@ export const getPharmacies = async (
     }
   } catch (error) {
     if (error?.response?.errors?.[0].message === 'No pharmacies found near location') {
-      const { message } = error.response.errors[0];
-      throw new Error(message);
+      throw new Error(error.response.errors[0].message);
     } else {
       throw error;
     }
@@ -64,10 +63,7 @@ export const markOrderAsPickedUp = async (orderId: string) => {
       throw new Error('Unable to mark order as picked up');
     }
   } catch (error) {
-    if (error?.response?.errors) {
-      const { message } = error.response.errors[0];
-      throw new Error(message);
-    }
+    throw new Error(error.response.errors[0].message);
   }
 };
 
@@ -84,10 +80,7 @@ export const rerouteOrder = async (orderId: string, pharmacyId: string, patientI
       throw new Error('Unable to reroute order');
     }
   } catch (error) {
-    if (error?.response?.errors) {
-      const { message } = error.response.errors[0];
-      throw new Error(message);
-    }
+    throw new Error(error.response.errors[0].message);
   }
 };
 
@@ -112,9 +105,7 @@ export const selectOrderPharmacy = async (
       throw new Error('Unable to select pharmacy');
     }
   } catch (error) {
-    if (error?.response?.errors) {
-      throw new Error(error.response.errors[0].message);
-    }
+    throw new Error(error.response.errors[0].message);
   }
 };
 
@@ -134,8 +125,6 @@ export const setPreferredPharmacy = async (patientId: string, pharmacyId: string
       throw new Error('Unable to set preferred pharmacy');
     }
   } catch (error) {
-    if (error?.response?.errors) {
-      throw new Error(error.response.errors[0].message);
-    }
+    throw new Error(error.response.errors[0].message);
   }
 };
