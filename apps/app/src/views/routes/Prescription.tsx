@@ -49,6 +49,7 @@ import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStat
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
 import SectionTitleRow from '../components/SectionTitleRow';
+import usePermissions from '../../hooks/usePermissions';
 
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
@@ -68,6 +69,7 @@ export const CANCEL_PRESCRIPTION = gql`
 export const Prescription = () => {
   const params = useParams();
   const id = params.prescriptionId;
+  const hasPermission = usePermissions(['write:prescription']);
 
   const { getPrescription, getToken } = usePhoton();
   const navigate = useNavigate();
@@ -147,7 +149,7 @@ export const Prescription = () => {
     );
   }
 
-  const canDuplicate = !(loading || rx.state === types.PrescriptionState.Canceled);
+  const canDuplicate = !loading && rx.state !== types.PrescriptionState.Canceled && hasPermission;
   const canCreateOrder = rx.state === types.PrescriptionState.Active;
 
   return (

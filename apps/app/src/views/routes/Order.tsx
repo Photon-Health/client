@@ -152,36 +152,29 @@ const CancelOrderAlert = ({
   orderState: OrderState;
   fulfillmentState: OrderFulfillmentState;
 }) => {
+  let status: 'info' | 'warning' = 'info';
+  let message = '';
+
   if (orderState === types.OrderState.Canceled) {
-    return (
-      <Alert colorScheme="gray">
-        <AlertIcon />
-        This order has been canceled
-      </Alert>
-    );
+    message = 'This order has been canceled';
+  } else if (orderState === types.OrderState.Completed) {
+    message = 'This order has been completed';
+  } else if (fulfillmentState === 'SHIPPED') {
+    message = 'This order has been shipped';
+  } else if (fulfillmentState === 'PICKED_UP') {
+    status = 'warning';
+    message =
+      "This order has been picked up, but we can't cancel the remaining fills. Please call the pharmacy.";
+  } else if (fulfillmentState === 'RECEIVED' || fulfillmentState === 'READY') {
+    status = 'warning';
+    message = 'This order may have been picked up, but we can cancel the remaining fills.';
   }
-  if (orderState === types.OrderState.Completed) {
+
+  if (message) {
     return (
-      <Alert colorScheme="gray">
+      <Alert status={status} colorScheme={status === 'info' ? 'gray' : undefined}>
         <AlertIcon />
-        This order has been completed
-      </Alert>
-    );
-  }
-  if (fulfillmentState === 'PICKED_UP') {
-    return (
-      <Alert status="warning">
-        <AlertIcon />
-        This order has been picked up, but we can't cancel the remaining fills. Please call the
-        pharmacy.
-      </Alert>
-    );
-  }
-  if (fulfillmentState === 'RECEIVED' || fulfillmentState === 'READY') {
-    return (
-      <Alert status="warning">
-        <AlertIcon />
-        This order may have been picked up, but we can cancel the remaining fills.
+        {message}
       </Alert>
     );
   }
@@ -197,6 +190,7 @@ export const Order = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [pharmacyId, setPharmacyId] = useState('');
   const { data, loading, error } = useQuery(GET_ORDER, { variables: { id: id! } });
+
   const [cancelOrder] = useMutation(CANCEL_ORDER, {
     update: (cache) => {
       // TODO manually updating, this can be automatic
@@ -636,6 +630,39 @@ export const Order = () => {
                 fulfillmentState={order?.fulfillment?.state as OrderFulfillmentState}
               />
             ) : null}
+
+            <Button
+              aria-label="Cancel Order"
+              variant="outline"
+              borderColor="red.500"
+              textColor="red.500"
+              colorScheme="red"
+              size="sm"
+              isLoading={updating}
+              loadingText="Canceling..."
+              isDisabled={
+                loading ||
+                order.state === types.OrderState.Canceled ||
+                order.state === types.OrderState.Completed ||
+                order?.fulfillment?.state === 'SHIPPED'
+              }
+              onClick={async () => {
+                const decision = await confirmWrapper('Cancel this order?', {
+                  description: 'You will not be able to undo this action.',
+                  cancelText: "No, Don't Cancel",
+                  confirmText: 'Yes, Cancel',
+                  darkMode: colorMode !== 'light',
+                  colorScheme: 'red'
+                });
+                if (decision) {
+                  setUpdating(true);
+                  await cancelOrder({ variables: { id } });
+                  setUpdating(false);
+                }
+              }}
+            >
+              Cancel Order
+            </Button>
           </VStack>
         </CardBody>
       </Card>
