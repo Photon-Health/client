@@ -16,7 +16,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiCheck } from 'react-icons/fi';
 import { types } from '@photonhealth/sdk';
 import { FixedFooter, Nav, PharmacyCard, PoweredBy, StatusStepper } from '../components';
-import { formatAddress, getFulfillmentType, addRatingsAndHours } from '../utils/general';
+import { formatAddress, getFulfillmentType, enrichPharmacy } from '../utils/general';
 import { Order, Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import { OrderContext } from './Main';
@@ -95,7 +95,7 @@ export const Status = () => {
   }, [order?.fulfillment]);
 
   const initializePharmacy = async (p: types.Pharmacy) => {
-    const enrichedPharmacy = await addRatingsAndHours(p);
+    const enrichedPharmacy = await enrichPharmacy(p, false);
     setEnrichedPharmacy(enrichedPharmacy);
   };
 

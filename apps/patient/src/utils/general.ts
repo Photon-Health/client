@@ -4,7 +4,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 import { types } from '@photonhealth/sdk';
 import { ExtendedFulfillmentType } from './models';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { getPlaceId, getPlaceDetails } from '../api';
+import { getPlace, getPlaceDetails } from '../api';
 
 dayjs.extend(isoWeek);
 dayjs.extend(isBetween);
@@ -191,25 +191,29 @@ export const countFillsAndRemoveDuplicates = (fills: types.Fill[]): FillWithCoun
   return result;
 };
 
-const enrichPharmacy = async (pharmacy: types.Pharmacy): Promise<EnrichedPharmacy> => {
+export const enrichPharmacy = async (
+  pharmacy: types.Pharmacy,
+  includeRating = true
+): Promise<EnrichedPharmacy> => {
   try {
-    const placeId = await getPlaceId(pharmacy);
-    if (!placeId) {
-      return pharmacy;
-    }
-
-    const placeDetails = await getPlaceDetails(placeId);
-    if (!placeDetails) {
+    const place = await getPlace(pharmacy, includeRating);
+    if (!place) {
       return pharmacy;
     }
 
     const enrichedPharmacyInfo = {
       ...pharmacy,
-      businessStatus: placeDetails.business_status || '',
-      rating: placeDetails.rating || undefined
+      businessStatus: place.business_status || '',
+      rating: place.rating || undefined
     };
 
     if (enrichedPharmacyInfo.businessStatus !== 'OPERATIONAL') {
+      return enrichedPharmacyInfo;
+    }
+
+    const fetchDetails = place.place_id && place.business_status === 'OPERATIONAL';
+    const placeDetails = fetchDetails ? await getPlaceDetails(place.place_id) : undefined;
+    if (!placeDetails) {
       return enrichedPharmacyInfo;
     }
 
@@ -231,16 +235,6 @@ const enrichPharmacy = async (pharmacy: types.Pharmacy): Promise<EnrichedPharmac
     };
   } catch (error) {
     console.log('Failed to enrich pharmacy data: ' + error.message);
-    return pharmacy;
-  }
-};
-
-export const addRatingsAndHours = async (pharmacy: types.Pharmacy): Promise<EnrichedPharmacy> => {
-  try {
-    const enrichedPharmacy = await enrichPharmacy(pharmacy);
-    return enrichedPharmacy;
-  } catch (error) {
-    console.log('Failed to add ratings and hours: ' + error.message);
     return pharmacy;
   }
 };

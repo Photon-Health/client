@@ -42,13 +42,25 @@ const query = (method: string, data: object) =>
 
 interface PlaceResponse {
   place_id: string;
+  types: string[];
+  business_status: string;
+  rating?: number;
 }
-export const getPlaceId = async (pharmacy: types.Pharmacy): Promise<string | undefined> => {
+export const getPlace = async (
+  pharmacy: types.Pharmacy,
+  includeRating = true
+): Promise<PlaceResponse | undefined> => {
   const address = pharmacy.address ? formatAddress(pharmacy.address) : '';
   const placeQuery = pharmacy.name + ' ' + address;
+  const placeFields = [
+    'place_id',
+    'business_status',
+    'types',
+    ...(includeRating ? ['rating'] : [])
+  ];
   const placeRequest = {
     query: placeQuery,
-    fields: ['place_id']
+    fields: placeFields
   };
 
   try {
@@ -56,8 +68,8 @@ export const getPlaceId = async (pharmacy: types.Pharmacy): Promise<string | und
       'findPlaceFromQuery',
       placeRequest
     );
-    if (status === 'OK' && response[0]?.place_id) {
-      return response[0].place_id;
+    if (status === 'OK' && response[0]) {
+      return response[0];
     }
     return undefined;
   } catch (error) {
@@ -79,7 +91,7 @@ export const getPlaceDetails = async (
 ): Promise<PlaceDetailsResponse | undefined> => {
   const detailsRequest = {
     placeId,
-    fields: ['opening_hours', 'utc_offset_minutes', 'rating', 'business_status']
+    fields: ['opening_hours', 'utc_offset_minutes']
   };
 
   try {
