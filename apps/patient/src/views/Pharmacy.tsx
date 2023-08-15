@@ -304,8 +304,8 @@ export const Pharmacy = () => {
             ...TOAST_CONFIG.ERROR
           });
         }
+        setSubmitting(false);
       }, 1000);
-      setSubmitting(false);
     } catch (error) {
       toast({
         title: isReroute ? 'Unable to reroute order' : 'Unable to submit pharmacy selection',
