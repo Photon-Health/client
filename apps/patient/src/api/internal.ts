@@ -18,17 +18,14 @@ export const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHOR
  */
 
 export const getOrder = async (orderId: string) => {
-  try {
-    const response: { order: Order } = await graphQLClient.request(GET_ORDER, {
-      id: orderId
-    });
-    if (response.order) {
-      return response.order;
-    } else {
-      throw new Error('No order found');
-    }
-  } catch (error) {
-    throw new Error(error);
+  // Not wrapped in try/catch so error handling can be done in Main
+  const response: { order: Order } = await graphQLClient.request(GET_ORDER, {
+    id: orderId
+  });
+  if (response.order) {
+    return response.order;
+  } else {
+    throw new Error('No order found');
   }
 };
 

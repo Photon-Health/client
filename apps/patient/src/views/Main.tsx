@@ -55,9 +55,9 @@ export const Main = () => {
         handleOrderResponse(result);
       }
     } catch (error) {
-      console.log(error);
+      console.log(error.response);
 
-      const isAuthError = AUTH_HEADER_ERRORS.includes(error.response.errors[0].extensions.code);
+      const isAuthError = AUTH_HEADER_ERRORS.includes(error?.response?.errors?.[0].extensions.code);
       const hasOrder = !!error?.response?.data?.order;
       if (isAuthError || !hasOrder) {
         navigate('/no-match', { replace: true });
