@@ -1,4 +1,3 @@
-import { useContext } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Accordion,
@@ -19,16 +18,15 @@ import {
 import { FaPrescription } from 'react-icons/fa';
 import { Helmet } from 'react-helmet';
 
-import { Order } from '../utils/models';
+import { useOrderContext } from './Main';
 import { formatDate, countFillsAndRemoveDuplicates } from '../utils/general';
 import { FixedFooter } from '../components/FixedFooter';
 import { Nav } from '../components/Nav';
 import { PoweredBy } from '../components/PoweredBy';
 import { text as t } from '../utils/text';
-import { OrderContext } from './Main';
 
 export const Review = () => {
-  const order = useContext<Order>(OrderContext);
+  const { order } = useOrderContext();
 
   const navigate = useNavigate();
 

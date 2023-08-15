@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, createContext } from 'react';
+import { useState, useEffect, useCallback, createContext, useContext } from 'react';
 import { Outlet, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { Center, CircularProgress } from '@chakra-ui/react';
 import { ChakraProvider } from '@chakra-ui/react';
@@ -11,7 +11,8 @@ import { setAuthHeader } from '../configs/graphqlClient';
 import { types } from '@photonhealth/sdk';
 import { AUTH_HEADER_ERRORS } from '../api/internal';
 
-export const OrderContext = createContext(null);
+const OrderContext = createContext(null);
+export const useOrderContext = () => useContext(OrderContext);
 
 export const Main = () => {
   const [searchParams] = useSearchParams();
@@ -83,9 +84,11 @@ export const Main = () => {
     );
   }
 
+  const orderContextValue = { order, setOrder };
+
   return (
     <ChakraProvider theme={theme(order.organization.id)}>
-      <OrderContext.Provider value={order}>
+      <OrderContext.Provider value={orderContextValue}>
         <Outlet />
       </OrderContext.Provider>
     </ChakraProvider>

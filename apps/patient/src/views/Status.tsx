@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Alert,
   AlertIcon,
@@ -17,9 +17,9 @@ import { FiCheck } from 'react-icons/fi';
 import { types } from '@photonhealth/sdk';
 import { FixedFooter, Nav, PharmacyCard, PoweredBy, StatusStepper } from '../components';
 import { formatAddress, getFulfillmentType, enrichPharmacy } from '../utils/general';
-import { Order, Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
-import { OrderContext } from './Main';
+import { useOrderContext } from './Main';
 import * as TOAST_CONFIG from '../configs/toast';
 import { markOrderAsPickedUp } from '../api';
 
@@ -27,7 +27,7 @@ const PHOTON_PHONE_NUMBER: string = process.env.REACT_APP_TWILIO_SMS_NUMBER;
 
 export const Status = () => {
   const navigate = useNavigate();
-  const order = useContext<Order>(OrderContext);
+  const { order } = useOrderContext();
 
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('orderId');

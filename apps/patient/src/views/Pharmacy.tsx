@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -16,7 +16,7 @@ import { Helmet } from 'react-helmet';
 import { types } from '@photonhealth/sdk';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, enrichPharmacy } from '../utils/general';
-import { ExtendedFulfillmentType, Order } from '../utils/models';
+import { ExtendedFulfillmentType } from '../utils/models';
 import { text as t } from '../utils/text';
 import { FixedFooter } from '../components/FixedFooter';
 import { Nav } from '../components/Nav';
@@ -24,7 +24,7 @@ import { PoweredBy } from '../components/PoweredBy';
 import { LocationModal } from '../components/LocationModal';
 import { PickupOptions } from '../components/PickupOptions';
 import { BrandedOptions } from '../components/BrandedOptions';
-import { OrderContext } from './Main';
+import { useOrderContext } from './Main';
 import { getSettings } from '@client/settings';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { FEATURED_PHARMACIES } from '../data/featuredPharmacies';
@@ -57,7 +57,7 @@ const sortIndiePharmaciesFirst = (list: EnrichedPharmacy[], distance: number, li
 };
 
 export const Pharmacy = () => {
-  const order = useContext<Order>(OrderContext);
+  const { order, setOrder } = useOrderContext();
 
   const orgSettings =
     order?.organization?.id in settings ? settings[order.organization.id] : settings.default;
@@ -292,6 +292,13 @@ export const Pharmacy = () => {
             } else if (orgSettings.mailOrderNavigateProviders.includes(selectedId)) {
               type = types.FulfillmentType.MailOrder;
             }
+
+            // Update the order context so /status shows the newly selected pharmacy
+            const selectedPharmacy = pharmacyOptions.find((p) => p.id === selectedId);
+            setOrder({
+              ...order,
+              pharmacy: selectedPharmacy
+            });
 
             navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
           }, 1000);
