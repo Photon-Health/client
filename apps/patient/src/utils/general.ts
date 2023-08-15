@@ -207,12 +207,16 @@ export const enrichPharmacy = async (
       rating: place.rating || undefined
     };
 
-    if (enrichedPharmacyInfo.businessStatus !== 'OPERATIONAL') {
+    const isOperational =
+      enrichedPharmacyInfo.businessStatus === google.maps.places.BusinessStatus.OPERATIONAL;
+    if (!isOperational) {
       return enrichedPharmacyInfo;
     }
 
-    const fetchDetails = place.place_id && place.business_status === 'OPERATIONAL';
-    const placeDetails = fetchDetails ? await getPlaceDetails(place.place_id) : undefined;
+    const fetchDetails = enrichedPharmacyInfo.place_id && isOperational; // Don't continue enriching non-operational pharmacies
+    const placeDetails = fetchDetails
+      ? await getPlaceDetails(enrichedPharmacyInfo.place_id)
+      : undefined;
     if (!placeDetails) {
       return enrichedPharmacyInfo;
     }
