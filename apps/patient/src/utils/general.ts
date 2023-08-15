@@ -213,10 +213,8 @@ export const enrichPharmacy = async (
       return enrichedPharmacyInfo;
     }
 
-    const fetchDetails = enrichedPharmacyInfo.place_id && isOperational; // Don't continue enriching non-operational pharmacies
-    const placeDetails = fetchDetails
-      ? await getPlaceDetails(enrichedPharmacyInfo.place_id)
-      : undefined;
+    const fetchDetails = place.place_id && isOperational; // Don't continue enriching non-operational pharmacies
+    const placeDetails = fetchDetails ? await getPlaceDetails(place.place_id) : undefined;
     if (!placeDetails) {
       return enrichedPharmacyInfo;
     }
