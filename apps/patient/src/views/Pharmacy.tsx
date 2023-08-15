@@ -129,7 +129,7 @@ export const Pharmacy = () => {
     } catch (error) {
       toast({
         title: 'Invalid location',
-        description: 'Please update your location and try again',
+        description: 'Please update your location and try again.',
         ...TOAST_CONFIG.ERROR
       });
 
