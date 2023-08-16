@@ -130,13 +130,10 @@ const CANCEL_ORDER = gql`
     }
   }
 `;
-const UPDATE_ORDER_PHARMACY = gql`
-  mutation UpdateOrderPharmacy($id: ID!) {
-    updateOrder(id: $id) {
-      __typename
-      id
-      externalId
-    }
+
+export const REROUTE_ORDER = gql`
+  mutation RerouteOrder($orderId: ID!, $pharmacyId: String) {
+    rerouteOrder(orderId: $orderId, pharmacyId: $pharmacyId)
   }
 `;
 
@@ -213,7 +210,7 @@ export const Order = () => {
       }
     }
   });
-  const [updateOrderPharmacy] = useMutation(UPDATE_ORDER_PHARMACY);
+  const [rerouteOrder] = useMutation(REROUTE_ORDER);
   const order = data?.order;
   const {
     isOpen: isOpenLocation,
@@ -445,7 +442,7 @@ export const Order = () => {
                             onClick={async () => {
                               setUpdating(true);
                               console.log('SETTING PHARMACY', pharmacyId);
-                              await updateOrderPharmacy({ variables: { id } });
+                              await rerouteOrder({ variables: { orderId: id, pharmacyId } });
                               setPharmacyId('');
                               setUpdating(false);
                               onClose();
@@ -602,7 +599,8 @@ export const Order = () => {
                   isDisabled={
                     loading ||
                     order.state === types.OrderState.Canceled ||
-                    order.state === types.OrderState.Completed
+                    order.state === types.OrderState.Completed ||
+                    order?.fulfillment?.state === 'SHIPPED'
                   }
                   onClick={async () => {
                     const decision = await confirmWrapper('Cancel this order?', {
@@ -630,39 +628,6 @@ export const Order = () => {
                 fulfillmentState={order?.fulfillment?.state as OrderFulfillmentState}
               />
             ) : null}
-
-            <Button
-              aria-label="Cancel Order"
-              variant="outline"
-              borderColor="red.500"
-              textColor="red.500"
-              colorScheme="red"
-              size="sm"
-              isLoading={updating}
-              loadingText="Canceling..."
-              isDisabled={
-                loading ||
-                order.state === types.OrderState.Canceled ||
-                order.state === types.OrderState.Completed ||
-                order?.fulfillment?.state === 'SHIPPED'
-              }
-              onClick={async () => {
-                const decision = await confirmWrapper('Cancel this order?', {
-                  description: 'You will not be able to undo this action.',
-                  cancelText: "No, Don't Cancel",
-                  confirmText: 'Yes, Cancel',
-                  darkMode: colorMode !== 'light',
-                  colorScheme: 'red'
-                });
-                if (decision) {
-                  setUpdating(true);
-                  await cancelOrder({ variables: { id } });
-                  setUpdating(false);
-                }
-              }}
-            >
-              Cancel Order
-            </Button>
           </VStack>
         </CardBody>
       </Card>
