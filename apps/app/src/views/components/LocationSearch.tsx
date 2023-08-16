@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import * as Sentry from '@sentry/react';
 
 import {
   Button,
@@ -11,11 +12,12 @@ import {
   ModalBody,
   ModalCloseButton,
   Text,
-  VStack
+  VStack,
+  useToast
 } from '@chakra-ui/react';
 
 import { FiTarget } from 'react-icons/fi';
-import { AsyncSelect } from 'chakra-react-select';
+import { AsyncSelect, OptionsOrGroups } from 'chakra-react-select';
 
 const formatLocationOptions = (p: any) => {
   const options = p.map((org: any) => {
@@ -29,6 +31,7 @@ const formatLocationOptions = (p: any) => {
 
 export const LocationSearch = ({ isOpen, onClose }: any) => {
   const [gettingCurrentLocation, setGettingCurrentLocation] = useState<boolean>(false);
+  const toast = useToast();
 
   const autocompleteService = new google.maps.places.AutocompleteService();
   const searchForLocations = async (inputValue: string) => {
@@ -72,10 +75,30 @@ export const LocationSearch = ({ isOpen, onClose }: any) => {
     }
   };
 
-  const loadOptions = (inputValue: string, callback: (options: any) => void) => {
-    setTimeout(async () => {
-      callback(await searchForLocations(inputValue));
-    }, 1000);
+  const loadOptions = async (
+    inputValue: string,
+    callback: (options: any) => void
+  ): Promise<OptionsOrGroups<never, never>> => {
+    try {
+      const result = await searchForLocations(inputValue);
+      callback(result);
+      return result; // assuming result is of type OptionsOrGroups<never, never>
+    } catch (e) {
+      toast({
+        title: 'Location Search Error',
+        description: 'There was an error searching for locations. Please refresh the page.',
+        status: 'error',
+        position: 'top',
+        duration: 5000,
+        isClosable: true
+      });
+      Sentry.withScope((scope) => {
+        scope.setTag('component', 'LocationSearch');
+        scope.setExtra('function', 'searchForLocations');
+        Sentry.captureException(e);
+      });
+      return []; // or whatever default or fallback value is appropriate
+    }
   };
 
   return (
