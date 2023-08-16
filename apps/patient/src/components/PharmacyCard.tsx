@@ -108,6 +108,7 @@ interface PharmacyCardProps {
   goodService?: boolean;
   savingPreferred?: boolean;
   selected?: boolean;
+  canReroute?: boolean;
   onSelect?: () => void;
   onSetPreferred?: () => void;
   onChangePharmacy?: () => void;
@@ -121,6 +122,7 @@ export const PharmacyCard = memo(function PharmacyCard({
   goodService = false,
   savingPreferred = false,
   selected = false,
+  canReroute = true,
   onSelect,
   onChangePharmacy,
   onSetPreferred,
@@ -193,7 +195,7 @@ export const PharmacyCard = memo(function PharmacyCard({
               Make this my preferred pharmacy
             </Button>
           ) : null}
-          {onChangePharmacy ? (
+          {onChangePharmacy && canReroute ? (
             <Button
               mx="auto"
               size="sm"

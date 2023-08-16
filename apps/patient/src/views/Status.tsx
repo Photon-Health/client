@@ -22,12 +22,18 @@ import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import * as TOAST_CONFIG from '../configs/toast';
 import { markOrderAsPickedUp } from '../api';
+import { getSettings } from '@client/settings';
+
+const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
 const PHOTON_PHONE_NUMBER: string = process.env.REACT_APP_TWILIO_SMS_NUMBER;
 
 export const Status = () => {
   const navigate = useNavigate();
   const { order } = useOrderContext();
+
+  const orgSettings =
+    order?.organization?.id in settings ? settings[order.organization.id] : settings.default;
 
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('orderId');
@@ -146,6 +152,7 @@ export const Status = () => {
               <PharmacyCard
                 pharmacy={enrichedPharmacy}
                 selected={true}
+                canReroute={orgSettings.patientsCanReroute}
                 onChangePharmacy={() =>
                   navigate(`/pharmacy?orderId=${order.id}&token=${token}&reroute=true`)
                 }
