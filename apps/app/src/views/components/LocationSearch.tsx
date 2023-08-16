@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import * as Sentry from '@sentry/react';
 
 import {
@@ -33,20 +33,21 @@ export const LocationSearch = ({ isOpen, onClose }: any) => {
   const [gettingCurrentLocation, setGettingCurrentLocation] = useState<boolean>(false);
   const toast = useToast();
 
-  const autocompleteService = new google.maps.places.AutocompleteService();
+  const autocompleteServiceRef = useRef(new google.maps.places.AutocompleteService());
+  const geocoderRef = useRef(new google.maps.Geocoder());
+
   const searchForLocations = async (inputValue: string) => {
     const request = {
       input: inputValue,
       types: ['geocode'],
       componentRestrictions: { country: 'us' }
     };
-    const opts = await autocompleteService.getPlacePredictions(request);
+    const opts = await autocompleteServiceRef.current.getPlacePredictions(request);
     return formatLocationOptions(opts.predictions);
   };
 
-  const geocoder = new google.maps.Geocoder();
   const geocode = async (address: string) => {
-    const data = await geocoder.geocode({ address });
+    const data = await geocoderRef.current.geocode({ address });
     if (data?.results) {
       onClose({
         loc: data.results[0].formatted_address,
@@ -59,17 +60,23 @@ export const LocationSearch = ({ isOpen, onClose }: any) => {
   const getCurrentLocation = async () => {
     setGettingCurrentLocation(true);
     if (navigator.geolocation) {
-      await navigator.geolocation.getCurrentPosition(async (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        const data = await geocoder.geocode({ location: { lat, lng } });
-        onClose({
-          loc: data.results[0].formatted_address,
-          lat,
-          lng
-        });
-        setGettingCurrentLocation(false);
-      });
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const data = await geocoderRef.current.geocode({ location: { lat, lng } });
+          onClose({
+            loc: data.results[0].formatted_address,
+            lat,
+            lng
+          });
+          setGettingCurrentLocation(false);
+        },
+        (error) => {
+          console.error('Geolocation error: ', error);
+          setGettingCurrentLocation(false);
+        }
+      );
     } else {
       setGettingCurrentLocation(false);
     }
@@ -82,7 +89,7 @@ export const LocationSearch = ({ isOpen, onClose }: any) => {
     try {
       const result = await searchForLocations(inputValue);
       callback(result);
-      return result; // assuming result is of type OptionsOrGroups<never, never>
+      return result;
     } catch (e) {
       toast({
         title: 'Location Search Error',
@@ -97,7 +104,7 @@ export const LocationSearch = ({ isOpen, onClose }: any) => {
         scope.setExtra('function', 'searchForLocations');
         Sentry.captureException(e);
       });
-      return []; // or whatever default or fallback value is appropriate
+      return [];
     }
   };
 
