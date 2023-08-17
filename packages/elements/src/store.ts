@@ -5,6 +5,7 @@ import {
   DispenseUnit,
   MutationCreatePrescriptionArgs,
   Patient,
+  Permission,
   Prescription,
   PrescriptionTemplate,
   Treatment
@@ -12,7 +13,6 @@ import {
 import gql from 'graphql-tag';
 import { GraphQLError } from 'graphql';
 import jwtDecode from 'jwt-decode';
-import { Permission } from '../types';
 
 const defaultOnRedirectCallback = (appState?: any): void => {
   window.location.replace(appState?.returnTo || window.location.pathname);
