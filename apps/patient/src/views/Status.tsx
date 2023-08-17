@@ -150,7 +150,7 @@ export const Status = () => {
                 href={`https://google.com/search?q=${fulfillment.trackingNumber}`}
                 display="inline"
                 ms={2}
-                color="brandLink"
+                color="link"
                 fontWeight="medium"
                 target="_blank"
                 data-dd-privacy="mask"
@@ -172,7 +172,7 @@ export const Status = () => {
                 )}`}
                 display="inline"
                 ms={2}
-                color="brandLink"
+                color="link"
                 fontWeight="medium"
                 target="_blank"
               >
