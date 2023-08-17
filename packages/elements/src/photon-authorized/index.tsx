@@ -1,11 +1,11 @@
 //Shoelace
+import { Permission } from '@photonhealth/sdk/dist/types';
 import '@shoelace-style/shoelace/dist/components/alert/alert';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 import { createEffect, createSignal, JSXElement, mergeProps, Show } from 'solid-js';
-import { Permission } from '../../types';
 import { usePhoton } from '../context';
 
 function checkHasPermission(subset: Permission[], superset: Permission[]) {

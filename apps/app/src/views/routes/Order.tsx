@@ -70,36 +70,29 @@ const CancelOrderAlert = ({
   orderState: OrderState;
   fulfillmentState: OrderFulfillmentState;
 }) => {
+  let status: 'info' | 'warning' = 'info';
+  let message = '';
+
   if (orderState === types.OrderState.Canceled) {
-    return (
-      <Alert colorScheme="gray">
-        <AlertIcon />
-        This order has been canceled
-      </Alert>
-    );
+    message = 'This order has been canceled';
+  } else if (orderState === types.OrderState.Completed) {
+    message = 'This order has been completed';
+  } else if (fulfillmentState === 'SHIPPED') {
+    message = 'This order has been shipped';
+  } else if (fulfillmentState === 'PICKED_UP') {
+    status = 'warning';
+    message =
+      "This order has been picked up, but we can't cancel the remaining fills. Please call the pharmacy.";
+  } else if (fulfillmentState === 'RECEIVED' || fulfillmentState === 'READY') {
+    status = 'warning';
+    message = 'This order may have been picked up, but we can cancel the remaining fills.';
   }
-  if (orderState === types.OrderState.Completed) {
+
+  if (message) {
     return (
-      <Alert colorScheme="gray">
+      <Alert status={status} colorScheme={status === 'info' ? 'gray' : undefined}>
         <AlertIcon />
-        This order has been completed
-      </Alert>
-    );
-  }
-  if (fulfillmentState === 'PICKED_UP') {
-    return (
-      <Alert status="warning">
-        <AlertIcon />
-        This order has been picked up, but we can't cancel the remaining fills. Please call the
-        pharmacy.
-      </Alert>
-    );
-  }
-  if (fulfillmentState === 'RECEIVED' || fulfillmentState === 'READY') {
-    return (
-      <Alert status="warning">
-        <AlertIcon />
-        This order may have been picked up, but we can cancel the remaining fills.
+        {message}
       </Alert>
     );
   }
@@ -435,7 +428,8 @@ export const Order = () => {
               isDisabled={
                 loading ||
                 order.state === types.OrderState.Canceled ||
-                order.state === types.OrderState.Completed
+                order.state === types.OrderState.Completed ||
+                order?.fulfillment?.state === 'SHIPPED'
               }
               onClick={async () => {
                 const decision = await confirmWrapper('Cancel this order?', {
