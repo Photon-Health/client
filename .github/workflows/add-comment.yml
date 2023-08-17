@@ -16,5 +16,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `[Click here](https://app-${ref}.boson.health) to see your changes live`
+              body: `<a href="https://app-${ref}.boson.health" target="_blank">Click here</a> to see your changes live`
             })
