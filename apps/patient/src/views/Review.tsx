@@ -116,10 +116,6 @@ export const Review = () => {
                             </Text>
                           </HStack>
                         </HStack>
-                        <HStack w="full" align="start">
-                          <Text color="gray.500">{t.review.instructions}</Text>
-                          <Text data-dd-privacy="mask">{prescription.instructions}</Text>
-                        </HStack>
                       </VStack>
                     </AccordionPanel>
                   </CardBody>
