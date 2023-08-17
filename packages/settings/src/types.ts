@@ -31,6 +31,7 @@ export type OrganizationSettings = {
   mailOrderNavigateProviders?: string[];
   sendToPatient?: boolean;
   sendToPatientUsers?: string[];
+  patientsCanReroute: boolean;
   returnTo?: string;
   federated?: boolean;
 };

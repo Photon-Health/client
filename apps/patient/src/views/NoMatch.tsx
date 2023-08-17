@@ -1,6 +1,6 @@
 import { Center, Heading, Text, VStack, ChakraProvider } from '@chakra-ui/react';
 import { MdSearch } from 'react-icons/md';
-import t from '../utils/text.json';
+import { text as t } from '../utils/text';
 import theme from '../configs/theme';
 
 export const NoMatch = () => {
