@@ -19,21 +19,25 @@ export const Main = () => {
   const orderId = searchParams.get('orderId');
   const token = searchParams.get('token');
 
-  if (token) {
-    setAuthHeader(token);
-  }
-
   const [order, setOrder] = useState<Order | undefined>(undefined);
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  if (location.pathname !== '/canceled') {
-    if (!orderId || !token) {
-      console.error('Missing orderId or token in search params');
-      navigate('/no-match', { replace: true });
+  useEffect(() => {
+    if (location.pathname !== '/canceled') {
+      if (!orderId || !token) {
+        console.error('Missing orderId or token in search params');
+        navigate('/no-match', { replace: true });
+      }
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      setAuthHeader(token);
+    }
+  }, [token]);
 
   const handleOrderResponse = (order: Order) => {
     setOrder(order);
