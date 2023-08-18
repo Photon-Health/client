@@ -15,7 +15,7 @@ import {
 import { FiTarget } from 'react-icons/fi';
 import { AsyncSelect } from 'chakra-react-select';
 
-import t from '../utils/text.json';
+import { text as t } from '../utils/text';
 
 const formatLocationOptions = (p: any) => {
   const options = p.map((org: any) => {

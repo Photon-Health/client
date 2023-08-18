@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import {
+  Box,
   Button,
   Card,
   CardBody,
@@ -14,7 +15,7 @@ import {
   VStack,
   useBreakpointValue
 } from '@chakra-ui/react';
-import { FiRotateCcw, FiStar, FiThumbsUp } from 'react-icons/fi';
+import { FiRotateCcw, FiStar, FiThumbsUp, FiRefreshCcw, FiNavigation } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { types } from '@photonhealth/sdk';
@@ -28,7 +29,7 @@ dayjs.extend(customParseFormat);
 
 interface RatingHoursProps {
   businessStatus: string;
-  rating: string;
+  rating: number;
   hours: {
     open?: boolean;
     opens?: string;
@@ -51,9 +52,11 @@ const RatingHours = ({ businessStatus, rating, hours }: RatingHoursProps) => {
     <HStack w="full" whiteSpace="nowrap" overflow="hidden">
       {rating ? <Rating rating={rating} /> : null}
       {rating ? <Text color="gray.400">&bull;</Text> : null}
-      <Text fontSize="sm" color={hours?.open ? 'green' : 'red'}>
-        {hours?.open ? 'Open' : 'Closed'}
-      </Text>
+      {hours?.open !== undefined ? (
+        <Text fontSize="sm" color={hours?.open ? 'green' : 'red'}>
+          {hours?.open ? 'Open' : 'Closed'}
+        </Text>
+      ) : null}
       {!hours?.is24Hr && ((hours?.open && hours?.closes) || (!hours?.open && hours?.opens)) ? (
         <Text color="gray.400">&bull;</Text>
       ) : null}
@@ -84,10 +87,16 @@ interface DistanceAddressProps {
 }
 
 const DistanceAddress = ({ distance, address }: DistanceAddressProps) => {
-  if (!distance || !address) return null;
+  if (!address) return null;
   return (
     <Text fontSize="sm" color="gray.500" display="inline">
-      {distance?.toFixed(1)} mi &bull; {formatAddress(address)}
+      {distance ? `${distance.toFixed(1)} mi` : ''}
+      {distance && (
+        <Box as="span" display="inline" mx={2}>
+          &bull;
+        </Box>
+      )}
+      {formatAddress(address)}
     </Text>
   );
 };
@@ -97,21 +106,27 @@ interface PharmacyCardProps {
   preferred?: boolean;
   previous?: boolean;
   goodService?: boolean;
-  savingPreferred: boolean;
-  selected: boolean;
-  onSelect: Function;
-  onSetPreferred: () => void;
+  savingPreferred?: boolean;
+  selected?: boolean;
+  canReroute?: boolean;
+  onSelect?: () => void;
+  onSetPreferred?: () => void;
+  onChangePharmacy?: () => void;
+  onGetDirections?: () => void;
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
   pharmacy,
-  preferred,
-  previous,
-  goodService,
-  savingPreferred,
-  selected,
+  preferred = false,
+  previous = false,
+  goodService = false,
+  savingPreferred = false,
+  selected = false,
+  canReroute = true,
   onSelect,
-  onSetPreferred
+  onChangePharmacy,
+  onSetPreferred,
+  onGetDirections
 }: PharmacyCardProps) {
   const isMobile = useBreakpointValue({ base: true, md: false });
 
@@ -121,9 +136,9 @@ export const PharmacyCard = memo(function PharmacyCard({
     <Card
       bgColor="white"
       border="2px solid"
-      borderColor={selected ? 'brand.600' : 'white'}
+      borderColor={selected && onSelect ? 'brand.600' : 'white'}
       cursor="pointer"
-      onClick={() => onSelect()}
+      onClick={() => onSelect && onSelect()}
       mx={isMobile ? -3 : undefined}
     >
       <CardBody p={3}>
@@ -167,17 +182,43 @@ export const PharmacyCard = memo(function PharmacyCard({
       <Collapse in={selected && !preferred} animateOpacity>
         <Divider />
         <CardFooter p={2}>
-          <Button
-            mx="auto"
-            size="sm"
-            variant="ghost"
-            color="link"
-            onClick={onSetPreferred}
-            isLoading={savingPreferred}
-            leftIcon={<FiStar />}
-          >
-            Make this my preferred pharmacy
-          </Button>
+          {onSetPreferred ? (
+            <Button
+              mx="auto"
+              size="sm"
+              variant="ghost"
+              color="link"
+              onClick={onSetPreferred}
+              isLoading={savingPreferred}
+              leftIcon={<FiStar />}
+            >
+              Make this my preferred pharmacy
+            </Button>
+          ) : null}
+          {onChangePharmacy && canReroute ? (
+            <Button
+              mx="auto"
+              size="sm"
+              variant="ghost"
+              colorScheme="brand"
+              onClick={onChangePharmacy}
+              leftIcon={<FiRefreshCcw />}
+            >
+              Change pharmacy
+            </Button>
+          ) : null}
+          {onGetDirections ? (
+            <Button
+              mx="auto"
+              size="sm"
+              variant="ghost"
+              colorScheme="brand"
+              onClick={onGetDirections}
+              leftIcon={<FiNavigation />}
+            >
+              Get directions
+            </Button>
+          ) : null}
         </CardFooter>
       </Collapse>
     </Card>

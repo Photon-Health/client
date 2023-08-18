@@ -7,22 +7,20 @@ const getStarIcon = (rating: number, pos: number) => {
   return FaRegStar;
 };
 
-export const Rating = ({ rating }: { rating: string }) => {
+export const Rating = ({ rating }: { rating: number }) => {
   if (!rating) return null;
-
-  const ratingNum = parseFloat(rating);
 
   return (
     <HStack>
       <Text fontSize="sm" me={0} color="gray.500">
-        {ratingNum.toFixed(1)}
+        {rating.toFixed(1)}
       </Text>
       <HStack spacing={1}>
-        <Icon as={getStarIcon(ratingNum, 1)} color="orange" w={4} h={4} />
-        <Icon as={getStarIcon(ratingNum, 2)} color="orange" w={4} h={4} />
-        <Icon as={getStarIcon(ratingNum, 3)} color="orange" w={4} h={4} />
-        <Icon as={getStarIcon(ratingNum, 4)} color="orange" w={4} h={4} />
-        <Icon as={getStarIcon(ratingNum, 5)} color="orange" w={4} h={4} />
+        <Icon as={getStarIcon(rating, 1)} color="orange" w={4} h={4} />
+        <Icon as={getStarIcon(rating, 2)} color="orange" w={4} h={4} />
+        <Icon as={getStarIcon(rating, 3)} color="orange" w={4} h={4} />
+        <Icon as={getStarIcon(rating, 4)} color="orange" w={4} h={4} />
+        <Icon as={getStarIcon(rating, 5)} color="orange" w={4} h={4} />
       </HStack>
     </HStack>
   );
