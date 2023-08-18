@@ -22,6 +22,7 @@ const defaultSettings: OrganizationSettings = {
   mailOrderNavigateProviders: [],
   sendToPatient: true,
   sendToPatientUsers: [],
+  patientsCanReroute: true,
   courier: false,
   courierProviders: [],
   returnTo: window.location.origin,
@@ -132,6 +133,7 @@ export const neutron: {
   org_vISrdMELQC3MhOFb: {
     ...defaultSettings,
     logo: 'blueberry_logo.png',
-    accentColor: '#235AFF'
+    accentColor: '#235AFF',
+    patientsCanReroute: false
   }
 };

@@ -1,8 +1,6 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
-  Alert,
-  AlertIcon,
   Box,
   Button,
   Container,
@@ -15,110 +13,42 @@ import {
 } from '@chakra-ui/react';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { Helmet } from 'react-helmet';
-import dayjs from 'dayjs';
 import { types } from '@photonhealth/sdk';
-import { formatAddress, getHours } from '../utils/general';
-import { GET_PHARMACIES } from '../utils/queries';
-import { ExtendedFulfillmentType, Order } from '../utils/models';
-import t from '../utils/text.json';
-import { SELECT_ORDER_PHARMACY, SET_PREFERRED_PHARMACY } from '../utils/mutations';
-import { graphQLClient } from '../configs/graphqlClient';
+import * as TOAST_CONFIG from '../configs/toast';
+import { formatAddress, enrichPharmacy } from '../utils/general';
+import { ExtendedFulfillmentType } from '../utils/models';
+import { text as t } from '../utils/text';
 import { FixedFooter } from '../components/FixedFooter';
 import { Nav } from '../components/Nav';
 import { PoweredBy } from '../components/PoweredBy';
 import { LocationModal } from '../components/LocationModal';
 import { PickupOptions } from '../components/PickupOptions';
 import { BrandedOptions } from '../components/BrandedOptions';
-import { OrderContext } from './Main';
+import { useOrderContext } from './Main';
 import { getSettings } from '@client/settings';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-
-export const AUSTIN_INDIE_PHARMACY_IDS: string[] = [
-  'phr_01G9CM8JJ03N4VPPDKR4KV4YKR', // Tarrytown Pharmacy
-  'phr_01G9CM8MFENM6P96F94RQWBMAY', // Northwest Hills Pharmacy at Davenport
-  // People's pharmacies (4)
-  'phr_01G9CM8MTAFDSKSJ5P3680FFBG',
-  'phr_01G9CM90JXBT4JPDQZAMEVRQ5K',
-  'phr_01G9CM8M2D23133Q9T91K3NQE5',
-  'phr_01G9CM8TFRJNZ5CYW1PV3Z4Z9C',
-  'phr_01G9CM8W0RD2YRWX8F64NJB4JM', // East Austin Medicine Shop
-  'phr_01GFVHFPSTYPWPMGQ4Y0ZMEEP0', // Martin's Wellness & Compounding Pharmacy at Lamar Plaza Drug Store
-  'phr_01H5Z4ZYBP0PSBE0EQZDNPY6ZQ', // Martin's Wellness Dripping Springs Pharmacy
-  'phr_01G9CM8WDPTAPXX8RWFSFTDZRW', // Brodie Lane Pharmacy
-  'phr_01H5Z4ZYBP0PSBE0EQZDNPY6ZR', // MedSavers Pharmacy
-  'phr_01GA9HPXHZY0NS2WBWEF52GKFM', // Gus's Drug
-  'phr_01G9CM8J8CDW1TVNY9MMNBF1QM', // 38th Street Pharmacy
-  'phr_01G9CM92EYZVK3FZ25JMYKRNR5', // Austin Compounding Pharmacy
-  'phr_01GA9HPXJPCEXYEBVGFYT17066', // Buda Drug Store
-  'phr_01G9CM92S2ES1TJD8DH1VTEBZJ', // Auro Pharmacy
-  'phr_01GA9HPXD5ZM86MASCK625ZQJF', // Lake Hills Pharmacy
-  'phr_01GA9HPXEQH5V38D5G11EKADNY', // Manor Pharmacy
-  'phr_01G9CM940NTXPBR0HQ7042T5CA', // Alive And Well Pharmacy
-  'phr_01GSB2FQ4F2D2JBJW58AGCP2V0' // Solutions Pharmacy
-];
+import { FEATURED_PHARMACIES } from '../data/featuredPharmacies';
+import {
+  geocode,
+  getPharmacies,
+  rerouteOrder,
+  selectOrderPharmacy,
+  setPreferredPharmacy
+} from '../api';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
-const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
 export const UNOPEN_BUSINESS_STATUS_MAP = {
   CLOSED_TEMPORARILY: 'Closed Temporarily',
   CLOSED_PERMANENTLY: 'Closed Permanently'
 };
 const FEATURE_INDIES_WITHIN_RADIUS = 3; // miles
 const FEATURED_PHARMACIES_LIMIT = 2;
-
-const placesService = new google.maps.places.PlacesService(document.createElement('div'));
-const query = (method: string, data: object) =>
-  new Promise((resolve, reject) => {
-    placesService[method](data, (response, status) => {
-      if (status === 'OK') {
-        resolve({ response, status });
-      } else {
-        reject({ response, status });
-      }
-    });
-  });
-
-const geocoder: google.maps.Geocoder = new google.maps.Geocoder();
-const geocode = async (address: string) => {
-  const request: google.maps.GeocoderRequest = { address };
-
-  try {
-    const response: google.maps.GeocoderResponse = await geocoder.geocode(request);
-
-    const result = response.results?.[0];
-    if (result?.geometry?.location) {
-      return {
-        address: result.formatted_address,
-        lat: result.geometry.location.lat(),
-        lng: result.geometry.location.lng()
-      };
-    } else {
-      throw new Error('No results found for the provided address.');
-    }
-  } catch (error) {
-    switch (error.message) {
-      case google.maps.GeocoderStatus.UNKNOWN_ERROR:
-        throw new Error('Unknown server error occurred.');
-      case google.maps.GeocoderStatus.OVER_QUERY_LIMIT:
-        throw new Error('Exceeded the query limit. Please try again later.');
-      case google.maps.GeocoderStatus.ZERO_RESULTS:
-        throw new Error('No result was found.');
-      case google.maps.GeocoderStatus.REQUEST_DENIED:
-        throw new Error('Geocoding request denied. Check your API key and permissions.');
-      case google.maps.GeocoderStatus.INVALID_REQUEST:
-        throw new Error('Invalid geocoding request.');
-      default:
-        throw error; // Re-throw any other unexpected errors
-    }
-  }
-};
+const MAX_ENRICHMENT = 5; // Maximum number of pharmacies to enrich at a time
 
 const sortIndiePharmaciesFirst = (list: EnrichedPharmacy[], distance: number, limit: number) => {
   const featuredPharmacies = list
-    .filter(
-      (p: EnrichedPharmacy) => AUSTIN_INDIE_PHARMACY_IDS.includes(p.id) && p.distance < distance
-    )
+    .filter((p: EnrichedPharmacy) => FEATURED_PHARMACIES.includes(p.id) && p.distance < distance)
     .slice(0, limit);
   const otherPharmacies = list.filter(
     (p: EnrichedPharmacy) => !featuredPharmacies.some((f) => f.id === p.id)
@@ -126,127 +56,8 @@ const sortIndiePharmaciesFirst = (list: EnrichedPharmacy[], distance: number, li
   return featuredPharmacies.concat(otherPharmacies);
 };
 
-const getPharmacies = async (
-  searchParams: {
-    latitude: number;
-    longitude: number;
-    radius: number;
-  },
-  limit: number,
-  offset: number,
-  token: string
-) => {
-  graphQLClient.setHeader('x-photon-auth', token);
-
-  try {
-    const query: { pharmaciesByLocation: types.Pharmacy[] } = await graphQLClient.request(
-      GET_PHARMACIES,
-      {
-        location: searchParams,
-        limit,
-        offset
-      }
-    );
-    if (query?.pharmaciesByLocation?.length > 0) {
-      return query.pharmaciesByLocation;
-    } else {
-      throw new Error('No pharmacies found near location');
-    }
-  } catch (error) {
-    if (error?.response?.errors?.[0].message === 'No pharmacies found near location') {
-      const { message } = error.response.errors[0];
-      throw new Error(message);
-    } else {
-      throw error;
-    }
-  }
-};
-
-/**
- * Adds ratings and hours to the Pharmacy object using Google Place API.
- * If the details are not found or an error occurs during the process, the original Pharmacy object is returned.
- *
- * @param {Pharmacy} p - The Pharmacy object to enrich with additional details.
- * @returns {Promise<Pharmacy>} - A Promise that resolves to the enriched Pharmacy object.
- */
-const addRatingsAndHours = async (p: EnrichedPharmacy) => {
-  // Get place from Google
-  const name = p.name;
-  const address = p.address ? formatAddress(p.address) : '';
-  const placeRequest = {
-    query: name + ' ' + address,
-    fields: ['place_id']
-  };
-  let placeId: string;
-  let placeStatus: string;
-  try {
-    const { response, status }: any = await query('findPlaceFromQuery', placeRequest);
-    placeId = response[0]?.place_id;
-    placeStatus = status;
-  } catch (error) {
-    console.error(JSON.stringify(error, undefined, 2));
-    console.log(error);
-    return p;
-  }
-
-  if (placeStatus !== 'OK' || !placeId) {
-    console.log('Could not find Google place');
-    return p; // Break early if place isn't found
-  }
-
-  // Get place details from Google
-  const detailsRequest = {
-    placeId,
-    fields: [
-      'opening_hours',
-      'utc_offset_minutes', // this gives us isOpen()
-      'rating',
-      'business_status'
-    ]
-  };
-  let details: any;
-  let detailsStatus: string;
-  try {
-    const { response, status }: any = await query('getDetails', detailsRequest);
-    details = response;
-    detailsStatus = status;
-  } catch (error) {
-    console.error(JSON.stringify(error, undefined, 2));
-    console.log(error);
-    return p;
-  }
-
-  if (detailsStatus !== 'OK') {
-    console.log('Could not find place details');
-    return p; // Break early if place details not found
-  }
-
-  p.businessStatus = details?.business_status || '';
-  p.rating = details?.rating || undefined;
-
-  const openForBusiness = details?.business_status === 'OPERATIONAL';
-  if (!openForBusiness) {
-    return p; // Don't need hours for non-operational business
-  }
-
-  const currentTime = dayjs().format('HHmm');
-  const { is24Hr, opens, opensDay, closes } = getHours(
-    details?.opening_hours?.periods,
-    currentTime
-  );
-  p.hours = {
-    open: details?.opening_hours?.isOpen() || false,
-    is24Hr,
-    opens,
-    opensDay,
-    closes
-  };
-
-  return p;
-};
-
 export const Pharmacy = () => {
-  const order = useContext<Order>(OrderContext);
+  const { order, setOrder } = useOrderContext();
 
   const orgSettings =
     order?.organization?.id in settings ? settings[order.organization.id] : settings.default;
@@ -255,6 +66,7 @@ export const Pharmacy = () => {
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
+  const isReroute = searchParams.get('reroute');
 
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
@@ -263,7 +75,6 @@ export const Pharmacy = () => {
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<string>('');
   const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
-  const [error, setError] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
   const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(false);
@@ -279,6 +90,7 @@ export const Pharmacy = () => {
   const toast = useToast();
 
   const reset = () => {
+    setInitialPharmacies([]);
     setPharmacyOptions([]);
     setSelectedId('');
     setShowFooter(false);
@@ -315,7 +127,17 @@ export const Pharmacy = () => {
     try {
       locationData = await geocode(location);
     } catch (error) {
-      console.error('Geocoding error:', error);
+      toast({
+        title: 'Invalid location',
+        description: 'Please update your location and try again.',
+        ...TOAST_CONFIG.ERROR
+      });
+
+      setShowingAllPharmacies(true);
+
+      console.log('Geocoding error:', error);
+
+      return;
     }
 
     const { address, lat, lng } = locationData;
@@ -339,28 +161,26 @@ export const Pharmacy = () => {
           radius: 25
         },
         30, // Set high to ensure indie's are found. Request time increase is minimal.
-        0,
-        token
+        0
       );
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
         setLoadingPharmacies(false);
         return;
       }
     } catch (error) {
-      if (error.message === 'No pharmacies found near location') {
-        setLoadingPharmacies(false);
-        toast({
-          title: error.message,
-          position: 'top',
-          status: 'warning',
-          duration: 5000,
-          isClosable: true
-        });
-        return;
-      } else {
-        console.error(JSON.stringify(error, undefined, 2));
-        console.log(error);
-      }
+      const noPharmaciesErr = 'No pharmacies found near location';
+      const genericError = 'Unable to get pharmacies';
+      const toastMsg = error?.message === noPharmaciesErr ? noPharmaciesErr : genericError;
+      toast({
+        title: toastMsg,
+        ...TOAST_CONFIG.WARNING
+      });
+
+      setLoadingPharmacies(false);
+
+      console.log('Get pharmacies error: ', error);
+
+      return;
     }
 
     // Sort initial list of pharmacies
@@ -373,9 +193,9 @@ export const Pharmacy = () => {
     // Save in case we fetched more than we initially show
     setInitialPharmacies(newPharmacies);
 
-    // We only show 3 at a time, so just enrich the first 3
+    // We only show add a few at a time, so just enrich the first group of pharmacies
     const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
-      newPharmacies.slice(0, 3).map(addRatingsAndHours)
+      newPharmacies.slice(0, MAX_ENRICHMENT).map((p) => enrichPharmacy(p, true))
     );
     setPharmacyOptions(enrichedPharmacies);
 
@@ -385,22 +205,15 @@ export const Pharmacy = () => {
   const handleShowMore = async () => {
     setLoadingPharmacies(true);
 
-    const newPharmacies = [];
-
     /**
      * Initially we fetched a list of pharmacies from our db, if some
      * of those haven't received ratings/hours, enrich those first
      *  */
-    const MAX_ENRICHMENT = 3; // Maximum number of pharmacies to enrich at a time
-    const pharmaciesToEnrich = initialPharmacies.slice(
-      pharmacyOptions.length,
-      pharmacyOptions.length + MAX_ENRICHMENT
+    const newPharmacies: EnrichedPharmacy[] = await Promise.all(
+      initialPharmacies
+        .slice(pharmacyOptions.length, pharmacyOptions.length + MAX_ENRICHMENT)
+        .map((p) => enrichPharmacy(p, true))
     );
-
-    for (const newPharmacy of pharmaciesToEnrich) {
-      await addRatingsAndHours(newPharmacy);
-      newPharmacies.push(newPharmacy);
-    }
 
     if (newPharmacies.length === MAX_ENRICHMENT) {
       // Break early and return enriched pharmacies
@@ -422,8 +235,7 @@ export const Pharmacy = () => {
           radius: 25
         },
         pharmaciesToGet,
-        totalEnriched,
-        token
+        totalEnriched
       );
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
         setLoadingPharmacies(false);
@@ -433,20 +245,16 @@ export const Pharmacy = () => {
       if (error.message === 'No pharmacies found near location') {
         setLoadingPharmacies(false);
         toast({
-          title: error.message,
-          position: 'top',
-          status: 'warning',
-          duration: 5000,
-          isClosable: true
+          title: 'No pharmacies found near location',
+          ...TOAST_CONFIG.WARNING
         });
       } else {
-        console.error(JSON.stringify(error, undefined, 2));
         console.log(error);
       }
     }
 
     const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
-      pharmaciesResult.map(addRatingsAndHours)
+      pharmaciesResult.map((p) => enrichPharmacy(p, true))
     );
     newPharmacies.push(...enrichedPharmacies);
 
@@ -465,18 +273,15 @@ export const Pharmacy = () => {
       return;
     }
 
-    try {
-      setSubmitting(true);
+    setSubmitting(true);
 
-      graphQLClient.setHeader('x-photon-auth', token);
-      const results: any = await graphQLClient.request(SELECT_ORDER_PHARMACY, {
-        orderId: order.id,
-        pharmacyId: selectedId,
-        patientId: order.patient.id
-      });
+    try {
+      const result = isReroute
+        ? await rerouteOrder(order.id, selectedId, order.patient.id)
+        : await selectOrderPharmacy(order.id, selectedId, order.patient.id);
 
       setTimeout(() => {
-        if (results?.selectOrderPharmacy) {
+        if (result) {
           setSuccessfullySubmitted(true);
           setTimeout(() => {
             setShowFooter(false);
@@ -488,90 +293,71 @@ export const Pharmacy = () => {
               type = types.FulfillmentType.MailOrder;
             }
 
+            // Update the order context so /status shows the newly selected pharmacy
+            const selectedPharmacy = pharmacyOptions.find((p) => p.id === selectedId);
+            setOrder({
+              ...order,
+              pharmacy: selectedPharmacy
+            });
+
             navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
           }, 1000);
         } else {
           toast({
-            title: 'Unable to submit pharmacy selection',
+            title: isReroute ? 'Unable to reroute order' : 'Unable to submit pharmacy selection',
             description: 'Please refresh and try again',
-            position: 'top',
-            status: 'error',
-            duration: 5000,
-            isClosable: true
+            ...TOAST_CONFIG.ERROR
           });
         }
         setSubmitting(false);
       }, 1000);
     } catch (error) {
+      toast({
+        title: isReroute ? 'Unable to reroute order' : 'Unable to submit pharmacy selection',
+        description: 'Please refresh and try again',
+        ...TOAST_CONFIG.ERROR
+      });
+
       setSubmitting(false);
 
-      console.log(error);
       console.error(JSON.stringify(error, undefined, 2));
-
-      if (error?.response?.errors) {
-        if (AUTH_HEADER_ERRORS.includes(error.response.errors[0].extensions.code)) {
-          navigate('/no-match');
-        } else {
-          setError(error.response.errors[0].message);
-        }
-      }
     }
   };
 
-  const setPreferredPharmacy = async (patientId: string, pharmacyId: string) => {
+  const handleSetPreferredPharmacy = async (pharmacyId: string) => {
     if (!pharmacyId) return;
 
     setSavingPreferred(true);
 
-    graphQLClient.setHeader('x-photon-auth', token);
-
     try {
-      const result: { setPreferredPharmacy: boolean } = await graphQLClient.request(
-        SET_PREFERRED_PHARMACY,
-        {
-          patientId,
-          pharmacyId
-        }
-      );
-
+      const result: boolean = await setPreferredPharmacy(order.patient.id, pharmacyId);
       setTimeout(() => {
-        if (result?.setPreferredPharmacy) {
-          setSavingPreferred(false);
+        if (result) {
           setPreferredPharmacyId(pharmacyId);
-
           toast({
             title: 'Set preferred pharmacy',
-            position: 'top',
-            status: 'success',
-            duration: 2000,
-            isClosable: true
+            ...TOAST_CONFIG.SUCCESS
           });
         } else {
-          setSavingPreferred(false);
           toast({
             title: 'Unable to set preferred pharmacy',
             description: 'Please refresh and try again',
-            position: 'top',
-            status: 'error',
-            duration: 5000,
-            isClosable: true
+            ...TOAST_CONFIG.ERROR
           });
         }
+        setSavingPreferred(false);
       }, 750);
     } catch (error) {
+      toast({
+        title: 'Unable to set preferred pharmacy',
+        description: 'Please refresh and try again',
+        ...TOAST_CONFIG.ERROR
+      });
+
       setSavingPreferred(false);
 
       console.error(JSON.stringify(error, undefined, 2));
-      console.log(error);
-
-      if (error?.response?.errors) {
-        setError(error.response.errors[0].message);
-      }
     }
-  };
-
-  const handleSetPreferredPharmacy = (id: string) => {
-    setPreferredPharmacy(order.patient.id, id);
   };
 
   useEffect(() => {
@@ -580,19 +366,13 @@ export const Pharmacy = () => {
     }
   }, [location]);
 
-  if (error) {
-    return (
-      <Alert status="error">
-        <AlertIcon />
-        {error}
-      </Alert>
-    );
-  }
-
-  // Courier option limited to MoPed in Austin, TX
   const patientAddressInAustinTX =
     order?.address?.city === 'Austin' && order?.address?.state === 'TX';
-  const enableCourier = searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier;
+  const enableCourier = searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier; // Courier limited to MoPed in Austin, TX
+  const heading = isReroute ? t.pharmacy.heading.reroute : t.pharmacy.heading.original;
+  const subheading = isReroute
+    ? t.pharmacy.subheading.reroute(order.pharmacy.name)
+    : t.pharmacy.subheading.original;
 
   return (
     <Box>
@@ -607,9 +387,9 @@ export const Pharmacy = () => {
         <VStack spacing={6} align="span" pt={5}>
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
-              {t.pharmacy.heading}
+              {heading}
             </Heading>
-            <Text>{t.pharmacy.subheading}</Text>
+            <Text>{subheading}</Text>
           </VStack>
 
           <HStack justify="space-between" w="full">

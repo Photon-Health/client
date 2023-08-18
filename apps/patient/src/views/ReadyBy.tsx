@@ -1,15 +1,14 @@
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { Box, Button, Container, Heading, Text, VStack } from '@chakra-ui/react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
 
-import { Order } from '../utils/models';
 import { FixedFooter } from '../components/FixedFooter';
 import { Nav } from '../components/Nav';
 import { PoweredBy } from '../components/PoweredBy';
-import t from '../utils/text.json';
-import { OrderContext } from './Main';
+import { text as t } from '../utils/text';
+import { useOrderContext } from './Main';
 
 const checkDisabled = (option: string): boolean => {
   const currentTime = dayjs();
@@ -18,7 +17,7 @@ const checkDisabled = (option: string): boolean => {
 };
 
 export const ReadyBy = () => {
-  const order = useContext<Order>(OrderContext);
+  const { order } = useOrderContext();
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
