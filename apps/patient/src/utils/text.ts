@@ -12,7 +12,6 @@ export const text = {
     refills: 'Refills',
     substitutions: 'Substitutions',
     expires: 'Expires',
-    instructions: 'Instructions',
     cta: 'Search for a pharmacy'
   },
   readyBy: {
