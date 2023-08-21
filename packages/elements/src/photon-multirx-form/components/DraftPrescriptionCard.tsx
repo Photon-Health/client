@@ -1,6 +1,7 @@
-import { createSignal, For, Show } from 'solid-js';
-import { message } from '../../validators';
+import { createSignal } from 'solid-js';
+import { DraftPrescriptions } from '@photonhealth/components';
 import { size, array, any } from 'superstruct';
+import { message } from '../../validators';
 import repopulateForm from '../util/repopulateForm';
 
 const draftPrescriptionsValidator = message(
@@ -116,66 +117,17 @@ export const DraftPrescriptionCard = (props: {
       </photon-dialog>
       <div class="flex flex-col gap-3">
         <p class="font-sans text-l font-medium">Pending Prescriptions</p>
-        <Show
-          when={(props.store['draftPrescriptions']?.value ?? []).length === 0 && !props.isLoading}
-        >
-          <div>
-            <photon-card invalid={props.store['draftPrescriptions']?.error}>
-              <p class="italic font-sans text-gray-500">No prescriptions pending</p>
-            </photon-card>
-            <Show when={props.store['draftPrescriptions']?.error}>
-              <p class="font-sans text-red-500 text-sm pt-1.5">
-                {props.store['draftPrescriptions']?.error}
-              </p>
-            </Show>
-          </div>
-        </Show>
-        <Show when={props.isLoading}>
-          <div>
-            <photon-card>
-              <div class="w-full flex justify-between">
-                <p class="italic font-sans text-gray-500">Loading Prescriptions...</p>
-                <sl-spinner style={{ 'font-size': '1rem' }} />
-              </div>
-            </photon-card>
-          </div>
-        </Show>
-        <For each={props.store['draftPrescriptions']?.value ?? []}>
-          {(draft: any) => {
-            return (
-              <photon-card>
-                <div class="flex flex-row items-center">
-                  <div class="flex flex-col flex-grow">
-                    <p class="font-medium font-sans">{draft.treatment.name}</p>
-                    <p class="font-normal text-gray-700 overflow-hidden overflow-ellipsis font-sans">
-                      {/* draft.refillsInput exists here because we are displaying the number of refills, not fills, the user entered into the form as part of the drafted prescription.
-                       We have this stored under refillsInput. This should not have a "+1" unless we update this to show fills*/}
-                      {draft.dispenseQuantity} {draft.dispenseUnit}, {draft.refillsInput} refills -{' '}
-                      {draft.instructions}
-                    </p>
-                  </div>
-                  <div class="flex flex-row">
-                    <sl-icon-button
-                      class="self-end text-xl edit-icon-button"
-                      name="pencil-square"
-                      onClick={() => {
-                        checkEditPrescription(draft.id);
-                      }}
-                    />
-                    <sl-icon-button
-                      class="self-end text-xl remove-icon-button"
-                      name="trash3"
-                      onClick={() => {
-                        setDeleteDialogOpen(true);
-                        setDeleteDraftId(draft.id);
-                      }}
-                    />
-                  </div>
-                </div>
-              </photon-card>
-            );
+        <DraftPrescriptions
+          draftPrescriptions={props.store['draftPrescriptions']?.value ?? []}
+          handleDelete={(draftId: string) => {
+            setDeleteDialogOpen(true);
+            setDeleteDraftId(draftId);
           }}
-        </For>
+          handleEdit={(draftId: string) => {
+            checkEditPrescription(draftId);
+          }}
+          loading={props.isLoading}
+        />
       </div>
     </photon-card>
   );

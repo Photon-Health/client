@@ -8,6 +8,44 @@ import { randomNames } from '../src/sampleData/randomNames';
 import ComboBox from '../src/particles/ComboBox';
 import PharmacySelect from '../src/systems/PharmacySelect';
 import Card from '../src/particles/Card';
+import DraftPrescriptions, { DraftPrescription } from '../src/systems/DraftPrescriptios';
+
+const draftPrescriptions: DraftPrescription[] = [
+  {
+    id: '1',
+    effectiveDate: '2021-01-01',
+    treatment: {
+      name: 'Metroprolol 50mg'
+    },
+    dispenseAsWritten: false,
+    dispenseQuantity: 1,
+    dispenseUnit: 'dispenseUnit',
+    daysSupply: 1,
+    refillsInput: 1,
+    instructions: 'instructions',
+    notes: 'notes',
+    fillsAllowed: 1,
+    addToTemplates: false,
+    catalogId: 'catalogId'
+  },
+  {
+    id: '2',
+    effectiveDate: '2021-01-01',
+    treatment: {
+      name: 'lisinopril 20 MG / hydroCHLOROthiazide 12.5 MG Oral Tablet'
+    },
+    dispenseAsWritten: false,
+    dispenseQuantity: 1,
+    dispenseUnit: 'dispenseUnit',
+    daysSupply: 1,
+    refillsInput: 1,
+    instructions: 'Here are some much longer instructions that will wrap around the card.',
+    notes: 'notes',
+    fillsAllowed: 1,
+    addToTemplates: false,
+    catalogId: 'catalogId'
+  }
+];
 
 const App = () => {
   const [setPharmacy] = createSignal<any>();
@@ -37,6 +75,7 @@ const App = () => {
       <div>
         <h1>Photon Component Systems</h1>
       </div>
+
       <Client
         id="7N9QZujlNJHL8EIPqXpu1wq8OuXqoxKb"
         org="org_KzSVZBQixLRkqj5d"
@@ -45,8 +84,16 @@ const App = () => {
         uri="https://api.boson.health/graphql"
       >
         <div class="mb-10">
+          <h2>Draft Presciptions</h2>
+          <DraftPrescriptions draftPrescriptions={draftPrescriptions} />
+          <h2>Loading Draft Presciptions</h2>
+          <DraftPrescriptions draftPrescriptions={[]} loading />
+        </div>
+
+        <div class="mb-10">
           <div>
             <h2>ComboBox</h2>
+
             <ComboBox>
               <ComboBox.Input
                 onInput={(e) => setQuery(e.currentTarget.value)}
