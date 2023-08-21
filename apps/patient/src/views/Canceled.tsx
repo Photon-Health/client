@@ -1,6 +1,6 @@
 import { Center, Heading, Text, VStack } from '@chakra-ui/react';
 import { MdOutlineCancel } from 'react-icons/md';
-import t from '../utils/text.json';
+import { text as t } from '../utils/text';
 
 export const Canceled = () => {
   return (
