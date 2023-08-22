@@ -117,6 +117,7 @@ const App = () => {
               'tmp_01H5JB37PPK9F64RE3QQ52WD7M',
               'tmp_01GQJDV39GPEJ03BATZV1X0SRJ'
             ]}
+            prescriptionIds={['rx_01H82MN6S6FN9PN0K7FTKGWC60', 'rx_01H82RKH4K1RA4RS2VG4H8J8XG']}
           />
         </div>
 

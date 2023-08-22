@@ -1,4 +1,4 @@
-import { PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
+import { Catalog, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
 import { createSignal, For, JSXElement, mergeProps, onMount, Show } from 'solid-js';
 import Card from '../../particles/Card';
@@ -30,6 +30,26 @@ const GetTemplatesFromCatalogs = gql`
   }
 `;
 
+// Can't use a fragment because of the type difference between Prescription and PrescriptionTemplate
+const GetPrescription = gql`
+  query GetPrescription($id: ID!) {
+    prescription(id: $id) {
+      id
+      daysSupply
+      dispenseAsWritten
+      dispenseQuantity
+      dispenseUnit
+      instructions
+      notes
+      fillsAllowed
+      treatment {
+        id
+        name
+      }
+    }
+  }
+`;
+
 export type DraftPrescription = PrescriptionTemplate & {
   refillsInput?: number;
   addToTemplates?: boolean;
@@ -51,50 +71,87 @@ const DraftPrescription = (props: { LeftChildren: JSXElement; RightChildren?: JS
 interface DraftPrescriptionsProps {
   draftPrescriptions: DraftPrescription[];
   templateIds?: string[];
+  prescriptionIds?: string[];
   setDraftPrescriptions: (draftPrescriptions: DraftPrescription[]) => void;
   handleEdit?: (draftId: string) => void;
   handleDelete?: (draftId: string) => void;
+  error?: string;
 }
 
 export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
-  const merged = mergeProps({ draftPrescriptions: [], templateIds: [] }, props);
+  const merged = mergeProps(
+    {
+      draftPrescriptions: [] as string[],
+      templateIds: [] as string[],
+      prescriptionIds: [] as string[]
+    },
+    props
+  );
   const [isLoading, setIsLoading] = createSignal<boolean>(true);
   const client = usePhotonClient();
 
-  async function fetchTemplates() {
+  async function fetchDrafts() {
     setIsLoading(true);
-    const { data } = await client!.apollo.query({ query: GetTemplatesFromCatalogs });
     const draftPrescriptions: DraftPrescription[] = [];
 
-    if (data?.catalogs) {
-      // get all templates, most likely only one catalog
-      const templates = data.catalogs.reduce(
-        (acc: PrescriptionTemplate[], catalog: any) => [...acc, ...catalog.templates],
-        []
-      );
-      // for each templateId, find the template by id and set the draft prescription
-      merged.templateIds.forEach((templateId: string) => {
-        const template = templates.find(
-          (template: PrescriptionTemplate) => template.id === templateId
+    // fetch templates
+    if (merged.templateIds.length > 0) {
+      const { data } = await client!.apollo.query({ query: GetTemplatesFromCatalogs });
+
+      if (data?.catalogs) {
+        // get all templates, most likely only one catalog
+        const templates = data.catalogs.reduce(
+          (acc: PrescriptionTemplate[], catalog: Catalog) => [...acc, ...catalog.templates],
+          []
         );
 
-        if (!template) {
-          return console.error(`Invalid template id ${templateId}`);
-        }
+        // for each templateId, find the template by id and set the draft prescription
+        merged.templateIds.forEach((templateId: string) => {
+          const template = templates.find(
+            (template: PrescriptionTemplate) => template.id === templateId
+          );
 
-        if (
-          // minimum template fields required to create a prescription
-          !template?.treatment ||
-          !template?.dispenseQuantity ||
-          !template?.dispenseUnit ||
-          !template?.fillsAllowed ||
-          !template?.instructions
-        ) {
-          console.error(`Template is missing required prescription details ${templateId}`);
-        } else {
-          draftPrescriptions.push(generateDraftPrescription(template));
-        }
-      });
+          if (!template) {
+            return console.error(`Invalid template id ${templateId}`);
+          }
+
+          if (
+            // minimum template fields required to create a prescription
+            !template?.treatment ||
+            !template?.dispenseQuantity ||
+            !template?.dispenseUnit ||
+            !template?.fillsAllowed ||
+            !template?.instructions
+          ) {
+            console.error(`Template is missing required prescription details ${templateId}`);
+          } else {
+            draftPrescriptions.push(generateDraftPrescription(template));
+          }
+        });
+      }
+    }
+
+    // fetch prescriptions
+    if (merged.prescriptionIds.length > 0) {
+      // for each prescriptionId, find the prescription by id and set the draft prescription
+      await Promise.allSettled(
+        merged.prescriptionIds.map(async (prescriptionId: string) => {
+          const { data } = await client!.apollo.query({
+            query: GetPrescription,
+            variables: {
+              id: prescriptionId
+            }
+          });
+
+          const prescription = data?.prescription;
+
+          if (!prescription) {
+            return console.error(`Invalid prescription id ${prescriptionId}`);
+          }
+
+          draftPrescriptions.push(generateDraftPrescription(prescription));
+        })
+      );
     }
     if (draftPrescriptions.length > 0) {
       props.setDraftPrescriptions(draftPrescriptions);
@@ -103,9 +160,8 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
   }
 
   onMount(() => {
-    console.log(merged.templateIds.length);
-    if (merged.templateIds.length > 0) {
-      fetchTemplates();
+    if (merged.templateIds.length > 0 || merged.prescriptionIds.length > 0) {
+      fetchDrafts();
     } else {
       setIsLoading(false);
     }
@@ -115,7 +171,7 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
     <div class="space-y-3">
       {/* Show when Loading */}
       <Show when={isLoading()}>
-        <For each={merged.templateIds}>
+        <For each={[...merged.templateIds, ...merged.prescriptionIds]}>
           {() => (
             <DraftPrescription
               LeftChildren={
@@ -131,7 +187,7 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
 
       {/* Show when No Drafts */}
       <Show when={!isLoading() && merged.draftPrescriptions.length === 0}>
-        <Text color="gray" class="italic">
+        <Text color={merged.error ? 'red' : 'gray'} class="italic">
           No prescriptions pending
         </Text>
       </Show>

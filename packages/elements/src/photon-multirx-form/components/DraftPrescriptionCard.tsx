@@ -10,10 +10,11 @@ const draftPrescriptionsValidator = message(
 );
 
 export const DraftPrescriptionCard = (props: {
+  templateIds: string[];
+  prescriptionIds: string[];
   prescriptionRef: HTMLDivElement | undefined;
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
-  isLoading: boolean;
   setIsEditing: (isEditing: boolean) => void;
 }) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
@@ -79,6 +80,11 @@ export const DraftPrescriptionCard = (props: {
     });
     setDeleteDialogOpen(false);
     setDeleteDraftId(undefined);
+
+    if (props.store['draftPrescriptions']?.value?.length === 0) {
+      // reopen form if all drafts are deleted
+      props.setIsEditing(true);
+    }
   };
   const handleDeleteCancel = () => {
     setDeleteDialogOpen(false);
@@ -126,7 +132,15 @@ export const DraftPrescriptionCard = (props: {
           handleEdit={(draftId: string) => {
             checkEditPrescription(draftId);
           }}
-          loading={props.isLoading}
+          templateIds={props.templateIds}
+          prescriptionIds={props.prescriptionIds}
+          setDraftPrescriptions={(draftPrescriptions: any) => {
+            props.actions.updateFormValue({
+              key: 'draftPrescriptions',
+              value: draftPrescriptions
+            });
+          }}
+          error={props.store['draftPrescriptions']?.error}
         />
       </div>
     </photon-card>
