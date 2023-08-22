@@ -135,5 +135,11 @@ export const neutron: {
     logo: 'blueberry_logo.png',
     accentColor: '#235AFF',
     patientsCanReroute: false
+  },
+  // Sunny
+  org_PILXReL8NKiTWxD3: {
+    ...defaultSettings,
+    logo: 'sunny_logo.svg',
+    accentColor: '#69672c'
   }
 };
