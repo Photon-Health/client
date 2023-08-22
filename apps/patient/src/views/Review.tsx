@@ -1,4 +1,3 @@
-import { useContext } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Accordion,
@@ -19,16 +18,15 @@ import {
 import { FaPrescription } from 'react-icons/fa';
 import { Helmet } from 'react-helmet';
 
-import { Order } from '../utils/models';
+import { useOrderContext } from './Main';
 import { formatDate, countFillsAndRemoveDuplicates } from '../utils/general';
 import { FixedFooter } from '../components/FixedFooter';
 import { Nav } from '../components/Nav';
 import { PoweredBy } from '../components/PoweredBy';
-import t from '../utils/text.json';
-import { OrderContext } from './Main';
+import { text as t } from '../utils/text';
 
 export const Review = () => {
-  const order = useContext<Order>(OrderContext);
+  const { order } = useOrderContext();
 
   const navigate = useNavigate();
 
@@ -117,10 +115,6 @@ export const Review = () => {
                               {formatDate(prescription.expirationDate)}
                             </Text>
                           </HStack>
-                        </HStack>
-                        <HStack w="full" align="start">
-                          <Text color="gray.500">{t.review.instructions}</Text>
-                          <Text data-dd-privacy="mask">{prescription.instructions}</Text>
                         </HStack>
                       </VStack>
                     </AccordionPanel>

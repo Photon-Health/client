@@ -57,7 +57,6 @@ export const GET_ORDER = gql`
           dispenseQuantity
           expirationDate
           fillsAllowed
-          instructions
         }
       }
       patient {
