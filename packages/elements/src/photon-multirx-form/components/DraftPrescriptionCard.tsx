@@ -134,7 +134,7 @@ export const DraftPrescriptionCard = (props: {
           }}
           templateIds={props.templateIds}
           prescriptionIds={props.prescriptionIds}
-          setDraftPrescriptions={(draftPrescriptions: any) => {
+          setDraftPrescriptions={(draftPrescriptions) => {
             props.actions.updateFormValue({
               key: 'draftPrescriptions',
               value: draftPrescriptions
