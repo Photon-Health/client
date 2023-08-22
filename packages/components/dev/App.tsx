@@ -8,14 +8,22 @@ import { randomNames } from '../src/sampleData/randomNames';
 import ComboBox from '../src/particles/ComboBox';
 import PharmacySelect from '../src/systems/PharmacySelect';
 import Card from '../src/particles/Card';
-import DraftPrescriptions, { DraftPrescription } from '../src/systems/DraftPrescriptios';
+import DraftPrescriptions, { DraftPrescription } from '../src/systems/DraftPrescriptions';
 
 const draftPrescriptions: DraftPrescription[] = [
   {
     id: '1',
     effectiveDate: '2021-01-01',
     treatment: {
-      name: 'Metroprolol 50mg'
+      name: 'Metroprolol 50mg',
+      id: 'treatmentId',
+      codes: {
+        rxcui: 'String',
+        productNDC: 'String',
+        packageNDC: 'String',
+        SKU: 'String',
+        HCPCS: 'String'
+      }
     },
     dispenseAsWritten: false,
     dispenseQuantity: 1,
@@ -32,7 +40,15 @@ const draftPrescriptions: DraftPrescription[] = [
     id: '2',
     effectiveDate: '2021-01-01',
     treatment: {
-      name: 'lisinopril 20 MG / hydroCHLOROthiazide 12.5 MG Oral Tablet'
+      name: 'Metroprolol 50mg',
+      id: 'treatmentId',
+      codes: {
+        rxcui: 'String',
+        productNDC: 'String',
+        packageNDC: 'String',
+        SKU: 'String',
+        HCPCS: 'String'
+      }
     },
     dispenseAsWritten: false,
     dispenseQuantity: 1,
@@ -53,6 +69,9 @@ const App = () => {
   const [query, setQuery] = createSignal('');
   const [patientIds, setPatientIds] = createSignal<string[]>([]);
   const [timedAddress, setTimedAddress] = createSignal<string>('');
+  const [draftPrescriptionsFromTemplates, setDraftPrescriptions] = createSignal<
+    DraftPrescription[]
+  >([]);
 
   const rando = randomNames.slice(0, 3);
   const filteredPeople = createMemo(() => {
@@ -85,9 +104,20 @@ const App = () => {
       >
         <div class="mb-10">
           <h2>Draft Presciptions</h2>
-          <DraftPrescriptions draftPrescriptions={draftPrescriptions} />
-          <h2>Loading Draft Presciptions</h2>
-          <DraftPrescriptions draftPrescriptions={[]} loading />
+          <DraftPrescriptions
+            draftPrescriptions={draftPrescriptions}
+            setDraftPrescriptions={setDraftPrescriptions}
+          />
+          <h2>Fetching Draft Presciptions</h2>
+          <DraftPrescriptions
+            draftPrescriptions={draftPrescriptionsFromTemplates()}
+            setDraftPrescriptions={setDraftPrescriptions}
+            templateIds={[
+              'tmp_01H5JXWKYFMYT70RND1CGQCFKZ',
+              'tmp_01H5JB37PPK9F64RE3QQ52WD7M',
+              'tmp_01GQJDV39GPEJ03BATZV1X0SRJ'
+            ]}
+          />
         </div>
 
         <div class="mb-10">

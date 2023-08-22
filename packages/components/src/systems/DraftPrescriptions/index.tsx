@@ -1,34 +1,43 @@
-import { For, JSXElement, mergeProps, Show } from 'solid-js';
+import { PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
+import gql from 'graphql-tag';
+import { createSignal, For, JSXElement, mergeProps, onMount, Show } from 'solid-js';
 import Card from '../../particles/Card';
 import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
+import { usePhotonClient } from '../SDKProvider';
+import generateDraftPrescription from './utils/generateDraftPrescription';
 
-export interface DraftPrescription {
-  id: string;
-  effectiveDate: string;
-  treatment: {
-    name: string;
-  };
-  dispenseAsWritten: boolean;
-  dispenseQuantity: number;
-  dispenseUnit: string;
-  daysSupply: number;
-  refillsInput: number;
-  instructions: string;
-  notes: string;
-  fillsAllowed: number;
-  addToTemplates: boolean;
-  catalogId: string;
-}
+// TODO fetch individual template, to get a template currently you need to fetch catalogs and parse out the templates
+// https://www.notion.so/photons/Ability-to-Query-Individual-Template-75c2277db7f44d02bc7ffdd5ab44f17c
+const GetTemplatesFromCatalogs = gql`
+  query TemplatesFromCatalogs {
+    catalogs {
+      templates {
+        id
+        daysSupply
+        dispenseAsWritten
+        dispenseQuantity
+        dispenseUnit
+        instructions
+        notes
+        fillsAllowed
+        treatment {
+          id
+          name
+        }
+      }
+    }
+  }
+`;
 
-interface DraftPrescriptionsProps {
-  loading?: boolean;
-  draftPrescriptions: DraftPrescription[];
-  handleEdit?: (draftId: string) => void;
-  handleDelete?: (draftId: string) => void;
-}
+export type DraftPrescription = PrescriptionTemplate & {
+  refillsInput?: number;
+  addToTemplates?: boolean;
+  catalogId?: string;
+  effectiveDate?: string;
+};
 
-const CardLayout = (props: { LeftChildren: JSXElement; RightChildren?: JSXElement }) => (
+const DraftPrescription = (props: { LeftChildren: JSXElement; RightChildren?: JSXElement }) => (
   <Card>
     <div class="flex justify-between items-center gap-4">
       <div class="flex flex-col items-start">{props.LeftChildren}</div>
@@ -39,36 +48,100 @@ const CardLayout = (props: { LeftChildren: JSXElement; RightChildren?: JSXElemen
   </Card>
 );
 
+interface DraftPrescriptionsProps {
+  draftPrescriptions: DraftPrescription[];
+  templateIds?: string[];
+  setDraftPrescriptions: (draftPrescriptions: DraftPrescription[]) => void;
+  handleEdit?: (draftId: string) => void;
+  handleDelete?: (draftId: string) => void;
+}
+
 export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
-  const merged = mergeProps({ draftPrescriptions: [], loading: false }, props);
+  const merged = mergeProps({ draftPrescriptions: [], templateIds: [] }, props);
+  const [isLoading, setIsLoading] = createSignal<boolean>(true);
+  const client = usePhotonClient();
+
+  async function fetchTemplates() {
+    setIsLoading(true);
+    const { data } = await client!.apollo.query({ query: GetTemplatesFromCatalogs });
+    const draftPrescriptions: DraftPrescription[] = [];
+
+    if (data?.catalogs) {
+      // get all templates, most likely only one catalog
+      const templates = data.catalogs.reduce(
+        (acc: PrescriptionTemplate[], catalog: any) => [...acc, ...catalog.templates],
+        []
+      );
+      // for each templateId, find the template by id and set the draft prescription
+      merged.templateIds.forEach((templateId: string) => {
+        const template = templates.find(
+          (template: PrescriptionTemplate) => template.id === templateId
+        );
+
+        if (!template) {
+          return console.error(`Invalid template id ${templateId}`);
+        }
+
+        if (
+          // minimum template fields required to create a prescription
+          !template?.treatment ||
+          !template?.dispenseQuantity ||
+          !template?.dispenseUnit ||
+          !template?.fillsAllowed ||
+          !template?.instructions
+        ) {
+          console.error(`Template is missing required prescription details ${templateId}`);
+        } else {
+          draftPrescriptions.push(generateDraftPrescription(template));
+        }
+      });
+    }
+    if (draftPrescriptions.length > 0) {
+      props.setDraftPrescriptions(draftPrescriptions);
+    }
+    setIsLoading(false);
+  }
+
+  onMount(() => {
+    console.log(merged.templateIds.length);
+    if (merged.templateIds.length > 0) {
+      fetchTemplates();
+    } else {
+      setIsLoading(false);
+    }
+  });
 
   return (
     <div class="space-y-3">
       {/* Show when Loading */}
-      <Show when={merged.loading}>
-        <CardLayout
-          LeftChildren={
-            <>
-              <Text size="lg" sampleLoadingText="Medication 100mg" loading />
-              <Text size="sm" sampleLoadingText="Loading notes about the medication" loading />
-            </>
-          }
-        />
+      <Show when={isLoading()}>
+        <For each={merged.templateIds}>
+          {() => (
+            <DraftPrescription
+              LeftChildren={
+                <>
+                  <Text size="lg" sampleLoadingText="Medication 100mg" loading />
+                  <Text size="sm" sampleLoadingText="Loading notes about the medication" loading />
+                </>
+              }
+            />
+          )}
+        </For>
       </Show>
 
       {/* Show when No Drafts */}
-      <Show when={!merged.loading && merged.draftPrescriptions.length === 0}>
+      <Show when={!isLoading() && merged.draftPrescriptions.length === 0}>
         <Text color="gray" class="italic">
           No prescriptions pending
         </Text>
       </Show>
 
       {/* Show when Drafts */}
-      <Show when={!merged.loading && merged.draftPrescriptions.length > 0}>
+      <Show when={!isLoading() && merged.draftPrescriptions.length > 0}>
         <For each={merged.draftPrescriptions}>
           {(draft: DraftPrescription) => {
             return (
-              <CardLayout
+              <DraftPrescription
                 LeftChildren={
                   <>
                     <Text>{draft.treatment.name}</Text>
