@@ -20,7 +20,7 @@ const defaultSettings: OrganizationSettings = {
   mailOrderNavigateProviders: [],
   sendToPatient: true,
   sendToPatientUsers: [],
-  patientsCanReroute: false,
+  patientsCanReroute: true,
   courier: false,
   courierProviders: [],
   returnTo: window.location.origin,
