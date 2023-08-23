@@ -108,6 +108,11 @@ export const Status = () => {
     }
   }, [pharmacy]);
 
+  // People that select a pharmacy low in the list might start at bottom of status page
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Only show "Text us now" prompt if pickup and RECEIVED or READY
   const showChatAlert = fulfillment?.state === 'RECEIVED' || fulfillment?.state === 'READY';
 
