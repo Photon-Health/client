@@ -1,6 +1,5 @@
 import { Patient } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
-import { format } from 'path';
 import { createMemo, createSignal, onMount, Show } from 'solid-js';
 import Badge from '../../particles/Badge';
 import { useRadioGroup } from '../../particles/RadioGroup';
