@@ -92,14 +92,6 @@ export const Status = () => {
     window.open(url, '_blank').focus();
   };
 
-  useEffect(() => {
-    if (!order?.fulfillment) {
-      setTimeout(() => {
-        window.location.reload();
-      }, 60000);
-    }
-  }, [order?.fulfillment]);
-
   const initializePharmacy = async (p: types.Pharmacy) => {
     const enrichedPharmacy = await enrichPharmacy(p, false);
     setEnrichedPharmacy(enrichedPharmacy);
