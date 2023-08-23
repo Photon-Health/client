@@ -3,6 +3,7 @@ import { DraftPrescriptions } from '@photonhealth/components';
 import { size, array, any } from 'superstruct';
 import { message } from '../../validators';
 import repopulateForm from '../util/repopulateForm';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 const draftPrescriptionsValidator = message(
   size(array(any()), 1, Infinity),
@@ -93,6 +94,7 @@ export const DraftPrescriptionCard = (props: {
 
   return (
     <photon-card>
+      <style>{photonStyles}</style>
       <photon-dialog
         open={editDialogOpen()}
         label="Overwrite in progress prescription?"

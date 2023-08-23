@@ -62,7 +62,7 @@ const DraftPrescription = (props: { LeftChildren: JSXElement; RightChildren?: JS
     <div class="flex justify-between items-center gap-4">
       <div class="flex flex-col items-start">{props.LeftChildren}</div>
       <Show when={props?.RightChildren}>
-        <div class="flex flex-col items-start gap-3">{props.RightChildren}</div>
+        <div class="flex items-start gap-3">{props.RightChildren}</div>
       </Show>
     </div>
   </Card>
