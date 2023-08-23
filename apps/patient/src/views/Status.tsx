@@ -92,14 +92,6 @@ export const Status = () => {
     window.open(url, '_blank').focus();
   };
 
-  useEffect(() => {
-    if (!order?.fulfillment) {
-      setTimeout(() => {
-        window.location.reload();
-      }, 60000);
-    }
-  }, [order?.fulfillment]);
-
   const initializePharmacy = async (p: types.Pharmacy) => {
     const enrichedPharmacy = await enrichPharmacy(p, false);
     setEnrichedPharmacy(enrichedPharmacy);
@@ -115,6 +107,11 @@ export const Status = () => {
       initializePharmacy(pharmacy);
     }
   }, [pharmacy]);
+
+  // People that select a pharmacy low in the list might start at bottom of status page
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Only show "Text us now" prompt if pickup and RECEIVED or READY
   const showChatAlert = fulfillment?.state === 'RECEIVED' || fulfillment?.state === 'READY';
