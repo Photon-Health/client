@@ -1,9 +1,11 @@
 import { Patient } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
+import { format } from 'path';
 import { createMemo, createSignal, onMount, Show } from 'solid-js';
 import Badge from '../../particles/Badge';
 import { useRadioGroup } from '../../particles/RadioGroup';
 import Text from '../../particles/Text';
+import formatAddress from '../../utils/formatAddress';
 import { usePhotonClient } from '../SDKProvider';
 
 interface PatientDetailsProps {
@@ -26,6 +28,7 @@ const GetPatientQuery = gql`
           street1
           city
           state
+          postalCode
         }
       }
     }
@@ -87,11 +90,7 @@ export function PatientDetails(props: PatientDetailsProps) {
         size="sm"
         sampleLoadingText="loading@gmail.com"
       >
-        <Show when={preferredPharmacy()}>
-          {preferredPharmacy()?.address?.street1} {preferredPharmacy()?.address?.city}
-          {', '}
-          {preferredPharmacy()?.address?.state}
-        </Show>
+        <Show when={preferredPharmacy()}>{formatAddress(preferredPharmacy()?.address)}</Show>
         <Show when={!preferredPharmacy()}>{patient()?.email}</Show>
       </Text>
     </div>
