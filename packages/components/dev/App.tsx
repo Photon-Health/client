@@ -8,6 +8,60 @@ import { randomNames } from '../src/sampleData/randomNames';
 import ComboBox from '../src/particles/ComboBox';
 import PharmacySelect from '../src/systems/PharmacySelect';
 import Card from '../src/particles/Card';
+import DraftPrescriptions, { DraftPrescription } from '../src/systems/DraftPrescriptions';
+
+const draftPrescriptions: DraftPrescription[] = [
+  {
+    id: '1',
+    effectiveDate: '2021-01-01',
+    treatment: {
+      name: 'Metroprolol 50mg',
+      id: 'treatmentId',
+      codes: {
+        rxcui: 'String',
+        productNDC: 'String',
+        packageNDC: 'String',
+        SKU: 'String',
+        HCPCS: 'String'
+      }
+    },
+    dispenseAsWritten: false,
+    dispenseQuantity: 1,
+    dispenseUnit: 'dispenseUnit',
+    daysSupply: 1,
+    refillsInput: 1,
+    instructions: 'instructions',
+    notes: 'notes',
+    fillsAllowed: 1,
+    addToTemplates: false,
+    catalogId: 'catalogId'
+  },
+  {
+    id: '2',
+    effectiveDate: '2021-01-01',
+    treatment: {
+      name: 'Metroprolol 50mg',
+      id: 'treatmentId',
+      codes: {
+        rxcui: 'String',
+        productNDC: 'String',
+        packageNDC: 'String',
+        SKU: 'String',
+        HCPCS: 'String'
+      }
+    },
+    dispenseAsWritten: false,
+    dispenseQuantity: 1,
+    dispenseUnit: 'dispenseUnit',
+    daysSupply: 1,
+    refillsInput: 1,
+    instructions: 'Here are some much longer instructions that will wrap around the card.',
+    notes: 'notes',
+    fillsAllowed: 1,
+    addToTemplates: false,
+    catalogId: 'catalogId'
+  }
+];
 
 const App = () => {
   const [setPharmacy] = createSignal<any>();
@@ -15,6 +69,9 @@ const App = () => {
   const [query, setQuery] = createSignal('');
   const [patientIds, setPatientIds] = createSignal<string[]>([]);
   const [timedAddress, setTimedAddress] = createSignal<string>('');
+  const [draftPrescriptionsFromTemplates, setDraftPrescriptions] = createSignal<
+    DraftPrescription[]
+  >([]);
 
   const rando = randomNames.slice(0, 3);
   const filteredPeople = createMemo(() => {
@@ -37,6 +94,7 @@ const App = () => {
       <div>
         <h1>Photon Component Systems</h1>
       </div>
+
       <Client
         id="7N9QZujlNJHL8EIPqXpu1wq8OuXqoxKb"
         org="org_KzSVZBQixLRkqj5d"
@@ -45,8 +103,28 @@ const App = () => {
         uri="https://api.boson.health/graphql"
       >
         <div class="mb-10">
+          <h2>Draft Presciptions</h2>
+          <DraftPrescriptions
+            draftPrescriptions={draftPrescriptions}
+            setDraftPrescriptions={setDraftPrescriptions}
+          />
+          <h2>Fetching Draft Presciptions</h2>
+          <DraftPrescriptions
+            draftPrescriptions={draftPrescriptionsFromTemplates()}
+            setDraftPrescriptions={setDraftPrescriptions}
+            templateIds={[
+              'tmp_01H5JXWKYFMYT70RND1CGQCFKZ',
+              'tmp_01H5JB37PPK9F64RE3QQ52WD7M',
+              'tmp_01GQJDV39GPEJ03BATZV1X0SRJ'
+            ]}
+            prescriptionIds={['rx_01H82MN6S6FN9PN0K7FTKGWC60', 'rx_01H82RKH4K1RA4RS2VG4H8J8XG']}
+          />
+        </div>
+
+        <div class="mb-10">
           <div>
             <h2>ComboBox</h2>
+
             <ComboBox>
               <ComboBox.Input
                 onInput={(e) => setQuery(e.currentTarget.value)}
