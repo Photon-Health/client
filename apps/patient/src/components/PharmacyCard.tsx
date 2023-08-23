@@ -145,13 +145,13 @@ export const PharmacyCard = memo(function PharmacyCard({
         <VStack align="start" w="full" spacing={1}>
           <HStack spacing={2}>
             {preferred ? (
-              <Tag size="sm" colorScheme="yellow">
+              <Tag size="sm" colorScheme="blue">
                 <TagLeftIcon boxSize="12px" as={FiStar} />
                 <TagLabel> Preferred</TagLabel>
               </Tag>
             ) : null}
             {previous && !preferred ? (
-              <Tag size="sm" colorScheme="blue">
+              <Tag size="sm" colorScheme="green">
                 <TagLeftIcon boxSize="12px" as={FiRotateCcw} />
                 <TagLabel> Previous</TagLabel>
               </Tag>

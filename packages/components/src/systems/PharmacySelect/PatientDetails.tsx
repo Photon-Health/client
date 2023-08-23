@@ -1,6 +1,7 @@
 import { Patient } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
-import { createMemo, createSignal, onMount } from 'solid-js';
+import { createMemo, createSignal, onMount, Show } from 'solid-js';
+import Badge from '../../particles/Badge';
 import { useRadioGroup } from '../../particles/RadioGroup';
 import Text from '../../particles/Text';
 import { usePhotonClient } from '../SDKProvider';
@@ -19,6 +20,14 @@ const GetPatientQuery = gql`
       }
       email
       phone
+      preferredPharmacies {
+        name
+        address {
+          street1
+          city
+          state
+        }
+      }
     }
   }
 `;
@@ -47,6 +56,10 @@ export function PatientDetails(props: PatientDetailsProps) {
     return state.selected === props.patientId;
   });
 
+  const preferredPharmacy = createMemo(() => {
+    return patient()?.preferredPharmacies?.[0];
+  });
+
   return (
     <div class="flex flex-col items-start	">
       <Text loading={!patient()} selected={selected()} sampleLoadingText="Loading Name">
@@ -59,7 +72,13 @@ export function PatientDetails(props: PatientDetailsProps) {
         size="sm"
         sampleLoadingText="111 222 3333"
       >
-        {patient()?.phone}
+        <Show when={preferredPharmacy()}>
+          {preferredPharmacy()?.name}{' '}
+          <Badge size="sm" color="blue" class="ml-1">
+            Preferred
+          </Badge>
+        </Show>
+        <Show when={!preferredPharmacy()}>{patient()?.phone}</Show>
       </Text>
       <Text
         loading={!patient()}
@@ -68,7 +87,12 @@ export function PatientDetails(props: PatientDetailsProps) {
         size="sm"
         sampleLoadingText="loading@gmail.com"
       >
-        {patient()?.email}
+        <Show when={preferredPharmacy()}>
+          {preferredPharmacy()?.address?.street1} {preferredPharmacy()?.address?.city}
+          {', '}
+          {preferredPharmacy()?.address?.state}
+        </Show>
+        <Show when={!preferredPharmacy()}>{patient()?.email}</Show>
       </Text>
     </div>
   );

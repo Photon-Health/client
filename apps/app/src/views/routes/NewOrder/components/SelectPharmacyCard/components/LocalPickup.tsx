@@ -37,7 +37,7 @@ const formatPharmacyOptions = (p: types.Pharmacy[], preferredIds: string[], prev
           {org.name}, {titleCase(org.address?.street1)}, {titleCase(org.address?.city)},{' '}
           {org.address?.state}{' '}
           {preferredIds.some((id) => id === org.id) ? (
-            <Tag size="sm" colorScheme="yellow" verticalAlign="text-center" me={1}>
+            <Tag size="sm" colorScheme="blue" verticalAlign="text-center" me={1}>
               <TagLeftIcon boxSize="12px" as={StarIcon} />
               <TagLabel>Preferred</TagLabel>
             </Tag>
