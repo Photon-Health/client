@@ -140,7 +140,7 @@ export const Status = () => {
                 <AlertIcon />
                 <Text>
                   {t.status.PICK_UP.chat.prompt}{' '}
-                  <Link href={`sms:${PHOTON_PHONE_NUMBER}`} textDecoration="underline">
+                  <Link href={`sms:${PHOTON_PHONE_NUMBER}`} color="link" fontWeight="medium">
                     {t.status.PICK_UP.chat.cta}
                   </Link>
                 </Text>
