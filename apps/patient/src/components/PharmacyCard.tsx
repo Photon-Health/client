@@ -200,7 +200,7 @@ export const PharmacyCard = memo(function PharmacyCard({
               mx="auto"
               size="sm"
               variant="ghost"
-              colorScheme="brand"
+              color="link"
               onClick={onChangePharmacy}
               leftIcon={<FiRefreshCcw />}
             >
@@ -212,7 +212,7 @@ export const PharmacyCard = memo(function PharmacyCard({
               mx="auto"
               size="sm"
               variant="ghost"
-              colorScheme="brand"
+              color="link"
               onClick={onGetDirections}
               leftIcon={<FiNavigation />}
             >
