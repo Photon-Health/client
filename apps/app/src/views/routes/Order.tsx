@@ -54,9 +54,38 @@ import { OrderState } from 'packages/sdk/dist/types';
 import { LocalPickup } from './NewOrder/components/SelectPharmacyCard/components/LocalPickup';
 import { LocationResults, LocationSearch } from '../components/LocationSearch';
 import SectionTitleRow from '../components/SectionTitleRow';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { gql, useApolloClient, useMutation, useQuery } from '@apollo/client';
+import { CANCEL_ORDER, REROUTE_ORDER } from '../../mutations';
+
+const PHARMACY_FRAGMENT = gql`
+  fragment PharmacyFragment on Pharmacy {
+    id
+    name
+    phone
+    address {
+      city
+      country
+      postalCode
+      state
+      street1
+      street2
+    }
+  }
+`;
+
+const PHARMACY_QUERY = gql`
+  ${PHARMACY_FRAGMENT}
+
+  query GetPharmacy($id: ID!) {
+    pharmacy(id: $id) {
+      ...PharmacyFragment
+    }
+  }
+`;
 
 const GET_ORDER = gql`
+  ${PHARMACY_FRAGMENT}
+
   query GetOrder($id: ID!) {
     order(id: $id) {
       __typename
@@ -99,17 +128,7 @@ const GET_ORDER = gql`
         }
       }
       pharmacy {
-        id
-        name
-        phone
-        address {
-          city
-          country
-          postalCode
-          state
-          street1
-          street2
-        }
+        ...PharmacyFragment
       }
       fulfillment {
         type
@@ -119,21 +138,6 @@ const GET_ORDER = gql`
       }
       createdAt
     }
-  }
-`;
-const CANCEL_ORDER = gql`
-  mutation cancel($id: ID!) {
-    cancelOrder(id: $id) {
-      __typename
-      id
-      state
-    }
-  }
-`;
-
-export const REROUTE_ORDER = gql`
-  mutation RerouteOrder($orderId: ID!, $pharmacyId: String) {
-    rerouteOrder(orderId: $orderId, pharmacyId: $pharmacyId)
   }
 `;
 
@@ -187,11 +191,12 @@ export const Order = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [pharmacyId, setPharmacyId] = useState('');
   const { data, loading, error } = useQuery(GET_ORDER, { variables: { id: id! } });
+  const client = useApolloClient();
 
   const [cancelOrder] = useMutation(CANCEL_ORDER, {
     update: (cache) => {
-      // TODO manually updating, this can be automatic
-      // but current mutation returns wrong data https://www.notion.so/photons/Successful-Cancel-Order-Returns-Incorrect-State-6bca56ec94cf49d88246730f002500fd?pvs=4
+      // TODO manually updating, this can be automatic but current mutation returns wrong data
+      // https://www.notion.so/photons/Successful-Cancel-Order-Returns-Incorrect-State-6bca56ec94cf49d88246730f002500fd?pvs=4
       const existingOrder: { order: types.Order } | null = cache.readQuery({
         query: GET_ORDER,
         variables: { id: id! }
@@ -210,7 +215,38 @@ export const Order = () => {
       }
     }
   });
-  const [rerouteOrder] = useMutation(REROUTE_ORDER);
+
+  const [rerouteOrder] = useMutation(REROUTE_ORDER, {
+    update: async (cache) => {
+      // after routing an order, we need to update the cache with the new pharmacy data optimistically
+      const existingOrder: { order: types.Order } | null = cache.readQuery({
+        query: GET_ORDER,
+        variables: { id: id! }
+      });
+      try {
+        const { data: pharmacyData } = await client.query({
+          query: PHARMACY_QUERY,
+          variables: { id: pharmacyId }
+        });
+        if (existingOrder && existingOrder.order && pharmacyData) {
+          cache.writeQuery({
+            query: GET_ORDER,
+            data: {
+              order: {
+                ...existingOrder.order,
+                state: types.OrderState.Placed,
+                pharmacy: pharmacyData.pharmacy
+              }
+            },
+            variables: { id: id! }
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching pharmacy data:', error);
+      }
+    }
+  });
+
   const order = data?.order;
   const {
     isOpen: isOpenLocation,
@@ -441,8 +477,7 @@ export const Order = () => {
                             isDisabled={!pharmacyId}
                             onClick={async () => {
                               setUpdating(true);
-                              console.log('SETTING PHARMACY', pharmacyId);
-                              await rerouteOrder({ variables: { orderId: id, pharmacyId } });
+                              await rerouteOrder({ variables: { id, pharmacyId } });
                               setPharmacyId('');
                               setUpdating(false);
                               onClose();

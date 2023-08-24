@@ -28,7 +28,7 @@ import {
   Show
 } from '@chakra-ui/react';
 import { FiChevronRight, FiPlus, FiRepeat } from 'react-icons/fi';
-import { gql, GraphQLClient } from 'graphql-request';
+import { GraphQLClient } from 'graphql-request';
 import dayjs from 'dayjs';
 
 import { formatAddress, FormatAddressProps, formatDate } from '../../utils';
@@ -50,6 +50,7 @@ import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
 import SectionTitleRow from '../components/SectionTitleRow';
 import usePermissions from '../../hooks/usePermissions';
+import { CANCEL_PRESCRIPTION } from '../../mutations';
 
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
@@ -57,14 +58,6 @@ export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI
     stringify: JSON.stringify
   }
 });
-
-export const CANCEL_PRESCRIPTION = gql`
-  mutation cancel($id: ID!) {
-    cancelPrescription(id: $id) {
-      id
-    }
-  }
-`;
 
 export const Prescription = () => {
   const params = useParams();
@@ -346,7 +339,7 @@ export const Prescription = () => {
             </InfoGrid>
 
             <SectionTitleRow
-              headerText="Related Orders"
+              headerText="Pharmacy Orders"
               subHeaderText="Below are orders that include fills from this prescription."
               rightElement={
                 loading ? undefined : (
