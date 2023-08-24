@@ -218,7 +218,10 @@ export const OrderForm = ({
 
         if (
           await confirmWrapper('Send Order?', {
-            description: 'This order will be immediately sent to the pharmacy of choice.',
+            // determine if order is "Send to Patient" by checking if pharmacyId is set
+            description: values.pharmacyId
+              ? 'This order will be sent immediately to the pharmacy of choice.'
+              : "This order will await the patient's choice of pharmacy.",
             cancelText: 'Keep Editing',
             confirmText: 'Yes, Send Order',
             darkMode: colorMode !== 'light'
