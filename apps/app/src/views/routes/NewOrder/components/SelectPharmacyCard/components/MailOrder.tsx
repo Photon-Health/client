@@ -66,7 +66,7 @@ export const MailOrder = ({
     if (isVisible && pharmOptions?.length === 1 && !pharmacyId) {
       setFieldValue('pharmacyId', pharmOptions[0].id);
     }
-  }, [isVisible, pharmOptions, pharmacyId]);
+  }, [isVisible]);
 
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 

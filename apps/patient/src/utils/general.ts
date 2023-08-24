@@ -3,6 +3,8 @@ import isoWeek from 'dayjs/plugin/isoWeek';
 import isBetween from 'dayjs/plugin/isBetween';
 import { types } from '@photonhealth/sdk';
 import { ExtendedFulfillmentType } from './models';
+import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { getPlace, getPlaceDetails } from '../api';
 
 dayjs.extend(isoWeek);
 dayjs.extend(isBetween);
@@ -187,4 +189,54 @@ export const countFillsAndRemoveDuplicates = (fills: types.Fill[]): FillWithCoun
     }
   }
   return result;
+};
+
+export const enrichPharmacy = async (
+  pharmacy: types.Pharmacy,
+  includeRating = true
+): Promise<EnrichedPharmacy> => {
+  try {
+    const place = await getPlace(pharmacy, includeRating);
+    if (!place) {
+      return pharmacy;
+    }
+
+    const enrichedPharmacyInfo = {
+      ...pharmacy,
+      businessStatus: place.business_status || '',
+      rating: place.rating || undefined
+    };
+
+    const isOperational =
+      enrichedPharmacyInfo.businessStatus === google.maps.places.BusinessStatus.OPERATIONAL;
+    if (!isOperational) {
+      return enrichedPharmacyInfo;
+    }
+
+    const fetchDetails = place.place_id && isOperational; // Don't continue enriching non-operational pharmacies
+    const placeDetails = fetchDetails ? await getPlaceDetails(place.place_id) : undefined;
+    if (!placeDetails) {
+      return enrichedPharmacyInfo;
+    }
+
+    const currentTime = dayjs().format('HHmm');
+    const { is24Hr, opens, opensDay, closes } = getHours(
+      placeDetails.opening_hours?.periods,
+      currentTime
+    );
+
+    return {
+      ...enrichedPharmacyInfo,
+      hours: {
+        open: placeDetails.opening_hours?.isOpen() || false,
+        is24Hr,
+        opens,
+        opensDay,
+        closes
+      }
+    };
+  } catch (error) {
+    console.log('Failed to enrich pharmacy data: ' + error.message);
+    return pharmacy;
+  }
 };

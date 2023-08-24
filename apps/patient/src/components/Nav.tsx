@@ -15,7 +15,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react';
 import { FiHelpCircle, FiRefreshCw } from 'react-icons/fi';
-import t from '../utils/text.json';
+import { text as t } from '../utils/text';
 import { Logo as PhotonLogo } from './Logo';
 import { getSettings } from '@client/settings';
 

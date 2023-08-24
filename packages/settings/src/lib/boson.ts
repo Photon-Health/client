@@ -21,6 +21,7 @@ const defaultSettings: OrganizationSettings = {
   mailOrderNavigateProviders: [],
   sendToPatient: true,
   sendToPatientUsers: [],
+  patientsCanReroute: true,
   courier: true,
   courierProviders: [ALTO_ID],
   returnTo: window.location.origin,

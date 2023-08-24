@@ -20,6 +20,7 @@ const defaultSettings: OrganizationSettings = {
   mailOrderNavigateProviders: [],
   sendToPatient: true,
   sendToPatientUsers: [],
+  patientsCanReroute: false,
   courier: false,
   courierProviders: [],
   returnTo: window.location.origin,
@@ -155,5 +156,12 @@ export const photon: {
     ...defaultSettings,
     logo: 'sana_care_logo.png',
     accentColor: '#FBCC45'
+  },
+  // Blueberry Pediatrics
+  org_ul8ojZgvzpqu299H: {
+    ...defaultSettings,
+    logo: 'blueberry_logo.png',
+    accentColor: '#235AFF',
+    patientsCanReroute: false
   }
 };
