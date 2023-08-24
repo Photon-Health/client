@@ -18,40 +18,14 @@ import { createEffect, onMount, createSignal, Show, For } from 'solid-js';
 import type { FormError } from '../stores/form';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
-import { Order, Prescription, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
+import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import { AddPrescriptionCard } from './components/AddPrescriptionCard';
 import { PatientCard } from './components/PatientCard';
 import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
 import { GraphQLError } from 'graphql';
 import { OrderCard } from './components/OrderCard';
-import { format } from 'date-fns';
-import gql from 'graphql-tag';
 import { PharmacyCard } from './components/PharmacyCard';
 import { PhotonAuthorized } from '../photon-authorized';
-
-const CATALOG_TREATMENTS_FIELDS = gql`
-  fragment CatalogTreatmentsFields on Catalog {
-    id
-    treatments {
-      id
-      name
-    }
-    templates {
-      id
-      daysSupply
-      dispenseAsWritten
-      dispenseQuantity
-      dispenseUnit
-      instructions
-      notes
-      fillsAllowed
-      treatment {
-        id
-        name
-      }
-    }
-  }
-`;
 
 customElement(
   'photon-prescribe-workflow',
@@ -110,7 +84,6 @@ customElement(
     const [errors, setErrors] = createSignal<FormError[]>([]);
     const [isLoading, setIsLoading] = createSignal<boolean>(true);
     const [isEditing, setIsEditing] = createSignal<boolean>(false);
-    const [isLoadingTemplates, setIsLoadingTemplates] = createSignal<boolean>(false);
     const [authenticated, setAuthenticated] = createSignal<boolean>(
       client?.authentication.state.isAuthenticated || false
     );
@@ -139,113 +112,6 @@ customElement(
     });
     createEffect(() => {
       setAuthenticated(client?.authentication.state.isAuthenticated || false);
-    });
-
-    const generateDraftPrescription = (prescription: Prescription | PrescriptionTemplate) => ({
-      id: String(Math.random()),
-      effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
-      treatment: prescription.treatment,
-      dispenseAsWritten: prescription.dispenseAsWritten,
-      dispenseQuantity: prescription.dispenseQuantity,
-      dispenseUnit: prescription.dispenseUnit,
-      daysSupply: prescription.daysSupply,
-      // when we pre-populate draft prescriptions using template ID's, we need need to update the value for refills here
-      refillsInput: prescription.fillsAllowed ? prescription.fillsAllowed - 1 : 0,
-      fillsAllowed: prescription.fillsAllowed,
-      instructions: prescription.instructions,
-      notes: prescription.notes,
-      addToTemplates: false,
-      catalogId: undefined
-    });
-
-    const fetchAndDisplayTemplates = async () => {
-      setIsLoadingTemplates(true);
-      const ids = props?.templateIds?.split(',') || [];
-      if (ids.length === 0) {
-        return;
-      }
-      // TODO: Should just get the template directly but not supported by the SDK
-      const {
-        data: { catalogs }
-      } = await client!.getSDK().clinical.catalog.getCatalogs();
-      if (catalogs.length === 0) {
-        console.error('No catalog set');
-        return;
-      }
-      const {
-        data: { catalog }
-      } = await client!.getSDK().clinical.catalog.getCatalog({
-        id: catalogs[0].id,
-        fragment: {
-          CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
-        }
-      });
-      // Build a map for easy lookup
-      const templateMap: { [key: string]: PrescriptionTemplate } = {};
-      catalog.templates.forEach((template) => {
-        if (template) templateMap[template.id] = template;
-      });
-      for (let i = 0; i < ids.length; i++) {
-        const templateId = ids[i];
-        const template = templateMap[templateId];
-        if (!template) {
-          console.error(`Invalid template id ${templateId}`);
-        }
-        if (
-          // minimum template fields required to create a prescription
-          !template?.treatment ||
-          !template?.dispenseQuantity ||
-          !template?.dispenseUnit ||
-          !template?.fillsAllowed ||
-          !template?.instructions
-        ) {
-          console.error(`Template is missing required prescription details ${templateId}`);
-        } else {
-          actions.updateFormValue({
-            key: 'draftPrescriptions',
-            value: [
-              ...(store['draftPrescriptions']?.value || []),
-              generateDraftPrescription(template)
-            ]
-          });
-        }
-      }
-      setIsLoadingTemplates(false);
-    };
-
-    const fetchAndDisplayPrescriptions = async () => {
-      setIsLoadingTemplates(true);
-      const ids = props?.prescriptionIds?.split(',') || [];
-      if (ids.length === 0) {
-        return;
-      }
-
-      try {
-        const prescriptions = await Promise.all(
-          ids.map((id) => client!.getSDK().clinical.prescription.getPrescription({ id }))
-        );
-
-        prescriptions.forEach(({ data: { prescription } }) => {
-          actions.updateFormValue({
-            key: 'draftPrescriptions',
-            value: [
-              ...(store['draftPrescriptions']?.value || []),
-              generateDraftPrescription(prescription)
-            ]
-          });
-        });
-      } catch (e) {
-        console.error(e);
-      }
-      setIsLoadingTemplates(false);
-    };
-
-    createEffect(() => {
-      if (props.templateIds && client) {
-        fetchAndDisplayTemplates();
-      } else if (props.prescriptionIds && client) {
-        fetchAndDisplayPrescriptions();
-      }
     });
 
     const dispatchPrescriptionsCreated = (prescriptions: Prescription[]) => {
@@ -456,10 +322,11 @@ customElement(
                 </div>
               </Show>
               <DraftPrescriptionCard
+                templateIds={props.templateIds?.split(',') || []}
+                prescriptionIds={props.prescriptionIds?.split(',') || []}
                 prescriptionRef={prescriptionRef}
                 actions={actions}
                 store={store}
-                isLoading={isLoadingTemplates()}
                 setIsEditing={setIsEditing}
               />
               <Show when={props.enableOrder && !props.pharmacyId}>

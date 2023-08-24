@@ -3,7 +3,7 @@ import { JSXElement, Show } from 'solid-js';
 import { createMemo, mergeProps } from 'solid-js';
 
 export type TextSize = 'lg' | 'md' | 'sm';
-export type TextColor = 'black' | 'gray';
+export type TextColor = 'black' | 'gray' | 'red';
 
 export interface TextProps {
   size?: TextSize;
@@ -25,6 +25,7 @@ export default function Text(props: TextProps) {
       'text-lg leading-snug	': merged.size === 'lg',
       'text-black': !props.loading && merged.color === 'black',
       'text-slate-500': !props.loading && merged.color === 'gray',
+      'text-red-500': !props.loading && merged.color === 'red',
       'text-transparent box-border rounded-md': props.loading,
       'bg-gray-100': !props.selected && props.loading,
       'bg-blue-100': props.selected && props.loading
