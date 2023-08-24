@@ -4,7 +4,7 @@ import { Stack, Text, Divider, VStack } from '@chakra-ui/react';
 type SectionTitleRowProps = {
   headerText: string;
   subHeaderText?: string;
-  rightElement?: ReactElement | undefined;
+  rightElement?: ReactElement;
 };
 
 const SectionTitleRow: React.FC<SectionTitleRowProps> = ({
