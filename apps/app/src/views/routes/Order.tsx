@@ -19,7 +19,6 @@ import {
   Stack,
   Text,
   VStack,
-  useBreakpointValue,
   useColorMode,
   LinkBox,
   LinkOverlay,
@@ -272,7 +271,7 @@ export const Order = () => {
       getAccessToken();
     }
   }, [accessToken]);
-  const isMobile = useBreakpointValue({ base: true, sm: false });
+
   const { colorMode } = useColorMode();
 
   const prescriptions = useMemo(() => {
@@ -367,8 +366,8 @@ export const Order = () => {
             w="100%"
             mt={0}
           >
-            <Stack direction={{ base: 'column', sm: 'row' }} gap={3} w="full">
-              <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
+            <Stack direction={{ base: 'column', sm: 'row' }} gap={[5, 3]} w="full">
+              <VStack align="start" borderRadius={6}>
                 <Text color="gray.500" fontWeight="medium" fontSize="sm">
                   Patient
                 </Text>
@@ -386,7 +385,7 @@ export const Order = () => {
                 <Divider orientation="vertical" height="auto" />
               </Show>
 
-              <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
+              <VStack align="start" borderRadius={6}>
                 <Text color="gray.500" fontWeight="medium" fontSize="sm">
                   Created At
                 </Text>
@@ -402,7 +401,7 @@ export const Order = () => {
                   <Show above="sm">
                     <Divider orientation="vertical" height="auto" />
                   </Show>
-                  <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
+                  <VStack align="start" borderRadius={6}>
                     <Text color="gray.500" fontWeight="medium" fontSize="sm">
                       External Id
                     </Text>

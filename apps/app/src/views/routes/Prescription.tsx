@@ -178,7 +178,7 @@ export const Prescription = () => {
             w="100%"
             mt={0}
           >
-            <Stack direction={{ base: 'column', sm: 'row' }} gap={3} w="full">
+            <Stack direction={{ base: 'column', sm: 'row' }} gap={[5, 3]} w="full">
               <VStack align="start" borderRadius={6}>
                 <Text color="gray.500" fontWeight="medium" fontSize="sm">
                   Patient
