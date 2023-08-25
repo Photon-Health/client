@@ -16,7 +16,6 @@ import { FiInfo, FiShoppingCart } from 'react-icons/fi';
 
 import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
-import { usePhoton } from '@photonhealth/react';
 import { formatDate } from '../../utils';
 
 import { Page } from '../components/Page';
@@ -24,6 +23,35 @@ import { TablePage } from '../components/TablePage';
 import NameView from '../components/NameView';
 import PatientView from '../components/PatientView';
 import { types } from '@photonhealth/sdk';
+import { gql, useQuery } from '@apollo/client';
+import { Prescription } from 'packages/sdk/dist/types';
+
+const GET_PRESCRIPTIONS = gql`
+  query GetPrescriptions($after: ID) {
+    prescriptions(first: 25, after: $after) {
+      id
+      externalId
+      state
+      dispenseQuantity
+      daysSupply
+      writtenAt
+      treatment {
+        name
+      }
+      patient {
+        id
+        name {
+          full
+        }
+      }
+      prescriber {
+        name {
+          full
+        }
+      }
+    }
+  }
+`;
 
 interface MedViewProps {
   name: string;
@@ -241,7 +269,6 @@ export const Prescriptions = () => {
     }
   ];
 
-  const { getPrescriptions } = usePhoton();
   const [filterText, setFilterText] = useState('');
   const [rows, setRows] = useState<any[]>([]);
   const [finished, setFinished] = useState<boolean>(false);
@@ -254,10 +281,11 @@ export const Prescriptions = () => {
     patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
   };
 
-  const { prescriptions, loading, error, refetch } = getPrescriptions(getPrescriptionsData);
+  const { data, loading, error, refetch } = useQuery(GET_PRESCRIPTIONS);
+  const prescriptions: Prescription[] | undefined = data?.prescriptions;
 
   useEffect(() => {
-    if (!loading) {
+    if (!loading && prescriptions) {
       const preppedRows = prescriptions.filter((row) => row).map(renderRow);
       setRows(preppedRows);
       setFinished(prescriptions.length === 0);

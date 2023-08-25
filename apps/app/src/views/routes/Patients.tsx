@@ -1,4 +1,4 @@
-import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 import {
   HStack,
@@ -17,13 +17,29 @@ import { FiEdit, FiEye, FiMoreVertical, FiShoppingCart } from 'react-icons/fi';
 import { TbPrescription } from 'react-icons/tb';
 
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { gql, useQuery } from '@apollo/client';
 import { useDebounce } from 'use-debounce';
-import { usePhoton } from '@photonhealth/react';
 import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
 import PatientView from '../components/PatientView';
 import ContactView from '../components/ContactView';
 import { Patient } from 'packages/sdk/dist/types';
+
+const GET_PATIENTS = gql`
+  query GetPatients($after: ID) {
+    patients(first: 25, after: $after) {
+      id
+      externalId
+      phone
+      email
+      sex
+      dateOfBirth
+      name {
+        full
+      }
+    }
+  }
+`;
 
 const dobToAge = require('dob-to-age');
 
@@ -116,9 +132,6 @@ const renderSkeletonRow = () => ({
 });
 
 export const Patients = () => {
-  const [params] = useSearchParams();
-  const reload = params.get('reload');
-
   const columns = [
     {
       Header: 'Name',
@@ -142,43 +155,17 @@ export const Patients = () => {
     }
   ];
 
-  const { getPatients, getPatient } = usePhoton();
   const [filterText, setFilterText] = useState('');
   const [rows, setRows] = useState<any[]>([]);
   const [finished, setFinished] = useState<boolean>(false);
   const [disableScroll, setDisableScroll] = useState<boolean>(false);
   const [filterTextDebounce] = useDebounce(filterText, 250);
 
-  const { patients, loading, error, refetch } = getPatients({
-    name: filterTextDebounce.length > 0 ? filterTextDebounce : null
-  });
-
-  const { refetch: refetchPatient } = getPatient({
-    id: ''
-  });
+  const { data, loading, error, refetch } = useQuery(GET_PATIENTS);
+  const patients: Patient[] | undefined = data?.patients;
 
   useEffect(() => {
-    if (reload) {
-      const getData = async () => {
-        const patientId = reload.split('-')[0];
-        const { data } = await refetchPatient({
-          id: patientId
-        });
-        setRows(
-          rows.map((x) => {
-            if (x.id === patientId) {
-              return renderRow(data.patient, setDisableScroll);
-            }
-            return x;
-          })
-        );
-      };
-      getData();
-    }
-  }, [reload]);
-
-  useEffect(() => {
-    if (!loading) {
+    if (!loading && patients) {
       setRows(
         patients
           .filter((patient) => !!patient)

@@ -18,7 +18,7 @@ import {
 import { FiInfo } from 'react-icons/fi';
 import { useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
-import { usePhoton } from '@photonhealth/react';
+import { gql, useQuery } from '@apollo/client';
 
 import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
@@ -27,6 +27,39 @@ import PharmacyNameView from '../components/PharmacyNameView';
 import { formatDate, formatFills } from '../../utils';
 import { Order } from 'packages/sdk/dist/types';
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
+
+const GET_ORDERS = gql`
+  query GetOrders($after: ID) {
+    orders(first: 25, after: $after) {
+      id
+      externalId
+      state
+      createdAt
+      fills {
+        id
+        treatment {
+          name
+        }
+      }
+      patient {
+        name {
+          full
+        }
+      }
+      pharmacy {
+        name
+        phone
+        address {
+          street1
+          street2
+          city
+          state
+          postalCode
+        }
+      }
+    }
+  }
+`;
 
 interface ActionsProps {
   id: string;
@@ -168,7 +201,6 @@ export const Orders = () => {
     }
   ];
 
-  const { getOrders } = usePhoton();
   const [filterText, setFilterText] = useState('');
   const [rows, setRows] = useState<any[]>([]);
   const [finished, setFinished] = useState(false);
@@ -176,13 +208,11 @@ export const Orders = () => {
 
   const isMobile = useBreakpointValue({ base: true, md: false });
 
-  const { orders, loading, error, refetch } = getOrders({
-    patientId,
-    patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
-  });
+  const { data, loading, error, refetch } = useQuery(GET_ORDERS);
+  const orders: Order[] | undefined = data?.orders;
 
   useEffect(() => {
-    if (!loading) {
+    if (!loading && orders) {
       setRows(orders.map(renderRow));
       setFinished(orders.length === 0);
     }
