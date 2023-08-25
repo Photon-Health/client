@@ -25,6 +25,7 @@ const GetPatientQuery = gql`
         name
         address {
           street1
+          street2
           city
           state
           postalCode
@@ -74,13 +75,12 @@ export function PatientDetails(props: PatientDetailsProps) {
         size="sm"
         sampleLoadingText="111 222 3333"
       >
-        <Show when={preferredPharmacy()}>
+        <Show when={preferredPharmacy()} fallback={<Text>{patient()?.phone}</Text>}>
           {preferredPharmacy()?.name}{' '}
           <Badge size="sm" color="blue" class="ml-1">
             Preferred
           </Badge>
         </Show>
-        <Show when={!preferredPharmacy()}>{patient()?.phone}</Show>
       </Text>
       <Text
         loading={!patient()}
@@ -89,8 +89,9 @@ export function PatientDetails(props: PatientDetailsProps) {
         size="sm"
         sampleLoadingText="loading@gmail.com"
       >
-        <Show when={preferredPharmacy()}>{formatAddress(preferredPharmacy()?.address)}</Show>
-        <Show when={!preferredPharmacy()}>{patient()?.email}</Show>
+        <Show when={preferredPharmacy()} fallback={patient()?.email}>
+          {formatAddress(preferredPharmacy()?.address)}
+        </Show>
       </Text>
     </div>
   );

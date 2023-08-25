@@ -24,7 +24,7 @@ export const SendToPatient = ({ patient }: any) => {
           <Radio isChecked />
           <VStack align="start" spacing={0} wordBreak="break-all">
             {patient.name ? <Text fontWeight="medium">{patient.name.full}</Text> : null}
-            {patient?.preferredPharmacies?.length || 0 > 0 ? (
+            {(patient?.preferredPharmacies?.length ?? 0) > 0 ? (
               <>
                 <Text fontSize="sm" color="gray.500">
                   {patient?.preferredPharmacies?.[0]?.name}{' '}
