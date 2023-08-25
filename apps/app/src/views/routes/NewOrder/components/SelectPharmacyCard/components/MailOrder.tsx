@@ -22,8 +22,8 @@ interface MailOrderProps {
   pharmacyId: string;
   location: string | undefined;
   setFieldValue: any;
-  errors: any;
-  touched: any;
+  errors?: any;
+  touched?: any;
   resetSelection: any;
 }
 
@@ -77,7 +77,7 @@ export const MailOrder = ({
           <Pharmacy pharmacyId={pharmacyId} resetSelection={resetSelection} />
         </CardBody>
       ) : (
-        <FormControl isInvalid={!!errors.pharmacyId && touched.pharmacyId} ref={ref}>
+        <FormControl isInvalid={!!errors?.pharmacyId && touched?.pharmacyId} ref={ref}>
           <Text>Contact support to add additional mail order integrations.</Text>
           {pharmOptions.map(({ id }: { id: string }) => (
             <Box

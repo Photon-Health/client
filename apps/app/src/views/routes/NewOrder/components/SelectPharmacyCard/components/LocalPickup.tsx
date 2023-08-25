@@ -60,8 +60,8 @@ interface LocalPickupProps {
   latitude: number | undefined;
   longitude: number | undefined;
   onOpen: any;
-  errors: any;
-  touched: any;
+  errors?: any;
+  touched?: any;
   patient: any;
   pharmacyId: string | undefined;
   updatePreferredPharmacy: any;
@@ -182,7 +182,7 @@ export const LocalPickup = (props: LocalPickupProps) => {
           </Button>
         </WrapItem>
       </Wrap>
-      <FormControl isInvalid={!!errors.pharmacyId && touched.pharmacyId}>
+      <FormControl isInvalid={!!errors?.pharmacyId && touched?.pharmacyId}>
         <AsyncSelect
           {...props}
           name="pharmacyId"
@@ -199,7 +199,7 @@ export const LocalPickup = (props: LocalPickupProps) => {
       </FormControl>
     </>
   ) : (
-    <FormControl isInvalid={!!errors.pharmacyId && touched.pharmacyId}>
+    <FormControl isInvalid={!!errors?.pharmacyId && touched?.pharmacyId}>
       <VStack align="start" spacing={3}>
         <Text>Set a location to be used for pharmacy search.</Text>
         <Button onClick={onOpen}>Set location</Button>

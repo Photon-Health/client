@@ -19,7 +19,6 @@ import {
   Skeleton,
   SkeletonCircle,
   SkeletonText,
-  useBreakpointValue,
   useColorMode,
   AlertTitle,
   AlertDescription,
@@ -29,7 +28,7 @@ import {
   Show
 } from '@chakra-ui/react';
 import { FiChevronRight, FiPlus, FiRepeat } from 'react-icons/fi';
-import { gql, GraphQLClient } from 'graphql-request';
+import { GraphQLClient } from 'graphql-request';
 import dayjs from 'dayjs';
 
 import { formatAddress, FormatAddressProps, formatDate } from '../../utils';
@@ -49,7 +48,9 @@ import { types } from '@photonhealth/sdk';
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
+import SectionTitleRow from '../components/SectionTitleRow';
 import usePermissions from '../../hooks/usePermissions';
+import { CANCEL_PRESCRIPTION } from '../../mutations';
 
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
@@ -57,14 +58,6 @@ export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI
     stringify: JSON.stringify
   }
 });
-
-export const CANCEL_PRESCRIPTION = gql`
-  mutation cancel($id: ID!) {
-    cancelPrescription(id: $id) {
-      id
-    }
-  }
-`;
 
 export const Prescription = () => {
   const params = useParams();
@@ -98,6 +91,7 @@ export const Prescription = () => {
     patient,
     dispenseAsWritten,
     dispenseQuantity,
+    dispenseUnit,
     fillsAllowed,
     fillsRemaining,
     daysSupply,
@@ -112,7 +106,6 @@ export const Prescription = () => {
   const effectiveDate = formatDate(rx.effectiveDate);
   const expirationDate = formatDate(rx.expirationDate);
 
-  const isMobile = useBreakpointValue({ base: true, sm: false });
   const { colorMode } = useColorMode();
 
   const orders = useMemo(() => {
@@ -157,28 +150,23 @@ export const Prescription = () => {
       <Card>
         <CardHeader>
           <Stack direction={{ base: 'column', md: 'row' }} justify="space-between" width="full">
-            <Text fontWeight="medium">
-              {loading ? <Skeleton height="30px" width="250px" /> : prescription?.treatment?.name}
-            </Text>
-            <Button
-              leftIcon={<FiRepeat />}
-              aria-label="Duplicate Prescription"
-              onClick={() => {
-                if (canDuplicate) {
-                  navigate(
-                    `/prescriptions/new?prescriptionIds=${id}${
-                      patient?.id ? `&patientId=${patient?.id}` : ''
-                    }`
-                  );
-                }
-              }}
-              isDisabled={!canDuplicate}
-              colorScheme="blue"
-              size="sm"
-              role="link"
+            <Stack
+              direction={{ base: 'column', md: 'row' }}
+              align={{ base: 'start', md: 'center' }}
+              spacing={2}
             >
-              Duplicate Prescription
-            </Button>
+              <Text fontWeight="medium">
+                {loading ? <Skeleton height="30px" width="250px" /> : prescription?.treatment?.name}
+              </Text>
+              {loading ? (
+                <Skeleton width="70px" height="24px" borderRadius="xl" />
+              ) : (
+                <Tooltip label={stateTip}>
+                  <Badge colorScheme={stateColor}>{state}</Badge>
+                </Tooltip>
+              )}
+            </Stack>
+            <CopyText size="xs" text={id || ''} />
           </Stack>
         </CardHeader>
         <Divider color="gray.100" />
@@ -190,8 +178,8 @@ export const Prescription = () => {
             w="100%"
             mt={0}
           >
-            <Stack direction={{ base: 'column', sm: 'row' }} gap={3} w="full">
-              <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
+            <Stack direction={{ base: 'column', sm: 'row' }} gap={[5, 3]} w="full">
+              <VStack align="start" borderRadius={6}>
                 <Text color="gray.500" fontWeight="medium" fontSize="sm">
                   Patient
                 </Text>
@@ -204,11 +192,29 @@ export const Prescription = () => {
                   <PatientView patient={patient} />
                 )}
               </VStack>
+
               <Show above="sm">
                 <Divider orientation="vertical" height="auto" />
               </Show>
 
-              <VStack align="start" borderRadius={6} w={isMobile ? '50%' : undefined}>
+              <VStack align="start" borderRadius={6}>
+                <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                  Written
+                </Text>
+                <Stack alignItems="center" justifyContent="center" height="100%">
+                  {loading ? (
+                    <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                  ) : (
+                    <Text fontSize="md">{writtenAt}</Text>
+                  )}
+                </Stack>
+              </VStack>
+
+              <Show above="sm">
+                <Divider orientation="vertical" height="auto" />
+              </Show>
+
+              <VStack align="start" borderRadius={6}>
                 <Text color="gray.500" fontWeight="medium" fontSize="sm">
                   Prescriber
                 </Text>
@@ -223,11 +229,30 @@ export const Prescription = () => {
               </VStack>
             </Stack>
 
-            <Divider />
-
-            <Text color="gray.500" fontWeight="medium" fontSize="sm">
-              Prescription Details
-            </Text>
+            <SectionTitleRow
+              headerText="Prescription"
+              rightElement={
+                <Button
+                  leftIcon={<FiRepeat />}
+                  aria-label="Duplicate Prescription"
+                  onClick={() => {
+                    if (canDuplicate) {
+                      navigate(
+                        `/prescriptions/new?prescriptionIds=${id}${
+                          patient?.id ? `&patientId=${patient?.id}` : ''
+                        }`
+                      );
+                    }
+                  }}
+                  isDisabled={!canDuplicate}
+                  colorScheme="blue"
+                  size="sm"
+                  role="link"
+                >
+                  Renew
+                </Button>
+              }
+            />
 
             <InfoGrid name="Instructions">
               {loading ? (
@@ -251,22 +276,12 @@ export const Prescription = () => {
               )}
             </InfoGrid>
 
-            <InfoGrid name="Status">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-              ) : (
-                <Tooltip label={stateTip}>
-                  <Badge colorScheme={stateColor}>{state}</Badge>
-                </Tooltip>
-              )}
-            </InfoGrid>
-
             <InfoGrid name="Quantity">
               {loading ? (
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text fontSize="md">
-                  {dispenseQuantity} ct / {daysSupply} day
+                  {dispenseQuantity} {dispenseUnit} / {daysSupply} day
                 </Text>
               )}
             </InfoGrid>
@@ -303,14 +318,6 @@ export const Prescription = () => {
               )}
             </InfoGrid>
 
-            <InfoGrid name="Written">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-              ) : (
-                <Text fontSize="md">{writtenAt}</Text>
-              )}
-            </InfoGrid>
-
             <InfoGrid name="Dispense As Written">
               {loading ? (
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="50px" />
@@ -318,33 +325,47 @@ export const Prescription = () => {
                 <Text fontSize="md">{dispenseAsWritten ? 'Yes' : 'No'}</Text>
               )}
             </InfoGrid>
-            <Divider />
-            <HStack justifyContent="space-between" width="100%">
-              <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                Orders
-              </Text>
-              {loading ? null : (
-                <Button
-                  leftIcon={<FiPlus />}
-                  aria-label="New Order"
-                  onClick={() => {
-                    if (canCreateOrder) {
-                      navigate(
-                        `/orders/new?prescriptionId=${id}${
-                          patient?.id ? `&patientId=${patient?.id}` : ''
-                        }`
-                      );
-                    }
-                  }}
-                  isDisabled={!canCreateOrder}
-                  colorScheme="blue"
-                  size="sm"
-                  role="link"
-                >
-                  Create Order
-                </Button>
+
+            <InfoGrid name="External Id">
+              {loading ? (
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="65px" />
+              ) : rx.externalId ? (
+                <CopyText text={rx.externalId || ''} />
+              ) : (
+                <Text fontSize="md" as="i">
+                  None
+                </Text>
               )}
-            </HStack>
+            </InfoGrid>
+
+            <SectionTitleRow
+              headerText="Pharmacy Orders"
+              subHeaderText="Below are orders that include fills from this prescription."
+              rightElement={
+                loading ? undefined : (
+                  <Button
+                    leftIcon={<FiPlus />}
+                    aria-label="New Order"
+                    onClick={() => {
+                      if (canCreateOrder) {
+                        navigate(
+                          `/orders/new?prescriptionId=${id}${
+                            patient?.id ? `&patientId=${patient?.id}` : ''
+                          }`
+                        );
+                      }
+                    }}
+                    isDisabled={!canCreateOrder}
+                    colorScheme="blue"
+                    size="sm"
+                    role="link"
+                  >
+                    Create Order
+                  </Button>
+                )
+              }
+            />
+
             {loading ? (
               <SkeletonText skeletonHeight={5} noOfLines={1} width="100%" />
             ) : (
@@ -409,73 +430,48 @@ export const Prescription = () => {
                 )}
               </>
             )}
-            <Divider />
-            <Text color="gray.500" fontWeight="medium" fontSize="sm">
-              Advanced
-            </Text>
 
-            <InfoGrid name="Id">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
-              ) : (
-                <CopyText text={id || ''} />
-              )}
-            </InfoGrid>
+            <SectionTitleRow
+              headerText="Actions"
+              subHeaderText="Canceling a prescription will prevent any team member from adding the prescription
+                  fills in a new order."
+              rightElement={
+                <Button
+                  aria-label="Cancel Prescription"
+                  isDisabled={loading || rx.state !== 'ACTIVE'}
+                  isLoading={canceling}
+                  loadingText="Canceling..."
+                  onClick={async () => {
+                    const decision = await confirmWrapper('Cancel this prescription?', {
+                      description: 'You will not be able to undo this action.',
+                      cancelText: "No, Don't Cancel",
+                      confirmText: 'Yes, Cancel',
+                      darkMode: colorMode !== 'light',
+                      colorScheme: 'red'
+                    });
+                    if (decision) {
+                      setCanceling(true);
+                      graphQLClient.setHeader('authorization', accessToken);
+                      await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
+                      navigate(0);
+                    }
+                  }}
+                  variant="outline"
+                  textColor="red.500"
+                  colorScheme="red"
+                  size="sm"
+                >
+                  Cancel Prescription
+                </Button>
+              }
+            />
 
-            <InfoGrid name="External Id">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="65px" />
-              ) : rx.externalId ? (
-                <CopyText text={rx.externalId || ''} />
-              ) : (
-                <Text fontSize="md" as="i">
-                  None
-                </Text>
-              )}
-            </InfoGrid>
-
-            <Divider />
-
-            <Text color="gray.500" fontWeight="medium" fontSize="sm">
-              Actions
-            </Text>
-            <Text>
-              Canceling a prescription will prevent any team member from adding the prescription
-              fills in a new order.
-            </Text>
             {rx?.state && rx.state !== 'ACTIVE' && (
               <Alert colorScheme="gray">
                 <AlertIcon />
                 This prescription has been {rx?.state?.toLowerCase()}
               </Alert>
             )}
-            <Button
-              aria-label="Cancel Prescription"
-              isDisabled={loading || rx.state !== 'ACTIVE'}
-              isLoading={canceling}
-              loadingText="Canceling..."
-              onClick={async () => {
-                const decision = await confirmWrapper('Cancel this prescription?', {
-                  description: 'You will not be able to undo this action.',
-                  cancelText: "No, Don't Cancel",
-                  confirmText: 'Yes, Cancel',
-                  darkMode: colorMode !== 'light',
-                  colorScheme: 'red'
-                });
-                if (decision) {
-                  setCanceling(true);
-                  graphQLClient.setHeader('authorization', accessToken);
-                  await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
-                  navigate(0);
-                }
-              }}
-              variant="outline"
-              textColor="red.500"
-              colorScheme="red"
-              size="sm"
-            >
-              Cancel Prescription
-            </Button>
           </VStack>
         </CardBody>
       </Card>

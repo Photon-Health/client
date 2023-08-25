@@ -26,7 +26,9 @@ const NameView = (props: NameViewProps) => {
         ) : (
           <Text fontWeight="medium">{name}</Text>
         )}
-        <Text color="muted">{sub}</Text>
+        <Text color="muted" fontSize="sm">
+          {sub}
+        </Text>
       </Box>
     </HStack>
   );

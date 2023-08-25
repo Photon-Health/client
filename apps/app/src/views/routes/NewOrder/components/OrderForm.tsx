@@ -300,7 +300,6 @@ export const OrderForm = ({
 
               <SelectPharmacyCard
                 user={user}
-                auth0UserId={auth0UserId}
                 updatePreferredPharmacy={updatePreferredPharmacy}
                 setUpdatePreferredPharmacy={setUpdatePreferredPharmacy}
                 pharmacyId={values.pharmacyId}
