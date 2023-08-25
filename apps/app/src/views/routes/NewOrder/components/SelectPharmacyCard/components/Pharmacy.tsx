@@ -67,7 +67,7 @@ export const Pharmacy = ({
       {showTags ? (
         <Box>
           {isPreferred ? (
-            <Tag size="sm" colorScheme="yellow" mb={1} me={1}>
+            <Tag size="sm" colorScheme="blue" mb={1} me={1}>
               <TagLeftIcon boxSize="12px" as={StarIcon} />
               <TagLabel>Preferred</TagLabel>
             </Tag>
