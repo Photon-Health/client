@@ -27,8 +27,24 @@ import { gql, useQuery } from '@apollo/client';
 import { Prescription } from 'packages/sdk/dist/types';
 
 const GET_PRESCRIPTIONS = gql`
-  query GetPrescriptions($after: ID) {
-    prescriptions(first: 25, after: $after) {
+  query GetPrescriptions(
+    $patientId: ID
+    $patientName: String
+    $prescriberId: ID
+    $state: PrescriptionState
+    $after: ID
+    $first: Int
+  ) {
+    prescriptions(
+      filter: {
+        patientId: $patientId
+        patientName: $patientName
+        prescriberId: $prescriberId
+        state: $state
+      }
+      after: $after
+      first: $first
+    ) {
       id
       externalId
       state
@@ -222,7 +238,6 @@ export const Prescriptions = () => {
   const location = useLocation();
   const queryStatus = new URLSearchParams(location.search).get('status');
   const navigate = useNavigate();
-
   const [status, setStatus] = useState<types.PrescriptionState | undefined>(
     convertStatusQuery(queryStatus)
   );
@@ -275,14 +290,38 @@ export const Prescriptions = () => {
   const [filterTextDebounce] = useDebounce(filterText, 250);
 
   const getPrescriptionsData = {
+    first: 25,
     patientId: patientId || undefined,
     prescriberId: prescriberId || undefined,
     state: status,
     patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
   };
+  console.log('getPrescriptionsData', getPrescriptionsData);
+  const { data, loading, error, fetchMore } = useQuery(GET_PRESCRIPTIONS, {
+    variables: getPrescriptionsData
+  });
 
-  const { data, loading, error, refetch } = useQuery(GET_PRESCRIPTIONS);
   const prescriptions: Prescription[] | undefined = data?.prescriptions;
+  const fetchMoreData = async () => {
+    if (fetchMore && !loading) {
+      await fetchMore({
+        variables: {
+          ...getPrescriptionsData,
+          after: rows?.at(-1)?.id
+        },
+        updateQuery: (prev, { fetchMoreResult }) => {
+          if (!fetchMoreResult) return prev;
+          if (fetchMoreResult.prescriptions.length === 0) {
+            setFinished(true);
+          }
+          return {
+            ...prev,
+            prescriptions: [...prev.prescriptions, ...fetchMoreResult.prescriptions]
+          };
+        }
+      });
+    }
+  };
 
   useEffect(() => {
     if (!loading && prescriptions) {
@@ -298,15 +337,17 @@ export const Prescriptions = () => {
       firstUpdate.current = false;
       return;
     }
+
+    if (status) {
+      navigate({
+        search: status ? `?status=${status}` : ''
+      });
+    }
     async function refetchData() {
       setRows([]);
       setFilterChangeLoading(true);
-      const { data } = await refetch(getPrescriptionsData);
+      await fetchMoreData();
       setFilterChangeLoading(false);
-      if (data?.prescriptions.length === 0) {
-        setFinished(true);
-      }
-      setRows(data?.prescriptions.map(renderRow));
     }
 
     if (status) {
@@ -345,18 +386,7 @@ export const Prescriptions = () => {
             <option value={types.PrescriptionState.Expired}>Status Expired</option>
           </Select>
         }
-        fetchMoreData={async () => {
-          if (refetch && !loading) {
-            const { data } = await refetch({
-              ...getPrescriptionsData,
-              after: rows?.at(-1)?.id
-            });
-            if (data?.prescriptions.length === 0) {
-              setFinished(true);
-            }
-            setRows(rows.concat(data?.prescriptions.map(renderRow)));
-          }
-        }}
+        fetchMoreData={fetchMoreData}
       />
     </Page>
   );

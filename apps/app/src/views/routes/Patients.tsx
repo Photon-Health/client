@@ -161,11 +161,12 @@ export const Patients = () => {
   const [disableScroll, setDisableScroll] = useState<boolean>(false);
   const [filterTextDebounce] = useDebounce(filterText, 250);
 
-  const { data, loading, error, refetch } = useQuery(GET_PATIENTS);
+  const { data, loading, error, fetchMore } = useQuery(GET_PATIENTS);
   const patients: Patient[] | undefined = data?.patients;
 
   useEffect(() => {
     if (!loading && patients) {
+      console.log('loading', loading, patients);
       setRows(
         patients
           .filter((patient) => !!patient)
@@ -173,7 +174,7 @@ export const Patients = () => {
       );
       setFinished(patients.length === 0);
     }
-  }, [loading]);
+  }, [loading, patients]);
 
   const skeletonRows = new Array(25).fill(0).map(renderSkeletonRow);
 
@@ -192,20 +193,22 @@ export const Patients = () => {
         searchPlaceholder="Search by patient name"
         hasMore={rows.length % 25 === 0 && !finished}
         fetchMoreData={async () => {
-          const { data } = await refetch({
-            name: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
-            after: rows?.at(-1)?.id
+          await fetchMore({
+            variables: {
+              after: rows?.at(-1)?.id,
+              name: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
+            },
+            updateQuery: (prev, { fetchMoreResult }) => {
+              if (!fetchMoreResult) return prev;
+              if (fetchMoreResult.patients.length === 0) {
+                setFinished(true);
+              }
+              return {
+                ...prev,
+                patients: [...prev.patients, ...fetchMoreResult.patients]
+              };
+            }
           });
-          if (data?.patients.length === 0) {
-            setFinished(true);
-          }
-          setRows(
-            rows.concat(
-              data?.patients
-                .filter((p: Patient) => !!p) // some nulls are sneaking in
-                .map((x: Patient) => renderRow(x, setDisableScroll))
-            )
-          );
         }}
       />
     </Page>

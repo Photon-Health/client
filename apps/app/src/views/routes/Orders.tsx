@@ -29,8 +29,12 @@ import { Order } from 'packages/sdk/dist/types';
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 
 const GET_ORDERS = gql`
-  query GetOrders($after: ID) {
-    orders(first: 25, after: $after) {
+  query GetOrders($patientId: ID, $patientName: String, $after: ID, $first: Int) {
+    orders(
+      filter: { patientId: $patientId, patientName: $patientName }
+      after: $after
+      first: $first
+    ) {
       id
       externalId
       state
@@ -208,7 +212,7 @@ export const Orders = () => {
 
   const isMobile = useBreakpointValue({ base: true, md: false });
 
-  const { data, loading, error, refetch } = useQuery(GET_ORDERS);
+  const { data, loading, error, fetchMore } = useQuery(GET_ORDERS);
   const orders: Order[] | undefined = data?.orders;
 
   useEffect(() => {
@@ -235,16 +239,34 @@ export const Orders = () => {
         hasMore={rows.length % 25 === 0 && !finished}
         searchPlaceholder="Search by patient name"
         fetchMoreData={async () => {
-          if (refetch && !loading) {
-            const { data } = await refetch({
-              patientId: patientId || undefined,
-              patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
-              after: rows?.at(-1)?.id
+          if (fetchMore && !loading) {
+            await fetchMore({
+              variables: {
+                patientId: patientId || undefined,
+                patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
+                after: rows?.at(-1)?.id
+              },
+              updateQuery: (prev, { fetchMoreResult }) => {
+                if (!fetchMoreResult) return prev;
+                if (fetchMoreResult.patients.length === 0) {
+                  setFinished(true);
+                }
+                return {
+                  ...prev,
+                  patients: [...prev.patients, ...fetchMoreResult.patients]
+                };
+              }
             });
-            if (data?.orders.length === 0) {
-              setFinished(true);
-            }
-            setRows(rows.concat(data?.orders.map(renderRow)));
+
+            // const { data } = await refetch({
+            //   patientId: patientId || undefined,
+            //   patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
+            //   after: rows?.at(-1)?.id
+            // });
+            // if (data?.orders.length === 0) {
+            //   setFinished(true);
+            // }
+            // setRows(rows.concat(data?.orders.map(renderRow)));
           }
         }}
       />
