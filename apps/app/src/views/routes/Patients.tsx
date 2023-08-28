@@ -154,8 +154,9 @@ export const Patients = () => {
   const [disableScroll, setDisableScroll] = useState<boolean>(false);
   const [filterTextDebounce] = useDebounce(filterText, 250);
 
-  const getPatientsData: { first: number; name?: string } = {
-    first: 25
+  const getPatientsData = {
+    first: 25,
+    name: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
   };
   const { data, loading, error, fetchMore, refetch } = useQuery(GET_PATIENTS, {
     variables: getPatientsData

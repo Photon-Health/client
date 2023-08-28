@@ -210,10 +210,11 @@ export const Orders = () => {
   const [filterTextDebounce] = useDebounce(filterText, 250);
 
   const isMobile = useBreakpointValue({ base: true, md: false });
-  // TODO when we have code generation, we can use the generated types here
-  const getOrdersData: { first: number; patientId?: string; patientName?: string } = {
+
+  const getOrdersData = {
     first: 25,
-    patientId: patientId || undefined
+    patientId: patientId || undefined,
+    patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
   };
 
   const { data, loading, error, fetchMore, refetch } = useQuery(GET_ORDERS, {
@@ -261,7 +262,6 @@ export const Orders = () => {
                 after: rows?.at(-1)?.id
               },
               updateQuery: (prev, { fetchMoreResult }) => {
-                console.log('fetch more result', fetchMoreResult, prev);
                 if (!fetchMoreResult) return prev;
                 if (fetchMoreResult.orders.length === 0) {
                   setFinished(true);
