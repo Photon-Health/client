@@ -12,8 +12,8 @@ function titleCase(str: string) {
 }
 
 // Format date to local date string (MM/DD/YYYY)
-function formatDate(date: string | Date) {
-  return new Date(date)?.toLocaleDateString();
+function formatDate(date: string) {
+  return new Date(date)?.toLocaleDateString('en-US', { timeZone: 'UTC' });
 }
 
 // Format date to Month D, Yr

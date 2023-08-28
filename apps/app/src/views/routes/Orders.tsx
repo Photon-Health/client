@@ -1,5 +1,4 @@
 import { Link as RouterLink, useSearchParams } from 'react-router-dom';
-
 import {
   HStack,
   IconButton,
@@ -18,7 +17,7 @@ import {
 import { FiInfo } from 'react-icons/fi';
 import { useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
-import { usePhoton } from '@photonhealth/react';
+import { gql, useQuery } from '@apollo/client';
 
 import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
@@ -27,6 +26,43 @@ import PharmacyNameView from '../components/PharmacyNameView';
 import { formatDate, formatFills } from '../../utils';
 import { Order } from 'packages/sdk/dist/types';
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
+
+const GET_ORDERS = gql`
+  query GetOrders($patientId: ID, $patientName: String, $after: ID, $first: Int) {
+    orders(
+      filter: { patientId: $patientId, patientName: $patientName }
+      after: $after
+      first: $first
+    ) {
+      id
+      externalId
+      state
+      createdAt
+      fills {
+        id
+        treatment {
+          name
+        }
+      }
+      patient {
+        name {
+          full
+        }
+      }
+      pharmacy {
+        name
+        phone
+        address {
+          street1
+          street2
+          city
+          state
+          postalCode
+        }
+      }
+    }
+  }
+`;
 
 interface ActionsProps {
   id: string;
@@ -168,7 +204,6 @@ export const Orders = () => {
     }
   ];
 
-  const { getOrders } = usePhoton();
   const [filterText, setFilterText] = useState('');
   const [rows, setRows] = useState<any[]>([]);
   const [finished, setFinished] = useState(false);
@@ -176,17 +211,31 @@ export const Orders = () => {
 
   const isMobile = useBreakpointValue({ base: true, md: false });
 
-  const { orders, loading, error, refetch } = getOrders({
-    patientId,
+  const getOrdersData = {
+    first: 25,
+    patientId: patientId ?? undefined,
     patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
+  };
+
+  const { data, loading, error, fetchMore, refetch } = useQuery(GET_ORDERS, {
+    variables: getOrdersData
   });
+  const orders: Order[] | undefined = data?.orders;
 
   useEffect(() => {
-    if (!loading) {
+    if (!loading && orders) {
       setRows(orders.map(renderRow));
       setFinished(orders.length === 0);
     }
   }, [loading, orders]);
+
+  useEffect(() => {
+    if (filterTextDebounce) {
+      refetch({
+        patientName: filterTextDebounce
+      });
+    }
+  }, [filterTextDebounce, refetch]);
 
   const skeletonRows = new Array(25).fill(0).map(() => renderSkeletonRow(isMobile));
 
@@ -205,16 +254,24 @@ export const Orders = () => {
         hasMore={rows.length % 25 === 0 && !finished}
         searchPlaceholder="Search by patient name"
         fetchMoreData={async () => {
-          if (refetch && !loading) {
-            const { data } = await refetch({
-              patientId: patientId || undefined,
-              patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
-              after: rows?.at(-1)?.id
+          if (fetchMore && !loading) {
+            await fetchMore({
+              variables: {
+                ...getOrdersData,
+                patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
+                after: rows?.at(-1)?.id
+              },
+              updateQuery: (prev, { fetchMoreResult }) => {
+                if (!fetchMoreResult) return prev;
+                if (fetchMoreResult.orders.length === 0) {
+                  setFinished(true);
+                }
+                return {
+                  ...prev,
+                  orders: [...prev.orders, ...fetchMoreResult.orders]
+                };
+              }
             });
-            if (data?.orders.length === 0) {
-              setFinished(true);
-            }
-            setRows(rows.concat(data?.orders.map(renderRow)));
           }
         }}
       />
