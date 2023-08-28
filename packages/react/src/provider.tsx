@@ -1,4 +1,4 @@
-import { ApolloError, DocumentNode } from '@apollo/client';
+import { ApolloError, ApolloProvider, DocumentNode } from '@apollo/client';
 import { useStore } from '@nanostores/react';
 import { GraphQLError } from 'graphql';
 import { action, map } from 'nanostores';
@@ -2935,7 +2935,9 @@ export const PhotonProvider = (opts: {
   };
 
   return (
-    <PhotonClientContext.Provider value={contextValue}>{children}</PhotonClientContext.Provider>
+    <ApolloProvider client={client.apollo}>
+      <PhotonClientContext.Provider value={contextValue}>{children}</PhotonClientContext.Provider>
+    </ApolloProvider>
   );
 };
 
