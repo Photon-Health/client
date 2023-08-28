@@ -16,7 +16,6 @@ import { FiInfo, FiShoppingCart } from 'react-icons/fi';
 
 import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
-import { usePhoton } from '@photonhealth/react';
 import { formatDate } from '../../utils';
 
 import { Page } from '../components/Page';
@@ -24,6 +23,53 @@ import { TablePage } from '../components/TablePage';
 import NameView from '../components/NameView';
 import PatientView from '../components/PatientView';
 import { types } from '@photonhealth/sdk';
+import { gql, useQuery } from '@apollo/client';
+import { Prescription } from 'packages/sdk/dist/types';
+
+const GET_PRESCRIPTIONS = gql`
+  query GetPrescriptions(
+    $patientId: ID
+    $patientName: String
+    $prescriberId: ID
+    $state: PrescriptionState
+    $after: ID
+    $first: Int
+  ) {
+    prescriptions(
+      filter: {
+        patientId: $patientId
+        patientName: $patientName
+        prescriberId: $prescriberId
+        state: $state
+      }
+      after: $after
+      first: $first
+    ) {
+      id
+      externalId
+      state
+      dispenseQuantity
+      daysSupply
+      writtenAt
+      fillsRemaining
+      fillsAllowed
+      treatment {
+        name
+      }
+      patient {
+        id
+        name {
+          full
+        }
+      }
+      prescriber {
+        name {
+          full
+        }
+      }
+    }
+  }
+`;
 
 interface MedViewProps {
   name: string;
@@ -194,7 +240,6 @@ export const Prescriptions = () => {
   const location = useLocation();
   const queryStatus = new URLSearchParams(location.search).get('status');
   const navigate = useNavigate();
-
   const [status, setStatus] = useState<types.PrescriptionState | undefined>(
     convertStatusQuery(queryStatus)
   );
@@ -241,28 +286,60 @@ export const Prescriptions = () => {
     }
   ];
 
-  const { getPrescriptions } = usePhoton();
   const [filterText, setFilterText] = useState('');
   const [rows, setRows] = useState<any[]>([]);
   const [finished, setFinished] = useState<boolean>(false);
   const [filterTextDebounce] = useDebounce(filterText, 250);
 
   const getPrescriptionsData = {
+    first: 25,
     patientId: patientId || undefined,
     prescriberId: prescriberId || undefined,
     state: status,
     patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
   };
 
-  const { prescriptions, loading, error, refetch } = getPrescriptions(getPrescriptionsData);
+  const { data, loading, error, fetchMore, refetch } = useQuery(GET_PRESCRIPTIONS, {
+    variables: getPrescriptionsData
+  });
+
+  const prescriptions: Prescription[] | undefined = data?.prescriptions;
+  const fetchMoreData = async () => {
+    if (fetchMore && !loading) {
+      await fetchMore({
+        variables: {
+          ...getPrescriptionsData,
+          after: rows?.at(-1)?.id
+        },
+        updateQuery: (prev, { fetchMoreResult }) => {
+          if (!fetchMoreResult) return prev;
+          if (fetchMoreResult.prescriptions.length === 0) {
+            setFinished(true);
+          }
+          return {
+            ...prev,
+            prescriptions: [...prev.prescriptions, ...fetchMoreResult.prescriptions]
+          };
+        }
+      });
+    }
+  };
 
   useEffect(() => {
-    if (!loading) {
+    if (!loading && prescriptions) {
       const preppedRows = prescriptions.filter((row) => row).map(renderRow);
       setRows(preppedRows);
       setFinished(prescriptions.length === 0);
     }
   }, [loading, prescriptions]);
+
+  useEffect(() => {
+    if (filterTextDebounce) {
+      refetch({
+        patientName: filterTextDebounce
+      });
+    }
+  }, [filterTextDebounce, refetch]);
 
   const firstUpdate = useRef(true);
   useEffect(() => {
@@ -270,15 +347,17 @@ export const Prescriptions = () => {
       firstUpdate.current = false;
       return;
     }
+
+    if (status) {
+      navigate({
+        search: status ? `?status=${status}` : ''
+      });
+    }
     async function refetchData() {
       setRows([]);
       setFilterChangeLoading(true);
-      const { data } = await refetch(getPrescriptionsData);
+      await fetchMoreData();
       setFilterChangeLoading(false);
-      if (data?.prescriptions.length === 0) {
-        setFinished(true);
-      }
-      setRows(data?.prescriptions.map(renderRow));
     }
 
     if (status) {
@@ -317,18 +396,7 @@ export const Prescriptions = () => {
             <option value={types.PrescriptionState.Expired}>Status Expired</option>
           </Select>
         }
-        fetchMoreData={async () => {
-          if (refetch && !loading) {
-            const { data } = await refetch({
-              ...getPrescriptionsData,
-              after: rows?.at(-1)?.id
-            });
-            if (data?.prescriptions.length === 0) {
-              setFinished(true);
-            }
-            setRows(rows.concat(data?.prescriptions.map(renderRow)));
-          }
-        }}
+        fetchMoreData={fetchMoreData}
       />
     </Page>
   );
