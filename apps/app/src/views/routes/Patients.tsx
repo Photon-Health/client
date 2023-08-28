@@ -166,7 +166,6 @@ export const Patients = () => {
 
   useEffect(() => {
     if (!loading && patients) {
-      console.log('loading', loading, patients);
       setRows(
         patients
           .filter((patient) => !!patient)

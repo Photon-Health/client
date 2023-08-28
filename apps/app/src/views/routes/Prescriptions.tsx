@@ -296,7 +296,7 @@ export const Prescriptions = () => {
     state: status,
     patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
   };
-  console.log('getPrescriptionsData', getPrescriptionsData);
+
   const { data, loading, error, fetchMore } = useQuery(GET_PRESCRIPTIONS, {
     variables: getPrescriptionsData
   });
