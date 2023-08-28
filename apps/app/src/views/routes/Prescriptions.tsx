@@ -297,7 +297,7 @@ export const Prescriptions = () => {
     patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
   };
 
-  const { data, loading, error, fetchMore } = useQuery(GET_PRESCRIPTIONS, {
+  const { data, loading, error, fetchMore, refetch } = useQuery(GET_PRESCRIPTIONS, {
     variables: getPrescriptionsData
   });
 
@@ -330,6 +330,14 @@ export const Prescriptions = () => {
       setFinished(prescriptions.length === 0);
     }
   }, [loading, prescriptions]);
+
+  useEffect(() => {
+    if (filterTextDebounce) {
+      refetch({
+        patientName: filterTextDebounce || ''
+      });
+    }
+  }, [filterTextDebounce, refetch]);
 
   const firstUpdate = useRef(true);
   useEffect(() => {

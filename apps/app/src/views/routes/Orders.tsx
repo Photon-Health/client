@@ -1,5 +1,4 @@
 import { Link as RouterLink, useSearchParams } from 'react-router-dom';
-
 import {
   HStack,
   IconButton,
@@ -211,8 +210,15 @@ export const Orders = () => {
   const [filterTextDebounce] = useDebounce(filterText, 250);
 
   const isMobile = useBreakpointValue({ base: true, md: false });
+  // TODO when we have code generation, we can use the generated types here
+  const getOrdersData: { first: number; patientId?: string; patientName?: string } = {
+    first: 25,
+    patientId: patientId || undefined
+  };
 
-  const { data, loading, error, fetchMore } = useQuery(GET_ORDERS);
+  const { data, loading, error, fetchMore, refetch } = useQuery(GET_ORDERS, {
+    variables: getOrdersData
+  });
   const orders: Order[] | undefined = data?.orders;
 
   useEffect(() => {
@@ -221,6 +227,14 @@ export const Orders = () => {
       setFinished(orders.length === 0);
     }
   }, [loading, orders]);
+
+  useEffect(() => {
+    if (filterTextDebounce) {
+      refetch({
+        patientName: filterTextDebounce || ''
+      });
+    }
+  }, [filterTextDebounce, refetch]);
 
   const skeletonRows = new Array(25).fill(0).map(() => renderSkeletonRow(isMobile));
 
@@ -242,31 +256,22 @@ export const Orders = () => {
           if (fetchMore && !loading) {
             await fetchMore({
               variables: {
-                patientId: patientId || undefined,
+                ...getOrdersData,
                 patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
                 after: rows?.at(-1)?.id
               },
               updateQuery: (prev, { fetchMoreResult }) => {
+                console.log('fetch more result', fetchMoreResult, prev);
                 if (!fetchMoreResult) return prev;
-                if (fetchMoreResult.patients.length === 0) {
+                if (fetchMoreResult.orders.length === 0) {
                   setFinished(true);
                 }
                 return {
                   ...prev,
-                  patients: [...prev.patients, ...fetchMoreResult.patients]
+                  orders: [...prev.orders, ...fetchMoreResult.orders]
                 };
               }
             });
-
-            // const { data } = await refetch({
-            //   patientId: patientId || undefined,
-            //   patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
-            //   after: rows?.at(-1)?.id
-            // });
-            // if (data?.orders.length === 0) {
-            //   setFinished(true);
-            // }
-            // setRows(rows.concat(data?.orders.map(renderRow)));
           }
         }}
       />

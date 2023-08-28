@@ -26,8 +26,8 @@ import ContactView from '../components/ContactView';
 import { Patient } from 'packages/sdk/dist/types';
 
 const GET_PATIENTS = gql`
-  query GetPatients($after: ID) {
-    patients(first: 25, after: $after) {
+  query GetPatients($after: ID, $name: String, $first: Int) {
+    patients(after: $after, first: $first, filter: { name: $name }) {
       id
       externalId
       phone
@@ -43,13 +43,6 @@ const GET_PATIENTS = gql`
 
 const dobToAge = require('dob-to-age');
 
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'photon-patient-dialog': unknown;
-    }
-  }
-}
 interface EditViewProps {
   id: string;
   setDisableScroll: Dispatch<SetStateAction<boolean>>;
@@ -161,8 +154,21 @@ export const Patients = () => {
   const [disableScroll, setDisableScroll] = useState<boolean>(false);
   const [filterTextDebounce] = useDebounce(filterText, 250);
 
-  const { data, loading, error, fetchMore } = useQuery(GET_PATIENTS);
+  const getPatientsData: { first: number; name?: string } = {
+    first: 25
+  };
+  const { data, loading, error, fetchMore, refetch } = useQuery(GET_PATIENTS, {
+    variables: getPatientsData
+  });
   const patients: Patient[] | undefined = data?.patients;
+
+  useEffect(() => {
+    if (filterTextDebounce) {
+      refetch({
+        name: filterTextDebounce || ''
+      });
+    }
+  }, [filterTextDebounce, refetch]);
 
   useEffect(() => {
     if (!loading && patients) {
@@ -194,6 +200,7 @@ export const Patients = () => {
         fetchMoreData={async () => {
           await fetchMore({
             variables: {
+              ...getPatientsData,
               after: rows?.at(-1)?.id,
               name: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
             },
