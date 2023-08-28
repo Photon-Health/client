@@ -1,14 +1,5 @@
-import {
-  Divider,
-  Flex,
-  Heading,
-  HStack,
-  Stack,
-  Text,
-  VStack,
-  useClipboard,
-  Button
-} from '@chakra-ui/react';
+import { Divider, Flex, Heading, HStack, Stack, Text, VStack } from '@chakra-ui/react';
+import CopyText from './CopyText';
 
 interface TemplateViewProps {
   template: {
@@ -28,7 +19,6 @@ interface TemplateViewProps {
 
 export const TemplateView = (props: TemplateViewProps) => {
   const { template } = props;
-  const { onCopy, hasCopied } = useClipboard(template.id);
 
   return (
     <Stack
@@ -45,10 +35,7 @@ export const TemplateView = (props: TemplateViewProps) => {
             <Text fontSize="xs" fontWeight="bold">
               TEMPLATE ID
             </Text>
-            <Text fontSize="sm">{template.id}</Text>
-            <Button size="xs" onClick={onCopy}>
-              {hasCopied ? 'Copied!' : 'Copy'}
-            </Button>
+            <CopyText size="sm" text={template.id} />
           </HStack>
           <Heading as="h6" size="xxs" paddingTop={4}>
             Details

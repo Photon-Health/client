@@ -29,7 +29,18 @@ const formatLocationOptions = (p: any) => {
   return options;
 };
 
-export const LocationSearch = ({ isOpen, onClose }: any) => {
+export interface LocationResults {
+  loc?: string;
+  lat?: number;
+  lng?: number;
+}
+
+interface LocationSearchProps {
+  isOpen: boolean;
+  onClose: (value: LocationResults) => void;
+}
+
+export const LocationSearch = ({ isOpen, onClose }: LocationSearchProps) => {
   const [gettingCurrentLocation, setGettingCurrentLocation] = useState<boolean>(false);
   const toast = useToast();
 

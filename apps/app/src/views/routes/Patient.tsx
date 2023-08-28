@@ -13,7 +13,6 @@ import {
   CardHeader,
   Divider,
   HStack,
-  IconButton,
   Link,
   Skeleton,
   SkeletonText,
@@ -23,12 +22,10 @@ import {
   Td,
   Tr,
   Text,
-  VStack,
-  Wrap,
-  WrapItem
+  VStack
 } from '@chakra-ui/react';
 
-import { FiEdit, FiPhone, FiMail, FiChevronRight, FiPlus } from 'react-icons/fi';
+import { FiEdit, FiChevronRight, FiPlus } from 'react-icons/fi';
 
 import { usePhoton } from '@photonhealth/react';
 import { useEffect, useState } from 'react';
@@ -40,6 +37,7 @@ import { PRESCRIPTION_STATE_MAP, PRESCRIPTION_COLOR_MAP } from './Prescriptions'
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
+import SectionTitleRow from '../components/SectionTitleRow';
 
 export const Patient = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -104,112 +102,35 @@ export const Patient = () => {
     );
   }
 
-  const buttons =
-    loading && !patient ? (
-      <Wrap>
-        <WrapItem>
-          <Skeleton width="32px" height="42px" borderRadius={6} />
-        </WrapItem>
-        <WrapItem>
-          <Skeleton width="32px" height="42px" borderRadius={6} />
-        </WrapItem>
-        <WrapItem>
-          <Skeleton width="180px" height="42px" borderRadius={6} />
-        </WrapItem>
-        <WrapItem>
-          <Skeleton width="125px" height="42px" borderRadius={6} />
-        </WrapItem>
-      </Wrap>
-    ) : (
-      <Wrap>
-        <WrapItem>
-          <IconButton
-            icon={<FiPhone />}
-            aria-label="Edit Order"
-            as={Link}
-            href={`tel:${patient?.phone}`}
-            isExternal
-            variant="outline"
-            borderColor="blue.500"
-            textColor="blue.500"
-            colorScheme="blue"
-            size="sm"
-          />
-        </WrapItem>
-        <WrapItem>
-          <IconButton
-            icon={<FiMail />}
-            aria-label="Edit Order"
-            as={Link}
-            href={`mailto:${patient?.email}`}
-            isExternal
-            variant="outline"
-            borderColor="blue.500"
-            textColor="blue.500"
-            colorScheme="blue"
-            size="sm"
-          />
-        </WrapItem>
-        <WrapItem>
-          <Button
-            aria-label="New Prescriptions"
-            as={RouterLink}
-            to={`/prescriptions/new?patientId=${id}`}
-            colorScheme="blue"
-            size="sm"
-          >
-            Create Prescriptions
-          </Button>
-        </WrapItem>
-        <WrapItem>
-          <Button
-            aria-label="New Order"
-            as={RouterLink}
-            to={`/orders/new?patientId=${id}`}
-            variant="outline"
-            borderColor="blue.500"
-            textColor="blue.500"
-            colorScheme="blue"
-            size="sm"
-          >
-            Create Order
-          </Button>
-        </WrapItem>
-      </Wrap>
-    );
-
   return (
-    <Page header="Patient" buttons={buttons}>
+    <Page header="Patient">
       <Card>
         <CardHeader>
-          <Text fontWeight="medium">
-            {loading ? <Skeleton height="30px" width="250px" /> : patient?.name.full}
-          </Text>
+          <HStack spacing={4} justifyContent="space-between">
+            <Text fontWeight="medium">
+              {loading ? <Skeleton height="30px" width="250px" /> : patient?.name.full}
+            </Text>
+            {!loading ? (
+              <Button
+                size="sm"
+                fontSize="sm"
+                aria-label="Edit patient details"
+                as={RouterLink}
+                to={`/patients/update/${id}`}
+                leftIcon={<FiEdit />}
+                variant="outline"
+                borderColor="orange.500"
+                textColor="orange.500"
+                colorScheme="orange"
+              >
+                Edit
+              </Button>
+            ) : undefined}
+          </HStack>
         </CardHeader>
         <Divider color="gray.100" />
         <CardBody>
           <VStack spacing={4} align="justify-start">
-            <HStack w="full" justify="space-between">
-              <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                Information
-              </Text>
-              {!loading ? (
-                <Button
-                  size="sm"
-                  fontSize="sm"
-                  aria-label="Edit patient details"
-                  as={RouterLink}
-                  to={`/patients/update/${id}`}
-                  leftIcon={<FiEdit />}
-                  variant="outline"
-                  borderColor="orange.500"
-                  textColor="orange.500"
-                  colorScheme="orange"
-                >
-                  Edit
-                </Button>
-              ) : null}
-            </HStack>
             {!loading && patient ? (
               <>
                 <InfoGrid name="Date of Birth">
@@ -277,25 +198,24 @@ export const Patient = () => {
               </>
             ) : null}
 
-            <Divider />
+            <SectionTitleRow
+              headerText="Prescriptions"
+              rightElement={
+                !loading ? (
+                  <Button
+                    leftIcon={<FiPlus />}
+                    aria-label="New Order"
+                    as={RouterLink}
+                    to={`/prescriptions/new?patientId=${id}`}
+                    colorScheme="blue"
+                    size="sm"
+                  >
+                    Create Prescription
+                  </Button>
+                ) : undefined
+              }
+            />
 
-            <HStack w="full" justify="space-between">
-              <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                Prescriptions
-              </Text>
-              {!loading ? (
-                <Button
-                  leftIcon={<FiPlus />}
-                  aria-label="New Order"
-                  as={RouterLink}
-                  to={`/prescriptions/new?patientId=${id}`}
-                  colorScheme="blue"
-                  size="sm"
-                >
-                  Create Prescription
-                </Button>
-              ) : null}
-            </HStack>
             {prescriptions.length > 0 ? (
               <TableContainer>
                 <Table bg="transparent" size="sm">
@@ -336,26 +256,29 @@ export const Patient = () => {
                 </Table>
               </TableContainer>
             ) : (
-              <Text as="i">No prescriptions</Text>
+              <Text as="i" fontSize="sm" color="gray.500">
+                No prescriptions
+              </Text>
             )}
 
-            <HStack w="full" justify="space-between">
-              <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                Orders
-              </Text>
-              {!loading ? (
-                <Button
-                  leftIcon={<FiPlus />}
-                  aria-label="New Order"
-                  as={RouterLink}
-                  to={`/orders/new?patientId=${id}`}
-                  colorScheme="blue"
-                  size="sm"
-                >
-                  Create Order
-                </Button>
-              ) : null}
-            </HStack>
+            <SectionTitleRow
+              headerText="Orders"
+              rightElement={
+                !loading ? (
+                  <Button
+                    leftIcon={<FiPlus />}
+                    aria-label="New Order"
+                    as={RouterLink}
+                    to={`/orders/new?patientId=${id}`}
+                    colorScheme="blue"
+                    size="sm"
+                  >
+                    Create Order
+                  </Button>
+                ) : undefined
+              }
+            />
+
             {orders.length > 0 ? (
               <TableContainer>
                 <Table bg="transparent" size="sm">
@@ -394,7 +317,9 @@ export const Patient = () => {
                 </Table>
               </TableContainer>
             ) : (
-              <Text as="i">No prescriptions</Text>
+              <Text as="i" fontSize="sm" color="gray.500">
+                No Orders
+              </Text>
             )}
           </VStack>
         </CardBody>
