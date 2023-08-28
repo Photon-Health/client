@@ -19,6 +19,7 @@ import { TbPrescription } from 'react-icons/tb';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { useDebounce } from 'use-debounce';
+import dobToAge from 'dob-to-age';
 import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
 import PatientView from '../components/PatientView';
@@ -26,7 +27,7 @@ import ContactView from '../components/ContactView';
 import { Patient } from 'packages/sdk/dist/types';
 
 const GET_PATIENTS = gql`
-  query GetPatients($after: ID, $name: String, $first: Int) {
+  query GetPatients($name: String, $after: ID, $first: Int) {
     patients(after: $after, first: $first, filter: { name: $name }) {
       id
       externalId
@@ -40,8 +41,6 @@ const GET_PATIENTS = gql`
     }
   }
 `;
-
-const dobToAge = require('dob-to-age');
 
 interface EditViewProps {
   id: string;
@@ -166,7 +165,7 @@ export const Patients = () => {
   useEffect(() => {
     if (filterTextDebounce) {
       refetch({
-        name: filterTextDebounce || ''
+        name: filterTextDebounce
       });
     }
   }, [filterTextDebounce, refetch]);

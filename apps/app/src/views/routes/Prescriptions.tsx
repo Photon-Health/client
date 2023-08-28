@@ -51,6 +51,8 @@ const GET_PRESCRIPTIONS = gql`
       dispenseQuantity
       daysSupply
       writtenAt
+      fillsRemaining
+      fillsAllowed
       treatment {
         name
       }
@@ -334,7 +336,7 @@ export const Prescriptions = () => {
   useEffect(() => {
     if (filterTextDebounce) {
       refetch({
-        patientName: filterTextDebounce || ''
+        patientName: filterTextDebounce
       });
     }
   }, [filterTextDebounce, refetch]);

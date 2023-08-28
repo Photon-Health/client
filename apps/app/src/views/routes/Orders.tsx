@@ -213,7 +213,7 @@ export const Orders = () => {
 
   const getOrdersData = {
     first: 25,
-    patientId: patientId || undefined,
+    patientId: patientId ?? undefined,
     patientName: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
   };
 
@@ -232,7 +232,7 @@ export const Orders = () => {
   useEffect(() => {
     if (filterTextDebounce) {
       refetch({
-        patientName: filterTextDebounce || ''
+        patientName: filterTextDebounce
       });
     }
   }, [filterTextDebounce, refetch]);
