@@ -1,4 +1,4 @@
-import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 import {
   HStack,
@@ -17,23 +17,31 @@ import { FiEdit, FiEye, FiMoreVertical, FiShoppingCart } from 'react-icons/fi';
 import { TbPrescription } from 'react-icons/tb';
 
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { gql, useQuery } from '@apollo/client';
 import { useDebounce } from 'use-debounce';
-import { usePhoton } from '@photonhealth/react';
+import dobToAge from 'dob-to-age';
 import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
 import PatientView from '../components/PatientView';
 import ContactView from '../components/ContactView';
 import { Patient } from 'packages/sdk/dist/types';
 
-const dobToAge = require('dob-to-age');
-
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'photon-patient-dialog': unknown;
+const GET_PATIENTS = gql`
+  query GetPatients($name: String, $after: ID, $first: Int) {
+    patients(after: $after, first: $first, filter: { name: $name }) {
+      id
+      externalId
+      phone
+      email
+      sex
+      dateOfBirth
+      name {
+        full
+      }
     }
   }
-}
+`;
+
 interface EditViewProps {
   id: string;
   setDisableScroll: Dispatch<SetStateAction<boolean>>;
@@ -116,9 +124,6 @@ const renderSkeletonRow = () => ({
 });
 
 export const Patients = () => {
-  const [params] = useSearchParams();
-  const reload = params.get('reload');
-
   const columns = [
     {
       Header: 'Name',
@@ -142,43 +147,31 @@ export const Patients = () => {
     }
   ];
 
-  const { getPatients, getPatient } = usePhoton();
   const [filterText, setFilterText] = useState('');
   const [rows, setRows] = useState<any[]>([]);
   const [finished, setFinished] = useState<boolean>(false);
   const [disableScroll, setDisableScroll] = useState<boolean>(false);
   const [filterTextDebounce] = useDebounce(filterText, 250);
 
-  const { patients, loading, error, refetch } = getPatients({
-    name: filterTextDebounce.length > 0 ? filterTextDebounce : null
+  const getPatientsData = {
+    first: 25,
+    name: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
+  };
+  const { data, loading, error, fetchMore, refetch } = useQuery(GET_PATIENTS, {
+    variables: getPatientsData
   });
-
-  const { refetch: refetchPatient } = getPatient({
-    id: ''
-  });
+  const patients: Patient[] | undefined = data?.patients;
 
   useEffect(() => {
-    if (reload) {
-      const getData = async () => {
-        const patientId = reload.split('-')[0];
-        const { data } = await refetchPatient({
-          id: patientId
-        });
-        setRows(
-          rows.map((x) => {
-            if (x.id === patientId) {
-              return renderRow(data.patient, setDisableScroll);
-            }
-            return x;
-          })
-        );
-      };
-      getData();
+    if (filterTextDebounce) {
+      refetch({
+        name: filterTextDebounce
+      });
     }
-  }, [reload]);
+  }, [filterTextDebounce, refetch]);
 
   useEffect(() => {
-    if (!loading) {
+    if (!loading && patients) {
       setRows(
         patients
           .filter((patient) => !!patient)
@@ -186,7 +179,7 @@ export const Patients = () => {
       );
       setFinished(patients.length === 0);
     }
-  }, [loading]);
+  }, [loading, patients]);
 
   const skeletonRows = new Array(25).fill(0).map(renderSkeletonRow);
 
@@ -205,20 +198,23 @@ export const Patients = () => {
         searchPlaceholder="Search by patient name"
         hasMore={rows.length % 25 === 0 && !finished}
         fetchMoreData={async () => {
-          const { data } = await refetch({
-            name: filterTextDebounce.length > 0 ? filterTextDebounce : undefined,
-            after: rows?.at(-1)?.id
+          await fetchMore({
+            variables: {
+              ...getPatientsData,
+              after: rows?.at(-1)?.id,
+              name: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
+            },
+            updateQuery: (prev, { fetchMoreResult }) => {
+              if (!fetchMoreResult) return prev;
+              if (fetchMoreResult.patients.length === 0) {
+                setFinished(true);
+              }
+              return {
+                ...prev,
+                patients: [...prev.patients, ...fetchMoreResult.patients]
+              };
+            }
           });
-          if (data?.patients.length === 0) {
-            setFinished(true);
-          }
-          setRows(
-            rows.concat(
-              data?.patients
-                .filter((p: Patient) => !!p) // some nulls are sneaking in
-                .map((x: Patient) => renderRow(x, setDisableScroll))
-            )
-          );
         }}
       />
     </Page>

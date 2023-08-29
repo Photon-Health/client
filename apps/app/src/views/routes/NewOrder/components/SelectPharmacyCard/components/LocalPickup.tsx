@@ -37,7 +37,7 @@ const formatPharmacyOptions = (p: types.Pharmacy[], preferredIds: string[], prev
           {org.name}, {titleCase(org.address?.street1)}, {titleCase(org.address?.city)},{' '}
           {org.address?.state}{' '}
           {preferredIds.some((id) => id === org.id) ? (
-            <Tag size="sm" colorScheme="yellow" verticalAlign="text-center" me={1}>
+            <Tag size="sm" colorScheme="blue" verticalAlign="text-center" me={1}>
               <TagLeftIcon boxSize="12px" as={StarIcon} />
               <TagLabel>Preferred</TagLabel>
             </Tag>
@@ -60,8 +60,8 @@ interface LocalPickupProps {
   latitude: number | undefined;
   longitude: number | undefined;
   onOpen: any;
-  errors: any;
-  touched: any;
+  errors?: any;
+  touched?: any;
   patient: any;
   pharmacyId: string | undefined;
   updatePreferredPharmacy: any;
@@ -182,7 +182,7 @@ export const LocalPickup = (props: LocalPickupProps) => {
           </Button>
         </WrapItem>
       </Wrap>
-      <FormControl isInvalid={!!errors.pharmacyId && touched.pharmacyId}>
+      <FormControl isInvalid={!!errors?.pharmacyId && touched?.pharmacyId}>
         <AsyncSelect
           {...props}
           name="pharmacyId"
@@ -199,7 +199,7 @@ export const LocalPickup = (props: LocalPickupProps) => {
       </FormControl>
     </>
   ) : (
-    <FormControl isInvalid={!!errors.pharmacyId && touched.pharmacyId}>
+    <FormControl isInvalid={!!errors?.pharmacyId && touched?.pharmacyId}>
       <VStack align="start" spacing={3}>
         <Text>Set a location to be used for pharmacy search.</Text>
         <Button onClick={onOpen}>Set location</Button>
