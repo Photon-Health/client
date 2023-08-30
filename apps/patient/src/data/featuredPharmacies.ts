@@ -20,5 +20,7 @@ export const FEATURED_PHARMACIES: string[] = [
   'phr_01GA9HPXD5ZM86MASCK625ZQJF', // Lake Hills Pharmacy
   'phr_01GA9HPXEQH5V38D5G11EKADNY', // Manor Pharmacy
   'phr_01G9CM940NTXPBR0HQ7042T5CA', // Alive And Well Pharmacy
-  'phr_01GSB2FQ4F2D2JBJW58AGCP2V0' // Solutions Pharmacy
+  'phr_01GSB2FQ4F2D2JBJW58AGCP2V0', // Solutions Pharmacy
+  // Demo pharmacies
+  'asdfsafas889767546f'
 ];

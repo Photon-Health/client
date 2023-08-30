@@ -35,6 +35,7 @@ import {
   selectOrderPharmacy,
   setPreferredPharmacy
 } from '../api';
+import { demoPharmacies } from '../data/demoPharmacies';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
@@ -67,6 +68,7 @@ export const Pharmacy = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const isReroute = searchParams.get('reroute');
+  const isTrial = searchParams.get('trial');
 
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
@@ -117,6 +119,16 @@ export const Pharmacy = () => {
     }
 
     setLocationModalOpen(false);
+  };
+
+  const initializeTrial = () => {
+    // Set geocode data
+    setLocation('201 N 8th St, Brooklyn, NY 11211');
+    setLatitude(40.717484);
+    setLongitude(-73.955662397568);
+
+    setInitialPharmacies(demoPharmacies);
+    setPharmacyOptions(demoPharmacies.slice(0, 5));
   };
 
   const initialize = async () => {
@@ -205,6 +217,22 @@ export const Pharmacy = () => {
   const handleShowMore = async () => {
     setLoadingPharmacies(true);
 
+    if (isTrial) {
+      const newOps = demoPharmacies.slice(
+        pharmacyOptions.length,
+        pharmacyOptions.length + MAX_ENRICHMENT
+      );
+      const totalOps = [...pharmacyOptions, ...newOps];
+      setPharmacyOptions(totalOps);
+      setLoadingPharmacies(false);
+
+      if (totalOps.length === demoPharmacies.length) {
+        setShowingAllPharmacies(true);
+      }
+
+      return;
+    }
+
     /**
      * Initially we fetched a list of pharmacies from our db, if some
      * of those haven't received ratings/hours, enrich those first
@@ -275,6 +303,24 @@ export const Pharmacy = () => {
 
     setSubmitting(true);
 
+    if (isTrial) {
+      setTimeout(() => {
+        setSuccessfullySubmitted(true);
+        setTimeout(() => {
+          setShowFooter(false);
+          const selectedPharmacy = pharmacyOptions.find((p) => p.id === selectedId);
+          setOrder({
+            ...order,
+            pharmacy: selectedPharmacy
+          });
+          navigate(`/status?trial=true`);
+        }, 1000);
+        setSubmitting(false);
+      }, 1000);
+
+      return;
+    }
+
     try {
       const result = isReroute
         ? await rerouteOrder(order.id, selectedId, order.patient.id)
@@ -329,6 +375,19 @@ export const Pharmacy = () => {
 
     setSavingPreferred(true);
 
+    // Handle trial
+    if (isTrial) {
+      setTimeout(() => {
+        setPreferredPharmacyId(pharmacyId);
+        toast({
+          title: 'Set preferred pharmacy',
+          ...TOAST_CONFIG.SUCCESS
+        });
+        setSavingPreferred(false);
+      }, 750);
+      return;
+    }
+
     try {
       const result: boolean = await setPreferredPharmacy(order.patient.id, pharmacyId);
       setTimeout(() => {
@@ -361,8 +420,12 @@ export const Pharmacy = () => {
   };
 
   useEffect(() => {
-    if (location) {
-      initialize();
+    if (isTrial) {
+      initializeTrial();
+    } else {
+      if (location) {
+        initialize();
+      }
     }
   }, [location]);
 

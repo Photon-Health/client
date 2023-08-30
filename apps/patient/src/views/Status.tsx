@@ -30,7 +30,7 @@ const PHOTON_PHONE_NUMBER: string = process.env.REACT_APP_TWILIO_SMS_NUMBER;
 
 export const Status = () => {
   const navigate = useNavigate();
-  const { order } = useOrderContext();
+  const { order, setOrder } = useOrderContext();
 
   const orgSettings =
     order?.organization?.id in settings ? settings[order.organization.id] : settings.default;
@@ -39,6 +39,7 @@ export const Status = () => {
   const orderId = searchParams.get('orderId');
   const token = searchParams.get('token');
   const type = searchParams.get('type');
+  const isTrial = searchParams.get('trial');
 
   const [showFooter, setShowFooter] = useState<boolean>(
     order?.state === types.OrderState.Placed &&
@@ -57,6 +58,16 @@ export const Status = () => {
 
   const handleMarkOrderAsPickedUp = async () => {
     setSubmitting(true);
+
+    // Trial
+    if (isTrial) {
+      setTimeout(() => {
+        setSuccessfullySubmitted(true);
+        setTimeout(() => setShowFooter(false), 1000);
+        setSubmitting(false);
+      }, 1000);
+      return;
+    }
 
     try {
       const result: boolean = await markOrderAsPickedUp(orderId);
@@ -113,6 +124,28 @@ export const Status = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    if (isTrial) {
+      setTimeout(() => {
+        setOrder({
+          ...order,
+          fulfillment: {
+            state: 'RECEIVED'
+          }
+        });
+        setShowFooter(true);
+        setTimeout(() => {
+          setOrder({
+            ...order,
+            fulfillment: {
+              state: 'READY'
+            }
+          });
+        }, 2000);
+      }, 2000);
+    }
+  }, []);
+
   // Only show "Text us now" prompt if pickup and RECEIVED or READY
   const showChatAlert = fulfillment?.state === 'RECEIVED' || fulfillment?.state === 'READY';
 
@@ -149,7 +182,7 @@ export const Status = () => {
               <PharmacyCard
                 pharmacy={enrichedPharmacy}
                 selected={true}
-                canReroute={orgSettings.patientsCanReroute}
+                canReroute={!isTrial && orgSettings.patientsCanReroute}
                 onChangePharmacy={() =>
                   navigate(`/pharmacy?orderId=${order.id}&token=${token}&reroute=true`)
                 }

@@ -32,11 +32,13 @@ export const Review = () => {
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
+  const isTrial = searchParams.get('trial');
 
   const { organization, patient, fills } = order;
 
   const handleCtaClick = () => {
-    navigate(`/pharmacy?orderId=${order.id}&token=${token}`);
+    const toUrl = isTrial ? `/pharmacy?trial=true` : `/pharmacy?orderId=${order.id}&token=${token}`;
+    navigate(toUrl);
   };
 
   const flattenedFills = countFillsAndRemoveDuplicates(fills);
@@ -58,11 +60,11 @@ export const Review = () => {
             <Text>{t.review.subheading}</Text>
           </VStack>
           <VStack spacing={1} align="start">
-            <HStack>
+            <HStack spacing={2}>
               <Text display="inline" color="gray.500">
                 {t.review.patient}
               </Text>
-              <Text display="inline" ms={3} data-dd-privacy="mask">
+              <Text display="inline" data-dd-privacy="mask">
                 {patient.name.full}
               </Text>
             </HStack>
