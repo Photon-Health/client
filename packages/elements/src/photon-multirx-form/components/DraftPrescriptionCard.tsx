@@ -4,6 +4,7 @@ import { size, array, any } from 'superstruct';
 import { message } from '../../validators';
 import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import type { TemplateOverrides, DraftPrescription } from '@photonhealth/components';
 
 const draftPrescriptionsValidator = message(
   size(array(any()), 1, Infinity),
@@ -12,6 +13,7 @@ const draftPrescriptionsValidator = message(
 
 export const DraftPrescriptionCard = (props: {
   templateIds: string[];
+  templateOverrides: TemplateOverrides;
   prescriptionIds: string[];
   prescriptionRef: HTMLDivElement | undefined;
   actions: Record<string, (...args: any) => any>;
@@ -135,8 +137,9 @@ export const DraftPrescriptionCard = (props: {
             checkEditPrescription(draftId);
           }}
           templateIds={props.templateIds}
+          templateOverrides={props.templateOverrides}
           prescriptionIds={props.prescriptionIds}
-          setDraftPrescriptions={(draftPrescriptions) => {
+          setDraftPrescriptions={(draftPrescriptions: DraftPrescription) => {
             props.actions.updateFormValue({
               key: 'draftPrescriptions',
               value: draftPrescriptions

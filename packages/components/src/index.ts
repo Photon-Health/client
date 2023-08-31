@@ -5,6 +5,8 @@ import PharmacySelect from './systems/PharmacySelect';
 import DraftPrescriptions from './systems/DraftPrescriptions';
 import SDKProvider, { usePhotonClient } from './systems/SDKProvider';
 
+import type { TemplateOverrides, DraftPrescription } from './systems/DraftPrescriptions';
+
 export {
   Text,
   RadioGroup,
@@ -14,3 +16,6 @@ export {
   DraftPrescriptions,
   usePhotonClient
 };
+
+// Export types
+export type { TemplateOverrides, DraftPrescription };
