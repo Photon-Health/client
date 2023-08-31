@@ -4,7 +4,6 @@ import { usePhoton } from '@photonhealth/react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Page } from '../../components/Page';
-import { ColorModeSwitcher } from '../../components/ColorModeSwitcher';
 import { Auth } from '../../components/Auth';
 import { TemplateTab } from './views/TemplateTab';
 import { TreatmentTab } from './views/TreatmentTab';
@@ -39,7 +38,6 @@ const Buttons = ({ orgId, orgName }: { orgId: string; orgName: string }) => (
     )}
 
     <Auth />
-    <ColorModeSwitcher />
   </HStack>
 );
 
