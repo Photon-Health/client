@@ -1,18 +1,22 @@
 import { Text, Flex, Box, HStack, Button, ChakraProvider } from '@chakra-ui/react';
+import React from 'react';
 import { confirmable, createConfirmation } from 'react-confirm';
 import theme from '../../configs/theme';
 
-const GuardDialog = ({
-  show,
-  proceed,
-  confirmation,
-  options
-}: {
+type GuardDialogProps = {
   show: boolean;
   proceed: Function;
   confirmation: string;
-  options: Record<string, any>;
-}) => {
+  options: {
+    description?: string | React.ReactNode;
+    darkMode?: boolean;
+    cancelText?: string;
+    confirmText?: string;
+    colorScheme?: string;
+  };
+};
+
+const GuardDialog = ({ show, proceed, confirmation, options }: GuardDialogProps) => {
   return (
     <ChakraProvider theme={theme}>
       <Flex
