@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 export const CANCEL_ORDER = gql`
-  mutation cancel($id: ID!) {
-    cancelOrder(id: $id) {
+  mutation cancel($id: ID!, $reason: String) {
+    cancelOrder(id: $id, reason: $reason) {
       __typename
       id
       state
