@@ -184,11 +184,13 @@ const CancelOrderAlert = ({
 };
 
 const cancelReasons = [
-  'Incorrect Prescription',
-  'Patient no longer needs order',
-  'Patient needs order changed',
-  'Patient needs order sooner',
-  'Incorrect pharmacy selected',
+  'Wrong patient selected',
+  'Wrong drug selected',
+  'Wrong directions written',
+  'Wrong pharmacy selected',
+  'Therapy change',
+  'Patient no longer taking',
+  'Changing pharmacies',
   'Other'
 ];
 
@@ -657,7 +659,7 @@ export const Order = () => {
                     const decision = await confirmWrapper('Cancel this order?', {
                       description: (
                         <RadioGroup onChange={setCancelReason}>
-                          <Text mb={2}>Please select a reason for canceling this order</Text>
+                          <Text mb={2}>Please select a reason for canceling</Text>
                           <Stack direction="column">
                             {cancelReasons.map((reason) => (
                               <Radio key={reason} value={reason}>
