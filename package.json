@@ -88,7 +88,7 @@
     "@chakra-ui/pro-theme": "^0.0.66",
     "@chakra-ui/react": "^2.8.0",
     "@chakra-ui/theme-tools": "^2.1.0",
-    "@datadog/browser-rum": "^4.37.0",
+    "@datadog/browser-rum": "^4.47.0",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@nanostores/persistent": "^0.7.0",

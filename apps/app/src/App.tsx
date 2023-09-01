@@ -1,4 +1,4 @@
-import { ColorModeScript } from '@chakra-ui/react';
+import { useColorMode } from '@chakra-ui/react';
 
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 
@@ -24,6 +24,7 @@ import { NewOrder } from './views/routes/NewOrder';
 import { Playground } from './views/routes/Playground';
 import { auth0Config } from './configs/auth';
 import { AlertDisplay } from './views/components/AlertDisplay';
+import { useEffect } from 'react';
 
 const client = new PhotonClient({
   domain: auth0Config.domain,
@@ -38,10 +39,19 @@ const onRedirectCallback = (appState?: AppState) => {
 };
 
 export const App = () => {
+  const { colorMode, toggleColorMode } = useColorMode();
+
+  useEffect(() => {
+    // TODO: Remove this once we have a better solution for dark mode.
+    // This will set anyones dark mode to light mode
+    if (colorMode === 'dark') {
+      toggleColorMode();
+    }
+  }, [colorMode]);
+
   return (
     <BrowserRouter>
       <PhotonProvider client={client} onRedirectCallback={onRedirectCallback}>
-        <ColorModeScript />
         <AlertDisplay />
         <Routes>
           <Route path="/" element={<Main />}>
