@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Alert,
   AlertDescription,
@@ -33,7 +33,9 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
-  Show
+  Show,
+  RadioGroup,
+  Radio
 } from '@chakra-ui/react';
 import { usePhoton, types } from '@photonhealth/react';
 import { FiChevronRight } from 'react-icons/fi';
@@ -181,6 +183,17 @@ const CancelOrderAlert = ({
   return null;
 };
 
+const cancelReasons = [
+  'Wrong patient selected',
+  'Wrong drug selected',
+  'Wrong directions written',
+  'Wrong pharmacy selected',
+  'Therapy change',
+  'Patient no longer taking',
+  'Changing pharmacies',
+  'Other'
+];
+
 export const Order = () => {
   const params = useParams();
   const id = params.orderId;
@@ -190,7 +203,13 @@ export const Order = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [pharmacyId, setPharmacyId] = useState('');
   const { data, loading, error } = useQuery(GET_ORDER, { variables: { id: id! } });
+  const [cancelReason, setCancelReason] = useState('');
+  const cancelReasonRef = useRef(cancelReason);
   const client = useApolloClient();
+
+  useEffect(() => {
+    cancelReasonRef.current = cancelReason;
+  }, [cancelReason]);
 
   const [cancelOrder] = useMutation(CANCEL_ORDER, {
     update: (cache) => {
@@ -638,7 +657,18 @@ export const Order = () => {
                   }
                   onClick={async () => {
                     const decision = await confirmWrapper('Cancel this order?', {
-                      description: 'You will not be able to undo this action.',
+                      description: (
+                        <RadioGroup onChange={setCancelReason}>
+                          <Text mb={2}>Please select a reason for canceling</Text>
+                          <Stack direction="column">
+                            {cancelReasons.map((reason) => (
+                              <Radio key={reason} value={reason}>
+                                {reason}
+                              </Radio>
+                            ))}
+                          </Stack>
+                        </RadioGroup>
+                      ),
                       cancelText: "No, Don't Cancel",
                       confirmText: 'Yes, Cancel',
                       darkMode: colorMode !== 'light',
@@ -646,7 +676,11 @@ export const Order = () => {
                     });
                     if (decision) {
                       setUpdating(true);
-                      await cancelOrder({ variables: { id } });
+                      const variables = {
+                        id,
+                        ...(cancelReasonRef.current && { reason: cancelReasonRef.current })
+                      };
+                      await cancelOrder({ variables });
                       setUpdating(false);
                     }
                   }}
