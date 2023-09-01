@@ -14,7 +14,7 @@ datadogRum.init({
   service: pkg.name,
   env: process.env.REACT_APP_ENV_NAME,
   version: pkg.version,
-  sampleRate: 100,
+  sessionSampleRate: 100,
   sessionReplaySampleRate: 100,
   trackUserInteractions: true,
   trackResources: true,

@@ -7,6 +7,18 @@ import Text from '../../particles/Text';
 import { usePhotonClient } from '../SDKProvider';
 import generateDraftPrescription from './utils/generateDraftPrescription';
 
+export type TemplateOverrides = {
+  [key: string]: {
+    daysSupply?: number;
+    dispenseAsWritten?: boolean;
+    dispenseQuantity?: number;
+    dispenseUnit?: string;
+    fillsAllowed?: number;
+    instructions?: string;
+    notes?: string;
+  };
+};
+
 // TODO fetch individual template, to get a template currently you need to fetch catalogs and parse out the templates
 // https://www.notion.so/photons/Ability-to-Query-Individual-Template-75c2277db7f44d02bc7ffdd5ab44f17c
 const GetTemplatesFromCatalogs = gql`
@@ -71,6 +83,7 @@ const DraftPrescription = (props: { LeftChildren: JSXElement; RightChildren?: JS
 interface DraftPrescriptionsProps {
   draftPrescriptions: DraftPrescription[];
   templateIds?: string[];
+  templateOverrides?: TemplateOverrides;
   prescriptionIds?: string[];
   setDraftPrescriptions: (draftPrescriptions: DraftPrescription[]) => void;
   handleEdit?: (draftId: string) => void;
@@ -83,6 +96,7 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
     {
       draftPrescriptions: [] as string[],
       templateIds: [] as string[],
+      templateOverrides: {} as TemplateOverrides,
       prescriptionIds: [] as string[]
     },
     props
@@ -125,7 +139,13 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
           ) {
             console.error(`Template is missing required prescription details ${templateId}`);
           } else {
-            draftPrescriptions.push(generateDraftPrescription(template));
+            // if template.id is in templateOverrides, apply the overrides
+            const templateOverride = merged?.templateOverrides?.[template.id];
+            const updatedTemplate = templateOverride
+              ? { ...template, ...templateOverride }
+              : template;
+
+            draftPrescriptions.push(generateDraftPrescription(updatedTemplate));
           }
         });
       }
