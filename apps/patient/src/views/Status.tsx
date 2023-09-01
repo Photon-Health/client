@@ -127,6 +127,9 @@ export const Status = () => {
   useEffect(() => {
     if (isTrial) {
       setTimeout(() => {
+        // trigger sms
+        // pharmacy is filling
+        // pharmacy name + address
         setOrder({
           ...order,
           fulfillment: {
@@ -135,6 +138,9 @@ export const Status = () => {
         });
         setShowFooter(true);
         setTimeout(() => {
+          // trigger sms
+          // should be ready
+          // pharmacy name
           setOrder({
             ...order,
             fulfillment: {

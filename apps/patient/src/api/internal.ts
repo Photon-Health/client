@@ -7,7 +7,8 @@ import {
   MARK_ORDER_AS_PICKED_UP,
   REROUTE_ORDER,
   SELECT_ORDER_PHARMACY,
-  SET_PREFERRED_PHARMACY
+  SET_PREFERRED_PHARMACY,
+  TRIGGER_DEMO_NOTIFICATION
 } from '../graphql';
 import { Order } from '../utils/models';
 
@@ -137,6 +138,33 @@ export const setPreferredPharmacy = async (patientId: string, pharmacyId: string
       return true;
     } else {
       throw new Error('Unable to set preferred pharmacy');
+    }
+  } catch (error) {
+    throw new Error(error.response.errors[0].message);
+  }
+};
+
+export const triggerDemoNotification = async (
+  phoneNumber: string,
+  eventType: string,
+  pharmacyName: string,
+  pharmacyAddress: string
+) => {
+  try {
+    const response: { setPreferredPharmacy: boolean } = await graphQLClient.request(
+      TRIGGER_DEMO_NOTIFICATION,
+      {
+        phoneNumber,
+        eventType,
+        pharmacyName,
+        pharmacyAddress
+      }
+    );
+
+    if (response) {
+      return true;
+    } else {
+      throw new Error('Unable to trigger sms');
     }
   } catch (error) {
     throw new Error(error.response.errors[0].message);
