@@ -41,7 +41,7 @@ export const Status = () => {
   const type = searchParams.get('type');
 
   const [showFooter, setShowFooter] = useState<boolean>(
-    order?.state === types.OrderState.Placed &&
+    order?.fulfillment?.state === 'RECEIVED' &&
       order?.fulfillment?.type !== types.FulfillmentType.MailOrder
   );
 
