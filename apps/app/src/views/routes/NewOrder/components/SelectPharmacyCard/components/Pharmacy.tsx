@@ -23,6 +23,7 @@ interface PharmacyProps {
   isPrevious?: boolean;
   showTags?: boolean;
   resetSelection?: any;
+  disableChange?: boolean;
 }
 
 export const Pharmacy = ({
@@ -30,7 +31,8 @@ export const Pharmacy = ({
   isPreferred,
   isPrevious,
   showTags,
-  resetSelection
+  resetSelection,
+  disableChange = false
 }: PharmacyProps) => {
   const { getPharmacy } = usePhoton();
   const { refetch, loading } = getPharmacy({ id: '' });
@@ -99,7 +101,7 @@ export const Pharmacy = ({
         </VStack>
         <Spacer />
         <Box>
-          {resetSelection ? (
+          {resetSelection && !disableChange ? (
             <Button onClick={() => resetSelection()} size="xs" ms="auto">
               Change
             </Button>
