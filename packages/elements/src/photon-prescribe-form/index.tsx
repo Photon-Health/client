@@ -154,7 +154,7 @@ customElement('photon-prescribe-form', {}, (_, options) => {
             }}
           />
           <photon-checkbox label="Dispense as written" form-name="daw" />
-          <photon-datepicker label="Effective Date" required="true" />
+          <photon-datepicker label="Do Not Fill Before" required="true" />
           <div class="flex flex-col sm:flex-wrap sm:flex-row sm:items-center sm:gap-x-4">
             <photon-number-input
               class="flex-grow flex-shrink md:max-w-[50%] flex-1"

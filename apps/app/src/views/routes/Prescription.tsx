@@ -302,7 +302,7 @@ export const Prescription = () => {
               )}
             </InfoGrid>
 
-            <InfoGrid name="Effective Date">
+            <InfoGrid name="Do Not Fill Before">
               {loading ? (
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (

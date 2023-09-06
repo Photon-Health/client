@@ -74,7 +74,11 @@ export const MailOrder = ({
     <Box ref={ref}>
       {pharmacyId ? (
         <CardBody p={0}>
-          <Pharmacy pharmacyId={pharmacyId} resetSelection={resetSelection} />
+          <Pharmacy
+            pharmacyId={pharmacyId}
+            resetSelection={resetSelection}
+            disableChange={pharmOptions.length === 1}
+          />
         </CardBody>
       ) : (
         <FormControl isInvalid={!!errors?.pharmacyId && touched?.pharmacyId} ref={ref}>
