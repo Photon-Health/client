@@ -108,7 +108,7 @@ export const AddPrescriptionCard = (props: {
         </div>
         <div class="mt-2 sm:mt-0 md:max-w-[50%] md:pr-2">
           <photon-datepicker
-            label="Effective Date"
+            label="Do Not Fill Before"
             invalid={props.store['effectiveDate']?.error ?? false}
             help-text={props.store['effectiveDate']?.error}
             required="true"
