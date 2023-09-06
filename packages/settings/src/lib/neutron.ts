@@ -141,5 +141,35 @@ export const neutron: {
     ...defaultSettings,
     logo: 'sunny_logo.svg',
     accentColor: '#69672c'
+  },
+  // One Medical
+  org_FDug4lPgyekFRNby: {
+    ...defaultSettings,
+    logo: 'one_medical.jpeg',
+    accentColor: '#005450'
+  },
+  // Carbon Health
+  org_Dye8T9VAM1GHjjzS: {
+    ...defaultSettings,
+    logo: 'carbon_health_logo.svg',
+    accentColor: '#000000'
+  },
+  // Oak Street Health
+  org_lXk4CKXWokY1rvnC: {
+    ...defaultSettings,
+    logo: 'oak_st_health.png',
+    accentColor: '#00694c'
+  },
+  // Heartbeat Health
+  org_6M1pULWU4O5AK3Lg: {
+    ...defaultSettings,
+    logo: 'heartbeat_health_logo.svg',
+    accentColor: '#d1007e'
+  },
+  // Harbor Health
+  org_1BNRl6kcTIZQg4ip: {
+    ...defaultSettings,
+    logo: 'harbor_health_logo.png',
+    accentColor: '#141d45'
   }
 };
