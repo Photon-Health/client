@@ -149,7 +149,7 @@ export const neutron: {
     accentColor: '#005450'
   },
   // Carbon Health
-  org_Dye8T9VAM1GHjjzS: {
+  org_jzJhkJH2D4kyJD0q: {
     ...defaultSettings,
     logo: 'carbon_health_logo.svg',
     accentColor: '#000000'
