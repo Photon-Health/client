@@ -396,14 +396,14 @@ export const AdvancedDrugSearch = forwardRef(
         </Stack>
         <Stack pt={2} flexDir={isMobile ? 'column' : 'row'} gap="2" alignItems="flex-end">
           <RouteSelect
-            drugbankPCID={strengthPCID}
+            drugbankPCID={drugbankPCID}
             setDrugbankPCID={(s: string) => setRoutePCID(s)}
-            isDisabled={!strengthPCID}
+            isDisabled={!drugbankPCID}
           />
           <FormSelect
-            drugbankPCID={routePCID}
+            drugbankPCID={drugbankPCID}
             setDrugbankPCID={(s: string) => setFormPCID(s)}
-            isDisabled={!routePCID}
+            isDisabled={!drugbankPCID}
           />
         </Stack>
         <Divider pt={8} />
