@@ -60,7 +60,7 @@ export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
             logo === 'photon' ? (
               <PhotonLogo />
             ) : (
-              <Image src={logo} width="auto" height="auto" maxW="45%" maxH="35px" />
+              <Image src={logo} width="auto" height="auto" maxW="60%" maxH="35px" />
             )
           ) : (
             <Text
