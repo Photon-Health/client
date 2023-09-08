@@ -171,5 +171,11 @@ export const neutron: {
     ...defaultSettings,
     logo: 'harbor_health_logo.png',
     accentColor: '#141d45'
+  },
+  // Assure Health
+  org_RPrHGTLipYfPywxf: {
+    ...defaultSettings,
+    logo: 'assure_health_logo.svg',
+    accentColor: '#66cca9'
   }
 };
