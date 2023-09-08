@@ -54,7 +54,6 @@ export const TreatmentForm = ({
               <AdvancedDrugSearch
                 submitRef={submitRef}
                 hideAddToCatalog
-                ref={advSearchRef}
                 loading={loading}
                 forceMobile
               />
