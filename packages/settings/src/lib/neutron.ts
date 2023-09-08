@@ -177,5 +177,23 @@ export const neutron: {
     ...defaultSettings,
     logo: 'assure_health_logo.svg',
     accentColor: '#66cca9'
+  },
+  // Sunrise
+  org_SgWtqCKFzYaDePCf: {
+    ...defaultSettings,
+    logo: 'sunrise_logo.svg',
+    accentColor: '#0057b8'
+  },
+  // Found
+  org_PwzQxriG4OcMD0iq: {
+    ...defaultSettings,
+    logo: 'found_logo.svg',
+    accentColor: '#1c3f28'
+  },
+  // Miga Health
+  org_u3kKBHGj4MFfzOVz: {
+    ...defaultSettings,
+    logo: 'miga_health_logo.svg',
+    accentColor: '#12110c'
   }
 };
