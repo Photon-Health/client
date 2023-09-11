@@ -42,7 +42,7 @@ export const Status = () => {
   const isTrial = searchParams.get('trial');
 
   const [showFooter, setShowFooter] = useState<boolean>(
-    order?.state === types.OrderState.Placed &&
+    order?.fulfillment?.state === 'RECEIVED' &&
       order?.fulfillment?.type !== types.FulfillmentType.MailOrder
   );
 

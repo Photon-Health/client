@@ -27,11 +27,14 @@ import { OrderCard } from './components/OrderCard';
 import { PharmacyCard } from './components/PharmacyCard';
 import { PhotonAuthorized } from '../photon-authorized';
 
+import type { TemplateOverrides } from '@photonhealth/components';
+
 customElement(
   'photon-prescribe-workflow',
   {
     patientId: undefined,
     templateIds: undefined,
+    templateOverrides: undefined,
     prescriptionIds: undefined,
     hideSubmit: false,
     hideTemplates: true,
@@ -47,6 +50,7 @@ customElement(
     props: {
       patientId?: string;
       templateIds?: string;
+      templateOverrides?: TemplateOverrides;
       prescriptionIds?: string;
       hideSubmit: boolean;
       hideTemplates: boolean;
@@ -323,6 +327,7 @@ customElement(
               </Show>
               <DraftPrescriptionCard
                 templateIds={props.templateIds?.split(',') || []}
+                templateOverrides={props.templateOverrides || {}}
                 prescriptionIds={props.prescriptionIds?.split(',') || []}
                 prescriptionRef={prescriptionRef}
                 actions={actions}

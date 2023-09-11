@@ -141,5 +141,59 @@ export const neutron: {
     ...defaultSettings,
     logo: 'sunny_logo.svg',
     accentColor: '#69672c'
+  },
+  // One Medical
+  org_FDug4lPgyekFRNby: {
+    ...defaultSettings,
+    logo: 'one_medical.jpeg',
+    accentColor: '#005450'
+  },
+  // Carbon Health
+  org_jzJhkJH2D4kyJD0q: {
+    ...defaultSettings,
+    logo: 'carbon_health_logo.svg',
+    accentColor: '#000000'
+  },
+  // Oak Street Health
+  org_lXk4CKXWokY1rvnC: {
+    ...defaultSettings,
+    logo: 'oak_st_health.png',
+    accentColor: '#00694c'
+  },
+  // Heartbeat Health
+  org_6M1pULWU4O5AK3Lg: {
+    ...defaultSettings,
+    logo: 'heartbeat_health_logo.svg',
+    accentColor: '#d1007e'
+  },
+  // Harbor Health
+  org_1BNRl6kcTIZQg4ip: {
+    ...defaultSettings,
+    logo: 'harbor_health_logo.png',
+    accentColor: '#141d45'
+  },
+  // Assure Health
+  org_RPrHGTLipYfPywxf: {
+    ...defaultSettings,
+    logo: 'assure_health_logo.svg',
+    accentColor: '#66cca9'
+  },
+  // Sunrise
+  org_SgWtqCKFzYaDePCf: {
+    ...defaultSettings,
+    logo: 'sunrise_logo.svg',
+    accentColor: '#0057b8'
+  },
+  // Found
+  org_PwzQxriG4OcMD0iq: {
+    ...defaultSettings,
+    logo: 'found_logo.svg',
+    accentColor: '#1c3f28'
+  },
+  // Miga Health
+  org_u3kKBHGj4MFfzOVz: {
+    ...defaultSettings,
+    logo: 'miga_health_logo.svg',
+    accentColor: '#12110c'
   }
 };
