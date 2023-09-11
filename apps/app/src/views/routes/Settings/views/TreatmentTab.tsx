@@ -78,7 +78,6 @@ export const TreatmentTab = (props: any) => {
   const [debouncedFilterText] = useDebounce(filterText, 250);
   const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const advSearchRef: any = useRef();
   const pageSize = 10;
   const [childLoading, setChildLoading] = useState(false);
 
@@ -157,7 +156,6 @@ export const TreatmentTab = (props: any) => {
               catalogId={catalogId}
               addToCatalogMutation={addToCatalogMutation}
               submitRef={submitRef}
-              advSearchRef={advSearchRef}
               isModal
               onClose={setShowModal.off}
             />
@@ -192,7 +190,6 @@ export const TreatmentTab = (props: any) => {
             catalogId={catalogId}
             addToCatalogMutation={addToCatalogMutation}
             submitRef={submitRef}
-            advSearchRef={advSearchRef}
             onClose={() => {}}
           />
         ) : null}

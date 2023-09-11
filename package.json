@@ -111,6 +111,7 @@
     "graphql-tag": "^2.12.6",
     "jwt-decode": "^3.1.2",
     "libphonenumber-js": "^1.10.24",
+    "lodash": "^4.17.21",
     "nanostores": "^0.7.4",
     "react": "18.2.0",
     "react-app-rewired": "^2.2.1",

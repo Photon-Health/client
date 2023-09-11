@@ -1,5 +1,5 @@
 import { Button, VStack, Heading, HStack, ModalFooter, useToast } from '@chakra-ui/react';
-import { RefObject } from 'react';
+import { RefObject, useState } from 'react';
 import { Formik } from 'formik';
 
 import { AdvancedDrugSearch } from '../../../components/AdvancedDrugSearch';
@@ -8,22 +8,26 @@ interface TreatmentFormProps {
   loading: boolean;
   addToCatalogMutation: Function;
   catalogId: string;
-  advSearchRef: RefObject<any>;
   submitRef: RefObject<any>;
   isModal?: boolean;
   onClose: () => void;
 }
 
+export type SelectedProduct = {
+  name: string;
+  id: string;
+};
+
 export const TreatmentForm = ({
   loading,
   addToCatalogMutation,
   catalogId,
-  advSearchRef,
   submitRef,
   isModal,
   onClose
 }: TreatmentFormProps) => {
   const toast = useToast();
+  const [selectedProduct, setSelectedProduct] = useState<SelectedProduct | undefined>();
 
   return (
     <Formik
@@ -32,7 +36,7 @@ export const TreatmentForm = ({
         addToCatalogMutation({
           variables: {
             catalogId,
-            treatmentId: advSearchRef.current.selected.id
+            treatmentId: selectedProduct?.id
           },
           onCompleted: () => {
             if (isModal) onClose();
@@ -56,6 +60,8 @@ export const TreatmentForm = ({
                 hideAddToCatalog
                 loading={loading}
                 forceMobile
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
               />
               {isModal ? (
                 <ModalFooter px="0">

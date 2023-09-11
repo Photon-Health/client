@@ -13,12 +13,12 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
-import { usePhoton } from '@photonhealth/react';
 import { SelectField } from './SelectField';
 import { RadioCard, RadioCardGroup } from './RadioCardGroup';
-import { unique } from '../../utils';
 import { gql, useLazyQuery } from '@apollo/client';
 import { Medication, SearchMedication } from 'packages/sdk/dist/types';
+import { SelectedProduct } from '../routes/Settings/components/TreatmentForm';
+import { uniq, uniqBy } from 'lodash';
 
 const GET_CONCEPT = gql`
   query GetConcept($name: String!) {
@@ -56,21 +56,20 @@ const GET_ROUTES = gql`
   }
 `;
 
-// const GET_PRODUCTS = gql`
-//   query GetProducts($medId: String!) {
-//     medicationProducts(id: $medId) {
-//       id
-//       name
-//       brandName
-//       manufacturer
-//     }
-//   }
-// `;
+const GET_PRODUCTS = gql`
+  query GetProducts($medId: String!) {
+    medicationProducts(id: $medId) {
+      id
+      name
+      controlled
+    }
+  }
+`;
 
 type ConceptSelectProps = {
   setFilterText: (text: string) => void;
   filterText: string;
-  setMedId: (id: string) => void;
+  setMedId: (id: string | undefined) => void;
 };
 
 const ConceptSelect = ({ setFilterText, filterText, setMedId }: ConceptSelectProps) => {
@@ -79,6 +78,7 @@ const ConceptSelect = ({ setFilterText, filterText, setMedId }: ConceptSelectPro
 
   useEffect(() => {
     if (filterText.length > 0) {
+      setMedId(undefined);
       searchConcepts({ variables: { name: filterText } });
     }
   }, [filterText]);
@@ -103,9 +103,9 @@ const ConceptSelect = ({ setFilterText, filterText, setMedId }: ConceptSelectPro
         setFilterText={setFilterText}
         filterOption={() => true}
         placeholder="Search by name"
-        onChange={(e: string) => {
-          console.log(e);
-          setMedId(e);
+        onChange={(id: string) => {
+          setMedId(undefined);
+          setMedId(id);
         }}
         isLoading={loading}
       />
@@ -113,36 +113,43 @@ const ConceptSelect = ({ setFilterText, filterText, setMedId }: ConceptSelectPro
   );
 };
 
-const ProductSelect = (props: any) => {
-  const { medId, setSelected, selected, setAddToCatalog } = props;
+type ProductSelectProps = {
+  medId?: string;
+  setAddToCatalog: (s: boolean) => void;
+  selectedProduct?: SelectedProduct;
+  setSelectedProduct: (s: SelectedProduct | undefined) => void;
+};
 
-  const { getMedicationProducts } = usePhoton();
-  const { medicationProducts, loading, query } = getMedicationProducts({
-    id: medId,
-    defer: true
-  });
-  const [products, setProducts] = useState<any[]>([]);
+const ProductSelect = ({
+  medId,
+  setAddToCatalog,
+  selectedProduct,
+  setSelectedProduct
+}: ProductSelectProps) => {
+  const [getProducts, { data, loading }] = useLazyQuery<{
+    medicationProducts: Medication[];
+  }>(GET_PRODUCTS);
+
+  const [products, setProducts] = useState<Medication[]>([]);
 
   useEffect(() => {
-    const getConcepts = async () => {
-      await query!({ id: medId });
-    };
     if (medId) {
-      getConcepts();
+      getProducts({ variables: { medId } });
     }
   }, [medId]);
 
   useEffect(() => {
-    if (medId) {
-      const data = unique(medicationProducts, 'name').filter((x) => !x.controlled);
-      data.sort((a: any, b: any) => (a.value > b.value ? 1 : -1));
-      setProducts(data);
-      if (selected) {
-        setSelected(undefined);
+    if (medId && data?.medicationProducts) {
+      const medications = data.medicationProducts;
+      const uniqueProducts = uniqBy(medications, 'name').filter((med) => !med.controlled);
+
+      setProducts(uniqueProducts);
+      if (selectedProduct) {
+        setSelectedProduct(undefined);
         setAddToCatalog(false);
       }
     }
-  }, [medicationProducts]);
+  }, [data]);
 
   useEffect(() => () => setProducts([]), []);
 
@@ -180,9 +187,9 @@ const ProductSelect = (props: any) => {
       ) : (
         <Stack spacing="5">
           <RadioCardGroup
-            onChange={(e: any) => {
+            onChange={(e: string) => {
               const parts = e.split(', ');
-              setSelected({
+              setSelectedProduct({
                 id: parts[0],
                 name: parts[1]
               });
@@ -221,21 +228,37 @@ type filterType = keyof typeof filters;
 type FilterSelectProps = {
   filterType: filterType;
   medId?: string;
+  conceptId?: string;
   setMedId: (s: string | undefined) => void;
   isDisabled?: boolean;
 };
 
-const FilterSelect = ({ filterType, medId, setMedId, isDisabled }: FilterSelectProps) => {
+const FilterSelect = ({
+  filterType,
+  medId,
+  setMedId,
+  conceptId,
+  isDisabled
+}: FilterSelectProps) => {
   const { query, key } = filters[filterType];
   const [fetchData, { data, loading }] = useLazyQuery(query);
   const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
+  const [filterSet, setFilterSet] = useState<boolean>(false);
   const selectInputRef = useRef<any>();
+  const prevConceptIdRef = useRef<string | undefined>();
 
   useEffect(() => {
-    if (medId) {
-      fetchData({ variables: { medId } });
+    if (conceptId !== prevConceptIdRef.current) {
+      setFilterSet(false);
+      setOptions([]);
+      prevConceptIdRef.current = conceptId;
     }
-  }, [medId]);
+    if (medId) {
+      if (!filterSet) {
+        fetchData({ variables: { medId } });
+      }
+    }
+  }, [medId, filterSet, conceptId]);
 
   useEffect(() => {
     if (data && data[key]) {
@@ -250,14 +273,20 @@ const FilterSelect = ({ filterType, medId, setMedId, isDisabled }: FilterSelectP
       );
     }
   }, [data]);
+
   return (
     <FormControl>
-      <FormLabel>{filterType}</FormLabel>
+      <FormLabel>
+        {filterType.charAt(0).toUpperCase() + filterType.slice(1).toLowerCase()}
+      </FormLabel>
       <SelectField
         name={filterType.toLowerCase()}
         ref={selectInputRef}
         options={options}
-        onChange={setMedId}
+        onChange={(id: string) => {
+          setMedId(id);
+          setFilterSet(true);
+        }}
         isDisabled={isDisabled}
         isLoading={loading}
       />
@@ -270,33 +299,24 @@ type AdvancedDrugSearchProps = {
   hideAddToCatalog?: boolean;
   loading?: boolean;
   forceMobile?: boolean;
+  selectedProduct?: SelectedProduct;
+  setSelectedProduct: (s: SelectedProduct | undefined) => void;
 };
 
 export const AdvancedDrugSearch = ({
-  submitRef,
   hideAddToCatalog,
   loading,
-  forceMobile
+  forceMobile,
+  selectedProduct,
+  setSelectedProduct
 }: AdvancedDrugSearchProps) => {
   const [filterText, setFilterText] = useState('');
   const [debouncedFilterText] = useDebounce(filterText, 350);
+  const [conceptId, setConceptId] = useState<string | undefined>();
   const [medId, setMedId] = useState<string | undefined>();
-  const [selected, setSelected] = useState<any>();
   const [addToCatalog, setAddToCatalog] = useState<boolean>(false);
 
   const isMobile = useBreakpointValue({ base: true, md: false }) || forceMobile;
-
-  useEffect(() => {
-    if (submitRef && submitRef.current) {
-      if (selected) {
-        submitRef.current.disabled = false;
-      } else {
-        submitRef.current.disabled = true;
-      }
-    }
-  }, [submitRef, selected]);
-
-  useEffect(() => () => setSelected(undefined), []);
 
   return (
     <VStack align="stretch">
@@ -304,27 +324,48 @@ export const AdvancedDrugSearch = ({
         <ConceptSelect
           filterText={debouncedFilterText}
           setFilterText={setFilterText}
-          setMedId={setMedId}
+          setMedId={(id) => {
+            setConceptId(id);
+            setMedId(id);
+          }}
         />
-        <FilterSelect medId={medId} filterType="FORM" setMedId={setMedId} isDisabled={!medId} />
+        <FilterSelect
+          conceptId={conceptId}
+          medId={medId}
+          filterType="FORM"
+          setMedId={setMedId}
+          isDisabled={!medId}
+        />
       </Stack>
       <Stack pt={2} flexDir={isMobile ? 'column' : 'row'} gap="2" alignItems="flex-end">
-        <FilterSelect medId={medId} filterType="STRENGTH" setMedId={setMedId} isDisabled={!medId} />
-        <FilterSelect medId={medId} filterType="ROUTE" setMedId={setMedId} isDisabled={!medId} />
+        <FilterSelect
+          conceptId={conceptId}
+          medId={medId}
+          filterType="STRENGTH"
+          setMedId={setMedId}
+          isDisabled={!medId}
+        />
+        <FilterSelect
+          conceptId={conceptId}
+          medId={medId}
+          filterType="ROUTE"
+          setMedId={setMedId}
+          isDisabled={!medId}
+        />
       </Stack>
       <Divider pt={8} />
       <Box pt={6} pb={4}>
         <ProductSelect
           medId={medId}
-          setSelected={setSelected}
-          selected={selected}
           setAddToCatalog={setAddToCatalog}
+          selectedProduct={selectedProduct}
+          setSelectedProduct={setSelectedProduct}
         />
       </Box>
       {!hideAddToCatalog ? (
         <Box pb={isMobile ? 12 : 0}>
           <Checkbox
-            isDisabled={!selected || loading}
+            isDisabled={!selectedProduct || loading}
             isChecked={addToCatalog}
             onChange={() => setAddToCatalog(!addToCatalog)}
           >
