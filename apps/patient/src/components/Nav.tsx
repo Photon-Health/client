@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
+  Alert,
   Box,
   Container,
   HStack,
@@ -14,6 +15,7 @@ import {
   Text,
   useColorModeValue
 } from '@chakra-ui/react';
+import { useSearchParams } from 'react-router-dom';
 import { FiHelpCircle, FiRefreshCw } from 'react-icons/fi';
 import { text as t } from '../utils/text';
 import { Logo as PhotonLogo } from './Logo';
@@ -30,6 +32,9 @@ interface NavProps {
 }
 
 export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
+  const [searchParams] = useSearchParams();
+  const isDemo = searchParams.get('demo');
+
   const [logo, setLogo] = useState(undefined);
 
   const fetchLogo = async (fileName: string) => {
@@ -54,6 +59,16 @@ export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
 
   return (
     <Box as="nav" bg="white" boxShadow={useColorModeValue('sm', 'sm-dark')}>
+      {isDemo ? (
+        <Alert status="info" variant="subtle" w="full">
+          <HStack spacing={1} mx="auto">
+            <Text fontSize="sm">This is not a real prescription.</Text>
+            <Link fontSize="sm" isExternal href="https://photon.health" textDecoration="underline">
+              Try Photon
+            </Link>
+          </HStack>
+        </Alert>
+      ) : null}
       <Container>
         <HStack direction="row" w="full" py={2}>
           {logo ? (
