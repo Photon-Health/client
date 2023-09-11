@@ -19,16 +19,16 @@ export const Main = () => {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('orderId');
   const token = searchParams.get('token');
-  const isTrial = searchParams.get('trial');
+  const isDemo = searchParams.get('demo');
 
-  const [order, setOrder] = useState<Order | undefined>(isTrial ? demoOrder : undefined);
+  const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
 
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     if (location.pathname !== '/canceled') {
-      if (!isTrial && (!orderId || !token)) {
+      if (!isDemo && (!orderId || !token)) {
         console.error('Missing orderId or token in search params');
         navigate('/no-match', { replace: true });
       }
@@ -75,13 +75,13 @@ export const Main = () => {
   }, [navigate, orderId, token]);
 
   useEffect(() => {
-    if (isTrial && order) {
-      navigate(`/review?trial=true`, { replace: true });
+    if (isDemo && order) {
+      navigate(`/review?demo=true`, { replace: true });
     }
-  }, [isTrial]);
+  }, [isDemo]);
 
   useEffect(() => {
-    if (!isTrial && !order) {
+    if (!isDemo && !order) {
       fetchOrder();
     }
   }, [order, orderId, fetchOrder]);

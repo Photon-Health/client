@@ -69,7 +69,7 @@ export const Pharmacy = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const isReroute = searchParams.get('reroute');
-  const isTrial = searchParams.get('trial');
+  const isDemo = searchParams.get('demo');
 
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
@@ -122,7 +122,7 @@ export const Pharmacy = () => {
     setLocationModalOpen(false);
   };
 
-  const initializeTrial = () => {
+  const initializeDemo = () => {
     // Set geocode data
     setLocation('201 N 8th St, Brooklyn, NY 11211');
     setLatitude(40.717484);
@@ -218,7 +218,7 @@ export const Pharmacy = () => {
   const handleShowMore = async () => {
     setLoadingPharmacies(true);
 
-    if (isTrial) {
+    if (isDemo) {
       const newOps = demoPharmacies.slice(
         pharmacyOptions.length,
         pharmacyOptions.length + MAX_ENRICHMENT
@@ -304,10 +304,10 @@ export const Pharmacy = () => {
 
     setSubmitting(true);
 
-    if (isTrial) {
+    if (isDemo) {
       setTimeout(() => {
         setSuccessfullySubmitted(true);
-        setTimeout(() => {
+        setTimeout(async () => {
           setShowFooter(false);
           const selectedPharmacy = pharmacyOptions.find((p) => p.id === selectedId);
           setOrder({
@@ -315,12 +315,9 @@ export const Pharmacy = () => {
             pharmacy: selectedPharmacy
           });
 
-          // TODO: trigger sms
-          // received
-          // pharmacy name
           await triggerDemoNotification(order.id, selectedId, order.patient.id);
 
-          navigate(`/status?trial=true`);
+          navigate(`/status?demo=true`);
         }, 1000);
         setSubmitting(false);
       }, 1000);
@@ -382,8 +379,8 @@ export const Pharmacy = () => {
 
     setSavingPreferred(true);
 
-    // Handle trial
-    if (isTrial) {
+    // Handle stp demo
+    if (isDemo) {
       setTimeout(() => {
         setPreferredPharmacyId(pharmacyId);
         toast({
@@ -427,8 +424,8 @@ export const Pharmacy = () => {
   };
 
   useEffect(() => {
-    if (isTrial) {
-      initializeTrial();
+    if (isDemo) {
+      initializeDemo();
     } else {
       if (location) {
         initialize();

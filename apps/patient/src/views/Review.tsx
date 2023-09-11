@@ -32,12 +32,12 @@ export const Review = () => {
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  const isTrial = searchParams.get('trial');
+  const isDemo = searchParams.get('demo');
 
   const { organization, patient, fills } = order;
 
   const handleCtaClick = () => {
-    const toUrl = isTrial ? `/pharmacy?trial=true` : `/pharmacy?orderId=${order.id}&token=${token}`;
+    const toUrl = isDemo ? `/pharmacy?demo=true` : `/pharmacy?orderId=${order.id}&token=${token}`;
     navigate(toUrl);
   };
 

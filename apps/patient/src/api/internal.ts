@@ -146,16 +146,16 @@ export const setPreferredPharmacy = async (patientId: string, pharmacyId: string
 
 export const triggerDemoNotification = async (
   phoneNumber: string,
-  eventType: string,
-  pharmacyName: string,
-  pharmacyAddress: string
+  eventName: string,
+  pharmacyName?: string,
+  pharmacyAddress?: string
 ) => {
   try {
     const response: { setPreferredPharmacy: boolean } = await graphQLClient.request(
       TRIGGER_DEMO_NOTIFICATION,
       {
         phoneNumber,
-        eventType,
+        eventName,
         pharmacyName,
         pharmacyAddress
       }

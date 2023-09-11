@@ -39,7 +39,7 @@ export const Status = () => {
   const orderId = searchParams.get('orderId');
   const token = searchParams.get('token');
   const type = searchParams.get('type');
-  const isTrial = searchParams.get('trial');
+  const isDemo = searchParams.get('demo');
 
   const [showFooter, setShowFooter] = useState<boolean>(
     order?.fulfillment?.state === 'RECEIVED' &&
@@ -59,8 +59,8 @@ export const Status = () => {
   const handleMarkOrderAsPickedUp = async () => {
     setSubmitting(true);
 
-    // Trial
-    if (isTrial) {
+    // Demo
+    if (isDemo) {
       setTimeout(() => {
         setSuccessfullySubmitted(true);
         setTimeout(() => setShowFooter(false), 1000);
@@ -125,7 +125,7 @@ export const Status = () => {
   }, []);
 
   useEffect(() => {
-    if (isTrial) {
+    if (isDemo) {
       setTimeout(() => {
         // trigger sms
         // pharmacy is filling
@@ -188,7 +188,7 @@ export const Status = () => {
               <PharmacyCard
                 pharmacy={enrichedPharmacy}
                 selected={true}
-                canReroute={!isTrial && orgSettings.patientsCanReroute}
+                canReroute={!isDemo && orgSettings.patientsCanReroute}
                 onChangePharmacy={() =>
                   navigate(`/pharmacy?orderId=${order.id}&token=${token}&reroute=true`)
                 }
