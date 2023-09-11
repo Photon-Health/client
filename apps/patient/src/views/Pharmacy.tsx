@@ -33,8 +33,8 @@ import {
   getPharmacies,
   rerouteOrder,
   selectOrderPharmacy,
-  setPreferredPharmacy,
-  triggerDemoNotification
+  setPreferredPharmacy
+  // triggerDemoNotification
 } from '../api';
 import { demoPharmacies } from '../data/demoPharmacies';
 
@@ -315,7 +315,7 @@ export const Pharmacy = () => {
             pharmacy: selectedPharmacy
           });
 
-          await triggerDemoNotification(order.id, selectedId, order.patient.id);
+          // await triggerDemoNotification(order.id, selectedId, order.patient.id);
 
           navigate(`/status?demo=true`);
         }, 1000);

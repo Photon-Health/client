@@ -23,6 +23,7 @@ import { useOrderContext } from './Main';
 import * as TOAST_CONFIG from '../configs/toast';
 import { markOrderAsPickedUp } from '../api';
 import { getSettings } from '@client/settings';
+import { DemoCtaModal } from '../components/DemoCtaModal';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
@@ -45,6 +46,7 @@ export const Status = () => {
     order?.fulfillment?.state === 'RECEIVED' &&
       order?.fulfillment?.type !== types.FulfillmentType.MailOrder
   );
+  const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
 
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
@@ -63,7 +65,10 @@ export const Status = () => {
     if (isDemo) {
       setTimeout(() => {
         setSuccessfullySubmitted(true);
-        setTimeout(() => setShowFooter(false), 1000);
+        setTimeout(() => {
+          setShowFooter(false);
+          setShowDemoCtaModal(true);
+        }, 1000);
         setSubmitting(false);
       }, 1000);
       return;
@@ -157,6 +162,8 @@ export const Status = () => {
 
   return (
     <Box>
+      <DemoCtaModal isOpen={showDemoCtaModal} />
+
       <Helmet>
         <title>{t.status.title}</title>
       </Helmet>

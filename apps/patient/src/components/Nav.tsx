@@ -63,7 +63,13 @@ export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
         <Alert status="info" variant="subtle" w="full">
           <HStack spacing={1} mx="auto">
             <Text fontSize="sm">This is not a real prescription.</Text>
-            <Link fontSize="sm" isExternal href="https://photon.health" textDecoration="underline">
+            <Link
+              fontSize="sm"
+              isExternal
+              href="https://photon.health"
+              color="link"
+              fontWeight="medium"
+            >
               Try Photon
             </Link>
           </HStack>
