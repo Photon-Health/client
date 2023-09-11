@@ -152,21 +152,32 @@ export const triggerDemoNotification = async (
     | 'SYSTEM_ORDER_FULFILLMENT_READY',
   pharmacyName?: string,
   pharmacyAddress?: string
-) => {
+): Promise<boolean> => {
   try {
-    const response = await graphQLClient.request(TRIGGER_DEMO_NOTIFICATION, {
+    const url = process.env.REACT_APP_THIRD_PARTY_REST_API_ENDPOINT;
+    const data = {
       phoneNumber,
       eventName,
       pharmacyName,
       pharmacyAddress
-    });
+    };
 
-    if (response) {
-      return true;
-    } else {
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    };
+
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
       throw new Error('Unable to trigger demo sms');
     }
+
+    return true;
   } catch (error) {
-    throw new Error(error.response.errors[0].message);
+    throw new Error('Unable to trigger demo sms');
   }
 };
