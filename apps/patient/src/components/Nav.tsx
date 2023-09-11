@@ -60,7 +60,7 @@ export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
   return (
     <Box as="nav" bg="white" boxShadow={useColorModeValue('sm', 'sm-dark')}>
       {isDemo ? (
-        <Alert status="info" variant="subtle" w="full">
+        <Alert status="info" variant="subtle" w="full" py={2}>
           <HStack spacing={1} mx="auto">
             <Text fontSize="sm">This is not a real prescription.</Text>
             <Link
@@ -69,6 +69,7 @@ export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
               href="https://photon.health"
               color="link"
               fontWeight="medium"
+              textDecoration="underline"
             >
               Try Photon
             </Link>

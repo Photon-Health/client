@@ -146,25 +146,25 @@ export const setPreferredPharmacy = async (patientId: string, pharmacyId: string
 
 export const triggerDemoNotification = async (
   phoneNumber: string,
-  eventName: string,
+  eventName:
+    | 'SYSTEM_ORDER_PLACED'
+    | 'SYSTEM_ORDER_FULFILLMENT_RECEIVED'
+    | 'SYSTEM_ORDER_FULFILLMENT_READY',
   pharmacyName?: string,
   pharmacyAddress?: string
 ) => {
   try {
-    const response: { setPreferredPharmacy: boolean } = await graphQLClient.request(
-      TRIGGER_DEMO_NOTIFICATION,
-      {
-        phoneNumber,
-        eventName,
-        pharmacyName,
-        pharmacyAddress
-      }
-    );
+    const response = await graphQLClient.request(TRIGGER_DEMO_NOTIFICATION, {
+      phoneNumber,
+      eventName,
+      pharmacyName,
+      pharmacyAddress
+    });
 
     if (response) {
       return true;
     } else {
-      throw new Error('Unable to trigger sms');
+      throw new Error('Unable to trigger demo sms');
     }
   } catch (error) {
     throw new Error(error.response.errors[0].message);

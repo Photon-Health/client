@@ -33,8 +33,8 @@ import {
   getPharmacies,
   rerouteOrder,
   selectOrderPharmacy,
-  setPreferredPharmacy
-  // triggerDemoNotification
+  setPreferredPharmacy,
+  triggerDemoNotification
 } from '../api';
 import { demoPharmacies } from '../data/demoPharmacies';
 
@@ -309,13 +309,21 @@ export const Pharmacy = () => {
         setSuccessfullySubmitted(true);
         setTimeout(async () => {
           setShowFooter(false);
+
+          // Store selected pharmacy for smooth transition to /status
           const selectedPharmacy = pharmacyOptions.find((p) => p.id === selectedId);
           setOrder({
             ...order,
             pharmacy: selectedPharmacy
           });
 
-          // await triggerDemoNotification(order.id, selectedId, order.patient.id);
+          // Send sms to demo participant
+          await triggerDemoNotification(
+            '5416029104',
+            'SYSTEM_ORDER_PLACED',
+            selectedPharmacy.name,
+            selectedPharmacy.address
+          );
 
           navigate(`/status?demo=true`);
         }, 1000);
