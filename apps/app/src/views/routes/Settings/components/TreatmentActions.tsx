@@ -36,8 +36,8 @@ export const TreatmentActions = (props: {
         onClick={async () => {
           const decision = await confirmWrapper('Remove this treatment?', {
             description: 'You will not be able to recover removed treatments.',
-            cancelText: 'No, Keep Editing',
-            confirmText: 'Yes, Cancel',
+            cancelText: 'Cancel',
+            confirmText: 'Yes, Remove',
             darkMode: colorMode !== 'light',
             colorScheme: 'red'
           });

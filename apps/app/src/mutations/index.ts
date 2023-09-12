@@ -25,3 +25,11 @@ export const CANCEL_PRESCRIPTION = gql`
     }
   }
 `;
+
+export const ADD_TO_CATALOG = gql`
+  mutation addToCatalog($catalogId: ID!, $treatmentId: ID!) {
+    addToCatalog(catalogId: $catalogId, treatmentId: $treatmentId) {
+      id
+    }
+  }
+`;

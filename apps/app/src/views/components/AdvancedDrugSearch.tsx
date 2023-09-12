@@ -18,7 +18,7 @@ import { RadioCard, RadioCardGroup } from './RadioCardGroup';
 import { gql, useLazyQuery } from '@apollo/client';
 import { Medication, SearchMedication } from 'packages/sdk/dist/types';
 import { SelectedProduct } from '../routes/Settings/components/TreatmentForm';
-import { uniq, uniqBy } from 'lodash';
+import { uniqBy } from 'lodash';
 
 const GET_CONCEPT = gql`
   query GetConcept($name: String!) {
@@ -86,10 +86,13 @@ const ConceptSelect = ({ setFilterText, filterText, setMedId }: ConceptSelectPro
   useEffect(() => {
     if (data && data.medicationConcepts) {
       setOptions(
-        data.medicationConcepts.map((med: SearchMedication) => ({
-          value: med.id,
-          label: med.name
-        }))
+        // create new array as data.medicationConcepts is readonly
+        [...(data.medicationConcepts as SearchMedication[])]
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((med: SearchMedication) => ({
+            value: med.id,
+            label: med.name
+          }))
       );
     }
   }, [data]);
@@ -244,7 +247,7 @@ const FilterSelect = ({
   const [fetchData, { data, loading }] = useLazyQuery(query);
   const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
   const [filterSet, setFilterSet] = useState<boolean>(false);
-  const selectInputRef = useRef<any>();
+  const selectInputRef = useRef<HTMLInputElement | null>(null);
   const prevConceptIdRef = useRef<string | undefined>();
 
   useEffect(() => {
@@ -295,7 +298,6 @@ const FilterSelect = ({
 };
 
 type AdvancedDrugSearchProps = {
-  submitRef: any;
   hideAddToCatalog?: boolean;
   loading?: boolean;
   forceMobile?: boolean;
