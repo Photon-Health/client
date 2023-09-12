@@ -7,8 +7,7 @@ import {
   MARK_ORDER_AS_PICKED_UP,
   REROUTE_ORDER,
   SELECT_ORDER_PHARMACY,
-  SET_PREFERRED_PHARMACY,
-  TRIGGER_DEMO_NOTIFICATION
+  SET_PREFERRED_PHARMACY
 } from '../graphql';
 import { Order } from '../utils/models';
 
