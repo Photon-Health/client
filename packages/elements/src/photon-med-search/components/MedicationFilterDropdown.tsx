@@ -67,7 +67,6 @@ export const MedicationFilterDropdown = (props: MedicationFormDropdownProps) => 
 
   createEffect(() => {
     if (props?.conceptId) {
-      console.log('setting filterId to undefined');
       setFilterId(undefined);
     }
   });
