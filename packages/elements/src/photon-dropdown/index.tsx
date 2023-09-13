@@ -1,6 +1,6 @@
 //Solid
 import { debounce } from '@solid-primitives/scheduled';
-import { createEffect, createSignal, For, JSXElement, onMount, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, For, JSXElement, onMount, Show } from 'solid-js';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/dropdown/dropdown';
@@ -95,6 +95,13 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   });
 
   createEffect(() => {
+    if (props.data) {
+      // if the source data changes then reset the selected value
+      setSelected(undefined);
+    }
+  });
+
+  createEffect(() => {
     if (lastIndex()) {
       observer.observe(lastIndex() as Element);
     }
@@ -167,6 +174,13 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
     }
   });
 
+  const placeholder = createMemo(() => {
+    const selectedValue = selected();
+    return selectedValue
+      ? props.displayAccessor(selectedValue, false)
+      : props.placeholder ?? 'Select data...';
+  });
+
   return (
     <div ref={ref}>
       <style>{tailwind}</style>
@@ -206,11 +220,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
         <sl-input
           ref={inputRef}
           slot="trigger"
-          placeholder={
-            selected()
-              ? props.displayAccessor(selected()!, false)
-              : props.placeholder ?? 'Select data...'
-          }
+          placeholder={placeholder()}
           disabled={props.disabled ?? false}
           size="medium"
           classList={{

@@ -20,7 +20,7 @@ import { Medication, SearchMedication } from 'packages/sdk/dist/types';
 import { SelectedProduct } from '../routes/Settings/components/TreatmentForm';
 import { uniqBy } from 'lodash';
 
-const GET_CONCEPT = gql`
+const GET_CONCEPTS = gql`
   query GetConcept($name: String!) {
     medicationConcepts(name: $name) {
       id
@@ -73,7 +73,7 @@ type ConceptSelectProps = {
 };
 
 const ConceptSelect = ({ setFilterText, filterText, setMedId }: ConceptSelectProps) => {
-  const [searchConcepts, { data, loading }] = useLazyQuery(GET_CONCEPT);
+  const [searchConcepts, { data, loading }] = useLazyQuery(GET_CONCEPTS);
   const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
 
   useEffect(() => {
