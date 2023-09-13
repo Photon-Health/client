@@ -36,7 +36,11 @@ const GET_PRODUCTS = gql`
   }
 `;
 
-customElement('photon-med-search', {}, () => {
+type MedSearchProps = {
+  open: boolean;
+};
+
+customElement('photon-med-search', { open: false }, (props: MedSearchProps) => {
   let ref: any;
   const client = usePhotonClient();
   const [conceptId, setConceptId] = createSignal<string>('');
@@ -70,6 +74,13 @@ customElement('photon-med-search', {}, () => {
   });
 
   createEffect(() => {
+    if (!props.open) {
+      setConceptId('');
+      setMedicationId('');
+    }
+  });
+
+  createEffect(() => {
     const searchProducts = async (id: string) => {
       const { data } = await client!.apollo.query({
         query: GET_PRODUCTS,
@@ -97,6 +108,7 @@ customElement('photon-med-search', {}, () => {
       <p class="font-sans text-lg text-gray-700 pb-2">Advanced Medication Search</p>
       <div class="flex flex-col xs:flex-row gap-4">
         <MedicationConceptDropdown
+          conceptId={conceptId()}
           setConceptId={(id: string) => {
             setConceptId(id);
             setMedicationId('');

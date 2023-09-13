@@ -95,7 +95,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   });
 
   createEffect(() => {
-    if (props.data) {
+    if (props.data.length === 0) {
       // if the source data changes then reset the selected value
       setSelected(undefined);
     }

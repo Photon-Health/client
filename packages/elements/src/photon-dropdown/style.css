@@ -19,7 +19,7 @@
 }
 
 .placeholder::part(base) {
-  @apply opacity-75;
+  @apply opacity-60;
 }
 
 .selected::part(base) {

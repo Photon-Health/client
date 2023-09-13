@@ -76,7 +76,7 @@ customElement(
           on:photon-dialog-canceled={handleCancel}
           on:photon-dialog-alt={handleCancel}
         >
-          <photon-med-search />
+          <photon-med-search open={props.open} />
         </photon-dialog>
       </div>
     );

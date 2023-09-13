@@ -89,7 +89,11 @@ export const MedicationFilterDropdown = (props: MedicationFormDropdownProps) => 
     }
   });
 
-  const actionRef = {};
+  createEffect(() => {
+    if (!props.conceptId) {
+      setData([]);
+    }
+  });
 
   return (
     <div
@@ -100,7 +104,6 @@ export const MedicationFilterDropdown = (props: MedicationFormDropdownProps) => 
       }}
     >
       <PhotonDropdown
-        actionRef={actionRef}
         data={data()}
         label={props.filterType.charAt(0).toUpperCase() + props.filterType.slice(1).toLowerCase()}
         disabled={!props?.conceptId}

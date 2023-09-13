@@ -14,6 +14,7 @@ const GET_CONCEPTS = gql`
 `;
 
 type MedicationConceptDropdownProps = {
+  conceptId?: string;
   setConceptId: (id: string) => void;
 };
 
@@ -42,6 +43,12 @@ export const MedicationConceptDropdown = (props: MedicationConceptDropdownProps)
     if (filterText().length > 0) {
       setIsLoading(true);
       fetchData();
+    }
+  });
+
+  createEffect(() => {
+    if (!props.conceptId) {
+      setData([]);
     }
   });
 
