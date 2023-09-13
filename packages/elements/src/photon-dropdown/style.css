@@ -18,6 +18,10 @@
   @apply hover:cursor-not-allowed;
 }
 
+.placeholder::part(base) {
+  @apply opacity-75;
+}
+
 .selected::part(base) {
   @apply bg-[#3182CE];
   @apply text-white;

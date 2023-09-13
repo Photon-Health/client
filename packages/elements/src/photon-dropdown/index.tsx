@@ -226,7 +226,8 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
           classList={{
             invalid: props.invalid ?? false,
             input: true,
-            disabled: props.disabled ?? false
+            disabled: props.disabled ?? false,
+            placeholder: !selected() && inputRef.value === ''
           }}
           required={props.required}
           on:sl-input={(e: any) => {

@@ -74,26 +74,16 @@ export const MedicationFilterDropdown = (props: MedicationFormDropdownProps) => 
 
   const medId = createMemo(() => props?.medicationId || props.conceptId);
 
-  createEffect(() => {
-    const fetchData = async () => {
-      const { data } = await client!.apollo.query({
-        query,
-        variables: { medId: medId() }
-      });
-      console.log(
-        'data',
-        data,
-        'key',
-        key,
-        'data[key]',
-        data[key],
-        'id ',
-        props?.medicationId || props.conceptId
-      );
-      setData(data[key] ?? []);
-      setIsLoading(false);
-    };
+  const fetchData = async () => {
+    const { data } = await client!.apollo.query({
+      query,
+      variables: { medId: medId() }
+    });
+    setData(data[key] ?? []);
+    setIsLoading(false);
+  };
 
+  createEffect(() => {
     if (medId() && !filterId()) {
       setIsLoading(true);
       fetchData();

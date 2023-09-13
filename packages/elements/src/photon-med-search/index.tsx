@@ -111,7 +111,7 @@ customElement('photon-med-search', {}, () => {
           setMedicationId={setMedicationId}
         />
       </div>
-      {/* <div class="flex flex-col xs:flex-row gap-4">
+      <div class="flex flex-col xs:flex-row gap-4">
         <MedicationFilterDropdown
           filterType="STRENGTH"
           conceptId={conceptId()}
@@ -126,7 +126,7 @@ customElement('photon-med-search', {}, () => {
           medicationId={medicationId()}
           setMedicationId={setMedicationId}
         />
-      </div> */}
+      </div>
       <hr class="my-8" />
       <p class="font-sans text-gray-700 pb-4">Select a medication:</p>
       <div
