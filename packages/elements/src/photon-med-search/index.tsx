@@ -77,6 +77,7 @@ customElement('photon-med-search', { open: false }, (props: MedSearchProps) => {
     if (!props.open) {
       setConceptId('');
       setMedicationId('');
+      setProducts([]);
     }
   });
 

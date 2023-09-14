@@ -313,7 +313,7 @@ export const AdvancedDrugSearch = ({
   setSelectedProduct
 }: AdvancedDrugSearchProps) => {
   const [filterText, setFilterText] = useState('');
-  const [debouncedFilterText] = useDebounce(filterText, 350);
+  const [debouncedFilterText] = useDebounce(filterText, 300);
   const [conceptId, setConceptId] = useState<string | undefined>();
   const [medId, setMedId] = useState<string | undefined>();
   const [addToCatalog, setAddToCatalog] = useState<boolean>(false);

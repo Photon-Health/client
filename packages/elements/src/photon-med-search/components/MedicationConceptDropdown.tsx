@@ -2,6 +2,7 @@ import { SearchMedication } from '@photonhealth/sdk/dist/types';
 import { createEffect, createSignal } from 'solid-js';
 import { usePhotonClient } from '@photonhealth/components';
 import { gql } from '@apollo/client';
+import { debounce } from '@solid-primitives/scheduled';
 import { PhotonDropdown } from '../../photon-dropdown';
 
 const GET_CONCEPTS = gql`
@@ -24,10 +25,10 @@ export const MedicationConceptDropdown = (props: MedicationConceptDropdownProps)
   const [filterText, setFilterText] = createSignal<string>('');
   const [data, setData] = createSignal<SearchMedication[]>([]);
 
-  const fetchData = async () => {
+  const fetchData = debounce(async (name: string) => {
     const { data } = await client!.apollo.query({
       query: GET_CONCEPTS,
-      variables: { name: filterText() }
+      variables: { name }
     });
 
     setData(
@@ -37,12 +38,12 @@ export const MedicationConceptDropdown = (props: MedicationConceptDropdownProps)
     );
 
     setIsLoading(false);
-  };
+  }, 300);
 
   createEffect(() => {
     if (filterText().length > 0) {
       setIsLoading(true);
-      fetchData();
+      fetchData(filterText());
     }
   });
 

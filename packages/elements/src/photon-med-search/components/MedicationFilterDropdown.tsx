@@ -68,6 +68,7 @@ export const MedicationFilterDropdown = (props: MedicationFormDropdownProps) => 
   createEffect(() => {
     if (props?.conceptId) {
       setFilterId(undefined);
+      setData([]);
     }
   });
 
@@ -86,12 +87,6 @@ export const MedicationFilterDropdown = (props: MedicationFormDropdownProps) => 
     if (medId() && !filterId()) {
       setIsLoading(true);
       fetchData();
-    }
-  });
-
-  createEffect(() => {
-    if (!props.conceptId) {
-      setData([]);
     }
   });
 
