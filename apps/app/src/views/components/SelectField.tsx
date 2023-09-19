@@ -77,7 +77,9 @@ export const SelectField = forwardRef((props: FieldAttributes<any>, ref: any) =>
     }
   };
 
-  const isEqual = (option: any) => option?.value === field.value;
+  const isEqual = (option: any) => {
+    return option?.value === field.value;
+  };
 
   const customNoOptions = NoOptionsMessage(
     () => onExpandedSearchClick(filterText),
@@ -100,7 +102,7 @@ export const SelectField = forwardRef((props: FieldAttributes<any>, ref: any) =>
       placeholder=""
       onChange={onChanged}
       onBlur={setTouched}
-      value={options?.find(isEqual)}
+      value={options?.find(isEqual) || null}
       onInputChange={handleSearch}
       onMenuScrollToBottom={fetchMore}
       blurInputOnSelect={false}
