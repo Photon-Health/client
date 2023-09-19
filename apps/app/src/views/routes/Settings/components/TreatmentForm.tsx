@@ -1,45 +1,41 @@
-import { Button, VStack, Heading, HStack, ModalFooter, useToast } from '@chakra-ui/react';
-import { RefObject } from 'react';
+import { Button, VStack, Heading, HStack, ModalFooter } from '@chakra-ui/react';
+import { RefObject, useState } from 'react';
 import { Formik } from 'formik';
 
 import { AdvancedDrugSearch } from '../../../components/AdvancedDrugSearch';
 
 interface TreatmentFormProps {
   loading: boolean;
-  addToCatalogMutation: Function;
+  addToCatalog: Function;
   catalogId: string;
-  advSearchRef: RefObject<any>;
   submitRef: RefObject<any>;
   isModal?: boolean;
   onClose: () => void;
 }
 
+export type SelectedProduct = {
+  name: string;
+  id: string;
+};
+
 export const TreatmentForm = ({
   loading,
-  addToCatalogMutation,
+  addToCatalog,
   catalogId,
-  advSearchRef,
   submitRef,
-  isModal,
+  isModal = false,
   onClose
 }: TreatmentFormProps) => {
-  const toast = useToast();
+  const [selectedProduct, setSelectedProduct] = useState<SelectedProduct | undefined>();
 
   return (
     <Formik
       initialValues={{}}
       onSubmit={async () => {
-        addToCatalogMutation({
+        addToCatalog({
           variables: {
             catalogId,
-            treatmentId: advSearchRef.current.selected.id
-          },
-          onCompleted: () => {
-            if (isModal) onClose();
-            toast({
-              title: 'Treatment added',
-              status: 'success'
-            });
+            treatmentId: selectedProduct?.id
           }
         });
       }}
@@ -52,11 +48,11 @@ export const TreatmentForm = ({
                 Add Treatment To Catalog
               </Heading>
               <AdvancedDrugSearch
-                submitRef={submitRef}
                 hideAddToCatalog
-                ref={advSearchRef}
                 loading={loading}
                 forceMobile
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
               />
               {isModal ? (
                 <ModalFooter px="0">
@@ -95,8 +91,4 @@ export const TreatmentForm = ({
       }}
     </Formik>
   );
-};
-
-TreatmentForm.defaultProps = {
-  isModal: false
 };
