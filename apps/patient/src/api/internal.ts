@@ -157,30 +157,17 @@ export const triggerDemoNotification = async (
     const data = {
       phoneNumber,
       eventName,
-      pharmacyName: pharmacyName + 'poop',
+      pharmacyName: pharmacyName,
       pharmacyAddress
     };
 
-    // const options = {
-    //   method: 'POST',
-    //   mode: 'no-cors',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify(data)
-    // };
-
     const response = await fetch(url, {
       method: 'POST',
-      // mode: 'no-cors',
       headers: {
-        // 'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
     });
-
-    console.log(response);
 
     if (!response.ok) {
       throw new Error('Unable to trigger demo sms');
