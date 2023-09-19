@@ -149,7 +149,7 @@ export const neutron: {
     accentColor: '#005450'
   },
   // Carbon Health
-  org_Dye8T9VAM1GHjjzS: {
+  org_jzJhkJH2D4kyJD0q: {
     ...defaultSettings,
     logo: 'carbon_health_logo.svg',
     accentColor: '#000000'
@@ -171,5 +171,35 @@ export const neutron: {
     ...defaultSettings,
     logo: 'harbor_health_logo.png',
     accentColor: '#141d45'
+  },
+  // Assure Health
+  org_RPrHGTLipYfPywxf: {
+    ...defaultSettings,
+    logo: 'assure_health_logo.svg',
+    accentColor: '#66cca9'
+  },
+  // Sunrise
+  org_SgWtqCKFzYaDePCf: {
+    ...defaultSettings,
+    logo: 'sunrise_logo.svg',
+    accentColor: '#0057b8'
+  },
+  // Found
+  org_PwzQxriG4OcMD0iq: {
+    ...defaultSettings,
+    logo: 'found_logo.svg',
+    accentColor: '#1c3f28'
+  },
+  // Miga Health
+  org_u3kKBHGj4MFfzOVz: {
+    ...defaultSettings,
+    logo: 'miga_health_logo.svg',
+    accentColor: '#12110c'
+  },
+  // Sesame
+  org_QFoulY6Ornx7dMdw: {
+    ...defaultSettings,
+    logo: 'sesame_logo.jpg',
+    accentColor: '#5224C7'
   }
 };
