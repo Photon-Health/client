@@ -84,7 +84,7 @@ const ConceptSelect = ({ setFilterText, filterText, setMedId }: ConceptSelectPro
   }, [filterText]);
 
   useEffect(() => {
-    if (data && data.medicationConcepts) {
+    if (data?.medicationConcepts) {
       setOptions(
         // create new array as data.medicationConcepts is readonly
         [...(data.medicationConcepts as SearchMedication[])]
@@ -107,7 +107,6 @@ const ConceptSelect = ({ setFilterText, filterText, setMedId }: ConceptSelectPro
         filterOption={() => true}
         placeholder="Search by name"
         onChange={(id: string) => {
-          setMedId(undefined);
           setMedId(id);
         }}
         isLoading={loading}
