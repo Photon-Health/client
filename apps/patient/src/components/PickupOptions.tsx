@@ -10,7 +10,6 @@ import {
 
 import { PharmacyCard } from './PharmacyCard';
 import { text as t } from '../utils/text';
-import { FEATURED_PHARMACIES } from '../data/featuredPharmacies';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 
 interface PickupOptionsProps {
@@ -66,7 +65,6 @@ export const PickupOptions = ({
             <PharmacyCard
               pharmacy={pharmacy}
               preferred={pharmacy.id === preferredPharmacy}
-              goodService={FEATURED_PHARMACIES.includes(pharmacy.id)}
               savingPreferred={savingPreferred}
               selected={selectedId === pharmacy.id}
               onSelect={() => handleSelect(pharmacy.id)}

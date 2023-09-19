@@ -27,7 +27,6 @@ import { BrandedOptions } from '../components/BrandedOptions';
 import { useOrderContext } from './Main';
 import { getSettings } from '@client/settings';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { FEATURED_PHARMACIES } from '../data/featuredPharmacies';
 import {
   geocode,
   getPharmacies,
@@ -42,19 +41,7 @@ export const UNOPEN_BUSINESS_STATUS_MAP = {
   CLOSED_TEMPORARILY: 'Closed Temporarily',
   CLOSED_PERMANENTLY: 'Closed Permanently'
 };
-const FEATURE_INDIES_WITHIN_RADIUS = 3; // miles
-const FEATURED_PHARMACIES_LIMIT = 2;
 const MAX_ENRICHMENT = 5; // Maximum number of pharmacies to enrich at a time
-
-const sortIndiePharmaciesFirst = (list: EnrichedPharmacy[], distance: number, limit: number) => {
-  const featuredPharmacies = list
-    .filter((p: EnrichedPharmacy) => FEATURED_PHARMACIES.includes(p.id) && p.distance < distance)
-    .slice(0, limit);
-  const otherPharmacies = list.filter(
-    (p: EnrichedPharmacy) => !featuredPharmacies.some((f) => f.id === p.id)
-  );
-  return featuredPharmacies.concat(otherPharmacies);
-};
 
 export const Pharmacy = () => {
   const { order, setOrder } = useOrderContext();
@@ -183,19 +170,12 @@ export const Pharmacy = () => {
       return;
     }
 
-    // Sort initial list of pharmacies
-    const newPharmacies: EnrichedPharmacy[] = sortIndiePharmaciesFirst(
-      pharmaciesResult,
-      FEATURE_INDIES_WITHIN_RADIUS,
-      FEATURED_PHARMACIES_LIMIT
-    );
-
     // Save in case we fetched more than we initially show
-    setInitialPharmacies(newPharmacies);
+    setInitialPharmacies(pharmaciesResult);
 
     // We only show add a few at a time, so just enrich the first group of pharmacies
     const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
-      newPharmacies.slice(0, MAX_ENRICHMENT).map((p) => enrichPharmacy(p, true))
+      pharmaciesResult.slice(0, MAX_ENRICHMENT).map((p) => enrichPharmacy(p, true))
     );
     setPharmacyOptions(enrichedPharmacies);
 
