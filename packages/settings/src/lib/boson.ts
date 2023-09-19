@@ -40,8 +40,8 @@ export const boson: {
   // Test Telehealth (us)
   org_KzSVZBQixLRkqj5d: {
     ...defaultSettings,
-    logo: 'sesame_logo.jpg',
-    accentColor: '#5224C7',
+    logo: 'photon',
+    accentColor: '#b35724',
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
   },
