@@ -319,10 +319,10 @@ export const Pharmacy = () => {
 
           // Send sms to demo participant
           await triggerDemoNotification(
-            '5416029104',
-            'SYSTEM_ORDER_PLACED',
+            '5416029101',
+            'photon:order:placed',
             selectedPharmacy.name,
-            selectedPharmacy.address
+            formatAddress(selectedPharmacy.address)
           );
 
           navigate(`/status?demo=true`);

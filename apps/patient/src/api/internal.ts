@@ -146,9 +146,9 @@ export const setPreferredPharmacy = async (patientId: string, pharmacyId: string
 export const triggerDemoNotification = async (
   phoneNumber: string,
   eventName:
-    | 'SYSTEM_ORDER_PLACED'
-    | 'SYSTEM_ORDER_FULFILLMENT_RECEIVED'
-    | 'SYSTEM_ORDER_FULFILLMENT_READY',
+    | 'photon:order:placed'
+    | 'photon:order_fulfillment:received'
+    | 'photon:order_fulfillment:ready',
   pharmacyName?: string,
   pharmacyAddress?: string
 ): Promise<boolean> => {
@@ -157,19 +157,30 @@ export const triggerDemoNotification = async (
     const data = {
       phoneNumber,
       eventName,
-      pharmacyName,
+      pharmacyName: pharmacyName + 'poop',
       pharmacyAddress
     };
 
-    const options = {
+    // const options = {
+    //   method: 'POST',
+    //   mode: 'no-cors',
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify(data)
+    // };
+
+    const response = await fetch(url, {
       method: 'POST',
+      // mode: 'no-cors',
       headers: {
+        // 'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
-    };
+    });
 
-    const response = await fetch(url, options);
+    console.log(response);
 
     if (!response.ok) {
       throw new Error('Unable to trigger demo sms');
@@ -177,6 +188,6 @@ export const triggerDemoNotification = async (
 
     return true;
   } catch (error) {
-    throw new Error('Unable to trigger demo sms');
+    throw new Error(error);
   }
 };
