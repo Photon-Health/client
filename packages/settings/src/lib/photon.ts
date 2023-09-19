@@ -123,7 +123,7 @@ export const photon: {
     logo: 'piction_health_logo.png',
     accentColor: '#3377e2'
   },
-  // Xyon Health
+  // Shapiro Medical (Xyon Health)
   org_Y0EPcd3p5eqG4iZs: {
     ...defaultSettings,
     pickUp: false,
@@ -133,6 +133,14 @@ export const photon: {
   },
   // Osei Tutu (Xyon Health)
   org_WeSplxuyqxdIph1f: {
+    ...defaultSettings,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_ID],
+    sendToPatient: false
+  },
+  // Fadeyi Derm (Xyon Health)
+  org_sWEo459pSKLt6wZ5: {
     ...defaultSettings,
     pickUp: false,
     mailOrder: true,
