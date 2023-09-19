@@ -195,5 +195,11 @@ export const neutron: {
     ...defaultSettings,
     logo: 'miga_health_logo.svg',
     accentColor: '#12110c'
+  },
+  // Sesame
+  org_QFoulY6Ornx7dMdw: {
+    ...defaultSettings,
+    logo: 'sesame_logo.jpg',
+    accentColor: '#5224C7'
   }
 };
