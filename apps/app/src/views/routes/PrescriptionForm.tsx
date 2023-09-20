@@ -15,6 +15,7 @@ export const PrescriptionForm = () => {
   const patientId = params.get('patientId') || '';
   const templateIds = params.get('templateIds') || '';
   const prescriptionIds = params.get('prescriptionIds') || '';
+  const weight = params.get('weight') || '';
 
   const navigate = useNavigate();
   const onClose = () => {
@@ -48,7 +49,7 @@ export const PrescriptionForm = () => {
       ref.current.patientId = patientId;
     }
   }, [ref.current, patientId]);
-
+  console.log(weight);
   return (
     <div
       style={{

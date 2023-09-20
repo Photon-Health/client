@@ -4,12 +4,11 @@ import { format } from 'date-fns';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
 import { DoseCalculator } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/button/button';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-import { createSignal, Show } from 'solid-js';
+import { createSignal, Show, onMount } from 'solid-js';
 import repopulateForm from '../util/repopulateForm';
 import clearForm from '../util/clearForm';
 
@@ -27,10 +26,13 @@ const validators = {
   effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
 };
 
+const patientWeight = (weight: number) => `Patient weight: ${weight} lbs`;
+
 export const AddPrescriptionCard = (props: {
   hideAddToTemplates: boolean;
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
+  weight: number;
 }) => {
   let medSearchRef: any;
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
@@ -45,6 +47,15 @@ export const AddPrescriptionCard = (props: {
       validator: v
     });
   }
+
+  onMount(() => {
+    if (props.weight) {
+      props.actions.updateFormValue({
+        key: 'notes',
+        value: patientWeight(props.weight)
+      });
+    }
+  });
 
   return (
     <photon-card ref={ref} title={'Add Prescription'}>
@@ -315,7 +326,10 @@ export const AddPrescriptionCard = (props: {
                     'notes'
                   ]);
                   setOffCatalog(undefined);
-                  clearForm(props.actions);
+                  clearForm(
+                    props.actions,
+                    props.weight ? { notes: patientWeight(props.weight) } : undefined
+                  );
                 }
               }}
             >
