@@ -199,15 +199,15 @@ export const Pharmacy = () => {
     setLoadingPharmacies(true);
 
     if (isDemo) {
-      const newOps = demoPharmacies.slice(
+      const newPharmacyOptions = demoPharmacies.slice(
         pharmacyOptions.length,
         pharmacyOptions.length + MAX_ENRICHMENT
       );
-      const totalOps = [...pharmacyOptions, ...newOps];
-      setPharmacyOptions(totalOps);
+      const totalPharmacyOptions = [...pharmacyOptions, ...newPharmacyOptions];
+      setPharmacyOptions(totalPharmacyOptions);
       setLoadingPharmacies(false);
 
-      if (totalOps.length === demoPharmacies.length) {
+      if (totalPharmacyOptions.length === demoPharmacies.length) {
         setShowingAllPharmacies(true);
       }
 
