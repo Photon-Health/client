@@ -157,7 +157,7 @@ export const triggerDemoNotification = async (
     const data = {
       phoneNumber,
       eventName,
-      pharmacyName: pharmacyName,
+      pharmacyName,
       pharmacyAddress
     };
 
