@@ -61,7 +61,7 @@ export const Status = () => {
   const handleMarkOrderAsPickedUp = async () => {
     setSubmitting(true);
 
-    // Demo
+    // Show cta modal for demo
     if (isDemo) {
       setTimeout(() => {
         setSuccessfullySubmitted(true);
@@ -71,6 +71,7 @@ export const Status = () => {
         }, 1000);
         setSubmitting(false);
       }, 1000);
+
       return;
     }
 
