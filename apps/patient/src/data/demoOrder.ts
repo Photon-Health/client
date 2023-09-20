@@ -53,7 +53,7 @@ export const demoOrder: any = {
   patient: {
     id: 'pat_01H7KBFG7BQRAYQF735EWMK4CX',
     name: {
-      full: 'Alex Demo'
+      full: 'Joseph Hewitt, MD'
     }
   },
   fulfillment: null,
