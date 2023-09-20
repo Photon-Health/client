@@ -6,7 +6,6 @@ declare module 'solid-js' {
       'photon-login': unknown;
       'photon-button': unknown;
       'photon-auth-button': unknown;
-      'photon-form': unknown;
       'photon-patient-select': unknown;
       'photon-auth-wrapper': unknown;
       'photon-text-input': unknown;

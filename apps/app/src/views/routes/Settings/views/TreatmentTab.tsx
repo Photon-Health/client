@@ -9,17 +9,20 @@ import {
   ModalContent,
   VStack,
   useBreakpointValue,
-  useBoolean
+  useBoolean,
+  useToast
 } from '@chakra-ui/react';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { usePhoton } from '@photonhealth/react';
 import { useDebounce } from 'use-debounce';
+import { useMutation } from '@apollo/client';
 
 import { CATALOG_TREATMENTS_FIELDS } from '../../../../model/fragments';
 import { SplitLayout } from '../../../components/SplitLayout';
 import { TreatmentTable } from '../components/TreatmentTable';
 import { TreatmentForm } from '../components/TreatmentForm';
 import { TreatmentActions } from '../components/TreatmentActions';
+import { ADD_TO_CATALOG } from '../../../../mutations';
 
 interface MedViewProps {
   name: string;
@@ -48,9 +51,10 @@ const renderTreatmentRow = (
 };
 
 export const TreatmentTab = (props: any) => {
+  const toast = useToast();
   const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
   const { organization } = props;
-  const { getCatalog, getCatalogs, addToCatalog } = usePhoton();
+  const { getCatalog, getCatalogs } = usePhoton();
   const catalogs = getCatalogs();
   const catalog = getCatalog({
     id: catalogs.catalogs[0]?.id || '',
@@ -58,17 +62,9 @@ export const TreatmentTab = (props: any) => {
     defer: true
   });
   const [catalogId, setCatalogId] = useState('');
-
-  const [addToCatalogMutation, { loading, error }] = addToCatalog({
-    refetchQueries: ['getCatalog'],
-    awaitRefetchQueries: true,
-    refetchArgs: {
-      id: catalogId,
-      fragment: {
-        CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
-      }
-    }
-  });
+  const [showModal, setShowModal] = useBoolean();
+  // use this to reset the form after adding a treatment
+  const [resetKey, setResetKey] = useState(0);
 
   const submitRef: any = useRef();
 
@@ -78,11 +74,30 @@ export const TreatmentTab = (props: any) => {
   const [debouncedFilterText] = useDebounce(filterText, 250);
   const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const advSearchRef: any = useRef();
   const pageSize = 10;
   const [childLoading, setChildLoading] = useState(false);
 
-  const [showModal, setShowModal] = useBoolean();
+  const [addToCatalog, { loading, error }] = useMutation(ADD_TO_CATALOG, {
+    onCompleted: () => {
+      setShowModal.off();
+      setResetKey(resetKey + 1);
+      toast({
+        title: 'Treatment added',
+        status: 'success'
+      });
+
+      // TODO replace catalog SDK query
+      // also setting timeout for now to allow for the mutation to complete, will have a better solution when we replace the SDK query
+      setTimeout(() => {
+        catalog.query!({
+          id: catalogs.catalogs[0].id,
+          fragment: {
+            CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
+          }
+        });
+      }, 500);
+    }
+  });
 
   useEffect(() => {
     if (!catalogs.loading && catalogs.catalogs.length > 0) {
@@ -153,13 +168,13 @@ export const TreatmentTab = (props: any) => {
           <ModalCloseButton />
           <ModalBody p={8}>
             <TreatmentForm
+              key={resetKey}
               loading={loading}
               catalogId={catalogId}
-              addToCatalogMutation={addToCatalogMutation}
-              submitRef={submitRef}
-              advSearchRef={advSearchRef}
-              isModal
+              addToCatalog={addToCatalog}
               onClose={setShowModal.off}
+              isModal
+              submitRef={submitRef}
             />
           </ModalBody>
         </ModalContent>
@@ -188,11 +203,11 @@ export const TreatmentTab = (props: any) => {
         />
         {!isMobileAndTablet ? (
           <TreatmentForm
+            key={resetKey}
             loading={loading}
             catalogId={catalogId}
-            addToCatalogMutation={addToCatalogMutation}
+            addToCatalog={addToCatalog}
             submitRef={submitRef}
-            advSearchRef={advSearchRef}
             onClose={() => {}}
           />
         ) : null}
