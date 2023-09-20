@@ -307,7 +307,7 @@ export const Pharmacy = () => {
     if (isDemo) {
       setTimeout(() => {
         setSuccessfullySubmitted(true);
-        setTimeout(async () => {
+        setTimeout(() => {
           setShowFooter(false);
 
           // Store selected pharmacy for smooth transition to /status
@@ -317,8 +317,8 @@ export const Pharmacy = () => {
             pharmacy: selectedPharmacy
           });
 
-          // Send sms to demo participant
-          await triggerDemoNotification(
+          // Send order placed sms to demo participant
+          triggerDemoNotification(
             '5416029101',
             'photon:order:placed',
             selectedPharmacy.name,
@@ -443,7 +443,9 @@ export const Pharmacy = () => {
 
   const patientAddressInAustinTX =
     order?.address?.city === 'Austin' && order?.address?.state === 'TX';
-  const enableCourier = searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier; // Courier limited to MoPed in Austin, TX
+  const enableCourier =
+    !isDemo && searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier; // Courier limited to MoPed in Austin, TX
+  const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
   const heading = isReroute ? t.pharmacy.heading.reroute : t.pharmacy.heading.original;
   const subheading = isReroute
     ? t.pharmacy.subheading.reroute(order.pharmacy.name)
@@ -502,7 +504,7 @@ export const Pharmacy = () => {
                   patientAddress={formatAddress(order?.address)}
                 />
               ) : null}
-              {orgSettings.mailOrderNavigate ? (
+              {enableMailOrder ? (
                 <BrandedOptions
                   type={types.FulfillmentType.MailOrder}
                   options={orgSettings.mailOrderNavigateProviders}
@@ -523,7 +525,7 @@ export const Pharmacy = () => {
                 handleSetPreferred={handleSetPreferredPharmacy}
                 loadingMore={loadingPharmacies}
                 showingAllPharmacies={showingAllPharmacies}
-                courierEnabled={enableCourier || orgSettings.mailOrderNavigate}
+                courierEnabled={enableCourier || enableMailOrder}
               />
             </VStack>
           ) : null}

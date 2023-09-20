@@ -21,7 +21,7 @@ import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import * as TOAST_CONFIG from '../configs/toast';
-import { markOrderAsPickedUp } from '../api';
+import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
 import { getSettings } from '@client/settings';
 import { DemoCtaModal } from '../components/DemoCtaModal';
 
@@ -131,29 +131,41 @@ export const Status = () => {
 
   useEffect(() => {
     if (isDemo) {
-      setTimeout(() => {
-        // trigger sms
-        // pharmacy is filling
-        // pharmacy name + address
+      setTimeout(async () => {
+        // Send order received sms to demo participant
+        await triggerDemoNotification(
+          '5416029101',
+          'photon:order_fulfillment:received',
+          pharmacy.name,
+          formatAddress(pharmacy.address)
+        );
+
         setOrder({
           ...order,
           fulfillment: {
             state: 'RECEIVED'
           }
         });
+
         setShowFooter(true);
-        setTimeout(() => {
-          // trigger sms
-          // should be ready
-          // pharmacy name
+
+        setTimeout(async () => {
+          // Send ready sms
+          await triggerDemoNotification(
+            '5416029101',
+            'photon:order_fulfillment:ready',
+            pharmacy.name,
+            formatAddress(pharmacy.address)
+          );
+
           setOrder({
             ...order,
             fulfillment: {
               state: 'READY'
             }
           });
-        }, 2000);
-      }, 2000);
+        }, 3000);
+      }, 3000);
     }
   }, []);
 
