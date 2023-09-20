@@ -110,7 +110,7 @@ export const Pharmacy = () => {
   };
 
   const initializeDemo = () => {
-    // Set geocode data
+    // Mock geocode data
     setLocation('201 N 8th St, Brooklyn, NY 11211');
     setLatitude(40.717484);
     setLongitude(-73.955662397568);
