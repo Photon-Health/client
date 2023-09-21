@@ -1,4 +1,7 @@
-const clearForm = (actions: Record<string, (...args: any) => any>) => {
+const clearForm = (
+  actions: Record<string, (...args: any) => any>,
+  overrides?: { notes?: string }
+) => {
   actions.updateFormValue({
     key: 'treatment',
     value: undefined
@@ -29,7 +32,7 @@ const clearForm = (actions: Record<string, (...args: any) => any>) => {
   });
   actions.updateFormValue({
     key: 'notes',
-    value: ''
+    value: overrides?.notes ?? ''
   });
 };
 

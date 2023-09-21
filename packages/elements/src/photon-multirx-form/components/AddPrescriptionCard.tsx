@@ -326,7 +326,10 @@ export const AddPrescriptionCard = (props: {
                     'notes'
                   ]);
                   setOffCatalog(undefined);
-                  clearForm(props.actions);
+                  clearForm(
+                    props.actions,
+                    props.weight ? { notes: patientWeight(props.weight) } : undefined
+                  );
                 }
               }}
             >
