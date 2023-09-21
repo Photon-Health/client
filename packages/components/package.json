@@ -29,7 +29,7 @@
     "@tailwindcss/forms": "^0.5.3",
     "@tailwindcss/typography": "^0.5.9",
     "clsx": "^1.2.1",
-    "graphql": "^16.6.0",
+    "graphql": "^16.8.1",
     "graphql-tag": "^2.12.6",
     "jwt-decode": "^3.1.2",
     "solid-heroicons": "^3.1.1",
