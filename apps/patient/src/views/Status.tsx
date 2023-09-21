@@ -41,6 +41,7 @@ export const Status = () => {
   const token = searchParams.get('token');
   const type = searchParams.get('type');
   const isDemo = searchParams.get('demo');
+  const phone = searchParams.get('phone');
 
   const [showFooter, setShowFooter] = useState<boolean>(
     order?.fulfillment?.state === 'RECEIVED' &&
@@ -135,7 +136,7 @@ export const Status = () => {
       setTimeout(async () => {
         // Send order received sms to demo participant
         await triggerDemoNotification(
-          '5416029101',
+          phone,
           'photon:order_fulfillment:received',
           pharmacy.name,
           formatAddress(pharmacy.address)
@@ -153,7 +154,7 @@ export const Status = () => {
         setTimeout(async () => {
           // Send ready sms
           await triggerDemoNotification(
-            '5416029101',
+            phone,
             'photon:order_fulfillment:ready',
             pharmacy.name,
             formatAddress(pharmacy.address)

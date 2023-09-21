@@ -23,9 +23,3 @@ export const REROUTE_ORDER = gql`
     rerouteOrder(orderId: $orderId, pharmacyId: $pharmacyId, patientId: $patientId)
   }
 `;
-
-export const TRIGGER_DEMO_NOTIFICATION = gql`
-  mutation SendStpDemoNotification($orderId: ID!, $pharmacyId: String, $patientId: String) {
-    sendStpDemoNotification(orderId: $orderId, pharmacyId: $pharmacyId, patientId: $patientId)
-  }
-`;
