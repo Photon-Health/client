@@ -44,7 +44,8 @@ customElement(
     mailOrderIds: undefined,
     pharmacyId: undefined,
     loading: false,
-    address: undefined
+    address: undefined,
+    weight: undefined
   },
   (
     props: {
@@ -68,6 +69,7 @@ customElement(
         street2?: string;
         country?: string;
       };
+      weight?: number;
     },
     options
   ) => {
@@ -322,6 +324,7 @@ customElement(
                     hideAddToTemplates={props.hideTemplates}
                     actions={actions}
                     store={store}
+                    weight={props.weight}
                   />
                 </div>
               </Show>
