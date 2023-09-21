@@ -26,13 +26,15 @@ customElement(
     hideTemplates: false,
     patientId: undefined,
     templateIds: undefined,
-    prescriptionIds: undefined
+    prescriptionIds: undefined,
+    weight: undefined
   },
   (props: {
     hideTemplates?: boolean;
     patientId?: string;
     templateIds?: string;
     prescriptionIds?: string;
+    weight?: number;
   }) => {
     let ref: any;
     const client = usePhoton();
@@ -282,6 +284,7 @@ customElement(
                   patient-id={props.patientId}
                   template-ids={props.templateIds}
                   prescription-ids={props.prescriptionIds}
+                  weight={props.weight}
                   on:photon-form-validate={(e: any) => {
                     setCanSubmit(e.detail.canSubmit);
                     setActions(e.detail.actions);

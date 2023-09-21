@@ -57,6 +57,7 @@ export const Pharmacy = () => {
   const token = searchParams.get('token');
   const isReroute = searchParams.get('reroute');
   const isDemo = searchParams.get('demo');
+  const phone = searchParams.get('phone');
 
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
@@ -299,13 +300,13 @@ export const Pharmacy = () => {
 
           // Send order placed sms to demo participant
           triggerDemoNotification(
-            '5416029101',
+            phone,
             'photon:order:placed',
             selectedPharmacy.name,
             formatAddress(selectedPharmacy.address)
           );
 
-          navigate(`/status?demo=true`);
+          navigate(`/status?demo=true&phone=${phone}`);
         }, 1000);
         setSubmitting(false);
       }, 1000);

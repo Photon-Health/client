@@ -1,4 +1,4 @@
-import { createMemo, createSignal } from 'solid-js';
+import { createMemo, createSignal, onMount } from 'solid-js';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
 import Input from '../../particles/Input';
@@ -25,6 +25,7 @@ export interface DoseCalculatorProps {
   open: boolean;
   onClose: () => void;
   medicationName?: string;
+  weight?: number;
   setAutocompleteValues: (data: {
     days: number;
     liquidDose: number;
@@ -50,6 +51,12 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
 
   const [daysSupply, setDaysSupply] = createSignal<number>(1);
   const [dosesPerDay, setDosesPerDay] = createSignal<number>(1);
+
+  onMount(() => {
+    if (props.weight) {
+      setWeight(props.weight || 0);
+    }
+  });
 
   const dose = createMemo(() => {
     const factor = conversionFactors.weight[weightUnit()];
