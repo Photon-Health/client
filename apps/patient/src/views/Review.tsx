@@ -33,11 +33,14 @@ export const Review = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const isDemo = searchParams.get('demo');
+  const phone = searchParams.get('phone');
 
   const { organization, patient, fills } = order;
 
   const handleCtaClick = () => {
-    const toUrl = isDemo ? `/pharmacy?demo=true` : `/pharmacy?orderId=${order.id}&token=${token}`;
+    const toUrl = isDemo
+      ? `/pharmacy?demo=true&phone=${phone}`
+      : `/pharmacy?orderId=${order.id}&token=${token}`;
     navigate(toUrl);
   };
 
