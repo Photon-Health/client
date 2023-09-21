@@ -27,14 +27,15 @@ import { BrandedOptions } from '../components/BrandedOptions';
 import { useOrderContext } from './Main';
 import { getSettings } from '@client/settings';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { FEATURED_PHARMACIES } from '../data/featuredPharmacies';
 import {
   geocode,
   getPharmacies,
   rerouteOrder,
   selectOrderPharmacy,
-  setPreferredPharmacy
+  setPreferredPharmacy,
+  triggerDemoNotification
 } from '../api';
+import { demoPharmacies } from '../data/demoPharmacies';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
@@ -42,19 +43,7 @@ export const UNOPEN_BUSINESS_STATUS_MAP = {
   CLOSED_TEMPORARILY: 'Closed Temporarily',
   CLOSED_PERMANENTLY: 'Closed Permanently'
 };
-const FEATURE_INDIES_WITHIN_RADIUS = 3; // miles
-const FEATURED_PHARMACIES_LIMIT = 2;
 const MAX_ENRICHMENT = 5; // Maximum number of pharmacies to enrich at a time
-
-const sortIndiePharmaciesFirst = (list: EnrichedPharmacy[], distance: number, limit: number) => {
-  const featuredPharmacies = list
-    .filter((p: EnrichedPharmacy) => FEATURED_PHARMACIES.includes(p.id) && p.distance < distance)
-    .slice(0, limit);
-  const otherPharmacies = list.filter(
-    (p: EnrichedPharmacy) => !featuredPharmacies.some((f) => f.id === p.id)
-  );
-  return featuredPharmacies.concat(otherPharmacies);
-};
 
 export const Pharmacy = () => {
   const { order, setOrder } = useOrderContext();
@@ -67,6 +56,7 @@ export const Pharmacy = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const isReroute = searchParams.get('reroute');
+  const isDemo = searchParams.get('demo');
 
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
@@ -117,6 +107,16 @@ export const Pharmacy = () => {
     }
 
     setLocationModalOpen(false);
+  };
+
+  const initializeDemo = () => {
+    // Mock geocode data
+    setLocation('201 N 8th St, Brooklyn, NY 11211');
+    setLatitude(40.717484);
+    setLongitude(-73.955662397568);
+
+    setInitialPharmacies(demoPharmacies);
+    setPharmacyOptions(demoPharmacies.slice(0, 5));
   };
 
   const initialize = async () => {
@@ -183,19 +183,12 @@ export const Pharmacy = () => {
       return;
     }
 
-    // Sort initial list of pharmacies
-    const newPharmacies: EnrichedPharmacy[] = sortIndiePharmaciesFirst(
-      pharmaciesResult,
-      FEATURE_INDIES_WITHIN_RADIUS,
-      FEATURED_PHARMACIES_LIMIT
-    );
-
     // Save in case we fetched more than we initially show
-    setInitialPharmacies(newPharmacies);
+    setInitialPharmacies(pharmaciesResult);
 
     // We only show add a few at a time, so just enrich the first group of pharmacies
     const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
-      newPharmacies.slice(0, MAX_ENRICHMENT).map((p) => enrichPharmacy(p, true))
+      pharmaciesResult.slice(0, MAX_ENRICHMENT).map((p) => enrichPharmacy(p, true))
     );
     setPharmacyOptions(enrichedPharmacies);
 
@@ -204,6 +197,22 @@ export const Pharmacy = () => {
 
   const handleShowMore = async () => {
     setLoadingPharmacies(true);
+
+    if (isDemo) {
+      const newPharmacyOptions = demoPharmacies.slice(
+        pharmacyOptions.length,
+        pharmacyOptions.length + MAX_ENRICHMENT
+      );
+      const totalPharmacyOptions = [...pharmacyOptions, ...newPharmacyOptions];
+      setPharmacyOptions(totalPharmacyOptions);
+      setLoadingPharmacies(false);
+
+      if (totalPharmacyOptions.length === demoPharmacies.length) {
+        setShowingAllPharmacies(true);
+      }
+
+      return;
+    }
 
     /**
      * Initially we fetched a list of pharmacies from our db, if some
@@ -275,6 +284,35 @@ export const Pharmacy = () => {
 
     setSubmitting(true);
 
+    if (isDemo) {
+      setTimeout(() => {
+        setSuccessfullySubmitted(true);
+        setTimeout(() => {
+          setShowFooter(false);
+
+          // Store selected pharmacy for smooth transition to /status
+          const selectedPharmacy = pharmacyOptions.find((p) => p.id === selectedId);
+          setOrder({
+            ...order,
+            pharmacy: selectedPharmacy
+          });
+
+          // Send order placed sms to demo participant
+          triggerDemoNotification(
+            '5416029101',
+            'photon:order:placed',
+            selectedPharmacy.name,
+            formatAddress(selectedPharmacy.address)
+          );
+
+          navigate(`/status?demo=true`);
+        }, 1000);
+        setSubmitting(false);
+      }, 1000);
+
+      return;
+    }
+
     try {
       const result = isReroute
         ? await rerouteOrder(order.id, selectedId, order.patient.id)
@@ -329,6 +367,19 @@ export const Pharmacy = () => {
 
     setSavingPreferred(true);
 
+    // Handle stp demo
+    if (isDemo) {
+      setTimeout(() => {
+        setPreferredPharmacyId(pharmacyId);
+        toast({
+          title: 'Set preferred pharmacy',
+          ...TOAST_CONFIG.SUCCESS
+        });
+        setSavingPreferred(false);
+      }, 750);
+      return;
+    }
+
     try {
       const result: boolean = await setPreferredPharmacy(order.patient.id, pharmacyId);
       setTimeout(() => {
@@ -361,14 +412,20 @@ export const Pharmacy = () => {
   };
 
   useEffect(() => {
-    if (location) {
-      initialize();
+    if (isDemo) {
+      initializeDemo();
+    } else {
+      if (location) {
+        initialize();
+      }
     }
   }, [location]);
 
   const patientAddressInAustinTX =
     order?.address?.city === 'Austin' && order?.address?.state === 'TX';
-  const enableCourier = searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier; // Courier limited to MoPed in Austin, TX
+  const enableCourier =
+    !isDemo && searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier; // Courier limited to MoPed in Austin, TX
+  const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
   const heading = isReroute ? t.pharmacy.heading.reroute : t.pharmacy.heading.original;
   const subheading = isReroute
     ? t.pharmacy.subheading.reroute(order.pharmacy.name)
@@ -427,7 +484,7 @@ export const Pharmacy = () => {
                   patientAddress={formatAddress(order?.address)}
                 />
               ) : null}
-              {orgSettings.mailOrderNavigate ? (
+              {enableMailOrder ? (
                 <BrandedOptions
                   type={types.FulfillmentType.MailOrder}
                   options={orgSettings.mailOrderNavigateProviders}
@@ -448,7 +505,7 @@ export const Pharmacy = () => {
                 handleSetPreferred={handleSetPreferredPharmacy}
                 loadingMore={loadingPharmacies}
                 showingAllPharmacies={showingAllPharmacies}
-                courierEnabled={enableCourier || orgSettings.mailOrderNavigate}
+                courierEnabled={enableCourier || enableMailOrder}
               />
             </VStack>
           ) : null}
