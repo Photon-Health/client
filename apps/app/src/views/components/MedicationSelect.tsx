@@ -113,13 +113,6 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
     }
   }, [catalog.loading, catalogId]);
 
-  const groupedOptions = [
-    {
-      label: 'Catalog',
-      options: treatmentOptions
-    }
-  ];
-
   return (
     <SelectField
       {...props}
@@ -131,7 +124,7 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
       expandedSearchNoResultsLabel={`No matches for '${filterText}' in catalog`}
       onExpandedSearchClick={onNotInCatalog}
       isLoading={catalog.loading && catalogId != null}
-      options={groupedOptions}
+      options={treatmentOptions}
       components={{ Option, GroupHeading }}
       isClearable
     />
