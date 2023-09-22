@@ -1,9 +1,9 @@
 import { message } from '../../validators';
 import { string, any, record } from 'superstruct';
 import { createSignal, onMount, Show, createEffect } from 'solid-js';
+import { PatientInfo } from '@photonhealth/components';
 import { PatientStore } from '../../stores/patient';
 import { PhotonClientStore } from '../../store';
-import { formatDate } from '../../utils';
 
 const patientValidator = message(record(string(), any()), 'Please select a patient...');
 
@@ -65,34 +65,25 @@ export const PatientCard = (props: {
   });
 
   return (
-    <photon-card>
-      <div class="flex flex-col gap-3">
-        <p class="font-sans text-l font-medium">
-          {props?.patientId ? 'Patient' : 'Select Patient'}
-        </p>
-        {/* Show Dropdown when no patientId is passed */}
-        <Show when={!props?.patientId}>
-          <photon-patient-select
-            invalid={props.store['patient']?.error ?? false}
-            help-text={props.store['patient']?.error}
-            on:photon-patient-selected={updatePatient}
-            selected={props.store['patient']?.value?.id ?? props.patientId}
-            sdk={props.client!.getSDK()}
-          />
-        </Show>
-        {/* Show Patient Name when patientId is passed */}
-        <Show when={props?.patientId}>
-          <Show
-            when={store?.selectedPatient?.data?.id}
-            fallback={<sl-spinner style={{ 'font-size': '1rem' }} />}
-          >
-            <p class="font-sans text-gray-700">
-              {store?.selectedPatient?.data?.name?.full},{' '}
-              {formatDate(store?.selectedPatient?.data?.dateOfBirth || '')}
+    <div class="gap-8">
+      <Show when={!props?.patientId}>
+        <photon-card>
+          <div class="flex flex-col gap-3">
+            <p class="font-sans text-l font-medium">
+              {props?.patientId ? 'Patient' : 'Select Patient'}
             </p>
-          </Show>
-        </Show>
-
+            {/* Show Dropdown when no patientId is passed */}
+            <photon-patient-select
+              invalid={props.store['patient']?.error ?? false}
+              help-text={props.store['patient']?.error}
+              on:photon-patient-selected={updatePatient}
+              selected={props.store['patient']?.value?.id ?? props.patientId}
+              sdk={props.client!.getSDK()}
+            />
+          </div>
+        </photon-card>
+      </Show>
+      <photon-card>
         <Show when={props.store['patient']?.value?.id && props.enableOrder && !props.hideAddress}>
           <photon-patient-dialog
             open={dialogOpen()}
@@ -101,52 +92,9 @@ export const PatientCard = (props: {
             }}
             patient-id={props.store['patient'].value.id}
           />
-          <Show when={props.store['patient']?.value}>
-            <p class="font-sans text-sm font-medium">Patient Address</p>
-            <Show when={props.store['patient']!.value.address}>
-              <div class="flex flex-col font-sans text-gray-700">
-                <p>{props.store['patient']!.value.address.street1}</p>
-                {props.store['patient']!.value.address.street2 ? (
-                  <p>{props.store['patient']!.value.address.street2}</p>
-                ) : null}
-                <div class="flex flex-row gap-1">
-                  <div class="flex flex-row">
-                    <p>{props.store['patient']!.value.address.city},</p>
-                    <p>{props.store['patient']!.value.address.state}</p>
-                  </div>
-                  <p>{props.store['patient']!.value.address.postalCode}</p>
-                </div>
-              </div>
-            </Show>
-            <Show when={!props.store['patient']!.value.address}>
-              <p
-                class="italic font-sans text-gray-500"
-                classList={{
-                  'p-2': props.store['address']!.error,
-                  'border-red-500': props.store['address']!.error,
-                  'border-2': props.store['address']!.error,
-                  rounded: props.store['address']!.error
-                }}
-              >
-                Please edit patient and add address
-              </p>
-              <Show when={props.store['address'].error}>
-                <p class="font-sans text-red-500 text-sm">{props.store['address'].error}</p>
-              </Show>
-            </Show>
-          </Show>
-          <photon-button
-            class="self-end"
-            variant="outline"
-            on:photon-clicked={() => {
-              setDialogOpen(false);
-              setDialogOpen(true);
-            }}
-          >
-            Edit Patient
-          </photon-button>
+          <PatientInfo patientId={props.patientId!} />
         </Show>
-      </div>
-    </photon-card>
+      </photon-card>
+    </div>
   );
 };
