@@ -66,7 +66,7 @@ export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
             <Link
               fontSize="sm"
               isExternal
-              href="https://photon.health"
+              href="https://www.photon.health/sign-up"
               color="link"
               fontWeight="medium"
               textDecoration="underline"
