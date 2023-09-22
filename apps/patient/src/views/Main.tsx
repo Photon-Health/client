@@ -20,6 +20,7 @@ export const Main = () => {
   const orderId = searchParams.get('orderId');
   const token = searchParams.get('token');
   const isDemo = searchParams.get('demo');
+  const phone = searchParams.get('phone');
 
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
 
@@ -76,7 +77,7 @@ export const Main = () => {
 
   useEffect(() => {
     if (isDemo && order) {
-      navigate(`/review?demo=true`, { replace: true });
+      navigate(`/review?demo=true&phone=${phone}`, { replace: true });
     }
   }, [isDemo]);
 
