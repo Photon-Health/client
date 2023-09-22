@@ -166,8 +166,10 @@ export const Status = () => {
               state: 'READY'
             }
           });
-        }, 3000);
-      }, 3000);
+
+          setTimeout(() => setShowDemoCtaModal(true), 2000);
+        }, 2000);
+      }, 2000);
     }
   }, []);
 
