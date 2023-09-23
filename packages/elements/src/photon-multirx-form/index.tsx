@@ -317,6 +317,7 @@ customElement(
                 client={client!}
                 enableOrder={props.enableOrder}
                 hideAddress={!!props.address}
+                weight={props.weight}
               />
               <Show when={showForm() || isEditing()}>
                 <div ref={prescriptionRef}>

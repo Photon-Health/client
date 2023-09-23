@@ -1,5 +1,6 @@
 import { createSignal, onMount, JSXElement, Show, createMemo } from 'solid-js';
 import gql from 'graphql-tag';
+import { parsePhoneNumber } from 'awesome-phonenumber';
 import { Patient } from '@photonhealth/sdk/dist/types';
 import { usePhotonClient } from '../SDKProvider';
 import Text from '../../particles/Text';
@@ -84,6 +85,14 @@ export default function PatientInfo(props: PatientInfoProps) {
     return patient()?.preferredPharmacies?.[0];
   });
 
+  const phoneNumber = createMemo(() => {
+    if (patient()?.phone) {
+      const pn = parsePhoneNumber(patient()?.phone);
+      return pn.valid ? pn.number.national : patient()?.phone;
+    }
+    return '';
+  });
+
   return (
     <div class="divide-y divide-gray-200">
       <div class="pb-4">
@@ -103,7 +112,7 @@ export default function PatientInfo(props: PatientInfoProps) {
           </InfoRow>
           <InfoRow label="Mobile Phone">
             <Text size="sm" loading={!patient()} sampleLoadingText="555-555-5555">
-              {patient()?.phone}
+              {phoneNumber()}
             </Text>
           </InfoRow>
           <InfoRow label="Address">
@@ -143,7 +152,7 @@ export default function PatientInfo(props: PatientInfoProps) {
           </InfoRow>
           <InfoRow label="Weight">
             <Text size="sm" loading={!patient()} sampleLoadingText="150 lbs">
-              {props?.weight ? `${props.weight} lbs` : 'N/A'}
+              {props?.weight ? `${props.weight} lbs` : ''}
             </Text>
           </InfoRow>
           <InfoRow label="Pharmacy">

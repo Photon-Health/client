@@ -19,6 +19,7 @@ export const PatientCard = (props: {
   client?: PhotonClientStore;
   enableOrder?: boolean;
   hideAddress?: boolean;
+  weight?: number;
 }) => {
   const [dialogOpen, setDialogOpen] = createSignal(false);
   const { actions, store } = PatientStore;
@@ -83,8 +84,9 @@ export const PatientCard = (props: {
           </div>
         </photon-card>
       </Show>
+
       <photon-card>
-        <Show when={props.store['patient']?.value?.id && props.enableOrder && !props.hideAddress}>
+        <Show when={props.store['patient']?.value?.id && !props.hideAddress}>
           <photon-patient-dialog
             open={dialogOpen()}
             on:photon-patient-updated={() => {
@@ -92,7 +94,7 @@ export const PatientCard = (props: {
             }}
             patient-id={props.store['patient'].value.id}
           />
-          <PatientInfo patientId={props.patientId!} />
+          <PatientInfo patientId={props.patientId!} weight={props?.weight} />
         </Show>
       </photon-card>
     </div>
