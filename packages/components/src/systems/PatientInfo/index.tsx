@@ -1,8 +1,9 @@
-import { createSignal, onMount, JSXElement, Show, createMemo } from 'solid-js';
+import { createSignal, createEffect, JSXElement, Show, createMemo } from 'solid-js';
 import gql from 'graphql-tag';
 import { parsePhoneNumber } from 'awesome-phonenumber';
 import { Patient } from '@photonhealth/sdk/dist/types';
 import { usePhotonClient } from '../SDKProvider';
+import Button from '../../particles/Button';
 import Text from '../../particles/Text';
 
 const GET_PATIENT = gql`
@@ -57,6 +58,7 @@ const InfoRow = (props: InfoRowProps) => {
 type PatientInfoProps = {
   patientId: string;
   weight?: number;
+  editPatient?: () => void;
 };
 
 export default function PatientInfo(props: PatientInfoProps) {
@@ -68,13 +70,15 @@ export default function PatientInfo(props: PatientInfoProps) {
       query: GET_PATIENT,
       variables: { id: props.patientId }
     });
-
-    return data?.patient;
+    if (data?.patient) {
+      setPatient(data?.patient);
+    }
   };
 
-  onMount(async () => {
-    const patient = await fetchPatient();
-    setPatient(patient);
+  createEffect(() => {
+    if (props.patientId) {
+      fetchPatient();
+    }
   });
 
   const address = createMemo(() => {
@@ -95,8 +99,13 @@ export default function PatientInfo(props: PatientInfoProps) {
 
   return (
     <div class="divide-y divide-gray-200">
-      <div class="pb-4">
-        <h4>Patient Info</h4>
+      <div class="flex justify-between pb-4">
+        <h5>Patient Info</h5>
+        <Show when={props?.editPatient}>
+          <Button variant="secondary" size="sm" onClick={props?.editPatient}>
+            Edit Patient
+          </Button>
+        </Show>
       </div>
       <div class="pt-4 sm:grid sm:grid-cols-2 sm:gap-2">
         <div>

@@ -1,6 +1,6 @@
 import { message } from '../../validators';
 import { string, any, record } from 'superstruct';
-import { createSignal, onMount, Show, createEffect } from 'solid-js';
+import { createSignal, onMount, Show, createEffect, createMemo } from 'solid-js';
 import { PatientInfo } from '@photonhealth/components';
 import { PatientStore } from '../../stores/patient';
 import { PhotonClientStore } from '../../store';
@@ -65,8 +65,10 @@ export const PatientCard = (props: {
     }
   });
 
+  const patientId = createMemo(() => props.store['patient']?.value?.id || props?.patientId);
+
   return (
-    <div class="gap-8">
+    <div class="flex flex-col gap-8">
       <Show when={!props?.patientId}>
         <photon-card>
           <div class="flex flex-col gap-3">
@@ -84,19 +86,22 @@ export const PatientCard = (props: {
           </div>
         </photon-card>
       </Show>
-
-      <photon-card>
-        <Show when={props.store['patient']?.value?.id && !props.hideAddress}>
+      <Show when={patientId() && !props.hideAddress}>
+        <photon-card>
+          <PatientInfo
+            patientId={patientId()}
+            weight={props?.weight}
+            editPatient={props?.enableOrder ? () => setDialogOpen(true) : undefined}
+          />
           <photon-patient-dialog
             open={dialogOpen()}
             on:photon-patient-updated={() => {
               actions.getSelectedPatient(props.client!.getSDK(), props.store['patient']?.value?.id);
             }}
-            patient-id={props.store['patient'].value.id}
+            patient-id={patientId()}
           />
-          <PatientInfo patientId={props.patientId!} weight={props?.weight} />
-        </Show>
-      </photon-card>
+        </photon-card>
+      </Show>
     </div>
   );
 };
