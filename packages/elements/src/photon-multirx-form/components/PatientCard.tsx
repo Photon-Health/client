@@ -94,6 +94,7 @@ export const PatientCard = (props: {
             editPatient={props?.enableOrder ? () => setDialogOpen(true) : undefined}
           />
           <photon-patient-dialog
+            hide-create-prescription={true}
             open={dialogOpen()}
             on:photon-patient-updated={() => {
               actions.getSelectedPatient(props.client!.getSDK(), props.store['patient']?.value?.id);

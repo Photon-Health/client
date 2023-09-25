@@ -15,8 +15,8 @@ const GET_PATIENT = gql`
       }
       email
       phone
-      sex
       gender
+      dateOfBirth
       address {
         street1
         street2
@@ -59,6 +59,14 @@ type PatientInfoProps = {
   patientId: string;
   weight?: number;
   editPatient?: () => void;
+  updatedAt?: number;
+};
+
+// Takes a date string in the format 'YYYY-MM-DD'
+// and returns it in the format 'MM-DD-YYYY'.
+const formatDate = (dateString: string) => {
+  const [year, month, day] = dateString.split('-');
+  return `${month}-${day}-${year}`;
 };
 
 export default function PatientInfo(props: PatientInfoProps) {
@@ -149,9 +157,9 @@ export default function PatientInfo(props: PatientInfoProps) {
         </div>
 
         <div>
-          <InfoRow label="Sex at Birth">
+          <InfoRow label="DOB">
             <Text size="sm" loading={!patient()} sampleLoadingText="female">
-              {patient()?.sex}
+              {formatDate(patient()?.dateOfBirth || '')}
             </Text>
           </InfoRow>
           <InfoRow label="Gender">
