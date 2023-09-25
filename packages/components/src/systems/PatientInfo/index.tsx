@@ -55,11 +55,21 @@ const InfoRow = (props: InfoRowProps) => {
   );
 };
 
+export type Address = {
+  city: string;
+  postalCode: string;
+  state: string;
+  street1: string;
+  street2?: string;
+  country?: string;
+};
+
 type PatientInfoProps = {
   patientId: string;
   weight?: number;
   editPatient?: () => void;
   updatedAt?: number;
+  address?: Address;
 };
 
 // Takes a date string in the format 'YYYY-MM-DD'
@@ -90,7 +100,7 @@ export default function PatientInfo(props: PatientInfoProps) {
   });
 
   const address = createMemo(() => {
-    return patient()?.address;
+    return props.address || patient()?.address;
   });
 
   const preferredPharmacy = createMemo(() => {

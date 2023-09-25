@@ -4,6 +4,7 @@ import { createSignal, onMount, Show, createEffect, createMemo } from 'solid-js'
 import { PatientInfo } from '@photonhealth/components';
 import { PatientStore } from '../../stores/patient';
 import { PhotonClientStore } from '../../store';
+import type { Address } from '../index';
 
 const patientValidator = message(record(string(), any()), 'Please select a patient...');
 
@@ -18,7 +19,7 @@ export const PatientCard = (props: {
   patientId?: string;
   client?: PhotonClientStore;
   enableOrder?: boolean;
-  hideAddress?: boolean;
+  address?: Address;
   weight?: number;
 }) => {
   const [dialogOpen, setDialogOpen] = createSignal(false);
@@ -41,7 +42,7 @@ export const PatientCard = (props: {
       key: 'patient',
       value: e.detail.patient
     });
-    if (props.enableOrder && !props.hideAddress) {
+    if (props.enableOrder && !props.address) {
       // update address when you want to allow send order
       // but the address hasn't been manually overridden
       props.actions.updateFormValue({
@@ -86,12 +87,13 @@ export const PatientCard = (props: {
           </div>
         </photon-card>
       </Show>
-      <Show when={patientId() && !props.hideAddress}>
+      <Show when={patientId()}>
         <photon-card>
           <PatientInfo
             patientId={patientId()}
             weight={props?.weight}
             editPatient={props?.enableOrder ? () => setDialogOpen(true) : undefined}
+            address={props?.address}
           />
           <photon-patient-dialog
             hide-create-prescription={true}

@@ -91,7 +91,7 @@ const App = () => {
   });
 
   return (
-    <div class="p-4">
+    <div class="sm:max-w-lg p-4">
       <div>
         <h1>Photon Component Systems</h1>
       </div>
