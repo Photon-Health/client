@@ -19,7 +19,9 @@ export default function Text(props: TextProps) {
   const merged = mergeProps({ size: 'md', color: 'black' }, props);
 
   const textClasses = createMemo(() =>
-    clsx(props.class, 'inline-flex my-px', {
+    // [overflow-wrap:anywhere] is here to prevent long text from overflowing, should be in tailwind soon
+    // https://github.com/tailwindlabs/tailwindcss/discussions/2213#discussioncomment-5316024
+    clsx(props.class, 'inline-flex my-px [overflow-wrap:anywhere]', {
       'text-sm leading-snug	': merged.size === 'sm',
       'text-base leading-snug	': merged.size === 'md',
       'text-lg leading-snug	': merged.size === 'lg',

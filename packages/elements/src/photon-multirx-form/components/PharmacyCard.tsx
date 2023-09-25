@@ -7,12 +7,16 @@ export const PharmacyCard = (props: { pharmacyId: string | undefined }) => {
   const client = usePhoton();
   const [pharmacy, setPharmacy] = createSignal<Pharmacy | null>(null);
 
-  createEffect(async () => {
-    if (props.pharmacyId && client) {
-      const { data } = await client.getSDK().clinical.pharmacy.getPharmacy({
-        id: props.pharmacyId
-      });
+  const fetchPharmacy = async (id: string) => {
+    if (id && client) {
+      const { data } = await client.getSDK().clinical.pharmacy.getPharmacy({ id });
       setPharmacy(data.pharmacy);
+    }
+  };
+
+  createEffect(() => {
+    if (props.pharmacyId) {
+      fetchPharmacy(props.pharmacyId);
     }
   });
 
