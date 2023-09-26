@@ -29,6 +29,15 @@ import { PhotonAuthorized } from '../photon-authorized';
 
 import type { TemplateOverrides } from '@photonhealth/components';
 
+export type Address = {
+  city: string;
+  postalCode: string;
+  state: string;
+  street1: string;
+  street2?: string;
+  country?: string;
+};
+
 customElement(
   'photon-prescribe-workflow',
   {
@@ -61,14 +70,7 @@ customElement(
       mailOrderIds?: string;
       pharmacyId?: string;
       loading: boolean;
-      address?: {
-        city: string;
-        postalCode: string;
-        state: string;
-        street1: string;
-        street2?: string;
-        country?: string;
-      };
+      address?: Address;
       weight?: number;
     },
     options
@@ -316,7 +318,8 @@ customElement(
                 patientId={props.patientId}
                 client={client!}
                 enableOrder={props.enableOrder}
-                hideAddress={!!props.address}
+                address={props.address}
+                weight={props.weight}
               />
               <Show when={showForm() || isEditing()}>
                 <div ref={prescriptionRef}>
