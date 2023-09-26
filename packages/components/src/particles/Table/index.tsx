@@ -20,7 +20,8 @@ const Cell = (props: { children: JSXElement }) => (
   <td class="whitespace-nowrap px-3 py-4 text-xs">{props.children}</td>
 );
 
-function Table(props: { children: JSXElement[] }) {
+export type TableProps = { children: JSXElement[] };
+function Table(props: TableProps) {
   return (
     <div class="px-4 sm:px-6 lg:px-8">
       <div class="flow-root">

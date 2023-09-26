@@ -1,4 +1,6 @@
 import { Medication } from '@photonhealth/sdk/dist/types';
+import { Button, Dialog } from '@photonhealth/components';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { customElement } from 'solid-element';
 import { createSignal } from 'solid-js';
 import { usePhoton } from '../context';
@@ -20,7 +22,6 @@ customElement(
     const [medication, setMedication] = createSignal<Medication | undefined>(undefined);
     const [addToCatalog, setAddToCatalog] = createSignal<boolean>(false);
     const [catalogId, setCatalogId] = createSignal<string>('');
-    const [loading, setLoading] = createSignal<boolean>(false);
 
     const dispatchMedicationSelected = () => {
       const event = new CustomEvent('photon-medication-selected', {
@@ -34,7 +35,6 @@ customElement(
     };
 
     const handleConfirm = async () => {
-      setLoading(true);
       if (addToCatalog()) {
         const addCatalogMutation = client!.getSDK().clinical.catalog.addToCatalog({});
         try {
@@ -50,7 +50,6 @@ customElement(
         }
       }
       dispatchMedicationSelected();
-      setLoading(false);
       props.open = false;
     };
     const handleCancel = () => {
@@ -66,18 +65,25 @@ customElement(
           setCatalogId(e.detail.catalogId);
         }}
       >
-        <photon-dialog
+        <style>{photonStyles}</style>
+        <Dialog
           open={props.open}
-          loading={loading()}
-          cancel-text="Back"
-          confirm-text="Select Medication"
-          disable-submit={!medication()}
+          onClose={handleCancel}
+          size="lg"
           on:photon-dialog-confirmed={handleConfirm}
           on:photon-dialog-canceled={handleCancel}
           on:photon-dialog-alt={handleCancel}
         >
           <photon-med-search open={props.open} />
-        </photon-dialog>
+          <div class="mt-8 flex gap-4 justify-end">
+            <Button variant="secondary" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button onClick={handleConfirm} disabled={!medication()}>
+              Select Medication
+            </Button>
+          </div>
+        </Dialog>
       </div>
     );
   }

@@ -140,42 +140,44 @@ customElement('photon-med-search', { open: false }, (props: MedSearchProps) => {
           setMedicationId={setMedicationId}
         />
       </div>
-      <hr class="my-8" />
-      <p class="font-sans text-gray-700 pb-4">Select a medication:</p>
-      <div
-        on:photon-option-selected={(e: any) => {
-          setSelectedMedication(e.detail.value);
-        }}
-      >
-        <photon-radio-group>
-          <For
-            each={products()
-              .filter(
-                //We filter here in order to only display "unique" prescribable names via the UI
-                //whereas we may have multiple different NDCs for the same prescribable name
-                (value, currentIndex, self) => {
-                  // We find the first occurence of an item with the same prescribable name
-                  const firstOccurence = self.findIndex((p) => p.name === value.name);
-                  // If the current index is the same as the first occurence, let it through
-                  // otherwise filter it
-                  if (currentIndex === firstOccurence) {
-                    return true;
+      <Show when={products().length > 0}>
+        <hr class="my-8" />
+        <p class="font-sans text-gray-700 pb-4">Select a medication:</p>
+        <div
+          on:photon-option-selected={(e: any) => {
+            setSelectedMedication(e.detail.value);
+          }}
+        >
+          <photon-radio-group>
+            <For
+              each={products()
+                .filter(
+                  //We filter here in order to only display "unique" prescribable names via the UI
+                  //whereas we may have multiple different NDCs for the same prescribable name
+                  (value, currentIndex, self) => {
+                    // We find the first occurence of an item with the same prescribable name
+                    const firstOccurence = self.findIndex((p) => p.name === value.name);
+                    // If the current index is the same as the first occurence, let it through
+                    // otherwise filter it
+                    if (currentIndex === firstOccurence) {
+                      return true;
+                    }
                   }
-                }
-              )
-              .sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1))}
-          >
-            {(product) => <photon-radio-card value={product}>{product.name}</photon-radio-card>}
-          </For>
-        </photon-radio-group>
-      </div>
-      <Show when={catalogId().length > 0}>
-        <photon-checkbox
-          on:photon-checkbox-toggled={(e: any) => setAddToCatalog(e.detail.checked)}
-          label="Add Medication to Catalog"
-          disabled={!selectedMedication()}
-          checked={addToCatalog()}
-        />
+                )
+                .sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1))}
+            >
+              {(product) => <photon-radio-card value={product}>{product.name}</photon-radio-card>}
+            </For>
+          </photon-radio-group>
+        </div>
+        <Show when={catalogId().length > 0}>
+          <photon-checkbox
+            on:photon-checkbox-toggled={(e: any) => setAddToCatalog(e.detail.checked)}
+            label="Add Medication to Catalog"
+            disabled={!selectedMedication()}
+            checked={addToCatalog()}
+          />
+        </Show>
       </Show>
     </div>
   );
