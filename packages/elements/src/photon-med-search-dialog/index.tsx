@@ -1,9 +1,14 @@
-import { Medication } from '@photonhealth/sdk/dist/types';
+import { Medication, Concept } from '@photonhealth/sdk/dist/types';
 import { Button, Dialog } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { customElement } from 'solid-element';
 import { createSignal } from 'solid-js';
 import { usePhoton } from '../context';
+
+type MedSearchDialogProps = {
+  open: boolean;
+  withConcept?: boolean;
+};
 
 customElement(
   'photon-med-search-dialog',
@@ -14,9 +19,10 @@ customElement(
       notify: false,
       attribute: 'open',
       parse: true
-    }
+    },
+    withConcept: false
   },
-  (props: { open: boolean }) => {
+  (props: MedSearchDialogProps) => {
     const client = usePhoton();
     let ref: any;
     const [medication, setMedication] = createSignal<Medication | undefined>(undefined);
@@ -49,13 +55,15 @@ customElement(
           console.log('Error adding to catalog: ', e?.message);
         }
       }
+
       dispatchMedicationSelected();
       props.open = false;
     };
+
     const handleCancel = () => {
       props.open = false;
     };
-
+    console.log('dialog', props.withConcept);
     return (
       <div
         ref={ref}
@@ -63,6 +71,9 @@ customElement(
           setMedication(e.detail.medication);
           setAddToCatalog(e.detail.addToCatalog);
           setCatalogId(e.detail.catalogId);
+        }}
+        on:photon-med-and-concept-search={(e: any) => {
+          setMedication(e.detail.medication);
         }}
       >
         <style>{photonStyles}</style>
@@ -74,7 +85,7 @@ customElement(
           on:photon-dialog-canceled={handleCancel}
           on:photon-dialog-alt={handleCancel}
         >
-          <photon-med-search open={props.open} />
+          <photon-med-search open={props.open} with-concept={props.withConcept} />
           <div class="mt-8 flex gap-4 justify-end">
             <Button variant="secondary" onClick={handleCancel}>
               Cancel

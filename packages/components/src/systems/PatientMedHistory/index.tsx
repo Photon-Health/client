@@ -1,4 +1,4 @@
-import { createSignal, createEffect, Show, For } from 'solid-js';
+import { createSignal, createEffect, Show, For, createMemo } from 'solid-js';
 import gql from 'graphql-tag';
 import { usePhotonClient } from '../SDKProvider';
 import { PatientMedication } from '@photonhealth/sdk/dist/types';
@@ -36,16 +36,16 @@ type PatientMedHistoryProps = {
 const LoadingRowFallback = () => (
   <Table.Row>
     <Table.Cell>
-      <Text sampleLoadingText={generateString(10, 45)} loading></Text>
+      <Text sampleLoadingText={generateString(10, 45)} loading />
     </Table.Cell>
     <Table.Cell>
-      <Text sampleLoadingText={generateString(6, 8)} loading></Text>
+      <Text sampleLoadingText={generateString(6, 8)} loading />
     </Table.Cell>
     <Table.Cell>
-      <Text sampleLoadingText={generateString()} loading></Text>
+      <Text sampleLoadingText={generateString()} loading />
     </Table.Cell>
     <Table.Cell>
-      <Text sampleLoadingText={generateString()} loading></Text>
+      <Text sampleLoadingText={generateString()} loading />
     </Table.Cell>
   </Table.Row>
 );
@@ -70,6 +70,10 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
     }
   });
 
+  const baseURL = createMemo(() =>
+    client.uri.replace('api', 'app').replace('graphql', 'prescriptions')
+  );
+
   return (
     <div class="divide-y divide-gray-200">
       <div class="flex justify-between pb-4">
@@ -80,7 +84,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
           </Button>
         </Show>
       </div>
-      <div style="max-height: 300px; overflow-y: auto;">
+      <div class="max-h-80 overflow-y-auto">
         <Table>
           <Table.Header>
             <Table.Col>Medication</Table.Col>
@@ -109,7 +113,19 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
                       )}
                     </Table.Cell>
                     <Table.Cell>{formatDate(med.prescription?.writtenAt)}</Table.Cell>
-                    <Table.Cell>{med.prescription?.id ? 'Photon' : 'External'}</Table.Cell>
+                    <Table.Cell>
+                      {med.prescription?.id ? (
+                        <a
+                          class="text-blue-500 underline"
+                          target="_blank"
+                          href={`${baseURL()}/${med.prescription?.id}`}
+                        >
+                          Link
+                        </a>
+                      ) : (
+                        'External'
+                      )}
+                    </Table.Cell>
                   </Table.Row>
                 )}
               </For>

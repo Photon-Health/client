@@ -1,4 +1,4 @@
-import { SearchMedication } from '@photonhealth/sdk/dist/types';
+import { SearchMedication, Concept } from '@photonhealth/sdk/dist/types';
 import { createEffect, createSignal } from 'solid-js';
 import { usePhotonClient } from '@photonhealth/components';
 import { gql } from '@apollo/client';
@@ -16,7 +16,7 @@ const GET_CONCEPTS = gql`
 
 type MedicationConceptDropdownProps = {
   conceptId?: string;
-  setConceptId: (id: string) => void;
+  setConcept: (concept: Concept) => void;
 };
 
 export const MedicationConceptDropdown = (props: MedicationConceptDropdownProps) => {
@@ -56,8 +56,8 @@ export const MedicationConceptDropdown = (props: MedicationConceptDropdownProps)
   return (
     <div
       class="w-full"
-      on:photon-data-selected={(e: { detail: { data: { id: string } } }) => {
-        props.setConceptId(e.detail.data.id);
+      on:photon-data-selected={(e: { detail: { data: Concept } }) => {
+        props.setConcept(e.detail.data);
       }}
     >
       <PhotonDropdown

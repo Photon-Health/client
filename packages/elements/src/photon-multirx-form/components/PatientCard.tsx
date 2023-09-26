@@ -24,6 +24,7 @@ export const PatientCard = (props: {
   enableMedHistory?: boolean;
 }) => {
   const [dialogOpen, setDialogOpen] = createSignal(false);
+  const [medDialogOpen, setMedDialogOpen] = createSignal(false);
   const { actions, store } = PatientStore;
 
   onMount(() => {
@@ -110,7 +111,14 @@ export const PatientCard = (props: {
       </Show>
       <Show when={props.enableMedHistory}>
         <photon-card>
-          <PatientMedHistory patientId={patientId()} addMedication={() => console.log('hello')} />
+          <PatientMedHistory patientId={patientId()} addMedication={() => setMedDialogOpen(true)} />
+          <photon-med-search-dialog
+            open={medDialogOpen()}
+            with-concept={true}
+            on:photon-medication-selected={(e: any) => {
+              console.log('med and concept search', e.detail);
+            }}
+          />
         </photon-card>
       </Show>
     </div>

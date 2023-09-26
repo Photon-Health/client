@@ -13,7 +13,7 @@ setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/')
 import { createEffect, createSignal, For, onMount, Show, createMemo } from 'solid-js';
 import { gql } from '@apollo/client';
 import { usePhotonClient } from '@photonhealth/components';
-import { Medication } from '@photonhealth/sdk/dist/types';
+import { Medication, Concept } from '@photonhealth/sdk/dist/types';
 import { MedicationConceptDropdown } from './components/MedicationConceptDropdown';
 import { MedicationFilterDropdown } from './components/MedicationFilterDropdown';
 
@@ -38,12 +38,14 @@ const GET_PRODUCTS = gql`
 
 type MedSearchProps = {
   open: boolean;
+  withConcept?: boolean;
 };
 
-customElement('photon-med-search', { open: false }, (props: MedSearchProps) => {
+customElement('photon-med-search', { open: false, withConcept: false }, (props: MedSearchProps) => {
   let ref: any;
   const client = usePhotonClient();
   const [conceptId, setConceptId] = createSignal<string>('');
+  const [concept, setConcept] = createSignal<Concept | undefined>(undefined);
   const [medicationId, setMedicationId] = createSignal<string>('');
   const [products, setProducts] = createSignal<Medication[]>([]);
   const [addToCatalog, setAddToCatalog] = createSignal<boolean>(false);
@@ -54,15 +56,18 @@ customElement('photon-med-search', { open: false }, (props: MedSearchProps) => {
   const medId = createMemo(() => medicationId() || conceptId());
 
   const dispatchFormUpdated = (medication: Medication, addToCatalog: boolean) => {
-    const event = new CustomEvent('photon-form-updated', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        medication: medication,
-        addToCatalog: addToCatalog,
-        catalogId: catalogId()
+    const event = new CustomEvent(
+      !props?.withConcept ? 'photon-form-updated' : 'photon-med-and-concept-search',
+      {
+        composed: true,
+        bubbles: true,
+        detail: {
+          medication: medication,
+          addToCatalog: addToCatalog,
+          catalogId: catalogId()
+        }
       }
-    });
+    );
     ref?.dispatchEvent(event);
   };
 
@@ -110,8 +115,9 @@ customElement('photon-med-search', { open: false }, (props: MedSearchProps) => {
       <div class="flex flex-col xs:flex-row gap-4">
         <MedicationConceptDropdown
           conceptId={conceptId()}
-          setConceptId={(id: string) => {
-            setConceptId(id);
+          setConcept={(concept) => {
+            setConceptId(concept.id);
+            setConcept(concept);
             setMedicationId('');
           }}
         />
@@ -149,6 +155,9 @@ customElement('photon-med-search', { open: false }, (props: MedSearchProps) => {
           }}
         >
           <photon-radio-group>
+            <Show when={props.withConcept && concept}>
+              <photon-radio-card value={concept()}>{concept().name}</photon-radio-card>
+            </Show>
             <For
               each={products()
                 .filter(
