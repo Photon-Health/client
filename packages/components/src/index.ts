@@ -1,6 +1,7 @@
 import DoseCalculator from './systems/DoseCalculator';
 import DraftPrescriptions from './systems/DraftPrescriptions';
 import PatientInfo from './systems/PatientInfo';
+import PatientMedHistory from './systems/PatientMedHistory';
 import PharmacySelect from './systems/PharmacySelect';
 import RadioGroup from './particles/RadioGroup';
 import SDKProvider, { usePhotonClient } from './systems/SDKProvider';
@@ -12,6 +13,7 @@ export {
   DoseCalculator,
   DraftPrescriptions,
   PatientInfo,
+  PatientMedHistory,
   PharmacySelect,
   RadioGroup,
   SDKProvider,
