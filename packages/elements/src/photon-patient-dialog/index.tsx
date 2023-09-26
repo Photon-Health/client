@@ -5,13 +5,20 @@ import { usePhoton } from '../context';
 import PhotonFormWrapper from '../photon-form-wrapper';
 import { message } from '../validators';
 
+type PatientDialogProps = {
+  patientId: string;
+  open: boolean;
+  hideCreatePrescription: boolean;
+};
+
 customElement(
   'photon-patient-dialog',
   {
     patientId: '',
+    hideCreatePrescription: false,
     open: false
   },
-  (props: { patientId: string; open: boolean }) => {
+  (props: PatientDialogProps) => {
     let ref: any;
     const client = usePhoton();
     const [loading, setLoading] = createSignal(false);
@@ -182,15 +189,17 @@ customElement(
             titleIconName={props?.patientId ? 'pencil-square' : 'person-plus'}
             headerRight={
               <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
-                <photon-button
-                  size="sm"
-                  variant="outline"
-                  disabled={loading()}
-                  loading={loading() && isCreatePrescription()}
-                  onClick={() => submitForm(formStore(), actions(), selectedStore(), true)}
-                >
-                  Save and Create Prescription
-                </photon-button>
+                <Show when={!props?.hideCreatePrescription}>
+                  <photon-button
+                    size="sm"
+                    variant="outline"
+                    disabled={loading()}
+                    loading={loading() && isCreatePrescription()}
+                    onClick={() => submitForm(formStore(), actions(), selectedStore(), true)}
+                  >
+                    Save and Create Prescription
+                  </photon-button>
+                </Show>
                 <photon-button
                   size="sm"
                   disabled={loading()}

@@ -142,3 +142,39 @@ export const setPreferredPharmacy = async (patientId: string, pharmacyId: string
     throw new Error(error.response.errors[0].message);
   }
 };
+
+export const triggerDemoNotification = async (
+  phoneNumber: string,
+  eventName:
+    | 'photon:order:placed'
+    | 'photon:order_fulfillment:received'
+    | 'photon:order_fulfillment:ready',
+  pharmacyName?: string,
+  pharmacyAddress?: string
+): Promise<boolean> => {
+  try {
+    const url = process.env.REACT_APP_THIRD_PARTY_REST_API_ENDPOINT;
+    const data = {
+      phoneNumber,
+      eventName,
+      pharmacyName,
+      pharmacyAddress
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      throw new Error('Unable to trigger demo sms');
+    }
+
+    return true;
+  } catch (error) {
+    throw new Error(error);
+  }
+};

@@ -21,8 +21,9 @@ import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import * as TOAST_CONFIG from '../configs/toast';
-import { markOrderAsPickedUp } from '../api';
+import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
 import { getSettings } from '@client/settings';
+import { DemoCtaModal } from '../components/DemoCtaModal';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
@@ -30,7 +31,7 @@ const PHOTON_PHONE_NUMBER: string = process.env.REACT_APP_TWILIO_SMS_NUMBER;
 
 export const Status = () => {
   const navigate = useNavigate();
-  const { order } = useOrderContext();
+  const { order, setOrder } = useOrderContext();
 
   const orgSettings =
     order?.organization?.id in settings ? settings[order.organization.id] : settings.default;
@@ -39,11 +40,14 @@ export const Status = () => {
   const orderId = searchParams.get('orderId');
   const token = searchParams.get('token');
   const type = searchParams.get('type');
+  const isDemo = searchParams.get('demo');
+  const phone = searchParams.get('phone');
 
   const [showFooter, setShowFooter] = useState<boolean>(
     order?.fulfillment?.state === 'RECEIVED' &&
       order?.fulfillment?.type !== types.FulfillmentType.MailOrder
   );
+  const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
 
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
@@ -57,6 +61,20 @@ export const Status = () => {
 
   const handleMarkOrderAsPickedUp = async () => {
     setSubmitting(true);
+
+    // Show cta modal for demo
+    if (isDemo) {
+      setTimeout(() => {
+        setSuccessfullySubmitted(true);
+        setTimeout(() => {
+          setShowFooter(false);
+          setShowDemoCtaModal(true);
+        }, 1000);
+        setSubmitting(false);
+      }, 1000);
+
+      return;
+    }
 
     try {
       const result: boolean = await markOrderAsPickedUp(orderId);
@@ -113,11 +131,55 @@ export const Status = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    if (isDemo) {
+      setTimeout(async () => {
+        // Send order received sms to demo participant
+        await triggerDemoNotification(
+          phone,
+          'photon:order_fulfillment:received',
+          pharmacy.name,
+          formatAddress(pharmacy.address)
+        );
+
+        setOrder({
+          ...order,
+          fulfillment: {
+            state: 'RECEIVED'
+          }
+        });
+
+        setShowFooter(true);
+
+        setTimeout(async () => {
+          // Send ready sms
+          await triggerDemoNotification(
+            phone,
+            'photon:order_fulfillment:ready',
+            pharmacy.name,
+            formatAddress(pharmacy.address)
+          );
+
+          setOrder({
+            ...order,
+            fulfillment: {
+              state: 'READY'
+            }
+          });
+
+          setTimeout(() => setShowDemoCtaModal(true), 2000);
+        }, 2000);
+      }, 2000);
+    }
+  }, []);
+
   // Only show "Text us now" prompt if pickup and RECEIVED or READY
   const showChatAlert = fulfillment?.state === 'RECEIVED' || fulfillment?.state === 'READY';
 
   return (
     <Box>
+      <DemoCtaModal isOpen={showDemoCtaModal} />
+
       <Helmet>
         <title>{t.status.title}</title>
       </Helmet>
@@ -149,7 +211,7 @@ export const Status = () => {
               <PharmacyCard
                 pharmacy={enrichedPharmacy}
                 selected={true}
-                canReroute={orgSettings.patientsCanReroute}
+                canReroute={!isDemo && orgSettings.patientsCanReroute}
                 onChangePharmacy={() =>
                   navigate(`/pharmacy?orderId=${order.id}&token=${token}&reroute=true`)
                 }

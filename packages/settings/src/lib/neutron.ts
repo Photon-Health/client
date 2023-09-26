@@ -201,5 +201,11 @@ export const neutron: {
     ...defaultSettings,
     logo: 'sesame_logo.jpg',
     accentColor: '#5224C7'
+  },
+  // Oshi Health
+  org_yOgsgGMBVUZIBcwp: {
+    ...defaultSettings,
+    logo: 'oshi_logo.svg',
+    accentColor: '#3b5b80'
   }
 };

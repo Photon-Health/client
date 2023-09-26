@@ -15,6 +15,7 @@ export const PrescriptionForm = () => {
   const patientId = params.get('patientId') || '';
   const templateIds = params.get('templateIds') || '';
   const prescriptionIds = params.get('prescriptionIds') || '';
+  const weight = params.get('weight') || '';
 
   const navigate = useNavigate();
   const onClose = () => {
@@ -65,6 +66,7 @@ export const PrescriptionForm = () => {
         template-ids={templateIds}
         patient-id={patientId}
         prescription-ids={prescriptionIds}
+        weight={weight}
       />
     </div>
   );

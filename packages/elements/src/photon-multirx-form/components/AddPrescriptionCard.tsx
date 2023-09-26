@@ -9,7 +9,7 @@ import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/button/button';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-import { createSignal, Show } from 'solid-js';
+import { createSignal, Show, onMount } from 'solid-js';
 import repopulateForm from '../util/repopulateForm';
 import clearForm from '../util/clearForm';
 
@@ -27,10 +27,13 @@ const validators = {
   effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
 };
 
+const patientWeight = (weight: number) => `Patient weight: ${weight} lbs`;
+
 export const AddPrescriptionCard = (props: {
   hideAddToTemplates: boolean;
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
+  weight?: number;
 }) => {
   let medSearchRef: any;
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
@@ -39,13 +42,21 @@ export const AddPrescriptionCard = (props: {
 
   let ref: any;
 
-  for (const [k, v] of Object.entries(validators)) {
-    props.actions.registerValidator({
-      key: k,
-      validator: v
-    });
-  }
+  onMount(() => {
+    for (const [k, v] of Object.entries(validators)) {
+      props.actions.registerValidator({
+        key: k,
+        validator: v
+      });
+    }
 
+    if (props.weight) {
+      props.actions.updateFormValue({
+        key: 'notes',
+        value: patientWeight(props.weight)
+      });
+    }
+  });
   return (
     <photon-card ref={ref} title={'Add Prescription'}>
       <style>{photonStyles}</style>
@@ -145,6 +156,7 @@ export const AddPrescriptionCard = (props: {
               open={openDoseCalculator()}
               onClose={() => setOpenDoseCalculator(false)}
               medicationName={props.store['treatment']?.value?.name}
+              weight={props.weight}
               setAutocompleteValues={({ liquidDose, totalLiquid, unit, days }) => {
                 props.actions.updateFormValue({
                   key: 'daysSupply',
@@ -315,7 +327,10 @@ export const AddPrescriptionCard = (props: {
                     'notes'
                   ]);
                   setOffCatalog(undefined);
-                  clearForm(props.actions);
+                  clearForm(
+                    props.actions,
+                    props.weight ? { notes: patientWeight(props.weight) } : undefined
+                  );
                 }
               }}
             >

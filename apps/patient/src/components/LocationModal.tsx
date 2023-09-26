@@ -1,5 +1,8 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
+  Alert,
+  AlertIcon,
   Button,
   Divider,
   HStack,
@@ -32,6 +35,9 @@ const geocoder = new google.maps.Geocoder();
 
 export const LocationModal = ({ isOpen, onClose }: any) => {
   const [gettingCurrentLocation, setGettingCurrentLocation] = useState<boolean>(false);
+
+  const [searchParams] = useSearchParams();
+  const isDemo = searchParams.get('demo');
 
   const searchForLocations = async (inputValue: string) => {
     const request = {
@@ -85,6 +91,12 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
       <ModalContent>
         <ModalHeader>{t.pharmacy.modal.heading}</ModalHeader>
         <ModalCloseButton />
+        {isDemo ? (
+          <Alert status="warning">
+            <AlertIcon />
+            <Text>Unable to change location in demo mode</Text>
+          </Alert>
+        ) : null}
         <ModalBody pb={6}>
           <Text> {t.pharmacy.modal.subheading}</Text>
           <Button
@@ -94,6 +106,7 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
             onClick={async () => getCurrentLocation()}
             isLoading={gettingCurrentLocation}
             loadingText={t.pharmacy.modal.getting}
+            isDisabled={!!isDemo}
           >
             {t.pharmacy.modal.currentLocation}
           </Button>
@@ -116,6 +129,7 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
                 defaultOptions={[]}
                 isClearable
                 menuPlacement="auto"
+                isDisabled={!!isDemo}
                 onChange={async (val) => {
                   if (val) {
                     await geocode(val.label);
