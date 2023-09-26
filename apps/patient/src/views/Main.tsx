@@ -5,6 +5,7 @@ import { ChakraProvider } from '@chakra-ui/react';
 
 import { Order } from '../utils/models';
 import { getOrder } from '../api/internal';
+import { demoOrder } from '../data/demoOrder';
 
 import theme from '../configs/theme';
 import { setAuthHeader } from '../configs/graphqlClient';
@@ -18,15 +19,17 @@ export const Main = () => {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('orderId');
   const token = searchParams.get('token');
+  const isDemo = searchParams.get('demo');
+  const phone = searchParams.get('phone');
 
-  const [order, setOrder] = useState<Order | undefined>(undefined);
+  const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
 
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     if (location.pathname !== '/canceled') {
-      if (!orderId || !token) {
+      if (!isDemo && (!orderId || !token)) {
         console.error('Missing orderId or token in search params');
         navigate('/no-match', { replace: true });
       }
@@ -73,7 +76,13 @@ export const Main = () => {
   }, [navigate, orderId, token]);
 
   useEffect(() => {
-    if (!order) {
+    if (isDemo && order) {
+      navigate(`/review?demo=true&phone=${phone}`, { replace: true });
+    }
+  }, [isDemo]);
+
+  useEffect(() => {
+    if (!isDemo && !order) {
       fetchOrder();
     }
   }, [order, orderId, fetchOrder]);

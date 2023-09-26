@@ -1,4 +1,5 @@
 import { For, createMemo, createSignal, createEffect } from 'solid-js';
+import PatientInfo from '../src/systems/PatientInfo';
 import PharmacySearch from '../src/systems/PharmacySearch';
 import DoseCalculator from '../src/systems/DoseCalculator';
 import Client from '../src/systems/Client';
@@ -102,6 +103,11 @@ const App = () => {
         audience="https://api.boson.health"
         uri="https://api.boson.health/graphql"
       >
+        <div class="mb-10">
+          <h2>Patient Info</h2>
+          <PatientInfo patientId="pat_01GQ0XFBHSH3YXN936A2D2SD7Y" />
+        </div>
+
         <div class="mb-10">
           <h2>Draft Presciptions</h2>
           <DraftPrescriptions
