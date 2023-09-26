@@ -5,6 +5,9 @@ import { PatientMedication } from '@photonhealth/sdk/dist/types';
 import Table from '../../particles/Table';
 import Text from '../../particles/Text';
 import generateString from '../../utils/generateString';
+import Badge from '../../particles/Badge';
+import formatDate from '../../utils/formatDate';
+import Button from '../../particles/Button';
 
 const GET_PATIENT = gql`
   query GetPatient($id: ID!) {
@@ -27,15 +30,16 @@ const GET_PATIENT = gql`
 
 type PatientMedHistoryProps = {
   patientId: string;
+  addMedication?: () => void;
 };
 
 const LoadingRowFallback = () => (
   <Table.Row>
     <Table.Cell>
-      <Text sampleLoadingText={generateString(10, 17)} loading></Text>
+      <Text sampleLoadingText={generateString(10, 45)} loading></Text>
     </Table.Cell>
     <Table.Cell>
-      <Text sampleLoadingText={generateString()} loading></Text>
+      <Text sampleLoadingText={generateString(6, 8)} loading></Text>
     </Table.Cell>
     <Table.Cell>
       <Text sampleLoadingText={generateString()} loading></Text>
@@ -56,7 +60,6 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
       variables: { id: props.patientId }
     });
     if (data?.patient?.medicationHistory) {
-      console.log(data.patient.medicationHistory);
       setMedHistory(data.patient.medicationHistory);
     }
   };
@@ -68,30 +71,52 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   });
 
   return (
-    <Table>
-      <Table.Header>
-        <Table.Col>Medication</Table.Col>
-        <Table.Col>Status</Table.Col>
-        <Table.Col>Written</Table.Col>
-        <Table.Col>Source</Table.Col>
-      </Table.Header>
-      <Table.Body>
-        <Show
-          when={medHistory()}
-          fallback={[LoadingRowFallback, LoadingRowFallback, LoadingRowFallback]}
-        >
-          <For each={medHistory()}>
-            {(med) => (
-              <Table.Row>
-                <Table.Cell>{med.medication?.name}</Table.Cell>
-                <Table.Cell>{med.active ? 'Active' : 'Inactive'}</Table.Cell>
-                <Table.Cell>{med.prescription?.writtenAt}</Table.Cell>
-                <Table.Cell>{med.prescription?.id ? 'Photon' : 'External'}</Table.Cell>
-              </Table.Row>
-            )}
-          </For>
+    <div class="divide-y divide-gray-200">
+      <div class="flex justify-between pb-4">
+        <h5>Medication History</h5>
+        <Show when={props?.addMedication}>
+          <Button variant="secondary" size="sm" onClick={props?.addMedication}>
+            + Add
+          </Button>
         </Show>
-      </Table.Body>
-    </Table>
+      </div>
+      <div style="max-height: 300px; overflow-y: auto;">
+        <Table>
+          <Table.Header>
+            <Table.Col>Medication</Table.Col>
+            <Table.Col>Status</Table.Col>
+            <Table.Col>Written</Table.Col>
+            <Table.Col>Source</Table.Col>
+          </Table.Header>
+          <Table.Body>
+            <Show
+              when={medHistory()}
+              fallback={[LoadingRowFallback, LoadingRowFallback, LoadingRowFallback]}
+            >
+              <For each={medHistory()}>
+                {(med) => (
+                  <Table.Row>
+                    <Table.Cell>{med.medication?.name}</Table.Cell>
+                    <Table.Cell>
+                      {med.active ? (
+                        <Badge color="green" size="sm">
+                          Active
+                        </Badge>
+                      ) : (
+                        <Badge color="red" size="sm">
+                          Inactive
+                        </Badge>
+                      )}
+                    </Table.Cell>
+                    <Table.Cell>{formatDate(med.prescription?.writtenAt)}</Table.Cell>
+                    <Table.Cell>{med.prescription?.id ? 'Photon' : 'External'}</Table.Cell>
+                  </Table.Row>
+                )}
+              </For>
+            </Show>
+          </Table.Body>
+        </Table>
+      </div>
+    </div>
   );
 }
