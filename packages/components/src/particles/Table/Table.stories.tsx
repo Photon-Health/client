@@ -1,6 +1,6 @@
 import Table, { TableProps } from '.';
 import type { Meta, StoryObj } from '@storybook/html';
-import type { ComponentProps } from 'solid-js';
+import { For, type ComponentProps } from 'solid-js';
 
 type TableStory = StoryObj<TableProps>;
 
@@ -31,15 +31,15 @@ const people = [
   }
 ];
 
+const headers = Object.keys(people[0]);
+const rows = people.map((person) =>
+  Object.values(person).map((value, idx) => (
+    <div class={idx === 0 ? 'font-semibold text-gray-900' : 'text-gray-500'}>{value}</div>
+  ))
+);
+
 export const Default: TableStory = {
-  args: {
-    headers: ['Name', 'Title', 'Email', 'Role'],
-    rows: people.map((person) =>
-      Object.values(person).map((value, idx) => (
-        <div class={idx === 0 ? 'font-semibold text-gray-900' : 'text-gray-500'}>{value}</div>
-      ))
-    )
-  }
+  args: {}
 };
 
 export default {
@@ -54,10 +54,24 @@ export default {
     }
   },
   render: (props) => {
+    // make header text have uppercase first letter
     return (
-      <div>
-        <Table {...props} />
-      </div>
+      <Table>
+        <Table.Header>
+          <For each={headers}>
+            {(header) => <Table.Col>{header[0].toUpperCase() + header.slice(1)}</Table.Col>}
+          </For>
+        </Table.Header>
+        <Table.Body>
+          <For each={rows}>
+            {(row) => (
+              <Table.Row>
+                <For each={row}>{(cell) => <Table.Cell>{cell}</Table.Cell>}</For>
+              </Table.Row>
+            )}
+          </For>
+        </Table.Body>
+      </Table>
     );
   }
 } as Meta<ComponentProps<typeof Table>>;
