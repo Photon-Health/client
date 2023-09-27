@@ -56,7 +56,7 @@ export const MedicationConceptDropdown = (props: MedicationConceptDropdownProps)
   return (
     <div
       class="w-full"
-      on:photon-data-selected={(e: { detail: { data: Concept } }) => {
+      on:photon-data-selected={(e: { detail: { data: SearchMedication } }) => {
         props.setConcept(e.detail.data);
       }}
     >
