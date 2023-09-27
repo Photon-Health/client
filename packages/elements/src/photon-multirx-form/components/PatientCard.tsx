@@ -113,10 +113,15 @@ export const PatientCard = (props: {
         <photon-card>
           <PatientMedHistory patientId={patientId()} addMedication={() => setMedDialogOpen(true)} />
           <photon-med-search-dialog
+            title="Add Medication History"
             open={medDialogOpen()}
             with-concept={true}
             on:photon-medication-selected={(e: any) => {
               console.log('med and concept search', e.detail);
+              setMedDialogOpen(false);
+            }}
+            on:photon-medication-closed={() => {
+              setMedDialogOpen(false);
             }}
           />
         </photon-card>

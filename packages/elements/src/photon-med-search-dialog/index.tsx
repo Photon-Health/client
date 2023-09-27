@@ -8,6 +8,7 @@ import { usePhoton } from '../context';
 type MedSearchDialogProps = {
   open: boolean;
   withConcept?: boolean;
+  title?: string;
 };
 
 customElement(
@@ -20,7 +21,8 @@ customElement(
       attribute: 'open',
       parse: true
     },
-    withConcept: false
+    withConcept: false,
+    title: ''
   },
   (props: MedSearchDialogProps) => {
     const client = usePhoton();
@@ -36,6 +38,14 @@ customElement(
         detail: {
           medication: medication()
         }
+      });
+      ref?.dispatchEvent(event);
+    };
+
+    const dispatchMedicationClosed = () => {
+      const event = new CustomEvent('photon-medication-closed', {
+        composed: true,
+        bubbles: true
       });
       ref?.dispatchEvent(event);
     };
@@ -61,9 +71,10 @@ customElement(
     };
 
     const handleCancel = () => {
+      dispatchMedicationClosed();
       props.open = false;
     };
-    console.log('dialog', props.withConcept);
+
     return (
       <div
         ref={ref}
@@ -85,7 +96,11 @@ customElement(
           on:photon-dialog-canceled={handleCancel}
           on:photon-dialog-alt={handleCancel}
         >
-          <photon-med-search open={props.open} with-concept={props.withConcept} />
+          <photon-med-search
+            open={props.open}
+            with-concept={props.withConcept}
+            title={props.title}
+          />
           <div class="mt-8 flex gap-4 justify-end">
             <Button variant="secondary" onClick={handleCancel}>
               Cancel
