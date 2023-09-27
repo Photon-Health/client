@@ -1,5 +1,10 @@
 import { MutableRefObject, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { usePhoton } from '@photonhealth/react';
+import { getSettings } from '@client/settings';
+
+const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
+const settings = getSettings(envName);
 
 declare global {
   namespace JSX {
@@ -11,6 +16,7 @@ declare global {
 
 export const PrescriptionForm = () => {
   const ref: MutableRefObject<any> = useRef();
+  const { user } = usePhoton();
   const [params] = useSearchParams();
   const patientId = params.get('patientId') || '';
   const templateIds = params.get('templateIds') || '';
@@ -61,13 +67,16 @@ export const PrescriptionForm = () => {
         zIndex: 15
       }}
     >
-      <photon-multirx-form-wrapper
-        ref={ref}
-        template-ids={templateIds}
-        patient-id={patientId}
-        prescription-ids={prescriptionIds}
-        weight={weight}
-      />
+      {user?.org_id ? (
+        <photon-multirx-form-wrapper
+          ref={ref}
+          template-ids={templateIds}
+          patient-id={patientId}
+          prescription-ids={prescriptionIds}
+          weight={weight}
+          enable-med-history={settings[user.org_id]?.enableMedHistory ?? false}
+        />
+      ) : null}
     </div>
   );
 };

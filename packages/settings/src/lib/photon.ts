@@ -24,7 +24,8 @@ const defaultSettings: OrganizationSettings = {
   courier: false,
   courierProviders: [],
   returnTo: window.location.origin,
-  federated: false
+  federated: false,
+  enableMedHistory: false
 };
 
 /**

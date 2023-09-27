@@ -25,7 +25,8 @@ const defaultSettings: OrganizationSettings = {
   courier: true,
   courierProviders: [ALTO_ID],
   returnTo: window.location.origin,
-  federated: false
+  federated: false,
+  enableMedHistory: false
 };
 
 /**
@@ -43,7 +44,8 @@ export const boson: {
     logo: 'photon',
     accentColor: '#b35724',
     mailOrderNavigate: true,
-    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
+    enableMedHistory: true
   },
   // NewCo (demo's)
   org_w85CgjUjCi52yvOz: {
