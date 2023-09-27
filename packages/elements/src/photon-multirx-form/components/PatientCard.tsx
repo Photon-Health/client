@@ -1,7 +1,8 @@
-import { message } from '../../validators';
 import { string, any, record } from 'superstruct';
 import { createSignal, onMount, Show, createEffect, createMemo } from 'solid-js';
 import { PatientInfo, PatientMedHistory } from '@photonhealth/components';
+import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
+import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
 import { PhotonClientStore } from '../../store';
 import type { Address } from '../index';
@@ -23,6 +24,9 @@ export const PatientCard = (props: {
   weight?: number;
   enableMedHistory?: boolean;
 }) => {
+  const [newMedication, setNewMedication] = createSignal<Medication | SearchMedication | undefined>(
+    undefined
+  );
   const [dialogOpen, setDialogOpen] = createSignal(false);
   const [medDialogOpen, setMedDialogOpen] = createSignal(false);
   const { actions, store } = PatientStore;
@@ -111,13 +115,19 @@ export const PatientCard = (props: {
       </Show>
       <Show when={props.enableMedHistory}>
         <photon-card>
-          <PatientMedHistory patientId={patientId()} addMedication={() => setMedDialogOpen(true)} />
+          <PatientMedHistory
+            patientId={patientId()}
+            openAddMedication={() => setMedDialogOpen(true)}
+            newMedication={newMedication()}
+          />
           <photon-med-search-dialog
             title="Add Medication History"
             open={medDialogOpen()}
             with-concept={true}
-            on:photon-medication-selected={(e: any) => {
-              console.log('med and concept search', e.detail);
+            on:photon-medication-selected={(e: {
+              detail: { medication: Medication | SearchMedication };
+            }) => {
+              setNewMedication(e.detail.medication);
               setMedDialogOpen(false);
             }}
             on:photon-medication-closed={() => {

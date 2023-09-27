@@ -1,4 +1,4 @@
-import { Medication, Concept } from '@photonhealth/sdk/dist/types';
+import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
 import { Button, Dialog } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { customElement } from 'solid-element';
@@ -27,7 +27,9 @@ customElement(
   (props: MedSearchDialogProps) => {
     const client = usePhoton();
     let ref: any;
-    const [medication, setMedication] = createSignal<Medication | undefined>(undefined);
+    const [medication, setMedication] = createSignal<Medication | SearchMedication | undefined>(
+      undefined
+    );
     const [addToCatalog, setAddToCatalog] = createSignal<boolean>(false);
     const [catalogId, setCatalogId] = createSignal<string>('');
 

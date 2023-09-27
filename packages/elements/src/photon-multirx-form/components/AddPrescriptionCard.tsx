@@ -35,7 +35,6 @@ export const AddPrescriptionCard = (props: {
   store: Record<string, any>;
   weight?: number;
 }) => {
-  let medSearchRef: any;
   const [medDialogOpen, setMedDialogOpen] = createSignal(false);
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
@@ -191,7 +190,7 @@ export const AddPrescriptionCard = (props: {
                 class="w-fit"
                 on:photon-clicked={() => setOpenDoseCalculator(true)}
               >
-                <button onClick={() => setOpenDoseCalculator(true)}>
+                <button aria-label="open calculator" onClick={() => setOpenDoseCalculator(true)}>
                   <sl-icon name="calculator" />
                 </button>
               </photon-button>

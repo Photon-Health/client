@@ -13,7 +13,7 @@ setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/')
 import { createEffect, createSignal, For, onMount, Show, createMemo } from 'solid-js';
 import { gql } from '@apollo/client';
 import { usePhotonClient } from '@photonhealth/components';
-import { Medication, Concept } from '@photonhealth/sdk/dist/types';
+import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
 import { MedicationConceptDropdown } from './components/MedicationConceptDropdown';
 import { MedicationFilterDropdown } from './components/MedicationFilterDropdown';
 
@@ -49,9 +49,9 @@ customElement(
     let ref: any;
     const client = usePhotonClient();
     const [conceptId, setConceptId] = createSignal<string>('');
-    const [concept, setConcept] = createSignal<Concept | undefined>(undefined);
+    const [concept, setConcept] = createSignal<SearchMedication | undefined>(undefined);
     const [medicationId, setMedicationId] = createSignal<string>('');
-    const [products, setProducts] = createSignal<Medication[]>([]);
+    const [products, setProducts] = createSignal<(Medication | SearchMedication)[]>([]);
     const [addToCatalog, setAddToCatalog] = createSignal<boolean>(false);
     const [selectedMedication, setSelectedMedication] = createSignal<Medication | undefined>(
       undefined

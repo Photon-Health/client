@@ -1,7 +1,8 @@
 import { createSignal, createEffect, Show, For, createMemo } from 'solid-js';
 import gql from 'graphql-tag';
 import { usePhotonClient } from '../SDKProvider';
-import { PatientMedication } from '@photonhealth/sdk/dist/types';
+import { PhotonClient } from '@photonhealth/sdk';
+import { PatientMedication, Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
 import Table from '../../particles/Table';
 import Text from '../../particles/Text';
 import generateString from '../../utils/generateString';
@@ -9,7 +10,7 @@ import Badge from '../../particles/Badge';
 import formatDate from '../../utils/formatDate';
 import Button from '../../particles/Button';
 
-const GET_PATIENT = gql`
+const GET_PATIENT_MED_HISTORY = gql`
   query GetPatient($id: ID!) {
     patient(id: $id) {
       id
@@ -28,9 +29,18 @@ const GET_PATIENT = gql`
   }
 `;
 
+const ADD_MED_HISTORY = gql`
+  mutation UpdateMedicationHistory($id: ID!, $medicationHistory: [MedHistoryInput!]!) {
+    updatePatient(id: $id, medicationHistory: $medicationHistory) {
+      id
+    }
+  }
+`;
+
 type PatientMedHistoryProps = {
   patientId: string;
-  addMedication?: () => void;
+  openAddMedication?: () => void;
+  newMedication?: Medication | SearchMedication;
 };
 
 const LoadingRowFallback = () => (
@@ -54,14 +64,51 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const client = usePhotonClient();
   const [medHistory, setMedHistory] = createSignal<PatientMedication[] | undefined>(undefined);
 
+  const baseURL = createMemo(() =>
+    client.uri.replace('api', 'app').replace('graphql', 'prescriptions')
+  );
+
   const fetchPatient = async () => {
     const { data } = await client!.apollo.query({
-      query: GET_PATIENT,
+      query: GET_PATIENT_MED_HISTORY,
       variables: { id: props.patientId }
     });
     if (data?.patient?.medicationHistory) {
       setMedHistory(data.patient.medicationHistory);
     }
+  };
+
+  const addMedHistory = async (medicationId: string) => {
+    await (client as PhotonClient)!.apollo.mutate({
+      mutation: ADD_MED_HISTORY,
+      variables: { id: props.patientId, medicationHistory: [{ medicationId, active: false }] },
+      update: (cache) => {
+        const existingPatient: any = cache.readQuery({
+          query: GET_PATIENT_MED_HISTORY,
+          variables: { id: props.patientId }
+        });
+
+        const newPatient = {
+          ...existingPatient.patient,
+          medicationHistory: [
+            {
+              __typename: 'PatientMedication',
+              medication: props.newMedication,
+              active: false,
+              prescription: null
+            },
+            ...existingPatient.patient.medicationHistory
+          ]
+        };
+        cache.writeQuery({
+          query: GET_PATIENT_MED_HISTORY,
+          variables: { id: props.patientId },
+          data: { patient: newPatient }
+        });
+
+        fetchPatient();
+      }
+    });
   };
 
   createEffect(() => {
@@ -70,16 +117,18 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
     }
   });
 
-  const baseURL = createMemo(() =>
-    client.uri.replace('api', 'app').replace('graphql', 'prescriptions')
-  );
+  createEffect(() => {
+    if (props?.newMedication?.id) {
+      addMedHistory(props.newMedication.id);
+    }
+  });
 
   return (
     <div class="divide-y divide-gray-200">
       <div class="flex justify-between pb-4">
         <h5>Medication History</h5>
-        <Show when={props?.addMedication}>
-          <Button variant="secondary" size="sm" onClick={props?.addMedication}>
+        <Show when={props?.openAddMedication}>
+          <Button variant="secondary" size="sm" onClick={props?.openAddMedication}>
             + Add
           </Button>
         </Show>
