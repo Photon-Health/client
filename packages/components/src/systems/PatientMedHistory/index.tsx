@@ -45,16 +45,16 @@ type PatientMedHistoryProps = {
 const LoadingRowFallback = () => (
   <Table.Row>
     <Table.Cell>
-      <Text sampleLoadingText={generateString(10, 45)} loading />
+      <Text sampleLoadingText={generateString(10, 25)} loading />
     </Table.Cell>
     <Table.Cell>
       <Text sampleLoadingText={generateString(6, 8)} loading />
     </Table.Cell>
     <Table.Cell>
-      <Text sampleLoadingText={generateString()} loading />
+      <Text sampleLoadingText={generateString(2, 8)} loading />
     </Table.Cell>
     <Table.Cell>
-      <Text sampleLoadingText={generateString()} loading />
+      <Text sampleLoadingText={generateString(4, 8)} loading />
     </Table.Cell>
   </Table.Row>
 );
@@ -133,7 +133,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
       <div class="max-h-80 overflow-y-auto">
         <Table>
           <Table.Header>
-            <Table.Col>Medication</Table.Col>
+            <Table.Col width="16rem">Medication</Table.Col>
             <Table.Col>Status</Table.Col>
             <Table.Col>Written</Table.Col>
             <Table.Col>Source</Table.Col>
@@ -146,7 +146,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
               <For each={medHistory()}>
                 {(med) => (
                   <Table.Row>
-                    <Table.Cell>{med.medication?.name}</Table.Cell>
+                    <Table.Cell width="16rem">{med.medication?.name}</Table.Cell>
                     <Table.Cell>
                       {med.active ? (
                         <Badge color="green" size="sm">
@@ -158,7 +158,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
                         </Badge>
                       )}
                     </Table.Cell>
-                    <Table.Cell>{formatDate(med.prescription?.writtenAt)}</Table.Cell>
+                    <Table.Cell>{formatDate(med.prescription?.writtenAt) || 'N/A'}</Table.Cell>
                     <Table.Cell>
                       {med.prescription?.id ? (
                         <a

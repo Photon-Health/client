@@ -6,9 +6,17 @@ const Header = (props: { children?: JSXElement }) => (
   </thead>
 );
 
-const Col = (props: { children?: JSXElement }) => {
+type ColProps = {
+  children?: JSXElement;
+  width?: string;
+};
+
+const Col = (props: ColProps) => {
+  const style = { 'max-width': props?.width || 'auto' };
   return (
-    <th class="px-3 py-3.5 text-left text-xs font-semibold text-gray-900">{props.children}</th>
+    <th class="px-3 py-3.5 text-left text-xs font-semibold text-gray-900" style={style}>
+      {props.children}
+    </th>
   );
 };
 
@@ -16,9 +24,19 @@ const Body = (props: { children: JSXElement }) => <tbody class="bg-white">{props
 
 const Row = (props: { children: JSXElement }) => <tr class="even:bg-gray-50">{props.children}</tr>;
 
-const Cell = (props: { children: JSXElement }) => (
-  <td class="whitespace-nowrap px-3 py-4 text-xs">{props.children}</td>
-);
+type CellProps = {
+  children: JSXElement;
+  width?: string;
+};
+
+const Cell = (props: CellProps) => {
+  const style = { 'max-width': props?.width || 'auto' };
+  return (
+    <td class="px-3 py-4 text-xs" style={style}>
+      {props.children}
+    </td>
+  );
+};
 
 export type TableProps = { children: JSXElement[] };
 function Table(props: TableProps) {

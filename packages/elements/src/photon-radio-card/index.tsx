@@ -30,7 +30,7 @@ customElement(
     };
 
     return (
-      <div ref={ref}>
+      <div ref={ref} class="cursor-pointer">
         <style>{tailwind}</style>
         <photon-card on:click={() => dispatchSelected()}>
           <div class="flex items-center gap-2">
