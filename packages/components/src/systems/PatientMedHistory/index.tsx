@@ -1,7 +1,6 @@
 import { createSignal, createEffect, Show, For, createMemo } from 'solid-js';
 import gql from 'graphql-tag';
 import { usePhotonClient } from '../SDKProvider';
-import { PhotonClient } from '@photonhealth/sdk';
 import { PatientMedication, Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
 import Table from '../../particles/Table';
 import Text from '../../particles/Text';
