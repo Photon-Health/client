@@ -64,9 +64,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const client = usePhotonClient();
   const [medHistory, setMedHistory] = createSignal<PatientMedication[] | undefined>(undefined);
 
-  const baseURL = createMemo(() =>
-    client.uri.replace('api', 'app').replace('graphql', 'prescriptions')
-  );
+  const baseURL = createMemo(() => `${client?.clinicalUrl}prescriptions/`);
 
   const fetchPatient = async () => {
     const { data } = await client!.apollo.query({
@@ -167,7 +165,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
                         <a
                           class="text-blue-500 underline"
                           target="_blank"
-                          href={`${baseURL()}/${med.prescription?.id}`}
+                          href={`${baseURL()}${med.prescription?.id}`}
                         >
                           Link
                         </a>

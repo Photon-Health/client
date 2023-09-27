@@ -113,7 +113,7 @@ export const PatientCard = (props: {
           />
         </photon-card>
       </Show>
-      <Show when={props.enableMedHistory}>
+      <Show when={props.enableMedHistory && patientId()}>
         <photon-card>
           <PatientMedHistory
             patientId={patientId()}
