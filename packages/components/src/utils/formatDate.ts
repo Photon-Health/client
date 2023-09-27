@@ -1,22 +1,13 @@
-function formatDate(dateString: string) {
-  const dateParts = dateString.split(/[/\s-]/); // split the string by any of these characters: "/", " ", "-"
-
-  if (dateParts.length !== 3) {
+export default function formatDate(dateString: string): string {
+  if (!dateString) {
     return '';
   }
 
-  const [month, day, year] = dateParts.map((part) => parseInt(part));
-  if (isNaN(month) || isNaN(day) || isNaN(year)) {
-    return '';
-  }
+  const date = new Date(dateString);
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const year = date.getFullYear();
 
-  // Check if month and day are within range
-  if (month < 1 || month > 12 || day < 1 || day > 31) {
-    return '';
-  }
-
-  // use template literals to format the date string
-  return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+  const formattedDate = `${month}/${day}/${year}`;
+  return formattedDate;
 }
-
-export default formatDate;

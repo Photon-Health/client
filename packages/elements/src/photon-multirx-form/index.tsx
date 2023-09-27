@@ -50,6 +50,7 @@ customElement(
     enableOrder: false,
     enableLocalPickup: false,
     enableSendToPatient: false,
+    enableMedHistory: false,
     mailOrderIds: undefined,
     pharmacyId: undefined,
     loading: false,
@@ -67,6 +68,7 @@ customElement(
       enableOrder: boolean;
       enableLocalPickup: boolean;
       enableSendToPatient: boolean;
+      enableMedHistory: boolean;
       mailOrderIds?: string;
       pharmacyId?: string;
       loading: boolean;
@@ -320,6 +322,7 @@ customElement(
                 enableOrder={props.enableOrder}
                 address={props.address}
                 weight={props.weight}
+                enableMedHistory={props.enableMedHistory}
               />
               <Show when={showForm() || isEditing()}>
                 <div ref={prescriptionRef}>
