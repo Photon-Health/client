@@ -129,21 +129,21 @@ export default function PatientInfo(props: PatientInfoProps) {
         <div>
           <InfoRow label="Patient ID">
             <Text size="sm" loading={!patient()} sampleLoadingText="Sally Patient">
-              {patient()?.name.full}
+              {patient()?.name.full || 'N/A'}
             </Text>
           </InfoRow>
           <InfoRow label="Email">
             <Text size="sm" loading={!patient()} sampleLoadingText="fake@email.com">
-              {patient()?.email}
+              {patient()?.email || 'N/A'}
             </Text>
           </InfoRow>
           <InfoRow label="Mobile Phone">
             <Text size="sm" loading={!patient()} sampleLoadingText="555-555-5555">
-              {phoneNumber()}
+              {phoneNumber() || 'N/A'}
             </Text>
           </InfoRow>
           <InfoRow label="Address">
-            <Show when={!patient() || address()}>
+            <Show when={!patient() || address()} fallback={<div>N/A</div>}>
               <div>
                 <Text size="sm" loading={!patient()} sampleLoadingText="123 Fake St">
                   {address()?.street1}
@@ -169,21 +169,21 @@ export default function PatientInfo(props: PatientInfoProps) {
         <div>
           <InfoRow label="DOB">
             <Text size="sm" loading={!patient()} sampleLoadingText="female">
-              {formatDate(patient()?.dateOfBirth || '')}
+              {formatDate(patient()?.dateOfBirth || 'N/A')}
             </Text>
           </InfoRow>
           <InfoRow label="Gender">
             <Text size="sm" loading={!patient()} sampleLoadingText="male/man">
-              {patient()?.gender}
+              {patient()?.gender || 'N/A'}
             </Text>
           </InfoRow>
           <InfoRow label="Weight">
             <Text size="sm" loading={!patient()} sampleLoadingText="150 lbs">
-              {props?.weight ? `${props.weight} lbs` : ''}
+              {props?.weight ? `${props.weight} lbs` : 'N/A'}
             </Text>
           </InfoRow>
           <InfoRow label="Pharmacy">
-            <Show when={!patient() || preferredPharmacy()}>
+            <Show when={!patient() || preferredPharmacy()} fallback={<div>N/A</div>}>
               <div>
                 <Text size="sm" loading={!patient()} sampleLoadingText="CVS Pharmacy">
                   {preferredPharmacy()?.name}
