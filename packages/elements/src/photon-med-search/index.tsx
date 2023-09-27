@@ -160,7 +160,7 @@ customElement(
           >
             <photon-radio-group>
               <Show when={props.withConcept && concept}>
-                <photon-radio-card value={concept()}>{concept().name}</photon-radio-card>
+                <photon-radio-card value={concept()}>{concept()?.name}</photon-radio-card>
               </Show>
               <For
                 each={products()
