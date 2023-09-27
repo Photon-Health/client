@@ -77,7 +77,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   };
 
   const addMedHistory = async (medicationId: string) => {
-    await (client as PhotonClient)!.apollo.mutate({
+    await client!.apollo.mutate({
       mutation: ADD_MED_HISTORY,
       variables: { id: props.patientId, medicationHistory: [{ medicationId, active: false }] },
       update: (cache) => {
