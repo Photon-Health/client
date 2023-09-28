@@ -16,7 +16,7 @@ const GET_CONCEPTS = gql`
 
 type MedicationConceptDropdownProps = {
   conceptId?: string;
-  setConceptId: (id: string) => void;
+  setConcept: (concept: SearchMedication) => void;
 };
 
 export const MedicationConceptDropdown = (props: MedicationConceptDropdownProps) => {
@@ -56,8 +56,8 @@ export const MedicationConceptDropdown = (props: MedicationConceptDropdownProps)
   return (
     <div
       class="w-full"
-      on:photon-data-selected={(e: { detail: { data: { id: string } } }) => {
-        props.setConceptId(e.detail.data.id);
+      on:photon-data-selected={(e: { detail: { data: SearchMedication } }) => {
+        props.setConcept(e.detail.data);
       }}
     >
       <PhotonDropdown

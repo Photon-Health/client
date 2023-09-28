@@ -4,6 +4,12 @@ import { createSignal } from 'solid-js';
 //Styles
 import tailwind from '../tailwind.css?inline';
 
+type CardProps = {
+  invalid: boolean;
+  title: string | null;
+  collapsable: boolean;
+};
+
 customElement(
   'photon-card',
   {
@@ -11,7 +17,7 @@ customElement(
     title: null,
     collapsable: false
   },
-  (props: { invalid: boolean; title: string | null; collapsable: boolean }) => {
+  (props: CardProps) => {
     const [isCollapsed, setIsCollapsed] = createSignal<boolean>(true);
 
     let titleElement = null;

@@ -35,7 +35,7 @@ export const AddPrescriptionCard = (props: {
   store: Record<string, any>;
   weight?: number;
 }) => {
-  let medSearchRef: any;
+  const [medDialogOpen, setMedDialogOpen] = createSignal(false);
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
@@ -106,12 +106,18 @@ export const AddPrescriptionCard = (props: {
                 })
               }
             />
-            <photon-med-search-dialog ref={medSearchRef} />
+            <photon-med-search-dialog
+              title="Advanced Medication Search"
+              open={medDialogOpen()}
+              on:photon-medication-closed={() => {
+                setMedDialogOpen(false);
+              }}
+            />
           </div>
           <div class="pb-4 md:py-2 text-left sm:text-right">
             <a
               class="font-sans text-gray-500 text-sm hover:text-black hover:cursor-pointer"
-              onClick={() => (medSearchRef.open = true)}
+              onClick={() => setMedDialogOpen(true)}
             >
               Advanced Search →
             </a>
@@ -184,7 +190,7 @@ export const AddPrescriptionCard = (props: {
                 class="w-fit"
                 on:photon-clicked={() => setOpenDoseCalculator(true)}
               >
-                <button onClick={() => setOpenDoseCalculator(true)}>
+                <button aria-label="open calculator" onClick={() => setOpenDoseCalculator(true)}>
                   <sl-icon name="calculator" />
                 </button>
               </photon-button>

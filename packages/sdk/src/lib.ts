@@ -4,6 +4,7 @@ import { setContext } from '@apollo/client/link/context/index.js';
 import { AuthManager } from './auth';
 import { ClinicalQueryManager } from './clinical';
 import { ManagementQueryManager } from './management';
+import { getClinicalUrl } from './utils';
 
 export * as types from './types';
 export * as fragments from './fragments';
@@ -33,6 +34,8 @@ export class PhotonClient {
   private audience?: string;
 
   private uri?: string;
+
+  public clinicalUrl?: string;
 
   private auth0Client: Auth0Client;
 
@@ -78,6 +81,7 @@ export class PhotonClient {
     });
     this.audience = audience;
     this.uri = uri;
+    this.clinicalUrl = getClinicalUrl(uri);
     if (developmentMode) {
       this.audience = 'https://api.neutron.health';
       this.uri = 'https://api.neutron.health/graphql';
