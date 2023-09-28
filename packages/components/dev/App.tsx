@@ -10,6 +10,7 @@ import ComboBox from '../src/particles/ComboBox';
 import PharmacySelect from '../src/systems/PharmacySelect';
 import Card from '../src/particles/Card';
 import DraftPrescriptions, { DraftPrescription } from '../src/systems/DraftPrescriptions';
+import PatientMedHistory from '../src/systems/PatientMedHistory';
 
 const draftPrescriptions: DraftPrescription[] = [
   {
@@ -106,6 +107,11 @@ const App = () => {
         <div class="mb-10">
           <h2>Patient Info</h2>
           <PatientInfo patientId="pat_01GQ0XFBHSH3YXN936A2D2SD7Y" />
+        </div>
+
+        <div class="mb-10">
+          <h2>Patient Med History</h2>
+          <PatientMedHistory patientId="pat_01GQ0XFBHSH3YXN936A2D2SD7Y" />
         </div>
 
         <div class="mb-10">

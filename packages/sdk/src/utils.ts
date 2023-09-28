@@ -74,3 +74,17 @@ export function makeMutation<T = any>(
     });
   };
 }
+
+export function getClinicalUrl(uri: string): string | undefined {
+  const serviceNameToUrlMap: Record<string, string> = {
+    boson: 'https://app.boson.health/',
+    neutron: 'https://app.neutron.health/',
+    photon: 'https://app.photon.health/'
+  };
+
+  const foundService = Object.keys(serviceNameToUrlMap).find((service) =>
+    uri.toLowerCase().includes(service)
+  );
+
+  return serviceNameToUrlMap[foundService || 'photon'];
+}

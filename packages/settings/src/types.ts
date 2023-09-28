@@ -34,4 +34,5 @@ export type OrganizationSettings = {
   patientsCanReroute: boolean;
   returnTo?: string;
   federated?: boolean;
+  enableMedHistory?: boolean;
 };
