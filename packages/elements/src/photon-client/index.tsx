@@ -1,5 +1,5 @@
 import { customElement } from 'solid-element';
-import { createEffect, createSignal } from 'solid-js';
+import { createEffect, createSignal, onMount, Show, createMemo } from 'solid-js';
 import { PhotonContext } from '../context';
 import { hasAuthParams } from '../utils';
 import { PhotonClient } from '@photonhealth/sdk';
@@ -18,6 +18,7 @@ type PhotonClientProps = {
   developmentMode?: boolean;
   errorMessage?: string;
   autoLogin: boolean;
+  hasClient: boolean;
 };
 
 customElement(
@@ -92,59 +93,106 @@ customElement(
       reflect: false,
       notify: false,
       parse: true
+    },
+    hasClient: {
+      attribute: 'has-client',
+      value: false,
+      reflect: false,
+      notify: false,
+      parse: true
     }
   },
   (props: PhotonClientProps) => {
     let ref: any;
+    const [externalClient, setExternalClient] = createSignal<PhotonClient | null>(null);
 
-    const sdk = new PhotonClient({
-      domain: props.domain,
-      audience: props.audience,
-      uri: props.uri,
-      clientId: props.id!,
-      redirectURI: props.redirectUri ? props.redirectUri : window.location.origin,
-      organization: props.org,
-      developmentMode: props.developmentMode
+    document.addEventListener('check-client', (e: any) => {
+      console.log('Event caught on document', e.detail.client);
+      setExternalClient(e.detail.client);
     });
-    const client = new PhotonClientStore(sdk);
-    if (props.developmentMode) {
-      console.info('[PhotonClient]: Development mode enabled');
-    }
-    const [store] = createSignal<PhotonClientStore>(client);
 
-    createEffect(async () => {
-      if (hasAuthParams() && store()) {
-        await store()?.authentication.handleRedirect();
-        if (props.redirectPath) window.location.replace(props.redirectPath);
-      } else if (store()) {
-        await store()?.authentication.checkSession();
-        makeTimer(
-          async () => {
-            await store()?.authentication.checkSession();
-          },
-          60000,
-          setInterval
-        );
+    const sdk = createMemo(() => {
+      if (props?.hasClient) {
+        if (externalClient()) {
+          return externalClient();
+        }
+        return null;
+      } else {
+        return new PhotonClient({
+          domain: props.domain,
+          audience: props.audience,
+          uri: props.uri,
+          clientId: props.id,
+          redirectURI: props.redirectUri ? props.redirectUri : window.location.origin,
+          organization: props.org,
+          developmentMode: props.developmentMode
+        });
       }
     });
-    createEffect(async () => {
-      if (!store()?.authentication.state.isLoading) {
-        if (!store()?.authentication.state.isAuthenticated && props.autoLogin) {
-          const args: any = { appState: {} };
-          if (props.redirectPath) {
-            args.appState.returnTo = props.redirectPath;
-          }
-          await store()?.authentication.login(args);
+
+    const client = createMemo(() => (sdk() ? new PhotonClientStore(sdk()) : null));
+
+    onMount(() => {
+      if (props.developmentMode) {
+        console.info('[PhotonClient]: Development mode enabled');
+      }
+    });
+
+    const [store] = createSignal<PhotonClientStore | null>(client());
+
+    const handleRedirect = async () => {
+      await store()?.authentication.handleRedirect();
+      if (props.redirectPath) window.location.replace(props.redirectPath);
+    };
+
+    const checkSession = async () => {
+      await store()?.authentication.checkSession();
+      makeTimer(
+        async () => {
+          await store()?.authentication.checkSession();
+        },
+        60000,
+        setInterval
+      );
+    };
+
+    const login = async () => {
+      const args: any = { appState: {} };
+      if (props.redirectPath) {
+        args.appState.returnTo = props.redirectPath;
+      }
+      await store()?.authentication.login(args);
+    };
+
+    createEffect(() => {
+      if (!props?.hasClient) {
+        if (hasAuthParams() && store()) {
+          console.log('- handleRedirect');
+          handleRedirect();
+        } else if (store()) {
+          console.log('- checkSession');
+          checkSession();
         }
       }
     });
 
+    createEffect(() => {
+      if (!store()?.authentication.state.isLoading) {
+        if (!store()?.authentication.state.isAuthenticated && props.autoLogin) {
+          console.log('- login');
+          login();
+        }
+      }
+    });
+    console.log('store', store());
     return (
       <div ref={ref}>
         <PhotonContext.Provider value={store()}>
-          <SDKProvider client={sdk}>
-            <slot />
-          </SDKProvider>
+          <Show when={sdk()} fallback={<slot />}>
+            <SDKProvider client={sdk()}>
+              <slot />
+            </SDKProvider>
+          </Show>
         </PhotonContext.Provider>
       </div>
     );

@@ -2,7 +2,7 @@ import { Outlet, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { Center, CircularProgress, Box } from '@chakra-ui/react';
 
 import { usePhoton } from '@photonhealth/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Nav } from '../components/Nav';
 import { SelectOrg } from './SelectOrg';
 import { addAlert } from '../../stores/alert';
@@ -18,11 +18,13 @@ declare global {
 }
 
 export const Main = () => {
+  const elementClientRef = useRef<HTMLElement | null>(null);
   const query = useQueryParams();
 
   // Detect is browser is Safari
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  const { user, isAuthenticated, isLoading, error, clearError } = usePhoton();
+  const { user, isAuthenticated, isLoading, error, clearError, client } = usePhoton();
+
   const [previouslyAuthed, setPreviouslyAuthed] = useState(
     localStorage.getItem('previouslyAuthed') != null || false
   );
@@ -54,6 +56,20 @@ export const Main = () => {
       }
     }
   }, [isLoading, error]);
+
+  useEffect(() => {
+    if (elementClientRef.current && client) {
+      console.log('dispatching check-client');
+      const checkClient = new CustomEvent('check-client', {
+        detail: { client },
+        bubbles: true,
+        composed: true
+      });
+      console.log(elementClientRef?.current?.dispatchEvent);
+
+      elementClientRef?.current?.dispatchEvent(checkClient);
+    }
+  }, [client, elementClientRef, isAuthenticated, user?.org_id]);
 
   if (isLoading || (previouslyAuthed && !isAuthenticated)) {
     return (
@@ -89,7 +105,7 @@ export const Main = () => {
 
   return (
     // For infinite scrolling, Safari expects body to be 100vh, while chrome/firefox expects heihgt auto
-    <Box as="section" height={isSafari ? '100vh' : 'auto'} overflowY="auto">
+    <Box as="section" height={isSafari ? '100vh' : 'auto'} overflowY="auto" ref={elementClientRef}>
       {isAuthenticated && user?.org_id ? (
         <photon-client
           id={auth0Config.clientId}
@@ -98,6 +114,7 @@ export const Main = () => {
           audience={auth0Config.audience}
           uri={process.env.REACT_APP_GRAPHQL_URI as string}
           auto-login="false"
+          has-client="true"
         >
           <Nav />
           <Outlet />
