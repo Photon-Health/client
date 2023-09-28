@@ -1,7 +1,8 @@
-import { message } from '../../validators';
 import { string, any, record } from 'superstruct';
 import { createSignal, onMount, Show, createEffect, createMemo } from 'solid-js';
-import { PatientInfo } from '@photonhealth/components';
+import { PatientInfo, PatientMedHistory } from '@photonhealth/components';
+import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
+import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
 import { PhotonClientStore } from '../../store';
 import type { Address } from '../index';
@@ -21,21 +22,33 @@ export const PatientCard = (props: {
   enableOrder?: boolean;
   address?: Address;
   weight?: number;
+  enableMedHistory?: boolean;
 }) => {
+  const [newMedication, setNewMedication] = createSignal<Medication | SearchMedication | undefined>(
+    undefined
+  );
   const [dialogOpen, setDialogOpen] = createSignal(false);
+  const [medDialogOpen, setMedDialogOpen] = createSignal(false);
   const { actions, store } = PatientStore;
 
-  props.actions.registerValidator({
-    key: 'patient',
-    validator: patientValidator
-  });
-
-  if (props.enableOrder) {
+  onMount(() => {
     props.actions.registerValidator({
-      key: 'address',
-      validator: patientAddressValidator
+      key: 'patient',
+      validator: patientValidator
     });
-  }
+
+    if (props.enableOrder) {
+      props.actions.registerValidator({
+        key: 'address',
+        validator: patientAddressValidator
+      });
+    }
+
+    if (props?.patientId) {
+      // fetch patient on mount when patientId is passed
+      actions.getSelectedPatient(props.client!.getSDK(), props.patientId);
+    }
+  });
 
   const updatePatient = (e: any) => {
     props.actions.updateFormValue({
@@ -51,13 +64,6 @@ export const PatientCard = (props: {
       });
     }
   };
-
-  onMount(() => {
-    if (props?.patientId) {
-      // fetch patient on mount when patientId is passed
-      actions.getSelectedPatient(props.client!.getSDK(), props.patientId);
-    }
-  });
 
   createEffect(() => {
     if (store?.selectedPatient?.data && props?.patientId) {
@@ -104,6 +110,29 @@ export const PatientCard = (props: {
               actions.getSelectedPatient(props.client!.getSDK(), props.store['patient']?.value?.id);
             }}
             patient-id={patientId()}
+          />
+        </photon-card>
+      </Show>
+      <Show when={props.enableMedHistory && patientId()}>
+        <photon-card>
+          <PatientMedHistory
+            patientId={patientId()}
+            openAddMedication={() => setMedDialogOpen(true)}
+            newMedication={newMedication()}
+          />
+          <photon-med-search-dialog
+            title="Add Medication History"
+            open={medDialogOpen()}
+            with-concept={true}
+            on:photon-medication-selected={(e: {
+              detail: { medication: Medication | SearchMedication };
+            }) => {
+              setNewMedication(e.detail.medication);
+              setMedDialogOpen(false);
+            }}
+            on:photon-medication-closed={() => {
+              setMedDialogOpen(false);
+            }}
           />
         </photon-card>
       </Show>

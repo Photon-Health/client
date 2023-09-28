@@ -24,6 +24,7 @@ import { NewOrder } from './views/routes/NewOrder';
 import { Playground } from './views/routes/Playground';
 import { auth0Config } from './configs/auth';
 import { AlertDisplay } from './views/components/AlertDisplay';
+import { Intercom } from './views/components/Intercom';
 import { useEffect } from 'react';
 
 const client = new PhotonClient({
@@ -52,6 +53,7 @@ export const App = () => {
   return (
     <BrowserRouter>
       <PhotonProvider client={client} onRedirectCallback={onRedirectCallback}>
+        <Intercom />
         <AlertDisplay />
         <Routes>
           <Route path="/" element={<Main />}>

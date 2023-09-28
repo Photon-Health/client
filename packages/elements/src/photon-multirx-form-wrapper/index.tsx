@@ -23,6 +23,7 @@ const shouldWarn = (form: any) =>
 customElement(
   'photon-multirx-form-wrapper',
   {
+    enableMedHistory: false,
     hideTemplates: false,
     patientId: undefined,
     templateIds: undefined,
@@ -30,6 +31,7 @@ customElement(
     weight: undefined
   },
   (props: {
+    enableMedHistory: boolean;
     hideTemplates?: boolean;
     patientId?: string;
     templateIds?: string;
@@ -285,6 +287,7 @@ customElement(
                   template-ids={props.templateIds}
                   prescription-ids={props.prescriptionIds}
                   weight={props.weight}
+                  enable-med-history={props.enableMedHistory}
                   on:photon-form-validate={(e: any) => {
                     setCanSubmit(e.detail.canSubmit);
                     setActions(e.detail.actions);
