@@ -44,7 +44,7 @@ export const PatientCard = ({ loading, patient }: PatientCardProps) => {
               gap={4}
             >
               <GridItem area="name">
-                <Text color="gray.500">Name</Text>
+                <Text color="gray.500">Patient</Text>
               </GridItem>
               <GridItem area="nameVal" alignSelf="center">
                 {loading ? (

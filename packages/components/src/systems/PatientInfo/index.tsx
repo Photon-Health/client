@@ -127,7 +127,7 @@ export default function PatientInfo(props: PatientInfoProps) {
       </div>
       <div class="pt-4 sm:grid sm:grid-cols-2 sm:gap-2">
         <div>
-          <InfoRow label="Patient ID">
+          <InfoRow label="Patient">
             <Text size="sm" loading={!patient()} sampleLoadingText="Sally Patient">
               {patient()?.name.full || 'N/A'}
             </Text>

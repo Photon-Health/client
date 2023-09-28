@@ -72,8 +72,6 @@ export const PatientCard = (props: {
     }
   });
 
-  // show the card if patient id has not been passed and order is not enabled
-  const hideCard = createMemo(() => !props?.patientId && !props.enableOrder);
   const patientId = createMemo(() => props.store['patient']?.value?.id || props?.patientId);
 
   return (
@@ -95,7 +93,7 @@ export const PatientCard = (props: {
           </div>
         </photon-card>
       </Show>
-      <Show when={patientId() && !hideCard()}>
+      <Show when={patientId()}>
         <photon-card>
           <PatientInfo
             patientId={patientId()}
