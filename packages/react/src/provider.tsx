@@ -618,6 +618,7 @@ export interface PhotonClientContextInterface {
   ];
   clearError: () => void;
   login: PhotonClient['authentication']['login'];
+  client?: PhotonClient;
   getToken: PhotonClient['authentication']['getAccessToken'];
   handleRedirect: PhotonClient['authentication']['handleRedirect'];
   logout: PhotonClient['authentication']['logout'];
@@ -663,6 +664,7 @@ const PhotonClientContext = createContext<PhotonClientContextInterface>({
   createWebhook: stub,
   deleteWebhook: stub,
   login: stub,
+  client: undefined,
   rotateSecret: stub,
   handleRedirect: stub,
   logout: stub,
@@ -2888,6 +2890,7 @@ export const PhotonProvider = (opts: {
 
   const contextValue = {
     ...state,
+    client,
     login,
     logout,
     getToken,
