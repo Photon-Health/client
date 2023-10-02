@@ -22,6 +22,7 @@ export const PatientCard = (props: {
   enableOrder?: boolean;
   address?: Address;
   weight?: number;
+  weightUnit?: string;
   enableMedHistory?: boolean;
 }) => {
   const [newMedication, setNewMedication] = createSignal<Medication | SearchMedication | undefined>(
@@ -98,6 +99,7 @@ export const PatientCard = (props: {
           <PatientInfo
             patientId={patientId()}
             weight={props?.weight}
+            weightUnit={props?.weightUnit}
             editPatient={props?.enableOrder ? () => setDialogOpen(true) : undefined}
             address={props?.address}
           />

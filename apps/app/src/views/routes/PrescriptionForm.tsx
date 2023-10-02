@@ -22,6 +22,7 @@ export const PrescriptionForm = () => {
   const templateIds = params.get('templateIds') || '';
   const prescriptionIds = params.get('prescriptionIds') || '';
   const weight = params.get('weight') || '';
+  const weightUnit = params.get('weightUnit') || 'lbs';
 
   const navigate = useNavigate();
   const onClose = () => {
@@ -74,6 +75,7 @@ export const PrescriptionForm = () => {
           patient-id={patientId}
           prescription-ids={prescriptionIds}
           weight={weight}
+          weight-unit={weightUnit}
           enable-med-history={settings[user.org_id]?.enableMedHistory ?? false}
         />
       ) : null}

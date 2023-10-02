@@ -28,7 +28,8 @@ customElement(
     patientId: undefined,
     templateIds: undefined,
     prescriptionIds: undefined,
-    weight: undefined
+    weight: undefined,
+    weightUnit: 'lbs'
   },
   (props: {
     enableMedHistory: boolean;
@@ -37,6 +38,7 @@ customElement(
     templateIds?: string;
     prescriptionIds?: string;
     weight?: number;
+    weightUnit?: string;
   }) => {
     let ref: any;
     const client = usePhoton();
@@ -287,6 +289,7 @@ customElement(
                   template-ids={props.templateIds}
                   prescription-ids={props.prescriptionIds}
                   weight={props.weight}
+                  weight-unit={props.weightUnit}
                   enable-med-history={props.enableMedHistory}
                   on:photon-form-validate={(e: any) => {
                     setCanSubmit(e.detail.canSubmit);
