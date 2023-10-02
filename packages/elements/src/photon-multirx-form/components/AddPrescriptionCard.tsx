@@ -27,13 +27,15 @@ const validators = {
   effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
 };
 
-const patientWeight = (weight: number) => `Patient weight: ${weight} lbs`;
+const patientWeight = (weight: number, weightUnit = 'lb') =>
+  `Patient weight: ${weight} ${weightUnit}`;
 
 export const AddPrescriptionCard = (props: {
   hideAddToTemplates: boolean;
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
   weight?: number;
+  weightUnit?: string;
 }) => {
   const [medDialogOpen, setMedDialogOpen] = createSignal(false);
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
@@ -53,7 +55,7 @@ export const AddPrescriptionCard = (props: {
     if (props.weight) {
       props.actions.updateFormValue({
         key: 'notes',
-        value: patientWeight(props.weight)
+        value: patientWeight(props.weight, props.weightUnit)
       });
     }
   });
@@ -163,6 +165,7 @@ export const AddPrescriptionCard = (props: {
               onClose={() => setOpenDoseCalculator(false)}
               medicationName={props.store['treatment']?.value?.name}
               weight={props.weight}
+              weightUnit={props.weightUnit}
               setAutocompleteValues={({ liquidDose, totalLiquid, unit, days }) => {
                 props.actions.updateFormValue({
                   key: 'daysSupply',
@@ -335,7 +338,9 @@ export const AddPrescriptionCard = (props: {
                   setOffCatalog(undefined);
                   clearForm(
                     props.actions,
-                    props.weight ? { notes: patientWeight(props.weight) } : undefined
+                    props.weight
+                      ? { notes: patientWeight(props.weight, props?.weightUnit) }
+                      : undefined
                   );
                 }
               }}

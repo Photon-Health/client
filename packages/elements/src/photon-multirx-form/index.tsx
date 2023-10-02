@@ -55,7 +55,8 @@ customElement(
     pharmacyId: undefined,
     loading: false,
     address: undefined,
-    weight: undefined
+    weight: undefined,
+    weightUnit: 'lbs'
   },
   (
     props: {
@@ -74,6 +75,7 @@ customElement(
       loading: boolean;
       address?: Address;
       weight?: number;
+      weightUnit?: string;
     },
     options
   ) => {
@@ -322,6 +324,7 @@ customElement(
                 enableOrder={props.enableOrder}
                 address={props.address}
                 weight={props.weight}
+                weightUnit={props.weightUnit}
                 enableMedHistory={props.enableMedHistory}
               />
               <Show when={showForm() || isEditing()}>
@@ -331,6 +334,7 @@ customElement(
                     actions={actions}
                     store={store}
                     weight={props.weight}
+                    weightUnit={props.weightUnit}
                   />
                 </div>
               </Show>
