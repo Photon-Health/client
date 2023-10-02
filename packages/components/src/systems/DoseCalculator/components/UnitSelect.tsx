@@ -1,4 +1,4 @@
-import { For } from 'solid-js';
+import { For, createMemo } from 'solid-js';
 import ComboBox from '../../../particles/ComboBox';
 
 export type RecordWithId = { id: string; name: string };
@@ -9,17 +9,20 @@ function UnitSelect<T extends string>(props: {
   setSelected: (value: T) => void;
   options: T[];
   initialIdx?: number;
+  initialValue?: T;
 }) {
-  const optionsWithIds = arrayToRecordMap(props.options);
+  const optionsWithIds = createMemo(() => arrayToRecordMap(props.options));
+  const idx = createMemo(() => {
+    if (props.initialIdx) return props.initialIdx;
+    if (props.initialValue) return props.options.indexOf(props.initialValue);
+    return 0;
+  });
 
   return (
-    <ComboBox
-      value={optionsWithIds[props.initialIdx || 0]}
-      setSelected={(unit) => props.setSelected(unit.name)}
-    >
+    <ComboBox value={optionsWithIds()[idx()]} setSelected={(unit) => props.setSelected(unit.name)}>
       <ComboBox.Input displayValue={(unit: RecordWithId) => unit.name} />
       <ComboBox.Options>
-        <For each={optionsWithIds}>
+        <For each={optionsWithIds()}>
           {(unit) => (
             <ComboBox.Option key={unit.id} value={unit}>
               {unit.name}
