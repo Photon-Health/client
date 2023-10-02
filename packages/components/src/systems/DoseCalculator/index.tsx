@@ -26,7 +26,7 @@ export interface DoseCalculatorProps {
   onClose: () => void;
   medicationName?: string;
   weight?: number;
-  weightUnit?: WeightUnit;
+  weightUnit?: string;
   setAutocompleteValues: (data: {
     days: number;
     liquidDose: number;
@@ -58,7 +58,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
       setWeight(props.weight || 0);
     }
     if (props.weightUnit) {
-      setWeightUnit(props.weightUnit);
+      setWeightUnit(props.weightUnit as WeightUnit);
     }
   });
 
