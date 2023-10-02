@@ -67,6 +67,7 @@ export type Address = {
 type PatientInfoProps = {
   patientId: string;
   weight?: number;
+  weightUnit?: string;
   editPatient?: () => void;
   updatedAt?: number;
   address?: Address;
@@ -179,7 +180,7 @@ export default function PatientInfo(props: PatientInfoProps) {
           </InfoRow>
           <InfoRow label="Weight">
             <Text size="sm" loading={!patient()} sampleLoadingText="150 lbs">
-              {props?.weight ? `${props.weight} lbs` : 'N/A'}
+              {props?.weight ? `${props.weight} ${props.weightUnit}` : 'N/A'}
             </Text>
           </InfoRow>
           <InfoRow label="Pharmacy">
