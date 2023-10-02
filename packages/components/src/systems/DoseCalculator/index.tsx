@@ -57,7 +57,6 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
     if (props.weight) {
       setWeight(props.weight || 0);
     }
-    console.log('weight unit', props.weightUnit);
     if (props.weightUnit) {
       setWeightUnit(props.weightUnit);
     }

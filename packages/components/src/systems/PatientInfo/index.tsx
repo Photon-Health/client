@@ -115,7 +115,7 @@ export default function PatientInfo(props: PatientInfoProps) {
     }
     return '';
   });
-  console.log('patient info', props.weightUnit);
+
   return (
     <div class="divide-y divide-gray-200">
       <div class="flex justify-between pb-4">
