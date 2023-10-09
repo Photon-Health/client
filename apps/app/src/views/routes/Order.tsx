@@ -22,9 +22,6 @@ import {
   useColorMode,
   LinkBox,
   LinkOverlay,
-  Tag,
-  TagLeftIcon,
-  TagLabel,
   useDisclosure,
   Modal,
   ModalOverlay,
@@ -43,12 +40,7 @@ import { Page } from '../components/Page';
 import PatientView from '../components/PatientView';
 import { confirmWrapper } from '../components/GuardDialog';
 import { formatAddress, formatDate, formatFills, formatPhone } from '../../utils';
-import {
-  OrderFulfillmentState,
-  ORDER_STATE_COLOR_MAP,
-  ORDER_STATE_ICON_MAP,
-  ORDER_STATE_MAP
-} from '../components/OrderStatusBadge';
+import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
 import { OrderState } from 'packages/sdk/dist/types';
@@ -363,14 +355,10 @@ export const Order = () => {
               {loading ? (
                 <Skeleton width="70px" height="24px" borderRadius="xl" />
               ) : (
-                <Tag
-                  size="sm"
-                  borderRadius="full"
-                  colorScheme={ORDER_STATE_COLOR_MAP[order.state as OrderState]}
-                >
-                  <TagLeftIcon boxSize="12px" as={ORDER_STATE_ICON_MAP[order.state]} />
-                  <TagLabel>{ORDER_STATE_MAP[order.state as keyof object] || ''}</TagLabel>
-                </Tag>
+                <OrderStatusBadge
+                  fulfillmentState={order.fulfillment?.state}
+                  orderState={order.state}
+                />
               )}
             </Stack>
             <CopyText size="xs" text={order?.id} />
