@@ -12,7 +12,7 @@ export const Intercom = () => {
         name: user.name,
         email: user.email,
         org_id: user.org_id,
-        app_type: 'clinical'
+        application: 'clinical'
       });
     }
   }, [user]);
