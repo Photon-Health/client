@@ -15,6 +15,7 @@ import {
 
 import { FiEdit, FiEye, FiMoreVertical, FiShoppingCart } from 'react-icons/fi';
 import { TbPrescription } from 'react-icons/tb';
+import { uniqBy } from 'lodash';
 
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
@@ -211,7 +212,7 @@ export const Patients = () => {
               }
               return {
                 ...prev,
-                patients: [...prev.patients, ...fetchMoreResult.patients]
+                patients: uniqBy([...prev.patients, ...fetchMoreResult.patients], 'id')
               };
             }
           });

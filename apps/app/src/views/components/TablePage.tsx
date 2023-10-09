@@ -96,6 +96,7 @@ export const TablePage = (props: TablePageProps) => {
   useEffect(() => {
     if (fetch) {
       if (fetchMoreData) {
+        setFetch(false);
         fetchMoreData();
       }
     }

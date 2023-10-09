@@ -13,11 +13,11 @@ import {
   Tooltip
 } from '@chakra-ui/react';
 import { FiInfo, FiShoppingCart } from 'react-icons/fi';
-
 import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
-import { formatDate } from '../../utils';
+import { uniqBy } from 'lodash';
 
+import { formatDate } from '../../utils';
 import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
 import NameView from '../components/NameView';
@@ -318,7 +318,7 @@ export const Prescriptions = () => {
           }
           return {
             ...prev,
-            prescriptions: [...prev.prescriptions, ...fetchMoreResult.prescriptions]
+            prescriptions: uniqBy([...prev.prescriptions, ...fetchMoreResult.prescriptions], 'id')
           };
         }
       });
