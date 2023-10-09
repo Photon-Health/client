@@ -15,7 +15,6 @@ import {
 import { FiInfo, FiShoppingCart } from 'react-icons/fi';
 import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
-import { uniqBy } from 'lodash';
 
 import { formatDate } from '../../utils';
 import { Page } from '../components/Page';
@@ -318,7 +317,7 @@ export const Prescriptions = () => {
           }
           return {
             ...prev,
-            prescriptions: uniqBy([...prev.prescriptions, ...fetchMoreResult.prescriptions], 'id')
+            prescriptions: [...prev.prescriptions, ...fetchMoreResult.prescriptions]
           };
         }
       });

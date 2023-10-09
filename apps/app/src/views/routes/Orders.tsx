@@ -18,7 +18,6 @@ import { FiInfo } from 'react-icons/fi';
 import { useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { gql, useQuery } from '@apollo/client';
-import { uniqBy } from 'lodash';
 
 import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
@@ -225,7 +224,6 @@ export const Orders = () => {
 
   useEffect(() => {
     if (!loading && orders) {
-      console.log(orders);
       setRows(orders.map(renderRow));
       setFinished(orders.length === 0);
     }
@@ -270,7 +268,7 @@ export const Orders = () => {
                 }
                 return {
                   ...prev,
-                  orders: uniqBy([...prev.orders, ...fetchMoreResult.orders], 'id')
+                  orders: [...prev.orders, ...fetchMoreResult.orders]
                 };
               }
             });

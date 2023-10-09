@@ -1,4 +1,4 @@
-import { ReactNode, useMemo, useCallback, useEffect, useRef, useState, ReactElement } from 'react';
+import { useMemo, useCallback, useRef, ReactElement } from 'react';
 import {
   Alert,
   AlertIcon,
@@ -39,7 +39,7 @@ interface TablePageProps {
   hideHeaders?: boolean;
   setFilterText: (filter: string) => void;
   filterText: string;
-  fetchMoreData?: () => void;
+  fetchMoreData: () => void;
   hasMore?: boolean;
   searchPlaceholder?: string;
   ctaText?: string;
@@ -54,6 +54,7 @@ interface TablePageProps {
 }
 
 export const TablePage = (props: TablePageProps) => {
+  const scrollableContainerRef = useRef(null);
   let { data, columns } = props;
   const {
     loading,
@@ -90,37 +91,7 @@ export const TablePage = (props: TablePageProps) => {
 
   const observableRef: any = useRef();
 
-  const [fetch, setFetch] = useState(false);
   const tableRef: any = useRef();
-
-  useEffect(() => {
-    if (fetch) {
-      if (fetchMoreData) {
-        setFetch(false);
-        fetchMoreData();
-      }
-    }
-  }, [fetch, fetchMoreData]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0]?.isIntersecting) {
-        setFetch(true);
-      } else {
-        setFetch(false);
-      }
-    });
-
-    if (observableRef.current) {
-      observer.observe(observableRef.current);
-    }
-
-    return () => {
-      if (observableRef.current) {
-        observer.unobserve(observableRef.current);
-      }
-    };
-  }, [data, hasMore, fetchMoreData, observableRef.current]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable(
     // @ts-ignore
@@ -136,6 +107,7 @@ export const TablePage = (props: TablePageProps) => {
       bg="bg-surface"
       boxShadow={{ base: 'none', md: useColorModeValue('sm', 'sm-dark') }}
       borderRadius={useBreakpointValue({ base: 'lg', md: 'lg' })}
+      ref={scrollableContainerRef}
     >
       <Stack spacing="5">
         <Box px={{ base: '4', md: '6' }} pt="5">
@@ -173,10 +145,8 @@ export const TablePage = (props: TablePageProps) => {
         <Box overflowX="auto">
           <InfiniteScroll
             dataLength={rows.length}
-            scrollableTarget={
-              document.getElementById('root')?.getElementsByTagName('section')[0] as ReactNode
-            }
-            next={fetchMoreData || (() => {})}
+            scrollableTarget={scrollableContainerRef.current}
+            next={fetchMoreData}
             hasMore={hasMore || false}
             loader={
               rows.length > 0 ? (
