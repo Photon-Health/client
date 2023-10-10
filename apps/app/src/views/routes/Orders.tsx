@@ -60,6 +60,9 @@ const GET_ORDERS = gql`
           postalCode
         }
       }
+      fulfillment {
+        state
+      }
     }
   }
 `;
