@@ -11,7 +11,8 @@ export const Intercom = () => {
         app_id: 'uqg0xvmw',
         name: user.name,
         email: user.email,
-        org_id: user.org_id
+        org_id: user.org_id,
+        app: 'clinical'
       });
     }
   }, [user]);

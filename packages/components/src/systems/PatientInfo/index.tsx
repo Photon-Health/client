@@ -15,7 +15,7 @@ const GET_PATIENT = gql`
       }
       email
       phone
-      gender
+      sex
       dateOfBirth
       address {
         street1
@@ -173,9 +173,9 @@ export default function PatientInfo(props: PatientInfoProps) {
               {formatDate(patient()?.dateOfBirth || 'N/A')}
             </Text>
           </InfoRow>
-          <InfoRow label="Gender">
-            <Text size="sm" loading={!patient()} sampleLoadingText="male/man">
-              {patient()?.gender || 'N/A'}
+          <InfoRow label="Sex">
+            <Text size="sm" loading={!patient()} sampleLoadingText="female">
+              {patient()?.sex || 'N/A'}
             </Text>
           </InfoRow>
           <InfoRow label="Weight">
