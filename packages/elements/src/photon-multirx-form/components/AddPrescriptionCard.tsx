@@ -65,6 +65,7 @@ export const AddPrescriptionCard = (props: {
       <div
         class="flex flex-col sm:gap-3"
         on:photon-medication-selected={(e: any) => {
+          setMedDialogOpen(false);
           setOffCatalog(e.detail.medication);
           props.actions.updateFormValue({
             key: 'treatment',
@@ -111,9 +112,7 @@ export const AddPrescriptionCard = (props: {
             <photon-med-search-dialog
               title="Advanced Medication Search"
               open={medDialogOpen()}
-              on:photon-medication-closed={() => {
-                setMedDialogOpen(false);
-              }}
+              on:photon-medication-closed={() => setMedDialogOpen(false)}
             />
           </div>
           <div class="pb-4 md:py-2 text-left sm:text-right">
