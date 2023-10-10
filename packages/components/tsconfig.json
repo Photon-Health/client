@@ -9,8 +9,7 @@
     "jsx": "preserve",
     "strict": true,
     "resolveJsonModule": true,
-    "declaration": true,
-    "types": ["@types/intercom-web"]
+    "declaration": true
   },
   "exclude": ["node_modules", "tmp", "dist"]
 }
