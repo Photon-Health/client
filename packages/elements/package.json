@@ -44,7 +44,7 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "fast-glob": "^3.2.12",
     "open-props": "^1.4.16",
-    "postcss": "^8.4.16",
+    "postcss": "^8.4.31",
     "postcss-custom-media": "^8.0.2",
     "postcss-jit-props": "^1.0.7",
     "rimraf": "^3.0.2",
