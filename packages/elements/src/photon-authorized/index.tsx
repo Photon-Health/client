@@ -5,16 +5,21 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
-import { createEffect, createSignal, JSXElement, mergeProps, Show } from 'solid-js';
+import { createEffect, createSignal, JSXElement, mergeProps, Show, createMemo } from 'solid-js';
 import { usePhoton } from '../context';
 
 function checkHasPermission(subset: Permission[], superset: Permission[]) {
-  for (let i = 0; i < subset.length; i++) {
-    if (superset.indexOf(subset[i]) === -1) {
-      return false;
-    }
-  }
-  return true;
+  return subset.every((permission) => superset.includes(permission));
+}
+
+function AlertMessage(props: { message: string }) {
+  return (
+    <sl-alert variant="warning" open>
+      <sl-icon slot="icon" name="exclamation-triangle" />
+      <strong>{props.message}</strong>
+      <br />
+    </sl-alert>
+  );
 }
 
 export const PhotonAuthorized = (p: { children: JSXElement; permissions?: Permission[] }) => {
@@ -46,30 +51,27 @@ export const PhotonAuthorized = (p: { children: JSXElement; permissions?: Permis
     );
   });
 
+  const canAccess = createMemo(() => authenticated() && inOrg() && hasPermission());
+
   return (
-    <>
-      <Show when={client && !isLoading()}>
-        <Show when={!authenticated()}>
-          <sl-alert variant="warning" open>
-            <sl-icon slot="icon" name="exclamation-triangle" />
-            <strong>You are not signed in</strong>
-            <br />
-          </sl-alert>
-        </Show>
-        <Show when={authenticated() && (!inOrg() || !hasPermission())}>
-          <sl-alert variant="warning" open>
-            <sl-icon slot="icon" name="exclamation-triangle" />
-            <strong>
-              Something went wrong, please contact support at Photon Health{' '}
-              <a style={{ 'text-decoration': 'underline' }} href="mailto:support@photon.health">
-                support@photon.health
-              </a>
-            </strong>
-            <br />
-          </sl-alert>
-        </Show>
-        <Show when={inOrg() && hasPermission()}>{props.children}</Show>
+    <Show when={client && !isLoading()}>
+      <Show
+        when={canAccess()}
+        fallback={
+          <Show
+            when={!authenticated()}
+            fallback={
+              <Show when={!inOrg()} fallback={<AlertMessage message="Access Denied" />}>
+                <AlertMessage message="You tried logging in with an account not associated with any organizations" />
+              </Show>
+            }
+          >
+            <AlertMessage message="You are not signed in" />
+          </Show>
+        }
+      >
+        {props.children}
       </Show>
-    </>
+    </Show>
   );
 };
