@@ -61,7 +61,10 @@ export const PhotonAuthorized = (p: { children: JSXElement; permissions?: Permis
           <Show
             when={!authenticated()}
             fallback={
-              <Show when={!inOrg()} fallback={<AlertMessage message="Access Denied" />}>
+              <Show
+                when={!inOrg()}
+                fallback={<AlertMessage message="You are not authorized to prescribe" />}
+              >
                 <AlertMessage message="You tried logging in with an account not associated with any organizations" />
               </Show>
             }
