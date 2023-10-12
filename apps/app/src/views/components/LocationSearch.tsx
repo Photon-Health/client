@@ -61,9 +61,36 @@ export const LocationSearch = ({ isOpen, onClose }: LocationSearchProps) => {
     });
   };
 
+  // intermittently, the google maps instance is not available on page load. The interval is to check for it
   useEffect(() => {
-    autocompleteServiceRef.current = new google.maps.places.AutocompleteService();
-    geocoderRef.current = new google.maps.Geocoder();
+    if (window.google && window.google.maps) {
+      autocompleteServiceRef.current = new google.maps.places.AutocompleteService();
+      geocoderRef.current = new google.maps.Geocoder();
+    } else {
+      let checkCount = 0;
+
+      const interval = setInterval(() => {
+        if (window.google && window.google.maps) {
+          autocompleteServiceRef.current = new google.maps.places.AutocompleteService();
+          geocoderRef.current = new google.maps.Geocoder();
+          clearInterval(interval);
+        }
+
+        checkCount += 1;
+
+        if (checkCount >= 20) {
+          Sentry.withScope((scope) => {
+            scope.setTag('component', 'LocationSearch');
+            Sentry.captureException(
+              new Error('Unable to find the Google Maps instance after 20 attempts.')
+            );
+          });
+          clearInterval(interval);
+        }
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
   }, []);
 
   const searchForLocations = async (inputValue: string) => {
