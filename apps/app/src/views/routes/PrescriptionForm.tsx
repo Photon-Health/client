@@ -76,7 +76,11 @@ export const PrescriptionForm = () => {
           prescription-ids={prescriptionIds}
           weight={weight}
           weight-unit={weightUnit}
+          enable-order={true}
           enable-med-history={settings[user.org_id]?.enableMedHistory ?? false}
+          enable-local-pickup={settings[user.org_id]?.pickUp ?? false}
+          enable-send-to-patient={settings[user.org_id]?.sendToPatient ?? false}
+          mail-order-ids={settings[user.org_id]?.mailOrderProviders?.join(',') ?? ''}
         />
       ) : null}
     </div>

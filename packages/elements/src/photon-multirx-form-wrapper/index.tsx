@@ -23,13 +23,17 @@ const shouldWarn = (form: any) =>
 customElement(
   'photon-multirx-form-wrapper',
   {
-    enableMedHistory: false,
     hideTemplates: false,
     patientId: undefined,
     templateIds: undefined,
     prescriptionIds: undefined,
     weight: undefined,
-    weightUnit: 'lbs'
+    weightUnit: 'lbs',
+    enableOrder: false,
+    enableLocalPickup: false,
+    enableSendToPatient: false,
+    enableMedHistory: false,
+    mailOrderIds: undefined
   },
   (props: {
     enableMedHistory: boolean;
@@ -39,6 +43,10 @@ customElement(
     prescriptionIds?: string;
     weight?: number;
     weightUnit?: string;
+    enableOrder?: boolean;
+    enableLocalPickup?: boolean;
+    enableSendToPatient?: boolean;
+    mailOrderIds?: string;
   }) => {
     let ref: any;
     const client = usePhoton();
@@ -296,6 +304,10 @@ customElement(
                     setActions(e.detail.actions);
                     setForm(e.detail.form);
                   }}
+                  enable-order={props.enableOrder}
+                  enable-local-pickup={props.enableLocalPickup}
+                  enable-send-to-patient={props.enableSendToPatient}
+                  mail-order-ids={props.mailOrderIds}
                 />
               </div>
             </div>
