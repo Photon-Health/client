@@ -1,14 +1,14 @@
 {
-  "name": "app",
-  "root": "apps/app",
-  "sourceRoot": "apps/app/src",
+  "name": "clinical",
+  "root": "apps/clinical",
+  "sourceRoot": "apps/clinical/src",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
     "start": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "apps/app",
+        "cwd": "apps/clinical",
         "command": "env-cmd -f .env.boson react-app-rewired start"
       },
       "dependsOn": ["^build"]
@@ -16,55 +16,55 @@
     "build:boson": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "apps/app",
+        "cwd": "apps/clinical",
         "command": "env-cmd -f .env.boson react-app-rewired build",
-        "outputs": "dist/apps/app"
+        "outputs": "dist/apps/clinical"
       },
       "dependsOn": ["^build"]
     },
     "build:neutron": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "apps/app",
+        "cwd": "apps/clinical",
         "command": "env-cmd -f .env.neutron react-app-rewired build",
-        "outputs": "dist/apps/app"
+        "outputs": "dist/apps/clinical"
       },
       "dependsOn": ["^build"]
     },
     "build:photon": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "apps/app",
+        "cwd": "apps/clinical",
         "command": "env-cmd -f .env.photon react-app-rewired build",
-        "outputs": "dist/apps/app"
+        "outputs": "dist/apps/clinical"
       },
       "dependsOn": ["^build"]
     },
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "apps/app",
+        "cwd": "apps/clinical",
         "command": "react-app-rewired test --watchAll=false"
       }
     },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "apps/app",
+        "cwd": "apps/clinical",
         "command": "npx eslint . --ext .tsx,.ts --quiet"
       }
     },
     "lint:fix": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "apps/app",
+        "cwd": "apps/clinical",
         "command": "npx eslint . --ext .tsx,.ts --fix && npx prettier --write src/**/*.{ts,tsx}"
       }
     },
     "tsc": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "apps/app",
+        "cwd": "apps/clinical",
         "command": "npx tsc --noEmit"
       }
     }

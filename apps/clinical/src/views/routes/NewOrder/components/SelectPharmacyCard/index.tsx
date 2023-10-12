@@ -18,7 +18,7 @@ import { MailOrder } from './components/MailOrder';
 import { Address } from '../../../../../models/general';
 import { SendToPatient } from './components/SendToPatient';
 import { FulfillmentOptions } from '../OrderForm';
-import { formatAddress } from 'apps/app/src/utils';
+import { formatAddress } from 'apps/clinical/src/utils';
 
 interface SelectPharmacyCardProps {
   user: any;

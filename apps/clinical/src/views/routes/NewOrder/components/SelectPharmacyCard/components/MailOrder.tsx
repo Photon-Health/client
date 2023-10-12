@@ -12,7 +12,7 @@ import {
 import { usePhoton, types } from '@photonhealth/react';
 import { Pharmacy } from './Pharmacy';
 import { getSettings } from '@client/settings';
-import { useIsVisible } from 'apps/app/src/hooks/useIsIntersecting';
+import { useIsVisible } from 'apps/clinical/src/hooks/useIsIntersecting';
 
 const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
 const settings = getSettings(envName);
