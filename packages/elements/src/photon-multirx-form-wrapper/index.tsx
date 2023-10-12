@@ -120,7 +120,7 @@ customElement(
                 }
                 loading={triggerSubmit()}
               >
-                Create Order
+                Send Order
               </photon-button>
             </div>
           }
