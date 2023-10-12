@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import * as Sentry from '@sentry/react';
 
 import {
@@ -43,9 +43,28 @@ interface LocationSearchProps {
 export const LocationSearch = ({ isOpen, onClose }: LocationSearchProps) => {
   const [gettingCurrentLocation, setGettingCurrentLocation] = useState<boolean>(false);
   const toast = useToast();
+  const autocompleteServiceRef = useRef<google.maps.places.AutocompleteService | null>(null);
+  const geocoderRef = useRef<google.maps.Geocoder | null>(null);
 
-  const autocompleteServiceRef = useRef(new google.maps.places.AutocompleteService());
-  const geocoderRef = useRef(new google.maps.Geocoder());
+  const handleLocationError = (functionName: string) => {
+    toast({
+      title: 'Location Search Error',
+      description: 'There was an error searching for locations. Please refresh the page.',
+      status: 'error',
+      position: 'top',
+      duration: 5000,
+      isClosable: true
+    });
+    Sentry.withScope((scope) => {
+      scope.setTag('component', 'LocationSearch');
+      scope.setExtra('function', functionName);
+    });
+  };
+
+  useEffect(() => {
+    autocompleteServiceRef.current = new google.maps.places.AutocompleteService();
+    geocoderRef.current = new google.maps.Geocoder();
+  }, []);
 
   const searchForLocations = async (inputValue: string) => {
     const request = {
@@ -53,12 +72,23 @@ export const LocationSearch = ({ isOpen, onClose }: LocationSearchProps) => {
       types: ['geocode'],
       componentRestrictions: { country: 'us' }
     };
-    const opts = await autocompleteServiceRef.current.getPlacePredictions(request);
-    return formatLocationOptions(opts.predictions);
+
+    if (!autocompleteServiceRef.current?.getPlacePredictions) {
+      handleLocationError('searchForLocations');
+      return [];
+    }
+
+    const opts = await autocompleteServiceRef.current?.getPlacePredictions(request);
+    return formatLocationOptions(opts?.predictions ?? []);
   };
 
   const geocode = async (address: string) => {
-    const data = await geocoderRef.current.geocode({ address });
+    if (!autocompleteServiceRef.current?.getPlacePredictions) {
+      handleLocationError('geocode');
+      return;
+    }
+
+    const data = await geocoderRef.current?.geocode({ address });
     if (data?.results) {
       onClose({
         loc: data.results[0].formatted_address,
@@ -71,16 +101,23 @@ export const LocationSearch = ({ isOpen, onClose }: LocationSearchProps) => {
   const getCurrentLocation = async () => {
     setGettingCurrentLocation(true);
     if (navigator.geolocation) {
+      if (!autocompleteServiceRef.current?.getPlacePredictions) {
+        handleLocationError('getCurrentLocation');
+        return;
+      }
+
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
-          const data = await geocoderRef.current.geocode({ location: { lat, lng } });
-          onClose({
-            loc: data.results[0].formatted_address,
-            lat,
-            lng
-          });
+          const data = await geocoderRef.current?.geocode({ location: { lat, lng } });
+          if (data?.results) {
+            onClose({
+              loc: data.results[0].formatted_address,
+              lat,
+              lng
+            });
+          }
           setGettingCurrentLocation(false);
         },
         (error) => {
@@ -102,25 +139,15 @@ export const LocationSearch = ({ isOpen, onClose }: LocationSearchProps) => {
       callback(result);
       return result;
     } catch (e) {
-      toast({
-        title: 'Location Search Error',
-        description: 'There was an error searching for locations. Please refresh the page.',
-        status: 'error',
-        position: 'top',
-        duration: 5000,
-        isClosable: true
-      });
-      Sentry.withScope((scope) => {
-        scope.setTag('component', 'LocationSearch');
-        scope.setExtra('function', 'searchForLocations');
-        Sentry.captureException(e);
-      });
+      handleLocationError('loadOptions');
       return [];
     }
   };
 
+  const handleModalClose = () => onClose({});
+
   return (
-    <Modal isOpen={isOpen} onClose={() => onClose({})}>
+    <Modal isOpen={isOpen} onClose={handleModalClose}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Set your location</ModalHeader>
