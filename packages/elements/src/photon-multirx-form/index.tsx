@@ -56,7 +56,8 @@ customElement(
     loading: false,
     address: undefined,
     weight: undefined,
-    weightUnit: 'lbs'
+    weightUnit: 'lbs',
+    triggerSubmit: false
   },
   (
     props: {
@@ -76,6 +77,7 @@ customElement(
       address?: Address;
       weight?: number;
       weightUnit?: string;
+      triggerSubmit: boolean;
     },
     options
   ) => {
@@ -220,13 +222,14 @@ customElement(
           };
           prescriptions.push(args);
         }
-        const { data, errors } = await rxMutation({
+        const { data: prescriptionData, errors } = await rxMutation({
           variables: {
             prescriptions
           },
           refetchQueries: [],
           awaitRefetchQueries: false
         });
+
         if (!props.enableOrder) {
           setIsLoading(false);
         }
@@ -234,7 +237,7 @@ customElement(
           dispatchPrescriptionsError(errors);
           return;
         }
-        dispatchPrescriptionsCreated(data!.createPrescriptions);
+        dispatchPrescriptionsCreated(prescriptionData!.createPrescriptions);
         if (props.enableOrder) {
           // remove unnecessary fields, and add country and street2 if missing
           const patientAddress = store?.address?.value ?? store?.patient?.value?.address ?? {};
@@ -267,17 +270,18 @@ customElement(
             });
           }
 
-          const { data: data2, errors } = await orderMutation({
+          const { data: orderData, errors } = await orderMutation({
             variables: {
               patientId: store['patient']?.value.id,
               pharmacyId: props?.pharmacyId || store['pharmacy']?.value || '',
               fulfillmentType: store['fulfillmentType']?.value || '',
               address,
-              fills: data?.createPrescriptions.map((x) => ({ prescriptionId: x.id }))
+              fills: prescriptionData?.createPrescriptions.map((x) => ({ prescriptionId: x.id }))
             },
             refetchQueries: [],
             awaitRefetchQueries: false
           });
+
           if (props.enableOrder) {
             setIsLoading(false);
           }
@@ -285,7 +289,7 @@ customElement(
             dispatchOrderError(errors);
             return;
           }
-          dispatchOrderCreated(data2!.createOrder);
+          dispatchOrderCreated(orderData!.createOrder);
         }
       } else {
         setErrors(errors);
@@ -298,6 +302,12 @@ customElement(
       dispatchPrescriptionsFormValidate(
         Boolean(store['draftPrescriptions']?.value?.length > 0 && store['patient']?.value)
       );
+    });
+
+    createEffect(() => {
+      if (props.triggerSubmit) {
+        submitForm(props.enableOrder);
+      }
     });
 
     let prescriptionRef: HTMLDivElement | undefined;
