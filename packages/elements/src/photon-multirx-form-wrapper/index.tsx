@@ -32,7 +32,8 @@ customElement(
     enableLocalPickup: false,
     enableSendToPatient: false,
     enableMedHistory: false,
-    mailOrderIds: undefined
+    mailOrderIds: undefined,
+    enableOrder: false
   },
   (props: {
     enableMedHistory: boolean;
@@ -45,6 +46,7 @@ customElement(
     enableLocalPickup?: boolean;
     enableSendToPatient?: boolean;
     mailOrderIds?: string;
+    enableOrder?: boolean;
   }) => {
     let ref: any;
     const client = usePhoton();
@@ -52,6 +54,8 @@ customElement(
     const [canWritePrescription, setCanWritePrescription] = createSignal<boolean>(false);
     const [form, setForm] = createSignal<any>();
     const [continueSubmitOpen, setContinueSubmitOpen] = createSignal<boolean>(false);
+    const [isCreateOrder, setIsCreateOrder] = createSignal<boolean>(false);
+    const [continueSaveOnly, setContinueSaveOnly] = createSignal<boolean>(false);
     const [triggerSubmit, setTriggerSubmit] = createSignal<boolean>(false);
     const { actions: patientActions } = PatientStore;
 
@@ -64,6 +68,23 @@ customElement(
         setCanWritePrescription(true);
       }
     });
+
+    const dispatchPrescriptionsCreated = (
+      createOrder: boolean,
+      prescriptionIds: string[],
+      patientId: string
+    ) => {
+      const event = new CustomEvent('photon-prescriptions-created', {
+        composed: true,
+        bubbles: true,
+        detail: {
+          patientId,
+          prescriptionIds,
+          createOrder
+        }
+      });
+      ref?.dispatchEvent(event);
+    };
 
     const dispatchClosed = () => {
       const event = new CustomEvent('photon-prescriptions-closed', {
@@ -98,6 +119,31 @@ customElement(
           </p>
         </photon-dialog>
 
+        <photon-dialog
+          label="Save prescriptions without an order?"
+          open={continueSaveOnly()}
+          confirm-text="Save and create order"
+          cancel-text="Yes, Save Only"
+          on:photon-dialog-confirmed={() => {
+            setContinueSaveOnly(false);
+            setIsCreateOrder(true);
+            setTriggerSubmit(true);
+          }}
+          on:photon-dialog-canceled={() => {
+            setContinueSaveOnly(false);
+          }}
+          on:photon-dialog-alt={() => {
+            setContinueSaveOnly(false);
+            setTriggerSubmit(true);
+          }}
+          width="500px"
+        >
+          <p class="font-sans text-lg xs:text-base">
+            You're about to save prescriptions without creating a pharmacy order. You can create an
+            order now, or at a later date.
+          </p>
+        </photon-dialog>
+
         <PhotonFormWrapper
           closeTitle="Lose unsaved prescriptions?"
           closeBody="You will not be able to recover unsaved prescriptions."
@@ -109,20 +155,47 @@ customElement(
           title="New Prescriptions"
           titleIconName="prescription"
           headerRight={
-            <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
+            props.enableOrder ? (
               <photon-button
                 size="sm"
                 disabled={!canSubmit() || !canWritePrescription()}
+                loading={triggerSubmit()}
                 on:photon-clicked={() =>
                   form()?.treatment?.value?.name
                     ? setContinueSubmitOpen(true)
                     : setTriggerSubmit(true)
                 }
-                loading={triggerSubmit()}
               >
                 Send Order
               </photon-button>
-            </div>
+            ) : (
+              <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
+                <photon-button
+                  size="sm"
+                  variant="outline"
+                  disabled={!canSubmit() || !canWritePrescription()}
+                  loading={triggerSubmit() && !isCreateOrder()}
+                  on:photon-clicked={() => setContinueSaveOnly(true)}
+                >
+                  Save prescriptions
+                </photon-button>
+                <photon-button
+                  size="sm"
+                  disabled={!canSubmit() || !canWritePrescription()}
+                  loading={triggerSubmit() && isCreateOrder()}
+                  on:photon-clicked={() => {
+                    if (form()?.treatment?.value?.name) {
+                      setContinueSubmitOpen(true);
+                    } else {
+                      setIsCreateOrder(true);
+                      setTriggerSubmit(true);
+                    }
+                  }}
+                >
+                  Save and create order
+                </photon-button>
+              </div>
+            )
           }
           form={
             <div class="w-full h-full bg-[#f7f4f4]">
@@ -137,7 +210,7 @@ customElement(
                   weight={props.weight}
                   weight-unit={props.weightUnit}
                   enable-med-history={props.enableMedHistory}
-                  enable-order={true}
+                  enable-order={props.enableOrder}
                   enable-local-pickup={props.enableLocalPickup}
                   enable-send-to-patient={props.enableSendToPatient}
                   mail-order-ids={props.mailOrderIds}
@@ -146,8 +219,15 @@ customElement(
                     setCanSubmit(e.detail.canSubmit);
                     setForm(e.detail.form);
                   }}
-                  on:photon-order-created={(e: any) => {
-                    console.log('order created', e.detail);
+                  on:photon-prescriptions-created={(e: any) => {
+                    e.stopPropagation();
+                    if (!props.enableOrder) {
+                      dispatchPrescriptionsCreated(
+                        isCreateOrder(),
+                        e.detail.prescriptions.map((p) => p.id),
+                        form()?.patient?.value?.id
+                      );
+                    }
                   }}
                 />
               </div>

@@ -31,6 +31,20 @@ export const PrescriptionForm = () => {
 
   useEffect(() => {
     if (ref.current) {
+      ref.current.addEventListener('photon-prescriptions-created', (e: any) => {
+        if (!e.detail.createOrder) {
+          onClose();
+        }
+        if (e.detail.createOrder) {
+          const searchParams = new URLSearchParams();
+          searchParams.append('patientId', e.detail.patientId);
+          searchParams.append('prescriptionIds', e.detail.prescriptionIds.join(','));
+          navigate({
+            pathname: '/orders/new',
+            search: searchParams.toString()
+          });
+        }
+      });
       ref.current.addEventListener(
         'photon-order-created',
         (e: { detail: { order: { id: string } } }) => {
@@ -76,6 +90,7 @@ export const PrescriptionForm = () => {
           prescription-ids={prescriptionIds}
           weight={weight}
           weight-unit={weightUnit}
+          enable-order={settings[user.org_id]?.enableRxAndOrder ?? false}
           enable-med-history={settings[user.org_id]?.enableMedHistory ?? false}
           enable-local-pickup={settings[user.org_id]?.pickUp ?? false}
           enable-send-to-patient={settings[user.org_id]?.sendToPatient ?? false}
