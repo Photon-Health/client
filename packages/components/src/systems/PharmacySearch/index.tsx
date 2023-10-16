@@ -6,7 +6,6 @@ import ComboBox from '../../particles/ComboBox';
 import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter';
 import LocationSelect from '../LocationSelect';
 import Icon from '../../particles/Icon';
-import Button from '../../particles/Button';
 
 import { types } from '@photonhealth/sdk';
 import { usePhotonClient } from '../SDKProvider';
