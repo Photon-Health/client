@@ -212,19 +212,22 @@ export default function PharmacySearch(props: PharmacyProps) {
         open={openLocationSearch()}
         setOpen={setOpenLocationSearch}
       />
-
       <InputGroup
         label={
-          <div class="flex items-center">
-            <label class="mr-1">Showing near:</label>
-            <Button
-              variant="naked"
-              class="text-left"
-              onClick={() => setOpenLocationSearch(true)}
-              iconLeft={<Icon name="mapPin" size="sm" />}
+          <div class="w-full flex items-center">
+            <label class="whitespace-nowrap mr-1">Showing near:</label>
+            <a
+              href="#!"
+              role="button"
+              onClick={(e) => {
+                e.preventDefault();
+                setOpenLocationSearch(true);
+              }}
+              class="text-left truncate text-blue-600 font-semibold text-sm"
             >
-              {location()?.address || 'Set a location'}{' '}
-            </Button>
+              <Icon name="mapPin" size="sm" class="inline-block mr-1" />
+              {location()?.address || 'Set a location'}
+            </a>
           </div>
         }
         helpText={

@@ -224,7 +224,7 @@ customElement(
                     if (!props.enableOrder) {
                       dispatchPrescriptionsCreated(
                         isCreateOrder(),
-                        e.detail.prescriptions.map((p) => p.id),
+                        e.detail.prescriptions.map((p: { id: string }) => p.id),
                         form()?.patient?.value?.id
                       );
                     }
