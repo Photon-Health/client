@@ -60,8 +60,8 @@ export default function LocationSelect(props: LocationSelectProps) {
 
   return (
     <Dialog open={props.open} onClose={() => props.setOpen(false)}>
-      <div class="mt-3 text-center sm:mt-5">
-        <h2>Set Location</h2>
+      <div class="text-left">
+        <h3 class="mt-0">Set Location</h3>
         <div class="mt-2">
           <p class="text-sm text-gray-500">
             Enter the zipcode or address where you'd like to search for a pharmacy.
