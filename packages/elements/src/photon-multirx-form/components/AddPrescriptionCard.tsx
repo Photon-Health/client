@@ -81,7 +81,12 @@ export const AddPrescriptionCard = (props: {
           off-catalog-option={offCatalog()}
           on:photon-treatment-selected={(e: any) => {
             if (e.detail.data.__typename === 'PrescriptionTemplate') {
-              repopulateForm(props.actions, e.detail.data);
+              repopulateForm(props.actions, {
+                ...e.detail.data,
+                notes: `${e.detail.data?.notes || ''} ${
+                  props.weight ? `\n\n${patientWeight(props.weight, props?.weightUnit)}` : ''
+                }`
+              });
             } else {
               props.actions.updateFormValue({
                 key: 'treatment',
