@@ -1,9 +1,8 @@
-import { createSignal, onMount, createEffect, For } from 'solid-js';
+import { createSignal, onMount, createEffect, For, Show } from 'solid-js';
 import Icon from '../../particles/Icon';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
 import InputGroup from '../../particles/InputGroup';
-import Input from '../../particles/Input';
 import Spinner from '../../particles/Spinner';
 import getNavigatorLocation from '../../utils/getNavigatorLocation';
 import loadGoogleScript from '../../utils/loadGoogleScript';
@@ -35,12 +34,11 @@ export default function LocationSelect(props: LocationSelectProps) {
     });
   });
 
-  const handleAddressSubmit = async (e: Event) => {
+  const handleAddressSubmit = async (address: string) => {
     // get location with address
-    e.preventDefault();
     setLoadingSearch(true);
     setNavigatorError(false);
-    const locations = await getLocations(address(), geocoder!);
+    const locations = await getLocations(address, geocoder!);
     props.setLocation(locations[0]);
     setLoadingSearch(false);
     props.setOpen(false);
@@ -79,7 +77,7 @@ export default function LocationSelect(props: LocationSelectProps) {
       <div class="text-left">
         <h3 class="mt-0">Set Location</h3>
         <div class="mt-2">
-          <p class="text-sm text-gray-500">
+          <p class="text-sm">
             Enter the zipcode or address where you'd like to search for a pharmacy.
           </p>
         </div>
@@ -101,22 +99,24 @@ export default function LocationSelect(props: LocationSelectProps) {
         <p>OR</p>
         <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700 w-full" />
       </div>
-      <form onSubmit={handleAddressSubmit}>
+      <form>
         <InputGroup label="Enter an address or zip code" loading={loadingSearch()}>
-          <ComboBox>
+          <ComboBox setSelected={handleAddressSubmit}>
             <ComboBox.Input
               displayValue={(option) => option.label}
               onInput={(e) => setAddress(e.currentTarget.value)}
             />
-            <ComboBox.Options>
-              <For each={options()}>
-                {(option) => (
-                  <ComboBox.Option key={option.value} value={option.label}>
-                    {option.label}
-                  </ComboBox.Option>
-                )}
-              </For>
-            </ComboBox.Options>
+            <Show when={options()?.length > 0}>
+              <ComboBox.Options>
+                <For each={options()}>
+                  {(option) => (
+                    <ComboBox.Option key={option.value} value={option.label}>
+                      {option.label}
+                    </ComboBox.Option>
+                  )}
+                </For>
+              </ComboBox.Options>
+            </Show>
           </ComboBox>
         </InputGroup>
       </form>
