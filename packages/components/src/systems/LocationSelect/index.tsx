@@ -1,4 +1,4 @@
-import { createSignal, onMount } from 'solid-js';
+import { createSignal, onMount, createEffect, For } from 'solid-js';
 import Icon from '../../particles/Icon';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
@@ -7,7 +7,9 @@ import Input from '../../particles/Input';
 import Spinner from '../../particles/Spinner';
 import getNavigatorLocation from '../../utils/getNavigatorLocation';
 import loadGoogleScript from '../../utils/loadGoogleScript';
-import getLocation, { Location } from '../../utils/getLocation';
+import getLocations, { Location } from '../../utils/getLocations';
+import autocompleteLocation from '../../utils/autocompleteLocation';
+import ComboBox from '../../particles/ComboBox';
 
 interface LocationSelectProps {
   open: boolean;
@@ -20,12 +22,15 @@ export default function LocationSelect(props: LocationSelectProps) {
   const [loadingNavigator, setLoadingNavigator] = createSignal(false);
   const [loadingSearch, setLoadingSearch] = createSignal(false);
   const [navigatorError, setNavigatorError] = createSignal(false);
+  const [options, setOptions] = createSignal<any[]>([]);
   let geocoder: google.maps.Geocoder | undefined;
+  let autocompleteService: google.maps.places.AutocompleteService | undefined;
 
   onMount(async () => {
     loadGoogleScript({
       onLoad: async () => {
         geocoder = new google.maps.Geocoder();
+        autocompleteService = new google.maps.places.AutocompleteService();
       }
     });
   });
@@ -35,8 +40,8 @@ export default function LocationSelect(props: LocationSelectProps) {
     e.preventDefault();
     setLoadingSearch(true);
     setNavigatorError(false);
-    const location = await getLocation(address(), geocoder!);
-    props.setLocation(location);
+    const locations = await getLocations(address(), geocoder!);
+    props.setLocation(locations[0]);
     setLoadingSearch(false);
     props.setOpen(false);
   };
@@ -49,14 +54,25 @@ export default function LocationSelect(props: LocationSelectProps) {
       const {
         coords: { latitude, longitude }
       } = await getNavigatorLocation({ timeout: 5000 });
-      const location = await getLocation({ latitude, longitude }, geocoder!);
-      props.setLocation(location);
+      const locations = await getLocations({ latitude, longitude }, geocoder!);
+      props.setLocation(locations[0]);
       props.setOpen(false);
     } catch {
       setNavigatorError(true);
     }
     setLoadingNavigator(false);
   };
+
+  const fetchOptions = async () => {
+    const results = await autocompleteLocation(address(), autocompleteService!);
+    setOptions(results);
+  };
+
+  createEffect(() => {
+    if (address()) {
+      fetchOptions();
+    }
+  });
 
   return (
     <Dialog open={props.open} onClose={() => props.setOpen(false)}>
@@ -87,7 +103,21 @@ export default function LocationSelect(props: LocationSelectProps) {
       </div>
       <form onSubmit={handleAddressSubmit}>
         <InputGroup label="Enter an address or zip code" loading={loadingSearch()}>
-          <Input type="text" value={address()} onInput={(e) => setAddress(e.currentTarget.value)} />
+          <ComboBox>
+            <ComboBox.Input
+              displayValue={(option) => option.label}
+              onInput={(e) => setAddress(e.currentTarget.value)}
+            />
+            <ComboBox.Options>
+              <For each={options()}>
+                {(option) => (
+                  <ComboBox.Option key={option.value} value={option.label}>
+                    {option.label}
+                  </ComboBox.Option>
+                )}
+              </For>
+            </ComboBox.Options>
+          </ComboBox>
         </InputGroup>
       </form>
     </Dialog>

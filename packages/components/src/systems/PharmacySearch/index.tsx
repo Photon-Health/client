@@ -9,7 +9,7 @@ import Icon from '../../particles/Icon';
 
 import { types } from '@photonhealth/sdk';
 import { usePhotonClient } from '../SDKProvider';
-import getLocation, { Location } from '../../utils/getLocation';
+import getLocations, { Location } from '../../utils/getLocations';
 import loadGoogleScript from '../../utils/loadGoogleScript';
 import Badge from '../../particles/Badge';
 import Checkbox from '../../particles/Checkbox';
@@ -169,8 +169,8 @@ export default function PharmacySearch(props: PharmacyProps) {
     )}, ${pharmacy.address?.state}`;
 
   async function getAndSetLocation(address: string, geocoder: google.maps.Geocoder) {
-    const location = await getLocation(address || '', geocoder);
-    setLocation(location);
+    const locations = await getLocations(address || '', geocoder);
+    setLocation(locations[0]);
   }
 
   onMount(() => {

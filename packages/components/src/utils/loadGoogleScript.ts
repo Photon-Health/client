@@ -12,7 +12,7 @@ export default function loadGoogleScript({ onLoad, onError }: LoadGoogleScriptOp
     scriptLoading = true;
     const script = document.createElement('script');
     script.src =
-      'https://maps.googleapis.com/maps/api/js?key=AIzaSyAvuwwE6g2Bsmih66nu4dB7-H7U1_7KQ6g';
+      'https://maps.googleapis.com/maps/api/js?key=AIzaSyAvuwwE6g2Bsmih66nu4dB7-H7U1_7KQ6g&libraries=places';
     document.head.appendChild(script);
 
     script.onload = () => {
