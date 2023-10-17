@@ -75,9 +75,9 @@ export const AddPrescriptionCard = (props: {
       >
         <photon-treatment-select
           label="Search Treatment Catalog"
-          selected={props.store['treatment']?.value ?? undefined}
-          invalid={props.store['treatment']?.error ?? false}
-          help-text={props.store['treatment']?.error}
+          selected={props.store.treatment?.value ?? undefined}
+          invalid={props.store.treatment?.error ?? false}
+          help-text={props.store.treatment?.error}
           off-catalog-option={offCatalog()}
           on:photon-treatment-selected={(e: any) => {
             if (e.detail.data.__typename === 'PrescriptionTemplate') {
@@ -106,7 +106,7 @@ export const AddPrescriptionCard = (props: {
               tip="This prescription will be filled generically unless this box is checked"
               form-name="daw"
               class="flex-grow"
-              checked={props.store['dispenseAsWritten']?.value || false}
+              checked={props.store.dispenseAsWritten?.value || false}
               on:photon-checkbox-toggled={(e: any) =>
                 props.actions.updateFormValue({
                   key: 'dispenseAsWritten',
@@ -132,8 +132,8 @@ export const AddPrescriptionCard = (props: {
         <div class="mt-2 sm:mt-0 md:max-w-[50%] md:pr-2">
           <photon-datepicker
             label="Do Not Fill Before"
-            invalid={props.store['effectiveDate']?.error ?? false}
-            help-text={props.store['effectiveDate']?.error}
+            invalid={props.store.effectiveDate?.error ?? false}
+            help-text={props.store.effectiveDate?.error}
             required="true"
             on:photon-datepicker-selected={(e: any) =>
               props.actions.updateFormValue({
@@ -148,11 +148,11 @@ export const AddPrescriptionCard = (props: {
             <photon-number-input
               class="flex-grow flex-1 w-2/5 sm:w-auto"
               label="Quantity"
-              value={props.store['dispenseQuantity']?.value ?? null}
+              value={props.store.dispenseQuantity?.value ?? null}
               required="true"
               min={1}
-              invalid={props.store['dispenseQuantity']?.error ?? false}
-              help-text={props.store['dispenseQuantity']?.error}
+              invalid={props.store.dispenseQuantity?.error ?? false}
+              help-text={props.store.dispenseQuantity?.error}
               on:photon-input-changed={(e: any) => {
                 const inputValue = Number(e.detail.input);
                 if (!isNaN(inputValue) && e.detail.input !== '') {
@@ -167,7 +167,7 @@ export const AddPrescriptionCard = (props: {
             <DoseCalculator
               open={openDoseCalculator()}
               onClose={() => setOpenDoseCalculator(false)}
-              medicationName={props.store['treatment']?.value?.name}
+              medicationName={props.store.treatment?.value?.name}
               weight={props.weight}
               weightUnit={props.weightUnit}
               setAutocompleteValues={({ liquidDose, totalLiquid, unit, days }) => {
@@ -181,7 +181,7 @@ export const AddPrescriptionCard = (props: {
                 });
                 props.actions.updateFormValue({
                   key: 'instructions',
-                  value: `${liquidDose} ${unit} ${props.store['instructions']?.value}`
+                  value: `${liquidDose} ${unit} ${props.store.instructions?.value}`
                 });
                 if (unit === 'mL') {
                   props.actions.updateFormValue({
@@ -208,7 +208,7 @@ export const AddPrescriptionCard = (props: {
             label="Dispense Unit"
             required="true"
             force-label-size="true"
-            selected={props.store['dispenseUnit']?.value ?? dispenseUnit()?.name}
+            selected={props.store.dispenseUnit?.value ?? dispenseUnit()?.name}
             on:photon-dispense-unit-selected={(e: any) =>
               props.actions.updateFormValue({
                 key: 'dispenseUnit',
@@ -221,9 +221,9 @@ export const AddPrescriptionCard = (props: {
           <photon-number-input
             class="flex-grow flex-shrink flex-1"
             label="Days Supply"
-            value={props.store['daysSupply']?.value ?? null}
-            invalid={props.store['daysSupply']?.error ?? false}
-            help-text={props.store['daysSupply']?.error}
+            value={props.store.daysSupply?.value ?? null}
+            invalid={props.store.daysSupply?.error ?? false}
+            help-text={props.store.daysSupply?.error}
             required="true"
             min={0}
             on:photon-input-changed={(e: any) => {
@@ -236,11 +236,11 @@ export const AddPrescriptionCard = (props: {
           <photon-number-input
             class="flex-grow flex-shrink flex-1"
             label="Refills"
-            value={props.store['refillsInput']?.value ?? 0}
+            value={props.store.refillsInput?.value ?? 0}
             required="true"
             min={0}
-            invalid={props.store['refillsInput']?.error ?? false}
-            help-text={props.store['refillsInput']?.error}
+            invalid={props.store.refillsInput?.error ?? false}
+            help-text={props.store.refillsInput?.error}
             on:photon-input-changed={(e: any) =>
               props.actions.updateFormValue({
                 key: 'refillsInput',
@@ -254,15 +254,15 @@ export const AddPrescriptionCard = (props: {
           form-name="patient_instructions"
           required="true"
           placeholder="Enter patient instructions"
-          invalid={props.store['instructions']?.error ?? false}
-          help-text={props.store['instructions']?.error}
+          invalid={props.store.instructions?.error ?? false}
+          help-text={props.store.instructions?.error}
           on:photon-textarea-changed={(e: any) =>
             props.actions.updateFormValue({
               key: 'instructions',
               value: e.detail.value
             })
           }
-          value={props.store['instructions']?.value}
+          value={props.store.instructions?.value}
         />
         <photon-textarea
           label="Pharmacy Note"
@@ -273,14 +273,14 @@ export const AddPrescriptionCard = (props: {
               value: e.detail.value
             })
           }
-          value={props.store['notes']?.value}
+          value={props.store.notes?.value}
         />
         <div class="flex flex-col xs:flex-row gap-2">
           <Show when={!props.hideAddToTemplates}>
             <photon-checkbox
               label="Add To Templates"
               form-name="daw"
-              checked={props.store['addToTemplates']?.value || false}
+              checked={props.store.addToTemplates?.value || false}
               on:photon-checkbox-toggled={(e: any) =>
                 props.actions.updateFormValue({
                   key: 'addToTemplates',
@@ -307,21 +307,21 @@ export const AddPrescriptionCard = (props: {
                   props.actions.updateFormValue({
                     key: 'draftPrescriptions',
                     value: [
-                      ...(props.store['draftPrescriptions']?.value || []),
+                      ...(props.store.draftPrescriptions?.value || []),
                       {
                         id: String(Math.random()),
-                        effectiveDate: props.store['effectiveDate'].value,
-                        treatment: props.store['treatment'].value,
-                        dispenseAsWritten: props.store['dispenseAsWritten'].value,
-                        dispenseQuantity: props.store['dispenseQuantity'].value,
-                        dispenseUnit: props.store['dispenseUnit'].value,
-                        daysSupply: props.store['daysSupply'].value,
-                        refillsInput: props.store['refillsInput'].value,
-                        instructions: props.store['instructions'].value,
-                        notes: props.store['notes'].value,
-                        fillsAllowed: props.store['refillsInput'].value + 1,
-                        addToTemplates: props.store['addToTemplates']?.value ?? false,
-                        catalogId: props.store['catalogId'].value ?? undefined
+                        effectiveDate: props.store.effectiveDate.value,
+                        treatment: props.store.treatment.value,
+                        dispenseAsWritten: props.store.dispenseAsWritten.value,
+                        dispenseQuantity: props.store.dispenseQuantity.value,
+                        dispenseUnit: props.store.dispenseUnit.value,
+                        daysSupply: props.store.daysSupply.value,
+                        refillsInput: props.store.refillsInput.value,
+                        instructions: props.store.instructions.value,
+                        notes: props.store.notes.value,
+                        fillsAllowed: props.store.refillsInput.value + 1,
+                        addToTemplates: props.store.addToTemplates?.value ?? false,
+                        catalogId: props.store.catalogId.value ?? undefined
                       }
                     ]
                   });
