@@ -83,9 +83,12 @@ export const AddPrescriptionCard = (props: {
             if (e.detail.data.__typename === 'PrescriptionTemplate') {
               repopulateForm(props.actions, {
                 ...e.detail.data,
-                notes: `${e.detail.data?.notes || ''} ${
-                  props.weight ? `\n\n${patientWeight(props.weight, props?.weightUnit)}` : ''
-                }`
+                notes: [
+                  e.detail.data?.notes,
+                  props.weight && patientWeight(props.weight, props?.weightUnit)
+                ]
+                  .filter((x) => x)
+                  .join('\n\n')
               });
             } else {
               props.actions.updateFormValue({
