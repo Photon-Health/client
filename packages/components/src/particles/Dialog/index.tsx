@@ -1,4 +1,4 @@
-import { JSX, Show, mergeProps } from 'solid-js';
+import { JSX, Show, mergeProps, createEffect, createMemo } from 'solid-js';
 import { Transition } from 'solid-transition-group';
 import Icon from '../Icon';
 import createTransition from '../../utils/createTransition';
@@ -16,13 +16,23 @@ export interface DialogProps {
 function Dialog(props: DialogProps) {
   const merged = mergeProps({ size: 'md', open: false }, props);
 
-  const panelClasses = clsx(
-    'relative transform rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 w-full sm:p-6',
-    {
-      'sm:max-w-lg': merged.size === 'lg',
-      'sm:max-w-sm': merged.size === 'md'
-    }
+  const panelClasses = createMemo(() =>
+    clsx(
+      'relative transform rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 w-full sm:p-6',
+      {
+        'sm:max-w-lg': merged.size === 'lg',
+        'sm:max-w-sm': merged.size === 'md'
+      }
+    )
   );
+
+  createEffect(() => {
+    if (window?.Intercom) {
+      window.Intercom('update', {
+        hide_default_launcher: merged.open
+      });
+    }
+  });
 
   return (
     <div class="relative z-10">
@@ -65,7 +75,7 @@ function Dialog(props: DialogProps) {
         {merged.open && (
           <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-              <div class={panelClasses}>
+              <div class={panelClasses()}>
                 <Show when={merged?.onClose}>
                   <div class="absolute right-0 top-0 pr-4 pt-4 sm:block">
                     <button
