@@ -213,7 +213,7 @@ export default function PharmacySearch(props: PharmacyProps) {
       />
       <InputGroup
         label={
-          <div class="w-full flex items-center">
+          <div class="w-full flex flex-col sm:flex-row sm:items-center mb-2">
             <label class="whitespace-nowrap mr-1">Showing near:</label>
             <a
               href="#!"
