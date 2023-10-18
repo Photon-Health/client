@@ -1,13 +1,14 @@
-import { createSignal, onMount } from 'solid-js';
+import { createSignal, onMount, createEffect, For, Show } from 'solid-js';
 import Icon from '../../particles/Icon';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
 import InputGroup from '../../particles/InputGroup';
-import Input from '../../particles/Input';
 import Spinner from '../../particles/Spinner';
 import getNavigatorLocation from '../../utils/getNavigatorLocation';
 import loadGoogleScript from '../../utils/loadGoogleScript';
-import getLocation, { Location } from '../../utils/getLocation';
+import getLocations, { Location } from '../../utils/getLocations';
+import autocompleteLocation from '../../utils/autocompleteLocation';
+import ComboBox from '../../particles/ComboBox';
 
 interface LocationSelectProps {
   open: boolean;
@@ -18,26 +19,25 @@ interface LocationSelectProps {
 export default function LocationSelect(props: LocationSelectProps) {
   const [address, setAddress] = createSignal('');
   const [loadingNavigator, setLoadingNavigator] = createSignal(false);
-  const [loadingSearch, setLoadingSearch] = createSignal(false);
   const [navigatorError, setNavigatorError] = createSignal(false);
+  const [options, setOptions] = createSignal<any[]>([]);
   let geocoder: google.maps.Geocoder | undefined;
+  let autocompleteService: google.maps.places.AutocompleteService | undefined;
 
   onMount(async () => {
     loadGoogleScript({
       onLoad: async () => {
         geocoder = new google.maps.Geocoder();
+        autocompleteService = new google.maps.places.AutocompleteService();
       }
     });
   });
 
-  const handleAddressSubmit = async (e: Event) => {
+  const handleAddressSubmit = async (address: string) => {
     // get location with address
-    e.preventDefault();
-    setLoadingSearch(true);
     setNavigatorError(false);
-    const location = await getLocation(address(), geocoder!);
-    props.setLocation(location);
-    setLoadingSearch(false);
+    const locations = await getLocations(address, geocoder!);
+    props.setLocation(locations[0]);
     props.setOpen(false);
   };
 
@@ -49,8 +49,8 @@ export default function LocationSelect(props: LocationSelectProps) {
       const {
         coords: { latitude, longitude }
       } = await getNavigatorLocation({ timeout: 5000 });
-      const location = await getLocation({ latitude, longitude }, geocoder!);
-      props.setLocation(location);
+      const locations = await getLocations({ latitude, longitude }, geocoder!);
+      props.setLocation(locations[0]);
       props.setOpen(false);
     } catch {
       setNavigatorError(true);
@@ -58,12 +58,23 @@ export default function LocationSelect(props: LocationSelectProps) {
     setLoadingNavigator(false);
   };
 
+  const fetchOptions = async () => {
+    const results = await autocompleteLocation(address(), autocompleteService!);
+    setOptions(results);
+  };
+
+  createEffect(() => {
+    if (address()) {
+      fetchOptions();
+    }
+  });
+
   return (
     <Dialog open={props.open} onClose={() => props.setOpen(false)}>
-      <div class="mt-3 text-center sm:mt-5">
-        <h2>Set Location</h2>
+      <div class="text-left">
+        <h3 class="mt-0">Set Location</h3>
         <div class="mt-2">
-          <p class="text-sm text-gray-500">
+          <p class="text-sm">
             Enter the zipcode or address where you'd like to search for a pharmacy.
           </p>
         </div>
@@ -85,9 +96,25 @@ export default function LocationSelect(props: LocationSelectProps) {
         <p>OR</p>
         <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700 w-full" />
       </div>
-      <form onSubmit={handleAddressSubmit}>
-        <InputGroup label="Enter an address or zip code" loading={loadingSearch()}>
-          <Input type="text" value={address()} onInput={(e) => setAddress(e.currentTarget.value)} />
+      <form>
+        <InputGroup label="Enter an address or zip code">
+          <ComboBox setSelected={handleAddressSubmit}>
+            <ComboBox.Input
+              displayValue={(option) => option.label}
+              onInput={(e) => setAddress(e.currentTarget.value)}
+            />
+            <Show when={options()?.length > 0}>
+              <ComboBox.Options>
+                <For each={options()}>
+                  {(option) => (
+                    <ComboBox.Option key={option.value} value={option.label}>
+                      {option.label}
+                    </ComboBox.Option>
+                  )}
+                </For>
+              </ComboBox.Options>
+            </Show>
+          </ComboBox>
         </InputGroup>
       </form>
     </Dialog>
