@@ -18,7 +18,7 @@ function Dialog(props: DialogProps) {
 
   const panelClasses = createMemo(() =>
     clsx(
-      'relative transform rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 w-full sm:p-6',
+      'relative transform rounded-lg bg-white p-4 text-left shadow-xl transition-all sm:my-8 w-full sm:p-6',
       {
         'sm:max-w-lg': merged.size === 'lg',
         'sm:max-w-sm': merged.size === 'md'
@@ -77,7 +77,7 @@ function Dialog(props: DialogProps) {
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
               <div class={panelClasses()}>
                 <Show when={merged?.onClose}>
-                  <div class="absolute right-0 top-0 pr-4 pt-4 sm:block">
+                  <div class="absolute right-0 top-0 pr-4 pt-4 sm:pr-6 sm:pt-6 sm:block">
                     <button
                       type="button"
                       class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
