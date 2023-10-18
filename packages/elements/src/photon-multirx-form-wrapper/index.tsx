@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { customElement } from 'solid-element';
-import { createSignal, For, onMount, Show } from 'solid-js';
+import { createSignal, onMount } from 'solid-js';
 import { usePhoton } from '../context';
 import jwtDecode from 'jwt-decode';
 import PhotonFormWrapper from '../photon-form-wrapper';
@@ -23,13 +23,17 @@ const shouldWarn = (form: any) =>
 customElement(
   'photon-multirx-form-wrapper',
   {
-    enableMedHistory: false,
     hideTemplates: false,
     patientId: undefined,
     templateIds: undefined,
     prescriptionIds: undefined,
     weight: undefined,
-    weightUnit: 'lbs'
+    weightUnit: 'lbs',
+    enableLocalPickup: false,
+    enableSendToPatient: false,
+    enableMedHistory: false,
+    mailOrderIds: undefined,
+    enableOrder: false
   },
   (props: {
     enableMedHistory: boolean;
@@ -39,18 +43,20 @@ customElement(
     prescriptionIds?: string;
     weight?: number;
     weightUnit?: string;
+    enableLocalPickup?: boolean;
+    enableSendToPatient?: boolean;
+    mailOrderIds?: string;
+    enableOrder?: boolean;
   }) => {
     let ref: any;
     const client = usePhoton();
     const [canSubmit, setCanSubmit] = createSignal<boolean>(false);
-    const [submitErrors, setSubmitErrors] = createSignal<readonly Error[]>([]);
     const [canWritePrescription, setCanWritePrescription] = createSignal<boolean>(false);
-    const [isLoading, setIsLoading] = createSignal<boolean>(false);
-    const [isCreateOrder, setIsCreateOrder] = createSignal<boolean>(false);
     const [form, setForm] = createSignal<any>();
-    const [actions, setActions] = createSignal<any>();
     const [continueSubmitOpen, setContinueSubmitOpen] = createSignal<boolean>(false);
+    const [isCreateOrder, setIsCreateOrder] = createSignal<boolean>(false);
     const [continueSaveOnly, setContinueSaveOnly] = createSignal<boolean>(false);
+    const [triggerSubmit, setTriggerSubmit] = createSignal<boolean>(false);
     const { actions: patientActions } = PatientStore;
 
     onMount(async () => {
@@ -89,96 +95,9 @@ customElement(
       ref?.dispatchEvent(event);
     };
 
-    const submitForm = async (store: any, actions: any, createOrder: boolean) => {
-      setIsCreateOrder(createOrder);
-      setSubmitErrors([]);
-      const keys = ['patient', 'draftPrescriptions'];
-      actions.validate(keys);
-      const errorsPresent = actions.hasErrors(keys);
-      if (!errorsPresent) {
-        setIsLoading(true);
-        actions.updateFormValue({
-          key: 'errors',
-          value: []
-        });
-        const rxMutation = client!.getSDK().clinical.prescription.createPrescriptions({});
-        const templateMutation = client!
-          .getSDK()
-          .clinical.prescriptionTemplate.createPrescriptionTemplate({});
-        const prescriptions = [];
-        for (const draft of store['draftPrescriptions']!.value) {
-          if (draft.addToTemplates) {
-            try {
-              const { errors } = await templateMutation({
-                variables: {
-                  catalogId: draft.catalogId,
-                  treatmentId: draft.treatment.id,
-                  dispenseAsWritten: draft.dispenseAsWritten,
-                  dispenseQuantity: draft.dispenseQuantity,
-                  dispenseUnit: draft.dispenseUnit,
-                  // this is what is being sent to graphQL to create the template. we store the refill input as part of the draft
-                  // so a '+1' is needed in order to be passed in as the variable for fillsAllowed
-                  fillsAllowed: draft.refillsInput + 1,
-                  daysSupply: draft.daysSupply,
-                  instructions: draft.instructions,
-                  notes: draft.notes
-                },
-                awaitRefetchQueries: false
-              });
-              if (errors) {
-                setSubmitErrors(errors);
-              }
-            } catch (err) {
-              setSubmitErrors([err as Error]);
-            }
-          }
-          const args = {
-            daysSupply: draft.daysSupply,
-            dispenseAsWritten: draft.dispenseAsWritten,
-            dispenseQuantity: draft.dispenseQuantity,
-            dispenseUnit: draft.dispenseUnit,
-            effectiveDate: draft.effectiveDate,
-            instructions: draft.instructions,
-            notes: draft.notes,
-            patientId: store['patient']?.value.id,
-            // This is what is being sent to graphQL to create the prescription. We store the refill input as part of the drafted prescription under "refillsInput"
-            // so a '+1' is needed in order to be passed in as the variable for fillsAllowed to accurately represent the total number of fills.
-            fillsAllowed: draft.refillsInput + 1,
-            treatmentId: draft.treatment.id
-          };
-          prescriptions.push(args);
-        }
-        if (submitErrors().length > 0) {
-          return;
-        }
-        try {
-          const { data, errors } = await rxMutation({
-            variables: {
-              prescriptions
-            },
-            refetchQueries: [],
-            awaitRefetchQueries: false
-          });
-          if (errors) {
-            setSubmitErrors(errors as readonly Error[]);
-            return;
-          }
-          dispatchPrescriptionsCreated(
-            createOrder,
-            data!.createPrescriptions.map((x) => x.id),
-            store['patient']?.value.id
-          );
-          patientActions.clearSelectedPatient();
-        } catch (err) {
-          setSubmitErrors([err as Error]);
-        }
-        setIsLoading(false);
-      }
-    };
-
     const handleUnsavedConfirm = () => {
       setContinueSubmitOpen(false);
-      submitForm(form(), actions(), true);
+      setTriggerSubmit(true);
     };
     const handleUnsavedCancel = () => setContinueSubmitOpen(false);
 
@@ -207,14 +126,15 @@ customElement(
           cancel-text="Yes, Save Only"
           on:photon-dialog-confirmed={() => {
             setContinueSaveOnly(false);
-            submitForm(form(), actions(), true);
+            setIsCreateOrder(true);
+            setTriggerSubmit(true);
           }}
           on:photon-dialog-canceled={() => {
             setContinueSaveOnly(false);
           }}
           on:photon-dialog-alt={() => {
             setContinueSaveOnly(false);
-            submitForm(form(), actions(), false);
+            setTriggerSubmit(true);
           }}
           width="500px"
         >
@@ -235,66 +155,79 @@ customElement(
           title="New Prescriptions"
           titleIconName="prescription"
           headerRight={
-            <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
-              <photon-button
-                size="sm"
-                variant="outline"
-                disabled={!canSubmit() || !canWritePrescription()}
-                loading={isLoading() && !isCreateOrder()}
-                on:photon-clicked={() => setContinueSaveOnly(true)}
-              >
-                Save prescriptions
-              </photon-button>
+            props.enableOrder ? (
               <photon-button
                 size="sm"
                 disabled={!canSubmit() || !canWritePrescription()}
+                loading={triggerSubmit()}
                 on:photon-clicked={() =>
                   form()?.treatment?.value?.name
                     ? setContinueSubmitOpen(true)
-                    : submitForm(form(), actions(), true)
+                    : setTriggerSubmit(true)
                 }
-                loading={isLoading() && isCreateOrder()}
               >
-                Save and create order
+                Send Order
               </photon-button>
-            </div>
+            ) : (
+              <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
+                <photon-button
+                  size="sm"
+                  variant="outline"
+                  disabled={!canSubmit() || !canWritePrescription()}
+                  loading={triggerSubmit() && !isCreateOrder()}
+                  on:photon-clicked={() => setContinueSaveOnly(true)}
+                >
+                  Save prescriptions
+                </photon-button>
+                <photon-button
+                  size="sm"
+                  disabled={!canSubmit() || !canWritePrescription()}
+                  loading={triggerSubmit() && isCreateOrder()}
+                  on:photon-clicked={() => {
+                    if (form()?.treatment?.value?.name) {
+                      setContinueSubmitOpen(true);
+                    } else {
+                      setIsCreateOrder(true);
+                      setTriggerSubmit(true);
+                    }
+                  }}
+                >
+                  Save and create order
+                </photon-button>
+              </div>
+            )
           }
           form={
             <div class="w-full h-full bg-[#f7f4f4]">
-              <Show when={submitErrors().length > 0}>
-                <For each={submitErrors()}>
-                  {(error) => (
-                    <div class="pt-2">
-                      <sl-alert variant="danger" open>
-                        <div class="flex items-start xs:items-center gap-4">
-                          <sl-icon
-                            slot="icon"
-                            name="exclamation-octagon"
-                            class="text-red-500"
-                            style={{ 'font-size': '24px' }}
-                          />
-                          <p class="font-sans">{error.message}</p>
-                        </div>
-                      </sl-alert>
-                    </div>
-                  )}
-                </For>
-              </Show>
               <div class="w-full h-full sm:w-[600px] xs:mx-auto">
                 <photon-prescribe-workflow
                   hide-submit="true"
                   hide-templates={props.hideTemplates}
-                  loading={isLoading()}
+                  loading={triggerSubmit()}
                   patient-id={props.patientId}
                   template-ids={props.templateIds}
                   prescription-ids={props.prescriptionIds}
                   weight={props.weight}
                   weight-unit={props.weightUnit}
                   enable-med-history={props.enableMedHistory}
+                  enable-order={props.enableOrder}
+                  enable-local-pickup={props.enableLocalPickup}
+                  enable-send-to-patient={props.enableSendToPatient}
+                  mail-order-ids={props.mailOrderIds}
+                  trigger-submit={triggerSubmit()}
                   on:photon-form-validate={(e: any) => {
                     setCanSubmit(e.detail.canSubmit);
-                    setActions(e.detail.actions);
                     setForm(e.detail.form);
+                  }}
+                  on:photon-prescriptions-created={(e: any) => {
+                    e.stopPropagation();
+                    if (!props.enableOrder) {
+                      dispatchPrescriptionsCreated(
+                        isCreateOrder(),
+                        e.detail.prescriptions.map((p: { id: string }) => p.id),
+                        form()?.patient?.value?.id
+                      );
+                    }
                   }}
                 />
               </div>
