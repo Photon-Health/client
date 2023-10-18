@@ -51,6 +51,8 @@ const parseFulfillmentType = (type: FulfillmentType) => {
 
 export default function PharmacySelect(props: PharmacySelectProps) {
   const [loadedTabs, setLoadedTabs] = createSignal<string[]>(['Send to Patient']);
+  const [localPharmId, setLocalPharmId] = createSignal<string>();
+  const [mailOrderId, setMailOrderId] = createSignal<string>();
 
   // determine which tabs to display based on props
   // (can safely ignore ESLINT errors as they represent initial values that won't change)
@@ -85,6 +87,18 @@ export default function PharmacySelect(props: PharmacySelectProps) {
     const type = fulfillmentOptions.find((option) => option.name === newTab)?.fulfillmentType;
     // @ts-ignore
     props.setFufillmentType(parseFulfillmentType(type));
+
+    // There was a change to not reinitialize each tab body from scratch on tab change.
+    // But that creates a problem where the pharmacy id doesn't update if one
+    // switches back to a tab the second time. Here we take the persisted pharmacyId
+    // if there is one update setPharmacyId
+    if (newTab === 'Local Pickup' && localPharmId()) {
+      props.setPharmacyId(localPharmId());
+    } else if (newTab === 'Mail Order' && mailOrderId()) {
+      props.setPharmacyId(mailOrderId());
+    } else {
+      props.setPharmacyId(undefined);
+    }
   };
 
   return (
@@ -128,6 +142,7 @@ export default function PharmacySelect(props: PharmacySelectProps) {
               address={props?.address || ''}
               patientId={props?.patientIds?.[0]}
               setPharmacy={(pharmacy) => {
+                setLocalPharmId(pharmacy.id);
                 props.setPharmacyId(pharmacy.id);
               }}
               setPreferred={(shouldSetPreferred) =>
@@ -142,7 +157,10 @@ export default function PharmacySelect(props: PharmacySelectProps) {
             <RadioGroup
               label="Pharmacies"
               initSelected={props?.mailOrderPharmacyIds?.[0]}
-              setSelected={(pharmacyId) => props.setPharmacyId(pharmacyId)}
+              setSelected={(pharmacyId) => {
+                setMailOrderId(pharmacyId);
+                props.setPharmacyId(pharmacyId);
+              }}
             >
               <For each={props?.mailOrderPharmacyIds || []}>
                 {(id) => (
