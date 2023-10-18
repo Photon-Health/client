@@ -19,7 +19,6 @@ interface LocationSelectProps {
 export default function LocationSelect(props: LocationSelectProps) {
   const [address, setAddress] = createSignal('');
   const [loadingNavigator, setLoadingNavigator] = createSignal(false);
-  const [loadingSearch, setLoadingSearch] = createSignal(false);
   const [navigatorError, setNavigatorError] = createSignal(false);
   const [options, setOptions] = createSignal<any[]>([]);
   let geocoder: google.maps.Geocoder | undefined;
@@ -36,11 +35,9 @@ export default function LocationSelect(props: LocationSelectProps) {
 
   const handleAddressSubmit = async (address: string) => {
     // get location with address
-    setLoadingSearch(true);
     setNavigatorError(false);
     const locations = await getLocations(address, geocoder!);
     props.setLocation(locations[0]);
-    setLoadingSearch(false);
     props.setOpen(false);
   };
 
@@ -100,7 +97,7 @@ export default function LocationSelect(props: LocationSelectProps) {
         <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700 w-full" />
       </div>
       <form>
-        <InputGroup label="Enter an address or zip code" loading={loadingSearch()}>
+        <InputGroup label="Enter an address or zip code">
           <ComboBox setSelected={handleAddressSubmit}>
             <ComboBox.Input
               displayValue={(option) => option.label}

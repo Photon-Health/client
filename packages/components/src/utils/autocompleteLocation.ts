@@ -2,7 +2,6 @@ const autocomplete = async (
   inputValue: string,
   autocomeleteService: google.maps.places.AutocompleteService
 ) => {
-  console.log('inputValue', inputValue, autocomeleteService);
   const request = {
     input: inputValue,
     types: ['geocode'],

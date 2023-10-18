@@ -16,7 +16,6 @@ const getLocation = async (
       ? { address: addressOrLocation }
       : { location: { lat: addressOrLocation.latitude, lng: addressOrLocation.longitude } })
   });
-  console.log('data', data);
 
   if (!data?.results?.length) {
     return [];
