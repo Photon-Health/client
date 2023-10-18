@@ -122,7 +122,7 @@ function ComboOption(props: ComboOptionProps) {
   const [state, { setSelected, setActive }] = useContext(ComboBoxContext);
 
   const optionClass = createMemo(() =>
-    clsx('relative cursor-default select-none py-2 pl-3 pr-9 text-gray-900', {
+    clsx('relative cursor-default select-none py-2 pl-3 pr-9 text-gray-900 cursor-pointer', {
       'bg-blue-600 text-white': state.active === props.key
     })
   );
@@ -183,7 +183,7 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
       <div ref={inputContainer! as HTMLDivElement}>
         <Input
           {...restInput}
-          value={selectedLocalValue()}
+          value={selectedLocalValue() || ''}
           onClick={() => setOpen(!state.open)}
           onInput={(e) => {
             if (local?.onInput) {
@@ -199,6 +199,7 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
       <button
         class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
         onClick={() => setOpen(!state.open)}
+        title="Input dropdown"
       >
         <Show when={!inputGroupState.loading}>
           <Icon name="chevronUpDown" class="text-gray-400" />

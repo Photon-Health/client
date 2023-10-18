@@ -1,5 +1,5 @@
 import { types } from '@photonhealth/sdk';
-import { createMemo, createSignal, For, onMount } from 'solid-js';
+import { createMemo, createSignal, For, onMount, Show } from 'solid-js';
 import RadioGroup from '../../particles/RadioGroup';
 import Tabs from '../../particles/Tabs';
 import PharmacySearch from '../PharmacySearch';
@@ -50,6 +50,8 @@ const parseFulfillmentType = (type: FulfillmentType) => {
 };
 
 export default function PharmacySelect(props: PharmacySelectProps) {
+  const [loadedTabs, setLoadedTabs] = createSignal<string[]>(['Send to Patient']);
+
   // determine which tabs to display based on props
   // (can safely ignore ESLINT errors as they represent initial values that won't change)
   const tabs = fulfillmentOptions
@@ -75,24 +77,23 @@ export default function PharmacySelect(props: PharmacySelectProps) {
 
   const patientCount = createMemo(() => props?.patientIds?.length || 0);
 
+  const handleTabChange = (newTab: string) => {
+    setTab(newTab);
+    if (!loadedTabs().includes(newTab)) {
+      setLoadedTabs([...loadedTabs(), newTab]);
+    }
+    const type = fulfillmentOptions.find((option) => option.name === newTab)?.fulfillmentType;
+    // @ts-ignore
+    props.setFufillmentType(parseFulfillmentType(type));
+  };
+
   return (
     <div>
-      <Tabs
-        tabs={tabs}
-        activeTab={tab()}
-        setActiveTab={(newTab: string) => {
-          setTab(newTab);
-          const type = fulfillmentOptions.find((option) => option.name === newTab)?.fulfillmentType;
-
-          // @ts-ignore
-          // TODO fix this typing
-          props.setFufillmentType(parseFulfillmentType(type));
-        }}
-      />
+      <Tabs tabs={tabs} activeTab={tab()} setActiveTab={handleTabChange} />
 
       <div class="pt-4">
-        {tab() === 'Send to Patient' && (
-          <>
+        <Show when={loadedTabs().includes('Send to Patient')}>
+          <div class={tab() !== 'Send to Patient' ? 'hidden' : ''}>
             {patientCount() > 0 && (
               <RadioGroup
                 label="Patients"
@@ -118,35 +119,41 @@ export default function PharmacySelect(props: PharmacySelectProps) {
               </RadioGroup>
             )}
             {patientCount() === 0 && <div>Please add a patient.</div>}
-          </>
-        )}
+          </div>
+        </Show>
 
-        {tab() === 'Local Pickup' && (
-          <PharmacySearch
-            address={props?.address || ''}
-            patientId={props?.patientIds?.[0]}
-            setPharmacy={(pharmacy) => {
-              props.setPharmacyId(pharmacy.id);
-            }}
-            setPreferred={(shouldSetPreferred) => props?.setPreferredPharmacy?.(shouldSetPreferred)}
-          />
-        )}
+        <Show when={loadedTabs().includes('Local Pickup')}>
+          <div class={tab() !== 'Local Pickup' ? 'hidden' : ''}>
+            <PharmacySearch
+              address={props?.address || ''}
+              patientId={props?.patientIds?.[0]}
+              setPharmacy={(pharmacy) => {
+                props.setPharmacyId(pharmacy.id);
+              }}
+              setPreferred={(shouldSetPreferred) =>
+                props?.setPreferredPharmacy?.(shouldSetPreferred)
+              }
+            />
+          </div>
+        </Show>
 
-        {tab() === 'Mail Order' && (
-          <RadioGroup
-            label="Pharmacies"
-            initSelected={props?.mailOrderPharmacyIds?.[0]}
-            setSelected={(pharmacyId) => props.setPharmacyId(pharmacyId)}
-          >
-            <For each={props?.mailOrderPharmacyIds || []}>
-              {(id) => (
-                <RadioGroup.Option value={id}>
-                  <MailOrderPharmacy pharmacyId={id} />
-                </RadioGroup.Option>
-              )}
-            </For>
-          </RadioGroup>
-        )}
+        <Show when={loadedTabs().includes('Mail Order')}>
+          <div class={tab() !== 'Mail Order' ? 'hidden' : ''}>
+            <RadioGroup
+              label="Pharmacies"
+              initSelected={props?.mailOrderPharmacyIds?.[0]}
+              setSelected={(pharmacyId) => props.setPharmacyId(pharmacyId)}
+            >
+              <For each={props?.mailOrderPharmacyIds || []}>
+                {(id) => (
+                  <RadioGroup.Option value={id}>
+                    <MailOrderPharmacy pharmacyId={id} />
+                  </RadioGroup.Option>
+                )}
+              </For>
+            </RadioGroup>
+          </div>
+        </Show>
       </div>
     </div>
   );

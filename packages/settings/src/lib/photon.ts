@@ -25,7 +25,8 @@ const defaultSettings: OrganizationSettings = {
   courierProviders: [],
   returnTo: window.location.origin,
   federated: false,
-  enableMedHistory: false
+  enableMedHistory: false,
+  enableRxAndOrder: false
 };
 
 /**
@@ -46,7 +47,8 @@ export const photon: {
   org_2utnNgp5NGCy9wOb: {
     ...defaultSettings,
     logo: 'modern_pediatrics_logo.png',
-    accentColor: '#3f7a9c'
+    accentColor: '#3f7a9c',
+    enableRxAndOrder: true
   },
   // Summer Health
   org_66nHWvQRtHbjZt4A: {

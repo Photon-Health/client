@@ -34,5 +34,8 @@ export type OrganizationSettings = {
   patientsCanReroute: boolean;
   returnTo?: string;
   federated?: boolean;
+  // Show the med history section in the prescribe flow
   enableMedHistory?: boolean;
+  // Combine Rx and order creation into one prescribe flow
+  enableRxAndOrder?: boolean;
 };
