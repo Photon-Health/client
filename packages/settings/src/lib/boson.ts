@@ -46,7 +46,6 @@ export const boson: {
     accentColor: '#b35724',
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
-    enableMedHistory: true,
     enableRxAndOrder: true
   },
   // NewCo (demo's)
@@ -56,5 +55,15 @@ export const boson: {
     accentColor: '#506ef5',
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
+  },
+  // test2
+  org_zjqxDJzBNyuN9qcm: {
+    ...defaultSettings,
+    logo: 'photon',
+    accentColor: '#b35724',
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
+    enableMedHistory: true,
+    enableRxAndOrder: true
   }
 };
