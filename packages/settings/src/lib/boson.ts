@@ -11,7 +11,7 @@ const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
  */
 
 const defaultSettings: OrganizationSettings = {
-  logo: undefined,
+  // logo: undefined,
   accentColor: '#3182ce',
   sendOrder: true,
   pickUp: true,
@@ -26,7 +26,8 @@ const defaultSettings: OrganizationSettings = {
   courierProviders: [ALTO_ID],
   returnTo: window.location.origin,
   federated: false,
-  enableMedHistory: false
+  enableMedHistory: false,
+  enableRxAndOrder: false
 };
 
 /**
@@ -45,7 +46,7 @@ export const boson: {
     accentColor: '#b35724',
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
-    enableMedHistory: true
+    enableRxAndOrder: true
   },
   // NewCo (demo's)
   org_w85CgjUjCi52yvOz: {
@@ -54,5 +55,15 @@ export const boson: {
     accentColor: '#506ef5',
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
+  },
+  // test2
+  org_zjqxDJzBNyuN9qcm: {
+    ...defaultSettings,
+    logo: 'photon',
+    accentColor: '#b35724',
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
+    enableMedHistory: true,
+    enableRxAndOrder: true
   }
 };
