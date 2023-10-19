@@ -16,7 +16,7 @@ import { FiInfo, FiShoppingCart } from 'react-icons/fi';
 import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
-import { formatDate } from '../../utils';
+import { formatDate, getUnitAbbreviation } from '../../utils';
 import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
 import NameView from '../components/NameView';
@@ -48,6 +48,7 @@ const GET_PRESCRIPTIONS = gql`
       externalId
       state
       dispenseQuantity
+      dispenseUnit
       daysSupply
       writtenAt
       fillsRemaining
@@ -171,7 +172,7 @@ const renderRow = (rx: any) => {
     medication: <MedView name={med.name} />,
     quantity: (
       <Text>
-        {rx.dispenseQuantity} ct / {rx.daysSupply} day
+        {rx.dispenseQuantity} {getUnitAbbreviation(rx.dispenseUnit)}
       </Text>
     ),
     patient: <PatientView patient={patient} />,
