@@ -96,27 +96,25 @@ export default function LocationSelect(props: LocationSelectProps) {
         <p>OR</p>
         <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700 w-full" />
       </div>
-      <form>
-        <InputGroup label="Enter an address or zip code">
-          <ComboBox setSelected={handleAddressSubmit}>
-            <ComboBox.Input
-              displayValue={(option) => option.label}
-              onInput={(e) => setAddress(e.currentTarget.value)}
-            />
-            <Show when={options()?.length > 0}>
-              <ComboBox.Options>
-                <For each={options()}>
-                  {(option) => (
-                    <ComboBox.Option key={option.value} value={option.label}>
-                      {option.label}
-                    </ComboBox.Option>
-                  )}
-                </For>
-              </ComboBox.Options>
-            </Show>
-          </ComboBox>
-        </InputGroup>
-      </form>
+      <InputGroup label="Enter an address or zip code">
+        <ComboBox setSelected={handleAddressSubmit}>
+          <ComboBox.Input
+            displayValue={(option) => option.label}
+            onInput={(e) => setAddress(e.currentTarget.value)}
+          />
+          <Show when={options()?.length > 0}>
+            <ComboBox.Options>
+              <For each={options()}>
+                {(option) => (
+                  <ComboBox.Option key={option.value} value={option.label}>
+                    {option.label}
+                  </ComboBox.Option>
+                )}
+              </For>
+            </ComboBox.Options>
+          </Show>
+        </ComboBox>
+      </InputGroup>
     </Dialog>
   );
 }
