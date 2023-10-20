@@ -206,7 +206,7 @@ customElement(
         const rxMutation = client!.getSDK().clinical.prescription.createPrescriptions({});
         const prescriptions = [];
 
-        for (const draft of store['draftPrescriptions']!.value) {
+        for (const draft of store.draftPrescriptions!.value) {
           const args = {
             daysSupply: draft.daysSupply,
             dispenseAsWritten: draft.dispenseAsWritten,
@@ -215,7 +215,7 @@ customElement(
             effectiveDate: draft.effectiveDate,
             instructions: draft.instructions,
             notes: draft.notes,
-            patientId: store['patient']?.value.id,
+            patientId: store.patient?.value.id,
             // +1 here because we're using the refillsInput
             fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
             treatmentId: draft.treatment.id
@@ -245,11 +245,11 @@ customElement(
           const address = { street2: '', country: 'US', ...filteredPatientAddress };
 
           if (
-            store['updatePreferredPharmacy']?.value &&
-            store['pharmacy']?.value &&
-            store['fulfillmentType']?.value === 'PICK_UP'
+            store.updatePreferredPharmacy?.value &&
+            store.pharmacy?.value &&
+            store.fulfillmentType?.value === 'PICK_UP'
           ) {
-            const patient = store['patient']?.value;
+            const patient = store.patient?.value;
             if (patient?.preferredPharmacies && patient?.preferredPharmacies?.length > 0) {
               // remove the current preferred pharmacy
               removePatientPreferredPharmacyMutation({
@@ -264,7 +264,7 @@ customElement(
             updatePatientMutation({
               variables: {
                 id: patient.id,
-                preferredPharmacies: [store['pharmacy']?.value]
+                preferredPharmacies: [store.pharmacy?.value]
               },
               awaitRefetchQueries: false
             });
@@ -272,9 +272,9 @@ customElement(
 
           const { data: orderData, errors } = await orderMutation({
             variables: {
-              patientId: store['patient']?.value.id,
-              pharmacyId: props?.pharmacyId || store['pharmacy']?.value || '',
-              fulfillmentType: store['fulfillmentType']?.value || '',
+              patientId: store.patient?.value.id,
+              pharmacyId: props?.pharmacyId || store.pharmacy?.value || '',
+              fulfillmentType: store.fulfillmentType?.value || '',
               address,
               fills: prescriptionData?.createPrescriptions.map((x) => ({ prescriptionId: x.id }))
             },
@@ -300,7 +300,7 @@ customElement(
 
     createEffect(() => {
       dispatchPrescriptionsFormValidate(
-        Boolean(store['draftPrescriptions']?.value?.length > 0 && store['patient']?.value)
+        Boolean(store.draftPrescriptions?.value?.length > 0 && store.patient?.value)
       );
     });
 
