@@ -145,7 +145,6 @@ const renderSkeletonRow = (isMobile: boolean | undefined) =>
         fills: <SkeletonText width="75px" noOfLines={4} spacing="3" />,
         patient: (
           <HStack alignContent="center">
-            <SkeletonCircle size="10" />
             <SkeletonText noOfLines={2} width="150px" />
           </HStack>
         ),
@@ -159,7 +158,6 @@ const renderSkeletonRow = (isMobile: boolean | undefined) =>
         fills: <SkeletonText width="250px" noOfLines={1} spacing="3" />,
         patient: (
           <HStack alignContent="center">
-            <SkeletonCircle size="10" />
             <SkeletonText noOfLines={2} width="150px" />
           </HStack>
         ),
