@@ -3,12 +3,15 @@ import { mergeProps } from 'solid-js';
 
 export interface SpinnerProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
+  color?: 'blue' | 'green';
 }
 
 export default function Spinner(props: SpinnerProps) {
-  const mergedProps = mergeProps({ size: 'lg' }, props);
+  const mergedProps = mergeProps({ size: 'lg', color: 'blue' }, props);
 
-  const spinnerClasses = clsx('mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600', {
+  const spinnerClasses = clsx('mr-2 text-gray-200 animate-spin dark:text-gray-600', {
+    'fill-blue-500': mergedProps.color === 'blue',
+    'fill-green-500': mergedProps.color === 'green',
     'w-4 h-4': mergedProps.size === 'sm',
     'w-6 h-6': mergedProps.size === 'md',
     'w-8 h-8': mergedProps.size === 'lg',
