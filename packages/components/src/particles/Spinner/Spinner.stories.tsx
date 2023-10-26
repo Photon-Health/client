@@ -13,11 +13,19 @@ export const Default: SpinnerStory = {
 export const MultipleSpinners: SpinnerStory = {
   // @ts-ignore
   render: () => (
-    <div class="flex gap-4">
-      <Spinner size="sm" />
-      <Spinner size="md" />
-      <Spinner size="lg" />
-      <Spinner size="xl" />
+    <div>
+      <div class="flex gap-4">
+        <Spinner size="sm" />
+        <Spinner size="md" />
+        <Spinner size="lg" />
+        <Spinner size="xl" />
+      </div>
+      <div class="flex gap-4">
+        <Spinner size="sm" color="green" />
+        <Spinner size="md" color="green" />
+        <Spinner size="lg" color="green" />
+        <Spinner size="xl" color="green" />
+      </div>
     </div>
   )
 };

@@ -16,7 +16,7 @@ import { FiInfo, FiShoppingCart } from 'react-icons/fi';
 import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
-import { formatDate } from '../../utils';
+import { formatDate, getUnitAbbreviation } from '../../utils';
 import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
 import NameView from '../components/NameView';
@@ -47,7 +47,9 @@ const GET_PRESCRIPTIONS = gql`
       id
       externalId
       state
+      instructions
       dispenseQuantity
+      dispenseUnit
       daysSupply
       writtenAt
       fillsRemaining
@@ -72,13 +74,16 @@ const GET_PRESCRIPTIONS = gql`
 
 interface MedViewProps {
   name: string;
+  sig: string;
 }
 
-const MedView = (props: MedViewProps) => {
-  const { name } = props;
+const MedView = ({ name, sig }: MedViewProps) => {
   return (
     <Stack spacing="0">
       <Text fontWeight="medium">{name}</Text>
+      <Text fontSize="sm" color="gray.600">
+        {sig}
+      </Text>
     </Stack>
   );
 };
@@ -168,15 +173,15 @@ const renderRow = (rx: any) => {
   return {
     id,
     externalId: extId,
-    medication: <MedView name={med.name} />,
+    medication: <MedView name={med.name} sig={rx.instructions} />,
     quantity: (
-      <Text>
-        {rx.dispenseQuantity} ct / {rx.daysSupply} day
+      <Text color="gray.600">
+        {rx.dispenseQuantity} {getUnitAbbreviation(rx.dispenseUnit)}
       </Text>
     ),
     patient: <PatientView patient={patient} />,
     fills: (
-      <Text>
+      <Text color="gray.600">
         {rx.fillsRemaining} of {rx.fillsAllowed}
       </Text>
     ),
@@ -188,7 +193,7 @@ const renderRow = (rx: any) => {
       </Tooltip>
     ),
     prescriber: <NameView name={prescriber} />,
-    writtenAt: <Text>{writtenAt}</Text>,
+    writtenAt: <Text color="gray.600">{writtenAt}</Text>,
     actions: (
       <ActionsView
         prescriptionId={id}
@@ -204,7 +209,6 @@ export const renderSkeletonRow = () => ({
   quantity: <SkeletonText noOfLines={1} width="80px" />,
   patient: (
     <HStack>
-      <SkeletonCircle size="10" />
       <Skeleton height="8px" width="100px" />
     </HStack>
   ),
@@ -212,7 +216,6 @@ export const renderSkeletonRow = () => ({
   status: <SkeletonText noOfLines={1} />,
   prescriber: (
     <HStack>
-      <SkeletonCircle size="10" />
       <Skeleton height="8px" width="100px" />
     </HStack>
   ),
