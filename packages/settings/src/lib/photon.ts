@@ -177,6 +177,7 @@ export const photon: {
     logo: 'blueberry_logo.png',
     accentColor: '#235AFF',
     patientsCanReroute: false,
-    enableMedHistory: true
+    enableMedHistory: true,
+    enableRxAndOrder: true
   }
 };
