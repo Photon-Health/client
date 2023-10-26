@@ -65,6 +65,43 @@ const unique = (array: any[], propertyName: string) => {
   );
 };
 
+// list derived from dispense_unit table
+const quantityAbbreviations: { [key: string]: string } = {
+  each: 'ea',
+  milliliter: 'ml',
+  gram: 'g',
+  applicator: 'appl',
+  blister: 'blst',
+  caplet: 'cap',
+  capsule: 'cap',
+  film: 'flm',
+  gum: 'gum',
+  implant: 'impl',
+  insert: 'ins',
+  kit: 'kit',
+  lancet: 'lanc',
+  lozenge: 'loz',
+  packet: 'pkt',
+  pad: 'pad',
+  patch: 'patch',
+  penneedle: 'pneedle',
+  ring: 'ring',
+  sponge: 'spng',
+  stick: 'stk',
+  strip: 'strip',
+  suppository: 'supp',
+  swab: 'swab',
+  tablet: 'tab',
+  troche: 'troche',
+  unspecified: 'unsp',
+  wafer: 'wafer'
+};
+
+function getUnitAbbreviation(quantity: string): string {
+  const loweredQuantity = quantity.toLowerCase();
+  return quantityAbbreviations[loweredQuantity] || quantity;
+}
+
 export {
   formatDate,
   formatDateLong,
@@ -73,5 +110,6 @@ export {
   formatAddress,
   capitalizeFirst,
   titleCase,
-  unique
+  unique,
+  getUnitAbbreviation
 };

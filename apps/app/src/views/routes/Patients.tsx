@@ -8,7 +8,6 @@ import {
   MenuItem,
   MenuList,
   Skeleton,
-  SkeletonCircle,
   SkeletonText,
   Text
 } from '@chakra-ui/react';
@@ -109,7 +108,6 @@ const renderRow = (patient: any, setDisableScroll: Dispatch<SetStateAction<boole
 const renderSkeletonRow = () => ({
   name: (
     <HStack alignContent="center">
-      <SkeletonCircle size="10" />
       <SkeletonText noOfLines={2} width="200px" />
     </HStack>
   ),
