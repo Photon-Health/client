@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { JSXElement, Show } from 'solid-js';
 import { createMemo, mergeProps } from 'solid-js';
 
-export type TextSize = 'lg' | 'md' | 'sm';
+export type TextSize = 'xl' | 'lg' | 'md' | 'sm';
 export type TextColor = 'black' | 'gray' | 'red';
 
 export interface TextProps {
@@ -13,6 +13,8 @@ export interface TextProps {
   children?: JSXElement | string;
   sampleLoadingText?: string;
   color?: TextColor;
+  bold?: boolean;
+  italic?: boolean;
 }
 
 export default function Text(props: TextProps) {
@@ -21,16 +23,19 @@ export default function Text(props: TextProps) {
   const textClasses = createMemo(() =>
     // [overflow-wrap:anywhere] is here to prevent long text from overflowing, should be in tailwind soon
     // https://github.com/tailwindlabs/tailwindcss/discussions/2213#discussioncomment-5316024
-    clsx(props.class, 'inline-flex my-px [overflow-wrap:anywhere]', {
-      'text-sm leading-snug	': merged.size === 'sm',
-      'text-base leading-snug	': merged.size === 'md',
-      'text-lg leading-snug	': merged.size === 'lg',
+    clsx(props.class, 'inline-flex my-px [overflow-wrap:anywhere] leading-snug', {
+      'text-sm': merged.size === 'sm',
+      'text-base': merged.size === 'md',
+      'text-lg': merged.size === 'lg',
+      'text-xl': merged.size === 'xl',
       'text-black': !props.loading && merged.color === 'black',
       'text-slate-500': !props.loading && merged.color === 'gray',
       'text-red-500': !props.loading && merged.color === 'red',
       'text-transparent box-border rounded-md': props.loading,
       'bg-gray-100': !props.selected && props.loading,
-      'bg-blue-100': props.selected && props.loading
+      'bg-blue-100': props.selected && props.loading,
+      'font-semibold': props.bold,
+      italic: props.italic
     })
   );
   return (
