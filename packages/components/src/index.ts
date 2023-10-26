@@ -3,6 +3,7 @@ import DraftPrescriptions from './systems/DraftPrescriptions';
 import PatientInfo from './systems/PatientInfo';
 import PatientMedHistory from './systems/PatientMedHistory';
 import PharmacySelect from './systems/PharmacySelect';
+import Spinner from './particles/Spinner';
 import RadioGroup from './particles/RadioGroup';
 import Dialog from './particles/Dialog';
 import Button from './particles/Button';
@@ -21,6 +22,7 @@ export {
   PharmacySelect,
   RadioGroup,
   SDKProvider,
+  Spinner,
   Text,
   usePhotonClient
 };
