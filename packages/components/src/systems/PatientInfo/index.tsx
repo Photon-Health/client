@@ -155,28 +155,30 @@ export default function PatientInfo(props: PatientInfoProps) {
             </tbody>
           </table>
 
-          <div>
-            <InfoRow label="DOB">
-              <Text size="sm" loading={!patient()} sampleLoadingText="female">
-                {formatDate(patient()?.dateOfBirth || 'N/A')}
-              </Text>
-            </InfoRow>
-            <InfoRow label="Weight">
-              <Text size="sm" loading={!patient()} sampleLoadingText="150 lbs">
-                {props?.weight ? `${props.weight} ${props.weightUnit}` : 'N/A'}
-              </Text>
-            </InfoRow>
-            <InfoRow label="Sex">
-              <Text size="sm" loading={!patient()} sampleLoadingText="female">
-                {patient()?.sex || 'N/A'}
-              </Text>
-            </InfoRow>
-            <InfoRow label="Gender">
-              <Text size="sm" loading={!patient()} sampleLoadingText="female">
-                {patient()?.gender || 'N/A'}
-              </Text>
-            </InfoRow>
-          </div>
+          <table class="table-auto">
+            <tbody>
+              <InfoRow label="DOB">
+                <Text size="sm" loading={!patient()} sampleLoadingText="female">
+                  {formatDate(patient()?.dateOfBirth || 'N/A')}
+                </Text>
+              </InfoRow>
+              <InfoRow label="Weight">
+                <Text size="sm" loading={!patient()} sampleLoadingText="150 lbs">
+                  {props?.weight ? `${props.weight} ${props.weightUnit}` : 'N/A'}
+                </Text>
+              </InfoRow>
+              <InfoRow label="Sex">
+                <Text size="sm" loading={!patient()} sampleLoadingText="female">
+                  {patient()?.sex || 'N/A'}
+                </Text>
+              </InfoRow>
+              <InfoRow label="Gender">
+                <Text size="sm" loading={!patient()} sampleLoadingText="female">
+                  {patient()?.gender || 'N/A'}
+                </Text>
+              </InfoRow>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
