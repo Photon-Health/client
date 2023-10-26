@@ -37,7 +37,7 @@ type InfoRowProps = {
 const InfoRow = (props: InfoRowProps) => {
   return (
     <tr>
-      <td class="align-top py-1 pr-2">
+      <td class="align-top py-1 w-20">
         <Text size="sm" color="gray">
           {props.label}
         </Text>
