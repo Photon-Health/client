@@ -2,7 +2,7 @@ import { afterDate, message } from '../../validators';
 import { record, string, any, number, min, size } from 'superstruct';
 import { format } from 'date-fns';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
-import { DoseCalculator } from '@photonhealth/components';
+import { DoseCalculator, successToast, infoToast } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 //Shoelace
@@ -349,6 +349,11 @@ export const AddPrescriptionCard = (props: {
                       ? { notes: patientWeight(props.weight, props?.weightUnit) }
                       : undefined
                   );
+                  successToast(
+                    'Prescription Added \n\n You can send this order or add another prescription before sending it'
+                  );
+                } else {
+                  infoToast('Please fix the errors before adding this prescription');
                 }
               }}
             >

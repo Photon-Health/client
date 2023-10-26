@@ -14,7 +14,7 @@ const defaultToastOptions: ToastOptions = {
 const successToast = (text: string) => {
   toast.success(text, {
     ...defaultToastOptions,
-    duration: 30000,
+    duration: 3000,
     style: {
       top: '100px',
       'border-radius': '0.5rem', // tailwind rounded-lg
@@ -22,7 +22,6 @@ const successToast = (text: string) => {
     },
     iconTheme: {
       primary: '#fff',
-
       secondary: 'rgb(34 197 94)' // tailwind green 500
     }
   });

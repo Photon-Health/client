@@ -19,7 +19,7 @@ import { createEffect, onMount, createSignal, Show, For } from 'solid-js';
 import type { FormError } from '../stores/form';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
-import { Spinner, successToast } from '@photonhealth/components';
+import { Spinner } from '@photonhealth/components';
 import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import { AddPrescriptionCard } from './components/AddPrescriptionCard';
 import { PatientCard } from './components/PatientCard';
@@ -342,7 +342,7 @@ customElement(
               />
               <Show when={props?.patientId || store.patient?.value?.id}>
                 <Show when={showForm() || isEditing()}>
-                  <div ref={prescriptionRef} onClick={successToast}>
+                  <div ref={prescriptionRef}>
                     <AddPrescriptionCard
                       hideAddToTemplates={props.hideTemplates}
                       actions={actions}

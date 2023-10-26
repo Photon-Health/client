@@ -5,7 +5,6 @@ import { Patient } from '@photonhealth/sdk/dist/types';
 import { usePhotonClient } from '../SDKProvider';
 import Button from '../../particles/Button';
 import Text from '../../particles/Text';
-import { successToast } from '../../utils/toastTriggers';
 
 const GET_PATIENT = gql`
   query GetPatient($id: ID!) {
@@ -38,7 +37,7 @@ type InfoRowProps = {
 const InfoRow = (props: InfoRowProps) => {
   return (
     <tr>
-      <td class="align-top py-1 w-20" onClick={() => successToast('hello')}>
+      <td class="align-top py-1 w-20">
         <Text size="sm" color="gray">
           {props.label}
         </Text>
