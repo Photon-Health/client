@@ -16,6 +16,7 @@ const GET_PATIENT = gql`
       email
       phone
       sex
+      gender
       dateOfBirth
       address {
         street1
@@ -23,15 +24,6 @@ const GET_PATIENT = gql`
         city
         state
         postalCode
-      }
-      preferredPharmacies {
-        name
-        address {
-          street1
-          city
-          state
-          postalCode
-        }
       }
     }
   }
@@ -44,14 +36,14 @@ type InfoRowProps = {
 
 const InfoRow = (props: InfoRowProps) => {
   return (
-    <div class="py-2 grid grid-cols-3 gap-2">
-      <div class="text-sm text-gray-400">
+    <tr>
+      <td class="align-top py-1 pr-2">
         <Text size="sm" color="gray">
           {props.label}
         </Text>
-      </div>
-      <div class="text-sm col-span-2">{props.children}</div>
-    </div>
+      </td>
+      <td class="align-top py-1">{props.children}</td>
+    </tr>
   );
 };
 
@@ -104,10 +96,6 @@ export default function PatientInfo(props: PatientInfoProps) {
     return props.address || patient()?.address;
   });
 
-  const preferredPharmacy = createMemo(() => {
-    return patient()?.preferredPharmacies?.[0];
-  });
-
   const phoneNumber = createMemo(() => {
     if (patient()?.phone) {
       const pn = parsePhoneNumber(patient()?.phone);
@@ -126,83 +114,69 @@ export default function PatientInfo(props: PatientInfoProps) {
           </Button>
         </Show>
       </div>
-      <div class="pt-4 sm:grid sm:grid-cols-2 sm:gap-2">
-        <div>
-          <InfoRow label="Patient">
-            <Text size="sm" loading={!patient()} sampleLoadingText="Sally Patient">
-              {patient()?.name.full || 'N/A'}
-            </Text>
-          </InfoRow>
-          <InfoRow label="Email">
-            <Text size="sm" loading={!patient()} sampleLoadingText="fake@email.com">
-              {patient()?.email || 'N/A'}
-            </Text>
-          </InfoRow>
-          <InfoRow label="Mobile Phone">
-            <Text size="sm" loading={!patient()} sampleLoadingText="555-555-5555">
-              {phoneNumber() || 'N/A'}
-            </Text>
-          </InfoRow>
-          <InfoRow label="Address">
-            <Show when={!patient() || address()} fallback={<div>N/A</div>}>
-              <div>
-                <Text size="sm" loading={!patient()} sampleLoadingText="123 Fake St">
-                  {address()?.street1}
+      <div class="pt-4">
+        <Text size="lg" bold loading={!patient()} sampleLoadingText="Sally Patient">
+          {patient()?.name.full || 'N/A'}
+        </Text>
+        <div class="pt-4 sm:grid sm:grid-cols-2 sm:gap-2">
+          <table class="table-auto">
+            <tbody>
+              <InfoRow label="Email">
+                <Text size="sm" loading={!patient()} sampleLoadingText="fake@email.com">
+                  {patient()?.email || 'N/A'}
                 </Text>
-              </div>
-              <Show when={!patient() || address()?.street2}>
-                <div>
-                  <Text size="sm" loading={!patient()} sampleLoadingText="Apt 3">
-                    {address()?.street2}
-                  </Text>
-                </div>
-              </Show>
+              </InfoRow>
+              <InfoRow label="Phone">
+                <Text size="sm" loading={!patient()} sampleLoadingText="555-555-5555">
+                  {phoneNumber() || 'N/A'}
+                </Text>
+              </InfoRow>
+              <InfoRow label="Address">
+                <Show when={!patient() || address()} fallback={<div>N/A</div>}>
+                  <div>
+                    <Text size="sm" loading={!patient()} sampleLoadingText="123 Fake St">
+                      {address()?.street1}
+                    </Text>
+                  </div>
+                  <Show when={!patient() || address()?.street2}>
+                    <div>
+                      <Text size="sm" loading={!patient()} sampleLoadingText="Apt 3">
+                        {address()?.street2}
+                      </Text>
+                    </div>
+                  </Show>
+                  <div>
+                    <Text size="sm" loading={!patient()} sampleLoadingText="Brooklyn, NY 11221">
+                      {address()?.city}, {address()?.state} {address()?.postalCode}
+                    </Text>
+                  </div>
+                </Show>
+              </InfoRow>
+            </tbody>
+          </table>
 
-              <div>
-                <Text size="sm" loading={!patient()} sampleLoadingText="Brooklyn, NY 11221">
-                  {address()?.city}, {address()?.state} {address()?.postalCode}
-                </Text>
-              </div>
-            </Show>
-          </InfoRow>
-        </div>
-
-        <div>
-          <InfoRow label="DOB">
-            <Text size="sm" loading={!patient()} sampleLoadingText="female">
-              {formatDate(patient()?.dateOfBirth || 'N/A')}
-            </Text>
-          </InfoRow>
-          <InfoRow label="Sex">
-            <Text size="sm" loading={!patient()} sampleLoadingText="female">
-              {patient()?.sex || 'N/A'}
-            </Text>
-          </InfoRow>
-          <InfoRow label="Weight">
-            <Text size="sm" loading={!patient()} sampleLoadingText="150 lbs">
-              {props?.weight ? `${props.weight} ${props.weightUnit}` : 'N/A'}
-            </Text>
-          </InfoRow>
-          <InfoRow label="Pharmacy">
-            <Show when={!patient() || preferredPharmacy()} fallback={<div>N/A</div>}>
-              <div>
-                <Text size="sm" loading={!patient()} sampleLoadingText="CVS Pharmacy">
-                  {preferredPharmacy()?.name}
-                </Text>
-              </div>
-              <div>
-                <Text size="sm" loading={!patient()} sampleLoadingText="123 Fake St">
-                  {preferredPharmacy()?.address?.street1}
-                </Text>
-              </div>
-              <div>
-                <Text size="sm" loading={!patient()} sampleLoadingText="Brooklyn, NY 11221">
-                  {preferredPharmacy()?.address?.city}, {preferredPharmacy()?.address?.state}{' '}
-                  {preferredPharmacy()?.address?.postalCode}
-                </Text>
-              </div>
-            </Show>
-          </InfoRow>
+          <div>
+            <InfoRow label="DOB">
+              <Text size="sm" loading={!patient()} sampleLoadingText="female">
+                {formatDate(patient()?.dateOfBirth || 'N/A')}
+              </Text>
+            </InfoRow>
+            <InfoRow label="Weight">
+              <Text size="sm" loading={!patient()} sampleLoadingText="150 lbs">
+                {props?.weight ? `${props.weight} ${props.weightUnit}` : 'N/A'}
+              </Text>
+            </InfoRow>
+            <InfoRow label="Sex">
+              <Text size="sm" loading={!patient()} sampleLoadingText="female">
+                {patient()?.sex || 'N/A'}
+              </Text>
+            </InfoRow>
+            <InfoRow label="Gender">
+              <Text size="sm" loading={!patient()} sampleLoadingText="female">
+                {patient()?.gender || 'N/A'}
+              </Text>
+            </InfoRow>
+          </div>
         </div>
       </div>
     </div>
