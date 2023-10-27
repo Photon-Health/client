@@ -168,8 +168,7 @@ export const photon: {
   org_boRh5PcUzFhvyiue: {
     ...defaultSettings,
     logo: 'sana_care_logo.png',
-    accentColor: '#FBCC45',
-    enableRxAndOrder: true
+    accentColor: '#FBCC45'
   },
   // Blueberry Pediatrics
   org_ul8ojZgvzpqu299H: {
