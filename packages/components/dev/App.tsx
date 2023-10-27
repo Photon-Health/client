@@ -227,7 +227,7 @@ const App = () => {
             triggerToast({
               status: 'info',
               header: 'Serving up some info',
-              body: 'This is the body of the toast, glad you are here.'
+              body: 'This is the body of the toast'
             })
           }
         >

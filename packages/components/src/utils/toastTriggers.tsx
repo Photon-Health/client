@@ -15,7 +15,7 @@ const triggerToast = (props: ToastProps) => {
       <div
         class={`${t.visible ? 'animate-enter' : 'animate-leave'} flex gap-1 items-start border ${
           props.status === 'success' ? 'border-green-400' : 'border-blue-400'
-        } border-2 rounded-lg p-4 bg-white w-full sm:max-w-md`}
+        } border-2 rounded-lg p-4 bg-white w-full sm:max-w-md sm:w-auto`}
       >
         <div class={props.status === 'success' ? 'text-green-500' : 'text-blue-500'}>
           <Icon
