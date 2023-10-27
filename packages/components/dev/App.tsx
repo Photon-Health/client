@@ -11,6 +11,7 @@ import PharmacySelect from '../src/systems/PharmacySelect';
 import Card from '../src/particles/Card';
 import DraftPrescriptions, { DraftPrescription } from '../src/systems/DraftPrescriptions';
 import PatientMedHistory from '../src/systems/PatientMedHistory';
+import { infoToast, successToast } from '../src';
 
 const draftPrescriptions: DraftPrescription[] = [
   {
@@ -208,6 +209,12 @@ const App = () => {
             setFufillmentType={(t) => console.log('fulfillmentType! ', t)}
           />
         </Card>
+
+        <h2>Toast</h2>
+        <Button onClick={() => successToast('this is a success message')}>Success Toast</Button>
+        <Button onClick={() => infoToast('this is a info message with a longer message')}>
+          Info Toast
+        </Button>
       </Client>
     </div>
   );

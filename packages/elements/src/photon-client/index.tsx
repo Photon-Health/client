@@ -19,6 +19,7 @@ type PhotonClientProps = {
   developmentMode?: boolean;
   errorMessage?: string;
   autoLogin: boolean;
+  toastBuffer?: number;
 };
 
 customElement(
@@ -93,6 +94,13 @@ customElement(
       reflect: false,
       notify: false,
       parse: true
+    },
+    toastBuffer: {
+      attribute: 'toast-buffer',
+      value: 0,
+      reflect: false,
+      notify: false,
+      parse: true
     }
   },
   (props: PhotonClientProps) => {
@@ -144,7 +152,7 @@ customElement(
       <div ref={ref}>
         <style>{photonStyles}</style>
         <PhotonContext.Provider value={store()}>
-          <SDKProvider client={sdk}>
+          <SDKProvider client={sdk} toastBuffer={props?.toastBuffer || 0}>
             <slot />
           </SDKProvider>
         </PhotonContext.Provider>
