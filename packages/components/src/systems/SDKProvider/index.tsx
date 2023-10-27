@@ -15,7 +15,7 @@ export default function SDKProvider(props: SDKProviderProps) {
     <SDKContext.Provider value={props.client}>
       <Toaster
         containerStyle={{
-          'margin-top': `${props?.toastBuffer || 0}px` // hardcoded to fit the height of our clinical navbar
+          'margin-top': `${props?.toastBuffer || 0}px`
         }}
       />
       {props.children}
