@@ -3,6 +3,7 @@ import { customElement } from 'solid-element';
 import { createSignal, onMount } from 'solid-js';
 import { usePhoton } from '../context';
 import jwtDecode from 'jwt-decode';
+import { triggerToast } from '@photonhealth/components';
 import PhotonFormWrapper from '../photon-form-wrapper';
 import { PatientStore } from '../stores/patient';
 
@@ -158,13 +159,21 @@ customElement(
             props.enableOrder ? (
               <photon-button
                 size="sm"
-                disabled={!canSubmit() || !canWritePrescription()}
                 loading={triggerSubmit()}
-                on:photon-clicked={() =>
-                  form()?.treatment?.value?.name
-                    ? setContinueSubmitOpen(true)
-                    : setTriggerSubmit(true)
-                }
+                on:photon-clicked={() => {
+                  if (!canSubmit() || !canWritePrescription()) {
+                    // show info error
+                    triggerToast({
+                      status: 'info',
+                      body: 'You need to add prescription(s) to this order before you can send it.'
+                    });
+                  } else {
+                    // submit rx and order
+                    form()?.treatment?.value?.name
+                      ? setContinueSubmitOpen(true)
+                      : setTriggerSubmit(true);
+                  }
+                }}
               >
                 Send Order
               </photon-button>
@@ -173,22 +182,36 @@ customElement(
                 <photon-button
                   size="sm"
                   variant="outline"
-                  disabled={!canSubmit() || !canWritePrescription()}
                   loading={triggerSubmit() && !isCreateOrder()}
-                  on:photon-clicked={() => setContinueSaveOnly(true)}
+                  on:photon-clicked={() => {
+                    if (!canSubmit() || !canWritePrescription()) {
+                      triggerToast({
+                        status: 'info',
+                        body: 'You need to add prescription(s) to this order before you can send it.'
+                      });
+                    } else {
+                      setContinueSaveOnly(true);
+                    }
+                  }}
                 >
                   Save prescriptions
                 </photon-button>
                 <photon-button
                   size="sm"
-                  disabled={!canSubmit() || !canWritePrescription()}
                   loading={triggerSubmit() && isCreateOrder()}
                   on:photon-clicked={() => {
-                    if (form()?.treatment?.value?.name) {
-                      setContinueSubmitOpen(true);
+                    if (!canSubmit() || !canWritePrescription()) {
+                      triggerToast({
+                        status: 'info',
+                        body: 'You need to add prescription(s) to this order before you can send it.'
+                      });
                     } else {
-                      setIsCreateOrder(true);
-                      setTriggerSubmit(true);
+                      if (form()?.treatment?.value?.name) {
+                        setContinueSubmitOpen(true);
+                      } else {
+                        setIsCreateOrder(true);
+                        setTriggerSubmit(true);
+                      }
                     }
                   }}
                 >
