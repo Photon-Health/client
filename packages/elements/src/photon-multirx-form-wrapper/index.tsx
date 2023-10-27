@@ -163,7 +163,10 @@ customElement(
                 on:photon-clicked={() => {
                   if (!canSubmit() || !canWritePrescription()) {
                     // show info error
-                    triggerToast('Please fill out all required fields');
+                    triggerToast({
+                      status: 'info',
+                      body: 'You need to add prescription(s) to this order before you can send it.'
+                    });
                   } else {
                     // submit rx and order
                     form()?.treatment?.value?.name
@@ -182,7 +185,10 @@ customElement(
                   loading={triggerSubmit() && !isCreateOrder()}
                   on:photon-clicked={() => {
                     if (!canSubmit() || !canWritePrescription()) {
-                      triggerToast('Please fill out all required fields');
+                      triggerToast({
+                        status: 'info',
+                        body: 'You need to add prescription(s) to this order before you can send it.'
+                      });
                     } else {
                       setContinueSaveOnly(true);
                     }
@@ -195,7 +201,10 @@ customElement(
                   loading={triggerSubmit() && isCreateOrder()}
                   on:photon-clicked={() => {
                     if (!canSubmit() || !canWritePrescription()) {
-                      triggerToast('Please fill out all required fields');
+                      triggerToast({
+                        status: 'info',
+                        body: 'You need to add prescription(s) to this order before you can send it.'
+                      });
                     } else {
                       if (form()?.treatment?.value?.name) {
                         setContinueSubmitOpen(true);

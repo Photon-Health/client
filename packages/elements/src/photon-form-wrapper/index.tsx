@@ -63,7 +63,6 @@ const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
             }}
             variant="naked"
           >
-            snthaoeusnth aoesnuth asonethu nst
             <div class="text-black text-xl md:text-3xl">
               <sl-icon style={{ display: 'block' }} name="x" />
             </div>

@@ -349,9 +349,16 @@ export const AddPrescriptionCard = (props: {
                       ? { notes: patientWeight(props.weight, props?.weightUnit) }
                       : undefined
                   );
-                  triggerToast();
+                  triggerToast({
+                    status: 'success',
+                    header: 'Prescription Added',
+                    body: 'You can send this order or add another prescription before sending it'
+                  });
                 } else {
-                  triggerToast();
+                  triggerToast({
+                    status: 'info',
+                    body: 'Some items in the form are incomplete, please check for errors'
+                  });
                 }
               }}
             >

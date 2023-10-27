@@ -45,7 +45,8 @@ export const boson: {
     logo: 'photon',
     accentColor: '#b35724',
     mailOrderNavigate: true,
-    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
+    enableRxAndOrder: true
   },
   // NewCo (demo's)
   org_w85CgjUjCi52yvOz: {
