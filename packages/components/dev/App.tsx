@@ -11,7 +11,7 @@ import PharmacySelect from '../src/systems/PharmacySelect';
 import Card from '../src/particles/Card';
 import DraftPrescriptions, { DraftPrescription } from '../src/systems/DraftPrescriptions';
 import PatientMedHistory from '../src/systems/PatientMedHistory';
-import { infoToast, successToast } from '../src';
+import { triggerToast } from '../src';
 
 const draftPrescriptions: DraftPrescription[] = [
   {
@@ -211,8 +211,26 @@ const App = () => {
         </Card>
 
         <h2>Toast</h2>
-        <Button onClick={() => successToast('this is a success message')}>Success Toast</Button>
-        <Button onClick={() => infoToast('this is a info message with a longer message')}>
+        <Button
+          onClick={() =>
+            triggerToast({
+              status: 'success',
+              header: 'What a great job',
+              body: 'This is the body of the toast, glad you are here. And it is a little bit longer and should wrap around the card.'
+            })
+          }
+        >
+          Success Toast
+        </Button>
+        <Button
+          onClick={() =>
+            triggerToast({
+              status: 'info',
+              header: 'Serving up some info',
+              body: 'This is the body of the toast, glad you are here.'
+            })
+          }
+        >
           Info Toast
         </Button>
       </Client>

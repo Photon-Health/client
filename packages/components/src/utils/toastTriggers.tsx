@@ -1,42 +1,55 @@
 import toast from 'solid-toast';
 import Icon from '../particles/Icon';
-import type { ToastOptions } from 'solid-toast';
+import { Show } from 'solid-js';
+import Text from '../particles/Text';
 
-const defaultToastOptions: ToastOptions = {
-  position: 'top-right',
-  unmountDelay: 500,
-  ariaProps: {
-    role: 'status',
-    'aria-live': 'polite'
-  }
+type ToastProps = {
+  header?: string;
+  body: string;
+  status: 'success' | 'info';
 };
 
-const successToast = (text: string) => {
-  toast.success(text, {
-    ...defaultToastOptions,
-    duration: 3000,
-    style: {
-      top: '100px',
-      'border-radius': '0.5rem', // tailwind rounded-lg
-      border: '2px solid rgb(34, 197, 94)' // tailwind green 500
-    },
-    iconTheme: {
-      primary: '#fff',
-      secondary: 'rgb(34 197 94)' // tailwind green 500
+const triggerToast = (props: ToastProps) => {
+  toast.custom(
+    (t) => (
+      <div
+        class={`${t.visible ? 'animate-enter' : 'animate-leave'} flex gap-1 items-start border ${
+          props.status === 'success' ? 'border-green-400' : 'border-blue-400'
+        } border-2 rounded-lg p-4 bg-white w-full sm:max-w-md`}
+      >
+        <div class={props.status === 'success' ? 'text-green-500' : 'text-blue-500'}>
+          <Icon
+            name={props.status === 'success' ? 'checkCircle' : 'informationCircle'}
+            class="mr-2"
+          />
+        </div>
+        <div>
+          <Show when={props?.header}>
+            <Text bold>{props.header}</Text>
+          </Show>
+          <div>
+            <Text>{props.body}</Text>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          onClick={() => toast.dismiss(t.id)}
+        >
+          <span class="sr-only">Close</span>
+          <Icon name="xMark" class="h-6 w-6" aria-hidden="true" />
+        </button>
+      </div>
+    ),
+    {
+      position: 'top-right',
+      unmountDelay: 4000,
+      ariaProps: {
+        role: 'status',
+        'aria-live': 'polite'
+      }
     }
-  });
+  );
 };
 
-const infoToast = (text: string) => {
-  toast.success(text, {
-    ...defaultToastOptions,
-    duration: 5000,
-    style: {
-      'border-radius': '0.5rem', // tailwind rounded-lg
-      border: '2px solid rgb(59 130 246)' // tailwind blue 500
-    },
-    icon: <Icon name="informationCircle" class="text-blue-500" />
-  });
-};
-
-export { successToast, infoToast };
+export default triggerToast;
