@@ -11,6 +11,7 @@ import PharmacySelect from '../src/systems/PharmacySelect';
 import Card from '../src/particles/Card';
 import DraftPrescriptions, { DraftPrescription } from '../src/systems/DraftPrescriptions';
 import PatientMedHistory from '../src/systems/PatientMedHistory';
+import { triggerToast } from '../src';
 
 const draftPrescriptions: DraftPrescription[] = [
   {
@@ -208,6 +209,30 @@ const App = () => {
             setFufillmentType={(t) => console.log('fulfillmentType! ', t)}
           />
         </Card>
+
+        <h2>Toast</h2>
+        <Button
+          onClick={() =>
+            triggerToast({
+              status: 'success',
+              header: 'What a great job',
+              body: 'This is the body of the toast, glad you are here. And it is a little bit longer and should wrap around the card.'
+            })
+          }
+        >
+          Success Toast
+        </Button>
+        <Button
+          onClick={() =>
+            triggerToast({
+              status: 'info',
+              header: 'Serving up some info',
+              body: 'This is the body of the toast'
+            })
+          }
+        >
+          Info Toast
+        </Button>
       </Client>
     </div>
   );
