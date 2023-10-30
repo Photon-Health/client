@@ -1,4 +1,4 @@
-import { JSX, Show, mergeProps, createEffect, createMemo } from 'solid-js';
+import { JSX, Show, mergeProps, createMemo } from 'solid-js';
 import { Transition } from 'solid-transition-group';
 import Icon from '../Icon';
 import createTransition from '../../utils/createTransition';
@@ -25,14 +25,6 @@ function Dialog(props: DialogProps) {
       }
     )
   );
-
-  createEffect(() => {
-    if (window?.Intercom) {
-      window.Intercom('update', {
-        hide_default_launcher: merged.open
-      });
-    }
-  });
 
   return (
     <div class="relative z-10">
