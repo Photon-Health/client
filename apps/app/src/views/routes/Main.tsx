@@ -98,6 +98,7 @@ export const Main = () => {
           audience={auth0Config.audience}
           uri={process.env.REACT_APP_GRAPHQL_URI as string}
           auto-login="false"
+          toast-buffer={70}
         >
           <Nav />
           <Outlet />

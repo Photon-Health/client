@@ -1,11 +1,12 @@
 import { customElement } from 'solid-element';
 import { createEffect, createSignal } from 'solid-js';
-import { PhotonContext } from '../context';
-import { hasAuthParams } from '../utils';
 import { PhotonClient } from '@photonhealth/sdk';
 import { SDKProvider } from '@photonhealth/components';
-import { PhotonClientStore } from '../store';
 import { makeTimer } from '@solid-primitives/timer';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import { PhotonClientStore } from '../store';
+import { hasAuthParams } from '../utils';
+import { PhotonContext } from '../context';
 
 type PhotonClientProps = {
   domain?: string;
@@ -18,6 +19,7 @@ type PhotonClientProps = {
   developmentMode?: boolean;
   errorMessage?: string;
   autoLogin: boolean;
+  toastBuffer?: number;
 };
 
 customElement(
@@ -92,6 +94,13 @@ customElement(
       reflect: false,
       notify: false,
       parse: true
+    },
+    toastBuffer: {
+      attribute: 'toast-buffer',
+      value: 0,
+      reflect: false,
+      notify: false,
+      parse: true
     }
   },
   (props: PhotonClientProps) => {
@@ -141,8 +150,9 @@ customElement(
 
     return (
       <div ref={ref}>
+        <style>{photonStyles}</style>
         <PhotonContext.Provider value={store()}>
-          <SDKProvider client={sdk}>
+          <SDKProvider client={sdk} toastBuffer={props?.toastBuffer || 0}>
             <slot />
           </SDKProvider>
         </PhotonContext.Provider>
