@@ -9,6 +9,7 @@ import Dialog from './particles/Dialog';
 import Button from './particles/Button';
 import SDKProvider, { usePhotonClient } from './systems/SDKProvider';
 import Text from './particles/Text';
+import triggerToast from './utils/toastTriggers';
 
 import type { DraftPrescription, TemplateOverrides } from './systems/DraftPrescriptions';
 
@@ -24,7 +25,8 @@ export {
   SDKProvider,
   Spinner,
   Text,
-  usePhotonClient
+  usePhotonClient,
+  triggerToast
 };
 
 // Export types

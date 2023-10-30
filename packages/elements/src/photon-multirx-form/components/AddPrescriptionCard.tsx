@@ -2,7 +2,7 @@ import { afterDate, message } from '../../validators';
 import { record, string, any, number, min, size } from 'superstruct';
 import { format } from 'date-fns';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
-import { DoseCalculator } from '@photonhealth/components';
+import { DoseCalculator, triggerToast } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 //Shoelace
@@ -157,13 +157,10 @@ export const AddPrescriptionCard = (props: {
               invalid={props.store.dispenseQuantity?.error ?? false}
               help-text={props.store.dispenseQuantity?.error}
               on:photon-input-changed={(e: any) => {
-                const inputValue = Number(e.detail.input);
-                if (!isNaN(inputValue) && e.detail.input !== '') {
-                  props.actions.updateFormValue({
-                    key: 'dispenseQuantity',
-                    value: inputValue
-                  });
-                }
+                props.actions.updateFormValue({
+                  key: 'dispenseQuantity',
+                  value: Number(e.detail.input)
+                });
               }}
               style={{ width: '100px' }}
             />
@@ -349,6 +346,16 @@ export const AddPrescriptionCard = (props: {
                       ? { notes: patientWeight(props.weight, props?.weightUnit) }
                       : undefined
                   );
+                  triggerToast({
+                    status: 'success',
+                    header: 'Prescription Added',
+                    body: 'You can send this order or add another prescription before sending it'
+                  });
+                } else {
+                  triggerToast({
+                    status: 'info',
+                    body: 'Some items in the form are incomplete, please check for errors'
+                  });
                 }
               }}
             >
