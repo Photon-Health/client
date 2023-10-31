@@ -1,11 +1,10 @@
-import { JSX, Show, mergeProps, createMemo } from 'solid-js';
+import { JSX, Show, mergeProps, createMemo, createEffect } from 'solid-js';
 import { Transition } from 'solid-transition-group';
 import Icon from '../Icon';
 import createTransition from '../../utils/createTransition';
 import clsx from 'clsx';
 
 const transitionDuration = 100;
-
 export interface DialogProps {
   open: boolean;
   size?: 'md' | 'lg';
@@ -25,6 +24,16 @@ function Dialog(props: DialogProps) {
       }
     )
   );
+
+  createEffect(() => {
+    if (window.zE !== undefined) {
+      if (merged.open) {
+        window.zE('messenger', 'hide');
+      } else {
+        window.zE('messenger', 'show');
+      }
+    }
+  });
 
   return (
     <div class="relative z-10">

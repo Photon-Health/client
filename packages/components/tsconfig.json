@@ -11,5 +11,6 @@
     "resolveJsonModule": true,
     "declaration": true
   },
+  "include": ["src", "types"],
   "exclude": ["node_modules", "tmp", "dist"]
 }
