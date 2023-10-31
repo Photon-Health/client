@@ -54,8 +54,7 @@ export const photon: {
   org_66nHWvQRtHbjZt4A: {
     ...defaultSettings,
     logo: 'summer_health_logo.svg',
-    accentColor: '#ffc21f',
-    enableRxAndOrder: true
+    accentColor: '#ffc21f'
   },
   // Modern Ritual
   org_IWmodVdrQYpqh5x2: {
