@@ -1,3 +1,6 @@
+// SOURCE https://gist.github.com/wuservices/c0c3de056f5e528c9145b1df128b5c83
+// not on DefinitelyTyped
+
 /**
  * Zendesk messaging Web Widget SDK
  * https://developer.zendesk.com/api-reference/widget-messaging/introduction/
