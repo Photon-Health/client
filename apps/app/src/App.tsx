@@ -25,6 +25,7 @@ import { Playground } from './views/routes/Playground';
 import { auth0Config } from './configs/auth';
 import { AlertDisplay } from './views/components/AlertDisplay';
 import { useEffect } from 'react';
+import { Zendesk } from './views/components/Zendesk';
 
 const client = new PhotonClient({
   domain: auth0Config.domain,
@@ -52,6 +53,7 @@ export const App = () => {
   return (
     <BrowserRouter>
       <PhotonProvider client={client} onRedirectCallback={onRedirectCallback}>
+        <Zendesk />
         <AlertDisplay />
         <Routes>
           <Route path="/" element={<Main />}>
