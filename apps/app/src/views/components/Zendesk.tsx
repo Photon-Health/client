@@ -1,20 +1,6 @@
 import { usePhoton } from '@photonhealth/react';
 import { useEffect } from 'react';
 
-type Env = 'boson' | 'neutron' | 'photon';
-function getEnvironmentFromUrl(): Env {
-  const url = window.location.href.toLowerCase();
-
-  let env: Env = 'boson';
-  if (url.includes('neutron')) {
-    env = 'neutron';
-  } else if (url.includes('photon')) {
-    env = 'photon';
-  }
-
-  return env;
-}
-
 export const Zendesk = () => {
   const { user } = usePhoton();
 
@@ -42,7 +28,7 @@ export const Zendesk = () => {
         {
           // Environment
           id: '22448619079059',
-          value: getEnvironmentFromUrl()
+          value: process.env.REACT_APP_ENV_NAME
         }
       ]);
     }
