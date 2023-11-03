@@ -26,7 +26,7 @@ function Dialog(props: DialogProps) {
   );
 
   createEffect(() => {
-    if (window.zE !== undefined) {
+    if (window?.zE) {
       if (merged.open) {
         window.zE('messenger', 'hide');
       } else {
