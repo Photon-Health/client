@@ -12,6 +12,7 @@ import Card from '../src/particles/Card';
 import DraftPrescriptions, { DraftPrescription } from '../src/systems/DraftPrescriptions';
 import PatientMedHistory from '../src/systems/PatientMedHistory';
 import { triggerToast } from '../src';
+import AddressForm from '../src/systems/AddressForm';
 
 const draftPrescriptions: DraftPrescription[] = [
   {
@@ -105,6 +106,11 @@ const App = () => {
         audience="https://api.boson.health"
         uri="https://api.boson.health/graphql"
       >
+        <div class="mb-10">
+          <h2>Address Form</h2>
+          <AddressForm />
+        </div>
+
         <div class="mb-10">
           <h2>Patient Info</h2>
           <PatientInfo patientId="pat_01GQ0XFBHSH3YXN936A2D2SD7Y" />
