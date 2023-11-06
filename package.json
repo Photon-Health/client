@@ -92,6 +92,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@felte/solid": "^1.2.11",
+    "@felte/validator-zod": "^1.0.17",
     "@nanostores/persistent": "^0.7.0",
     "@nanostores/react": "^0.4.1",
     "@sentry/browser": "^7.45.0",
@@ -140,6 +141,7 @@
     "url-loader": "^4.1.1",
     "use-debounce": "^9.0.3",
     "web-vitals": "^3.3.0",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "zod": "^3.22.4"
   }
 }
