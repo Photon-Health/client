@@ -13,6 +13,7 @@ import DraftPrescriptions, { DraftPrescription } from '../src/systems/DraftPresc
 import PatientMedHistory from '../src/systems/PatientMedHistory';
 import { triggerToast } from '../src';
 import AddressForm from '../src/systems/AddressForm';
+import SingleExample from '../src/particles/ComboBoxX';
 
 const draftPrescriptions: DraftPrescription[] = [
   {
