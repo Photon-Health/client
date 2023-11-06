@@ -18,10 +18,7 @@ const addressSchema = zod.object({
   street2: zod.string().optional(),
   city: zod.string().min(1, { message: 'City is required' }),
   state: zod.string().min(1, { message: 'State is required' }),
-  postalCode: zod
-    .string()
-    .min(1, { message: 'Postal code is required' })
-    .length(5, { message: 'Postal code must be 5 digits' })
+  postalCode: zod.string().min(5, { message: 'Postal code must be 5 digits' })
 });
 
 const UPDATE_PATIENT_ADDRESS = gql`

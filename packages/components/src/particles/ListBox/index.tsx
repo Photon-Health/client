@@ -11,6 +11,7 @@ import { createSignal, For } from 'solid-js';
 import { createField } from '@felte/solid';
 import Icon from '../Icon';
 import clsx from 'clsx';
+import { useInputGroup } from '../InputGroup';
 
 type ListItem = {
   id?: string;
@@ -28,6 +29,8 @@ export default function ListSelect(props: ListSelectProps): JSX.Element {
   const [selected, setSelected] = createSignal<ListItem>({ name: props.selectMessage });
   const { field, onInput } = createField(props.name);
 
+  const [state] = useInputGroup();
+
   return (
     <>
       <Listbox
@@ -42,7 +45,13 @@ export default function ListSelect(props: ListSelectProps): JSX.Element {
       >
         <ListboxButton
           type="button"
-          class="block text-left w-full rounded-lg border-0 py-3 px-4 shadow-sm ring-1 ring-inset text-sm sm:text-base sm:leading-6 focus:outline-none text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-inset focus:ring-blue-600 focus:ring-2"
+          class={`block text-left w-full rounded-lg border-0 py-3 px-4 shadow-sm ring-1 ring-inset text-sm sm:text-base sm:leading-6 focus:outline-none text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-inset focus:ring-blue-600 focus:ring-2
+          ${
+            state.error
+              ? 'ring-red-300 placeholder:text-red-300 focus:ring-inset focus:ring-red-500'
+              : ''
+          }
+          `}
         >
           <span class="block truncate">{selected()?.name ?? ''}</span>
           <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">

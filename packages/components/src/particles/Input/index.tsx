@@ -37,7 +37,7 @@ export default function Input(props: InputProps) {
       'block w-full rounded-lg border-0 py-3 px-4 shadow-sm ring-1 ring-inset text-sm sm:text-base sm:leading-6 focus:outline-none',
       {
         'pl-10': inputProps.type === 'email',
-        'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-inset focus:ring-red-500':
+        'ring-red-300 placeholder:text-red-300 focus:ring-inset focus:ring-red-500':
           !!error && !disabled,
         'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-inset focus:ring-blue-600':
           !error && !disabled,
