@@ -43,12 +43,12 @@ export const text = {
       enter: 'Enter a zipcode or address'
     },
     COURIER: {
-      heading: 'Delivery',
-      subheading: 'Courier delivery to'
+      heading: 'Home Delivery',
+      subheading: 'Get your prescriptions delivered to'
     },
     MAIL_ORDER: {
-      heading: 'Delivery',
-      subheading: 'Ship to'
+      heading: 'Home Delivery',
+      subheading: 'Get your prescriptions shipped to'
     },
     PICK_UP: {
       heading: 'Local Pickup',

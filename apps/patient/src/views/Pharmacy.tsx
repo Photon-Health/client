@@ -326,7 +326,7 @@ export const Pharmacy = () => {
             setShowFooter(false);
 
             let type: ExtendedFulfillmentType = types.FulfillmentType.PickUp;
-            if (orgSettings.courierProviders.includes(selectedId)) {
+            if (orgSettings.courierNavigateProviders.includes(selectedId)) {
               type = 'COURIER';
             } else if (orgSettings.mailOrderNavigateProviders.includes(selectedId)) {
               type = types.FulfillmentType.MailOrder;
@@ -422,10 +422,13 @@ export const Pharmacy = () => {
     }
   }, [location]);
 
-  const patientAddressInAustinTX =
+  const deliveryAddressInAustinTX =
     order?.address?.city === 'Austin' && order?.address?.state === 'TX';
   const enableCourier =
-    !isDemo && searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier; // Courier limited to MoPed in Austin, TX
+    !isDemo &&
+    searchingInAustinTX &&
+    deliveryAddressInAustinTX &&
+    orgSettings.enableCourierNavigate;
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
   const heading = isReroute ? t.pharmacy.heading.reroute : t.pharmacy.heading.original;
   const subheading = isReroute
@@ -478,7 +481,7 @@ export const Pharmacy = () => {
               {enableCourier ? (
                 <BrandedOptions
                   type="COURIER"
-                  options={orgSettings.courierProviders}
+                  options={orgSettings.courierNavigateProviders}
                   location={location}
                   selectedId={selectedId}
                   handleSelect={handleSelect}
