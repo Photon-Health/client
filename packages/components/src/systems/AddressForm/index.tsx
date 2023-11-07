@@ -12,7 +12,6 @@ import Button from '../../particles/Button';
 import { usePhotonClient } from '../SDKProvider';
 import { createSignal } from 'solid-js';
 import triggerToast from '../../utils/toastTriggers';
-import Icon from '../../particles/Icon';
 import Banner from '../../particles/Banner';
 
 const addressSchema = zod.object({
