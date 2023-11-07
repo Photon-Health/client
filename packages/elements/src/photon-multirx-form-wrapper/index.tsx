@@ -221,7 +221,7 @@ customElement(
             )
           }
           form={
-            <div class="w-full h-full bg-[#f7f4f4]">
+            <div class="w-full h-full bg-[#F9FAFB]">
               <div class="w-full h-full sm:w-[600px] xs:mx-auto">
                 <photon-prescribe-workflow
                   hide-submit="true"

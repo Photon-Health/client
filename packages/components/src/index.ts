@@ -1,3 +1,4 @@
+import AddressForm from './systems/AddressForm';
 import DoseCalculator from './systems/DoseCalculator';
 import DraftPrescriptions from './systems/DraftPrescriptions';
 import PatientInfo from './systems/PatientInfo';
@@ -14,6 +15,7 @@ import triggerToast from './utils/toastTriggers';
 import type { DraftPrescription, TemplateOverrides } from './systems/DraftPrescriptions';
 
 export {
+  AddressForm,
   Button,
   Dialog,
   DoseCalculator,

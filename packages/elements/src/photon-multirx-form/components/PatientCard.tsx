@@ -1,6 +1,6 @@
 import { string, any, record } from 'superstruct';
 import { createSignal, onMount, Show, createEffect, createMemo } from 'solid-js';
-import { PatientInfo, PatientMedHistory } from '@photonhealth/components';
+import { PatientInfo, PatientMedHistory, AddressForm } from '@photonhealth/components';
 import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
@@ -73,7 +73,7 @@ export const PatientCard = (props: {
     }
   });
 
-  const patientId = createMemo(() => props.store['patient']?.value?.id || props?.patientId);
+  const patientId = createMemo(() => props.store.patient?.value?.id || props?.patientId);
 
   return (
     <div class="flex flex-col gap-8">
@@ -85,10 +85,10 @@ export const PatientCard = (props: {
             </p>
             {/* Show Dropdown when no patientId is passed */}
             <photon-patient-select
-              invalid={props.store['patient']?.error ?? false}
-              help-text={props.store['patient']?.error}
+              invalid={props.store.patient?.error ?? false}
+              help-text={props.store.patient?.error}
               on:photon-patient-selected={updatePatient}
-              selected={props.store['patient']?.value?.id ?? props.patientId}
+              selected={props.store.patient?.value?.id ?? props.patientId}
               sdk={props.client!.getSDK()}
             />
           </div>
@@ -101,13 +101,13 @@ export const PatientCard = (props: {
             weight={props?.weight}
             weightUnit={props?.weightUnit}
             editPatient={props?.enableOrder ? () => setDialogOpen(true) : undefined}
-            address={props?.address}
+            address={props?.address || props.store.patient?.value?.address}
           />
           <photon-patient-dialog
             hide-create-prescription={true}
             open={dialogOpen()}
             on:photon-patient-updated={() => {
-              actions.getSelectedPatient(props.client!.getSDK(), props.store['patient']?.value?.id);
+              actions.getSelectedPatient(props.client!.getSDK(), props.store.patient?.value?.id);
             }}
             patient-id={patientId()}
           />
@@ -135,6 +135,20 @@ export const PatientCard = (props: {
             }}
           />
         </photon-card>
+      </Show>
+      <Show when={props.store.patient?.value?.id && !props.store.patient?.value?.address}>
+        <AddressForm
+          patientId={patientId()}
+          setAddress={(address: Address) =>
+            props.actions.updateFormValue({
+              key: 'patient',
+              value: {
+                ...props.store.patient.value,
+                address
+              }
+            })
+          }
+        />
       </Show>
     </div>
   );

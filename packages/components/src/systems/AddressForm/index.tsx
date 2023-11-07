@@ -12,6 +12,7 @@ import Button from '../../particles/Button';
 import { usePhotonClient } from '../SDKProvider';
 import { createSignal } from 'solid-js';
 import triggerToast from '../../utils/toastTriggers';
+import Icon from '../../particles/Icon';
 
 const addressSchema = zod.object({
   street1: zod.string().min(1, { message: 'Street 1 is required' }),
@@ -40,6 +41,7 @@ type AddressProps = {
 
 type AddressFormProps = {
   patientId: string;
+  setAddress?: (address: AddressProps) => void;
 };
 
 export default function AddressForm(props: AddressFormProps) {
@@ -57,6 +59,9 @@ export default function AddressForm(props: AddressFormProps) {
           body: 'The patient address has been updated.',
           status: 'success'
         });
+        if (props?.setAddress) {
+          props.setAddress(address);
+        }
       }
     });
   };
@@ -85,29 +90,37 @@ export default function AddressForm(props: AddressFormProps) {
           Save Address
         </Button>
       </div>
-      <form ref={form} id="patient-address">
-        <InputGroup
-          label="Address Line 1 *"
-          subLabel="Enter Street Number and Name"
-          error={errors().street1}
-        >
-          <Input type="text" name="street1" />
-        </InputGroup>
-        <InputGroup label="Address Line 2" subLabel="Enter Apt, Unit, or Suite">
-          <Input type="text" name="street2" />
-        </InputGroup>
-        <InputGroup label="City *" error={errors().city}>
-          <Input type="text" name="city" />
-        </InputGroup>
-        <div class="grid grid-cols-1 sm:gap-4 sm:grid-cols-2">
-          <InputGroup label="State *" error={errors().state}>
-            <ListSelect list={states} selectMessage="Select a State" name="state" />
-          </InputGroup>
-          <InputGroup label="Zip Code *" error={errors().postalCode}>
-            <Input type="text" name="postalCode" />
-          </InputGroup>
+      <div>
+        <div class="text-blue-600 flex items-center gap-2 bg-blue-50 py-3 px-3 sm:px-4 rounded-lg mb-4">
+          <div class="flex-shrink-0">
+            <Icon name="informationCircle" size="sm" />
+          </div>
+          <span>Patient address is required to write a prescription</span>
         </div>
-      </form>
+        <form ref={form} id="patient-address">
+          <InputGroup
+            label="Address Line 1 *"
+            subLabel="Enter Street Number and Name"
+            error={errors().street1}
+          >
+            <Input type="text" name="street1" />
+          </InputGroup>
+          <InputGroup label="Address Line 2" subLabel="Enter Apt, Unit, or Suite">
+            <Input type="text" name="street2" />
+          </InputGroup>
+          <InputGroup label="City *" error={errors().city}>
+            <Input type="text" name="city" />
+          </InputGroup>
+          <div class="grid grid-cols-1 sm:gap-4 sm:grid-cols-2">
+            <InputGroup label="State *" error={errors().state}>
+              <ListSelect list={states} selectMessage="Select a State" name="state" />
+            </InputGroup>
+            <InputGroup label="Zip Code *" error={errors().postalCode}>
+              <Input type="text" name="postalCode" />
+            </InputGroup>
+          </div>
+        </form>
+      </div>
     </Card>
   );
 }
