@@ -139,15 +139,19 @@ export const PatientCard = (props: {
       <Show when={props.store.patient?.value?.id && !props.store.patient?.value?.address}>
         <AddressForm
           patientId={patientId()}
-          setAddress={(address: Address) =>
+          setAddress={(address: Address) => {
+            props.actions.updateFormValue({
+              key: 'address',
+              value: address
+            });
             props.actions.updateFormValue({
               key: 'patient',
               value: {
                 ...props.store.patient.value,
                 address
               }
-            })
-          }
+            });
+          }}
         />
       </Show>
     </div>
