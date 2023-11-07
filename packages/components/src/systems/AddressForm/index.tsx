@@ -13,6 +13,7 @@ import { usePhotonClient } from '../SDKProvider';
 import { createSignal } from 'solid-js';
 import triggerToast from '../../utils/toastTriggers';
 import Icon from '../../particles/Icon';
+import Banner from '../../particles/Banner';
 
 const addressSchema = zod.object({
   street1: zod.string().min(1, { message: 'Street 1 is required' }),
@@ -91,12 +92,7 @@ export default function AddressForm(props: AddressFormProps) {
         </Button>
       </div>
       <div>
-        <div class="text-blue-600 flex items-center gap-2 bg-blue-50 py-3 px-3 sm:px-4 rounded-lg mb-4">
-          <div class="flex-shrink-0">
-            <Icon name="informationCircle" size="sm" />
-          </div>
-          <span>Patient address is required to write a prescription</span>
-        </div>
+        <Banner text="Patient address is required to write a prescription" status="info" />
         <form ref={form} id="patient-address">
           <InputGroup
             label="Address Line 1 *"

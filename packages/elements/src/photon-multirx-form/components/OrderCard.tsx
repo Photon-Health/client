@@ -1,5 +1,6 @@
 import { createMemo } from 'solid-js';
 import { PharmacySelect } from '@photonhealth/components';
+import { Card, Text } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 export const OrderCard = (props: {
   store: Record<string, any>;
@@ -22,40 +23,42 @@ export const OrderCard = (props: {
   });
 
   return (
-    <photon-card>
+    <div>
       <style>{photonStyles}</style>
-      <div class="flex flex-row">
-        <p class="font-sans text-l font-medium flex-grow">Select Pharmacy</p>
-      </div>
-      <PharmacySelect
-        enableSendToPatient={props.enableSendToPatient}
-        // Defaults to Local Pickup if nothing is set
-        enableLocalPickup={
-          props.enableLocalPickup || (!props?.enableSendToPatient && !props?.mailOrderIds)
-        }
-        mailOrderPharmacyIds={props.mailOrderIds ? props.mailOrderIds.split(',') : undefined}
-        patientIds={patientIds()}
-        address={address()}
-        setFufillmentType={(type: string | undefined) => {
-          props.actions.updateFormValue({
-            key: 'fulfillmentType',
-            value: type || ''
-          });
-        }}
-        setPreferredPharmacy={(shouldSet = false) => {
-          props.actions.updateFormValue({
-            key: 'updatePreferredPharmacy',
-            value: shouldSet
-          });
-        }}
-        setPharmacyId={(id: string | undefined) => {
-          // TODO need to fix types coming from components, shouldn't have to do the above
-          props.actions.updateFormValue({
-            key: 'pharmacy',
-            value: id
-          });
-        }}
-      />
-    </photon-card>
+      <Card>
+        <div class="flex items-center justify-between">
+          <Text color="gray">Select Pharmacy</Text>
+        </div>
+        <PharmacySelect
+          enableSendToPatient={props.enableSendToPatient}
+          // Defaults to Local Pickup if nothing is set
+          enableLocalPickup={
+            props.enableLocalPickup || (!props?.enableSendToPatient && !props?.mailOrderIds)
+          }
+          mailOrderPharmacyIds={props.mailOrderIds ? props.mailOrderIds.split(',') : undefined}
+          patientIds={patientIds()}
+          address={address()}
+          setFufillmentType={(type: string | undefined) => {
+            props.actions.updateFormValue({
+              key: 'fulfillmentType',
+              value: type || ''
+            });
+          }}
+          setPreferredPharmacy={(shouldSet = false) => {
+            props.actions.updateFormValue({
+              key: 'updatePreferredPharmacy',
+              value: shouldSet
+            });
+          }}
+          setPharmacyId={(id: string | undefined) => {
+            // TODO need to fix types coming from components, shouldn't have to do the above
+            props.actions.updateFormValue({
+              key: 'pharmacy',
+              value: id
+            });
+          }}
+        />
+      </Card>
+    </div>
   );
 };

@@ -1,6 +1,6 @@
 import { string, any, record } from 'superstruct';
 import { createSignal, onMount, Show, createEffect, createMemo } from 'solid-js';
-import { PatientInfo, PatientMedHistory, AddressForm } from '@photonhealth/components';
+import { PatientInfo, PatientMedHistory, AddressForm, Card, Text } from '@photonhealth/components';
 import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
@@ -78,24 +78,23 @@ export const PatientCard = (props: {
   return (
     <div class="flex flex-col gap-8">
       <Show when={!props?.patientId}>
-        <photon-card>
-          <div class="flex flex-col gap-3">
-            <p class="font-sans text-l font-medium">
-              {props?.patientId ? 'Patient' : 'Select Patient'}
-            </p>
-            {/* Show Dropdown when no patientId is passed */}
-            <photon-patient-select
-              invalid={props.store.patient?.error ?? false}
-              help-text={props.store.patient?.error}
-              on:photon-patient-selected={updatePatient}
-              selected={props.store.patient?.value?.id ?? props.patientId}
-              sdk={props.client!.getSDK()}
-            />
+        <Card>
+          <div class="flex items-center justify-between">
+            <Text color="gray">{props?.patientId ? 'Patient' : 'Select Patient'}</Text>
           </div>
-        </photon-card>
+
+          {/* Show Dropdown when no patientId is passed */}
+          <photon-patient-select
+            invalid={props.store.patient?.error ?? false}
+            help-text={props.store.patient?.error}
+            on:photon-patient-selected={updatePatient}
+            selected={props.store.patient?.value?.id ?? props.patientId}
+            sdk={props.client!.getSDK()}
+          />
+        </Card>
       </Show>
       <Show when={patientId()}>
-        <photon-card>
+        <div>
           <PatientInfo
             patientId={patientId()}
             weight={props?.weight}
@@ -111,10 +110,10 @@ export const PatientCard = (props: {
             }}
             patient-id={patientId()}
           />
-        </photon-card>
+        </div>
       </Show>
       <Show when={props.enableMedHistory && patientId()}>
-        <photon-card>
+        <div>
           <PatientMedHistory
             patientId={patientId()}
             openAddMedication={() => setMedDialogOpen(true)}
@@ -134,7 +133,7 @@ export const PatientCard = (props: {
               setMedDialogOpen(false);
             }}
           />
-        </photon-card>
+        </div>
       </Show>
       <Show when={props.store.patient?.value?.id && !props.store.patient?.value?.address}>
         <AddressForm
