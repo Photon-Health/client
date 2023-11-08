@@ -1,4 +1,4 @@
-export const capsuleAustinZipCodes: string[] = [
+const zipCodes: string[] = [
   '78610',
   '78613',
   '78617',
@@ -56,3 +56,5 @@ export const capsuleAustinZipCodes: string[] = [
   '78757',
   '78758'
 ];
+
+export const zipCodeMap = new Map<string, boolean>(zipCodes.map((zip) => [zip, true]));

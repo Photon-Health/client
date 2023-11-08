@@ -36,7 +36,7 @@ import {
   triggerDemoNotification
 } from '../api';
 import { demoPharmacies } from '../data/demoPharmacies';
-import { capsuleAustinZipCodes } from '../data/capsuleAustinZipcodes';
+import { zipCodeMap as capsuleZipCodes } from '../data/capsuleAustinZipcodes';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
@@ -423,10 +423,7 @@ export const Pharmacy = () => {
     }
   }, [location]);
 
-  const deliveryAddressInAustinTX = order?.address?.postalCode
-    ? capsuleAustinZipCodes.includes(order.address.postalCode)
-    : false;
-  order?.address?.city === 'Austin' && order?.address?.state === 'TX';
+  const deliveryAddressInAustinTX = capsuleZipCodes.has(order?.address?.postalCode);
   const enableCourier =
     !isDemo &&
     searchingInAustinTX &&
