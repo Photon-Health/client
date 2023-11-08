@@ -74,6 +74,9 @@ export const PatientCard = (props: {
   });
 
   const patientId = createMemo(() => props.store.patient?.value?.id || props?.patientId);
+  const showAddressForm = createMemo(
+    () => props.store.patient?.value?.id && !props.store.patient?.value?.address
+  );
 
   return (
     <div class="flex flex-col gap-8">
@@ -99,7 +102,9 @@ export const PatientCard = (props: {
             patientId={patientId()}
             weight={props?.weight}
             weightUnit={props?.weightUnit}
-            editPatient={props?.enableOrder ? () => setDialogOpen(true) : undefined}
+            editPatient={
+              props?.enableOrder && !showAddressForm() ? () => setDialogOpen(true) : undefined
+            }
             address={props?.address || props.store.patient?.value?.address}
           />
           <photon-patient-dialog
@@ -107,6 +112,10 @@ export const PatientCard = (props: {
             open={dialogOpen()}
             on:photon-patient-updated={() => {
               actions.getSelectedPatient(props.client!.getSDK(), props.store.patient?.value?.id);
+              setDialogOpen(false);
+            }}
+            on:photon-patient-closed={() => {
+              setDialogOpen(false);
             }}
             patient-id={patientId()}
           />
@@ -135,7 +144,7 @@ export const PatientCard = (props: {
           />
         </div>
       </Show>
-      <Show when={props.store.patient?.value?.id && !props.store.patient?.value?.address}>
+      <Show when={showAddressForm()}>
         <AddressForm
           patientId={patientId()}
           setAddress={(address: Address) => {
