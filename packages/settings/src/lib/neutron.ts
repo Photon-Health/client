@@ -3,6 +3,7 @@ import { OrganizationSettings } from '../types';
 const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
 const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
 const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
+const CAPSULE_ID = 'phr_01G9CM8XB71GYHQVFMZBXSVTBF';
 const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 const HONEYBEE_PHARMACY_ID = 'phr_01GA9HPXNE3TGEWPK91YY8Z4TS';
 
@@ -23,8 +24,8 @@ const defaultSettings: OrganizationSettings = {
   sendToPatient: true,
   sendToPatientUsers: [],
   patientsCanReroute: true,
-  courier: false,
-  courierProviders: [],
+  enableCourierNavigate: true,
+  courierNavigateProviders: [CAPSULE_ID],
   returnTo: window.location.origin,
   federated: false,
   enableMedHistory: false
@@ -46,8 +47,8 @@ export const neutron: {
     accentColor: '#b35724',
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID, CAREPOINT_ID],
-    courier: true,
-    courierProviders: [ALTO_ID]
+    enableCourierNavigate: true,
+    courierNavigateProviders: [ALTO_ID]
   },
   // NewCo (demo's)
   org_YiUudCToTSrjOuow: {

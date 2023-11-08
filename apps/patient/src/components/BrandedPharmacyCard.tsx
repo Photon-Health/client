@@ -1,4 +1,5 @@
 import {
+  Box,
   Card,
   CardBody,
   Image,
@@ -21,7 +22,7 @@ interface Props {
 const PHARMACY_BRANDING = {
   [process.env.REACT_APP_CAPSULE_PHARMACY_ID as string]: {
     logo: capsuleLogo,
-    description: 'Free, same-day prescription delivery.'
+    description: 'FREE Delivery within 1-2 Days'
   },
   [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]: {
     logo: amazonPharmacyLogo,
@@ -40,6 +41,24 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
 
   if (!logo || !description) return null;
 
+  const [firstWord, ...restOfSentence] = description.split(' ');
+
+  const tagline =
+    pharmacyId === process.env.REACT_APP_CAPSULE_PHARMACY_ID ? (
+      <Text fontSize="sm" display="inline">
+        <Box as="span" color="gray.900" mr={1}>
+          {firstWord}
+        </Box>
+        <Box as="span" color="gray.500">
+          {restOfSentence.join(' ')}
+        </Box>
+      </Text>
+    ) : (
+      <Text fontSize="sm" color="gray.500">
+        {description}
+      </Text>
+    );
+
   return (
     <SlideFade offsetY="60px" in={true} key={`courier-pharmacy-${pharmacyId}`}>
       <Card
@@ -53,9 +72,7 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
         <CardBody p={3}>
           <VStack align="start" spacing={2}>
             <Image src={logo} width="auto" height="30px" />
-            <Text fontSize="sm" color="gray.500">
-              {description}
-            </Text>
+            {tagline}
           </VStack>
         </CardBody>
       </Card>
