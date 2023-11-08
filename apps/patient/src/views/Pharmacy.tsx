@@ -36,6 +36,7 @@ import {
   triggerDemoNotification
 } from '../api';
 import { demoPharmacies } from '../data/demoPharmacies';
+import { zipCodeMap as capsuleLookup } from '../data/capsuleAustinZipcodes';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
@@ -326,7 +327,7 @@ export const Pharmacy = () => {
             setShowFooter(false);
 
             let type: ExtendedFulfillmentType = types.FulfillmentType.PickUp;
-            if (orgSettings.courierProviders.includes(selectedId)) {
+            if (orgSettings.courierNavigateProviders.includes(selectedId)) {
               type = 'COURIER';
             } else if (orgSettings.mailOrderNavigateProviders.includes(selectedId)) {
               type = types.FulfillmentType.MailOrder;
@@ -422,10 +423,12 @@ export const Pharmacy = () => {
     }
   }, [location]);
 
-  const patientAddressInAustinTX =
-    order?.address?.city === 'Austin' && order?.address?.state === 'TX';
+  const deliveryAddressInAustinTX = capsuleLookup.has(order?.address?.postalCode);
   const enableCourier =
-    !isDemo && searchingInAustinTX && patientAddressInAustinTX && orgSettings.courier; // Courier limited to MoPed in Austin, TX
+    !isDemo &&
+    searchingInAustinTX &&
+    deliveryAddressInAustinTX &&
+    orgSettings.enableCourierNavigate;
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
   const heading = isReroute ? t.pharmacy.heading.reroute : t.pharmacy.heading.original;
   const subheading = isReroute
@@ -478,7 +481,7 @@ export const Pharmacy = () => {
               {enableCourier ? (
                 <BrandedOptions
                   type="COURIER"
-                  options={orgSettings.courierProviders}
+                  options={orgSettings.courierNavigateProviders}
                   location={location}
                   selectedId={selectedId}
                   handleSelect={handleSelect}
