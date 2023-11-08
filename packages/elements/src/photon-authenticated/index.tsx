@@ -30,6 +30,7 @@ customElement(
   (props: { autoLogin: boolean; hideLoader: boolean; redirectPath?: string }) => {
     const client = usePhoton();
     const [authenticated, setAuthenticated] = createSignal<boolean>(false);
+    const [user, setUser] = createSignal<any>(false);
     const [isLoading, setIsLoading] = createSignal<boolean>(true);
 
     createEffect(() => {
@@ -51,6 +52,7 @@ customElement(
           client?.authentication.login(args);
         }
         setAuthenticated(client?.authentication.state.isAuthenticated || false);
+        setUser(client?.authentication.state);
       } else {
         setIsLoading(true);
       }
@@ -62,6 +64,8 @@ customElement(
         <style>{shoelaceDarkStyles}</style>
         <style>{shoelaceLightStyles}</style>
         <Show when={client && authenticated()}>
+          <div>You're good to go!</div>
+          <div>{JSON.stringify(user())}</div>
           <slot />
         </Show>
         <Show when={client && !authenticated() && !isLoading() && !props.autoLogin}>

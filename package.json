@@ -3,8 +3,13 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+<<<<<<< HEAD
     "app:local": "concurrently \"npx graphql-codegen --watch --config='apps/app/codegen.ts'\" \"npx nx run app:start\"",
     "app:tau": "concurrently \"npx graphql-codegen --watch --config='apps/app/codegen.ts'\" \"npx nx run app:start:tau\"",
+=======
+    "app:local": "concurrently \"npx nx run elements:build:watch\" \"npx nx run app:start\"",
+    "ory-sesame-cra:local": "concurrently \"npx nx run elements:build:watch\" \"npx nx run ory-sesame-cra:start\"",
+>>>>>>> 98d62e3 (sesame ory POC)
     "patient": "npx nx run patient:start",
     "lint": "npx nx run-many --target=lint",
     "lint:fix": "npx nx run-many --target=lint:fix"
@@ -98,6 +103,7 @@
     "@felte/validator-zod": "^1.0.17",
     "@nanostores/persistent": "^0.7.0",
     "@nanostores/react": "^0.4.1",
+    "@ory/client": "^1.2.16",
     "@sentry/browser": "^7.45.0",
     "@sentry/react": "^7.45.0",
     "@sentry/tracing": "^7.45.0",
