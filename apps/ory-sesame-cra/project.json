@@ -1,0 +1,80 @@
+{
+  "name": "ory-sesame-cra",
+  "root": "apps/ory-sesame-cra",
+  "sourceRoot": "apps/ory-sesame-cra/src",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "targets": {
+    "start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/ory-sesame-cra",
+        "command": "env-cmd -f .env.boson react-app-rewired start"
+      },
+      "dependsOn": ["^build"]
+    },
+    "start:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/ory-sesame-cra",
+        "command": "env-cmd -f .env.tau react-app-rewired start"
+      },
+      "dependsOn": ["^build"]
+    },
+    "build:boson": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/ory-sesame-cra",
+        "command": "env-cmd -f .env.boson react-app-rewired build",
+        "outputs": "dist/apps/ory-sesame-cra"
+      },
+      "dependsOn": ["^build"]
+    },
+    "build:neutron": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/ory-sesame-cra",
+        "command": "env-cmd -f .env.neutron react-app-rewired build",
+        "outputs": "dist/apps/ory-sesame-cra"
+      },
+      "dependsOn": ["^build"]
+    },
+    "build:photon": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/ory-sesame-cra",
+        "command": "env-cmd -f .env.photon react-app-rewired build",
+        "outputs": "dist/apps/ory-sesame-cra"
+      },
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/ory-sesame-cra",
+        "command": "react-app-rewired test --watchAll=false"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/ory-sesame-cra",
+        "command": "npx eslint . --ext .tsx,.ts --quiet"
+      }
+    },
+    "lint:fix": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/ory-sesame-cra",
+        "command": "npx eslint . --ext .tsx,.ts --fix && npx prettier --write src/**/*.{ts,tsx}"
+      }
+    },
+    "tsc": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/ory-sesame-cra",
+        "command": "npx tsc --noEmit"
+      }
+    }
+  }
+}

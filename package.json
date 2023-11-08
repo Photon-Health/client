@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "app:local": "concurrently \"npx nx run elements:build:watch\" \"npx nx run app:start\"",
+    "ory-sesame-cra:local": "concurrently \"npx nx run elements:build:watch\" \"npx nx run ory-sesame-cra:start\"",
     "patient": "npx nx run patient:start",
     "lint": "npx nx run-many --target=lint",
     "lint:fix": "npx nx run-many --target=lint:fix"
@@ -93,6 +94,7 @@
     "@emotion/styled": "^11.10.6",
     "@nanostores/persistent": "^0.7.0",
     "@nanostores/react": "^0.4.1",
+    "@ory/client": "^1.2.16",
     "@sentry/browser": "^7.45.0",
     "@sentry/react": "^7.45.0",
     "@sentry/tracing": "^7.45.0",
