@@ -17,8 +17,8 @@ import { ExtendedFulfillmentType } from '../utils/models';
 
 export const STATES = {
   PICK_UP: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'],
-  COURIER: ['SENT', 'FILLING', 'IN_TRANSIT', 'DELIVERED'],
-  MAIL_ORDER: ['SENT', 'FILLING', 'SHIPPED', 'DELIVERED']
+  COURIER: ['SENT', 'PREPARING', 'IN_TRANSIT', 'DELIVERED'],
+  MAIL_ORDER: ['SENT', 'PREPARING', 'SHIPPED', 'DELIVERED']
 };
 
 interface Props {
