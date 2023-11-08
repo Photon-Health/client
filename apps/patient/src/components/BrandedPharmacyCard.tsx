@@ -37,11 +37,10 @@ const PHARMACY_BRANDING = {
 export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Props) => {
   const isMobile = useBreakpointValue({ base: true, md: false });
 
-  const { logo, description } = PHARMACY_BRANDING[pharmacyId];
+  const brand = PHARMACY_BRANDING[pharmacyId];
+  if (!brand) return null;
 
-  if (!logo || !description) return null;
-
-  const [firstWord, ...restOfSentence] = description.split(' ');
+  const [firstWord, ...restOfSentence] = brand.description.split(' ');
 
   const tagline =
     pharmacyId === process.env.REACT_APP_CAPSULE_PHARMACY_ID ? (
@@ -55,7 +54,7 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
       </Text>
     ) : (
       <Text fontSize="sm" color="gray.500">
-        {description}
+        {brand.description}
       </Text>
     );
 
@@ -71,7 +70,7 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
       >
         <CardBody p={3}>
           <VStack align="start" spacing={2}>
-            <Image src={logo} width="auto" height="30px" />
+            <Image src={brand.logo} width="auto" height="30px" />
             {tagline}
           </VStack>
         </CardBody>
