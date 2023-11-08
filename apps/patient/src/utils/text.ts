@@ -43,12 +43,12 @@ export const text = {
       enter: 'Enter a zipcode or address'
     },
     COURIER: {
-      heading: 'Delivery',
-      subheading: 'Courier delivery to'
+      heading: 'Home Delivery',
+      subheading: 'Get your prescriptions delivered to'
     },
     MAIL_ORDER: {
-      heading: 'Delivery',
-      subheading: 'Ship to'
+      heading: 'Home Delivery',
+      subheading: 'Get your prescriptions shipped to'
     },
     PICK_UP: {
       heading: 'Local Pickup',
@@ -61,8 +61,8 @@ export const text = {
     thankYou: 'Thank you!'
   },
   status: {
-    title: 'Filling your prescriptions',
-    heading: 'Filling your prescriptions',
+    title: 'Preparing your prescriptions',
+    heading: 'Preparing your prescriptions',
     subheading:
       "After your prescriptions are sent to the pharmacy, we'll send you updates on their status.",
     PICK_UP: {
@@ -74,11 +74,11 @@ export const text = {
       states: {
         SENT: {
           title: 'Sent',
-          description: 'Your prescription fills have been sent to the pharmacy.'
+          description: 'Your prescriptions have been sent to the pharmacy.'
         },
         RECEIVED: {
           title: 'Received',
-          description: 'The pharmacy has received your order and is preparing to fill it.'
+          description: 'The pharmacy has received your order and is preparing it.'
         },
         READY: {
           title: 'Ready',
@@ -99,11 +99,11 @@ export const text = {
       states: {
         SENT: {
           title: 'Sent',
-          description: 'Your prescription fills have been sent to the pharmacy.'
+          description: 'Your prescriptions have been sent to the pharmacy.'
         },
-        FILLING: {
-          title: 'Filling',
-          description: 'The pharmacy has received your order and is filling it.'
+        PREPARING: {
+          title: 'Preparing',
+          description: 'The pharmacy has received your order and is preparing it.'
         },
         IN_TRANSIT: {
           title: 'In transit',
@@ -125,11 +125,11 @@ export const text = {
       states: {
         SENT: {
           title: 'Sent',
-          description: 'Your prescription fills have been sent to the pharmacy.'
+          description: 'Your prescriptions have been sent to the pharmacy.'
         },
-        FILLING: {
-          title: 'Processing',
-          description: 'The pharmacy has received your order and is filling it.'
+        PREPARING: {
+          title: 'Preparing',
+          description: 'The pharmacy has received your order and is preparing it.'
         },
         SHIPPED: {
           title: 'Shipped',
