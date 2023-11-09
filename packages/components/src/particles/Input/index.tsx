@@ -34,10 +34,10 @@ export default function Input(props: InputProps) {
     const error = nonNativeProps.error || state.error;
     const readonly = inputProps.readonly || inputProps.readOnly;
     return clsx(
-      'block w-full rounded-md border-0 py-1.5 px-2 shadow-sm ring-1 ring-inset text-sm sm:text-base sm:leading-6 focus:outline-none',
+      'block w-full rounded-lg border-0 py-3 px-4 shadow-sm ring-1 ring-inset text-sm sm:text-base sm:leading-6 focus:outline-none',
       {
         'pl-10': inputProps.type === 'email',
-        'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-inset focus:ring-red-500':
+        'ring-red-300 placeholder:text-red-300 focus:ring-inset focus:ring-red-500':
           !!error && !disabled,
         'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-inset focus:ring-blue-600':
           !error && !disabled,
@@ -68,7 +68,7 @@ export default function Input(props: InputProps) {
 
   return (
     <>
-      <div class="relative rounded-md shadow-sm">
+      <div class="relative rounded-lg shadow-sm">
         <Show when={inputProps.type === 'email'}>
           <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
             <Icon name="envelope" class="h-5 w-5 text-gray-400" size="sm" />
@@ -93,6 +93,7 @@ export default function Input(props: InputProps) {
                 navigator.clipboard.writeText(valueToString(inputProps?.value));
                 setCopied(true);
               }}
+              aria-label="Drop Down for more options"
             >
               <Show when={copied()}>
                 <Icon name="check" class="h-5 w-5 text-gray-400" size="sm" />

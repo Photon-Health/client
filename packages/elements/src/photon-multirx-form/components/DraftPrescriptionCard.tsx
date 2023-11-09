@@ -1,6 +1,7 @@
 import { createSignal } from 'solid-js';
 import { DraftPrescriptions } from '@photonhealth/components';
 import { size, array, any } from 'superstruct';
+import { Card, Text } from '@photonhealth/components';
 import { message } from '../../validators';
 import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
@@ -95,7 +96,7 @@ export const DraftPrescriptionCard = (props: {
   };
 
   return (
-    <photon-card>
+    <div>
       <style>{photonStyles}</style>
       <photon-dialog
         open={editDialogOpen()}
@@ -125,8 +126,10 @@ export const DraftPrescriptionCard = (props: {
           cannot be undone.
         </p>
       </photon-dialog>
-      <div class="flex flex-col gap-3">
-        <p class="font-sans text-l font-medium">Pending Prescriptions</p>
+      <Card>
+        <div class="flex items-center justify-between">
+          <Text color="gray">Pending Prescription</Text>
+        </div>
         <DraftPrescriptions
           draftPrescriptions={props.store['draftPrescriptions']?.value ?? []}
           handleDelete={(draftId: string) => {
@@ -147,7 +150,7 @@ export const DraftPrescriptionCard = (props: {
           }}
           error={props.store['draftPrescriptions']?.error}
         />
-      </div>
-    </photon-card>
+      </Card>
+    </div>
   );
 };
