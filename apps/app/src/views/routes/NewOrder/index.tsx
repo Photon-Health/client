@@ -129,7 +129,7 @@ export const NewOrder = () => {
   }, [patient?.address]);
 
   const background = useColorModeValue('white', 'dark');
-  const bodyBackground = useColorModeValue('#f7f4f4', 'bg-canvas');
+  const bodyBackground = useColorModeValue('#F9FAFB', 'bg-canvas');
   const border = useColorModeValue('gray.200', 'gray.800');
   const isMobile = useBreakpointValue({ base: true, sm: false });
 
