@@ -67,13 +67,13 @@ export const MultipleInputs: InputGroupStory = {
         <InputGroup label="Select Name" helpText="So many options">
           <ComboBox>
             <ComboBox.Input
-              displayValue={(person) => person.name}
               onInput={(e) => setQuery(e.currentTarget.value)}
+              displayValue={(person) => person.name}
             />
             <ComboBox.Options>
               <For each={filteredPeople()}>
                 {(person) => (
-                  <ComboBox.Option key={person.id} value={person.name}>
+                  <ComboBox.Option key={person.id} value={person}>
                     {person.name}
                   </ComboBox.Option>
                 )}
@@ -101,6 +101,10 @@ export const MultipleInputs: InputGroupStory = {
               setValue(e.currentTarget.value === 'yes');
             }}
           />
+        </InputGroup>
+
+        <InputGroup label="Email with Sub-Label" subLabel="We'll only use this for spam.">
+          <Input type="email" placeholder="you@example.com" />
         </InputGroup>
       </div>
     );

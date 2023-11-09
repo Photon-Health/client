@@ -28,10 +28,10 @@ export const Default: InputGroupStory = {
     });
 
     return (
-      <ComboBox value={filteredPeople()[0]} {...args}>
+      <ComboBox>
         <ComboBox.Input
-          displayValue={(person) => person.name}
           onInput={(e) => setQuery(e.currentTarget.value)}
+          displayValue={(person) => person.name}
         />
         <ComboBox.Options>
           <For each={filteredPeople()}>

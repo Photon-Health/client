@@ -55,7 +55,8 @@ export const photon: {
   org_66nHWvQRtHbjZt4A: {
     ...defaultSettings,
     logo: 'summer_health_logo.svg',
-    accentColor: '#ffc21f'
+    accentColor: '#ffc21f',
+    enableRxAndOrder: true
   },
   // Modern Ritual
   org_IWmodVdrQYpqh5x2: {
@@ -125,7 +126,8 @@ export const photon: {
   org_v5It8IoY0RH1Rw80: {
     ...defaultSettings,
     logo: 'piction_health_logo.png',
-    accentColor: '#3377e2'
+    accentColor: '#3377e2',
+    enableRxAndOrder: true
   },
   // Shapiro Medical (Xyon Health)
   org_Y0EPcd3p5eqG4iZs: {
@@ -167,7 +169,8 @@ export const photon: {
   org_boRh5PcUzFhvyiue: {
     ...defaultSettings,
     logo: 'sana_care_logo.png',
-    accentColor: '#FBCC45'
+    accentColor: '#FBCC45',
+    enableRxAndOrder: true
   },
   // Blueberry Pediatrics
   org_ul8ojZgvzpqu299H: {
