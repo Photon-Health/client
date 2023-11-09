@@ -7,7 +7,7 @@ const customTheme = extendTheme(
     styles: {
       global: (props: StyleFunctionProps) => ({
         body: {
-          bgColor: mode('#f7f4f4', 'bg-canvas')(props)
+          bgColor: mode('#F9FAFB', 'bg-canvas')(props)
         }
       })
     },

@@ -5,6 +5,7 @@ import { Patient } from '@photonhealth/sdk/dist/types';
 import { usePhotonClient } from '../SDKProvider';
 import Button from '../../particles/Button';
 import Text from '../../particles/Text';
+import Card from '../../particles/Card';
 
 const GET_PATIENT = gql`
   query GetPatient($id: ID!) {
@@ -105,9 +106,9 @@ export default function PatientInfo(props: PatientInfoProps) {
   });
 
   return (
-    <div class="divide-y divide-gray-200">
-      <div class="flex justify-between pb-4">
-        <h5>Patient Info</h5>
+    <Card>
+      <div class="flex items-center justify-between">
+        <Text color="gray">Patient Info</Text>
         <Show when={props?.editPatient}>
           <Button variant="secondary" size="sm" onClick={props?.editPatient}>
             Edit Patient
@@ -181,6 +182,6 @@ export default function PatientInfo(props: PatientInfoProps) {
           </table>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
