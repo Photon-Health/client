@@ -8,6 +8,7 @@ import generateString from '../../utils/generateString';
 import Badge from '../../particles/Badge';
 import formatDate from '../../utils/formatDate';
 import Button from '../../particles/Button';
+import Card from '../../particles/Card';
 
 const GET_PATIENT_MED_HISTORY = gql`
   query GetPatient($id: ID!) {
@@ -121,15 +122,16 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   });
 
   return (
-    <div class="divide-y divide-gray-200">
-      <div class="flex justify-between pb-4">
-        <h5>Medication History</h5>
+    <Card>
+      <div class="flex items-center justify-between">
+        <Text color="gray">Medication History</Text>
         <Show when={props?.openAddMedication}>
           <Button variant="secondary" size="sm" onClick={props?.openAddMedication}>
             + Add
           </Button>
         </Show>
       </div>
+
       <div class="max-h-80 overflow-y-auto">
         <Table>
           <Table.Header>
@@ -179,6 +181,6 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
           </Table.Body>
         </Table>
       </div>
-    </div>
+    </Card>
   );
 }

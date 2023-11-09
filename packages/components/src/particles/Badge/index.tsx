@@ -23,7 +23,7 @@ export default function Badge(props: BadgeProps) {
   const merged = mergeProps({ size: 'md', color: 'blue' }, props);
 
   const badgeClasses = createMemo(() =>
-    clsx(props.class, 'inline-flex items-center rounded-md text-xs font-medium', {
+    clsx(props.class, 'inline-flex items-center rounded-md text-xs font-medium whitespace-nowrap', {
       'px-2 py-1': merged.size === 'md',
       'px-1.5 py-0.5': merged.size === 'sm',
       'bg-gray-100 text-gray-600': merged.color === 'gray',
@@ -37,5 +37,5 @@ export default function Badge(props: BadgeProps) {
     })
   );
 
-  return <span class={badgeClasses()}>{props.children}</span>;
+  return <div class={badgeClasses()}>{props.children}</div>;
 }

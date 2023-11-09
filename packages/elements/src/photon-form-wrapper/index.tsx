@@ -31,7 +31,7 @@ const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
   const handleCancel = () => onCloseDialogOpen(false);
 
   return (
-    <div ref={ref} class="fixed top-0 left-0 w-full h-screen z-10 overflow-y-scroll">
+    <div ref={ref} class="fixed top-0 left-0 w-full h-screen z-10 overflow-y-scroll bg-[#F9FAFB]">
       <style>{tailwind}</style>
 
       {/* Close Wrapper Modal */}
@@ -80,10 +80,8 @@ const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
           </Show>
         </div>
       </header>
-      <div class="overflow-y-scroll w-full min-h-screen bg-[#f7f4f4] pt-28 xs:pt-28 lg:pt-20">
-        <div class="px-4 pb-24 md:pt-4 md:pb-52 md:px-4 w-full h-full sm:w-[600px] xs:mx-auto">
-          {props.form}
-        </div>
+      <div class="overflow-y-scroll w-full min-h-screen bg-[#F9FAFB] pt-28 xs:pt-28 lg:pt-20">
+        <div class="px-4 pb-24 md:pt-4 md:pb-52 md:px-4 w-full h-full">{props.form}</div>
       </div>
     </div>
   );
