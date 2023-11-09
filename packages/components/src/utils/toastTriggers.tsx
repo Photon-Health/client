@@ -43,7 +43,7 @@ const triggerToast = (props: ToastProps) => {
     ),
     {
       position: 'top-right',
-      unmountDelay: 4000,
+      unmountDelay: 3000,
       ariaProps: {
         role: 'status',
         'aria-live': 'polite'
