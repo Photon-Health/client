@@ -1,6 +1,7 @@
 import { customElement } from 'solid-element';
 import { createEffect, onCleanup, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
+import { Spinner } from '@photonhealth/components';
 import { usePhoton } from '../context';
 import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
@@ -186,8 +187,8 @@ customElement(
         <style>{shoelaceDarkStyles}</style>
         <style>{shoelaceLightStyles}</style>
         <Show when={pStore.selectedPatient.isLoading}>
-          <div class="flex align-center justify-center h-screen">
-            <sl-spinner style={{ 'font-size': '3rem' }} class="mt-8" />
+          <div class="w-full flex justify-center">
+            <Spinner color="green" />
           </div>
         </Show>
 
