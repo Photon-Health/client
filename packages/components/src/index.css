@@ -16,7 +16,7 @@
   ul,
   input {
     @apply font-sans;
-    @apply font-light;
+    @apply font-normal;
     @apply leading-relaxed;
   }
   body,
