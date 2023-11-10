@@ -7,6 +7,7 @@ import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
 import { PharmacyStore } from '../stores/pharmacy';
 import tailwind from '../tailwind.css?inline';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { email, empty, message, zipString, notFutureDate } from '../validators';
 
 //Shoelace
@@ -186,6 +187,7 @@ customElement(
         <style>{tailwind}</style>
         <style>{shoelaceDarkStyles}</style>
         <style>{shoelaceLightStyles}</style>
+        <style>{photonStyles}</style>
         <Show when={pStore.selectedPatient.isLoading}>
           <div class="w-full flex justify-center">
             <Spinner color="green" />
