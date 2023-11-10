@@ -1,4 +1,4 @@
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 
 import {
   HStack,
@@ -48,7 +48,7 @@ interface EditViewProps {
 
 const EditView = (props: EditViewProps) => {
   const { id, setDisableScroll } = props;
-  const navigate = useNavigate();
+
   return (
     <HStack justifyContent="flex-end">
       <Menu>
@@ -64,9 +64,10 @@ const EditView = (props: EditViewProps) => {
           </MenuItem>
           <MenuItem
             icon={<FiEdit fontSize="1.2em" />}
+            as={RouterLink}
+            to={`/patients/update/${id}`}
             onClick={() => {
               setDisableScroll(true);
-              navigate(`/patients/update/${id}`);
             }}
           >
             Edit Patient
