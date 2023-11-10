@@ -209,5 +209,11 @@ export const neutron: {
     ...defaultSettings,
     logo: 'oshi_logo.svg',
     accentColor: '#3b5b80'
+  },
+  // TBD Health
+  org_kI58h1e86jYO37LQ: {
+    ...defaultSettings,
+    logo: 'tbd_logo.svg',
+    accentColor: '#ee8155'
   }
 };
