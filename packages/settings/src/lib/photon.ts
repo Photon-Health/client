@@ -180,5 +180,11 @@ export const photon: {
     patientsCanReroute: false,
     enableMedHistory: true,
     enableRxAndOrder: true
+  },
+  // TBD Health
+  org_XoBVNLkIWL6BP8vZ: {
+    ...defaultSettings,
+    logo: 'tbd_logo.svg',
+    accentColor: '#ee8155'
   }
 };
