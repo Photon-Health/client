@@ -185,5 +185,11 @@ export const photon: {
     ...defaultSettings,
     logo: 'tbd_logo.svg',
     accentColor: '#ee8155'
+  },
+  // Openloop Health
+  org_Oxc0CSPfdiyWW3VM: {
+    ...defaultSettings,
+    logo: 'openloop_logo.png',
+    accentColor: '#E90C54'
   }
 };
