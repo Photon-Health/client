@@ -215,5 +215,12 @@ export const neutron: {
     ...defaultSettings,
     logo: 'tbd_logo.svg',
     accentColor: '#ee8155'
+  },
+  // Piction Health
+  org_aE5uK35xUqfDjMD4: {
+    ...defaultSettings,
+    logo: 'piction_health_logo.png',
+    accentColor: '#3377e2',
+    enableRxAndOrder: true
   }
 };
