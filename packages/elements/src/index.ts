@@ -25,3 +25,4 @@ import './photon-radio-card';
 import './photon-radio-group';
 import './photon-med-search-dialog';
 import './photon-multirx-form-wrapper';
+import './photon-button-inner';

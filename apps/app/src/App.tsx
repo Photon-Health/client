@@ -2,6 +2,7 @@ import { useColorMode } from '@chakra-ui/react';
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
+<<<<<<< HEAD
 import { AppState } from '@auth0/auth0-react';
 import { PhotonClient, PhotonProvider } from '@photonhealth/react';
 
@@ -39,6 +40,11 @@ const client = new PhotonClient({
 const onRedirectCallback = (appState?: AppState) => {
   window.location.replace(appState?.returnTo || window.location.pathname);
 };
+=======
+import { useEffect } from 'react';
+import { SesameApp } from './Sesame/OrySesameApp';
+import { NotFound } from './views/routes/NotFound';
+>>>>>>> 3e28cd4 (temp)
 
 export const App = () => {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -53,6 +59,7 @@ export const App = () => {
 
   return (
     <BrowserRouter>
+<<<<<<< HEAD
       <PhotonProvider client={client} onRedirectCallback={onRedirectCallback}>
         <ClinicalApiProvider photonClient={client}>
           <Zendesk />
@@ -92,6 +99,12 @@ export const App = () => {
           </Routes>
         </ClinicalApiProvider>
       </PhotonProvider>
+=======
+      <Routes>
+        <Route path="/" element={<SesameApp />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+>>>>>>> 3e28cd4 (temp)
     </BrowserRouter>
   );
 };
