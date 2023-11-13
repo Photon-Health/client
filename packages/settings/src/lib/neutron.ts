@@ -215,5 +215,11 @@ export const neutron: {
     ...defaultSettings,
     logo: 'tbd_logo.svg',
     accentColor: '#ee8155'
+  },
+  // Openloop Health
+  org_t5lbHt9eb9gMeeeb: {
+    ...defaultSettings,
+    logo: 'openloop_logo.png',
+    accentColor: '#E90C54'
   }
 };
