@@ -25,9 +25,15 @@ customElement(
       reflect: false,
       notify: false,
       parse: false
-    }
+    },
+    hideLogin: false
   },
-  (props: { autoLogin: boolean; hideLoader: boolean; redirectPath?: string }) => {
+  (props: {
+    autoLogin: boolean;
+    hideLoader: boolean;
+    redirectPath?: string;
+    hideLogin: boolean;
+  }) => {
     const client = usePhoton();
     const [authenticated, setAuthenticated] = createSignal<boolean>(false);
     const [user, setUser] = createSignal<any>(false);
@@ -42,6 +48,7 @@ customElement(
     });
 
     createEffect(() => {
+      console.log("props", props);
       if (!client?.authentication.state.isLoading) {
         setIsLoading(false);
         if (!client?.authentication.state.isAuthenticated && props.autoLogin) {
@@ -68,7 +75,9 @@ customElement(
           <div>{JSON.stringify(user())}</div>
           <slot />
         </Show>
-        <Show when={client && !authenticated() && !isLoading() && !props.autoLogin}>
+        <Show
+          when={client && !authenticated() && !isLoading() && !props.autoLogin && !props.hideLogin}
+        >
           <photon-login redirect-path={props.redirectPath} />
         </Show>
         <Show when={client && isLoading() && !props.hideLoader}>

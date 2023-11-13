@@ -120,6 +120,7 @@ customElement(
         !client?.authentication.state.isLoading &&
         !client?.authentication.state.error
       ) {
+        console.log('here yo');
         client?.authentication.login({ appState: { returnTo: window.location.pathname } });
       }
     });

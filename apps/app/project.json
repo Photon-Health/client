@@ -9,7 +9,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "env-cmd -f .env.boson react-app-rewired start"
+        "command": "PORT=3002 env-cmd -f .env.boson react-app-rewired start"
       },
       "dependsOn": ["^build"]
     },

@@ -35,6 +35,7 @@ export const PhotonAuthorized = (p: { children: JSXElement; permissions?: Permis
   const [hasPermission, setHasPermission] = createSignal<boolean>(
     checkHasPermission(props.permissions, client?.authentication.state.permissions || [])
   );
+  const [user, setUser] = createSignal(JSON.stringify(client?.authentication.state.user) || '');
 
   createEffect(() => {
     setIsLoading(client?.authentication.state.isLoading || false);
@@ -50,6 +51,9 @@ export const PhotonAuthorized = (p: { children: JSXElement; permissions?: Permis
       checkHasPermission(props.permissions, client?.authentication.state.permissions || [])
     );
   });
+  createEffect(() => {
+    setUser(JSON.stringify(client?.authentication.state.user) || '');
+  });
 
   const canAccess = createMemo(() => authenticated() && inOrg() && hasPermission());
 
@@ -63,7 +67,9 @@ export const PhotonAuthorized = (p: { children: JSXElement; permissions?: Permis
             fallback={
               <Show
                 when={!inOrg()}
-                fallback={<AlertMessage message="You are not authorized to prescribe" />}
+                fallback={
+                  <AlertMessage message={`You are not authorized to prescribe: ${user()}`} />
+                }
               >
                 <AlertMessage message="You tried logging in with an account not associated with any organizations" />
               </Show>
