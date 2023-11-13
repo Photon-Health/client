@@ -126,8 +126,7 @@ export const photon: {
   org_v5It8IoY0RH1Rw80: {
     ...defaultSettings,
     logo: 'piction_health_logo.png',
-    accentColor: '#3377e2',
-    enableRxAndOrder: true
+    accentColor: '#3377e2'
   },
   // Shapiro Medical (Xyon Health)
   org_Y0EPcd3p5eqG4iZs: {

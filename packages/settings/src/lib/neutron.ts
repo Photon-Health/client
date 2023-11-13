@@ -28,7 +28,8 @@ const defaultSettings: OrganizationSettings = {
   courierNavigateProviders: [CAPSULE_ID],
   returnTo: window.location.origin,
   federated: false,
-  enableMedHistory: false
+  enableMedHistory: false,
+  enableRxAndOrder: false
 };
 
 /**
@@ -221,5 +222,11 @@ export const neutron: {
     ...defaultSettings,
     logo: 'openloop_logo.png',
     accentColor: '#E90C54'
+  },
+  // Piction Health
+  org_aE5uK35xUqfDjMD4: {
+    ...defaultSettings,
+    logo: 'piction_health_logo.png',
+    accentColor: '#3377e2'
   }
 };
