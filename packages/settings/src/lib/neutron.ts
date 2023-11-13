@@ -28,7 +28,8 @@ const defaultSettings: OrganizationSettings = {
   courierNavigateProviders: [CAPSULE_ID],
   returnTo: window.location.origin,
   federated: false,
-  enableMedHistory: false
+  enableMedHistory: false,
+  enableRxAndOrder: false
 };
 
 /**
