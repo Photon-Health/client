@@ -34,6 +34,10 @@ const clearForm = (
     key: 'notes',
     value: overrides?.notes ?? ''
   });
+  actions.updateFormValue({
+    key: 'addToTemplates',
+    value: false
+  });
 };
 
 export default clearForm;
