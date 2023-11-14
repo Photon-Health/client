@@ -207,6 +207,9 @@ customElement(
         const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
         const rxMutation = client!.getSDK().clinical.prescription.createPrescriptions({});
         const prescriptions = [];
+        const templateMutation = client!
+          .getSDK()
+          .clinical.prescriptionTemplate.createPrescriptionTemplate({});
 
         for (const draft of store.draftPrescriptions!.value) {
           const args = {
@@ -222,6 +225,22 @@ customElement(
             fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
             treatmentId: draft.treatment.id
           };
+          if (draft.addToTemplates) {
+            try {
+              const { errors } = await templateMutation({
+                variables: {
+                  ...args,
+                  catalogId: draft.catalogId
+                },
+                awaitRefetchQueries: false
+              });
+              if (errors) {
+                dispatchOrderError(errors);
+              }
+            } catch (err) {
+              dispatchOrderError([err as GraphQLError]);
+            }
+          }
           prescriptions.push(args);
         }
         const { data: prescriptionData, errors } = await rxMutation({
