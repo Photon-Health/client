@@ -187,7 +187,7 @@ export const Status = () => {
       <Nav header={organization.name} orgId={organization.id} showRefresh />
 
       {/* Bottom padding is added so stepper can be seen when footer is showing on smaller screens */}
-      <Container pb={showFooter ? 32 : undefined}>
+      <Container pb={showFooter ? 32 : 8}>
         <VStack spacing={6} align="start" pt={5}>
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
