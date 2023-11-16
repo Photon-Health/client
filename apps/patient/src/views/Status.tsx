@@ -184,7 +184,7 @@ export const Status = () => {
         <title>{t.status.title}</title>
       </Helmet>
 
-      <Nav header={organization.name} orgId={organization.id} showRefresh />
+      <Nav header={organization.name} showRefresh />
 
       {/* Bottom padding is added so stepper can be seen when footer is showing on smaller screens */}
       <Container pb={showFooter ? 32 : 8}>
