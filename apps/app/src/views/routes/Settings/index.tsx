@@ -151,9 +151,9 @@ export const Settings = () => {
         <Tabs index={tabIndex} onChange={handleTabsChange}>
           <TabList>
             <Tab>User</Tab>
-            {hasTeam && <Tab>Team</Tab>}
-            {hasOrg && <Tab>Organization</Tab>}
-            {hasDeveloper && <Tab>Developers</Tab>}
+            <Tab hidden={!hasTeam}>Team</Tab>
+            <Tab hidden={!hasOrg}>Organization</Tab>
+            <Tab hidden={!hasDeveloper}>Developers</Tab>
             <Tab>Templates</Tab>
             <Tab>Catalog</Tab>
           </TabList>
@@ -171,10 +171,10 @@ export const Settings = () => {
               <DevelopersTab />
             </TabPanel>
             <TabPanel display="flex" flexDir="column" gap="4">
-              {data?.organization && <TemplateTab organizationFragment={data.organization} />}
+              <TemplateTab organizationFragment={data?.organization ?? undefined} />
             </TabPanel>
             <TabPanel display="flex" flexDir="column" gap="4">
-              {data?.organization && <TreatmentTab organization={data.organization} />}
+              <TreatmentTab organization={data?.organization ?? undefined} />
             </TabPanel>
           </TabPanels>
         </Tabs>

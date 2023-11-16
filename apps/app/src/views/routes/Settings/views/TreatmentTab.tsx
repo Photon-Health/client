@@ -62,7 +62,7 @@ const organizationTreatmentTabFragment = graphql(/* GraphQL */ `
 export const TreatmentTab = ({
   organization: organizationFragment
 }: {
-  organization: FragmentType<typeof organizationTreatmentTabFragment>;
+  organization?: FragmentType<typeof organizationTreatmentTabFragment>;
 }) => {
   const toast = useToast();
   const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });

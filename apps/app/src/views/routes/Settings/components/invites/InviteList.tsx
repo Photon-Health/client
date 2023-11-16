@@ -1,8 +1,10 @@
 import { useQuery } from '@apollo/client';
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import {
   Alert,
   AlertIcon,
   Box,
+  Button,
   Center,
   CircularProgress,
   Container,
@@ -14,17 +16,15 @@ import {
   Text,
   Th,
   Thead,
-  Button,
   Tr,
   useBreakpointValue
 } from '@chakra-ui/react';
 import { graphql } from 'apps/app/src/gql';
+import { useMemo, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useClinicalApiClient } from '../../apollo';
-import { InviteItem } from './InviteItem';
-import { useMemo, useState } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { PaginationIndicator } from '../PaginationIndicator';
+import { InviteItem } from './InviteItem';
 
 const invitesQuery = graphql(/* GraphQL */ `
   query InvitesQuery {

@@ -82,7 +82,7 @@ const organizationTemplateTabFragment = graphql(/* GraphQL */ `
 export const TemplateTab = ({
   organizationFragment
 }: {
-  organizationFragment: FragmentType<typeof organizationTemplateTabFragment>;
+  organizationFragment?: FragmentType<typeof organizationTemplateTabFragment>;
 }) => {
   const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
 
