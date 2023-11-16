@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import {
   Alert,
   Box,
@@ -19,43 +18,20 @@ import { useSearchParams } from 'react-router-dom';
 import { FiHelpCircle, FiRefreshCw } from 'react-icons/fi';
 import { text as t } from '../utils/text';
 import { Logo as PhotonLogo } from './Logo';
-import { getSettings } from '@client/settings';
-
-const settings = getSettings(process.env.REACT_APP_ENV_NAME);
+import { useOrderContext } from '../views/Main';
 
 const PHOTON_PHONE_NUMBER = '+15138663212';
 
 interface NavProps {
   header: string;
   showRefresh: boolean;
-  orgId?: string;
 }
 
-export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
+export const Nav = ({ header, showRefresh = false }: NavProps) => {
   const [searchParams] = useSearchParams();
   const isDemo = searchParams.get('demo');
 
-  const [logo, setLogo] = useState(undefined);
-
-  const fetchLogo = async (fileName: string) => {
-    if (fileName === 'photon') {
-      setLogo('photon');
-    } else {
-      try {
-        const response = await import(`../assets/${fileName}`);
-        setLogo(response.default);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (orgId) {
-      const theme = orgId in settings ? settings[orgId] : settings.default;
-      fetchLogo(theme.logo);
-    }
-  }, [orgId]);
+  const { logo } = useOrderContext();
 
   return (
     <Box as="nav" bg="white" boxShadow={useColorModeValue('sm', 'sm-dark')}>
