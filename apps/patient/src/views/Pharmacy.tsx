@@ -442,7 +442,7 @@ export const Pharmacy = () => {
         <title>{t.pharmacy.title}</title>
       </Helmet>
 
-      <Nav header={order.organization.name} />
+      <Nav header={order.organization.name} orgId={order.organization.id} />
 
       <Container pb={showFooter ? 32 : 8}>
         <VStack spacing={6} align="span" pt={5}>

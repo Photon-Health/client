@@ -12,8 +12,8 @@ import { FiEdit, FiEye, FiMoreVertical, FiTrash } from 'react-icons/fi';
 
 import { usePhoton } from '@photonhealth/react';
 
-import { CATALOG_TREATMENTS_FIELDS } from '../../../../model/fragments';
-import { confirmWrapper } from '../../../components/GuardDialog';
+import { CATALOG_TREATMENTS_FIELDS } from '../../../../../model/fragments';
+import { confirmWrapper } from '../../../../components/GuardDialog';
 
 export const TemplateActions = (props: any) => {
   const { template, setSingleView, catalogId, setLoading, setTemplateToEdit, setShowModal } = props;

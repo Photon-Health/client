@@ -1,11 +1,10 @@
 import {
   Alert,
   AlertIcon,
-  Badge,
   Box,
   Button,
-  CircularProgress,
   Center,
+  CircularProgress,
   Container,
   Divider,
   HStack,
@@ -13,7 +12,6 @@ import {
   Table,
   TableContainer,
   Tbody,
-  Td,
   Text,
   Th,
   Thead,
@@ -21,34 +19,38 @@ import {
   useDisclosure
 } from '@chakra-ui/react';
 
+import { useQuery } from '@apollo/client';
+import { graphql } from 'apps/app/src/gql';
+import { useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
-import { usePhoton } from '@photonhealth/react';
+import { useClinicalApiClient } from '../../apollo';
+import { WebhookItem } from './WebhookItem';
 import { WebhooksForm } from './WebhooksForm';
 
+const webhookListQuery = graphql(/* GraphQL */ `
+  query WebhookListQuery {
+    webhooks {
+      id
+      ...WebhookItemFragment
+    }
+  }
+`);
+
 export const Webhooks = () => {
-  const { getWebhooks, deleteWebhook } = usePhoton();
-  const { loading, error, webhooks } = getWebhooks();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [onDeleteHandler, { loading: deleteLoading }] = deleteWebhook({
-    refetchQueries: ['getWebhooks'],
-    awaitRefetchQueries: true
-  });
+  const client = useClinicalApiClient();
+  const { data, loading, error } = useQuery(webhookListQuery, { client });
+  const webhooks = useMemo(() => data?.webhooks, [data?.webhooks]);
 
-  const onDelete = (id: string) => {
-    // eslint-disable-next-line no-alert
-    if (window.confirm("Are you sure? You can't undo this action afterwards.")) {
-      onDeleteHandler({ variables: { id } });
-    }
-  };
   return (
     <Box
-      py={{ base: '4', md: '8' }}
+      pt={{ base: '4', md: '4' }}
+      pb={{ base: '4', md: '8' }}
       px={{ base: '4', md: '8' }}
       borderRadius="lg"
       bg="bg-surface"
       boxShadow="base"
-      maxWidth="55em"
     >
       <Container padding={{ base: '0', md: '0' }}>
         <Stack spacing={3}>
@@ -72,7 +74,7 @@ export const Webhooks = () => {
             </Center>
           )}
           <WebhooksForm isOpen={isOpen} close={onClose} />
-          {webhooks.length !== 0 && !loading && (
+          {webhooks?.length !== 0 && !loading && (
             <TableContainer paddingTop={3}>
               <Table variant="unstyled" size="sm">
                 <Thead>
@@ -83,31 +85,8 @@ export const Webhooks = () => {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {webhooks.map((webhook: any) => (
-                    <Tr key={webhook.id}>
-                      <Td>
-                        <Text color="muted">{webhook.url}</Text>
-                      </Td>
-                      <Td>
-                        <Badge size="sm" colorScheme="green">
-                          Active
-                        </Badge>
-                      </Td>
-                      <Td textAlign="end">
-                        <Button
-                          aria-label="Delete"
-                          size="sm"
-                          variant="outline"
-                          borderColor="blue.500"
-                          textColor="blue.500"
-                          colorScheme="blue"
-                          isLoading={deleteLoading}
-                          onClick={() => onDelete(webhook.id)}
-                        >
-                          Delete
-                        </Button>
-                      </Td>
-                    </Tr>
+                  {webhooks?.map((webhook) => (
+                    <WebhookItem webhook={webhook} key={webhook.id} />
                   ))}
                 </Tbody>
               </Table>

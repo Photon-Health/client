@@ -21,9 +21,10 @@ import { CATALOG_TREATMENTS_FIELDS } from '../../../../model/fragments';
 import { DosageCalc } from '../../../components/DosageCalc';
 import { TemplateView } from '../../../components/TemplateView';
 import { SplitLayout } from '../../../components/SplitLayout';
-import { TemplateTable } from '../components/TemplateTable';
-import { TemplateForm } from '../components/TemplateForm';
-import { TemplateActions } from '../components/TemplateActions';
+import { TemplateTable } from '../components/templates/TemplateTable';
+import { TemplateForm } from '../components/templates/TemplateForm';
+import { TemplateActions } from '../components/templates/TemplateActions';
+import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 
 const renderTemplateRow = (
   rx: any,
@@ -71,9 +72,21 @@ const renderTemplateRow = (
   };
 };
 
-export const TemplateTab = (props: any) => {
+const organizationTemplateTabFragment = graphql(/* GraphQL */ `
+  fragment OrganizationTemplateTabFragment on Organization {
+    id
+    name
+  }
+`);
+
+export const TemplateTab = ({
+  organizationFragment
+}: {
+  organizationFragment: FragmentType<typeof organizationTemplateTabFragment>;
+}) => {
   const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
-  const { organization } = props;
+
+  const organization = useFragment(organizationTemplateTabFragment, organizationFragment);
   const { getCatalog, getCatalogs, updatePrescriptionTemplate, createPrescriptionTemplate }: any =
     usePhoton();
   const catalogs = getCatalogs();
@@ -243,7 +256,7 @@ export const TemplateTab = (props: any) => {
       />
       <VStack>
         <Text width="full" fontWeight="medium" fontSize="lg">
-          Manage {organization.organization ? `${organization.organization.name}'s` : ''} Templates
+          Manage {organization ? `${organization.name}'s` : ''} Templates
         </Text>
         {createError ? (
           <Alert status="error">

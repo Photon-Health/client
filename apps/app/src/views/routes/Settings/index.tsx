@@ -1,117 +1,184 @@
-import { HStack, TabPanel, TabPanels, Tab, TabList, Tabs, Button, Link } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
-import { usePhoton } from '@photonhealth/react';
+import {
+  Button,
+  Center,
+  CircularProgress,
+  HStack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs
+} from '@chakra-ui/react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Page } from '../../components/Page';
+import { useQuery } from '@apollo/client';
+import { AddIcon } from '@chakra-ui/icons';
+import { graphql } from 'apps/app/src/gql';
+import usePermissions from 'apps/app/src/hooks/usePermissions';
 import { Auth } from '../../components/Auth';
+import { Page } from '../../components/Page';
+import { useClinicalApiClient } from './apollo';
+import { InviteForm } from './components/invites/InviteForm';
+import { DevelopersTab } from './views/DevelopersTab';
+import { OrganizationTab } from './views/OrganizationTab';
+import { TeamTab } from './views/TeamTab';
 import { TemplateTab } from './views/TemplateTab';
 import { TreatmentTab } from './views/TreatmentTab';
 import { UserTab } from './views/UserTab';
-import { AddIcon } from '@chakra-ui/icons';
 
-const AddProviderButton = ({ disabled = false }: { disabled?: boolean }) => (
-  <Button
-    borderColor="blue.500"
-    textColor="blue.500"
-    colorScheme="blue"
-    rightIcon={<AddIcon />}
-    variant="outline"
-    disabled={disabled}
-    opacity={disabled ? 0.2 : 1}
-  >
-    Add a Provider
-  </Button>
-);
+const settingsPageQuery = graphql(/* GraphQL */ `
+  query SettingsPageQuery {
+    me {
+      roles {
+        id
+      }
+    }
+    organization {
+      id
+      name
+      ...OrganizationTreatmentTabFragment
+      ...OrganizationTemplateTabFragment
+    }
+    roles {
+      name
+      id
+    }
+  }
+`);
 
-const Buttons = ({ orgId, orgName }: { orgId: string; orgName: string }) => (
-  <HStack>
-    {orgId ? (
-      <Link
-        href={`https://fxr8djfdbq8.typeform.com/to/awCi4YTp#org_id=${orgId}&org_name=${orgName}&env=${process.env.REACT_APP_ENV_NAME}`}
-        isExternal
+const AddProviderButton = ({ disabled = false }: { disabled?: boolean }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+      <Button
+        borderColor="blue.500"
+        textColor="blue.500"
+        colorScheme="blue"
+        rightIcon={<AddIcon />}
+        variant="outline"
+        disabled={disabled}
+        opacity={disabled ? 0.2 : 1}
+        onClick={() => setIsOpen(true)}
       >
-        <AddProviderButton />
-      </Link>
-    ) : (
-      <AddProviderButton disabled />
-    )}
+        Add a Provider
+      </Button>
+      <InviteForm isOpen={isOpen} onClose={() => setIsOpen(false)} />
+    </>
+  );
+};
 
+const Buttons = ({ orgId, hasInvite }: { orgId: string | undefined; hasInvite: boolean }) => (
+  <HStack>
+    {hasInvite && <AddProviderButton disabled={orgId == null} />}
     <Auth />
   </HStack>
 );
 
-export const Settings = () => {
-  const { getOrganization } = usePhoton();
-  const organization = getOrganization();
-  const [tabIndex, setTabIndex] = useState(0);
+const tabs = [
+  '/settings/user',
+  '/settings/team',
+  '/settings/organization',
+  '/settings/developers',
+  '/settings/templates',
+  '/settings/catalog'
+] as const;
 
+export const Settings = () => {
+  const [tabIndex, setTabIndex] = useState(0);
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
+  const client = useClinicalApiClient();
+  const { data, loading } = useQuery(settingsPageQuery, {
+    client,
+    fetchPolicy: 'cache-first'
+  });
+
+  const rolesMap: Record<string, string> = useMemo(
+    () =>
+      data?.roles
+        ? Object.fromEntries(
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            data.roles.filter((r) => r.name != null).map(({ id, name }) => [id, name!])
+          )
+        : {},
+    [data?.roles]
+  );
+
+  const hasDeveloper = usePermissions(['read:client', 'write:client']);
+  const hasTeam = usePermissions(['edit:profile', 'read:profile']);
+  const hasInvite = usePermissions(['write:invite']);
+  const hasOrg = usePermissions(['read:organization']);
+
   useEffect(() => {
-    switch (pathname) {
-      case '/settings/user':
-        setTabIndex(0);
-        break;
-      case '/settings/templates':
-        setTabIndex(1);
-        break;
-      case '/settings/catalog':
-        setTabIndex(2);
-        break;
-      default:
-        navigate('/settings/user');
-        break;
+    const idx = tabs.findIndex((path) => path === pathname);
+    if (
+      idx >= 0 &&
+      !(tabs[tabIndex] === '/settings/developers' && !hasDeveloper) &&
+      !(tabs[tabIndex] === '/settings/team' && !hasTeam)
+    ) {
+      setTabIndex(idx);
+    } else {
+      navigate(tabs[0]);
     }
   }, [pathname]);
 
   const handleTabsChange = (index: number) => {
+    const newPath = tabs[index];
+    if (newPath === '/settings/developers' && !hasDeveloper) {
+      return;
+    }
+    if (newPath === '/settings/team' && !hasTeam) {
+      return;
+    }
     setTabIndex(index);
-    switch (index) {
-      case 0:
-        navigate('/settings/user');
-        break;
-      case 1:
-        navigate('/settings/templates');
-        break;
-      case 2:
-        navigate('/settings/catalog');
-        break;
-      default:
-        break;
+    if (newPath) {
+      navigate(newPath);
     }
   };
 
   return (
     <Page
       header="Settings"
-      buttons={
-        <Buttons
-          orgId={organization?.organization?.id}
-          orgName={organization?.organization?.name}
-        />
-      }
+      buttons={<Buttons orgId={data?.organization?.id} hasInvite={hasInvite} />}
     >
-      <Tabs index={tabIndex} onChange={handleTabsChange}>
-        <TabList>
-          <Tab>User</Tab>
-          <Tab>Templates</Tab>
-          <Tab>Catalog</Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel display="flex" flexDir="column" gap="4" px={0}>
-            <UserTab />
-          </TabPanel>
-          <TabPanel display="flex" flexDir="column" gap="4">
-            {/* Remember to move this table/form split layout to a component */}
-            <TemplateTab organization={organization} />
-          </TabPanel>
-          <TabPanel display="flex" flexDir="column" gap="4">
-            <TreatmentTab organization={organization} />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
+      {loading ? (
+        <Center padding="100px">
+          <CircularProgress isIndeterminate color="green.300" />
+        </Center>
+      ) : (
+        <Tabs index={tabIndex} onChange={handleTabsChange}>
+          <TabList>
+            <Tab>User</Tab>
+            {hasTeam && <Tab>Team</Tab>}
+            {hasOrg && <Tab>Organization</Tab>}
+            {hasDeveloper && <Tab>Developers</Tab>}
+            <Tab>Templates</Tab>
+            <Tab>Catalog</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel display="flex" flexDir="column" gap="4" px={0}>
+              <UserTab />
+            </TabPanel>
+            <TabPanel display="flex" flexDir="column" gap="4" px={0}>
+              <TeamTab rolesMap={rolesMap} />
+            </TabPanel>
+            <TabPanel display="flex" flexDir="column" gap="4" px={0}>
+              <OrganizationTab />
+            </TabPanel>
+            <TabPanel display="flex" flexDir="column" gap="4" px={0}>
+              <DevelopersTab />
+            </TabPanel>
+            <TabPanel display="flex" flexDir="column" gap="4">
+              {data?.organization && <TemplateTab organizationFragment={data.organization} />}
+            </TabPanel>
+            <TabPanel display="flex" flexDir="column" gap="4">
+              {data?.organization && <TreatmentTab organization={data.organization} />}
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      )}
     </Page>
   );
 };
