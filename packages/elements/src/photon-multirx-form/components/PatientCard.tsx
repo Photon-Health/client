@@ -74,8 +74,10 @@ export const PatientCard = (props: {
   });
 
   const patientId = createMemo(() => props.store.patient?.value?.id || props?.patientId);
+  // Show the address form only if the patient doesnt have an address
   const showAddressForm = createMemo(
-    () => props.store.patient?.value?.id && !props.store.patient?.value?.address
+    () =>
+      props.store.patient?.value?.id && !props.store.patient?.value?.address && props.enableOrder
   );
 
   return (
