@@ -42,7 +42,7 @@ const profileQuery = graphql(/* GraphQL */ `
 
 export const Profile = () => {
   const client = useClinicalApiClient();
-  const { data, loading, error } = useQuery(profileQuery, { client });
+  const { data, loading, error } = useQuery(profileQuery, { client, errorPolicy: 'ignore' });
 
   const renderSkeletonRow = (isMobile: boolean | undefined) =>
     isMobile
@@ -111,7 +111,7 @@ export const Profile = () => {
           {error && (
             <Alert status="error">
               <AlertIcon />
-              There was an error processing your request for organization details
+              There was an error getting your user details
             </Alert>
           )}
           <Text color="muted" fontSize="sm">
