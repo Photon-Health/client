@@ -359,7 +359,11 @@ customElement(
                 weightUnit={props.weightUnit}
                 enableMedHistory={props.enableMedHistory}
               />
-              <Show when={store.patient?.value?.address}>
+              <Show
+                when={
+                  store.patient?.value?.address || (store.patient?.value?.id && !props.enableOrder)
+                }
+              >
                 <Show when={showForm() || isEditing()}>
                   <div ref={prescriptionRef}>
                     <AddPrescriptionCard
