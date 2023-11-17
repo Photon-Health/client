@@ -1,6 +1,7 @@
 import { useLazyQuery } from '@apollo/client';
 import { graphql } from 'apps/app/src/gql';
-import { AsyncSelect } from 'chakra-react-select';
+import { AsyncSelect, OptionProps, components } from 'chakra-react-select';
+import { Text } from '@chakra-ui/react';
 import * as yup from 'yup';
 import { useClinicalApiClient } from '../../apollo';
 export const rolesSchema = yup.array(
@@ -22,7 +23,20 @@ const allRolesQuery = graphql(/* GraphQL */ `
   }
 `);
 
-type Role = { value: string; label: string };
+type Role = { value: string; label: string; description?: string };
+
+const Option = (props: OptionProps<Role>) => {
+  return (
+    <components.Option {...props}>
+      <div>{props.label}</div>
+      {props.data.description && (
+        <Text color="muted" fontSize="sm">
+          {props.data.description}
+        </Text>
+      )}
+    </components.Option>
+  );
+};
 export interface RolesSelectProps {
   onChange: (role: readonly Role[]) => void;
   onBlur: () => void;
@@ -37,12 +51,19 @@ export const RolesSelect = (props: RolesSelectProps) => {
 
   const loadOptions = async () => {
     const roles = (await loadRoleOptions()).data?.roles ?? [];
-    return roles.map(({ name, id }) => ({ value: id, label: name ?? id })).sort();
+    return roles
+      .map(({ name, id, description }) => ({
+        value: id,
+        label: name ?? id,
+        description: description ?? undefined
+      }))
+      .sort();
   };
 
   return (
     <AsyncSelect
       loadOptions={loadOptions}
+      components={{ Option }}
       cacheOptions
       defaultOptions
       isMulti

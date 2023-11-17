@@ -145,41 +145,43 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
               </Table>
             </TableContainer>
           )}
-          <Box px={{ base: '4', md: '6' }} pb="5">
-            <HStack spacing="3" justify="space-between">
-              <Text color="muted" fontSize="sm">
-                Showing {currPageSize} results {total ? `(${total} total)` : null}
-              </Text>
-              <PaginationIndicator
-                pages={pages}
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-              />
-              <HStack
-                w={isMobileAndTablet ? '100%' : undefined}
-                justifyContent={isMobileAndTablet ? 'space-between' : 'initial'}
-              >
-                <Button
-                  variant="ghost"
-                  leftIcon={<ChevronLeftIcon />}
-                  disabled={currentPage === 1}
-                  isDisabled={currentPage === 1}
-                  onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+          {!loading && (
+            <Box px={{ base: '4', md: '6' }} pb="5">
+              <HStack spacing="3" justify="space-between">
+                <Text color="muted" fontSize="sm">
+                  Showing {currPageSize} results {total ? `(${total} total)` : null}
+                </Text>
+                <PaginationIndicator
+                  pages={pages}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                />
+                <HStack
+                  w={isMobileAndTablet ? '100%' : undefined}
+                  justifyContent={isMobileAndTablet ? 'space-between' : 'initial'}
                 >
-                  Prev
-                </Button>
-                <Button
-                  variant="ghost"
-                  rightIcon={<ChevronRightIcon />}
-                  disabled={currentPage === pages}
-                  isDisabled={currentPage === pages}
-                  onClick={() => setCurrentPage(Math.min(currentPage + 1, pages))}
-                >
-                  Next
-                </Button>
+                  <Button
+                    variant="ghost"
+                    leftIcon={<ChevronLeftIcon />}
+                    disabled={currentPage === 1}
+                    isDisabled={currentPage === 1}
+                    onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+                  >
+                    Prev
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    rightIcon={<ChevronRightIcon />}
+                    disabled={currentPage === pages}
+                    isDisabled={currentPage === pages}
+                    onClick={() => setCurrentPage(Math.min(currentPage + 1, pages))}
+                  >
+                    Next
+                  </Button>
+                </HStack>
               </HStack>
-            </HStack>
-          </Box>
+            </Box>
+          )}
         </Stack>
       </Container>
     </Box>

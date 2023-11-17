@@ -31,12 +31,12 @@ export const WebhookItem = (props: WebhookItemProps) => {
   });
 
   const onDelete = useMemo(() => {
-    return (webhookId: string) => {
+    return () => {
       if (window.confirm("Are you sure? You can't undo this action afterwards.")) {
-        deleteMutation({ variables: { webhookId } });
+        deleteMutation({ variables: { webhookId: webhook.id } });
       }
     };
-  }, [deleteMutation]);
+  }, [deleteMutation, webhook.id]);
 
   return (
     <Tr key={webhook.id}>
@@ -51,13 +51,13 @@ export const WebhookItem = (props: WebhookItemProps) => {
       <Td textAlign="end">
         <Button
           aria-label="Delete"
-          size="sm"
+          size="xs"
           variant="outline"
-          borderColor="blue.500"
-          textColor="blue.500"
-          colorScheme="blue"
+          borderColor="red.500"
+          textColor="red.500"
+          colorScheme="red"
           isLoading={deleteLoading}
-          onClick={() => onDelete(webhook.id)}
+          onClick={onDelete}
         >
           Delete
         </Button>

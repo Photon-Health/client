@@ -84,6 +84,16 @@ const tabs = [
   '/settings/catalog'
 ] as const;
 
+const canNavigate = (
+  route: (typeof tabs)[number],
+  { hasDeveloper, hasTeam, hasOrg }: { hasDeveloper: boolean; hasTeam: boolean; hasOrg: boolean }
+) => {
+  if (route === '/settings/developers') return hasDeveloper;
+  if (route === '/settings/team') return hasTeam;
+  if (route === '/settings/organization') return hasOrg;
+  return true;
+};
+
 export const Settings = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const { pathname } = useLocation();
@@ -106,19 +116,17 @@ export const Settings = () => {
     [data?.roles]
   );
 
-  const hasDeveloper = usePermissions(['read:client', 'write:client']);
-  const hasTeam = usePermissions(['edit:profile', 'read:profile']);
+  const hasDeveloper = usePermissions(['read:client']);
+  const hasTeam = usePermissions(['read:profile']);
   const hasInvite = usePermissions(['write:invite']);
   const hasOrg = usePermissions(['read:organization']);
 
   useEffect(() => {
-    const idx = tabs.findIndex((path) => path === pathname);
-    if (
-      idx >= 0 &&
-      !(tabs[tabIndex] === '/settings/developers' && !hasDeveloper) &&
-      !(tabs[tabIndex] === '/settings/team' && !hasTeam)
-    ) {
-      setTabIndex(idx);
+    const newTabIndex = tabs.findIndex((path) => path === pathname);
+    const newTabRoute = tabs[newTabIndex];
+
+    if (newTabIndex >= 0 && canNavigate(newTabRoute, { hasDeveloper, hasTeam, hasOrg })) {
+      setTabIndex(newTabIndex);
     } else {
       navigate(tabs[0]);
     }
@@ -126,12 +134,7 @@ export const Settings = () => {
 
   const handleTabsChange = (index: number) => {
     const newPath = tabs[index];
-    if (newPath === '/settings/developers' && !hasDeveloper) {
-      return;
-    }
-    if (newPath === '/settings/team' && !hasTeam) {
-      return;
-    }
+    if (!canNavigate(newPath, { hasDeveloper, hasOrg, hasTeam })) return;
     setTabIndex(index);
     if (newPath) {
       navigate(newPath);
