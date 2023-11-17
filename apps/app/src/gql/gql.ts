@@ -13,7 +13,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\n  query MeProfileQuery {\n    me {\n      name {\n        full\n      }\n      email\n      phone\n      npi\n      address {\n        street1\n        street2\n        city\n        state\n        postalCode\n      }\n    }\n    organization {\n      id\n      name\n    }\n  }\n": types.MeProfileQueryDocument,
+    "\n  query MeProfileQuery {\n    me {\n      name {\n        full\n      }\n      email\n      phone\n      npi\n      address {\n        street1\n        street2\n        city\n        state\n        postalCode\n        country\n      }\n    }\n    organization {\n      id\n      name\n    }\n  }\n": types.MeProfileQueryDocument,
     "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n  }\n": types.ClientInfoCardFragmentFragmentDoc,
     "\n  query ClientsDeveloperTabQuery {\n    clients {\n      id\n      ...ClientInfoCardFragment\n    }\n  }\n": types.ClientsDeveloperTabQueryDocument,
     "\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n": types.RotateSecretDocument,
@@ -53,7 +53,7 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query MeProfileQuery {\n    me {\n      name {\n        full\n      }\n      email\n      phone\n      npi\n      address {\n        street1\n        street2\n        city\n        state\n        postalCode\n      }\n    }\n    organization {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  query MeProfileQuery {\n    me {\n      name {\n        full\n      }\n      email\n      phone\n      npi\n      address {\n        street1\n        street2\n        city\n        state\n        postalCode\n      }\n    }\n    organization {\n      id\n      name\n    }\n  }\n"];
+export function graphql(source: "\n  query MeProfileQuery {\n    me {\n      name {\n        full\n      }\n      email\n      phone\n      npi\n      address {\n        street1\n        street2\n        city\n        state\n        postalCode\n        country\n      }\n    }\n    organization {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  query MeProfileQuery {\n    me {\n      name {\n        full\n      }\n      email\n      phone\n      npi\n      address {\n        street1\n        street2\n        city\n        state\n        postalCode\n        country\n      }\n    }\n    organization {\n      id\n      name\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

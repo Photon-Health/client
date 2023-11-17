@@ -15,6 +15,7 @@ import { graphql } from 'apps/app/src/gql';
 import { useMemo } from 'react';
 import { SimpleTable } from '../../../components/SimpleTable';
 import { useClinicalApiClient } from '../apollo';
+import { formatAddress } from 'apps/app/src/utils';
 
 const profileQuery = graphql(/* GraphQL */ `
   query MeProfileQuery {
@@ -31,6 +32,7 @@ const profileQuery = graphql(/* GraphQL */ `
         city
         state
         postalCode
+        country
       }
     }
     organization {
@@ -63,9 +65,7 @@ export const Profile = () => {
     if (!addressData) {
       return undefined;
     }
-    return `${addressData.street1} ${addressData.street2 ? `${addressData.street2} ` : ''}${
-      addressData.city
-    }, ${addressData.state} ${addressData.postalCode}`;
+    return formatAddress(addressData);
   }, [data?.me.address?.street1]);
 
   const rows = useMemo(
