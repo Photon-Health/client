@@ -164,7 +164,7 @@ export const Status = () => {
           setOrder({
             ...order,
             fulfillment: {
-              state: 'READY' as types.FulfillmentState
+              state: 'READY'
             }
           });
 
