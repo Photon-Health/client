@@ -44,7 +44,8 @@ export const Status = () => {
   const phone = searchParams.get('phone');
 
   const [showFooter, setShowFooter] = useState<boolean>(
-    order?.fulfillment?.state === 'RECEIVED' &&
+    order?.fulfillment?.state ===
+      (types.FulfillmentState.Received || types.FulfillmentState.Ready) &&
       order?.fulfillment?.type !== types.FulfillmentType.MailOrder
   );
   const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
@@ -163,7 +164,7 @@ export const Status = () => {
           setOrder({
             ...order,
             fulfillment: {
-              state: 'READY'
+              state: types.FulfillmentState.Ready
             }
           });
 
@@ -174,7 +175,8 @@ export const Status = () => {
   }, []);
 
   // Only show "Text us now" prompt if pickup and RECEIVED or READY
-  const showChatAlert = fulfillment?.state === 'RECEIVED' || fulfillment?.state === 'READY';
+  const showChatAlert =
+    fulfillment?.state === (types.FulfillmentState.Received || types.FulfillmentState.Ready);
 
   return (
     <Box>
@@ -239,7 +241,11 @@ export const Status = () => {
           ) : null}
           <StatusStepper
             fulfillmentType={fulfillmentType}
-            status={successfullySubmitted ? 'PICKED_UP' : fulfillment?.state || 'SENT'}
+            status={
+              successfullySubmitted
+                ? 'PICKED_UP'
+                : fulfillment?.state || types.FulfillmentState.Sent
+            }
             patientAddress={formatAddress(address)}
           />
         </VStack>

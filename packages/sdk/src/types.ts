@@ -131,6 +131,18 @@ export enum FulfillmentType {
   PickUp = 'PICK_UP'
 }
 
+export enum FulfillmentState {
+  Sent = 'SENT',
+  // Pick Up
+  Received = 'RECEIVED',
+  Ready = 'READY',
+  PickedUp = 'PICKED_UP',
+  // Mail Order
+  Filling = 'FILLING',
+  Shipped = 'SHIPPED',
+  Delivered = 'DELIVERED'
+}
+
 export type Invite = {
   __typename?: 'Invite';
   createdAt: Scalars['AWSDateTime'];
