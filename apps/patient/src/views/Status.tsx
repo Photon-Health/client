@@ -241,11 +241,7 @@ export const Status = () => {
           ) : null}
           <StatusStepper
             fulfillmentType={fulfillmentType}
-            status={
-              successfullySubmitted
-                ? 'PICKED_UP'
-                : fulfillment?.state || types.FulfillmentState.Sent
-            }
+            status={successfullySubmitted ? 'PICKED_UP' : fulfillment?.state || 'SENT'}
             patientAddress={formatAddress(address)}
           />
         </VStack>
