@@ -22,7 +22,7 @@ interface Props {
 const PHARMACY_BRANDING = {
   [process.env.REACT_APP_CAPSULE_PHARMACY_ID as string]: {
     logo: capsuleLogo,
-    description: 'FREE Delivery within 1-2 Days'
+    description: 'FREE Same Day Delivery'
   },
   [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]: {
     logo: amazonPharmacyLogo,
