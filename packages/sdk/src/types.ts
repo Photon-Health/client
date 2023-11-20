@@ -131,6 +131,15 @@ export enum FulfillmentType {
   PickUp = 'PICK_UP'
 }
 
+export type FulfillmentState =
+  | 'SENT'
+  | 'RECEIVED'
+  | 'READY'
+  | 'PICKED_UP'
+  | 'FILLING'
+  | 'SHIPPED'
+  | 'DELIVERED';
+
 export type Invite = {
   __typename?: 'Invite';
   createdAt: Scalars['AWSDateTime'];
@@ -416,7 +425,7 @@ export type OrderFilter = {
 export type OrderFulfillment = {
   __typename?: 'OrderFulfillment';
   carrier?: Maybe<Scalars['String']>;
-  state: Scalars['String'];
+  state: FulfillmentState;
   trackingNumber?: Maybe<Scalars['String']>;
   type: FulfillmentType;
 };
