@@ -24,6 +24,7 @@ import * as TOAST_CONFIG from '../configs/toast';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
 import { getSettings } from '@client/settings';
 import { DemoCtaModal } from '../components/DemoCtaModal';
+import { FulfillmentState } from 'packages/sdk/dist/types';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
@@ -43,10 +44,10 @@ export const Status = () => {
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
 
+  const showFooterStates: FulfillmentState[] = ['RECEIVED', 'READY'];
   const [showFooter, setShowFooter] = useState<boolean>(
-    [types.FulfillmentState.Received, types.FulfillmentState.Ready].includes(
-      order?.fulfillment?.state
-    ) && order?.fulfillment?.type !== types.FulfillmentType.MailOrder
+    showFooterStates.includes(order?.fulfillment?.state) &&
+      order?.fulfillment?.type !== types.FulfillmentType.MailOrder
   );
   const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
 
@@ -164,7 +165,7 @@ export const Status = () => {
           setOrder({
             ...order,
             fulfillment: {
-              state: types.FulfillmentState.Ready
+              state: 'READY' as types.FulfillmentState
             }
           });
 
@@ -175,9 +176,8 @@ export const Status = () => {
   }, []);
 
   // Only show "Text us now" prompt if pickup and RECEIVED or READY
-  const showChatAlert = [types.FulfillmentState.Received, types.FulfillmentState.Ready].includes(
-    fulfillment?.state
-  );
+  const showChatAlertStates: types.FulfillmentState[] = ['RECEIVED', 'READY'];
+  const showChatAlert = showChatAlertStates.includes(fulfillment?.state);
 
   return (
     <Box>
