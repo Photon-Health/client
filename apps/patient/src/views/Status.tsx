@@ -43,8 +43,9 @@ export const Status = () => {
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
 
+  const showFooterStates: types.FulfillmentState[] = ['RECEIVED', 'READY'];
   const [showFooter, setShowFooter] = useState<boolean>(
-    order?.fulfillment?.state === 'RECEIVED' &&
+    showFooterStates.includes(order?.fulfillment?.state) &&
       order?.fulfillment?.type !== types.FulfillmentType.MailOrder
   );
   const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
@@ -174,7 +175,8 @@ export const Status = () => {
   }, []);
 
   // Only show "Text us now" prompt if pickup and RECEIVED or READY
-  const showChatAlert = fulfillment?.state === 'RECEIVED' || fulfillment?.state === 'READY';
+  const showChatAlertStates: types.FulfillmentState[] = ['RECEIVED', 'READY'];
+  const showChatAlert = showChatAlertStates.includes(fulfillment?.state);
 
   return (
     <Box>
