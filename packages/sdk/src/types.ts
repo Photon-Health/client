@@ -428,7 +428,7 @@ export type OrderFilter = {
 export type OrderFulfillment = {
   __typename?: 'OrderFulfillment';
   carrier?: Maybe<Scalars['String']>;
-  state: Scalars['String'];
+  state: FulfillmentState;
   trackingNumber?: Maybe<Scalars['String']>;
   type: FulfillmentType;
 };
