@@ -36,7 +36,7 @@ import {
   triggerDemoNotification
 } from '../api';
 import { demoPharmacies } from '../data/demoPharmacies';
-import { zipCodeMap as capsuleLookup } from '../data/capsuleAustinZipcodes';
+import capsuleLookup from '../data/capsuleZipcodes.json';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
@@ -76,8 +76,6 @@ export const Pharmacy = () => {
   const [location, setLocation] = useState<string>(
     order?.address ? formatAddress(order.address) : ''
   );
-
-  const searchingInAustinTX = /Austin.*(?:TX|Texas)/.test(location);
 
   const toast = useToast();
 
@@ -423,13 +421,11 @@ export const Pharmacy = () => {
     }
   }, [location]);
 
-  const deliveryAddressInAustinTX = capsuleLookup.has(order?.address?.postalCode);
-  const enableCourier =
-    !isDemo &&
-    searchingInAustinTX &&
-    deliveryAddressInAustinTX &&
-    orgSettings.enableCourierNavigate;
+  const isCapsuleTerritory = order?.address?.postalCode in capsuleLookup;
+  const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
+
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
+
   const heading = isReroute ? t.pharmacy.heading.reroute : t.pharmacy.heading.original;
   const subheading = isReroute
     ? t.pharmacy.subheading.reroute(order.pharmacy.name)
