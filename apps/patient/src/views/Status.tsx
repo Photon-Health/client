@@ -213,7 +213,7 @@ export const Status = () => {
               <PharmacyCard
                 pharmacy={enrichedPharmacy}
                 selected={true}
-                canReroute={!isDemo && orgSettings.patientsCanReroute}
+                canReroute={!isDemo && orgSettings.enablePatientRerouting}
                 onChangePharmacy={() =>
                   navigate(`/pharmacy?orderId=${order.id}&token=${token}&reroute=true`)
                 }

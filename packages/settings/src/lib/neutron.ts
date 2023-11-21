@@ -23,7 +23,7 @@ const defaultSettings: OrganizationSettings = {
   mailOrderNavigateProviders: [],
   sendToPatient: true,
   sendToPatientUsers: [],
-  patientsCanReroute: true,
+  enablePatientRerouting: true,
   enableCourierNavigate: true,
   courierNavigateProviders: [CAPSULE_ID],
   returnTo: window.location.origin,
@@ -65,7 +65,10 @@ export const neutron: {
   org_TY5GFYPIRo3xQGYM: {
     ...defaultSettings,
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID]
+    mailOrderProviders: [CUREXA_ID],
+    enablePatientRerouting: true,
+    enableMedHistory: true,
+    enableRxAndOrder: true
   },
   // Weekend Health
   org_u93EDGhy5I4Ia5Bb: {
@@ -137,7 +140,7 @@ export const neutron: {
     ...defaultSettings,
     logo: 'blueberry_logo.png',
     accentColor: '#235AFF',
-    patientsCanReroute: false
+    enablePatientRerouting: false
   },
   // Sunny
   org_PILXReL8NKiTWxD3: {
