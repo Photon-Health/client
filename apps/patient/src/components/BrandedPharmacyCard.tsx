@@ -47,16 +47,16 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
   const brand = PHARMACY_BRANDING[pharmacyId];
   if (!brand) return null;
 
-  const description =
-    pharmacyId === process.env.REACT_APP_CAPSULE_PHARMACY_ID &&
-    capsuleLookup[order?.address?.postalCode] === 'Austin'
-      ? brand.descriptionSameDay
-      : brand.descriptionNextDay;
+  let tagline = null;
+  if (pharmacyId === process.env.REACT_APP_CAPSULE_PHARMACY_ID) {
+    const capsuleDescription =
+      capsuleLookup[order?.address?.postalCode] === 'Austin'
+        ? brand.descriptionSameDay
+        : brand.descriptionNextDay;
 
-  const [firstWord, ...restOfSentence] = description.split(' ');
+    const [firstWord, ...restOfSentence] = capsuleDescription.split(' ');
 
-  const tagline =
-    pharmacyId === process.env.REACT_APP_CAPSULE_PHARMACY_ID ? (
+    tagline = (
       <Text fontSize="sm" display="inline">
         <Box as="span" color="gray.900" mr={1}>
           {firstWord}
@@ -65,11 +65,14 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
           {restOfSentence.join(' ')}
         </Box>
       </Text>
-    ) : (
+    );
+  } else {
+    tagline = (
       <Text fontSize="sm" color="gray.500">
-        {description}
+        {brand.description}
       </Text>
     );
+  }
 
   return (
     <SlideFade offsetY="60px" in={true} key={`courier-pharmacy-${pharmacyId}`}>
