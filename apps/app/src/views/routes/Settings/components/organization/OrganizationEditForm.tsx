@@ -4,19 +4,18 @@ import { FC } from 'react';
 import * as yup from 'yup';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 
+const phoneRegex =
+  /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
+
 export const organizationFormSchema = yup.object({
   id: yup.string().required(),
   name: yup.string().required().min(1, 'Missing organization name'),
-  fax: yup
-    .string()
-    .matches(/^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/, {
-      message: 'Please enter a valid fax number'
-    }),
-  phone: yup
-    .string()
-    .matches(/^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/, {
-      message: 'Please enter a valid phone number'
-    }),
+  fax: yup.string().matches(phoneRegex, {
+    message: 'Please enter a valid fax number'
+  }),
+  phone: yup.string().matches(phoneRegex, {
+    message: 'Please enter a valid phone number'
+  }),
   email: yup.string().email('Please enter a valid email'),
   address: yup
     .object({

@@ -100,10 +100,7 @@ export const Settings = () => {
   const navigate = useNavigate();
 
   const client = useClinicalApiClient();
-  const { data, loading } = useQuery(settingsPageQuery, {
-    client,
-    fetchPolicy: 'cache-first'
-  });
+  const { data, loading } = useQuery(settingsPageQuery, { client });
 
   const rolesMap: Record<string, string> = useMemo(
     () =>

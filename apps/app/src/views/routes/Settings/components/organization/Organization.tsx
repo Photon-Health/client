@@ -88,8 +88,7 @@ export const Organization = () => {
   const [isEditing, setIsEditing] = useState(false);
   const client = useClinicalApiClient();
   const { data, error } = useQuery(organizationQuery, { client });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [updateOrganization, { loading: mutationLoading, error: mutationError }] = useMutation(
+  const [updateOrganization, { loading: mutationLoading }] = useMutation(
     updateOrganizationMutation,
     {
       refetchQueries: ['OrganizationQuery'],

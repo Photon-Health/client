@@ -44,10 +44,7 @@ export interface RolesSelectProps {
 }
 export const RolesSelect = (props: RolesSelectProps) => {
   const client = useClinicalApiClient();
-  const [loadRoleOptions] = useLazyQuery(allRolesQuery, {
-    client,
-    fetchPolicy: 'cache-first'
-  });
+  const [loadRoleOptions] = useLazyQuery(allRolesQuery, { client });
 
   const loadOptions = async () => {
     const roles = (await loadRoleOptions()).data?.roles ?? [];

@@ -16,23 +16,23 @@ const clientFragment = graphql(/* GraphQL */ `
   }
 `);
 interface ClientInfoCardProps {
-  client: FragmentType<typeof clientFragment>;
+  clientCreds: FragmentType<typeof clientFragment>;
 }
 
 export const ClientInfoCard = (props: ClientInfoCardProps) => {
-  const client = useFragment(clientFragment, props.client);
+  const clientCreds = useFragment(clientFragment, props.clientCreds);
 
   return (
     <Box as="form" {...props}>
       <Stack spacing={6}>
-        <AppDescriptionView appType={client.appType} />
-        <AppNameView name={client.name ?? 'Client'} />
-        <ClientIdView clientId={client.id} />
-        {client.appType !== 'spa' && (
+        <AppDescriptionView appType={clientCreds.appType} />
+        <AppNameView name={clientCreds.name ?? 'Client'} />
+        <ClientIdView clientId={clientCreds.id} />
+        {clientCreds.appType !== 'spa' && (
           <>
             {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
-            <ClientSecretView clientSecret={client.secret!} clientId={client.id} />
-            <RotateSecret clientId={client.id} />
+            <ClientSecretView clientSecret={clientCreds.secret!} clientId={clientCreds.id} />
+            <RotateSecret clientId={clientCreds.id} />
           </>
         )}
       </Stack>
