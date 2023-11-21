@@ -50,6 +50,7 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
   let tagline = null;
   if (pharmacyId === process.env.REACT_APP_CAPSULE_PHARMACY_ID) {
     const capsuleDescription =
+      pharmacyId === process.env.REACT_APP_CAPSULE_PHARMACY_ID &&
       capsuleLookup[order?.address?.postalCode] === 'Austin'
         ? brand.descriptionSameDay
         : brand.descriptionNextDay;
