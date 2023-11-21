@@ -9,9 +9,13 @@ import {
   useBreakpointValue
 } from '@chakra-ui/react';
 
+import { useOrderContext } from '../views/Main';
+
 import capsuleLogo from '../assets/capsule_logo.png';
 import amazonPharmacyLogo from '../assets/amazon_pharmacy.png';
 import altoLogo from '../assets/alto_logo.svg';
+
+import capsuleLookup from '../data/capsuleZipcodes.json';
 
 interface Props {
   pharmacyId: string;
@@ -22,7 +26,8 @@ interface Props {
 const PHARMACY_BRANDING = {
   [process.env.REACT_APP_CAPSULE_PHARMACY_ID as string]: {
     logo: capsuleLogo,
-    description: 'FREE Same Day Delivery'
+    description: 'FREE Delivery within 1-2 Days',
+    description2: 'FREE Same Day Delivery'
   },
   [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]: {
     logo: amazonPharmacyLogo,
@@ -35,12 +40,20 @@ const PHARMACY_BRANDING = {
 };
 
 export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Props) => {
+  const { order } = useOrderContext();
+
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   const brand = PHARMACY_BRANDING[pharmacyId];
   if (!brand) return null;
 
-  const [firstWord, ...restOfSentence] = brand.description.split(' ');
+  const description =
+    pharmacyId === process.env.REACT_APP_CAPSULE_PHARMACY_ID &&
+    capsuleLookup[order?.address?.postalCode] === 'Austin'
+      ? brand.description2
+      : brand.description;
+
+  const [firstWord, ...restOfSentence] = description.split(' ');
 
   const tagline =
     pharmacyId === process.env.REACT_APP_CAPSULE_PHARMACY_ID ? (
@@ -54,7 +67,7 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
       </Text>
     ) : (
       <Text fontSize="sm" color="gray.500">
-        {brand.description}
+        {description}
       </Text>
     );
 
