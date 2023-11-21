@@ -26,8 +26,8 @@ interface Props {
 const PHARMACY_BRANDING = {
   [process.env.REACT_APP_CAPSULE_PHARMACY_ID as string]: {
     logo: capsuleLogo,
-    description: 'FREE Delivery within 1-2 Days',
-    description2: 'FREE Same Day Delivery'
+    descriptionNextDay: 'FREE Delivery within 1-2 Days',
+    descriptionSameDay: 'FREE Same Day Delivery'
   },
   [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]: {
     logo: amazonPharmacyLogo,
@@ -50,8 +50,8 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
   const description =
     pharmacyId === process.env.REACT_APP_CAPSULE_PHARMACY_ID &&
     capsuleLookup[order?.address?.postalCode] === 'Austin'
-      ? brand.description2
-      : brand.description;
+      ? brand.descriptionSameDay
+      : brand.descriptionNextDay;
 
   const [firstWord, ...restOfSentence] = description.split(' ');
 
