@@ -3,7 +3,6 @@ import { createEffect, createSignal } from 'solid-js';
 import { PhotonClient } from '@photonhealth/sdk';
 import { SDKProvider } from '@photonhealth/components';
 import { makeTimer } from '@solid-primitives/timer';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { PhotonClientStore } from '../store';
 import { hasAuthParams } from '../utils';
 import { PhotonContext } from '../context';
@@ -150,7 +149,6 @@ customElement(
 
     return (
       <div ref={ref}>
-        <style>{photonStyles}</style>
         <PhotonContext.Provider value={store()}>
           <SDKProvider client={sdk} toastBuffer={props?.toastBuffer || 0}>
             <slot />
