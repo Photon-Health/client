@@ -15,9 +15,11 @@
  * @param sendToPatientUsers Limit ability to send to patient to specific users
  * @param returnTo Logout redirect
  * @param federated Toggle federated auth
+ * @param enablePatientRerouting Ability for patients to reroute orders
+ * @param enableMedHistory Show the med history section in the prescribe flow
+ * @param enableRxAndOrder Combine Rx and order creation into one prescribe flow
  *
  */
-
 export type OrganizationSettings = {
   logo?: string | undefined;
   accentColor?: string;
@@ -31,11 +33,9 @@ export type OrganizationSettings = {
   mailOrderNavigateProviders?: string[];
   sendToPatient?: boolean;
   sendToPatientUsers?: string[];
-  patientsCanReroute: boolean;
+  enablePatientRerouting?: boolean;
   returnTo?: string;
   federated?: boolean;
-  // Show the med history section in the prescribe flow
   enableMedHistory?: boolean;
-  // Combine Rx and order creation into one prescribe flow
   enableRxAndOrder?: boolean;
 };

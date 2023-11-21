@@ -21,7 +21,7 @@ const defaultSettings: OrganizationSettings = {
   mailOrderNavigateProviders: [],
   sendToPatient: true,
   sendToPatientUsers: [],
-  patientsCanReroute: false,
+  enablePatientRerouting: false,
   enableCourierNavigate: true,
   courierNavigateProviders: [CAPSULE_ID],
   returnTo: window.location.origin,
@@ -176,7 +176,7 @@ export const photon: {
     ...defaultSettings,
     logo: 'blueberry_logo.png',
     accentColor: '#235AFF',
-    patientsCanReroute: false,
+    enablePatientRerouting: false,
     enableMedHistory: true,
     enableRxAndOrder: true
   },
