@@ -9,9 +9,13 @@ import {
   useBreakpointValue
 } from '@chakra-ui/react';
 
+import { useOrderContext } from '../views/Main';
+
 import capsuleLogo from '../assets/capsule_logo.png';
 import amazonPharmacyLogo from '../assets/amazon_pharmacy.png';
 import altoLogo from '../assets/alto_logo.svg';
+
+import capsuleLookup from '../data/capsuleZipcodes.json';
 
 interface Props {
   pharmacyId: string;
@@ -22,7 +26,8 @@ interface Props {
 const PHARMACY_BRANDING = {
   [process.env.REACT_APP_CAPSULE_PHARMACY_ID as string]: {
     logo: capsuleLogo,
-    description: 'FREE Delivery within 1-2 Days'
+    descriptionNextDay: 'FREE Delivery within 1-2 Days',
+    descriptionSameDay: 'FREE Same Day Delivery'
   },
   [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]: {
     logo: amazonPharmacyLogo,
@@ -35,15 +40,24 @@ const PHARMACY_BRANDING = {
 };
 
 export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Props) => {
+  const { order } = useOrderContext();
+
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   const brand = PHARMACY_BRANDING[pharmacyId];
   if (!brand) return null;
 
-  const [firstWord, ...restOfSentence] = brand.description.split(' ');
+  let tagline = null;
+  if (pharmacyId === process.env.REACT_APP_CAPSULE_PHARMACY_ID) {
+    const capsuleDescription =
+      pharmacyId === process.env.REACT_APP_CAPSULE_PHARMACY_ID &&
+      capsuleLookup[order?.address?.postalCode] === 'Austin'
+        ? brand.descriptionSameDay
+        : brand.descriptionNextDay;
 
-  const tagline =
-    pharmacyId === process.env.REACT_APP_CAPSULE_PHARMACY_ID ? (
+    const [firstWord, ...restOfSentence] = capsuleDescription.split(' ');
+
+    tagline = (
       <Text fontSize="sm" display="inline">
         <Box as="span" color="gray.900" mr={1}>
           {firstWord}
@@ -52,11 +66,14 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
           {restOfSentence.join(' ')}
         </Box>
       </Text>
-    ) : (
+    );
+  } else {
+    tagline = (
       <Text fontSize="sm" color="gray.500">
         {brand.description}
       </Text>
     );
+  }
 
   return (
     <SlideFade offsetY="60px" in={true} key={`courier-pharmacy-${pharmacyId}`}>
