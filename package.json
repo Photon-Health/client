@@ -13,6 +13,9 @@
     "apps/*",
     "packages/*"
   ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
     "@babel/preset-react": "^7.14.5",
     "@nrwl/cypress": "^15.6.3",
