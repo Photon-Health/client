@@ -70,14 +70,7 @@ export const InviteList = () => {
 
   if (error) {
     return (
-      <Box
-        pt={{ base: '4', md: '4' }}
-        pb={{ base: '4', md: '8' }}
-        px={{ base: '4', md: '8' }}
-        borderRadius="lg"
-        bg="bg-surface"
-        boxShadow="base"
-      >
+      <Box py="4" px={{ base: '4', md: '8' }} borderRadius="lg" bg="bg-surface" boxShadow="base">
         <Container padding={{ base: '0', md: '0' }}>
           <Stack spacing={3}>
             <HStack justify="space-between">
@@ -136,15 +129,21 @@ export const InviteList = () => {
             </TableContainer>
           )}
           <Box px={{ base: '4', md: '6' }} pb="5">
-            <HStack spacing="3" justify="space-between">
-              <Text color="muted" fontSize="sm">
+            <Stack
+              spacing="3"
+              justify={isMobileAndTablet ? 'center' : 'space-between'}
+              direction={isMobileAndTablet ? 'column' : 'row'}
+            >
+              <Text color="muted" fontSize="sm" textAlign={isMobileAndTablet ? 'center' : 'left'}>
                 Showing {currPageSize} results {total ? `(${total} total)` : null}
               </Text>
-              <PaginationIndicator
-                pages={pages}
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-              />
+              {!isMobileAndTablet && (
+                <PaginationIndicator
+                  pages={pages}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                />
+              )}
               <HStack
                 w={isMobileAndTablet ? '100%' : undefined}
                 justifyContent={isMobileAndTablet ? 'space-between' : 'initial'}
@@ -168,7 +167,7 @@ export const InviteList = () => {
                   Next
                 </Button>
               </HStack>
-            </HStack>
+            </Stack>
           </Box>
         </Stack>
       </Container>

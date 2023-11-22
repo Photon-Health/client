@@ -119,6 +119,10 @@ export const Settings = () => {
   const hasOrg = usePermissions(['read:organization']);
 
   useEffect(() => {
+    if (loading) {
+      // Don't do anything until we've loaded
+      return;
+    }
     const newTabIndex = tabs.findIndex((path) => path === pathname);
     const newTabRoute = tabs[newTabIndex];
 
@@ -127,7 +131,7 @@ export const Settings = () => {
     } else {
       navigate(tabs[0]);
     }
-  }, [pathname]);
+  }, [pathname, loading]);
 
   const handleTabsChange = (index: number) => {
     const newPath = tabs[index];
@@ -148,8 +152,8 @@ export const Settings = () => {
           <CircularProgress isIndeterminate color="green.300" />
         </Center>
       ) : (
-        <Tabs index={tabIndex} onChange={handleTabsChange}>
-          <TabList>
+        <Tabs index={tabIndex} onChange={handleTabsChange} isLazy maxWidth="100%">
+          <TabList overflowX={'auto'}>
             <Tab>User</Tab>
             <Tab hidden={!hasTeam}>Team</Tab>
             <Tab hidden={!hasOrg}>Organization</Tab>
