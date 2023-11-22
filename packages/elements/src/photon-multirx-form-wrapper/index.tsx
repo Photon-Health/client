@@ -34,7 +34,8 @@ customElement(
     enableSendToPatient: false,
     enableMedHistory: false,
     mailOrderIds: undefined,
-    enableOrder: false
+    enableOrder: false,
+    toastBuffer: 0
   },
   (props: {
     enableMedHistory: boolean;
@@ -48,6 +49,7 @@ customElement(
     enableSendToPatient?: boolean;
     mailOrderIds?: string;
     enableOrder?: boolean;
+    toastBuffer?: number;
   }) => {
     let ref: any;
     const client = usePhoton();
@@ -238,6 +240,7 @@ customElement(
                   enable-send-to-patient={props.enableSendToPatient}
                   mail-order-ids={props.mailOrderIds}
                   trigger-submit={triggerSubmit()}
+                  toast-buffer={props?.toastBuffer || 0}
                   on:photon-form-validate={(e: any) => {
                     setCanSubmit(e.detail.canSubmit);
                     setForm(e.detail.form);

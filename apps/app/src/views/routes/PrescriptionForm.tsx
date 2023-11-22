@@ -95,6 +95,7 @@ export const PrescriptionForm = () => {
           enable-local-pickup={settings[user.org_id]?.pickUp ?? false}
           enable-send-to-patient={settings[user.org_id]?.sendToPatient ?? false}
           mail-order-ids={settings[user.org_id]?.mailOrderProviders?.join(',') ?? ''}
+          toast-buffer={70}
         />
       ) : null}
     </div>
