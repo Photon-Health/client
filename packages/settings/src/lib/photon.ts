@@ -1,7 +1,6 @@
 import { OrganizationSettings } from '../types';
 
 // const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
-const CAPSULE_ID = 'phr_01G9CM8XB71GYHQVFMZBXSVTBF';
 const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
 const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
 
@@ -21,9 +20,8 @@ const defaultSettings: OrganizationSettings = {
   mailOrderNavigateProviders: [],
   sendToPatient: true,
   sendToPatientUsers: [],
-  patientsCanReroute: false,
+  enablePatientRerouting: false,
   enableCourierNavigate: true,
-  courierNavigateProviders: [CAPSULE_ID],
   returnTo: window.location.origin,
   federated: false,
   enableMedHistory: false,
@@ -176,7 +174,7 @@ export const photon: {
     ...defaultSettings,
     logo: 'blueberry_logo.png',
     accentColor: '#235AFF',
-    patientsCanReroute: false,
+    enablePatientRerouting: false,
     enableMedHistory: true,
     enableRxAndOrder: true
   },
