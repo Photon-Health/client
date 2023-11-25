@@ -19,7 +19,7 @@ import { createEffect, onMount, createSignal, Show, For } from 'solid-js';
 import type { FormError } from '../stores/form';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
-import { Spinner } from '@photonhealth/components';
+import { Spinner, Toaster } from '@photonhealth/components';
 import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import { AddPrescriptionCard } from './components/AddPrescriptionCard';
 import { PatientCard } from './components/PatientCard';
@@ -59,7 +59,8 @@ customElement(
     address: undefined,
     weight: undefined,
     weightUnit: 'lbs',
-    triggerSubmit: false
+    triggerSubmit: false,
+    toastBuffer: 0
   },
   (
     props: {
@@ -80,6 +81,7 @@ customElement(
       weight?: number;
       weightUnit?: string;
       triggerSubmit: boolean;
+      toastBuffer: number;
     },
     options
   ) => {
@@ -341,6 +343,7 @@ customElement(
         <style>{styles}</style>
         <style>{photonStyles}</style>
         <div>
+          <Toaster buffer={props?.toastBuffer || 0} />
           <div class="flex flex-col gap-8">
             <Show when={(!client || isLoading()) && !authenticated()}>
               <div class="w-full flex justify-center">

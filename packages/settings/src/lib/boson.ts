@@ -2,7 +2,6 @@ import { OrganizationSettings } from '../types';
 
 const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
 const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
-const CAPSULE_ID = 'phr_01G9CM8XB71GYHQVFMZBXSVTBF';
 // const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
 const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 
@@ -22,9 +21,8 @@ const defaultSettings: OrganizationSettings = {
   mailOrderNavigateProviders: [],
   sendToPatient: true,
   sendToPatientUsers: [],
-  patientsCanReroute: true,
+  enablePatientRerouting: true,
   enableCourierNavigate: true,
-  courierNavigateProviders: [CAPSULE_ID],
   returnTo: window.location.origin,
   federated: false,
   enableMedHistory: false,
