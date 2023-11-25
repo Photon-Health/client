@@ -2,8 +2,7 @@ import { OrganizationSettings } from '../types';
 
 const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
 const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
-const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
-const CAPSULE_ID = 'phr_01G9CM8XB71GYHQVFMZBXSVTBF';
+// const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
 const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 const HONEYBEE_PHARMACY_ID = 'phr_01GA9HPXNE3TGEWPK91YY8Z4TS';
 
@@ -23,9 +22,8 @@ const defaultSettings: OrganizationSettings = {
   mailOrderNavigateProviders: [],
   sendToPatient: true,
   sendToPatientUsers: [],
-  patientsCanReroute: true,
+  enablePatientRerouting: true,
   enableCourierNavigate: true,
-  courierNavigateProviders: [CAPSULE_ID],
   returnTo: window.location.origin,
   federated: false,
   enableMedHistory: false,
@@ -48,8 +46,7 @@ export const neutron: {
     accentColor: '#b35724',
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID, CAREPOINT_ID],
-    enableCourierNavigate: true,
-    courierNavigateProviders: [ALTO_ID]
+    enableCourierNavigate: true
   },
   // NewCo (demo's)
   org_YiUudCToTSrjOuow: {
@@ -65,7 +62,10 @@ export const neutron: {
   org_TY5GFYPIRo3xQGYM: {
     ...defaultSettings,
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID]
+    mailOrderProviders: [CUREXA_ID],
+    enablePatientRerouting: true,
+    enableMedHistory: true,
+    enableRxAndOrder: true
   },
   // Weekend Health
   org_u93EDGhy5I4Ia5Bb: {
@@ -137,7 +137,7 @@ export const neutron: {
     ...defaultSettings,
     logo: 'blueberry_logo.png',
     accentColor: '#235AFF',
-    patientsCanReroute: false
+    enablePatientRerouting: false
   },
   // Sunny
   org_PILXReL8NKiTWxD3: {

@@ -36,7 +36,8 @@ import {
   triggerDemoNotification
 } from '../api';
 import { demoPharmacies } from '../data/demoPharmacies';
-import capsuleLookup from '../data/capsuleZipcodes.json';
+import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
+import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
@@ -325,7 +326,7 @@ export const Pharmacy = () => {
             setShowFooter(false);
 
             let type: ExtendedFulfillmentType = types.FulfillmentType.PickUp;
-            if (orgSettings.courierNavigateProviders.includes(selectedId)) {
+            if (selectedId in capsulePharmacyIdLookup) {
               type = 'COURIER';
             } else if (orgSettings.mailOrderNavigateProviders.includes(selectedId)) {
               type = types.FulfillmentType.MailOrder;
@@ -421,7 +422,7 @@ export const Pharmacy = () => {
     }
   }, [location]);
 
-  const isCapsuleTerritory = order?.address?.postalCode in capsuleLookup;
+  const isCapsuleTerritory = order?.address?.postalCode in capsuleZipcodeLookup;
   const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
 
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
@@ -477,7 +478,7 @@ export const Pharmacy = () => {
               {enableCourier ? (
                 <BrandedOptions
                   type="COURIER"
-                  options={orgSettings.courierNavigateProviders}
+                  options={[capsuleZipcodeLookup[order?.address?.postalCode].pharmacyId]}
                   location={location}
                   selectedId={selectedId}
                   handleSelect={handleSelect}
