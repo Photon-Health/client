@@ -9,13 +9,11 @@ import {
   useBreakpointValue
 } from '@chakra-ui/react';
 
-import { useOrderContext } from '../views/Main';
-
 import capsuleLogo from '../assets/capsule_logo.png';
 import amazonPharmacyLogo from '../assets/amazon_pharmacy.png';
 import altoLogo from '../assets/alto_logo.svg';
 
-import capsuleLookup from '../data/capsuleZipcodes.json';
+import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
 interface Props {
   pharmacyId: string;
@@ -24,11 +22,6 @@ interface Props {
 }
 
 const PHARMACY_BRANDING = {
-  [process.env.REACT_APP_CAPSULE_PHARMACY_ID as string]: {
-    logo: capsuleLogo,
-    descriptionNextDay: 'FREE Delivery within 1-2 Days',
-    descriptionSameDay: 'FREE Same Day Delivery'
-  },
   [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]: {
     logo: amazonPharmacyLogo,
     description: 'Save time. Save money. Stay healthy.'
@@ -38,23 +31,27 @@ const PHARMACY_BRANDING = {
     description: 'Free same-day delivery'
   }
 };
+// TODO: need to make this more elegant
+const capsulePharmacyIds = Object.keys(capsulePharmacyIdLookup);
+for (let i = 0; i++; i < capsulePharmacyIds.length) {
+  PHARMACY_BRANDING[capsulePharmacyIds[i]] = {
+    logo: capsuleLogo,
+    description: 'FREE Delivery within 1-2 Days'
+  };
+}
 
 export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Props) => {
-  const { order } = useOrderContext();
-
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   const brand = PHARMACY_BRANDING[pharmacyId];
   if (!brand) return null;
 
   let tagline = null;
-  if (pharmacyId === process.env.REACT_APP_CAPSULE_PHARMACY_ID) {
-    const capsuleDescription =
-      pharmacyId === process.env.REACT_APP_CAPSULE_PHARMACY_ID &&
-      capsuleLookup[order?.address?.postalCode] === 'Austin'
-        ? brand.descriptionSameDay
-        : brand.descriptionNextDay;
-
+  if (capsulePharmacyIdLookup[pharmacyId]) {
+    let capsuleDescription = 'FREE Delivery within 1-2 Days';
+    if (capsulePharmacyIdLookup[pharmacyId] === 'Austin') {
+      capsuleDescription = 'FREE Same Day Delivery';
+    }
     const [firstWord, ...restOfSentence] = capsuleDescription.split(' ');
 
     tagline = (

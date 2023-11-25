@@ -5,7 +5,6 @@
  * @param accentColor Primary theme color
  * @param sendOrder Toggle ability to create new orders
  * @param enableCourierNavigate Toggle courier fulfillment pharmacy options in the Navigate app
- * @param courierNavigateProviders List of courier pharmacy options
  * @param pickUp Toggle fulfillment pickup pharmacy options
  * @param mailOrder Toggle fulfillment mail order pharmacy options
  * @param mailOrderProviders Fulfillment mail order pharmacy options
@@ -25,7 +24,6 @@ export type OrganizationSettings = {
   accentColor?: string;
   sendOrder?: boolean;
   enableCourierNavigate?: boolean;
-  courierNavigateProviders?: string[];
   pickUp?: boolean;
   mailOrder?: boolean;
   mailOrderProviders?: string[];
