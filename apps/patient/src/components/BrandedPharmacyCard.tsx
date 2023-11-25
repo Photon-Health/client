@@ -33,7 +33,7 @@ const PHARMACY_BRANDING = {
 };
 // TODO: need to make this more elegant
 const capsulePharmacyIds = Object.keys(capsulePharmacyIdLookup);
-for (let i = 0; i++; i < capsulePharmacyIds.length) {
+for (let i = 0; i < capsulePharmacyIds.length; i++) {
   PHARMACY_BRANDING[capsulePharmacyIds[i]] = {
     logo: capsuleLogo,
     description: 'FREE Delivery within 1-2 Days'
