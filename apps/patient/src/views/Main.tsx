@@ -11,9 +11,6 @@ import theme from '../configs/theme';
 import { setAuthHeader } from '../configs/graphqlClient';
 import { types } from '@photonhealth/sdk';
 import { AUTH_HEADER_ERRORS } from '../api/internal';
-import { getSettings } from '@client/settings';
-
-const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
 const OrderContext = createContext(null);
 export const useOrderContext = () => useContext(OrderContext);
@@ -90,49 +87,7 @@ export const Main = () => {
     }
   }, [order, orderId, fetchOrder]);
 
-  const [logo, setLogo] = useState(undefined);
-  const [loadingLogo, setLoadingLogo] = useState(true);
-
-  const preloadImage = (url: string) => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = resolve;
-      img.onerror = reject;
-      img.src = url;
-    });
-  };
-
-  const fetchLogo = async (fileName: string) => {
-    if (fileName === 'photon') {
-      setLogo('photon');
-      setLoadingLogo(false);
-    } else {
-      try {
-        const response = await import(`../assets/${fileName}`);
-        await preloadImage(response.default);
-        setLogo(response.default);
-        setLoadingLogo(false);
-      } catch (e) {
-        console.error(e);
-        setLoadingLogo(false);
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (order?.organization?.id) {
-      const theme =
-        order.organization.id in settings ? settings[order.organization.id] : settings.default;
-
-      if (theme.logo) {
-        fetchLogo(theme.logo);
-      } else {
-        setLoadingLogo(false);
-      }
-    }
-  }, [order?.organization?.id]);
-
-  if (!order || loadingLogo) {
+  if (!order) {
     return (
       <ChakraProvider theme={theme()}>
         <Center h="100vh">
@@ -142,7 +97,7 @@ export const Main = () => {
     );
   }
 
-  const orderContextValue = { order, setOrder, logo };
+  const orderContextValue = { order, setOrder };
 
   return (
     <ChakraProvider theme={theme(order.organization.id)}>

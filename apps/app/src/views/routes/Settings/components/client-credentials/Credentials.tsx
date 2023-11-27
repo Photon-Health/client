@@ -1,4 +1,4 @@
-import { CopyIcon } from '@chakra-ui/icons';
+import { CheckIcon, CopyIcon } from '@chakra-ui/icons';
 import {
   Box,
   CircularProgress,
@@ -17,26 +17,52 @@ import {
 import { usePhoton } from '@photonhealth/react';
 
 import { ClientInfoCard } from './ClientInfoCard';
+import { graphql } from 'apps/app/src/gql';
+import { useClinicalApiClient } from '../../apollo';
+import { Fragment, useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@apollo/client';
+
+const clientsQuery = graphql(/* GraphQL */ `
+  query ClientsDeveloperTabQuery {
+    clients {
+      id
+      ...ClientInfoCardFragment
+    }
+  }
+`);
 
 export const Credentials = () => {
-  const { getClients, getToken } = usePhoton();
-  const { loading, error, clients } = getClients();
+  const { getToken } = usePhoton();
+  const [tokenClickedState, setTokenClickedState] = useState(false);
+  const client = useClinicalApiClient();
+  const { data, loading, error } = useQuery(clientsQuery, { client });
+  const clients = useMemo(() => data?.clients, [data?.clients]);
+
+  useEffect(() => {
+    if (tokenClickedState) {
+      setTimeout(() => {
+        setTokenClickedState(false);
+      }, 1000);
+    }
+  }, [tokenClickedState]);
+
   const getAccessToken = async () => {
     try {
       const token = await getToken();
       navigator.clipboard.writeText(token);
+      setTokenClickedState(true);
     } catch (e) {
       console.error(e);
     }
   };
   return (
     <Box
-      py={{ base: '4', md: '8' }}
+      pt={{ base: '4', md: '4' }}
+      pb={{ base: '4', md: '8' }}
       px={{ base: '4', md: '8' }}
       borderRadius="lg"
       bg="bg-surface"
       boxShadow="base"
-      maxWidth="45em"
     >
       <Container padding={{ base: '0', md: '0' }}>
         <Box>
@@ -45,14 +71,15 @@ export const Credentials = () => {
               <Text fontSize="xl" fontWeight="medium">
                 API Credentials
               </Text>
-
               <Button
                 borderColor="blue.500"
-                textColor="blue.500"
+                border={'1px'}
+                textColor={tokenClickedState ? 'white' : 'blue.500'}
                 colorScheme="blue"
-                rightIcon={<CopyIcon />}
-                variant="outline"
+                rightIcon={tokenClickedState ? <CheckIcon /> : <CopyIcon />}
+                variant={tokenClickedState ? 'solid' : 'outline'}
                 onClick={getAccessToken}
+                size={'sm'}
               >
                 Auth Token
               </Button>
@@ -74,7 +101,7 @@ export const Credentials = () => {
         ) : (
           <Text />
         )}
-        {clients.length === 0 && (
+        {clients?.length === 0 && (
           <Text>
             Email us at&nbsp;
             <Link href="mailto:support@photon.health">support@photon.health</Link>
@@ -82,8 +109,13 @@ export const Credentials = () => {
           </Text>
         )}
         <Stack spacing={6}>
-          {clients.map((client: any) => {
-            return <ClientInfoCard key={client.id} client={client} />;
+          {clients?.map((clientCreds) => {
+            return (
+              <Fragment key={clientCreds.id}>
+                <ClientInfoCard clientCreds={clientCreds} />
+                <Divider />
+              </Fragment>
+            );
           })}
         </Stack>
         {error && (

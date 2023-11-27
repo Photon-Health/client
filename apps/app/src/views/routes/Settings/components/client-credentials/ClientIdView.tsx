@@ -23,7 +23,6 @@ export const ClientIdView = (props: ClientIdViewProps) => {
       <FormLabel>Client ID</FormLabel>
       <InputGroup variant="outline">
         <Input value={clientId} isReadOnly placeholder={clientId} />
-        {/* {eslint-disable-next-line react/no-children-prop} */}
         <InputRightElement>
           <IconButton
             aria-label="Options"

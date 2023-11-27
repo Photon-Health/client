@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   HStack,
   Skeleton,
@@ -8,13 +9,14 @@ import {
 } from '@chakra-ui/react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 
-import { TablePage } from '../../../components/TablePage';
-import { PaginationIndicator } from './PaginationIndicator';
+import { TablePage } from '../../../../components/TablePage';
 
-const TREATMENT_COLUMNS = [
+import { PaginationIndicator } from '../PaginationIndicator';
+
+const TEMPLATE_COLUMNS = [
   {
-    Header: 'Treatment',
-    accessor: 'treatment',
+    Header: 'Template',
+    accessor: 'template',
     width: 'wrap'
   },
   {
@@ -25,13 +27,17 @@ const TREATMENT_COLUMNS = [
 
 const renderSkeletonRow = (isMobile: boolean | undefined) => {
   return {
-    treatment: isMobile ? (
+    template: isMobile ? (
       <VStack align="left" py={2}>
-        <SkeletonText noOfLines={2} width="175px" spacing={2} />
+        <SkeletonText height="25px" noOfLines={2} width="150px" spacing={2} />
+        <SkeletonText height="25px" noOfLines={2} width="150px" ps={4} spacing={2} />
       </VStack>
     ) : (
-      <VStack align="left" py={4} verticalAlign="center">
-        <SkeletonText noOfLines={1} width="325px" />
+      <VStack align="left" py={2}>
+        <SkeletonText noOfLines={1} width="300px" />
+        <Box ps={4}>
+          <SkeletonText noOfLines={1} width="325px" />
+        </Box>
       </VStack>
     ),
     actions: (
@@ -42,7 +48,7 @@ const renderSkeletonRow = (isMobile: boolean | undefined) => {
   };
 };
 
-interface TreatmentTableProps {
+interface TemplateTableProps {
   isLoading: boolean;
   rows: any[];
   filteredRows: any[];
@@ -57,18 +63,18 @@ interface TreatmentTableProps {
   };
 }
 
-export const TreatmentTable = ({
+export const TemplateTable = ({
   isLoading,
   rows,
+  filteredRows,
   pages,
+  pageSize,
   currentPage,
   setCurrentPage,
-  pageSize,
-  filteredRows,
   filterText,
   setFilterText,
   setShowModal
-}: TreatmentTableProps) => {
+}: TemplateTableProps) => {
   const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
   const displayRows = isLoading
     ? new Array(isMobileAndTablet ? 3 : 10).fill(0).map(() => renderSkeletonRow(isMobileAndTablet))
@@ -77,14 +83,14 @@ export const TreatmentTable = ({
   return (
     <TablePage
       data={displayRows}
-      columns={TREATMENT_COLUMNS}
+      columns={TEMPLATE_COLUMNS}
       filterText={filterText}
       setFilterText={setFilterText}
-      ctaText={isMobileAndTablet ? 'Add to Catalog' : undefined}
+      loading={isLoading}
+      ctaText={isMobileAndTablet ? 'New Template' : undefined}
       ctaColor={isMobileAndTablet ? 'blue' : undefined}
       ctaRoute=""
       ctaOnClick={isMobileAndTablet ? setShowModal.on : undefined}
-      loading={isLoading}
       paginationIndicator={
         <PaginationIndicator
           pages={pages}
