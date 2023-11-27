@@ -1,5 +1,5 @@
+import { Field, Formik } from 'formik';
 import * as yup from 'yup';
-import { Formik, Field } from 'formik';
 
 import {
   Alert,
@@ -26,9 +26,11 @@ import {
   VStack
 } from '@chakra-ui/react';
 
+import { useMutation } from '@apollo/client';
+import { graphql } from 'apps/app/src/gql';
 import { useEffect, useState } from 'react';
-import { usePhoton } from '@photonhealth/react';
-import { capitalizeFirst } from '../../../../utils';
+import { capitalizeFirst } from '../../../../../utils';
+import { useClinicalApiClient } from '../../apollo';
 
 const hookSchema = yup.object({
   url: yup
@@ -40,31 +42,30 @@ const hookSchema = yup.object({
     ),
   sharedSecret: yup.string().matches(/^\S*$/, 'Secrets cannot contain any whitespace'),
   radioGroup: yup.string().required('Please select one of the options'),
-  filters: yup.array()
+  filters: yup.array(yup.string().required()).required()
 });
-
-interface WebhooksFormValues {
-  url: string;
-  sharedSecret: string;
-  radioGroup: string;
-  filters: string[];
-}
 
 interface WebhooksFormProps {
   isOpen: boolean;
   close: () => void;
 }
 
-export const WebhooksForm = ({ isOpen, close }: WebhooksFormProps) => {
-  const [eventValue, setEventValue] = useState('');
+const webhookFormCreateMutation = graphql(/* GraphQL */ `
+  mutation WebhookFormCreateMutation($url: String!, $sharedSecret: String!, $filters: [String!]!) {
+    createWebhookConfig(url: $url, filters: $filters, sharedSecret: $sharedSecret)
+  }
+`);
 
-  const { createWebhook } = usePhoton();
-  const [createWebhookConfig, { loading, error }] = createWebhook({
-    refetchQueries: ['getWebhooks'],
+export const WebhooksForm = ({ isOpen, close }: WebhooksFormProps) => {
+  const [eventValue, setEventValue] = useState('all');
+  const client = useClinicalApiClient();
+  const [createWebhook, { loading, error }] = useMutation(webhookFormCreateMutation, {
+    client,
+    refetchQueries: ['WebhookListQuery'],
     awaitRefetchQueries: true
   });
 
-  const initialValues: WebhooksFormValues = {
+  const initialValues: yup.InferType<typeof hookSchema> = {
     url: '',
     sharedSecret: '',
     radioGroup: '',
@@ -109,7 +110,13 @@ export const WebhooksForm = ({ isOpen, close }: WebhooksFormProps) => {
                 // eslint-disable-next-line no-param-reassign
                 values.filters = allFilters;
               }
-              createWebhookConfig({ variables: values, onCompleted: close });
+              createWebhook({
+                variables: {
+                  ...values,
+                  sharedSecret: values.sharedSecret ?? ''
+                },
+                onCompleted: close
+              });
             }}
           >
             {({ setFieldValue, handleSubmit, errors, touched }) => {
