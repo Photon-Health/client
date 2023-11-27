@@ -3,3 +3,6 @@
 /dist
 /coverage
 /node_modules
+
+# gql codegen
+/apps/app/src/gql

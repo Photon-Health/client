@@ -17,10 +17,10 @@ import {
 
 import { Column, useTable, useSortBy } from 'react-table';
 
-interface SimpleTableProps {
+interface SimpleTableProps<T = any> {
   loading?: boolean;
   error?: Error;
-  data: Array<any>;
+  data: Array<T>;
   columns: Array<Column>;
   hideHeaders?: boolean;
   useLoadingOverlay?: boolean;
@@ -36,7 +36,6 @@ export const SimpleTable = (props: SimpleTableProps) => {
   const tableRef: any = useRef();
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable(
-    // @ts-ignore
     { columns, data },
     useSortBy
   );

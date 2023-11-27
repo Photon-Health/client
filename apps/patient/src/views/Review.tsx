@@ -52,7 +52,7 @@ export const Review = () => {
         <title>{t.review.title}</title>
       </Helmet>
 
-      <Nav header={organization.name} />
+      <Nav header={organization.name} orgId={organization.id} />
 
       <Container pb={32}>
         <VStack spacing={6} align="span" pt={5}>
