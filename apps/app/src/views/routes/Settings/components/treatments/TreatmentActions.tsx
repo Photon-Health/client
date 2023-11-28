@@ -2,8 +2,8 @@ import { IconButton, HStack, useColorMode } from '@chakra-ui/react';
 import { FiTrash } from 'react-icons/fi';
 import { usePhoton } from '@photonhealth/react';
 
-import { CATALOG_TREATMENTS_FIELDS } from '../../../../model/fragments';
-import { confirmWrapper } from '../../../components/GuardDialog';
+import { CATALOG_TREATMENTS_FIELDS } from '../../../../../model/fragments';
+import { confirmWrapper } from '../../../../components/GuardDialog';
 import { Dispatch, SetStateAction } from 'react';
 
 export const TreatmentActions = (props: {

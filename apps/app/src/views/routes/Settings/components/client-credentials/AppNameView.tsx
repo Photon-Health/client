@@ -19,7 +19,6 @@ export const AppNameView = (props: AppNameViewProps) => {
       <FormLabel>Application Name</FormLabel>
       <InputGroup variant="outline">
         <Input value={name} isReadOnly placeholder={name} />
-        {/* {eslint-disable-next-line react/no-children-prop} */}
         <InputRightElement>
           <IconButton aria-label="Options" size="s" variant="ghost" />
         </InputRightElement>
