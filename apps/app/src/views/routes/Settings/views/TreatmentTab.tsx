@@ -19,10 +19,12 @@ import { useMutation } from '@apollo/client';
 
 import { CATALOG_TREATMENTS_FIELDS } from '../../../../model/fragments';
 import { SplitLayout } from '../../../components/SplitLayout';
-import { TreatmentTable } from '../components/TreatmentTable';
-import { TreatmentForm } from '../components/TreatmentForm';
-import { TreatmentActions } from '../components/TreatmentActions';
+import { TreatmentTable } from '../components/treatments/TreatmentTable';
+import { TreatmentForm } from '../components/treatments/TreatmentForm';
+import { TreatmentActions } from '../components/treatments/TreatmentActions';
 import { ADD_TO_CATALOG } from '../../../../mutations';
+import { graphql } from 'apps/app/src/gql/gql';
+import { FragmentType, useFragment } from 'apps/app/src/gql';
 
 interface MedViewProps {
   name: string;
@@ -50,10 +52,21 @@ const renderTreatmentRow = (
   };
 };
 
-export const TreatmentTab = (props: any) => {
+const organizationTreatmentTabFragment = graphql(/* GraphQL */ `
+  fragment OrganizationTreatmentTabFragment on Organization {
+    id
+    name
+  }
+`);
+
+export const TreatmentTab = ({
+  organization: organizationFragment
+}: {
+  organization?: FragmentType<typeof organizationTreatmentTabFragment>;
+}) => {
   const toast = useToast();
   const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
-  const { organization } = props;
+  const organization = useFragment(organizationTreatmentTabFragment, organizationFragment);
   const { getCatalog, getCatalogs } = usePhoton();
   const catalogs = getCatalogs();
   const catalog = getCatalog({
@@ -180,7 +193,7 @@ export const TreatmentTab = (props: any) => {
         </ModalContent>
       </Modal>
       <Text width="full" fontWeight="medium" fontSize="lg">
-        Manage {organization.organization ? `${organization.organization.name}'s` : ''} Catalog
+        Manage {organization ? `${organization.name}'s ` : ''}Catalog
       </Text>
       {error && (
         <Alert status="error" rounded="lg">

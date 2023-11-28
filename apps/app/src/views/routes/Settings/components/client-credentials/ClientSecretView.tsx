@@ -15,6 +15,7 @@ import {
 import { FiCopy, FiEye, FiEyeOff } from 'react-icons/fi';
 
 interface ClientSecretViewProps {
+  clientId: string;
   clientSecret: string;
 }
 
@@ -27,7 +28,7 @@ export const ClientSecretView = (props: ClientSecretViewProps) => {
   };
 
   return (
-    <FormControl id="client_secret">
+    <FormControl id={`client_secret-${props.clientId}`}>
       <FormLabel>Client Secret</FormLabel>
       <InputGroup>
         <Input
@@ -36,7 +37,6 @@ export const ClientSecretView = (props: ClientSecretViewProps) => {
           isReadOnly
           placeholder={clientSecret}
         />
-        {/* {eslint-disable-next-line react/no-children-prop} */}
         <InputRightElement>
           <HStack paddingRight={5}>
             <Button size="s" variant="ghost" onClick={handleClick}>
@@ -48,6 +48,7 @@ export const ClientSecretView = (props: ClientSecretViewProps) => {
               variant="ghost"
               icon={<FiCopy />}
               onClick={() => handleCopy(clientSecret)}
+              colorScheme="blue"
             />
           </HStack>
         </InputRightElement>
