@@ -88,18 +88,21 @@ export const Nav = () => {
                               icon={TbPrescription}
                               link="/prescriptions"
                               onClick={onToggle}
+                              bgIsWhite
                             />
                             <NavButton
                               label="Patients"
                               icon={FiUsers}
                               link="/patients"
                               onClick={onToggle}
+                              bgIsWhite
                             />
                             <NavButton
                               label="Orders"
                               icon={FiShoppingCart}
                               link="/orders"
                               onClick={onToggle}
+                              bgIsWhite
                             />
                           </Stack>
                         </Stack>
@@ -110,12 +113,14 @@ export const Nav = () => {
                               icon={FiHelpCircle}
                               link="/support"
                               onClick={onToggle}
+                              bgIsWhite
                             />
                             <NavButton
                               label="Settings"
                               icon={FiSettings}
                               link="/settings"
                               onClick={onToggle}
+                              bgIsWhite
                             />
                           </Stack>
                           {/* <Onboarding/> */}
