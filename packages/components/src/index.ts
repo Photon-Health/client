@@ -3,6 +3,7 @@ import Banner from './particles/Banner';
 import DoseCalculator from './systems/DoseCalculator';
 import Card from './particles/Card';
 import DraftPrescriptions from './systems/DraftPrescriptions';
+import Icon from './particles/Icon';
 import PatientInfo from './systems/PatientInfo';
 import PatientMedHistory from './systems/PatientMedHistory';
 import PharmacySelect from './systems/PharmacySelect';
@@ -26,6 +27,7 @@ export {
   Dialog,
   DoseCalculator,
   DraftPrescriptions,
+  Icon,
   PatientInfo,
   PatientMedHistory,
   PharmacySelect,

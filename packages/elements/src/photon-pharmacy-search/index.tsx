@@ -13,6 +13,8 @@ import { createEffect, createMemo, createSignal, onMount, Show, untrack } from '
 import { PharmacyStore } from '../stores/pharmacy';
 import { toTitleCase } from '../utils';
 
+import { Button } from '@photonhealth/components';
+
 customElement(
   'photon-pharmacy-search',
   {
@@ -151,16 +153,16 @@ customElement(
               <p class=" text-gray-500">Showing pharmacies near</p>
               <p>{store.pharmacies.address}</p>
             </div>
-            <photon-button
+            <Button
               class="self-end"
-              variant="outline"
+              variant="secondary"
               size="xs"
-              on:photon-clicked={() => {
+              onClick={() => {
                 setUserOverrode(true);
               }}
             >
               Change
-            </photon-button>
+            </Button>
           </div>
         </Show>
         <Show
@@ -175,16 +177,16 @@ customElement(
             <div class="flex flex-col font-sans text-sm">
               <p class=" text-gray-500">Showing preferred pharmacy</p>
             </div>
-            <photon-button
-              variant="outline"
+            <Button
+              variant="secondary"
               size="xs"
-              on:photon-clicked={() => {
+              onClick={() => {
                 dispatchRemoved();
                 setUserOverrode(true);
               }}
             >
               Change
-            </photon-button>
+            </Button>
           </div>
         </Show>
         <Show

@@ -3,7 +3,8 @@ import { customElement } from 'solid-element';
 import { createSignal, onMount } from 'solid-js';
 import { usePhoton } from '../context';
 import jwtDecode from 'jwt-decode';
-import { triggerToast } from '@photonhealth/components';
+import { triggerToast, Button } from '@photonhealth/components';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import PhotonFormWrapper from '../photon-form-wrapper';
 import { PatientStore } from '../stores/patient';
 
@@ -103,9 +104,11 @@ customElement(
       setTriggerSubmit(true);
     };
     const handleUnsavedCancel = () => setContinueSubmitOpen(false);
-
+    const variants = ['primary', 'secondary', 'tertiary', 'naked'];
+    const sizes = ['xs', 'sm', 'md', 'lg', 'xl'];
     return (
       <div ref={ref}>
+        <style>{photonStyles}</style>
         <photon-dialog
           label="Lose Unsaved Prescription?"
           open={continueSubmitOpen()}
@@ -159,10 +162,10 @@ customElement(
           titleIconName="prescription"
           headerRight={
             props.enableOrder ? (
-              <photon-button
-                size="sm"
+              <Button
+                size="md"
                 loading={triggerSubmit()}
-                on:photon-clicked={() => {
+                onClick={() => {
                   if (!canSubmit() || !canWritePrescription()) {
                     // show info error
                     triggerToast({
@@ -178,14 +181,14 @@ customElement(
                 }}
               >
                 Send Order
-              </photon-button>
+              </Button>
             ) : (
               <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
-                <photon-button
-                  size="sm"
-                  variant="outline"
+                <Button
+                  size="md"
+                  variant="secondary"
                   loading={triggerSubmit() && !isCreateOrder()}
-                  on:photon-clicked={() => {
+                  onClick={() => {
                     if (!canSubmit() || !canWritePrescription()) {
                       triggerToast({
                         status: 'info',
@@ -197,11 +200,11 @@ customElement(
                   }}
                 >
                   Save prescriptions
-                </photon-button>
-                <photon-button
-                  size="sm"
+                </Button>
+                <Button
+                  size="md"
                   loading={triggerSubmit() && isCreateOrder()}
-                  on:photon-clicked={() => {
+                  onClick={() => {
                     if (!canSubmit() || !canWritePrescription()) {
                       triggerToast({
                         status: 'info',
@@ -218,7 +221,7 @@ customElement(
                   }}
                 >
                   Save and create order
-                </photon-button>
+                </Button>
               </div>
             )
           }

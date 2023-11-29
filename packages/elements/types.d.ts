@@ -4,7 +4,6 @@ declare module 'solid-js' {
   namespace JSX {
     interface IntrinsicElements {
       'photon-login': unknown;
-      'photon-button': unknown;
       'photon-auth-button': unknown;
       'photon-patient-select': unknown;
       'photon-auth-wrapper': unknown;
