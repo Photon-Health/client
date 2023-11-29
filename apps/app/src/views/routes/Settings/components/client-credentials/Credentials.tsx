@@ -109,11 +109,11 @@ export const Credentials = () => {
           </Text>
         )}
         <Stack spacing={6}>
-          {clients?.map((clientCreds) => {
+          {clients?.map((clientCreds, idx) => {
             return (
               <Fragment key={clientCreds.id}>
                 <ClientInfoCard clientCreds={clientCreds} />
-                <Divider />
+                {idx !== clients.length - 1 && <Divider />}
               </Fragment>
             );
           })}
