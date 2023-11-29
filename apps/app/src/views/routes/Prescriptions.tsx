@@ -381,7 +381,7 @@ export const Prescriptions = () => {
         loading={loading}
         error={error}
         ctaText="New Prescription"
-        ctaColor="green"
+        ctaColor="blue"
         ctaRoute="/prescriptions/new"
         filterText={filterText}
         setFilterText={setFilterText}
