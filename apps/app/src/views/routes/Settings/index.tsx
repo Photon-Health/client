@@ -152,7 +152,7 @@ export const Settings = () => {
         </Center>
       ) : (
         <Tabs index={tabIndex} onChange={handleTabsChange} isLazy maxWidth="100%">
-          <TabList overflowX={'auto'}>
+          <TabList overflowX={'auto'} overflowY={'hidden'}>
             <Tab>User</Tab>
             <Tab hidden={!hasTeam}>Team</Tab>
             <Tab hidden={!hasOrg}>Organization</Tab>
