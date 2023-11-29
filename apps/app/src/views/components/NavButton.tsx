@@ -6,10 +6,11 @@ interface NavButtonProps extends ButtonProps {
   label: string;
   link: string;
   bgIsWhite?: boolean;
+  iconColor?: string;
 }
 
 export const NavButton = (props: NavButtonProps) => {
-  const { icon, label, link, bgIsWhite, ...buttonProps } = props;
+  const { icon, label, link, bgIsWhite, iconColor, ...buttonProps } = props;
   const theme = useTheme();
 
   const resolved = useResolvedPath(link);
@@ -38,7 +39,11 @@ export const NavButton = (props: NavButtonProps) => {
       {...buttonProps}
     >
       <HStack spacing="3">
-        <Icon as={icon} boxSize="5" color={!label ? 'white' : theme.colors.slate[iconSlateShade]} />
+        <Icon
+          as={icon}
+          boxSize="5"
+          color={iconColor ?? (!label ? 'white' : theme.colors.slate[iconSlateShade])}
+        />
         {label && <Text>{label}</Text>}
       </HStack>
     </Button>
