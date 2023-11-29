@@ -33,7 +33,7 @@ export const Nav = () => {
   const { isOpen, onClose, onToggle } = useDisclosure();
 
   return (
-    <Box as="nav" bg="bg-surface" py="3" boxShadow={useColorModeValue('sm', 'sm-dark')}>
+    <Box as="nav" bg="navy" py="3">
       <Container>
         <Flex justifyContent="space-between">
           <HStack>
@@ -79,27 +79,30 @@ export const Nav = () => {
                       py={{ base: '6', sm: '8' }}
                       px={{ base: '4', sm: '6' }}
                     >
-                      <Stack justify="space-between" spacing="1">
+                      <Stack justify="space-between" align="center" spacing="1">
                         <Stack spacing={{ base: '5', sm: '6' }} shouldWrapChildren>
-                          <Logo />
+                          <Logo bgIsWhite />
                           <Stack spacing="1">
                             <NavButton
                               label="Prescriptions"
                               icon={TbPrescription}
                               link="/prescriptions"
                               onClick={onToggle}
+                              bgIsWhite
                             />
                             <NavButton
                               label="Patients"
                               icon={FiUsers}
                               link="/patients"
                               onClick={onToggle}
+                              bgIsWhite
                             />
                             <NavButton
                               label="Orders"
                               icon={FiShoppingCart}
                               link="/orders"
                               onClick={onToggle}
+                              bgIsWhite
                             />
                           </Stack>
                         </Stack>
@@ -110,12 +113,14 @@ export const Nav = () => {
                               icon={FiHelpCircle}
                               link="/support"
                               onClick={onToggle}
+                              bgIsWhite
                             />
                             <NavButton
                               label="Settings"
                               icon={FiSettings}
                               link="/settings"
                               onClick={onToggle}
+                              bgIsWhite
                             />
                           </Stack>
                           {/* <Onboarding/> */}
