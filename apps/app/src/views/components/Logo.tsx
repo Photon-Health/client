@@ -1,17 +1,17 @@
-import { chakra, HTMLChakraProps, useColorModeValue } from '@chakra-ui/react';
+import { chakra, HTMLChakraProps, useTheme } from '@chakra-ui/react';
 
-export const Logo = (props: HTMLChakraProps<'svg'>) => {
-  const text = useColorModeValue('#273D52', 'white');
+export const Logo = ({ bgIsWhite, ...rest }: HTMLChakraProps<'svg'> & { bgIsWhite?: boolean }) => {
+  const theme = useTheme();
   return (
     <chakra.svg
       color="accent"
       height="7"
       width="auto"
-      viewBox="0 0 305 62.61"
+      viewBox="0 0 305 58"
       xmlns="http://www.w3.org/2000/svg"
-      {...props}
+      {...rest}
     >
-      <g fill={text}>
+      <g fill={bgIsWhite ? theme.colors.navy : '#FFFFFF'}>
         <path d="M0 54.1169H6.81375V35.7722H18.0826C29.5481 35.7722 34.3963 30.3343 34.3963 18.7378V17.4275C34.3963 5.76548 29.417 0.655167 18.0826 0.655167H0V54.1169ZM6.81375 30.1377V6.28961H18.2792C24.7653 6.28961 27.386 8.9758 27.386 16.0516V20.0481C27.386 27.1895 24.7653 30.1377 18.2792 30.1377H6.81375Z" />
         <path d="M70.9593 54.1169H77.773V0.655167H70.9593V24.4378H50.8456V0.655167H44.0319V54.1169H50.8456V30.3343H70.9593V54.1169Z" />
         <path d="M107.146 54.772C119.528 54.772 125.687 46.5169 125.687 34.9205V19.7861C125.687 8.25511 119.528 0 107.146 0C94.6974 0 88.5388 8.25511 88.5388 19.7861V34.9205C88.5388 46.5169 94.6974 54.772 107.146 54.772ZM95.5491 35.9687V18.8033C95.5491 10.7448 99.4801 5.89651 107.146 5.89651C114.745 5.89651 118.677 10.7448 118.677 18.8033V35.9687C118.677 44.0928 114.745 48.8755 107.146 48.8755C99.4801 48.8755 95.5491 44.0928 95.5491 35.9687Z" />
