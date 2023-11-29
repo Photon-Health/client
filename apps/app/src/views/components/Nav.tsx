@@ -22,7 +22,9 @@ import {
   useBreakpointValue,
   useColorModeValue,
   useDisclosure,
-  useTheme
+  useTheme,
+  Text,
+  VStack
 } from '@chakra-ui/react';
 
 import {
@@ -92,6 +94,14 @@ export const Nav = () => {
                   </Tooltip>
                 </MenuButton>
                 <MenuList>
+                  <MenuItem as={VStack} alignItems={'start'}>
+                    <Text fontWeight="medium" fontSize="sm">
+                      {user?.name}
+                    </Text>
+                    <Text color="muted" fontSize="sm">
+                      {user?.email}
+                    </Text>
+                  </MenuItem>
                   <MenuItem
                     as={RouterLink}
                     to="/settings"
