@@ -45,7 +45,7 @@ const usersQuery = graphql(/* GraphQL */ `
 export const UsersList = (props: { rolesMap: Record<string, string> }) => {
   const client = useClinicalApiClient();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data, error, loading } = useQuery(usersQuery, { client });
+  const { data, error, loading } = useQuery(usersQuery, { client, errorPolicy: 'ignore' });
 
   const hasUsers = usePermissions(['edit:profile', 'read:profile']);
   const hasInvite = usePermissions(['write:invite']);
