@@ -16,7 +16,6 @@ import { useQuery } from '@apollo/client';
 import { AddIcon } from '@chakra-ui/icons';
 import { graphql } from 'apps/app/src/gql';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
-import { Auth } from '../../components/Auth';
 import { Page } from '../../components/Page';
 import { useClinicalApiClient } from './apollo';
 import { InviteForm } from './components/invites/InviteForm';
@@ -71,7 +70,7 @@ const AddProviderButton = ({ disabled = false }: { disabled?: boolean }) => {
 const Buttons = ({ orgId, hasInvite }: { orgId: string | undefined; hasInvite: boolean }) => (
   <HStack>
     {hasInvite && <AddProviderButton disabled={orgId == null} />}
-    <Auth />
+    {/* <Auth /> */}
   </HStack>
 );
 

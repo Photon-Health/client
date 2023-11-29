@@ -3,34 +3,60 @@ import {
   Box,
   ButtonGroup,
   Container,
+  Divider,
+  Drawer,
+  DrawerContent,
+  DrawerOverlay,
   Flex,
   HStack,
-  LinkBox,
+  Icon,
   IconButton,
+  LinkBox,
+  Menu,
+  MenuButton,
+  MenuDivider,
+  MenuItem,
+  MenuList,
+  Stack,
   Tooltip,
-  useColorModeValue,
   useBreakpointValue,
-  Drawer,
-  DrawerOverlay,
-  DrawerContent,
+  useColorModeValue,
   useDisclosure,
-  Divider,
-  Stack
+  useTheme
 } from '@chakra-ui/react';
 
-import { FiShoppingCart, FiSettings, FiUsers, FiMenu, FiHelpCircle } from 'react-icons/fi';
+import {
+  FiHelpCircle,
+  FiLogOut,
+  FiMenu,
+  FiSettings,
+  FiShoppingCart,
+  FiUsers
+} from 'react-icons/fi';
 import { TbPrescription } from 'react-icons/tb';
 
-import { Link as RouterLink } from 'react-router-dom';
+import { getSettings } from '@client/settings';
 import { usePhoton } from '@photonhealth/react';
+import { useCallback } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import { Logo } from './Logo';
 import { NavButton } from './NavButton';
 import { UserProfile } from './UserProfile';
 
+const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
+const settings = getSettings(envName);
+
 export const Nav = () => {
-  const { user } = usePhoton();
+  const theme = useTheme();
   const isDesktop = useBreakpointValue({ base: false, lg: true });
   const { isOpen, onClose, onToggle } = useDisclosure();
+  const { user, logout } = usePhoton();
+  const orgSettings = user?.org_id in settings ? settings[user?.org_id] : settings.default;
+
+  const onLogout = useCallback(() => {
+    localStorage.removeItem('previouslyAuthed');
+    logout({ returnTo: orgSettings.returnTo, federated: orgSettings.federated });
+  }, [logout, orgSettings]);
 
   return (
     <Box as="nav" bg="navy" py="3">
@@ -52,16 +78,39 @@ export const Nav = () => {
             <HStack spacing="4">
               <ButtonGroup variant="ghost" spacing="1">
                 {/* <NavButton label="" icon={FiSearch} link="/search" /> */}
-                <NavButton label="" icon={FiSettings} link="/settings" />
+                {/* <NavButton label="" icon={FiSettings} link="/settings" /> */}
                 <NavButton label="" icon={FiHelpCircle} link="/support" />
               </ButtonGroup>
-              <Tooltip label={user?.name} aria-label={user?.name}>
-                <Avatar
-                  name={typeof user?.name === 'string' ? user.name : ''}
-                  src={typeof user?.image === 'string' ? user.image : ''}
-                  boxSize="10"
-                />
-              </Tooltip>
+              <Menu>
+                <MenuButton>
+                  <Tooltip label={user?.name} aria-label={user?.name}>
+                    <Avatar
+                      name={typeof user?.name === 'string' ? user.name : ''}
+                      src={typeof user?.image === 'string' ? user.image : ''}
+                      boxSize="10"
+                    />
+                  </Tooltip>
+                </MenuButton>
+                <MenuList>
+                  <MenuItem
+                    as={RouterLink}
+                    to="/settings"
+                    icon={<Icon as={FiSettings} boxSize="4" color={theme.colors.slate['500']} />}
+                    fontSize={'sm'}
+                  >
+                    Settings
+                  </MenuItem>
+                  <MenuDivider />
+                  <MenuItem
+                    textColor="red"
+                    onClick={onLogout}
+                    fontSize={'sm'}
+                    icon={<Icon as={FiLogOut} boxSize="4" />}
+                  >
+                    Logout
+                  </MenuItem>
+                </MenuList>
+              </Menu>
             </HStack>
           ) : (
             <>
@@ -121,6 +170,15 @@ export const Nav = () => {
                               link="/settings"
                               onClick={onToggle}
                               bgIsWhite
+                            />
+                            <NavButton
+                              label="Logout"
+                              onClick={onLogout}
+                              textColor="red"
+                              iconColor="red"
+                              icon={FiLogOut}
+                              bgIsWhite
+                              link=""
                             />
                           </Stack>
                           {/* <Onboarding/> */}
