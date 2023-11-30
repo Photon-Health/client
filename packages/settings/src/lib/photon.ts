@@ -189,5 +189,11 @@ export const photon: {
     ...defaultSettings,
     logo: 'openloop_logo.png',
     accentColor: '#E90C54'
+  },
+  // PM Pediatrics Care
+  : {
+    ...defaultSettings,
+    logo: 'pm_pediatrics_logo.svg',
+    accentColor: '#4D15B7'
   }
 };
