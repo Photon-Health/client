@@ -19,7 +19,7 @@ import { createEffect, onMount, createSignal, Show, For } from 'solid-js';
 import type { FormError } from '../stores/form';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
-import { Spinner, Toaster } from '@photonhealth/components';
+import { Spinner, Toaster, Button } from '@photonhealth/components';
 import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import { AddPrescriptionCard } from './components/AddPrescriptionCard';
 import { PatientCard } from './components/PatientCard';
@@ -420,21 +420,13 @@ customElement(
                   </Show>
                   <div class="flex flex-row justify-end gap-2">
                     <Show when={!showForm()}>
-                      <photon-button
-                        class="min-w-min"
-                        variant="outline"
-                        on:photon-clicked={async () => setShowForm(true)}
-                      >
-                        {'Add Prescription'}
-                      </photon-button>
+                      <Button variant="secondary" onClick={() => setShowForm(true)}>
+                        Add Prescription
+                      </Button>
                     </Show>
-                    <photon-button
-                      class="min-w-min"
-                      loading={isLoading()}
-                      on:photon-clicked={async () => await submitForm(props.enableOrder)}
-                    >
+                    <Button loading={isLoading()} onClick={() => submitForm(props.enableOrder)}>
                       {props.enableOrder ? 'Send Order' : 'Save Prescriptions'}
-                    </photon-button>
+                    </Button>
                   </div>
                 </Show>
               </Show>
