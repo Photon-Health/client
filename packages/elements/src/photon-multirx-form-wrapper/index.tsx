@@ -104,8 +104,7 @@ customElement(
       setTriggerSubmit(true);
     };
     const handleUnsavedCancel = () => setContinueSubmitOpen(false);
-    const variants = ['primary', 'secondary', 'tertiary', 'naked'];
-    const sizes = ['xs', 'sm', 'md', 'lg', 'xl'];
+
     return (
       <div ref={ref}>
         <style>{photonStyles}</style>
