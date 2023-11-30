@@ -13,6 +13,7 @@ import {
 import gql from 'graphql-tag';
 import { GraphQLError } from 'graphql';
 import jwtDecode from 'jwt-decode';
+import { clinicalApolloClient } from './clinicalApolloClient';
 
 const defaultOnRedirectCallback = (appState?: any): void => {
   window.location.replace(appState?.returnTo || window.location.pathname);
@@ -43,6 +44,7 @@ const CATALOG_TREATMENTS_FIELDS = gql`
 
 export class PhotonClientStore {
   public readonly sdk: PhotonClient;
+  public readonly clinicalApolloClient: ReturnType<typeof clinicalApolloClient>;
   private setStore;
   private store;
   public authentication: {
@@ -118,6 +120,7 @@ export class PhotonClientStore {
   };
   public constructor(sdk: PhotonClient) {
     this.sdk = sdk;
+    this.clinicalApolloClient = clinicalApolloClient(sdk);
     const [store, setStore] = createStore<{
       authentication: {
         isAuthenticated: boolean;
@@ -125,7 +128,7 @@ export class PhotonClientStore {
         isLoading: boolean;
         permissions: Permission[];
         error?: string;
-        user: any;
+        user: Awaited<ReturnType<PhotonClient['authentication']['getUser']>>;
       };
       catalog: {
         isLoading: boolean;

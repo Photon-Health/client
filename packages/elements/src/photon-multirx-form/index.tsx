@@ -30,6 +30,7 @@ import { PharmacyCard } from './components/PharmacyCard';
 import { PhotonAuthorized } from '../photon-authorized';
 
 import type { TemplateOverrides } from '@photonhealth/components';
+import { NeedsSignatureAttestationWrapper } from './components/signatureAttestation/SignatureAttestation';
 
 export type Address = {
   city: string;
@@ -351,85 +352,88 @@ customElement(
               </div>
             </Show>
             <PhotonAuthorized permissions={['write:prescription']}>
-              <PatientCard
-                actions={actions}
-                store={store}
-                patientId={props.patientId}
-                client={client!}
-                enableOrder={props.enableOrder}
-                address={props.address}
-                weight={props.weight}
-                weightUnit={props.weightUnit}
-                enableMedHistory={props.enableMedHistory}
-              />
-              <Show
-                when={
-                  store.patient?.value?.address || (store.patient?.value?.id && !props.enableOrder)
-                }
-              >
-                <Show when={showForm() || isEditing()}>
-                  <div ref={prescriptionRef}>
-                    <AddPrescriptionCard
-                      hideAddToTemplates={props.hideTemplates}
-                      actions={actions}
-                      store={store}
-                      weight={props.weight}
-                      weightUnit={props.weightUnit}
-                    />
-                  </div>
-                </Show>
-                <DraftPrescriptionCard
-                  templateIds={props.templateIds?.split(',') || []}
-                  templateOverrides={props.templateOverrides || {}}
-                  prescriptionIds={props.prescriptionIds?.split(',') || []}
-                  prescriptionRef={prescriptionRef}
+              <NeedsSignatureAttestationWrapper>
+                <PatientCard
                   actions={actions}
                   store={store}
-                  setIsEditing={setIsEditing}
+                  patientId={props.patientId}
+                  client={client!}
+                  enableOrder={props.enableOrder}
+                  address={props.address}
+                  weight={props.weight}
+                  weightUnit={props.weightUnit}
+                  enableMedHistory={props.enableMedHistory}
                 />
-                <Show when={props.enableOrder && !props.pharmacyId}>
-                  <OrderCard
-                    store={store}
-                    actions={actions}
-                    enableLocalPickup={props.enableLocalPickup}
-                    enableSendToPatient={props.enableSendToPatient}
-                    mailOrderIds={props.mailOrderIds}
-                  />
-                </Show>
-                <Show when={props.enableOrder && props.pharmacyId}>
-                  <PharmacyCard pharmacyId={props.pharmacyId} />
-                </Show>
-                <Show when={!props.hideSubmit}>
-                  {/* We're hiding this alert message if enable-order is set, a rough way to let us know this is not in the App.
-                The issue we're having is when props are passed and cards are hidden, the form is not showing validation errors. */}
-                  <Show when={errors().length > 0 && props.enableOrder}>
-                    <div class="m-3">
-                      <For each={errors()} fallback={<div>No errors...</div>}>
-                        {({ key, error }: { key: string; error: string }) => (
-                          <sl-alert variant="warning" open>
-                            <sl-icon slot="icon" name="exclamation-triangle" />
-                            <strong>Error with {key}: </strong>
-                            <br />
-                            {error}
-                            <br />
-                            {JSON.stringify(store?.[key]?.value || {})}
-                          </sl-alert>
-                        )}
-                      </For>
+                <Show
+                  when={
+                    store.patient?.value?.address ||
+                    (store.patient?.value?.id && !props.enableOrder)
+                  }
+                >
+                  <Show when={showForm() || isEditing()}>
+                    <div ref={prescriptionRef}>
+                      <AddPrescriptionCard
+                        hideAddToTemplates={props.hideTemplates}
+                        actions={actions}
+                        store={store}
+                        weight={props.weight}
+                        weightUnit={props.weightUnit}
+                      />
                     </div>
                   </Show>
-                  <div class="flex flex-row justify-end gap-2">
-                    <Show when={!showForm()}>
-                      <Button variant="secondary" onClick={() => setShowForm(true)}>
-                        Add Prescription
-                      </Button>
+                  <DraftPrescriptionCard
+                    templateIds={props.templateIds?.split(',') || []}
+                    templateOverrides={props.templateOverrides || {}}
+                    prescriptionIds={props.prescriptionIds?.split(',') || []}
+                    prescriptionRef={prescriptionRef}
+                    actions={actions}
+                    store={store}
+                    setIsEditing={setIsEditing}
+                  />
+                  <Show when={props.enableOrder && !props.pharmacyId}>
+                    <OrderCard
+                      store={store}
+                      actions={actions}
+                      enableLocalPickup={props.enableLocalPickup}
+                      enableSendToPatient={props.enableSendToPatient}
+                      mailOrderIds={props.mailOrderIds}
+                    />
+                  </Show>
+                  <Show when={props.enableOrder && props.pharmacyId}>
+                    <PharmacyCard pharmacyId={props.pharmacyId} />
+                  </Show>
+                  <Show when={!props.hideSubmit}>
+                    {/* We're hiding this alert message if enable-order is set, a rough way to let us know this is not in the App.
+                The issue we're having is when props are passed and cards are hidden, the form is not showing validation errors. */}
+                    <Show when={errors().length > 0 && props.enableOrder}>
+                      <div class="m-3">
+                        <For each={errors()} fallback={<div>No errors...</div>}>
+                          {({ key, error }: { key: string; error: string }) => (
+                            <sl-alert variant="warning" open>
+                              <sl-icon slot="icon" name="exclamation-triangle" />
+                              <strong>Error with {key}: </strong>
+                              <br />
+                              {error}
+                              <br />
+                              {JSON.stringify(store?.[key]?.value || {})}
+                            </sl-alert>
+                          )}
+                        </For>
+                      </div>
                     </Show>
-                    <Button loading={isLoading()} onClick={() => submitForm(props.enableOrder)}>
-                      {props.enableOrder ? 'Send Order' : 'Save Prescriptions'}
-                    </Button>
-                  </div>
+                    <div class="flex flex-row justify-end gap-2">
+                      <Show when={!showForm()}>
+                        <Button variant="secondary" onClick={() => setShowForm(true)}>
+                          Add Prescription
+                        </Button>
+                      </Show>
+                      <Button loading={isLoading()} onClick={() => submitForm(props.enableOrder)}>
+                        {props.enableOrder ? 'Send Order' : 'Save Prescriptions'}
+                      </Button>
+                    </div>
+                  </Show>
                 </Show>
-              </Show>
+              </NeedsSignatureAttestationWrapper>
             </PhotonAuthorized>
           </div>
         </div>

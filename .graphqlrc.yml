@@ -11,3 +11,7 @@ projects:
     schema: ['http://clinical-api.boson.health/graphql']
     documents: ['apps/app/**/Settings/**/*.{ts,tsx}']
     extensions: { languageService: { cacheSchemaFileForLookup: true } }
+  'elements-v2':
+    schema: ['http://clinical-api.boson.health/graphql']
+    documents: ['element/**/signatureAttestation/*.{ts,tsx}']
+    extensions: { languageService: { cacheSchemaFileForLookup: true } }
