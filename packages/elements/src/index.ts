@@ -11,7 +11,6 @@ import './photon-datepicker';
 import './photon-number-input';
 import './photon-dispense-units';
 import './photon-textarea';
-import './photon-pharmacy-search';
 import './photon-text-input';
 import './photon-dialog';
 import './photon-phone-input';
