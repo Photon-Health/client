@@ -36,7 +36,7 @@ export default function Button(props: ButtonProps) {
         'px-2.5 py-1.5': otherProps.size === 'md' && otherProps.variant !== 'naked',
         'px-2 py-1':
           (otherProps.size === 'sm' || otherProps.size === 'xs') && otherProps.variant !== 'naked',
-        'text-white bg-blue-600 hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:bg-blue-500':
+        'text-white bg-blue-500 hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2':
           otherProps.variant === 'primary',
         'rounded bg-white text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50':
           otherProps.variant === 'secondary',
@@ -50,7 +50,7 @@ export default function Button(props: ButtonProps) {
   );
 
   return (
-    <button {...buttonProps} class={buttonClasses()} type={props.type || 'button'}>
+    <button {...buttonProps} class={buttonClasses()} type={props?.type}>
       <Show when={otherProps?.loading}>
         <Spinner size="sm" />
       </Show>

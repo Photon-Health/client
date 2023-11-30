@@ -1,9 +1,11 @@
 import { customElement } from 'solid-element';
 import { createSignal, Show } from 'solid-js';
 import { size, string } from 'superstruct';
+import { Button } from '@photonhealth/components';
 import { usePhoton } from '../context';
 import PhotonFormWrapper from '../photon-form-wrapper';
 import { message } from '../validators';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 type PatientDialogProps = {
   patientId: string;
@@ -178,6 +180,7 @@ customElement(
 
     return (
       <div ref={ref}>
+        <style>{photonStyles}</style>
         <Show when={props.open}>
           <PhotonFormWrapper
             onClosed={() => {
@@ -190,24 +193,24 @@ customElement(
             headerRight={
               <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
                 <Show when={!props?.hideCreatePrescription}>
-                  <photon-button
+                  <Button
                     size="sm"
-                    variant="outline"
+                    variant="secondary"
                     disabled={loading()}
                     loading={loading() && isCreatePrescription()}
                     onClick={() => submitForm(formStore(), actions(), selectedStore(), true)}
                   >
                     Save and Create Prescription
-                  </photon-button>
+                  </Button>
                 </Show>
-                <photon-button
+                <Button
                   size="sm"
                   disabled={loading()}
                   loading={loading() && !isCreatePrescription()}
                   onClick={() => submitForm(formStore(), actions(), selectedStore(), false)}
                 >
                   Save
-                </photon-button>
+                </Button>
               </div>
             }
             form={

@@ -1,7 +1,7 @@
 import { customElement } from 'solid-element';
 import { createEffect, onCleanup, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
-import { Spinner } from '@photonhealth/components';
+import { Spinner, PharmacySearch } from '@photonhealth/components';
 import { usePhoton } from '../context';
 import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
@@ -397,16 +397,16 @@ customElement(
               </div>
               <hr class="py-2" />
               <p class="font-sans text-lg flex-grow">Preferred Local Pharmacy</p>
-              <photon-pharmacy-search
-                on:photon-pharmacy-selected={(e: any) => {
+              <PharmacySearch
+                address={getPatientAddress(pStore, store)}
+                setPharmacy={(pharmacy: any) => {
                   actions.updateFormValue({
                     key: 'preferredPharmacy',
-                    value: e.detail.pharmacy.id
+                    value: pharmacy.id
                   });
                 }}
-                address={getPatientAddress(pStore, store)}
-                patient-id={props.patientId}
-                selected={pStore.selectedPatient.data?.preferredPharmacies?.[0]?.id}
+                patientId={props.patientId}
+                hidePreferred
               />
             </photon-card>
           </PhotonAuthorized>
