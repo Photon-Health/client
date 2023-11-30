@@ -1,4 +1,5 @@
 import { createSignal, JSX, mergeProps, Show } from 'solid-js';
+import { Button, Icon } from '@photonhealth/components';
 import tailwind from '../tailwind.css?inline';
 
 export type PhotonFormWrapperProps = {
@@ -50,23 +51,21 @@ const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
       {/* Wrapper */}
       <header class="flex flex-col md:flex-row items-center px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full z-10 shadow-card">
         <div class="flex justify-start md:flex-1 absolute md:static left-4">
-          <photon-button
-            class="close-button"
-            size="small"
-            circle
-            on:click={() => {
+          <Button
+            variant="naked"
+            size="sm"
+            onClick={() => {
               if (props.checkShouldWarn()) {
                 onCloseDialogOpen(true);
               } else {
                 props.onClosed();
               }
             }}
-            variant="naked"
           >
             <div class="text-black text-xl md:text-3xl">
-              <sl-icon style={{ display: 'block' }} name="x" />
+              <Icon name="xMark" />
             </div>
-          </photon-button>
+          </Button>
         </div>
         <div class="mb-2 md:mb-0 flex flex-0 md:flex-1 justify-center md:justify-center items-center">
           <Show when={props.titleIconName}>

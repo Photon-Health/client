@@ -1,3 +1,4 @@
+/// <reference types="@types/google.maps" />
 import { PhotonClient } from '@photonhealth/sdk';
 import { Pharmacy, FulfillmentType } from '@photonhealth/sdk/dist/types';
 import { GraphQLError } from 'graphql';

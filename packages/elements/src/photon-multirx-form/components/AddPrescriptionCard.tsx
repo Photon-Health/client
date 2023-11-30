@@ -1,7 +1,7 @@
 import { afterDate, message } from '../../validators';
 import { record, string, any, number, min, size } from 'superstruct';
 import { format } from 'date-fns';
-import { Card, Text } from '@photonhealth/components';
+import { Card, Text, Button, Icon } from '@photonhealth/components';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
 import { DoseCalculator, triggerToast } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
@@ -60,6 +60,72 @@ export const AddPrescriptionCard = (props: {
       });
     }
   });
+
+  const handleAddPrescription = () => {
+    const keys = [
+      'treatment',
+      'effectiveDate',
+      'dispenseQuantity',
+      'daysSupply',
+      'refillsInput',
+      'instructions'
+    ];
+    props.actions.validate(keys);
+    const errorsPresent = props.actions.hasErrors(keys);
+    if (!errorsPresent) {
+      props.actions.updateFormValue({
+        key: 'draftPrescriptions',
+        value: [
+          ...(props.store.draftPrescriptions?.value || []),
+          {
+            id: String(Math.random()),
+            effectiveDate: props.store.effectiveDate.value,
+            treatment: props.store.treatment.value,
+            dispenseAsWritten: props.store.dispenseAsWritten.value,
+            dispenseQuantity: props.store.dispenseQuantity.value,
+            dispenseUnit: props.store.dispenseUnit.value,
+            daysSupply: props.store.daysSupply.value,
+            refillsInput: props.store.refillsInput.value,
+            instructions: props.store.instructions.value,
+            notes: props.store.notes.value,
+            fillsAllowed: props.store.refillsInput.value + 1,
+            addToTemplates: props.store.addToTemplates?.value ?? false,
+            catalogId: props.store.catalogId.value ?? undefined
+          }
+        ]
+      });
+      props.actions.updateFormValue({
+        key: 'effectiveDate',
+        value: format(new Date(), 'yyyy-MM-dd').toString()
+      });
+      props.actions.clearKeys([
+        'treatment',
+        'dispenseAsWritten',
+        'dispenseQuantity',
+        'dispenseUnit',
+        'daysSupply',
+        'refillsInput',
+        'instructions',
+        'notes'
+      ]);
+      setOffCatalog(undefined);
+      clearForm(
+        props.actions,
+        props.weight ? { notes: patientWeight(props.weight, props?.weightUnit) } : undefined
+      );
+      triggerToast({
+        status: 'success',
+        header: 'Prescription Added',
+        body: 'You can send this order or add another prescription before sending it'
+      });
+    } else {
+      triggerToast({
+        status: 'info',
+        body: 'Some items in the form are incomplete, please check for errors'
+      });
+    }
+  };
+
   return (
     <div ref={ref}>
       <style>{photonStyles}</style>
@@ -153,7 +219,7 @@ export const AddPrescriptionCard = (props: {
             />
           </div>
           <div class="mt-2 sm:mt-0 sm:grid sm:grid-cols-2 sm:gap-4">
-            <div class="flex items-end gap-1">
+            <div class="flex items-end gap-1 items-stretch">
               <photon-number-input
                 class="flex-grow flex-1 w-2/5 sm:w-auto"
                 label="Quantity"
@@ -198,15 +264,17 @@ export const AddPrescriptionCard = (props: {
                 }}
               />
               <div>
-                <photon-button
-                  variant="outline"
+                <Button
+                  variant="secondary"
                   class="w-fit"
-                  on:photon-clicked={() => setOpenDoseCalculator(true)}
+                  onClick={() => setOpenDoseCalculator(true)}
+                  style={{
+                    // ya, it ain't pretty, but it works. just need it for a lil bit longer
+                    height: '40px'
+                  }}
                 >
-                  <button aria-label="open calculator" onClick={() => setOpenDoseCalculator(true)}>
-                    <sl-icon name="calculator" />
-                  </button>
-                </photon-button>
+                  <Icon name="calculator" size="sm" />
+                </Button>
                 <div style={{ height: '23px' }} class="pt-1" />
               </div>
             </div>
@@ -296,77 +364,9 @@ export const AddPrescriptionCard = (props: {
               />
             </Show>
             <div class="flex flex-grow justify-end">
-              <photon-button
-                class="w-full xs:w-fit"
-                on:photon-clicked={() => {
-                  const keys = [
-                    'treatment',
-                    'effectiveDate',
-                    'dispenseQuantity',
-                    'daysSupply',
-                    'refillsInput',
-                    'instructions'
-                  ];
-                  props.actions.validate(keys);
-                  const errorsPresent = props.actions.hasErrors(keys);
-                  if (!errorsPresent) {
-                    props.actions.updateFormValue({
-                      key: 'draftPrescriptions',
-                      value: [
-                        ...(props.store.draftPrescriptions?.value || []),
-                        {
-                          id: String(Math.random()),
-                          effectiveDate: props.store.effectiveDate.value,
-                          treatment: props.store.treatment.value,
-                          dispenseAsWritten: props.store.dispenseAsWritten.value,
-                          dispenseQuantity: props.store.dispenseQuantity.value,
-                          dispenseUnit: props.store.dispenseUnit.value,
-                          daysSupply: props.store.daysSupply.value,
-                          refillsInput: props.store.refillsInput.value,
-                          instructions: props.store.instructions.value,
-                          notes: props.store.notes.value,
-                          fillsAllowed: props.store.refillsInput.value + 1,
-                          addToTemplates: props.store.addToTemplates?.value ?? false,
-                          catalogId: props.store.catalogId.value ?? undefined
-                        }
-                      ]
-                    });
-                    props.actions.updateFormValue({
-                      key: 'effectiveDate',
-                      value: format(new Date(), 'yyyy-MM-dd').toString()
-                    });
-                    props.actions.clearKeys([
-                      'treatment',
-                      'dispenseAsWritten',
-                      'dispenseQuantity',
-                      'dispenseUnit',
-                      'daysSupply',
-                      'refillsInput',
-                      'instructions',
-                      'notes'
-                    ]);
-                    setOffCatalog(undefined);
-                    clearForm(
-                      props.actions,
-                      props.weight
-                        ? { notes: patientWeight(props.weight, props?.weightUnit) }
-                        : undefined
-                    );
-                    triggerToast({
-                      status: 'success',
-                      header: 'Prescription Added',
-                      body: 'You can send this order or add another prescription before sending it'
-                    });
-                  } else {
-                    triggerToast({
-                      status: 'info',
-                      body: 'Some items in the form are incomplete, please check for errors'
-                    });
-                  }
-                }}
-              >
+              <Button class="w-full md:!w-auto" size="lg" onClick={handleAddPrescription}>
                 Add Prescription
-              </photon-button>
+              </Button>
             </div>
           </div>
         </div>

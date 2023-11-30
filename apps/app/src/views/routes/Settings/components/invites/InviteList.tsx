@@ -52,9 +52,6 @@ export const InviteList = () => {
   const page = currentPage - 1;
   const PAGE_SIZE = 5;
   const start = page * PAGE_SIZE;
-  const pages = Math.ceil((data?.invites.length ?? 0) / PAGE_SIZE);
-
-  const total = data?.invites.length;
   const allInvites = useMemo(
     () =>
       data?.invites
@@ -64,6 +61,9 @@ export const InviteList = () => {
         .sort((a, b) => (b.expires_at as string).localeCompare(a.expires_at as string)),
     [data?.invites]
   );
+  const pages = Math.ceil((allInvites?.length ?? 0) / PAGE_SIZE);
+
+  const total = allInvites?.length ?? 0;
 
   const invites = useMemo(() => allInvites?.slice(start, start + PAGE_SIZE), [allInvites, page]);
   const currPageSize = invites?.length ?? 0;
