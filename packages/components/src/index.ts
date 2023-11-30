@@ -3,8 +3,10 @@ import Banner from './particles/Banner';
 import DoseCalculator from './systems/DoseCalculator';
 import Card from './particles/Card';
 import DraftPrescriptions from './systems/DraftPrescriptions';
+import Icon from './particles/Icon';
 import PatientInfo from './systems/PatientInfo';
 import PatientMedHistory from './systems/PatientMedHistory';
+import PharmacySearch from './systems/PharmacySearch';
 import PharmacySelect from './systems/PharmacySelect';
 import Spinner from './particles/Spinner';
 import RadioGroup from './particles/RadioGroup';
@@ -26,8 +28,10 @@ export {
   Dialog,
   DoseCalculator,
   DraftPrescriptions,
+  Icon,
   PatientInfo,
   PatientMedHistory,
+  PharmacySearch,
   PharmacySelect,
   RadioGroup,
   SDKProvider,
