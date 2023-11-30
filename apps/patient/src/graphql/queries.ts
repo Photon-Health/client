@@ -70,8 +70,13 @@ export const GET_ORDER = gql`
 `;
 
 export const GET_PHARMACIES = gql`
-  query GetPharmaciesByLocation($location: LatLongSearch!, $limit: Int, $offset: Int) {
-    pharmaciesByLocation(location: $location, limit: $limit, offset: $offset) {
+  query GetPharmaciesByLocation(
+    $location: LatLongSearch!
+    $limit: Int
+    $offset: Int # $openAt: String
+    $isOpenAt: DateTime
+  ) {
+    pharmaciesByLocation(location: $location, limit: $limit, offset: $offset, isOpen: $isOpenAt) {
       id
       name
       address {
@@ -83,6 +88,7 @@ export const GET_PHARMACIES = gql`
         postalCode
       }
       distance
+      isOpen
     }
   }
 `;
