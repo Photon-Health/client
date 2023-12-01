@@ -152,19 +152,19 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
               <Table variant="simple" size="sm">
                 <Thead>
                   <Tr>
-                    <Th width={{ lg: '30%' }} onClick={handleSort('NAME')}>
+                    <Th cursor={'pointer'} width={{ lg: '30%' }} onClick={handleSort('NAME')}>
                       <HStack alignItems={'center'} spacing={2}>
                         <Text userSelect={'none'}>Name</Text>
                         {sortBy === 'NAME' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)}
                       </HStack>
                     </Th>
-                    <Th width={{ lg: '30%' }} onClick={handleSort('EMAIL')}>
+                    <Th cursor={'pointer'} width={{ lg: '30%' }} onClick={handleSort('EMAIL')}>
                       <HStack alignItems={'center'} spacing={2}>
                         <Text userSelect={'none'}>Email</Text>
                         {sortBy === 'EMAIL' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)}
                       </HStack>
                     </Th>
-                    <Th onClick={handleSort('ROLES')}>
+                    <Th cursor={'pointer'} onClick={handleSort('ROLES')}>
                       <HStack alignItems={'center'} spacing={2}>
                         <Text userSelect={'none'}>Roles</Text>
                         {sortBy === 'ROLES' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)}
