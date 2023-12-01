@@ -228,11 +228,5 @@ export const neutron: {
     ...defaultSettings,
     logo: 'piction_health_logo.png',
     accentColor: '#3377e2'
-  },
-    // PM Pediatrics Care
-    : {
-      ...defaultSettings,
-      logo: 'pm_pediatrics_logo.svg',
-      accentColor: '#4D15B7'
-    }
+  }
 };

@@ -191,7 +191,7 @@ export const photon: {
     accentColor: '#E90C54'
   },
   // PM Pediatrics Care
-  : {
+  org_2Mqu8Kf7dknKNFXb: {
     ...defaultSettings,
     logo: 'pm_pediatrics_logo.svg',
     accentColor: '#4D15B7'
