@@ -23,17 +23,26 @@ import {
 import { graphql } from 'apps/app/src/gql';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
 import { useMemo, useState } from 'react';
+import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
 import { Outlet } from 'react-router-dom';
 import { useClinicalApiClient } from '../../apollo';
 import { PaginationIndicator } from '../PaginationIndicator';
 import { InviteForm } from '../invites/InviteForm';
 import { UserItem } from './UserItem';
+import { sortByFn } from './utils';
 
 const usersQuery = graphql(/* GraphQL */ `
   query UsersListQuery {
     users {
       id
       ...UserItemFragment
+      name {
+        full
+      }
+      roles {
+        name
+      }
+      email
     }
     roles {
       name
@@ -44,6 +53,8 @@ const usersQuery = graphql(/* GraphQL */ `
 
 export const UsersList = (props: { rolesMap: Record<string, string> }) => {
   const client = useClinicalApiClient();
+  const [sortBy, setSortBy] = useState<'NAME' | 'ROLES' | 'EMAIL' | undefined>();
+  const [sortByDir, setSortByDir] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data, error, loading } = useQuery(usersQuery, { client });
 
@@ -59,8 +70,24 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
   const pages = Math.ceil((data?.users.length ?? 0) / PAGE_SIZE);
 
   const total = data?.users.length;
-  const users = useMemo(() => data?.users.slice(start, start + PAGE_SIZE), [data?.users, page]);
+  const users = useMemo(
+    () =>
+      data?.users
+        .map((x) => x)
+        .sort(sortByFn(sortBy, sortByDir))
+        .slice(start, start + PAGE_SIZE),
+    [data?.users, page, sortBy, sortByDir]
+  );
   const currPageSize = users?.length ?? 0;
+
+  const handleSort = (key: 'NAME' | 'ROLES' | 'EMAIL') => () => {
+    if (key === sortBy) {
+      setSortByDir(!sortByDir);
+    } else {
+      setSortByDir(true);
+      setSortBy(key);
+    }
+  };
 
   if (!hasUsers) return null;
 
@@ -125,9 +152,24 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
               <Table variant="simple" size="sm">
                 <Thead>
                   <Tr>
-                    <Th width={{ lg: '30%' }}>Name</Th>
-                    <Th width={{ lg: '30%' }}>Email</Th>
-                    <Th>Role</Th>
+                    <Th width={{ lg: '30%' }} onClick={handleSort('NAME')}>
+                      <HStack alignItems={'center'} spacing={2}>
+                        <Text userSelect={'none'}>Name</Text>
+                        {sortBy === 'NAME' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)}
+                      </HStack>
+                    </Th>
+                    <Th width={{ lg: '30%' }} onClick={handleSort('EMAIL')}>
+                      <HStack alignItems={'center'} spacing={2}>
+                        <Text userSelect={'none'}>Email</Text>
+                        {sortBy === 'EMAIL' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)}
+                      </HStack>
+                    </Th>
+                    <Th onClick={handleSort('ROLES')}>
+                      <HStack alignItems={'center'} spacing={2}>
+                        <Text userSelect={'none'}>Roles</Text>
+                        {sortBy === 'ROLES' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)}
+                      </HStack>
+                    </Th>
                   </Tr>
                 </Thead>
                 <Tbody>
