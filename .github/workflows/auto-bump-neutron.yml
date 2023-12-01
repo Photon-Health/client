@@ -1,0 +1,25 @@
+name: Auto Bump Neutron
+
+on:
+  push:
+    branches: [boson, mrochlin/test-boson/**]
+
+jobs:
+  bumpAndOpen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: checkout neutron
+        uses: actions/checkout@v1
+        with:
+          ref: neutron
+      - name: merge
+        run: git merge boson
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          base: neutron
+          branch: neturon/merge
+          title: Merge boson
+          commit-message: merge
