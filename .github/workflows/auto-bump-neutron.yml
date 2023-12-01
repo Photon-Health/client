@@ -2,9 +2,7 @@ name: Auto Bump Neutron
 
 on:
   push:
-    branches: [boson, mrochlin/test-boson/**]
-  pull_request:
-    branches: [boson, mrochlin/auto-bump-neutron-2]
+    branches: [boson]
 
 jobs:
   bumpAndOpen:
