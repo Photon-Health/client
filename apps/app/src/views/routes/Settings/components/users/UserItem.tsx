@@ -1,6 +1,7 @@
 import { Td, Text, Tr } from '@chakra-ui/react';
 import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { useMemo } from 'react';
+import { compareRoles } from './utils';
 
 const userFragment = graphql(/* GraphQL */ `
   fragment UserItemFragment on User {
@@ -29,7 +30,7 @@ export const UserItem = ({
       user.roles
         .map(({ id }) => rolesMap[id])
         .filter((r) => r != null)
-        .sort()
+        .sort(compareRoles)
         .join(', '),
     [user.roles]
   );
