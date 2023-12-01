@@ -4,7 +4,7 @@ on:
   push:
     branches: [boson, mrochlin/test-boson/**]
   pull_request:
-    branches: [mrochlin/auto-bump-neutron-2]
+    branches: [boson, mrochlin/auto-bump-neutron-2]
 
 jobs:
   bumpAndOpen:
