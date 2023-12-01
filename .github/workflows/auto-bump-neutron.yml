@@ -14,7 +14,7 @@ jobs:
         with:
           ref: neutron
       - name: merge
-        run: git merge boson
+        run: git merge origin/boson
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v5
