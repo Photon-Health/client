@@ -25,7 +25,7 @@ const documents = {
     "\n  query OrganizationQuery {\n    organization {\n      id\n      name\n      address {\n        street1\n        street2\n        postalCode\n        city\n        state\n        country\n      }\n      fax\n      phone\n      email\n    }\n  }\n": types.OrganizationQueryDocument,
     "\n  mutation UpdateOrganization($input: OrganizationInput!) {\n    updateOrganization(input: $input)\n  }\n": types.UpdateOrganizationDocument,
     "\n  fragment UserItemFragment on User {\n    id\n    name {\n      full\n    }\n    roles {\n      id\n    }\n    email\n  }\n": types.UserItemFragmentFragmentDoc,
-    "\n  query UsersListQuery {\n    users {\n      id\n      ...UserItemFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n": types.UsersListQueryDocument,
+    "\n  query UsersListQuery {\n    users {\n      id\n      ...UserItemFragment\n      name {\n        full\n      }\n      roles {\n        name\n      }\n      email\n    }\n    roles {\n      name\n      id\n    }\n  }\n": types.UsersListQueryDocument,
     "\n  query AllRolesSelect {\n    roles {\n      id\n      name\n      description\n    }\n  }\n": types.AllRolesSelectDocument,
     "\n  fragment WebhookItemFragment on WebhookConfig {\n    id\n    url\n  }\n": types.WebhookItemFragmentFragmentDoc,
     "\n  mutation WebhookItemDeleteMutation($webhookId: ID!) {\n    deleteWebhookConfig(webhookId: $webhookId)\n  }\n": types.WebhookItemDeleteMutationDocument,
@@ -101,7 +101,7 @@ export function graphql(source: "\n  fragment UserItemFragment on User {\n    id
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query UsersListQuery {\n    users {\n      id\n      ...UserItemFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n"): (typeof documents)["\n  query UsersListQuery {\n    users {\n      id\n      ...UserItemFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n"];
+export function graphql(source: "\n  query UsersListQuery {\n    users {\n      id\n      ...UserItemFragment\n      name {\n        full\n      }\n      roles {\n        name\n      }\n      email\n    }\n    roles {\n      name\n      id\n    }\n  }\n"): (typeof documents)["\n  query UsersListQuery {\n    users {\n      id\n      ...UserItemFragment\n      name {\n        full\n      }\n      roles {\n        name\n      }\n      email\n    }\n    roles {\n      name\n      id\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
