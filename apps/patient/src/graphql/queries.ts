@@ -74,9 +74,9 @@ export const GET_PHARMACIES = gql`
     $location: LatLongSearch!
     $limit: Int
     $offset: Int # $openAt: String
-    $isOpenAt: DateTime
-  ) {
-    pharmaciesByLocation(location: $location, limit: $limit, offset: $offset, isOpen: $isOpenAt) {
+  ) # $isOpenAt: DateTime
+  {
+    pharmaciesByLocation(location: $location, limit: $limit, offset: $offset) {
       id
       name
       address {
@@ -89,6 +89,13 @@ export const GET_PHARMACIES = gql`
       }
       distance
       isOpen
+      hours {
+        dayOfWeek
+        is24Hr
+        openFrom
+        openUntil
+        timezone
+      }
     }
   }
 `;
