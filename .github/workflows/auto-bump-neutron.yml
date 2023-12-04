@@ -1,0 +1,31 @@
+name: Auto Bump Neutron
+
+on:
+  push:
+    branches: [boson]
+
+jobs:
+  bumpAndOpen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: checkout neutron
+        uses: actions/checkout@v1
+        with:
+          ref: neutron
+
+      - name: merge
+        run: |
+          git config user.name 'GitHub'
+          git config user.email 'noreply@github.com'
+          git merge origin/boson
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          base: neutron
+          branch: neturon/merge
+          title: Merge boson
+          commit-message: merge
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
