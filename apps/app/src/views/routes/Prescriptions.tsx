@@ -124,7 +124,8 @@ const ActionsView = (props: ActionsViewProps) => {
             toast({
               description:
                 'A new order cannot be created for a depleted prescription. Please create a new prescription.',
-              status: 'error'
+              status: 'error',
+              position: 'top'
             });
             event.preventDefault();
             return;
