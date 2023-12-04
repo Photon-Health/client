@@ -60,22 +60,19 @@ export const photon: {
     ...defaultSettings,
     logo: 'modern_ritual_logo.webp',
     accentColor: '#202a36',
-    sendToPatient: false,
-    enableRxAndOrder: false
+    sendToPatient: false
   },
   // Reside Health
   org_8fwLMYQGxj6Bg70X: {
     ...defaultSettings,
     logo: 'reside_health_logo.webp',
-    accentColor: '#0c3276',
-    enableRxAndOrder: false
+    accentColor: '#0c3276'
   },
   // Radish Health
   org_tHroj0b67F08q1yw: {
     ...defaultSettings,
     logo: 'red_radish_logo.svg',
-    accentColor: '#ba4a71',
-    enableRxAndOrder: false
+    accentColor: '#ba4a71'
   },
   // River Health
   org_jScrLol7ZMSfExSR: {
@@ -83,8 +80,7 @@ export const photon: {
     logo: 'river_health_logo.svg',
     accentColor: '#2faef3',
     mailOrder: true,
-    mailOrderProviders: [CAREPOINT_ID],
-    enableRxAndOrder: false
+    mailOrderProviders: [CAREPOINT_ID]
   },
   // Peachy
   org_vTC7G2EAuHgac90E: {
@@ -102,8 +98,7 @@ export const photon: {
   org_pxcJ7Dlclcsg0OJw: {
     ...defaultSettings,
     logo: 'zzpeds_logo.png',
-    accentColor: '#5271ff',
-    enableRxAndOrder: false
+    accentColor: '#5271ff'
   },
   // MisterRx
   org_Frco5TQQFDHqS7xY: {
@@ -111,22 +106,19 @@ export const photon: {
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    sendToPatient: false,
-    enableRxAndOrder: false
+    sendToPatient: false
   },
   // Mishe
   org_kLRbIfgsTXHmXDcj: {
     ...defaultSettings,
     logo: 'mishe_logo.svg',
-    accentColor: '#652D92',
-    enableRxAndOrder: false
+    accentColor: '#652D92'
   },
   // Bold Health
   org_TVIFBLp7zkkDGeQI: {
     ...defaultSettings,
     logo: 'bold_health_logo.svg',
-    accentColor: '#25532b',
-    enableRxAndOrder: false
+    accentColor: '#25532b'
   },
   // Piction Health
   org_v5It8IoY0RH1Rw80: {
@@ -166,15 +158,13 @@ export const photon: {
   org_2B1yxV6yS9ROqV1g: {
     ...defaultSettings,
     logo: 'ognomy_logo.webp',
-    accentColor: '#0a7ade',
-    enableRxAndOrder: false
+    accentColor: '#0a7ade'
   },
   // Carbon Health
   org_Dye8T9VAM1GHjjzS: {
     ...defaultSettings,
     logo: 'carbon_health_logo.svg',
-    accentColor: '#000000',
-    enableRxAndOrder: false
+    accentColor: '#000000'
   },
   // Sana Care
   org_boRh5PcUzFhvyiue: {
@@ -194,21 +184,18 @@ export const photon: {
   org_XoBVNLkIWL6BP8vZ: {
     ...defaultSettings,
     logo: 'tbd_logo.svg',
-    accentColor: '#ee8155',
-    enableRxAndOrder: false
+    accentColor: '#ee8155'
   },
   // Openloop Health
   org_Oxc0CSPfdiyWW3VM: {
     ...defaultSettings,
     logo: 'openloop_logo.png',
-    accentColor: '#E90C54',
-    enableRxAndOrder: false
+    accentColor: '#E90C54'
   },
   // PM Pediatrics Care
   org_2Mqu8Kf7dknKNFXb: {
     ...defaultSettings,
     logo: 'pm_pediatrics_logo.svg',
-    accentColor: '#4D15B7',
-    enableRxAndOrder: false
+    accentColor: '#4D15B7'
   }
 };
