@@ -114,6 +114,13 @@ const ActionsView = (props: ActionsViewProps) => {
         as={RouterLink}
         to={`/orders/new?patientId=${patientId}&prescriptionIds=${prescriptionId}`}
         isDisabled={disableCreateOrder}
+        onClick={(event) => {
+          // Lame, but w/o this the redirect will still happen
+          if (disableCreateOrder) {
+            event.preventDefault();
+            return;
+          }
+        }}
       />
     </HStack>
   );
