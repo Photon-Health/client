@@ -5,9 +5,9 @@ projects:
 
   # 'app-v2':
   #   schema: ['http://clinical-api.tau.health:8080/graphql']
-  #   documents: ['apps/app/**/SettingsV2/**/*.{ts,tsx}']
-  #   extensions: { languageService: { cacheSchemaFileForLookup: true } }
+  #   documents: ['apps/app/**/Settings/**/*.{ts,tsx}']
+  #   extensions: {languageService: {cacheSchemaFileForLookup: true}}
   'app-v2':
     schema: ['http://clinical-api.boson.health/graphql']
     documents: ['apps/app/**/Settings/**/*.{ts,tsx}']
-    extensions: { languageService: { cacheSchemaFileForLookup: true } }
+    extensions: {languageService: {cacheSchemaFileForLookup: true}}
