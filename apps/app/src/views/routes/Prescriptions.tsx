@@ -2,8 +2,10 @@ import { Link as RouterLink, useLocation, useSearchParams, useNavigate } from 'r
 
 import {
   Badge,
+  Box,
   Select,
   HStack,
+  Icon,
   IconButton,
   Skeleton,
   SkeletonCircle,
@@ -13,7 +15,7 @@ import {
   Tooltip,
   useToast
 } from '@chakra-ui/react';
-import { FiInfo, FiShoppingCart } from 'react-icons/fi';
+import { FiInfo, FiShoppingCart, FiX } from 'react-icons/fi';
 import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
@@ -122,10 +124,34 @@ const ActionsView = (props: ActionsViewProps) => {
           // Lame, but w/o this the redirect will still happen
           if (disableCreateOrder) {
             toast({
-              description:
-                'A new order cannot be created for a depleted prescription. Please create a new prescription.',
-              status: 'error',
-              position: 'top'
+              position: 'top',
+              // TODO: Override default solid theme with this outline variant
+              render: ({ onClose }) => (
+                <Box
+                  color="gray.800"
+                  p={4}
+                  borderWidth="2px"
+                  borderRadius="md"
+                  bg="white"
+                  borderColor="blue.500"
+                >
+                  <HStack align="start">
+                    <Icon as={FiInfo} color="blue.500" boxSize="5" />
+                    <Text>
+                      A new order cannot be created for a depleted prescription. Please create a new
+                      prescription.
+                    </Text>
+                    <IconButton
+                      color="muted"
+                      icon={<FiX fontSize="1.25rem" />}
+                      variant="ghost"
+                      aria-label="close"
+                      title="Close"
+                      onClick={onClose}
+                    />
+                  </HStack>
+                </Box>
+              )
             });
             event.preventDefault();
             return;
