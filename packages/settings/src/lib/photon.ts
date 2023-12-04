@@ -25,7 +25,7 @@ const defaultSettings: OrganizationSettings = {
   returnTo: window.location.origin,
   federated: false,
   enableMedHistory: false,
-  enableRxAndOrder: false
+  enableRxAndOrder: true
 };
 
 /**
@@ -40,21 +40,20 @@ export const photon: {
   // Weekend Health
   org_uZPt00PG0JElhh3d: {
     ...defaultSettings,
-    sendOrder: false
+    sendOrder: false,
+    enableRxAndOrder: false
   },
   // Modern Pediatrics
   org_2utnNgp5NGCy9wOb: {
     ...defaultSettings,
     logo: 'modern_pediatrics_logo.png',
-    accentColor: '#3f7a9c',
-    enableRxAndOrder: true
+    accentColor: '#3f7a9c'
   },
   // Summer Health
   org_66nHWvQRtHbjZt4A: {
     ...defaultSettings,
     logo: 'summer_health_logo.svg',
-    accentColor: '#ffc21f',
-    enableRxAndOrder: true
+    accentColor: '#ffc21f'
   },
   // Modern Ritual
   org_IWmodVdrQYpqh5x2: {
@@ -92,7 +91,8 @@ export const photon: {
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
     federated: true,
-    sendToPatient: false
+    sendToPatient: false,
+    enableRxAndOrder: false
   },
   // ZZPeds
   org_pxcJ7Dlclcsg0OJw: {
@@ -124,7 +124,8 @@ export const photon: {
   org_v5It8IoY0RH1Rw80: {
     ...defaultSettings,
     logo: 'piction_health_logo.png',
-    accentColor: '#3377e2'
+    accentColor: '#3377e2',
+    enableRxAndOrder: false
   },
   // Shapiro Medical (Xyon Health)
   org_Y0EPcd3p5eqG4iZs: {
@@ -132,7 +133,8 @@ export const photon: {
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    sendToPatient: false
+    sendToPatient: false,
+    enableRxAndOrder: false
   },
   // Osei Tutu (Xyon Health)
   org_WeSplxuyqxdIph1f: {
@@ -140,7 +142,8 @@ export const photon: {
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    sendToPatient: false
+    sendToPatient: false,
+    enableRxAndOrder: false
   },
   // Fadeyi Derm (Xyon Health)
   org_sWEo459pSKLt6wZ5: {
@@ -148,7 +151,8 @@ export const photon: {
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    sendToPatient: false
+    sendToPatient: false,
+    enableRxAndOrder: false
   },
   // Ognomy
   org_2B1yxV6yS9ROqV1g: {
@@ -166,8 +170,7 @@ export const photon: {
   org_boRh5PcUzFhvyiue: {
     ...defaultSettings,
     logo: 'sana_care_logo.png',
-    accentColor: '#FBCC45',
-    enableRxAndOrder: true
+    accentColor: '#FBCC45'
   },
   // Blueberry Pediatrics
   org_ul8ojZgvzpqu299H: {
@@ -175,8 +178,7 @@ export const photon: {
     logo: 'blueberry_logo.png',
     accentColor: '#235AFF',
     enablePatientRerouting: false,
-    enableMedHistory: true,
-    enableRxAndOrder: true
+    enableMedHistory: true
   },
   // TBD Health
   org_XoBVNLkIWL6BP8vZ: {
