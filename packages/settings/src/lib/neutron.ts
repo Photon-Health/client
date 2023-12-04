@@ -27,7 +27,7 @@ const defaultSettings: OrganizationSettings = {
   returnTo: window.location.origin,
   federated: false,
   enableMedHistory: false,
-  enableRxAndOrder: false
+  enableRxAndOrder: true
 };
 
 /**
@@ -45,8 +45,7 @@ export const neutron: {
     logo: 'photon',
     accentColor: '#b35724',
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID, CAREPOINT_ID],
-    enableCourierNavigate: true
+    mailOrderProviders: [CUREXA_ID, CAREPOINT_ID]
   },
   // NewCo (demo's)
   org_YiUudCToTSrjOuow: {
@@ -64,13 +63,13 @@ export const neutron: {
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
     enablePatientRerouting: true,
-    enableMedHistory: true,
-    enableRxAndOrder: true
+    enableMedHistory: true
   },
   // Weekend Health
   org_u93EDGhy5I4Ia5Bb: {
     ...defaultSettings,
-    sendOrder: false
+    sendOrder: false,
+    enableRxAndOrder: false
   },
   // Modern Pediatrics
   org_XiV8H4uCFu6QFUov: {
@@ -114,7 +113,8 @@ export const neutron: {
     federated: true,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    sendToPatient: false
+    sendToPatient: false,
+    enableRxAndOrder: false
   },
   // MisterRx
   org_BBTs0RfOHqjpOO92: {
@@ -185,7 +185,8 @@ export const neutron: {
   org_SgWtqCKFzYaDePCf: {
     ...defaultSettings,
     logo: 'sunrise_logo.svg',
-    accentColor: '#0057b8'
+    accentColor: '#0057b8',
+    enableRxAndOrder: false
   },
   // Found
   org_PwzQxriG4OcMD0iq: {
@@ -227,6 +228,7 @@ export const neutron: {
   org_aE5uK35xUqfDjMD4: {
     ...defaultSettings,
     logo: 'piction_health_logo.png',
-    accentColor: '#3377e2'
+    accentColor: '#3377e2',
+    enableRxAndOrder: false
   }
 };
