@@ -27,7 +27,7 @@ const defaultSettings: OrganizationSettings = {
   returnTo: window.location.origin,
   federated: false,
   enableMedHistory: false,
-  enableRxAndOrder: false
+  enableRxAndOrder: true
 };
 
 /**
@@ -45,8 +45,7 @@ export const neutron: {
     logo: 'photon',
     accentColor: '#b35724',
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID, CAREPOINT_ID],
-    enableCourierNavigate: true
+    mailOrderProviders: [CUREXA_ID, CAREPOINT_ID]
   },
   // NewCo (demo's)
   org_YiUudCToTSrjOuow: {
@@ -64,38 +63,42 @@ export const neutron: {
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
     enablePatientRerouting: true,
-    enableMedHistory: true,
-    enableRxAndOrder: true
+    enableMedHistory: true
   },
   // Weekend Health
   org_u93EDGhy5I4Ia5Bb: {
     ...defaultSettings,
-    sendOrder: false
+    sendOrder: false,
+    enableRxAndOrder: false
   },
   // Modern Pediatrics
   org_XiV8H4uCFu6QFUov: {
     ...defaultSettings,
     logo: 'modern_pediatrics_logo.png',
-    accentColor: '#3f7a9c'
+    accentColor: '#3f7a9c',
+    enableRxAndOrder: false // doublecheck
   },
   // Summer Health
   org_jr5fT3Mh4zCFsVQA: {
     ...defaultSettings,
     logo: 'summer_health_logo.svg',
-    accentColor: '#ffc21f'
+    accentColor: '#ffc21f',
+    enableRxAndOrder: false // doublecheck
   },
   // Modern Ritual
   org_0WP4tWCftMEM7K2q: {
     ...defaultSettings,
     logo: 'modern_ritual_logo.webp',
     accentColor: '#202a36',
-    sendToPatient: false
+    sendToPatient: false,
+    enableRxAndOrder: false
   },
   // Radish Health
   org_kBuUKySvfFeWLovJ: {
     ...defaultSettings,
     logo: 'red_radish_logo.svg',
-    accentColor: '#ba4a71'
+    accentColor: '#ba4a71',
+    enableRxAndOrder: false
   },
   // River Health
   org_U3ofDUVRsNTYt7d8: {
@@ -103,7 +106,8 @@ export const neutron: {
     logo: 'river_health_logo.svg',
     accentColor: '#2faef3',
     mailOrder: true,
-    mailOrderProviders: [CAREPOINT_ID]
+    mailOrderProviders: [CAREPOINT_ID],
+    enableRxAndOrder: false
   },
   // Peachy
   org_O2SLIoyyVTNXG5nX: {
@@ -114,7 +118,8 @@ export const neutron: {
     federated: true,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    sendToPatient: false
+    sendToPatient: false,
+    enableRxAndOrder: false
   },
   // MisterRx
   org_BBTs0RfOHqjpOO92: {
@@ -122,7 +127,8 @@ export const neutron: {
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    sendToPatient: false
+    sendToPatient: false,
+    enableRxAndOrder: false
   },
   // Emily's Test environment (us)
   org_KPfcKzFtfzD3ISxW: {
@@ -130,103 +136,120 @@ export const neutron: {
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [HONEYBEE_PHARMACY_ID],
-    sendToPatient: false
+    sendToPatient: false,
+    enableRxAndOrder: false
   },
   // Blueberry Pediatrics
   org_vISrdMELQC3MhOFb: {
     ...defaultSettings,
     logo: 'blueberry_logo.png',
     accentColor: '#235AFF',
-    enablePatientRerouting: false
+    enablePatientRerouting: false,
+    enableRxAndOrder: false
   },
   // Sunny
   org_PILXReL8NKiTWxD3: {
     ...defaultSettings,
     logo: 'sunny_logo.svg',
-    accentColor: '#69672c'
+    accentColor: '#69672c',
+    enableRxAndOrder: false
   },
   // One Medical
   org_FDug4lPgyekFRNby: {
     ...defaultSettings,
     logo: 'one_medical.jpeg',
-    accentColor: '#005450'
+    accentColor: '#005450',
+    enableRxAndOrder: false
   },
   // Carbon Health
   org_jzJhkJH2D4kyJD0q: {
     ...defaultSettings,
     logo: 'carbon_health_logo.svg',
-    accentColor: '#000000'
+    accentColor: '#000000',
+    enableRxAndOrder: false
   },
   // Oak Street Health
   org_lXk4CKXWokY1rvnC: {
     ...defaultSettings,
     logo: 'oak_st_health.png',
-    accentColor: '#00694c'
+    accentColor: '#00694c',
+    enableRxAndOrder: false
   },
   // Heartbeat Health
   org_6M1pULWU4O5AK3Lg: {
     ...defaultSettings,
     logo: 'heartbeat_health_logo.svg',
-    accentColor: '#d1007e'
+    accentColor: '#d1007e',
+    enableRxAndOrder: false
   },
   // Harbor Health
   org_1BNRl6kcTIZQg4ip: {
     ...defaultSettings,
     logo: 'harbor_health_logo.png',
-    accentColor: '#141d45'
+    accentColor: '#141d45',
+    enableRxAndOrder: false
   },
   // Assure Health
   org_RPrHGTLipYfPywxf: {
     ...defaultSettings,
     logo: 'assure_health_logo.svg',
-    accentColor: '#66cca9'
+    accentColor: '#66cca9',
+    enableRxAndOrder: false
   },
   // Sunrise
   org_SgWtqCKFzYaDePCf: {
     ...defaultSettings,
     logo: 'sunrise_logo.svg',
-    accentColor: '#0057b8'
+    accentColor: '#0057b8',
+    enableRxAndOrder: false
   },
   // Found
   org_PwzQxriG4OcMD0iq: {
     ...defaultSettings,
     logo: 'found_logo.svg',
-    accentColor: '#1c3f28'
+    accentColor: '#1c3f28',
+    enableRxAndOrder: false
   },
   // Miga Health
   org_u3kKBHGj4MFfzOVz: {
     ...defaultSettings,
     logo: 'miga_health_logo.svg',
-    accentColor: '#12110c'
+    accentColor: '#12110c',
+    enableRxAndOrder: false
   },
   // Sesame
   org_QFoulY6Ornx7dMdw: {
     ...defaultSettings,
     logo: 'sesame_logo.jpg',
-    accentColor: '#5224C7'
+    accentColor: '#5224C7',
+    enableRxAndOrder: false
   },
   // Oshi Health
   org_yOgsgGMBVUZIBcwp: {
     ...defaultSettings,
     logo: 'oshi_logo.svg',
-    accentColor: '#3b5b80'
+    accentColor: '#3b5b80',
+    enableRxAndOrder: false
   },
   // TBD Health
   org_kI58h1e86jYO37LQ: {
     ...defaultSettings,
     logo: 'tbd_logo.svg',
-    accentColor: '#ee8155'
+    accentColor: '#ee8155',
+    enableRxAndOrder: false
   },
   // Openloop Health
   org_t5lbHt9eb9gMeeeb: {
     ...defaultSettings,
     logo: 'openloop_logo.png',
-    accentColor: '#E90C54'
+    accentColor: '#E90C54',
+    enableRxAndOrder: false
   },
   // Piction Health
   org_aE5uK35xUqfDjMD4: {
     ...defaultSettings,
     logo: 'piction_health_logo.png',
-    accentColor: '#3377e2'
+    accentColor: '#3377e2',
+    enableRxAndOrder: false
   }
 };
