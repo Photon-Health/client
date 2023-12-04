@@ -10,7 +10,8 @@ import {
   SkeletonText,
   Stack,
   Text,
-  Tooltip
+  Tooltip,
+  useToast
 } from '@chakra-ui/react';
 import { FiInfo, FiShoppingCart } from 'react-icons/fi';
 import { useEffect, useRef, useState } from 'react';
@@ -96,6 +97,9 @@ interface ActionsViewProps {
 
 const ActionsView = (props: ActionsViewProps) => {
   const { prescriptionId, patientId, disableCreateOrder = false } = props;
+
+  const toast = useToast();
+
   return (
     <HStack spacing="0">
       <IconButton
@@ -117,6 +121,11 @@ const ActionsView = (props: ActionsViewProps) => {
         onClick={(event) => {
           // Lame, but w/o this the redirect will still happen
           if (disableCreateOrder) {
+            toast({
+              description:
+                'A new order cannot be created for a depleted prescription. Please create a new prescription.',
+              status: 'error'
+            });
             event.preventDefault();
             return;
           }
