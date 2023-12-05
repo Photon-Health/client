@@ -23,6 +23,7 @@ const GetPatientOrdersQuery = gql`
       orders(first: 5) {
         id
         createdAt
+        state
         fills {
           treatment {
             name
@@ -50,8 +51,18 @@ function RecentOrders(props: SDKProviderProps) {
       }
     });
 
-    if (data?.patient?.orders?.length > 0) {
-      setOrders(data.patient.orders);
+    const orders = data?.patient?.orders;
+
+    if (orders?.length > 0) {
+      const now = new Date();
+      const eightHoursAgo = new Date(now.getTime() - 8 * 60 * 60 * 1000);
+
+      const recentOrders = orders.filter((order: Order) => {
+        const createdAt = new Date(order.createdAt);
+        return createdAt > eightHoursAgo;
+      });
+
+      setOrders(recentOrders);
     }
   }
 
