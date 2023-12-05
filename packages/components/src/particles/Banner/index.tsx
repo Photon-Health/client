@@ -1,6 +1,6 @@
 import Icon from '../Icon';
 
-type BannerProps = {
+export type BannerProps = {
   text: string;
   status: 'success' | 'info';
 };
