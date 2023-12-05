@@ -188,7 +188,7 @@ export const enrichPharmacy = async (
     return {
       ...enrichedPharmacyInfo,
       hours: {
-        open: placeDetails.opening_hours?.isOpen() || false,
+        // open: placeDetails.opening_hours?.isOpen() || false,
         is24Hr,
         opens,
         opensDay,

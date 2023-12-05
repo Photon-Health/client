@@ -30,8 +30,9 @@ dayjs.extend(customParseFormat);
 interface RatingHoursProps {
   businessStatus: string;
   rating: number;
+  open: boolean;
   hours: {
-    open?: boolean;
+    // open?: boolean;
     opens?: string;
     opensDay?: string;
     closes?: string;
@@ -39,7 +40,7 @@ interface RatingHoursProps {
   };
 }
 
-const RatingHours = ({ businessStatus, rating, hours }: RatingHoursProps) => {
+const RatingHours = ({ businessStatus, rating, hours, open }: RatingHoursProps) => {
   if (businessStatus in UNOPEN_BUSINESS_STATUS_MAP) {
     return (
       <Text fontSize="sm" color="red">
@@ -48,19 +49,21 @@ const RatingHours = ({ businessStatus, rating, hours }: RatingHoursProps) => {
     );
   }
 
+  console.log(open);
+
   return (
     <HStack w="full" whiteSpace="nowrap" overflow="hidden">
       {rating ? <Rating rating={rating} /> : null}
       {rating ? <Text color="gray.400">&bull;</Text> : null}
-      {hours?.open !== undefined ? (
-        <Text fontSize="sm" color={hours?.open ? 'green' : 'red'}>
-          {hours?.open ? 'Open' : 'Closed'}
+      {open !== undefined ? (
+        <Text fontSize="sm" color={open ? 'green' : 'red'}>
+          {open ? 'Open' : 'Closed'}
         </Text>
       ) : null}
-      {!hours?.is24Hr && ((hours?.open && hours?.closes) || (!hours?.open && hours?.opens)) ? (
+      {!hours?.is24Hr && ((open && hours?.closes) || (!open && hours?.opens)) ? (
         <Text color="gray.400">&bull;</Text>
       ) : null}
-      {hours?.open && hours?.closes ? (
+      {open && hours?.closes ? (
         <Text fontSize="sm" color="gray.500" isTruncated>
           Closes{' '}
           {dayjs(hours?.closes, 'HHmm').format(
@@ -68,7 +71,7 @@ const RatingHours = ({ businessStatus, rating, hours }: RatingHoursProps) => {
           )}
         </Text>
       ) : null}
-      {!hours?.open && hours?.opens ? (
+      {!open && hours?.opens ? (
         <Text fontSize="sm" color="gray.500" isTruncated>
           Opens{' '}
           {dayjs(hours?.opens, 'HHmm').format(
@@ -174,6 +177,7 @@ export const PharmacyCard = memo(function PharmacyCard({
               businessStatus={pharmacy.businessStatus}
               rating={pharmacy.rating}
               hours={pharmacy.hours}
+              open={pharmacy.isOpen}
             />
             <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
           </VStack>

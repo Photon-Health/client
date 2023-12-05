@@ -33,6 +33,7 @@ export const GET_ORDER = gql`
           country
           postalCode
         }
+        isOpen
       }
       fills {
         id
@@ -73,9 +74,8 @@ export const GET_PHARMACIES = gql`
   query GetPharmaciesByLocation(
     $location: LatLongSearch!
     $limit: Int
-    $offset: Int # $openAt: String
-  ) # $isOpenAt: DateTime
-  {
+    $offset: Int # $openAt: String # $isOpenAt: DateTime
+  ) {
     pharmaciesByLocation(location: $location, limit: $limit, offset: $offset) {
       id
       name
