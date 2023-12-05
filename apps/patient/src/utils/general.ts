@@ -4,7 +4,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 import { types } from '@photonhealth/sdk';
 import { ExtendedFulfillmentType } from './models';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { getPlace, getPlaceDetails } from '../api';
+import { getRating } from '../api';
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 
 dayjs.extend(isoWeek);
@@ -151,49 +151,41 @@ export const countFillsAndRemoveDuplicates = (fills: types.Fill[]): FillWithCoun
   return result;
 };
 
+function isOpenEvent(event: types.PharmacyEvent): event is types.PharmacyOpenEvent {
+  return event.type === 'open';
+}
+
+function isCloseEvent(event: types.PharmacyEvent): event is types.PharmacyCloseEvent {
+  return event.type === 'close';
+}
+
 export const enrichPharmacy = async (
   pharmacy: types.Pharmacy,
   includeRating = true
 ): Promise<EnrichedPharmacy> => {
   try {
-    const place = await getPlace(pharmacy, includeRating);
-    if (!place) {
-      return pharmacy;
-    }
+    const rating = includeRating ? await getRating(pharmacy) : null;
 
-    const enrichedPharmacyInfo = {
-      ...pharmacy,
-      businessStatus: place.business_status || '',
-      rating: place.rating || undefined
-    };
+    const is24Hr = pharmacy.nextEvents[pharmacy.isOpen ? 'open' : 'close'].type === '24hr';
 
-    const isOperational =
-      enrichedPharmacyInfo.businessStatus === google.maps.places.BusinessStatus.OPERATIONAL;
-    if (!isOperational) {
-      return enrichedPharmacyInfo;
-    }
+    const nextOpen = isOpenEvent(pharmacy.nextEvents.open)
+      ? pharmacy.nextEvents.open.datetime
+      : undefined;
+    const f1 = dayjs(nextOpen).format(dayjs(nextOpen).minute() > 0 ? 'h:mmA' : 'hA');
+    const opens = `Opens ${f1}`;
 
-    const fetchDetails = place.place_id && isOperational; // Don't continue enriching non-operational pharmacies
-    const placeDetails = fetchDetails ? await getPlaceDetails(place.place_id) : undefined;
-    if (!placeDetails) {
-      return enrichedPharmacyInfo;
-    }
-
-    const currentTime = dayjs().format('HHmm');
-    const { is24Hr, opens, opensDay, closes } = getHours(
-      placeDetails.opening_hours?.periods,
-      currentTime
-    );
+    const nextClose = isCloseEvent(pharmacy.nextEvents.close)
+      ? pharmacy.nextEvents.close.datetime
+      : undefined;
+    const f2 = dayjs(nextClose).format(dayjs(nextClose).minute() > 0 ? 'h:mmA' : 'hA');
+    const closes = `Closes ${f2}`;
 
     return {
-      ...enrichedPharmacyInfo,
-      hours: {
-        // open: placeDetails.opening_hours?.isOpen() || false,
-        is24Hr,
-        opens,
-        opensDay,
-        closes
-      }
+      ...pharmacy,
+      rating: rating || undefined,
+      is24Hr,
+      opens,
+      closes
     };
   } catch (error) {
     console.log('Failed to enrich pharmacy data: ' + error.message);

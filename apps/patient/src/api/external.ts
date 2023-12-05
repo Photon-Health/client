@@ -40,70 +40,28 @@ const query = (method: string, data: object) =>
     });
   });
 
-interface PlaceResponse {
-  place_id: string;
-  types: string[];
-  business_status: string;
+interface RatingResponse {
   rating?: number;
 }
-export const getPlace = async (
-  pharmacy: types.Pharmacy,
-  includeRating = true
-): Promise<PlaceResponse | undefined> => {
+export const getRating = async (pharmacy: types.Pharmacy): Promise<number> => {
   const address = pharmacy.address ? formatAddress(pharmacy.address) : '';
   const placeQuery = pharmacy.name + ' ' + address;
-  const placeFields = [
-    'place_id',
-    'business_status',
-    'types',
-    ...(includeRating ? ['rating'] : [])
-  ];
+  const placeFields = ['rating'];
   const placeRequest = {
     query: placeQuery,
     fields: placeFields
   };
 
   try {
-    const { response, status }: { response: PlaceResponse[]; status: string } = await query(
+    const { response, status }: { response: RatingResponse[]; status: string } = await query(
       'findPlaceFromQuery',
       placeRequest
     );
     if (status === 'OK' && response[0]) {
-      return response[0];
+      return response[0].rating;
     }
     return undefined;
   } catch (error) {
     throw new Error(error);
-  }
-};
-
-interface PlaceDetailsResponse {
-  opening_hours?: {
-    periods: Array<{ close: { day: number; time: string }; open: { day: number; time: string } }>;
-    isOpen(): boolean;
-  };
-  utc_offset_minutes?: number;
-  rating?: number;
-  business_status?: string;
-}
-export const getPlaceDetails = async (
-  placeId: string
-): Promise<PlaceDetailsResponse | undefined> => {
-  const detailsRequest = {
-    placeId,
-    fields: ['opening_hours', 'utc_offset_minutes']
-  };
-
-  try {
-    const { response, status }: { response: PlaceDetailsResponse; status: string } = await query(
-      'getDetails',
-      detailsRequest
-    );
-    if (status === 'OK') {
-      return response;
-    }
-    return undefined;
-  } catch (error) {
-    throw new Error(`Failed to get place details: ${error.message}`);
   }
 };

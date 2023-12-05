@@ -21,7 +21,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { types } from '@photonhealth/sdk';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 
-import { UNOPEN_BUSINESS_STATUS_MAP } from '../views/Pharmacy';
+// import { UNOPEN_BUSINESS_STATUS_MAP } from '../views/Pharmacy';
 import { Rating } from './Rating';
 import { formatAddress } from '../utils/general';
 
@@ -31,26 +31,20 @@ interface RatingHoursProps {
   businessStatus: string;
   rating: number;
   open: boolean;
-  hours: {
-    // open?: boolean;
-    opens?: string;
-    opensDay?: string;
-    closes?: string;
-    is24Hr?: boolean;
-  };
+  is24Hr: boolean;
+  opens: string;
+  closes: string;
+  // hours: {
+  //   // open?: boolean;
+  //   opens?: string;
+  //   opensDay?: string;
+  //   closes?: string;
+  //   is24Hr?: boolean;
+  // };
 }
 
-const RatingHours = ({ businessStatus, rating, hours, open }: RatingHoursProps) => {
-  if (businessStatus in UNOPEN_BUSINESS_STATUS_MAP) {
-    return (
-      <Text fontSize="sm" color="red">
-        {UNOPEN_BUSINESS_STATUS_MAP[businessStatus]}
-      </Text>
-    );
-  }
-
-  console.log(open);
-
+const RatingHours = ({ rating, is24Hr, open, opens, closes }: RatingHoursProps) => {
+  console.log(opens, closes);
   return (
     <HStack w="full" whiteSpace="nowrap" overflow="hidden">
       {rating ? <Rating rating={rating} /> : null}
@@ -60,24 +54,17 @@ const RatingHours = ({ businessStatus, rating, hours, open }: RatingHoursProps) 
           {open ? 'Open' : 'Closed'}
         </Text>
       ) : null}
-      {!hours?.is24Hr && ((open && hours?.closes) || (!open && hours?.opens)) ? (
+      {!is24Hr && ((open && closes) || (!open && opens)) ? (
         <Text color="gray.400">&bull;</Text>
       ) : null}
-      {open && hours?.closes ? (
+      {open && closes ? (
         <Text fontSize="sm" color="gray.500" isTruncated>
-          Closes{' '}
-          {dayjs(hours?.closes, 'HHmm').format(
-            dayjs(hours?.closes, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA'
-          )}
+          {closes}
         </Text>
       ) : null}
-      {!open && hours?.opens ? (
+      {!open && opens ? (
         <Text fontSize="sm" color="gray.500" isTruncated>
-          Opens{' '}
-          {dayjs(hours?.opens, 'HHmm').format(
-            dayjs(hours?.opens, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA'
-          )}
-          {hours?.opensDay ? ` ${hours?.opensDay}` : ''}
+          {opens}
         </Text>
       ) : null}
     </HStack>
@@ -165,7 +152,7 @@ export const PharmacyCard = memo(function PharmacyCard({
                 <TagLabel> Good service</TagLabel>
               </Tag>
             ) : null}
-            {pharmacy?.hours?.is24Hr ? (
+            {pharmacy?.is24Hr ? (
               <Tag size="sm" colorScheme="green">
                 <TagLabel>24 hr</TagLabel>
               </Tag>
@@ -176,8 +163,10 @@ export const PharmacyCard = memo(function PharmacyCard({
             <RatingHours
               businessStatus={pharmacy.businessStatus}
               rating={pharmacy.rating}
-              hours={pharmacy.hours}
               open={pharmacy.isOpen}
+              is24Hr={pharmacy.is24Hr}
+              opens={pharmacy.opens}
+              closes={pharmacy.closes}
             />
             <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
           </VStack>

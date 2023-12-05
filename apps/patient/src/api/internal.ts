@@ -40,14 +40,14 @@ export const getPharmacies = async (
 ) => {
   try {
     const dateTime = new Date();
-    const thingy = dateTime.toString();
+    // const thingy = dateTime.toString();
     const response: { pharmaciesByLocation: types.Pharmacy[] } = await graphQLClient.request(
       GET_PHARMACIES,
       {
         location: searchParams,
         limit,
         offset,
-        openAt: thingy
+        openAt: dateTime
       }
     );
     if (response?.pharmaciesByLocation?.length > 0) {

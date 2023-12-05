@@ -16,14 +16,9 @@ export interface Pharmacy extends types.Pharmacy {
   rating?: number | undefined;
   businessStatus?: string | undefined;
   isOpen?: boolean;
-  hours?: {
-    open?: boolean;
-    is24Hr?: boolean;
-    opens?: string;
-    opensDay?: 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun';
-    closes?: string;
-  };
-  enriched?: boolean | undefined;
+  is24Hr?: boolean;
+  closes?: string;
+  opens?: string;
 }
 
 export type ExtendedFulfillmentType = types.FulfillmentType | 'COURIER';

@@ -46,6 +46,7 @@ export const UNOPEN_BUSINESS_STATUS_MAP = {
   CLOSED_PERMANENTLY: 'Closed Permanently'
 };
 const MAX_ENRICHMENT = 5; // Maximum number of pharmacies to enrich at a time
+const PHARMACIES_TO_GET_INITIALLY = 5;
 
 export const Pharmacy = () => {
   const { order, setOrder } = useOrderContext();
@@ -161,7 +162,7 @@ export const Pharmacy = () => {
           longitude: lng,
           radius: 25
         },
-        30, // Set high to ensure indie's are found. Request time increase is minimal.
+        PHARMACIES_TO_GET_INITIALLY,
         0
       );
       if (!pharmaciesResult || pharmaciesResult.length === 0) {

@@ -19,8 +19,7 @@ export const demoPharmacies: any = [
       opens: '0900',
       opensDay: 'Tue',
       closes: '1800'
-    },
-    enriched: true
+    }
   },
   {
     id: 'as4563456dfsafasdf',
@@ -42,8 +41,7 @@ export const demoPharmacies: any = [
       opens: '0900',
       opensDay: 'Tue',
       closes: '1900'
-    },
-    enriched: true
+    }
   },
   {
     id: 'asdfsa2435236fasdf',
@@ -62,8 +60,7 @@ export const demoPharmacies: any = [
     hours: {
       open: true,
       is24Hr: true
-    },
-    enriched: true
+    }
   },
   {
     id: 'as324gfdsf5236fasdf',
@@ -85,8 +82,7 @@ export const demoPharmacies: any = [
       opens: '0900',
       opensDay: 'Tue',
       closes: '1800'
-    },
-    enriched: true
+    }
   },
   {
     id: 'as324gf6h5ehgrgsdf',
@@ -105,8 +101,7 @@ export const demoPharmacies: any = [
     hours: {
       open: true,
       is24Hr: true
-    },
-    enriched: true
+    }
   },
   {
     id: 'as324gf6h6g45wgrfwefrgsdf',
@@ -128,8 +123,7 @@ export const demoPharmacies: any = [
       opens: '0900',
       opensDay: 'Tue',
       closes: '1900'
-    },
-    enriched: true
+    }
   },
   {
     id: 'as324gf65j5hgersdf',
@@ -151,8 +145,7 @@ export const demoPharmacies: any = [
       opens: '0900',
       opensDay: 'Tue',
       closes: '1900'
-    },
-    enriched: true
+    }
   },
   {
     id: 'a328798frfafgf',
@@ -174,8 +167,7 @@ export const demoPharmacies: any = [
       opens: '0900',
       opensDay: 'Tue',
       closes: '1830'
-    },
-    enriched: true
+    }
   },
   {
     id: 'a32843y6hgwrgwrtgwgf',
@@ -194,8 +186,7 @@ export const demoPharmacies: any = [
     hours: {
       open: true,
       is24Hr: true
-    },
-    enriched: true
+    }
   },
   {
     id: 'a3284334t54gdgdfwrtgwgf',
@@ -217,7 +208,6 @@ export const demoPharmacies: any = [
       opens: '0900',
       opensDay: 'Tue',
       closes: '1800'
-    },
-    enriched: true
+    }
   }
 ];
