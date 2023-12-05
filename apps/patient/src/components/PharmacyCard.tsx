@@ -21,7 +21,6 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { types } from '@photonhealth/sdk';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 
-// import { UNOPEN_BUSINESS_STATUS_MAP } from '../views/Pharmacy';
 import { Rating } from './Rating';
 import { formatAddress } from '../utils/general';
 
@@ -34,17 +33,9 @@ interface RatingHoursProps {
   is24Hr: boolean;
   opens: string;
   closes: string;
-  // hours: {
-  //   // open?: boolean;
-  //   opens?: string;
-  //   opensDay?: string;
-  //   closes?: string;
-  //   is24Hr?: boolean;
-  // };
 }
 
 const RatingHours = ({ rating, is24Hr, open, opens, closes }: RatingHoursProps) => {
-  console.log(opens, closes);
   return (
     <HStack w="full" whiteSpace="nowrap" overflow="hidden">
       {rating ? <Rating rating={rating} /> : null}
