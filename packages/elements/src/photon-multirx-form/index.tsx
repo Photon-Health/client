@@ -19,7 +19,7 @@ import { createEffect, onMount, createSignal, Show, For } from 'solid-js';
 import type { FormError } from '../stores/form';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
-import { Spinner, Toaster, Button } from '@photonhealth/components';
+import { Spinner, Toaster, Button, RecentOrders } from '@photonhealth/components';
 import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import { AddPrescriptionCard } from './components/AddPrescriptionCard';
 import { PatientCard } from './components/PatientCard';
@@ -367,6 +367,9 @@ customElement(
                   store.patient?.value?.address || (store.patient?.value?.id && !props.enableOrder)
                 }
               >
+                <RecentOrders patientId={store.patient?.value?.id}>
+                  <RecentOrders.Card />
+                </RecentOrders>
                 <Show when={showForm() || isEditing()}>
                   <div ref={prescriptionRef}>
                     <AddPrescriptionCard
