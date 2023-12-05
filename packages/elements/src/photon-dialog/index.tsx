@@ -6,12 +6,15 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
+import { Button } from '@photonhealth/components';
+
 //Styles
 import tailwind from '../tailwind.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import styles from './style.css?inline';
 import { Show } from 'solid-js';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 type Proceed = 'photon-dialog-confirmed' | 'photon-dialog-alt' | 'photon-dialog-canceled';
 
@@ -56,10 +59,12 @@ customElement(
 
     return (
       <>
+        <style>{photonStyles}</style>
         <style>{tailwind}</style>
         <style>{shoelaceDarkStyles}</style>
         <style>{shoelaceLightStyles}</style>
         <style>{styles}</style>
+
         <sl-dialog
           class="dialog"
           classList={{
@@ -96,24 +101,24 @@ customElement(
             }}
             slot="footer"
           >
-            <photon-button
-              variant="outline"
+            <Button
+              variant="secondary"
               disabled={props.disableButtons || props.loading}
-              on:photon-clicked={() => {
+              onClick={() => {
                 dispatchDecision('photon-dialog-alt');
               }}
             >
               {props.cancelText}
-            </photon-button>
-            <photon-button
+            </Button>
+            <Button
               disabled={props.disableButtons || props.disableSubmit}
               loading={props.loading}
-              on:photon-clicked={() => {
+              onClick={() => {
                 dispatchDecision('photon-dialog-confirmed');
               }}
             >
               {props.confirmText}
-            </photon-button>
+            </Button>
           </div>
         </sl-dialog>
       </>

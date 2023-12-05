@@ -54,10 +54,11 @@ const GetLastOrder = gql`
   }
 `;
 
-export interface PharmacyProps {
+export interface PharmacySearchProps {
   address?: string;
   patientId?: string;
   geocodingApiKey?: string;
+  hidePreferred?: boolean;
   setPharmacy: (pharmacy: types.Pharmacy) => void;
   setPreferred?: (shouldSetPreferred: boolean) => void;
 }
@@ -66,7 +67,7 @@ interface PharmacyExtended extends Pharmacy {
   preferred: boolean | undefined;
 }
 
-export default function PharmacySearch(props: PharmacyProps) {
+export default function PharmacySearch(props: PharmacySearchProps) {
   const client = usePhotonClient();
   const [selected, setSelected] = createSignal<any>();
   const [query, setQuery] = createSignal('');
@@ -288,7 +289,11 @@ export default function PharmacySearch(props: PharmacyProps) {
       </InputGroup>
       <Show
         when={
-          !fetchingPharmacies() && !fetchingPreferred() && !!selected() && !selected()?.preferred
+          !props?.hidePreferred &&
+          !fetchingPharmacies() &&
+          !fetchingPreferred() &&
+          !!selected() &&
+          !selected()?.preferred
         }
       >
         <Checkbox

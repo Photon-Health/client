@@ -7,6 +7,7 @@ import {
   Divider,
   Flex,
   HStack,
+  SkeletonText,
   Spinner,
   Stack,
   Text
@@ -17,10 +18,10 @@ import { CheckIcon, EditIcon } from '@chakra-ui/icons';
 import { graphql } from 'apps/app/src/gql';
 import { OrgType } from 'apps/app/src/gql/graphql';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
+import InfoGrid from 'apps/app/src/views/components/InfoGrid';
 import { Formik } from 'formik';
 import { useMemo, useState } from 'react';
 import * as yup from 'yup';
-import { SimpleTable } from '../../../../components/SimpleTable';
 import { useClinicalApiClient } from '../../apollo';
 import { OrganizationForm, organizationFormSchema } from './OrganizationEditForm';
 
@@ -87,7 +88,7 @@ const EditButtons = ({
 export const Organization = () => {
   const [isEditing, setIsEditing] = useState(false);
   const client = useClinicalApiClient();
-  const { data, error } = useQuery(organizationQuery, { client });
+  const { data, error, loading } = useQuery(organizationQuery, { client });
   const [updateOrganization, { loading: mutationLoading }] = useMutation(
     updateOrganizationMutation,
     {
@@ -124,13 +125,23 @@ export const Organization = () => {
   }, [organization?.address?.street1]);
 
   const rows = useMemo(
-    () => [
-      { title: 'Organization Name', value: organization?.name },
-      { title: 'Email', value: organization?.email },
-      { title: 'Fax', value: organization?.fax },
-      { title: 'Phone', value: organization?.phone },
-      { title: 'Address', value: address }
-    ],
+    () =>
+      [
+        { title: 'Organization Name', value: organization?.name },
+        { title: 'Email', value: organization?.email },
+        { title: 'Fax', value: organization?.fax },
+        { title: 'Phone', value: organization?.phone },
+        { title: 'Address', value: address }
+      ].map(({ title, value }) => ({
+        title,
+        value: value ? (
+          <Text fontSize="sm">{value}</Text>
+        ) : (
+          <Text fontSize="sm" color="gray.400" as="i">
+            Not available
+          </Text>
+        )
+      })),
     [
       organization,
       organization?.name,
@@ -140,18 +151,6 @@ export const Organization = () => {
       organization?.phone
     ]
   );
-
-  const columns = [
-    {
-      Header: 'Titles',
-      accessor: 'title',
-      width: 'wrap'
-    },
-    {
-      Header: 'Values',
-      accessor: 'value'
-    }
-  ];
 
   return (
     <Formik
@@ -226,7 +225,15 @@ export const Organization = () => {
               {isEditing ? (
                 <OrganizationForm {...formikProps} />
               ) : (
-                <SimpleTable data={rows} columns={columns} hideHeaders useLoadingOverlay={false} />
+                rows.map(({ title, value }) => (
+                  <InfoGrid key={title} name={title}>
+                    {loading ? (
+                      <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                    ) : (
+                      value
+                    )}
+                  </InfoGrid>
+                ))
               )}
             </Stack>
           </Container>
