@@ -10,6 +10,7 @@ import PharmacySearch from './systems/PharmacySearch';
 import PharmacySelect from './systems/PharmacySelect';
 import Spinner from './particles/Spinner';
 import RadioGroup from './particles/RadioGroup';
+import RecentOrders from './systems/RecentOrders';
 import Dialog from './particles/Dialog';
 import Button from './particles/Button';
 import SDKProvider, { usePhotonClient } from './systems/SDKProvider';
@@ -34,6 +35,7 @@ export {
   PharmacySearch,
   PharmacySelect,
   RadioGroup,
+  RecentOrders,
   SDKProvider,
   Spinner,
   Text,
