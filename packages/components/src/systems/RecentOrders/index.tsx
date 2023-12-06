@@ -1,17 +1,36 @@
-import {
-  createContext,
-  JSXElement,
-  useContext,
-  createEffect,
-  createSignal,
-  Accessor
-} from 'solid-js';
+import { createContext, JSXElement, useContext, createEffect } from 'solid-js';
 import { gql } from '@apollo/client';
 import RecentOrdersCard from './RecentOrdersCard';
 import { usePhotonClient } from '../SDKProvider';
 import { Order } from '@photonhealth/sdk/dist/types';
+import { createStore } from 'solid-js/store';
+import RecentOrdersCancelDialog from './RecentOrdersCancelDialog';
+import RecentOrdersDuplicateDialog from './RecentOrdersDuplicateDialog';
+import RecentOrdersIssueDialog from './RecentOrdersIssueDialog';
 
-const RecentOrdersContext = createContext<{ orders: Accessor<Order[]> }>();
+type RecentOrdersState = {
+  orders: Order[];
+  isCancelDialogOpen: boolean;
+  isDuplicateDialogOpen: boolean;
+  isIssueDialogOpen: boolean;
+};
+
+type RecentOrdersActions = {
+  setIsCancelDialogOpen: (isOpen: boolean) => void;
+  setIsDuplicateDialogOpen: (isOpen: boolean) => void;
+  setIsIssueDialogOpen: (isOpen: boolean) => void;
+};
+
+type RecentOrdersContextValue = [RecentOrdersState, RecentOrdersActions];
+
+const RecentOrdersContext = createContext<RecentOrdersContextValue>([
+  { orders: [], isCancelDialogOpen: false, isDuplicateDialogOpen: false, isIssueDialogOpen: false },
+  {
+    setIsCancelDialogOpen: () => undefined,
+    setIsDuplicateDialogOpen: () => undefined,
+    setIsIssueDialogOpen: () => undefined
+  }
+]);
 
 const GetPatientOrdersQuery = gql`
   query GetPatientOrders($patientId: ID!) {
@@ -41,7 +60,27 @@ interface SDKProviderProps {
 
 function RecentOrders(props: SDKProviderProps) {
   const client = usePhotonClient();
-  const [orders, setOrders] = createSignal<Order[]>([]);
+  const [state, setState] = createStore<RecentOrdersState>({
+    orders: [],
+    isCancelDialogOpen: false,
+    isDuplicateDialogOpen: false,
+    isIssueDialogOpen: false
+  });
+
+  const value: RecentOrdersContextValue = [
+    state,
+    {
+      setIsCancelDialogOpen(isOpen: boolean) {
+        setState('isCancelDialogOpen', isOpen);
+      },
+      setIsDuplicateDialogOpen(isOpen: boolean) {
+        setState('isDuplicateDialogOpen', isOpen);
+      },
+      setIsIssueDialogOpen(isOpen: boolean) {
+        setState('isIssueDialogOpen', isOpen);
+      }
+    }
+  ];
 
   async function fetchOrders() {
     const { data } = await client!.apollo.query({
@@ -62,7 +101,7 @@ function RecentOrders(props: SDKProviderProps) {
         return createdAt > eightHoursAgo;
       });
 
-      setOrders(recentOrders);
+      setState('orders', recentOrders);
     }
   }
 
@@ -73,7 +112,7 @@ function RecentOrders(props: SDKProviderProps) {
   });
 
   return (
-    <RecentOrdersContext.Provider value={{ orders }}>{props.children}</RecentOrdersContext.Provider>
+    <RecentOrdersContext.Provider value={value}>{props.children}</RecentOrdersContext.Provider>
   );
 }
 
@@ -82,5 +121,8 @@ export function useRecentOrders() {
 }
 
 RecentOrders.Card = RecentOrdersCard;
+RecentOrders.CancelDialog = RecentOrdersCancelDialog;
+RecentOrders.DuplicateDialog = RecentOrdersDuplicateDialog;
+RecentOrders.IssueDialog = RecentOrdersIssueDialog;
 
 export default RecentOrders;
