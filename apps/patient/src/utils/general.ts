@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import isBetween from 'dayjs/plugin/isBetween';
+import isToday from 'dayjs/plugin/isToday';
 import { types } from '@photonhealth/sdk';
 import { ExtendedFulfillmentType } from './models';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
@@ -9,6 +10,7 @@ import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 
 dayjs.extend(isoWeek);
 dayjs.extend(isBetween);
+dayjs.extend(isToday);
 
 export const titleCase = (str: string) =>
   str
@@ -173,8 +175,10 @@ export const preparePharmacy = async (
     const nextOpen = isOpenEvent(pharmacy.nextEvents.open)
       ? pharmacy.nextEvents.open.datetime
       : undefined;
-    const f1 = dayjs(nextOpen).format(dayjs(nextOpen).minute() > 0 ? 'h:mmA' : 'hA');
-    const opens = `Opens ${f1}`;
+    const notToday = !dayjs(nextOpen).isToday;
+    const format = `${dayjs(nextOpen).minute() > 0 ? 'h:mmA' : 'hA'} ${notToday ? 'ddd' : ''}`;
+    const formattedOpens = dayjs(nextOpen).format(format);
+    const opens = `Opens ${formattedOpens}`;
 
     const nextClose = isCloseEvent(pharmacy.nextEvents.close)
       ? pharmacy.nextEvents.close.datetime
