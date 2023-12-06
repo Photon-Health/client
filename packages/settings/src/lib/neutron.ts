@@ -181,13 +181,6 @@ export const neutron: {
     logo: 'assure_health_logo.svg',
     accentColor: '#66cca9'
   },
-  // Sunrise
-  org_SgWtqCKFzYaDePCf: {
-    ...defaultSettings,
-    logo: 'sunrise_logo.svg',
-    accentColor: '#0057b8',
-    enableRxAndOrder: false
-  },
   // Found
   org_PwzQxriG4OcMD0iq: {
     ...defaultSettings,
