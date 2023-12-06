@@ -47,12 +47,12 @@ const RatingHours = ({ rating, is24Hr, isOpen, opens, closes }: RatingHoursProps
       {!is24Hr && ((isOpen && closes) || (!isOpen && opens)) ? (
         <Text color="gray.400">&bull;</Text>
       ) : null}
-      {isOpen && closes ? (
+      {!is24Hr && isOpen && closes ? (
         <Text fontSize="sm" color="gray.500" isTruncated>
           {closes}
         </Text>
       ) : null}
-      {!isOpen && opens ? (
+      {!is24Hr && !isOpen && opens ? (
         <Text fontSize="sm" color="gray.500" isTruncated>
           {opens}
         </Text>
