@@ -1,6 +1,3 @@
-import { types } from '@photonhealth/sdk';
-import { formatAddress } from '../utils/general';
-
 const geocoder: google.maps.Geocoder = new google.maps.Geocoder();
 const placesService = new google.maps.places.PlacesService(document.createElement('div'));
 
