@@ -29,31 +29,31 @@ dayjs.extend(customParseFormat);
 interface RatingHoursProps {
   businessStatus: string;
   rating: number;
-  open: boolean;
+  isOpen: boolean;
   is24Hr: boolean;
   opens: string;
   closes: string;
 }
 
-const RatingHours = ({ rating, is24Hr, open, opens, closes }: RatingHoursProps) => {
+const RatingHours = ({ rating, is24Hr, isOpen, opens, closes }: RatingHoursProps) => {
   return (
     <HStack w="full" whiteSpace="nowrap" overflow="hidden">
       {rating ? <Rating rating={rating} /> : null}
       {rating ? <Text color="gray.400">&bull;</Text> : null}
-      {open !== undefined ? (
+      {isOpen !== undefined ? (
         <Text fontSize="sm" color={open ? 'green' : 'red'}>
-          {open ? 'Open' : 'Closed'}
+          {isOpen ? 'Open' : 'Closed'}
         </Text>
       ) : null}
-      {!is24Hr && ((open && closes) || (!open && opens)) ? (
+      {!is24Hr && ((isOpen && closes) || (!isOpen && opens)) ? (
         <Text color="gray.400">&bull;</Text>
       ) : null}
-      {open && closes ? (
+      {isOpen && closes ? (
         <Text fontSize="sm" color="gray.500" isTruncated>
           {closes}
         </Text>
       ) : null}
-      {!open && opens ? (
+      {!isOpen && opens ? (
         <Text fontSize="sm" color="gray.500" isTruncated>
           {opens}
         </Text>
