@@ -65,8 +65,8 @@ export const InviteItem = ({ invite: data }: { invite: FragmentType<typeof invit
             onClick={async () => {
               const decision = await confirmWrapper('Resend Invite?', {
                 description: <Text mb={2}>This will resend invite</Text>,
-                cancelText: "No, Don't resend",
-                confirmText: 'Yes, resend',
+                cancelText: "No, Don't Resend",
+                confirmText: 'Yes, Resend',
                 colorScheme: 'blue'
               });
               if (decision) {
@@ -114,8 +114,8 @@ export const InviteItem = ({ invite: data }: { invite: FragmentType<typeof invit
             onClick={async () => {
               const decision = await confirmWrapper('Delete Invite?', {
                 description: <Text mb={2}>This will delete invite</Text>,
-                cancelText: "No, Don't delete",
-                confirmText: 'Yes, delete',
+                cancelText: "No, Don't Delete",
+                confirmText: 'Yes, Delete',
                 colorScheme: 'red'
               });
               if (decision) {
