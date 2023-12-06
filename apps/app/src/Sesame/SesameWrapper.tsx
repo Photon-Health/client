@@ -83,15 +83,11 @@ const SesameHeader = ({
   </Container>
 );
 
-const basePath = process.env.REACT_APP_ORY_URL || 'http://clinical-api.tau.health:4000';
-const secureBasePath =
-  process.env.REACT_APP_ORY_URL_SECURE ||
-  process.env.REACT_APP_ORY_URL ||
-  'https://clinical-api.tau.health:40444';
+const basePath = process.env.REACT_APP_ORY_URL || 'http://localhost:4000';
 
 const ory = new FrontendApi(
   new Configuration({
-    basePath: secureBasePath,
+    basePath,
     baseOptions: {
       withCredentials: true
     }
@@ -103,12 +99,12 @@ export const SesamePage: FC<{ children: ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<Session | undefined>();
   const [logoutUrl, setLogoutUrl] = useState<string | undefined>();
 
-  const { logout } = usePhoton();
+  const { logout, isAuthenticated } = usePhoton();
 
   const login = () => window.location.assign(`${basePath}/ui/login`);
   const onClickLogout = logoutUrl
     ? async () => {
-        await logout({});
+        // await logout({ returnTo: logoutUrl, federated: true });
         window.location.assign(logoutUrl);
       }
     : undefined;
@@ -121,12 +117,18 @@ export const SesamePage: FC<{ children: ReactNode }> = ({ children }) => {
         const data = await ory.toSession();
         const logoutData = await ory.createBrowserLogoutFlow();
         setSession(data.data);
-        setLogoutUrl(logoutData.data.logout_url.replace('http://', 'https://'));
+        setLogoutUrl(logoutData.data.logout_url);
       } finally {
         setIsLoading(false);
       }
     })();
   }, []);
+
+  useEffect(() => {
+    if (!loading && !session?.active && isAuthenticated) {
+      logout({ returnTo: document.location.href });
+    }
+  }, [loading, session?.active, isAuthenticated]);
 
   return (
     <div
@@ -153,12 +155,14 @@ export const SesamePage: FC<{ children: ReactNode }> = ({ children }) => {
       {loading ? null : session ? (
         <>
           {children}
-          <photon-auth-button />
+          {logoutUrl}
+          {/* <photon-auth-button /> */}
         </>
       ) : (
         <>
           <div style={{ textAlign: 'center' }}>Login to get started</div>
-          <photon-auth-button />
+          {children}
+          {/* <photon-auth-button /> */}
         </>
       )}
     </div>

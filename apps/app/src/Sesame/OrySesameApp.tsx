@@ -41,6 +41,7 @@ export function SesameApp() {
           domain={domain}
           audience={audience}
           uri={uri}
+          redirect-path={document.location.pathname}
         >
           <SesamePage>
             <Flex pr="10" h="100%" flexGrow={'1'}>

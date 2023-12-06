@@ -3,13 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-<<<<<<< HEAD
-    "app:local": "concurrently \"npx graphql-codegen --watch --config='apps/app/codegen.ts'\" \"npx nx run app:start\"",
-    "app:tau": "concurrently \"npx graphql-codegen --watch --config='apps/app/codegen.ts'\" \"npx nx run app:start:tau\"",
-=======
     "app:local": "concurrently \"npx nx run elements:build:watch\" \"npx nx run app:start\"",
     "ory-sesame-cra:local": "concurrently \"npx nx run elements:build:watch\" \"npx nx run ory-sesame-cra:start\"",
->>>>>>> 98d62e3 (sesame ory POC)
     "patient": "npx nx run patient:start",
     "lint": "npx nx run-many --target=lint",
     "lint:fix": "npx nx run-many --target=lint:fix"
