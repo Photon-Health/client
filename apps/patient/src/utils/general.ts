@@ -177,14 +177,14 @@ export const preparePharmacy = async (
       : undefined;
     const notToday = !dayjs(nextOpen).isToday;
     const format = `${dayjs(nextOpen).minute() > 0 ? 'h:mmA' : 'hA'} ${notToday ? 'ddd' : ''}`;
-    const formattedOpens = dayjs(nextOpen).format(format);
-    const opens = `Opens ${formattedOpens}`;
+    const oTime = dayjs(nextOpen).format(format);
+    const opens = `Opens ${oTime}`;
 
     const nextClose = isCloseEvent(pharmacy.nextEvents.close)
       ? pharmacy.nextEvents.close.datetime
       : undefined;
-    const f2 = dayjs(nextClose).format(dayjs(nextClose).minute() > 0 ? 'h:mmA' : 'hA');
-    const closes = `Closes ${f2}`;
+    const cTime = dayjs(nextClose).format(dayjs(nextClose).minute() > 0 ? 'h:mmA' : 'hA');
+    const closes = `Closes ${cTime}`;
 
     return {
       ...pharmacy,
