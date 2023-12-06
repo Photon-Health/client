@@ -27,7 +27,6 @@ import { formatAddress } from '../utils/general';
 dayjs.extend(customParseFormat);
 
 interface RatingHoursProps {
-  businessStatus: string;
   rating: number;
   isOpen: boolean;
   is24Hr: boolean;
@@ -152,7 +151,6 @@ export const PharmacyCard = memo(function PharmacyCard({
           <VStack align="start" w="full" spacing={0}>
             <Text fontSize="md">{pharmacy.name}</Text>
             <RatingHours
-              businessStatus={pharmacy.businessStatus}
               rating={pharmacy.rating}
               open={pharmacy.isOpen}
               is24Hr={pharmacy.is24Hr}

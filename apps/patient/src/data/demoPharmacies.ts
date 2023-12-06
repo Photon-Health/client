@@ -12,7 +12,6 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 0.2,
     rating: 4.9,
-    businessStatus: 'OPERATIONAL',
     hours: {
       open: true,
       is24Hr: false,
@@ -34,7 +33,6 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 0.4,
     rating: 4.6,
-    businessStatus: 'OPERATIONAL',
     hours: {
       open: true,
       is24Hr: false,
@@ -56,7 +54,6 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 0.5,
     rating: 3.5,
-    businessStatus: 'OPERATIONAL',
     hours: {
       open: true,
       is24Hr: true
@@ -75,7 +72,6 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 0.8,
     rating: 2.7,
-    businessStatus: 'OPERATIONAL',
     hours: {
       open: true,
       is24Hr: false,
@@ -97,7 +93,6 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 1.0,
     rating: 2.8,
-    businessStatus: 'OPERATIONAL',
     hours: {
       open: true,
       is24Hr: true
@@ -116,7 +111,6 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 1.1,
     rating: 3.8,
-    businessStatus: 'OPERATIONAL',
     hours: {
       open: true,
       is24Hr: false,
@@ -138,7 +132,6 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 1.1,
     rating: 5.0,
-    businessStatus: 'OPERATIONAL',
     hours: {
       open: true,
       is24Hr: false,
@@ -160,7 +153,6 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 1.4,
     rating: 4.7,
-    businessStatus: 'OPERATIONAL',
     hours: {
       open: true,
       is24Hr: false,
@@ -182,7 +174,6 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 1.5,
     rating: 3.5,
-    businessStatus: 'OPERATIONAL',
     hours: {
       open: true,
       is24Hr: true
@@ -201,7 +192,6 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 2.1,
     rating: 4.3,
-    businessStatus: 'OPERATIONAL',
     hours: {
       open: true,
       is24Hr: false,
