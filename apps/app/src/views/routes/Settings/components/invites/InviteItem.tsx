@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { useClinicalApiClient } from '../../apollo';
 import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { InvitesQueryDocument } from 'apps/app/src/gql/graphql';
-import { FiCheck, FiSend, FiTrash, FiX } from 'react-icons/fi';
+import { FiCheckCircle, FiSend, FiTrash, FiX } from 'react-icons/fi';
 import { confirmWrapper } from '../../../../components/GuardDialog';
 
 export const inviteFragment = graphql(/* GraphQL */ `
@@ -35,12 +35,12 @@ export const InviteItem = ({ invite: data }: { invite: FragmentType<typeof invit
   const invite = useFragment(inviteFragment, data);
   const client = useClinicalApiClient();
 
-  const [deleteInvite] = useMutation(DeleteInviteUserMutation, {
+  const [deleteInvite, { loading: deleteLoading }] = useMutation(DeleteInviteUserMutation, {
     client,
     refetchQueries: [InvitesQueryDocument]
   });
 
-  const [resendInvite] = useMutation(ResendInviteUserMutation, {
+  const [resendInvite, { loading: resendLoading }] = useMutation(ResendInviteUserMutation, {
     client,
     refetchQueries: [InvitesQueryDocument]
   });
@@ -62,6 +62,7 @@ export const InviteItem = ({ invite: data }: { invite: FragmentType<typeof invit
             variant="ghost"
             aria-label="Resend Invite"
             title="Resend Invite"
+            isDisabled={resendLoading || deleteLoading}
             onClick={async () => {
               const decision = await confirmWrapper('Resend Invite?', {
                 description: <Text mb={2}>This will resend invite</Text>,
@@ -87,8 +88,8 @@ export const InviteItem = ({ invite: data }: { invite: FragmentType<typeof invit
                       bg="white"
                       borderColor="green.500"
                     >
-                      <HStack align="start">
-                        <Icon as={FiCheck} color="green.500" boxSize="5" />
+                      <HStack>
+                        <Icon as={FiCheckCircle} color="green.500" boxSize="5" />
                         <Text flex="1">Invite Resent</Text>
                         <IconButton
                           color="muted"
@@ -111,11 +112,12 @@ export const InviteItem = ({ invite: data }: { invite: FragmentType<typeof invit
             variant="ghost"
             aria-label="Delete Invite"
             title="Delete Invite"
+            isDisabled={resendLoading || deleteLoading}
             onClick={async () => {
               const decision = await confirmWrapper('Delete Invite?', {
                 description: <Text mb={2}>This will delete invite</Text>,
-                cancelText: "No, Don't Delete",
-                confirmText: 'Yes, Delete',
+                cancelText: "No, Don't delete",
+                confirmText: 'Yes, delete',
                 colorScheme: 'red'
               });
               if (decision) {
@@ -136,8 +138,8 @@ export const InviteItem = ({ invite: data }: { invite: FragmentType<typeof invit
                       bg="white"
                       borderColor="green.500"
                     >
-                      <HStack align="start">
-                        <Icon as={FiCheck} color="green.500" boxSize="5" />
+                      <HStack>
+                        <Icon as={FiCheckCircle} color="green.500" boxSize="5" />
                         <Text flex="1">Invite Deleted</Text>
                         <IconButton
                           color="muted"
