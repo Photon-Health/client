@@ -172,14 +172,17 @@ export const preparePharmacy = async (
 
     const is24Hr = pharmacy.nextEvents[pharmacy.isOpen ? 'open' : 'close'].type === '24hr';
 
+    // Prepare opens string, ex: Opens 8AM Wed
     const nextOpen = isOpenEvent(pharmacy.nextEvents.open)
       ? pharmacy.nextEvents.open.datetime
       : undefined;
-    const notToday = !dayjs(nextOpen).isToday;
-    const format = `${dayjs(nextOpen).minute() > 0 ? 'h:mmA' : 'hA'} ${notToday ? 'ddd' : ''}`;
-    const oTime = dayjs(nextOpen).format(format);
+    const formatter = `${dayjs(nextOpen).minute() > 0 ? 'h:mmA' : 'hA'} ${
+      !dayjs(nextOpen).isToday ? 'ddd' : ''
+    }`;
+    const oTime = dayjs(nextOpen).format(formatter);
     const opens = `Opens ${oTime}`;
 
+    // Prepare closes string, ex: Closes 6PM
     const nextClose = isCloseEvent(pharmacy.nextEvents.close)
       ? pharmacy.nextEvents.close.datetime
       : undefined;
@@ -194,7 +197,7 @@ export const preparePharmacy = async (
       closes
     };
   } catch (error) {
-    console.log('Failed to enrich pharmacy data: ' + error.message);
+    console.log('Failed to prepare pharmacy metadata: ' + error.message);
     return pharmacy;
   }
 };
