@@ -176,8 +176,8 @@ export const preparePharmacy = async (
     const nextOpen = isOpenEvent(pharmacy.nextEvents.open)
       ? pharmacy.nextEvents.open.datetime
       : undefined;
-    const formatter = `${dayjs(nextOpen).minute() > 0 ? 'h:mmA' : 'hA'} ${
-      !dayjs(nextOpen).isToday ? 'ddd' : ''
+    const formatter = `${dayjs(nextOpen).minute() > 0 ? 'h:mmA' : 'hA'}${
+      dayjs(nextOpen).isToday() ? '' : ' ddd'
     }`;
     const oTime = dayjs(nextOpen).format(formatter);
     const opens = `Opens ${oTime}`;
