@@ -108,7 +108,7 @@ export const Status = () => {
 
   const handleGetDirections = () => {
     const url = `http://maps.google.com/?q=${pharmacy.name}, ${formatAddress(pharmacy.address)}`;
-    window.open(url, '_blank').focus();
+    window.open(url);
   };
 
   const initializePharmacy = async (p: types.Pharmacy) => {

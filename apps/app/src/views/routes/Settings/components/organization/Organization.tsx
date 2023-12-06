@@ -131,7 +131,8 @@ export const Organization = () => {
         { title: 'Email', value: organization?.email },
         { title: 'Fax', value: organization?.fax },
         { title: 'Phone', value: organization?.phone },
-        { title: 'Address', value: address }
+        { title: 'Address', value: address },
+        { title: 'Organization ID', value: organization?.id }
       ].map(({ title, value }) => ({
         title,
         value: value ? (
@@ -144,6 +145,7 @@ export const Organization = () => {
       })),
     [
       organization,
+      organization?.id,
       organization?.name,
       organization?.address,
       organization?.email,
