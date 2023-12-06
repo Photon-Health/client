@@ -20,7 +20,10 @@ export const Default: BannerStory = {
   render: () => {
     return (
       <div class="max-w-md flex flex-col items-start gap-y-10">
-        <Banner status="info" text="This is an info banner" />
+        <Banner status="info">This is an info banner</Banner>
+        <Banner status="info" withoutIcon>
+          This is an info banner without an icon
+        </Banner>
       </div>
     );
   }
