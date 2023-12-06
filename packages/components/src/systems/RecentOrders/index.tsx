@@ -7,30 +7,7 @@ import { createStore } from 'solid-js/store';
 import RecentOrdersCancelDialog from './RecentOrdersCancelDialog';
 import RecentOrdersDuplicateDialog from './RecentOrdersDuplicateDialog';
 import RecentOrdersIssueDialog from './RecentOrdersIssueDialog';
-
-type RecentOrdersState = {
-  orders: Order[];
-  isCancelDialogOpen: boolean;
-  isDuplicateDialogOpen: boolean;
-  isIssueDialogOpen: boolean;
-};
-
-type RecentOrdersActions = {
-  setIsCancelDialogOpen: (isOpen: boolean) => void;
-  setIsDuplicateDialogOpen: (isOpen: boolean) => void;
-  setIsIssueDialogOpen: (isOpen: boolean) => void;
-};
-
-type RecentOrdersContextValue = [RecentOrdersState, RecentOrdersActions];
-
-const RecentOrdersContext = createContext<RecentOrdersContextValue>([
-  { orders: [], isCancelDialogOpen: false, isDuplicateDialogOpen: false, isIssueDialogOpen: false },
-  {
-    setIsCancelDialogOpen: () => undefined,
-    setIsDuplicateDialogOpen: () => undefined,
-    setIsIssueDialogOpen: () => undefined
-  }
-]);
+import RecentOrdersCombineDialog from './RecentOrdersCombineDialog';
 
 const GetPatientOrdersQuery = gql`
   query GetPatientOrders($patientId: ID!) {
@@ -53,6 +30,39 @@ const GetPatientOrdersQuery = gql`
   }
 `;
 
+type RecentOrdersState = {
+  orders: Order[];
+  isCancelDialogOpen: boolean;
+  isCombineDialogOpen: boolean;
+  isDuplicateDialogOpen: boolean;
+  isIssueDialogOpen: boolean;
+};
+
+type RecentOrdersActions = {
+  setIsCancelDialogOpen: (isOpen: boolean) => void;
+  setIsCombineDialogOpen: (isOpen: boolean) => void;
+  setIsDuplicateDialogOpen: (isOpen: boolean) => void;
+  setIsIssueDialogOpen: (isOpen: boolean) => void;
+};
+
+type RecentOrdersContextValue = [RecentOrdersState, RecentOrdersActions];
+
+const RecentOrdersContext = createContext<RecentOrdersContextValue>([
+  {
+    orders: [],
+    isCancelDialogOpen: false,
+    isCombineDialogOpen: false,
+    isDuplicateDialogOpen: false,
+    isIssueDialogOpen: false
+  },
+  {
+    setIsCancelDialogOpen: () => undefined,
+    setIsCombineDialogOpen: () => undefined,
+    setIsDuplicateDialogOpen: () => undefined,
+    setIsIssueDialogOpen: () => undefined
+  }
+]);
+
 interface SDKProviderProps {
   patientId: string;
   children: JSXElement;
@@ -62,7 +72,8 @@ function RecentOrders(props: SDKProviderProps) {
   const client = usePhotonClient();
   const [state, setState] = createStore<RecentOrdersState>({
     orders: [],
-    isCancelDialogOpen: false,
+    isCancelDialogOpen: true,
+    isCombineDialogOpen: false,
     isDuplicateDialogOpen: false,
     isIssueDialogOpen: false
   });
@@ -72,6 +83,9 @@ function RecentOrders(props: SDKProviderProps) {
     {
       setIsCancelDialogOpen(isOpen: boolean) {
         setState('isCancelDialogOpen', isOpen);
+      },
+      setIsCombineDialogOpen(isOpen: boolean) {
+        setState('isCombineDialogOpen', isOpen);
       },
       setIsDuplicateDialogOpen(isOpen: boolean) {
         setState('isDuplicateDialogOpen', isOpen);
@@ -122,6 +136,7 @@ export function useRecentOrders() {
 
 RecentOrders.Card = RecentOrdersCard;
 RecentOrders.CancelDialog = RecentOrdersCancelDialog;
+RecentOrders.CombineDialog = RecentOrdersCombineDialog;
 RecentOrders.DuplicateDialog = RecentOrdersDuplicateDialog;
 RecentOrders.IssueDialog = RecentOrdersIssueDialog;
 

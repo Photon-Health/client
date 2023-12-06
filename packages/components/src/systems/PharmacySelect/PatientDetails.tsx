@@ -2,7 +2,7 @@ import { Patient } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
 import { createMemo, createSignal, onMount, Show } from 'solid-js';
 import Badge from '../../particles/Badge';
-import { useRadioGroup } from '../../particles/RadioGroup';
+import { useRadioGroupCards } from '../../particles/RadioGroupCards';
 import Text from '../../particles/Text';
 import formatAddress from '../../utils/formatAddress';
 import { usePhotonClient } from '../SDKProvider';
@@ -36,7 +36,7 @@ const GetPatientQuery = gql`
 `;
 
 export function PatientDetails(props: PatientDetailsProps) {
-  const [state] = useRadioGroup();
+  const [state] = useRadioGroupCards();
   const client = usePhotonClient();
   const [patient, setPatient] = createSignal<Patient | null>(null);
 

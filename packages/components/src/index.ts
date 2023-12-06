@@ -9,7 +9,7 @@ import PatientMedHistory from './systems/PatientMedHistory';
 import PharmacySearch from './systems/PharmacySearch';
 import PharmacySelect from './systems/PharmacySelect';
 import Spinner from './particles/Spinner';
-import RadioGroup from './particles/RadioGroup';
+import RadioGroupCards from './particles/RadioGroupCards';
 import RecentOrders from './systems/RecentOrders';
 import Dialog from './particles/Dialog';
 import Button from './particles/Button';
@@ -34,7 +34,7 @@ export {
   PatientMedHistory,
   PharmacySearch,
   PharmacySelect,
-  RadioGroup,
+  RadioGroupCards,
   RecentOrders,
   SDKProvider,
   Spinner,
