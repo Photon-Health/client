@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { JSXElement, Show } from 'solid-js';
 import { createMemo, mergeProps } from 'solid-js';
 
-export type TextSize = 'xl' | 'lg' | 'md' | 'sm';
+export type TextSize = 'xl' | 'lg' | 'md' | 'sm' | 'xs';
 export type TextColor = 'black' | 'gray' | 'red';
 
 export interface TextProps {
@@ -24,6 +24,7 @@ export default function Text(props: TextProps) {
     // [overflow-wrap:anywhere] is here to prevent long text from overflowing, should be in tailwind soon
     // https://github.com/tailwindlabs/tailwindcss/discussions/2213#discussioncomment-5316024
     clsx(props.class, 'inline-flex my-px [overflow-wrap:anywhere] leading-snug', {
+      'text-xs': merged.size === 'xs',
       'text-sm': merged.size === 'sm',
       'text-base': merged.size === 'md',
       'text-lg': merged.size === 'lg',

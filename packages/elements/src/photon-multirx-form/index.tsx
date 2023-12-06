@@ -345,6 +345,7 @@ customElement(
           <style>{photonStyles}</style>
 
           <RecentOrders.DuplicateDialog />
+          <RecentOrders.CombineDialog />
           <RecentOrders.CancelDialog />
           <RecentOrders.IssueDialog />
 
