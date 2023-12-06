@@ -117,7 +117,6 @@ export const PharmacyCard = memo(function PharmacyCard({
       bgColor="white"
       border="2px solid"
       borderColor={selected && onSelect ? 'brand.600' : 'white'}
-      cursor="pointer"
       onClick={() => onSelect && onSelect()}
       mx={isMobile ? -3 : undefined}
     >
@@ -152,7 +151,7 @@ export const PharmacyCard = memo(function PharmacyCard({
             <Text fontSize="md">{pharmacy.name}</Text>
             <RatingHours
               rating={pharmacy.rating}
-              open={pharmacy.isOpen}
+              isOpen={pharmacy.isOpen}
               is24Hr={pharmacy.is24Hr}
               opens={pharmacy.opens}
               closes={pharmacy.closes}
