@@ -25,12 +25,12 @@ export const geocode = async (address: string) => {
   }
 };
 
-interface QueryHelperResponse<T> {
+interface GQueryResponse<T> {
   response: T;
   status: string;
 }
-const placeQuery = (method: string, data: object) =>
-  new Promise<QueryHelperResponse<any>>((resolve, reject) => {
+const gQuery = (method: string, data: object) =>
+  new Promise<GQueryResponse<any>>((resolve, reject) => {
     placesService[method](data, (response: any, status: string) => {
       if (status === 'OK') {
         resolve({ response, status });
@@ -51,7 +51,7 @@ export const getPlace = async (
   fields: string[]
 ): Promise<PlaceResponse | undefined> => {
   try {
-    const { response, status }: { response: PlaceResponse[]; status: string } = await placeQuery(
+    const { response, status }: { response: PlaceResponse[]; status: string } = await gQuery(
       'findPlaceFromQuery',
       { query, fields }
     );
