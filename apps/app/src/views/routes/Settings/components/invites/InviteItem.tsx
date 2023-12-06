@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { useClinicalApiClient } from '../../apollo';
 import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { InvitesQueryDocument } from 'apps/app/src/gql/graphql';
-import { FiInfo, FiSend, FiTrash, FiX } from 'react-icons/fi';
+import { FiCheck, FiSend, FiTrash, FiX } from 'react-icons/fi';
 import { confirmWrapper } from '../../../../components/GuardDialog';
 
 export const inviteFragment = graphql(/* GraphQL */ `
@@ -88,8 +88,8 @@ export const InviteItem = ({ invite: data }: { invite: FragmentType<typeof invit
                       borderColor="green.500"
                     >
                       <HStack align="start">
-                        <Icon as={FiInfo} color="green.500" boxSize="5" />
-                        <Text>Invite Resent</Text>
+                        <Icon as={FiCheck} color="green.500" boxSize="5" />
+                        <Text flex="1">Invite Resent</Text>
                         <IconButton
                           color="muted"
                           icon={<FiX fontSize="1.25rem" />}
@@ -137,8 +137,8 @@ export const InviteItem = ({ invite: data }: { invite: FragmentType<typeof invit
                       borderColor="green.500"
                     >
                       <HStack align="start">
-                        <Icon as={FiInfo} color="green.500" boxSize="5" />
-                        <Text>Invite Deleted</Text>
+                        <Icon as={FiCheck} color="green.500" boxSize="5" />
+                        <Text flex="1">Invite Deleted</Text>
                         <IconButton
                           color="muted"
                           icon={<FiX fontSize="1.25rem" />}
