@@ -39,13 +39,14 @@ export const getPharmacies = async (
   offset: number
 ) => {
   try {
+    const now = new Date();
     const response: { pharmaciesByLocation: types.Pharmacy[] } = await graphQLClient.request(
       GET_PHARMACIES,
       {
         location: searchParams,
         limit,
         offset,
-        openAt: new Date()
+        openAt: now
       }
     );
     if (response?.pharmaciesByLocation?.length > 0) {
