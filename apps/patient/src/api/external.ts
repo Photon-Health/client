@@ -25,12 +25,12 @@ export const geocode = async (address: string) => {
   }
 };
 
-interface QueryResponse<T> {
+interface QueryHelperResponse<T> {
   response: T;
   status: string;
 }
-const query = (method: string, data: object) =>
-  new Promise<QueryResponse<any>>((resolve, reject) => {
+const placeQuery = (method: string, data: object) =>
+  new Promise<QueryHelperResponse<any>>((resolve, reject) => {
     placesService[method](data, (response: any, status: string) => {
       if (status === 'OK') {
         resolve({ response, status });
@@ -40,25 +40,23 @@ const query = (method: string, data: object) =>
     });
   });
 
-interface RatingResponse {
+interface PlaceResponse {
+  place_id?: string;
+  types?: string[];
+  business_status?: string;
   rating?: number;
 }
-export const getRating = async (pharmacy: types.Pharmacy): Promise<number> => {
-  const address = pharmacy.address ? formatAddress(pharmacy.address) : '';
-  const placeQuery = pharmacy.name + ' ' + address;
-  const placeFields = ['rating'];
-  const placeRequest = {
-    query: placeQuery,
-    fields: placeFields
-  };
-
+export const getPlace = async (
+  query: string,
+  fields: string[]
+): Promise<PlaceResponse | undefined> => {
   try {
-    const { response, status }: { response: RatingResponse[]; status: string } = await query(
+    const { response, status }: { response: PlaceResponse[]; status: string } = await placeQuery(
       'findPlaceFromQuery',
-      placeRequest
+      { query, fields }
     );
     if (status === 'OK' && response[0]) {
-      return response[0].rating;
+      return response[0];
     }
     return undefined;
   } catch (error) {

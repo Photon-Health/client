@@ -4,7 +4,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 import { types } from '@photonhealth/sdk';
 import { ExtendedFulfillmentType } from './models';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { getRating } from '../api';
+import { getPlace } from '../api';
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 
 dayjs.extend(isoWeek);
@@ -159,12 +159,14 @@ function isCloseEvent(event: types.PharmacyEvent): event is types.PharmacyCloseE
   return event.type === 'close';
 }
 
-export const enrichPharmacy = async (
+export const preparePharmacy = async (
   pharmacy: types.Pharmacy,
   includeRating = true
 ): Promise<EnrichedPharmacy> => {
   try {
-    const rating = includeRating ? await getRating(pharmacy) : null;
+    const queryText = `${pharmacy.name} ${pharmacy.address ? formatAddress(pharmacy.address) : ''}`;
+    const queryFields = ['rating'];
+    const rating = includeRating ? (await getPlace(queryText, queryFields)).rating : null;
 
     const is24Hr = pharmacy.nextEvents[pharmacy.isOpen ? 'open' : 'close'].type === '24hr';
 

@@ -15,7 +15,7 @@ import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { Helmet } from 'react-helmet';
 import { types } from '@photonhealth/sdk';
 import * as TOAST_CONFIG from '../configs/toast';
-import { formatAddress, enrichPharmacy } from '../utils/general';
+import { formatAddress, preparePharmacy } from '../utils/general';
 import { ExtendedFulfillmentType } from '../utils/models';
 import { text as t } from '../utils/text';
 import { FixedFooter } from '../components/FixedFooter';
@@ -190,7 +190,7 @@ export const Pharmacy = () => {
 
     // We only show add a few at a time, so just enrich the first group of pharmacies
     const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
-      pharmaciesResult.slice(0, MAX_ENRICHMENT).map((p) => enrichPharmacy(p, true))
+      pharmaciesResult.slice(0, MAX_ENRICHMENT).map((p) => preparePharmacy(p, true))
     );
     setPharmacyOptions(enrichedPharmacies);
 
@@ -223,7 +223,7 @@ export const Pharmacy = () => {
     const newPharmacies: EnrichedPharmacy[] = await Promise.all(
       initialPharmacies
         .slice(pharmacyOptions.length, pharmacyOptions.length + MAX_ENRICHMENT)
-        .map((p) => enrichPharmacy(p, true))
+        .map((p) => preparePharmacy(p, true))
     );
 
     if (newPharmacies.length === MAX_ENRICHMENT) {
@@ -265,7 +265,7 @@ export const Pharmacy = () => {
     }
 
     const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
-      pharmaciesResult.map((p) => enrichPharmacy(p, true))
+      pharmaciesResult.map((p) => preparePharmacy(p, true))
     );
     newPharmacies.push(...enrichedPharmacies);
 
