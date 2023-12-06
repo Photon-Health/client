@@ -570,7 +570,7 @@ export type Pharmacy = {
   phone?: Maybe<Scalars['AWSPhone']>;
   is24Hr?: boolean;
   nextEvents?: PharmacyEvents;
-  hours: [PharmacyHours];
+  hours?: [PharmacyHours];
   isOpen?: boolean;
 };
 
