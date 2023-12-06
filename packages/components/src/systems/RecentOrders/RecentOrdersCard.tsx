@@ -1,27 +1,26 @@
 import { For, Show } from 'solid-js';
 import { useRecentOrders } from '.';
 import formatDate from '../../utils/formatDate';
+import Banner from '../../particles/Banner';
+import Button from '../../particles/Button';
 import Card from '../../particles/Card';
 import Text from '../../particles/Text';
-import Banner from '../../particles/Banner';
 import OrderStatusBadge from '../../particles/OrderStatusBadge';
 
 export default function RecentOrdersCard() {
-  // TODO fix type error
-  const { orders } = useRecentOrders();
+  const [state, actions] = useRecentOrders();
 
   return (
-    <Show when={orders().length > 0}>
+    <Show when={state.orders.length > 0}>
       <Card>
         <div class="flex items-center justify-between">
           <Text color="gray">Recent Orders</Text>
         </div>
         <table class="table-fixed divide-y divide-gray-300 break-words">
           <tbody class="divide-y divide-gray-200">
-            <For each={orders()}>
+            <For each={state.orders}>
               {(order) => {
                 const treatments = new Set<string>();
-                // TODO fix type error
                 order?.fills.forEach((fill) => {
                   treatments.add(fill.treatment?.name);
                 });
@@ -48,9 +47,31 @@ export default function RecentOrdersCard() {
                           </For>
                         </div>
                       </div>
-                      <div class="mt-4">
-                        <Banner text="This order is being processed" status="info" />
-                      </div>
+                      <Show when={order.state === 'ROUTING'}>
+                        <div class="mt-4">
+                          <Banner status="info" withoutIcon>
+                            <div class="flex flex-col gap-2">
+                              <Text size="sm" color="black">
+                                This order is pending pharmacy selection by the patient
+                              </Text>
+                              <div class="flex gap-x-4">
+                                <Button
+                                  variant="naked"
+                                  onClick={() => actions.setIsIssueDialogOpen(true)}
+                                >
+                                  Report Issue
+                                </Button>
+                                <Button
+                                  variant="naked"
+                                  onClick={() => actions.setIsCancelDialogOpen(true)}
+                                >
+                                  Cancel Order
+                                </Button>
+                              </div>
+                            </div>
+                          </Banner>
+                        </div>
+                      </Show>
                     </td>
                   </tr>
                 );
