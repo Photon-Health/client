@@ -108,9 +108,9 @@ export const PharmacyCard = memo(function PharmacyCard({
   onSetPreferred,
   onGetDirections
 }: PharmacyCardProps) {
-  const isMobile = useBreakpointValue({ base: true, md: false });
-
   if (!pharmacy) return null;
+
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
     <Card
