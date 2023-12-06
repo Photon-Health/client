@@ -40,7 +40,7 @@ const RatingHours = ({ rating, is24Hr, isOpen, opens, closes }: RatingHoursProps
       {rating ? <Rating rating={rating} /> : null}
       {rating ? <Text color="gray.400">&bull;</Text> : null}
       {isOpen !== undefined ? (
-        <Text fontSize="sm" color={open ? 'green' : 'red'}>
+        <Text fontSize="sm" color={isOpen ? 'green' : 'red'}>
           {isOpen ? 'Open' : 'Closed'}
         </Text>
       ) : null}
