@@ -46,7 +46,7 @@ export const UNOPEN_BUSINESS_STATUS_MAP = {
   CLOSED_PERMANENTLY: 'Closed Permanently'
 };
 const MAX_ENRICHMENT = 5; // Maximum number of pharmacies to enrich at a time
-const PHARMACIES_TO_GET_INITIALLY = 5;
+const INITIAL_PHARMACIES = 5;
 
 export const Pharmacy = () => {
   const { order, setOrder } = useOrderContext();
@@ -155,14 +155,13 @@ export const Pharmacy = () => {
     // Get pharmacies from photon db
     let pharmaciesResult: types.Pharmacy[];
     try {
-      // Get pharmacies from photon db
       pharmaciesResult = await getPharmacies(
         {
           latitude: lat,
           longitude: lng,
           radius: 25
         },
-        PHARMACIES_TO_GET_INITIALLY,
+        INITIAL_PHARMACIES,
         0
       );
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
@@ -189,10 +188,10 @@ export const Pharmacy = () => {
     setInitialPharmacies(pharmaciesResult);
 
     // We only show add a few at a time, so just enrich the first group of pharmacies
-    const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
+    const preparedPharmacies: EnrichedPharmacy[] = await Promise.all(
       pharmaciesResult.slice(0, MAX_ENRICHMENT).map((p) => preparePharmacy(p, true))
     );
-    setPharmacyOptions(enrichedPharmacies);
+    setPharmacyOptions(preparedPharmacies);
 
     setLoadingPharmacies(false);
   };
@@ -264,10 +263,10 @@ export const Pharmacy = () => {
       }
     }
 
-    const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
+    const preparedPharmacies: EnrichedPharmacy[] = await Promise.all(
       pharmaciesResult.map((p) => preparePharmacy(p, true))
     );
-    newPharmacies.push(...enrichedPharmacies);
+    newPharmacies.push(...preparedPharmacies);
 
     setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
     setLoadingPharmacies(false);
