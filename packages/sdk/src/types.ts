@@ -521,6 +521,44 @@ export type PatientPrescriptionFilter = {
   state?: InputMaybe<PrescriptionState>;
 };
 
+export type DayOfWeek =
+  | 'SUNDAY'
+  | 'MONDAY'
+  | 'TUESDAY'
+  | 'WEDNESDAY'
+  | 'THURSDAY'
+  | 'FRIDAY'
+  | 'SATURDAY';
+
+export type PharmacyHours = {
+  openFrom: string;
+  openUntil: string;
+  dayOfWeek: DayOfWeek;
+  is24Hr: boolean;
+  timezone: string;
+};
+
+export type PharmacyOpenEvent = {
+  type: string;
+  datetime: Scalars['AWSDateTime'];
+};
+
+export type PharmacyCloseEvent = {
+  type: string;
+  datetime: Scalars['AWSDateTime'];
+};
+
+export type PharmacyOpen24HrEvent = {
+  type: string;
+};
+
+export type PharmacyEvent = PharmacyOpenEvent | PharmacyCloseEvent | PharmacyOpen24HrEvent;
+
+export type PharmacyEvents = {
+  open: PharmacyEvent;
+  close: PharmacyEvent;
+};
+
 export type Pharmacy = {
   __typename?: 'Pharmacy';
   NPI?: Maybe<Scalars['String']>;
@@ -530,6 +568,10 @@ export type Pharmacy = {
   id: Scalars['ID'];
   name: Scalars['String'];
   phone?: Maybe<Scalars['AWSPhone']>;
+  is24Hr?: boolean;
+  nextEvents?: PharmacyEvents;
+  hours?: [PharmacyHours];
+  isOpen?: boolean;
 };
 
 export type Prescription = {

@@ -21,6 +21,8 @@ const documents = {
     "\n  query UserInviteFormQuery {\n    me {\n      id\n      name {\n        full\n      }\n    }\n  }\n": types.UserInviteFormQueryDocument,
     "\n  mutation InviteUser(\n    $email: String!\n    $inviter: String\n    $roles: [String!]!\n    $provider: ProviderInput\n  ) {\n    inviteUser(email: $email, inviter: $inviter, roles: $roles, provider: $provider) {\n      id\n    }\n  }\n": types.InviteUserDocument,
     "\n  fragment InviteFragment on Invite {\n    id\n    invitee\n    inviter\n    expired\n    expires_at\n  }\n": types.InviteFragmentFragmentDoc,
+    "\n  mutation ResendInvite($inviteId: ID!) {\n    resendInvite(inviteId: $inviteId) {\n      id\n    }\n  }\n": types.ResendInviteDocument,
+    "\n  mutation DeleteInvite($inviteId: ID!) {\n    deleteInvite(inviteId: $inviteId)\n  }\n": types.DeleteInviteDocument,
     "\n  query InvitesQuery {\n    invites {\n      ...InviteFragment\n      id\n      expired\n      expires_at\n    }\n  }\n": types.InvitesQueryDocument,
     "\n  query OrganizationQuery {\n    organization {\n      id\n      name\n      address {\n        street1\n        street2\n        postalCode\n        city\n        state\n        country\n      }\n      fax\n      phone\n      email\n    }\n  }\n": types.OrganizationQueryDocument,
     "\n  mutation UpdateOrganization($input: OrganizationInput!) {\n    updateOrganization(input: $input)\n  }\n": types.UpdateOrganizationDocument,
@@ -82,6 +84,14 @@ export function graphql(source: "\n  mutation InviteUser(\n    $email: String!\n
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  fragment InviteFragment on Invite {\n    id\n    invitee\n    inviter\n    expired\n    expires_at\n  }\n"): (typeof documents)["\n  fragment InviteFragment on Invite {\n    id\n    invitee\n    inviter\n    expired\n    expires_at\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ResendInvite($inviteId: ID!) {\n    resendInvite(inviteId: $inviteId) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation ResendInvite($inviteId: ID!) {\n    resendInvite(inviteId: $inviteId) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation DeleteInvite($inviteId: ID!) {\n    deleteInvite(inviteId: $inviteId)\n  }\n"): (typeof documents)["\n  mutation DeleteInvite($inviteId: ID!) {\n    deleteInvite(inviteId: $inviteId)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
