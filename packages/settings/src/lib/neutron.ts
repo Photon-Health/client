@@ -87,8 +87,7 @@ export const neutron: {
   org_0WP4tWCftMEM7K2q: {
     ...defaultSettings,
     logo: 'modern_ritual_logo.webp',
-    accentColor: '#202a36',
-    sendToPatient: false
+    accentColor: '#202a36'
   },
   // Radish Health
   org_kBuUKySvfFeWLovJ: {
