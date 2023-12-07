@@ -16,7 +16,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiCheck } from 'react-icons/fi';
 import { types } from '@photonhealth/sdk';
 import { FixedFooter, Nav, PharmacyCard, PoweredBy, StatusStepper } from '../components';
-import { formatAddress, getFulfillmentType, enrichPharmacy } from '../utils/general';
+import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
@@ -108,11 +108,11 @@ export const Status = () => {
 
   const handleGetDirections = () => {
     const url = `http://maps.google.com/?q=${pharmacy.name}, ${formatAddress(pharmacy.address)}`;
-    window.open(url, '_blank').focus();
+    window.open(url);
   };
 
   const initializePharmacy = async (p: types.Pharmacy) => {
-    const enrichedPharmacy = await enrichPharmacy(p, false);
+    const enrichedPharmacy = await preparePharmacy(p, false);
     setEnrichedPharmacy(enrichedPharmacy);
   };
 

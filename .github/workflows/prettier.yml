@@ -1,6 +1,9 @@
 name: Prettier Check
 
-on: push
+on:
+  push:
+  pull_request:
+    branches: [neutron, photon]
 
 jobs:
   prettier:
