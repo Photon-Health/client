@@ -19,7 +19,7 @@ import { createEffect, onMount, createSignal, Show, For } from 'solid-js';
 import type { FormError } from '../stores/form';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
-import { Spinner, Toaster, Button } from '@photonhealth/components';
+import { Spinner, Toaster, Button, triggerToast } from '@photonhealth/components';
 import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import { AddPrescriptionCard } from './components/AddPrescriptionCard';
 import { PatientCard } from './components/PatientCard';
@@ -60,6 +60,7 @@ customElement(
     weight: undefined,
     weightUnit: 'lbs',
     triggerSubmit: false,
+    setTriggerSubmit: undefined,
     toastBuffer: 0
   },
   (
@@ -81,6 +82,7 @@ customElement(
       weight?: number;
       weightUnit?: string;
       triggerSubmit: boolean;
+      setTriggerSubmit?: (val: boolean) => void;
       toastBuffer: number;
     },
     options
@@ -190,6 +192,17 @@ customElement(
     };
 
     const submitForm = async (enableOrder: boolean) => {
+      if (
+        store.fulfillmentType?.value === 'PICK_UP' &&
+        !(props?.pharmacyId || store.pharmacy?.value)
+      ) {
+        props?.setTriggerSubmit?.(false);
+        return triggerToast({
+          status: 'info',
+          body: 'You must select a pharmacy to send this order to.'
+        });
+      }
+
       setErrors([]);
       const keys = enableOrder
         ? ['patient', 'draftPrescriptions', 'pharmacy', 'address']
