@@ -15,12 +15,12 @@ const NameView = (props: NameViewProps) => {
       <Box>
         {isPatient ? (
           <ChakraLink as={RouterLink} to={`/patients/${patientId}`}>
-            <Text fontWeight="medium" whiteSpace="nowrap">
+            <Text fontWeight="medium" whiteSpace="nowrap" data-dd-privacy="mask">
               {name}
             </Text>
           </ChakraLink>
         ) : (
-          <Text fontWeight="medium" whiteSpace="nowrap">
+          <Text fontWeight="medium" whiteSpace="nowrap" data-dd-privacy="mask">
             {name}
           </Text>
         )}

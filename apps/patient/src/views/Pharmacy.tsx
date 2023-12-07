@@ -15,7 +15,7 @@ import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { Helmet } from 'react-helmet';
 import { types } from '@photonhealth/sdk';
 import * as TOAST_CONFIG from '../configs/toast';
-import { formatAddress, enrichPharmacy } from '../utils/general';
+import { formatAddress, preparePharmacy } from '../utils/general';
 import { ExtendedFulfillmentType } from '../utils/models';
 import { text as t } from '../utils/text';
 import { FixedFooter } from '../components/FixedFooter';
@@ -46,6 +46,7 @@ export const UNOPEN_BUSINESS_STATUS_MAP = {
   CLOSED_PERMANENTLY: 'Closed Permanently'
 };
 const MAX_ENRICHMENT = 5; // Maximum number of pharmacies to enrich at a time
+const INITIAL_PHARMACIES = 5;
 
 export const Pharmacy = () => {
   const { order, setOrder } = useOrderContext();
@@ -154,14 +155,13 @@ export const Pharmacy = () => {
     // Get pharmacies from photon db
     let pharmaciesResult: types.Pharmacy[];
     try {
-      // Get pharmacies from photon db
       pharmaciesResult = await getPharmacies(
         {
           latitude: lat,
           longitude: lng,
           radius: 25
         },
-        30, // Set high to ensure indie's are found. Request time increase is minimal.
+        INITIAL_PHARMACIES,
         0
       );
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
@@ -188,10 +188,10 @@ export const Pharmacy = () => {
     setInitialPharmacies(pharmaciesResult);
 
     // We only show add a few at a time, so just enrich the first group of pharmacies
-    const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
-      pharmaciesResult.slice(0, MAX_ENRICHMENT).map((p) => enrichPharmacy(p, true))
+    const preparedPharmacies: EnrichedPharmacy[] = await Promise.all(
+      pharmaciesResult.slice(0, MAX_ENRICHMENT).map((p) => preparePharmacy(p, true))
     );
-    setPharmacyOptions(enrichedPharmacies);
+    setPharmacyOptions(preparedPharmacies);
 
     setLoadingPharmacies(false);
   };
@@ -222,7 +222,7 @@ export const Pharmacy = () => {
     const newPharmacies: EnrichedPharmacy[] = await Promise.all(
       initialPharmacies
         .slice(pharmacyOptions.length, pharmacyOptions.length + MAX_ENRICHMENT)
-        .map((p) => enrichPharmacy(p, true))
+        .map((p) => preparePharmacy(p, true))
     );
 
     if (newPharmacies.length === MAX_ENRICHMENT) {
@@ -258,15 +258,16 @@ export const Pharmacy = () => {
           title: 'No pharmacies found near location',
           ...TOAST_CONFIG.WARNING
         });
+        setShowingAllPharmacies(true);
       } else {
         console.log(error);
       }
     }
 
-    const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
-      pharmaciesResult.map((p) => enrichPharmacy(p, true))
+    const preparedPharmacies: EnrichedPharmacy[] = await Promise.all(
+      pharmaciesResult.map((p) => preparePharmacy(p, true))
     );
-    newPharmacies.push(...enrichedPharmacies);
+    newPharmacies.push(...preparedPharmacies);
 
     setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
     setLoadingPharmacies(false);
