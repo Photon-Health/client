@@ -13,6 +13,8 @@ import getLocations, { Location } from '../../utils/getLocations';
 import loadGoogleScript from '../../utils/loadGoogleScript';
 import Badge from '../../particles/Badge';
 import Checkbox from '../../particles/Checkbox';
+import formatAddress from '../../utils/formatAddress';
+import Spinner from '../../particles/Spinner';
 
 const GetPharmaciesQuery = gql`
   query GetPharmacies($location: LatLongSearch!) {
@@ -31,6 +33,13 @@ const GetPharmaciesQuery = gql`
 const GetPreferredPharmaciesQuery = gql`
   query GetPatient($id: ID!) {
     patient(id: $id) {
+      address {
+        street1
+        street2
+        city
+        state
+        postalCode
+      }
       preferredPharmacies {
         id
         name
@@ -104,6 +113,14 @@ export default function PharmacySearch(props: PharmacySearchProps) {
       query: GetLastOrder,
       variables: { id: patientId }
     });
+
+    const address = preferredData?.patient?.address;
+
+    if (address) {
+      const addressStr = formatAddress(address);
+      await getAndSetLocation(addressStr, geocoder()!);
+    }
+
     if (preferredData?.patient?.preferredPharmacies?.length > 0) {
       setPreferredPharmacies(
         preferredData?.patient?.preferredPharmacies.map((ph: Pharmacy) => ({
@@ -112,6 +129,7 @@ export default function PharmacySearch(props: PharmacySearchProps) {
         }))
       );
     }
+
     if (previousData?.orders?.length > 0) {
       setPreviousId(previousData?.orders?.[0]?.pharmacy?.id);
     }
@@ -216,18 +234,20 @@ export default function PharmacySearch(props: PharmacySearchProps) {
         label={
           <div class="w-full flex flex-col sm:flex-row sm:items-center mb-2">
             <label class="whitespace-nowrap mr-1">Showing near:</label>
-            <a
-              href="#!"
-              role="button"
-              onClick={(e) => {
-                e.preventDefault();
-                setOpenLocationSearch(true);
-              }}
-              class="text-left truncate text-blue-600 font-semibold text-sm"
-            >
-              <Icon name="mapPin" size="sm" class="inline-block mr-1" />
-              {location()?.address || 'Set a location'}
-            </a>
+            <Show when={!fetchingPreferred()} fallback={<Spinner size="sm" />}>
+              <a
+                href="#!"
+                role="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setOpenLocationSearch(true);
+                }}
+                class="text-left truncate text-blue-600 font-semibold text-sm"
+              >
+                <Icon name="mapPin" size="sm" class="inline-block mr-1" />
+                {location()?.address || 'Set a location'}
+              </a>
+            </Show>
           </div>
         }
         helpText={
@@ -237,7 +257,9 @@ export default function PharmacySearch(props: PharmacySearchProps) {
                 Preferred
               </Badge>
             </Show>
-            <Show when={previousId() === selected()?.id && !selected()?.preferred}>
+            <Show
+              when={!!previousId() && previousId() === selected()?.id && !selected()?.preferred}
+            >
               <Badge size="sm" color="green">
                 Previous
               </Badge>
@@ -246,7 +268,10 @@ export default function PharmacySearch(props: PharmacySearchProps) {
         }
         loading={fetchingPharmacies()}
       >
-        <ComboBox value={mergedPharmacies()?.[0] || undefined} setSelected={setSelected}>
+        <ComboBox
+          value={(preferredPharmacies()?.length > 0 && mergedPharmacies()?.[0]) || undefined}
+          setSelected={setSelected}
+        >
           <ComboBox.Input
             onInput={(e) => setQuery(e.currentTarget.value)}
             displayValue={(pharmacy) => {
