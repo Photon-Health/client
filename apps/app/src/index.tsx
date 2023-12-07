@@ -23,11 +23,12 @@ datadogRum.init({
   service: pkg.name,
   env: process.env.REACT_APP_ENV_NAME,
   version: pkg.version,
-  sessionSampleRate: 10,
-  sessionReplaySampleRate: 10,
+  sessionSampleRate: 50,
+  sessionReplaySampleRate: 100,
   trackUserInteractions: true,
   trackResources: true,
-  trackLongTasks: true
+  trackLongTasks: true,
+  defaultPrivacyLevel: 'mask-user-input'
 });
 
 datadogRum.startSessionReplayRecording();
