@@ -55,8 +55,9 @@ export const getPlace = async (
     if (status === 'OK' && response[0]) {
       return response[0];
     }
-    return undefined;
-  } catch (error) {
-    throw new Error(error);
+    return null;
+  } catch (e) {
+    console.error(e);
+    return null;
   }
 };

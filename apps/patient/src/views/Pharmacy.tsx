@@ -258,6 +258,7 @@ export const Pharmacy = () => {
           title: 'No pharmacies found near location',
           ...TOAST_CONFIG.WARNING
         });
+        setShowingAllPharmacies(true);
       } else {
         console.log(error);
       }
