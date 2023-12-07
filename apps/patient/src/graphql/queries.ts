@@ -1,7 +1,7 @@
 import { gql } from 'graphql-request';
 
 export const GET_ORDER = gql`
-  query order($id: ID!) {
+  query order($id: ID!, $openAt: DateTime) {
     order(id: $id) {
       id
       state
@@ -32,6 +32,42 @@ export const GET_ORDER = gql`
           state
           country
           postalCode
+        }
+        isOpen(at: $openAt)
+        nextEvents(at: $openAt) {
+          open {
+            ... on PharmacyOpenEvent {
+              type
+              datetime
+            }
+            ... on PharmacyCloseEvent {
+              type
+              datetime
+            }
+            ... on PharmacyOpen24HrEvent {
+              type
+            }
+          }
+          close {
+            ... on PharmacyOpenEvent {
+              type
+              datetime
+            }
+            ... on PharmacyCloseEvent {
+              type
+              datetime
+            }
+            ... on PharmacyOpen24HrEvent {
+              type
+            }
+          }
+        }
+        hours {
+          dayOfWeek
+          is24Hr
+          openFrom
+          openUntil
+          timezone
         }
       }
       fills {
@@ -70,7 +106,12 @@ export const GET_ORDER = gql`
 `;
 
 export const GET_PHARMACIES = gql`
-  query GetPharmaciesByLocation($location: LatLongSearch!, $limit: Int, $offset: Int) {
+  query GetPharmaciesByLocation(
+    $location: LatLongSearch!
+    $limit: Int
+    $offset: Int
+    $openAt: DateTime
+  ) {
     pharmaciesByLocation(location: $location, limit: $limit, offset: $offset) {
       id
       name
@@ -83,6 +124,42 @@ export const GET_PHARMACIES = gql`
         postalCode
       }
       distance
+      isOpen(at: $openAt)
+      nextEvents(at: $openAt) {
+        open {
+          ... on PharmacyOpenEvent {
+            type
+            datetime
+          }
+          ... on PharmacyCloseEvent {
+            type
+            datetime
+          }
+          ... on PharmacyOpen24HrEvent {
+            type
+          }
+        }
+        close {
+          ... on PharmacyOpenEvent {
+            type
+            datetime
+          }
+          ... on PharmacyCloseEvent {
+            type
+            datetime
+          }
+          ... on PharmacyOpen24HrEvent {
+            type
+          }
+        }
+      }
+      hours {
+        dayOfWeek
+        is24Hr
+        openFrom
+        openUntil
+        timezone
+      }
     }
   }
 `;

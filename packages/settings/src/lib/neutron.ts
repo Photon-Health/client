@@ -181,13 +181,6 @@ export const neutron: {
     logo: 'assure_health_logo.svg',
     accentColor: '#66cca9'
   },
-  // Sunrise
-  org_SgWtqCKFzYaDePCf: {
-    ...defaultSettings,
-    logo: 'sunrise_logo.svg',
-    accentColor: '#0057b8',
-    enableRxAndOrder: false
-  },
   // Found
   org_PwzQxriG4OcMD0iq: {
     ...defaultSettings,
@@ -230,5 +223,11 @@ export const neutron: {
     logo: 'piction_health_logo.png',
     accentColor: '#3377e2',
     enableRxAndOrder: false
+  },
+  // Pine Medical
+  org_SgWtqCKFzYaDePCf: {
+    ...defaultSettings,
+    logo: 'pine_medical_logo.svg',
+    accentColor: '#000000'
   }
 };

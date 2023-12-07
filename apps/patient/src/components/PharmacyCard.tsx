@@ -21,60 +21,40 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { types } from '@photonhealth/sdk';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 
-import { UNOPEN_BUSINESS_STATUS_MAP } from '../views/Pharmacy';
 import { Rating } from './Rating';
 import { formatAddress } from '../utils/general';
 
 dayjs.extend(customParseFormat);
 
 interface RatingHoursProps {
-  businessStatus: string;
-  rating: number;
-  hours: {
-    open?: boolean;
-    opens?: string;
-    opensDay?: string;
-    closes?: string;
-    is24Hr?: boolean;
-  };
+  rating?: number;
+  isOpen?: boolean;
+  is24Hr?: boolean;
+  opens?: string;
+  closes?: string;
 }
 
-const RatingHours = ({ businessStatus, rating, hours }: RatingHoursProps) => {
-  if (businessStatus in UNOPEN_BUSINESS_STATUS_MAP) {
-    return (
-      <Text fontSize="sm" color="red">
-        {UNOPEN_BUSINESS_STATUS_MAP[businessStatus]}
-      </Text>
-    );
-  }
-
+const RatingHours = ({ rating, is24Hr, isOpen, opens, closes }: RatingHoursProps) => {
   return (
     <HStack w="full" whiteSpace="nowrap" overflow="hidden">
       {rating ? <Rating rating={rating} /> : null}
-      {rating ? <Text color="gray.400">&bull;</Text> : null}
-      {hours?.open !== undefined ? (
-        <Text fontSize="sm" color={hours?.open ? 'green' : 'red'}>
-          {hours?.open ? 'Open' : 'Closed'}
+      {rating && isOpen != null ? <Text color="gray.400">&bull;</Text> : null}
+      {isOpen != null ? (
+        <Text fontSize="sm" color={isOpen ? 'green' : 'red'}>
+          {isOpen ? 'Open' : 'Closed'}
         </Text>
       ) : null}
-      {!hours?.is24Hr && ((hours?.open && hours?.closes) || (!hours?.open && hours?.opens)) ? (
+      {!is24Hr && ((isOpen && closes) || (!isOpen && opens)) ? (
         <Text color="gray.400">&bull;</Text>
       ) : null}
-      {hours?.open && hours?.closes ? (
+      {!is24Hr && isOpen && closes ? (
         <Text fontSize="sm" color="gray.500" isTruncated>
-          Closes{' '}
-          {dayjs(hours?.closes, 'HHmm').format(
-            dayjs(hours?.closes, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA'
-          )}
+          {closes}
         </Text>
       ) : null}
-      {!hours?.open && hours?.opens ? (
+      {!is24Hr && !isOpen && opens ? (
         <Text fontSize="sm" color="gray.500" isTruncated>
-          Opens{' '}
-          {dayjs(hours?.opens, 'HHmm').format(
-            dayjs(hours?.opens, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA'
-          )}
-          {hours?.opensDay ? ` ${hours?.opensDay}` : ''}
+          {opens}
         </Text>
       ) : null}
     </HStack>
@@ -128,16 +108,15 @@ export const PharmacyCard = memo(function PharmacyCard({
   onSetPreferred,
   onGetDirections
 }: PharmacyCardProps) {
-  const isMobile = useBreakpointValue({ base: true, md: false });
-
   if (!pharmacy) return null;
+
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
     <Card
       bgColor="white"
       border="2px solid"
       borderColor={selected && onSelect ? 'brand.600' : 'white'}
-      cursor="pointer"
       onClick={() => onSelect && onSelect()}
       mx={isMobile ? -3 : undefined}
     >
@@ -162,7 +141,7 @@ export const PharmacyCard = memo(function PharmacyCard({
                 <TagLabel> Good service</TagLabel>
               </Tag>
             ) : null}
-            {pharmacy?.hours?.is24Hr ? (
+            {pharmacy?.is24Hr ? (
               <Tag size="sm" colorScheme="green">
                 <TagLabel>24 hr</TagLabel>
               </Tag>
@@ -171,9 +150,11 @@ export const PharmacyCard = memo(function PharmacyCard({
           <VStack align="start" w="full" spacing={0}>
             <Text fontSize="md">{pharmacy.name}</Text>
             <RatingHours
-              businessStatus={pharmacy.businessStatus}
               rating={pharmacy.rating}
-              hours={pharmacy.hours}
+              isOpen={pharmacy.isOpen}
+              is24Hr={pharmacy.is24Hr}
+              opens={pharmacy.opens}
+              closes={pharmacy.closes}
             />
             <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
           </VStack>
