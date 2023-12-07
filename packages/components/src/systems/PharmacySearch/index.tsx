@@ -84,7 +84,7 @@ export default function PharmacySearch(props: PharmacySearchProps) {
   const [pharmacies, setPharmacies] = createSignal<PharmacyExtended[] | null>(null);
   const [preferredPharmacies, setPreferredPharmacies] = createSignal<PharmacyExtended[]>([]);
   const [fetchingPharmacies, setFetchingPharmacies] = createSignal(false);
-  const [fetchingPreferred, setFetchingPreferred] = createSignal(true);
+  const [fetchingPreferred, setFetchingPreferred] = createSignal(false);
   const [openLocationSearch, setOpenLocationSearch] = createSignal(false);
   const [geocoder, setGeocoder] = createSignal<google.maps.Geocoder | undefined>();
   const [previousId, setPreviousId] = createSignal<string | null>(null);
