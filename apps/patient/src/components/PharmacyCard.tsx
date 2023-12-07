@@ -27,19 +27,21 @@ import { formatAddress } from '../utils/general';
 dayjs.extend(customParseFormat);
 
 interface RatingHoursProps {
-  rating: number;
-  isOpen: boolean;
-  is24Hr: boolean;
-  opens: string;
-  closes: string;
+  rating?: number;
+  isOpen?: boolean;
+  is24Hr?: boolean;
+  opens?: string;
+  closes?: string;
 }
 
 const RatingHours = ({ rating, is24Hr, isOpen, opens, closes }: RatingHoursProps) => {
   return (
     <HStack w="full" whiteSpace="nowrap" overflow="hidden">
       {rating ? <Rating rating={rating} /> : null}
-      {rating ? <Text color="gray.400">&bull;</Text> : null}
-      {isOpen !== undefined ? (
+      {rating && isOpen !== undefined && isOpen !== null ? (
+        <Text color="gray.400">&bull;</Text>
+      ) : null}
+      {isOpen !== undefined && isOpen !== null ? (
         <Text fontSize="sm" color={isOpen ? 'green' : 'red'}>
           {isOpen ? 'Open' : 'Closed'}
         </Text>

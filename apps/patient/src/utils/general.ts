@@ -108,26 +108,33 @@ export const preparePharmacy = async (
   try {
     const queryText = `${pharmacy.name} ${pharmacy.address ? formatAddress(pharmacy.address) : ''}`;
     const queryFields = ['rating'];
-    const rating = includeRating ? (await getPlace(queryText, queryFields)).rating : null;
 
-    const is24Hr = pharmacy.nextEvents[pharmacy.isOpen ? 'open' : 'close'].type === '24hr';
+    const rating = includeRating ? (await getPlace(queryText, queryFields))?.rating : null;
 
-    // Prepare opens string, ex: Opens 8AM Wed
-    const nextOpen = isOpenEvent(pharmacy.nextEvents.open)
-      ? pharmacy.nextEvents.open.datetime
-      : undefined;
-    const formatter = `${dayjs(nextOpen).minute() > 0 ? 'h:mmA' : 'hA'}${
-      dayjs(nextOpen).isToday() ? '' : ' ddd'
-    }`;
-    const oTime = dayjs(nextOpen).format(formatter);
-    const opens = `Opens ${oTime}`;
+    let is24Hr = false;
+    let opens = '';
+    let closes = '';
 
-    // Prepare closes string, ex: Closes 6PM
-    const nextClose = isCloseEvent(pharmacy.nextEvents.close)
-      ? pharmacy.nextEvents.close.datetime
-      : undefined;
-    const cTime = dayjs(nextClose).format(dayjs(nextClose).minute() > 0 ? 'h:mmA' : 'hA');
-    const closes = `Closes ${cTime}`;
+    if (pharmacy.nextEvents) {
+      is24Hr = pharmacy.nextEvents[pharmacy.isOpen ? 'open' : 'close'].type === '24hr';
+
+      // Prepare opens string, ex: Opens 8AM Wed
+      const nextOpen = isOpenEvent(pharmacy.nextEvents.open)
+        ? pharmacy.nextEvents.open.datetime
+        : undefined;
+      const formatter = `${dayjs(nextOpen).minute() > 0 ? 'h:mmA' : 'hA'}${
+        dayjs(nextOpen).isToday() ? '' : ' ddd'
+      }`;
+      const oTime = dayjs(nextOpen).format(formatter);
+      opens = `Opens ${oTime}`;
+
+      // Prepare closes string, ex: Closes 6PM
+      const nextClose = isCloseEvent(pharmacy.nextEvents.close)
+        ? pharmacy.nextEvents.close.datetime
+        : undefined;
+      const cTime = dayjs(nextClose).format(dayjs(nextClose).minute() > 0 ? 'h:mmA' : 'hA');
+      closes = `Closes ${cTime}`;
+    }
 
     return {
       ...pharmacy,
