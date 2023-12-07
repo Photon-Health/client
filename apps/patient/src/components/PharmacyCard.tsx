@@ -38,10 +38,8 @@ const RatingHours = ({ rating, is24Hr, isOpen, opens, closes }: RatingHoursProps
   return (
     <HStack w="full" whiteSpace="nowrap" overflow="hidden">
       {rating ? <Rating rating={rating} /> : null}
-      {rating && isOpen !== undefined && isOpen !== null ? (
-        <Text color="gray.400">&bull;</Text>
-      ) : null}
-      {isOpen !== undefined && isOpen !== null ? (
+      {rating && isOpen != null ? <Text color="gray.400">&bull;</Text> : null}
+      {isOpen != null ? (
         <Text fontSize="sm" color={isOpen ? 'green' : 'red'}>
           {isOpen ? 'Open' : 'Closed'}
         </Text>
