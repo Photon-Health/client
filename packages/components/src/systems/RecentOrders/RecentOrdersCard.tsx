@@ -61,12 +61,6 @@ export default function RecentOrdersCard() {
                                 >
                                   Report Issue
                                 </Button>
-                                <Button
-                                  variant="naked"
-                                  onClick={() => actions.setIsCancelDialogOpen(true)}
-                                >
-                                  Cancel Order
-                                </Button>
                               </div>
                             </div>
                           </Banner>
