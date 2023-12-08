@@ -59,8 +59,7 @@ export const photon: {
   org_IWmodVdrQYpqh5x2: {
     ...defaultSettings,
     logo: 'modern_ritual_logo.webp',
-    accentColor: '#202a36',
-    sendToPatient: false
+    accentColor: '#202a36'
   },
   // Reside Health
   org_8fwLMYQGxj6Bg70X: {
@@ -202,6 +201,7 @@ export const photon: {
   org_ZIksHxx59zFVc1Xw: {
     ...defaultSettings,
     logo: 'pine_medical_logo.svg',
-    accentColor: '#000000'
+    accentColor: '#000000',
+    enableRxAndOrder: false
   }
 };
