@@ -4,7 +4,6 @@ import RecentOrdersCard from './RecentOrdersCard';
 import { usePhotonClient } from '../SDKProvider';
 import { Order } from '@photonhealth/sdk/dist/types';
 import { createStore } from 'solid-js/store';
-import RecentOrdersCancelDialog from './RecentOrdersCancelDialog';
 import RecentOrdersDuplicateDialog from './RecentOrdersDuplicateDialog';
 import RecentOrdersIssueDialog from './RecentOrdersIssueDialog';
 import RecentOrdersCombineDialog from './RecentOrdersCombineDialog';
@@ -135,7 +134,6 @@ export function useRecentOrders() {
 }
 
 RecentOrders.Card = RecentOrdersCard;
-RecentOrders.CancelDialog = RecentOrdersCancelDialog;
 RecentOrders.CombineDialog = RecentOrdersCombineDialog;
 RecentOrders.DuplicateDialog = RecentOrdersDuplicateDialog;
 RecentOrders.IssueDialog = RecentOrdersIssueDialog;
