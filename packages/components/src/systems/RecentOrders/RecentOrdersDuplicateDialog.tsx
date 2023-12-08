@@ -32,6 +32,9 @@ export default function RecentOrdersDuplicateDialog() {
 
         <div class="flex flex-col items-stretch gap-4">
           <Button size="xl">Report Issue</Button>
+          <Button size="xl" variant="secondary">
+            Add Prescriptions Anyway
+          </Button>
           <Button variant="naked" size="xl" onClick={() => actions.setIsDuplicateDialogOpen(false)}>
             Go Back
           </Button>

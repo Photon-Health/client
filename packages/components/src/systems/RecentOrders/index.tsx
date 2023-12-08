@@ -31,14 +31,12 @@ const GetPatientOrdersQuery = gql`
 
 type RecentOrdersState = {
   orders: Order[];
-  isCancelDialogOpen: boolean;
   isCombineDialogOpen: boolean;
   isDuplicateDialogOpen: boolean;
   isIssueDialogOpen: boolean;
 };
 
 type RecentOrdersActions = {
-  setIsCancelDialogOpen: (isOpen: boolean) => void;
   setIsCombineDialogOpen: (isOpen: boolean) => void;
   setIsDuplicateDialogOpen: (isOpen: boolean) => void;
   setIsIssueDialogOpen: (isOpen: boolean) => void;
@@ -49,13 +47,11 @@ type RecentOrdersContextValue = [RecentOrdersState, RecentOrdersActions];
 const RecentOrdersContext = createContext<RecentOrdersContextValue>([
   {
     orders: [],
-    isCancelDialogOpen: false,
     isCombineDialogOpen: false,
     isDuplicateDialogOpen: false,
     isIssueDialogOpen: false
   },
   {
-    setIsCancelDialogOpen: () => undefined,
     setIsCombineDialogOpen: () => undefined,
     setIsDuplicateDialogOpen: () => undefined,
     setIsIssueDialogOpen: () => undefined
@@ -71,7 +67,6 @@ function RecentOrders(props: SDKProviderProps) {
   const client = usePhotonClient();
   const [state, setState] = createStore<RecentOrdersState>({
     orders: [],
-    isCancelDialogOpen: true,
     isCombineDialogOpen: false,
     isDuplicateDialogOpen: false,
     isIssueDialogOpen: false
@@ -80,9 +75,6 @@ function RecentOrders(props: SDKProviderProps) {
   const value: RecentOrdersContextValue = [
     state,
     {
-      setIsCancelDialogOpen(isOpen: boolean) {
-        setState('isCancelDialogOpen', isOpen);
-      },
       setIsCombineDialogOpen(isOpen: boolean) {
         setState('isCombineDialogOpen', isOpen);
       },
