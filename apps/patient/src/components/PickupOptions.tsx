@@ -85,15 +85,15 @@ export const PickupOptions = ({
                     borderColor="gray.200"
                     _hover={{
                       background: 'blue.50',
-                      color: 'blue.700',
+                      color: 'blue.500',
                       border: '1px',
-                      borderColor: 'blue.600'
+                      borderColor: 'blue.500'
                     }}
                     _active={{
                       background: 'blue.50',
-                      color: 'blue.700',
+                      color: 'blue.500',
                       border: '1px',
-                      borderColor: 'blue.600'
+                      borderColor: 'blue.500'
                     }}
                     isActive={enable24Hr}
                     onClick={() => setEnable24Hr(!enable24Hr)}
