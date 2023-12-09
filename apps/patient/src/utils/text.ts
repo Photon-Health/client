@@ -43,17 +43,16 @@ export const text = {
       enter: 'Enter a zipcode or address'
     },
     COURIER: {
-      heading: 'Home Delivery',
-      subheading: 'Get your prescriptions delivered to'
+      heading: 'Delivery',
+      subheading: 'Ship to'
     },
     MAIL_ORDER: {
-      heading: 'Home Delivery',
-      subheading: 'Get your prescriptions shipped to'
+      heading: 'Delivery',
+      subheading: 'Ship to'
     },
     PICK_UP: {
-      heading: 'Local Pickup',
-      subheading: 'Get your prescriptions at a nearby pharmacy.',
-      sorted: 'Sorted by distance',
+      heading: 'Pick Up',
+      subheading: 'Select a local pharmacy for pick up.',
       showMore: 'Show more pharmacies',
       showingAll: 'Showing all pharmacies'
     },
