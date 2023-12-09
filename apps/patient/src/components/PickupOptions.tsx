@@ -1,8 +1,9 @@
-import { Button, Heading, HStack, SlideFade, Text, VStack } from '@chakra-ui/react';
+import { Button, Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
 
 import { PharmacyCard } from './PharmacyCard';
 import { text as t } from '../utils/text';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { PharmacyFilters } from './PharmacyFilters';
 
 interface PickupOptionsProps {
   pharmacies: EnrichedPharmacy[];
@@ -51,57 +52,14 @@ export const PickupOptions = ({
             </Heading>
             <Text>{t.pharmacy.PICK_UP.subheading}</Text>
             {showOpenNowFilter || show24HrFilter ? (
-              <HStack my={2}>
-                <Text>Filter by</Text>
-                {showOpenNowFilter ? (
-                  <Button
-                    size="sm"
-                    bg="white"
-                    border="1px"
-                    borderColor="gray.200"
-                    _hover={{
-                      background: 'blue.50',
-                      color: 'blue.500',
-                      border: '1px',
-                      borderColor: 'blue.500'
-                    }}
-                    _active={{
-                      background: 'blue.50',
-                      color: 'blue.500',
-                      border: '1px',
-                      borderColor: 'blue.500'
-                    }}
-                    isActive={enableOpenNow}
-                    onClick={() => setEnableOpenNow(!enableOpenNow)}
-                  >
-                    Open Now
-                  </Button>
-                ) : null}
-                {show24HrFilter ? (
-                  <Button
-                    size="sm"
-                    bg="white"
-                    border="1px"
-                    borderColor="gray.200"
-                    _hover={{
-                      background: 'blue.50',
-                      color: 'blue.500',
-                      border: '1px',
-                      borderColor: 'blue.500'
-                    }}
-                    _active={{
-                      background: 'blue.50',
-                      color: 'blue.500',
-                      border: '1px',
-                      borderColor: 'blue.500'
-                    }}
-                    isActive={enable24Hr}
-                    onClick={() => setEnable24Hr(!enable24Hr)}
-                  >
-                    Open 24 Hours
-                  </Button>
-                ) : null}
-              </HStack>
+              <PharmacyFilters
+                enableOpenNow={enableOpenNow}
+                enable24Hr={enable24Hr}
+                setEnableOpenNow={setEnableOpenNow}
+                setEnable24Hr={setEnable24Hr}
+                showOpenNowFilter={showOpenNowFilter}
+                show24HrFilter={show24HrFilter}
+              />
             ) : null}
           </VStack>
         </SlideFade>
