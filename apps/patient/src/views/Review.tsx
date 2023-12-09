@@ -45,11 +45,12 @@ export const Review = () => {
   };
 
   const flattenedFills = countFillsAndRemoveDuplicates(fills);
+  const isMultiRx = flattenedFills.length > 1;
 
   return (
     <Box>
       <Helmet>
-        <title>{t.review.title}</title>
+        <title>{t.review.title(isMultiRx)}</title>
       </Helmet>
 
       <Nav header={organization.name} orgId={organization.id} />
@@ -58,9 +59,9 @@ export const Review = () => {
         <VStack spacing={6} align="span" pt={5}>
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
-              {t.review.heading}
+              {t.review.heading(isMultiRx)}
             </Heading>
-            <Text>{t.review.subheading}</Text>
+            <Text>{t.review.subheading(isMultiRx)}</Text>
           </VStack>
           <VStack spacing={1} align="start">
             <HStack spacing={2}>

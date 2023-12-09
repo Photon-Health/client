@@ -1,10 +1,12 @@
 export const text = {
   contactSupport: 'Contact Support',
   review: {
-    title: 'Review prescriptions',
-    heading: 'Review your prescriptions',
-    subheading:
-      'Please review the prescriptions before you select a pharmacy. Reach out to your provider for any issues.',
+    title: (isPlural: boolean) => `Review ${isPlural ? 'prescriptions' : 'prescription'}`,
+    heading: (isPlural: boolean) => `Review your ${isPlural ? 'prescriptions' : 'prescription'}`,
+    subheading: (isPlural: boolean) =>
+      `Please review your ${
+        isPlural ? 'prescriptions' : 'prescription'
+      } before you select a pharmacy. Reach out to your provider for any issues.`,
     patient: 'Patient',
     prescriber: 'Prescriber',
     quantity: 'Quantity',
