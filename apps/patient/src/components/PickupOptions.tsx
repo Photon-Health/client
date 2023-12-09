@@ -1,12 +1,4 @@
-import {
-  Button,
-  Heading,
-  HStack,
-  SlideFade,
-  Text,
-  VStack,
-  useBreakpointValue
-} from '@chakra-ui/react';
+import { Button, Heading, HStack, SlideFade, Text, VStack } from '@chakra-ui/react';
 
 import { PharmacyCard } from './PharmacyCard';
 import { text as t } from '../utils/text';
@@ -23,6 +15,12 @@ interface PickupOptionsProps {
   loadingMore: boolean;
   showingAllPharmacies: boolean;
   courierEnabled: boolean;
+  enableOpenNow: boolean;
+  enable24Hr: boolean;
+  setEnableOpenNow: (isOpen: boolean) => void;
+  setEnable24Hr: (is24Hr: boolean) => void;
+  showOpenNowFilter: boolean;
+  show24HrFilter: boolean;
 }
 
 export const PickupOptions = ({
@@ -35,10 +33,14 @@ export const PickupOptions = ({
   handleSetPreferred,
   loadingMore,
   showingAllPharmacies,
-  courierEnabled
+  courierEnabled,
+  enableOpenNow,
+  enable24Hr,
+  setEnableOpenNow,
+  setEnable24Hr,
+  showOpenNowFilter,
+  show24HrFilter
 }: PickupOptionsProps) => {
-  const isMobile = useBreakpointValue({ base: true, md: false });
-
   return (
     <VStack spacing={3} align="span" w="full">
       {pharmacies?.length > 0 && courierEnabled ? (
@@ -47,14 +49,60 @@ export const PickupOptions = ({
             <Heading as="h5" size="sm">
               {t.pharmacy.PICK_UP.heading}
             </Heading>
-            <HStack justify="space-between" w="full">
-              <Text>{t.pharmacy.PICK_UP.subheading}</Text>
-              {!isMobile && pharmacies.length > 0 ? (
-                <Text size="sm" color="gray.500" whiteSpace="nowrap" alignSelf="flex-end">
-                  {t.pharmacy.PICK_UP.sorted}
-                </Text>
-              ) : null}
-            </HStack>
+            <Text>{t.pharmacy.PICK_UP.subheading}</Text>
+            {showOpenNowFilter || show24HrFilter ? (
+              <HStack>
+                <Text>Filter by</Text>
+                {showOpenNowFilter ? (
+                  <Button
+                    size="sm"
+                    bg="white"
+                    border="1px"
+                    borderColor="gray.200"
+                    _hover={{
+                      background: 'blue.50',
+                      color: 'blue.500',
+                      border: '1px',
+                      borderColor: 'blue.500'
+                    }}
+                    _active={{
+                      background: 'blue.50',
+                      color: 'blue.500',
+                      border: '1px',
+                      borderColor: 'blue.500'
+                    }}
+                    isActive={enableOpenNow}
+                    onClick={() => setEnableOpenNow(!enableOpenNow)}
+                  >
+                    Open Now
+                  </Button>
+                ) : null}
+                {show24HrFilter ? (
+                  <Button
+                    size="sm"
+                    bg="white"
+                    border="1px"
+                    borderColor="gray.200"
+                    _hover={{
+                      background: 'blue.50',
+                      color: 'blue.700',
+                      border: '1px',
+                      borderColor: 'blue.600'
+                    }}
+                    _active={{
+                      background: 'blue.50',
+                      color: 'blue.700',
+                      border: '1px',
+                      borderColor: 'blue.600'
+                    }}
+                    isActive={enable24Hr}
+                    onClick={() => setEnable24Hr(!enable24Hr)}
+                  >
+                    Open 24 Hours
+                  </Button>
+                ) : null}
+              </HStack>
+            ) : null}
           </VStack>
         </SlideFade>
       ) : null}
@@ -69,6 +117,7 @@ export const PickupOptions = ({
               selected={selectedId === pharmacy.id}
               onSelect={() => handleSelect(pharmacy.id)}
               onSetPreferred={() => handleSetPreferred(pharmacy.id)}
+              isPharmacySelection={true}
             />
           </SlideFade>
         ))}

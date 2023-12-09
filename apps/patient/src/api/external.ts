@@ -57,7 +57,7 @@ export const getPlace = async (
     }
     return null;
   } catch (e) {
-    console.error(e);
+    console.log(e);
     return null;
   }
 };

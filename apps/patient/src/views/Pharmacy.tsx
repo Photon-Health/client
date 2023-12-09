@@ -78,6 +78,8 @@ export const Pharmacy = () => {
   const [location, setLocation] = useState<string>(
     order?.address ? formatAddress(order.address) : ''
   );
+  const [enableOpenNow, setEnableOpenNow] = useState(false);
+  const [enable24Hr, setEnable24Hr] = useState(false);
 
   const toast = useToast();
 
@@ -433,6 +435,20 @@ export const Pharmacy = () => {
     ? t.pharmacy.subheading.reroute(order.pharmacy.name)
     : t.pharmacy.subheading.original;
 
+  const filtered = pharmacyOptions.filter((p) => {
+    if (enableOpenNow && enable24Hr) {
+      return p.isOpen && p.is24Hr;
+    } else if (enableOpenNow) {
+      return p.isOpen;
+    } else if (enable24Hr) {
+      return p.is24Hr;
+    }
+    return true; // If both are false, include all pharmacies
+  });
+
+  const showOpenNowFilter = pharmacyOptions.some((p) => !p.isOpen);
+  const show24HrFilter = pharmacyOptions.some((p) => p.is24Hr);
+
   return (
     <Box>
       <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />
@@ -498,7 +514,7 @@ export const Pharmacy = () => {
               ) : null}
 
               <PickupOptions
-                pharmacies={pharmacyOptions}
+                pharmacies={filtered}
                 preferredPharmacy={preferredPharmacyId}
                 savingPreferred={savingPreferred}
                 selectedId={selectedId}
@@ -508,6 +524,12 @@ export const Pharmacy = () => {
                 loadingMore={loadingPharmacies}
                 showingAllPharmacies={showingAllPharmacies}
                 courierEnabled={enableCourier || enableMailOrder}
+                enableOpenNow={enableOpenNow}
+                enable24Hr={enable24Hr}
+                setEnableOpenNow={setEnableOpenNow}
+                setEnable24Hr={setEnable24Hr}
+                showOpenNowFilter={showOpenNowFilter}
+                show24HrFilter={show24HrFilter}
               />
             </VStack>
           ) : null}
