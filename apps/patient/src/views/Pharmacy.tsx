@@ -446,7 +446,8 @@ export const Pharmacy = () => {
     return true; // If both are false, include all pharmacies
   });
 
-  const showOpenNowFilter = pharmacyOptions.some((p) => !p.isOpen);
+  const showOpenNowFilter =
+    pharmacyOptions.some((p) => !p.isOpen) && pharmacyOptions.some((p) => p.isOpen);
   const show24HrFilter = pharmacyOptions.some((p) => p.is24Hr);
 
   return (

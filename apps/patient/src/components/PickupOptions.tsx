@@ -51,7 +51,7 @@ export const PickupOptions = ({
             </Heading>
             <Text>{t.pharmacy.PICK_UP.subheading}</Text>
             {showOpenNowFilter || show24HrFilter ? (
-              <HStack>
+              <HStack my={2}>
                 <Text>Filter by</Text>
                 {showOpenNowFilter ? (
                   <Button
