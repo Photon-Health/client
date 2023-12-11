@@ -435,20 +435,22 @@ export const Pharmacy = () => {
     ? t.pharmacy.subheading.reroute(order.pharmacy.name)
     : t.pharmacy.subheading.original;
 
-  const filtered = pharmacyOptions.filter((p) => {
-    if (enableOpenNow && enable24Hr) {
-      return p.isOpen && p.is24Hr;
-    } else if (enableOpenNow) {
-      return p.isOpen;
-    } else if (enable24Hr) {
-      return p.is24Hr;
-    }
-    return true; // If both are false, include all pharmacies
-  });
+  // const filtered = pharmacyOptions.filter((p) => {
+  //   if (enableOpenNow && enable24Hr) {
+  //     return p.isOpen && p.is24Hr;
+  //   } else if (enableOpenNow) {
+  //     return p.isOpen;
+  //   } else if (enable24Hr) {
+  //     return p.is24Hr;
+  //   }
+  //   return true; // If both are false, include all pharmacies
+  // });
 
   // const showOpenNowFilter =
   //   pharmacyOptions.some((p) => !p.isOpen) && pharmacyOptions.some((p) => p.isOpen);
   // const show24HrFilter = pharmacyOptions.some((p) => p.is24Hr);
+
+  useEffect(() => {}, [enableOpenNow, enable24Hr]);
 
   return (
     <Box>
