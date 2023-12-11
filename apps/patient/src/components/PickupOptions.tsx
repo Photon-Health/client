@@ -20,8 +20,6 @@ interface PickupOptionsProps {
   enable24Hr: boolean;
   setEnableOpenNow: (isOpen: boolean) => void;
   setEnable24Hr: (is24Hr: boolean) => void;
-  showOpenNowFilter: boolean;
-  show24HrFilter: boolean;
 }
 
 export const PickupOptions = ({
@@ -38,9 +36,7 @@ export const PickupOptions = ({
   enableOpenNow,
   enable24Hr,
   setEnableOpenNow,
-  setEnable24Hr,
-  showOpenNowFilter,
-  show24HrFilter
+  setEnable24Hr
 }: PickupOptionsProps) => {
   return (
     <VStack spacing={3} align="span" w="full">
@@ -51,16 +47,12 @@ export const PickupOptions = ({
               {t.pharmacy.PICK_UP.heading}
             </Heading>
             <Text>{t.pharmacy.PICK_UP.subheading}</Text>
-            {showOpenNowFilter || show24HrFilter ? (
-              <PharmacyFilters
-                enableOpenNow={enableOpenNow}
-                enable24Hr={enable24Hr}
-                setEnableOpenNow={setEnableOpenNow}
-                setEnable24Hr={setEnable24Hr}
-                showOpenNowFilter={showOpenNowFilter}
-                show24HrFilter={show24HrFilter}
-              />
-            ) : null}
+            <PharmacyFilters
+              enableOpenNow={enableOpenNow}
+              enable24Hr={enable24Hr}
+              setEnableOpenNow={setEnableOpenNow}
+              setEnable24Hr={setEnable24Hr}
+            />
           </VStack>
         </SlideFade>
       ) : null}

@@ -446,9 +446,9 @@ export const Pharmacy = () => {
     return true; // If both are false, include all pharmacies
   });
 
-  const showOpenNowFilter =
-    pharmacyOptions.some((p) => !p.isOpen) && pharmacyOptions.some((p) => p.isOpen);
-  const show24HrFilter = pharmacyOptions.some((p) => p.is24Hr);
+  // const showOpenNowFilter =
+  //   pharmacyOptions.some((p) => !p.isOpen) && pharmacyOptions.some((p) => p.isOpen);
+  // const show24HrFilter = pharmacyOptions.some((p) => p.is24Hr);
 
   return (
     <Box>
@@ -529,8 +529,6 @@ export const Pharmacy = () => {
                 enable24Hr={enable24Hr}
                 setEnableOpenNow={setEnableOpenNow}
                 setEnable24Hr={setEnable24Hr}
-                showOpenNowFilter={showOpenNowFilter}
-                show24HrFilter={show24HrFilter}
               />
             </VStack>
           ) : null}
