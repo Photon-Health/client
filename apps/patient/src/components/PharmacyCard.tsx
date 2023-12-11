@@ -93,7 +93,7 @@ interface PharmacyCardProps {
   onSetPreferred?: () => void;
   onChangePharmacy?: () => void;
   onGetDirections?: () => void;
-  isPharmacySelection?: boolean;
+  selectable?: boolean;
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
@@ -108,7 +108,7 @@ export const PharmacyCard = memo(function PharmacyCard({
   onChangePharmacy,
   onSetPreferred,
   onGetDirections,
-  isPharmacySelection = false
+  selectable = false
 }: PharmacyCardProps) {
   if (!pharmacy) return null;
 
@@ -121,7 +121,7 @@ export const PharmacyCard = memo(function PharmacyCard({
       borderColor={selected && onSelect ? 'brand.600' : 'white'}
       onClick={() => onSelect && onSelect()}
       mx={isMobile ? -3 : undefined}
-      cursor={isPharmacySelection ? 'pointer' : undefined}
+      cursor={selectable ? 'pointer' : undefined}
     >
       <CardBody p={3}>
         <VStack align="start" w="full" spacing={1}>

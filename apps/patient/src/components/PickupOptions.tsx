@@ -75,7 +75,7 @@ export const PickupOptions = ({
               selected={selectedId === pharmacy.id}
               onSelect={() => handleSelect(pharmacy.id)}
               onSetPreferred={() => handleSetPreferred(pharmacy.id)}
-              isPharmacySelection={true}
+              selectable={true}
             />
           </SlideFade>
         ))}
