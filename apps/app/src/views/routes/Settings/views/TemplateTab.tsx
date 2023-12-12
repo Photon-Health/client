@@ -183,16 +183,23 @@ export const TemplateTab = () => {
     [filterType]
   );
 
+  const filteredRows = useMemo(
+    () =>
+      rows.filter(
+        (x) =>
+          (x.treatment.name.toLowerCase().includes(debouncedFilterText.toLowerCase()) ||
+            x.name?.toLowerCase().includes(debouncedFilterText.toLowerCase())) &&
+          typeFilter(x)
+      ),
+    [debouncedFilterText, rows, pageSize, typeFilter]
+  );
+
   const formattedRows = useMemo(() => {
-    const filtered = rows.filter(
-      (x) =>
-        x.treatment.name.toLowerCase().includes(debouncedFilterText.toLowerCase()) && typeFilter(x)
-    );
     return {
-      rows: filtered.map(templateRowRender),
-      pages: Math.ceil(filtered.length / pageSize)
+      rows: filteredRows.map(templateRowRender),
+      pages: Math.ceil(filteredRows.length / pageSize)
     };
-  }, [debouncedFilterText, rows, pageSize, typeFilter]);
+  }, [filteredRows]);
 
   const [doseCalcVis, setDoseCalcVis] = useState(false);
   const quantityRef = useRef<HTMLInputElement>(null);
@@ -245,7 +252,7 @@ export const TemplateTab = () => {
       <VStack w="full">
         <TemplateTable
           isLoading={isLoading}
-          rows={rows}
+          rows={filteredRows}
           filteredRows={formattedRows.rows}
           pages={formattedRows.pages}
           pageSize={pageSize}
