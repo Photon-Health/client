@@ -86,14 +86,19 @@ export const TemplateTable = ({
   filterElement
 }: TemplateTableProps) => {
   const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
+  const showBadgeStacked = useBreakpointValue({ base: true, md: false });
   const displayRows = isLoading
     ? new Array(isMobileAndTablet ? 3 : 10).fill(0).map(() => renderSkeletonRow(isMobileAndTablet))
     : filteredRows.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
+  const columns = showBadgeStacked
+    ? TEMPLATE_COLUMNS.filter(({ accessor }) => accessor !== 'badge')
+    : TEMPLATE_COLUMNS;
+
   return (
     <TablePage
       data={displayRows}
-      columns={TEMPLATE_COLUMNS}
+      columns={columns}
       filterText={filterText}
       setFilterText={setFilterText}
       loading={isLoading}

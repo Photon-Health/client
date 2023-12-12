@@ -6,6 +6,7 @@ import {
   ModalContent,
   ModalOverlay,
   Select,
+  Show,
   Text,
   VStack,
   theme,
@@ -81,7 +82,7 @@ const renderTemplateRow = (
     template: (
       <>
         <Text fontSize="md">{templateName}</Text>
-        <Box ps={4}>
+        <Box py={{ base: '2', md: 0 }}>
           <Text fontSize="sm" textOverflow="ellipsis" overflow="hidden" color="gray.500">
             QTY: {rx.dispenseQuantity} {rx.dispenseUnit}&nbsp;|&nbsp;Days Supply:&nbsp;
             {rx.daysSupply}
@@ -89,6 +90,11 @@ const renderTemplateRow = (
             &nbsp;|&nbsp;Refills: {fillsAllowed - 1}&nbsp;|&nbsp;Sig: {rx.instructions}
           </Text>
         </Box>
+        <Show below="md">
+          <Badge color={rx.isPrivate ? 'blue' : 'purple'}>
+            {rx.isPrivate ? 'Personal' : 'Organization'}
+          </Badge>
+        </Show>
       </>
     ),
     actions: (

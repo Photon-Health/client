@@ -190,7 +190,7 @@ export const AddPrescriptionCard = (props: {
         <div class="flex items-center justify-between">
           <Text color="gray">Add Prescription</Text>
           <div
-            class="pb-4 md:py-2 text-left sm:text-right text-blue-600 flex gap-2 cursor-pointer items-center"
+            class="md:py-2 text-left sm:text-right text-blue-600 flex gap-2 cursor-pointer items-center h-full"
             onClick={() => setMedDialogOpen(true)}
           >
             <a class="font-sans text-sm ">Advanced Search</a>
