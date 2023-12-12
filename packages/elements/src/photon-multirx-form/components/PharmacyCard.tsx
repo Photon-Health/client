@@ -1,6 +1,6 @@
 import { createEffect, createSignal, Show } from 'solid-js';
 import { usePhoton } from '../../context';
-import { RadioGroup, Text } from '@photonhealth/components';
+import { RadioGroupCards, Text } from '@photonhealth/components';
 import { Pharmacy } from '@photonhealth/sdk/dist/types';
 
 export const PharmacyCard = (props: { pharmacyId: string | undefined }) => {
@@ -28,8 +28,8 @@ export const PharmacyCard = (props: { pharmacyId: string | undefined }) => {
         </div>
 
         <Show when={pharmacy()}>
-          <RadioGroup label="Pharmacies" initSelected={props?.pharmacyId || ''}>
-            <RadioGroup.Option value={props?.pharmacyId || ''}>
+          <RadioGroupCards label="Pharmacies" initSelected={props?.pharmacyId || ''}>
+            <RadioGroupCards.Option value={props?.pharmacyId || ''}>
               <div class="flex flex-col items-start">
                 <Text loading={!pharmacy()} sampleLoadingText="Loading Name">
                   {pharmacy()?.name}
@@ -45,8 +45,8 @@ export const PharmacyCard = (props: { pharmacyId: string | undefined }) => {
                   </span>
                 </Text>
               </div>
-            </RadioGroup.Option>
-          </RadioGroup>
+            </RadioGroupCards.Option>
+          </RadioGroupCards>
         </Show>
       </div>
     </photon-card>

@@ -1,8 +1,10 @@
+import { createMemo, Show } from 'solid-js';
 import { useRecentOrders } from '.';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
 import Text from '../../particles/Text';
 import Textarea from '../../particles/Textarea';
+import formatRxString from '../../utils/formatRxString';
 
 export default function RecentOrdersIssueDialog() {
   const [state, actions] = useRecentOrders();
@@ -22,16 +24,35 @@ export default function RecentOrdersIssueDialog() {
             <Text size="xs" color="gray">
               PATIENT
             </Text>
-            <Text size="sm">Olive Rhye</Text>
+            <Text size="sm">{state?.patientName}</Text>
           </div>
           <div class="flex flex-col">
             <Text size="xs" color="gray">
               PRESCRIPTION
             </Text>
-            <Text size="sm">Cefdinir 200 mg Oral Capsule</Text>
-            <Text size="sm" color="gray">
-              30 Each, 11 Refills - Take 1 (one) daily
-            </Text>
+            <Show when={state?.duplicateFill}>
+              <Text size="sm">{state?.duplicateFill?.treatment?.name}</Text>
+              <Text size="sm" color="gray">
+                {formatRxString({
+                  dispenseQuantity: state?.duplicateFill?.prescription?.dispenseQuantity,
+                  dispenseUnit: state?.duplicateFill?.prescription?.dispenseUnit,
+                  fillsAllowed: state?.duplicateFill?.prescription?.fillsAllowed,
+                  instructions: state?.duplicateFill?.prescription?.instructions
+                })}
+              </Text>
+            </Show>
+            <Show when={state?.orderWithIssue}>
+              <Text size="sm">{state?.orderWithIssue?.fills?.[0]?.treatment?.name}</Text>
+              <Text size="sm" color="gray">
+                {formatRxString({
+                  dispenseQuantity:
+                    state?.orderWithIssue?.fills?.[0]?.prescription?.dispenseQuantity,
+                  dispenseUnit: state?.orderWithIssue?.fills?.[0]?.prescription?.dispenseUnit,
+                  fillsAllowed: state?.orderWithIssue?.fills?.[0]?.prescription?.fillsAllowed,
+                  instructions: state?.orderWithIssue?.fills?.[0]?.prescription?.instructions
+                })}
+              </Text>
+            </Show>
           </div>
         </div>
 
