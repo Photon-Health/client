@@ -80,6 +80,16 @@ customElement(
       return [];
     };
 
+    const onOpen = async () => {
+      // if (store.catalogs.data.length === 0) {
+      await actions.getCatalogs(client!.getSDK());
+      // }
+    };
+
+    const onHide = async () => setFilter('');
+
+    const onSearchChange = async (s: string) => setFilter(s);
+
     return (
       <div
         ref={ref}
@@ -146,13 +156,9 @@ customElement(
               }
             }
           }}
-          onSearchChange={async (s: string) => setFilter(s)}
-          onOpen={async () => {
-            if (store.catalogs.data.length === 0) {
-              await actions.getCatalogs(client!.getSDK());
-            }
-          }}
-          onHide={async () => setFilter('')}
+          onSearchChange={onSearchChange}
+          onOpen={onOpen}
+          onHide={onHide}
           noDataMsg={
             store.catalogs.data.length === 0 && !store.catalogs.isLoading
               ? 'No catalog found'

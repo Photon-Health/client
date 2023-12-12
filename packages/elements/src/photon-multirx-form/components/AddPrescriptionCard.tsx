@@ -13,6 +13,8 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 import { createSignal, Show, onMount } from 'solid-js';
 import repopulateForm from '../util/repopulateForm';
 import clearForm from '../util/clearForm';
+import { usePhoton } from '../../context';
+import { GraphQLError } from 'graphql';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -42,6 +44,8 @@ export const AddPrescriptionCard = (props: {
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
+  const [isSubmitting, setIsSubmitting] = createSignal(false);
+  const client = usePhoton();
 
   let ref: any;
 
@@ -69,7 +73,23 @@ export const AddPrescriptionCard = (props: {
     }
   });
 
-  const handleAddPrescription = () => {
+  const templateMutation = client!
+    .getSDK()
+    .clinical.prescriptionTemplate.createPrescriptionTemplate({});
+
+  const dispatchOrderError = (errors: readonly GraphQLError[]) => {
+    const event = new CustomEvent('photon-order-error', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        errors: errors
+      }
+    });
+    ref?.dispatchEvent(event);
+  };
+
+  const handleAddPrescription = async () => {
+    setIsSubmitting(true);
     const keys = [
       'treatment',
       'effectiveDate',
@@ -81,27 +101,28 @@ export const AddPrescriptionCard = (props: {
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
     if (!errorsPresent) {
+      const draft = {
+        id: String(Math.random()),
+        effectiveDate: props.store.effectiveDate.value,
+        treatment: props.store.treatment.value,
+        dispenseAsWritten: props.store.dispenseAsWritten.value,
+        dispenseQuantity: props.store.dispenseQuantity.value,
+        dispenseUnit: props.store.dispenseUnit.value,
+        daysSupply: props.store.daysSupply.value,
+        refillsInput: props.store.refillsInput.value,
+        instructions: props.store.instructions.value,
+        notes: props.store.notes.value,
+        fillsAllowed: props.store.refillsInput.value + 1,
+        addToTemplates: props.store.addToTemplates?.value ?? false,
+        catalogId: props.store.catalogId.value ?? undefined
+      };
+
       props.actions.updateFormValue({
         key: 'draftPrescriptions',
-        value: [
-          ...(props.store.draftPrescriptions?.value || []),
-          {
-            id: String(Math.random()),
-            effectiveDate: props.store.effectiveDate.value,
-            treatment: props.store.treatment.value,
-            dispenseAsWritten: props.store.dispenseAsWritten.value,
-            dispenseQuantity: props.store.dispenseQuantity.value,
-            dispenseUnit: props.store.dispenseUnit.value,
-            daysSupply: props.store.daysSupply.value,
-            refillsInput: props.store.refillsInput.value,
-            instructions: props.store.instructions.value,
-            notes: props.store.notes.value,
-            fillsAllowed: props.store.refillsInput.value + 1,
-            addToTemplates: props.store.addToTemplates?.value ?? false,
-            catalogId: props.store.catalogId.value ?? undefined
-          }
-        ]
+        value: [...(props.store.draftPrescriptions?.value || []), draft]
       });
+
+      const addToTemplate = props.store.addToTemplates?.value ?? false;
       props.actions.updateFormValue({
         key: 'effectiveDate',
         value: format(new Date(), 'yyyy-MM-dd').toString()
@@ -121,23 +142,40 @@ export const AddPrescriptionCard = (props: {
         props.actions,
         props.weight ? { notes: patientWeight(props.weight, props?.weightUnit) } : undefined
       );
+      if (addToTemplate) {
+        try {
+          const { errors } = await templateMutation({
+            variables: {
+              ...draft,
+              treatmentId: draft.treatment.id,
+              isPrivate: true
+            },
+            awaitRefetchQueries: false
+          });
+          if (errors) {
+            dispatchOrderError(errors);
+          } else {
+            triggerToast({
+              status: 'success',
+              header: 'Personal template saved'
+            });
+          }
+        } catch (err) {
+          dispatchOrderError([err as GraphQLError]);
+        }
+      }
       triggerToast({
         status: 'success',
         header: 'Prescription Added',
         body: 'You can send this order or add another prescription before sending it'
       });
-      if (props.store.addToTemplates?.value) {
-        triggerToast({
-          status: 'success',
-          header: 'Personal template saved'
-        });
-      }
     } else {
       triggerToast({
         status: 'info',
         body: 'Some items in the form are incomplete, please check for errors'
       });
     }
+    setIsSubmitting(false);
   };
 
   return (
@@ -146,11 +184,13 @@ export const AddPrescriptionCard = (props: {
       <Card>
         <div class="flex items-center justify-between">
           <Text color="gray">Add Prescription</Text>
-          <photon-med-search-dialog
-            title="Advanced Medication Search"
-            open={medDialogOpen()}
-            on:photon-medication-closed={() => setMedDialogOpen(false)}
-          />
+          <div
+            class="pb-4 md:py-2 text-left sm:text-right text-blue-600 flex gap-2 cursor-pointer items-center"
+            onClick={() => setMedDialogOpen(true)}
+          >
+            <a class="font-sans text-sm ">Advanced Search</a>
+            <Icon name="magnifyingGlass" size="sm" />
+          </div>
         </div>
 
         <div
@@ -208,14 +248,11 @@ export const AddPrescriptionCard = (props: {
                   })
                 }
               />
-            </div>
-            <div class="pb-4 md:py-2 text-left sm:text-right">
-              <a
-                class="font-sans text-gray-500 text-sm hover:text-black hover:cursor-pointer"
-                onClick={() => setMedDialogOpen(true)}
-              >
-                Advanced Search →
-              </a>
+              <photon-med-search-dialog
+                title="Advanced Medication Search"
+                open={medDialogOpen()}
+                on:photon-medication-closed={() => setMedDialogOpen(false)}
+              />
             </div>
           </div>
           <div class="mt-2 sm:mt-0 w-full md:pr-2">
@@ -385,8 +422,14 @@ export const AddPrescriptionCard = (props: {
               />
             </Show>
             <div class="flex flex-grow justify-end">
-              <Button class="w-full md:!w-auto" size="lg" onClick={handleAddPrescription}>
-                Add Prescription
+              <Button
+                class="w-full md:!w-auto"
+                size="lg"
+                onClick={handleAddPrescription}
+                loading={isSubmitting()}
+                disabled={isSubmitting()}
+              >
+                Add Prescription to Order
               </Button>
             </div>
           </div>
