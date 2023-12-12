@@ -42,7 +42,8 @@ const Badge = ({ color, children }: { color: 'blue' | 'purple'; children: ReactN
     color={theme.colors[color][700]}
     px={0}
     py={0.5}
-    maxW="sm"
+    maxW="32"
+    minW="32"
     display={'flex'}
     justifyContent={'center'}
   >
@@ -174,15 +175,24 @@ export const TemplateTab = () => {
     [setSingleView, catalogId, setChildLoading, setTemplateToEdit, setShowModal]
   );
 
+  const typeFilter = useCallback(
+    (template: PrescriptionTemplate) =>
+      filterType === 'ALL' ||
+      (filterType === 'GLOBAL' && !template.isPrivate) ||
+      (filterType === 'INDIVIDUAL' && template.isPrivate),
+    [filterType]
+  );
+
   const formattedRows = useMemo(() => {
-    const filtered = rows.filter((x) =>
-      x.treatment.name.toLowerCase().includes(debouncedFilterText.toLowerCase())
+    const filtered = rows.filter(
+      (x) =>
+        x.treatment.name.toLowerCase().includes(debouncedFilterText.toLowerCase()) && typeFilter(x)
     );
     return {
       rows: filtered.map(templateRowRender),
       pages: Math.ceil(filtered.length / pageSize)
     };
-  }, [debouncedFilterText, rows, pageSize]);
+  }, [debouncedFilterText, rows, pageSize, typeFilter]);
 
   const [doseCalcVis, setDoseCalcVis] = useState(false);
   const quantityRef = useRef<HTMLInputElement>(null);
