@@ -29,7 +29,7 @@ jobs:
         with:
           token: ${{ steps.generate-token.outputs.token }}
           base: neutron
-          branch: neturon/merge
+          branch: neutron/merge
           title: 'Neutron: Merge boson into neutron'
           commit-message: merge
           committer: GitHub <noreply@github.com>
