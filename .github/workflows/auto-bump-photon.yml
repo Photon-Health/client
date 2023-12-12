@@ -29,8 +29,8 @@ jobs:
         with:
           token: ${{ steps.generate-token.outputs.token }}
           base: photon
-          branch: neturon/merge
-          title: Merge neutron
+          branch: photons/merge
+          title: 'Photon: Merge neutron into photon'
           commit-message: merge
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>

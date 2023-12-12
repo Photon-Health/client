@@ -10,7 +10,7 @@ interface ContactViewProps {
 const ContactView = (props: ContactViewProps) => {
   const { phone, email } = props;
   return (
-    <Stack spacing="0">
+    <Stack spacing="0" data-dd-privacy="mask">
       <Link fontWeight="medium" href={`tel:${phone}`} isExternal>
         {formatPhone(phone)}
       </Link>
