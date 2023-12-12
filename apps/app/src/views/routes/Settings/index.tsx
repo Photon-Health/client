@@ -33,7 +33,6 @@ const settingsPageQuery = graphql(/* GraphQL */ `
       id
       name
       ...OrganizationTreatmentTabFragment
-      ...OrganizationTemplateTabFragment
     }
     roles {
       name
@@ -138,7 +137,7 @@ export const Settings = () => {
               <DevelopersTab />
             </TabPanel>
             <TabPanel display="flex" flexDir="column" gap="4">
-              <TemplateTab organizationFragment={data?.organization ?? undefined} />
+              <TemplateTab />
             </TabPanel>
             <TabPanel display="flex" flexDir="column" gap="4">
               <TreatmentTab organization={data?.organization ?? undefined} />

@@ -12,12 +12,19 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { TablePage } from '../../../../components/TablePage';
 
 import { PaginationIndicator } from '../PaginationIndicator';
+import { PrescriptionTemplate } from 'packages/sdk/dist/types';
+import { JSX } from 'react';
 
 const TEMPLATE_COLUMNS = [
   {
     Header: 'Template',
     accessor: 'template',
     width: 'wrap'
+  },
+  {
+    Header: '',
+    accessor: 'badge',
+    width: '100px'
   },
   {
     Header: '',
@@ -40,6 +47,7 @@ const renderSkeletonRow = (isMobile: boolean | undefined) => {
         </Box>
       </VStack>
     ),
+    badge: null,
     actions: (
       <HStack spacing={5} justifyContent="flex-end" me={3}>
         <Skeleton height="20px" width="20px" />
@@ -50,8 +58,8 @@ const renderSkeletonRow = (isMobile: boolean | undefined) => {
 
 interface TemplateTableProps {
   isLoading: boolean;
-  rows: any[];
-  filteredRows: any[];
+  rows: PrescriptionTemplate[];
+  filteredRows: { template: JSX.Element; actions: JSX.Element }[];
   pages: number;
   pageSize: number;
   currentPage: number;
@@ -61,6 +69,7 @@ interface TemplateTableProps {
   setShowModal: {
     on: () => void;
   };
+  filterElement: JSX.Element;
 }
 
 export const TemplateTable = ({
@@ -73,7 +82,8 @@ export const TemplateTable = ({
   setCurrentPage,
   filterText,
   setFilterText,
-  setShowModal
+  setShowModal,
+  filterElement
 }: TemplateTableProps) => {
   const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
   const displayRows = isLoading
@@ -87,10 +97,12 @@ export const TemplateTable = ({
       filterText={filterText}
       setFilterText={setFilterText}
       loading={isLoading}
-      ctaText={isMobileAndTablet ? 'New Template' : undefined}
-      ctaColor={isMobileAndTablet ? 'blue' : undefined}
+      ctaText={'Create Template'}
+      ctaColor={'blue'}
       ctaRoute=""
-      ctaOnClick={isMobileAndTablet ? setShowModal.on : undefined}
+      ctaOnClick={setShowModal.on}
+      filter={filterElement}
+      ctaRight
       paginationIndicator={
         <PaginationIndicator
           pages={pages}

@@ -4,16 +4,14 @@ import CopyText from './CopyText';
 interface TemplateViewProps {
   template: {
     id: string;
-    treatment: {
-      name: string;
-    };
-    fillsAllowed?: number;
-    dispenseUnit?: string;
-    dispenseQuantity?: number;
-    daysSupply?: number;
-    dispenseAsWritten?: boolean;
-    instructions?: string;
-    notes?: string;
+    treatment: { name: string };
+    fillsAllowed?: number | null;
+    dispenseUnit?: string | null;
+    dispenseQuantity?: number | null;
+    daysSupply?: number | null;
+    dispenseAsWritten?: boolean | null;
+    instructions?: string | null;
+    notes?: string | null;
   };
 }
 
