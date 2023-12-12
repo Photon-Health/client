@@ -40,20 +40,25 @@ export const PickupOptions = ({
 }: PickupOptionsProps) => {
   return (
     <VStack spacing={3} align="span" w="full">
-      {pharmacies?.length > 0 && courierEnabled ? (
+      {courierEnabled ? (
         <SlideFade offsetY="60px" in={true}>
           <VStack spacing={1} align="start">
             <Heading as="h5" size="sm">
               {t.pharmacy.PICK_UP.heading}
             </Heading>
             <Text>{t.pharmacy.PICK_UP.subheading}</Text>
-            <PharmacyFilters
-              enableOpenNow={enableOpenNow}
-              enable24Hr={enable24Hr}
-              setEnableOpenNow={setEnableOpenNow}
-              setEnable24Hr={setEnable24Hr}
-            />
           </VStack>
+        </SlideFade>
+      ) : null}
+
+      {pharmacies?.length > 0 ? (
+        <SlideFade offsetY="60px" in={true}>
+          <PharmacyFilters
+            enableOpenNow={enableOpenNow}
+            enable24Hr={enable24Hr}
+            setEnableOpenNow={setEnableOpenNow}
+            setEnable24Hr={setEnable24Hr}
+          />
         </SlideFade>
       ) : null}
 

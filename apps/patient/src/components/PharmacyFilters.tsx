@@ -13,49 +13,27 @@ export const PharmacyFilters = ({
   setEnable24Hr
 }: PharmacyFiltersProps) => {
   return (
-    <HStack my={2}>
+    <HStack>
       <Text>Filter by</Text>
       <Button
         size="sm"
-        bg="white"
-        border="1px"
-        borderColor="gray.200"
-        _hover={{
-          background: 'blue.50',
-          color: 'blue.500',
-          border: '1px',
-          borderColor: 'blue.500'
-        }}
-        _active={{
-          background: 'blue.50',
-          color: 'blue.500',
-          border: '1px',
-          borderColor: 'blue.500'
-        }}
+        variant="filter"
         isActive={enableOpenNow}
-        onClick={() => setEnableOpenNow(!enableOpenNow)}
+        onClick={() => {
+          if (enable24Hr) setEnable24Hr(false);
+          setEnableOpenNow(!enableOpenNow);
+        }}
       >
         Open Now
       </Button>
       <Button
         size="sm"
-        bg="white"
-        border="1px"
-        borderColor="gray.200"
-        _hover={{
-          background: 'blue.50',
-          color: 'blue.500',
-          border: '1px',
-          borderColor: 'blue.500'
-        }}
-        _active={{
-          background: 'blue.50',
-          color: 'blue.500',
-          border: '1px',
-          borderColor: 'blue.500'
-        }}
+        variant="filter"
         isActive={enable24Hr}
-        onClick={() => setEnable24Hr(!enable24Hr)}
+        onClick={() => {
+          if (setEnableOpenNow) setEnableOpenNow(false);
+          setEnable24Hr(!enable24Hr);
+        }}
       >
         Open 24 Hours
       </Button>

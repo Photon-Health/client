@@ -45,8 +45,9 @@ export const UNOPEN_BUSINESS_STATUS_MAP = {
   CLOSED_TEMPORARILY: 'Closed Temporarily',
   CLOSED_PERMANENTLY: 'Closed Permanently'
 };
-const MAX_ENRICHMENT = 5; // Maximum number of pharmacies to enrich at a time
-const INITIAL_PHARMACIES = 5;
+const MAX_ENRICHMENT_COUNT = 5; // Maximum number of pharmacies to enrich at a time
+const INITIAL_PHARMACY_COUNT = 5;
+const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
 
 export const Pharmacy = () => {
   const { order, setOrder } = useOrderContext();
@@ -161,10 +162,12 @@ export const Pharmacy = () => {
         {
           latitude: lat,
           longitude: lng,
-          radius: 25
+          radius: PHARMACY_SEARCH_RADIUS_IN_MILES
         },
-        INITIAL_PHARMACIES,
-        0
+        INITIAL_PHARMACY_COUNT,
+        0,
+        enableOpenNow,
+        enable24Hr
       );
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
         setLoadingPharmacies(false);
@@ -191,7 +194,7 @@ export const Pharmacy = () => {
 
     // We only show add a few at a time, so just enrich the first group of pharmacies
     const preparedPharmacies: EnrichedPharmacy[] = await Promise.all(
-      pharmaciesResult.slice(0, MAX_ENRICHMENT).map((p) => preparePharmacy(p, true))
+      pharmaciesResult.slice(0, MAX_ENRICHMENT_COUNT).map((p) => preparePharmacy(p, true))
     );
     setPharmacyOptions(preparedPharmacies);
 
@@ -204,7 +207,7 @@ export const Pharmacy = () => {
     if (isDemo) {
       const newPharmacyOptions = demoPharmacies.slice(
         pharmacyOptions.length,
-        pharmacyOptions.length + MAX_ENRICHMENT
+        pharmacyOptions.length + MAX_ENRICHMENT_COUNT
       );
       const totalPharmacyOptions = [...pharmacyOptions, ...newPharmacyOptions];
       setPharmacyOptions(totalPharmacyOptions);
@@ -223,18 +226,18 @@ export const Pharmacy = () => {
      *  */
     const newPharmacies: EnrichedPharmacy[] = await Promise.all(
       initialPharmacies
-        .slice(pharmacyOptions.length, pharmacyOptions.length + MAX_ENRICHMENT)
+        .slice(pharmacyOptions.length, pharmacyOptions.length + MAX_ENRICHMENT_COUNT)
         .map((p) => preparePharmacy(p, true))
     );
 
-    if (newPharmacies.length === MAX_ENRICHMENT) {
+    if (newPharmacies.length === MAX_ENRICHMENT_COUNT) {
       // Break early and return enriched pharmacies
       setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
       setLoadingPharmacies(false);
       return;
     }
 
-    const pharmaciesToGet = MAX_ENRICHMENT - newPharmacies.length;
+    const pharmaciesToGet = MAX_ENRICHMENT_COUNT - newPharmacies.length;
     const totalEnriched = pharmacyOptions.length + newPharmacies.length;
 
     // Get pharmacies from our db
@@ -247,7 +250,9 @@ export const Pharmacy = () => {
           radius: 25
         },
         pharmaciesToGet,
-        totalEnriched
+        totalEnriched,
+        enableOpenNow,
+        enable24Hr
       );
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
         setLoadingPharmacies(false);
@@ -440,23 +445,6 @@ export const Pharmacy = () => {
     ? t.pharmacy.subheading.reroute(order.pharmacy.name)
     : t.pharmacy.subheading.original;
 
-  // const filtered = pharmacyOptions.filter((p) => {
-  //   if (enableOpenNow && enable24Hr) {
-  //     return p.isOpen && p.is24Hr;
-  //   } else if (enableOpenNow) {
-  //     return p.isOpen;
-  //   } else if (enable24Hr) {
-  //     return p.is24Hr;
-  //   }
-  //   return true; // If both are false, include all pharmacies
-  // });
-
-  // const showOpenNowFilter =
-  //   pharmacyOptions.some((p) => !p.isOpen) && pharmacyOptions.some((p) => p.isOpen);
-  // const show24HrFilter = pharmacyOptions.some((p) => p.is24Hr);
-
-  useEffect(() => {}, [enableOpenNow, enable24Hr]);
-
   return (
     <Box>
       <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />
@@ -522,7 +510,7 @@ export const Pharmacy = () => {
               ) : null}
 
               <PickupOptions
-                pharmacies={filtered}
+                pharmacies={pharmacyOptions}
                 preferredPharmacy={preferredPharmacyId}
                 savingPreferred={savingPreferred}
                 selectedId={selectedId}
