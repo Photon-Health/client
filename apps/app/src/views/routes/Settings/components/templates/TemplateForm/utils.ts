@@ -48,5 +48,5 @@ export const TEMPLATE_INITIAL_VALUES: TemplateSchemaType = {
   daysSupply: 30,
   instructions: '',
   notes: '',
-  isPublic: true
+  isPublic: false
 };
