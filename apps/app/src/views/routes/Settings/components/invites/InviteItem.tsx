@@ -114,14 +114,14 @@ export const InviteItem = ({ invite: data }: { invite: FragmentType<typeof invit
             title="Delete Invite"
             isDisabled={resendLoading || deleteLoading}
             onClick={async () => {
-              const decision = await confirmWrapper('Delete Invite?', {
+              const decision = await confirmWrapper('Delete current invite?', {
                 description: (
                   <Text mb={2}>
                     This will disable the current invite and remove it from the list.
                   </Text>
                 ),
-                cancelText: "No, Don't Delete",
-                confirmText: 'Yes, Delete',
+                cancelText: 'Cancel',
+                confirmText: 'Delete',
                 colorScheme: 'red'
               });
               if (decision) {
