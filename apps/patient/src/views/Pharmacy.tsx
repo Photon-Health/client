@@ -425,6 +425,11 @@ export const Pharmacy = () => {
     }
   }, [location]);
 
+  useEffect(() => {
+    reset();
+    initialize();
+  }, [enableOpenNow, enable24Hr]);
+
   const isCapsuleTerritory = order?.address?.postalCode in capsuleZipcodeLookup;
   const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
 
