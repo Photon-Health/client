@@ -107,7 +107,7 @@ export const Patient = () => {
       <Card>
         <CardHeader>
           <HStack spacing={4} justifyContent="space-between">
-            <Text fontWeight="medium">
+            <Text fontWeight="medium" data-dd-privacy="mask">
               {loading ? <Skeleton height="30px" width="250px" /> : patient?.name.full}
             </Text>
             {!loading ? (
@@ -137,7 +137,9 @@ export const Patient = () => {
                   {loading ? (
                     <SkeletonText skeletonHeight={5} noOfLines={1} width="130px" />
                   ) : (
-                    <Text fontSize="md">{formatDateLong(patient.dateOfBirth)}</Text>
+                    <Text fontSize="md" data-dd-privacy="mask">
+                      {formatDateLong(patient.dateOfBirth)}
+                    </Text>
                   )}
                 </InfoGrid>
 
@@ -145,7 +147,9 @@ export const Patient = () => {
                   {loading ? (
                     <SkeletonText skeletonHeight={5} noOfLines={1} width="50px" />
                   ) : (
-                    <Text fontSize="md">{sexMap[patient.sex as keyof object]} </Text>
+                    <Text fontSize="md" data-dd-privacy="mask">
+                      {sexMap[patient.sex as keyof object]}{' '}
+                    </Text>
                   )}
                 </InfoGrid>
 
@@ -153,7 +157,9 @@ export const Patient = () => {
                   {loading ? (
                     <SkeletonText skeletonHeight={5} noOfLines={1} width="50px" />
                   ) : (
-                    <Text fontSize="md">{patient.gender}</Text>
+                    <Text fontSize="md" data-dd-privacy="mask">
+                      {patient.gender}
+                    </Text>
                   )}
                 </InfoGrid>
 
@@ -167,6 +173,7 @@ export const Patient = () => {
                       href={`tel:${patient.phone}`}
                       isExternal
                       textDecoration="underline"
+                      data-dd-privacy="mask"
                     >
                       {formatPhone(patient.phone)}
                     </Link>
@@ -182,6 +189,7 @@ export const Patient = () => {
                       href={`mailto:${patient.email}`}
                       isExternal
                       textDecoration="underline"
+                      data-dd-privacy="mask"
                     >
                       {patient.email}
                     </Link>

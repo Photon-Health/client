@@ -4,6 +4,8 @@ const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
 const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
 // const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
 const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
+const TRUE_PILL_ID = 'phr_01HHDHKAMNMKC3CRY8VCYRVVPE';
+const HONEYBEE_PHARMACY_ID = 'phr_01GA9HPXNE3TGEWPK91YY8Z4TS';
 
 /**
  * All orgs inherit from default settings, so updates
@@ -16,7 +18,7 @@ const defaultSettings: OrganizationSettings = {
   sendOrder: true,
   pickUp: true,
   mailOrder: true,
-  mailOrderProviders: [CUREXA_ID, CAREPOINT_ID],
+  mailOrderProviders: [CUREXA_ID, CAREPOINT_ID, TRUE_PILL_ID, HONEYBEE_PHARMACY_ID],
   mailOrderNavigate: false,
   mailOrderNavigateProviders: [],
   sendToPatient: true,
