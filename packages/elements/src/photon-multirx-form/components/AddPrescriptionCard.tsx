@@ -146,6 +146,11 @@ export const AddPrescriptionCard = (props: {
       <Card>
         <div class="flex items-center justify-between">
           <Text color="gray">Add Prescription</Text>
+          <photon-med-search-dialog
+            title="Advanced Medication Search"
+            open={medDialogOpen()}
+            on:photon-medication-closed={() => setMedDialogOpen(false)}
+          />
         </div>
 
         <div
@@ -203,11 +208,6 @@ export const AddPrescriptionCard = (props: {
                   })
                 }
               />
-              <photon-med-search-dialog
-                title="Advanced Medication Search"
-                open={medDialogOpen()}
-                on:photon-medication-closed={() => setMedDialogOpen(false)}
-              />
             </div>
             <div class="pb-4 md:py-2 text-left sm:text-right">
               <a
@@ -218,7 +218,7 @@ export const AddPrescriptionCard = (props: {
               </a>
             </div>
           </div>
-          <div class="mt-2 sm:mt-0 md:max-w-[50%] md:pr-2">
+          <div class="mt-2 sm:mt-0 w-full md:pr-2">
             <photon-datepicker
               label="Do Not Fill Before"
               invalid={props.store.effectiveDate?.error ?? false}
