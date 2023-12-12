@@ -126,6 +126,12 @@ export const AddPrescriptionCard = (props: {
         header: 'Prescription Added',
         body: 'You can send this order or add another prescription before sending it'
       });
+      if (props.store.addToTemplates?.value) {
+        triggerToast({
+          status: 'success',
+          header: 'Personal template saved'
+        });
+      }
     } else {
       triggerToast({
         status: 'info',
@@ -367,7 +373,7 @@ export const AddPrescriptionCard = (props: {
           <div class="flex flex-col xs:flex-row gap-2">
             <Show when={!props.hideAddToTemplates}>
               <photon-checkbox
-                label="Add To Templates"
+                label="Add To Personal Templates"
                 form-name="daw"
                 checked={props.store.addToTemplates?.value || false}
                 on:photon-checkbox-toggled={(e: any) =>

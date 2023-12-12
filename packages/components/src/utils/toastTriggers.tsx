@@ -5,7 +5,7 @@ import Text from '../particles/Text';
 
 type ToastProps = {
   header?: string;
-  body: string;
+  body?: string;
   status: 'success' | 'info';
 };
 
@@ -27,9 +27,11 @@ const triggerToast = (props: ToastProps) => {
           <Show when={props?.header}>
             <Text bold>{props.header}</Text>
           </Show>
-          <div>
-            <Text>{props.body}</Text>
-          </div>
+          <Show when={props.body}>
+            <div>
+              <Text>{props.body}</Text>
+            </div>
+          </Show>
         </div>
         <button
           type="button"

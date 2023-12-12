@@ -67,7 +67,10 @@ customElement(
         }
         const filtered = data.filter((x) => {
           if ('treatment' in x) {
-            return x.treatment.name.toLowerCase().includes(filter.toLowerCase());
+            return (
+              x.treatment.name.toLowerCase().includes(filter.toLowerCase()) ||
+              x.name?.toLowerCase().includes(filter.toLowerCase())
+            );
           } else {
             return x.name.toLowerCase().includes(filter.toLowerCase());
           }
@@ -89,21 +92,23 @@ customElement(
           groups={[
             {
               label: 'Off Catalog',
-              filter: (t: Treatment | PrescriptionTemplate) =>
+              filter: (t) =>
                 t &&
                 typeof t === 'object' &&
                 props.offCatalogOption &&
                 t.id === props.offCatalogOption.id
             },
             {
-              label: 'Templates',
-              filter: (t: Treatment | PrescriptionTemplate) =>
-                t && typeof t === 'object' && 'treatment' in t
+              label: 'Personal Templates',
+              filter: (t) => t && typeof t === 'object' && 'treatment' in t && t.isPrivate
+            },
+            {
+              label: 'Organization Templates',
+              filter: (t) => t && typeof t === 'object' && 'treatment' in t && !t.isPrivate
             },
             {
               label: 'Catalog',
-              filter: (t: Treatment | PrescriptionTemplate) =>
-                t && typeof t === 'object' && 'name' in t && !('treatment' in t)
+              filter: (t) => t && typeof t === 'object' && 'name' in t && !('treatment' in t)
             }
           ]}
           label={props.label}
@@ -115,37 +120,28 @@ customElement(
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
           displayAccessor={(t: Treatment | PrescriptionTemplate, groupAccess: boolean) => {
-            // TODO when we have generated types we can fix this
-            // @ts-ignore
             if (t?.__typename !== 'PrescriptionTemplate') {
               if (groupAccess) {
-                // @ts-ignore
-                return <p class="text-sm whitespace-normal leading-snug mb-2">{t.name}</p>;
+                return <p class="text-sm whitespace-normal leading-snug my-1">{t.name}</p>;
               } else {
-                // @ts-ignore
                 return t?.name || '';
               }
             } else {
               if (groupAccess) {
                 return (
-                  <>
+                  <div class="my-1">
                     <p class="text-sm whitespace-normal leading-snug">
-                      {/* @ts-ignore */}
                       {t?.name ? `${t.name}: ` : ''}
-                      {/* @ts-ignore */}
                       {t.treatment.name}
                     </p>
-                    <p class="text-xs text-gray-500 overflow-hidden whitespace-nowrap overflow-ellipsis mb-2">
-                      {/* @ts-ignore */}
+                    <p class="text-xs text-gray-500 overflow-hidden whitespace-nowrap overflow-ellipsis">
                       QTY: {t.dispenseQuantity} {t.dispenseUnit} | Days Supply: {t.daysSupply} |{' '}
                       {/* A "-1" is needed here because in the UI we are displaying the number of refills, not fills. We get this from the templates in the catalog */}
-                      {/* @ts-ignore */}
                       Refills: {t.fillsAllowed ? t.fillsAllowed - 1 : 0} | Sig: {t.instructions}
                     </p>
-                  </>
+                  </div>
                 );
               } else {
-                // @ts-ignore
                 return t.treatment.name;
               }
             }
