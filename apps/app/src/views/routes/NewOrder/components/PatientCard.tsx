@@ -56,7 +56,7 @@ export const PatientCard = ({ loading, patient }: PatientCardProps) => {
                     skeletonHeight="4"
                   />
                 ) : (
-                  <Text>{patient?.name.full}</Text>
+                  <Text data-dd-privacy="mask">{patient?.name.full}</Text>
                 )}
               </GridItem>
               <GridItem area="sexAtBirth" whiteSpace="nowrap">
@@ -72,7 +72,7 @@ export const PatientCard = ({ loading, patient }: PatientCardProps) => {
                     skeletonHeight="4"
                   />
                 ) : patient?.sex ? (
-                  <Text>{patient?.sex}</Text>
+                  <Text data-dd-privacy="mask">{patient?.sex}</Text>
                 ) : (
                   <Text as="i">None</Text>
                 )}
@@ -90,7 +90,7 @@ export const PatientCard = ({ loading, patient }: PatientCardProps) => {
                     skeletonHeight="4"
                   />
                 ) : patient?.gender ? (
-                  <Text>{patient?.gender}</Text>
+                  <Text data-dd-privacy="mask">{patient?.gender}</Text>
                 ) : (
                   <Text as="i">None</Text>
                 )}
@@ -116,7 +116,7 @@ export const PatientCard = ({ loading, patient }: PatientCardProps) => {
                     skeletonHeight="4"
                   />
                 ) : patient?.phone ? (
-                  <Text>{formatPhone(patient.phone)}</Text>
+                  <Text data-dd-privacy="mask">{formatPhone(patient.phone)}</Text>
                 ) : (
                   <Text as="i">None</Text>
                 )}
@@ -134,7 +134,7 @@ export const PatientCard = ({ loading, patient }: PatientCardProps) => {
                     skeletonHeight="4"
                   />
                 ) : patient?.email ? (
-                  <Text>{patient.email}</Text>
+                  <Text data-dd-privacy="mask">{patient.email}</Text>
                 ) : (
                   <Text as="i">None</Text>
                 )}

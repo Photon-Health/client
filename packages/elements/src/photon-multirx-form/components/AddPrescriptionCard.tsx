@@ -53,6 +53,14 @@ export const AddPrescriptionCard = (props: {
       });
     }
 
+    // This is a hack to fix a bug where the form is cleared when the user types a decimal
+    // in the dispense quantity input. But because of the hack, we have to do this to register the validator
+    // that would otherwise be registered with the input below 🙃
+    props.actions.updateFormValue({
+      key: 'dispenseQuantity',
+      value: undefined
+    });
+
     if (props.weight) {
       props.actions.updateFormValue({
         key: 'notes',
@@ -229,10 +237,17 @@ export const AddPrescriptionCard = (props: {
                 invalid={props.store.dispenseQuantity?.error ?? false}
                 help-text={props.store.dispenseQuantity?.error}
                 on:photon-input-changed={(e: any) => {
-                  props.actions.updateFormValue({
-                    key: 'dispenseQuantity',
-                    value: Number(e.detail.input)
-                  });
+                  const inputValue = Number(e.detail.input);
+                  // this handles a bug on mobile where the input is cleared when the user types a decimal.
+                  // However, this introduces a bug where the input validator isn't registered. To fix this, we
+                  // add a undefined form update in the onMount function up top 🙄
+                  // https://github.com/Photon-Health/client/commit/9566daa5dea50709677c66fdceac6d2edbd43fe5
+                  if (!isNaN(inputValue) && e.detail.input !== '') {
+                    props.actions.updateFormValue({
+                      key: 'dispenseQuantity',
+                      value: inputValue
+                    });
+                  }
                 }}
                 style={{ width: '100px' }}
               />
