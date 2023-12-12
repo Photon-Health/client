@@ -51,16 +51,14 @@ export const PickupOptions = ({
         </SlideFade>
       ) : null}
 
-      {pharmacies?.length > 0 ? (
-        <SlideFade offsetY="60px" in={true}>
-          <PharmacyFilters
-            enableOpenNow={enableOpenNow}
-            enable24Hr={enable24Hr}
-            setEnableOpenNow={setEnableOpenNow}
-            setEnable24Hr={setEnable24Hr}
-          />
-        </SlideFade>
-      ) : null}
+      <SlideFade offsetY="60px" in={true}>
+        <PharmacyFilters
+          enableOpenNow={enableOpenNow}
+          enable24Hr={enable24Hr}
+          setEnableOpenNow={setEnableOpenNow}
+          setEnable24Hr={setEnable24Hr}
+        />
+      </SlideFade>
 
       <VStack align="span" spacing={2}>
         {pharmacies.map((pharmacy: EnrichedPharmacy, i: number) => (
