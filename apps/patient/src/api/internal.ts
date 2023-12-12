@@ -36,7 +36,9 @@ export const getPharmacies = async (
     radius: number;
   },
   limit: number,
-  offset: number
+  offset: number,
+  isOpenNow: boolean,
+  is24hr: boolean
 ) => {
   try {
     const now = new Date();
@@ -46,7 +48,8 @@ export const getPharmacies = async (
         location: searchParams,
         limit,
         offset,
-        openAt: now
+        openAt: isOpenNow ? now : undefined,
+        is24hr
       }
     );
     if (response?.pharmaciesByLocation?.length > 0) {
