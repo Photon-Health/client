@@ -114,6 +114,7 @@ export const AddPrescriptionCard = (props: {
         notes: props.store.notes.value,
         fillsAllowed: props.store.refillsInput.value + 1,
         addToTemplates: props.store.addToTemplates?.value ?? false,
+        templateName: props.store.templateName?.value ?? '',
         catalogId: props.store.catalogId.value ?? undefined
       };
 
@@ -123,6 +124,7 @@ export const AddPrescriptionCard = (props: {
       });
 
       const addToTemplate = props.store.addToTemplates?.value ?? false;
+      const templateName = props.store.templateName?.value ?? '';
       props.actions.updateFormValue({
         key: 'effectiveDate',
         value: format(new Date(), 'yyyy-MM-dd').toString()
@@ -135,7 +137,9 @@ export const AddPrescriptionCard = (props: {
         'daysSupply',
         'refillsInput',
         'instructions',
-        'notes'
+        'notes',
+        'templateName',
+        'addToTemplates'
       ]);
       setOffCatalog(undefined);
       clearForm(
@@ -147,6 +151,7 @@ export const AddPrescriptionCard = (props: {
           const { errors } = await templateMutation({
             variables: {
               ...draft,
+              name: templateName,
               treatmentId: draft.treatment.id,
               isPrivate: true
             },
@@ -417,6 +422,22 @@ export const AddPrescriptionCard = (props: {
                   props.actions.updateFormValue({
                     key: 'addToTemplates',
                     value: e.detail.checked
+                  })
+                }
+              />
+            </Show>
+            <Show when={props.store.addToTemplates?.value ?? false}>
+              <photon-text-input
+                class="flex-grow flex-shrink flex-1"
+                label="Template Name"
+                value={props.store.templateName?.value ?? ''}
+                invalid={props.store.templateName?.error ?? false}
+                help-text={props.store.templateName?.error}
+                optional="true"
+                on:photon-input-changed={(e: any) =>
+                  props.actions.updateFormValue({
+                    key: 'templateName',
+                    value: e.detail.input
                   })
                 }
               />
