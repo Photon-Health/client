@@ -346,7 +346,6 @@ customElement(
 
           <RecentOrders.DuplicateDialog />
           <RecentOrders.CombineDialog />
-          <RecentOrders.CancelDialog />
           <RecentOrders.IssueDialog />
 
           <div>

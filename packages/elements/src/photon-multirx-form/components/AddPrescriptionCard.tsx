@@ -1,9 +1,16 @@
 import { afterDate, message } from '../../validators';
 import { record, string, any, number, min, size } from 'superstruct';
 import { format } from 'date-fns';
-import { Card, Text, Button, Icon } from '@photonhealth/components';
+import {
+  Card,
+  Text,
+  Button,
+  Icon,
+  DoseCalculator,
+  triggerToast,
+  useRecentOrders
+} from '@photonhealth/components';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
-import { DoseCalculator, triggerToast } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 //Shoelace
@@ -42,7 +49,7 @@ export const AddPrescriptionCard = (props: {
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
-
+  const [, recentOrdersActions] = useRecentOrders();
   let ref: any;
 
   onMount(() => {
@@ -72,52 +79,73 @@ export const AddPrescriptionCard = (props: {
     ];
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
+
     if (!errorsPresent) {
-      props.actions.updateFormValue({
-        key: 'draftPrescriptions',
-        value: [
-          ...(props.store.draftPrescriptions?.value || []),
-          {
-            id: String(Math.random()),
-            effectiveDate: props.store.effectiveDate.value,
-            treatment: props.store.treatment.value,
-            dispenseAsWritten: props.store.dispenseAsWritten.value,
-            dispenseQuantity: props.store.dispenseQuantity.value,
-            dispenseUnit: props.store.dispenseUnit.value,
-            daysSupply: props.store.daysSupply.value,
-            refillsInput: props.store.refillsInput.value,
-            instructions: props.store.instructions.value,
-            notes: props.store.notes.value,
-            fillsAllowed: props.store.refillsInput.value + 1,
-            addToTemplates: props.store.addToTemplates?.value ?? false,
-            catalogId: props.store.catalogId.value ?? undefined
-          }
-        ]
-      });
-      props.actions.updateFormValue({
-        key: 'effectiveDate',
-        value: format(new Date(), 'yyyy-MM-dd').toString()
-      });
-      props.actions.clearKeys([
-        'treatment',
-        'dispenseAsWritten',
-        'dispenseQuantity',
-        'dispenseUnit',
-        'daysSupply',
-        'refillsInput',
-        'instructions',
-        'notes'
-      ]);
-      setOffCatalog(undefined);
-      clearForm(
-        props.actions,
-        props.weight ? { notes: patientWeight(props.weight, props?.weightUnit) } : undefined
-      );
-      triggerToast({
-        status: 'success',
-        header: 'Prescription Added',
-        body: 'You can send this order or add another prescription before sending it'
-      });
+      const rxTemp = {
+        effectiveDate: props.store.effectiveDate.value,
+        treatment: props.store.treatment.value,
+        dispenseAsWritten: props.store.dispenseAsWritten.value,
+        dispenseQuantity: props.store.dispenseQuantity.value,
+        dispenseUnit: props.store.dispenseUnit.value,
+        daysSupply: props.store.daysSupply.value,
+        refillsInput: props.store.refillsInput.value,
+        instructions: props.store.instructions.value,
+        notes: props.store.notes.value,
+        fillsAllowed: props.store.refillsInput.value + 1,
+        addToTemplates: props.store.addToTemplates?.value ?? false,
+        catalogId: props.store.catalogId.value ?? undefined
+      };
+
+      const duplicateFill = recentOrdersActions.checkDuplicateFill(rxTemp.treatment.name);
+
+      const addDraftPrescription = () => {
+        props.actions.updateFormValue({
+          key: 'draftPrescriptions',
+          value: [
+            ...(props.store.draftPrescriptions?.value || []),
+            {
+              id: String(Math.random()),
+              ...rxTemp
+            }
+          ]
+        });
+        props.actions.updateFormValue({
+          key: 'effectiveDate',
+          value: format(new Date(), 'yyyy-MM-dd').toString()
+        });
+        props.actions.clearKeys([
+          'treatment',
+          'dispenseAsWritten',
+          'dispenseQuantity',
+          'dispenseUnit',
+          'daysSupply',
+          'refillsInput',
+          'instructions',
+          'notes'
+        ]);
+        setOffCatalog(undefined);
+        clearForm(
+          props.actions,
+          props.weight ? { notes: patientWeight(props.weight, props?.weightUnit) } : undefined
+        );
+        triggerToast({
+          status: 'success',
+          header: 'Prescription Added',
+          body: 'You can send this order or add another prescription before sending it'
+        });
+      };
+
+      if (duplicateFill) {
+        // if there's a duplicate order, check first if they want to report an issue
+        return recentOrdersActions.setIsDuplicateDialogOpen(
+          true,
+          duplicateFill,
+          addDraftPrescription
+        );
+      }
+
+      // otherwise add it to the draft prescriptions list
+      addDraftPrescription();
     } else {
       triggerToast({
         status: 'info',
