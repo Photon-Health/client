@@ -27,7 +27,7 @@ const GetPatientOrdersQuery = gql`
           prescription {
             dispenseQuantity
             dispenseUnit
-            refillsAllowed
+            fillsAllowed
             instructions
           }
         }
@@ -59,8 +59,9 @@ type RecentOrdersActions = {
     duplicateFill?: Fill,
     continueCb?: () => void
   ) => void;
-  setIsIssueDialogOpen: (isOpen: boolean) => void;
+  setIsIssueDialogOpen: (isOpen: boolean, orderWithIssue?: Order) => void;
   checkDuplicateFill: (treatmentName: string) => Fill | undefined;
+  hasRoutingOrder: () => boolean;
 };
 
 type RecentOrdersContextValue = [RecentOrdersState, RecentOrdersActions];
@@ -76,7 +77,8 @@ const RecentOrdersContext = createContext<RecentOrdersContextValue>([
     setIsCombineDialogOpen: () => undefined,
     setIsDuplicateDialogOpen: () => undefined,
     setIsIssueDialogOpen: () => undefined,
-    checkDuplicateFill: () => undefined
+    checkDuplicateFill: () => undefined,
+    hasRoutingOrder: () => false
   }
 ]);
 
@@ -99,7 +101,7 @@ function RecentOrders(props: SDKProviderProps) {
     state,
     {
       setIsCombineDialogOpen(isOpen: boolean) {
-        setState({ isCombineDialogOpen: isOpen });
+        setState('isCombineDialogOpen', isOpen);
       },
       setIsDuplicateDialogOpen(isOpen, duplicateFill, continueCb) {
         setState({
@@ -108,17 +110,20 @@ function RecentOrders(props: SDKProviderProps) {
           ...(duplicateFill && { duplicateFill })
         });
       },
-      setIsIssueDialogOpen(isOpen: boolean, orderWithIssue?: Order) {
+      setIsIssueDialogOpen(isOpen, orderWithIssue) {
         setState({
           isIssueDialogOpen: isOpen,
           ...(orderWithIssue && { orderWithIssue }),
           ...(!isOpen && { duplicateFill: undefined, orderWithIssue: undefined })
         });
       },
-      checkDuplicateFill(treatmentName: string) {
+      checkDuplicateFill(treatmentName) {
         return state.orders
           .map((order) => order.fills.find((fill) => fill.treatment.name === treatmentName))
           .find((fill) => fill !== undefined);
+      },
+      hasRoutingOrder() {
+        return state.orders.some((order) => order.state === 'ROUTING');
       }
     }
   ];
