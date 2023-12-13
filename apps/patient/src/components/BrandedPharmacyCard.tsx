@@ -36,7 +36,7 @@ const capsulePharmacyIds = Object.keys(capsulePharmacyIdLookup);
 for (let i = 0; i < capsulePharmacyIds.length; i++) {
   PHARMACY_BRANDING[capsulePharmacyIds[i]] = {
     logo: capsuleLogo,
-    description: 'FREE Delivery within 1-2 Days'
+    description: 'FREE Same Day Delivery'
   };
 }
 
@@ -48,11 +48,7 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
 
   let tagline = null;
   if (capsulePharmacyIdLookup[pharmacyId]) {
-    let capsuleDescription = 'FREE Delivery within 1-2 Days';
-    if (capsulePharmacyIdLookup[pharmacyId] === 'Austin') {
-      capsuleDescription = 'FREE Same Day Delivery';
-    }
-    const [firstWord, ...restOfSentence] = capsuleDescription.split(' ');
+    const [firstWord, ...restOfSentence] = brand.description.split(' ');
 
     tagline = (
       <Text fontSize="sm" display="inline">
