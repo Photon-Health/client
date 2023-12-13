@@ -203,5 +203,10 @@ export const photon: {
     logo: 'pine_medical_logo.svg',
     accentColor: '#000000',
     enableRxAndOrder: false
+  },
+  // New provider?
+  org_MYJ66XrRE3eGb12U: {
+    ...defaultSettings,
+    enableRxAndOrder: false
   }
 };
