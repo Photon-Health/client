@@ -115,70 +115,39 @@ export default function PatientInfo(props: PatientInfoProps) {
           </Button>
         </Show>
       </div>
-      <div class="pt-4">
-        <Text
-          size="lg"
-          bold
-          loading={!patient()}
-          sampleLoadingText="Sally Patient"
-          data-dd-privacy="mask"
-        >
+      <div class="pt-4" data-dd-privacy="mask">
+        <Text size="lg" bold loading={!patient()} sampleLoadingText="Sally Patient">
           {patient()?.name.full || 'N/A'}
         </Text>
         <div class="pt-4 sm:grid sm:grid-cols-2 sm:gap-2">
           <table class="table-auto">
             <tbody>
               <InfoRow label="Email">
-                <Text
-                  size="sm"
-                  loading={!patient()}
-                  sampleLoadingText="fake@email.com"
-                  data-dd-privacy="mask"
-                >
+                <Text size="sm" loading={!patient()} sampleLoadingText="fake@email.com">
                   {patient()?.email || 'N/A'}
                 </Text>
               </InfoRow>
               <InfoRow label="Phone">
-                <Text
-                  size="sm"
-                  loading={!patient()}
-                  sampleLoadingText="555-555-5555"
-                  data-dd-privacy="mask"
-                >
+                <Text size="sm" loading={!patient()} sampleLoadingText="555-555-5555">
                   {phoneNumber() || 'N/A'}
                 </Text>
               </InfoRow>
               <InfoRow label="Address">
                 <Show when={!patient() || address()} fallback={<div>N/A</div>}>
                   <div>
-                    <Text
-                      size="sm"
-                      loading={!patient()}
-                      sampleLoadingText="123 Fake St"
-                      data-dd-privacy="mask"
-                    >
+                    <Text size="sm" loading={!patient()} sampleLoadingText="123 Fake St">
                       {address()?.street1}
                     </Text>
                   </div>
                   <Show when={!patient() || address()?.street2}>
                     <div>
-                      <Text
-                        size="sm"
-                        loading={!patient()}
-                        sampleLoadingText="Apt 3"
-                        data-dd-privacy="mask"
-                      >
+                      <Text size="sm" loading={!patient()} sampleLoadingText="Apt 3">
                         {address()?.street2}
                       </Text>
                     </div>
                   </Show>
                   <div>
-                    <Text
-                      size="sm"
-                      loading={!patient()}
-                      sampleLoadingText="Brooklyn, NY 11221"
-                      data-dd-privacy="mask"
-                    >
+                    <Text size="sm" loading={!patient()} sampleLoadingText="Brooklyn, NY 11221">
                       {address()?.city}, {address()?.state} {address()?.postalCode}
                     </Text>
                   </div>
@@ -190,42 +159,22 @@ export default function PatientInfo(props: PatientInfoProps) {
           <table class="table-auto">
             <tbody>
               <InfoRow label="DOB">
-                <Text
-                  size="sm"
-                  loading={!patient()}
-                  sampleLoadingText="female"
-                  data-dd-privacy="mask"
-                >
+                <Text size="sm" loading={!patient()} sampleLoadingText="female">
                   {formatDate(patient()?.dateOfBirth || 'N/A')}
                 </Text>
               </InfoRow>
               <InfoRow label="Weight">
-                <Text
-                  size="sm"
-                  loading={!patient()}
-                  sampleLoadingText="150 lbs"
-                  data-dd-privacy="mask"
-                >
+                <Text size="sm" loading={!patient()} sampleLoadingText="150 lbs">
                   {props?.weight ? `${props.weight} ${props.weightUnit}` : 'N/A'}
                 </Text>
               </InfoRow>
               <InfoRow label="Sex">
-                <Text
-                  size="sm"
-                  loading={!patient()}
-                  sampleLoadingText="female"
-                  data-dd-privacy="mask"
-                >
+                <Text size="sm" loading={!patient()} sampleLoadingText="female">
                   {patient()?.sex || 'N/A'}
                 </Text>
               </InfoRow>
               <InfoRow label="Gender">
-                <Text
-                  size="sm"
-                  loading={!patient()}
-                  sampleLoadingText="female"
-                  data-dd-privacy="mask"
-                >
+                <Text size="sm" loading={!patient()} sampleLoadingText="female">
                   {patient()?.gender || 'N/A'}
                 </Text>
               </InfoRow>
