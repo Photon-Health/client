@@ -24,7 +24,6 @@ import { TemplateView } from '../../../components/TemplateView';
 import { TemplateActions } from '../components/templates/TemplateActions';
 import { TemplateForm } from '../components/templates/TemplateForm';
 import { TemplateTable } from '../components/templates/TemplateTable';
-// import Badge from '../../../components/Badge';
 
 const renderTemplateRow = (
   rx: PrescriptionTemplate,
