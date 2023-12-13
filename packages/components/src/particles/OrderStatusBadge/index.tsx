@@ -1,4 +1,4 @@
-// forgive me, ripped from clinical app
+// forgive me, ripped from clinical app and solid(js)ified it
 import { OrderState } from 'packages/sdk/dist/types';
 import Badge, { BadgeColor } from '../Badge';
 import Icon from '../Icon';

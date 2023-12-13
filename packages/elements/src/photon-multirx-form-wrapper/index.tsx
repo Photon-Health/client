@@ -105,6 +105,38 @@ customElement(
     };
     const handleUnsavedCancel = () => setContinueSubmitOpen(false);
 
+    const handleCreateOrder = () => {
+      // Notify there aren't any draft prescriptions
+      if (!canSubmit() || !canWritePrescription()) {
+        return triggerToast({
+          status: 'info',
+          body: 'You need to add prescription(s) to this order before you can send it.'
+        });
+      }
+
+      // Show a dialog if there is a prescription that hasn't been added to draft prescriptions
+      if (form()?.treatment?.value?.name) {
+        return setContinueSubmitOpen(true);
+      }
+
+      // else if all good, create the order
+      setIsCreateOrder(true);
+      setTriggerSubmit(true);
+    };
+
+    const handleCreatePrescriptions = () => {
+      // check if there are draft prescriptions
+      if (!canSubmit() || !canWritePrescription()) {
+        return triggerToast({
+          status: 'info',
+          body: 'You need to add prescription(s) to this order before you can send it.'
+        });
+      }
+
+      // create the prescriptions
+      setContinueSaveOnly(true);
+    };
+
     return (
       <div ref={ref}>
         <style>{photonStyles}</style>
@@ -161,24 +193,7 @@ customElement(
           titleIconName="prescription"
           headerRight={
             props.enableOrder ? (
-              <Button
-                size="md"
-                loading={triggerSubmit()}
-                onClick={() => {
-                  if (!canSubmit() || !canWritePrescription()) {
-                    // show info error
-                    triggerToast({
-                      status: 'info',
-                      body: 'You need to add prescription(s) to this order before you can send it.'
-                    });
-                  } else {
-                    // submit rx and order
-                    form()?.treatment?.value?.name
-                      ? setContinueSubmitOpen(true)
-                      : setTriggerSubmit(true);
-                  }
-                }}
-              >
+              <Button size="md" loading={triggerSubmit()} onClick={handleCreateOrder}>
                 Send Order
               </Button>
             ) : (
@@ -187,37 +202,14 @@ customElement(
                   size="md"
                   variant="secondary"
                   loading={triggerSubmit() && !isCreateOrder()}
-                  onClick={() => {
-                    if (!canSubmit() || !canWritePrescription()) {
-                      triggerToast({
-                        status: 'info',
-                        body: 'You need to add prescription(s) to this order before you can send it.'
-                      });
-                    } else {
-                      setContinueSaveOnly(true);
-                    }
-                  }}
+                  onClick={handleCreatePrescriptions}
                 >
                   Save prescriptions
                 </Button>
                 <Button
                   size="md"
                   loading={triggerSubmit() && isCreateOrder()}
-                  onClick={() => {
-                    if (!canSubmit() || !canWritePrescription()) {
-                      triggerToast({
-                        status: 'info',
-                        body: 'You need to add prescription(s) to this order before you can send it.'
-                      });
-                    } else {
-                      if (form()?.treatment?.value?.name) {
-                        setContinueSubmitOpen(true);
-                      } else {
-                        setIsCreateOrder(true);
-                        setTriggerSubmit(true);
-                      }
-                    }
-                  }}
+                  onClick={handleCreateOrder}
                 >
                   Save and create order
                 </Button>
@@ -256,6 +248,10 @@ customElement(
                         form()?.patient?.value?.id
                       );
                     }
+                  }}
+                  on:photon-order-error={(e: any) => {
+                    e.stopPropagation();
+                    setTriggerSubmit(false);
                   }}
                 />
               </div>

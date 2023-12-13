@@ -9,7 +9,8 @@ export default function formatRxString({
   fillsAllowed?: number;
   instructions?: string;
 }): string {
-  return `${dispenseQuantity} ${dispenseUnit}, ${fillsAllowed || 0} Refill${
-    (fillsAllowed || 0) === 1 ? '' : 's'
+  const refills = Math.max(fillsAllowed - 1, 0);
+  return `${dispenseQuantity} ${dispenseUnit}, ${refills} Refill${
+    refills === 1 ? '' : 's'
   } - ${instructions}`;
 }
