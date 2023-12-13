@@ -204,7 +204,7 @@ export const photon: {
     accentColor: '#000000',
     enableRxAndOrder: false
   },
-  // New provider?
+  // Burdoin Mtn Medicine
   org_MYJ66XrRE3eGb12U: {
     ...defaultSettings,
     enableRxAndOrder: false
