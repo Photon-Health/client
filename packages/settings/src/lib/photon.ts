@@ -153,6 +153,15 @@ export const photon: {
     sendToPatient: false,
     enableRxAndOrder: false
   },
+  // Fadeyi Derm (Precision Medical Hair Restoration & Aesthetics)
+  org_G52mrmIBC3yqeNYB: {
+    ...defaultSettings,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_ID],
+    sendToPatient: false,
+    enableRxAndOrder: false
+  },
   // Ognomy
   org_2B1yxV6yS9ROqV1g: {
     ...defaultSettings,
