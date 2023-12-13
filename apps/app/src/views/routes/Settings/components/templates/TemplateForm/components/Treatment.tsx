@@ -13,7 +13,7 @@ export const Treatment = ({
   catalogId: string;
   errors: any;
   touched: any;
-  edit: any;
+  edit?: boolean;
   values: any;
   medicationSelectRef: any;
 }) => (

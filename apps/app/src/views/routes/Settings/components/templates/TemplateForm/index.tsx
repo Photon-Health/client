@@ -246,14 +246,19 @@ export const TemplateForm = ({
         touched,
         values,
         setFieldValue,
-        setSubmitting,
         isSubmitting,
-        resetForm
+        setSubmitting,
+        resetForm,
+        isValid
       }) => {
         const hidden = values.treatment.__typename === 'MedicalEquipment';
 
+        const onClose = () => {
+          setSubmitting(false);
+          handleClose();
+        };
         return (
-          <Modal isOpen={isOpen} onClose={handleClose} size="lg" closeOnOverlayClick closeOnEsc>
+          <Modal isOpen={isOpen} onClose={onClose} size="lg" closeOnOverlayClick closeOnEsc>
             <ModalOverlay />
             <ModalContent>
               <ModalBody p={8}>
@@ -373,11 +378,11 @@ export const TemplateForm = ({
                     </FormControl>
                     <ModalFooter px="0">
                       <CtaButtons
+                        isValid={isValid}
                         edit={edit}
                         handleCancel={() => handleCancel(resetForm)}
                         loading={loading || loadingCreate || loadingUpdate}
                         isSubmitting={isSubmitting}
-                        setSubmitting={setSubmitting}
                       />
                     </ModalFooter>
                   </VStack>
