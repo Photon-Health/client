@@ -1,4 +1,5 @@
-import { createMemo, Show } from 'solid-js';
+import { Fill, Order } from '@photonhealth/sdk/dist/types';
+import { createMemo, For } from 'solid-js';
 import { useRecentOrders } from '.';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
@@ -6,8 +7,31 @@ import Text from '../../particles/Text';
 import Textarea from '../../particles/Textarea';
 import formatRxString from '../../utils/formatRxString';
 
+function uniqueFills(order: Order): Fill[] {
+  const treatmentNames = new Set<string>();
+
+  return order.fills.filter((fill) => {
+    if (treatmentNames.has(fill.treatment.name)) {
+      return false;
+    }
+
+    treatmentNames.add(fill.treatment.name);
+    return true;
+  });
+}
+
 export default function RecentOrdersIssueDialog() {
   const [state, actions] = useRecentOrders();
+
+  const fills = createMemo(() => {
+    if (state?.orderWithIssue) {
+      return uniqueFills(state.orderWithIssue);
+    }
+    if (state?.duplicateFill) {
+      return [state.duplicateFill];
+    }
+    return [];
+  });
 
   return (
     <Dialog open={state.isIssueDialogOpen} onClose={() => actions.setIsIssueDialogOpen(false)}>
@@ -30,29 +54,23 @@ export default function RecentOrdersIssueDialog() {
             <Text size="xs" color="gray">
               PRESCRIPTION
             </Text>
-            <Show when={state?.duplicateFill}>
-              <Text size="sm">{state?.duplicateFill?.treatment?.name}</Text>
-              <Text size="sm" color="gray">
-                {formatRxString({
-                  dispenseQuantity: state?.duplicateFill?.prescription?.dispenseQuantity,
-                  dispenseUnit: state?.duplicateFill?.prescription?.dispenseUnit,
-                  fillsAllowed: state?.duplicateFill?.prescription?.fillsAllowed,
-                  instructions: state?.duplicateFill?.prescription?.instructions
-                })}
-              </Text>
-            </Show>
-            <Show when={state?.orderWithIssue}>
-              <Text size="sm">{state?.orderWithIssue?.fills?.[0]?.treatment?.name}</Text>
-              <Text size="sm" color="gray">
-                {formatRxString({
-                  dispenseQuantity:
-                    state?.orderWithIssue?.fills?.[0]?.prescription?.dispenseQuantity,
-                  dispenseUnit: state?.orderWithIssue?.fills?.[0]?.prescription?.dispenseUnit,
-                  fillsAllowed: state?.orderWithIssue?.fills?.[0]?.prescription?.fillsAllowed,
-                  instructions: state?.orderWithIssue?.fills?.[0]?.prescription?.instructions
-                })}
-              </Text>
-            </Show>
+            <div class="flex flex-col gap-y-4">
+              <For each={fills()}>
+                {(fill) => (
+                  <div>
+                    <Text size="sm">{fill.treatment.name}</Text>
+                    <Text size="sm" color="gray">
+                      {formatRxString({
+                        dispenseQuantity: fill?.prescription?.dispenseQuantity,
+                        dispenseUnit: fill?.prescription?.dispenseUnit,
+                        fillsAllowed: fill?.prescription?.fillsAllowed,
+                        instructions: fill?.prescription?.instructions
+                      })}
+                    </Text>
+                  </div>
+                )}
+              </For>
+            </div>
           </div>
         </div>
 

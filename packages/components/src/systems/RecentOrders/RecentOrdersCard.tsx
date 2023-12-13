@@ -57,7 +57,7 @@ export default function RecentOrdersCard() {
                               <div class="flex gap-x-4">
                                 <Button
                                   variant="naked"
-                                  onClick={() => actions.setIsIssueDialogOpen(true)}
+                                  onClick={() => actions.setIsIssueDialogOpen(true, order)}
                                 >
                                   Report Issue
                                 </Button>
