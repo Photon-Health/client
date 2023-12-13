@@ -62,6 +62,26 @@ function generateChakraTheme(key = undefined) {
               bg: 'brand.700'
             },
             _disabled: disabledStyles
+          }),
+          filter: () => ({
+            bg: 'white',
+            border: '1px',
+            borderColor: 'gray.200',
+            _active: {
+              bg: 'blue.50',
+              color: 'blue.500',
+              border: '1px',
+              borderColor: 'blue.500'
+            },
+            // Applies hover styling only to non-mobile widths
+            '@media(hover: hover)': {
+              _hover: {
+                bg: 'blue.50',
+                color: 'blue.500',
+                border: '1px',
+                borderColor: 'blue.500'
+              }
+            }
           })
         }
       }
