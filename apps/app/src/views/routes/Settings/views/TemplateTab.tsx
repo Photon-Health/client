@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Modal,
   ModalBody,
@@ -9,21 +10,11 @@ import {
   Show,
   Text,
   VStack,
-  theme,
   useBoolean
 } from '@chakra-ui/react';
 
 import { usePhoton } from '@photonhealth/react';
-import {
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
 import { PrescriptionTemplate } from 'packages/sdk/dist/types';
@@ -33,24 +24,7 @@ import { TemplateView } from '../../../components/TemplateView';
 import { TemplateActions } from '../components/templates/TemplateActions';
 import { TemplateForm } from '../components/templates/TemplateForm';
 import { TemplateTable } from '../components/templates/TemplateTable';
-
-const Badge = ({ color, children }: { color: 'blue' | 'purple'; children: ReactNode }) => (
-  <Box
-    borderRadius={'full'}
-    bgColor={theme.colors[color][50]}
-    border={`1px solid`}
-    borderColor={theme.colors[color][200]}
-    color={theme.colors[color][700]}
-    px={0}
-    py={0.5}
-    maxW="32"
-    minW="32"
-    display={'flex'}
-    justifyContent={'center'}
-  >
-    {children}
-  </Box>
-);
+// import Badge from '../../../components/Badge';
 
 const renderTemplateRow = (
   rx: PrescriptionTemplate,
@@ -91,7 +65,7 @@ const renderTemplateRow = (
           </Text>
         </Box>
         <Show below="md">
-          <Badge color={rx.isPrivate ? 'blue' : 'purple'}>
+          <Badge colorScheme={rx.isPrivate ? 'blue' : 'purple'}>
             {rx.isPrivate ? 'Personal' : 'Organization'}
           </Badge>
         </Show>
@@ -108,7 +82,7 @@ const renderTemplateRow = (
       />
     ),
     badge: (
-      <Badge color={rx.isPrivate ? 'blue' : 'purple'}>
+      <Badge colorScheme={rx.isPrivate ? 'blue' : 'purple'}>
         {rx.isPrivate ? 'Personal' : 'Organization'}
       </Badge>
     )
