@@ -45,8 +45,9 @@ export const UNOPEN_BUSINESS_STATUS_MAP = {
   CLOSED_TEMPORARILY: 'Closed Temporarily',
   CLOSED_PERMANENTLY: 'Closed Permanently'
 };
-const MAX_ENRICHMENT = 5; // Maximum number of pharmacies to enrich at a time
-const INITIAL_PHARMACIES = 5;
+const MAX_ENRICHMENT_COUNT = 5; // Maximum number of pharmacies to enrich at a time
+const INITIAL_PHARMACY_COUNT = 5;
+const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
 
 export const Pharmacy = () => {
   const { order, setOrder } = useOrderContext();
@@ -78,6 +79,8 @@ export const Pharmacy = () => {
   const [location, setLocation] = useState<string>(
     order?.address ? formatAddress(order.address) : ''
   );
+  const [enableOpenNow, setEnableOpenNow] = useState(false);
+  const [enable24Hr, setEnable24Hr] = useState(false);
 
   const toast = useToast();
 
@@ -159,10 +162,12 @@ export const Pharmacy = () => {
         {
           latitude: lat,
           longitude: lng,
-          radius: 25
+          radius: PHARMACY_SEARCH_RADIUS_IN_MILES
         },
-        INITIAL_PHARMACIES,
-        0
+        INITIAL_PHARMACY_COUNT,
+        0,
+        enableOpenNow,
+        enable24Hr
       );
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
         setLoadingPharmacies(false);
@@ -189,7 +194,7 @@ export const Pharmacy = () => {
 
     // We only show add a few at a time, so just enrich the first group of pharmacies
     const preparedPharmacies: EnrichedPharmacy[] = await Promise.all(
-      pharmaciesResult.slice(0, MAX_ENRICHMENT).map((p) => preparePharmacy(p, true))
+      pharmaciesResult.slice(0, MAX_ENRICHMENT_COUNT).map((p) => preparePharmacy(p, true))
     );
     setPharmacyOptions(preparedPharmacies);
 
@@ -202,7 +207,7 @@ export const Pharmacy = () => {
     if (isDemo) {
       const newPharmacyOptions = demoPharmacies.slice(
         pharmacyOptions.length,
-        pharmacyOptions.length + MAX_ENRICHMENT
+        pharmacyOptions.length + MAX_ENRICHMENT_COUNT
       );
       const totalPharmacyOptions = [...pharmacyOptions, ...newPharmacyOptions];
       setPharmacyOptions(totalPharmacyOptions);
@@ -221,18 +226,18 @@ export const Pharmacy = () => {
      *  */
     const newPharmacies: EnrichedPharmacy[] = await Promise.all(
       initialPharmacies
-        .slice(pharmacyOptions.length, pharmacyOptions.length + MAX_ENRICHMENT)
+        .slice(pharmacyOptions.length, pharmacyOptions.length + MAX_ENRICHMENT_COUNT)
         .map((p) => preparePharmacy(p, true))
     );
 
-    if (newPharmacies.length === MAX_ENRICHMENT) {
+    if (newPharmacies.length === MAX_ENRICHMENT_COUNT) {
       // Break early and return enriched pharmacies
       setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
       setLoadingPharmacies(false);
       return;
     }
 
-    const pharmaciesToGet = MAX_ENRICHMENT - newPharmacies.length;
+    const pharmaciesToGet = MAX_ENRICHMENT_COUNT - newPharmacies.length;
     const totalEnriched = pharmacyOptions.length + newPharmacies.length;
 
     // Get pharmacies from our db
@@ -245,7 +250,9 @@ export const Pharmacy = () => {
           radius: 25
         },
         pharmaciesToGet,
-        totalEnriched
+        totalEnriched,
+        enableOpenNow,
+        enable24Hr
       );
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
         setLoadingPharmacies(false);
@@ -423,6 +430,11 @@ export const Pharmacy = () => {
     }
   }, [location]);
 
+  useEffect(() => {
+    reset();
+    initialize();
+  }, [enableOpenNow, enable24Hr]);
+
   const isCapsuleTerritory = order?.address?.postalCode in capsuleZipcodeLookup;
   const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
 
@@ -508,6 +520,10 @@ export const Pharmacy = () => {
                 loadingMore={loadingPharmacies}
                 showingAllPharmacies={showingAllPharmacies}
                 courierEnabled={enableCourier || enableMailOrder}
+                enableOpenNow={enableOpenNow}
+                enable24Hr={enable24Hr}
+                setEnableOpenNow={setEnableOpenNow}
+                setEnable24Hr={setEnable24Hr}
               />
             </VStack>
           ) : null}
