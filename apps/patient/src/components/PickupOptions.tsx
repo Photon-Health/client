@@ -1,16 +1,9 @@
-import {
-  Button,
-  Heading,
-  HStack,
-  SlideFade,
-  Text,
-  VStack,
-  useBreakpointValue
-} from '@chakra-ui/react';
+import { Button, Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
 
 import { PharmacyCard } from './PharmacyCard';
 import { text as t } from '../utils/text';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { PharmacyFilters } from './PharmacyFilters';
 
 interface PickupOptionsProps {
   pharmacies: EnrichedPharmacy[];
@@ -23,6 +16,10 @@ interface PickupOptionsProps {
   loadingMore: boolean;
   showingAllPharmacies: boolean;
   courierEnabled: boolean;
+  enableOpenNow: boolean;
+  enable24Hr: boolean;
+  setEnableOpenNow: (isOpen: boolean) => void;
+  setEnable24Hr: (is24Hr: boolean) => void;
 }
 
 export const PickupOptions = ({
@@ -35,29 +32,33 @@ export const PickupOptions = ({
   handleSetPreferred,
   loadingMore,
   showingAllPharmacies,
-  courierEnabled
+  courierEnabled,
+  enableOpenNow,
+  enable24Hr,
+  setEnableOpenNow,
+  setEnable24Hr
 }: PickupOptionsProps) => {
-  const isMobile = useBreakpointValue({ base: true, md: false });
-
   return (
     <VStack spacing={3} align="span" w="full">
-      {pharmacies?.length > 0 && courierEnabled ? (
+      {courierEnabled ? (
         <SlideFade offsetY="60px" in={true}>
           <VStack spacing={1} align="start">
             <Heading as="h5" size="sm">
               {t.pharmacy.PICK_UP.heading}
             </Heading>
-            <HStack justify="space-between" w="full">
-              <Text>{t.pharmacy.PICK_UP.subheading}</Text>
-              {!isMobile && pharmacies.length > 0 ? (
-                <Text size="sm" color="gray.500" whiteSpace="nowrap" alignSelf="flex-end">
-                  {t.pharmacy.PICK_UP.sorted}
-                </Text>
-              ) : null}
-            </HStack>
+            <Text>{t.pharmacy.PICK_UP.subheading}</Text>
           </VStack>
         </SlideFade>
       ) : null}
+
+      <SlideFade offsetY="60px" in={true}>
+        <PharmacyFilters
+          enableOpenNow={enableOpenNow}
+          enable24Hr={enable24Hr}
+          setEnableOpenNow={setEnableOpenNow}
+          setEnable24Hr={setEnable24Hr}
+        />
+      </SlideFade>
 
       <VStack align="span" spacing={2}>
         {pharmacies.map((pharmacy: EnrichedPharmacy, i: number) => (
@@ -69,6 +70,7 @@ export const PickupOptions = ({
               selected={selectedId === pharmacy.id}
               onSelect={() => handleSelect(pharmacy.id)}
               onSetPreferred={() => handleSetPreferred(pharmacy.id)}
+              selectable={true}
             />
           </SlideFade>
         ))}
