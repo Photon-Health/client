@@ -81,9 +81,7 @@ customElement(
     };
 
     const onOpen = async () => {
-      // if (store.catalogs.data.length === 0) {
       await actions.getCatalogs(client!.getSDK());
-      // }
     };
 
     const onHide = async () => setFilter('');

@@ -4,7 +4,8 @@ export const TEMPLATE_SCHEMA = yup.object({
   treatment: yup
     .object({
       id: yup.string().required('Must select a treatment'),
-      __typename: yup.string().optional()
+      __typename: yup.string().optional(),
+      name: yup.string()
     })
     .required('Please select a treatment...'),
   dispenseAsWritten: yup.boolean().nullable().optional(),
@@ -36,7 +37,7 @@ export type TemplateSchemaType = yup.InferType<typeof TEMPLATE_SCHEMA>;
 export const TEMPLATE_INITIAL_VALUES: TemplateSchemaType = {
   treatment: {
     id: '',
-    // name: '',
+    name: '',
     __typename: ''
   },
   name: '',

@@ -117,13 +117,14 @@ export const TemplateTable = ({
       }
       paginationActions={
         <HStack
-          w={isMobileAndTablet ? '100%' : undefined}
-          justifyContent={isMobileAndTablet ? 'space-between' : 'initial'}
+          w={{ base: '100%', lg: 'unset' }}
+          justifyContent={{ base: 'space-between', lg: 'initial' }}
         >
           <Button
             variant="ghost"
             leftIcon={<ChevronLeftIcon />}
             disabled={currentPage === 1}
+            isDisabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
             Prev
@@ -131,7 +132,8 @@ export const TemplateTable = ({
           <Button
             variant="ghost"
             rightIcon={<ChevronRightIcon />}
-            disabled={pages === 1 || currentPage === pages}
+            disabled={currentPage === pages}
+            isDisabled={currentPage === pages}
             onClick={() => setCurrentPage(currentPage + 1)}
           >
             Next

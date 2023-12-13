@@ -69,8 +69,8 @@ export const TemplateActions = (props: TemplateActionsProps) => {
             onClick={async () => {
               const decision = await confirmWrapper('Delete this prescription template?', {
                 description: 'You will not be able to recover deleted prescription templates.',
-                cancelText: 'Keep Editing',
-                confirmText: 'Yes, Delete',
+                cancelText: 'Cancel',
+                confirmText: 'Yes',
                 darkMode: colorMode !== 'light',
                 colorScheme: 'red'
               });
