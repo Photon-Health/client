@@ -18,12 +18,14 @@ import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, preparePharmacy } from '../utils/general';
 import { ExtendedFulfillmentType } from '../utils/models';
 import { text as t } from '../utils/text';
-import { FixedFooter } from '../components/FixedFooter';
-import { Nav } from '../components/Nav';
-import { PoweredBy } from '../components/PoweredBy';
-import { LocationModal } from '../components/LocationModal';
-import { PickupOptions } from '../components/PickupOptions';
-import { BrandedOptions } from '../components/BrandedOptions';
+import {
+  BrandedOptions,
+  FixedFooter,
+  LocationModal,
+  Nav,
+  PickupOptions,
+  PoweredBy
+} from '../components';
 import { useOrderContext } from './Main';
 import { getSettings } from '@client/settings';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
@@ -448,7 +450,7 @@ export const Pharmacy = () => {
         <title>{t.pharmacy.title}</title>
       </Helmet>
 
-      <Nav header={order.organization.name} orgId={order.organization.id} />
+      <Nav />
 
       <Container pb={showFooter ? 32 : 8}>
         <VStack spacing={6} align="span" pt={5}>
