@@ -19,7 +19,7 @@ interface DispenseQuantityProps {
   quantityRef: any;
   setFieldValue: any;
   hidden: boolean;
-  setDoseCalcVis: any;
+  setDoseCalcVis: (b: boolean) => void;
 }
 
 export const DispenseQuantity = ({

@@ -41,10 +41,6 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
-export const UNOPEN_BUSINESS_STATUS_MAP = {
-  CLOSED_TEMPORARILY: 'Closed Temporarily',
-  CLOSED_PERMANENTLY: 'Closed Permanently'
-};
 const MAX_ENRICHMENT_COUNT = 5; // Maximum number of pharmacies to enrich at a time
 const INITIAL_PHARMACY_COUNT = 5;
 const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
@@ -247,7 +243,7 @@ export const Pharmacy = () => {
         {
           latitude,
           longitude,
-          radius: 25
+          radius: PHARMACY_SEARCH_RADIUS_IN_MILES
         },
         pharmaciesToGet,
         totalEnriched,
