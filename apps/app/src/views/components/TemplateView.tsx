@@ -1,19 +1,19 @@
-import { Divider, Flex, Heading, HStack, Stack, Text, VStack } from '@chakra-ui/react';
+import { Badge, Divider, Flex, Heading, HStack, Stack, Text, VStack } from '@chakra-ui/react';
 import CopyText from './CopyText';
 
 interface TemplateViewProps {
   template: {
+    name: string | null;
+    isPrivate: boolean;
     id: string;
-    treatment: {
-      name: string;
-    };
-    fillsAllowed?: number;
-    dispenseUnit?: string;
-    dispenseQuantity?: number;
-    daysSupply?: number;
-    dispenseAsWritten?: boolean;
-    instructions?: string;
-    notes?: string;
+    treatment: { name: string };
+    fillsAllowed?: number | null;
+    dispenseUnit?: string | null;
+    dispenseQuantity?: number | null;
+    daysSupply?: number | null;
+    dispenseAsWritten?: boolean | null;
+    instructions?: string | null;
+    notes?: string | null;
   };
 }
 
@@ -28,15 +28,24 @@ export const TemplateView = (props: TemplateViewProps) => {
     >
       <Flex>
         <VStack spacing="4" fontSize={{ base: 'md', md: 'lg' }} alignItems="start">
-          <Heading as="h6" size="xs">
+          <Heading as={'div'} size="xxs">
+            <Heading as="div" size="xs">
+              {template.name}
+            </Heading>
             {template.treatment.name}
           </Heading>
-          <HStack>
+          <Stack
+            direction={{ base: 'column', md: 'row' }}
+            alignItems={{ base: 'start', md: 'center' }}
+          >
+            <Badge colorScheme={props.template.isPrivate ? 'blue' : 'purple'}>
+              {props.template.isPrivate ? 'Personal' : 'Organization'}
+            </Badge>
             <Text fontSize="xs" fontWeight="bold">
               TEMPLATE ID
             </Text>
             <CopyText size="sm" text={template.id} />
-          </HStack>
+          </Stack>
           <Heading as="h6" size="xxs" paddingTop={4}>
             Details
           </Heading>

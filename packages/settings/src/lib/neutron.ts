@@ -6,6 +6,8 @@ const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
 const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 const HONEYBEE_PHARMACY_ID = 'phr_01GA9HPXNE3TGEWPK91YY8Z4TS';
 const TRUE_PILL_ID = 'phr_01HHDHKAMNMKC3CRY8VCYRVVPE';
+const COSTCO_ID = 'phr_01GA9HPWTQ75YNJGFD505X5C4J';
+
 /**
  * All orgs inherit from default settings, so updates
  * to default settings can affect multiple orgs
@@ -60,10 +62,11 @@ export const neutron: {
   // Demo (demo's)
   org_TY5GFYPIRo3xQGYM: {
     ...defaultSettings,
-    mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
-    enablePatientRerouting: true,
-    enableMedHistory: true
+    logo: 'sesame_logo.jpg',
+    accentColor: '#5224C7',
+    enableCourierNavigate: false,
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [COSTCO_ID]
   },
   // Weekend Health
   org_u93EDGhy5I4Ia5Bb: {
@@ -196,7 +199,10 @@ export const neutron: {
   org_QFoulY6Ornx7dMdw: {
     ...defaultSettings,
     logo: 'sesame_logo.jpg',
-    accentColor: '#5224C7'
+    accentColor: '#5224C7',
+    enableCourierNavigate: false,
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [COSTCO_ID]
   },
   // Oshi Health
   org_yOgsgGMBVUZIBcwp: {

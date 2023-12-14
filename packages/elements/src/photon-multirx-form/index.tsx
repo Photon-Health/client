@@ -245,7 +245,8 @@ customElement(
               const { errors } = await templateMutation({
                 variables: {
                   ...args,
-                  catalogId: draft.catalogId
+                  catalogId: draft.catalogId,
+                  isPrivate: true
                 },
                 awaitRefetchQueries: false
               });
