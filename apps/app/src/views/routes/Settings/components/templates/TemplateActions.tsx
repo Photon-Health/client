@@ -1,24 +1,31 @@
 import {
-  IconButton,
   HStack,
+  IconButton,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  useColorMode,
-  useBreakpointValue
+  useColorMode
 } from '@chakra-ui/react';
 import { FiEdit, FiEye, FiMoreVertical, FiTrash } from 'react-icons/fi';
 
 import { usePhoton } from '@photonhealth/react';
 
+import { PrescriptionTemplate } from 'packages/sdk/dist/types';
 import { CATALOG_TREATMENTS_FIELDS } from '../../../../../model/fragments';
 import { confirmWrapper } from '../../../../components/GuardDialog';
 
-export const TemplateActions = (props: any) => {
-  const { template, setSingleView, catalogId, setLoading, setTemplateToEdit, setShowModal } = props;
+interface TemplateActionsProps {
+  template: PrescriptionTemplate;
+  setSingleView: (t?: PrescriptionTemplate) => void;
+  catalogId: string;
+  setLoading: (b: boolean) => void;
+  setTemplateToEdit: (t?: PrescriptionTemplate) => void;
+  setShowModal: { on: () => void; off: () => void; toggle: () => void };
+}
 
-  const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
+export const TemplateActions = (props: TemplateActionsProps) => {
+  const { template, setSingleView, catalogId, setLoading, setTemplateToEdit, setShowModal } = props;
 
   const { deletePrescriptionTemplate } = usePhoton();
 
@@ -36,7 +43,7 @@ export const TemplateActions = (props: any) => {
   const { colorMode } = useColorMode();
 
   const handleEdit = () => {
-    if (isMobileAndTablet) setShowModal.on();
+    setShowModal.on();
     setTemplateToEdit(template);
   };
 
@@ -62,8 +69,8 @@ export const TemplateActions = (props: any) => {
             onClick={async () => {
               const decision = await confirmWrapper('Delete this prescription template?', {
                 description: 'You will not be able to recover deleted prescription templates.',
-                cancelText: 'Keep Editing',
-                confirmText: 'Yes, Delete',
+                cancelText: 'Cancel',
+                confirmText: 'Yes',
                 darkMode: colorMode !== 'light',
                 colorScheme: 'red'
               });

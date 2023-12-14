@@ -8,8 +8,15 @@ export const Treatment = ({
   edit,
   values,
   medicationSelectRef,
-  catalogs
-}: any) => (
+  catalogId
+}: {
+  catalogId: string;
+  errors: any;
+  touched: any;
+  edit?: boolean;
+  values: any;
+  medicationSelectRef: any;
+}) => (
   <HStack align="flex-start" spacing={4}>
     <FormControl isInvalid={!!errors.treatment && !!touched.treatment}>
       <FormLabel htmlFor="treatment">Treatment</FormLabel>
@@ -31,7 +38,7 @@ export const Treatment = ({
           hideExpandedSearch
           ref={medicationSelectRef}
           name="treatment"
-          catalogId={catalogs?.catalogs?.[0]?.id || undefined}
+          catalogId={catalogId}
         />
       )}
       <FormErrorMessage>{errors.treatment?.id}</FormErrorMessage>

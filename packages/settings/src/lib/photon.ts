@@ -153,7 +153,7 @@ export const photon: {
     sendToPatient: false,
     enableRxAndOrder: false
   },
-  // Fadeyi Derm (Precision Medical Hair Restoration & Aesthetics)
+  // Precision Medical Hair Restoration & Aesthetics (Xyon Health)
   org_G52mrmIBC3yqeNYB: {
     ...defaultSettings,
     pickUp: false,
