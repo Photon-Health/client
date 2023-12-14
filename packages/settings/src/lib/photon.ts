@@ -220,5 +220,13 @@ export const photon: {
   org_MYJ66XrRE3eGb12U: {
     ...defaultSettings,
     enableRxAndOrder: false
+  },
+  // Moment Health
+  org_fdq7ceDPlQlO5e3J: {
+    ...defaultSettings,
+    logo: 'moment_health_logo.webp',
+    accentColor: '#FF001F',
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_ID]
   }
 };
