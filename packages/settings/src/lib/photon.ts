@@ -3,6 +3,7 @@ import { OrganizationSettings } from '../types';
 // const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
 const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
 const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
+const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 
 /**
  * All orgs inherit from default settings, so updates
@@ -178,7 +179,9 @@ export const photon: {
   org_boRh5PcUzFhvyiue: {
     ...defaultSettings,
     logo: 'sana_care_logo.png',
-    accentColor: '#FBCC45'
+    accentColor: '#FBCC45',
+    mailOrderNavigate: false,
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
   },
   // Blueberry Pediatrics
   org_ul8ojZgvzpqu299H: {

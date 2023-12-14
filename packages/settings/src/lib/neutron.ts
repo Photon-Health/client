@@ -199,6 +199,7 @@ export const neutron: {
     ...defaultSettings,
     logo: 'sesame_logo.jpg',
     accentColor: '#5224C7',
+    enableCourierNavigate: false,
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [COSTCO_ID]
   },
