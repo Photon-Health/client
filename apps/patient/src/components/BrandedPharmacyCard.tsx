@@ -33,7 +33,7 @@ const PHARMACY_BRANDING = {
   },
   [process.env.REACT_APP_COSTCO_PHARMACY_ID as string]: {
     logo: costcoLogo,
-    description: 'One-stop shopping and home delivery'
+    description: 'Home delivery within 1-2 days'
   }
 };
 // TODO: need to make this more elegant

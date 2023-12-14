@@ -62,10 +62,11 @@ export const neutron: {
   // Demo (demo's)
   org_TY5GFYPIRo3xQGYM: {
     ...defaultSettings,
-    mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
-    enablePatientRerouting: true,
-    enableMedHistory: true
+    logo: 'sesame_logo.jpg',
+    accentColor: '#5224C7',
+    enableCourierNavigate: false,
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [COSTCO_ID]
   },
   // Weekend Health
   org_u93EDGhy5I4Ia5Bb: {
@@ -199,6 +200,7 @@ export const neutron: {
     ...defaultSettings,
     logo: 'sesame_logo.jpg',
     accentColor: '#5224C7',
+    enableCourierNavigate: false,
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [COSTCO_ID]
   },
