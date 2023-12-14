@@ -180,10 +180,6 @@ export const Patients = () => {
     }
   }, [loading, patients]);
 
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
-
   const skeletonRows = new Array(25).fill(0).map(renderSkeletonRow);
 
   return (

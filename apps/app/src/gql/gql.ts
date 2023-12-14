@@ -33,7 +33,8 @@ const documents = {
     "\n  mutation WebhookItemDeleteMutation($webhookId: ID!) {\n    deleteWebhookConfig(webhookId: $webhookId)\n  }\n": types.WebhookItemDeleteMutationDocument,
     "\n  query WebhookListQuery {\n    webhooks {\n      id\n      ...WebhookItemFragment\n    }\n  }\n": types.WebhookListQueryDocument,
     "\n  mutation WebhookFormCreateMutation($url: String!, $sharedSecret: String!, $filters: [String!]!) {\n    createWebhookConfig(url: $url, filters: $filters, sharedSecret: $sharedSecret)\n  }\n": types.WebhookFormCreateMutationDocument,
-    "\n  query SettingsPageQuery {\n    me {\n      roles {\n        id\n      }\n    }\n    organization {\n      id\n      name\n      ...OrganizationTreatmentTabFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n": types.SettingsPageQueryDocument,
+    "\n  query SettingsPageQuery {\n    me {\n      roles {\n        id\n      }\n    }\n    organization {\n      id\n      name\n      ...OrganizationTreatmentTabFragment\n      ...OrganizationTemplateTabFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n": types.SettingsPageQueryDocument,
+    "\n  fragment OrganizationTemplateTabFragment on Organization {\n    id\n    name\n  }\n": types.OrganizationTemplateTabFragmentFragmentDoc,
     "\n  fragment OrganizationTreatmentTabFragment on Organization {\n    id\n    name\n  }\n": types.OrganizationTreatmentTabFragmentFragmentDoc,
 };
 
@@ -134,7 +135,11 @@ export function graphql(source: "\n  mutation WebhookFormCreateMutation($url: St
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query SettingsPageQuery {\n    me {\n      roles {\n        id\n      }\n    }\n    organization {\n      id\n      name\n      ...OrganizationTreatmentTabFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n"): (typeof documents)["\n  query SettingsPageQuery {\n    me {\n      roles {\n        id\n      }\n    }\n    organization {\n      id\n      name\n      ...OrganizationTreatmentTabFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n"];
+export function graphql(source: "\n  query SettingsPageQuery {\n    me {\n      roles {\n        id\n      }\n    }\n    organization {\n      id\n      name\n      ...OrganizationTreatmentTabFragment\n      ...OrganizationTemplateTabFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n"): (typeof documents)["\n  query SettingsPageQuery {\n    me {\n      roles {\n        id\n      }\n    }\n    organization {\n      id\n      name\n      ...OrganizationTreatmentTabFragment\n      ...OrganizationTemplateTabFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment OrganizationTemplateTabFragment on Organization {\n    id\n    name\n  }\n"): (typeof documents)["\n  fragment OrganizationTemplateTabFragment on Organization {\n    id\n    name\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

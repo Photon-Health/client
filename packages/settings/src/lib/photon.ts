@@ -3,7 +3,6 @@ import { OrganizationSettings } from '../types';
 // const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
 const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
 const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
-const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 
 /**
  * All orgs inherit from default settings, so updates
@@ -154,7 +153,7 @@ export const photon: {
     sendToPatient: false,
     enableRxAndOrder: false
   },
-  // Precision Medical Hair Restoration & Aesthetics (Xyon Health)
+  // Fadeyi Derm (Precision Medical Hair Restoration & Aesthetics)
   org_G52mrmIBC3yqeNYB: {
     ...defaultSettings,
     pickUp: false,
@@ -179,9 +178,7 @@ export const photon: {
   org_boRh5PcUzFhvyiue: {
     ...defaultSettings,
     logo: 'sana_care_logo.png',
-    accentColor: '#FBCC45',
-    mailOrderNavigate: false,
-    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
+    accentColor: '#FBCC45'
   },
   // Blueberry Pediatrics
   org_ul8ojZgvzpqu299H: {
@@ -220,13 +217,5 @@ export const photon: {
   org_MYJ66XrRE3eGb12U: {
     ...defaultSettings,
     enableRxAndOrder: false
-  },
-  // Moment Health
-  org_fdq7ceDPlQlO5e3J: {
-    ...defaultSettings,
-    logo: 'moment_health_logo.webp',
-    accentColor: '#FF001F',
-    mailOrder: true,
-    mailOrderProviders: [CUREXA_ID]
   }
 };

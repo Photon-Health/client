@@ -649,8 +649,6 @@ export type PrescriptionTemplate = {
   notes?: Maybe<Scalars['String']>;
   fillsAllowed?: Maybe<Scalars['Int']>;
   treatment: Treatment;
-  name: Maybe<Scalars['String']>;
-  isPrivate: Scalars['Boolean'];
 };
 
 export type ProductFilter = {
@@ -880,7 +878,6 @@ export type Treatment = {
   description?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   name: Scalars['String'];
-  __typename?: 'MedicalEquipment' | 'Compound' | 'Medication';
 };
 
 export type TreatmentCodes = {

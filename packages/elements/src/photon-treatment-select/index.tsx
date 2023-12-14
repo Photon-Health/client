@@ -67,10 +67,7 @@ customElement(
         }
         const filtered = data.filter((x) => {
           if ('treatment' in x) {
-            return (
-              x.treatment.name.toLowerCase().includes(filter.toLowerCase()) ||
-              x.name?.toLowerCase().includes(filter.toLowerCase())
-            );
+            return x.treatment.name.toLowerCase().includes(filter.toLowerCase());
           } else {
             return x.name.toLowerCase().includes(filter.toLowerCase());
           }
@@ -79,14 +76,6 @@ customElement(
       }
       return [];
     };
-
-    const onOpen = async () => {
-      await actions.getCatalogs(client!.getSDK());
-    };
-
-    const onHide = async () => setFilter('');
-
-    const onSearchChange = async (s: string) => setFilter(s);
 
     return (
       <div
@@ -100,23 +89,21 @@ customElement(
           groups={[
             {
               label: 'Off Catalog',
-              filter: (t) =>
+              filter: (t: Treatment | PrescriptionTemplate) =>
                 t &&
                 typeof t === 'object' &&
                 props.offCatalogOption &&
                 t.id === props.offCatalogOption.id
             },
             {
-              label: 'Personal Templates',
-              filter: (t) => t && typeof t === 'object' && 'treatment' in t && t.isPrivate
-            },
-            {
-              label: 'Organization Templates',
-              filter: (t) => t && typeof t === 'object' && 'treatment' in t && !t.isPrivate
+              label: 'Templates',
+              filter: (t: Treatment | PrescriptionTemplate) =>
+                t && typeof t === 'object' && 'treatment' in t
             },
             {
               label: 'Catalog',
-              filter: (t) => t && typeof t === 'object' && 'name' in t && !('treatment' in t)
+              filter: (t: Treatment | PrescriptionTemplate) =>
+                t && typeof t === 'object' && 'name' in t && !('treatment' in t)
             }
           ]}
           label={props.label}
@@ -128,35 +115,48 @@ customElement(
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
           displayAccessor={(t: Treatment | PrescriptionTemplate, groupAccess: boolean) => {
+            // TODO when we have generated types we can fix this
+            // @ts-ignore
             if (t?.__typename !== 'PrescriptionTemplate') {
               if (groupAccess) {
-                return <p class="text-sm whitespace-normal leading-snug my-1">{t.name}</p>;
+                // @ts-ignore
+                return <p class="text-sm whitespace-normal leading-snug mb-2">{t.name}</p>;
               } else {
+                // @ts-ignore
                 return t?.name || '';
               }
             } else {
               if (groupAccess) {
                 return (
-                  <div class="my-1">
+                  <>
                     <p class="text-sm whitespace-normal leading-snug">
+                      {/* @ts-ignore */}
                       {t?.name ? `${t.name}: ` : ''}
+                      {/* @ts-ignore */}
                       {t.treatment.name}
                     </p>
-                    <p class="text-xs text-gray-500 overflow-hidden whitespace-nowrap overflow-ellipsis">
+                    <p class="text-xs text-gray-500 overflow-hidden whitespace-nowrap overflow-ellipsis mb-2">
+                      {/* @ts-ignore */}
                       QTY: {t.dispenseQuantity} {t.dispenseUnit} | Days Supply: {t.daysSupply} |{' '}
                       {/* A "-1" is needed here because in the UI we are displaying the number of refills, not fills. We get this from the templates in the catalog */}
+                      {/* @ts-ignore */}
                       Refills: {t.fillsAllowed ? t.fillsAllowed - 1 : 0} | Sig: {t.instructions}
                     </p>
-                  </div>
+                  </>
                 );
               } else {
+                // @ts-ignore
                 return t.treatment.name;
               }
             }
           }}
-          onSearchChange={onSearchChange}
-          onOpen={onOpen}
-          onHide={onHide}
+          onSearchChange={async (s: string) => setFilter(s)}
+          onOpen={async () => {
+            if (store.catalogs.data.length === 0) {
+              await actions.getCatalogs(client!.getSDK());
+            }
+          }}
+          onHide={async () => setFilter('')}
           noDataMsg={
             store.catalogs.data.length === 0 && !store.catalogs.isLoading
               ? 'No catalog found'

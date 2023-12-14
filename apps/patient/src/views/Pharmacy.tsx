@@ -18,14 +18,12 @@ import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, preparePharmacy } from '../utils/general';
 import { ExtendedFulfillmentType } from '../utils/models';
 import { text as t } from '../utils/text';
-import {
-  BrandedOptions,
-  FixedFooter,
-  LocationModal,
-  Nav,
-  PickupOptions,
-  PoweredBy
-} from '../components';
+import { FixedFooter } from '../components/FixedFooter';
+import { Nav } from '../components/Nav';
+import { PoweredBy } from '../components/PoweredBy';
+import { LocationModal } from '../components/LocationModal';
+import { PickupOptions } from '../components/PickupOptions';
+import { BrandedOptions } from '../components/BrandedOptions';
 import { useOrderContext } from './Main';
 import { getSettings } from '@client/settings';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
@@ -43,6 +41,10 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
+export const UNOPEN_BUSINESS_STATUS_MAP = {
+  CLOSED_TEMPORARILY: 'Closed Temporarily',
+  CLOSED_PERMANENTLY: 'Closed Permanently'
+};
 const MAX_ENRICHMENT_COUNT = 5; // Maximum number of pharmacies to enrich at a time
 const INITIAL_PHARMACY_COUNT = 5;
 const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
@@ -245,7 +247,7 @@ export const Pharmacy = () => {
         {
           latitude,
           longitude,
-          radius: PHARMACY_SEARCH_RADIUS_IN_MILES
+          radius: 25
         },
         pharmaciesToGet,
         totalEnriched,
@@ -450,7 +452,7 @@ export const Pharmacy = () => {
         <title>{t.pharmacy.title}</title>
       </Helmet>
 
-      <Nav />
+      <Nav header={order.organization.name} orgId={order.organization.id} />
 
       <Container pb={showFooter ? 32 : 8}>
         <VStack spacing={6} align="span" pt={5}>

@@ -255,6 +255,5 @@ export const PRESCRIPTION_TEMPLATE_FIELDS = gql`
       id
       name
     }
-    isPrivate
   }
 `;

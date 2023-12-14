@@ -1,50 +1,38 @@
 import {
-  Badge,
   Box,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalOverlay,
-  Select,
-  Show,
   Text,
+  Alert,
+  AlertIcon,
   VStack,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalCloseButton,
+  ModalBody,
+  useBreakpointValue,
   useBoolean
 } from '@chakra-ui/react';
 
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { usePhoton } from '@photonhealth/react';
-import {
-  ChangeEvent,
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react';
 import { useDebounce } from 'use-debounce';
 
-import { PrescriptionTemplate } from 'packages/sdk/dist/types';
 import { CATALOG_TREATMENTS_FIELDS } from '../../../../model/fragments';
 import { DosageCalc } from '../../../components/DosageCalc';
 import { TemplateView } from '../../../components/TemplateView';
-import { TemplateActions } from '../components/templates/TemplateActions';
-import { TemplateForm } from '../components/templates/TemplateForm';
+import { SplitLayout } from '../../../components/SplitLayout';
 import { TemplateTable } from '../components/templates/TemplateTable';
+import { TemplateForm } from '../components/templates/TemplateForm';
+import { TemplateActions } from '../components/templates/TemplateActions';
+import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 
 const renderTemplateRow = (
-  rx: PrescriptionTemplate,
-  setSingleView: (t?: PrescriptionTemplate) => void,
+  rx: any,
+  setSingleView: any,
   catalogId: string,
   setLoading: Dispatch<SetStateAction<boolean>>,
-  setTemplateToEdit: (t?: PrescriptionTemplate) => void,
-  setShowModal: {
-    on: () => void;
-    off: () => void;
-    toggle: () => void;
-  }
+  setTemplateToEdit: any,
+  setShowModal: any
 ) => {
   const med = rx.treatment;
   const templateName = rx.name ? (
@@ -57,26 +45,18 @@ const renderTemplateRow = (
   ) : (
     med.name
   );
-
-  const fillsAllowed = rx.fillsAllowed ?? 1;
-
   return {
     template: (
       <>
         <Text fontSize="md">{templateName}</Text>
-        <Box py={{ base: '2', md: 0 }}>
+        <Box ps={4}>
           <Text fontSize="sm" textOverflow="ellipsis" overflow="hidden" color="gray.500">
             QTY: {rx.dispenseQuantity} {rx.dispenseUnit}&nbsp;|&nbsp;Days Supply:&nbsp;
             {rx.daysSupply}
             {/* We need a -1 here becuause we are intentionally displaying Refills, not fills in the template UI */}
-            &nbsp;|&nbsp;Refills: {fillsAllowed - 1}&nbsp;|&nbsp;Sig: {rx.instructions}
+            &nbsp;|&nbsp;Refills: {rx.fillsAllowed - 1}&nbsp;|&nbsp;Sig: {rx.instructions}
           </Text>
         </Box>
-        <Show below="md">
-          <Badge colorScheme={rx.isPrivate ? 'blue' : 'purple'}>
-            {rx.isPrivate ? 'Personal' : 'Organization'}
-          </Badge>
-        </Show>
       </>
     ),
     actions: (
@@ -88,127 +68,147 @@ const renderTemplateRow = (
         setShowModal={setShowModal}
         setTemplateToEdit={setTemplateToEdit}
       />
-    ),
-    badge: (
-      <Badge colorScheme={rx.isPrivate ? 'blue' : 'purple'}>
-        {rx.isPrivate ? 'Personal' : 'Organization'}
-      </Badge>
     )
   };
 };
 
-type FilterTypes = 'ALL' | 'GLOBAL' | 'INDIVIDUAL';
+const organizationTemplateTabFragment = graphql(/* GraphQL */ `
+  fragment OrganizationTemplateTabFragment on Organization {
+    id
+    name
+  }
+`);
 
-export const TemplateTab = () => {
-  const { getCatalog, getCatalogs } = usePhoton();
+export const TemplateTab = ({
+  organizationFragment
+}: {
+  organizationFragment?: FragmentType<typeof organizationTemplateTabFragment>;
+}) => {
+  const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
+
+  const organization = useFragment(organizationTemplateTabFragment, organizationFragment);
+  const { getCatalog, getCatalogs, updatePrescriptionTemplate, createPrescriptionTemplate }: any =
+    usePhoton();
   const catalogs = getCatalogs();
   const catalog = getCatalog({
     id: catalogs.catalogs[0]?.id || '',
     fragment: { CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS },
     defer: true
   });
-  const [catalogId, setCatalogId] = useState<string>();
+  const [catalogId, setCatalogId] = useState('');
 
-  const [filterType, setFilterType] = useState<FilterTypes>('ALL');
+  const [createRxTemplateMutation, { loading: loadingCreate, error: createError }] =
+    createPrescriptionTemplate({
+      refetchQueries: ['getCatalog'],
+      awaitRefetchQueries: true,
+      refetchArgs: {
+        id: catalogId,
+        fragment: {
+          CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
+        }
+      }
+    });
+  const [updatePrescriptionTemplateMutation, { loading: loadingUpdate, error: updateError }] =
+    updatePrescriptionTemplate({
+      refetchQueries: ['getCatalog'],
+      awaitRefetchQueries: true,
+      refetchArgs: {
+        id: catalogId,
+        fragment: {
+          CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
+        }
+      }
+    });
 
-  const [rows, setRows] = useState<PrescriptionTemplate[]>([]);
+  const [rows, setRows] = useState<any[]>([]);
+  const [filteredRows, setFilteredRows] = useState<any[]>([]);
   const [filterText, setFilterText] = useState('');
   const [debouncedFilterText] = useDebounce(filterText, 250);
-  const [singleView, setSingleView] = useState<PrescriptionTemplate | undefined>(undefined);
+  const [singleView, setSingleView] = useState<any>(undefined);
+  const [pages, setPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [childLoading, setChildLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useBoolean();
-  const [templateToEdit, setTemplateToEdit] = useState<PrescriptionTemplate | undefined>(undefined);
+  const [templateToEdit, setTemplateToEdit] = useState(undefined);
   const pageSize = 10;
 
   useEffect(() => {
-    if (!catalogs.loading && catalogs.catalogs.length > 0 && catalogs.catalogs[0]?.id) {
-      setCatalogId(catalogs.catalogs[0]?.id);
+    if (!catalogs.loading && catalogs.catalogs.length > 0) {
+      setCatalogId(catalogs.catalogs[0].id);
       catalog.query!({
-        id: catalogs.catalogs[0]?.id,
+        id: catalogs.catalogs[0].id,
         fragment: {
           CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
         }
       });
     }
-  }, [catalogs.loading, catalogs.catalogs.length, catalogs.catalogs[0]?.id]);
+  }, [catalogs.loading]);
 
   useEffect(() => {
     if (!catalog.loading && catalog.catalog) {
-      const preppedRows = catalog.catalog.templates
-        .filter((x): x is PrescriptionTemplate => !!x)
-        .sort((a, b) => (a.treatment.name.toLowerCase() > b.treatment.name.toLowerCase() ? 1 : -1));
+      const sorted = [...catalog.catalog.templates].sort((a: any, b: any) =>
+        a.treatment.name.toLowerCase() > b.treatment.name.toLowerCase() ? 1 : -1
+      );
+      const preppedRows = sorted;
       setRows(preppedRows);
+      setPages(Math.ceil(preppedRows.length / pageSize));
       setCurrentPage(1);
+      setFilteredRows(
+        preppedRows.map((y: any) =>
+          renderTemplateRow(
+            y,
+            setSingleView,
+            catalogs.catalogs[0].id,
+            setChildLoading,
+            setTemplateToEdit,
+            setShowModal
+          )
+        )
+      );
     }
-  }, [catalog.loading, catalogId, catalog.catalog?.templates]);
+  }, [catalog.loading]);
 
   useEffect(() => {
-    // Reset current page to first page on debounce
-    if (currentPage !== 1) {
+    if (debouncedFilterText.length === 0) {
+      const fRows = rows.map((y) =>
+        renderTemplateRow(
+          y,
+          setSingleView,
+          catalogs.catalogs[0].id,
+          setChildLoading,
+          setTemplateToEdit,
+          setShowModal
+        )
+      );
+      setFilteredRows(fRows);
       setCurrentPage(1);
+      setPages(Math.ceil(fRows.length / pageSize));
+    } else {
+      const fRows = rows
+        .filter((x) => x.treatment.name.toLowerCase().includes(debouncedFilterText.toLowerCase()))
+        .map((y) =>
+          renderTemplateRow(
+            y,
+            setSingleView,
+            catalogs.catalogs[0].id,
+            setChildLoading,
+            setTemplateToEdit,
+            setShowModal
+          )
+        );
+      setCurrentPage(1);
+      setPages(Math.ceil(fRows.length / pageSize));
+      setFilteredRows(fRows);
     }
   }, [debouncedFilterText]);
-
-  const templateRowRender = useCallback(
-    (template: PrescriptionTemplate) =>
-      renderTemplateRow(
-        template,
-        setSingleView,
-        catalogId ?? '',
-        setChildLoading,
-        setTemplateToEdit,
-        setShowModal
-      ),
-    [setSingleView, catalogId, setChildLoading, setTemplateToEdit, setShowModal]
-  );
-
-  const typeFilter = useCallback(
-    (template: PrescriptionTemplate) =>
-      filterType === 'ALL' ||
-      (filterType === 'GLOBAL' && !template.isPrivate) ||
-      (filterType === 'INDIVIDUAL' && template.isPrivate),
-    [filterType]
-  );
-
-  const filteredRows = useMemo(
-    () =>
-      rows.filter(
-        (x) =>
-          (x.treatment.name.toLowerCase().includes(debouncedFilterText.toLowerCase()) ||
-            x.name?.toLowerCase().includes(debouncedFilterText.toLowerCase())) &&
-          typeFilter(x)
-      ),
-    [debouncedFilterText, rows, pageSize, typeFilter]
-  );
-
-  const formattedRows = useMemo(() => {
-    return {
-      rows: filteredRows.map(templateRowRender),
-      pages: Math.ceil(filteredRows.length / pageSize)
-    };
-  }, [filteredRows]);
 
   const [doseCalcVis, setDoseCalcVis] = useState(false);
   const quantityRef = useRef<HTMLInputElement>(null);
   const medicationSelectRef = useRef<HTMLInputElement>(null);
   const unitRef = useRef<HTMLSelectElement>(null);
 
-  const onClearSelectedTemplate = useCallback(() => setTemplateToEdit(undefined), []);
-
-  const isLoading = catalogs.loading || (catalog.loading && !catalog.catalog) || childLoading;
-
-  const onFilterChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
-    // Change event triggered even if no change
-    if (e.target.value !== filterType) {
-      setCurrentPage(1);
-      setFilterType(e.target.value as FilterTypes);
-    }
-  }, []);
-
-  if (catalogs.loading || !catalogId) {
-    return null;
-  }
+  const isLoading =
+    catalogs.loading || catalog.loading || loadingCreate || loadingUpdate || childLoading;
 
   return (
     <>
@@ -225,19 +225,28 @@ export const TemplateTab = () => {
           <ModalBody p={8}>{singleView ? <TemplateView template={singleView} /> : null}</ModalBody>
         </ModalContent>
       </Modal>
-      <TemplateForm
-        isOpen={showModal}
-        catalogId={catalogId}
-        clearSelectedTemplate={onClearSelectedTemplate}
-        edit={!!templateToEdit}
-        unitRef={unitRef}
-        quantityRef={quantityRef}
-        medicationSelectRef={medicationSelectRef}
-        setDoseCalcVis={setDoseCalcVis}
-        loading={isLoading}
-        onClose={setShowModal.off}
-        templateToEdit={templateToEdit}
-      />
+      <Modal isOpen={showModal} onClose={setShowModal.off} size="lg" closeOnOverlayClick={false}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalBody p={8}>
+            <TemplateForm
+              edit={!!templateToEdit}
+              catalogs={catalogs}
+              loading={loadingCreate || loadingUpdate}
+              createRxTemplateMutation={createRxTemplateMutation}
+              updatePrescriptionTemplateMutation={updatePrescriptionTemplateMutation}
+              unitRef={unitRef}
+              quantityRef={quantityRef}
+              medicationSelectRef={medicationSelectRef}
+              setDoseCalcVis={setDoseCalcVis}
+              isModal
+              onClose={setShowModal.off}
+              templateToEdit={templateToEdit}
+              setTemplateToEdit={setTemplateToEdit}
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       <DosageCalc
         isOpen={doseCalcVis}
         onClose={() => setDoseCalcVis(false)}
@@ -245,26 +254,52 @@ export const TemplateTab = () => {
         drugRef={medicationSelectRef}
         unitRef={unitRef}
       />
-      <VStack w="full">
-        <TemplateTable
-          isLoading={isLoading}
-          rows={filteredRows}
-          filteredRows={formattedRows.rows}
-          pages={formattedRows.pages}
-          pageSize={pageSize}
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          filterText={filterText}
-          setFilterText={setFilterText}
-          setShowModal={setShowModal}
-          filterElement={
-            <Select onChange={onFilterChange} value={filterType}>
-              <option value="ALL">All Templates</option>
-              <option value="GLOBAL">Organization Templates</option>
-              <option value="INDIVIDUAL">Personal Templates</option>
-            </Select>
-          }
-        />
+      <VStack>
+        <Text width="full" fontWeight="medium" fontSize="lg">
+          Manage {organization ? `${organization.name}'s` : ''} Templates
+        </Text>
+        {createError ? (
+          <Alert status="error">
+            <AlertIcon />
+            {createError.message}
+          </Alert>
+        ) : null}
+        {updateError ? (
+          <Alert status="error">
+            <AlertIcon />
+            {updateError.message}
+          </Alert>
+        ) : null}
+        <SplitLayout>
+          <TemplateTable
+            isLoading={isLoading}
+            rows={rows}
+            filteredRows={filteredRows}
+            pages={pages}
+            pageSize={pageSize}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            filterText={filterText}
+            setFilterText={setFilterText}
+            setShowModal={setShowModal}
+          />
+          {!isMobileAndTablet ? (
+            <TemplateForm
+              edit={!!templateToEdit}
+              templateToEdit={templateToEdit}
+              setTemplateToEdit={setTemplateToEdit}
+              catalogs={catalogs}
+              loading={loadingCreate || loadingUpdate}
+              createRxTemplateMutation={createRxTemplateMutation}
+              updatePrescriptionTemplateMutation={updatePrescriptionTemplateMutation}
+              unitRef={unitRef}
+              quantityRef={quantityRef}
+              medicationSelectRef={medicationSelectRef}
+              setDoseCalcVis={setDoseCalcVis}
+              onClose={() => {}}
+            />
+          ) : null}
+        </SplitLayout>
       </VStack>
     </>
   );

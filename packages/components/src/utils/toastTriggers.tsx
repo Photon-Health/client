@@ -5,8 +5,8 @@ import Text from '../particles/Text';
 
 type ToastProps = {
   header?: string;
-  body?: string;
-  status: 'success' | 'info' | 'error';
+  body: string;
+  status: 'success' | 'info';
 };
 
 const triggerToast = (props: ToastProps) => {
@@ -14,30 +14,12 @@ const triggerToast = (props: ToastProps) => {
     (t) => (
       <div
         class={`${t.visible ? 'animate-enter' : 'animate-leave'} flex gap-1 items-start border ${
-          props.status === 'success'
-            ? 'border-green-400'
-            : props.status === 'error'
-            ? 'border-red-400'
-            : 'border-blue-400'
+          props.status === 'success' ? 'border-green-400' : 'border-blue-400'
         } border-2 rounded-lg p-4 bg-white w-full sm:max-w-md sm:w-auto`}
       >
-        <div
-          class={
-            props.status === 'success'
-              ? 'text-green-500'
-              : props.status === 'error'
-              ? 'text-red-400'
-              : 'text-blue-500'
-          }
-        >
+        <div class={props.status === 'success' ? 'text-green-500' : 'text-blue-500'}>
           <Icon
-            name={
-              props.status === 'success'
-                ? 'checkCircle'
-                : props.status === 'error'
-                ? 'exclamationCircle'
-                : 'informationCircle'
-            }
+            name={props.status === 'success' ? 'checkCircle' : 'informationCircle'}
             class="mr-2"
           />
         </div>
@@ -45,11 +27,9 @@ const triggerToast = (props: ToastProps) => {
           <Show when={props?.header}>
             <Text bold>{props.header}</Text>
           </Show>
-          <Show when={props.body}>
-            <div>
-              <Text>{props.body}</Text>
-            </div>
-          </Show>
+          <div>
+            <Text>{props.body}</Text>
+          </div>
         </div>
         <button
           type="button"

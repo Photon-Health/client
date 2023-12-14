@@ -16,8 +16,8 @@ import {
 import { ChangeEvent, RefObject, useEffect, useState } from 'react';
 import { Field, Formik } from 'formik';
 
-import { OptionalText } from '../../../../../components/OptionalText';
-import { DispenseUnitSelect } from '../../../../../components/DispenseUnitSelect';
+import { OptionalText } from '../../../../components/OptionalText';
+import { DispenseUnitSelect } from '../../../../components/DispenseUnitSelect';
 import { CtaButtons } from './components/CtaButtons';
 import { Treatment } from './components/Treatment';
 import { DaysSupply } from './components/DaysSupply';

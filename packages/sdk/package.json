@@ -1,6 +1,6 @@
 {
   "name": "@photonhealth/sdk",
-  "version": "1.0.19",
+  "version": "1.0.18",
   "main": "dist/lib.js",
   "scripts": {
     "build": "npx nx run sdk:build",

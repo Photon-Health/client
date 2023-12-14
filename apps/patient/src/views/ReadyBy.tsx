@@ -4,7 +4,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
 
-import { FixedFooter, Nav, PoweredBy } from '../components';
+import { FixedFooter } from '../components/FixedFooter';
+import { Nav } from '../components/Nav';
+import { PoweredBy } from '../components/PoweredBy';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -22,6 +24,8 @@ export const ReadyBy = () => {
 
   const navigate = useNavigate();
 
+  const { organization } = order;
+
   const [selected, setSelected] = useState(undefined);
   const showFooter = typeof selected !== 'undefined';
 
@@ -35,7 +39,7 @@ export const ReadyBy = () => {
         <title>{t.readyBy.title}</title>
       </Helmet>
 
-      <Nav />
+      <Nav header={organization.name} orgId={organization.id} />
 
       <Container pb={showFooter ? 32 : 8}>
         <VStack spacing={7} pt={5} align="span">

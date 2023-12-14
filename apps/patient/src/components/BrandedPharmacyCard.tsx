@@ -12,7 +12,6 @@ import {
 import capsuleLogo from '../assets/capsule_logo.png';
 import amazonPharmacyLogo from '../assets/amazon_pharmacy.png';
 import altoLogo from '../assets/alto_logo.svg';
-import costcoLogo from '../assets/costco_pharmacy_logo.png';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
@@ -30,10 +29,6 @@ const PHARMACY_BRANDING = {
   [process.env.REACT_APP_ALTO_PHARMACY_ID as string]: {
     logo: altoLogo,
     description: 'Free same-day delivery'
-  },
-  [process.env.REACT_APP_COSTCO_PHARMACY_ID as string]: {
-    logo: costcoLogo,
-    description: 'Home delivery within 1-2 days'
   }
 };
 // TODO: need to make this more elegant
@@ -41,7 +36,7 @@ const capsulePharmacyIds = Object.keys(capsulePharmacyIdLookup);
 for (let i = 0; i < capsulePharmacyIds.length; i++) {
   PHARMACY_BRANDING[capsulePharmacyIds[i]] = {
     logo: capsuleLogo,
-    description: 'FREE Same Day Delivery'
+    description: 'FREE Delivery within 1-2 Days'
   };
 }
 
@@ -53,7 +48,11 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
 
   let tagline = null;
   if (capsulePharmacyIdLookup[pharmacyId]) {
-    const [firstWord, ...restOfSentence] = brand.description.split(' ');
+    let capsuleDescription = 'FREE Delivery within 1-2 Days';
+    if (capsulePharmacyIdLookup[pharmacyId] === 'Austin') {
+      capsuleDescription = 'FREE Same Day Delivery';
+    }
+    const [firstWord, ...restOfSentence] = capsuleDescription.split(' ');
 
     tagline = (
       <Text fontSize="sm" display="inline">

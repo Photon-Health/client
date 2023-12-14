@@ -20,7 +20,6 @@ export const CATALOG_TREATMENTS_FIELDS = gql`
         id
         name
       }
-      isPrivate
     }
   }
 `;

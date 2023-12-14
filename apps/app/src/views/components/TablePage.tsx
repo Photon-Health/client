@@ -1,10 +1,11 @@
+import { useMemo, useCallback, useRef, ReactElement } from 'react';
 import {
   Alert,
   AlertIcon,
   Box,
   Button,
-  Center,
   CircularProgress,
+  Center,
   HStack,
   Icon,
   Input,
@@ -21,14 +22,13 @@ import {
   useBreakpointValue,
   useColorModeValue
 } from '@chakra-ui/react';
-import { ReactElement, useCallback, useMemo, useRef } from 'react';
 
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-import { FiSearch } from 'react-icons/fi';
+import { FiSearch, FiPlus } from 'react-icons/fi';
 import { Outlet, Link as RouterLink } from 'react-router-dom';
 
-import { Column, useSortBy, useTable } from 'react-table';
+import { Column, useTable, useSortBy } from 'react-table';
 
 interface TablePageProps {
   loading?: boolean;
@@ -51,7 +51,6 @@ interface TablePageProps {
   paginationActions?: Element | ReactElement;
   total?: number;
   useLoadingOverlay?: boolean;
-  ctaRight?: boolean;
 }
 
 export const TablePage = (props: TablePageProps) => {
@@ -75,8 +74,7 @@ export const TablePage = (props: TablePageProps) => {
     paginationIndicator,
     paginationActions,
     total,
-    useLoadingOverlay,
-    ctaRight
+    useLoadingOverlay
   } = props;
 
   const handleInputChange = useCallback(
@@ -106,7 +104,6 @@ export const TablePage = (props: TablePageProps) => {
 
   return (
     <Box
-      w="full"
       bg="bg-surface"
       boxShadow={{ base: 'none', md: useColorModeValue('sm', 'sm-dark') }}
       borderRadius={useBreakpointValue({ base: 'lg', md: 'lg' })}
@@ -114,15 +111,13 @@ export const TablePage = (props: TablePageProps) => {
     >
       <Stack spacing="5">
         <Box px={{ base: '4', md: '6' }} pt="5">
-          <Stack
-            direction={{ base: 'column', md: `row${ctaRight ? '-reverse' : ''}` }}
-            justify="space-between"
-          >
+          <Stack direction={{ base: 'column', md: 'row' }} justify="space-between">
             {ctaRouteColorTextUndefined ? null : (
               <Button
                 as={ctaOnClick ? undefined : RouterLink}
                 to={ctaRoute || ''}
                 onClick={ctaOnClick}
+                leftIcon={<FiPlus fontSize="1.25rem" />}
                 colorScheme={ctaColor}
                 aria-label={ctaText}
               >
@@ -218,12 +213,12 @@ export const TablePage = (props: TablePageProps) => {
                 ) : null}
                 {
                   // Loop over the table rows
-                  rows.map((row, idx) => {
+                  rows.map((row) => {
                     // Prepare the row for display
                     prepareRow(row);
                     return (
                       // Apply the row props
-                      <Tr {...row.getRowProps()} key={`${row.id}-${idx}`}>
+                      <Tr {...row.getRowProps()} key={row.id}>
                         {
                           // Loop over the rows cells
                           row.cells.map((cell) => {

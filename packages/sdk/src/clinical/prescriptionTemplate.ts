@@ -50,8 +50,7 @@ export class PrescriptionTemplateQueryManager {
           $daysSupply: Int,
           $instructions: String,
           $notes: String,
-          $name: String,
-          $isPrivate: Boolean
+          $name: String
         ) {
           createPrescriptionTemplate(
             catalogId: $catalogId
@@ -64,7 +63,6 @@ export class PrescriptionTemplateQueryManager {
             instructions: $instructions
             notes: $notes
             name: $name
-            isPrivate: $isPrivate
         ) {
             ...${fName}
         }
