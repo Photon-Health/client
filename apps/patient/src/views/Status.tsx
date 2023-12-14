@@ -15,7 +15,14 @@ import { Helmet } from 'react-helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiCheck } from 'react-icons/fi';
 import { types } from '@photonhealth/sdk';
-import { FixedFooter, Nav, PharmacyCard, PoweredBy, StatusStepper } from '../components';
+import {
+  DemoCtaModal,
+  FixedFooter,
+  Nav,
+  PharmacyCard,
+  PoweredBy,
+  StatusStepper
+} from '../components';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
@@ -23,7 +30,6 @@ import { useOrderContext } from './Main';
 import * as TOAST_CONFIG from '../configs/toast';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
 import { getSettings } from '@client/settings';
-import { DemoCtaModal } from '../components/DemoCtaModal';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
@@ -54,7 +60,7 @@ export const Status = () => {
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
   const [enrichedPharmacy, setEnrichedPharmacy] = useState<EnrichedPharmacy | undefined>(undefined);
 
-  const { fulfillment, pharmacy, organization, address } = order;
+  const { fulfillment, pharmacy, address } = order;
 
   const fulfillmentType = getFulfillmentType(pharmacy?.id, fulfillment, type);
 
@@ -186,10 +192,10 @@ export const Status = () => {
         <title>{t.status.title}</title>
       </Helmet>
 
-      <Nav header={organization.name} orgId={organization.id} showRefresh />
+      <Nav showRefresh />
 
       {/* Bottom padding is added so stepper can be seen when footer is showing on smaller screens */}
-      <Container pb={showFooter ? 32 : undefined}>
+      <Container pb={showFooter ? 32 : 8}>
         <VStack spacing={6} align="start" pt={5}>
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">

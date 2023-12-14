@@ -12,6 +12,7 @@ import {
 import capsuleLogo from '../assets/capsule_logo.png';
 import amazonPharmacyLogo from '../assets/amazon_pharmacy.png';
 import altoLogo from '../assets/alto_logo.svg';
+import costcoLogo from '../assets/costco_pharmacy_logo.png';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
@@ -29,6 +30,10 @@ const PHARMACY_BRANDING = {
   [process.env.REACT_APP_ALTO_PHARMACY_ID as string]: {
     logo: altoLogo,
     description: 'Free same-day delivery'
+  },
+  [process.env.REACT_APP_COSTCO_PHARMACY_ID as string]: {
+    logo: costcoLogo,
+    description: 'One-stop shopping and home delivery'
   }
 };
 // TODO: need to make this more elegant
