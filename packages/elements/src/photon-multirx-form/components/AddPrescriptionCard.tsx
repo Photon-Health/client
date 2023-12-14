@@ -1,9 +1,8 @@
 import { afterDate, message } from '../../validators';
 import { record, string, any, number, min, size } from 'superstruct';
 import { format } from 'date-fns';
-import { Card, Text, Button, Icon } from '@photonhealth/components';
+import { Card, Text, Button, Icon, DoseCalculator, triggerToast } from '@photonhealth/components';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
-import { DoseCalculator, triggerToast } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 //Shoelace
@@ -162,7 +161,7 @@ export const AddPrescriptionCard = (props: {
           } else {
             triggerToast({
               status: 'success',
-              header: 'Personal template saved'
+              header: 'Personal Template Saved'
             });
           }
         } catch (err) {
@@ -176,7 +175,7 @@ export const AddPrescriptionCard = (props: {
       });
     } else {
       triggerToast({
-        status: 'info',
+        status: 'error',
         body: 'Some items in the form are incomplete, please check for errors'
       });
     }

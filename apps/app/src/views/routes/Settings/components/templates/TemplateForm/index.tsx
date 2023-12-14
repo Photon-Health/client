@@ -372,7 +372,7 @@ export const TemplateForm = ({
                         isDisabled={edit}
                       >
                         <HStack alignItems="baseline">
-                          <Text>Add to Organization templates?</Text>
+                          <Text>Add to Organization Templates</Text>
                         </HStack>
                       </Field>
                     </FormControl>
