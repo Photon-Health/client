@@ -222,7 +222,7 @@ export const photon: {
   org_fdq7ceDPlQlO5e3J: {
     ...defaultSettings,
     logo: 'moment_health_logo.webp',
-    accentColor: '#000000',
+    accentColor: '#FF001F',
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID]
   }
