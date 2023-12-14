@@ -14,7 +14,16 @@ import {
 } from '@chakra-ui/react';
 
 import { usePhoton } from '@photonhealth/react';
-import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import { useDebounce } from 'use-debounce';
 
 import { PrescriptionTemplate } from 'packages/sdk/dist/types';
@@ -189,6 +198,14 @@ export const TemplateTab = () => {
 
   const isLoading = catalogs.loading || (catalog.loading && !catalog.catalog) || childLoading;
 
+  const onFilterChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
+    // Change event triggered even if no change
+    if (e.target.value !== filterType) {
+      setCurrentPage(1);
+      setFilterType(e.target.value as FilterTypes);
+    }
+  }, []);
+
   if (catalogs.loading || !catalogId) {
     return null;
   }
@@ -241,10 +258,7 @@ export const TemplateTab = () => {
           setFilterText={setFilterText}
           setShowModal={setShowModal}
           filterElement={
-            <Select
-              onChange={(event) => setFilterType(event.target.value as FilterTypes)}
-              value={filterType}
-            >
+            <Select onChange={onFilterChange} value={filterType}>
               <option value="ALL">All Templates</option>
               <option value="GLOBAL">Organization Templates</option>
               <option value="INDIVIDUAL">Personal Templates</option>
