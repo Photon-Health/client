@@ -198,10 +198,6 @@ export const TemplateTab = () => {
 
   const isLoading = catalogs.loading || (catalog.loading && !catalog.catalog) || childLoading;
 
-  if (catalogs.loading || !catalogId) {
-    return null;
-  }
-
   const onFilterChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
     // Change event triggered even if no change
     if (e.target.value !== filterType) {
@@ -209,6 +205,10 @@ export const TemplateTab = () => {
       setFilterType(e.target.value as FilterTypes);
     }
   }, []);
+
+  if (catalogs.loading || !catalogId) {
+    return null;
+  }
 
   return (
     <>
