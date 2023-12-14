@@ -1,11 +1,23 @@
+import { createMemo, For } from 'solid-js';
 import { useRecentOrders } from '.';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
 import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
+import formatRxString from '../../utils/formatRxString';
+import uniqueFills from '../../utils/uniqueFills';
 
 export default function RecentOrdersCombineDialog() {
   const [state, actions] = useRecentOrders();
+
+  const fillsWithRoutingState = createMemo(() => {
+    const order = state.orders.find((order) => order.state === 'ROUTING');
+
+    if (order) {
+      return uniqueFills(order);
+    }
+    return [];
+  });
 
   return (
     <Dialog open={state.isCombineDialogOpen} onClose={() => actions.setIsCombineDialogOpen(false)}>
@@ -21,10 +33,21 @@ export default function RecentOrdersCombineDialog() {
           <div class="flex flex-col gap-2">
             <Text>This patient currently has an order for:</Text>
             <div class="border border-solid border-gray-200 rounded-lg bg-gray-50 py-3 px-4">
-              <Text size="sm">Cefdinir 200 mg Oral Capsule</Text>
-              <Text size="sm" color="gray">
-                30 Each, 11 Refills - Take 1 (one) daily
-              </Text>
+              <For each={fillsWithRoutingState()}>
+                {(fill) => (
+                  <div>
+                    <Text size="sm">{fill.treatment.name}</Text>
+                    <Text size="sm" color="gray">
+                      {formatRxString({
+                        dispenseQuantity: fill?.prescription?.dispenseQuantity,
+                        dispenseUnit: fill?.prescription?.dispenseUnit,
+                        fillsAllowed: fill?.prescription?.fillsAllowed,
+                        instructions: fill?.prescription?.instructions
+                      })}
+                    </Text>
+                  </div>
+                )}
+              </For>
             </div>
           </div>
 
