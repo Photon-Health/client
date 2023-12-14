@@ -60,8 +60,8 @@ type PrescribeProps = {
   triggerSubmit: boolean;
   setTriggerSubmit?: (val: boolean) => void;
   toastBuffer: number;
-  store?: any;
-  actions?: any;
+  formStore?: any;
+  formActions?: any;
 };
 
 function PrescribeWorkflow(props: PrescribeProps) {
@@ -82,7 +82,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
   onMount(() => {
     if (props.address) {
       // if manually overriding address, update the store on mount
-      props.actions.updateFormValue({
+      props.formActions.updateFormValue({
         key: 'address',
         value: props.address
       });
@@ -155,8 +155,8 @@ function PrescribeWorkflow(props: PrescribeProps) {
       bubbles: true,
       detail: {
         canSubmit: canSubmit,
-        form: props.store,
-        actions: props.actions
+        form: props.formStore,
+        actions: props.formActions
       }
     });
     ref?.dispatchEvent(event);
@@ -174,11 +174,11 @@ function PrescribeWorkflow(props: PrescribeProps) {
     const keys = enableOrder
       ? ['patient', 'draftPrescriptions', 'pharmacy', 'address']
       : ['patient', 'draftPrescriptions'];
-    props.actions.validate(keys);
-    const errors = props.actions.getErrors(keys);
+    props.formActions.validate(keys);
+    const errors = props.formActions.getErrors(keys);
     if (errors.length === 0) {
       setIsLoading(true);
-      props.actions.updateFormValue({
+      props.formActions.updateFormValue({
         key: 'errors',
         value: []
       });
@@ -193,7 +193,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
         .getSDK()
         .clinical.prescriptionTemplate.createPrescriptionTemplate({});
 
-      for (const draft of props.store.draftPrescriptions!.value) {
+      for (const draft of props.formStore.draftPrescriptions!.value) {
         const args = {
           daysSupply: draft.daysSupply,
           dispenseAsWritten: draft.dispenseAsWritten,
@@ -202,7 +202,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
           effectiveDate: draft.effectiveDate,
           instructions: draft.instructions,
           notes: draft.notes,
-          patientId: props.store.patient?.value.id,
+          patientId: props.formStore.patient?.value.id,
           // +1 here because we're using the refillsInput
           fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
           treatmentId: draft.treatment.id
@@ -245,16 +245,16 @@ function PrescribeWorkflow(props: PrescribeProps) {
       if (props.enableOrder) {
         // remove unnecessary fields, and add country and street2 if missing
         const patientAddress =
-          props.store?.address?.value ?? props.store?.patient?.value?.address ?? {};
+          props.formStore?.address?.value ?? props.formStore?.patient?.value?.address ?? {};
         const { __typename, name, ...filteredPatientAddress } = patientAddress;
         const address = { street2: '', country: 'US', ...filteredPatientAddress };
 
         if (
-          props.store.updatePreferredPharmacy?.value &&
-          props.store.pharmacy?.value &&
-          props.store.fulfillmentType?.value === 'PICK_UP'
+          props.formStore.updatePreferredPharmacy?.value &&
+          props.formStore.pharmacy?.value &&
+          props.formStore.fulfillmentType?.value === 'PICK_UP'
         ) {
-          const patient = props.store.patient?.value;
+          const patient = props.formStore.patient?.value;
           if (patient?.preferredPharmacies && patient?.preferredPharmacies?.length > 0) {
             // remove the current preferred pharmacy
             removePatientPreferredPharmacyMutation({
@@ -269,7 +269,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
           updatePatientMutation({
             variables: {
               id: patient.id,
-              preferredPharmacies: [props.store.pharmacy?.value]
+              preferredPharmacies: [props.formStore.pharmacy?.value]
             },
             awaitRefetchQueries: false
           });
@@ -277,9 +277,9 @@ function PrescribeWorkflow(props: PrescribeProps) {
 
         const { data: orderData, errors } = await orderMutation({
           variables: {
-            patientId: props.store.patient?.value.id,
-            pharmacyId: props?.pharmacyId || props.store.pharmacy?.value || '',
-            fulfillmentType: props.store.fulfillmentType?.value || '',
+            patientId: props.formStore.patient?.value.id,
+            pharmacyId: props?.pharmacyId || props.formStore.pharmacy?.value || '',
+            fulfillmentType: props.formStore.fulfillmentType?.value || '',
             address,
             fills: prescriptionData?.createPrescriptions.map((x) => ({ prescriptionId: x.id }))
           },
@@ -303,7 +303,9 @@ function PrescribeWorkflow(props: PrescribeProps) {
 
   createEffect(() => {
     dispatchPrescriptionsFormValidate(
-      Boolean(props.store.draftPrescriptions?.value?.length > 0 && props.store.patient?.value)
+      Boolean(
+        props.formStore.draftPrescriptions?.value?.length > 0 && props.formStore.patient?.value
+      )
     );
   });
 
@@ -337,8 +339,8 @@ function PrescribeWorkflow(props: PrescribeProps) {
           </Show>
           <PhotonAuthorized permissions={['write:prescription']}>
             <PatientCard
-              actions={props.actions}
-              store={props.store}
+              actions={props.formActions}
+              store={props.formStore}
               patientId={props.patientId}
               client={client!}
               enableOrder={props.enableOrder}
@@ -349,8 +351,8 @@ function PrescribeWorkflow(props: PrescribeProps) {
             />
             <Show
               when={
-                props.store.patient?.value?.address ||
-                (props.store.patient?.value?.id && !props.enableOrder)
+                props.formStore.patient?.value?.address ||
+                (props.formStore.patient?.value?.id && !props.enableOrder)
               }
             >
               <RecentOrders.Card />
@@ -358,8 +360,8 @@ function PrescribeWorkflow(props: PrescribeProps) {
                 <div ref={prescriptionRef}>
                   <AddPrescriptionCard
                     hideAddToTemplates={props.hideTemplates}
-                    actions={props.actions}
-                    store={props.store}
+                    actions={props.formActions}
+                    store={props.formStore}
                     weight={props.weight}
                     weightUnit={props.weightUnit}
                   />
@@ -370,14 +372,14 @@ function PrescribeWorkflow(props: PrescribeProps) {
                 templateOverrides={props.templateOverrides || {}}
                 prescriptionIds={props.prescriptionIds?.split(',') || []}
                 prescriptionRef={prescriptionRef}
-                actions={props.actions}
-                store={props.store}
+                actions={props.formActions}
+                store={props.formStore}
                 setIsEditing={setIsEditing}
               />
               <Show when={props.enableOrder && !props.pharmacyId}>
                 <OrderCard
-                  store={props.store}
-                  actions={props.actions}
+                  store={props.formStore}
+                  actions={props.formActions}
                   enableLocalPickup={props.enableLocalPickup}
                   enableSendToPatient={props.enableSendToPatient}
                   mailOrderIds={props.mailOrderIds}
@@ -399,7 +401,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
                           <br />
                           {error}
                           <br />
-                          {JSON.stringify(props.store?.[key]?.value || {})}
+                          {JSON.stringify(props.formStore?.[key]?.value || {})}
                         </sl-alert>
                       )}
                     </For>
@@ -480,8 +482,8 @@ customElement(
           weightUnit={props.weightUnit}
           triggerSubmit={props.triggerSubmit}
           toastBuffer={props.toastBuffer}
-          store={store}
-          actions={actions}
+          formStore={store}
+          formActions={actions}
         />
       </RecentOrders>
     );

@@ -1,4 +1,3 @@
-import { Fill, Order } from '@photonhealth/sdk/dist/types';
 import { createMemo, For } from 'solid-js';
 import { useRecentOrders } from '.';
 import Button from '../../particles/Button';
@@ -6,19 +5,7 @@ import Dialog from '../../particles/Dialog';
 import Text from '../../particles/Text';
 import Textarea from '../../particles/Textarea';
 import formatRxString from '../../utils/formatRxString';
-
-function uniqueFills(order: Order): Fill[] {
-  const treatmentNames = new Set<string>();
-
-  return order.fills.filter((fill) => {
-    if (treatmentNames.has(fill.treatment.name)) {
-      return false;
-    }
-
-    treatmentNames.add(fill.treatment.name);
-    return true;
-  });
-}
+import uniqueFills from '../../utils/uniqueFills';
 
 export default function RecentOrdersIssueDialog() {
   const [state, actions] = useRecentOrders();
