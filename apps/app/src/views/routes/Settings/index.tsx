@@ -33,7 +33,6 @@ const settingsPageQuery = graphql(/* GraphQL */ `
       id
       name
       ...OrganizationTreatmentTabFragment
-      ...OrganizationTemplateTabFragment
     }
     roles {
       name
@@ -125,22 +124,22 @@ export const Settings = () => {
             <Tab>Catalog</Tab>
           </TabList>
           <TabPanels>
-            <TabPanel display="flex" flexDir="column" gap="4" px={0}>
+            <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
               <TeamTab rolesMap={rolesMap} />
             </TabPanel>
-            <TabPanel display="flex" flexDir="column" gap="4" px={0}>
+            <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
               <UserTab />
             </TabPanel>
-            <TabPanel display="flex" flexDir="column" gap="4" px={0}>
+            <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
               <OrganizationTab />
             </TabPanel>
-            <TabPanel display="flex" flexDir="column" gap="4" px={0}>
+            <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
               <DevelopersTab />
             </TabPanel>
-            <TabPanel display="flex" flexDir="column" gap="4">
-              <TemplateTab organizationFragment={data?.organization ?? undefined} />
+            <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
+              <TemplateTab />
             </TabPanel>
-            <TabPanel display="flex" flexDir="column" gap="4">
+            <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
               <TreatmentTab organization={data?.organization ?? undefined} />
             </TabPanel>
           </TabPanels>

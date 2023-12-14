@@ -1,5 +1,11 @@
 import { Auth0Client } from '@auth0/auth0-spa-js';
-import { ApolloClient, InMemoryCache, HttpLink, NormalizedCacheObject } from '@apollo/client';
+import {
+  ApolloClient,
+  InMemoryCache,
+  HttpLink,
+  NormalizedCacheObject,
+  OnQueryUpdated
+} from '@apollo/client';
 import { setContext } from '@apollo/client/link/context/index.js';
 import { AuthManager } from './auth';
 import { ClinicalQueryManager } from './clinical';
@@ -123,6 +129,12 @@ export class PhotonClient {
         query: {
           fetchPolicy: 'cache-first',
           errorPolicy: 'all'
+        },
+        mutate: {
+          // Because of the way we do lambdas, we have a _slight_ delay between reads and writes
+          // This forces a delay of 1s which isn't the greatest, but also isn't the worst
+          // https://github.com/apollographql/apollo-feature-requests/issues/207
+          onQueryUpdated: delayRefetchedQuery
         }
       },
       cache: new InMemoryCache()
@@ -144,3 +156,10 @@ export class PhotonClient {
     return this;
   }
 }
+
+// https://github.com/apollographql/apollo-feature-requests/issues/207
+const wait = (ms: number) => new Promise((res) => setTimeout(res, ms));
+const delayRefetchedQuery: OnQueryUpdated<unknown> = async (observableQuery) => {
+  await wait(1000); // 1s to make it super obvious if working or not
+  observableQuery.refetch();
+};

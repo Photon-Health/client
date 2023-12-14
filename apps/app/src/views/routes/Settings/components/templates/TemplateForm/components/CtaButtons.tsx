@@ -1,13 +1,20 @@
 import { Button, HStack } from '@chakra-ui/react';
 
+interface CtaButtonProps {
+  edit?: boolean;
+  handleCancel: () => void;
+  loading: boolean;
+  isSubmitting: boolean;
+  isValid: boolean;
+}
+
 export const CtaButtons = ({
   edit,
   handleCancel,
   loading,
   isSubmitting,
-  setSubmitting,
-  catalogs
-}: any) => (
+  isValid
+}: CtaButtonProps) => (
   <HStack alignSelf="end">
     <Button variant="outline" onClick={handleCancel} isLoading={loading && isSubmitting}>
       Cancel
@@ -16,9 +23,9 @@ export const CtaButtons = ({
       type="submit"
       colorScheme="brand"
       form="template-builder"
-      onClick={() => setSubmitting(true)}
-      disabled={loading || catalogs.loading}
-      isLoading={loading && isSubmitting}
+      disabled={loading}
+      isDisabled={loading || !isValid}
+      isLoading={loading || isSubmitting}
       loadingText="Saving template"
     >
       {edit ? 'Save Changes' : 'Create Template'}
