@@ -79,7 +79,13 @@ customElement(
               }}
             />
           )}
-          <div>
+          <div
+            onClick={() => {
+              dispatchChecked(!checked());
+              setChecked(!checked());
+            }}
+            class="cursor-pointer"
+          >
             <p class="flex items-center text-gray-500 text-sm font-medium font-sans">
               <span class="mr-1">{props.label} </span>
               <Show when={props.tip}>

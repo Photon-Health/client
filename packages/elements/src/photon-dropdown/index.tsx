@@ -42,7 +42,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   selectedData?: T | undefined;
   groups?: Array<{
     label: string;
-    filter: (arr: any) => void;
+    filter: (arr: T) => void;
   }>;
   showOverflow?: boolean;
   optional?: boolean;
@@ -297,7 +297,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
         <div class="border border-gray-200 dropdown-container overflow-hidden relative">
           <div
             ref={overlayRef}
-            class="bg-white pt-2 overflow-x-hidden overflow-y-auto relative"
+            class="bg-white overflow-x-hidden overflow-y-auto relative"
             style={{
               'max-height': '200px',
               'min-height': '56px',
@@ -387,7 +387,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                           .getVirtualItems()
                           .filter((vr) => el.filter(props.data[vr.index]))}
                       >
-                        {(vr: any) => {
+                        {(vr) => {
                           const isLoaderRow = vr.index > props.data.length - 1;
                           const datum = props.data[vr.index];
                           return (

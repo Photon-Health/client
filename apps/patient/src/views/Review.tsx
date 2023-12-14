@@ -20,9 +20,7 @@ import { Helmet } from 'react-helmet';
 
 import { useOrderContext } from './Main';
 import { formatDate, countFillsAndRemoveDuplicates } from '../utils/general';
-import { FixedFooter } from '../components/FixedFooter';
-import { Nav } from '../components/Nav';
-import { PoweredBy } from '../components/PoweredBy';
+import { FixedFooter, Nav, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
 
 export const Review = () => {
@@ -35,7 +33,7 @@ export const Review = () => {
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
 
-  const { organization, patient, fills } = order;
+  const { patient, fills } = order;
 
   const handleCtaClick = () => {
     const toUrl = isDemo
@@ -53,7 +51,7 @@ export const Review = () => {
         <title>{t.review.title(isMultiRx)}</title>
       </Helmet>
 
-      <Nav header={organization.name} orgId={organization.id} />
+      <Nav />
 
       <Container pb={32}>
         <VStack spacing={6} align="span" pt={5}>

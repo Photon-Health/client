@@ -43,9 +43,11 @@
 }
 
 .group::part(base) {
-  @apply bg-gray-100;
+  background: #d1e9ff;
+  @apply py-1;
   @apply text-gray-800;
-  @apply text-sm;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .dropdown::part(panel) {
