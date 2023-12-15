@@ -84,7 +84,7 @@ export const Nav = () => {
                 {/* <NavButton label="" icon={FiSettings} link="/settings" /> */}
                 <NavButton label="" icon={FiHelpCircle} link="/support" />
               </ButtonGroup>
-              <Menu>
+              <Menu autoSelect={false}>
                 <MenuButton>
                   <Tooltip label={user?.name} aria-label={user?.name}>
                     <Avatar
@@ -109,11 +109,9 @@ export const Nav = () => {
                     <Text color="muted" fontSize="sm">
                       {user?.email}
                     </Text>
-                    {organization?.name && (
-                      <Text color="muted" fontSize="sm">
-                        {organization.name}
-                      </Text>
-                    )}
+                    <Text color="muted" fontSize="sm">
+                      {organization?.name && organization.name}
+                    </Text>
                   </VStack>
                   <MenuDivider my={0} py={0} borderColor="gray.300" />
                   <MenuItem
