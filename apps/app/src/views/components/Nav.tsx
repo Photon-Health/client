@@ -18,13 +18,13 @@ import {
   MenuItem,
   MenuList,
   Stack,
+  Text,
   Tooltip,
+  VStack,
   useBreakpointValue,
   useColorModeValue,
   useDisclosure,
-  useTheme,
-  Text,
-  VStack
+  useTheme
 } from '@chakra-ui/react';
 
 import {
@@ -52,8 +52,9 @@ export const Nav = () => {
   const theme = useTheme();
   const isDesktop = useBreakpointValue({ base: false, lg: true });
   const { isOpen, onClose, onToggle } = useDisclosure();
-  const { user, logout } = usePhoton();
+  const { user, logout, getOrganization } = usePhoton();
   const orgSettings = user?.org_id in settings ? settings[user?.org_id] : settings.default;
+  const { organization } = getOrganization();
 
   const onLogout = useCallback(() => {
     localStorage.removeItem('previouslyAuthed');
@@ -83,7 +84,7 @@ export const Nav = () => {
                 {/* <NavButton label="" icon={FiSettings} link="/settings" /> */}
                 <NavButton label="" icon={FiHelpCircle} link="/support" />
               </ButtonGroup>
-              <Menu>
+              <Menu autoSelect={false}>
                 <MenuButton>
                   <Tooltip label={user?.name} aria-label={user?.name}>
                     <Avatar
@@ -93,15 +94,19 @@ export const Nav = () => {
                     />
                   </Tooltip>
                 </MenuButton>
-                <MenuList>
-                  <MenuItem as={VStack} alignItems={'start'}>
-                    <Text fontWeight="medium" fontSize="sm">
+                <MenuList py="0">
+                  <VStack alignItems={'start'} py={'2.5'} px={'3'} roundedTop={'md'} gap={'1'}>
+                    <Text fontWeight="medium" fontSize="md">
                       {user?.name}
                     </Text>
                     <Text color="muted" fontSize="sm">
                       {user?.email}
                     </Text>
-                  </MenuItem>
+                    <Text color="muted" fontSize="sm">
+                      {organization?.name && organization.name}
+                    </Text>
+                  </VStack>
+                  <MenuDivider my={0} py={0} />
                   <MenuItem
                     as={RouterLink}
                     to="/settings"
@@ -110,12 +115,13 @@ export const Nav = () => {
                   >
                     Settings
                   </MenuItem>
-                  <MenuDivider />
+                  <MenuDivider my={0} py={0} />
                   <MenuItem
                     textColor="red"
                     onClick={onLogout}
                     fontSize={'sm'}
                     icon={<Icon as={FiLogOut} boxSize="4" />}
+                    roundedBottom={'md'}
                   >
                     Logout
                   </MenuItem>
