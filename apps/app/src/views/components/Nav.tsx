@@ -95,15 +95,8 @@ export const Nav = () => {
                   </Tooltip>
                 </MenuButton>
                 <MenuList py="0">
-                  <VStack
-                    alignItems={'start'}
-                    py={'1.5'}
-                    px={'3'}
-                    gap={0}
-                    bg="gray.100"
-                    roundedTop={'md'}
-                  >
-                    <Text fontWeight="medium" fontSize="sm">
+                  <VStack alignItems={'start'} py={'2.5'} px={'3'} roundedTop={'md'} gap={'1'}>
+                    <Text fontWeight="medium" fontSize="md">
                       {user?.name}
                     </Text>
                     <Text color="muted" fontSize="sm">
@@ -113,7 +106,7 @@ export const Nav = () => {
                       {organization?.name && organization.name}
                     </Text>
                   </VStack>
-                  <MenuDivider my={0} py={0} borderColor="gray.300" />
+                  <MenuDivider my={0} py={0} />
                   <MenuItem
                     as={RouterLink}
                     to="/settings"
@@ -122,7 +115,7 @@ export const Nav = () => {
                   >
                     Settings
                   </MenuItem>
-                  <MenuDivider my={0} py={0} borderColor="gray.300" />
+                  <MenuDivider my={0} py={0} />
                   <MenuItem
                     textColor="red"
                     onClick={onLogout}
