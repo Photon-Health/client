@@ -438,11 +438,10 @@ export const Pharmacy = () => {
   }, [location]);
 
   useEffect(() => {
+    reset();
     if (isDemo) {
-      reset();
       initializeDemo();
     } else {
-      reset();
       initialize();
     }
   }, [enableOpenNow, enable24Hr]);
