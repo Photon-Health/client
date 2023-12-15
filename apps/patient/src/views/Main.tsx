@@ -119,15 +119,20 @@ export const Main = () => {
     }
   };
 
+  // Set logo
   useEffect(() => {
     if (order?.organization?.id) {
       const theme =
         order.organization.id in settings ? settings[order.organization.id] : settings.default;
 
-      if (theme.logo) {
-        fetchLogo(theme.logo);
+      if (isDemo) {
+        fetchLogo('newco_logo.svg');
       } else {
-        setLoadingLogo(false);
+        if (theme.logo) {
+          fetchLogo(theme.logo);
+        } else {
+          setLoadingLogo(false);
+        }
       }
     }
   }, [order?.organization?.id]);

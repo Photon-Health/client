@@ -30,7 +30,7 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
   const [searchParams] = useSearchParams();
   const isDemo = searchParams.get('demo');
 
-  const { organization, logo } = useOrderContext();
+  const { order, logo } = useOrderContext();
 
   return (
     <Box as="nav" bg="white" boxShadow={useColorModeValue('sm', 'sm-dark')}>
@@ -68,7 +68,7 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
               textOverflow="ellipsis"
               overflow="hidden"
             >
-              {organization.name}
+              {order.organization.name}
             </Text>
           )}
           <Spacer />
