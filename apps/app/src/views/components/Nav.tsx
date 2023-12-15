@@ -18,13 +18,13 @@ import {
   MenuItem,
   MenuList,
   Stack,
+  Text,
   Tooltip,
+  VStack,
   useBreakpointValue,
   useColorModeValue,
   useDisclosure,
-  useTheme,
-  Text,
-  VStack
+  useTheme
 } from '@chakra-ui/react';
 
 import {
@@ -52,8 +52,9 @@ export const Nav = () => {
   const theme = useTheme();
   const isDesktop = useBreakpointValue({ base: false, lg: true });
   const { isOpen, onClose, onToggle } = useDisclosure();
-  const { user, logout } = usePhoton();
+  const { user, logout, getOrganization } = usePhoton();
   const orgSettings = user?.org_id in settings ? settings[user?.org_id] : settings.default;
+  const { organization } = getOrganization();
 
   const onLogout = useCallback(() => {
     localStorage.removeItem('previouslyAuthed');
@@ -93,15 +94,28 @@ export const Nav = () => {
                     />
                   </Tooltip>
                 </MenuButton>
-                <MenuList>
-                  <MenuItem as={VStack} alignItems={'start'}>
+                <MenuList py="0">
+                  <VStack
+                    alignItems={'start'}
+                    py={'1.5'}
+                    px={'3'}
+                    gap={0}
+                    bg="gray.100"
+                    roundedTop={'md'}
+                  >
                     <Text fontWeight="medium" fontSize="sm">
                       {user?.name}
                     </Text>
                     <Text color="muted" fontSize="sm">
                       {user?.email}
                     </Text>
-                  </MenuItem>
+                    {organization?.name && (
+                      <Text color="muted" fontSize="sm">
+                        {organization.name}
+                      </Text>
+                    )}
+                  </VStack>
+                  <MenuDivider my={0} py={0} borderColor="gray.300" />
                   <MenuItem
                     as={RouterLink}
                     to="/settings"
@@ -110,12 +124,13 @@ export const Nav = () => {
                   >
                     Settings
                   </MenuItem>
-                  <MenuDivider />
+                  <MenuDivider my={0} py={0} borderColor="gray.300" />
                   <MenuItem
                     textColor="red"
                     onClick={onLogout}
                     fontSize={'sm'}
                     icon={<Icon as={FiLogOut} boxSize="4" />}
+                    roundedBottom={'md'}
                   >
                     Logout
                   </MenuItem>
