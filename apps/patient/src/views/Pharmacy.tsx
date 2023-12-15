@@ -118,8 +118,17 @@ export const Pharmacy = () => {
     setLatitude(40.717484);
     setLongitude(-73.955662397568);
 
-    setInitialPharmacies(demoPharmacies);
-    setPharmacyOptions(demoPharmacies.slice(0, 5));
+    const filteredPharmacies =
+      enableOpenNow || enable24Hr
+        ? demoPharmacies.filter((p) => (enableOpenNow && p.isOpen) || (enable24Hr && p.is24Hr))
+        : demoPharmacies;
+
+    setInitialPharmacies(filteredPharmacies);
+    setPharmacyOptions(filteredPharmacies.slice(0, 5));
+
+    if (filteredPharmacies.length < 5) {
+      setShowingAllPharmacies(true);
+    }
   };
 
   const initialize = async () => {
@@ -203,7 +212,7 @@ export const Pharmacy = () => {
     setLoadingPharmacies(true);
 
     if (isDemo) {
-      const newPharmacyOptions = demoPharmacies.slice(
+      const newPharmacyOptions = initialPharmacies.slice(
         pharmacyOptions.length,
         pharmacyOptions.length + MAX_ENRICHMENT_COUNT
       );
@@ -211,7 +220,7 @@ export const Pharmacy = () => {
       setPharmacyOptions(totalPharmacyOptions);
       setLoadingPharmacies(false);
 
-      if (totalPharmacyOptions.length === demoPharmacies.length) {
+      if (totalPharmacyOptions.length === initialPharmacies.length) {
         setShowingAllPharmacies(true);
       }
 
@@ -430,12 +439,15 @@ export const Pharmacy = () => {
 
   useEffect(() => {
     reset();
-    initialize();
+    if (isDemo) {
+      initializeDemo();
+    } else {
+      initialize();
+    }
   }, [enableOpenNow, enable24Hr]);
 
   const isCapsuleTerritory = order?.address?.postalCode in capsuleZipcodeLookup;
   const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
-
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
 
   const heading = isReroute ? t.pharmacy.heading.reroute : t.pharmacy.heading.original;

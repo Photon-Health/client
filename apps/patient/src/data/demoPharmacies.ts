@@ -12,13 +12,10 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 0.2,
     rating: 4.9,
-    hours: {
-      open: true,
-      is24Hr: false,
-      opens: '0900',
-      opensDay: 'Tue',
-      closes: '1800'
-    }
+    isOpen: true,
+    closes: 'Closes 4:30PM',
+    opens: 'Opens 9AM Sat',
+    is24Hr: false
   },
   {
     id: 'as4563456dfsafasdf',
@@ -33,13 +30,10 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 0.4,
     rating: 4.6,
-    hours: {
-      open: true,
-      is24Hr: false,
-      opens: '0900',
-      opensDay: 'Tue',
-      closes: '1900'
-    }
+    isOpen: false,
+    closes: 'Closes 7PM',
+    opens: 'Opens 9AM Sat',
+    is24Hr: false
   },
   {
     id: 'asdfsa2435236fasdf',
@@ -54,10 +48,10 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 0.5,
     rating: 3.5,
-    hours: {
-      open: true,
-      is24Hr: true
-    }
+    isOpen: true,
+    closes: '',
+    opens: '',
+    is24Hr: true
   },
   {
     id: 'as324gfdsf5236fasdf',
@@ -72,13 +66,10 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 0.8,
     rating: 2.7,
-    hours: {
-      open: true,
-      is24Hr: false,
-      opens: '0900',
-      opensDay: 'Tue',
-      closes: '1800'
-    }
+    isOpen: true,
+    closes: 'Closes 6PM',
+    opens: 'Opens 9AM Tue',
+    is24Hr: false
   },
   {
     id: 'as324gf6h5ehgrgsdf',
@@ -93,10 +84,10 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 1.0,
     rating: 2.8,
-    hours: {
-      open: true,
-      is24Hr: true
-    }
+    isOpen: true,
+    closes: '',
+    opens: '',
+    is24Hr: true
   },
   {
     id: 'as324gf6h6g45wgrfwefrgsdf',
@@ -111,13 +102,10 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 1.1,
     rating: 3.8,
-    hours: {
-      open: true,
-      is24Hr: false,
-      opens: '0900',
-      opensDay: 'Tue',
-      closes: '1900'
-    }
+    isOpen: true,
+    closes: 'Closes 4:30PM',
+    opens: 'Opens 9AM Sat',
+    is24Hr: false
   },
   {
     id: 'as324gf65j5hgersdf',
@@ -132,13 +120,10 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 1.1,
     rating: 5.0,
-    hours: {
-      open: true,
-      is24Hr: false,
-      opens: '0900',
-      opensDay: 'Tue',
-      closes: '1900'
-    }
+    isOpen: true,
+    closes: 'Closes 4:30PM',
+    opens: 'Opens 9AM Sat',
+    is24Hr: false
   },
   {
     id: 'a328798frfafgf',
@@ -153,13 +138,10 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 1.4,
     rating: 4.7,
-    hours: {
-      open: true,
-      is24Hr: false,
-      opens: '0900',
-      opensDay: 'Tue',
-      closes: '1830'
-    }
+    isOpen: false,
+    closes: 'Closes 4:30PM',
+    opens: 'Opens 9AM Sat',
+    is24Hr: false
   },
   {
     id: 'a32843y6hgwrgwrtgwgf',
@@ -174,10 +156,10 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 1.5,
     rating: 3.5,
-    hours: {
-      open: true,
-      is24Hr: true
-    }
+    isOpen: true,
+    closes: '',
+    opens: '',
+    is24Hr: true
   },
   {
     id: 'a3284334t54gdgdfwrtgwgf',
@@ -192,12 +174,9 @@ export const demoPharmacies: any = [
     info: 'preferred',
     distance: 2.1,
     rating: 4.3,
-    hours: {
-      open: true,
-      is24Hr: false,
-      opens: '0900',
-      opensDay: 'Tue',
-      closes: '1800'
-    }
+    isOpen: true,
+    closes: 'Closes 4:30PM',
+    opens: 'Opens 9AM Sat',
+    is24Hr: false
   }
 ];
