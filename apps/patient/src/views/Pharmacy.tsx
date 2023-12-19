@@ -15,8 +15,8 @@ import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { Helmet } from 'react-helmet';
 import { types } from '@photonhealth/sdk';
 import * as TOAST_CONFIG from '../configs/toast';
-import { formatAddress, preparePharmacy } from '../utils/general';
-import { ExtendedFulfillmentType } from '../utils/models';
+import { formatAddress, preparePharmacy, countFillsAndRemoveDuplicates } from '../utils/general';
+import { ExtendedFulfillmentType, Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import {
   BrandedOptions,
@@ -28,7 +28,6 @@ import {
 } from '../components';
 import { useOrderContext } from './Main';
 import { getSettings } from '@client/settings';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import {
   geocode,
   getPharmacies,
@@ -446,14 +445,17 @@ export const Pharmacy = () => {
     }
   }, [enableOpenNow, enable24Hr]);
 
+  const flattenedFills = countFillsAndRemoveDuplicates(order.fills);
+  const isMultiRx = flattenedFills.length > 1;
+
   const isCapsuleTerritory = order?.address?.postalCode in capsuleZipcodeLookup;
   const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
 
   const heading = isReroute ? t.pharmacy.heading.reroute : t.pharmacy.heading.original;
   const subheading = isReroute
-    ? t.pharmacy.subheading.reroute(order.pharmacy.name)
-    : t.pharmacy.subheading.original;
+    ? t.pharmacy.subheading.reroute(isMultiRx, order.pharmacy.name)
+    : t.pharmacy.subheading.original(isMultiRx);
 
   return (
     <Box>

@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 
 import { FixedFooter, Nav, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
+import { countFillsAndRemoveDuplicates } from '../utils/general';
 import { useOrderContext } from './Main';
 
 const checkDisabled = (option: string): boolean => {
@@ -17,6 +18,8 @@ const checkDisabled = (option: string): boolean => {
 export const ReadyBy = () => {
   const { order } = useOrderContext();
 
+  const { id, fills } = order;
+
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
 
@@ -26,8 +29,11 @@ export const ReadyBy = () => {
   const showFooter = typeof selected !== 'undefined';
 
   const handleCtaClick = () => {
-    navigate(`/pharmacy?orderId=${order.id}&token=${token}`);
+    navigate(`/pharmacy?orderId=${id}&token=${token}`);
   };
+
+  const flattenedFills = countFillsAndRemoveDuplicates(fills);
+  const isMultiRx = flattenedFills.length > 1;
 
   return (
     <Box>
@@ -43,7 +49,7 @@ export const ReadyBy = () => {
             <Heading as="h3" size="lg">
               {t.readyBy.heading}
             </Heading>
-            <Text>{t.readyBy.subheading}</Text>
+            <Text>{t.readyBy.subheading(isMultiRx)}</Text>
           </VStack>
 
           <VStack spacing={3} w="full">

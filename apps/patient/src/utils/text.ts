@@ -4,11 +4,10 @@ export const text = {
     title: (isPlural: boolean) => `Review ${isPlural ? 'prescriptions' : 'prescription'}`,
     heading: (isPlural: boolean) => `Review your ${isPlural ? 'prescriptions' : 'prescription'}`,
     subheading: (isPlural: boolean) =>
-      `Please review your ${
+      `Please review the ${
         isPlural ? 'prescriptions' : 'prescription'
       } before you select a pharmacy. Reach out to your provider for any issues.`,
     patient: 'Patient',
-    prescriber: 'Prescriber',
     quantity: 'Quantity',
     daysSupply: 'Days supply',
     refills: 'Refills',
@@ -19,7 +18,10 @@ export const text = {
   readyBy: {
     title: 'Ready by',
     heading: 'When do you want this ready by?',
-    subheading: "We'll do our best ensure your prescription(s) are ready by your selected time.",
+    subheading: (isPlural: boolean) =>
+      `We'll do our best to ensure your ${
+        isPlural ? 'prescriptions' : 'prescription'
+      } are ready by your selected time.`,
     options: ['10:00 am', '12:00 pm', '2:00 pm', '4:00 pm', '6:00 pm', 'After hours', 'Tomorrow'],
     cta: 'Select a pharmacy'
   },
@@ -30,9 +32,16 @@ export const text = {
       reroute: 'Change pharmacy'
     },
     subheading: {
-      original: "We'll send your prescriptions to your selected pharmacy to be filled.",
-      reroute: (originalPharmacyName: string) =>
-        `We'll cancel your prescriptions at ${originalPharmacyName} and send them to your new pharmacy to be filled.`
+      original: (isPlural: boolean) =>
+        `We'll send your ${
+          isPlural ? 'prescriptions' : 'prescription'
+        } to your selected pharmacy to be filled.`,
+      reroute: (isPlural: boolean, originalPharmacyName: string) =>
+        `We'll cancel your ${
+          isPlural ? 'prescriptions' : 'prescription'
+        } at ${originalPharmacyName} and send ${
+          isPlural ? 'them' : 'it'
+        } to your new pharmacy to be filled.`
     },
     showing: 'Showing pharmacies near:',
     setLocation: 'Set search location',
@@ -62,95 +71,179 @@ export const text = {
     thankYou: 'Thank you!'
   },
   status: {
-    title: 'Preparing your prescriptions',
-    heading: 'Preparing your prescriptions',
-    subheading:
-      "After your prescriptions are sent to the pharmacy, we'll send you updates on their status.",
     PICK_UP: {
+      title: 'Track your order',
       pickup: 'Pick Up:',
-      chat: {
-        prompt: "At the pharmacy? Let us know if you're having any issues.",
-        cta: 'Text us now'
-      },
       states: {
         SENT: {
-          title: 'Sent',
-          description: 'Your prescriptions have been sent to the pharmacy.'
+          heading: 'Your order has been placed',
+          subheading: (isPlural: boolean) =>
+            `Your ${
+              isPlural ? 'prescriptions were' : 'prescription was'
+            } sent to the pharmacy. We’ll text you to let you know when it’s ready.`,
+          state: 'Order placed',
+          description: (isPlural: boolean) =>
+            `Your ${isPlural ? 'prescriptions were' : 'prescription was'} sent to the pharmacy.`,
+          cta: (isPlural: boolean) =>
+            `I picked up my ${isPlural ? 'prescriptions' : 'prescription'}`
         },
         RECEIVED: {
-          title: 'Received',
-          description: 'The pharmacy has received your order and is preparing it.'
+          heading: 'Preparing your order',
+          subheading: (isPlural: boolean, phoneNumber: string) =>
+            `The pharmacy is preparing your ${
+              isPlural ? 'prescriptions' : 'prescription'
+            } for pick up. Please <a href="sms:${phoneNumber}">text us</a> if you have any issues.`,
+          state: 'Preparing order',
+          description: (isPlural: boolean) =>
+            `The pharmacy is preparing your ${
+              isPlural ? 'prescriptions' : 'prescription'
+            } for pick up.`,
+          cta: (isPlural: boolean) =>
+            `I picked up my ${isPlural ? 'prescriptions' : 'prescription'}`
         },
         READY: {
-          title: 'Ready',
-          description: 'Your prescriptions are ready to be picked up.'
+          heading: 'Your order is ready',
+          subheading: (isPlural: boolean) =>
+            `Your ${
+              isPlural ? 'prescriptions are' : 'prescription is'
+            } ready to be picked up. Please notify us below when you’ve picked up your ${
+              isPlural ? 'prescriptions' : 'prescription'
+            }.`,
+          state: 'Ready for pick up',
+          description: (isPlural: boolean) =>
+            `Your ${isPlural ? 'prescriptions are' : 'prescription is'} ready to be picked up.`,
+          cta: (isPlural: boolean) =>
+            `I picked up my ${isPlural ? 'prescriptions' : 'prescription'}`
         },
         PICKED_UP: {
-          title: 'Picked Up',
-          description: "Please notify us below when you've picked up your prescriptions."
+          heading: 'Your order was picked up',
+          subheading: (isPlural: boolean, phoneNumber: string) =>
+            `Your ${
+              isPlural ? 'prescriptions were' : 'prescription was'
+            } picked up. Please <a href="sms:${phoneNumber}">text us</a> if you have any issues.`,
+          state: 'Picked up',
+          description: (isPlural: boolean) =>
+            `Please notify us below when you’ve picked up your ${
+              isPlural ? 'prescriptions' : 'prescription'
+            }.`,
+          cta: (isPlural: boolean) =>
+            `I picked up my ${isPlural ? 'prescriptions' : 'prescription'}`
         }
       },
-      cta: 'I picked up my prescriptions',
       errorToast: {
         title: 'Unable to mark order as picked up',
         description: 'Please refresh and try again'
       }
     },
     COURIER: {
+      title: 'Track your order',
       states: {
         SENT: {
-          title: 'Sent',
-          description: 'Your prescriptions have been sent to the pharmacy.'
+          heading: 'Your order has been placed',
+          subheading: (isPlural: boolean) =>
+            `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`,
+          state: 'Order placed',
+          description: (isPlural: boolean) =>
+            `Your ${isPlural ? 'prescriptions were' : 'prescription was'} sent to the pharmacy`,
+          cta: (isPlural: boolean) => `I received my ${isPlural ? 'prescriptions' : 'prescription'}`
         },
         PREPARING: {
-          title: 'Preparing',
-          description: 'The pharmacy has received your order and is preparing it.'
+          heading: 'Preparing your order',
+          subheading: (isPlural: boolean) =>
+            `We sent your ${
+              isPlural ? 'prescriptions' : 'prescription'
+            } to your selected pharmacy. We’ll text you updates on your order status.`,
+          state: 'Preparing order',
+          description: (_) => 'The pharmacy has received your order and is preparing it.',
+          cta: (isPlural: boolean) => `I received my ${isPlural ? 'prescriptions' : 'prescription'}`
         },
         IN_TRANSIT: {
-          title: 'In transit',
-          description: 'Your prescriptions are on their way to '
+          heading: 'Your order is in transit',
+          subheading: (isPlural: boolean) =>
+            `We sent your ${
+              isPlural ? 'prescriptions' : 'prescription'
+            } to your selected pharmacy. We’ll text you updates on your order status.`,
+          state: 'In transit',
+          description: (isPlural: boolean) =>
+            `Your ${isPlural ? 'prescriptions are on their' : 'prescription is on its'} way to `,
+          cta: (isPlural: boolean) => `I received my ${isPlural ? 'prescriptions' : 'prescription'}`
         },
         DELIVERED: {
-          title: 'Delivered',
-          description: 'Your prescriptions have arrived at their destination.'
+          heading: 'Your order was delivered',
+          subheading: (isPlural: boolean) =>
+            `We sent your ${
+              isPlural ? 'prescriptions' : 'prescription'
+            } to your selected pharmacy. We’ll text you updates on your order status.`,
+          state: 'Delivered',
+          description: (isPlural: boolean) =>
+            `Your ${isPlural ? 'prescriptions have' : 'prescription has'} arrived at ${
+              isPlural ? 'their' : 'its'
+            } destination.`,
+          cta: (isPlural: boolean) => `I received my ${isPlural ? 'prescriptions' : 'prescription'}`
         }
       },
-      cta: 'I received my prescriptions',
       errorToast: {
         title: 'Unable to mark order as delivered',
         description: 'Please refresh and try again'
       }
     },
     MAIL_ORDER: {
+      title: 'Track your order',
       trackingNumber: 'Tracking #:',
       states: {
         SENT: {
-          title: 'Sent',
-          description: 'Your prescriptions have been sent to the pharmacy.'
+          heading: 'Your order has been placed',
+          subheading: (isPlural: boolean) =>
+            `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`,
+          state: 'Order placed',
+          description: (isPlural: boolean) =>
+            `Your ${isPlural ? 'prescriptions were' : 'prescription was'} sent to the pharmacy.`,
+          cta: (isPlural: boolean) => `I received my ${isPlural ? 'prescriptions' : 'prescription'}`
         },
         PREPARING: {
-          title: 'Preparing',
-          description: 'The pharmacy has received your order and is preparing it.'
+          heading: 'Preparing your order',
+          subheading: 'The pharmacy is preparing your order for delivery.',
+          state: 'Preparing order',
+          description: (isPlural: boolean) =>
+            `The pharmacy is preparing your ${
+              isPlural ? 'prescriptions' : 'prescription'
+            } for delivery.`,
+          cta: (isPlural: boolean) => `I received my ${isPlural ? 'prescriptions' : 'prescription'}`
         },
         SHIPPED: {
-          title: 'Shipped',
-          description: 'Your prescriptions are being delivered to '
+          heading: 'Your order is in transit',
+          subheading: (isPlural: boolean) =>
+            `Your order is out for delivery. Please notify us below when you’ve received your ${
+              isPlural ? 'prescriptions' : 'prescription'
+            }.`,
+          state: 'In transit',
+          description: (isPlural: boolean, deliveryAddress: string) =>
+            `Your ${
+              isPlural ? 'prescriptions are on their' : 'prescription is on its'
+            } way to ${deliveryAddress}.`,
+          cta: (isPlural: boolean) => `I received my ${isPlural ? 'prescriptions' : 'prescription'}`
         },
         DELIVERED: {
-          title: 'Delivered',
-          description: 'Your prescriptions have arrived at their destination.'
+          heading: 'Your order was delivered',
+          subheading: (phoneNumber: string) =>
+            `Please <a href="sms:${phoneNumber}">text us</a> if you have any issues.`,
+          state: 'Delivered',
+          description: (isPlural: boolean) =>
+            `Your ${
+              isPlural ? 'prescriptions' : 'prescription'
+            } have arrived at their destination.`,
+          cta: (isPlural: boolean) => `I received my ${isPlural ? 'prescriptions' : 'prescription'}`
         }
       },
-      cta: 'I received my prescriptions',
       errorToast: {
-        title: 'Unable to mark order as shipped',
+        title: 'Unable to mark order as delivered',
         description: 'Please refresh and try again'
       }
     },
     thankYou: 'Thank you!'
   },
   canceled: {
-    heading: 'This order has been canceled.',
+    heading: 'This order was canceled.',
     subheading: 'If you have any questions, please text us at +1 (513) 866-3212.'
   },
   noMatch: {

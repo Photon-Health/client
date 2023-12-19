@@ -20,7 +20,7 @@ import { text as t } from '../utils/text';
 import { Logo as PhotonLogo } from './Logo';
 import { useOrderContext } from '../views/Main';
 
-const PHOTON_PHONE_NUMBER = '+15138663212';
+const PHOTON_PHONE_NUMBER: string = process.env.REACT_APP_TWILIO_SMS_NUMBER;
 
 interface NavProps {
   showRefresh?: boolean;

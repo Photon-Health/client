@@ -1,16 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  Alert,
-  AlertIcon,
-  Box,
-  Button,
-  Container,
-  Heading,
-  Link,
-  Text,
-  VStack,
-  useToast
-} from '@chakra-ui/react';
+import { Box, Button, Container, Heading, Link, Text, VStack, useToast } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiCheck } from 'react-icons/fi';
@@ -23,7 +12,12 @@ import {
   PoweredBy,
   StatusStepper
 } from '../components';
-import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
+import {
+  formatAddress,
+  getFulfillmentType,
+  preparePharmacy,
+  countFillsAndRemoveDuplicates
+} from '../utils/general';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
@@ -60,7 +54,7 @@ export const Status = () => {
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
   const [enrichedPharmacy, setEnrichedPharmacy] = useState<EnrichedPharmacy | undefined>(undefined);
 
-  const { fulfillment, pharmacy, address } = order;
+  const { fulfillment, pharmacy, address, fills } = order;
 
   const fulfillmentType = getFulfillmentType(pharmacy?.id, fulfillment, type);
 
@@ -180,16 +174,17 @@ export const Status = () => {
     }
   }, []);
 
-  // Only show "Text us now" prompt if pickup and RECEIVED or READY
-  const showChatAlertStates: types.FulfillmentState[] = ['RECEIVED', 'READY'];
-  const showChatAlert = showChatAlertStates.includes(fulfillment?.state);
+  const flattenedFills = countFillsAndRemoveDuplicates(fills);
+  const isMultiRx = flattenedFills.length > 1;
+
+  console.log(fulfillment);
 
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
 
       <Helmet>
-        <title>{t.status.title}</title>
+        <title>{t.status[fulfillmentType].title}</title>
       </Helmet>
 
       <Nav showRefresh />
@@ -199,26 +194,21 @@ export const Status = () => {
         <VStack spacing={6} align="start" pt={5}>
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
-              {t.status.heading}
+              {t.status[fulfillmentType].states[fulfillment.state].heading}
             </Heading>
-            <Text>{t.status.subheading}</Text>
-            {showChatAlert ? (
-              <Alert status="warning">
-                <AlertIcon />
-                <Text>
-                  {t.status.PICK_UP.chat.prompt}{' '}
-                  <Link href={`sms:${PHOTON_PHONE_NUMBER}`} color="link" fontWeight="medium">
-                    {t.status.PICK_UP.chat.cta}
-                  </Link>
-                </Text>
-              </Alert>
-            ) : null}
+            <Text>
+              {t.status[fulfillmentType].states[fulfillment.state].subheading(
+                isMultiRx,
+                PHOTON_PHONE_NUMBER
+              )}
+            </Text>
           </VStack>
           {enrichedPharmacy ? (
             <Box width="full">
               <PharmacyCard
                 pharmacy={enrichedPharmacy}
                 selected={true}
+                showDetails={fulfillmentType === 'PICK_UP'}
                 canReroute={!isDemo && orgSettings.enablePatientRerouting}
                 onChangePharmacy={() =>
                   navigate(`/pharmacy?orderId=${order.id}&token=${token}&reroute=true`)
@@ -264,7 +254,9 @@ export const Status = () => {
             onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
             isLoading={submitting}
           >
-            {successfullySubmitted ? t.status.thankYou : t.status[fulfillmentType].cta}
+            {successfullySubmitted
+              ? t.status.thankYou
+              : t.status[fulfillmentType].states[fulfillment.state].cta}
           </Button>
           <PoweredBy />
         </Container>
