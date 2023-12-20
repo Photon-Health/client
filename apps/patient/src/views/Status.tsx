@@ -19,7 +19,7 @@ import {
   countFillsAndRemoveDuplicates
 } from '../utils/general';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { text as t } from '../utils/text';
+import { text as t, mapping as m } from '../utils/text';
 import { useOrderContext } from './Main';
 import * as TOAST_CONFIG from '../configs/toast';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
@@ -86,8 +86,8 @@ export const Status = () => {
           setTimeout(() => setShowFooter(false), 1000);
         } else {
           toast({
-            title: t.status[fulfillmentType].errorToast.title,
-            description: t.status[fulfillmentType].errorToast.description,
+            title: m[fulfillmentType].error.title,
+            description: m[fulfillmentType].error.description,
             ...TOAST_CONFIG.ERROR
           });
         }
@@ -95,8 +95,8 @@ export const Status = () => {
       }, 1000);
     } catch (error) {
       toast({
-        title: t.status[fulfillmentType].errorToast.title,
-        description: t.status[fulfillmentType].errorToast.description,
+        title: m[fulfillmentType].error.title,
+        description: m[fulfillmentType].error.description,
         ...TOAST_CONFIG.ERROR
       });
 
@@ -177,14 +177,12 @@ export const Status = () => {
   const flattenedFills = countFillsAndRemoveDuplicates(fills);
   const isMultiRx = flattenedFills.length > 1;
 
-  console.log(fulfillment);
-
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
 
       <Helmet>
-        <title>{t.status[fulfillmentType].title}</title>
+        <title>{t.track}</title>
       </Helmet>
 
       <Nav showRefresh />
@@ -194,13 +192,10 @@ export const Status = () => {
         <VStack spacing={6} align="start" pt={5}>
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
-              {t.status[fulfillmentType].states[fulfillment.state].heading}
+              {m[fulfillmentType][fulfillment.state].heading}
             </Heading>
             <Text>
-              {t.status[fulfillmentType].states[fulfillment.state].subheading(
-                isMultiRx,
-                PHOTON_PHONE_NUMBER
-              )}
+              {m[fulfillmentType][fulfillment.state].subheading(isMultiRx, PHOTON_PHONE_NUMBER)}
             </Text>
           </VStack>
           {enrichedPharmacy ? (
@@ -220,7 +215,7 @@ export const Status = () => {
           {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
             <Box alignSelf="start">
               <Text display="inline" color="gray.600">
-                {t.status.MAIL_ORDER.trackingNumber}
+                {t.tracking}
               </Text>
               <Link
                 href={`https://google.com/search?q=${fulfillment.trackingNumber}`}
@@ -254,9 +249,7 @@ export const Status = () => {
             onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
             isLoading={submitting}
           >
-            {successfullySubmitted
-              ? t.status.thankYou
-              : t.status[fulfillmentType].states[fulfillment.state].cta}
+            {successfullySubmitted ? t.thankYou : m[fulfillmentType][fulfillment.state].cta}
           </Button>
           <PoweredBy />
         </Container>

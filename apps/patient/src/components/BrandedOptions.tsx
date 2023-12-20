@@ -29,11 +29,9 @@ export const BrandedOptions = ({
       <SlideFade offsetY="60px" in={true}>
         <VStack spacing={1} align="start">
           <Heading as="h5" size="sm">
-            {t.pharmacy[type].heading}
+            {t.delivery}
           </Heading>
-          <Text size="sm">
-            {t.pharmacy[type].subheading} {patientAddress}
-          </Text>
+          <Text size="sm">{t.shipTo(patientAddress)}</Text>
         </VStack>
       </SlideFade>
 

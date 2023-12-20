@@ -48,7 +48,7 @@ export const Review = () => {
   return (
     <Box>
       <Helmet>
-        <title>{t.review.title(isMultiRx)}</title>
+        <title>{t.reviewRx(isMultiRx)}</title>
       </Helmet>
 
       <Nav />
@@ -57,14 +57,14 @@ export const Review = () => {
         <VStack spacing={6} align="span" pt={5}>
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
-              {t.review.heading(isMultiRx)}
+              {t.reviewYourRx(isMultiRx)}
             </Heading>
-            <Text>{t.review.subheading(isMultiRx)}</Text>
+            <Text>{t.pleaseReview(isMultiRx)}</Text>
           </VStack>
           <VStack spacing={1} align="start">
             <HStack spacing={2}>
               <Text display="inline" color="gray.500">
-                {t.review.patient}
+                {t.patient}
               </Text>
               <Text display="inline" data-dd-privacy="mask">
                 {patient.name.full}
@@ -100,21 +100,21 @@ export const Review = () => {
                       <VStack align="span">
                         <HStack>
                           <HStack w="50%">
-                            <Text color="gray.500">{t.review.quantity}</Text>
+                            <Text color="gray.500">{t.quantity}</Text>
                             <Text data-dd-privacy="mask">{prescription.dispenseQuantity}</Text>
                           </HStack>
                           <HStack w="50%">
-                            <Text color="gray.500">{t.review.daysSupply}</Text>
+                            <Text color="gray.500">{t.daysSupply}</Text>
                             <Text data-dd-privacy="mask">{prescription.daysSupply}</Text>
                           </HStack>
                         </HStack>
                         <HStack>
                           <HStack w="50%">
-                            <Text color="gray.500">{t.review.refills}</Text>
+                            <Text color="gray.500">{t.refills}</Text>
                             <Text data-dd-privacy="mask">{count - 1}</Text>
                           </HStack>
                           <HStack w="50%">
-                            <Text color="gray.500">{t.review.expires}</Text>
+                            <Text color="gray.500">{t.expires}</Text>
                             <Text data-dd-privacy="mask">
                               {formatDate(prescription.expirationDate)}
                             </Text>
@@ -133,7 +133,7 @@ export const Review = () => {
       <FixedFooter show={true}>
         <Container as={VStack} w="full">
           <Button size="lg" w="full" variant="brand" onClick={handleCtaClick}>
-            {t.review.cta}
+            {t.searchPharmacy}
           </Button>
           <PoweredBy />
         </Container>

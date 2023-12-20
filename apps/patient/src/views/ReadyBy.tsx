@@ -38,7 +38,7 @@ export const ReadyBy = () => {
   return (
     <Box>
       <Helmet>
-        <title>{t.readyBy.title}</title>
+        <title>{t.readyBy}</title>
       </Helmet>
 
       <Nav />
@@ -47,13 +47,13 @@ export const ReadyBy = () => {
         <VStack spacing={7} pt={5} align="span">
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
-              {t.readyBy.heading}
+              {t.readyWhen}
             </Heading>
-            <Text>{t.readyBy.subheading(isMultiRx)}</Text>
+            <Text>{t.readyBySelected(isMultiRx)}</Text>
           </VStack>
 
           <VStack spacing={3} w="full">
-            {t.readyBy.options.map((option, i) => {
+            {t.readyByOptions.map((option, i) => {
               const isDisabled = checkDisabled(option);
               return (
                 <Button
@@ -84,7 +84,7 @@ export const ReadyBy = () => {
       <FixedFooter show={showFooter}>
         <Container as={VStack} w="full">
           <Button size="lg" w="full" variant="brand" onClick={handleCtaClick}>
-            {t.readyBy.cta}
+            {t.selectPharmacy}
           </Button>
           <PoweredBy />
         </Container>

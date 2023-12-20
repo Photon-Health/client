@@ -452,16 +452,16 @@ export const Pharmacy = () => {
   const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
 
-  const heading = isReroute ? t.pharmacy.heading.reroute : t.pharmacy.heading.original;
+  const heading = isReroute ? t.changePharmacy : t.selectPharmacy;
   const subheading = isReroute
-    ? t.pharmacy.subheading.reroute(isMultiRx, order.pharmacy.name)
-    : t.pharmacy.subheading.original(isMultiRx);
+    ? t.sendToNew(isMultiRx, order.pharmacy.name)
+    : t.sendToSelected(isMultiRx);
 
   return (
     <Box>
       <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />
       <Helmet>
-        <title>{t.pharmacy.title}</title>
+        <title>{t.selectPharmacy}</title>
       </Helmet>
 
       <Nav />
@@ -478,7 +478,7 @@ export const Pharmacy = () => {
           <HStack justify="space-between" w="full">
             {location ? (
               <VStack w="full" align="start" spacing={1}>
-                <Text size="sm">{t.pharmacy.showing}</Text>
+                <Text size="sm">{t.showingLabel}</Text>
                 <Link
                   onClick={() => setLocationModalOpen(true)}
                   display="inline"
@@ -493,7 +493,7 @@ export const Pharmacy = () => {
               </VStack>
             ) : (
               <Button variant="brand" onClick={() => setLocationModalOpen(true)}>
-                {t.pharmacy.setLocation}
+                {t.setLoc}
               </Button>
             )}
           </HStack>
@@ -553,7 +553,7 @@ export const Pharmacy = () => {
             onClick={!successfullySubmitted ? handleSubmit : undefined}
             isLoading={submitting}
           >
-            {successfullySubmitted ? t.pharmacy.thankYou : t.pharmacy.cta}
+            {successfullySubmitted ? t.thankYou : t.selectPharmacy}
           </Button>
           <PoweredBy />
         </Container>
