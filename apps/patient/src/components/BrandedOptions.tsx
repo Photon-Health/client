@@ -1,12 +1,9 @@
 import { Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
 
-import { types } from '@photonhealth/sdk';
-import { ExtendedFulfillmentType } from '../utils/models';
 import { text as t } from '../utils/text';
 import { BrandedPharmacyCard } from './BrandedPharmacyCard';
 
 interface Props {
-  type: Exclude<ExtendedFulfillmentType, types.FulfillmentType.PickUp>;
   options: string[];
   location: string;
   selectedId: string;
@@ -15,7 +12,6 @@ interface Props {
 }
 
 export const BrandedOptions = ({
-  type,
   options,
   location,
   selectedId,

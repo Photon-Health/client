@@ -19,7 +19,7 @@ import {
   countFillsAndRemoveDuplicates
 } from '../utils/general';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { text as t, mapping as m } from '../utils/text';
+import { text as t, orderStateMapping as m } from '../utils/text';
 import { useOrderContext } from './Main';
 import * as TOAST_CONFIG from '../configs/toast';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';

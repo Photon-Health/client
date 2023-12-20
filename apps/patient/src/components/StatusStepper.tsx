@@ -12,7 +12,7 @@ import {
   StepNumber,
   StepSeparator
 } from '@chakra-ui/react';
-import { text as t } from '../utils/text';
+import { orderStateMapping as t } from '../utils/text';
 import { ExtendedFulfillmentType } from '../utils/models';
 import { countFillsAndRemoveDuplicates } from '../utils/general';
 import { useOrderContext } from '../views/Main';
@@ -54,12 +54,9 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
             colorScheme="green"
           >
             {states.map((state, id) => {
-              const title = t.status[fulfillmentType].states[state].state;
+              const title = t[fulfillmentType][state].status;
               const isDelivery = state === 'IN_TRANSIT' || state === 'SHIPPED';
-              // console.log(t.status[fulfillmentType].states[state].description(isMultiRx));
-              console.log(fulfillmentType);
-              const thing = t.status[fulfillmentType].states[state].description(isMultiRx);
-              // const thing2 = t.status[fulfillmentType].states[state].description;
+              const thing = t[fulfillmentType][state].description(isMultiRx);
               const description = isDelivery ? `${thing}${patientAddress}.` : thing;
 
               return (

@@ -135,7 +135,7 @@ export const text = {
     `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`
 };
 
-export const mapping = {
+export const orderStateMapping = {
   PICK_UP: {
     SENT: {
       heading: text.orderWasPlaced,
