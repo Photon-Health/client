@@ -6,6 +6,7 @@ import { makeTimer } from '@solid-primitives/timer';
 import { PhotonClientStore } from '../store';
 import { hasAuthParams } from '../utils';
 import { PhotonContext } from '../context';
+import * as packageJson from '../../package.json';
 
 type PhotonClientProps = {
   domain?: string;
@@ -20,6 +21,8 @@ type PhotonClientProps = {
   autoLogin: boolean;
   toastBuffer?: number;
 };
+
+const version = packageJson?.version ?? 'unknown';
 
 customElement(
   'photon-client',
@@ -98,15 +101,18 @@ customElement(
   (props: PhotonClientProps) => {
     let ref: any;
 
-    const sdk = new PhotonClient({
-      domain: props.domain,
-      audience: props.audience,
-      uri: props.uri,
-      clientId: props.id!,
-      redirectURI: props.redirectUri ? props.redirectUri : window.location.origin,
-      organization: props.org,
-      developmentMode: props.developmentMode
-    });
+    const sdk = new PhotonClient(
+      {
+        domain: props.domain,
+        audience: props.audience,
+        uri: props.uri,
+        clientId: props.id!,
+        redirectURI: props.redirectUri ? props.redirectUri : window.location.origin,
+        organization: props.org,
+        developmentMode: props.developmentMode
+      },
+      version
+    );
     const client = new PhotonClientStore(sdk);
     if (props.developmentMode) {
       console.info('[PhotonClient]: Development mode enabled');
