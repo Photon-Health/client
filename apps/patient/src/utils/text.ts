@@ -55,10 +55,8 @@ export const text = {
     `The pharmacy is preparing your ${isPlural ? 'prescriptions' : 'prescription'} for pick up.`,
   preparingRxDelivery: (isPlural: boolean) =>
     `The pharmacy is preparing your ${isPlural ? 'prescriptions' : 'prescription'} for delivery.`,
-  preparingTextUs: (isPlural: boolean, phoneNumber: string) =>
-    `The pharmacy is preparing your ${
-      isPlural ? 'prescriptions' : 'prescription'
-    } for pick up. Please <a href="sms:${phoneNumber}">text us</a> if you have any issues.`,
+  preparingTextUs: (isPlural: boolean) =>
+    `The pharmacy is preparing your ${isPlural ? 'prescriptions' : 'prescription'} for pick up.`,
   previous: 'Previous',
   quantity: 'Quantity',
   questions: 'If you have any questions, please text us at +1 (513) 866-3212.',
@@ -91,10 +89,8 @@ export const text = {
     `Your ${
       isPlural ? 'prescriptions are on their' : 'prescription is on its'
     } way to ${deliveryAddress}.`,
-  rxPickedUpTextUs: (isPlural: boolean, phoneNumber: string) =>
-    `Your ${
-      isPlural ? 'prescriptions were' : 'prescription was'
-    } picked up. Please <a href="sms:${phoneNumber}">text us</a> if you have any issues.`,
+  rxPickedUpTextUs: (isPlural: boolean) =>
+    `Your ${isPlural ? 'prescriptions were' : 'prescription was'} picked up.`,
   rxPickUp: (isPlural: boolean) =>
     `Your ${isPlural ? 'prescriptions are' : 'prescription is'} ready to be picked up.`,
   rxReadyNotify: (isPlural: boolean) =>
@@ -134,8 +130,6 @@ export const text = {
   showingLabel: 'Showing pharmacies near:',
   showingAll: 'Showing all pharmacies',
   showMore: 'Show more pharmacies',
-  textUs: (phoneNumber: string) =>
-    `Please <a href="sms:${phoneNumber}">text us</a> if you have any issues.`,
   thankYou: 'Thank you!',
   track: 'Track your order',
   tracking: 'Tracking #:',
@@ -156,8 +150,7 @@ export const orderStateMapping = {
     },
     RECEIVED: {
       heading: text.preparingOrder,
-      subheading: (isPlural: boolean, phoneNumber: string) =>
-        text.preparingTextUs(isPlural, phoneNumber),
+      subheading: (isPlural: boolean) => text.preparingTextUs(isPlural),
       status: text.preparing,
       description: (isPlural: boolean) => text.preparingPickUp(isPlural),
       cta: (isPlural: boolean) => text.pickedUpRx(isPlural)
@@ -171,8 +164,7 @@ export const orderStateMapping = {
     },
     PICKED_UP: {
       heading: text.orderPickedUp,
-      subheading: (isPlural: boolean, phoneNumber: string) =>
-        text.rxPickedUpTextUs(isPlural, phoneNumber),
+      subheading: (isPlural: boolean) => text.rxPickedUpTextUs(isPlural),
       status: text.pickedUp,
       description: (isPlural: boolean) => text.notifyPickUp(isPlural),
       cta: (isPlural: boolean) => text.pickedUpRx(isPlural)
@@ -242,7 +234,7 @@ export const orderStateMapping = {
     },
     DELIVERED: {
       heading: text.orderDelivered,
-      subheading: (phoneNumber: string) => text.textUs(phoneNumber),
+      subheading: () => '', // it'll still show text us prompt
       status: text.delivered,
       description: (isPlural: boolean) => text.rxDelivered(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)

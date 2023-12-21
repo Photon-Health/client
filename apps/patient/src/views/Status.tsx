@@ -27,8 +27,6 @@ import { getSettings } from '@client/settings';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
-const PHOTON_PHONE_NUMBER: string = process.env.REACT_APP_TWILIO_SMS_NUMBER;
-
 export const Status = () => {
   const navigate = useNavigate();
   const { order, setOrder } = useOrderContext();
@@ -177,6 +175,15 @@ export const Status = () => {
   const flattenedFills = countFillsAndRemoveDuplicates(fills);
   const isMultiRx = flattenedFills.length > 1;
 
+  // There's still a slight delay (1-3s) before fulfillment is created,
+  // so default to SENT on first navigation
+  const fulfillmentState = fulfillment?.state ?? 'SENT';
+
+  const showTextUsPrompt =
+    fulfillmentState === 'DELIVERED' ||
+    fulfillmentState === 'PICKED_UP' ||
+    fulfillmentState === 'RECEIVED';
+
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
@@ -192,11 +199,27 @@ export const Status = () => {
         <VStack spacing={6} align="start" pt={5}>
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
-              {m[fulfillmentType][fulfillment?.state].heading}
+              {m[fulfillmentType][fulfillmentState].heading}
             </Heading>
-            <Text>
-              {m[fulfillmentType][fulfillment?.state].subheading(isMultiRx, PHOTON_PHONE_NUMBER)}
-            </Text>
+            <Box>
+              <Text display="inline">
+                {m[fulfillmentType][fulfillmentState].subheading(isMultiRx)}
+              </Text>
+              {showTextUsPrompt ? (
+                <Text ms={1} display="inline">
+                  Please
+                  <Link
+                    mx={1}
+                    color="link"
+                    textDecoration="underline"
+                    href={`sms:${process.env.REACT_APP_TWILIO_SMS_NUMBER}`}
+                  >
+                    text us
+                  </Link>
+                  if you have any issues.
+                </Text>
+              ) : null}
+            </Box>
           </VStack>
           {enrichedPharmacy ? (
             <Box width="full">
@@ -232,7 +255,7 @@ export const Status = () => {
           ) : null}
           <StatusStepper
             fulfillmentType={fulfillmentType}
-            status={successfullySubmitted ? 'PICKED_UP' : fulfillment?.state || 'SENT'}
+            status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
             patientAddress={formatAddress(address)}
           />
         </VStack>
@@ -251,7 +274,7 @@ export const Status = () => {
           >
             {successfullySubmitted
               ? t.thankYou
-              : m[fulfillmentType][fulfillment?.state].cta(isMultiRx)}
+              : m[fulfillmentType][fulfillmentState].cta(isMultiRx)}
           </Button>
           <PoweredBy />
         </Container>
