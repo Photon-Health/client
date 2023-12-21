@@ -20,8 +20,6 @@ import { text as t } from '../utils/text';
 import { Logo as PhotonLogo } from './Logo';
 import { useOrderContext } from '../views/Main';
 
-const PHOTON_PHONE_NUMBER: string = process.env.REACT_APP_TWILIO_SMS_NUMBER;
-
 interface NavProps {
   showRefresh?: boolean;
 }
@@ -91,7 +89,10 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
             />
             <MenuList>
               <MenuItem>
-                <Link href={`sms:${PHOTON_PHONE_NUMBER}`} style={{ textDecoration: 'none' }}>
+                <Link
+                  href={`sms:${process.env.REACT_APP_TWILIO_SMS_NUMBER}`}
+                  style={{ textDecoration: 'none' }}
+                >
                   {t.contactSupport}
                 </Link>
               </MenuItem>
