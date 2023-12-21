@@ -17,6 +17,7 @@ import {
 } from '@chakra-ui/react';
 import { FiTarget } from 'react-icons/fi';
 import { AsyncSelect } from 'chakra-react-select';
+import { debounce } from 'lodash';
 
 import { text as t } from '../utils/text';
 
@@ -49,6 +50,14 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
     return formatLocationOptions(opts.predictions);
   };
 
+  const debouncedSearchForLocations = debounce(
+    async (inputValue: string, callback: (options) => void) => {
+      const options = await searchForLocations(inputValue);
+      callback(options);
+    },
+    1000
+  );
+
   const geocode = async (address: string) => {
     const data = await geocoder.geocode({ address });
     if (data?.results) {
@@ -80,9 +89,7 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
   };
 
   const loadOptions = (inputValue: string, callback: (options: any) => void) => {
-    setTimeout(async () => {
-      callback(await searchForLocations(inputValue));
-    }, 1000);
+    debouncedSearchForLocations(inputValue, callback);
   };
 
   return (

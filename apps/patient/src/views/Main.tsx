@@ -9,7 +9,7 @@ import { demoOrder } from '../data/demoOrder';
 
 import theme from '../configs/theme';
 import { setAuthHeader } from '../configs/graphqlClient';
-// import { types } from '@photonhealth/sdk';
+import { types } from '@photonhealth/sdk';
 import { AUTH_HEADER_ERRORS } from '../api/internal';
 import { getSettings } from '@client/settings';
 
@@ -48,7 +48,7 @@ export const Main = () => {
   const handleOrderResponse = (order: Order) => {
     setOrder(order);
 
-    if (order.state === 'CANCELED') {
+    if (order.state === types.OrderState.Canceled) {
       navigate('/canceled', { replace: true });
       return;
     }
