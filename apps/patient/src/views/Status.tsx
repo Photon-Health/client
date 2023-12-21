@@ -249,7 +249,9 @@ export const Status = () => {
             onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
             isLoading={submitting}
           >
-            {successfullySubmitted ? t.thankYou : m[fulfillmentType][fulfillment.state].cta}
+            {successfullySubmitted
+              ? t.thankYou
+              : m[fulfillmentType][fulfillment.state].cta(isMultiRx)}
           </Button>
           <PoweredBy />
         </Container>

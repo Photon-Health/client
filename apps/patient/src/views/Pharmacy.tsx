@@ -502,7 +502,6 @@ export const Pharmacy = () => {
             <VStack spacing={9} align="stretch">
               {enableCourier ? (
                 <BrandedOptions
-                  type="COURIER"
                   options={[capsuleZipcodeLookup[order?.address?.postalCode].pharmacyId]}
                   location={location}
                   selectedId={selectedId}
@@ -512,7 +511,6 @@ export const Pharmacy = () => {
               ) : null}
               {enableMailOrder ? (
                 <BrandedOptions
-                  type={types.FulfillmentType.MailOrder}
                   options={orgSettings.mailOrderNavigateProviders}
                   location={location}
                   selectedId={selectedId}

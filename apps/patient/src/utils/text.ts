@@ -1,27 +1,30 @@
 export const text = {
+  closed: 'Closed',
   contactSupport: 'Contact Support',
   changePharmacy: 'Change pharmacy',
   daysSupply: 'Days supply',
   delivered: 'Delivered',
   delivery: 'Delivery',
+  directions: 'Get directions',
   enterLoc: 'Enter a zipcode or address',
   enterLocLong: "Enter the zipcode or address where you'd like to search for a pharmacy.",
   errorMarkPickedUp: 'Unable to mark order as picked up',
   errorMarkDelivered: 'Unable to mark order as delivered',
   expires: 'Expires',
+  fakeRx: 'This is not a real prescription.',
   findLoc: 'Find a location',
   gettingLoc: 'Getting current location',
   goLocal: 'Select a local pharmacy for pick up.',
+  goodService: 'Good Service',
   inTransit: 'In transit',
+  makePreferred: 'Make this my preferred pharmacy',
   noMatch: "We couldn't find what you're looking for.",
   notifyPickUp: (isPlural: boolean) =>
     `Please notify us below when you’ve picked up your ${
       isPlural ? 'prescriptions' : 'prescription'
     }.`,
-  outForDelivery: (isPlural: boolean) =>
-    `Your order is out for delivery. Please notify us below when you’ve received your ${
-      isPlural ? 'prescriptions' : 'prescription'
-    }.`,
+  open: 'Open',
+  open24hrs: 'Open 24 Hours',
   orderCanceled: 'This order was canceled.',
   orderDelivered: 'Your order was delivered',
   orderInTransit: 'Your order is in transit',
@@ -29,6 +32,10 @@ export const text = {
   orderPlaced: 'Order placed',
   orderReady: 'Your order is ready',
   orderWasPlaced: 'Your order has been placed',
+  outForDelivery: (isPlural: boolean) =>
+    `Your order is out for delivery. Please notify us below when you’ve received your ${
+      isPlural ? 'prescriptions' : 'prescription'
+    }.`,
   patient: 'Patient',
   pickedUp: 'Picked up',
   pickedUpRx: (isPlural: boolean) =>
@@ -40,6 +47,7 @@ export const text = {
       isPlural ? 'prescriptions' : 'prescription'
     } before you select a pharmacy. Reach out to your provider for any issues.`,
   pleaseRefresh: 'Please refresh and try again',
+  preferred: 'Preferred',
   preparing: 'Preparing order',
   preparingDelivery: 'The pharmacy is preparing your order for delivery.',
   preparingOrder: 'Preparing your order',
@@ -51,6 +59,7 @@ export const text = {
     `The pharmacy is preparing your ${
       isPlural ? 'prescriptions' : 'prescription'
     } for pick up. Please <a href="sms:${phoneNumber}">text us</a> if you have any issues.`,
+  previous: 'Previous',
   quantity: 'Quantity',
   questions: 'If you have any questions, please text us at +1 (513) 866-3212.',
   readyBy: 'Ready by',
@@ -130,6 +139,7 @@ export const text = {
   thankYou: 'Thank you!',
   track: 'Track your order',
   tracking: 'Tracking #:',
+  tryPhoton: 'Try Photon',
   useLoc: 'Use my current location',
   weSent: (isPlural: boolean) =>
     `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`

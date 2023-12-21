@@ -20,6 +20,7 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { types } from '@photonhealth/sdk';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { text as t } from '../utils/text';
 
 import { Rating } from './Rating';
 import { formatAddress } from '../utils/general';
@@ -41,7 +42,7 @@ const RatingHours = ({ rating, is24Hr, isOpen, opens, closes }: RatingHoursProps
       {rating && isOpen != null ? <Text color="gray.400">&bull;</Text> : null}
       {isOpen != null ? (
         <Text fontSize="sm" color={isOpen ? 'green' : 'red'}>
-          {isOpen ? 'Open' : 'Closed'}
+          {isOpen ? t.open : t.closed}
         </Text>
       ) : null}
       {!is24Hr && ((isOpen && closes) || (!isOpen && opens)) ? (
@@ -131,24 +132,24 @@ export const PharmacyCard = memo(function PharmacyCard({
             {preferred ? (
               <Tag size="sm" colorScheme="blue">
                 <TagLeftIcon boxSize="12px" as={FiStar} />
-                <TagLabel> Preferred</TagLabel>
+                <TagLabel> {t.preferred}</TagLabel>
               </Tag>
             ) : null}
             {previous && !preferred ? (
               <Tag size="sm" colorScheme="green">
                 <TagLeftIcon boxSize="12px" as={FiRotateCcw} />
-                <TagLabel> Previous</TagLabel>
+                <TagLabel> {t.previous}</TagLabel>
               </Tag>
             ) : null}
             {goodService ? (
               <Tag size="sm" colorScheme="purple">
                 <TagLeftIcon boxSize="12px" as={FiThumbsUp} />
-                <TagLabel> Good service</TagLabel>
+                <TagLabel> {t.goodService}</TagLabel>
               </Tag>
             ) : null}
             {pharmacy?.is24Hr ? (
               <Tag size="sm" colorScheme="green">
-                <TagLabel>24 hr</TagLabel>
+                <TagLabel>{t.open24hrs}</TagLabel>
               </Tag>
             ) : null}
           </HStack>
@@ -183,7 +184,7 @@ export const PharmacyCard = memo(function PharmacyCard({
                 isLoading={savingPreferred}
                 leftIcon={<FiStar />}
               >
-                Make this my preferred pharmacy
+                {t.makePreferred}
               </Button>
             ) : null}
             {onChangePharmacy && canReroute ? (
@@ -195,7 +196,7 @@ export const PharmacyCard = memo(function PharmacyCard({
                 onClick={onChangePharmacy}
                 leftIcon={<FiRefreshCcw />}
               >
-                Change pharmacy
+                {t.changePharmacy}
               </Button>
             ) : null}
             {onGetDirections ? (
@@ -207,7 +208,7 @@ export const PharmacyCard = memo(function PharmacyCard({
                 onClick={onGetDirections}
                 leftIcon={<FiNavigation />}
               >
-                Get directions
+                {t.directions}
               </Button>
             ) : null}
           </CardFooter>

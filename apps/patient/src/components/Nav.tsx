@@ -37,7 +37,7 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
       {isDemo ? (
         <Alert status="info" variant="subtle" w="full" py={2}>
           <HStack spacing={1} mx="auto">
-            <Text fontSize="sm">This is not a real prescription.</Text>
+            <Text fontSize="sm">{t.fakeRx}</Text>
             <Link
               fontSize="sm"
               isExternal
@@ -46,7 +46,7 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
               fontWeight="medium"
               textDecoration="underline"
             >
-              Try Photon
+              {t.tryPhoton}
             </Link>
           </HStack>
         </Alert>
