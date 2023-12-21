@@ -29,12 +29,13 @@ interface NavProps {
 export const Nav = ({ showRefresh = false }: NavProps) => {
   const [searchParams] = useSearchParams();
   const isDemo = searchParams.get('demo');
+  const isProduction = process.env.REACT_APP_ENV_NAME === 'photon';
 
   const { order, logo } = useOrderContext();
 
   return (
     <Box as="nav" bg="white" boxShadow={useColorModeValue('sm', 'sm-dark')}>
-      {isDemo ? (
+      {isDemo || !isProduction ? (
         <Alert status="info" variant="subtle" w="full" py={2}>
           <HStack spacing={1} mx="auto">
             <Text fontSize="sm">{t.fakeRx}</Text>
