@@ -85,10 +85,8 @@ export const text = {
     `Your ${isPlural ? 'prescriptions have' : 'prescription has'} arrived at ${
       isPlural ? 'their' : 'its'
     } destination.`,
-  rxInTransit: (isPlural: boolean, deliveryAddress: string) =>
-    `Your ${
-      isPlural ? 'prescriptions are on their' : 'prescription is on its'
-    } way to ${deliveryAddress}.`,
+  rxInTransit: (isPlural: boolean) =>
+    `Your ${isPlural ? 'prescriptions are on their' : 'prescription is on its'} way to `,
   rxPickedUpTextUs: (isPlural: boolean) =>
     `Your ${isPlural ? 'prescriptions were' : 'prescription was'} picked up.`,
   rxPickUp: (isPlural: boolean) =>
@@ -193,8 +191,7 @@ export const orderStateMapping = {
       heading: text.orderInTransit,
       subheading: (isPlural: boolean) => text.sentWithOrderSms(isPlural),
       status: text.inTransit,
-      description: (isPlural: boolean, deliveryAddress: string) =>
-        text.rxInTransit(isPlural, deliveryAddress),
+      description: (isPlural: boolean) => text.rxInTransit(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
     DELIVERED: {
@@ -228,8 +225,7 @@ export const orderStateMapping = {
       heading: text.orderInTransit,
       subheading: (isPlural: boolean) => text.outForDelivery(isPlural),
       status: text.inTransit,
-      description: (isPlural: boolean, deliveryAddress: string) =>
-        text.rxInTransit(isPlural, deliveryAddress),
+      description: (isPlural: boolean) => text.rxInTransit(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
     DELIVERED: {

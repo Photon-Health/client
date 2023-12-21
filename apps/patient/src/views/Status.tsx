@@ -115,15 +115,8 @@ export const Status = () => {
   };
 
   useEffect(() => {
-    // Show the pharmacy with ratings + hours if not mail order or courier
-    const showEnrichedPharmacy =
-      fulfillmentType !== (types.FulfillmentType.MailOrder || 'COURIER') &&
-      pharmacy?.name &&
-      pharmacy?.address;
-    if (showEnrichedPharmacy) {
-      initializePharmacy(pharmacy);
-    }
-  }, [pharmacy]);
+    initializePharmacy(pharmacy);
+  }, []);
 
   // People that select a pharmacy low in the list might start at bottom of status page
   useEffect(() => {
@@ -183,6 +176,9 @@ export const Status = () => {
     fulfillmentState === 'DELIVERED' ||
     fulfillmentState === 'PICKED_UP' ||
     fulfillmentState === 'RECEIVED';
+
+  console.log('pharmacy', pharmacy);
+  console.log('enriched ', enrichedPharmacy);
 
   return (
     <Box>

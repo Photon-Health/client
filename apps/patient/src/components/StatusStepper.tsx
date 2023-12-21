@@ -56,8 +56,9 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
             {states.map((state, id) => {
               const title = t[fulfillmentType][state].status;
               const isDelivery = state === 'IN_TRANSIT' || state === 'SHIPPED';
-              const thing = t[fulfillmentType][state].description(isMultiRx);
-              const description = isDelivery ? `${thing}${patientAddress}.` : thing;
+              const description = isDelivery
+                ? `${t[fulfillmentType][state].description(isMultiRx)}${patientAddress}.`
+                : t[fulfillmentType][state].description(isMultiRx);
 
               return (
                 <Step key={id}>

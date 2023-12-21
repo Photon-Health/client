@@ -339,17 +339,31 @@ export const Pharmacy = () => {
           setTimeout(() => {
             setShowFooter(false);
 
+            // Fudge it so that we can show the pharmacy card on initial load of the
+            // status view for all types. On my christmas list for 2024 is better
+            // fulfillment types on pharmacies.
             let type: ExtendedFulfillmentType = types.FulfillmentType.PickUp;
+            let selectedPharmacy = null;
             if (selectedId in capsulePharmacyIdLookup) {
               type = 'COURIER';
-            } else if (orgSettings.mailOrderNavigateProviders.includes(selectedId)) {
+              selectedPharmacy = { id: selectedId, name: 'Capsule Pharmacy' };
+            } else if (selectedId === process.env.REACT_APP_ALTO_PHARMACY_ID) {
+              type = 'COURIER';
+              selectedPharmacy = { id: selectedId, name: 'Alto Pharmacy' };
+            } else if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
               type = types.FulfillmentType.MailOrder;
+              selectedPharmacy = { id: selectedId, name: 'Amazon Pharmacy' };
+            } else if (selectedId === process.env.REACT_APP_COSTCO_PHARMACY_ID) {
+              type = types.FulfillmentType.MailOrder;
+              selectedPharmacy = { id: selectedId, name: 'Costco Pharmacy' };
+            } else {
+              type = types.FulfillmentType.PickUp;
+              selectedPharmacy = pharmacyOptions.find((p) => p.id === selectedId);
             }
 
-            // Update the order context so /status shows the newly selected pharmacy
-            const selectedPharmacy = pharmacyOptions.find((p) => p.id === selectedId);
             setOrder({
               ...order,
+              // Update the order context so /status shows the newly selected pharmacy
               pharmacy: selectedPharmacy
             });
 
