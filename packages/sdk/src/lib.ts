@@ -15,6 +15,10 @@ import { getClinicalUrl } from './utils';
 export * as types from './types';
 export * as fragments from './fragments';
 
+import * as packageJson from '../package.json';
+
+const version: string = packageJson?.version ?? 'unknown';
+
 /**
  * Configuration options for Photon SDK
  * @param domain The Auth0 domain
@@ -70,15 +74,18 @@ export class PhotonClient {
    * @param config - Photon SDK configuration options
    * @remarks - Note, that organization is optional for scenarios in which a provider supports more than themselves.
    */
-  constructor({
-    domain,
-    clientId,
-    redirectURI,
-    organization,
-    audience = 'https://api.photon.health',
-    uri = 'https://api.photon.health/graphql',
-    developmentMode = false
-  }: PhotonClientOptions) {
+  constructor(
+    {
+      domain,
+      clientId,
+      redirectURI,
+      organization,
+      audience = 'https://api.photon.health',
+      uri = 'https://api.photon.health/graphql',
+      developmentMode = false
+    }: PhotonClientOptions,
+    elementsVersion?: string
+  ) {
     this.auth0Client = new Auth0Client({
       domain: domain ? domain : developmentMode ? 'auth.neutron.health' : 'auth.photon.health',
       client_id: clientId,
@@ -99,16 +106,21 @@ export class PhotonClient {
       audience: this.audience
     });
 
-    this.apollo = this.constructApolloClient();
+    this.apollo = this.constructApolloClient({ elementsVersion });
     this.clinical = new ClinicalQueryManager(this.apollo);
     this.management = new ManagementQueryManager(this.apollo);
   }
 
-  private constructApolloClient() {
+  private constructApolloClient({ elementsVersion }: { elementsVersion?: string } = {}) {
     const apollo = new ApolloClient({
-      link: setContext(async (_, { headers, ...rest }) => {
+      link: setContext(async (_, { headers: baseHeaders, ...rest }) => {
         const token = await this.authentication.getAccessToken();
 
+        const headers = {
+          ...baseHeaders,
+          'x-photon-sdk-version': version,
+          ...(elementsVersion ? { 'x-photon-elements-version': elementsVersion } : {})
+        };
         if (!token) {
           return { headers, ...rest };
         }
