@@ -177,9 +177,6 @@ export const Status = () => {
     fulfillmentState === 'PICKED_UP' ||
     fulfillmentState === 'RECEIVED';
 
-  console.log('pharmacy', pharmacy);
-  console.log('enriched ', enrichedPharmacy);
-
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
