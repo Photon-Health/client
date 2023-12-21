@@ -192,10 +192,10 @@ export const Status = () => {
         <VStack spacing={6} align="start" pt={5}>
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
-              {m[fulfillmentType][fulfillment.state].heading}
+              {m[fulfillmentType][fulfillment?.state].heading}
             </Heading>
             <Text>
-              {m[fulfillmentType][fulfillment.state].subheading(isMultiRx, PHOTON_PHONE_NUMBER)}
+              {m[fulfillmentType][fulfillment?.state].subheading(isMultiRx, PHOTON_PHONE_NUMBER)}
             </Text>
           </VStack>
           {enrichedPharmacy ? (
@@ -251,7 +251,7 @@ export const Status = () => {
           >
             {successfullySubmitted
               ? t.thankYou
-              : m[fulfillmentType][fulfillment.state].cta(isMultiRx)}
+              : m[fulfillmentType][fulfillment?.state].cta(isMultiRx)}
           </Button>
           <PoweredBy />
         </Container>
