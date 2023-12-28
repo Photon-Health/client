@@ -6,7 +6,7 @@ import { types } from '@photonhealth/sdk';
 import { ExtendedFulfillmentType } from './models';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { getPlace } from '../api';
-import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
+import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
 
 dayjs.extend(isoWeek);
 dayjs.extend(isBetween);
@@ -39,7 +39,7 @@ export const getFulfillmentType = (
   param?: string
 ): ExtendedFulfillmentType => {
   // We don't have COURIER fulfillment type yet, so manually check for those
-  if (pharmacyId in capsuleZipcodeLookup) {
+  if (pharmacyId in COMMON_COURIER_PHARMACY_IDS) {
     return 'COURIER';
   }
 
