@@ -25,7 +25,7 @@ const defaultSettings: OrganizationSettings = {
   sendToPatient: true,
   sendToPatientUsers: [],
   enablePatientRerouting: true,
-  enableCourierNavigate: true,
+  enableCourierNavigate: false,
   returnTo: window.location.origin,
   federated: false,
   enableMedHistory: false,
