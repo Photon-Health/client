@@ -99,7 +99,6 @@ export class AuthManager {
       authorizationParams = Object.assign(opts, { appState });
     }
     opts.authorizationParams = authorizationParams;
-    console.log('login', opts, organizationId, this.organization);
 
     return this.authentication.loginWithRedirect(opts);
   }
