@@ -142,8 +142,7 @@ export class AuthManager {
     const opts: GetTokenSilentlyOptions | GetTokenWithPopupOptions = {
       authorizationParams: {
         audience: audience || this.audience || undefined,
-        ...(this.organization ? { organization: this.organization } : {}),
-        scope: 'openid profile email offline_access'
+        ...(this.organization ? { organization: this.organization } : {})
       }
     };
 
