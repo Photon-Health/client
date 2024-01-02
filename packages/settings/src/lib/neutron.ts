@@ -25,7 +25,7 @@ const defaultSettings: OrganizationSettings = {
   sendToPatient: true,
   sendToPatientUsers: [],
   enablePatientRerouting: true,
-  enableCourierNavigate: true,
+  enableCourierNavigate: false,
   returnTo: window.location.origin,
   federated: false,
   enableMedHistory: false,
@@ -235,5 +235,11 @@ export const neutron: {
     logo: 'pine_medical_logo.svg',
     accentColor: '#000000',
     enableRxAndOrder: false
+  },
+  // Brightside
+  org_Dcq069P9AxLlv4l2: {
+    ...defaultSettings,
+    logo: 'brightside_health_logo.svg',
+    accentColor: '#2e4985'
   }
 };
