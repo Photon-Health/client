@@ -15,7 +15,7 @@ import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { Helmet } from 'react-helmet';
 import { types } from '@photonhealth/sdk';
 import * as TOAST_CONFIG from '../configs/toast';
-import { formatAddress, preparePharmacy, countFillsAndRemoveDuplicates } from '../utils/general';
+import { formatAddress, preparePharmacy } from '../utils/general';
 import { ExtendedFulfillmentType, Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import {
@@ -47,7 +47,7 @@ const INITIAL_PHARMACY_COUNT = 5;
 const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
 
 export const Pharmacy = () => {
-  const { order, setOrder } = useOrderContext();
+  const { order, flattenedFills, setOrder } = useOrderContext();
 
   const orgSettings =
     order?.organization?.id in settings ? settings[order.organization.id] : settings.default;
@@ -459,7 +459,6 @@ export const Pharmacy = () => {
     }
   }, [enableOpenNow, enable24Hr]);
 
-  const flattenedFills = countFillsAndRemoveDuplicates(order.fills);
   const isMultiRx = flattenedFills.length > 1;
 
   const isCapsuleTerritory = order?.address?.postalCode in capsuleZipcodeLookup;

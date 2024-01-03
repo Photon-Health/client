@@ -19,12 +19,12 @@ import { FaPrescription } from 'react-icons/fa';
 import { Helmet } from 'react-helmet';
 
 import { useOrderContext } from './Main';
-import { formatDate, countFillsAndRemoveDuplicates } from '../utils/general';
+import { formatDate } from '../utils/general';
 import { FixedFooter, Nav, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
 
 export const Review = () => {
-  const { order } = useOrderContext();
+  const { order, flattenedFills } = useOrderContext();
 
   const navigate = useNavigate();
 
@@ -33,7 +33,7 @@ export const Review = () => {
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
 
-  const { patient, fills } = order;
+  const { patient } = order;
 
   const handleCtaClick = () => {
     const toUrl = isDemo
@@ -42,7 +42,6 @@ export const Review = () => {
     navigate(toUrl);
   };
 
-  const flattenedFills = countFillsAndRemoveDuplicates(fills);
   const isMultiRx = flattenedFills.length > 1;
 
   return (

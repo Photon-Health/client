@@ -12,12 +12,7 @@ import {
   PoweredBy,
   StatusStepper
 } from '../components';
-import {
-  formatAddress,
-  getFulfillmentType,
-  preparePharmacy,
-  countFillsAndRemoveDuplicates
-} from '../utils/general';
+import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t, orderStateMapping as m } from '../utils/text';
 import { useOrderContext } from './Main';
@@ -29,7 +24,7 @@ const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
 export const Status = () => {
   const navigate = useNavigate();
-  const { order, setOrder } = useOrderContext();
+  const { order, flattenedFills, setOrder } = useOrderContext();
 
   const orgSettings =
     order?.organization?.id in settings ? settings[order.organization.id] : settings.default;
@@ -52,7 +47,7 @@ export const Status = () => {
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
   const [enrichedPharmacy, setEnrichedPharmacy] = useState<EnrichedPharmacy | undefined>(undefined);
 
-  const { fulfillment, pharmacy, address, fills } = order;
+  const { fulfillment, pharmacy, address } = order;
 
   const fulfillmentType = getFulfillmentType(pharmacy?.id, fulfillment, type);
 
@@ -165,7 +160,6 @@ export const Status = () => {
     }
   }, []);
 
-  const flattenedFills = countFillsAndRemoveDuplicates(fills);
   const isMultiRx = flattenedFills.length > 1;
 
   // There's still a slight delay (1-3s) before fulfillment is created,

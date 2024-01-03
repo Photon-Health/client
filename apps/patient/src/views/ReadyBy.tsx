@@ -6,7 +6,6 @@ import dayjs from 'dayjs';
 
 import { FixedFooter, Nav, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
-import { countFillsAndRemoveDuplicates } from '../utils/general';
 import { useOrderContext } from './Main';
 
 const checkDisabled = (option: string): boolean => {
@@ -16,9 +15,9 @@ const checkDisabled = (option: string): boolean => {
 };
 
 export const ReadyBy = () => {
-  const { order } = useOrderContext();
+  const { order, flattenedFills } = useOrderContext();
 
-  const { id, fills } = order;
+  const { id } = order;
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
@@ -32,7 +31,6 @@ export const ReadyBy = () => {
     navigate(`/pharmacy?orderId=${id}&token=${token}`);
   };
 
-  const flattenedFills = countFillsAndRemoveDuplicates(fills);
   const isMultiRx = flattenedFills.length > 1;
 
   return (

@@ -127,7 +127,7 @@ export const PharmacyCard = memo(function PharmacyCard({
       cursor={selectable ? 'pointer' : undefined}
     >
       <CardBody p={3}>
-        <VStack align="start" w="full" spacing={1}>
+        <VStack align="start" w="full" spacing={showDetails ? 1 : 0}>
           <HStack spacing={2}>
             {preferred ? (
               <Tag size="sm" colorScheme="blue">
