@@ -6,7 +6,6 @@ export const prescriptions = [
     quantity: '3 ML',
     daysSupply: 28,
     refills: 1,
-    substitutions: false,
     expires: '04/20/23',
     instructions: 'Inject 2.4 mg SC once weekly for 4 weeks (28 days)'
   },
@@ -17,7 +16,6 @@ export const prescriptions = [
     quantity: '100 ML',
     daysSupply: 10,
     refills: 1,
-    substitutions: false,
     expires: '04/20/23',
     instructions: '4.5 ml PO BID x 10 days'
   },
@@ -27,7 +25,6 @@ export const prescriptions = [
     quantity: '2 tablets',
     daysSupply: 2,
     refills: 1,
-    substitutions: false,
     expires: '05/06/23',
     instructions: 'Crush 1 tablet and mix with food once a day'
   }

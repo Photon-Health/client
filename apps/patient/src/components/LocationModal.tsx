@@ -17,6 +17,7 @@ import {
 } from '@chakra-ui/react';
 import { FiTarget } from 'react-icons/fi';
 import { AsyncSelect } from 'chakra-react-select';
+import { debounce } from 'lodash';
 
 import { text as t } from '../utils/text';
 
@@ -49,6 +50,14 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
     return formatLocationOptions(opts.predictions);
   };
 
+  const debouncedSearchForLocations = debounce(
+    async (inputValue: string, callback: (options: any) => void) => {
+      const options = await searchForLocations(inputValue);
+      callback(options);
+    },
+    1000
+  );
+
   const geocode = async (address: string) => {
     const data = await geocoder.geocode({ address });
     if (data?.results) {
@@ -79,17 +88,11 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
     }
   };
 
-  const loadOptions = (inputValue: string, callback: (options: any) => void) => {
-    setTimeout(async () => {
-      callback(await searchForLocations(inputValue));
-    }, 1000);
-  };
-
   return (
     <Modal isOpen={isOpen} onClose={() => onClose({})}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>{t.pharmacy.modal.heading}</ModalHeader>
+        <ModalHeader>{t.setLoc}</ModalHeader>
         <ModalCloseButton />
         {isDemo ? (
           <Alert status="warning">
@@ -98,17 +101,17 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
           </Alert>
         ) : null}
         <ModalBody pb={6}>
-          <Text> {t.pharmacy.modal.subheading}</Text>
+          <Text>{t.enterLocLong}</Text>
           <Button
             w="full"
             leftIcon={<FiTarget />}
             mt={5}
             onClick={async () => getCurrentLocation()}
             isLoading={gettingCurrentLocation}
-            loadingText={t.pharmacy.modal.getting}
+            loadingText={t.gettingLoc}
             isDisabled={!!isDemo}
           >
-            {t.pharmacy.modal.currentLocation}
+            {t.useLoc}
           </Button>
           <HStack spacing={2} mt={5}>
             <Divider />
@@ -117,15 +120,17 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
           </HStack>
           <VStack spacing={1} align="start">
             <Text mt={5} fontWeight="medium">
-              {t.pharmacy.modal.find}
+              {t.findLoc}
             </Text>
             <VStack w="full" align="stretch">
               <Text pb={0} mt={0} fontSize="sm">
-                {t.pharmacy.modal.enter}
+                {t.enterLoc}
               </Text>
               <AsyncSelect
                 placeholder=""
-                loadOptions={loadOptions}
+                loadOptions={(inputValue: string, callback: (options) => void) => {
+                  debouncedSearchForLocations(inputValue, callback);
+                }}
                 defaultOptions={[]}
                 isClearable
                 menuPlacement="auto"

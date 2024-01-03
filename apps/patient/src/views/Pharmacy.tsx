@@ -16,7 +16,7 @@ import { Helmet } from 'react-helmet';
 import { types } from '@photonhealth/sdk';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, preparePharmacy } from '../utils/general';
-import { ExtendedFulfillmentType } from '../utils/models';
+import { ExtendedFulfillmentType, Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import {
   BrandedOptions,
@@ -28,7 +28,6 @@ import {
 } from '../components';
 import { useOrderContext } from './Main';
 import { getSettings } from '@client/settings';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import {
   geocode,
   getPharmacies,
@@ -48,7 +47,7 @@ const INITIAL_PHARMACY_COUNT = 5;
 const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
 
 export const Pharmacy = () => {
-  const { order, setOrder } = useOrderContext();
+  const { order, flattenedFills, setOrder } = useOrderContext();
 
   const orgSettings =
     order?.organization?.id in settings ? settings[order.organization.id] : settings.default;
@@ -340,17 +339,31 @@ export const Pharmacy = () => {
           setTimeout(() => {
             setShowFooter(false);
 
+            // Fudge it so that we can show the pharmacy card on initial load of the
+            // status view for all types. On my christmas list for 2024 is better
+            // fulfillment types on pharmacies.
             let type: ExtendedFulfillmentType = types.FulfillmentType.PickUp;
+            let selectedPharmacy = null;
             if (selectedId in capsulePharmacyIdLookup) {
               type = 'COURIER';
-            } else if (orgSettings.mailOrderNavigateProviders.includes(selectedId)) {
+              selectedPharmacy = { id: selectedId, name: 'Capsule Pharmacy' };
+            } else if (selectedId === process.env.REACT_APP_ALTO_PHARMACY_ID) {
+              type = 'COURIER';
+              selectedPharmacy = { id: selectedId, name: 'Alto Pharmacy' };
+            } else if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
               type = types.FulfillmentType.MailOrder;
+              selectedPharmacy = { id: selectedId, name: 'Amazon Pharmacy' };
+            } else if (selectedId === process.env.REACT_APP_COSTCO_PHARMACY_ID) {
+              type = types.FulfillmentType.MailOrder;
+              selectedPharmacy = { id: selectedId, name: 'Costco Pharmacy' };
+            } else {
+              type = types.FulfillmentType.PickUp;
+              selectedPharmacy = pharmacyOptions.find((p) => p.id === selectedId);
             }
 
-            // Update the order context so /status shows the newly selected pharmacy
-            const selectedPharmacy = pharmacyOptions.find((p) => p.id === selectedId);
             setOrder({
               ...order,
+              // Update the order context so /status shows the newly selected pharmacy
               pharmacy: selectedPharmacy
             });
 
@@ -446,20 +459,22 @@ export const Pharmacy = () => {
     }
   }, [enableOpenNow, enable24Hr]);
 
+  const isMultiRx = flattenedFills.length > 1;
+
   const isCapsuleTerritory = order?.address?.postalCode in capsuleZipcodeLookup;
   const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
 
-  const heading = isReroute ? t.pharmacy.heading.reroute : t.pharmacy.heading.original;
+  const heading = isReroute ? t.changePharmacy : t.selectPharmacy;
   const subheading = isReroute
-    ? t.pharmacy.subheading.reroute(order.pharmacy.name)
-    : t.pharmacy.subheading.original;
+    ? t.sendToNew(isMultiRx, order.pharmacy.name)
+    : t.sendToSelected(isMultiRx);
 
   return (
     <Box>
       <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />
       <Helmet>
-        <title>{t.pharmacy.title}</title>
+        <title>{t.selectPharmacy}</title>
       </Helmet>
 
       <Nav />
@@ -476,7 +491,7 @@ export const Pharmacy = () => {
           <HStack justify="space-between" w="full">
             {location ? (
               <VStack w="full" align="start" spacing={1}>
-                <Text size="sm">{t.pharmacy.showing}</Text>
+                <Text size="sm">{t.showingLabel}</Text>
                 <Link
                   onClick={() => setLocationModalOpen(true)}
                   display="inline"
@@ -491,7 +506,7 @@ export const Pharmacy = () => {
               </VStack>
             ) : (
               <Button variant="brand" onClick={() => setLocationModalOpen(true)}>
-                {t.pharmacy.setLocation}
+                {t.setLoc}
               </Button>
             )}
           </HStack>
@@ -500,7 +515,6 @@ export const Pharmacy = () => {
             <VStack spacing={9} align="stretch">
               {enableCourier ? (
                 <BrandedOptions
-                  type="COURIER"
                   options={[capsuleZipcodeLookup[order?.address?.postalCode].pharmacyId]}
                   location={location}
                   selectedId={selectedId}
@@ -510,7 +524,6 @@ export const Pharmacy = () => {
               ) : null}
               {enableMailOrder ? (
                 <BrandedOptions
-                  type={types.FulfillmentType.MailOrder}
                   options={orgSettings.mailOrderNavigateProviders}
                   location={location}
                   selectedId={selectedId}
@@ -551,7 +564,7 @@ export const Pharmacy = () => {
             onClick={!successfullySubmitted ? handleSubmit : undefined}
             isLoading={submitting}
           >
-            {successfullySubmitted ? t.pharmacy.thankYou : t.pharmacy.cta}
+            {successfullySubmitted ? t.thankYou : t.selectPharmacy}
           </Button>
           <PoweredBy />
         </Container>
