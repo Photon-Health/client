@@ -12,6 +12,7 @@ export const text = {
   errorMarkDelivered: 'Unable to mark order as delivered',
   expires: 'Expires',
   fakeRx: 'This is not a real prescription.',
+  fakeRxs: 'These are not real prescriptions.',
   findLoc: 'Find a location',
   gettingLoc: 'Getting current location',
   goLocal: 'Select a local pharmacy for pick up.',

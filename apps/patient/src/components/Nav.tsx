@@ -29,14 +29,16 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
   const isDemo = searchParams.get('demo');
   const isProd = process.env.REACT_APP_ENV_NAME === 'photon';
 
-  const { order, logo } = useOrderContext();
+  const { order, flattenedFills, logo } = useOrderContext();
+
+  const isMultiRx = flattenedFills.length > 1;
 
   return (
     <Box as="nav" bg="white" boxShadow={useColorModeValue('sm', 'sm-dark')}>
       {isDemo || !isProd ? (
         <Alert status="info" variant="subtle" w="full" py={2}>
           <HStack spacing={1} mx="auto">
-            <Text fontSize="sm">{t.fakeRx}</Text>
+            <Text fontSize="sm">{isMultiRx ? t.fakeRxs : t.fakeRx}</Text>
             <Link
               fontSize="sm"
               isExternal
