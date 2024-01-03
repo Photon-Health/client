@@ -77,6 +77,13 @@ export const Status = () => {
         if (result) {
           setSuccessfullySubmitted(true);
           setTimeout(() => setShowFooter(false), 1000);
+
+          setOrder({
+            ...order,
+            fulfillment: {
+              state: 'PICKED_UP'
+            }
+          });
         } else {
           toast({
             title: m[fulfillmentType].error.title,
