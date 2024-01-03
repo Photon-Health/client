@@ -134,7 +134,11 @@ type ProviderFormikErrorsType = FormikErrors<ProviderYupType>;
 export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClose }) => {
   const client = useClinicalApiClient();
   console.log('my user id', userId);
-  const { data: userData, error: userDataError } = useQuery(GetUserQuery, {
+  const {
+    data: userData,
+    error: userDataError,
+    loading
+  } = useQuery(GetUserQuery, {
     client,
     variables: { userId: userId }
   });
@@ -187,7 +191,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
         street1: userData?.user?.address?.street1 ?? '',
         street2: userData?.user?.address?.street2 ?? undefined,
         city: userData?.user?.address?.city ?? '',
-        state: (userData?.user?.address?.state as any) ?? '',
+        state: { value: (userData?.user?.address?.state as string) ?? '' },
         postalCode: userData?.user?.address?.postalCode ?? ''
       },
       phone: userData?.user?.phone ?? ''
@@ -222,59 +226,60 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
             <Text fontSize="sm">{userData?.user?.email}</Text>
           </VStack>
         </Box>
-        <Formik
-          validateOnBlur
-          initialValues={initialValues}
-          validationSchema={roleSchema}
-          onSubmit={async (values, { validateForm, resetForm }) => {
-            await validateForm(values);
-            await handleSaveRoles({
-              variables: {
-                email: values.email,
-                roles: values.roles,
-                ...(values.provider == null
-                  ? {}
-                  : {
-                      provider: {
-                        ...values.provider,
-                        address: {
-                          ...values.provider.address,
-                          state: values.provider.address?.state?.value,
-                          country: 'US'
+        {!loading && userData && (
+          <Formik
+            validateOnBlur
+            initialValues={initialValues}
+            validationSchema={roleSchema}
+            onSubmit={async (values, { validateForm, resetForm }) => {
+              await validateForm(values);
+              await handleSaveRoles({
+                variables: {
+                  email: values.email,
+                  roles: values.roles,
+                  ...(values.provider == null
+                    ? {}
+                    : {
+                        provider: {
+                          ...values.provider,
+                          address: {
+                            ...values.provider.address,
+                            state: values.provider.address?.state?.value,
+                            country: 'US'
+                          }
                         }
-                      }
-                    })
-              }
-            });
-            resetForm();
-            onClose();
-          }}
-        >
-          {({ setFieldValue, handleSubmit, errors, touched, values, setFieldTouched }) => {
-            // Typescript thinks that errors.provider and touched.provider are simple strings/bools
-            // but really theyre objects
-            const providerErrors = errors.provider as ProviderFormikErrorsType | undefined;
-            const providerTouched = touched.provider as ProviderFormikTouchedType | undefined;
-            console.log('user data', userData);
-            return (
-              <form onSubmit={handleSubmit} noValidate>
-                <VStack spacing={2} align="stretch">
-                  <FormControl isInvalid={!!errors.roles && !!touched.roles} pb="4" isRequired>
-                    <FormLabel htmlFor="roles" mb={1}>
-                      Roles
-                    </FormLabel>
-                    <RolesSelect
-                      onChange={(newValue) => setFieldValue('roles', newValue)}
-                      onBlur={() => setFieldTouched('roles')}
-                      value={values.roles}
-                    />
-                    <ErrorMessage name="roles" component={FormErrorMessage} />
-                  </FormControl>
+                      })
+                }
+              });
+              resetForm();
+              onClose();
+            }}
+          >
+            {({ setFieldValue, handleSubmit, errors, touched, values, setFieldTouched }) => {
+              // Typescript thinks that errors.provider and touched.provider are simple strings/bools
+              // but really theyre objects
+              const providerErrors = errors.provider as ProviderFormikErrorsType | undefined;
+              const providerTouched = touched.provider as ProviderFormikTouchedType | undefined;
+              console.log('user data', userData);
 
-                  {hasPrescriberRole(values.roles) &&
-                    (userData?.user?.npi == undefined ||
-                      userData?.user?.address == undefined ||
-                      userData?.user?.email == undefined) && (
+              console.log('ERRORRERRORORRORORO', errors);
+              console.log('values', values);
+              return (
+                <form onSubmit={handleSubmit} noValidate>
+                  <VStack spacing={2} align="stretch">
+                    <FormControl isInvalid={!!errors.roles && !!touched.roles} pb="4" isRequired>
+                      <FormLabel htmlFor="roles" mb={1}>
+                        Roles
+                      </FormLabel>
+                      <RolesSelect
+                        onChange={(newValue) => setFieldValue('roles', newValue)}
+                        onBlur={() => setFieldTouched('roles')}
+                        value={values.roles}
+                      />
+                      <ErrorMessage name="roles" component={FormErrorMessage} />
+                    </FormControl>
+
+                    {hasPrescriberRole(values.roles) && (
                       <>
                         <FormControl
                           isRequired
@@ -354,11 +359,14 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
                           pb="4"
                         >
                           <FormLabel htmlFor="provider.address.state" mb={1}>
-                            State
+                            State {values.provider?.address?.state?.value}
                           </FormLabel>
                           <FormikStateSelect
-                            value={values.provider?.address?.state}
-                            defaultValue={{ value: userData?.user?.address?.state ?? '' }}
+                            value={
+                              values.provider?.address?.state?.value
+                                ? { value: values.provider?.address?.state?.value }
+                                : undefined
+                            }
                             setFieldTouched={setFieldTouched}
                             setFieldValue={setFieldValue}
                             fieldName="provider.address.state"
@@ -402,33 +410,34 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
                         </FormControl>
                       </>
                     )}
-                </VStack>
-                <ModalFooter px="0">
-                  <VStack>
-                    <HStack>
-                      <Button variant="outline" mr={3} onClick={onClose}>
-                        Close
-                      </Button>
-
-                      <Button
-                        type="submit"
-                        colorScheme="blue"
-                        isDisabled={
-                          !!errors.roles ||
-                          !!errors.email ||
-                          !!(errors.provider && hasPrescriberRole(values.roles)) ||
-                          !touched.roles
-                        }
-                      >
-                        Update Role
-                      </Button>
-                    </HStack>
                   </VStack>
-                </ModalFooter>
-              </form>
-            );
-          }}
-        </Formik>
+                  <ModalFooter px="0">
+                    <VStack>
+                      <HStack>
+                        <Button variant="outline" mr={3} onClick={onClose}>
+                          Close
+                        </Button>
+
+                        <Button
+                          type="submit"
+                          colorScheme="blue"
+                          isDisabled={
+                            !!errors.roles ||
+                            !!errors.email ||
+                            !!(errors.provider && hasPrescriberRole(values.roles)) ||
+                            !touched.roles
+                          }
+                        >
+                          Update Role
+                        </Button>
+                      </HStack>
+                    </VStack>
+                  </ModalFooter>
+                </form>
+              );
+            }}
+          </Formik>
+        )}
       </ModalBody>
     </ModalContent>
   );

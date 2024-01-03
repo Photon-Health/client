@@ -50,7 +50,7 @@ const UserItemActions: React.FC<UserItemActionsProps> = ({
       </Menu>
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
-        <EditRolesAction userId={userId} onClose={onClose}></EditRolesAction>
+        {isOpen && <EditRolesAction userId={userId} onClose={onClose}></EditRolesAction>}
       </Modal>
     </HStack>
   );
