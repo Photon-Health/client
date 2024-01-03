@@ -51,7 +51,7 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
   };
 
   const debouncedSearchForLocations = debounce(
-    async (inputValue: string, callback: (options) => void) => {
+    async (inputValue: string, callback: (options: any) => void) => {
       const options = await searchForLocations(inputValue);
       callback(options);
     },
@@ -86,10 +86,6 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
     } else {
       setGettingCurrentLocation(false);
     }
-  };
-
-  const loadOptions = (inputValue: string, callback: (options: any) => void) => {
-    debouncedSearchForLocations(inputValue, callback);
   };
 
   return (
@@ -132,7 +128,9 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
               </Text>
               <AsyncSelect
                 placeholder=""
-                loadOptions={loadOptions}
+                loadOptions={(inputValue: string, callback: (options) => void) => {
+                  debouncedSearchForLocations(inputValue, callback);
+                }}
                 defaultOptions={[]}
                 isClearable
                 menuPlacement="auto"
