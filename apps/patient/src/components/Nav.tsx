@@ -20,8 +20,6 @@ import { text as t } from '../utils/text';
 import { Logo as PhotonLogo } from './Logo';
 import { useOrderContext } from '../views/Main';
 
-const PHOTON_PHONE_NUMBER = '+15138663212';
-
 interface NavProps {
   showRefresh?: boolean;
 }
@@ -29,15 +27,18 @@ interface NavProps {
 export const Nav = ({ showRefresh = false }: NavProps) => {
   const [searchParams] = useSearchParams();
   const isDemo = searchParams.get('demo');
+  const isProd = process.env.REACT_APP_ENV_NAME === 'photon';
 
-  const { order, logo } = useOrderContext();
+  const { order, flattenedFills, logo } = useOrderContext();
+
+  const isMultiRx = flattenedFills.length > 1;
 
   return (
     <Box as="nav" bg="white" boxShadow={useColorModeValue('sm', 'sm-dark')}>
-      {isDemo ? (
+      {isDemo || !isProd ? (
         <Alert status="info" variant="subtle" w="full" py={2}>
           <HStack spacing={1} mx="auto">
-            <Text fontSize="sm">This is not a real prescription.</Text>
+            <Text fontSize="sm">{isMultiRx ? t.fakeRxs : t.fakeRx}</Text>
             <Link
               fontSize="sm"
               isExternal
@@ -46,7 +47,7 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
               fontWeight="medium"
               textDecoration="underline"
             >
-              Try Photon
+              {t.tryPhoton}
             </Link>
           </HStack>
         </Alert>
@@ -90,7 +91,10 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
             />
             <MenuList>
               <MenuItem>
-                <Link href={`sms:${PHOTON_PHONE_NUMBER}`} style={{ textDecoration: 'none' }}>
+                <Link
+                  href={`sms:${process.env.REACT_APP_TWILIO_SMS_NUMBER}`}
+                  style={{ textDecoration: 'none' }}
+                >
                   {t.contactSupport}
                 </Link>
               </MenuItem>
