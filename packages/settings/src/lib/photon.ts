@@ -22,7 +22,7 @@ const defaultSettings: OrganizationSettings = {
   sendToPatient: true,
   sendToPatientUsers: [],
   enablePatientRerouting: false,
-  enableCourierNavigate: true,
+  enableCourierNavigate: false,
   returnTo: window.location.origin,
   federated: false,
   enableMedHistory: false,
@@ -228,5 +228,11 @@ export const photon: {
     accentColor: '#FF001F',
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID]
+  },
+  // Brightside
+  org_Dcq069P9AxLlv4l2: {
+    ...defaultSettings,
+    logo: 'brightside_health_logo.svg',
+    accentColor: '#2e4985'
   }
 };
