@@ -102,26 +102,19 @@ export type Medication = Treatment & {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  addRole: Scalars['ID']['output'];
   createClient: Client;
   createWebhookConfig: Scalars['ID']['output'];
   deleteInvite: Scalars['ID']['output'];
   deleteWebhookConfig: Scalars['ID']['output'];
   inviteUser: Invite;
-  removeRole: Scalars['ID']['output'];
   resendInvite: Invite;
   rotateClientSecret: Client;
+  setUserRoles: Scalars['ID']['output'];
   updateClient: Scalars['ID']['output'];
   updateOrganization: Scalars['ID']['output'];
   updateProviderProfile: Scalars['ID']['output'];
   updateProviderSignature: Scalars['ID']['output'];
   updateWebhookConfig: Scalars['ID']['output'];
-};
-
-
-export type MutationAddRoleArgs = {
-  roleId: Scalars['ID']['input'];
-  userId: Scalars['String']['input'];
 };
 
 
@@ -158,12 +151,6 @@ export type MutationInviteUserArgs = {
 };
 
 
-export type MutationRemoveRoleArgs = {
-  roleId: Scalars['ID']['input'];
-  userId: Scalars['String']['input'];
-};
-
-
 export type MutationResendInviteArgs = {
   inviteId: Scalars['ID']['input'];
 };
@@ -171,6 +158,12 @@ export type MutationResendInviteArgs = {
 
 export type MutationRotateClientSecretArgs = {
   clientId: Scalars['ID']['input'];
+};
+
+
+export type MutationSetUserRolesArgs = {
+  roles: Array<Scalars['ID']['input']>;
+  userId: Scalars['ID']['input'];
 };
 
 
@@ -417,7 +410,6 @@ export type UpdateProviderProfileInput = {
   name?: InputMaybe<UpdateUserNameInput>;
   npi?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
-  roles: Array<Scalars['String']['input']>;
   /** A base64 encoded string of the signature picture */
   signature?: InputMaybe<Scalars['String']['input']>;
 };
