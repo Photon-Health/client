@@ -10,9 +10,9 @@ export const NoMatch = () => {
         <VStack>
           <MdSearch size="2em" />
           <Heading as="h4" size="md" textAlign="center">
-            {t.noMatch.heading}
+            {t.noMatch}
           </Heading>
-          <Text textAlign="center">{t.noMatch.subheading}</Text>
+          <Text textAlign="center">{t.questions}</Text>
         </VStack>
       </Center>
     </ChakraProvider>

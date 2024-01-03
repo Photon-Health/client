@@ -8,9 +8,9 @@ export const Canceled = () => {
       <VStack>
         <MdOutlineCancel size="2em" />
         <Heading as="h4" size="md" textAlign="center">
-          {t.canceled.heading}
+          {t.orderCanceled}
         </Heading>
-        <Text textAlign="center">{t.canceled.subheading}</Text>
+        <Text textAlign="center">{t.questions}</Text>
       </VStack>
     </Center>
   );
