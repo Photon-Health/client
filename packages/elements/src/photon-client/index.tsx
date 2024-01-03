@@ -119,29 +119,38 @@ customElement(
     }
     const [store] = createSignal<PhotonClientStore>(client);
 
-    createEffect(async () => {
+    const handleRedirect = async () => {
+      await store()?.authentication.handleRedirect();
+      if (props.redirectPath) window.location.replace(props.redirectPath);
+    };
+
+    const checkSession = async () => {
+      await store()?.authentication.checkSession();
+      makeTimer(
+        async () => {
+          await store()?.authentication.checkSession();
+        },
+        60000,
+        setInterval
+      );
+    };
+
+    createEffect(() => {
       if (hasAuthParams() && store()) {
-        await store()?.authentication.handleRedirect();
-        if (props.redirectPath) window.location.replace(props.redirectPath);
+        handleRedirect();
       } else if (store()) {
-        await store()?.authentication.checkSession();
-        makeTimer(
-          async () => {
-            await store()?.authentication.checkSession();
-          },
-          60000,
-          setInterval
-        );
+        checkSession();
       }
     });
-    createEffect(async () => {
+
+    createEffect(() => {
       if (!store()?.authentication.state.isLoading) {
         if (!store()?.authentication.state.isAuthenticated && props.autoLogin) {
           const args: any = { appState: {} };
           if (props.redirectPath) {
             args.appState.returnTo = props.redirectPath;
           }
-          await store()?.authentication.login(args);
+          store()?.authentication.login(args);
         }
       }
     });
