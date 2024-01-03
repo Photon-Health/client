@@ -1,16 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  Alert,
-  AlertIcon,
-  Box,
-  Button,
-  Container,
-  Heading,
-  Link,
-  Text,
-  VStack,
-  useToast
-} from '@chakra-ui/react';
+import { Box, Button, Container, Heading, Link, Text, VStack, useToast } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiCheck } from 'react-icons/fi';
@@ -25,7 +14,7 @@ import {
 } from '../components';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { text as t } from '../utils/text';
+import { text as t, orderStateMapping as m } from '../utils/text';
 import { useOrderContext } from './Main';
 import * as TOAST_CONFIG from '../configs/toast';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
@@ -33,11 +22,9 @@ import { getSettings } from '@client/settings';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
-const PHOTON_PHONE_NUMBER: string = process.env.REACT_APP_TWILIO_SMS_NUMBER;
-
 export const Status = () => {
   const navigate = useNavigate();
-  const { order, setOrder } = useOrderContext();
+  const { order, flattenedFills, setOrder } = useOrderContext();
 
   const orgSettings =
     order?.organization?.id in settings ? settings[order.organization.id] : settings.default;
@@ -90,10 +77,17 @@ export const Status = () => {
         if (result) {
           setSuccessfullySubmitted(true);
           setTimeout(() => setShowFooter(false), 1000);
+
+          setOrder({
+            ...order,
+            fulfillment: {
+              state: 'PICKED_UP'
+            }
+          });
         } else {
           toast({
-            title: t.status[fulfillmentType].errorToast.title,
-            description: t.status[fulfillmentType].errorToast.description,
+            title: m[fulfillmentType].error.title,
+            description: m[fulfillmentType].error.description,
             ...TOAST_CONFIG.ERROR
           });
         }
@@ -101,8 +95,8 @@ export const Status = () => {
       }, 1000);
     } catch (error) {
       toast({
-        title: t.status[fulfillmentType].errorToast.title,
-        description: t.status[fulfillmentType].errorToast.description,
+        title: m[fulfillmentType].error.title,
+        description: m[fulfillmentType].error.description,
         ...TOAST_CONFIG.ERROR
       });
 
@@ -123,15 +117,8 @@ export const Status = () => {
   };
 
   useEffect(() => {
-    // Show the pharmacy with ratings + hours if not mail order or courier
-    const showEnrichedPharmacy =
-      fulfillmentType !== (types.FulfillmentType.MailOrder || 'COURIER') &&
-      pharmacy?.name &&
-      pharmacy?.address;
-    if (showEnrichedPharmacy) {
-      initializePharmacy(pharmacy);
-    }
-  }, [pharmacy]);
+    initializePharmacy(pharmacy);
+  }, []);
 
   // People that select a pharmacy low in the list might start at bottom of status page
   useEffect(() => {
@@ -180,16 +167,23 @@ export const Status = () => {
     }
   }, []);
 
-  // Only show "Text us now" prompt if pickup and RECEIVED or READY
-  const showChatAlertStates: types.FulfillmentState[] = ['RECEIVED', 'READY'];
-  const showChatAlert = showChatAlertStates.includes(fulfillment?.state);
+  const isMultiRx = flattenedFills.length > 1;
+
+  // There's still a slight delay (1-3s) before fulfillment is created,
+  // so default to SENT on first navigation
+  const fulfillmentState = fulfillment?.state ?? 'SENT';
+
+  const showTextUsPrompt =
+    fulfillmentState === 'DELIVERED' ||
+    fulfillmentState === 'PICKED_UP' ||
+    fulfillmentState === 'RECEIVED';
 
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
 
       <Helmet>
-        <title>{t.status.title}</title>
+        <title>{t.track}</title>
       </Helmet>
 
       <Nav showRefresh />
@@ -199,26 +193,34 @@ export const Status = () => {
         <VStack spacing={6} align="start" pt={5}>
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
-              {t.status.heading}
+              {m[fulfillmentType][fulfillmentState].heading}
             </Heading>
-            <Text>{t.status.subheading}</Text>
-            {showChatAlert ? (
-              <Alert status="warning">
-                <AlertIcon />
-                <Text>
-                  {t.status.PICK_UP.chat.prompt}{' '}
-                  <Link href={`sms:${PHOTON_PHONE_NUMBER}`} color="link" fontWeight="medium">
-                    {t.status.PICK_UP.chat.cta}
+            <Box>
+              <Text display="inline">
+                {m[fulfillmentType][fulfillmentState].subheading(isMultiRx)}
+              </Text>
+              {showTextUsPrompt ? (
+                <Text ms={1} display="inline">
+                  Please
+                  <Link
+                    mx={1}
+                    color="link"
+                    textDecoration="underline"
+                    href={`sms:${process.env.REACT_APP_TWILIO_SMS_NUMBER}`}
+                  >
+                    text us
                   </Link>
+                  if you have any issues.
                 </Text>
-              </Alert>
-            ) : null}
+              ) : null}
+            </Box>
           </VStack>
           {enrichedPharmacy ? (
             <Box width="full">
               <PharmacyCard
                 pharmacy={enrichedPharmacy}
                 selected={true}
+                showDetails={fulfillmentType === 'PICK_UP'}
                 canReroute={!isDemo && orgSettings.enablePatientRerouting}
                 onChangePharmacy={() =>
                   navigate(`/pharmacy?orderId=${order.id}&token=${token}&reroute=true`)
@@ -230,7 +232,7 @@ export const Status = () => {
           {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
             <Box alignSelf="start">
               <Text display="inline" color="gray.600">
-                {t.status.MAIL_ORDER.trackingNumber}
+                {t.tracking}
               </Text>
               <Link
                 href={`https://google.com/search?q=${fulfillment.trackingNumber}`}
@@ -247,7 +249,7 @@ export const Status = () => {
           ) : null}
           <StatusStepper
             fulfillmentType={fulfillmentType}
-            status={successfullySubmitted ? 'PICKED_UP' : fulfillment?.state || 'SENT'}
+            status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
             patientAddress={formatAddress(address)}
           />
         </VStack>
@@ -264,7 +266,9 @@ export const Status = () => {
             onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
             isLoading={submitting}
           >
-            {successfullySubmitted ? t.status.thankYou : t.status[fulfillmentType].cta}
+            {successfullySubmitted
+              ? t.thankYou
+              : m[fulfillmentType][fulfillmentState].cta(isMultiRx)}
           </Button>
           <PoweredBy />
         </Container>

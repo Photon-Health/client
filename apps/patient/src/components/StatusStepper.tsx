@@ -12,8 +12,10 @@ import {
   StepNumber,
   StepSeparator
 } from '@chakra-ui/react';
-import { text as t } from '../utils/text';
+import { orderStateMapping as t } from '../utils/text';
 import { ExtendedFulfillmentType } from '../utils/models';
+import { countFillsAndRemoveDuplicates } from '../utils/general';
+import { useOrderContext } from '../views/Main';
 
 export const STATES = {
   PICK_UP: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'],
@@ -34,6 +36,11 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
   const states = STATES[fulfillmentType]; // map index to faux states
   const activeStep = initialStepIdx + 1; // step to do next
 
+  const { order } = useOrderContext();
+
+  const flattenedFills = countFillsAndRemoveDuplicates(order.fills);
+  const isMultiRx = flattenedFills.length > 1;
+
   return (
     <Box>
       <Container px={0} pt={0}>
@@ -47,11 +54,11 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
             colorScheme="green"
           >
             {states.map((state, id) => {
-              const title = t.status[fulfillmentType].states[state].title;
+              const title = t[fulfillmentType][state].status;
               const isDelivery = state === 'IN_TRANSIT' || state === 'SHIPPED';
               const description = isDelivery
-                ? `${t.status[fulfillmentType].states[state].description}${patientAddress}.`
-                : t.status[fulfillmentType].states[state].description;
+                ? `${t[fulfillmentType][state].description(isMultiRx)}${patientAddress}.`
+                : t[fulfillmentType][state].description(isMultiRx);
 
               return (
                 <Step key={id}>
