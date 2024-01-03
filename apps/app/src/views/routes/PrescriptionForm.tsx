@@ -90,7 +90,7 @@ export const PrescriptionForm = () => {
           prescription-ids={prescriptionIds}
           weight={weight}
           weight-unit={weightUnit}
-          enable-order={settings[user.org_id]?.enableRxAndOrder ?? false}
+          enable-order={settings[user.org_id]?.enableRxAndOrder ?? true}
           enable-med-history={settings[user.org_id]?.enableMedHistory ?? false}
           enable-local-pickup={settings[user.org_id]?.pickUp ?? false}
           enable-send-to-patient={settings[user.org_id]?.sendToPatient ?? false}
