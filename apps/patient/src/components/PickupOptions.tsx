@@ -44,9 +44,9 @@ export const PickupOptions = ({
         <SlideFade offsetY="60px" in={true}>
           <VStack spacing={1} align="start">
             <Heading as="h5" size="sm">
-              {t.pharmacy.PICK_UP.heading}
+              {t.pickUp}
             </Heading>
-            <Text>{t.pharmacy.PICK_UP.subheading}</Text>
+            <Text>{t.goLocal}</Text>
           </VStack>
         </SlideFade>
       ) : null}
@@ -86,12 +86,12 @@ export const PickupOptions = ({
           onClick={handleShowMore}
           p={3}
         >
-          {t.pharmacy.PICK_UP.showMore}
+          {t.showMore}
         </Button>
       ) : null}
       {showingAllPharmacies ? (
         <Text color="gray.500" textAlign="center">
-          {t.pharmacy.PICK_UP.showingAll}
+          {t.showingAll}
         </Text>
       ) : null}
     </VStack>
