@@ -1,8 +1,7 @@
 import { Td, Text, Tr } from '@chakra-ui/react';
-import React from 'react';
 import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { useMemo } from 'react';
-import UserItemActions from './UserItemActions';
+import { UserItemActions } from './UserItemActions';
 import { compareRoles } from './utils';
 
 const userFragment = graphql(/* GraphQL */ `

@@ -23,6 +23,7 @@ import { useClinicalApiClient } from '../../apollo';
 import { graphql } from 'apps/app/src/gql';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 import { FormikTouched, FormikErrors, ErrorMessage, Field, Formik } from 'formik';
+import { Role } from 'packages/sdk/dist/types';
 
 interface EditRolesActionProps {
   userId: string;
@@ -51,6 +52,11 @@ const EditRolesActionGetUserQuery = graphql(/* GraphQL */ `
       }
       fax
       email
+      roles {
+        description
+        id
+        name
+      }
     }
   }
 `);
@@ -173,9 +179,21 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
     onClose;
   };
 
+  function mapAndSortRoles(
+    roles: Role[]
+  ): { value: string; label: string; description?: string }[] {
+    const mappedRoles = roles.map(({ name, id, description }) => ({
+      value: id,
+      label: name ?? id,
+      description: description ?? undefined
+    }));
+    const sortedRoles = mappedRoles.sort();
+    return sortedRoles;
+  }
+
   const initialValues: yup.InferType<typeof roleSchema> = {
     email: userData?.user?.email ?? '',
-    roles: [],
+    roles: mapAndSortRoles(userData?.user?.roles ?? []),
     provider: {
       npi: userData?.user?.npi ?? '',
       address: {
