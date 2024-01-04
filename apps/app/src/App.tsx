@@ -24,7 +24,7 @@ import { Prescription } from './views/routes/Prescription';
 import { PrescriptionForm } from './views/routes/PrescriptionForm';
 import { Prescriptions } from './views/routes/Prescriptions';
 import { Settings } from './views/routes/Settings';
-import { ClinicalApiProvider } from './views/routes/Settings/apollo';
+import { ClinicalApiProvider } from './clinicalApollo';
 import { Support } from './views/routes/Support';
 import { UpdatePatientForm } from './views/routes/UpdatePatientForm';
 
@@ -54,7 +54,7 @@ export const App = () => {
   return (
     <BrowserRouter>
       <PhotonProvider client={client} onRedirectCallback={onRedirectCallback}>
-        <ClinicalApiProvider photonClient={client}>
+        <ClinicalApiProvider apolloClient={client.apolloClinical}>
           <Zendesk />
           <AlertDisplay />
           <Routes>

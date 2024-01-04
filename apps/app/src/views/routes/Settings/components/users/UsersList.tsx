@@ -25,7 +25,7 @@ import usePermissions from 'apps/app/src/hooks/usePermissions';
 import { useMemo, useState } from 'react';
 import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
 import { Outlet } from 'react-router-dom';
-import { useClinicalApiClient } from '../../apollo';
+import { useClinicalApiClient } from '../../../../../clinicalApollo';
 import { PaginationIndicator } from '../PaginationIndicator';
 import { InviteForm } from '../invites/InviteForm';
 import { UserItem } from './UserItem';

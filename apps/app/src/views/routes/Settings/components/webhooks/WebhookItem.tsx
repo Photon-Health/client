@@ -1,6 +1,6 @@
 import { Tr, Td, Badge, Button, Text } from '@chakra-ui/react';
 import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
-import { useClinicalApiClient } from '../../apollo';
+import { useClinicalApiClient } from '../../../../../clinicalApollo';
 import { useMutation } from '@apollo/client';
 import { useMemo } from 'react';
 

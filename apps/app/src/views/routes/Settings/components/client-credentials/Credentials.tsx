@@ -18,7 +18,7 @@ import { usePhoton } from '@photonhealth/react';
 
 import { ClientInfoCard } from './ClientInfoCard';
 import { graphql } from 'apps/app/src/gql';
-import { useClinicalApiClient } from '../../apollo';
+import { useClinicalApiClient } from '../../../../../clinicalApollo';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@apollo/client';
 

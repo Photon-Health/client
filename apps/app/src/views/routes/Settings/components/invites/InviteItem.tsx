@@ -1,6 +1,6 @@
 import { Badge, Td, Text, Tr, HStack, IconButton, useToast, Box, Icon } from '@chakra-ui/react';
 import { useMutation } from '@apollo/client';
-import { useClinicalApiClient } from '../../apollo';
+import { useClinicalApiClient } from '../../../../../clinicalApollo';
 import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { InvitesQueryDocument } from 'apps/app/src/gql/graphql';
 import { FiCheckCircle, FiSend, FiTrash, FiX } from 'react-icons/fi';

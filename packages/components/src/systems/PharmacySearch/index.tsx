@@ -63,6 +63,15 @@ const GetLastOrder = gql`
   }
 `;
 
+const GetOrg = gql`
+  query Query {
+    organization {
+      email
+      id
+    }
+  }
+`;
+
 export interface PharmacySearchProps {
   address?: string;
   patientId?: string;
@@ -136,6 +145,20 @@ export default function PharmacySearch(props: PharmacySearchProps) {
     setFetchingPreferred(false);
   }
 
+  // TODO REMOVE
+  async function fetchOrg() {
+    try {
+      console.log('TRYING');
+      const { data } = await client!.apolloClinical.query({
+        query: GetOrg
+      });
+      console.log('DATA', data);
+      return data?.organization;
+    } catch (error) {
+      console.log('ERROR', error);
+    }
+  }
+
   const mergedPharmacies = createMemo(() => {
     const localPharmacies = pharmacies() || [];
     // -- verify preferred pharmacy is included in local pharmacy search
@@ -206,6 +229,9 @@ export default function PharmacySearch(props: PharmacySearchProps) {
         }
       }
     });
+
+    // TODO REMOVE
+    fetchOrg();
   });
 
   createEffect(() => {

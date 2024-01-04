@@ -2,7 +2,7 @@ import { Alert, AlertIcon, Button } from '@chakra-ui/react';
 
 import { useMutation } from '@apollo/client';
 import { graphql } from 'apps/app/src/gql';
-import { useClinicalApiClient } from '../../apollo';
+import { useClinicalApiClient } from '../../../../../clinicalApollo';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
 
 interface RotateSecretProps {

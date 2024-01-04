@@ -19,10 +19,11 @@ import {
   Tr,
   useBreakpointValue
 } from '@chakra-ui/react';
+import { useClinicalApiClient } from 'apps/app/src/clinicalApollo';
 import { graphql } from 'apps/app/src/gql';
 import { useMemo, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { useClinicalApiClient } from '../../apollo';
+
 import { PaginationIndicator } from '../PaginationIndicator';
 import { InviteItem } from './InviteItem';
 

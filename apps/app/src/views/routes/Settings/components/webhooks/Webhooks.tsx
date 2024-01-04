@@ -23,7 +23,7 @@ import { useQuery } from '@apollo/client';
 import { graphql } from 'apps/app/src/gql';
 import { useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
-import { useClinicalApiClient } from '../../apollo';
+import { useClinicalApiClient } from '../../../../../clinicalApollo';
 import { WebhookItem } from './WebhookItem';
 import { WebhooksForm } from './WebhooksForm';
 

@@ -20,7 +20,7 @@ import { graphql } from 'apps/app/src/gql';
 import { InvitesQueryDocument } from 'apps/app/src/gql/graphql';
 import { ErrorMessage, Field, Formik, FormikErrors, FormikTouched } from 'formik';
 import * as yup from 'yup';
-import { useClinicalApiClient } from '../../apollo';
+import { useClinicalApiClient } from '../../../../../clinicalApollo';
 import { RolesSelect, rolesSchema } from '../utils/Roles';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 

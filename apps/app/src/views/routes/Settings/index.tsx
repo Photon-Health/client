@@ -14,7 +14,7 @@ import { useQuery } from '@apollo/client';
 import { graphql } from 'apps/app/src/gql';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
 import { Page } from '../../components/Page';
-import { useClinicalApiClient } from './apollo';
+import { useClinicalApiClient } from '../../../clinicalApollo';
 import { DevelopersTab } from './views/DevelopersTab';
 import { OrganizationTab } from './views/OrganizationTab';
 import { TeamTab } from './views/TeamTab';

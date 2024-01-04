@@ -3,7 +3,7 @@ import { graphql } from 'apps/app/src/gql';
 import { AsyncSelect, OptionProps, components } from 'chakra-react-select';
 import { Text } from '@chakra-ui/react';
 import * as yup from 'yup';
-import { useClinicalApiClient } from '../../apollo';
+import { useClinicalApiClient } from '../../../../../clinicalApollo';
 export const rolesSchema = yup.array(
   yup
     .object({
