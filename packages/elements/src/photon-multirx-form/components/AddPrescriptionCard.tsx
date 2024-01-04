@@ -52,7 +52,6 @@ export const AddPrescriptionCard = (props: {
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
-  const [isSubmitting, setIsSubmitting] = createSignal(false);
   const [, recentOrdersActions] = useRecentOrders();
   let ref: any;
 
@@ -96,7 +95,6 @@ export const AddPrescriptionCard = (props: {
   };
 
   const handleAddPrescription = async () => {
-    setIsSubmitting(true);
     const keys = [
       'treatment',
       'effectiveDate',
@@ -208,7 +206,6 @@ export const AddPrescriptionCard = (props: {
         body: 'Some items in the form are incomplete, please check for errors'
       });
     }
-    setIsSubmitting(false);
   };
 
   return (
@@ -471,13 +468,7 @@ export const AddPrescriptionCard = (props: {
               />
             </Show>
             <div class="flex flex-grow justify-end">
-              <Button
-                class="w-full md:!w-auto"
-                size="lg"
-                onClick={handleAddPrescription}
-                loading={isSubmitting()}
-                disabled={isSubmitting()}
-              >
+              <Button class="w-full md:!w-auto" size="lg" onClick={handleAddPrescription}>
                 Add Prescription to Order
               </Button>
             </div>
