@@ -174,7 +174,12 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
                 </Thead>
                 <Tbody>
                   {users?.map((user) => (
-                    <UserItem rolesMap={props.rolesMap} key={user.id} user={user} />
+                    <UserItem
+                      rolesMap={props.rolesMap}
+                      key={user.id}
+                      user={user}
+                      hasRole={hasUsers}
+                    />
                   ))}
                 </Tbody>
               </Table>

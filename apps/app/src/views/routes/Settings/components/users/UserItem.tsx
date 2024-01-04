@@ -19,10 +19,12 @@ const userFragment = graphql(/* GraphQL */ `
 
 export const UserItem = ({
   user: data,
-  rolesMap
+  rolesMap,
+  hasRole
 }: {
   user: FragmentType<typeof userFragment>;
   rolesMap: Record<string, string>;
+  hasRole: boolean;
 }) => {
   const user = useFragment(userFragment, data);
 
@@ -43,9 +45,11 @@ export const UserItem = ({
       </Td>
       <Td>{user.email}</Td>
       <Td textOverflow={'ellipsis'}>{roles}</Td>
-      <Td>
-        <UserItemActions userId={user.id}></UserItemActions>
-      </Td>
+      {!hasRole ? null : (
+        <Td>
+          <UserItemActions userId={user.id}></UserItemActions>
+        </Td>
+      )}
     </Tr>
   );
 };
