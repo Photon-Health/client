@@ -230,7 +230,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
           backgroundColor="gray.100"
           borderRadius={10}
         >
-          <VStack m={[3, 3]} p={[2, 2]} spacing={2} align="stretch">
+          <VStack m={3} mt={2} p={[2, 2]} spacing={2} align="stretch">
             <Text fontSize="md">{userData?.user?.name?.full}</Text>
             <Text fontSize="sm">{userData?.user?.email}</Text>
           </VStack>
@@ -271,7 +271,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
                 <form onSubmit={handleSubmit} noValidate>
                   <VStack spacing={2} align="stretch">
                     <FormControl isInvalid={!!errors.roles && !!touched.roles} pb="4" isRequired>
-                      <FormLabel htmlFor="roles" mb={1}>
+                      <FormLabel htmlFor="roles" m={2} mt={3}>
                         Roles
                       </FormLabel>
                       <RolesSelect
