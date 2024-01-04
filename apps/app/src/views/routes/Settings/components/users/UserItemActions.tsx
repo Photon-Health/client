@@ -19,10 +19,6 @@ interface UserItemActionsProps {
 
 export const UserItemActions: React.FC<UserItemActionsProps> = ({ userId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const close = () => {
-    //refetch;
-    onClose();
-  };
   return (
     <HStack justifyContent="flex-end">
       <Menu>
@@ -40,7 +36,7 @@ export const UserItemActions: React.FC<UserItemActionsProps> = ({ userId }) => {
       </Menu>
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
-        {isOpen && <EditRolesAction userId={userId} onClose={close}></EditRolesAction>}
+        {isOpen && <EditRolesAction userId={userId} onClose={onClose}></EditRolesAction>}
       </Modal>
     </HStack>
   );
