@@ -20,12 +20,10 @@ const userFragment = graphql(/* GraphQL */ `
 
 export const UserItem = ({
   user: data,
-  rolesMap,
-  refetch
+  rolesMap
 }: {
   user: FragmentType<typeof userFragment>;
   rolesMap: Record<string, string>;
-  refetch: any;
 }) => {
   const user = useFragment(userFragment, data);
 
@@ -47,7 +45,7 @@ export const UserItem = ({
       <Td>{user.email}</Td>
       <Td textOverflow={'ellipsis'}>{roles}</Td>
       <Td>
-        <UserItemActions userId={user.id} refetch={refetch}></UserItemActions>
+        <UserItemActions userId={user.id}></UserItemActions>
       </Td>
     </Tr>
   );

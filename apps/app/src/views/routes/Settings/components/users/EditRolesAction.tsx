@@ -55,26 +55,6 @@ const GetUserQuery = graphql(/* GraphQL */ `
   }
 `);
 
-const usersQuery = graphql(/* GraphQL */ `
-  query UsersListQuery {
-    users {
-      id
-      ...UserItemFragment
-      name {
-        full
-      }
-      roles {
-        name
-      }
-      email
-    }
-    roles {
-      name
-      id
-    }
-  }
-`);
-
 const SetUserRolesMutation = graphql(/* GraphQL */ `
   mutation SetUserRoles($userId: ID!, $roles: [ID!]!) {
     setUserRoles(userId: $userId, roles: $roles)
@@ -161,7 +141,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
   });
   const [setUserRoles, { error }] = useMutation(SetUserRolesMutation, {
     client,
-    refetchQueries: [usersQuery]
+    refetchQueries: ['UsersListQuery', 'usersQuery']
   });
   const [updateProviderProfile] = useMutation(UpdateProviderProfileMutation, {
     client,

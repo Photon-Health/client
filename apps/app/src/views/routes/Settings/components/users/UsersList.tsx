@@ -56,7 +56,7 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
   const [sortBy, setSortBy] = useState<'NAME' | 'ROLES' | 'EMAIL' | undefined>();
   const [sortByDir, setSortByDir] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data, error, loading, refetch } = useQuery(usersQuery, { client });
+  const { data, error, loading } = useQuery(usersQuery, { client });
 
   const hasUsers = usePermissions(['edit:profile', 'read:profile']);
   const hasInvite = usePermissions(['write:invite']);
@@ -174,12 +174,7 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
                 </Thead>
                 <Tbody>
                   {users?.map((user) => (
-                    <UserItem
-                      rolesMap={props.rolesMap}
-                      key={user.id}
-                      user={user}
-                      refetch={refetch}
-                    />
+                    <UserItem rolesMap={props.rolesMap} key={user.id} user={user} />
                   ))}
                 </Tbody>
               </Table>

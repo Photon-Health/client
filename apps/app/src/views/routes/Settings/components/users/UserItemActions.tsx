@@ -15,14 +15,13 @@ import { EditRolesAction } from './EditRolesAction';
 
 interface UserItemActionsProps {
   userId: string;
-  refetch: any;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const UserItemActions: React.FC<UserItemActionsProps> = ({ userId, refetch }) => {
+const UserItemActions: React.FC<UserItemActionsProps> = ({ userId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const close = () => {
-    refetch;
+    //refetch;
     onClose();
   };
   return (
