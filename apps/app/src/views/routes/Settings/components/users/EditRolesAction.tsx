@@ -31,7 +31,7 @@ interface EditRolesActionProps {
 }
 
 const EditRolesActionGetUserQuery = graphql(/* GraphQL */ `
-  query EditRolesActionGetUserQuery($userId: ID!) {
+  query EditRolesActionGetUser($userId: ID!) {
     user(id: $userId) {
       address {
         street1
