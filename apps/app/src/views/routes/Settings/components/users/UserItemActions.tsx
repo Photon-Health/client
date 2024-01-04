@@ -21,7 +21,7 @@ export const UserItemActions: React.FC<UserItemActionsProps> = ({ userId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <HStack justifyContent="flex-end">
-      <Menu>
+      <Menu autoSelect={false}>
         <MenuButton
           as={IconButton}
           aria-label="Options"

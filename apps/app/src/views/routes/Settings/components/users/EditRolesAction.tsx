@@ -275,7 +275,10 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
                         Roles
                       </FormLabel>
                       <RolesSelect
-                        onChange={(newValue) => setFieldValue('roles', newValue)}
+                        onChange={(newValue) => {
+                          setFieldValue('roles', newValue);
+                          setFieldTouched('roles');
+                        }}
                         onBlur={() => setFieldTouched('roles')}
                         value={values.roles}
                       />
