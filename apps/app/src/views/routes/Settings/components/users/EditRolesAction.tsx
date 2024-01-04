@@ -29,7 +29,7 @@ interface EditRolesActionProps {
   onClose: () => void;
 }
 
-const GetUserQuery = graphql(/* GraphQL */ `
+const EditRolesActionGetUserQuery = graphql(/* GraphQL */ `
   query Query($userId: ID!) {
     user(id: $userId) {
       address {
@@ -75,17 +75,14 @@ const hasPrescriberRole = (roles: { value: string; label: string }[]) =>
 
 const roleSchema = yup
   .object({
-    email: yup
-      .string()
-      .email('Invalid email')
-      .required("Please include email of the person you'd like to invite"),
+    email: yup.string().email('Invalid email').required('email is required for providers'),
     roles: rolesSchema.required().min(1, 'Must have at least one role'),
     provider: yup
       .object({
         npi: yup
           .string()
           .required('NPI is required for prescribers')
-          .matches(/^[0-9]*$/, { message: 'Invalid NPI' }),
+          .matches(/^[0-9]+$/, { message: 'Invalid NPI' }),
         address: yup
           .object({
             street1: yup.string().required('Address is required'),
@@ -135,17 +132,17 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
     data: userData,
     error: userDataError,
     loading
-  } = useQuery(GetUserQuery, {
+  } = useQuery(EditRolesActionGetUserQuery, {
     client,
     variables: { userId: userId }
-  });
-  const [setUserRoles, { error }] = useMutation(SetUserRolesMutation, {
-    client,
-    refetchQueries: ['UsersListQuery', 'usersQuery']
   });
   const [updateProviderProfile] = useMutation(UpdateProviderProfileMutation, {
     client,
     refetchQueries: []
+  });
+  const [setUserRoles, { error }] = useMutation(SetUserRolesMutation, {
+    client,
+    refetchQueries: ['UsersListQuery', 'EditRolesActionGetUserQuery']
   });
 
   const handleSaveRoles = (formVariables: any) => {
@@ -196,9 +193,9 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
     <ModalContent>
       <ModalHeader>
         <VStack spacing={3} align="stretch">
-          <Text fontSize="bg">Invite User</Text>
+          <Text fontSize="bg">Assign roles to user</Text>
           <Text fontSize="sm" color="gray.500">
-            Add or remove roles for this user.
+            Set roles for this user.
           </Text>
         </VStack>
       </ModalHeader>
