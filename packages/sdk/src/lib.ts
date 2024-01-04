@@ -35,7 +35,6 @@ export interface PhotonClientOptions {
   organization?: string;
   audience?: string;
   uri?: string;
-  clinicalApiUri?: string;
   developmentMode?: boolean;
 }
 
@@ -99,7 +98,6 @@ export class PhotonClient {
       organization,
       audience = 'https://api.photon.health',
       uri = 'https://api.photon.health/graphql',
-      clinicalApiUri = 'https://clinical-api.photon.health/graphql',
       developmentMode = false
     }: PhotonClientOptions,
     elementsVersion?: string
@@ -112,8 +110,16 @@ export class PhotonClient {
     });
     this.audience = audience;
     this.uri = uri;
-    this.clinicalApiUri = clinicalApiUri;
     this.clinicalUrl = getClinicalUrl(uri);
+
+    this.clinicalApiUri = `${
+      this.clinicalUrl?.includes('photon')
+        ? 'https://clinical-api.photon.health'
+        : this.clinicalUrl?.includes('neutron')
+        ? 'https://clinical-api.neutron.health'
+        : 'http://clinical-api.tau.health:8080'
+    }/graphql`;
+
     if (developmentMode) {
       this.audience = 'https://api.neutron.health';
       this.uri = 'https://api.neutron.health/graphql';
@@ -146,6 +152,7 @@ export class PhotonClient {
           'x-photon-sdk-version': version,
           ...(elementsVersion ? { 'x-photon-elements-version': elementsVersion } : {})
         };
+
         if (!token) {
           return { headers, ...rest };
         }
