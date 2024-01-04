@@ -31,7 +31,7 @@ interface EditRolesActionProps {
 }
 
 const EditRolesActionGetUserQuery = graphql(/* GraphQL */ `
-  query Query($userId: ID!) {
+  query EditRolesActionGetUserQuery($userId: ID!) {
     user(id: $userId) {
       address {
         street1
@@ -213,7 +213,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
         <VStack spacing={3} align="stretch">
           <Text fontSize="bg">Assign roles to user</Text>
           <Text fontSize="sm" color="gray.500">
-            Set roles for this user.
+            Add or remove roles for this user
           </Text>
         </VStack>
       </ModalHeader>
@@ -228,10 +228,13 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
           px="0"
           border={'1px solid var(--chakra-colors-gray-100)'}
           backgroundColor="gray.100"
+          boxShadow={'base'}
           borderRadius={10}
         >
           <VStack m={3} mt={2} p={[2, 2]} spacing={2} align="stretch">
-            <Text fontSize="md">{userData?.user?.name?.full}</Text>
+            <Text fontSize="md" fontWeight={'semibold'}>
+              {userData?.user?.name?.full}
+            </Text>
             <Text fontSize="sm">{userData?.user?.email}</Text>
           </VStack>
         </Box>
@@ -432,8 +435,8 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
                   <ModalFooter px="0">
                     <VStack>
                       <HStack>
-                        <Button variant="outline" mr={3} onClick={onClose}>
-                          Close
+                        <Button variant="outline" onClick={onClose}>
+                          Cancel
                         </Button>
 
                         <Button
