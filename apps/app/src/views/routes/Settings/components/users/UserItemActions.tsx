@@ -15,24 +15,16 @@ import { EditRolesAction } from './EditRolesAction';
 
 interface UserItemActionsProps {
   userId: string;
-  userFullName: string;
-  userEmail: string;
-  rolesProp: Record<string, string>;
+  refetch: any;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const UserItemActions: React.FC<UserItemActionsProps> = ({
-  userId,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  userFullName,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  userEmail,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  rolesProp
-}) => {
-  console.log('my user id', userId);
+const UserItemActions: React.FC<UserItemActionsProps> = ({ userId, refetch }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-
+  const close = () => {
+    refetch;
+    onClose();
+  };
   return (
     <HStack justifyContent="flex-end">
       <Menu>
@@ -50,7 +42,7 @@ const UserItemActions: React.FC<UserItemActionsProps> = ({
       </Menu>
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
-        {isOpen && <EditRolesAction userId={userId} onClose={onClose}></EditRolesAction>}
+        {isOpen && <EditRolesAction userId={userId} onClose={close}></EditRolesAction>}
       </Modal>
     </HStack>
   );

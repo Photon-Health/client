@@ -55,6 +55,26 @@ const GetUserQuery = graphql(/* GraphQL */ `
   }
 `);
 
+const usersQuery = graphql(/* GraphQL */ `
+  query UsersListQuery {
+    users {
+      id
+      ...UserItemFragment
+      name {
+        full
+      }
+      roles {
+        name
+      }
+      email
+    }
+    roles {
+      name
+      id
+    }
+  }
+`);
+
 const SetUserRolesMutation = graphql(/* GraphQL */ `
   mutation SetUserRoles($userId: ID!, $roles: [ID!]!) {
     setUserRoles(userId: $userId, roles: $roles)
@@ -126,14 +146,11 @@ const roleSchema = yup
 
 type RoleYupType = yup.InferType<typeof roleSchema>;
 type ProviderYupType = RoleYupType['provider'];
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type ProviderFormikTouchedType = FormikTouched<ProviderYupType>;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type ProviderFormikErrorsType = FormikErrors<ProviderYupType>;
 
 export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClose }) => {
   const client = useClinicalApiClient();
-  console.log('my user id', userId);
   const {
     data: userData,
     error: userDataError,
@@ -142,10 +159,9 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
     client,
     variables: { userId: userId }
   });
-  console.log('user data error', userDataError);
   const [setUserRoles, { error }] = useMutation(SetUserRolesMutation, {
     client,
-    refetchQueries: []
+    refetchQueries: [usersQuery]
   });
   const [updateProviderProfile] = useMutation(UpdateProviderProfileMutation, {
     client,
@@ -153,14 +169,12 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
   });
 
   const handleSaveRoles = (formVariables: any) => {
-    console.log('handle save roles', formVariables.variables);
     if (
       hasPrescriberRole(formVariables.variables.roles) &&
       (userData?.user?.npi == undefined ||
         userData?.user?.address == undefined ||
         userData?.user?.email == undefined)
     ) {
-      console.log('reached here');
       updateProviderProfile({
         variables: {
           providerId: userId,
@@ -226,7 +240,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
             <Text fontSize="sm">{userData?.user?.email}</Text>
           </VStack>
         </Box>
-        {!loading && userData && (
+        {userData && !loading && userData && !userDataError && (
           <Formik
             validateOnBlur
             initialValues={initialValues}
@@ -256,14 +270,8 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
             }}
           >
             {({ setFieldValue, handleSubmit, errors, touched, values, setFieldTouched }) => {
-              // Typescript thinks that errors.provider and touched.provider are simple strings/bools
-              // but really theyre objects
               const providerErrors = errors.provider as ProviderFormikErrorsType | undefined;
               const providerTouched = touched.provider as ProviderFormikTouchedType | undefined;
-              console.log('user data', userData);
-
-              console.log('ERRORRERRORORRORORO', errors);
-              console.log('values', values);
               return (
                 <form onSubmit={handleSubmit} noValidate>
                   <VStack spacing={2} align="stretch">
@@ -279,137 +287,149 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
                       <ErrorMessage name="roles" component={FormErrorMessage} />
                     </FormControl>
 
-                    {hasPrescriberRole(values.roles) && (
-                      <>
-                        <FormControl
-                          isRequired
-                          isInvalid={!!providerErrors?.npi && providerTouched?.npi}
-                          pb="4"
-                        >
-                          <FormLabel htmlFor="provider.npi" mb={1}>
-                            NPI
-                          </FormLabel>
+                    {hasPrescriberRole(values.roles) &&
+                      (userData?.user?.npi == undefined ||
+                        userData?.user?.address == undefined ||
+                        userData?.user?.email == undefined) && (
+                        <>
+                          <FormControl
+                            isRequired
+                            isInvalid={!!providerErrors?.npi && providerTouched?.npi}
+                            pb="4"
+                          >
+                            <FormLabel htmlFor="provider.npi" mb={1}>
+                              NPI
+                            </FormLabel>
 
-                          <Field name="provider.npi" default={userData?.user?.npi} as={Input} />
-                          <ErrorMessage name="provider.npi" component={FormErrorMessage} />
-                        </FormControl>
-                        <FormControl
-                          isRequired
-                          isInvalid={
-                            !!providerErrors?.address?.street1 && providerTouched?.address?.street1
-                          }
-                          pb="4"
-                        >
-                          <FormLabel htmlFor="provider.address.street1" mb={1}>
-                            Address 1
-                          </FormLabel>
-                          <Field
-                            name="provider.address.street1"
-                            default={userData?.user?.address?.street1}
-                            as={Input}
-                          />
-                          <ErrorMessage
-                            name="provider.address.street1"
-                            component={FormErrorMessage}
-                          />
-                        </FormControl>
-                        <FormControl
-                          isInvalid={
-                            !!providerErrors?.address?.street2 && providerTouched?.address?.street2
-                          }
-                          pb="4"
-                        >
-                          <FormLabel htmlFor="provider.address.street2" mb={1}>
-                            Address 2
-                          </FormLabel>
-                          <Field
-                            name="provider.address.street2"
-                            default={userData?.user?.address?.street2}
-                            as={Input}
-                          />
-                          <ErrorMessage
-                            name="provider.address.street2"
-                            component={FormErrorMessage}
-                          />
-                        </FormControl>
-                        <FormControl
-                          isRequired
-                          isInvalid={
-                            !!providerErrors?.address?.city && providerTouched?.address?.city
-                          }
-                          pb="4"
-                        >
-                          <FormLabel htmlFor="provider.address.city" mb={1}>
-                            City
-                          </FormLabel>
-                          <Field
-                            name="provider.address.city"
-                            default={userData?.user?.address?.city}
-                            as={Input}
-                          />
-                          <ErrorMessage name="provider.address.city" component={FormErrorMessage} />
-                        </FormControl>
-                        <FormControl
-                          isRequired
-                          isInvalid={
-                            (!!providerErrors?.address?.state?.value &&
-                              providerTouched?.address?.state?.value) ??
-                            false
-                          }
-                          pb="4"
-                        >
-                          <FormLabel htmlFor="provider.address.state" mb={1}>
-                            State {values.provider?.address?.state?.value}
-                          </FormLabel>
-                          <FormikStateSelect
-                            value={
-                              values.provider?.address?.state?.value
-                                ? { value: values.provider?.address?.state?.value }
-                                : undefined
+                            <Field name="provider.npi" default={userData?.user?.npi} as={Input} />
+                            <ErrorMessage name="provider.npi" component={FormErrorMessage} />
+                          </FormControl>
+                          <FormControl
+                            isRequired
+                            isInvalid={
+                              !!providerErrors?.address?.street1 &&
+                              providerTouched?.address?.street1
                             }
-                            setFieldTouched={setFieldTouched}
-                            setFieldValue={setFieldValue}
-                            fieldName="provider.address.state"
-                          />
-                          <ErrorMessage
-                            name="provider.address.state"
-                            component={FormErrorMessage}
-                          />
-                        </FormControl>
-                        <FormControl
-                          isRequired
-                          isInvalid={
-                            !!providerErrors?.address?.postalCode &&
-                            providerTouched?.address?.postalCode
-                          }
-                          pb="4"
-                        >
-                          <FormLabel htmlFor="provider.address.postalCode" mb={1}>
-                            Zip Code
-                          </FormLabel>
-                          <Field
-                            name="provider.address.postalCode"
-                            default={userData?.user?.address?.postalCode}
-                            as={Input}
-                          />
-                          <ErrorMessage
-                            name="provider.address.postalCode"
-                            component={FormErrorMessage}
-                          />
-                        </FormControl>
-                        <FormControl
-                          isRequired
-                          isInvalid={!!providerErrors?.phone && providerTouched?.phone}
-                          pb="4"
-                        >
-                          <FormLabel htmlFor="provider.phone" mb={1}>
-                            Phone
-                          </FormLabel>
-                          <Field name="provider.phone" default={userData?.user?.phone} as={Input} />
-                          <ErrorMessage name="provider.phone" component={FormErrorMessage} />
-                        </FormControl>
-                      </>
-                    )}
+                            pb="4"
+                          >
+                            <FormLabel htmlFor="provider.address.street1" mb={1}>
+                              Address 1
+                            </FormLabel>
+                            <Field
+                              name="provider.address.street1"
+                              default={userData?.user?.address?.street1}
+                              as={Input}
+                            />
+                            <ErrorMessage
+                              name="provider.address.street1"
+                              component={FormErrorMessage}
+                            />
+                          </FormControl>
+                          <FormControl
+                            isInvalid={
+                              !!providerErrors?.address?.street2 &&
+                              providerTouched?.address?.street2
+                            }
+                            pb="4"
+                          >
+                            <FormLabel htmlFor="provider.address.street2" mb={1}>
+                              Address 2
+                            </FormLabel>
+                            <Field
+                              name="provider.address.street2"
+                              default={userData?.user?.address?.street2}
+                              as={Input}
+                            />
+                            <ErrorMessage
+                              name="provider.address.street2"
+                              component={FormErrorMessage}
+                            />
+                          </FormControl>
+                          <FormControl
+                            isRequired
+                            isInvalid={
+                              !!providerErrors?.address?.city && providerTouched?.address?.city
+                            }
+                            pb="4"
+                          >
+                            <FormLabel htmlFor="provider.address.city" mb={1}>
+                              City
+                            </FormLabel>
+                            <Field
+                              name="provider.address.city"
+                              default={userData?.user?.address?.city}
+                              as={Input}
+                            />
+                            <ErrorMessage
+                              name="provider.address.city"
+                              component={FormErrorMessage}
+                            />
+                          </FormControl>
+                          <FormControl
+                            isRequired
+                            isInvalid={
+                              (!!providerErrors?.address?.state?.value &&
+                                providerTouched?.address?.state?.value) ??
+                              false
+                            }
+                            pb="4"
+                          >
+                            <FormLabel htmlFor="provider.address.state" mb={1}>
+                              State {values.provider?.address?.state?.value}
+                            </FormLabel>
+                            <FormikStateSelect
+                              value={
+                                values.provider?.address?.state?.value
+                                  ? { value: values.provider?.address?.state?.value }
+                                  : undefined
+                              }
+                              setFieldTouched={setFieldTouched}
+                              setFieldValue={setFieldValue}
+                              fieldName="provider.address.state"
+                            />
+                            <ErrorMessage
+                              name="provider.address.state"
+                              component={FormErrorMessage}
+                            />
+                          </FormControl>
+                          <FormControl
+                            isRequired
+                            isInvalid={
+                              !!providerErrors?.address?.postalCode &&
+                              providerTouched?.address?.postalCode
+                            }
+                            pb="4"
+                          >
+                            <FormLabel htmlFor="provider.address.postalCode" mb={1}>
+                              Zip Code
+                            </FormLabel>
+                            <Field
+                              name="provider.address.postalCode"
+                              default={userData?.user?.address?.postalCode}
+                              as={Input}
+                            />
+                            <ErrorMessage
+                              name="provider.address.postalCode"
+                              component={FormErrorMessage}
+                            />
+                          </FormControl>
+                          <FormControl
+                            isRequired
+                            isInvalid={!!providerErrors?.phone && providerTouched?.phone}
+                            pb="4"
+                          >
+                            <FormLabel htmlFor="provider.phone" mb={1}>
+                              Phone
+                            </FormLabel>
+                            <Field
+                              name="provider.phone"
+                              default={userData?.user?.phone}
+                              as={Input}
+                            />
+                            <ErrorMessage name="provider.phone" component={FormErrorMessage} />
+                          </FormControl>
+                        </>
+                      )}
                   </VStack>
                   <ModalFooter px="0">
                     <VStack>

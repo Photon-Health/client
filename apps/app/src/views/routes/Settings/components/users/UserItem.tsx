@@ -1,4 +1,5 @@
 import { Td, Text, Tr } from '@chakra-ui/react';
+import React from 'react';
 import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { useMemo } from 'react';
 import UserItemActions from './UserItemActions';
@@ -19,10 +20,12 @@ const userFragment = graphql(/* GraphQL */ `
 
 export const UserItem = ({
   user: data,
-  rolesMap
+  rolesMap,
+  refetch
 }: {
   user: FragmentType<typeof userFragment>;
   rolesMap: Record<string, string>;
+  refetch: any;
 }) => {
   const user = useFragment(userFragment, data);
 
@@ -44,12 +47,7 @@ export const UserItem = ({
       <Td>{user.email}</Td>
       <Td textOverflow={'ellipsis'}>{roles}</Td>
       <Td>
-        <UserItemActions
-          userId={user.id}
-          userEmail={user.email ?? ''}
-          userFullName={user.name?.full ?? ''}
-          rolesProp={{}}
-        ></UserItemActions>
+        <UserItemActions userId={user.id} refetch={refetch}></UserItemActions>
       </Td>
     </Tr>
   );
