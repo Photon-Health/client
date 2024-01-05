@@ -1,6 +1,5 @@
 import { customElement } from 'solid-element';
 import { createEffect, createSignal } from 'solid-js';
-import { PhotonClient } from '@photonhealth/sdk';
 import { PhotonClient, Env } from '@photonhealth/sdk';
 import { SDKProvider } from '@photonhealth/components';
 import { makeTimer } from '@solid-primitives/timer';
