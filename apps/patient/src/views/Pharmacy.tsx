@@ -42,8 +42,7 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
-const MAX_ENRICHMENT_COUNT = 5; // Maximum number of pharmacies to enrich at a time
-const INITIAL_PHARMACY_COUNT = 5;
+const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
 
 export const Pharmacy = () => {
@@ -62,7 +61,6 @@ export const Pharmacy = () => {
 
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
-  const [initialPharmacies, setInitialPharmacies] = useState<EnrichedPharmacy[]>([]);
   const [pharmacyOptions, setPharmacyOptions] = useState([]);
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<string>('');
@@ -82,7 +80,6 @@ export const Pharmacy = () => {
   const toast = useToast();
 
   const reset = () => {
-    setInitialPharmacies([]);
     setPharmacyOptions([]);
     setSelectedId('');
     setShowFooter(false);
@@ -117,15 +114,16 @@ export const Pharmacy = () => {
     setLatitude(40.717484);
     setLongitude(-73.955662397568);
 
-    const filteredPharmacies =
+    let pharmacies =
       enableOpenNow || enable24Hr
         ? demoPharmacies.filter((p) => (enableOpenNow && p.isOpen) || (enable24Hr && p.is24Hr))
         : demoPharmacies;
 
-    setInitialPharmacies(filteredPharmacies);
-    setPharmacyOptions(filteredPharmacies.slice(0, 5));
+    pharmacies = pharmacies.slice(0, 5);
 
-    if (filteredPharmacies.length < 5) {
+    setPharmacyOptions(pharmacies);
+
+    if (pharmacies.length < 5) {
       setShowingAllPharmacies(true);
     }
   };
@@ -170,7 +168,7 @@ export const Pharmacy = () => {
           longitude: lng,
           radius: PHARMACY_SEARCH_RADIUS_IN_MILES
         },
-        INITIAL_PHARMACY_COUNT,
+        GET_PHARMACIES_COUNT,
         0,
         enableOpenNow,
         enable24Hr
@@ -195,12 +193,8 @@ export const Pharmacy = () => {
       return;
     }
 
-    // Save in case we fetched more than we initially show
-    setInitialPharmacies(pharmaciesResult);
-
-    // We only show add a few at a time, so just enrich the first group of pharmacies
-    const preparedPharmacies: EnrichedPharmacy[] = await Promise.all(
-      pharmaciesResult.slice(0, MAX_ENRICHMENT_COUNT).map((p) => preparePharmacyHours(p))
+    const preparedPharmacies: EnrichedPharmacy[] = pharmaciesResult.map((p) =>
+      preparePharmacyHours(p)
     );
     setPharmacyOptions(preparedPharmacies);
 
@@ -211,39 +205,26 @@ export const Pharmacy = () => {
     setLoadingPharmacies(true);
 
     if (isDemo) {
-      const newPharmacyOptions = initialPharmacies.slice(
+      const pharmacies =
+        enableOpenNow || enable24Hr
+          ? demoPharmacies.filter((p) => (enableOpenNow && p.isOpen) || (enable24Hr && p.is24Hr))
+          : demoPharmacies;
+
+      const newPharmacyOptions = pharmacies.slice(
         pharmacyOptions.length,
-        pharmacyOptions.length + MAX_ENRICHMENT_COUNT
+        pharmacyOptions.length + GET_PHARMACIES_COUNT
       );
       const totalPharmacyOptions = [...pharmacyOptions, ...newPharmacyOptions];
       setPharmacyOptions(totalPharmacyOptions);
       setLoadingPharmacies(false);
 
-      if (totalPharmacyOptions.length === initialPharmacies.length) {
+      if (totalPharmacyOptions.length === pharmacies.length) {
         setShowingAllPharmacies(true);
       }
 
       return;
     }
 
-    /**
-     * Initially we fetched a list of pharmacies from our db, if some
-     * of those haven't received ratings/hours, enrich those first
-     *  */
-    const newPharmacies: EnrichedPharmacy[] = initialPharmacies
-      .slice(pharmacyOptions.length, pharmacyOptions.length + MAX_ENRICHMENT_COUNT)
-      .map(preparePharmacyHours);
-    if (newPharmacies.length === MAX_ENRICHMENT_COUNT) {
-      // Break early and return enriched pharmacies
-      setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
-      setLoadingPharmacies(false);
-      return;
-    }
-
-    const pharmaciesToGet = MAX_ENRICHMENT_COUNT - newPharmacies.length;
-    const totalEnriched = pharmacyOptions.length + newPharmacies.length;
-
-    // Get pharmacies from our db
     let pharmaciesResult: types.Pharmacy[];
     try {
       pharmaciesResult = await getPharmacies(
@@ -252,8 +233,8 @@ export const Pharmacy = () => {
           longitude,
           radius: PHARMACY_SEARCH_RADIUS_IN_MILES
         },
-        pharmaciesToGet,
-        totalEnriched,
+        GET_PHARMACIES_COUNT,
+        pharmacyOptions.length,
         enableOpenNow,
         enable24Hr
       );
@@ -275,9 +256,8 @@ export const Pharmacy = () => {
     }
 
     const preparedPharmacies: EnrichedPharmacy[] = pharmaciesResult.map(preparePharmacyHours);
-    newPharmacies.push(...preparedPharmacies);
+    setPharmacyOptions([...pharmacyOptions, ...preparedPharmacies]);
 
-    setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
     setLoadingPharmacies(false);
   };
 
