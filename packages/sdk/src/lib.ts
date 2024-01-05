@@ -40,7 +40,6 @@ export interface PhotonClientOptions {
   domain?: string;
   clientId: string;
   redirectURI?: string;
-  env?: Env;
   env?: Environment;
   organization?: string;
   audience?: string;
