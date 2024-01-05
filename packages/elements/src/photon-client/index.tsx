@@ -1,12 +1,12 @@
 import { customElement } from 'solid-element';
 import { createEffect, createSignal } from 'solid-js';
-import { PhotonClient } from '@photonhealth/sdk';
+import { PhotonClient, Env } from '@photonhealth/sdk';
 import { SDKProvider } from '@photonhealth/components';
 import { makeTimer } from '@solid-primitives/timer';
 import { PhotonClientStore } from '../store';
 import { hasAuthParams } from '../utils';
 import { PhotonContext } from '../context';
-import * as packageJson from '../../package.json';
+import pkg from '../../package.json';
 
 type PhotonClientProps = {
   domain?: string;
@@ -20,9 +20,10 @@ type PhotonClientProps = {
   errorMessage?: string;
   autoLogin: boolean;
   toastBuffer?: number;
+  env?: Env;
 };
 
-const version = packageJson?.version ?? 'unknown';
+const version = pkg?.version ?? 'unknown';
 
 customElement(
   'photon-client',
@@ -96,6 +97,13 @@ customElement(
       reflect: false,
       notify: false,
       parse: true
+    },
+    env: {
+      attribute: 'env',
+      value: undefined,
+      reflect: false,
+      notify: false,
+      parse: false
     }
   },
   (props: PhotonClientProps) => {
@@ -103,6 +111,7 @@ customElement(
 
     const sdk = new PhotonClient(
       {
+        env: props.env,
         domain: props.domain,
         audience: props.audience,
         uri: props.uri,
@@ -119,29 +128,38 @@ customElement(
     }
     const [store] = createSignal<PhotonClientStore>(client);
 
-    createEffect(async () => {
+    const handleRedirect = async () => {
+      await store()?.authentication.handleRedirect();
+      if (props.redirectPath) window.location.replace(props.redirectPath);
+    };
+
+    const checkSession = async () => {
+      await store()?.authentication.checkSession();
+      makeTimer(
+        async () => {
+          await store()?.authentication.checkSession();
+        },
+        60000,
+        setInterval
+      );
+    };
+
+    createEffect(() => {
       if (hasAuthParams() && store()) {
-        await store()?.authentication.handleRedirect();
-        if (props.redirectPath) window.location.replace(props.redirectPath);
+        handleRedirect();
       } else if (store()) {
-        await store()?.authentication.checkSession();
-        makeTimer(
-          async () => {
-            await store()?.authentication.checkSession();
-          },
-          60000,
-          setInterval
-        );
+        checkSession();
       }
     });
-    createEffect(async () => {
+
+    createEffect(() => {
       if (!store()?.authentication.state.isLoading) {
         if (!store()?.authentication.state.isAuthenticated && props.autoLogin) {
           const args: any = { appState: {} };
           if (props.redirectPath) {
             args.appState.returnTo = props.redirectPath;
           }
-          await store()?.authentication.login(args);
+          store()?.authentication.login(args);
         }
       }
     });

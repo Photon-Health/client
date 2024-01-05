@@ -13,7 +13,6 @@ export interface Pharmacy extends types.Pharmacy {
   name: string;
   info?: string | undefined;
   distance?: number | undefined;
-  rating?: number | undefined;
   isOpen?: boolean;
   is24Hr?: boolean;
   closes?: string;

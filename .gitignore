@@ -38,3 +38,5 @@ Thumbs.db
 # Storybook
 storybook-static/
 build-storybook.log
+
+.nx/cache/

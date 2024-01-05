@@ -22,7 +22,7 @@ import InfoGrid from 'apps/app/src/views/components/InfoGrid';
 import { Formik } from 'formik';
 import { useMemo, useState } from 'react';
 import * as yup from 'yup';
-import { useClinicalApiClient } from '../../apollo';
+import { usePhoton } from '@photonhealth/react';
 import { OrganizationForm, organizationFormSchema } from './OrganizationEditForm';
 
 const organizationQuery = graphql(/* GraphQL */ `
@@ -87,13 +87,13 @@ const EditButtons = ({
 
 export const Organization = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const client = useClinicalApiClient();
-  const { data, error, loading } = useQuery(organizationQuery, { client });
+  const { clinicalClient } = usePhoton();
+  const { data, error, loading } = useQuery(organizationQuery, { client: clinicalClient });
   const [updateOrganization, { loading: mutationLoading }] = useMutation(
     updateOrganizationMutation,
     {
       refetchQueries: ['OrganizationQuery'],
-      client
+      client: clinicalClient
     }
   );
   const hasOrgEdit = usePermissions(['manage:organization']);

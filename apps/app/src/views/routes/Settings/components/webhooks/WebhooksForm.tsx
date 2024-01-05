@@ -30,7 +30,7 @@ import { useMutation } from '@apollo/client';
 import { graphql } from 'apps/app/src/gql';
 import { useEffect, useState } from 'react';
 import { capitalizeFirst } from '../../../../../utils';
-import { useClinicalApiClient } from '../../apollo';
+import { usePhoton } from '@photonhealth/react';
 
 const hookSchema = yup.object({
   url: yup
@@ -58,9 +58,9 @@ const webhookFormCreateMutation = graphql(/* GraphQL */ `
 
 export const WebhooksForm = ({ isOpen, close }: WebhooksFormProps) => {
   const [eventValue, setEventValue] = useState('all');
-  const client = useClinicalApiClient();
+  const { clinicalClient } = usePhoton();
   const [createWebhook, { loading, error }] = useMutation(webhookFormCreateMutation, {
-    client,
+    client: clinicalClient,
     refetchQueries: ['WebhookListQuery'],
     awaitRefetchQueries: true
   });
