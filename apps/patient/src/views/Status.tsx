@@ -47,10 +47,6 @@ export const Status = () => {
 
   const { fulfillment, pharmacy, address } = order;
 
-  // const [enrichedPharmacy, setEnrichedPharmacy] = useState<EnrichedPharmacy | undefined>(
-  //   preparePharmacyHours(pharmacy)
-  // );
-
   const fulfillmentType = getFulfillmentType(pharmacy?.id, fulfillment, type);
 
   const toast = useToast();
@@ -112,10 +108,6 @@ export const Status = () => {
     const url = `http://maps.google.com/?q=${pharmacy.name}, ${formatAddress(pharmacy.address)}`;
     window.open(url);
   };
-
-  // useEffect(() => {
-  //   setEnrichedPharmacy(preparePharmacyHours(pharmacy));
-  // }, []);
 
   // People that select a pharmacy low in the list might start at bottom of status page
   useEffect(() => {
