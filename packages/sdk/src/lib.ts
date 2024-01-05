@@ -10,7 +10,7 @@ import { setContext } from '@apollo/client/link/context/index.js';
 import { AuthManager } from './auth';
 import { ClinicalQueryManager } from './clinical';
 import { ManagementQueryManager } from './management';
-import { getClinicalUrl } from './utils';
+import { Env, getClinicalUrl, clinicalApiUrl, lambdasApiUrl, clinicalAppUrl } from './utils';
 
 export * as types from './types';
 export * as fragments from './fragments';
@@ -32,6 +32,7 @@ export interface PhotonClientOptions {
   domain?: string;
   clientId: string;
   redirectURI?: string;
+  env?: Env;
   organization?: string;
   audience?: string;
   uri?: string;
@@ -96,6 +97,7 @@ export class PhotonClient {
       clientId,
       redirectURI,
       organization,
+      env = 'photon',
       audience = 'https://api.photon.health',
       uri = 'https://api.photon.health/graphql',
       developmentMode = false
@@ -108,25 +110,18 @@ export class PhotonClient {
       redirect_uri: redirectURI,
       cacheLocation: 'memory'
     });
-    this.audience = audience;
-    this.uri = uri;
-    this.clinicalUrl = getClinicalUrl(uri);
+    this.audience = env ? lambdasApiUrl[env] : audience;
+    this.uri = env ? `${lambdasApiUrl[env]}/graphql` : uri;
+    this.clinicalUrl = env ? clinicalAppUrl[env] : getClinicalUrl(uri);
 
-    this.clinicalApiUri = `${
-      this.clinicalUrl?.includes('photon')
-        ? 'https://clinical-api.photon.health'
-        : this.clinicalUrl?.includes('neutron')
-        ? 'https://clinical-api.neutron.health'
-        : this.clinicalUrl?.includes('tau')
-        ? 'https://clinical-api.tau.health:8080'
-        : 'https://clinical-api.boson.health'
-    }/graphql`;
+    this.clinicalApiUri = `${clinicalApiUrl[env]}/graphql`;
 
     if (developmentMode) {
-      this.audience = 'https://api.neutron.health';
-      this.uri = 'https://api.neutron.health/graphql';
-      this.clinicalApiUri = 'https://clinical-api.neutron.health/graphql';
+      this.audience = clinicalAppUrl['neutron'];
+      this.uri = `${lambdasApiUrl['neutron']}/graphql'`;
+      this.clinicalApiUri = `${clinicalApiUrl['neutron']}/graphql'`;
     }
+
     this.organization = organization;
     this.authentication = new AuthManager({
       authentication: this.auth0Client,
