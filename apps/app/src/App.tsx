@@ -26,7 +26,7 @@ import { Prescriptions } from './views/routes/Prescriptions';
 import { Settings } from './views/routes/Settings';
 import { Support } from './views/routes/Support';
 import { UpdatePatientForm } from './views/routes/UpdatePatientForm';
-import { Env } from 'packages/sdk/src/utils';
+import { Env } from '@photonhealth/sdk';
 
 const client = new PhotonClient({
   env: process.env.REACT_APP_ENV_NAME as Env,

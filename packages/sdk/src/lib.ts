@@ -10,7 +10,13 @@ import { setContext } from '@apollo/client/link/context/index.js';
 import { AuthManager } from './auth';
 import { ClinicalQueryManager } from './clinical';
 import { ManagementQueryManager } from './management';
-import { Env, getClinicalUrl, clinicalApiUrl, lambdasApiUrl, clinicalAppUrl } from './utils';
+import {
+  Env as Environment,
+  getClinicalUrl,
+  clinicalApiUrl,
+  lambdasApiUrl,
+  clinicalAppUrl
+} from './utils';
 
 export * as types from './types';
 export * as fragments from './fragments';
@@ -18,6 +24,8 @@ export * as fragments from './fragments';
 import pkg from '../package.json';
 
 const version: string = pkg?.version ?? 'unknown';
+
+export type Env = Environment;
 
 /**
  * Configuration options for Photon SDK
@@ -33,6 +41,7 @@ export interface PhotonClientOptions {
   clientId: string;
   redirectURI?: string;
   env?: Env;
+  env?: Environment;
   organization?: string;
   audience?: string;
   uri?: string;
