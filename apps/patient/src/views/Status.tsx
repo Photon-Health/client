@@ -45,9 +45,12 @@ export const Status = () => {
 
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
-  const [enrichedPharmacy, setEnrichedPharmacy] = useState<EnrichedPharmacy | undefined>(undefined);
 
   const { fulfillment, pharmacy, address } = order;
+
+  const [enrichedPharmacy, setEnrichedPharmacy] = useState<EnrichedPharmacy | undefined>(
+    preparePharmacyHours(pharmacy)
+  );
 
   const fulfillmentType = getFulfillmentType(pharmacy?.id, fulfillment, type);
 
@@ -111,13 +114,8 @@ export const Status = () => {
     window.open(url);
   };
 
-  const initializePharmacy = async (p: types.Pharmacy) => {
-    const enrichedPharmacy = preparePharmacyHours(p);
-    setEnrichedPharmacy(enrichedPharmacy);
-  };
-
   useEffect(() => {
-    initializePharmacy(pharmacy);
+    setEnrichedPharmacy(preparePharmacyHours(pharmacy));
   }, []);
 
   // People that select a pharmacy low in the list might start at bottom of status page
