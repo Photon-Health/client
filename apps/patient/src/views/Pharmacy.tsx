@@ -15,7 +15,7 @@ import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { Helmet } from 'react-helmet';
 import { types } from '@photonhealth/sdk';
 import * as TOAST_CONFIG from '../configs/toast';
-import { formatAddress, preparePharmacy } from '../utils/general';
+import { formatAddress, preparePharmacyHours } from '../utils/general';
 import { ExtendedFulfillmentType, Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import {
@@ -200,7 +200,7 @@ export const Pharmacy = () => {
 
     // We only show add a few at a time, so just enrich the first group of pharmacies
     const preparedPharmacies: EnrichedPharmacy[] = await Promise.all(
-      pharmaciesResult.slice(0, MAX_ENRICHMENT_COUNT).map((p) => preparePharmacy(p, true))
+      pharmaciesResult.slice(0, MAX_ENRICHMENT_COUNT).map((p) => preparePharmacyHours(p))
     );
     setPharmacyOptions(preparedPharmacies);
 
@@ -230,12 +230,9 @@ export const Pharmacy = () => {
      * Initially we fetched a list of pharmacies from our db, if some
      * of those haven't received ratings/hours, enrich those first
      *  */
-    const newPharmacies: EnrichedPharmacy[] = await Promise.all(
-      initialPharmacies
-        .slice(pharmacyOptions.length, pharmacyOptions.length + MAX_ENRICHMENT_COUNT)
-        .map((p) => preparePharmacy(p, true))
-    );
-
+    const newPharmacies: EnrichedPharmacy[] = initialPharmacies
+      .slice(pharmacyOptions.length, pharmacyOptions.length + MAX_ENRICHMENT_COUNT)
+      .map(preparePharmacyHours);
     if (newPharmacies.length === MAX_ENRICHMENT_COUNT) {
       // Break early and return enriched pharmacies
       setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
@@ -277,9 +274,7 @@ export const Pharmacy = () => {
       }
     }
 
-    const preparedPharmacies: EnrichedPharmacy[] = await Promise.all(
-      pharmaciesResult.map((p) => preparePharmacy(p, true))
-    );
+    const preparedPharmacies: EnrichedPharmacy[] = pharmaciesResult.map(preparePharmacyHours);
     newPharmacies.push(...preparedPharmacies);
 
     setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);

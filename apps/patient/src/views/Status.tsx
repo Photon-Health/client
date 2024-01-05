@@ -12,7 +12,7 @@ import {
   PoweredBy,
   StatusStepper
 } from '../components';
-import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
+import { formatAddress, getFulfillmentType, preparePharmacyHours } from '../utils/general';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t, orderStateMapping as m } from '../utils/text';
 import { useOrderContext } from './Main';
@@ -112,7 +112,7 @@ export const Status = () => {
   };
 
   const initializePharmacy = async (p: types.Pharmacy) => {
-    const enrichedPharmacy = await preparePharmacy(p, false);
+    const enrichedPharmacy = preparePharmacyHours(p);
     setEnrichedPharmacy(enrichedPharmacy);
   };
 
