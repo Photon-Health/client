@@ -16,11 +16,11 @@
     "baseUrl": ".",
     "paths": {
       "@client/settings": ["packages/settings/src/index.ts"],
-      "@photonHealth/sdk": ["packages/sdk/src/lib.ts"],
-      "@photonHealth/react": ["packages/react/src/index.ts"],
-      "@photonHealth/components": ["packages/components/src/index.ts"],
-      "@photonHealth/elements": ["packages/elements/src/index.ts"],
-      "@photonHealth/settings": ["packages/settings/src/index.ts"]
+      "@photonhealth/sdk": ["packages/sdk/src/lib.ts"],
+      "@photonhealth/react": ["packages/react/src/index.ts"],
+      "@photonhealth/components": ["packages/components/src/index.ts"],
+      "@photonhealth/elements": ["packages/elements/src/index.ts"],
+      "@photonhealth/settings": ["packages/settings/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist"]
