@@ -13,7 +13,6 @@ import {
   StatusStepper
 } from '../components';
 import { formatAddress, getFulfillmentType, preparePharmacyHours } from '../utils/general';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t, orderStateMapping as m } from '../utils/text';
 import { useOrderContext } from './Main';
 import * as TOAST_CONFIG from '../configs/toast';
@@ -48,9 +47,9 @@ export const Status = () => {
 
   const { fulfillment, pharmacy, address } = order;
 
-  const [enrichedPharmacy, setEnrichedPharmacy] = useState<EnrichedPharmacy | undefined>(
-    preparePharmacyHours(pharmacy)
-  );
+  // const [enrichedPharmacy, setEnrichedPharmacy] = useState<EnrichedPharmacy | undefined>(
+  //   preparePharmacyHours(pharmacy)
+  // );
 
   const fulfillmentType = getFulfillmentType(pharmacy?.id, fulfillment, type);
 
@@ -114,9 +113,9 @@ export const Status = () => {
     window.open(url);
   };
 
-  useEffect(() => {
-    setEnrichedPharmacy(preparePharmacyHours(pharmacy));
-  }, []);
+  // useEffect(() => {
+  //   setEnrichedPharmacy(preparePharmacyHours(pharmacy));
+  // }, []);
 
   // People that select a pharmacy low in the list might start at bottom of status page
   useEffect(() => {
@@ -176,6 +175,8 @@ export const Status = () => {
     fulfillmentState === 'PICKED_UP' ||
     fulfillmentState === 'RECEIVED';
 
+  const pharmacyWithHours = preparePharmacyHours(pharmacy);
+
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
@@ -213,10 +214,10 @@ export const Status = () => {
               ) : null}
             </Box>
           </VStack>
-          {enrichedPharmacy ? (
+          {pharmacy ? (
             <Box width="full">
               <PharmacyCard
-                pharmacy={enrichedPharmacy}
+                pharmacy={pharmacyWithHours}
                 selected={true}
                 showDetails={fulfillmentType === 'PICK_UP'}
                 canReroute={!isDemo && orgSettings.enablePatientRerouting}
