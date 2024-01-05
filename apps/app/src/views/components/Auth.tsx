@@ -1,6 +1,6 @@
 import { Button, Stack } from '@chakra-ui/react';
 
-import { usePhoton } from '@photonhealth/react';
+import { usePhoton } from 'packages/react';
 import { getSettings } from '@client/settings';
 
 const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';

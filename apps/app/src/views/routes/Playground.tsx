@@ -1,7 +1,7 @@
 import { Center, CircularProgress } from '@chakra-ui/react';
 import { useState, useEffect, useMemo } from 'react';
 import GraphiQL from 'graphiql';
-import { usePhoton } from '@photonhealth/react';
+import { usePhoton } from 'packages/react';
 
 import 'graphiql/graphiql.min.css';
 import './Playground.css';

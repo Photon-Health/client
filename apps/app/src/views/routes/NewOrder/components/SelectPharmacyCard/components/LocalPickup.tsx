@@ -14,7 +14,7 @@ import {
   WrapItem
 } from '@chakra-ui/react';
 import { FiMapPin } from 'react-icons/fi';
-import { usePhoton, types } from '@photonhealth/react';
+import { usePhoton, types } from 'packages/react';
 import { AsyncSelect } from 'chakra-react-select';
 import { RepeatIcon, StarIcon } from '@chakra-ui/icons';
 import { useSearchParams } from 'react-router-dom';

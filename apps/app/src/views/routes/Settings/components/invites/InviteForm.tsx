@@ -20,7 +20,7 @@ import { graphql } from 'apps/app/src/gql';
 import { InvitesQueryDocument } from 'apps/app/src/gql/graphql';
 import { ErrorMessage, Field, Formik, FormikErrors, FormikTouched } from 'formik';
 import * as yup from 'yup';
-import { useClinicalApiClient } from '../../../../../clinicalApollo';
+import { usePhoton } from 'packages/react';
 import { RolesSelect, rolesSchema } from '../utils/Roles';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 
@@ -117,14 +117,14 @@ type ProviderFormikTouchedType = FormikTouched<ProviderYupType>;
 type ProviderFormikErrorsType = FormikErrors<ProviderYupType>;
 
 export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-  const client = useClinicalApiClient();
+  const { clinicalClient } = usePhoton();
   const { data: user, loading: userLoading } = useQuery(userInviteFormQuery, {
-    client,
+    client: clinicalClient,
     fetchPolicy: 'cache-first'
   });
 
   const [inviteUser, { error, loading }] = useMutation(inviteUserMutation, {
-    client,
+    client: clinicalClient,
     refetchQueries: [InvitesQueryDocument]
   });
 

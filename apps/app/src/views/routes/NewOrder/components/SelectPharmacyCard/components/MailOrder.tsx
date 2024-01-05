@@ -9,7 +9,7 @@ import {
   Text,
   useColorModeValue
 } from '@chakra-ui/react';
-import { usePhoton, types } from '@photonhealth/react';
+import { usePhoton, types } from 'packages/react';
 import { Pharmacy } from './Pharmacy';
 import { getSettings } from '@client/settings';
 import { useIsVisible } from 'apps/app/src/hooks/useIsIntersecting';

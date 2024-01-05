@@ -13,7 +13,7 @@ import {
   useToast
 } from '@chakra-ui/react';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
-import { usePhoton } from '@photonhealth/react';
+import { usePhoton } from 'packages/react';
 import { useDebounce } from 'use-debounce';
 import { useMutation } from '@apollo/client';
 

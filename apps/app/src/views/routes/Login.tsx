@@ -12,7 +12,7 @@ import {
 
 import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
 
-import { usePhoton } from '@photonhealth/react';
+import { usePhoton } from 'packages/react';
 import { Logo } from '../components/Logo';
 import { Auth } from '../components/Auth';
 import useQueryParams from '../../hooks/useQueryParams';

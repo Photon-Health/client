@@ -1,4 +1,4 @@
-import { usePhoton } from '@photonhealth/react';
+import { usePhoton } from 'packages/react';
 import jwtDecode from 'jwt-decode';
 import { Permission } from 'packages/sdk/dist/types';
 import { useEffect, useState } from 'react';

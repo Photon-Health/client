@@ -1,4 +1,6 @@
 import { useQuery } from '@apollo/client';
+import { usePhoton } from 'packages/react';
+
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import {
   Alert,
@@ -19,7 +21,6 @@ import {
   Tr,
   useBreakpointValue
 } from '@chakra-ui/react';
-import { useClinicalApiClient } from 'apps/app/src/clinicalApollo';
 import { graphql } from 'apps/app/src/gql';
 import { useMemo, useState } from 'react';
 import { Outlet } from 'react-router-dom';
@@ -43,8 +44,8 @@ const dateDiffInDays = (d1: Date, d2: Date) => {
 };
 
 export const InviteList = () => {
-  const client = useClinicalApiClient();
-  const { data, error, loading } = useQuery(invitesQuery, { client });
+  const { clinicalClient } = usePhoton();
+  const { data, error, loading } = useQuery(invitesQuery, { client: clinicalClient });
 
   const isMobileAndTablet = useBreakpointValue({ base: true, md: true, lg: false });
 

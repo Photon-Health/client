@@ -1,6 +1,6 @@
 import { Badge, VStack } from '@chakra-ui/react';
 import { useStore } from '@nanostores/react';
-import { usePhoton } from '@photonhealth/react';
+import { usePhoton } from 'packages/react';
 import { alertStore, hiddenCount } from '../../stores/alert';
 import { Alert } from './Alert';
 

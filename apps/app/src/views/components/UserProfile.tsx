@@ -1,6 +1,6 @@
 import { Avatar, Box, HStack, Text } from '@chakra-ui/react';
 
-import { usePhoton } from '@photonhealth/react';
+import { usePhoton } from 'packages/react';
 
 export const UserProfile = () => {
   const { user } = usePhoton();

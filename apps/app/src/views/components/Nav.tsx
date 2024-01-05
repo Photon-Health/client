@@ -38,7 +38,7 @@ import {
 import { TbPrescription } from 'react-icons/tb';
 
 import { getSettings } from '@client/settings';
-import { usePhoton } from '@photonhealth/react';
+import { usePhoton } from 'packages/react';
 import { useCallback } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Logo } from './Logo';

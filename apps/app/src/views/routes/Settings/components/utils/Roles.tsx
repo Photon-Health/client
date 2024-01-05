@@ -3,7 +3,7 @@ import { graphql } from 'apps/app/src/gql';
 import { AsyncSelect, OptionProps, components } from 'chakra-react-select';
 import { Text } from '@chakra-ui/react';
 import * as yup from 'yup';
-import { useClinicalApiClient } from '../../../../../clinicalApollo';
+import { usePhoton } from 'packages/react';
 export const rolesSchema = yup.array(
   yup
     .object({
@@ -55,8 +55,8 @@ const customStyles = {
 };
 
 export const RolesSelect = (props: RolesSelectProps) => {
-  const client = useClinicalApiClient();
-  const [loadRoleOptions] = useLazyQuery(allRolesQuery, { client });
+  const { clinicalClient } = usePhoton();
+  const [loadRoleOptions] = useLazyQuery(allRolesQuery, { client: clinicalClient });
 
   const loadOptions = async () => {
     const roles = (await loadRoleOptions()).data?.roles ?? [];

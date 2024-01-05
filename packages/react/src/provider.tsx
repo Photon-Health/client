@@ -1,4 +1,10 @@
-import { ApolloError, ApolloProvider, DocumentNode } from '@apollo/client';
+import {
+  ApolloClient,
+  ApolloError,
+  ApolloProvider,
+  DocumentNode,
+  NormalizedCacheObject
+} from '@apollo/client';
 import { useStore } from '@nanostores/react';
 import { GraphQLError } from 'graphql';
 import { action, map } from 'nanostores';
@@ -108,6 +114,7 @@ export type GetAllergensReturn = {
 };
 
 export interface PhotonClientContextInterface {
+  clinicalClient: ApolloClient<object> | undefined;
   getPatient: ({ id, fragment }: { id: string; fragment?: Record<string, DocumentNode> }) => {
     patient: Patient;
     loading: boolean;
@@ -633,6 +640,7 @@ const stub = (): never => {
 };
 
 const PhotonClientContext = createContext<PhotonClientContextInterface>({
+  clinicalClient: undefined,
   getAllergens: stub,
   getPatients: stub,
   getDispenseUnits: stub,
@@ -2888,6 +2896,7 @@ export const PhotonProvider = (opts: {
 
   const contextValue = {
     ...state,
+    clinicalClient: client.apolloClinical,
     login,
     logout,
     getToken,

@@ -13,7 +13,7 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { RepeatIcon, StarIcon } from '@chakra-ui/icons';
-import { usePhoton, types } from '@photonhealth/react';
+import { usePhoton, types } from 'packages/react';
 
 import { formatAddress } from '../../../../../../utils';
 

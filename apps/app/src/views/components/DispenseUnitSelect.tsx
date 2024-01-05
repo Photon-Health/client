@@ -1,5 +1,5 @@
 import { forwardRef } from '@chakra-ui/react';
-import { usePhoton } from '@photonhealth/react';
+import { usePhoton } from 'packages/react';
 import { useEffect, useState } from 'react';
 import { SelectField } from './SelectField';
 

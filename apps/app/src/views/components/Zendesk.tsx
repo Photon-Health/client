@@ -1,4 +1,4 @@
-import { usePhoton } from '@photonhealth/react';
+import { usePhoton } from 'packages/react';
 import { useEffect } from 'react';
 
 export const Zendesk = () => {

@@ -1,6 +1,6 @@
 import { Badge, Td, Text, Tr, HStack, IconButton, useToast, Box, Icon } from '@chakra-ui/react';
 import { useMutation } from '@apollo/client';
-import { useClinicalApiClient } from '../../../../../clinicalApollo';
+import { usePhoton } from 'packages/react';
 import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { InvitesQueryDocument } from 'apps/app/src/gql/graphql';
 import { FiCheckCircle, FiSend, FiTrash, FiX } from 'react-icons/fi';
@@ -33,15 +33,15 @@ const DeleteInviteUserMutation = graphql(/* GraphQL */ `
 export const InviteItem = ({ invite: data }: { invite: FragmentType<typeof inviteFragment> }) => {
   const toast = useToast();
   const invite = useFragment(inviteFragment, data);
-  const client = useClinicalApiClient();
+  const { clinicalClient } = usePhoton();
 
   const [deleteInvite, { loading: deleteLoading }] = useMutation(DeleteInviteUserMutation, {
-    client,
+    client: clinicalClient,
     refetchQueries: [InvitesQueryDocument]
   });
 
   const [resendInvite, { loading: resendLoading }] = useMutation(ResendInviteUserMutation, {
-    client,
+    client: clinicalClient,
     refetchQueries: [InvitesQueryDocument]
   });
 

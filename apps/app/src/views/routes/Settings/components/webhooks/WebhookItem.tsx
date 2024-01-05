@@ -1,6 +1,6 @@
 import { Tr, Td, Badge, Button, Text } from '@chakra-ui/react';
 import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
-import { useClinicalApiClient } from '../../../../../clinicalApollo';
+import { usePhoton } from 'packages/react';
 import { useMutation } from '@apollo/client';
 import { useMemo } from 'react';
 
@@ -22,10 +22,10 @@ export interface WebhookItemProps {
 }
 
 export const WebhookItem = (props: WebhookItemProps) => {
-  const client = useClinicalApiClient();
+  const { clinicalClient } = usePhoton();
   const webhook = useFragment(webhookItemFragment, props.webhook);
   const [deleteMutation, { loading: deleteLoading }] = useMutation(webhookItemDeleteMutation, {
-    client,
+    client: clinicalClient,
     refetchQueries: ['WebhookListQuery'],
     awaitRefetchQueries: true
   });

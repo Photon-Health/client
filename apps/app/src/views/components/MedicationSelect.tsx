@@ -3,7 +3,7 @@ import { forwardRef, Box, Text, VStack } from '@chakra-ui/react';
 import { GroupHeadingProps, OptionProps as SelectOptionProps } from 'chakra-react-select';
 
 import { useEffect, useImperativeHandle, useState } from 'react';
-import { usePhoton } from '@photonhealth/react';
+import { usePhoton } from 'packages/react';
 import { SelectField } from './SelectField';
 
 import { CATALOG_TREATMENTS_FIELDS } from '../../model/fragments';

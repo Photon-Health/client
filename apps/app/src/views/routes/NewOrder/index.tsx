@@ -20,7 +20,7 @@ import {
 
 import { FiShoppingCart } from 'react-icons/fi';
 
-import { usePhoton } from '@photonhealth/react';
+import { usePhoton } from 'packages/react';
 import { getSettings } from '@client/settings';
 
 import { PATIENT_FIELDS } from '../../../model/fragments';

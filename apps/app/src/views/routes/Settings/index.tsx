@@ -14,7 +14,7 @@ import { useQuery } from '@apollo/client';
 import { graphql } from 'apps/app/src/gql';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
 import { Page } from '../../components/Page';
-import { useClinicalApiClient } from '../../../clinicalApollo';
+import { usePhoton } from 'packages/react';
 import { DevelopersTab } from './views/DevelopersTab';
 import { OrganizationTab } from './views/OrganizationTab';
 import { TeamTab } from './views/TeamTab';
@@ -65,8 +65,8 @@ export const Settings = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  const client = useClinicalApiClient();
-  const { data, loading } = useQuery(settingsPageQuery, { client });
+  const { clinicalClient } = usePhoton();
+  const { data, loading } = useQuery(settingsPageQuery, { client: clinicalClient });
 
   const rolesMap: Record<string, string> = useMemo(
     () =>
