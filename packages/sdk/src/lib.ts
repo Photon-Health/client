@@ -107,8 +107,8 @@ export class PhotonClient {
       redirectURI,
       organization,
       env = 'photon',
-      audience = 'https://api.photon.health',
-      uri = 'https://api.photon.health/graphql',
+      audience,
+      uri,
       developmentMode = false
     }: PhotonClientOptions,
     elementsVersion?: string
@@ -119,10 +119,9 @@ export class PhotonClient {
       redirect_uri: redirectURI,
       cacheLocation: 'memory'
     });
-    this.audience = env ? lambdasApiUrl[env] : audience;
-    this.uri = env ? `${lambdasApiUrl[env]}/graphql` : uri;
-    this.clinicalUrl = env ? clinicalAppUrl[env] : getClinicalUrl(uri);
-
+    this.audience = audience ? audience : lambdasApiUrl[env];
+    this.uri = uri ? uri : `${lambdasApiUrl[env]}/graphql`;
+    this.clinicalUrl = uri ? getClinicalUrl(uri) : clinicalAppUrl[env];
     this.clinicalApiUri = `${clinicalApiUrl[env]}/graphql`;
 
     if (developmentMode) {
