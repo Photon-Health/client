@@ -5,7 +5,6 @@ import isToday from 'dayjs/plugin/isToday';
 import { types } from '@photonhealth/sdk';
 import { ExtendedFulfillmentType } from './models';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { getPlace } from '../api';
 import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
 
 dayjs.extend(isoWeek);
@@ -101,50 +100,36 @@ function isCloseEvent(event: types.PharmacyEvent): event is types.PharmacyCloseE
   return event.type === 'close';
 }
 
-export const preparePharmacy = async (
-  pharmacy: types.Pharmacy,
-  includeRating = true
-): Promise<EnrichedPharmacy> => {
-  try {
-    const queryText = `${pharmacy.name} ${pharmacy.address ? formatAddress(pharmacy.address) : ''}`;
-    const queryFields = ['rating'];
+export const preparePharmacyHours = (pharmacy: types.Pharmacy): EnrichedPharmacy => {
+  let is24Hr = false;
+  let opens = '';
+  let closes = '';
 
-    const rating = includeRating ? (await getPlace(queryText, queryFields))?.rating : null;
+  if (pharmacy.nextEvents) {
+    is24Hr = pharmacy.nextEvents[pharmacy.isOpen ? 'open' : 'close'].type === '24hr';
 
-    let is24Hr = false;
-    let opens = '';
-    let closes = '';
+    // Prepare opens string, ex: Opens 8AM Wed
+    const nextOpen = isOpenEvent(pharmacy.nextEvents.open)
+      ? pharmacy.nextEvents.open.datetime
+      : undefined;
+    const formatter = `${dayjs(nextOpen).minute() > 0 ? 'h:mmA' : 'hA'}${
+      dayjs(nextOpen).isToday() ? '' : ' ddd'
+    }`;
+    const oTime = dayjs(nextOpen).format(formatter);
+    opens = `Opens ${oTime}`;
 
-    if (pharmacy.nextEvents) {
-      is24Hr = pharmacy.nextEvents[pharmacy.isOpen ? 'open' : 'close'].type === '24hr';
-
-      // Prepare opens string, ex: Opens 8AM Wed
-      const nextOpen = isOpenEvent(pharmacy.nextEvents.open)
-        ? pharmacy.nextEvents.open.datetime
-        : undefined;
-      const formatter = `${dayjs(nextOpen).minute() > 0 ? 'h:mmA' : 'hA'}${
-        dayjs(nextOpen).isToday() ? '' : ' ddd'
-      }`;
-      const oTime = dayjs(nextOpen).format(formatter);
-      opens = `Opens ${oTime}`;
-
-      // Prepare closes string, ex: Closes 6PM
-      const nextClose = isCloseEvent(pharmacy.nextEvents.close)
-        ? pharmacy.nextEvents.close.datetime
-        : undefined;
-      const cTime = dayjs(nextClose).format(dayjs(nextClose).minute() > 0 ? 'h:mmA' : 'hA');
-      closes = `Closes ${cTime}`;
-    }
-
-    return {
-      ...pharmacy,
-      rating: rating || undefined,
-      is24Hr,
-      opens,
-      closes
-    };
-  } catch (error) {
-    console.log('Failed to prepare pharmacy metadata: ' + error.message);
-    return pharmacy;
+    // Prepare closes string, ex: Closes 6PM
+    const nextClose = isCloseEvent(pharmacy.nextEvents.close)
+      ? pharmacy.nextEvents.close.datetime
+      : undefined;
+    const cTime = dayjs(nextClose).format(dayjs(nextClose).minute() > 0 ? 'h:mmA' : 'hA');
+    closes = `Closes ${cTime}`;
   }
+
+  return {
+    ...pharmacy,
+    is24Hr,
+    opens,
+    closes
+  };
 };
