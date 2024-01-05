@@ -117,7 +117,9 @@ export class PhotonClient {
         ? 'https://clinical-api.photon.health'
         : this.clinicalUrl?.includes('neutron')
         ? 'https://clinical-api.neutron.health'
-        : 'http://clinical-api.tau.health:8080'
+        : this.clinicalUrl?.includes('tau')
+        ? 'https://clinical-api.tau.health:8080'
+        : 'https://clinical-api.boson.health'
     }/graphql`;
 
     if (developmentMode) {
