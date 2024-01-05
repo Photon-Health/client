@@ -15,9 +15,9 @@ import { Env, getClinicalUrl, clinicalApiUrl, lambdasApiUrl, clinicalAppUrl } fr
 export * as types from './types';
 export * as fragments from './fragments';
 
-import * as packageJson from '../package.json';
+import pkg from '../package.json';
 
-const version: string = packageJson?.version ?? 'unknown';
+const version: string = pkg?.version ?? 'unknown';
 
 /**
  * Configuration options for Photon SDK

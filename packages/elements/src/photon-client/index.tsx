@@ -6,7 +6,7 @@ import { makeTimer } from '@solid-primitives/timer';
 import { PhotonClientStore } from '../store';
 import { hasAuthParams } from '../utils';
 import { PhotonContext } from '../context';
-import * as packageJson from '../../package.json';
+import pkg from '../../package.json';
 
 type PhotonClientProps = {
   domain?: string;
@@ -22,7 +22,7 @@ type PhotonClientProps = {
   toastBuffer?: number;
 };
 
-const version = packageJson?.version ?? 'unknown';
+const version = pkg?.version ?? 'unknown';
 
 customElement(
   'photon-client',
