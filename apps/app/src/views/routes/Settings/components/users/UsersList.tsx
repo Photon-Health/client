@@ -25,7 +25,7 @@ import usePermissions from 'apps/app/src/hooks/usePermissions';
 import { useMemo, useState } from 'react';
 import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
 import { Outlet } from 'react-router-dom';
-import { useClinicalApiClient } from '../../apollo';
+import { usePhoton } from '@photonhealth/react';
 import { PaginationIndicator } from '../PaginationIndicator';
 import { InviteForm } from '../invites/InviteForm';
 import { UserItem } from './UserItem';
@@ -52,11 +52,11 @@ const usersQuery = graphql(/* GraphQL */ `
 `);
 
 export const UsersList = (props: { rolesMap: Record<string, string> }) => {
-  const client = useClinicalApiClient();
+  const { clinicalClient } = usePhoton();
   const [sortBy, setSortBy] = useState<'NAME' | 'ROLES' | 'EMAIL' | undefined>();
   const [sortByDir, setSortByDir] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data, error, loading } = useQuery(usersQuery, { client });
+  const { data, error, loading } = useQuery(usersQuery, { client: clinicalClient });
 
   const hasUsers = usePermissions(['edit:profile', 'read:profile']);
   const hasInvite = usePermissions(['write:invite']);

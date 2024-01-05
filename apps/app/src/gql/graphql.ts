@@ -46,6 +46,16 @@ export type Client = {
   whiteListedUrls: Array<Scalars['String']['output']>;
 };
 
+export type CommentTicketInput = {
+  body: Scalars['String']['input'];
+};
+
+export type CompletedSignatureAttestation = {
+  __typename?: 'CompletedSignatureAttestation';
+  agreedAt: Scalars['DateTime']['output'];
+  version: Scalars['String']['output'];
+};
+
 export type Compound = Treatment & {
   __typename?: 'Compound';
   id: Scalars['ID']['output'];
@@ -102,7 +112,9 @@ export type Medication = Treatment & {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  agreeToSignatureAttestation: Scalars['Boolean']['output'];
   createClient: Client;
+  createTicket: Ticket;
   createWebhookConfig: Scalars['ID']['output'];
   deleteInvite: Scalars['ID']['output'];
   deleteWebhookConfig: Scalars['ID']['output'];
@@ -118,10 +130,20 @@ export type Mutation = {
 };
 
 
+export type MutationAgreeToSignatureAttestationArgs = {
+  version: Scalars['String']['input'];
+};
+
+
 export type MutationCreateClientArgs = {
   appType?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   whiteListedUrls?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+export type MutationCreateTicketArgs = {
+  input: TicketInput;
 };
 
 
@@ -206,6 +228,17 @@ export type Name = {
   last: Scalars['String']['output'];
   middle?: Maybe<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
+};
+
+export type NeedsSignatureAttestation = {
+  __typename?: 'NeedsSignatureAttestation';
+  content?: Maybe<Scalars['String']['output']>;
+  version: Scalars['String']['output'];
+};
+
+export type NotApplicableSignatureAttestation = {
+  __typename?: 'NotApplicableSignatureAttestation';
+  reason?: Maybe<Scalars['String']['output']>;
 };
 
 export type Order = {
@@ -398,6 +431,18 @@ export enum SexType {
   Unknown = 'UNKNOWN'
 }
 
+export type SignatureAttestationStatus = CompletedSignatureAttestation | NeedsSignatureAttestation | NotApplicableSignatureAttestation;
+
+export type Ticket = {
+  __typename?: 'Ticket';
+  id: Scalars['String']['output'];
+};
+
+export type TicketInput = {
+  comment: CommentTicketInput;
+  subject: Scalars['String']['input'];
+};
+
 export type Treatment = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
@@ -434,6 +479,7 @@ export type User = {
   roles: Array<Role>;
   /** A base64 encoded string of the signature picture that can be rendered */
   signature?: Maybe<Scalars['String']['output']>;
+  signatureAttestationStatus?: Maybe<SignatureAttestationStatus>;
 };
 
 export type UserNameInput = {
