@@ -31,7 +31,9 @@ export const Main = () => {
   const [logo, setLogo] = useState(undefined);
   const [loadingLogo, setLoadingLogo] = useState(true);
 
-  const [flattenedFills, setFlattenedFills] = useState([]);
+  const [flattenedFills, setFlattenedFills] = useState(
+    isDemo ? countFillsAndRemoveDuplicates(demoOrder.fills) : []
+  );
 
   const navigate = useNavigate();
   const location = useLocation();
