@@ -16,7 +16,7 @@ import { Helmet } from 'react-helmet';
 import { types } from '@photonhealth/sdk';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, preparePharmacyHours } from '../utils/general';
-import { ExtendedFulfillmentType, Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { ExtendedFulfillmentType, Pharmacy as PharmacyWithHours } from '../utils/models';
 import { text as t } from '../utils/text';
 import {
   BrandedOptions,
@@ -193,7 +193,7 @@ export const Pharmacy = () => {
       return;
     }
 
-    const preparedPharmacies: EnrichedPharmacy[] = pharmaciesResult.map((p) =>
+    const preparedPharmacies: PharmacyWithHours[] = pharmaciesResult.map((p) =>
       preparePharmacyHours(p)
     );
     setPharmacyOptions(preparedPharmacies);
@@ -255,7 +255,7 @@ export const Pharmacy = () => {
       }
     }
 
-    const preparedPharmacies: EnrichedPharmacy[] = pharmaciesResult.map(preparePharmacyHours);
+    const preparedPharmacies: PharmacyWithHours[] = pharmaciesResult.map(preparePharmacyHours);
     setPharmacyOptions([...pharmacyOptions, ...preparedPharmacies]);
 
     setLoadingPharmacies(false);

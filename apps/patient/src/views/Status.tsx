@@ -12,6 +12,7 @@ import {
   PoweredBy,
   StatusStepper
 } from '../components';
+import { Pharmacy as PharmacyWithHours } from '../utils/models';
 import { formatAddress, getFulfillmentType, preparePharmacyHours } from '../utils/general';
 import { text as t, orderStateMapping as m } from '../utils/text';
 import { useOrderContext } from './Main';
@@ -167,7 +168,7 @@ export const Status = () => {
     fulfillmentState === 'PICKED_UP' ||
     fulfillmentState === 'RECEIVED';
 
-  const pharmacyWithHours = preparePharmacyHours(pharmacy);
+  const pharmacyWithHours: PharmacyWithHours = preparePharmacyHours(pharmacy);
 
   return (
     <Box>
