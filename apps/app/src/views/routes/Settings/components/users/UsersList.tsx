@@ -170,11 +170,19 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
                         {sortBy === 'ROLES' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)}
                       </HStack>
                     </Th>
+                    <Th cursor={'pointer'}>
+                      <HStack alignItems={'center'} spacing={2}></HStack>
+                    </Th>
                   </Tr>
                 </Thead>
                 <Tbody>
                   {users?.map((user) => (
-                    <UserItem rolesMap={props.rolesMap} key={user.id} user={user} />
+                    <UserItem
+                      rolesMap={props.rolesMap}
+                      key={user.id}
+                      user={user}
+                      hasRole={hasUsers}
+                    />
                   ))}
                 </Tbody>
               </Table>

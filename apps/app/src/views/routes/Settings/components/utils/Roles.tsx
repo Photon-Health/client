@@ -42,6 +42,18 @@ export interface RolesSelectProps {
   onBlur: () => void;
   value: Role[];
 }
+
+const customStyles = {
+  control: (provided: any /* struggled to find this type */) => ({
+    ...provided,
+    height: 'auto'
+  }),
+  valueContainer: (provided: any /* struggled to find this type */) => ({
+    ...provided,
+    py: 1
+  })
+};
+
 export const RolesSelect = (props: RolesSelectProps) => {
   const client = useClinicalApiClient();
   const [loadRoleOptions] = useLazyQuery(allRolesQuery, { client });
@@ -64,6 +76,7 @@ export const RolesSelect = (props: RolesSelectProps) => {
       cacheOptions
       defaultOptions
       isMulti
+      chakraStyles={customStyles}
       value={props.value}
       onChange={props.onChange}
       onBlur={props.onBlur}
