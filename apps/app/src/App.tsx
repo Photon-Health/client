@@ -26,13 +26,13 @@ import { Prescriptions } from './views/routes/Prescriptions';
 import { Settings } from './views/routes/Settings';
 import { Support } from './views/routes/Support';
 import { UpdatePatientForm } from './views/routes/UpdatePatientForm';
+import { Env } from 'packages/sdk/src/utils';
 
 const client = new PhotonClient({
+  env: process.env.REACT_APP_ENV_NAME as Env,
   domain: auth0Config.domain,
   clientId: auth0Config.clientId,
-  redirectURI: auth0Config.redirectUri,
-  audience: auth0Config.audience,
-  uri: process.env.REACT_APP_GRAPHQL_URI as string
+  redirectURI: auth0Config.redirectUri
 });
 
 const onRedirectCallback = (appState?: AppState) => {
