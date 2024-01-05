@@ -161,9 +161,9 @@ export const Status = () => {
             }
           });
 
-          setTimeout(() => setShowDemoCtaModal(true), 2000);
-        }, 2000);
-      }, 2000);
+          setTimeout(() => setShowDemoCtaModal(true), 1500);
+        }, 1500);
+      }, 1500);
     }
   }, []);
 
