@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { usePhoton } from 'packages/react';
+import { usePhoton } from '@photonhealth/react';
 
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import {

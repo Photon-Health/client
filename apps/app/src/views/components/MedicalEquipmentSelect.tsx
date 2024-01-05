@@ -1,7 +1,7 @@
 import { Text } from '@chakra-ui/react';
 
 import { useEffect, useState } from 'react';
-import { usePhoton } from 'packages/react';
+import { usePhoton } from '@photonhealth/react';
 import { useDebounce } from 'use-debounce';
 import { SelectField } from './SelectField';
 

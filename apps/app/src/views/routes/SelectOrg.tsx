@@ -14,7 +14,7 @@ import {
 import { FiLogIn } from 'react-icons/fi';
 
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { usePhoton } from 'packages/react';
+import { usePhoton } from '@photonhealth/react';
 import { useEffect } from 'react';
 
 export const SelectOrg = () => {

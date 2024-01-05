@@ -1,6 +1,6 @@
 import { IconButton, HStack, useColorMode } from '@chakra-ui/react';
 import { FiTrash } from 'react-icons/fi';
-import { usePhoton } from 'packages/react';
+import { usePhoton } from '@photonhealth/react';
 
 import { CATALOG_TREATMENTS_FIELDS } from '../../../../../model/fragments';
 import { confirmWrapper } from '../../../../components/GuardDialog';

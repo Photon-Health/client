@@ -1,4 +1,4 @@
-import { usePhoton } from 'packages/react';
+import { usePhoton } from '@photonhealth/react';
 import { Navigate } from 'react-router-dom';
 
 export const Logout = () => {

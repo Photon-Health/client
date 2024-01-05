@@ -30,7 +30,7 @@ import { useMutation } from '@apollo/client';
 import { graphql } from 'apps/app/src/gql';
 import { useEffect, useState } from 'react';
 import { capitalizeFirst } from '../../../../../utils';
-import { usePhoton } from 'packages/react';
+import { usePhoton } from '@photonhealth/react';
 
 const hookSchema = yup.object({
   url: yup

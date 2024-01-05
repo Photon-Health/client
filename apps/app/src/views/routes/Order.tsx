@@ -34,7 +34,7 @@ import {
   RadioGroup,
   Radio
 } from '@chakra-ui/react';
-import { usePhoton, types } from 'packages/react';
+import { usePhoton, types } from '@photonhealth/react';
 import { FiChevronRight } from 'react-icons/fi';
 import { Page } from '../components/Page';
 import PatientView from '../components/PatientView';

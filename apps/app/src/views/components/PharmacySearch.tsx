@@ -14,7 +14,7 @@ import {
   Text
 } from '@chakra-ui/react';
 import { useDebounce } from 'use-debounce';
-import { usePhoton, types } from 'packages/react';
+import { usePhoton, types } from '@photonhealth/react';
 import { titleCase } from '../../utils';
 
 export const PharmacySearch = (props: FieldAttributes<any>) => {

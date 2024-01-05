@@ -114,7 +114,7 @@ export type GetAllergensReturn = {
 };
 
 export interface PhotonClientContextInterface {
-  clinicalClient: ApolloClient<object> | undefined;
+  clinicalClient: ApolloClient<NormalizedCacheObject> | undefined;
   getPatient: ({ id, fragment }: { id: string; fragment?: Record<string, DocumentNode> }) => {
     patient: Patient;
     loading: boolean;

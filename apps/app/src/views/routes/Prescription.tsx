@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
-import { usePhoton } from 'packages/react';
+import { usePhoton } from '@photonhealth/react';
 import {
   Alert,
   AlertIcon,

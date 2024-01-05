@@ -13,7 +13,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react';
 
-import { usePhoton } from 'packages/react';
+import { usePhoton } from '@photonhealth/react';
 import { useEffect, useRef, useState } from 'react';
 import { formatDate } from '../../utils';
 import { LoadingInputField } from './LoadingInputField';

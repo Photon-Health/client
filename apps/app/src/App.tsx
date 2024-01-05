@@ -3,7 +3,7 @@ import { useColorMode } from '@chakra-ui/react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import { AppState } from '@auth0/auth0-react';
-import { PhotonClient, PhotonProvider } from 'packages/react';
+import { PhotonClient, PhotonProvider } from '@photonhealth/react';
 
 import { useEffect } from 'react';
 import { auth0Config } from './configs/auth';

@@ -14,7 +14,7 @@ import { graphql } from 'apps/app/src/gql';
 import { formatAddress } from 'apps/app/src/utils';
 import { useMemo } from 'react';
 import InfoGrid from '../../../components/InfoGrid';
-import { usePhoton } from 'packages/react';
+import { usePhoton } from '@photonhealth/react';
 
 const profileQuery = graphql(/* GraphQL */ `
   query MeProfileQuery {

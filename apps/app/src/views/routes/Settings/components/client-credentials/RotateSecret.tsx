@@ -2,7 +2,7 @@ import { Alert, AlertIcon, Button } from '@chakra-ui/react';
 
 import { useMutation } from '@apollo/client';
 import { graphql } from 'apps/app/src/gql';
-import { usePhoton } from 'packages/react';
+import { usePhoton } from '@photonhealth/react';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
 
 interface RotateSecretProps {

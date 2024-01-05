@@ -13,7 +13,7 @@ import {
   useBoolean
 } from '@chakra-ui/react';
 
-import { usePhoton } from 'packages/react';
+import { usePhoton } from '@photonhealth/react';
 import {
   ChangeEvent,
   Dispatch,

@@ -28,7 +28,7 @@ import { DispenseQuantity } from './components/DispenseQuantity';
 import { RefillsInput } from './components/RefillsInput';
 import { Treatment } from './components/Treatment';
 
-import { types, usePhoton } from 'packages/react';
+import { types, usePhoton } from '@photonhealth/react';
 import { CATALOG_TREATMENTS_FIELDS } from 'apps/app/src/model/fragments';
 import { TEMPLATE_INITIAL_VALUES, TEMPLATE_SCHEMA, TemplateSchemaType } from './utils';
 

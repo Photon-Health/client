@@ -1,6 +1,6 @@
 import { Text } from '@chakra-ui/react';
 
-import { usePhoton } from 'packages/react';
+import { usePhoton } from '@photonhealth/react';
 import { SelectField } from './SelectField';
 
 export const PharmacySelect = (props: any) => {

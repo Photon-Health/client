@@ -14,7 +14,7 @@ import {
   HStack
 } from '@chakra-ui/react';
 
-import { usePhoton } from 'packages/react';
+import { usePhoton } from '@photonhealth/react';
 import { ClientInfoCard } from './ClientInfoCard';
 import { graphql } from 'apps/app/src/gql';
 import { Fragment, useEffect, useMemo, useState } from 'react';

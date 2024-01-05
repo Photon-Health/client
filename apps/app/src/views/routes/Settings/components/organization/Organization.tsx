@@ -22,7 +22,7 @@ import InfoGrid from 'apps/app/src/views/components/InfoGrid';
 import { Formik } from 'formik';
 import { useMemo, useState } from 'react';
 import * as yup from 'yup';
-import { usePhoton } from 'packages/react';
+import { usePhoton } from '@photonhealth/react';
 import { OrganizationForm, organizationFormSchema } from './OrganizationEditForm';
 
 const organizationQuery = graphql(/* GraphQL */ `

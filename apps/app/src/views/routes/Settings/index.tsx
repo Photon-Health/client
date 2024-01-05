@@ -14,7 +14,7 @@ import { useQuery } from '@apollo/client';
 import { graphql } from 'apps/app/src/gql';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
 import { Page } from '../../components/Page';
-import { usePhoton } from 'packages/react';
+import { usePhoton } from '@photonhealth/react';
 import { DevelopersTab } from './views/DevelopersTab';
 import { OrganizationTab } from './views/OrganizationTab';
 import { TeamTab } from './views/TeamTab';
