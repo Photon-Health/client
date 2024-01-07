@@ -1,4 +1,9 @@
-import { createMemo, For } from 'solid-js';
+import { createMemo, createSignal, For } from 'solid-js';
+import * as zod from 'zod';
+import { createForm } from '@felte/solid';
+import { validator } from '@felte/validator-zod';
+import gql from 'graphql-tag';
+import triggerToast from '../../utils/toastTriggers';
 import { useRecentOrders } from '.';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
@@ -6,9 +11,66 @@ import Text from '../../particles/Text';
 import Textarea from '../../particles/Textarea';
 import formatRxString from '../../utils/formatRxString';
 import uniqueFills from '../../utils/uniqueFills';
+import { usePhotonClient } from '../SDKProvider';
+
+const ticketSchema = zod.object({
+  description: zod.string().min(1, { message: 'A description is required' })
+});
+
+type TicketProps = {
+  description: string;
+};
+
+const CREATE_TICKET = gql`
+  mutation CreateTicket($input: TicketInput!) {
+    createTicket(input: $input) {
+      id
+    }
+  }
+`;
+
+const composeTicket = ({
+  patient,
+  prescription,
+  values
+}: {
+  patient: { id?: string; name?: string };
+  prescription: {
+    name?: string;
+    dispenseQuantity?: number;
+    dispenseUnit?: string;
+    fillsAllowed?: number;
+    instructions?: string;
+  };
+  values: TicketProps;
+}) => {
+  return `
+Patient:
+  ID: ${patient.id} 
+  Name: ${patient.name}
+
+----
+Prescription:
+  Name: ${prescription.name}
+  Info: ${formatRxString({
+    dispenseQuantity: prescription.dispenseQuantity,
+    dispenseUnit: prescription.dispenseUnit,
+    fillsAllowed: prescription.fillsAllowed,
+    instructions: prescription.instructions
+  })}
+
+---- 
+Description: 
+  ${values.description}
+`;
+};
+
+const formName = 'prescribe-flow-duplicate';
 
 export default function RecentOrdersIssueDialog() {
+  const [submitting, setSubmitting] = createSignal(false);
   const [state, actions] = useRecentOrders();
+  const client = usePhotonClient();
 
   const fills = createMemo(() => {
     if (state?.orderWithIssue) {
@@ -18,6 +80,53 @@ export default function RecentOrdersIssueDialog() {
       return [state.duplicateFill];
     }
     return [];
+  });
+
+  const createTicket = async (values: TicketProps) => {
+    setSubmitting(true);
+    const body = composeTicket({
+      patient: { id: state?.patientId, name: state?.patientName },
+      prescription: {
+        name: state?.duplicateFill?.treatment?.name,
+        dispenseQuantity: state?.duplicateFill?.prescription?.dispenseQuantity,
+        dispenseUnit: state?.duplicateFill?.prescription?.dispenseUnit,
+        fillsAllowed: state?.duplicateFill?.prescription?.fillsAllowed,
+        instructions: state?.duplicateFill?.prescription?.instructions
+      },
+      values
+    });
+
+    await client!.apolloClinical.mutate({
+      mutation: CREATE_TICKET,
+      variables: {
+        input: {
+          subject: `Issue with ${state?.duplicateFill?.treatment?.name}`,
+          comment: {
+            body
+          }
+        }
+      },
+      update: () => {
+        setSubmitting(false);
+        // TODO: redirect
+      }
+    });
+  };
+
+  const { form, errors } = createForm({
+    onSubmit: async (values) => {
+      setSubmitting(true);
+      try {
+        createTicket({ ...values });
+      } catch (e) {
+        triggerToast({
+          header: 'Error Creating Ticket',
+          body: 'A ticket for this order has not been sent.',
+          status: 'info'
+        });
+      }
+    },
+    extend: validator({ schema: ticketSchema })
   });
 
   return (
@@ -61,15 +170,25 @@ export default function RecentOrdersIssueDialog() {
           </div>
         </div>
 
-        <div>
+        <form ref={form} class="mt-4" id={formName}>
           <Text size="xs" class="mb-2" bold>
             Description
           </Text>
-          <Textarea placeholder="Describe issue with this order" />
-        </div>
+
+          <Textarea placeholder="Describe issue with this order" name="description" />
+          {errors().description}
+        </form>
 
         <div class="flex flex-col items-stretch gap-4">
-          <Button size="xl">Report Issue</Button>
+          <Button
+            size="xl"
+            disabled={submitting()}
+            loading={submitting()}
+            type="submit"
+            form={formName}
+          >
+            Report Issue
+          </Button>
           <Button variant="naked" size="xl" onClick={() => actions.setIsIssueDialogOpen(false)}>
             Go Back
           </Button>

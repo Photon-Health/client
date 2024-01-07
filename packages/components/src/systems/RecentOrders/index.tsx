@@ -41,6 +41,7 @@ type RecentOrdersState = {
   isCombineDialogOpen: boolean;
   isDuplicateDialogOpen: boolean;
   isIssueDialogOpen: boolean;
+  patientId?: string;
   patientName?: string;
   tmpDraftPrescription?: DraftPrescription;
   draftPrescriptions?: DraftPrescription[];
@@ -147,7 +148,11 @@ function RecentOrders(props: SDKProviderProps) {
         return createdAt > eightHoursAgo;
       });
 
-      setState({ orders: recentOrders, patientName: data?.patient?.name?.full });
+      setState({
+        orders: recentOrders,
+        patientName: data?.patient?.name?.full,
+        patientId: data?.patient?.id
+      });
     }
   }
 
