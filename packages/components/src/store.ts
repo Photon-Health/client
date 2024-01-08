@@ -116,8 +116,12 @@ export class PhotonClientStore {
       }>;
     };
   };
-  public constructor(sdk: PhotonClient, cs?: typeof createStore) {
+  private autoLogin: boolean;
+  private redirectPath: string | undefined;
+  public constructor(sdk: PhotonClient, autoLogin: boolean, redirectPath: string | undefined, cs?: typeof createStore) {
     this.sdk = sdk;
+    this.autoLogin = autoLogin;
+    this.redirectPath = redirectPath;
 
     // TODO when we are no longer maintaining components inside of elements, we can remove this
     // this fixes an issue where the reactivity is lost when using the store in elements
@@ -268,6 +272,14 @@ export class PhotonClientStore {
     try {
       await this.sdk.authentication.checkSession();
       const authenticated = await this.sdk.authentication.isAuthenticated();
+      if (this.autoLogin && !authenticated) {
+        const args: { appState: { returnTo?: string }} = { appState: {} };
+        if (this.redirectPath) {
+          args.appState.returnTo = this.redirectPath;
+        }
+        await this.authentication.login(args);
+        return;
+      }
       this.setStore('authentication', {
         ...this.store.authentication,
         isAuthenticated: authenticated

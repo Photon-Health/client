@@ -57,18 +57,6 @@ export default function Client(props: ClientProps) {
     }
   });
 
-  createEffect(async () => {
-    if (!store?.authentication.state.isLoading) {
-      if (!store?.authentication.state.isAuthenticated && props.autoLogin) {
-        const args: any = { appState: {} };
-        if (props.redirectPath) {
-          args.appState.returnTo = props.redirectPath;
-        }
-        await store?.authentication.login(args);
-      }
-    }
-  });
-
   const Provider = props.context?.Provider || PhotonContext.Provider;
 
   return (
