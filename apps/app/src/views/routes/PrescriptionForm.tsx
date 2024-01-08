@@ -62,6 +62,12 @@ export const PrescriptionForm = () => {
       ref.current.addEventListener('photon-prescriptions-closed', () => {
         onClose();
       });
+      ref.current.addEventListener(
+        'photon-order-combined',
+        (e: { detail: { orderId: string } }) => {
+          navigate(`/orders/${e.detail.orderId}`);
+        }
+      );
     }
   }, [ref.current]);
 

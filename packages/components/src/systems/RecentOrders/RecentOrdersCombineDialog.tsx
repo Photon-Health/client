@@ -1,4 +1,4 @@
-import { createMemo, createSignal, For } from 'solid-js';
+import { createMemo, createSignal, For, Ref } from 'solid-js';
 import gql from 'graphql-tag';
 import { useRecentOrders } from '.';
 import Button from '../../particles/Button';
@@ -27,10 +27,20 @@ const COMBINE_ORDERS_MUTATION = gql`
 `;
 
 export default function RecentOrdersCombineDialog() {
+  let ref: Ref<any> | undefined;
   const client = usePhotonClient();
   const [state, actions] = useRecentOrders();
   const [isCreatingOrder, setIsCreatingOrder] = createSignal(false);
   const [isCombiningOrders, setIsCombiningOrders] = createSignal(false);
+
+  const dispatchCombineOrderUpdated = (orderId: string) => {
+    const event = new CustomEvent('photon-order-combined', {
+      composed: true,
+      bubbles: true,
+      detail: { orderId }
+    });
+    ref?.dispatchEvent(event);
+  };
 
   const routingOrder = createMemo(() => {
     return state.orders.find((order) => order.state === 'ROUTING');
@@ -88,12 +98,13 @@ export default function RecentOrdersCombineDialog() {
       const prescriptions = await createPrescriptions();
 
       // Add rxs to the order
-      await updateOrder(
+      const updatedOrder = await updateOrder(
         order.id,
         prescriptions.data.createPrescriptions.map((rx: { id: string }) => rx.id)
       );
 
       // Trigger message to redirect to order page
+      dispatchCombineOrderUpdated(updatedOrder.data.updateOrder.id);
     } catch (e) {
       console.error('error', e);
 
@@ -106,7 +117,11 @@ export default function RecentOrdersCombineDialog() {
   };
 
   return (
-    <Dialog open={state.isCombineDialogOpen} onClose={() => actions.setIsCombineDialogOpen(false)}>
+    <Dialog
+      open={state.isCombineDialogOpen}
+      onClose={() => actions.setIsCombineDialogOpen(false)}
+      ref={ref}
+    >
       <div class="flex flex-col gap-6">
         <div>
           <div class="table bg-blue-50 text-blue-600 p-2 rounded-full mb-4">
