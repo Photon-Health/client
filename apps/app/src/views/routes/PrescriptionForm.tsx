@@ -100,6 +100,7 @@ export const PrescriptionForm = () => {
           enable-med-history={settings[user.org_id]?.enableMedHistory ?? false}
           enable-local-pickup={settings[user.org_id]?.pickUp ?? false}
           enable-send-to-patient={settings[user.org_id]?.sendToPatient ?? false}
+          enableCombineAndDuplicate={settings[user.org_id]?.enableCombineAndDuplicate ?? false}
           mail-order-ids={settings[user.org_id]?.mailOrderProviders?.join(',') ?? ''}
           toast-buffer={70}
         />

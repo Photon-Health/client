@@ -28,6 +28,8 @@ import { GraphQLError } from 'graphql';
 import { OrderCard } from './components/OrderCard';
 import { PharmacyCard } from './components/PharmacyCard';
 import { PhotonAuthorized } from '../photon-authorized';
+import { formatPatientWeight } from './util/formatPatientWeight';
+import clearForm from './util/clearForm';
 
 import type { TemplateOverrides } from '@photonhealth/components';
 
@@ -51,6 +53,7 @@ type PrescribeProps = {
   enableLocalPickup: boolean;
   enableSendToPatient: boolean;
   enableMedHistory: boolean;
+  enableCombineAndDuplicate: boolean;
   mailOrderIds?: string;
   pharmacyId?: string;
   loading: boolean;
@@ -346,9 +349,11 @@ function PrescribeWorkflow(props: PrescribeProps) {
       <style>{styles}</style>
       <style>{photonStyles}</style>
 
-      <RecentOrders.DuplicateDialog />
-      <RecentOrders.CombineDialog />
-      <RecentOrders.IssueDialog />
+      <Show when={props.enableCombineAndDuplicate}>
+        <RecentOrders.DuplicateDialog />
+        <RecentOrders.CombineDialog />
+        <RecentOrders.IssueDialog />
+      </Show>
 
       <div>
         <Toaster buffer={props?.toastBuffer || 0} />
@@ -460,6 +465,7 @@ customElement(
     enableOrder: false,
     enableLocalPickup: false,
     enableSendToPatient: false,
+    enableCombineAndDuplicate: false,
     enableMedHistory: false,
     mailOrderIds: undefined,
     pharmacyId: undefined,
@@ -495,6 +501,7 @@ customElement(
           enableLocalPickup={props.enableLocalPickup}
           enableSendToPatient={props.enableSendToPatient}
           enableMedHistory={props.enableMedHistory}
+          enableCombineAndDuplicate={props.enableCombineAndDuplicate}
           mailOrderIds={props.mailOrderIds}
           pharmacyId={props.pharmacyId}
           loading={props.loading}

@@ -26,7 +26,8 @@ const defaultSettings: OrganizationSettings = {
   returnTo: window.location.origin,
   federated: false,
   enableMedHistory: false,
-  enableRxAndOrder: true
+  enableRxAndOrder: true,
+  enableCombineAndDuplicate: false
 };
 
 /**

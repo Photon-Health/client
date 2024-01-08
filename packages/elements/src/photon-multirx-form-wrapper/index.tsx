@@ -34,6 +34,7 @@ customElement(
     enableLocalPickup: false,
     enableSendToPatient: false,
     enableMedHistory: false,
+    enableCombineAndDuplicate: false,
     mailOrderIds: undefined,
     enableOrder: false,
     toastBuffer: 0
@@ -48,6 +49,7 @@ customElement(
     weightUnit?: string;
     enableLocalPickup?: boolean;
     enableSendToPatient?: boolean;
+    enableCombineAndDuplicate?: boolean;
     mailOrderIds?: string;
     enableOrder?: boolean;
     toastBuffer?: number;
@@ -232,6 +234,7 @@ customElement(
                   enable-order={props.enableOrder}
                   enable-local-pickup={props.enableLocalPickup}
                   enable-send-to-patient={props.enableSendToPatient}
+                  enable-combine-and-duplicate={props.enableCombineAndDuplicate}
                   mail-order-ids={props.mailOrderIds}
                   trigger-submit={triggerSubmit()}
                   set-trigger-submit={setTriggerSubmit}
