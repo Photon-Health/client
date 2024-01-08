@@ -64,6 +64,7 @@ customElement(
     const [continueSaveOnly, setContinueSaveOnly] = createSignal<boolean>(false);
     const [triggerSubmit, setTriggerSubmit] = createSignal<boolean>(false);
     const { actions: patientActions } = PatientStore;
+    const [hideOrderButton, setHideOrderButton] = createSignal<boolean>(true);
 
     onMount(async () => {
       const token = await client!.getSDK().authentication.getAccessToken();
@@ -194,8 +195,30 @@ customElement(
           title="New Prescriptions"
           titleIconName="prescription"
           headerRight={
+<<<<<<< HEAD
             props.enableOrder ? (
               <Button size="md" loading={triggerSubmit()} onClick={handleCreateOrder}>
+=======
+            hideOrderButton() ? null : props.enableOrder ? (
+              <Button
+                size="md"
+                loading={triggerSubmit()}
+                onClick={() => {
+                  if (!canSubmit() || !canWritePrescription()) {
+                    // show info error
+                    triggerToast({
+                      status: 'info',
+                      body: 'You need to add prescription(s) to this order before you can send it.'
+                    });
+                  } else {
+                    // submit rx and order
+                    form()?.treatment?.value?.name
+                      ? setContinueSubmitOpen(true)
+                      : setTriggerSubmit(true);
+                  }
+                }}
+              >
+>>>>>>> aaf1676c (wire up and hide the send order button)
                 Send Order
               </Button>
             ) : (
@@ -253,9 +276,14 @@ customElement(
                       );
                     }
                   }}
+<<<<<<< HEAD
                   on:photon-order-error={(e: any) => {
                     e.stopPropagation();
                     setTriggerSubmit(false);
+=======
+                  on:photon-signature-attestation-agreed={() => {
+                    setHideOrderButton(false);
+>>>>>>> aaf1676c (wire up and hide the send order button)
                   }}
                 />
               </div>

@@ -1,6 +1,6 @@
 import { ApolloClient } from '@apollo/client';
 import gql from 'graphql-tag';
-import { createEffect, createSignal, JSXElement, Show } from 'solid-js';
+import { createEffect, createSignal, JSXElement, Ref, Show } from 'solid-js';
 import Button from '../../particles/Button';
 import Card from '../../particles/Card';
 import Spinner from '../../particles/Spinner';
@@ -8,8 +8,7 @@ import Text from '../../particles/Text';
 import { Maybe } from 'graphql/jsutils/Maybe';
 import Icon from '../../particles/Icon';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _GetCurrentUserSignatureAttestationStatus = gql`
+const GetCurrentUserSignatureAttestationStatus = gql`
   query GetCurrentUserSignatureAttestationStatus {
     me {
       signatureAttestationStatus {
@@ -49,8 +48,7 @@ export type GetCurrentUserSignatureAttestationStatusType = {
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _AgreeToSignatureAttestation = gql`
+const AgreeToSignatureAttestation = gql`
   mutation AgreeToSignatureAttestation($version: String!) {
     agreeToSignatureAttestation(version: $version)
   }
@@ -68,33 +66,45 @@ type DataReturn<Type> = {
 };
 
 const getCurrentUserSignatureAttestationStatus = async (
-  _client: ApolloClient<any>
+  client: ApolloClient<any>
 ): Promise<DataReturn<GetCurrentUserSignatureAttestationStatusType>> => {
-  return {
-    data: {
-      me: {
-        signatureAttestationStatus: {
-          __typename: 'NeedsSignatureAttestation',
-          version: '1.0.0',
-          content: 'blah'
-        }
-      }
-    }
-  };
-  // return await _client.query<GetCurrentUserSignatureAttestationStatusType>({
-  //   query: GetCurrentUserSignatureAttestationStatus
-  // });
+  return await client.query<GetCurrentUserSignatureAttestationStatusType>({
+    query: GetCurrentUserSignatureAttestationStatus,
+    fetchPolicy: 'cache-first'
+  });
 };
 
 const agreeToSignatureAttestation =
-  (_client: ApolloClient<any>) =>
-  async (_version: string): Promise<DataReturn<Maybe<AgreeToSignatureAttestationType>>> => {
-    return { data: { agreeToSignatureAttestation: true } };
+  (client: ApolloClient<any>) =>
+  async (version: string): Promise<DataReturn<Maybe<AgreeToSignatureAttestationType>>> => {
+    return await client.mutate<AgreeToSignatureAttestationType, { version: string }>({
+      mutation: AgreeToSignatureAttestation,
+      variables: { version },
+      refetchQueries: ['GetCurrentUserSignatureAttestationStatus'],
+      awaitRefetchQueries: true,
+      update: (cache, { data }) => {
+        if (data?.agreeToSignatureAttestation) {
+          cache.writeQuery({
+            query: GetCurrentUserSignatureAttestationStatus,
+            data: {
+              me: {
+                signatureAttestationStatus: {
+                  __typename: 'CompletedSignatureAttestation',
+                  agreedAt: new Date(),
+                  version
+                }
+              }
+            }
+          });
+        }
+      }
+    });
   };
 
 export interface SignatureAttestationModalProps {
   client: ApolloClient<any>;
   children: JSXElement;
+  onAgreeComplete?: () => void;
 }
 
 type Status =
@@ -106,52 +116,87 @@ type Status =
   | { status: 'ERROR'; errors: any[] };
 
 export const SignatureAttestationModal = (props: SignatureAttestationModalProps) => {
+  let ref: Ref<any> | undefined;
   const [status, setStatus] = createSignal<Status>({ status: 'LOADING' });
 
-  createEffect(() => {
-    (async () => {
-      const req = await getCurrentUserSignatureAttestationStatus(props.client);
-      if (req.error || req.errors) {
-        setStatus({
-          status: 'ERROR',
-          errors: [
-            ...(req.errors?.map((e) => e.message) ?? []),
-            ...(req.error ? [req.error.message] : [])
-          ]
-        });
-      } else if (!req.data?.me?.signatureAttestationStatus) {
-        setStatus({
-          status: 'ERROR',
-          errors: ['Could not get user data. Please refresh and try again']
-        });
-      } else if (
-        req.data?.me?.signatureAttestationStatus?.__typename === 'CompletedSignatureAttestation' ||
-        req.data?.me?.signatureAttestationStatus?.__typename === 'NotApplicableSignatureAttestation'
-      ) {
-        setStatus({ status: 'COMPLETE' });
-      } else
-        setStatus({
-          status: 'NEEDS ATTESTATION',
-          version: req.data.me.signatureAttestationStatus.version
-        });
-    })();
-  });
+  const refreshAttestationStatus = async () => {
+    const req = await getCurrentUserSignatureAttestationStatus(props.client);
+    if (req.error || req.errors) {
+      setStatus({
+        status: 'ERROR',
+        errors: [
+          ...(req.errors?.map((e) => e.message) ?? []),
+          ...(req.error ? [req.error.message] : [])
+        ]
+      });
+    } else if (!req.data?.me?.signatureAttestationStatus) {
+      setStatus({
+        status: 'ERROR',
+        errors: ['Could not get user data. Please refresh and try again']
+      });
+    } else if (
+      req.data?.me?.signatureAttestationStatus?.__typename === 'CompletedSignatureAttestation' ||
+      req.data?.me?.signatureAttestationStatus?.__typename === 'NotApplicableSignatureAttestation'
+    ) {
+      setStatus({ status: 'COMPLETE' });
+    } else
+      setStatus({
+        status: 'NEEDS ATTESTATION',
+        version: req.data.me.signatureAttestationStatus.version
+      });
+  };
 
-  const [onAgree] = createSignal(() => () => {
-    const curr = status();
-    if (curr.status === 'NEEDS ATTESTATION') {
-      agreeToSignatureAttestation(props.client)(curr.version);
+  const dispatchSignatureAttestationAgreed = () => {
+    const event = new CustomEvent('photon-signature-attestation-agreed', {
+      composed: true,
+      bubbles: true,
+      detail: {}
+    });
+    ref?.dispatchEvent(event);
+  };
+
+  createEffect(() => {
+    if (status().status === 'COMPLETE') {
+      props.onAgreeComplete?.();
+      dispatchSignatureAttestationAgreed();
     }
   });
 
+  createEffect(() => {
+    refreshAttestationStatus();
+  });
+
+  const onAgree = async () => {
+    const curr = status();
+    if (curr.status === 'NEEDS ATTESTATION') {
+      const res = await agreeToSignatureAttestation(props.client)(curr.version);
+      if (res.data?.agreeToSignatureAttestation) {
+        setStatus({ status: 'COMPLETE' });
+      } else if (res.error || res.errors) {
+        setStatus({
+          status: 'ERROR',
+          errors: [
+            ...(res.errors?.map((e) => e.message) ?? []),
+            ...(res.error ? [res.error.message] : [])
+          ]
+        });
+      }
+    }
+  };
+
   return (
-    <div>
+    <div class="w-full" ref={ref}>
       <Show when={status().status === 'LOADING'}>
-        <div />
+        <div class="flex justify-center w-full">
+          <Spinner color="green" />
+        </div>
       </Show>
       <Show when={status().status === 'COMPLETE'}>{props.children}</Show>
       <Show when={status().status === 'ERROR'}>
-        <Spinner />
+        <div class="text-red-700 font-bold flex space-x-2 items-center justify-center">
+          <Icon name="exclamationCircle" />
+          <span>An error occurred. Please refresh and try again</span>
+        </div>
       </Show>
       <Show when={status().status === 'NEEDS ATTESTATION'}>
         <AgreementCard onAgree={onAgree} />
