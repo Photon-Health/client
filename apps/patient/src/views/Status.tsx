@@ -12,8 +12,8 @@ import {
   PoweredBy,
   StatusStepper
 } from '../components';
-import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { Pharmacy as PharmacyWithHours } from '../utils/models';
+import { formatAddress, getFulfillmentType, preparePharmacyHours } from '../utils/general';
 import { text as t, orderStateMapping as m } from '../utils/text';
 import { useOrderContext } from './Main';
 import * as TOAST_CONFIG from '../configs/toast';
@@ -45,7 +45,6 @@ export const Status = () => {
 
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
-  const [enrichedPharmacy, setEnrichedPharmacy] = useState<EnrichedPharmacy | undefined>(undefined);
 
   const { fulfillment, pharmacy, address } = order;
 
@@ -111,15 +110,6 @@ export const Status = () => {
     window.open(url);
   };
 
-  const initializePharmacy = async (p: types.Pharmacy) => {
-    const enrichedPharmacy = await preparePharmacy(p, false);
-    setEnrichedPharmacy(enrichedPharmacy);
-  };
-
-  useEffect(() => {
-    initializePharmacy(pharmacy);
-  }, []);
-
   // People that select a pharmacy low in the list might start at bottom of status page
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -161,9 +151,9 @@ export const Status = () => {
             }
           });
 
-          setTimeout(() => setShowDemoCtaModal(true), 2000);
-        }, 2000);
-      }, 2000);
+          setTimeout(() => setShowDemoCtaModal(true), 1500);
+        }, 1500);
+      }, 1500);
     }
   }, []);
 
@@ -177,6 +167,8 @@ export const Status = () => {
     fulfillmentState === 'DELIVERED' ||
     fulfillmentState === 'PICKED_UP' ||
     fulfillmentState === 'RECEIVED';
+
+  const pharmacyWithHours: PharmacyWithHours = preparePharmacyHours(pharmacy);
 
   return (
     <Box>
@@ -215,10 +207,10 @@ export const Status = () => {
               ) : null}
             </Box>
           </VStack>
-          {enrichedPharmacy ? (
+          {pharmacy ? (
             <Box width="full">
               <PharmacyCard
-                pharmacy={enrichedPharmacy}
+                pharmacy={pharmacyWithHours}
                 selected={true}
                 showDetails={fulfillmentType === 'PICK_UP'}
                 canReroute={!isDemo && orgSettings.enablePatientRerouting}

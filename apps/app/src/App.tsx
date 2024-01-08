@@ -24,16 +24,15 @@ import { Prescription } from './views/routes/Prescription';
 import { PrescriptionForm } from './views/routes/PrescriptionForm';
 import { Prescriptions } from './views/routes/Prescriptions';
 import { Settings } from './views/routes/Settings';
-import { ClinicalApiProvider } from './views/routes/Settings/apollo';
 import { Support } from './views/routes/Support';
 import { UpdatePatientForm } from './views/routes/UpdatePatientForm';
+import { Env } from '@photonhealth/sdk';
 
 const client = new PhotonClient({
+  env: process.env.REACT_APP_ENV_NAME as Env,
   domain: auth0Config.domain,
   clientId: auth0Config.clientId,
-  redirectURI: auth0Config.redirectUri,
-  audience: auth0Config.audience,
-  uri: process.env.REACT_APP_GRAPHQL_URI as string
+  redirectURI: auth0Config.redirectUri
 });
 
 const onRedirectCallback = (appState?: AppState) => {
@@ -54,43 +53,41 @@ export const App = () => {
   return (
     <BrowserRouter>
       <PhotonProvider client={client} onRedirectCallback={onRedirectCallback}>
-        <ClinicalApiProvider photonClient={client}>
-          <Zendesk />
-          <AlertDisplay />
-          <Routes>
-            <Route path="/" element={<Main />}>
-              <Route path="/patients">
-                <Route path="/patients" element={<Patients />} />
-                <Route path="new" element={<PatientForm />} />
-                <Route path="update/:patientId" element={<UpdatePatientForm />} />
-              </Route>
-              <Route path="/patients/:patientId" element={<Patient />} />
-              <Route path="/prescriptions">
-                <Route path="/prescriptions" element={<Prescriptions />} />
-                <Route path="new" element={<PrescriptionForm />} />
-                <Route path=":prescriptionId" element={<Prescription />} />
-              </Route>
-              <Route path="/orders">
-                <Route path="/orders" element={<Orders />} />
-                <Route path="new" element={<NewOrder />} />
-                <Route path=":orderId" element={<Order />} />
-              </Route>
-              <Route path="/support" element={<Support />} />
-              <Route path="/playground" element={<Playground />} />={' '}
-              <Route path="/settings" element={<Settings />}>
-                <Route path="user" />
-                <Route path="team" />
-                <Route path="organization" />
-                <Route path="developers" />
-                <Route path="templates" />
-                <Route path="catalog" />
-              </Route>
+        <Zendesk />
+        <AlertDisplay />
+        <Routes>
+          <Route path="/" element={<Main />}>
+            <Route path="/patients">
+              <Route path="/patients" element={<Patients />} />
+              <Route path="new" element={<PatientForm />} />
+              <Route path="update/:patientId" element={<UpdatePatientForm />} />
             </Route>
-            <Route path="/login" element={<Login />} />
-            <Route path="/logout" element={<Logout />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </ClinicalApiProvider>
+            <Route path="/patients/:patientId" element={<Patient />} />
+            <Route path="/prescriptions">
+              <Route path="/prescriptions" element={<Prescriptions />} />
+              <Route path="new" element={<PrescriptionForm />} />
+              <Route path=":prescriptionId" element={<Prescription />} />
+            </Route>
+            <Route path="/orders">
+              <Route path="/orders" element={<Orders />} />
+              <Route path="new" element={<NewOrder />} />
+              <Route path=":orderId" element={<Order />} />
+            </Route>
+            <Route path="/support" element={<Support />} />
+            <Route path="/playground" element={<Playground />} />={' '}
+            <Route path="/settings" element={<Settings />}>
+              <Route path="user" />
+              <Route path="team" />
+              <Route path="organization" />
+              <Route path="developers" />
+              <Route path="templates" />
+              <Route path="catalog" />
+            </Route>
+          </Route>
+          <Route path="/login" element={<Login />} />
+          <Route path="/logout" element={<Logout />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </PhotonProvider>
     </BrowserRouter>
   );
