@@ -162,14 +162,19 @@ function PrescribeWorkflow(props: PrescribeProps) {
     ref?.dispatchEvent(event);
   };
 
+  // before submitting the form, show combine dialog if there is a routing order for the patient
+  const displayCombineDialog = () => {
+    dispatchOrderError();
+    return recentOrdersActions.setIsCombineDialogOpen(
+      true,
+      () => submitForm(props.enableOrder),
+      props.formStore.draftPrescriptions.value
+    );
+  };
+
+  // submits the form to create a new order
   const submitForm = async (enableOrder: boolean) => {
     setErrors([]);
-
-    if (recentOrdersActions.hasRoutingOrder()) {
-      // show combine dialog if there is a routing order for the patient
-      dispatchOrderError();
-      return recentOrdersActions.setIsCombineDialogOpen(true);
-    }
 
     const keys = enableOrder
       ? ['patient', 'draftPrescriptions', 'pharmacy', 'address']
@@ -301,18 +306,26 @@ function PrescribeWorkflow(props: PrescribeProps) {
     }
   };
 
+  // decide whether to show the combine modal or submit the form
+  const combineOrSubmit = () => {
+    if (recentOrdersActions.hasRoutingOrder()) {
+      return displayCombineDialog();
+    }
+    return submitForm(props.enableOrder);
+  };
+
+  createEffect(() => {
+    if (props.triggerSubmit) {
+      combineOrSubmit();
+    }
+  });
+
   createEffect(() => {
     dispatchPrescriptionsFormValidate(
       Boolean(
         props.formStore.draftPrescriptions?.value?.length > 0 && props.formStore.patient?.value
       )
     );
-  });
-
-  createEffect(() => {
-    if (props.triggerSubmit) {
-      submitForm(props.enableOrder);
-    }
   });
 
   let prescriptionRef: HTMLDivElement | undefined;

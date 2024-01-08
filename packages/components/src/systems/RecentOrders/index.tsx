@@ -43,8 +43,10 @@ type RecentOrdersState = {
   isIssueDialogOpen: boolean;
   patientId?: string;
   patientName?: string;
-  tmpDraftPrescription?: DraftPrescription;
+  // for displaying combine orders
   draftPrescriptions?: DraftPrescription[];
+  // if provider chooses not to combine the order, call this to create a new order
+  createOrder?: () => void;
   // if the user clicks "continue" on the duplicate dialog, we need to call the callback to add to draft prescriptions
   duplicateDialogContinueCb?: () => void;
   // reference for the order that the user clicked
@@ -54,7 +56,11 @@ type RecentOrdersState = {
 };
 
 type RecentOrdersActions = {
-  setIsCombineDialogOpen: (isOpen: boolean) => void;
+  setIsCombineDialogOpen: (
+    isOpen: boolean,
+    createOrder?: () => void,
+    draftPrescriptions?: DraftPrescription[]
+  ) => void;
   setIsDuplicateDialogOpen: (
     isOpen: boolean,
     duplicateFill?: Fill,
@@ -101,8 +107,12 @@ function RecentOrders(props: SDKProviderProps) {
   const value: RecentOrdersContextValue = [
     state,
     {
-      setIsCombineDialogOpen(isOpen: boolean) {
-        setState('isCombineDialogOpen', isOpen);
+      setIsCombineDialogOpen(isOpen, createOrder, draftPrescriptions) {
+        setState({
+          isCombineDialogOpen: isOpen,
+          ...(createOrder ? { createOrder } : { createOrderCb: undefined }),
+          ...(draftPrescriptions ? { draftPrescriptions } : { draftPrescriptions: [] })
+        });
       },
       setIsDuplicateDialogOpen(isOpen, duplicateFill, continueCb) {
         setState({

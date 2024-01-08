@@ -1,4 +1,4 @@
-import { createMemo, For } from 'solid-js';
+import { createMemo, createSignal, For } from 'solid-js';
 import { useRecentOrders } from '.';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
@@ -9,6 +9,7 @@ import uniqueFills from '../../utils/uniqueFills';
 
 export default function RecentOrdersCombineDialog() {
   const [state, actions] = useRecentOrders();
+  const [isCreatingOrder, setIsCreatingOrder] = createSignal(false);
 
   const fillsWithRoutingState = createMemo(() => {
     const order = state.orders.find((order) => order.state === 'ROUTING');
@@ -55,11 +56,22 @@ export default function RecentOrdersCombineDialog() {
             <Text>
               Select YES to combine orders and enable the patient to send it to the same pharmacy:
             </Text>
-            <div class="border border-solid border-gray-200 rounded-lg bg-gray-50 py-3 px-4">
-              <Text size="sm">Cefdinir 200 mg Oral Capsule</Text>
-              <Text size="sm" color="gray">
-                30 Each, 11 Refills - Take 1 (one) daily
-              </Text>
+            <div class="border border-solid border-gray-200 rounded-lg bg-gray-50 py-3 px-4 flex flex-col gap-4">
+              <For each={state.draftPrescriptions}>
+                {(draft) => (
+                  <div>
+                    <Text size="sm">{draft.treatment.name}</Text>
+                    <Text size="sm" color="gray">
+                      {formatRxString({
+                        dispenseQuantity: draft?.dispenseQuantity ?? 0,
+                        dispenseUnit: draft?.dispenseUnit ?? '',
+                        fillsAllowed: draft?.fillsAllowed ?? 0,
+                        instructions: draft?.instructions ?? ''
+                      })}
+                    </Text>
+                  </div>
+                )}
+              </For>
             </div>
           </div>
         </div>
@@ -69,9 +81,14 @@ export default function RecentOrdersCombineDialog() {
           <Button
             variant="secondary"
             size="xl"
-            onClick={() => actions.setIsCombineDialogOpen(false)}
+            onClick={() => {
+              state.createOrder?.();
+              setIsCreatingOrder(true);
+            }}
+            disabled={isCreatingOrder()}
+            loading={isCreatingOrder()}
           >
-            No, send new order
+            {isCreatingOrder() ? 'Creating order...' : 'No, send new order'}
           </Button>
         </div>
       </div>
