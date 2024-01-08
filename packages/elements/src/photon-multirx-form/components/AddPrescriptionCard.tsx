@@ -44,6 +44,7 @@ export const AddPrescriptionCard = (props: {
   store: Record<string, any>;
   weight?: number;
   weightUnit?: string;
+  enableCombineAndDuplicate?: boolean;
 }) => {
   const client = usePhoton();
   const [medDialogOpen, setMedDialogOpen] = createSignal(false);
@@ -187,7 +188,7 @@ export const AddPrescriptionCard = (props: {
         });
       };
 
-      if (duplicateFill) {
+      if (props.enableCombineAndDuplicate && duplicateFill) {
         // if there's a duplicate order, check first if they want to report an issue
         return recentOrdersActions.setIsDuplicateDialogOpen(
           true,
@@ -244,7 +245,7 @@ export const AddPrescriptionCard = (props: {
                   ...e.detail.data,
                   notes: [
                     e.detail.data?.notes,
-                    props.weight && patientWeight(props.weight, props?.weightUnit)
+                    props.weight && formatPatientWeight(props.weight, props?.weightUnit)
                   ]
                     .filter((x) => x)
                     .join('\n\n')

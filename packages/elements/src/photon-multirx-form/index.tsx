@@ -319,7 +319,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
 
   // decide whether to show the combine modal or submit the form
   const combineOrSubmit = () => {
-    if (recentOrdersActions.hasRoutingOrder()) {
+    if (props.enableCombineAndDuplicate && recentOrdersActions.hasRoutingOrder()) {
       return displayCombineDialog();
     }
     return submitForm(props.enableOrder);
@@ -381,7 +381,9 @@ function PrescribeWorkflow(props: PrescribeProps) {
                 (props.formStore.patient?.value?.id && !props.enableOrder)
               }
             >
-              <RecentOrders.Card />
+              <Show when={props.enableCombineAndDuplicate}>
+                <RecentOrders.Card />
+              </Show>
               <Show when={showForm() || isEditing()}>
                 <div ref={prescriptionRef}>
                   <AddPrescriptionCard
@@ -390,6 +392,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
                     store={props.formStore}
                     weight={props.weight}
                     weightUnit={props.weightUnit}
+                    enableCombineAndDuplicate={props.enableCombineAndDuplicate}
                   />
                 </div>
               </Show>
