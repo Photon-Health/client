@@ -1,4 +1,5 @@
 import { createMemo, createSignal, For } from 'solid-js';
+import gql from 'graphql-tag';
 import { useRecentOrders } from '.';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
@@ -6,19 +7,75 @@ import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
 import formatRxString from '../../utils/formatRxString';
 import uniqueFills from '../../utils/uniqueFills';
+import { usePhotonClient } from '../SDKProvider';
+
+const CREATE_PRESCRIPTIONS_MUTATION = gql`
+  mutation CreatePrescriptions($prescriptions: [PrescriptionInput!]!) {
+    createPrescriptions(prescriptions: $prescriptions) {
+      id
+    }
+  }
+`;
+
+const COMBINE_ORDERS_MUTATION = gql`
+  mutation UpdateOrder($orderId: ID!, $fills: [FillInput!]!) {
+    updateOrder(id: $orderId, fills: $fills) {
+      id
+    }
+  }
+`;
 
 export default function RecentOrdersCombineDialog() {
+  const client = usePhotonClient();
   const [state, actions] = useRecentOrders();
   const [isCreatingOrder, setIsCreatingOrder] = createSignal(false);
+  const [isCombiningOrders, setIsCombiningOrders] = createSignal(false);
+
+  const routingOrder = createMemo(() => {
+    return state.orders.find((order) => order.state === 'ROUTING');
+  });
 
   const fillsWithRoutingState = createMemo(() => {
-    const order = state.orders.find((order) => order.state === 'ROUTING');
+    const order = routingOrder();
 
     if (order) {
       return uniqueFills(order);
     }
+
     return [];
   });
+
+  const createPrescriptions = async () => {
+    return client!.apollo.mutate({
+      mutation: CREATE_PRESCRIPTIONS_MUTATION,
+      variables: { prescriptions: state.draftPrescriptions }
+    });
+  };
+
+  const updateOrder = async (orderId: string, prescriptionIds: string[]) => {
+    return client!.apollo.mutate({
+      mutation: COMBINE_ORDERS_MUTATION,
+      variables: { orderId, fills: prescriptionIds.map((id) => ({ prescriptionId: id })) }
+    });
+  };
+
+  const combineOrders = async () => {
+    const order = routingOrder();
+
+    if (!order) {
+      return;
+    }
+
+    setIsCombiningOrders(true);
+
+    // Create prescriptions for the drafts
+    await createPrescriptions();
+
+    // Add rxs to the order
+    await updateOrder(order.id, ['test']);
+
+    // Trigger message to redirect to order page
+  };
 
   return (
     <Dialog open={state.isCombineDialogOpen} onClose={() => actions.setIsCombineDialogOpen(false)}>
@@ -77,7 +134,14 @@ export default function RecentOrdersCombineDialog() {
         </div>
 
         <div class="flex flex-col items-stretch gap-2">
-          <Button size="xl">Yes, combine orders</Button>
+          <Button
+            size="xl"
+            onClick={combineOrders}
+            disabled={isCombiningOrders()}
+            loading={isCombiningOrders()}
+          >
+            Yes, combine orders
+          </Button>
           <Button
             variant="secondary"
             size="xl"
