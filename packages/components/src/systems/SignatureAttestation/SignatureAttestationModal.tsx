@@ -208,7 +208,7 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
         </div>
       </Show>
       <Show when={status().status === 'NEEDS ATTESTATION'}>
-        <AgreementCard onAgree={onAgree} onCancel={dispatchSignatureAttestationCanceled}/>
+        <AgreementCard onAgree={onAgree} onCancel={dispatchSignatureAttestationCanceled} />
       </Show>
     </div>
   );
@@ -242,7 +242,9 @@ const AgreementCard = (props: { onAgree: () => void; onCancel: () => void }) => 
         </p>
       </div>
       <div class="flex justify-end space-x-4">
-        <Button variant="secondary" onClick={props.onCancel}>Cancel</Button>
+        <Button variant="secondary" onClick={props.onCancel}>
+          Cancel
+        </Button>
         <Button variant="primary" onClick={props.onAgree}>
           Agree
         </Button>
