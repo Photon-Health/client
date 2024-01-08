@@ -87,6 +87,14 @@ function PrescribeWorkflow(props: PrescribeProps) {
         value: props.address
       });
     }
+    if (ref) {
+      ref.addEventListener('photon-ticket-created-duplicate', () => {
+        clearForm(
+          props.formActions,
+          props.weight ? { notes: formatPatientWeight(props.weight, props?.weightUnit) } : undefined
+        );
+      });
+    }
   });
 
   createEffect(() => {

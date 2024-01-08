@@ -79,6 +79,7 @@ export default function RecentOrdersIssueDialog() {
       bubbles: true,
       detail: {}
     });
+
     ref?.dispatchEvent(event);
   };
 
@@ -146,7 +147,7 @@ export default function RecentOrdersIssueDialog() {
 
   return (
     <Dialog open={state.isIssueDialogOpen} onClose={() => actions.setIsIssueDialogOpen(false)}>
-      <div class="flex flex-col gap-6">
+      <div class="flex flex-col gap-6" ref={ref}>
         <div>
           <Text bold class="mb-2">
             Report issue with existing order
