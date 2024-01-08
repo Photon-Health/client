@@ -8,6 +8,7 @@ import Text from '../../particles/Text';
 import formatRxString from '../../utils/formatRxString';
 import uniqueFills from '../../utils/uniqueFills';
 import { usePhotonClient } from '../SDKProvider';
+import triggerToast from '../../utils/toastTriggers';
 
 const CREATE_PRESCRIPTIONS_MUTATION = gql`
   mutation CreatePrescriptions($prescriptions: [PrescriptionInput!]!) {
@@ -48,7 +49,21 @@ export default function RecentOrdersCombineDialog() {
   const createPrescriptions = async () => {
     return client!.apollo.mutate({
       mutation: CREATE_PRESCRIPTIONS_MUTATION,
-      variables: { prescriptions: state.draftPrescriptions }
+      variables: {
+        prescriptions: state.draftPrescriptions?.map((draft) => ({
+          daysSupply: draft.daysSupply,
+          dispenseAsWritten: draft.dispenseAsWritten,
+          dispenseQuantity: draft.dispenseQuantity,
+          dispenseUnit: draft.dispenseUnit,
+          effectiveDate: draft.effectiveDate,
+          instructions: draft.instructions,
+          notes: draft.notes,
+          patientId: state.patientId,
+          // +1 here because we're using the refillsInput
+          fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
+          treatmentId: draft.treatment.id
+        }))
+      }
     });
   };
 
@@ -68,13 +83,26 @@ export default function RecentOrdersCombineDialog() {
 
     setIsCombiningOrders(true);
 
-    // Create prescriptions for the drafts
-    await createPrescriptions();
+    try {
+      // Create prescriptions for the drafts
+      const prescriptions = await createPrescriptions();
 
-    // Add rxs to the order
-    await updateOrder(order.id, ['test']);
+      // Add rxs to the order
+      await updateOrder(
+        order.id,
+        prescriptions.data.createPrescriptions.map((rx: { id: string }) => rx.id)
+      );
 
-    // Trigger message to redirect to order page
+      // Trigger message to redirect to order page
+    } catch (e) {
+      console.error('error', e);
+
+      triggerToast({
+        status: 'info',
+        header: 'Error combining orders',
+        body: 'Your order wasn’t combined, please refresh the page.'
+      });
+    }
   };
 
   return (
