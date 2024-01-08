@@ -13,7 +13,6 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\n  query MeProfileQuery {\n    me {\n      name {\n        full\n      }\n      email\n      phone\n      npi\n      address {\n        street1\n        street2\n        city\n        state\n        postalCode\n        country\n      }\n    }\n    organization {\n      id\n      name\n    }\n  }\n": types.MeProfileQueryDocument,
     "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n  }\n": types.ClientInfoCardFragmentFragmentDoc,
     "\n  query ClientsDeveloperTabQuery {\n    clients {\n      id\n      ...ClientInfoCardFragment\n    }\n  }\n": types.ClientsDeveloperTabQueryDocument,
     "\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n": types.RotateSecretDocument,
@@ -26,6 +25,9 @@ const documents = {
     "\n  query InvitesQuery {\n    invites {\n      ...InviteFragment\n      id\n      expired\n      expires_at\n    }\n  }\n": types.InvitesQueryDocument,
     "\n  query OrganizationQuery {\n    organization {\n      id\n      name\n      address {\n        street1\n        street2\n        postalCode\n        city\n        state\n        country\n      }\n      fax\n      phone\n      email\n    }\n  }\n": types.OrganizationQueryDocument,
     "\n  mutation UpdateOrganization($input: OrganizationInput!) {\n    updateOrganization(input: $input)\n  }\n": types.UpdateOrganizationDocument,
+    "\n  query MeProfileQuery {\n    me {\n      id\n      name {\n        first\n        last\n        middle\n        title\n        full\n      }\n      email\n      phone\n      fax\n      npi\n      address {\n        street1\n        street2\n        city\n        state\n        postalCode\n        country\n      }\n      roles {\n        id\n        name\n        description\n      }\n    }\n    organization {\n      id\n      name\n    }\n  }\n": types.MeProfileQueryDocument,
+    "\n  query EditProfileActionGetUser($userId: ID!) {\n    user(id: $userId) {\n      address {\n        street1\n        street2\n        state\n        postalCode\n        country\n        city\n      }\n      npi\n      phone\n      name {\n        first\n        full\n        last\n        middle\n        title\n      }\n      fax\n      email\n      roles {\n        description\n        id\n        name\n      }\n    }\n  }\n": types.EditProfileActionGetUserDocument,
+    "\n  mutation UpdateMyProfile($updateMyProfileInput: ProfileInput!) {\n    updateMyProfile(input: $updateMyProfileInput)\n  }\n": types.UpdateMyProfileDocument,
     "\n  query EditRolesActionGetUser($userId: ID!) {\n    user(id: $userId) {\n      address {\n        street1\n        street2\n        state\n        postalCode\n        country\n        city\n      }\n      npi\n      phone\n      name {\n        first\n        full\n        last\n        middle\n        title\n      }\n      fax\n      email\n      roles {\n        description\n        id\n        name\n      }\n    }\n  }\n": types.EditRolesActionGetUserDocument,
     "\n  mutation SetUserRoles($userId: ID!, $roles: [ID!]!) {\n    setUserRoles(userId: $userId, roles: $roles)\n  }\n": types.SetUserRolesDocument,
     "\n  mutation UpdateProviderProfile(\n    $providerId: ID!\n    $updateProviderProfileInput: UpdateProviderProfileInput!\n  ) {\n    updateProviderProfile(providerId: $providerId, input: $updateProviderProfileInput)\n  }\n": types.UpdateProviderProfileDocument,
@@ -54,10 +56,6 @@ const documents = {
  */
 export function graphql(source: string): unknown;
 
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  query MeProfileQuery {\n    me {\n      name {\n        full\n      }\n      email\n      phone\n      npi\n      address {\n        street1\n        street2\n        city\n        state\n        postalCode\n        country\n      }\n    }\n    organization {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  query MeProfileQuery {\n    me {\n      name {\n        full\n      }\n      email\n      phone\n      npi\n      address {\n        street1\n        street2\n        city\n        state\n        postalCode\n        country\n      }\n    }\n    organization {\n      id\n      name\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -106,6 +104,18 @@ export function graphql(source: "\n  query OrganizationQuery {\n    organization
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation UpdateOrganization($input: OrganizationInput!) {\n    updateOrganization(input: $input)\n  }\n"): (typeof documents)["\n  mutation UpdateOrganization($input: OrganizationInput!) {\n    updateOrganization(input: $input)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query MeProfileQuery {\n    me {\n      id\n      name {\n        first\n        last\n        middle\n        title\n        full\n      }\n      email\n      phone\n      fax\n      npi\n      address {\n        street1\n        street2\n        city\n        state\n        postalCode\n        country\n      }\n      roles {\n        id\n        name\n        description\n      }\n    }\n    organization {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  query MeProfileQuery {\n    me {\n      id\n      name {\n        first\n        last\n        middle\n        title\n        full\n      }\n      email\n      phone\n      fax\n      npi\n      address {\n        street1\n        street2\n        city\n        state\n        postalCode\n        country\n      }\n      roles {\n        id\n        name\n        description\n      }\n    }\n    organization {\n      id\n      name\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query EditProfileActionGetUser($userId: ID!) {\n    user(id: $userId) {\n      address {\n        street1\n        street2\n        state\n        postalCode\n        country\n        city\n      }\n      npi\n      phone\n      name {\n        first\n        full\n        last\n        middle\n        title\n      }\n      fax\n      email\n      roles {\n        description\n        id\n        name\n      }\n    }\n  }\n"): (typeof documents)["\n  query EditProfileActionGetUser($userId: ID!) {\n    user(id: $userId) {\n      address {\n        street1\n        street2\n        state\n        postalCode\n        country\n        city\n      }\n      npi\n      phone\n      name {\n        first\n        full\n        last\n        middle\n        title\n      }\n      fax\n      email\n      roles {\n        description\n        id\n        name\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateMyProfile($updateMyProfileInput: ProfileInput!) {\n    updateMyProfile(input: $updateMyProfileInput)\n  }\n"): (typeof documents)["\n  mutation UpdateMyProfile($updateMyProfileInput: ProfileInput!) {\n    updateMyProfile(input: $updateMyProfileInput)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

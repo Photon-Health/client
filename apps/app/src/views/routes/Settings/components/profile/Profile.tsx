@@ -2,11 +2,17 @@ import {
   Alert,
   AlertIcon,
   Box,
+  Button,
   Container,
   Divider,
+  Flex,
+  Modal,
+  ModalOverlay,
   SkeletonText,
+  Spacer,
   Stack,
-  Text
+  Text,
+  useDisclosure
 } from '@chakra-ui/react';
 
 import { useQuery } from '@apollo/client';
@@ -15,15 +21,24 @@ import { formatAddress } from 'apps/app/src/utils';
 import { useMemo } from 'react';
 import InfoGrid from '../../../components/InfoGrid';
 import { usePhoton } from '@photonhealth/react';
+import { useClinicalApiClient } from '../../apollo';
+import { EditProfileAction } from './ProfileEditForm';
+import { EditIcon } from '@chakra-ui/icons';
 
 const profileQuery = graphql(/* GraphQL */ `
   query MeProfileQuery {
     me {
+      id
       name {
+        first
+        last
+        middle
+        title
         full
       }
       email
       phone
+      fax
       npi
       address {
         street1
@@ -32,6 +47,11 @@ const profileQuery = graphql(/* GraphQL */ `
         state
         postalCode
         country
+      }
+      roles {
+        id
+        name
+        description
       }
     }
     organization {
@@ -48,6 +68,9 @@ export const Profile = () => {
     errorPolicy: 'ignore'
   });
 
+  const client = useClinicalApiClient();
+  const { data, loading, error } = useQuery(profileQuery, { client, errorPolicy: 'ignore' });
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const address = useMemo(() => {
     const addressData = data?.me.address;
     if (!addressData) {
@@ -63,6 +86,7 @@ export const Profile = () => {
         { title: 'Organization', value: data?.organization?.name },
         { title: 'Email Address', value: data?.me?.email },
         { title: 'Phone', value: data?.me.phone },
+        { title: 'Fax', value: data?.me.fax },
         { title: 'Address', value: address },
         { title: 'NPI', value: data?.me.npi }
       ].map(({ title, value }) => ({
@@ -90,10 +114,29 @@ export const Profile = () => {
     >
       <Container padding={{ base: '0', md: '0' }}>
         <Stack spacing={2}>
-          <Text fontSize="xl" fontWeight="medium">
-            Profile
-          </Text>
+          <Flex minWidth="max-content" alignItems="center" gap="2">
+            <Box>
+              <Text fontSize="xl" fontWeight="medium">
+                Profile
+              </Text>
+            </Box>
+
+            <Spacer />
+
+            <Box>
+              <Button size={'sm'} colorScheme={'brand'} leftIcon={<EditIcon />} onClick={onOpen}>
+                Update Profile
+              </Button>
+            </Box>
+          </Flex>
+          <Modal isOpen={isOpen} onClose={onClose} size="xl">
+            <ModalOverlay />
+            {isOpen && (
+              <EditProfileAction userId={data?.me?.id ?? ''} onClose={onClose}></EditProfileAction>
+            )}
+          </Modal>
           <Divider />
+
           {error && (
             <Alert status="error">
               <AlertIcon />
