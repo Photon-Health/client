@@ -1,4 +1,4 @@
-import { createMemo, createSignal, For } from 'solid-js';
+import { createMemo, createSignal, For, Ref } from 'solid-js';
 import * as zod from 'zod';
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
@@ -68,9 +68,19 @@ Description:
 const formName = 'prescribe-flow-duplicate';
 
 export default function RecentOrdersIssueDialog() {
+  let ref: Ref<any> | undefined;
   const [submitting, setSubmitting] = createSignal(false);
   const [state, actions] = useRecentOrders();
   const client = usePhotonClient();
+
+  const dispatchTicketCreatedDuplicate = () => {
+    const event = new CustomEvent('photon-ticket-created-duplicate', {
+      composed: true,
+      bubbles: true,
+      detail: {}
+    });
+    ref?.dispatchEvent(event);
+  };
 
   const fills = createMemo(() => {
     if (state?.orderWithIssue) {
@@ -105,12 +115,17 @@ export default function RecentOrdersIssueDialog() {
             body
           }
         }
-      },
-      update: () => {
-        setSubmitting(false);
-        // TODO: redirect
       }
     });
+
+    setSubmitting(false);
+    triggerToast({
+      header: 'Ticket Created',
+      body: 'A ticket for this prescription has been sent. Our team will be in touch shortly.',
+      status: 'success'
+    });
+    dispatchTicketCreatedDuplicate();
+    actions.setIsIssueDialogOpen(false);
   };
 
   const { form, errors } = createForm({

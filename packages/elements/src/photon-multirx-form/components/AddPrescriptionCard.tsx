@@ -20,6 +20,7 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 import { createSignal, Show, onMount } from 'solid-js';
 import repopulateForm from '../util/repopulateForm';
 import clearForm from '../util/clearForm';
+import { formatPatientWeight } from '../util/formatPatientWeight';
 import { usePhoton } from '../../context';
 import { GraphQLError } from 'graphql';
 
@@ -36,9 +37,6 @@ const validators = {
   ),
   effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
 };
-
-const patientWeight = (weight: number, weightUnit = 'lb') =>
-  `Patient weight: ${weight} ${weightUnit}`;
 
 export const AddPrescriptionCard = (props: {
   hideAddToTemplates: boolean;
@@ -74,7 +72,7 @@ export const AddPrescriptionCard = (props: {
     if (props.weight) {
       props.actions.updateFormValue({
         key: 'notes',
-        value: patientWeight(props.weight, props.weightUnit)
+        value: formatPatientWeight(props.weight, props.weightUnit)
       });
     }
   });
@@ -157,7 +155,7 @@ export const AddPrescriptionCard = (props: {
         setOffCatalog(undefined);
         clearForm(
           props.actions,
-          props.weight ? { notes: patientWeight(props.weight, props?.weightUnit) } : undefined
+          props.weight ? { notes: formatPatientWeight(props.weight, props?.weightUnit) } : undefined
         );
         if (addToTemplate) {
           try {
