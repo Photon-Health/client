@@ -118,7 +118,12 @@ export class PhotonClientStore {
   };
   private autoLogin: boolean;
   private redirectPath: string | undefined;
-  public constructor(sdk: PhotonClient, autoLogin: boolean, redirectPath: string | undefined, cs?: typeof createStore) {
+  public constructor(
+    sdk: PhotonClient,
+    autoLogin: boolean,
+    redirectPath: string | undefined,
+    cs?: typeof createStore
+  ) {
     this.sdk = sdk;
     this.autoLogin = autoLogin;
     this.redirectPath = redirectPath;
@@ -273,7 +278,7 @@ export class PhotonClientStore {
       await this.sdk.authentication.checkSession();
       const authenticated = await this.sdk.authentication.isAuthenticated();
       if (this.autoLogin && !authenticated) {
-        const args: { appState: { returnTo?: string }} = { appState: {} };
+        const args: { appState: { returnTo?: string } } = { appState: {} };
         if (this.redirectPath) {
           args.appState.returnTo = this.redirectPath;
         }

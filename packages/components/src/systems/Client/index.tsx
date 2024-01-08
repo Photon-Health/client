@@ -34,8 +34,8 @@ export default function Client(props: ClientProps) {
   });
 
   const store = props?.createStore
-    ? new PhotonClientStore(sdk, props.createStore)
-    : new PhotonClientStore(sdk);
+    ? new PhotonClientStore(sdk, props.autoLogin ?? false, props.redirectPath, props.createStore)
+    : new PhotonClientStore(sdk, props.autoLogin ?? false, props.redirectPath);
 
   if (props.developmentMode) {
     console.info('[PhotonClient]: Development mode enabled');
