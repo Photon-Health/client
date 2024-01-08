@@ -18,7 +18,7 @@ import {
 import * as yup from 'yup';
 import { rolesSchema } from '../utils/Roles';
 import { useMutation, useQuery } from '@apollo/client';
-import { useClinicalApiClient } from '../../apollo';
+import { usePhoton } from '@photonhealth/react';
 import { graphql } from 'apps/app/src/gql';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 import { FormikTouched, FormikErrors, ErrorMessage, Field, Formik } from 'formik';
@@ -136,17 +136,17 @@ type ProviderFormikTouchedType = FormikTouched<ProviderYupType>;
 type ProviderFormikErrorsType = FormikErrors<ProviderYupType>;
 
 export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, onClose }) => {
-  const client = useClinicalApiClient();
+  const { clinicalClient } = usePhoton();
   const {
     data: userData,
     error: userDataError,
     loading
   } = useQuery(EditProfileActionGetUserQuery, {
-    client,
+    client: clinicalClient,
     variables: { userId: userId }
   });
   const [updateMyProfile, { error }] = useMutation(UpdateMyProfileMutation, {
-    client,
+    client: clinicalClient,
     refetchQueries: ['MeProfileQuery', 'EditProfileActionGetUserQuery']
   });
 

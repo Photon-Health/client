@@ -19,9 +19,8 @@ import { useQuery } from '@apollo/client';
 import { graphql } from 'apps/app/src/gql';
 import { formatAddress } from 'apps/app/src/utils';
 import { useMemo } from 'react';
-import InfoGrid from '../../../components/InfoGrid';
+import InfoGrid from '../../../../components/InfoGrid';
 import { usePhoton } from '@photonhealth/react';
-import { useClinicalApiClient } from '../../apollo';
 import { EditProfileAction } from './ProfileEditForm';
 import { EditIcon } from '@chakra-ui/icons';
 
@@ -68,8 +67,6 @@ export const Profile = () => {
     errorPolicy: 'ignore'
   });
 
-  const client = useClinicalApiClient();
-  const { data, loading, error } = useQuery(profileQuery, { client, errorPolicy: 'ignore' });
   const { isOpen, onOpen, onClose } = useDisclosure();
   const address = useMemo(() => {
     const addressData = data?.me.address;
