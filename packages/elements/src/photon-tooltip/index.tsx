@@ -26,10 +26,11 @@ export type TooltipPlacements =
 export type PhotonTooltipProps = {
   tip: string;
   placement?: TooltipPlacements;
+  maxWidth?: string;
 };
 
 const PhotonTooltip = (p: PhotonTooltipProps) => {
-  const props = mergeProps({ placement: 'top' }, p);
+  const props = mergeProps({ placement: 'top', maxWidth: '200px' }, p);
   return (
     <>
       <style>{tailwind}</style>
@@ -38,7 +39,7 @@ const PhotonTooltip = (p: PhotonTooltipProps) => {
       <sl-tooltip
         content={props.tip}
         placement={props.placement}
-        style={{ '--max-width': '200px' }}
+        style={{ '--max-width': props.maxWidth }}
       >
         <sl-icon name="info-circle" />
       </sl-tooltip>

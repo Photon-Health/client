@@ -1,12 +1,12 @@
 import { ApolloClient } from '@apollo/client';
 import gql from 'graphql-tag';
-import { createEffect, createSignal, JSXElement, Ref, Show } from 'solid-js';
+import { Maybe } from 'graphql/jsutils/Maybe';
+import { createEffect, createSignal, JSXElement, Match, Ref, Switch } from 'solid-js';
 import Button from '../../particles/Button';
 import Card from '../../particles/Card';
+import Icon from '../../particles/Icon';
 import Spinner from '../../particles/Spinner';
 import Text from '../../particles/Text';
-import { Maybe } from 'graphql/jsutils/Maybe';
-import Icon from '../../particles/Icon';
 
 const GetCurrentUserSignatureAttestationStatus = gql`
   query GetCurrentUserSignatureAttestationStatus {
@@ -104,7 +104,6 @@ const agreeToSignatureAttestation =
 export interface SignatureAttestationModalProps {
   client: ApolloClient<any>;
   children: JSXElement;
-  onAgreeComplete?: () => void;
 }
 
 type Status =
@@ -166,7 +165,6 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
 
   createEffect(() => {
     if (status().status === 'COMPLETE') {
-      props.onAgreeComplete?.();
       dispatchSignatureAttestationAgreed();
     }
   });
@@ -194,23 +192,29 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
   };
 
   return (
-    <div class="w-full" ref={ref}>
-      <Show when={status().status === 'LOADING'}>
-        <div class="flex justify-center w-full">
-          <Spinner color="green" />
-        </div>
-      </Show>
-      <Show when={status().status === 'COMPLETE'}>{props.children}</Show>
-      <Show when={status().status === 'ERROR'}>
-        <div class="text-red-700 font-bold flex space-x-2 items-center justify-center">
-          <Icon name="exclamationCircle" />
-          <span>An error occurred. Please refresh and try again</span>
-        </div>
-      </Show>
-      <Show when={status().status === 'NEEDS ATTESTATION'}>
-        <AgreementCard onAgree={onAgree} onCancel={dispatchSignatureAttestationCanceled} />
-      </Show>
-    </div>
+    <>
+      {/* This span is needed so we can easily dispatch events */}
+      <span ref={ref} hidden />
+      <Switch>
+        <Match when={status().status === 'LOADING'}>
+          <div class="flex justify-center w-full">
+            <Spinner color="green" />
+          </div>
+        </Match>
+        <Match when={status().status === 'COMPLETE'}>{props.children}</Match>
+        <Match when={status().status === 'ERROR'}>
+          <div class="text-red-700 font-bold flex space-x-2 items-center justify-center">
+            <Icon name="exclamationCircle" />
+            <span>An error occurred. Please refresh and try again</span>
+          </div>
+        </Match>
+        <Match when={status().status === 'NEEDS ATTESTATION'}>
+          <div class="w-full">
+            <AgreementCard onAgree={onAgree} onCancel={dispatchSignatureAttestationCanceled} />
+          </div>
+        </Match>
+      </Switch>
+    </>
   );
 };
 
