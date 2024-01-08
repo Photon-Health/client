@@ -155,6 +155,15 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
     ref?.dispatchEvent(event);
   };
 
+  const dispatchSignatureAttestationCanceled = () => {
+    const event = new CustomEvent('photon-signature-attestation-canceled', {
+      composed: true,
+      bubbles: true,
+      detail: {}
+    });
+    ref?.dispatchEvent(event);
+  };
+
   createEffect(() => {
     if (status().status === 'COMPLETE') {
       props.onAgreeComplete?.();
@@ -199,13 +208,13 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
         </div>
       </Show>
       <Show when={status().status === 'NEEDS ATTESTATION'}>
-        <AgreementCard onAgree={onAgree} />
+        <AgreementCard onAgree={onAgree} onCancel={dispatchSignatureAttestationCanceled}/>
       </Show>
     </div>
   );
 };
 
-const AgreementCard = (props: { onAgree: () => void }) => (
+const AgreementCard = (props: { onAgree: () => void; onCancel: () => void }) => (
   <Card>
     <div class="flex flex-col space-y-5">
       <div class="bg-[#FFFAEB] flex text-[#DC6803] py-2 font-semibold items-center text-sm">
@@ -233,7 +242,7 @@ const AgreementCard = (props: { onAgree: () => void }) => (
         </p>
       </div>
       <div class="flex justify-end space-x-4">
-        <Button variant="secondary">Cancel</Button>
+        <Button variant="secondary" onClick={props.onCancel}>Cancel</Button>
         <Button variant="primary" onClick={props.onAgree}>
           Agree
         </Button>

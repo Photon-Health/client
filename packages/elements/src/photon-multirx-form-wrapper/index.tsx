@@ -285,6 +285,10 @@ customElement(
                     setHideOrderButton(false);
 >>>>>>> aaf1676c (wire up and hide the send order button)
                   }}
+                  on:photon-signature-attestation-canceled={() => {
+                    dispatchClosed();
+                    patientActions.clearSelectedPatient();
+                  }}
                 />
               </div>
             </div>
