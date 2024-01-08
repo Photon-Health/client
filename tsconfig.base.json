@@ -10,15 +10,28 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": ["es2017", "dom"],
+    "lib": [
+      "es2017",
+      "dom"
+    ],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@client/settings": ["packages/settings/src/index.ts"],
-      "@photonhealth/sdk": ["packages/sdk/src/lib.ts"],
-      "@photonhealth/react": ["packages/react/src/index.ts"]
+      "@client/settings": [
+        "packages/settings/src/index.ts"
+      ],
+      "@photonhealth/react": [
+        "packages/react/src/index.ts"
+      ],
+      "@photonhealth/sdk": [
+        "packages/sdk/src/lib.ts"
+      ]
     }
   },
-  "exclude": ["node_modules", "tmp", "dist"]
+  "exclude": [
+    "node_modules",
+    "tmp",
+    "dist"
+  ]
 }
