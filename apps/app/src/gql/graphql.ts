@@ -123,6 +123,7 @@ export type Mutation = {
   rotateClientSecret: Client;
   setUserRoles: Scalars['ID']['output'];
   updateClient: Scalars['ID']['output'];
+  updateMyProfile: Scalars['ID']['output'];
   updateOrganization: Scalars['ID']['output'];
   updateProviderProfile: Scalars['ID']['output'];
   updateProviderSignature: Scalars['ID']['output'];
@@ -192,6 +193,11 @@ export type MutationSetUserRolesArgs = {
 export type MutationUpdateClientArgs = {
   clientId: Scalars['ID']['input'];
   whiteListedUrls?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+export type MutationUpdateMyProfileArgs = {
+  input: ProfileInput;
 };
 
 
@@ -339,6 +345,17 @@ export type Prescription = {
   notes?: Maybe<Scalars['String']['output']>;
   treatment: Treatment;
   writtenAt: Scalars['DateTime']['output'];
+};
+
+export type ProfileInput = {
+  address?: InputMaybe<AddressInput>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  fax?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<UserNameInput>;
+  npi?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
+  /** A base64 encoded string of the signature picture */
+  signature?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ProviderInput = {

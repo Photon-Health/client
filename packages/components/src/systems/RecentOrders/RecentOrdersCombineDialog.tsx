@@ -9,6 +9,7 @@ import formatRxString from '../../utils/formatRxString';
 import uniqueFills from '../../utils/uniqueFills';
 import { usePhotonClient } from '../SDKProvider';
 import triggerToast from '../../utils/toastTriggers';
+import { Address } from '../PatientInfo';
 
 const CREATE_PRESCRIPTIONS_MUTATION = gql`
   mutation CreatePrescriptions($prescriptions: [PrescriptionInput!]!) {
@@ -21,6 +22,14 @@ const CREATE_PRESCRIPTIONS_MUTATION = gql`
 const COMBINE_ORDERS_MUTATION = gql`
   mutation UpdateOrder($orderId: ID!, $fills: [FillInput!]!) {
     updateOrder(id: $orderId, fills: $fills) {
+      id
+    }
+  }
+`;
+
+const CREATE_ORDER_MUTATION = gql`
+  mutation CreateOrder($patientId: ID!, $fills: [FillInput!]!, $address: AddressInput!) {
+    createOrder(patientId: $patientId, fills: $fills, address: $address) {
       id
     }
   }
@@ -84,6 +93,13 @@ export default function RecentOrdersCombineDialog() {
     });
   };
 
+  const createOrder = async (orderId: string, prescriptionIds: string[], address: Address) => {
+    return client!.apollo.mutate({
+      mutation: CREATE_ORDER_MUTATION,
+      variables: { orderId, fills: prescriptionIds.map((id) => ({ prescriptionId: id })), address }
+    });
+  };
+
   const combineOrders = async () => {
     const order = routingOrder();
 
@@ -93,10 +109,21 @@ export default function RecentOrdersCombineDialog() {
 
     setIsCombiningOrders(true);
 
+    let prescriptions;
     try {
       // Create prescriptions for the drafts
-      const prescriptions = await createPrescriptions();
+      prescriptions = await createPrescriptions();
+    } catch {
+      triggerToast({
+        header: 'Error Creating Prescriptions',
+        body: 'The prescriptions have not been created.',
+        status: 'info'
+      });
+      setIsCombiningOrders(false);
+      return;
+    }
 
+    try {
       // Add rxs to the order
       const updatedOrder = await updateOrder(
         order.id,
@@ -105,14 +132,25 @@ export default function RecentOrdersCombineDialog() {
 
       // Trigger message to redirect to order page
       dispatchCombineOrderUpdated(updatedOrder.data.updateOrder.id);
-    } catch (e) {
-      console.error('error', e);
-
-      triggerToast({
-        status: 'info',
-        header: 'Error combining orders',
-        body: 'Your order wasn’t combined, please refresh the page.'
-      });
+      return;
+    } catch {
+      // error updating order most likely because the order state has changed since it was
+      // first fetched so we need to create a new order
+      try {
+        await createOrder(
+          order.id,
+          prescriptions.data.createPrescriptions.map((rx: { id: string }) => rx.id),
+          {}
+        );
+      } catch {
+        triggerToast({
+          header: 'Error Creating Order',
+          body: 'The prescription was created but not turned into an order.',
+          status: 'info'
+        });
+        setIsCombiningOrders(false);
+        return;
+      }
     }
   };
 
