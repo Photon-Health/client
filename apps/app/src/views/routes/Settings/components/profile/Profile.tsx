@@ -60,7 +60,7 @@ export const Profile = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const address = useMemo(() => {
-    const addressData = data?.me?.address;
+    const addressData = data?.me.address;
     if (!addressData) {
       return undefined;
     }
@@ -70,9 +70,9 @@ export const Profile = () => {
   const rows = useMemo(
     () =>
       [
-        { title: 'Full Name', value: data?.me?.name?.full },
+        { title: 'Full Name', value: data?.me.name?.full },
         { title: 'Organization', value: data?.organization?.name },
-        { title: 'Email Address', value: data?.me?.email },
+        { title: 'Email Address', value: data?.me.email },
         { title: 'Phone', value: data?.me.phone },
         { title: 'Fax', value: data?.me.fax },
         { title: 'Address', value: address },
