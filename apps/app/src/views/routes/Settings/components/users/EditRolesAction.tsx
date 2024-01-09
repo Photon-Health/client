@@ -142,7 +142,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
   });
   const [setUserRoles, { error }] = useMutation(SetUserRolesMutation, {
     client: clinicalClient,
-    refetchQueries: ['UsersListQuery', 'EditRolesActionGetUserQuery']
+    refetchQueries: ['UsersListQuery']
   });
 
   const handleSaveRoles = (formVariables: any) => {
