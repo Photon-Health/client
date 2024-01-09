@@ -1,21 +1,9 @@
 import { Td, Text, Tr } from '@chakra-ui/react';
-import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
+import { FragmentType, useFragment } from 'apps/app/src/gql';
 import { useMemo } from 'react';
 import { UserItemActions } from './UserItemActions';
 import { compareRoles } from './utils';
-
-const userFragment = graphql(/* GraphQL */ `
-  fragment UserItemFragment on User {
-    id
-    name {
-      full
-    }
-    roles {
-      id
-    }
-    email
-  }
-`);
+import { userFragment } from '../utils/UserFragment';
 
 export const UserItem = ({
   user: data,
@@ -47,7 +35,7 @@ export const UserItem = ({
       <Td textOverflow={'ellipsis'}>{roles}</Td>
       {!hasRole ? null : (
         <Td>
-          <UserItemActions userId={user.id}></UserItemActions>
+          <UserItemActions user={data}></UserItemActions>
         </Td>
       )}
     </Tr>

@@ -18,48 +18,18 @@ import {
 } from '@chakra-ui/react';
 import * as yup from 'yup';
 import { rolesSchema, RolesSelect } from '../utils/Roles';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { usePhoton } from '@photonhealth/react';
-import { graphql } from 'apps/app/src/gql';
+import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 import { FormikTouched, FormikErrors, ErrorMessage, Field, Formik } from 'formik';
 import { Role } from 'packages/sdk/dist/types';
+import { userFragment } from '../utils/UserFragment';
 
 interface EditRolesActionProps {
-  userId: string;
+  user?: FragmentType<typeof userFragment>;
   onClose: () => void;
 }
-
-const EditRolesActionGetUserQuery = graphql(/* GraphQL */ `
-  query EditRolesActionGetUser($userId: ID!) {
-    user(id: $userId) {
-      address {
-        street1
-        street2
-        state
-        postalCode
-        country
-        city
-      }
-      npi
-      phone
-      name {
-        first
-        full
-        last
-        middle
-        title
-      }
-      fax
-      email
-      roles {
-        description
-        id
-        name
-      }
-    }
-  }
-`);
 
 const SetUserRolesMutation = graphql(/* GraphQL */ `
   mutation SetUserRoles($userId: ID!, $roles: [ID!]!) {
@@ -132,16 +102,9 @@ type ProviderYupType = RoleYupType['provider'];
 type ProviderFormikTouchedType = FormikTouched<ProviderYupType>;
 type ProviderFormikErrorsType = FormikErrors<ProviderYupType>;
 
-export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClose }) => {
+export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose }) => {
   const { clinicalClient } = usePhoton();
-  const {
-    data: userData,
-    error: userDataError,
-    loading
-  } = useQuery(EditRolesActionGetUserQuery, {
-    client: clinicalClient,
-    variables: { userId: userId }
-  });
+  const userData = useFragment(userFragment, user);
   const [updateProviderProfile] = useMutation(UpdateProviderProfileMutation, {
     client: clinicalClient,
     refetchQueries: []
@@ -154,25 +117,23 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
   const handleSaveRoles = (formVariables: any) => {
     if (
       hasPrescriberRole(formVariables.variables.roles) &&
-      (userData?.user?.npi == undefined ||
-        userData?.user?.address == undefined ||
-        userData?.user?.email == undefined)
+      (userData?.npi == undefined || userData?.address == undefined || userData?.email == undefined)
     ) {
       updateProviderProfile({
         variables: {
-          providerId: userId,
+          providerId: userData?.id ?? '',
           updateProviderProfileInput: {
-            address: formVariables.variables.provider.address ?? userData?.user?.address,
-            email: formVariables.variables.email ?? userData?.user?.email,
-            npi: formVariables.variables.provider.npi ?? userData?.user?.npi,
-            phone: formVariables.variables.phone ?? userData?.user?.phone
+            address: formVariables.variables.provider.address ?? userData?.address,
+            email: formVariables.variables.email ?? userData?.email,
+            npi: formVariables.variables.provider.npi ?? userData?.npi,
+            phone: formVariables.variables.phone ?? userData?.phone
           }
         }
       });
     }
     setUserRoles({
       variables: {
-        userId: userId,
+        userId: userData?.id ?? '',
         roles: formVariables.variables.roles.map((role: any) => role.value)
       }
     });
@@ -192,18 +153,18 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
   }
 
   const initialValues: yup.InferType<typeof roleSchema> = {
-    email: userData?.user?.email ?? '',
-    roles: mapAndSortRoles(userData?.user?.roles ?? []),
+    email: userData?.email ?? '',
+    roles: mapAndSortRoles(userData?.roles ?? []),
     provider: {
-      npi: userData?.user?.npi ?? '',
+      npi: userData?.npi ?? '',
       address: {
-        street1: userData?.user?.address?.street1 ?? '',
-        street2: userData?.user?.address?.street2 ?? undefined,
-        city: userData?.user?.address?.city ?? '',
-        state: { value: (userData?.user?.address?.state as string) ?? '' },
-        postalCode: userData?.user?.address?.postalCode ?? ''
+        street1: userData?.address?.street1 ?? '',
+        street2: userData?.address?.street2 ?? undefined,
+        city: userData?.address?.city ?? '',
+        state: { value: (userData?.address?.state as string) ?? '' },
+        postalCode: userData?.address?.postalCode ?? ''
       },
-      phone: userData?.user?.phone ?? ''
+      phone: userData?.phone ?? ''
     }
   };
 
@@ -233,12 +194,12 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
         >
           <VStack m={3} mt={2} p={[2, 2]} spacing={2} align="stretch">
             <Text fontSize="md" fontWeight={'semibold'}>
-              {userData?.user?.name?.full}
+              {userData?.name?.full}
             </Text>
-            <Text fontSize="sm">{userData?.user?.email}</Text>
+            <Text fontSize="sm">{userData?.email}</Text>
           </VStack>
         </Box>
-        {userData && !loading && userData && !userDataError && (
+        {userData && (
           <Formik
             validateOnBlur
             initialValues={initialValues}
@@ -289,9 +250,9 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
                     </FormControl>
 
                     {hasPrescriberRole(values.roles) &&
-                      (userData?.user?.npi == undefined ||
-                        userData?.user?.address == undefined ||
-                        userData?.user?.email == undefined) && (
+                      (userData?.npi == undefined ||
+                        userData?.address == undefined ||
+                        userData?.email == undefined) && (
                         <>
                           <FormControl
                             isRequired
@@ -302,7 +263,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
                               NPI
                             </FormLabel>
 
-                            <Field name="provider.npi" default={userData?.user?.npi} as={Input} />
+                            <Field name="provider.npi" default={userData?.npi} as={Input} />
                             <ErrorMessage name="provider.npi" component={FormErrorMessage} />
                           </FormControl>
                           <FormControl
@@ -318,7 +279,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
                             </FormLabel>
                             <Field
                               name="provider.address.street1"
-                              default={userData?.user?.address?.street1}
+                              default={userData?.address?.street1}
                               as={Input}
                             />
                             <ErrorMessage
@@ -338,7 +299,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
                             </FormLabel>
                             <Field
                               name="provider.address.street2"
-                              default={userData?.user?.address?.street2}
+                              default={userData?.address?.street2}
                               as={Input}
                             />
                             <ErrorMessage
@@ -358,7 +319,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
                             </FormLabel>
                             <Field
                               name="provider.address.city"
-                              default={userData?.user?.address?.city}
+                              default={userData?.address?.city}
                               as={Input}
                             />
                             <ErrorMessage
@@ -406,7 +367,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
                             </FormLabel>
                             <Field
                               name="provider.address.postalCode"
-                              default={userData?.user?.address?.postalCode}
+                              default={userData?.address?.postalCode}
                               as={Input}
                             />
                             <ErrorMessage
@@ -422,11 +383,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ userId, onClos
                             <FormLabel htmlFor="provider.phone" mb={1}>
                               Phone
                             </FormLabel>
-                            <Field
-                              name="provider.phone"
-                              default={userData?.user?.phone}
-                              as={Input}
-                            />
+                            <Field name="provider.phone" default={userData?.phone} as={Input} />
                             <ErrorMessage name="provider.phone" component={FormErrorMessage} />
                           </FormControl>
                         </>

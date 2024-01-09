@@ -12,12 +12,14 @@ import {
 } from '@chakra-ui/react';
 import { FiEdit, FiMoreVertical } from 'react-icons/fi';
 import { EditRolesAction } from './EditRolesAction';
+import { userFragment } from '../utils/UserFragment';
+import { FragmentType } from 'apps/app/src/gql';
 
 interface UserItemActionsProps {
-  userId: string;
+  user?: FragmentType<typeof userFragment>;
 }
 
-export const UserItemActions: React.FC<UserItemActionsProps> = ({ userId }) => {
+export const UserItemActions: React.FC<UserItemActionsProps> = ({ user }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <HStack justifyContent="flex-end">
@@ -36,7 +38,7 @@ export const UserItemActions: React.FC<UserItemActionsProps> = ({ userId }) => {
       </Menu>
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
-        {isOpen && <EditRolesAction userId={userId} onClose={onClose}></EditRolesAction>}
+        {isOpen && <EditRolesAction user={user} onClose={onClose}></EditRolesAction>}
       </Modal>
     </HStack>
   );

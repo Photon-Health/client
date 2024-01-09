@@ -27,30 +27,31 @@ import { EditIcon } from '@chakra-ui/icons';
 const profileQuery = graphql(/* GraphQL */ `
   query MeProfileQuery {
     me {
+      ...UserFragment
       id
-      name {
-        first
-        last
-        middle
-        title
-        full
-      }
-      email
+      npi
       phone
       fax
-      npi
+      email
       address {
         street1
         street2
-        city
         state
         postalCode
         country
+        city
+      }
+      name {
+        first
+        full
+        last
+        middle
+        title
       }
       roles {
+        description
         id
         name
-        description
       }
     }
     organization {
@@ -69,7 +70,7 @@ export const Profile = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const address = useMemo(() => {
-    const addressData = data?.me.address;
+    const addressData = data?.me?.address;
     if (!addressData) {
       return undefined;
     }
@@ -129,7 +130,7 @@ export const Profile = () => {
           <Modal isOpen={isOpen} onClose={onClose} size="xl">
             <ModalOverlay />
             {isOpen && (
-              <EditProfileAction userId={data?.me?.id ?? ''} onClose={onClose}></EditProfileAction>
+              <EditProfileAction user={data?.me ?? undefined} onClose={onClose}></EditProfileAction>
             )}
           </Modal>
           <Divider />

@@ -17,48 +17,18 @@ import {
 } from '@chakra-ui/react';
 import * as yup from 'yup';
 import { rolesSchema } from '../utils/Roles';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { usePhoton } from '@photonhealth/react';
-import { graphql } from 'apps/app/src/gql';
+import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 import { FormikTouched, FormikErrors, ErrorMessage, Field, Formik } from 'formik';
 import { Role } from 'packages/sdk/dist/types';
+import { userFragment } from '../utils/UserFragment';
 
 interface EditProfileActionProps {
-  userId: string;
+  user?: FragmentType<typeof userFragment>;
   onClose: () => void;
 }
-
-const EditProfileActionGetUserQuery = graphql(/* GraphQL */ `
-  query EditProfileActionGetUser($userId: ID!) {
-    user(id: $userId) {
-      address {
-        street1
-        street2
-        state
-        postalCode
-        country
-        city
-      }
-      npi
-      phone
-      name {
-        first
-        full
-        last
-        middle
-        title
-      }
-      fax
-      email
-      roles {
-        description
-        id
-        name
-      }
-    }
-  }
-`);
 
 const UpdateMyProfileMutation = graphql(/* GraphQL */ `
   mutation UpdateMyProfile($updateMyProfileInput: ProfileInput!) {
@@ -135,16 +105,9 @@ type ProviderYupType = ProfileYupType['provider'];
 type ProviderFormikTouchedType = FormikTouched<ProviderYupType>;
 type ProviderFormikErrorsType = FormikErrors<ProviderYupType>;
 
-export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, onClose }) => {
+export const EditProfileAction: React.FC<EditProfileActionProps> = ({ user, onClose }) => {
   const { clinicalClient } = usePhoton();
-  const {
-    data: userData,
-    error: userDataError,
-    loading
-  } = useQuery(EditProfileActionGetUserQuery, {
-    client: clinicalClient,
-    variables: { userId: userId }
-  });
+  const currentUser = useFragment(userFragment, user);
   const [updateMyProfile, { error }] = useMutation(UpdateMyProfileMutation, {
     client: clinicalClient,
     refetchQueries: ['MeProfileQuery', 'EditProfileActionGetUserQuery']
@@ -154,12 +117,12 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, on
     updateMyProfile({
       variables: {
         updateMyProfileInput: {
-          name: formVariables.variables.name ?? userData?.user?.name,
-          address: formVariables.variables.provider.address ?? userData?.user?.address,
-          email: formVariables.variables.email ?? userData?.user?.email,
-          npi: formVariables.variables.provider.npi ?? userData?.user?.npi,
-          phone: formVariables.variables.provider.phone ?? userData?.user?.phone,
-          fax: formVariables.variables.fax ?? userData?.user?.fax
+          name: formVariables.variables.name ?? currentUser?.name,
+          address: formVariables.variables.provider.address ?? currentUser?.address,
+          email: formVariables.variables.email ?? currentUser?.email,
+          npi: formVariables.variables.provider.npi ?? currentUser?.npi,
+          phone: formVariables.variables.provider.phone ?? currentUser?.phone,
+          fax: formVariables.variables.fax ?? currentUser?.fax
         }
       }
     });
@@ -181,24 +144,24 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, on
 
   const initialValues: yup.InferType<typeof profileSchema> = {
     name: {
-      title: userData?.user?.name?.title ?? undefined,
-      first: userData?.user?.name?.first ?? '',
-      middle: userData?.user?.name?.middle ?? undefined,
-      last: userData?.user?.name?.last ?? ''
+      title: currentUser?.name?.title ?? undefined,
+      first: currentUser?.name?.first ?? '',
+      middle: currentUser?.name?.middle ?? undefined,
+      last: currentUser?.name?.last ?? ''
     },
-    fax: userData?.user?.fax ?? undefined,
-    email: userData?.user?.email ?? '',
-    roles: mapAndSortRoles(userData?.user?.roles ?? []),
+    fax: currentUser?.fax ?? undefined,
+    email: currentUser?.email ?? '',
+    roles: mapAndSortRoles(currentUser?.roles ?? []),
     provider: {
-      npi: userData?.user?.npi ?? '',
+      npi: currentUser?.npi ?? '',
       address: {
-        street1: userData?.user?.address?.street1 ?? '',
-        street2: userData?.user?.address?.street2 ?? undefined,
-        city: userData?.user?.address?.city ?? '',
-        state: { value: (userData?.user?.address?.state as string) ?? '' },
-        postalCode: userData?.user?.address?.postalCode ?? ''
+        street1: currentUser?.address?.street1 ?? '',
+        street2: currentUser?.address?.street2 ?? undefined,
+        city: currentUser?.address?.city ?? '',
+        state: { value: (currentUser?.address?.state as string) ?? '' },
+        postalCode: currentUser?.address?.postalCode ?? ''
       },
-      phone: userData?.user?.phone ?? ''
+      phone: currentUser?.phone ?? ''
     }
   };
 
@@ -219,7 +182,7 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, on
             {error.message}
           </Alert>
         )}
-        {userData && !loading && userData && !userDataError && (
+        {currentUser && (
           <Formik
             validateOnBlur
             initialValues={initialValues}
@@ -261,7 +224,7 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, on
                         <FormLabel htmlFor="name.title" mb={1}>
                           Title
                         </FormLabel>
-                        <Field name="name.title" default={userData?.user?.name?.title} as={Input} />
+                        <Field name="name.title" default={currentUser?.name?.title} as={Input} />
                         <ErrorMessage name="name.title" component={FormErrorMessage} />
                       </FormControl>
                       <FormControl
@@ -272,7 +235,7 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, on
                         <FormLabel htmlFor="name.title" mb={1}>
                           First Name
                         </FormLabel>
-                        <Field name="name.first" default={userData?.user?.name?.first} as={Input} />
+                        <Field name="name.first" default={currentUser?.name?.first} as={Input} />
                         <ErrorMessage name="name.first" component={FormErrorMessage} />
                       </FormControl>
                       <FormControl
@@ -282,11 +245,7 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, on
                         <FormLabel htmlFor="name.middle" mb={1}>
                           Middle Name
                         </FormLabel>
-                        <Field
-                          name="name.middle"
-                          default={userData?.user?.name?.middle}
-                          as={Input}
-                        />
+                        <Field name="name.middle" default={currentUser?.name?.middle} as={Input} />
                         <ErrorMessage name="name.middle" component={FormErrorMessage} />
                       </FormControl>
                       <FormControl
@@ -298,7 +257,7 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, on
                           Last Name
                         </FormLabel>
 
-                        <Field name="name.last" default={userData?.user?.name?.last} as={Input} />
+                        <Field name="name.last" default={currentUser?.name?.last} as={Input} />
                         <ErrorMessage name="name.last" component={FormErrorMessage} />
                       </FormControl>
                       <FormControl isRequired isInvalid={!!errors?.email && touched?.email} pb="4">
@@ -306,7 +265,7 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, on
                           Email
                         </FormLabel>
 
-                        <Field name="email" default={userData?.user?.email} as={Input} />
+                        <Field name="email" default={currentUser?.email} as={Input} />
                         <ErrorMessage name="email" component={FormErrorMessage} />
                       </FormControl>
                       <FormControl
@@ -318,7 +277,7 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, on
                           NPI
                         </FormLabel>
 
-                        <Field name="provider.npi" default={userData?.user?.npi} as={Input} />
+                        <Field name="provider.npi" default={currentUser?.npi} as={Input} />
                         <ErrorMessage name="provider.npi" component={FormErrorMessage} />
                       </FormControl>
                       <FormControl
@@ -333,7 +292,7 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, on
                         </FormLabel>
                         <Field
                           name="provider.address.street1"
-                          default={userData?.user?.address?.street1}
+                          default={currentUser?.address?.street1}
                           as={Input}
                         />
                         <ErrorMessage
@@ -352,7 +311,7 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, on
                         </FormLabel>
                         <Field
                           name="provider.address.street2"
-                          default={userData?.user?.address?.street2}
+                          default={currentUser?.address?.street2}
                           as={Input}
                         />
                         <ErrorMessage
@@ -372,7 +331,7 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, on
                         </FormLabel>
                         <Field
                           name="provider.address.city"
-                          default={userData?.user?.address?.city}
+                          default={currentUser?.address?.city}
                           as={Input}
                         />
                         <ErrorMessage name="provider.address.city" component={FormErrorMessage} />
@@ -414,7 +373,7 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, on
                         </FormLabel>
                         <Field
                           name="provider.address.postalCode"
-                          default={userData?.user?.address?.postalCode}
+                          default={currentUser?.address?.postalCode}
                           as={Input}
                         />
                         <ErrorMessage
@@ -430,14 +389,14 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, on
                         <FormLabel htmlFor="provider.phone" mb={1}>
                           Phone
                         </FormLabel>
-                        <Field name="provider.phone" default={userData?.user?.phone} as={Input} />
+                        <Field name="provider.phone" default={currentUser?.phone} as={Input} />
                         <ErrorMessage name="provider.phone" component={FormErrorMessage} />
                       </FormControl>
                       <FormControl isInvalid={!!errors?.fax && touched?.fax} pb="4">
                         <FormLabel htmlFor="fax" mb={1}>
                           Fax
                         </FormLabel>
-                        <Field name="fax" default={userData?.user?.fax} as={Input} />
+                        <Field name="fax" default={currentUser?.fax} as={Input} />
                         <ErrorMessage name="fax" component={FormErrorMessage} />
                       </FormControl>
                     </>
