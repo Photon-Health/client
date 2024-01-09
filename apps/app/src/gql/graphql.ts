@@ -46,6 +46,16 @@ export type Client = {
   whiteListedUrls: Array<Scalars['String']['output']>;
 };
 
+export type CommentTicketInput = {
+  body: Scalars['String']['input'];
+};
+
+export type CompletedSignatureAttestation = {
+  __typename?: 'CompletedSignatureAttestation';
+  agreedAt: Scalars['DateTime']['output'];
+  version: Scalars['String']['output'];
+};
+
 export type Compound = Treatment & {
   __typename?: 'Compound';
   id: Scalars['ID']['output'];
@@ -102,15 +112,16 @@ export type Medication = Treatment & {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  addRole: Scalars['ID']['output'];
+  agreeToSignatureAttestation: Scalars['Boolean']['output'];
   createClient: Client;
+  createTicket: Ticket;
   createWebhookConfig: Scalars['ID']['output'];
   deleteInvite: Scalars['ID']['output'];
   deleteWebhookConfig: Scalars['ID']['output'];
   inviteUser: Invite;
-  removeRole: Scalars['ID']['output'];
   resendInvite: Invite;
   rotateClientSecret: Client;
+  setUserRoles: Scalars['ID']['output'];
   updateClient: Scalars['ID']['output'];
   updateOrganization: Scalars['ID']['output'];
   updateProviderProfile: Scalars['ID']['output'];
@@ -119,9 +130,8 @@ export type Mutation = {
 };
 
 
-export type MutationAddRoleArgs = {
-  roleId: Scalars['ID']['input'];
-  userId: Scalars['String']['input'];
+export type MutationAgreeToSignatureAttestationArgs = {
+  version: Scalars['String']['input'];
 };
 
 
@@ -129,6 +139,11 @@ export type MutationCreateClientArgs = {
   appType?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   whiteListedUrls?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+export type MutationCreateTicketArgs = {
+  input: TicketInput;
 };
 
 
@@ -158,12 +173,6 @@ export type MutationInviteUserArgs = {
 };
 
 
-export type MutationRemoveRoleArgs = {
-  roleId: Scalars['ID']['input'];
-  userId: Scalars['String']['input'];
-};
-
-
 export type MutationResendInviteArgs = {
   inviteId: Scalars['ID']['input'];
 };
@@ -171,6 +180,12 @@ export type MutationResendInviteArgs = {
 
 export type MutationRotateClientSecretArgs = {
   clientId: Scalars['ID']['input'];
+};
+
+
+export type MutationSetUserRolesArgs = {
+  roles: Array<Scalars['ID']['input']>;
+  userId: Scalars['ID']['input'];
 };
 
 
@@ -213,6 +228,17 @@ export type Name = {
   last: Scalars['String']['output'];
   middle?: Maybe<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
+};
+
+export type NeedsSignatureAttestation = {
+  __typename?: 'NeedsSignatureAttestation';
+  content?: Maybe<Scalars['String']['output']>;
+  version: Scalars['String']['output'];
+};
+
+export type NotApplicableSignatureAttestation = {
+  __typename?: 'NotApplicableSignatureAttestation';
+  reason?: Maybe<Scalars['String']['output']>;
 };
 
 export type Order = {
@@ -405,6 +431,18 @@ export enum SexType {
   Unknown = 'UNKNOWN'
 }
 
+export type SignatureAttestationStatus = CompletedSignatureAttestation | NeedsSignatureAttestation | NotApplicableSignatureAttestation;
+
+export type Ticket = {
+  __typename?: 'Ticket';
+  id: Scalars['String']['output'];
+};
+
+export type TicketInput = {
+  comment: CommentTicketInput;
+  subject: Scalars['String']['input'];
+};
+
 export type Treatment = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
@@ -417,7 +455,6 @@ export type UpdateProviderProfileInput = {
   name?: InputMaybe<UpdateUserNameInput>;
   npi?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
-  roles: Array<Scalars['String']['input']>;
   /** A base64 encoded string of the signature picture */
   signature?: InputMaybe<Scalars['String']['input']>;
 };
@@ -442,6 +479,7 @@ export type User = {
   roles: Array<Role>;
   /** A base64 encoded string of the signature picture that can be rendered */
   signature?: Maybe<Scalars['String']['output']>;
+  signatureAttestationStatus?: Maybe<SignatureAttestationStatus>;
 };
 
 export type UserNameInput = {
@@ -534,6 +572,29 @@ export type UpdateOrganizationMutationVariables = Exact<{
 
 export type UpdateOrganizationMutation = { __typename?: 'Mutation', updateOrganization: string };
 
+export type EditRolesActionGetUserQueryVariables = Exact<{
+  userId: Scalars['ID']['input'];
+}>;
+
+
+export type EditRolesActionGetUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', npi?: string | null, phone?: string | null, fax?: string | null, email?: string | null, address?: { __typename?: 'Address', street1: string, street2?: string | null, state: string, postalCode: string, country: string, city: string } | null, name?: { __typename?: 'Name', first: string, full: string, last: string, middle?: string | null, title?: string | null } | null, roles: Array<{ __typename?: 'Role', description?: string | null, id: string, name?: string | null }> } | null };
+
+export type SetUserRolesMutationVariables = Exact<{
+  userId: Scalars['ID']['input'];
+  roles: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type SetUserRolesMutation = { __typename?: 'Mutation', setUserRoles: string };
+
+export type UpdateProviderProfileMutationVariables = Exact<{
+  providerId: Scalars['ID']['input'];
+  updateProviderProfileInput: UpdateProviderProfileInput;
+}>;
+
+
+export type UpdateProviderProfileMutation = { __typename?: 'Mutation', updateProviderProfile: string };
+
 export type UserItemFragmentFragment = { __typename?: 'User', id: string, email?: string | null, name?: { __typename?: 'Name', full: string } | null, roles: Array<{ __typename?: 'Role', id: string }> } & { ' $fragmentName'?: 'UserItemFragmentFragment' };
 
 export type UsersListQueryQueryVariables = Exact<{ [key: string]: never; }>;
@@ -601,6 +662,9 @@ export const DeleteInviteDocument = {"kind":"Document","definitions":[{"kind":"O
 export const InvitesQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"InvitesQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"invites"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"InviteFragment"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"expired"}},{"kind":"Field","name":{"kind":"Name","value":"expires_at"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"InviteFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Invite"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"invitee"}},{"kind":"Field","name":{"kind":"Name","value":"inviter"}},{"kind":"Field","name":{"kind":"Name","value":"expired"}},{"kind":"Field","name":{"kind":"Name","value":"expires_at"}}]}}]} as unknown as DocumentNode<InvitesQueryQuery, InvitesQueryQueryVariables>;
 export const OrganizationQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"OrganizationQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"organization"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"street1"}},{"kind":"Field","name":{"kind":"Name","value":"street2"}},{"kind":"Field","name":{"kind":"Name","value":"postalCode"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}},{"kind":"Field","name":{"kind":"Name","value":"fax"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]}}]} as unknown as DocumentNode<OrganizationQueryQuery, OrganizationQueryQueryVariables>;
 export const UpdateOrganizationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateOrganization"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"OrganizationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateOrganization"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}]}]}}]} as unknown as DocumentNode<UpdateOrganizationMutation, UpdateOrganizationMutationVariables>;
+export const EditRolesActionGetUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"EditRolesActionGetUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"address"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"street1"}},{"kind":"Field","name":{"kind":"Name","value":"street2"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"postalCode"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"city"}}]}},{"kind":"Field","name":{"kind":"Name","value":"npi"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"name"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"first"}},{"kind":"Field","name":{"kind":"Name","value":"full"}},{"kind":"Field","name":{"kind":"Name","value":"last"}},{"kind":"Field","name":{"kind":"Name","value":"middle"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"fax"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<EditRolesActionGetUserQuery, EditRolesActionGetUserQueryVariables>;
+export const SetUserRolesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SetUserRoles"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"roles"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setUserRoles"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"userId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userId"}}},{"kind":"Argument","name":{"kind":"Name","value":"roles"},"value":{"kind":"Variable","name":{"kind":"Name","value":"roles"}}}]}]}}]} as unknown as DocumentNode<SetUserRolesMutation, SetUserRolesMutationVariables>;
+export const UpdateProviderProfileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateProviderProfile"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"providerId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"updateProviderProfileInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateProviderProfileInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateProviderProfile"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"providerId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"providerId"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"updateProviderProfileInput"}}}]}]}}]} as unknown as DocumentNode<UpdateProviderProfileMutation, UpdateProviderProfileMutationVariables>;
 export const UsersListQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"UsersListQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"UserItemFragment"}},{"kind":"Field","name":{"kind":"Name","value":"name"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"full"}}]}},{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}},{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"UserItemFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"full"}}]}},{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]} as unknown as DocumentNode<UsersListQueryQuery, UsersListQueryQueryVariables>;
 export const AllRolesSelectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AllRolesSelect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}}]}}]}}]} as unknown as DocumentNode<AllRolesSelectQuery, AllRolesSelectQueryVariables>;
 export const WebhookItemDeleteMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"WebhookItemDeleteMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"webhookId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteWebhookConfig"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"webhookId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"webhookId"}}}]}]}}]} as unknown as DocumentNode<WebhookItemDeleteMutationMutation, WebhookItemDeleteMutationMutationVariables>;

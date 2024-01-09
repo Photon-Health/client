@@ -26,6 +26,9 @@ const documents = {
     "\n  query InvitesQuery {\n    invites {\n      ...InviteFragment\n      id\n      expired\n      expires_at\n    }\n  }\n": types.InvitesQueryDocument,
     "\n  query OrganizationQuery {\n    organization {\n      id\n      name\n      address {\n        street1\n        street2\n        postalCode\n        city\n        state\n        country\n      }\n      fax\n      phone\n      email\n    }\n  }\n": types.OrganizationQueryDocument,
     "\n  mutation UpdateOrganization($input: OrganizationInput!) {\n    updateOrganization(input: $input)\n  }\n": types.UpdateOrganizationDocument,
+    "\n  query EditRolesActionGetUser($userId: ID!) {\n    user(id: $userId) {\n      address {\n        street1\n        street2\n        state\n        postalCode\n        country\n        city\n      }\n      npi\n      phone\n      name {\n        first\n        full\n        last\n        middle\n        title\n      }\n      fax\n      email\n      roles {\n        description\n        id\n        name\n      }\n    }\n  }\n": types.EditRolesActionGetUserDocument,
+    "\n  mutation SetUserRoles($userId: ID!, $roles: [ID!]!) {\n    setUserRoles(userId: $userId, roles: $roles)\n  }\n": types.SetUserRolesDocument,
+    "\n  mutation UpdateProviderProfile(\n    $providerId: ID!\n    $updateProviderProfileInput: UpdateProviderProfileInput!\n  ) {\n    updateProviderProfile(providerId: $providerId, input: $updateProviderProfileInput)\n  }\n": types.UpdateProviderProfileDocument,
     "\n  fragment UserItemFragment on User {\n    id\n    name {\n      full\n    }\n    roles {\n      id\n    }\n    email\n  }\n": types.UserItemFragmentFragmentDoc,
     "\n  query UsersListQuery {\n    users {\n      id\n      ...UserItemFragment\n      name {\n        full\n      }\n      roles {\n        name\n      }\n      email\n    }\n    roles {\n      name\n      id\n    }\n  }\n": types.UsersListQueryDocument,
     "\n  query AllRolesSelect {\n    roles {\n      id\n      name\n      description\n    }\n  }\n": types.AllRolesSelectDocument,
@@ -103,6 +106,18 @@ export function graphql(source: "\n  query OrganizationQuery {\n    organization
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation UpdateOrganization($input: OrganizationInput!) {\n    updateOrganization(input: $input)\n  }\n"): (typeof documents)["\n  mutation UpdateOrganization($input: OrganizationInput!) {\n    updateOrganization(input: $input)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query EditRolesActionGetUser($userId: ID!) {\n    user(id: $userId) {\n      address {\n        street1\n        street2\n        state\n        postalCode\n        country\n        city\n      }\n      npi\n      phone\n      name {\n        first\n        full\n        last\n        middle\n        title\n      }\n      fax\n      email\n      roles {\n        description\n        id\n        name\n      }\n    }\n  }\n"): (typeof documents)["\n  query EditRolesActionGetUser($userId: ID!) {\n    user(id: $userId) {\n      address {\n        street1\n        street2\n        state\n        postalCode\n        country\n        city\n      }\n      npi\n      phone\n      name {\n        first\n        full\n        last\n        middle\n        title\n      }\n      fax\n      email\n      roles {\n        description\n        id\n        name\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetUserRoles($userId: ID!, $roles: [ID!]!) {\n    setUserRoles(userId: $userId, roles: $roles)\n  }\n"): (typeof documents)["\n  mutation SetUserRoles($userId: ID!, $roles: [ID!]!) {\n    setUserRoles(userId: $userId, roles: $roles)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateProviderProfile(\n    $providerId: ID!\n    $updateProviderProfileInput: UpdateProviderProfileInput!\n  ) {\n    updateProviderProfile(providerId: $providerId, input: $updateProviderProfileInput)\n  }\n"): (typeof documents)["\n  mutation UpdateProviderProfile(\n    $providerId: ID!\n    $updateProviderProfileInput: UpdateProviderProfileInput!\n  ) {\n    updateProviderProfile(providerId: $providerId, input: $updateProviderProfileInput)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

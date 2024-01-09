@@ -14,7 +14,7 @@ import { graphql } from 'apps/app/src/gql';
 import { formatAddress } from 'apps/app/src/utils';
 import { useMemo } from 'react';
 import InfoGrid from '../../../components/InfoGrid';
-import { useClinicalApiClient } from '../apollo';
+import { usePhoton } from '@photonhealth/react';
 
 const profileQuery = graphql(/* GraphQL */ `
   query MeProfileQuery {
@@ -42,8 +42,11 @@ const profileQuery = graphql(/* GraphQL */ `
 `);
 
 export const Profile = () => {
-  const client = useClinicalApiClient();
-  const { data, loading, error } = useQuery(profileQuery, { client, errorPolicy: 'ignore' });
+  const { clinicalClient } = usePhoton();
+  const { data, loading, error } = useQuery(profileQuery, {
+    client: clinicalClient,
+    errorPolicy: 'ignore'
+  });
 
   const address = useMemo(() => {
     const addressData = data?.me.address;

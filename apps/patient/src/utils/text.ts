@@ -181,21 +181,21 @@ export const orderStateMapping = {
       description: (isPlural: boolean) => text.sent(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    PREPARING: {
+    RECEIVED: {
       heading: text.preparingOrder,
       subheading: (isPlural: boolean) => text.sentWithOrderSms(isPlural),
       status: text.preparing,
       description: (isPlural: boolean) => text.preparingRxDelivery(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    IN_TRANSIT: {
+    READY: {
       heading: text.orderInTransit,
       subheading: (isPlural: boolean) => text.sentWithOrderSms(isPlural),
       status: text.inTransit,
       description: (isPlural: boolean) => text.rxInTransit(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    DELIVERED: {
+    PICKED_UP: {
       heading: text.orderDelivered,
       subheading: (isPlural: boolean) => text.sentWithOrderSms(isPlural),
       status: text.delivered,
@@ -215,21 +215,21 @@ export const orderStateMapping = {
       description: (isPlural: boolean) => text.sent(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    PREPARING: {
+    RECEIVED: {
       heading: text.preparingOrder,
       subheading: text.preparingDelivery,
       status: text.preparing,
       description: (isPlural: boolean) => text.preparingRxDelivery(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    SHIPPED: {
+    READY: {
       heading: text.orderInTransit,
       subheading: (isPlural: boolean) => text.outForDelivery(isPlural),
       status: text.inTransit,
       description: (isPlural: boolean) => text.rxInTransit(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    DELIVERED: {
+    PICKED_UP: {
       heading: text.orderDelivered,
       subheading: () => '', // it'll still show text us prompt
       status: text.delivered,
