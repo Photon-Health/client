@@ -23,7 +23,36 @@ import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 import { FormikTouched, FormikErrors, ErrorMessage, Field, Formik } from 'formik';
 import { Role } from 'packages/sdk/dist/types';
-import { userFragment } from '../utils/UserFragment';
+
+export const userFragment = graphql(/* GraphQL */ `
+  fragment UserFragment on User {
+    id
+    npi
+    phone
+    fax
+    email
+    address {
+      street1
+      street2
+      state
+      postalCode
+      country
+      city
+    }
+    name {
+      first
+      full
+      last
+      middle
+      title
+    }
+    roles {
+      description
+      id
+      name
+    }
+  }
+`);
 
 interface EditProfileActionProps {
   user?: FragmentType<typeof userFragment>;

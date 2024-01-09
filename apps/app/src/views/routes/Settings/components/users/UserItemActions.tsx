@@ -12,8 +12,37 @@ import {
 } from '@chakra-ui/react';
 import { FiEdit, FiMoreVertical } from 'react-icons/fi';
 import { EditRolesAction } from './EditRolesAction';
-import { userFragment } from '../utils/UserFragment';
-import { FragmentType } from 'apps/app/src/gql';
+import { FragmentType, graphql } from 'apps/app/src/gql';
+
+export const userFragment = graphql(/* GraphQL */ `
+  fragment UserFragment on User {
+    id
+    npi
+    phone
+    fax
+    email
+    address {
+      street1
+      street2
+      state
+      postalCode
+      country
+      city
+    }
+    name {
+      first
+      full
+      last
+      middle
+      title
+    }
+    roles {
+      description
+      id
+      name
+    }
+  }
+`);
 
 interface UserItemActionsProps {
   user?: FragmentType<typeof userFragment>;

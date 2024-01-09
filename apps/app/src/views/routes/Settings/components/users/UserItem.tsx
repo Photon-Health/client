@@ -1,9 +1,38 @@
 import { Td, Text, Tr } from '@chakra-ui/react';
-import { FragmentType, useFragment } from 'apps/app/src/gql';
+import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { useMemo } from 'react';
 import { UserItemActions } from './UserItemActions';
 import { compareRoles } from './utils';
-import { userFragment } from '../utils/UserFragment';
+
+export const userFragment = graphql(/* GraphQL */ `
+  fragment UserFragment on User {
+    id
+    npi
+    phone
+    fax
+    email
+    address {
+      street1
+      street2
+      state
+      postalCode
+      country
+      city
+    }
+    name {
+      first
+      full
+      last
+      middle
+      title
+    }
+    roles {
+      description
+      id
+      name
+    }
+  }
+`);
 
 export const UserItem = ({
   user: data,
