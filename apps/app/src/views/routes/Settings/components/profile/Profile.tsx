@@ -28,7 +28,6 @@ const profileQuery = graphql(/* GraphQL */ `
   query MeProfileQuery {
     me {
       ...UserFragment
-      id
       npi
       phone
       fax
@@ -42,16 +41,7 @@ const profileQuery = graphql(/* GraphQL */ `
         city
       }
       name {
-        first
         full
-        last
-        middle
-        title
-      }
-      roles {
-        description
-        id
-        name
       }
     }
     organization {
@@ -129,8 +119,8 @@ export const Profile = () => {
           </Flex>
           <Modal isOpen={isOpen} onClose={onClose} size="xl">
             <ModalOverlay />
-            {isOpen && (
-              <EditProfileAction user={data?.me ?? undefined} onClose={onClose}></EditProfileAction>
+            {isOpen && data && (
+              <EditProfileAction user={data.me} onClose={onClose}></EditProfileAction>
             )}
           </Modal>
           <Divider />

@@ -13,7 +13,8 @@ import {
   FormControl,
   FormLabel,
   FormErrorMessage,
-  Input
+  Input,
+  useToast
 } from '@chakra-ui/react';
 import * as yup from 'yup';
 import { rolesSchema } from '../utils/Roles';
@@ -55,7 +56,7 @@ export const userFragment = graphql(/* GraphQL */ `
 `);
 
 interface EditProfileActionProps {
-  user?: FragmentType<typeof userFragment>;
+  user: FragmentType<typeof userFragment>;
   onClose: () => void;
 }
 
@@ -135,6 +136,7 @@ type ProviderFormikTouchedType = FormikTouched<ProviderYupType>;
 type ProviderFormikErrorsType = FormikErrors<ProviderYupType>;
 
 export const EditProfileAction: React.FC<EditProfileActionProps> = ({ user, onClose }) => {
+  const toast = useToast();
   const { clinicalClient } = usePhoton();
   const currentUser = useFragment(userFragment, user);
   const [updateMyProfile, { error }] = useMutation(UpdateMyProfileMutation, {
@@ -156,7 +158,7 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ user, onCl
       }
     });
 
-    onClose;
+    onClose();
   };
 
   function mapAndSortRoles(
@@ -237,6 +239,11 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ user, onCl
                         }
                       })
                 }
+              });
+              toast({
+                title: 'Role updated',
+                status: 'success',
+                duration: 4000
               });
               resetForm();
               onClose();

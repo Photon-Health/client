@@ -14,7 +14,8 @@ import {
   FormControl,
   FormLabel,
   FormErrorMessage,
-  Input
+  Input,
+  useToast
 } from '@chakra-ui/react';
 import * as yup from 'yup';
 import { rolesSchema, RolesSelect } from '../utils/Roles';
@@ -56,7 +57,7 @@ export const userFragment = graphql(/* GraphQL */ `
 `);
 
 interface EditRolesActionProps {
-  user?: FragmentType<typeof userFragment>;
+  user: FragmentType<typeof userFragment>;
   onClose: () => void;
 }
 
@@ -132,6 +133,7 @@ type ProviderFormikTouchedType = FormikTouched<ProviderYupType>;
 type ProviderFormikErrorsType = FormikErrors<ProviderYupType>;
 
 export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose }) => {
+  const toast = useToast();
   const { clinicalClient } = usePhoton();
   const userData = useFragment(userFragment, user);
   const [updateProviderProfile] = useMutation(UpdateProviderProfileMutation, {
@@ -252,6 +254,11 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
                         }
                       })
                 }
+              });
+              toast({
+                title: 'Role updated',
+                status: 'success',
+                duration: 4000
               });
               resetForm();
               onClose();

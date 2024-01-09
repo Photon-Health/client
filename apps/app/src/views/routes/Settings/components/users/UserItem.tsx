@@ -62,11 +62,12 @@ export const UserItem = ({
       </Td>
       <Td>{user.email}</Td>
       <Td textOverflow={'ellipsis'}>{roles}</Td>
-      {!hasRole ? null : (
-        <Td>
-          <UserItemActions user={data}></UserItemActions>
-        </Td>
-      )}
+      {data &&
+        (!hasRole ? null : (
+          <Td>
+            <UserItemActions user={data}></UserItemActions>
+          </Td>
+        ))}
     </Tr>
   );
 };

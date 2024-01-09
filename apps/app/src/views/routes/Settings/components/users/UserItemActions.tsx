@@ -45,7 +45,7 @@ export const userFragment = graphql(/* GraphQL */ `
 `);
 
 interface UserItemActionsProps {
-  user?: FragmentType<typeof userFragment>;
+  user: FragmentType<typeof userFragment>;
 }
 
 export const UserItemActions: React.FC<UserItemActionsProps> = ({ user }) => {
@@ -67,7 +67,7 @@ export const UserItemActions: React.FC<UserItemActionsProps> = ({ user }) => {
       </Menu>
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
-        {isOpen && <EditRolesAction user={user} onClose={onClose}></EditRolesAction>}
+        {isOpen && user && <EditRolesAction user={user} onClose={onClose}></EditRolesAction>}
       </Modal>
     </HStack>
   );
