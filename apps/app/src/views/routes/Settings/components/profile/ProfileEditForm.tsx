@@ -141,7 +141,7 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ user, onCl
   const currentUser = useFragment(userFragment, user);
   const [updateMyProfile, { error }] = useMutation(UpdateMyProfileMutation, {
     client: clinicalClient,
-    refetchQueries: ['MeProfileQuery', 'EditProfileActionGetUserQuery']
+    refetchQueries: ['MeProfileQuery']
   });
 
   const handleSaveRoles = (formVariables: any) => {
