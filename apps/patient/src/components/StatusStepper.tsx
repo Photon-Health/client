@@ -20,7 +20,7 @@ import { useOrderContext } from '../views/Main';
 export const STATES = {
   PICK_UP: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'],
   COURIER: ['SENT', 'PREPARING', 'IN_TRANSIT', 'DELIVERED'],
-  MAIL_ORDER: ['SENT', 'PREPARING', 'SHIPPED', 'DELIVERED']
+  MAIL_ORDER: ['SENT', 'FILLING', 'SHIPPED', 'DELIVERED']
 };
 
 interface Props {
