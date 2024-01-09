@@ -215,7 +215,7 @@ export const orderStateMapping = {
       description: (isPlural: boolean) => text.sent(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    PREPARING: {
+    FILLING: {
       heading: text.preparingOrder,
       subheading: text.preparingDelivery,
       status: text.preparing,
