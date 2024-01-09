@@ -8,6 +8,7 @@ import RecentOrdersDuplicateDialog from './RecentOrdersDuplicateDialog';
 import RecentOrdersIssueDialog from './RecentOrdersIssueDialog';
 import RecentOrdersCombineDialog from './RecentOrdersCombineDialog';
 import type { DraftPrescription } from '../DraftPrescriptions';
+import { Address } from '../PatientInfo';
 
 const GetPatientOrdersQuery = gql`
   query GetPatientOrders($patientId: ID!) {
@@ -43,6 +44,8 @@ type RecentOrdersState = {
   isIssueDialogOpen: boolean;
   patientId?: string;
   patientName?: string;
+  // in case the combine order fails, we need address to make a new order
+  address?: Address;
   // for displaying combine orders
   draftPrescriptions?: DraftPrescription[];
   // if provider chooses not to combine the order, call this to create a new order
@@ -59,7 +62,8 @@ type RecentOrdersActions = {
   setIsCombineDialogOpen: (
     isOpen: boolean,
     createOrder?: () => void,
-    draftPrescriptions?: DraftPrescription[]
+    draftPrescriptions?: DraftPrescription[],
+    address?: Address
   ) => void;
   setIsDuplicateDialogOpen: (
     isOpen: boolean,
@@ -107,11 +111,12 @@ function RecentOrders(props: SDKProviderProps) {
   const value: RecentOrdersContextValue = [
     state,
     {
-      setIsCombineDialogOpen(isOpen, createOrder, draftPrescriptions) {
+      setIsCombineDialogOpen(isOpen, createOrder, draftPrescriptions, address) {
         setState({
           isCombineDialogOpen: isOpen,
           ...(createOrder ? { createOrder } : { createOrderCb: undefined }),
-          ...(draftPrescriptions ? { draftPrescriptions } : { draftPrescriptions: [] })
+          ...(draftPrescriptions ? { draftPrescriptions } : { draftPrescriptions: [] }),
+          ...(address ? { address } : { address: undefined })
         });
       },
       setIsDuplicateDialogOpen(isOpen, duplicateFill, continueCb) {

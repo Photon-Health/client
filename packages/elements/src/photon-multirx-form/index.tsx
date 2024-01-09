@@ -15,7 +15,7 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import styles from './style.css?inline';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { createEffect, onMount, createSignal, Show, For } from 'solid-js';
+import { createEffect, onMount, createSignal, Show, For, createMemo } from 'solid-js';
 import type { FormError } from '../stores/form';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
@@ -32,6 +32,7 @@ import { formatPatientWeight } from './util/formatPatientWeight';
 import clearForm from './util/clearForm';
 
 import type { TemplateOverrides } from '@photonhealth/components';
+import { format } from 'path';
 
 export type Address = {
   city: string;
@@ -116,6 +117,15 @@ function PrescribeWorkflow(props: PrescribeProps) {
     setAuthenticated(client?.authentication.state.isAuthenticated || false);
   });
 
+  const formattedAddress = createMemo(() => {
+    // remove unnecessary fields, and add country and street2 if missing
+    const patientAddress =
+      props.formStore?.address?.value ?? props.formStore?.patient?.value?.address ?? {};
+    const { __typename, name, ...filteredPatientAddress } = patientAddress;
+    const address = { street2: '', country: 'US', ...filteredPatientAddress };
+    return address;
+  });
+
   const dispatchPrescriptionsCreated = (prescriptions: Prescription[]) => {
     const event = new CustomEvent('photon-prescriptions-created', {
       composed: true,
@@ -179,7 +189,8 @@ function PrescribeWorkflow(props: PrescribeProps) {
     return recentOrdersActions.setIsCombineDialogOpen(
       true,
       () => submitForm(props.enableOrder),
-      props.formStore.draftPrescriptions.value
+      props.formStore.draftPrescriptions.value,
+      formattedAddress()
     );
   };
 
@@ -242,6 +253,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
         }
         prescriptions.push(args);
       }
+
       const { data: prescriptionData, errors } = await rxMutation({
         variables: {
           prescriptions
@@ -259,12 +271,6 @@ function PrescribeWorkflow(props: PrescribeProps) {
       }
       dispatchPrescriptionsCreated(prescriptionData!.createPrescriptions);
       if (props.enableOrder) {
-        // remove unnecessary fields, and add country and street2 if missing
-        const patientAddress =
-          props.formStore?.address?.value ?? props.formStore?.patient?.value?.address ?? {};
-        const { __typename, name, ...filteredPatientAddress } = patientAddress;
-        const address = { street2: '', country: 'US', ...filteredPatientAddress };
-
         if (
           props.formStore.updatePreferredPharmacy?.value &&
           props.formStore.pharmacy?.value &&
@@ -296,7 +302,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
             patientId: props.formStore.patient?.value.id,
             pharmacyId: props?.pharmacyId || props.formStore.pharmacy?.value || '',
             fulfillmentType: props.formStore.fulfillmentType?.value || '',
-            address,
+            address: formattedAddress(),
             fills: prescriptionData?.createPrescriptions.map((x) => ({ prescriptionId: x.id }))
           },
           refetchQueries: [],

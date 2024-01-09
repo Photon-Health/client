@@ -1,4 +1,5 @@
 import { createMemo, createSignal, For, Ref } from 'solid-js';
+import { Order } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
 import { useRecentOrders } from '.';
 import Button from '../../particles/Button';
@@ -51,6 +52,17 @@ export default function RecentOrdersCombineDialog() {
     ref?.dispatchEvent(event);
   };
 
+  const dispatchOrderCreated = (order: Order) => {
+    const event = new CustomEvent('photon-order-created', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        order: order
+      }
+    });
+    ref?.dispatchEvent(event);
+  };
+
   const routingOrder = createMemo(() => {
     return state.orders.find((order) => order.state === 'ROUTING');
   });
@@ -93,10 +105,14 @@ export default function RecentOrdersCombineDialog() {
     });
   };
 
-  const createOrder = async (orderId: string, prescriptionIds: string[], address: Address) => {
+  const createOrder = async (patientId: string, prescriptionIds: string[], address: Address) => {
     return client!.apollo.mutate({
       mutation: CREATE_ORDER_MUTATION,
-      variables: { orderId, fills: prescriptionIds.map((id) => ({ prescriptionId: id })), address }
+      variables: {
+        patientId,
+        fills: prescriptionIds.map((id) => ({ prescriptionId: id })),
+        address
+      }
     });
   };
 
@@ -125,6 +141,7 @@ export default function RecentOrdersCombineDialog() {
 
     try {
       // Add rxs to the order
+      console.log('attepting to update an order');
       const updatedOrder = await updateOrder(
         order.id,
         prescriptions.data.createPrescriptions.map((rx: { id: string }) => rx.id)
@@ -134,14 +151,26 @@ export default function RecentOrdersCombineDialog() {
       dispatchCombineOrderUpdated(updatedOrder.data.updateOrder.id);
       return;
     } catch {
-      // error updating order most likely because the order state has changed since it was
-      // first fetched so we need to create a new order
+      console.log('error updating an order', state?.address);
+      // if there is an error updating an order, most likely because the order state has
+      // changed since it was first fetched so we need to create a new order
       try {
-        await createOrder(
-          order.id,
+        if (!state?.address || !state?.patientId) {
+          throw new Error('No address provided');
+        }
+        console.log(
+          'attemptyng to create an order',
+          state.patientId,
           prescriptions.data.createPrescriptions.map((rx: { id: string }) => rx.id),
-          {}
+          state.address
         );
+        const newOrder = await createOrder(
+          state.patientId,
+          prescriptions.data.createPrescriptions.map((rx: { id: string }) => rx.id),
+          state.address
+        );
+        console.log('new order created', newOrder.data.createOrder);
+        dispatchOrderCreated(newOrder.data.createOrder);
       } catch {
         triggerToast({
           header: 'Error Creating Order',
@@ -155,12 +184,8 @@ export default function RecentOrdersCombineDialog() {
   };
 
   return (
-    <Dialog
-      open={state.isCombineDialogOpen}
-      onClose={() => actions.setIsCombineDialogOpen(false)}
-      ref={ref}
-    >
-      <div class="flex flex-col gap-6">
+    <Dialog open={state.isCombineDialogOpen} onClose={() => actions.setIsCombineDialogOpen(false)}>
+      <div class="flex flex-col gap-6" ref={ref}>
         <div>
           <div class="table bg-blue-50 text-blue-600 p-2 rounded-full mb-4">
             <Icon name="exclamationCircle" />
