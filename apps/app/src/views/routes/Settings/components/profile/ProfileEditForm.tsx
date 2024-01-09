@@ -151,26 +151,19 @@ export const EditProfileAction: React.FC<EditProfileActionProps> = ({ userId, on
   });
 
   const handleSaveRoles = (formVariables: any) => {
-    console.log('reached here', formVariables);
-    if (
-      hasPrescriberRole(formVariables.variables.roles) &&
-      (userData?.user?.npi == undefined ||
-        userData?.user?.address == undefined ||
-        userData?.user?.email == undefined)
-    ) {
-      updateMyProfile({
-        variables: {
-          updateMyProfileInput: {
-            name: formVariables.variables.name ?? userData?.user?.name,
-            address: formVariables.variables.provider.address ?? userData?.user?.address,
-            email: formVariables.variables.email ?? userData?.user?.email,
-            npi: formVariables.variables.provider.npi ?? userData?.user?.npi,
-            phone: formVariables.variables.provider.phone ?? userData?.user?.phone,
-            fax: formVariables.variables.fax ?? userData?.user?.fax
-          }
+    updateMyProfile({
+      variables: {
+        updateMyProfileInput: {
+          name: formVariables.variables.name ?? userData?.user?.name,
+          address: formVariables.variables.provider.address ?? userData?.user?.address,
+          email: formVariables.variables.email ?? userData?.user?.email,
+          npi: formVariables.variables.provider.npi ?? userData?.user?.npi,
+          phone: formVariables.variables.provider.phone ?? userData?.user?.phone,
+          fax: formVariables.variables.fax ?? userData?.user?.fax
         }
-      });
-    }
+      }
+    });
+
     onClose;
   };
 
