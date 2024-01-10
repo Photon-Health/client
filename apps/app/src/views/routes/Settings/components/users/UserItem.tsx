@@ -4,16 +4,33 @@ import { useMemo } from 'react';
 import { UserItemActions } from './UserItemActions';
 import { compareRoles } from './utils';
 
-const userFragment = graphql(/* GraphQL */ `
-  fragment UserItemFragment on User {
+export const userFragment = graphql(/* GraphQL */ `
+  fragment UserFragment on User {
     id
+    npi
+    phone
+    fax
+    email
+    address {
+      street1
+      street2
+      state
+      postalCode
+      country
+      city
+    }
     name {
+      first
       full
+      last
+      middle
+      title
     }
     roles {
+      description
       id
+      name
     }
-    email
   }
 `);
 
@@ -45,11 +62,12 @@ export const UserItem = ({
       </Td>
       <Td>{user.email}</Td>
       <Td textOverflow={'ellipsis'}>{roles}</Td>
-      {!hasRole ? null : (
-        <Td>
-          <UserItemActions userId={user.id}></UserItemActions>
-        </Td>
-      )}
+      {data &&
+        (!hasRole ? null : (
+          <Td>
+            <UserItemActions user={data}></UserItemActions>
+          </Td>
+        ))}
     </Tr>
   );
 };
