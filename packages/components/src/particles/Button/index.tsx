@@ -2,7 +2,7 @@ import { clsx } from 'clsx';
 import { JSX, Show, mergeProps, splitProps, createMemo } from 'solid-js';
 import Spinner from '../Spinner';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'naked';
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'tertiary' | 'naked';
 export type ButtonSize = 'xl' | 'lg' | 'md' | 'sm' | 'xs';
 
 export interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -40,6 +40,8 @@ export default function Button(props: ButtonProps) {
           otherProps.variant === 'primary',
         'rounded bg-white text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50':
           otherProps.variant === 'secondary',
+        'text-white bg-red-500 hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2':
+          otherProps.variant === 'danger',
         'bg-blue-50 text-blue-600 hover:bg-blue-100': otherProps.variant === 'tertiary',
         'text-blue-600 hover:text-blue-500 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300':
           otherProps.variant === 'naked',
