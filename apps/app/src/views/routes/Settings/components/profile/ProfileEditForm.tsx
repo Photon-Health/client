@@ -96,6 +96,27 @@ export const ProfileForm: FC<FormikProps<ProfileYupType>> = ({
           <Field name="name.title" component={FieldComponent} />
           <ErrorMessage name="name.title" component={FormErrorMessage} />
         </FormControl>
+        <FormControl isRequired isInvalid={!!errors.name?.first && touched?.name?.first} pb="2">
+          <FormLabel htmlFor="name.first" mb={1}>
+            First name
+          </FormLabel>
+          <Field name="name.first" component={FieldComponent} />
+          <ErrorMessage name="name.first" component={FormErrorMessage} />
+        </FormControl>
+        <FormControl pb="2">
+          <FormLabel htmlFor="name.middle" mb={1}>
+            Middle Name
+          </FormLabel>
+          <Field name="name.middle" component={FieldComponent} />
+          <ErrorMessage name="name.middle" component={FormErrorMessage} />
+        </FormControl>
+        <FormControl isRequired isInvalid={!!errors.name?.last && touched?.name?.last} pb="2">
+          <FormLabel htmlFor="name.first" mb={1}>
+            Last name
+          </FormLabel>
+          <Field name="name.last" component={FieldComponent} />
+          <ErrorMessage name="name.last" component={FormErrorMessage} />
+        </FormControl>
         <FormControl
           isRequired
           isInvalid={!!providerErrors?.address?.street1 && providerTouched?.address?.street1}

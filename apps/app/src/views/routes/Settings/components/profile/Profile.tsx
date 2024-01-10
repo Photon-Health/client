@@ -236,7 +236,7 @@ export const Profile = () => {
             }
           });
           toast({
-            title: 'Role updated',
+            title: 'Profile updated',
             status: 'success',
             duration: 4000
           });
