@@ -26,6 +26,7 @@ export default function RecentOrdersDuplicateDialog() {
 
         <div class="border border-solid border-gray-200 rounded-lg bg-gray-50 py-3 px-4">
           <Text size="sm">{state?.duplicateFill?.treatment?.name}</Text>
+          <br />
           <Text size="sm" color="gray">
             {formatRxString({
               dispenseQuantity: state?.duplicateFill?.prescription?.dispenseQuantity,

@@ -187,6 +187,7 @@ export default function RecentOrdersIssueDialog() {
                 {(fill) => (
                   <div>
                     <Text size="sm">{fill.treatment.name}</Text>
+                    <br />
                     <Text size="sm" color="gray">
                       {formatRxString({
                         dispenseQuantity: fill?.prescription?.dispenseQuantity,
@@ -208,7 +209,9 @@ export default function RecentOrdersIssueDialog() {
           </Text>
 
           <Textarea placeholder="Describe issue with this order" name="description" />
-          {errors().description}
+          <Text size="xs" color="red">
+            {errors().description}
+          </Text>
         </form>
 
         <div class="flex flex-col items-stretch gap-4">

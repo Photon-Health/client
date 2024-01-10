@@ -201,6 +201,7 @@ export default function RecentOrdersCombineDialog() {
                 {(fill) => (
                   <div>
                     <Text size="sm">{fill.treatment.name}</Text>
+                    <br />
                     <Text size="sm" color="gray">
                       {formatRxString({
                         dispenseQuantity: fill?.prescription?.dispenseQuantity,
@@ -224,6 +225,7 @@ export default function RecentOrdersCombineDialog() {
                 {(draft) => (
                   <div>
                     <Text size="sm">{draft.treatment.name}</Text>
+                    <br />
                     <Text size="sm" color="gray">
                       {formatRxString({
                         dispenseQuantity: draft?.dispenseQuantity ?? 0,
