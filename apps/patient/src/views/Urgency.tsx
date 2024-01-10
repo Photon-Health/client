@@ -25,8 +25,8 @@ export const Urgency = () => {
 
   const navigate = useNavigate();
 
-  const [selectedIdx, setSelectedIdx] = useState(undefined);
-  const showFooter = typeof selectedIdx !== 'undefined';
+  const [selectedIdx, setSelectedIdx] = useState(null);
+  const showFooter = selectedIdx !== null;
 
   const handleCtaClick = () => {
     if (!isDemo) {
