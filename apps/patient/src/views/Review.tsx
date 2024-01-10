@@ -37,8 +37,8 @@ export const Review = () => {
 
   const handleCtaClick = () => {
     const toUrl = isDemo
-      ? `/pharmacy?demo=true&phone=${phone}`
-      : `/pharmacy?orderId=${order.id}&token=${token}`;
+      ? `/urgency?demo=true&phone=${phone}`
+      : `/urgency?orderId=${order.id}&token=${token}`;
     navigate(toUrl);
   };
 
