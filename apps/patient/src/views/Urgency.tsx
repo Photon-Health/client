@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Button, Container, Heading, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Card, CardBody, Container, Heading, Text, VStack } from '@chakra-ui/react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
@@ -69,25 +69,20 @@ export const Urgency = () => {
             {t.urgencyOptions.map((option, i) => {
               const isDisabled = checkDisabled(option);
               return (
-                <Button
+                <Card
                   key={option}
-                  bgColor={selectedIdx === i ? 'gray.700' : undefined}
-                  _active={
-                    !isDisabled
-                      ? {
-                          bgColor: 'gray.700',
-                          textColor: 'white'
-                        }
-                      : undefined
-                  }
-                  size="lg"
-                  w="full"
-                  isActive={selectedIdx === i}
+                  bgColor={isDisabled ? 'gray.100' : 'white'}
+                  border={isDisabled ? 'gray.100' : '2px solid'}
+                  borderColor={selectedIdx === i ? 'brand.600' : 'white'}
                   onClick={() => setSelectedIdx(i)}
-                  isDisabled={isDisabled}
+                  m="auto"
+                  w="full"
+                  cursor={isDisabled ? 'not-allowed' : 'pointer'}
                 >
-                  {option}
-                </Button>
+                  <CardBody p={3} m="auto">
+                    <Text fontWeight="medium">{option}</Text>
+                  </CardBody>
+                </Card>
               );
             })}
           </VStack>
