@@ -162,12 +162,7 @@ export default function RecentOrdersCombineDialog() {
         if (!state?.address || !state?.patientId) {
           throw new Error('No address provided');
         }
-        console.log(
-          'attemptyng to create an order',
-          state.patientId,
-          prescriptions.data.createPrescriptions.map((rx: { id: string }) => rx.id),
-          state.address
-        );
+
         const newOrder = await createOrder(
           state.patientId,
           prescriptions.data.createPrescriptions.map((rx: { id: string }) => rx.id),
