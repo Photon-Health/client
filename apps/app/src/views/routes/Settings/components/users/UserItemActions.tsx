@@ -12,12 +12,43 @@ import {
 } from '@chakra-ui/react';
 import { FiEdit, FiMoreVertical } from 'react-icons/fi';
 import { EditRolesAction } from './EditRolesAction';
+import { FragmentType, graphql } from 'apps/app/src/gql';
+
+export const userFragment = graphql(/* GraphQL */ `
+  fragment UserFragment on User {
+    id
+    npi
+    phone
+    fax
+    email
+    address {
+      street1
+      street2
+      state
+      postalCode
+      country
+      city
+    }
+    name {
+      first
+      full
+      last
+      middle
+      title
+    }
+    roles {
+      description
+      id
+      name
+    }
+  }
+`);
 
 interface UserItemActionsProps {
-  userId: string;
+  user: FragmentType<typeof userFragment>;
 }
 
-export const UserItemActions: React.FC<UserItemActionsProps> = ({ userId }) => {
+export const UserItemActions: React.FC<UserItemActionsProps> = ({ user }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <HStack justifyContent="flex-end">
@@ -36,7 +67,7 @@ export const UserItemActions: React.FC<UserItemActionsProps> = ({ userId }) => {
       </Menu>
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
-        {isOpen && <EditRolesAction userId={userId} onClose={onClose}></EditRolesAction>}
+        {isOpen && user && <EditRolesAction user={user} onClose={onClose}></EditRolesAction>}
       </Modal>
     </HStack>
   );
