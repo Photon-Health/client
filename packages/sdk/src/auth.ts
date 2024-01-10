@@ -5,7 +5,8 @@ import {
   LogoutOptions as Auth0LogoutOptions,
   RedirectLoginOptions,
   RedirectLoginResult,
-  User
+  User,
+  AuthorizationParams
 } from '@auth0/auth0-spa-js';
 
 const CODE_RE = /[?&]code=[^&]+/;
@@ -83,20 +84,21 @@ export class AuthManager {
    * @returns
    */
   public async login({ organizationId, invitation, appState }: LoginOptions): Promise<void> {
-    let opts: RedirectLoginOptions<any> = { redirectMethod: 'assign' };
-
+    const opts: RedirectLoginOptions<any> = {};
+    let authorizationParams: AuthorizationParams = {};
     if (organizationId || this.organization) {
-      opts = Object.assign(opts, {
+      authorizationParams = Object.assign(opts, {
         organization: organizationId || this.organization
       });
     }
     if (invitation) {
-      opts = Object.assign(opts, { invitation });
+      authorizationParams = Object.assign(opts, { invitation });
     }
 
     if (appState) {
-      opts = Object.assign(opts, { appState });
+      authorizationParams = Object.assign(opts, { appState });
     }
+    opts.authorizationParams = authorizationParams;
 
     return this.authentication.loginWithRedirect(opts);
   }
@@ -108,8 +110,10 @@ export class AuthManager {
    */
   public async logout({ returnTo, federated = false }: LogoutOptions): Promise<void> {
     const opts: Auth0LogoutOptions = {
-      ...(returnTo ? { returnTo } : {}),
-      ...(federated ? { federated } : {})
+      logoutParams: {
+        ...(returnTo ? { returnTo } : {}),
+        ...(federated ? { federated } : {})
+      }
     };
 
     return this.authentication.logout(opts);
@@ -136,8 +140,10 @@ export class AuthManager {
     }
   ): Promise<string> {
     const opts: GetTokenSilentlyOptions | GetTokenWithPopupOptions = {
-      audience: audience || this.audience || undefined,
-      ...(this.organization ? { organization: this.organization } : {})
+      authorizationParams: {
+        audience: audience || this.audience || undefined,
+        ...(this.organization ? { organization: this.organization } : {})
+      }
     };
 
     let token;
@@ -150,6 +156,7 @@ export class AuthManager {
         throw e;
       }
     }
+    if (!token) throw new Error('Missing token');
     return token;
   }
 
@@ -162,10 +169,12 @@ export class AuthManager {
     { audience }: { audience?: string } = {
       audience: this.audience
     }
-  ): Promise<string> {
+  ): Promise<string | undefined> {
     const opts: GetTokenWithPopupOptions = {
-      audience: audience || this.audience || undefined,
-      ...(this.organization ? { organization: this.organization } : {})
+      authorizationParams: {
+        audience: audience || this.audience || undefined,
+        ...(this.organization ? { organization: this.organization } : {})
+      }
     };
 
     return this.authentication.getTokenWithPopup(opts);

@@ -22,24 +22,20 @@ import { types } from '@photonhealth/sdk';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 
-import { Rating } from './Rating';
 import { formatAddress } from '../utils/general';
 
 dayjs.extend(customParseFormat);
 
-interface RatingHoursProps {
-  rating?: number;
+interface HoursProps {
   isOpen?: boolean;
   is24Hr?: boolean;
   opens?: string;
   closes?: string;
 }
 
-const RatingHours = ({ rating, is24Hr, isOpen, opens, closes }: RatingHoursProps) => {
+const Hours = ({ is24Hr, isOpen, opens, closes }: HoursProps) => {
   return (
     <HStack w="full" whiteSpace="nowrap" overflow="hidden">
-      {rating ? <Rating rating={rating} /> : null}
-      {rating && isOpen != null ? <Text color="gray.400">&bull;</Text> : null}
       {isOpen != null ? (
         <Text fontSize="sm" color={isOpen ? 'green' : 'red'}>
           {isOpen ? t.open : t.closed}
@@ -157,8 +153,7 @@ export const PharmacyCard = memo(function PharmacyCard({
             <Text fontSize="md">{pharmacy.name}</Text>
             {showDetails ? (
               <>
-                <RatingHours
-                  rating={pharmacy.rating}
+                <Hours
                   isOpen={pharmacy.isOpen}
                   is24Hr={pharmacy.is24Hr}
                   opens={pharmacy.opens}

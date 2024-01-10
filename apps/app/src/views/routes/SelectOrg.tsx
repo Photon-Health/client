@@ -76,6 +76,7 @@ export const SelectOrg = () => {
               onClick={() => {
                 setOrganization(id);
                 login({
+                  organizationId: id,
                   appState: {
                     returnTo: from
                   }

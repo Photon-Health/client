@@ -1,4 +1,4 @@
-import { Auth0Client } from '@auth0/auth0-spa-js';
+import { Auth0Client, Auth0ClientOptions } from '@auth0/auth0-spa-js';
 import {
   ApolloClient,
   InMemoryCache,
@@ -112,12 +112,6 @@ export class PhotonClient {
     }: PhotonClientOptions,
     elementsVersion?: string
   ) {
-    this.auth0Client = new Auth0Client({
-      domain: domain ? domain : developmentMode ? 'auth.neutron.health' : 'auth.photon.health',
-      client_id: clientId,
-      redirect_uri: redirectURI,
-      cacheLocation: 'memory'
-    });
     this.audience = audience ? audience : lambdasApiUrl[env];
     this.uri = uri ? uri : `${lambdasApiUrl[env]}/graphql`;
     this.clinicalUrl = uri ? getClinicalUrl(uri) : clinicalAppUrl[env];
@@ -130,6 +124,18 @@ export class PhotonClient {
       this.clinicalApiUri = `${clinicalApiUrl['neutron']}/graphql'`;
     }
 
+    const params: Auth0ClientOptions = {
+      domain: domain ? domain : developmentMode ? 'auth.neutron.health' : 'auth.photon.health',
+      clientId,
+      cacheLocation: 'localstorage',
+      useRefreshTokens: true,
+      useRefreshTokensFallback: true,
+      authorizationParams: {
+        redirect_uri: redirectURI,
+        audience: this.audience
+      }
+    };
+    this.auth0Client = new Auth0Client(params);
     this.organization = organization;
     this.authentication = new AuthManager({
       authentication: this.auth0Client,

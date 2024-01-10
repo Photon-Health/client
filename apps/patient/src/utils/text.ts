@@ -62,21 +62,13 @@ export const text = {
   quantity: 'Quantity',
   questions: 'If you have any questions, please text us at +1 (513) 866-3212.',
   readyBy: 'Ready by',
-  readyByOptions: [
-    '10:00 am',
-    '12:00 pm',
-    '2:00 pm',
-    '4:00 pm',
-    '6:00 pm',
-    'After hours',
-    'Tomorrow'
-  ],
+
   readyBySelected: (isPlural: boolean) =>
     `We'll do our best to ensure your ${
-      isPlural ? 'prescriptions' : 'prescription'
-    } are ready by your selected time.`,
+      isPlural ? 'prescriptions are' : 'prescription is'
+    } ready by your selected time.`,
   readyPickUp: 'Ready for pick up',
-  readyWhen: 'When do you want your order ready by?',
+  readyWhen: 'When do you need your order ready by?',
   receivedPreparing: 'The pharmacy has received your order and is preparing it.',
   receivedRx: (isPlural: boolean) => `I received my ${isPlural ? 'prescriptions' : 'prescription'}`,
   refills: 'Refills',
@@ -133,6 +125,16 @@ export const text = {
   track: 'Track your order',
   tracking: 'Tracking #:',
   tryPhoton: 'Try Photon',
+  urgencyOptions: [
+    'As soon as possible',
+    '10:00 am',
+    '12:00 pm',
+    '2:00 pm',
+    '4:00 pm',
+    '6:00 pm',
+    'After hours',
+    'Tomorrow'
+  ],
   useLoc: 'Use my current location',
   weSent: (isPlural: boolean) =>
     `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`
@@ -181,21 +183,21 @@ export const orderStateMapping = {
       description: (isPlural: boolean) => text.sent(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    PREPARING: {
+    RECEIVED: {
       heading: text.preparingOrder,
       subheading: (isPlural: boolean) => text.sentWithOrderSms(isPlural),
       status: text.preparing,
       description: (isPlural: boolean) => text.preparingRxDelivery(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    IN_TRANSIT: {
+    READY: {
       heading: text.orderInTransit,
       subheading: (isPlural: boolean) => text.sentWithOrderSms(isPlural),
       status: text.inTransit,
       description: (isPlural: boolean) => text.rxInTransit(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    DELIVERED: {
+    PICKED_UP: {
       heading: text.orderDelivered,
       subheading: (isPlural: boolean) => text.sentWithOrderSms(isPlural),
       status: text.delivered,
@@ -215,21 +217,21 @@ export const orderStateMapping = {
       description: (isPlural: boolean) => text.sent(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    PREPARING: {
+    RECEIVED: {
       heading: text.preparingOrder,
       subheading: text.preparingDelivery,
       status: text.preparing,
       description: (isPlural: boolean) => text.preparingRxDelivery(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    SHIPPED: {
+    READY: {
       heading: text.orderInTransit,
       subheading: (isPlural: boolean) => text.outForDelivery(isPlural),
       status: text.inTransit,
       description: (isPlural: boolean) => text.rxInTransit(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    DELIVERED: {
+    PICKED_UP: {
       heading: text.orderDelivered,
       subheading: () => '', // it'll still show text us prompt
       status: text.delivered,
