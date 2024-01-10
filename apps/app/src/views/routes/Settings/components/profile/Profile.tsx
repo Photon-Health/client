@@ -10,7 +10,8 @@ import {
   SkeletonText,
   Spinner,
   Stack,
-  Text
+  Text,
+  useToast
 } from '@chakra-ui/react';
 
 import { useMutation, useQuery } from '@apollo/client';
@@ -113,6 +114,7 @@ const EditButtons = ({
 );
 
 export const Profile = () => {
+  const toast = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const { clinicalClient } = usePhoton();
   const { data, loading, error } = useQuery(profileQuery, {
@@ -203,7 +205,7 @@ export const Profile = () => {
       initialValues={initialValues}
       validationSchema={profileFormSchema}
       enableReinitialize // if organization changes so should this form
-      onSubmit={async (values, { validateForm }) => {
+      onSubmit={async (values, { validateForm, resetForm }) => {
         try {
           await validateForm(values);
           await handleSaveRoles({
@@ -233,6 +235,12 @@ export const Profile = () => {
                   })
             }
           });
+          toast({
+            title: 'Role updated',
+            status: 'success',
+            duration: 4000
+          });
+          resetForm();
         } catch (e) {
           console.error('Failed to update', e);
         }
