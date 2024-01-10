@@ -145,7 +145,6 @@ export default function RecentOrdersCombineDialog() {
 
     try {
       // Add rxs to the order
-      console.log('attepting to update an order');
       const updatedOrder = await updateOrder(
         order.id,
         prescriptions.data.createPrescriptions.map((rx: { id: string }) => rx.id)
@@ -155,7 +154,6 @@ export default function RecentOrdersCombineDialog() {
       dispatchCombineOrderUpdated(updatedOrder.data.updateOrder.id);
       return;
     } catch {
-      console.log('error updating an order', state?.address);
       // if there is an error updating an order, most likely because the order state has
       // changed since it was first fetched so we need to create a new order
       try {
@@ -168,7 +166,7 @@ export default function RecentOrdersCombineDialog() {
           prescriptions.data.createPrescriptions.map((rx: { id: string }) => rx.id),
           state.address
         );
-        console.log('new order created', newOrder.data.createOrder);
+
         dispatchOrderCreated(newOrder.data.createOrder);
       } catch {
         triggerToast({

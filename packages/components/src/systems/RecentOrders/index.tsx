@@ -71,7 +71,7 @@ type RecentOrdersActions = {
     continueCb?: () => void
   ) => void;
   setIsIssueDialogOpen: (isOpen: boolean, orderWithIssue?: Order) => void;
-  checkDuplicateFill: (treatmentName: string) => { order: Order; fill: Fill } | null;
+  checkDuplicateFill: (treatmentName: string) => { order: Order; fill: Fill } | undefined;
   hasRoutingOrder: () => boolean;
 };
 
@@ -88,7 +88,7 @@ const RecentOrdersContext = createContext<RecentOrdersContextValue>([
     setIsCombineDialogOpen: () => undefined,
     setIsDuplicateDialogOpen: () => undefined,
     setIsIssueDialogOpen: () => undefined,
-    checkDuplicateFill: () => null,
+    checkDuplicateFill: () => undefined,
     hasRoutingOrder: () => false
   }
 ]);
@@ -143,7 +143,7 @@ function RecentOrders(props: SDKProviderProps) {
             return { order, fill };
           }
         }
-        return null;
+        return undefined;
       },
       hasRoutingOrder() {
         return state.orders.some((order) => order.state === 'ROUTING');
