@@ -2,7 +2,7 @@ import { Alert, AlertIcon, Button } from '@chakra-ui/react';
 
 import { useMutation } from '@apollo/client';
 import { graphql } from 'apps/app/src/gql';
-import { useClinicalApiClient } from '../../apollo';
+import { usePhoton } from '@photonhealth/react';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
 
 interface RotateSecretProps {
@@ -19,11 +19,11 @@ const rotateSecretMutation = graphql(/* GraphQL */ `
 
 export const RotateSecret = (props: RotateSecretProps) => {
   const { clientId } = props;
-  const client = useClinicalApiClient();
+  const { clinicalClient } = usePhoton();
   const [rotateSecret, { loading, error }] = useMutation(rotateSecretMutation, {
     refetchQueries: ['getClients', 'ClientsDeveloperTabQuery'],
     awaitRefetchQueries: true,
-    client
+    client: clinicalClient
   });
 
   const hasWriteClient = usePermissions(['update:client_keys', 'write:client']);

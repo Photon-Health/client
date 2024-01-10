@@ -17,11 +17,7 @@ import { ExtendedFulfillmentType } from '../utils/models';
 import { countFillsAndRemoveDuplicates } from '../utils/general';
 import { useOrderContext } from '../views/Main';
 
-export const STATES = {
-  PICK_UP: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'],
-  COURIER: ['SENT', 'PREPARING', 'IN_TRANSIT', 'DELIVERED'],
-  MAIL_ORDER: ['SENT', 'PREPARING', 'SHIPPED', 'DELIVERED']
-};
+export const STATES = ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'];
 
 interface Props {
   fulfillmentType: ExtendedFulfillmentType;
@@ -30,11 +26,8 @@ interface Props {
 }
 
 export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props) => {
-  // We don't have courier states, so get index from pickup and fake it
-  const key = fulfillmentType === 'COURIER' ? 'PICK_UP' : fulfillmentType;
-  const initialStepIdx = STATES[key].findIndex((state) => state === status);
-  const states = STATES[fulfillmentType]; // map index to faux states
-  const activeStep = initialStepIdx + 1; // step to do next
+  const currentStepIdx = STATES.findIndex((state) => state === status);
+  const activeStep = currentStepIdx + 1; // step to do next
 
   const { order } = useOrderContext();
 
@@ -53,12 +46,12 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
             size="lg"
             colorScheme="green"
           >
-            {states.map((state, id) => {
+            {STATES.map((state, id) => {
               const title = t[fulfillmentType][state].status;
-              const isDelivery = state === 'IN_TRANSIT' || state === 'SHIPPED';
-              const description = isDelivery
-                ? `${t[fulfillmentType][state].description(isMultiRx)}${patientAddress}.`
-                : t[fulfillmentType][state].description(isMultiRx);
+              const isDelivery = fulfillmentType === 'COURIER' || fulfillmentType === 'MAIL_ORDER';
+              const description = `${t[fulfillmentType][state].description(isMultiRx)}${
+                isDelivery ? patientAddress : ''
+              }`;
 
               return (
                 <Step key={id}>

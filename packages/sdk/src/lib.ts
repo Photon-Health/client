@@ -10,14 +10,22 @@ import { setContext } from '@apollo/client/link/context/index.js';
 import { AuthManager } from './auth';
 import { ClinicalQueryManager } from './clinical';
 import { ManagementQueryManager } from './management';
-import { getClinicalUrl } from './utils';
+import {
+  Env as Environment,
+  getClinicalUrl,
+  clinicalApiUrl,
+  lambdasApiUrl,
+  clinicalAppUrl
+} from './utils';
 
 export * as types from './types';
 export * as fragments from './fragments';
 
-import * as packageJson from '../package.json';
+import pkg from '../package.json';
 
-const version: string = packageJson?.version ?? 'unknown';
+const version: string = pkg?.version ?? 'unknown';
+
+export type Env = Environment;
 
 /**
  * Configuration options for Photon SDK
@@ -32,6 +40,7 @@ export interface PhotonClientOptions {
   domain?: string;
   clientId: string;
   redirectURI?: string;
+  env?: Environment;
   organization?: string;
   audience?: string;
   uri?: string;
@@ -43,8 +52,19 @@ export class PhotonClient {
 
   private audience?: string;
 
+  /**
+   * The GraphQL endpoint of the "legacy" Photon API
+   * */
   private uri?: string;
 
+  /**
+   * The GraphQL endpoint of Service's clinical API
+   * */
+  private clinicalApiUri?: string;
+
+  /**
+   * The clinical app url
+   */
   public clinicalUrl?: string;
 
   private auth0Client: Auth0Client;
@@ -70,6 +90,11 @@ export class PhotonClient {
   public apollo: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>;
 
   /**
+   * Apollo client services instance
+   */
+  public apolloClinical: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>;
+
+  /**
    * Constructs a new PhotonSDK instance
    * @param config - Photon SDK configuration options
    * @remarks - Note, that organization is optional for scenarios in which a provider supports more than themselves.
@@ -80,8 +105,9 @@ export class PhotonClient {
       clientId,
       redirectURI,
       organization,
-      audience = 'https://api.photon.health',
-      uri = 'https://api.photon.health/graphql',
+      env = 'photon',
+      audience,
+      uri,
       developmentMode = false
     }: PhotonClientOptions,
     elementsVersion?: string
@@ -92,13 +118,17 @@ export class PhotonClient {
       redirect_uri: redirectURI,
       cacheLocation: 'memory'
     });
-    this.audience = audience;
-    this.uri = uri;
-    this.clinicalUrl = getClinicalUrl(uri);
+    this.audience = audience ? audience : lambdasApiUrl[env];
+    this.uri = uri ? uri : `${lambdasApiUrl[env]}/graphql`;
+    this.clinicalUrl = uri ? getClinicalUrl(uri) : clinicalAppUrl[env];
+    this.clinicalApiUri = `${clinicalApiUrl[env]}/graphql`;
+
     if (developmentMode) {
-      this.audience = 'https://api.neutron.health';
-      this.uri = 'https://api.neutron.health/graphql';
+      this.audience = clinicalAppUrl['neutron'];
+      this.uri = `${lambdasApiUrl['neutron']}/graphql'`;
+      this.clinicalApiUri = `${clinicalApiUrl['neutron']}/graphql'`;
     }
+
     this.organization = organization;
     this.authentication = new AuthManager({
       authentication: this.auth0Client,
@@ -106,12 +136,17 @@ export class PhotonClient {
       audience: this.audience
     });
 
-    this.apollo = this.constructApolloClient({ elementsVersion });
+    this.apollo = this.constructApolloClient({ elementsVersion, isServices: false });
+    this.apolloClinical = this.constructApolloClient({ elementsVersion, isServices: true });
     this.clinical = new ClinicalQueryManager(this.apollo);
     this.management = new ManagementQueryManager(this.apollo);
   }
 
-  private constructApolloClient({ elementsVersion }: { elementsVersion?: string } = {}) {
+  private constructApolloClient(
+    { elementsVersion, isServices }: { elementsVersion?: string; isServices: boolean } = {
+      isServices: false
+    }
+  ) {
     const apollo = new ApolloClient({
       link: setContext(async (_, { headers: baseHeaders, ...rest }) => {
         const token = await this.authentication.getAccessToken();
@@ -121,20 +156,27 @@ export class PhotonClient {
           'x-photon-sdk-version': version,
           ...(elementsVersion ? { 'x-photon-elements-version': elementsVersion } : {})
         };
+
         if (!token) {
           return { headers, ...rest };
         }
 
         return {
           ...rest,
-          headers: {
-            ...headers,
-            authorization: token
-          }
+          headers: isServices
+            ? {
+                ...headers,
+                'x-photon-auth-token': token,
+                'x-photon-auth-token-type': 'auth0'
+              }
+            : {
+                ...headers,
+                authorization: token
+              }
         };
       }).concat(
         new HttpLink({
-          uri: this.uri
+          uri: isServices ? this.clinicalApiUri : this.uri
         })
       ),
       defaultOptions: {
