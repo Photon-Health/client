@@ -13,7 +13,7 @@ import triggerToast from '../../utils/toastTriggers';
 import { Address } from '../PatientInfo';
 
 const CREATE_PRESCRIPTIONS_MUTATION = gql`
-  mutation CreatePrescriptions($prescriptions: [PrescriptionInput!]!) {
+  mutation RecentOrdersCombineDialogCreatePrescriptions($prescriptions: [PrescriptionInput!]!) {
     createPrescriptions(prescriptions: $prescriptions) {
       id
     }
@@ -21,7 +21,7 @@ const CREATE_PRESCRIPTIONS_MUTATION = gql`
 `;
 
 const COMBINE_ORDERS_MUTATION = gql`
-  mutation UpdateOrder($orderId: ID!, $fills: [FillInput!]!) {
+  mutation RecentOrdersCombineDialogUpdateOrder($orderId: ID!, $fills: [FillInput!]!) {
     updateOrder(id: $orderId, fills: $fills) {
       id
     }
@@ -29,7 +29,11 @@ const COMBINE_ORDERS_MUTATION = gql`
 `;
 
 const CREATE_ORDER_MUTATION = gql`
-  mutation CreateOrder($patientId: ID!, $fills: [FillInput!]!, $address: AddressInput!) {
+  mutation RecentOrdersCombineDialogCreateOrder(
+    $patientId: ID!
+    $fills: [FillInput!]!
+    $address: AddressInput!
+  ) {
     createOrder(patientId: $patientId, fills: $fills, address: $address) {
       id
     }
