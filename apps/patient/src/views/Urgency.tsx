@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Box, Button, Container, Heading, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Card, CardBody, Container, Heading, Text, VStack } from '@chakra-ui/react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
+import { datadogRum } from '@datadog/browser-rum';
 
 import { FixedFooter, Nav, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
@@ -14,21 +15,35 @@ const checkDisabled = (option: string): boolean => {
   return currentTime.isAfter(timetoCheckDayJs);
 };
 
-export const ReadyBy = () => {
+export const Urgency = () => {
   const { order, flattenedFills } = useOrderContext();
-
-  const { id } = order;
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
+  const isDemo = searchParams.get('demo');
+  const phone = searchParams.get('phone');
 
   const navigate = useNavigate();
 
-  const [selected, setSelected] = useState(undefined);
-  const showFooter = typeof selected !== 'undefined';
+  const [selectedIdx, setSelectedIdx] = useState(null);
+  const showFooter = selectedIdx !== null;
 
   const handleCtaClick = () => {
-    navigate(`/pharmacy?orderId=${id}&token=${token}`);
+    if (!isDemo) {
+      // Track selection
+      datadogRum.addAction('urgency_selection', {
+        value: t.urgencyOptions[selectedIdx],
+        orderId: order.id,
+        organization: order.organization.name,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Redirect
+    const toUrl = isDemo
+      ? `/pharmacy?demo=true&phone=${phone}`
+      : `/pharmacy?orderId=${order.id}&token=${token}`;
+    navigate(toUrl);
   };
 
   const isMultiRx = flattenedFills.length > 1;
@@ -51,28 +66,23 @@ export const ReadyBy = () => {
           </VStack>
 
           <VStack spacing={3} w="full">
-            {t.readyByOptions.map((option, i) => {
+            {t.urgencyOptions.map((option, i) => {
               const isDisabled = checkDisabled(option);
               return (
-                <Button
+                <Card
                   key={option}
-                  bgColor={selected === i ? 'gray.700' : undefined}
-                  _active={
-                    !isDisabled
-                      ? {
-                          bgColor: 'gray.700',
-                          textColor: 'white'
-                        }
-                      : undefined
-                  }
-                  size="lg"
+                  bgColor={isDisabled ? 'gray.100' : 'white'}
+                  border={isDisabled ? 'gray.100' : '2px solid'}
+                  borderColor={selectedIdx === i ? 'brand.600' : 'white'}
+                  onClick={() => setSelectedIdx(i)}
+                  m="auto"
                   w="full"
-                  isActive={selected === i}
-                  onClick={() => setSelected(i)}
-                  isDisabled={isDisabled}
+                  cursor={isDisabled ? 'not-allowed' : 'pointer'}
                 >
-                  {option}
-                </Button>
+                  <CardBody p={3} m="auto">
+                    <Text fontWeight="medium">{option}</Text>
+                  </CardBody>
+                </Card>
               );
             })}
           </VStack>

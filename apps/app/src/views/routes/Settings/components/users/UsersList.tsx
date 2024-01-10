@@ -35,14 +35,15 @@ const usersQuery = graphql(/* GraphQL */ `
   query UsersListQuery {
     users {
       id
-      ...UserItemFragment
+      ...UserFragment
+      email
       name {
         full
       }
       roles {
+        id
         name
       }
-      email
     }
     roles {
       name
