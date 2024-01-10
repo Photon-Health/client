@@ -119,10 +119,6 @@ function OrderStatusBadge(props: OrderStatusBadgeProps) {
     }
   });
 
-  createEffect(() => {
-    console.log(!props.fulfillmentState, !props.orderState, status());
-  });
-
   return (
     <Show when={status()}>
       <Tooltip text={statusTip()}>

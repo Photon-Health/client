@@ -12,6 +12,7 @@ import Textarea from '../../particles/Textarea';
 import formatRxString from '../../utils/formatRxString';
 import uniqueFills from '../../utils/uniqueFills';
 import { usePhotonClient } from '../SDKProvider';
+import { type } from 'os';
 
 const ticketSchema = zod.object({
   description: zod.string().min(1, { message: 'A description is required' })
@@ -29,35 +30,48 @@ const CREATE_TICKET = gql`
   }
 `;
 
+type FillWithName = {
+  name?: string;
+  dispenseQuantity?: number;
+  dispenseUnit?: string;
+  fillsAllowed?: number;
+  instructions?: string;
+};
 const composeTicket = ({
   patient,
-  prescription,
+  order,
+  prescriptions,
   values
 }: {
   patient: { id?: string; name?: string };
-  prescription: {
-    name?: string;
-    dispenseQuantity?: number;
-    dispenseUnit?: string;
-    fillsAllowed?: number;
-    instructions?: string;
-  };
+  order: { id?: string };
+  prescriptions: FillWithName[];
   values: TicketProps;
 }) => {
+  const formatPrescription = (prescription: FillWithName) => `
+    Name: ${prescription.name}
+    Info: ${formatRxString({
+      dispenseQuantity: prescription.dispenseQuantity,
+      dispenseUnit: prescription.dispenseUnit,
+      fillsAllowed: prescription.fillsAllowed,
+      instructions: prescription.instructions
+    })}
+  `;
+
+  const prescriptionsString = prescriptions.map(formatPrescription).join('\n\n');
+
   return `
+Order:
+  ID: ${order.id}
+
+----
 Patient:
   ID: ${patient.id} 
   Name: ${patient.name}
 
 ----
-Prescription:
-  Name: ${prescription.name}
-  Info: ${formatRxString({
-    dispenseQuantity: prescription.dispenseQuantity,
-    dispenseUnit: prescription.dispenseUnit,
-    fillsAllowed: prescription.fillsAllowed,
-    instructions: prescription.instructions
-  })}
+Prescriptions:
+${prescriptionsString}
 
 ---- 
 Description: 
@@ -97,13 +111,14 @@ export default function RecentOrdersIssueDialog() {
     setSubmitting(true);
     const body = composeTicket({
       patient: { id: state?.patientId, name: state?.patientName },
-      prescription: {
-        name: state?.duplicateFill?.treatment?.name,
-        dispenseQuantity: state?.duplicateFill?.prescription?.dispenseQuantity,
-        dispenseUnit: state?.duplicateFill?.prescription?.dispenseUnit,
-        fillsAllowed: state?.duplicateFill?.prescription?.fillsAllowed,
-        instructions: state?.duplicateFill?.prescription?.instructions
-      },
+      order: { id: state?.orderWithIssue?.id },
+      prescriptions: fills().map((fill) => ({
+        name: fill?.treatment?.name,
+        dispenseQuantity: fill?.prescription?.dispenseQuantity,
+        dispenseUnit: fill?.prescription?.dispenseUnit,
+        fillsAllowed: fill?.prescription?.fillsAllowed,
+        instructions: fill?.prescription?.instructions
+      })),
       values
     });
 
@@ -111,7 +126,9 @@ export default function RecentOrdersIssueDialog() {
       mutation: CREATE_TICKET,
       variables: {
         input: {
-          subject: `Issue with ${state?.duplicateFill?.treatment?.name}`,
+          subject: `Issue with ${
+            state?.duplicateFill?.treatment?.name || state?.orderWithIssue?.id
+          }`,
           comment: {
             body
           }

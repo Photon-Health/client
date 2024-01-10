@@ -67,11 +67,11 @@ type RecentOrdersActions = {
   ) => void;
   setIsDuplicateDialogOpen: (
     isOpen: boolean,
-    duplicateFill?: Fill,
+    duplicate?: { order: Order; fill: Fill },
     continueCb?: () => void
   ) => void;
   setIsIssueDialogOpen: (isOpen: boolean, orderWithIssue?: Order) => void;
-  checkDuplicateFill: (treatmentName: string) => Fill | undefined;
+  checkDuplicateFill: (treatmentName: string) => { order: Order; fill: Fill } | null;
   hasRoutingOrder: () => boolean;
 };
 
@@ -88,7 +88,7 @@ const RecentOrdersContext = createContext<RecentOrdersContextValue>([
     setIsCombineDialogOpen: () => undefined,
     setIsDuplicateDialogOpen: () => undefined,
     setIsIssueDialogOpen: () => undefined,
-    checkDuplicateFill: () => undefined,
+    checkDuplicateFill: () => null,
     hasRoutingOrder: () => false
   }
 ]);
@@ -119,11 +119,14 @@ function RecentOrders(props: SDKProviderProps) {
           ...(address ? { address } : { address: undefined })
         });
       },
-      setIsDuplicateDialogOpen(isOpen, duplicateFill, continueCb) {
+      setIsDuplicateDialogOpen(isOpen, duplicate, continueCb) {
         setState({
           isDuplicateDialogOpen: isOpen,
-          ...(continueCb && { duplicateDialogContinueCb: continueCb }),
-          ...(duplicateFill && { duplicateFill })
+          ...(continueCb
+            ? { duplicateDialogContinueCb: continueCb }
+            : { duplicateDialogContinueCb: undefined }),
+          ...(duplicate ? { duplicateFill: duplicate.fill } : {}),
+          ...(duplicate ? { orderWithIssue: duplicate.order } : {})
         });
       },
       setIsIssueDialogOpen(isOpen, orderWithIssue) {
@@ -134,9 +137,13 @@ function RecentOrders(props: SDKProviderProps) {
         });
       },
       checkDuplicateFill(treatmentName) {
-        return state.orders
-          .map((order) => order.fills.find((fill) => fill.treatment.name === treatmentName))
-          .find((fill) => fill !== undefined);
+        for (const order of state.orders) {
+          const fill = order.fills.find((fill: Fill) => fill.treatment.name === treatmentName);
+          if (fill !== undefined) {
+            return { order, fill };
+          }
+        }
+        return null;
       },
       hasRoutingOrder() {
         return state.orders.some((order) => order.state === 'ROUTING');

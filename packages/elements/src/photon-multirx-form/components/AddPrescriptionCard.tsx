@@ -122,7 +122,7 @@ export const AddPrescriptionCard = (props: {
         catalogId: props.store.catalogId.value ?? undefined
       };
 
-      const duplicateFill = recentOrdersActions.checkDuplicateFill(draft.treatment.name);
+      const duplicate = recentOrdersActions.checkDuplicateFill(draft.treatment.name);
 
       const addDraftPrescription = async () => {
         props.actions.updateFormValue({
@@ -188,13 +188,9 @@ export const AddPrescriptionCard = (props: {
         });
       };
 
-      if (props.enableCombineAndDuplicate && duplicateFill) {
+      if (props.enableCombineAndDuplicate && duplicate) {
         // if there's a duplicate order, check first if they want to report an issue
-        return recentOrdersActions.setIsDuplicateDialogOpen(
-          true,
-          duplicateFill,
-          addDraftPrescription
-        );
+        return recentOrdersActions.setIsDuplicateDialogOpen(true, duplicate, addDraftPrescription);
       }
 
       // otherwise add it to the draft prescriptions list
@@ -357,7 +353,8 @@ export const AddPrescriptionCard = (props: {
                   onClick={() => setOpenDoseCalculator(true)}
                   style={{
                     // ya, it ain't pretty, but it works. just need it for a lil bit longer
-                    height: '40px'
+                    height: '40px',
+                    'margin-top': '34px'
                   }}
                 >
                   <Icon name="calculator" size="sm" />
