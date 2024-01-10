@@ -32,7 +32,6 @@ import { formatPatientWeight } from './util/formatPatientWeight';
 import clearForm from './util/clearForm';
 
 import type { TemplateOverrides } from '@photonhealth/components';
-import { format } from 'path';
 
 export type Address = {
   city: string;

@@ -1,7 +1,8 @@
+import { createEffect, createSignal, Show } from 'solid-js';
 // forgive me, ripped from clinical app and solid(js)ified it
 import { OrderState } from '@photonhealth/sdk/dist/types';
 import Badge, { BadgeColor } from '../Badge';
-import Icon from '../Icon';
+import Icon, { IconName } from '../Icon';
 import Tooltip from '../Tooltip';
 
 export type OrderFulfillmentState =
@@ -25,7 +26,7 @@ export const ORDER_STATE_MAP: { [key in OrderState]: string } = {
   ERROR: 'Error'
 };
 
-export const ORDER_STATE_ICON_MAP: any = {
+export const ORDER_STATE_ICON_MAP: { [key in OrderState]: IconName } = {
   PLACED: 'arrowUpRight',
   ROUTING: 'arrowUturnRight',
   PENDING: 'clock',
@@ -74,51 +75,67 @@ export const ORDER_STATE_TIP_MAP: { [key in OrderState]: string } = {
 };
 
 export const ORDER_STATE_COLOR_MAP: { [key in OrderState]: BadgeColor } = {
-  PLACED: 'yellow',
-  ROUTING: 'gray',
-  PENDING: 'yellow',
+  ERROR: 'red',
   CANCELED: 'red',
-  COMPLETED: 'green',
-  ERROR: 'red'
+  ROUTING: 'gray',
+  PLACED: 'yellow',
+  PENDING: 'yellow',
+  COMPLETED: 'green'
+};
+
+export const ORDER_FULFILLMENT_STATE_COLOR_MAP: { [key in OrderFulfillmentState]: BadgeColor } = {
+  SENT: 'yellow',
+  RECEIVED: 'yellow',
+  FILLING: 'yellow',
+  SHIPPED: 'yellow',
+  READY: 'green',
+  PICKED_UP: 'green',
+  DELIVERED: 'green'
 };
 
 interface OrderStatusBadgeProps {
   fulfillmentState?: OrderFulfillmentState;
-  orderState?: OrderState;
+  orderState: OrderState | undefined;
 }
 
 function OrderStatusBadge(props: OrderStatusBadgeProps) {
-  let status = '';
-  let statusColor: BadgeColor = 'gray';
-  let statusTip = '';
-  let statusIcon;
+  const [status, setStatus] = createSignal('');
+  const [statusColor, setStatusColor] = createSignal<BadgeColor>('gray');
+  const [statusIcon, setStatusIcon] = createSignal<IconName | undefined>();
+  const [statusTip, setStatusTip] = createSignal('');
 
-  if (!props.fulfillmentState && !props.orderState) {
-    return null;
-  }
+  createEffect(() => {
+    if (props.orderState === 'PLACED' && props.fulfillmentState) {
+      const key = props.fulfillmentState;
+      setStatus(ORDER_FULFILLMENT_STATE_MAP?.[key]);
+      setStatusTip(ORDER_FULFILLMENT_TIP_MAP[key] || status);
+      setStatusColor(ORDER_FULFILLMENT_STATE_COLOR_MAP[key] || statusColor());
+    } else {
+      const key = props.orderState as OrderState;
+      setStatus(ORDER_STATE_MAP[key]);
+      setStatusTip(ORDER_STATE_TIP_MAP[key] || status);
+      setStatusIcon(ORDER_STATE_ICON_MAP[key]);
+      setStatusColor(ORDER_STATE_COLOR_MAP[key] || statusColor());
+    }
+  });
 
-  if (props.orderState === 'PLACED' && props.fulfillmentState) {
-    const key = props.fulfillmentState;
-    status = ORDER_FULFILLMENT_STATE_MAP[key];
-    statusTip = ORDER_FULFILLMENT_TIP_MAP[key] || status;
-    statusColor = (ORDER_FULFILLMENT_COLOR_MAP[key] as BadgeColor) || statusColor;
-  } else {
-    const key = props.orderState as OrderState;
-    status = ORDER_STATE_MAP[key];
-    statusTip = ORDER_STATE_TIP_MAP[key] || status;
-    statusIcon = ORDER_STATE_ICON_MAP[key];
-    statusColor = ORDER_STATE_COLOR_MAP[key] || statusColor;
-  }
+  createEffect(() => {
+    console.log(!props.fulfillmentState, !props.orderState, status());
+  });
 
   return (
-    <Tooltip text={statusTip}>
-      <Badge color={statusColor}>
-        <div class="mr-1">
-          <Icon name={statusIcon} size="sm" />
-        </div>
-        {status}
-      </Badge>
-    </Tooltip>
+    <Show when={status()}>
+      <Tooltip text={statusTip()}>
+        <Badge color={statusColor()}>
+          <Show when={statusIcon()}>
+            <div class="mr-1">
+              <Icon name={statusIcon()} size="sm" />
+            </div>
+          </Show>
+          {status()}
+        </Badge>
+      </Tooltip>
+    </Show>
   );
 }
 

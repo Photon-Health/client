@@ -121,8 +121,8 @@ export default function RecentOrdersIssueDialog() {
 
     setSubmitting(false);
     triggerToast({
-      header: 'Ticket Created',
-      body: 'A ticket for this prescription has been sent. Our team will be in touch shortly.',
+      header: 'Issue reported',
+      body: 'The customer support team will respond to you shortly.',
       status: 'success'
     });
     dispatchTicketCreatedDuplicate();
@@ -136,7 +136,7 @@ export default function RecentOrdersIssueDialog() {
         createTicket({ ...values });
       } catch (e) {
         triggerToast({
-          header: 'Error Creating Ticket',
+          header: 'Error Creating Issue',
           body: 'A ticket for this order has not been sent.',
           status: 'info'
         });

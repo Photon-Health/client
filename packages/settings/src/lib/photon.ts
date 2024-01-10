@@ -27,7 +27,7 @@ const defaultSettings: OrganizationSettings = {
   federated: false,
   enableMedHistory: false,
   enableRxAndOrder: true,
-  enableCombineAndDuplicate: false
+  enableCombineAndDuplicate: true
 };
 
 /**
@@ -190,7 +190,8 @@ export const photon: {
     logo: 'blueberry_logo.png',
     accentColor: '#235AFF',
     enablePatientRerouting: false,
-    enableMedHistory: true
+    enableMedHistory: true,
+    enableCombineAndDuplicate: false
   },
   // TBD Health
   org_XoBVNLkIWL6BP8vZ: {

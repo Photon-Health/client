@@ -30,7 +30,7 @@ const defaultSettings: OrganizationSettings = {
   federated: false,
   enableMedHistory: false,
   enableRxAndOrder: true,
-  enableCombineAndDuplicate: false
+  enableCombineAndDuplicate: true
 };
 
 /**
