@@ -12,7 +12,6 @@ import Textarea from '../../particles/Textarea';
 import formatRxString from '../../utils/formatRxString';
 import uniqueFills from '../../utils/uniqueFills';
 import { usePhotonClient } from '../SDKProvider';
-import { type } from 'os';
 
 const ticketSchema = zod.object({
   description: zod.string().min(1, { message: 'A description is required' })
