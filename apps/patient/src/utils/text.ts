@@ -68,7 +68,7 @@ export const text = {
       isPlural ? 'prescriptions are' : 'prescription is'
     } ready by your selected time.`,
   readyPickUp: 'Ready for pick up',
-  readyWhen: 'When do you want your order ready by?',
+  readyWhen: 'When do you need your order ready by?',
   receivedPreparing: 'The pharmacy has received your order and is preparing it.',
   receivedRx: (isPlural: boolean) => `I received my ${isPlural ? 'prescriptions' : 'prescription'}`,
   refills: 'Refills',
