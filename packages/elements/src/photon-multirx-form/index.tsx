@@ -15,7 +15,7 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import styles from './style.css?inline';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { createEffect, onMount, createSignal, Show, For, createMemo } from 'solid-js';
+import { createEffect, onMount, createSignal, Show, For, createMemo, Ref } from 'solid-js';
 import type { FormError } from '../stores/form';
 import { createFormStore } from '../stores/form';
 import { usePhoton } from '../context';
@@ -68,7 +68,7 @@ type PrescribeProps = {
 };
 
 function PrescribeWorkflow(props: PrescribeProps) {
-  let ref: any;
+  let ref: Ref<any> | undefined;
 
   const client = usePhoton();
   const [showForm, setShowForm] = createSignal<boolean>(
@@ -90,14 +90,13 @@ function PrescribeWorkflow(props: PrescribeProps) {
         value: props.address
       });
     }
-    if (ref) {
-      ref.addEventListener('photon-ticket-created-duplicate', () => {
-        clearForm(
-          props.formActions,
-          props.weight ? { notes: formatPatientWeight(props.weight, props?.weightUnit) } : undefined
-        );
-      });
-    }
+
+    ref.addEventListener('photon-ticket-created-duplicate', () => {
+      clearForm(
+        props.formActions,
+        props.weight ? { notes: formatPatientWeight(props.weight, props?.weightUnit) } : undefined
+      );
+    });
   });
 
   createEffect(() => {
@@ -447,7 +446,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
                       Add Prescription
                     </Button>
                   </Show>
-                  <Button loading={isLoading()} onClick={() => props.enableOrder}>
+                  <Button loading={isLoading()} onClick={combineOrSubmit}>
                     {props.enableOrder ? 'Send Order' : 'Save Prescriptions'}
                   </Button>
                 </div>
