@@ -340,27 +340,84 @@ export const Order = () => {
   }
 
   return (
-    <Page header="Order">
+    <Page
+      header="Order"
+      buttons={
+        <HStack>
+          <Button
+            aria-label="Cancel Order"
+            variant="outline"
+            borderColor="red.500"
+            textColor="red.500"
+            colorScheme="red"
+            isLoading={updating}
+            loadingText="Canceling..."
+            isDisabled={
+              loading ||
+              order.state === types.OrderState.Canceled ||
+              order.state === types.OrderState.Completed ||
+              order?.fulfillment?.state === 'SHIPPED'
+            }
+            onClick={async () => {
+              const decision = await confirmWrapper('Cancel this order?', {
+                description: (
+                  <RadioGroup onChange={setCancelReason}>
+                    <Text mb={2}>Please select a reason for canceling</Text>
+                    <Stack direction="column">
+                      {cancelReasons.map((reason) => (
+                        <Radio key={reason} value={reason}>
+                          {reason}
+                        </Radio>
+                      ))}
+                    </Stack>
+                  </RadioGroup>
+                ),
+                cancelText: "No, Don't Cancel",
+                confirmText: 'Yes, Cancel',
+                darkMode: colorMode !== 'light',
+                colorScheme: 'red'
+              });
+              if (decision) {
+                setUpdating(true);
+                const variables = {
+                  id,
+                  ...(cancelReasonRef.current && { reason: cancelReasonRef.current })
+                };
+                await cancelOrder({ variables });
+                setUpdating(false);
+              }
+            }}
+          >
+            Cancel Order
+          </Button>
+          <Button aria-label="Report Issue" colorScheme="blue">
+            Report Issue
+          </Button>
+        </HStack>
+      }
+    >
       <Card>
         <CardHeader>
-          <Stack direction={{ base: 'column', md: 'row' }} justify="space-between" width="full">
-            <Stack
-              direction={{ base: 'column', md: 'row' }}
-              align={{ base: 'start', md: 'stretch' }}
-              spacing={2}
-            >
-              <Text fontWeight="medium">
-                {loading ? <Skeleton height="30px" width="250px" /> : formatFills(order.fills)}
-              </Text>
-              {loading ? (
-                <Skeleton width="70px" height="24px" borderRadius="xl" />
-              ) : (
+          <Stack
+            direction={{ base: 'column', md: 'row' }}
+            justify="space-between"
+            align="center"
+            width="full"
+          >
+            <Text fontWeight="medium" flex="1">
+              {loading ? <Skeleton height="30px" width="250px" /> : formatFills(order.fills)}
+            </Text>
+            {loading ? (
+              <Skeleton width="70px" height="24px" borderRadius="xl" />
+            ) : (
+              <Stack flexShrink={0}>
                 <OrderStatusBadge
                   fulfillmentState={order.fulfillment?.state}
                   orderState={order.state}
                 />
-              )}
-            </Stack>
+              </Stack>
+            )}
+
             <CopyText size="xs" text={order?.id} />
           </Stack>
         </CardHeader>
@@ -623,60 +680,6 @@ export const Order = () => {
                 No fills
               </Text>
             )}
-
-            <SectionTitleRow
-              headerText="Actions"
-              subHeaderText="Canceling an order will send a cancellation notification to the pharmacy for any fills already sent to the pharmacy."
-              rightElement={
-                <Button
-                  aria-label="Cancel Order"
-                  variant="outline"
-                  borderColor="red.500"
-                  textColor="red.500"
-                  colorScheme="red"
-                  size="sm"
-                  isLoading={updating}
-                  loadingText="Canceling..."
-                  isDisabled={
-                    loading ||
-                    order.state === types.OrderState.Canceled ||
-                    order.state === types.OrderState.Completed ||
-                    order?.fulfillment?.state === 'SHIPPED'
-                  }
-                  onClick={async () => {
-                    const decision = await confirmWrapper('Cancel this order?', {
-                      description: (
-                        <RadioGroup onChange={setCancelReason}>
-                          <Text mb={2}>Please select a reason for canceling</Text>
-                          <Stack direction="column">
-                            {cancelReasons.map((reason) => (
-                              <Radio key={reason} value={reason}>
-                                {reason}
-                              </Radio>
-                            ))}
-                          </Stack>
-                        </RadioGroup>
-                      ),
-                      cancelText: "No, Don't Cancel",
-                      confirmText: 'Yes, Cancel',
-                      darkMode: colorMode !== 'light',
-                      colorScheme: 'red'
-                    });
-                    if (decision) {
-                      setUpdating(true);
-                      const variables = {
-                        id,
-                        ...(cancelReasonRef.current && { reason: cancelReasonRef.current })
-                      };
-                      await cancelOrder({ variables });
-                      setUpdating(false);
-                    }
-                  }}
-                >
-                  Cancel Order
-                </Button>
-              }
-            />
 
             {!loading ? (
               <CancelOrderAlert
