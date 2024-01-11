@@ -49,6 +49,7 @@ import { LocationResults, LocationSearch } from '../components/LocationSearch';
 import SectionTitleRow from '../components/SectionTitleRow';
 import { gql, useApolloClient, useMutation, useQuery } from '@apollo/client';
 import { CANCEL_ORDER, REROUTE_ORDER } from '../../mutations';
+import { TicketModal } from '../components/TicketModal';
 
 const PHARMACY_FRAGMENT = gql`
   fragment PharmacyFragment on Pharmacy {
@@ -190,6 +191,7 @@ export const Order = () => {
   const params = useParams();
   const id = params.orderId;
   const { getToken } = usePhoton();
+  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [accessToken, setAccessToken] = useState('');
   const [updating, setUpdating] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -340,356 +342,363 @@ export const Order = () => {
   }
 
   return (
-    <Page
-      header="Order"
-      buttons={
-        <HStack>
-          <Button
-            aria-label="Cancel Order"
-            variant="outline"
-            borderColor="red.500"
-            textColor="red.500"
-            colorScheme="red"
-            isLoading={updating}
-            loadingText="Canceling..."
-            isDisabled={
-              loading ||
-              order.state === types.OrderState.Canceled ||
-              order.state === types.OrderState.Completed ||
-              order?.fulfillment?.state === 'SHIPPED'
-            }
-            onClick={async () => {
-              const decision = await confirmWrapper('Cancel this order?', {
-                description: (
-                  <RadioGroup onChange={setCancelReason}>
-                    <Text mb={2}>Please select a reason for canceling</Text>
-                    <Stack direction="column">
-                      {cancelReasons.map((reason) => (
-                        <Radio key={reason} value={reason}>
-                          {reason}
-                        </Radio>
-                      ))}
-                    </Stack>
-                  </RadioGroup>
-                ),
-                cancelText: "No, Don't Cancel",
-                confirmText: 'Yes, Cancel',
-                darkMode: colorMode !== 'light',
-                colorScheme: 'red'
-              });
-              if (decision) {
-                setUpdating(true);
-                const variables = {
-                  id,
-                  ...(cancelReasonRef.current && { reason: cancelReasonRef.current })
-                };
-                await cancelOrder({ variables });
-                setUpdating(false);
+    <>
+      <TicketModal isOpen={isTicketModalOpen} onClose={() => setIsTicketModalOpen(false)} />
+      <Page
+        header="Order"
+        buttons={
+          <HStack>
+            <Button
+              aria-label="Cancel Order"
+              variant="outline"
+              borderColor="red.500"
+              textColor="red.500"
+              colorScheme="red"
+              isLoading={updating}
+              loadingText="Canceling..."
+              isDisabled={
+                loading ||
+                order.state === types.OrderState.Canceled ||
+                order.state === types.OrderState.Completed ||
+                order?.fulfillment?.state === 'SHIPPED'
               }
-            }}
-          >
-            Cancel Order
-          </Button>
-          <Button aria-label="Report Issue" colorScheme="blue">
-            Report Issue
-          </Button>
-        </HStack>
-      }
-    >
-      <Card>
-        <CardHeader>
-          <Stack
-            direction={{ base: 'column', md: 'row' }}
-            justify="space-between"
-            align="center"
-            width="full"
-          >
-            <Text fontWeight="medium" flex="1">
-              {loading ? <Skeleton height="30px" width="250px" /> : formatFills(order.fills)}
-            </Text>
-            {loading ? (
-              <Skeleton width="70px" height="24px" borderRadius="xl" />
-            ) : (
-              <Stack flexShrink={0}>
-                <OrderStatusBadge
-                  fulfillmentState={order.fulfillment?.state}
-                  orderState={order.state}
-                />
+              onClick={async () => {
+                const decision = await confirmWrapper('Cancel this order?', {
+                  description: (
+                    <RadioGroup onChange={setCancelReason}>
+                      <Text mb={2}>Please select a reason for canceling</Text>
+                      <Stack direction="column">
+                        {cancelReasons.map((reason) => (
+                          <Radio key={reason} value={reason}>
+                            {reason}
+                          </Radio>
+                        ))}
+                      </Stack>
+                    </RadioGroup>
+                  ),
+                  cancelText: "No, Don't Cancel",
+                  confirmText: 'Yes, Cancel',
+                  darkMode: colorMode !== 'light',
+                  colorScheme: 'red'
+                });
+                if (decision) {
+                  setUpdating(true);
+                  const variables = {
+                    id,
+                    ...(cancelReasonRef.current && { reason: cancelReasonRef.current })
+                  };
+                  await cancelOrder({ variables });
+                  setUpdating(false);
+                }
+              }}
+            >
+              Cancel Order
+            </Button>
+            <Button
+              aria-label="Report Issue"
+              colorScheme="blue"
+              onClick={() => setIsTicketModalOpen(true)}
+            >
+              Report Issue
+            </Button>
+          </HStack>
+        }
+      >
+        <Card>
+          <CardHeader>
+            <Stack
+              direction={{ base: 'column', md: 'row' }}
+              justify="space-between"
+              align="center"
+              width="full"
+            >
+              <Text fontWeight="medium" flex="1">
+                {loading ? <Skeleton height="30px" width="250px" /> : formatFills(order.fills)}
+              </Text>
+              {loading ? (
+                <Skeleton width="70px" height="24px" borderRadius="xl" />
+              ) : (
+                <Stack flexShrink={0}>
+                  <OrderStatusBadge
+                    fulfillmentState={order.fulfillment?.state}
+                    orderState={order.state}
+                  />
+                </Stack>
+              )}
+
+              <CopyText size="xs" text={order?.id} />
+            </Stack>
+          </CardHeader>
+          <Divider color="gray.100" />
+          <CardBody>
+            <VStack
+              spacing={4}
+              fontSize={{ base: 'md', md: 'lg' }}
+              alignItems="start"
+              w="100%"
+              mt={0}
+            >
+              <Stack direction={{ base: 'column', sm: 'row' }} gap={[5, 3]} w="full">
+                <VStack align="start" borderRadius={6}>
+                  <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                    Patient
+                  </Text>
+                  {loading ? (
+                    <HStack alignContent="center" w="150px" display="flex">
+                      <SkeletonCircle size="10" />
+                      <SkeletonText skeletonHeight={5} noOfLines={2} flexGrow={1} />
+                    </HStack>
+                  ) : (
+                    <PatientView patient={order.patient} />
+                  )}
+                </VStack>
+
+                <Show above="sm">
+                  <Divider orientation="vertical" height="auto" />
+                </Show>
+
+                <VStack align="start" borderRadius={6}>
+                  <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                    Created At
+                  </Text>
+
+                  {loading ? (
+                    <SkeletonText skeletonHeight={5} noOfLines={1} width="125px" />
+                  ) : (
+                    <Text fontSize="md">{formatDate(order.createdAt)}</Text>
+                  )}
+                </VStack>
+                {order?.externalId ? (
+                  <>
+                    <Show above="sm">
+                      <Divider orientation="vertical" height="auto" />
+                    </Show>
+                    <VStack align="start" borderRadius={6}>
+                      <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                        External Id
+                      </Text>
+
+                      <CopyText text={order?.externalId} size="xs" />
+                    </VStack>
+                  </>
+                ) : null}
               </Stack>
-            )}
 
-            <CopyText size="xs" text={order?.id} />
-          </Stack>
-        </CardHeader>
-        <Divider color="gray.100" />
-        <CardBody>
-          <VStack
-            spacing={4}
-            fontSize={{ base: 'md', md: 'lg' }}
-            alignItems="start"
-            w="100%"
-            mt={0}
-          >
-            <Stack direction={{ base: 'column', sm: 'row' }} gap={[5, 3]} w="full">
-              <VStack align="start" borderRadius={6}>
-                <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                  Patient
-                </Text>
+              <SectionTitleRow
+                headerText="Pharmacy Information"
+                rightElement={
+                  order?.state === types.OrderState.Routing ? (
+                    <>
+                      <Button onClick={onOpen} size="sm" colorScheme="blue">
+                        Select Pharmacy
+                      </Button>
+                      <LocationSearch
+                        isOpen={isOpenLocation}
+                        onClose={({ loc, lat, lng }) => {
+                          if (loc && lat && lng) {
+                            setLocation({ loc, lat, lng });
+                          }
+                          onCloseLocation();
+                        }}
+                      />
+                      <Modal isOpen={isOpen} onClose={onClose}>
+                        <ModalOverlay />
+                        <ModalContent>
+                          <ModalHeader>Select a Pharmacy</ModalHeader>
+                          <ModalCloseButton />
+
+                          <ModalBody>
+                            <LocalPickup
+                              location={location.loc}
+                              latitude={location.lat}
+                              longitude={location.lng}
+                              onOpen={onOpenLocation}
+                              patient={order.patient}
+                              pharmacyId=""
+                              updatePreferredPharmacy={false}
+                              setUpdatePreferredPharmacy={() => {}}
+                              preferredPharmacyIds={[]}
+                              setFieldValue={(_, id) => {
+                                setPharmacyId(id);
+                              }}
+                              resetSelection={() => {}}
+                            />
+                          </ModalBody>
+
+                          <ModalFooter>
+                            <Button
+                              aria-label="Close Pharmacy Select Modal"
+                              variant="solid"
+                              size="sm"
+                              mr={3}
+                              onClick={() => {
+                                setPharmacyId('');
+                                onClose();
+                              }}
+                            >
+                              Close
+                            </Button>
+                            <Button
+                              aria-label="Set Pharmacy"
+                              variant="solid"
+                              colorScheme="blue"
+                              size="sm"
+                              isLoading={updating}
+                              loadingText="Setting Pharmacy..."
+                              isDisabled={!pharmacyId}
+                              onClick={async () => {
+                                setUpdating(true);
+                                await rerouteOrder({ variables: { id, pharmacyId } });
+                                setPharmacyId('');
+                                setUpdating(false);
+                                onClose();
+                              }}
+                            >
+                              Set Pharmacy
+                            </Button>
+                          </ModalFooter>
+                        </ModalContent>
+                      </Modal>
+                    </>
+                  ) : undefined
+                }
+              />
+
+              {order?.state === types.OrderState.Routing ? (
+                <Alert colorScheme="gray">
+                  <AlertIcon />
+                  This order is pending pharmacy selection, please select a pharmacy if needed.
+                </Alert>
+              ) : null}
+
+              <InfoGrid name="Name">
                 {loading ? (
-                  <HStack alignContent="center" w="150px" display="flex">
-                    <SkeletonCircle size="10" />
-                    <SkeletonText skeletonHeight={5} noOfLines={2} flexGrow={1} />
-                  </HStack>
+                  <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                ) : order?.pharmacy?.name ? (
+                  <Text fontSize="md">{order.pharmacy.name}</Text>
                 ) : (
-                  <PatientView patient={order.patient} />
+                  <Text fontSize="md" as="i">
+                    None
+                  </Text>
                 )}
-              </VStack>
+              </InfoGrid>
 
-              <Show above="sm">
-                <Divider orientation="vertical" height="auto" />
-              </Show>
-
-              <VStack align="start" borderRadius={6}>
-                <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                  Created At
-                </Text>
-
+              <InfoGrid name="Phone">
                 {loading ? (
-                  <SkeletonText skeletonHeight={5} noOfLines={1} width="125px" />
+                  <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                ) : order?.pharmacy?.phone ? (
+                  <Link fontSize="md" href={`tel:${order.pharmacy.phone}`} isExternal>
+                    {formatPhone(order.pharmacy.phone)}
+                  </Link>
                 ) : (
-                  <Text fontSize="md">{formatDate(order.createdAt)}</Text>
+                  <Text fontSize="md" as="i">
+                    None
+                  </Text>
                 )}
-              </VStack>
-              {order?.externalId ? (
+              </InfoGrid>
+
+              <InfoGrid name="Address">
+                {loading ? (
+                  <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                ) : order?.pharmacy?.address ? (
+                  <Text fontSize="md">{formatAddress(order.pharmacy.address)}</Text>
+                ) : (
+                  <Text fontSize="md" as="i">
+                    None
+                  </Text>
+                )}
+              </InfoGrid>
+
+              <InfoGrid name="Id">
+                {loading ? (
+                  <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                ) : order?.pharmacy?.id ? (
+                  <CopyText text={order.pharmacy.id} />
+                ) : (
+                  <Text fontSize="md" as="i">
+                    None
+                  </Text>
+                )}
+              </InfoGrid>
+
+              {!loading && order.fulfillment?.type === 'MAIL_ORDER' ? (
                 <>
-                  <Show above="sm">
-                    <Divider orientation="vertical" height="auto" />
-                  </Show>
-                  <VStack align="start" borderRadius={6}>
-                    <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                      External Id
-                    </Text>
-
-                    <CopyText text={order?.externalId} size="xs" />
-                  </VStack>
+                  <InfoGrid name="Carrier">
+                    {order.fulfillment?.carrier ? (
+                      <Text fontSize="md">{order.fulfillment.carrier}</Text>
+                    ) : (
+                      <Text fontSize="md" as="i">
+                        None
+                      </Text>
+                    )}
+                  </InfoGrid>
+                  <InfoGrid name="Tracking Number">
+                    {order.fulfillment?.trackingNumber ? (
+                      <Text fontSize="md">{order.fulfillment.trackingNumber}</Text>
+                    ) : (
+                      <Text fontSize="md" as="i">
+                        None
+                      </Text>
+                    )}
+                  </InfoGrid>
                 </>
               ) : null}
-            </Stack>
 
-            <SectionTitleRow
-              headerText="Pharmacy Information"
-              rightElement={
-                order?.state === types.OrderState.Routing ? (
-                  <>
-                    <Button onClick={onOpen} size="sm" colorScheme="blue">
-                      Select Pharmacy
-                    </Button>
-                    <LocationSearch
-                      isOpen={isOpenLocation}
-                      onClose={({ loc, lat, lng }) => {
-                        if (loc && lat && lng) {
-                          setLocation({ loc, lat, lng });
-                        }
-                        onCloseLocation();
-                      }}
-                    />
-                    <Modal isOpen={isOpen} onClose={onClose}>
-                      <ModalOverlay />
-                      <ModalContent>
-                        <ModalHeader>Select a Pharmacy</ModalHeader>
-                        <ModalCloseButton />
+              <SectionTitleRow headerText="Prescription Fills" />
 
-                        <ModalBody>
-                          <LocalPickup
-                            location={location.loc}
-                            latitude={location.lat}
-                            longitude={location.lng}
-                            onOpen={onOpenLocation}
-                            patient={order.patient}
-                            pharmacyId=""
-                            updatePreferredPharmacy={false}
-                            setUpdatePreferredPharmacy={() => {}}
-                            preferredPharmacyIds={[]}
-                            setFieldValue={(_, id) => {
-                              setPharmacyId(id);
-                            }}
-                            resetSelection={() => {}}
-                          />
-                        </ModalBody>
+              {prescriptions.length > 0 ? (
+                <>
+                  {prescriptions.map((fill: any, i: number) => {
+                    return i < 5 ? (
+                      <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
+                        <Card
+                          variant="outline"
+                          p={[2, 3]}
+                          w="full"
+                          shadow="none"
+                          _hover={{
+                            backgroundColor: 'gray.50'
+                          }}
+                        >
+                          <HStack justify="space-between" width="full">
+                            <VStack alignItems="start">
+                              <HStack>
+                                <LinkOverlay href={`/prescriptions/${fill?.prescription?.id}`}>
+                                  <Text>{fill.treatment.name}</Text>
+                                </LinkOverlay>
+                              </HStack>
+                              <Stack direction={['column', 'row']}>
+                                <Text fontSize="xs" color="gray.500">
+                                  Fill ID: {fill.id}
+                                </Text>
+                              </Stack>
+                            </VStack>
 
-                        <ModalFooter>
-                          <Button
-                            aria-label="Close Pharmacy Select Modal"
-                            variant="solid"
-                            size="sm"
-                            mr={3}
-                            onClick={() => {
-                              setPharmacyId('');
-                              onClose();
-                            }}
-                          >
-                            Close
-                          </Button>
-                          <Button
-                            aria-label="Set Pharmacy"
-                            variant="solid"
-                            colorScheme="blue"
-                            size="sm"
-                            isLoading={updating}
-                            loadingText="Setting Pharmacy..."
-                            isDisabled={!pharmacyId}
-                            onClick={async () => {
-                              setUpdating(true);
-                              await rerouteOrder({ variables: { id, pharmacyId } });
-                              setPharmacyId('');
-                              setUpdating(false);
-                              onClose();
-                            }}
-                          >
-                            Set Pharmacy
-                          </Button>
-                        </ModalFooter>
-                      </ModalContent>
-                    </Modal>
-                  </>
-                ) : undefined
-              }
-            />
-
-            {order?.state === types.OrderState.Routing ? (
-              <Alert colorScheme="gray">
-                <AlertIcon />
-                This order is pending pharmacy selection, please select a pharmacy if needed.
-              </Alert>
-            ) : null}
-
-            <InfoGrid name="Name">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-              ) : order?.pharmacy?.name ? (
-                <Text fontSize="md">{order.pharmacy.name}</Text>
+                            <Box alignItems="end">
+                              <FiChevronRight size="1.3em" />
+                            </Box>
+                          </HStack>
+                        </Card>
+                      </LinkBox>
+                    ) : null;
+                  })}
+                </>
               ) : (
-                <Text fontSize="md" as="i">
-                  None
+                <Text as="i" fontSize="sm" color="gray.500">
+                  No fills
                 </Text>
               )}
-            </InfoGrid>
 
-            <InfoGrid name="Phone">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-              ) : order?.pharmacy?.phone ? (
-                <Link fontSize="md" href={`tel:${order.pharmacy.phone}`} isExternal>
-                  {formatPhone(order.pharmacy.phone)}
-                </Link>
-              ) : (
-                <Text fontSize="md" as="i">
-                  None
-                </Text>
-              )}
-            </InfoGrid>
-
-            <InfoGrid name="Address">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-              ) : order?.pharmacy?.address ? (
-                <Text fontSize="md">{formatAddress(order.pharmacy.address)}</Text>
-              ) : (
-                <Text fontSize="md" as="i">
-                  None
-                </Text>
-              )}
-            </InfoGrid>
-
-            <InfoGrid name="Id">
-              {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-              ) : order?.pharmacy?.id ? (
-                <CopyText text={order.pharmacy.id} />
-              ) : (
-                <Text fontSize="md" as="i">
-                  None
-                </Text>
-              )}
-            </InfoGrid>
-
-            {!loading && order.fulfillment?.type === 'MAIL_ORDER' ? (
-              <>
-                <InfoGrid name="Carrier">
-                  {order.fulfillment?.carrier ? (
-                    <Text fontSize="md">{order.fulfillment.carrier}</Text>
-                  ) : (
-                    <Text fontSize="md" as="i">
-                      None
-                    </Text>
-                  )}
-                </InfoGrid>
-                <InfoGrid name="Tracking Number">
-                  {order.fulfillment?.trackingNumber ? (
-                    <Text fontSize="md">{order.fulfillment.trackingNumber}</Text>
-                  ) : (
-                    <Text fontSize="md" as="i">
-                      None
-                    </Text>
-                  )}
-                </InfoGrid>
-              </>
-            ) : null}
-
-            <SectionTitleRow headerText="Prescription Fills" />
-
-            {prescriptions.length > 0 ? (
-              <>
-                {prescriptions.map((fill: any, i: number) => {
-                  return i < 5 ? (
-                    <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
-                      <Card
-                        variant="outline"
-                        p={[2, 3]}
-                        w="full"
-                        shadow="none"
-                        _hover={{
-                          backgroundColor: 'gray.50'
-                        }}
-                      >
-                        <HStack justify="space-between" width="full">
-                          <VStack alignItems="start">
-                            <HStack>
-                              <LinkOverlay href={`/prescriptions/${fill?.prescription?.id}`}>
-                                <Text>{fill.treatment.name}</Text>
-                              </LinkOverlay>
-                            </HStack>
-                            <Stack direction={['column', 'row']}>
-                              <Text fontSize="xs" color="gray.500">
-                                Fill ID: {fill.id}
-                              </Text>
-                            </Stack>
-                          </VStack>
-
-                          <Box alignItems="end">
-                            <FiChevronRight size="1.3em" />
-                          </Box>
-                        </HStack>
-                      </Card>
-                    </LinkBox>
-                  ) : null;
-                })}
-              </>
-            ) : (
-              <Text as="i" fontSize="sm" color="gray.500">
-                No fills
-              </Text>
-            )}
-
-            {!loading ? (
-              <CancelOrderAlert
-                orderState={order.state as OrderState}
-                fulfillmentState={order?.fulfillment?.state as OrderFulfillmentState}
-              />
-            ) : null}
-          </VStack>
-        </CardBody>
-      </Card>
-    </Page>
+              {!loading ? (
+                <CancelOrderAlert
+                  orderState={order.state as OrderState}
+                  fulfillmentState={order?.fulfillment?.state as OrderFulfillmentState}
+                />
+              ) : null}
+            </VStack>
+          </CardBody>
+        </Card>
+      </Page>
+    </>
   );
 };
