@@ -195,7 +195,7 @@ customElement(
           title="New Prescriptions"
           titleIconName="prescription"
           headerRight={
-            props.enableOrder ? (
+            hideOrderButton() ? null : props.enableOrder ? (
               <Button size="md" loading={triggerSubmit()} onClick={handleCreateOrder}>
                 Send Order
               </Button>

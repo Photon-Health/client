@@ -1,8 +1,8 @@
 import { customElement } from 'solid-element';
 
 //Shoelace Components
-import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
 import '@shoelace-style/shoelace/dist/components/alert/alert';
+import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/switch/switch';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
@@ -10,34 +10,33 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 //Styles
-import tailwind from '../tailwind.css?inline';
-import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
-import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
-import styles from './style.css?inline';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { createEffect, onMount, createSignal, Show, For, createMemo, Ref } from 'solid-js';
-import type { FormError } from '../stores/form';
-import { createFormStore } from '../stores/form';
-import { usePhoton } from '../context';
 import {
-  Spinner,
-  Toaster,
   Button,
   RecentOrders,
-  useRecentOrders,
-  triggerToast,
-  SignatureAttestationModal
+  SignatureAttestationModal,
+  Spinner,
+  Toaster,
+  useRecentOrders
 } from '@photonhealth/components';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { Order, Prescription } from '@photonhealth/sdk/dist/types';
-import { AddPrescriptionCard } from './components/AddPrescriptionCard';
-import { PatientCard } from './components/PatientCard';
-import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
+import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
+import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import { GraphQLError } from 'graphql';
-import { OrderCard } from './components/OrderCard';
-import { PharmacyCard } from './components/PharmacyCard';
+import { For, Ref, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
+import { usePhoton } from '../context';
 import { PhotonAuthorized } from '../photon-authorized';
-import { formatPatientWeight } from './util/formatPatientWeight';
+import type { FormError } from '../stores/form';
+import { createFormStore } from '../stores/form';
+import tailwind from '../tailwind.css?inline';
+import { AddPrescriptionCard } from './components/AddPrescriptionCard';
+import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
+import { OrderCard } from './components/OrderCard';
+import { PatientCard } from './components/PatientCard';
+import { PharmacyCard } from './components/PharmacyCard';
+import styles from './style.css?inline';
 import clearForm from './util/clearForm';
+import { formatPatientWeight } from './util/formatPatientWeight';
 
 import type { TemplateOverrides } from '@photonhealth/components';
 
