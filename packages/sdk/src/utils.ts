@@ -95,7 +95,7 @@ export const clinicalApiUrl: { [key in Env]: string } = {
   tau: 'http://clinical-api.tau.health:8080',
   boson: 'https://clinical-api.boson.health',
   neutron: 'https://clinical-api.neutron.health',
-  photon: 'https://clinical-api.photon.health/'
+  photon: 'https://clinical-api.photon.health'
 };
 
 export function getClinicalUrl(uri: string): string | undefined {
