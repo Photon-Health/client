@@ -23,7 +23,7 @@ export const Default: Story = {
 export const ButtonBonanza: Story = {
   // @ts-ignore
   render: () => {
-    const variants: ButtonVariant[] = ['primary', 'secondary', 'tertiary', 'naked'];
+    const variants: ButtonVariant[] = ['primary', 'secondary', 'danger', 'tertiary', 'naked'];
     const sizes: ButtonSize[] = ['xs', 'sm', 'md', 'lg', 'xl'];
 
     return (
