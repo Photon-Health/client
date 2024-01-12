@@ -142,8 +142,14 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
           </Table.Header>
           <Table.Body>
             <Show
-              when={medHistory()}
-              fallback={[LoadingRowFallback, LoadingRowFallback, LoadingRowFallback]}
+              when={(medHistory()?.length || 0) > 0}
+              fallback={
+                <>
+                  <LoadingRowFallback />
+                  <LoadingRowFallback />
+                  <LoadingRowFallback />
+                </>
+              }
             >
               <For each={medHistory()}>
                 {(med) => (

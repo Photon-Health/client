@@ -9,7 +9,8 @@ import PatientMedHistory from './systems/PatientMedHistory';
 import PharmacySearch from './systems/PharmacySearch';
 import PharmacySelect from './systems/PharmacySelect';
 import Spinner from './particles/Spinner';
-import RadioGroup from './particles/RadioGroup';
+import RadioGroupCards from './particles/RadioGroupCards';
+import RecentOrders, { useRecentOrders } from './systems/RecentOrders';
 import Dialog from './particles/Dialog';
 import Button from './particles/Button';
 import SDKProvider, { usePhotonClient } from './systems/SDKProvider';
@@ -33,11 +34,13 @@ export {
   PatientMedHistory,
   PharmacySearch,
   PharmacySelect,
-  RadioGroup,
+  RadioGroupCards,
+  RecentOrders,
+  useRecentOrders,
   SDKProvider,
+  usePhotonClient,
   Spinner,
   Text,
-  usePhotonClient,
   Toaster,
   triggerToast
 };

@@ -1,6 +1,6 @@
 import { types } from '@photonhealth/sdk';
 import { createMemo, createSignal, For, onMount, Show } from 'solid-js';
-import RadioGroup from '../../particles/RadioGroup';
+import RadioGroupCards from '../../particles/RadioGroupCards';
 import Tabs from '../../particles/Tabs';
 import PharmacySearch from '../PharmacySearch';
 import { MailOrderPharmacy } from './MailOrderPharmacy';
@@ -109,7 +109,7 @@ export default function PharmacySelect(props: PharmacySelectProps) {
         <Show when={loadedTabs().includes('Send to Patient')}>
           <div class={tab() !== 'Send to Patient' ? 'hidden' : ''}>
             {patientCount() > 0 && (
-              <RadioGroup
+              <RadioGroupCards
                 label="Patients"
                 initSelected={props?.patientIds?.[0]}
                 setSelected={(patientId) => {
@@ -125,12 +125,12 @@ export default function PharmacySelect(props: PharmacySelectProps) {
               >
                 <For each={props?.patientIds || []}>
                   {(id) => (
-                    <RadioGroup.Option value={id}>
+                    <RadioGroupCards.Option value={id}>
                       <PatientDetails patientId={id} />
-                    </RadioGroup.Option>
+                    </RadioGroupCards.Option>
                   )}
                 </For>
-              </RadioGroup>
+              </RadioGroupCards>
             )}
             {patientCount() === 0 && <div>Please add a patient.</div>}
           </div>
@@ -154,7 +154,7 @@ export default function PharmacySelect(props: PharmacySelectProps) {
 
         <Show when={loadedTabs().includes('Mail Order')}>
           <div class={tab() !== 'Mail Order' ? 'hidden' : ''}>
-            <RadioGroup
+            <RadioGroupCards
               label="Pharmacies"
               initSelected={props?.mailOrderPharmacyIds?.[0]}
               setSelected={(pharmacyId) => {
@@ -164,12 +164,12 @@ export default function PharmacySelect(props: PharmacySelectProps) {
             >
               <For each={props?.mailOrderPharmacyIds || []}>
                 {(id) => (
-                  <RadioGroup.Option value={id}>
+                  <RadioGroupCards.Option value={id}>
                     <MailOrderPharmacy pharmacyId={id} />
-                  </RadioGroup.Option>
+                  </RadioGroupCards.Option>
                 )}
               </For>
-            </RadioGroup>
+            </RadioGroupCards>
           </div>
         </Show>
       </div>
