@@ -5,6 +5,7 @@ import Banner from '../../particles/Banner';
 import Card from '../../particles/Card';
 import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
+import formatRxString from '../../utils/formatRxString';
 import { usePhotonClient } from '../SDKProvider';
 import generateDraftPrescription from './utils/generateDraftPrescription';
 
@@ -208,7 +209,7 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
 
       {/* Show when No Drafts */}
       <Show when={!isLoading() && merged.draftPrescriptions.length === 0}>
-        <Banner text="No pending prescriptions" status="info" />
+        <Banner status="info">No pending prescriptions</Banner>
       </Show>
 
       {/* Show when Drafts */}
@@ -221,8 +222,13 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
                   <>
                     <Text>{draft.treatment.name}</Text>
                     <Text color="gray" size="sm">
-                      {draft.dispenseQuantity} {draft.dispenseUnit}, {draft.refillsInput} refills -{' '}
-                      {draft.instructions}
+                      {formatRxString({
+                        // need to use nullish coalescing here because draft types are eg `Maybe<number> | undefined`
+                        dispenseQuantity: draft?.dispenseQuantity ?? undefined,
+                        dispenseUnit: draft?.dispenseUnit ?? undefined,
+                        fillsAllowed: draft?.fillsAllowed ?? undefined,
+                        instructions: draft?.instructions ?? undefined
+                      })}
                     </Text>
                   </>
                 }
