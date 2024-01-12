@@ -115,6 +115,7 @@ export class PhotonClient {
     this.audience = audience ? audience : lambdasApiUrl[env];
     this.uri = uri ? uri : `${lambdasApiUrl[env]}/graphql`;
     this.clinicalUrl = uri ? getClinicalUrl(uri) : clinicalAppUrl[env];
+
     this.clinicalApiUri = `${clinicalApiUrl[env]}/graphql`;
 
     if (developmentMode) {

@@ -62,6 +62,12 @@ export const PrescriptionForm = () => {
       ref.current.addEventListener('photon-prescriptions-closed', () => {
         onClose();
       });
+      ref.current.addEventListener(
+        'photon-order-combined',
+        (e: { detail: { orderId: string } }) => {
+          navigate(`/orders/${e.detail.orderId}`);
+        }
+      );
     }
   }, [ref.current]);
 
@@ -94,6 +100,7 @@ export const PrescriptionForm = () => {
           enable-med-history={settings[user.org_id]?.enableMedHistory ?? false}
           enable-local-pickup={settings[user.org_id]?.pickUp ?? false}
           enable-send-to-patient={settings[user.org_id]?.sendToPatient ?? false}
+          enable-combine-and-duplicate={settings[user.org_id]?.enableCombineAndDuplicate ?? false}
           mail-order-ids={settings[user.org_id]?.mailOrderProviders?.join(',') ?? ''}
           toast-buffer={70}
         />

@@ -1,7 +1,15 @@
 import { afterDate, message } from '../../validators';
 import { record, string, any, number, min, size } from 'superstruct';
 import { format } from 'date-fns';
-import { Card, Text, Button, Icon, DoseCalculator, triggerToast } from '@photonhealth/components';
+import {
+  Card,
+  Text,
+  Button,
+  Icon,
+  DoseCalculator,
+  triggerToast,
+  useRecentOrders
+} from '@photonhealth/components';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
@@ -12,6 +20,7 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 import { createSignal, Show, onMount } from 'solid-js';
 import repopulateForm from '../util/repopulateForm';
 import clearForm from '../util/clearForm';
+import { formatPatientWeight } from '../util/formatPatientWeight';
 import { usePhoton } from '../../context';
 import { GraphQLError } from 'graphql';
 
@@ -29,23 +38,20 @@ const validators = {
   effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
 };
 
-const patientWeight = (weight: number, weightUnit = 'lb') =>
-  `Patient weight: ${weight} ${weightUnit}`;
-
 export const AddPrescriptionCard = (props: {
   hideAddToTemplates: boolean;
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
   weight?: number;
   weightUnit?: string;
+  enableCombineAndDuplicate?: boolean;
 }) => {
+  const client = usePhoton();
   const [medDialogOpen, setMedDialogOpen] = createSignal(false);
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
-  const [isSubmitting, setIsSubmitting] = createSignal(false);
-  const client = usePhoton();
-
+  const [, recentOrdersActions] = useRecentOrders();
   let ref: any;
 
   onMount(() => {
@@ -67,7 +73,7 @@ export const AddPrescriptionCard = (props: {
     if (props.weight) {
       props.actions.updateFormValue({
         key: 'notes',
-        value: patientWeight(props.weight, props.weightUnit)
+        value: formatPatientWeight(props.weight, props.weightUnit)
       });
     }
   });
@@ -88,7 +94,6 @@ export const AddPrescriptionCard = (props: {
   };
 
   const handleAddPrescription = async () => {
-    setIsSubmitting(true);
     const keys = [
       'treatment',
       'effectiveDate',
@@ -99,9 +104,9 @@ export const AddPrescriptionCard = (props: {
     ];
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
+
     if (!errorsPresent) {
       const draft = {
-        id: String(Math.random()),
         effectiveDate: props.store.effectiveDate.value,
         treatment: props.store.treatment.value,
         dispenseAsWritten: props.store.dispenseAsWritten.value,
@@ -117,69 +122,85 @@ export const AddPrescriptionCard = (props: {
         catalogId: props.store.catalogId.value ?? undefined
       };
 
-      props.actions.updateFormValue({
-        key: 'draftPrescriptions',
-        value: [...(props.store.draftPrescriptions?.value || []), draft]
-      });
+      const duplicate = recentOrdersActions.checkDuplicateFill(draft.treatment.name);
 
-      const addToTemplate = props.store.addToTemplates?.value ?? false;
-      const templateName = props.store.templateName?.value ?? '';
-      props.actions.updateFormValue({
-        key: 'effectiveDate',
-        value: format(new Date(), 'yyyy-MM-dd').toString()
-      });
-      props.actions.clearKeys([
-        'treatment',
-        'dispenseAsWritten',
-        'dispenseQuantity',
-        'dispenseUnit',
-        'daysSupply',
-        'refillsInput',
-        'instructions',
-        'notes',
-        'templateName',
-        'addToTemplates'
-      ]);
-      setOffCatalog(undefined);
-      clearForm(
-        props.actions,
-        props.weight ? { notes: patientWeight(props.weight, props?.weightUnit) } : undefined
-      );
-      if (addToTemplate) {
-        try {
-          const { errors } = await templateMutation({
-            variables: {
-              ...draft,
-              name: templateName,
-              treatmentId: draft.treatment.id,
-              isPrivate: true
-            },
-            awaitRefetchQueries: false
-          });
-          if (errors) {
-            dispatchOrderError(errors);
-          } else {
-            triggerToast({
-              status: 'success',
-              header: 'Personal Template Saved'
+      const addDraftPrescription = async () => {
+        props.actions.updateFormValue({
+          key: 'draftPrescriptions',
+          value: [
+            ...(props.store.draftPrescriptions?.value || []),
+            {
+              id: String(Math.random()),
+              ...draft
+            }
+          ]
+        });
+        props.actions.updateFormValue({
+          key: 'effectiveDate',
+          value: format(new Date(), 'yyyy-MM-dd').toString()
+        });
+        const addToTemplate = props.store.addToTemplates?.value ?? false;
+        const templateName = props.store.templateName?.value ?? '';
+        props.actions.clearKeys([
+          'treatment',
+          'dispenseAsWritten',
+          'dispenseQuantity',
+          'dispenseUnit',
+          'daysSupply',
+          'refillsInput',
+          'instructions',
+          'notes',
+          'templateName',
+          'addToTemplates'
+        ]);
+        setOffCatalog(undefined);
+        clearForm(
+          props.actions,
+          props.weight ? { notes: formatPatientWeight(props.weight, props?.weightUnit) } : undefined
+        );
+        if (addToTemplate) {
+          try {
+            const { errors } = await templateMutation({
+              variables: {
+                ...draft,
+                name: templateName,
+                treatmentId: draft.treatment.id,
+                isPrivate: true
+              },
+              awaitRefetchQueries: false
             });
+            if (errors) {
+              dispatchOrderError(errors);
+            } else {
+              triggerToast({
+                status: 'success',
+                header: 'Personal Template Saved'
+              });
+            }
+          } catch (err) {
+            dispatchOrderError([err as GraphQLError]);
           }
-        } catch (err) {
-          dispatchOrderError([err as GraphQLError]);
         }
+        triggerToast({
+          status: 'success',
+          header: 'Prescription Added',
+          body: 'You can send this order or add another prescription before sending it'
+        });
+      };
+
+      if (props.enableCombineAndDuplicate && duplicate) {
+        // if there's a duplicate order, check first if they want to report an issue
+        return recentOrdersActions.setIsDuplicateDialogOpen(true, duplicate, addDraftPrescription);
       }
-      triggerToast({
-        status: 'success',
-        header: 'Prescription Added',
-        body: 'You can send this order or add another prescription before sending it'
-      });
+
+      // otherwise add it to the draft prescriptions list
+      addDraftPrescription();
     } else {
       triggerToast({
         status: 'error',
         body: 'Some items in the form are incomplete, please check for errors'
       });
     }
-    setIsSubmitting(false);
   };
 
   return (
@@ -220,7 +241,7 @@ export const AddPrescriptionCard = (props: {
                   ...e.detail.data,
                   notes: [
                     e.detail.data?.notes,
-                    props.weight && patientWeight(props.weight, props?.weightUnit)
+                    props.weight && formatPatientWeight(props.weight, props?.weightUnit)
                   ]
                     .filter((x) => x)
                     .join('\n\n')
@@ -332,7 +353,8 @@ export const AddPrescriptionCard = (props: {
                   onClick={() => setOpenDoseCalculator(true)}
                   style={{
                     // ya, it ain't pretty, but it works. just need it for a lil bit longer
-                    height: '40px'
+                    height: '40px',
+                    'margin-top': '34px'
                   }}
                 >
                   <Icon name="calculator" size="sm" />
@@ -442,13 +464,7 @@ export const AddPrescriptionCard = (props: {
               />
             </Show>
             <div class="flex flex-grow justify-end">
-              <Button
-                class="w-full md:!w-auto"
-                size="lg"
-                onClick={handleAddPrescription}
-                loading={isSubmitting()}
-                disabled={isSubmitting()}
-              >
+              <Button class="w-full md:!w-auto" size="lg" onClick={handleAddPrescription}>
                 Add Prescription to Order
               </Button>
             </div>

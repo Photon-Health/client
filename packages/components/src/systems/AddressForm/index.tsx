@@ -91,8 +91,8 @@ export default function AddressForm(props: AddressFormProps) {
         </Button>
       </div>
       <div>
-        <Banner text="Patient address is required to write a prescription" status="info" />
-        <form ref={form} id="patient-address">
+        <Banner status="info">Patient address is required to write a prescription</Banner>
+        <form ref={form} id="patient-address" class="mt-4">
           <InputGroup
             label="Address Line 1 *"
             subLabel="Enter Street Number and Name"

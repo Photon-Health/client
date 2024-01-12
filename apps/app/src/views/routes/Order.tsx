@@ -43,7 +43,7 @@ import { formatAddress, formatDate, formatFills, formatPhone } from '../../utils
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
-import { OrderState } from 'packages/sdk/dist/types';
+import { OrderState } from '@photonhealth/sdk/dist/types';
 import { LocalPickup } from './NewOrder/components/SelectPharmacyCard/components/LocalPickup';
 import { LocationResults, LocationSearch } from '../components/LocationSearch';
 import SectionTitleRow from '../components/SectionTitleRow';
