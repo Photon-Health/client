@@ -164,9 +164,8 @@ customElement(
     createEffect(() => {
       if (!store()?.authentication.state.isLoading && props.externalUserId != null) {
         if (
-          !(store().authentication.state.user as User).sub
-            ?.split('|')
-            .some((s) => s === props.externalUserId)
+          (store().authentication.state.user as User).sub?.split('|').reverse()[0] !==
+          props.externalUserId
         ) {
           store()?.authentication.logout();
           const args: any = { appState: {} };
