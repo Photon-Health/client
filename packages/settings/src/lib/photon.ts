@@ -189,7 +189,6 @@ export const photon: {
     ...defaultSettings,
     logo: 'blueberry_logo.png',
     accentColor: '#235AFF',
-    enablePatientRerouting: false,
     enableMedHistory: true,
     enableCombineAndDuplicate: false
   },
