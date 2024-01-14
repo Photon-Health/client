@@ -24,7 +24,7 @@ const defaultSettings: OrganizationSettings = {
   mailOrderNavigateProviders: [],
   sendToPatient: true,
   sendToPatientUsers: [],
-  enablePatientRerouting: true,
+  enablePatientRerouting: false,
   enableCourierNavigate: false,
   returnTo: window.location.origin,
   federated: false,
@@ -48,6 +48,7 @@ export const neutron: {
     logo: 'photon',
     accentColor: '#b35724',
     mailOrder: true,
+    enableMedHistory: true,
     mailOrderProviders: [CUREXA_ID, CAREPOINT_ID, TRUE_PILL_ID, HONEYBEE_PHARMACY_ID]
   },
   // NewCo (demo's)
@@ -139,8 +140,7 @@ export const neutron: {
   org_vISrdMELQC3MhOFb: {
     ...defaultSettings,
     logo: 'blueberry_logo.png',
-    accentColor: '#235AFF',
-    enablePatientRerouting: false
+    accentColor: '#235AFF'
   },
   // Sunny
   org_PILXReL8NKiTWxD3: {
