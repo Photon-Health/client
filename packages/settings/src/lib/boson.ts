@@ -46,7 +46,8 @@ export const boson: {
     ...defaultSettings,
     logo: 'photon',
     accentColor: '#b35724',
-    enableRxAndOrder: true
+    enableRxAndOrder: true,
+    enableMedHistory: true
   },
   // NewCo (demo's)
   org_w85CgjUjCi52yvOz: {
