@@ -64,7 +64,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const client = usePhotonClient();
   const [medHistory, setMedHistory] = createSignal<PatientMedication[] | undefined>(undefined);
 
-  const baseURL = createMemo(() => `${client?.clinicalUrl}prescriptions/`);
+  const baseURL = createMemo(() => `${client?.clinicalUrl}/prescriptions/`);
 
   const fetchPatient = async () => {
     const { data } = await client!.apollo.query({
@@ -73,6 +73,8 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
     });
     if (data?.patient?.medicationHistory) {
       setMedHistory(data.patient.medicationHistory);
+    } else {
+      setMedHistory([]);
     }
   };
 
