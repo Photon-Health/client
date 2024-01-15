@@ -32,7 +32,8 @@ import {
   ModalFooter,
   Show,
   RadioGroup,
-  Radio
+  Radio,
+  useTheme
 } from '@chakra-ui/react';
 import { usePhoton, types } from '@photonhealth/react';
 import { FiChevronRight } from 'react-icons/fi';
@@ -50,6 +51,7 @@ import SectionTitleRow from '../components/SectionTitleRow';
 import { gql, useApolloClient, useMutation, useQuery } from '@apollo/client';
 import { CANCEL_ORDER, REROUTE_ORDER } from '../../mutations';
 import { TicketModal } from '../components/TicketModal';
+import { Fill, Order as OrderType } from '@photonhealth/sdk/dist/types';
 
 const PHARMACY_FRAGMENT = gql`
   fragment PharmacyFragment on Pharmacy {
@@ -90,6 +92,10 @@ const GET_ORDER = gql`
         id
         prescription {
           id
+          dispenseQuantity
+          dispenseUnit
+          fillsAllowed
+          instructions
         }
         treatment {
           name
@@ -187,6 +193,31 @@ const cancelReasons = [
   'Other'
 ];
 
+export default function uniqueFills(order: OrderType): Fill[] {
+  const treatmentNames = new Set();
+  return order.fills.filter((fill) =>
+    treatmentNames.has(fill.treatment.name) ? false : treatmentNames.add(fill.treatment.name)
+  );
+}
+
+// ripped from components
+function formatRxString({
+  dispenseQuantity = 0,
+  dispenseUnit = '',
+  fillsAllowed = 0,
+  instructions = ''
+}: {
+  dispenseQuantity?: number;
+  dispenseUnit?: string;
+  fillsAllowed?: number;
+  instructions?: string;
+}): string {
+  const refills = Math.max(fillsAllowed - 1, 0);
+  return `${dispenseQuantity} ${dispenseUnit}, ${refills} Refill${
+    refills === 1 ? '' : 's'
+  } - ${instructions}`;
+}
+
 export const Order = () => {
   const params = useParams();
   const id = params.orderId;
@@ -200,6 +231,7 @@ export const Order = () => {
   const [cancelReason, setCancelReason] = useState('');
   const cancelReasonRef = useRef(cancelReason);
   const client = useApolloClient();
+  const theme = useTheme();
 
   useEffect(() => {
     cancelReasonRef.current = cancelReason;
@@ -341,9 +373,89 @@ export const Order = () => {
     );
   }
 
+  const fills = order ? uniqueFills(order) : [];
+
   return (
     <>
-      <TicketModal isOpen={isTicketModalOpen} onClose={() => setIsTicketModalOpen(false)} />
+      <TicketModal
+        isOpen={isTicketModalOpen}
+        onClose={() => setIsTicketModalOpen(false)}
+        body={
+          <>
+            <Text>Start an email thread with the Photon team to discuss next steps.</Text>
+            <Card
+              p={4}
+              bg={theme.colors.slate['50']}
+              borderWidth="1px"
+              borderColor={theme.colors.slate['200']}
+              borderRadius="lg"
+              variant="outline"
+            >
+              <VStack spacing={4}>
+                <Box w="100%">
+                  <Text fontSize="xs" color={theme.colors.slate['700']}>
+                    PATIENT
+                  </Text>
+                  <Text fontSize="sm" fontWeight="medium">
+                    {order?.patient && order.patient.name.full}
+                  </Text>
+                </Box>
+                <VStack w="100%" align="left">
+                  <Text fontSize="xs" color={theme.colors.slate['700']}>
+                    PRESCRIPTION
+                  </Text>
+                  {fills?.length > 0 &&
+                    fills.map((fill) => (
+                      <Box w="100%" key={fill.treatment.name}>
+                        <Text fontSize="sm" fontWeight="medium">
+                          {fill?.treatment?.name}
+                        </Text>
+                        <Text fontSize="sm" color={theme.colors.slate['500']}>
+                          {formatRxString({
+                            dispenseQuantity: fill?.prescription?.dispenseQuantity,
+                            dispenseUnit: fill?.prescription?.dispenseUnit,
+                            fillsAllowed: fill?.prescription?.fillsAllowed,
+                            instructions: fill?.prescription?.instructions
+                          })}
+                        </Text>
+                      </Box>
+                    ))}
+                </VStack>
+              </VStack>
+            </Card>
+          </>
+        }
+        prependContext={
+          !order
+            ? ''
+            : `
+Order:
+  ID: ${order.id}
+
+----
+Patient:
+  ID: ${order?.patient?.id} 
+  Name: ${order?.patient?.name?.full}
+
+----
+Prescriptions:
+${fills.map(
+  (fill) => `
+  Name: ${fill.treatment.name}
+  Info: ${formatRxString({
+    dispenseQuantity: fill?.prescription?.dispenseQuantity,
+    dispenseUnit: fill?.prescription?.dispenseUnit,
+    fillsAllowed: fill?.prescription?.fillsAllowed,
+    instructions: fill?.prescription?.instructions
+  })}
+`
+)}
+
+---- 
+Description: 
+        `
+        }
+      />
       <Page
         header="Order"
         buttons={
@@ -398,6 +510,7 @@ export const Order = () => {
               aria-label="Report Issue"
               colorScheme="blue"
               onClick={() => setIsTicketModalOpen(true)}
+              isDisabled={loading}
             >
               Report Issue
             </Button>
