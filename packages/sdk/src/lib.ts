@@ -119,9 +119,9 @@ export class PhotonClient {
     this.clinicalApiUri = `${clinicalApiUrl[env]}/graphql`;
 
     if (developmentMode) {
-      this.audience = clinicalAppUrl['neutron'];
-      this.uri = `${lambdasApiUrl['neutron']}/graphql'`;
-      this.clinicalApiUri = `${clinicalApiUrl['neutron']}/graphql'`;
+      this.audience = lambdasApiUrl['neutron'];
+      this.uri = `${lambdasApiUrl['neutron']}/graphql`;
+      this.clinicalApiUri = `${clinicalApiUrl['neutron']}/graphql`;
     }
 
     const params: Auth0ClientOptions = {
