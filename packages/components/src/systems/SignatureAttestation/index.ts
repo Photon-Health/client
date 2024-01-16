@@ -1,0 +1,1 @@
+export { SignatureAttestationModal } from './SignatureAttestationModal';

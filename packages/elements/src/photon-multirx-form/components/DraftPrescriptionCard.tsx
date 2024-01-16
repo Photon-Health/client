@@ -6,6 +6,7 @@ import { message } from '../../validators';
 import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import type { TemplateOverrides, DraftPrescription } from '@photonhealth/components';
+import PhotonTooltip from '../../photon-tooltip';
 
 const draftPrescriptionsValidator = message(
   size(array(any()), 1, Infinity),
@@ -127,8 +128,14 @@ export const DraftPrescriptionCard = (props: {
         </p>
       </photon-dialog>
       <Card>
-        <div class="flex items-center justify-between">
-          <Text color="gray">Pending Prescription</Text>
+        <div class="flex items-center space-x-2 text-slate-500">
+          <Text color="gray" class="pr-2">
+            Pending Order
+          </Text>
+          <PhotonTooltip
+            maxWidth="300px"
+            tip="Each prescription will include the prescriber’s digital signature and the date it was written when the order is sent to the pharmacy."
+          />
         </div>
         <DraftPrescriptions
           draftPrescriptions={props.store['draftPrescriptions']?.value ?? []}
