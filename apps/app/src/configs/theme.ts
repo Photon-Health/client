@@ -32,36 +32,23 @@ const slate = {
   950: '#020617'
 };
 
-const customTheme = extendTheme(theme, {
-  components: {
-    Modal: {
-      baseStyle: {
-        dialog: {
-          maxWidth: '32rem'
+const customTheme = extendTheme(
+  {
+    styles: {
+      global: (props: StyleFunctionProps) => ({
+        body: {
+          bgColor: mode('#F9FAFB', 'bg-canvas')(props)
         }
-      },
-      sizes: {
-        xl: {
-          Content: {
-            maxWidth: '31rem'
-          }
-        }
-      }
+      })
+    },
+    colors: {
+      ...baseTheme.colors,
+      blue,
+      brand: blue,
+      navy: '#273D52',
+      slate
     }
   },
-  styles: {
-    global: (props: StyleFunctionProps) => ({
-      body: {
-        bgColor: mode('#F9FAFB', 'bg-canvas')(props)
-      }
-    })
-  },
-  colors: {
-    ...baseTheme.colors,
-    blue,
-    brand: blue,
-    navy: '#273D52',
-    slate
-  }
-});
+  theme
+);
 export default customTheme;
