@@ -74,7 +74,7 @@ export const Urgency = () => {
                   bgColor={isDisabled ? 'gray.100' : 'white'}
                   border={isDisabled ? 'gray.100' : '2px solid'}
                   borderColor={selectedIdx === i ? 'brand.600' : 'white'}
-                  onClick={() => setSelectedIdx(i)}
+                  onClick={() => !isDisabled && setSelectedIdx(i)}
                   m="auto"
                   w="full"
                   cursor={isDisabled ? 'not-allowed' : 'pointer'}
