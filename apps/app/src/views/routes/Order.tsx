@@ -380,6 +380,7 @@ export const Order = () => {
       <TicketModal
         isOpen={isTicketModalOpen}
         onClose={() => setIsTicketModalOpen(false)}
+        subject={`Issue with order for ${order?.patient?.name?.full}`}
         body={
           <>
             <Text>Start an email thread with the Photon team to discuss next steps.</Text>

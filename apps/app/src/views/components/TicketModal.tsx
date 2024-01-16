@@ -45,11 +45,18 @@ const initialValues: yup.InferType<typeof ticketSchema> = {
 type TicketModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  subject: string;
   body: JSX.Element;
   prependContext?: string;
 };
 
-export const TicketModal = ({ isOpen, onClose, body, prependContext }: TicketModalProps) => {
+export const TicketModal = ({
+  isOpen,
+  onClose,
+  subject,
+  body,
+  prependContext
+}: TicketModalProps) => {
   const toast = useToast();
   const { clinicalClient } = usePhoton();
 
@@ -92,7 +99,7 @@ export const TicketModal = ({ isOpen, onClose, body, prependContext }: TicketMod
                 await createTicket({
                   variables: {
                     input: {
-                      subject: 'Issue with order',
+                      subject,
                       comment: {
                         body: `${prependContext ? `${prependContext}\n` : ''}${values.description}`
                       }
