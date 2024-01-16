@@ -7,6 +7,7 @@ import { PhotonClientStore } from '../store';
 import { hasAuthParams } from '../utils';
 import { PhotonContext } from '../context';
 import pkg from '../../package.json';
+import { type User } from '@auth0/auth0-react';
 
 type PhotonClientProps = {
   domain?: string;
@@ -21,6 +22,7 @@ type PhotonClientProps = {
   autoLogin: boolean;
   toastBuffer?: number;
   env?: Env;
+  externalUserId?: string;
 };
 
 const version = pkg?.version ?? 'unknown';
@@ -104,6 +106,13 @@ customElement(
       reflect: false,
       notify: false,
       parse: false
+    },
+    externalUserId: {
+      attribute: 'userId',
+      value: undefined,
+      reflect: true,
+      notify: true,
+      parse: false
     }
   },
   (props: PhotonClientProps) => {
@@ -122,7 +131,7 @@ customElement(
       },
       version
     );
-    const client = new PhotonClientStore(sdk);
+    const client = new PhotonClientStore(sdk, props.autoLogin, props.redirectPath);
     if (props.developmentMode) {
       console.info('[PhotonClient]: Development mode enabled');
     }
@@ -153,8 +162,12 @@ customElement(
     });
 
     createEffect(() => {
-      if (!store()?.authentication.state.isLoading) {
-        if (!store()?.authentication.state.isAuthenticated && props.autoLogin) {
+      if (!store()?.authentication.state.isLoading && props.externalUserId != null) {
+        if (
+          (store().authentication.state.user as User).sub?.split('|').reverse()[0] !==
+          props.externalUserId
+        ) {
+          store()?.authentication.logout();
           const args: any = { appState: {} };
           if (props.redirectPath) {
             args.appState.returnTo = props.redirectPath;
