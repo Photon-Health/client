@@ -20,6 +20,7 @@ import Toaster from './particles/Toaster';
 import triggerToast from './utils/toastTriggers';
 
 import type { DraftPrescription, TemplateOverrides } from './systems/DraftPrescriptions';
+import { SignatureAttestationModal } from './systems/SignatureAttestation';
 
 export {
   AddressForm,
@@ -36,13 +37,14 @@ export {
   PharmacySelect,
   RadioGroupCards,
   RecentOrders,
-  useRecentOrders,
   SDKProvider,
-  usePhotonClient,
+  SignatureAttestationModal,
   Spinner,
   Text,
   Toaster,
-  triggerToast
+  triggerToast,
+  usePhotonClient,
+  useRecentOrders
 };
 
 // Export types
