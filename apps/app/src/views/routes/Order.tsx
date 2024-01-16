@@ -193,7 +193,7 @@ const cancelReasons = [
   'Other'
 ];
 
-export default function uniqueFills(order: OrderType): Fill[] {
+function uniqueFills(order: OrderType): Fill[] {
   const treatmentNames = new Set();
   return order.fills.filter((fill) =>
     treatmentNames.has(fill.treatment.name) ? false : treatmentNames.add(fill.treatment.name)
@@ -216,6 +216,35 @@ function formatRxString({
   return `${dispenseQuantity} ${dispenseUnit}, ${refills} Refill${
     refills === 1 ? '' : 's'
   } - ${instructions}`;
+}
+
+function formatTicketContext({ order, fills }: { order: OrderType; fills: Fill[] }) {
+  return `
+Order:
+  ID: ${order.id}
+
+----
+Patient:
+  ID: ${order?.patient?.id} 
+  Name: ${order?.patient?.name?.full}
+
+----
+Prescriptions:
+${fills.map(
+  (fill) => `
+  Name: ${fill.treatment.name}
+  Info: ${formatRxString({
+    dispenseQuantity: fill?.prescription?.dispenseQuantity,
+    dispenseUnit: fill?.prescription?.dispenseUnit,
+    fillsAllowed: fill?.prescription?.fillsAllowed,
+    instructions: fill?.prescription?.instructions
+  })}
+`
+)}
+
+---- 
+Description: 
+  `;
 }
 
 export const Order = () => {
@@ -426,36 +455,7 @@ export const Order = () => {
             </Card>
           </>
         }
-        prependContext={
-          !order
-            ? ''
-            : `
-Order:
-  ID: ${order.id}
-
-----
-Patient:
-  ID: ${order?.patient?.id} 
-  Name: ${order?.patient?.name?.full}
-
-----
-Prescriptions:
-${fills.map(
-  (fill) => `
-  Name: ${fill.treatment.name}
-  Info: ${formatRxString({
-    dispenseQuantity: fill?.prescription?.dispenseQuantity,
-    dispenseUnit: fill?.prescription?.dispenseUnit,
-    fillsAllowed: fill?.prescription?.fillsAllowed,
-    instructions: fill?.prescription?.instructions
-  })}
-`
-)}
-
----- 
-Description: 
-        `
-        }
+        prependContext={!order ? '' : formatTicketContext({ order, fills })}
       />
       <Page
         header="Order"

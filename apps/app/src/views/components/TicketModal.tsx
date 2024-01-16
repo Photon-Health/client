@@ -73,7 +73,7 @@ export const TicketModal = ({
       closeOnEsc={false}
     >
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent maxW="28rem">
         <ModalHeader>
           <HStack>
             <Text flex="1" align="left">
