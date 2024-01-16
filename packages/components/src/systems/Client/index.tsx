@@ -34,8 +34,8 @@ export default function Client(props: ClientProps) {
   });
 
   const store = props?.createStore
-    ? new PhotonClientStore(sdk, props.createStore)
-    : new PhotonClientStore(sdk);
+    ? new PhotonClientStore(sdk, props.autoLogin ?? false, props.redirectPath, props.createStore)
+    : new PhotonClientStore(sdk, props.autoLogin ?? false, props.redirectPath);
 
   if (props.developmentMode) {
     console.info('[PhotonClient]: Development mode enabled');
@@ -54,18 +54,6 @@ export default function Client(props: ClientProps) {
         60000,
         setInterval
       );
-    }
-  });
-
-  createEffect(async () => {
-    if (!store?.authentication.state.isLoading) {
-      if (!store?.authentication.state.isAuthenticated && props.autoLogin) {
-        const args: any = { appState: {} };
-        if (props.redirectPath) {
-          args.appState.returnTo = props.redirectPath;
-        }
-        await store?.authentication.login(args);
-      }
     }
   });
 
