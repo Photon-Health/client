@@ -16,8 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@client/settings": ["packages/settings/src/index.ts"],
-      "@photonhealth/sdk": ["packages/sdk/src/lib.ts"],
-      "@photonhealth/react": ["packages/react/src/index.ts"]
+      "@photonhealth/react": ["packages/react/src/index.ts"],
+      "@photonhealth/sdk": ["packages/sdk/src/lib.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist"]
