@@ -209,7 +209,7 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
 
       {/* Show when No Drafts */}
       <Show when={!isLoading() && merged.draftPrescriptions.length === 0}>
-        <Banner status="info">No pending prescriptions</Banner>
+        <Banner status="info">Add prescription(s) before sending an order</Banner>
       </Show>
 
       {/* Show when Drafts */}
