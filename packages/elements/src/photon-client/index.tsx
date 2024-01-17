@@ -163,6 +163,7 @@ customElement(
 
     createEffect(() => {
       if (!store()?.authentication.state.isLoading) {
+        // If autoLogin, then automatically log in
         if (!store()?.authentication.state.isAuthenticated && props.autoLogin) {
           const args: any = { appState: {} };
           if (props.redirectPath) {
@@ -170,7 +171,11 @@ customElement(
           }
           store()?.authentication.login(args);
         } else if (
+          // If `externalUserId` is set, then we check if it matches the logged in user
+          // If it doesn't match then logout and then immediately log back in if possible
           props.externalUserId != null &&
+          // Note that we check the last piece of the `sub` which is the id from the auth provider
+          // We do an exact match on this last section because ids are not guaranteed to not be substrings of the other
           (store().authentication.state.user as User | undefined)?.sub?.split('|').reverse()[0] !==
             props.externalUserId
         ) {
