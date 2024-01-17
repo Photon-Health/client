@@ -72,6 +72,7 @@ type PrescribeProps = {
   toastBuffer: number;
   formStore?: any;
   formActions?: any;
+  externalOrderId?: string;
 };
 
 function PrescribeWorkflow(props: PrescribeProps) {
@@ -304,6 +305,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
 
         const { data: orderData, errors } = await orderMutation({
           variables: {
+            ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
             patientId: props.formStore.patient?.value.id,
             pharmacyId: props?.pharmacyId || props.formStore.pharmacy?.value || '',
             fulfillmentType: props.formStore.fulfillmentType?.value || '',
@@ -493,7 +495,8 @@ customElement(
     weightUnit: 'lbs',
     triggerSubmit: false,
     setTriggerSubmit: undefined,
-    toastBuffer: 0
+    toastBuffer: 0,
+    externalOrderId: undefined
   },
   (props: PrescribeProps) => {
     const { store, actions } = createFormStore({
@@ -530,6 +533,7 @@ customElement(
           toastBuffer={props.toastBuffer}
           formStore={store}
           formActions={actions}
+          externalOrderId={props.externalOrderId}
         />
       </RecentOrders>
     );
