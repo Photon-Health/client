@@ -1,8 +1,8 @@
 import { customElement } from 'solid-element';
 
 //Shoelace Components
-import '@shoelace-style/shoelace/dist/components/alert/alert';
 import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
+import '@shoelace-style/shoelace/dist/components/alert/alert';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/switch/switch';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
@@ -10,33 +10,26 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 //Styles
-import {
-  Button,
-  RecentOrders,
-  SignatureAttestationModal,
-  Spinner,
-  Toaster,
-  useRecentOrders
-} from '@photonhealth/components';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { Order, Prescription } from '@photonhealth/sdk/dist/types';
-import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
+import tailwind from '../tailwind.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
-import { GraphQLError } from 'graphql';
-import { For, Ref, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
-import { usePhoton } from '../context';
-import { PhotonAuthorized } from '../photon-authorized';
+import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
+import styles from './style.css?inline';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import { createEffect, onMount, createSignal, Show, For, createMemo, Ref } from 'solid-js';
 import type { FormError } from '../stores/form';
 import { createFormStore } from '../stores/form';
-import tailwind from '../tailwind.css?inline';
+import { usePhoton } from '../context';
+import { Spinner, Toaster, Button, RecentOrders, useRecentOrders } from '@photonhealth/components';
+import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import { AddPrescriptionCard } from './components/AddPrescriptionCard';
-import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
-import { OrderCard } from './components/OrderCard';
 import { PatientCard } from './components/PatientCard';
+import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
+import { GraphQLError } from 'graphql';
+import { OrderCard } from './components/OrderCard';
 import { PharmacyCard } from './components/PharmacyCard';
-import styles from './style.css?inline';
-import clearForm from './util/clearForm';
+import { PhotonAuthorized } from '../photon-authorized';
 import { formatPatientWeight } from './util/formatPatientWeight';
+import clearForm from './util/clearForm';
 
 import type { TemplateOverrides } from '@photonhealth/components';
 
@@ -350,8 +343,6 @@ function PrescribeWorkflow(props: PrescribeProps) {
     );
   });
 
-  const clinicalClient = client!.sdk.apolloClinical;
-
   let prescriptionRef: HTMLDivElement | undefined;
 
   return (
@@ -377,92 +368,90 @@ function PrescribeWorkflow(props: PrescribeProps) {
             </div>
           </Show>
           <PhotonAuthorized permissions={['write:prescription']}>
-            <SignatureAttestationModal client={clinicalClient}>
-              <PatientCard
+            <PatientCard
+              actions={props.formActions}
+              store={props.formStore}
+              patientId={props.patientId}
+              client={client!}
+              enableOrder={props.enableOrder}
+              address={props.address}
+              weight={props.weight}
+              weightUnit={props.weightUnit}
+              enableMedHistory={props.enableMedHistory}
+            />
+            <Show
+              when={
+                props.formStore.patient?.value?.address ||
+                (props.formStore.patient?.value?.id && !props.enableOrder)
+              }
+            >
+              <Show when={props.enableCombineAndDuplicate}>
+                <RecentOrders.Card />
+              </Show>
+              <Show when={showForm() || isEditing()}>
+                <div ref={prescriptionRef}>
+                  <AddPrescriptionCard
+                    hideAddToTemplates={props.hideTemplates}
+                    actions={props.formActions}
+                    store={props.formStore}
+                    weight={props.weight}
+                    weightUnit={props.weightUnit}
+                    enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+                  />
+                </div>
+              </Show>
+              <DraftPrescriptionCard
+                templateIds={props.templateIds?.split(',') || []}
+                templateOverrides={props.templateOverrides || {}}
+                prescriptionIds={props.prescriptionIds?.split(',') || []}
+                prescriptionRef={prescriptionRef}
                 actions={props.formActions}
                 store={props.formStore}
-                patientId={props.patientId}
-                client={client!}
-                enableOrder={props.enableOrder}
-                address={props.address}
-                weight={props.weight}
-                weightUnit={props.weightUnit}
-                enableMedHistory={props.enableMedHistory}
+                setIsEditing={setIsEditing}
               />
-              <Show
-                when={
-                  props.formStore.patient?.value?.address ||
-                  (props.formStore.patient?.value?.id && !props.enableOrder)
-                }
-              >
-                <Show when={props.enableCombineAndDuplicate}>
-                  <RecentOrders.Card />
-                </Show>
-                <Show when={showForm() || isEditing()}>
-                  <div ref={prescriptionRef}>
-                    <AddPrescriptionCard
-                      hideAddToTemplates={props.hideTemplates}
-                      actions={props.formActions}
-                      store={props.formStore}
-                      weight={props.weight}
-                      weightUnit={props.weightUnit}
-                      enableCombineAndDuplicate={props.enableCombineAndDuplicate}
-                    />
-                  </div>
-                </Show>
-                <DraftPrescriptionCard
-                  templateIds={props.templateIds?.split(',') || []}
-                  templateOverrides={props.templateOverrides || {}}
-                  prescriptionIds={props.prescriptionIds?.split(',') || []}
-                  prescriptionRef={prescriptionRef}
-                  actions={props.formActions}
+              <Show when={props.enableOrder && !props.pharmacyId}>
+                <OrderCard
                   store={props.formStore}
-                  setIsEditing={setIsEditing}
+                  actions={props.formActions}
+                  enableLocalPickup={props.enableLocalPickup}
+                  enableSendToPatient={props.enableSendToPatient}
+                  mailOrderIds={props.mailOrderIds}
                 />
-                <Show when={props.enableOrder && !props.pharmacyId}>
-                  <OrderCard
-                    store={props.formStore}
-                    actions={props.formActions}
-                    enableLocalPickup={props.enableLocalPickup}
-                    enableSendToPatient={props.enableSendToPatient}
-                    mailOrderIds={props.mailOrderIds}
-                  />
-                </Show>
-                <Show when={props.enableOrder && props.pharmacyId}>
-                  <PharmacyCard pharmacyId={props.pharmacyId} />
-                </Show>
-                <Show when={!props.hideSubmit}>
-                  {/* We're hiding this alert message if enable-order is set, a rough way to let us know this is not in the App.
+              </Show>
+              <Show when={props.enableOrder && props.pharmacyId}>
+                <PharmacyCard pharmacyId={props.pharmacyId} />
+              </Show>
+              <Show when={!props.hideSubmit}>
+                {/* We're hiding this alert message if enable-order is set, a rough way to let us know this is not in the App.
               The issue we're having is when props are passed and cards are hidden, the form is not showing validation errors. */}
-                  <Show when={errors().length > 0 && props.enableOrder}>
-                    <div class="m-3">
-                      <For each={errors()} fallback={<div>No errors...</div>}>
-                        {({ key, error }: { key: string; error: string }) => (
-                          <sl-alert variant="warning" open>
-                            <sl-icon slot="icon" name="exclamation-triangle" />
-                            <strong>Error with {key}: </strong>
-                            <br />
-                            {error}
-                            <br />
-                            {JSON.stringify(props.formStore?.[key]?.value || {})}
-                          </sl-alert>
-                        )}
-                      </For>
-                    </div>
-                  </Show>
-                  <div class="flex flex-row justify-end gap-2">
-                    <Show when={!showForm()}>
-                      <Button variant="secondary" onClick={() => setShowForm(true)}>
-                        Add Prescription
-                      </Button>
-                    </Show>
-                    <Button loading={isLoading()} onClick={combineOrSubmit}>
-                      {props.enableOrder ? 'Send Order' : 'Save Prescriptions'}
-                    </Button>
+                <Show when={errors().length > 0 && props.enableOrder}>
+                  <div class="m-3">
+                    <For each={errors()} fallback={<div>No errors...</div>}>
+                      {({ key, error }: { key: string; error: string }) => (
+                        <sl-alert variant="warning" open>
+                          <sl-icon slot="icon" name="exclamation-triangle" />
+                          <strong>Error with {key}: </strong>
+                          <br />
+                          {error}
+                          <br />
+                          {JSON.stringify(props.formStore?.[key]?.value || {})}
+                        </sl-alert>
+                      )}
+                    </For>
                   </div>
                 </Show>
+                <div class="flex flex-row justify-end gap-2">
+                  <Show when={!showForm()}>
+                    <Button variant="secondary" onClick={() => setShowForm(true)}>
+                      Add Prescription
+                    </Button>
+                  </Show>
+                  <Button loading={isLoading()} onClick={combineOrSubmit}>
+                    {props.enableOrder ? 'Send Order' : 'Save Prescriptions'}
+                  </Button>
+                </div>
               </Show>
-            </SignatureAttestationModal>
+            </Show>
           </PhotonAuthorized>
         </div>
       </div>
