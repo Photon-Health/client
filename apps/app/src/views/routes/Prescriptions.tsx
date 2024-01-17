@@ -2,10 +2,8 @@ import { Link as RouterLink, useLocation, useSearchParams, useNavigate } from 'r
 
 import {
   Badge,
-  Box,
   Select,
   HStack,
-  Icon,
   IconButton,
   Skeleton,
   SkeletonCircle,
@@ -15,7 +13,7 @@ import {
   Tooltip,
   useToast
 } from '@chakra-ui/react';
-import { FiInfo, FiShoppingCart, FiX } from 'react-icons/fi';
+import { FiInfo, FiShoppingCart } from 'react-icons/fi';
 import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
@@ -27,6 +25,7 @@ import PatientView from '../components/PatientView';
 import { types } from '@photonhealth/sdk';
 import { gql, useQuery } from '@apollo/client';
 import { Prescription } from 'packages/sdk/dist/types';
+import { StyledToast } from '../components/StyledToast';
 
 const GET_PRESCRIPTIONS = gql`
   query GetPrescriptions(
@@ -124,33 +123,15 @@ const ActionsView = (props: ActionsViewProps) => {
           // Lame, but w/o this the redirect will still happen
           if (disableCreateOrder) {
             toast({
-              position: 'top',
-              // TODO: Override default solid theme with this outline variant
+              position: 'top-right',
+              duration: 4000,
               render: ({ onClose }) => (
-                <Box
-                  color="gray.800"
-                  p={4}
-                  borderWidth="2px"
-                  borderRadius="md"
-                  bg="white"
-                  borderColor="blue.500"
-                >
-                  <HStack align="start">
-                    <Icon as={FiInfo} color="blue.500" boxSize="5" />
-                    <Text>
-                      A new order cannot be created for a depleted prescription. Please create a new
-                      prescription.
-                    </Text>
-                    <IconButton
-                      color="muted"
-                      icon={<FiX fontSize="1.25rem" />}
-                      variant="ghost"
-                      aria-label="close"
-                      title="Close"
-                      onClick={onClose}
-                    />
-                  </HStack>
-                </Box>
+                <StyledToast
+                  onClose={onClose}
+                  type="info"
+                  description="A new order cannot be created for a depleted prescription. Please create a new
+                  prescription."
+                />
               )
             });
             event.preventDefault();

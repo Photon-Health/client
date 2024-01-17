@@ -13,6 +13,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
+    "\n  mutation TicketModalCreateTicket($input: TicketInput!) {\n    createTicket(input: $input) {\n      id\n    }\n  }\n": types.TicketModalCreateTicketDocument,
     "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n  }\n": types.ClientInfoCardFragmentFragmentDoc,
     "\n  query ClientsDeveloperTabQuery {\n    clients {\n      id\n      ...ClientInfoCardFragment\n    }\n  }\n": types.ClientsDeveloperTabQueryDocument,
     "\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n": types.RotateSecretDocument,
@@ -54,6 +55,10 @@ const documents = {
  */
 export function graphql(source: string): unknown;
 
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation TicketModalCreateTicket($input: TicketInput!) {\n    createTicket(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation TicketModalCreateTicket($input: TicketInput!) {\n    createTicket(input: $input) {\n      id\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

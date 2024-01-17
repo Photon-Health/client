@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Button, Card, CardBody, Container, Heading, Text, VStack } from '@chakra-ui/react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
@@ -47,6 +47,13 @@ export const Urgency = () => {
   };
 
   const isMultiRx = flattenedFills.length > 1;
+
+  useEffect(() => {
+    if (selectedIdx) {
+      // Scroll to bottom to make sure selection isn't hidden by footer
+      window.scrollTo({ top: document.getElementById('root').scrollHeight, behavior: 'smooth' });
+    }
+  }, [selectedIdx]);
 
   return (
     <Box>

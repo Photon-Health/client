@@ -18,6 +18,7 @@ import {
 
 import { FiTarget } from 'react-icons/fi';
 import { AsyncSelect, OptionsOrGroups } from 'chakra-react-select';
+import { StyledToast } from './StyledToast';
 
 const formatLocationOptions = (p: any) => {
   const options = p.map((org: any) => {
@@ -48,12 +49,16 @@ export const LocationSearch = ({ isOpen, onClose }: LocationSearchProps) => {
 
   const handleLocationError = (functionName: string) => {
     toast({
-      title: 'Location Search Error',
-      description: 'There was an error searching for locations. Please refresh the page.',
-      status: 'error',
-      position: 'top',
-      duration: 5000,
-      isClosable: true
+      position: 'top-right',
+      duration: 4000,
+      render: ({ onClose }) => (
+        <StyledToast
+          onClose={onClose}
+          type="info"
+          title="Location Search Error"
+          description="There was an error searching for locations. Please refresh the page."
+        />
+      )
     });
     Sentry.withScope((scope) => {
       scope.setTag('component', 'LocationSearch');
