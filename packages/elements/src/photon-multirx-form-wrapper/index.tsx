@@ -1,10 +1,10 @@
-import { Button, triggerToast } from '@photonhealth/components';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { format } from 'date-fns';
-import jwtDecode from 'jwt-decode';
 import { customElement } from 'solid-element';
 import { createSignal, onMount } from 'solid-js';
 import { usePhoton } from '../context';
+import jwtDecode from 'jwt-decode';
+import { triggerToast, Button } from '@photonhealth/components';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import PhotonFormWrapper from '../photon-form-wrapper';
 import { PatientStore } from '../stores/patient';
 
@@ -64,7 +64,6 @@ customElement(
     const [continueSaveOnly, setContinueSaveOnly] = createSignal<boolean>(false);
     const [triggerSubmit, setTriggerSubmit] = createSignal<boolean>(false);
     const { actions: patientActions } = PatientStore;
-    const [hideOrderButton, setHideOrderButton] = createSignal<boolean>(true);
 
     onMount(async () => {
       const token = await client!.getSDK().authentication.getAccessToken();
@@ -195,7 +194,7 @@ customElement(
           title="New Prescriptions"
           titleIconName="prescription"
           headerRight={
-            hideOrderButton() ? null : props.enableOrder ? (
+            props.enableOrder ? (
               <Button size="md" loading={triggerSubmit()} onClick={handleCreateOrder}>
                 Send Order
               </Button>
@@ -257,13 +256,6 @@ customElement(
                   on:photon-order-error={(e: any) => {
                     e.stopPropagation();
                     setTriggerSubmit(false);
-                  }}
-                  on:photon-signature-attestation-agreed={() => {
-                    setHideOrderButton(false);
-                  }}
-                  on:photon-signature-attestation-canceled={() => {
-                    dispatchClosed();
-                    patientActions.clearSelectedPatient();
                   }}
                 />
               </div>
