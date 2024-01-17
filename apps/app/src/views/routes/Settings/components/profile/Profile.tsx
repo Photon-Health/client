@@ -26,6 +26,7 @@ import { Role } from 'packages/sdk/dist/types';
 import { usePhoton } from '@photonhealth/react';
 import { ProfileForm, profileFormSchema } from './ProfileEditForm';
 import { formatAddress } from 'apps/app/src/utils';
+import { StyledToast } from 'apps/app/src/views/components/StyledToast';
 
 const profileQuery = graphql(/* GraphQL */ `
   query MeProfileQuery {
@@ -236,9 +237,11 @@ export const Profile = () => {
             }
           });
           toast({
-            title: 'Profile updated',
-            status: 'success',
-            duration: 4000
+            position: 'top-right',
+            duration: 4000,
+            render: ({ onClose }) => (
+              <StyledToast onClose={onClose} type="success" description="Profile updated" />
+            )
           });
           resetForm();
         } catch (e) {
