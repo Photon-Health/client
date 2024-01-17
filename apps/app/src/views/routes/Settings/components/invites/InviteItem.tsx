@@ -1,10 +1,11 @@
-import { Badge, Td, Text, Tr, HStack, IconButton, useToast, Box, Icon } from '@chakra-ui/react';
+import { Badge, Td, Text, Tr, HStack, IconButton, useToast } from '@chakra-ui/react';
 import { useMutation } from '@apollo/client';
 import { usePhoton } from '@photonhealth/react';
 import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { InvitesQueryDocument } from 'apps/app/src/gql/graphql';
-import { FiCheckCircle, FiSend, FiTrash, FiX } from 'react-icons/fi';
+import { FiSend, FiTrash } from 'react-icons/fi';
 import { confirmWrapper } from '../../../../components/GuardDialog';
+import { StyledToast } from 'apps/app/src/views/components/StyledToast';
 
 export const inviteFragment = graphql(/* GraphQL */ `
   fragment InviteFragment on Invite {
@@ -77,30 +78,10 @@ export const InviteItem = ({ invite: data }: { invite: FragmentType<typeof invit
                   }
                 });
                 toast({
-                  position: 'top',
-                  // TODO: Override default solid theme with this outline variant
+                  position: 'top-right',
+                  duration: 4000,
                   render: ({ onClose }) => (
-                    <Box
-                      color="gray.800"
-                      p={4}
-                      borderWidth="2px"
-                      borderRadius="md"
-                      bg="white"
-                      borderColor="green.500"
-                    >
-                      <HStack>
-                        <Icon as={FiCheckCircle} color="green.500" boxSize="5" />
-                        <Text flex="1">Invite Resent</Text>
-                        <IconButton
-                          color="muted"
-                          icon={<FiX fontSize="1.25rem" />}
-                          variant="ghost"
-                          aria-label="close"
-                          title="Close"
-                          onClick={onClose}
-                        />
-                      </HStack>
-                    </Box>
+                    <StyledToast onClose={onClose} type="success" description="Invite Resent" />
                   )
                 });
               }
@@ -131,30 +112,10 @@ export const InviteItem = ({ invite: data }: { invite: FragmentType<typeof invit
                   }
                 });
                 toast({
-                  position: 'top',
-                  // TODO: Override default solid theme with this outline variant
+                  position: 'top-right',
+                  duration: 4000,
                   render: ({ onClose }) => (
-                    <Box
-                      color="gray.800"
-                      p={4}
-                      borderWidth="2px"
-                      borderRadius="md"
-                      bg="white"
-                      borderColor="green.500"
-                    >
-                      <HStack>
-                        <Icon as={FiCheckCircle} color="green.500" boxSize="5" />
-                        <Text flex="1">Invite Deleted</Text>
-                        <IconButton
-                          color="muted"
-                          icon={<FiX fontSize="1.25rem" />}
-                          variant="ghost"
-                          aria-label="close"
-                          title="Close"
-                          onClick={onClose}
-                        />
-                      </HStack>
-                    </Box>
+                    <StyledToast onClose={onClose} type="success" description="Invite Deleted" />
                   )
                 });
               }
