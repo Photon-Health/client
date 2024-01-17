@@ -9,20 +9,30 @@ import { PhotonContext } from '../context';
 import pkg from '../../package.json';
 import { type User } from '@auth0/auth0-react';
 
-type PhotonClientProps = {
+// convert kebab to camel case
+// https://stackoverflow.com/a/65642944
+type KebabToCamelCase<S extends string> = S extends `${infer T}-${infer U}`
+  ? `${T}${Capitalize<KebabToCamelCase<U>>}`
+  : S;
+
+type CamelCaseKeys<T> = {
+  [K in keyof T as KebabToCamelCase<K & string>]: T[K];
+};
+
+export type PhotonClientProps = {
   domain?: string;
   audience?: string;
   uri?: string;
   id?: string;
-  redirectUri?: string;
-  redirectPath?: string;
+  'redirect-uri'?: string;
+  'redirect-path'?: string;
   org?: string;
-  developmentMode?: boolean;
-  errorMessage?: string;
-  autoLogin: boolean;
-  toastBuffer?: number;
+  'development-mode'?: boolean;
+  'error-message'?: string;
+  'auto-login': boolean;
+  'toast-buffer'?: number;
   env?: Env;
-  externalUserId?: string;
+  'external-user-id'?: string;
 };
 
 const version = pkg?.version ?? 'unknown';
@@ -115,7 +125,7 @@ customElement(
       parse: false
     }
   },
-  (props: PhotonClientProps) => {
+  (props: CamelCaseKeys<PhotonClientProps>) => {
     let ref: any;
 
     const sdk = new PhotonClient(

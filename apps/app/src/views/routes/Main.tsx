@@ -1,8 +1,9 @@
 import { Outlet, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { Center, CircularProgress, Box } from '@chakra-ui/react';
+import type { PhotonClientProps } from '@photonhealth/elements/dist/photon-client';
 
 import { usePhoton } from '@photonhealth/react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Nav } from '../components/Nav';
 import { SelectOrg } from './SelectOrg';
 import { addAlert } from '../../stores/alert';
@@ -13,7 +14,8 @@ import { Env } from '@photonhealth/sdk';
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      'photon-client': unknown;
+      'photon-client': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> &
+        PhotonClientProps;
     }
   }
 }
