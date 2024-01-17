@@ -131,7 +131,7 @@ customElement(
       },
       version
     );
-    const client = new PhotonClientStore(sdk, props.autoLogin, props.redirectPath);
+    const client = new PhotonClientStore(sdk);
     if (props.developmentMode) {
       console.info('[PhotonClient]: Development mode enabled');
     }
@@ -168,6 +168,18 @@ customElement(
           props.externalUserId
         ) {
           store()?.authentication.logout();
+          const args: any = { appState: {} };
+          if (props.redirectPath) {
+            args.appState.returnTo = props.redirectPath;
+          }
+          store()?.authentication.login(args);
+        }
+      }
+    });
+
+    createEffect(() => {
+      if (!store()?.authentication.state.isLoading) {
+        if (!store()?.authentication.state.isAuthenticated && props.autoLogin) {
           const args: any = { appState: {} };
           if (props.redirectPath) {
             args.appState.returnTo = props.redirectPath;

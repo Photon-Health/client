@@ -42,10 +42,15 @@ customElement(
 
     createEffect(() => {
       if (!client?.authentication.state.isLoading) {
-        client?.authentication.checkSession().then(() => {
-          setIsLoading(false);
-          setAuthenticated(client?.authentication.state.isAuthenticated || false);
-        });
+        setIsLoading(false);
+        if (!client?.authentication.state.isAuthenticated && props.autoLogin) {
+          const args: any = { appState: {} };
+          if (props.redirectPath) {
+            args.appState.returnTo = props.redirectPath;
+          }
+          client?.authentication.login(args);
+        }
+        setAuthenticated(client?.authentication.state.isAuthenticated || false);
       } else {
         setIsLoading(true);
       }
