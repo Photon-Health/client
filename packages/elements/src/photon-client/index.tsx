@@ -162,24 +162,19 @@ customElement(
     });
 
     createEffect(() => {
-      if (!store()?.authentication.state.isLoading && props.externalUserId != null) {
-        if (
-          (store().authentication.state.user as User).sub?.split('|').reverse()[0] !==
-          props.externalUserId
-        ) {
-          store()?.authentication.logout();
+      if (!store()?.authentication.state.isLoading) {
+        if (!store()?.authentication.state.isAuthenticated && props.autoLogin) {
           const args: any = { appState: {} };
           if (props.redirectPath) {
             args.appState.returnTo = props.redirectPath;
           }
           store()?.authentication.login(args);
-        }
-      }
-    });
-
-    createEffect(() => {
-      if (!store()?.authentication.state.isLoading) {
-        if (!store()?.authentication.state.isAuthenticated && props.autoLogin) {
+        } else if (
+          props.externalUserId != null &&
+          (store().authentication.state.user as User | undefined)?.sub?.split('|').reverse()[0] !==
+            props.externalUserId
+        ) {
+          store()?.authentication.logout();
           const args: any = { appState: {} };
           if (props.redirectPath) {
             args.appState.returnTo = props.redirectPath;
