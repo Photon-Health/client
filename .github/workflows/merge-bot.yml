@@ -1,0 +1,39 @@
+name: Merge Bot
+
+on:
+  pull_request:
+    branches: [neutron, photon]
+    types:
+      - labeled
+      - ready_for_review
+      - review_request_removed
+      - review_requested
+      - synchronize
+      - unlabeled
+  pull_request_review:
+    branches: [neutron, photon]
+    types:
+      - dismissed
+      - submitted
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    name: Merge
+    steps:
+      - uses: tibdex/github-app-token@v1
+        id: generate-token
+        with:
+          app_id: ${{ secrets.CPR_APP_ID }}
+          private_key: ${{ secrets.CPR_APP_SECRET }}
+      - name: Integration check
+        uses: squalrus/merge-bot@v0.1.0
+        with:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          test: true
+          reviewers: true
+          labels: ready, merge
+          blocking_labels: do not merge
+          checks_enabled: true
+          method: merge
+          delete_source_branch: true
