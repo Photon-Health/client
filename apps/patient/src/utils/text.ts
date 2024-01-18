@@ -126,7 +126,6 @@ export const text = {
   tracking: 'Tracking #:',
   tryPhoton: 'Try Photon',
   urgencyOptions: [
-    'As soon as possible',
     '10:00 am',
     '12:00 pm',
     '2:00 pm',

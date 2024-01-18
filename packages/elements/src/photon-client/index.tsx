@@ -7,6 +7,7 @@ import { PhotonClientStore } from '../store';
 import { hasAuthParams } from '../utils';
 import { PhotonContext } from '../context';
 import pkg from '../../package.json';
+import { type User } from '@auth0/auth0-react';
 
 type PhotonClientProps = {
   domain?: string;
@@ -21,6 +22,7 @@ type PhotonClientProps = {
   autoLogin: boolean;
   toastBuffer?: number;
   env?: Env;
+  externalUserId?: string;
 };
 
 const version = pkg?.version ?? 'unknown';
