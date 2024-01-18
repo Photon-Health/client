@@ -50,7 +50,7 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
               const title = t[fulfillmentType][state].status;
               const isDelivery = fulfillmentType === 'COURIER' || fulfillmentType === 'MAIL_ORDER';
               const description = `${t[fulfillmentType][state].description(isMultiRx)}${
-                isDelivery ? patientAddress : ''
+                isDelivery && state === 'READY' ? patientAddress : ''
               }`;
 
               return (
