@@ -7,6 +7,7 @@ setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/')
 
 import { createEffect, createSignal, JSXElement, mergeProps, Show, createMemo } from 'solid-js';
 import { usePhoton } from '../context';
+import { Spinner } from '@photonhealth/components';
 
 function checkHasPermission(subset: Permission[], superset: Permission[]) {
   return subset.every((permission) => superset.includes(permission));
@@ -69,7 +70,19 @@ export const PhotonAuthorized = (p: { children: JSXElement; permissions?: Permis
               </Show>
             }
           >
-            <AlertMessage message="You are not signed in" />
+            <Show
+              when={client?.autoLogin}
+              fallback={<AlertMessage message="You are not signed in" />}
+            >
+              {/* 
+                If using auto login, we expect that this will only momentarily be visible
+                Either it'll kick out to an auth page, or it'll do the background OAuth dance
+                In either case, a spinner is the correct design
+              */}
+              <div class="w-full flex justify-center">
+                <Spinner color="green" />
+              </div>
+            </Show>
           </Show>
         }
       >
