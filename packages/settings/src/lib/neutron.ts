@@ -2,6 +2,7 @@ import { OrganizationSettings } from '../types';
 
 const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
 const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
+const EMPOWER_ID = 'phr_01HMEZG7Y2SVA4T7MW49XYAPVF';
 // const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
 const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 const HONEYBEE_PHARMACY_ID = 'phr_01GA9HPXNE3TGEWPK91YY8Z4TS';
@@ -235,12 +236,40 @@ export const neutron: {
     ...defaultSettings,
     logo: 'pine_medical_logo.svg',
     accentColor: '#000000',
-    enableRxAndOrder: false
+    enableRxAndOrder: false,
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [EMPOWER_ID]
   },
   // Brightside
   org_Dcq069P9AxLlv4l2: {
     ...defaultSettings,
     logo: 'brightside_health_logo.svg',
     accentColor: '#2e4985'
+  },
+  // Twentyeight Health
+  org_WhLKXXfPPwq8R4vX: {
+    ...defaultSettings,
+    logo: 'twentyeight_health_logo.svg',
+    accentColor: '#f48273',
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
+  },
+  // Frontier Direct Care
+  org_b37dAjtODQmdded8: {
+    ...defaultSettings,
+    logo: 'frontier_direct_care_logo.png',
+    accentColor: '#6AA2B9'
+  },
+  // Circle Medical
+  org_pEJMB30hbJuCzyJL: {
+    ...defaultSettings,
+    logo: 'circle_medical_logo.svg',
+    accentColor: '#0c70e9'
+  },
+  // Transcarent
+  org_YqcUHY5azUJyXll6: {
+    ...defaultSettings,
+    logo: 'transcarent_logo.png',
+    accentColor: '#3d409a'
   }
 };
