@@ -2,6 +2,7 @@ import { MutableRefObject, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { usePhoton } from '@photonhealth/react';
 import { getSettings } from '@client/settings';
+import { datadogRum } from '@datadog/browser-rum';
 
 const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
 const settings = getSettings(envName);
@@ -66,6 +67,19 @@ export const PrescriptionForm = () => {
         'photon-order-combined',
         (e: { detail: { orderId: string } }) => {
           navigate(`/orders/${e.detail.orderId}`);
+        }
+      );
+      ref.current.addEventListener(
+        'photon-datadog-action',
+        (e: {
+          detail: {
+            action: string;
+            data: {
+              [key: string]: unknown;
+            };
+          };
+        }) => {
+          datadogRum.addAction(e.detail.action, e.detail.data);
         }
       );
     }

@@ -1,4 +1,4 @@
-import { createMemo, createSignal, For, Ref } from 'solid-js';
+import { createEffect, createMemo, createSignal, For, Ref } from 'solid-js';
 import { Order } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
 import { useRecentOrders } from '.';
@@ -11,6 +11,7 @@ import uniqueFills from '../../utils/uniqueFills';
 import { usePhotonClient } from '../SDKProvider';
 import triggerToast from '../../utils/toastTriggers';
 import { Address } from '../PatientInfo';
+import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 
 const CREATE_PRESCRIPTIONS_MUTATION = gql`
   mutation RecentOrdersCombineDialogCreatePrescriptions($prescriptions: [PrescriptionInput!]!) {
@@ -66,6 +67,12 @@ export default function RecentOrdersCombineDialog() {
     });
     ref?.dispatchEvent(event);
   };
+
+  createEffect(() => {
+    if (state.isCombineDialogOpen) {
+      dispatchDatadogAction('prescribe-combine-dialog-open', {}, ref);
+    }
+  });
 
   const routingOrder = createMemo(() => {
     return state.orders.find((order) => order.state === 'ROUTING');
@@ -181,7 +188,13 @@ export default function RecentOrdersCombineDialog() {
   };
 
   return (
-    <Dialog open={state.isCombineDialogOpen} onClose={() => actions.setIsCombineDialogOpen(false)}>
+    <Dialog
+      open={state.isCombineDialogOpen}
+      onClose={() => {
+        dispatchDatadogAction('prescribe-combine-dialog-exit', {}, ref);
+        actions.setIsCombineDialogOpen(false);
+      }}
+    >
       <div class="flex flex-col gap-6" ref={ref}>
         <div>
           <div class="table bg-blue-50 text-blue-600 p-2 rounded-full mb-4">
