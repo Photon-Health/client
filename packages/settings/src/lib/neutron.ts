@@ -2,6 +2,7 @@ import { OrganizationSettings } from '../types';
 
 const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
 const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
+const EMPOWER_ID = 'phr_01HMEZG7Y2SVA4T7MW49XYAPVF';
 // const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
 const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 const HONEYBEE_PHARMACY_ID = 'phr_01GA9HPXNE3TGEWPK91YY8Z4TS';
@@ -235,7 +236,9 @@ export const neutron: {
     ...defaultSettings,
     logo: 'pine_medical_logo.svg',
     accentColor: '#000000',
-    enableRxAndOrder: false
+    enableRxAndOrder: false,
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [EMPOWER_ID]
   },
   // Brightside
   org_Dcq069P9AxLlv4l2: {
