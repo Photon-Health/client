@@ -2,7 +2,6 @@ name: Merge Bot
 
 on:
   pull_request:
-    branches: [neutron, photon]
     types:
       - labeled
       - ready_for_review
@@ -11,7 +10,6 @@ on:
       - synchronize
       - unlabeled
   pull_request_review:
-    branches: [neutron, photon]
     types:
       - dismissed
       - submitted
@@ -27,6 +25,7 @@ jobs:
           app_id: ${{ secrets.CPR_APP_ID }}
           private_key: ${{ secrets.CPR_APP_SECRET }}
       - name: Integration check
+        if: github.head_ref == 'photon' || github.head_ref == 'neutron'
         uses: squalrus/merge-bot@v0.1.0
         with:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
