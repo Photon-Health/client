@@ -28,7 +28,7 @@ jobs:
           app_id: ${{ secrets.CPR_APP_ID }}
           private_key: ${{ secrets.CPR_APP_SECRET }}
       - name: Integration check
-        if: github.base_ref == 'photon' || github.base_ref == 'neutron'
+        if: github.base_ref == 'photon' || github.base_ref == 'neutron' || github.base_ref == 'mrochlin/merge-bot'
         uses: squalrus/merge-bot@v0.4.5
         with:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
