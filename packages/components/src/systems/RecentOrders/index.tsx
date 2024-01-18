@@ -1,3 +1,3 @@
 import RecentOrders, { useRecentOrders } from './RecentOrders';
-export { useRecentOrders };
+export { useRecentOrders, RecentOrders };
 export default RecentOrders;
