@@ -247,7 +247,9 @@ export const neutron: {
   org_WhLKXXfPPwq8R4vX: {
     ...defaultSettings,
     logo: 'twentyeight_health_logo.svg',
-    accentColor: '#f48273'
+    accentColor: '#f48273',
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
   },
   // Frontier Direct Care
   org_b37dAjtODQmdded8: {
