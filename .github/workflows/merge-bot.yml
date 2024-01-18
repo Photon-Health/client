@@ -13,6 +13,8 @@ on:
     types:
       - dismissed
       - submitted
+  issue_comment:
+    types: [created, edited, deleted]
 
 jobs:
   merge:
