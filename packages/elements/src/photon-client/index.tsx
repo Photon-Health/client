@@ -131,7 +131,7 @@ customElement(
       },
       version
     );
-    const client = new PhotonClientStore(sdk);
+    const client = new PhotonClientStore(sdk, props.autoLogin);
     if (props.developmentMode) {
       console.info('[PhotonClient]: Development mode enabled');
     }
