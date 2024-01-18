@@ -242,5 +242,29 @@ export const neutron: {
     ...defaultSettings,
     logo: 'brightside_health_logo.svg',
     accentColor: '#2e4985'
+  },
+  // Twentyeight Health
+  org_WhLKXXfPPwq8R4vX: {
+    ...defaultSettings,
+    logo: 'twentyeight_health_logo.svg',
+    accentColor: '#f48273'
+  },
+  // Frontier Direct Care
+  org_b37dAjtODQmdded8: {
+    ...defaultSettings,
+    logo: 'frontier_direct_care_logo.png',
+    accentColor: '#6AA2B9'
+  },
+  // Circle Medical
+  org_pEJMB30hbJuCzyJL: {
+    ...defaultSettings,
+    logo: 'circle_medical_logo.svg',
+    accentColor: '#0c70e9'
+  },
+  // Transcarent
+  org_YqcUHY5azUJyXll6: {
+    ...defaultSettings,
+    logo: 'transcarent_logo.png',
+    accentColor: '#3d409a'
   }
 };

@@ -247,7 +247,7 @@ export const Status = () => {
         </VStack>
       </Container>
 
-      <FixedFooter show={showFooter}>
+      <FixedFooter show={true}>
         <Container as={VStack} w="full">
           <Button
             size="lg"
