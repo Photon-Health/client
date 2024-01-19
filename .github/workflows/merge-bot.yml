@@ -20,7 +20,6 @@ on:
 jobs:
   merge:
     name: Merge
-    # if: ${{ github.event.comment.body == '/merge' }}
     runs-on: ubuntu-latest
     steps:
       - uses: tibdex/github-app-token@v1
@@ -34,11 +33,9 @@ jobs:
         with:
           token: ${{ steps.generate-token.outputs.token }}
       - name: Merge when ready
-        if: |
-          echo ${{ github.event.comment.body }}
-          # (${{ steps.refs.outputs.base_ref }} == 'photon' || ${{ steps.refs.outputs.base_ref }} == 'neutron' || ${{ steps.refs.outputs.base_ref }} == 'mrochlin/merge-bot')
-          ${{ steps.refs.outputs.base_ref }} == 'mrochlin/merge-bot'
         run: |
-          gh pr ${{ github.event.issue.number }} merge --auto --merge
+          echo HELLO ${{ github.event.comment.body }} ${{ github.event.issue.number }}
+          echo GOODBYE ${{ steps.refs.outputs.base_ref }} ${{ steps.refs.outputs.head_ref }}
+          # gh pr ${{ github.event.issue.number }} merge --auto --merge
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
