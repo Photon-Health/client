@@ -27,7 +27,6 @@ jobs:
           private_key: ${{ secrets.CPR_APP_SECRET }}
       - name: Merge when ready
         run: |
-          echo HELLO ${{ contains(github.event.pull_request.labels.*.name, 'ready')  }} 
-          # gh pr ${{ github.event.pull_request.number }} merge --auto --merge
+          gh pr ${{ github.event.pull_request.number }} merge --auto --merge
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
