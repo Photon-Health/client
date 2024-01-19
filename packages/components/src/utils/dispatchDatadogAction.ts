@@ -3,14 +3,14 @@ export const dispatchDatadogAction = (
   data: {
     [key: string]: unknown;
   },
-  ref?: HTMLElement
+  ref: { dispatchEvent(event: CustomEvent): void }
 ) => {
   const event = new CustomEvent('photon-datadog-action', {
     composed: true,
     bubbles: true,
     detail: {
       action,
-      data
+      data: { ...data, timestamp: new Date().toISOString() }
     }
   });
   ref?.dispatchEvent(event);
