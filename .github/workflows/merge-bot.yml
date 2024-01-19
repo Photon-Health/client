@@ -1,40 +1,43 @@
 name: Merge Bot
 
 on:
-  pull_request:
-    types:
-      - labeled
-      - ready_for_review
-      - review_request_removed
-      - review_requested
-      - synchronize
-      - unlabeled
-      - edited
-  pull_request_review:
-    types:
-      - dismissed
-      - submitted
+  # pull_request:
+  #   types:
+  #     - labeled
+  #     - ready_for_review
+  #     - review_request_removed
+  #     - review_requested
+  #     - synchronize
+  #     - unlabeled
+  #     - edited
+  # pull_request_review:
+  #   types:
+  #     - dismissed
+  #     - submitted
   issue_comment:
     types: [created, edited, deleted]
 
 jobs:
   merge:
-    runs-on: ubuntu-latest
     name: Merge
+    if: ${{ github.event.comment.body == '/merge' }}
+    runs-on: ubuntu-latest
     steps:
       - uses: tibdex/github-app-token@v1
         id: generate-token
         with:
           app_id: ${{ secrets.CPR_APP_ID }}
           private_key: ${{ secrets.CPR_APP_SECRET }}
-      - name: Integration check
-        if: github.base_ref == 'photon' || github.base_ref == 'neutron' || github.base_ref == 'mrochlin/merge-bot'
-        uses: comnoco/merge-bot@v0.5.1
+      - name: resolve pr refs
+        id: refs
+        uses: eficode/resolve-pr-refs@main
         with:
+          token: ${{ steps.generate-token.outputs.token }}
+      - name: Merge when ready
+        if: |
+          # (${{ steps.refs.outputs.base_ref }} == 'photon' || ${{ steps.refs.outputs.base_ref }} == 'neutron' || ${{ steps.refs.outputs.base_ref }} == 'mrochlin/merge-bot')
+          ${{ steps.refs.outputs.base_ref }} == 'mrochlin/merge-bot'
+        run: |
+          gh pr ${{ github.event.issue.number }} merge --auto --merge
+        env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
-          reviewers: true
-          labels: ready, merge
-          blocking_labels: do not merge
-          checks_enabled: true
-          method: merge
-          delete_source_branch: true
