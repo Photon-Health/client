@@ -10,7 +10,7 @@ import PharmacySearch from './systems/PharmacySearch';
 import PharmacySelect from './systems/PharmacySelect';
 import Spinner from './particles/Spinner';
 import RadioGroupCards from './particles/RadioGroupCards';
-import RecentOrders, { useRecentOrders } from './systems/RecentOrders';
+import { useRecentOrders, RecentOrders } from './systems/RecentOrders';
 import Dialog from './particles/Dialog';
 import Button from './particles/Button';
 import SDKProvider, { usePhotonClient } from './systems/SDKProvider';
