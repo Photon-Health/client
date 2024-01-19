@@ -20,7 +20,7 @@ type MedicationConceptDropdownProps = {
 };
 
 export const MedicationConceptDropdown = (props: MedicationConceptDropdownProps) => {
-  const client = usePhotonClient();
+  const { client } = usePhotonClient();
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
   const [filterText, setFilterText] = createSignal<string>('');
   const [data, setData] = createSignal<SearchMedication[]>([]);

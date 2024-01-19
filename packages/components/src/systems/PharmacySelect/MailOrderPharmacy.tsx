@@ -23,7 +23,7 @@ const GetPharmacyQuery = gql`
 `;
 
 export function MailOrderPharmacy(props: MailOrderPharmacyProps) {
-  const client = usePhotonClient();
+  const { client } = usePhotonClient();
   const [pharmacy, setPharmacy] = createSignal<Pharmacy | null>(null);
 
   async function fetchPharmacy() {

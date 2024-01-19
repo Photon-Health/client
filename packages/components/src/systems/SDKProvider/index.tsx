@@ -1,7 +1,8 @@
 import { PhotonClient } from '@photonhealth/sdk';
-import { createContext, JSXElement, useContext } from 'solid-js';
+import { createContext, createEffect, JSXElement, Ref, useContext } from 'solid-js';
+import { createStore } from 'solid-js/store';
 
-const SDKContext = createContext<PhotonClient>();
+const SDKContext = createContext<{ client: PhotonClient; ref: Ref<any> | undefined }>();
 
 interface SDKProviderProps {
   client: PhotonClient;
@@ -9,9 +10,27 @@ interface SDKProviderProps {
 }
 
 export default function SDKProvider(props: SDKProviderProps) {
-  return <SDKContext.Provider value={props.client}>{props.children}</SDKContext.Provider>;
+  let ref: Ref<any> | undefined;
+  const [store, setStore] = createStore({
+    client: props.client,
+    ref
+  });
+
+  createEffect(() => {
+    setStore({ client: props.client, ref });
+  });
+
+  return (
+    <SDKContext.Provider value={store}>
+      <div ref={ref}>{props.children}</div>
+    </SDKContext.Provider>
+  );
 }
 
 export function usePhotonClient() {
-  return useContext(SDKContext);
+  const context = useContext(SDKContext);
+  if (!context) {
+    throw new Error('usePhotonClient must be used within a SDKProvider');
+  }
+  return context;
 }

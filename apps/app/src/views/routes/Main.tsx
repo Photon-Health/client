@@ -2,7 +2,7 @@ import { Outlet, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { Center, CircularProgress, Box } from '@chakra-ui/react';
 
 import { usePhoton } from '@photonhealth/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Nav } from '../components/Nav';
 import { SelectOrg } from './SelectOrg';
 import { addAlert } from '../../stores/alert';
@@ -20,6 +20,8 @@ declare global {
 }
 
 export const Main = () => {
+  const ref = useRef<any>(null);
+
   const query = useQueryParams();
 
   // Detect is browser is Safari
@@ -67,6 +69,24 @@ export const Main = () => {
     }
   }, [isLoading, error]);
 
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.addEventListener(
+        'photon-datadog-action',
+        (e: {
+          detail: {
+            action: string;
+            data: {
+              [key: string]: unknown;
+            };
+          };
+        }) => {
+          datadogRum.addAction(e.detail.action, e.detail.data);
+        }
+      );
+    }
+  }, [ref.current]);
+
   if (isLoading || (previouslyAuthed && !isAuthenticated)) {
     return (
       <Center h="100vh">
@@ -101,7 +121,7 @@ export const Main = () => {
 
   return (
     // For infinite scrolling, Safari expects body to be 100vh, while chrome/firefox expects heihgt auto
-    <Box as="section" height={isSafari ? '100vh' : 'auto'} overflowY="auto">
+    <Box as="section" height={isSafari ? '100vh' : 'auto'} overflowY="auto" ref={ref}>
       {isAuthenticated && user?.org_id ? (
         <photon-client
           id={auth0Config.clientId}

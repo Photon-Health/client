@@ -85,11 +85,11 @@ export default function RecentOrdersIssueDialog() {
   let ref: Ref<any> | undefined;
   const [submitting, setSubmitting] = createSignal(false);
   const [state, actions] = useRecentOrders();
-  const client = usePhotonClient();
+  const { client } = usePhotonClient();
 
   createEffect(() => {
     if (state.isIssueDialogOpen) {
-      dispatchDatadogAction('prescribe-issue-dialog-open', {}, ref);
+      dispatchDatadogAction('prescribe-issue-dialog-open', {});
     }
   });
 
@@ -115,7 +115,7 @@ export default function RecentOrdersIssueDialog() {
 
   const createTicket = async (values: TicketProps) => {
     setSubmitting(true);
-    dispatchDatadogAction('prescribe-issue-dialog-submitting', {}, ref);
+    dispatchDatadogAction('prescribe-issue-dialog-submitting', {});
     const body = composeTicket({
       patient: { id: state?.patientId, name: state?.patientName },
       order: { id: state?.orderWithIssue?.id },
@@ -173,7 +173,7 @@ export default function RecentOrdersIssueDialog() {
     <Dialog
       open={state.isIssueDialogOpen}
       onClose={() => {
-        dispatchDatadogAction('prescribe-issue-dialog-exit', {}, ref);
+        dispatchDatadogAction('prescribe-issue-dialog-exit', {});
         actions.setIsIssueDialogOpen(false);
       }}
     >
@@ -242,7 +242,7 @@ export default function RecentOrdersIssueDialog() {
             variant="naked"
             size="xl"
             onClick={() => {
-              dispatchDatadogAction('prescribe-issue-dialog-exit', {}, ref);
+              dispatchDatadogAction('prescribe-issue-dialog-exit', {});
               actions.setIsIssueDialogOpen(false);
             }}
           >

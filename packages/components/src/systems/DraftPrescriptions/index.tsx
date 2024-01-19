@@ -104,7 +104,7 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
     props
   );
   const [isLoading, setIsLoading] = createSignal<boolean>(true);
-  const client = usePhotonClient();
+  const { client } = usePhotonClient();
 
   async function fetchDrafts() {
     setIsLoading(true);

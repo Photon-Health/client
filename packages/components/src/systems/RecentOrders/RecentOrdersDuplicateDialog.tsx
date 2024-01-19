@@ -1,4 +1,4 @@
-import { createEffect, Ref } from 'solid-js';
+import { createEffect, createSignal } from 'solid-js';
 import { useRecentOrders } from '.';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
@@ -8,24 +8,27 @@ import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 import formatRxString from '../../utils/formatRxString';
 
 export default function RecentOrdersDuplicateDialog() {
-  let ref: Ref<any> | undefined;
   const [state, actions] = useRecentOrders();
+  const [exit, setExit] = createSignal(false);
 
   createEffect(() => {
     if (state.isDuplicateDialogOpen) {
-      dispatchDatadogAction('prescribe-duplicate-dialog-open', {}, ref);
+      dispatchDatadogAction('prescribe-duplicate-dialog-open', {});
+    }
+  });
+
+  createEffect(() => {
+    if (exit()) {
+      dispatchDatadogAction('prescribe-duplicate-dialog-exit', {});
     }
   });
 
   return (
     <Dialog
       open={state.isDuplicateDialogOpen}
-      onClose={() => {
-        dispatchDatadogAction('prescribe-duplicate-dialog-exit', {}, ref);
-        actions.setIsDuplicateDialogOpen(false);
-      }}
+      onClose={() => actions.setIsDuplicateDialogOpen(false)}
     >
-      <div class="flex flex-col gap-6" ref={ref}>
+      <div class="flex flex-col gap-6">
         <div>
           <div class="table bg-red-50 text-red-600 p-2 rounded-full mb-4">
             <Icon name="exclamationCircle" />
@@ -63,7 +66,7 @@ export default function RecentOrdersDuplicateDialog() {
             size="xl"
             variant="secondary"
             onClick={() => {
-              dispatchDatadogAction('prescribe-duplicate-dialog-add-anyway', {}, ref);
+              dispatchDatadogAction('prescribe-duplicate-dialog-add-anyway', {});
               state?.duplicateDialogContinueCb?.();
               actions.setIsDuplicateDialogOpen(false);
             }}
@@ -74,7 +77,7 @@ export default function RecentOrdersDuplicateDialog() {
             variant="naked"
             size="xl"
             onClick={() => {
-              dispatchDatadogAction('prescribe-duplicate-dialog-exit', {}, ref);
+              setExit(true);
               actions.setIsDuplicateDialogOpen(false);
             }}
           >

@@ -99,7 +99,7 @@ interface SDKProviderProps {
 }
 
 function RecentOrders(props: SDKProviderProps) {
-  const client = usePhotonClient();
+  const { client } = usePhotonClient();
   const [state, setState] = createStore<RecentOrdersState>({
     orders: [],
     isCombineDialogOpen: false,

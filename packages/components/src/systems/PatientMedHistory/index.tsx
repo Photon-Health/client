@@ -61,7 +61,7 @@ const LoadingRowFallback = () => (
 );
 
 export default function PatientMedHistory(props: PatientMedHistoryProps) {
-  const client = usePhotonClient();
+  const { client } = usePhotonClient();
   const [medHistory, setMedHistory] = createSignal<PatientMedication[] | undefined>(undefined);
 
   const baseURL = createMemo(() => `${client?.clinicalUrl}/prescriptions/`);

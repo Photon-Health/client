@@ -77,7 +77,7 @@ interface PharmacyExtended extends Pharmacy {
 }
 
 export default function PharmacySearch(props: PharmacySearchProps) {
-  const client = usePhotonClient();
+  const { client } = usePhotonClient();
   const [selected, setSelected] = createSignal<any>();
   const [query, setQuery] = createSignal('');
   const [location, setLocation] = createSignal<Location | null>(null);

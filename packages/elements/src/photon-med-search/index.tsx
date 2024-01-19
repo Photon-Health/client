@@ -47,7 +47,7 @@ customElement(
   { open: false, withConcept: false, title: '' },
   (props: MedSearchProps) => {
     let ref: any;
-    const client = usePhotonClient();
+    const { client } = usePhotonClient();
     const [conceptId, setConceptId] = createSignal<string>('');
     const [concept, setConcept] = createSignal<SearchMedication | undefined>(undefined);
     const [medicationId, setMedicationId] = createSignal<string>('');

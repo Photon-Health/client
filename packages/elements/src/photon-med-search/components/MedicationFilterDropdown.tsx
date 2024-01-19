@@ -58,7 +58,7 @@ type MedicationFormDropdownProps = {
 type MedCombo = SearchMedication & Medication;
 
 export const MedicationFilterDropdown = (props: MedicationFormDropdownProps) => {
-  const client = usePhotonClient();
+  const { client } = usePhotonClient();
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
   const [data, setData] = createSignal<MedCombo[]>([]);
   const [filterId, setFilterId] = createSignal<string>();

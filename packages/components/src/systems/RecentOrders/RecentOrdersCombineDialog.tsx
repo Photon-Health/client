@@ -43,7 +43,7 @@ const CREATE_ORDER_MUTATION = gql`
 
 export default function RecentOrdersCombineDialog() {
   let ref: Ref<any> | undefined;
-  const client = usePhotonClient();
+  const { client } = usePhotonClient();
   const [state, actions] = useRecentOrders();
   const [isCreatingOrder, setIsCreatingOrder] = createSignal(false);
   const [isCombiningOrders, setIsCombiningOrders] = createSignal(false);
@@ -70,7 +70,7 @@ export default function RecentOrdersCombineDialog() {
 
   createEffect(() => {
     if (state.isCombineDialogOpen) {
-      dispatchDatadogAction('prescribe-combine-dialog-open', {}, ref);
+      dispatchDatadogAction('prescribe-combine-dialog-open', {});
     }
   });
 
@@ -191,7 +191,7 @@ export default function RecentOrdersCombineDialog() {
     <Dialog
       open={state.isCombineDialogOpen}
       onClose={() => {
-        dispatchDatadogAction('prescribe-combine-dialog-exit', {}, ref);
+        dispatchDatadogAction('prescribe-combine-dialog-exit', {});
         actions.setIsCombineDialogOpen(false);
       }}
     >

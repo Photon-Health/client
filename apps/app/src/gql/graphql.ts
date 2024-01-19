@@ -119,6 +119,7 @@ export type Mutation = {
   deleteInvite: Scalars['ID']['output'];
   deleteWebhookConfig: Scalars['ID']['output'];
   inviteUser: Invite;
+  removeUserFromOrganization: Scalars['ID']['output'];
   resendInvite: Invite;
   rotateClientSecret: Client;
   setUserRoles: Scalars['ID']['output'];
@@ -171,6 +172,11 @@ export type MutationInviteUserArgs = {
   inviter?: InputMaybe<Scalars['String']['input']>;
   provider?: InputMaybe<ProviderInput>;
   roles: Array<Scalars['String']['input']>;
+};
+
+
+export type MutationRemoveUserFromOrganizationArgs = {
+  userId: Scalars['ID']['input'];
 };
 
 

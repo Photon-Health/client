@@ -46,7 +46,7 @@ type AddressFormProps = {
 
 export default function AddressForm(props: AddressFormProps) {
   const [submitting, setSubmitting] = createSignal(false);
-  const client = usePhotonClient();
+  const { client } = usePhotonClient();
 
   const updatePatientAddress = async (address: AddressProps) => {
     await client!.apollo.mutate({

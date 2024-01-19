@@ -37,7 +37,7 @@ const GetPatientQuery = gql`
 
 export function PatientDetails(props: PatientDetailsProps) {
   const [state] = useRadioGroupCards();
-  const client = usePhotonClient();
+  const { client } = usePhotonClient();
   const [patient, setPatient] = createSignal<Patient | null>(null);
 
   async function fetchPatient() {

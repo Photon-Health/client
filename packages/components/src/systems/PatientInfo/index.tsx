@@ -74,7 +74,7 @@ const formatDate = (dateString: string) => {
 };
 
 export default function PatientInfo(props: PatientInfoProps) {
-  const client = usePhotonClient();
+  const { client } = usePhotonClient();
   const [patient, setPatient] = createSignal<Patient | undefined>(undefined);
 
   const fetchPatient = async () => {
