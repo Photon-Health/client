@@ -6,6 +6,7 @@ on:
 
 jobs:
   bumpAndOpen:
+    name: Bump neutron
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
