@@ -30,6 +30,7 @@ const documents = {
     "\n  fragment UserFragment on User {\n    id\n    npi\n    phone\n    fax\n    email\n    address {\n      street1\n      street2\n      state\n      postalCode\n      country\n      city\n    }\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n    roles {\n      description\n      id\n      name\n    }\n  }\n": types.UserFragmentFragmentDoc,
     "\n  mutation SetUserRoles($userId: ID!, $roles: [ID!]!) {\n    setUserRoles(userId: $userId, roles: $roles)\n  }\n": types.SetUserRolesDocument,
     "\n  mutation UpdateProviderProfile(\n    $providerId: ID!\n    $updateProviderProfileInput: UpdateProviderProfileInput!\n  ) {\n    updateProviderProfile(providerId: $providerId, input: $updateProviderProfileInput)\n  }\n": types.UpdateProviderProfileDocument,
+    "\n  mutation RemoveUserFromOrganization($userId: ID!) {\n    removeUserFromOrganization(userId: $userId)\n  }\n": types.RemoveUserFromOrganizationDocument,
     "\n  query UsersListQuery {\n    users {\n      id\n      ...UserFragment\n      email\n      name {\n        full\n      }\n      roles {\n        id\n        name\n      }\n    }\n    roles {\n      name\n      id\n    }\n  }\n": types.UsersListQueryDocument,
     "\n  query AllRolesSelect {\n    roles {\n      id\n      name\n      description\n    }\n  }\n": types.AllRolesSelectDocument,
     "\n  fragment WebhookItemFragment on WebhookConfig {\n    id\n    url\n  }\n": types.WebhookItemFragmentFragmentDoc,
@@ -122,6 +123,10 @@ export function graphql(source: "\n  mutation SetUserRoles($userId: ID!, $roles:
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation UpdateProviderProfile(\n    $providerId: ID!\n    $updateProviderProfileInput: UpdateProviderProfileInput!\n  ) {\n    updateProviderProfile(providerId: $providerId, input: $updateProviderProfileInput)\n  }\n"): (typeof documents)["\n  mutation UpdateProviderProfile(\n    $providerId: ID!\n    $updateProviderProfileInput: UpdateProviderProfileInput!\n  ) {\n    updateProviderProfile(providerId: $providerId, input: $updateProviderProfileInput)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RemoveUserFromOrganization($userId: ID!) {\n    removeUserFromOrganization(userId: $userId)\n  }\n"): (typeof documents)["\n  mutation RemoveUserFromOrganization($userId: ID!) {\n    removeUserFromOrganization(userId: $userId)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
