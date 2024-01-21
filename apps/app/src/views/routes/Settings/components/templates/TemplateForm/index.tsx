@@ -31,6 +31,7 @@ import { Treatment } from './components/Treatment';
 import { types, usePhoton } from '@photonhealth/react';
 import { CATALOG_TREATMENTS_FIELDS } from 'apps/app/src/model/fragments';
 import { TEMPLATE_INITIAL_VALUES, TEMPLATE_SCHEMA, TemplateSchemaType } from './utils';
+import { StyledToast } from 'apps/app/src/views/components/StyledToast';
 
 type PrescriptionTemplate = types.PrescriptionTemplate;
 
@@ -191,8 +192,11 @@ export const TemplateForm = ({
           resetForm();
           handleClose();
           toast({
-            title: 'Template edited',
-            status: 'success'
+            position: 'top-right',
+            duration: 4000,
+            render: ({ onClose }) => (
+              <StyledToast onClose={onClose} type="success" description="Template edited" />
+            )
           });
         }
       });
@@ -225,8 +229,11 @@ export const TemplateForm = ({
           resetForm();
           handleClose();
           toast({
-            title: 'Template added',
-            status: 'success'
+            position: 'top-right',
+            duration: 4000,
+            render: ({ onClose }) => (
+              <StyledToast onClose={onClose} type="success" description="Template added" />
+            )
           });
         }
       });

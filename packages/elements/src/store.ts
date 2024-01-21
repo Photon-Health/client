@@ -116,8 +116,12 @@ export class PhotonClientStore {
       }>;
     };
   };
-  public constructor(sdk: PhotonClient) {
+
+  public autoLogin: boolean;
+
+  public constructor(sdk: PhotonClient, autoLogin = false) {
     this.sdk = sdk;
+    this.autoLogin = autoLogin;
     const [store, setStore] = createStore<{
       authentication: {
         isAuthenticated: boolean;

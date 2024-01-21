@@ -36,4 +36,5 @@ export type OrganizationSettings = {
   federated?: boolean;
   enableMedHistory?: boolean;
   enableRxAndOrder?: boolean;
+  enableCombineAndDuplicate?: boolean;
 };

@@ -25,6 +25,7 @@ import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 import { FormikTouched, FormikErrors, ErrorMessage, Field, Formik } from 'formik';
 import { Role } from 'packages/sdk/dist/types';
+import { StyledToast } from 'apps/app/src/views/components/StyledToast';
 
 export const userFragment = graphql(/* GraphQL */ `
   fragment UserFragment on User {
@@ -256,9 +257,11 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
                 }
               });
               toast({
-                title: 'Role updated',
-                status: 'success',
-                duration: 4000
+                position: 'top-right',
+                duration: 4000,
+                render: ({ onClose }) => (
+                  <StyledToast onClose={onClose} type="success" description="Role Updated" />
+                )
               });
               resetForm();
               onClose();

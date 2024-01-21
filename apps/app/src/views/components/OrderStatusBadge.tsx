@@ -1,5 +1,5 @@
 import { Tag, TagLabel, TagLeftIcon, Tooltip } from '@chakra-ui/react';
-import { OrderState } from 'packages/sdk/dist/types';
+import { OrderState } from '@photonhealth/sdk/dist/types';
 import {
   FiAlertTriangle,
   FiArrowUpRight,

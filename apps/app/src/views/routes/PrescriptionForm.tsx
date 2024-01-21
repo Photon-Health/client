@@ -2,6 +2,7 @@ import { MutableRefObject, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { usePhoton } from '@photonhealth/react';
 import { getSettings } from '@client/settings';
+import { datadogRum } from '@datadog/browser-rum';
 
 const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
 const settings = getSettings(envName);
@@ -62,6 +63,25 @@ export const PrescriptionForm = () => {
       ref.current.addEventListener('photon-prescriptions-closed', () => {
         onClose();
       });
+      ref.current.addEventListener(
+        'photon-order-combined',
+        (e: { detail: { orderId: string } }) => {
+          navigate(`/orders/${e.detail.orderId}`);
+        }
+      );
+      ref.current.addEventListener(
+        'photon-datadog-action',
+        (e: {
+          detail: {
+            action: string;
+            data: {
+              [key: string]: unknown;
+            };
+          };
+        }) => {
+          datadogRum.addAction(e.detail.action, e.detail.data);
+        }
+      );
     }
   }, [ref.current]);
 
@@ -94,6 +114,7 @@ export const PrescriptionForm = () => {
           enable-med-history={settings[user.org_id]?.enableMedHistory ?? false}
           enable-local-pickup={settings[user.org_id]?.pickUp ?? false}
           enable-send-to-patient={settings[user.org_id]?.sendToPatient ?? false}
+          enable-combine-and-duplicate={settings[user.org_id]?.enableCombineAndDuplicate ?? false}
           mail-order-ids={settings[user.org_id]?.mailOrderProviders?.join(',') ?? ''}
           toast-buffer={70}
         />

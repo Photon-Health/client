@@ -9,6 +9,7 @@ import { addAlert } from '../../stores/alert';
 import { auth0Config } from '../../configs/auth';
 import useQueryParams from '../../hooks/useQueryParams';
 import { Env } from '@photonhealth/sdk';
+import { datadogRum } from '@datadog/browser-rum';
 
 declare global {
   namespace JSX {
@@ -38,6 +39,16 @@ export const Main = () => {
     if (!isLoading && !isAuthenticated && !error) {
       localStorage.removeItem('previouslyAuthed');
       setPreviouslyAuthed(false);
+    }
+    if (isAuthenticated && !isLoading) {
+      // global context to the datadog RUM session
+      datadogRum.addRumGlobalContext('org', {
+        orgId: user.org_id
+      });
+      datadogRum.setUser({
+        email: user.email,
+        name: user.name
+      });
     }
   }, [isAuthenticated, isLoading]);
 
