@@ -10,14 +10,14 @@ import {
   ModalOverlay,
   useDisclosure
 } from '@chakra-ui/react';
-import { FiEdit, FiMoreVertical } from 'react-icons/fi';
+import { FiEdit, FiMoreVertical, FiTrash } from 'react-icons/fi';
 import { EditRolesAction } from './EditRolesAction';
 import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
-import RemoveUserMenuItem from './RemoveUserActionItem';
+import { RemoveUserAction } from './RemoveUserActionItem';
 
 export const userFragment = graphql(/* GraphQL */ `
   fragment UserFragment on User {
-    ...RemoveUserActionItemUserFragment
+    ...RemoveUserActionUserFragment
     ...EditRolesActionUserFragment
     id
     npi
@@ -53,6 +53,11 @@ interface UserItemActionsProps {
 
 export const UserItemActions: React.FC<UserItemActionsProps> = ({ user }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: removeUserIsOpen,
+    onOpen: removeUseronOpen,
+    onClose: removeUserOnClose
+  } = useDisclosure();
   const userData = useFragment(userFragment, user);
   return (
     <HStack justifyContent="flex-end">
@@ -67,12 +72,20 @@ export const UserItemActions: React.FC<UserItemActionsProps> = ({ user }) => {
           <MenuItem icon={<FiEdit fontSize="1.2em" />} onClick={onOpen}>
             Edit Roles
           </MenuItem>
-          <RemoveUserMenuItem user={userData} onDelete={onClose} />
+          <MenuItem icon={<FiTrash fontSize="1.2em" color="red" />} onClick={removeUseronOpen}>
+            Remove User
+          </MenuItem>
         </MenuList>
       </Menu>
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
         {isOpen && user && <EditRolesAction user={userData} onClose={onClose}></EditRolesAction>}
+      </Modal>
+      <Modal isOpen={removeUserIsOpen} onClose={removeUserOnClose} size="xl">
+        <ModalOverlay />
+        {removeUserIsOpen && user && (
+          <RemoveUserAction user={userData} onClose={removeUserOnClose}></RemoveUserAction>
+        )}
       </Modal>
     </HStack>
   );
