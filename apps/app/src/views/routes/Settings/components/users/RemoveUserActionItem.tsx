@@ -23,11 +23,7 @@ export const userFragment = graphql(/* GraphQL */ `
     id
     email
     name {
-      first
       full
-      last
-      middle
-      title
     }
   }
 `);
