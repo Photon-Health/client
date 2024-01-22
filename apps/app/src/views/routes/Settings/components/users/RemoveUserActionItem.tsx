@@ -49,7 +49,8 @@ export const RemoveUserAction: React.FC<RemoveUserActionProps> = ({ user, onClos
   const userData = useFragment(userFragment, user);
   const [removeUser, { error }] = useMutation(RemoveUserFromOrganizationMutation, {
     client: clinicalClient,
-    refetchQueries: ['UsersListQuery']
+    refetchQueries: ['UsersListQuery'],
+    awaitRefetchQueries: true
   });
 
   const handleRemoveUser = async () => {
