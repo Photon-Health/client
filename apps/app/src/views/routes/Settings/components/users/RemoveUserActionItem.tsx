@@ -1,4 +1,3 @@
-// RemoveUserMenuItem.tsx
 import React from 'react';
 import { MenuItem, useColorMode, useToast } from '@chakra-ui/react';
 import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
@@ -9,31 +8,14 @@ import { usePhoton } from '@photonhealth/react';
 import { StyledToast } from 'apps/app/src/views/components/StyledToast';
 
 export const userFragment = graphql(/* GraphQL */ `
-  fragment UserFragment on User {
+  fragment RemoveUserActionItemUserFragment on User {
     id
-    npi
-    phone
-    fax
-    email
-    address {
-      street1
-      street2
-      state
-      postalCode
-      country
-      city
-    }
     name {
       first
       full
       last
       middle
       title
-    }
-    roles {
-      description
-      id
-      name
     }
   }
 `);

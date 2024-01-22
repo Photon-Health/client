@@ -12,11 +12,13 @@ import {
 } from '@chakra-ui/react';
 import { FiEdit, FiMoreVertical } from 'react-icons/fi';
 import { EditRolesAction } from './EditRolesAction';
-import { FragmentType, graphql } from 'apps/app/src/gql';
+import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import RemoveUserMenuItem from './RemoveUserActionItem';
 
 export const userFragment = graphql(/* GraphQL */ `
   fragment UserFragment on User {
+    ...RemoveUserActionItemUserFragment
+    ...EditRolesActionUserFragment
     id
     npi
     phone
@@ -51,7 +53,7 @@ interface UserItemActionsProps {
 
 export const UserItemActions: React.FC<UserItemActionsProps> = ({ user }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-
+  const userData = useFragment(userFragment, user);
   return (
     <HStack justifyContent="flex-end">
       <Menu autoSelect={false}>
@@ -65,12 +67,12 @@ export const UserItemActions: React.FC<UserItemActionsProps> = ({ user }) => {
           <MenuItem icon={<FiEdit fontSize="1.2em" />} onClick={onOpen}>
             Edit Roles
           </MenuItem>
-          <RemoveUserMenuItem user={user} onDelete={onClose} />
+          <RemoveUserMenuItem user={userData} onDelete={onClose} />
         </MenuList>
       </Menu>
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
-        {isOpen && user && <EditRolesAction user={user} onClose={onClose}></EditRolesAction>}
+        {isOpen && user && <EditRolesAction user={userData} onClose={onClose}></EditRolesAction>}
       </Modal>
     </HStack>
   );
