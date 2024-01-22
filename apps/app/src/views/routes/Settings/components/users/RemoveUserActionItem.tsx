@@ -1,6 +1,6 @@
 // RemoveUserMenuItem.tsx
 import React from 'react';
-import { MenuItem, useToast, Text } from '@chakra-ui/react';
+import { MenuItem, useColorMode, useToast } from '@chakra-ui/react';
 import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { FiTrash } from 'react-icons/fi';
 import { confirmWrapper } from '../../../../components/GuardDialog';
@@ -51,6 +51,7 @@ const RemoveUserFromOrganizationMutation = graphql(/* GraphQL */ `
 
 const RemoveUserMenuItem: React.FC<RemoveUserMenuItemProps> = ({ user, onDelete }) => {
   const toast = useToast();
+  const { colorMode } = useColorMode();
   const { clinicalClient } = usePhoton();
   const userData = useFragment(userFragment, user);
   const [removeUser, { loading: deleteLoading }] = useMutation(RemoveUserFromOrganizationMutation, {
@@ -60,9 +61,10 @@ const RemoveUserMenuItem: React.FC<RemoveUserMenuItemProps> = ({ user, onDelete 
 
   const handleRemoveUser = async () => {
     const decision = await confirmWrapper('Remove user?', {
-      description: <Text mb={2}>This will remove user from the organization.</Text>,
+      description: `user - ${userData.name?.full} will be removed from your organization`,
       cancelText: 'Cancel',
-      confirmText: 'Delete',
+      confirmText: 'Yes, Remove',
+      darkMode: colorMode !== 'light',
       colorScheme: 'red'
     });
 
