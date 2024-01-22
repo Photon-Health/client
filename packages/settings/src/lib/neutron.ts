@@ -2,9 +2,12 @@ import { OrganizationSettings } from '../types';
 
 const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
 const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
+const EMPOWER_ID = 'phr_01HMEZG7Y2SVA4T7MW49XYAPVF';
 // const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
 const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 const HONEYBEE_PHARMACY_ID = 'phr_01GA9HPXNE3TGEWPK91YY8Z4TS';
+const TRUE_PILL_ID = 'phr_01HHDHKAMNMKC3CRY8VCYRVVPE';
+const COSTCO_ID = 'phr_01GA9HPWTQ75YNJGFD505X5C4J';
 
 /**
  * All orgs inherit from default settings, so updates
@@ -22,12 +25,13 @@ const defaultSettings: OrganizationSettings = {
   mailOrderNavigateProviders: [],
   sendToPatient: true,
   sendToPatientUsers: [],
-  enablePatientRerouting: true,
-  enableCourierNavigate: true,
+  enablePatientRerouting: false,
+  enableCourierNavigate: false,
   returnTo: window.location.origin,
   federated: false,
   enableMedHistory: false,
-  enableRxAndOrder: false
+  enableRxAndOrder: true,
+  enableCombineAndDuplicate: true
 };
 
 /**
@@ -45,8 +49,8 @@ export const neutron: {
     logo: 'photon',
     accentColor: '#b35724',
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID, CAREPOINT_ID],
-    enableCourierNavigate: true
+    enableMedHistory: true,
+    mailOrderProviders: [CUREXA_ID, CAREPOINT_ID, TRUE_PILL_ID, HONEYBEE_PHARMACY_ID]
   },
   // NewCo (demo's)
   org_YiUudCToTSrjOuow: {
@@ -61,16 +65,17 @@ export const neutron: {
   // Demo (demo's)
   org_TY5GFYPIRo3xQGYM: {
     ...defaultSettings,
-    mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
-    enablePatientRerouting: true,
-    enableMedHistory: true,
-    enableRxAndOrder: true
+    logo: 'sesame_logo.jpg',
+    accentColor: '#5224C7',
+    enableCourierNavigate: false,
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [COSTCO_ID]
   },
   // Weekend Health
   org_u93EDGhy5I4Ia5Bb: {
     ...defaultSettings,
-    sendOrder: false
+    sendOrder: false,
+    enableRxAndOrder: false
   },
   // Modern Pediatrics
   org_XiV8H4uCFu6QFUov: {
@@ -88,8 +93,7 @@ export const neutron: {
   org_0WP4tWCftMEM7K2q: {
     ...defaultSettings,
     logo: 'modern_ritual_logo.webp',
-    accentColor: '#202a36',
-    sendToPatient: false
+    accentColor: '#202a36'
   },
   // Radish Health
   org_kBuUKySvfFeWLovJ: {
@@ -114,7 +118,8 @@ export const neutron: {
     federated: true,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    sendToPatient: false
+    sendToPatient: false,
+    enableRxAndOrder: false
   },
   // MisterRx
   org_BBTs0RfOHqjpOO92: {
@@ -136,8 +141,7 @@ export const neutron: {
   org_vISrdMELQC3MhOFb: {
     ...defaultSettings,
     logo: 'blueberry_logo.png',
-    accentColor: '#235AFF',
-    enablePatientRerouting: false
+    accentColor: '#235AFF'
   },
   // Sunny
   org_PILXReL8NKiTWxD3: {
@@ -181,12 +185,6 @@ export const neutron: {
     logo: 'assure_health_logo.svg',
     accentColor: '#66cca9'
   },
-  // Sunrise
-  org_SgWtqCKFzYaDePCf: {
-    ...defaultSettings,
-    logo: 'sunrise_logo.svg',
-    accentColor: '#0057b8'
-  },
   // Found
   org_PwzQxriG4OcMD0iq: {
     ...defaultSettings,
@@ -203,7 +201,10 @@ export const neutron: {
   org_QFoulY6Ornx7dMdw: {
     ...defaultSettings,
     logo: 'sesame_logo.jpg',
-    accentColor: '#5224C7'
+    accentColor: '#5224C7',
+    enableCourierNavigate: false,
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [COSTCO_ID]
   },
   // Oshi Health
   org_yOgsgGMBVUZIBcwp: {
@@ -227,6 +228,48 @@ export const neutron: {
   org_aE5uK35xUqfDjMD4: {
     ...defaultSettings,
     logo: 'piction_health_logo.png',
-    accentColor: '#3377e2'
+    accentColor: '#3377e2',
+    enableRxAndOrder: false
+  },
+  // Pine Medical
+  org_SgWtqCKFzYaDePCf: {
+    ...defaultSettings,
+    logo: 'pine_medical_logo.svg',
+    accentColor: '#000000',
+    enableRxAndOrder: false,
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [EMPOWER_ID]
+  },
+  // Brightside
+  org_Dcq069P9AxLlv4l2: {
+    ...defaultSettings,
+    logo: 'brightside_health_logo.svg',
+    accentColor: '#2e4985'
+  },
+  // Twentyeight Health
+  org_WhLKXXfPPwq8R4vX: {
+    ...defaultSettings,
+    logo: 'twentyeight_health_logo.svg',
+    accentColor: '#f48273',
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
+  },
+  // Frontier Direct Care
+  org_b37dAjtODQmdded8: {
+    ...defaultSettings,
+    logo: 'frontier_direct_care_logo.png',
+    accentColor: '#6AA2B9'
+  },
+  // Circle Medical
+  org_pEJMB30hbJuCzyJL: {
+    ...defaultSettings,
+    logo: 'circle_medical_logo.svg',
+    accentColor: '#0c70e9'
+  },
+  // Transcarent
+  org_YqcUHY5azUJyXll6: {
+    ...defaultSettings,
+    logo: 'transcarent_logo.png',
+    accentColor: '#3d409a'
   }
 };

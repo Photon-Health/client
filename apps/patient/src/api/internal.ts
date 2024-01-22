@@ -36,15 +36,20 @@ export const getPharmacies = async (
     radius: number;
   },
   limit: number,
-  offset: number
+  offset: number,
+  isOpenNow: boolean,
+  is24hr: boolean
 ) => {
   try {
+    const now = new Date();
     const response: { pharmaciesByLocation: types.Pharmacy[] } = await graphQLClient.request(
       GET_PHARMACIES,
       {
         location: searchParams,
         limit,
-        offset
+        offset,
+        openAt: isOpenNow ? now : undefined,
+        is24hr
       }
     );
     if (response?.pharmaciesByLocation?.length > 0) {

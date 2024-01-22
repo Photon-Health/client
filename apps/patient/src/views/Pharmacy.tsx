@@ -15,18 +15,19 @@ import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { Helmet } from 'react-helmet';
 import { types } from '@photonhealth/sdk';
 import * as TOAST_CONFIG from '../configs/toast';
-import { formatAddress, enrichPharmacy } from '../utils/general';
-import { ExtendedFulfillmentType } from '../utils/models';
+import { formatAddress, preparePharmacyHours } from '../utils/general';
+import { ExtendedFulfillmentType, Pharmacy as PharmacyWithHours } from '../utils/models';
 import { text as t } from '../utils/text';
-import { FixedFooter } from '../components/FixedFooter';
-import { Nav } from '../components/Nav';
-import { PoweredBy } from '../components/PoweredBy';
-import { LocationModal } from '../components/LocationModal';
-import { PickupOptions } from '../components/PickupOptions';
-import { BrandedOptions } from '../components/BrandedOptions';
+import {
+  BrandedOptions,
+  FixedFooter,
+  LocationModal,
+  Nav,
+  PickupOptions,
+  PoweredBy
+} from '../components';
 import { useOrderContext } from './Main';
 import { getSettings } from '@client/settings';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import {
   geocode,
   getPharmacies,
@@ -41,14 +42,11 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
 const settings = getSettings(process.env.REACT_APP_ENV_NAME);
 
-export const UNOPEN_BUSINESS_STATUS_MAP = {
-  CLOSED_TEMPORARILY: 'Closed Temporarily',
-  CLOSED_PERMANENTLY: 'Closed Permanently'
-};
-const MAX_ENRICHMENT = 5; // Maximum number of pharmacies to enrich at a time
+const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
+const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
 
 export const Pharmacy = () => {
-  const { order, setOrder } = useOrderContext();
+  const { order, flattenedFills, setOrder } = useOrderContext();
 
   const orgSettings =
     order?.organization?.id in settings ? settings[order.organization.id] : settings.default;
@@ -63,7 +61,6 @@ export const Pharmacy = () => {
 
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
-  const [initialPharmacies, setInitialPharmacies] = useState<EnrichedPharmacy[]>([]);
   const [pharmacyOptions, setPharmacyOptions] = useState([]);
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<string>('');
@@ -77,11 +74,12 @@ export const Pharmacy = () => {
   const [location, setLocation] = useState<string>(
     order?.address ? formatAddress(order.address) : ''
   );
+  const [enableOpenNow, setEnableOpenNow] = useState(false);
+  const [enable24Hr, setEnable24Hr] = useState(false);
 
   const toast = useToast();
 
   const reset = () => {
-    setInitialPharmacies([]);
     setPharmacyOptions([]);
     setSelectedId('');
     setShowFooter(false);
@@ -116,8 +114,18 @@ export const Pharmacy = () => {
     setLatitude(40.717484);
     setLongitude(-73.955662397568);
 
-    setInitialPharmacies(demoPharmacies);
-    setPharmacyOptions(demoPharmacies.slice(0, 5));
+    let pharmacies =
+      enableOpenNow || enable24Hr
+        ? demoPharmacies.filter((p) => (enableOpenNow && p.isOpen) || (enable24Hr && p.is24Hr))
+        : demoPharmacies;
+
+    pharmacies = pharmacies.slice(0, 5);
+
+    setPharmacyOptions(pharmacies);
+
+    if (pharmacies.length < 5) {
+      setShowingAllPharmacies(true);
+    }
   };
 
   const initialize = async () => {
@@ -154,15 +162,16 @@ export const Pharmacy = () => {
     // Get pharmacies from photon db
     let pharmaciesResult: types.Pharmacy[];
     try {
-      // Get pharmacies from photon db
       pharmaciesResult = await getPharmacies(
         {
           latitude: lat,
           longitude: lng,
-          radius: 25
+          radius: PHARMACY_SEARCH_RADIUS_IN_MILES
         },
-        30, // Set high to ensure indie's are found. Request time increase is minimal.
-        0
+        GET_PHARMACIES_COUNT,
+        0,
+        enableOpenNow,
+        enable24Hr
       );
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
         setLoadingPharmacies(false);
@@ -184,14 +193,10 @@ export const Pharmacy = () => {
       return;
     }
 
-    // Save in case we fetched more than we initially show
-    setInitialPharmacies(pharmaciesResult);
-
-    // We only show add a few at a time, so just enrich the first group of pharmacies
-    const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
-      pharmaciesResult.slice(0, MAX_ENRICHMENT).map((p) => enrichPharmacy(p, true))
+    const preparedPharmacies: PharmacyWithHours[] = pharmaciesResult.map((p) =>
+      preparePharmacyHours(p)
     );
-    setPharmacyOptions(enrichedPharmacies);
+    setPharmacyOptions(preparedPharmacies);
 
     setLoadingPharmacies(false);
   };
@@ -200,52 +205,38 @@ export const Pharmacy = () => {
     setLoadingPharmacies(true);
 
     if (isDemo) {
-      const newPharmacyOptions = demoPharmacies.slice(
+      const pharmacies =
+        enableOpenNow || enable24Hr
+          ? demoPharmacies.filter((p) => (enableOpenNow && p.isOpen) || (enable24Hr && p.is24Hr))
+          : demoPharmacies;
+
+      const newPharmacyOptions = pharmacies.slice(
         pharmacyOptions.length,
-        pharmacyOptions.length + MAX_ENRICHMENT
+        pharmacyOptions.length + GET_PHARMACIES_COUNT
       );
       const totalPharmacyOptions = [...pharmacyOptions, ...newPharmacyOptions];
       setPharmacyOptions(totalPharmacyOptions);
       setLoadingPharmacies(false);
 
-      if (totalPharmacyOptions.length === demoPharmacies.length) {
+      if (totalPharmacyOptions.length === pharmacies.length) {
         setShowingAllPharmacies(true);
       }
 
       return;
     }
 
-    /**
-     * Initially we fetched a list of pharmacies from our db, if some
-     * of those haven't received ratings/hours, enrich those first
-     *  */
-    const newPharmacies: EnrichedPharmacy[] = await Promise.all(
-      initialPharmacies
-        .slice(pharmacyOptions.length, pharmacyOptions.length + MAX_ENRICHMENT)
-        .map((p) => enrichPharmacy(p, true))
-    );
-
-    if (newPharmacies.length === MAX_ENRICHMENT) {
-      // Break early and return enriched pharmacies
-      setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
-      setLoadingPharmacies(false);
-      return;
-    }
-
-    const pharmaciesToGet = MAX_ENRICHMENT - newPharmacies.length;
-    const totalEnriched = pharmacyOptions.length + newPharmacies.length;
-
-    // Get pharmacies from our db
     let pharmaciesResult: types.Pharmacy[];
     try {
       pharmaciesResult = await getPharmacies(
         {
           latitude,
           longitude,
-          radius: 25
+          radius: PHARMACY_SEARCH_RADIUS_IN_MILES
         },
-        pharmaciesToGet,
-        totalEnriched
+        GET_PHARMACIES_COUNT,
+        pharmacyOptions.length,
+        enableOpenNow,
+        enable24Hr
       );
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
         setLoadingPharmacies(false);
@@ -258,17 +249,15 @@ export const Pharmacy = () => {
           title: 'No pharmacies found near location',
           ...TOAST_CONFIG.WARNING
         });
+        setShowingAllPharmacies(true);
       } else {
         console.log(error);
       }
     }
 
-    const enrichedPharmacies: EnrichedPharmacy[] = await Promise.all(
-      pharmaciesResult.map((p) => enrichPharmacy(p, true))
-    );
-    newPharmacies.push(...enrichedPharmacies);
+    const preparedPharmacies: PharmacyWithHours[] = pharmaciesResult.map(preparePharmacyHours);
+    setPharmacyOptions([...pharmacyOptions, ...preparedPharmacies]);
 
-    setPharmacyOptions([...pharmacyOptions, ...newPharmacies]);
     setLoadingPharmacies(false);
   };
 
@@ -325,17 +314,31 @@ export const Pharmacy = () => {
           setTimeout(() => {
             setShowFooter(false);
 
+            // Fudge it so that we can show the pharmacy card on initial load of the
+            // status view for all types. On my christmas list for 2024 is better
+            // fulfillment types on pharmacies.
             let type: ExtendedFulfillmentType = types.FulfillmentType.PickUp;
+            let selectedPharmacy = null;
             if (selectedId in capsulePharmacyIdLookup) {
               type = 'COURIER';
-            } else if (orgSettings.mailOrderNavigateProviders.includes(selectedId)) {
+              selectedPharmacy = { id: selectedId, name: 'Capsule Pharmacy' };
+            } else if (selectedId === process.env.REACT_APP_ALTO_PHARMACY_ID) {
+              type = 'COURIER';
+              selectedPharmacy = { id: selectedId, name: 'Alto Pharmacy' };
+            } else if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
               type = types.FulfillmentType.MailOrder;
+              selectedPharmacy = { id: selectedId, name: 'Amazon Pharmacy' };
+            } else if (selectedId === process.env.REACT_APP_COSTCO_PHARMACY_ID) {
+              type = types.FulfillmentType.MailOrder;
+              selectedPharmacy = { id: selectedId, name: 'Costco Pharmacy' };
+            } else {
+              type = types.FulfillmentType.PickUp;
+              selectedPharmacy = pharmacyOptions.find((p) => p.id === selectedId);
             }
 
-            // Update the order context so /status shows the newly selected pharmacy
-            const selectedPharmacy = pharmacyOptions.find((p) => p.id === selectedId);
             setOrder({
               ...order,
+              // Update the order context so /status shows the newly selected pharmacy
               pharmacy: selectedPharmacy
             });
 
@@ -422,24 +425,34 @@ export const Pharmacy = () => {
     }
   }, [location]);
 
+  useEffect(() => {
+    reset();
+    if (isDemo) {
+      initializeDemo();
+    } else {
+      initialize();
+    }
+  }, [enableOpenNow, enable24Hr]);
+
+  const isMultiRx = flattenedFills.length > 1;
+
   const isCapsuleTerritory = order?.address?.postalCode in capsuleZipcodeLookup;
   const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
-
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
 
-  const heading = isReroute ? t.pharmacy.heading.reroute : t.pharmacy.heading.original;
+  const heading = isReroute ? t.changePharmacy : t.selectPharmacy;
   const subheading = isReroute
-    ? t.pharmacy.subheading.reroute(order.pharmacy.name)
-    : t.pharmacy.subheading.original;
+    ? t.sendToNew(isMultiRx, order.pharmacy.name)
+    : t.sendToSelected(isMultiRx);
 
   return (
     <Box>
       <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />
       <Helmet>
-        <title>{t.pharmacy.title}</title>
+        <title>{t.selectPharmacy}</title>
       </Helmet>
 
-      <Nav header={order.organization.name} orgId={order.organization.id} />
+      <Nav />
 
       <Container pb={showFooter ? 32 : 8}>
         <VStack spacing={6} align="span" pt={5}>
@@ -453,7 +466,7 @@ export const Pharmacy = () => {
           <HStack justify="space-between" w="full">
             {location ? (
               <VStack w="full" align="start" spacing={1}>
-                <Text size="sm">{t.pharmacy.showing}</Text>
+                <Text size="sm">{t.showingLabel}</Text>
                 <Link
                   onClick={() => setLocationModalOpen(true)}
                   display="inline"
@@ -468,7 +481,7 @@ export const Pharmacy = () => {
               </VStack>
             ) : (
               <Button variant="brand" onClick={() => setLocationModalOpen(true)}>
-                {t.pharmacy.setLocation}
+                {t.setLoc}
               </Button>
             )}
           </HStack>
@@ -477,7 +490,6 @@ export const Pharmacy = () => {
             <VStack spacing={9} align="stretch">
               {enableCourier ? (
                 <BrandedOptions
-                  type="COURIER"
                   options={[capsuleZipcodeLookup[order?.address?.postalCode].pharmacyId]}
                   location={location}
                   selectedId={selectedId}
@@ -487,7 +499,6 @@ export const Pharmacy = () => {
               ) : null}
               {enableMailOrder ? (
                 <BrandedOptions
-                  type={types.FulfillmentType.MailOrder}
                   options={orgSettings.mailOrderNavigateProviders}
                   location={location}
                   selectedId={selectedId}
@@ -507,6 +518,10 @@ export const Pharmacy = () => {
                 loadingMore={loadingPharmacies}
                 showingAllPharmacies={showingAllPharmacies}
                 courierEnabled={enableCourier || enableMailOrder}
+                enableOpenNow={enableOpenNow}
+                enable24Hr={enable24Hr}
+                setEnableOpenNow={setEnableOpenNow}
+                setEnable24Hr={setEnable24Hr}
               />
             </VStack>
           ) : null}
@@ -524,7 +539,7 @@ export const Pharmacy = () => {
             onClick={!successfullySubmitted ? handleSubmit : undefined}
             isLoading={submitting}
           >
-            {successfullySubmitted ? t.pharmacy.thankYou : t.pharmacy.cta}
+            {successfullySubmitted ? t.thankYou : t.selectPharmacy}
           </Button>
           <PoweredBy />
         </Container>

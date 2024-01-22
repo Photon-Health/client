@@ -1,8 +1,6 @@
 import {
-  Button,
   Center,
   CircularProgress,
-  HStack,
   Tab,
   TabList,
   TabPanel,
@@ -13,12 +11,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useQuery } from '@apollo/client';
-import { AddIcon } from '@chakra-ui/icons';
 import { graphql } from 'apps/app/src/gql';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
 import { Page } from '../../components/Page';
-import { useClinicalApiClient } from './apollo';
-import { InviteForm } from './components/invites/InviteForm';
+import { usePhoton } from '@photonhealth/react';
 import { DevelopersTab } from './views/DevelopersTab';
 import { OrganizationTab } from './views/OrganizationTab';
 import { TeamTab } from './views/TeamTab';
@@ -37,7 +33,6 @@ const settingsPageQuery = graphql(/* GraphQL */ `
       id
       name
       ...OrganizationTreatmentTabFragment
-      ...OrganizationTemplateTabFragment
     }
     roles {
       name
@@ -46,37 +41,9 @@ const settingsPageQuery = graphql(/* GraphQL */ `
   }
 `);
 
-const AddProviderButton = ({ disabled = false }: { disabled?: boolean }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  return (
-    <>
-      <Button
-        borderColor="blue.500"
-        textColor="blue.500"
-        colorScheme="blue"
-        rightIcon={<AddIcon />}
-        variant="outline"
-        disabled={disabled}
-        opacity={disabled ? 0.2 : 1}
-        onClick={() => setIsOpen(true)}
-      >
-        Add a Provider
-      </Button>
-      <InviteForm isOpen={isOpen} onClose={() => setIsOpen(false)} />
-    </>
-  );
-};
-
-const Buttons = ({ orgId, hasInvite }: { orgId: string | undefined; hasInvite: boolean }) => (
-  <HStack>
-    {hasInvite && <AddProviderButton disabled={orgId == null} />}
-    {/* <Auth /> */}
-  </HStack>
-);
-
 const tabs = [
-  '/settings/user',
   '/settings/team',
+  '/settings/user',
   '/settings/organization',
   '/settings/developers',
   '/settings/templates',
@@ -98,8 +65,8 @@ export const Settings = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  const client = useClinicalApiClient();
-  const { data, loading } = useQuery(settingsPageQuery, { client });
+  const { clinicalClient } = usePhoton();
+  const { data, loading } = useQuery(settingsPageQuery, { client: clinicalClient });
 
   const rolesMap: Record<string, string> = useMemo(
     () =>
@@ -114,7 +81,6 @@ export const Settings = () => {
 
   const hasDeveloper = usePermissions(['read:client']);
   const hasTeam = usePermissions(['read:profile']);
-  const hasInvite = usePermissions(['write:invite']);
   const hasOrg = usePermissions(['read:organization']);
 
   useEffect(() => {
@@ -142,10 +108,7 @@ export const Settings = () => {
   };
 
   return (
-    <Page
-      header="Settings"
-      buttons={<Buttons orgId={data?.organization?.id} hasInvite={hasInvite} />}
-    >
+    <Page header="Settings">
       {loading ? (
         <Center padding="100px">
           <CircularProgress isIndeterminate color="green.300" />
@@ -153,30 +116,30 @@ export const Settings = () => {
       ) : (
         <Tabs index={tabIndex} onChange={handleTabsChange} isLazy maxWidth="100%">
           <TabList overflowX={'auto'} overflowY={'hidden'}>
-            <Tab>User</Tab>
             <Tab hidden={!hasTeam}>Team</Tab>
+            <Tab>User</Tab>
             <Tab hidden={!hasOrg}>Organization</Tab>
             <Tab hidden={!hasDeveloper}>Developers</Tab>
             <Tab>Templates</Tab>
             <Tab>Catalog</Tab>
           </TabList>
           <TabPanels>
-            <TabPanel display="flex" flexDir="column" gap="4" px={0}>
-              <UserTab />
-            </TabPanel>
-            <TabPanel display="flex" flexDir="column" gap="4" px={0}>
+            <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
               <TeamTab rolesMap={rolesMap} />
             </TabPanel>
-            <TabPanel display="flex" flexDir="column" gap="4" px={0}>
+            <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
+              <UserTab />
+            </TabPanel>
+            <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
               <OrganizationTab />
             </TabPanel>
-            <TabPanel display="flex" flexDir="column" gap="4" px={0}>
+            <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
               <DevelopersTab />
             </TabPanel>
-            <TabPanel display="flex" flexDir="column" gap="4">
-              <TemplateTab organizationFragment={data?.organization ?? undefined} />
+            <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
+              <TemplateTab />
             </TabPanel>
-            <TabPanel display="flex" flexDir="column" gap="4">
+            <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
               <TreatmentTab organization={data?.organization ?? undefined} />
             </TabPanel>
           </TabPanels>

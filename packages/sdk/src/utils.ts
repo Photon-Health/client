@@ -75,16 +75,33 @@ export function makeMutation<T = any>(
   };
 }
 
+export type Env = 'photon' | 'neutron' | 'boson' | 'tau';
+
+export const clinicalAppUrl: { [key in Env]: string } = {
+  tau: 'https://app.boson.health',
+  boson: 'https://app.boson.health',
+  neutron: 'https://app.neutron.health',
+  photon: 'https://app.photon.health'
+};
+
+export const lambdasApiUrl: { [key in Env]: string } = {
+  tau: 'https://api.boson.health',
+  boson: 'https://api.boson.health',
+  neutron: 'https://api.neutron.health',
+  photon: 'https://api.photon.health'
+};
+
+export const clinicalApiUrl: { [key in Env]: string } = {
+  tau: 'http://clinical-api.tau.health:8080',
+  boson: 'https://clinical-api.boson.health',
+  neutron: 'https://clinical-api.neutron.health',
+  photon: 'https://clinical-api.photon.health'
+};
+
 export function getClinicalUrl(uri: string): string | undefined {
-  const serviceNameToUrlMap: Record<string, string> = {
-    boson: 'https://app.boson.health/',
-    neutron: 'https://app.neutron.health/',
-    photon: 'https://app.photon.health/'
-  };
-
-  const foundService = Object.keys(serviceNameToUrlMap).find((service) =>
+  const foundService = Object.keys(clinicalAppUrl).find((service) =>
     uri.toLowerCase().includes(service)
-  );
+  ) as Env | undefined;
 
-  return serviceNameToUrlMap[foundService || 'photon'];
+  return clinicalAppUrl[foundService || 'photon'];
 }

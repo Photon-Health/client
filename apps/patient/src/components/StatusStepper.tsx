@@ -12,14 +12,12 @@ import {
   StepNumber,
   StepSeparator
 } from '@chakra-ui/react';
-import { text as t } from '../utils/text';
+import { orderStateMapping as t } from '../utils/text';
 import { ExtendedFulfillmentType } from '../utils/models';
+import { countFillsAndRemoveDuplicates } from '../utils/general';
+import { useOrderContext } from '../views/Main';
 
-export const STATES = {
-  PICK_UP: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'],
-  COURIER: ['SENT', 'PREPARING', 'IN_TRANSIT', 'DELIVERED'],
-  MAIL_ORDER: ['SENT', 'PREPARING', 'SHIPPED', 'DELIVERED']
-};
+export const STATES = ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'];
 
 interface Props {
   fulfillmentType: ExtendedFulfillmentType;
@@ -28,11 +26,13 @@ interface Props {
 }
 
 export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props) => {
-  // We don't have courier states, so get index from pickup and fake it
-  const key = fulfillmentType === 'COURIER' ? 'PICK_UP' : fulfillmentType;
-  const initialStepIdx = STATES[key].findIndex((state) => state === status);
-  const states = STATES[fulfillmentType]; // map index to faux states
-  const activeStep = initialStepIdx + 1; // step to do next
+  const currentStepIdx = STATES.findIndex((state) => state === status);
+  const activeStep = currentStepIdx + 1; // step to do next
+
+  const { order } = useOrderContext();
+
+  const flattenedFills = countFillsAndRemoveDuplicates(order.fills);
+  const isMultiRx = flattenedFills.length > 1;
 
   return (
     <Box>
@@ -46,12 +46,12 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
             size="lg"
             colorScheme="green"
           >
-            {states.map((state, id) => {
-              const title = t.status[fulfillmentType].states[state].title;
-              const isDelivery = state === 'IN_TRANSIT' || state === 'SHIPPED';
-              const description = isDelivery
-                ? `${t.status[fulfillmentType].states[state].description}${patientAddress}.`
-                : t.status[fulfillmentType].states[state].description;
+            {STATES.map((state, id) => {
+              const title = t[fulfillmentType][state].status;
+              const isDelivery = fulfillmentType === 'COURIER' || fulfillmentType === 'MAIL_ORDER';
+              const description = `${t[fulfillmentType][state].description(isMultiRx)}${
+                isDelivery && state === 'READY' ? patientAddress : ''
+              }`;
 
               return (
                 <Step key={id}>

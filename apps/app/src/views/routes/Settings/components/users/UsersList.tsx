@@ -23,17 +23,27 @@ import {
 import { graphql } from 'apps/app/src/gql';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
 import { useMemo, useState } from 'react';
+import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
 import { Outlet } from 'react-router-dom';
-import { useClinicalApiClient } from '../../apollo';
+import { usePhoton } from '@photonhealth/react';
 import { PaginationIndicator } from '../PaginationIndicator';
 import { InviteForm } from '../invites/InviteForm';
 import { UserItem } from './UserItem';
+import { sortByFn } from './utils';
 
 const usersQuery = graphql(/* GraphQL */ `
   query UsersListQuery {
     users {
       id
-      ...UserItemFragment
+      ...UserFragment
+      email
+      name {
+        full
+      }
+      roles {
+        id
+        name
+      }
     }
     roles {
       name
@@ -43,9 +53,11 @@ const usersQuery = graphql(/* GraphQL */ `
 `);
 
 export const UsersList = (props: { rolesMap: Record<string, string> }) => {
-  const client = useClinicalApiClient();
+  const { clinicalClient } = usePhoton();
+  const [sortBy, setSortBy] = useState<'NAME' | 'ROLES' | 'EMAIL' | undefined>();
+  const [sortByDir, setSortByDir] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data, error, loading } = useQuery(usersQuery, { client });
+  const { data, error, loading } = useQuery(usersQuery, { client: clinicalClient });
 
   const hasUsers = usePermissions(['edit:profile', 'read:profile']);
   const hasInvite = usePermissions(['write:invite']);
@@ -59,8 +71,24 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
   const pages = Math.ceil((data?.users.length ?? 0) / PAGE_SIZE);
 
   const total = data?.users.length;
-  const users = useMemo(() => data?.users.slice(start, start + PAGE_SIZE), [data?.users, page]);
+  const users = useMemo(
+    () =>
+      data?.users
+        .map((x) => x)
+        .sort(sortByFn(sortBy, sortByDir))
+        .slice(start, start + PAGE_SIZE),
+    [data?.users, page, sortBy, sortByDir]
+  );
   const currPageSize = users?.length ?? 0;
+
+  const handleSort = (key: 'NAME' | 'ROLES' | 'EMAIL') => () => {
+    if (key === sortBy) {
+      setSortByDir(!sortByDir);
+    } else {
+      setSortByDir(true);
+      setSortBy(key);
+    }
+  };
 
   if (!hasUsers) return null;
 
@@ -125,14 +153,37 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
               <Table variant="simple" size="sm">
                 <Thead>
                   <Tr>
-                    <Th width={{ lg: '30%' }}>Name</Th>
-                    <Th width={{ lg: '30%' }}>Email</Th>
-                    <Th>Role</Th>
+                    <Th cursor={'pointer'} width={{ lg: '30%' }} onClick={handleSort('NAME')}>
+                      <HStack alignItems={'center'} spacing={2}>
+                        <Text userSelect={'none'}>Name</Text>
+                        {sortBy === 'NAME' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)}
+                      </HStack>
+                    </Th>
+                    <Th cursor={'pointer'} width={{ lg: '30%' }} onClick={handleSort('EMAIL')}>
+                      <HStack alignItems={'center'} spacing={2}>
+                        <Text userSelect={'none'}>Email</Text>
+                        {sortBy === 'EMAIL' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)}
+                      </HStack>
+                    </Th>
+                    <Th cursor={'pointer'} onClick={handleSort('ROLES')}>
+                      <HStack alignItems={'center'} spacing={2}>
+                        <Text userSelect={'none'}>Roles</Text>
+                        {sortBy === 'ROLES' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)}
+                      </HStack>
+                    </Th>
+                    <Th cursor={'pointer'}>
+                      <HStack alignItems={'center'} spacing={2}></HStack>
+                    </Th>
                   </Tr>
                 </Thead>
                 <Tbody>
                   {users?.map((user) => (
-                    <UserItem rolesMap={props.rolesMap} key={user.id} user={user} />
+                    <UserItem
+                      rolesMap={props.rolesMap}
+                      key={user.id}
+                      user={user}
+                      hasRole={hasUsers}
+                    />
                   ))}
                 </Tbody>
               </Table>

@@ -1,8 +1,12 @@
 projects:
-  # 'app-core':
-  #   schema: ['https://api.boson.health/graphql']
-  #   documents: ['apps/app/**/*.{graphql,js,ts,jsx,tsx}']
+  'app-core':
+    schema:
+      'https://egkkxiywpvbtplabf5mo6syu3a.appsync-api.us-east-1.amazonaws.com/graphql':
+        headers: { 'x-api-key': 'da2-evtma6y5jfb7tnhxhxqojjsfvi' }
+    documents: 'packages/**/*.{graphql,js,ts,jsx,tsx}'
+    ignoreNoDocuments: true
 
+  # 'app-v2':
   # 'app-v2':
   #   schema: ['http://clinical-api.tau.health:8080/graphql']
   #   documents: ['apps/app/**/SettingsV2/**/*.{ts,tsx}']

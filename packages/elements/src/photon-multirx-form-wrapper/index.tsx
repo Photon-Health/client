@@ -1,10 +1,10 @@
+import { Button, triggerToast } from '@photonhealth/components';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { format } from 'date-fns';
+import jwtDecode from 'jwt-decode';
 import { customElement } from 'solid-element';
 import { createSignal, onMount } from 'solid-js';
 import { usePhoton } from '../context';
-import jwtDecode from 'jwt-decode';
-import { triggerToast, Button } from '@photonhealth/components';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import PhotonFormWrapper from '../photon-form-wrapper';
 import { PatientStore } from '../stores/patient';
 
@@ -34,6 +34,7 @@ customElement(
     enableLocalPickup: false,
     enableSendToPatient: false,
     enableMedHistory: false,
+    enableCombineAndDuplicate: false,
     mailOrderIds: undefined,
     enableOrder: false,
     toastBuffer: 0
@@ -48,6 +49,7 @@ customElement(
     weightUnit?: string;
     enableLocalPickup?: boolean;
     enableSendToPatient?: boolean;
+    enableCombineAndDuplicate?: boolean;
     mailOrderIds?: string;
     enableOrder?: boolean;
     toastBuffer?: number;
@@ -62,6 +64,7 @@ customElement(
     const [continueSaveOnly, setContinueSaveOnly] = createSignal<boolean>(false);
     const [triggerSubmit, setTriggerSubmit] = createSignal<boolean>(false);
     const { actions: patientActions } = PatientStore;
+    const [hideOrderButton, setHideOrderButton] = createSignal<boolean>(true);
 
     onMount(async () => {
       const token = await client!.getSDK().authentication.getAccessToken();
@@ -104,6 +107,38 @@ customElement(
       setTriggerSubmit(true);
     };
     const handleUnsavedCancel = () => setContinueSubmitOpen(false);
+
+    const handleCreateOrder = () => {
+      // Notify there aren't any draft prescriptions
+      if (!canSubmit() || !canWritePrescription()) {
+        return triggerToast({
+          status: 'info',
+          body: 'You need to add prescription(s) to this order before you can send it.'
+        });
+      }
+
+      // Show a dialog if there is a prescription that hasn't been added to draft prescriptions
+      if (form()?.treatment?.value?.name) {
+        return setContinueSubmitOpen(true);
+      }
+
+      // else if all good, create the order
+      setIsCreateOrder(true);
+      setTriggerSubmit(true);
+    };
+
+    const handleCreatePrescriptions = () => {
+      // check if there are draft prescriptions
+      if (!canSubmit() || !canWritePrescription()) {
+        return triggerToast({
+          status: 'info',
+          body: 'You need to add prescription(s) to this order before you can send it.'
+        });
+      }
+
+      // create the prescriptions
+      setContinueSaveOnly(true);
+    };
 
     return (
       <div ref={ref}>
@@ -160,25 +195,8 @@ customElement(
           title="New Prescriptions"
           titleIconName="prescription"
           headerRight={
-            props.enableOrder ? (
-              <Button
-                size="md"
-                loading={triggerSubmit()}
-                onClick={() => {
-                  if (!canSubmit() || !canWritePrescription()) {
-                    // show info error
-                    triggerToast({
-                      status: 'info',
-                      body: 'You need to add prescription(s) to this order before you can send it.'
-                    });
-                  } else {
-                    // submit rx and order
-                    form()?.treatment?.value?.name
-                      ? setContinueSubmitOpen(true)
-                      : setTriggerSubmit(true);
-                  }
-                }}
-              >
+            hideOrderButton() ? null : props.enableOrder ? (
+              <Button size="md" loading={triggerSubmit()} onClick={handleCreateOrder}>
                 Send Order
               </Button>
             ) : (
@@ -187,37 +205,14 @@ customElement(
                   size="md"
                   variant="secondary"
                   loading={triggerSubmit() && !isCreateOrder()}
-                  onClick={() => {
-                    if (!canSubmit() || !canWritePrescription()) {
-                      triggerToast({
-                        status: 'info',
-                        body: 'You need to add prescription(s) to this order before you can send it.'
-                      });
-                    } else {
-                      setContinueSaveOnly(true);
-                    }
-                  }}
+                  onClick={handleCreatePrescriptions}
                 >
                   Save prescriptions
                 </Button>
                 <Button
                   size="md"
                   loading={triggerSubmit() && isCreateOrder()}
-                  onClick={() => {
-                    if (!canSubmit() || !canWritePrescription()) {
-                      triggerToast({
-                        status: 'info',
-                        body: 'You need to add prescription(s) to this order before you can send it.'
-                      });
-                    } else {
-                      if (form()?.treatment?.value?.name) {
-                        setContinueSubmitOpen(true);
-                      } else {
-                        setIsCreateOrder(true);
-                        setTriggerSubmit(true);
-                      }
-                    }
-                  }}
+                  onClick={handleCreateOrder}
                 >
                   Save and create order
                 </Button>
@@ -240,8 +235,10 @@ customElement(
                   enable-order={props.enableOrder}
                   enable-local-pickup={props.enableLocalPickup}
                   enable-send-to-patient={props.enableSendToPatient}
+                  enable-combine-and-duplicate={props.enableCombineAndDuplicate}
                   mail-order-ids={props.mailOrderIds}
                   trigger-submit={triggerSubmit()}
+                  set-trigger-submit={setTriggerSubmit}
                   toast-buffer={props?.toastBuffer || 0}
                   on:photon-form-validate={(e: any) => {
                     setCanSubmit(e.detail.canSubmit);
@@ -256,6 +253,17 @@ customElement(
                         form()?.patient?.value?.id
                       );
                     }
+                  }}
+                  on:photon-order-error={(e: any) => {
+                    e.stopPropagation();
+                    setTriggerSubmit(false);
+                  }}
+                  on:photon-signature-attestation-agreed={() => {
+                    setHideOrderButton(false);
+                  }}
+                  on:photon-signature-attestation-canceled={() => {
+                    dispatchClosed();
+                    patientActions.clearSelectedPatient();
                   }}
                 />
               </div>

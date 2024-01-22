@@ -20,61 +20,38 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { types } from '@photonhealth/sdk';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { text as t } from '../utils/text';
 
-import { UNOPEN_BUSINESS_STATUS_MAP } from '../views/Pharmacy';
-import { Rating } from './Rating';
 import { formatAddress } from '../utils/general';
 
 dayjs.extend(customParseFormat);
 
-interface RatingHoursProps {
-  businessStatus: string;
-  rating: number;
-  hours: {
-    open?: boolean;
-    opens?: string;
-    opensDay?: string;
-    closes?: string;
-    is24Hr?: boolean;
-  };
+interface HoursProps {
+  isOpen?: boolean;
+  is24Hr?: boolean;
+  opens?: string;
+  closes?: string;
 }
 
-const RatingHours = ({ businessStatus, rating, hours }: RatingHoursProps) => {
-  if (businessStatus in UNOPEN_BUSINESS_STATUS_MAP) {
-    return (
-      <Text fontSize="sm" color="red">
-        {UNOPEN_BUSINESS_STATUS_MAP[businessStatus]}
-      </Text>
-    );
-  }
-
+const Hours = ({ is24Hr, isOpen, opens, closes }: HoursProps) => {
   return (
     <HStack w="full" whiteSpace="nowrap" overflow="hidden">
-      {rating ? <Rating rating={rating} /> : null}
-      {rating ? <Text color="gray.400">&bull;</Text> : null}
-      {hours?.open !== undefined ? (
-        <Text fontSize="sm" color={hours?.open ? 'green' : 'red'}>
-          {hours?.open ? 'Open' : 'Closed'}
+      {isOpen != null ? (
+        <Text fontSize="sm" color={isOpen ? 'green' : 'red'}>
+          {isOpen ? t.open : t.closed}
         </Text>
       ) : null}
-      {!hours?.is24Hr && ((hours?.open && hours?.closes) || (!hours?.open && hours?.opens)) ? (
+      {!is24Hr && ((isOpen && closes) || (!isOpen && opens)) ? (
         <Text color="gray.400">&bull;</Text>
       ) : null}
-      {hours?.open && hours?.closes ? (
+      {!is24Hr && isOpen && closes ? (
         <Text fontSize="sm" color="gray.500" isTruncated>
-          Closes{' '}
-          {dayjs(hours?.closes, 'HHmm').format(
-            dayjs(hours?.closes, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA'
-          )}
+          {closes}
         </Text>
       ) : null}
-      {!hours?.open && hours?.opens ? (
+      {!is24Hr && !isOpen && opens ? (
         <Text fontSize="sm" color="gray.500" isTruncated>
-          Opens{' '}
-          {dayjs(hours?.opens, 'HHmm').format(
-            dayjs(hours?.opens, 'HHmm').minute() > 0 ? 'h:mmA' : 'hA'
-          )}
-          {hours?.opensDay ? ` ${hours?.opensDay}` : ''}
+          {opens}
         </Text>
       ) : null}
     </HStack>
@@ -113,6 +90,8 @@ interface PharmacyCardProps {
   onSetPreferred?: () => void;
   onChangePharmacy?: () => void;
   onGetDirections?: () => void;
+  selectable?: boolean;
+  showDetails?: boolean;
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
@@ -126,101 +105,110 @@ export const PharmacyCard = memo(function PharmacyCard({
   onSelect,
   onChangePharmacy,
   onSetPreferred,
-  onGetDirections
+  onGetDirections,
+  selectable = false,
+  showDetails = true
 }: PharmacyCardProps) {
-  const isMobile = useBreakpointValue({ base: true, md: false });
-
   if (!pharmacy) return null;
+
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
     <Card
       bgColor="white"
       border="2px solid"
       borderColor={selected && onSelect ? 'brand.600' : 'white'}
-      cursor="pointer"
       onClick={() => onSelect && onSelect()}
       mx={isMobile ? -3 : undefined}
+      cursor={selectable ? 'pointer' : undefined}
     >
       <CardBody p={3}>
-        <VStack align="start" w="full" spacing={1}>
+        <VStack align="start" w="full" spacing={showDetails ? 1 : 0}>
           <HStack spacing={2}>
             {preferred ? (
               <Tag size="sm" colorScheme="blue">
                 <TagLeftIcon boxSize="12px" as={FiStar} />
-                <TagLabel> Preferred</TagLabel>
+                <TagLabel> {t.preferred}</TagLabel>
               </Tag>
             ) : null}
             {previous && !preferred ? (
               <Tag size="sm" colorScheme="green">
                 <TagLeftIcon boxSize="12px" as={FiRotateCcw} />
-                <TagLabel> Previous</TagLabel>
+                <TagLabel> {t.previous}</TagLabel>
               </Tag>
             ) : null}
             {goodService ? (
               <Tag size="sm" colorScheme="purple">
                 <TagLeftIcon boxSize="12px" as={FiThumbsUp} />
-                <TagLabel> Good service</TagLabel>
+                <TagLabel> {t.goodService}</TagLabel>
               </Tag>
             ) : null}
-            {pharmacy?.hours?.is24Hr ? (
+            {pharmacy?.is24Hr ? (
               <Tag size="sm" colorScheme="green">
-                <TagLabel>24 hr</TagLabel>
+                <TagLabel>{t.open24hrs}</TagLabel>
               </Tag>
             ) : null}
           </HStack>
           <VStack align="start" w="full" spacing={0}>
             <Text fontSize="md">{pharmacy.name}</Text>
-            <RatingHours
-              businessStatus={pharmacy.businessStatus}
-              rating={pharmacy.rating}
-              hours={pharmacy.hours}
-            />
-            <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
+            {showDetails ? (
+              <>
+                <Hours
+                  isOpen={pharmacy.isOpen}
+                  is24Hr={pharmacy.is24Hr}
+                  opens={pharmacy.opens}
+                  closes={pharmacy.closes}
+                />
+                <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
+              </>
+            ) : null}
           </VStack>
         </VStack>
       </CardBody>
-      <Collapse in={selected && !preferred} animateOpacity>
-        <Divider />
-        <CardFooter p={2}>
-          {onSetPreferred ? (
-            <Button
-              mx="auto"
-              size="sm"
-              variant="ghost"
-              color="link"
-              onClick={onSetPreferred}
-              isLoading={savingPreferred}
-              leftIcon={<FiStar />}
-            >
-              Make this my preferred pharmacy
-            </Button>
-          ) : null}
-          {onChangePharmacy && canReroute ? (
-            <Button
-              mx="auto"
-              size="sm"
-              variant="ghost"
-              color="link"
-              onClick={onChangePharmacy}
-              leftIcon={<FiRefreshCcw />}
-            >
-              Change pharmacy
-            </Button>
-          ) : null}
-          {onGetDirections ? (
-            <Button
-              mx="auto"
-              size="sm"
-              variant="ghost"
-              color="link"
-              onClick={onGetDirections}
-              leftIcon={<FiNavigation />}
-            >
-              Get directions
-            </Button>
-          ) : null}
-        </CardFooter>
-      </Collapse>
+      {showDetails ? (
+        <Collapse in={selected && !preferred} animateOpacity>
+          <Divider />
+          <CardFooter p={2}>
+            {onSetPreferred ? (
+              <Button
+                mx="auto"
+                size="sm"
+                variant="ghost"
+                color="link"
+                onClick={onSetPreferred}
+                isLoading={savingPreferred}
+                leftIcon={<FiStar />}
+              >
+                {t.makePreferred}
+              </Button>
+            ) : null}
+            {onChangePharmacy && canReroute ? (
+              <Button
+                mx="auto"
+                size="sm"
+                variant="ghost"
+                color="link"
+                onClick={onChangePharmacy}
+                leftIcon={<FiRefreshCcw />}
+              >
+                {t.changePharmacy}
+              </Button>
+            ) : null}
+            {onGetDirections ? (
+              <Button
+                mx="auto"
+                size="sm"
+                variant="ghost"
+                color="link"
+                onClick={onGetDirections}
+                leftIcon={<FiNavigation />}
+              >
+                {t.directions}
+              </Button>
+            ) : null}
+          </CardFooter>
+        </Collapse>
+      ) : null}
     </Card>
   );
 });

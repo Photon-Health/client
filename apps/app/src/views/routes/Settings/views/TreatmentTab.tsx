@@ -25,6 +25,7 @@ import { TreatmentActions } from '../components/treatments/TreatmentActions';
 import { ADD_TO_CATALOG } from '../../../../mutations';
 import { graphql } from 'apps/app/src/gql/gql';
 import { FragmentType, useFragment } from 'apps/app/src/gql';
+import { StyledToast } from '../../../components/StyledToast';
 
 interface MedViewProps {
   name: string;
@@ -95,8 +96,11 @@ export const TreatmentTab = ({
       setShowModal.off();
       setResetKey(resetKey + 1);
       toast({
-        title: 'Treatment added',
-        status: 'success'
+        position: 'top-right',
+        duration: 4000,
+        render: ({ onClose }) => (
+          <StyledToast onClose={onClose} type="success" description="Treatment added" />
+        )
       });
 
       // TODO replace catalog SDK query

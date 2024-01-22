@@ -23,7 +23,7 @@ import { useQuery } from '@apollo/client';
 import { graphql } from 'apps/app/src/gql';
 import { useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
-import { useClinicalApiClient } from '../../apollo';
+import { usePhoton } from '@photonhealth/react';
 import { WebhookItem } from './WebhookItem';
 import { WebhooksForm } from './WebhooksForm';
 
@@ -39,8 +39,8 @@ const webhookListQuery = graphql(/* GraphQL */ `
 export const Webhooks = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const client = useClinicalApiClient();
-  const { data, loading, error } = useQuery(webhookListQuery, { client });
+  const { clinicalClient } = usePhoton();
+  const { data, loading, error } = useQuery(webhookListQuery, { client: clinicalClient });
   const webhooks = useMemo(() => data?.webhooks, [data?.webhooks]);
 
   return (

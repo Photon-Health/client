@@ -3,6 +3,7 @@ import { OrganizationSettings } from '../types';
 // const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
 const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
 const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
+const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 
 /**
  * All orgs inherit from default settings, so updates
@@ -21,11 +22,12 @@ const defaultSettings: OrganizationSettings = {
   sendToPatient: true,
   sendToPatientUsers: [],
   enablePatientRerouting: false,
-  enableCourierNavigate: true,
+  enableCourierNavigate: false,
   returnTo: window.location.origin,
   federated: false,
   enableMedHistory: false,
-  enableRxAndOrder: false
+  enableRxAndOrder: true,
+  enableCombineAndDuplicate: true
 };
 
 /**
@@ -40,28 +42,26 @@ export const photon: {
   // Weekend Health
   org_uZPt00PG0JElhh3d: {
     ...defaultSettings,
-    sendOrder: false
+    sendOrder: false,
+    enableRxAndOrder: false
   },
   // Modern Pediatrics
   org_2utnNgp5NGCy9wOb: {
     ...defaultSettings,
     logo: 'modern_pediatrics_logo.png',
-    accentColor: '#3f7a9c',
-    enableRxAndOrder: true
+    accentColor: '#3f7a9c'
   },
   // Summer Health
   org_66nHWvQRtHbjZt4A: {
     ...defaultSettings,
     logo: 'summer_health_logo.svg',
-    accentColor: '#ffc21f',
-    enableRxAndOrder: true
+    accentColor: '#ffc21f'
   },
   // Modern Ritual
   org_IWmodVdrQYpqh5x2: {
     ...defaultSettings,
     logo: 'modern_ritual_logo.webp',
-    accentColor: '#202a36',
-    sendToPatient: false
+    accentColor: '#202a36'
   },
   // Reside Health
   org_8fwLMYQGxj6Bg70X: {
@@ -92,7 +92,8 @@ export const photon: {
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
     federated: true,
-    sendToPatient: false
+    sendToPatient: false,
+    enableRxAndOrder: false
   },
   // ZZPeds
   org_pxcJ7Dlclcsg0OJw: {
@@ -124,7 +125,8 @@ export const photon: {
   org_v5It8IoY0RH1Rw80: {
     ...defaultSettings,
     logo: 'piction_health_logo.png',
-    accentColor: '#3377e2'
+    accentColor: '#3377e2',
+    enableRxAndOrder: false
   },
   // Shapiro Medical (Xyon Health)
   org_Y0EPcd3p5eqG4iZs: {
@@ -132,7 +134,8 @@ export const photon: {
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    sendToPatient: false
+    sendToPatient: false,
+    enableRxAndOrder: false
   },
   // Osei Tutu (Xyon Health)
   org_WeSplxuyqxdIph1f: {
@@ -140,7 +143,8 @@ export const photon: {
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    sendToPatient: false
+    sendToPatient: false,
+    enableRxAndOrder: false
   },
   // Fadeyi Derm (Xyon Health)
   org_sWEo459pSKLt6wZ5: {
@@ -148,7 +152,17 @@ export const photon: {
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_ID],
-    sendToPatient: false
+    sendToPatient: false,
+    enableRxAndOrder: false
+  },
+  // Precision Medical Hair Restoration & Aesthetics (Xyon Health)
+  org_G52mrmIBC3yqeNYB: {
+    ...defaultSettings,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_ID],
+    sendToPatient: false,
+    enableRxAndOrder: false
   },
   // Ognomy
   org_2B1yxV6yS9ROqV1g: {
@@ -167,16 +181,16 @@ export const photon: {
     ...defaultSettings,
     logo: 'sana_care_logo.png',
     accentColor: '#FBCC45',
-    enableRxAndOrder: true
+    mailOrderNavigate: false,
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
   },
   // Blueberry Pediatrics
   org_ul8ojZgvzpqu299H: {
     ...defaultSettings,
     logo: 'blueberry_logo.png',
     accentColor: '#235AFF',
-    enablePatientRerouting: false,
     enableMedHistory: true,
-    enableRxAndOrder: true
+    enableCombineAndDuplicate: false
   },
   // TBD Health
   org_XoBVNLkIWL6BP8vZ: {
@@ -189,5 +203,37 @@ export const photon: {
     ...defaultSettings,
     logo: 'openloop_logo.png',
     accentColor: '#E90C54'
+  },
+  // PM Pediatrics Care
+  org_2Mqu8Kf7dknKNFXb: {
+    ...defaultSettings,
+    logo: 'pm_pediatrics_logo.svg',
+    accentColor: '#4D15B7'
+  },
+  // Pine Medical
+  org_ZIksHxx59zFVc1Xw: {
+    ...defaultSettings,
+    logo: 'pine_medical_logo.svg',
+    accentColor: '#000000',
+    enableRxAndOrder: false
+  },
+  // Burdoin Mtn Medicine
+  org_MYJ66XrRE3eGb12U: {
+    ...defaultSettings,
+    enableRxAndOrder: false
+  },
+  // Moment Health
+  org_fdq7ceDPlQlO5e3J: {
+    ...defaultSettings,
+    logo: 'moment_health_logo.webp',
+    accentColor: '#FF001F',
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_ID]
+  },
+  // Brightside
+  org_Dcq069P9AxLlv4l2: {
+    ...defaultSettings,
+    logo: 'brightside_health_logo.svg',
+    accentColor: '#2e4985'
   }
 };

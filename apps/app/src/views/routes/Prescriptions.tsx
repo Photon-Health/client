@@ -10,7 +10,8 @@ import {
   SkeletonText,
   Stack,
   Text,
-  Tooltip
+  Tooltip,
+  useToast
 } from '@chakra-ui/react';
 import { FiInfo, FiShoppingCart } from 'react-icons/fi';
 import { useEffect, useRef, useState } from 'react';
@@ -24,6 +25,7 @@ import PatientView from '../components/PatientView';
 import { types } from '@photonhealth/sdk';
 import { gql, useQuery } from '@apollo/client';
 import { Prescription } from 'packages/sdk/dist/types';
+import { StyledToast } from '../components/StyledToast';
 
 const GET_PRESCRIPTIONS = gql`
   query GetPrescriptions(
@@ -96,6 +98,9 @@ interface ActionsViewProps {
 
 const ActionsView = (props: ActionsViewProps) => {
   const { prescriptionId, patientId, disableCreateOrder = false } = props;
+
+  const toast = useToast();
+
   return (
     <HStack spacing="0">
       <IconButton
@@ -114,6 +119,25 @@ const ActionsView = (props: ActionsViewProps) => {
         as={RouterLink}
         to={`/orders/new?patientId=${patientId}&prescriptionIds=${prescriptionId}`}
         isDisabled={disableCreateOrder}
+        onClick={(event) => {
+          // Lame, but w/o this the redirect will still happen
+          if (disableCreateOrder) {
+            toast({
+              position: 'top-right',
+              duration: 4000,
+              render: ({ onClose }) => (
+                <StyledToast
+                  onClose={onClose}
+                  type="info"
+                  description="A new order cannot be created for a depleted prescription. Please create a new
+                  prescription."
+                />
+              )
+            });
+            event.preventDefault();
+            return;
+          }
+        }}
       />
     </HStack>
   );

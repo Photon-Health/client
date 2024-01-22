@@ -1,159 +1,245 @@
 export const text = {
+  closed: 'Closed',
   contactSupport: 'Contact Support',
-  review: {
-    title: 'Review prescriptions',
-    heading: 'Review your prescriptions',
-    subheading:
-      'Please review the prescriptions before you select a pharmacy. Reach out to your provider for any issues.',
-    patient: 'Patient',
-    prescriber: 'Prescriber',
-    quantity: 'Quantity',
-    daysSupply: 'Days supply',
-    refills: 'Refills',
-    substitutions: 'Substitutions',
-    expires: 'Expires',
-    cta: 'Search for a pharmacy'
+  changePharmacy: 'Change pharmacy',
+  daysSupply: 'Days supply',
+  delivered: 'Delivered',
+  delivery: 'Delivery',
+  directions: 'Get directions',
+  enterLoc: 'Enter a zipcode or address',
+  enterLocLong: "Enter the zipcode or address where you'd like to search for a pharmacy.",
+  errorMarkPickedUp: 'Unable to mark order as picked up',
+  errorMarkDelivered: 'Unable to mark order as delivered',
+  expires: 'Expires',
+  fakeRx: 'This is not a real prescription.',
+  fakeRxs: 'These are not real prescriptions.',
+  findLoc: 'Find a location',
+  gettingLoc: 'Getting current location',
+  goLocal: 'Select a local pharmacy for pick up.',
+  goodService: 'Good Service',
+  inTransit: 'In transit',
+  makePreferred: 'Make this my preferred pharmacy',
+  noMatch: "We couldn't find what you're looking for.",
+  notifyPickUp: (isPlural: boolean) =>
+    `Please notify us below when you’ve picked up your ${
+      isPlural ? 'prescriptions' : 'prescription'
+    }.`,
+  open: 'Open',
+  open24hrs: 'Open 24 Hours',
+  orderCanceled: 'This order was canceled.',
+  orderDelivered: 'Your order was delivered',
+  orderInTransit: 'Your order is in transit',
+  orderPickedUp: 'Your order was picked up',
+  orderPlaced: 'Order placed',
+  orderReady: 'Your order is ready',
+  orderWasPlaced: 'Your order has been placed',
+  outForDelivery: (isPlural: boolean) =>
+    `Your order is out for delivery. Please notify us below when you’ve received your ${
+      isPlural ? 'prescriptions' : 'prescription'
+    }.`,
+  patient: 'Patient',
+  pickedUp: 'Picked up',
+  pickedUpRx: (isPlural: boolean) =>
+    `I picked up my ${isPlural ? 'prescriptions' : 'prescription'}`,
+  pickUp: 'Pick Up',
+  pickUpLabel: 'Pick Up:',
+  pleaseReview: (isPlural: boolean) =>
+    `Please review the ${
+      isPlural ? 'prescriptions' : 'prescription'
+    } before you select a pharmacy. Reach out to your provider for any issues.`,
+  pleaseRefresh: 'Please refresh and try again',
+  preferred: 'Preferred',
+  preparing: 'Preparing order',
+  preparingDelivery: 'The pharmacy is preparing your order for delivery.',
+  preparingOrder: 'Preparing your order',
+  preparingPickUp: (isPlural: boolean) =>
+    `The pharmacy is preparing your ${isPlural ? 'prescriptions' : 'prescription'} for pick up.`,
+  preparingRxDelivery: (isPlural: boolean) =>
+    `The pharmacy is preparing your ${isPlural ? 'prescriptions' : 'prescription'} for delivery.`,
+  preparingTextUs: (isPlural: boolean) =>
+    `The pharmacy is preparing your ${isPlural ? 'prescriptions' : 'prescription'} for pick up.`,
+  previous: 'Previous',
+  quantity: 'Quantity',
+  questions: 'If you have any questions, please text us at +1 (513) 866-3212.',
+  readyBy: 'Ready by',
+
+  readyBySelected: (isPlural: boolean) =>
+    `We'll do our best to ensure your ${
+      isPlural ? 'prescriptions are' : 'prescription is'
+    } ready by your selected time.`,
+  readyPickUp: 'Ready for pick up',
+  readyWhen: 'When do you need your order ready by?',
+  receivedPreparing: 'The pharmacy has received your order and is preparing it.',
+  receivedRx: (isPlural: boolean) => `I received my ${isPlural ? 'prescriptions' : 'prescription'}`,
+  refills: 'Refills',
+  reviewRx: (isPlural: boolean) => `Review ${isPlural ? 'prescriptions' : 'prescription'}`,
+  reviewYourRx: (isPlural: boolean) => `Review your ${isPlural ? 'prescriptions' : 'prescription'}`,
+  rxDelivered: (isPlural: boolean) =>
+    `Your ${isPlural ? 'prescriptions have' : 'prescription has'} arrived at ${
+      isPlural ? 'their' : 'its'
+    } destination.`,
+  rxInTransit: (isPlural: boolean) =>
+    `Your ${isPlural ? 'prescriptions are on their' : 'prescription is on its'} way to `,
+  rxPickedUpTextUs: (isPlural: boolean) =>
+    `Your ${isPlural ? 'prescriptions were' : 'prescription was'} picked up.`,
+  rxPickUp: (isPlural: boolean) =>
+    `Your ${isPlural ? 'prescriptions are' : 'prescription is'} ready to be picked up.`,
+  rxReadyNotify: (isPlural: boolean) =>
+    `Your ${
+      isPlural ? 'prescriptions are' : 'prescription is'
+    } ready to be picked up. Please notify us below when you’ve picked up your ${
+      isPlural ? 'prescriptions' : 'prescription'
+    }.`,
+  searchPharmacy: 'Search for a pharmacy',
+  select: 'Select pharmacy',
+  selectPharmacy: 'Select a pharmacy',
+  sendToNew: (isPlural: boolean, originalPharmacyName: string) =>
+    `We'll cancel your ${
+      isPlural ? 'prescriptions' : 'prescription'
+    } at ${originalPharmacyName} and send ${
+      isPlural ? 'them' : 'it'
+    } to your new pharmacy to be filled.`,
+  sendToSelected: (isPlural: boolean) =>
+    `We'll send your ${
+      isPlural ? 'prescriptions' : 'prescription'
+    } to your selected pharmacy to be filled.`,
+  sent: (isPlural: boolean) =>
+    `Your ${isPlural ? 'prescriptions were' : 'prescription was'} sent to the pharmacy.`,
+  sentWithOrderSms: (isPlural: boolean) =>
+    `We sent your ${
+      isPlural ? 'prescriptions' : 'prescription'
+    } to your selected pharmacy. We’ll text you updates on your order status.`,
+  sentWithSms: (isPlural: boolean) =>
+    `Your ${
+      isPlural ? 'prescriptions were' : 'prescription was'
+    } sent to the pharmacy. We’ll text you to let you know when ${
+      isPlural ? 'their' : "it's"
+    } ready.`,
+  setLoc: 'Set location',
+  setSearchLoc: 'Set search location',
+  shipTo: (deliveryAddress: string) => `Ship to ${deliveryAddress}`,
+  showingLabel: 'Showing pharmacies near:',
+  showingAll: 'Showing all pharmacies',
+  showMore: 'Show more pharmacies',
+  thankYou: 'Thank you!',
+  track: 'Track your order',
+  tracking: 'Tracking #:',
+  tryPhoton: 'Try Photon',
+  urgencyOptions: [
+    '10:00 am',
+    '12:00 pm',
+    '2:00 pm',
+    '4:00 pm',
+    '6:00 pm',
+    'After hours',
+    'Tomorrow'
+  ],
+  useLoc: 'Use my current location',
+  weSent: (isPlural: boolean) =>
+    `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`
+};
+
+export const orderStateMapping = {
+  PICK_UP: {
+    SENT: {
+      heading: text.orderWasPlaced,
+      subheading: (isPlural: boolean) => text.sentWithSms(isPlural),
+      status: text.orderPlaced,
+      description: (isPlural: boolean) => text.sent(isPlural),
+      cta: (isPlural: boolean) => text.pickedUpRx(isPlural)
+    },
+    RECEIVED: {
+      heading: text.preparingOrder,
+      subheading: (isPlural: boolean) => text.preparingTextUs(isPlural),
+      status: text.preparing,
+      description: (isPlural: boolean) => text.preparingPickUp(isPlural),
+      cta: (isPlural: boolean) => text.pickedUpRx(isPlural)
+    },
+    READY: {
+      heading: text.orderReady,
+      subheading: (isPlural: boolean) => text.rxReadyNotify(isPlural),
+      status: text.readyPickUp,
+      description: (isPlural: boolean) => text.rxPickUp(isPlural),
+      cta: (isPlural: boolean) => text.pickedUpRx(isPlural)
+    },
+    PICKED_UP: {
+      heading: text.orderPickedUp,
+      subheading: (isPlural: boolean) => text.rxPickedUpTextUs(isPlural),
+      status: text.pickedUp,
+      description: (isPlural: boolean) => text.notifyPickUp(isPlural),
+      cta: (isPlural: boolean) => text.pickedUpRx(isPlural)
+    },
+    error: {
+      title: text.errorMarkPickedUp,
+      description: text.questions
+    }
   },
-  readyBy: {
-    title: 'Ready by',
-    heading: 'When do you want this ready by?',
-    subheading: "We'll do our best ensure your prescription(s) are ready by your selected time.",
-    options: ['10:00 am', '12:00 pm', '2:00 pm', '4:00 pm', '6:00 pm', 'After hours', 'Tomorrow'],
-    cta: 'Select a pharmacy'
+  COURIER: {
+    SENT: {
+      heading: text.orderWasPlaced,
+      subheading: (isPlural: boolean) => text.weSent(isPlural),
+      status: text.orderPlaced,
+      description: (isPlural: boolean) => text.sent(isPlural),
+      cta: (isPlural: boolean) => text.receivedRx(isPlural)
+    },
+    RECEIVED: {
+      heading: text.preparingOrder,
+      subheading: (isPlural: boolean) => text.sentWithOrderSms(isPlural),
+      status: text.preparing,
+      description: (isPlural: boolean) => text.preparingRxDelivery(isPlural),
+      cta: (isPlural: boolean) => text.receivedRx(isPlural)
+    },
+    READY: {
+      heading: text.orderInTransit,
+      subheading: (isPlural: boolean) => text.sentWithOrderSms(isPlural),
+      status: text.inTransit,
+      description: (isPlural: boolean) => text.rxInTransit(isPlural),
+      cta: (isPlural: boolean) => text.receivedRx(isPlural)
+    },
+    PICKED_UP: {
+      heading: text.orderDelivered,
+      subheading: (isPlural: boolean) => text.sentWithOrderSms(isPlural),
+      status: text.delivered,
+      description: (isPlural: boolean) => text.rxDelivered(isPlural),
+      cta: (isPlural: boolean) => text.receivedRx(isPlural)
+    },
+    error: {
+      title: text.errorMarkDelivered,
+      description: text.questions
+    }
   },
-  pharmacy: {
-    title: 'Select a pharmacy',
-    heading: {
-      original: 'Select a pharmacy',
-      reroute: 'Change pharmacy'
+  MAIL_ORDER: {
+    SENT: {
+      heading: text.orderWasPlaced,
+      subheading: (isPlural: boolean) => text.weSent(isPlural),
+      status: text.orderPlaced,
+      description: (isPlural: boolean) => text.sent(isPlural),
+      cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    subheading: {
-      original: "We'll send your prescriptions to your selected pharmacy to be filled.",
-      reroute: (originalPharmacyName: string) =>
-        `We'll cancel your prescriptions at ${originalPharmacyName} and send them to your new pharmacy to be filled.`
+    RECEIVED: {
+      heading: text.preparingOrder,
+      subheading: text.preparingDelivery,
+      status: text.preparing,
+      description: (isPlural: boolean) => text.preparingRxDelivery(isPlural),
+      cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    showing: 'Showing pharmacies near:',
-    setLocation: 'Set search location',
-    modal: {
-      heading: 'Set location',
-      subheading: "Enter the zipcode or address where you'd like to search for a pharmacy.",
-      currentLocation: 'Use my current location',
-      getting: 'Getting current location',
-      find: 'Find a location',
-      enter: 'Enter a zipcode or address'
+    READY: {
+      heading: text.orderInTransit,
+      subheading: (isPlural: boolean) => text.outForDelivery(isPlural),
+      status: text.inTransit,
+      description: (isPlural: boolean) => text.rxInTransit(isPlural),
+      cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    COURIER: {
-      heading: 'Home Delivery',
-      subheading: 'Get your prescriptions delivered to'
+    PICKED_UP: {
+      heading: text.orderDelivered,
+      subheading: () => '', // it'll still show text us prompt
+      status: text.delivered,
+      description: (isPlural: boolean) => text.rxDelivered(isPlural),
+      cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    MAIL_ORDER: {
-      heading: 'Home Delivery',
-      subheading: 'Get your prescriptions shipped to'
-    },
-    PICK_UP: {
-      heading: 'Local Pickup',
-      subheading: 'Get your prescriptions at a nearby pharmacy.',
-      sorted: 'Sorted by distance',
-      showMore: 'Show more pharmacies',
-      showingAll: 'Showing all pharmacies'
-    },
-    cta: 'Select pharmacy',
-    thankYou: 'Thank you!'
-  },
-  status: {
-    title: 'Preparing your prescriptions',
-    heading: 'Preparing your prescriptions',
-    subheading:
-      "After your prescriptions are sent to the pharmacy, we'll send you updates on their status.",
-    PICK_UP: {
-      pickup: 'Pick Up:',
-      chat: {
-        prompt: "At the pharmacy? Let us know if you're having any issues.",
-        cta: 'Text us now'
-      },
-      states: {
-        SENT: {
-          title: 'Sent',
-          description: 'Your prescriptions have been sent to the pharmacy.'
-        },
-        RECEIVED: {
-          title: 'Received',
-          description: 'The pharmacy has received your order and is preparing it.'
-        },
-        READY: {
-          title: 'Ready',
-          description: 'Your prescriptions are ready to be picked up.'
-        },
-        PICKED_UP: {
-          title: 'Picked Up',
-          description: "Please notify us below when you've picked up your prescriptions."
-        }
-      },
-      cta: 'I picked up my prescriptions',
-      errorToast: {
-        title: 'Unable to mark order as picked up',
-        description: 'Please refresh and try again'
-      }
-    },
-    COURIER: {
-      states: {
-        SENT: {
-          title: 'Sent',
-          description: 'Your prescriptions have been sent to the pharmacy.'
-        },
-        PREPARING: {
-          title: 'Preparing',
-          description: 'The pharmacy has received your order and is preparing it.'
-        },
-        IN_TRANSIT: {
-          title: 'In transit',
-          description: 'Your prescriptions are on their way to '
-        },
-        DELIVERED: {
-          title: 'Delivered',
-          description: 'Your prescriptions have arrived at their destination.'
-        }
-      },
-      cta: 'I received my prescriptions',
-      errorToast: {
-        title: 'Unable to mark order as delivered',
-        description: 'Please refresh and try again'
-      }
-    },
-    MAIL_ORDER: {
-      trackingNumber: 'Tracking #:',
-      states: {
-        SENT: {
-          title: 'Sent',
-          description: 'Your prescriptions have been sent to the pharmacy.'
-        },
-        PREPARING: {
-          title: 'Preparing',
-          description: 'The pharmacy has received your order and is preparing it.'
-        },
-        SHIPPED: {
-          title: 'Shipped',
-          description: 'Your prescriptions are being delivered to '
-        },
-        DELIVERED: {
-          title: 'Delivered',
-          description: 'Your prescriptions have arrived at their destination.'
-        }
-      },
-      cta: 'I received my prescriptions',
-      errorToast: {
-        title: 'Unable to mark order as shipped',
-        description: 'Please refresh and try again'
-      }
-    },
-    thankYou: 'Thank you!'
-  },
-  canceled: {
-    heading: 'This order has been canceled.',
-    subheading: 'If you have any questions, please text us at +1 (513) 866-3212.'
-  },
-  noMatch: {
-    heading: "We couldn't find what you're looking for.",
-    subheading: 'If you have any questions, please text us at +1 (513) 866-3212.'
+    error: {
+      title: text.errorMarkDelivered,
+      description: text.questions
+    }
   }
 };

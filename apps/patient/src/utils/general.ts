@@ -1,14 +1,15 @@
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import isBetween from 'dayjs/plugin/isBetween';
+import isToday from 'dayjs/plugin/isToday';
 import { types } from '@photonhealth/sdk';
 import { ExtendedFulfillmentType } from './models';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { getPlace, getPlaceDetails } from '../api';
-import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
+import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
 
 dayjs.extend(isoWeek);
 dayjs.extend(isBetween);
+dayjs.extend(isToday);
 
 export const titleCase = (str: string) =>
   str
@@ -27,66 +28,6 @@ export const formatAddress = (address: types.Address) => {
 // Format date to local date string (MM/DD/YYYY)
 export const formatDate = (date: string | Date) => new Date(date)?.toLocaleDateString();
 
-export const getHours = (
-  periods: { close: { day: number; time: string }; open: { day: number; time: string } }[],
-  currentTime: string
-) => {
-  /**
-   * There are 1-2 periods per day. For example CVS may have an hour off for
-   * lunch so google will show two "periods" with the same "day", like
-   * 0830-1200, 1300-2000.
-   *
-   * Todo:
-   *  - Add timezone support. Not urgent since user is usually in same tz as pharmacy.
-   */
-
-  const now = dayjs(currentTime, 'HHmm');
-  const today = now.isoWeekday();
-  let nextOpenTime = null;
-  let nextOpenDay = null;
-  let nextCloseTime = null;
-  let is24Hr = false;
-
-  if (periods?.length === 1) is24Hr = true;
-
-  if (periods && !is24Hr) {
-    for (let i = 0; i < periods.length; i++) {
-      const period = periods[i];
-      const open = period.open.time;
-      const close = period.close.time;
-
-      if (period.open.day === today) {
-        if (now.isBetween(dayjs(open, 'HHmm'), dayjs(close, 'HHmm'))) {
-          nextCloseTime = close;
-        } else if (!nextOpenTime && now.isBefore(dayjs(open, 'HHmm'))) {
-          nextOpenTime = open;
-        }
-      }
-    }
-
-    // after hours
-    if (!nextOpenTime) {
-      const indexOfLastCurrentDayPeriod = periods.lastIndexOf(
-        // clone periods to get around reverse-in-place
-        [...periods].reverse().find((per) => per.close.day === today)
-      );
-      const nextPeriod =
-        indexOfLastCurrentDayPeriod === periods.length - 1
-          ? periods[0]
-          : periods[indexOfLastCurrentDayPeriod + 1];
-      nextOpenTime = nextPeriod.open.time;
-      nextOpenDay = dayjs().isoWeekday(nextPeriod.open.day).format('ddd');
-    }
-  }
-
-  return {
-    is24Hr,
-    opens: nextOpenTime,
-    opensDay: nextOpenDay,
-    closes: nextCloseTime
-  };
-};
-
 /**
  * There is a delay before order fulfillment is created, so a query
  * param is used to assume fulfillment type coming from pharmacy selection.
@@ -97,7 +38,7 @@ export const getFulfillmentType = (
   param?: string
 ): ExtendedFulfillmentType => {
   // We don't have COURIER fulfillment type yet, so manually check for those
-  if (pharmacyId in capsuleZipcodeLookup) {
+  if (pharmacyId in COMMON_COURIER_PHARMACY_IDS) {
     return 'COURIER';
   }
 
@@ -151,52 +92,44 @@ export const countFillsAndRemoveDuplicates = (fills: types.Fill[]): FillWithCoun
   return result;
 };
 
-export const enrichPharmacy = async (
-  pharmacy: types.Pharmacy,
-  includeRating = true
-): Promise<EnrichedPharmacy> => {
-  try {
-    const place = await getPlace(pharmacy, includeRating);
-    if (!place) {
-      return pharmacy;
-    }
+function isOpenEvent(event: types.PharmacyEvent): event is types.PharmacyOpenEvent {
+  return event.type === 'open';
+}
 
-    const enrichedPharmacyInfo = {
-      ...pharmacy,
-      businessStatus: place.business_status || '',
-      rating: place.rating || undefined
-    };
+function isCloseEvent(event: types.PharmacyEvent): event is types.PharmacyCloseEvent {
+  return event.type === 'close';
+}
 
-    const isOperational =
-      enrichedPharmacyInfo.businessStatus === google.maps.places.BusinessStatus.OPERATIONAL;
-    if (!isOperational) {
-      return enrichedPharmacyInfo;
-    }
+export const preparePharmacyHours = (pharmacy: types.Pharmacy): EnrichedPharmacy => {
+  let is24Hr = false;
+  let opens = '';
+  let closes = '';
 
-    const fetchDetails = place.place_id && isOperational; // Don't continue enriching non-operational pharmacies
-    const placeDetails = fetchDetails ? await getPlaceDetails(place.place_id) : undefined;
-    if (!placeDetails) {
-      return enrichedPharmacyInfo;
-    }
+  if (pharmacy.nextEvents) {
+    is24Hr = pharmacy.nextEvents[pharmacy.isOpen ? 'open' : 'close'].type === '24hr';
 
-    const currentTime = dayjs().format('HHmm');
-    const { is24Hr, opens, opensDay, closes } = getHours(
-      placeDetails.opening_hours?.periods,
-      currentTime
-    );
+    // Prepare opens string, ex: Opens 8AM Wed
+    const nextOpen = isOpenEvent(pharmacy.nextEvents.open)
+      ? pharmacy.nextEvents.open.datetime
+      : undefined;
+    const formatter = `${dayjs(nextOpen).minute() > 0 ? 'h:mmA' : 'hA'}${
+      dayjs(nextOpen).isToday() ? '' : ' ddd'
+    }`;
+    const oTime = dayjs(nextOpen).format(formatter);
+    opens = `Opens ${oTime}`;
 
-    return {
-      ...enrichedPharmacyInfo,
-      hours: {
-        open: placeDetails.opening_hours?.isOpen() || false,
-        is24Hr,
-        opens,
-        opensDay,
-        closes
-      }
-    };
-  } catch (error) {
-    console.log('Failed to enrich pharmacy data: ' + error.message);
-    return pharmacy;
+    // Prepare closes string, ex: Closes 6PM
+    const nextClose = isCloseEvent(pharmacy.nextEvents.close)
+      ? pharmacy.nextEvents.close.datetime
+      : undefined;
+    const cTime = dayjs(nextClose).format(dayjs(nextClose).minute() > 0 ? 'h:mmA' : 'hA');
+    closes = `Closes ${cTime}`;
   }
+
+  return {
+    ...pharmacy,
+    is24Hr,
+    opens,
+    closes
+  };
 };

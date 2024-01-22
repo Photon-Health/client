@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import {
   Alert,
   Box,
@@ -19,50 +18,27 @@ import { useSearchParams } from 'react-router-dom';
 import { FiHelpCircle, FiRefreshCw } from 'react-icons/fi';
 import { text as t } from '../utils/text';
 import { Logo as PhotonLogo } from './Logo';
-import { getSettings } from '@client/settings';
-
-const settings = getSettings(process.env.REACT_APP_ENV_NAME);
-
-const PHOTON_PHONE_NUMBER = '+15138663212';
+import { useOrderContext } from '../views/Main';
 
 interface NavProps {
-  header: string;
-  showRefresh: boolean;
-  orgId?: string;
+  showRefresh?: boolean;
 }
 
-export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
+export const Nav = ({ showRefresh = false }: NavProps) => {
   const [searchParams] = useSearchParams();
   const isDemo = searchParams.get('demo');
+  const isProd = process.env.REACT_APP_ENV_NAME === 'photon';
 
-  const [logo, setLogo] = useState(undefined);
+  const { order, flattenedFills, logo } = useOrderContext();
 
-  const fetchLogo = async (fileName: string) => {
-    if (fileName === 'photon') {
-      setLogo('photon');
-    } else {
-      try {
-        const response = await import(`../assets/${fileName}`);
-        setLogo(response.default);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (orgId) {
-      const theme = orgId in settings ? settings[orgId] : settings.default;
-      fetchLogo(theme.logo);
-    }
-  }, [orgId]);
+  const isMultiRx = flattenedFills.length > 1;
 
   return (
     <Box as="nav" bg="white" boxShadow={useColorModeValue('sm', 'sm-dark')}>
-      {isDemo ? (
+      {isDemo || !isProd ? (
         <Alert status="info" variant="subtle" w="full" py={2}>
           <HStack spacing={1} mx="auto">
-            <Text fontSize="sm">This is not a real prescription.</Text>
+            <Text fontSize="sm">{isMultiRx ? t.fakeRxs : t.fakeRx}</Text>
             <Link
               fontSize="sm"
               isExternal
@@ -71,7 +47,7 @@ export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
               fontWeight="medium"
               textDecoration="underline"
             >
-              Try Photon
+              {t.tryPhoton}
             </Link>
           </HStack>
         </Alert>
@@ -93,7 +69,7 @@ export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
               textOverflow="ellipsis"
               overflow="hidden"
             >
-              {header}
+              {order.organization.name}
             </Text>
           )}
           <Spacer />
@@ -115,7 +91,10 @@ export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
             />
             <MenuList>
               <MenuItem>
-                <Link href={`sms:${PHOTON_PHONE_NUMBER}`} style={{ textDecoration: 'none' }}>
+                <Link
+                  href={`sms:${process.env.REACT_APP_TWILIO_SMS_NUMBER}`}
+                  style={{ textDecoration: 'none' }}
+                >
                   {t.contactSupport}
                 </Link>
               </MenuItem>
@@ -125,9 +104,4 @@ export const Nav = ({ header, showRefresh, orgId }: NavProps) => {
       </Container>
     </Box>
   );
-};
-
-Nav.defaultProps = {
-  showRefresh: false,
-  orgId: undefined
 };

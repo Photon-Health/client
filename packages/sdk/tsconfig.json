@@ -8,6 +8,7 @@
     "strict": true,
     "noEmit": true,
     "jsx": "preserve",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "resolveJsonModule": true
   }
 }

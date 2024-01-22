@@ -15,10 +15,8 @@ import {
 } from '@chakra-ui/react';
 
 import { usePhoton } from '@photonhealth/react';
-
 import { ClientInfoCard } from './ClientInfoCard';
 import { graphql } from 'apps/app/src/gql';
-import { useClinicalApiClient } from '../../apollo';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@apollo/client';
 
@@ -34,8 +32,8 @@ const clientsQuery = graphql(/* GraphQL */ `
 export const Credentials = () => {
   const { getToken } = usePhoton();
   const [tokenClickedState, setTokenClickedState] = useState(false);
-  const client = useClinicalApiClient();
-  const { data, loading, error } = useQuery(clientsQuery, { client });
+  const { clinicalClient } = usePhoton();
+  const { data, loading, error } = useQuery(clientsQuery, { client: clinicalClient });
   const clients = useMemo(() => data?.clients, [data?.clients]);
 
   useEffect(() => {
