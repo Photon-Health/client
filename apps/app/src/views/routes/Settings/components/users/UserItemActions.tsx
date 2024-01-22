@@ -56,7 +56,7 @@ interface UserItemActionsProps {
 }
 
 const RemoveUserFromOrganizationMutation = graphql(/* GraphQL */ `
-  mutation RemoveUserFromOrganization($userId: ID!) {
+  mutation UserItemActionRemoveUserFromOrganization($userId: ID!) {
     removeUserFromOrganization(userId: $userId)
   }
 `);
