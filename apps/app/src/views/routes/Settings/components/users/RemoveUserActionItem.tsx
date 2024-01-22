@@ -63,7 +63,7 @@ export const RemoveUserAction: React.FC<RemoveUserActionProps> = ({ user, onClos
       position: 'top-right',
       duration: 4000,
       render: ({ onClose }) => (
-        <StyledToast onClose={onClose} type="success" description="Profile updated" />
+        <StyledToast onClose={onClose} type="success" description="User Removed" />
       )
     });
   };
