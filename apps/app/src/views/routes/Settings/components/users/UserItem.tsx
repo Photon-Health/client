@@ -5,7 +5,8 @@ import { UserItemActions } from './UserItemActions';
 import { compareRoles } from './utils';
 
 export const userFragment = graphql(/* GraphQL */ `
-  fragment UserFragment on User {
+  fragment UserItemUserFragment on User {
+    ...UserFragment
     id
     npi
     phone
@@ -65,7 +66,7 @@ export const UserItem = ({
       {data &&
         (!hasRole ? null : (
           <Td>
-            <UserItemActions user={data}></UserItemActions>
+            <UserItemActions user={user}></UserItemActions>
           </Td>
         ))}
     </Tr>
