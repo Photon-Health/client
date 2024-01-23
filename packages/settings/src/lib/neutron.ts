@@ -271,5 +271,11 @@ export const neutron: {
     ...defaultSettings,
     logo: 'transcarent_logo.png',
     accentColor: '#3d409a'
+  },
+  // Virtue Security
+  org_AT6udPlpnPkWcuom: {
+    ...defaultSettings,
+    logo: 'virtue_security_logo.png',
+    accentColor: '#012b54'
   }
 };
