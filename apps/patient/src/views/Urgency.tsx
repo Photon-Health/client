@@ -78,12 +78,14 @@ export const Urgency = () => {
               return (
                 <Card
                   key={option}
-                  bgColor={isDisabled ? 'gray.100' : 'white'}
-                  border={isDisabled ? 'gray.100' : '2px solid'}
+                  bgColor={isDisabled ? 'gray.300' : 'white'}
+                  border={isDisabled ? 'gray.300' : '2px solid'}
                   borderColor={selectedIdx === i ? 'brand.600' : 'white'}
+                  color={isDisabled ? 'gray.600' : 'base'}
                   onClick={() => !isDisabled && setSelectedIdx(i)}
                   m="auto"
                   w="full"
+                  shadow={isDisabled ? 'none' : 'base'}
                   cursor={isDisabled ? 'not-allowed' : 'pointer'}
                 >
                   <CardBody p={3} m="auto">
