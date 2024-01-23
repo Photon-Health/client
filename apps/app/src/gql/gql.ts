@@ -31,7 +31,7 @@ const documents = {
     "\n  fragment EditRolesActionUserFragment on User {\n    id\n    npi\n    phone\n    fax\n    email\n    address {\n      street1\n      street2\n      state\n      postalCode\n      country\n      city\n    }\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n    roles {\n      description\n      id\n      name\n    }\n  }\n": types.EditRolesActionUserFragmentFragmentDoc,
     "\n  mutation SetUserRoles($userId: ID!, $roles: [ID!]!) {\n    setUserRoles(userId: $userId, roles: $roles)\n  }\n": types.SetUserRolesDocument,
     "\n  mutation UpdateProviderProfile(\n    $providerId: ID!\n    $updateProviderProfileInput: UpdateProviderProfileInput!\n  ) {\n    updateProviderProfile(providerId: $providerId, input: $updateProviderProfileInput)\n  }\n": types.UpdateProviderProfileDocument,
-    "\n  fragment RemoveUserActionUserFragment on User {\n    id\n    email\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n  }\n": types.RemoveUserActionUserFragmentFragmentDoc,
+    "\n  fragment RemoveUserActionUserFragment on User {\n    id\n    email\n    name {\n      full\n    }\n  }\n": types.RemoveUserActionUserFragmentFragmentDoc,
     "\n  mutation UserItemActionRemoveUserFromOrganization($userId: ID!) {\n    removeUserFromOrganization(userId: $userId)\n  }\n": types.UserItemActionRemoveUserFromOrganizationDocument,
     "\n  fragment UserItemUserFragment on User {\n    ...UserFragment\n    id\n    npi\n    phone\n    fax\n    email\n    address {\n      street1\n      street2\n      state\n      postalCode\n      country\n      city\n    }\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n    roles {\n      description\n      id\n      name\n    }\n  }\n": types.UserItemUserFragmentFragmentDoc,
     "\n  fragment UserFragment on User {\n    ...RemoveUserActionUserFragment\n    ...EditRolesActionUserFragment\n    id\n    npi\n    phone\n    fax\n    email\n    address {\n      street1\n      street2\n      state\n      postalCode\n      country\n      city\n    }\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n    roles {\n      description\n      id\n      name\n    }\n  }\n": types.UserFragmentFragmentDoc,
@@ -134,7 +134,7 @@ export function graphql(source: "\n  mutation UpdateProviderProfile(\n    $provi
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment RemoveUserActionUserFragment on User {\n    id\n    email\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n  }\n"): (typeof documents)["\n  fragment RemoveUserActionUserFragment on User {\n    id\n    email\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n  }\n"];
+export function graphql(source: "\n  fragment RemoveUserActionUserFragment on User {\n    id\n    email\n    name {\n      full\n    }\n  }\n"): (typeof documents)["\n  fragment RemoveUserActionUserFragment on User {\n    id\n    email\n    name {\n      full\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
