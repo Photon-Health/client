@@ -7,7 +7,7 @@ import { PhotonDropdown } from '../photon-dropdown';
 
 //Types
 import { Medication, Treatment, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
-import { createSignal, onMount } from 'solid-js';
+import { createMemo, createSignal, onMount } from 'solid-js';
 import { CatalogStore } from '../stores/catalog';
 
 customElement(
@@ -80,13 +80,11 @@ customElement(
       return [];
     };
 
-    const onOpen = async () => {
-      await actions.getCatalogs(client!.getSDK());
-    };
-
     const onHide = async () => setFilter('');
 
     const onSearchChange = async (s: string) => setFilter(s);
+
+    const data = createMemo(() => getData(filter()));
 
     return (
       <div
@@ -96,7 +94,7 @@ customElement(
         }}
       >
         <PhotonDropdown
-          data={getData(filter())}
+          data={data()}
           groups={[
             {
               label: 'Off Catalog',
@@ -124,7 +122,7 @@ customElement(
           required={props.required}
           placeholder="Select a treatment..."
           invalid={props.invalid}
-          isLoading={client?.clinical.catalog.state.isLoading || false}
+          isLoading={store.catalogs.isLoading}
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
           displayAccessor={(t: Treatment | PrescriptionTemplate, groupAccess: boolean) => {
@@ -155,13 +153,7 @@ customElement(
             }
           }}
           onSearchChange={onSearchChange}
-          onOpen={onOpen}
           onHide={onHide}
-          noDataMsg={
-            store.catalogs.data.length === 0 && !store.catalogs.isLoading
-              ? 'No catalog found'
-              : 'No treatments found'
-          }
           helpText={props.helpText}
         />
       </div>
