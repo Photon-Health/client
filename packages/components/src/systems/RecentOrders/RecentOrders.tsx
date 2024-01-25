@@ -161,7 +161,7 @@ function RecentOrders(props: SDKProviderProps) {
     });
 
     const orders = data?.patient?.orders;
-
+    console.log('orders', orders);
     if (orders?.length > 0) {
       const now = new Date();
       const eightHoursAgo = new Date(now.getTime() - 8 * 60 * 60 * 1000);
@@ -170,7 +170,7 @@ function RecentOrders(props: SDKProviderProps) {
         const createdAt = new Date(order.createdAt);
         return createdAt > eightHoursAgo;
       });
-
+      console.log('recentOrders', recentOrders);
       setState({
         orders: recentOrders,
         patientName: data?.patient?.name?.full,

@@ -46,13 +46,13 @@ export const Default: OrderStatusBadgeStory = {
       <For each={orderStates}>
         {(orderState) => (
           <div class="flex mb-4 gap-4">
-            <For each={fulfillmentStates}>
+            <For each={[...fulfillmentStates, undefined]}>
               {(fulfillmentState) => (
                 <div class="mb-2">
                   <OrderStatusBadge orderState={orderState} fulfillmentState={fulfillmentState} />
                   <span class="text-xs font-mono">
                     {' '}
-                    {orderState ?? 'undefined'} / {fulfillmentState}
+                    {orderState} / {fulfillmentState || 'undefined'}
                   </span>
                 </div>
               )}
