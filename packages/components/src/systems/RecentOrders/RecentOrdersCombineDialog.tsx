@@ -135,6 +135,7 @@ export default function RecentOrdersCombineDialog() {
     }
 
     setIsCombiningOrders(true);
+    dispatchDatadogAction('prescribe-combine-dialog-combining', {}, ref);
 
     let prescriptions;
     try {
@@ -264,6 +265,7 @@ export default function RecentOrdersCombineDialog() {
             variant="secondary"
             size="xl"
             onClick={() => {
+              dispatchDatadogAction('prescribe-combine-dialog-not-combining', {}, ref);
               state.createOrder?.();
               setIsCreatingOrder(true);
             }}

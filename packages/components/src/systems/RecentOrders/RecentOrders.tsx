@@ -156,7 +156,8 @@ function RecentOrders(props: SDKProviderProps) {
       query: GetPatientOrdersQuery,
       variables: {
         patientId: props.patientId
-      }
+      },
+      fetchPolicy: 'network-only'
     });
 
     const orders = data?.patient?.orders;
