@@ -97,7 +97,7 @@ export const ORDER_FULFILLMENT_STATE_COLOR_MAP: { [key in OrderFulfillmentState]
 export type OrderStateString = `${OrderState}`;
 
 export interface OrderStatusBadgeProps {
-  fulfillmentState: OrderFulfillmentState | undefined;
+  fulfillmentState?: OrderFulfillmentState;
   orderState: OrderStateString;
 }
 
