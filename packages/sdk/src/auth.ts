@@ -152,11 +152,12 @@ export class AuthManager {
     } catch (e) {
       if ((e as Error).message.includes('Consent required')) {
         token = await this.authentication.getTokenWithPopup(opts);
-      } else {
-        throw e;
       }
     }
-    if (!token) throw new Error('Missing token');
+    if (!token) {
+      await this.authentication.loginWithRedirect();
+      throw new Error(); // Needed just because this needs to resolve to something
+    }
     return token;
   }
 
