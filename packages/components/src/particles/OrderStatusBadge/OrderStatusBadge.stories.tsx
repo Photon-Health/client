@@ -42,7 +42,7 @@ export const Default: OrderStatusBadgeStory = {
   // @ts-ignore
   render: () => (
     <>
-      <div class="text-xs mb-8 font-mono">ORDER_STATE / FULFILLEMENT_STATE</div>
+      <div class="text-xs mb-8 font-mono">ORDER_STATE / FULFILLMENT_STATE</div>
       <For each={orderStates}>
         {(orderState) => (
           <div class="flex mb-4 gap-4">
