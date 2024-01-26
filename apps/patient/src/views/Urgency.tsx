@@ -1,13 +1,27 @@
 import { useEffect, useState } from 'react';
-import { Box, Button, Card, CardBody, Container, Heading, Text, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Card,
+  CardBody,
+  Container,
+  Heading,
+  HStack,
+  Text,
+  VStack
+} from '@chakra-ui/react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
 import { datadogRum } from '@datadog/browser-rum';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(timezone);
 
 import { FixedFooter, Nav, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
+import { RxLightningBolt } from 'react-icons/rx';
 
 const checkDisabled = (option: string): boolean => {
   const currentTime = dayjs();
@@ -32,10 +46,11 @@ export const Urgency = () => {
     if (!isDemo) {
       // Track selection
       datadogRum.addAction('urgency_selection', {
-        value: t.urgencyOptions[selectedIdx],
+        value: t.urgencyOptions[selectedIdx].label,
         orderId: order.id,
         organization: order.organization.name,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        timezone: dayjs.tz.guess()
       });
     }
 
@@ -74,10 +89,10 @@ export const Urgency = () => {
 
           <VStack spacing={3} w="full">
             {t.urgencyOptions.map((option, i) => {
-              const isDisabled = checkDisabled(option);
+              const isDisabled = checkDisabled(option.label);
               return (
                 <Card
-                  key={option}
+                  key={option.label}
                   bgColor={isDisabled ? 'gray.300' : 'white'}
                   border={isDisabled ? 'gray.300' : '2px solid'}
                   borderColor={selectedIdx === i ? 'brand.600' : 'white'}
@@ -89,7 +104,17 @@ export const Urgency = () => {
                   cursor={isDisabled ? 'not-allowed' : 'pointer'}
                 >
                   <CardBody p={3} m="auto">
-                    <Text fontWeight="medium">{option}</Text>
+                    {option.description ? (
+                      <VStack spacing={1}>
+                        <HStack>
+                          {option.icon ? <RxLightningBolt /> : null}
+                          <Text fontWeight="medium">{option.label}</Text>
+                        </HStack>
+                        <Text color="gray.500">{option.description}</Text>
+                      </VStack>
+                    ) : (
+                      <Text fontWeight="medium">{option.label}</Text>
+                    )}
                   </CardBody>
                 </Card>
               );
