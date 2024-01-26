@@ -28,7 +28,7 @@ import { Role } from 'packages/sdk/dist/types';
 import { StyledToast } from 'apps/app/src/views/components/StyledToast';
 
 export const userFragment = graphql(/* GraphQL */ `
-  fragment UserFragment on User {
+  fragment EditRolesActionUserFragment on User {
     id
     npi
     phone

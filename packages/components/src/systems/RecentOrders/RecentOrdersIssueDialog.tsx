@@ -1,4 +1,4 @@
-import { createMemo, createSignal, For, Ref } from 'solid-js';
+import { createEffect, createMemo, createSignal, For, Ref } from 'solid-js';
 import * as zod from 'zod';
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
@@ -12,6 +12,7 @@ import Textarea from '../../particles/Textarea';
 import formatRxString from '../../utils/formatRxString';
 import uniqueFills from '../../utils/uniqueFills';
 import { usePhotonClient } from '../SDKProvider';
+import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 
 const ticketSchema = zod.object({
   description: zod.string().min(1, { message: 'A description is required' })
@@ -86,6 +87,12 @@ export default function RecentOrdersIssueDialog() {
   const [state, actions] = useRecentOrders();
   const client = usePhotonClient();
 
+  createEffect(() => {
+    if (state.isIssueDialogOpen) {
+      dispatchDatadogAction('prescribe-issue-dialog-open', {}, ref);
+    }
+  });
+
   const dispatchTicketCreatedDuplicate = () => {
     const event = new CustomEvent('photon-ticket-created-duplicate', {
       composed: true,
@@ -108,6 +115,7 @@ export default function RecentOrdersIssueDialog() {
 
   const createTicket = async (values: TicketProps) => {
     setSubmitting(true);
+    dispatchDatadogAction('prescribe-issue-dialog-submitting', {}, ref);
     const body = composeTicket({
       patient: { id: state?.patientId, name: state?.patientName },
       order: { id: state?.orderWithIssue?.id },
@@ -162,7 +170,13 @@ export default function RecentOrdersIssueDialog() {
   });
 
   return (
-    <Dialog open={state.isIssueDialogOpen} onClose={() => actions.setIsIssueDialogOpen(false)}>
+    <Dialog
+      open={state.isIssueDialogOpen}
+      onClose={() => {
+        dispatchDatadogAction('prescribe-issue-dialog-exit', {}, ref);
+        actions.setIsIssueDialogOpen(false);
+      }}
+    >
       <div class="flex flex-col gap-6" ref={ref}>
         <div>
           <Text bold class="mb-2">
@@ -224,7 +238,14 @@ export default function RecentOrdersIssueDialog() {
           >
             Report Issue
           </Button>
-          <Button variant="naked" size="xl" onClick={() => actions.setIsIssueDialogOpen(false)}>
+          <Button
+            variant="naked"
+            size="xl"
+            onClick={() => {
+              dispatchDatadogAction('prescribe-issue-dialog-exit', {}, ref);
+              actions.setIsIssueDialogOpen(false);
+            }}
+          >
             Go Back
           </Button>
         </div>
