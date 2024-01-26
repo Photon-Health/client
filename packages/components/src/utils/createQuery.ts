@@ -28,6 +28,7 @@ export const createQuery = <
   options: CreateQueryOptions<TData, TVariables>
 ) => {
   const resolvedOptions = typeof options === 'function' ? options() : options; // could be accessor or object
+  const client = resolvedOptions.client;
   const optionsAccessor = () => {
     if (typeof options !== 'function') {
       if (options.skip) {
@@ -44,7 +45,6 @@ export const createQuery = <
     }
     return opts;
   };
-  const client = resolvedOptions.client;
 
   const [resource] = createResource<TData, BaseOptions<TData, TVariables>>(
     optionsAccessor,

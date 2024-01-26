@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, For, Ref } from 'solid-js';
+import { createEffect, createMemo, For, Ref } from 'solid-js';
 import * as zod from 'zod';
 import { createForm } from '@felte/solid';
 import { validator } from '@felte/validator-zod';
@@ -13,6 +13,7 @@ import formatRxString from '../../utils/formatRxString';
 import uniqueFills from '../../utils/uniqueFills';
 import { usePhotonClient } from '../SDKProvider';
 import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
+import { createMutation } from '../../utils/createMutation';
 
 const ticketSchema = zod.object({
   description: zod.string().min(1, { message: 'A description is required' })
@@ -29,6 +30,15 @@ const CREATE_TICKET = gql`
     }
   }
 `;
+
+type InputValues = {
+  input: {
+    subject: string;
+    comment: {
+      body: string;
+    };
+  };
+};
 
 type FillWithName = {
   name?: string;
@@ -83,9 +93,12 @@ const formName = 'prescribe-flow-duplicate';
 
 export default function RecentOrdersIssueDialog() {
   let ref: Ref<any> | undefined;
-  const [submitting, setSubmitting] = createSignal(false);
   const [state, actions] = useRecentOrders();
   const client = usePhotonClient();
+
+  const [createTicketMutation, data] = createMutation<{ id: string }, InputValues>(CREATE_TICKET, {
+    client: client!.apolloClinical
+  });
 
   createEffect(() => {
     if (state.isIssueDialogOpen) {
@@ -94,6 +107,7 @@ export default function RecentOrdersIssueDialog() {
   });
 
   const dispatchTicketCreatedDuplicate = () => {
+    // triggers the parent flow to clears the add prescription form
     const event = new CustomEvent('photon-ticket-created-duplicate', {
       composed: true,
       bubbles: true,
@@ -114,7 +128,6 @@ export default function RecentOrdersIssueDialog() {
   });
 
   const createTicket = async (values: TicketProps) => {
-    setSubmitting(true);
     dispatchDatadogAction('prescribe-issue-dialog-submitting', {}, ref);
     const body = composeTicket({
       patient: { id: state?.patientId, name: state?.patientName },
@@ -129,8 +142,7 @@ export default function RecentOrdersIssueDialog() {
       values
     });
 
-    await client!.apolloClinical.mutate({
-      mutation: CREATE_TICKET,
+    await createTicketMutation({
       variables: {
         input: {
           subject: `Issue with ${
@@ -142,20 +154,22 @@ export default function RecentOrdersIssueDialog() {
         }
       }
     });
-
-    setSubmitting(false);
-    triggerToast({
-      header: 'Issue reported',
-      body: 'The customer support team will respond to you shortly.',
-      status: 'success'
-    });
-    dispatchTicketCreatedDuplicate();
-    actions.setIsIssueDialogOpen(false);
   };
+
+  createEffect(() => {
+    if (data()) {
+      triggerToast({
+        header: 'Issue reported',
+        body: 'The customer support team will respond to you shortly.',
+        status: 'success'
+      });
+      dispatchTicketCreatedDuplicate();
+      actions.setIsIssueDialogOpen(false);
+    }
+  });
 
   const { form, errors } = createForm({
     onSubmit: async (values) => {
-      setSubmitting(true);
       try {
         createTicket({ ...values });
       } catch (e) {
@@ -231,8 +245,8 @@ export default function RecentOrdersIssueDialog() {
         <div class="flex flex-col items-stretch gap-4">
           <Button
             size="xl"
-            disabled={submitting()}
-            loading={submitting()}
+            disabled={data.loading}
+            loading={data.loading}
             type="submit"
             form={formName}
           >
