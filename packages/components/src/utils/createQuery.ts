@@ -2,7 +2,7 @@
  * createQuery originates from the solid-apollo package
  * https://github.com/merged-js/solid-apollo/blob/main/src/createQuery.ts
  *
- * Modified slightly to fix types
+ * Modified slightly to fix types, enforces passing a client to work
  */
 import type { WatchQueryOptions, OperationVariables, ApolloClient } from '@apollo/client/core';
 import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
@@ -10,7 +10,7 @@ import type { Accessor } from 'solid-js';
 import { createResource, onCleanup } from 'solid-js';
 import { createStore, reconcile } from 'solid-js/store';
 
-interface BaseOptions<TData, TVariables extends OperationVariables = OperationVariables>
+export interface BaseOptions<TData, TVariables extends OperationVariables = OperationVariables>
   extends Omit<WatchQueryOptions<TVariables, TData>, 'query'> {
   skip?: boolean;
   client: ApolloClient<any>; // enforce a client being present since we have two

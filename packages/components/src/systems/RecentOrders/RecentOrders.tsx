@@ -1,14 +1,14 @@
-import { createContext, JSXElement, useContext, createEffect } from 'solid-js';
+import { createContext, JSXElement, useContext, createEffect, createMemo } from 'solid-js';
 import { gql } from '@apollo/client';
 import RecentOrdersCard from './RecentOrdersCard';
 import { usePhotonClient } from '../SDKProvider';
-import { Fill, Order } from '@photonhealth/sdk/dist/types';
 import { createStore } from 'solid-js/store';
 import RecentOrdersDuplicateDialog from './RecentOrdersDuplicateDialog';
 import RecentOrdersIssueDialog from './RecentOrdersIssueDialog';
 import RecentOrdersCombineDialog from './RecentOrdersCombineDialog';
 import type { DraftPrescription } from '../DraftPrescriptions';
 import { Address } from '../PatientInfo';
+import { BaseOptions, createQuery } from '../../utils/createQuery';
 
 const GetPatientOrdersQuery = gql`
   query GetPatientOrders($patientId: ID!) {
@@ -36,6 +36,40 @@ const GetPatientOrdersQuery = gql`
     }
   }
 `;
+
+type GetPatientOrdersVars = {
+  patientId: string;
+};
+
+// we will generate these soon...
+type Fill = {
+  treatment: {
+    name: string;
+  };
+  prescription: {
+    dispenseQuantity: number;
+    dispenseUnit: string;
+    fillsAllowed: number;
+    instructions: string;
+  };
+};
+
+type Order = {
+  id: string;
+  createdAt: string;
+  state: string;
+  fills: Fill[];
+};
+
+interface GetPatientOrdersResponse {
+  patient: {
+    id: string;
+    name: {
+      full: string;
+    };
+    orders: Order[];
+  };
+}
 
 type RecentOrdersState = {
   orders: Order[];
@@ -108,6 +142,20 @@ function RecentOrders(props: SDKProviderProps) {
     duplicateDialogContinueCb: () => undefined
   });
 
+  // we need to make this reactive because we need to re-query when the patientId changes
+  const options = createMemo<BaseOptions<GetPatientOrdersResponse, GetPatientOrdersVars>>(() => ({
+    variables: {
+      patientId: props.patientId
+    },
+    skip: !props.patientId,
+    client: client!.apollo,
+    fetchPolicy: 'network-only'
+  }));
+  const data = createQuery<GetPatientOrdersResponse, GetPatientOrdersVars>(
+    GetPatientOrdersQuery,
+    options
+  );
+
   const value: RecentOrdersContextValue = [
     state,
     {
@@ -151,37 +199,26 @@ function RecentOrders(props: SDKProviderProps) {
     }
   ];
 
-  async function fetchPatientAndOrders() {
-    const { data } = await client!.apollo.query({
-      query: GetPatientOrdersQuery,
-      variables: {
-        patientId: props.patientId
-      },
-      fetchPolicy: 'network-only'
-    });
-
-    const orders = data?.patient?.orders;
-
-    if (orders?.length > 0) {
-      const now = new Date();
-      const eightHoursAgo = new Date(now.getTime() - 8 * 60 * 60 * 1000);
-
-      const recentOrders = orders.filter((order: Order) => {
-        const createdAt = new Date(order.createdAt);
-        return createdAt > eightHoursAgo;
-      });
-
-      setState({
-        orders: recentOrders,
-        patientName: data?.patient?.name?.full,
-        patientId: data?.patient?.id
-      });
-    }
-  }
-
   createEffect(() => {
-    if (props.patientId) {
-      fetchPatientAndOrders();
+    const patient = data()?.patient;
+    if (!data.loading && patient) {
+      const orders = patient?.orders;
+
+      if (orders?.length > 0) {
+        const now = new Date();
+        const eightHoursAgo = new Date(now.getTime() - 8 * 60 * 60 * 1000);
+
+        const recentOrders = orders.filter((order: Order) => {
+          const createdAt = new Date(order.createdAt);
+          return createdAt > eightHoursAgo;
+        });
+
+        setState({
+          orders: recentOrders,
+          patientName: patient?.name?.full,
+          patientId: patient?.id
+        });
+      }
     }
   });
 
