@@ -4,6 +4,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
 import { datadogRum } from '@datadog/browser-rum';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(timezone);
 
 import { FixedFooter, Nav, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
@@ -35,7 +38,8 @@ export const Urgency = () => {
         value: t.urgencyOptions[selectedIdx],
         orderId: order.id,
         organization: order.organization.name,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        timezone: dayjs.tz.guess()
       });
     }
 
