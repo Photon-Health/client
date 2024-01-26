@@ -1,3 +1,9 @@
+/**
+ * createQuery originates from the solid-apollo package
+ * https://github.com/merged-js/solid-apollo/blob/main/src/createMutation.ts
+ *
+ * Modified to fix types, enforces passing a client to work
+ */
 import { ApolloClient, mergeOptions } from '@apollo/client/core';
 import type {
   DefaultContext,

@@ -2,7 +2,7 @@
  * createQuery originates from the solid-apollo package
  * https://github.com/merged-js/solid-apollo/blob/main/src/createQuery.ts
  *
- * Modified slightly to fix types, enforces passing a client to work
+ * Modified to fix types, enforces passing a client to work
  */
 import type { WatchQueryOptions, OperationVariables, ApolloClient } from '@apollo/client/core';
 import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
