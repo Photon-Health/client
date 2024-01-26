@@ -117,6 +117,7 @@ type Status =
 export const SignatureAttestationModal = (props: SignatureAttestationModalProps) => {
   let ref: Ref<any> | undefined;
   const [status, setStatus] = createSignal<Status>({ status: 'LOADING' });
+  const [submitting, setSubmitting] = createSignal(false);
 
   const refreshAttestationStatus = async () => {
     const req = await getCurrentUserSignatureAttestationStatus(props.client);
@@ -174,12 +175,18 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
   });
 
   const onAgree = async () => {
+    if (submitting()) {
+      return;
+    }
     const curr = status();
     if (curr.status === 'NEEDS ATTESTATION') {
+      setSubmitting(true);
       const res = await agreeToSignatureAttestation(props.client)(curr.version);
       if (res.data?.agreeToSignatureAttestation) {
+        setSubmitting(false);
         setStatus({ status: 'COMPLETE' });
       } else if (res.error || res.errors) {
+        setSubmitting(false);
         setStatus({
           status: 'ERROR',
           errors: [
@@ -210,7 +217,11 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
         </Match>
         <Match when={status().status === 'NEEDS ATTESTATION'}>
           <div class="w-full">
-            <AgreementCard onAgree={onAgree} onCancel={dispatchSignatureAttestationCanceled} />
+            <AgreementCard
+              onAgree={onAgree}
+              onCancel={dispatchSignatureAttestationCanceled}
+              disabled={submitting()}
+            />
           </div>
         </Match>
       </Switch>
@@ -218,7 +229,7 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
   );
 };
 
-const AgreementCard = (props: { onAgree: () => void; onCancel: () => void }) => (
+const AgreementCard = (props: { onAgree: () => void; onCancel: () => void; disabled: boolean }) => (
   <Card>
     <div class="flex flex-col space-y-5">
       <div class="bg-[#FFFAEB] flex text-[#DC6803] py-2 font-semibold items-center text-sm">
@@ -246,10 +257,10 @@ const AgreementCard = (props: { onAgree: () => void; onCancel: () => void }) => 
         </p>
       </div>
       <div class="flex justify-end space-x-4">
-        <Button variant="secondary" onClick={props.onCancel}>
+        <Button variant="secondary" onClick={props.onCancel} disabled={props.disabled}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={props.onAgree}>
+        <Button variant="primary" onClick={props.onAgree} disabled={props.disabled}>
           Agree
         </Button>
       </div>

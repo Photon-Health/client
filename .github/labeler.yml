@@ -1,0 +1,23 @@
+Elements:
+  - changed-files:
+      - any-glob-to-any-file: 'packages/elements/**'
+
+SDK:
+  - changed-files:
+      - any-glob-to-any-file: 'packages/sdk/**'
+
+Components:
+  - changed-files:
+      - any-glob-to-any-file: 'packages/components/**'
+
+Settings:
+  - changed-files:
+      - any-glob-to-any-file: 'packages/settings/**'
+
+'Patient App':
+  - changed-files:
+      - any-glob-to-any-file: 'apps/patient/**'
+
+'Clinical App':
+  - changed-files:
+      - any-glob-to-any-file: 'apps/app/**'
