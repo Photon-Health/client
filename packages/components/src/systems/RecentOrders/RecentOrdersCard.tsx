@@ -5,7 +5,7 @@ import Banner from '../../particles/Banner';
 import Button from '../../particles/Button';
 import Card from '../../particles/Card';
 import Text from '../../particles/Text';
-import OrderStatusBadge from '../../particles/OrderStatusBadge';
+import { OrderStatusBadge } from '../../particles/OrderStatusBadge';
 
 export default function RecentOrdersCard() {
   const [state, actions] = useRecentOrders();
