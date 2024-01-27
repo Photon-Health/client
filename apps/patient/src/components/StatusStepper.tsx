@@ -17,7 +17,11 @@ import { ExtendedFulfillmentType } from '../utils/models';
 import { countFillsAndRemoveDuplicates } from '../utils/general';
 import { useOrderContext } from '../views/Main';
 
-export const STATES = ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'];
+export const STATES = {
+  PICK_UP: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'],
+  MAIL_ORDER: ['SENT', 'FILLING', 'SHIPPED', 'DELIVERED'],
+  COURIER: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP']
+};
 
 interface Props {
   fulfillmentType: ExtendedFulfillmentType;
@@ -25,8 +29,12 @@ interface Props {
   patientAddress?: string;
 }
 
+const getStates = (fulfillmentType) => {
+  return STATES[fulfillmentType];
+};
+
 export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props) => {
-  const currentStepIdx = STATES.findIndex((state) => state === status);
+  const currentStepIdx = getStates(fulfillmentType).findIndex((state) => state === status);
   const activeStep = currentStepIdx + 1; // step to do next
 
   const { order } = useOrderContext();
@@ -46,7 +54,7 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
             size="lg"
             colorScheme="green"
           >
-            {STATES.map((state, id) => {
+            {getStates(fulfillmentType).map((state, id) => {
               const title = t[fulfillmentType][state].status;
               const isDelivery = fulfillmentType === 'COURIER' || fulfillmentType === 'MAIL_ORDER';
               const description = `${t[fulfillmentType][state].description(isMultiRx)}${
