@@ -28,7 +28,7 @@ const stateOptions = [
   { value: 'MS', label: 'Mississippi' },
   { value: 'MO', label: 'Missouri' },
   { value: 'MT', label: 'Montana' },
-  { value: 'NB', label: 'Nebraska' },
+  { value: 'NE', label: 'Nebraska' },
   { value: 'NV', label: 'Nevada' },
   { value: 'NH', label: 'New Hampshire' },
   { value: 'NJ', label: 'New Jersey' },
