@@ -26,7 +26,7 @@ const STATES = [
   { value: 'MS', label: 'Mississippi' },
   { value: 'MO', label: 'Missouri' },
   { value: 'MT', label: 'Montana' },
-  { value: 'NB', label: 'Nebraska' },
+  { value: 'NE', label: 'Nebraska' },
   { value: 'NV', label: 'Nevada' },
   { value: 'NH', label: 'New Hampshire' },
   { value: 'NJ', label: 'New Jersey' },
@@ -61,7 +61,7 @@ export const yupStateSchema = yup.object({
     .string()
     .required()
     .matches(
-      /^(AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NB|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|PR|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY)$/,
+      /^(AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|PR|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY)$/,
       { message: 'Please select a valid state' }
     )
 });
