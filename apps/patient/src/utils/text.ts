@@ -221,21 +221,21 @@ export const orderStateMapping = {
       description: (isPlural: boolean) => text.sent(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    RECEIVED: {
+    FILLING: {
       heading: text.preparingOrder,
       subheading: text.preparingDelivery,
       status: text.preparing,
       description: (isPlural: boolean) => text.preparingRxDelivery(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    READY: {
+    SHIPPED: {
       heading: text.orderInTransit,
       subheading: (isPlural: boolean) => text.outForDelivery(isPlural),
       status: text.inTransit,
       description: (isPlural: boolean) => text.rxInTransit(isPlural),
       cta: (isPlural: boolean) => text.receivedRx(isPlural)
     },
-    PICKED_UP: {
+    DELIVERED: {
       heading: text.orderDelivered,
       subheading: () => '', // it'll still show text us prompt
       status: text.delivered,
