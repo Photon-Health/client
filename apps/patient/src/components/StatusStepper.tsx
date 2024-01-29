@@ -41,6 +41,7 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
 
   const flattenedFills = countFillsAndRemoveDuplicates(order.fills);
   const isMultiRx = flattenedFills.length > 1;
+  const isDelivery = fulfillmentType === 'COURIER' || fulfillmentType === 'MAIL_ORDER';
 
   return (
     <Box>
@@ -56,9 +57,8 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
           >
             {getStates(fulfillmentType).map((state, id) => {
               const title = t[fulfillmentType][state].status;
-              const isDelivery = fulfillmentType === 'COURIER' || fulfillmentType === 'MAIL_ORDER';
               const description = `${t[fulfillmentType][state].description(isMultiRx)}${
-                isDelivery && state === 'READY' ? patientAddress : ''
+                isDelivery && (state === 'SHIPPED' || state === 'READY') ? patientAddress : ''
               }`;
 
               return (
