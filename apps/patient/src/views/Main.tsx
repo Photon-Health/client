@@ -64,7 +64,7 @@ export const Main = () => {
 
     setFlattenedFills(countFillsAndRemoveDuplicates(order.fills));
 
-    datadogRum.addRumGlobalContext('organizationId', { orgId: order.organization.id });
+    datadogRum.addRumGlobalContext('organizationId', order.organization.id);
     datadogRum.setUser({ patientId: order.patient.id });
 
     const hasPharmacy = order.pharmacy?.id;
