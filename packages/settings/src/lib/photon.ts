@@ -235,5 +235,11 @@ export const photon: {
     ...defaultSettings,
     logo: 'brightside_health_logo.svg',
     accentColor: '#2e4985'
+  },
+  // Found
+  org_wM4wI7rop0W1eNfM: {
+    ...defaultSettings,
+    logo: 'found_logo.svg',
+    accentColor: '#1c3f28'
   }
 };
