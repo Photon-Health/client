@@ -126,13 +126,18 @@ export const text = {
   tracking: 'Tracking #:',
   tryPhoton: 'Try Photon',
   urgencyOptions: [
-    '10:00 am',
-    '12:00 pm',
-    '2:00 pm',
-    '4:00 pm',
-    '6:00 pm',
-    'After hours',
-    'Tomorrow'
+    { label: '10:00 am', description: null, icon: false },
+    { label: '12:00 pm', description: null, icon: false },
+    { label: '2:00 pm', description: null, icon: false },
+    { label: '4:00 pm', description: null, icon: false },
+    { label: '6:00 pm', description: null, icon: false },
+    { label: 'After hours', description: null, icon: false },
+    { label: 'Tomorrow', description: null, icon: false },
+    {
+      label: 'Urgent',
+      description: 'I need to pick this up as soon as possible',
+      icon: true
+    }
   ],
   useLoc: 'Use my current location',
   weSent: (isPlural: boolean) =>
