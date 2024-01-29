@@ -12,6 +12,7 @@ import { usePhotonClient } from '../SDKProvider';
 import triggerToast from '../../utils/toastTriggers';
 import { Address } from '../PatientInfo';
 import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
+import { createMutation } from '../../utils/createMutation';
 
 const CREATE_PRESCRIPTIONS_MUTATION = gql`
   mutation RecentOrdersCombineDialogCreatePrescriptions($prescriptions: [PrescriptionInput!]!) {
@@ -41,12 +42,35 @@ const CREATE_ORDER_MUTATION = gql`
   }
 `;
 
+type SuccessResponse = {
+  id: string;
+};
+
 export default function RecentOrdersCombineDialog() {
   let ref: Ref<any> | undefined;
   const client = usePhotonClient();
   const [state, actions] = useRecentOrders();
   const [isCreatingOrder, setIsCreatingOrder] = createSignal(false);
   const [isCombiningOrders, setIsCombiningOrders] = createSignal(false);
+
+  const [createPrescriptionsMutation, newPrescriptions] = createMutation<
+    SuccessResponse,
+    InputValues
+  >(CREATE_PRESCRIPTIONS_MUTATION, {
+    client: client!.apollo
+  });
+  const [combineOrdersMutation, combinedOrder] = createMutation<SuccessResponse, InputValues>(
+    COMBINE_ORDERS_MUTATION,
+    {
+      client: client!.apollo
+    }
+  );
+  const [createOrderMutanion, newOrder] = createMutation<SuccessResponse, InputValues>(
+    CREATE_ORDER_MUTATION,
+    {
+      client: client!.apollo
+    }
+  );
 
   const dispatchCombineOrderUpdated = (orderId: string) => {
     const event = new CustomEvent('photon-order-combined', {
@@ -155,7 +179,7 @@ export default function RecentOrdersCombineDialog() {
       // Add rxs to the order
       const updatedOrder = await updateOrder(
         order.id,
-        prescriptions.data.createPrescriptions.map((rx: { id: string }) => rx.id)
+        prescriptions.data.createPrescriptions.map((rx: SuccessResponse) => rx.id)
       );
 
       // Trigger message to redirect to order page
@@ -171,7 +195,7 @@ export default function RecentOrdersCombineDialog() {
 
         const newOrder = await createOrder(
           state.patientId,
-          prescriptions.data.createPrescriptions.map((rx: { id: string }) => rx.id),
+          prescriptions.data.createPrescriptions.map((rx: SuccessResponse) => rx.id),
           state.address
         );
 
