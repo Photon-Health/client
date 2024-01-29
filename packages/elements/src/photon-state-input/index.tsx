@@ -39,7 +39,7 @@ const states: State[] = [
   { id: '25', name: 'MS' },
   { id: '26', name: 'MO' },
   { id: '27', name: 'MT' },
-  { id: '28', name: 'NB' },
+  { id: '28', name: 'NE' },
   { id: '29', name: 'NV' },
   { id: '30', name: 'NH' },
   { id: '31', name: 'NJ' },
