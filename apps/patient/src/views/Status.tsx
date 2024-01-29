@@ -170,6 +170,8 @@ export const Status = () => {
 
   const pharmacyWithHours: PharmacyWithHours = preparePharmacyHours(pharmacy);
 
+  const copy = m[fulfillmentType][fulfillmentState];
+
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
@@ -185,11 +187,13 @@ export const Status = () => {
         <VStack spacing={6} align="start" pt={5}>
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
-              {m[fulfillmentType][fulfillmentState].heading}
+              {copy.heading}
             </Heading>
             <Box>
               <Text display="inline">
-                {m[fulfillmentType][fulfillmentState].subheading(isMultiRx)}
+                {typeof copy.subheading === 'function'
+                  ? copy.subheading(isMultiRx)
+                  : copy.subheading}
               </Text>
               {showTextUsPrompt ? (
                 <Text ms={1} display="inline">
