@@ -5,7 +5,7 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
-import { createEffect, createSignal, JSXElement, mergeProps, Show, createMemo } from 'solid-js';
+import { JSXElement, mergeProps, Show, createMemo } from 'solid-js';
 import { usePhoton } from '../context';
 import { Spinner } from '@photonhealth/components';
 
@@ -26,33 +26,17 @@ function AlertMessage(props: { message: string }) {
 export const PhotonAuthorized = (p: { children: JSXElement; permissions?: Permission[] }) => {
   const props = mergeProps({ permissions: [] }, p);
   const client = usePhoton();
-  const [isLoading, setIsLoading] = createSignal<boolean>(
-    client?.authentication.state.isLoading || false
+
+  const isLoading = createMemo<boolean>(() => client?.authentication.state.isLoading || false);
+  const isAuthenticated = createMemo<boolean>(
+    () => client?.authentication.state.isAuthenticated || false
   );
-  const [authenticated, setAuthenticated] = createSignal<boolean>(
-    client?.authentication.state.isAuthenticated || false
-  );
-  const [inOrg, setInOrg] = createSignal<boolean>(client?.authentication.state.isInOrg || false);
-  const [hasPermission, setHasPermission] = createSignal<boolean>(
+  const isInOrg = createMemo<boolean>(() => client?.authentication.state.isInOrg || false);
+  const hasPermission = createMemo<boolean>(() =>
     checkHasPermission(props.permissions, client?.authentication.state.permissions || [])
   );
 
-  createEffect(() => {
-    setIsLoading(client?.authentication.state.isLoading || false);
-  });
-  createEffect(() => {
-    setAuthenticated(client?.authentication.state.isAuthenticated || false);
-  });
-  createEffect(() => {
-    setInOrg(client?.authentication.state.isInOrg || false);
-  });
-  createEffect(() => {
-    setHasPermission(
-      checkHasPermission(props.permissions, client?.authentication.state.permissions || [])
-    );
-  });
-
-  const canAccess = createMemo(() => authenticated() && inOrg() && hasPermission());
+  const canAccess = createMemo(() => isAuthenticated() && isInOrg() && hasPermission());
 
   return (
     <Show when={client && !isLoading()}>
@@ -60,10 +44,10 @@ export const PhotonAuthorized = (p: { children: JSXElement; permissions?: Permis
         when={canAccess()}
         fallback={
           <Show
-            when={!authenticated()}
+            when={!isAuthenticated()}
             fallback={
               <Show
-                when={!inOrg()}
+                when={!isInOrg()}
                 fallback={<AlertMessage message="You are not authorized to prescribe" />}
               >
                 <AlertMessage message="You tried logging in with an account not associated with any organizations" />
