@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, createContext, useContext } from 'rea
 import { Outlet, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { Center, CircularProgress } from '@chakra-ui/react';
 import { ChakraProvider } from '@chakra-ui/react';
+import { datadogRum } from '@datadog/browser-rum';
 
 import { countFillsAndRemoveDuplicates } from '../utils/general';
 import { Order } from '../utils/models';
@@ -62,6 +63,9 @@ export const Main = () => {
     }
 
     setFlattenedFills(countFillsAndRemoveDuplicates(order.fills));
+
+    datadogRum.setGlobalContextProperty('organizationId', order.organization.id);
+    datadogRum.setUser({ patientId: order.patient.id });
 
     const hasPharmacy = order.pharmacy?.id;
     const redirect = hasPharmacy ? '/status' : '/review';
