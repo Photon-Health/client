@@ -18,19 +18,23 @@ on:
 jobs:
   merge:
     name: Merge
-    if: ${{ contains(github.event.pull_request.labels.*.name, 'ready') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.head_ref }}
+      - name: Fail if not ready
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'ready') }}
+        run: exit 1
       - uses: tibdex/github-app-token@v1
         id: generate-token
         with:
           app_id: ${{ secrets.CPR_APP_ID }}
           private_key: ${{ secrets.CPR_APP_SECRET }}
+      - run: gh --version
       - name: Merge when ready
+        if: success()
         run: |
-          gh pr merge --auto --merge
+          GH_DEBUG=api gh pr merge --auto --merge
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
