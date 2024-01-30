@@ -61,7 +61,7 @@ const canNavigate = (
 };
 
 export const Settings = () => {
-  const [tabIndex, setTabIndex] = useState(0);
+  const [tabIndex, setTabIndex] = useState<number | undefined>();
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
@@ -94,9 +94,13 @@ export const Settings = () => {
     if (newTabIndex >= 0 && canNavigate(newTabRoute, { hasDeveloper, hasTeam, hasOrg })) {
       setTabIndex(newTabIndex);
     } else {
-      navigate(tabs[0]);
+      // Find the first page they can navigate to
+      const firstEligible = tabs.find((route) =>
+        canNavigate(route, { hasDeveloper, hasTeam, hasOrg })
+      );
+      navigate(firstEligible ?? tabs[1]);
     }
-  }, [pathname, loading]);
+  }, [pathname, loading, hasDeveloper, hasTeam, hasOrg]);
 
   const handleTabsChange = (index: number) => {
     const newPath = tabs[index];
@@ -109,7 +113,8 @@ export const Settings = () => {
 
   return (
     <Page header="Settings">
-      {loading ? (
+      {/* Show loading spinner until the correct tab index has been resolved */}
+      {loading || tabIndex == null ? (
         <Center padding="100px">
           <CircularProgress isIndeterminate color="green.300" />
         </Center>
