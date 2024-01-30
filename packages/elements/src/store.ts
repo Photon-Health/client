@@ -272,10 +272,17 @@ export class PhotonClientStore {
     try {
       await this.sdk.authentication.checkSession();
       const authenticated = await this.sdk.authentication.isAuthenticated();
-      this.setStore('authentication', {
-        ...this.store.authentication,
-        isAuthenticated: authenticated
-      });
+      // if not authenticated, do something specific
+      if (authenticated === false) {
+        this.setStore('authentication', {
+          ...this.store.authentication,
+          user: null,
+          isLoading: false,
+          isInOrg: false,
+          isAuthenticated: authenticated
+        });
+        return;
+      }
       const user = await this.sdk.authentication.getUser();
       const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
 
@@ -284,19 +291,26 @@ export class PhotonClientStore {
         const token = await this.sdk.authentication.getAccessToken();
 
         const decoded: { permissions: Permission[] } = jwtDecode(token);
+        console.error(`this should maybe be null - ${JSON.stringify(decoded)}`);
+        // if decoded == null, do something specific
         permissions = decoded?.permissions || [];
       } catch (err) {
+        // if error, do something specific
+        console.error('error');
+        console.error(err);
         permissions = [];
       }
 
       this.setStore('authentication', {
         ...this.store.authentication,
+        isAuthenticated: true,
         user: user,
         isLoading: false,
         isInOrg: authenticated && hasOrgs && this.sdk.organization === user.org_id,
         permissions: permissions || []
       });
     } catch (err) {
+      // do something specific
       this.setStore('authentication', {
         ...this.store.authentication,
         isLoading: false
