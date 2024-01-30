@@ -13,6 +13,7 @@ import triggerToast from '../../utils/toastTriggers';
 import { Address } from '../PatientInfo';
 import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 import { createMutation } from '../../utils/createMutation';
+import { DraftPrescription } from '../DraftPrescriptions';
 
 const CREATE_PRESCRIPTIONS_MUTATION = gql`
   mutation RecentOrdersCombineDialogCreatePrescriptions($prescriptions: [PrescriptionInput!]!) {
@@ -55,7 +56,7 @@ export default function RecentOrdersCombineDialog() {
 
   const [createPrescriptionsMutation, newPrescriptions] = createMutation<
     SuccessResponse,
-    InputValues
+    { prescriptions: DraftPrescription[] }
   >(CREATE_PRESCRIPTIONS_MUTATION, {
     client: client!.apollo
   });
@@ -113,10 +114,9 @@ export default function RecentOrdersCombineDialog() {
   });
 
   const createPrescriptions = async () => {
-    return client!.apollo.mutate({
-      mutation: CREATE_PRESCRIPTIONS_MUTATION,
+    return createPrescriptionsMutation({
       variables: {
-        prescriptions: state.draftPrescriptions?.map((draft) => ({
+        prescriptions: (state.draftPrescriptions || []).map((draft) => ({
           daysSupply: draft.daysSupply,
           dispenseAsWritten: draft.dispenseAsWritten,
           dispenseQuantity: draft.dispenseQuantity,
@@ -127,7 +127,8 @@ export default function RecentOrdersCombineDialog() {
           patientId: state.patientId,
           // +1 here because we're using the refillsInput
           fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
-          treatmentId: draft.treatment.id
+          treatmentId: draft.treatment.id,
+          treatment: draft.treatment
         }))
       }
     });

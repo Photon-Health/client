@@ -64,7 +64,7 @@ const GetPrescription = gql`
   }
 `;
 
-export type DraftPrescription = PrescriptionTemplate & {
+export type DraftPrescription = Omit<PrescriptionTemplate, 'id' | 'name' | 'isPrivate'> & {
   refillsInput?: number;
   addToTemplates?: boolean;
   catalogId?: string;
