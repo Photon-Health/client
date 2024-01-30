@@ -42,7 +42,7 @@ export const Main = () => {
     }
     if (isAuthenticated && !isLoading) {
       // global context to the datadog RUM session
-      datadogRum.addRumGlobalContext('org', {
+      datadogRum.setGlobalContextProperty('org', {
         orgId: user.org_id
       });
       datadogRum.setUser({
