@@ -1,5 +1,4 @@
 import { createEffect, createMemo, createSignal, For, Ref } from 'solid-js';
-import { Order } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
 import { useRecentOrders } from '.';
 import Button from '../../particles/Button';
@@ -47,6 +46,19 @@ type SuccessResponse = {
   id: string;
 };
 
+type SuccessCreatePrescriptions = { createPrescriptions: SuccessResponse[] };
+type VariablesCreatePrescriptions = { prescriptions: Omit<DraftPrescription, 'treatment'>[] };
+
+type SuccessCombineOrders = { updateOrder: SuccessResponse };
+type VariablesCombineOrders = { orderId: string; fills: { prescriptionId: string }[] };
+
+type SuccessCreateOrder = { createOrder: SuccessResponse };
+type VariablesCreateOrder = {
+  patientId: string;
+  fills: { prescriptionId: string }[];
+  address: Address;
+};
+
 export default function RecentOrdersCombineDialog() {
   let ref: Ref<any> | undefined;
   const client = usePhotonClient();
@@ -54,19 +66,19 @@ export default function RecentOrdersCombineDialog() {
   const [isCreatingOrder, setIsCreatingOrder] = createSignal(false);
   const [isCombiningOrders, setIsCombiningOrders] = createSignal(false);
 
-  const [createPrescriptionsMutation, newPrescriptions] = createMutation<
-    SuccessResponse,
-    { prescriptions: DraftPrescription[] }
+  const [createPrescriptionsMutation] = createMutation<
+    SuccessCreatePrescriptions,
+    VariablesCreatePrescriptions
   >(CREATE_PRESCRIPTIONS_MUTATION, {
     client: client!.apollo
   });
-  const [combineOrdersMutation, combinedOrder] = createMutation<SuccessResponse, InputValues>(
+  const [combineOrdersMutation] = createMutation<SuccessCombineOrders, VariablesCombineOrders>(
     COMBINE_ORDERS_MUTATION,
     {
       client: client!.apollo
     }
   );
-  const [createOrderMutanion, newOrder] = createMutation<SuccessResponse, InputValues>(
+  const [createOrderMutation] = createMutation<SuccessCreateOrder, VariablesCreateOrder>(
     CREATE_ORDER_MUTATION,
     {
       client: client!.apollo
@@ -82,7 +94,7 @@ export default function RecentOrdersCombineDialog() {
     ref?.dispatchEvent(event);
   };
 
-  const dispatchOrderCreated = (order: Order) => {
+  const dispatchOrderCreated = (order: SuccessResponse) => {
     const event = new CustomEvent('photon-order-created', {
       composed: true,
       bubbles: true,
@@ -113,8 +125,8 @@ export default function RecentOrdersCombineDialog() {
     return [];
   });
 
-  const createPrescriptions = async () => {
-    return createPrescriptionsMutation({
+  const createPrescriptions = async () =>
+    createPrescriptionsMutation({
       variables: {
         prescriptions: (state.draftPrescriptions || []).map((draft) => ({
           daysSupply: draft.daysSupply,
@@ -127,30 +139,24 @@ export default function RecentOrdersCombineDialog() {
           patientId: state.patientId,
           // +1 here because we're using the refillsInput
           fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
-          treatmentId: draft.treatment.id,
-          treatment: draft.treatment
+          treatmentId: draft.treatment.id
         }))
       }
     });
-  };
 
-  const updateOrder = async (orderId: string, prescriptionIds: string[]) => {
-    return client!.apollo.mutate({
-      mutation: COMBINE_ORDERS_MUTATION,
+  const updateOrder = async (orderId: string, prescriptionIds: string[]) =>
+    combineOrdersMutation({
       variables: { orderId, fills: prescriptionIds.map((id) => ({ prescriptionId: id })) }
     });
-  };
 
-  const createOrder = async (patientId: string, prescriptionIds: string[], address: Address) => {
-    return client!.apollo.mutate({
-      mutation: CREATE_ORDER_MUTATION,
+  const createOrder = async (patientId: string, prescriptionIds: string[], address: Address) =>
+    createOrderMutation({
       variables: {
         patientId,
         fills: prescriptionIds.map((id) => ({ prescriptionId: id })),
         address
       }
     });
-  };
 
   const combineOrders = async () => {
     const order = routingOrder();
@@ -180,11 +186,11 @@ export default function RecentOrdersCombineDialog() {
       // Add rxs to the order
       const updatedOrder = await updateOrder(
         order.id,
-        prescriptions.data.createPrescriptions.map((rx: SuccessResponse) => rx.id)
+        prescriptions.createPrescriptions.map((rx: SuccessResponse) => rx.id)
       );
 
       // Trigger message to redirect to order page
-      dispatchCombineOrderUpdated(updatedOrder.data.updateOrder.id);
+      dispatchCombineOrderUpdated(updatedOrder.updateOrder.id);
       return;
     } catch {
       // if there is an error updating an order, most likely because the order state has
@@ -196,11 +202,11 @@ export default function RecentOrdersCombineDialog() {
 
         const newOrder = await createOrder(
           state.patientId,
-          prescriptions.data.createPrescriptions.map((rx: SuccessResponse) => rx.id),
+          prescriptions.createPrescriptions.map((rx: SuccessResponse) => rx.id),
           state.address
         );
 
-        dispatchOrderCreated(newOrder.data.createOrder);
+        dispatchOrderCreated(newOrder.createOrder);
       } catch {
         triggerToast({
           header: 'Error Creating Order',
