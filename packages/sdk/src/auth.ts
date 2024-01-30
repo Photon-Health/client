@@ -155,7 +155,7 @@ export class AuthManager {
       }
     }
     if (!token) {
-      await this.authentication.loginWithRedirect();
+      await this.authentication.loginWithRedirect(opts);
       throw new Error(); // Needed just because this needs to resolve to something
     }
     return token;
