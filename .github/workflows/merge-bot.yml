@@ -18,7 +18,6 @@ on:
 jobs:
   merge:
     name: Merge
-    if: ${{ contains(github.event.pull_request.labels.*.name, 'ready') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -29,7 +28,15 @@ jobs:
         with:
           app_id: ${{ secrets.CPR_APP_ID }}
           private_key: ${{ secrets.CPR_APP_SECRET }}
+      - name: Fail if not ready
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'ready') }}
+        run: |
+          gh pr merge --disable-auto --merge
+          exit 1
+        env:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
       - name: Merge when ready
+        if: success()
         run: |
           gh pr merge --auto --merge
         env:
