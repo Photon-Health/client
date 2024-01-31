@@ -175,7 +175,10 @@ export const TablePage = (props: TablePageProps) => {
                   // Loop over the header rows
                   headerGroups.map((headerGroup) => (
                     // Apply the header row props
-                    <Tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
+                    <Tr
+                      {...headerGroup.getHeaderGroupProps()}
+                      key={headerGroup.headers.map((header) => header.Header).join('-')}
+                    >
                       {
                         // Loop over the headers in each row
                         headerGroup.headers.map((column) => (
