@@ -91,8 +91,6 @@ export const TablePage = (props: TablePageProps) => {
   data = useMemo(() => data, [data]);
   columns = useMemo(() => columns, [columns]);
 
-  const observableRef: any = useRef();
-
   const tableRef: any = useRef();
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable(
@@ -150,14 +148,14 @@ export const TablePage = (props: TablePageProps) => {
         <Box overflowX="auto">
           <InfiniteScroll
             dataLength={rows.length}
-            scrollableTarget={scrollableContainerRef.current}
+            scrollableTarget={scrollableContainerRef.current ?? undefined}
             next={fetchMoreData}
             hasMore={hasMore || false}
             loader={
               rows.length > 0 ? (
                 <Table>
                   <Thead>
-                    <Tr ref={observableRef}>
+                    <Tr>
                       <Td>
                         <Center>
                           <CircularProgress isIndeterminate color="green.300" />
@@ -175,7 +173,10 @@ export const TablePage = (props: TablePageProps) => {
                   // Loop over the header rows
                   headerGroups.map((headerGroup) => (
                     // Apply the header row props
-                    <Tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
+                    <Tr
+                      {...headerGroup.getHeaderGroupProps()}
+                      key={headerGroup.getHeaderGroupProps().key}
+                    >
                       {
                         // Loop over the headers in each row
                         headerGroup.headers.map((column) => (
