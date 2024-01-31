@@ -154,19 +154,15 @@ export default function RecentOrdersIssueDialog() {
         }
       }
     });
-  };
 
-  createEffect(() => {
-    if (data()) {
-      triggerToast({
-        header: 'Issue reported',
-        body: 'The customer support team will respond to you shortly.',
-        status: 'success'
-      });
-      dispatchTicketCreatedDuplicate();
-      actions.setIsIssueDialogOpen(false);
-    }
-  });
+    triggerToast({
+      header: 'Issue reported',
+      body: 'The customer support team will respond to you shortly.',
+      status: 'success'
+    });
+    dispatchTicketCreatedDuplicate();
+    actions.setIsIssueDialogOpen(false);
+  };
 
   const { form, errors } = createForm({
     onSubmit: async (values) => {
