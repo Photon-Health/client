@@ -9,7 +9,11 @@ import RecentOrdersCombineDialog from './RecentOrdersCombineDialog';
 import type { DraftPrescription } from '../DraftPrescriptions';
 import { Address } from '../PatientInfo';
 import { BaseOptions, createQuery } from '../../utils/createQuery';
-import type { OrderStateString } from '../../particles/OrderStatusBadge/OrderStatusBadge';
+import {
+  Order as FullOrder,
+  Fill as FullFill,
+  Prescription as FullPrescription
+} from '@photonhealth/sdk/dist/types';
 
 const GetPatientOrdersQuery = gql`
   query GetPatientOrders($patientId: ID!) {
@@ -43,24 +47,16 @@ type GetPatientOrdersVars = {
 };
 
 // we will generate these soon...
+type Treatment = Pick<FullFill['treatment'], 'name'>;
+type Prescription = Pick<
+  FullPrescription,
+  'dispenseQuantity' | 'dispenseUnit' | 'fillsAllowed' | 'instructions'
+>;
 type Fill = {
-  treatment: {
-    name: string;
-  };
-  prescription: {
-    dispenseQuantity: number;
-    dispenseUnit: string;
-    fillsAllowed: number;
-    instructions: string;
-  };
+  treatment: Treatment;
+  prescription: Prescription;
 };
-
-type Order = {
-  id: string;
-  createdAt: string;
-  state: OrderStateString;
-  fills: Fill[];
-};
+type Order = Pick<FullOrder, 'id' | 'createdAt' | 'state'> & { fills: Fill[] };
 
 interface GetPatientOrdersResponse {
   patient: {
@@ -187,7 +183,7 @@ function RecentOrders(props: SDKProviderProps) {
       },
       checkDuplicateFill(treatmentName) {
         for (const order of state.orders) {
-          const fill = order.fills.find((fill: Fill) => fill.treatment.name === treatmentName);
+          const fill = order.fills.find((fill) => fill.treatment.name === treatmentName);
           if (fill !== undefined) {
             return { order, fill };
           }

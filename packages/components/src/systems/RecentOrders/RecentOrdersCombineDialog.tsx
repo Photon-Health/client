@@ -244,7 +244,7 @@ export default function RecentOrdersCombineDialog() {
               <For each={fillsWithRoutingState()}>
                 {(fill) => (
                   <div>
-                    <Text size="sm">{fill.treatment.name}</Text>
+                    <Text size="sm">{fill?.treatment?.name}</Text>
                     <br />
                     <Text size="sm" color="gray">
                       {formatRxString({

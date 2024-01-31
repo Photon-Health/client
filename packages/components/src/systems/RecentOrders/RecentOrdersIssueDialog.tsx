@@ -210,7 +210,7 @@ export default function RecentOrdersIssueDialog() {
               <For each={fills()}>
                 {(fill) => (
                   <div>
-                    <Text size="sm">{fill.treatment.name}</Text>
+                    <Text size="sm">{fill?.treatment?.name}</Text>
                     <br />
                     <Text size="sm" color="gray">
                       {formatRxString({
