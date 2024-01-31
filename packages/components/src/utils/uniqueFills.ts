@@ -1,14 +1,15 @@
-import { Fill, Order } from '@photonhealth/sdk/dist/types';
+import { Fill } from '@photonhealth/sdk/dist/types';
 
-export default function uniqueFills(order: Order): Fill[] {
+export default function uniqueFills(order: { fills: any[] }): Partial<Fill>[] {
   const treatmentNames = new Set<string>();
 
   return order.fills.filter((fill) => {
-    if (treatmentNames.has(fill.treatment.name)) {
+    const treatmentName = fill.treatment?.name;
+    if (!treatmentName || treatmentNames.has(treatmentName)) {
       return false;
     }
 
-    treatmentNames.add(fill.treatment.name);
+    treatmentNames.add(treatmentName);
     return true;
   });
 }
