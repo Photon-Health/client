@@ -9,6 +9,7 @@ import RecentOrdersCombineDialog from './RecentOrdersCombineDialog';
 import type { DraftPrescription } from '../DraftPrescriptions';
 import { Address } from '../PatientInfo';
 import { BaseOptions, createQuery } from '../../utils/createQuery';
+import type { OrderStateString } from '../../particles/OrderStatusBadge/OrderStatusBadge';
 
 const GetPatientOrdersQuery = gql`
   query GetPatientOrders($patientId: ID!) {
@@ -57,7 +58,7 @@ type Fill = {
 type Order = {
   id: string;
   createdAt: string;
-  state: string;
+  state: OrderStateString;
   fills: Fill[];
 };
 

@@ -47,7 +47,9 @@ type SuccessResponse = {
 };
 
 type SuccessCreatePrescriptions = { createPrescriptions: SuccessResponse[] };
-type VariablesCreatePrescriptions = { prescriptions: Omit<DraftPrescription, 'treatment'>[] };
+type VariablesCreatePrescriptions = {
+  prescriptions: Omit<DraftPrescription, 'id' | 'name' | 'isPrivate' | 'treatment'>[];
+};
 
 type SuccessCombineOrders = { updateOrder: SuccessResponse };
 type VariablesCombineOrders = { orderId: string; fills: { prescriptionId: string }[] };
