@@ -293,6 +293,8 @@ export class PhotonClientStore {
         const decoded: { permissions: Permission[] } = jwtDecode(token);
         console.error(`this should maybe be null - ${JSON.stringify(decoded)}`);
         // if decoded == null, do something specific
+        // call login fro sdk/src/auth
+        // see if I can create a DD action if permissions is empty array
         permissions = decoded?.permissions || [];
       } catch (err) {
         // if error, do something specific
