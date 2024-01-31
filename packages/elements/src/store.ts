@@ -19,7 +19,7 @@ const defaultOnRedirectCallback = (appState?: any): void => {
 };
 
 const CATALOG_TREATMENTS_FIELDS = gql`
-  fragment CatalogTreatmentsFields on Catalog {
+  fragment CatalogTreatmentsFieldsElementsFragment on Catalog {
     treatments {
       id
       name
