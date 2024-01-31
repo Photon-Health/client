@@ -177,7 +177,7 @@ export const TablePage = (props: TablePageProps) => {
                     // Apply the header row props
                     <Tr
                       {...headerGroup.getHeaderGroupProps()}
-                      key={headerGroup.headers.map((header) => header.Header).join('-')}
+                      key={headerGroup.getHeaderGroupProps().key}
                     >
                       {
                         // Loop over the headers in each row
