@@ -117,6 +117,11 @@ customElement(
   },
   (props: PhotonClientProps) => {
     let ref: any;
+
+    if (props.developmentMode) {
+      console.info('[PhotonClient]: Development mode enabled');
+    }
+
     const sdk = new PhotonClient(
       {
         env: props.env,
@@ -131,9 +136,7 @@ customElement(
       version
     );
     const client = new PhotonClientStore(sdk, props.autoLogin);
-    if (props.developmentMode) {
-      console.info('[PhotonClient]: Development mode enabled');
-    }
+
     const [store] = createSignal<PhotonClientStore>(client);
 
     const handleRedirect = async () => {

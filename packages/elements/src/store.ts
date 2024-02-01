@@ -213,21 +213,21 @@ export class PhotonClientStore {
           const urlParams = new URLSearchParams(window.location.search);
           const errorMessage = urlParams.get('error_description');
           if (err.message.includes('must be an organization id')) {
-            this.setStore('authentication', {
-              ...this.store.authentication,
+            this.setStore('authentication', (prevAuth) => ({
+              ...prevAuth,
               error: 'The provided organization id is invalid or does not exist'
-            });
+            }));
           } else if (errorMessage?.includes('is not part of the org')) {
-            this.setStore('authentication', {
-              ...this.store.authentication,
+            this.setStore('authentication', (prevAuth) => ({
+              ...prevAuth,
               error: 'User is not authorized',
               isLoading: false
-            });
+            }));
           } else {
-            this.setStore('authentication', {
-              ...this.store.authentication,
+            this.setStore('authentication', (prevAuth) => ({
+              ...prevAuth,
               error: err.message
-            });
+            }));
           }
         }
       },
@@ -272,13 +272,13 @@ export class PhotonClientStore {
     try {
       const authenticated = await this.sdk.authentication.isAuthenticated();
       if (authenticated === false) {
-        this.setStore('authentication', {
-          ...this.store.authentication,
+        this.setStore('authentication', (prevAuth) => ({
+          ...prevAuth,
           user: null,
           isLoading: false,
           isInOrg: false,
           isAuthenticated: authenticated
-        });
+        }));
         return;
       }
       const user = await this.sdk.authentication.getUser();
@@ -305,20 +305,20 @@ export class PhotonClientStore {
         return;
       }
 
-      this.setStore('authentication', {
-        ...this.store.authentication,
+      this.setStore('authentication', (prevAuth) => ({
+        ...prevAuth,
         isAuthenticated: true,
         user: user,
         isLoading: false,
         isInOrg: authenticated && hasOrgs && this.sdk.organization === user.org_id,
         permissions: permissions || []
-      });
+      }));
     } catch (err) {
       // do something specific
-      this.setStore('authentication', {
-        ...this.store.authentication,
+      this.setStore('authentication', (prevAuth) => ({
+        ...prevAuth,
         isLoading: false
-      });
+      }));
     }
   }
   private async login(args = {}) {
@@ -327,13 +327,13 @@ export class PhotonClientStore {
   }
   private async logout(args = {}) {
     await this.sdk.authentication.logout(args);
-    this.setStore('authentication', {
-      ...this.store.authentication,
+    this.setStore('authentication', (prevAuth) => ({
+      ...prevAuth,
       isAuthenticated: false,
       isInOrg: false,
       permissions: [],
       user: undefined
-    });
+    }));
   }
   private async getPatients(args?: {
     after?: string;
@@ -344,79 +344,79 @@ export class PhotonClientStore {
     if (!args) {
       args = {};
     }
-    this.setStore('patients', {
-      ...this.store.patients,
+    this.setStore('patients', (prevPatients) => ({
+      ...prevPatients,
       isLoading: true
-    });
+    }));
     const { data } = await this.sdk.clinical.patient.getPatients(args);
-    this.setStore('patients', {
-      ...this.store.patients,
+    this.setStore('patients', (prevPatients) => ({
+      ...prevPatients,
       isLoading: false,
-      patients: args.clear ? data.patients : this.store.patients.patients.concat(data.patients),
+      patients: args?.clear ? data.patients : this.store.patients.patients.concat(data.patients),
       finished: data.patients.length == 0
-    });
+    }));
   }
   private async getPatient(args: { id: string }) {
-    this.setStore('patient', {
-      ...this.store.patient,
+    this.setStore('patient', (prevPatient) => ({
+      ...prevPatient,
       isLoading: true
-    });
+    }));
     const { data } = await this.sdk.clinical.patient.getPatient(args);
-    this.setStore('patient', {
-      ...this.store.patient,
+    this.setStore('patient', (prevPatient) => ({
+      ...prevPatient,
       isLoading: false,
       patient: data.patient
-    });
+    }));
     return data.patient;
   }
   private async getCatalog(args: { id: string }) {
-    this.setStore('catalog', {
-      ...this.store.catalog,
+    this.setStore('catalog', (prevCatalog) => ({
+      ...prevCatalog,
       isLoading: true
-    });
+    }));
     const { data } = await this.sdk.clinical.catalog.getCatalog({
       id: args.id,
       fragment: CatalogTreatmentFieldsMap
     });
-    this.setStore('catalog', {
-      ...this.store.catalog,
+    this.setStore('catalog', (prevCatalog) => ({
+      ...prevCatalog,
       isLoading: false,
       treatments: data.catalog.treatments.map((x) => x!) || [],
       templates: data.catalog.templates.map((x) => x!) || []
-    });
+    }));
   }
   private async getCatalogs() {
-    this.setStore('catalogs', {
-      ...this.store.catalogs,
+    this.setStore('catalogs', (prevCatalogs) => ({
+      ...prevCatalogs,
       isLoading: true
-    });
+    }));
     const { data } = await this.sdk.clinical.catalog.getCatalogs();
-    this.setStore('catalogs', {
-      ...this.store.catalogs,
+    this.setStore('catalogs', (prevCatalogs) => ({
+      ...prevCatalogs,
       isLoading: false,
       catalogs: data.catalogs
-    });
+    }));
   }
   private async getDispenseUnits() {
-    this.setStore('dispenseUnits', {
-      ...this.store.dispenseUnits,
+    this.setStore('dispenseUnits', (prevUnits) => ({
+      ...prevUnits,
       isLoading: true
-    });
+    }));
     const { data } = await this.sdk.clinical.prescription.getDispenseUnits();
-    this.setStore('dispenseUnits', {
-      ...this.store.dispenseUnits,
+    this.setStore('dispenseUnits', (prevUnits) => ({
+      ...prevUnits,
       isLoading: false,
       dispenseUnits: data.dispenseUnits.map((x, idx) => ({
         id: String(idx),
         ...x
       }))
-    });
+    }));
   }
   private async createPrescription(args: MutationCreatePrescriptionArgs) {
-    this.setStore('prescription', {
-      ...this.store.prescription,
+    this.setStore('prescription', (prevPrescription) => ({
+      ...prevPrescription,
       isLoading: true
-    });
+    }));
     const createPrescriptionMutation = this.sdk.clinical.prescription.createPrescription({});
     try {
       const { data, errors } = await createPrescriptionMutation({
@@ -425,31 +425,31 @@ export class PhotonClientStore {
         awaitRefetchQueries: false
       });
       if (errors && errors.length > 0) {
-        this.setStore('prescription', {
-          ...this.store.prescription,
+        this.setStore('prescription', (prevPrescription) => ({
+          ...prevPrescription,
           errors: [...errors]
-        });
+        }));
       }
       if (data?.createPrescription) {
-        this.setStore('prescription', {
-          ...this.store.prescription,
+        this.setStore('prescription', (prevPrescription) => ({
+          ...prevPrescription,
           data: data.createPrescription
-        });
+        }));
       }
-      this.setStore('prescription', {
-        ...this.store.prescription,
+      this.setStore('prescription', (prevPrescription) => ({
+        ...prevPrescription,
         isLoading: false
-      });
+      }));
       return {
         data,
         errors
       };
     } catch (e) {
-      this.setStore('prescription', {
-        ...this.store.prescription,
+      this.setStore('prescription', (prevPrescription) => ({
+        ...prevPrescription,
         error: e,
         isLoading: false
-      });
+      }));
       return {
         data: null,
         errors: []
