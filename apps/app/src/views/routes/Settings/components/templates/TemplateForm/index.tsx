@@ -29,7 +29,7 @@ import { RefillsInput } from './components/RefillsInput';
 import { Treatment } from './components/Treatment';
 
 import { types, usePhoton } from '@photonhealth/react';
-import { CATALOG_TREATMENTS_FIELDS } from 'apps/app/src/model/fragments';
+import { CatalogTreatmentFieldsMap } from 'apps/app/src/model/fragments';
 import { TEMPLATE_INITIAL_VALUES, TEMPLATE_SCHEMA, TemplateSchemaType } from './utils';
 import { StyledToast } from 'apps/app/src/views/components/StyledToast';
 
@@ -115,9 +115,7 @@ export const TemplateForm = ({
     awaitRefetchQueries: true,
     refetchArgs: {
       id: catalogId,
-      fragment: {
-        CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
-      }
+      fragment: CatalogTreatmentFieldsMap
     }
   });
   const [updatePrescriptionTemplateMutation, { loading: loadingUpdate }] =
@@ -126,9 +124,7 @@ export const TemplateForm = ({
       awaitRefetchQueries: true,
       refetchArgs: {
         id: catalogId,
-        fragment: {
-          CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
-        }
+        fragment: CatalogTreatmentFieldsMap
       }
     });
 

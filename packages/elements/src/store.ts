@@ -355,7 +355,7 @@ export class PhotonClientStore {
     const { data } = await this.sdk.clinical.catalog.getCatalog({
       id: args.id,
       fragment: {
-        CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
+        CatalogTreatmentsFieldsElementsFragment: CATALOG_TREATMENTS_FIELDS
       }
     });
     this.setStore('catalog', {

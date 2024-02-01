@@ -27,7 +27,7 @@ import {
 import { useDebounce } from 'use-debounce';
 
 import { PrescriptionTemplate } from 'packages/sdk/dist/types';
-import { CATALOG_TREATMENTS_FIELDS } from '../../../../model/fragments';
+import { CatalogTreatmentFieldsMap } from '../../../../model/fragments';
 import { DosageCalc } from '../../../components/DosageCalc';
 import { TemplateView } from '../../../components/TemplateView';
 import { TemplateActions } from '../components/templates/TemplateActions';
@@ -104,7 +104,7 @@ export const TemplateTab = () => {
   const catalogs = getCatalogs();
   const catalog = getCatalog({
     id: catalogs.catalogs[0]?.id || '',
-    fragment: { CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS },
+    fragment: CatalogTreatmentFieldsMap,
     defer: true
   });
   const [catalogId, setCatalogId] = useState<string>();
@@ -126,9 +126,7 @@ export const TemplateTab = () => {
       setCatalogId(catalogs.catalogs[0]?.id);
       catalog.query!({
         id: catalogs.catalogs[0]?.id,
-        fragment: {
-          CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
-        }
+        fragment: CatalogTreatmentFieldsMap
       });
     }
   }, [catalogs.loading, catalogs.catalogs.length, catalogs.catalogs[0]?.id]);
