@@ -272,13 +272,7 @@ export class PhotonClientStore {
     try {
       const authenticated = await this.sdk.authentication.isAuthenticated();
       if (authenticated === false) {
-        this.setStore('authentication', (prevAuth) => ({
-          ...prevAuth,
-          user: null,
-          isLoading: false,
-          isInOrg: false,
-          isAuthenticated: authenticated
-        }));
+        this.logout();
         return;
       }
       const user = await this.sdk.authentication.getUser();
@@ -304,7 +298,7 @@ export class PhotonClientStore {
         permissions
       }));
     } catch (err) {
-      this.sdk.authentication.logout();
+      this.logout();
     }
   }
   private async login(args = {}) {
