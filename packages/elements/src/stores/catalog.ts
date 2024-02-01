@@ -1,8 +1,8 @@
 import { PhotonClient } from '@photonhealth/sdk';
 import { Catalog } from '@photonhealth/sdk/dist/types';
-import { GraphQLError, Kind } from 'graphql';
-import { createStore } from 'solid-js/store';
+import { GraphQLError } from 'graphql';
 import gql from 'graphql-tag';
+import { createStore } from 'solid-js/store';
 
 const CATALOG_TREATMENTS_FIELDS = gql`
   fragment CatalogTreatmentsFields on Catalog {
