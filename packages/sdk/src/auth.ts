@@ -123,16 +123,12 @@ export class AuthManager {
     );
   }
 
-  /**
-   * Retrieves a valid access token
-   * @param config - getAccessToken configuration
-   * @returns
-   */
-  public async getAccessToken(
+  private _getAccessToken = async (
     { audience }: { audience?: string } = {
       audience: this.audience
-    }
-  ): Promise<string> {
+    },
+    throwIfFailure = false
+  ): Promise<string> => {
     const opts: GetTokenSilentlyOptions | GetTokenWithPopupOptions = {
       authorizationParams: {
         audience: audience || this.audience || undefined,
@@ -150,9 +146,27 @@ export class AuthManager {
     }
     if (!token) {
       await this.authentication.loginWithRedirect(opts);
-      throw new Error(); // Needed just because this needs to resolve to something
+      if (throwIfFailure) {
+        throw new Error(); // Needed just because this needs to resolve to something
+      } else {
+        // Retry once
+        return await this._getAccessToken({ audience }, true);
+      }
     }
     return token;
+  };
+
+  /**
+   * Retrieves a valid access token
+   * @param config - getAccessToken configuration
+   * @returns
+   */
+  public async getAccessToken(
+    { audience }: { audience?: string } = {
+      audience: this.audience
+    }
+  ): Promise<string> {
+    return await this._getAccessToken({ audience: audience ?? this.audience });
   }
 
   /**
