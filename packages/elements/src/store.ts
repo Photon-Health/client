@@ -296,10 +296,12 @@ export class PhotonClientStore {
           // call login fro sdk/src/auth
           // see if I can create a DD action if permissions is empty array\
           // login
+          this.sdk.authentication.login({});
           return;
         }
       } catch (err) {
         // if error, do something specific
+        this.sdk.authentication.login({});
         return;
       }
 
