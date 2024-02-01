@@ -108,18 +108,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
   });
 
   createEffect(() => {
-    if (
-      !client?.authentication.state.isAuthenticated &&
-      !client?.authentication.state.isLoading &&
-      !client?.authentication.state.error
-    ) {
-      client?.authentication.login({ appState: { returnTo: window.location.pathname } });
-    }
-  });
-  createEffect(() => {
     setIsLoading(client?.authentication.state.isLoading || false);
-  });
-  createEffect(() => {
     setAuthenticated(client?.authentication.state.isAuthenticated || false);
   });
 

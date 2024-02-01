@@ -270,9 +270,7 @@ export class PhotonClientStore {
 
   private async checkSession() {
     try {
-      await this.sdk.authentication.checkSession();
       const authenticated = await this.sdk.authentication.isAuthenticated();
-      // if not authenticated, do something specific
       if (authenticated === false) {
         this.setStore('authentication', {
           ...this.store.authentication,
@@ -289,18 +287,20 @@ export class PhotonClientStore {
       let permissions: Permission[];
       try {
         const token = await this.sdk.authentication.getAccessToken();
-
         const decoded: { permissions: Permission[] } = jwtDecode(token);
-        console.error(`this should maybe be null - ${JSON.stringify(decoded)}`);
-        // if decoded == null, do something specific
-        // call login fro sdk/src/auth
-        // see if I can create a DD action if permissions is empty array
-        permissions = decoded?.permissions || [];
+
+        if (decoded?.permissions instanceof Array) {
+          permissions = decoded?.permissions;
+        } else {
+          // if decoded == null, do something specific
+          // call login fro sdk/src/auth
+          // see if I can create a DD action if permissions is empty array\
+          // login
+          return;
+        }
       } catch (err) {
         // if error, do something specific
-        console.error('error');
-        console.error(err);
-        permissions = [];
+        return;
       }
 
       this.setStore('authentication', {
