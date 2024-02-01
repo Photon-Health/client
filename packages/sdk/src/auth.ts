@@ -1,12 +1,11 @@
 import {
   Auth0Client,
+  LogoutOptions as Auth0LogoutOptions,
   GetTokenSilentlyOptions,
   GetTokenWithPopupOptions,
-  LogoutOptions as Auth0LogoutOptions,
   RedirectLoginOptions,
   RedirectLoginResult,
-  User,
-  AuthorizationParams
+  User
 } from '@auth0/auth0-spa-js';
 
 const CODE_RE = /[?&]code=[^&]+/;
