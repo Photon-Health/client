@@ -84,21 +84,15 @@ export class AuthManager {
    * @returns
    */
   public async login({ organizationId, invitation, appState }: LoginOptions): Promise<void> {
-    const opts: RedirectLoginOptions<any> = {};
-    let authorizationParams: AuthorizationParams = {};
-    if (organizationId || this.organization) {
-      authorizationParams = Object.assign(opts, {
-        organization: organizationId || this.organization
-      });
-    }
-    if (invitation) {
-      authorizationParams = Object.assign(opts, { invitation });
-    }
-
-    if (appState) {
-      authorizationParams = Object.assign(opts, { appState });
-    }
-    opts.authorizationParams = authorizationParams;
+    const opts: RedirectLoginOptions<any> = {
+      authorizationParams: {
+        ...(organizationId || this.organization
+          ? { organization: organizationId || this.organization }
+          : {}),
+        ...(invitation ? { invitation } : {})
+      },
+      ...(appState ? { appState } : {})
+    };
 
     return this.authentication.loginWithRedirect(opts);
   }
