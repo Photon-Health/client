@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ApolloClient,
   ApolloError,
@@ -33,8 +32,7 @@ import {
   Treatment,
   WebhookConfig
 } from '@photonhealth/sdk/dist/types';
-import { useEffect, createContext, useContext, useReducer, useCallback } from 'react';
-import { GetAllergensOptions } from '@photonhealth/sdk/dist/clinical/allergen';
+import { useEffect, createContext, useContext, useReducer } from 'react';
 
 const reducer = (state: any, action: any) => {
   switch (action.type) {
@@ -728,27 +726,24 @@ export const PhotonProvider = (opts: {
 
   /// Auth0
 
-  const handleRedirect = useCallback(
-    async (url?: string) => {
-      try {
-        await client.authentication.handleRedirect(url);
-      } catch (e) {
-        const message = (e as Error).message;
-        dispatch({ type: 'ERROR', error: message });
-      }
-      dispatch({
-        type: 'HANDLE_REDIRECT_COMPLETE',
-        user: await client.authentication.getUser()
-      });
-    },
-    [client.authentication]
-  );
+  const handleRedirect = async (url?: string) => {
+    try {
+      await client.authentication.handleRedirect(url);
+    } catch (e) {
+      const message = (e as Error).message;
+      dispatch({ type: 'ERROR', error: message });
+    }
+    dispatch({
+      type: 'HANDLE_REDIRECT_COMPLETE',
+      user: await client.authentication.getUser()
+    });
+  };
 
   useEffect(() => {
     if (client.authentication.hasAuthParams(searchParams)) {
       handleRedirect();
     }
-  }, [client.authentication, handleRedirect, searchParams]);
+  }, [searchParams]);
 
   const login = ({
     organizationId,
@@ -834,7 +829,7 @@ export const PhotonProvider = (opts: {
     store.setKey('loading', false);
   });
 
-  const useGetPatient = ({
+  const getPatient = ({
     id,
     fragment
   }: {
@@ -845,7 +840,7 @@ export const PhotonProvider = (opts: {
 
     useEffect(() => {
       fetchPatient({ id, fragment });
-    }, [fragment, id]);
+    }, [id]);
 
     return {
       patient,
@@ -877,7 +872,7 @@ export const PhotonProvider = (opts: {
     store.setKey('loading', false);
   });
 
-  const useGetPatients = (
+  const getPatients = (
     {
       after,
       first,
@@ -958,7 +953,7 @@ export const PhotonProvider = (opts: {
       }
     );
 
-  const useCreatePatient = ({
+  const createPatient = ({
     refetchQueries = undefined,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     awaitRefetchQueries = false
@@ -1024,7 +1019,7 @@ export const PhotonProvider = (opts: {
       }
     );
 
-  const useUpdatePatient = ({ refetchQueries = undefined }: { refetchQueries?: string[] }) => {
+  const updatePatient = ({ refetchQueries = undefined }: { refetchQueries?: string[] }) => {
     const { updatePatient, loading, error } = useStore(updatePatientStore);
 
     return [
@@ -1083,11 +1078,7 @@ export const PhotonProvider = (opts: {
       }
     );
 
-  const useRemovePatientAllergy = ({
-    refetchQueries = undefined
-  }: {
-    refetchQueries?: string[];
-  }) => {
+  const removePatientAllergy = ({ refetchQueries = undefined }: { refetchQueries?: string[] }) => {
     const { removePatientAllergy, loading, error } = useStore(removePatientAllergyStore);
 
     return [
@@ -1147,7 +1138,7 @@ export const PhotonProvider = (opts: {
       }
     );
 
-  const useRemovePatientPreferredPharmacy = ({
+  const removePatientPreferredPharmacy = ({
     refetchQueries = undefined
   }: {
     refetchQueries?: string[];
@@ -1188,7 +1179,7 @@ export const PhotonProvider = (opts: {
     store.setKey('loading', false);
   });
 
-  const useGetOrder = ({ id }: { id: string }) => {
+  const getOrder = ({ id }: { id: string }) => {
     const { order, loading, error } = useStore(getOrderStore);
 
     useEffect(() => {
@@ -1226,7 +1217,7 @@ export const PhotonProvider = (opts: {
     store.setKey('loading', false);
   });
 
-  const useGetOrders = (
+  const getOrders = (
     {
       after,
       first,
@@ -1313,7 +1304,7 @@ export const PhotonProvider = (opts: {
       store.setKey('loading', false);
     });
 
-  const useCreateOrder = ({ refetchQueries = undefined }: { refetchQueries?: string[] }) => {
+  const createOrder = ({ refetchQueries = undefined }: { refetchQueries?: string[] }) => {
     const { createOrder, loading, error } = useStore(createOrderStore);
 
     return [
@@ -1346,7 +1337,7 @@ export const PhotonProvider = (opts: {
     store.setKey('loading', false);
   });
 
-  const useGetDispenseUnits = () => {
+  const getDispenseUnits = () => {
     const { dispenseUnits, loading, error } = useStore(getDispenseUnitsStore);
 
     useEffect(() => {
@@ -1387,7 +1378,7 @@ export const PhotonProvider = (opts: {
     }
   );
 
-  const useGetPrescription = ({ id }: { id: string }) => {
+  const getPrescription = ({ id }: { id: string }) => {
     const { prescription, loading, error } = useStore(getPrescriptionStore);
 
     useEffect(() => {
@@ -1431,7 +1422,7 @@ export const PhotonProvider = (opts: {
     }
   );
 
-  const useGetPrescriptions = (
+  const getPrescriptions = (
     {
       after,
       first,
@@ -1459,7 +1450,7 @@ export const PhotonProvider = (opts: {
         prescriberId,
         state
       });
-    }, [after, first, patientId, patientName, prescriberId, state]);
+    }, [after, first, patientId, patientName]);
 
     return {
       prescriptions,
@@ -1538,7 +1529,7 @@ export const PhotonProvider = (opts: {
       }
     );
 
-  const useCreatePrescription = ({ refetchQueries = undefined }: { refetchQueries?: string[] }) => {
+  const createPrescription = ({ refetchQueries = undefined }: { refetchQueries?: string[] }) => {
     const { createPrescription, loading, error } = useStore(createPrescriptionStore);
 
     return [
@@ -1574,7 +1565,7 @@ export const PhotonProvider = (opts: {
     store.setKey('loading', false);
   });
 
-  const useGetCatalog = ({
+  const getCatalog = ({
     id,
     fragment,
     defer
@@ -1585,13 +1576,13 @@ export const PhotonProvider = (opts: {
   }) => {
     const { catalog, loading, error } = useStore(getCatalogStore);
 
-    useEffect(() => {
-      if (!defer) {
+    if (!defer) {
+      useEffect(() => {
         if (id) {
           fetchCatalog({ id, fragment });
         }
-      }
-    }, [defer, fragment, id]);
+      }, [id]);
+    }
 
     return {
       catalog,
@@ -1630,7 +1621,7 @@ export const PhotonProvider = (opts: {
     store.setKey('loading', false);
   });
 
-  const useGetCatalogs = () => {
+  const getCatalogs = () => {
     const { catalogs, loading, error } = useStore(getCatalogsStore);
 
     useEffect(() => {
@@ -1689,7 +1680,7 @@ export const PhotonProvider = (opts: {
       store.setKey('loading', false);
     });
 
-  const useAddToCatalog = ({
+  const addToCatalog = ({
     refetchQueries = undefined,
     refetchArgs = undefined
   }: {
@@ -1756,7 +1747,7 @@ export const PhotonProvider = (opts: {
       }
     );
 
-  const useRemoveFromCatalog = ({
+  const removeFromCatalog = ({
     refetchQueries = undefined,
     refetchArgs = undefined
   }: {
@@ -1787,26 +1778,22 @@ export const PhotonProvider = (opts: {
     error: undefined
   });
 
-  const fetchAllergens = action(
-    getAllergensStore,
-    'fetchAllergens',
-    async (store, { filter }: GetAllergensOptions) => {
-      store.setKey('loading', true);
-      const { data, error } = await client.clinical.allergens.getAllergens({
-        filter
-      });
-      store.setKey('allergens', data?.allergens || []);
-      store.setKey('error', error);
-      store.setKey('loading', false);
-    }
-  );
+  const fetchAllergens = action(getAllergensStore, 'fetchAllergens', async (store, { filter }) => {
+    store.setKey('loading', true);
+    const { data, error } = await client.clinical.allergens.getAllergens({
+      filter
+    });
+    store.setKey('allergens', data?.allergens || []);
+    store.setKey('error', error);
+    store.setKey('loading', false);
+  });
 
-  const useGetAllergens = ({ filter }: { filter?: AllergenFilter }) => {
+  const getAllergens = ({ filter }: { filter?: AllergenFilter }) => {
     const { allergens, loading, error } = useStore(getAllergensStore);
 
     useEffect(() => {
       fetchAllergens({ filter });
-    }, [filter, filter?.name]);
+    }, [filter?.name]);
 
     return {
       allergens,
@@ -1845,7 +1832,7 @@ export const PhotonProvider = (opts: {
     }
   );
 
-  const useGetMedications = ({
+  const getMedications = ({
     filter,
     first,
     after
@@ -1870,8 +1857,7 @@ export const PhotonProvider = (opts: {
       filter?.package?.code,
       filter?.package?.type,
       first,
-      after,
-      filter
+      after
     ]);
 
     return {
@@ -1918,7 +1904,7 @@ export const PhotonProvider = (opts: {
     }
   );
 
-  const useGetMedicalEquipment = ({
+  const getMedicalEquipment = ({
     name,
     first,
     after
@@ -1968,7 +1954,7 @@ export const PhotonProvider = (opts: {
     store.setKey('loading', false);
   });
 
-  const useGetPharmacy = ({ id }: { id: string }) => {
+  const getPharmacy = ({ id }: { id: string }) => {
     const { pharmacy, loading, error } = useStore(getPharmacyStore);
 
     useEffect(() => {
@@ -2009,7 +1995,7 @@ export const PhotonProvider = (opts: {
     }
   );
 
-  const useGetPharmacies = ({
+  const getPharmacies = ({
     name,
     location,
     type,
@@ -2026,16 +2012,7 @@ export const PhotonProvider = (opts: {
 
     useEffect(() => {
       fetchPharmacies({ name, location, type, after, first });
-    }, [
-      name,
-      location,
-      location?.latitude,
-      location?.longitude,
-      location?.radius,
-      type,
-      after,
-      first
-    ]);
+    }, [name, location?.latitude, location?.longitude, location?.radius, type]);
 
     return {
       pharmacies,
@@ -2083,7 +2060,7 @@ export const PhotonProvider = (opts: {
     store.setKey('loading', false);
   });
 
-  const useGetOrganization = () => {
+  const getOrganization = () => {
     const { organization, loading, error } = useStore(getOrganizationStore);
 
     useEffect(() => {
@@ -2116,7 +2093,7 @@ export const PhotonProvider = (opts: {
     store.setKey('loading', false);
   });
 
-  const useGetOrganizations = () => {
+  const getOrganizations = () => {
     const { organizations, loading, error } = useStore(getOrganizationsStore);
 
     useEffect(() => {
@@ -2151,7 +2128,7 @@ export const PhotonProvider = (opts: {
     store.setKey('loading', false);
   });
 
-  const useGetWebhooks = () => {
+  const getWebhooks = () => {
     const { webhooks, loading, error } = useStore(getWebhooksStore);
 
     useEffect(() => {
@@ -2212,7 +2189,7 @@ export const PhotonProvider = (opts: {
       }
     );
 
-  const useCreateWebhook = ({ refetchQueries = undefined }: { refetchQueries?: string[] }) => {
+  const createWebhook = ({ refetchQueries = undefined }: { refetchQueries?: string[] }) => {
     const { createWebhook, loading, error } = useStore(createWebhookStore);
 
     return [
@@ -2271,7 +2248,7 @@ export const PhotonProvider = (opts: {
       }
     );
 
-  const useDeleteWebhook = ({ refetchQueries = undefined }: { refetchQueries?: string[] }) => {
+  const deleteWebhook = ({ refetchQueries = undefined }: { refetchQueries?: string[] }) => {
     const { deleteWebhook, loading, error } = useStore(deleteWebhookStore);
 
     return [
@@ -2335,7 +2312,7 @@ export const PhotonProvider = (opts: {
       }
     );
 
-  const useCreatePrescriptionTemplate = ({
+  const createPrescriptionTemplate = ({
     refetchQueries = undefined,
     refetchArgs
   }: {
@@ -2405,7 +2382,7 @@ export const PhotonProvider = (opts: {
       }
     );
 
-  const useUpdatePrescriptionTemplate = ({
+  const updatePrescriptionTemplate = ({
     refetchQueries = undefined,
     refetchArgs
   }: {
@@ -2475,7 +2452,7 @@ export const PhotonProvider = (opts: {
       }
     );
 
-  const useDeletePrescriptionTemplate = ({
+  const deletePrescriptionTemplate = ({
     refetchQueries = undefined,
     refetchArgs
   }: {
@@ -2522,7 +2499,7 @@ export const PhotonProvider = (opts: {
     }
   );
 
-  const useGetMedicationConcepts = (
+  const getMedicationConcepts = (
     {
       name,
       defer
@@ -2536,11 +2513,11 @@ export const PhotonProvider = (opts: {
   ) => {
     const { medicationConcepts, loading, error } = useStore(getMedicationConceptsStore);
 
-    useEffect(() => {
-      if (!defer) {
+    if (!defer) {
+      useEffect(() => {
         fetchMedicationConcepts({ name });
-      }
-    }, [name, defer]);
+      }, [name]);
+    }
 
     return {
       medicationConcepts,
@@ -2585,14 +2562,14 @@ export const PhotonProvider = (opts: {
     }
   );
 
-  const useGetMedicationStrengths = ({ id, defer }: { id: string; defer?: boolean }) => {
+  const getMedicationStrengths = ({ id, defer }: { id: string; defer?: boolean }) => {
     const { medicationStrengths, loading, error } = useStore(getMedicationStrengthsStore);
 
-    useEffect(() => {
-      if (!defer) {
+    if (!defer) {
+      useEffect(() => {
         fetchMedicationStrengths({ id });
-      }
-    }, [id, defer]);
+      }, [id]);
+    }
 
     return {
       medicationStrengths,
@@ -2636,14 +2613,14 @@ export const PhotonProvider = (opts: {
     }
   );
 
-  const useGetMedicationRoutes = ({ id, defer }: { id: string; defer?: boolean }) => {
+  const getMedicationRoutes = ({ id, defer }: { id: string; defer?: boolean }) => {
     const { medicationRoutes, loading, error } = useStore(getMedicationRoutesStore);
 
-    useEffect(() => {
-      if (!defer) {
+    if (!defer) {
+      useEffect(() => {
         fetchMedicationRoutes({ id });
-      }
-    }, [id, defer]);
+      }, [id]);
+    }
 
     return {
       medicationRoutes,
@@ -2687,14 +2664,14 @@ export const PhotonProvider = (opts: {
     }
   );
 
-  const useGetMedicationForms = ({ id, defer }: { id: string; defer?: boolean }) => {
+  const getMedicationForms = ({ id, defer }: { id: string; defer?: boolean }) => {
     const { medicationForms, loading, error } = useStore(getMedicationFormsStore);
 
-    useEffect(() => {
-      if (!defer) {
+    if (!defer) {
+      useEffect(() => {
         fetchMedicationForms({ id });
-      }
-    }, [id, defer]);
+      }, [id]);
+    }
 
     return {
       medicationForms,
@@ -2738,14 +2715,14 @@ export const PhotonProvider = (opts: {
     }
   );
 
-  const useGetMedicationProducts = ({ id, defer }: { id: string; defer?: boolean }) => {
+  const getMedicationProducts = ({ id, defer }: { id: string; defer?: boolean }) => {
     const { medicationProducts, loading, error } = useStore(getMedicationProductsStore);
 
-    useEffect(() => {
-      if (!defer) {
+    if (!defer) {
+      useEffect(() => {
         fetchMedicationProducts({ id });
-      }
-    }, [id, defer]);
+      }, [id]);
+    }
 
     return {
       medicationProducts,
@@ -2789,14 +2766,14 @@ export const PhotonProvider = (opts: {
     }
   );
 
-  const useGetMedicationPackages = ({ id, defer }: { id: string; defer?: boolean }) => {
+  const getMedicationPackages = ({ id, defer }: { id: string; defer?: boolean }) => {
     const { medicationPackages, loading, error } = useStore(getMedicationPackagesStore);
 
-    useEffect(() => {
-      if (!defer) {
+    if (!defer) {
+      useEffect(() => {
         fetchMedicationPackages({ id });
-      }
-    }, [id, defer]);
+      }, [id]);
+    }
 
     return {
       medicationPackages,
@@ -2836,7 +2813,7 @@ export const PhotonProvider = (opts: {
     store.setKey('loading', false);
   });
 
-  const useGetClients = () => {
+  const getClients = () => {
     const { clients, loading, error } = useStore(getClientsStore);
 
     useEffect(() => {
@@ -2893,7 +2870,7 @@ export const PhotonProvider = (opts: {
       store.setKey('loading', false);
     });
 
-  const useRotateSecret = ({ refetchQueries = undefined }: { refetchQueries?: string[] }) => {
+  const rotateSecret = ({ refetchQueries = undefined }: { refetchQueries?: string[] }) => {
     const { rotateSecret, loading, error } = useStore(rotateSecretStore);
 
     return [
@@ -2924,46 +2901,46 @@ export const PhotonProvider = (opts: {
     logout,
     getToken,
     handleRedirect,
-    getPatient: useGetPatient,
-    getPatients: useGetPatients,
-    createPatient: useCreatePatient,
-    getOrder: useGetOrder,
-    getOrders: useGetOrders,
-    createOrder: useCreateOrder,
-    getPrescription: useGetPrescription,
-    getPrescriptions: useGetPrescriptions,
-    createPrescription: useCreatePrescription,
-    createPrescriptionTemplate: useCreatePrescriptionTemplate,
-    updatePrescriptionTemplate: useUpdatePrescriptionTemplate,
-    getCatalog: useGetCatalog,
-    getCatalogs: useGetCatalogs,
-    getMedications: useGetMedications,
-    getMedicalEquipment: useGetMedicalEquipment,
-    getOrganizations: useGetOrganizations,
-    getOrganization: useGetOrganization,
-    getWebhooks: useGetWebhooks,
-    createWebhook: useCreateWebhook,
-    deleteWebhook: useDeleteWebhook,
-    getPharmacies: useGetPharmacies,
-    getPharmacy: useGetPharmacy,
-    getClients: useGetClients,
-    rotateSecret: useRotateSecret,
+    getPatient,
+    getPatients,
+    createPatient,
+    getOrder,
+    getOrders,
+    createOrder,
+    getPrescription,
+    getPrescriptions,
+    createPrescription,
+    createPrescriptionTemplate,
+    updatePrescriptionTemplate,
+    getCatalog,
+    getCatalogs,
+    getMedications,
+    getMedicalEquipment,
+    getOrganizations,
+    getOrganization,
+    getWebhooks,
+    createWebhook,
+    deleteWebhook,
+    getPharmacies,
+    getPharmacy,
+    getClients,
+    rotateSecret,
     clearError,
-    updatePatient: useUpdatePatient,
-    getAllergens: useGetAllergens,
-    removePatientAllergy: useRemovePatientAllergy,
-    removePatientPreferredPharmacy: useRemovePatientPreferredPharmacy,
-    getDispenseUnits: useGetDispenseUnits,
+    updatePatient,
+    getAllergens,
+    removePatientAllergy,
+    removePatientPreferredPharmacy,
+    getDispenseUnits,
     setOrganization,
-    addToCatalog: useAddToCatalog,
-    getMedicationConcepts: useGetMedicationConcepts,
-    getMedicationStrengths: useGetMedicationStrengths,
-    getMedicationRoutes: useGetMedicationRoutes,
-    getMedicationForms: useGetMedicationForms,
-    getMedicationProducts: useGetMedicationProducts,
-    getMedicationPackages: useGetMedicationPackages,
-    removeFromCatalog: useRemoveFromCatalog,
-    deletePrescriptionTemplate: useDeletePrescriptionTemplate
+    addToCatalog,
+    getMedicationConcepts,
+    getMedicationStrengths,
+    getMedicationRoutes,
+    getMedicationForms,
+    getMedicationProducts,
+    getMedicationPackages,
+    removeFromCatalog,
+    deletePrescriptionTemplate
   };
 
   return (

@@ -232,7 +232,7 @@ export const neutron: {
     enableRxAndOrder: false
   },
   // Pine Medical
-  org_AJ6WSTbag7RCfi0N: {
+  org_SgWtqCKFzYaDePCf: {
     ...defaultSettings,
     logo: 'pine_medical_logo.svg',
     accentColor: '#000000',
