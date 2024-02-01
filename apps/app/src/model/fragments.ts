@@ -1,7 +1,7 @@
 import { gql } from 'graphql-tag';
 
-export const CATALOG_TREATMENTS_FIELDS = gql`
-  fragment CatalogTreatmentsFields on Catalog {
+const CATALOG_TREATMENTS_FIELDS = gql`
+  fragment CatalogTreatmentsFieldsAppFragment on Catalog {
     treatments {
       id
       name
@@ -24,8 +24,13 @@ export const CATALOG_TREATMENTS_FIELDS = gql`
     }
   }
 `;
-export const PATIENT_FIELDS = gql`
-  fragment PatientFields on Patient {
+
+export const CatalogTreatmentFieldsMap = {
+  CatalogTreatmentsFieldsAppFragment: CATALOG_TREATMENTS_FIELDS
+};
+
+const PATIENT_FIELDS = gql`
+  fragment PatientFieldsAppFragment on Patient {
     id
     externalId
     name {
@@ -63,3 +68,5 @@ export const PATIENT_FIELDS = gql`
     }
   }
 `;
+
+export const PatientFieldsFragmentMap = { PatientFieldsAppFragment: PATIENT_FIELDS };

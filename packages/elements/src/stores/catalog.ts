@@ -1,8 +1,8 @@
 import { PhotonClient } from '@photonhealth/sdk';
 import { Catalog } from '@photonhealth/sdk/dist/types';
 import { GraphQLError } from 'graphql';
-import { createStore } from 'solid-js/store';
 import gql from 'graphql-tag';
+import { createStore } from 'solid-js/store';
 
 const CATALOG_TREATMENTS_FIELDS = gql`
   fragment CatalogTreatmentsFields on Catalog {
@@ -30,6 +30,8 @@ const CATALOG_TREATMENTS_FIELDS = gql`
   }
 `;
 
+const CatalogTreatmentFieldsMap = { CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS };
+
 const createCatalogStore = () => {
   const [store, setStore] = createStore<{
     catalogs: {
@@ -51,9 +53,7 @@ const createCatalogStore = () => {
       isLoading: true
     });
     const { data, errors } = await client.clinical.catalog.getCatalogs({
-      fragment: {
-        CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
-      }
+      fragment: CatalogTreatmentFieldsMap
     });
     setStore('catalogs', {
       ...store.catalogs,

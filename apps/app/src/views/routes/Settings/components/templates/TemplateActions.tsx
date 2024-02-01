@@ -12,7 +12,7 @@ import { FiEdit, FiEye, FiMoreVertical, FiTrash } from 'react-icons/fi';
 import { usePhoton } from '@photonhealth/react';
 
 import { PrescriptionTemplate } from 'packages/sdk/dist/types';
-import { CATALOG_TREATMENTS_FIELDS } from '../../../../../model/fragments';
+import { CatalogTreatmentFieldsMap } from '../../../../../model/fragments';
 import { confirmWrapper } from '../../../../components/GuardDialog';
 
 interface TemplateActionsProps {
@@ -34,9 +34,7 @@ export const TemplateActions = (props: TemplateActionsProps) => {
     awaitRefetchQueries: true,
     refetchArgs: {
       id: catalogId,
-      fragment: {
-        CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
-      }
+      fragment: CatalogTreatmentFieldsMap
     }
   });
 

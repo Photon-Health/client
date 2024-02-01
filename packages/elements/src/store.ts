@@ -19,7 +19,7 @@ const defaultOnRedirectCallback = (appState?: any): void => {
 };
 
 const CATALOG_TREATMENTS_FIELDS = gql`
-  fragment CatalogTreatmentsFields on Catalog {
+  fragment CatalogTreatmentsFieldsElementsFragment on Catalog {
     treatments {
       id
       name
@@ -40,6 +40,10 @@ const CATALOG_TREATMENTS_FIELDS = gql`
     }
   }
 `;
+
+const CatalogTreatmentFieldsMap = {
+  CatalogTreatmentsFieldsElementsFragment: CATALOG_TREATMENTS_FIELDS
+};
 
 export class PhotonClientStore {
   public readonly sdk: PhotonClient;
@@ -354,9 +358,7 @@ export class PhotonClientStore {
     });
     const { data } = await this.sdk.clinical.catalog.getCatalog({
       id: args.id,
-      fragment: {
-        CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
-      }
+      fragment: CatalogTreatmentFieldsMap
     });
     this.setStore('catalog', {
       ...this.store.catalog,

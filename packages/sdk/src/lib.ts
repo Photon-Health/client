@@ -198,7 +198,39 @@ export class PhotonClient {
           onQueryUpdated: delayRefetchedQuery
         }
       },
-      cache: new InMemoryCache()
+      cache: new InMemoryCache({
+        // Addresses and names don't have unique ids. So we just allow for merging these
+        typePolicies: {
+          Patient: {
+            fields: {
+              name: {
+                merge(existing, incoming, { mergeObjects }) {
+                  return mergeObjects(existing, incoming);
+                }
+              },
+              address: {
+                merge(existing, incoming, { mergeObjects }) {
+                  return mergeObjects(existing, incoming);
+                }
+              }
+            }
+          },
+          User: {
+            fields: {
+              name: {
+                merge(existing, incoming, { mergeObjects }) {
+                  return mergeObjects(existing, incoming);
+                }
+              },
+              address: {
+                merge(existing, incoming, { mergeObjects }) {
+                  return mergeObjects(existing, incoming);
+                }
+              }
+            }
+          }
+        }
+      })
     });
     return apollo;
   }
