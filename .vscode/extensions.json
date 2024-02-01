@@ -4,7 +4,6 @@
     "esbenp.prettier-vscode",
     "dbaeumer.vscode-eslint",
     "firsttris.vscode-jest-runner",
-    "graphql.vscode-graphql",
-    "github.vscode-github-actions"
+    "graphql.vscode-graphql"
   ]
 }

@@ -57,8 +57,6 @@ export const SelectOrg = () => {
     }
   }, []);
 
-  const colorMode = useColorModeValue('sm', 'sm-dark');
-
   const orgs = (organizations || []).map((organization: any) => {
     const { id, name } = organization;
 
@@ -114,7 +112,7 @@ export const SelectOrg = () => {
             bg="bg-surface"
             px={{ base: '4', md: '6' }}
             py="5"
-            boxShadow={colorMode}
+            boxShadow={useColorModeValue('sm', 'sm-dark')}
             borderTopWidth="4px"
             borderColor="accent"
           >

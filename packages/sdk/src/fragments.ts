@@ -88,7 +88,7 @@ export const DISPENSE_UNIT_FIELDS = gql`
 `;
 
 export const FILL_PRESCRIPTION_FIELDS = gql`
-  fragment FillPrescriptionFields on Fill {
+  fragment FillFields on Fill {
     id
     state
     requestedAt
@@ -121,7 +121,7 @@ export const PRESCRIPTION_FIELDS = gql`
     id
     externalId
     fills {
-      ...FillPrescriptionFields
+      ...FillFields
     }
     prescriber {
       id
