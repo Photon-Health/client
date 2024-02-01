@@ -1,5 +1,5 @@
 import { customElement } from 'solid-element';
-import { createEffect, createSignal, onMount } from 'solid-js';
+import { createEffect, createSignal } from 'solid-js';
 import { PhotonClient, Env } from '@photonhealth/sdk';
 import { SDKProvider } from '@photonhealth/components';
 import { makeTimer } from '@solid-primitives/timer';
@@ -117,42 +117,35 @@ customElement(
   },
   (props: PhotonClientProps) => {
     let ref: any;
-    const [sdk, setSDK] = createSignal<PhotonClient | undefined>(undefined);
-    const [client, setClient] = createSignal<PhotonClientStore | undefined>(undefined);
-
-    onMount(() => {
-      if (props.developmentMode) {
-        console.info('[PhotonClient]: Development mode enabled');
-      }
-      const _sdk = new PhotonClient(
-        {
-          env: props.env,
-          domain: props.domain,
-          audience: props.audience,
-          uri: props.uri,
-          clientId: props.id!,
-          redirectURI: props.redirectUri ? props.redirectUri : window.location.origin,
-          organization: props.org,
-          developmentMode: props.developmentMode
-        },
-        version
-      );
-
-      const _client = new PhotonClientStore(sdk, props.autoLogin);
-      setSDK(_sdk);
-      setClient(_client);
-    });
+    const sdk = new PhotonClient(
+      {
+        env: props.env,
+        domain: props.domain,
+        audience: props.audience,
+        uri: props.uri,
+        clientId: props.id!,
+        redirectURI: props.redirectUri ? props.redirectUri : window.location.origin,
+        organization: props.org,
+        developmentMode: props.developmentMode
+      },
+      version
+    );
+    const client = new PhotonClientStore(sdk, props.autoLogin);
+    if (props.developmentMode) {
+      console.info('[PhotonClient]: Development mode enabled');
+    }
+    const [store] = createSignal<PhotonClientStore>(client);
 
     const handleRedirect = async () => {
-      await client()?.authentication.handleRedirect();
+      await store()?.authentication.handleRedirect();
       if (props.redirectPath) window.location.replace(props.redirectPath);
     };
 
     const checkSession = async () => {
-      await client()?.authentication.checkSession();
+      await store()?.authentication.checkSession();
       makeTimer(
         async () => {
-          await client()?.authentication.checkSession();
+          await store()?.authentication.checkSession();
         },
         60000,
         setInterval
@@ -160,45 +153,44 @@ customElement(
     };
 
     createEffect(() => {
-      if (hasAuthParams() && client()) {
+      if (hasAuthParams() && store()) {
         handleRedirect();
-      } else if (client()) {
+      } else if (store()) {
         checkSession();
       }
     });
 
     createEffect(() => {
-      if (!client()?.authentication.state.isLoading) {
+      if (!store()?.authentication.state.isLoading) {
         // If autoLogin, then automatically log in
-        if (!client()?.authentication.state.isAuthenticated && props.autoLogin) {
+        if (!store()?.authentication.state.isAuthenticated && props.autoLogin) {
           const args: any = { appState: {} };
           if (props.redirectPath) {
             args.appState.returnTo = props.redirectPath;
           }
-          client()?.authentication.login(args);
+          store()?.authentication.login(args);
         } else if (
           // If `externalUserId` is set, then we check if it matches the logged in user
           // If it doesn't match then logout and then immediately log back in if possible
           props.externalUserId != null &&
           // Note that we check the last piece of the `sub` which is the id from the auth provider
           // We do an exact match on this last section because ids are not guaranteed to not be substrings of the other
-          (client()?.authentication.state.user as User | undefined)?.sub
-            ?.split('|')
-            .reverse()[0] !== props.externalUserId
+          (store().authentication.state.user as User | undefined)?.sub?.split('|').reverse()[0] !==
+            props.externalUserId
         ) {
-          client()?.authentication.logout();
+          store()?.authentication.logout();
           const args: any = { appState: {} };
           if (props.redirectPath) {
             args.appState.returnTo = props.redirectPath;
           }
-          client()?.authentication.login(args);
+          store()?.authentication.login(args);
         }
       }
     });
 
     return (
       <div ref={ref}>
-        <PhotonContext.Provider value={client()}>
+        <PhotonContext.Provider value={store()}>
           <SDKProvider client={sdk}>
             <slot />
           </SDKProvider>
