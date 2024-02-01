@@ -285,24 +285,14 @@ export class PhotonClientStore {
       const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
 
       let permissions: Permission[];
-      try {
-        const token = await this.sdk.authentication.getAccessToken();
-        const decoded: { permissions: Permission[] } = jwtDecode(token);
 
-        if (decoded?.permissions instanceof Array) {
-          permissions = decoded?.permissions;
-        } else {
-          // if decoded == null, do something specific
-          // call login fro sdk/src/auth
-          // see if I can create a DD action if permissions is empty array\
-          // login
-          this.sdk.authentication.login({});
-          return;
-        }
-      } catch (err) {
-        // if error, do something specific
-        this.sdk.authentication.login({});
-        return;
+      const token = await this.sdk.authentication.getAccessToken();
+      const decoded: { permissions: Permission[] } = jwtDecode(token);
+
+      if (decoded?.permissions instanceof Array) {
+        permissions = decoded?.permissions;
+      } else {
+        throw new Error('Invalid permissions');
       }
 
       this.setStore('authentication', (prevAuth) => ({
@@ -311,14 +301,10 @@ export class PhotonClientStore {
         user: user,
         isLoading: false,
         isInOrg: authenticated && hasOrgs && this.sdk.organization === user.org_id,
-        permissions: permissions || []
+        permissions
       }));
     } catch (err) {
-      // do something specific
-      this.setStore('authentication', (prevAuth) => ({
-        ...prevAuth,
-        isLoading: false
-      }));
+      this.sdk.authentication.logout();
     }
   }
   private async login(args = {}) {
