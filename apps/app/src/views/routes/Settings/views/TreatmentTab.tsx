@@ -1,31 +1,31 @@
+import { useMutation } from '@apollo/client';
 import {
-  Text,
   Alert,
   AlertIcon,
   Modal,
   ModalBody,
   ModalCloseButton,
-  ModalOverlay,
   ModalContent,
+  ModalOverlay,
+  Text,
   VStack,
-  useBreakpointValue,
   useBoolean,
+  useBreakpointValue,
   useToast
 } from '@chakra-ui/react';
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { usePhoton } from '@photonhealth/react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
-import { useMutation } from '@apollo/client';
 
-import { CATALOG_TREATMENTS_FIELDS } from '../../../../model/fragments';
-import { SplitLayout } from '../../../components/SplitLayout';
-import { TreatmentTable } from '../components/treatments/TreatmentTable';
-import { TreatmentForm } from '../components/treatments/TreatmentForm';
-import { TreatmentActions } from '../components/treatments/TreatmentActions';
-import { ADD_TO_CATALOG } from '../../../../mutations';
-import { graphql } from 'apps/app/src/gql/gql';
 import { FragmentType, useFragment } from 'apps/app/src/gql';
+import { graphql } from 'apps/app/src/gql/gql';
+import { CatalogTreatmentFieldsMap } from '../../../../model/fragments';
+import { ADD_TO_CATALOG } from '../../../../mutations';
+import { SplitLayout } from '../../../components/SplitLayout';
 import { StyledToast } from '../../../components/StyledToast';
+import { TreatmentActions } from '../components/treatments/TreatmentActions';
+import { TreatmentForm } from '../components/treatments/TreatmentForm';
+import { TreatmentTable } from '../components/treatments/TreatmentTable';
 
 interface MedViewProps {
   name: string;
@@ -72,7 +72,7 @@ export const TreatmentTab = ({
   const catalogs = getCatalogs();
   const catalog = getCatalog({
     id: catalogs.catalogs[0]?.id || '',
-    fragment: { CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS },
+    fragment: CatalogTreatmentFieldsMap,
     defer: true
   });
   const [catalogId, setCatalogId] = useState('');
@@ -108,9 +108,7 @@ export const TreatmentTab = ({
       setTimeout(() => {
         catalog.query!({
           id: catalogs.catalogs[0].id,
-          fragment: {
-            CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
-          }
+          fragment: CatalogTreatmentFieldsMap
         });
       }, 500);
     }
@@ -121,9 +119,7 @@ export const TreatmentTab = ({
       setCatalogId(catalogs.catalogs[0].id);
       catalog.query!({
         id: catalogs.catalogs[0].id,
-        fragment: {
-          CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
-        }
+        fragment: CatalogTreatmentFieldsMap
       });
     }
   }, [catalogs.loading]);

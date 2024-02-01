@@ -1,12 +1,12 @@
-import { forwardRef, Box, Text, VStack } from '@chakra-ui/react';
+import { Box, Text, VStack, forwardRef } from '@chakra-ui/react';
 
 import { GroupHeadingProps, OptionProps as SelectOptionProps } from 'chakra-react-select';
 
-import { useEffect, useImperativeHandle, useState } from 'react';
 import { usePhoton } from '@photonhealth/react';
+import { useEffect, useImperativeHandle, useState } from 'react';
 import { SelectField } from './SelectField';
 
-import { CATALOG_TREATMENTS_FIELDS } from '../../model/fragments';
+import { CatalogTreatmentFieldsMap } from '../../model/fragments';
 
 interface OptionProps extends SelectOptionProps {
   data: {
@@ -75,7 +75,7 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
     awaitRefetchQueries: true,
     refetchArgs: {
       id: catalogId,
-      fragment: { CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS }
+      fragment: CatalogTreatmentFieldsMap
     }
   });
 
@@ -94,7 +94,7 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
   const [filterText, setFilterText] = useState('');
   const catalog = getCatalog({
     id: catalogId,
-    fragment: { CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS }
+    fragment: CatalogTreatmentFieldsMap
   });
 
   if (catalog.error?.message) {
