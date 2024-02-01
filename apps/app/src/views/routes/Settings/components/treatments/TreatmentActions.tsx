@@ -1,10 +1,10 @@
-import { IconButton, HStack, useColorMode } from '@chakra-ui/react';
-import { FiTrash } from 'react-icons/fi';
+import { HStack, IconButton, useColorMode } from '@chakra-ui/react';
 import { usePhoton } from '@photonhealth/react';
+import { FiTrash } from 'react-icons/fi';
 
-import { CATALOG_TREATMENTS_FIELDS } from '../../../../../model/fragments';
-import { confirmWrapper } from '../../../../components/GuardDialog';
 import { Dispatch, SetStateAction } from 'react';
+import { CatalogTreatmentFieldsMap } from '../../../../../model/fragments';
+import { confirmWrapper } from '../../../../components/GuardDialog';
 
 export const TreatmentActions = (props: {
   catalogId: string;
@@ -19,9 +19,7 @@ export const TreatmentActions = (props: {
     awaitRefetchQueries: true,
     refetchArgs: {
       id: catalogId,
-      fragment: {
-        CatalogTreatmentsFields: CATALOG_TREATMENTS_FIELDS
-      }
+      fragment: CatalogTreatmentFieldsMap
     }
   });
 
