@@ -106,6 +106,22 @@ const App = () => {
         audience="https://api.boson.health"
         uri="https://api.boson.health/graphql"
       >
+        <h4 class="mt-8">With Mail Order</h4>
+        <Card>
+          <PharmacySelect
+            patientIds={['pat_01GQ0XFBHSH3YXN936A2D2SD7Y']}
+            enableLocalPickup
+            enableSendToPatient
+            mailOrderPharmacyIds={[
+              'phr_01GA9HPVBVJ0E65P819FD881N0',
+              'phr_01GCA54GVKA06C905DETQ9SY98'
+            ]}
+            address="11221"
+            setPharmacyId={(p) => console.log('pharmacyId! ', p)}
+            setFufillmentType={(t) => console.log('fulfillmentType! ', t)}
+          />
+        </Card>
+
         <div class="mb-10">
           <h2>Address Form</h2>
           <AddressForm patientId="pat_01HAW8GT14ZTJRBADVEY68NQKK" />
@@ -198,21 +214,6 @@ const App = () => {
             enableSendToPatient
             setFufillmentType={(t) => console.log('fulfillmentType: ', t)}
             setPharmacyId={(p) => console.log('pharmacyId: ', p)}
-          />
-        </Card>
-        <h4 class="mt-8">With Mail Order</h4>
-        <Card>
-          <PharmacySelect
-            patientIds={['pat_01GQ0XFBHSH3YXN936A2D2SD7Y']}
-            enableLocalPickup
-            enableSendToPatient
-            mailOrderPharmacyIds={[
-              'phr_01GA9HPVBVJ0E65P819FD881N0',
-              'phr_01GCA54GVKA06C905DETQ9SY98'
-            ]}
-            address="11221"
-            setPharmacyId={(p) => console.log('pharmacyId! ', p)}
-            setFufillmentType={(t) => console.log('fulfillmentType! ', t)}
           />
         </Card>
 

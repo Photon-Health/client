@@ -29,14 +29,14 @@ export default function Badge(props: BadgeProps) {
       {
         'px-2 py-1': merged.size === 'md',
         'px-1.5 py-0.5': merged.size === 'sm',
-        'bg-gray-100 text-gray-600': merged.color === 'gray',
-        'bg-red-100 text-red-700': merged.color === 'red',
-        'bg-yellow-100 text-yellow-800': merged.color === 'yellow',
-        'bg-green-100 text-green-700': merged.color === 'green',
-        'bg-blue-100 text-blue-700': merged.color === 'blue',
-        'bg-indigo-100 text-indigo-700': merged.color === 'indigo',
-        'bg-purple-100 text-purple-700': merged.color === 'purple',
-        'bg-pink-100 text-pink-700': merged.color === 'pink'
+        'bg-gray-100 text-gray-600 border-gray-300 border-2': merged.color === 'gray',
+        'bg-red-100 text-red-700 border-red-300 border-2': merged.color === 'red',
+        'bg-yellow-100 text-yellow-800 border-yellow-300 border-2': merged.color === 'yellow',
+        'bg-green-100 text-green-700 border-green-300 border-2': merged.color === 'green',
+        'bg-blue-100 text-blue-700 border-blue-300 border-2': merged.color === 'blue',
+        'bg-indigo-100 text-indigo-700 border-indigo-300 border-2': merged.color === 'indigo',
+        'bg-purple-100 text-purple-700 border-purple-300 border-2': merged.color === 'purple',
+        'bg-pink-100 text-pink-700 border-pink-300 border-2': merged.color === 'pink'
       }
     )
   );
