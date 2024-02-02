@@ -182,7 +182,8 @@ export const photon: {
     logo: 'sana_care_logo.png',
     accentColor: '#FBCC45',
     mailOrderNavigate: false,
-    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
+    enableMedHistory: true
   },
   // Blueberry Pediatrics
   org_ul8ojZgvzpqu299H: {
