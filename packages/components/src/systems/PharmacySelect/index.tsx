@@ -1,5 +1,5 @@
 import { types } from '@photonhealth/sdk';
-import { createMemo, createSignal, For, Match, onMount, Show, Switch } from 'solid-js';
+import { createMemo, createSignal, For, onMount, Show } from 'solid-js';
 import RadioGroupCards from '../../particles/RadioGroupCards';
 import Tabs from '../../particles/Tabs';
 import PharmacySearch from '../PharmacySearch';
@@ -77,8 +77,6 @@ export default function PharmacySelect(props: PharmacySelectProps) {
     props.setFufillmentType(parseFulfillmentType(fulfillmentOptions[0].fulfillmentType));
   });
 
-  const patientCount = createMemo(() => props?.patientIds?.length || 0);
-
   const handleTabChange = (newTab: string) => {
     setTab(newTab);
     if (!loadedTabs().includes(newTab)) {
@@ -106,50 +104,53 @@ export default function PharmacySelect(props: PharmacySelectProps) {
       <Tabs tabs={tabs} activeTab={tab()} setActiveTab={handleTabChange} />
 
       <div class="pt-4">
-        <Switch fallback={<div>Loading...</div>}>
-          <Match when={loadedTabs().includes('Send to Patient')}>
-            <Show when={patientCount() > 0} fallback={<div>Please select a patient.</div>}>
-              <SendToPatient />
+        <Show when={loadedTabs().includes('Send to Patient')}>
+          <div class={tab() !== 'Send to Patient' ? 'hidden' : ''}>
+            <Show
+              when={(props?.patientIds?.length || 0) > 0}
+              fallback={<div>Please select a patient.</div>}
+            >
+              <SendToPatient patientId={props.patientIds[0]} />
             </Show>
-          </Match>
+          </div>
+        </Show>
 
-          <Match when={loadedTabs().includes('Local Pickup')}>
-            <div class={tab() !== 'Local Pickup' ? 'hidden' : ''}>
-              <PharmacySearch
-                address={props?.address || ''}
-                patientId={props?.patientIds?.[0]}
-                setPharmacy={(pharmacy) => {
-                  setLocalPharmId(pharmacy.id);
-                  props.setPharmacyId(pharmacy.id);
-                }}
-                setPreferred={(shouldSetPreferred) =>
-                  props?.setPreferredPharmacy?.(shouldSetPreferred)
-                }
-              />
-            </div>
-          </Match>
+        <Show when={loadedTabs().includes('Local Pickup')}>
+          <div class={tab() !== 'Local Pickup' ? 'hidden' : ''}>
+            <PharmacySearch
+              address={props?.address || ''}
+              patientId={props?.patientIds?.[0]}
+              setPharmacy={(pharmacy) => {
+                setLocalPharmId(pharmacy.id);
+                props.setPharmacyId(pharmacy.id);
+              }}
+              setPreferred={(shouldSetPreferred) =>
+                props?.setPreferredPharmacy?.(shouldSetPreferred)
+              }
+            />
+          </div>
+        </Show>
 
-          <Match when={loadedTabs().includes('Mail Order')}>
-            <div class={tab() !== 'Mail Order' ? 'hidden' : ''}>
-              <RadioGroupCards
-                label="Pharmacies"
-                initSelected={props?.mailOrderPharmacyIds?.[0]}
-                setSelected={(pharmacyId) => {
-                  setMailOrderId(pharmacyId);
-                  props.setPharmacyId(pharmacyId);
-                }}
-              >
-                <For each={props?.mailOrderPharmacyIds || []}>
-                  {(id) => (
-                    <RadioGroupCards.Option value={id}>
-                      <MailOrderPharmacy pharmacyId={id} />
-                    </RadioGroupCards.Option>
-                  )}
-                </For>
-              </RadioGroupCards>
-            </div>
-          </Match>
-        </Switch>
+        <Show when={loadedTabs().includes('Mail Order')}>
+          <div class={tab() !== 'Mail Order' ? 'hidden' : ''}>
+            <RadioGroupCards
+              label="Pharmacies"
+              initSelected={props?.mailOrderPharmacyIds?.[0]}
+              setSelected={(pharmacyId) => {
+                setMailOrderId(pharmacyId);
+                props.setPharmacyId(pharmacyId);
+              }}
+            >
+              <For each={props?.mailOrderPharmacyIds || []}>
+                {(id) => (
+                  <RadioGroupCards.Option value={id}>
+                    <MailOrderPharmacy pharmacyId={id} />
+                  </RadioGroupCards.Option>
+                )}
+              </For>
+            </RadioGroupCards>
+          </div>
+        </Show>
       </div>
     </div>
   );

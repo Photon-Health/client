@@ -133,7 +133,7 @@
     "react-scripts": "^5.0.1",
     "react-table": "^7.8.0",
     "react-test-renderer": "18.2.0",
-    "solid-js": "1.6.11",
+    "solid-js": "1.8.12",
     "solid-toast": "^0.5.0",
     "tailwindcss": "^3.3.2",
     "terracotta": "^1.0.3",

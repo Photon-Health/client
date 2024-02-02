@@ -1,7 +1,16 @@
-import { createMemo } from 'solid-js';
+import { createEffect, createMemo, createSignal, Show } from 'solid-js';
 import Badge, { BadgeColor } from '../../particles/Badge';
 import Card from '../../particles/Card';
+import Spinner from '../../particles/Spinner';
 import Text from '../../particles/Text';
+import { BaseOptions, createQuery } from '../../utils/createQuery';
+import {
+  GetLastOrderQuery,
+  GetLastOrderResponse,
+  GetPreferredPharmaciesQuery,
+  GetPreferredPharmaciesResponse
+} from '../PharmacySearch';
+import { usePhotonClient } from '../SDKProvider';
 
 type STPState = {
   badgeColor: BadgeColor;
@@ -13,12 +22,12 @@ const stpStates: {
   [key: string]: STPState;
 } = {
   patientWillSelect: {
-    badgeColor: 'blue',
+    badgeColor: 'purple',
     badgeText: 'Patient Will Select',
     text: 'Patient will select a pharmacy after you send an order.'
   },
   recentPharmacy: {
-    badgeColor: 'blue',
+    badgeColor: 'yellow',
     badgeText: 'Recent Pharmacy',
     text: 'This patient selected this pharmacy in the last 8 hours. After you send this order, the patient can change the pharmacy.'
   },
@@ -29,16 +38,45 @@ const stpStates: {
   }
 };
 
-export function SendToPatient() {
-  const state = createMemo(() => stpStates.patientWillSelect);
+export function SendToPatient(props: { patientId: string }) {
+  const client = usePhotonClient();
+  const [stpState, setStpState] = createSignal<STPState>(stpStates.patientWillSelect);
+  const [pharmacy, setPharmacy] = createSignal<any | undefined>(undefined);
+
+  // const preferredPharmaciesData = createQuery<GetPreferredPharmaciesResponse, { id: string }>(
+  //   GetPreferredPharmaciesQuery,
+  //   {
+  //     variables: { id: props.patientId },
+  //     client: client!.apollo
+  //   }
+  // );
+
+  const lastOrderData = createQuery<GetLastOrderResponse, { id: string }>(GetLastOrderQuery, {
+    variables: { id: props.patientId },
+    client: client!.apollo
+  });
+
+  createEffect(() => {
+    const lastOrder = lastOrderData()?.orders?.[0];
+    console.log('lastOrder', lastOrderData());
+    if (!lastOrderData.loading && lastOrder) {
+      if (lastOrder.pharmacy) {
+        setStpState(stpStates.recentPharmacy);
+        setPharmacy(lastOrder.pharmacy);
+      }
+    }
+  });
+
   return (
-    <>
-      <Badge color={state().badgeColor}>{state().badgeText}</Badge>
+    <Show when={!lastOrderData.loading} fallback={<Spinner />}>
+      <Badge color={stpState().badgeColor}>{stpState().badgeText}</Badge>
       <Text size="sm" class="py-4">
-        {state().text}
+        {stpState().text}
       </Text>
 
-      <Card gray>Hello</Card>
-    </>
+      <Show when={pharmacy()}>
+        <Card gray>{pharmacy()?.name}</Card>
+      </Show>
+    </Show>
   );
 }
