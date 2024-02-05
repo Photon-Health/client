@@ -66,6 +66,70 @@ const states: State[] = [
   { id: '52', name: 'WY' }
 ];
 
+const Component = (props: {
+  label?: string;
+  required: boolean;
+  value?: number;
+  invalid: boolean;
+  helpText?: string;
+  disabled: boolean;
+  selected?: string;
+}) => {
+  const [filter, setFilter] = createSignal<string>('');
+  let ref: any;
+
+  const dispatchStateSelected = (state: string) => {
+    const event = new CustomEvent('photon-state-selected', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        state: state
+      }
+    });
+    ref?.dispatchEvent(event);
+  };
+
+  const getData = (filter: string): State[] => {
+    if (filter.length === 0) {
+      return states;
+    }
+    return states.filter((x) => x.name.toLowerCase().includes(filter.toLowerCase()));
+  };
+
+  return (
+    <div
+      ref={ref}
+      on:photon-data-selected={(e: any) => {
+        dispatchStateSelected(e.detail.data.name);
+      }}
+    >
+      <style>{tailwind}</style>
+      <style>{styles}</style>
+      <PhotonDropdown
+        data={getData(filter())}
+        label={props.label}
+        required={props.required}
+        placeholder=""
+        disabled={props.disabled}
+        invalid={props.invalid}
+        isLoading={false}
+        hasMore={false}
+        displayAccessor={(p) => p?.name || ''}
+        showOverflow={true}
+        onSearchChange={async (s: string) => {
+          setFilter(s);
+        }}
+        onHide={async () => {
+          setFilter('');
+        }}
+        noDataMsg={''}
+        optional={false}
+        helpText={props.helpText}
+        selectedData={states.filter((x) => x.name === props.selected)?.[0]}
+      />
+    </div>
+  );
+};
 customElement(
   'photon-state-input',
   {
@@ -77,68 +141,5 @@ customElement(
     disabled: false,
     selected: undefined
   },
-  (props: {
-    label?: string;
-    required: boolean;
-    value?: number;
-    invalid: boolean;
-    helpText?: string;
-    disabled: boolean;
-    selected?: string;
-  }) => {
-    const [filter, setFilter] = createSignal<string>('');
-    let ref: any;
-
-    const dispatchStateSelected = (state: string) => {
-      const event = new CustomEvent('photon-state-selected', {
-        composed: true,
-        bubbles: true,
-        detail: {
-          state: state
-        }
-      });
-      ref?.dispatchEvent(event);
-    };
-
-    const getData = (filter: string): State[] => {
-      if (filter.length === 0) {
-        return states;
-      }
-      return states.filter((x) => x.name.toLowerCase().includes(filter.toLowerCase()));
-    };
-
-    return (
-      <div
-        ref={ref}
-        on:photon-data-selected={(e: any) => {
-          dispatchStateSelected(e.detail.data.name);
-        }}
-      >
-        <style>{tailwind}</style>
-        <style>{styles}</style>
-        <PhotonDropdown
-          data={getData(filter())}
-          label={props.label}
-          required={props.required}
-          placeholder=""
-          disabled={props.disabled}
-          invalid={props.invalid}
-          isLoading={false}
-          hasMore={false}
-          displayAccessor={(p) => p?.name || ''}
-          showOverflow={true}
-          onSearchChange={async (s: string) => {
-            setFilter(s);
-          }}
-          onHide={async () => {
-            setFilter('');
-          }}
-          noDataMsg={''}
-          optional={false}
-          helpText={props.helpText}
-          selectedData={states.filter((x) => x.name === props.selected)?.[0]}
-        />
-      </div>
-    );
-  }
+  Component
 );

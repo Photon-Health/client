@@ -25,6 +25,56 @@ export const sexes: Sex[] = [
   }
 ];
 
+const Component = (props: {
+  label?: string;
+  required: boolean;
+  value?: number;
+  invalid: boolean;
+  helpText?: string;
+  disabled: boolean;
+  selected?: string;
+}) => {
+  let ref: any;
+
+  const dispatchSexSelected = (sex: string) => {
+    const event = new CustomEvent('photon-sex-selected', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        sex: sex
+      }
+    });
+    ref?.dispatchEvent(event);
+  };
+
+  return (
+    <div
+      ref={ref}
+      on:photon-data-selected={(e: any) => {
+        dispatchSexSelected(e.detail.data.name);
+      }}
+    >
+      <style>{tailwind}</style>
+      <style>{styles}</style>
+      <PhotonDropdown
+        data={sexes}
+        label={props.label}
+        required={props.required}
+        placeholder=""
+        disabled={props.disabled}
+        invalid={props.invalid}
+        isLoading={false}
+        hasMore={false}
+        displayAccessor={(p) => p?.name || ''}
+        showOverflow={true}
+        noDataMsg={''}
+        optional={false}
+        helpText={props.helpText}
+        selectedData={sexes.filter((x) => x.name.toUpperCase() === props.selected)?.[0]}
+      />
+    </div>
+  );
+};
 customElement(
   'photon-sex-input',
   {
@@ -36,54 +86,5 @@ customElement(
     disabled: false,
     selected: undefined
   },
-  (props: {
-    label?: string;
-    required: boolean;
-    value?: number;
-    invalid: boolean;
-    helpText?: string;
-    disabled: boolean;
-    selected?: string;
-  }) => {
-    let ref: any;
-
-    const dispatchSexSelected = (sex: string) => {
-      const event = new CustomEvent('photon-sex-selected', {
-        composed: true,
-        bubbles: true,
-        detail: {
-          sex: sex
-        }
-      });
-      ref?.dispatchEvent(event);
-    };
-
-    return (
-      <div
-        ref={ref}
-        on:photon-data-selected={(e: any) => {
-          dispatchSexSelected(e.detail.data.name);
-        }}
-      >
-        <style>{tailwind}</style>
-        <style>{styles}</style>
-        <PhotonDropdown
-          data={sexes}
-          label={props.label}
-          required={props.required}
-          placeholder=""
-          disabled={props.disabled}
-          invalid={props.invalid}
-          isLoading={false}
-          hasMore={false}
-          displayAccessor={(p) => p?.name || ''}
-          showOverflow={true}
-          noDataMsg={''}
-          optional={false}
-          helpText={props.helpText}
-          selectedData={sexes.filter((x) => x.name.toUpperCase() === props.selected)?.[0]}
-        />
-      </div>
-    );
-  }
+  Component
 );
