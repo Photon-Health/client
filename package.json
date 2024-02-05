@@ -108,6 +108,7 @@
     "@types/react-table": "^7.7.16",
     "@types/react-test-renderer": "^18.0.0",
     "awesome-phonenumber": "^5.11.0",
+    "axios": "^1.6.7",
     "chakra-react-select": "^4.6.0",
     "dayjs": "^1.11.7",
     "dob-to-age": "^1.0.0",

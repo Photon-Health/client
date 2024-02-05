@@ -32,6 +32,17 @@ export const SpeechPrescribeButton = () => {
     };
   };
 
+  const uploadFileToTranscribe = async () => {
+    const config = {
+      headers: { 'content-type': 'multipart/form-data' },
+      onUploadProgress: (event: { loaded: number; total: number }) => {
+        console.log(`Current progress:`, Math.round((event.loaded * 100) / event.total));
+      }
+    };
+
+    const response = await axios.post('/api/uploads', formData, config);
+  };
+
   createEffect(() => {
     if (isRecording()) {
       startRecording();
