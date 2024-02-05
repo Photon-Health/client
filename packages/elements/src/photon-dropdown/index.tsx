@@ -4,19 +4,19 @@ import { createEffect, createMemo, createSignal, For, JSXElement, onMount, Show 
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/dropdown/dropdown';
-import '@shoelace-style/shoelace/dist/components/input/input';
-import '@shoelace-style/shoelace/dist/components/menu/menu';
-import '@shoelace-style/shoelace/dist/components/menu-item/menu-item';
-import '@shoelace-style/shoelace/dist/components/spinner/spinner';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
+import '@shoelace-style/shoelace/dist/components/input/input';
+import '@shoelace-style/shoelace/dist/components/menu-item/menu-item';
+import '@shoelace-style/shoelace/dist/components/menu/menu';
+import '@shoelace-style/shoelace/dist/components/spinner/spinner';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 //Styles
-import tailwind from '../tailwind.css?inline';
-import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
+import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
+import tailwind from '../tailwind.css?inline';
 import styles from './style.css?inline';
 
 //Virtual List
@@ -301,7 +301,10 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             style={{
               'max-height': '200px',
               'min-height': '56px',
-              width: '100%'
+              width: '100%',
+              display: 'flex',
+              'flex-direction': 'column',
+              'justify-content': props.data.length === 0 ? 'center' : 'start'
             }}
           >
             <div
@@ -312,7 +315,10 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
               ref={listRef}
             >
               <Show when={props.data.length > 0 && !props.groups}>
-                <For each={virtualizer().getVirtualItems()} fallback={<div>Loading...</div>}>
+                <For
+                  each={virtualizer().getVirtualItems()}
+                  fallback={<sl-menu-item>Loading...</sl-menu-item>}
+                >
                   {(vr: any) => {
                     const isLoaderRow = vr.index > props.data.length - 1;
                     const datum = props.data[vr.index];
