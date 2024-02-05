@@ -3,7 +3,7 @@ import { createSignal, Show } from 'solid-js';
 import { size, string } from 'superstruct';
 import { Button } from '@photonhealth/components';
 import { usePhoton } from '../context';
-import PhotonFormWrapper from '../photon-form-wrapper';
+import { PhotonFormWrapper } from '../photon-form-wrapper';
 import { message } from '../validators';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 

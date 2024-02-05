@@ -29,7 +29,7 @@ export type PhotonTooltipProps = {
   maxWidth?: string;
 };
 
-const PhotonTooltip = (p: PhotonTooltipProps) => {
+export const PhotonTooltip = (p: PhotonTooltipProps) => {
   const props = mergeProps({ placement: 'top', maxWidth: '200px' }, p);
   return (
     <>

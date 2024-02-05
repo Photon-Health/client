@@ -19,7 +19,7 @@ setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/')
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import { isZip } from '../utils';
-import { sexes } from '../photon-sex-input';
+import { sexes } from '../photon-sex-input/photon-sex-input-component';
 import { PhotonAuthorized } from '../photon-authorized';
 
 const getPatientAddress = (pStore: any, store: any) => {

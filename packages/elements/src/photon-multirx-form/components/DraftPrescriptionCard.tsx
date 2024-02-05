@@ -6,7 +6,7 @@ import { message } from '../../validators';
 import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import type { TemplateOverrides, DraftPrescription } from '@photonhealth/components';
-import PhotonTooltip from '../../photon-tooltip';
+import { PhotonTooltip } from '../../photon-tooltip';
 
 const draftPrescriptionsValidator = message(
   size(array(any()), 1, Infinity),

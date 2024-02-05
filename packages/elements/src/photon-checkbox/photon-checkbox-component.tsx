@@ -11,7 +11,7 @@ import tailwind from '../tailwind.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import { createEffect, createSignal, onMount, Show } from 'solid-js';
-import PhotonTooltip from '../photon-tooltip';
+import { PhotonTooltip } from '../photon-tooltip';
 
 customElement(
   'photon-checkbox',

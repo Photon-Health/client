@@ -5,7 +5,7 @@ import jwtDecode from 'jwt-decode';
 import { customElement } from 'solid-element';
 import { createSignal, onMount } from 'solid-js';
 import { usePhoton } from '../context';
-import PhotonFormWrapper from '../photon-form-wrapper';
+import { PhotonFormWrapper } from '../photon-form-wrapper';
 import { PatientStore } from '../stores/patient';
 
 const shouldWarn = (form: any) =>

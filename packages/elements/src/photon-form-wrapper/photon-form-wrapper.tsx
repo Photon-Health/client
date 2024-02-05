@@ -13,7 +13,7 @@ export type PhotonFormWrapperProps = {
   checkShouldWarn?: () => boolean;
 };
 
-const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
+export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
   const props = mergeProps(
     {
       closeTitle: 'Lose unsaved changes?',
@@ -87,5 +87,3 @@ const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
     </div>
   );
 };
-
-export default PhotonFormWrapper;
