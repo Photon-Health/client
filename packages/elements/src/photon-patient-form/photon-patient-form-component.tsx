@@ -39,7 +39,7 @@ const getPatientAddress = (pStore: any, store: any) => {
   return '';
 };
 
-const Component = (props: { patientId: string }) => {
+const PatientForm = (props: { patientId: string }) => {
   let ref: any;
   const client = usePhoton();
   const { store: pStore, actions: pActions } = PatientStore;
@@ -427,4 +427,4 @@ const Component = (props: { patientId: string }) => {
   );
 };
 
-customElement('photon-patient-form', { patientId: '' }, Component);
+customElement('photon-patient-form', { patientId: '' }, PatientForm);
