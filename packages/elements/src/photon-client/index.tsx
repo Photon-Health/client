@@ -1,8 +1,7 @@
 import { SDKProvider } from '@photonhealth/components';
 import { Env, PhotonClient } from '@photonhealth/sdk';
 import { customElement } from 'solid-element';
-import { JSXElement, createEffect, createSignal } from 'solid-js';
-import { PhotonClientStore } from '../store';
+import { JSXElement, createEffect } from 'solid-js';
 import { hasAuthParams } from '../utils';
 import { type User } from '@auth0/auth0-react';
 import pkg from '../../package.json';
@@ -29,6 +28,17 @@ const version = pkg?.version ?? 'unknown';
 const PhotonClientComponent = (props: PhotonClientComponentProps) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const photon = usePhotonWrapper()!;
+
+  const handleRedirect = async () => {
+    await photon()?.authentication.handleRedirect();
+    if (props.redirectPath) window.location.replace(props.redirectPath);
+  };
+
+  createEffect(() => {
+    if (hasAuthParams()) {
+      handleRedirect();
+    }
+  });
 
   createEffect(() => {
     const args: { appState: { returnTo?: string } } = { appState: {} };
@@ -176,19 +186,6 @@ customElement(
       },
       version
     );
-    const client = new PhotonClientStore(sdk, props.autoLogin);
-    const [store] = createSignal<PhotonClientStore>(client);
-
-    const handleRedirect = async () => {
-      await store()?.authentication.handleRedirect();
-      if (props.redirectPath) window.location.replace(props.redirectPath);
-    };
-
-    createEffect(() => {
-      if (hasAuthParams()) {
-        handleRedirect();
-      }
-    });
 
     return (
       <div ref={ref}>
