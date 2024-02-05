@@ -1,5 +1,5 @@
-import { useEffect, useCallback, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import {
   Alert,
@@ -20,10 +20,10 @@ import {
 
 import { FiShoppingCart } from 'react-icons/fi';
 
-import { usePhoton } from '@photonhealth/react';
 import { getSettings } from '@client/settings';
+import { usePhoton } from '@photonhealth/react';
 
-import { PATIENT_FIELDS } from '../../../model/fragments';
+import { PatientFieldsFragmentMap } from '../../../model/fragments';
 import { OrderForm } from './components/OrderForm';
 
 import jwtDecode from 'jwt-decode';
@@ -80,7 +80,7 @@ export const NewOrder = () => {
 
   const { refetch } = getPatient({
     id: patientId || '',
-    fragment: { PatientFields: PATIENT_FIELDS }
+    fragment: PatientFieldsFragmentMap
   });
 
   const [loadingPatient, setLoadingPatient] = useState(false);
@@ -90,7 +90,7 @@ export const NewOrder = () => {
     setLoadingPatient(true);
     const result = await refetch({
       id: patientId || '',
-      fragment: { PatientFields: PATIENT_FIELDS }
+      fragment: PatientFieldsFragmentMap
     });
     if (result) {
       setPatient(result.data.patient);
