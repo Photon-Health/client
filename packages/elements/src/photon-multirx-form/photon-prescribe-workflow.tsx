@@ -1,5 +1,3 @@
-import { customElement } from 'solid-element';
-
 //Shoelace Components
 import '@shoelace-style/shoelace/dist/components/alert/alert';
 import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
@@ -27,7 +25,6 @@ import { For, Ref, Show, createEffect, createMemo, createSignal, onMount } from 
 import { usePhoton } from '../context';
 import { PhotonAuthorized } from '../photon-authorized';
 import type { FormError } from '../stores/form';
-import { createFormStore } from '../stores/form';
 import tailwind from '../tailwind.css?inline';
 import { AddPrescriptionCard } from './components/AddPrescriptionCard';
 import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
