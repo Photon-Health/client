@@ -13,6 +13,7 @@ import DraftPrescriptions, { DraftPrescription } from '../src/systems/DraftPresc
 import PatientMedHistory from '../src/systems/PatientMedHistory';
 import { triggerToast } from '../src';
 import AddressForm from '../src/systems/AddressForm';
+import { SpeechPrescribeButton } from '../src/systems/SpeechPrescribeButton';
 
 const draftPrescriptions: DraftPrescription[] = [
   {
@@ -106,6 +107,7 @@ const App = () => {
         audience="https://api.boson.health"
         uri="https://api.boson.health/graphql"
       >
+        <SpeechPrescribeButton />
         <div class="mb-10">
           <h2>Address Form</h2>
           <AddressForm patientId="pat_01HAW8GT14ZTJRBADVEY68NQKK" />
