@@ -1,11 +1,11 @@
-import { string, any, record } from 'superstruct';
-import { createSignal, onMount, Show, createEffect, createMemo } from 'solid-js';
-import { PatientInfo, PatientMedHistory, AddressForm, Card, Text } from '@photonhealth/components';
+import { AddressForm, Card, PatientInfo, PatientMedHistory, Text } from '@photonhealth/components';
 import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
-import { message } from '../../validators';
+import { Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
+import { any, record, string } from 'superstruct';
 import { PatientStore } from '../../stores/patient';
-import { PhotonClientStore } from '../../store';
+import { message } from '../../validators';
 import type { Address } from '../index';
+import { usePhotonWrapper } from '../../store-context';
 
 const patientValidator = message(record(string(), any()), 'Please select a patient...');
 
@@ -18,13 +18,15 @@ export const PatientCard = (props: {
   store: Record<string, any>;
   actions: Record<string, (...args: any) => any>;
   patientId?: string;
-  client?: PhotonClientStore;
   enableOrder?: boolean;
   address?: Address;
   weight?: number;
   weightUnit?: string;
   enableMedHistory?: boolean;
 }) => {
+  const photon = usePhotonWrapper();
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const sdk = createMemo(() => photon!().getSDK());
   const [newMedication, setNewMedication] = createSignal<Medication | SearchMedication | undefined>(
     undefined
   );
@@ -47,7 +49,7 @@ export const PatientCard = (props: {
 
     if (props?.patientId) {
       // fetch patient on mount when patientId is passed
-      actions.getSelectedPatient(props.client!.getSDK(), props.patientId);
+      actions.getSelectedPatient(sdk(), props.patientId);
     }
   });
 
@@ -94,7 +96,7 @@ export const PatientCard = (props: {
             help-text={props.store.patient?.error}
             on:photon-patient-selected={updatePatient}
             selected={props.store.patient?.value?.id ?? props.patientId}
-            sdk={props.client!.getSDK()}
+            sdk={sdk()}
           />
         </Card>
       </Show>
@@ -113,7 +115,7 @@ export const PatientCard = (props: {
             hide-create-prescription={true}
             open={dialogOpen()}
             on:photon-patient-updated={() => {
-              actions.getSelectedPatient(props.client!.getSDK(), props.store.patient?.value?.id);
+              actions.getSelectedPatient(sdk(), props.store.patient?.value?.id);
               setDialogOpen(false);
             }}
             on:photon-patient-closed={() => {

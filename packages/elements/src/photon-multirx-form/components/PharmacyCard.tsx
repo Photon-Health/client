@@ -1,15 +1,16 @@
 import { createEffect, createSignal, Show } from 'solid-js';
-import { usePhoton } from '../../context';
 import { RadioGroupCards, Text } from '@photonhealth/components';
 import { Pharmacy } from '@photonhealth/sdk/dist/types';
+import { usePhotonWrapper } from '../../store-context';
 
 export const PharmacyCard = (props: { pharmacyId: string | undefined }) => {
-  const client = usePhoton();
+  const photon = usePhotonWrapper()!;
+  const sdk = photon().getSDK();
   const [pharmacy, setPharmacy] = createSignal<Pharmacy | null>(null);
 
   const fetchPharmacy = async (id: string) => {
-    if (id && client) {
-      const { data } = await client.getSDK().clinical.pharmacy.getPharmacy({ id });
+    if (id) {
+      const { data } = await sdk.clinical.pharmacy.getPharmacy({ id });
       setPharmacy(data.pharmacy);
     }
   };

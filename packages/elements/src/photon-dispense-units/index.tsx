@@ -2,11 +2,11 @@
 import { customElement } from 'solid-element';
 
 //Photon
-import { usePhoton } from '../context';
 import { PhotonDropdown } from '../photon-dropdown';
 
 //Types
-import { createSignal, onMount } from 'solid-js';
+import { createMemo, createSignal, onMount } from 'solid-js';
+import { usePhotonWrapper } from '../store-context';
 import { DispenseUnitStore, StoreDispenseUnit } from '../stores/dispenseUnit';
 
 customElement(
@@ -33,7 +33,7 @@ customElement(
   }) => {
     let ref: any;
     //context
-    const client = usePhoton();
+    const photon = usePhotonWrapper();
     const { store, actions } = DispenseUnitStore;
     const [filter, setFilter] = createSignal<string>('');
 
@@ -51,7 +51,8 @@ customElement(
     };
 
     onMount(async () => {
-      await actions.getDispenseUnits(client!.getSDK());
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await actions.getDispenseUnits(photon!().getSDK());
     });
 
     const getData = (filter: string): StoreDispenseUnit[] => {
@@ -64,6 +65,12 @@ customElement(
       }
       return [];
     };
+
+    const selectedData = createMemo(() =>
+      props.selected
+        ? store.dispenseUnits.data?.find((x) => x.name === props.selected)
+        : store.dispenseUnits.data?.[0]
+    );
 
     return (
       <div
@@ -80,20 +87,12 @@ customElement(
           forceLabelSize={props.forceLabelSize}
           placeholder="Select a dispense unit..."
           invalid={props.invalid}
-          isLoading={client?.clinical.dispenseUnits.state.isLoading || false}
+          isLoading={photon?.().clinical.dispenseUnits.state.isLoading || false}
           hasMore={false}
-          selectedData={
-            props.selected
-              ? store.dispenseUnits.data?.filter((x) => x.name === props.selected)[0]
-              : store.dispenseUnits.data?.[0]
-          }
+          selectedData={selectedData()}
           displayAccessor={(t) => t?.name || ''}
-          onSearchChange={async (s: string) => {
-            setFilter(s);
-          }}
-          onHide={async () => {
-            setFilter('');
-          }}
+          onSearchChange={setFilter}
+          onHide={() => setFilter('')}
           noDataMsg={'No dispense units found'}
           helpText={props.helpText}
         />

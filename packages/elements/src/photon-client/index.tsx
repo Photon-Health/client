@@ -1,13 +1,12 @@
-import { customElement } from 'solid-element';
-import { createEffect, createSignal } from 'solid-js';
-import { PhotonClient, Env } from '@photonhealth/sdk';
 import { SDKProvider } from '@photonhealth/components';
-import { makeTimer } from '@solid-primitives/timer';
+import { Env, PhotonClient } from '@photonhealth/sdk';
+import { customElement } from 'solid-element';
+import { JSXElement, createEffect, createSignal } from 'solid-js';
 import { PhotonClientStore } from '../store';
 import { hasAuthParams } from '../utils';
-import { PhotonContext } from '../context';
-import pkg from '../../package.json';
 import { type User } from '@auth0/auth0-react';
+import pkg from '../../package.json';
+import { PhotonClientStoreProvider, usePhotonWrapper } from '../store-context';
 
 type PhotonClientProps = {
   domain?: string;
@@ -26,6 +25,48 @@ type PhotonClientProps = {
 };
 
 const version = pkg?.version ?? 'unknown';
+
+const PhotonClientComponent = (props: PhotonClientComponentProps) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const photon = usePhotonWrapper()!;
+
+  createEffect(() => {
+    const args: { appState: { returnTo?: string } } = { appState: {} };
+    if (props.redirectPath) {
+      args.appState.returnTo = props.redirectPath;
+    }
+    if (!photon()?.authentication.state.isLoading) {
+      // If autoLogin, then automatically log in
+      if (!photon()?.authentication.state.isAuthenticated && props.autoLogin) {
+        photon()?.authentication.login(args);
+      } else if (
+        // If `externalUserId` is set, then we check if it matches the logged in user
+        // If it doesn't match then logout and then immediately log back in if possible
+        props.externalUserId != null &&
+        // Note that we check the last piece of the `sub` which is the id from the auth provider
+        // We do an exact match on this last section because ids are not guaranteed to not be substrings of the other
+        (photon().authentication.state.user as User | undefined)?.sub?.split('|').reverse()[0] !==
+          props.externalUserId
+      ) {
+        photon()?.authentication.logout();
+        photon()?.authentication.login(args);
+      }
+    }
+  });
+
+  return (
+    <>
+      <div style={{ display: 'flex', 'flex-direction': 'column' }}>
+        <div>isLoading: {JSON.stringify(photon()?.authentication.state.isLoading)}</div>
+        <div>isAuthenticated: {JSON.stringify(photon()?.authentication.state.isAuthenticated)}</div>
+        <div>autoLogin: {JSON.stringify(props.autoLogin)}</div>
+        <div>externalUserId: {JSON.stringify(props.externalUserId)}</div>
+        <div>user: {JSON.stringify(photon().authentication.state.user)}</div>
+      </div>
+      {props.children}
+    </>
+  );
+};
 
 customElement(
   'photon-client',
@@ -116,6 +157,10 @@ customElement(
     }
   },
   (props: PhotonClientProps) => {
+    if (props.developmentMode) {
+      console.info('[PhotonClient]: Development mode enabled');
+    }
+
     let ref: any;
 
     const sdk = new PhotonClient(
@@ -132,9 +177,6 @@ customElement(
       version
     );
     const client = new PhotonClientStore(sdk, props.autoLogin);
-    if (props.developmentMode) {
-      console.info('[PhotonClient]: Development mode enabled');
-    }
     const [store] = createSignal<PhotonClientStore>(client);
 
     const handleRedirect = async () => {
@@ -142,61 +184,33 @@ customElement(
       if (props.redirectPath) window.location.replace(props.redirectPath);
     };
 
-    const checkSession = async () => {
-      await store()?.authentication.checkSession();
-      makeTimer(
-        async () => {
-          await store()?.authentication.checkSession();
-        },
-        60000,
-        setInterval
-      );
-    };
-
     createEffect(() => {
-      if (hasAuthParams() && store()) {
+      if (hasAuthParams()) {
         handleRedirect();
-      } else if (store()) {
-        checkSession();
-      }
-    });
-
-    createEffect(() => {
-      if (!store()?.authentication.state.isLoading) {
-        // If autoLogin, then automatically log in
-        if (!store()?.authentication.state.isAuthenticated && props.autoLogin) {
-          const args: any = { appState: {} };
-          if (props.redirectPath) {
-            args.appState.returnTo = props.redirectPath;
-          }
-          store()?.authentication.login(args);
-        } else if (
-          // If `externalUserId` is set, then we check if it matches the logged in user
-          // If it doesn't match then logout and then immediately log back in if possible
-          props.externalUserId != null &&
-          // Note that we check the last piece of the `sub` which is the id from the auth provider
-          // We do an exact match on this last section because ids are not guaranteed to not be substrings of the other
-          (store().authentication.state.user as User | undefined)?.sub?.split('|').reverse()[0] !==
-            props.externalUserId
-        ) {
-          store()?.authentication.logout();
-          const args: any = { appState: {} };
-          if (props.redirectPath) {
-            args.appState.returnTo = props.redirectPath;
-          }
-          store()?.authentication.login(args);
-        }
       }
     });
 
     return (
       <div ref={ref}>
-        <PhotonContext.Provider value={store()}>
+        <PhotonClientStoreProvider sdk={sdk} autoLogin={props.autoLogin}>
           <SDKProvider client={sdk}>
-            <slot />
+            <PhotonClientComponent
+              redirectPath={props.redirectPath}
+              autoLogin={props.autoLogin}
+              externalUserId={props.externalUserId}
+            >
+              <slot />
+            </PhotonClientComponent>
           </SDKProvider>
-        </PhotonContext.Provider>
+        </PhotonClientStoreProvider>
       </div>
     );
   }
 );
+
+interface PhotonClientComponentProps {
+  redirectPath: string | undefined;
+  externalUserId: string | undefined;
+  autoLogin: boolean;
+  children: JSXElement;
+}

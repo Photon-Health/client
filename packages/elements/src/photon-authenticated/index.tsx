@@ -1,6 +1,5 @@
 import { customElement } from 'solid-element';
-import { createEffect, createSignal, Show } from 'solid-js';
-import { usePhoton } from '../context';
+import { createEffect, createMemo, Show } from 'solid-js';
 
 import '../photon-login';
 
@@ -10,9 +9,10 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
-import tailwind from '../tailwind.css?inline';
-import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
+import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
+import { usePhotonWrapper } from '../store-context';
+import tailwind from '../tailwind.css?inline';
 
 customElement(
   'photon-auth-wrapper',
@@ -28,31 +28,27 @@ customElement(
     }
   },
   (props: { autoLogin: boolean; hideLoader: boolean; redirectPath?: string }) => {
-    const client = usePhoton();
-    const [authenticated, setAuthenticated] = createSignal<boolean>(false);
-    const [isLoading, setIsLoading] = createSignal<boolean>(true);
+    const photon = usePhotonWrapper();
+
+    if (!photon) {
+      console.error(
+        '[photon-auth-wrapper] No valid PhotonClient instance was provided. Please ensure you are wrapping the element in a photon-photon element'
+      );
+      return (
+        <div>
+          [photon-auth-wrapper] No valid PhotonClient instance was provided. Please ensure you are
+          wrapping the element in a photon-photon element
+        </div>
+      );
+    }
+
+    const authenticated = createMemo(() => photon().authentication.state.isAuthenticated, false);
+    const isLoading = createMemo(() => photon().authentication.state.isLoading, true);
 
     createEffect(() => {
-      if (!client) {
-        console.error(
-          '[photon-auth-wrapper] No valid PhotonClient instance was provided. Please ensure you are wrapping the element in a photon-client element'
-        );
-      }
-    });
-
-    createEffect(() => {
-      if (!client?.authentication.state.isLoading) {
-        setIsLoading(false);
-        if (!client?.authentication.state.isAuthenticated && props.autoLogin) {
-          const args: any = { appState: {} };
-          if (props.redirectPath) {
-            args.appState.returnTo = props.redirectPath;
-          }
-          client?.authentication.login(args);
-        }
-        setAuthenticated(client?.authentication.state.isAuthenticated || false);
-      } else {
-        setIsLoading(true);
+      if (!isLoading() && !authenticated() && props.autoLogin) {
+        const args = { appState: props.redirectPath ? { returnTo: props.redirectPath } : {} };
+        photon().authentication.login(args);
       }
     });
 
@@ -61,13 +57,13 @@ customElement(
         <style>{tailwind}</style>
         <style>{shoelaceDarkStyles}</style>
         <style>{shoelaceLightStyles}</style>
-        <Show when={client && authenticated()}>
+        <Show when={authenticated()}>
           <slot />
         </Show>
-        <Show when={client && !authenticated() && !isLoading() && !props.autoLogin}>
+        <Show when={!authenticated() && !isLoading() && !props.autoLogin}>
           <photon-login redirect-path={props.redirectPath} />
         </Show>
-        <Show when={client && isLoading() && !props.hideLoader}>
+        <Show when={isLoading() && !props.hideLoader}>
           <div class="w-full flex justify-center">
             <sl-spinner style={{ 'font-size': '3rem' }} />
           </div>

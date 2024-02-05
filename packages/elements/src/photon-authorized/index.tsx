@@ -5,9 +5,9 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
-import { createEffect, createSignal, JSXElement, mergeProps, Show, createMemo } from 'solid-js';
-import { usePhoton } from '../context';
 import { Spinner } from '@photonhealth/components';
+import { JSXElement, Show, createMemo, mergeProps } from 'solid-js';
+import { usePhotonWrapper } from '../store-context';
 
 function checkHasPermission(subset: Permission[], superset: Permission[]) {
   return subset.every((permission) => superset.includes(permission));
@@ -25,37 +25,19 @@ function AlertMessage(props: { message: string }) {
 
 export const PhotonAuthorized = (p: { children: JSXElement; permissions?: Permission[] }) => {
   const props = mergeProps({ permissions: [] }, p);
-  const client = usePhoton();
-  const [isLoading, setIsLoading] = createSignal<boolean>(
-    client?.authentication.state.isLoading || false
-  );
-  const [authenticated, setAuthenticated] = createSignal<boolean>(
-    client?.authentication.state.isAuthenticated || false
-  );
-  const [inOrg, setInOrg] = createSignal<boolean>(client?.authentication.state.isInOrg || false);
-  const [hasPermission, setHasPermission] = createSignal<boolean>(
-    checkHasPermission(props.permissions, client?.authentication.state.permissions || [])
-  );
+  const photon = usePhotonWrapper();
 
-  createEffect(() => {
-    setIsLoading(client?.authentication.state.isLoading || false);
-  });
-  createEffect(() => {
-    setAuthenticated(client?.authentication.state.isAuthenticated || false);
-  });
-  createEffect(() => {
-    setInOrg(client?.authentication.state.isInOrg || false);
-  });
-  createEffect(() => {
-    setHasPermission(
-      checkHasPermission(props.permissions, client?.authentication.state.permissions || [])
-    );
-  });
+  const authenticated = createMemo(() => photon?.().authentication.state.isAuthenticated);
+  const isLoading = createMemo(() => photon?.().authentication.state.isLoading, true);
+  const inOrg = createMemo(() => photon?.().authentication.state.isInOrg);
+  const hasPermission = createMemo(() =>
+    checkHasPermission(props.permissions, photon?.().authentication.state.permissions || [])
+  );
 
   const canAccess = createMemo(() => authenticated() && inOrg() && hasPermission());
 
   return (
-    <Show when={client && !isLoading()}>
+    <Show when={!isLoading()}>
       <Show
         when={canAccess()}
         fallback={
@@ -71,7 +53,7 @@ export const PhotonAuthorized = (p: { children: JSXElement; permissions?: Permis
             }
           >
             <Show
-              when={client?.autoLogin}
+              when={photon?.().autoLogin}
               fallback={<AlertMessage message="You are not signed in" />}
             >
               {/* 

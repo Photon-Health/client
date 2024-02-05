@@ -103,10 +103,7 @@ const createPatientStore = () => {
     if (!args) {
       args = {};
     }
-    setStore('patients', {
-      ...store.patients,
-      isLoading: true
-    });
+    setStore('patients', 'isLoading', true);
     const { data, errors } = await client.clinical.patient.getPatients({
       first: args.first,
       name: args.name,
@@ -115,7 +112,6 @@ const createPatientStore = () => {
       }
     });
     setStore('patients', {
-      ...store.patients,
       isLoading: false,
       errors: errors,
       data: data.patients,

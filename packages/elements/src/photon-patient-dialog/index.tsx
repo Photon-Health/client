@@ -1,11 +1,13 @@
-import { customElement } from 'solid-element';
-import { createSignal, Show } from 'solid-js';
-import { size, string } from 'superstruct';
 import { Button } from '@photonhealth/components';
-import { usePhoton } from '../context';
-import PhotonFormWrapper from '../photon-form-wrapper';
-import { message } from '../validators';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import { customElement } from 'solid-element';
+import { createEffect, createSignal, Show } from 'solid-js';
+import { size, string } from 'superstruct';
+import PhotonFormWrapper from '../photon-form-wrapper';
+import { usePhotonWrapper } from '../store-context';
+import { createFormStore } from '../stores/form';
+import { PatientStore } from '../stores/patient';
+import { message } from '../validators';
 
 type PatientDialogProps = {
   patientId: string;
@@ -22,12 +24,30 @@ customElement(
   },
   (props: PatientDialogProps) => {
     let ref: any;
-    const client = usePhoton();
+    const photon = usePhotonWrapper();
+    if (!photon) {
+      console.error(
+        '[photon-patient-dialog] No valid PhotonClient instance was provided. Please ensure you are wrapping the element in a photon-photon element'
+      );
+      return (
+        <div>
+          [photon-patient-dialog] No valid PhotonClient instance was provided. Please ensure you are
+          wrapping the element in a photon-photon element
+        </div>
+      );
+    }
+
+    const sdk = photon().getSDK();
+    const [isOpen, setIsOpen] = createSignal(props.open);
+    createEffect(() => setIsOpen(props.open));
     const [loading, setLoading] = createSignal(false);
     const [isCreatePrescription, setIsCreatePrescription] = createSignal<boolean>(false);
-    const [formStore, setFormStore] = createSignal<any>(undefined);
-    const [selectedStore, setSelectedStore] = createSignal<any>(undefined);
-    const [actions, setActions] = createSignal<any>(undefined);
+    const [formStore, setFormStore] = createSignal<ReturnType<typeof createFormStore>>();
+    const [selectedStore, setSelectedStore] = createSignal<(typeof PatientStore)['store']>();
+
+    const [actions, setActions] = createSignal<
+      ReturnType<typeof createFormStore>['actions'] & { resetStores: () => void }
+    >();
     const [globalError, setGlobalError] = createSignal<string | undefined>(undefined);
 
     const dispatchUpdate = (patientId: string, createPrescription = false) => {
@@ -107,7 +127,7 @@ customElement(
       }
 
       if (
-        store['preferredPharmacy']!.value &&
+        store['preferredPharmacy']?.value &&
         pStore.selectedPatient.data?.preferredPharmacies &&
         pStore.selectedPatient.data?.preferredPharmacies.length !== 0 &&
         !pStore.selectedPatient.data?.preferredPharmacies
@@ -116,13 +136,14 @@ customElement(
           .includes(store['preferredPharmacy']!.value)
       ) {
         // remove existing preferred pharmacy in order to add the new one
-        const removePreferredPharmacyMutation = client!
-          .getSDK()
-          .clinical.patient.removePatientPreferredPharmacy({});
+        const removePreferredPharmacyMutation = sdk.clinical.patient.removePatientPreferredPharmacy(
+          {}
+        );
+        const pharmacyId: string = pStore.selectedPatient.data?.preferredPharmacies[0]?.id;
         await removePreferredPharmacyMutation({
           variables: {
             patientId: props.patientId,
-            pharmacyId: pStore.selectedPatient.data?.preferredPharmacies![0]!.id
+            pharmacyId
           },
           awaitRefetchQueries: false
         });
@@ -157,12 +178,12 @@ customElement(
       try {
         if (props?.patientId) {
           // if patientId is provided, update the patient.
-          const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
+          const updatePatientMutation = sdk.clinical.patient.updatePatient({});
           await updatePatientMutation({ variables: patientData, awaitRefetchQueries: false });
           dispatchUpdate(props.patientId, createPrescription);
         } else {
           // otherwise, create a new patient
-          const createPatientMutation = client!.getSDK().clinical.patient.createPatient({});
+          const createPatientMutation = sdk.clinical.patient.createPatient({});
           const patient = await createPatientMutation({
             variables: patientData,
             awaitRefetchQueries: false
@@ -171,7 +192,7 @@ customElement(
         }
         setLoading(false);
         actions.resetStores();
-        props.open = false;
+        setIsOpen(false);
       } catch (e: any) {
         setLoading(false);
         setGlobalError(e?.message || 'An error occurred while saving the patient.');
@@ -181,12 +202,12 @@ customElement(
     return (
       <div ref={ref}>
         <style>{photonStyles}</style>
-        <Show when={props.open}>
+        <Show when={isOpen()}>
           <PhotonFormWrapper
             onClosed={() => {
               dispatchClosed();
-              actions().resetStores();
-              props.open = false;
+              actions()?.resetStores();
+              setIsOpen(false);
             }}
             title={props?.patientId ? 'Update Patient' : 'Create Patient'}
             titleIconName={props?.patientId ? 'pencil-square' : 'person-plus'}

@@ -24,7 +24,6 @@ import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?in
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import { GraphQLError } from 'graphql';
 import { For, Ref, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
-import { usePhoton } from '../context';
 import { PhotonAuthorized } from '../photon-authorized';
 import type { FormError } from '../stores/form';
 import { createFormStore } from '../stores/form';
@@ -39,6 +38,7 @@ import clearForm from './util/clearForm';
 import { formatPatientWeight } from './util/formatPatientWeight';
 
 import type { TemplateOverrides } from '@photonhealth/components';
+import { usePhotonWrapper } from '../store-context';
 
 export type Address = {
   city: string;
@@ -78,16 +78,21 @@ type PrescribeProps = {
 function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
 
-  const client = usePhoton();
-  const [showForm, setShowForm] = createSignal<boolean>(
-    !props.templateIds && !props.prescriptionIds
-  );
+  const photon = usePhotonWrapper();
+  const sdk = photon!().getSDK();
+
+  const [showForm, setShowForm] = createSignal<boolean>();
+  createEffect(() => setShowForm(!props.templateIds && !props.prescriptionIds));
+
   const [errors, setErrors] = createSignal<FormError[]>([]);
-  const [isLoading, setIsLoading] = createSignal<boolean>(true);
+
+  const [isSubmitting, setIsSubmitting] = createSignal(false);
+  const isAuthLoading = createMemo(() => photon?.().authentication.state.isLoading);
+  const isLoading = createMemo(() => isSubmitting() || isAuthLoading());
+  const isAuthenticated = createMemo(() => photon?.().authentication.state.isAuthenticated);
+  const isAuthError = createMemo(() => photon?.().authentication.state.error != null);
+
   const [isEditing, setIsEditing] = createSignal<boolean>(false);
-  const [authenticated, setAuthenticated] = createSignal<boolean>(
-    client?.authentication.state.isAuthenticated || false
-  );
   const [, recentOrdersActions] = useRecentOrders();
 
   onMount(() => {
@@ -108,19 +113,17 @@ function PrescribeWorkflow(props: PrescribeProps) {
   });
 
   createEffect(() => {
-    if (
-      !client?.authentication.state.isAuthenticated &&
-      !client?.authentication.state.isLoading &&
-      !client?.authentication.state.error
-    ) {
-      client?.authentication.login({ appState: { returnTo: window.location.pathname } });
+    console.log(
+      'isAuthLoading',
+      isAuthLoading(),
+      'isAuthError',
+      isAuthError(),
+      'isAuthenticated',
+      isAuthenticated()
+    );
+    if (!isAuthLoading() && !isAuthError() && !isAuthenticated()) {
+      photon?.().authentication.login({ appState: { returnTo: window.location.pathname } });
     }
-  });
-  createEffect(() => {
-    setIsLoading(client?.authentication.state.isLoading || false);
-  });
-  createEffect(() => {
-    setAuthenticated(client?.authentication.state.isAuthenticated || false);
   });
 
   const formattedAddress = createMemo(() => {
@@ -204,29 +207,29 @@ function PrescribeWorkflow(props: PrescribeProps) {
   const submitForm = async (enableOrder: boolean) => {
     setErrors([]);
 
+    const sdk = photon!().getSDK();
+
     const keys = enableOrder
       ? ['patient', 'draftPrescriptions', 'pharmacy', 'address']
       : ['patient', 'draftPrescriptions'];
     props.formActions.validate(keys);
     const errors = props.formActions.getErrors(keys);
     if (errors.length === 0) {
-      setIsLoading(true);
+      setIsSubmitting(true);
       props.formActions.updateFormValue({
         key: 'errors',
         value: []
       });
-      const orderMutation = client!.getSDK().clinical.order.createOrder({});
-      const removePatientPreferredPharmacyMutation = client!
-        .getSDK()
-        .clinical.patient.removePatientPreferredPharmacy({});
-      const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
-      const rxMutation = client!.getSDK().clinical.prescription.createPrescriptions({});
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const orderMutation = sdk.clinical.order.createOrder({});
+      const removePatientPreferredPharmacyMutation =
+        sdk.clinical.patient.removePatientPreferredPharmacy({});
+      const updatePatientMutation = sdk.clinical.patient.updatePatient({});
+      const rxMutation = sdk.clinical.prescription.createPrescriptions({});
       const prescriptions = [];
-      const templateMutation = client!
-        .getSDK()
-        .clinical.prescriptionTemplate.createPrescriptionTemplate({});
+      const templateMutation = sdk.clinical.prescriptionTemplate.createPrescriptionTemplate({});
 
-      for (const draft of props.formStore.draftPrescriptions!.value) {
+      for (const draft of props.formStore.draftPrescriptions.value) {
         const args = {
           daysSupply: draft.daysSupply,
           dispenseAsWritten: draft.dispenseAsWritten,
@@ -269,7 +272,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
       });
 
       if (!props.enableOrder) {
-        setIsLoading(false);
+        setIsSubmitting(false);
       }
       if (errors) {
         dispatchPrescriptionsError(errors);
@@ -317,7 +320,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
         });
 
         if (props.enableOrder) {
-          setIsLoading(false);
+          setIsSubmitting(false);
         }
         if (errors) {
           dispatchOrderError(errors);
@@ -352,7 +355,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
     );
   });
 
-  const clinicalClient = client!.sdk.apolloClinical;
+  const clinicalClient = sdk.apolloClinical;
 
   let prescriptionRef: HTMLDivElement | undefined;
 
@@ -373,7 +376,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
       <div>
         <Toaster buffer={props?.toastBuffer || 0} />
         <div class="flex flex-col gap-8">
-          <Show when={(!client || isLoading()) && !authenticated()}>
+          <Show when={isLoading() || !isAuthenticated()}>
             <div class="w-full flex justify-center">
               <Spinner color="green" />
             </div>
@@ -384,7 +387,6 @@ function PrescribeWorkflow(props: PrescribeProps) {
                 actions={props.formActions}
                 store={props.formStore}
                 patientId={props.patientId}
-                client={client!}
                 enableOrder={props.enableOrder}
                 address={props.address}
                 weight={props.weight}

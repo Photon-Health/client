@@ -1,9 +1,9 @@
-import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
 import { Button, Dialog } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
 import { customElement } from 'solid-element';
-import { createSignal } from 'solid-js';
-import { usePhoton } from '../context';
+import { createEffect, createSignal } from 'solid-js';
+import { usePhotonWrapper } from '../store-context';
 
 type MedSearchDialogProps = {
   open: boolean;
@@ -25,8 +25,14 @@ customElement(
     title: ''
   },
   (props: MedSearchDialogProps) => {
-    const client = usePhoton();
+    const photon = usePhotonWrapper();
     let ref: any;
+
+    const [isOpen, setIsOpen] = createSignal<boolean>();
+    createEffect(() => {
+      setIsOpen(props.open);
+    });
+
     const [medication, setMedication] = createSignal<Medication | SearchMedication | undefined>(
       undefined
     );
@@ -54,7 +60,8 @@ customElement(
 
     const handleConfirm = async () => {
       if (addToCatalog()) {
-        const addCatalogMutation = client!.getSDK().clinical.catalog.addToCatalog({});
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const addCatalogMutation = photon!().getSDK().clinical.catalog.addToCatalog({});
         try {
           await addCatalogMutation({
             variables: {
@@ -69,12 +76,12 @@ customElement(
       }
 
       dispatchMedicationSelected();
-      props.open = false;
+      setIsOpen(false);
     };
 
     const handleCancel = () => {
       dispatchMedicationClosed();
-      props.open = false;
+      setIsOpen(false);
     };
 
     return (
@@ -91,18 +98,14 @@ customElement(
       >
         <style>{photonStyles}</style>
         <Dialog
-          open={props.open}
+          open={isOpen() ?? props.open}
           onClose={handleCancel}
           size="lg"
           on:photon-dialog-confirmed={handleConfirm}
           on:photon-dialog-canceled={handleCancel}
           on:photon-dialog-alt={handleCancel}
         >
-          <photon-med-search
-            open={props.open}
-            with-concept={props.withConcept}
-            title={props.title}
-          />
+          <photon-med-search open={isOpen()} with-concept={props.withConcept} title={props.title} />
           <div class="mt-8 flex gap-4 justify-end">
             <Button variant="secondary" onClick={handleCancel}>
               Cancel

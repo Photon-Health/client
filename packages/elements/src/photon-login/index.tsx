@@ -1,7 +1,5 @@
-import '../photon-auth-button';
 import { customElement } from 'solid-element';
-import { createEffect } from 'solid-js';
-import { usePhoton } from '../context';
+import '../photon-auth-button';
 import tailwind from '../tailwind.css?inline';
 
 customElement(
@@ -16,15 +14,6 @@ customElement(
     }
   },
   (props: { redirectPath?: string }) => {
-    const client = usePhoton();
-
-    createEffect(() => {
-      if (!client) {
-        console.error(
-          '[photon-login] No valid PhotonClient instance was provided. Please ensure you are wrapping the element in a photon-client element'
-        );
-      }
-    });
     return (
       <>
         <style>{tailwind}</style>

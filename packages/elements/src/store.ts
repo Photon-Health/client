@@ -1,4 +1,4 @@
-import { createStore } from 'solid-js/store';
+import { User } from '@auth0/auth0-react';
 import { PhotonClient } from '@photonhealth/sdk';
 import {
   Catalog,
@@ -10,9 +10,10 @@ import {
   PrescriptionTemplate,
   Treatment
 } from '@photonhealth/sdk/dist/types';
-import gql from 'graphql-tag';
 import { GraphQLError } from 'graphql';
+import gql from 'graphql-tag';
 import jwtDecode from 'jwt-decode';
+import { createStore } from 'solid-js/store';
 
 const defaultOnRedirectCallback = (appState?: any): void => {
   window.location.replace(appState?.returnTo || window.location.pathname);
@@ -51,7 +52,7 @@ export class PhotonClientStore {
   private store;
   public authentication: {
     state: {
-      user: any;
+      user: (User & { org_id?: string }) | undefined;
       isAuthenticated: boolean;
       isInOrg: boolean;
       permissions: Permission[];
@@ -133,7 +134,7 @@ export class PhotonClientStore {
         isLoading: boolean;
         permissions: Permission[];
         error?: string;
-        user: any;
+        user: (User & { org_id?: string }) | undefined;
       };
       catalog: {
         isLoading: boolean;
@@ -209,10 +210,10 @@ export class PhotonClientStore {
         try {
           const result = await this.sdk.authentication.handleRedirect(url);
           defaultOnRedirectCallback(result?.appState);
-        } catch (err: any) {
+        } catch (err) {
           const urlParams = new URLSearchParams(window.location.search);
           const errorMessage = urlParams.get('error_description');
-          if (err.message.includes('must be an organization id')) {
+          if ((err as Error).message.includes('must be an organization id')) {
             this.setStore('authentication', {
               ...this.store.authentication,
               error: 'The provided organization id is invalid or does not exist'
@@ -226,7 +227,7 @@ export class PhotonClientStore {
           } else {
             this.setStore('authentication', {
               ...this.store.authentication,
-              error: err.message
+              error: (err as Error).message
             });
           }
         }
@@ -270,14 +271,10 @@ export class PhotonClientStore {
 
   private async checkSession() {
     try {
+      this.setStore('authentication', 'isLoading', true);
       await this.sdk.authentication.checkSession();
       const authenticated = await this.sdk.authentication.isAuthenticated();
-      this.setStore('authentication', {
-        ...this.store.authentication,
-        isAuthenticated: authenticated
-      });
       const user = await this.sdk.authentication.getUser();
-      const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
 
       let permissions: Permission[];
       try {
@@ -289,12 +286,14 @@ export class PhotonClientStore {
         permissions = [];
       }
 
+      const isInOrg = authenticated && user?.org_id && user.org_id === this.sdk.organization;
+
       this.setStore('authentication', {
-        ...this.store.authentication,
-        user: user,
-        isLoading: false,
-        isInOrg: authenticated && hasOrgs && this.sdk.organization === user.org_id,
-        permissions: permissions || []
+        isAuthenticated: authenticated,
+        user,
+        isInOrg,
+        permissions,
+        isLoading: false
       });
     } catch (err) {
       this.setStore('authentication', {
