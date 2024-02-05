@@ -1,12 +1,11 @@
 import {
   Auth0Client,
+  LogoutOptions as Auth0LogoutOptions,
   GetTokenSilentlyOptions,
   GetTokenWithPopupOptions,
-  LogoutOptions as Auth0LogoutOptions,
   RedirectLoginOptions,
   RedirectLoginResult,
-  User,
-  AuthorizationParams
+  User
 } from '@auth0/auth0-spa-js';
 
 const CODE_RE = /[?&]code=[^&]+/;
@@ -84,21 +83,15 @@ export class AuthManager {
    * @returns
    */
   public async login({ organizationId, invitation, appState }: LoginOptions): Promise<void> {
-    const opts: RedirectLoginOptions<any> = {};
-    let authorizationParams: AuthorizationParams = {};
-    if (organizationId || this.organization) {
-      authorizationParams = Object.assign(opts, {
-        organization: organizationId || this.organization
-      });
-    }
-    if (invitation) {
-      authorizationParams = Object.assign(opts, { invitation });
-    }
-
-    if (appState) {
-      authorizationParams = Object.assign(opts, { appState });
-    }
-    opts.authorizationParams = authorizationParams;
+    const opts: RedirectLoginOptions<any> = {
+      authorizationParams: {
+        ...(organizationId || this.organization
+          ? { organization: organizationId || this.organization }
+          : {}),
+        ...(invitation ? { invitation } : {})
+      },
+      ...(appState ? { appState } : {})
+    };
 
     return this.authentication.loginWithRedirect(opts);
   }
@@ -129,16 +122,12 @@ export class AuthManager {
     );
   }
 
-  /**
-   * Retrieves a valid access token
-   * @param config - getAccessToken configuration
-   * @returns
-   */
-  public async getAccessToken(
+  private _getAccessToken = async (
     { audience }: { audience?: string } = {
       audience: this.audience
-    }
-  ): Promise<string> {
+    },
+    throwIfFailure = false
+  ): Promise<string> => {
     const opts: GetTokenSilentlyOptions | GetTokenWithPopupOptions = {
       authorizationParams: {
         audience: audience || this.audience || undefined,
@@ -156,9 +145,27 @@ export class AuthManager {
     }
     if (!token) {
       await this.authentication.loginWithRedirect(opts);
-      throw new Error(); // Needed just because this needs to resolve to something
+      if (throwIfFailure) {
+        throw new Error(); // Needed just because this needs to resolve to something
+      } else {
+        // Retry once
+        return await this._getAccessToken({ audience }, true);
+      }
     }
     return token;
+  };
+
+  /**
+   * Retrieves a valid access token
+   * @param config - getAccessToken configuration
+   * @returns
+   */
+  public async getAccessToken(
+    { audience }: { audience?: string } = {
+      audience: this.audience
+    }
+  ): Promise<string> {
+    return await this._getAccessToken({ audience: audience ?? this.audience });
   }
 
   /**
