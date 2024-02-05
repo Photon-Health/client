@@ -2,14 +2,13 @@
 import { customElement } from 'solid-element';
 
 //Photon
-import { usePhoton } from '../context';
 import { PhotonDropdown } from '../photon-dropdown';
 
 //Types
 import { Patient } from '@photonhealth/sdk/dist/types';
 import { createEffect, createMemo, onMount, untrack } from 'solid-js';
+import { usePhotonWrapper } from '../store-context';
 import { PatientStore } from '../stores/patient';
-import { PhotonClient } from '@photonhealth/sdk';
 
 customElement(
   'photon-patient-select',
@@ -21,8 +20,7 @@ customElement(
     selected: undefined,
     formName: undefined,
     disabled: false,
-    forceLabelSize: false,
-    sdk: undefined
+    forceLabelSize: false
   },
   (props: {
     label?: string;
@@ -33,13 +31,25 @@ customElement(
     formName?: string;
     disabled: boolean;
     forceLabelSize: boolean;
-    sdk?: PhotonClient;
   }) => {
     let ref: any;
     //context
-    const client = usePhoton();
+    const photon = usePhotonWrapper();
+    if (!photon) {
+      console.error(
+        '[photon-patient-dialog] No valid PhotonClient instance was provided. Please ensure you are wrapping the element in a photon-photon element'
+      );
+      return (
+        <div>
+          [photon-patient-dialog] No valid PhotonClient instance was provided. Please ensure you are
+          wrapping the element in a photon-photon element
+        </div>
+      );
+    }
+
+    const sdk = photon().getSDK();
     const { store, actions } = PatientStore;
-    let fetchMore: unknown;
+    let fetchMore: Awaited<ReturnType<(typeof actions)['getPatients']>>;
 
     onMount(() => {
       actions.reset();
@@ -70,7 +80,7 @@ customElement(
     createEffect(async () => {
       if (props.selected && !store.selectedPatient.data) {
         untrack(async () => {
-          await actions.getSelectedPatient(client ? client!.getSDK() : props.sdk!, props.selected!);
+          await actions.getSelectedPatient(sdk, props.selected!);
         });
       }
     });
@@ -94,21 +104,20 @@ customElement(
           hasMore={store.patients.data.length % 25 === 0 && !store.patients.finished}
           displayAccessor={(p) => p?.name?.full || ''}
           onSearchChange={async (s: string) =>
-            (fetchMore = await actions.getPatients(client!.getSDK(), {
+            (fetchMore = await actions.getPatients(sdk, {
               name: s
             }))
           }
           onOpen={async () => {
             if (store.patients.data.length == 0) {
-              fetchMore = await actions.getPatients(client!.getSDK());
+              fetchMore = await actions.getPatients(sdk);
             }
           }}
           onHide={async () => {
-            fetchMore = await actions.getPatients(client!.getSDK());
+            fetchMore = await actions.getPatients(sdk);
           }}
           fetchMore={async () => {
             if (fetchMore) {
-              // @ts-ignore
               fetchMore = await fetchMore();
             }
           }}

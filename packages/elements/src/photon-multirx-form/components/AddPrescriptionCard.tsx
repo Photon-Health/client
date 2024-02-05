@@ -1,28 +1,28 @@
-import { afterDate, message } from '../../validators';
-import { record, string, any, number, min, size } from 'superstruct';
-import { format } from 'date-fns';
 import {
-  Card,
-  Text,
   Button,
-  Icon,
+  Card,
   DoseCalculator,
+  Icon,
+  Text,
   triggerToast,
   useRecentOrders
 } from '@photonhealth/components';
-import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
+import { format } from 'date-fns';
+import { any, min, number, record, size, string } from 'superstruct';
+import { afterDate, message } from '../../validators';
 
 //Shoelace
-import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/button/button';
+import '@shoelace-style/shoelace/dist/components/icon/icon';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-import { createSignal, Show, onMount } from 'solid-js';
-import repopulateForm from '../util/repopulateForm';
+import { GraphQLError } from 'graphql';
+import { Show, createSignal, onMount } from 'solid-js';
+import { usePhotonWrapper } from '../../store-context';
 import clearForm from '../util/clearForm';
 import { formatPatientWeight } from '../util/formatPatientWeight';
-import { usePhoton } from '../../context';
-import { GraphQLError } from 'graphql';
+import repopulateForm from '../util/repopulateForm';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -46,7 +46,8 @@ export const AddPrescriptionCard = (props: {
   weightUnit?: string;
   enableCombineAndDuplicate?: boolean;
 }) => {
-  const client = usePhoton();
+  const photon = usePhotonWrapper();
+  const sdk = photon!().getSDK();
   const [medDialogOpen, setMedDialogOpen] = createSignal(false);
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
@@ -78,9 +79,7 @@ export const AddPrescriptionCard = (props: {
     }
   });
 
-  const templateMutation = client!
-    .getSDK()
-    .clinical.prescriptionTemplate.createPrescriptionTemplate({});
+  const templateMutation = sdk.clinical.prescriptionTemplate.createPrescriptionTemplate({});
 
   const dispatchOrderError = (errors: readonly GraphQLError[]) => {
     const event = new CustomEvent('photon-order-error', {

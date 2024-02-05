@@ -1,14 +1,13 @@
+import { Card, PharmacySearch, Spinner } from '@photonhealth/components';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { customElement } from 'solid-element';
 import { createEffect, onCleanup, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
-import { Spinner, PharmacySearch, Card } from '@photonhealth/components';
-import { usePhoton } from '../context';
 import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
 import { PharmacyStore } from '../stores/pharmacy';
 import tailwind from '../tailwind.css?inline';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { email, empty, message, zipString, notFutureDate } from '../validators';
+import { email, empty, message, notFutureDate, zipString } from '../validators';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/spinner/spinner';
@@ -16,11 +15,12 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
-import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
-import { isZip } from '../utils';
-import { sexes } from '../photon-sex-input';
+import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import { PhotonAuthorized } from '../photon-authorized';
+import { sexes } from '../photon-sex-input';
+import { usePhotonWrapper } from '../store-context';
+import { isZip } from '../utils';
 
 const getPatientAddress = (pStore: any, store: any) => {
   const patientAddress = pStore.selectedPatient.data?.address;
@@ -46,7 +46,21 @@ customElement(
   },
   (props: { patientId: string }) => {
     let ref: any;
-    const client = usePhoton();
+    const photon = usePhotonWrapper();
+    if (!photon) {
+      console.error(
+        '[photon-patient-form] No valid PhotonClient instance was provided. Please ensure you are wrapping the element in a photon-photon element'
+      );
+      return (
+        <div>
+          [photon-patient-form] No valid PhotonClient instance was provided. Please ensure you are
+          wrapping the element in a photon-photon element
+        </div>
+      );
+    }
+
+    const sdk = photon().getSDK();
+
     const { store: pStore, actions: pActions } = PatientStore;
     const { actions: pharmActions } = PharmacyStore;
     const { store, actions } = createFormStore({
@@ -95,7 +109,7 @@ customElement(
 
     onMount(() => {
       if (props.patientId) {
-        pActions.getSelectedPatient(client!.getSDK(), props.patientId);
+        pActions.getSelectedPatient(sdk, props.patientId);
       } else {
         pActions.clearSelectedPatient();
       }

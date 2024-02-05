@@ -1,11 +1,10 @@
 import { Button, triggerToast } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { format } from 'date-fns';
-import jwtDecode from 'jwt-decode';
 import { customElement } from 'solid-element';
-import { createSignal, onMount } from 'solid-js';
-import { usePhoton } from '../context';
+import { createMemo, createSignal } from 'solid-js';
 import PhotonFormWrapper from '../photon-form-wrapper';
+import { usePhotonWrapper } from '../store-context';
 import { PatientStore } from '../stores/patient';
 
 const shouldWarn = (form: any) =>
@@ -55,9 +54,25 @@ customElement(
     toastBuffer?: number;
   }) => {
     let ref: any;
-    const client = usePhoton();
+    const photon = usePhotonWrapper();
+    if (!photon) {
+      console.error(
+        '[photon-multirx-form-wrapper] No valid PhotonClient instance was provided. Please ensure you are wrapping the element in a photon-photon element'
+      );
+      return (
+        <div>
+          [photon-multirx-form-wrapper] No valid PhotonClient instance was provided. Please ensure
+          you are wrapping the element in a photon-photon element
+        </div>
+      );
+    }
+
+    const canWritePrescription = createMemo(() =>
+      photon().authentication.state.permissions.includes('write:prescription')
+    );
+
     const [canSubmit, setCanSubmit] = createSignal<boolean>(false);
-    const [canWritePrescription, setCanWritePrescription] = createSignal<boolean>(false);
+
     const [form, setForm] = createSignal<any>();
     const [continueSubmitOpen, setContinueSubmitOpen] = createSignal<boolean>(false);
     const [isCreateOrder, setIsCreateOrder] = createSignal<boolean>(false);
@@ -65,16 +80,6 @@ customElement(
     const [triggerSubmit, setTriggerSubmit] = createSignal<boolean>(false);
     const { actions: patientActions } = PatientStore;
     const [hideOrderButton, setHideOrderButton] = createSignal<boolean>(true);
-
-    onMount(async () => {
-      const token = await client!.getSDK().authentication.getAccessToken();
-
-      const decoded: { permissions: string[] } = jwtDecode(token);
-
-      if (decoded.permissions?.includes('write:prescription')) {
-        setCanWritePrescription(true);
-      }
-    });
 
     const dispatchPrescriptionsCreated = (
       createOrder: boolean,

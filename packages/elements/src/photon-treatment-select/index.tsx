@@ -2,12 +2,12 @@
 import { customElement } from 'solid-element';
 
 //Photon
-import { usePhoton } from '../context';
 import { PhotonDropdown } from '../photon-dropdown';
 
 //Types
-import { Medication, Treatment, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
+import { Medication, PrescriptionTemplate, Treatment } from '@photonhealth/sdk/dist/types';
 import { createMemo, createSignal, onMount } from 'solid-js';
+import { usePhotonWrapper } from '../store-context';
 import { CatalogStore } from '../stores/catalog';
 
 customElement(
@@ -35,12 +35,25 @@ customElement(
     offCatalogOption?: Medication;
   }) => {
     let ref: any;
-    const client = usePhoton();
+    const photon = usePhotonWrapper();
+    if (!photon) {
+      console.error(
+        '[photon-patient-dialog] No valid PhotonClient instance was provided. Please ensure you are wrapping the element in a photon-photon element'
+      );
+      return (
+        <div>
+          [photon-patient-dialog] No valid PhotonClient instance was provided. Please ensure you are
+          wrapping the element in a photon-photon element
+        </div>
+      );
+    }
+
+    const sdk = photon().getSDK();
     const { store, actions } = CatalogStore;
     const [filter, setFilter] = createSignal<string>('');
 
     onMount(async () => {
-      await actions.getCatalogs(client!.getSDK());
+      await actions.getCatalogs(sdk);
     });
 
     const dispatchTreatmentSelected = (datum: Treatment | PrescriptionTemplate) => {
