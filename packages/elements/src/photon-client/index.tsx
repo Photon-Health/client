@@ -64,18 +64,7 @@ const PhotonClientComponent = (props: PhotonClientComponentProps) => {
     }
   });
 
-  return (
-    <>
-      <div style={{ display: 'flex', 'flex-direction': 'column' }}>
-        <div>isLoading: {JSON.stringify(photon()?.authentication.state.isLoading)}</div>
-        <div>isAuthenticated: {JSON.stringify(photon()?.authentication.state.isAuthenticated)}</div>
-        <div>autoLogin: {JSON.stringify(props.autoLogin)}</div>
-        <div>externalUserId: {JSON.stringify(props.externalUserId)}</div>
-        <div>user: {JSON.stringify(photon().authentication.state.user)}</div>
-      </div>
-      {props.children}
-    </>
-  );
+  return <>{props.children}</>;
 };
 
 customElement(
