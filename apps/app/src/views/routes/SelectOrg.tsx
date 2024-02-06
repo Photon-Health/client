@@ -43,7 +43,8 @@ export const SelectOrg = () => {
         login({
           appState: {
             returnTo: from
-          }
+          },
+          organizationId: organizations[0].id
         });
       }
     }
