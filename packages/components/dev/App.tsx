@@ -107,7 +107,7 @@ const App = () => {
         audience="https://api.boson.health"
         uri="https://api.boson.health/graphql"
       >
-        <SpeechPrescribeButton />
+        <SpeechPrescribeButton setDraftPrescription={(draft) => console.log('DRAFT', draft)} />
         <div class="mb-10">
           <h2>Address Form</h2>
           <AddressForm patientId="pat_01HAW8GT14ZTJRBADVEY68NQKK" />

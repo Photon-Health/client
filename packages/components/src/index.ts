@@ -16,6 +16,7 @@ import Button from './particles/Button';
 import SDKProvider, { usePhotonClient } from './systems/SDKProvider';
 import Text from './particles/Text';
 import Toaster from './particles/Toaster';
+import { SpeechPrescribeButton } from './systems/SpeechPrescribeButton';
 
 import triggerToast from './utils/toastTriggers';
 
@@ -40,6 +41,7 @@ export {
   SDKProvider,
   SignatureAttestationModal,
   Spinner,
+  SpeechPrescribeButton,
   Text,
   Toaster,
   triggerToast,

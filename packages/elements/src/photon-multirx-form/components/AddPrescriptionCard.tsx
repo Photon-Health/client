@@ -7,6 +7,7 @@ import {
   Button,
   Icon,
   DoseCalculator,
+  SpeechPrescribeButton,
   triggerToast,
   useRecentOrders
 } from '@photonhealth/components';
@@ -209,12 +210,19 @@ export const AddPrescriptionCard = (props: {
       <Card>
         <div class="flex items-center justify-between">
           <Text color="gray">Add Prescription</Text>
-          <div
-            class="md:py-2 text-left sm:text-right text-blue-600 flex gap-2 cursor-pointer items-center h-full"
-            onClick={() => setMedDialogOpen(true)}
-          >
-            <a class="font-sans text-sm ">Advanced Search</a>
-            <Icon name="magnifyingGlass" size="sm" />
+          <div>
+            <SpeechPrescribeButton
+              setDraftPrescription={(draft) => {
+                repopulateForm(props.actions, draft);
+              }}
+            />
+            {/* <div
+              class="md:py-2 text-left sm:text-right text-blue-600 flex gap-2 cursor-pointer items-center h-full"
+              onClick={() => setMedDialogOpen(true)}
+            >
+              <a class="font-sans text-sm ">Advanced Search</a>
+              <Icon name="magnifyingGlass" size="sm" />
+            </div> */}
           </div>
         </div>
 
@@ -236,6 +244,7 @@ export const AddPrescriptionCard = (props: {
             help-text={props.store.treatment?.error}
             off-catalog-option={offCatalog()}
             on:photon-treatment-selected={(e: any) => {
+              console.log('e.detail.data', e.detail.data);
               if (e.detail.data.__typename === 'PrescriptionTemplate') {
                 repopulateForm(props.actions, {
                   ...e.detail.data,
