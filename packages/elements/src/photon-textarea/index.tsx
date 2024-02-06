@@ -1,8 +1,14 @@
 import { customElement } from 'solid-element';
 
+import { Icon } from '@photonhealth/components';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import { onMount, Show } from 'solid-js';
+import PhotonTooltip from '../photon-tooltip';
+
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/textarea/textarea';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
+import '@shoelace-style/shoelace/dist/components/icon/icon';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -11,7 +17,6 @@ import tailwind from '../tailwind.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import styles from './style.css?inline';
-import { onMount } from 'solid-js';
 
 customElement(
   'photon-textarea',
@@ -23,7 +28,8 @@ customElement(
     formName: undefined,
     helpText: undefined,
     invalid: false,
-    disabled: false
+    disabled: false,
+    verified: undefined
   },
   (props: {
     label?: string;
@@ -34,6 +40,7 @@ customElement(
     helpText?: string;
     invalid: boolean;
     disabled: boolean;
+    verified?: boolean;
   }) => {
     let ref: any;
 
@@ -54,16 +61,54 @@ customElement(
 
     return (
       <>
+        <style>{photonStyles}</style>
         <style>{tailwind}</style>
         <style>{shoelaceDarkStyles}</style>
         <style>{shoelaceLightStyles}</style>
         <style>{styles}</style>
         <div class="sm:py-2 flex flex-col" ref={ref}>
           {props.label ? (
-            <div class="flex items-center pb-2 font-sans">
-              <p class="text-gray-700 text-sm">{props.label}</p>
-              {props.required ? <p class="pl-1 text-red-500">*</p> : null}
-              {!props.required ? <p class="text-gray-400 text-xs pl-2">Optional</p> : null}
+            <div class="flex justify-between pb-2">
+              <div>
+                <p class="text-gray-700 text-sm">
+                  {props.label}{' '}
+                  {props.required ? (
+                    <span class="pl-1 text-red-500">*</span>
+                  ) : (
+                    <span class="text-gray-400 text-xs pl-2">Optional</span>
+                  )}
+                </p>
+              </div>
+
+              {props.verified !== undefined ? (
+                props.verified ? (
+                  <div class="text-left sm:text-right text-green-500 flex gap-2 cursor-pointer items-center h-full">
+                    <Show when={true}>
+                      <Icon name="check" size="sm" />
+                      <sl-tooltip
+                        content="This SIG follows the suggested format: Action + Quantity + Form/Measurement + Route + Frequency + Time"
+                        placement="top-start"
+                        style={{ '--max-width': '400px' }}
+                      >
+                        <a class="font-sans text-sm">Verified</a>
+                      </sl-tooltip>
+                    </Show>
+                  </div>
+                ) : (
+                  <div class="text-left sm:text-right text-red-500 flex gap-2 cursor-pointer items-center h-full">
+                    <Show when={true}>
+                      <Icon name="xMark" size="sm" />
+                      <sl-tooltip
+                        content={`Missing “Route” in following format: Action + Quantity + Form/Measurement + Route + Frequency + Time`}
+                        placement="top-start"
+                        style={{ '--max-width': '400px' }}
+                      >
+                        <a class="font-sans text-sm">Incomplete</a>
+                      </sl-tooltip>
+                    </Show>
+                  </div>
+                )
+              ) : null}
             </div>
           ) : null}
           <sl-textarea

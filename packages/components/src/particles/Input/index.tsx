@@ -80,6 +80,7 @@ export default function Input(props: InputProps) {
           {...inputProps}
           class={inputClass()}
           autocomplete="off"
+          onBlur={}
         />
         <Show when={state.loading || inputProps.loading}>
           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1">

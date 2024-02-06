@@ -12,6 +12,8 @@ import {
 } from '@photonhealth/components';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import PhotonTooltip from '../../photon-tooltip';
+import validateSig from '../util/validateSig';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/icon/icon';
@@ -201,6 +203,28 @@ export const AddPrescriptionCard = (props: {
         body: 'Some items in the form are incomplete, please check for errors'
       });
     }
+  };
+
+  const checkSig = async (sig: string) => {
+    validateSig(sig);
+
+    // try {
+    //   // const response = await fetch('/api/generate', {
+    //   //   method: 'POST',
+    //   //   headers: {
+    //   //     'Content-Type': 'application/json'
+    //   //   },
+    //   //   body: JSON.stringify({ sig })
+    //   // });
+    //   // const data = await response.json();
+    //   // if (response.status !== 200) {
+    //   //   throw data.error || new Error(`Request failed with status ${response.status}`);
+    //   // }
+    //   // setResult(data.result);
+    //   // setAnimalInput('');
+    // } catch (error) {
+    //   console.error(error);
+    // }
   };
 
   return (
@@ -414,13 +438,15 @@ export const AddPrescriptionCard = (props: {
             placeholder="Enter patient instructions"
             invalid={props.store.instructions?.error ?? false}
             help-text={props.store.instructions?.error}
-            on:photon-textarea-changed={(e: any) =>
+            on:photon-textarea-changed={(e: any) => {
               props.actions.updateFormValue({
                 key: 'instructions',
                 value: e.detail.value
-              })
-            }
+              });
+              checkSig(e.detail.value);
+            }}
             value={props.store.instructions?.value}
+            verified={false}
           />
           <photon-textarea
             label="Pharmacy Note"
