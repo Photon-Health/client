@@ -6,7 +6,6 @@ import { NoMatch } from './views/NoMatch';
 import { Pharmacy } from './views/Pharmacy';
 import { Review } from './views/Review';
 import { Canceled } from './views/Canceled';
-import { Urgency } from './views/Urgency';
 
 export const App = () => {
   return (
@@ -14,7 +13,6 @@ export const App = () => {
       <Routes>
         <Route path="/" element={<Main />}>
           <Route path="/review" element={<Review />} />
-          <Route path="/urgency" element={<Urgency />} />
           <Route path="/pharmacy" element={<Pharmacy />} />
           <Route path="/status" element={<Status />} />
           <Route path="/canceled" element={<Canceled />} />

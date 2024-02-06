@@ -5,7 +5,7 @@ import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
 import { PhotonClientStore } from '../../store';
-import type { Address } from '../index';
+import type { Address } from '../photon-prescribe-workflow';
 
 const patientValidator = message(record(string(), any()), 'Please select a patient...');
 

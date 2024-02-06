@@ -1,7 +1,7 @@
 import { Story, Meta } from '@storybook/html';
 import '../photon-client';
-import '.';
-import type { PhoneInputProps } from '.';
+import './photon-phone-input-component';
+import type { PhoneInputProps } from './photon-phone-input-component';
 
 export default {
   title: 'photon-phone-input'
