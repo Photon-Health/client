@@ -193,7 +193,14 @@ export class AuthManager {
    * @returns
    */
   public async checkSession(): Promise<void> {
-    return this.authentication.checkSession();
+    const opts = {
+      authorizationParams: {
+        audience: this.audience || undefined,
+        ...(this.organization ? { organization: this.organization } : {})
+      }
+    };
+
+    return this.authentication.checkSession(opts);
   }
 
   /**
