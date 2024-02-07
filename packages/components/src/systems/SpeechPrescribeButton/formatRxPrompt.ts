@@ -267,6 +267,6 @@ XR : extended release
 If the doctor says the patient speaks another language (spanish, french, mandarin for example), write the notes in english, then translate them into the language of choice as well on a new line.
 
   --
-  lastly, this is VERY important. return this as a JSON object only. Provide no other information, only the json. Do not describe the results. Simply return as JSON, nothing else.
+  lastly, this is VERY important. return this as a JSON object only. Provide no other information, only the json. Do not describe the results. Simply return as JSON, nothing else. Don't wrap it in coding markdown, just the object nothing else.
   `;
 };

@@ -16,6 +16,7 @@ import {
   SignatureAttestationModal,
   Spinner,
   Toaster,
+  Clippy,
   useRecentOrders
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
@@ -89,6 +90,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
     client?.authentication.state.isAuthenticated || false
   );
   const [, recentOrdersActions] = useRecentOrders();
+  const [isUnleashed, setIsUnleashed] = createSignal<boolean>(false);
 
   onMount(() => {
     if (props.address) {
@@ -370,6 +372,30 @@ function PrescribeWorkflow(props: PrescribeProps) {
         <RecentOrders.IssueDialog />
       </Show>
 
+      <Show when={isUnleashed()}>
+        <Clippy
+          setDosage={({ liquidDose, totalLiquid, unit, days }) => {
+            props.formActions.updateFormValue({
+              key: 'daysSupply',
+              value: Number(days)
+            });
+            props.formActions.updateFormValue({
+              key: 'dispenseQuantity',
+              value: Number(totalLiquid)
+            });
+            props.formActions.updateFormValue({
+              key: 'instructions',
+              value: `${liquidDose} ${unit} ${props.formStore.instructions?.value}`
+            });
+            if (unit === 'mL') {
+              props.formActions.updateFormValue({
+                key: 'dispenseUnit',
+                value: 'Milliliter'
+              });
+            }
+          }}
+        />
+      </Show>
       <div>
         <Toaster buffer={props?.toastBuffer || 0} />
         <div class="flex flex-col gap-8">
@@ -463,6 +489,9 @@ function PrescribeWorkflow(props: PrescribeProps) {
                     </Button>
                   </div>
                 </Show>
+                <Button variant="naked" onClick={() => setIsUnleashed(!isUnleashed())}>
+                  Unleash the beast
+                </Button>
               </Show>
             </SignatureAttestationModal>
           </PhotonAuthorized>

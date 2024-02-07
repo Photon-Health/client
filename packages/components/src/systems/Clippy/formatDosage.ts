@@ -1,0 +1,287 @@
+export const formatCalculations = (question: string) => {
+  return `
+  A doctor is having a hard time calculating this: ${question}
+
+return me a response that's in the format:
+
+"
+{very brief explanation of the calculation, no more than 1 sentences.}
+
+So you have a {days} day supply of {totalLiquid} {unit} to take {liquidDose} {unit} {days} times a day.
+"
+
+Infer from my code to determine the dosage calculations:
+
+const round = (num: number) => parseFloat(num.toFixed(1));
+
+type DosageUnit = 'mcg/kg' | 'mg/kg' | 'g/kg';
+type WeightUnit = 'lbs' | 'kg';
+type DosageFrequency = 'day' | 'dose';
+type LiquidUnit = 'mcg' | 'mg' | 'g';
+type LiquidVolume = 'mL' | 'L';
+
+const dosageUnits: DosageUnit[] = ['mcg/kg', 'mg/kg', 'g/kg'];
+const dosageFrequencies: DosageFrequency[] = ['day', 'dose'];
+const weightUnits: WeightUnit[] = ['lbs', 'kg'];
+const liquidConcentrationUnits: LiquidUnit[] = ['mcg', 'mg', 'g'];
+const liquidVolumes: LiquidVolume[] = ['mL', 'L'];
+
+export interface DoseCalculatorProps {
+  open: boolean;
+  onClose: () => void;
+  medicationName?: string;
+  weight?: number;
+  weightUnit?: string;
+  setAutocompleteValues: (data: {
+    days: number;
+    liquidDose: number;
+    totalLiquid: number;
+    unit: LiquidVolume;
+  }) => void;
+}
+
+const sanitizeValue = (value: number): number => (isNaN(value) || !isFinite(value) ? 0 : value);
+
+export default function DoseCalculator(props: DoseCalculatorProps) {
+  const [dosage, setDosage] = createSignal<number>(0);
+  const [dosageUnit, setDosageUnit] = createSignal<DosageUnit>(dosageUnits[0]);
+  const [dosageFrequency, setDosageFrequency] = createSignal<DosageFrequency>(dosageFrequencies[0]);
+
+  const [weight, setWeight] = createSignal<number>(0);
+  const [weightUnit, setWeightUnit] = createSignal<WeightUnit>(weightUnits[0]);
+
+  const [liquidConcentration, setLiquidConcentration] = createSignal<number>(0);
+  const [liquidUnit, setLiquidUnit] = createSignal<LiquidUnit>(liquidConcentrationUnits[0]);
+  const [perVolume, setPerVolume] = createSignal<number>(0);
+  const [perVolumeUnit, setPerVolumeUnit] = createSignal<LiquidVolume>(liquidVolumes[0]);
+
+  const [daysSupply, setDaysSupply] = createSignal<number>(1);
+  const [dosesPerDay, setDosesPerDay] = createSignal<number>(1);
+
+  onMount(() => {
+    if (props.weight) {
+      setWeight(props.weight || 0);
+    }
+    if (props.weightUnit) {
+      setWeightUnit(props.weightUnit as WeightUnit);
+    }
+  });
+
+  const dose = createMemo(() => {
+    const factor = conversionFactors.weight[weightUnit()];
+    return factor * dosage() * weight();
+  });
+  const liquidDose = createMemo(() => {
+    if (!liquidConcentration() || parseInt(liquidConcentration().toString(), 10) === 0) {
+      return 0;
+    }
+    const factor = conversionFactors.liquid[dosageUnit()][liquidUnit()];
+    return (dose() * perVolume()) / (liquidConcentration() * factor);
+  });
+
+  const singleDose = createMemo(() =>
+    sanitizeValue(dosageFrequency() === 'day' ? dose() / dosesPerDay() : dose())
+  );
+  const totalQuantity = createMemo(() =>
+    sanitizeValue(singleDose() * daysSupply() * dosesPerDay())
+  );
+  const solidUnit = createMemo(() => dosageUnit().split('/')[0]);
+
+  const singleLiquidDose = createMemo(() =>
+    sanitizeValue(dosageFrequency() === 'day' ? liquidDose() / dosesPerDay() : liquidDose())
+  );
+  const totalLiquidQuantity = createMemo(() =>
+    sanitizeValue(singleLiquidDose() * daysSupply() * dosesPerDay())
+  );
+
+  return (
+    <Dialog open={props.open} onClose={props.onClose} size="lg">
+      <div class="flex items-center">
+        <Icon name="calculator" class="mr-2" />
+        <h2>Calculate Dose Quantity</h2>
+      </div>
+      <p>Enter desired dosage and patient weight to calculate total and dose quantity.</p>
+
+      <div class="my-8">
+        <div class="flex items-center">
+          <Icon name="pencilSquare" class="mr-2" />
+          <h3>Selected Medication</h3>
+        </div>
+        <p class={!props?.medicationName ? '@apply text-gray-400' : ''}>
+          {props?.medicationName || 'None Selected'}
+        </p>
+      </div>
+
+      <section class="mt-8">
+        <div class="flex items-center">
+          <Icon name="beaker" class="mr-2" />
+          <h3>Dosage Inputs</h3>
+        </div>
+        <InputGroup label="Dose">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 gap-4 sm:gap-2">
+              <Input
+                type="number"
+                inputmode="decimal"
+                value={dosage()}
+                onInput={(e) => setDosage(e.currentTarget?.valueAsNumber)}
+              />
+              <UnitSelect setSelected={setDosageUnit} options={dosageUnits} initialIdx={1} />
+            </div>
+            <div class="flex gap-4 items-center">
+              <div>per</div>
+              <div class="grow">
+                <UnitSelect setSelected={setDosageFrequency} options={dosageFrequencies} />
+              </div>
+            </div>
+          </div>
+        </InputGroup>
+        <InputGroup label="Patient Weight">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 gap-4 sm:gap-2">
+              <Input
+                type="number"
+                inputmode="decimal"
+                value={weight()}
+                onInput={(e) => setWeight(e.currentTarget?.valueAsNumber)}
+              />
+              <UnitSelect
+                setSelected={setWeightUnit}
+                options={weightUnits}
+                initialValue={props?.weightUnit}
+              />
+            </div>
+          </div>
+        </InputGroup>
+        <div class="grid grid-cols-1 sm:grid-cols-2 sm:gap-4">
+          <InputGroup label="Liquid Concentration">
+            <div class="flex gap-4 sm:gap-2">
+              <Input
+                type="number"
+                inputmode="decimal"
+                value={liquidConcentration()}
+                onInput={(e) => setLiquidConcentration(e.currentTarget?.valueAsNumber)}
+              />
+              <UnitSelect
+                setSelected={setLiquidUnit}
+                options={liquidConcentrationUnits}
+                initialIdx={1}
+              />
+            </div>
+          </InputGroup>
+          <InputGroup label="Per Volume">
+            <div class="flex gap-4 sm:gap-2">
+              <Input
+                type="number"
+                inputmode="decimal"
+                value={perVolume()}
+                onInput={(e) => setPerVolume(e.currentTarget?.valueAsNumber)}
+              />
+              <UnitSelect setSelected={setPerVolumeUnit} options={liquidVolumes} />
+            </div>
+          </InputGroup>
+        </div>
+      </section>
+
+      <section class="mt-8">
+        <div class="flex items-center">
+          <Icon name="clock" class="mr-2" />
+          <h3>Frequency</h3>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <InputGroup label="Duration in Days">
+            <Input
+              type="number"
+              inputmode="decimal"
+              value={daysSupply()}
+              onInput={(e) => setDaysSupply(e.currentTarget?.valueAsNumber)}
+            />
+          </InputGroup>
+          <InputGroup label="Doses per Day">
+            <Input
+              type="number"
+              inputmode="decimal"
+              value={dosesPerDay()}
+              onInput={(e) => setDosesPerDay(e.currentTarget?.valueAsNumber)}
+            />
+          </InputGroup>
+        </div>
+      </section>
+
+      <section class="mt-8">
+        <div class="flex items-center">
+          <Icon name="chartPie" class="mr-2" />
+          <h3>Dosage</h3>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <InputGroup label="Single Dose">
+            <Input type="text" value={{round(singleDose())} {solidUnit()}} readonly copy />
+          </InputGroup>
+          <InputGroup label="Total Quantity">
+            <Input type="text" value={{round(totalQuantity())} {solidUnit()}} readonly copy />
+          </InputGroup>
+        </div>
+        <hr class="h-px mb-4 bg-gray-200 border-0 dark:bg-gray-700 w-full" />
+        <div class="grid grid-cols-2 gap-4">
+          <InputGroup label="Single Liquid Dose">
+            <Input
+              type="text"
+              value={{round(singleLiquidDose())} {perVolumeUnit()}}
+              readonly
+              copy
+            />
+          </InputGroup>
+          <InputGroup label="Total Liquid Quantity">
+            <Input
+              type="text"
+              value={{round(totalLiquidQuantity())} {perVolumeUnit()}}
+              readonly
+              copy
+            />
+          </InputGroup>
+        </div>
+      </section>
+
+      <div class="mt-8 flex gap-4 justify-end">
+        <Button variant="secondary" onClick={props.onClose}>
+          Cancel
+        </Button>
+        <Button
+          onClick={() => {
+            props.setAutocompleteValues({
+              days: daysSupply(),
+              liquidDose: round(singleLiquidDose()),
+              totalLiquid: round(totalLiquidQuantity()),
+              unit: perVolumeUnit()
+            });
+            props.onClose();
+          }}
+          disabled={totalLiquidQuantity() === 0}
+        >
+          Autofill
+        </Button>
+      </div>
+    </Dialog>
+  );
+}
+
+  `;
+};
+
+export const formatDosage = (dosage: string) => {
+  return `
+  take this response:
+${dosage}
+
+and return me a response that's in the format:
+  {
+    days: number;
+    liquidDose: number;
+    totalLiquid: number;
+    unit: 'mL' | 'L';
+  }
+
+
+ this is VERY important. return this as a JSON object only. Provide no other information, only the json. Do not describe the results. Simply return as JSON, nothing else. Don't wrap it in coding markdown, just the object nothing else.
+  `;
+};

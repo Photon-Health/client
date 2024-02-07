@@ -14,6 +14,7 @@ import PatientMedHistory from '../src/systems/PatientMedHistory';
 import { triggerToast } from '../src';
 import AddressForm from '../src/systems/AddressForm';
 import { SpeechPrescribeButton } from '../src/systems/SpeechPrescribeButton';
+import { Clippy } from '../src/systems/Clippy';
 
 const draftPrescriptions: DraftPrescription[] = [
   {
@@ -107,6 +108,7 @@ const App = () => {
         audience="https://api.boson.health"
         uri="https://api.boson.health/graphql"
       >
+        <Clippy />
         <SpeechPrescribeButton setDraftPrescription={(draft) => console.log('DRAFT', draft)} />
         <div class="mb-10">
           <h2>Address Form</h2>
