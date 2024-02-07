@@ -28,7 +28,7 @@ const defaultSettings: OrganizationSettings = {
   returnTo: window.location.origin,
   federated: false,
   enableMedHistory: false,
-  enableRxAndOrder: true,
+  enableRxAndOrder: false,
   enableCombineAndDuplicate: true
 };
 
@@ -46,7 +46,7 @@ export const boson: {
     ...defaultSettings,
     logo: 'photon',
     accentColor: '#b35724',
-    enableRxAndOrder: false,
+    enableRxAndOrder: true,
     enableMedHistory: true
   },
   // NewCo (demo's)

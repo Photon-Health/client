@@ -3,6 +3,7 @@ import { createSignal, Match, Show, Switch } from 'solid-js';
 import Button from '../../particles/Button';
 import chillin from './clippyChillin.gif';
 import searchin from './clippySearchin.gif';
+import eggman from './eggman.png';
 
 import OpenAI from 'openai';
 import { formatCalculations, formatDosage } from './formatDosage';
@@ -14,6 +15,7 @@ const openai = new OpenAI({
 
 export const Clippy = (props: { setDosage: (dose: any) => void }) => {
   const [step, setStep] = createSignal(0);
+  const [isEggman, setIsEggman] = createSignal(false);
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
   const [isTalking, setIsTalking] = createSignal<boolean>(false);
   const [text, setText] = createSignal('');
@@ -74,7 +76,7 @@ export const Clippy = (props: { setDosage: (dose: any) => void }) => {
               <Button variant="secondary" size="sm">
                 Add a New Medication
               </Button>
-              <Button variant="secondary" size="sm">
+              <Button variant="secondary" size="sm" onClick={() => setIsEggman(true)}>
                 Feed Eggs
               </Button>
             </div>
@@ -125,10 +127,19 @@ export const Clippy = (props: { setDosage: (dose: any) => void }) => {
       </div>
       <div onClick={() => setIsTalking(!isTalking())}>
         <Show
-          when={!isLoading()}
-          fallback={<img src={searchin} alt="clippy" class="cursor-pointer" />}
+          when={!isEggman()}
+          fallback={() => (
+            <div style={{ height: '88px', width: '90px' }}>
+              <img src={eggman} alt="clippy" class="cursor-pointer" />
+            </div>
+          )}
         >
-          <img src={chillin} alt="clippy" class="cursor-pointer" />
+          <Show
+            when={!isLoading()}
+            fallback={<img src={searchin} alt="clippy" class="cursor-pointer" />}
+          >
+            <img src={chillin} alt="clippy" class="cursor-pointer" />
+          </Show>
         </Show>
       </div>
     </div>
