@@ -70,16 +70,101 @@ export const PatientCard = (props: {
     console.log(store?.selectedPatient?.data, props?.patientId);
     if (store?.selectedPatient?.data && props?.patientId) {
       // update patient when passed-in patient (patientId) is fetched
-      // updatePatient({ detail: { patient: store?.selectedPatient?.data } });
+      updatePatient({ detail: { patient: store?.selectedPatient?.data } });
     }
   });
 
-  // const patientId = createMemo(() => props.store.patient?.value?.id || props?.patientId);
-  // // Show the address form only if the patient doesnt have an address
-  // const showAddressForm = createMemo(
-  //   () =>
-  //     props.store.patient?.value?.id && !props.store.patient?.value?.address && props.enableOrder
-  // );
+  const patientId = createMemo(() => props.store.patient?.value?.id || props?.patientId);
+  // Show the address form only if the patient doesnt have an address
+  const showAddressForm = createMemo(
+    () =>
+      props.store.patient?.value?.id && !props.store.patient?.value?.address && props.enableOrder
+  );
 
-  return <div class="flex flex-col gap-8">what</div>;
+  return (
+    <div class="flex flex-col gap-8">
+      <Show when={!props?.patientId}>
+        <Card>
+          <div class="flex items-center justify-between">
+            <Text color="gray">{props?.patientId ? 'Patient' : 'Select Patient'}</Text>
+          </div>
+
+          {/* Show Dropdown when no patientId is passed */}
+          <photon-patient-select
+            invalid={props.store.patient?.error ?? false}
+            help-text={props.store.patient?.error}
+            on:photon-patient-selected={updatePatient}
+            selected={props.store.patient?.value?.id ?? props.patientId}
+            sdk={props.client!.getSDK()}
+          />
+        </Card>
+      </Show>
+      <Show when={patientId()}>
+        <div>
+          <PatientInfo
+            patientId={patientId()}
+            weight={props?.weight}
+            weightUnit={props?.weightUnit}
+            editPatient={
+              props?.enableOrder && !showAddressForm() ? () => setDialogOpen(true) : undefined
+            }
+            address={props?.address || props.store.patient?.value?.address}
+          />
+          <photon-patient-dialog
+            hide-create-prescription={true}
+            open={dialogOpen()}
+            on:photon-patient-updated={() => {
+              actions.getSelectedPatient(props.client!.getSDK(), props.store.patient?.value?.id);
+              setDialogOpen(false);
+            }}
+            on:photon-patient-closed={() => {
+              setDialogOpen(false);
+            }}
+            patient-id={patientId()}
+          />
+        </div>
+      </Show>
+      <Show when={props.enableMedHistory && patientId()}>
+        <div>
+          <PatientMedHistory
+            patientId={patientId()}
+            openAddMedication={() => setMedDialogOpen(true)}
+            newMedication={newMedication()}
+          />
+          <photon-med-search-dialog
+            title="Add Medication History"
+            open={medDialogOpen()}
+            with-concept={true}
+            on:photon-medication-selected={(e: {
+              detail: { medication: Medication | SearchMedication };
+            }) => {
+              setNewMedication(e.detail.medication);
+              setMedDialogOpen(false);
+            }}
+            on:photon-medication-closed={() => {
+              setMedDialogOpen(false);
+            }}
+          />
+        </div>
+      </Show>
+      <Show when={showAddressForm()}>
+        <AddressForm
+          patientId={patientId()}
+          setAddress={(address: Address) => {
+            props.actions.updateFormValue({
+              key: 'address',
+              value: address
+            });
+            props.actions.updateFormValue({
+              key: 'patient',
+              value: {
+                ...props.store.patient.value,
+                address
+              }
+            });
+          }}
+        />
+      </Show>
+    </div>
+  );
 };
