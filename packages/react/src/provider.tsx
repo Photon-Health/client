@@ -719,8 +719,11 @@ export const PhotonProvider = (opts: {
           dispatch({ type: 'ERROR', error: message });
         }
       }
-      await client.authentication.checkSession();
       const user = await client.authentication.getUser();
+      if (user) {
+        client.setOrganization(user.org_id);
+      }
+      await client.authentication.checkSession();
       dispatch({ type: 'INITIALISED', user });
     };
     initialize();
