@@ -6,12 +6,12 @@ import { getSettings } from '@client/settings';
 const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
 const settings = getSettings(envName);
 
-interface AuthProps {
-  returnTo?: string;
-}
+// interface AuthProps {
+//   returnTo?: string;
+// }
 
-export const Auth = (props: AuthProps) => {
-  const { returnTo } = props;
+export const Auth = () => {
+  // const { returnTo } = props;
   const { user, isLoading, isAuthenticated, login, logout } = usePhoton();
   const orgSettings = user?.org_id in settings ? settings[user?.org_id] : settings.default;
 
@@ -33,7 +33,10 @@ export const Auth = (props: AuthProps) => {
     );
 
   return (
-    <Button colorScheme="blue" onClick={() => login({ appState: { returnTo } })}>
+    <Button
+      colorScheme="blue"
+      onClick={() => login({ appState: { returnTo: '/prescriptions/new?patientId=2385' } })}
+    >
       Log in
     </Button>
   );

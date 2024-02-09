@@ -41,6 +41,14 @@ export const boson: {
 } = {
   default: defaultSettings,
 
+  org_P24IeOD1tq8sIYeH: {
+    ...defaultSettings,
+    logo: 'photon',
+    accentColor: '#b35724',
+    enableRxAndOrder: true,
+    enableMedHistory: true
+  },
+
   // Test Telehealth (us)
   org_KzSVZBQixLRkqj5d: {
     ...defaultSettings,

@@ -133,6 +133,10 @@ export class PhotonClient {
       authorizationParams: {
         redirect_uri: redirectURI,
         audience: this.audience
+        // audience: 'https://api.preview.platform.athenahealth.com/fhir/r4', //audience || this.audience || undefined,
+        // Note this didnt work, added to connection under params so need to figure that out
+        // aud: 'https://api.preview.platform.athenahealth.com/fhir/r4',
+        // launch: 'a-1959521.62A85C04-C12E-3B7E-83DE-40B25D819059'
       }
     };
     this.auth0Client = new Auth0Client(params);

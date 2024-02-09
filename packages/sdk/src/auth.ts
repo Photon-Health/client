@@ -83,24 +83,40 @@ export class AuthManager {
    * @param config - Login configuration
    * @returns
    */
-  public async login({ organizationId, invitation, appState }: LoginOptions): Promise<void> {
+  public async login({
+    organizationId,
+    invitation,
+    appState
+  }: LoginOptions): Promise<string | undefined> {
     const opts: RedirectLoginOptions<any> = {};
     let authorizationParams: AuthorizationParams = {};
     if (organizationId || this.organization) {
-      authorizationParams = Object.assign(opts, {
+      authorizationParams = Object.assign(authorizationParams, {
         organization: organizationId || this.organization
       });
     }
     if (invitation) {
-      authorizationParams = Object.assign(opts, { invitation });
+      authorizationParams = Object.assign(authorizationParams, { invitation });
     }
 
     if (appState) {
-      authorizationParams = Object.assign(opts, { appState });
+      authorizationParams = Object.assign(authorizationParams, { appState });
     }
     opts.authorizationParams = authorizationParams;
+    opts.authorizationParams.organization = 'org_P24IeOD1tq8sIYeH';
+    // opts.authorizationParams.connection = 'Athena';
+    opts.authorizationParams.login_hint = 'https://api.preview.platform.athenahealth.com/fhir/r4';
+    opts.authorizationParams.id_token_hint = 'a-1959521.62A85C04-C12E-3B7E-83DE-40B25D819059';
 
-    return this.authentication.loginWithRedirect(opts);
+    // return this.authentication.loginWithRedirect(opts);
+    const result = await this.authentication.getTokenWithPopup(opts);
+    // @ts-ignore
+    if (appState?.returnTo) {
+      // @ts-ignore
+      window.location.replace(appState?.returnTo);
+    }
+    return result;
+    // return this.authentication.getTokenWithPopup(opts);
   }
 
   /**
@@ -174,7 +190,9 @@ export class AuthManager {
     const opts: GetTokenWithPopupOptions = {
       authorizationParams: {
         audience: audience || this.audience || undefined,
-        ...(this.organization ? { organization: this.organization } : {})
+        ...(this.organization ? { organization: this.organization } : {}),
+        aud: 'https://api.preview.platform.athenahealth.com/fhir/r4',
+        launch: 'a-1959521.62A85C04-C12E-3B7E-83DE-40B25D819059'
       }
     };
 

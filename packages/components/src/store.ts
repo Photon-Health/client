@@ -307,7 +307,10 @@ export class PhotonClientStore {
     }
   }
   private async login(args = {}) {
+    // Not called
+    console.log('login called');
     await this.sdk.authentication.login(args);
+    console.log('login completed, checking session');
     await this.checkSession();
   }
   private async logout(args = {}) {

@@ -750,20 +750,30 @@ export const PhotonProvider = (opts: {
     }
   }, [client.authentication, handleRedirect, searchParams]);
 
-  const login = ({
+  const login = async ({
     organizationId,
     invitation,
-    appState
+    appState,
+    returnTo
   }: {
     organizationId?: string;
     invitation?: string;
     appState?: object;
+    returnTo?: string;
   } = {}) => {
-    return client.authentication.login({
+    console.log('login called');
+    const result = await client.authentication.login({
       organizationId,
       invitation,
       appState
     });
+    console.log('result- provider', result);
+    await client.authentication.checkSession();
+    if (returnTo) {
+      window.location.replace(returnTo);
+    }
+
+    return result;
   };
 
   const clearError = () => {

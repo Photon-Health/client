@@ -270,8 +270,10 @@ export class PhotonClientStore {
 
   private async checkSession() {
     try {
+      console.log('check session -store');
       await this.sdk.authentication.checkSession();
       const authenticated = await this.sdk.authentication.isAuthenticated();
+      console.log(authenticated);
       this.setStore('authentication', {
         ...this.store.authentication,
         isAuthenticated: authenticated
@@ -304,7 +306,15 @@ export class PhotonClientStore {
     }
   }
   private async login(args = {}) {
+    // Not called
+    console.log('login called - store', { args });
     await this.sdk.authentication.login(args);
+    console.log('login completed, checking session');
+    // @ts-ignore
+    if (args.appState.returnTo) {
+      // @ts-ignore
+      window.location.replace(args.appState.returnTo);
+    }
     await this.checkSession();
   }
   private async logout(args = {}) {
