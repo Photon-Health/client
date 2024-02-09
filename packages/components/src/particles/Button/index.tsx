@@ -27,8 +27,7 @@ export default function Button(props: ButtonProps) {
       'font-semibold flex justify-center inline-flex items-center gap-x-1',
       {
         'shadow-sm': otherProps.variant !== 'naked',
-        'rounded-lg': ['xl', 'lg', 'md'].includes(otherProps.size),
-        'rounded-md': ['sm', 'xs'].includes(otherProps.size),
+        'rounded-md': ['xl', 'lg', 'md'].includes(otherProps.size),
         rounded: !['xl', 'lg', 'md'].includes(otherProps.size),
         'text-xs': otherProps.size === 'xs',
         'text-sm': otherProps.size !== 'xs',
@@ -39,7 +38,7 @@ export default function Button(props: ButtonProps) {
           (otherProps.size === 'sm' || otherProps.size === 'xs') && otherProps.variant !== 'naked',
         'text-white bg-blue-500 hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2':
           otherProps.variant === 'primary',
-        'bg-white text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50':
+        'rounded bg-white text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50':
           otherProps.variant === 'secondary',
         'text-white bg-red-500 hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2':
           otherProps.variant === 'danger',
