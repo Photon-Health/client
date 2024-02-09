@@ -1,0 +1,71 @@
+{
+  "token_type": "Bearer",
+  "expires_in": "3600",
+  "scope": "fhirUser profile launch offline_access email user/Practitioner.read openid user/Patient.read user/Provider.read",
+  "id_token": "eyJraWQiOiJ3U1lHRjdqdndUVjBVdVBVV3NnU3QyQnRULTh2amNtQ0NtNno3aFh3WEtZIiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiIwMHVtdDEwcXVvUVJWWmpWRjI5NyIsIm5hbWUiOiJQaG90b25IZWFsdGggRW5naW5lZXJpbmdNRFAiLCJlbWFpbCI6InAtcGVuZ2luZWVyaW5nbWRAcHJldmlldy5tYW5hZ2VkaWRlbnRpdHkucGxhdGZvcm0uYXRoZW5haGVhbHRoLmNvbSIsInZlciI6MSwiaXNzIjoiaHR0cHM6Ly9hdGhlbmEub2t0YS5jb20vb2F1dGgyL2F1czJoZmVpNm9va1B5eUNBMjk3IiwiYXVkIjoiMG9hbjljMG03cVBnTW5tZWUyOTciLCJpYXQiOjE3MDY4OTA3NTIsImV4cCI6MTcwNjg5NDM1MiwianRpIjoiSUQuQzBWYWNIanNEZ2dGakpXVVotajgtZ25Oc1dpMmpxQm04TE9WUHB5RTZWayIsImFtciI6WyJwd2QiXSwiaWRwIjoiMDBvNnd6c2F2ZjdVNXpsNFMyOTYiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJwLXBlbmdpbmVlcmluZ21kIiwiYXV0aF90aW1lIjoxNzA2ODg4ODAxLCJhdF9oYXNoIjoidjdPeWREZGkwZ29UX3FtSjFnSEFCdyIsImlzTmV3VXNlciI6ZmFsc2UsImZoaXJVc2VyIjoiaHR0cHM6Ly9hcGkucHJldmlldy5wbGF0Zm9ybS5hdGhlbmFoZWFsdGguY29tL2ZoaXIvcjQvUHJhY3RpdGlvbmVyL2EtMTk1OTUyMS5Vc2VyLTIxMDUxMDU1NzEifQ.V-lVqhaCQuEXZrZM4QZJtV9lyqPmxjMWGfEZNi_-NQZ2hPy74TVCdrze8fPNF8oCDvQcNyiickOWqdjMGIr5rpLZl58le_Zvn5q2xZMwYMF0nqNqhxf-bYGtI0JgnoNnoLnMMKl2tJXCE_3DlSVruq5cYJzJ5aNHKV6pgJ0Xj4xWvONGV1koK-WL8UY6At9gzcIb3ZfyOsiyYr8jBIzyzCYH0qyShePhu_VLv2KmueEZjXKcPS3WidUvddUqsUrLNQb-oO_1SSuIfwAXIaZ18S8eg4soy1G3MqInXOuFI3ewCdmqP9g_vfaLwho0fp_jykKG_E2uFUfY6ydqrGYd3w",
+  "patient": "a-1959521.E-2385",
+  "ah_department": "a-1959521.Department-196",
+  "smart_style_url": "https://preview.athenahealth.com/static/smart_on_fhir/smart_stylesheet_v1.json",
+  "ah_brand": "a-1959521.Brand-1",
+  "ah_csg": "a-1959521.CSG-42",
+  "need_patient_banner": true,
+  "ah_practice": "a-1.Practice-1959521",
+  "username": "p-pengineeringmd",
+  "fhir_user_reference": "Practitioner/a-1959521.User-2105105571",
+  "options": {
+    "scope": "email openid profile offline_access launch fhirUser user/Patient.read user/Provider.read user/Practitioner.read",
+    "icon_url": "https://pbs.twimg.com/profile_images/1442477846438449159/l_fkCPqD_400x400.jpg",
+    "tokenURL": "https://api.preview.platform.athenahealth.com/oauth2/v1/token",
+    "client_id": "0oan9c0m7qPgMnmee297",
+    "pkce_enabled": true,
+    "authParamsMap": {},
+    "upstream_params": {
+      "aud": { "alias": "login_hint" },
+      "launch": { "alias": "id_token_hint" }
+    },
+    "authorizationURL": "https://api.preview.platform.athenahealth.com/oauth2/v1/authorize",
+    "store": {}
+  }
+}
+
+{
+  "sub": "00umt10quoQRVZjVF297",
+  "name": "PhotonHealth EngineeringMDP",
+  "email": "p-pengineeringmd@preview.managedidentity.platform.athenahealth.com",
+  "ver": 1,
+  "iss": "https://athena.okta.com/oauth2/aus2hfei6ookPyyCA297",
+  "aud": "0oan9c0m7qPgMnmee297",
+  "iat": 1706890752,
+  "exp": 1706894352,
+  "jti": "ID.C0VacHjsDggFjJWUZ-j8-gnNsWi2jqBm8LOVPpyE6Vk",
+  "amr": [
+    "pwd"
+  ],
+  "idp": "00o6wzsavf7U5zl4S296",
+  "preferred_username": "p-pengineeringmd",
+  "auth_time": 1706888801,
+  "at_hash": "v7OydDdi0goT_qmJ1gHABw",
+  "isNewUser": false,
+  "fhirUser": "https://api.preview.platform.athenahealth.com/fhir/r4/Practitioner/a-1959521.User-2105105571"
+}
+
+{
+  "providerusername": "p-pengineeringmd",
+  "specialty": "General Practice",
+  "entitytype": "Person",
+  "ansinamecode": "Group : Multi-Specialty (193200000X)",
+  "hideinportal": false,
+  "providertypeid": "MD",
+  "providerid": 101,
+  "firstname": "Adam",
+  "lastname": "Bricker",
+  "displayname": "Abricker",
+  "schedulingname": "shmg_abricker",
+  "specialtyid": "001",
+  "providertype": "MD",
+  "billable": true,
+  "homedepartment": "7 Hills Department",
+  "scheduleresourcetype": "Flu shot",
+  "ansispecialtycode": "193200000X",
+  "createencounteroncheckin": false
+}
