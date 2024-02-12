@@ -67,7 +67,7 @@ export const Main = () => {
     }
   }, [isLoading, error]);
 
-  if (isLoading || (previouslyAuthed && !isAuthenticated)) {
+  if (isLoading || (previouslyAuthed && !isAuthenticated) || query.get('code')) {
     return (
       <Center h="100vh">
         <CircularProgress isIndeterminate color="green.300" />
