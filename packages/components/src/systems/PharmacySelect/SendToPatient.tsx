@@ -72,9 +72,9 @@ export function SendToPatient(props: { patientId: string }) {
           const updatedPharmacy: Pharmacy = {
             ...firstPreferredPharmacy,
             address: {
-              ...firstPreferredPharmacy.address,
               country: '',
-              postalCode: ''
+              postalCode: '',
+              ...firstPreferredPharmacy.address
             }
           };
           setPharmacy(updatedPharmacy);
