@@ -99,9 +99,10 @@ export function SendToPatient(props: { patientId: string }) {
         {(p) => (
           <Card gray>
             <div>
-              {p().name}
-              <br />
-              {formatAddress(p().address)}
+              <Text size="sm" bold>
+                {p().name}
+              </Text>
+              <Text size="sm">{formatAddress(p().address)}</Text>
             </div>
           </Card>
         )}
