@@ -8,7 +8,6 @@ import { PhotonClient, PhotonProvider } from '@photonhealth/react';
 import { useEffect } from 'react';
 import { auth0Config } from './configs/auth';
 import { AlertDisplay } from './views/components/AlertDisplay';
-import { Zendesk } from './views/components/Zendesk';
 import { Login } from './views/routes/Login';
 import { Logout } from './views/routes/Logout';
 import { Main } from './views/routes/Main';
@@ -53,7 +52,6 @@ export const App = () => {
   return (
     <BrowserRouter>
       <PhotonProvider client={client} onRedirectCallback={onRedirectCallback}>
-        <Zendesk />
         <AlertDisplay />
         <Routes>
           <Route path="/" element={<Main />}>
