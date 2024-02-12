@@ -1,9 +1,11 @@
+import { Pharmacy } from '@photonhealth/sdk/dist/types';
 import { createEffect, createMemo, createSignal, Show } from 'solid-js';
 import Badge, { BadgeColor } from '../../particles/Badge';
 import Card from '../../particles/Card';
 import Spinner from '../../particles/Spinner';
 import Text from '../../particles/Text';
-import { BaseOptions, createQuery } from '../../utils/createQuery';
+import { createQuery } from '../../utils/createQuery';
+import formatAddress from '../../utils/formatAddress';
 import {
   GetLastOrderQuery,
   GetLastOrderResponse,
@@ -41,41 +43,68 @@ const stpStates: {
 export function SendToPatient(props: { patientId: string }) {
   const client = usePhotonClient();
   const [stpState, setStpState] = createSignal<STPState>(stpStates.patientWillSelect);
-  const [pharmacy, setPharmacy] = createSignal<any | undefined>(undefined);
+  const [pharmacy, setPharmacy] = createSignal<Pharmacy | undefined>(undefined);
 
-  // const preferredPharmaciesData = createQuery<GetPreferredPharmaciesResponse, { id: string }>(
-  //   GetPreferredPharmaciesQuery,
-  //   {
-  //     variables: { id: props.patientId },
-  //     client: client!.apollo
-  //   }
-  // );
+  const preferredPharmaciesData = createQuery<GetPreferredPharmaciesResponse, { id: string }>(
+    GetPreferredPharmaciesQuery,
+    {
+      variables: { id: props.patientId },
+      client: client!.apollo
+    }
+  );
 
   const lastOrderData = createQuery<GetLastOrderResponse, { id: string }>(GetLastOrderQuery, {
     variables: { id: props.patientId },
     client: client!.apollo
   });
 
-  createEffect(() => {
-    const lastOrder = lastOrderData()?.orders?.[0];
+  const notLoading = createMemo(() => !lastOrderData.loading && !preferredPharmaciesData.loading);
 
-    if (!lastOrderData.loading && lastOrder) {
-      if (lastOrder.pharmacy) {
+  createEffect(() => {
+    if (notLoading()) {
+      const preferredPharmacies = preferredPharmaciesData()?.patient?.preferredPharmacies;
+      const lastOrder = lastOrderData()?.orders?.[0];
+
+      if (preferredPharmacies?.length ?? 0 > 0) {
+        setStpState(stpStates.preferredPharmacy);
+        if (preferredPharmacies && preferredPharmacies.length > 0) {
+          const firstPreferredPharmacy = preferredPharmacies[0];
+          const updatedPharmacy: Pharmacy = {
+            ...firstPreferredPharmacy,
+            address: {
+              ...firstPreferredPharmacy.address,
+              country: '',
+              postalCode: ''
+            }
+          };
+          setPharmacy(updatedPharmacy);
+        }
+      } else if (lastOrder?.pharmacy) {
         setStpState(stpStates.recentPharmacy);
         setPharmacy(lastOrder.pharmacy);
+      } else {
+        setStpState(stpStates.patientWillSelect);
       }
     }
   });
 
   return (
-    <Show when={!lastOrderData.loading} fallback={<Spinner />}>
+    <Show when={notLoading()} fallback={<Spinner />}>
       <Badge color={stpState().badgeColor}>{stpState().badgeText}</Badge>
       <Text size="sm" class="py-4">
         {stpState().text}
       </Text>
 
       <Show when={pharmacy()}>
-        <Card gray>{pharmacy()?.name}</Card>
+        {(p) => (
+          <Card gray>
+            <div>
+              {p().name}
+              <br />
+              {formatAddress(p().address)}
+            </div>
+          </Card>
+        )}
       </Show>
     </Show>
   );

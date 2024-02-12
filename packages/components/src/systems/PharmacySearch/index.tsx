@@ -69,6 +69,14 @@ export const GetLastOrderQuery = gql`
     orders(filter: { patientId: $id }, first: 1) {
       pharmacy {
         id
+        name
+        address {
+          street1
+          street2
+          city
+          state
+          postalCode
+        }
       }
     }
   }
@@ -76,6 +84,8 @@ export const GetLastOrderQuery = gql`
 
 type PharmacyOrder = {
   id: string;
+  name: string;
+  address: Address;
 };
 
 export interface GetLastOrderResponse {
