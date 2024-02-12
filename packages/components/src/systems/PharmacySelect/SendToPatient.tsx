@@ -89,24 +89,31 @@ export function SendToPatient(props: { patientId: string }) {
   });
 
   return (
-    <Show when={notLoading()} fallback={<Spinner />}>
-      <Badge color={stpState().badgeColor}>{stpState().badgeText}</Badge>
-      <Text size="sm" class="py-4">
-        {stpState().text}
-      </Text>
+    <Show when={notLoading()} fallback={<Spinner size="sm" />}>
+      <div class="mt-4">
+        <div>
+          <Badge color={stpState().badgeColor}>{stpState().badgeText}</Badge>
+        </div>
 
-      <Show when={pharmacy()}>
-        {(p) => (
-          <Card gray>
-            <div>
-              <Text size="sm" bold>
-                {p().name}
-              </Text>
-              <Text size="sm">{formatAddress(p().address)}</Text>
-            </div>
-          </Card>
-        )}
-      </Show>
+        <Text size="sm" class="py-4">
+          {stpState().text}
+        </Text>
+
+        <Show when={pharmacy()}>
+          {(p) => (
+            <Card gray>
+              <div>
+                <Text size="sm" bold>
+                  {p().name}
+                </Text>
+                <div>
+                  <Text size="sm">{formatAddress(p().address)}</Text>
+                </div>
+              </div>
+            </Card>
+          )}
+        </Show>
+      </div>
     </Show>
   );
 }
