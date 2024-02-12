@@ -32,7 +32,6 @@
   "devDependencies": {
     "@babel/core": "^7.18.13",
     "@csstools/postcss-sass": "^5.0.1",
-    "@rollup/plugin-typescript": "^11.0.0",
     "@types/lodash": "^4.14.185",
     "@types/node": "^18.7.18",
     "@typescript-eslint/eslint-plugin": "^5.48.1",
@@ -47,10 +46,7 @@
     "postcss": "^8.4.31",
     "postcss-custom-media": "^8.0.2",
     "postcss-jit-props": "^1.0.7",
-    "rimraf": "^3.0.2",
-    "vite": "^3.0.6",
-    "vite-plugin-solid": "^2.3.0",
-    "vite-plugin-static-copy": "^0.13.1"
+    "rimraf": "^3.0.2"
   },
   "dependencies": {
     "@photonhealth/components": "*",

@@ -378,6 +378,7 @@ function PrescribeWorkflow(props: PrescribeProps) {
               <Spinner color="green" />
             </div>
           </Show>
+
           <PhotonAuthorized permissions={['write:prescription']}>
             <SignatureAttestationModal client={clinicalClient}>
               <PatientCard

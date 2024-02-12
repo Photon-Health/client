@@ -58,7 +58,7 @@ export function SendToPatient(props: { patientId: string }) {
 
   createEffect(() => {
     const lastOrder = lastOrderData()?.orders?.[0];
-    console.log('lastOrder', lastOrderData());
+
     if (!lastOrderData.loading && lastOrder) {
       if (lastOrder.pharmacy) {
         setStpState(stpStates.recentPharmacy);
