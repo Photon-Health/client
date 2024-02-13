@@ -13,10 +13,10 @@ export const UserProfile = () => {
         boxSize="10"
       />
       <Box>
-        <Text fontWeight="medium" fontSize="sm">
+        <Text fontWeight="medium" fontSize="sm" wordBreak={'break-word'}>
           {user?.name}
         </Text>
-        <Text color="muted" fontSize="sm">
+        <Text color="muted" fontSize="sm" wordBreak={'break-all'}>
           {user?.email}
         </Text>
       </Box>
