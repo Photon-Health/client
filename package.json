@@ -79,11 +79,10 @@
     "s3-deploy": "^1.4.0",
     "storybook": "^7.6.10",
     "tw-colors": "^1.2.6",
-    "vite": "^5.1.1",
-    "vite-plugin-dts": "^3.7.2",
-    "vite-plugin-solid": "^2.9.1",
-    "vite-plugin-static-copy": "^1.0.1",
-    "vitest": "^1.2.2"
+    "vite": "^4.1.4",
+    "vite-plugin-dts": "^2.3.0",
+    "vite-plugin-solid": "^2.5.0",
+    "vitest": "^0.31.0"
   },
   "dependencies": {
     "@apollo/client": "^3.7.10",
@@ -135,7 +134,7 @@
     "react-scripts": "^5.0.1",
     "react-table": "^7.8.0",
     "react-test-renderer": "18.2.0",
-    "solid-js": "1.8.12",
+    "solid-js": "1.6.11",
     "solid-toast": "^0.5.0",
     "tailwindcss": "^3.3.2",
     "terracotta": "^1.0.3",

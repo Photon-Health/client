@@ -100,18 +100,16 @@ export function SendToPatient(props: { patientId: string }) {
         </Text>
 
         <Show when={pharmacy()}>
-          {(p) => (
-            <Card gray>
+          <Card gray>
+            <div>
+              <Text size="sm" bold>
+                {pharmacy()!.name}
+              </Text>
               <div>
-                <Text size="sm" bold>
-                  {p().name}
-                </Text>
-                <div>
-                  <Text size="sm">{formatAddress(p().address)}</Text>
-                </div>
+                <Text size="sm">{formatAddress(pharmacy()!.address)}</Text>
               </div>
-            </Card>
-          )}
+            </div>
+          </Card>
         </Show>
       </div>
     </Show>
