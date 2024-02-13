@@ -45,27 +45,39 @@ export function SendToPatient(props: { patientId: string }) {
   const [stpState, setStpState] = createSignal<STPState>(stpStates.patientWillSelect);
   const [pharmacy, setPharmacy] = createSignal<Pharmacy | undefined>(undefined);
 
-  const preferredPharmaciesData = createQuery<GetPreferredPharmaciesResponse, { id: string }>(
-    GetPreferredPharmaciesQuery,
-    {
-      variables: { id: props.patientId },
-      client: client!.apollo
-    }
-  );
-
-  const lastOrderData = createQuery<GetLastOrderResponse, { id: string }>(GetLastOrderQuery, {
+  const queryOptions = createMemo(() => ({
     variables: { id: props.patientId },
     client: client!.apollo
-  });
+  }));
+
+  const preferredPharmaciesData = createQuery<GetPreferredPharmaciesResponse, { id: string }>(
+    GetPreferredPharmaciesQuery,
+    queryOptions
+  );
+
+  const lastOrderData = createQuery<GetLastOrderResponse, { id: string }>(
+    GetLastOrderQuery,
+    queryOptions
+  );
 
   const notLoading = createMemo(() => !lastOrderData.loading && !preferredPharmaciesData.loading);
+  const recentOrder = createMemo(() => {
+    const lastOrder = lastOrderData()?.orders?.[0];
+    if (lastOrder) {
+      const now = new Date();
+      const eightHoursAgo = new Date(now.getTime() - 8 * 60 * 60 * 1000);
+
+      if (new Date(lastOrder.createdAt) > eightHoursAgo) {
+        return lastOrder;
+      }
+    }
+  });
 
   createEffect(() => {
     if (notLoading()) {
       const preferredPharmacies = preferredPharmaciesData()?.patient?.preferredPharmacies;
-      const lastOrder = lastOrderData()?.orders?.[0];
-
-      if (preferredPharmacies?.length ?? 0 > 0) {
+      const lastPharmacy = recentOrder()?.pharmacy;
+      if ((preferredPharmacies?.length ?? 0) > 0) {
         setStpState(stpStates.preferredPharmacy);
         if (preferredPharmacies && preferredPharmacies.length > 0) {
           const firstPreferredPharmacy = preferredPharmacies[0];
@@ -79,12 +91,14 @@ export function SendToPatient(props: { patientId: string }) {
           };
           setPharmacy(updatedPharmacy);
         }
-      } else if (lastOrder?.pharmacy) {
+      } else if (lastPharmacy) {
         setStpState(stpStates.recentPharmacy);
-        setPharmacy(lastOrder.pharmacy);
+        setPharmacy(lastPharmacy);
       } else {
         setStpState(stpStates.patientWillSelect);
       }
+    } else {
+      setPharmacy(undefined);
     }
   });
 

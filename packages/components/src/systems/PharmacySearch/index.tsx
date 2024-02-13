@@ -66,6 +66,7 @@ export interface GetPreferredPharmaciesResponse {
 export const GetLastOrderQuery = gql`
   query GetLastOrder($id: ID!) {
     orders(filter: { patientId: $id }, first: 1) {
+      createdAt
       pharmacy {
         id
         name
@@ -89,6 +90,7 @@ type PharmacyOrder = {
 
 export interface GetLastOrderResponse {
   orders: {
+    createdAt: string;
     pharmacy: PharmacyOrder;
   }[];
 }
