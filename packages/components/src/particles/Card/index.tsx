@@ -4,13 +4,15 @@ import { createMemo, For, JSX } from 'solid-js';
 export interface CardProps extends JSX.HTMLAttributes<HTMLDivElement> {
   children: JSX.Element | JSX.Element[];
   selected?: boolean;
+  variant?: 'gray';
 }
 
 function Card(props: CardProps) {
   const cardClasses = createMemo(() =>
     clsx('border rounded-lg divide-y divide-gray-300', {
       'border-blue-600 bg-blue-50': props?.selected,
-      'border-gray-300 bg-white': !props?.selected
+      'border-gray-300 bg-white': !props?.selected,
+      'border-gray-300 bg-gray-50': props?.variant === 'gray'
     })
   );
 

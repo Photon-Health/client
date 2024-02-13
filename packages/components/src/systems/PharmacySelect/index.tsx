@@ -1,10 +1,10 @@
 import { types } from '@photonhealth/sdk';
-import { createMemo, createSignal, For, onMount, Show } from 'solid-js';
+import { createSignal, For, onMount, Show } from 'solid-js';
 import RadioGroupCards from '../../particles/RadioGroupCards';
 import Tabs from '../../particles/Tabs';
 import PharmacySearch from '../PharmacySearch';
 import { MailOrderPharmacy } from './MailOrderPharmacy';
-import { PatientDetails } from './PatientDetails';
+import { SendToPatient } from './SendToPatient';
 
 enum SendToPatientEnum {
   sendToPatient = 'SEND_TO_PATIENT'
@@ -77,8 +77,6 @@ export default function PharmacySelect(props: PharmacySelectProps) {
     props.setFufillmentType(parseFulfillmentType(fulfillmentOptions[0].fulfillmentType));
   });
 
-  const patientCount = createMemo(() => props?.patientIds?.length || 0);
-
   const handleTabChange = (newTab: string) => {
     setTab(newTab);
     if (!loadedTabs().includes(newTab)) {
@@ -108,31 +106,12 @@ export default function PharmacySelect(props: PharmacySelectProps) {
       <div class="pt-4">
         <Show when={loadedTabs().includes('Send to Patient')}>
           <div class={tab() !== 'Send to Patient' ? 'hidden' : ''}>
-            {patientCount() > 0 && (
-              <RadioGroupCards
-                label="Patients"
-                initSelected={props?.patientIds?.[0]}
-                setSelected={(patientId) => {
-                  // for now, there is only one patient, but in the future we
-                  // might want to support selecting between multiple patients
-                  if (props.setPatientId) {
-                    props.setPatientId(patientId);
-                  }
-                  if (props.setPharmacyId) {
-                    props.setPharmacyId(undefined);
-                  }
-                }}
-              >
-                <For each={props?.patientIds || []}>
-                  {(id) => (
-                    <RadioGroupCards.Option value={id}>
-                      <PatientDetails patientId={id} />
-                    </RadioGroupCards.Option>
-                  )}
-                </For>
-              </RadioGroupCards>
-            )}
-            {patientCount() === 0 && <div>Please add a patient.</div>}
+            <Show
+              when={(props?.patientIds?.length || 0) > 0}
+              fallback={<div>Please select a patient.</div>}
+            >
+              <SendToPatient patientId={props.patientIds[0]} />
+            </Show>
           </div>
         </Show>
 

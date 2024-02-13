@@ -1,12 +1,11 @@
 import { For, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
 import { gql } from '@apollo/client';
-import { Pharmacy } from '@photonhealth/sdk/dist/types';
+import { Address, Pharmacy as _Pharmacy } from '@photonhealth/sdk/dist/types';
 import InputGroup from '../../particles/InputGroup';
 import ComboBox from '../../particles/ComboBox';
 import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter';
 import LocationSelect from '../LocationSelect';
 import Icon from '../../particles/Icon';
-
 import { types } from '@photonhealth/sdk';
 import { usePhotonClient } from '../SDKProvider';
 import getLocations, { Location } from '../../utils/getLocations';
@@ -16,7 +15,7 @@ import Checkbox from '../../particles/Checkbox';
 import formatAddress from '../../utils/formatAddress';
 import Spinner from '../../particles/Spinner';
 
-const GetPharmaciesQuery = gql`
+export const GetPharmaciesQuery = gql`
   query GetPharmacies($location: LatLongSearch!) {
     pharmacies(location: $location) {
       id
@@ -30,7 +29,7 @@ const GetPharmaciesQuery = gql`
   }
 `;
 
-const GetPreferredPharmaciesQuery = gql`
+export const GetPreferredPharmaciesQuery = gql`
   query GetPatient($id: ID!) {
     patient(id: $id) {
       address {
@@ -53,15 +52,46 @@ const GetPreferredPharmaciesQuery = gql`
   }
 `;
 
-const GetLastOrder = gql`
+type Pharmacy = Pick<_Pharmacy, 'id' | 'name'> & {
+  address: Pick<Address, 'street1' | 'city' | 'state'>;
+};
+
+export interface GetPreferredPharmaciesResponse {
+  patient: {
+    address: Address;
+    preferredPharmacies: Pharmacy[];
+  };
+}
+
+export const GetLastOrderQuery = gql`
   query GetLastOrder($id: ID!) {
     orders(filter: { patientId: $id }, first: 1) {
       pharmacy {
         id
+        name
+        address {
+          street1
+          street2
+          city
+          state
+          postalCode
+        }
       }
     }
   }
 `;
+
+type PharmacyOrder = {
+  id: string;
+  name: string;
+  address: Address;
+};
+
+export interface GetLastOrderResponse {
+  orders: {
+    pharmacy: PharmacyOrder;
+  }[];
+}
 
 export interface PharmacySearchProps {
   address?: string;
@@ -110,7 +140,7 @@ export default function PharmacySearch(props: PharmacySearchProps) {
       variables: { id: patientId }
     });
     const { data: previousData } = await client!.apollo.query({
-      query: GetLastOrder,
+      query: GetLastOrderQuery,
       variables: { id: patientId }
     });
 
