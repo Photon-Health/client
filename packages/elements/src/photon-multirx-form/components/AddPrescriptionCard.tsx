@@ -1,5 +1,5 @@
 import { afterDate, message } from '../../validators';
-import { record, string, any, number, min, size } from 'superstruct';
+import { record, string, any, number, min, size, refine } from 'superstruct';
 import { format } from 'date-fns';
 import {
   Card,
@@ -29,6 +29,10 @@ setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/')
 const validators = {
   treatment: message(record(string(), any()), 'Please select a treatment...'),
   dispenseQuantity: message(min(number(), 1), 'Quantity must be positive'),
+  dispenseUnit: message(
+    refine(string(), 'nonEmptyString', (value) => value.trim().length > 0),
+    'Please select a dispensing unit...'
+  ),
   daysSupply: message(min(number(), 0), 'Days Supply must be at least 0'),
   refillsInput: message(min(number(), 0), 'Refills must be at least 0'),
   instructions: message(
@@ -70,6 +74,12 @@ export const AddPrescriptionCard = (props: {
       value: undefined
     });
 
+    // initialize values in the form
+    clearForm(
+      props.actions,
+      props.weight ? { notes: formatPatientWeight(props.weight, props?.weightUnit) } : undefined
+    );
+
     if (props.weight) {
       props.actions.updateFormValue({
         key: 'notes',
@@ -102,6 +112,7 @@ export const AddPrescriptionCard = (props: {
       'refillsInput',
       'instructions'
     ];
+    const keys = Object.keys(validators);
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
 
@@ -367,12 +378,14 @@ export const AddPrescriptionCard = (props: {
               required="true"
               force-label-size="true"
               selected={props.store.dispenseUnit?.value ?? dispenseUnit()?.name}
-              on:photon-dispense-unit-selected={(e: any) =>
+              invalid={props.store.dispenseUnit?.error ?? false}
+              help-text={props.store.dispenseUnit?.error}
+              on:photon-dispense-unit-selected={(e: any) => {
                 props.actions.updateFormValue({
                   key: 'dispenseUnit',
                   value: e.detail.dispenseUnit.name
-                })
-              }
+                });
+              }}
             />
           </div>
           <div class="sm:grid sm:grid-cols-2 sm:gap-4">

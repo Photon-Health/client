@@ -16,7 +16,7 @@ const clearForm = (
   });
   actions.updateFormValue({
     key: 'dispenseUnit',
-    value: 'Each'
+    value: undefined
   });
   actions.updateFormValue({
     key: 'daysSupply',
