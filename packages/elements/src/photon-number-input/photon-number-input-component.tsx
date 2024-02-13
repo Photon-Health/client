@@ -11,7 +11,6 @@ import tailwind from '../tailwind.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import styles from './style.css?inline';
-import { onMount } from 'solid-js';
 
 const Component = (props: {
   label?: string;
@@ -36,10 +35,6 @@ const Component = (props: {
     });
     ref?.dispatchEvent(event);
   };
-
-  onMount(() => {
-    dispatchInputChanged(props.value);
-  });
 
   return (
     <>

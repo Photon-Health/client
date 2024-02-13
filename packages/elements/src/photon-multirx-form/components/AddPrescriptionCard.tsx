@@ -104,14 +104,6 @@ export const AddPrescriptionCard = (props: {
   };
 
   const handleAddPrescription = async () => {
-    const keys = [
-      'treatment',
-      'effectiveDate',
-      'dispenseQuantity',
-      'daysSupply',
-      'refillsInput',
-      'instructions'
-    ];
     const keys = Object.keys(validators);
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
