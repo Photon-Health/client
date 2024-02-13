@@ -1,3 +1,4 @@
+import { EventHandler } from 'react';
 import 'solid-js';
 
 declare module 'solid-js' {

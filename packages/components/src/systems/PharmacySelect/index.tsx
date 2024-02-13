@@ -1,5 +1,5 @@
 import { types } from '@photonhealth/sdk';
-import { createMemo, createSignal, For, onMount, Show } from 'solid-js';
+import { createSignal, For, onMount, Show } from 'solid-js';
 import RadioGroupCards from '../../particles/RadioGroupCards';
 import Tabs from '../../particles/Tabs';
 import PharmacySearch from '../PharmacySearch';
@@ -110,7 +110,7 @@ export default function PharmacySelect(props: PharmacySelectProps) {
               when={(props?.patientIds?.length || 0) > 0}
               fallback={<div>Please select a patient.</div>}
             >
-              <SendToPatient patientId={props.patientIds[0]} />
+              <SendToPatient patientId={props.patientIds![0]} />
             </Show>
           </div>
         </Show>

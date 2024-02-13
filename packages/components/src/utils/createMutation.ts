@@ -77,7 +77,7 @@ export const createMutation = <
 
   return [
     async (opts: Omit<BaseOptions<TData, TVariables, TContext>, 'client'>) => {
-      const mergedOptions = mergeOptions<MutationOptions<TData, TVariables, TContext>>(opts, {
+      const mergedOptions = mergeOptions(opts, {
         mutation,
         ...(typeof options === 'function' ? untrack(options) : options)
       });
