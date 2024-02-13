@@ -66,15 +66,7 @@ export const AddPrescriptionCard = (props: {
       });
     }
 
-    // This is a hack to fix a bug where the form is cleared when the user types a decimal
-    // in the dispense quantity input. But because of the hack, we have to do this to register the validator
-    // that would otherwise be registered with the input below 🙃
-    props.actions.updateFormValue({
-      key: 'dispenseQuantity',
-      value: undefined
-    });
-
-    // initialize values in the form
+    // initialize values in the prescribe form
     clearForm(
       props.actions,
       props.weight ? { notes: formatPatientWeight(props.weight, props?.weightUnit) } : undefined

@@ -12,7 +12,7 @@ const clearForm = (
   });
   actions.updateFormValue({
     key: 'dispenseQuantity',
-    value: null
+    value: undefined
   });
   actions.updateFormValue({
     key: 'dispenseUnit',
@@ -20,7 +20,7 @@ const clearForm = (
   });
   actions.updateFormValue({
     key: 'daysSupply',
-    value: null
+    value: undefined
   });
   actions.updateFormValue({
     key: 'refillsInput',
