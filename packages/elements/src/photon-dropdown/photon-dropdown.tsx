@@ -190,7 +190,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
       {props.label ? (
         <div class="flex items-center pb-2">
           <p class="text-gray-700 text-sm font-sans">{props.label}</p>
-          {props.required ? <p class="pl-1 text-red-500">*</p> : null}
+          {props.required ? <p class="pl-1 text-red-400">*</p> : null}
           {props.optional ? <p class="text-gray-400 text-xs pl-2 font-sans">Optional</p> : null}
         </div>
       ) : null}
@@ -245,7 +245,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
         >
           <p
             slot="help-text"
-            class="text-red-500 pt-1 font-sans"
+            class="text-red-400 pt-1 font-sans"
             classList={{
               'h-[21px]': props.forceLabelSize
             }}
