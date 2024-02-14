@@ -80,7 +80,7 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
         cursor="pointer"
         onClick={() => handleSelect(pharmacyId)}
         border="2px solid"
-        borderColor={selectedId === pharmacyId ? 'brand.600' : 'white'}
+        borderColor={selectedId === pharmacyId ? 'brand.500' : 'white'}
         mx={isMobile ? -3 : undefined}
       >
         <CardBody p={3}>

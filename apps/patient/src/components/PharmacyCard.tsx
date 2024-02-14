@@ -117,7 +117,7 @@ export const PharmacyCard = memo(function PharmacyCard({
     <Card
       bgColor="white"
       border="2px solid"
-      borderColor={selected && onSelect ? 'brand.600' : 'white'}
+      borderColor={selected && onSelect ? 'brand.500' : 'white'}
       onClick={() => onSelect && onSelect()}
       mx={isMobile ? -3 : undefined}
       cursor={selectable ? 'pointer' : undefined}
