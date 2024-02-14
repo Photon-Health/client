@@ -13,7 +13,14 @@ export default function RecentOrdersDuplicateDialog() {
 
   createEffect(() => {
     if (state.isDuplicateDialogOpen) {
-      dispatchDatadogAction('prescribe-duplicate-dialog-open', {}, ref);
+      dispatchDatadogAction(
+        'prescribe-duplicate-dialog-open',
+        {
+          duplicate: state.duplicateFill,
+          order: state.orderWithIssue
+        },
+        ref
+      );
     }
   });
 
