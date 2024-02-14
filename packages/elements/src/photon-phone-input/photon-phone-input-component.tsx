@@ -64,7 +64,7 @@ const Component = (props: PhoneInputProps) => {
         {props.label ? (
           <div class="flex items-center pb-2">
             <p class="text-gray-700 text-sm">{props.label}</p>
-            {props.required ? <p class="pl-1 text-red-500">*</p> : null}
+            {props.required ? <p class="pl-1 text-red-400">*</p> : null}
           </div>
         ) : null}
         <sl-input
@@ -86,7 +86,7 @@ const Component = (props: PhoneInputProps) => {
           placeholder={'(   ) ___-____'}
           value={phoneValue()}
         >
-          <p slot="help-text" class="text-red-500 pt-1 h-[21px] font-sans">
+          <p slot="help-text" class="text-red-400 pt-1 h-[21px] font-sans">
             {props.helpText}
           </p>
         </sl-input>

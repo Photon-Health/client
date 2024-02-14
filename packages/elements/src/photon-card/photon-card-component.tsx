@@ -36,7 +36,7 @@ const Component = (props: CardProps) => {
       <div
         class="rounded-lg bg-white p-4 shadow-card border border-gray-200"
         classList={{
-          'border-red-500': props.invalid,
+          'border-red-400': props.invalid,
           'border-2': props.invalid
         }}
       >

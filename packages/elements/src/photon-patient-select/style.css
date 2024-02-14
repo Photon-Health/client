@@ -1,5 +1,5 @@
 .invalid::part(base) {
-  @apply border-red-500;
+  @apply border-red-400;
   @apply border-2;
 }
 

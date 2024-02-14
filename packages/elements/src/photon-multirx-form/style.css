@@ -1,6 +1,6 @@
 .remove-icon-button::part(base):hover,
 .remove-icon-button::part(base):focus {
-  @apply text-red-500;
+  @apply text-red-400;
 }
 
 .edit-icon-button::part(base):hover,
