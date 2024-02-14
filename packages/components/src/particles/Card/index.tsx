@@ -1,16 +1,21 @@
 import clsx from 'clsx';
-import { createMemo, For, JSX } from 'solid-js';
+import { createMemo, For, JSX, mergeProps } from 'solid-js';
 
 export interface CardProps extends JSX.HTMLAttributes<HTMLDivElement> {
   children: JSX.Element | JSX.Element[];
   selected?: boolean;
+  variant?: 'white' | 'gray';
 }
 
-function Card(props: CardProps) {
+function Card(preProps: CardProps) {
+  const props = mergeProps({ variant: 'white' }, preProps);
+
   const cardClasses = createMemo(() =>
     clsx('border rounded-lg divide-y divide-gray-300', {
       'border-blue-600 bg-blue-50': props?.selected,
-      'border-gray-300 bg-white': !props?.selected
+      'border-gray-300': !props?.selected,
+      'bg-white': props?.variant === 'white',
+      'bg-gray-50': props?.variant === 'gray'
     })
   );
 

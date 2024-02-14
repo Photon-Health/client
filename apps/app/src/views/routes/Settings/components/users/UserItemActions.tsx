@@ -70,7 +70,7 @@ export const UserItemActions: React.FC<UserItemActionsProps> = ({ user }) => {
         />
         <MenuList>
           <MenuItem icon={<FiEdit fontSize="1.2em" />} onClick={onOpen}>
-            Edit Roles
+            Edit User
           </MenuItem>
           <MenuItem icon={<FiTrash fontSize="1.2em" color="red" />} onClick={removeUseronOpen}>
             Remove User

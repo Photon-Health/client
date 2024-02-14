@@ -73,7 +73,7 @@ const Component = (props: {
         selectedData={
           props.selected
             ? store.dispenseUnits.data?.filter((x) => x.name === props.selected)[0]
-            : store.dispenseUnits.data?.[0]
+            : undefined
         }
         displayAccessor={(t) => t?.name || ''}
         onSearchChange={async (s: string) => {

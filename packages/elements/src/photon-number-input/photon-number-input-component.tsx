@@ -11,7 +11,6 @@ import tailwind from '../tailwind.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import styles from './style.css?inline';
-import { onMount } from 'solid-js';
 
 const Component = (props: {
   label?: string;
@@ -37,10 +36,6 @@ const Component = (props: {
     ref?.dispatchEvent(event);
   };
 
-  onMount(() => {
-    dispatchInputChanged(props.value);
-  });
-
   return (
     <>
       <style>{tailwind}</style>
@@ -51,7 +46,7 @@ const Component = (props: {
         {props.label ? (
           <div class="flex items-center pb-2">
             <p class="text-gray-700 text-sm">{props.label}</p>
-            {props.required ? <p class="pl-1 text-red-500">*</p> : null}
+            {props.required ? <p class="pl-1 text-red-400">*</p> : null}
           </div>
         ) : null}
         <sl-input
@@ -74,7 +69,7 @@ const Component = (props: {
           invalid={props.invalid}
           value={props.value}
         >
-          <p slot="help-text" class="text-red-500 pt-1 h-[21px] font-sans">
+          <p slot="help-text" class="text-red-400 pt-1 h-[21px] font-sans">
             {props.helpText}
           </p>
         </sl-input>
