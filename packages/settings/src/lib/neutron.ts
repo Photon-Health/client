@@ -271,5 +271,11 @@ export const neutron: {
     ...defaultSettings,
     logo: 'transcarent_logo.png',
     accentColor: '#3d409a'
+  },
+  // Maven Clinic
+  org_bZxIVsm8jqwLqPVr: {
+    ...defaultSettings,
+    logo: 'maven_logo.svg',
+    accentColor: '#00856f'
   }
 };
