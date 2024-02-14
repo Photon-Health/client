@@ -95,7 +95,7 @@ export const Urgency = () => {
                   key={option.label}
                   bgColor={isDisabled ? 'gray.300' : 'white'}
                   border={isDisabled ? 'gray.300' : '2px solid'}
-                  borderColor={selectedIdx === i ? 'brand.600' : 'white'}
+                  borderColor={selectedIdx === i ? 'brand.500' : 'white'}
                   color={isDisabled ? 'gray.600' : 'base'}
                   onClick={() => !isDisabled && setSelectedIdx(i)}
                   m="auto"

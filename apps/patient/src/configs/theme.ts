@@ -13,16 +13,16 @@ function generateChakraTheme(key = undefined) {
 
   const colors = {
     brand: {
-      50: color.clone().lighten(55).toHexString(),
-      100: color.clone().lighten(50).toHexString(),
-      200: color.clone().lighten(40).toHexString(),
-      300: color.clone().lighten(30).toHexString(),
-      400: color.clone().lighten(20).toHexString(),
-      500: color.clone().lighten(10).toHexString(),
-      600: accentColor,
-      700: color.clone().darken(10).toHexString(),
-      800: color.clone().darken(20).toHexString(),
-      900: color.clone().darken(30).toHexString()
+      50: color.clone().lighten(45).toHexString(),
+      100: color.clone().lighten(40).toHexString(),
+      200: color.clone().lighten(30).toHexString(),
+      300: color.clone().lighten(20).toHexString(),
+      400: color.clone().lighten(10).toHexString(),
+      500: accentColor,
+      600: color.clone().darken(10).toHexString(),
+      700: color.clone().darken(20).toHexString(),
+      800: color.clone().darken(30).toHexString(),
+      900: color.clone().darken(40).toHexString()
     },
     link: linkColor
   };
@@ -31,7 +31,7 @@ function generateChakraTheme(key = undefined) {
     opacity: 0.4,
     cursor: 'not-allowed',
     boxShadow: 'none',
-    bg: 'brand.300',
+    bg: 'brand.400',
     color: 'gray.900'
   };
 
@@ -59,7 +59,7 @@ function generateChakraTheme(key = undefined) {
               _disabled: disabledStyles
             },
             _active: {
-              bg: 'brand.700'
+              bg: 'brand.600'
             },
             _disabled: disabledStyles
           }),
