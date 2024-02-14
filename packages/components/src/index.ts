@@ -7,7 +7,7 @@ import Icon from './particles/Icon';
 import PatientInfo from './systems/PatientInfo';
 import PatientMedHistory from './systems/PatientMedHistory';
 import PharmacySearch from './systems/PharmacySearch';
-import PharmacySelect from './systems/PharmacySelect';
+import { PharmacySelect } from './systems/PharmacySelect';
 import Spinner from './particles/Spinner';
 import RadioGroupCards from './particles/RadioGroupCards';
 import { useRecentOrders, RecentOrders } from './systems/RecentOrders';

@@ -56,7 +56,11 @@ const customStyles = {
 
 export const RolesSelect = (props: RolesSelectProps) => {
   const { clinicalClient } = usePhoton();
-  const [loadRoleOptions] = useLazyQuery(allRolesQuery, { client: clinicalClient });
+  const [loadRoleOptions] = useLazyQuery(allRolesQuery, {
+    client: clinicalClient,
+    // Not sure why, but looks like roles were cached with empty descriptions
+    fetchPolicy: 'network-only'
+  });
 
   const loadOptions = async () => {
     const roles = (await loadRoleOptions()).data?.roles ?? [];
