@@ -62,7 +62,20 @@ export const text = {
   quantity: 'Quantity',
   questions: 'If you have any questions, please text us at +1 (513) 866-3212.',
   readyBy: 'Ready by',
-
+  readyByOptions: [
+    { label: '10:00 am', description: null, icon: false },
+    { label: '12:00 pm', description: null, icon: false },
+    { label: '2:00 pm', description: null, icon: false },
+    { label: '4:00 pm', description: null, icon: false },
+    { label: '6:00 pm', description: null, icon: false },
+    { label: 'After hours', description: null, icon: false },
+    { label: 'Tomorrow', description: null, icon: false },
+    {
+      label: 'Urgent',
+      description: 'I need to pick this up as soon as possible',
+      icon: true
+    }
+  ],
   readyBySelected: (isPlural: boolean) =>
     `We'll do our best to ensure your ${
       isPlural ? 'prescriptions are' : 'prescription is'
@@ -125,20 +138,6 @@ export const text = {
   track: 'Track your order',
   tracking: 'Tracking #:',
   tryPhoton: 'Try Photon',
-  urgencyOptions: [
-    { label: '10:00 am', description: null, icon: false },
-    { label: '12:00 pm', description: null, icon: false },
-    { label: '2:00 pm', description: null, icon: false },
-    { label: '4:00 pm', description: null, icon: false },
-    { label: '6:00 pm', description: null, icon: false },
-    { label: 'After hours', description: null, icon: false },
-    { label: 'Tomorrow', description: null, icon: false },
-    {
-      label: 'Urgent',
-      description: 'I need to pick this up as soon as possible',
-      icon: true
-    }
-  ],
   useLoc: 'Use my current location',
   weSent: (isPlural: boolean) =>
     `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`

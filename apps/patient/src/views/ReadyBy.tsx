@@ -8,13 +8,16 @@ import {
   Heading,
   HStack,
   Text,
-  VStack
+  VStack,
+  useToast
 } from '@chakra-ui/react';
+import { selectReadyBy } from '../api';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
 import { datadogRum } from '@datadog/browser-rum';
 import timezone from 'dayjs/plugin/timezone';
+import * as TOAST_CONFIG from '../configs/toast';
 
 dayjs.extend(timezone);
 
@@ -22,6 +25,7 @@ import { FixedFooter, Nav, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { RxLightningBolt } from 'react-icons/rx';
+import { FiCheck } from 'react-icons/fi';
 
 const checkDisabled = (option: string): boolean => {
   const currentTime = dayjs();
@@ -29,36 +33,83 @@ const checkDisabled = (option: string): boolean => {
   return currentTime.isAfter(timetoCheckDayJs);
 };
 
-export const Urgency = () => {
+export const ReadyBy = () => {
   const { order, flattenedFills } = useOrderContext();
+
+  const navigate = useNavigate();
+
+  const toast = useToast();
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
 
-  const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
 
   const [selectedIdx, setSelectedIdx] = useState(null);
   const showFooter = selectedIdx !== null;
 
-  const handleCtaClick = () => {
-    if (!isDemo) {
-      // Track selection
-      datadogRum.addAction('urgency_selection', {
-        value: t.urgencyOptions[selectedIdx].label,
-        orderId: order.id,
-        organization: order.organization.name,
-        timestamp: new Date().toISOString(),
-        timezone: dayjs.tz.guess()
-      });
+  const handleSubmit = async () => {
+    if (!selectedIdx) {
+      console.error('No selected readyBy time.');
+      return;
     }
 
-    // Redirect
-    const toUrl = isDemo
-      ? `/pharmacy?demo=true&phone=${phone}`
-      : `/pharmacy?orderId=${order.id}&token=${token}`;
-    navigate(toUrl);
+    setSubmitting(true);
+
+    if (isDemo) {
+      setTimeout(() => {
+        setSuccessfullySubmitted(true);
+        setTimeout(() => {
+          navigate(`/pharmacy?demo=true&phone=${phone}`);
+        }, 1000);
+        setSubmitting(false);
+      }, 1000);
+
+      return;
+    }
+
+    // Track selection
+    const selectedTime = t.readyByOptions[selectedIdx].label;
+    datadogRum.addAction('ready_by_selection', {
+      value: selectedTime,
+      orderId: order.id,
+      organization: order.organization.name,
+      timestamp: new Date().toISOString(),
+      timezone: dayjs.tz.guess()
+    });
+
+    try {
+      const result = await selectReadyBy(order.id, selectedTime);
+
+      setTimeout(() => {
+        if (result) {
+          setSuccessfullySubmitted(true);
+          setTimeout(() => {
+            navigate(`/pharmacy?orderId=${order.id}&token=${token}`);
+          }, 1000);
+        } else {
+          toast({
+            title: 'Unable to select ready by time',
+            description: 'Please refresh and try again',
+            ...TOAST_CONFIG.ERROR
+          });
+        }
+        setSubmitting(false);
+      }, 1000);
+    } catch (error) {
+      toast({
+        title: 'Unable to select ready by time',
+        description: 'Please refresh and try again',
+        ...TOAST_CONFIG.ERROR
+      });
+
+      setSubmitting(false);
+
+      console.error(JSON.stringify(error, undefined, 2));
+    }
   };
 
   const isMultiRx = flattenedFills.length > 1;
@@ -88,7 +139,7 @@ export const Urgency = () => {
           </VStack>
 
           <VStack spacing={3} w="full">
-            {t.urgencyOptions.map((option, i) => {
+            {t.readyByOptions.map((option, i) => {
               const isDisabled = checkDisabled(option.label);
               return (
                 <Card
@@ -125,8 +176,16 @@ export const Urgency = () => {
 
       <FixedFooter show={showFooter}>
         <Container as={VStack} w="full">
-          <Button size="lg" w="full" variant="brand" onClick={handleCtaClick}>
-            {t.selectPharmacy}
+          <Button
+            size="lg"
+            w="full"
+            variant={successfullySubmitted ? undefined : 'brand'}
+            colorScheme={successfullySubmitted ? 'green' : undefined}
+            leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
+            onClick={!successfullySubmitted ? handleSubmit : undefined}
+            isLoading={submitting}
+          >
+            {successfullySubmitted ? t.thankYou : t.selectPharmacy}
           </Button>
           <PoweredBy />
         </Container>

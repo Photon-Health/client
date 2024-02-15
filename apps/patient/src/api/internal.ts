@@ -7,6 +7,7 @@ import {
   MARK_ORDER_AS_PICKED_UP,
   REROUTE_ORDER,
   SELECT_ORDER_PHARMACY,
+  SELECT_READY_BY,
   SET_PREFERRED_PHARMACY
 } from '../graphql';
 import { Order } from '../utils/models';
@@ -122,6 +123,23 @@ export const selectOrderPharmacy = async (
       return true;
     } else {
       throw new Error('Unable to select pharmacy');
+    }
+  } catch (error) {
+    throw new Error(error.response.errors[0].message);
+  }
+};
+
+export const selectReadyBy = async (orderId: string, readyBy: string) => {
+  try {
+    const response: { selectReadyBy: boolean } = await graphQLClient.request(SELECT_READY_BY, {
+      orderId,
+      readyBy
+    });
+
+    if (response?.selectReadyBy) {
+      return true;
+    } else {
+      throw new Error('Unable to select readyBy time');
     }
   } catch (error) {
     throw new Error(error.response.errors[0].message);

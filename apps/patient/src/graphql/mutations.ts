@@ -23,3 +23,9 @@ export const REROUTE_ORDER = gql`
     rerouteOrder(orderId: $orderId, pharmacyId: $pharmacyId, patientId: $patientId)
   }
 `;
+
+export const SELECT_READY_BY = gql`
+  mutation SelectReadyBy($orderId: ID!, $readyBy: String) {
+    selectReadyBy(orderId: $orderId, readyBy: $readyBy)
+  }
+`;
