@@ -94,7 +94,11 @@ const roleSchema = yup
             street1: yup.string().required('Address is required'),
             street2: yup.string(),
             city: yup.string().required('City is required'),
-            state: yupStateSchema,
+            state: yupStateSchema.when('roles', {
+              is: (roles: { value: string; label: string }[]) => hasPrescriberRole(roles),
+              then: yup.string().required('Please enter a valid phone number'),
+              otherwise: yup.string()
+            }),
             postalCode: yup
               .string()
               .required('Zip is required')
@@ -288,6 +292,11 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
               console.log('hasPrescriber', hasPrescriber);
               const providerErrors = errors.provider as ProviderFormikErrorsType | undefined;
               const providerTouched = touched.provider as ProviderFormikTouchedType | undefined;
+              console.log(
+                'paul',
+                { value: values.provider?.address?.state?.value },
+                values.provider?.address
+              );
               return (
                 <form onSubmit={handleSubmit} noValidate>
                   <VStack spacing={2} align="stretch">
@@ -418,7 +427,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
                             }
                             setFieldTouched={setFieldTouched}
                             setFieldValue={setFieldValue}
-                            fieldName="address.state"
+                            fieldName="provider.address.state"
                           />
                           <ErrorMessage
                             name="provider.address.state"
