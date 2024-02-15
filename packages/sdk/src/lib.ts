@@ -43,6 +43,7 @@ export interface PhotonClientOptions {
   env?: Environment;
   organization?: string;
   audience?: string;
+  connection?: string;
   uri?: string;
   developmentMode?: boolean;
 }
@@ -107,6 +108,7 @@ export class PhotonClient {
       organization,
       env = 'photon',
       audience,
+      connection,
       uri,
       developmentMode = false
     }: PhotonClientOptions,
@@ -132,7 +134,8 @@ export class PhotonClient {
       useRefreshTokensFallback: true,
       authorizationParams: {
         redirect_uri: redirectURI,
-        audience: this.audience
+        audience: this.audience,
+        ...(connection ? { connection } : {})
       }
     };
     this.auth0Client = new Auth0Client(params);
