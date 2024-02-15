@@ -158,6 +158,13 @@ customElement(
       notify: false,
       parse: false
     },
+    connection: {
+      attribute: 'connection',
+      value: undefined,
+      reflect: false,
+      notify: false,
+      parse: false
+    },
     uri: {
       attribute: 'uri',
       value: undefined,
