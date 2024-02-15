@@ -143,7 +143,8 @@ export class PhotonClient {
     this.authentication = new AuthManager({
       authentication: this.auth0Client,
       organization: this.organization,
-      audience: this.audience
+      audience: this.audience,
+      ...(connection ? { connection } : {})
     });
 
     this.apollo = this.constructApolloClient({ elementsVersion, isServices: false });
