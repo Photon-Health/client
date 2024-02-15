@@ -251,7 +251,6 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
             initialValues={initialValues}
             validationSchema={roleSchema}
             onSubmit={async (values, { validateForm, resetForm }) => {
-              console.log('values', values);
               await validateForm(values);
               await handleSaveRoles(values);
               toast({
@@ -266,37 +265,9 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
             }}
           >
             {({ setFieldValue, handleSubmit, errors, touched, values, setFieldTouched }) => {
-              console.log('--------------------HEREE-----------');
-              console.log('errors', errors);
-              console.log('touched roles', !touched.roles);
-              console.log('email', errors.email);
-              console.log('first', errors.first);
-              console.log('last', errors.last);
-              console.log('phone', errors.phone);
-              console.log(
-                'prescriber check',
-                !!(errors.provider && hasPrescriberRole(values.roles))
-              );
-              console.log('touched roles', !touched.roles);
-              console.log(
-                !touched ||
-                  !!errors.roles ||
-                  !!errors.email ||
-                  !!errors.first ||
-                  !!errors.last ||
-                  !!errors.phone ||
-                  !!(errors.provider && hasPrescriberRole(values.roles)) ||
-                  !touched.roles
-              );
               const hasPrescriber = hasPrescriberRole(values.roles);
-              console.log('hasPrescriber', hasPrescriber);
               const providerErrors = errors.provider as ProviderFormikErrorsType | undefined;
               const providerTouched = touched.provider as ProviderFormikTouchedType | undefined;
-              console.log(
-                'paul',
-                { value: values.provider?.address?.state?.value },
-                values.provider?.address
-              );
               return (
                 <form onSubmit={handleSubmit} noValidate>
                   <VStack spacing={2} align="stretch">
