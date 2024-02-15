@@ -12,6 +12,7 @@ import { type User } from '@auth0/auth0-react';
 type PhotonClientProps = {
   domain?: string;
   audience?: string;
+  connection?: string;
   uri?: string;
   id?: string;
   redirectUri?: string;
@@ -35,6 +36,7 @@ const Component = (props: PhotonClientProps) => {
       env: props.env,
       domain: props.domain,
       audience: props.audience,
+      connection: props.connection,
       uri: props.uri,
       clientId: props.id!,
       redirectURI: props.redirectUri ? props.redirectUri : window.location.origin,
@@ -151,6 +153,13 @@ customElement(
     },
     audience: {
       attribute: 'audience',
+      value: undefined,
+      reflect: false,
+      notify: false,
+      parse: false
+    },
+    connection: {
+      attribute: 'connection',
       value: undefined,
       reflect: false,
       notify: false,
