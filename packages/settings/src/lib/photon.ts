@@ -249,8 +249,6 @@ export const photon: {
     logo: 'sesame_logo.jpg',
     accentColor: '#5224C7',
     sendToPatient: true,
-    enableCourierNavigate: false,
-    mailOrderNavigate: true,
-    mailOrderNavigateProviders: [COSTCO_ID]
+    enableCourierNavigate: false
   }
 };
