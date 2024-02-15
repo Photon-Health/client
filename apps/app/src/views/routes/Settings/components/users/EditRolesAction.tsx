@@ -113,10 +113,14 @@ const roleSchema = yup
       }),
     phone: yup
       .string()
+      .when('roles', {
+        is: (roles: { value: string; label: string }[]) => hasPrescriberRole(roles),
+        then: yup.string().required('Please enter a valid phone number'),
+        otherwise: yup.string()
+      })
       .matches(/^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/, {
         message: 'Please enter a valid phone number'
       })
-      .required('Please enter a valid phone number')
   })
   // If not a prescriber, set the provider to undefined
   .transform((value) => {
@@ -243,6 +247,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
             initialValues={initialValues}
             validationSchema={roleSchema}
             onSubmit={async (values, { validateForm, resetForm }) => {
+              console.log('values', values);
               await validateForm(values);
               await handleSaveRoles(values);
               toast({
@@ -257,7 +262,30 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
             }}
           >
             {({ setFieldValue, handleSubmit, errors, touched, values, setFieldTouched }) => {
+              console.log('--------------------HEREE-----------');
+              console.log('errors', errors);
+              console.log('touched roles', !touched.roles);
+              console.log('email', errors.email);
+              console.log('first', errors.first);
+              console.log('last', errors.last);
+              console.log('phone', errors.phone);
+              console.log(
+                'prescriber check',
+                !!(errors.provider && hasPrescriberRole(values.roles))
+              );
+              console.log('touched roles', !touched.roles);
+              console.log(
+                !touched ||
+                  !!errors.roles ||
+                  !!errors.email ||
+                  !!errors.first ||
+                  !!errors.last ||
+                  !!errors.phone ||
+                  !!(errors.provider && hasPrescriberRole(values.roles)) ||
+                  !touched.roles
+              );
               const hasPrescriber = hasPrescriberRole(values.roles);
+              console.log('hasPrescriber', hasPrescriber);
               const providerErrors = errors.provider as ProviderFormikErrorsType | undefined;
               const providerTouched = touched.provider as ProviderFormikTouchedType | undefined;
               return (
@@ -450,7 +478,6 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
                             !!errors.email ||
                             !!errors.first ||
                             !!errors.last ||
-                            !!errors.phone ||
                             !!(errors.provider && hasPrescriberRole(values.roles)) ||
                             !touched.roles
                           }
