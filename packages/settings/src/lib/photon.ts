@@ -4,7 +4,6 @@ import { OrganizationSettings } from '../types';
 const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
 const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
 const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
-const COSTCO_ID = 'phr_01GA9HPWTQ75YNJGFD505X5C4J';
 
 /**
  * All orgs inherit from default settings, so updates
