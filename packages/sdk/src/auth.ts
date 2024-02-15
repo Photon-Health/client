@@ -22,6 +22,7 @@ export interface AuthManagerOptions {
   authentication: Auth0Client;
   organization?: string;
   audience?: string;
+  connection?: string;
 }
 
 /**
@@ -63,6 +64,8 @@ export class AuthManager {
 
   private audience?: string;
 
+  private connection?: string;
+
   /**
    * @param config - Photon AuthManager configuration options
    * @remarks - Note, that organization is optional for scenarios in which a provider supports more than themselves.
@@ -70,11 +73,13 @@ export class AuthManager {
   constructor({
     authentication,
     organization,
-    audience = 'https://api.photon.health'
+    audience = 'https://api.photon.health',
+    connection
   }: AuthManagerOptions) {
     this.authentication = authentication;
     this.organization = organization;
     this.audience = audience;
+    this.connection = connection;
   }
 
   /**
@@ -85,6 +90,8 @@ export class AuthManager {
   public async login({ organizationId, invitation, appState }: LoginOptions): Promise<void> {
     const opts: RedirectLoginOptions<any> = {
       authorizationParams: {
+        ...(this.audience ? { audience: this.audience } : {}),
+        ...(this.connection ? { connection: this.connection } : {}),
         ...(organizationId || this.organization
           ? { organization: organizationId || this.organization }
           : {}),
