@@ -111,11 +111,6 @@ export const Status = () => {
   };
 
   useEffect(() => {
-    // Scroll to top on initial load
-    document?.getElementsByClassName('css-0')[0]?.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
     if (isDemo) {
       setTimeout(async () => {
         // Send order received sms to demo participant
