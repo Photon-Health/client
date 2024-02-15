@@ -241,5 +241,11 @@ export const photon: {
     ...defaultSettings,
     logo: 'found_logo.svg',
     accentColor: '#1c3f28'
+  },
+  // Sesame
+  org_zc1RzzmSwd8eE94U: {
+    ...defaultSettings,
+    logo: 'sesame_logo.jpg',
+    accentColor: '#5224C7'
   }
 };
