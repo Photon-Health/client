@@ -78,6 +78,11 @@ export const Patient = () => {
     refetchData();
   }, [id]);
 
+  useEffect(() => {
+    // Scroll to top on initial load
+    document?.getElementById('root')?.querySelector('section')?.scrollTo(0, 0);
+  }, []);
+
   if (error || (!loading && !patient)) {
     return (
       <Alert

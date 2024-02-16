@@ -86,6 +86,11 @@ export const Prescription = () => {
     }
   }, [accessToken]);
 
+  useEffect(() => {
+    // Scroll to top on initial load
+    document?.getElementById('root')?.querySelector('section')?.scrollTo(0, 0);
+  }, []);
+
   const {
     prescriber,
     patient,
