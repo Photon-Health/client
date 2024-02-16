@@ -126,7 +126,7 @@ export const Urgency = () => {
       <FixedFooter show={showFooter}>
         <Container as={VStack} w="full">
           <Button size="lg" w="full" variant="brand" onClick={handleCtaClick}>
-            {t.selectPharmacy}
+            {t.selectAPharmacy}
           </Button>
           <PoweredBy />
         </Container>

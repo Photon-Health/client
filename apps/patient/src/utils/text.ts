@@ -91,8 +91,8 @@ export const text = {
       isPlural ? 'prescriptions' : 'prescription'
     }.`,
   searchPharmacy: 'Search for a pharmacy',
-  select: 'Select pharmacy',
-  selectPharmacy: 'Select a pharmacy',
+  selectAPharmacy: 'Select a pharmacy',
+  selectPharmacy: 'Select pharmacy',
   sendToNew: (isPlural: boolean, originalPharmacyName: string) =>
     `We'll cancel your ${
       isPlural ? 'prescriptions' : 'prescription'
