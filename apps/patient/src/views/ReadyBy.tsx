@@ -7,6 +7,10 @@ import {
   Container,
   Heading,
   HStack,
+  Icon,
+  Radio,
+  RadioGroup,
+  Tag,
   Text,
   VStack,
   useToast
@@ -48,11 +52,10 @@ export const ReadyBy = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
 
-  const [selectedIdx, setSelectedIdx] = useState(null);
-  const showFooter = selectedIdx !== null;
+  const [selectedTime, setSelectedTime] = useState('');
 
   const handleSubmit = async () => {
-    if (!selectedIdx) {
+    if (!selectedTime) {
       console.error('No selected readyBy time.');
       return;
     }
@@ -72,7 +75,6 @@ export const ReadyBy = () => {
     }
 
     // Track selection
-    const selectedTime = t.readyByOptions[selectedIdx].label;
     datadogRum.addAction('ready_by_selection', {
       value: selectedTime,
       orderId: order.id,
@@ -115,11 +117,11 @@ export const ReadyBy = () => {
   const isMultiRx = flattenedFills.length > 1;
 
   useEffect(() => {
-    if (selectedIdx) {
+    if (selectedTime) {
       // Scroll to bottom to make sure selection isn't hidden by footer
       window.scrollTo({ top: document.getElementById('root').scrollHeight, behavior: 'smooth' });
     }
-  }, [selectedIdx]);
+  }, [selectedTime]);
 
   return (
     <Box>
@@ -129,7 +131,7 @@ export const ReadyBy = () => {
 
       <Nav />
 
-      <Container pb={showFooter ? 32 : 8}>
+      <Container pb={selectedTime ? 32 : 8}>
         <VStack spacing={7} pt={5} align="span">
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
@@ -138,43 +140,58 @@ export const ReadyBy = () => {
             <Text>{t.readyBySelected(isMultiRx)}</Text>
           </VStack>
 
-          <VStack spacing={3} w="full">
-            {t.readyByOptions.map((option, i) => {
-              const isDisabled = checkDisabled(option.label);
-              return (
-                <Card
-                  key={option.label}
-                  bgColor={isDisabled ? 'gray.300' : 'white'}
-                  border={isDisabled ? 'gray.300' : '2px solid'}
-                  borderColor={selectedIdx === i ? 'brand.500' : 'white'}
-                  color={isDisabled ? 'gray.600' : 'base'}
-                  onClick={() => !isDisabled && setSelectedIdx(i)}
-                  m="auto"
-                  w="full"
-                  shadow={isDisabled ? 'none' : 'base'}
-                  cursor={isDisabled ? 'not-allowed' : 'pointer'}
-                >
-                  <CardBody p={3} m="auto">
-                    {option.description ? (
-                      <VStack spacing={1}>
-                        <HStack>
-                          {option.icon ? <RxLightningBolt /> : null}
-                          <Text fontWeight="medium">{option.label}</Text>
-                        </HStack>
-                        <Text color="gray.500">{option.description}</Text>
-                      </VStack>
-                    ) : (
-                      <Text fontWeight="medium">{option.label}</Text>
-                    )}
-                  </CardBody>
-                </Card>
-              );
-            })}
-          </VStack>
+          <RadioGroup onChange={setSelectedTime} value={selectedTime}>
+            <VStack spacing={3} w="full">
+              {t.readyByOptions.map((option) => {
+                const isDisabled = checkDisabled(option.label);
+                return (
+                  <Card
+                    key={option.label}
+                    bgColor={isDisabled ? 'gray.300' : 'white'}
+                    border={isDisabled ? 'gray.300' : '2px solid'}
+                    borderColor={selectedTime === option.label ? 'brand.500' : 'white'}
+                    color={isDisabled ? 'gray.600' : 'base'}
+                    onClick={() => !isDisabled && setSelectedTime(option.label)}
+                    m="auto"
+                    w="full"
+                    shadow={isDisabled ? 'none' : 'base'}
+                    cursor={isDisabled ? 'not-allowed' : 'pointer'}
+                  >
+                    <CardBody p={3}>
+                      <HStack align="start">
+                        <Radio mt={1} value={option.label} colorScheme="brand" />
+                        <VStack spacing={1}>
+                          <HStack alignSelf="start">
+                            {option.icon ? <Icon as={RxLightningBolt} color="yellow.500" /> : null}
+                            <Text fontWeight="medium">{option.label}</Text>
+                          </HStack>
+                          {option.description ? (
+                            option.badge ? (
+                              <Tag
+                                colorScheme={option.badgeColor}
+                                variant="subtle"
+                                borderRadius="full"
+                              >
+                                {option.description}
+                              </Tag>
+                            ) : (
+                              <Text color="gray.500" fontSize="sm">
+                                {option.description}
+                              </Text>
+                            )
+                          ) : null}
+                        </VStack>
+                      </HStack>
+                    </CardBody>
+                  </Card>
+                );
+              })}
+            </VStack>
+          </RadioGroup>
         </VStack>
       </Container>
 
-      <FixedFooter show={showFooter}>
+      <FixedFooter show={!!selectedTime}>
         <Container as={VStack} w="full">
           <Button
             size="lg"
