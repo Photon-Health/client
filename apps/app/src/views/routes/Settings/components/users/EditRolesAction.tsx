@@ -94,7 +94,11 @@ const roleSchema = yup
             street1: yup.string().required('Address is required'),
             street2: yup.string(),
             city: yup.string().required('City is required'),
-            state: yupStateSchema,
+            state: yupStateSchema.when('roles', {
+              is: (roles: { value: string; label: string }[]) => hasPrescriberRole(roles),
+              then: yup.string().required('Please enter a valid phone number'),
+              otherwise: yup.string()
+            }),
             postalCode: yup
               .string()
               .required('Zip is required')
@@ -113,10 +117,14 @@ const roleSchema = yup
       }),
     phone: yup
       .string()
+      .when('roles', {
+        is: (roles: { value: string; label: string }[]) => hasPrescriberRole(roles),
+        then: yup.string().required('Please enter a valid phone number'),
+        otherwise: yup.string()
+      })
       .matches(/^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/, {
         message: 'Please enter a valid phone number'
       })
-      .required('Please enter a valid phone number')
   })
   // If not a prescriber, set the provider to undefined
   .transform((value) => {
@@ -390,7 +398,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
                             }
                             setFieldTouched={setFieldTouched}
                             setFieldValue={setFieldValue}
-                            fieldName="address.state"
+                            fieldName="provider.address.state"
                           />
                           <ErrorMessage
                             name="provider.address.state"
@@ -450,7 +458,6 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
                             !!errors.email ||
                             !!errors.first ||
                             !!errors.last ||
-                            !!errors.phone ||
                             !!(errors.provider && hasPrescriberRole(values.roles)) ||
                             !touched.roles
                           }
