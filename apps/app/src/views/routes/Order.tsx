@@ -346,6 +346,11 @@ export const Order = () => {
     }
   }, [accessToken]);
 
+  useEffect(() => {
+    // Scroll to top on initial load
+    document?.getElementById('root')?.querySelector('section')?.scrollTo(0, 0);
+  }, []);
+
   const { colorMode } = useColorMode();
 
   const prescriptions = useMemo(() => {

@@ -110,11 +110,6 @@ export const Status = () => {
     window.open(url);
   };
 
-  // People that select a pharmacy low in the list might start at bottom of status page
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   useEffect(() => {
     if (isDemo) {
       setTimeout(async () => {
