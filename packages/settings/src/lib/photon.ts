@@ -164,6 +164,15 @@ export const photon: {
     sendToPatient: false,
     enableRxAndOrder: false
   },
+  // California Hair Surgeon (Xyon Health)
+  org_XWFD5B6e8qhCxXfN: {
+    ...defaultSettings,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_ID],
+    sendToPatient: false,
+    enableRxAndOrder: false
+  },
   // Ognomy
   org_2B1yxV6yS9ROqV1g: {
     ...defaultSettings,
