@@ -277,5 +277,23 @@ export const neutron: {
     ...defaultSettings,
     logo: 'maven_logo.svg',
     accentColor: '#00856f'
+  },
+  // Grow Therapy
+  org_8QvehhOF7G5SFgK0: {
+    ...defaultSettings,
+    logo: 'grow_therapy_logo.svg',
+    accentColor: '#c0b0ff'
+  },
+  // Superpower
+  org_8J3sxe0csVpM5oZr: {
+    ...defaultSettings,
+    logo: 'superpower_logo.svg',
+    accentColor: '#111111'
+  },
+  // Hera Fertility
+  org_GSTGr8n2QWwygTWS: {
+    ...defaultSettings,
+    logo: 'hera_fertility_logo.svg',
+    accentColor: '#2a769e'
   }
 };
