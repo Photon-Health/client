@@ -34,11 +34,23 @@ const defaultSettings: OrganizationSettings = {
  * Org-specific settings overrides
  */
 
-export const photon: {
+/**
+ * Org-specific settings overrides
+ */
+export const photon = function (organizationId: string) {
+  if (organizationSettings[organizationId]) {
+    return organizationSettings[organizationId];
+  }
+  return defaultSettings;
+};
+
+/**
+ * Org-specific settings overrides
+ */
+
+const organizationSettings: {
   [key: string]: OrganizationSettings;
 } = {
-  default: defaultSettings,
-
   // Weekend Health
   org_uZPt00PG0JElhh3d: {
     ...defaultSettings,

@@ -38,11 +38,20 @@ const defaultSettings: OrganizationSettings = {
  * Org-specific settings overrides
  */
 
-export const neutron: {
+export const neutron = function (organizationId: string) {
+  if (organizationSettings[organizationId]) {
+    return organizationSettings[organizationId];
+  }
+  return defaultSettings;
+};
+
+/**
+ * Org-specific settings overrides
+ */
+
+const organizationSettings: {
   [key: string]: OrganizationSettings;
 } = {
-  default: defaultSettings,
-
   // Test Telehealth (us)
   org_kVS7AP4iuItESdMA: {
     ...defaultSettings,

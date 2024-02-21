@@ -4,9 +4,6 @@ import { usePhoton } from '@photonhealth/react';
 import { getSettings } from '@client/settings';
 import { datadogRum } from '@datadog/browser-rum';
 
-const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
-const settings = getSettings(envName);
-
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -90,7 +87,8 @@ export const PrescriptionForm = () => {
       ref.current.patientId = patientId;
     }
   }, [ref.current, patientId]);
-  const orgSettings = user?.org_id in settings ? settings[user?.org_id] : settings.default;
+
+  const orgSettings = getSettings(user?.org_id);
   return (
     <div
       style={{

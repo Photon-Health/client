@@ -32,15 +32,20 @@ const defaultSettings: OrganizationSettings = {
   enableCombineAndDuplicate: true
 };
 
+export const boson = function (organizationId: string) {
+  if (organizationSettings[organizationId]) {
+    return organizationSettings[organizationId];
+  }
+  return defaultSettings;
+};
+
 /**
  * Org-specific settings overrides
  */
 
-export const boson: {
+const organizationSettings: {
   [key: string]: OrganizationSettings;
 } = {
-  default: defaultSettings,
-
   // Test Telehealth (us)
   org_KzSVZBQixLRkqj5d: {
     ...defaultSettings,
