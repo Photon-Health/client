@@ -437,7 +437,7 @@ export const Pharmacy = () => {
   const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
 
-  const heading = isReroute ? t.changePharmacy : t.selectPharmacy;
+  const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
   const subheading = isReroute
     ? t.sendToNew(isMultiRx, order.pharmacy.name)
     : t.sendToSelected(isMultiRx);
@@ -446,7 +446,7 @@ export const Pharmacy = () => {
     <Box>
       <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />
       <Helmet>
-        <title>{t.selectPharmacy}</title>
+        <title>{t.selectAPharmacy}</title>
       </Helmet>
 
       <Nav />
