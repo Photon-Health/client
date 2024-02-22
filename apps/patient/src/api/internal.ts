@@ -6,7 +6,7 @@ import {
   GET_PHARMACIES,
   MARK_ORDER_AS_PICKED_UP,
   REROUTE_ORDER,
-  SELECT_ORDER_PHARMACY,
+  SET_ORDER_PHARMACY,
   SET_PREFERRED_PHARMACY
 } from '../graphql';
 import { Order } from '../utils/models';
@@ -103,25 +103,27 @@ export const rerouteOrder = async (orderId: string, pharmacyId: string, patientI
   }
 };
 
-export const selectOrderPharmacy = async (
+export const setOrderPharmacy = async (
   orderId: string,
   pharmacyId: string,
-  patientId: string
+  readyBy: string,
+  readyByTime: string
 ) => {
   try {
-    const response: { selectOrderPharmacy: boolean } = await graphQLClient.request(
-      SELECT_ORDER_PHARMACY,
+    const response: { setOrderPharmacy: boolean } = await graphQLClient.request(
+      SET_ORDER_PHARMACY,
       {
-        orderId,
         pharmacyId,
-        patientId
+        orderId,
+        readyBy,
+        readyByTime
       }
     );
 
-    if (response?.selectOrderPharmacy) {
+    if (response?.setOrderPharmacy) {
       return true;
     } else {
-      throw new Error('Unable to select pharmacy');
+      throw new Error('Unable to set order pharmacy');
     }
   } catch (error) {
     throw new Error(error.response.errors[0].message);
