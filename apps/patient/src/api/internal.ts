@@ -6,7 +6,6 @@ import {
   GET_PHARMACIES,
   MARK_ORDER_AS_PICKED_UP,
   REROUTE_ORDER,
-  SELECT_ORDER_PHARMACY,
   SET_ORDER_PHARMACY,
   SET_PREFERRED_PHARMACY
 } from '../graphql';
@@ -98,31 +97,6 @@ export const rerouteOrder = async (orderId: string, pharmacyId: string, patientI
       return true;
     } else {
       throw new Error('Unable to reroute order');
-    }
-  } catch (error) {
-    throw new Error(error.response.errors[0].message);
-  }
-};
-
-export const selectOrderPharmacy = async (
-  orderId: string,
-  pharmacyId: string,
-  patientId: string
-) => {
-  try {
-    const response: { selectOrderPharmacy: boolean } = await graphQLClient.request(
-      SELECT_ORDER_PHARMACY,
-      {
-        orderId,
-        pharmacyId,
-        patientId
-      }
-    );
-
-    if (response?.selectOrderPharmacy) {
-      return true;
-    } else {
-      throw new Error('Unable to select pharmacy');
     }
   } catch (error) {
     throw new Error(error.response.errors[0].message);
