@@ -45,15 +45,12 @@ import { Logo } from './Logo';
 import { NavButton } from './NavButton';
 import { UserProfile } from './UserProfile';
 
-const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
-const settings = getSettings(envName);
-
 export const Nav = () => {
   const theme = useTheme();
   const isDesktop = useBreakpointValue({ base: false, lg: true });
   const { isOpen, onClose, onToggle } = useDisclosure();
   const { user, logout, getOrganization } = usePhoton();
-  const orgSettings = user?.org_id in settings ? settings[user?.org_id] : settings.default;
+  const orgSettings = getSettings(user?.org_id);
   const { organization } = getOrganization();
 
   const onLogout = useCallback(() => {

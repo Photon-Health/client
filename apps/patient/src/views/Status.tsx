@@ -20,14 +20,11 @@ import * as TOAST_CONFIG from '../configs/toast';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
 import { getSettings } from '@client/settings';
 
-const settings = getSettings(process.env.REACT_APP_ENV_NAME);
-
 export const Status = () => {
   const navigate = useNavigate();
   const { order, flattenedFills, setOrder } = useOrderContext();
 
-  const orgSettings =
-    order?.organization?.id in settings ? settings[order.organization.id] : settings.default;
+  const orgSettings = getSettings(order.organization.id);
 
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('orderId');
@@ -109,11 +106,6 @@ export const Status = () => {
     const url = `http://maps.google.com/?q=${pharmacy.name}, ${formatAddress(pharmacy.address)}`;
     window.open(url);
   };
-
-  // People that select a pharmacy low in the list might start at bottom of status page
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   useEffect(() => {
     if (isDemo) {

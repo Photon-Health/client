@@ -34,11 +34,23 @@ const defaultSettings: OrganizationSettings = {
  * Org-specific settings overrides
  */
 
-export const photon: {
+/**
+ * Org-specific settings overrides
+ */
+export const photon = function (organizationId: string) {
+  if (organizationSettings[organizationId]) {
+    return organizationSettings[organizationId];
+  }
+  return defaultSettings;
+};
+
+/**
+ * Org-specific settings overrides
+ */
+
+const organizationSettings: {
   [key: string]: OrganizationSettings;
 } = {
-  default: defaultSettings,
-
   // Weekend Health
   org_uZPt00PG0JElhh3d: {
     ...defaultSettings,
@@ -157,6 +169,15 @@ export const photon: {
   },
   // Precision Medical Hair Restoration & Aesthetics (Xyon Health)
   org_G52mrmIBC3yqeNYB: {
+    ...defaultSettings,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_ID],
+    sendToPatient: false,
+    enableRxAndOrder: false
+  },
+  // California Hair Surgeon (Xyon Health)
+  org_XWFD5B6e8qhCxXfN: {
     ...defaultSettings,
     pickUp: false,
     mailOrder: true,

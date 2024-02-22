@@ -40,16 +40,13 @@ import { demoPharmacies } from '../data/demoPharmacies';
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
-const settings = getSettings(process.env.REACT_APP_ENV_NAME);
-
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
 
 export const Pharmacy = () => {
   const { order, flattenedFills, setOrder } = useOrderContext();
 
-  const orgSettings =
-    order?.organization?.id in settings ? settings[order.organization.id] : settings.default;
+  const orgSettings = getSettings(order.organization.id);
 
   const navigate = useNavigate();
 
@@ -440,7 +437,7 @@ export const Pharmacy = () => {
   const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
 
-  const heading = isReroute ? t.changePharmacy : t.selectPharmacy;
+  const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
   const subheading = isReroute
     ? t.sendToNew(isMultiRx, order.pharmacy.name)
     : t.sendToSelected(isMultiRx);
@@ -449,7 +446,7 @@ export const Pharmacy = () => {
     <Box>
       <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />
       <Helmet>
-        <title>{t.selectPharmacy}</title>
+        <title>{t.selectAPharmacy}</title>
       </Helmet>
 
       <Nav />

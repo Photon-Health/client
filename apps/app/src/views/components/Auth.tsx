@@ -3,9 +3,6 @@ import { Button, Stack } from '@chakra-ui/react';
 import { usePhoton } from '@photonhealth/react';
 import { getSettings } from '@client/settings';
 
-const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
-const settings = getSettings(envName);
-
 interface AuthProps {
   returnTo?: string;
 }
@@ -13,7 +10,7 @@ interface AuthProps {
 export const Auth = (props: AuthProps) => {
   const { returnTo } = props;
   const { user, isLoading, isAuthenticated, login, logout } = usePhoton();
-  const orgSettings = user?.org_id in settings ? settings[user?.org_id] : settings.default;
+  const orgSettings = getSettings(user?.org_id);
 
   if (isLoading) return <Button isLoading loadingText="Loading" colorScheme="gray" />;
 

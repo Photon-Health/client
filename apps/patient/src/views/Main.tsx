@@ -15,8 +15,6 @@ import theme from '../configs/theme';
 import { setAuthHeader } from '../configs/graphqlClient';
 import { AUTH_HEADER_ERRORS } from '../api/internal';
 
-const settings = getSettings(process.env.REACT_APP_ENV_NAME);
-
 const OrderContext = createContext(null);
 export const useOrderContext = () => useContext(OrderContext);
 
@@ -135,8 +133,7 @@ export const Main = () => {
   // Set logo
   useEffect(() => {
     if (order?.organization?.id) {
-      const theme =
-        order.organization.id in settings ? settings[order.organization.id] : settings.default;
+      const theme = getSettings(order.organization.id);
 
       if (isDemo) {
         fetchLogo('newco_logo.svg');

@@ -2,10 +2,8 @@ import { extendTheme } from '@chakra-ui/react';
 import tinycolor from 'tinycolor2';
 import { getSettings } from '@client/settings';
 
-const settings = getSettings(process.env.REACT_APP_ENV_NAME);
-
 function generateChakraTheme(key = undefined) {
-  const { accentColor } = key in settings ? settings[key] : settings.default;
+  const { accentColor } = getSettings(key);
 
   const color = tinycolor(accentColor);
   const textColor = color.isLight() ? 'gray.800' : 'white';
