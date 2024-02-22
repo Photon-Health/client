@@ -7,7 +7,8 @@ import {
   Link,
   Stack,
   Text,
-  useBreakpointValue
+  useBreakpointValue,
+  VStack
 } from '@chakra-ui/react';
 
 import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
@@ -58,7 +59,15 @@ export const Login = () => {
             {query.get('orgs') === '0' ? (
               <Alert status="warning">
                 <AlertIcon />
-                You tried logging in with an account not associated with any organizations.
+                {/* the text below, but left aligned */}
+                <VStack>
+                  <Text textAlign="left">
+                    You tried logging in with an account not associated with any organizations.
+                  </Text>
+                  <Text textAlign="left">
+                    Please check your email for an invite, or ask your administrator for assistance.
+                  </Text>
+                </VStack>
               </Alert>
             ) : null}
             <HStack spacing="1" justify="center">
