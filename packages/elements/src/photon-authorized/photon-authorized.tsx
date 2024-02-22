@@ -66,7 +66,7 @@ export const PhotonAuthorized = (p: { children: JSXElement; permissions?: Permis
                 when={!inOrg()}
                 fallback={<AlertMessage message="You are not authorized to prescribe" />}
               >
-                <AlertMessage message="You tried logging in with an account not associated with any organizations" />
+                <AlertMessage message="You tried logging in with an account not associated with any organizations. Please check your email for an invite, or ask your administrator for assistance." />
               </Show>
             }
           >

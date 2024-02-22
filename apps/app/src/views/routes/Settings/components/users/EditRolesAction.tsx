@@ -96,7 +96,7 @@ const roleSchema = yup
             city: yup.string().required('City is required'),
             state: yupStateSchema.when('roles', {
               is: (roles: { value: string; label: string }[]) => hasPrescriberRole(roles),
-              then: yup.string().required('Please enter a valid phone number'),
+              then: yup.string().required('Please enter a valid state'),
               otherwise: yup.string()
             }),
             postalCode: yup
