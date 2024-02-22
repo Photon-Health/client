@@ -14,9 +14,6 @@ import { Pharmacy } from './Pharmacy';
 import { getSettings } from '@client/settings';
 import { useIsVisible } from 'apps/app/src/hooks/useIsIntersecting';
 
-const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
-const settings = getSettings(envName);
-
 interface MailOrderProps {
   user: any;
   pharmacyId: string;
@@ -41,7 +38,7 @@ export const MailOrder = ({
   const { getPharmacies } = usePhoton();
   const { refetch } = getPharmacies({});
 
-  const orgSettings = user.org_id in settings ? settings[user.org_id] : settings.default;
+  const orgSettings = getSettings(user?.org_id);
 
   const [pharmOptions, setPharmOptions] = useState<any>([]);
 
