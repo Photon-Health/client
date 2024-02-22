@@ -28,9 +28,6 @@ import { OrderForm } from './components/OrderForm';
 
 import jwtDecode from 'jwt-decode';
 
-const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
-const settings = getSettings(envName);
-
 export const NewOrder = () => {
   const [params] = useSearchParams();
   const patientId = params.get('patientId') || '';
@@ -39,7 +36,7 @@ export const NewOrder = () => {
   const { createOrder, getPatient, updatePatient, removePatientPreferredPharmacy, user, getToken } =
     usePhoton();
 
-  const orgSettings = user.org_id in settings ? settings[user.org_id] : settings.default;
+  const orgSettings = getSettings(user?.org_id);
 
   const [auth0UserId, setAuth0UserId] = useState<string>('');
   const getAuth0UserId = async () => {

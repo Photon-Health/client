@@ -15,9 +15,6 @@ import { SelectPrescriptionsCard } from './SelectPrescriptionsCard';
 import { SelectPharmacyCard } from './SelectPharmacyCard';
 import { PatientAddressCard } from './PatientAddressCard';
 
-const envName = process.env.REACT_APP_ENV_NAME as 'boson' | 'neutron' | 'photon';
-const settings = getSettings(envName);
-
 const EMPTY_FORM_VALUES = {
   patientId: '',
   fills: [],
@@ -185,7 +182,7 @@ export const OrderForm = ({
   const [updatePreferredPharmacy, setUpdatePreferredPharmacy] = useState(false);
   const [updateAddress, setUpdateAddress] = useState(false);
 
-  const orgSettings = user.org_id in settings ? settings[user.org_id] : settings.default;
+  const orgSettings = getSettings(user?.org_id);
 
   const { initialFormValues, fulfillmentOptions } = initOrder(
     orgSettings,
