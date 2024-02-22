@@ -32,7 +32,7 @@ import {
   geocode,
   getPharmacies,
   rerouteOrder,
-  selectOrderPharmacy,
+  setOrderPharmacy,
   setPreferredPharmacy,
   triggerDemoNotification
 } from '../api';
@@ -280,7 +280,7 @@ export const Pharmacy = () => {
         setTimeout(() => {
           setShowFooter(false);
 
-          // Store selected pharmacy for smooth transition to /status
+          // Add selected pharmacy to order context so /status shows pharmacy on render
           const selectedPharmacy = pharmacyOptions.find((p) => p.id === selectedId);
           setOrder({
             ...order,
@@ -306,7 +306,7 @@ export const Pharmacy = () => {
     try {
       const result = isReroute
         ? await rerouteOrder(order.id, selectedId, order.patient.id)
-        : await selectOrderPharmacy(order.id, selectedId, order.patient.id);
+        : await setOrderPharmacy(order.id, selectedId, order.readyBy, order.readyByTime);
 
       setTimeout(() => {
         if (result) {
@@ -338,7 +338,7 @@ export const Pharmacy = () => {
 
             setOrder({
               ...order,
-              // Update the order context so /status shows the newly selected pharmacy
+              // Add selected pharmacy to order context so /status shows pharmacy on render
               pharmacy: selectedPharmacy
             });
 

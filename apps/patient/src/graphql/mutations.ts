@@ -24,8 +24,18 @@ export const REROUTE_ORDER = gql`
   }
 `;
 
-export const SELECT_READY_BY = gql`
-  mutation SelectReadyBy($orderId: ID!, $readyBy: String) {
-    selectReadyBy(orderId: $orderId, readyBy: $readyBy)
+export const SET_ORDER_PHARMACY = gql`
+  mutation SetOrderPharmacy(
+    $orderId: ID!
+    $pharmacyId: ID!
+    $readyBy: String
+    $readyByTime: DateTime
+  ) {
+    setOrderPharmacy(
+      orderId: $orderId
+      pharmacyId: $pharmacyId
+      readyBy: $readyBy
+      readyByTime: $readyByTime
+    )
   }
 `;
