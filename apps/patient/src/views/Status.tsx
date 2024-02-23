@@ -164,6 +164,11 @@ export const Status = () => {
 
   const copy = m[fulfillmentType][fulfillmentState];
 
+  // right after selecting a pharmacy, the order state is ROUTING because of delay but we can assume it's PENDING
+  const isPending = order.state === 'ROUTING' || fulfillmentState === 'PENDING';
+  // TODO HAVE A CHECK FOR ONLY INITIAL ROUTE
+  // const isInitialRoute = ...
+
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
@@ -209,7 +214,7 @@ export const Status = () => {
                 pharmacy={pharmacyWithHours}
                 selected={true}
                 showDetails={fulfillmentType === 'PICK_UP'}
-                canReroute={!isDemo && orgSettings.enablePatientRerouting}
+                canReroute={!isDemo && orgSettings.enablePatientRerouting && isPending}
                 onChangePharmacy={() =>
                   navigate(`/pharmacy?orderId=${order.id}&token=${token}&reroute=true`)
                 }
