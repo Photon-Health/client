@@ -106,6 +106,7 @@ function isCloseEvent(event: types.PharmacyEvent): event is types.PharmacyCloseE
 
 export const preparePharmacyHours = (pharmacy: types.Pharmacy): EnrichedPharmacy => {
   let is24Hr = false;
+  let isClosingSoon = false;
   let opens = '';
   let closes = '';
 
@@ -128,11 +129,23 @@ export const preparePharmacyHours = (pharmacy: types.Pharmacy): EnrichedPharmacy
       : undefined;
     const cTime = dayjs(nextClose).format(dayjs(nextClose).minute() > 0 ? 'h:mmA' : 'hA');
     closes = `Closes ${cTime}`;
+
+    // Check if closing soon
+    if (!is24Hr && nextClose) {
+      const now = dayjs();
+      const userTimezone = dayjs.tz.guess();
+      const closesInMins = dayjs(nextClose).tz(userTimezone).diff(now, 'minutes');
+      if (closesInMins < 30) {
+        isClosingSoon = true;
+        closes = `Closes in ${closesInMins} mins`;
+      }
+    }
   }
 
   return {
     ...pharmacy,
     is24Hr,
+    isClosingSoon,
     opens,
     closes
   };
