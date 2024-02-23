@@ -142,7 +142,13 @@ export const ReadyBy = () => {
                   >
                     <CardBody p={3}>
                       <HStack align="start">
-                        <Radio mt={1} value={option.label} colorScheme="brand" />
+                        <Radio
+                          mt={1}
+                          value={option.label}
+                          colorScheme="brand"
+                          onClick={(e) => isDisabled && e.preventDefault()}
+                          cursor={isDisabled ? 'not-allowed' : 'pointer'}
+                        />
                         <VStack spacing={1}>
                           <HStack alignSelf="start">
                             {option.icon ? <Icon as={RxLightningBolt} color="yellow.500" /> : null}
