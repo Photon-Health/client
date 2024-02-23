@@ -29,7 +29,7 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
   const isDemo = searchParams.get('demo');
   const isProd = process.env.REACT_APP_ENV_NAME === 'photon';
 
-  const { order, flattenedFills, logo } = useOrderContext();
+  const { flattenedFills, logo } = useOrderContext();
 
   const isMultiRx = flattenedFills.length > 1;
 
@@ -55,22 +55,9 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
       <Container>
         <HStack direction="row" w="full" py={2}>
           {logo ? (
-            logo === 'photon' ? (
-              <PhotonLogo />
-            ) : (
-              <Image src={logo} width="auto" height="auto" maxW="60%" maxH="35px" />
-            )
+            <Image src={logo} width="auto" height="auto" maxW="60%" maxH="35px" />
           ) : (
-            <Text
-              mb={0}
-              fontSize="xl"
-              fontWeight="medium"
-              whiteSpace="nowrap"
-              textOverflow="ellipsis"
-              overflow="hidden"
-            >
-              {order.organization.name}
-            </Text>
+            <PhotonLogo />
           )}
           <Spacer />
           {showRefresh ? (
