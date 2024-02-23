@@ -31,7 +31,8 @@ import { FiCheck } from 'react-icons/fi';
 
 const checkDisabled = (option: string): boolean => {
   const currentTime = dayjs();
-  const timetoCheckDayJs = dayjs(option, 'h:mm a');
+  // If the option is within 30 minutes, disable it
+  const timetoCheckDayJs = dayjs(option, 'h:mm a').subtract(30, 'minutes');
   return currentTime.isAfter(timetoCheckDayJs);
 };
 
