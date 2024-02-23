@@ -1,5 +1,6 @@
 export const text = {
   closed: 'Closed',
+  closingSoon: 'Closing soon',
   contactSupport: 'Contact Support',
   changePharmacy: 'Change pharmacy',
   daysSupply: 'Days supply',
