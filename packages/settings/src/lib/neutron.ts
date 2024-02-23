@@ -55,7 +55,6 @@ const organizationSettings: {
   // Test Telehealth (us)
   org_kVS7AP4iuItESdMA: {
     ...defaultSettings,
-    logo: 'photon',
     accentColor: '#b35724',
     mailOrder: true,
     enableMedHistory: true,
