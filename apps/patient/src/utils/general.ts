@@ -1,12 +1,16 @@
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import isBetween from 'dayjs/plugin/isBetween';
 import isToday from 'dayjs/plugin/isToday';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 import { types } from '@photonhealth/sdk';
 import { ExtendedFulfillmentType } from './models';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 dayjs.extend(isoWeek);
 dayjs.extend(isBetween);
 dayjs.extend(isToday);
@@ -102,6 +106,7 @@ function isCloseEvent(event: types.PharmacyEvent): event is types.PharmacyCloseE
 
 export const preparePharmacyHours = (pharmacy: types.Pharmacy): EnrichedPharmacy => {
   let is24Hr = false;
+  let isClosingSoon = false;
   let opens = '';
   let closes = '';
 
@@ -124,12 +129,64 @@ export const preparePharmacyHours = (pharmacy: types.Pharmacy): EnrichedPharmacy
       : undefined;
     const cTime = dayjs(nextClose).format(dayjs(nextClose).minute() > 0 ? 'h:mmA' : 'hA');
     closes = `Closes ${cTime}`;
+
+    // Check if closing soon
+    if (!is24Hr && nextClose) {
+      const now = dayjs();
+      const userTimezone = dayjs.tz.guess();
+      const closesInMins = dayjs(nextClose).tz(userTimezone).diff(now, 'minutes');
+      if (closesInMins < 30) {
+        isClosingSoon = true;
+        closes = `Closes in ${closesInMins} mins`;
+      }
+    }
   }
 
   return {
     ...pharmacy,
     is24Hr,
+    isClosingSoon,
     opens,
     closes
   };
+};
+
+export const convertReadyByToUTCTimestamp = (readyBy: string): string => {
+  // Get the timezone for dayjs
+  const userTimezone = dayjs.tz.guess();
+
+  let targetTime: Dayjs;
+
+  switch (readyBy) {
+    case '10:00 am':
+      targetTime = dayjs().tz(userTimezone).hour(10).minute(0).second(0);
+      break;
+    case '12:00 pm':
+      targetTime = dayjs().tz(userTimezone).hour(12).minute(0).second(0);
+      break;
+    case '2:00 pm':
+      targetTime = dayjs().tz(userTimezone).hour(14).minute(0).second(0);
+      break;
+    case '4:00 pm':
+      targetTime = dayjs().tz(userTimezone).hour(16).minute(0).second(0);
+      break;
+    case '6:00 pm':
+      targetTime = dayjs().tz(userTimezone).hour(18).minute(0).second(0);
+      break;
+    case 'After hours':
+      // Assuming 'After hours' means 8:00 pm
+      targetTime = dayjs().tz(userTimezone).hour(20).minute(0).second(0);
+      break;
+    case 'Tomorrow':
+      // For 'Tomorrow', we need to ensure we translate that to tomorrow at 9:00 am
+      targetTime = dayjs().tz(userTimezone).add(1, 'day').hour(9).minute(0).second(0);
+      break;
+    case 'Urgent':
+      targetTime = dayjs().tz(userTimezone);
+      break;
+    default:
+      return 'Invalid time selection';
+  }
+
+  return targetTime.utc().format();
 };

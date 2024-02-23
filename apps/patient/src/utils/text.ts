@@ -1,5 +1,6 @@
 export const text = {
   closed: 'Closed',
+  closingSoon: 'Closing soon',
   contactSupport: 'Contact Support',
   changePharmacy: 'Change pharmacy',
   daysSupply: 'Days supply',
@@ -62,9 +63,34 @@ export const text = {
   quantity: 'Quantity',
   questions: 'If you have any questions, please text us at +1 (513) 866-3212.',
   readyBy: 'Ready by',
-
+  readyByOptions: [
+    {
+      label: '10:00 am',
+      description: 'Pharmacies may be busy',
+      icon: false,
+      badge: true,
+      badgeColor: 'gray'
+    },
+    {
+      label: '12:00 pm',
+      description: 'May be affected by lunch hours',
+      icon: false,
+      badge: true,
+      badgeColor: 'red'
+    },
+    { label: '2:00 pm', description: null, icon: false, badge: false, badgeColor: null },
+    { label: '4:00 pm', description: null, icon: false, badge: false, badgeColor: null },
+    { label: '6:00 pm', description: null, icon: false, badge: false, badgeColor: null },
+    { label: 'After hours', description: null, icon: false, badge: false, badgeColor: null },
+    { label: 'Tomorrow', description: null, icon: false, badge: false, badgeColor: null },
+    {
+      label: 'Urgent',
+      description: 'Need to pickup ASAP',
+      icon: true
+    }
+  ],
   readyBySelected: (isPlural: boolean) =>
-    `We'll do our best to ensure your ${
+    `Please select a time below. We'll do our best to ensure your ${
       isPlural ? 'prescriptions are' : 'prescription is'
     } ready by your selected time.`,
   readyPickUp: 'Ready for pick up',
@@ -125,20 +151,6 @@ export const text = {
   track: 'Track your order',
   tracking: 'Tracking #:',
   tryPhoton: 'Try Photon',
-  urgencyOptions: [
-    { label: '10:00 am', description: null, icon: false },
-    { label: '12:00 pm', description: null, icon: false },
-    { label: '2:00 pm', description: null, icon: false },
-    { label: '4:00 pm', description: null, icon: false },
-    { label: '6:00 pm', description: null, icon: false },
-    { label: 'After hours', description: null, icon: false },
-    { label: 'Tomorrow', description: null, icon: false },
-    {
-      label: 'Urgent',
-      description: 'I need to pick this up as soon as possible',
-      icon: true
-    }
-  ],
   useLoc: 'Use my current location',
   weSent: (isPlural: boolean) =>
     `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`
