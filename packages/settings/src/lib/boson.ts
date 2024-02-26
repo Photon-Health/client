@@ -49,7 +49,6 @@ const organizationSettings: {
   // Test Telehealth (us)
   org_KzSVZBQixLRkqj5d: {
     ...defaultSettings,
-    logo: 'photon',
     accentColor: '#b35724',
     enableRxAndOrder: true,
     enableMedHistory: true
@@ -65,7 +64,6 @@ const organizationSettings: {
   // test2
   org_zjqxDJzBNyuN9qcm: {
     ...defaultSettings,
-    logo: 'photon',
     accentColor: '#b35724',
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
