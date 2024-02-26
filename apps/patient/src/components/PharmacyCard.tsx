@@ -28,28 +28,37 @@ dayjs.extend(customParseFormat);
 
 interface HoursProps {
   isOpen?: boolean;
+  isClosingSoon?: boolean;
   is24Hr?: boolean;
   opens?: string;
   closes?: string;
 }
 
-const Hours = ({ is24Hr, isOpen, opens, closes }: HoursProps) => {
+const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes }: HoursProps) => {
+  const color = isClosingSoon ? 'orange.500' : isOpen ? 'green' : 'red';
+  const text = isClosingSoon ? t.closingSoon : isOpen ? t.open : t.closed;
+
   return (
     <HStack w="full" whiteSpace="nowrap" overflow="hidden">
-      {isOpen != null ? (
-        <Text fontSize="sm" color={isOpen ? 'green' : 'red'}>
-          {isOpen ? t.open : t.closed}
+      {isOpen != null || isClosingSoon != null ? (
+        <Text fontSize="sm" color={color}>
+          {text}
         </Text>
       ) : null}
       {!is24Hr && ((isOpen && closes) || (!isOpen && opens)) ? (
         <Text color="gray.400">&bull;</Text>
       ) : null}
-      {!is24Hr && isOpen && closes ? (
+      {!is24Hr && isClosingSoon ? (
         <Text fontSize="sm" color="gray.500" isTruncated>
           {closes}
         </Text>
       ) : null}
-      {!is24Hr && !isOpen && opens ? (
+      {!is24Hr && !isClosingSoon && isOpen && closes ? (
+        <Text fontSize="sm" color="gray.500" isTruncated>
+          {closes}
+        </Text>
+      ) : null}
+      {!is24Hr && !isClosingSoon && !isOpen && opens ? (
         <Text fontSize="sm" color="gray.500" isTruncated>
           {opens}
         </Text>
@@ -156,6 +165,7 @@ export const PharmacyCard = memo(function PharmacyCard({
                 <Hours
                   isOpen={pharmacy.isOpen}
                   is24Hr={pharmacy.is24Hr}
+                  isClosingSoon={pharmacy.isClosingSoon}
                   opens={pharmacy.opens}
                   closes={pharmacy.closes}
                 />
