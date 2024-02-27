@@ -112,6 +112,7 @@ export const GET_PHARMACIES = gql`
     $offset: Int
     $openAt: DateTime
     $is24hr: Boolean
+    $name: String
   ) {
     pharmaciesByLocation(
       location: $location
@@ -119,6 +120,7 @@ export const GET_PHARMACIES = gql`
       offset: $offset
       openAt: $openAt
       is24hr: $is24hr
+      name: $name
     ) {
       id
       name

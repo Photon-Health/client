@@ -17,6 +17,8 @@
  * @param enablePatientRerouting Ability for patients to reroute orders
  * @param enableMedHistory Show the med history section in the prescribe flow
  * @param enableRxAndOrder Combine Rx and order creation into one prescribe flow
+ * @param enableCombineAndDuplicate Enable the ability to combine and duplicate orders
+ * @param topRankedCostco Enable Costco to rank at the top of pickup pharmacy list in the patient app
  *
  */
 export type OrganizationSettings = {
@@ -37,5 +39,5 @@ export type OrganizationSettings = {
   enableMedHistory?: boolean;
   enableRxAndOrder?: boolean;
   enableCombineAndDuplicate?: boolean;
-  proRankCostco?: boolean;
+  topRankedCostco?: boolean;
 };

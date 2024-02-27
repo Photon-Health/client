@@ -18,6 +18,7 @@ export interface Pharmacy extends types.Pharmacy {
   isClosingSoon?: boolean;
   closes?: string;
   opens?: string;
+  logo?: string;
 }
 
 export type ExtendedFulfillmentType = types.FulfillmentType | 'COURIER';

@@ -39,6 +39,8 @@ import {
 import { demoPharmacies } from '../data/demoPharmacies';
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
+import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import costcoLogo from '../assets/costco_small.png';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
@@ -169,9 +171,10 @@ export const Pharmacy = () => {
     setLongitude(lng);
 
     // Get pharmacies from photon db
-    let topRankedPharmacy: types.Pharmacy[] = [];
-    let pharmaciesResult: types.Pharmacy[];
+    let topRankedPharmacy: EnrichedPharmacy[] = [];
+    let pharmaciesResult: EnrichedPharmacy[];
     try {
+      console.log('enableTopRankedCostco', enableTopRankedCostco);
       if (enableTopRankedCostco) {
         topRankedPharmacy = await getPharmacies(
           {
@@ -185,6 +188,10 @@ export const Pharmacy = () => {
           false,
           'costco'
         );
+        if (topRankedPharmacy.length > 0) {
+          // add a logo to the only item in the array
+          topRankedPharmacy[0].logo = costcoLogo;
+        }
       }
       pharmaciesResult = await getPharmacies(
         {
@@ -251,7 +258,7 @@ export const Pharmacy = () => {
       return;
     }
 
-    let pharmaciesResult: types.Pharmacy[];
+    let pharmaciesResult: EnrichedPharmacy[];
     try {
       pharmaciesResult = await getPharmacies(
         {
