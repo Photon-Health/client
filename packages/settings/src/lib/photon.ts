@@ -27,7 +27,8 @@ const defaultSettings: OrganizationSettings = {
   federated: false,
   enableMedHistory: false,
   enableRxAndOrder: true,
-  enableCombineAndDuplicate: true
+  enableCombineAndDuplicate: true,
+  topRankedCostco: false
 };
 
 /**

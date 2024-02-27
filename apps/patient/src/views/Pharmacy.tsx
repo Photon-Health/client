@@ -76,6 +76,18 @@ export const Pharmacy = () => {
 
   const toast = useToast();
 
+  const isMultiRx = flattenedFills.length > 1;
+
+  const isCapsuleTerritory = order?.address?.postalCode in capsuleZipcodeLookup;
+  const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
+  const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
+  const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
+
+  const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
+  const subheading = isReroute
+    ? t.sendToNew(isMultiRx, order.pharmacy.name)
+    : t.sendToSelected(isMultiRx);
+
   const reset = () => {
     setPharmacyOptions([]);
     setSelectedId('');
@@ -157,8 +169,23 @@ export const Pharmacy = () => {
     setLongitude(lng);
 
     // Get pharmacies from photon db
+    let topRankedPharmacy: types.Pharmacy[] = [];
     let pharmaciesResult: types.Pharmacy[];
     try {
+      if (enableTopRankedCostco) {
+        topRankedPharmacy = await getPharmacies(
+          {
+            latitude: lat,
+            longitude: lng,
+            radius: PHARMACY_SEARCH_RADIUS_IN_MILES
+          },
+          1,
+          0,
+          false,
+          false,
+          'costco'
+        );
+      }
       pharmaciesResult = await getPharmacies(
         {
           latitude: lat,
@@ -170,6 +197,8 @@ export const Pharmacy = () => {
         enableOpenNow,
         enable24Hr
       );
+      // prepend top ranked pharmacy to the list
+      pharmaciesResult = [...topRankedPharmacy, ...pharmaciesResult];
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
         setLoadingPharmacies(false);
         return;
@@ -430,17 +459,6 @@ export const Pharmacy = () => {
       initialize();
     }
   }, [enableOpenNow, enable24Hr]);
-
-  const isMultiRx = flattenedFills.length > 1;
-
-  const isCapsuleTerritory = order?.address?.postalCode in capsuleZipcodeLookup;
-  const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
-  const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
-
-  const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
-  const subheading = isReroute
-    ? t.sendToNew(isMultiRx, order.pharmacy.name)
-    : t.sendToSelected(isMultiRx);
 
   return (
     <Box>

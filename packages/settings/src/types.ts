@@ -37,4 +37,5 @@ export type OrganizationSettings = {
   enableMedHistory?: boolean;
   enableRxAndOrder?: boolean;
   enableCombineAndDuplicate?: boolean;
+  proRankCostco?: boolean;
 };
