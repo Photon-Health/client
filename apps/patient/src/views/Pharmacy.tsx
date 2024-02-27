@@ -37,7 +37,6 @@ import {
   triggerDemoNotification
 } from '../api';
 import { demoPharmacies } from '../data/demoPharmacies';
-import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import costcoLogo from '../assets/costco_small.png';
@@ -81,8 +80,6 @@ export const Pharmacy = () => {
 
   const isMultiRx = flattenedFills.length > 1;
 
-  const isCapsuleTerritory = order?.address?.postalCode in capsuleZipcodeLookup;
-  const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
   const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
   const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
@@ -511,15 +508,6 @@ export const Pharmacy = () => {
 
           {location ? (
             <VStack spacing={9} align="stretch">
-              {enableCourier ? (
-                <BrandedOptions
-                  options={[capsuleZipcodeLookup[order?.address?.postalCode].pharmacyId]}
-                  location={location}
-                  selectedId={selectedId}
-                  handleSelect={handleSelect}
-                  patientAddress={formatAddress(order?.address)}
-                />
-              ) : null}
               {enableMailOrder ? (
                 <BrandedOptions
                   options={orgSettings.mailOrderNavigateProviders}
@@ -540,7 +528,7 @@ export const Pharmacy = () => {
                 handleSetPreferred={handleSetPreferredPharmacy}
                 loadingMore={loadingPharmacies}
                 showingAllPharmacies={showingAllPharmacies}
-                courierEnabled={enableCourier || enableMailOrder}
+                courierEnabled={enableMailOrder}
                 enableOpenNow={enableOpenNow}
                 enable24Hr={enable24Hr}
                 setEnableOpenNow={setEnableOpenNow}
