@@ -1,7 +1,7 @@
 import { HStack, IconButton, Text, Tooltip, useClipboard } from '@chakra-ui/react';
 import { FiCheck, FiCopy } from 'react-icons/fi';
 
-const CopyText = ({ text, size = 'md' }: { text: string; size?: 'xs' | 'sm' | 'md' }) => {
+const CopyText = ({ text, size = 'md' }: { text: string; size?: 'xs' | 'sm' | 'md' | 'lg' }) => {
   const { onCopy, hasCopied } = useClipboard(text);
   if (!text) return null;
   return (
@@ -11,6 +11,7 @@ const CopyText = ({ text, size = 'md' }: { text: string; size?: 'xs' | 'sm' | 'm
         whiteSpace={{ base: 'nowrap', sm: 'normal' }}
         overflow={{ base: 'hidden', sm: 'visible' }}
         textOverflow={{ base: 'ellipsis', sm: 'clip' }}
+        fontWeight="medium"
       >
         {text}
       </Text>
