@@ -40,7 +40,7 @@ import { FiChevronRight } from 'react-icons/fi';
 import { Page } from '../components/Page';
 import PatientView from '../components/PatientView';
 import { confirmWrapper } from '../components/GuardDialog';
-import { formatAddress, formatDate, formatFills, formatPhone } from '../../utils';
+import { formatAddress, formatDate, formatPhone, getMedicationNames } from '../../utils';
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
@@ -408,6 +408,7 @@ export const Order = () => {
   }
 
   const fills = order ? uniqueFills(order) : [];
+  const medicationNames = getMedicationNames(fills);
 
   return (
     <>
@@ -535,10 +536,19 @@ export const Order = () => {
               justify="space-between"
               align="start"
               width="full"
+              spacing={4}
             >
-              <Text fontWeight="medium" flex="1">
-                {loading ? <Skeleton height="30px" width="250px" /> : formatFills(order.fills)}
-              </Text>
+              <VStack w="full" align="start">
+                {loading ? (
+                  <SkeletonText skeletonHeight={5} noOfLines={1} w="300px" />
+                ) : (
+                  medicationNames.map((med, i: number) => (
+                    <Text key={i} fontWeight="medium" flex="1">
+                      {med}
+                    </Text>
+                  ))
+                )}
+              </VStack>
               {loading ? (
                 <Skeleton width="70px" height="24px" borderRadius="xl" />
               ) : (

@@ -29,7 +29,7 @@ import { FiEdit, FiChevronRight, FiPlus } from 'react-icons/fi';
 
 import { usePhoton } from '@photonhealth/react';
 import { useEffect, useState } from 'react';
-import { formatDateLong, formatPhone, formatDate, formatFills } from '../../utils';
+import { formatDateLong, formatPhone, formatDate, getMedicationNames } from '../../utils';
 
 import { Page } from '../components/Page';
 
@@ -297,7 +297,7 @@ export const Patient = () => {
                 <Table bg="transparent" size="sm">
                   <Tbody>
                     {orders.map(({ id: orderId, fulfillment, fills, createdAt, state }, i) => {
-                      const fillsFormatted = formatFills(fills);
+                      const fillsFormatted = getMedicationNames(fills);
 
                       return i < 5 ? (
                         <Tr
