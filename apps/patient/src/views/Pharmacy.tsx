@@ -41,6 +41,7 @@ import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import costcoLogo from '../assets/costco_small.png';
+import { isGLP } from '../utils/isGLP';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
@@ -84,6 +85,7 @@ export const Pharmacy = () => {
   const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
   const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
+  const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
 
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
   const subheading = isReroute
@@ -174,36 +176,35 @@ export const Pharmacy = () => {
     let topRankedPharmacy: EnrichedPharmacy[] = [];
     let pharmaciesResult: EnrichedPharmacy[];
     try {
-      console.log('enableTopRankedCostco', enableTopRankedCostco);
-      if (enableTopRankedCostco) {
-        topRankedPharmacy = await getPharmacies(
-          {
+      if (enableTopRankedCostco && containsGLP) {
+        topRankedPharmacy = await getPharmacies({
+          searchParams: {
             latitude: lat,
             longitude: lng,
             radius: PHARMACY_SEARCH_RADIUS_IN_MILES
           },
-          1,
-          0,
-          false,
-          false,
-          'costco'
-        );
+          limit: 1,
+          offset: 0,
+          isOpenNow: false,
+          is24hr: false,
+          name: 'costco'
+        });
         if (topRankedPharmacy.length > 0) {
           // add a logo to the only item in the array
           topRankedPharmacy[0].logo = costcoLogo;
         }
       }
-      pharmaciesResult = await getPharmacies(
-        {
+      pharmaciesResult = await getPharmacies({
+        searchParams: {
           latitude: lat,
           longitude: lng,
           radius: PHARMACY_SEARCH_RADIUS_IN_MILES
         },
-        GET_PHARMACIES_COUNT,
-        0,
-        enableOpenNow,
-        enable24Hr
-      );
+        limit: GET_PHARMACIES_COUNT,
+        offset: 0,
+        isOpenNow: enableOpenNow,
+        is24hr: enable24Hr
+      });
       // prepend top ranked pharmacy to the list
       pharmaciesResult = [...topRankedPharmacy, ...pharmaciesResult];
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
@@ -260,17 +261,17 @@ export const Pharmacy = () => {
 
     let pharmaciesResult: EnrichedPharmacy[];
     try {
-      pharmaciesResult = await getPharmacies(
-        {
+      pharmaciesResult = await getPharmacies({
+        searchParams: {
           latitude,
           longitude,
           radius: PHARMACY_SEARCH_RADIUS_IN_MILES
         },
-        GET_PHARMACIES_COUNT,
-        pharmacyOptions.length,
-        enableOpenNow,
-        enable24Hr
-      );
+        limit: GET_PHARMACIES_COUNT,
+        offset: pharmacyOptions.length,
+        isOpenNow: enableOpenNow,
+        is24hr: enable24Hr
+      });
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
         setLoadingPharmacies(false);
         return;

@@ -29,18 +29,25 @@ export const getOrder = async (orderId: string) => {
   }
 };
 
-export const getPharmacies = async (
+export const getPharmacies = async ({
+  searchParams,
+  limit,
+  offset,
+  isOpenNow,
+  is24hr,
+  name
+}: {
   searchParams: {
     latitude: number;
     longitude: number;
     radius: number;
-  },
-  limit: number,
-  offset: number,
-  isOpenNow: boolean,
-  is24hr: boolean,
-  name?: string
-) => {
+  };
+  limit: number;
+  offset: number;
+  isOpenNow: boolean;
+  is24hr: boolean;
+  name?: string;
+}) => {
   try {
     const now = new Date();
     const response: { pharmaciesByLocation: types.Pharmacy[] } = await graphQLClient.request(
