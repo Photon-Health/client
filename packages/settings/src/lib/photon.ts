@@ -270,6 +270,7 @@ const organizationSettings: {
     logo: 'sesame_logo.jpg',
     accentColor: '#5224C7',
     sendToPatient: true,
-    enableCourierNavigate: false
+    enableCourierNavigate: false,
+    topRankedCostco: true
   }
 };
