@@ -108,29 +108,31 @@ export const Patient = () => {
   }
 
   return (
-    <Page header="Patient">
+    <Page
+      kicker="PATIENT"
+      header={<CopyText size="md" text={patient?.id} />}
+      buttons={
+        <Button
+          aria-label="Edit patient details"
+          as={RouterLink}
+          to={`/patients/update/${id}`}
+          leftIcon={<FiEdit />}
+          variant="outline"
+          borderColor="orange.500"
+          textColor="orange.500"
+          colorScheme="orange"
+          w={{ base: 'full', md: 'auto' }}
+        >
+          Edit
+        </Button>
+      }
+    >
       <Card>
         <CardHeader>
           <HStack spacing={4} justifyContent="space-between">
             <Text fontWeight="medium" data-dd-privacy="mask">
               {loading ? <Skeleton height="30px" width="250px" /> : patient?.name.full}
             </Text>
-            {!loading ? (
-              <Button
-                size="sm"
-                fontSize="sm"
-                aria-label="Edit patient details"
-                as={RouterLink}
-                to={`/patients/update/${id}`}
-                leftIcon={<FiEdit />}
-                variant="outline"
-                borderColor="orange.500"
-                textColor="orange.500"
-                colorScheme="orange"
-              >
-                Edit
-              </Button>
-            ) : undefined}
           </HStack>
         </CardHeader>
         <Divider color="gray.100" />
@@ -198,14 +200,6 @@ export const Patient = () => {
                     >
                       {patient.email}
                     </Link>
-                  )}
-                </InfoGrid>
-
-                <InfoGrid name="Id">
-                  {loading ? (
-                    <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
-                  ) : (
-                    <CopyText text={id || ''} />
                   )}
                 </InfoGrid>
               </>
