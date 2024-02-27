@@ -172,6 +172,8 @@ export const Pharmacy = () => {
     // Get pharmacies from photon db
     let topRankedPharmacy: EnrichedPharmacy[] = [];
     let pharmaciesResult: EnrichedPharmacy[];
+
+    // check if top ranked costco is enabled and there are GLP treatments
     try {
       if (enableTopRankedCostco && containsGLP) {
         topRankedPharmacy = await getPharmacies({
@@ -182,8 +184,8 @@ export const Pharmacy = () => {
           },
           limit: 1,
           offset: 0,
-          isOpenNow: false,
-          is24hr: false,
+          isOpenNow: enableOpenNow,
+          is24hr: enable24Hr,
           name: 'costco'
         });
         if (topRankedPharmacy.length > 0) {
@@ -191,6 +193,13 @@ export const Pharmacy = () => {
           topRankedPharmacy[0].logo = costcoLogo;
         }
       }
+    } catch {
+      // no costcos found :(
+      pharmaciesResult = [];
+    }
+
+    // get the rest of the local pickup pharmacies
+    try {
       pharmaciesResult = await getPharmacies({
         searchParams: {
           latitude: lat,
