@@ -9,11 +9,15 @@ const commonGLPs = [
   'bydureon',
   'mounjaro',
   'zepbound',
+  'adlyxin',
+  'tanzeum',
   'semaglutide',
   'liraglutide',
   'dulaglutide',
   'exenatide',
-  'tirzepatide'
+  'tirzepatide',
+  'lixisenatide',
+  'albiglutide'
 ];
 
 export function isGLP(name: string) {
