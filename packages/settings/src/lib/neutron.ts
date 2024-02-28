@@ -31,7 +31,8 @@ const defaultSettings: OrganizationSettings = {
   federated: false,
   enableMedHistory: false,
   enableRxAndOrder: true,
-  enableCombineAndDuplicate: true
+  enableCombineAndDuplicate: true,
+  topRankedCostco: false
 };
 
 /**
@@ -58,7 +59,8 @@ const organizationSettings: {
     accentColor: '#b35724',
     mailOrder: true,
     enableMedHistory: true,
-    mailOrderProviders: [CUREXA_ID, CAREPOINT_ID, TRUE_PILL_ID, HONEYBEE_PHARMACY_ID]
+    mailOrderProviders: [CUREXA_ID, CAREPOINT_ID, TRUE_PILL_ID, HONEYBEE_PHARMACY_ID],
+    topRankedCostco: true
   },
   // NewCo (demo's)
   org_YiUudCToTSrjOuow: {
