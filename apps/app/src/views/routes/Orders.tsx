@@ -91,7 +91,7 @@ const renderRow = (order: Order) => {
   const { id, pharmacy, patient } = order;
   const extId = order.externalId || <Text as="i">None</Text>;
 
-  const fills = getMedicationNames(order.fills);
+  const medNames = getMedicationNames(order.fills).join(', ');
 
   const pharmacyView = pharmacy?.name ? (
     <Popover>
@@ -126,7 +126,7 @@ const renderRow = (order: Order) => {
     id,
     externalId: extId,
     createdAt: formatDate(order.createdAt),
-    fills: <Text fontWeight="medium">{fills}</Text>,
+    fills: <Text fontWeight="medium">{medNames}</Text>,
     status: (
       <OrderStatusBadge
         fulfillmentState={order.fulfillment?.state as OrderFulfillmentState}

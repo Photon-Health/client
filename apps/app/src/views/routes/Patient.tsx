@@ -300,7 +300,7 @@ export const Patient = () => {
                 <Table bg="transparent" size="sm">
                   <Tbody>
                     {orders.map(({ id: orderId, fulfillment, fills, createdAt, state }, i) => {
-                      const fillsFormatted = getMedicationNames(fills);
+                      const medNames = getMedicationNames(fills).join(', ');
 
                       return i < 5 ? (
                         <Tr
@@ -312,7 +312,7 @@ export const Patient = () => {
                           <Td px={0} py={3} whiteSpace="pre-wrap" borderColor="gray.200">
                             <HStack w="full" justify="space-between">
                               <VStack alignItems="start">
-                                <Text>{fillsFormatted}</Text>
+                                <Text>{medNames}</Text>
                                 <HStack>
                                   <OrderStatusBadge
                                     fulfillmentState={fulfillment?.state as OrderFulfillmentState}
