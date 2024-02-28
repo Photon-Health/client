@@ -151,7 +151,16 @@ export const Prescription = () => {
   const canCreateOrder = rx.state === types.PrescriptionState.Active;
 
   return (
-    <Page kicker="PRESCRIPTION" header={<CopyText text={id || ''} />}>
+    <Page
+      kicker="PRESCRIPTION"
+      header={
+        loading ? (
+          <SkeletonText skeletonHeight={5} noOfLines={1} width="300px" mt={2} />
+        ) : (
+          <CopyText text={id || ''} />
+        )
+      }
+    >
       <Card>
         <CardHeader>
           <Stack

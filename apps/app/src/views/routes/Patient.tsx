@@ -113,7 +113,7 @@ export const Patient = () => {
         loading ? (
           <SkeletonText skeletonHeight={5} noOfLines={1} width="300px" mt={2} />
         ) : (
-          <CopyText text={patient?.id} />
+          <CopyText text={id || ''} />
         )
       }
       buttons={
