@@ -14,7 +14,6 @@ import {
   Divider,
   HStack,
   Link,
-  Skeleton,
   SkeletonText,
   Table,
   TableContainer,
@@ -29,7 +28,7 @@ import { FiEdit, FiChevronRight, FiPlus } from 'react-icons/fi';
 
 import { usePhoton } from '@photonhealth/react';
 import { useEffect, useState } from 'react';
-import { formatDateLong, formatPhone, formatDate, formatFills } from '../../utils';
+import { formatDateLong, formatPhone, formatDate, getMedicationNames } from '../../utils';
 
 import { Page } from '../components/Page';
 
@@ -108,30 +107,42 @@ export const Patient = () => {
   }
 
   return (
-    <Page header="Patient">
+    <Page
+      kicker="PATIENT"
+      header={
+        loading ? (
+          <SkeletonText skeletonHeight={5} noOfLines={1} width="300px" mt={2} />
+        ) : (
+          <CopyText text={id || ''} />
+        )
+      }
+      buttons={
+        <Button
+          aria-label="Edit patient details"
+          as={RouterLink}
+          to={`/patients/update/${id}`}
+          leftIcon={<FiEdit />}
+          variant="outline"
+          borderColor="orange.500"
+          textColor="orange.500"
+          colorScheme="orange"
+          w={{ base: 'full', md: 'auto' }}
+        >
+          Edit
+        </Button>
+      }
+    >
       <Card>
         <CardHeader>
-          <HStack spacing={4} justifyContent="space-between">
-            <Text fontWeight="medium" data-dd-privacy="mask">
-              {loading ? <Skeleton height="30px" width="250px" /> : patient?.name.full}
-            </Text>
-            {!loading ? (
-              <Button
-                size="sm"
-                fontSize="sm"
-                aria-label="Edit patient details"
-                as={RouterLink}
-                to={`/patients/update/${id}`}
-                leftIcon={<FiEdit />}
-                variant="outline"
-                borderColor="orange.500"
-                textColor="orange.500"
-                colorScheme="orange"
-              >
-                Edit
-              </Button>
-            ) : undefined}
-          </HStack>
+          <Text fontWeight="medium" data-dd-privacy="mask">
+            {loading ? (
+              <SkeletonText skeletonHeight={5} noOfLines={1} width="200px" />
+            ) : (
+              <Text fontWeight="medium" flex="1">
+                {patient?.name.full}
+              </Text>
+            )}
+          </Text>
         </CardHeader>
         <Divider color="gray.100" />
         <CardBody>
@@ -198,14 +209,6 @@ export const Patient = () => {
                     >
                       {patient.email}
                     </Link>
-                  )}
-                </InfoGrid>
-
-                <InfoGrid name="Id">
-                  {loading ? (
-                    <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
-                  ) : (
-                    <CopyText text={id || ''} />
                   )}
                 </InfoGrid>
               </>
@@ -297,7 +300,7 @@ export const Patient = () => {
                 <Table bg="transparent" size="sm">
                   <Tbody>
                     {orders.map(({ id: orderId, fulfillment, fills, createdAt, state }, i) => {
-                      const fillsFormatted = formatFills(fills);
+                      const fillsFormatted = getMedicationNames(fills);
 
                       return i < 5 ? (
                         <Tr
