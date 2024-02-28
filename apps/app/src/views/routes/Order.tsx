@@ -465,7 +465,7 @@ export const Order = () => {
       />
       <Page
         kicker="ORDER"
-        header={<CopyText size="md" text={order?.id} />}
+        header={<CopyText text={order?.id} />}
         buttons={
           <Stack
             direction={{ base: 'column-reverse', md: 'row' }}

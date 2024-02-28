@@ -151,7 +151,7 @@ export const Prescription = () => {
   const canCreateOrder = rx.state === types.PrescriptionState.Active;
 
   return (
-    <Page header="Prescription">
+    <Page kicker="PRESCRIPTION" header={<CopyText text={id || ''} />}>
       <Card>
         <CardHeader>
           <Stack direction={{ base: 'column', md: 'row' }} justify="space-between" width="full">
@@ -171,7 +171,6 @@ export const Prescription = () => {
                 </Tooltip>
               )}
             </Stack>
-            <CopyText size="xs" text={id || ''} />
           </Stack>
         </CardHeader>
         <Divider color="gray.100" />

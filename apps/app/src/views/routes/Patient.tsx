@@ -110,7 +110,7 @@ export const Patient = () => {
   return (
     <Page
       kicker="PATIENT"
-      header={<CopyText size="md" text={patient?.id} />}
+      header={<CopyText text={patient?.id} />}
       buttons={
         <Button
           aria-label="Edit patient details"
@@ -129,11 +129,9 @@ export const Patient = () => {
     >
       <Card>
         <CardHeader>
-          <HStack spacing={4} justifyContent="space-between">
-            <Text fontWeight="medium" data-dd-privacy="mask">
-              {loading ? <Skeleton height="30px" width="250px" /> : patient?.name.full}
-            </Text>
-          </HStack>
+          <Text fontWeight="medium" data-dd-privacy="mask">
+            {loading ? <Skeleton height="30px" width="250px" /> : patient?.name.full}
+          </Text>
         </CardHeader>
         <Divider color="gray.100" />
         <CardBody>
