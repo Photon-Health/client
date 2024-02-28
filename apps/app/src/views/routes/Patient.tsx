@@ -14,7 +14,6 @@ import {
   Divider,
   HStack,
   Link,
-  Skeleton,
   SkeletonText,
   Table,
   TableContainer,
@@ -110,7 +109,13 @@ export const Patient = () => {
   return (
     <Page
       kicker="PATIENT"
-      header={<CopyText text={patient?.id} />}
+      header={
+        loading ? (
+          <SkeletonText skeletonHeight={5} noOfLines={1} width="300px" mt={2} />
+        ) : (
+          <CopyText text={patient?.id} />
+        )
+      }
       buttons={
         <Button
           aria-label="Edit patient details"
@@ -130,7 +135,13 @@ export const Patient = () => {
       <Card>
         <CardHeader>
           <Text fontWeight="medium" data-dd-privacy="mask">
-            {loading ? <Skeleton height="30px" width="250px" /> : patient?.name.full}
+            {loading ? (
+              <SkeletonText skeletonHeight={5} noOfLines={1} width="200px" />
+            ) : (
+              <Text fontWeight="medium" flex="1">
+                {patient?.name.full}
+              </Text>
+            )}
           </Text>
         </CardHeader>
         <Divider color="gray.100" />

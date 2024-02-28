@@ -154,23 +154,29 @@ export const Prescription = () => {
     <Page kicker="PRESCRIPTION" header={<CopyText text={id || ''} />}>
       <Card>
         <CardHeader>
-          <Stack direction={{ base: 'column', md: 'row' }} justify="space-between" width="full">
-            <Stack
-              direction={{ base: 'column', md: 'row' }}
-              align={{ base: 'start', md: 'center' }}
-              spacing={2}
-            >
-              <Text fontWeight="medium">
-                {loading ? <Skeleton height="30px" width="250px" /> : prescription?.treatment?.name}
-              </Text>
+          <Stack
+            direction={{ base: 'column', md: 'row' }}
+            justify="space-between"
+            align="start"
+            width="full"
+            spacing={4}
+          >
+            <VStack w="full" align="start">
               {loading ? (
-                <Skeleton width="70px" height="24px" borderRadius="xl" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} w="250px" />
               ) : (
-                <Tooltip label={stateTip}>
-                  <Badge colorScheme={stateColor}>{state}</Badge>
-                </Tooltip>
+                <Text fontWeight="medium" flex="1">
+                  {prescription?.treatment?.name}
+                </Text>
               )}
-            </Stack>
+            </VStack>
+            {loading ? (
+              <Skeleton width="70px" height="24px" borderRadius="xl" />
+            ) : (
+              <Tooltip label={stateTip}>
+                <Badge colorScheme={stateColor}>{state}</Badge>
+              </Tooltip>
+            )}
           </Stack>
         </CardHeader>
         <Divider color="gray.100" />
