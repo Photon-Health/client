@@ -27,7 +27,8 @@ const defaultSettings: OrganizationSettings = {
   federated: false,
   enableMedHistory: false,
   enableRxAndOrder: true,
-  enableCombineAndDuplicate: true
+  enableCombineAndDuplicate: true,
+  topRankedCostco: false
 };
 
 /**
@@ -269,6 +270,7 @@ const organizationSettings: {
     logo: 'sesame_logo.jpg',
     accentColor: '#5224C7',
     sendToPatient: true,
-    enableCourierNavigate: false
+    enableCourierNavigate: false,
+    topRankedCostco: true
   }
 };

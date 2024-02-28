@@ -37,8 +37,10 @@ import {
   triggerDemoNotification
 } from '../api';
 import { demoPharmacies } from '../data/demoPharmacies';
-import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
+import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import costcoLogo from '../assets/costco_small.png';
+import { isGLP } from '../utils/isGLP';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
@@ -75,6 +77,17 @@ export const Pharmacy = () => {
   const [enable24Hr, setEnable24Hr] = useState(false);
 
   const toast = useToast();
+
+  const isMultiRx = flattenedFills.length > 1;
+
+  const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
+  const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
+  const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
+
+  const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
+  const subheading = isReroute
+    ? t.sendToNew(isMultiRx, order.pharmacy.name)
+    : t.sendToSelected(isMultiRx);
 
   const reset = () => {
     setPharmacyOptions([]);
@@ -157,19 +170,49 @@ export const Pharmacy = () => {
     setLongitude(lng);
 
     // Get pharmacies from photon db
-    let pharmaciesResult: types.Pharmacy[];
+    let topRankedPharmacy: EnrichedPharmacy[] = [];
+    let pharmaciesResult: EnrichedPharmacy[];
+
+    // check if top ranked costco is enabled and there are GLP treatments
     try {
-      pharmaciesResult = await getPharmacies(
-        {
+      if (enableTopRankedCostco && containsGLP) {
+        topRankedPharmacy = await getPharmacies({
+          searchParams: {
+            latitude: lat,
+            longitude: lng,
+            radius: PHARMACY_SEARCH_RADIUS_IN_MILES
+          },
+          limit: 1,
+          offset: 0,
+          isOpenNow: enableOpenNow,
+          is24hr: enable24Hr,
+          name: 'costco'
+        });
+        if (topRankedPharmacy.length > 0) {
+          // add a logo to the only item in the array
+          topRankedPharmacy[0].logo = costcoLogo;
+        }
+      }
+    } catch {
+      // no costcos found :(
+      pharmaciesResult = [];
+    }
+
+    // get the rest of the local pickup pharmacies
+    try {
+      pharmaciesResult = await getPharmacies({
+        searchParams: {
           latitude: lat,
           longitude: lng,
           radius: PHARMACY_SEARCH_RADIUS_IN_MILES
         },
-        GET_PHARMACIES_COUNT,
-        0,
-        enableOpenNow,
-        enable24Hr
-      );
+        limit: GET_PHARMACIES_COUNT,
+        offset: 0,
+        isOpenNow: enableOpenNow,
+        is24hr: enable24Hr
+      });
+      // prepend top ranked pharmacy to the list
+      pharmaciesResult = [...topRankedPharmacy, ...pharmaciesResult];
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
         setLoadingPharmacies(false);
         return;
@@ -222,19 +265,19 @@ export const Pharmacy = () => {
       return;
     }
 
-    let pharmaciesResult: types.Pharmacy[];
+    let pharmaciesResult: EnrichedPharmacy[];
     try {
-      pharmaciesResult = await getPharmacies(
-        {
+      pharmaciesResult = await getPharmacies({
+        searchParams: {
           latitude,
           longitude,
           radius: PHARMACY_SEARCH_RADIUS_IN_MILES
         },
-        GET_PHARMACIES_COUNT,
-        pharmacyOptions.length,
-        enableOpenNow,
-        enable24Hr
-      );
+        limit: GET_PHARMACIES_COUNT,
+        offset: pharmacyOptions.length,
+        isOpenNow: enableOpenNow,
+        is24hr: enable24Hr
+      });
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
         setLoadingPharmacies(false);
         return;
@@ -431,17 +474,6 @@ export const Pharmacy = () => {
     }
   }, [enableOpenNow, enable24Hr]);
 
-  const isMultiRx = flattenedFills.length > 1;
-
-  const isCapsuleTerritory = order?.address?.postalCode in capsuleZipcodeLookup;
-  const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
-  const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
-
-  const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
-  const subheading = isReroute
-    ? t.sendToNew(isMultiRx, order.pharmacy.name)
-    : t.sendToSelected(isMultiRx);
-
   return (
     <Box>
       <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />
@@ -485,15 +517,6 @@ export const Pharmacy = () => {
 
           {location ? (
             <VStack spacing={9} align="stretch">
-              {enableCourier ? (
-                <BrandedOptions
-                  options={[capsuleZipcodeLookup[order?.address?.postalCode].pharmacyId]}
-                  location={location}
-                  selectedId={selectedId}
-                  handleSelect={handleSelect}
-                  patientAddress={formatAddress(order?.address)}
-                />
-              ) : null}
               {enableMailOrder ? (
                 <BrandedOptions
                   options={orgSettings.mailOrderNavigateProviders}
@@ -514,7 +537,7 @@ export const Pharmacy = () => {
                 handleSetPreferred={handleSetPreferredPharmacy}
                 loadingMore={loadingPharmacies}
                 showingAllPharmacies={showingAllPharmacies}
-                courierEnabled={enableCourier || enableMailOrder}
+                courierEnabled={enableMailOrder}
                 enableOpenNow={enableOpenNow}
                 enable24Hr={enable24Hr}
                 setEnableOpenNow={setEnableOpenNow}
