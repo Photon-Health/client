@@ -567,6 +567,54 @@ export const Order = () => {
           </CardHeader>
           <Divider color="gray.100" />
           <CardBody>
+            <Stack direction={{ base: 'column', sm: 'row' }} gap={[5, 3]} w="full">
+              <VStack align="start" borderRadius={6}>
+                <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                  Patient
+                </Text>
+                {loading ? (
+                  <HStack alignContent="center" w="150px" display="flex">
+                    <SkeletonCircle size="10" />
+                    <SkeletonText skeletonHeight={5} noOfLines={2} flexGrow={1} />
+                  </HStack>
+                ) : (
+                  <PatientView patient={order.patient} />
+                )}
+              </VStack>
+
+              <Show above="sm">
+                <Divider orientation="vertical" height="auto" />
+              </Show>
+
+              <VStack align="start" borderRadius={6}>
+                <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                  Created At
+                </Text>
+
+                {loading ? (
+                  <SkeletonText skeletonHeight={5} noOfLines={1} width="125px" />
+                ) : (
+                  <Text fontSize="md">{formatDate(order.createdAt)}</Text>
+                )}
+              </VStack>
+              {order?.externalId ? (
+                <>
+                  <Show above="sm">
+                    <Divider orientation="vertical" height="auto" />
+                  </Show>
+                  <VStack align="start" borderRadius={6}>
+                    <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                      External Id
+                    </Text>
+
+                    <CopyText text={order?.externalId} size="xs" />
+                  </VStack>
+                </>
+              ) : null}
+            </Stack>
+          </CardBody>
+          <Divider color="gray.100" />
+          <CardBody>
             <VStack
               spacing={4}
               fontSize={{ base: 'md', md: 'lg' }}
@@ -574,52 +622,6 @@ export const Order = () => {
               w="100%"
               mt={0}
             >
-              <Stack direction={{ base: 'column', sm: 'row' }} gap={[5, 3]} w="full">
-                <VStack align="start" borderRadius={6}>
-                  <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                    Patient
-                  </Text>
-                  {loading ? (
-                    <HStack alignContent="center" w="150px" display="flex">
-                      <SkeletonCircle size="10" />
-                      <SkeletonText skeletonHeight={5} noOfLines={2} flexGrow={1} />
-                    </HStack>
-                  ) : (
-                    <PatientView patient={order.patient} />
-                  )}
-                </VStack>
-
-                <Show above="sm">
-                  <Divider orientation="vertical" height="auto" />
-                </Show>
-
-                <VStack align="start" borderRadius={6}>
-                  <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                    Created At
-                  </Text>
-
-                  {loading ? (
-                    <SkeletonText skeletonHeight={5} noOfLines={1} width="125px" />
-                  ) : (
-                    <Text fontSize="md">{formatDate(order.createdAt)}</Text>
-                  )}
-                </VStack>
-                {order?.externalId ? (
-                  <>
-                    <Show above="sm">
-                      <Divider orientation="vertical" height="auto" />
-                    </Show>
-                    <VStack align="start" borderRadius={6}>
-                      <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                        External Id
-                      </Text>
-
-                      <CopyText text={order?.externalId} size="xs" />
-                    </VStack>
-                  </>
-                ) : null}
-              </Stack>
-
               <SectionTitleRow
                 headerText="Pharmacy Information"
                 rightElement={
@@ -784,30 +786,30 @@ export const Order = () => {
 
               {prescriptions.length > 0 ? (
                 <>
-                  {prescriptions.map((fill: any, i: number) => {
+                  {prescriptions.map((fill: Fill, i: number) => {
                     return i < 5 ? (
-                      <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
+                      <LinkBox key={fill.id} style={{ textDecoration: 'none' }}>
                         <Card
                           variant="outline"
-                          p={[2, 3]}
+                          p={3}
                           w="full"
                           shadow="none"
-                          _hover={{
-                            backgroundColor: 'gray.50'
-                          }}
+                          backgroundColor="gray.50"
+                          _hover={{ backgroundColor: 'gray.100' }}
                         >
-                          <HStack justify="space-between" width="full">
-                            <VStack alignItems="start">
-                              <HStack>
-                                <LinkOverlay href={`/prescriptions/${fill?.prescription?.id}`}>
-                                  <Text>{fill.treatment.name}</Text>
-                                </LinkOverlay>
-                              </HStack>
-                              <Stack direction={['column', 'row']}>
-                                <Text fontSize="xs" color="gray.500">
-                                  Fill ID: {fill.id}
-                                </Text>
-                              </Stack>
+                          <HStack justify="space-between">
+                            <VStack alignItems="start" spacing={0}>
+                              <LinkOverlay href={`/prescriptions/${fill?.prescription?.id}`}>
+                                <Text noOfLines={1}>{fill.treatment.name}</Text>
+                              </LinkOverlay>
+                              <Text color="gray.500">
+                                {fill.prescription?.dispenseQuantity}{' '}
+                                {fill.prescription?.dispenseUnit},{' '}
+                                {fill.prescription?.fillsAllowed
+                                  ? fill.prescription?.fillsAllowed - 1
+                                  : ''}{' '}
+                                Refills - {fill.prescription?.instructions}
+                              </Text>
                             </VStack>
 
                             <Box alignItems="end">
