@@ -627,9 +627,6 @@ export const Order = () => {
                 rightElement={
                   order?.state === types.OrderState.Routing ? (
                     <>
-                      <Button onClick={onOpen} size="sm" colorScheme="blue">
-                        Select Pharmacy
-                      </Button>
                       <LocationSearch
                         isOpen={isOpenLocation}
                         onClose={({ loc, lat, lng }) => {
@@ -703,10 +700,23 @@ export const Order = () => {
               />
 
               {order?.state === types.OrderState.Routing ? (
-                <Alert colorScheme="gray">
-                  <AlertIcon />
-                  This order is pending pharmacy selection, please select a pharmacy if needed.
-                </Alert>
+                <Card backgroundColor="gray.50" shadow="none" variant="outline">
+                  <CardBody p={3}>
+                    <VStack spacing={1} align="start">
+                      <VStack spacing={0} align="start">
+                        <Text fontSize="md" fontWeight="medium">
+                          This order is pending pharmacy selection by the patient.
+                        </Text>
+                        <Text fontSize="md" color="gray.500">
+                          Select a pharmacy for the patient if needed.
+                        </Text>
+                      </VStack>
+                      <Button onClick={onOpen} colorScheme="blue" variant="link" mt={2}>
+                        Select Pharmacy
+                      </Button>
+                    </VStack>
+                  </CardBody>
+                </Card>
               ) : null}
 
               <InfoGrid name="Name">
@@ -785,14 +795,13 @@ export const Order = () => {
               <SectionTitleRow headerText="Prescription Fills" />
 
               {prescriptions.length > 0 ? (
-                <>
+                <VStack spacing={3}>
                   {prescriptions.map((fill: Fill, i: number) => {
                     return i < 5 ? (
-                      <LinkBox key={fill.id} style={{ textDecoration: 'none' }}>
+                      <LinkBox key={fill.id} style={{ textDecoration: 'none' }} w="full">
                         <Card
                           variant="outline"
                           p={3}
-                          w="full"
                           shadow="none"
                           backgroundColor="gray.50"
                           _hover={{ backgroundColor: 'gray.100' }}
@@ -800,9 +809,9 @@ export const Order = () => {
                           <HStack justify="space-between">
                             <VStack alignItems="start" spacing={0}>
                               <LinkOverlay href={`/prescriptions/${fill?.prescription?.id}`}>
-                                <Text noOfLines={1}>{fill.treatment.name}</Text>
+                                <Text fontSize="md">{fill.treatment.name}</Text>
                               </LinkOverlay>
-                              <Text color="gray.500">
+                              <Text fontSize="md" color="gray.500">
                                 {fill.prescription?.dispenseQuantity}{' '}
                                 {fill.prescription?.dispenseUnit},{' '}
                                 {fill.prescription?.fillsAllowed
@@ -820,7 +829,7 @@ export const Order = () => {
                       </LinkBox>
                     ) : null;
                   })}
-                </>
+                </VStack>
               ) : (
                 <Text as="i" fontSize="sm" color="gray.500">
                   No fills
