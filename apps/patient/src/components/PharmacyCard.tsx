@@ -13,7 +13,8 @@ import {
   TagLeftIcon,
   Text,
   VStack,
-  useBreakpointValue
+  useBreakpointValue,
+  Image
 } from '@chakra-ui/react';
 import { FiRotateCcw, FiStar, FiThumbsUp, FiRefreshCcw, FiNavigation } from 'react-icons/fi';
 import dayjs from 'dayjs';
@@ -159,7 +160,10 @@ export const PharmacyCard = memo(function PharmacyCard({
             ) : null}
           </HStack>
           <VStack align="start" w="full" spacing={0}>
-            <Text fontSize="md">{pharmacy.name}</Text>
+            <HStack spacing={2}>
+              {pharmacy?.logo ? <Image src={pharmacy.logo} width="auto" height="24px" /> : null}
+              <Text fontSize="md">{pharmacy.name}</Text>
+            </HStack>
             {showDetails ? (
               <>
                 <Hours

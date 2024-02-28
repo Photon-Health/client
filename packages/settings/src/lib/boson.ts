@@ -29,7 +29,8 @@ const defaultSettings: OrganizationSettings = {
   federated: false,
   enableMedHistory: false,
   enableRxAndOrder: false,
-  enableCombineAndDuplicate: true
+  enableCombineAndDuplicate: true,
+  topRankedCostco: false
 };
 
 export const boson = function (organizationId: string) {
@@ -51,7 +52,8 @@ const organizationSettings: {
     ...defaultSettings,
     accentColor: '#b35724',
     enableRxAndOrder: true,
-    enableMedHistory: true
+    enableMedHistory: true,
+    topRankedCostco: true
   },
   // NewCo (demo's)
   org_w85CgjUjCi52yvOz: {
