@@ -11,7 +11,7 @@ const CopyText = ({ text, size = 'md' }: { text: string; size?: 'xs' | 'sm' | 'm
         whiteSpace={{ base: 'nowrap', sm: 'normal' }}
         overflow={{ base: 'hidden', sm: 'visible' }}
         textOverflow={{ base: 'ellipsis', sm: 'clip' }}
-        fontWeight="medium"
+        fontWeight={size === 'lg' ? 'medium' : undefined}
       >
         {text}
       </Text>
