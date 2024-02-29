@@ -14,7 +14,6 @@ import {
   HStack,
   Link,
   Skeleton,
-  SkeletonCircle,
   SkeletonText,
   Stack,
   Text,
@@ -41,10 +40,9 @@ import { Page } from '../components/Page';
 import PatientView from '../components/PatientView';
 import { confirmWrapper } from '../components/GuardDialog';
 import { formatAddress, formatDate, formatPhone, getMedicationNames } from '../../utils';
-import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
+import OrderStatusBadge from '../components/OrderStatusBadge';
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
-import { OrderState } from '@photonhealth/sdk/dist/types';
 import { LocalPickup } from './NewOrder/components/SelectPharmacyCard/components/LocalPickup';
 import { LocationResults, LocationSearch } from '../components/LocationSearch';
 import SectionTitleRow from '../components/SectionTitleRow';
@@ -144,42 +142,6 @@ const GET_ORDER = gql`
 export const ORDER_FULFILLMENT_TYPE_MAP = {
   [types.FulfillmentType.PickUp]: 'Pick up',
   [types.FulfillmentType.MailOrder]: 'Mail order'
-};
-
-const CancelOrderAlert = ({
-  orderState,
-  fulfillmentState
-}: {
-  orderState: OrderState;
-  fulfillmentState: OrderFulfillmentState;
-}) => {
-  let status: 'info' | 'warning' = 'info';
-  let message = '';
-
-  if (orderState === types.OrderState.Canceled) {
-    message = 'This order has been canceled';
-  } else if (orderState === types.OrderState.Completed) {
-    message = 'This order has been completed';
-  } else if (fulfillmentState === 'SHIPPED') {
-    message = 'This order has been shipped';
-  } else if (fulfillmentState === 'PICKED_UP') {
-    status = 'warning';
-    message =
-      "This order has been picked up, but we can't cancel the remaining fills. Please call the pharmacy.";
-  } else if (fulfillmentState === 'RECEIVED' || fulfillmentState === 'READY') {
-    status = 'warning';
-    message = 'This order may have been picked up, but we can cancel the remaining fills.';
-  }
-
-  if (message) {
-    return (
-      <Alert status={status} colorScheme={status === 'info' ? 'gray' : undefined}>
-        <AlertIcon />
-        {message}
-      </Alert>
-    );
-  }
-  return null;
 };
 
 const cancelReasons = [
@@ -574,7 +536,6 @@ export const Order = () => {
                 </Text>
                 {loading ? (
                   <HStack alignContent="center" w="150px" display="flex">
-                    <SkeletonCircle size="10" />
                     <SkeletonText skeletonHeight={5} noOfLines={2} flexGrow={1} />
                   </HStack>
                 ) : (
@@ -835,13 +796,6 @@ export const Order = () => {
                   No fills
                 </Text>
               )}
-
-              {!loading ? (
-                <CancelOrderAlert
-                  orderState={order.state as OrderState}
-                  fulfillmentState={order?.fulfillment?.state as OrderFulfillmentState}
-                />
-              ) : null}
             </VStack>
           </CardBody>
         </Card>

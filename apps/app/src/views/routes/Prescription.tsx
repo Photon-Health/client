@@ -17,7 +17,6 @@ import {
   Tooltip,
   VStack,
   Skeleton,
-  SkeletonCircle,
   SkeletonText,
   useColorMode,
   AlertTitle,
@@ -190,6 +189,59 @@ export const Prescription = () => {
         </CardHeader>
         <Divider color="gray.100" />
         <CardBody>
+          <Stack direction={{ base: 'column', sm: 'row' }} gap={[5, 3]} w="full">
+            <VStack align="start" borderRadius={6}>
+              <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                Patient
+              </Text>
+              {loading ? (
+                <HStack alignContent="center" w="150px" display="flex">
+                  <SkeletonText skeletonHeight={5} noOfLines={1} flexGrow={1} />
+                </HStack>
+              ) : (
+                <PatientView patient={patient} />
+              )}
+            </VStack>
+
+            <Show above="sm">
+              <Divider orientation="vertical" height="auto" />
+            </Show>
+
+            <VStack align="start" borderRadius={6}>
+              <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                Written
+              </Text>
+              <Stack alignItems="center" justifyContent="center" height="100%">
+                {loading ? (
+                  <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                ) : (
+                  <Text fontSize="md">{writtenAt}</Text>
+                )}
+              </Stack>
+            </VStack>
+
+            <Show above="sm">
+              <Divider orientation="vertical" height="auto" />
+            </Show>
+
+            <VStack align="start" borderRadius={6}>
+              <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                Prescriber
+              </Text>
+              {loading ? (
+                <HStack alignContent="center" w="150px" display="flex">
+                  <SkeletonText skeletonHeight={5} noOfLines={1} flexGrow={1} />
+                </HStack>
+              ) : (
+                <NameView name={prescriber?.name?.full} />
+              )}
+            </VStack>
+          </Stack>
+        </CardBody>
+
+        <Divider color="gray.100" />
+
+        <CardBody>
           <VStack
             spacing={4}
             fontSize={{ base: 'md', md: 'lg' }}
@@ -197,57 +249,6 @@ export const Prescription = () => {
             w="100%"
             mt={0}
           >
-            <Stack direction={{ base: 'column', sm: 'row' }} gap={[5, 3]} w="full">
-              <VStack align="start" borderRadius={6}>
-                <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                  Patient
-                </Text>
-                {loading ? (
-                  <HStack alignContent="center" w="150px" display="flex">
-                    <SkeletonCircle size="10" />
-                    <SkeletonText skeletonHeight={5} noOfLines={1} flexGrow={1} />
-                  </HStack>
-                ) : (
-                  <PatientView patient={patient} />
-                )}
-              </VStack>
-
-              <Show above="sm">
-                <Divider orientation="vertical" height="auto" />
-              </Show>
-
-              <VStack align="start" borderRadius={6}>
-                <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                  Written
-                </Text>
-                <Stack alignItems="center" justifyContent="center" height="100%">
-                  {loading ? (
-                    <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-                  ) : (
-                    <Text fontSize="md">{writtenAt}</Text>
-                  )}
-                </Stack>
-              </VStack>
-
-              <Show above="sm">
-                <Divider orientation="vertical" height="auto" />
-              </Show>
-
-              <VStack align="start" borderRadius={6}>
-                <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                  Prescriber
-                </Text>
-                {loading ? (
-                  <HStack alignContent="center" w="150px" display="flex">
-                    <SkeletonCircle size="10" />
-                    <SkeletonText skeletonHeight={5} noOfLines={1} flexGrow={1} />
-                  </HStack>
-                ) : (
-                  <NameView name={prescriber?.name?.full} />
-                )}
-              </VStack>
-            </Stack>
-
             <SectionTitleRow
               headerText="Prescription"
               rightElement={
@@ -387,67 +388,60 @@ export const Prescription = () => {
 
             {loading ? (
               <SkeletonText skeletonHeight={5} noOfLines={1} width="100%" />
+            ) : orders.length === 0 ? (
+              <Text>No orders for this prescription</Text>
             ) : (
-              <>
-                {orders.length === 0 ? (
-                  <Text>No orders for this prescription</Text>
-                ) : (
-                  <>
-                    <VStack spacing={4} w="full">
-                      {orders.map((fill: types.Maybe<types.Fill>) => {
-                        if (!fill) return null;
-                        const address = fill?.order?.pharmacy?.address;
-                        const addressString = formatAddress(address as FormatAddressProps);
-                        return (
-                          <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
-                            <Card
-                              variant="outline"
-                              p={[2, 3]}
-                              w="full"
-                              shadow="none"
-                              _hover={{
-                                backgroundColor: 'gray.50'
-                              }}
-                            >
-                              <HStack justifyContent="space-between">
-                                <VStack alignItems="start">
-                                  <HStack>
-                                    <LinkOverlay href={`/orders/${fill?.order?.id}`}>
-                                      <HStack spacing={2}>
-                                        <Text
-                                          fontSize="md"
-                                          as={fill?.order?.pharmacy?.name ? undefined : 'i'}
-                                        >
-                                          {fill?.order?.pharmacy?.name || 'Pending Selection'}
-                                        </Text>
-                                        <OrderStatusBadge
-                                          fulfillmentState={
-                                            fill?.order?.fulfillment?.state as OrderFulfillmentState
-                                          }
-                                          orderState={fill?.order?.state}
-                                        />
-                                      </HStack>
-                                    </LinkOverlay>
-                                  </HStack>
-                                  <Text fontSize="sm" color="gray.500">
-                                    {addressString}
-                                    {addressString ? <br /> : null}
-                                    Created:{' '}
-                                    {dayjs(fill?.order?.createdAt).format('MMM D, YYYY, h:mm A')}
+              <VStack spacing={4}>
+                {orders.map((fill: types.Maybe<types.Fill>) => {
+                  if (!fill) return null;
+                  const address = fill?.order?.pharmacy?.address;
+                  const addressString = formatAddress(address as FormatAddressProps);
+                  return (
+                    <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
+                      <Card
+                        variant="outline"
+                        p={[2, 3]}
+                        w="full"
+                        shadow="none"
+                        _hover={{
+                          backgroundColor: 'gray.50'
+                        }}
+                      >
+                        <HStack justifyContent="space-between">
+                          <VStack alignItems="start">
+                            <HStack>
+                              <LinkOverlay href={`/orders/${fill?.order?.id}`}>
+                                <HStack spacing={2}>
+                                  <Text
+                                    fontSize="md"
+                                    as={fill?.order?.pharmacy?.name ? undefined : 'i'}
+                                  >
+                                    {fill?.order?.pharmacy?.name || 'Pending Selection'}
                                   </Text>
-                                </VStack>
-                                <Box alignItems="end">
-                                  <FiChevronRight size="1.3em" />
-                                </Box>
-                              </HStack>
-                            </Card>
-                          </LinkBox>
-                        );
-                      })}
-                    </VStack>
-                  </>
-                )}
-              </>
+                                  <OrderStatusBadge
+                                    fulfillmentState={
+                                      fill?.order?.fulfillment?.state as OrderFulfillmentState
+                                    }
+                                    orderState={fill?.order?.state}
+                                  />
+                                </HStack>
+                              </LinkOverlay>
+                            </HStack>
+                            <Text fontSize="sm" color="gray.500">
+                              {addressString}
+                              {addressString ? <br /> : null}
+                              Created: {dayjs(fill?.order?.createdAt).format('MMM D, YYYY, h:mm A')}
+                            </Text>
+                          </VStack>
+                          <Box alignItems="end">
+                            <FiChevronRight size="1.3em" />
+                          </Box>
+                        </HStack>
+                      </Card>
+                    </LinkBox>
+                  );
+                })}
+              </VStack>
             )}
 
             <SectionTitleRow
