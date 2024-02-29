@@ -163,72 +163,87 @@ export const Patient = () => {
             w="100%"
             mt={0}
           >
-            {!loading && patient ? (
-              <>
-                <InfoGrid name="Date of Birth">
-                  {loading ? (
-                    <SkeletonText skeletonHeight={5} noOfLines={1} width="130px" />
-                  ) : (
-                    <Text fontSize="md" data-dd-privacy="mask">
-                      {formatDateLong(patient.dateOfBirth)}
-                    </Text>
-                  )}
-                </InfoGrid>
+            <InfoGrid name="Date of Birth">
+              {loading ? (
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+              ) : patient?.dateOfBirth ? (
+                <Text fontSize="md" data-dd-privacy="mask">
+                  {formatDateLong(patient.dateOfBirth)}
+                </Text>
+              ) : (
+                <Text fontSize="md" as="i" color="gray.500">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
 
-                <InfoGrid name="Sex">
-                  {loading ? (
-                    <SkeletonText skeletonHeight={5} noOfLines={1} width="50px" />
-                  ) : (
-                    <Text fontSize="md" data-dd-privacy="mask">
-                      {sexMap[patient.sex as keyof object]}{' '}
-                    </Text>
-                  )}
-                </InfoGrid>
+            <InfoGrid name="Sex">
+              {loading ? (
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+              ) : patient?.sex ? (
+                <Text fontSize="md" data-dd-privacy="mask">
+                  {sexMap[patient.sex as keyof object]}{' '}
+                </Text>
+              ) : (
+                <Text fontSize="md" as="i" color="gray.500">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
 
-                <InfoGrid name="Gender">
-                  {loading ? (
-                    <SkeletonText skeletonHeight={5} noOfLines={1} width="50px" />
-                  ) : (
-                    <Text fontSize="md" data-dd-privacy="mask">
-                      {patient.gender}
-                    </Text>
-                  )}
-                </InfoGrid>
+            <InfoGrid name="Gender">
+              {loading ? (
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+              ) : patient?.gender ? (
+                <Text fontSize="md" data-dd-privacy="mask">
+                  {patient.gender}
+                </Text>
+              ) : (
+                <Text fontSize="md" as="i" color="gray.500">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
 
-                <InfoGrid name="Mobile Number">
-                  {' '}
-                  {loading ? (
-                    <SkeletonText skeletonHeight={5} noOfLines={1} width="120px" />
-                  ) : (
-                    <Link
-                      fontSize="md"
-                      href={`tel:${patient.phone}`}
-                      isExternal
-                      textDecoration="underline"
-                      data-dd-privacy="mask"
-                    >
-                      {formatPhone(patient.phone)}
-                    </Link>
-                  )}
-                </InfoGrid>
+            <InfoGrid name="Mobile Number">
+              {loading ? (
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+              ) : patient?.phone ? (
+                <Link
+                  fontSize="md"
+                  href={`tel:${patient.phone}`}
+                  isExternal
+                  textDecoration="underline"
+                  data-dd-privacy="mask"
+                >
+                  {formatPhone(patient.phone)}
+                </Link>
+              ) : (
+                <Text fontSize="md" as="i" color="gray.500">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
 
-                <InfoGrid name="Email">
-                  {loading ? (
-                    <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
-                  ) : (
-                    <Link
-                      fontSize="md"
-                      href={`mailto:${patient.email}`}
-                      isExternal
-                      textDecoration="underline"
-                      data-dd-privacy="mask"
-                    >
-                      {patient.email}
-                    </Link>
-                  )}
-                </InfoGrid>
-              </>
-            ) : null}
+            <InfoGrid name="Email">
+              {loading ? (
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+              ) : patient?.email ? (
+                <Link
+                  fontSize="md"
+                  href={`mailto:${patient.email}`}
+                  isExternal
+                  textDecoration="underline"
+                  data-dd-privacy="mask"
+                >
+                  {patient.email}
+                </Link>
+              ) : (
+                <Text fontSize="md" as="i" color="gray.500">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
           </VStack>
         </CardBody>
 
@@ -293,18 +308,17 @@ export const Patient = () => {
             <SectionTitleRow
               headerText="Orders"
               rightElement={
-                !loading ? (
-                  <Button
-                    leftIcon={<FiPlus />}
-                    aria-label="New Order"
-                    as={RouterLink}
-                    to={`/orders/new?patientId=${id}`}
-                    colorScheme="blue"
-                    size="sm"
-                  >
-                    Create Order
-                  </Button>
-                ) : undefined
+                <Button
+                  leftIcon={<FiPlus />}
+                  aria-label="New Order"
+                  as={RouterLink}
+                  to={`/orders/new?patientId=${id}`}
+                  colorScheme="blue"
+                  size="sm"
+                  isDisabled={loading}
+                >
+                  Create Order
+                </Button>
               }
             />
 
