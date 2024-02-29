@@ -50,6 +50,7 @@ import { gql, useApolloClient, useMutation, useQuery } from '@apollo/client';
 import { CANCEL_ORDER, REROUTE_ORDER } from '../../mutations';
 import { TicketModal } from '../components/TicketModal';
 import { Fill, Order as OrderType } from '@photonhealth/sdk/dist/types';
+import { datadogRum } from '@datadog/browser-rum';
 
 const PHARMACY_FRAGMENT = gql`
   fragment PharmacyFragment on Pharmacy {
@@ -463,6 +464,10 @@ export const Order = () => {
                 order?.fulfillment?.state === 'SHIPPED'
               }
               onClick={async () => {
+                datadogRum.addAction('cancel_order_btn_click', {
+                  orderId: id
+                });
+
                 const decision = await confirmWrapper('Cancel this order?', {
                   description: (
                     <RadioGroup onChange={setCancelReason}>
@@ -497,7 +502,13 @@ export const Order = () => {
             <Button
               aria-label="Report Issue"
               colorScheme="blue"
-              onClick={() => setIsTicketModalOpen(true)}
+              onClick={() => {
+                datadogRum.addAction('report_issue_btn_click', {
+                  orderId: id
+                });
+
+                setIsTicketModalOpen(true);
+              }}
               isDisabled={loading}
             >
               Report Issue
@@ -606,7 +617,18 @@ export const Order = () => {
                             Select a pharmacy for the patient if needed.
                           </Text>
                         </VStack>
-                        <Button onClick={onOpen} colorScheme="blue" variant="link" mt={2}>
+                        <Button
+                          onClick={() => {
+                            datadogRum.addAction('select_pharmacy_btn_click', {
+                              orderId: id
+                            });
+
+                            onOpen();
+                          }}
+                          colorScheme="blue"
+                          variant="link"
+                          mt={2}
+                        >
                           Select Pharmacy
                         </Button>
                       </VStack>

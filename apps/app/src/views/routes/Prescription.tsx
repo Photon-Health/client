@@ -51,6 +51,8 @@ import SectionTitleRow from '../components/SectionTitleRow';
 import usePermissions from '../../hooks/usePermissions';
 import { CANCEL_PRESCRIPTION } from '../../mutations';
 
+import { datadogRum } from '@datadog/browser-rum';
+
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
     parse: JSON.parse,
@@ -171,6 +173,10 @@ export const Prescription = () => {
             isLoading={canceling}
             loadingText="Canceling..."
             onClick={async () => {
+              datadogRum.addAction('cancel_prescription_btn_click', {
+                prescriptionId: id
+              });
+
               const decision = await confirmWrapper('Cancel this prescription?', {
                 description: 'You will not be able to undo this action.',
                 cancelText: "No, Don't Cancel",
@@ -195,6 +201,10 @@ export const Prescription = () => {
             leftIcon={<FiPlus />}
             aria-label="New Order"
             onClick={() => {
+              datadogRum.addAction('new_order_btn_click', {
+                prescriptionId: id
+              });
+
               if (canCreateOrder) {
                 navigate(
                   `/orders/new?prescriptionId=${id}${
@@ -308,6 +318,10 @@ export const Prescription = () => {
                   leftIcon={<FiRepeat />}
                   aria-label="Duplicate Prescription"
                   onClick={() => {
+                    datadogRum.addAction('renew_btn_click', {
+                      prescriptionId: id
+                    });
+
                     if (canDuplicate) {
                       navigate(
                         `/prescriptions/new?prescriptionIds=${id}${
