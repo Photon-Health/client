@@ -1,4 +1,4 @@
-import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useParams, Link as RouterLink } from 'react-router-dom';
 
 import {
   Alert,
@@ -14,12 +14,9 @@ import {
   Divider,
   HStack,
   Link,
+  LinkBox,
+  LinkOverlay,
   SkeletonText,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Tr,
   Text,
   VStack
 } from '@chakra-ui/react';
@@ -41,8 +38,6 @@ import SectionTitleRow from '../components/SectionTitleRow';
 export const Patient = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const { patientId: id } = useParams();
-
-  const navigate = useNavigate();
 
   const { getPatient, getPrescriptions, getOrders } = usePhoton();
   const {
@@ -146,7 +141,13 @@ export const Patient = () => {
         </CardHeader>
         <Divider color="gray.100" />
         <CardBody>
-          <VStack spacing={4} align="justify-start">
+          <VStack
+            spacing={4}
+            fontSize={{ base: 'md', md: 'lg' }}
+            alignItems="start"
+            w="100%"
+            mt={0}
+          >
             {!loading && patient ? (
               <>
                 <InfoGrid name="Date of Birth">
@@ -213,7 +214,19 @@ export const Patient = () => {
                 </InfoGrid>
               </>
             ) : null}
+          </VStack>
+        </CardBody>
 
+        <Divider color="gray.100" />
+
+        <CardBody>
+          <VStack
+            spacing={4}
+            fontSize={{ base: 'md', md: 'lg' }}
+            alignItems="start"
+            w="100%"
+            mt={0}
+          >
             <SectionTitleRow
               headerText="Prescriptions"
               rightElement={
@@ -232,49 +245,48 @@ export const Patient = () => {
               }
             />
 
-            {prescriptions.length > 0 ? (
-              <TableContainer>
-                <Table bg="transparent" size="sm">
-                  <Tbody>
-                    {prescriptions.map(({ id: prescriptionId, treatment, state, writtenAt }, i) =>
-                      i < 5 ? (
-                        <Tr
-                          key={prescriptionId}
-                          onClick={() => navigate(`/prescriptions/${prescriptionId}`)}
-                          _hover={{ backgroundColor: 'gray.100' }}
-                          cursor="pointer"
-                        >
-                          <Td px={0} py={3} whiteSpace="pre-wrap" borderColor="gray.200">
-                            <HStack w="full" justify="space-between">
-                              <VStack alignItems="start">
-                                <Text>{treatment.name}</Text>
-                                <HStack>
-                                  <Badge
-                                    size="sm"
-                                    colorScheme={
-                                      PRESCRIPTION_COLOR_MAP[state as keyof object] || ''
-                                    }
-                                  >
-                                    {PRESCRIPTION_STATE_MAP[state as keyof object] || ''}
-                                  </Badge>
-                                  <Text>{formatDate(writtenAt)}</Text>
-                                </HStack>
-                              </VStack>
-                              <Box alignItems="end">
-                                <FiChevronRight size="1.3em" />
-                              </Box>
-                            </HStack>
-                          </Td>
-                        </Tr>
-                      ) : null
-                    )}
-                  </Tbody>
-                </Table>
-              </TableContainer>
-            ) : (
+            {loading ? (
+              <SkeletonText skeletonHeight={20} noOfLines={1} width="300px" />
+            ) : prescriptions.length === 0 ? (
               <Text as="i" fontSize="sm" color="gray.500">
                 No prescriptions
               </Text>
+            ) : (
+              <VStack spacing={3} align="start">
+                {prescriptions.map(({ id: prescriptionId, treatment, state, writtenAt }) => (
+                  <LinkBox key={prescriptionId} style={{ textDecoration: 'none' }} w="full">
+                    <Card
+                      variant="outline"
+                      p={3}
+                      shadow="none"
+                      backgroundColor="gray.50"
+                      _hover={{ backgroundColor: 'gray.100' }}
+                    >
+                      <HStack w="full" justify="space-between">
+                        <VStack alignItems="start">
+                          <LinkOverlay href={`/prescriptions/${prescriptionId}`}>
+                            <Text fontSize="md">{treatment.name}</Text>
+                          </LinkOverlay>
+                          <HStack>
+                            <Badge
+                              size="sm"
+                              colorScheme={PRESCRIPTION_COLOR_MAP[state as keyof object] || ''}
+                            >
+                              {PRESCRIPTION_STATE_MAP[state as keyof object] || ''}
+                            </Badge>
+                            <Text fontSize="md" color="gray.500">
+                              {formatDate(writtenAt)}
+                            </Text>
+                          </HStack>
+                        </VStack>
+                        <Box alignItems="end">
+                          <FiChevronRight size="1.3em" />
+                        </Box>
+                      </HStack>
+                    </Card>
+                  </LinkBox>
+                ))}
+              </VStack>
             )}
 
             <SectionTitleRow
@@ -295,47 +307,50 @@ export const Patient = () => {
               }
             />
 
-            {orders.length > 0 ? (
-              <TableContainer>
-                <Table bg="transparent" size="sm">
-                  <Tbody>
-                    {orders.map(({ id: orderId, fulfillment, fills, createdAt, state }, i) => {
-                      const medNames = getMedicationNames(fills).join(', ');
-
-                      return i < 5 ? (
-                        <Tr
-                          key={orderId}
-                          onClick={() => navigate(`/orders/${orderId}`)}
-                          _hover={{ backgroundColor: 'gray.100' }}
-                          cursor="pointer"
-                        >
-                          <Td px={0} py={3} whiteSpace="pre-wrap" borderColor="gray.200">
-                            <HStack w="full" justify="space-between">
-                              <VStack alignItems="start">
-                                <Text>{medNames}</Text>
-                                <HStack>
-                                  <OrderStatusBadge
-                                    fulfillmentState={fulfillment?.state as OrderFulfillmentState}
-                                    orderState={state}
-                                  />
-                                  <Text>{formatDate(createdAt)}</Text>
-                                </HStack>
-                              </VStack>
-                              <Box alignItems="end">
-                                <FiChevronRight size="1.3em" />
-                              </Box>
-                            </HStack>
-                          </Td>
-                        </Tr>
-                      ) : null;
-                    })}
-                  </Tbody>
-                </Table>
-              </TableContainer>
-            ) : (
+            {loading ? (
+              <SkeletonText skeletonHeight={20} noOfLines={1} width="300px" />
+            ) : orders.length === 0 ? (
               <Text as="i" fontSize="sm" color="gray.500">
                 No Orders
               </Text>
+            ) : (
+              <VStack spacing={3} align="start">
+                {orders.map(({ id: orderId, fulfillment, fills, createdAt, state }, i) => {
+                  const medNames = getMedicationNames(fills).join(', ');
+
+                  return i < 5 ? (
+                    <LinkBox key={orderId} style={{ textDecoration: 'none' }} w="full">
+                      <Card
+                        variant="outline"
+                        p={3}
+                        shadow="none"
+                        backgroundColor="gray.50"
+                        _hover={{ backgroundColor: 'gray.100' }}
+                      >
+                        <HStack w="full" justify="space-between">
+                          <VStack alignItems="start">
+                            <LinkOverlay href={`/orders/${orderId}`}>
+                              <Text fontSize="md">{medNames}</Text>
+                            </LinkOverlay>
+                            <HStack>
+                              <OrderStatusBadge
+                                fulfillmentState={fulfillment?.state as OrderFulfillmentState}
+                                orderState={state}
+                              />
+                              <Text fontSize="md" color="gray.500">
+                                {formatDate(createdAt)}
+                              </Text>
+                            </HStack>
+                          </VStack>
+                          <Box alignItems="end">
+                            <FiChevronRight size="1.3em" />
+                          </Box>
+                        </HStack>
+                      </Card>
+                    </LinkBox>
+                  ) : null;
+                })}
+              </VStack>
             )}
           </VStack>
         </CardBody>

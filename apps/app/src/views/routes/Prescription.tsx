@@ -387,11 +387,11 @@ export const Prescription = () => {
             />
 
             {loading ? (
-              <SkeletonText skeletonHeight={5} noOfLines={1} width="100%" />
+              <SkeletonText skeletonHeight={20} noOfLines={1} width="300px" />
             ) : orders.length === 0 ? (
               <Text>No orders for this prescription</Text>
             ) : (
-              <VStack spacing={4}>
+              <VStack spacing={3}>
                 {orders.map((fill: types.Maybe<types.Fill>) => {
                   if (!fill) return null;
                   const address = fill?.order?.pharmacy?.address;
@@ -400,12 +400,11 @@ export const Prescription = () => {
                     <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
                       <Card
                         variant="outline"
-                        p={[2, 3]}
+                        p={3}
                         w="full"
                         shadow="none"
-                        _hover={{
-                          backgroundColor: 'gray.50'
-                        }}
+                        backgroundColor="gray.50"
+                        _hover={{ backgroundColor: 'gray.100' }}
                       >
                         <HStack justifyContent="space-between">
                           <VStack alignItems="start">
