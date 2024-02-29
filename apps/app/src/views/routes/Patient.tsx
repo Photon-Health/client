@@ -17,6 +17,7 @@ import {
   LinkBox,
   LinkOverlay,
   SkeletonText,
+  Stack,
   Text,
   VStack
 } from '@chakra-ui/react';
@@ -112,19 +113,33 @@ export const Patient = () => {
         )
       }
       buttons={
-        <Button
-          aria-label="Edit patient details"
-          as={RouterLink}
-          to={`/patients/update/${id}`}
-          leftIcon={<FiEdit />}
-          variant="outline"
-          borderColor="orange.500"
-          textColor="orange.500"
-          colorScheme="orange"
-          w={{ base: 'full', md: 'auto' }}
+        <Stack
+          direction={{ base: 'column-reverse', md: 'row' }}
+          w={{ base: 'full', sm: undefined }}
+          justify="end"
         >
-          Edit
-        </Button>
+          <Button
+            aria-label="Edit patient details"
+            as={RouterLink}
+            to={`/patients/update/${id}`}
+            leftIcon={<FiEdit />}
+            variant="outline"
+            borderColor="orange.500"
+            textColor="orange.500"
+            colorScheme="orange"
+          >
+            Edit Patient
+          </Button>
+          <Button
+            leftIcon={<FiPlus />}
+            aria-label="New Order"
+            as={RouterLink}
+            to={`/prescriptions/new?patientId=${id}`}
+            colorScheme="blue"
+          >
+            Create Prescription
+          </Button>
+        </Stack>
       }
     >
       <Card>
@@ -227,23 +242,7 @@ export const Patient = () => {
             w="100%"
             mt={0}
           >
-            <SectionTitleRow
-              headerText="Prescriptions"
-              rightElement={
-                !loading ? (
-                  <Button
-                    leftIcon={<FiPlus />}
-                    aria-label="New Order"
-                    as={RouterLink}
-                    to={`/prescriptions/new?patientId=${id}`}
-                    colorScheme="blue"
-                    size="sm"
-                  >
-                    Create Prescription
-                  </Button>
-                ) : undefined
-              }
-            />
+            <SectionTitleRow headerText="Prescriptions" />
 
             {loading ? (
               <SkeletonText skeletonHeight={20} noOfLines={1} width="300px" />
