@@ -148,6 +148,7 @@ export const ReadyBy = () => {
                           value={option.label}
                           colorScheme="brand"
                           onClick={(e) => isDisabled && e.preventDefault()}
+                          isDisabled={isDisabled}
                           cursor={isDisabled ? 'not-allowed' : 'pointer'}
                         />
                         <VStack spacing={1}>
