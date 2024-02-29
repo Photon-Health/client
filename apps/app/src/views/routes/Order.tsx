@@ -734,6 +734,15 @@ export const Order = () => {
 
               {!loading && order.fulfillment?.type === 'MAIL_ORDER' ? (
                 <>
+                  <InfoGrid name="Delivery Address">
+                    {order.patient?.address ? (
+                      <Text fontSize="md">{formatAddress(order.patient.address)}</Text>
+                    ) : (
+                      <Text fontSize="md" as="i" color="gray.500">
+                        None
+                      </Text>
+                    )}
+                  </InfoGrid>
                   <InfoGrid name="Carrier">
                     {order.fulfillment?.carrier ? (
                       <Text fontSize="md">{order.fulfillment.carrier}</Text>
