@@ -312,7 +312,7 @@ export const Patient = () => {
               <SkeletonText skeletonHeight={20} noOfLines={1} width="300px" />
             ) : orders.length === 0 ? (
               <Text as="i" fontSize="sm" color="gray.500">
-                No Orders
+                No orders
               </Text>
             ) : (
               <VStack spacing={3} align="start">

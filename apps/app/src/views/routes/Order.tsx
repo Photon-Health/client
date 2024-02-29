@@ -162,6 +162,14 @@ function uniqueFills(order: OrderType): Fill[] {
   );
 }
 
+const rxSummary = (fill: Fill): string => {
+  const dispenseQuantity = fill.prescription?.dispenseQuantity || '';
+  const dispenseUnit = fill.prescription?.dispenseUnit || '';
+  const fillsAllowed = fill.prescription?.fillsAllowed ? fill.prescription.fillsAllowed - 1 : '';
+  const instructions = fill.prescription?.instructions || '';
+  return `${dispenseQuantity} ${dispenseUnit}, ${fillsAllowed} Refills - ${instructions}`;
+};
+
 // ripped from components
 function formatRxString({
   dispenseQuantity = 0,
@@ -583,101 +591,95 @@ export const Order = () => {
               w="100%"
               mt={0}
             >
-              <SectionTitleRow
-                headerText="Pharmacy Information"
-                rightElement={
-                  order?.state === types.OrderState.Routing ? (
-                    <>
-                      <LocationSearch
-                        isOpen={isOpenLocation}
-                        onClose={({ loc, lat, lng }) => {
-                          if (loc && lat && lng) {
-                            setLocation({ loc, lat, lng });
-                          }
-                          onCloseLocation();
-                        }}
-                      />
-                      <Modal isOpen={isOpen} onClose={onClose}>
-                        <ModalOverlay />
-                        <ModalContent>
-                          <ModalHeader>Select a Pharmacy</ModalHeader>
-                          <ModalCloseButton />
-
-                          <ModalBody>
-                            <LocalPickup
-                              location={location.loc}
-                              latitude={location.lat}
-                              longitude={location.lng}
-                              onOpen={onOpenLocation}
-                              patient={order.patient}
-                              pharmacyId=""
-                              updatePreferredPharmacy={false}
-                              setUpdatePreferredPharmacy={() => {}}
-                              preferredPharmacyIds={[]}
-                              setFieldValue={(_, id) => {
-                                setPharmacyId(id);
-                              }}
-                              resetSelection={() => {}}
-                            />
-                          </ModalBody>
-
-                          <ModalFooter>
-                            <Button
-                              aria-label="Close Pharmacy Select Modal"
-                              variant="solid"
-                              size="sm"
-                              mr={3}
-                              onClick={() => {
-                                setPharmacyId('');
-                                onClose();
-                              }}
-                            >
-                              Close
-                            </Button>
-                            <Button
-                              aria-label="Set Pharmacy"
-                              variant="solid"
-                              colorScheme="blue"
-                              size="sm"
-                              isLoading={updating}
-                              loadingText="Setting Pharmacy..."
-                              isDisabled={!pharmacyId}
-                              onClick={async () => {
-                                setUpdating(true);
-                                await rerouteOrder({ variables: { id, pharmacyId } });
-                                setPharmacyId('');
-                                setUpdating(false);
-                                onClose();
-                              }}
-                            >
-                              Set Pharmacy
-                            </Button>
-                          </ModalFooter>
-                        </ModalContent>
-                      </Modal>
-                    </>
-                  ) : undefined
-                }
-              />
+              <SectionTitleRow headerText="Pharmacy Information" />
 
               {order?.state === types.OrderState.Routing ? (
-                <Card backgroundColor="gray.50" shadow="none" variant="outline">
-                  <CardBody p={3}>
-                    <VStack spacing={1} align="start">
-                      <VStack spacing={0} align="start">
-                        <Text fontSize="md" fontWeight="medium">
-                          This order is pending pharmacy selection by the patient.
-                        </Text>
-                        <Text fontSize="md" color="gray.500">
-                          Select a pharmacy for the patient if needed.
-                        </Text>
+                <>
+                  <Card backgroundColor="gray.50" shadow="none" variant="outline">
+                    <CardBody p={3}>
+                      <VStack spacing={1} align="start">
+                        <VStack spacing={0} align="start">
+                          <Text fontSize="md" fontWeight="medium">
+                            This order is pending pharmacy selection by the patient.
+                          </Text>
+                          <Text fontSize="md" color="gray.500">
+                            Select a pharmacy for the patient if needed.
+                          </Text>
+                        </VStack>
+                        <Button onClick={onOpen} colorScheme="blue" variant="link" mt={2}>
+                          Select Pharmacy
+                        </Button>
                       </VStack>
-                      <Button onClick={onOpen} colorScheme="blue" variant="link" mt={2}>
-                        Select Pharmacy
-                      </Button>
-                    </VStack>
-                  </CardBody>
-                </Card>
+                    </CardBody>
+                  </Card>
+                  <LocationSearch
+                    isOpen={isOpenLocation}
+                    onClose={({ loc, lat, lng }) => {
+                      if (loc && lat && lng) {
+                        setLocation({ loc, lat, lng });
+                      }
+                      onCloseLocation();
+                    }}
+                  />
+                  <Modal isOpen={isOpen} onClose={onClose}>
+                    <ModalOverlay />
+                    <ModalContent>
+                      <ModalHeader>Select a Pharmacy</ModalHeader>
+                      <ModalCloseButton />
+
+                      <ModalBody>
+                        <LocalPickup
+                          location={location.loc}
+                          latitude={location.lat}
+                          longitude={location.lng}
+                          onOpen={onOpenLocation}
+                          patient={order.patient}
+                          pharmacyId=""
+                          updatePreferredPharmacy={false}
+                          setUpdatePreferredPharmacy={() => {}}
+                          preferredPharmacyIds={[]}
+                          setFieldValue={(_, id) => {
+                            setPharmacyId(id);
+                          }}
+                          resetSelection={() => {}}
+                        />
+                      </ModalBody>
+
+                      <ModalFooter>
+                        <Button
+                          aria-label="Close Pharmacy Select Modal"
+                          variant="solid"
+                          size="sm"
+                          mr={3}
+                          onClick={() => {
+                            setPharmacyId('');
+                            onClose();
+                          }}
+                        >
+                          Close
+                        </Button>
+                        <Button
+                          aria-label="Set Pharmacy"
+                          variant="solid"
+                          colorScheme="blue"
+                          size="sm"
+                          isLoading={updating}
+                          loadingText="Setting Pharmacy..."
+                          isDisabled={!pharmacyId}
+                          onClick={async () => {
+                            setUpdating(true);
+                            await rerouteOrder({ variables: { id, pharmacyId } });
+                            setPharmacyId('');
+                            setUpdating(false);
+                            onClose();
+                          }}
+                        >
+                          Set Pharmacy
+                        </Button>
+                      </ModalFooter>
+                    </ModalContent>
+                  </Modal>
+                </>
               ) : null}
 
               <InfoGrid name="Name">
@@ -686,7 +688,7 @@ export const Order = () => {
                 ) : order?.pharmacy?.name ? (
                   <Text fontSize="md">{order.pharmacy.name}</Text>
                 ) : (
-                  <Text fontSize="md" as="i">
+                  <Text fontSize="md" as="i" color="gray.500">
                     None
                   </Text>
                 )}
@@ -700,7 +702,7 @@ export const Order = () => {
                     {formatPhone(order.pharmacy.phone)}
                   </Link>
                 ) : (
-                  <Text fontSize="md" as="i">
+                  <Text fontSize="md" as="i" color="gray.500">
                     None
                   </Text>
                 )}
@@ -712,7 +714,7 @@ export const Order = () => {
                 ) : order?.pharmacy?.address ? (
                   <Text fontSize="md">{formatAddress(order.pharmacy.address)}</Text>
                 ) : (
-                  <Text fontSize="md" as="i">
+                  <Text fontSize="md" as="i" color="gray.500">
                     None
                   </Text>
                 )}
@@ -724,7 +726,7 @@ export const Order = () => {
                 ) : order?.pharmacy?.id ? (
                   <CopyText text={order.pharmacy.id} />
                 ) : (
-                  <Text fontSize="md" as="i">
+                  <Text fontSize="md" as="i" color="gray.500">
                     None
                   </Text>
                 )}
@@ -736,7 +738,7 @@ export const Order = () => {
                     {order.fulfillment?.carrier ? (
                       <Text fontSize="md">{order.fulfillment.carrier}</Text>
                     ) : (
-                      <Text fontSize="md" as="i">
+                      <Text fontSize="md" as="i" color="gray.500">
                         None
                       </Text>
                     )}
@@ -745,7 +747,7 @@ export const Order = () => {
                     {order.fulfillment?.trackingNumber ? (
                       <Text fontSize="md">{order.fulfillment.trackingNumber}</Text>
                     ) : (
-                      <Text fontSize="md" as="i">
+                      <Text fontSize="md" as="i" color="gray.500">
                         None
                       </Text>
                     )}
@@ -755,7 +757,13 @@ export const Order = () => {
 
               <SectionTitleRow headerText="Prescription Fills" />
 
-              {prescriptions.length > 0 ? (
+              {loading ? (
+                <SkeletonText skeletonHeight={20} noOfLines={1} width="300px" />
+              ) : prescriptions.length === 0 ? (
+                <Text as="i" fontSize="sm" color="gray.500">
+                  No fills
+                </Text>
+              ) : (
                 <VStack spacing={3}>
                   {prescriptions.map((fill: Fill, i: number) => {
                     return i < 5 ? (
@@ -773,15 +781,9 @@ export const Order = () => {
                                 <Text fontSize="md">{fill.treatment.name}</Text>
                               </LinkOverlay>
                               <Text fontSize="md" color="gray.500">
-                                {fill.prescription?.dispenseQuantity}{' '}
-                                {fill.prescription?.dispenseUnit},{' '}
-                                {fill.prescription?.fillsAllowed
-                                  ? fill.prescription?.fillsAllowed - 1
-                                  : ''}{' '}
-                                Refills - {fill.prescription?.instructions}
+                                {rxSummary(fill)}
                               </Text>
                             </VStack>
-
                             <Box alignItems="end">
                               <FiChevronRight size="1.3em" />
                             </Box>
@@ -791,10 +793,6 @@ export const Order = () => {
                     ) : null;
                   })}
                 </VStack>
-              ) : (
-                <Text as="i" fontSize="sm" color="gray.500">
-                  No fills
-                </Text>
               )}
             </VStack>
           </CardBody>

@@ -328,7 +328,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Instructions">
               {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text fontSize="md">{instructions}</Text>
               )}
@@ -336,7 +336,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Pharmacy Notes">
               {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text
                   fontSize="md"
@@ -360,7 +360,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Fills Remaining">
               {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="20px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text fontSize="md">{fillsRemaining}</Text>
               )}
@@ -368,7 +368,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Fills Allowed">
               {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="20px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text fontSize="md">{fillsAllowed}</Text>
               )}
@@ -392,7 +392,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Dispense As Written">
               {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="50px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text fontSize="md">{dispenseAsWritten ? 'Yes' : 'No'}</Text>
               )}
@@ -400,11 +400,11 @@ export const Prescription = () => {
 
             <InfoGrid name="External Id">
               {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="65px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : rx.externalId ? (
                 <CopyText text={rx.externalId || ''} />
               ) : (
-                <Text fontSize="md" as="i">
+                <Text fontSize="md" as="i" color="gray.500">
                   None
                 </Text>
               )}
