@@ -159,6 +159,58 @@ export const Prescription = () => {
           <CopyText text={id || ''} />
         )
       }
+      buttons={
+        <Stack
+          direction={{ base: 'column-reverse', md: 'row' }}
+          w={{ base: 'full', sm: undefined }}
+          justify="end"
+        >
+          <Button
+            aria-label="Cancel Prescription"
+            isDisabled={loading || rx.state !== 'ACTIVE'}
+            isLoading={canceling}
+            loadingText="Canceling..."
+            onClick={async () => {
+              const decision = await confirmWrapper('Cancel this prescription?', {
+                description: 'You will not be able to undo this action.',
+                cancelText: "No, Don't Cancel",
+                confirmText: 'Yes, Cancel',
+                darkMode: colorMode !== 'light',
+                colorScheme: 'red'
+              });
+              if (decision) {
+                setCanceling(true);
+                graphQLClient.setHeader('authorization', accessToken);
+                await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
+                navigate(0);
+              }
+            }}
+            variant="outline"
+            textColor="red.500"
+            colorScheme="red"
+          >
+            Cancel Prescription
+          </Button>
+          <Button
+            leftIcon={<FiPlus />}
+            aria-label="New Order"
+            onClick={() => {
+              if (canCreateOrder) {
+                navigate(
+                  `/orders/new?prescriptionId=${id}${
+                    patient?.id ? `&patientId=${patient?.id}` : ''
+                  }`
+                );
+              }
+            }}
+            isDisabled={!canCreateOrder}
+            colorScheme="blue"
+            role="link"
+          >
+            Create Order
+          </Button>
+        </Stack>
+      }
     >
       <Card>
         <CardHeader>
@@ -361,29 +413,6 @@ export const Prescription = () => {
             <SectionTitleRow
               headerText="Pharmacy Orders"
               subHeaderText="Below are orders that include fills from this prescription."
-              rightElement={
-                loading ? undefined : (
-                  <Button
-                    leftIcon={<FiPlus />}
-                    aria-label="New Order"
-                    onClick={() => {
-                      if (canCreateOrder) {
-                        navigate(
-                          `/orders/new?prescriptionId=${id}${
-                            patient?.id ? `&patientId=${patient?.id}` : ''
-                          }`
-                        );
-                      }
-                    }}
-                    isDisabled={!canCreateOrder}
-                    colorScheme="blue"
-                    size="sm"
-                    role="link"
-                  >
-                    Create Order
-                  </Button>
-                )
-              }
             />
 
             {loading ? (
@@ -441,48 +470,6 @@ export const Prescription = () => {
                   );
                 })}
               </VStack>
-            )}
-
-            <SectionTitleRow
-              headerText="Actions"
-              subHeaderText="Canceling a prescription will prevent any team member from adding the prescription
-                  fills in a new order."
-              rightElement={
-                <Button
-                  aria-label="Cancel Prescription"
-                  isDisabled={loading || rx.state !== 'ACTIVE'}
-                  isLoading={canceling}
-                  loadingText="Canceling..."
-                  onClick={async () => {
-                    const decision = await confirmWrapper('Cancel this prescription?', {
-                      description: 'You will not be able to undo this action.',
-                      cancelText: "No, Don't Cancel",
-                      confirmText: 'Yes, Cancel',
-                      darkMode: colorMode !== 'light',
-                      colorScheme: 'red'
-                    });
-                    if (decision) {
-                      setCanceling(true);
-                      graphQLClient.setHeader('authorization', accessToken);
-                      await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
-                      navigate(0);
-                    }
-                  }}
-                  variant="outline"
-                  textColor="red.500"
-                  colorScheme="red"
-                  size="sm"
-                >
-                  Cancel Prescription
-                </Button>
-              }
-            />
-
-            {rx?.state && rx.state !== 'ACTIVE' && (
-              <Alert colorScheme="gray">
-                <AlertIcon />
-                This prescription has been {rx?.state?.toLowerCase()}
-              </Alert>
             )}
           </VStack>
         </CardBody>
