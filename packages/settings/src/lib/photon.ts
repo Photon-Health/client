@@ -1,10 +1,13 @@
 import { OrganizationSettings } from '../types';
 
-// const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
-const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
-const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
-const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
-
+import {
+  CUREXA_PHARMACY_ID,
+  CAREPOINT_PHARMACY_ID,
+  AMAZON_PHARMACY_ID,
+  TAILORMADE_PHARMACY_ID,
+  REDBOX_PHARMACY_ID,
+  GOGOMEDS_PHARMACY_ID
+} from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
  * to default settings can affect multiple orgs
@@ -94,7 +97,7 @@ const organizationSettings: {
     logo: 'river_health_logo.svg',
     accentColor: '#2faef3',
     mailOrder: true,
-    mailOrderProviders: [CAREPOINT_ID]
+    mailOrderProviders: [CAREPOINT_PHARMACY_ID]
   },
   // Peachy
   org_vTC7G2EAuHgac90E: {
@@ -103,7 +106,7 @@ const organizationSettings: {
     accentColor: '#1D1D1F',
     pickUp: false,
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
     federated: true,
     sendToPatient: false,
     enableRxAndOrder: false
@@ -119,7 +122,7 @@ const organizationSettings: {
     ...defaultSettings,
     pickUp: false,
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
     sendToPatient: false
   },
   // Mishe
@@ -146,7 +149,7 @@ const organizationSettings: {
     ...defaultSettings,
     pickUp: false,
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
     sendToPatient: false,
     enableRxAndOrder: false
   },
@@ -155,7 +158,7 @@ const organizationSettings: {
     ...defaultSettings,
     pickUp: false,
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
     sendToPatient: false,
     enableRxAndOrder: false
   },
@@ -164,7 +167,7 @@ const organizationSettings: {
     ...defaultSettings,
     pickUp: false,
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
     sendToPatient: false,
     enableRxAndOrder: false
   },
@@ -173,7 +176,7 @@ const organizationSettings: {
     ...defaultSettings,
     pickUp: false,
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
     sendToPatient: false,
     enableRxAndOrder: false
   },
@@ -182,7 +185,7 @@ const organizationSettings: {
     ...defaultSettings,
     pickUp: false,
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
     sendToPatient: false,
     enableRxAndOrder: false
   },
@@ -250,7 +253,7 @@ const organizationSettings: {
     logo: 'moment_health_logo.webp',
     accentColor: '#FF001F',
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID]
+    mailOrderProviders: [CUREXA_PHARMACY_ID]
   },
   // Brightside
   org_Dcq069P9AxLlv4l2: {
@@ -272,5 +275,21 @@ const organizationSettings: {
     sendToPatient: true,
     enableCourierNavigate: false,
     topRankedCostco: true
+  },
+  // DrTelx
+  org_6DKb7celAunAoLzb: {
+    ...defaultSettings,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [TAILORMADE_PHARMACY_ID, GOGOMEDS_PHARMACY_ID]
+  },
+  // Redbox Rx
+  org_fPIzyQJhFqvBAhJG: {
+    ...defaultSettings,
+    logo: 'redbox_logo.jpg',
+    accentColor: '#E81D21',
+    mailOrder: true,
+    pickUp: false,
+    mailOrderProviders: [REDBOX_PHARMACY_ID]
   }
 };
