@@ -257,13 +257,14 @@ export class PhotonClient {
    * Clears the organization ID
    * @returns PhotonSDK
    */
-  public removeOrganization() {
+  public clearOrganization() {
     this.organization = undefined;
     this.authentication = new AuthManager({
       authentication: this.auth0Client,
       organization: undefined,
       audience: this.audience
     });
+    this.authentication.login({});
     return this;
   }
 }
