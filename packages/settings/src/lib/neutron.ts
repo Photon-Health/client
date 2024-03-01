@@ -1,13 +1,15 @@
 import { OrganizationSettings } from '../types';
 
-const CUREXA_ID = 'phr_01GCA54GVKA06C905DETQ9SY98';
-const CAREPOINT_ID = 'phr_01GA9HPVBVJ0E65P819FD881N0';
-const EMPOWER_ID = 'phr_01HMEZG7Y2SVA4T7MW49XYAPVF';
-// const ALTO_ID = 'phr_01G9CM93X1NFP1C9H9K50DPKHX';
-const AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
-const HONEYBEE_PHARMACY_ID = 'phr_01GA9HPXNE3TGEWPK91YY8Z4TS';
-const TRUE_PILL_ID = 'phr_01HHDHKAMNMKC3CRY8VCYRVVPE';
-const COSTCO_ID = 'phr_01GA9HPWTQ75YNJGFD505X5C4J';
+import {
+  CUREXA_PHARMACY_ID,
+  CAREPOINT_PHARMACY_ID,
+  AMAZON_PHARMACY_ID,
+  TRUEPILL_PHARMACY_ID,
+  HONEYBEE_PHARMACY_ID,
+  EMPOWER_PHARMACY_ID,
+  COSTCO_PHARMACY_ID,
+  REDBOX_PHARMACY_ID
+} from '../pharmacies';
 
 /**
  * All orgs inherit from default settings, so updates
@@ -59,7 +61,12 @@ const organizationSettings: {
     accentColor: '#b35724',
     mailOrder: true,
     enableMedHistory: true,
-    mailOrderProviders: [CUREXA_ID, CAREPOINT_ID, TRUE_PILL_ID, HONEYBEE_PHARMACY_ID],
+    mailOrderProviders: [
+      CUREXA_PHARMACY_ID,
+      CAREPOINT_PHARMACY_ID,
+      TRUEPILL_PHARMACY_ID,
+      HONEYBEE_PHARMACY_ID
+    ],
     topRankedCostco: true
   },
   // NewCo (demo's)
@@ -68,7 +75,7 @@ const organizationSettings: {
     logo: 'newco_logo.svg',
     accentColor: '#506ef5',
     mailOrder: true,
-    mailOrderProviders: [CAREPOINT_ID],
+    mailOrderProviders: [CAREPOINT_PHARMACY_ID],
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
   },
@@ -79,7 +86,7 @@ const organizationSettings: {
     accentColor: '#5224C7',
     enableCourierNavigate: false,
     mailOrderNavigate: true,
-    mailOrderNavigateProviders: [COSTCO_ID]
+    mailOrderNavigateProviders: [COSTCO_PHARMACY_ID]
   },
   // Weekend Health
   org_u93EDGhy5I4Ia5Bb: {
@@ -117,7 +124,7 @@ const organizationSettings: {
     logo: 'river_health_logo.svg',
     accentColor: '#2faef3',
     mailOrder: true,
-    mailOrderProviders: [CAREPOINT_ID]
+    mailOrderProviders: [CAREPOINT_PHARMACY_ID]
   },
   // Peachy
   org_O2SLIoyyVTNXG5nX: {
@@ -127,7 +134,7 @@ const organizationSettings: {
     pickUp: false,
     federated: true,
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
     sendToPatient: false,
     enableRxAndOrder: false
   },
@@ -136,7 +143,7 @@ const organizationSettings: {
     ...defaultSettings,
     pickUp: false,
     mailOrder: true,
-    mailOrderProviders: [CUREXA_ID],
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
     sendToPatient: false
   },
   // Emily's Test environment (us)
@@ -212,9 +219,7 @@ const organizationSettings: {
     ...defaultSettings,
     logo: 'sesame_logo.jpg',
     accentColor: '#5224C7',
-    enableCourierNavigate: false,
-    mailOrderNavigate: true,
-    mailOrderNavigateProviders: [COSTCO_ID]
+    enableCourierNavigate: false
   },
   // Oshi Health
   org_yOgsgGMBVUZIBcwp: {
@@ -248,7 +253,7 @@ const organizationSettings: {
     accentColor: '#000000',
     enableRxAndOrder: false,
     mailOrderNavigate: true,
-    mailOrderNavigateProviders: [EMPOWER_ID]
+    mailOrderNavigateProviders: [EMPOWER_PHARMACY_ID]
   },
   // Brightside
   org_Dcq069P9AxLlv4l2: {
@@ -305,5 +310,14 @@ const organizationSettings: {
     ...defaultSettings,
     logo: 'hera_fertility_logo.svg',
     accentColor: '#2a769e'
+  },
+  // Redbox Rx
+  org_1orA5KZ4dOtDwVsC: {
+    ...defaultSettings,
+    logo: 'redbox_logo.jpg',
+    accentColor: '#E81D21',
+    mailOrder: true,
+    pickUp: false,
+    mailOrderProviders: [REDBOX_PHARMACY_ID]
   }
 };
