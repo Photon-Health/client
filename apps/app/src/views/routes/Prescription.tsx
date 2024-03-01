@@ -17,7 +17,6 @@ import {
   Tooltip,
   VStack,
   Skeleton,
-  SkeletonCircle,
   SkeletonText,
   useColorMode,
   AlertTitle,
@@ -51,6 +50,8 @@ import CopyText from '../components/CopyText';
 import SectionTitleRow from '../components/SectionTitleRow';
 import usePermissions from '../../hooks/usePermissions';
 import { CANCEL_PRESCRIPTION } from '../../mutations';
+
+import { datadogRum } from '@datadog/browser-rum';
 
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
@@ -160,6 +161,66 @@ export const Prescription = () => {
           <CopyText text={id || ''} />
         )
       }
+      buttons={
+        <Stack
+          direction={{ base: 'column-reverse', md: 'row' }}
+          w={{ base: 'full', sm: undefined }}
+          justify="end"
+        >
+          <Button
+            aria-label="Cancel Prescription"
+            isDisabled={loading || rx.state !== 'ACTIVE'}
+            isLoading={canceling}
+            loadingText="Canceling..."
+            onClick={async () => {
+              datadogRum.addAction('cancel_prescription_btn_click', {
+                prescriptionId: id
+              });
+
+              const decision = await confirmWrapper('Cancel this prescription?', {
+                description: 'You will not be able to undo this action.',
+                cancelText: "No, Don't Cancel",
+                confirmText: 'Yes, Cancel',
+                darkMode: colorMode !== 'light',
+                colorScheme: 'red'
+              });
+              if (decision) {
+                setCanceling(true);
+                graphQLClient.setHeader('authorization', accessToken);
+                await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
+                navigate(0);
+              }
+            }}
+            variant="outline"
+            textColor="red.500"
+            colorScheme="red"
+          >
+            Cancel Prescription
+          </Button>
+          <Button
+            leftIcon={<FiPlus />}
+            aria-label="New Order"
+            onClick={() => {
+              datadogRum.addAction('new_order_btn_click', {
+                prescriptionId: id
+              });
+
+              if (canCreateOrder) {
+                navigate(
+                  `/orders/new?prescriptionId=${id}${
+                    patient?.id ? `&patientId=${patient?.id}` : ''
+                  }`
+                );
+              }
+            }}
+            isDisabled={!canCreateOrder}
+            colorScheme="blue"
+            role="link"
+          >
+            Create Order
+          </Button>
+        </Stack>
+      }
     >
       <Card>
         <CardHeader>
@@ -190,6 +251,59 @@ export const Prescription = () => {
         </CardHeader>
         <Divider color="gray.100" />
         <CardBody>
+          <Stack direction={{ base: 'column', sm: 'row' }} gap={[5, 3]} w="full">
+            <VStack align="start" borderRadius={6}>
+              <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                Patient
+              </Text>
+              {loading ? (
+                <HStack alignContent="center" w="150px" display="flex">
+                  <SkeletonText skeletonHeight={5} noOfLines={1} flexGrow={1} />
+                </HStack>
+              ) : (
+                <PatientView patient={patient} />
+              )}
+            </VStack>
+
+            <Show above="sm">
+              <Divider orientation="vertical" height="auto" />
+            </Show>
+
+            <VStack align="start" borderRadius={6}>
+              <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                Written
+              </Text>
+              <Stack alignItems="center" justifyContent="center" height="100%">
+                {loading ? (
+                  <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+                ) : (
+                  <Text fontSize="md">{writtenAt}</Text>
+                )}
+              </Stack>
+            </VStack>
+
+            <Show above="sm">
+              <Divider orientation="vertical" height="auto" />
+            </Show>
+
+            <VStack align="start" borderRadius={6}>
+              <Text color="gray.500" fontWeight="medium" fontSize="sm">
+                Prescriber
+              </Text>
+              {loading ? (
+                <HStack alignContent="center" w="150px" display="flex">
+                  <SkeletonText skeletonHeight={5} noOfLines={1} flexGrow={1} />
+                </HStack>
+              ) : (
+                <NameView name={prescriber?.name?.full} />
+              )}
+            </VStack>
+          </Stack>
+        </CardBody>
+
+        <Divider color="gray.100" />
+
+        <CardBody>
           <VStack
             spacing={4}
             fontSize={{ base: 'md', md: 'lg' }}
@@ -197,57 +311,6 @@ export const Prescription = () => {
             w="100%"
             mt={0}
           >
-            <Stack direction={{ base: 'column', sm: 'row' }} gap={[5, 3]} w="full">
-              <VStack align="start" borderRadius={6}>
-                <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                  Patient
-                </Text>
-                {loading ? (
-                  <HStack alignContent="center" w="150px" display="flex">
-                    <SkeletonCircle size="10" />
-                    <SkeletonText skeletonHeight={5} noOfLines={1} flexGrow={1} />
-                  </HStack>
-                ) : (
-                  <PatientView patient={patient} />
-                )}
-              </VStack>
-
-              <Show above="sm">
-                <Divider orientation="vertical" height="auto" />
-              </Show>
-
-              <VStack align="start" borderRadius={6}>
-                <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                  Written
-                </Text>
-                <Stack alignItems="center" justifyContent="center" height="100%">
-                  {loading ? (
-                    <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
-                  ) : (
-                    <Text fontSize="md">{writtenAt}</Text>
-                  )}
-                </Stack>
-              </VStack>
-
-              <Show above="sm">
-                <Divider orientation="vertical" height="auto" />
-              </Show>
-
-              <VStack align="start" borderRadius={6}>
-                <Text color="gray.500" fontWeight="medium" fontSize="sm">
-                  Prescriber
-                </Text>
-                {loading ? (
-                  <HStack alignContent="center" w="150px" display="flex">
-                    <SkeletonCircle size="10" />
-                    <SkeletonText skeletonHeight={5} noOfLines={1} flexGrow={1} />
-                  </HStack>
-                ) : (
-                  <NameView name={prescriber?.name?.full} />
-                )}
-              </VStack>
-            </Stack>
-
             <SectionTitleRow
               headerText="Prescription"
               rightElement={
@@ -255,6 +318,10 @@ export const Prescription = () => {
                   leftIcon={<FiRepeat />}
                   aria-label="Duplicate Prescription"
                   onClick={() => {
+                    datadogRum.addAction('renew_btn_click', {
+                      prescriptionId: id
+                    });
+
                     if (canDuplicate) {
                       navigate(
                         `/prescriptions/new?prescriptionIds=${id}${
@@ -275,7 +342,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Instructions">
               {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text fontSize="md">{instructions}</Text>
               )}
@@ -283,7 +350,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Pharmacy Notes">
               {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text
                   fontSize="md"
@@ -307,7 +374,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Fills Remaining">
               {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="20px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text fontSize="md">{fillsRemaining}</Text>
               )}
@@ -315,7 +382,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Fills Allowed">
               {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="20px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text fontSize="md">{fillsAllowed}</Text>
               )}
@@ -339,7 +406,7 @@ export const Prescription = () => {
 
             <InfoGrid name="Dispense As Written">
               {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="50px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text fontSize="md">{dispenseAsWritten ? 'Yes' : 'No'}</Text>
               )}
@@ -347,11 +414,11 @@ export const Prescription = () => {
 
             <InfoGrid name="External Id">
               {loading ? (
-                <SkeletonText skeletonHeight={5} noOfLines={1} width="65px" />
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : rx.externalId ? (
                 <CopyText text={rx.externalId || ''} />
               ) : (
-                <Text fontSize="md" as="i">
+                <Text fontSize="md" as="i" color="gray.500">
                   None
                 </Text>
               )}
@@ -360,136 +427,63 @@ export const Prescription = () => {
             <SectionTitleRow
               headerText="Pharmacy Orders"
               subHeaderText="Below are orders that include fills from this prescription."
-              rightElement={
-                loading ? undefined : (
-                  <Button
-                    leftIcon={<FiPlus />}
-                    aria-label="New Order"
-                    onClick={() => {
-                      if (canCreateOrder) {
-                        navigate(
-                          `/orders/new?prescriptionId=${id}${
-                            patient?.id ? `&patientId=${patient?.id}` : ''
-                          }`
-                        );
-                      }
-                    }}
-                    isDisabled={!canCreateOrder}
-                    colorScheme="blue"
-                    size="sm"
-                    role="link"
-                  >
-                    Create Order
-                  </Button>
-                )
-              }
             />
 
             {loading ? (
-              <SkeletonText skeletonHeight={5} noOfLines={1} width="100%" />
+              <SkeletonText skeletonHeight={20} noOfLines={1} width="300px" />
+            ) : orders.length === 0 ? (
+              <Text>No orders for this prescription</Text>
             ) : (
-              <>
-                {orders.length === 0 ? (
-                  <Text>No orders for this prescription</Text>
-                ) : (
-                  <>
-                    <VStack spacing={4} w="full">
-                      {orders.map((fill: types.Maybe<types.Fill>) => {
-                        if (!fill) return null;
-                        const address = fill?.order?.pharmacy?.address;
-                        const addressString = formatAddress(address as FormatAddressProps);
-                        return (
-                          <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
-                            <Card
-                              variant="outline"
-                              p={[2, 3]}
-                              w="full"
-                              shadow="none"
-                              _hover={{
-                                backgroundColor: 'gray.50'
-                              }}
-                            >
-                              <HStack justifyContent="space-between">
-                                <VStack alignItems="start">
-                                  <HStack>
-                                    <LinkOverlay href={`/orders/${fill?.order?.id}`}>
-                                      <HStack spacing={2}>
-                                        <Text
-                                          fontSize="md"
-                                          as={fill?.order?.pharmacy?.name ? undefined : 'i'}
-                                        >
-                                          {fill?.order?.pharmacy?.name || 'Pending Selection'}
-                                        </Text>
-                                        <OrderStatusBadge
-                                          fulfillmentState={
-                                            fill?.order?.fulfillment?.state as OrderFulfillmentState
-                                          }
-                                          orderState={fill?.order?.state}
-                                        />
-                                      </HStack>
-                                    </LinkOverlay>
-                                  </HStack>
-                                  <Text fontSize="sm" color="gray.500">
-                                    {addressString}
-                                    {addressString ? <br /> : null}
-                                    Created:{' '}
-                                    {dayjs(fill?.order?.createdAt).format('MMM D, YYYY, h:mm A')}
+              <VStack spacing={3}>
+                {orders.map((fill: types.Maybe<types.Fill>) => {
+                  if (!fill) return null;
+                  const address = fill?.order?.pharmacy?.address;
+                  const addressString = formatAddress(address as FormatAddressProps);
+                  return (
+                    <LinkBox key={fill.id} w="full" style={{ textDecoration: 'none' }}>
+                      <Card
+                        variant="outline"
+                        p={3}
+                        w="full"
+                        shadow="none"
+                        backgroundColor="gray.50"
+                        _hover={{ backgroundColor: 'gray.100' }}
+                      >
+                        <HStack justifyContent="space-between">
+                          <VStack alignItems="start">
+                            <HStack>
+                              <LinkOverlay href={`/orders/${fill?.order?.id}`}>
+                                <HStack spacing={2}>
+                                  <Text
+                                    fontSize="md"
+                                    as={fill?.order?.pharmacy?.name ? undefined : 'i'}
+                                  >
+                                    {fill?.order?.pharmacy?.name || 'Pending Selection'}
                                   </Text>
-                                </VStack>
-                                <Box alignItems="end">
-                                  <FiChevronRight size="1.3em" />
-                                </Box>
-                              </HStack>
-                            </Card>
-                          </LinkBox>
-                        );
-                      })}
-                    </VStack>
-                  </>
-                )}
-              </>
-            )}
-
-            <SectionTitleRow
-              headerText="Actions"
-              subHeaderText="Canceling a prescription will prevent any team member from adding the prescription
-                  fills in a new order."
-              rightElement={
-                <Button
-                  aria-label="Cancel Prescription"
-                  isDisabled={loading || rx.state !== 'ACTIVE'}
-                  isLoading={canceling}
-                  loadingText="Canceling..."
-                  onClick={async () => {
-                    const decision = await confirmWrapper('Cancel this prescription?', {
-                      description: 'You will not be able to undo this action.',
-                      cancelText: "No, Don't Cancel",
-                      confirmText: 'Yes, Cancel',
-                      darkMode: colorMode !== 'light',
-                      colorScheme: 'red'
-                    });
-                    if (decision) {
-                      setCanceling(true);
-                      graphQLClient.setHeader('authorization', accessToken);
-                      await graphQLClient.request(CANCEL_PRESCRIPTION, { id });
-                      navigate(0);
-                    }
-                  }}
-                  variant="outline"
-                  textColor="red.500"
-                  colorScheme="red"
-                  size="sm"
-                >
-                  Cancel Prescription
-                </Button>
-              }
-            />
-
-            {rx?.state && rx.state !== 'ACTIVE' && (
-              <Alert colorScheme="gray">
-                <AlertIcon />
-                This prescription has been {rx?.state?.toLowerCase()}
-              </Alert>
+                                  <OrderStatusBadge
+                                    fulfillmentState={
+                                      fill?.order?.fulfillment?.state as OrderFulfillmentState
+                                    }
+                                    orderState={fill?.order?.state}
+                                  />
+                                </HStack>
+                              </LinkOverlay>
+                            </HStack>
+                            <Text fontSize="sm" color="gray.500">
+                              {addressString}
+                              {addressString ? <br /> : null}
+                              Created: {dayjs(fill?.order?.createdAt).format('MMM D, YYYY, h:mm A')}
+                            </Text>
+                          </VStack>
+                          <Box alignItems="end">
+                            <FiChevronRight size="1.3em" />
+                          </Box>
+                        </HStack>
+                      </Card>
+                    </LinkBox>
+                  );
+                })}
+              </VStack>
             )}
           </VStack>
         </CardBody>
