@@ -17,6 +17,7 @@ import { usePhoton } from '@photonhealth/react';
 import { Logo } from '../components/Logo';
 import { Auth } from '../components/Auth';
 import useQueryParams from '../../hooks/useQueryParams';
+import { auth0Config } from '../../configs/auth';
 
 export const Login = () => {
   const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });
@@ -47,6 +48,13 @@ export const Login = () => {
     <Container maxW="md" py={{ base: '12', md: '24' }}>
       <Stack spacing="8">
         <Stack spacing="6">
+          <photon-client
+            id={auth0Config.clientId}
+            domain={auth0Config.domain}
+            audience={auth0Config.audience}
+            uri={process.env.REACT_APP_GRAPHQL_URI as string}
+            auto-login="true"
+          />
           <Logo style={{ paddingLeft: '19.75px' }} bgIsWhite />
           {error && !isLoading && (
             <Alert status="error">
@@ -71,7 +79,7 @@ export const Login = () => {
               </Alert>
             ) : null}
             <HStack spacing="1" justify="center">
-              <Text color="muted">Don't have an account?</Text>
+              <Text color="muted">Don't have asdadsaan account?</Text>
               <Link color="teal.500" href="mailto:sales@photon.health">
                 Contact Sales
               </Link>
