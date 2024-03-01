@@ -1,4 +1,4 @@
-import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useParams, Link as RouterLink } from 'react-router-dom';
 
 import {
   Alert,
@@ -14,12 +14,10 @@ import {
   Divider,
   HStack,
   Link,
+  LinkBox,
+  LinkOverlay,
   SkeletonText,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Tr,
+  Stack,
   Text,
   VStack
 } from '@chakra-ui/react';
@@ -38,11 +36,11 @@ import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
 import SectionTitleRow from '../components/SectionTitleRow';
 
+import { datadogRum } from '@datadog/browser-rum';
+
 export const Patient = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const { patientId: id } = useParams();
-
-  const navigate = useNavigate();
 
   const { getPatient, getPrescriptions, getOrders } = usePhoton();
   const {
@@ -117,19 +115,43 @@ export const Patient = () => {
         )
       }
       buttons={
-        <Button
-          aria-label="Edit patient details"
-          as={RouterLink}
-          to={`/patients/update/${id}`}
-          leftIcon={<FiEdit />}
-          variant="outline"
-          borderColor="orange.500"
-          textColor="orange.500"
-          colorScheme="orange"
-          w={{ base: 'full', md: 'auto' }}
+        <Stack
+          direction={{ base: 'column-reverse', md: 'row' }}
+          w={{ base: 'full', sm: undefined }}
+          justify="end"
         >
-          Edit
-        </Button>
+          <Button
+            aria-label="Edit patient details"
+            as={RouterLink}
+            to={`/patients/update/${id}`}
+            onClick={() => {
+              datadogRum.addAction('edit_patient_btn_click', {
+                patientId: id
+              });
+            }}
+            leftIcon={<FiEdit />}
+            variant="outline"
+            borderColor="orange.500"
+            textColor="orange.500"
+            colorScheme="orange"
+          >
+            Edit Patient
+          </Button>
+          <Button
+            leftIcon={<FiPlus />}
+            aria-label="New Order"
+            as={RouterLink}
+            to={`/prescriptions/new?patientId=${id}`}
+            onClick={() => {
+              datadogRum.addAction('create_prescription_btn_click', {
+                patientId: id
+              });
+            }}
+            colorScheme="blue"
+          >
+            Create Prescription
+          </Button>
+        </Stack>
       }
     >
       <Card>
@@ -146,196 +168,221 @@ export const Patient = () => {
         </CardHeader>
         <Divider color="gray.100" />
         <CardBody>
-          <VStack spacing={4} align="justify-start">
-            {!loading && patient ? (
-              <>
-                <InfoGrid name="Date of Birth">
-                  {loading ? (
-                    <SkeletonText skeletonHeight={5} noOfLines={1} width="130px" />
-                  ) : (
-                    <Text fontSize="md" data-dd-privacy="mask">
-                      {formatDateLong(patient.dateOfBirth)}
-                    </Text>
-                  )}
-                </InfoGrid>
+          <VStack
+            spacing={4}
+            fontSize={{ base: 'md', md: 'lg' }}
+            alignItems="start"
+            w="100%"
+            mt={0}
+          >
+            <InfoGrid name="Date of Birth">
+              {loading ? (
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+              ) : patient?.dateOfBirth ? (
+                <Text fontSize="md" data-dd-privacy="mask">
+                  {formatDateLong(patient.dateOfBirth)}
+                </Text>
+              ) : (
+                <Text fontSize="md" as="i" color="gray.500">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
 
-                <InfoGrid name="Sex">
-                  {loading ? (
-                    <SkeletonText skeletonHeight={5} noOfLines={1} width="50px" />
-                  ) : (
-                    <Text fontSize="md" data-dd-privacy="mask">
-                      {sexMap[patient.sex as keyof object]}{' '}
-                    </Text>
-                  )}
-                </InfoGrid>
+            <InfoGrid name="Sex">
+              {loading ? (
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+              ) : patient?.sex ? (
+                <Text fontSize="md" data-dd-privacy="mask">
+                  {sexMap[patient.sex as keyof object]}{' '}
+                </Text>
+              ) : (
+                <Text fontSize="md" as="i" color="gray.500">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
 
-                <InfoGrid name="Gender">
-                  {loading ? (
-                    <SkeletonText skeletonHeight={5} noOfLines={1} width="50px" />
-                  ) : (
-                    <Text fontSize="md" data-dd-privacy="mask">
-                      {patient.gender}
-                    </Text>
-                  )}
-                </InfoGrid>
+            <InfoGrid name="Gender">
+              {loading ? (
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+              ) : patient?.gender ? (
+                <Text fontSize="md" data-dd-privacy="mask">
+                  {patient.gender}
+                </Text>
+              ) : (
+                <Text fontSize="md" as="i" color="gray.500">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
 
-                <InfoGrid name="Mobile Number">
-                  {' '}
-                  {loading ? (
-                    <SkeletonText skeletonHeight={5} noOfLines={1} width="120px" />
-                  ) : (
-                    <Link
-                      fontSize="md"
-                      href={`tel:${patient.phone}`}
-                      isExternal
-                      textDecoration="underline"
-                      data-dd-privacy="mask"
-                    >
-                      {formatPhone(patient.phone)}
-                    </Link>
-                  )}
-                </InfoGrid>
+            <InfoGrid name="Mobile Number">
+              {loading ? (
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+              ) : patient?.phone ? (
+                <Link
+                  fontSize="md"
+                  href={`tel:${patient.phone}`}
+                  isExternal
+                  textDecoration="underline"
+                  data-dd-privacy="mask"
+                >
+                  {formatPhone(patient.phone)}
+                </Link>
+              ) : (
+                <Text fontSize="md" as="i" color="gray.500">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
 
-                <InfoGrid name="Email">
-                  {loading ? (
-                    <SkeletonText skeletonHeight={5} noOfLines={1} width="150px" />
-                  ) : (
-                    <Link
-                      fontSize="md"
-                      href={`mailto:${patient.email}`}
-                      isExternal
-                      textDecoration="underline"
-                      data-dd-privacy="mask"
-                    >
-                      {patient.email}
-                    </Link>
-                  )}
-                </InfoGrid>
-              </>
-            ) : null}
+            <InfoGrid name="Email">
+              {loading ? (
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+              ) : patient?.email ? (
+                <Link
+                  fontSize="md"
+                  href={`mailto:${patient.email}`}
+                  isExternal
+                  textDecoration="underline"
+                  data-dd-privacy="mask"
+                >
+                  {patient.email}
+                </Link>
+              ) : (
+                <Text fontSize="md" as="i" color="gray.500">
+                  None
+                </Text>
+              )}
+            </InfoGrid>
+          </VStack>
+        </CardBody>
 
-            <SectionTitleRow
-              headerText="Prescriptions"
-              rightElement={
-                !loading ? (
-                  <Button
-                    leftIcon={<FiPlus />}
-                    aria-label="New Order"
-                    as={RouterLink}
-                    to={`/prescriptions/new?patientId=${id}`}
-                    colorScheme="blue"
-                    size="sm"
-                  >
-                    Create Prescription
-                  </Button>
-                ) : undefined
-              }
-            />
+        <Divider color="gray.100" />
 
-            {prescriptions.length > 0 ? (
-              <TableContainer>
-                <Table bg="transparent" size="sm">
-                  <Tbody>
-                    {prescriptions.map(({ id: prescriptionId, treatment, state, writtenAt }, i) =>
-                      i < 5 ? (
-                        <Tr
-                          key={prescriptionId}
-                          onClick={() => navigate(`/prescriptions/${prescriptionId}`)}
-                          _hover={{ backgroundColor: 'gray.100' }}
-                          cursor="pointer"
-                        >
-                          <Td px={0} py={3} whiteSpace="pre-wrap" borderColor="gray.200">
-                            <HStack w="full" justify="space-between">
-                              <VStack alignItems="start">
-                                <Text>{treatment.name}</Text>
-                                <HStack>
-                                  <Badge
-                                    size="sm"
-                                    colorScheme={
-                                      PRESCRIPTION_COLOR_MAP[state as keyof object] || ''
-                                    }
-                                  >
-                                    {PRESCRIPTION_STATE_MAP[state as keyof object] || ''}
-                                  </Badge>
-                                  <Text>{formatDate(writtenAt)}</Text>
-                                </HStack>
-                              </VStack>
-                              <Box alignItems="end">
-                                <FiChevronRight size="1.3em" />
-                              </Box>
-                            </HStack>
-                          </Td>
-                        </Tr>
-                      ) : null
-                    )}
-                  </Tbody>
-                </Table>
-              </TableContainer>
-            ) : (
+        <CardBody>
+          <VStack
+            spacing={4}
+            fontSize={{ base: 'md', md: 'lg' }}
+            alignItems="start"
+            w="100%"
+            mt={0}
+          >
+            <SectionTitleRow headerText="Prescriptions" />
+
+            {loading ? (
+              <SkeletonText skeletonHeight={20} noOfLines={1} width="300px" />
+            ) : prescriptions.length === 0 ? (
               <Text as="i" fontSize="sm" color="gray.500">
                 No prescriptions
               </Text>
+            ) : (
+              <VStack spacing={3} align="start">
+                {prescriptions.map(({ id: prescriptionId, treatment, state, writtenAt }, i) =>
+                  i < 5 ? (
+                    <LinkBox key={prescriptionId} style={{ textDecoration: 'none' }} w="full">
+                      <Card
+                        variant="outline"
+                        p={3}
+                        shadow="none"
+                        backgroundColor="gray.50"
+                        _hover={{ backgroundColor: 'gray.100' }}
+                      >
+                        <HStack w="full" justify="space-between">
+                          <VStack alignItems="start">
+                            <LinkOverlay href={`/prescriptions/${prescriptionId}`}>
+                              <Text fontSize="md">{treatment.name}</Text>
+                            </LinkOverlay>
+                            <HStack>
+                              <Badge
+                                size="sm"
+                                colorScheme={PRESCRIPTION_COLOR_MAP[state as keyof object] || ''}
+                              >
+                                {PRESCRIPTION_STATE_MAP[state as keyof object] || ''}
+                              </Badge>
+                              <Text fontSize="md" color="gray.500">
+                                {formatDate(writtenAt)}
+                              </Text>
+                            </HStack>
+                          </VStack>
+                          <Box alignItems="end">
+                            <FiChevronRight size="1.3em" />
+                          </Box>
+                        </HStack>
+                      </Card>
+                    </LinkBox>
+                  ) : null
+                )}
+              </VStack>
             )}
 
             <SectionTitleRow
               headerText="Orders"
               rightElement={
-                !loading ? (
-                  <Button
-                    leftIcon={<FiPlus />}
-                    aria-label="New Order"
-                    as={RouterLink}
-                    to={`/orders/new?patientId=${id}`}
-                    colorScheme="blue"
-                    size="sm"
-                  >
-                    Create Order
-                  </Button>
-                ) : undefined
+                <Button
+                  leftIcon={<FiPlus />}
+                  aria-label="New Order"
+                  as={RouterLink}
+                  to={`/orders/new?patientId=${id}`}
+                  colorScheme="blue"
+                  size="sm"
+                  onClick={() => {
+                    datadogRum.addAction('create_order_btn_click', {
+                      patientId: id
+                    });
+                  }}
+                  isDisabled={loading}
+                >
+                  Create Order
+                </Button>
               }
             />
 
-            {orders.length > 0 ? (
-              <TableContainer>
-                <Table bg="transparent" size="sm">
-                  <Tbody>
-                    {orders.map(({ id: orderId, fulfillment, fills, createdAt, state }, i) => {
-                      const medNames = getMedicationNames(fills).join(', ');
-
-                      return i < 5 ? (
-                        <Tr
-                          key={orderId}
-                          onClick={() => navigate(`/orders/${orderId}`)}
-                          _hover={{ backgroundColor: 'gray.100' }}
-                          cursor="pointer"
-                        >
-                          <Td px={0} py={3} whiteSpace="pre-wrap" borderColor="gray.200">
-                            <HStack w="full" justify="space-between">
-                              <VStack alignItems="start">
-                                <Text>{medNames}</Text>
-                                <HStack>
-                                  <OrderStatusBadge
-                                    fulfillmentState={fulfillment?.state as OrderFulfillmentState}
-                                    orderState={state}
-                                  />
-                                  <Text>{formatDate(createdAt)}</Text>
-                                </HStack>
-                              </VStack>
-                              <Box alignItems="end">
-                                <FiChevronRight size="1.3em" />
-                              </Box>
-                            </HStack>
-                          </Td>
-                        </Tr>
-                      ) : null;
-                    })}
-                  </Tbody>
-                </Table>
-              </TableContainer>
-            ) : (
+            {loading ? (
+              <SkeletonText skeletonHeight={20} noOfLines={1} width="300px" />
+            ) : orders.length === 0 ? (
               <Text as="i" fontSize="sm" color="gray.500">
-                No Orders
+                No orders
               </Text>
+            ) : (
+              <VStack spacing={3} align="start">
+                {orders.map(({ id: orderId, fulfillment, fills, createdAt, state }, i) => {
+                  const medNames = getMedicationNames(fills).join(', ');
+
+                  return i < 5 ? (
+                    <LinkBox key={orderId} style={{ textDecoration: 'none' }} w="full">
+                      <Card
+                        variant="outline"
+                        p={3}
+                        shadow="none"
+                        backgroundColor="gray.50"
+                        _hover={{ backgroundColor: 'gray.100' }}
+                      >
+                        <HStack w="full" justify="space-between">
+                          <VStack alignItems="start">
+                            <LinkOverlay href={`/orders/${orderId}`}>
+                              <Text fontSize="md">{medNames}</Text>
+                            </LinkOverlay>
+                            <HStack>
+                              <OrderStatusBadge
+                                fulfillmentState={fulfillment?.state as OrderFulfillmentState}
+                                orderState={state}
+                              />
+                              <Text fontSize="md" color="gray.500">
+                                {formatDate(createdAt)}
+                              </Text>
+                            </HStack>
+                          </VStack>
+                          <Box alignItems="end">
+                            <FiChevronRight size="1.3em" />
+                          </Box>
+                        </HStack>
+                      </Card>
+                    </LinkBox>
+                  ) : null;
+                })}
+              </VStack>
             )}
           </VStack>
         </CardBody>
