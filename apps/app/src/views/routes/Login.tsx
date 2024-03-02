@@ -53,7 +53,7 @@ export const Login = () => {
             domain={auth0Config.domain}
             audience={auth0Config.audience}
             uri={process.env.REACT_APP_GRAPHQL_URI as string}
-            auto-login="true"
+            auto-login="false"
           />
           <Logo style={{ paddingLeft: '19.75px' }} bgIsWhite />
           {error && !isLoading && (

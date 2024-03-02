@@ -109,7 +109,7 @@ export const Main = () => {
           domain={auth0Config.domain}
           audience={auth0Config.audience}
           uri={process.env.REACT_APP_GRAPHQL_URI as string}
-          auto-login="false"
+          auto-login="true"
           env={process.env.REACT_APP_ENV_NAME as Env}
         >
           <Nav />
