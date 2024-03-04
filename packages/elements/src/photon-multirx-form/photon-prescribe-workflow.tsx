@@ -108,7 +108,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     if (
       !client?.authentication.state.isAuthenticated &&
       !client?.authentication.state.isLoading &&
-      !client?.authentication.state.error
+      !client?.authentication.state.error &&
+      client?.autoLogin // don't attempt to login if auto-login=false
     ) {
       client?.authentication.login({ appState: { returnTo: window.location.pathname } });
     }
