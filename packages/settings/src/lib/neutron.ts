@@ -8,7 +8,8 @@ import {
   HONEYBEE_PHARMACY_ID,
   EMPOWER_PHARMACY_ID,
   COSTCO_PHARMACY_ID,
-  REDBOX_PHARMACY_ID
+  REDBOX_PHARMACY_ID,
+  GOGOMEDS_PHARMACY_ID
 } from '../pharmacies';
 
 /**
@@ -65,7 +66,8 @@ const organizationSettings: {
       CUREXA_PHARMACY_ID,
       CAREPOINT_PHARMACY_ID,
       TRUEPILL_PHARMACY_ID,
-      HONEYBEE_PHARMACY_ID
+      HONEYBEE_PHARMACY_ID,
+      GOGOMEDS_PHARMACY_ID
     ],
     topRankedCostco: true
   },
