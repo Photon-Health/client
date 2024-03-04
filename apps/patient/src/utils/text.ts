@@ -62,7 +62,7 @@ export const text = {
   previous: 'Previous',
   quantity: 'Quantity',
   questionVerb: 'If you have any questions, please text us at ',
-  questionsPhoneNumber: '+1 (513) 866-3212',
+  questionsPhoneNumber: '+15138663212',
   readyBy: 'Ready by',
   readyByOptions: [
     {
@@ -158,7 +158,7 @@ export const text = {
 };
 
 function generatePhoneNumberLink(): string {
-  return `${text.questionVerb} <a href="tel:${text.questionsPhoneNumber}">${text.questionsPhoneNumber}</a>.`;
+  return `${text.questionVerb} <a href="sms:${text.questionsPhoneNumber}">${text.questionsPhoneNumber}</a>.`;
 }
 
 export const orderStateMapping = {

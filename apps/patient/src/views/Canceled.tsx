@@ -10,7 +10,7 @@ export const Canceled = () => {
         <Heading as="h4" size="md" textAlign="center">
           {t.orderCanceled}
         </Heading>
-        <Text textAlign="center">{`${t.questionVerb} <a href="tel:${t.questionsPhoneNumber}">${t.questionsPhoneNumber}</a>.`}</Text>
+        <Text textAlign="center">{`${t.questionVerb} <a href="sms:${t.questionsPhoneNumber}">${t.questionsPhoneNumber}</a>.`}</Text>
       </VStack>
     </Center>
   );
