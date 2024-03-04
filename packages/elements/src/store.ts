@@ -279,8 +279,6 @@ export class PhotonClientStore {
       const user = await this.sdk.authentication.getUser();
       const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
 
-      try {
-        const token = await this.sdk.authentication.getAccessToken();
       let permissions: Permission[] = [];
 
       if (this.autoLogin || authenticated) {
