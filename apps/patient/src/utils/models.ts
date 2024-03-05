@@ -15,8 +15,10 @@ export interface Pharmacy extends types.Pharmacy {
   distance?: number | undefined;
   isOpen?: boolean;
   is24Hr?: boolean;
+  isClosingSoon?: boolean;
   closes?: string;
   opens?: string;
+  logo?: string;
 }
 
 export type ExtendedFulfillmentType = types.FulfillmentType | 'COURIER';

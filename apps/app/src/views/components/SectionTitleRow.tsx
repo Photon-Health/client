@@ -13,16 +13,15 @@ const SectionTitleRow: React.FC<SectionTitleRowProps> = ({
   rightElement
 }) => {
   return (
-    <VStack spacing={4} width="100%">
+    <VStack spacing={4} width="100%" mt={4}>
       <Stack
         direction={{ base: 'column', md: 'row' }}
         align={{ base: 'start', md: 'stretch' }}
-        pt={5}
         justify="space-between"
         width="full"
         alignItems={{ base: 'start', md: 'center' }}
       >
-        <VStack align="start" spacing={0}>
+        <VStack align="start" spacing={0} mt={0}>
           <Text fontWeight="medium" fontSize="lg">
             {headerText}
           </Text>

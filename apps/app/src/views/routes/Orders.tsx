@@ -23,7 +23,7 @@ import { Page } from '../components/Page';
 import { TablePage } from '../components/TablePage';
 import PatientView from '../components/PatientView';
 import PharmacyNameView from '../components/PharmacyNameView';
-import { formatDate, formatFills } from '../../utils';
+import { formatDate, getMedicationNames } from '../../utils';
 import { Order } from 'packages/sdk/dist/types';
 import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
 
@@ -91,7 +91,7 @@ const renderRow = (order: Order) => {
   const { id, pharmacy, patient } = order;
   const extId = order.externalId || <Text as="i">None</Text>;
 
-  const fills = formatFills(order.fills);
+  const medNames = getMedicationNames(order.fills).join(', ');
 
   const pharmacyView = pharmacy?.name ? (
     <Popover>
@@ -126,7 +126,7 @@ const renderRow = (order: Order) => {
     id,
     externalId: extId,
     createdAt: formatDate(order.createdAt),
-    fills: <Text fontWeight="medium">{fills}</Text>,
+    fills: <Text fontWeight="medium">{medNames}</Text>,
     status: (
       <OrderStatusBadge
         fulfillmentState={order.fulfillment?.state as OrderFulfillmentState}
