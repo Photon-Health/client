@@ -70,7 +70,7 @@ const Component = (props: PhotonClientProps) => {
   createEffect(() => {
     if (hasAuthParams() && store()) {
       handleRedirect();
-    } else if (store() && props.autoLogin) {
+    } else if (store()) {
       checkSession();
     }
   });
