@@ -279,14 +279,18 @@ export class PhotonClientStore {
       const user = await this.sdk.authentication.getUser();
       const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
 
-      let permissions: Permission[];
-      try {
-        const token = await this.sdk.authentication.getAccessToken();
+      let permissions: Permission[] = [];
 
-        const decoded: { permissions: Permission[] } = jwtDecode(token);
-        permissions = decoded?.permissions || [];
-      } catch (err) {
-        permissions = [];
+      if (this.autoLogin || authenticated) {
+        // getAccessToken is triggering the SSO screen to appear, so for auto-login=false, we don't want to call it
+        try {
+          const token = await this.sdk.authentication.getAccessToken();
+
+          const decoded: { permissions: Permission[] } = jwtDecode(token);
+          permissions = decoded?.permissions || [];
+        } catch (err) {
+          permissions = [];
+        }
       }
 
       this.setStore('authentication', {
