@@ -27,7 +27,6 @@ import { FixedFooter, Nav, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { RxLightningBolt } from 'react-icons/rx';
-import { FiCheck } from 'react-icons/fi';
 
 const checkDisabled = (option: string): boolean => {
   const currentTime = dayjs();
@@ -46,9 +45,6 @@ export const ReadyBy = () => {
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
 
-  const [submitting, setSubmitting] = useState<boolean>(false);
-  const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
-
   const [readyBy, setReadyBy] = useState<string>(undefined);
 
   const handleSubmit = async () => {
@@ -57,17 +53,8 @@ export const ReadyBy = () => {
       return;
     }
 
-    setSubmitting(true);
-
     if (isDemo) {
-      setTimeout(() => {
-        setSuccessfullySubmitted(true);
-        setTimeout(() => {
-          navigate(`/pharmacy?demo=true&phone=${phone}`);
-        }, 1000);
-        setSubmitting(false);
-      }, 1000);
-
+      navigate(`/pharmacy?demo=true&phone=${phone}`);
       return;
     }
 
@@ -85,17 +72,10 @@ export const ReadyBy = () => {
 
     setOrder({
       ...order,
-      readyBy,
-      readyByTime
+      readyBy
     });
 
-    setTimeout(() => {
-      setSuccessfullySubmitted(true);
-      setTimeout(() => {
-        navigate(`/pharmacy?orderId=${order.id}&token=${token}`);
-      }, 1000);
-      setSubmitting(false);
-    }, 1000);
+    navigate(`/pharmacy?orderId=${order.id}&token=${token}`);
   };
 
   const isMultiRx = flattenedFills.length > 1;
@@ -184,16 +164,8 @@ export const ReadyBy = () => {
 
       <FixedFooter show={!!readyBy}>
         <Container as={VStack} w="full">
-          <Button
-            size="lg"
-            w="full"
-            variant={successfullySubmitted ? undefined : 'brand'}
-            colorScheme={successfullySubmitted ? 'green' : undefined}
-            leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
-            onClick={!successfullySubmitted ? handleSubmit : undefined}
-            isLoading={submitting}
-          >
-            {successfullySubmitted ? t.thankYou : t.selectPharmacy}
+          <Button size="lg" w="full" variant="brand" onClick={handleSubmit}>
+            {t.next}
           </Button>
           <PoweredBy />
         </Container>

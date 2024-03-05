@@ -41,6 +41,10 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import costcoLogo from '../assets/costco_small.png';
 import { isGLP } from '../utils/isGLP';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(timezone);
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
