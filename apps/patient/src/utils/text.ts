@@ -61,7 +61,8 @@ export const text = {
     `The pharmacy is preparing your ${isPlural ? 'prescriptions' : 'prescription'} for pick up.`,
   previous: 'Previous',
   quantity: 'Quantity',
-  questions: 'If you have any questions, please text us at +1 (513) 866-3212.',
+  questionVerb: 'If you have any questions, please text us at ',
+  questionsPhoneNumber: '+15138663212',
   readyBy: 'Ready by',
   readyByOptions: [
     {
@@ -156,6 +157,10 @@ export const text = {
     `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`
 };
 
+function generatePhoneNumberLink(): string {
+  return `${text.questionVerb} <a href="sms:${text.questionsPhoneNumber}">${text.questionsPhoneNumber}</a>.`;
+}
+
 export const orderStateMapping = {
   PICK_UP: {
     SENT: {
@@ -188,7 +193,7 @@ export const orderStateMapping = {
     },
     error: {
       title: text.errorMarkPickedUp,
-      description: text.questions
+      description: generatePhoneNumberLink()
     }
   },
   COURIER: {
@@ -222,7 +227,7 @@ export const orderStateMapping = {
     },
     error: {
       title: text.errorMarkDelivered,
-      description: text.questions
+      description: generatePhoneNumberLink()
     }
   },
   MAIL_ORDER: {
@@ -256,7 +261,7 @@ export const orderStateMapping = {
     },
     error: {
       title: text.errorMarkDelivered,
-      description: text.questions
+      description: generatePhoneNumberLink()
     }
   }
 };
