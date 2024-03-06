@@ -72,7 +72,8 @@ export const ReadyBy = () => {
 
     setOrder({
       ...order,
-      readyBy
+      readyBy,
+      readyByTime
     });
 
     navigate(`/pharmacy?orderId=${order.id}&token=${token}`);
