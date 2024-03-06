@@ -1,3 +1,6 @@
+import { Link } from '@chakra-ui/react';
+import React from 'react';
+
 export const text = {
   closed: 'Closed',
   closingSoon: 'Closing soon',
@@ -20,6 +23,7 @@ export const text = {
   goodService: 'Good Service',
   inTransit: 'In transit',
   makePreferred: 'Make this my preferred pharmacy',
+  next: 'Next',
   noMatch: "We couldn't find what you're looking for.",
   notifyPickUp: (isPlural: boolean) =>
     `Please notify us below when you’ve picked up your ${
@@ -62,7 +66,7 @@ export const text = {
   previous: 'Previous',
   quantity: 'Quantity',
   questionVerb: 'If you have any questions, please text us at ',
-  questionsPhoneNumber: '+15138663212',
+  questionsPhoneNumber: '+1 (513) 866 3212',
   readyBy: 'Ready by',
   readyByOptions: [
     {
@@ -157,8 +161,21 @@ export const text = {
     `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`
 };
 
-function generatePhoneNumberLink(): string {
-  return `${text.questionVerb} <a href="sms:${text.questionsPhoneNumber}">${text.questionsPhoneNumber}</a>.`;
+export function generatePhoneNumberLink(): React.ReactElement {
+  const cleanedPhoneNumber = text.questionsPhoneNumber.replace(/[\s()-]/g, '');
+  return (
+    <>
+      {text.questionVerb}
+      <Link
+        color="link"
+        fontWeight="medium"
+        textDecoration="underline"
+        href={`sms:${cleanedPhoneNumber}`}
+      >
+        {text.questionsPhoneNumber}
+      </Link>
+    </>
+  );
 }
 
 export const orderStateMapping = {
