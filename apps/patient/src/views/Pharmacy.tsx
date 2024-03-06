@@ -391,7 +391,7 @@ export const Pharmacy = () => {
               pharmacy: selectedPharmacy
             });
 
-            navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
+            return navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
           }, 1000);
         } else {
           showToastError();
@@ -403,6 +403,7 @@ export const Pharmacy = () => {
       setSubmitting(false);
       console.error(JSON.stringify(error, undefined, 2));
     }
+    navigate(`/status?orderId=${order.id}&token=${token}`);
   };
 
   const handleSetPreferredPharmacy = async (pharmacyId: string) => {
