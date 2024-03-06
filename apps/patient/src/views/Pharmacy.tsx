@@ -96,13 +96,13 @@ export const Pharmacy = () => {
     setShowingAllPharmacies(false);
   };
 
-  const showToastError = () =>
+  const showToastWarning = () =>
     toast({
       title: isReroute ? 'Unable to change pharmacies' : 'Unable to submit pharmacy selection',
       description: isReroute
         ? 'Your order is already being processed. Text us if you need it sent to a different pharmacy.'
         : 'Please refresh and try again',
-      ...TOAST_CONFIG.ERROR
+      ...TOAST_CONFIG.WARNING
     });
 
   const handleModalClose = ({
@@ -394,16 +394,16 @@ export const Pharmacy = () => {
             return navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
           }, 1000);
         } else {
-          showToastError();
+          showToastWarning();
         }
         setSubmitting(false);
       }, 1000);
     } catch (error) {
-      showToastError();
+      showToastWarning();
       setSubmitting(false);
       console.error(JSON.stringify(error, undefined, 2));
     }
-    navigate(`/status?orderId=${order.id}&token=${token}`);
+    navigate(`/status?orderId=${order.id}&token=${token}&rerouteFailed=true`);
   };
 
   const handleSetPreferredPharmacy = async (pharmacyId: string) => {
