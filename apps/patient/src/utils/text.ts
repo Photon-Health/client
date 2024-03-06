@@ -20,6 +20,7 @@ export const text = {
   goodService: 'Good Service',
   inTransit: 'In transit',
   makePreferred: 'Make this my preferred pharmacy',
+  next: 'Next',
   noMatch: "We couldn't find what you're looking for.",
   notifyPickUp: (isPlural: boolean) =>
     `Please notify us below when you’ve picked up your ${
