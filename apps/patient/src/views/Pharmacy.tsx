@@ -98,9 +98,9 @@ export const Pharmacy = () => {
 
   const showToastError = () =>
     toast({
-      title: isReroute ? 'Unable to reroute order' : 'Unable to submit pharmacy selection',
+      title: isReroute ? 'Unable to change pharmacies' : 'Unable to submit pharmacy selection',
       description: isReroute
-        ? 'Your prescription has already been received. Text us if you need to update your pharmacy.'
+        ? 'Your order is already being processed. Text us if you need it sent to a different pharmacy.'
         : 'Please refresh and try again',
       ...TOAST_CONFIG.ERROR
     });
