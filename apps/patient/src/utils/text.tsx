@@ -1,3 +1,4 @@
+import { Link } from '@chakra-ui/react';
 import React from 'react';
 
 export const text = {
@@ -160,11 +161,19 @@ export const text = {
     `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`
 };
 
-function generatePhoneNumberLink(): React.ReactElement {
+export function generatePhoneNumberLink(): React.ReactElement {
+  const cleanedPhoneNumber = text.questionsPhoneNumber.replace(/[\s()-]/g, '');
   return (
     <>
       {text.questionVerb}
-      <a href={`sms:${text.questionsPhoneNumber}`}>{text.questionsPhoneNumber}</a>;
+      <Link
+        color="link"
+        fontWeight="medium"
+        textDecoration="underline"
+        href={`sms:${cleanedPhoneNumber}`}
+      >
+        {text.questionsPhoneNumber}
+      </Link>
     </>
   );
 }
