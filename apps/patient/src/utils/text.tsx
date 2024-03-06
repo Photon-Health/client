@@ -1,3 +1,5 @@
+import React from 'react';
+
 export const text = {
   closed: 'Closed',
   closingSoon: 'Closing soon',
@@ -63,7 +65,7 @@ export const text = {
   previous: 'Previous',
   quantity: 'Quantity',
   questionVerb: 'If you have any questions, please text us at ',
-  questionsPhoneNumber: '+15138663212',
+  questionsPhoneNumber: '+1 (513) 866 3212',
   readyBy: 'Ready by',
   readyByOptions: [
     {
@@ -158,8 +160,13 @@ export const text = {
     `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`
 };
 
-function generatePhoneNumberLink(): string {
-  return `${text.questionVerb} <a href="sms:${text.questionsPhoneNumber}">${text.questionsPhoneNumber}</a>.`;
+function generatePhoneNumberLink(): React.ReactElement {
+  return (
+    <>
+      {text.questionVerb}
+      <a href={`sms:${text.questionsPhoneNumber}`}>{text.questionsPhoneNumber}</a>;
+    </>
+  );
 }
 
 export const orderStateMapping = {
