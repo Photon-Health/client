@@ -96,6 +96,15 @@ export const Pharmacy = () => {
     setShowingAllPharmacies(false);
   };
 
+  const showToastError = () =>
+    toast({
+      title: isReroute ? 'Unable to reroute order' : 'Unable to submit pharmacy selection',
+      description: isReroute
+        ? 'Your prescription has already been received. Text us if you need to update your pharmacy.'
+        : 'Please refresh and try again',
+      ...TOAST_CONFIG.ERROR
+    });
+
   const handleModalClose = ({
     loc = undefined,
     lat = undefined,
@@ -385,23 +394,13 @@ export const Pharmacy = () => {
             navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
           }, 1000);
         } else {
-          toast({
-            title: isReroute ? 'Unable to reroute order' : 'Unable to submit pharmacy selection',
-            description: 'Please refresh and try again',
-            ...TOAST_CONFIG.ERROR
-          });
+          showToastError();
         }
         setSubmitting(false);
       }, 1000);
     } catch (error) {
-      toast({
-        title: isReroute ? 'Unable to reroute order' : 'Unable to submit pharmacy selection',
-        description: 'Please refresh and try again',
-        ...TOAST_CONFIG.ERROR
-      });
-
+      showToastError();
       setSubmitting(false);
-
       console.error(JSON.stringify(error, undefined, 2));
     }
   };
