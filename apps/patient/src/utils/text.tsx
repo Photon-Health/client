@@ -1,3 +1,6 @@
+import { Link } from '@chakra-ui/react';
+import React from 'react';
+
 export const text = {
   closed: 'Closed',
   closingSoon: 'Closing soon',
@@ -20,6 +23,7 @@ export const text = {
   goodService: 'Good Service',
   inTransit: 'In transit',
   makePreferred: 'Make this my preferred pharmacy',
+  next: 'Next',
   noMatch: "We couldn't find what you're looking for.",
   notifyPickUp: (isPlural: boolean) =>
     `Please notify us below when you’ve picked up your ${
@@ -61,7 +65,8 @@ export const text = {
     `The pharmacy is preparing your ${isPlural ? 'prescriptions' : 'prescription'} for pick up.`,
   previous: 'Previous',
   quantity: 'Quantity',
-  questions: 'If you have any questions, please text us at +1 (513) 866-3212.',
+  questionVerb: 'If you have any questions, please text us at ',
+  questionsPhoneNumber: '+1 (513) 866 3212',
   readyBy: 'Ready by',
   readyByOptions: [
     {
@@ -156,6 +161,23 @@ export const text = {
     `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`
 };
 
+export function generatePhoneNumberLink(): React.ReactElement {
+  const cleanedPhoneNumber = text.questionsPhoneNumber.replace(/[\s()-]/g, '');
+  return (
+    <>
+      {text.questionVerb}
+      <Link
+        color="link"
+        fontWeight="medium"
+        textDecoration="underline"
+        href={`sms:${cleanedPhoneNumber}`}
+      >
+        {text.questionsPhoneNumber}
+      </Link>
+    </>
+  );
+}
+
 export const orderStateMapping = {
   PICK_UP: {
     SENT: {
@@ -188,7 +210,7 @@ export const orderStateMapping = {
     },
     error: {
       title: text.errorMarkPickedUp,
-      description: text.questions
+      description: generatePhoneNumberLink()
     }
   },
   COURIER: {
@@ -222,7 +244,7 @@ export const orderStateMapping = {
     },
     error: {
       title: text.errorMarkDelivered,
-      description: text.questions
+      description: generatePhoneNumberLink()
     }
   },
   MAIL_ORDER: {
@@ -256,7 +278,7 @@ export const orderStateMapping = {
     },
     error: {
       title: text.errorMarkDelivered,
-      description: text.questions
+      description: generatePhoneNumberLink()
     }
   }
 };
