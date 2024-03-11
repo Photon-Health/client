@@ -6,7 +6,8 @@ import {
   AMAZON_PHARMACY_ID,
   TAILORMADE_PHARMACY_ID,
   REDBOX_PHARMACY_ID,
-  GOGOMEDS_PHARMACY_ID
+  GOGOMEDS_PHARMACY_ID,
+  EMPOWER_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -281,7 +282,7 @@ const organizationSettings: {
     ...defaultSettings,
     pickUp: false,
     mailOrder: true,
-    mailOrderProviders: [TAILORMADE_PHARMACY_ID, GOGOMEDS_PHARMACY_ID]
+    mailOrderProviders: [TAILORMADE_PHARMACY_ID, GOGOMEDS_PHARMACY_ID, EMPOWER_PHARMACY_ID]
   },
   // Redbox Rx
   org_fPIzyQJhFqvBAhJG: {
