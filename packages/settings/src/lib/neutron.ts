@@ -36,7 +36,8 @@ const defaultSettings: OrganizationSettings = {
   enableMedHistory: false,
   enableRxAndOrder: true,
   enableCombineAndDuplicate: true,
-  topRankedCostco: false
+  topRankedCostco: false,
+  hideTemplates: false
 };
 
 /**
