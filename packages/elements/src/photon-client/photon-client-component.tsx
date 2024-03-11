@@ -201,7 +201,7 @@ customElement(
       parse: false
     },
     externalUserId: {
-      attribute: 'userId',
+      attribute: 'user-id',
       value: undefined,
       reflect: true,
       notify: true,

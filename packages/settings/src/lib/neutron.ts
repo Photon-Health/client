@@ -36,7 +36,8 @@ const defaultSettings: OrganizationSettings = {
   enableMedHistory: false,
   enableRxAndOrder: true,
   enableCombineAndDuplicate: true,
-  topRankedCostco: false
+  topRankedCostco: false,
+  hideTemplates: false
 };
 
 /**
@@ -330,5 +331,13 @@ const organizationSettings: {
     accentColor: '#e08433',
     mailOrder: true,
     mailOrderProviders: [TAILORMADE_PHARMACY_ID, GOGOMEDS_PHARMACY_ID]
+  },
+  // Sana
+  org_nWFRQpF5fK1Fd0Ap: {
+    ...defaultSettings,
+    logo: 'sana_care_logo.png',
+    accentColor: '#FBCC45',
+    mailOrderNavigate: false,
+    enableMedHistory: true
   }
 };
