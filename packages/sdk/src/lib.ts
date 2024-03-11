@@ -252,6 +252,21 @@ export class PhotonClient {
     });
     return this;
   }
+
+  /**
+   * Clears the organization ID
+   * @returns PhotonSDK
+   */
+  public clearOrganization() {
+    this.organization = undefined;
+    this.authentication = new AuthManager({
+      authentication: this.auth0Client,
+      organization: undefined,
+      audience: this.audience
+    });
+    this.authentication.login({});
+    return this;
+  }
 }
 
 // https://github.com/apollographql/apollo-feature-requests/issues/207
