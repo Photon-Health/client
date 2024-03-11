@@ -33,7 +33,8 @@ import {
   FiMenu,
   FiSettings,
   FiShoppingCart,
-  FiUsers
+  FiUsers,
+  FiRepeat
 } from 'react-icons/fi';
 import { TbPrescription } from 'react-icons/tb';
 
@@ -49,14 +50,19 @@ export const Nav = () => {
   const theme = useTheme();
   const isDesktop = useBreakpointValue({ base: false, lg: true });
   const { isOpen, onClose, onToggle } = useDisclosure();
-  const { user, logout, getOrganization } = usePhoton();
+  const { user, logout, getOrganization, getOrganizations, clearOrganization } = usePhoton();
   const orgSettings = getSettings(user?.org_id);
   const { organization } = getOrganization();
+  const { organizations } = getOrganizations();
 
   const onLogout = useCallback(() => {
     localStorage.removeItem('previouslyAuthed');
     logout({ returnTo: orgSettings.returnTo, federated: orgSettings.federated });
   }, [logout, orgSettings]);
+
+  const onSwitchOrganization = useCallback(() => {
+    clearOrganization();
+  }, [clearOrganization]);
 
   return (
     <Box as="nav" bg="navy" py="3">
@@ -111,6 +117,14 @@ export const Nav = () => {
                     fontSize={'sm'}
                   >
                     Settings
+                  </MenuItem>
+                  <MenuItem
+                    icon={<Icon as={FiRepeat} boxSize="4" color={theme.colors.slate['500']} />}
+                    fontSize={'sm'}
+                    onClick={onSwitchOrganization}
+                    hidden={!organizations || organizations.length <= 1}
+                  >
+                    Switch Organization
                   </MenuItem>
                   <MenuDivider my={0} py={0} />
                   <MenuItem
@@ -183,6 +197,14 @@ export const Nav = () => {
                               link="/settings"
                               onClick={onToggle}
                               bgIsWhite
+                            />
+                            <NavButton
+                              label="Switch Organization"
+                              onClick={onSwitchOrganization}
+                              icon={FiRepeat}
+                              bgIsWhite
+                              link=""
+                              hidden={!organizations || organizations.length <= 1}
                             />
                             <NavButton
                               label="Logout"
