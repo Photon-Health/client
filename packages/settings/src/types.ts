@@ -40,4 +40,5 @@ export type OrganizationSettings = {
   enableRxAndOrder?: boolean;
   enableCombineAndDuplicate?: boolean;
   topRankedCostco?: boolean;
+  hideTemplates?: boolean;
 };

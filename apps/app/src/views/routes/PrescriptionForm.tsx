@@ -115,6 +115,7 @@ export const PrescriptionForm = () => {
           enable-combine-and-duplicate={orgSettings?.enableCombineAndDuplicate ?? false}
           mail-order-ids={orgSettings?.mailOrderProviders?.join(',') ?? ''}
           toast-buffer={70}
+          hide-templates={orgSettings?.hideTemplates ?? false}
         />
       ) : null}
     </div>
