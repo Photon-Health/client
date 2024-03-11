@@ -635,6 +635,7 @@ export interface PhotonClientContextInterface {
   user: any;
   error: any;
   setOrganization: (organizationId: string) => void;
+  clearOrganization: () => void;
 }
 
 const stub = (): never => {
@@ -683,6 +684,7 @@ const PhotonClientContext = createContext<PhotonClientContextInterface>({
   user: undefined,
   error: undefined,
   setOrganization: stub,
+  clearOrganization: stub,
   addToCatalog: stub,
   removeFromCatalog: stub,
   getMedicationConcepts: stub,
@@ -2920,6 +2922,10 @@ export const PhotonProvider = (opts: {
     client.setOrganization(organizationId);
   };
 
+  const clearOrganization = () => {
+    client.clearOrganization();
+  };
+
   const contextValue = {
     ...state,
     clinicalClient: client.apolloClinical,
@@ -2958,6 +2964,7 @@ export const PhotonProvider = (opts: {
     removePatientPreferredPharmacy: useRemovePatientPreferredPharmacy,
     getDispenseUnits: useGetDispenseUnits,
     setOrganization,
+    clearOrganization,
     addToCatalog: useAddToCatalog,
     getMedicationConcepts: useGetMedicationConcepts,
     getMedicationStrengths: useGetMedicationStrengths,
