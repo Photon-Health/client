@@ -1,10 +1,10 @@
-import { Container, Heading, Stack, useBreakpointValue } from '@chakra-ui/react';
+import { Container, Heading, Stack, Text, useBreakpointValue, VStack } from '@chakra-ui/react';
 
 import { ReactNode } from 'react';
 
 export interface PageProps {
   kicker?: string;
-  header?: string;
+  header?: string | ReactNode;
   children?: ReactNode;
   buttons?: ReactNode;
   disableScroll?: boolean;
@@ -13,20 +13,20 @@ export interface PageProps {
 export const Page = (props: PageProps) => {
   const { kicker, header, buttons, children, disableScroll } = props;
   return (
-    <Container
-      py="8"
-      flex="1"
-      height={disableScroll ? window.innerHeight - 64 : '100%'}
-      mb={{ base: 20, sm: 0 }}
-    >
+    <Container py="8" flex="1" height={disableScroll ? window.innerHeight - 64 : '100%'}>
       <Stack spacing={{ base: kicker ? '3' : '8', lg: kicker ? '3' : '6' }}>
         <Stack
           spacing="4"
-          direction={{ base: 'column', sm: 'row' }}
+          direction={{ base: 'column', md: 'row' }}
           justify="space-between"
           align={{ base: 'start', lg: 'center' }}
         >
-          <Heading size={useBreakpointValue({ base: 'xs' })}>{header}</Heading>
+          <VStack spacing={0} align="start">
+            <Text fontSize="sm" fontWeight="semibold" color="gray.500" ps={0} ms={0}>
+              {kicker}
+            </Text>
+            <Heading size={useBreakpointValue({ base: 'xs' })}>{header}</Heading>
+          </VStack>
           {buttons}
         </Stack>
         {children}

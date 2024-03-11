@@ -117,7 +117,7 @@ function OrderStatusBadge({ fulfillmentState, orderState }: OrderStatusBadgeProp
 
   return (
     <Tooltip label={statusTip}>
-      <Tag size="sm" borderRadius="full" colorScheme={statusColor}>
+      <Tag size="sm" borderRadius="full" colorScheme={statusColor} flexShrink={0}>
         {statusIcon ? <TagLeftIcon boxSize="12px" as={statusIcon} /> : null}
         <TagLabel>{status}</TagLabel>
       </Tag>

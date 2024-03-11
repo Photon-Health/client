@@ -1,5 +1,6 @@
 /* This file contains helper functions that can be used anywhere in the app */
 import parsePhoneNumber from 'libphonenumber-js';
+import { Fill } from 'packages/sdk/dist/types';
 
 function titleCase(str: string) {
   return str
@@ -49,10 +50,10 @@ function formatAddress(address: FormatAddressProps | undefined) {
   )}, ${state} ${postalCode}`;
 }
 
-function formatFills(fills: any) {
-  const treatmentNames = new Set();
-  fills.forEach((fill: any) => treatmentNames.add(fill.treatment.name));
-  return Array.from(treatmentNames).join(', ');
+function getMedicationNames(fills: any): string[] {
+  const treatmentNames = new Set<string>();
+  fills.forEach((fill: Fill) => treatmentNames.add(fill.treatment.name));
+  return Array.from(treatmentNames);
 }
 
 function capitalizeFirst(str: string) {
@@ -105,7 +106,7 @@ function getUnitAbbreviation(quantity: string): string {
 export {
   formatDate,
   formatDateLong,
-  formatFills,
+  getMedicationNames,
   formatPhone,
   formatAddress,
   capitalizeFirst,
