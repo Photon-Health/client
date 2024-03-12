@@ -1,6 +1,7 @@
 const path = require('path');
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
+import webpack from '@nrwl/webpack';
 
 module.exports = {
   webpack: (config) => {
@@ -32,6 +33,14 @@ module.exports = {
         });
       }
     });
+
+    // Add Datadog source map upload code
+    config.plugins.push(
+      new webpack.SourceMapDevToolPlugin({
+        noSources: false,
+        filename: '[file].map'
+      })
+    );
 
     return config;
   },
