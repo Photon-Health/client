@@ -1,7 +1,7 @@
 const path = require('path');
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
-import webpack from '@nrwl/webpack';
+const webpack = require('@nrwl/webpack');
 
 module.exports = {
   webpack: (config) => {
