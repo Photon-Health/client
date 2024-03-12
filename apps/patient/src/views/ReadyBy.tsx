@@ -10,6 +10,7 @@ import {
   Icon,
   Radio,
   RadioGroup,
+  Slide,
   Tag,
   Text,
   VStack
@@ -46,6 +47,7 @@ export const ReadyBy = () => {
   const phone = searchParams.get('phone');
 
   const [readyBy, setReadyBy] = useState<string>(undefined);
+  const [readyByDay, setReadyByDay] = useState<string>('Today');
 
   const handleSubmit = async () => {
     if (!readyBy) {
@@ -96,15 +98,43 @@ export const ReadyBy = () => {
 
       <Nav />
 
+      <Container pb={4} bgColor="white">
+        <VStack spacing={4} align="span">
+          <Heading as="h3" size="lg">
+            {t.readyWhen}
+          </Heading>
+          <Text>{t.readyBySelected(isMultiRx)}</Text>
+
+          <HStack justify="space-evenly">
+            {['Today', 'Tomorrow'].map((day) => (
+              <Box key={day}>
+                <Slide direction="left" in={readyByDay === day}>
+                  <Button
+                    w="full"
+                    size="lg"
+                    isActive={readyByDay === day}
+                    _active={{
+                      backgroundColor: 'brand.500',
+                      color: 'white',
+                      borderColor: 'brand.500'
+                    }}
+                    border="2px"
+                    borderColor="gray.100"
+                    backgroundColor="white"
+                    onClick={() => setReadyByDay(day)}
+                    borderRadius="xl"
+                  >
+                    {day}
+                  </Button>
+                </Slide>
+              </Box>
+            ))}
+          </HStack>
+        </VStack>
+      </Container>
+
       <Container pb={readyBy ? 32 : 8}>
         <VStack spacing={7} pt={5} align="span">
-          <VStack spacing={2} align="start">
-            <Heading as="h3" size="lg">
-              {t.readyWhen}
-            </Heading>
-            <Text>{t.readyBySelected(isMultiRx)}</Text>
-          </VStack>
-
           <RadioGroup onChange={setReadyBy} value={readyBy}>
             <VStack spacing={3} w="full">
               {t.readyByOptions.map((option) => {

@@ -11,8 +11,7 @@ import {
   MenuItem,
   MenuList,
   Spacer,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react';
 import { useSearchParams } from 'react-router-dom';
 import { FiHelpCircle, FiRefreshCw } from 'react-icons/fi';
@@ -34,7 +33,7 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
   const isMultiRx = flattenedFills.length > 1;
 
   return (
-    <Box as="nav" bg="white" boxShadow={useColorModeValue('sm', 'sm-dark')}>
+    <Box as="nav" bg="white" shadow="xl">
       {isDemo || !isProd ? (
         <Alert status="info" variant="subtle" w="full" py={2}>
           <HStack spacing={1} mx="auto">
