@@ -51,7 +51,7 @@ customElement(
     templateOverrides: undefined,
     prescriptionIds: undefined,
     hideSubmit: false,
-    hideTemplates: true,
+    hideTemplates: false,
     enableOrder: false,
     enableLocalPickup: false,
     enableSendToPatient: false,

@@ -9,7 +9,8 @@ import {
   EMPOWER_PHARMACY_ID,
   COSTCO_PHARMACY_ID,
   REDBOX_PHARMACY_ID,
-  GOGOMEDS_PHARMACY_ID
+  GOGOMEDS_PHARMACY_ID,
+  TAILORMADE_PHARMACY_ID
 } from '../pharmacies';
 
 /**
@@ -35,7 +36,8 @@ const defaultSettings: OrganizationSettings = {
   enableMedHistory: false,
   enableRxAndOrder: true,
   enableCombineAndDuplicate: true,
-  topRankedCostco: false
+  topRankedCostco: false,
+  hideTemplates: false
 };
 
 /**
@@ -321,5 +323,21 @@ const organizationSettings: {
     mailOrder: true,
     pickUp: false,
     mailOrderProviders: [REDBOX_PHARMACY_ID]
+  },
+  // Lifeforce
+  org_3QjCdlUhKYD3Y5Xd: {
+    ...defaultSettings,
+    logo: 'lifeforce_logo.jpeg',
+    accentColor: '#e08433',
+    mailOrder: true,
+    mailOrderProviders: [TAILORMADE_PHARMACY_ID, GOGOMEDS_PHARMACY_ID]
+  },
+  // Sana
+  org_nWFRQpF5fK1Fd0Ap: {
+    ...defaultSettings,
+    logo: 'sana_care_logo.png',
+    accentColor: '#FBCC45',
+    mailOrderNavigate: false,
+    enableMedHistory: true
   }
 };
