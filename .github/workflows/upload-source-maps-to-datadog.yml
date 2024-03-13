@@ -23,7 +23,6 @@ jobs:
       - name: Upload source maps to Datadog
         run: |
           export DATADOG_API_KEY=${{ secrets.DATADOG_API_KEY }}
-          ENV_NAME=boson # Where to get this?
           SERVICE_NAME=$(node -p "require('./package.json').name")
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           npx datadog-ci sourcemaps upload dist/apps/patient \
