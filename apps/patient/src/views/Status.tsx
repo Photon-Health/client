@@ -216,7 +216,7 @@ export const Status = () => {
                     orderId: order.id,
                     token,
                     reroute: true,
-                    ...(!pharmacyWithHours.isOpen ? { pharmacyClosed: true } : {})
+                    ...(!pharmacyWithHours.isOpen ? { openNow: true } : {})
                   });
                   navigate(`/pharmacy?${query}`);
                 }}
