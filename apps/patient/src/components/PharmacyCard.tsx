@@ -41,7 +41,7 @@ const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes }: HoursProps) => 
 
   return (
     <HStack w="full" whiteSpace="nowrap" overflow="hidden">
-      {isOpen != null || isClosingSoon != null ? (
+      {isOpen != null || isClosingSoon ? (
         <Text fontSize="sm" color={color}>
           {text}
         </Text>
