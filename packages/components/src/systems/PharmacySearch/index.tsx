@@ -14,6 +14,7 @@ import Badge from '../../particles/Badge';
 import Checkbox from '../../particles/Checkbox';
 import formatAddress from '../../utils/formatAddress';
 import Spinner from '../../particles/Spinner';
+import { asyncInterval } from '../../utils/asyncInterval';
 
 export const GetPharmaciesQuery = gql`
   query GetPharmacies($location: LatLongSearch!) {
@@ -150,6 +151,7 @@ export default function PharmacySearch(props: PharmacySearchProps) {
 
     if (address) {
       const addressStr = formatAddress(address);
+      await asyncInterval(() => !!geocoder(), 10, 20);
       await getAndSetLocation(addressStr, geocoder()!);
     }
 
