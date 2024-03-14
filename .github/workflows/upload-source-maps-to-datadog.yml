@@ -28,4 +28,4 @@ jobs:
           npx datadog-ci sourcemaps upload dist/apps/patient \
             --service=${SERVICE_NAME} \
             --release-version=${PACKAGE_VERSION} \
-            --minified-path-prefix=https://app.${github.event.pull_request.base.ref}.health/static/js
+            --minified-path-prefix=https://app.${{ github.event.pull_request.base.ref }}.health/static/js
