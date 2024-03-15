@@ -20,12 +20,16 @@ jobs:
       - name: Install @datadog/datadog-ci
         run: npm install @datadog/datadog-ci@latest
 
+      - name: Extract environment from branch name
+        id: extract_environment
+        run: echo "::set-output name=ENVIRONMENT::${GITHUB_REF#refs/heads/}"
+
       - name: Upload source maps to Datadog - Patient App
         run: |
           export DATADOG_API_KEY=${{ secrets.DATADOG_API_KEY }}
           SERVICE_NAME=$(node -p "require('.apps/patient/package.json').name")
           PACKAGE_VERSION=$(node -p "require('.apps/patient/package.json').version")
-          ENVIRONMENT=${{ github.ref }}
+          ENVIRONMENT=$(echo "${{ steps.extract_environment.outputs.ENVIRONMENT }}")
           npx datadog-ci sourcemaps upload dist/apps/patient \
             --service=${SERVICE_NAME} \
             --release-version=${PACKAGE_VERSION} \
@@ -36,7 +40,7 @@ jobs:
           export DATADOG_API_KEY=${{ secrets.DATADOG_API_KEY }}
           SERVICE_NAME=$(node -p "require('.apps/app/package.json').name")
           PACKAGE_VERSION=$(node -p "require('.apps/app/package.json').version")
-          ENVIRONMENT=${{ github.ref }}
+          ENVIRONMENT=$(echo "${{ steps.extract_environment.outputs.ENVIRONMENT }}")
           npx datadog-ci sourcemaps upload dist/apps/app \
             --service=${SERVICE_NAME} \
             --release-version=${PACKAGE_VERSION} \
