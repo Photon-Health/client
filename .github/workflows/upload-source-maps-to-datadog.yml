@@ -25,7 +25,7 @@ jobs:
           export DATADOG_API_KEY=${{ secrets.DATADOG_API_KEY }}
           SERVICE_NAME=$(node -p "require('.apps/patient/package.json').name")
           PACKAGE_VERSION=$(node -p "require('.apps/patient/package.json').version")
-          ENVIRONMENT=${{ github.event.pull_request.base.ref }}
+          ENVIRONMENT=${{ github.ref }}
           npx datadog-ci sourcemaps upload dist/apps/patient \
             --service=${SERVICE_NAME} \
             --release-version=${PACKAGE_VERSION} \
@@ -36,7 +36,7 @@ jobs:
           export DATADOG_API_KEY=${{ secrets.DATADOG_API_KEY }}
           SERVICE_NAME=$(node -p "require('.apps/app/package.json').name")
           PACKAGE_VERSION=$(node -p "require('.apps/app/package.json').version")
-          ENVIRONMENT=${{ github.event.pull_request.base.ref }}
+          ENVIRONMENT=${{ github.ref }}
           npx datadog-ci sourcemaps upload dist/apps/app \
             --service=${SERVICE_NAME} \
             --release-version=${PACKAGE_VERSION} \
