@@ -27,9 +27,9 @@ jobs:
       - name: Upload source maps to Datadog - Patient App
         run: |
           export DATADOG_API_KEY=${{ secrets.DATADOG_API_KEY }}
-          SERVICE_NAME=$(node -p "require('.apps/patient/package.json').name")
-          PACKAGE_VERSION=$(node -p "require('.apps/patient/package.json').version")
-          ENVIRONMENT=$(echo "${{ steps.extract_environment.outputs.ENVIRONMENT }}")
+          SERVICE_NAME=$(node -p "require('./apps/patient/package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./apps/patient/package.json').version")
+          ENVIRONMENT=${{ steps.extract_environment.outputs.ENVIRONMENT }}
           npx datadog-ci sourcemaps upload dist/apps/patient \
             --service=${SERVICE_NAME} \
             --release-version=${PACKAGE_VERSION} \
@@ -38,9 +38,9 @@ jobs:
       - name: Upload source maps to Datadog - Clinical App
         run: |
           export DATADOG_API_KEY=${{ secrets.DATADOG_API_KEY }}
-          SERVICE_NAME=$(node -p "require('.apps/app/package.json').name")
-          PACKAGE_VERSION=$(node -p "require('.apps/app/package.json').version")
-          ENVIRONMENT=$(echo "${{ steps.extract_environment.outputs.ENVIRONMENT }}")
+          SERVICE_NAME=$(node -p "require('./apps/app/package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./apps/app/package.json').version")
+          ENVIRONMENT=${{ steps.extract_environment.outputs.ENVIRONMENT }}
           npx datadog-ci sourcemaps upload dist/apps/app \
             --service=${SERVICE_NAME} \
             --release-version=${PACKAGE_VERSION} \
