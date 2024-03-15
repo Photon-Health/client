@@ -20,7 +20,7 @@ jobs:
       - name: Install @datadog/datadog-ci
         run: npm install @datadog/datadog-ci@latest
 
-      - name: Upload source maps to Datadog
+      - name: Upload source maps to Datadog - Patient App
         run: |
           export DATADOG_API_KEY=${{ secrets.DATADOG_API_KEY }}
           SERVICE_NAME=$(node -p "require('./package.json').name")
@@ -29,3 +29,13 @@ jobs:
             --service=${SERVICE_NAME} \
             --release-version=${PACKAGE_VERSION} \
             --minified-path-prefix=https://orders.${{ github.event.pull_request.base.ref }}.health/static/js
+
+      - name: Upload source maps to Datadog - Clinical App
+        run: |
+          export DATADOG_API_KEY=${{ secrets.DATADOG_API_KEY }}
+          SERVICE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          npx datadog-ci sourcemaps upload dist/apps/app \
+            --service=${SERVICE_NAME} \
+            --release-version=${PACKAGE_VERSION} \
+            --minified-path-prefix=https://app.${{ github.event.pull_request.base.ref }}.health/static/js
