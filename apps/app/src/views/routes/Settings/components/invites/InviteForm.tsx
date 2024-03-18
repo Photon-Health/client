@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import {
   Alert,
   AlertIcon,
@@ -45,13 +45,8 @@ export const userInviteFormQuery = graphql(/* GraphQL */ `
 `);
 
 const inviteUserMutation = graphql(/* GraphQL */ `
-  mutation InviteUser(
-    $email: String!
-    $inviter: String
-    $roles: [String!]!
-    $provider: ProviderInput
-  ) {
-    inviteUser(email: $email, inviter: $inviter, roles: $roles, provider: $provider) {
+  mutation InviteUser($email: String!, $roles: [String!]!, $provider: ProviderInput) {
+    inviteUser(email: $email, roles: $roles, provider: $provider) {
       id
     }
   }
@@ -118,10 +113,6 @@ type ProviderFormikErrorsType = FormikErrors<ProviderYupType>;
 
 export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const { clinicalClient } = usePhoton();
-  const { data: user, loading: userLoading } = useQuery(userInviteFormQuery, {
-    client: clinicalClient,
-    fetchPolicy: 'cache-first'
-  });
 
   const [inviteUser, { error, loading }] = useMutation(inviteUserMutation, {
     client: clinicalClient,
@@ -156,7 +147,6 @@ export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                 variables: {
                   email: values.email,
                   roles: values.roles.map(({ value }) => value) ?? [],
-                  inviter: user?.me.name?.full,
                   ...(values.provider == null
                     ? {}
                     : {
@@ -323,7 +313,6 @@ export const InviteForm = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                           colorScheme="blue"
                           isDisabled={
                             loading ||
-                            !!userLoading ||
                             !!errors.roles ||
                             !!errors.email ||
                             !!(errors.provider && hasPrescriberRole(values.roles)) ||
