@@ -5,7 +5,6 @@ import { PatientMedication, Medication, SearchMedication } from '@photonhealth/s
 import Table from '../../particles/Table';
 import Text from '../../particles/Text';
 import generateString from '../../utils/generateString';
-import Badge from '../../particles/Badge';
 import formatDate from '../../utils/formatDate';
 import Button from '../../particles/Button';
 import Card from '../../particles/Card';
