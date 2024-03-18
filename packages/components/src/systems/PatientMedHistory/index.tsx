@@ -5,7 +5,6 @@ import { PatientMedication, Medication, SearchMedication } from '@photonhealth/s
 import Table from '../../particles/Table';
 import Text from '../../particles/Text';
 import generateString from '../../utils/generateString';
-import Badge from '../../particles/Badge';
 import formatDate from '../../utils/formatDate';
 import Button from '../../particles/Button';
 import Card from '../../particles/Card';
@@ -47,9 +46,6 @@ const LoadingRowFallback = () => (
   <Table.Row>
     <Table.Cell>
       <Text sampleLoadingText={generateString(10, 25)} loading />
-    </Table.Cell>
-    <Table.Cell>
-      <Text sampleLoadingText={generateString(6, 8)} loading />
     </Table.Cell>
     <Table.Cell>
       <Text sampleLoadingText={generateString(2, 8)} loading />
@@ -138,7 +134,6 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
         <Table>
           <Table.Header>
             <Table.Col width="16rem">Medication</Table.Col>
-            <Table.Col>Status</Table.Col>
             <Table.Col>Written</Table.Col>
             <Table.Col>Source</Table.Col>
           </Table.Header>
@@ -157,17 +152,6 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
                 {(med) => (
                   <Table.Row>
                     <Table.Cell width="16rem">{med.medication?.name}</Table.Cell>
-                    <Table.Cell>
-                      {med.active ? (
-                        <Badge color="green" size="sm">
-                          Active
-                        </Badge>
-                      ) : (
-                        <Badge color="red" size="sm">
-                          Inactive
-                        </Badge>
-                      )}
-                    </Table.Cell>
                     <Table.Cell>{formatDate(med.prescription?.writtenAt) || 'N/A'}</Table.Cell>
                     <Table.Cell>
                       {med.prescription?.id ? (
