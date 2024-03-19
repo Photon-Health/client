@@ -62,8 +62,8 @@ export const PrescriptionForm = () => {
       });
       ref.current.addEventListener(
         'photon-order-combined',
-        (e: { detail: { orderId: string } }) => {
-          navigate(`/orders/${e.detail.orderId}`);
+        (e: { detail: { order: { id: string } } }) => {
+          navigate(`/orders/${e.detail.order.id}`);
         }
       );
       ref.current.addEventListener(
