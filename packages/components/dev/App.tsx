@@ -7,7 +7,7 @@ import Button from '../src/particles/Button';
 import Icon from '../src/particles/Icon';
 import { randomNames } from '../src/sampleData/randomNames';
 import ComboBox from '../src/particles/ComboBox';
-import PharmacySelect from '../src/systems/PharmacySelect';
+import { PharmacySelect } from '../src/systems/PharmacySelect';
 import Card from '../src/particles/Card';
 import DraftPrescriptions, { DraftPrescription } from '../src/systems/DraftPrescriptions';
 import PatientMedHistory from '../src/systems/PatientMedHistory';

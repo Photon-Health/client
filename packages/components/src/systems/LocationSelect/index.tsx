@@ -9,6 +9,7 @@ import loadGoogleScript from '../../utils/loadGoogleScript';
 import getLocations, { Location } from '../../utils/getLocations';
 import autocompleteLocation from '../../utils/autocompleteLocation';
 import ComboBox from '../../particles/ComboBox';
+import { asyncInterval } from '../../utils/asyncInterval';
 
 interface LocationSelectProps {
   open: boolean;
@@ -21,13 +22,14 @@ export default function LocationSelect(props: LocationSelectProps) {
   const [loadingNavigator, setLoadingNavigator] = createSignal(false);
   const [navigatorError, setNavigatorError] = createSignal(false);
   const [options, setOptions] = createSignal<any[]>([]);
-  let geocoder: google.maps.Geocoder | undefined;
+  const [geocoder, setGeocoder] = createSignal<google.maps.Geocoder | undefined>();
   let autocompleteService: google.maps.places.AutocompleteService | undefined;
 
   onMount(async () => {
     loadGoogleScript({
       onLoad: async () => {
-        geocoder = new google.maps.Geocoder();
+        const geo = new google.maps.Geocoder();
+        setGeocoder(geo);
         autocompleteService = new google.maps.places.AutocompleteService();
       }
     });
@@ -36,7 +38,8 @@ export default function LocationSelect(props: LocationSelectProps) {
   const handleAddressSubmit = async (address: string) => {
     // get location with address
     setNavigatorError(false);
-    const locations = await getLocations(address, geocoder!);
+    await asyncInterval(() => !!geocoder(), 10, 20);
+    const locations = await getLocations(address, geocoder()!);
     props.setLocation(locations[0]);
     props.setOpen(false);
   };
@@ -49,7 +52,8 @@ export default function LocationSelect(props: LocationSelectProps) {
       const {
         coords: { latitude, longitude }
       } = await getNavigatorLocation({ timeout: 5000 });
-      const locations = await getLocations({ latitude, longitude }, geocoder!);
+      await asyncInterval(() => !!geocoder(), 10, 20);
+      const locations = await getLocations({ latitude, longitude }, geocoder()!);
       props.setLocation(locations[0]);
       props.setOpen(false);
     } catch {
