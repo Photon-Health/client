@@ -35,7 +35,8 @@ const defaultSettings: OrganizationSettings = {
   enableMedHistory: false,
   enableRxAndOrder: false,
   enableCombineAndDuplicate: true,
-  topRankedCostco: false
+  topRankedCostco: false,
+  hideTemplates: false
 };
 
 export const boson = function (organizationId: string) {
