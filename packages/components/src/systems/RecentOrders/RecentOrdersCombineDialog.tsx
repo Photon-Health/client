@@ -13,6 +13,7 @@ import { Address } from '../PatientInfo';
 import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 import { createMutation } from '../../utils/createMutation';
 import { DraftPrescription } from '../DraftPrescriptions';
+import { Order } from '@photonhealth/sdk/dist/types';
 
 const CREATE_PRESCRIPTIONS_MUTATION = gql`
   mutation RecentOrdersCombineDialogCreatePrescriptions($prescriptions: [PrescriptionInput!]!) {
@@ -26,6 +27,21 @@ const COMBINE_ORDERS_MUTATION = gql`
   mutation RecentOrdersCombineDialogUpdateOrder($orderId: ID!, $fills: [FillInput!]!) {
     updateOrder(id: $orderId, fills: $fills) {
       id
+      createdAt
+      fills {
+        id
+        prescription {
+          id
+          dispenseQuantity
+          dispenseUnit
+          fillsAllowed
+          instructions
+          notes
+        }
+        treatment {
+          name
+        }
+      }
     }
   }
 `;
@@ -87,11 +103,11 @@ export default function RecentOrdersCombineDialog() {
     }
   );
 
-  const dispatchCombineOrderUpdated = (orderId: string) => {
+  const dispatchCombineOrderUpdated = (order: Order) => {
     const event = new CustomEvent('photon-order-combined', {
       composed: true,
       bubbles: true,
-      detail: { orderId }
+      detail: { order }
     });
     ref?.dispatchEvent(event);
   };
@@ -190,9 +206,9 @@ export default function RecentOrdersCombineDialog() {
         order.id,
         prescriptions.createPrescriptions.map((rx: SuccessResponse) => rx.id)
       );
-
       // Trigger message to redirect to order page
-      dispatchCombineOrderUpdated(updatedOrder.updateOrder.id);
+      dispatchCombineOrderUpdated(updatedOrder.updateOrder as Order);
+      setIsCombiningOrders(false);
       return;
     } catch {
       // if there is an error updating an order, most likely because the order state has
@@ -209,6 +225,7 @@ export default function RecentOrdersCombineDialog() {
         );
 
         dispatchOrderCreated(newOrder.createOrder);
+        setIsCombiningOrders(false);
       } catch {
         triggerToast({
           header: 'Error Creating Order',
