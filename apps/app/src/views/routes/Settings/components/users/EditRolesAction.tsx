@@ -94,11 +94,7 @@ const roleSchema = yup
             street1: yup.string().required('Address is required'),
             street2: yup.string(),
             city: yup.string().required('City is required'),
-            state: yupStateSchema.when('roles', {
-              is: (roles: { value: string; label: string }[]) => hasPrescriberRole(roles),
-              then: yup.string().required('Please enter a valid state'),
-              otherwise: yup.string()
-            }),
+            state: yupStateSchema,
             postalCode: yup
               .string()
               .required('Zip is required')
@@ -153,16 +149,13 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
 
   const handleSaveRoles = async (formVariables: RoleYupType) => {
     const maybeAddress: Partial<AddressInput> = {
+      country: 'US',
       ...(formVariables.provider?.address ?? userData.address),
       state: formVariables.provider?.address.state.value ?? userData.address?.state
     };
 
     const address =
-      maybeAddress.state &&
-      maybeAddress.city &&
-      maybeAddress.country &&
-      maybeAddress.postalCode &&
-      maybeAddress.street1
+      maybeAddress.state && maybeAddress.city && maybeAddress.postalCode && maybeAddress.street1
         ? (maybeAddress as AddressInput)
         : undefined;
 

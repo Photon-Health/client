@@ -32,7 +32,8 @@ const defaultSettings: OrganizationSettings = {
   enableMedHistory: false,
   enableRxAndOrder: true,
   enableCombineAndDuplicate: true,
-  topRankedCostco: false
+  topRankedCostco: false,
+  hideTemplates: false
 };
 
 /**
@@ -282,6 +283,7 @@ const organizationSettings: {
     ...defaultSettings,
     pickUp: false,
     mailOrder: true,
+    enableRxAndOrder: false,
     mailOrderProviders: [TAILORMADE_PHARMACY_ID, GOGOMEDS_PHARMACY_ID, EMPOWER_PHARMACY_ID]
   },
   // Redbox Rx
