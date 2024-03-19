@@ -283,6 +283,7 @@ const organizationSettings: {
     ...defaultSettings,
     pickUp: false,
     mailOrder: true,
+    enableRxAndOrder: false,
     mailOrderProviders: [TAILORMADE_PHARMACY_ID, GOGOMEDS_PHARMACY_ID, EMPOWER_PHARMACY_ID]
   },
   // Redbox Rx
