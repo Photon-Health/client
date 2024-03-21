@@ -486,40 +486,44 @@ export const Pharmacy = () => {
         <title>{t.selectAPharmacy}</title>
       </Helmet>
 
-      {/* <Nav /> */}
+      <Box bgColor="white" shadow="sm">
+        <Container>
+          <VStack spacing={4} align="span" py={4}>
+            <VStack spacing={2} align="start">
+              <Heading as="h3" size="lg">
+                {heading}
+              </Heading>
+              <Text>{subheading}</Text>
+            </VStack>
 
-      <Container pb={showFooter ? 32 : 8}>
-        <VStack spacing={6} align="span" pt={5}>
-          <VStack spacing={2} align="start">
-            <Heading as="h3" size="lg">
-              {heading}
-            </Heading>
-            <Text>{subheading}</Text>
+            <HStack justify="space-between" w="full">
+              {location ? (
+                <VStack w="full" align="start" spacing={1}>
+                  <Text size="sm">{t.showingLabel}</Text>
+                  <Link
+                    onClick={() => setLocationModalOpen(true)}
+                    display="inline"
+                    color="link"
+                    fontWeight="medium"
+                    size="sm"
+                    data-dd-privacy="mask"
+                  >
+                    <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
+                    {location}
+                  </Link>
+                </VStack>
+              ) : (
+                <Button variant="brand" onClick={() => setLocationModalOpen(true)}>
+                  {t.setLoc}
+                </Button>
+              )}
+            </HStack>
           </VStack>
+        </Container>
+      </Box>
 
-          <HStack justify="space-between" w="full">
-            {location ? (
-              <VStack w="full" align="start" spacing={1}>
-                <Text size="sm">{t.showingLabel}</Text>
-                <Link
-                  onClick={() => setLocationModalOpen(true)}
-                  display="inline"
-                  color="link"
-                  fontWeight="medium"
-                  size="sm"
-                  data-dd-privacy="mask"
-                >
-                  <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
-                  {location}
-                </Link>
-              </VStack>
-            ) : (
-              <Button variant="brand" onClick={() => setLocationModalOpen(true)}>
-                {t.setLoc}
-              </Button>
-            )}
-          </HStack>
-
+      <Container pb={showFooter ? 28 : 8}>
+        <VStack spacing={4} align="span" py={4}>
           {location ? (
             <VStack spacing={9} align="stretch">
               {enableMailOrder ? (

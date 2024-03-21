@@ -10,7 +10,7 @@ import {
   Icon,
   Radio,
   RadioGroup,
-  SlideFade,
+  Fade,
   Tag,
   Text,
   VStack
@@ -46,12 +46,12 @@ export const ReadyBy = () => {
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
 
-  const [readyBy, setReadyBy] = useState<string | undefined>(undefined);
+  const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);
+  const [selectedDay, setSelectedDay] = useState<string | undefined>(undefined);
+
   const [activeTab, setActiveTab] = useState<string | undefined>('today');
 
   const handleSubmit = async () => {
-    const [selectedTime, selectedDay] = readyBy.split('-');
-
     if (!selectedTime || !selectedDay) {
       console.error('No selected readyBy time/day.');
       return;
@@ -88,11 +88,11 @@ export const ReadyBy = () => {
   const isMultiRx = flattenedFills.length > 1;
 
   useEffect(() => {
-    if (readyBy) {
+    if (selectedTime) {
       // Scroll to bottom to make sure selection isn't hidden by footer
-      // window.scrollTo({ top: document.getElementById('root').scrollHeight, behavior: 'smooth' });
+      window.scrollTo({ top: document.getElementById('root').scrollHeight, behavior: 'smooth' });
     }
-  }, [readyBy]);
+  }, [selectedTime]);
 
   return (
     <Box>
@@ -111,7 +111,7 @@ export const ReadyBy = () => {
         </Container>
       </Box>
 
-      <Box bgColor="white" style={{ position: 'sticky', top: 90, zIndex: 50000 }}>
+      <Box bgColor="white" style={{ position: 'sticky', top: 90, zIndex: 1 }} shadow="sm">
         <Container p={4}>
           <HStack>
             {['today', 'tomorrow'].map((day) => (
@@ -143,29 +143,27 @@ export const ReadyBy = () => {
       </Box>
 
       <Box pt={5} shadow="inner">
-        <Container pb={readyBy ? 32 : 8}>
-          <RadioGroup value={readyBy}>
+        <Container pb={selectedTime ? 32 : 8}>
+          <RadioGroup value={`${selectedDay}-${selectedTime}`}>
             <VStack spacing={3} w="full" align="stretch">
               {t.readyByOptions[activeTab].map((option) => {
                 const isDisabled = activeTab === 'today' ? checkDisabled(option.label) : false;
 
                 return (
-                  <SlideFade
-                    key={activeTab + '-' + option.label}
-                    offsetX={'-100px'}
-                    offsetY="0px"
-                    in={true}
-                  >
+                  <Fade key={activeTab + '-' + option.label} in={true}>
                     <Card
                       bgColor={isDisabled ? 'gray.300' : 'white'}
                       border={isDisabled ? 'gray.300' : '2px solid'}
                       borderColor={
-                        readyBy === activeTab + '-' + option.label ? 'brand.500' : 'white'
+                        selectedTime === option.label && selectedDay === activeTab
+                          ? 'brand.500'
+                          : 'white'
                       }
                       color={isDisabled ? 'gray.600' : 'base'}
                       onClick={() => {
                         if (!isDisabled) {
-                          setReadyBy(activeTab + '-' + option.label);
+                          setSelectedTime(option.label);
+                          setSelectedDay(activeTab);
                         }
                       }}
                       m="auto"
@@ -177,7 +175,7 @@ export const ReadyBy = () => {
                         <HStack align="start">
                           <Radio
                             mt={1}
-                            value={activeTab + '-' + option.label}
+                            value={`${activeTab}-${option.label}`}
                             colorScheme="brand"
                             onClick={(e) => isDisabled && e.preventDefault()}
                             isDisabled={isDisabled}
@@ -209,7 +207,7 @@ export const ReadyBy = () => {
                         </HStack>
                       </CardBody>
                     </Card>
-                  </SlideFade>
+                  </Fade>
                 );
               })}
             </VStack>
@@ -217,7 +215,7 @@ export const ReadyBy = () => {
         </Container>
       </Box>
 
-      <FixedFooter show={!!readyBy}>
+      <FixedFooter show={!!selectedTime}>
         <Container as={VStack} w="full">
           <Button size="lg" w="full" variant="brand" onClick={handleSubmit}>
             {t.next}

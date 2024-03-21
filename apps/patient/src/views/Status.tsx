@@ -165,11 +165,8 @@ export const Status = () => {
         <title>{t.track}</title>
       </Helmet>
 
-      {/* <Nav showRefresh /> */}
-
-      {/* Bottom padding is added so stepper can be seen when footer is showing on smaller screens */}
-      <Container pb={showFooter ? 32 : 8}>
-        <VStack spacing={6} align="start" pt={5}>
+      <Box bgColor="white" shadow="sm">
+        <Container>
           <VStack spacing={2} align="start">
             <Heading as="h3" size="lg">
               {copy.heading}
@@ -195,7 +192,31 @@ export const Status = () => {
                 </Text>
               ) : null}
             </Box>
+            {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
+              <Box alignSelf="start">
+                <Text display="inline" color="gray.600">
+                  {t.tracking}
+                </Text>
+                <Link
+                  href={`https://google.com/search?q=${fulfillment.trackingNumber}`}
+                  display="inline"
+                  ms={2}
+                  color="link"
+                  fontWeight="medium"
+                  target="_blank"
+                  data-dd-privacy="mask"
+                >
+                  {fulfillment.trackingNumber}
+                </Link>
+              </Box>
+            ) : null}
           </VStack>
+        </Container>
+      </Box>
+
+      {/* Bottom padding is added so stepper can be seen when footer is showing on smaller screens */}
+      <Container pb={showFooter ? 32 : 8}>
+        <VStack spacing={6} align="start" pt={5}>
           {pharmacy ? (
             <Box width="full">
               <PharmacyCard
@@ -208,24 +229,6 @@ export const Status = () => {
                 }
                 onGetDirections={handleGetDirections}
               />
-            </Box>
-          ) : null}
-          {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
-            <Box alignSelf="start">
-              <Text display="inline" color="gray.600">
-                {t.tracking}
-              </Text>
-              <Link
-                href={`https://google.com/search?q=${fulfillment.trackingNumber}`}
-                display="inline"
-                ms={2}
-                color="link"
-                fontWeight="medium"
-                target="_blank"
-                data-dd-privacy="mask"
-              >
-                {fulfillment.trackingNumber}
-              </Link>
             </Box>
           ) : null}
           <StatusStepper

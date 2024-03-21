@@ -50,15 +50,15 @@ export const Review = () => {
         <title>{t.reviewRx(isMultiRx)}</title>
       </Helmet>
 
-      <Container pb={32}>
-        <VStack spacing={6} align="span" pt={5}>
-          <VStack spacing={2} align="start">
-            <Heading as="h3" size="lg">
-              {t.reviewYourRx(isMultiRx)}
-            </Heading>
-            <Text>{t.pleaseReview(isMultiRx)}</Text>
-          </VStack>
-          <VStack spacing={1} align="start">
+      <Box bgColor="white" shadow="sm">
+        <Container>
+          <VStack spacing={4} align="span" py={4}>
+            <VStack spacing={2} align="start">
+              <Heading as="h3" size="lg">
+                {t.reviewYourRx(isMultiRx)}
+              </Heading>
+              <Text>{t.pleaseReview(isMultiRx)}</Text>
+            </VStack>
             <HStack spacing={2}>
               <Text display="inline" color="gray.500">
                 {t.patient}
@@ -68,7 +68,11 @@ export const Review = () => {
               </Text>
             </HStack>
           </VStack>
+        </Container>
+      </Box>
 
+      <Container pb={32}>
+        <VStack spacing={4} align="span" pt={5}>
           <Accordion allowToggle defaultIndex={[0]}>
             {flattenedFills.map(({ id, treatment, prescription, count }) => (
               <AccordionItem border="none" mb={3} key={id}>
