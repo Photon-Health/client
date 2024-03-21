@@ -48,8 +48,22 @@ export const Alert = (props: AlertProps) => {
     }
   });
 
+  // add a border color using tailwind for all the cases
+  const borderColor = createMemo(() => {
+    switch (props.type) {
+      case 'success':
+        return 'border-green-200';
+      case 'info':
+        return 'border-blue-200';
+      case 'warning':
+        return 'border-yellow-200';
+      case 'error':
+        return 'border-red-200';
+    }
+  });
+
   return (
-    <div class={`rounded-md ${bgColor()} p-4`}>
+    <div class={`rounded-md ${bgColor()} border-2 ${borderColor()} border p-4`}>
       <div class="flex">
         <div class="flex-shrink-0">
           <Icon name={iconName()} class={textColor()} />

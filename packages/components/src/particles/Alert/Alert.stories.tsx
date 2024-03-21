@@ -6,6 +6,7 @@ type AlertStory = StoryObj<ComponentProps<typeof Alert>>;
 
 const meta: Meta<ComponentProps<typeof Alert>> = {
   title: 'Alert',
+  // @ts-ignore
   component: Alert,
   tags: ['autodocs'],
   argTypes: {
