@@ -7,7 +7,8 @@ import {
   TAILORMADE_PHARMACY_ID,
   REDBOX_PHARMACY_ID,
   GOGOMEDS_PHARMACY_ID,
-  EMPOWER_PHARMACY_ID
+  EMPOWER_PHARMACY_ID,
+  INNOVASCRIPT_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -228,8 +229,9 @@ const organizationSettings: {
   // Openloop Health
   org_Oxc0CSPfdiyWW3VM: {
     ...defaultSettings,
-    logo: 'openloop_logo.png',
-    accentColor: '#E90C54'
+    mailOrder: true,
+    pickUp: true,
+    mailOrderProviders: [INNOVASCRIPT_PHARMACY_ID]
   },
   // PM Pediatrics Care
   org_2Mqu8Kf7dknKNFXb: {
@@ -283,6 +285,7 @@ const organizationSettings: {
     ...defaultSettings,
     pickUp: false,
     mailOrder: true,
+    enableRxAndOrder: false,
     mailOrderProviders: [TAILORMADE_PHARMACY_ID, GOGOMEDS_PHARMACY_ID, EMPOWER_PHARMACY_ID]
   },
   // Redbox Rx
