@@ -33,7 +33,6 @@ export const Status = () => {
   const type = searchParams.get('type');
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
-  console.log('order', order);
 
   const showFooterStates: types.FulfillmentState[] = ['RECEIVED', 'READY'];
   const [showFooter, setShowFooter] = useState<boolean>(
