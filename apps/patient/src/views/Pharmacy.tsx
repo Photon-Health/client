@@ -55,9 +55,9 @@ export const Pharmacy = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const isReroute = searchParams.get('reroute');
+  const openNow = searchParams.get('openNow');
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
-
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
   const [pharmacyOptions, setPharmacyOptions] = useState([]);
@@ -73,7 +73,7 @@ export const Pharmacy = () => {
   const [location, setLocation] = useState<string>(
     order?.address ? formatAddress(order.address) : ''
   );
-  const [enableOpenNow, setEnableOpenNow] = useState(false);
+  const [enableOpenNow, setEnableOpenNow] = useState(!!openNow);
   const [enable24Hr, setEnable24Hr] = useState(false);
 
   const toast = useToast();
