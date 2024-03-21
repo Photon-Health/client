@@ -10,6 +10,7 @@ import {
   Icon,
   Radio,
   RadioGroup,
+  SlideFade,
   Tag,
   Text,
   VStack
@@ -45,12 +46,12 @@ export const ReadyBy = () => {
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
 
-  const [activeTab, setActiveTab] = useState<string>('today');
-
-  const [selectedTime, setSelectedTime] = useState<string>(undefined);
-  const [selectedDay, setSelectedDay] = useState<string>(undefined);
+  const [readyBy, setReadyBy] = useState<string | undefined>(undefined);
+  const [activeTab, setActiveTab] = useState<string | undefined>('today');
 
   const handleSubmit = async () => {
+    const [selectedTime, selectedDay] = readyBy.split(' ');
+
     if (!selectedTime || !selectedDay) {
       console.error('No selected readyBy time/day.');
       return;
@@ -86,18 +87,12 @@ export const ReadyBy = () => {
 
   const isMultiRx = flattenedFills.length > 1;
 
-  const handleThingChange = (time) => {
-    console.log('handle change');
-    setSelectedTime(time);
-    setSelectedDay(activeTab);
-  };
-
   useEffect(() => {
-    if (selectedTime) {
+    if (readyBy) {
       // Scroll to bottom to make sure selection isn't hidden by footer
-      window.scrollTo({ top: document.getElementById('root').scrollHeight, behavior: 'smooth' });
+      // window.scrollTo({ top: document.getElementById('root').scrollHeight, behavior: 'smooth' });
     }
-  }, [selectedTime]);
+  }, [readyBy]);
 
   return (
     <Box>
@@ -122,6 +117,7 @@ export const ReadyBy = () => {
             {['today', 'tomorrow'].map((day) => (
               <Button
                 key={day}
+                type="button"
                 w="full"
                 size="lg"
                 isActive={day === activeTab}
@@ -133,7 +129,11 @@ export const ReadyBy = () => {
                 border="2px"
                 borderColor="gray.100"
                 backgroundColor="white"
-                onClick={() => setActiveTab(day)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveTab(day);
+                  // setReadyBy(undefined);
+                }}
                 borderRadius="xl"
               >
                 {capitalize(day)}
@@ -144,69 +144,73 @@ export const ReadyBy = () => {
       </Box>
 
       <Box pt={5} shadow="inner">
-        <Container pb={selectedTime ? 32 : 8}>
-          <RadioGroup onChange={handleThingChange} value={selectedTime}>
-            <VStack spacing={3} w="full">
+        <Container pb={readyBy ? 32 : 8}>
+          <RadioGroup value={readyBy}>
+            <VStack spacing={3} w="full" align="stretch">
               {t.readyByOptions[activeTab].map((option) => {
-                const isDisabled = checkDisabled(option.label);
-
-                // console.log('*****');
-                // console.log(selectedTime);
-                // console.log(selectedDay);
-                // console.log(activeTab);
+                const isDisabled = activeTab === 'today' ? checkDisabled(option.label) : false;
 
                 return (
-                  <Card
-                    key={option.label}
-                    bgColor={isDisabled ? 'gray.300' : 'white'}
-                    border={isDisabled ? 'gray.300' : '2px solid'}
-                    borderColor={
-                      selectedTime === option.label && selectedDay === activeTab
-                        ? 'brand.500'
-                        : 'white'
-                    }
-                    color={isDisabled ? 'gray.600' : 'base'}
-                    onClick={() => !isDisabled && setSelectedTime(option.label)}
-                    m="auto"
-                    w="full"
-                    shadow={isDisabled ? 'none' : 'base'}
-                    cursor={isDisabled ? 'not-allowed' : 'pointer'}
+                  <SlideFade
+                    key={activeTab + ' ' + option.label}
+                    offsetX={'-100px'}
+                    offsetY="0px"
+                    in={true}
                   >
-                    <CardBody p={3}>
-                      <HStack align="start">
-                        <Radio
-                          mt={1}
-                          value={option.label}
-                          colorScheme="brand"
-                          onClick={(e) => isDisabled && e.preventDefault()}
-                          isDisabled={isDisabled}
-                          isChecked={selectedTime === option.label && selectedDay === activeTab}
-                          cursor={isDisabled ? 'not-allowed' : 'pointer'}
-                        />
-                        <VStack spacing={1}>
-                          <HStack alignSelf="start">
-                            {option.icon ? <Icon as={RxLightningBolt} color="yellow.500" /> : null}
-                            <Text fontWeight="medium">{option.label}</Text>
-                          </HStack>
-                          {option.description ? (
-                            option.badge ? (
-                              <Tag
-                                colorScheme={option.badgeColor}
-                                variant="subtle"
-                                borderRadius="full"
-                              >
-                                {option.description}
-                              </Tag>
-                            ) : (
-                              <Text color="gray.500" fontSize="sm">
-                                {option.description}
-                              </Text>
-                            )
-                          ) : null}
-                        </VStack>
-                      </HStack>
-                    </CardBody>
-                  </Card>
+                    <Card
+                      bgColor={isDisabled ? 'gray.300' : 'white'}
+                      border={isDisabled ? 'gray.300' : '2px solid'}
+                      borderColor={
+                        readyBy === activeTab + ' ' + option.label ? 'brand.500' : 'white'
+                      }
+                      color={isDisabled ? 'gray.600' : 'base'}
+                      onClick={() => {
+                        if (!isDisabled) {
+                          setReadyBy(activeTab + ' ' + option.label);
+                        }
+                      }}
+                      m="auto"
+                      w="full"
+                      shadow={isDisabled ? 'none' : 'base'}
+                      cursor={isDisabled ? 'not-allowed' : 'pointer'}
+                    >
+                      <CardBody p={3}>
+                        <HStack align="start">
+                          <Radio
+                            mt={1}
+                            value={activeTab + ' ' + option.label}
+                            colorScheme="brand"
+                            onClick={(e) => isDisabled && e.preventDefault()}
+                            isDisabled={isDisabled}
+                            cursor={isDisabled ? 'not-allowed' : 'pointer'}
+                          />
+                          <VStack spacing={1}>
+                            <HStack alignSelf="start">
+                              {option.icon ? (
+                                <Icon as={RxLightningBolt} color="yellow.500" />
+                              ) : null}
+                              <Text fontWeight="medium">{option.label}</Text>
+                            </HStack>
+                            {option.description ? (
+                              option.badge ? (
+                                <Tag
+                                  colorScheme={option.badgeColor}
+                                  variant="subtle"
+                                  borderRadius="full"
+                                >
+                                  {option.description}
+                                </Tag>
+                              ) : (
+                                <Text color="gray.500" fontSize="sm">
+                                  {option.description}
+                                </Text>
+                              )
+                            ) : null}
+                          </VStack>
+                        </HStack>
+                      </CardBody>
+                    </Card>
+                  </SlideFade>
                 );
               })}
             </VStack>
@@ -214,7 +218,7 @@ export const ReadyBy = () => {
         </Container>
       </Box>
 
-      <FixedFooter show={!!selectedTime}>
+      <FixedFooter show={!!readyBy}>
         <Container as={VStack} w="full">
           <Button size="lg" w="full" variant="brand" onClick={handleSubmit}>
             {t.next}
