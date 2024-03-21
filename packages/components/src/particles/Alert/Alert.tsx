@@ -63,7 +63,7 @@ export const Alert = (props: AlertProps) => {
   });
 
   return (
-    <div class={`rounded-md ${bgColor()} border-2 ${borderColor()} border p-4`}>
+    <div class={`rounded-md ${bgColor()} border-2 ${borderColor()} p-4`}>
       <div class="flex">
         <div class="flex-shrink-0">
           <Icon name={iconName()} class={textColor()} />
