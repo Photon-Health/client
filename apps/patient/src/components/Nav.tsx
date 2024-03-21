@@ -33,7 +33,7 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
   const isMultiRx = flattenedFills.length > 1;
 
   return (
-    <Box as="nav" bg="white" shadow="xl">
+    <Box as="nav" bg="white" shadow="xs" style={{ position: 'sticky', top: 0, zIndex: 5000000 }}>
       {isDemo || !isProd ? (
         <Alert status="info" variant="subtle" w="full" py={2}>
           <HStack spacing={1} mx="auto">

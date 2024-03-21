@@ -20,7 +20,7 @@ import { Helmet } from 'react-helmet';
 
 import { useOrderContext } from './Main';
 import { formatDate } from '../utils/general';
-import { FixedFooter, Nav, PoweredBy } from '../components';
+import { FixedFooter, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
 
 export const Review = () => {
@@ -49,8 +49,6 @@ export const Review = () => {
       <Helmet>
         <title>{t.reviewRx(isMultiRx)}</title>
       </Helmet>
-
-      <Nav />
 
       <Container pb={32}>
         <VStack spacing={6} align="span" pt={5}>

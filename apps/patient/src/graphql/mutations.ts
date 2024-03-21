@@ -23,12 +23,14 @@ export const SET_ORDER_PHARMACY = gql`
     $orderId: ID!
     $pharmacyId: ID!
     $readyBy: String
+    $readyByDay: String
     $readyByTime: DateTime
   ) {
     setOrderPharmacy(
       orderId: $orderId
       pharmacyId: $pharmacyId
       readyBy: $readyBy
+      readyByDay: $readyByDay
       readyByTime: $readyByTime
     )
   }

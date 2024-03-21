@@ -10,7 +10,6 @@ import {
   Icon,
   Radio,
   RadioGroup,
-  Slide,
   Tag,
   Text,
   VStack
@@ -20,11 +19,11 @@ import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
 import { datadogRum } from '@datadog/browser-rum';
 import timezone from 'dayjs/plugin/timezone';
-import { convertReadyByToUTCTimestamp } from '../utils/general';
+import { capitalize, convertReadyByToUTCTimestamp } from '../utils/general';
 
 dayjs.extend(timezone);
 
-import { FixedFooter, Nav, PoweredBy } from '../components';
+import { FixedFooter, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { RxLightningBolt } from 'react-icons/rx';
@@ -46,12 +45,14 @@ export const ReadyBy = () => {
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
 
-  const [readyBy, setReadyBy] = useState<string>(undefined);
-  const [readyByDay, setReadyByDay] = useState<string>('Today');
+  const [activeTab, setActiveTab] = useState<string>('today');
+
+  const [selectedTime, setSelectedTime] = useState<string>(undefined);
+  const [selectedDay, setSelectedDay] = useState<string>(undefined);
 
   const handleSubmit = async () => {
-    if (!readyBy) {
-      console.error('No selected readyBy time.');
+    if (!selectedTime || !selectedDay) {
+      console.error('No selected readyBy time/day.');
       return;
     }
 
@@ -60,11 +61,12 @@ export const ReadyBy = () => {
       return;
     }
 
-    const readyByTime = convertReadyByToUTCTimestamp(readyBy);
+    const readyByTime = convertReadyByToUTCTimestamp(selectedTime, selectedDay);
 
     // Track selection
     datadogRum.addAction('ready_by_selection', {
-      readyBy: readyBy,
+      readyBy: selectedTime,
+      readyByDay: selectedDay,
       readyByTime: readyByTime,
       orderId: order.id,
       organization: order.organization.name,
@@ -74,7 +76,8 @@ export const ReadyBy = () => {
 
     setOrder({
       ...order,
-      readyBy,
+      readyBy: selectedTime,
+      readyByDay: selectedDay,
       readyByTime
     });
 
@@ -83,12 +86,18 @@ export const ReadyBy = () => {
 
   const isMultiRx = flattenedFills.length > 1;
 
+  const handleThingChange = (time) => {
+    console.log('handle change');
+    setSelectedTime(time);
+    setSelectedDay(activeTab);
+  };
+
   useEffect(() => {
-    if (readyBy) {
+    if (selectedTime) {
       // Scroll to bottom to make sure selection isn't hidden by footer
       window.scrollTo({ top: document.getElementById('root').scrollHeight, behavior: 'smooth' });
     }
-  }, [readyBy]);
+  }, [selectedTime]);
 
   return (
     <Box>
@@ -96,57 +105,68 @@ export const ReadyBy = () => {
         <title>{t.readyBy}</title>
       </Helmet>
 
-      <Nav />
+      <Box bgColor="white">
+        <Container>
+          <VStack spacing={4} align="span" pt={4}>
+            <Heading as="h3" size="lg">
+              {t.readyWhen}
+            </Heading>
+            <Text>{t.readyBySelected(isMultiRx)}</Text>
+          </VStack>
+        </Container>
+      </Box>
 
-      <Container pb={4} bgColor="white">
-        <VStack spacing={4} align="span">
-          <Heading as="h3" size="lg">
-            {t.readyWhen}
-          </Heading>
-          <Text>{t.readyBySelected(isMultiRx)}</Text>
-
-          <HStack justify="space-evenly">
-            {['Today', 'Tomorrow'].map((day) => (
-              <Box key={day}>
-                <Slide direction="left" in={readyByDay === day}>
-                  <Button
-                    w="full"
-                    size="lg"
-                    isActive={readyByDay === day}
-                    _active={{
-                      backgroundColor: 'brand.500',
-                      color: 'white',
-                      borderColor: 'brand.500'
-                    }}
-                    border="2px"
-                    borderColor="gray.100"
-                    backgroundColor="white"
-                    onClick={() => setReadyByDay(day)}
-                    borderRadius="xl"
-                  >
-                    {day}
-                  </Button>
-                </Slide>
-              </Box>
+      <Box bgColor="white" style={{ position: 'sticky', top: 90, zIndex: 50000 }}>
+        <Container p={4}>
+          <HStack>
+            {['today', 'tomorrow'].map((day) => (
+              <Button
+                key={day}
+                w="full"
+                size="lg"
+                isActive={day === activeTab}
+                _active={{
+                  backgroundColor: 'brand.500',
+                  color: 'white',
+                  borderColor: 'brand.500'
+                }}
+                border="2px"
+                borderColor="gray.100"
+                backgroundColor="white"
+                onClick={() => setActiveTab(day)}
+                borderRadius="xl"
+              >
+                {capitalize(day)}
+              </Button>
             ))}
           </HStack>
-        </VStack>
-      </Container>
+        </Container>
+      </Box>
 
-      <Container pb={readyBy ? 32 : 8}>
-        <VStack spacing={7} pt={5} align="span">
-          <RadioGroup onChange={setReadyBy} value={readyBy}>
+      <Box pt={5} shadow="inner">
+        <Container pb={selectedTime ? 32 : 8}>
+          <RadioGroup onChange={handleThingChange} value={selectedTime}>
             <VStack spacing={3} w="full">
-              {t.readyByOptions.map((option) => {
+              {t.readyByOptions[activeTab].map((option) => {
                 const isDisabled = checkDisabled(option.label);
+
+                // console.log('*****');
+                // console.log(selectedTime);
+                // console.log(selectedDay);
+                // console.log(activeTab);
+
                 return (
                   <Card
                     key={option.label}
                     bgColor={isDisabled ? 'gray.300' : 'white'}
                     border={isDisabled ? 'gray.300' : '2px solid'}
-                    borderColor={readyBy === option.label ? 'brand.500' : 'white'}
+                    borderColor={
+                      selectedTime === option.label && selectedDay === activeTab
+                        ? 'brand.500'
+                        : 'white'
+                    }
                     color={isDisabled ? 'gray.600' : 'base'}
-                    onClick={() => !isDisabled && setReadyBy(option.label)}
+                    onClick={() => !isDisabled && setSelectedTime(option.label)}
                     m="auto"
                     w="full"
                     shadow={isDisabled ? 'none' : 'base'}
@@ -160,6 +180,7 @@ export const ReadyBy = () => {
                           colorScheme="brand"
                           onClick={(e) => isDisabled && e.preventDefault()}
                           isDisabled={isDisabled}
+                          isChecked={selectedTime === option.label && selectedDay === activeTab}
                           cursor={isDisabled ? 'not-allowed' : 'pointer'}
                         />
                         <VStack spacing={1}>
@@ -190,10 +211,10 @@ export const ReadyBy = () => {
               })}
             </VStack>
           </RadioGroup>
-        </VStack>
-      </Container>
+        </Container>
+      </Box>
 
-      <FixedFooter show={!!readyBy}>
+      <FixedFooter show={!!selectedTime}>
         <Container as={VStack} w="full">
           <Button size="lg" w="full" variant="brand" onClick={handleSubmit}>
             {t.next}

@@ -4,14 +4,7 @@ import { Helmet } from 'react-helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiCheck } from 'react-icons/fi';
 import { types } from '@photonhealth/sdk';
-import {
-  DemoCtaModal,
-  FixedFooter,
-  Nav,
-  PharmacyCard,
-  PoweredBy,
-  StatusStepper
-} from '../components';
+import { DemoCtaModal, FixedFooter, PharmacyCard, PoweredBy, StatusStepper } from '../components';
 import { Pharmacy as PharmacyWithHours } from '../utils/models';
 import { formatAddress, getFulfillmentType, preparePharmacyHours } from '../utils/general';
 import { text as t, orderStateMapping as m } from '../utils/text';
@@ -172,7 +165,7 @@ export const Status = () => {
         <title>{t.track}</title>
       </Helmet>
 
-      <Nav showRefresh />
+      {/* <Nav showRefresh /> */}
 
       {/* Bottom padding is added so stepper can be seen when footer is showing on smaller screens */}
       <Container pb={showFooter ? 32 : 8}>

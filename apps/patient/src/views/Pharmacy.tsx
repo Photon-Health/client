@@ -22,7 +22,6 @@ import {
   BrandedOptions,
   FixedFooter,
   LocationModal,
-  Nav,
   PickupOptions,
   PoweredBy
 } from '../components';
@@ -346,7 +345,13 @@ export const Pharmacy = () => {
     try {
       const result = isReroute
         ? await rerouteOrder(order.id, selectedId, order.patient.id)
-        : await setOrderPharmacy(order.id, selectedId, order.readyBy, order.readyByTime);
+        : await setOrderPharmacy(
+            order.id,
+            selectedId,
+            order.readyBy,
+            order.readyByDay,
+            order.readyByTime
+          );
 
       setTimeout(() => {
         if (result) {
@@ -481,7 +486,7 @@ export const Pharmacy = () => {
         <title>{t.selectAPharmacy}</title>
       </Helmet>
 
-      <Nav />
+      {/* <Nav /> */}
 
       <Container pb={showFooter ? 32 : 8}>
         <VStack spacing={6} align="span" pt={5}>
