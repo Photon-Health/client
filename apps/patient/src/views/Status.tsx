@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiCheck } from 'react-icons/fi';
 import { types } from '@photonhealth/sdk';
+import queryString from 'query-string';
 import {
   DemoCtaModal,
   FixedFooter,
@@ -213,12 +214,18 @@ export const Status = () => {
                 canReroute={
                   !isDemo &&
                   orgSettings.enablePatientRerouting &&
-                  order.reroutable &&
+                  order.isReroutable &&
                   !rerouteFailed
                 }
-                onChangePharmacy={() =>
-                  navigate(`/pharmacy?orderId=${order.id}&token=${token}&reroute=true`)
-                }
+                onChangePharmacy={() => {
+                  const query = queryString.stringify({
+                    orderId: order.id,
+                    token,
+                    reroute: true,
+                    ...(!pharmacyWithHours.isOpen ? { openNow: true } : {})
+                  });
+                  navigate(`/pharmacy?${query}`);
+                }}
                 onGetDirections={handleGetDirections}
               />
             </Box>
