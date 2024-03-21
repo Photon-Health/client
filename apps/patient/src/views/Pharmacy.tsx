@@ -13,6 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { Helmet } from 'react-helmet';
+import queryString from 'query-string';
 import { types } from '@photonhealth/sdk';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, preparePharmacyHours } from '../utils/general';
@@ -390,8 +391,12 @@ export const Pharmacy = () => {
               // Add selected pharmacy to order context so /status shows pharmacy on render
               pharmacy: selectedPharmacy
             });
-
-            return navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
+            const query = queryString.stringify({
+              orderId: order.id,
+              token,
+              type
+            });
+            return navigate(`/status?${query}`);
           }, 1000);
         } else {
           showToastWarning();
@@ -403,7 +408,12 @@ export const Pharmacy = () => {
       setSubmitting(false);
       console.error(JSON.stringify(error, undefined, 2));
     }
-    navigate(`/status?orderId=${order.id}&token=${token}&rerouteFailed=true`);
+    const query = queryString.stringify({
+      orderId: order.id,
+      token,
+      rerouteFailed: true
+    });
+    return navigate(`/status?${query}`);
   };
 
   const handleSetPreferredPharmacy = async (pharmacyId: string) => {

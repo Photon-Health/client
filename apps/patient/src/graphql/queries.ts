@@ -5,7 +5,7 @@ export const GET_ORDER = gql`
     order(id: $id) {
       id
       state
-      reroutable
+      isReroutable
       address {
         street1
         street2
