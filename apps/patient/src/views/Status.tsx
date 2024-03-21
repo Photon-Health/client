@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiCheck } from 'react-icons/fi';
 import { types } from '@photonhealth/sdk';
+import queryString from 'query-string';
 import { DemoCtaModal, FixedFooter, PharmacyCard, PoweredBy, StatusStepper } from '../components';
 import { Pharmacy as PharmacyWithHours } from '../utils/models';
 import { formatAddress, getFulfillmentType, preparePharmacyHours } from '../utils/general';
@@ -25,6 +26,7 @@ export const Status = () => {
   const type = searchParams.get('type');
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
+  const rerouteFailed = searchParams.get('rerouteFailed') || false;
 
   const showFooterStates: types.FulfillmentState[] = ['RECEIVED', 'READY'];
   const [showFooter, setShowFooter] = useState<boolean>(
@@ -223,10 +225,21 @@ export const Status = () => {
                 pharmacy={pharmacyWithHours}
                 selected={true}
                 showDetails={fulfillmentType === 'PICK_UP'}
-                canReroute={!isDemo && orgSettings.enablePatientRerouting}
-                onChangePharmacy={() =>
-                  navigate(`/pharmacy?orderId=${order.id}&token=${token}&reroute=true`)
+                canReroute={
+                  !isDemo &&
+                  orgSettings.enablePatientRerouting &&
+                  order.isReroutable &&
+                  !rerouteFailed
                 }
+                onChangePharmacy={() => {
+                  const query = queryString.stringify({
+                    orderId: order.id,
+                    token,
+                    reroute: true,
+                    ...(!pharmacyWithHours.isOpen ? { openNow: true } : {})
+                  });
+                  navigate(`/pharmacy?${query}`);
+                }}
                 onGetDirections={handleGetDirections}
               />
             </Box>

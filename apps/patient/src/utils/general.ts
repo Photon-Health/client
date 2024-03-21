@@ -117,7 +117,7 @@ export const preparePharmacyHours = (pharmacy: types.Pharmacy): EnrichedPharmacy
     const nextOpen = isOpenEvent(pharmacy.nextEvents.open)
       ? pharmacy.nextEvents.open.datetime
       : undefined;
-    const formatter = `${dayjs(nextOpen).minute() > 0 ? 'h:mmA' : 'hA'}${
+    const formatter = `${dayjs(nextOpen).minute() > 0 ? 'h:mm a' : 'h a'}${
       dayjs(nextOpen).isToday() ? '' : ' ddd'
     }`;
     const oTime = dayjs(nextOpen).format(formatter);
@@ -127,7 +127,7 @@ export const preparePharmacyHours = (pharmacy: types.Pharmacy): EnrichedPharmacy
     const nextClose = isCloseEvent(pharmacy.nextEvents.close)
       ? pharmacy.nextEvents.close.datetime
       : undefined;
-    const cTime = dayjs(nextClose).format(dayjs(nextClose).minute() > 0 ? 'h:mmA' : 'hA');
+    const cTime = dayjs(nextClose).format(dayjs(nextClose).minute() > 0 ? 'h:mm a' : 'h a');
     closes = `Closes ${cTime}`;
 
     // Check if closing soon

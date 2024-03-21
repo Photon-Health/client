@@ -19,7 +19,7 @@ const documents = {
     "\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n": types.RotateSecretDocument,
     "\n  fragment InviteFormFragment on Invite {\n    id\n    invitee\n    inviter\n    expires_at\n  }\n": types.InviteFormFragmentFragmentDoc,
     "\n  query UserInviteFormQuery {\n    me {\n      id\n      name {\n        full\n      }\n    }\n  }\n": types.UserInviteFormQueryDocument,
-    "\n  mutation InviteUser(\n    $email: String!\n    $inviter: String\n    $roles: [String!]!\n    $provider: ProviderInput\n  ) {\n    inviteUser(email: $email, inviter: $inviter, roles: $roles, provider: $provider) {\n      id\n    }\n  }\n": types.InviteUserDocument,
+    "\n  mutation InviteUser($email: String!, $roles: [String!]!, $provider: ProviderInput) {\n    inviteUser(email: $email, roles: $roles, provider: $provider) {\n      id\n    }\n  }\n": types.InviteUserDocument,
     "\n  fragment InviteFragment on Invite {\n    id\n    invitee\n    inviter\n    expired\n    expires_at\n  }\n": types.InviteFragmentFragmentDoc,
     "\n  mutation ResendInvite($inviteId: ID!) {\n    resendInvite(inviteId: $inviteId) {\n      id\n    }\n  }\n": types.ResendInviteDocument,
     "\n  mutation DeleteInvite($inviteId: ID!) {\n    deleteInvite(inviteId: $inviteId)\n  }\n": types.DeleteInviteDocument,
@@ -85,7 +85,7 @@ export function graphql(source: "\n  query UserInviteFormQuery {\n    me {\n    
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation InviteUser(\n    $email: String!\n    $inviter: String\n    $roles: [String!]!\n    $provider: ProviderInput\n  ) {\n    inviteUser(email: $email, inviter: $inviter, roles: $roles, provider: $provider) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation InviteUser(\n    $email: String!\n    $inviter: String\n    $roles: [String!]!\n    $provider: ProviderInput\n  ) {\n    inviteUser(email: $email, inviter: $inviter, roles: $roles, provider: $provider) {\n      id\n    }\n  }\n"];
+export function graphql(source: "\n  mutation InviteUser($email: String!, $roles: [String!]!, $provider: ProviderInput) {\n    inviteUser(email: $email, roles: $roles, provider: $provider) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation InviteUser($email: String!, $roles: [String!]!, $provider: ProviderInput) {\n    inviteUser(email: $email, roles: $roles, provider: $provider) {\n      id\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

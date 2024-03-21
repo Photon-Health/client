@@ -13,6 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { Helmet } from 'react-helmet';
+import queryString from 'query-string';
 import { types } from '@photonhealth/sdk';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, preparePharmacyHours } from '../utils/general';
@@ -54,9 +55,9 @@ export const Pharmacy = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const isReroute = searchParams.get('reroute');
+  const openNow = searchParams.get('openNow');
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
-
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
   const [pharmacyOptions, setPharmacyOptions] = useState([]);
@@ -72,7 +73,7 @@ export const Pharmacy = () => {
   const [location, setLocation] = useState<string>(
     order?.address ? formatAddress(order.address) : ''
   );
-  const [enableOpenNow, setEnableOpenNow] = useState(false);
+  const [enableOpenNow, setEnableOpenNow] = useState(!!openNow);
   const [enable24Hr, setEnable24Hr] = useState(false);
 
   const toast = useToast();
@@ -94,6 +95,15 @@ export const Pharmacy = () => {
     setShowFooter(false);
     setShowingAllPharmacies(false);
   };
+
+  const showToastWarning = () =>
+    toast({
+      title: isReroute ? 'Unable to change pharmacies' : 'Unable to submit pharmacy selection',
+      description: isReroute
+        ? 'Your order is already being processed. Text us if you need it sent to a different pharmacy.'
+        : 'Please refresh and try again',
+      ...TOAST_CONFIG.WARNING
+    });
 
   const handleModalClose = ({
     loc = undefined,
@@ -386,29 +396,29 @@ export const Pharmacy = () => {
               // Add selected pharmacy to order context so /status shows pharmacy on render
               pharmacy: selectedPharmacy
             });
-
-            navigate(`/status?orderId=${order.id}&token=${token}&type=${type}`);
+            const query = queryString.stringify({
+              orderId: order.id,
+              token,
+              type
+            });
+            return navigate(`/status?${query}`);
           }, 1000);
         } else {
-          toast({
-            title: isReroute ? 'Unable to reroute order' : 'Unable to submit pharmacy selection',
-            description: 'Please refresh and try again',
-            ...TOAST_CONFIG.ERROR
-          });
+          showToastWarning();
         }
         setSubmitting(false);
       }, 1000);
     } catch (error) {
-      toast({
-        title: isReroute ? 'Unable to reroute order' : 'Unable to submit pharmacy selection',
-        description: 'Please refresh and try again',
-        ...TOAST_CONFIG.ERROR
-      });
-
+      showToastWarning();
       setSubmitting(false);
-
       console.error(JSON.stringify(error, undefined, 2));
     }
+    const query = queryString.stringify({
+      orderId: order.id,
+      token,
+      rerouteFailed: true
+    });
+    return navigate(`/status?${query}`);
   };
 
   const handleSetPreferredPharmacy = async (pharmacyId: string) => {
