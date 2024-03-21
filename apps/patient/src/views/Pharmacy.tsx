@@ -408,10 +408,13 @@ export const Pharmacy = () => {
       showToastWarning();
       setSubmitting(false);
       if (isReroute) {
+        setOrder({
+          ...order,
+          isReroutable: false
+        });
         const query = queryString.stringify({
           orderId: order.id,
-          token,
-          rerouteAttempt: true
+          token
         });
         return navigate(`/status?${query}`);
       }
