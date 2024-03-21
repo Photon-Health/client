@@ -355,7 +355,7 @@ export const Pharmacy = () => {
 
     try {
       const result = isReroute
-        ? await rerouteOrder(order.id, selectedId, order.patient.id)
+        ? await rerouteOrder(order.id, selectedId)
         : await setOrderPharmacy(order.id, selectedId, order.readyBy, order.readyByTime);
 
       setTimeout(() => {
@@ -388,14 +388,14 @@ export const Pharmacy = () => {
 
             setOrder({
               ...order,
+              isReroutable: !isReroute,
               // Add selected pharmacy to order context so /status shows pharmacy on render
               pharmacy: selectedPharmacy
             });
             const query = queryString.stringify({
               orderId: order.id,
               token,
-              type,
-              ...(!isReroute ? { isFirstPharmacySelection: true } : {})
+              type
             });
             return navigate(`/status?${query}`);
           }, 1000);
@@ -411,7 +411,7 @@ export const Pharmacy = () => {
         const query = queryString.stringify({
           orderId: order.id,
           token,
-          rerouteFailed: true
+          rerouteAttempt: true
         });
         return navigate(`/status?${query}`);
       }
