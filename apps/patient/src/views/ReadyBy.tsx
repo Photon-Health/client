@@ -50,7 +50,7 @@ export const ReadyBy = () => {
   const [activeTab, setActiveTab] = useState<string | undefined>('today');
 
   const handleSubmit = async () => {
-    const [selectedTime, selectedDay] = readyBy.split(' ');
+    const [selectedTime, selectedDay] = readyBy.split('-');
 
     if (!selectedTime || !selectedDay) {
       console.error('No selected readyBy time/day.');
@@ -132,7 +132,6 @@ export const ReadyBy = () => {
                 onClick={(e) => {
                   e.preventDefault();
                   setActiveTab(day);
-                  // setReadyBy(undefined);
                 }}
                 borderRadius="xl"
               >
@@ -152,7 +151,7 @@ export const ReadyBy = () => {
 
                 return (
                   <SlideFade
-                    key={activeTab + ' ' + option.label}
+                    key={activeTab + '-' + option.label}
                     offsetX={'-100px'}
                     offsetY="0px"
                     in={true}
@@ -161,12 +160,12 @@ export const ReadyBy = () => {
                       bgColor={isDisabled ? 'gray.300' : 'white'}
                       border={isDisabled ? 'gray.300' : '2px solid'}
                       borderColor={
-                        readyBy === activeTab + ' ' + option.label ? 'brand.500' : 'white'
+                        readyBy === activeTab + '-' + option.label ? 'brand.500' : 'white'
                       }
                       color={isDisabled ? 'gray.600' : 'base'}
                       onClick={() => {
                         if (!isDisabled) {
-                          setReadyBy(activeTab + ' ' + option.label);
+                          setReadyBy(activeTab + '-' + option.label);
                         }
                       }}
                       m="auto"
@@ -178,7 +177,7 @@ export const ReadyBy = () => {
                         <HStack align="start">
                           <Radio
                             mt={1}
-                            value={activeTab + ' ' + option.label}
+                            value={activeTab + '-' + option.label}
                             colorScheme="brand"
                             onClick={(e) => isDisabled && e.preventDefault()}
                             isDisabled={isDisabled}
