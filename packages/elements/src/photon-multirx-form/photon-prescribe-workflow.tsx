@@ -189,7 +189,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   // before submitting the form, show combine dialog if there is a routing order for the patient
   const displayCombineDialog = () => {
-    dispatchOrderError();
     return recentOrdersActions.setIsCombineDialogOpen(
       true,
       () => submitForm(props.enableOrder),

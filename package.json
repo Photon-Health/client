@@ -92,6 +92,7 @@
     "@chakra-ui/react": "^2.8.0",
     "@chakra-ui/theme-tools": "^2.1.0",
     "@datadog/browser-rum": "^5.8.0",
+    "@datadog/datadog-ci": "^2.32.0",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@felte/solid": "^1.2.11",
@@ -146,6 +147,7 @@
     "url-loader": "^4.1.1",
     "use-debounce": "^9.0.3",
     "web-vitals": "^3.3.0",
+    "webpack": "^5.90.3",
     "yup": "^0.32.11",
     "zod": "^3.22.4"
   }

@@ -1,6 +1,6 @@
 import { Center, Heading, Text, VStack } from '@chakra-ui/react';
 import { MdOutlineCancel } from 'react-icons/md';
-import { text as t } from '../utils/text';
+import { generatePhoneNumberLink, text as t } from '../utils/text';
 
 export const Canceled = () => {
   return (
@@ -10,7 +10,7 @@ export const Canceled = () => {
         <Heading as="h4" size="md" textAlign="center">
           {t.orderCanceled}
         </Heading>
-        <Text textAlign="center">{`${t.questionVerb} <a href="sms:${t.questionsPhoneNumber}">${t.questionsPhoneNumber}</a>.`}</Text>
+        <Text textAlign="center">{generatePhoneNumberLink()}</Text>
       </VStack>
     </Center>
   );
