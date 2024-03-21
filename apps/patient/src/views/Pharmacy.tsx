@@ -394,7 +394,8 @@ export const Pharmacy = () => {
             const query = queryString.stringify({
               orderId: order.id,
               token,
-              type
+              type,
+              ...(!isReroute ? { isFirstPharmacySelection: true } : {})
             });
             return navigate(`/status?${query}`);
           }, 1000);
@@ -406,14 +407,15 @@ export const Pharmacy = () => {
     } catch (error) {
       showToastWarning();
       setSubmitting(false);
-      console.error(JSON.stringify(error, undefined, 2));
+      if (isReroute) {
+        const query = queryString.stringify({
+          orderId: order.id,
+          token,
+          rerouteFailed: true
+        });
+        return navigate(`/status?${query}`);
+      }
     }
-    const query = queryString.stringify({
-      orderId: order.id,
-      token,
-      rerouteFailed: true
-    });
-    return navigate(`/status?${query}`);
   };
 
   const handleSetPreferredPharmacy = async (pharmacyId: string) => {

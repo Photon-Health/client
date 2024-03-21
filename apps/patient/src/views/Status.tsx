@@ -33,6 +33,7 @@ export const Status = () => {
   const type = searchParams.get('type');
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
+  const isFirstPharmacySelection = searchParams.get('firstPharmacySelection') || false;
   const rerouteFailed = searchParams.get('rerouteFailed') || false;
 
   const showFooterStates: types.FulfillmentState[] = ['RECEIVED', 'READY'];
