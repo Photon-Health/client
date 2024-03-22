@@ -93,10 +93,18 @@ const Component = (props: {
 
   const handleCreateOrder = () => {
     // Notify there aren't any draft prescriptions
-    if (!canSubmit() || !canWritePrescription()) {
+    if (!canSubmit()) {
       return triggerToast({
         status: 'info',
         body: 'You need to add prescription(s) to this order before you can send it.'
+      });
+    }
+
+    if (!canWritePrescription()) {
+      return triggerToast({
+        status: 'error',
+        header: 'Unauthorized',
+        body: 'You do not have permission to prescribe'
       });
     }
 
@@ -112,10 +120,18 @@ const Component = (props: {
 
   const handleCreatePrescriptions = () => {
     // check if there are draft prescriptions
-    if (!canSubmit() || !canWritePrescription()) {
+    if (!canSubmit()) {
       return triggerToast({
         status: 'info',
         body: 'You need to add prescription(s) to this order before you can send it.'
+      });
+    }
+
+    if (!canWritePrescription()) {
+      return triggerToast({
+        status: 'error',
+        header: 'Unauthorized',
+        body: 'You do not have permission to prescribe'
       });
     }
 

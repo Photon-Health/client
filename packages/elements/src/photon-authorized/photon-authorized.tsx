@@ -1,5 +1,4 @@
 //Shoelace
-import { Permission } from '@photonhealth/sdk/dist/types';
 import '@shoelace-style/shoelace/dist/components/alert/alert';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 
@@ -7,20 +6,12 @@ setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/')
 
 import { createEffect, createSignal, JSXElement, mergeProps, Show, createMemo } from 'solid-js';
 import { usePhoton } from '../context';
-import { Spinner } from '@photonhealth/components';
-
-function checkHasPermission(subset: Permission[], superset: Permission[]) {
-  return subset.every((permission) => superset.includes(permission));
-}
+import { Spinner, Alert } from '@photonhealth/components';
+import { checkHasPermission } from '../utils';
+import { Permission } from '@photonhealth/sdk/dist/types';
 
 function AlertMessage(props: { message: string }) {
-  return (
-    <sl-alert variant="warning" open>
-      <sl-icon slot="icon" name="exclamation-triangle" />
-      <strong>{props.message}</strong>
-      <br />
-    </sl-alert>
-  );
+  return <Alert type="error" header="Unauthorized" message={props.message} />;
 }
 
 export const PhotonAuthorized = (p: { children: JSXElement; permissions?: Permission[] }) => {

@@ -1,3 +1,5 @@
+import { Permission } from '@photonhealth/sdk/dist/types';
+
 export const validateProps = (props: Record<string, any>, required: string[]) => {
   const errors: string[] = [];
   required.forEach((r) => {
@@ -32,3 +34,7 @@ export const formatDate = (dateString: string) => {
   const [year, month, day] = dateString.split('-');
   return `${month}-${day}-${year}`;
 };
+
+export function checkHasPermission(subset: Permission[], superset: Permission[]) {
+  return subset.every((permission) => superset.includes(permission));
+}
