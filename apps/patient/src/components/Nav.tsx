@@ -33,6 +33,8 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
   const isMultiRx = flattenedFills.length > 1;
 
   return (
+    // If you're going to modify z-index here, just double-check that the readyBy buttons
+    // and options don't overlap the nav.
     <Box as="nav" bg="white" shadow="sm" style={{ position: 'sticky', top: 0, zIndex: 2 }}>
       {isDemo || !isProd ? (
         <Alert status="info" variant="subtle" w="full" py={2}>
