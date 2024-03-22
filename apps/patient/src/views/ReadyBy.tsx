@@ -159,6 +159,7 @@ export const ReadyBy = () => {
                           ? 'brand.500'
                           : 'white'
                       }
+                      borderRadius="lg"
                       color={isDisabled ? 'gray.600' : 'base'}
                       onClick={() => {
                         if (!isDisabled) {
@@ -217,7 +218,7 @@ export const ReadyBy = () => {
 
       <FixedFooter show={!!selectedTime}>
         <Container as={VStack} w="full">
-          <Button size="lg" w="full" variant="brand" onClick={handleSubmit}>
+          <Button size="lg" borderRadius="lg" w="full" variant="brand" onClick={handleSubmit}>
             {t.next}
           </Button>
           <PoweredBy />

@@ -76,7 +76,7 @@ export const Review = () => {
           <Accordion allowToggle defaultIndex={[0]}>
             {flattenedFills.map(({ id, treatment, prescription, count }) => (
               <AccordionItem border="none" mb={3} key={id}>
-                <Card w="full" backgroundColor="white">
+                <Card w="full" backgroundColor="white" borderRadius="lg">
                   <CardBody p={0}>
                     <HStack>
                       <AccordionButton
@@ -133,7 +133,7 @@ export const Review = () => {
 
       <FixedFooter show={true}>
         <Container as={VStack} w="full">
-          <Button size="lg" w="full" variant="brand" onClick={handleCtaClick}>
+          <Button size="lg" borderRadius="lg" w="full" variant="brand" onClick={handleCtaClick}>
             {t.searchPharmacy}
           </Button>
           <PoweredBy />

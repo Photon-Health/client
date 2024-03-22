@@ -257,6 +257,7 @@ export const Status = () => {
           <Button
             size="lg"
             w="full"
+            borderRadius="lg"
             variant={successfullySubmitted ? undefined : 'brand'}
             colorScheme={successfullySubmitted ? 'green' : undefined}
             leftIcon={successfullySubmitted ? <FiCheck /> : undefined}

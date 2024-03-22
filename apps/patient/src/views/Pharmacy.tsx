@@ -571,6 +571,7 @@ export const Pharmacy = () => {
         <Container as={VStack} w="full">
           <Button
             size="lg"
+            borderRadius="lg"
             w="full"
             variant={successfullySubmitted ? undefined : 'brand'}
             colorScheme={successfullySubmitted ? 'green' : undefined}
