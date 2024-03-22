@@ -71,7 +71,8 @@ const organizationSettings: {
       HONEYBEE_PHARMACY_ID,
       GOGOMEDS_PHARMACY_ID
     ],
-    topRankedCostco: true
+    topRankedCostco: true,
+    enablePatientRerouting: true
   },
   // NewCo (demo's)
   org_YiUudCToTSrjOuow: {
