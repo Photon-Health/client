@@ -29,7 +29,7 @@ const defaultSettings: OrganizationSettings = {
   mailOrderNavigateProviders: [],
   sendToPatient: true,
   sendToPatientUsers: [],
-  enablePatientRerouting: false,
+  enablePatientRerouting: true,
   enableCourierNavigate: false,
   returnTo: window.location.origin,
   federated: false,
@@ -223,7 +223,8 @@ const organizationSettings: {
     ...defaultSettings,
     logo: 'sesame_logo.jpg',
     accentColor: '#5224C7',
-    enableCourierNavigate: false
+    enableCourierNavigate: false,
+    topRankedCostco: true
   },
   // Oshi Health
   org_yOgsgGMBVUZIBcwp: {

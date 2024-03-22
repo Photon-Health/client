@@ -9,11 +9,14 @@ setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/')
 
 //Styles
 import {
+  Alert,
   Button,
   RecentOrders,
   SignatureAttestationModal,
   Spinner,
+  TemplateOverrides,
   Toaster,
+  triggerToast,
   useRecentOrders
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
@@ -34,8 +37,7 @@ import { PharmacyCard } from './components/PharmacyCard';
 import styles from './style.css?inline';
 import clearForm from './util/clearForm';
 import { formatPatientWeight } from './util/formatPatientWeight';
-
-import type { TemplateOverrides } from '@photonhealth/components';
+import { checkHasPermission } from '../utils';
 
 export type Address = {
   city: string;
@@ -121,6 +123,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     setAuthenticated(client?.authentication.state.isAuthenticated || false);
   });
 
+  const hasPrescribePermission = createMemo(() =>
+    checkHasPermission(['write:prescription'], client?.authentication.state.permissions || [])
+  );
+
   const formattedAddress = createMemo(() => {
     // remove unnecessary fields, and add country and street2 if missing
     const patientAddress =
@@ -200,6 +206,14 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   // submits the form to create a new order
   const submitForm = async (enableOrder: boolean) => {
     setErrors([]);
+
+    if (!hasPrescribePermission()) {
+      return triggerToast({
+        status: 'error',
+        header: 'Unauthorized',
+        body: 'You do not have permission to prescribe'
+      });
+    }
 
     const keys = enableOrder
       ? ['patient', 'draftPrescriptions', 'pharmacy', 'address']
@@ -375,8 +389,15 @@ export function PrescribeWorkflow(props: PrescribeProps) {
               <Spinner color="green" />
             </div>
           </Show>
-          <PhotonAuthorized permissions={['write:prescription']}>
+          <PhotonAuthorized permissions={['read:patient']}>
             <SignatureAttestationModal client={clinicalClient}>
+              <Show when={!hasPrescribePermission()}>
+                <Alert
+                  type="warning"
+                  header="You do not have permission to prescribe"
+                  message="You have access to see the form but you will not be able to submit an order."
+                />
+              </Show>
               <PatientCard
                 actions={props.formActions}
                 store={props.formStore}
@@ -434,17 +455,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   {/* We're hiding this alert message if enable-order is set, a rough way to let us know this is not in the App.
               The issue we're having is when props are passed and cards are hidden, the form is not showing validation errors. */}
                   <Show when={errors().length > 0 && props.enableOrder}>
-                    <div class="m-3">
+                    <div class="m-3 gap-4">
                       <For each={errors()} fallback={<div>No errors...</div>}>
                         {({ key, error }: { key: string; error: string }) => (
-                          <sl-alert variant="warning" open>
-                            <sl-icon slot="icon" name="exclamation-triangle" />
-                            <strong>Error with {key}: </strong>
-                            <br />
-                            {error}
-                            <br />
-                            {JSON.stringify(props.formStore?.[key]?.value || {})}
-                          </sl-alert>
+                          <Alert type="warning" header={`Error with ${key}`} message={error} />
                         )}
                       </For>
                     </div>

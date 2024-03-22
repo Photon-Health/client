@@ -95,12 +95,11 @@ export const markOrderAsPickedUp = async (orderId: string) => {
   }
 };
 
-export const rerouteOrder = async (orderId: string, pharmacyId: string, patientId: string) => {
+export const rerouteOrder = async (orderId: string, pharmacyId: string) => {
   try {
     const response: { rerouteOrder: boolean } = await graphQLClient.request(REROUTE_ORDER, {
       orderId,
-      pharmacyId,
-      patientId
+      pharmacyId
     });
     if (response?.rerouteOrder) {
       return true;
