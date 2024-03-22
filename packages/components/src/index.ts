@@ -1,4 +1,5 @@
 import AddressForm from './systems/AddressForm';
+import { Alert } from './particles/Alert';
 import Banner from './particles/Banner';
 import DoseCalculator from './systems/DoseCalculator';
 import Card from './particles/Card';
@@ -24,6 +25,7 @@ import { SignatureAttestationModal } from './systems/SignatureAttestation';
 
 export {
   AddressForm,
+  Alert,
   Banner,
   Button,
   Card,
