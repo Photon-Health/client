@@ -168,7 +168,7 @@ export const Status = () => {
 
       <Box bgColor="white" shadow="sm">
         <Container>
-          <VStack spacing={2} align="start">
+          <VStack spacing={2} align="start" py={4}>
             <Heading as="h3" size="lg">
               {copy.heading}
             </Heading>
