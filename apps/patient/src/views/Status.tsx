@@ -26,7 +26,6 @@ export const Status = () => {
   const type = searchParams.get('type');
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
-  const rerouteFailed = searchParams.get('rerouteFailed') || false;
 
   const showFooterStates: types.FulfillmentState[] = ['RECEIVED', 'READY'];
   const [showFooter, setShowFooter] = useState<boolean>(
@@ -225,12 +224,7 @@ export const Status = () => {
                 pharmacy={pharmacyWithHours}
                 selected={true}
                 showDetails={fulfillmentType === 'PICK_UP'}
-                canReroute={
-                  !isDemo &&
-                  orgSettings.enablePatientRerouting &&
-                  order.isReroutable &&
-                  !rerouteFailed
-                }
+                canReroute={!isDemo && orgSettings.enablePatientRerouting && order.isReroutable}
                 onChangePharmacy={() => {
                   const query = queryString.stringify({
                     orderId: order.id,

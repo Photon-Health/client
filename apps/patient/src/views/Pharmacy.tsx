@@ -354,7 +354,7 @@ export const Pharmacy = () => {
 
     try {
       const result = isReroute
-        ? await rerouteOrder(order.id, selectedId, order.patient.id)
+        ? await rerouteOrder(order.id, selectedId)
         : await setOrderPharmacy(
             order.id,
             selectedId,
@@ -393,6 +393,7 @@ export const Pharmacy = () => {
 
             setOrder({
               ...order,
+              isReroutable: !isReroute,
               // Add selected pharmacy to order context so /status shows pharmacy on render
               pharmacy: selectedPharmacy
             });
@@ -411,14 +412,18 @@ export const Pharmacy = () => {
     } catch (error) {
       showToastWarning();
       setSubmitting(false);
-      console.error(JSON.stringify(error, undefined, 2));
+      if (isReroute) {
+        setOrder({
+          ...order,
+          isReroutable: false
+        });
+        const query = queryString.stringify({
+          orderId: order.id,
+          token
+        });
+        return navigate(`/status?${query}`);
+      }
     }
-    const query = queryString.stringify({
-      orderId: order.id,
-      token,
-      rerouteFailed: true
-    });
-    return navigate(`/status?${query}`);
   };
 
   const handleSetPreferredPharmacy = async (pharmacyId: string) => {
