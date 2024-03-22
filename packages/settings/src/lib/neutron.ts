@@ -223,7 +223,8 @@ const organizationSettings: {
     ...defaultSettings,
     logo: 'sesame_logo.jpg',
     accentColor: '#5224C7',
-    enableCourierNavigate: false
+    enableCourierNavigate: false,
+    topRankedCostco: true
   },
   // Oshi Health
   org_yOgsgGMBVUZIBcwp: {
