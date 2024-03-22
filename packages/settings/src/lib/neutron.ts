@@ -29,7 +29,7 @@ const defaultSettings: OrganizationSettings = {
   mailOrderNavigateProviders: [],
   sendToPatient: true,
   sendToPatientUsers: [],
-  enablePatientRerouting: false,
+  enablePatientRerouting: true,
   enableCourierNavigate: false,
   returnTo: window.location.origin,
   federated: false,
@@ -71,8 +71,7 @@ const organizationSettings: {
       HONEYBEE_PHARMACY_ID,
       GOGOMEDS_PHARMACY_ID
     ],
-    topRankedCostco: true,
-    enablePatientRerouting: true
+    topRankedCostco: true
   },
   // NewCo (demo's)
   org_YiUudCToTSrjOuow: {
