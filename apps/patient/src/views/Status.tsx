@@ -5,14 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiCheck } from 'react-icons/fi';
 import { types } from '@photonhealth/sdk';
 import queryString from 'query-string';
-import {
-  DemoCtaModal,
-  FixedFooter,
-  Nav,
-  PharmacyCard,
-  PoweredBy,
-  StatusStepper
-} from '../components';
+import { DemoCtaModal, FixedFooter, PharmacyCard, PoweredBy, StatusStepper } from '../components';
 import { Pharmacy as PharmacyWithHours } from '../utils/models';
 import { formatAddress, getFulfillmentType, preparePharmacyHours } from '../utils/general';
 import { text as t, orderStateMapping as m } from '../utils/text';
@@ -173,12 +166,9 @@ export const Status = () => {
         <title>{t.track}</title>
       </Helmet>
 
-      <Nav showRefresh />
-
-      {/* Bottom padding is added so stepper can be seen when footer is showing on smaller screens */}
-      <Container pb={showFooter ? 32 : 8}>
-        <VStack spacing={6} align="start" pt={5}>
-          <VStack spacing={2} align="start">
+      <Box bgColor="white" shadow="sm">
+        <Container>
+          <VStack spacing={2} align="start" py={4}>
             <Heading as="h3" size="lg">
               {copy.heading}
             </Heading>
@@ -203,7 +193,31 @@ export const Status = () => {
                 </Text>
               ) : null}
             </Box>
+            {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
+              <Box alignSelf="start">
+                <Text display="inline" color="gray.600">
+                  {t.tracking}
+                </Text>
+                <Link
+                  href={`https://google.com/search?q=${fulfillment.trackingNumber}`}
+                  display="inline"
+                  ms={2}
+                  color="link"
+                  fontWeight="medium"
+                  target="_blank"
+                  data-dd-privacy="mask"
+                >
+                  {fulfillment.trackingNumber}
+                </Link>
+              </Box>
+            ) : null}
           </VStack>
+        </Container>
+      </Box>
+
+      {/* Bottom padding is added so stepper can be seen when footer is showing on smaller screens */}
+      <Container pb={showFooter ? 32 : 8}>
+        <VStack spacing={6} align="start" pt={5}>
           {pharmacy ? (
             <Box width="full">
               <PharmacyCard
@@ -224,24 +238,6 @@ export const Status = () => {
               />
             </Box>
           ) : null}
-          {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
-            <Box alignSelf="start">
-              <Text display="inline" color="gray.600">
-                {t.tracking}
-              </Text>
-              <Link
-                href={`https://google.com/search?q=${fulfillment.trackingNumber}`}
-                display="inline"
-                ms={2}
-                color="link"
-                fontWeight="medium"
-                target="_blank"
-                data-dd-privacy="mask"
-              >
-                {fulfillment.trackingNumber}
-              </Link>
-            </Box>
-          ) : null}
           <StatusStepper
             fulfillmentType={fulfillmentType}
             status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
@@ -255,6 +251,7 @@ export const Status = () => {
           <Button
             size="lg"
             w="full"
+            borderRadius="lg"
             variant={successfullySubmitted ? undefined : 'brand'}
             colorScheme={successfullySubmitted ? 'green' : undefined}
             leftIcon={successfullySubmitted ? <FiCheck /> : undefined}

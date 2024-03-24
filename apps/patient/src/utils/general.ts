@@ -151,7 +151,7 @@ export const preparePharmacyHours = (pharmacy: types.Pharmacy): EnrichedPharmacy
   };
 };
 
-export const convertReadyByToUTCTimestamp = (readyBy: string): string => {
+export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string): string => {
   // Get the timezone for dayjs
   const userTimezone = dayjs.tz.guess();
 
@@ -174,12 +174,8 @@ export const convertReadyByToUTCTimestamp = (readyBy: string): string => {
       targetTime = dayjs().tz(userTimezone).hour(18).minute(0).second(0);
       break;
     case 'After hours':
-      // Assuming 'After hours' means 8:00 pm
+      // We're setting 'After hours' to 8:00 pm
       targetTime = dayjs().tz(userTimezone).hour(20).minute(0).second(0);
-      break;
-    case 'Tomorrow':
-      // For 'Tomorrow', we need to ensure we translate that to tomorrow at 9:00 am
-      targetTime = dayjs().tz(userTimezone).add(1, 'day').hour(9).minute(0).second(0);
       break;
     case 'Urgent':
       targetTime = dayjs().tz(userTimezone);
@@ -188,5 +184,11 @@ export const convertReadyByToUTCTimestamp = (readyBy: string): string => {
       return 'Invalid time selection';
   }
 
+  if (readyByDay === 'tomorrow') {
+    targetTime = dayjs().tz(userTimezone).add(1, 'day');
+  }
+
   return targetTime.utc().format();
 };
+
+export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
