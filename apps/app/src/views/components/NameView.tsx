@@ -14,11 +14,11 @@ const NameView = (props: NameViewProps) => {
     <HStack spacing="3">
       <Box>
         {isPatient ? (
-          <ChakraLink as={RouterLink} to={`/patients/${patientId}`}>
-            <Text fontWeight="medium" whiteSpace="nowrap" data-dd-privacy="mask">
+          <Text fontWeight="medium" whiteSpace="nowrap" data-dd-privacy="mask">
+            <ChakraLink as={RouterLink} to={`/patients/${patientId}`} width="fit-content">
               {name}
-            </Text>
-          </ChakraLink>
+            </ChakraLink>
+          </Text>
         ) : (
           <Text fontWeight="medium" whiteSpace="nowrap" data-dd-privacy="mask">
             {name}
