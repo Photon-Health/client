@@ -38,7 +38,7 @@ function generateChakraTheme(key = undefined) {
     styles: {
       global: () => ({
         body: {
-          bg: 'gray.50',
+          bg: 'gray.100',
           color: 'gray.800'
         }
       })
