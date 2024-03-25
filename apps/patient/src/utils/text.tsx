@@ -68,32 +68,53 @@ export const text = {
   questionVerb: 'If you have any questions, please text us at ',
   questionsPhoneNumber: '+1 (513) 866 3212',
   readyBy: 'Ready by',
-  readyByOptions: [
-    {
-      label: '10:00 am',
-      description: 'Pharmacies may be busy',
-      icon: false,
-      badge: true,
-      badgeColor: 'gray'
-    },
-    {
-      label: '12:00 pm',
-      description: 'May be affected by lunch hours',
-      icon: false,
-      badge: true,
-      badgeColor: 'red'
-    },
-    { label: '2:00 pm', description: null, icon: false, badge: false, badgeColor: null },
-    { label: '4:00 pm', description: null, icon: false, badge: false, badgeColor: null },
-    { label: '6:00 pm', description: null, icon: false, badge: false, badgeColor: null },
-    { label: 'After hours', description: null, icon: false, badge: false, badgeColor: null },
-    { label: 'Tomorrow', description: null, icon: false, badge: false, badgeColor: null },
-    {
-      label: 'Urgent',
-      description: 'Need to pickup ASAP',
-      icon: true
-    }
-  ],
+  readyByOptions: {
+    today: [
+      {
+        label: '10:00 am',
+        description: 'Pharmacies may be busy',
+        icon: false,
+        badge: true,
+        badgeColor: 'gray'
+      },
+      {
+        label: '12:00 pm',
+        description: 'May be affected by lunch hours',
+        icon: false,
+        badge: true,
+        badgeColor: 'red'
+      },
+      { label: '2:00 pm', description: null, icon: false, badge: false, badgeColor: null },
+      { label: '4:00 pm', description: null, icon: false, badge: false, badgeColor: null },
+      { label: '6:00 pm', description: null, icon: false, badge: false, badgeColor: null },
+      { label: 'After hours', description: null, icon: false, badge: false, badgeColor: null },
+      {
+        label: 'Urgent',
+        description: 'Need to pickup ASAP',
+        icon: true
+      }
+    ],
+    tomorrow: [
+      {
+        label: '10:00 am',
+        description: 'Pharmacies may be busy',
+        icon: false,
+        badge: true,
+        badgeColor: 'gray'
+      },
+      {
+        label: '12:00 pm',
+        description: 'May be affected by lunch hours',
+        icon: false,
+        badge: true,
+        badgeColor: 'red'
+      },
+      { label: '2:00 pm', description: null, icon: false, badge: false, badgeColor: null },
+      { label: '4:00 pm', description: null, icon: false, badge: false, badgeColor: null },
+      { label: '6:00 pm', description: null, icon: false, badge: false, badgeColor: null },
+      { label: 'After hours', description: null, icon: false, badge: false, badgeColor: null }
+    ]
+  },
   readyBySelected: (isPlural: boolean) =>
     `Please select a time below. We'll do our best to ensure your ${
       isPlural ? 'prescriptions are' : 'prescription is'

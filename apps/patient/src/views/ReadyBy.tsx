@@ -10,6 +10,7 @@ import {
   Icon,
   Radio,
   RadioGroup,
+  Fade,
   Tag,
   Text,
   VStack
@@ -19,11 +20,11 @@ import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
 import { datadogRum } from '@datadog/browser-rum';
 import timezone from 'dayjs/plugin/timezone';
-import { convertReadyByToUTCTimestamp } from '../utils/general';
+import { capitalize, convertReadyByToUTCTimestamp } from '../utils/general';
 
 dayjs.extend(timezone);
 
-import { FixedFooter, Nav, PoweredBy } from '../components';
+import { FixedFooter, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { RxLightningBolt } from 'react-icons/rx';
@@ -45,11 +46,14 @@ export const ReadyBy = () => {
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
 
-  const [readyBy, setReadyBy] = useState<string>(undefined);
+  const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);
+  const [selectedDay, setSelectedDay] = useState<string | undefined>(undefined);
+
+  const [activeTab, setActiveTab] = useState<string | undefined>('today');
 
   const handleSubmit = async () => {
-    if (!readyBy) {
-      console.error('No selected readyBy time.');
+    if (!selectedTime || !selectedDay) {
+      console.error('No selected readyBy time/day.');
       return;
     }
 
@@ -58,11 +62,12 @@ export const ReadyBy = () => {
       return;
     }
 
-    const readyByTime = convertReadyByToUTCTimestamp(readyBy);
+    const readyByTime = convertReadyByToUTCTimestamp(selectedTime, selectedDay);
 
     // Track selection
     datadogRum.addAction('ready_by_selection', {
-      readyBy: readyBy,
+      readyBy: selectedTime,
+      readyByDay: selectedDay,
       readyByTime: readyByTime,
       orderId: order.id,
       organization: order.organization.name,
@@ -72,7 +77,8 @@ export const ReadyBy = () => {
 
     setOrder({
       ...order,
-      readyBy,
+      readyBy: selectedTime,
+      readyByDay: selectedDay,
       readyByTime
     });
 
@@ -82,11 +88,11 @@ export const ReadyBy = () => {
   const isMultiRx = flattenedFills.length > 1;
 
   useEffect(() => {
-    if (readyBy) {
+    if (selectedTime) {
       // Scroll to bottom to make sure selection isn't hidden by footer
       window.scrollTo({ top: document.getElementById('root').scrollHeight, behavior: 'smooth' });
     }
-  }, [readyBy]);
+  }, [selectedTime]);
 
   return (
     <Box>
@@ -94,78 +100,126 @@ export const ReadyBy = () => {
         <title>{t.readyBy}</title>
       </Helmet>
 
-      <Nav />
-
-      <Container pb={readyBy ? 32 : 8}>
-        <VStack spacing={7} pt={5} align="span">
-          <VStack spacing={2} align="start">
+      <Box bgColor="white">
+        <Container>
+          <VStack spacing={4} align="span" pt={4}>
             <Heading as="h3" size="lg">
               {t.readyWhen}
             </Heading>
             <Text>{t.readyBySelected(isMultiRx)}</Text>
           </VStack>
+        </Container>
+      </Box>
 
-          <RadioGroup onChange={setReadyBy} value={readyBy}>
-            <VStack spacing={3} w="full">
-              {t.readyByOptions.map((option) => {
-                const isDisabled = checkDisabled(option.label);
+      {/* z-index set here to sit above ready by options but still below nav so shadow looks good*/}
+      <Box bgColor="white" style={{ position: 'sticky', top: 90, zIndex: 1 }} shadow="sm">
+        <Container p={4}>
+          <HStack>
+            {['today', 'tomorrow'].map((day) => (
+              <Button
+                key={day}
+                type="button"
+                w="full"
+                size="lg"
+                isActive={day === activeTab}
+                _active={{
+                  backgroundColor: 'brand.500',
+                  color: 'white',
+                  borderColor: 'brand.500'
+                }}
+                border="2px"
+                borderColor="gray.100"
+                backgroundColor="white"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveTab(day);
+                }}
+                borderRadius="xl"
+              >
+                {capitalize(day)}
+              </Button>
+            ))}
+          </HStack>
+        </Container>
+      </Box>
+
+      <Box pt={5} shadow="inner">
+        <Container pb={selectedTime ? 32 : 8}>
+          <RadioGroup value={`${selectedDay}-${selectedTime}`}>
+            <VStack spacing={3} w="full" align="stretch">
+              {t.readyByOptions[activeTab].map((option) => {
+                const isDisabled = activeTab === 'today' ? checkDisabled(option.label) : false;
+
                 return (
-                  <Card
-                    key={option.label}
-                    bgColor={isDisabled ? 'gray.300' : 'white'}
-                    border={isDisabled ? 'gray.300' : '2px solid'}
-                    borderColor={readyBy === option.label ? 'brand.500' : 'white'}
-                    color={isDisabled ? 'gray.600' : 'base'}
-                    onClick={() => !isDisabled && setReadyBy(option.label)}
-                    m="auto"
-                    w="full"
-                    shadow={isDisabled ? 'none' : 'base'}
-                    cursor={isDisabled ? 'not-allowed' : 'pointer'}
-                  >
-                    <CardBody p={3}>
-                      <HStack align="start">
-                        <Radio
-                          mt={1}
-                          value={option.label}
-                          colorScheme="brand"
-                          onClick={(e) => isDisabled && e.preventDefault()}
-                          isDisabled={isDisabled}
-                          cursor={isDisabled ? 'not-allowed' : 'pointer'}
-                        />
-                        <VStack spacing={1}>
-                          <HStack alignSelf="start">
-                            {option.icon ? <Icon as={RxLightningBolt} color="yellow.500" /> : null}
-                            <Text fontWeight="medium">{option.label}</Text>
-                          </HStack>
-                          {option.description ? (
-                            option.badge ? (
-                              <Tag
-                                colorScheme={option.badgeColor}
-                                variant="subtle"
-                                borderRadius="full"
-                              >
-                                {option.description}
-                              </Tag>
-                            ) : (
-                              <Text color="gray.500" fontSize="sm">
-                                {option.description}
-                              </Text>
-                            )
-                          ) : null}
-                        </VStack>
-                      </HStack>
-                    </CardBody>
-                  </Card>
+                  <Fade key={activeTab + '-' + option.label} in={true}>
+                    <Card
+                      bgColor={isDisabled ? 'gray.300' : 'white'}
+                      border={isDisabled ? 'gray.300' : '2px solid'}
+                      borderColor={
+                        selectedTime === option.label && selectedDay === activeTab
+                          ? 'brand.500'
+                          : 'white'
+                      }
+                      borderRadius="lg"
+                      color={isDisabled ? 'gray.600' : 'base'}
+                      onClick={() => {
+                        if (!isDisabled) {
+                          setSelectedTime(option.label);
+                          setSelectedDay(activeTab);
+                        }
+                      }}
+                      m="auto"
+                      w="full"
+                      shadow={isDisabled ? 'none' : 'base'}
+                      cursor={isDisabled ? 'not-allowed' : 'pointer'}
+                    >
+                      <CardBody p={3}>
+                        <HStack align="start">
+                          <Radio
+                            mt={1}
+                            value={`${activeTab}-${option.label}`}
+                            colorScheme="brand"
+                            onClick={(e) => isDisabled && e.preventDefault()}
+                            isDisabled={isDisabled}
+                            cursor={isDisabled ? 'not-allowed' : 'pointer'}
+                          />
+                          <VStack spacing={1}>
+                            <HStack alignSelf="start">
+                              {option.icon ? (
+                                <Icon as={RxLightningBolt} color="yellow.500" />
+                              ) : null}
+                              <Text fontWeight="medium">{option.label}</Text>
+                            </HStack>
+                            {option.description ? (
+                              option.badge ? (
+                                <Tag
+                                  colorScheme={option.badgeColor}
+                                  variant="subtle"
+                                  borderRadius="full"
+                                >
+                                  {option.description}
+                                </Tag>
+                              ) : (
+                                <Text color="gray.500" fontSize="sm">
+                                  {option.description}
+                                </Text>
+                              )
+                            ) : null}
+                          </VStack>
+                        </HStack>
+                      </CardBody>
+                    </Card>
+                  </Fade>
                 );
               })}
             </VStack>
           </RadioGroup>
-        </VStack>
-      </Container>
+        </Container>
+      </Box>
 
-      <FixedFooter show={!!readyBy}>
+      <FixedFooter show={!!selectedTime}>
         <Container as={VStack} w="full">
-          <Button size="lg" w="full" variant="brand" onClick={handleSubmit}>
+          <Button size="lg" borderRadius="lg" w="full" variant="brand" onClick={handleSubmit}>
             {t.next}
           </Button>
           <PoweredBy />

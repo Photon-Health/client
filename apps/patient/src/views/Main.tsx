@@ -8,6 +8,7 @@ import { countFillsAndRemoveDuplicates } from '../utils/general';
 import { Order } from '../utils/models';
 import { getOrder } from '../api/internal';
 import { demoOrder } from '../data/demoOrder';
+import { Nav } from '../components';
 
 import { getSettings } from '@client/settings';
 import { types } from '@photonhealth/sdk';
@@ -163,6 +164,7 @@ export const Main = () => {
   return (
     <ChakraProvider theme={theme(order.organization.id)}>
       <OrderContext.Provider value={orderContextValue}>
+        <Nav />
         <Outlet />
       </OrderContext.Provider>
     </ChakraProvider>
