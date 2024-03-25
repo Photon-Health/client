@@ -45,6 +45,7 @@ const GET_ORDERS = gql`
         }
       }
       patient {
+        id
         name {
           full
         }
