@@ -83,8 +83,6 @@ export const Nav = () => {
           {isDesktop ? (
             <HStack spacing="4">
               <ButtonGroup variant="ghost" spacing="1">
-                {/* <NavButton label="" icon={FiSearch} link="/search" /> */}
-                {/* <NavButton label="" icon={FiSettings} link="/settings" /> */}
                 <NavButton label="" icon={FiHelpCircle} link="/support" />
               </ButtonGroup>
               <Menu autoSelect={false}>
@@ -141,7 +139,12 @@ export const Nav = () => {
             </HStack>
           ) : (
             <>
-              <IconButton aria-label="Options" icon={<FiMenu />} onClick={onToggle} />
+              <IconButton
+                aria-label="Options"
+                colorScheme="gray"
+                icon={<FiMenu />}
+                onClick={onToggle}
+              />
               <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
                 <DrawerOverlay />
                 <DrawerContent>
