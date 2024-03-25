@@ -17,6 +17,7 @@ export const PharmacyFilters = ({
       <Text>Filter by</Text>
       <Button
         size="sm"
+        borderRadius="lg"
         variant="filter"
         isActive={enableOpenNow}
         onClick={() => {
@@ -28,6 +29,7 @@ export const PharmacyFilters = ({
       </Button>
       <Button
         size="sm"
+        borderRadius="lg"
         variant="filter"
         isActive={enable24Hr}
         onClick={() => {
