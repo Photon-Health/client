@@ -139,7 +139,12 @@ export const Nav = () => {
             </HStack>
           ) : (
             <>
-              <IconButton aria-label="Options" icon={<FiMenu />} onClick={onToggle} />
+              <IconButton
+                aria-label="Options"
+                colorScheme="gray"
+                icon={<FiMenu />}
+                onClick={onToggle}
+              />
               <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
                 <DrawerOverlay />
                 <DrawerContent>
