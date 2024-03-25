@@ -83,8 +83,6 @@ export const Nav = () => {
           {isDesktop ? (
             <HStack spacing="4">
               <ButtonGroup variant="ghost" spacing="1">
-                {/* <NavButton label="" icon={FiSearch} link="/search" /> */}
-                {/* <NavButton label="" icon={FiSettings} link="/settings" /> */}
                 <NavButton label="" icon={FiHelpCircle} link="/support" />
               </ButtonGroup>
               <Menu autoSelect={false}>
