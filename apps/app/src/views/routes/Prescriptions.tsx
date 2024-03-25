@@ -1,7 +1,6 @@
 import { Link as RouterLink, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 
 import {
-  Badge,
   Select,
   HStack,
   IconButton,
@@ -9,6 +8,7 @@ import {
   SkeletonCircle,
   SkeletonText,
   Stack,
+  Tag,
   Text,
   Tooltip,
   useToast
@@ -211,9 +211,9 @@ const renderRow = (rx: any) => {
     ),
     status: (
       <Tooltip label={stateTip}>
-        <Badge size="sm" colorScheme={stateColor}>
+        <Tag size="sm" borderRadius="full" colorScheme={stateColor} flexShrink={0}>
           {state}
-        </Badge>
+        </Tag>
       </Tooltip>
     ),
     prescriber: <NameView name={prescriber} />,

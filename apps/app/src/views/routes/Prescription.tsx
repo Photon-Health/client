@@ -4,7 +4,6 @@ import { usePhoton } from '@photonhealth/react';
 import {
   Alert,
   AlertIcon,
-  Badge,
   Button,
   Card,
   CardBody,
@@ -13,6 +12,7 @@ import {
   Stack,
   HStack,
   Link,
+  Tag,
   Text,
   Tooltip,
   VStack,
@@ -244,7 +244,9 @@ export const Prescription = () => {
               <Skeleton width="70px" height="24px" borderRadius="xl" />
             ) : (
               <Tooltip label={stateTip}>
-                <Badge colorScheme={stateColor}>{state}</Badge>
+                <Tag size="sm" borderRadius="full" colorScheme={stateColor} flexShrink={0}>
+                  {state}
+                </Tag>
               </Tooltip>
             )}
           </Stack>

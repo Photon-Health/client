@@ -105,7 +105,7 @@ export const TablePage = (props: TablePageProps) => {
   return (
     <Box
       w="full"
-      bg="bg-surface"
+      bg="white"
       boxShadow={{ base: 'none', md: useColorModeValue('sm', 'sm-dark') }}
       borderRadius={useBreakpointValue({ base: 'lg', md: 'lg' })}
       ref={scrollableContainerRef}
