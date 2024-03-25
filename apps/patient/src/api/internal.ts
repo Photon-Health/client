@@ -115,6 +115,7 @@ export const setOrderPharmacy = async (
   orderId: string,
   pharmacyId: string,
   readyBy: string,
+  readyByDay: string,
   readyByTime: string
 ) => {
   try {
@@ -124,6 +125,7 @@ export const setOrderPharmacy = async (
         pharmacyId,
         orderId,
         readyBy,
+        readyByDay,
         readyByTime
       }
     );
