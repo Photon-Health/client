@@ -336,6 +336,7 @@ export const Prescription = () => {
                   colorScheme="blue"
                   size="sm"
                   role="link"
+                  variant="outline"
                 >
                   Renew
                 </Button>
