@@ -119,8 +119,18 @@ export const Settings = () => {
           <CircularProgress isIndeterminate color="green.300" />
         </Center>
       ) : (
-        <Tabs index={tabIndex} onChange={handleTabsChange} isLazy maxWidth="100%">
-          <TabList overflowX={'auto'} overflowY={'hidden'}>
+        <Tabs
+          index={tabIndex}
+          onChange={handleTabsChange}
+          isLazy
+          maxWidth="100%"
+          // borderBottom="2px solid"
+        >
+          <TabList
+          // overflowX="auto" // Enable horizontal scrolling
+          // overflowY="auto" // Enable horizontal scrolling
+          // display="flex" // Ensure tabs are displayed in a row
+          >
             <Tab hidden={!hasTeam}>Team</Tab>
             <Tab>User</Tab>
             <Tab hidden={!hasOrg}>Organization</Tab>

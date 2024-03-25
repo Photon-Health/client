@@ -7,7 +7,7 @@ export const TeamTab = (props: { rolesMap: Record<string, string> }) => {
   const hasInvite = usePermissions(['read:invite']);
 
   return (
-    <VStack spacing={5} align="left">
+    <VStack spacing={5} align="left" bg="white">
       <UsersList {...props} />
       {hasInvite && <InviteList />}
     </VStack>

@@ -4,7 +4,7 @@ import { Webhooks } from '../components/webhooks/Webhooks';
 
 export const DevelopersTab = () => {
   return (
-    <VStack spacing={5} align="left">
+    <VStack spacing={5} align="left" bg="white">
       <Credentials />
       <Webhooks />
     </VStack>
