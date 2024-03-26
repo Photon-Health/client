@@ -185,7 +185,7 @@ export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string
   }
 
   if (readyByDay === 'tomorrow') {
-    targetTime = dayjs().tz(userTimezone).add(1, 'day');
+    targetTime = targetTime.add(1, 'day');
   }
 
   return targetTime.utc().format();
