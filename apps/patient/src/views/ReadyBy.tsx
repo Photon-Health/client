@@ -49,7 +49,7 @@ export const ReadyBy = () => {
   const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);
   const [selectedDay, setSelectedDay] = useState<string | undefined>(undefined);
 
-  const [activeTab, setActiveTab] = useState<string | undefined>('today');
+  const [activeTab, setActiveTab] = useState<string | undefined>('Today');
 
   const handleSubmit = async () => {
     if (!selectedTime || !selectedDay) {
@@ -115,7 +115,7 @@ export const ReadyBy = () => {
       <Box bgColor="white" style={{ position: 'sticky', top: 90, zIndex: 1 }} shadow="sm">
         <Container p={4}>
           <HStack>
-            {['today', 'tomorrow'].map((day) => (
+            {['Today', 'Tomorrow'].map((day) => (
               <Button
                 key={day}
                 type="button"
@@ -148,7 +148,7 @@ export const ReadyBy = () => {
           <RadioGroup value={`${selectedDay}-${selectedTime}`}>
             <VStack spacing={3} w="full" align="stretch">
               {t.readyByOptions[activeTab].map((option) => {
-                const isDisabled = activeTab === 'today' ? checkDisabled(option.label) : false;
+                const isDisabled = activeTab === 'Today' ? checkDisabled(option.label) : false;
 
                 return (
                   <Fade key={activeTab + '-' + option.label} in={true}>
