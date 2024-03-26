@@ -69,7 +69,7 @@ export const text = {
   questionsPhoneNumber: '+1 (513) 866 3212',
   readyBy: 'Ready by',
   readyByOptions: {
-    today: [
+    Today: [
       {
         label: '10:00 am',
         description: 'Pharmacies may be busy',
@@ -94,7 +94,7 @@ export const text = {
         icon: true
       }
     ],
-    tomorrow: [
+    Tomorrow: [
       {
         label: '10:00 am',
         description: 'Pharmacies may be busy',
