@@ -29,7 +29,7 @@ export const Canceled = () => {
       </Box>
 
       <Container>
-        <Text align="left" mt={4} fontSize="md" color="gray.400">
+        <Text align="left" mt={4} fontSize="md" color="gray.500">
           Patient{' '}
           <Text as="span" color="gray.700">
             {patient.name.full}
