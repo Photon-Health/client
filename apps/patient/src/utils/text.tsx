@@ -32,6 +32,12 @@ export const text = {
   open: 'Open',
   open24hrs: 'Open 24 Hours',
   orderCanceled: 'This order was canceled.',
+  orderCanceledHeader: 'Your order was canceled',
+  orderCanceledSubheader: (
+    <>
+      If you have any questions, please <PhoneLink>text us</PhoneLink> or reach out to your provider
+    </>
+  ),
   orderDelivered: 'Your order was delivered',
   orderInTransit: 'Your order is in transit',
   orderPickedUp: 'Your order was picked up',
@@ -182,20 +188,17 @@ export const text = {
     `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`
 };
 
-export function generatePhoneNumberLink(): React.ReactElement {
+export function PhoneLink({ children }: { children?: React.ReactNode }): React.ReactElement {
   const cleanedPhoneNumber = text.questionsPhoneNumber.replace(/[\s()-]/g, '');
   return (
-    <>
-      {text.questionVerb}
-      <Link
-        color="link"
-        fontWeight="medium"
-        textDecoration="underline"
-        href={`sms:${cleanedPhoneNumber}`}
-      >
-        {text.questionsPhoneNumber}
-      </Link>
-    </>
+    <Link
+      color="link"
+      fontWeight="medium"
+      textDecoration="underline"
+      href={`sms:${cleanedPhoneNumber}`}
+    >
+      {children || text.questionsPhoneNumber}
+    </Link>
   );
 }
 
@@ -231,7 +234,12 @@ export const orderStateMapping = {
     },
     error: {
       title: text.errorMarkPickedUp,
-      description: generatePhoneNumberLink()
+      description: (
+        <>
+          {text.questionVerb}
+          <PhoneLink />
+        </>
+      )
     }
   },
   COURIER: {
@@ -265,7 +273,12 @@ export const orderStateMapping = {
     },
     error: {
       title: text.errorMarkDelivered,
-      description: generatePhoneNumberLink()
+      description: (
+        <>
+          {text.questionVerb}
+          <PhoneLink />
+        </>
+      )
     }
   },
   MAIL_ORDER: {
@@ -299,7 +312,12 @@ export const orderStateMapping = {
     },
     error: {
       title: text.errorMarkDelivered,
-      description: generatePhoneNumberLink()
+      description: (
+        <>
+          {text.questionVerb}
+          <PhoneLink />
+        </>
+      )
     }
   }
 };
