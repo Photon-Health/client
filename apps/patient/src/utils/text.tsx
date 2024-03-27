@@ -32,12 +32,6 @@ export const text = {
   open: 'Open',
   open24hrs: 'Open 24 Hours',
   orderCanceled: 'This order was canceled.',
-  orderCanceledHeader: 'Your order was canceled',
-  orderCanceledSubheader: (
-    <>
-      If you have any questions, please <PhoneLink>text us</PhoneLink> or reach out to your provider
-    </>
-  ),
   orderDelivered: 'Your order was delivered',
   orderInTransit: 'Your order is in transit',
   orderPickedUp: 'Your order was picked up',
@@ -73,6 +67,11 @@ export const text = {
   quantity: 'Quantity',
   questionVerb: 'If you have any questions, please text us at ',
   questionsPhoneNumber: '+1 (513) 866 3212',
+  reachOut: (
+    <>
+      If you have any questions, please <PhoneLink>text us</PhoneLink> or reach out to your provider
+    </>
+  ),
   readyBy: 'Ready by',
   readyByOptions: {
     Today: [

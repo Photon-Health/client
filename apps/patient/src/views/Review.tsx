@@ -5,7 +5,7 @@ import { Helmet } from 'react-helmet';
 import { useOrderContext } from './Main';
 import { FixedFooter, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
-import { Prescriptions } from '../components/Prescriptions';
+import { PrescriptionsList } from '../components/PrescriptionsList';
 
 export const Review = () => {
   const { order, flattenedFills } = useOrderContext();
@@ -55,7 +55,7 @@ export const Review = () => {
         </Container>
       </Box>
 
-      <Prescriptions />
+      <PrescriptionsList />
 
       <FixedFooter show={true}>
         <Container as={VStack} w="full">

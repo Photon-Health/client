@@ -1,6 +1,6 @@
 import { Box, Container, Heading, Text, VStack } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet';
-import { Prescriptions } from '../components/Prescriptions';
+import { PrescriptionsList } from '../components/PrescriptionsList';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -19,10 +19,10 @@ export const Canceled = () => {
         <Container>
           <VStack spacing={2} align="start" py={4}>
             <Heading as="h3" size="lg">
-              {t.orderCanceledHeader}
+              {t.orderCanceled}
             </Heading>
             <Box>
-              <Text display="inline">{t.orderCanceledSubheader}</Text>
+              <Text display="inline">{t.reachOut}</Text>
             </Box>
           </VStack>
         </Container>
@@ -37,7 +37,7 @@ export const Canceled = () => {
         </Text>
       </Container>
 
-      <Prescriptions />
+      <PrescriptionsList />
     </Box>
   );
 };

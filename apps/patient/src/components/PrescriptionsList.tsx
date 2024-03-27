@@ -16,7 +16,7 @@ import { text as t } from '../utils/text';
 import { formatDate } from '../utils/general';
 import { useOrderContext } from '../views/Main';
 
-export const Prescriptions = () => {
+export const PrescriptionsList = () => {
   const { flattenedFills } = useOrderContext();
 
   return (
