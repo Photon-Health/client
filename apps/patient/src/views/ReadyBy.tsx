@@ -111,8 +111,16 @@ export const ReadyBy = () => {
         </Container>
       </Box>
 
-      {/* z-index set here to sit above ready by options but still below nav so shadow looks good*/}
-      <Box bgColor="white" style={{ position: 'sticky', top: 90, zIndex: 1 }} shadow="sm">
+      <Box
+        bgColor="white"
+        style={{
+          position: 'sticky',
+          top: process.env.REACT_APP_ENV_NAME === 'photon' ? 55 : 90,
+          // z-index set here to sit above ready by options but still below nav so shadow looks good
+          zIndex: 1
+        }}
+        shadow="sm"
+      >
         <Container p={4}>
           <HStack>
             {['Today', 'Tomorrow'].map((day) => (
