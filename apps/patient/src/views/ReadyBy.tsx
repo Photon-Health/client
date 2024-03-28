@@ -132,6 +132,8 @@ export const ReadyBy = () => {
                 backgroundColor="white"
                 onClick={(e) => {
                   e.preventDefault();
+                  setSelectedTime(undefined);
+                  setSelectedDay(undefined);
                   setActiveTab(day);
                 }}
                 borderRadius="xl"
