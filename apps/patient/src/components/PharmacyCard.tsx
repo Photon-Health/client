@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import {
   Box,
   Button,
@@ -8,21 +7,23 @@ import {
   Collapse,
   Divider,
   HStack,
+  Image,
   Tag,
   TagLabel,
   TagLeftIcon,
   Text,
   VStack,
-  useBreakpointValue,
-  Image
+  useBreakpointValue
 } from '@chakra-ui/react';
-import { FiRotateCcw, FiStar, FiThumbsUp, FiRefreshCcw, FiNavigation } from 'react-icons/fi';
+import { types } from '@photonhealth/sdk';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { types } from '@photonhealth/sdk';
+import { memo, useState, MouseEvent } from 'react';
+import { FiNavigation, FiRefreshCcw, FiRotateCcw, FiStar, FiThumbsUp } from 'react-icons/fi';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 
+import { datadogRum } from '@datadog/browser-rum';
 import { formatAddress } from '../utils/general';
 
 dayjs.extend(customParseFormat);
@@ -119,9 +120,19 @@ export const PharmacyCard = memo(function PharmacyCard({
   selectable = false,
   showDetails = true
 }: PharmacyCardProps) {
-  if (!pharmacy) return null;
-
   const isMobile = useBreakpointValue({ base: true, md: false });
+  const [editSuggested, setEditSuggested] = useState(false);
+
+  const onSuggestAnEdit = (e: MouseEvent<unknown>) => {
+    e.stopPropagation();
+    setEditSuggested(true);
+    datadogRum.addAction('suggest_an_edit', {
+      pharmacyId: pharmacy.id,
+      timestamp: new Date().toISOString()
+    });
+  };
+
+  if (!pharmacy) return null;
 
   return (
     <Card
@@ -175,6 +186,14 @@ export const PharmacyCard = memo(function PharmacyCard({
                   closes={pharmacy.closes}
                 />
                 <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
+                <Text
+                  onClick={onSuggestAnEdit}
+                  color={editSuggested ? 'gray.500' : 'blue.500'}
+                  fontSize="xs"
+                  pt="2"
+                >
+                  Something look wrong? {editSuggested && "We're taking a look"}
+                </Text>
               </>
             ) : null}
           </VStack>
