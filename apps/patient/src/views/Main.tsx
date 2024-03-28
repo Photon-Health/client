@@ -56,16 +56,16 @@ export const Main = () => {
   const handleOrderResponse = (order: Order) => {
     setOrder(order);
 
-    if (order.state === types.OrderState.Canceled) {
-      navigate('/canceled', { replace: true });
-      return;
-    }
-
     setFlattenedFills(countFillsAndRemoveDuplicates(order.fills));
 
     datadogRum.setGlobalContextProperty('organizationId', order.organization.id);
     datadogRum.setGlobalContextProperty('orderId', orderId);
     datadogRum.setUser({ patientId: order.patient.id });
+
+    if (order.state === types.OrderState.Canceled) {
+      navigate('/canceled', { replace: true });
+      return;
+    }
 
     const hasPharmacy = order.pharmacy?.id;
     const redirect = hasPharmacy ? '/status' : '/review';
