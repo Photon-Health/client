@@ -1,6 +1,7 @@
 import {
   Accordion,
   AccordionButton,
+  AccordionIcon,
   AccordionItem,
   AccordionPanel,
   Box,
@@ -42,7 +43,7 @@ export const PrescriptionsList = () => {
                         </Text>
                       </HStack>
                       <Box>
-                        <AccordionItem />
+                        <AccordionIcon />
                       </Box>
                     </AccordionButton>
                   </HStack>
