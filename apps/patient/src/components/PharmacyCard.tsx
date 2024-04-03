@@ -91,7 +91,6 @@ const DistanceAddress = ({ distance, address }: DistanceAddressProps) => {
 interface PharmacyCardProps {
   pharmacy: EnrichedPharmacy;
   preferred?: boolean;
-  previous?: boolean;
   goodService?: boolean;
   savingPreferred?: boolean;
   selected?: boolean;
@@ -107,7 +106,6 @@ interface PharmacyCardProps {
 export const PharmacyCard = memo(function PharmacyCard({
   pharmacy,
   preferred = false,
-  previous = false,
   goodService = false,
   savingPreferred = false,
   selected = false,
@@ -140,12 +138,6 @@ export const PharmacyCard = memo(function PharmacyCard({
               <Tag size="sm" colorScheme="blue">
                 <TagLeftIcon boxSize="12px" as={FiStar} />
                 <TagLabel> {t.preferred}</TagLabel>
-              </Tag>
-            ) : null}
-            {previous && !preferred ? (
-              <Tag size="sm" colorScheme="green">
-                <TagLeftIcon boxSize="12px" as={FiRotateCcw} />
-                <TagLabel> {t.previous}</TagLabel>
               </Tag>
             ) : null}
             {goodService ? (

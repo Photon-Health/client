@@ -63,7 +63,6 @@ export const text = {
     `The pharmacy is preparing your ${isPlural ? 'prescriptions' : 'prescription'} for delivery.`,
   preparingTextUs: (isPlural: boolean) =>
     `The pharmacy is preparing your ${isPlural ? 'prescriptions' : 'prescription'} for pick up.`,
-  previous: 'Previous',
   quantity: 'Quantity',
   questionVerb: 'If you have any questions, please text us at ',
   questionsPhoneNumber: '+1 (513) 866 3212',
