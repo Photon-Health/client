@@ -159,10 +159,15 @@ export const PharmacyCard = memo(function PharmacyCard({
                 <TagLabel>{t.open24hrs}</TagLabel>
               </Tag>
             ) : null}
+            {pharmacy?.isUrgent ? (
+              <Tag size="sm" bgColor="yellow.200">
+                <TagLabel>Ready in 30 minutes</TagLabel>
+              </Tag>
+            ) : null}
           </HStack>
           <VStack align="start" w="full" spacing={0}>
             <HStack spacing={2}>
-              {pharmacy?.logo ? <Image src={pharmacy.logo} width="auto" height="24px" /> : null}
+              {pharmacy?.logo ? <Image src={pharmacy.logo} width="auto" height="20px" /> : null}
               <Text fontSize="md">{pharmacy.name}</Text>
             </HStack>
             {showDetails ? (
