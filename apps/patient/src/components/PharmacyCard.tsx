@@ -16,7 +16,7 @@ import {
   useBreakpointValue,
   Image
 } from '@chakra-ui/react';
-import { FiRotateCcw, FiStar, FiThumbsUp, FiRefreshCcw, FiNavigation } from 'react-icons/fi';
+import { FiStar, FiRefreshCcw, FiNavigation } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { types } from '@photonhealth/sdk';
@@ -37,7 +37,7 @@ interface HoursProps {
 
 const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes }: HoursProps) => {
   const color = isClosingSoon ? 'orange.500' : isOpen ? 'green' : 'red';
-  const text = isClosingSoon ? t.closingSoon : isOpen ? t.open : t.closed;
+  const text = is24Hr ? t.open24hrs : isClosingSoon ? t.closingSoon : isOpen ? t.open : t.closed;
 
   return (
     <HStack w="full" whiteSpace="nowrap" overflow="hidden">
@@ -136,11 +136,6 @@ export const PharmacyCard = memo(function PharmacyCard({
               <Tag size="sm" colorScheme="blue">
                 <TagLeftIcon boxSize="12px" as={FiStar} />
                 <TagLabel> {t.preferred}</TagLabel>
-              </Tag>
-            ) : null}
-            {pharmacy?.is24Hr ? (
-              <Tag size="sm" colorScheme="green">
-                <TagLabel>{t.open24hrs}</TagLabel>
               </Tag>
             ) : null}
             {pharmacy?.isUrgent ? (
