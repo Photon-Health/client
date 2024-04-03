@@ -211,7 +211,7 @@ export const Pharmacy = () => {
 
     // check if top ranked walgreens is in the area
     try {
-      if (order.readyBy === 'Urgent') {
+      if (order.organization.name === 'Blueberry Pediatrics' && order.readyBy === 'Urgent') {
         const topRankedWags: EnrichedPharmacy[] = await getPharmacies({
           searchParams: {
             latitude: lat,
