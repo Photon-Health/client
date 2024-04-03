@@ -20,7 +20,6 @@ export const text = {
   findLoc: 'Find a location',
   gettingLoc: 'Getting current location',
   goLocal: 'Select a local pharmacy for pick up.',
-  goodService: 'Good Service',
   inTransit: 'In transit',
   makePreferred: 'Make this my preferred pharmacy',
   next: 'Next',

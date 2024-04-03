@@ -91,7 +91,6 @@ const DistanceAddress = ({ distance, address }: DistanceAddressProps) => {
 interface PharmacyCardProps {
   pharmacy: EnrichedPharmacy;
   preferred?: boolean;
-  goodService?: boolean;
   savingPreferred?: boolean;
   selected?: boolean;
   canReroute?: boolean;
@@ -106,7 +105,6 @@ interface PharmacyCardProps {
 export const PharmacyCard = memo(function PharmacyCard({
   pharmacy,
   preferred = false,
-  goodService = false,
   savingPreferred = false,
   selected = false,
   canReroute = true,
@@ -138,12 +136,6 @@ export const PharmacyCard = memo(function PharmacyCard({
               <Tag size="sm" colorScheme="blue">
                 <TagLeftIcon boxSize="12px" as={FiStar} />
                 <TagLabel> {t.preferred}</TagLabel>
-              </Tag>
-            ) : null}
-            {goodService ? (
-              <Tag size="sm" colorScheme="purple">
-                <TagLeftIcon boxSize="12px" as={FiThumbsUp} />
-                <TagLabel> {t.goodService}</TagLabel>
               </Tag>
             ) : null}
             {pharmacy?.is24Hr ? (
