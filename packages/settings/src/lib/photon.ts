@@ -34,7 +34,6 @@ const defaultSettings: OrganizationSettings = {
   enableRxAndOrder: true,
   enableCombineAndDuplicate: true,
   topRankedCostco: false,
-  topRankedWalgreens: false,
   hideTemplates: false
 };
 

@@ -40,7 +40,6 @@ import { demoPharmacies } from '../data/demoPharmacies';
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import costcoLogo from '../assets/costco_small.png';
-import walgreensLogo from '../assets/walgreens_small.png';
 import { isGLP } from '../utils/isGLP';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
@@ -74,10 +73,8 @@ export const Pharmacy = () => {
   const [location, setLocation] = useState<string>(
     order?.address ? formatAddress(order.address) : ''
   );
-  const [enableOpenNow, setEnableOpenNow] = useState(
-    openNow !== null ? !!openNow : order?.readyBy === 'Urgent'
-  );
-  const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
+  const [enableOpenNow, setEnableOpenNow] = useState(!!openNow);
+  const [enable24Hr, setEnable24Hr] = useState(false);
 
   const toast = useToast();
 
@@ -85,7 +82,6 @@ export const Pharmacy = () => {
 
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
   const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
-  const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
   const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
 
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
@@ -183,13 +179,13 @@ export const Pharmacy = () => {
     setLongitude(lng);
 
     // Get pharmacies from photon db
-    const topRankedPharmacies: EnrichedPharmacy[] = [];
+    let topRankedPharmacy: EnrichedPharmacy[] = [];
     let pharmaciesResult: EnrichedPharmacy[];
 
     // check if top ranked costco is enabled and there are GLP treatments
     try {
       if (enableTopRankedCostco && containsGLP) {
-        const topRankedCostco: EnrichedPharmacy[] = await getPharmacies({
+        topRankedPharmacy = await getPharmacies({
           searchParams: {
             latitude: lat,
             longitude: lng,
@@ -201,41 +197,14 @@ export const Pharmacy = () => {
           is24hr: enable24Hr,
           name: 'costco'
         });
-        if (topRankedCostco.length > 0) {
+        if (topRankedPharmacy.length > 0) {
           // add a logo to the only item in the array
-          topRankedCostco[0].logo = costcoLogo;
-          topRankedPharmacies.push(topRankedCostco[0]);
+          topRankedPharmacy[0].logo = costcoLogo;
         }
       }
     } catch {
       // no costcos found :(
       pharmaciesResult = [];
-    }
-
-    // check if top ranked walgreens is in the area
-    try {
-      if (enableTopRankedWalgreens && order.readyBy === 'Urgent') {
-        const topRankedWags: EnrichedPharmacy[] = await getPharmacies({
-          searchParams: {
-            latitude: lat,
-            longitude: lng,
-            radius: PHARMACY_SEARCH_RADIUS_IN_MILES
-          },
-          limit: 1,
-          offset: 0,
-          isOpenNow: enableOpenNow,
-          is24hr: enable24Hr,
-          name: 'walgreens'
-        });
-        if (topRankedWags.length > 0) {
-          // add a logo to the only item in the array
-          topRankedWags[0].logo = walgreensLogo;
-          topRankedWags[0].isUrgent = true;
-          topRankedPharmacies.push(topRankedWags[0]);
-        }
-      }
-    } catch {
-      // no walgreens found :(
     }
 
     // get the rest of the local pickup pharmacies
@@ -252,8 +221,7 @@ export const Pharmacy = () => {
         is24hr: enable24Hr
       });
       // prepend top ranked pharmacy to the list
-      pharmaciesResult = [...topRankedPharmacies, ...pharmaciesResult];
-
+      pharmaciesResult = [...topRankedPharmacy, ...pharmaciesResult];
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
         setLoadingPharmacies(false);
         return;
