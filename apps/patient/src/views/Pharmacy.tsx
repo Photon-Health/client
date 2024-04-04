@@ -74,8 +74,9 @@ export const Pharmacy = () => {
   const [location, setLocation] = useState<string>(
     order?.address ? formatAddress(order.address) : ''
   );
-  const [enableOpenNow, setEnableOpenNow] = useState(!!openNow);
-  const [enable24Hr, setEnable24Hr] = useState(false);
+  const openNowDefault = openNow !== null ? !!openNow : order.readyBy === 'Urgent' ? true : false;
+  const [enableOpenNow, setEnableOpenNow] = useState(openNowDefault);
+  const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
 
   const toast = useToast();
 
