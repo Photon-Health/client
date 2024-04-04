@@ -16,7 +16,7 @@ import {
   useBreakpointValue,
   Image
 } from '@chakra-ui/react';
-import { FiRotateCcw, FiStar, FiThumbsUp, FiRefreshCcw, FiNavigation } from 'react-icons/fi';
+import { FiStar, FiRefreshCcw, FiNavigation } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { types } from '@photonhealth/sdk';
@@ -37,7 +37,7 @@ interface HoursProps {
 
 const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes }: HoursProps) => {
   const color = isClosingSoon ? 'orange.500' : isOpen ? 'green' : 'red';
-  const text = isClosingSoon ? t.closingSoon : isOpen ? t.open : t.closed;
+  const text = is24Hr ? t.open24hrs : isClosingSoon ? t.closingSoon : isOpen ? t.open : t.closed;
 
   return (
     <HStack w="full" whiteSpace="nowrap" overflow="hidden">
@@ -91,8 +91,6 @@ const DistanceAddress = ({ distance, address }: DistanceAddressProps) => {
 interface PharmacyCardProps {
   pharmacy: EnrichedPharmacy;
   preferred?: boolean;
-  previous?: boolean;
-  goodService?: boolean;
   savingPreferred?: boolean;
   selected?: boolean;
   canReroute?: boolean;
@@ -107,8 +105,6 @@ interface PharmacyCardProps {
 export const PharmacyCard = memo(function PharmacyCard({
   pharmacy,
   preferred = false,
-  previous = false,
-  goodService = false,
   savingPreferred = false,
   selected = false,
   canReroute = true,
@@ -142,27 +138,15 @@ export const PharmacyCard = memo(function PharmacyCard({
                 <TagLabel> {t.preferred}</TagLabel>
               </Tag>
             ) : null}
-            {previous && !preferred ? (
-              <Tag size="sm" colorScheme="green">
-                <TagLeftIcon boxSize="12px" as={FiRotateCcw} />
-                <TagLabel> {t.previous}</TagLabel>
-              </Tag>
-            ) : null}
-            {goodService ? (
-              <Tag size="sm" colorScheme="purple">
-                <TagLeftIcon boxSize="12px" as={FiThumbsUp} />
-                <TagLabel> {t.goodService}</TagLabel>
-              </Tag>
-            ) : null}
-            {pharmacy?.is24Hr ? (
-              <Tag size="sm" colorScheme="green">
-                <TagLabel>{t.open24hrs}</TagLabel>
+            {pharmacy?.isUrgent ? (
+              <Tag size="sm" bgColor="yellow.200">
+                <TagLabel>Ready in 30 minutes</TagLabel>
               </Tag>
             ) : null}
           </HStack>
           <VStack align="start" w="full" spacing={0}>
             <HStack spacing={2}>
-              {pharmacy?.logo ? <Image src={pharmacy.logo} width="auto" height="24px" /> : null}
+              {pharmacy?.logo ? <Image src={pharmacy.logo} width="auto" height="19px" /> : null}
               <Text fontSize="md">{pharmacy.name}</Text>
             </HStack>
             {showDetails ? (
