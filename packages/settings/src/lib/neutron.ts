@@ -163,8 +163,7 @@ const organizationSettings: {
   org_vISrdMELQC3MhOFb: {
     ...defaultSettings,
     logo: 'blueberry_logo.png',
-    accentColor: '#235AFF',
-    topRankedWalgreens: true
+    accentColor: '#235AFF'
   },
   // Sunny
   org_PILXReL8NKiTWxD3: {
