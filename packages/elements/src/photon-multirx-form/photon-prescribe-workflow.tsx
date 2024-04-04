@@ -270,71 +270,80 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         }
         prescriptions.push(args);
       }
-
-      const { data: prescriptionData, errors } = await rxMutation({
-        variables: {
-          prescriptions
-        },
-        refetchQueries: [],
-        awaitRefetchQueries: false
-      });
-
-      if (!props.enableOrder) {
-        setIsLoading(false);
-      }
-      if (errors) {
-        dispatchPrescriptionsError(errors);
-        return;
-      }
-      dispatchPrescriptionsCreated(prescriptionData!.createPrescriptions);
-      if (props.enableOrder) {
-        if (
-          props.formStore.updatePreferredPharmacy?.value &&
-          props.formStore.pharmacy?.value &&
-          props.formStore.fulfillmentType?.value === 'PICK_UP'
-        ) {
-          const patient = props.formStore.patient?.value;
-          if (patient?.preferredPharmacies && patient?.preferredPharmacies?.length > 0) {
-            // remove the current preferred pharmacy
-            removePatientPreferredPharmacyMutation({
-              variables: {
-                patientId: patient.id,
-                pharmacyId: patient?.preferredPharmacies?.[0]?.id
-              },
-              awaitRefetchQueries: false
-            });
-          }
-          // add the new preferred pharmacy to the patient
-          updatePatientMutation({
-            variables: {
-              id: patient.id,
-              preferredPharmacies: [props.formStore.pharmacy?.value]
-            },
-            awaitRefetchQueries: false
-          });
-        }
-
-        const { data: orderData, errors } = await orderMutation({
+      try {
+        const { data: prescriptionData, errors } = await rxMutation({
           variables: {
-            ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
-            patientId: props.formStore.patient?.value.id,
-            pharmacyId: props?.pharmacyId || props.formStore.pharmacy?.value || '',
-            fulfillmentType: props.formStore.fulfillmentType?.value || '',
-            address: formattedAddress(),
-            fills: prescriptionData?.createPrescriptions.map((x) => ({ prescriptionId: x.id }))
+            prescriptions
           },
           refetchQueries: [],
           awaitRefetchQueries: false
         });
 
-        if (props.enableOrder) {
+        if (!props.enableOrder) {
           setIsLoading(false);
         }
         if (errors) {
-          dispatchOrderError(errors);
+          dispatchPrescriptionsError(errors);
           return;
         }
-        dispatchOrderCreated(orderData!.createOrder);
+        dispatchPrescriptionsCreated(prescriptionData!.createPrescriptions);
+        if (props.enableOrder) {
+          if (
+            props.formStore.updatePreferredPharmacy?.value &&
+            props.formStore.pharmacy?.value &&
+            props.formStore.fulfillmentType?.value === 'PICK_UP'
+          ) {
+            const patient = props.formStore.patient?.value;
+            if (patient?.preferredPharmacies && patient?.preferredPharmacies?.length > 0) {
+              // remove the current preferred pharmacy
+              removePatientPreferredPharmacyMutation({
+                variables: {
+                  patientId: patient.id,
+                  pharmacyId: patient?.preferredPharmacies?.[0]?.id
+                },
+                awaitRefetchQueries: false
+              });
+            }
+            // add the new preferred pharmacy to the patient
+            updatePatientMutation({
+              variables: {
+                id: patient.id,
+                preferredPharmacies: [props.formStore.pharmacy?.value]
+              },
+              awaitRefetchQueries: false
+            });
+          }
+
+          const { data: orderData, errors } = await orderMutation({
+            variables: {
+              ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
+              patientId: props.formStore.patient?.value.id,
+              pharmacyId: props?.pharmacyId || props.formStore.pharmacy?.value || '',
+              fulfillmentType: props.formStore.fulfillmentType?.value || '',
+              address: formattedAddress(),
+              fills: prescriptionData?.createPrescriptions.map((x) => ({ prescriptionId: x.id }))
+            },
+            refetchQueries: [],
+            awaitRefetchQueries: false
+          });
+
+          if (props.enableOrder) {
+            setIsLoading(false);
+          }
+          if (errors) {
+            dispatchOrderError(errors);
+            return;
+          }
+          dispatchOrderCreated(orderData!.createOrder);
+        }
+      } catch (err) {
+        dispatchOrderError([err as GraphQLError]);
+        setIsLoading(false);
+        triggerToast({
+          status: 'error',
+          header: 'Error Creating Order',
+          body: (err as GraphQLError)?.message
+        });
       }
     } else {
       setErrors(errors);
