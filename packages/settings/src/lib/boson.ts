@@ -36,7 +36,6 @@ const defaultSettings: OrganizationSettings = {
   enableRxAndOrder: false,
   enableCombineAndDuplicate: true,
   topRankedCostco: false,
-  topRankedWalgreens: false,
   hideTemplates: false
 };
 
@@ -60,8 +59,7 @@ const organizationSettings: {
     accentColor: '#b35724',
     enableRxAndOrder: true,
     enableMedHistory: true,
-    topRankedCostco: true,
-    topRankedWalgreens: true
+    topRankedCostco: true
   },
   // NewCo (demo's)
   org_w85CgjUjCi52yvOz: {

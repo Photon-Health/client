@@ -19,7 +19,6 @@
  * @param enableRxAndOrder Combine Rx and order creation into one prescribe flow
  * @param enableCombineAndDuplicate Enable the ability to combine and duplicate orders
  * @param topRankedCostco Enable Costco to rank at the top of pickup pharmacy list in the patient app
- * @param topRankedWalgreens Enable Walgreens to rank at the top of pickup pharmacy list in the patient app
  *
  */
 export type OrganizationSettings = {
@@ -41,6 +40,5 @@ export type OrganizationSettings = {
   enableRxAndOrder?: boolean;
   enableCombineAndDuplicate?: boolean;
   topRankedCostco?: boolean;
-  topRankedWalgreens?: boolean;
   hideTemplates?: boolean;
 };
