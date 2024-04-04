@@ -508,21 +508,23 @@ export const Pharmacy = () => {
   };
 
   useEffect(() => {
-    if (isDemo) {
-      initializeDemo();
-    } else {
-      if (location && !loadingPharmacies) {
-        initialize();
+    if (!loadingPharmacies) {
+      if (isDemo) {
+        initializeDemo();
+      } else {
+        if (location) {
+          initialize();
+        }
       }
     }
   }, [location]);
 
   useEffect(() => {
     reset();
-    if (isDemo) {
-      initializeDemo();
-    } else {
-      if (!loadingPharmacies) {
+    if (!loadingPharmacies) {
+      if (isDemo) {
+        initializeDemo();
+      } else {
         initialize();
       }
     }
