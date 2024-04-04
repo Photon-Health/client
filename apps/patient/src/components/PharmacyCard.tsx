@@ -146,7 +146,7 @@ export const PharmacyCard = memo(function PharmacyCard({
           </HStack>
           <VStack align="start" w="full" spacing={0}>
             <HStack spacing={2}>
-              {pharmacy?.logo ? <Image src={pharmacy.logo} width="auto" height="20px" /> : null}
+              {pharmacy?.logo ? <Image src={pharmacy.logo} width="auto" height="19px" /> : null}
               <Text fontSize="md">{pharmacy.name}</Text>
             </HStack>
             {showDetails ? (
