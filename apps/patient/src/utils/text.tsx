@@ -20,7 +20,6 @@ export const text = {
   findLoc: 'Find a location',
   gettingLoc: 'Getting current location',
   goLocal: 'Select a local pharmacy for pick up.',
-  goodService: 'Good Service',
   inTransit: 'In transit',
   makePreferred: 'Make this my preferred pharmacy',
   next: 'Next',
@@ -30,7 +29,7 @@ export const text = {
       isPlural ? 'prescriptions' : 'prescription'
     }.`,
   open: 'Open',
-  open24hrs: 'Open 24 Hours',
+  open24hrs: 'Open 24 hours',
   orderCanceled: 'This order was canceled.',
   orderDelivered: 'Your order was delivered',
   orderInTransit: 'Your order is in transit',
@@ -63,7 +62,6 @@ export const text = {
     `The pharmacy is preparing your ${isPlural ? 'prescriptions' : 'prescription'} for delivery.`,
   preparingTextUs: (isPlural: boolean) =>
     `The pharmacy is preparing your ${isPlural ? 'prescriptions' : 'prescription'} for pick up.`,
-  previous: 'Previous',
   quantity: 'Quantity',
   questionVerb: 'If you have any questions, please text us at ',
   questionsPhoneNumber: '+1 (513) 866 3212',
