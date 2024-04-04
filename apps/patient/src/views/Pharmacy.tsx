@@ -75,7 +75,7 @@ export const Pharmacy = () => {
     order?.address ? formatAddress(order.address) : ''
   );
   const [enableOpenNow, setEnableOpenNow] = useState(
-    openNow !== null ? !!openNow : order.readyBy === 'Urgent'
+    openNow !== null ? !!openNow : order?.readyBy === 'Urgent'
   );
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
 
