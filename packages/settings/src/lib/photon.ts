@@ -34,6 +34,7 @@ const defaultSettings: OrganizationSettings = {
   enableRxAndOrder: true,
   enableCombineAndDuplicate: true,
   topRankedCostco: false,
+  topRankedWalgreens: false,
   hideTemplates: false
 };
 
@@ -218,7 +219,8 @@ const organizationSettings: {
     ...defaultSettings,
     logo: 'blueberry_logo.png',
     accentColor: '#235AFF',
-    enableMedHistory: true
+    enableMedHistory: true,
+    topRankedWalgreens: true
   },
   // TBD Health
   org_XoBVNLkIWL6BP8vZ: {

@@ -37,6 +37,7 @@ const defaultSettings: OrganizationSettings = {
   enableRxAndOrder: true,
   enableCombineAndDuplicate: true,
   topRankedCostco: false,
+  topRankedWalgreens: false,
   hideTemplates: false
 };
 
@@ -162,7 +163,8 @@ const organizationSettings: {
   org_vISrdMELQC3MhOFb: {
     ...defaultSettings,
     logo: 'blueberry_logo.png',
-    accentColor: '#235AFF'
+    accentColor: '#235AFF',
+    topRankedWalgreens: true
   },
   // Sunny
   org_PILXReL8NKiTWxD3: {

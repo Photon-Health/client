@@ -83,6 +83,7 @@ export const Pharmacy = () => {
 
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
   const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
+  const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
   const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
 
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
@@ -211,7 +212,7 @@ export const Pharmacy = () => {
 
     // check if top ranked walgreens is in the area
     try {
-      if (order.organization.name === 'Blueberry Pediatrics' && order.readyBy === 'Urgent') {
+      if (enableTopRankedWalgreens && order.readyBy === 'Urgent') {
         const topRankedWags: EnrichedPharmacy[] = await getPharmacies({
           searchParams: {
             latitude: lat,
