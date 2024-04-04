@@ -511,7 +511,7 @@ export const Pharmacy = () => {
     if (isDemo) {
       initializeDemo();
     } else {
-      if (location) {
+      if (location && !loadingPharmacies) {
         initialize();
       }
     }
@@ -522,7 +522,9 @@ export const Pharmacy = () => {
     if (isDemo) {
       initializeDemo();
     } else {
-      initialize();
+      if (!loadingPharmacies) {
+        initialize();
+      }
     }
   }, [enableOpenNow, enable24Hr]);
 
