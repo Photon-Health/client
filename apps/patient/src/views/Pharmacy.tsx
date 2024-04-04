@@ -508,21 +508,25 @@ export const Pharmacy = () => {
   };
 
   useEffect(() => {
-    if (isDemo) {
-      initializeDemo();
-    } else {
-      if (location) {
-        initialize();
+    if (!loadingPharmacies) {
+      if (isDemo) {
+        initializeDemo();
+      } else {
+        if (location) {
+          initialize();
+        }
       }
     }
   }, [location]);
 
   useEffect(() => {
     reset();
-    if (isDemo) {
-      initializeDemo();
-    } else {
-      initialize();
+    if (!loadingPharmacies) {
+      if (isDemo) {
+        initializeDemo();
+      } else {
+        initialize();
+      }
     }
   }, [enableOpenNow, enable24Hr]);
 
