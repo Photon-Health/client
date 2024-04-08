@@ -257,6 +257,10 @@ const Component = (props: {
                   e.stopPropagation();
                   setTriggerSubmit(false);
                 }}
+                on:photon-order-combine-error={(e: any) => {
+                  e.stopPropagation();
+                  setTriggerSubmit(false);
+                }}
                 on:photon-signature-attestation-agreed={() => {
                   setHideOrderButton(false);
                 }}

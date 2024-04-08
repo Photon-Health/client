@@ -14,6 +14,7 @@ import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 import { createMutation } from '../../utils/createMutation';
 import { DraftPrescription } from '../DraftPrescriptions';
 import { Order } from '@photonhealth/sdk/dist/types';
+import { GraphQLError } from 'graphql';
 
 const CREATE_PRESCRIPTIONS_MUTATION = gql`
   mutation RecentOrdersCombineDialogCreatePrescriptions($prescriptions: [PrescriptionInput!]!) {
@@ -123,6 +124,17 @@ export default function RecentOrdersCombineDialog() {
     ref?.dispatchEvent(event);
   };
 
+  const dispatchCombineOrderError = (err: GraphQLError) => {
+    const event = new CustomEvent('photon-order-combine-error', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        error: err.message
+      }
+    });
+    ref?.dispatchEvent(event);
+  };
+
   createEffect(() => {
     if (state.isCombineDialogOpen) {
       dispatchDatadogAction('prescribe-combine-dialog-open', {}, ref);
@@ -190,13 +202,16 @@ export default function RecentOrdersCombineDialog() {
     try {
       // Create prescriptions for the drafts
       prescriptions = await createPrescriptions();
-    } catch {
+    } catch (err) {
       triggerToast({
         header: 'Error Creating Prescriptions',
-        body: 'The prescriptions have not been created.',
-        status: 'info'
+        body: (err as GraphQLError).message,
+        status: 'error'
       });
       setIsCombiningOrders(false);
+      setIsCreatingOrder(false);
+      actions.setIsCombineDialogOpen(false);
+      dispatchCombineOrderError(err as GraphQLError);
       return;
     }
 
