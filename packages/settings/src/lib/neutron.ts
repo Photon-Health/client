@@ -71,7 +71,7 @@ const organizationSettings: {
       HONEYBEE_PHARMACY_ID,
       GOGOMEDS_PHARMACY_ID
     ],
-    topRankedCostco: true
+    topRankedWalgreens: true
   },
   // NewCo (demo's)
   org_YiUudCToTSrjOuow: {
