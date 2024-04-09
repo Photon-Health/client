@@ -111,14 +111,14 @@ export const preparePharmacy = (pharmacy: types.Pharmacy): EnrichedPharmacy => {
   let isClosingSoon = false;
   let opens = '';
   let closes = '';
-  let isUrgent = false;
+  let showReadyIn30Min = false;
   let logo = null;
 
   // Add logo and urgent badge to certain pharmacies
   const pharmacyNameLowerCase = pharmacy.name.toLowerCase();
   if (pharmacyNameLowerCase.includes('walgreens')) {
     logo = walgreensLogo;
-    isUrgent = true;
+    showReadyIn30Min = true;
   } else if (pharmacyNameLowerCase.includes('costco')) {
     logo = costcoLogo;
   }
@@ -158,7 +158,7 @@ export const preparePharmacy = (pharmacy: types.Pharmacy): EnrichedPharmacy => {
   return {
     ...pharmacy,
     logo,
-    isUrgent,
+    showReadyIn30Min,
     is24Hr,
     isClosingSoon,
     opens,
