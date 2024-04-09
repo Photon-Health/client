@@ -106,6 +106,23 @@ function isCloseEvent(event: types.PharmacyEvent): event is types.PharmacyCloseE
   return event.type === 'close';
 }
 
+/**
+ * Dedupes pharmacy options when merging new and existing pharmacies
+ * @param newPharmacies Pharmacies query result
+ * @param existingPharmacies Pre-loaded pharmacies
+ * @returns Deduped list of enriched pharmacy options
+ */
+export const preparePharmacyOptions = (
+  newPharmacies: types.Pharmacy[],
+  existingPharmacies: EnrichedPharmacy[] = []
+) => {
+  const existingPharmacyIds = new Set(existingPharmacies.map((p) => p.id));
+  const enrichedNewPharmacies = newPharmacies
+    .filter((p) => !existingPharmacyIds.has(p.id))
+    .map(preparePharmacy);
+  return [...existingPharmacies, ...enrichedNewPharmacies];
+};
+
 export const preparePharmacy = (pharmacy: types.Pharmacy): EnrichedPharmacy => {
   let is24Hr = false;
   let isClosingSoon = false;

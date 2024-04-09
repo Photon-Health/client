@@ -16,7 +16,7 @@ import { Helmet } from 'react-helmet';
 import queryString from 'query-string';
 import { types } from '@photonhealth/sdk';
 import * as TOAST_CONFIG from '../configs/toast';
-import { formatAddress, preparePharmacy } from '../utils/general';
+import { formatAddress, preparePharmacyOptions } from '../utils/general';
 import { ExtendedFulfillmentType, Pharmacy as PharmacyWithHours } from '../utils/models';
 import { text as t } from '../utils/text';
 import {
@@ -41,7 +41,7 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { isGLP } from '../utils/isGLP';
 
-const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
+const GET_PHARMACIES_LIMIT = 5; // Number of pharmacies to fetch at a time
 const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
 
 export const Pharmacy = () => {
@@ -239,7 +239,7 @@ export const Pharmacy = () => {
           longitude: lng,
           radius: PHARMACY_SEARCH_RADIUS_IN_MILES
         },
-        limit: GET_PHARMACIES_COUNT,
+        limit: GET_PHARMACIES_LIMIT,
         offset: 0,
         isOpenNow: enableOpenNow,
         is24hr: enable24Hr
@@ -267,7 +267,7 @@ export const Pharmacy = () => {
       return;
     }
 
-    const preparedPharmacies: PharmacyWithHours[] = pharmaciesResult.map(preparePharmacy);
+    const preparedPharmacies: PharmacyWithHours[] = preparePharmacyOptions(pharmaciesResult);
     setPharmacyOptions(preparedPharmacies);
 
     setLoadingPharmacies(false);
@@ -284,7 +284,7 @@ export const Pharmacy = () => {
 
       const newPharmacyOptions = pharmacies.slice(
         pharmacyOptions.length,
-        pharmacyOptions.length + GET_PHARMACIES_COUNT
+        pharmacyOptions.length + GET_PHARMACIES_LIMIT
       );
       const totalPharmacyOptions = [...pharmacyOptions, ...newPharmacyOptions];
       setPharmacyOptions(totalPharmacyOptions);
@@ -305,7 +305,7 @@ export const Pharmacy = () => {
           longitude,
           radius: PHARMACY_SEARCH_RADIUS_IN_MILES
         },
-        limit: GET_PHARMACIES_COUNT,
+        limit: GET_PHARMACIES_LIMIT,
         offset: pharmacyOptions.length,
         isOpenNow: enableOpenNow,
         is24hr: enable24Hr
@@ -327,8 +327,11 @@ export const Pharmacy = () => {
       }
     }
 
-    const preparedPharmacies: PharmacyWithHours[] = pharmaciesResult.map(preparePharmacy);
-    setPharmacyOptions([...pharmacyOptions, ...preparedPharmacies]);
+    const preparedPharmacies: PharmacyWithHours[] = preparePharmacyOptions(
+      pharmaciesResult,
+      pharmacyOptions
+    );
+    setPharmacyOptions(preparedPharmacies);
 
     setLoadingPharmacies(false);
   };
