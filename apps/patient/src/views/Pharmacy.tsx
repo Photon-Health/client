@@ -16,7 +16,7 @@ import { Helmet } from 'react-helmet';
 import queryString from 'query-string';
 import { types } from '@photonhealth/sdk';
 import * as TOAST_CONFIG from '../configs/toast';
-import { formatAddress, preparePharmacyOptions } from '../utils/general';
+import { formatAddress, preparePharmacy, preparePharmacyOptions } from '../utils/general';
 import { ExtendedFulfillmentType, Pharmacy as PharmacyWithHours } from '../utils/models';
 import { text as t } from '../utils/text';
 import {
@@ -180,9 +180,8 @@ export const Pharmacy = () => {
     setLatitude(lat);
     setLongitude(lng);
 
-    // Get pharmacies from photon db
+    // Get top ranked pharmacies from photon db
     const topRankedPharmacies: EnrichedPharmacy[] = [];
-    let pharmaciesResult: EnrichedPharmacy[];
 
     // check if top ranked costco is enabled and there are GLP treatments
     try {
@@ -200,12 +199,11 @@ export const Pharmacy = () => {
           name: 'costco'
         });
         if (topRankedCostco.length > 0) {
-          topRankedPharmacies.push(topRankedCostco[0]);
+          topRankedPharmacies.push(preparePharmacy(topRankedCostco[0]));
         }
       }
     } catch {
       // no costcos found :(
-      pharmaciesResult = [];
     }
 
     // check if top ranked walgreens is in the area
@@ -224,14 +222,16 @@ export const Pharmacy = () => {
           name: 'walgreens'
         });
         if (topRankedWags.length > 0) {
-          topRankedPharmacies.push(topRankedWags[0]);
+          topRankedPharmacies.push(preparePharmacy(topRankedWags[0]));
         }
       }
     } catch {
       // no walgreens found :(
     }
 
-    // get the rest of the local pickup pharmacies
+    // Get the rest of the local pickup pharmacies
+    let pharmaciesResult: EnrichedPharmacy[] = [];
+
     try {
       pharmaciesResult = await getPharmacies({
         searchParams: {
@@ -244,8 +244,6 @@ export const Pharmacy = () => {
         isOpenNow: enableOpenNow,
         is24hr: enable24Hr
       });
-      // prepend top ranked pharmacy to the list
-      pharmaciesResult = [...topRankedPharmacies, ...pharmaciesResult];
 
       if (!pharmaciesResult || pharmaciesResult.length === 0) {
         setLoadingPharmacies(false);
@@ -267,7 +265,10 @@ export const Pharmacy = () => {
       return;
     }
 
-    const preparedPharmacies: PharmacyWithHours[] = preparePharmacyOptions(pharmaciesResult);
+    const preparedPharmacies: PharmacyWithHours[] = preparePharmacyOptions(
+      pharmaciesResult,
+      topRankedPharmacies
+    );
     setPharmacyOptions(preparedPharmacies);
 
     setLoadingPharmacies(false);
