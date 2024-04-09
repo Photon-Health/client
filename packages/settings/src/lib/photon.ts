@@ -219,8 +219,7 @@ const organizationSettings: {
     ...defaultSettings,
     logo: 'blueberry_logo.png',
     accentColor: '#235AFF',
-    enableMedHistory: true,
-    topRankedWalgreens: true
+    enableMedHistory: true
   },
   // TBD Health
   org_XoBVNLkIWL6BP8vZ: {
