@@ -7,7 +7,7 @@ import { types } from '@photonhealth/sdk';
 import queryString from 'query-string';
 import { DemoCtaModal, FixedFooter, PharmacyCard, PoweredBy, StatusStepper } from '../components';
 import { Pharmacy as PharmacyWithHours } from '../utils/models';
-import { formatAddress, getFulfillmentType, preparePharmacyHours } from '../utils/general';
+import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { text as t, orderStateMapping as m } from '../utils/text';
 import { useOrderContext } from './Main';
 import * as TOAST_CONFIG from '../configs/toast';
@@ -154,7 +154,7 @@ export const Status = () => {
     fulfillmentState === 'PICKED_UP' ||
     fulfillmentState === 'RECEIVED';
 
-  const pharmacyWithHours: PharmacyWithHours = preparePharmacyHours(pharmacy);
+  const pharmacyWithHours: PharmacyWithHours = preparePharmacy(pharmacy);
 
   const copy = m[fulfillmentType][fulfillmentState];
 
