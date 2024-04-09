@@ -16,7 +16,7 @@ export interface Pharmacy extends types.Pharmacy {
   isOpen?: boolean;
   is24Hr?: boolean;
   isClosingSoon?: boolean;
-  isUrgent?: boolean;
+  showReadyIn30Min?: boolean;
   closes?: string;
   opens?: string;
   logo?: string;
