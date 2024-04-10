@@ -8,6 +8,8 @@ import { types } from '@photonhealth/sdk';
 import { ExtendedFulfillmentType } from './models';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
+import costcoLogo from '../assets/costco_small.png';
+import walgreensLogo from '../assets/walgreens_small.png';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -104,11 +106,22 @@ function isCloseEvent(event: types.PharmacyEvent): event is types.PharmacyCloseE
   return event.type === 'close';
 }
 
-export const preparePharmacyHours = (pharmacy: types.Pharmacy): EnrichedPharmacy => {
+export const preparePharmacy = (pharmacy: types.Pharmacy): EnrichedPharmacy => {
   let is24Hr = false;
   let isClosingSoon = false;
   let opens = '';
   let closes = '';
+  let showReadyIn30Min = false;
+  let logo = null;
+
+  // Add logo and urgent badge to certain pharmacies
+  const pharmacyNameLowerCase = pharmacy.name.toLowerCase();
+  if (pharmacyNameLowerCase.includes('walgreens')) {
+    logo = walgreensLogo;
+    showReadyIn30Min = true;
+  } else if (pharmacyNameLowerCase.includes('costco')) {
+    logo = costcoLogo;
+  }
 
   if (pharmacy.nextEvents) {
     is24Hr = pharmacy.nextEvents[pharmacy.isOpen ? 'open' : 'close'].type === '24hr';
@@ -144,6 +157,8 @@ export const preparePharmacyHours = (pharmacy: types.Pharmacy): EnrichedPharmacy
 
   return {
     ...pharmacy,
+    logo,
+    showReadyIn30Min,
     is24Hr,
     isClosingSoon,
     opens,
