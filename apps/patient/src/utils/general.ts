@@ -17,12 +17,13 @@ dayjs.extend(isoWeek);
 dayjs.extend(isBetween);
 dayjs.extend(isToday);
 
-export const titleCase = (str: string) =>
-  str
+export const titleCase = (str) => {
+  return str
     .toLowerCase()
     .split(' ')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
+};
 
 export const formatAddress = (address: types.Address) => {
   const { city, postalCode, state, street1, street2 } = address;
@@ -112,16 +113,16 @@ function isCloseEvent(event: types.PharmacyEvent): event is types.PharmacyCloseE
  * @param existingPharmacies Pre-loaded pharmacies
  * @returns Deduped list of enriched pharmacy options
  */
-export const preparePharmacyOptions = (
+export function preparePharmacyOptions(
   newPharmacies: types.Pharmacy[],
   existingPharmacies: EnrichedPharmacy[] = []
-) => {
+) {
   const existingPharmacyIds = new Set(existingPharmacies.map((p) => p.id));
   const enrichedNewPharmacies = newPharmacies
     .filter((p) => !existingPharmacyIds.has(p.id))
     .map(preparePharmacy);
   return [...existingPharmacies, ...enrichedNewPharmacies];
-};
+}
 
 export const preparePharmacy = (pharmacy: types.Pharmacy): EnrichedPharmacy => {
   let is24Hr = false;
