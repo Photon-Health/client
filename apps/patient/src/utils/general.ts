@@ -107,7 +107,7 @@ function isCloseEvent(event: types.PharmacyEvent): event is types.PharmacyCloseE
 }
 
 /**
- * Dedupes pharmacy options when merging new and existing pharmacies
+ * Dedupes and enriches pharmacy options when merging new and existing pharmacies
  * @param newPharmacies Pharmacies query result
  * @param existingPharmacies Pre-loaded pharmacies
  * @returns Deduped list of enriched pharmacy options
