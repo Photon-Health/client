@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Box, Button, Container, Heading, Link, Text, VStack, useToast } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -18,18 +18,17 @@ export const Status = () => {
   const navigate = useNavigate();
   const { order, flattenedFills, setOrder } = useOrderContext();
 
-  const orgSettings = getSettings(order.organization.id);
+  const orgSettings = getSettings(order?.organization.id);
 
   const [searchParams] = useSearchParams();
-  const orderId = searchParams.get('orderId');
   const token = searchParams.get('token');
   const type = searchParams.get('type');
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
 
-  const showFooterStates: types.FulfillmentState[] = ['RECEIVED', 'READY'];
+  const showFooterStates = ['RECEIVED', 'READY'];
   const [showFooter, setShowFooter] = useState<boolean>(
-    showFooterStates.includes(order?.fulfillment?.state) &&
+    showFooterStates.includes(order?.fulfillment?.state ?? '') &&
       order?.fulfillment?.type !== types.FulfillmentType.MailOrder
   );
   const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
@@ -37,13 +36,16 @@ export const Status = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
 
-  const { fulfillment, pharmacy, address } = order;
+  const { fulfillment, pharmacy, address } = order!;
 
-  const fulfillmentType = getFulfillmentType(pharmacy?.id, fulfillment, type);
+  const fulfillmentType = getFulfillmentType(pharmacy?.id, fulfillment!, type!);
 
   const toast = useToast();
 
   const handleMarkOrderAsPickedUp = async () => {
+    if (!order) {
+      return;
+    }
     setSubmitting(true);
 
     // Show cta modal for demo
@@ -61,7 +63,7 @@ export const Status = () => {
     }
 
     try {
-      const result: boolean = await markOrderAsPickedUp(orderId);
+      const result: boolean = await markOrderAsPickedUp(order.id);
 
       setTimeout(() => {
         if (result) {
@@ -70,9 +72,7 @@ export const Status = () => {
 
           setOrder({
             ...order,
-            fulfillment: {
-              state: 'PICKED_UP'
-            }
+            fulfillment: { ...order.fulfillment, state: 'PICKED_UP', type: fulfillment!.type }
           });
         } else {
           toast({
@@ -83,7 +83,7 @@ export const Status = () => {
         }
         setSubmitting(false);
       }, 1000);
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: m[fulfillmentType].error.title,
         description: m[fulfillmentType].error.description,
@@ -96,27 +96,33 @@ export const Status = () => {
     }
   };
 
+  const pharmacyFormattedAddress = useMemo(
+    () => (pharmacy ? formatAddress(pharmacy.address!) : ''),
+    [pharmacy?.address]
+  );
+
   const handleGetDirections = () => {
-    const url = `http://maps.google.com/?q=${pharmacy.name}, ${formatAddress(pharmacy.address)}`;
+    const url = `http://maps.google.com/?q=${pharmacy!.name}, ${pharmacyFormattedAddress}`;
     window.open(url);
   };
 
   useEffect(() => {
+    if (!phone || !pharmacy || !order || !fulfillment) {
+      return;
+    }
     if (isDemo) {
       setTimeout(async () => {
         // Send order received sms to demo participant
         await triggerDemoNotification(
-          phone,
+          phone!,
           'photon:order_fulfillment:received',
           pharmacy.name,
-          formatAddress(pharmacy.address)
+          pharmacyFormattedAddress
         );
 
         setOrder({
           ...order,
-          fulfillment: {
-            state: 'RECEIVED'
-          }
+          fulfillment: { ...order.fulfillment, state: 'RECEIVED', type: fulfillment!.type }
         });
 
         setShowFooter(true);
@@ -127,21 +133,29 @@ export const Status = () => {
             phone,
             'photon:order_fulfillment:ready',
             pharmacy.name,
-            formatAddress(pharmacy.address)
+            pharmacyFormattedAddress
           );
 
           setOrder({
             ...order,
-            fulfillment: {
-              state: 'READY'
-            }
+            fulfillment: { ...order.fulfillment, state: 'READY', type: fulfillment!.type }
           });
 
           setTimeout(() => setShowDemoCtaModal(true), 1500);
         }, 1500);
       }, 1500);
     }
-  }, []);
+  }, [
+    fulfillment,
+    isDemo,
+    order,
+    pharmacy,
+    pharmacy?.address,
+    pharmacy?.name,
+    pharmacyFormattedAddress,
+    phone,
+    setOrder
+  ]);
 
   const isMultiRx = flattenedFills.length > 1;
 
@@ -154,10 +168,15 @@ export const Status = () => {
     fulfillmentState === 'PICKED_UP' ||
     fulfillmentState === 'RECEIVED';
 
-  const pharmacyWithHours: PharmacyWithHours = preparePharmacy(pharmacy);
+  const pharmacyWithHours: PharmacyWithHours = preparePharmacy(pharmacy!);
 
-  const copy = m[fulfillmentType][fulfillmentState];
+  // TODO(mrochlin) Theres so typing issue here because MAIL_ORDER doesnt have RECEIVED as a valid state.
+  const copy = (m[fulfillmentType] as any)[fulfillmentState];
 
+  if (!order) {
+    console.error('No order found');
+    return null;
+  }
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
@@ -241,7 +260,7 @@ export const Status = () => {
           <StatusStepper
             fulfillmentType={fulfillmentType}
             status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
-            patientAddress={formatAddress(address)}
+            patientAddress={formatAddress(address!)}
           />
         </VStack>
       </Container>
@@ -258,9 +277,7 @@ export const Status = () => {
             onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
             isLoading={submitting}
           >
-            {successfullySubmitted
-              ? t.thankYou
-              : m[fulfillmentType][fulfillmentState].cta(isMultiRx)}
+            {successfullySubmitted ? t.thankYou : copy.cta(isMultiRx)}
           </Button>
           <PoweredBy />
         </Container>

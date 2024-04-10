@@ -1,23 +1,29 @@
-import { useState, useEffect, useCallback, createContext, useContext } from 'react';
-import { Outlet, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
-import { Center, CircularProgress } from '@chakra-ui/react';
-import { ChakraProvider } from '@chakra-ui/react';
+import { Center, ChakraProvider, CircularProgress } from '@chakra-ui/react';
 import { datadogRum } from '@datadog/browser-rum';
+import { Context, createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
-import { countFillsAndRemoveDuplicates } from '../utils/general';
-import { Order } from '../utils/models';
 import { getOrder } from '../api/internal';
-import { demoOrder } from '../data/demoOrder';
 import { Nav } from '../components';
+import { demoOrder } from '../data/demoOrder';
+import { FillWithCount, countFillsAndRemoveDuplicates } from '../utils/general';
+import { Order } from '../utils/models';
 
 import { getSettings } from '@client/settings';
 import { types } from '@photonhealth/sdk';
-import theme from '../configs/theme';
-import { setAuthHeader } from '../configs/graphqlClient';
 import { AUTH_HEADER_ERRORS } from '../api/internal';
+import { setAuthHeader } from '../configs/graphqlClient';
+import theme from '../configs/theme';
 
-const OrderContext = createContext(null);
-export const useOrderContext = () => useContext(OrderContext);
+interface OrderContextType {
+  order: Order;
+  flattenedFills: FillWithCount[];
+  setOrder: (order: Order) => void;
+  logo: any;
+}
+const OrderContext = createContext<OrderContextType | null>(null);
+export const useOrderContext = () =>
+  useContext<OrderContextType>(OrderContext as Context<OrderContextType>);
 
 export const Main = () => {
   const [searchParams] = useSearchParams();
@@ -28,7 +34,7 @@ export const Main = () => {
 
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
 
-  const [logo, setLogo] = useState(undefined);
+  const [logo, setLogo] = useState<any>(undefined);
   const [loadingLogo, setLoadingLogo] = useState(true);
 
   const [flattenedFills, setFlattenedFills] = useState(
@@ -45,7 +51,7 @@ export const Main = () => {
         navigate('/no-match', { replace: true });
       }
     }
-  }, []);
+  }, [isDemo, location.pathname, navigate, orderId, token]);
 
   useEffect(() => {
     if (token) {
@@ -53,33 +59,37 @@ export const Main = () => {
     }
   }, [token]);
 
-  const handleOrderResponse = (order: Order) => {
-    setOrder(order);
+  const handleOrderResponse = useCallback(
+    (order: Order) => {
+      setOrder(order);
 
-    setFlattenedFills(countFillsAndRemoveDuplicates(order.fills));
+      setFlattenedFills(countFillsAndRemoveDuplicates(order.fills));
 
-    datadogRum.setGlobalContextProperty('organizationId', order.organization.id);
-    datadogRum.setGlobalContextProperty('orderId', orderId);
-    datadogRum.setUser({ patientId: order.patient.id });
+      datadogRum.setGlobalContextProperty('organizationId', order.organization.id);
+      datadogRum.setGlobalContextProperty('orderId', order.id);
+      datadogRum.setUser({ patientId: order.patient.id });
 
-    if (order.state === types.OrderState.Canceled) {
-      navigate('/canceled', { replace: true });
-      return;
-    }
+      if (order.state === types.OrderState.Canceled) {
+        navigate('/canceled', { replace: true });
+        return;
+      }
 
-    const hasPharmacy = order.pharmacy?.id;
-    const redirect = hasPharmacy ? '/status' : '/review';
+      const hasPharmacy = order.pharmacy?.id;
+      const redirect = hasPharmacy ? '/status' : '/review';
 
-    navigate(`${redirect}?orderId=${order.id}&token=${token}`, { replace: true });
-  };
+      navigate(`${redirect}?orderId=${order.id}&token=${token}`, { replace: true });
+    },
+    [navigate, token]
+  );
 
   const fetchOrder = useCallback(async () => {
     try {
-      const result: Order = await getOrder(orderId);
+      const result: Order = await getOrder(orderId!);
       if (result) {
         handleOrderResponse(result);
       }
-    } catch (error) {
+    } catch (e: any) {
+      const error = e as any;
       console.log(error.response);
 
       const isAuthError = AUTH_HEADER_ERRORS.includes(error?.response?.errors?.[0].extensions.code);
@@ -92,19 +102,19 @@ export const Main = () => {
       // If an order was returned, use it for routing
       handleOrderResponse(error.response.data.order);
     }
-  }, [navigate, orderId, token]);
+  }, [handleOrderResponse, navigate, orderId]);
 
   useEffect(() => {
     if (isDemo && order) {
       navigate(`/review?demo=true&phone=${phone}`, { replace: true });
     }
-  }, [isDemo]);
+  }, [isDemo, navigate, order, phone]);
 
   useEffect(() => {
     if (!isDemo && !order) {
       fetchOrder();
     }
-  }, [order, orderId, fetchOrder]);
+  }, [order, orderId, fetchOrder, isDemo]);
 
   const preloadImage = (url: string) => {
     return new Promise((resolve, reject) => {
@@ -115,7 +125,7 @@ export const Main = () => {
     });
   };
 
-  const fetchLogo = async (fileName: string) => {
+  const fetchLogo = useCallback(async (fileName: string) => {
     if (fileName === 'photon') {
       setLogo('photon');
       setLoadingLogo(false);
@@ -125,12 +135,12 @@ export const Main = () => {
         await preloadImage(response.default);
         setLogo(response.default);
         setLoadingLogo(false);
-      } catch (e) {
+      } catch (e: any) {
         console.error(e);
         setLoadingLogo(false);
       }
     }
-  };
+  }, []);
 
   // Set logo
   useEffect(() => {
@@ -147,7 +157,7 @@ export const Main = () => {
         }
       }
     }
-  }, [order?.organization?.id]);
+  }, [fetchLogo, isDemo, order?.organization.id]);
 
   if (!order || loadingLogo) {
     return (
@@ -162,7 +172,7 @@ export const Main = () => {
   const orderContextValue = { order, flattenedFills, setOrder, logo };
 
   return (
-    <ChakraProvider theme={theme(order.organization.id)}>
+    <ChakraProvider theme={theme(order!.organization.id)}>
       <OrderContext.Provider value={orderContextValue}>
         <Nav />
         <Outlet />

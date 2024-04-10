@@ -49,9 +49,13 @@ export const ReadyBy = () => {
   const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);
   const [selectedDay, setSelectedDay] = useState<string | undefined>(undefined);
 
-  const [activeTab, setActiveTab] = useState<string | undefined>('Today');
+  const [activeTab, setActiveTab] = useState<keyof (typeof t)['readyByOptions']>('Today');
 
   const handleSubmit = async () => {
+    if (!order) {
+      console.error('Tried to submit without an order');
+      return;
+    }
     if (!selectedTime || !selectedDay) {
       console.error('No selected readyBy time/day.');
       return;
@@ -82,7 +86,7 @@ export const ReadyBy = () => {
       readyByTime
     });
 
-    navigate(`/pharmacy?orderId=${order.id}&token=${token}`);
+    navigate(`/pharmacy?orderId=${order?.id}&token=${token}`);
   };
 
   const isMultiRx = flattenedFills.length > 1;
@@ -90,7 +94,7 @@ export const ReadyBy = () => {
   useEffect(() => {
     if (selectedTime) {
       // Scroll to bottom to make sure selection isn't hidden by footer
-      window.scrollTo({ top: document.getElementById('root').scrollHeight, behavior: 'smooth' });
+      window.scrollTo({ top: document.getElementById('root')!.scrollHeight, behavior: 'smooth' });
     }
   }, [selectedTime]);
 
@@ -123,7 +127,7 @@ export const ReadyBy = () => {
       >
         <Container p={4}>
           <HStack>
-            {['Today', 'Tomorrow'].map((day) => (
+            {(['Today', 'Tomorrow'] as const).map((day) => (
               <Button
                 key={day}
                 type="button"

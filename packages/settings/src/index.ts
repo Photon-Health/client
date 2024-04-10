@@ -4,7 +4,7 @@ import { photon } from './lib/photon';
 
 const environment = process.env['REACT_APP_ENV_NAME'] as 'boson' | 'neutron' | 'photon';
 
-export function getSettings(organizationId: string) {
+export function getSettings(organizationId: string | undefined) {
   switch (environment) {
     case 'boson':
       return boson(organizationId);

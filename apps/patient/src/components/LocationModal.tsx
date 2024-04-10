@@ -21,8 +21,13 @@ import { debounce } from 'lodash';
 
 import { text as t } from '../utils/text';
 
-const formatLocationOptions = (p: any) => {
-  const options = p.map((org: any) => {
+interface Option {
+  value: string;
+  label: string;
+}
+
+const formatLocationOptions = (p: any[]) => {
+  const options = p.map<Option>((org) => {
     return {
       value: org.place_id,
       label: org.description
@@ -51,7 +56,7 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
   };
 
   const debouncedSearchForLocations = debounce(
-    async (inputValue: string, callback: (options: any) => void) => {
+    async (inputValue: string, callback: (options: Option[]) => void) => {
       const options = await searchForLocations(inputValue);
       callback(options);
     },
@@ -126,12 +131,12 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
               <Text pb={0} mt={0} fontSize="sm">
                 {t.enterLoc}
               </Text>
-              <AsyncSelect
+              <AsyncSelect<Option>
                 placeholder=""
-                loadOptions={(inputValue: string, callback: (options) => void) => {
+                loadOptions={(inputValue: string, callback: (options: Option[]) => void) => {
                   debouncedSearchForLocations(inputValue, callback);
                 }}
-                defaultOptions={[]}
+                defaultOptions={[] as Option[]}
                 isClearable
                 menuPlacement="auto"
                 isDisabled={!!isDemo}

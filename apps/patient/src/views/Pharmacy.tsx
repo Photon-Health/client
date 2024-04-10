@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -17,7 +18,7 @@ import queryString from 'query-string';
 import { types } from '@photonhealth/sdk';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, preparePharmacy } from '../utils/general';
-import { ExtendedFulfillmentType, Pharmacy as PharmacyWithHours } from '../utils/models';
+import { ExtendedFulfillmentType } from '../utils/models';
 import { text as t } from '../utils/text';
 import {
   BrandedOptions,
@@ -47,52 +48,102 @@ const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
 export const Pharmacy = () => {
   const { order, flattenedFills, setOrder } = useOrderContext();
 
-  const orgSettings = getSettings(order.organization.id);
+  const orgSettings = getSettings(order?.organization.id);
 
   const navigate = useNavigate();
+  const toast = useToast();
 
+  // search params
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const isReroute = searchParams.get('reroute');
   const openNow = searchParams.get('openNow');
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
+
+  // preferred pharmacy
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
-  const [pharmacyOptions, setPharmacyOptions] = useState([]);
+
+  // View state
   const [showFooter, setShowFooter] = useState<boolean>(false);
-  const [selectedId, setSelectedId] = useState<string>('');
   const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
+
+  // selection state
+  const [selectedId, setSelectedId] = useState<string>('');
+
+  // Submitting state
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
+
+  // loading state
   const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(false);
   const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
+
+  // Address state
   const [latitude, setLatitude] = useState<number | undefined>(undefined);
-  const [longitude, setLongitude] = useState<number | undefined>(undefined);
-  const [location, setLocation] = useState<string>(
-    order?.address ? formatAddress(order.address) : ''
+  const [longitude, setLongitude] = useState<number | null>(null);
+  const [location, setLocation] = useState(
+    order?.address ? formatAddress(order.address) : undefined
   );
+  const [cleanAddress, setCleanAddress] = useState<string>();
+  const [loadingLocation, setLoadingLocation] = useState(false);
+
+  // loading state
+  const isLoading = useMemo(
+    () => loadingLocation || loadingPharmacies,
+    [loadingLocation, loadingPharmacies]
+  );
+
+  // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
     openNow !== null ? !!openNow : order?.readyBy === 'Urgent'
   );
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
 
-  const toast = useToast();
+  // pagination
+  const [pageOffset, setPageOffset] = useState(0);
 
-  const isMultiRx = flattenedFills.length > 1;
+  const isMultiRx = useMemo(() => flattenedFills.length > 1, [flattenedFills.length]);
 
-  const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
-  const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
-  const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
-  const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
+  const enableMailOrder = useMemo(
+    () => !isDemo && orgSettings.mailOrderNavigate,
+    [isDemo, orgSettings.mailOrderNavigate]
+  );
+  const enableTopRankedCostco = useMemo(
+    () => !isDemo && orgSettings.topRankedCostco,
+    [isDemo, orgSettings.topRankedCostco]
+  );
+  const enableTopRankedWalgreens = useMemo(
+    () => !isDemo && orgSettings.topRankedWalgreens,
+    [isDemo, orgSettings.topRankedWalgreens]
+  );
+  const containsGLP = useMemo(
+    () => flattenedFills.some((fill) => isGLP(fill.treatment.name)),
+    [flattenedFills]
+  );
 
-  const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
-  const subheading = isReroute
-    ? t.sendToNew(isMultiRx, order.pharmacy.name)
-    : t.sendToSelected(isMultiRx);
+  const heading = useMemo(() => (isReroute ? t.changePharmacy : t.selectAPharmacy), [isReroute]);
+  const subheading = useMemo(
+    () => (isReroute ? t.sendToNew(isMultiRx, order!.pharmacy!.name) : t.sendToSelected(isMultiRx)),
+    [isMultiRx, isReroute, order]
+  );
+
+  // Pharmacy results
+  const [topRankedPharmacies, setTopRankedPharmacies] = useState<EnrichedPharmacy[]>([]);
+  const [pharmacyResults, setPharmacyResults] = useState<EnrichedPharmacy[]>([]);
+  const allPharmacies = useMemo(() => {
+    const topRankedIds = topRankedPharmacies.map((p) => p.id);
+    return [
+      ...topRankedPharmacies,
+      ...pharmacyResults.filter((p) => !topRankedIds.includes(p.id))
+    ].map(preparePharmacy);
+  }, [pharmacyResults, topRankedPharmacies]);
 
   const reset = () => {
-    setPharmacyOptions([]);
+    setTopRankedPharmacies([]);
+    setPharmacyResults([]);
+    setPageOffset(0);
     setSelectedId('');
     setShowFooter(false);
     setShowingAllPharmacies(false);
@@ -107,31 +158,16 @@ export const Pharmacy = () => {
       ...TOAST_CONFIG.WARNING
     });
 
-  const handleModalClose = ({
-    loc = undefined,
-    lat = undefined,
-    lng = undefined
-  }: {
-    loc: string | undefined;
-    lat: number | undefined;
-    lng: number | undefined;
-  }) => {
-    // Reset view if search location changes
-    if (loc && loc !== location) {
-      if (lat && lng) {
-        reset();
-        setLocation(loc);
-        setLatitude(lat);
-        setLongitude(lng);
-      }
-    }
-
+  const handleModalClose = ({ loc = undefined }: { loc: string | undefined }) => {
+    reset();
+    setLocation(loc);
     setLocationModalOpen(false);
   };
 
-  const initializeDemo = () => {
+  const initializeDemo = useCallback(() => {
     // Mock geocode data
     setLocation('201 N 8th St, Brooklyn, NY 11211');
+    setCleanAddress('201 N 8th St, Brooklyn, NY 11211');
     setLatitude(40.717484);
     setLongitude(-73.955662397568);
 
@@ -142,136 +178,173 @@ export const Pharmacy = () => {
 
     pharmacies = pharmacies.slice(0, 5);
 
-    setPharmacyOptions(pharmacies);
+    setPharmacyResults(pharmacies);
 
     if (pharmacies.length < 5) {
       setShowingAllPharmacies(true);
     }
-  };
+  }, [enable24Hr, enableOpenNow]);
 
-  const initialize = async () => {
-    setLoadingPharmacies(true);
-
-    // Perform geocode to get lat/lng
-    let locationData: { address: string; lat: number; lng: number };
-    try {
-      locationData = await geocode(location);
-    } catch (error) {
-      toast({
-        title: 'Invalid location',
-        description: 'Please update your location and try again.',
-        ...TOAST_CONFIG.ERROR
-      });
-
-      setShowingAllPharmacies(true);
-
-      console.log('Geocoding error:', error);
-
-      return;
+  useEffect(() => {
+    if (isDemo) {
+      initializeDemo();
     }
+  }, [initializeDemo, isDemo]);
 
-    const { address, lat, lng } = locationData;
-    if (!address || !lat || !lng) {
-      setLoadingPharmacies(false);
-      return;
-    }
-
-    setLocation(address);
-    setLatitude(lat);
-    setLongitude(lng);
-
-    // Get pharmacies from photon db
-    const topRankedPharmacies: EnrichedPharmacy[] = [];
-    let pharmaciesResult: EnrichedPharmacy[];
-
-    // check if top ranked costco is enabled and there are GLP treatments
-    try {
-      if (enableTopRankedCostco && containsGLP) {
-        const topRankedCostco: EnrichedPharmacy[] = await getPharmacies({
-          searchParams: {
-            latitude: lat,
-            longitude: lng,
-            radius: PHARMACY_SEARCH_RADIUS_IN_MILES
-          },
-          limit: 1,
-          offset: 0,
-          isOpenNow: enableOpenNow,
-          is24hr: enable24Hr,
-          name: 'costco'
+  useEffect(() => {
+    const onUpdateLocation = async () => {
+      if (location == null) {
+        return;
+      }
+      setLoadingLocation(true);
+      try {
+        const locationData = await geocode(location);
+        setLatitude(locationData.lat);
+        setLongitude(locationData.lng);
+        setCleanAddress(locationData.address);
+      } catch (e: any) {
+        toast({
+          title: 'Invalid location',
+          description: 'Please update your location and try again.',
+          ...TOAST_CONFIG.ERROR
         });
-        if (topRankedCostco.length > 0) {
-          topRankedPharmacies.push(topRankedCostco[0]);
-        }
+        setShowingAllPharmacies(true);
+
+        console.warn('Geocoding error:', e);
+      }
+      setLoadingLocation(false);
+    };
+    onUpdateLocation();
+  }, [location, toast]);
+
+  const getCostco = useCallback(async () => {
+    if (latitude == null || longitude == null) {
+      return [];
+    }
+    try {
+      const topRankedCostco: EnrichedPharmacy[] = await getPharmacies({
+        searchParams: {
+          latitude,
+          longitude,
+          radius: PHARMACY_SEARCH_RADIUS_IN_MILES
+        },
+        limit: 1,
+        offset: 0,
+        isOpenNow: enableOpenNow,
+        is24hr: enable24Hr,
+        name: 'costco'
+      });
+      if (topRankedCostco.length > 0) {
+        return [topRankedCostco[0]];
       }
     } catch {
       // no costcos found :(
-      pharmaciesResult = [];
+    }
+    return [];
+  }, [enable24Hr, enableOpenNow, latitude, longitude]);
+
+  const getWalgreens = useCallback(async () => {
+    if (latitude == null || longitude == null) {
+      return [];
     }
 
-    // check if top ranked walgreens is in the area
     try {
-      if (enableTopRankedWalgreens && order.readyBy === 'Urgent') {
-        const topRankedWags: EnrichedPharmacy[] = await getPharmacies({
-          searchParams: {
-            latitude: lat,
-            longitude: lng,
-            radius: PHARMACY_SEARCH_RADIUS_IN_MILES
-          },
-          limit: 1,
-          offset: 0,
-          isOpenNow: enableOpenNow,
-          is24hr: enable24Hr,
-          name: 'walgreens'
-        });
-        if (topRankedWags.length > 0) {
-          topRankedPharmacies.push(topRankedWags[0]);
-        }
+      const topRankedWags: EnrichedPharmacy[] = await getPharmacies({
+        searchParams: {
+          latitude,
+          longitude,
+          radius: PHARMACY_SEARCH_RADIUS_IN_MILES
+        },
+        limit: 1,
+        offset: 0,
+        isOpenNow: enableOpenNow,
+        is24hr: enable24Hr,
+        name: 'walgreens'
+      });
+      if (topRankedWags.length > 0) {
+        return [topRankedWags[0]];
       }
     } catch {
       // no walgreens found :(
     }
+    return [];
+  }, [enable24Hr, enableOpenNow, latitude, longitude]);
 
-    // get the rest of the local pickup pharmacies
-    try {
-      pharmaciesResult = await getPharmacies({
+  const loadPharmacies = useCallback(
+    async (pageOffset = 0) => {
+      if (latitude == null || longitude == null) {
+        return [];
+      }
+
+      const res = await getPharmacies({
         searchParams: {
-          latitude: lat,
-          longitude: lng,
+          latitude,
+          longitude,
           radius: PHARMACY_SEARCH_RADIUS_IN_MILES
         },
         limit: GET_PHARMACIES_COUNT,
-        offset: 0,
+        offset: pageOffset,
         isOpenNow: enableOpenNow,
         is24hr: enable24Hr
       });
-      // prepend top ranked pharmacy to the list
-      pharmaciesResult = [...topRankedPharmacies, ...pharmaciesResult];
+      setPageOffset(res.length);
+      return res;
+    },
+    [enable24Hr, enableOpenNow, latitude, longitude]
+  );
 
-      if (!pharmaciesResult || pharmaciesResult.length === 0) {
-        setLoadingPharmacies(false);
+  useEffect(() => {
+    const fetchPharmaciesOnLocationChange = async () => {
+      if (latitude == null || longitude == null) {
+        // Need to wait till we have lat/lng
         return;
       }
-    } catch (error) {
-      const noPharmaciesErr = 'No pharmacies found near location';
-      const genericError = 'Unable to get pharmacies';
-      const toastMsg = error?.message === noPharmaciesErr ? noPharmaciesErr : genericError;
-      toast({
-        title: toastMsg,
-        ...TOAST_CONFIG.WARNING
-      });
 
+      setLoadingPharmacies(true);
+      try {
+        // Get pharmacies from photon db
+        let topRankedPharmacies: EnrichedPharmacy[] = [];
+
+        // check if top ranked costco is enabled and there are GLP treatments
+        if (enableTopRankedCostco && containsGLP) {
+          topRankedPharmacies = [...(await getCostco()), ...topRankedPharmacies];
+        }
+
+        if (enableTopRankedWalgreens && order?.readyBy === 'Urgent') {
+          topRankedPharmacies = [...(await getWalgreens()), ...topRankedPharmacies];
+        }
+        setTopRankedPharmacies(topRankedPharmacies);
+
+        setPharmacyResults(await loadPharmacies());
+      } catch (error: any) {
+        const noPharmaciesErr = 'No pharmacies found near location';
+        const genericError = 'Unable to get pharmacies';
+        const toastMsg = error?.message === noPharmaciesErr ? noPharmaciesErr : genericError;
+        toast({
+          ...TOAST_CONFIG.WARNING,
+          title: toastMsg
+        });
+
+        console.log('Get pharmacies error: ', error);
+      }
       setLoadingPharmacies(false);
+    };
 
-      console.log('Get pharmacies error: ', error);
-
-      return;
-    }
-
-    const preparedPharmacies: PharmacyWithHours[] = pharmaciesResult.map(preparePharmacy);
-    setPharmacyOptions(preparedPharmacies);
-
-    setLoadingPharmacies(false);
-  };
+    fetchPharmaciesOnLocationChange();
+  }, [
+    containsGLP,
+    enable24Hr,
+    enableOpenNow,
+    enableTopRankedCostco,
+    enableTopRankedWalgreens,
+    getCostco,
+    getWalgreens,
+    latitude,
+    loadPharmacies,
+    longitude,
+    order?.readyBy,
+    toast
+  ]);
 
   const handleShowMore = async () => {
     setLoadingPharmacies(true);
@@ -283,11 +356,11 @@ export const Pharmacy = () => {
           : demoPharmacies;
 
       const newPharmacyOptions = pharmacies.slice(
-        pharmacyOptions.length,
-        pharmacyOptions.length + GET_PHARMACIES_COUNT
+        pharmacyResults.length,
+        pharmacyResults.length + GET_PHARMACIES_COUNT
       );
-      const totalPharmacyOptions = [...pharmacyOptions, ...newPharmacyOptions];
-      setPharmacyOptions(totalPharmacyOptions);
+      const totalPharmacyOptions = [...pharmacyResults, ...newPharmacyOptions];
+      setPharmacyResults(totalPharmacyOptions);
       setLoadingPharmacies(false);
 
       if (totalPharmacyOptions.length === pharmacies.length) {
@@ -297,38 +370,8 @@ export const Pharmacy = () => {
       return;
     }
 
-    let pharmaciesResult: EnrichedPharmacy[];
-    try {
-      pharmaciesResult = await getPharmacies({
-        searchParams: {
-          latitude,
-          longitude,
-          radius: PHARMACY_SEARCH_RADIUS_IN_MILES
-        },
-        limit: GET_PHARMACIES_COUNT,
-        offset: pharmacyOptions.length,
-        isOpenNow: enableOpenNow,
-        is24hr: enable24Hr
-      });
-      if (!pharmaciesResult || pharmaciesResult.length === 0) {
-        setLoadingPharmacies(false);
-        return;
-      }
-    } catch (error) {
-      if (error.message === 'No pharmacies found near location') {
-        setLoadingPharmacies(false);
-        toast({
-          title: 'No pharmacies found near location',
-          ...TOAST_CONFIG.WARNING
-        });
-        setShowingAllPharmacies(true);
-      } else {
-        console.log(error);
-      }
-    }
-
-    const preparedPharmacies: PharmacyWithHours[] = pharmaciesResult.map(preparePharmacy);
-    setPharmacyOptions([...pharmacyOptions, ...preparedPharmacies]);
+    const newPharmacies = await loadPharmacies(pageOffset);
+    setPharmacyResults([...pharmacyResults, ...newPharmacies]);
 
     setLoadingPharmacies(false);
   };
@@ -344,6 +387,11 @@ export const Pharmacy = () => {
       return;
     }
 
+    if (!order) {
+      console.error('No order present');
+      return;
+    }
+
     setSubmitting(true);
 
     if (isDemo) {
@@ -353,7 +401,7 @@ export const Pharmacy = () => {
           setShowFooter(false);
 
           // Add selected pharmacy to order context so /status shows pharmacy on render
-          const selectedPharmacy = pharmacyOptions.find((p) => p.id === selectedId);
+          const selectedPharmacy = pharmacyResults.find((p) => p.id === selectedId)!;
           setOrder({
             ...order,
             pharmacy: selectedPharmacy
@@ -361,10 +409,10 @@ export const Pharmacy = () => {
 
           // Send order placed sms to demo participant
           triggerDemoNotification(
-            phone,
+            phone!,
             'photon:order:placed',
             selectedPharmacy.name,
-            formatAddress(selectedPharmacy.address)
+            formatAddress(selectedPharmacy.address!)
           );
 
           navigate(`/status?demo=true&phone=${phone}`);
@@ -411,7 +459,7 @@ export const Pharmacy = () => {
               selectedPharmacy = { id: selectedId, name: 'Costco Pharmacy' };
             } else {
               type = types.FulfillmentType.PickUp;
-              selectedPharmacy = pharmacyOptions.find((p) => p.id === selectedId);
+              selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
             }
 
             setOrder({
@@ -432,14 +480,11 @@ export const Pharmacy = () => {
         }
         setSubmitting(false);
       }, 1000);
-    } catch (error) {
+    } catch (error: any) {
       showToastWarning();
       setSubmitting(false);
       if (isReroute) {
-        setOrder({
-          ...order,
-          isReroutable: false
-        });
+        setOrder({ ...order, isReroutable: false });
         const query = queryString.stringify({
           orderId: order.id,
           token
@@ -458,17 +503,14 @@ export const Pharmacy = () => {
     if (isDemo) {
       setTimeout(() => {
         setPreferredPharmacyId(pharmacyId);
-        toast({
-          title: 'Set preferred pharmacy',
-          ...TOAST_CONFIG.SUCCESS
-        });
+        toast({ ...TOAST_CONFIG.SUCCESS, title: 'Set preferred pharmacy' });
         setSavingPreferred(false);
       }, 750);
       return;
     }
 
     try {
-      const result: boolean = await setPreferredPharmacy(order.patient.id, pharmacyId);
+      const result: boolean = await setPreferredPharmacy(order!.patient.id, pharmacyId);
       setTimeout(() => {
         if (result) {
           setPreferredPharmacyId(pharmacyId);
@@ -485,7 +527,7 @@ export const Pharmacy = () => {
         }
         setSavingPreferred(false);
       }, 750);
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Unable to set preferred pharmacy',
         description: 'Please refresh and try again',
@@ -498,28 +540,10 @@ export const Pharmacy = () => {
     }
   };
 
-  useEffect(() => {
-    if (!loadingPharmacies) {
-      if (isDemo) {
-        initializeDemo();
-      } else {
-        if (location) {
-          initialize();
-        }
-      }
-    }
-  }, [location]);
-
-  useEffect(() => {
-    reset();
-    if (!loadingPharmacies) {
-      if (isDemo) {
-        initializeDemo();
-      } else {
-        initialize();
-      }
-    }
-  }, [enableOpenNow, enable24Hr]);
+  if (!order) {
+    console.error('No error');
+    return null;
+  }
 
   return (
     <Box>
@@ -551,7 +575,7 @@ export const Pharmacy = () => {
                     data-dd-privacy="mask"
                   >
                     <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
-                    {location}
+                    {cleanAddress}
                   </Link>
                 </VStack>
               ) : (
@@ -570,25 +594,25 @@ export const Pharmacy = () => {
             <VStack spacing={9} align="stretch">
               {enableMailOrder ? (
                 <BrandedOptions
-                  options={orgSettings.mailOrderNavigateProviders}
+                  options={orgSettings.mailOrderNavigateProviders ?? []}
                   location={location}
                   selectedId={selectedId}
                   handleSelect={handleSelect}
-                  patientAddress={formatAddress(order?.address)}
+                  patientAddress={formatAddress(order.address!)}
                 />
               ) : null}
 
               <PickupOptions
-                pharmacies={pharmacyOptions}
+                pharmacies={allPharmacies}
                 preferredPharmacy={preferredPharmacyId}
                 savingPreferred={savingPreferred}
                 selectedId={selectedId}
                 handleSelect={handleSelect}
                 handleShowMore={handleShowMore}
                 handleSetPreferred={handleSetPreferredPharmacy}
-                loadingMore={loadingPharmacies}
+                loadingMore={isLoading}
                 showingAllPharmacies={showingAllPharmacies}
-                courierEnabled={enableMailOrder}
+                courierEnabled={enableMailOrder ?? false}
                 enableOpenNow={enableOpenNow}
                 enable24Hr={enable24Hr}
                 setEnableOpenNow={setEnableOpenNow}
@@ -610,6 +634,8 @@ export const Pharmacy = () => {
             leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
             onClick={!successfullySubmitted ? handleSubmit : undefined}
             isLoading={submitting}
+            disabled={selectedId == null}
+            isDisabled={selectedId == null}
           >
             {successfullySubmitted ? t.thankYou : t.selectPharmacy}
           </Button>

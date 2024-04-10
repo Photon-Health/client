@@ -44,7 +44,7 @@ export const getFulfillmentType = (
   param?: string
 ): ExtendedFulfillmentType => {
   // We don't have COURIER fulfillment type yet, so manually check for those
-  if (pharmacyId in COMMON_COURIER_PHARMACY_IDS) {
+  if (COMMON_COURIER_PHARMACY_IDS.includes(pharmacyId ?? '')) {
     return 'COURIER';
   }
 
@@ -71,10 +71,10 @@ export const getFulfillmentType = (
  * Flatten the returned fills array and count each unique
  * fill by treatment name
  */
-type FillWithCount = types.Fill & { count: number };
+export type FillWithCount = types.Fill & { count: number };
 export const countFillsAndRemoveDuplicates = (fills: types.Fill[]): FillWithCount[] => {
-  const count = {};
-  const result = [];
+  const count: Record<string, number> = {};
+  const result: FillWithCount[] = [];
 
   for (const fill of fills) {
     const str = fill.treatment.id;
