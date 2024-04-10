@@ -138,7 +138,7 @@ export const PharmacyCard = memo(function PharmacyCard({
                 <TagLabel> {t.preferred}</TagLabel>
               </Tag>
             ) : null}
-            {pharmacy?.isUrgent ? (
+            {pharmacy?.showReadyIn30Min ? (
               <Tag size="sm" bgColor="yellow.200">
                 <TagLabel>Ready in 30 minutes</TagLabel>
               </Tag>

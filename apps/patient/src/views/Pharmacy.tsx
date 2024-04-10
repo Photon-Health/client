@@ -16,7 +16,7 @@ import { Helmet } from 'react-helmet';
 import queryString from 'query-string';
 import { types } from '@photonhealth/sdk';
 import * as TOAST_CONFIG from '../configs/toast';
-import { formatAddress, preparePharmacyHours } from '../utils/general';
+import { formatAddress, preparePharmacy } from '../utils/general';
 import { ExtendedFulfillmentType, Pharmacy as PharmacyWithHours } from '../utils/models';
 import { text as t } from '../utils/text';
 import {
@@ -39,8 +39,6 @@ import {
 import { demoPharmacies } from '../data/demoPharmacies';
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import costcoLogo from '../assets/costco_small.png';
-import walgreensLogo from '../assets/walgreens_small.png';
 import { isGLP } from '../utils/isGLP';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
@@ -202,8 +200,6 @@ export const Pharmacy = () => {
           name: 'costco'
         });
         if (topRankedCostco.length > 0) {
-          // add a logo to the only item in the array
-          topRankedCostco[0].logo = costcoLogo;
           topRankedPharmacies.push(topRankedCostco[0]);
         }
       }
@@ -228,9 +224,6 @@ export const Pharmacy = () => {
           name: 'walgreens'
         });
         if (topRankedWags.length > 0) {
-          // add a logo to the only item in the array
-          topRankedWags[0].logo = walgreensLogo;
-          topRankedWags[0].isUrgent = true;
           topRankedPharmacies.push(topRankedWags[0]);
         }
       }
@@ -274,9 +267,7 @@ export const Pharmacy = () => {
       return;
     }
 
-    const preparedPharmacies: PharmacyWithHours[] = pharmaciesResult.map((p) =>
-      preparePharmacyHours(p)
-    );
+    const preparedPharmacies: PharmacyWithHours[] = pharmaciesResult.map(preparePharmacy);
     setPharmacyOptions(preparedPharmacies);
 
     setLoadingPharmacies(false);
@@ -336,7 +327,7 @@ export const Pharmacy = () => {
       }
     }
 
-    const preparedPharmacies: PharmacyWithHours[] = pharmaciesResult.map(preparePharmacyHours);
+    const preparedPharmacies: PharmacyWithHours[] = pharmaciesResult.map(preparePharmacy);
     setPharmacyOptions([...pharmacyOptions, ...preparedPharmacies]);
 
     setLoadingPharmacies(false);
