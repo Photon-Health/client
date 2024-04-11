@@ -81,8 +81,8 @@ export const Pharmacy = () => {
   const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
 
   // Address state
-  const [latitude, setLatitude] = useState<number | undefined>(undefined);
-  const [longitude, setLongitude] = useState<number | null>(null);
+  const [latitude, setLatitude] = useState<number>();
+  const [longitude, setLongitude] = useState<number>();
   const [location, setLocation] = useState(
     order?.address ? formatAddress(order.address) : undefined
   );
@@ -140,15 +140,6 @@ export const Pharmacy = () => {
     ].map(preparePharmacy);
   }, [pharmacyResults, topRankedPharmacies]);
 
-  const reset = () => {
-    setTopRankedPharmacies([]);
-    setPharmacyResults([]);
-    setPageOffset(0);
-    setSelectedId('');
-    setShowFooter(false);
-    setShowingAllPharmacies(false);
-  };
-
   const showToastWarning = () =>
     toast({
       title: isReroute ? 'Unable to change pharmacies' : 'Unable to submit pharmacy selection',
@@ -158,39 +149,51 @@ export const Pharmacy = () => {
       ...TOAST_CONFIG.WARNING
     });
 
+  const reset = () => {
+    setTopRankedPharmacies([]);
+    setPharmacyResults([]);
+    setPageOffset(0);
+    setSelectedId('');
+    setShowFooter(false);
+    setShowingAllPharmacies(false);
+  };
+
   const handleModalClose = ({ loc = undefined }: { loc: string | undefined }) => {
     reset();
     setLocation(loc);
     setLocationModalOpen(false);
   };
 
-  const initializeDemo = useCallback(() => {
-    // Mock geocode data
-    setLocation('201 N 8th St, Brooklyn, NY 11211');
-    setCleanAddress('201 N 8th St, Brooklyn, NY 11211');
-    setLatitude(40.717484);
-    setLongitude(-73.955662397568);
-
-    let pharmacies =
-      enableOpenNow || enable24Hr
-        ? demoPharmacies.filter((p) => (enableOpenNow && p.isOpen) || (enable24Hr && p.is24Hr))
-        : demoPharmacies;
-
-    pharmacies = pharmacies.slice(0, 5);
-
-    setPharmacyResults(pharmacies);
-
-    if (pharmacies.length < 5) {
-      setShowingAllPharmacies(true);
-    }
+  // Reset when we toggle 24hr/open now
+  useEffect(() => {
+    reset();
   }, [enable24Hr, enableOpenNow]);
 
+  // Initialize demo data
   useEffect(() => {
     if (isDemo) {
-      initializeDemo();
-    }
-  }, [initializeDemo, isDemo]);
+      // Mock geocode data
+      setLocation('201 N 8th St, Brooklyn, NY 11211');
+      setCleanAddress('201 N 8th St, Brooklyn, NY 11211');
+      setLatitude(40.717484);
+      setLongitude(-73.955662397568);
 
+      let pharmacies =
+        enableOpenNow || enable24Hr
+          ? demoPharmacies.filter((p) => (enableOpenNow && p.isOpen) || (enable24Hr && p.is24Hr))
+          : demoPharmacies;
+
+      pharmacies = pharmacies.slice(0, 5);
+
+      setPharmacyResults(pharmacies);
+
+      if (pharmacies.length < 5) {
+        setShowingAllPharmacies(true);
+      }
+    }
+  }, [enable24Hr, enableOpenNow, isDemo]);
+
+  // Update and geocode location
   useEffect(() => {
     const onUpdateLocation = async () => {
       if (location == null) {
@@ -217,61 +220,99 @@ export const Pharmacy = () => {
     onUpdateLocation();
   }, [location, toast]);
 
-  const getCostco = useCallback(async () => {
-    if (latitude == null || longitude == null) {
-      return [];
-    }
-    try {
-      const topRankedCostco: EnrichedPharmacy[] = await getPharmacies({
-        searchParams: {
-          latitude,
-          longitude,
-          radius: PHARMACY_SEARCH_RADIUS_IN_MILES
-        },
-        limit: 1,
-        offset: 0,
-        isOpenNow: enableOpenNow,
-        is24hr: enable24Hr,
-        name: 'costco'
-      });
-      if (topRankedCostco.length > 0) {
-        return [topRankedCostco[0]];
+  const getCostco = useCallback(
+    async ({
+      enable24Hr,
+      enableOpenNow,
+      latitude,
+      longitude
+    }: {
+      enable24Hr: boolean;
+      enableOpenNow: boolean;
+      latitude: number | undefined;
+      longitude: number | undefined;
+    }) => {
+      if (latitude == null || longitude == null) {
+        return [];
       }
-    } catch {
-      // no costcos found :(
-    }
-    return [];
-  }, [enable24Hr, enableOpenNow, latitude, longitude]);
-
-  const getWalgreens = useCallback(async () => {
-    if (latitude == null || longitude == null) {
-      return [];
-    }
-
-    try {
-      const topRankedWags: EnrichedPharmacy[] = await getPharmacies({
-        searchParams: {
-          latitude,
-          longitude,
-          radius: PHARMACY_SEARCH_RADIUS_IN_MILES
-        },
-        limit: 1,
-        offset: 0,
-        isOpenNow: enableOpenNow,
-        is24hr: enable24Hr,
-        name: 'walgreens'
-      });
-      if (topRankedWags.length > 0) {
-        return [topRankedWags[0]];
+      try {
+        const topRankedCostco: EnrichedPharmacy[] = await getPharmacies({
+          searchParams: {
+            latitude,
+            longitude,
+            radius: PHARMACY_SEARCH_RADIUS_IN_MILES
+          },
+          limit: 1,
+          offset: 0,
+          isOpenNow: enableOpenNow,
+          is24hr: enable24Hr,
+          name: 'costco'
+        });
+        if (topRankedCostco.length > 0) {
+          return [topRankedCostco[0]];
+        }
+      } catch {
+        // no costcos found :(
       }
-    } catch {
-      // no walgreens found :(
-    }
-    return [];
-  }, [enable24Hr, enableOpenNow, latitude, longitude]);
+      return [];
+    },
+    []
+  );
+
+  const getWalgreens = useCallback(
+    async ({
+      enable24Hr,
+      enableOpenNow,
+      latitude,
+      longitude
+    }: {
+      enable24Hr: boolean;
+      enableOpenNow: boolean;
+      latitude: number | undefined;
+      longitude: number | undefined;
+    }) => {
+      if (latitude == null || longitude == null) {
+        return [];
+      }
+
+      try {
+        const topRankedWags: EnrichedPharmacy[] = await getPharmacies({
+          searchParams: {
+            latitude,
+            longitude,
+            radius: PHARMACY_SEARCH_RADIUS_IN_MILES
+          },
+          limit: 1,
+          offset: 0,
+          isOpenNow: enableOpenNow,
+          is24hr: enable24Hr,
+          name: 'walgreens'
+        });
+        if (topRankedWags.length > 0) {
+          return [topRankedWags[0]];
+        }
+      } catch {
+        // no walgreens found :(
+      }
+      return [];
+    },
+    []
+  );
 
   const loadPharmacies = useCallback(
-    async (pageOffset = 0) => {
+    async ({
+      enable24Hr,
+      enableOpenNow,
+      latitude,
+      longitude,
+      pageOffset = 0
+    }: {
+      enable24Hr: boolean;
+      enableOpenNow: boolean;
+      latitude: number | undefined;
+      longitude: number | undefined;
+      pageOffset?: number;
+    }) => {
       if (latitude == null || longitude == null) {
         return [];
       }
@@ -287,10 +328,10 @@ export const Pharmacy = () => {
         isOpenNow: enableOpenNow,
         is24hr: enable24Hr
       });
-      setPageOffset(res.length);
+      setPageOffset(pageOffset + res.length);
       return res;
     },
-    [enable24Hr, enableOpenNow, latitude, longitude]
+    []
   );
 
   useEffect(() => {
@@ -307,15 +348,22 @@ export const Pharmacy = () => {
 
         // check if top ranked costco is enabled and there are GLP treatments
         if (enableTopRankedCostco && containsGLP) {
-          topRankedPharmacies = [...(await getCostco()), ...topRankedPharmacies];
+          topRankedPharmacies = [
+            ...(await getCostco({ latitude, longitude, enable24Hr, enableOpenNow })),
+            ...topRankedPharmacies
+          ];
         }
 
         if (enableTopRankedWalgreens && order?.readyBy === 'Urgent') {
-          topRankedPharmacies = [...(await getWalgreens()), ...topRankedPharmacies];
+          topRankedPharmacies = [
+            ...(await getWalgreens({ latitude, longitude, enable24Hr, enableOpenNow })),
+            ...topRankedPharmacies
+          ];
         }
-        setTopRankedPharmacies(topRankedPharmacies);
 
-        setPharmacyResults(await loadPharmacies());
+        const pharmacies = await loadPharmacies({ latitude, longitude, enable24Hr, enableOpenNow });
+        setTopRankedPharmacies(topRankedPharmacies);
+        setPharmacyResults(pharmacies);
       } catch (error: any) {
         const noPharmaciesErr = 'No pharmacies found near location';
         const genericError = 'Unable to get pharmacies';
@@ -370,7 +418,13 @@ export const Pharmacy = () => {
       return;
     }
 
-    const newPharmacies = await loadPharmacies(pageOffset);
+    const newPharmacies = await loadPharmacies({
+      latitude,
+      longitude,
+      enable24Hr,
+      enableOpenNow,
+      pageOffset
+    });
     setPharmacyResults([...pharmacyResults, ...newPharmacies]);
 
     setLoadingPharmacies(false);
