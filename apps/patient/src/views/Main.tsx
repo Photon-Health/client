@@ -29,7 +29,7 @@ export const Main = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const isDemo = searchParams.get('demo');
-  const orderId = searchParams.get('orderId') ?? isDemo ? demoOrder.id : undefined;
+  const orderId = searchParams.get('orderId');
   const phone = searchParams.get('phone');
 
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
@@ -107,10 +107,10 @@ export const Main = () => {
   }, [handleOrderResponse, isDemo, navigate, orderId]);
 
   useEffect(() => {
-    if (isDemo && order?.id !== demoOrder.id) {
+    if (isDemo && (orderId || order?.id !== demoOrder.id)) {
       navigate(`/review?demo=true&phone=${phone}`, { replace: true });
     }
-  }, [isDemo, navigate, order, phone]);
+  }, [isDemo, navigate, order, orderId, phone]);
 
   useEffect(() => {
     if (!isDemo && !order) {
@@ -171,7 +171,7 @@ export const Main = () => {
     );
   }
 
-  const orderContextValue = { order, flattenedFills, setOrder, logo };
+  const orderContextValue = { order: isDemo ? demoOrder : order, flattenedFills, setOrder, logo };
 
   return (
     <ChakraProvider theme={theme(order?.organization.id)}>
