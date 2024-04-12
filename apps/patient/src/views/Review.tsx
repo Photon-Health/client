@@ -20,6 +20,7 @@ export const Review = () => {
   const { patient } = order!;
 
   const handleCtaClick = () => {
+    console.log('isDemo?', isDemo);
     const toUrl = isDemo
       ? `/readyBy?demo=true&phone=${phone}`
       : `/readyBy?orderId=${order!.id}&token=${token}`;

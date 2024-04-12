@@ -5,8 +5,9 @@ import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
 export const Canceled = () => {
-  const { order } = useOrderContext();
-  const { patient } = order!;
+  const {
+    order: { patient }
+  } = useOrderContext();
 
   return (
     <Box>

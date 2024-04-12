@@ -52,17 +52,17 @@ export const ReadyBy = () => {
   const [activeTab, setActiveTab] = useState<keyof (typeof t)['readyByOptions']>('Today');
 
   const handleSubmit = async () => {
+    if (isDemo) {
+      navigate(`/pharmacy?demo=true&phone=${phone}`);
+      return;
+    }
+
     if (!order) {
       console.error('Tried to submit without an order');
       return;
     }
     if (!selectedTime || !selectedDay) {
       console.error('No selected readyBy time/day.');
-      return;
-    }
-
-    if (isDemo) {
-      navigate(`/pharmacy?demo=true&phone=${phone}`);
       return;
     }
 

@@ -27,9 +27,9 @@ export const useOrderContext = () =>
 
 export const Main = () => {
   const [searchParams] = useSearchParams();
-  const orderId = searchParams.get('orderId');
   const token = searchParams.get('token');
   const isDemo = searchParams.get('demo');
+  const orderId = searchParams.get('orderId') ?? isDemo ? demoOrder.id : undefined;
   const phone = searchParams.get('phone');
 
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
@@ -61,12 +61,13 @@ export const Main = () => {
 
   const handleOrderResponse = useCallback(
     (order: Order) => {
+      console.log('handleOrderResponse', order);
       setOrder(order);
 
       setFlattenedFills(countFillsAndRemoveDuplicates(order.fills));
 
       datadogRum.setGlobalContextProperty('organizationId', order.organization.id);
-      datadogRum.setGlobalContextProperty('orderId', order.id);
+      datadogRum.setGlobalContextProperty('orderId', orderId);
       datadogRum.setUser({ patientId: order.patient.id });
 
       if (order.state === types.OrderState.Canceled) {
@@ -79,10 +80,11 @@ export const Main = () => {
 
       navigate(`${redirect}?orderId=${order.id}&token=${token}`, { replace: true });
     },
-    [navigate, token]
+    [navigate, orderId, token]
   );
 
   const fetchOrder = useCallback(async () => {
+    if (isDemo) return demoOrder;
     try {
       const result: Order = await getOrder(orderId!);
       if (result) {
@@ -102,10 +104,10 @@ export const Main = () => {
       // If an order was returned, use it for routing
       handleOrderResponse(error.response.data.order);
     }
-  }, [handleOrderResponse, navigate, orderId]);
+  }, [handleOrderResponse, isDemo, navigate, orderId]);
 
   useEffect(() => {
-    if (isDemo && order) {
+    if (isDemo && order?.id !== demoOrder.id) {
       navigate(`/review?demo=true&phone=${phone}`, { replace: true });
     }
   }, [isDemo, navigate, order, phone]);
@@ -172,7 +174,7 @@ export const Main = () => {
   const orderContextValue = { order, flattenedFills, setOrder, logo };
 
   return (
-    <ChakraProvider theme={theme(order!.organization.id)}>
+    <ChakraProvider theme={theme(order?.organization.id)}>
       <OrderContext.Provider value={orderContextValue}>
         <Nav />
         <Outlet />

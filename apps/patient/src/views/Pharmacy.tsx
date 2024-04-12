@@ -90,10 +90,7 @@ export const Pharmacy = () => {
   const [loadingLocation, setLoadingLocation] = useState(false);
 
   // loading state
-  const isLoading = useMemo(
-    () => loadingLocation || loadingPharmacies,
-    [loadingLocation, loadingPharmacies]
-  );
+  const isLoading = loadingLocation || loadingPharmacies;
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
@@ -104,30 +101,18 @@ export const Pharmacy = () => {
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
 
-  const isMultiRx = useMemo(() => flattenedFills.length > 1, [flattenedFills.length]);
+  const isMultiRx = flattenedFills.length > 1;
 
-  const enableMailOrder = useMemo(
-    () => !isDemo && orgSettings.mailOrderNavigate,
-    [isDemo, orgSettings.mailOrderNavigate]
-  );
-  const enableTopRankedCostco = useMemo(
-    () => !isDemo && orgSettings.topRankedCostco,
-    [isDemo, orgSettings.topRankedCostco]
-  );
-  const enableTopRankedWalgreens = useMemo(
-    () => !isDemo && orgSettings.topRankedWalgreens,
-    [isDemo, orgSettings.topRankedWalgreens]
-  );
-  const containsGLP = useMemo(
-    () => flattenedFills.some((fill) => isGLP(fill.treatment.name)),
-    [flattenedFills]
-  );
+  const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
 
-  const heading = useMemo(() => (isReroute ? t.changePharmacy : t.selectAPharmacy), [isReroute]);
-  const subheading = useMemo(
-    () => (isReroute ? t.sendToNew(isMultiRx, order!.pharmacy!.name) : t.sendToSelected(isMultiRx)),
-    [isMultiRx, isReroute, order]
-  );
+  const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
+  const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
+  const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
+
+  const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
+  const subheading = isReroute
+    ? t.sendToNew(isMultiRx, order!.pharmacy!.name)
+    : t.sendToSelected(isMultiRx);
 
   // Pharmacy results
   const [topRankedPharmacies, setTopRankedPharmacies] = useState<EnrichedPharmacy[]>([]);
@@ -237,11 +222,7 @@ export const Pharmacy = () => {
       }
       try {
         const topRankedCostco: EnrichedPharmacy[] = await getPharmacies({
-          searchParams: {
-            latitude,
-            longitude,
-            radius: PHARMACY_SEARCH_RADIUS_IN_MILES
-          },
+          searchParams: { latitude, longitude, radius: PHARMACY_SEARCH_RADIUS_IN_MILES },
           limit: 1,
           offset: 0,
           isOpenNow: enableOpenNow,
@@ -277,11 +258,7 @@ export const Pharmacy = () => {
 
       try {
         const topRankedWags: EnrichedPharmacy[] = await getPharmacies({
-          searchParams: {
-            latitude,
-            longitude,
-            radius: PHARMACY_SEARCH_RADIUS_IN_MILES
-          },
+          searchParams: { latitude, longitude, radius: PHARMACY_SEARCH_RADIUS_IN_MILES },
           limit: 1,
           offset: 0,
           isOpenNow: enableOpenNow,
@@ -318,11 +295,7 @@ export const Pharmacy = () => {
       }
 
       const res = await getPharmacies({
-        searchParams: {
-          latitude,
-          longitude,
-          radius: PHARMACY_SEARCH_RADIUS_IN_MILES
-        },
+        searchParams: { latitude, longitude, radius: PHARMACY_SEARCH_RADIUS_IN_MILES },
         limit: GET_PHARMACIES_COUNT,
         offset: pageOffset,
         isOpenNow: enableOpenNow,
@@ -336,6 +309,7 @@ export const Pharmacy = () => {
 
   useEffect(() => {
     const fetchPharmaciesOnLocationChange = async () => {
+      if (isDemo) return;
       if (latitude == null || longitude == null) {
         // Need to wait till we have lat/lng
         return;
@@ -368,10 +342,7 @@ export const Pharmacy = () => {
         const noPharmaciesErr = 'No pharmacies found near location';
         const genericError = 'Unable to get pharmacies';
         const toastMsg = error?.message === noPharmaciesErr ? noPharmaciesErr : genericError;
-        toast({
-          ...TOAST_CONFIG.WARNING,
-          title: toastMsg
-        });
+        toast({ ...TOAST_CONFIG.WARNING, title: toastMsg });
 
         console.log('Get pharmacies error: ', error);
       }
@@ -387,6 +358,7 @@ export const Pharmacy = () => {
     enableTopRankedWalgreens,
     getCostco,
     getWalgreens,
+    isDemo,
     latitude,
     loadPharmacies,
     longitude,
@@ -459,10 +431,7 @@ export const Pharmacy = () => {
 
           // Add selected pharmacy to order context so /status shows pharmacy on render
           const selectedPharmacy = pharmacyResults.find((p) => p.id === selectedId)!;
-          setOrder({
-            ...order,
-            pharmacy: selectedPharmacy
-          });
+          setOrder({ ...order, pharmacy: selectedPharmacy });
 
           // Send order placed sms to demo participant
           triggerDemoNotification(
@@ -519,17 +488,8 @@ export const Pharmacy = () => {
               selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
             }
 
-            setOrder({
-              ...order,
-              isReroutable: !isReroute,
-              // Add selected pharmacy to order context so /status shows pharmacy on render
-              pharmacy: selectedPharmacy
-            });
-            const query = queryString.stringify({
-              orderId: order.id,
-              token,
-              type
-            });
+            setOrder({ ...order, isReroutable: !isReroute, pharmacy: selectedPharmacy });
+            const query = queryString.stringify({ orderId: order.id, token, type });
             return navigate(`/status?${query}`);
           }, 1000);
         } else {
@@ -571,10 +531,7 @@ export const Pharmacy = () => {
       setTimeout(() => {
         if (result) {
           setPreferredPharmacyId(pharmacyId);
-          toast({
-            title: 'Set preferred pharmacy',
-            ...TOAST_CONFIG.SUCCESS
-          });
+          toast({ ...TOAST_CONFIG.SUCCESS, title: 'Set preferred pharmacy' });
         } else {
           toast({
             title: 'Unable to set preferred pharmacy',
@@ -586,9 +543,9 @@ export const Pharmacy = () => {
       }, 750);
     } catch (error: any) {
       toast({
+        ...TOAST_CONFIG.ERROR,
         title: 'Unable to set preferred pharmacy',
-        description: 'Please refresh and try again',
-        ...TOAST_CONFIG.ERROR
+        description: 'Please refresh and try again'
       });
 
       setSavingPreferred(false);
@@ -604,7 +561,7 @@ export const Pharmacy = () => {
 
   return (
     <Box>
-      <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />
+      {!isDemo && <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />}
       <Helmet>
         <title>{t.selectAPharmacy}</title>
       </Helmet>
@@ -630,6 +587,7 @@ export const Pharmacy = () => {
                     fontWeight="medium"
                     size="sm"
                     data-dd-privacy="mask"
+                    cursor={isDemo ? 'default' : 'auto'}
                   >
                     <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
                     {cleanAddress}
