@@ -119,11 +119,16 @@ export const Pharmacy = () => {
   const [pharmacyResults, setPharmacyResults] = useState<EnrichedPharmacy[]>([]);
   const allPharmacies = useMemo(() => {
     const topRankedIds = topRankedPharmacies.map((p) => p.id);
-    return [
+    const combined = [
       ...topRankedPharmacies,
       ...pharmacyResults.filter((p) => !topRankedIds.includes(p.id))
-    ].map(preparePharmacy);
-  }, [pharmacyResults, topRankedPharmacies]);
+    ];
+    if (isDemo) {
+      // demo pharmacies already are prepared
+      return combined;
+    }
+    return combined.map(preparePharmacy);
+  }, [isDemo, pharmacyResults, topRankedPharmacies]);
 
   const showToastWarning = () =>
     toast({
