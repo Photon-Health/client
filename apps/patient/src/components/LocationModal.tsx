@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   Alert,
@@ -39,11 +39,24 @@ const formatLocationOptions = (p: any[]) => {
 const autocompleteService = new google.maps.places.AutocompleteService();
 const geocoder = new google.maps.Geocoder();
 
-export const LocationModal = ({ isOpen, onClose }: any) => {
+interface LocationModalProps {
+  isOpen: boolean;
+  onClose: (args: { loc?: string; lat?: number; lng?: number }) => void;
+}
+
+export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
   const [gettingCurrentLocation, setGettingCurrentLocation] = useState<boolean>(false);
 
   const [searchParams] = useSearchParams();
   const isDemo = searchParams.get('demo');
+
+  const handleClose = useCallback(
+    (args: { loc?: string; lat?: number; lng?: number }) => {
+      setGettingCurrentLocation(false);
+      onClose(args);
+    },
+    [onClose]
+  );
 
   const searchForLocations = async (inputValue: string) => {
     const request = {
@@ -66,7 +79,7 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
   const geocode = async (address: string) => {
     const data = await geocoder.geocode({ address });
     if (data?.results) {
-      onClose({
+      handleClose({
         loc: data.results[0].formatted_address,
         lat: data.results[0].geometry.location.lat(),
         lng: data.results[0].geometry.location.lng()
@@ -77,16 +90,16 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
   const getCurrentLocation = async () => {
     setGettingCurrentLocation(true);
     if (navigator.geolocation) {
-      await navigator.geolocation.getCurrentPosition(async (pos) => {
+      navigator.geolocation.getCurrentPosition(async (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
         const data = await geocoder.geocode({ location: { lat, lng } });
-        onClose({
+        setGettingCurrentLocation(false);
+        handleClose({
           loc: data.results[0].formatted_address,
           lat: data.results[0].geometry.location.lat(),
           lng: data.results[0].geometry.location.lng()
         });
-        setGettingCurrentLocation(false);
       });
     } else {
       setGettingCurrentLocation(false);
@@ -94,7 +107,7 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={() => onClose({})}>
+    <Modal isOpen={isOpen} onClose={() => handleClose({})}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{t.setLoc}</ModalHeader>
@@ -111,7 +124,7 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
             w="full"
             leftIcon={<FiTarget />}
             mt={5}
-            onClick={async () => getCurrentLocation()}
+            onClick={getCurrentLocation}
             isLoading={gettingCurrentLocation}
             loadingText={t.gettingLoc}
             isDisabled={!!isDemo}

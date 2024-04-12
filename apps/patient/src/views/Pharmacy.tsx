@@ -158,7 +158,7 @@ export const Pharmacy = () => {
     setShowingAllPharmacies(false);
   };
 
-  const handleModalClose = ({ loc = undefined }: { loc: string | undefined }) => {
+  const handleModalClose = ({ loc = undefined }: { loc?: string | undefined }) => {
     reset();
     setLocation(loc);
     setLocationModalOpen(false);
@@ -426,6 +426,9 @@ export const Pharmacy = () => {
       pageOffset
     });
     setPharmacyResults([...pharmacyResults, ...newPharmacies]);
+    if (newPharmacies.length < GET_PHARMACIES_COUNT) {
+      setShowingAllPharmacies(true);
+    }
 
     setLoadingPharmacies(false);
   };
