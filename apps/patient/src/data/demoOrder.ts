@@ -1,6 +1,6 @@
+import { Fill } from 'packages/sdk/dist/types';
 import { FillState } from 'packages/sdk/src/types';
 import { Order } from '../utils/models';
-import { Fill, Prescription } from 'packages/sdk/dist/types';
 
 // TODO(mrochlin) need to fix this
 export const demoOrder: Order = {
@@ -36,12 +36,11 @@ export const demoOrder: Order = {
       id: 'fil_01sH91JWEAPK8ZHF0H35sfwe3JE59RQY',
       prescription: {
         daysSupply: 2,
-        dispenseQuantity: 2,
-        dispenseUnit: 'tablets',
+        dispenseQuantity: '2 tablets',
         expirationDate: '2024-08-29T00:00:00.000Z',
         fillsAllowed: 1,
         id: 'rx_01H9154tgJW889FRF7QC5V3PYBNWD0'
-      } as Prescription,
+      },
       treatment: {
         id: 'med_01GZH4K86J1ZF85C061G14fe4DTGYZ',
         name: 'dexamethasone 6 MG Oral Tablet',
