@@ -41,7 +41,7 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
 
   const { order } = useOrderContext();
 
-  const flattenedFills = countFillsAndRemoveDuplicates(order!.fills);
+  const flattenedFills = countFillsAndRemoveDuplicates(order.fills);
   const isMultiRx = flattenedFills.length > 1;
   const isDelivery = fulfillmentType === 'COURIER' || fulfillmentType === 'MAIL_ORDER';
 

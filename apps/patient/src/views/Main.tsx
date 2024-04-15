@@ -20,6 +20,7 @@ interface OrderContextType {
   flattenedFills: FillWithCount[];
   setOrder: (order: Order) => void;
   logo: any;
+  isDemo: boolean;
 }
 const OrderContext = createContext<OrderContextType | null>(null);
 export const useOrderContext = () =>
@@ -107,13 +108,13 @@ export const Main = () => {
   }, [handleOrderResponse, isDemo, navigate, orderId]);
 
   useEffect(() => {
-    if (isDemo && (orderId || order?.id !== demoOrder.id)) {
+    if (isDemo && (orderId || order?.id !== demoOrder.id || location.pathname === '/')) {
       navigate(`/review?demo=true&phone=${phone}`, { replace: true });
     }
-  }, [isDemo, navigate, order, orderId, phone]);
+  }, [isDemo, location.pathname, navigate, order, orderId, phone]);
 
   useEffect(() => {
-    if (!isDemo && !order) {
+    if (!order) {
       fetchOrder();
     }
   }, [order, orderId, fetchOrder, isDemo]);
@@ -171,7 +172,13 @@ export const Main = () => {
     );
   }
 
-  const orderContextValue = { order: isDemo ? demoOrder : order, flattenedFills, setOrder, logo };
+  const orderContextValue = {
+    isDemo: isDemo != null ?? false,
+    order,
+    flattenedFills,
+    setOrder,
+    logo
+  };
 
   return (
     <ChakraProvider theme={theme(order?.organization.id)}>

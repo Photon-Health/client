@@ -17,13 +17,12 @@ export const Review = () => {
   const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
 
-  const { patient } = order!;
+  const { patient } = order;
 
   const handleCtaClick = () => {
-    console.log('isDemo?', isDemo);
     const toUrl = isDemo
       ? `/readyBy?demo=true&phone=${phone}`
-      : `/readyBy?orderId=${order!.id}&token=${token}`;
+      : `/readyBy?orderId=${order.id}&token=${token}`;
     navigate(toUrl);
   };
 

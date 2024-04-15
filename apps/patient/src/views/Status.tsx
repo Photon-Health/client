@@ -181,7 +181,6 @@ export const Status = () => {
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
-
       <Helmet>
         <title>{t.track}</title>
       </Helmet>

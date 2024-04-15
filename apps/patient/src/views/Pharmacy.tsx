@@ -46,7 +46,7 @@ const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
 
 export const Pharmacy = () => {
-  const { order, flattenedFills, setOrder } = useOrderContext();
+  const { order, flattenedFills, setOrder, isDemo } = useOrderContext();
 
   const orgSettings = getSettings(order?.organization.id);
 
@@ -58,7 +58,6 @@ export const Pharmacy = () => {
   const token = searchParams.get('token');
   const isReroute = searchParams.get('reroute');
   const openNow = searchParams.get('openNow');
-  const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
 
   // preferred pharmacy
@@ -111,7 +110,7 @@ export const Pharmacy = () => {
 
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
   const subheading = isReroute
-    ? t.sendToNew(isMultiRx, order!.pharmacy!.name)
+    ? t.sendToNew(isMultiRx, order.pharmacy!.name)
     : t.sendToSelected(isMultiRx);
 
   // Pharmacy results
@@ -435,7 +434,7 @@ export const Pharmacy = () => {
           setShowFooter(false);
 
           // Add selected pharmacy to order context so /status shows pharmacy on render
-          const selectedPharmacy = pharmacyResults.find((p) => p.id === selectedId)!;
+          const selectedPharmacy = allPharmacies.find((p) => p.id === selectedId)!;
           setOrder({ ...order, pharmacy: selectedPharmacy });
 
           // Send order placed sms to demo participant
@@ -532,7 +531,7 @@ export const Pharmacy = () => {
     }
 
     try {
-      const result: boolean = await setPreferredPharmacy(order!.patient.id, pharmacyId);
+      const result: boolean = await setPreferredPharmacy(order.patient.id, pharmacyId);
       setTimeout(() => {
         if (result) {
           setPreferredPharmacyId(pharmacyId);
