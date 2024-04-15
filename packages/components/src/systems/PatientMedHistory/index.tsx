@@ -1,13 +1,14 @@
 import { createSignal, createEffect, Show, For, createMemo } from 'solid-js';
 import gql from 'graphql-tag';
 import { usePhotonClient } from '../SDKProvider';
-import { PatientMedication, Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
+import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
 import Table from '../../particles/Table';
 import Text from '../../particles/Text';
 import generateString from '../../utils/generateString';
 import formatDate from '../../utils/formatDate';
 import Button from '../../particles/Button';
 import Card from '../../particles/Card';
+import { createQuery } from '../../utils/createQuery';
 
 const GET_PATIENT_MED_HISTORY = gql`
   query GetPatient($id: ID!) {
@@ -42,6 +43,25 @@ type PatientMedHistoryProps = {
   newMedication?: Medication | SearchMedication;
 };
 
+type PatientMedication = {
+  active: boolean;
+  prescription: {
+    id: string;
+    writtenAt: string;
+  };
+  medication: {
+    id: string;
+    name: string;
+  };
+};
+
+type GetPatientResponse = {
+  patient: {
+    id: string;
+    medicationHistory: PatientMedication[];
+  };
+};
+
 const LoadingRowFallback = () => (
   <Table.Row>
     <Table.Cell>
@@ -62,17 +82,34 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
 
   const baseURL = createMemo(() => `${client?.clinicalUrl}/prescriptions/`);
 
-  const fetchPatient = async () => {
-    const { data } = await client!.apollo.query({
-      query: GET_PATIENT_MED_HISTORY,
-      variables: { id: props.patientId }
-    });
-    if (data?.patient?.medicationHistory) {
-      setMedHistory(data.patient.medicationHistory);
-    } else {
+  const queryOptions = createMemo(() => ({
+    variables: { id: props.patientId },
+    client: client!.apollo
+  }));
+
+  const patientMedHistory = createQuery<GetPatientResponse, { id: string }>(
+    GET_PATIENT_MED_HISTORY,
+    queryOptions
+  );
+
+  createEffect(() => {
+    const medicationHistory = patientMedHistory()?.patient?.medicationHistory;
+    if (medicationHistory) {
+      const sortedMedHistory = medicationHistory.slice().sort((a, b) => {
+        const dateA = a?.prescription?.writtenAt
+          ? new Date(a.prescription.writtenAt).getTime()
+          : -Infinity;
+        const dateB = b?.prescription?.writtenAt
+          ? new Date(b.prescription.writtenAt).getTime()
+          : -Infinity;
+        return dateA - dateB;
+      });
+      setMedHistory(sortedMedHistory);
+    }
+    if (!patientMedHistory.loading && !medicationHistory) {
       setMedHistory([]);
     }
-  };
+  });
 
   const addMedHistory = async (medicationId: string) => {
     await client!.apollo.mutate({
@@ -101,17 +138,9 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
           variables: { id: props.patientId },
           data: { patient: newPatient }
         });
-
-        fetchPatient();
       }
     });
   };
-
-  createEffect(() => {
-    if (props.patientId) {
-      fetchPatient();
-    }
-  });
 
   createEffect(() => {
     if (props?.newMedication?.id) {
