@@ -52,7 +52,7 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
   if (!brand) return null;
 
   let tagline = null;
-  if (capsulePharmacyIdLookup[pharmacyId]) {
+  if (pharmacyId in capsulePharmacyIdLookup) {
     const [firstWord, ...restOfSentence] = brand.description.split(' ');
 
     tagline = (

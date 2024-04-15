@@ -1,4 +1,4 @@
-export const demoPharmacies: any = [
+export const demoPharmacies = [
   {
     id: 'asdfsafas889767546f',
     address: {

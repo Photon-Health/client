@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   Alert,
@@ -21,8 +21,13 @@ import { debounce } from 'lodash';
 
 import { text as t } from '../utils/text';
 
-const formatLocationOptions = (p: any) => {
-  const options = p.map((org: any) => {
+interface Option {
+  value: string;
+  label: string;
+}
+
+const formatLocationOptions = (p: any[]) => {
+  const options = p.map<Option>((org) => {
     return {
       value: org.place_id,
       label: org.description
@@ -34,11 +39,24 @@ const formatLocationOptions = (p: any) => {
 const autocompleteService = new google.maps.places.AutocompleteService();
 const geocoder = new google.maps.Geocoder();
 
-export const LocationModal = ({ isOpen, onClose }: any) => {
+interface LocationModalProps {
+  isOpen: boolean;
+  onClose: (args: { loc?: string; lat?: number; lng?: number }) => void;
+}
+
+export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
   const [gettingCurrentLocation, setGettingCurrentLocation] = useState<boolean>(false);
 
   const [searchParams] = useSearchParams();
   const isDemo = searchParams.get('demo');
+
+  const handleClose = useCallback(
+    (args: { loc?: string; lat?: number; lng?: number }) => {
+      setGettingCurrentLocation(false);
+      onClose(args);
+    },
+    [onClose]
+  );
 
   const searchForLocations = async (inputValue: string) => {
     const request = {
@@ -51,7 +69,7 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
   };
 
   const debouncedSearchForLocations = debounce(
-    async (inputValue: string, callback: (options: any) => void) => {
+    async (inputValue: string, callback: (options: Option[]) => void) => {
       const options = await searchForLocations(inputValue);
       callback(options);
     },
@@ -61,7 +79,7 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
   const geocode = async (address: string) => {
     const data = await geocoder.geocode({ address });
     if (data?.results) {
-      onClose({
+      handleClose({
         loc: data.results[0].formatted_address,
         lat: data.results[0].geometry.location.lat(),
         lng: data.results[0].geometry.location.lng()
@@ -72,16 +90,16 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
   const getCurrentLocation = async () => {
     setGettingCurrentLocation(true);
     if (navigator.geolocation) {
-      await navigator.geolocation.getCurrentPosition(async (pos) => {
+      navigator.geolocation.getCurrentPosition(async (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
         const data = await geocoder.geocode({ location: { lat, lng } });
-        onClose({
+        setGettingCurrentLocation(false);
+        handleClose({
           loc: data.results[0].formatted_address,
           lat: data.results[0].geometry.location.lat(),
           lng: data.results[0].geometry.location.lng()
         });
-        setGettingCurrentLocation(false);
       });
     } else {
       setGettingCurrentLocation(false);
@@ -89,7 +107,7 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={() => onClose({})}>
+    <Modal isOpen={isOpen} onClose={() => handleClose({})}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{t.setLoc}</ModalHeader>
@@ -106,7 +124,7 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
             w="full"
             leftIcon={<FiTarget />}
             mt={5}
-            onClick={async () => getCurrentLocation()}
+            onClick={getCurrentLocation}
             isLoading={gettingCurrentLocation}
             loadingText={t.gettingLoc}
             isDisabled={!!isDemo}
@@ -126,12 +144,12 @@ export const LocationModal = ({ isOpen, onClose }: any) => {
               <Text pb={0} mt={0} fontSize="sm">
                 {t.enterLoc}
               </Text>
-              <AsyncSelect
+              <AsyncSelect<Option>
                 placeholder=""
-                loadOptions={(inputValue: string, callback: (options) => void) => {
+                loadOptions={(inputValue: string, callback: (options: Option[]) => void) => {
                   debouncedSearchForLocations(inputValue, callback);
                 }}
-                defaultOptions={[]}
+                defaultOptions={[] as Option[]}
                 isClearable
                 menuPlacement="auto"
                 isDisabled={!!isDemo}
