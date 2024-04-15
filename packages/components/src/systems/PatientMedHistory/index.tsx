@@ -1,7 +1,7 @@
 import { createSignal, createEffect, Show, For, createMemo } from 'solid-js';
 import gql from 'graphql-tag';
 import { usePhotonClient } from '../SDKProvider';
-import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
+import { Medication, PatientMedication, SearchMedication } from '@photonhealth/sdk/dist/types';
 import Table from '../../particles/Table';
 import Text from '../../particles/Text';
 import generateString from '../../utils/generateString';
@@ -44,22 +44,12 @@ type PatientMedHistoryProps = {
   newMedication?: Medication | SearchMedication;
 };
 
-type PatientMedication = {
-  active: boolean;
-  prescription: {
-    id: string;
-    writtenAt: string;
-  };
-  medication: {
-    id: string;
-    name: string;
-  };
-};
+type SelectedPatientMedication = Pick<PatientMedication, 'active' | 'medication' | 'prescription'>;
 
 type GetPatientResponse = {
   patient: {
     id: string;
-    medicationHistory: PatientMedication[];
+    medicationHistory: SelectedPatientMedication[];
   };
 };
 
