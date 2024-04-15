@@ -9,6 +9,8 @@ import formatDate from '../../utils/formatDate';
 import Button from '../../particles/Button';
 import Card from '../../particles/Card';
 import { createQuery } from '../../utils/createQuery';
+import Icon from '../../particles/Icon';
+import { create } from 'lodash';
 
 const GET_PATIENT_MED_HISTORY = gql`
   query GetPatient($id: ID!) {
@@ -79,6 +81,7 @@ const LoadingRowFallback = () => (
 export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const client = usePhotonClient();
   const [medHistory, setMedHistory] = createSignal<PatientMedication[] | undefined>(undefined);
+  const [chronological, setChronological] = createSignal<boolean>(true);
 
   const baseURL = createMemo(() => `${client?.clinicalUrl}/prescriptions/`);
 
@@ -102,7 +105,8 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
         const dateB = b?.prescription?.writtenAt
           ? new Date(b.prescription.writtenAt).getTime()
           : -Infinity;
-        return dateA - dateB;
+        if (chronological()) return dateA - dateB;
+        return dateB - dateA;
       });
       setMedHistory(sortedMedHistory);
     }
@@ -163,7 +167,17 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
         <Table>
           <Table.Header>
             <Table.Col width="16rem">Medication</Table.Col>
-            <Table.Col>Written</Table.Col>
+            <Table.Col>
+              <span class="cursor-pointer flex" onClick={() => setChronological(!chronological())}>
+                Written
+                <Show when={chronological()}>
+                  <Icon name="chevronDown" size="sm" />
+                </Show>
+                <Show when={!chronological()}>
+                  <Icon name="chevronUp" size="sm" />
+                </Show>
+              </span>
+            </Table.Col>
             <Table.Col>Source</Table.Col>
           </Table.Header>
           <Table.Body>
