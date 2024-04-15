@@ -2,7 +2,7 @@ import { extendTheme } from '@chakra-ui/react';
 import tinycolor from 'tinycolor2';
 import { getSettings } from '@client/settings';
 
-function generateChakraTheme(key = undefined) {
+function generateChakraTheme(key?: string) {
   const { accentColor } = getSettings(key);
 
   const color = tinycolor(accentColor);

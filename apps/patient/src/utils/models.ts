@@ -5,11 +5,15 @@ export interface Order extends types.Order {
     id: string;
     name: string;
   };
+  readyBy?: string;
+  readyByDay?: string;
+  readyByTime?: string;
+  isReroutable?: boolean;
 }
 
 export interface Pharmacy extends types.Pharmacy {
   id: string;
-  address?: types.Address;
+  address?: types.Address | null;
   name: string;
   info?: string | undefined;
   distance?: number | undefined;
@@ -19,7 +23,7 @@ export interface Pharmacy extends types.Pharmacy {
   showReadyIn30Min?: boolean;
   closes?: string;
   opens?: string;
-  logo?: string;
+  logo?: string | null;
 }
 
 export type ExtendedFulfillmentType = types.FulfillmentType | 'COURIER';

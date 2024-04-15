@@ -70,7 +70,7 @@ const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes }: HoursProps) => 
 
 interface DistanceAddressProps {
   distance?: number;
-  address?: types.Address;
+  address?: types.Address | null;
 }
 
 const DistanceAddress = ({ distance, address }: DistanceAddressProps) => {
