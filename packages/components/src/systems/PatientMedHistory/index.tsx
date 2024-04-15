@@ -10,7 +10,6 @@ import Button from '../../particles/Button';
 import Card from '../../particles/Card';
 import { createQuery } from '../../utils/createQuery';
 import Icon from '../../particles/Icon';
-import { create } from 'lodash';
 
 const GET_PATIENT_MED_HISTORY = gql`
   query GetPatient($id: ID!) {
@@ -81,7 +80,7 @@ const LoadingRowFallback = () => (
 export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const client = usePhotonClient();
   const [medHistory, setMedHistory] = createSignal<PatientMedication[] | undefined>(undefined);
-  const [chronological, setChronological] = createSignal<boolean>(true);
+  const [chronological, setChronological] = createSignal<boolean>(false);
 
   const baseURL = createMemo(() => `${client?.clinicalUrl}/prescriptions/`);
 
