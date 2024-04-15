@@ -16,7 +16,7 @@ export const geocode = async (address: string) => {
     } else {
       throw new Error('No results found for the provided address.');
     }
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error);
   }
 };

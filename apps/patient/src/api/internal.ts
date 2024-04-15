@@ -66,7 +66,8 @@ export const getPharmacies = async ({
     } else {
       throw new Error('No pharmacies found near location');
     }
-  } catch (error) {
+  } catch (e: any) {
+    const error = e as any;
     if (error?.response?.errors?.[0].message === 'No pharmacies found near location') {
       throw new Error(error.response.errors[0].message);
     } else {
@@ -90,7 +91,7 @@ export const markOrderAsPickedUp = async (orderId: string) => {
     } else {
       throw new Error('Unable to mark order as picked up');
     }
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.response.errors[0].message);
   }
 };
@@ -106,7 +107,7 @@ export const rerouteOrder = async (orderId: string, pharmacyId: string) => {
     } else {
       throw new Error('Unable to reroute order');
     }
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.response.errors[0].message);
   }
 };
@@ -114,9 +115,9 @@ export const rerouteOrder = async (orderId: string, pharmacyId: string) => {
 export const setOrderPharmacy = async (
   orderId: string,
   pharmacyId: string,
-  readyBy: string,
-  readyByDay: string,
-  readyByTime: string
+  readyBy?: string,
+  readyByDay?: string,
+  readyByTime?: string
 ) => {
   try {
     const response: { setOrderPharmacy: boolean } = await graphQLClient.request(
@@ -135,7 +136,7 @@ export const setOrderPharmacy = async (
     } else {
       throw new Error('Unable to set order pharmacy');
     }
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.response.errors[0].message);
   }
 };
@@ -155,7 +156,7 @@ export const setPreferredPharmacy = async (patientId: string, pharmacyId: string
     } else {
       throw new Error('Unable to set preferred pharmacy');
     }
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.response.errors[0].message);
   }
 };
@@ -169,29 +170,25 @@ export const triggerDemoNotification = async (
   pharmacyName?: string,
   pharmacyAddress?: string
 ): Promise<boolean> => {
-  try {
-    const url = process.env.REACT_APP_THIRD_PARTY_REST_API_ENDPOINT;
-    const data = {
-      phoneNumber,
-      eventName,
-      pharmacyName,
-      pharmacyAddress
-    };
+  const url = process.env.REACT_APP_THIRD_PARTY_REST_API_ENDPOINT;
+  const data = {
+    phoneNumber,
+    eventName,
+    pharmacyName,
+    pharmacyAddress
+  };
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
+  const response = await fetch(url!, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
 
-    if (!response.ok) {
-      throw new Error('Unable to trigger demo sms');
-    }
-
-    return true;
-  } catch (error) {
-    throw new Error(error);
+  if (!response.ok) {
+    throw new Error('Unable to trigger demo sms');
   }
+
+  return true;
 };

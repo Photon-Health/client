@@ -45,8 +45,8 @@ const defaultSettings: OrganizationSettings = {
 /**
  * Org-specific settings overrides
  */
-export const photon = function (organizationId: string) {
-  if (organizationSettings[organizationId]) {
+export const photon = function (organizationId: string | undefined) {
+  if (organizationId && organizationSettings[organizationId]) {
     return organizationSettings[organizationId];
   }
   return defaultSettings;
