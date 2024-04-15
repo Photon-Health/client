@@ -159,12 +159,14 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
             <Table.Col>
               <span class="cursor-pointer flex" onClick={() => setChronological(!chronological())}>
                 Written
-                <Show when={chronological()}>
-                  <Icon name="chevronDown" size="sm" />
-                </Show>
-                <Show when={!chronological()}>
-                  <Icon name="chevronUp" size="sm" />
-                </Show>
+                <div class="ml-1">
+                  <Show when={chronological()}>
+                    <Icon name="chevronDown" size="sm" />
+                  </Show>
+                  <Show when={!chronological()}>
+                    <Icon name="chevronUp" size="sm" />
+                  </Show>
+                </div>
               </span>
             </Table.Col>
             <Table.Col>Source</Table.Col>
