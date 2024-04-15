@@ -1,35 +1,32 @@
-import { useState, useEffect } from 'react';
 import { Box, Button, Container, Heading, Link, Text, VStack, useToast } from '@chakra-ui/react';
-import { Helmet } from 'react-helmet';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { FiCheck } from 'react-icons/fi';
+import { getSettings } from '@client/settings';
 import { types } from '@photonhealth/sdk';
 import queryString from 'query-string';
-import { DemoCtaModal, FixedFooter, PharmacyCard, PoweredBy, StatusStepper } from '../components';
-import { Pharmacy as PharmacyWithHours } from '../utils/models';
-import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
-import { text as t, orderStateMapping as m } from '../utils/text';
-import { useOrderContext } from './Main';
-import * as TOAST_CONFIG from '../configs/toast';
+import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet';
+import { FiCheck } from 'react-icons/fi';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
-import { getSettings } from '@client/settings';
+import { DemoCtaModal, FixedFooter, PharmacyCard, PoweredBy, StatusStepper } from '../components';
+import * as TOAST_CONFIG from '../configs/toast';
+import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
+import { orderStateMapping as m, text as t } from '../utils/text';
+import { useOrderContext } from './Main';
 
 export const Status = () => {
   const navigate = useNavigate();
-  const { order, flattenedFills, setOrder } = useOrderContext();
+  const { order, flattenedFills, setOrder, isDemo } = useOrderContext();
 
-  const orgSettings = getSettings(order.organization.id);
+  const orgSettings = getSettings(order?.organization.id);
 
   const [searchParams] = useSearchParams();
-  const orderId = searchParams.get('orderId');
   const token = searchParams.get('token');
   const type = searchParams.get('type');
-  const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
 
-  const showFooterStates: types.FulfillmentState[] = ['RECEIVED', 'READY'];
+  const showFooterStates = ['RECEIVED', 'READY'];
   const [showFooter, setShowFooter] = useState<boolean>(
-    showFooterStates.includes(order?.fulfillment?.state) &&
+    showFooterStates.includes(order?.fulfillment?.state ?? '') &&
       order?.fulfillment?.type !== types.FulfillmentType.MailOrder
   );
   const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
@@ -39,11 +36,18 @@ export const Status = () => {
 
   const { fulfillment, pharmacy, address } = order;
 
-  const fulfillmentType = getFulfillmentType(pharmacy?.id, fulfillment, type);
+  const fulfillmentType = getFulfillmentType(
+    pharmacy?.id,
+    fulfillment ?? undefined,
+    type ?? undefined
+  );
 
   const toast = useToast();
 
   const handleMarkOrderAsPickedUp = async () => {
+    if (!order) {
+      return;
+    }
     setSubmitting(true);
 
     // Show cta modal for demo
@@ -61,7 +65,7 @@ export const Status = () => {
     }
 
     try {
-      const result: boolean = await markOrderAsPickedUp(orderId);
+      const result: boolean = await markOrderAsPickedUp(order.id);
 
       setTimeout(() => {
         if (result) {
@@ -70,9 +74,7 @@ export const Status = () => {
 
           setOrder({
             ...order,
-            fulfillment: {
-              state: 'PICKED_UP'
-            }
+            fulfillment: { ...order.fulfillment, state: 'PICKED_UP', type: fulfillment!.type }
           });
         } else {
           toast({
@@ -83,7 +85,7 @@ export const Status = () => {
         }
         setSubmitting(false);
       }, 1000);
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: m[fulfillmentType].error.title,
         description: m[fulfillmentType].error.description,
@@ -96,27 +98,31 @@ export const Status = () => {
     }
   };
 
+  const pharmacyFormattedAddress = pharmacy?.address ? formatAddress(pharmacy.address) : '';
+
   const handleGetDirections = () => {
-    const url = `http://maps.google.com/?q=${pharmacy.name}, ${formatAddress(pharmacy.address)}`;
+    if (!pharmacy?.name) return;
+    const url = `http://maps.google.com/?q=${pharmacy?.name}, ${pharmacyFormattedAddress}`;
     window.open(url);
   };
 
   useEffect(() => {
+    if (!phone || !pharmacy || !order || !fulfillment) {
+      return;
+    }
     if (isDemo) {
       setTimeout(async () => {
         // Send order received sms to demo participant
         await triggerDemoNotification(
-          phone,
+          phone!,
           'photon:order_fulfillment:received',
           pharmacy.name,
-          formatAddress(pharmacy.address)
+          pharmacyFormattedAddress
         );
 
         setOrder({
           ...order,
-          fulfillment: {
-            state: 'RECEIVED'
-          }
+          fulfillment: { ...order.fulfillment, state: 'RECEIVED', type: fulfillment!.type }
         });
 
         setShowFooter(true);
@@ -127,21 +133,29 @@ export const Status = () => {
             phone,
             'photon:order_fulfillment:ready',
             pharmacy.name,
-            formatAddress(pharmacy.address)
+            pharmacyFormattedAddress
           );
 
           setOrder({
             ...order,
-            fulfillment: {
-              state: 'READY'
-            }
+            fulfillment: { ...order.fulfillment, state: 'READY', type: fulfillment!.type }
           });
 
           setTimeout(() => setShowDemoCtaModal(true), 1500);
         }, 1500);
       }, 1500);
     }
-  }, []);
+  }, [
+    fulfillment,
+    isDemo,
+    order,
+    pharmacy,
+    pharmacy?.address,
+    pharmacy?.name,
+    pharmacyFormattedAddress,
+    phone,
+    setOrder
+  ]);
 
   const isMultiRx = flattenedFills.length > 1;
 
@@ -154,14 +168,19 @@ export const Status = () => {
     fulfillmentState === 'PICKED_UP' ||
     fulfillmentState === 'RECEIVED';
 
-  const pharmacyWithHours: PharmacyWithHours = preparePharmacy(pharmacy);
+  // Demo pharmacies are already prepared
+  const pharmacyWithHours = pharmacy ? (isDemo ? pharmacy : preparePharmacy(pharmacy)) : undefined;
 
-  const copy = m[fulfillmentType][fulfillmentState];
+  // TODO(mrochlin) Theres so typing issue here because MAIL_ORDER doesnt have RECEIVED as a valid state.
+  const copy = (m[fulfillmentType] as any)[fulfillmentState];
 
+  if (!order) {
+    console.error('No order found');
+    return null;
+  }
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
-
       <Helmet>
         <title>{t.track}</title>
       </Helmet>
@@ -218,7 +237,7 @@ export const Status = () => {
       {/* Bottom padding is added so stepper can be seen when footer is showing on smaller screens */}
       <Container pb={showFooter ? 32 : 8}>
         <VStack spacing={6} align="start" pt={5}>
-          {pharmacy ? (
+          {pharmacyWithHours ? (
             <Box width="full">
               <PharmacyCard
                 pharmacy={pharmacyWithHours}
@@ -241,7 +260,7 @@ export const Status = () => {
           <StatusStepper
             fulfillmentType={fulfillmentType}
             status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
-            patientAddress={formatAddress(address)}
+            patientAddress={address ? formatAddress(address) : undefined}
           />
         </VStack>
       </Container>
@@ -258,9 +277,7 @@ export const Status = () => {
             onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
             isLoading={submitting}
           >
-            {successfullySubmitted
-              ? t.thankYou
-              : m[fulfillmentType][fulfillmentState].cta(isMultiRx)}
+            {successfullySubmitted ? t.thankYou : copy.cta(isMultiRx)}
           </Button>
           <PoweredBy />
         </Container>

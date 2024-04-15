@@ -45,8 +45,8 @@ const defaultSettings: OrganizationSettings = {
  * Org-specific settings overrides
  */
 
-export const neutron = function (organizationId: string) {
-  if (organizationSettings[organizationId]) {
+export const neutron = function (organizationId: string | undefined) {
+  if (organizationId && organizationSettings[organizationId]) {
     return organizationSettings[organizationId];
   }
   return defaultSettings;
