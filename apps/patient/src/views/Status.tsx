@@ -15,14 +15,13 @@ import { useOrderContext } from './Main';
 
 export const Status = () => {
   const navigate = useNavigate();
-  const { order, flattenedFills, setOrder } = useOrderContext();
+  const { order, flattenedFills, setOrder, isDemo } = useOrderContext();
 
   const orgSettings = getSettings(order?.organization.id);
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const type = searchParams.get('type');
-  const isDemo = searchParams.get('demo');
   const phone = searchParams.get('phone');
 
   const showFooterStates = ['RECEIVED', 'READY'];
@@ -169,7 +168,8 @@ export const Status = () => {
     fulfillmentState === 'PICKED_UP' ||
     fulfillmentState === 'RECEIVED';
 
-  const pharmacyWithHours = pharmacy ? preparePharmacy(pharmacy) : undefined;
+  // Demo pharmacies are already prepared
+  const pharmacyWithHours = pharmacy ? (isDemo ? pharmacy : preparePharmacy(pharmacy)) : undefined;
 
   // TODO(mrochlin) Theres so typing issue here because MAIL_ORDER doesnt have RECEIVED as a valid state.
   const copy = (m[fulfillmentType] as any)[fulfillmentState];
