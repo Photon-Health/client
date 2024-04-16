@@ -223,7 +223,9 @@ export default function PharmacySearch(props: PharmacySearchProps) {
 
   async function getAndSetLocation(address: string, geocoder: google.maps.Geocoder) {
     const locations = await getLocations(address || '', geocoder);
-    setLocation(locations[0]);
+    if (locations.length > 0) {
+      setLocation(locations[0]);
+    }
   }
 
   onMount(() => {
