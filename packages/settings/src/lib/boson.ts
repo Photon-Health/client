@@ -40,8 +40,8 @@ const defaultSettings: OrganizationSettings = {
   hideTemplates: false
 };
 
-export const boson = function (organizationId: string) {
-  if (organizationSettings[organizationId]) {
+export const boson = function (organizationId: string | undefined) {
+  if (organizationId && organizationSettings[organizationId]) {
     return organizationSettings[organizationId];
   }
   return defaultSettings;

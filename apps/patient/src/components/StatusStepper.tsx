@@ -18,10 +18,10 @@ import { countFillsAndRemoveDuplicates } from '../utils/general';
 import { useOrderContext } from '../views/Main';
 
 export const STATES = {
-  PICK_UP: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'],
-  MAIL_ORDER: ['SENT', 'FILLING', 'SHIPPED', 'DELIVERED'],
-  COURIER: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP']
-};
+  PICK_UP: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'] as const,
+  MAIL_ORDER: ['SENT', 'FILLING', 'SHIPPED', 'DELIVERED'] as const,
+  COURIER: ['SENT', 'RECEIVED', 'READY', 'PICKED_UP'] as const
+} as const;
 
 interface Props {
   fulfillmentType: ExtendedFulfillmentType;
@@ -29,7 +29,9 @@ interface Props {
   patientAddress?: string;
 }
 
-const getStates = (fulfillmentType) => {
+const getStates = (
+  fulfillmentType: keyof typeof STATES
+): (typeof STATES)[typeof fulfillmentType] => {
   return STATES[fulfillmentType];
 };
 
@@ -56,8 +58,12 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
             colorScheme="green"
           >
             {getStates(fulfillmentType).map((state, id) => {
-              const title = t[fulfillmentType][state].status;
-              const description = `${t[fulfillmentType][state].description(isMultiRx)}${
+              // Types are a bit screwy here
+              const text = t[fulfillmentType][
+                state as keyof (typeof t)[typeof fulfillmentType]
+              ] as (typeof t)[typeof fulfillmentType]['SENT'];
+              const title = text.status;
+              const description = `${text.description(isMultiRx)}${
                 isDelivery && (state === 'SHIPPED' || state === 'READY') ? patientAddress : ''
               }`;
 
