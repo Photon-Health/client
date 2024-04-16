@@ -11,9 +11,8 @@ export default function loadGoogleScript({ onLoad, onError }: LoadGoogleScriptOp
   } else if (!scriptLoading) {
     scriptLoading = true;
     const script = document.createElement('script');
-    script.async = true;
     script.src =
-      'https://maps.googleapis.com/maps/api/js?key=AIzaSyAvuwwE6g2Bsmih66nu4dB7-H7U1_7KQ6g&loading=async&callback=Function.prototype&libraries=places';
+      'https://maps.googleapis.com/maps/api/js?key=AIzaSyAvuwwE6g2Bsmih66nu4dB7-H7U1_7KQ6g&callback=Function.prototype&libraries=places';
     document.head.appendChild(script);
 
     script.onload = () => {
