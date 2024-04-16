@@ -48,7 +48,6 @@ export const Main = () => {
   useEffect(() => {
     if (location.pathname !== '/canceled') {
       if (!isDemo && (!orderId || !token)) {
-        console.error('Missing orderId or token in search params');
         navigate('/no-match', { replace: true });
       }
     }
