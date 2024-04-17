@@ -17,8 +17,8 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
 interface Props {
   pharmacyId: string;
-  selectedId?: string;
-  handleSelect?: (id: string) => void;
+  selectedId?: string | undefined;
+  handleSelect?: ((id: string) => void) | undefined;
 }
 
 const PHARMACY_BRANDING = {
