@@ -185,8 +185,7 @@ export const Status = () => {
   // Demo pharmacies are already prepared
   const pharmacyWithHours = pharmacy ? (isDemo ? pharmacy : preparePharmacy(pharmacy)) : undefined;
 
-  const isDeliveryPharmacy =
-    fulfillmentType === types.FulfillmentType.MailOrder || fulfillmentType === 'COURIER';
+  const isDeliveryPharmacy = fulfillmentType === 'MAIL_ORDER' || fulfillmentType === 'COURIER';
 
   // TODO(mrochlin) Theres so typing issue here because MAIL_ORDER doesnt have RECEIVED as a valid state.
   const copy = (m[fulfillmentType] as any)[fulfillmentState];
