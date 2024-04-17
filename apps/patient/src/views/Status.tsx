@@ -107,10 +107,10 @@ export const Status = () => {
   };
 
   useEffect(() => {
-    if (!phone || !pharmacy || !order || !fulfillment) {
+    if (!phone || !pharmacy || !order) {
       return;
     }
-    if (isDemo) {
+    if (isDemo && !order.fulfillment) {
       setTimeout(async () => {
         // Send order received sms to demo participant
         await triggerDemoNotification(
@@ -122,7 +122,11 @@ export const Status = () => {
 
         setOrder({
           ...order,
-          fulfillment: { ...order.fulfillment, state: 'RECEIVED', type: fulfillment!.type }
+          fulfillment: {
+            ...order.fulfillment,
+            state: 'RECEIVED',
+            type: 'PICK_UP' as types.FulfillmentType
+          }
         });
 
         setShowFooter(true);
@@ -138,15 +142,18 @@ export const Status = () => {
 
           setOrder({
             ...order,
-            fulfillment: { ...order.fulfillment, state: 'READY', type: fulfillment!.type }
+            fulfillment: {
+              ...order.fulfillment,
+              state: 'READY',
+              type: 'PICK_UP' as types.FulfillmentType
+            }
           });
 
           setTimeout(() => setShowDemoCtaModal(true), 1500);
-        }, 1500);
-      }, 1500);
+        }, 1000);
+      }, 1000);
     }
   }, [
-    fulfillment,
     isDemo,
     order,
     pharmacy,
