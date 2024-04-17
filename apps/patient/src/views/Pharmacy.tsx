@@ -105,9 +105,14 @@ export const Pharmacy = () => {
 
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
 
+  // capsule
   const isCapsuleTerritory =
     order?.address?.postalCode != null && order.address.postalCode in capsuleZipcodeLookup;
   const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
+  const capsulePharmacyId = order?.address?.postalCode
+    ? capsuleZipcodeLookup[order.address.postalCode as keyof typeof capsuleZipcodeLookup]
+        ?.pharmacyId
+    : null;
 
   const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
   const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
@@ -619,12 +624,8 @@ export const Pharmacy = () => {
               {enableCourier || enableMailOrder ? (
                 <BrandedOptions
                   options={[
-                    ...(enableCourier && order?.address?.postalCode
-                      ? [
-                          capsuleZipcodeLookup[
-                            order.address.postalCode as keyof typeof capsuleZipcodeLookup
-                          ]?.pharmacyId
-                        ]
+                    ...(enableCourier && order?.address?.postalCode && capsulePharmacyId
+                      ? [capsulePharmacyId]
                       : []),
                     ...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : [])
                   ]}
