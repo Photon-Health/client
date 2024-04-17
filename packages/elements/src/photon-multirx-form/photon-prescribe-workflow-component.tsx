@@ -34,7 +34,7 @@ const Component = (props: PrescribeProps) => {
         address={props.address}
         weight={props.weight}
         weightUnit={props.weightUnit}
-        generalNotes={props.generalNotes}
+        additionalNotes={props.additionalNotes}
         triggerSubmit={props.triggerSubmit}
         toastBuffer={props.toastBuffer}
         formStore={store}
@@ -64,7 +64,7 @@ customElement(
     address: undefined,
     weight: undefined,
     weightUnit: 'lbs',
-    generalNotes: undefined,
+    additionalNotes: undefined,
     triggerSubmit: false,
     setTriggerSubmit: undefined,
     toastBuffer: 0,

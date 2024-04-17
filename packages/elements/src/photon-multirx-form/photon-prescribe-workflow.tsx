@@ -66,7 +66,7 @@ export type PrescribeProps = {
   address?: Address;
   weight?: number;
   weightUnit?: string;
-  generalNotes?: string;
+  additionalNotes?: string;
   triggerSubmit: boolean;
   setTriggerSubmit?: (val: boolean) => void;
   toastBuffer: number;
@@ -90,10 +90,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   );
   const [, recentOrdersActions] = useRecentOrders();
 
-  // we can ignore the warnings to put inside of a createEffect, the generalNotes or weight shouldn't be updating
+  // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
   let prefillNotes = '';
-  if (props.generalNotes) {
-    prefillNotes = `${props.generalNotes}
+  if (props.additionalNotes) {
+    prefillNotes = `${props.additionalNotes}
 
 `;
   }
