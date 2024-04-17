@@ -7,7 +7,14 @@ import { Helmet } from 'react-helmet';
 import { FiCheck } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
-import { DemoCtaModal, FixedFooter, PharmacyCard, PoweredBy, StatusStepper } from '../components';
+import {
+  BrandedPharmacyCard,
+  DemoCtaModal,
+  FixedFooter,
+  PharmacyCard,
+  PoweredBy,
+  StatusStepper
+} from '../components';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { orderStateMapping as m, text as t } from '../utils/text';
@@ -178,6 +185,9 @@ export const Status = () => {
   // Demo pharmacies are already prepared
   const pharmacyWithHours = pharmacy ? (isDemo ? pharmacy : preparePharmacy(pharmacy)) : undefined;
 
+  const isDeliveryPharmacy =
+    fulfillmentType === types.FulfillmentType.MailOrder || fulfillmentType === 'COURIER';
+
   // TODO(mrochlin) Theres so typing issue here because MAIL_ORDER doesnt have RECEIVED as a valid state.
   const copy = (m[fulfillmentType] as any)[fulfillmentState];
 
@@ -244,8 +254,10 @@ export const Status = () => {
       {/* Bottom padding is added so stepper can be seen when footer is showing on smaller screens */}
       <Container pb={showFooter ? 32 : 8}>
         <VStack spacing={6} align="start" pt={5}>
-          {pharmacyWithHours ? (
-            <Box width="full">
+          <Box width="full">
+            {order?.pharmacy?.id && isDeliveryPharmacy ? (
+              <BrandedPharmacyCard pharmacyId={order.pharmacy.id} />
+            ) : pharmacyWithHours ? (
               <PharmacyCard
                 pharmacy={pharmacyWithHours}
                 selected={true}
@@ -262,8 +274,8 @@ export const Status = () => {
                 }}
                 onGetDirections={handleGetDirections}
               />
-            </Box>
-          ) : null}
+            ) : null}
+          </Box>
           <StatusStepper
             fulfillmentType={fulfillmentType}
             status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
