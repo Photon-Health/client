@@ -66,6 +66,7 @@ export type PrescribeProps = {
   address?: Address;
   weight?: number;
   weightUnit?: string;
+  additionalNotes?: string;
   triggerSubmit: boolean;
   setTriggerSubmit?: (val: boolean) => void;
   toastBuffer: number;
@@ -89,6 +90,17 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   );
   const [, recentOrdersActions] = useRecentOrders();
 
+  // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
+  let prefillNotes = '';
+  if (props.additionalNotes) {
+    prefillNotes = `${props.additionalNotes}
+
+`;
+  }
+  if (props.weight) {
+    prefillNotes = `${prefillNotes}${formatPatientWeight(props.weight, props?.weightUnit)}`;
+  }
+
   onMount(() => {
     if (props.address) {
       // if manually overriding address, update the store on mount
@@ -99,10 +111,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     }
 
     ref.addEventListener('photon-ticket-created-duplicate', () => {
-      clearForm(
-        props.formActions,
-        props.weight ? { notes: formatPatientWeight(props.weight, props?.weightUnit) } : undefined
-      );
+      clearForm(props.formActions, prefillNotes ? { notes: prefillNotes } : undefined);
     });
   });
 
@@ -435,6 +444,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       store={props.formStore}
                       weight={props.weight}
                       weightUnit={props.weightUnit}
+                      prefillNotes={prefillNotes}
                       enableCombineAndDuplicate={props.enableCombineAndDuplicate}
                     />
                   </div>
