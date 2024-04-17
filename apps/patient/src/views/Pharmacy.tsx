@@ -106,7 +106,7 @@ export const Pharmacy = () => {
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
 
   const isCapsuleTerritory =
-    order?.address?.postalCode !== undefined && order.address.postalCode in capsuleZipcodeLookup;
+    order?.address?.postalCode != null && order.address.postalCode in capsuleZipcodeLookup;
   const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
 
   const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
