@@ -24,15 +24,15 @@ interface Props {
 const PHARMACY_BRANDING = {
   [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]: {
     logo: amazonPharmacyLogo,
-    description: 'Save time. Save money. Stay healthy.'
+    description: 'Delivers in 2-5 Days'
   },
   [process.env.REACT_APP_ALTO_PHARMACY_ID as string]: {
     logo: altoLogo,
-    description: 'Free same-day delivery'
+    description: 'FREE Same Day Delivery'
   },
   [process.env.REACT_APP_COSTCO_PHARMACY_ID as string]: {
     logo: costcoLogo,
-    description: 'Home delivery within 1-2 days'
+    description: 'Delivers in 1-2 Days'
   }
 };
 // TODO: need to make this more elegant
@@ -40,7 +40,7 @@ const capsulePharmacyIds = Object.keys(capsulePharmacyIdLookup);
 for (let i = 0; i < capsulePharmacyIds.length; i++) {
   PHARMACY_BRANDING[capsulePharmacyIds[i]] = {
     logo: capsuleLogo,
-    description: 'FREE Same Day Delivery'
+    description: 'Delivers Today'
   };
 }
 

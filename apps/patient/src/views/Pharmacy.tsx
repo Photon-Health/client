@@ -632,7 +632,6 @@ export const Pharmacy = () => {
                   location={location}
                   selectedId={selectedId}
                   handleSelect={handleSelect}
-                  patientAddress={formatAddress(order.address!)}
                 />
               ) : null}
 

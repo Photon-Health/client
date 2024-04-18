@@ -46,7 +46,7 @@ export const PickupOptions = ({
             <Heading as="h5" size="sm">
               {t.pickUp}
             </Heading>
-            <Text>{t.goLocal}</Text>
+            <Text>{t.selectLocal}</Text>
           </VStack>
         </SlideFade>
       ) : null}
