@@ -1,5 +1,4 @@
 import {
-  Box,
   Card,
   CardBody,
   Image,
@@ -18,8 +17,8 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
 interface Props {
   pharmacyId: string;
-  selectedId: string;
-  handleSelect: (id: string) => void;
+  selectedId?: string | undefined;
+  handleSelect?: ((id: string) => void) | undefined;
 }
 
 const PHARMACY_BRANDING = {
@@ -51,40 +50,24 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
   const brand = PHARMACY_BRANDING[pharmacyId];
   if (!brand) return null;
 
-  let tagline = null;
-  if (pharmacyId in capsulePharmacyIdLookup) {
-    const [firstWord, ...restOfSentence] = brand.description.split(' ');
-
-    tagline = (
-      <Text fontSize="sm" display="inline">
-        <Box as="span" color="gray.900" mr={1}>
-          {firstWord}
-        </Box>
-        <Box as="span" color="gray.500">
-          {restOfSentence.join(' ')}
-        </Box>
-      </Text>
-    );
-  } else {
-    tagline = (
-      <Text fontSize="sm" color="gray.500">
-        {brand.description}
-      </Text>
-    );
-  }
+  const tagline = brand.description ? (
+    <Text fontSize="sm" color="gray.500">
+      {brand.description}
+    </Text>
+  ) : null;
 
   return (
     <SlideFade offsetY="60px" in={true} key={`courier-pharmacy-${pharmacyId}`}>
       <Card
         bgColor="white"
         cursor="pointer"
-        onClick={() => handleSelect(pharmacyId)}
+        onClick={() => handleSelect?.(pharmacyId)}
         border="2px solid"
         borderColor={selectedId === pharmacyId ? 'brand.500' : 'white'}
         mx={isMobile ? -3 : undefined}
       >
         <CardBody p={3}>
-          <VStack align="start" spacing={2}>
+          <VStack align="start" spacing={1}>
             <Image src={brand.logo} width="auto" height="30px" />
             {tagline}
           </VStack>

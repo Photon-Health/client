@@ -39,6 +39,7 @@ import {
 } from '../api';
 import { demoPharmacies } from '../data/demoPharmacies';
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
+import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { isGLP } from '../utils/isGLP';
 
@@ -103,6 +104,15 @@ export const Pharmacy = () => {
   const isMultiRx = flattenedFills.length > 1;
 
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
+
+  // capsule
+  const isCapsuleTerritory =
+    order?.address?.postalCode != null && order.address.postalCode in capsuleZipcodeLookup;
+  const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
+  const capsulePharmacyId = order?.address?.postalCode
+    ? capsuleZipcodeLookup[order.address.postalCode as keyof typeof capsuleZipcodeLookup]
+        ?.pharmacyId
+    : null;
 
   const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
   const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
@@ -611,9 +621,14 @@ export const Pharmacy = () => {
         <VStack spacing={4} align="span" py={4}>
           {location ? (
             <VStack spacing={9} align="stretch">
-              {enableMailOrder ? (
+              {enableCourier || enableMailOrder ? (
                 <BrandedOptions
-                  options={orgSettings.mailOrderNavigateProviders ?? []}
+                  options={[
+                    ...(enableCourier && order?.address?.postalCode && capsulePharmacyId
+                      ? [capsulePharmacyId]
+                      : []),
+                    ...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : [])
+                  ]}
                   location={location}
                   selectedId={selectedId}
                   handleSelect={handleSelect}

@@ -61,7 +61,10 @@ const organizationSettings: {
     enableRxAndOrder: true,
     enableMedHistory: true,
     topRankedCostco: true,
-    topRankedWalgreens: true
+    topRankedWalgreens: true,
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
+    enableCourierNavigate: true
   },
   // NewCo (demo's)
   org_w85CgjUjCi52yvOz: {
