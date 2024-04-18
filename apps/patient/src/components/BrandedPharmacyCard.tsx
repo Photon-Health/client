@@ -61,7 +61,7 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
       <Card
         bgColor="white"
         cursor="pointer"
-        onClick={() => handleSelect && handleSelect(pharmacyId)}
+        onClick={() => handleSelect?.(pharmacyId)}
         border="2px solid"
         borderColor={selectedId === pharmacyId ? 'brand.500' : 'white'}
         mx={isMobile ? -3 : undefined}
