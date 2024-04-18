@@ -23,7 +23,8 @@ interface Props {
 
 const PHARMACY_BRANDING = {
   [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]: {
-    logo: amazonPharmacyLogo
+    logo: amazonPharmacyLogo,
+    description: 'Save time. Save money. Stay healthy.'
   },
   [process.env.REACT_APP_ALTO_PHARMACY_ID as string]: {
     logo: altoLogo,
