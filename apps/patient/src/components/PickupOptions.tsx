@@ -15,7 +15,7 @@ interface PickupOptionsProps {
   handleSetPreferred: (id: string) => void;
   loadingMore: boolean;
   showingAllPharmacies: boolean;
-  courierEnabled: boolean;
+  showHeading: boolean;
   enableOpenNow: boolean;
   enable24Hr: boolean;
   setEnableOpenNow: (isOpen: boolean) => void;
@@ -32,7 +32,7 @@ export const PickupOptions = ({
   handleSetPreferred,
   loadingMore,
   showingAllPharmacies,
-  courierEnabled,
+  showHeading,
   enableOpenNow,
   enable24Hr,
   setEnableOpenNow,
@@ -40,13 +40,13 @@ export const PickupOptions = ({
 }: PickupOptionsProps) => {
   return (
     <VStack spacing={3} align="span" w="full">
-      {courierEnabled ? (
+      {showHeading ? (
         <SlideFade offsetY="60px" in={true}>
           <VStack spacing={1} align="start">
             <Heading as="h5" size="sm">
               {t.pickUp}
             </Heading>
-            <Text>{t.goLocal}</Text>
+            <Text>{t.selectLocal}</Text>
           </VStack>
         </SlideFade>
       ) : null}

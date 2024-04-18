@@ -39,6 +39,7 @@ import {
 } from '../api';
 import { demoPharmacies } from '../data/demoPharmacies';
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
+import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { isGLP } from '../utils/isGLP';
 
@@ -103,6 +104,15 @@ export const Pharmacy = () => {
   const isMultiRx = flattenedFills.length > 1;
 
   const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
+
+  // capsule
+  const isCapsuleTerritory =
+    order?.address?.postalCode != null && order.address.postalCode in capsuleZipcodeLookup;
+  const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
+  const capsulePharmacyId = order?.address?.postalCode
+    ? capsuleZipcodeLookup[order.address.postalCode as keyof typeof capsuleZipcodeLookup]
+        ?.pharmacyId
+    : null;
 
   const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
   const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
@@ -608,38 +618,40 @@ export const Pharmacy = () => {
       </Box>
 
       <Container pb={showFooter ? 28 : 8}>
-        <VStack spacing={4} align="span" py={4}>
-          {location ? (
-            <VStack spacing={9} align="stretch">
-              {enableMailOrder ? (
-                <BrandedOptions
-                  options={orgSettings.mailOrderNavigateProviders ?? []}
-                  location={location}
-                  selectedId={selectedId}
-                  handleSelect={handleSelect}
-                  patientAddress={formatAddress(order.address!)}
-                />
-              ) : null}
-
-              <PickupOptions
-                pharmacies={allPharmacies}
-                preferredPharmacy={preferredPharmacyId}
-                savingPreferred={savingPreferred}
+        {location ? (
+          <VStack spacing={6} align="stretch" pt={4}>
+            {enableCourier || enableMailOrder ? (
+              <BrandedOptions
+                options={[
+                  ...(enableCourier && order?.address?.postalCode && capsulePharmacyId
+                    ? [capsulePharmacyId]
+                    : []),
+                  ...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : [])
+                ]}
+                location={location}
                 selectedId={selectedId}
                 handleSelect={handleSelect}
-                handleShowMore={handleShowMore}
-                handleSetPreferred={handleSetPreferredPharmacy}
-                loadingMore={isLoading}
-                showingAllPharmacies={showingAllPharmacies}
-                courierEnabled={enableMailOrder ?? false}
-                enableOpenNow={enableOpenNow}
-                enable24Hr={enable24Hr}
-                setEnableOpenNow={setEnableOpenNow}
-                setEnable24Hr={setEnable24Hr}
               />
-            </VStack>
-          ) : null}
-        </VStack>
+            ) : null}
+
+            <PickupOptions
+              pharmacies={allPharmacies}
+              preferredPharmacy={preferredPharmacyId}
+              savingPreferred={savingPreferred}
+              selectedId={selectedId}
+              handleSelect={handleSelect}
+              handleShowMore={handleShowMore}
+              handleSetPreferred={handleSetPreferredPharmacy}
+              loadingMore={isLoading}
+              showingAllPharmacies={showingAllPharmacies}
+              showHeading={(enableCourier || enableMailOrder) ?? false}
+              enableOpenNow={enableOpenNow}
+              enable24Hr={enable24Hr}
+              setEnableOpenNow={setEnableOpenNow}
+              setEnable24Hr={setEnable24Hr}
+            />
+          </VStack>
+        ) : null}
       </Container>
 
       <FixedFooter show={showFooter}>
