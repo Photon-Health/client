@@ -8,16 +8,9 @@ interface Props {
   location: string;
   selectedId: string;
   handleSelect: (id: string) => void;
-  patientAddress: string;
 }
 
-export const BrandedOptions = ({
-  options,
-  location,
-  selectedId,
-  handleSelect,
-  patientAddress
-}: Props) => {
+export const BrandedOptions = ({ options, location, selectedId, handleSelect }: Props) => {
   if (!location) return null;
 
   return (
@@ -27,7 +20,7 @@ export const BrandedOptions = ({
           <Heading as="h5" size="sm">
             {t.delivery}
           </Heading>
-          <Text size="sm">{t.shipTo(patientAddress)}</Text>
+          <Text size="sm">{t.selectDelivery}</Text>
         </VStack>
       </SlideFade>
 

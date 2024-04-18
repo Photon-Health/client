@@ -11,6 +11,13 @@ const getLocation = async (
   addressOrLocation: string | Coordinates,
   geocoder: google.maps.Geocoder
 ): Promise<Location[]> => {
+  if (
+    typeof addressOrLocation !== 'string' &&
+    (!addressOrLocation.latitude || !addressOrLocation.longitude)
+  ) {
+    return [];
+  }
+
   const data = await geocoder.geocode({
     ...(typeof addressOrLocation === 'string'
       ? { address: addressOrLocation }

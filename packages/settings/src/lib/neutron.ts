@@ -45,8 +45,8 @@ const defaultSettings: OrganizationSettings = {
  * Org-specific settings overrides
  */
 
-export const neutron = function (organizationId: string) {
-  if (organizationSettings[organizationId]) {
+export const neutron = function (organizationId: string | undefined) {
+  if (organizationId && organizationSettings[organizationId]) {
     return organizationSettings[organizationId];
   }
   return defaultSettings;
@@ -339,7 +339,9 @@ const organizationSettings: {
     ...defaultSettings,
     logo: 'sana_care_logo.png',
     accentColor: '#FBCC45',
-    mailOrderNavigate: false,
-    enableMedHistory: true
+    enableMedHistory: true,
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
+    enableCourierNavigate: true
   }
 };

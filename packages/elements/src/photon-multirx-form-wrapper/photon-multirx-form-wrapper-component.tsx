@@ -30,6 +30,7 @@ const Component = (props: {
   prescriptionIds?: string;
   weight?: number;
   weightUnit?: string;
+  additionalNotes?: string;
   enableLocalPickup?: boolean;
   enableSendToPatient?: boolean;
   enableCombineAndDuplicate?: boolean;
@@ -230,6 +231,7 @@ const Component = (props: {
                 prescription-ids={props.prescriptionIds}
                 weight={props.weight}
                 weight-unit={props.weightUnit}
+                additional-notes={props.additionalNotes}
                 enable-med-history={props.enableMedHistory}
                 enable-order={props.enableOrder}
                 enable-local-pickup={props.enableLocalPickup}
@@ -285,6 +287,7 @@ customElement(
     prescriptionIds: undefined,
     weight: undefined,
     weightUnit: 'lbs',
+    additionalNotes: undefined,
     enableLocalPickup: false,
     enableSendToPatient: false,
     enableMedHistory: false,
