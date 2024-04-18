@@ -339,7 +339,9 @@ const organizationSettings: {
     ...defaultSettings,
     logo: 'sana_care_logo.png',
     accentColor: '#FBCC45',
-    mailOrderNavigate: false,
-    enableMedHistory: true
+    enableMedHistory: true,
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
+    enableCourierNavigate: true
   }
 };
