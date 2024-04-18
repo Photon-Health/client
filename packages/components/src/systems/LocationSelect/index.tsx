@@ -40,8 +40,10 @@ export default function LocationSelect(props: LocationSelectProps) {
     setNavigatorError(false);
     await asyncInterval(() => !!geocoder(), 10, 20);
     const locations = await getLocations(address, geocoder()!);
-    props.setLocation(locations[0]);
-    props.setOpen(false);
+    if (locations.length > 0) {
+      props.setLocation(locations[0]);
+      props.setOpen(false);
+    }
   };
 
   const getCurrentLocation = async () => {
@@ -54,7 +56,9 @@ export default function LocationSelect(props: LocationSelectProps) {
       } = await getNavigatorLocation({ timeout: 5000 });
       await asyncInterval(() => !!geocoder(), 10, 20);
       const locations = await getLocations({ latitude, longitude }, geocoder()!);
-      props.setLocation(locations[0]);
+      if (locations.length > 0) {
+        props.setLocation(locations[0]);
+      }
       props.setOpen(false);
     } catch {
       setNavigatorError(true);

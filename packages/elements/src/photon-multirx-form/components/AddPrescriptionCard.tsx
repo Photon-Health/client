@@ -20,7 +20,6 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 import { createSignal, Show, onMount } from 'solid-js';
 import repopulateForm from '../util/repopulateForm';
 import clearForm from '../util/clearForm';
-import { formatPatientWeight } from '../util/formatPatientWeight';
 import { usePhoton } from '../../context';
 import { GraphQLError } from 'graphql';
 
@@ -48,6 +47,7 @@ export const AddPrescriptionCard = (props: {
   store: Record<string, any>;
   weight?: number;
   weightUnit?: string;
+  prefillNotes?: string;
   enableCombineAndDuplicate?: boolean;
 }) => {
   const client = usePhoton();
@@ -67,17 +67,7 @@ export const AddPrescriptionCard = (props: {
     }
 
     // initialize values in the prescribe form
-    clearForm(
-      props.actions,
-      props.weight ? { notes: formatPatientWeight(props.weight, props?.weightUnit) } : undefined
-    );
-
-    if (props.weight) {
-      props.actions.updateFormValue({
-        key: 'notes',
-        value: formatPatientWeight(props.weight, props.weightUnit)
-      });
-    }
+    clearForm(props.actions, props?.prefillNotes ? { notes: props.prefillNotes } : undefined);
   });
 
   const templateMutation = client!
@@ -149,10 +139,7 @@ export const AddPrescriptionCard = (props: {
           'addToTemplates'
         ]);
         setOffCatalog(undefined);
-        clearForm(
-          props.actions,
-          props.weight ? { notes: formatPatientWeight(props.weight, props?.weightUnit) } : undefined
-        );
+        clearForm(props.actions, props.prefillNotes ? { notes: props.prefillNotes } : undefined);
         if (addToTemplate) {
           try {
             const { errors } = await templateMutation({
@@ -234,12 +221,7 @@ export const AddPrescriptionCard = (props: {
               if (e.detail.data.__typename === 'PrescriptionTemplate') {
                 repopulateForm(props.actions, {
                   ...e.detail.data,
-                  notes: [
-                    e.detail.data?.notes,
-                    props.weight && formatPatientWeight(props.weight, props?.weightUnit)
-                  ]
-                    .filter((x) => x)
-                    .join('\n\n')
+                  notes: [e.detail.data?.notes, props.prefillNotes].filter((x) => x).join('\n\n')
                 });
               } else {
                 props.actions.updateFormValue({
