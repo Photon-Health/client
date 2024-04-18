@@ -77,7 +77,7 @@ customElement(
 
     onMount(async () => {
       const { data } = await client!.apollo.query({ query: GET_CATALOGS });
-      if (data.catalogs.length > 0) {
+      if (data?.catalogs.length > 0) {
         setCatalogId(data.catalogs[0].id);
       }
     });
