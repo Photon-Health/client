@@ -1,15 +1,15 @@
+import { types } from '@photonhealth/sdk';
 import dayjs, { Dayjs } from 'dayjs';
-import isoWeek from 'dayjs/plugin/isoWeek';
 import isBetween from 'dayjs/plugin/isBetween';
 import isToday from 'dayjs/plugin/isToday';
+import isoWeek from 'dayjs/plugin/isoWeek';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import { types } from '@photonhealth/sdk';
-import { ExtendedFulfillmentType } from './models';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
 import costcoLogo from '../assets/costco_small.png';
 import walgreensLogo from '../assets/walgreens_small.png';
+import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
+import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { ExtendedFulfillmentType } from './models';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -44,7 +44,7 @@ export const getFulfillmentType = (
   param?: string
 ): ExtendedFulfillmentType => {
   // We don't have COURIER fulfillment type yet, so manually check for those
-  if (pharmacyId in COMMON_COURIER_PHARMACY_IDS) {
+  if (COMMON_COURIER_PHARMACY_IDS.includes(pharmacyId ?? '')) {
     return 'COURIER';
   }
 
@@ -71,10 +71,10 @@ export const getFulfillmentType = (
  * Flatten the returned fills array and count each unique
  * fill by treatment name
  */
-type FillWithCount = types.Fill & { count: number };
+export type FillWithCount = types.Fill & { count: number };
 export const countFillsAndRemoveDuplicates = (fills: types.Fill[]): FillWithCount[] => {
-  const count = {};
-  const result = [];
+  const count: Record<string, number> = {};
+  const result: FillWithCount[] = [];
 
   for (const fill of fills) {
     const str = fill.treatment.id;

@@ -19,7 +19,6 @@ export const text = {
   fakeRxs: 'These are not real prescriptions.',
   findLoc: 'Find a location',
   gettingLoc: 'Getting current location',
-  goLocal: 'Select a local pharmacy for pick up.',
   inTransit: 'In transit',
   makePreferred: 'Make this my preferred pharmacy',
   next: 'Next',
@@ -147,6 +146,8 @@ export const text = {
     }.`,
   searchPharmacy: 'Search for a pharmacy',
   selectAPharmacy: 'Select a pharmacy',
+  selectDelivery: 'Select a mail order or courier for delivery.',
+  selectLocal: 'Select a local pharmacy for pick up.',
   selectPharmacy: 'Select pharmacy',
   sendToNew: (isPlural: boolean, originalPharmacyName: string) =>
     `We'll cancel your ${

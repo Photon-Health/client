@@ -40,8 +40,8 @@ const defaultSettings: OrganizationSettings = {
   hideTemplates: false
 };
 
-export const boson = function (organizationId: string) {
-  if (organizationSettings[organizationId]) {
+export const boson = function (organizationId: string | undefined) {
+  if (organizationId && organizationSettings[organizationId]) {
     return organizationSettings[organizationId];
   }
   return defaultSettings;
@@ -61,7 +61,10 @@ const organizationSettings: {
     enableRxAndOrder: true,
     enableMedHistory: true,
     topRankedCostco: true,
-    topRankedWalgreens: true
+    topRankedWalgreens: true,
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
+    enableCourierNavigate: true
   },
   // NewCo (demo's)
   org_w85CgjUjCi52yvOz: {
