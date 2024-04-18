@@ -618,43 +618,40 @@ export const Pharmacy = () => {
       </Box>
 
       <Container pb={showFooter ? 28 : 8}>
-        <VStack spacing={4} align="span" py={4}>
-          {location ? (
-            <VStack spacing={9} align="stretch">
-              {enableCourier || enableMailOrder ? (
-                <BrandedOptions
-                  options={[
-                    ...(enableCourier && order?.address?.postalCode && capsulePharmacyId
-                      ? [capsulePharmacyId]
-                      : []),
-                    ...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : [])
-                  ]}
-                  location={location}
-                  selectedId={selectedId}
-                  handleSelect={handleSelect}
-                  patientAddress={formatAddress(order.address!)}
-                />
-              ) : null}
-
-              <PickupOptions
-                pharmacies={allPharmacies}
-                preferredPharmacy={preferredPharmacyId}
-                savingPreferred={savingPreferred}
+        {location ? (
+          <VStack spacing={6} align="stretch" pt={4}>
+            {enableCourier || enableMailOrder ? (
+              <BrandedOptions
+                options={[
+                  ...(enableCourier && order?.address?.postalCode && capsulePharmacyId
+                    ? [capsulePharmacyId]
+                    : []),
+                  ...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : [])
+                ]}
+                location={location}
                 selectedId={selectedId}
                 handleSelect={handleSelect}
-                handleShowMore={handleShowMore}
-                handleSetPreferred={handleSetPreferredPharmacy}
-                loadingMore={isLoading}
-                showingAllPharmacies={showingAllPharmacies}
-                courierEnabled={enableMailOrder ?? false}
-                enableOpenNow={enableOpenNow}
-                enable24Hr={enable24Hr}
-                setEnableOpenNow={setEnableOpenNow}
-                setEnable24Hr={setEnable24Hr}
               />
-            </VStack>
-          ) : null}
-        </VStack>
+            ) : null}
+
+            <PickupOptions
+              pharmacies={allPharmacies}
+              preferredPharmacy={preferredPharmacyId}
+              savingPreferred={savingPreferred}
+              selectedId={selectedId}
+              handleSelect={handleSelect}
+              handleShowMore={handleShowMore}
+              handleSetPreferred={handleSetPreferredPharmacy}
+              loadingMore={isLoading}
+              showingAllPharmacies={showingAllPharmacies}
+              showHeading={(enableCourier || enableMailOrder) ?? false}
+              enableOpenNow={enableOpenNow}
+              enable24Hr={enable24Hr}
+              setEnableOpenNow={setEnableOpenNow}
+              setEnable24Hr={setEnable24Hr}
+            />
+          </VStack>
+        ) : null}
       </Container>
 
       <FixedFooter show={showFooter}>
