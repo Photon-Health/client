@@ -67,6 +67,12 @@ export const Main = () => {
     }
   }, [isLoading, error]);
 
+  if (query.get('error_description') === 'invitation not found or already used') {
+    // https://www.notion.so/photons/Handle-auth0-Error-States-on-Login-3486ee6a8e5d4c60a2db091f8f0cbd78?pvs=4
+    // In this error state, instead of endless loop we can just kick the user back login with an error message
+    return <Navigate to="/login?orgs=0" replace />;
+  }
+
   if (isLoading || (previouslyAuthed && !isAuthenticated) || query.get('code')) {
     return (
       <Center h="100vh">
