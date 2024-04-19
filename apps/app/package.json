@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "__COMMIT_HASH__",
+  "version": "0.1.0",
   "private": true,
   "eslintConfig": {
     "extends": "react-app"
