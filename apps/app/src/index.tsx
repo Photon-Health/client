@@ -14,6 +14,8 @@ import { App } from './App';
 
 import pkg from '../package.json';
 
+import '../globals';
+
 import('@photonhealth/elements').catch(() => {});
 
 datadogRum.init({
@@ -22,7 +24,7 @@ datadogRum.init({
   site: 'datadoghq.com',
   service: pkg.name,
   env: process.env.REACT_APP_ENV_NAME,
-  version: pkg.version,
+  version: __COMMIT_HASH__,
   sessionSampleRate: 100,
   sessionReplaySampleRate: 100,
   trackUserInteractions: true,

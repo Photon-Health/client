@@ -2,6 +2,7 @@ const path = require('path');
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const webpack = require('webpack');
+const gitRevisionPlugin = require('git-revision-webpack-plugin');
 
 module.exports = {
   webpack: (config) => {
@@ -42,13 +43,10 @@ module.exports = {
       })
     );
 
-    // Get git commit hash
-    const commitHash = childProcess.execSync('git rev-parse --short HEAD').toString().trim();
-
     // Define __COMMIT_HASH__
     config.plugins.push(
       new webpack.DefinePlugin({
-        __COMMIT_HASH__: JSON.stringify(commitHash)
+        __COMMIT_HASH__: JSON.stringify(gitRevisionPlugin().commithash())
       })
     );
 
