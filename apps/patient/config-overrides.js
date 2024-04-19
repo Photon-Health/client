@@ -2,7 +2,7 @@ const path = require('path');
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const webpack = require('webpack');
-const gitRevisionPlugin = require('git-revision-webpack-plugin');
+const gitRevisionPlugin = require('git-rev-sync');
 
 module.exports = {
   webpack: (config) => {
