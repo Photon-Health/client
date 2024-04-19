@@ -33,6 +33,24 @@ module.exports = {
       }
     });
 
+    // Add Datadog source map upload code
+    config.plugins.push(
+      new webpack.SourceMapDevToolPlugin({
+        noSources: false,
+        filename: '[file].map'
+      })
+    );
+
+    // Get git commit hash
+    const commitHash = childProcess.execSync('git rev-parse --short HEAD').toString().trim();
+
+    // Define __COMMIT_HASH__
+    config.plugins.push(
+      new webpack.DefinePlugin({
+        __COMMIT_HASH__: JSON.stringify(commitHash)
+      })
+    );
+
     return config;
   },
   paths: (paths) => {

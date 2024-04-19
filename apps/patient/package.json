@@ -1,6 +1,6 @@
 {
   "name": "patient",
-  "version": "0.1.0",
+  "version": "__COMMIT_HASH__",
   "private": true,
   "dependencies": {
     "@photonhealth/sdk": "*",
