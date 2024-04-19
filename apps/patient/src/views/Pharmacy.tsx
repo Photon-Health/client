@@ -350,14 +350,15 @@ export const Pharmacy = () => {
         }
 
         const pharmacies = await loadPharmacies({ latitude, longitude, enable24Hr, enableOpenNow });
+
+        if (pharmacies?.length === 0) {
+          toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
+        }
+
         setTopRankedPharmacies(topRankedPharmacies);
         setPharmacyResults(pharmacies);
       } catch (error: any) {
-        const noPharmaciesErr = 'No pharmacies found near location';
-        const genericError = 'Unable to get pharmacies';
-        const toastMsg = error?.message === noPharmaciesErr ? noPharmaciesErr : genericError;
-        toast({ ...TOAST_CONFIG.WARNING, title: toastMsg });
-
+        toast({ ...TOAST_CONFIG.WARNING, title: 'Unable to get pharmacies' });
         console.log('Get pharmacies error: ', error);
       }
       setLoadingPharmacies(false);

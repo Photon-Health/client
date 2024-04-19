@@ -61,11 +61,12 @@ export const getPharmacies = async ({
         name
       }
     );
+
     if (response?.pharmaciesByLocation?.length > 0) {
       return response.pharmaciesByLocation;
-    } else {
-      throw new Error('No pharmacies found near location');
     }
+
+    return [];
   } catch (e: any) {
     const errorMessage =
       e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on getPharmacies.';
