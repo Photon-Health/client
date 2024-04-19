@@ -18,11 +18,9 @@ import { MedicationConceptDropdown } from './components/MedicationConceptDropdow
 import { MedicationFilterDropdown } from './components/MedicationFilterDropdown';
 
 const GET_CATALOGS = gql`
-  query GetProducts($medId: String!) {
-    medicationProducts(id: $medId) {
+  query GetCatalogs {
+    catalogs {
       id
-      name
-      controlled
     }
   }
 `;
