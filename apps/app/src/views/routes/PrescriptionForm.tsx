@@ -79,6 +79,10 @@ export const PrescriptionForm = () => {
           datadogRum.addAction(e.detail.action, e.detail.data);
         }
       );
+      // TODO REMOVE: we're running discovery on which providers are using advanced search
+      ref.current.addEventListener('photon-medication-search-open', () => {
+        datadogRum.addAction('photon-medication-search-open', { user });
+      });
     }
   }, [ref.current]);
 

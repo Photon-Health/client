@@ -73,11 +73,23 @@ customElement(
       ref?.dispatchEvent(event);
     };
 
+    const dispatchMedSearchOpen = () => {
+      const event = new CustomEvent('photon-medication-search-open', {
+        composed: true,
+        bubbles: true,
+        detail: {
+          action: 'photon-medication-search-open'
+        }
+      });
+      ref?.dispatchEvent(event);
+    };
+
     onMount(async () => {
       const { data } = await client!.apollo.query({ query: GET_CATALOGS });
       if (data.catalogs.length > 0) {
         setCatalogId(data.catalogs[0].id);
       }
+      dispatchMedSearchOpen();
     });
 
     createEffect(() => {
