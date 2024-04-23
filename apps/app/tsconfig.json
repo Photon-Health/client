@@ -17,5 +17,5 @@
     "jsx": "react-jsx"
   },
   "extends": "../../tsconfig.base.json",
-  "include": ["src", "types", "types.d.ts", "declarations/*.d.ts", "globals.d.ts"]
+  "include": ["src", "types", "types.d.ts", "declarations/*.d.ts", "src/globals.d.ts"]
 }
