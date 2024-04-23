@@ -7,5 +7,5 @@
     "strict": true
   },
   "extends": "../../tsconfig.base.json",
-  "include": ["src", "types.d.ts"]
+  "include": ["src", "types.d.ts", "./globals.d.ts"]
 }
