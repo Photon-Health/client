@@ -1,4 +1,4 @@
-import { Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
+import { Card, Heading, SlideFade, Text, useBreakpointValue, VStack } from '@chakra-ui/react';
 
 import { text as t } from '../utils/text';
 import { BrandedPharmacyCard } from './BrandedPharmacyCard';
@@ -12,6 +12,7 @@ interface Props {
 
 export const BrandedOptions = ({ options, location, selectedId, handleSelect }: Props) => {
   if (!location) return null;
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
     <VStack spacing={2} align="span" w="full">
@@ -25,12 +26,21 @@ export const BrandedOptions = ({ options, location, selectedId, handleSelect }: 
       </SlideFade>
 
       {options.map((id) => (
-        <BrandedPharmacyCard
-          key={id}
-          pharmacyId={id}
-          selectedId={selectedId}
-          handleSelect={handleSelect}
-        />
+        <SlideFade offsetY="60px" in={true} key={`courier-pharmacy-${id}`}>
+          <Card
+            bgColor="white"
+            cursor="pointer"
+            border="2px solid"
+            borderColor={selectedId === id ? 'brand.500' : 'white'}
+            mx={isMobile ? -3 : undefined}
+          >
+            <BrandedPharmacyCard
+              pharmacyId={id}
+              selectedId={selectedId}
+              handleSelect={handleSelect}
+            />
+          </Card>
+        </SlideFade>
       ))}
     </VStack>
   );

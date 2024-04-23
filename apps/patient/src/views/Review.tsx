@@ -34,7 +34,7 @@ export const Review = () => {
         <title>{t.reviewRx(isMultiRx)}</title>
       </Helmet>
 
-      <Box bgColor="white" shadow="sm">
+      <Box bgColor="white">
         <Container>
           <VStack spacing={4} align="span" py={4}>
             <VStack spacing={2} align="start">
@@ -55,7 +55,9 @@ export const Review = () => {
         </Container>
       </Box>
 
-      <PrescriptionsList />
+      <Box bgColor="white" mt={2}>
+        <PrescriptionsList />
+      </Box>
 
       <FixedFooter show={true}>
         <Container as={VStack} w="full">

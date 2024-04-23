@@ -11,10 +11,11 @@ import {
   BrandedPharmacyCard,
   DemoCtaModal,
   FixedFooter,
-  PharmacyCard,
+  PharmacyCardNew,
   PoweredBy,
   StatusStepper
 } from '../components';
+import { PrescriptionsList } from '../components/PrescriptionsList';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { orderStateMapping as m, text as t } from '../utils/text';
@@ -201,7 +202,7 @@ export const Status = () => {
         <title>{t.track}</title>
       </Helmet>
 
-      <Box bgColor="white" shadow="sm">
+      <Box bgColor="white">
         <Container>
           <VStack spacing={2} align="start" py={4}>
             <Heading as="h3" size="lg">
@@ -251,30 +252,35 @@ export const Status = () => {
       </Box>
 
       {/* Bottom padding is added so stepper can be seen when footer is showing on smaller screens */}
-      <Container pb={showFooter ? 32 : 8}>
+      <Box bgColor="white" mt={2}>
+        {order?.pharmacy?.id && isDeliveryPharmacy ? (
+          <BrandedPharmacyCard pharmacyId={order.pharmacy.id} />
+        ) : pharmacyWithHours ? (
+          <PharmacyCardNew
+            pharmacy={pharmacyWithHours}
+            selected={true}
+            showDetails={fulfillmentType === 'PICK_UP'}
+            canReroute={!isDemo && orgSettings.enablePatientRerouting && order.isReroutable}
+            onChangePharmacy={() => {
+              const query = queryString.stringify({
+                orderId: order.id,
+                token,
+                reroute: true,
+                ...(!pharmacyWithHours.isOpen ? { openNow: true } : {})
+              });
+              navigate(`/pharmacy?${query}`);
+            }}
+            onGetDirections={handleGetDirections}
+          />
+        ) : null}
+      </Box>
+
+      <Box bgColor="white" mt={2}>
+        <PrescriptionsList />
+      </Box>
+
+      <Container>
         <VStack spacing={6} align="start" pt={5}>
-          <Box width="full">
-            {order?.pharmacy?.id && isDeliveryPharmacy ? (
-              <BrandedPharmacyCard pharmacyId={order.pharmacy.id} />
-            ) : pharmacyWithHours ? (
-              <PharmacyCard
-                pharmacy={pharmacyWithHours}
-                selected={true}
-                showDetails={fulfillmentType === 'PICK_UP'}
-                canReroute={!isDemo && orgSettings.enablePatientRerouting && order.isReroutable}
-                onChangePharmacy={() => {
-                  const query = queryString.stringify({
-                    orderId: order.id,
-                    token,
-                    reroute: true,
-                    ...(!pharmacyWithHours.isOpen ? { openNow: true } : {})
-                  });
-                  navigate(`/pharmacy?${query}`);
-                }}
-                onGetDirections={handleGetDirections}
-              />
-            ) : null}
-          </Box>
           <StatusStepper
             fulfillmentType={fulfillmentType}
             status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
