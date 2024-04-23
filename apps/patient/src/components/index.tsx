@@ -6,7 +6,7 @@ export * from './LocationModal';
 export * from './Logo';
 export * from './Nav';
 export * from './PharmacyCard';
-export * from './PharmacyCardNew';
+export * from './PharmacyInfo';
 export * from './PharmacyFilters';
 export * from './PickupOptions';
 export * from './PoweredBy';

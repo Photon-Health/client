@@ -4,14 +4,14 @@ import { types } from '@photonhealth/sdk';
 import queryString from 'query-string';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { FiCheck } from 'react-icons/fi';
+import { FiCheck, FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
 import {
   BrandedPharmacyCard,
   DemoCtaModal,
   FixedFooter,
-  PharmacyCardNew,
+  PharmacyInfo,
   PoweredBy,
   StatusStepper
 } from '../components';
@@ -195,6 +195,9 @@ export const Status = () => {
     console.error('No order found');
     return null;
   }
+
+  const canReroute = !isDemo && orgSettings.enablePatientRerouting && order.isReroutable;
+
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
@@ -249,38 +252,58 @@ export const Status = () => {
             ) : null}
           </VStack>
         </Container>
-      </Box>
 
-      {/* Bottom padding is added so stepper can be seen when footer is showing on smaller screens */}
-      <Box bgColor="white" mt={2}>
         {order?.pharmacy?.id && isDeliveryPharmacy ? (
           <BrandedPharmacyCard pharmacyId={order.pharmacy.id} />
         ) : pharmacyWithHours ? (
-          <PharmacyCardNew
-            pharmacy={pharmacyWithHours}
-            selected={true}
-            showDetails={fulfillmentType === 'PICK_UP'}
-            canReroute={!isDemo && orgSettings.enablePatientRerouting && order.isReroutable}
-            onChangePharmacy={() => {
-              const query = queryString.stringify({
-                orderId: order.id,
-                token,
-                reroute: true,
-                ...(!pharmacyWithHours.isOpen ? { openNow: true } : {})
-              });
-              navigate(`/pharmacy?${query}`);
-            }}
-            onGetDirections={handleGetDirections}
-          />
+          <Container pb={4}>
+            <VStack>
+              <PharmacyInfo
+                pharmacy={pharmacyWithHours}
+                showDetails={fulfillmentType === 'PICK_UP'}
+              />
+              <Button
+                mt={4}
+                mx="auto"
+                size="md"
+                variant="solid"
+                onClick={handleGetDirections}
+                leftIcon={<FiNavigation />}
+                w="full"
+                bg="gray.900"
+                color="white"
+              >
+                {t.directions}
+              </Button>
+              {canReroute ? (
+                <Button
+                  mx="auto"
+                  size="md"
+                  variant="outline"
+                  onClick={() => {
+                    const query = queryString.stringify({
+                      orderId: order.id,
+                      token,
+                      reroute: true,
+                      ...(!pharmacyWithHours.isOpen ? { openNow: true } : {})
+                    });
+                    navigate(`/pharmacy?${query}`);
+                  }}
+                  leftIcon={<FiRefreshCcw />}
+                  bg="gray.50"
+                  color="blue.500"
+                  w="full"
+                >
+                  {t.changePharmacy}
+                </Button>
+              ) : null}
+            </VStack>
+          </Container>
         ) : null}
       </Box>
 
-      <Box bgColor="white" mt={2}>
-        <PrescriptionsList />
-      </Box>
-
       <Container>
-        <VStack spacing={6} align="start" pt={5}>
+        <VStack spacing={6} align="start" py={5}>
           <StatusStepper
             fulfillmentType={fulfillmentType}
             status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
@@ -288,6 +311,10 @@ export const Status = () => {
           />
         </VStack>
       </Container>
+
+      <Box bgColor="white" mt={2} mb={showFooter ? 32 : 8}>
+        <PrescriptionsList />
+      </Box>
 
       <FixedFooter show={showFooter}>
         <Container as={VStack} w="full">

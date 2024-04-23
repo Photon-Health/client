@@ -23,7 +23,7 @@ export const PrescriptionsList = () => {
         <Heading as="h4" size="md">
           Order Details
         </Heading>
-        <Accordion allowToggle>
+        <Accordion allowToggle allowMultiple>
           {flattenedFills.map(({ id, treatment, prescription: rx, count }) => {
             const prescription = rx!;
             return (
