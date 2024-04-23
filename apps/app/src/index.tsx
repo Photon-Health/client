@@ -14,8 +14,6 @@ import { App } from './App';
 
 import pkg from '../package.json';
 
-import './globals';
-
 import('@photonhealth/elements').catch(() => {});
 
 datadogRum.init({
