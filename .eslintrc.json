@@ -17,7 +17,8 @@
     "Keyframe": "readonly",
     "PropertyIndexedKeyframes": "readonly",
     "KeyframeAnimationOptions": "readonly",
-    "GeolocationPosition": "readonly"
+    "GeolocationPosition": "readonly",
+    "__COMMIT_HASH__": "readonly"
   },
   "rules": {
     "@typescript-eslint/ban-ts-comment": "off",
