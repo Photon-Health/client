@@ -61,18 +61,16 @@ export const getPharmacies = async ({
         name
       }
     );
+
     if (response?.pharmaciesByLocation?.length > 0) {
       return response.pharmaciesByLocation;
-    } else {
-      throw new Error('No pharmacies found near location');
     }
+
+    return [];
   } catch (e: any) {
-    const error = e as any;
-    if (error?.response?.errors?.[0].message === 'No pharmacies found near location') {
-      throw new Error(error.response.errors[0].message);
-    } else {
-      throw error;
-    }
+    const errorMessage =
+      e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on getPharmacies.';
+    throw new Error(errorMessage);
   }
 };
 
@@ -91,8 +89,10 @@ export const markOrderAsPickedUp = async (orderId: string) => {
     } else {
       throw new Error('Unable to mark order as picked up');
     }
-  } catch (error: any) {
-    throw new Error(error.response.errors[0].message);
+  } catch (e: any) {
+    const errorMessage =
+      e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on markOrderAsPickedUp.';
+    throw new Error(errorMessage);
   }
 };
 
@@ -107,8 +107,10 @@ export const rerouteOrder = async (orderId: string, pharmacyId: string) => {
     } else {
       throw new Error('Unable to reroute order');
     }
-  } catch (error: any) {
-    throw new Error(error.response.errors[0].message);
+  } catch (e: any) {
+    const errorMessage =
+      e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on rerouteOrder.';
+    throw new Error(errorMessage);
   }
 };
 
@@ -136,8 +138,10 @@ export const setOrderPharmacy = async (
     } else {
       throw new Error('Unable to set order pharmacy');
     }
-  } catch (error: any) {
-    throw new Error(error.response.errors[0].message);
+  } catch (e: any) {
+    const errorMessage =
+      e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on setOrderPharmacy.';
+    throw new Error(errorMessage);
   }
 };
 
@@ -156,8 +160,10 @@ export const setPreferredPharmacy = async (patientId: string, pharmacyId: string
     } else {
       throw new Error('Unable to set preferred pharmacy');
     }
-  } catch (error: any) {
-    throw new Error(error.response.errors[0].message);
+  } catch (e: any) {
+    const errorMessage =
+      e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on setPreferredPharmacy.';
+    throw new Error(errorMessage);
   }
 };
 
