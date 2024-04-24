@@ -10,7 +10,6 @@ import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
 import {
   BrandedPharmacyCard,
   DemoCtaModal,
-  FixedFooter,
   PharmacyInfo,
   PoweredBy,
   StatusStepper
@@ -32,9 +31,9 @@ export const Status = () => {
   const type = searchParams.get('type');
   const phone = searchParams.get('phone');
 
-  const showFooterStates = ['RECEIVED', 'READY'];
-  const [showFooter, setShowFooter] = useState<boolean>(
-    showFooterStates.includes(order?.fulfillment?.state ?? '') &&
+  const showReceivedButtonStates = ['RECEIVED', 'READY'];
+  const [showReceivedButton, setShowReceivedButton] = useState<boolean>(
+    showReceivedButtonStates.includes(order?.fulfillment?.state ?? '') &&
       order?.fulfillment?.type !== types.FulfillmentType.MailOrder
   );
   const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
@@ -63,7 +62,7 @@ export const Status = () => {
       setTimeout(() => {
         setSuccessfullySubmitted(true);
         setTimeout(() => {
-          setShowFooter(false);
+          setShowReceivedButton(false);
           setShowDemoCtaModal(true);
         }, 1000);
         setSubmitting(false);
@@ -78,7 +77,7 @@ export const Status = () => {
       setTimeout(() => {
         if (result) {
           setSuccessfullySubmitted(true);
-          setTimeout(() => setShowFooter(false), 1000);
+          setTimeout(() => setShowReceivedButton(false), 1000);
 
           setOrder({
             ...order,
@@ -137,7 +136,7 @@ export const Status = () => {
           }
         });
 
-        setShowFooter(true);
+        setShowReceivedButton(true);
 
         setTimeout(async () => {
           // Send ready sms
@@ -261,11 +260,13 @@ export const Status = () => {
               <PharmacyInfo
                 pharmacy={pharmacyWithHours}
                 showDetails={fulfillmentType === 'PICK_UP'}
+                isStatus
               />
               <Button
                 mt={4}
                 mx="auto"
                 size="md"
+                py={6}
                 variant="solid"
                 onClick={handleGetDirections}
                 leftIcon={<FiNavigation />}
@@ -279,6 +280,7 @@ export const Status = () => {
                 <Button
                   mx="auto"
                   size="md"
+                  py={6}
                   variant="outline"
                   onClick={() => {
                     const query = queryString.stringify({
@@ -297,42 +299,48 @@ export const Status = () => {
                   {t.changePharmacy}
                 </Button>
               ) : null}
+
+              {showReceivedButton ? (
+                <Button
+                  size="md"
+                  py={6}
+                  w="full"
+                  borderRadius="lg"
+                  variant="outline"
+                  bg="gray.50"
+                  color="blue.500"
+                  colorScheme={successfullySubmitted ? 'green' : undefined}
+                  leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
+                  onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
+                  isLoading={submitting}
+                >
+                  {successfullySubmitted ? t.thankYou : copy.cta(isMultiRx)}
+                </Button>
+              ) : null}
             </VStack>
           </Container>
         ) : null}
       </Box>
 
-      <Container>
-        <VStack spacing={6} align="start" py={5}>
-          <StatusStepper
-            fulfillmentType={fulfillmentType}
-            status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
-            patientAddress={address ? formatAddress(address) : undefined}
-          />
-        </VStack>
-      </Container>
+      <Box bgColor="white" mt={2}>
+        <Container>
+          <VStack spacing={6} align="start" py={5}>
+            <StatusStepper
+              fulfillmentType={fulfillmentType}
+              status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
+              patientAddress={address ? formatAddress(address) : undefined}
+            />
+          </VStack>
+        </Container>
+      </Box>
 
-      <Box bgColor="white" mt={2} mb={showFooter ? 32 : 8}>
+      <Box bgColor="white" mt={2}>
         <PrescriptionsList />
       </Box>
 
-      <FixedFooter show={showFooter}>
-        <Container as={VStack} w="full">
-          <Button
-            size="lg"
-            w="full"
-            borderRadius="lg"
-            variant={successfullySubmitted ? undefined : 'brand'}
-            colorScheme={successfullySubmitted ? 'green' : undefined}
-            leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
-            onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
-            isLoading={submitting}
-          >
-            {successfullySubmitted ? t.thankYou : copy.cta(isMultiRx)}
-          </Button>
-          <PoweredBy />
-        </Container>
-      </FixedFooter>
+      <Container as={VStack} w="full" py={4}>
+        <PoweredBy />
+      </Container>
     </Box>
   );
 };

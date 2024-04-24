@@ -1,4 +1,14 @@
-import { Box, HStack, Tag, TagLabel, TagLeftIcon, Text, VStack, Image } from '@chakra-ui/react';
+import {
+  Box,
+  HStack,
+  Tag,
+  TagLabel,
+  TagLeftIcon,
+  Text,
+  VStack,
+  Image,
+  Stack
+} from '@chakra-ui/react';
 import { FiStar } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -54,12 +64,13 @@ const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes }: HoursProps) => 
 interface DistanceAddressProps {
   distance?: number;
   address?: types.Address | null;
+  fontSize?: string;
 }
 
-const DistanceAddress = ({ distance, address }: DistanceAddressProps) => {
+const DistanceAddress = ({ distance, address, fontSize = 'sm' }: DistanceAddressProps) => {
   if (!address) return null;
   return (
-    <Text fontSize="sm" color="gray.500" display="inline">
+    <Text fontSize={fontSize} color="gray.600" display="inline">
       {distance ? `${distance.toFixed(1)} mi` : ''}
       {distance && (
         <Box as="span" display="inline" mx={2}>
@@ -76,13 +87,15 @@ interface PharmacyInfoProps {
   preferred?: boolean;
   showDetails?: boolean;
   boldPharmacyName?: boolean;
+  isStatus?: boolean;
 }
 
 export const PharmacyInfo = ({
   pharmacy,
   preferred = false,
   showDetails = true,
-  boldPharmacyName = true
+  boldPharmacyName = true,
+  isStatus = false
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
@@ -95,7 +108,7 @@ export const PharmacyInfo = ({
             <TagLabel> {t.preferred}</TagLabel>
           </Tag>
         ) : null}
-        {pharmacy?.showReadyIn30Min ? (
+        {pharmacy?.showReadyIn30Min && !isStatus ? (
           <Tag size="sm" bgColor="yellow.200">
             <TagLabel>Ready in 30 minutes</TagLabel>
           </Tag>
@@ -109,7 +122,7 @@ export const PharmacyInfo = ({
           </Text>
         </HStack>
         {showDetails ? (
-          <>
+          <Stack direction={isStatus ? 'column-reverse' : 'column'} gap={1} mt={2}>
             <Hours
               isOpen={pharmacy.isOpen}
               is24Hr={pharmacy.is24Hr}
@@ -117,8 +130,12 @@ export const PharmacyInfo = ({
               opens={pharmacy.opens}
               closes={pharmacy.closes}
             />
-            <DistanceAddress distance={pharmacy.distance} address={pharmacy.address} />
-          </>
+            <DistanceAddress
+              distance={pharmacy.distance}
+              address={pharmacy.address}
+              fontSize={isStatus ? 'md' : 'sm'}
+            />
+          </Stack>
         ) : null}
       </VStack>
     </VStack>
