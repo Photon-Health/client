@@ -55,7 +55,7 @@ export const Review = () => {
         </Container>
       </Box>
 
-      <Box bgColor="white" mt={2}>
+      <Box bgColor="white" mt={2} mb={32}>
         <PrescriptionsList />
       </Box>
 

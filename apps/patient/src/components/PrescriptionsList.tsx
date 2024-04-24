@@ -37,7 +37,7 @@ export const PrescriptionsList = () => {
                         _focus={{ bg: 'transparent' }}
                       >
                         <VStack me="auto" w="full" align="start">
-                          <Text align="start" data-dd-privacy="mask" as="b">
+                          <Text align="start" data-dd-privacy="mask" fontWeight="semibold">
                             {treatment.name}
                           </Text>
                           <HStack>
