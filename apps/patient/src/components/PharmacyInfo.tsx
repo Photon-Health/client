@@ -122,7 +122,7 @@ export const PharmacyInfo = ({
           </Text>
         </HStack>
         {showDetails ? (
-          <Stack direction={isStatus ? 'column-reverse' : 'column'} gap={1} mt={2}>
+          <Stack direction={isStatus ? 'column-reverse' : 'column'} gap={0}>
             <Hours
               isOpen={pharmacy.isOpen}
               is24Hr={pharmacy.is24Hr}
