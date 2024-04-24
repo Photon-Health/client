@@ -34,11 +34,7 @@ export const BrandedOptions = ({ options, location, selectedId, handleSelect }: 
             borderColor={selectedId === id ? 'brand.500' : 'white'}
             mx={isMobile ? -3 : undefined}
           >
-            <BrandedPharmacyCard
-              pharmacyId={id}
-              selectedId={selectedId}
-              handleSelect={handleSelect}
-            />
+            <BrandedPharmacyCard pharmacyId={id} handleSelect={handleSelect} />
           </Card>
         </SlideFade>
       ))}

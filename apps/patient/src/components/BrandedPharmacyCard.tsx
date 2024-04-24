@@ -9,7 +9,6 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
 interface Props {
   pharmacyId: string;
-  selectedId?: string | undefined;
   handleSelect?: ((id: string) => void) | undefined;
 }
 
@@ -36,7 +35,7 @@ for (let i = 0; i < capsulePharmacyIds.length; i++) {
   };
 }
 
-export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Props) => {
+export const BrandedPharmacyCard = ({ pharmacyId, handleSelect }: Props) => {
   const brand = PHARMACY_BRANDING[pharmacyId];
   if (!brand) return null;
 
@@ -48,14 +47,7 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
 
   return (
     <Container>
-      <Box
-        py={2}
-        bgColor="white"
-        cursor="pointer"
-        onClick={() => handleSelect?.(pharmacyId)}
-        border="2px solid"
-        borderColor={selectedId === pharmacyId ? 'brand.500' : 'white'}
-      >
+      <Box py={2} bgColor="white" cursor="pointer" onClick={() => handleSelect?.(pharmacyId)}>
         <VStack align="start" spacing={1}>
           <Image src={brand.logo} width="auto" height="30px" />
           {tagline}
