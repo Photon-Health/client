@@ -26,7 +26,7 @@ jobs:
           SERVICE_NAME=$(node -p "require('./apps/patient/package.json').name")
           PACKAGE_VERSION=${{ github.sha }}
           ENVIRONMENT=${GITHUB_REF#refs/heads/}
-          npx datadog-ci sourcemaps upload dist/apps/patient \
+          npx datadog-ci sourcemaps upload dist \
             --service=${SERVICE_NAME} \
             --release-version=${PACKAGE_VERSION} \
             --minified-path-prefix=https://orders.${ENVIRONMENT}.health/static/js
@@ -37,7 +37,7 @@ jobs:
           SERVICE_NAME=$(node -p "require('./apps/app/package.json').name")
           PACKAGE_VERSION=${{ github.sha }}
           ENVIRONMENT=${GITHUB_REF#refs/heads/}
-          npx datadog-ci sourcemaps upload dist/apps/app \
+          npx datadog-ci sourcemaps upload dist \
             --service=${SERVICE_NAME} \
             --release-version=${PACKAGE_VERSION} \
             --minified-path-prefix=https://app.${ENVIRONMENT}.health/static/js
