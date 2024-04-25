@@ -42,7 +42,7 @@ export const PrescriptionsList = () => {
                           </Text>
                           <HStack>
                             <Text fontSize="sm" color="gray.500">
-                              {isExpanded ? 'Show less ' : 'Show more '}
+                              {isExpanded ? 'Show less' : 'Show more'}
                             </Text>
                             <AccordionIcon />
                           </HStack>

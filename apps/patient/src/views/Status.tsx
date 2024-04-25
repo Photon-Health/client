@@ -197,6 +197,16 @@ export const Status = () => {
 
   const canReroute = !isDemo && orgSettings.enablePatientRerouting && order.isReroutable;
 
+  const handleRerouteLink = () => {
+    const query = queryString.stringify({
+      orderId: order.id,
+      token,
+      reroute: true,
+      ...(!pharmacyWithHours?.isOpen ? { openNow: true } : {})
+    });
+    navigate(`/pharmacy?${query}`);
+  };
+
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
@@ -282,15 +292,7 @@ export const Status = () => {
                   size="md"
                   py={6}
                   variant="outline"
-                  onClick={() => {
-                    const query = queryString.stringify({
-                      orderId: order.id,
-                      token,
-                      reroute: true,
-                      ...(!pharmacyWithHours.isOpen ? { openNow: true } : {})
-                    });
-                    navigate(`/pharmacy?${query}`);
-                  }}
+                  onClick={handleRerouteLink}
                   leftIcon={<FiRefreshCcw />}
                   bg="gray.50"
                   color="blue.500"
