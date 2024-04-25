@@ -14,6 +14,7 @@ import {
   PoweredBy,
   StatusStepper
 } from '../components';
+import { FAQ } from '../components/FAQ';
 import { PrescriptionsList } from '../components/PrescriptionsList';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
@@ -338,6 +339,10 @@ export const Status = () => {
 
       <Box bgColor="white" mt={2}>
         <PrescriptionsList />
+      </Box>
+
+      <Box bgColor="white" mt={2}>
+        <FAQ />
       </Box>
 
       <Container as={VStack} w="full" py={4}>
