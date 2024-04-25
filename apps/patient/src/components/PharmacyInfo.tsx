@@ -40,7 +40,7 @@ const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes }: HoursProps) => 
         </Text>
       ) : null}
       {!is24Hr && ((isOpen && closes) || (!isOpen && opens)) ? (
-        <Text color="gray.400">&bull;</Text>
+        <Text color="gray.500">&bull;</Text>
       ) : null}
       {!is24Hr && isClosingSoon ? (
         <Text fontSize="sm" color="gray.500" isTruncated>
@@ -70,7 +70,7 @@ interface DistanceAddressProps {
 const DistanceAddress = ({ distance, address, fontSize = 'sm' }: DistanceAddressProps) => {
   if (!address) return null;
   return (
-    <Text fontSize={fontSize} color="gray.600" display="inline">
+    <Text fontSize={fontSize} color="gray.500" display="inline">
       {distance ? `${distance.toFixed(1)} mi` : ''}
       {distance && (
         <Box as="span" display="inline" mx={2}>
