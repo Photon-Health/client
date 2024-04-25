@@ -1,12 +1,4 @@
-import {
-  Card,
-  CardBody,
-  Image,
-  SlideFade,
-  Text,
-  VStack,
-  useBreakpointValue
-} from '@chakra-ui/react';
+import { Image, Text, VStack, Box, Container } from '@chakra-ui/react';
 
 import capsuleLogo from '../assets/capsule_logo.png';
 import amazonPharmacyLogo from '../assets/amazon_pharmacy.png';
@@ -17,7 +9,6 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
 interface Props {
   pharmacyId: string;
-  selectedId?: string | undefined;
   handleSelect?: ((id: string) => void) | undefined;
 }
 
@@ -44,9 +35,7 @@ for (let i = 0; i < capsulePharmacyIds.length; i++) {
   };
 }
 
-export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Props) => {
-  const isMobile = useBreakpointValue({ base: true, md: false });
-
+export const BrandedPharmacyCard = ({ pharmacyId, handleSelect }: Props) => {
   const brand = PHARMACY_BRANDING[pharmacyId];
   if (!brand) return null;
 
@@ -57,22 +46,13 @@ export const BrandedPharmacyCard = ({ pharmacyId, selectedId, handleSelect }: Pr
   ) : null;
 
   return (
-    <SlideFade offsetY="60px" in={true} key={`courier-pharmacy-${pharmacyId}`}>
-      <Card
-        bgColor="white"
-        cursor="pointer"
-        onClick={() => handleSelect?.(pharmacyId)}
-        border="2px solid"
-        borderColor={selectedId === pharmacyId ? 'brand.500' : 'white'}
-        mx={isMobile ? -3 : undefined}
-      >
-        <CardBody p={3}>
-          <VStack align="start" spacing={1}>
-            <Image src={brand.logo} width="auto" height="30px" />
-            {tagline}
-          </VStack>
-        </CardBody>
-      </Card>
-    </SlideFade>
+    <Container>
+      <Box py={2} bgColor="white" cursor="pointer" onClick={() => handleSelect?.(pharmacyId)}>
+        <VStack align="start" spacing={1}>
+          <Image src={brand.logo} width="auto" height="30px" />
+          {tagline}
+        </VStack>
+      </Box>
+    </Container>
   );
 };
