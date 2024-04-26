@@ -126,7 +126,7 @@ export const PharmacyInfo = ({
           </HStack>
           {price && !isStatus ? (
             <Text as="b" ms="auto">
-              ${price}.00
+              ${price.toFixed(2)}
             </Text>
           ) : null}
         </HStack>
