@@ -1,14 +1,4 @@
-import {
-  Box,
-  HStack,
-  Tag,
-  TagLabel,
-  TagLeftIcon,
-  Text,
-  VStack,
-  Image,
-  Stack
-} from '@chakra-ui/react';
+import { Box, HStack, Tag, TagLabel, TagLeftIcon, Text, VStack, Image } from '@chakra-ui/react';
 import { FiStar } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -31,16 +21,19 @@ interface HoursProps {
 const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes }: HoursProps) => {
   const color = isClosingSoon ? 'orange.500' : isOpen ? 'green' : 'red';
   const text = is24Hr ? t.open24hrs : isClosingSoon ? t.closingSoon : isOpen ? t.open : t.closed;
+  const hasHours = isOpen != null;
+
+  if (!hasHours) return null;
 
   return (
-    <HStack w="full" whiteSpace="nowrap" overflow="hidden">
+    <HStack w="full" whiteSpace="nowrap" overflow="hidden" height="fit-content">
       {isOpen != null || isClosingSoon ? (
         <Text fontSize="sm" color={color}>
           {text}
         </Text>
       ) : null}
       {!is24Hr && ((isOpen && closes) || (!isOpen && opens)) ? (
-        <Text color="gray.400">&bull;</Text>
+        <Text color="gray.500">&bull;</Text>
       ) : null}
       {!is24Hr && isClosingSoon ? (
         <Text fontSize="sm" color="gray.500" isTruncated>
@@ -70,7 +63,7 @@ interface DistanceAddressProps {
 const DistanceAddress = ({ distance, address, fontSize = 'sm' }: DistanceAddressProps) => {
   if (!address) return null;
   return (
-    <Text fontSize={fontSize} color="gray.600" display="inline">
+    <Text fontSize={fontSize} color="gray.500" display="inline">
       {distance ? `${distance.toFixed(1)} mi` : ''}
       {distance && (
         <Box as="span" display="inline" mx={2}>
@@ -88,6 +81,8 @@ interface PharmacyInfoProps {
   showDetails?: boolean;
   boldPharmacyName?: boolean;
   isStatus?: boolean;
+  price?: number | null;
+  selected?: boolean;
 }
 
 export const PharmacyInfo = ({
@@ -95,49 +90,66 @@ export const PharmacyInfo = ({
   preferred = false,
   showDetails = true,
   boldPharmacyName = true,
-  isStatus = false
+  isStatus = false,
+  price = null,
+  selected = false
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
+  const showPreferredTag = preferred;
+  const showReadyIn30MinTag = pharmacy?.showReadyIn30Min && !isStatus;
+
   return (
-    <VStack align="start" w="full" spacing={showDetails ? 1 : 0}>
-      <HStack spacing={2}>
-        {preferred ? (
-          <Tag size="sm" colorScheme="blue">
-            <TagLeftIcon boxSize="12px" as={FiStar} />
-            <TagLabel> {t.preferred}</TagLabel>
-          </Tag>
-        ) : null}
-        {pharmacy?.showReadyIn30Min && !isStatus ? (
-          <Tag size="sm" bgColor="yellow.200">
-            <TagLabel>Ready in 30 minutes</TagLabel>
-          </Tag>
-        ) : null}
-      </HStack>
-      <VStack align="start" w="full" spacing={0}>
-        <HStack spacing={2}>
-          {pharmacy?.logo ? <Image src={pharmacy.logo} width="auto" height="19px" /> : null}
+    <VStack align="start" w="full" spacing={1}>
+      {showPreferredTag || showReadyIn30MinTag ? (
+        <HStack spacing={2} m={0} p={0}>
+          {showPreferredTag ? (
+            <Tag size="sm" colorScheme="blue">
+              <TagLeftIcon boxSize="12px" as={FiStar} />
+              <TagLabel> {t.preferred}</TagLabel>
+            </Tag>
+          ) : null}
+          {showReadyIn30MinTag ? (
+            <Tag size="sm" bgColor="yellow.200">
+              <TagLabel>Ready in 30 minutes</TagLabel>
+            </Tag>
+          ) : null}
+        </HStack>
+      ) : null}
+      <HStack w="full">
+        <HStack>
+          {pharmacy?.logo ? <Image src={pharmacy.logo} width="auto" height="18px" /> : null}
           <Text fontSize="md" as={boldPharmacyName ? 'b' : undefined}>
             {pharmacy.name}
           </Text>
         </HStack>
-        {showDetails ? (
-          <Stack direction={isStatus ? 'column-reverse' : 'column'} gap={0}>
-            <Hours
-              isOpen={pharmacy.isOpen}
-              is24Hr={pharmacy.is24Hr}
-              isClosingSoon={pharmacy.isClosingSoon}
-              opens={pharmacy.opens}
-              closes={pharmacy.closes}
-            />
-            <DistanceAddress
-              distance={pharmacy.distance}
-              address={pharmacy.address}
-              fontSize={isStatus ? 'md' : 'sm'}
-            />
-          </Stack>
+        {price && !isStatus ? (
+          <Text as="b" ms="auto">
+            ${price.toFixed(2)}
+          </Text>
         ) : null}
-      </VStack>
+      </HStack>
+      {showDetails ? (
+        <VStack direction={isStatus ? 'column-reverse' : 'column'} spacing={1}>
+          <Hours
+            isOpen={pharmacy.isOpen}
+            is24Hr={pharmacy.is24Hr}
+            isClosingSoon={pharmacy.isClosingSoon}
+            opens={pharmacy.opens}
+            closes={pharmacy.closes}
+          />
+          <DistanceAddress
+            distance={pharmacy.distance}
+            address={pharmacy.address}
+            fontSize={isStatus ? 'md' : 'sm'}
+          />
+        </VStack>
+      ) : null}
+      {price && !isStatus && selected ? (
+        <Box borderRadius="lg" bgColor="gray.100" py={2} px={3} mt={1} fontSize="sm" w="full">
+          Cash price is estimated from available data.
+        </Box>
+      ) : null}
     </VStack>
   );
 };

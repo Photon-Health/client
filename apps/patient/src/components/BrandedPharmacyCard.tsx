@@ -1,4 +1,4 @@
-import { Image, Text, VStack, Box, Container } from '@chakra-ui/react';
+import { Image, Text, VStack, Box } from '@chakra-ui/react';
 
 import capsuleLogo from '../assets/capsule_logo.png';
 import amazonPharmacyLogo from '../assets/amazon_pharmacy.png';
@@ -46,13 +46,11 @@ export const BrandedPharmacyCard = ({ pharmacyId, handleSelect }: Props) => {
   ) : null;
 
   return (
-    <Container>
-      <Box py={2} bgColor="white" cursor="pointer" onClick={() => handleSelect?.(pharmacyId)}>
-        <VStack align="start" spacing={1}>
-          <Image src={brand.logo} width="auto" height="30px" />
-          {tagline}
-        </VStack>
-      </Box>
-    </Container>
+    <Box bgColor="white" cursor="pointer" onClick={() => handleSelect?.(pharmacyId)}>
+      <VStack align="start" spacing={2}>
+        <Image src={brand.logo} width="auto" height="30px" />
+        {tagline}
+      </VStack>
+    </Box>
   );
 };
