@@ -229,7 +229,7 @@ export const getTotalWalmartOrderPrice = (fills: types.Fill[]): number => {
     const match = walmartMedLookup.find(
       (med) =>
         new RegExp(`${med.name}.*${med.strength}`, 'i').test(fill.treatment.name) &&
-        // If data has medicatoin form, check against that as well
+        // If data has medication form, few do, check against that as well
         (!med.form || fill.treatment.name.toLowerCase().includes(med.form)) &&
         med.daysSupply === fill?.prescription?.daysSupply &&
         med.dispenseQuantity === fill?.prescription?.dispenseQuantity
