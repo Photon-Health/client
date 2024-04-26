@@ -4,15 +4,12 @@ import {
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
-  Box,
-  Card,
-  CardBody,
   Container,
+  Heading,
   HStack,
   Text,
   VStack
 } from '@chakra-ui/react';
-import { FaPrescription } from 'react-icons/fa';
 import { text as t } from '../utils/text';
 import { formatDate } from '../utils/general';
 import { useOrderContext } from '../views/Main';
@@ -21,35 +18,38 @@ export const PrescriptionsList = () => {
   const { flattenedFills } = useOrderContext();
 
   return (
-    <Container pb={32}>
+    <Container>
       <VStack spacing={4} align="span" pt={5}>
-        <Accordion allowToggle defaultIndex={[0]}>
+        <Heading as="h4" size="md">
+          Order Details
+        </Heading>
+        <Accordion allowToggle allowMultiple>
           {flattenedFills.map(({ id, treatment, prescription: rx, count }) => {
             const prescription = rx!;
             return (
-              <AccordionItem border="none" mb={3} key={id}>
-                <Card w="full" backgroundColor="white" borderRadius="lg">
-                  <CardBody p={0}>
+              <AccordionItem border="none" mb={5} key={id}>
+                {({ isExpanded }) => (
+                  <>
                     <HStack>
                       <AccordionButton
-                        p={5}
+                        p={0}
                         _expanded={{ bg: 'transparent' }}
                         _focus={{ bg: 'transparent' }}
                       >
-                        <HStack me="auto">
-                          <Box me={2}>
-                            <FaPrescription size="1.3em" />
-                          </Box>
-                          <Text align="start" data-dd-privacy="mask">
+                        <VStack me="auto" w="full" align="start">
+                          <Text align="start" data-dd-privacy="mask" fontWeight="semibold">
                             {treatment.name}
                           </Text>
-                        </HStack>
-                        <Box>
-                          <AccordionIcon />
-                        </Box>
+                          <HStack>
+                            <Text fontSize="sm" color="gray.500">
+                              {isExpanded ? 'Show less' : 'Show more'}
+                            </Text>
+                            <AccordionIcon />
+                          </HStack>
+                        </VStack>
                       </AccordionButton>
                     </HStack>
-                    <AccordionPanel mt={0} p={5} borderTop="1px" borderColor="gray.100">
+                    <AccordionPanel mt={0} px={0} pt={2} pb={4}>
                       <VStack align="span">
                         <HStack>
                           <HStack w="50%">
@@ -75,8 +75,8 @@ export const PrescriptionsList = () => {
                         </HStack>
                       </VStack>
                     </AccordionPanel>
-                  </CardBody>
-                </Card>
+                  </>
+                )}
               </AccordionItem>
             );
           })}

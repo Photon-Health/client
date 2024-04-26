@@ -1,0 +1,1212 @@
+[
+  {
+    "name": "glimepiride",
+    "strength": "1 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "glimepiride",
+    "strength": "1 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 90,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "glimepiride",
+    "strength": "2 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "glimepiride",
+    "strength": "2 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 90,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "glimepiride",
+    "strength": "4 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "glimepiride",
+    "strength": "4 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 90,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "glipizide",
+    "strength": "5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "glipizide",
+    "strength": "5 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "glipizide",
+    "strength": "10 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "glipizide",
+    "strength": "10 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "metformin",
+    "strength": "500 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "metformin",
+    "strength": "500 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "metformin",
+    "strength": "850 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "metformin",
+    "strength": "850 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "metformin",
+    "strength": "1000 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "metformin",
+    "strength": "1000 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "metformin er",
+    "strength": "500 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": "tablet"
+  },
+  {
+    "name": "metformin er",
+    "strength": "500 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": "tablet"
+  },
+  {
+    "name": "metformin er",
+    "strength": "750 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": "tablet"
+  },
+  {
+    "name": "metformin er",
+    "strength": "750 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": "tablet"
+  },
+
+  {
+    "name": "atenolol",
+    "strength": "25 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "atenolol",
+    "strength": "25 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "atenolol",
+    "strength": "50 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "atenolol",
+    "strength": "50 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "atenolol",
+    "strength": "100 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "atenolol",
+    "strength": "100 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+
+  {
+    "name": "benazepril",
+    "strength": "20 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "benazepril",
+    "strength": "20 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "benazepril",
+    "strength": "40 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "benazepril",
+    "strength": "40 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+
+  {
+    "name": "carvedilol",
+    "strength": "3.125 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "carvedilol",
+    "strength": "3.125 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "carvedilol",
+    "strength": "6.25 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "carvedilol",
+    "strength": "6.25 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "carvedilol",
+    "strength": "12.5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "carvedilol",
+    "strength": "12.5 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "carvedilol",
+    "strength": "25 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "carvedilol",
+    "strength": "25 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+
+  {
+    "name": "clonidine",
+    "strength": "0.1 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "clonidine",
+    "strength": "0.1 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "clonidine",
+    "strength": "0.2 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "clonidine",
+    "strength": "0.2 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "clonidine",
+    "strength": "0.3 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "clonidine",
+    "strength": "0.3 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+
+  {
+    "name": "furosemide",
+    "strength": "20 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "furosemide",
+    "strength": "20 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "furosemide",
+    "strength": "40 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "furosemide",
+    "strength": "40 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "furosemide",
+    "strength": "80 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "furosemide",
+    "strength": "80 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+
+  {
+    "name": "hydralazine",
+    "strength": "10 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 90,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "hydralazine",
+    "strength": "10 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 270,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "hydralazine",
+    "strength": "25 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 90,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "hydralazine",
+    "strength": "25 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 270,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "hydralazine",
+    "strength": "50 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 90,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "hydralazine",
+    "strength": "50 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 270,
+    "price": 10,
+    "form": ""
+  },
+
+  {
+    "name": "hydrochlorothiazide",
+    "strength": "12.5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": "tablet"
+  },
+  {
+    "name": "hydrochlorothiazide",
+    "strength": "12.5 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": "tablet"
+  },
+  {
+    "name": "hydrochlorothiazide",
+    "strength": "25 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": "tablet"
+  },
+  {
+    "name": "hydrochlorothiazide",
+    "strength": "25 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": "tablet"
+  },
+  {
+    "name": "hydrochlorothiazide",
+    "strength": "50 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": "tablet"
+  },
+  {
+    "name": "hydrochlorothiazide",
+    "strength": "50 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": "tablet"
+  },
+  {
+    "name": "hydrochlorothiazide",
+    "strength": "12.5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": "capsule"
+  },
+  {
+    "name": "hydrochlorothiazide",
+    "strength": "12.5 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": "capsule"
+  },
+
+  {
+    "name": "indapamide",
+    "strength": "1.25 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "indapamide",
+    "strength": "1.25 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "indapamide",
+    "strength": "2.5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "indapamide",
+    "strength": "2.5 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+
+  {
+    "name": "isosorbide mononitrate er",
+    "strength": "30 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "isosorbide mononitrate er",
+    "strength": "30 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "isosorbide mononitrate er",
+    "strength": "60 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "isosorbide mononitrate er",
+    "strength": "60 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+
+  {
+    "name": "lisinopril",
+    "strength": "2.5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "lisinopril",
+    "strength": "2.5 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "lisinopril",
+    "strength": "5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "lisinopril",
+    "strength": "5 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "lisinopril",
+    "strength": "10 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "lisinopril",
+    "strength": "10 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "lisinopril",
+    "strength": "20 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "lisinopril",
+    "strength": "20 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "lisinopril",
+    "strength": "30 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "lisinopril",
+    "strength": "30 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "lisinopril hctz",
+    "strength": "25 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "lisinopril hctz",
+    "strength": "25 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "losartan",
+    "strength": "50 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": "tablet"
+  },
+  {
+    "name": "losartan",
+    "strength": "50 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": "tablet"
+  },
+  {
+    "name": "losartan hct",
+    "strength": "12.5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": "tablet"
+  },
+  {
+    "name": "losartan hct",
+    "strength": "12.5 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": "tablet"
+  },
+  {
+    "name": "metoprolol tart",
+    "strength": "100 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "metoprolol tart",
+    "strength": "100 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 180,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "ramipril",
+    "strength": "2.5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "ramipril",
+    "strength": "2.5 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 90,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "ramipril",
+    "strength": "5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "ramipril",
+    "strength": "5 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 90,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "ramipril",
+    "strength": "10 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "ramipril",
+    "strength": "10 mg",
+    "daysSupply": 90,
+    "dispenseQuantity": 90,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "triamterene",
+    "strength": "37.5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": "tablet"
+  },
+  {
+    "name": "triamterene hctz",
+    "strength": "25 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": "tablet"
+  },
+  {
+    "name": "triamterene",
+    "strength": "75 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": "tablet"
+  },
+  {
+    "name": "triamterene hctz",
+    "strength": "50 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": "tablet"
+  },
+  {
+    "name": "warfarin",
+    "strength": "1 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "warfarin",
+    "strength": "2 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "warfarin",
+    "strength": "2.5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "warfarin",
+    "strength": "3 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "warfarin",
+    "strength": "4 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "warfarin",
+    "strength": "5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "warfarin",
+    "strength": "6 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "warfarin",
+    "strength": "7.5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "warfarin",
+    "strength": "10 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "amitriptyline",
+    "strength": "10 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "amitriptyline",
+    "strength": "25 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "amitriptyline",
+    "strength": "50 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "amitriptyline",
+    "strength": "75 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "buspirone",
+    "strength": "5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "buspirone",
+    "strength": "10 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "citalopram",
+    "strength": "10 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "citalopram",
+    "strength": "20 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "citalopram",
+    "strength": "40 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "fluoxetine",
+    "strength": "10 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": "tablet"
+  },
+  {
+    "name": "fluoxetine",
+    "strength": "20 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": "capsule"
+  },
+  {
+    "name": "fluoxetine",
+    "strength": "40 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": "capsule"
+  },
+  {
+    "name": "lithium carb",
+    "strength": "300 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": "capsule"
+  },
+  {
+    "name": "nortriptyline",
+    "strength": "10 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "nortriptyline",
+    "strength": "25 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "nortriptyline",
+    "strength": "50 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "paroxetine",
+    "strength": "20 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "paroxetine",
+    "strength": "30 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "risperidone",
+    "strength": "0.25 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "risperidone",
+    "strength": "0.5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "risperidone",
+    "strength": "1 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "risperidone",
+    "strength": "2 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "risperidone",
+    "strength": "3 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "risperidone",
+    "strength": "4 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "trazodone",
+    "strength": "50 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "trazodone",
+    "strength": "100 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "trazodone",
+    "strength": "150 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "trihexyphenidyl",
+    "strength": "2 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 60,
+    "price": 4,
+    "form": "tablet"
+  },
+  {
+    "name": "metoclopramide",
+    "strength": "5 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 90,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "metoclopramide",
+    "strength": "10 mg",
+    "daysSupply": 30,
+    "dispenseQuantity": 90,
+    "price": 10,
+    "form": ""
+  },
+  {
+    "name": "levothyroxine",
+    "strength": "25 mcg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "levothyroxine",
+    "strength": "50 mcg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "levothyroxine",
+    "strength": "75 mcg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "levothyroxine",
+    "strength": "88 mcg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "levothyroxine",
+    "strength": "100 mcg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "levothyroxine",
+    "strength": "112 mcg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "levothyroxine",
+    "strength": "125 mcg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "levothyroxine",
+    "strength": "137 mcg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "levothyroxine",
+    "strength": "150 mcg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "levothyroxine",
+    "strength": "175 mcg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  },
+  {
+    "name": "levothyroxine",
+    "strength": "200 mcg",
+    "daysSupply": 30,
+    "dispenseQuantity": 30,
+    "price": 4,
+    "form": ""
+  }
+]
