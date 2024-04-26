@@ -220,9 +220,8 @@ export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.sli
  * @param {types.Fill[]} fills - An array of fills representing the medications in the order.
  * @returns {number} The total price of the order.
  */
-export const getTotalWalmartOrderPrice = (fills: types.Fill[]): number => {
+export const getTotalWalmartOrderPrice = (fills: types.Fill[]): number | null => {
   let totalPrice = 0;
-  let allFillsMatch = true;
 
   for (const fill of fills) {
     // Check if the fill is in the walmartMedLookup list
@@ -235,10 +234,9 @@ export const getTotalWalmartOrderPrice = (fills: types.Fill[]): number => {
         med.dispenseQuantity === fill?.prescription?.dispenseQuantity
     );
 
-    // If a matching fill is not found, set allFillsMatch to false
+    // If no match found, exit
     if (!match) {
-      allFillsMatch = false;
-      break;
+      return null;
     }
 
     // If a matching fill is found, add its price to the total price
@@ -246,5 +244,5 @@ export const getTotalWalmartOrderPrice = (fills: types.Fill[]): number => {
   }
 
   // If all fills match, return the total price; otherwise, return 0
-  return allFillsMatch ? totalPrice : 0;
+  return totalPrice;
 };

@@ -25,7 +25,7 @@ interface OrderContextType {
   setOrder: (order: Order) => void;
   logo: any;
   isDemo: boolean;
-  totalWalmartPrice: number;
+  totalWalmartPrice: number | null;
 }
 const OrderContext = createContext<OrderContextType | null>(null);
 export const useOrderContext = () =>
@@ -47,7 +47,7 @@ export const Main = () => {
     isDemo ? countFillsAndRemoveDuplicates(demoOrder.fills) : []
   );
 
-  const [totalWalmartPrice, setTotalWalmartPrice] = useState(0);
+  const [totalWalmartPrice, setTotalWalmartPrice] = useState<number | null>(null);
 
   const navigate = useNavigate();
   const location = useLocation();
