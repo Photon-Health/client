@@ -52,9 +52,9 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
           <Stepper
             index={activeStep}
             orientation="vertical"
-            height="400px"
+            height="300px"
             gap="0"
-            size="lg"
+            size="md"
             colorScheme="green"
           >
             {getStates(fulfillmentType).map((state, id) => {

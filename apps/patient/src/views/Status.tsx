@@ -4,17 +4,17 @@ import { types } from '@photonhealth/sdk';
 import queryString from 'query-string';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { FiCheck } from 'react-icons/fi';
+import { FiCheck, FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
 import {
   BrandedPharmacyCard,
   DemoCtaModal,
-  FixedFooter,
-  PharmacyCard,
+  PharmacyInfo,
   PoweredBy,
   StatusStepper
 } from '../components';
+import { PrescriptionsList } from '../components/PrescriptionsList';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { orderStateMapping as m, text as t } from '../utils/text';
@@ -31,9 +31,9 @@ export const Status = () => {
   const type = searchParams.get('type');
   const phone = searchParams.get('phone');
 
-  const showFooterStates = ['RECEIVED', 'READY'];
-  const [showFooter, setShowFooter] = useState<boolean>(
-    showFooterStates.includes(order?.fulfillment?.state ?? '') &&
+  const showReceivedButtonStates = ['RECEIVED', 'READY'];
+  const [showReceivedButton, setShowReceivedButton] = useState<boolean>(
+    showReceivedButtonStates.includes(order?.fulfillment?.state ?? '') &&
       order?.fulfillment?.type !== types.FulfillmentType.MailOrder
   );
   const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
@@ -62,7 +62,7 @@ export const Status = () => {
       setTimeout(() => {
         setSuccessfullySubmitted(true);
         setTimeout(() => {
-          setShowFooter(false);
+          setShowReceivedButton(false);
           setShowDemoCtaModal(true);
         }, 1000);
         setSubmitting(false);
@@ -77,7 +77,7 @@ export const Status = () => {
       setTimeout(() => {
         if (result) {
           setSuccessfullySubmitted(true);
-          setTimeout(() => setShowFooter(false), 1000);
+          setTimeout(() => setShowReceivedButton(false), 1000);
 
           setOrder({
             ...order,
@@ -136,7 +136,7 @@ export const Status = () => {
           }
         });
 
-        setShowFooter(true);
+        setShowReceivedButton(true);
 
         setTimeout(async () => {
           // Send ready sms
@@ -185,7 +185,10 @@ export const Status = () => {
   // Demo pharmacies are already prepared
   const pharmacyWithHours = pharmacy ? (isDemo ? pharmacy : preparePharmacy(pharmacy)) : undefined;
 
-  const isDeliveryPharmacy = fulfillmentType === 'MAIL_ORDER' || fulfillmentType === 'COURIER';
+  const isDeliveryPharmacy =
+    fulfillmentType === 'MAIL_ORDER' ||
+    fulfillmentType === 'COURIER' ||
+    pharmacy?.name === 'Amazon Pharmacy';
 
   // TODO(mrochlin) Theres so typing issue here because MAIL_ORDER doesnt have RECEIVED as a valid state.
   const copy = (m[fulfillmentType] as any)[fulfillmentState];
@@ -194,6 +197,19 @@ export const Status = () => {
     console.error('No order found');
     return null;
   }
+
+  const canReroute = !isDemo && orgSettings.enablePatientRerouting && order.isReroutable;
+
+  const handleRerouteLink = () => {
+    const query = queryString.stringify({
+      orderId: order.id,
+      token,
+      reroute: true,
+      ...(!pharmacyWithHours?.isOpen ? { openNow: true } : {})
+    });
+    navigate(`/pharmacy?${query}`);
+  };
+
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
@@ -201,7 +217,7 @@ export const Status = () => {
         <title>{t.track}</title>
       </Helmet>
 
-      <Box bgColor="white" shadow="sm">
+      <Box bgColor="white">
         <Container>
           <VStack spacing={2} align="start" py={4}>
             <Heading as="h3" size="lg">
@@ -246,60 +262,90 @@ export const Status = () => {
                 </Link>
               </Box>
             ) : null}
+
+            <Box mt={2}>
+              {order?.pharmacy?.id && isDeliveryPharmacy ? (
+                <BrandedPharmacyCard pharmacyId={order.pharmacy.id} />
+              ) : pharmacyWithHours ? (
+                <PharmacyInfo
+                  pharmacy={pharmacyWithHours}
+                  showDetails={fulfillmentType === 'PICK_UP'}
+                  isStatus
+                />
+              ) : null}
+            </Box>
+
+            {pharmacyWithHours && !isDeliveryPharmacy ? (
+              <Button
+                mt={4}
+                mx="auto"
+                size="md"
+                py={6}
+                variant="solid"
+                onClick={handleGetDirections}
+                leftIcon={<FiNavigation />}
+                w="full"
+                bg="gray.900"
+                color="white"
+              >
+                {t.directions}
+              </Button>
+            ) : null}
+            {!isDeliveryPharmacy && pharmacyWithHours && canReroute ? (
+              <Button
+                mx="auto"
+                size="md"
+                py={6}
+                variant="outline"
+                onClick={handleRerouteLink}
+                leftIcon={<FiRefreshCcw />}
+                bg="gray.50"
+                color="blue.500"
+                w="full"
+              >
+                {t.changePharmacy}
+              </Button>
+            ) : null}
+            {pharmacyWithHours && showReceivedButton ? (
+              <Button
+                size="md"
+                py={6}
+                w="full"
+                borderRadius="lg"
+                variant="outline"
+                bg="gray.50"
+                color="blue.500"
+                colorScheme={successfullySubmitted ? 'green' : undefined}
+                leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
+                onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
+                isLoading={submitting}
+              >
+                {successfullySubmitted ? t.thankYou : copy.cta(isMultiRx)}
+              </Button>
+            ) : null}
           </VStack>
         </Container>
       </Box>
 
-      {/* Bottom padding is added so stepper can be seen when footer is showing on smaller screens */}
-      <Container pb={showFooter ? 32 : 8}>
-        <VStack spacing={6} align="start" pt={5}>
-          <Box width="full">
-            {order?.pharmacy?.id && isDeliveryPharmacy ? (
-              <BrandedPharmacyCard pharmacyId={order.pharmacy.id} />
-            ) : pharmacyWithHours ? (
-              <PharmacyCard
-                pharmacy={pharmacyWithHours}
-                selected={true}
-                showDetails={fulfillmentType === 'PICK_UP'}
-                canReroute={!isDemo && orgSettings.enablePatientRerouting && order.isReroutable}
-                onChangePharmacy={() => {
-                  const query = queryString.stringify({
-                    orderId: order.id,
-                    token,
-                    reroute: true,
-                    ...(!pharmacyWithHours.isOpen ? { openNow: true } : {})
-                  });
-                  navigate(`/pharmacy?${query}`);
-                }}
-                onGetDirections={handleGetDirections}
-              />
-            ) : null}
-          </Box>
-          <StatusStepper
-            fulfillmentType={fulfillmentType}
-            status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
-            patientAddress={address ? formatAddress(address) : undefined}
-          />
-        </VStack>
-      </Container>
-
-      <FixedFooter show={showFooter}>
-        <Container as={VStack} w="full">
-          <Button
-            size="lg"
-            w="full"
-            borderRadius="lg"
-            variant={successfullySubmitted ? undefined : 'brand'}
-            colorScheme={successfullySubmitted ? 'green' : undefined}
-            leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
-            onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
-            isLoading={submitting}
-          >
-            {successfullySubmitted ? t.thankYou : copy.cta(isMultiRx)}
-          </Button>
-          <PoweredBy />
+      <Box bgColor="white" mt={2}>
+        <Container>
+          <VStack spacing={6} align="start" py={5}>
+            <StatusStepper
+              fulfillmentType={fulfillmentType}
+              status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
+              patientAddress={address ? formatAddress(address) : undefined}
+            />
+          </VStack>
         </Container>
-      </FixedFooter>
+      </Box>
+
+      <Box bgColor="white" mt={2}>
+        <PrescriptionsList />
+      </Box>
+
+      <Container as={VStack} w="full" py={4}>
+        <PoweredBy />
+      </Container>
     </Box>
   );
 };
