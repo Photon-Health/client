@@ -146,9 +146,8 @@ export const PharmacyInfo = ({
         </VStack>
       ) : null}
       {price && !isStatus && selected ? (
-        <Box borderRadius="lg" bgColor="gray.100" py={2} px={3} mt={1} fontSize="sm">
-          Cash price is based on available data and may vary. For accurate pricing, consult your
-          pharmacist.
+        <Box borderRadius="lg" bgColor="gray.100" py={2} px={3} mt={1} fontSize="sm" w="full">
+          Cash price is estimated from available data.
         </Box>
       ) : null}
     </VStack>
