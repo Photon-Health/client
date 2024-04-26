@@ -1,13 +1,5 @@
 import { memo } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  Collapse,
-  Divider,
-  useBreakpointValue
-} from '@chakra-ui/react';
+import { Button, Card, CardBody, CardFooter, Collapse, Divider } from '@chakra-ui/react';
 import { FiStar } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -42,8 +34,6 @@ export const PharmacyCard = memo(function PharmacyCard({
 }: PharmacyCardProps) {
   if (!pharmacy) return null;
 
-  const isMobile = useBreakpointValue({ base: true, md: false });
-
   return (
     <Card
       bgColor="white"
@@ -51,7 +41,8 @@ export const PharmacyCard = memo(function PharmacyCard({
       borderColor={selected && onSelect ? 'brand.500' : 'white'}
       borderRadius="lg"
       onClick={() => onSelect && onSelect()}
-      mx={isMobile ? -3 : undefined}
+      // mx={isMobile ? -3 : undefined}
+      mx={{ base: -3, md: undefined }}
       cursor={selectable ? 'pointer' : undefined}
       data-dd-action-name={price ? 'selected_walmart_pilot' : undefined}
     >
