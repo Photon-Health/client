@@ -185,7 +185,10 @@ export const Status = () => {
   // Demo pharmacies are already prepared
   const pharmacyWithHours = pharmacy ? (isDemo ? pharmacy : preparePharmacy(pharmacy)) : undefined;
 
-  const isDeliveryPharmacy = fulfillmentType === 'MAIL_ORDER' || fulfillmentType === 'COURIER';
+  const isDeliveryPharmacy =
+    fulfillmentType === 'MAIL_ORDER' ||
+    fulfillmentType === 'COURIER' ||
+    pharmacy?.name === 'Amazon Pharmacy';
 
   // TODO(mrochlin) Theres so typing issue here because MAIL_ORDER doesnt have RECEIVED as a valid state.
   const copy = (m[fulfillmentType] as any)[fulfillmentState];
@@ -259,69 +262,69 @@ export const Status = () => {
                 </Link>
               </Box>
             ) : null}
-          </VStack>
-        </Container>
 
-        {order?.pharmacy?.id && isDeliveryPharmacy ? (
-          <BrandedPharmacyCard pharmacyId={order.pharmacy.id} />
-        ) : pharmacyWithHours ? (
-          <Container pb={4}>
-            <VStack>
-              <PharmacyInfo
-                pharmacy={pharmacyWithHours}
-                showDetails={fulfillmentType === 'PICK_UP'}
-                isStatus
-              />
-              <Button
-                mt={4}
-                mx="auto"
-                size="md"
-                py={6}
-                variant="solid"
-                onClick={handleGetDirections}
-                leftIcon={<FiNavigation />}
-                w="full"
-                bg="gray.900"
-                color="white"
-              >
-                {t.directions}
-              </Button>
-              {canReroute ? (
+            {order?.pharmacy?.id && isDeliveryPharmacy ? (
+              <Box mt={2}>
+                <BrandedPharmacyCard pharmacyId={order.pharmacy.id} />
+              </Box>
+            ) : pharmacyWithHours ? (
+              <Box mt={2}>
+                <PharmacyInfo
+                  pharmacy={pharmacyWithHours}
+                  showDetails={fulfillmentType === 'PICK_UP'}
+                  isStatus
+                />
                 <Button
+                  mt={4}
                   mx="auto"
                   size="md"
                   py={6}
-                  variant="outline"
-                  onClick={handleRerouteLink}
-                  leftIcon={<FiRefreshCcw />}
-                  bg="gray.50"
-                  color="blue.500"
+                  variant="solid"
+                  onClick={handleGetDirections}
+                  leftIcon={<FiNavigation />}
                   w="full"
+                  bg="gray.900"
+                  color="white"
                 >
-                  {t.changePharmacy}
+                  {t.directions}
                 </Button>
-              ) : null}
+                {canReroute ? (
+                  <Button
+                    mx="auto"
+                    size="md"
+                    py={6}
+                    variant="outline"
+                    onClick={handleRerouteLink}
+                    leftIcon={<FiRefreshCcw />}
+                    bg="gray.50"
+                    color="blue.500"
+                    w="full"
+                  >
+                    {t.changePharmacy}
+                  </Button>
+                ) : null}
 
-              {showReceivedButton ? (
-                <Button
-                  size="md"
-                  py={6}
-                  w="full"
-                  borderRadius="lg"
-                  variant="outline"
-                  bg="gray.50"
-                  color="blue.500"
-                  colorScheme={successfullySubmitted ? 'green' : undefined}
-                  leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
-                  onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
-                  isLoading={submitting}
-                >
-                  {successfullySubmitted ? t.thankYou : copy.cta(isMultiRx)}
-                </Button>
-              ) : null}
-            </VStack>
-          </Container>
-        ) : null}
+                {showReceivedButton ? (
+                  <Button
+                    size="md"
+                    py={6}
+                    w="full"
+                    borderRadius="lg"
+                    variant="outline"
+                    bg="gray.50"
+                    color="blue.500"
+                    colorScheme={successfullySubmitted ? 'green' : undefined}
+                    leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
+                    onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
+                    isLoading={submitting}
+                  >
+                    {successfullySubmitted ? t.thankYou : copy.cta(isMultiRx)}
+                  </Button>
+                ) : null}
+              </Box>
+            ) : null}
+          </VStack>
+        </Container>
       </Box>
 
       <Box bgColor="white" mt={2}>
