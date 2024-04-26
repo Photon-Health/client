@@ -7,6 +7,7 @@ import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import costcoLogo from '../assets/costco_small.png';
 import walgreensLogo from '../assets/walgreens_small.png';
+import walmartLogo from '../assets/walmart_small.svg';
 import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { ExtendedFulfillmentType } from './models';
@@ -122,6 +123,8 @@ export const preparePharmacy = (pharmacy: types.Pharmacy): EnrichedPharmacy => {
     showReadyIn30Min = true;
   } else if (pharmacyNameLowerCase.includes('costco')) {
     logo = costcoLogo;
+  } else if (pharmacyNameLowerCase.includes('walmart')) {
+    logo = walmartLogo;
   }
 
   if (pharmacy.nextEvents) {
