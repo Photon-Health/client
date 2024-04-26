@@ -53,6 +53,7 @@ export const PharmacyCard = memo(function PharmacyCard({
       onClick={() => onSelect && onSelect()}
       mx={isMobile ? -3 : undefined}
       cursor={selectable ? 'pointer' : undefined}
+      data-dd-action-name={price ? 'selected_walmart_pilot' : undefined}
     >
       <CardBody p={3}>
         <PharmacyInfo
@@ -61,6 +62,7 @@ export const PharmacyCard = memo(function PharmacyCard({
           showDetails={showDetails}
           boldPharmacyName={false}
           price={price}
+          selected={selected}
         />
       </CardBody>
       {showDetails ? (

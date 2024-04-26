@@ -263,65 +263,65 @@ export const Status = () => {
               </Box>
             ) : null}
 
-            {order?.pharmacy?.id && isDeliveryPharmacy ? (
-              <Box mt={2}>
+            <Box mt={2}>
+              {order?.pharmacy?.id && isDeliveryPharmacy ? (
                 <BrandedPharmacyCard pharmacyId={order.pharmacy.id} />
-              </Box>
-            ) : pharmacyWithHours ? (
-              <Box mt={2}>
+              ) : pharmacyWithHours ? (
                 <PharmacyInfo
                   pharmacy={pharmacyWithHours}
                   showDetails={fulfillmentType === 'PICK_UP'}
                   isStatus
                 />
-                <Button
-                  mt={4}
-                  mx="auto"
-                  size="md"
-                  py={6}
-                  variant="solid"
-                  onClick={handleGetDirections}
-                  leftIcon={<FiNavigation />}
-                  w="full"
-                  bg="gray.900"
-                  color="white"
-                >
-                  {t.directions}
-                </Button>
-                {canReroute ? (
-                  <Button
-                    mx="auto"
-                    size="md"
-                    py={6}
-                    variant="outline"
-                    onClick={handleRerouteLink}
-                    leftIcon={<FiRefreshCcw />}
-                    bg="gray.50"
-                    color="blue.500"
-                    w="full"
-                  >
-                    {t.changePharmacy}
-                  </Button>
-                ) : null}
+              ) : null}
+            </Box>
 
-                {showReceivedButton ? (
-                  <Button
-                    size="md"
-                    py={6}
-                    w="full"
-                    borderRadius="lg"
-                    variant="outline"
-                    bg="gray.50"
-                    color="blue.500"
-                    colorScheme={successfullySubmitted ? 'green' : undefined}
-                    leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
-                    onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
-                    isLoading={submitting}
-                  >
-                    {successfullySubmitted ? t.thankYou : copy.cta(isMultiRx)}
-                  </Button>
-                ) : null}
-              </Box>
+            {pharmacyWithHours && !isDeliveryPharmacy ? (
+              <Button
+                mt={4}
+                mx="auto"
+                size="md"
+                py={6}
+                variant="solid"
+                onClick={handleGetDirections}
+                leftIcon={<FiNavigation />}
+                w="full"
+                bg="gray.900"
+                color="white"
+              >
+                {t.directions}
+              </Button>
+            ) : null}
+            {!isDeliveryPharmacy && pharmacyWithHours && canReroute ? (
+              <Button
+                mx="auto"
+                size="md"
+                py={6}
+                variant="outline"
+                onClick={handleRerouteLink}
+                leftIcon={<FiRefreshCcw />}
+                bg="gray.50"
+                color="blue.500"
+                w="full"
+              >
+                {t.changePharmacy}
+              </Button>
+            ) : null}
+            {pharmacyWithHours && showReceivedButton ? (
+              <Button
+                size="md"
+                py={6}
+                w="full"
+                borderRadius="lg"
+                variant="outline"
+                bg="gray.50"
+                color="blue.500"
+                colorScheme={successfullySubmitted ? 'green' : undefined}
+                leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
+                onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
+                isLoading={submitting}
+              >
+                {successfullySubmitted ? t.thankYou : copy.cta(isMultiRx)}
+              </Button>
             ) : null}
           </VStack>
         </Container>
