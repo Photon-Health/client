@@ -4,6 +4,7 @@ import { PharmacyCard } from './PharmacyCard';
 import { text as t } from '../utils/text';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { PharmacyFilters } from './PharmacyFilters';
+import { useOrderContext } from '../views/Main';
 
 interface PickupOptionsProps {
   pharmacies: EnrichedPharmacy[];
@@ -38,6 +39,8 @@ export const PickupOptions = ({
   setEnableOpenNow,
   setEnable24Hr
 }: PickupOptionsProps) => {
+  const { totalWalmartPrice } = useOrderContext();
+
   return (
     <VStack spacing={3} align="span" w="full">
       {showHeading ? (
@@ -71,6 +74,7 @@ export const PickupOptions = ({
               onSelect={() => handleSelect(pharmacy.id)}
               onSetPreferred={() => handleSetPreferred(pharmacy.id)}
               selectable={true}
+              price={pharmacy.name === 'Walmart Pharmacy' ? totalWalmartPrice : 0}
             />
           </SlideFade>
         ))}

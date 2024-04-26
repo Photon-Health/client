@@ -88,6 +88,7 @@ interface PharmacyInfoProps {
   showDetails?: boolean;
   boldPharmacyName?: boolean;
   isStatus?: boolean;
+  price: number;
 }
 
 export const PharmacyInfo = ({
@@ -95,7 +96,8 @@ export const PharmacyInfo = ({
   preferred = false,
   showDetails = true,
   boldPharmacyName = true,
-  isStatus = false
+  isStatus = false,
+  price
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
@@ -115,11 +117,18 @@ export const PharmacyInfo = ({
         ) : null}
       </HStack>
       <VStack align="start" w="full" spacing={0}>
-        <HStack spacing={2}>
-          {pharmacy?.logo ? <Image src={pharmacy.logo} width="auto" height="19px" /> : null}
-          <Text fontSize="md" as={boldPharmacyName ? 'b' : undefined}>
-            {pharmacy.name}
-          </Text>
+        <HStack w="full">
+          <HStack>
+            {pharmacy?.logo ? <Image src={pharmacy.logo} width="auto" height="19px" /> : null}
+            <Text fontSize="md" as={boldPharmacyName ? 'b' : undefined}>
+              {pharmacy.name}
+            </Text>
+          </HStack>
+          {price && !isStatus ? (
+            <Text as="b" ms="auto">
+              ${price}
+            </Text>
+          ) : null}
         </HStack>
         {showDetails ? (
           <Stack direction={isStatus ? 'column-reverse' : 'column'} gap={0}>

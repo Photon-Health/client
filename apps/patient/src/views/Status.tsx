@@ -271,6 +271,7 @@ export const Status = () => {
                 pharmacy={pharmacyWithHours}
                 showDetails={fulfillmentType === 'PICK_UP'}
                 isStatus
+                price={0}
               />
               <Button
                 mt={4}

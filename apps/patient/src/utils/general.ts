@@ -10,6 +10,7 @@ import walgreensLogo from '../assets/walgreens_small.png';
 import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { ExtendedFulfillmentType } from './models';
+import walmartMedLookup from '../data/walmartMedPrices.json';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -207,3 +208,38 @@ export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string
 };
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
+/**
+ * Calculates the total price of all fills in an order based on the pricing information
+ * available in a Walmart medication list. All fills must match the pricing information
+ * to be included in the total price calculation.
+ *
+ * @param {types.Fill[]} fills - An array of fills representing the medications in the order.
+ * @returns {number} The total price of the order.
+ */
+export const getTotalWalmartOrderPrice = (fills: types.Fill[]): number => {
+  let totalPrice = 0;
+  let allFillsMatch = true;
+
+  for (const fill of fills) {
+    // Check if the fill is in the walmartMedLookup list
+    const match = walmartMedLookup.find(
+      (med) =>
+        new RegExp(`${med.name}.*${med.strength}`, 'i').test(fill.treatment.name) &&
+        med.daysSupply === fill?.prescription?.daysSupply &&
+        med.dispenseQuantity === fill?.prescription?.dispenseQuantity
+    );
+
+    // If a matching fill is not found, set allFillsMatch to false
+    if (!match) {
+      allFillsMatch = false;
+      break;
+    }
+
+    // If a matching fill is found, add its price to the total price
+    totalPrice += match.price;
+  }
+
+  // If all fills match, return the total price; otherwise, return 0
+  return allFillsMatch ? totalPrice : 0;
+};

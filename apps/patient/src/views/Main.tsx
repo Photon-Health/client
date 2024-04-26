@@ -6,7 +6,11 @@ import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-
 import { getOrder } from '../api/internal';
 import { Nav } from '../components';
 import { demoOrder } from '../data/demoOrder';
-import { FillWithCount, countFillsAndRemoveDuplicates } from '../utils/general';
+import {
+  FillWithCount,
+  countFillsAndRemoveDuplicates,
+  getTotalWalmartOrderPrice
+} from '../utils/general';
 import { Order } from '../utils/models';
 
 import { getSettings } from '@client/settings';
@@ -21,6 +25,7 @@ interface OrderContextType {
   setOrder: (order: Order) => void;
   logo: any;
   isDemo: boolean;
+  totalWalmartPrice: number;
 }
 const OrderContext = createContext<OrderContextType | null>(null);
 export const useOrderContext = () =>
@@ -41,6 +46,8 @@ export const Main = () => {
   const [flattenedFills, setFlattenedFills] = useState(
     isDemo ? countFillsAndRemoveDuplicates(demoOrder.fills) : []
   );
+
+  const [totalWalmartPrice, setTotalWalmartPrice] = useState(0);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,7 +71,10 @@ export const Main = () => {
       console.log('handleOrderResponse', order);
       setOrder(order);
 
-      setFlattenedFills(countFillsAndRemoveDuplicates(order.fills));
+      const preppedFills = countFillsAndRemoveDuplicates(order.fills);
+      setFlattenedFills(countFillsAndRemoveDuplicates(preppedFills));
+
+      setTotalWalmartPrice(getTotalWalmartOrderPrice(preppedFills));
 
       datadogRum.setGlobalContextProperty('organizationId', order.organization.id);
       datadogRum.setGlobalContextProperty('orderId', orderId);
@@ -176,7 +186,8 @@ export const Main = () => {
     order,
     flattenedFills,
     setOrder,
-    logo
+    logo,
+    totalWalmartPrice
   };
 
   return (
