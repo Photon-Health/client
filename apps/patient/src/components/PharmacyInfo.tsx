@@ -88,7 +88,7 @@ interface PharmacyInfoProps {
   showDetails?: boolean;
   boldPharmacyName?: boolean;
   isStatus?: boolean;
-  price: number;
+  price?: number;
 }
 
 export const PharmacyInfo = ({
