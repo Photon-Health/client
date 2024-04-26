@@ -1,13 +1,5 @@
 import { memo } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  Collapse,
-  Divider,
-  useBreakpointValue
-} from '@chakra-ui/react';
+import { Button, Card, CardBody, CardFooter, Collapse, Divider } from '@chakra-ui/react';
 import { FiStar } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -26,6 +18,7 @@ interface PharmacyCardProps {
   onSetPreferred?: () => void;
   selectable?: boolean;
   showDetails?: boolean;
+  price?: number | null;
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
@@ -36,11 +29,10 @@ export const PharmacyCard = memo(function PharmacyCard({
   onSelect,
   onSetPreferred,
   selectable = false,
-  showDetails = true
+  showDetails = true,
+  price = null
 }: PharmacyCardProps) {
   if (!pharmacy) return null;
-
-  const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
     <Card
@@ -49,8 +41,10 @@ export const PharmacyCard = memo(function PharmacyCard({
       borderColor={selected && onSelect ? 'brand.500' : 'white'}
       borderRadius="lg"
       onClick={() => onSelect && onSelect()}
-      mx={isMobile ? -3 : undefined}
+      // mx={isMobile ? -3 : undefined}
+      mx={{ base: -3, md: undefined }}
       cursor={selectable ? 'pointer' : undefined}
+      data-dd-action-name={price ? 'selected_walmart_pilot' : undefined}
     >
       <CardBody p={3}>
         <PharmacyInfo
@@ -58,6 +52,8 @@ export const PharmacyCard = memo(function PharmacyCard({
           preferred={preferred}
           showDetails={showDetails}
           boldPharmacyName={false}
+          price={price}
+          selected={selected}
         />
       </CardBody>
       {showDetails ? (
