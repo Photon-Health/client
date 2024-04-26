@@ -88,7 +88,7 @@ interface PharmacyInfoProps {
   showDetails?: boolean;
   boldPharmacyName?: boolean;
   isStatus?: boolean;
-  price?: number;
+  price?: number | null;
 }
 
 export const PharmacyInfo = ({
@@ -97,7 +97,7 @@ export const PharmacyInfo = ({
   showDetails = true,
   boldPharmacyName = true,
   isStatus = false,
-  price
+  price = null
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
