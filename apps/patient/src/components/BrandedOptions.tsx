@@ -1,4 +1,4 @@
-import { Card, Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
+import { Card, Container, Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
 
 import { text as t } from '../utils/text';
 import { BrandedPharmacyCard } from './BrandedPharmacyCard';
@@ -33,7 +33,9 @@ export const BrandedOptions = ({ options, location, selectedId, handleSelect }: 
             borderColor={selectedId === id ? 'brand.500' : 'white'}
             mx={{ base: -3, md: undefined }}
           >
-            <BrandedPharmacyCard pharmacyId={id} handleSelect={handleSelect} />
+            <Container p={3}>
+              <BrandedPharmacyCard pharmacyId={id} handleSelect={handleSelect} />
+            </Container>
           </Card>
         </SlideFade>
       ))}
