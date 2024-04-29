@@ -2,6 +2,8 @@ const path = require('path');
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const webpack = require('webpack');
+const { GitRevisionPlugin } = require('git-revision-webpack-plugin');
+const gitRevisionPlugin = new GitRevisionPlugin();
 
 module.exports = {
   webpack: (config) => {
@@ -39,6 +41,13 @@ module.exports = {
       new webpack.SourceMapDevToolPlugin({
         noSources: false,
         filename: '[file].map'
+      })
+    );
+
+    // Define __COMMIT_HASH__
+    config.plugins.push(
+      new webpack.DefinePlugin({
+        __COMMIT_HASH__: JSON.stringify(gitRevisionPlugin.commithash())
       })
     );
 
