@@ -3,6 +3,7 @@ import { createEffect, createSignal } from 'solid-js';
 import { PhotonClient, Env } from '@photonhealth/sdk';
 import { SDKProvider } from '@photonhealth/components';
 import { makeTimer } from '@solid-primitives/timer';
+import queryString from 'query-string';
 import { PhotonClientStore } from '../store';
 import { hasAuthParams } from '../utils';
 import { PhotonContext } from '../context';
@@ -31,6 +32,14 @@ const version = pkg?.version ?? 'unknown';
 const Component = (props: PhotonClientProps) => {
   let ref: any;
 
+  const baseRedirectURI = props.redirectUri ? props.redirectUri : window.location.origin;
+  // In order to distinguish our requests from a potential other Auth0 instance on the same domain
+  // we add a query parameter to the redirect URI
+  const redirectURI = queryString.stringifyUrl({
+    url: baseRedirectURI,
+    query: { photon: true }
+  });
+
   const sdk = new PhotonClient(
     {
       env: props.env,
@@ -39,7 +48,7 @@ const Component = (props: PhotonClientProps) => {
       connection: props.connection,
       uri: props.uri,
       clientId: props.id!,
-      redirectURI: props.redirectUri ? props.redirectUri : window.location.origin,
+      redirectURI,
       organization: props.org,
       developmentMode: props.developmentMode
     },

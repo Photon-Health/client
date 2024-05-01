@@ -24,9 +24,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       domain="neutrons.us.auth0.com"
       clientId="L1RZwrRzOUqRcdRcVIqsviWbfLyiMBHc"
       authorizationParams={{
-        redirect_uri: `${window.location.origin}?photon-parent=true`
+        redirect_uri: window.location.origin
       }}
-      skipRedirectCallback={window.location.href.includes('?photon-child=true')}
+      skipRedirectCallback={window.location.href.includes('photon=true')}
     >
       <App />
     </Auth0Provider>

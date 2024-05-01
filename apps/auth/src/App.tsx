@@ -23,7 +23,7 @@ function App() {
           audience="https://api.boson.health"
           uri="https://api.boson.health/graphql"
           auto-login="true"
-          redirect-uri={`${window.location.origin}?photon-child=true`}
+          redirect-uri={window.location.origin}
         >
           <div>
             <LogoutButton />
