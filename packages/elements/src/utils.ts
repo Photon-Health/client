@@ -14,12 +14,12 @@ export const validateProps = (props: Record<string, any>, required: string[]) =>
 const CODE_RE = /[?&]code=[^&]+/;
 const STATE_RE = /[?&]state=[^&]+/;
 const ERROR_RE = /[?&]error=[^&]+/;
-const PARENT_RE = /[?&]photon-parent-auth=[^&]+/; // if this is present, these are auth params for a different Auth0 instance
+const IS_PHOTON_RE = /[?&]photon=true[^&]+/; // if this is present, these are auth params for a different Auth0 instance
 
 export const hasAuthParams = (searchParams = window.location.search): boolean =>
   (CODE_RE.test(searchParams) || ERROR_RE.test(searchParams)) &&
   STATE_RE.test(searchParams) &&
-  !PARENT_RE.test(searchParams);
+  IS_PHOTON_RE.test(searchParams);
 
 export const toTitleCase = (str: string) => {
   return str.replace(/\w\S*/g, function (txt) {
