@@ -40,8 +40,6 @@ const Component = (props: PhotonClientProps) => {
     query: { photon: true }
   });
 
-  console.log('redirectURI', redirectURI);
-
   const sdk = new PhotonClient(
     {
       env: props.env,
