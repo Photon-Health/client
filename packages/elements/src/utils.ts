@@ -15,9 +15,12 @@ export const validateProps = (props: Record<string, any>, required: string[]) =>
 export const hasAuthParams = (searchParams = window.location.search): boolean => {
   if (!searchParams) return false;
   const parsedParams = queryString.parse(searchParams);
-  const { code, state, error, photon } = parsedParams;
   // if photon is not present, then these are auth params for a different Auth0 instance so we should ignore them
-  return (Boolean(code) || Boolean(error)) && Boolean(state) && Boolean(photon);
+  return (
+    'state' in parsedParams &&
+    'photon' in parsedParams &&
+    ('code' in parsedParams || 'error' in parsedParams)
+  );
 };
 
 export const toTitleCase = (str: string) => {
