@@ -17,7 +17,7 @@ export const hasAuthParams = (searchParams = window.location.search): boolean =>
   const parsedParams = queryString.parse(searchParams);
   const { code, state, error, photon } = parsedParams;
   // if photon is not present, then these are auth params for a different Auth0 instance so we should ignore them
-  return (code || error) !== null && state !== null && photon !== null;
+  return (Boolean(code) || Boolean(error)) && Boolean(state) && Boolean(photon);
 };
 
 export const toTitleCase = (str: string) => {
