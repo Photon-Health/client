@@ -343,5 +343,11 @@ const organizationSettings: {
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
     enableCourierNavigate: true
+  },
+  // GoalMD
+  org_4CKpLMduRVMHl2Ft: {
+    ...defaultSettings,
+    mailOrder: true,
+    mailOrderProviders: [HONEYBEE_PHARMACY_ID, TRUEPILL_PHARMACY_ID]
   }
 };
