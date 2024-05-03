@@ -41,6 +41,20 @@ phases:
           npx nx run app:build:neutron
         fi
       - echo "OUTPUT_DIR set to '$OUTPUT_DIR'"
+  post_build:
+    commands:
+      - echo Installing Datadog CI
+      - npm install -g @datadog/datadog-ci
+      - echo Uploading source maps to Datadog
+      - |
+        export DATADOG_API_KEY=$DATADOG_API_KEY
+        SERVICE_NAME=$(node -p "require('./apps/app/package.json').name")
+        PACKAGE_VERSION=$(git rev-parse HEAD)
+        ENVIRONMENT=$OUTPUT_DIR
+        npx datadog-ci sourcemaps upload dist/apps/app \
+          --service=$SERVICE_NAME \
+          --release-version=$PACKAGE_VERSION \
+          --minified-path-prefix=https://app.${ENVIRONMENT}.health/static/js
 
 artifacts:
   files:
