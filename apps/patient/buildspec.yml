@@ -54,7 +54,7 @@ phases:
         npx datadog-ci sourcemaps upload dist/apps/patient \
           --service=$SERVICE_NAME \
           --release-version=$PACKAGE_VERSION \
-          --minified-path-prefix=https://orders.${ENVIRONMENT}.health/static/js
+          --minified-path-prefix=https://orders.${ENVIRONMENT}.health
 
 artifacts:
   files:
