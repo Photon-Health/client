@@ -47,7 +47,7 @@ phases:
       - npm install -g @datadog/datadog-ci
       - echo Uploading source maps to Datadog
       - |
-        export DATADOG_API_KEY=$DATADOG_SOURCE_MAPS_API_KEY
+        export DATADOG_API_KEY=$(aws secretsmanager get-secret-value --secret-id $DATADOG_SOURCE_MAPS_API_KEY --query 'SecretString' --output text)
         SERVICE_NAME=$(node -p "require('./apps/app/package.json').name")
         PACKAGE_VERSION=$(git rev-parse HEAD)
         ENVIRONMENT=$OUTPUT_DIR
