@@ -43,7 +43,7 @@ phases:
       - echo "OUTPUT_DIR set to '$OUTPUT_DIR'"
   post_build:
     commands:
-      - echo Installing Datadog CI
+      - echo Installing DataDog CI
       - npm install -g @datadog/datadog-ci
       - echo Uploading source maps to Datadog
       - |
