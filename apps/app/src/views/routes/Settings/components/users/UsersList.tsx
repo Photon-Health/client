@@ -121,10 +121,10 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
   }
 
   return (
-    <Box py="4" px={{ base: '4', md: '8' }} borderRadius="lg" bg="bg-surface" boxShadow="base">
+    <Box borderRadius="lg" bg="white" boxShadow="base">
       <Container padding={{ base: '0', md: '0' }}>
         <Stack spacing={3}>
-          <HStack justify="space-between">
+          <HStack justify="space-between" pt={6} pb={2} px={4}>
             <Text fontSize="xl" fontWeight="medium">
               Users
             </Text>
@@ -149,29 +149,39 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
           )}
           <InviteForm isOpen={isOpen} onClose={onClose} />
           {users?.length !== 0 && !loading && (
-            <TableContainer border={'1px solid var(--chakra-colors-gray-100)'} borderRadius={10}>
+            <TableContainer>
               <Table variant="simple" size="sm">
                 <Thead>
                   <Tr>
-                    <Th cursor={'pointer'} width={{ lg: '30%' }} onClick={handleSort('NAME')}>
+                    <Th
+                      py={4}
+                      cursor={'pointer'}
+                      width={{ lg: '30%' }}
+                      onClick={handleSort('NAME')}
+                    >
                       <HStack alignItems={'center'} spacing={2}>
                         <Text userSelect={'none'}>Name</Text>
                         {sortBy === 'NAME' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)}
                       </HStack>
                     </Th>
-                    <Th cursor={'pointer'} width={{ lg: '30%' }} onClick={handleSort('EMAIL')}>
+                    <Th
+                      py={4}
+                      cursor={'pointer'}
+                      width={{ lg: '30%' }}
+                      onClick={handleSort('EMAIL')}
+                    >
                       <HStack alignItems={'center'} spacing={2}>
                         <Text userSelect={'none'}>Email</Text>
                         {sortBy === 'EMAIL' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)}
                       </HStack>
                     </Th>
-                    <Th cursor={'pointer'} onClick={handleSort('ROLES')}>
+                    <Th py={4} cursor={'pointer'} onClick={handleSort('ROLES')}>
                       <HStack alignItems={'center'} spacing={2}>
                         <Text userSelect={'none'}>Roles</Text>
                         {sortBy === 'ROLES' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)}
                       </HStack>
                     </Th>
-                    <Th cursor={'pointer'}>
+                    <Th py={4} cursor={'pointer'}>
                       <HStack alignItems={'center'} spacing={2}></HStack>
                     </Th>
                   </Tr>
