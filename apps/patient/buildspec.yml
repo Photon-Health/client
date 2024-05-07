@@ -41,6 +41,20 @@ phases:
           npx nx run patient:build:neutron
         fi
       - echo "OUTPUT_DIR set to '$OUTPUT_DIR'"
+  post_build:
+    commands:
+      - echo Installing Datadog CI
+      - npm install -g @datadog/datadog-ci
+      - echo Uploading source maps to Datadog
+      - |
+        export DATADOG_API_KEY=$(aws secretsmanager get-secret-value --secret-id $DATADOG_SOURCE_MAPS_API_KEY --query 'SecretString' --output text)
+        SERVICE_NAME=$(node -p "require('./apps/patient/package.json').name")
+        PACKAGE_VERSION=$(git rev-parse HEAD)
+        ENVIRONMENT=$OUTPUT_DIR
+        npx datadog-ci sourcemaps upload dist/apps/patient \
+          --service=$SERVICE_NAME \
+          --release-version=$PACKAGE_VERSION \
+          --minified-path-prefix=https://orders.${ENVIRONMENT}.health
 
 artifacts:
   files:
