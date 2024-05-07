@@ -1,4 +1,5 @@
 import { Permission } from '@photonhealth/sdk/dist/types';
+import queryString from 'query-string';
 
 export const validateProps = (props: Record<string, any>, required: string[]) => {
   const errors: string[] = [];
@@ -11,12 +12,13 @@ export const validateProps = (props: Record<string, any>, required: string[]) =>
   return errors;
 };
 
-const CODE_RE = /[?&]code=[^&]+/;
-const STATE_RE = /[?&]state=[^&]+/;
-const ERROR_RE = /[?&]error=[^&]+/;
-
-export const hasAuthParams = (searchParams = window.location.search): boolean =>
-  (CODE_RE.test(searchParams) || ERROR_RE.test(searchParams)) && STATE_RE.test(searchParams);
+export const hasAuthParams = (searchParams = window.location.search): boolean => {
+  if (!searchParams) return false;
+  const parsedParams = queryString.parse(searchParams);
+  const { code, state, error, photon } = parsedParams;
+  // if photon is not present, then these are auth params for a different Auth0 instance so we should ignore them
+  return (code || error) !== null && state !== null && photon !== null;
+};
 
 export const toTitleCase = (str: string) => {
   return str.replace(/\w\S*/g, function (txt) {
