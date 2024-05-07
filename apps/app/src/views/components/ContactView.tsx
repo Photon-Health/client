@@ -1,4 +1,4 @@
-import { Link, Stack } from '@chakra-ui/react';
+import { Link, VStack } from '@chakra-ui/react';
 
 import { formatPhone } from '../../utils';
 
@@ -10,14 +10,14 @@ interface ContactViewProps {
 const ContactView = (props: ContactViewProps) => {
   const { phone, email } = props;
   return (
-    <Stack spacing="0" data-dd-privacy="mask">
+    <VStack spacing="0" data-dd-privacy="mask" alignItems="start">
       <Link fontWeight="medium" href={`tel:${phone}`} isExternal>
         {formatPhone(phone)}
       </Link>
       <Link href={`mailto:${email}`} isExternal>
         {email}
       </Link>
-    </Stack>
+    </VStack>
   );
 };
 
