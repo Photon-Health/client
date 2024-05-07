@@ -21,6 +21,7 @@ export const PrescriptionForm = () => {
   const prescriptionIds = params.get('prescriptionIds') || '';
   const weight = params.get('weight') || '';
   const weightUnit = params.get('weightUnit') || 'lbs';
+  const externalId = params.get('externalId') || '';
 
   const navigate = useNavigate();
   const onClose = () => {
@@ -120,6 +121,7 @@ export const PrescriptionForm = () => {
           mail-order-ids={orgSettings?.mailOrderProviders?.join(',') ?? ''}
           toast-buffer={70}
           hide-templates={orgSettings?.hideTemplates ?? false}
+          external-order-id={externalId}
         />
       ) : null}
     </div>

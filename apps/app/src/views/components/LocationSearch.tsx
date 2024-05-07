@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState } from 'react';
-import * as Sentry from '@sentry/react';
 
 import {
   Button,
@@ -47,7 +46,7 @@ export const LocationSearch = ({ isOpen, onClose }: LocationSearchProps) => {
   const autocompleteServiceRef = useRef<google.maps.places.AutocompleteService | null>(null);
   const geocoderRef = useRef<google.maps.Geocoder | null>(null);
 
-  const handleLocationError = (functionName: string) => {
+  const handleLocationError = () => {
     toast({
       position: 'top-right',
       duration: 4000,
@@ -59,10 +58,6 @@ export const LocationSearch = ({ isOpen, onClose }: LocationSearchProps) => {
           description="There was an error searching for locations. Please refresh the page."
         />
       )
-    });
-    Sentry.withScope((scope) => {
-      scope.setTag('component', 'LocationSearch');
-      scope.setExtra('function', functionName);
     });
   };
 
@@ -84,12 +79,6 @@ export const LocationSearch = ({ isOpen, onClose }: LocationSearchProps) => {
         checkCount += 1;
 
         if (checkCount >= 20) {
-          Sentry.withScope((scope) => {
-            scope.setTag('component', 'LocationSearch');
-            Sentry.captureException(
-              new Error('Unable to find the Google Maps instance after 20 attempts.')
-            );
-          });
           clearInterval(interval);
         }
       }, 1000);
@@ -106,7 +95,7 @@ export const LocationSearch = ({ isOpen, onClose }: LocationSearchProps) => {
     };
 
     if (!autocompleteServiceRef.current?.getPlacePredictions) {
-      handleLocationError('searchForLocations');
+      handleLocationError();
       return [];
     }
 
@@ -116,7 +105,7 @@ export const LocationSearch = ({ isOpen, onClose }: LocationSearchProps) => {
 
   const geocode = async (address: string) => {
     if (!autocompleteServiceRef.current?.getPlacePredictions) {
-      handleLocationError('geocode');
+      handleLocationError();
       return;
     }
 
@@ -134,7 +123,7 @@ export const LocationSearch = ({ isOpen, onClose }: LocationSearchProps) => {
     setGettingCurrentLocation(true);
     if (navigator.geolocation) {
       if (!autocompleteServiceRef.current?.getPlacePredictions) {
-        handleLocationError('getCurrentLocation');
+        handleLocationError();
         return;
       }
 
@@ -171,7 +160,7 @@ export const LocationSearch = ({ isOpen, onClose }: LocationSearchProps) => {
       callback(result);
       return result;
     } catch (e) {
-      handleLocationError('loadOptions');
+      handleLocationError();
       return [];
     }
   };
