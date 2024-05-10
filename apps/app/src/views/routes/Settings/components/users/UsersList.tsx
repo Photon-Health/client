@@ -125,13 +125,7 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
       <Container padding={{ base: '0', md: '0' }}>
         <Stack spacing={3}>
           <HStack justify="space-between" pt={6} pb={2} px={4}>
-            <Text
-              fontSize="xl"
-              fontWeight="medium"
-              onClick={() => {
-                throw new Error('We got ya! (source map check)');
-              }}
-            >
+            <Text fontSize="xl" fontWeight="medium">
               Users
             </Text>
             {hasInvite && (
