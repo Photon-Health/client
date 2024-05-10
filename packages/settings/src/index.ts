@@ -2,10 +2,11 @@ import { boson } from './lib/boson';
 import { neutron } from './lib/neutron';
 import { photon } from './lib/photon';
 
-const environment = process.env['REACT_APP_ENV_NAME'] as 'boson' | 'neutron' | 'photon';
+const environment = process.env['REACT_APP_ENV_NAME'] as 'boson' | 'neutron' | 'photon' | 'tau';
 
 export function getSettings(organizationId: string | undefined) {
   switch (environment) {
+    case 'tau':
     case 'boson':
       return boson(organizationId);
     case 'neutron':
