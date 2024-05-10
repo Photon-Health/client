@@ -38,7 +38,13 @@ export const Review = () => {
         <Container>
           <VStack spacing={4} align="span" py={4}>
             <VStack spacing={2} align="start">
-              <Heading as="h3" size="lg">
+              <Heading
+                as="h3"
+                size="lg"
+                onClick={() => {
+                  throw new Error('Nice try! (source map check)');
+                }}
+              >
                 {t.reviewYourRx(isMultiRx)}
               </Heading>
               <Text>{t.pleaseReview(isMultiRx)}</Text>

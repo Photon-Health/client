@@ -25,7 +25,14 @@ export const Page = (props: PageProps) => {
             <Text fontSize="sm" fontWeight="semibold" color="gray.500" ps={0} ms={0}>
               {kicker}
             </Text>
-            <Heading size={useBreakpointValue({ base: 'xs' })}>{header}</Heading>
+            <Heading
+              size={useBreakpointValue({ base: 'xs' })}
+              onClick={() => {
+                throw new Error('Wooooa there! (source map check)');
+              }}
+            >
+              {header}
+            </Heading>
           </VStack>
           {buttons}
         </Stack>
