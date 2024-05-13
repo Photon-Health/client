@@ -37,6 +37,7 @@ const Component = (props: {
   mailOrderIds?: string;
   enableOrder?: boolean;
   toastBuffer?: number;
+  externalOrderId?: string;
 }) => {
   let ref: any;
   const client = usePhoton();
@@ -231,6 +232,7 @@ const Component = (props: {
                 prescription-ids={props.prescriptionIds}
                 weight={props.weight}
                 weight-unit={props.weightUnit}
+                external-order-id={props.externalOrderId}
                 additional-notes={props.additionalNotes}
                 enable-med-history={props.enableMedHistory}
                 enable-order={props.enableOrder}
@@ -294,7 +296,8 @@ customElement(
     enableCombineAndDuplicate: false,
     mailOrderIds: undefined,
     enableOrder: false,
-    toastBuffer: 0
+    toastBuffer: 0,
+    externalOrderId: undefined
   },
   Component
 );

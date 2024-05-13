@@ -287,6 +287,7 @@ export const Status = () => {
                 leftIcon={<FiNavigation />}
                 w="full"
                 bg="gray.900"
+                _hover={{ bg: 'gray.600' }}
                 color="white"
               >
                 {t.directions}

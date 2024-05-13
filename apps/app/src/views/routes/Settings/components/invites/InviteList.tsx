@@ -91,17 +91,10 @@ export const InviteList = () => {
   }
 
   return (
-    <Box
-      pt={{ base: '4', md: '4' }}
-      pb={{ base: '4', md: '8' }}
-      px={{ base: '4', md: '8' }}
-      borderRadius="lg"
-      bg="bg-surface"
-      boxShadow="base"
-    >
+    <Box borderRadius="lg" bg="white" boxShadow="base">
       <Container padding={{ base: '0', md: '0' }}>
         <Stack spacing={3}>
-          <HStack justify="space-between">
+          <HStack justify="space-between" pt={6} pb={2} px={4}>
             <Text fontSize="xl" fontWeight="medium">
               Invites
             </Text>
@@ -113,13 +106,13 @@ export const InviteList = () => {
             </Center>
           )}
           {invites?.length !== 0 && !loading && (
-            <TableContainer border={'1px solid var(--chakra-colors-gray-100)'} borderRadius={10}>
+            <TableContainer border={'1px solid var(--chakra-colors-gray-100)'}>
               <Table variant="simple" size="sm">
                 <Thead>
                   <Tr>
-                    <Th>Email</Th>
-                    <Th>Expires</Th>
-                    <Th />
+                    <Th py={4}>Email</Th>
+                    <Th py={4}>Expires</Th>
+                    <Th py={4} />
                   </Tr>
                 </Thead>
                 <Tbody>

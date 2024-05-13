@@ -44,14 +44,7 @@ export const Webhooks = () => {
   const webhooks = useMemo(() => data?.webhooks, [data?.webhooks]);
 
   return (
-    <Box
-      pt={{ base: '4', md: '4' }}
-      pb={{ base: '4', md: '8' }}
-      px={{ base: '4', md: '8' }}
-      borderRadius="lg"
-      bg="bg-surface"
-      boxShadow="base"
-    >
+    <Box p={{ base: '4', md: '8' }} borderRadius="lg" bg="white" boxShadow="base" w="full">
       <Container padding={{ base: '0', md: '0' }}>
         <Stack spacing={3}>
           <HStack justify="space-between">
