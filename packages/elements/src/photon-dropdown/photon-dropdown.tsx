@@ -221,6 +221,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
           ref={inputRef}
           slot="trigger"
           placeholder={placeholder()}
+          autocomplete="off"
           disabled={props.disabled ?? false}
           size="medium"
           classList={{
