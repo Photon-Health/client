@@ -24,7 +24,7 @@ import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import { GraphQLError } from 'graphql';
-import { For, Ref, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
+import { For, Ref, Show, createEffect, createMemo, createSignal, onMount, untrack } from 'solid-js';
 import { usePhoton } from '../context';
 import { PhotonAuthorized } from '../photon-authorized';
 import type { FormError } from '../stores/form';
@@ -372,7 +372,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   createEffect(() => {
     if (props.triggerSubmit) {
-      combineOrSubmit();
+      untrack(() => combineOrSubmit());
     }
   });
 
