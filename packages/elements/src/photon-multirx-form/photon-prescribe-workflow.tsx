@@ -214,6 +214,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   // submits the form to create a new order
   const submitForm = async (enableOrder: boolean) => {
+    if (isLoading()) {
+      return;
+    }
     setErrors([]);
 
     if (!hasPrescribePermission()) {
