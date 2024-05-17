@@ -311,5 +311,12 @@ const organizationSettings: {
   org_4CKpLMduRVMHl2Ft: {
     mailOrder: true,
     mailOrderProviders: [HONEYBEE_PHARMACY_ID, TRUEPILL_PHARMACY_ID]
+  },
+  // Great Many
+  org_3IVuVvEdKSStmAig: {
+    mailOrder: true,
+    pickUp: false,
+    sendToPatient: false,
+    mailOrderProviders: [CUREXA_PHARMACY_ID]
   }
 };
