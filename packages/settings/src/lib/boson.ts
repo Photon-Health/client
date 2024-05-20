@@ -42,7 +42,10 @@ const defaultSettings: OrganizationSettings = {
 
 export const boson = function (organizationId: string | undefined) {
   if (organizationId && organizationSettings[organizationId]) {
-    return organizationSettings[organizationId];
+    return {
+      ...defaultSettings,
+      ...organizationSettings[organizationId]
+    };
   }
   return defaultSettings;
 };
@@ -56,7 +59,6 @@ const organizationSettings: {
 } = {
   // Test Telehealth (us)
   org_KzSVZBQixLRkqj5d: {
-    ...defaultSettings,
     accentColor: '#b35724',
     enableRxAndOrder: true,
     enableMedHistory: true,
@@ -68,7 +70,6 @@ const organizationSettings: {
   },
   // NewCo (demo's)
   org_w85CgjUjCi52yvOz: {
-    ...defaultSettings,
     logo: 'newco_logo.svg',
     accentColor: '#506ef5',
     mailOrderNavigate: true,
@@ -76,7 +77,6 @@ const organizationSettings: {
   },
   // test2
   org_zjqxDJzBNyuN9qcm: {
-    ...defaultSettings,
     accentColor: '#b35724',
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],

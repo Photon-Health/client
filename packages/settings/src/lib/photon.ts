@@ -47,7 +47,10 @@ const defaultSettings: OrganizationSettings = {
  */
 export const photon = function (organizationId: string | undefined) {
   if (organizationId && organizationSettings[organizationId]) {
-    return organizationSettings[organizationId];
+    return {
+      ...defaultSettings,
+      ...organizationSettings[organizationId]
+    };
   }
   return defaultSettings;
 };
@@ -61,43 +64,36 @@ const organizationSettings: {
 } = {
   // Weekend Health
   org_uZPt00PG0JElhh3d: {
-    ...defaultSettings,
     sendOrder: false,
     enableRxAndOrder: false
   },
   // Modern Pediatrics
   org_2utnNgp5NGCy9wOb: {
-    ...defaultSettings,
     logo: 'modern_pediatrics_logo.png',
     accentColor: '#3f7a9c'
   },
   // Summer Health
   org_66nHWvQRtHbjZt4A: {
-    ...defaultSettings,
     logo: 'summer_health_logo.svg',
     accentColor: '#ffc21f'
   },
   // Modern Ritual
   org_IWmodVdrQYpqh5x2: {
-    ...defaultSettings,
     logo: 'modern_ritual_logo.webp',
     accentColor: '#202a36'
   },
   // Reside Health
   org_8fwLMYQGxj6Bg70X: {
-    ...defaultSettings,
     logo: 'reside_health_logo.webp',
     accentColor: '#0c3276'
   },
   // Radish Health
   org_tHroj0b67F08q1yw: {
-    ...defaultSettings,
     logo: 'red_radish_logo.svg',
     accentColor: '#ba4a71'
   },
   // River Health
   org_jScrLol7ZMSfExSR: {
-    ...defaultSettings,
     logo: 'river_health_logo.svg',
     accentColor: '#2faef3',
     mailOrder: true,
@@ -105,7 +101,6 @@ const organizationSettings: {
   },
   // Peachy
   org_vTC7G2EAuHgac90E: {
-    ...defaultSettings,
     logo: 'peachy_logo.png',
     accentColor: '#1D1D1F',
     pickUp: false,
@@ -117,13 +112,11 @@ const organizationSettings: {
   },
   // ZZPeds
   org_pxcJ7Dlclcsg0OJw: {
-    ...defaultSettings,
     logo: 'zzpeds_logo.png',
     accentColor: '#5271ff'
   },
   // MisterRx
   org_Frco5TQQFDHqS7xY: {
-    ...defaultSettings,
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID],
@@ -131,26 +124,22 @@ const organizationSettings: {
   },
   // Mishe
   org_kLRbIfgsTXHmXDcj: {
-    ...defaultSettings,
     logo: 'mishe_logo.svg',
     accentColor: '#652D92'
   },
   // Bold Health
   org_TVIFBLp7zkkDGeQI: {
-    ...defaultSettings,
     logo: 'bold_health_logo.svg',
     accentColor: '#25532b'
   },
   // Piction Health
   org_v5It8IoY0RH1Rw80: {
-    ...defaultSettings,
     logo: 'piction_health_logo.png',
     accentColor: '#3377e2',
     enableRxAndOrder: false
   },
   // Shapiro Medical (Xyon Health)
   org_Y0EPcd3p5eqG4iZs: {
-    ...defaultSettings,
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID],
@@ -159,7 +148,6 @@ const organizationSettings: {
   },
   // Osei Tutu (Xyon Health)
   org_WeSplxuyqxdIph1f: {
-    ...defaultSettings,
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID],
@@ -168,7 +156,6 @@ const organizationSettings: {
   },
   // Fadeyi Derm (Xyon Health)
   org_sWEo459pSKLt6wZ5: {
-    ...defaultSettings,
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID],
@@ -177,7 +164,6 @@ const organizationSettings: {
   },
   // Precision Medical Hair Restoration & Aesthetics (Xyon Health)
   org_G52mrmIBC3yqeNYB: {
-    ...defaultSettings,
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID],
@@ -186,7 +172,6 @@ const organizationSettings: {
   },
   // California Hair Surgeon (Xyon Health)
   org_XWFD5B6e8qhCxXfN: {
-    ...defaultSettings,
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID],
@@ -195,19 +180,16 @@ const organizationSettings: {
   },
   // Ognomy
   org_2B1yxV6yS9ROqV1g: {
-    ...defaultSettings,
     logo: 'ognomy_logo.webp',
     accentColor: '#0a7ade'
   },
   // Carbon Health
   org_Dye8T9VAM1GHjjzS: {
-    ...defaultSettings,
     logo: 'carbon_health_logo.svg',
     accentColor: '#000000'
   },
   // Sana Care
   org_boRh5PcUzFhvyiue: {
-    ...defaultSettings,
     logo: 'sana_care_logo.png',
     accentColor: '#FBCC45',
     mailOrderNavigate: false,
@@ -216,7 +198,6 @@ const organizationSettings: {
   },
   // Blueberry Pediatrics
   org_ul8ojZgvzpqu299H: {
-    ...defaultSettings,
     logo: 'blueberry_logo.png',
     accentColor: '#235AFF',
     enableMedHistory: true,
@@ -224,38 +205,32 @@ const organizationSettings: {
   },
   // TBD Health
   org_XoBVNLkIWL6BP8vZ: {
-    ...defaultSettings,
     logo: 'tbd_logo.svg',
     accentColor: '#ee8155'
   },
   // Openloop Health
   org_Oxc0CSPfdiyWW3VM: {
-    ...defaultSettings,
     mailOrder: true,
     pickUp: true,
     mailOrderProviders: [INNOVASCRIPT_PHARMACY_ID]
   },
   // PM Pediatrics Care
   org_2Mqu8Kf7dknKNFXb: {
-    ...defaultSettings,
     logo: 'pm_pediatrics_logo.svg',
     accentColor: '#4D15B7'
   },
   // Pine Medical
   org_ZIksHxx59zFVc1Xw: {
-    ...defaultSettings,
     logo: 'pine_medical_logo.svg',
     accentColor: '#000000',
     enableRxAndOrder: false
   },
   // Burdoin Mtn Medicine
   org_MYJ66XrRE3eGb12U: {
-    ...defaultSettings,
     enableRxAndOrder: false
   },
   // Moment Health
   org_fdq7ceDPlQlO5e3J: {
-    ...defaultSettings,
     logo: 'moment_health_logo.webp',
     accentColor: '#FF001F',
     mailOrder: true,
@@ -263,19 +238,16 @@ const organizationSettings: {
   },
   // Brightside
   org_Dcq069P9AxLlv4l2: {
-    ...defaultSettings,
     logo: 'brightside_health_logo.svg',
     accentColor: '#2e4985'
   },
   // Found
   org_wM4wI7rop0W1eNfM: {
-    ...defaultSettings,
     logo: 'found_logo.svg',
     accentColor: '#1c3f28'
   },
   // Sesame
   org_zc1RzzmSwd8eE94U: {
-    ...defaultSettings,
     logo: 'sesame_logo.jpg',
     accentColor: '#5224C7',
     sendToPatient: true,
@@ -284,7 +256,6 @@ const organizationSettings: {
   },
   // DrTelx
   org_6DKb7celAunAoLzb: {
-    ...defaultSettings,
     pickUp: false,
     mailOrder: true,
     enableRxAndOrder: false,
@@ -292,11 +263,17 @@ const organizationSettings: {
   },
   // Redbox Rx
   org_fPIzyQJhFqvBAhJG: {
-    ...defaultSettings,
     logo: 'redbox_logo.jpg',
     accentColor: '#E81D21',
     mailOrder: true,
     pickUp: false,
     mailOrderProviders: [REDBOX_PHARMACY_ID]
+  },
+  // Great Many
+  org_gvTsxeeYy97qedaS: {
+    mailOrder: true,
+    pickUp: false,
+    sendToPatient: false,
+    mailOrderProviders: [CUREXA_PHARMACY_ID]
   }
 };

@@ -46,7 +46,7 @@ export const BrandedPharmacyCard = ({ pharmacyId, handleSelect }: Props) => {
   ) : null;
 
   return (
-    <Box bgColor="white" cursor="pointer" onClick={() => handleSelect?.(pharmacyId)}>
+    <Box bgColor="white" w="full" cursor="pointer" onClick={() => handleSelect?.(pharmacyId)}>
       <VStack align="start" spacing={2}>
         <Image src={brand.logo} width="auto" height="30px" />
         {tagline}
