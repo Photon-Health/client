@@ -7,19 +7,14 @@ import { Helmet } from 'react-helmet';
 import { FiCheck, FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
-import {
-  BrandedPharmacyCard,
-  DemoCtaModal,
-  PharmacyInfo,
-  PoweredBy,
-  StatusStepper
-} from '../components';
+import { BrandedPharmacyCard, DemoCtaModal, PharmacyInfo, PoweredBy } from '../components';
 import { FAQ } from '../components/FAQ';
 import { PrescriptionsList } from '../components/PrescriptionsList';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
+import { HorizontalStatusStepper } from '../components/HorizontalStatusStepper';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -42,7 +37,7 @@ export const Status = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
 
-  const { fulfillment, pharmacy, address } = order;
+  const { fulfillment, pharmacy } = order;
 
   const fulfillmentType = getFulfillmentType(
     pharmacy?.id,
@@ -178,11 +173,6 @@ export const Status = () => {
   // so default to SENT on first navigation
   const fulfillmentState = fulfillment?.state ?? 'SENT';
 
-  const showTextUsPrompt =
-    fulfillmentState === 'DELIVERED' ||
-    fulfillmentState === 'PICKED_UP' ||
-    fulfillmentState === 'RECEIVED';
-
   // Demo pharmacies are already prepared
   const pharmacyWithHours = pharmacy ? (isDemo ? pharmacy : preparePharmacy(pharmacy)) : undefined;
 
@@ -220,30 +210,16 @@ export const Status = () => {
 
       <Box bgColor="white">
         <Container>
-          <VStack spacing={2} align="start" py={4}>
+          <VStack spacing={5} align="start" py={5}>
             <Heading as="h3" size="lg">
               {copy.heading}
             </Heading>
-            <Box>
+            <Box bg="orange.100" p={4} borderRadius="lg" w="full">
               <Text display="inline">
                 {typeof copy.subheading === 'function'
                   ? copy.subheading(isMultiRx)
                   : copy.subheading}
               </Text>
-              {showTextUsPrompt ? (
-                <Text ms={1} display="inline">
-                  Please
-                  <Link
-                    mx={1}
-                    color="link"
-                    textDecoration="underline"
-                    href={`sms:${process.env.REACT_APP_TWILIO_SMS_NUMBER}`}
-                  >
-                    text us
-                  </Link>
-                  if you have any issues.
-                </Text>
-              ) : null}
             </Box>
             {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
               <Box alignSelf="start">
@@ -264,7 +240,12 @@ export const Status = () => {
               </Box>
             ) : null}
 
-            <Box mt={2}>
+            <HorizontalStatusStepper
+              fulfillmentType={fulfillmentType}
+              status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
+            />
+
+            <VStack spacing={2} w="full">
               {order?.pharmacy?.id && isDeliveryPharmacy ? (
                 <BrandedPharmacyCard pharmacyId={order.pharmacy.id} />
               ) : pharmacyWithHours ? (
@@ -274,69 +255,59 @@ export const Status = () => {
                   isStatus
                 />
               ) : null}
-            </Box>
 
-            {pharmacyWithHours && !isDeliveryPharmacy ? (
-              <Button
-                mt={4}
-                mx="auto"
-                size="md"
-                py={6}
-                variant="solid"
-                onClick={handleGetDirections}
-                leftIcon={<FiNavigation />}
-                w="full"
-                bg="gray.900"
-                _hover={{ bg: 'gray.600' }}
-                color="white"
-              >
-                {t.directions}
-              </Button>
-            ) : null}
-            {!isDeliveryPharmacy && pharmacyWithHours && canReroute ? (
-              <Button
-                mx="auto"
-                size="md"
-                py={6}
-                variant="outline"
-                onClick={handleRerouteLink}
-                leftIcon={<FiRefreshCcw />}
-                bg="gray.50"
-                color="blue.500"
-                w="full"
-              >
-                {t.changePharmacy}
-              </Button>
-            ) : null}
-            {pharmacyWithHours && showReceivedButton ? (
-              <Button
-                size="md"
-                py={6}
-                w="full"
-                borderRadius="lg"
-                variant="outline"
-                bg="gray.50"
-                color="blue.500"
-                colorScheme={successfullySubmitted ? 'green' : undefined}
-                leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
-                onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
-                isLoading={submitting}
-              >
-                {successfullySubmitted ? t.thankYou : copy.cta(isMultiRx)}
-              </Button>
-            ) : null}
-          </VStack>
-        </Container>
-      </Box>
-
-      <Box bgColor="white" mt={2}>
-        <Container>
-          <VStack spacing={6} align="start" py={5}>
-            <StatusStepper
-              fulfillmentType={fulfillmentType}
-              status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
-              patientAddress={address ? formatAddress(address) : undefined}
-            />
+              <VStack spacing={2} w="full">
+                {pharmacyWithHours && !isDeliveryPharmacy ? (
+                  <Button
+                    mt={2}
+                    mx="auto"
+                    size="md"
+                    py={6}
+                    variant="solid"
+                    onClick={handleGetDirections}
+                    leftIcon={<FiNavigation />}
+                    w="full"
+                    bg="gray.900"
+                    _hover={{ bg: 'gray.600' }}
+                    color="white"
+                  >
+                    {t.directions}
+                  </Button>
+                ) : null}
+                {!isDeliveryPharmacy && pharmacyWithHours && canReroute ? (
+                  <Button
+                    mx="auto"
+                    size="md"
+                    py={6}
+                    variant="outline"
+                    onClick={handleRerouteLink}
+                    leftIcon={<FiRefreshCcw />}
+                    bg="gray.50"
+                    color="blue.500"
+                    w="full"
+                  >
+                    {t.changePharmacy}
+                  </Button>
+                ) : null}
+                {pharmacyWithHours && showReceivedButton ? (
+                  <Button
+                    size="md"
+                    py={6}
+                    w="full"
+                    borderRadius="lg"
+                    variant="outline"
+                    bg="gray.50"
+                    color="blue.500"
+                    colorScheme={successfullySubmitted ? 'green' : undefined}
+                    leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
+                    onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
+                    isLoading={submitting}
+                  >
+                    {successfullySubmitted ? t.thankYou : copy.cta(isMultiRx)}
+                  </Button>
+                ) : null}
+              </VStack>
+            </VStack>
           </VStack>
         </Container>
       </Box>

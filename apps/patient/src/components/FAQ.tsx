@@ -43,7 +43,7 @@ export const FAQ = () => {
       <Text align="start" fontWeight="semibold">
         Frequently Asked Questions
       </Text>
-      <Accordion allowToggle allowMultiple>
+      <Accordion allowToggle>
         {questions.map(({ question, answer }, idx) => (
           <AccordionItem
             key={question}
