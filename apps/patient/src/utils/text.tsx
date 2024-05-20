@@ -33,7 +33,7 @@ export const text = {
   orderDelivered: 'Your order was delivered',
   orderInTransit: 'Your order is in transit',
   orderPickedUp: 'Your order was picked up',
-  orderPlaced: 'Order placed',
+  orderPlaced: 'Placed',
   orderReady: 'Your order is ready',
   orderWasPlaced: 'Your order has been placed',
   outForDelivery: (isPlural: boolean) =>
@@ -52,7 +52,7 @@ export const text = {
     } before you select a pharmacy. Reach out to your provider for any issues.`,
   pleaseRefresh: 'Please refresh and try again',
   preferred: 'Preferred',
-  preparing: 'Preparing order',
+  preparing: 'Preparing',
   preparingDelivery: 'The pharmacy is preparing your order for delivery.',
   preparingOrder: 'Preparing your order',
   preparingPickUp: (isPlural: boolean) =>
@@ -121,7 +121,7 @@ export const text = {
     `Please select a time below. We'll do our best to ensure your ${
       isPlural ? 'prescriptions are' : 'prescription is'
     } ready by your selected time.`,
-  readyPickUp: 'Ready for pick up',
+  readyPickUp: 'Ready',
   readyWhen: 'When do you need your order ready by?',
   receivedPreparing: 'The pharmacy has received your order and is preparing it.',
   receivedRx: (isPlural: boolean) => `I received my ${isPlural ? 'prescriptions' : 'prescription'}`,
