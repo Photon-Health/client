@@ -409,7 +409,7 @@ export type Query = {
   userCount: Scalars['Int']['output'];
   /**
    * Retrieve users for current user organization
-   * pageSize default 50
+   * Default pageSize is 50, max 100
    */
   users: Array<User>;
   webhook?: Maybe<WebhookConfig>;

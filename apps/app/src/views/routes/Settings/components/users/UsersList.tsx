@@ -86,34 +86,6 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
 
   if (!hasUsers) return null;
 
-  if (error) {
-    return (
-      <Box
-        pt={{ base: '4', md: '4' }}
-        pb={{ base: '4', md: '8' }}
-        px={{ base: '4', md: '8' }}
-        borderRadius="lg"
-        bg="bg-surface"
-        boxShadow="base"
-        maxWidth="55em"
-      >
-        <Container padding={{ base: '0', md: '0' }}>
-          <Stack spacing={3}>
-            <HStack justify="space-between">
-              <Text fontSize="lg" fontWeight="medium">
-                Error: Could not load users
-              </Text>
-              <Alert status="error">
-                <AlertIcon />
-                {error.message}
-              </Alert>
-            </HStack>
-          </Stack>
-        </Container>
-      </Box>
-    );
-  }
-
   return (
     <Box borderRadius="lg" bg="white" boxShadow="base">
       <Container padding={{ base: '0', md: '0' }}>
@@ -134,79 +106,87 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
               </Button>
             )}
           </HStack>
+          {error ? (
+            <HStack justify="space-between">
+              <Text fontSize="lg" fontWeight="medium">
+                Error: Could not load users
+              </Text>
+              <Alert status="error">
+                <AlertIcon />
+                {error.message}
+              </Alert>
+            </HStack>
+          ) : (
+            <>
+              <Outlet />
+              <InviteForm isOpen={isOpen} onClose={onClose} />
 
-          <Outlet />
-          {/* {loading && (
-            <Center padding="100px">
-              <CircularProgress isIndeterminate color="green.300" />
-            </Center>
-          )} */}
-          <InviteForm isOpen={isOpen} onClose={onClose} />
-
-          <TableContainer>
-            <Table variant="simple" size="sm">
-              <Thead>
-                <Tr>
-                  <Th
-                    py={4}
-                    // cursor={'pointer'}
-                    width={{ lg: '30%' }}
-                    // onClick={handleSort('NAME')}
-                  >
-                    <HStack alignItems={'center'} spacing={2}>
-                      <Text userSelect={'none'}>Name</Text>
-                      {/* {sortBy === 'NAME' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)} */}
-                    </HStack>
-                  </Th>
-                  <Th
-                    py={4}
-                    // cursor={'pointer'}
-                    width={{ lg: '30%' }}
-                    // onClick={handleSort('EMAIL')}
-                  >
-                    <HStack alignItems={'center'} spacing={2}>
-                      <Text userSelect={'none'}>Email</Text>
-                      {/* {sortBy === 'EMAIL' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)} */}
-                    </HStack>
-                  </Th>
-                  <Th
-                    py={4}
-                    // cursor={'pointer'}
-                    // onClick={handleSort('ROLES')}
-                  >
-                    <HStack alignItems={'center'} spacing={2}>
-                      <Text userSelect={'none'}>Roles</Text>
-                      {/* {sortBy === 'ROLES' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)} */}
-                    </HStack>
-                  </Th>
-                  <Th py={4} cursor={'pointer'}>
-                    <HStack alignItems={'center'} spacing={2}></HStack>
-                  </Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {loading
-                  ? new Array(PAGE_SIZE)
-                      .fill(0)
-                      .map((_, i) => (
-                        <UserItem
-                          loading
-                          rolesMap={props.rolesMap}
-                          hasRole={false}
-                          key={`loading-${i}`}
-                        />
-                      ))
-                  : users?.map((user) => (
-                      <UserItem
-                        rolesMap={props.rolesMap}
-                        key={user.id}
-                        user={user}
-                        hasRole={hasUsers}
-                      />
-                    ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
+              <TableContainer>
+                <Table variant="simple" size="sm">
+                  <Thead>
+                    <Tr>
+                      <Th
+                        py={4}
+                        // cursor={'pointer'}
+                        width={{ lg: '30%' }}
+                        // onClick={handleSort('NAME')}
+                      >
+                        <HStack alignItems={'center'} spacing={2}>
+                          <Text userSelect={'none'}>Name</Text>
+                          {/* {sortBy === 'NAME' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)} */}
+                        </HStack>
+                      </Th>
+                      <Th
+                        py={4}
+                        // cursor={'pointer'}
+                        width={{ lg: '30%' }}
+                        // onClick={handleSort('EMAIL')}
+                      >
+                        <HStack alignItems={'center'} spacing={2}>
+                          <Text userSelect={'none'}>Email</Text>
+                          {/* {sortBy === 'EMAIL' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)} */}
+                        </HStack>
+                      </Th>
+                      <Th
+                        py={4}
+                        // cursor={'pointer'}
+                        // onClick={handleSort('ROLES')}
+                      >
+                        <HStack alignItems={'center'} spacing={2}>
+                          <Text userSelect={'none'}>Roles</Text>
+                          {/* {sortBy === 'ROLES' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)} */}
+                        </HStack>
+                      </Th>
+                      <Th py={4} cursor={'pointer'}>
+                        <HStack alignItems={'center'} spacing={2}></HStack>
+                      </Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {loading
+                      ? new Array(PAGE_SIZE)
+                          .fill(0)
+                          .map((_, i) => (
+                            <UserItem
+                              loading
+                              rolesMap={props.rolesMap}
+                              hasRole={false}
+                              key={`loading-${i}`}
+                            />
+                          ))
+                      : users?.map((user) => (
+                          <UserItem
+                            rolesMap={props.rolesMap}
+                            key={user.id}
+                            user={user}
+                            hasRole={hasUsers}
+                          />
+                        ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
+            </>
+          )}
           {!loading && (
             <Box px={{ base: '4', md: '6' }} pb="5">
               <Stack
