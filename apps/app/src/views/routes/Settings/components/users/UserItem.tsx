@@ -1,7 +1,7 @@
 import { Skeleton, Td, Text, Tr } from '@chakra-ui/react';
 import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { useMemo } from 'react';
-import { UserItemActions, UserItemActionsDisabled } from './UserItemActions';
+import { UserItemActions } from './UserItemActions';
 import { compareRoles } from './utils';
 
 export const userFragment = graphql(/* GraphQL */ `
@@ -73,13 +73,7 @@ export const UserItem = ({
       <Td textOverflow={'ellipsis'}>
         <Skeleton isLoaded={!loading}>{roles ?? 'ROLES'}</Skeleton>
       </Td>
-      <Td>
-        {user && hasRole ? (
-          <UserItemActions user={user}></UserItemActions>
-        ) : (
-          <UserItemActionsDisabled />
-        )}
-      </Td>
+      <Td>{hasRole ? <UserItemActions user={user ?? undefined} /> : null}</Td>
     </Tr>
   );
 };
