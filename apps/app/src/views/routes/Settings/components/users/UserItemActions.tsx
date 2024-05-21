@@ -51,6 +51,23 @@ interface UserItemActionsProps {
   user: FragmentType<typeof userFragment>;
 }
 
+export const UserItemActionsDisabled = () => {
+  return (
+    <HStack justifyContent="flex-end">
+      <Menu autoSelect={false}>
+        <MenuButton
+          as={IconButton}
+          aria-label="Options"
+          icon={<FiMoreVertical fontSize="1.25rem" />}
+          variant="ghost"
+          disabled
+          isDisabled
+        />
+      </Menu>
+    </HStack>
+  );
+};
+
 export const UserItemActions: React.FC<UserItemActionsProps> = ({ user }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {

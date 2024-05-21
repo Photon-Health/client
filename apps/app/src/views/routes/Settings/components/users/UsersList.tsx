@@ -5,8 +5,6 @@ import {
   AlertIcon,
   Box,
   Button,
-  Center,
-  CircularProgress,
   Container,
   HStack,
   Stack,
@@ -20,30 +18,21 @@ import {
   useBreakpointValue,
   useDisclosure
 } from '@chakra-ui/react';
+import { usePhoton } from '@photonhealth/react';
 import { graphql } from 'apps/app/src/gql';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
-import { useMemo, useState } from 'react';
-import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
+import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { usePhoton } from '@photonhealth/react';
 import { PaginationIndicator } from '../PaginationIndicator';
 import { InviteForm } from '../invites/InviteForm';
 import { UserItem } from './UserItem';
-import { sortByFn } from './utils';
 
 const usersQuery = graphql(/* GraphQL */ `
-  query UsersListQuery {
-    users {
+  query UsersListQuery($page: Int, $pageSize: Int) {
+    userCount
+    users(pageNum: $page, pageSize: $pageSize) {
       id
       ...UserItemUserFragment
-      email
-      name {
-        full
-      }
-      roles {
-        id
-        name
-      }
     }
     roles {
       name
@@ -54,10 +43,9 @@ const usersQuery = graphql(/* GraphQL */ `
 
 export const UsersList = (props: { rolesMap: Record<string, string> }) => {
   const { clinicalClient } = usePhoton();
-  const [sortBy, setSortBy] = useState<'NAME' | 'ROLES' | 'EMAIL' | undefined>();
-  const [sortByDir, setSortByDir] = useState(false);
+  // const [sortBy, setSortBy] = useState<'NAME' | 'ROLES' | 'EMAIL' | undefined>();
+  // const [sortByDir, setSortByDir] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data, error, loading } = useQuery(usersQuery, { client: clinicalClient });
 
   const hasUsers = usePermissions(['edit:profile', 'read:profile']);
   const hasInvite = usePermissions(['write:invite']);
@@ -67,28 +55,34 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const page = currentPage - 1;
   const PAGE_SIZE = 10;
-  const start = page * PAGE_SIZE;
-  const pages = Math.ceil((data?.users.length ?? 0) / PAGE_SIZE);
+  const { data, error, loading } = useQuery(usersQuery, {
+    client: clinicalClient,
+    variables: { page, pageSize: PAGE_SIZE }
+  });
 
-  const total = data?.users.length;
-  const users = useMemo(
-    () =>
-      data?.users
-        .map((x) => x)
-        .sort(sortByFn(sortBy, sortByDir))
-        .slice(start, start + PAGE_SIZE),
-    [data?.users, page, sortBy, sortByDir]
-  );
+  const pages = Math.ceil((data?.userCount ?? 0) / PAGE_SIZE);
+
+  const total = data?.userCount;
+  // const users = useMemo(
+  //   () =>
+  //     data?.users
+  //       .map((x) => x)
+  //       .sort(sortByFn(sortBy, sortByDir))
+  //       .slice(start, start + PAGE_SIZE),
+  //   [data?.users, page, sortBy, sortByDir]
+  // );
+  const users = data?.users;
   const currPageSize = users?.length ?? 0;
 
-  const handleSort = (key: 'NAME' | 'ROLES' | 'EMAIL') => () => {
-    if (key === sortBy) {
-      setSortByDir(!sortByDir);
-    } else {
-      setSortByDir(true);
-      setSortBy(key);
-    }
-  };
+  // TODO: Add sorting functionality back
+  // const handleSort = (key: 'NAME' | 'ROLES' | 'EMAIL') => () => {
+  //   if (key === sortBy) {
+  //     setSortByDir(!sortByDir);
+  //   } else {
+  //     setSortByDir(true);
+  //     setSortBy(key);
+  //   }
+  // };
 
   if (!hasUsers) return null;
 
@@ -142,63 +136,77 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
           </HStack>
 
           <Outlet />
-          {loading && (
+          {/* {loading && (
             <Center padding="100px">
               <CircularProgress isIndeterminate color="green.300" />
             </Center>
-          )}
+          )} */}
           <InviteForm isOpen={isOpen} onClose={onClose} />
-          {users?.length !== 0 && !loading && (
-            <TableContainer>
-              <Table variant="simple" size="sm">
-                <Thead>
-                  <Tr>
-                    <Th
-                      py={4}
-                      cursor={'pointer'}
-                      width={{ lg: '30%' }}
-                      onClick={handleSort('NAME')}
-                    >
-                      <HStack alignItems={'center'} spacing={2}>
-                        <Text userSelect={'none'}>Name</Text>
-                        {sortBy === 'NAME' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)}
-                      </HStack>
-                    </Th>
-                    <Th
-                      py={4}
-                      cursor={'pointer'}
-                      width={{ lg: '30%' }}
-                      onClick={handleSort('EMAIL')}
-                    >
-                      <HStack alignItems={'center'} spacing={2}>
-                        <Text userSelect={'none'}>Email</Text>
-                        {sortBy === 'EMAIL' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)}
-                      </HStack>
-                    </Th>
-                    <Th py={4} cursor={'pointer'} onClick={handleSort('ROLES')}>
-                      <HStack alignItems={'center'} spacing={2}>
-                        <Text userSelect={'none'}>Roles</Text>
-                        {sortBy === 'ROLES' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)}
-                      </HStack>
-                    </Th>
-                    <Th py={4} cursor={'pointer'}>
-                      <HStack alignItems={'center'} spacing={2}></HStack>
-                    </Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {users?.map((user) => (
-                    <UserItem
-                      rolesMap={props.rolesMap}
-                      key={user.id}
-                      user={user}
-                      hasRole={hasUsers}
-                    />
-                  ))}
-                </Tbody>
-              </Table>
-            </TableContainer>
-          )}
+
+          <TableContainer>
+            <Table variant="simple" size="sm">
+              <Thead>
+                <Tr>
+                  <Th
+                    py={4}
+                    // cursor={'pointer'}
+                    width={{ lg: '30%' }}
+                    // onClick={handleSort('NAME')}
+                  >
+                    <HStack alignItems={'center'} spacing={2}>
+                      <Text userSelect={'none'}>Name</Text>
+                      {/* {sortBy === 'NAME' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)} */}
+                    </HStack>
+                  </Th>
+                  <Th
+                    py={4}
+                    // cursor={'pointer'}
+                    width={{ lg: '30%' }}
+                    // onClick={handleSort('EMAIL')}
+                  >
+                    <HStack alignItems={'center'} spacing={2}>
+                      <Text userSelect={'none'}>Email</Text>
+                      {/* {sortBy === 'EMAIL' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)} */}
+                    </HStack>
+                  </Th>
+                  <Th
+                    py={4}
+                    // cursor={'pointer'}
+                    // onClick={handleSort('ROLES')}
+                  >
+                    <HStack alignItems={'center'} spacing={2}>
+                      <Text userSelect={'none'}>Roles</Text>
+                      {/* {sortBy === 'ROLES' && (sortByDir ? <FaCaretDown /> : <FaCaretUp />)} */}
+                    </HStack>
+                  </Th>
+                  <Th py={4} cursor={'pointer'}>
+                    <HStack alignItems={'center'} spacing={2}></HStack>
+                  </Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {loading
+                  ? new Array(PAGE_SIZE)
+                      .fill(0)
+                      .map((_, i) => (
+                        <UserItem
+                          loading
+                          rolesMap={props.rolesMap}
+                          hasRole={false}
+                          key={`loading-${i}`}
+                        />
+                      ))
+                  : users?.map((user) => (
+                      <UserItem
+                        rolesMap={props.rolesMap}
+                        key={user.id}
+                        user={user}
+                        hasRole={hasUsers}
+                      />
+                    ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
           {!loading && (
             <Box px={{ base: '4', md: '6' }} pb="5">
               <Stack
