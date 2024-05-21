@@ -1,4 +1,4 @@
-import { UsersListQueryQuery } from 'apps/app/src/gql/graphql';
+import { UserItemUserFragmentFragment } from 'apps/app/src/gql/graphql';
 
 export const compareRoles = (roleNameA: string, roleNameB: string) => {
   if (roleNameA === roleNameB) {
@@ -14,7 +14,7 @@ export const compareRoles = (roleNameA: string, roleNameB: string) => {
 export type Sorts = 'NAME' | 'ROLES' | 'EMAIL';
 export const sortByFn =
   (sortBy: Sorts | undefined, dir: boolean) =>
-  (a: UsersListQueryQuery['users'][number], b: UsersListQueryQuery['users'][number]) => {
+  (a: UserItemUserFragmentFragment, b: UserItemUserFragmentFragment) => {
     const multiplier = dir ? 1 : -1;
     if (sortBy === 'NAME') {
       return multiplier * (a.name?.full ?? '').localeCompare(b.name?.full ?? '');
