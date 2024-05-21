@@ -1,4 +1,4 @@
-import { Td, Text, Tr } from '@chakra-ui/react';
+import { Skeleton, Td, Text, Tr } from '@chakra-ui/react';
 import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { useMemo } from 'react';
 import { UserItemActions } from './UserItemActions';
@@ -38,37 +38,42 @@ export const userFragment = graphql(/* GraphQL */ `
 export const UserItem = ({
   user: data,
   rolesMap,
-  hasRole
-}: {
-  user: FragmentType<typeof userFragment>;
-  rolesMap: Record<string, string>;
-  hasRole: boolean;
-}) => {
+  hasRole,
+  loading
+}:
+  | {
+      user: FragmentType<typeof userFragment>;
+      rolesMap: Record<string, string>;
+      hasRole: boolean;
+      loading?: false;
+    }
+  | { user?: undefined; rolesMap: Record<string, string>; hasRole: boolean; loading: true }) => {
   const user = useFragment(userFragment, data);
 
   const roles = useMemo(
     () =>
-      user.roles
+      user?.roles
         .map(({ id }) => rolesMap[id])
         .filter((r) => r != null)
         .sort(compareRoles)
         .join(', '),
-    [user.roles]
+    [user?.roles, rolesMap]
   );
 
   return (
-    <Tr key={user.id}>
+    <Tr>
       <Td>
-        <Text>{user.name?.full ?? 'Unknown'}</Text>
+        <Skeleton isLoaded={!loading}>
+          <Text>{user?.name?.full ?? 'Unknown'}</Text>
+        </Skeleton>
       </Td>
-      <Td>{user.email}</Td>
-      <Td textOverflow={'ellipsis'}>{roles}</Td>
-      {data &&
-        (!hasRole ? null : (
-          <Td>
-            <UserItemActions user={user}></UserItemActions>
-          </Td>
-        ))}
+      <Td>
+        <Skeleton isLoaded={!loading}>{user?.email ?? 'EMAIL'}</Skeleton>
+      </Td>
+      <Td textOverflow={'ellipsis'}>
+        <Skeleton isLoaded={!loading}>{roles ?? 'ROLES'}</Skeleton>
+      </Td>
+      <Td>{hasRole ? <UserItemActions user={user ?? undefined} /> : null}</Td>
     </Tr>
   );
 };
