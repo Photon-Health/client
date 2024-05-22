@@ -34,7 +34,7 @@ const documents = {
     "\n  mutation UserItemActionRemoveUserFromOrganization($userId: ID!) {\n    removeUserFromOrganization(userId: $userId)\n  }\n": types.UserItemActionRemoveUserFromOrganizationDocument,
     "\n  fragment UserItemUserFragment on User {\n    ...UserFragment\n    id\n    npi\n    phone\n    fax\n    email\n    address {\n      street1\n      street2\n      state\n      postalCode\n      country\n      city\n    }\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n    roles {\n      description\n      id\n      name\n    }\n  }\n": types.UserItemUserFragmentFragmentDoc,
     "\n  fragment UserFragment on User {\n    ...RemoveUserActionUserFragment\n    ...EditRolesActionUserFragment\n    id\n    npi\n    phone\n    fax\n    email\n    address {\n      street1\n      street2\n      state\n      postalCode\n      country\n      city\n    }\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n    roles {\n      description\n      id\n      name\n    }\n  }\n": types.UserFragmentFragmentDoc,
-    "\n  query UsersListQuery {\n    users {\n      id\n      ...UserItemUserFragment\n      email\n      name {\n        full\n      }\n      roles {\n        id\n        name\n      }\n    }\n    roles {\n      name\n      id\n    }\n  }\n": types.UsersListQueryDocument,
+    "\n  query UsersListQuery($page: Int, $pageSize: Int) {\n    userCount\n    users(pageNum: $page, pageSize: $pageSize) {\n      id\n      ...UserItemUserFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n": types.UsersListQueryDocument,
     "\n  query AllRolesSelect {\n    roles {\n      id\n      name\n      description\n    }\n  }\n": types.AllRolesSelectDocument,
     "\n  fragment WebhookItemFragment on WebhookConfig {\n    id\n    url\n  }\n": types.WebhookItemFragmentFragmentDoc,
     "\n  mutation WebhookItemDeleteMutation($webhookId: ID!) {\n    deleteWebhookConfig(webhookId: $webhookId)\n  }\n": types.WebhookItemDeleteMutationDocument,
@@ -145,7 +145,7 @@ export function graphql(source: "\n  fragment UserFragment on User {\n    ...Rem
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query UsersListQuery {\n    users {\n      id\n      ...UserItemUserFragment\n      email\n      name {\n        full\n      }\n      roles {\n        id\n        name\n      }\n    }\n    roles {\n      name\n      id\n    }\n  }\n"): (typeof documents)["\n  query UsersListQuery {\n    users {\n      id\n      ...UserItemUserFragment\n      email\n      name {\n        full\n      }\n      roles {\n        id\n        name\n      }\n    }\n    roles {\n      name\n      id\n    }\n  }\n"];
+export function graphql(source: "\n  query UsersListQuery($page: Int, $pageSize: Int) {\n    userCount\n    users(pageNum: $page, pageSize: $pageSize) {\n      id\n      ...UserItemUserFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n"): (typeof documents)["\n  query UsersListQuery($page: Int, $pageSize: Int) {\n    userCount\n    users(pageNum: $page, pageSize: $pageSize) {\n      id\n      ...UserItemUserFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
