@@ -431,6 +431,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   weight={props.weight}
                   weightUnit={props.weightUnit}
                   enableMedHistory={props.enableMedHistory}
+                  hidePatientCard={props.hidePatientCard}
                 />
               </Show>
               <Show

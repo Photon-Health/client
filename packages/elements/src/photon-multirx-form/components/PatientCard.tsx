@@ -24,6 +24,7 @@ export const PatientCard = (props: {
   weight?: number;
   weightUnit?: string;
   enableMedHistory?: boolean;
+  hidePatientCard?: boolean;
 }) => {
   const [newMedication, setNewMedication] = createSignal<Medication | SearchMedication | undefined>(
     undefined
