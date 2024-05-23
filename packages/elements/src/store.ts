@@ -15,7 +15,11 @@ import { GraphQLError } from 'graphql';
 import jwtDecode from 'jwt-decode';
 
 const defaultOnRedirectCallback = (appState?: any): void => {
-  window.location.replace(appState?.returnTo || window.location.pathname);
+  if (appState?.returnTo) {
+    window.location.replace(appState?.returnTo);
+  } else {
+    window.history.pushState(null, window.document.title, window.location.pathname);
+  }
 };
 
 const CATALOG_TREATMENTS_FIELDS = gql`
@@ -209,6 +213,7 @@ export class PhotonClientStore {
         try {
           const result = await this.sdk.authentication.handleRedirect(url);
           defaultOnRedirectCallback(result?.appState);
+          await this.authentication.checkSession();
         } catch (err: any) {
           const urlParams = new URLSearchParams(window.location.search);
           const errorMessage = urlParams.get('error_description');
