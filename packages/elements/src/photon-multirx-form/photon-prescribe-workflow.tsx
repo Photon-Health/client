@@ -420,20 +420,18 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   message="You have access to see the form but you will not be able to submit an order."
                 />
               </Show>
-              <Show when={!props.hidePatientCard}>
-                <PatientCard
-                  actions={props.formActions}
-                  store={props.formStore}
-                  patientId={props.patientId}
-                  client={client!}
-                  enableOrder={props.enableOrder}
-                  address={props.address}
-                  weight={props.weight}
-                  weightUnit={props.weightUnit}
-                  enableMedHistory={props.enableMedHistory}
-                  hidePatientCard={props.hidePatientCard}
-                />
-              </Show>
+              <PatientCard
+                actions={props.formActions}
+                store={props.formStore}
+                patientId={props.patientId}
+                client={client!}
+                enableOrder={props.enableOrder}
+                address={props.address}
+                weight={props.weight}
+                weightUnit={props.weightUnit}
+                enableMedHistory={props.enableMedHistory}
+                hidePatientCard={props.hidePatientCard}
+              />
               <Show
                 when={
                   props.formStore.patient?.value?.address ||

@@ -99,7 +99,7 @@ export const PatientCard = (props: {
           />
         </Card>
       </Show>
-      <Show when={patientId()}>
+      <Show when={patientId() && !props.hidePatientCard}>
         <div>
           <PatientInfo
             patientId={patientId()}
