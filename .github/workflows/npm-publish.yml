@@ -55,13 +55,22 @@ jobs:
               for PACKAGE in $PACKAGES
               do
                   echo "Publishing $PACKAGE..."
-                  cd $PACKAGE && npm publish && cd -
-
-                  echo "Creating GitHub release for $PACKAGE..."
-                  PACKAGE_NAME=$(basename $PACKAGE)
+                  
+                  cd $PACKAGE
+                  
                   PACKAGE_VERSION=$(node -p "require('./$PACKAGE/package.json').version")
+                  PACKAGE_NAME=$(basename $PACKAGE)
                   PACKAGE_TAG="${PACKAGE_NAME}_v${PACKAGE_VERSION}"
                   PACKAGE_BODY="TODO FILL OUT RELEASE NOTES for $PACKAGE_NAME v$PACKAGE_VERSION"
+
+                  if [[ $PACKAGE_VERSION == *"rc"* ]]
+                  then
+                    npm publish --tag rc && cd -
+                  else
+                    npm publish && cd -
+                  fi
+
+                  echo "Creating GitHub release for $PACKAGE version $PACKAGE_VERSION..."
 
                   git tag -a $PACKAGE_TAG -m "$PACKAGE_BODY"
                   git push origin $PACKAGE_TAG
