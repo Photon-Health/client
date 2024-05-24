@@ -21,6 +21,7 @@ import './photon-state-input';
 import './photon-patient-dialog';
 import './photon-update-patient-dialog';
 import './photon-med-search';
+import './photon-med-history';
 import './photon-radio-card';
 import './photon-radio-group';
 import './photon-med-search-dialog';

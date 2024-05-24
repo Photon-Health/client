@@ -40,6 +40,7 @@ const ADD_MED_HISTORY = gql`
 
 type PatientMedHistoryProps = {
   patientId: string;
+  enableLinks: boolean;
   openAddMedication?: () => void;
   newMedication?: Medication | SearchMedication;
 };
@@ -53,7 +54,7 @@ type GetPatientResponse = {
   };
 };
 
-const LoadingRowFallback = () => (
+const LoadingRowFallback = (props: { enableLinks: boolean }) => (
   <Table.Row>
     <Table.Cell>
       <Text sampleLoadingText={generateString(10, 25)} loading />
@@ -61,9 +62,11 @@ const LoadingRowFallback = () => (
     <Table.Cell>
       <Text sampleLoadingText={generateString(2, 8)} loading />
     </Table.Cell>
-    <Table.Cell>
-      <Text sampleLoadingText={generateString(4, 8)} loading />
-    </Table.Cell>
+    <Show when={props.enableLinks}>
+      <Table.Cell>
+        <Text sampleLoadingText={generateString(4, 8)} loading />
+      </Table.Cell>
+    </Show>
   </Table.Row>
 );
 
@@ -169,16 +172,18 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
                 </div>
               </span>
             </Table.Col>
-            <Table.Col>Source</Table.Col>
+            <Show when={props.enableLinks}>
+              <Table.Col>Source</Table.Col>
+            </Show>
           </Table.Header>
           <Table.Body>
             <Show
               when={medHistory()}
               fallback={
                 <>
-                  <LoadingRowFallback />
-                  <LoadingRowFallback />
-                  <LoadingRowFallback />
+                  <LoadingRowFallback enableLinks={props.enableLinks} />
+                  <LoadingRowFallback enableLinks={props.enableLinks} />
+                  <LoadingRowFallback enableLinks={props.enableLinks} />
                 </>
               }
             >
@@ -187,19 +192,21 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
                   <Table.Row>
                     <Table.Cell width="16rem">{med.medication?.name}</Table.Cell>
                     <Table.Cell>{formatDate(med.prescription?.writtenAt) || 'N/A'}</Table.Cell>
-                    <Table.Cell>
-                      {med.prescription?.id ? (
-                        <a
-                          class="text-blue-500 underline"
-                          target="_blank"
-                          href={`${baseURL()}${med.prescription?.id}`}
-                        >
-                          Link
-                        </a>
-                      ) : (
-                        'External'
-                      )}
-                    </Table.Cell>
+                    <Show when={props.enableLinks}>
+                      <Table.Cell>
+                        {med.prescription?.id ? (
+                          <a
+                            class="text-blue-500 underline"
+                            target="_blank"
+                            href={`${baseURL()}${med.prescription?.id}`}
+                          >
+                            Link
+                          </a>
+                        ) : (
+                          'External'
+                        )}
+                      </Table.Cell>
+                    </Show>
                   </Table.Row>
                 )}
               </For>

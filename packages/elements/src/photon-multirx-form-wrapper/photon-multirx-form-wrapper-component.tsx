@@ -24,6 +24,7 @@ const shouldWarn = (form: any) =>
 
 const Component = (props: {
   enableMedHistory: boolean;
+  enableMedHistoryLinks: boolean;
   hideTemplates?: boolean;
   patientId?: string;
   templateIds?: string;
@@ -235,6 +236,7 @@ const Component = (props: {
                 external-order-id={props.externalOrderId}
                 additional-notes={props.additionalNotes}
                 enable-med-history={props.enableMedHistory}
+                enable-med-history-links={props.enableMedHistoryLinks}
                 enable-order={props.enableOrder}
                 enable-local-pickup={props.enableLocalPickup}
                 enable-send-to-patient={props.enableSendToPatient}
@@ -293,6 +295,7 @@ customElement(
     enableLocalPickup: false,
     enableSendToPatient: false,
     enableMedHistory: false,
+    enableMedHistoryLinks: false,
     enableCombineAndDuplicate: false,
     mailOrderIds: undefined,
     enableOrder: false,
