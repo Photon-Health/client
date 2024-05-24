@@ -130,7 +130,7 @@ export const PatientCard = (props: {
             patientId={patientId()}
             openAddMedication={() => setMedDialogOpen(true)}
             newMedication={newMedication()}
-            enableLinks={props.enableMedHistoryLinks}
+            enableLinks={props.enableMedHistoryLinks ?? false}
           />
           <photon-med-search-dialog
             title="Add Medication History"
