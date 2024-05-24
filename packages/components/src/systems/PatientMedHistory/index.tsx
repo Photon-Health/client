@@ -40,6 +40,7 @@ const ADD_MED_HISTORY = gql`
 
 type PatientMedHistoryProps = {
   patientId: string;
+  hideLink: boolean;
   openAddMedication?: () => void;
   newMedication?: Medication | SearchMedication;
 };
@@ -169,7 +170,9 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
                 </div>
               </span>
             </Table.Col>
-            <Table.Col>Source</Table.Col>
+            <Show when={!props.hideLink}>
+              <Table.Col>Source</Table.Col>
+            </Show>
           </Table.Header>
           <Table.Body>
             <Show
@@ -187,19 +190,21 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
                   <Table.Row>
                     <Table.Cell width="16rem">{med.medication?.name}</Table.Cell>
                     <Table.Cell>{formatDate(med.prescription?.writtenAt) || 'N/A'}</Table.Cell>
-                    <Table.Cell>
-                      {med.prescription?.id ? (
-                        <a
-                          class="text-blue-500 underline"
-                          target="_blank"
-                          href={`${baseURL()}${med.prescription?.id}`}
-                        >
-                          Link
-                        </a>
-                      ) : (
-                        'External'
-                      )}
-                    </Table.Cell>
+                    <Show when={!props.hideLink}>
+                      <Table.Cell>
+                        {med.prescription?.id ? (
+                          <a
+                            class="text-blue-500 underline"
+                            target="_blank"
+                            href={`${baseURL()}${med.prescription?.id}`}
+                          >
+                            Link
+                          </a>
+                        ) : (
+                          'External'
+                        )}
+                      </Table.Cell>
+                    </Show>
                   </Table.Row>
                 )}
               </For>
