@@ -22,6 +22,10 @@ const holidays = [
   '2024-05-27' // Memorial Day
 ];
 
+/**
+ * Checks if it's a holiday or the weekend before so that we can surface
+ * an hours disclaimer on the pharmacy list
+ */
 function showHolidayDisclaimer() {
   const today = dayjs();
   const formattedToday = today.format('YYYY-MM-DD');
