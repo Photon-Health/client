@@ -25,6 +25,7 @@ export const PatientCard = (props: {
   weightUnit?: string;
   enableMedHistory?: boolean;
   enableMedHistoryLinks?: boolean;
+  hidePatientCard?: boolean;
 }) => {
   const [newMedication, setNewMedication] = createSignal<Medication | SearchMedication | undefined>(
     undefined
@@ -99,7 +100,7 @@ export const PatientCard = (props: {
           />
         </Card>
       </Show>
-      <Show when={patientId()}>
+      <Show when={patientId() && !props.hidePatientCard}>
         <div>
           <PatientInfo
             patientId={patientId()}

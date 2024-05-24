@@ -23,6 +23,7 @@ const Component = (props: PrescribeProps) => {
         prescriptionIds={props.prescriptionIds}
         hideSubmit={props.hideSubmit}
         hideTemplates={props.hideTemplates}
+        hidePatientCard={props.hidePatientCard}
         enableOrder={props.enableOrder}
         enableLocalPickup={props.enableLocalPickup}
         enableSendToPatient={props.enableSendToPatient}
@@ -54,6 +55,7 @@ customElement(
     prescriptionIds: undefined,
     hideSubmit: false,
     hideTemplates: false,
+    hidePatientCard: false,
     enableOrder: false,
     enableLocalPickup: false,
     enableSendToPatient: false,
