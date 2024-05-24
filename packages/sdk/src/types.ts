@@ -428,6 +428,8 @@ export type OrderFulfillment = {
   state: FulfillmentState;
   trackingNumber?: Maybe<Scalars['String']>;
   type: FulfillmentType;
+  minutesUntilReady?: Maybe<Scalars['Int']>;
+  createdAt?: Scalars['AWSDateTime'];
 };
 
 export enum OrderState {

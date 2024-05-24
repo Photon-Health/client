@@ -6,6 +6,9 @@ export const GET_ORDER = gql`
       id
       state
       isReroutable
+      readyBy
+      readyByDay
+      readyByTime
       address {
         street1
         street2
@@ -22,6 +25,8 @@ export const GET_ORDER = gql`
         type
         state
         trackingNumber
+        minutesUntilReady
+        createdAt
       }
       pharmacy {
         id

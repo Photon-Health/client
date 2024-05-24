@@ -1,10 +1,21 @@
-import { Box, Button, Container, Heading, Link, Text, VStack, useToast } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Container,
+  Heading,
+  Link,
+  Text,
+  VStack,
+  useToast,
+  HStack,
+  Tooltip
+} from '@chakra-ui/react';
 import { getSettings } from '@client/settings';
 import { types } from '@photonhealth/sdk';
 import queryString from 'query-string';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { FiCheck, FiNavigation, FiRefreshCcw } from 'react-icons/fi';
+import { FiCheck, FiNavigation, FiRefreshCcw, FiInfo } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
 import { BrandedPharmacyCard, DemoCtaModal, PharmacyInfo, PoweredBy } from '../components';
@@ -15,6 +26,7 @@ import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/gen
 import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { HorizontalStatusStepper } from '../components/HorizontalStatusStepper';
+import dayjs from 'dayjs';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -37,7 +49,7 @@ export const Status = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
 
-  const { fulfillment, pharmacy } = order;
+  const { fulfillment, pharmacy, readyByTime } = order;
 
   const fulfillmentType = getFulfillmentType(
     pharmacy?.id,
@@ -201,6 +213,9 @@ export const Status = () => {
     navigate(`/pharmacy?${query}`);
   };
 
+  const neededBy = readyByTime ? dayjs(readyByTime).tz(dayjs.tz.guess()).format('h a') : null;
+  const estimatedBy = fulfillment?.minutesUntilReady ?? 0;
+
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
@@ -210,11 +225,11 @@ export const Status = () => {
 
       <Box bgColor="white">
         <Container>
-          <VStack spacing={5} align="start" py={5}>
+          <VStack spacing={4} align="start" py={5}>
             <Heading as="h3" size="lg">
               {copy.heading}
             </Heading>
-            <Box bg="orange.100" p={4} borderRadius="lg" w="full">
+            <Box bg="orange.100" p={4} borderRadius="lg">
               <Text display="inline">
                 {typeof copy.subheading === 'function'
                   ? copy.subheading(isMultiRx)
@@ -240,12 +255,49 @@ export const Status = () => {
               </Box>
             ) : null}
 
+            {/* Ready by Fri, May 10 at 6 pm */}
+
+            {neededBy ? (
+              <HStack>
+                <Text>
+                  Need order by <b>{neededBy}</b>
+                </Text>
+                <Tooltip
+                  label="We do our best to ensure your order is ready by your selected time"
+                  fontSize="md"
+                  textAlign="center"
+                >
+                  <span>
+                    <FiInfo color="gray" />
+                  </span>
+                </Tooltip>
+              </HStack>
+            ) : null}
+
+            {/* Ready by Fri, May 10 at 6 pm */}
+            {estimatedBy ? (
+              <HStack>
+                <Text>
+                  Estimated ready in <b>{estimatedBy} min</b>
+                </Text>
+                <Tooltip
+                  label="We do our best to ensure your order is ready by your selected time"
+                  fontSize="md"
+                  textAlign="center"
+                >
+                  <span>
+                    <FiInfo color="gray" />
+                  </span>
+                </Tooltip>
+              </HStack>
+            ) : null}
+
             <HorizontalStatusStepper
               fulfillmentType={fulfillmentType}
               status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
             />
 
-            <VStack spacing={2} w="full">
+            <VStack spacing={2} w="full" pt={2}>
               {order?.pharmacy?.id && isDeliveryPharmacy ? (
                 <BrandedPharmacyCard pharmacyId={order.pharmacy.id} />
               ) : pharmacyWithHours ? (

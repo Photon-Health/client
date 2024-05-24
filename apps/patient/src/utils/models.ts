@@ -9,6 +9,7 @@ export interface Order extends types.Order {
   readyByDay?: string;
   readyByTime?: string;
   isReroutable?: boolean;
+  minutesUntilReady?: number;
 }
 
 export interface Pharmacy extends types.Pharmacy {
