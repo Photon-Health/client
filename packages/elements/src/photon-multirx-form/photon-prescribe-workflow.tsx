@@ -59,6 +59,7 @@ export type PrescribeProps = {
   enableLocalPickup: boolean;
   enableSendToPatient: boolean;
   enableMedHistory: boolean;
+  enableMedHistoryLinks: boolean;
   enableCombineAndDuplicate: boolean;
   mailOrderIds?: string;
   pharmacyId?: string;
@@ -429,6 +430,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 weight={props.weight}
                 weightUnit={props.weightUnit}
                 enableMedHistory={props.enableMedHistory}
+                enableMedHistoryLinks={props.enableMedHistoryLinks ?? false}
               />
               <Show
                 when={

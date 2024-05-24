@@ -27,6 +27,7 @@ const Component = (props: PrescribeProps) => {
         enableLocalPickup={props.enableLocalPickup}
         enableSendToPatient={props.enableSendToPatient}
         enableMedHistory={props.enableMedHistory}
+        enableMedHistoryLinks={props.enableMedHistoryLinks}
         enableCombineAndDuplicate={props.enableCombineAndDuplicate}
         mailOrderIds={props.mailOrderIds}
         pharmacyId={props.pharmacyId}
@@ -58,6 +59,7 @@ customElement(
     enableSendToPatient: false,
     enableCombineAndDuplicate: false,
     enableMedHistory: false,
+    enableMedHistoryLinks: false,
     mailOrderIds: undefined,
     pharmacyId: undefined,
     loading: false,
