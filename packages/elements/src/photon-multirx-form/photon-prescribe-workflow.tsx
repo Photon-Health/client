@@ -55,6 +55,7 @@ export type PrescribeProps = {
   prescriptionIds?: string;
   hideSubmit: boolean;
   hideTemplates: boolean;
+  hidePatientCard: boolean;
   enableOrder: boolean;
   enableLocalPickup: boolean;
   enableSendToPatient: boolean;
@@ -429,6 +430,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 weight={props.weight}
                 weightUnit={props.weightUnit}
                 enableMedHistory={props.enableMedHistory}
+                hidePatientCard={props.hidePatientCard}
               />
               <Show
                 when={
