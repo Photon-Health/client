@@ -115,6 +115,7 @@ export const PrescriptionForm = () => {
           weight-unit={weightUnit}
           enable-order={orgSettings?.enableRxAndOrder ?? true}
           enable-med-history={orgSettings?.enableMedHistory ?? false}
+          enable-med-history-links={true}
           enable-local-pickup={orgSettings?.pickUp ?? false}
           enable-send-to-patient={orgSettings?.sendToPatient ?? false}
           enable-combine-and-duplicate={orgSettings?.enableCombineAndDuplicate ?? false}

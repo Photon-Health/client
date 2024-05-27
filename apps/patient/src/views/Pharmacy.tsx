@@ -158,8 +158,10 @@ export const Pharmacy = () => {
   };
 
   const handleModalClose = ({ loc = undefined }: { loc?: string | undefined }) => {
-    reset();
-    setLocation(loc);
+    if (loc) {
+      reset();
+      setLocation(loc);
+    }
     setLocationModalOpen(false);
   };
 
