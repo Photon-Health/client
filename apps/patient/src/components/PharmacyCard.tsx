@@ -41,6 +41,7 @@ export const PharmacyCard = memo(function PharmacyCard({
       borderColor={selected && onSelect ? 'brand.500' : 'white'}
       borderRadius="lg"
       onClick={() => onSelect && onSelect()}
+      // mx={isMobile ? -3 : undefined}
       mx={{ base: -3, md: undefined }}
       cursor={selectable ? 'pointer' : undefined}
       data-dd-action-name={price ? 'selected_walmart_pilot' : undefined}
