@@ -274,13 +274,20 @@ export const Status = () => {
   };
 
   const neededBy = readyBy && readyByDay ? formatReadyBy(readyBy, readyByDay) : null;
-  const showNeededBy = neededBy && !isDeliveryPharmacy && fulfillment?.state === 'SENT';
+  const showNeededBy =
+    neededBy &&
+    !isDeliveryPharmacy &&
+    (!fulfillment || // No fulfillment means coming from pharmacy selection
+      fulfillment?.state === 'SENT');
 
   const estimatedReadyAt = fulfillment?.minutesUntilReady
     ? formatReadyTime(fulfillment.createdAt, fulfillment.minutesUntilReady)
     : null;
   const showEstimatedReadyAt =
-    estimatedReadyAt && !isDeliveryPharmacy && fulfillment?.state === 'RECEIVED';
+    estimatedReadyAt &&
+    !isDeliveryPharmacy &&
+    (!fulfillment || // No fulfillment means coming from pharmacy selection
+      fulfillment?.state === 'RECEIVED');
 
   return (
     <Box>
