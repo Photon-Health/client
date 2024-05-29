@@ -169,7 +169,7 @@ export const text = {
     `Your ${
       isPlural ? 'prescriptions were' : 'prescription was'
     } sent to the pharmacy. We’ll text you to let you know when ${
-      isPlural ? 'their' : "it's"
+      isPlural ? "they're" : "it's"
     } ready.`,
   setLoc: 'Set location',
   setSearchLoc: 'Set search location',
