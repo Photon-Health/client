@@ -13,7 +13,7 @@ import {
 import { getSettings } from '@client/settings';
 import { types } from '@photonhealth/sdk';
 import queryString from 'query-string';
-import { useEffect, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { FiCheck, FiNavigation, FiRefreshCcw, FiInfo } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -27,6 +27,66 @@ import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { HorizontalStatusStepper } from '../components/HorizontalStatusStepper';
 import dayjs from 'dayjs';
+
+function formatReadyTime(baseTime: string, minutesUntilReady: number): ReactElement {
+  const currentTime = dayjs(baseTime);
+  let readyTime = currentTime.add(minutesUntilReady, 'minutes');
+
+  // Round up to the nearest 15-minute increment
+  const minutes = readyTime.minute();
+  const roundedMinutes = Math.ceil(minutes / 15) * 15;
+  if (roundedMinutes >= 60) {
+    readyTime = readyTime.add(1, 'hour').minute(0);
+  } else {
+    readyTime = readyTime.minute(roundedMinutes);
+  }
+
+  const isToday = readyTime.isSame(currentTime, 'day');
+  const isTomorrow = readyTime.isSame(currentTime.add(1, 'day'), 'day');
+  const timeFormat = readyTime.minute() ? 'h:mm a' : 'h a';
+  const dayPrefix = isToday ? 'Today' : isTomorrow ? 'Tomorrow' : readyTime.format('dddd');
+
+  return (
+    <Text>
+      Ready{' '}
+      <b>
+        {dayPrefix} at {readyTime.format(timeFormat)}
+      </b>
+    </Text>
+  );
+}
+
+function formatReadyBy(readyBy: string, readyByDay: string): ReactElement {
+  if (readyBy === 'Urgent') {
+    return (
+      <Text>
+        Need order <b>as soon as possible</b>
+      </Text>
+    );
+  } else if (readyBy === 'After hours') {
+    return readyByDay === 'Today' ? (
+      <Text>
+        Need order <b>this evening</b>
+      </Text>
+    ) : (
+      <Text>
+        Need order <b>tomorrow evening</b>
+      </Text>
+    );
+  } else {
+    const [time, period] = readyBy.split(' ');
+    const [hour] = time.split(':');
+    return (
+      <Text>
+        Need order by{' '}
+        <b>
+          {hour} {period}
+          {readyByDay === 'Tomorrow' ? ' tomorrow' : ''}
+        </b>
+      </Text>
+    );
+  }
+}
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -49,7 +109,7 @@ export const Status = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
 
-  const { fulfillment, pharmacy, readyByTime } = order;
+  const { fulfillment, pharmacy, readyBy, readyByDay } = order;
 
   const fulfillmentType = getFulfillmentType(
     pharmacy?.id,
@@ -213,8 +273,14 @@ export const Status = () => {
     navigate(`/pharmacy?${query}`);
   };
 
-  const neededBy = readyByTime ? dayjs(readyByTime).tz(dayjs.tz.guess()).format('h a') : null;
-  const estimatedBy = fulfillment?.minutesUntilReady ?? 0;
+  const neededBy = readyBy && readyByDay ? formatReadyBy(readyBy, readyByDay) : null;
+  const showNeededBy = neededBy && !isDeliveryPharmacy && fulfillment?.state === 'SENT';
+
+  const estimatedReadyAt = fulfillment?.minutesUntilReady
+    ? formatReadyTime(fulfillment.createdAt, fulfillment.minutesUntilReady)
+    : null;
+  const showEstimatedReadyAt =
+    estimatedReadyAt && !isDeliveryPharmacy && fulfillment?.state === 'RECEIVED';
 
   return (
     <Box>
@@ -229,7 +295,7 @@ export const Status = () => {
             <Heading as="h3" size="lg">
               {copy.heading}
             </Heading>
-            <Box bg="orange.100" p={4} borderRadius="lg">
+            <Box bg="orange.100" p={4} borderRadius="lg" w="full">
               <Text display="inline">
                 {typeof copy.subheading === 'function'
                   ? copy.subheading(isMultiRx)
@@ -255,13 +321,10 @@ export const Status = () => {
               </Box>
             ) : null}
 
-            {/* Ready by Fri, May 10 at 6 pm */}
-
-            {neededBy ? (
+            {/* Ex: Ready by Fri, May 10 at 6 pm */}
+            {showNeededBy ? (
               <HStack>
-                <Text>
-                  Need order by <b>{neededBy}</b>
-                </Text>
+                {neededBy}
                 <Tooltip
                   label="We do our best to ensure your order is ready by your selected time"
                   fontSize="md"
@@ -274,14 +337,12 @@ export const Status = () => {
               </HStack>
             ) : null}
 
-            {/* Ready by Fri, May 10 at 6 pm */}
-            {estimatedBy ? (
+            {/* Ex: Estimated ready at 6 pm */}
+            {showEstimatedReadyAt ? (
               <HStack>
-                <Text>
-                  Estimated ready in <b>{estimatedBy} min</b>
-                </Text>
+                {estimatedReadyAt}
                 <Tooltip
-                  label="We do our best to ensure your order is ready by your selected time"
+                  label="The pharmacy stated your order should be ready at this time"
                   fontSize="md"
                   textAlign="center"
                 >
