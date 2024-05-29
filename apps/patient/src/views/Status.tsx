@@ -277,7 +277,7 @@ export const Status = () => {
   const showNeededBy =
     neededBy &&
     !isDeliveryPharmacy &&
-    (!fulfillment || // No fulfillment means coming from pharmacy selection
+    (!fulfillment || // No fulfillment means user came from pharmacy selection
       fulfillment?.state === 'SENT');
 
   const estimatedReadyAt = fulfillment?.minutesUntilReady
@@ -286,7 +286,7 @@ export const Status = () => {
   const showEstimatedReadyAt =
     estimatedReadyAt &&
     !isDeliveryPharmacy &&
-    (!fulfillment || // No fulfillment means coming from pharmacy selection
+    (!fulfillment || // No fulfillment means user came from pharmacy selection
       fulfillment?.state === 'RECEIVED');
 
   return (
