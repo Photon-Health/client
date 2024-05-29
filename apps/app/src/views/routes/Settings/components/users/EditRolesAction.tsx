@@ -235,6 +235,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
               {userData.name?.full}
             </Text>
             <Text fontSize="sm">{userData.email}</Text>
+            <Text fontSize="sm">{userData.id}</Text>
           </VStack>
         </Box>
         {userData && (
