@@ -14,7 +14,6 @@ import { PharmacyCard } from './PharmacyCard';
 import { text as t } from '../utils/text';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { PharmacyFilters } from './PharmacyFilters';
-import { useOrderContext } from '../views/Main';
 import { FiInfo } from 'react-icons/fi';
 import dayjs from 'dayjs';
 
