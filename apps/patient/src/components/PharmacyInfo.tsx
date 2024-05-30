@@ -81,7 +81,6 @@ interface PharmacyInfoProps {
   showDetails?: boolean;
   boldPharmacyName?: boolean;
   isStatus?: boolean;
-  price?: number | null;
   selected?: boolean;
 }
 
@@ -90,9 +89,7 @@ export const PharmacyInfo = ({
   preferred = false,
   showDetails = true,
   boldPharmacyName = true,
-  isStatus = false,
-  price = null,
-  selected = false
+  isStatus = false
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
@@ -123,11 +120,6 @@ export const PharmacyInfo = ({
             {pharmacy.name}
           </Text>
         </HStack>
-        {price && !isStatus ? (
-          <Text as="b" ms="auto">
-            ${price.toFixed(2)}
-          </Text>
-        ) : null}
       </HStack>
       {showDetails ? (
         <VStack direction={isStatus ? 'column-reverse' : 'column'} spacing={1}>
@@ -144,11 +136,6 @@ export const PharmacyInfo = ({
             fontSize={isStatus ? 'md' : 'sm'}
           />
         </VStack>
-      ) : null}
-      {price && !isStatus && selected ? (
-        <Box borderRadius="lg" bgColor="gray.100" py={2} px={3} mt={1} fontSize="sm" w="full">
-          Cash price is estimated from available data.
-        </Box>
       ) : null}
     </VStack>
   );

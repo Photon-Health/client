@@ -80,8 +80,6 @@ export const PickupOptions = ({
   setEnableOpenNow,
   setEnable24Hr
 }: PickupOptionsProps) => {
-  const { totalWalmartPrice } = useOrderContext();
-
   return (
     <VStack spacing={3} align="span" w="full">
       {showHeading ? (
@@ -135,7 +133,6 @@ export const PickupOptions = ({
               onSelect={() => handleSelect(pharmacy.id)}
               onSetPreferred={() => handleSetPreferred(pharmacy.id)}
               selectable={true}
-              price={pharmacy.name === 'Walmart Pharmacy' ? totalWalmartPrice : 0}
             />
           </SlideFade>
         ))}

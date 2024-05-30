@@ -18,7 +18,6 @@ interface PharmacyCardProps {
   onSetPreferred?: () => void;
   selectable?: boolean;
   showDetails?: boolean;
-  price?: number | null;
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
@@ -29,8 +28,7 @@ export const PharmacyCard = memo(function PharmacyCard({
   onSelect,
   onSetPreferred,
   selectable = false,
-  showDetails = true,
-  price = null
+  showDetails = true
 }: PharmacyCardProps) {
   if (!pharmacy) return null;
 
@@ -43,7 +41,6 @@ export const PharmacyCard = memo(function PharmacyCard({
       onClick={() => onSelect && onSelect()}
       mx={{ base: -3, md: undefined }}
       cursor={selectable ? 'pointer' : undefined}
-      data-dd-action-name={price ? 'selected_walmart_pilot' : undefined}
     >
       <CardBody p={3}>
         <PharmacyInfo
@@ -51,7 +48,6 @@ export const PharmacyCard = memo(function PharmacyCard({
           preferred={preferred}
           showDetails={showDetails}
           boldPharmacyName={false}
-          price={price}
           selected={selected}
         />
       </CardBody>
