@@ -328,7 +328,6 @@ export const Status = () => {
               </Box>
             ) : null}
 
-            {/* Ex: Ready by Fri, May 10 at 6 pm */}
             {showNeededBy ? (
               <HStack>
                 {neededBy}
@@ -344,7 +343,6 @@ export const Status = () => {
               </HStack>
             ) : null}
 
-            {/* Ex: Estimated ready at 6 pm */}
             {showEstimatedReadyAt ? (
               <HStack>
                 {estimatedReadyAt}
