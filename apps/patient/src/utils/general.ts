@@ -7,11 +7,9 @@ import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import costcoLogo from '../assets/costco_small.png';
 import walgreensLogo from '../assets/walgreens_small.png';
-import walmartLogo from '../assets/walmart_small.svg';
 import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { ExtendedFulfillmentType } from './models';
-import walmartMedLookup from '../data/walmartMedPrices.json';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -123,8 +121,6 @@ export const preparePharmacy = (pharmacy: types.Pharmacy): EnrichedPharmacy => {
     showReadyIn30Min = true;
   } else if (pharmacyNameLowerCase.includes('costco')) {
     logo = costcoLogo;
-  } else if (pharmacyNameLowerCase.includes('walmart')) {
-    logo = walmartLogo;
   }
 
   if (pharmacy.nextEvents) {
@@ -211,38 +207,3 @@ export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string
 };
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-
-/**
- * Calculates the total price of all fills in an order based on the pricing information
- * available in a Walmart medication list. All fills must match the pricing information
- * to be included in the total price calculation.
- *
- * @param {types.Fill[]} fills - An array of fills representing the medications in the order.
- * @returns {number} The total price of the order.
- */
-export const getTotalWalmartOrderPrice = (fills: types.Fill[]): number | null => {
-  let totalPrice = 0;
-
-  for (const fill of fills) {
-    // Check if the fill is in the walmartMedLookup list
-    const match = walmartMedLookup.find(
-      (med) =>
-        new RegExp(`${med.name}.*${med.strength}`, 'i').test(fill.treatment.name) &&
-        // If data has medication form, few do, check against that as well
-        (!med.form || fill.treatment.name.toLowerCase().includes(med.form)) &&
-        med.daysSupply === fill?.prescription?.daysSupply &&
-        med.dispenseQuantity === fill?.prescription?.dispenseQuantity
-    );
-
-    // If no match found, exit
-    if (!match) {
-      return null;
-    }
-
-    // If a matching fill is found, add its price to the total price
-    totalPrice += match.price;
-  }
-
-  // If all fills match, return the total price; otherwise, return 0
-  return totalPrice;
-};
