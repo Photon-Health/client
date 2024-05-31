@@ -47,7 +47,7 @@ const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
 
 export const Pharmacy = () => {
-  const { order, flattenedFills, setOrder, isDemo, totalWalmartPrice } = useOrderContext();
+  const { order, flattenedFills, setOrder, isDemo } = useOrderContext();
 
   const orgSettings = getSettings(order?.organization.id);
 
@@ -292,42 +292,6 @@ export const Pharmacy = () => {
     []
   );
 
-  const getWalmart = useCallback(
-    async ({
-      enable24Hr,
-      enableOpenNow,
-      latitude,
-      longitude
-    }: {
-      enable24Hr: boolean;
-      enableOpenNow: boolean;
-      latitude: number | undefined;
-      longitude: number | undefined;
-    }) => {
-      if (latitude == null || longitude == null) {
-        return [];
-      }
-
-      try {
-        const topRankedWalmart: EnrichedPharmacy[] = await getPharmacies({
-          searchParams: { latitude, longitude, radius: PHARMACY_SEARCH_RADIUS_IN_MILES },
-          limit: 1,
-          offset: 0,
-          isOpenNow: enableOpenNow,
-          is24hr: enable24Hr,
-          name: 'walmart'
-        });
-        if (topRankedWalmart.length > 0) {
-          return [topRankedWalmart[0]];
-        }
-      } catch {
-        // no walgreens found :(
-      }
-      return [];
-    },
-    []
-  );
-
   const loadPharmacies = useCallback(
     async ({
       enable24Hr,
@@ -387,13 +351,6 @@ export const Pharmacy = () => {
           ];
         }
 
-        if (totalWalmartPrice) {
-          topRankedPharmacies = [
-            ...(await getWalmart({ latitude, longitude, enable24Hr, enableOpenNow })),
-            ...topRankedPharmacies
-          ];
-        }
-
         const pharmacies = await loadPharmacies({ latitude, longitude, enable24Hr, enableOpenNow });
 
         if (pharmacies?.length === 0) {
@@ -418,7 +375,6 @@ export const Pharmacy = () => {
     enableTopRankedWalgreens,
     getCostco,
     getWalgreens,
-    getWalmart,
     isDemo,
     latitude,
     loadPharmacies,
