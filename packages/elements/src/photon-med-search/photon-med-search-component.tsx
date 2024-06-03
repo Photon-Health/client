@@ -24,6 +24,7 @@ const GET_CATALOGS = gql`
     }
   }
 `;
+
 const GET_PRODUCTS = gql`
   query GetProducts($medId: String!) {
     medicationProducts(id: $medId) {
