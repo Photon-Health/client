@@ -107,7 +107,6 @@ customElement(
           variables: { medId: id }
         });
 
-        setAddToCatalog(false);
         setSelectedMedication(undefined);
         setProducts(data.medicationProducts);
       };
