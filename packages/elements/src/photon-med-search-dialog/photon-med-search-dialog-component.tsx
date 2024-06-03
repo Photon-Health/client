@@ -93,7 +93,6 @@ const Component = (props: MedSearchDialogProps) => {
           <Button variant="secondary" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button onClick={handleConfirm} disabled={!medication()}>
           <Button onClick={handleConfirm} disabled={!medication()} loading={submitting()}>
             Select Medication
           </Button>
