@@ -318,7 +318,7 @@ export const AdvancedDrugSearch = ({
   const [addToCatalog, setAddToCatalog] = useState<boolean>(true);
 
   const isMobile = useBreakpointValue({ base: true, md: false }) || forceMobile;
-  console.log('???');
+
   return (
     <VStack align="stretch">
       <Stack flexDir={isMobile ? 'column' : 'row'} gap="2" alignItems="flex-end">
