@@ -315,10 +315,10 @@ export const AdvancedDrugSearch = ({
   const [debouncedFilterText] = useDebounce(filterText, 300);
   const [conceptId, setConceptId] = useState<string | undefined>();
   const [medId, setMedId] = useState<string | undefined>();
-  const [addToCatalog, setAddToCatalog] = useState<boolean>(false);
+  const [addToCatalog, setAddToCatalog] = useState<boolean>(true);
 
   const isMobile = useBreakpointValue({ base: true, md: false }) || forceMobile;
-
+  console.log('???');
   return (
     <VStack align="stretch">
       <Stack flexDir={isMobile ? 'column' : 'row'} gap="2" alignItems="flex-end">

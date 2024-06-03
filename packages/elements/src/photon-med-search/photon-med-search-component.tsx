@@ -50,7 +50,7 @@ customElement(
     const [concept, setConcept] = createSignal<SearchMedication | undefined>(undefined);
     const [medicationId, setMedicationId] = createSignal<string>('');
     const [products, setProducts] = createSignal<(Medication | SearchMedication)[]>([]);
-    const [addToCatalog, setAddToCatalog] = createSignal<boolean>(false);
+    const [addToCatalog, setAddToCatalog] = createSignal<boolean>(true);
     const [selectedMedication, setSelectedMedication] = createSignal<Medication | undefined>(
       undefined
     );

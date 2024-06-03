@@ -17,8 +17,9 @@ const Component = (props: MedSearchDialogProps) => {
   const [medication, setMedication] = createSignal<Medication | SearchMedication | undefined>(
     undefined
   );
-  const [addToCatalog, setAddToCatalog] = createSignal<boolean>(false);
+  const [addToCatalog, setAddToCatalog] = createSignal<boolean>(true);
   const [catalogId, setCatalogId] = createSignal<string>('');
+  const [submitting, setSubmitting] = createSignal(false);
 
   const dispatchMedicationSelected = () => {
     const event = new CustomEvent('photon-medication-selected', {
@@ -41,6 +42,7 @@ const Component = (props: MedSearchDialogProps) => {
 
   const handleConfirm = async () => {
     if (addToCatalog()) {
+      setSubmitting(true);
       const addCatalogMutation = client!.getSDK().clinical.catalog.addToCatalog({});
       try {
         await addCatalogMutation({
@@ -57,6 +59,7 @@ const Component = (props: MedSearchDialogProps) => {
 
     dispatchMedicationSelected();
     props.open = false;
+    setSubmitting(false);
   };
 
   const handleCancel = () => {
@@ -91,6 +94,7 @@ const Component = (props: MedSearchDialogProps) => {
             Cancel
           </Button>
           <Button onClick={handleConfirm} disabled={!medication()}>
+          <Button onClick={handleConfirm} disabled={!medication()} loading={submitting()}>
             Select Medication
           </Button>
         </div>
