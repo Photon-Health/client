@@ -121,7 +121,9 @@ export function PharmacySelect(props: PharmacySelectProps) {
               patientId={props?.patientIds?.[0]}
               setPharmacy={(pharmacy) => {
                 setLocalPharmId(pharmacy.id);
-                props.setPharmacyId(pharmacy.id);
+                if (activeTab() === TabNamesEnum.localPickup) {
+                  props.setPharmacyId(pharmacy.id);
+                }
               }}
               setPreferred={(shouldSetPreferred) =>
                 props?.setPreferredPharmacy?.(shouldSetPreferred)
@@ -137,7 +139,9 @@ export function PharmacySelect(props: PharmacySelectProps) {
               initSelected={props?.mailOrderPharmacyIds?.[0]}
               setSelected={(pharmacyId) => {
                 setMailOrderId(pharmacyId);
-                props.setPharmacyId(pharmacyId);
+                if (activeTab() === TabNamesEnum.mailOrder) {
+                  props.setPharmacyId(pharmacyId);
+                }
               }}
             >
               <For each={props?.mailOrderPharmacyIds || []}>
