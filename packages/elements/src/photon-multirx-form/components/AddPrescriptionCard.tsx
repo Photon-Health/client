@@ -373,7 +373,7 @@ export const AddPrescriptionCard = (props: {
             <photon-number-input
               class="flex-grow flex-shrink flex-1"
               label="Refills"
-              value={props.store.refillsInput?.value ?? 0}
+              value={props.store.refillsInput?.value}
               required="true"
               min={0}
               invalid={props.store.refillsInput?.error ?? false}

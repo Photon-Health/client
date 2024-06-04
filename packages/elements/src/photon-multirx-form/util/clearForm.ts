@@ -24,7 +24,7 @@ const clearForm = (
   });
   actions.updateFormValue({
     key: 'refillsInput',
-    value: 0
+    value: undefined
   });
   actions.updateFormValue({
     key: 'instructions',
