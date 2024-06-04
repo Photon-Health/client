@@ -35,6 +35,21 @@ export interface DoseCalculatorProps {
   }) => void;
 }
 
+const cleanWeightUnit = (
+  weightUnitRaw: WeightUnit | string | undefined
+): WeightUnit | undefined => {
+  switch (weightUnitRaw?.toLowerCase()) {
+    case 'kg':
+    case 'kgs':
+      return 'kg';
+    case 'lb':
+    case 'lbs':
+      return 'lbs';
+    default:
+      return undefined;
+  }
+};
+
 const sanitizeValue = (value: number): number => (isNaN(value) || !isFinite(value) ? 0 : value);
 
 export default function DoseCalculator(props: DoseCalculatorProps) {
@@ -54,11 +69,15 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
   const [dosesPerDay, setDosesPerDay] = createSignal<number>(1);
 
   onMount(() => {
-    if (props.weight) {
-      setWeight(props.weight || 0);
-    }
-    if (props.weightUnit) {
-      setWeightUnit(props.weightUnit as WeightUnit);
+    // We only set the weight and weight unit if we have a valid value
+    const cleanedWeightUnit = cleanWeightUnit(props.weightUnit);
+    if (cleanedWeightUnit) {
+      if (props.weight) {
+        setWeight(props.weight);
+      }
+      if (props.weightUnit) {
+        setWeightUnit(cleanedWeightUnit);
+      }
     }
   });
 
