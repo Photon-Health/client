@@ -115,7 +115,6 @@ export function PharmacySelect(props: PharmacySelectProps) {
         </Show>
 
         <Show when={tabs().includes(TabNamesEnum.localPickup)}>
-          {activeTab()}
           <div class={activeTab() !== TabNamesEnum.localPickup ? 'hidden' : ''}>
             <PharmacySearch
               address={props?.address || ''}
