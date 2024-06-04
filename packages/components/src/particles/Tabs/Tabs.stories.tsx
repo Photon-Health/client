@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/html';
 import { ComponentProps, createSignal } from 'solid-js';
 import Tabs, { TabsProps } from '.';
 
-type TabsStory = StoryObj<TabsProps>;
+type TabsStory = StoryObj<TabsProps<any>>;
 
 const meta: Meta<ComponentProps<typeof Tabs>> = {
   title: 'Tabs',
