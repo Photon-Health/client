@@ -66,15 +66,13 @@ const Component = (props: {
   const dispatchPrescriptionsCreated = (
     createOrder: boolean,
     prescriptionIds: string[],
-    patientId: string,
-    pharmacyId: string
+    patientId: string
   ) => {
     const event = new CustomEvent('photon-prescriptions-created', {
       composed: true,
       bubbles: true,
       detail: {
         patientId,
-        pharmacyId,
         prescriptionIds,
         createOrder
       }
