@@ -1,3 +1,4 @@
+// NOTE this should match DosageCalc/conversionFactors in the app
 export type WeightUnits = 'lb' | 'kg' | 'oz' | 'g';
 export type LiquidDosageUnits = 'mcg' | 'mg' | 'g';
 export type LiquidVolumeUnits = 'mL' | 'L';

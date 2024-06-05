@@ -29,7 +29,7 @@ import {
   LiquidDosageUnits,
   ValueWithUnits,
   WeightUnits
-} from './weightHelpers';
+} from './conversionFactors';
 
 interface DosageCalcInputs {
   input: {
