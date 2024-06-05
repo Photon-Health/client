@@ -93,12 +93,6 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
   });
 
   const dose = createMemo(() => {
-    console.log(
-      'dose',
-      { unit: dosageUnit(), value: dosage() },
-      { unit: weightUnit(), value: weight() }
-    );
-
     return weight()
       ? calculateDosage(
           { unit: dosageUnit(), value: dosage() },
@@ -109,7 +103,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
 
   const liquidDose = createMemo(() =>
     calculateLiquidDosage(
-      { unit: dosageUnit(), value: dosage() },
+      { unit: dosageUnit(), value: dose() },
       { unit: liquidUnit(), value: liquidConcentration() },
       { unit: perVolumeUnit(), value: perVolume() }
     )
