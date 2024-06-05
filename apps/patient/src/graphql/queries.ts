@@ -25,7 +25,7 @@ export const GET_ORDER = gql`
         state
         trackingNumber
         minutesUntilReady
-        createdAt
+        pharmacyEstimatedReadyAt
       }
       pharmacy {
         id
