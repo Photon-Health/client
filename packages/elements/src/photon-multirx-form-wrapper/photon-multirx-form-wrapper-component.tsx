@@ -27,6 +27,7 @@ const Component = (props: {
   enableMedHistoryLinks: boolean;
   hideTemplates?: boolean;
   patientId?: string;
+  pharmacyId?: string;
   templateIds?: string;
   prescriptionIds?: string;
   weight?: number;
@@ -65,13 +66,15 @@ const Component = (props: {
   const dispatchPrescriptionsCreated = (
     createOrder: boolean,
     prescriptionIds: string[],
-    patientId: string
+    patientId: string,
+    pharmacyId: string
   ) => {
     const event = new CustomEvent('photon-prescriptions-created', {
       composed: true,
       bubbles: true,
       detail: {
         patientId,
+        pharmacyId,
         prescriptionIds,
         createOrder
       }
@@ -241,6 +244,7 @@ const Component = (props: {
                 enable-local-pickup={props.enableLocalPickup}
                 enable-send-to-patient={props.enableSendToPatient}
                 enable-combine-and-duplicate={props.enableCombineAndDuplicate}
+                pharmacy-id={props.pharmacyId}
                 mail-order-ids={props.mailOrderIds}
                 trigger-submit={triggerSubmit()}
                 set-trigger-submit={setTriggerSubmit}
