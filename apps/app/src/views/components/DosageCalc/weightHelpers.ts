@@ -1,14 +1,14 @@
 export type WeightUnits = 'lb' | 'kg' | 'oz' | 'g';
 export const weightUnits: WeightUnits[] = ['lb', 'kg', 'oz', 'g'];
 
-export type WeightValue<T extends WeightUnits> = number & { __brand: T };
+export type WeightValue<T extends WeightUnits = WeightUnits> = number & { __brand: T };
 export type Pounds = WeightValue<'lb'>;
 export type Kilo = WeightValue<'kg'>;
 export type Ounces = WeightValue<'oz'>;
 export type Grams = WeightValue<'g'>;
 
-const poundsToKilo = (pounds: Pounds) => (2.20462 * pounds) as Kilo;
-const kiloToPounds = (kilo: Kilo) => (0.453592 * kilo) as Pounds;
+const poundsToKilo = (pounds: Pounds) => (0.453592 * pounds) as Kilo;
+const kiloToPounds = (kilo: Kilo) => (2.20462 * kilo) as Pounds;
 const ozToPounds = (ozs: Ounces) => (ozs / 16) as Pounds;
 const gramsToKilo = (grams: Grams) => (grams / 1000) as Kilo;
 const ozsToKilo = (ozs: Ounces) => poundsToKilo(ozToPounds(ozs));
@@ -59,17 +59,22 @@ export const convertWeightToDosageUnits = (
   dosageUnit: WeightUnits,
   weight: ValueWithUnits<WeightUnits>
 ) => {
+  console.log('YY', dosageUnit, weight);
   // Need to cast to `any` because TS narrowing won't work
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return CONVERSION_MAP[weight.unit][dosageUnit](weight.value as any);
 };
 
-type LiquidNumeratorValue<T extends LiquidNumeratorUnits = LiquidNumeratorUnits> = number & {
+export type LiquidNumeratorValue<T extends LiquidNumeratorUnits = LiquidNumeratorUnits> = number & {
   __brand: T;
 };
+export type LiquidDenominatorValue<T extends LiquidDenominatorUnits = LiquidDenominatorUnits> =
+  number & {
+    __brand: T;
+  };
 
-type MicroGrams = LiquidNumeratorValue<'mcg'>;
-type Miligrams = LiquidNumeratorValue<'mg'>;
+export type MicroGrams = LiquidNumeratorValue<'mcg'>;
+export type Miligrams = LiquidNumeratorValue<'mg'>;
 
 type LiquidConversionFunction<T extends LiquidNumeratorUnits, U extends LiquidNumeratorUnits> = (
   input: LiquidNumeratorValue<T>
@@ -113,7 +118,7 @@ const getDosageNumerator = <D extends DosageUnits>(dosage: D): DosageUnitsNumera
   return dosage.split('/')[0] as DosageUnitsNumerator<D>;
 };
 
-export const convertCompatibleLiquid = (
+export const convertLiquidToDosageUnit = (
   dosageUnit: DosageUnits,
   liquid: ValueWithUnits<LiquidNumeratorUnits>
 ) => {
@@ -147,6 +152,6 @@ export const calculateLiquidDosage = (
   drugDosage: ValueWithUnits<LiquidNumeratorUnits>,
   perVolume: ValueWithUnits<LiquidDenominatorUnits>
 ) => {
-  const volumeInMl = perVolume.unit === 'L' ? perVolume.value * 1000 : perVolume.value;
-  return (dosage.value * volumeInMl) / convertCompatibleLiquid(dosage.unit, drugDosage);
+  const volumeInML = perVolume.unit === 'L' ? perVolume.value * 1000 : perVolume.value;
+  return (dosage.value * volumeInML) / convertLiquidToDosageUnit(dosage.unit, drugDosage);
 };
