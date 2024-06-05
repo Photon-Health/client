@@ -1,7 +1,21 @@
 export type WeightUnits = 'lb' | 'kg' | 'oz' | 'g';
-export const weightUnits: WeightUnits[] = ['lb', 'kg', 'oz', 'g'];
+export type LiquidDosageUnits = 'mcg' | 'mg' | 'g';
+export type LiquidVolumeUnits = 'mL' | 'L';
+export type DosageUnits = 'mcg/kg' | 'mg/kg' | 'g/kg';
 
-export type WeightValue<T extends WeightUnits = WeightUnits> = number & { __brand: T };
+export const weightUnits: WeightUnits[] = ['lb', 'kg', 'oz', 'g'];
+export const liquidDosageUnits: LiquidDosageUnits[] = ['mcg', 'mg', 'g'];
+export const liquidVolumeUnits: LiquidVolumeUnits[] = ['mL', 'L'];
+export const dosageUnits: DosageUnits[] = ['mcg/kg', 'mg/kg', 'g/kg'];
+
+export type DosageValue<T extends DosageUnits = DosageUnits> = number & { __brand: T };
+
+export type LiquidDoseValue<T extends LiquidDosageUnits = LiquidDosageUnits> = BrandedValue<T>;
+export type LiquidVolumeValue<T extends LiquidVolumeUnits = LiquidVolumeUnits> = BrandedValue<T>;
+export type MicroGrams = LiquidDoseValue<'mcg'>;
+export type Miligrams = LiquidDoseValue<'mg'>;
+
+export type WeightValue<T extends WeightUnits = WeightUnits> = BrandedValue<T>;
 export type Pounds = WeightValue<'lb'>;
 export type Kilo = WeightValue<'kg'>;
 export type Ounces = WeightValue<'oz'>;
@@ -16,19 +30,17 @@ const gramsToPounds = (grams: Grams) => kiloToPounds(gramsToKilo(grams));
 const kiloToGrams = (kilo: Kilo) => (1000 * kilo) as Grams;
 const poundsToOunces = (pounds: Pounds) => (16 * pounds) as Ounces;
 
-export type ValueWithUnits<Unit> = { unit: Unit; value: number & { __brand: Unit } };
-
-// Define the types for the conversion functions
-type WeightConversionFunction<T extends WeightUnits, U extends WeightUnits> = (
-  input: WeightValue<T>
-) => WeightValue<U>;
-
-// Define the type for the nested conversion map
-type WeightConversionMap = {
-  [T in WeightUnits]: { [U in WeightUnits]: WeightConversionFunction<T, U> };
+type BrandedValue<T = string> = number & { __brand: T };
+type ConversionFunction<Base, T extends Base, U extends Base> = (
+  input: BrandedValue<T>
+) => BrandedValue<U>;
+type UnitConversionMap<Base extends string> = {
+  [T in Base]: { [U in Base]: ConversionFunction<Base, T, U> };
 };
 
-const CONVERSION_MAP: WeightConversionMap = {
+export type ValueWithUnits<Unit> = { unit: Unit; value: BrandedValue<Unit> };
+
+const WEIGHT_CONVERSION_MAP: UnitConversionMap<WeightUnits> = {
   lb: {
     lb: (pounds: Pounds) => pounds,
     kg: poundsToKilo,
@@ -59,30 +71,12 @@ export const convertWeightToDosageUnits = (
   dosageUnit: WeightUnits,
   weight: ValueWithUnits<WeightUnits>
 ) => {
-  console.log('YY', dosageUnit, weight);
   // Need to cast to `any` because TS narrowing won't work
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return CONVERSION_MAP[weight.unit][dosageUnit](weight.value as any);
+  return WEIGHT_CONVERSION_MAP[weight.unit][dosageUnit](weight.value as any);
 };
 
-export type LiquidNumeratorValue<T extends LiquidNumeratorUnits = LiquidNumeratorUnits> = number & {
-  __brand: T;
-};
-export type LiquidDenominatorValue<T extends LiquidDenominatorUnits = LiquidDenominatorUnits> =
-  number & {
-    __brand: T;
-  };
-
-export type MicroGrams = LiquidNumeratorValue<'mcg'>;
-export type Miligrams = LiquidNumeratorValue<'mg'>;
-
-type LiquidConversionFunction<T extends LiquidNumeratorUnits, U extends LiquidNumeratorUnits> = (
-  input: LiquidNumeratorValue<T>
-) => LiquidNumeratorValue<U>;
-
-const LIQUID_CONVERSION_MAP: {
-  [T in LiquidNumeratorUnits]: { [U in LiquidNumeratorUnits]: LiquidConversionFunction<T, U> };
-} = {
+const LIQUID_CONVERSION_MAP: UnitConversionMap<LiquidDosageUnits> = {
   g: {
     g: (g) => g,
     mcg: (g) => (g * 1000 * 1000) as MicroGrams,
@@ -100,12 +94,6 @@ const LIQUID_CONVERSION_MAP: {
   }
 };
 
-export type DosageValue<T extends DosageUnits = DosageUnits> = number & {
-  __brand: T;
-};
-export type DosageUnits = 'mcg/kg' | 'mg/kg' | 'g/kg';
-export const dosageUnits: DosageUnits[] = ['mcg/kg', 'mg/kg', 'g/kg'];
-
 type DosageUnitsNumerator<T extends DosageUnits> = T extends 'mcg/kg'
   ? 'mcg'
   : T extends 'mg/kg'
@@ -120,18 +108,16 @@ const getDosageNumerator = <D extends DosageUnits>(dosage: D): DosageUnitsNumera
 
 export const convertLiquidToDosageUnit = (
   dosageUnit: DosageUnits,
-  liquid: ValueWithUnits<LiquidNumeratorUnits>
+  liquid: ValueWithUnits<LiquidDosageUnits>
 ) => {
   // Typescript can't narrow properly here
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return LIQUID_CONVERSION_MAP[liquid.unit][getDosageNumerator(dosageUnit)](liquid.value as any);
 };
 
-export type LiquidNumeratorUnits = 'mcg' | 'mg' | 'g';
-export type LiquidDenominatorUnits = 'mL' | 'L';
-
 export const getDosageWeightUnits = (dosageUnit: DosageUnits): WeightUnits => {
   // Note: it appears that all dosages are specified in terms of kg
+  // If in the future this changes, we'll get a type error here
   switch (dosageUnit) {
     case 'g/kg':
     case 'mg/kg':
@@ -143,14 +129,15 @@ export const getDosageWeightUnits = (dosageUnit: DosageUnits): WeightUnits => {
 export const calculateDosage = (
   dosage: ValueWithUnits<DosageUnits>,
   weight: ValueWithUnits<WeightUnits>
-) => {
-  return dosage.value * convertWeightToDosageUnits(getDosageWeightUnits(dosage.unit), weight);
+): DosageValue => {
+  return (dosage.value *
+    convertWeightToDosageUnits(getDosageWeightUnits(dosage.unit), weight)) as DosageValue;
 };
 
 export const calculateLiquidDosage = (
-  dosage: { unit: DosageUnits; value: number },
-  drugDosage: ValueWithUnits<LiquidNumeratorUnits>,
-  perVolume: ValueWithUnits<LiquidDenominatorUnits>
+  dosage: ValueWithUnits<DosageUnits>,
+  drugDosage: ValueWithUnits<LiquidDosageUnits>,
+  perVolume: ValueWithUnits<LiquidVolumeUnits>
 ) => {
   const volumeInML = perVolume.unit === 'L' ? perVolume.value * 1000 : perVolume.value;
   return (dosage.value * volumeInML) / convertLiquidToDosageUnit(dosage.unit, drugDosage);

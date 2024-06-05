@@ -5,16 +5,17 @@ import Icon from '../../../particles/Icon';
 import Input from '../../../particles/Input';
 import InputGroup from '../../../particles/InputGroup';
 import {
-  DosageUnits,
   DosageValue,
-  LiquidDenominatorUnits,
-  LiquidDenominatorValue,
-  LiquidNumeratorUnits,
-  LiquidNumeratorValue,
+  LiquidDoseValue,
+  LiquidVolumeUnits,
+  LiquidVolumeValue,
   WeightUnits,
   WeightValue,
   calculateDosage,
-  calculateLiquidDosage
+  calculateLiquidDosage,
+  dosageUnits,
+  liquidDosageUnits,
+  liquidVolumeUnits
 } from '../utils/conversionFactors';
 import UnitSelect from './UnitSelect';
 
@@ -22,11 +23,8 @@ const round = (num: number) => parseFloat(num.toFixed(1));
 
 type DosageFrequency = 'day' | 'dose';
 
-const dosageUnits: DosageUnits[] = ['mcg/kg', 'mg/kg', 'g/kg'];
 const dosageFrequencies: DosageFrequency[] = ['day', 'dose'];
 const weightUnits: WeightUnits[] = ['lb', 'kg'];
-const liquidConcentrationUnits: LiquidNumeratorUnits[] = ['mcg', 'mg', 'g'];
-const liquidVolumes: LiquidDenominatorUnits[] = ['mL', 'L'];
 
 export interface DoseCalculatorProps {
   open: boolean;
@@ -38,7 +36,7 @@ export interface DoseCalculatorProps {
     days: number;
     liquidDose: number;
     totalLiquid: number;
-    unit: LiquidDenominatorUnits;
+    unit: LiquidVolumeUnits;
   }) => void;
 }
 
@@ -67,11 +65,11 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
   const [weight, setWeight] = createSignal(0 as WeightValue);
   const [weightUnit, setWeightUnit] = createSignal(weightUnits[0]);
 
-  const [liquidConcentration, setLiquidConcentration] = createSignal(0 as LiquidNumeratorValue);
-  const [liquidUnit, setLiquidUnit] = createSignal(liquidConcentrationUnits[0]);
+  const [liquidConcentration, setLiquidConcentration] = createSignal(0 as LiquidDoseValue);
+  const [liquidUnit, setLiquidUnit] = createSignal(liquidDosageUnits[0]);
 
-  const [perVolume, setPerVolume] = createSignal(0 as LiquidDenominatorValue);
-  const [perVolumeUnit, setPerVolumeUnit] = createSignal(liquidVolumes[0]);
+  const [perVolume, setPerVolume] = createSignal(0 as LiquidVolumeValue);
+  const [perVolumeUnit, setPerVolumeUnit] = createSignal(liquidVolumeUnits[0]);
 
   const [daysSupply, setDaysSupply] = createSignal<number>(1);
   const [dosesPerDay, setDosesPerDay] = createSignal<number>(1);
@@ -93,12 +91,13 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
   });
 
   const dose = createMemo(() => {
-    return weight()
+    // Need to do this because sometimes weightUnit is null
+    return weightUnit()
       ? calculateDosage(
           { unit: dosageUnit(), value: dosage() },
           { unit: weightUnit(), value: weight() }
         )
-      : 0;
+      : (0 as DosageValue);
   });
 
   const liquidDose = createMemo(() =>
@@ -193,16 +192,10 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
                 inputmode="decimal"
                 value={liquidConcentration()}
                 onInput={(e) =>
-                  setLiquidConcentration(
-                    (e.currentTarget?.valueAsNumber ?? 0) as LiquidNumeratorValue
-                  )
+                  setLiquidConcentration((e.currentTarget?.valueAsNumber ?? 0) as LiquidDoseValue)
                 }
               />
-              <UnitSelect
-                setSelected={setLiquidUnit}
-                options={liquidConcentrationUnits}
-                initialIdx={1}
-              />
+              <UnitSelect setSelected={setLiquidUnit} options={liquidDosageUnits} initialIdx={1} />
             </div>
           </InputGroup>
           <InputGroup label="Per Volume">
@@ -212,10 +205,10 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
                 inputmode="decimal"
                 value={perVolume()}
                 onInput={(e) =>
-                  setPerVolume((e.currentTarget?.valueAsNumber ?? 0) as LiquidDenominatorValue)
+                  setPerVolume((e.currentTarget?.valueAsNumber ?? 0) as LiquidVolumeValue)
                 }
               />
-              <UnitSelect setSelected={setPerVolumeUnit} options={liquidVolumes} />
+              <UnitSelect setSelected={setPerVolumeUnit} options={liquidVolumeUnits} />
             </div>
           </InputGroup>
         </div>
