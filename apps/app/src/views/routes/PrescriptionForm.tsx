@@ -17,6 +17,7 @@ export const PrescriptionForm = () => {
   const { user } = usePhoton();
   const [params] = useSearchParams();
   const patientId = params.get('patientId') || '';
+  const pharmacyId = params.get('pharmacyId') || '';
   const templateIds = params.get('templateIds') || '';
   const prescriptionIds = params.get('prescriptionIds') || '';
   const weight = params.get('weight') || '';
@@ -110,6 +111,7 @@ export const PrescriptionForm = () => {
           ref={ref}
           template-ids={templateIds}
           patient-id={patientId}
+          pharmacy-id={pharmacyId}
           prescription-ids={prescriptionIds}
           weight={weight}
           weight-unit={weightUnit}
