@@ -291,6 +291,7 @@ customElement(
   {
     hideTemplates: false,
     patientId: undefined,
+    pharmacyId: undefined,
     templateIds: undefined,
     prescriptionIds: undefined,
     weight: undefined,
