@@ -25,8 +25,8 @@ import {
   calculateLiquidDosage,
   DosageUnits,
   dosageUnits,
-  LiquidDenominatorUnits,
-  LiquidNumeratorUnits,
+  LiquidVolumeUnits,
+  LiquidDosageUnits,
   ValueWithUnits,
   WeightUnits
 } from './weightHelpers';
@@ -37,8 +37,8 @@ interface DosageCalcInputs {
     weight: ValueWithUnits<WeightUnits>;
   };
   liquid_formation: {
-    drug_amount: ValueWithUnits<LiquidNumeratorUnits>;
-    per_volume: ValueWithUnits<LiquidDenominatorUnits>;
+    drug_amount: ValueWithUnits<LiquidDosageUnits>;
+    per_volume: ValueWithUnits<LiquidVolumeUnits>;
   };
 }
 
@@ -48,8 +48,8 @@ const initialValues: DosageCalcInputs = {
     weight: { value: 0, unit: 'lb' } as ValueWithUnits<WeightUnits>
   },
   liquid_formation: {
-    drug_amount: { value: 0, unit: 'mg' } as ValueWithUnits<LiquidNumeratorUnits>,
-    per_volume: { value: 0, unit: 'mL' } as ValueWithUnits<LiquidDenominatorUnits>
+    drug_amount: { value: 0, unit: 'mg' } as ValueWithUnits<LiquidDosageUnits>,
+    per_volume: { value: 0, unit: 'mL' } as ValueWithUnits<LiquidVolumeUnits>
   }
 };
 
