@@ -143,6 +143,13 @@ const organizationSettings: {
     mailOrderProviders: [CUREXA_PHARMACY_ID],
     sendToPatient: false
   },
+  // DrTelx
+  org_XwCIUzcnim5PfPJa: {
+    pickUp: false,
+    mailOrder: true,
+    enableRxAndOrder: false,
+    mailOrderProviders: [TAILORMADE_PHARMACY_ID, GOGOMEDS_PHARMACY_ID, EMPOWER_PHARMACY_ID]
+  },
   // Emily's Test environment (us)
   org_KPfcKzFtfzD3ISxW: {
     pickUp: false,
