@@ -434,7 +434,7 @@ export const Pharmacy = () => {
   ): void => {
     // Get pharmacy index in list
     const index = pharmacies.findIndex((p) => p.id === selectedPharmacyId);
-    if (index != -1) {
+    if (index !== -1) {
       ReactGA.event({
         category: 'Pharmacy',
         action: 'Select',
