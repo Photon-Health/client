@@ -10,12 +10,20 @@ enum SendToPatientEnum {
   sendToPatient = 'SEND_TO_PATIENT'
 }
 
+export enum TabNamesEnum {
+  sendToPatient = 'Send to Patient',
+  localPickup = 'Local Pickup',
+  mailOrder = 'Mail Order'
+}
+
 export type FulfillmentType = types.FulfillmentType | SendToPatientEnum;
 
-export type FulfillmentOptions = {
-  name: string;
+export type FulfillmentOption = {
+  name: TabNamesEnum;
   fulfillmentType: FulfillmentType;
-}[];
+};
+
+export type FulfillmentOptions = FulfillmentOption[];
 
 interface PharmacySelectProps {
   enableSendToPatient?: boolean; // declaritively displays Send to Patient tab
@@ -31,68 +39,60 @@ interface PharmacySelectProps {
 
 const fulfillmentOptions: FulfillmentOptions = [
   {
-    name: 'Send to Patient',
+    name: TabNamesEnum.sendToPatient,
     fulfillmentType: SendToPatientEnum.sendToPatient
   },
   {
-    name: 'Local Pickup',
+    name: TabNamesEnum.localPickup,
     fulfillmentType: types.FulfillmentType.PickUp
   },
   {
-    name: 'Mail Order',
+    name: TabNamesEnum.mailOrder,
     fulfillmentType: types.FulfillmentType.MailOrder
   }
 ];
-
 // if SEND_TO_PATIENT, fulfillment type is returned as undefined
-const parseFulfillmentType = (type: FulfillmentType) => {
+const parseFulfillmentType = (type: FulfillmentType | undefined) => {
   return type === 'SEND_TO_PATIENT' ? undefined : type;
 };
 
 export function PharmacySelect(props: PharmacySelectProps) {
-  const [loadedTabs, setLoadedTabs] = createSignal<string[]>(['Send to Patient']);
-  const [localPharmId, setLocalPharmId] = createSignal<string>();
-  const [mailOrderId, setMailOrderId] = createSignal<string>();
-
-  // determine which tabs to display based on props
-  // (can safely ignore ESLINT errors as they represent initial values that won't change)
-  const tabs = fulfillmentOptions
-    .filter((option) => {
-      switch (option.fulfillmentType) {
-        case SendToPatientEnum.sendToPatient:
-          return props.enableSendToPatient === true;
-        case types.FulfillmentType.PickUp:
-          return props.enableLocalPickup === true;
-        case types.FulfillmentType.MailOrder:
-          return props.mailOrderPharmacyIds !== undefined;
-        default:
-          return false;
-      }
-    })
-    .map((option) => option.name);
-  const [tab, setTab] = createSignal(tabs[0]);
+  const [localPharmId, setLocalPharmId] = createSignal<string | undefined>();
+  const [mailOrderId, setMailOrderId] = createSignal<string | undefined>();
+  const [tabs, setTabs] = createSignal<TabNamesEnum[]>([]);
+  const [activeTab, setActiveTab] = createSignal<TabNamesEnum>(TabNamesEnum.sendToPatient);
 
   onMount(() => {
-    // sets the initial fulfillment type to 'Send to Patient'
-    props.setFufillmentType(parseFulfillmentType(fulfillmentOptions[0].fulfillmentType));
+    // add the tabs to tabs
+    setTabs([
+      ...(props.enableSendToPatient ? [TabNamesEnum.sendToPatient] : []),
+      ...(props.enableLocalPickup ? [TabNamesEnum.localPickup] : []),
+      ...(props.mailOrderPharmacyIds ? [TabNamesEnum.mailOrder] : [])
+    ]);
+
+    // Fulfillment option from the first tab name
+    const firstOption = fulfillmentOptions.find(
+      (option) => option.name === tabs()[0]
+    )?.fulfillmentType;
+
+    // Sets the initial fulfillment type to the first available tab
+    props.setFufillmentType(parseFulfillmentType(firstOption));
+    setActiveTab(tabs()[0]);
   });
 
-  const handleTabChange = (newTab: string) => {
-    setTab(newTab);
-    if (!loadedTabs().includes(newTab)) {
-      setLoadedTabs([...loadedTabs(), newTab]);
+  const handleTabChange = (newTab: TabNamesEnum) => {
+    setActiveTab(newTab);
+    if (!tabs().includes(newTab)) {
+      setTabs([...tabs(), newTab]);
     }
+
     const type = fulfillmentOptions.find((option) => option.name === newTab)?.fulfillmentType;
-    // @ts-ignore
     props.setFufillmentType(parseFulfillmentType(type));
 
-    // There was a change to not reinitialize each tab body from scratch on tab change.
-    // But that creates a problem where the pharmacy id doesn't update if one
-    // switches back to a tab the second time. Here we take the persisted pharmacyId
-    // if there is one update setPharmacyId
-    if (newTab === 'Local Pickup' && localPharmId()) {
+    // Preserve the selected pharmacy ID for Local Pickup and Mail Order tabs
+    if (newTab === TabNamesEnum.localPickup && localPharmId()) {
       props.setPharmacyId(localPharmId());
-    } else if (newTab === 'Mail Order' && mailOrderId()) {
+    } else if (newTab === TabNamesEnum.mailOrder && mailOrderId()) {
       props.setPharmacyId(mailOrderId());
     } else {
       props.setPharmacyId(undefined);
@@ -101,11 +101,10 @@ export function PharmacySelect(props: PharmacySelectProps) {
 
   return (
     <div>
-      <Tabs tabs={tabs} activeTab={tab()} setActiveTab={handleTabChange} />
-
+      <Tabs<TabNamesEnum> tabs={tabs()} activeTab={activeTab()} setActiveTab={handleTabChange} />
       <div class="pt-4">
-        <Show when={loadedTabs().includes('Send to Patient')}>
-          <div class={tab() !== 'Send to Patient' ? 'hidden' : ''}>
+        <Show when={tabs().includes(TabNamesEnum.sendToPatient)}>
+          <div class={activeTab() !== TabNamesEnum.sendToPatient ? 'hidden' : ''}>
             <Show
               when={(props?.patientIds?.length || 0) > 0}
               fallback={<div>Please select a patient.</div>}
@@ -115,14 +114,16 @@ export function PharmacySelect(props: PharmacySelectProps) {
           </div>
         </Show>
 
-        <Show when={loadedTabs().includes('Local Pickup')}>
-          <div class={tab() !== 'Local Pickup' ? 'hidden' : ''}>
+        <Show when={tabs().includes(TabNamesEnum.localPickup)}>
+          <div class={activeTab() !== TabNamesEnum.localPickup ? 'hidden' : ''}>
             <PharmacySearch
               address={props?.address || ''}
               patientId={props?.patientIds?.[0]}
               setPharmacy={(pharmacy) => {
                 setLocalPharmId(pharmacy.id);
-                props.setPharmacyId(pharmacy.id);
+                if (activeTab() === TabNamesEnum.localPickup) {
+                  props.setPharmacyId(pharmacy.id);
+                }
               }}
               setPreferred={(shouldSetPreferred) =>
                 props?.setPreferredPharmacy?.(shouldSetPreferred)
@@ -131,14 +132,16 @@ export function PharmacySelect(props: PharmacySelectProps) {
           </div>
         </Show>
 
-        <Show when={loadedTabs().includes('Mail Order')}>
-          <div class={tab() !== 'Mail Order' ? 'hidden' : ''}>
+        <Show when={tabs().includes(TabNamesEnum.mailOrder)}>
+          <div class={activeTab() !== TabNamesEnum.mailOrder ? 'hidden' : ''}>
             <RadioGroupCards
               label="Pharmacies"
               initSelected={props?.mailOrderPharmacyIds?.[0]}
               setSelected={(pharmacyId) => {
                 setMailOrderId(pharmacyId);
-                props.setPharmacyId(pharmacyId);
+                if (activeTab() === TabNamesEnum.mailOrder) {
+                  props.setPharmacyId(pharmacyId);
+                }
               }}
             >
               <For each={props?.mailOrderPharmacyIds || []}>
