@@ -1,12 +1,12 @@
 import { createMemo, For } from 'solid-js';
 
-export interface TabsProps {
-  tabs: string[];
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
+export interface TabsProps<T extends string> {
+  tabs: T[];
+  activeTab: T;
+  setActiveTab: (tab: T) => void;
 }
 
-export default function Tabs(props: TabsProps) {
+export default function Tabs<T extends string>(props: TabsProps<T>) {
   const regularClass =
     'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium cursor-pointer';
   const activeClass =
