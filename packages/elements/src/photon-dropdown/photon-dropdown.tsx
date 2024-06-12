@@ -21,7 +21,6 @@ import styles from './style.css?inline';
 
 //Virtual List
 import { createVirtualizer } from '@tanstack/solid-virtual';
-import { set } from 'date-fns';
 
 export const PhotonDropdown = <T extends { id: string }>(props: {
   data: Array<T>;
