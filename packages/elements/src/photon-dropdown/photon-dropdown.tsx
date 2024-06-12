@@ -214,6 +214,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
           if (props.onOpen) {
             await props.onOpen();
           }
+          dropdownRef.reposition();
         }}
         style={{ width: '100%' }}
       >
