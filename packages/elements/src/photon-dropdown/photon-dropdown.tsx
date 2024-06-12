@@ -208,15 +208,14 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             }
           }
           setOpen(false);
+          dropdownRef.reposition();
         }}
         on:sl-show={async () => {
           setOpen(true);
           if (props.onOpen) {
             await props.onOpen();
           }
-          setTimeout(() => {
-            dropdownRef.reposition();
-          }, 500);
+          dropdownRef.reposition();
         }}
         style={{ width: '100%' }}
       >
