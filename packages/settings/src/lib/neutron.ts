@@ -325,5 +325,15 @@ const organizationSettings: {
     pickUp: false,
     sendToPatient: false,
     mailOrderProviders: [CUREXA_PHARMACY_ID]
+  },
+  // Xyon Health
+  org_t9KbrhuLYSeZaqLK: {
+    logo: 'xyon_logo.svg',
+    enableRxAndOrder: false
+  },
+  // Xyon Health 2 (for Eric Liu)
+  org_Nic6tFhWwlsnCvjc: {
+    logo: 'xyon_logo.svg',
+    enableRxAndOrder: false
   }
 };
