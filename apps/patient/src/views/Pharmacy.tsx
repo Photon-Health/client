@@ -42,7 +42,7 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { isGLP } from '../utils/isGLP';
-import ReactGA from 'react-ga';
+import ReactGA from 'react-ga4';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
@@ -435,7 +435,7 @@ export const Pharmacy = () => {
     // Get pharmacy index in list
     const index = pharmacies.findIndex((p) => p.id === selectedPharmacyId);
     if (index !== -1) {
-      ReactGA.event({
+      ReactGA.event('pharmacy_selected', {
         category: 'Pharmacy',
         action: 'Select',
         label: 'Pharmacy Rank',
