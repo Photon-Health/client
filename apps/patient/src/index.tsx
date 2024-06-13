@@ -5,7 +5,7 @@ import { App } from './App';
 
 import { datadogRum } from '@datadog/browser-rum';
 
-import ReactGA from 'react-ga';
+import ReactGA from 'react-ga4';
 
 import pkg from '../package.json';
 
