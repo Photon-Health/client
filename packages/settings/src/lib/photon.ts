@@ -275,6 +275,5 @@ const organizationSettings: {
     pickUp: false,
     sendToPatient: false,
     mailOrderProviders: [CUREXA_PHARMACY_ID]
-  },
-
+  }
 };
