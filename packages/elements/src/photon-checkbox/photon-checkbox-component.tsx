@@ -35,6 +35,7 @@ const Component = (props: {
   };
 
   onMount(() => {
+    setChecked(props.checked);
     dispatchChecked(checked());
   });
 

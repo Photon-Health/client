@@ -27,6 +27,7 @@ const Component = (props: {
   enableMedHistoryLinks: boolean;
   hideTemplates?: boolean;
   patientId?: string;
+  pharmacyId?: string;
   templateIds?: string;
   prescriptionIds?: string;
   weight?: number;
@@ -241,6 +242,7 @@ const Component = (props: {
                 enable-local-pickup={props.enableLocalPickup}
                 enable-send-to-patient={props.enableSendToPatient}
                 enable-combine-and-duplicate={props.enableCombineAndDuplicate}
+                pharmacy-id={props.pharmacyId}
                 mail-order-ids={props.mailOrderIds}
                 trigger-submit={triggerSubmit()}
                 set-trigger-submit={setTriggerSubmit}
@@ -287,6 +289,7 @@ customElement(
   {
     hideTemplates: false,
     patientId: undefined,
+    pharmacyId: undefined,
     templateIds: undefined,
     prescriptionIds: undefined,
     weight: undefined,
