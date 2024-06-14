@@ -1,4 +1,3 @@
-
 # Photon Elements
 
 Photon's collection of customizable and reusable components to help clients integrate seamlessly with our system. Elements can be used to add prescribing functionality into any web-based clinical tool.
@@ -14,7 +13,7 @@ npm i @photonhealth/elements
 ### Usage
 
 ```javascript
-import("@photonhealth/webcomponents").catch((err) => {});
+import('@photonhealth/webcomponents').catch((err) => {});
 ```
 
 You can also import within the `head` tag in HTML:
