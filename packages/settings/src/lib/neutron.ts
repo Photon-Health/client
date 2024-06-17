@@ -330,12 +330,20 @@ const organizationSettings: {
   org_t9KbrhuLYSeZaqLK: {
     logo: 'xyon_logo.svg',
     accentColor: '#365abd',
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
+    sendToPatient: false,
     enableRxAndOrder: false
   },
   // Xyon Health 2 (for Eric Liu)
   org_Nic6tFhWwlsnCvjc: {
     logo: 'xyon_logo.svg',
     accentColor: '#365abd',
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
+    sendToPatient: false,
     enableRxAndOrder: false
   }
 };
