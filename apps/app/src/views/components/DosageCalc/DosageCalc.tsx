@@ -19,146 +19,49 @@ import {
 } from '@chakra-ui/react';
 import { Field, Formik } from 'formik';
 import { MutableRefObject, useEffect, useState } from 'react';
-import { SelectField } from './SelectField';
+import { SelectField } from '../SelectField';
+import {
+  calculateDosage,
+  calculateLiquidDosage,
+  DosageUnits,
+  dosageUnits,
+  LiquidVolumeUnits,
+  LiquidDosageUnits,
+  ValueWithUnits,
+  WeightUnits
+} from './conversionFactors';
 
-const initialValues = {
+interface DosageCalcInputs {
   input: {
-    dosage: {
-      value: 0,
-      unit: 'mg/kg'
-    },
-    weight: {
-      value: 0,
-      unit: 'lb'
-    }
+    dosage: ValueWithUnits<DosageUnits>;
+    weight: ValueWithUnits<WeightUnits>;
+  };
+  liquid_formation: {
+    drug_amount: ValueWithUnits<LiquidDosageUnits>;
+    per_volume: ValueWithUnits<LiquidVolumeUnits>;
+  };
+}
+
+const initialValues: DosageCalcInputs = {
+  input: {
+    dosage: { value: 0, unit: 'mg/kg' } as ValueWithUnits<DosageUnits>,
+    weight: { value: 0, unit: 'lb' } as ValueWithUnits<WeightUnits>
   },
   liquid_formation: {
-    drug_amount: {
-      value: 0,
-      unit: 'mg'
-    },
-    per_volume: {
-      value: 0,
-      unit: 'mL'
-    }
+    drug_amount: { value: 0, unit: 'mg' } as ValueWithUnits<LiquidDosageUnits>,
+    per_volume: { value: 0, unit: 'mL' } as ValueWithUnits<LiquidVolumeUnits>
   }
 };
 
-const compatibleDosageWeight = (dosageUnit: string, weightUnit: string) => {
-  if ((weightUnit === 'kg' || weightUnit === 'g') && dosageUnit.includes('kg')) {
-    return true;
-  }
-  if ((weightUnit === 'lb' || weightUnit === 'oz') && dosageUnit.includes('lb')) {
-    return true;
-  }
-  return false;
-};
-
-const convertCompatibleWeight = (dosageUnit: string, weight: { value: number; unit: string }) => {
-  if (dosageUnit.includes('kg') && weight.unit === 'oz') {
-    return (weight.value / 16) * 0.453592;
-  }
-  if (dosageUnit.includes('kg') && weight.unit === 'lb') {
-    return weight.value * 0.453592;
-  }
-  if (dosageUnit.includes('lb') && weight.unit === 'kg') {
-    return weight.value * 2.20462;
-  }
-  if (dosageUnit.includes('lb') && weight.unit === 'g') {
-    return (weight.value / 1000) * 2.20462;
-  }
-  return 0;
-};
-
-const compatibleLiquid = (dosageUnit: string, liquidDosageUnit: string) => {
-  if (liquidDosageUnit === 'mcg' && dosageUnit.split('/')[0] === 'mcg') {
-    return true;
-  }
-  if (liquidDosageUnit === 'mg' && dosageUnit.split('/')[0] === 'mg') {
-    return true;
-  }
-  if (liquidDosageUnit === 'g' && dosageUnit.split('/')[0] === 'g') {
-    return true;
-  }
-  return false;
-};
-
-const convertCompatibleLiquid = (dosageUnit: string, liquid: { value: number; unit: string }) => {
-  if (dosageUnit.includes('mcg') && liquid.unit === 'mcg') {
-    return liquid.value / (1000 * 1000);
-  }
-  if (dosageUnit.includes('mcg') && liquid.unit === 'g') {
-    return liquid.value * (1000 * 1000);
-  }
-  if (dosageUnit.includes('mg') && liquid.unit === 'mcg') {
-    return liquid.value / 1000;
-  }
-  if (dosageUnit.includes('mg') && liquid.unit === 'g') {
-    return liquid.value * 1000;
-  }
-  if (dosageUnit.includes('g') && liquid.unit === 'mcg') {
-    return liquid.value / (1000 * 1000);
-  }
-  if (dosageUnit.includes('g') && liquid.unit === 'mg') {
-    return liquid.value / 1000;
-  }
-
-  return 0;
-};
-
-const calculateDosage = (
-  dosage: {
-    value: number;
-    unit: string;
-  },
-  weight: { value: number; unit: string }
-) => {
-  if (compatibleDosageWeight(dosage.unit, weight.unit) && weight.unit === 'g') {
-    return dosage.value * (weight.value / 1000);
-  }
-  if (compatibleDosageWeight(dosage.unit, weight.unit) && weight.unit === 'oz') {
-    return dosage.value * (weight.value / 16);
-  }
-  if (compatibleDosageWeight(dosage.unit, weight.unit)) {
-    return dosage.value * weight.value;
-  }
-  return dosage.value * convertCompatibleWeight(dosage.unit, weight);
-};
-
-const calculateLiquidDosage = (
-  dosage: number,
-  dosage_unit: string,
-  drug: number,
-  drug_unit: string,
-  volume: number
-) => {
-  if (
-    drug === 0 ||
-    drug.toString().length === 0 ||
-    parseInt(drug.toString(), 10) === 0 ||
-    window.isNaN(drug)
-  ) {
-    return 0;
-  }
-  if (compatibleLiquid(dosage_unit, drug_unit)) {
-    return (dosage * volume) / drug;
-  }
-  return (dosage * volume) / convertCompatibleLiquid(dosage_unit, { value: drug, unit: drug_unit });
-};
-
-export const DosageCalc = ({
-  isOpen,
-  onClose,
-  quantityRef,
-  drugRef,
-  unitRef
-}: {
+export interface DosageCalcProps {
   isOpen: boolean;
-  onClose: any;
+  onClose: () => void;
   quantityRef: MutableRefObject<any>;
   drugRef: MutableRefObject<any>;
   unitRef: MutableRefObject<any>;
-}) => {
+}
+
+export const DosageCalc = ({ isOpen, onClose, quantityRef, drugRef, unitRef }: DosageCalcProps) => {
   const background = useColorModeValue('white', 'dark');
   const [dose, setDose] = useState<string | undefined>();
   const [liquidDose, setLiquidDose] = useState<string | undefined>();
@@ -173,7 +76,7 @@ export const DosageCalc = ({
         setSelectedMedication('');
       }
     }
-  }, [isOpen]);
+  }, [drugRef, isOpen]);
 
   return (
     <Modal
@@ -198,32 +101,26 @@ export const DosageCalc = ({
           </Flex>
         </ModalHeader>
         <ModalBody padding={0}>
-          <Formik
+          <Formik<DosageCalcInputs>
             initialValues={initialValues}
             onSubmit={() => {}}
             validate={(values) => {
-              let dosage = calculateDosage(values.input.dosage, values.input.weight);
-              if (
-                dosage.toString().split('.').length > 1 &&
-                dosage.toString().split('.')[1].length > 4
-              ) {
-                dosage = parseFloat(dosage.toFixed(4));
-              }
-              let liquidDosage = calculateLiquidDosage(
-                dosage,
-                values.input.dosage.unit.split('/')[0],
-                values.liquid_formation.drug_amount.value,
-                values.liquid_formation.drug_amount.unit,
-                values.liquid_formation.per_volume.value
+              const dosage = calculateDosage(values.input.dosage, values.input.weight);
+              const liquidDosage = calculateLiquidDosage(
+                values.input.dosage,
+                values.liquid_formation.drug_amount,
+                values.liquid_formation.per_volume
               );
-              if (
-                liquidDosage.toString().split('.').length > 1 &&
-                liquidDosage.toString().split('.')[1].length > 4
-              ) {
-                liquidDosage = parseFloat(liquidDosage.toFixed(4));
-              }
-              setDose(`${dosage} ${values.input.dosage.unit.split('/')[0]}`);
-              setLiquidDose(`${liquidDosage} ${values.liquid_formation.per_volume.unit}`);
+              setDose(
+                `${dosage.toFixed(4).replaceAll(/0+$/, '')} ${
+                  values.input.dosage.unit.split('/')[0]
+                }`
+              );
+              setLiquidDose(
+                `${liquidDosage.toFixed(4).replaceAll(/0+$/, '')} ${
+                  values.liquid_formation.per_volume.unit
+                }`
+              );
             }}
           >
             {() => {
@@ -253,20 +150,7 @@ export const DosageCalc = ({
                       <FormControl>
                         <SelectField
                           name="input.dosage.unit"
-                          options={[
-                            {
-                              value: 'mcg/kg',
-                              label: 'mcg/kg'
-                            },
-                            {
-                              value: 'mg/kg',
-                              label: 'mg/kg'
-                            },
-                            {
-                              value: 'g/kg',
-                              label: 'g/kg'
-                            }
-                          ]}
+                          options={dosageUnits.map((u) => ({ value: u, label: u }))}
                         />
                       </FormControl>
                     </HStack>

@@ -272,8 +272,6 @@ const organizationSettings: {
   // Great Many
   org_gvTsxeeYy97qedaS: {
     mailOrder: true,
-    pickUp: false,
-    sendToPatient: false,
     mailOrderProviders: [CUREXA_PHARMACY_ID]
   }
 };
