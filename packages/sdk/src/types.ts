@@ -429,6 +429,7 @@ export type OrderFulfillment = {
   trackingNumber?: Maybe<Scalars['String']>;
   type: FulfillmentType;
   minutesUntilReady?: Maybe<Scalars['Int']>;
+  pharmacyEstimatedReadyAt?: Maybe<Scalars['AWSDateTime']>;
   createdAt?: Scalars['AWSDateTime'];
 };
 

@@ -1,21 +1,10 @@
-import {
-  Box,
-  Button,
-  Container,
-  Heading,
-  Link,
-  Text,
-  VStack,
-  useToast,
-  HStack,
-  Tooltip
-} from '@chakra-ui/react';
+import { Box, Button, Container, Heading, Link, Text, VStack, useToast } from '@chakra-ui/react';
 import { getSettings } from '@client/settings';
 import { types } from '@photonhealth/sdk';
 import queryString from 'query-string';
-import { ReactElement, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { FiCheck, FiNavigation, FiRefreshCcw, FiInfo } from 'react-icons/fi';
+import { FiCheck, FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
 import { BrandedPharmacyCard, DemoCtaModal, PharmacyInfo, PoweredBy } from '../components';
@@ -26,67 +15,7 @@ import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/gen
 import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { HorizontalStatusStepper } from '../components/HorizontalStatusStepper';
-import dayjs from 'dayjs';
-
-function formatReadyTime(baseTime: string, minutesUntilReady: number): ReactElement {
-  const currentTime = dayjs(baseTime);
-  let readyTime = currentTime.add(minutesUntilReady, 'minutes');
-
-  // Round up to the nearest 15-minute increment
-  const minutes = readyTime.minute();
-  const roundedMinutes = Math.ceil(minutes / 15) * 15;
-  if (roundedMinutes >= 60) {
-    readyTime = readyTime.add(1, 'hour').minute(0);
-  } else {
-    readyTime = readyTime.minute(roundedMinutes);
-  }
-
-  const isToday = readyTime.isSame(currentTime, 'day');
-  const isTomorrow = readyTime.isSame(currentTime.add(1, 'day'), 'day');
-  const timeFormat = readyTime.minute() ? 'h:mm a' : 'h a';
-  const dayPrefix = isToday ? 'Today' : isTomorrow ? 'Tomorrow' : readyTime.format('dddd');
-
-  return (
-    <Text>
-      Ready{' '}
-      <b>
-        {dayPrefix} at {readyTime.format(timeFormat)}
-      </b>
-    </Text>
-  );
-}
-
-function formatReadyBy(readyBy: string, readyByDay: string): ReactElement {
-  if (readyBy === 'Urgent') {
-    return (
-      <Text>
-        Need order <b>as soon as possible</b>
-      </Text>
-    );
-  } else if (readyBy === 'After hours') {
-    return readyByDay === 'Today' ? (
-      <Text>
-        Need order <b>this evening</b>
-      </Text>
-    ) : (
-      <Text>
-        Need order <b>tomorrow evening</b>
-      </Text>
-    );
-  } else {
-    const [time, period] = readyBy.split(' ');
-    const [hour] = time.split(':');
-    return (
-      <Text>
-        Need order by{' '}
-        <b>
-          {hour} {period}
-          {readyByDay === 'Tomorrow' ? ' tomorrow' : ''}
-        </b>
-      </Text>
-    );
-  }
-}
+import ReadyText from '../components/ReadyText';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -273,22 +202,6 @@ export const Status = () => {
     navigate(`/pharmacy?${query}`);
   };
 
-  const neededBy = readyBy && readyByDay ? formatReadyBy(readyBy, readyByDay) : null;
-  const showNeededBy =
-    neededBy &&
-    !isDeliveryPharmacy &&
-    (!fulfillment || // No fulfillment means user came from pharmacy selection
-      fulfillment?.state === 'SENT');
-
-  const estimatedReadyAt = fulfillment?.minutesUntilReady
-    ? formatReadyTime(fulfillment.createdAt, fulfillment.minutesUntilReady)
-    : null;
-  const showEstimatedReadyAt =
-    estimatedReadyAt &&
-    !isDeliveryPharmacy &&
-    (!fulfillment || // No fulfillment means user came from pharmacy selection
-      fulfillment?.state === 'RECEIVED');
-
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
@@ -328,7 +241,14 @@ export const Status = () => {
               </Box>
             ) : null}
 
-            {showNeededBy ? (
+            <ReadyText
+              readyBy={readyBy}
+              readyByDay={readyByDay}
+              isDeliveryPharmacy={isDeliveryPharmacy}
+              fulfillment={fulfillment}
+            />
+
+            {/* {showNeededBy ? (
               <HStack>
                 {neededBy}
                 <Tooltip
@@ -356,7 +276,7 @@ export const Status = () => {
                   </span>
                 </Tooltip>
               </HStack>
-            ) : null}
+            ) : null} */}
 
             <HorizontalStatusStepper
               fulfillmentType={fulfillmentType}

@@ -9,7 +9,6 @@ export interface Order extends types.Order {
   readyByDay?: string;
   readyByTime?: string;
   isReroutable?: boolean;
-  minutesUntilReady?: number;
   pharmacyEstimatedReadyAt?: Date;
 }
 
