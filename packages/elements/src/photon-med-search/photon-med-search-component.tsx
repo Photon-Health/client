@@ -12,7 +12,7 @@ setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/')
 //Styles
 import { createEffect, createSignal, For, onMount, Show, createMemo } from 'solid-js';
 import { gql } from '@apollo/client';
-import { usePhotonClient } from '@photonhealth/components';
+import { usePhotonClient, ComboBox } from '@photonhealth/components';
 import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
 import { MedicationConceptDropdown } from './components/MedicationConceptDropdown';
 import { MedicationFilterDropdown } from './components/MedicationFilterDropdown';
@@ -125,6 +125,37 @@ customElement(
     return (
       <div ref={ref}>
         <p class="font-sans text-lg text-gray-700 pb-2">{props.title}</p>
+        <div class="flex flex-col xs:flex-row gap-4">
+          <ComboBox>
+            <ComboBox.Input
+              onInput={() => {
+                console.log('input');
+              }}
+              displayValue={() => 'eaoeuaoeua'}
+            />
+            <ComboBox.Options>
+              <For
+                each={[
+                  { id: '1', name: 'Samuel Schloss' },
+                  { id: '2', name: 'Paul LaFosse' },
+                  { id: '3', name: 'Emma Johnson' },
+                  { id: '4', name: 'Olivia Smith' },
+                  { id: '5', name: 'Ava Williams' },
+                  { id: '6', name: 'Isabella Jones' },
+                  { id: '7', name: 'Sophia Brown' },
+                  { id: '8', name: 'Mia Davis' },
+                  { id: '9', name: 'Charlotte Wilson' }
+                ]}
+              >
+                {(person) => (
+                  <ComboBox.Option key={person.id} value={person}>
+                    {person.name}
+                  </ComboBox.Option>
+                )}
+              </For>
+            </ComboBox.Options>
+          </ComboBox>
+        </div>
         <div class="flex flex-col xs:flex-row gap-4">
           <MedicationConceptDropdown
             conceptId={conceptId()}

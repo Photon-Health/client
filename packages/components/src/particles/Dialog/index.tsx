@@ -75,7 +75,7 @@ function Dialog(props: DialogProps) {
       >
         {merged.open && (
           <div class="fixed inset-0 z-10 overflow-y-auto">
-            <div class="flex min-h-full justify-center p-4 text-center items-center sm:p-0">
+            <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 p-4 text-center">
               <div class={panelClasses()}>
                 <Show when={merged?.onClose}>
                   <div class="absolute right-0 top-0 pr-4 pt-4 sm:pr-6 sm:pt-6 sm:block">
