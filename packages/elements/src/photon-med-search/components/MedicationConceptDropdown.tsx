@@ -1,8 +1,6 @@
 import { SearchMedication } from '@photonhealth/sdk/dist/types';
-import { createEffect, createSignal, For } from 'solid-js';
+import { createEffect, createSignal, For, Show } from 'solid-js';
 import { usePhotonClient, ComboBox, Text } from '@photonhealth/components';
-// import { Combobox } from 'terracotta';
-
 import { gql } from '@apollo/client';
 import { debounce } from '@solid-primitives/scheduled';
 
@@ -25,6 +23,7 @@ export const MedicationConceptDropdown = (props: MedicationConceptDropdownProps)
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
   const [filterText, setFilterText] = createSignal<string>('');
   const [data, setData] = createSignal<SearchMedication[]>([]);
+  const [selected, setSelected] = createSignal<SearchMedication | undefined>();
 
   const fetchData = debounce(async (name: string) => {
     const { data } = await client!.apollo.query({
@@ -54,30 +53,34 @@ export const MedicationConceptDropdown = (props: MedicationConceptDropdownProps)
     }
   });
 
+  createEffect(() => {
+    if (selected()?.id) {
+      props.setConcept(selected()!);
+    }
+  });
+
   return (
     <div class="w-full">
       <Text color="gray">Medication History</Text>
-      <ComboBox
-        loading={isLoading()}
-        setSelected={(med: SearchMedication) => {
-          console.log('aoeuaoeuaoe', med());
-        }}
-      >
+      <ComboBox setSelected={setSelected}>
         <ComboBox.Input
-          onInput={(e: KeyboardEvent) =>
+          onInput={(e: InputEvent) =>
             setFilterText((e?.currentTarget as HTMLTextAreaElement).value)
           }
           displayValue={(med: SearchMedication) => med.name}
+          loading={isLoading()}
         />
-        <ComboBox.Options>
-          <For each={data()}>
-            {(med) => (
-              <ComboBox.Option key={med.id} value={med}>
-                {med.name}
-              </ComboBox.Option>
-            )}
-          </For>
-        </ComboBox.Options>
+        <Show when={data().length !== 0}>
+          <ComboBox.Options>
+            <For each={data()}>
+              {(med) => (
+                <ComboBox.Option key={med.id} value={med}>
+                  {med.name}
+                </ComboBox.Option>
+              )}
+            </For>
+          </ComboBox.Options>
+        </Show>
       </ComboBox>
     </div>
   );
