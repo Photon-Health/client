@@ -2,7 +2,6 @@ import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
 import { createEffect, createSignal, createMemo, Show, For } from 'solid-js';
 import { gql } from '@apollo/client';
 import { usePhotonClient, ComboBox, Text } from '@photonhealth/components';
-import { PhotonDropdown } from '../../photon-dropdown';
 
 const GET_FORMS = gql`
   query GetForms($medId: String!) {
