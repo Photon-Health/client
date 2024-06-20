@@ -1,9 +1,10 @@
 import { SearchMedication } from '@photonhealth/sdk/dist/types';
-import { createEffect, createSignal } from 'solid-js';
-import { usePhotonClient } from '@photonhealth/components';
+import { createEffect, createSignal, For } from 'solid-js';
+import { usePhotonClient, ComboBox, Text } from '@photonhealth/components';
+// import { Combobox } from 'terracotta';
+
 import { gql } from '@apollo/client';
 import { debounce } from '@solid-primitives/scheduled';
-import { PhotonDropdown } from '../../photon-dropdown';
 
 const GET_CONCEPTS = gql`
   query GetConcept($name: String!) {
@@ -54,30 +55,30 @@ export const MedicationConceptDropdown = (props: MedicationConceptDropdownProps)
   });
 
   return (
-    <div
-      class="w-full"
-      on:photon-data-selected={(e: { detail: { data: SearchMedication } }) => {
-        props.setConcept(e.detail.data);
-      }}
-    >
-      <PhotonDropdown
-        data={data()}
-        label={'Medication Name'}
-        placeholder="Enter a medication name..."
-        isLoading={isLoading()}
-        hasMore={false}
-        displayAccessor={(p, groupAccess) =>
-          groupAccess ? (
-            <p class="text-sm whitespace-normal leading-snug mb-2">{p?.name || ''}</p>
-          ) : (
-            p?.name || ''
-          )
-        }
-        onSearchChange={setFilterText}
-        onHide={() => setFilterText('')}
-        noDataMsg={'No medications found'}
-        required={false}
-      />
+    <div class="w-full">
+      <Text color="gray">Medication History</Text>
+      <ComboBox
+        loading={isLoading()}
+        setSelected={(med: SearchMedication) => {
+          console.log('aoeuaoeuaoe', med());
+        }}
+      >
+        <ComboBox.Input
+          onInput={(e: KeyboardEvent) =>
+            setFilterText((e?.currentTarget as HTMLTextAreaElement).value)
+          }
+          displayValue={(med: SearchMedication) => med.name}
+        />
+        <ComboBox.Options>
+          <For each={data()}>
+            {(med) => (
+              <ComboBox.Option key={med.id} value={med}>
+                {med.name}
+              </ComboBox.Option>
+            )}
+          </For>
+        </ComboBox.Options>
+      </ComboBox>
     </div>
   );
 };
