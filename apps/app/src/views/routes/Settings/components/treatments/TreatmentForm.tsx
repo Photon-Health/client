@@ -64,7 +64,7 @@ export const TreatmentForm = ({
                       ref={submitRef}
                       type="submit"
                       colorScheme="brand"
-                      disabled={loading}
+                      isDisabled={loading || !selectedProduct?.id}
                       isLoading={loading}
                       loadingText="Adding to catalog"
                     >
@@ -77,7 +77,7 @@ export const TreatmentForm = ({
                   ref={submitRef}
                   type="submit"
                   colorScheme="brand"
-                  disabled={loading}
+                  isDisabled={loading || !selectedProduct?.id}
                   isLoading={loading}
                   loadingText="Adding to catalog"
                   mr="1"

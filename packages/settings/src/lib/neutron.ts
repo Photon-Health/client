@@ -148,6 +148,7 @@ const organizationSettings: {
     pickUp: false,
     mailOrder: true,
     enableRxAndOrder: false,
+    sendToPatient: false,
     mailOrderProviders: [TAILORMADE_PHARMACY_ID, GOGOMEDS_PHARMACY_ID, EMPOWER_PHARMACY_ID]
   },
   // Emily's Test environment (us)
@@ -325,5 +326,21 @@ const organizationSettings: {
     pickUp: false,
     sendToPatient: false,
     mailOrderProviders: [CUREXA_PHARMACY_ID]
+  },
+  // Xyon Health
+  org_t9KbrhuLYSeZaqLK: {
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
+    sendToPatient: false,
+    enableRxAndOrder: false
+  },
+  // Xyon Health 2 (for Eric Liu)
+  org_Nic6tFhWwlsnCvjc: {
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
+    sendToPatient: false,
+    enableRxAndOrder: false
   }
 };
