@@ -49,6 +49,7 @@ export function ComboBoxProvider(props: { children?: JSX.Element }) {
     active: '',
     typing: false
   });
+
   const comboBox: ComboBoxContextValue = [
     state,
     {
