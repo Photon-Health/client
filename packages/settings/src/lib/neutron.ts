@@ -148,6 +148,7 @@ const organizationSettings: {
     pickUp: false,
     mailOrder: true,
     enableRxAndOrder: false,
+    sendToPatient: false,
     mailOrderProviders: [TAILORMADE_PHARMACY_ID, GOGOMEDS_PHARMACY_ID, EMPOWER_PHARMACY_ID]
   },
   // Emily's Test environment (us)
