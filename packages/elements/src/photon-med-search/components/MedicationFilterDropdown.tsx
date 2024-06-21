@@ -1,5 +1,5 @@
 import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
-import { createEffect, createSignal, createMemo, Show, For } from 'solid-js';
+import { createEffect, createSignal, createMemo, Show, For, batch } from 'solid-js';
 import { gql } from '@apollo/client';
 import { usePhotonClient, ComboBox, Text } from '@photonhealth/components';
 
@@ -92,8 +92,10 @@ export const MedicationFilterDropdown = (props: MedicationFormDropdownProps) => 
 
   createEffect(() => {
     if (selected()?.id) {
-      setFilterId(selected()!.id);
-      props.setMedicationId(selected()!.id);
+      batch(() => {
+        setFilterId(selected()!.id);
+        props.setMedicationId(selected()!.id);
+      });
     }
   });
 
