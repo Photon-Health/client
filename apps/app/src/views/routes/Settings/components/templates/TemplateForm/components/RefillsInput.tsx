@@ -34,7 +34,7 @@ export const RefillsInput = ({ errors, touched, hidden, setFieldValue }: Refills
                 id="refillsInput"
                 min={0}
                 {...field}
-                onChange={(val: any) => setFieldValue(field.name, val)}
+                onChange={(val: string) => setFieldValue(field.name, Number(val))}
               >
                 <NumberInputField />
                 <NumberInputStepper>
