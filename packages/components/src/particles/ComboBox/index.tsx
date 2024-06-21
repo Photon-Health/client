@@ -49,6 +49,7 @@ export function ComboBoxProvider(props: { children?: JSX.Element }) {
     active: '',
     typing: false
   });
+
   const comboBox: ComboBoxContextValue = [
     state,
     {
@@ -201,7 +202,7 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
         onClick={() => setOpen(!state.open)}
         title="Input dropdown"
       >
-        <Show when={!inputGroupState.loading}>
+        <Show when={!inputGroupState.loading && !props.loading}>
           <Icon name="chevronUpDown" class="text-gray-400" />
         </Show>
       </button>
