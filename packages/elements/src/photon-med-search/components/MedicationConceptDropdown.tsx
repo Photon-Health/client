@@ -61,7 +61,7 @@ export const MedicationConceptDropdown = (props: MedicationConceptDropdownProps)
 
   return (
     <div class="w-full">
-      <Text color="gray">Medication History</Text>
+      <Text color="gray">Medication Name</Text>
       <ComboBox setSelected={setSelected}>
         <ComboBox.Input
           onInput={(e: InputEvent) =>
