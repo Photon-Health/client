@@ -9,7 +9,7 @@ export const TEMPLATE_SCHEMA = yup.object({
     })
     .required('Please select a treatment...'),
   dispenseAsWritten: yup.boolean().nullable().optional(),
-  dispenseQuantity: yup.number().min(1, 'Must be more than 0...').default(1).nullable().optional(),
+  dispenseQuantity: yup.number().min(1, 'Must be 1 or more...').default(1).nullable().optional(),
   dispenseUnit: yup.string().when('values.treatment.__typename', {
     is: 'MedicalEquipment',
     then: yup.string().default('Each'),
@@ -24,7 +24,7 @@ export const TEMPLATE_SCHEMA = yup.object({
   daysSupply: yup.number().when('values.treatment.__typename', {
     is: 'MedicalEquipment',
     then: yup.number().default(0),
-    otherwise: yup.number().min(0, 'Must be a number...').default(0)
+    otherwise: yup.number().min(1, 'Must be 1 or more...').default(0)
   }),
   instructions: yup.string().min(1, 'Please enter instructions for the patient...'),
   notes: yup.string(),
@@ -42,11 +42,11 @@ export const TEMPLATE_INITIAL_VALUES: TemplateSchemaType = {
   },
   name: '',
   dispenseAsWritten: false,
-  dispenseQuantity: 1,
+  dispenseQuantity: 0,
   dispenseUnit: 'Each',
   fillsAllowed: 1,
   refillsInput: 0,
-  daysSupply: 30,
+  daysSupply: 0,
   instructions: '',
   notes: '',
   isPublic: false

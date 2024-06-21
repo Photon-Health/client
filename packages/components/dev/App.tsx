@@ -76,7 +76,6 @@ const App = () => {
   const [draftPrescriptionsFromTemplates, setDraftPrescriptions] = createSignal<
     DraftPrescription[]
   >([]);
-
   const rando = randomNames.slice(0, 3);
   const filteredPeople = createMemo(() => {
     return query() === ''

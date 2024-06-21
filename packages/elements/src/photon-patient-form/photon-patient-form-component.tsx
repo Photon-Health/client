@@ -409,7 +409,6 @@ const PatientForm = (props: { patientId: string }) => {
                 <PharmacySearch
                   address={getPatientAddress(pStore, store)}
                   setPharmacy={(pharmacy: any) => {
-                    console.log('pharmacy: ', pharmacy);
                     actions.updateFormValue({
                       key: 'preferredPharmacy',
                       value: pharmacy.id

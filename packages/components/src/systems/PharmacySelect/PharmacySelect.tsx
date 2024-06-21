@@ -82,6 +82,7 @@ export function PharmacySelect(props: PharmacySelectProps) {
 
   const handleTabChange = (newTab: TabNamesEnum) => {
     setActiveTab(newTab);
+
     if (!tabs().includes(newTab)) {
       setTabs([...tabs(), newTab]);
     }

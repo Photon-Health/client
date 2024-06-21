@@ -118,6 +118,7 @@ export const TemplateForm = ({
       fragment: CatalogTreatmentFieldsMap
     }
   });
+
   const [updatePrescriptionTemplateMutation, { loading: loadingUpdate }] =
     updatePrescriptionTemplate({
       refetchQueries: ['getCatalog'],

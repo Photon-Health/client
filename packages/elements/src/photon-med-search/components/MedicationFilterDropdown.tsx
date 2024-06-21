@@ -1,8 +1,7 @@
 import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
-import { createEffect, createSignal, createMemo } from 'solid-js';
+import { createEffect, createSignal, createMemo, Show, For, batch } from 'solid-js';
 import { gql } from '@apollo/client';
-import { usePhotonClient } from '@photonhealth/components';
-import { PhotonDropdown } from '../../photon-dropdown';
+import { usePhotonClient, ComboBox, Text } from '@photonhealth/components';
 
 const GET_FORMS = gql`
   query GetForms($medId: String!) {
@@ -62,6 +61,7 @@ export const MedicationFilterDropdown = (props: MedicationFormDropdownProps) => 
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
   const [data, setData] = createSignal<MedCombo[]>([]);
   const [filterId, setFilterId] = createSignal<string>();
+  const [selected, setSelected] = createSignal<MedCombo | undefined>();
   // eslint warning is fine, filter type won't be changing per component
   const { query, key } = filters[props.filterType];
 
@@ -90,25 +90,41 @@ export const MedicationFilterDropdown = (props: MedicationFormDropdownProps) => 
     }
   });
 
+  createEffect(() => {
+    if (selected()?.id) {
+      batch(() => {
+        setFilterId(selected()!.id);
+        props.setMedicationId(selected()!.id);
+      });
+    }
+  });
+
   return (
-    <div
-      class="w-full"
-      on:photon-data-selected={(e: { detail: { data: { id: string } } }) => {
-        setFilterId(e.detail.data.id);
-        props.setMedicationId(e.detail.data.id);
-      }}
-    >
-      <PhotonDropdown
-        data={data()}
-        label={props.filterType.charAt(0).toUpperCase() + props.filterType.slice(1).toLowerCase()}
-        disabled={!props?.conceptId}
-        placeholder={`Select a ${props.filterType.toLowerCase()}...`}
-        isLoading={isLoading()}
-        hasMore={false}
-        displayAccessor={(p) => p?.name || p?.form || ''}
-        noDataMsg={`No ${props.filterType.toLowerCase()}s found`}
-        required={false}
-      />
+    <div class="w-full">
+      <Text color="gray">
+        {props.filterType.charAt(0).toUpperCase() + props.filterType.slice(1).toLowerCase()}
+      </Text>
+
+      <ComboBox setSelected={setSelected}>
+        <ComboBox.Input
+          placeholder={`Select a ${props.filterType.toLowerCase()}...`}
+          displayValue={(filter: MedCombo) => filter?.name || filter?.form || ''}
+          loading={isLoading()}
+          disabled={!props?.conceptId}
+          pointer
+        />
+        <Show when={data().length !== 0}>
+          <ComboBox.Options>
+            <For each={data()}>
+              {(filter) => (
+                <ComboBox.Option key={filter.id} value={filter}>
+                  {filter?.name || filter?.form || ''}
+                </ComboBox.Option>
+              )}
+            </For>
+          </ComboBox.Options>
+        </Show>
+      </ComboBox>
     </div>
   );
 };
