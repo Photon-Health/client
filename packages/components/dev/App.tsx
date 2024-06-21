@@ -78,6 +78,7 @@ const App = () => {
   >([]);
 
   const rando = randomNames.slice(0, 3);
+
   const filteredPeople = createMemo(() => {
     return query() === ''
       ? rando
