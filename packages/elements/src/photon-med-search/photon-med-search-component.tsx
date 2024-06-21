@@ -6,6 +6,7 @@ import '@shoelace-style/shoelace/dist/components/alert/alert';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/switch/switch';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -124,8 +125,9 @@ customElement(
 
     return (
       <div ref={ref}>
+        <style>{photonStyles}</style>
         <p class="font-sans text-lg text-gray-700 pb-2">{props.title}</p>
-        <div class="flex flex-col xs:flex-row gap-4">
+        <div class="flex flex-col gap-2">
           <MedicationConceptDropdown
             conceptId={conceptId()}
             setConcept={(concept) => {
@@ -134,24 +136,18 @@ customElement(
               setMedicationId('');
             }}
           />
-        </div>
-        <div class="flex flex-col xs:flex-row gap-4">
           <MedicationFilterDropdown
             filterType="FORM"
             conceptId={conceptId()}
             medicationId={medicationId()}
             setMedicationId={setMedicationId}
           />
-        </div>
-        <div class="flex flex-col xs:flex-row gap-4">
           <MedicationFilterDropdown
             filterType="STRENGTH"
             conceptId={conceptId()}
             medicationId={medicationId()}
             setMedicationId={setMedicationId}
           />
-        </div>
-        <div class="flex flex-col xs:flex-row gap-4">
           <MedicationFilterDropdown
             filterType="ROUTE"
             conceptId={conceptId()}
