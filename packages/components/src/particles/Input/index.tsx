@@ -9,6 +9,7 @@ export interface InputProps extends JSX.InputHTMLAttributes<HTMLInputElement> {
   loading?: boolean;
   copy?: boolean;
   onInput?: JSX.EventHandlerUnion<HTMLInputElement, InputEvent>;
+  pointer?: boolean;
 }
 
 function valueToString(value: string | number | string[] | undefined): string {
@@ -44,7 +45,8 @@ export default function Input(props: InputProps) {
         'focus:ring-2': !readonly,
         'cursor-not-allowed bg-gray-50 text-gray-500 ring-gray-200': inputProps.disabled,
         'focus:ring-1 focus:ring-1  focus:outline-0 focus:ring-gray-300 bg-gray-50 text-gray-500 ring-gray-200':
-          readonly
+          readonly,
+        'cursor-pointer': props.pointer
       }
     );
   });
