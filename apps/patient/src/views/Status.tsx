@@ -202,6 +202,9 @@ export const Status = () => {
     navigate(`/pharmacy?${query}`);
   };
 
+  console.log(readyBy, readyByDay);
+  console.log(order.fulfillment?.pharmacyEstimatedReadyAt);
+
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />

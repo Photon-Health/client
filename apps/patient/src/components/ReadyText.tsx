@@ -1,7 +1,15 @@
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { Text } from '@chakra-ui/react';
+import { OrderFulfillment } from 'packages/sdk/dist/types';
 
-const ReadyText = ({ readyBy, readyByDay, isDeliveryPharmacy, fulfillment }: any) => {
+export type Maybe<T> = T | null;
+interface ReadyTextProps {
+  readyBy?: string;
+  readyByDay?: string;
+  isDeliveryPharmacy?: boolean;
+  fulfillment?: Maybe<OrderFulfillment> | undefined;
+}
+const ReadyText = ({ readyBy, readyByDay, isDeliveryPharmacy, fulfillment }: ReadyTextProps) => {
   const neededBy =
     readyBy && readyByDay ? <ReadyBy readyBy={readyBy} readyByDay={readyByDay} /> : null;
   const showNeededBy =
@@ -13,7 +21,6 @@ const ReadyText = ({ readyBy, readyByDay, isDeliveryPharmacy, fulfillment }: any
   const estimatedReadyAt = fulfillment?.pharmacyEstimatedReadyAt ? (
     <ReadyAt pharmacyEstimatedReadyAt={fulfillment.pharmacyEstimatedReadyAt} />
   ) : null;
-  console.log(fulfillment.state);
   const showEstimatedReadyAt =
     estimatedReadyAt &&
     !isDeliveryPharmacy &&
@@ -28,34 +35,44 @@ const ReadyText = ({ readyBy, readyByDay, isDeliveryPharmacy, fulfillment }: any
   );
 };
 
-const ReadyAt = ({ pharmacyEstimatedReadyAt }: any) => {
-  let readyAt = dayjs(pharmacyEstimatedReadyAt);
-
-  // Round up to the nearest 15-minute increment
-  const minutes = readyAt.minute();
+const roundUpTo15MinInterval = (pharmacyEstimatedReadyAt: Date): Dayjs => {
+  const dayJS = dayjs(pharmacyEstimatedReadyAt);
+  const minutes = dayJS.minute();
   const roundedMinutes = Math.ceil(minutes / 15) * 15;
   if (roundedMinutes >= 60) {
-    readyAt = readyAt.add(1, 'hour').minute(0);
+    return dayJS.add(1, 'hour').minute(0);
   } else {
-    readyAt = readyAt.minute(roundedMinutes);
+    return dayJS.minute(roundedMinutes);
   }
+};
 
-  const isToday = readyAt.isSame(dayjs(), 'day');
+interface ReadyAtProps {
+  pharmacyEstimatedReadyAt: Date;
+}
+const ReadyAt = ({ pharmacyEstimatedReadyAt }: ReadyAtProps) => {
+  const readyAt = roundUpTo15MinInterval(pharmacyEstimatedReadyAt);
   const isTomorrow = readyAt.isSame(dayjs().add(1, 'day'), 'day');
   const timeFormat = readyAt.minute() ? 'h:mm a' : 'h a';
-  const dayPrefix = isToday ? 'Today' : isTomorrow ? 'Tomorrow' : readyAt.format('dddd');
 
   return (
     <Text>
       Ready{' '}
-      <b>
-        {dayPrefix} at {readyAt.format(timeFormat)}
-      </b>
+      {isTomorrow ? (
+        <b>Tomorrow at {readyAt.format(timeFormat)}</b>
+      ) : (
+        <>
+          at <b>{readyAt.format(timeFormat)}</b>
+        </>
+      )}
     </Text>
   );
 };
 
-const ReadyBy = ({ readyBy, readyByDay }: any) => {
+interface ReadyByProps {
+  readyBy: string;
+  readyByDay: string;
+}
+const ReadyBy = ({ readyBy, readyByDay }: ReadyByProps) => {
   if (readyBy === 'Urgent') {
     return (
       <Text>
