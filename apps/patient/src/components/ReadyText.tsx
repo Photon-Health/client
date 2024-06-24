@@ -10,27 +10,26 @@ interface ReadyTextProps {
   fulfillment?: Maybe<OrderFulfillment> | undefined;
 }
 const ReadyText = ({ readyBy, readyByDay, isDeliveryPharmacy, fulfillment }: ReadyTextProps) => {
-  const neededBy =
-    readyBy && readyByDay ? <ReadyBy readyBy={readyBy} readyByDay={readyByDay} /> : null;
-  const showNeededBy =
-    neededBy &&
+  const showPatientDesiredreadyBy =
+    readyBy &&
+    readyByDay &&
     !isDeliveryPharmacy &&
     (!fulfillment || // No fulfillment means user came from pharmacy selection
       fulfillment?.state === 'SENT');
-
-  const estimatedReadyAt = fulfillment?.pharmacyEstimatedReadyAt ? (
-    <ReadyAt pharmacyEstimatedReadyAt={fulfillment.pharmacyEstimatedReadyAt} />
-  ) : null;
   const showEstimatedReadyAt =
-    estimatedReadyAt &&
+    fulfillment?.pharmacyEstimatedReadyAt &&
     !isDeliveryPharmacy &&
     (!fulfillment || // No fulfillment means user came from pharmacy selection
       fulfillment?.state === 'RECEIVED');
 
   return (
     <>
-      {showNeededBy && neededBy}
-      {showEstimatedReadyAt && estimatedReadyAt}
+      {showPatientDesiredreadyBy && (
+        <PatientDesiredReadyBy readyBy={readyBy} readyByDay={readyByDay} />
+      )}
+      {showEstimatedReadyAt && (
+        <PharmacyEstimatedReadyAt pharmacyEstimatedReadyAt={fulfillment.pharmacyEstimatedReadyAt} />
+      )}
     </>
   );
 };
@@ -46,10 +45,10 @@ const roundUpTo15MinInterval = (pharmacyEstimatedReadyAt: Date): Dayjs => {
   }
 };
 
-interface ReadyAtProps {
+interface PharmacyEstimatedReadyAtProps {
   pharmacyEstimatedReadyAt: Date;
 }
-const ReadyAt = ({ pharmacyEstimatedReadyAt }: ReadyAtProps) => {
+const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimatedReadyAtProps) => {
   const readyAt = roundUpTo15MinInterval(pharmacyEstimatedReadyAt);
   const isTomorrow = readyAt.isSame(dayjs().add(1, 'day'), 'day');
   const timeFormat = readyAt.minute() ? 'h:mm a' : 'h a';
@@ -68,11 +67,11 @@ const ReadyAt = ({ pharmacyEstimatedReadyAt }: ReadyAtProps) => {
   );
 };
 
-interface ReadyByProps {
+interface PatientDesiredReadyByProps {
   readyBy: string;
   readyByDay: string;
 }
-const ReadyBy = ({ readyBy, readyByDay }: ReadyByProps) => {
+const PatientDesiredReadyBy = ({ readyBy, readyByDay }: PatientDesiredReadyByProps) => {
   if (readyBy === 'Urgent') {
     return (
       <Text>
