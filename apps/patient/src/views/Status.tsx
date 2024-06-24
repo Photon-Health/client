@@ -202,9 +202,6 @@ export const Status = () => {
     navigate(`/pharmacy?${query}`);
   };
 
-  console.log(readyBy, readyByDay);
-  console.log(order.fulfillment?.pharmacyEstimatedReadyAt);
-
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} />
@@ -250,36 +247,6 @@ export const Status = () => {
               isDeliveryPharmacy={isDeliveryPharmacy}
               fulfillment={fulfillment}
             />
-
-            {/* {showNeededBy ? (
-              <HStack>
-                {neededBy}
-                <Tooltip
-                  label="We do our best to ensure your order is ready by your selected time"
-                  fontSize="md"
-                  textAlign="center"
-                >
-                  <span>
-                    <FiInfo color="gray" />
-                  </span>
-                </Tooltip>
-              </HStack>
-            ) : null}
-
-            {showEstimatedReadyAt ? (
-              <HStack>
-                {estimatedReadyAt}
-                <Tooltip
-                  label="The pharmacy stated your order should be ready at this time"
-                  fontSize="md"
-                  textAlign="center"
-                >
-                  <span>
-                    <FiInfo color="gray" />
-                  </span>
-                </Tooltip>
-              </HStack>
-            ) : null} */}
 
             <HorizontalStatusStepper
               fulfillmentType={fulfillmentType}
