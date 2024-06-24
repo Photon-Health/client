@@ -430,7 +430,7 @@ export type OrderFulfillment = {
   type: FulfillmentType;
   minutesUntilReady?: Maybe<Scalars['Int']>;
   pharmacyEstimatedReadyAt?: Maybe<Scalars['AWSDateTime']>;
-  createdAt: Scalars['AWSDateTime'];
+  createdAt?: Scalars['AWSDateTime'];
 };
 
 export enum OrderState {
