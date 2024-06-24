@@ -5,7 +5,11 @@ import { App } from './App';
 
 import { datadogRum } from '@datadog/browser-rum';
 
+import ReactGA from 'react-ga4';
+
 import pkg from '../package.json';
+
+ReactGA.initialize('G-WQ9PD39S25');
 
 datadogRum.init({
   applicationId: process.env.REACT_APP_DATADOG_RUM_APPLICATION_ID as string,

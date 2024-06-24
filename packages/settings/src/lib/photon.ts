@@ -250,7 +250,6 @@ const organizationSettings: {
   org_zc1RzzmSwd8eE94U: {
     logo: 'sesame_logo.jpg',
     accentColor: '#5224C7',
-    sendToPatient: true,
     enableCourierNavigate: false,
     topRankedCostco: true
   },
@@ -259,6 +258,7 @@ const organizationSettings: {
     pickUp: false,
     mailOrder: true,
     enableRxAndOrder: false,
+    sendToPatient: false,
     mailOrderProviders: [TAILORMADE_PHARMACY_ID, GOGOMEDS_PHARMACY_ID, EMPOWER_PHARMACY_ID]
   },
   // Redbox Rx
@@ -272,8 +272,6 @@ const organizationSettings: {
   // Great Many
   org_gvTsxeeYy97qedaS: {
     mailOrder: true,
-    pickUp: false,
-    sendToPatient: false,
     mailOrderProviders: [CUREXA_PHARMACY_ID]
   }
 };

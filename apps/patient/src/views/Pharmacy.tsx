@@ -42,6 +42,7 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { isGLP } from '../utils/isGLP';
+import ReactGA from 'react-ga4';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
@@ -427,6 +428,22 @@ export const Pharmacy = () => {
     setShowFooter(true);
   };
 
+  const trackSelectedPharmacyRank = (
+    selectedPharmacyId: string,
+    pharmacies: EnrichedPharmacy[]
+  ): void => {
+    // Get pharmacy index in list
+    const index = pharmacies.findIndex((p) => p.id === selectedPharmacyId);
+    if (index !== -1) {
+      ReactGA.event('pharmacy_selected', {
+        category: 'Pharmacy',
+        action: 'Select',
+        label: 'Pharmacy Rank',
+        value: index + 1
+      });
+    }
+  };
+
   const handleSubmit = async () => {
     if (!selectedId) {
       console.error('No selectedId. Cannot set pharmacy on order.');
@@ -465,6 +482,8 @@ export const Pharmacy = () => {
 
       return;
     }
+
+    trackSelectedPharmacyRank(selectedId, allPharmacies);
 
     try {
       const result = isReroute
