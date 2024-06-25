@@ -1,6 +1,9 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { Text } from '@chakra-ui/react';
 import { OrderFulfillment } from 'packages/sdk/dist/types';
+import isTomorrow from 'dayjs/plugin/isTomorrow';
+
+dayjs.extend(isTomorrow);
 
 export type Maybe<T> = T | null;
 interface ReadyTextProps {
@@ -10,38 +13,28 @@ interface ReadyTextProps {
   fulfillment?: Maybe<OrderFulfillment> | undefined;
 }
 const ReadyText = ({ readyBy, readyByDay, isDeliveryPharmacy, fulfillment }: ReadyTextProps) => {
-  const showPatientDesiredreadyBy =
-    readyBy &&
-    readyByDay &&
-    !isDeliveryPharmacy &&
-    (!fulfillment || // No fulfillment means user came from pharmacy selection
-      fulfillment?.state === 'SENT');
-  const showEstimatedReadyAt =
-    fulfillment?.pharmacyEstimatedReadyAt &&
-    !isDeliveryPharmacy &&
-    (!fulfillment || // No fulfillment means user came from pharmacy selection
-      fulfillment?.state === 'RECEIVED');
+  if (isDeliveryPharmacy) return null;
 
-  return (
-    <>
-      {showPatientDesiredreadyBy && (
-        <PatientDesiredReadyBy readyBy={readyBy} readyByDay={readyByDay} />
-      )}
-      {showEstimatedReadyAt && (
-        <PharmacyEstimatedReadyAt pharmacyEstimatedReadyAt={fulfillment.pharmacyEstimatedReadyAt} />
-      )}
-    </>
-  );
+  // No fulfillment means user came from pharmacy selection
+  if ((!fulfillment || fulfillment?.state === 'SENT') && readyBy && readyByDay) {
+    return <PatientDesiredReadyBy readyBy={readyBy} readyByDay={readyByDay} />;
+  }
+
+  if (fulfillment?.state === 'RECEIVED' && fulfillment?.pharmacyEstimatedReadyAt) {
+    return (
+      <PharmacyEstimatedReadyAt pharmacyEstimatedReadyAt={fulfillment.pharmacyEstimatedReadyAt} />
+    );
+  }
 };
 
 const roundUpTo15MinInterval = (pharmacyEstimatedReadyAt: Date): Dayjs => {
-  const dayJS = dayjs(pharmacyEstimatedReadyAt);
-  const minutes = dayJS.minute();
+  const estimatedReadyAtAsDayJs = dayjs(pharmacyEstimatedReadyAt);
+  const minutes = estimatedReadyAtAsDayJs.minute();
   const roundedMinutes = Math.ceil(minutes / 15) * 15;
   if (roundedMinutes >= 60) {
-    return dayJS.add(1, 'hour').minute(0);
+    return estimatedReadyAtAsDayJs.add(1, 'hour').minute(0);
   } else {
-    return dayJS.minute(roundedMinutes);
+    return estimatedReadyAtAsDayJs.minute(roundedMinutes);
   }
 };
 
@@ -50,7 +43,7 @@ interface PharmacyEstimatedReadyAtProps {
 }
 const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimatedReadyAtProps) => {
   const readyAt = roundUpTo15MinInterval(pharmacyEstimatedReadyAt);
-  const isTomorrow = readyAt.isSame(dayjs().add(1, 'day'), 'day');
+  const isTomorrow = readyAt.add(1, 'day').isTomorrow();
   const timeFormat = readyAt.minute() ? 'h:mm a' : 'h a';
 
   return (
