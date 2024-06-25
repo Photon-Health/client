@@ -179,8 +179,6 @@ export const Main = () => {
     logo
   };
 
-  console.log(flattenedFills);
-
   return (
     <ChakraProvider theme={theme(order?.organization.id)}>
       <OrderContext.Provider value={orderContextValue}>
