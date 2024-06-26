@@ -34,6 +34,8 @@ export const ReadyText = ({
       <PharmacyEstimatedReadyAt pharmacyEstimatedReadyAt={fulfillment.pharmacyEstimatedReadyAt} />
     );
   }
+
+  return null;
 };
 
 const roundUpTo15MinInterval = (pharmacyEstimatedReadyAt: Date): Dayjs => {
