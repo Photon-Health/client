@@ -15,7 +15,7 @@ import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/gen
 import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { HorizontalStatusStepper } from '../components/HorizontalStatusStepper';
-import ReadyText from '../components/ReadyText';
+import { ReadyText } from '../components/ReadyText';
 
 export const Status = () => {
   const navigate = useNavigate();

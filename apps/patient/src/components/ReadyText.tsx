@@ -12,7 +12,12 @@ interface ReadyTextProps {
   isDeliveryPharmacy?: boolean;
   fulfillment?: Maybe<OrderFulfillment> | undefined;
 }
-const ReadyText = ({ readyBy, readyByDay, isDeliveryPharmacy, fulfillment }: ReadyTextProps) => {
+export const ReadyText = ({
+  readyBy,
+  readyByDay,
+  isDeliveryPharmacy,
+  fulfillment
+}: ReadyTextProps) => {
   if (isDeliveryPharmacy) return null;
 
   // No fulfillment means user came from pharmacy selection
@@ -48,14 +53,7 @@ const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimate
 
   return (
     <Text>
-      Ready{' '}
-      {isTomorrow ? (
-        <b>Tomorrow at {readyAt.format(timeFormat)}</b>
-      ) : (
-        <>
-          at <b>{readyAt.format(timeFormat)}</b>
-        </>
-      )}
+      Ready{isTomorrow ? <b> Tomorrow </b> : ' '} at <b>{readyAt.format(timeFormat)}</b>
     </Text>
   );
 };
@@ -95,5 +93,3 @@ const PatientDesiredReadyBy = ({ readyBy, readyByDay }: PatientDesiredReadyByPro
     );
   }
 };
-
-export default ReadyText;
