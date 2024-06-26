@@ -9,20 +9,24 @@ export type Maybe<T> = T | null;
 interface ReadyTextProps {
   readyBy?: string;
   readyByDay?: string;
+  readyByTime?: string;
   isDeliveryPharmacy?: boolean;
   fulfillment?: Maybe<OrderFulfillment> | undefined;
 }
 export const ReadyText = ({
   readyBy,
   readyByDay,
+  readyByTime,
   isDeliveryPharmacy,
   fulfillment
 }: ReadyTextProps) => {
   if (isDeliveryPharmacy) return null;
 
   // No fulfillment means user came from pharmacy selection
-  if ((!fulfillment || fulfillment?.state === 'SENT') && readyBy && readyByDay) {
-    return <PatientDesiredReadyBy readyBy={readyBy} readyByDay={readyByDay} />;
+  if ((!fulfillment || fulfillment?.state === 'SENT') && readyBy && readyByDay && readyByTime) {
+    return (
+      <PatientDesiredReadyBy readyBy={readyBy} readyByDay={readyByDay} readyByTime={readyByTime} />
+    );
   }
 
   if (fulfillment?.state === 'RECEIVED' && fulfillment?.pharmacyEstimatedReadyAt) {
@@ -61,8 +65,19 @@ const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimate
 interface PatientDesiredReadyByProps {
   readyBy: string;
   readyByDay: string;
+  readyByTime: string;
 }
-const PatientDesiredReadyBy = ({ readyBy, readyByDay }: PatientDesiredReadyByProps) => {
+const PatientDesiredReadyBy = ({
+  readyBy,
+  readyByDay,
+  readyByTime
+}: PatientDesiredReadyByProps) => {
+  const now = dayjs();
+  const timezone = dayjs.tz.guess();
+  const readyByTimeDayJs = dayjs.utc(readyByTime).tz(timezone);
+  const isToday = readyByTimeDayJs.isToday();
+  const isPast = now.isAfter(readyByTimeDayJs);
+
   if (readyBy === 'Urgent') {
     return (
       <Text>
@@ -70,26 +85,43 @@ const PatientDesiredReadyBy = ({ readyBy, readyByDay }: PatientDesiredReadyByPro
       </Text>
     );
   } else if (readyBy === 'After hours') {
-    return readyByDay === 'Today' ? (
-      <Text>
-        Need order <b>this evening</b>
-      </Text>
-    ) : (
-      <Text>
-        Need order <b>tomorrow evening</b>
-      </Text>
-    );
+    if (isPast) {
+      // Let's not surface anything here until we decide on copy
+      return null;
+    } else if (isToday) {
+      return (
+        <Text>
+          Need order <b>this evening</b>
+        </Text>
+      );
+    } else {
+      return (
+        <Text>
+          Need order <b>tomorrow evening</b>
+        </Text>
+      );
+    }
   } else {
     const [time, period] = readyBy.split(' ');
     const [hour] = time.split(':');
-    return (
-      <Text>
-        Need order by{' '}
-        <b>
-          {hour} {period}
-          {readyByDay === 'Tomorrow' ? ' tomorrow' : ''}
-        </b>
-      </Text>
-    );
+
+    if (isPast) {
+      return (
+        <Text>
+          Need order by <b>{readyByTimeDayJs.format('h:mm A on MMM D')}</b>
+        </Text>
+      );
+    } else {
+      const displayTomorrow = readyByDay === 'Tomorrow' && !isToday;
+      return (
+        <Text>
+          Need order by{' '}
+          <b>
+            {hour} {period}
+            {displayTomorrow ? ' tomorrow' : ''}
+          </b>
+        </Text>
+      );
+    }
   }
 };

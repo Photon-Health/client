@@ -38,7 +38,7 @@ export const Status = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
 
-  const { fulfillment, pharmacy, readyBy, readyByDay } = order;
+  const { fulfillment, pharmacy, readyBy, readyByDay, readyByTime } = order;
 
   const fulfillmentType = getFulfillmentType(
     pharmacy?.id,
@@ -244,6 +244,7 @@ export const Status = () => {
             <ReadyText
               readyBy={readyBy}
               readyByDay={readyByDay}
+              readyByTime={readyByTime}
               isDeliveryPharmacy={isDeliveryPharmacy}
               fulfillment={fulfillment}
             />
