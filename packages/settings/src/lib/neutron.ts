@@ -10,7 +10,9 @@ import {
   COSTCO_PHARMACY_ID,
   REDBOX_PHARMACY_ID,
   GOGOMEDS_PHARMACY_ID,
-  TAILORMADE_PHARMACY_ID
+  TAILORMADE_PHARMACY_ID,
+  AMBROSIA_PHARMACY_ID,
+  WOMENS_INTERNATIONAL_PHARMACY_ID
 } from '../pharmacies';
 
 /**
@@ -149,7 +151,13 @@ const organizationSettings: {
     mailOrder: true,
     enableRxAndOrder: false,
     sendToPatient: false,
-    mailOrderProviders: [TAILORMADE_PHARMACY_ID, GOGOMEDS_PHARMACY_ID, EMPOWER_PHARMACY_ID]
+    mailOrderProviders: [
+      TAILORMADE_PHARMACY_ID,
+      GOGOMEDS_PHARMACY_ID,
+      EMPOWER_PHARMACY_ID,
+      AMBROSIA_PHARMACY_ID,
+      WOMENS_INTERNATIONAL_PHARMACY_ID
+    ]
   },
   // Emily's Test environment (us)
   org_KPfcKzFtfzD3ISxW: {
@@ -342,5 +350,10 @@ const organizationSettings: {
     mailOrderProviders: [CUREXA_PHARMACY_ID],
     sendToPatient: false,
     enableRxAndOrder: false
+  },
+  // Counsel Health
+  org_srLyKiKZhbYToD6C: {
+    logo: 'counsel_logo.png',
+    accentColor: '#333333'
   }
 };
