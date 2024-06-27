@@ -8,7 +8,9 @@ import {
   REDBOX_PHARMACY_ID,
   GOGOMEDS_PHARMACY_ID,
   EMPOWER_PHARMACY_ID,
-  INNOVASCRIPT_PHARMACY_ID
+  INNOVASCRIPT_PHARMACY_ID,
+  AMBROSIA_PHARMACY_ID,
+  WOMENS_INTERNATIONAL_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -259,7 +261,13 @@ const organizationSettings: {
     mailOrder: true,
     enableRxAndOrder: false,
     sendToPatient: false,
-    mailOrderProviders: [TAILORMADE_PHARMACY_ID, GOGOMEDS_PHARMACY_ID, EMPOWER_PHARMACY_ID]
+    mailOrderProviders: [
+      TAILORMADE_PHARMACY_ID,
+      GOGOMEDS_PHARMACY_ID,
+      EMPOWER_PHARMACY_ID,
+      AMBROSIA_PHARMACY_ID,
+      WOMENS_INTERNATIONAL_PHARMACY_ID
+    ]
   },
   // Redbox Rx
   org_fPIzyQJhFqvBAhJG: {
@@ -273,5 +281,10 @@ const organizationSettings: {
   org_gvTsxeeYy97qedaS: {
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID]
+  },
+  // Counsel Health
+  org_YVKjNwccHKUm3DIa: {
+    logo: 'counsel_logo.png',
+    accentColor: '#333333'
   }
 };
