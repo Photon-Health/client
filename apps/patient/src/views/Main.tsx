@@ -64,8 +64,7 @@ export const Main = () => {
       console.log('handleOrderResponse', order);
       setOrder(order);
 
-      const preppedFills = countFillsAndRemoveDuplicates(order.fills);
-      setFlattenedFills(countFillsAndRemoveDuplicates(preppedFills));
+      setFlattenedFills(countFillsAndRemoveDuplicates(order.fills));
 
       datadogRum.setGlobalContextProperty('organizationId', order.organization.id);
       datadogRum.setGlobalContextProperty('orderId', orderId);
