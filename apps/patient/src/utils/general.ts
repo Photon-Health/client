@@ -72,30 +72,30 @@ export const getFulfillmentType = (
  * fill by treatment name
  */
 export type FillWithCount = types.Fill & { count: number };
-export const countFillsAndRemoveDuplicates = (fills: types.Fill[]): FillWithCount[] => {
-  const count: Record<string, number> = {};
-  const result: FillWithCount[] = [];
-
-  for (const fill of fills) {
-    const str = fill.treatment.id;
-
-    if (count[str]) {
-      // Increment count if treatment name already exists
-      count[str]++;
-
-      // Update count on existing object in result array
-      const existingFill = result.find((o) => o.treatment.id === str);
-      if (existingFill) {
-        existingFill.count = count[str];
-      }
-    } else {
-      // Add new treatment name and count if it does not exist
-      count[str] = 1;
-      const fillWithCount: FillWithCount = { ...fill, count: count[str] };
-      result.push(fillWithCount);
+export const countFillsAndRemoveDuplicates = (
+  fills: (FillWithCount | types.Fill)[]
+): FillWithCount[] => {
+  // First, count the occurrences of each treatment.id
+  const counts = fills.reduce((acc, fill) => {
+    const id = fill.treatment.id;
+    if (!(id in acc)) {
+      acc[id] = 0;
     }
-  }
-  return result;
+    acc[id] += 'count' in fill ? fill.count : 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Then, create a map of distinct fills with updated counts
+  const distinctFills = fills.reduce((acc: Map<string, FillWithCount>, fill) => {
+    const id = fill.treatment.id;
+    if (!acc.has(id)) {
+      acc.set(id, { ...fill, count: counts[id] });
+    }
+    return acc;
+  }, new Map<string, FillWithCount>());
+
+  // Convert the map values to an array and return
+  return Array.from(distinctFills.values());
 };
 
 function isOpenEvent(event: types.PharmacyEvent): event is types.PharmacyOpenEvent {
