@@ -96,23 +96,6 @@ export interface GetLastOrderResponse {
   }[];
 }
 
-async function hangingAsyncInterval(
-  callback: () => boolean,
-  interval: number,
-  maxAttempts: number
-): Promise<boolean> {
-  return new Promise((resolve) => {
-    const checkCondition = () => {
-      if (callback()) {
-        resolve(true);
-      } else {
-        setTimeout(checkCondition, interval); // No maxAttempts check, will run indefinitely
-      }
-    };
-    checkCondition();
-  });
-}
-
 export interface PharmacySearchProps {
   address?: string;
   patientId?: string;
