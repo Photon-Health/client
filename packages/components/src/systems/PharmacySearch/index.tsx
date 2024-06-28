@@ -96,6 +96,23 @@ export interface GetLastOrderResponse {
   }[];
 }
 
+async function hangingAsyncInterval(
+  callback: () => boolean,
+  interval: number,
+  maxAttempts: number
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    const checkCondition = () => {
+      if (callback()) {
+        resolve(true);
+      } else {
+        setTimeout(checkCondition, interval); // No maxAttempts check, will run indefinitely
+      }
+    };
+    checkCondition();
+  });
+}
+
 export interface PharmacySearchProps {
   address?: string;
   patientId?: string;
@@ -138,36 +155,49 @@ export default function PharmacySearch(props: PharmacySearchProps) {
 
   async function fetchPreferredAndPrevious(patientId: string) {
     setFetchingPreferred(true);
-    const { data: preferredData } = await client!.apollo.query({
-      query: GetPreferredPharmaciesQuery,
-      variables: { id: patientId }
-    });
-    const { data: previousData } = await client!.apollo.query({
-      query: GetLastOrderQuery,
-      variables: { id: patientId }
-    });
+    try {
+      const { data: preferredData } = await client!.apollo.query({
+        query: GetPreferredPharmaciesQuery,
+        variables: { id: patientId }
+      });
+      const { data: previousData } = await client!.apollo.query({
+        query: GetLastOrderQuery,
+        variables: { id: patientId }
+      });
 
-    const address = preferredData?.patient?.address;
+      const address = preferredData?.patient?.address;
 
-    if (address) {
-      const addressStr = formatAddress(address);
-      await asyncInterval(() => !!geocoder(), 10, 20);
-      await getAndSetLocation(addressStr, geocoder()!);
+      if (address) {
+        const addressStr = formatAddress(address);
+
+        // Make sure that the geocoder is loaded
+        const isGeocoderLoaded = await asyncInterval(() => !!geocoder(), 10, 20);
+
+        if (isGeocoderLoaded) {
+          const geo = geocoder()!; // ts won't let it fly without the non-null assertion here
+          await getAndSetLocation(addressStr, geo);
+        } else {
+          throw new Error('Hit max attempts to load geocoder');
+        }
+      }
+
+      if (preferredData?.patient?.preferredPharmacies?.length > 0) {
+        setPreferredPharmacies(
+          preferredData?.patient?.preferredPharmacies.map((ph: Pharmacy) => ({
+            ...ph,
+            preferred: true
+          }))
+        );
+      }
+
+      if (previousData?.orders?.length > 0) {
+        setPreviousId(previousData?.orders?.[0]?.pharmacy?.id);
+      }
+    } catch (error) {
+      console.error('Error fetching preferred and previous pharmacies:', error);
+    } finally {
+      setFetchingPreferred(false);
     }
-
-    if (preferredData?.patient?.preferredPharmacies?.length > 0) {
-      setPreferredPharmacies(
-        preferredData?.patient?.preferredPharmacies.map((ph: Pharmacy) => ({
-          ...ph,
-          preferred: true
-        }))
-      );
-    }
-
-    if (previousData?.orders?.length > 0) {
-      setPreviousId(previousData?.orders?.[0]?.pharmacy?.id);
-    }
-    setFetchingPreferred(false);
   }
 
   const mergedPharmacies = createMemo(() => {
