@@ -153,11 +153,12 @@ export default function PharmacySearch(props: PharmacySearchProps) {
       if (address) {
         const addressStr = formatAddress(address);
 
-        // Make sure that the geocoder is loaded
-        const isGeocoderLoaded = await asyncInterval(() => !!geocoder(), 10, 20);
+        const geo = geocoder();
 
-        if (isGeocoderLoaded) {
-          const geo = geocoder()!; // ts won't let it fly without the non-null assertion here
+        // Make sure that the geocoder is loaded
+        await asyncInterval(() => !!geo, 10, 20);
+
+        if (geo) {
           await getAndSetLocation(addressStr, geo);
         } else {
           throw new Error('Hit max attempts to load geocoder');
