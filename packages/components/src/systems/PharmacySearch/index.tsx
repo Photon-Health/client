@@ -138,36 +138,50 @@ export default function PharmacySearch(props: PharmacySearchProps) {
 
   async function fetchPreferredAndPrevious(patientId: string) {
     setFetchingPreferred(true);
-    const { data: preferredData } = await client!.apollo.query({
-      query: GetPreferredPharmaciesQuery,
-      variables: { id: patientId }
-    });
-    const { data: previousData } = await client!.apollo.query({
-      query: GetLastOrderQuery,
-      variables: { id: patientId }
-    });
+    try {
+      const { data: preferredData } = await client!.apollo.query({
+        query: GetPreferredPharmaciesQuery,
+        variables: { id: patientId }
+      });
+      const { data: previousData } = await client!.apollo.query({
+        query: GetLastOrderQuery,
+        variables: { id: patientId }
+      });
 
-    const address = preferredData?.patient?.address;
+      const address = preferredData?.patient?.address;
 
-    if (address) {
-      const addressStr = formatAddress(address);
-      await asyncInterval(() => !!geocoder(), 10, 20);
-      await getAndSetLocation(addressStr, geocoder()!);
+      if (address) {
+        const addressStr = formatAddress(address);
+
+        const geo = geocoder();
+
+        // Make sure that the geocoder is loaded
+        await asyncInterval(() => !!geo, 10, 20);
+
+        if (geo) {
+          await getAndSetLocation(addressStr, geo);
+        } else {
+          throw new Error('Hit max attempts to load geocoder');
+        }
+      }
+
+      if (preferredData?.patient?.preferredPharmacies?.length > 0) {
+        setPreferredPharmacies(
+          preferredData?.patient?.preferredPharmacies.map((ph: Pharmacy) => ({
+            ...ph,
+            preferred: true
+          }))
+        );
+      }
+
+      if (previousData?.orders?.length > 0) {
+        setPreviousId(previousData?.orders?.[0]?.pharmacy?.id);
+      }
+    } catch (error) {
+      console.error('Error fetching preferred and previous pharmacies:', error);
+    } finally {
+      setFetchingPreferred(false);
     }
-
-    if (preferredData?.patient?.preferredPharmacies?.length > 0) {
-      setPreferredPharmacies(
-        preferredData?.patient?.preferredPharmacies.map((ph: Pharmacy) => ({
-          ...ph,
-          preferred: true
-        }))
-      );
-    }
-
-    if (previousData?.orders?.length > 0) {
-      setPreviousId(previousData?.orders?.[0]?.pharmacy?.id);
-    }
-    setFetchingPreferred(false);
   }
 
   const mergedPharmacies = createMemo(() => {
