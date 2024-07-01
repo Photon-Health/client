@@ -1,11 +1,10 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { Text } from '@chakra-ui/react';
-import { OrderFulfillment } from 'packages/sdk/dist/types';
+import { OrderFulfillment, Maybe } from 'packages/sdk/dist/types';
 import isTomorrow from 'dayjs/plugin/isTomorrow';
 
 dayjs.extend(isTomorrow);
 
-export type Maybe<T> = T | null;
 interface ReadyTextProps {
   readyBy?: string;
   readyByDay?: string;
