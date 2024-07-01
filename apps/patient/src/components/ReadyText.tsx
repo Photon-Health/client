@@ -10,7 +10,7 @@ interface ReadyTextProps {
   readyByDay?: string;
   readyByTime?: string;
   isDeliveryPharmacy?: boolean;
-  fulfillment?: Maybe<OrderFulfillment> | undefined;
+  fulfillment?: Maybe<OrderFulfillment>;
 }
 export const ReadyText = ({
   readyBy,
