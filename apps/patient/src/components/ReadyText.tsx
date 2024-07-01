@@ -12,6 +12,7 @@ interface ReadyTextProps {
   isDeliveryPharmacy?: boolean;
   fulfillment?: Maybe<OrderFulfillment>;
 }
+
 export const ReadyText = ({
   readyBy,
   readyByDay,
