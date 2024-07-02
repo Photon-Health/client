@@ -18,7 +18,13 @@ import { FiInfo } from 'react-icons/fi';
 import dayjs from 'dayjs';
 
 const holidays = [
-  '2024-05-27' // Memorial Day
+  '2024-05-27', // Memorial Day
+  '2024-07-04', // july 4
+  '2024-09-02', // labor day
+  '2024-11-28', // Thanksgiving
+  '2024-12-24', // Christmas Eve
+  '2024-12-25', // Christmas
+  '2025-01-01' // New years
 ];
 
 /**
