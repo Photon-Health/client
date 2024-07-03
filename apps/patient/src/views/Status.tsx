@@ -15,6 +15,7 @@ import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/gen
 import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { HorizontalStatusStepper } from '../components/HorizontalStatusStepper';
+import { ReadyText } from '../components/ReadyText';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ export const Status = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
 
-  const { fulfillment, pharmacy } = order;
+  const { fulfillment, pharmacy, readyBy, readyByDay, readyByTime } = order;
 
   const fulfillmentType = getFulfillmentType(
     pharmacy?.id,
@@ -210,7 +211,7 @@ export const Status = () => {
 
       <Box bgColor="white">
         <Container>
-          <VStack spacing={5} align="start" py={5}>
+          <VStack spacing={4} align="start" py={5}>
             <Heading as="h3" size="lg">
               {copy.heading}
             </Heading>
@@ -240,12 +241,20 @@ export const Status = () => {
               </Box>
             ) : null}
 
+            <ReadyText
+              readyBy={readyBy}
+              readyByDay={readyByDay}
+              readyByTime={readyByTime}
+              isDeliveryPharmacy={isDeliveryPharmacy}
+              fulfillment={fulfillment}
+            />
+
             <HorizontalStatusStepper
               fulfillmentType={fulfillmentType}
               status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
             />
 
-            <VStack spacing={2} w="full">
+            <VStack spacing={2} w="full" pt={2}>
               {order?.pharmacy?.id && isDeliveryPharmacy ? (
                 <BrandedPharmacyCard pharmacyId={order.pharmacy.id} />
               ) : pharmacyWithHours ? (
