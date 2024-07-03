@@ -286,5 +286,10 @@ const organizationSettings: {
   org_YVKjNwccHKUm3DIa: {
     logo: 'counsel_logo.png',
     accentColor: '#333333'
+  },
+  // Measured
+  org_pcPnPx5PVamzjS2p: {
+    logo: 'measured_logo.svg',
+    accentColor: '#ffd100'
   }
 };
