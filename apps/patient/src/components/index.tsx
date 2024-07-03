@@ -11,3 +11,4 @@ export * from './PharmacyFilters';
 export * from './PickupOptions';
 export * from './PoweredBy';
 export * from './StatusStepper';
+export * from './ReadyText';
