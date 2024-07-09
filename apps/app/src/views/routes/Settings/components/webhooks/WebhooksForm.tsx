@@ -40,7 +40,11 @@ const hookSchema = yup.object({
       /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
       'Please enter a valid URL'
     ),
-  sharedSecret: yup.string().matches(/^\S*$/, 'Secrets cannot contain any whitespace'),
+  sharedSecret: yup
+    .string()
+    .min(1, 'Secret must not be empty')
+    .required()
+    .matches(/^\S*$/, 'Secrets cannot contain any whitespace'),
   radioGroup: yup.string().required('Please select one of the options'),
   filters: yup.array(yup.string().required()).required()
 });
