@@ -42,8 +42,7 @@ const hookSchema = yup.object({
     ),
   sharedSecret: yup
     .string()
-    .min(1, 'Secret must not be empty')
-    .required()
+    .required('Secret must not be empty')
     .matches(/^\S*$/, 'Secrets cannot contain any whitespace'),
   radioGroup: yup.string().required('Please select one of the options'),
   filters: yup.array(yup.string().required()).required()
