@@ -150,6 +150,7 @@ const organizationSettings: {
   },
   // Shapiro Medical (Xyon Health)
   org_Y0EPcd3p5eqG4iZs: {
+    sendOrder: false,
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID],
@@ -158,6 +159,7 @@ const organizationSettings: {
   },
   // Osei Tutu (Xyon Health)
   org_WeSplxuyqxdIph1f: {
+    sendOrder: false,
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID],
@@ -166,6 +168,7 @@ const organizationSettings: {
   },
   // Fadeyi Derm (Xyon Health)
   org_sWEo459pSKLt6wZ5: {
+    sendOrder: false,
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID],
@@ -174,6 +177,7 @@ const organizationSettings: {
   },
   // Precision Medical Hair Restoration & Aesthetics (Xyon Health)
   org_G52mrmIBC3yqeNYB: {
+    sendOrder: false,
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID],
@@ -182,6 +186,7 @@ const organizationSettings: {
   },
   // Gabel Center (Xyon Health)
   org_CFRRTHpFWmTjUjdP: {
+    sendOrder: false,
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID],
@@ -190,6 +195,16 @@ const organizationSettings: {
   },
   // California Hair Surgeon (Xyon Health)
   org_XWFD5B6e8qhCxXfN: {
+    sendOrder: false,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
+    sendToPatient: false,
+    enableRxAndOrder: false
+  },
+  // Anderson HSC (Xyon Health)
+  org_mFPQdGzFZibbkFd7: {
+    sendOrder: false,
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID],
