@@ -204,7 +204,7 @@ export const Status = () => {
 
   return (
     <Box>
-      <DemoCtaModal isOpen={showDemoCtaModal} />
+      <DemoCtaModal isOpen={showDemoCtaModal} onClose={() => setShowDemoCtaModal(false)} />
       <Helmet>
         <title>{t.track}</title>
       </Helmet>
