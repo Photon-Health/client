@@ -172,6 +172,14 @@ const organizationSettings: {
     sendToPatient: false,
     enableRxAndOrder: false
   },
+  // Gabel Center (Xyon Health)
+  org_CFRRTHpFWmTjUjdP: {
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
+    sendToPatient: false,
+    enableRxAndOrder: false
+  },
   // California Hair Surgeon (Xyon Health)
   org_XWFD5B6e8qhCxXfN: {
     pickUp: false,
