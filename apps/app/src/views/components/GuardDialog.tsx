@@ -29,14 +29,15 @@ const GuardDialog = ({ show, proceed, confirmation, options }: GuardDialogProps)
         left={0}
         align="center"
         justify="center"
-        backgroundColor="rgb(0, 0, 0, 0.4)"
+        backgroundColor="rgba(0, 0, 0, 0.4)"
       >
         <Box
           background={options.darkMode ? 'gray.700' : 'white'}
           rounded="md"
-          px={4}
-          py={4}
-          minW="40%"
+          px={{ base: 4, md: 6 }}
+          py={{ base: 4, md: 6 }}
+          maxW={{ base: '90%', md: '600px' }}
+          mx="auto"
         >
           <Text align="left" fontWeight="semibold" fontSize="xl" pb={2}>
             {confirmation}

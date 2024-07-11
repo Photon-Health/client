@@ -66,7 +66,7 @@ export const InviteItem = ({ invite: data }: { invite: FragmentType<typeof invit
             isDisabled={resendLoading || deleteLoading}
             onClick={async () => {
               const decision = await confirmWrapper('Resend Invite?', {
-                description: <Text mb={2}>This will resend invite</Text>,
+                description: <Text mb={2}>The user will receive a new signup link via email.</Text>,
                 cancelText: "No, Don't Resend",
                 confirmText: 'Yes, Resend',
                 colorScheme: 'blue'
