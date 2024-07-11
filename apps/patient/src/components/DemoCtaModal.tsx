@@ -2,6 +2,7 @@ import {
   Button,
   Image,
   Modal,
+  ModalCloseButton,
   ModalHeader,
   ModalOverlay,
   ModalContent,
@@ -12,7 +13,12 @@ import {
 
 import image from '../assets/conversation.png';
 
-export const DemoCtaModal = ({ isOpen }: { isOpen: boolean }) => {
+interface DemoCtaModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const DemoCtaModal = ({ isOpen, onClose }: DemoCtaModalProps) => {
   const handleCtaClick = () => {
     window.open('https://www.photon.health/sign-up');
   };
@@ -25,6 +31,7 @@ export const DemoCtaModal = ({ isOpen }: { isOpen: boolean }) => {
           <Image src={image} width="auto" height="120px" mx="auto" pt={6} />
         </ModalBody>
         <ModalHeader alignSelf="center">Take your time back</ModalHeader>
+        <ModalCloseButton onClick={onClose} />
         <ModalBody pb={6}>
           <VStack spacing={1} align="stretch" textAlign="center" w="full">
             <Text align="start">
