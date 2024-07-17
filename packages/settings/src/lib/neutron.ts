@@ -76,7 +76,8 @@ const organizationSettings: {
       HONEYBEE_PHARMACY_ID,
       GOGOMEDS_PHARMACY_ID
     ],
-    topRankedWalgreens: true
+    topRankedWalgreens: true,
+    enableCourierNavigate: true
   },
   // NewCo (demo's)
   org_YiUudCToTSrjOuow: {
@@ -220,7 +221,7 @@ const organizationSettings: {
   org_QFoulY6Ornx7dMdw: {
     logo: 'sesame_logo.jpg',
     accentColor: '#5224C7',
-    enableCourierNavigate: false,
+    enableCourierNavigate: true,
     topRankedCostco: true
   },
   // Oshi Health

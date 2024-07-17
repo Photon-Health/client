@@ -5,7 +5,7 @@ import isToday from 'dayjs/plugin/isToday';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import costcoLogo from '../assets/costco_small.png';
+import costcoLogo from '../assets/costco_logo_small.png';
 import walgreensLogo from '../assets/walgreens_small.png';
 import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';

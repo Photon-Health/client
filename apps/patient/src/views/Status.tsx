@@ -7,7 +7,7 @@ import { Helmet } from 'react-helmet';
 import { FiCheck, FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
-import { BrandedPharmacyCard, DemoCtaModal, PharmacyInfo, PoweredBy } from '../components';
+import { DemoCtaModal, PharmacyInfo, PoweredBy, PHARMACY_BRANDING } from '../components';
 import { FAQ } from '../components/FAQ';
 import { PrescriptionsList } from '../components/PrescriptionsList';
 import * as TOAST_CONFIG from '../configs/toast';
@@ -256,7 +256,14 @@ export const Status = () => {
 
             <VStack spacing={2} w="full" pt={2}>
               {order?.pharmacy?.id && isDeliveryPharmacy ? (
-                <BrandedPharmacyCard pharmacyId={order.pharmacy.id} />
+                <PharmacyInfo
+                  pharmacy={{
+                    id: order.pharmacy.id,
+                    ...PHARMACY_BRANDING[order.pharmacy.id]
+                  }}
+                  showDetails={false}
+                  isStatus
+                />
               ) : pharmacyWithHours ? (
                 <PharmacyInfo
                   pharmacy={pharmacyWithHours}
