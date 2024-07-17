@@ -646,8 +646,10 @@ export const Pharmacy = () => {
               <BrandedOptions
                 options={[
                   ...(enableCourier && order?.address?.postalCode && capsulePharmacyId
-                    ? // For Sesame only, check that there are no GLP1's before surfacing Capsule
-                      order?.organization?.name.includes('Sesame') && !containsGLP
+                    ? // For Sesame and our test org only, check that there are no GLP1's before surfacing Capsule
+                      (order?.organization?.name.includes('Sesame') ||
+                        order?.organization?.name.includes('Test')) &&
+                      !containsGLP
                       ? [capsulePharmacyId]
                       : []
                     : []),

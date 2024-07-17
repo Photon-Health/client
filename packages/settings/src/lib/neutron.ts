@@ -76,7 +76,8 @@ const organizationSettings: {
       HONEYBEE_PHARMACY_ID,
       GOGOMEDS_PHARMACY_ID
     ],
-    topRankedWalgreens: true
+    topRankedWalgreens: true,
+    enableCourierNavigate: true
   },
   // NewCo (demo's)
   org_YiUudCToTSrjOuow: {
