@@ -31,7 +31,7 @@ const capsulePharmacyIds = Object.keys(capsulePharmacyIdLookup);
 for (let i = 0; i < capsulePharmacyIds.length; i++) {
   PHARMACY_BRANDING[capsulePharmacyIds[i]] = {
     logo: capsuleLogo,
-    description: 'Delivers as soon as today'
+    description: 'Next day delivery'
   };
 }
 
