@@ -1,56 +1,66 @@
-import { Image, Text, VStack, Box } from '@chakra-ui/react';
+import { Card, CardBody } from '@chakra-ui/react';
 
-import capsuleLogo from '../assets/capsule_logo.png';
-import amazonPharmacyLogo from '../assets/amazon_pharmacy.png';
+import capsuleLogo from '../assets/capsule_logo_small.png';
+import amazonPharmacyLogo from '../assets/amazon_pharmacy_logo_small.png';
 import altoLogo from '../assets/alto_logo.svg';
-import costcoLogo from '../assets/costco_pharmacy_logo.png';
+import costcoLogo from '../assets/costco_logo_small.png';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
+import { PharmacyInfo } from './PharmacyInfo';
 
 interface Props {
   pharmacyId: string;
-  handleSelect?: ((id: string) => void) | undefined;
+  selected: boolean;
+  handleSelect: (id: string) => void;
 }
 
-const PHARMACY_BRANDING = {
+export const PHARMACY_BRANDING = {
   [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]: {
     logo: amazonPharmacyLogo,
+    name: 'Amazon Pharmacy',
     description: 'Delivers in 2-5 days'
   },
   [process.env.REACT_APP_ALTO_PHARMACY_ID as string]: {
     logo: altoLogo,
+    name: 'Alto Pharmacy',
     description: 'Delivers as soon as today'
   },
   [process.env.REACT_APP_COSTCO_PHARMACY_ID as string]: {
     logo: costcoLogo,
+    name: 'Costco Pharmacy',
     description: 'Delivers in 1-2 days'
-  }
+  },
+  ...Object.fromEntries(
+    Object.keys(capsulePharmacyIdLookup).map((id) => [
+      id,
+      {
+        logo: capsuleLogo,
+        name: 'Capsule Pharmacy',
+        description: 'Next day delivery'
+      }
+    ])
+  )
 };
-// TODO: need to make this more elegant
-const capsulePharmacyIds = Object.keys(capsulePharmacyIdLookup);
-for (let i = 0; i < capsulePharmacyIds.length; i++) {
-  PHARMACY_BRANDING[capsulePharmacyIds[i]] = {
-    logo: capsuleLogo,
-    description: 'Delivers as soon as today'
-  };
-}
 
-export const BrandedPharmacyCard = ({ pharmacyId, handleSelect }: Props) => {
+export const BrandedPharmacyCard = ({ pharmacyId, selected, handleSelect }: Props) => {
   const brand = PHARMACY_BRANDING[pharmacyId];
   if (!brand) return null;
 
-  const tagline = brand.description ? (
-    <Text fontSize="sm" color="gray.500">
-      {brand.description}
-    </Text>
-  ) : null;
+  const pharmacy = { id: pharmacyId, name: brand.name, logo: brand.logo };
 
   return (
-    <Box bgColor="white" w="full" cursor="pointer" onClick={() => handleSelect?.(pharmacyId)}>
-      <VStack align="start" spacing={2}>
-        <Image src={brand.logo} width="auto" height="30px" />
-        {tagline}
-      </VStack>
-    </Box>
+    <Card
+      bgColor="white"
+      border="2px solid"
+      borderColor={selected ? 'brand.500' : 'white'}
+      borderRadius="lg"
+      onClick={() => handleSelect(pharmacyId)}
+      mx={{ base: -3, md: undefined }}
+      cursor="pointer"
+    >
+      <CardBody p={3}>
+        <PharmacyInfo pharmacy={pharmacy} tagline={brand.description} boldPharmacyName={false} />
+      </CardBody>
+    </Card>
   );
 };
