@@ -1,7 +1,7 @@
 import { Card, CardBody } from '@chakra-ui/react';
 
 import capsuleLogo from '../assets/capsule_logo_small.png';
-import amazonPharmacyLogo from '../assets/amazon_pharmacy_logo_small.svg';
+import amazonPharmacyLogo from '../assets/amazon_pharmacy_logo_small.png';
 import altoLogo from '../assets/alto_logo.svg';
 import costcoLogo from '../assets/costco_pharmacy_logo.png';
 
