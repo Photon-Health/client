@@ -77,6 +77,7 @@ const DistanceAddress = ({ distance, address, fontSize = 'sm' }: DistanceAddress
 
 interface PharmacyInfoProps {
   pharmacy: EnrichedPharmacy;
+  tagline?: string;
   preferred?: boolean;
   showDetails?: boolean;
   boldPharmacyName?: boolean;
@@ -86,6 +87,7 @@ interface PharmacyInfoProps {
 
 export const PharmacyInfo = ({
   pharmacy,
+  tagline,
   preferred = false,
   showDetails = true,
   boldPharmacyName = true,
@@ -115,14 +117,29 @@ export const PharmacyInfo = ({
       ) : null}
       <HStack w="full">
         <HStack>
-          {pharmacy?.logo ? <Image src={pharmacy.logo} width="auto" height="18px" /> : null}
-          <Text fontSize="md" as={boldPharmacyName ? 'b' : undefined}>
+          {pharmacy?.logo ? (
+            <Box boxSize="32px" overflow="hidden">
+              <Image
+                src={pharmacy.logo}
+                width="auto"
+                height="32px"
+                boxSize="100%"
+                objectFit="contain"
+              />
+            </Box>
+          ) : null}
+          <Text fontSize="md" fontWeight={boldPharmacyName ? 'bold' : 'medium'}>
             {pharmacy.name}
           </Text>
         </HStack>
       </HStack>
       {showDetails ? (
         <VStack direction={isStatus ? 'column-reverse' : 'column'} spacing={1}>
+          {tagline ? (
+            <Text fontSize="sm" color="gray.500">
+              {tagline}
+            </Text>
+          ) : null}
           <Hours
             isOpen={pharmacy.isOpen}
             is24Hr={pharmacy.is24Hr}
