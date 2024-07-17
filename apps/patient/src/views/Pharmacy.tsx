@@ -646,7 +646,10 @@ export const Pharmacy = () => {
               <BrandedOptions
                 options={[
                   ...(enableCourier && order?.address?.postalCode && capsulePharmacyId
-                    ? [capsulePharmacyId]
+                    ? // For Sesame only, check that there are no GLP1's before surfacing Capsule
+                      order?.organization?.name.includes('Sesame') && !containsGLP
+                      ? [capsulePharmacyId]
+                      : []
                     : []),
                   ...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : [])
                 ]}

@@ -13,8 +13,6 @@ interface Props {
 export const BrandedOptions = ({ options, location, selectedId, handleSelect }: Props) => {
   if (!location) return null;
 
-  console.log(options);
-
   return (
     <VStack spacing={2} align="span" w="full">
       <SlideFade offsetY="60px" in={true}>
