@@ -11,7 +11,7 @@ import { PharmacyInfo } from './PharmacyInfo';
 interface Props {
   pharmacyId: string;
   selected: boolean;
-  handleSelect?: ((id: string) => void) | undefined;
+  handleSelect: (id: string) => void;
 }
 
 export const PHARMACY_BRANDING = {
@@ -48,17 +48,15 @@ export const BrandedPharmacyCard = ({ pharmacyId, selected, handleSelect }: Prop
 
   const pharmacy = { id: pharmacyId, name: brand.name, logo: brand.logo };
 
-  const selectable = !!handleSelect;
-
   return (
     <Card
       bgColor="white"
       border="2px solid"
-      borderColor={selected && selectable ? 'brand.500' : 'white'}
+      borderColor={selected ? 'brand.500' : 'white'}
       borderRadius="lg"
-      onClick={() => selectable && handleSelect(pharmacyId)}
+      onClick={() => handleSelect(pharmacyId)}
       mx={{ base: -3, md: undefined }}
-      cursor={selectable ? 'pointer' : undefined}
+      cursor="pointer"
     >
       <CardBody p={3}>
         <PharmacyInfo pharmacy={pharmacy} tagline={brand.description} boldPharmacyName={false} />
