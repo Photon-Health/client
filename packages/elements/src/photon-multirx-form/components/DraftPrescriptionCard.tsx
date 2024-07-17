@@ -1,4 +1,4 @@
-import { createSignal } from 'solid-js';
+import { createSignal, Ref } from 'solid-js';
 import { DraftPrescriptions } from '@photonhealth/components';
 import { size, array, any } from 'superstruct';
 import { Card, Text } from '@photonhealth/components';
@@ -7,6 +7,8 @@ import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import type { TemplateOverrides, DraftPrescription } from '@photonhealth/components';
 import { PhotonTooltip } from '../../photon-tooltip';
+import { partition } from 'lodash';
+import { unwrap } from 'solid-js/store';
 
 const draftPrescriptionsValidator = message(
   size(array(any()), 1, Infinity),
@@ -22,6 +24,7 @@ export const DraftPrescriptionCard = (props: {
   store: Record<string, any>;
   setIsEditing: (isEditing: boolean) => void;
 }) => {
+  let ref: Ref<any> | undefined;
   const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = createSignal<boolean>(false);
   const [editDraft, setEditDraft] = createSignal<any>(undefined);
@@ -31,6 +34,17 @@ export const DraftPrescriptionCard = (props: {
     key: 'draftPrescriptions',
     validator: draftPrescriptionsValidator
   });
+
+  const dispatchPrescriptionDraftDeleted = (prescription: DraftPrescription) => {
+    const event = new CustomEvent('photon-draft-prescription-deleted', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        prescription: unwrap(prescription)
+      }
+    });
+    ref?.dispatchEvent(event);
+  };
 
   const editPrescription = () => {
     if (editDraft().treatment) {
@@ -79,10 +93,18 @@ export const DraftPrescriptionCard = (props: {
     setEditDraft(undefined);
   };
   const handleDeleteConfirm = () => {
+    const [deleted, remaining] = partition<DraftPrescription>(
+      props.store['draftPrescriptions'].value,
+      (x) => x.id === deleteDraftId()
+    );
+
     props.actions.updateFormValue({
       key: 'draftPrescriptions',
-      value: props.store['draftPrescriptions'].value.filter((x: any) => x.id !== deleteDraftId())
+      value: remaining
     });
+
+    dispatchPrescriptionDraftDeleted(deleted[0]);
+
     setDeleteDialogOpen(false);
     setDeleteDraftId(undefined);
 
