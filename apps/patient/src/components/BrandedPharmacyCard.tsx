@@ -3,7 +3,7 @@ import { Card, CardBody } from '@chakra-ui/react';
 import capsuleLogo from '../assets/capsule_logo_small.png';
 import amazonPharmacyLogo from '../assets/amazon_pharmacy_logo_small.png';
 import altoLogo from '../assets/alto_logo.svg';
-import costcoLogo from '../assets/costco_pharmacy_logo.png';
+import costcoLogo from '../assets/costco_logo_small.png';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import { PharmacyInfo } from './PharmacyInfo';
