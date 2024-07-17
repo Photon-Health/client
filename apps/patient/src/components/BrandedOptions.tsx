@@ -12,6 +12,7 @@ interface Props {
 
 export const BrandedOptions = ({ options, location, selectedId, handleSelect }: Props) => {
   if (!location) return null;
+  if (options.length === 0) return null;
 
   return (
     <VStack spacing={2} align="span" w="full">
