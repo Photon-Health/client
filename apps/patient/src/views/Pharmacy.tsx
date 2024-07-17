@@ -648,7 +648,7 @@ export const Pharmacy = () => {
                   ...(enableCourier && order?.address?.postalCode && capsulePharmacyId
                     ? // For Sesame and our test org only, check that there are no GLP1's before surfacing Capsule
                       (order?.organization?.name.includes('Sesame') ||
-                        order?.organization?.name.includes('Test')) &&
+                        order?.organization?.name.includes('Photon Test Org')) &&
                       !containsGLP
                       ? [capsulePharmacyId]
                       : []
