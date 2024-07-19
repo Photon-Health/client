@@ -95,7 +95,8 @@ export class AuthManager {
         ...(organizationId || this.organization
           ? { organization: organizationId || this.organization }
           : {}),
-        ...(invitation ? { invitation } : {})
+        ...(invitation ? { invitation } : {}),
+        prompt: 'select_account'
       },
       ...(appState ? { appState } : {})
     };
