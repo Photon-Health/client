@@ -35,6 +35,8 @@ import { createVirtualizer, VirtualItem } from '@tanstack/solid-virtual';
 
 interface DataItem<T> {
   data: T;
+  // TODO: setting this to scroll to the correct index
+  // after reopening the list, but not working ATM
   allItemsIdx: number;
 }
 
