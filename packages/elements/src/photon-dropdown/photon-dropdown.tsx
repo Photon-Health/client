@@ -35,6 +35,7 @@ import { createVirtualizer, VirtualItem } from '@tanstack/solid-virtual';
 
 interface DataItem<T> {
   data: T;
+  allItemsIdx: number;
 }
 
 interface GroupTitle {
@@ -95,14 +96,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   const [open, setOpen] = createSignal(false);
   const [selected, setSelected] = createSignal<T | undefined>(undefined);
   const [selectedIndex, setSelectedIndex] = createSignal(-1);
-  const [virtualizer, setVirtualizer] = createSignal(
-    createVirtualizer({
-      count: props.data.length,
-      getScrollElement: () => listRef,
-      estimateSize: () => 36.8,
-      overscan: 25
-    })
-  );
   const [lastIndex, setLastIndex] = createSignal();
 
   const debounceSearch = debounce(async (s: string) => {
@@ -177,18 +170,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
     }
   });
 
-  createEffect(() => {
-    const minHeight = props.data.length * 36.8;
-    listRef!.style.minHeight = `${minHeight}px`;
-    const virtualizer = createVirtualizer({
-      count: props.hasMore ? props.data.length + 1 : props.data.length,
-      getScrollElement: () => listRef,
-      estimateSize: () => 36.8,
-      overscan: !props.fetchMore ? props.data.length : 25
-    });
-    setVirtualizer(virtualizer);
-  });
-
   onMount(() => {
     if (inputRef) {
       inputRef.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -207,14 +188,17 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   });
 
   // Title and group items as one flat array
-  const allItems: Accessor<Item<T>[]> = createMemo(
-    () =>
-      props.groups
-        ?.map((g) => {
-          const data = props.data.filter((d) => g.filter(d)).map((d) => ({ data: d }));
-          return data.length > 0 ? [{ title: g.label }, ...data] : [];
-        })
-        .flat() ?? []
+  const allItems: Accessor<Item<T>[]> = createMemo(() =>
+    props.groups
+      ? props.groups
+          .map((g) => {
+            const data = props.data
+              .map((d, idx) => ({ data: d, allItemsIdx: idx }))
+              .filter((d) => g.filter(d.data));
+            return data.length > 0 ? [{ title: g.label }, ...data] : [];
+          })
+          .flat()
+      : props.data.map((d, idx) => ({ data: d, allItemsIdx: idx }))
   );
 
   const rowVirtualizer = createMemo(() =>
@@ -222,7 +206,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
       count: allItems().length,
       getScrollElement: () => listRef,
       estimateSize: () => 36.8,
-      overscan: 25
+      overscan: 100
     })
   );
 
@@ -285,7 +269,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
           on:sl-focus={() => {
             dropdownRef.children[1].style.width = `${inputRef.clientWidth}px`;
             if (selectedIndex() > 0) {
-              virtualizer().scrollToIndex(selectedIndex());
+              rowVirtualizer().scrollToIndex(selectedIndex());
             }
           }}
         >
@@ -355,14 +339,14 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
           >
             <div
               style={{
-                'min-height': `36.8px`,
+                height: `${rowVirtualizer().getTotalSize()}px`,
                 width: '100%'
               }}
               ref={listRef}
             >
               <Show when={props.data.length > 0 && !props.groups}>
                 <For
-                  each={virtualizer().getVirtualItems()}
+                  each={rowVirtualizer().getVirtualItems()}
                   fallback={<sl-menu-item>Loading...</sl-menu-item>}
                 >
                   {(vr: any) => {
@@ -443,7 +427,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                             onClick={() => {
                               if (!isLoaderRow) {
                                 setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
-                                setSelectedIndex(vr.index);
+                                setSelectedIndex((datum as DataItem<T>).allItemsIdx);
                                 inputRef.value = '';
                                 debounceSearch('');
                                 dispatchSelect((datum as DataItem<T>).data);
@@ -452,6 +436,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                             }}
                             setLastIndex={setLastIndex}
                           >
+                            {(datum as DataItem<T>).allItemsIdx}
                             {props.displayAccessor((datum as DataItem<T>).data, false)}
                           </ItemEl>
                         </Match>
