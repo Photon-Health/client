@@ -344,47 +344,45 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
               }}
               ref={listRef}
             >
-              <Show when={props.data.length > 0}>
-                <For each={rowVirtualizer().getVirtualItems()}>
-                  {(vr) => {
-                    const isLoaderRow = vr.index > allItems().length - 1;
-                    const datum = allItems()[vr.index];
-                    const isSelected =
-                      'data' in datum && datum.data.id === selected()?.id && !isLoaderRow;
+              <For each={rowVirtualizer().getVirtualItems()}>
+                {(vr) => {
+                  const isLoaderRow = vr.index > allItems().length - 1;
+                  const datum = allItems()[vr.index];
+                  const isSelected =
+                    'data' in datum && datum.data.id === selected()?.id && !isLoaderRow;
 
-                    return (
-                      <Switch>
-                        <Match when={'title' in datum}>
-                          <GroupLabelEl item={datum as GroupTitle} />
-                        </Match>
-                        <Match when={'data' in datum}>
-                          <ItemEl
-                            item={vr}
-                            isLoader={isLoaderRow}
-                            isSelected={isSelected}
-                            index={vr.index}
-                            hasMore={props.hasMore}
-                            showOverflow={props.showOverflow}
-                            onClick={() => {
-                              if (!isLoaderRow) {
-                                setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
-                                setSelectedIndex((datum as DataItem<T>).allItemsIdx);
-                                inputRef.value = '';
-                                debounceSearch('');
-                                dispatchSelect((datum as DataItem<T>).data);
-                                dropdownRef.hide();
-                              }
-                            }}
-                            setLastIndex={setLastIndex}
-                          >
-                            {props.displayAccessor((datum as DataItem<T>).data, false)}
-                          </ItemEl>
-                        </Match>
-                      </Switch>
-                    );
-                  }}
-                </For>
-              </Show>
+                  return (
+                    <Switch>
+                      <Match when={'title' in datum}>
+                        <GroupLabelEl item={datum as GroupTitle} />
+                      </Match>
+                      <Match when={'data' in datum}>
+                        <ItemEl
+                          item={vr}
+                          isLoader={isLoaderRow}
+                          isSelected={isSelected}
+                          index={vr.index}
+                          hasMore={props.hasMore}
+                          showOverflow={props.showOverflow}
+                          onClick={() => {
+                            if (!isLoaderRow) {
+                              setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
+                              setSelectedIndex((datum as DataItem<T>).allItemsIdx);
+                              inputRef.value = '';
+                              debounceSearch('');
+                              dispatchSelect((datum as DataItem<T>).data);
+                              dropdownRef.hide();
+                            }
+                          }}
+                          setLastIndex={setLastIndex}
+                        >
+                          {props.displayAccessor((datum as DataItem<T>).data, false)}
+                        </ItemEl>
+                      </Match>
+                    </Switch>
+                  );
+                }}
+              </For>
               <Show when={props.data.length == 0 && !props.isLoading}>
                 <sl-menu-item>{props.noDataMsg ? props.noDataMsg : 'No data found'}</sl-menu-item>
               </Show>
