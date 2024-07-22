@@ -344,7 +344,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
               }}
               ref={listRef}
             >
-              <Show when={props.data.length > 0 && props.groups && props.groups.length > 0}>
+              <Show when={props.data.length > 0}>
                 <For each={rowVirtualizer().getVirtualItems()}>
                   {(vr) => {
                     const isLoaderRow = vr.index > allItems().length - 1;
