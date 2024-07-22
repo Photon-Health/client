@@ -344,65 +344,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
               }}
               ref={listRef}
             >
-              <Show when={props.data.length > 0 && !props.groups}>
-                <For
-                  each={rowVirtualizer().getVirtualItems()}
-                  fallback={<sl-menu-item>Loading...</sl-menu-item>}
-                >
-                  {(vr: any) => {
-                    const isLoaderRow = vr.index > props.data.length - 1;
-                    const datum = props.data[vr.index];
-                    return (
-                      <sl-menu-item
-                        class={
-                          datum && datum.id === selected()?.id && !isLoaderRow
-                            ? 'selected default'
-                            : 'default'
-                        }
-                        onClick={() => {
-                          if (!isLoaderRow) {
-                            // @ts-ignore
-                            setSelected(datum);
-                            setSelectedIndex(vr.index);
-                            inputRef.value = '';
-                            debounceSearch('');
-                            dispatchSelect(datum);
-                            dropdownRef.hide();
-                          }
-                        }}
-                        ref={(r: Element) => {
-                          if (isLoaderRow && vr.index > 0) {
-                            setLastIndex(r);
-                          }
-                        }}
-                        style={{
-                          width: '100%',
-                          'min-height': `${vr.size}px`
-                        }}
-                      >
-                        {isLoaderRow ? (
-                          props.hasMore ? (
-                            <p class="text-center text-gray-400 italic">Loading...</p>
-                          ) : (
-                            <p class="text-center text-gray-400 italic">Nothing more to load</p>
-                          )
-                        ) : (
-                          <p
-                            classList={{
-                              'overflow-hidden': !props.showOverflow,
-                              'overflow-ellipsis': !props.showOverflow,
-                              'whitespace-nowrap': !props.showOverflow,
-                              'whitespace-normal': props.showOverflow
-                            }}
-                          >
-                            {props.displayAccessor(datum, true)}
-                          </p>
-                        )}
-                      </sl-menu-item>
-                    );
-                  }}
-                </For>
-              </Show>
               <Show when={props.data.length > 0 && props.groups && props.groups.length > 0}>
                 <For each={rowVirtualizer().getVirtualItems()}>
                   {(vr) => {
@@ -436,7 +377,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                             }}
                             setLastIndex={setLastIndex}
                           >
-                            {(datum as DataItem<T>).allItemsIdx}
                             {props.displayAccessor((datum as DataItem<T>).data, false)}
                           </ItemEl>
                         </Match>
