@@ -36,7 +36,7 @@ export const PHARMACY_BRANDING = {
       {
         logo: capsuleLogo,
         name: 'Capsule Pharmacy',
-        description: 'Free Next Day Delivery'
+        description: 'Next day delivery'
       }
     ])
   )

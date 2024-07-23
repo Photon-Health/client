@@ -1,17 +1,6 @@
 //Solid
 import { debounce } from '@solid-primitives/scheduled';
-import {
-  Accessor,
-  createEffect,
-  createMemo,
-  createSignal,
-  For,
-  JSXElement,
-  Match,
-  onMount,
-  Show,
-  Switch
-} from 'solid-js';
+import { createEffect, createMemo, createSignal, For, JSXElement, onMount, Show } from 'solid-js';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/dropdown/dropdown';
@@ -31,24 +20,7 @@ import tailwind from '../tailwind.css?inline';
 import styles from './style.css?inline';
 
 //Virtual List
-import { createVirtualizer, VirtualItem } from '@tanstack/solid-virtual';
-
-interface DataItem<T> {
-  data: T;
-  // TODO: setting this to scroll to the correct index
-  // after reopening the list, but not working ATM
-  allItemsIdx: number;
-}
-
-interface GroupTitle {
-  title: string;
-}
-
-type Item<T = any> = DataItem<T> | GroupTitle;
-
-// Typescript and solid are annoying
-// eslint-disable-next-line @typescript-eslint/ban-types
-type ThisisNotAFunction<T> = Exclude<T, Function>;
+import { createVirtualizer } from '@tanstack/solid-virtual';
 
 export const PhotonDropdown = <T extends { id: string }>(props: {
   data: Array<T>;
@@ -70,7 +42,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   selectedData?: T | undefined;
   groups?: Array<{
     label: string;
-    filter: (arr: T) => boolean | undefined;
+    filter: (arr: T) => void;
   }>;
   showOverflow?: boolean;
   optional?: boolean;
@@ -96,8 +68,16 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
 
   //signals
   const [open, setOpen] = createSignal(false);
-  const [selected, setSelected] = createSignal<T | undefined>(undefined);
+  const [selected, setSelected] = createSignal<T>();
   const [selectedIndex, setSelectedIndex] = createSignal(-1);
+  const [virtualizer, setVirtualizer] = createSignal(
+    createVirtualizer({
+      count: props.data.length,
+      getScrollElement: () => listRef,
+      estimateSize: () => 36.8,
+      overscan: 25
+    })
+  );
   const [lastIndex, setLastIndex] = createSignal();
 
   const debounceSearch = debounce(async (s: string) => {
@@ -172,6 +152,18 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
     }
   });
 
+  createEffect(() => {
+    const minHeight = props.data.length * 36.8;
+    listRef!.style.minHeight = `${minHeight}px`;
+    const virtualizer = createVirtualizer({
+      count: props.hasMore ? props.data.length + 1 : props.data.length,
+      getScrollElement: () => listRef,
+      estimateSize: () => 36.8,
+      overscan: !props.fetchMore ? props.data.length : 25
+    });
+    setVirtualizer(virtualizer);
+  });
+
   onMount(() => {
     if (inputRef) {
       inputRef.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -188,29 +180,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
       ? props.displayAccessor(selectedValue, false)
       : props.placeholder ?? 'Select data...';
   });
-
-  // Title and group items as one flat array
-  const allItems: Accessor<Item<T>[]> = createMemo(() =>
-    props.groups
-      ? props.groups
-          .map((g) => {
-            const data = props.data
-              .map((d, idx) => ({ data: d, allItemsIdx: idx }))
-              .filter((d) => g.filter(d.data));
-            return data.length > 0 ? [{ title: g.label }, ...data] : [];
-          })
-          .flat()
-      : props.data.map((d, idx) => ({ data: d, allItemsIdx: idx }))
-  );
-
-  const rowVirtualizer = createMemo(() =>
-    createVirtualizer({
-      count: allItems().length,
-      getScrollElement: () => listRef,
-      estimateSize: () => 36.8,
-      overscan: 100
-    })
-  );
 
   return (
     <div ref={ref}>
@@ -271,7 +240,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
           on:sl-focus={() => {
             dropdownRef.children[1].style.width = `${inputRef.clientWidth}px`;
             if (selectedIndex() > 0) {
-              rowVirtualizer().scrollToIndex(selectedIndex());
+              virtualizer().scrollToIndex(selectedIndex());
             }
           }}
         >
@@ -341,50 +310,149 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
           >
             <div
               style={{
-                height: `${rowVirtualizer().getTotalSize()}px`,
+                'min-height': `36.8px`,
                 width: '100%'
               }}
               ref={listRef}
             >
-              <For each={rowVirtualizer().getVirtualItems()}>
-                {(vr) => {
-                  const isLoaderRow = vr.index > allItems().length - 1;
-                  const datum = allItems()[vr.index];
-                  const isSelected =
-                    'data' in datum && datum.data.id === selected()?.id && !isLoaderRow;
-
-                  return (
-                    <Switch>
-                      <Match when={'title' in datum}>
-                        <GroupLabelEl item={datum as GroupTitle} />
-                      </Match>
-                      <Match when={'data' in datum}>
-                        <ItemEl
-                          item={vr}
-                          isLoader={isLoaderRow}
-                          isSelected={isSelected}
-                          index={vr.index}
-                          hasMore={props.hasMore}
-                          showOverflow={props.showOverflow}
-                          onClick={() => {
-                            if (!isLoaderRow) {
-                              setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
-                              setSelectedIndex((datum as DataItem<T>).allItemsIdx);
-                              inputRef.value = '';
-                              debounceSearch('');
-                              dispatchSelect((datum as DataItem<T>).data);
-                              dropdownRef.hide();
-                            }
-                          }}
-                          setLastIndex={setLastIndex}
-                        >
-                          {props.displayAccessor((datum as DataItem<T>).data, false)}
-                        </ItemEl>
-                      </Match>
-                    </Switch>
-                  );
-                }}
-              </For>
+              <Show when={props.data.length > 0 && !props.groups}>
+                <For
+                  each={virtualizer().getVirtualItems()}
+                  fallback={<sl-menu-item>Loading...</sl-menu-item>}
+                >
+                  {(vr: any) => {
+                    const isLoaderRow = vr.index > props.data.length - 1;
+                    const datum = props.data[vr.index];
+                    return (
+                      <sl-menu-item
+                        class={
+                          datum && datum.id === selected()?.id && !isLoaderRow
+                            ? 'selected default'
+                            : 'default'
+                        }
+                        onClick={() => {
+                          if (!isLoaderRow) {
+                            // @ts-ignore
+                            setSelected(datum);
+                            setSelectedIndex(vr.index);
+                            inputRef.value = '';
+                            debounceSearch('');
+                            dispatchSelect(datum);
+                            dropdownRef.hide();
+                          }
+                        }}
+                        ref={(r: Element) => {
+                          if (isLoaderRow && vr.index > 0) {
+                            setLastIndex(r);
+                          }
+                        }}
+                        style={{
+                          width: '100%',
+                          'min-height': `${vr.size}px`
+                        }}
+                      >
+                        {isLoaderRow ? (
+                          props.hasMore ? (
+                            <p class="text-center text-gray-400 italic">Loading...</p>
+                          ) : (
+                            <p class="text-center text-gray-400 italic">Nothing more to load</p>
+                          )
+                        ) : (
+                          <p
+                            classList={{
+                              'overflow-hidden': !props.showOverflow,
+                              'overflow-ellipsis': !props.showOverflow,
+                              'whitespace-nowrap': !props.showOverflow,
+                              'whitespace-normal': props.showOverflow
+                            }}
+                          >
+                            {props.displayAccessor(datum, true)}
+                          </p>
+                        )}
+                      </sl-menu-item>
+                    );
+                  }}
+                </For>
+              </Show>
+              <Show when={props.data.length > 0 && props.groups && props.groups.length > 0}>
+                <For each={props.groups || []}>
+                  {(el) => (
+                    <>
+                      <sl-menu-item
+                        class="group"
+                        classList={{
+                          hidden:
+                            virtualizer()
+                              .getVirtualItems()
+                              .filter((vr) => el.filter(props.data[vr.index])).length === 0
+                        }}
+                      >
+                        {el.label}
+                      </sl-menu-item>
+                      <For
+                        each={virtualizer()
+                          .getVirtualItems()
+                          .filter((vr) => el.filter(props.data[vr.index]))}
+                      >
+                        {(vr) => {
+                          const isLoaderRow = vr.index > props.data.length - 1;
+                          const datum = props.data[vr.index];
+                          return (
+                            <sl-menu-item
+                              class={
+                                datum && datum.id === selected()?.id && !isLoaderRow
+                                  ? 'selected default'
+                                  : 'default'
+                              }
+                              onClick={() => {
+                                if (!isLoaderRow) {
+                                  // @ts-ignore
+                                  setSelected(datum);
+                                  setSelectedIndex(vr.index);
+                                  inputRef.value = '';
+                                  debounceSearch('');
+                                  dispatchSelect(datum);
+                                  dropdownRef.hide();
+                                }
+                              }}
+                              ref={(r: Element) => {
+                                if (isLoaderRow && vr.index > 0) {
+                                  setLastIndex(r);
+                                }
+                              }}
+                              style={{
+                                width: '100%',
+                                'min-height': `${vr.size}px`
+                              }}
+                            >
+                              {isLoaderRow ? (
+                                props.hasMore ? (
+                                  <p class="text-center text-gray-400 italic">Loading...</p>
+                                ) : (
+                                  <p class="text-center text-gray-400 italic">
+                                    Nothing more to load
+                                  </p>
+                                )
+                              ) : (
+                                <p
+                                  classList={{
+                                    'overflow-hidden': !props.showOverflow,
+                                    'overflow-ellipsis': !props.showOverflow,
+                                    'whitespace-nowrap': !props.showOverflow,
+                                    'whitespace-normal': props.showOverflow
+                                  }}
+                                >
+                                  {props.displayAccessor(datum, true)}
+                                </p>
+                              )}
+                            </sl-menu-item>
+                          );
+                        }}
+                      </For>
+                    </>
+                  )}
+                </For>
+              </Show>
               <Show when={props.data.length == 0 && !props.isLoading}>
                 <sl-menu-item>{props.noDataMsg ? props.noDataMsg : 'No data found'}</sl-menu-item>
               </Show>
@@ -398,56 +466,5 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
         </div>
       </sl-dropdown>
     </div>
-  );
-};
-
-const GroupLabelEl = (props: { item: GroupTitle }) => (
-  <sl-menu-item class="group">{props.item.title}</sl-menu-item>
-);
-
-const ItemEl = (props: {
-  item: VirtualItem<unknown>;
-  index: number;
-  isLoader: boolean;
-  isSelected: boolean;
-  onClick: () => void;
-  setLastIndex: (r: Element) => void;
-  hasMore: boolean;
-  showOverflow?: boolean;
-  children: JSXElement;
-}) => {
-  return (
-    <sl-menu-item
-      class={props.isSelected ? 'selected default' : 'default'}
-      onClick={() => props.onClick()}
-      ref={(r: Element) => {
-        if (props.isLoader && props.index > 0) {
-          props.setLastIndex(r);
-        }
-      }}
-      style={{
-        width: '100%',
-        'min-height': `${props.item.size}px`
-      }}
-    >
-      {props.isLoader ? (
-        props.hasMore ? (
-          <p class="text-center text-gray-400 italic">Loading...</p>
-        ) : (
-          <p class="text-center text-gray-400 italic">Nothing more to load</p>
-        )
-      ) : (
-        <p
-          classList={{
-            'overflow-hidden': !props.showOverflow,
-            'overflow-ellipsis': !props.showOverflow,
-            'whitespace-nowrap': !props.showOverflow,
-            'whitespace-normal': props.showOverflow
-          }}
-        >
-          {props.children}
-        </p>
-      )}
-    </sl-menu-item>
   );
 };
