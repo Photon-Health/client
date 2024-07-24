@@ -378,7 +378,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                           }}
                           setLastIndex={setLastIndex}
                         >
-                          {props.displayAccessor((datum as DataItem<T>).data, false)}
+                          {props.displayAccessor((datum as DataItem<T>).data, true)}
                         </ItemEl>
                       </Match>
                     </Switch>
