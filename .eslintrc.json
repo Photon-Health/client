@@ -11,6 +11,7 @@
     "browser": true
   },
   "globals": {
+    "chrome": "readonly",
     "require": "readonly",
     "process": "readonly",
     "google": "readonly",

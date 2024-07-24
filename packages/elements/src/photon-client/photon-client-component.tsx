@@ -25,6 +25,7 @@ type PhotonClientProps = {
   toastBuffer?: number;
   env?: Env;
   externalUserId?: string;
+  chromeExtension?: boolean;
 };
 
 const version = pkg?.version ?? 'unknown';
@@ -50,7 +51,8 @@ const Component = (props: PhotonClientProps) => {
       clientId: props.id!,
       redirectURI,
       organization: props.org,
-      developmentMode: props.developmentMode
+      developmentMode: props.developmentMode,
+      chromeExtension: props.chromeExtension
     },
     version
   );
@@ -114,6 +116,7 @@ const Component = (props: PhotonClientProps) => {
 
   return (
     <div ref={ref}>
+      <div>Chrome Extension?: {props.chromeExtension}</div>
       <PhotonContext.Provider value={store()}>
         <SDKProvider client={sdk}>
           <slot />
@@ -211,6 +214,13 @@ customElement(
     },
     externalUserId: {
       attribute: 'user-id',
+      value: undefined,
+      reflect: true,
+      notify: true,
+      parse: false
+    },
+    chromeExtension: {
+      attribute: 'chrome-extension',
       value: undefined,
       reflect: true,
       notify: true,

@@ -277,6 +277,7 @@ export class PhotonClientStore {
     try {
       await this.sdk.authentication.checkSession();
       const authenticated = await this.sdk.authentication.isAuthenticated();
+      console.log('isAuthenticated?', authenticated);
       this.setStore('authentication', {
         ...this.store.authentication,
         isAuthenticated: authenticated

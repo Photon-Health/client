@@ -7,6 +7,7 @@ import {
   RedirectLoginResult,
   User
 } from '@auth0/auth0-spa-js';
+import jwtDecode from 'jwt-decode';
 
 const CODE_RE = /[?&]code=[^&]+/;
 const STATE_RE = /[?&]state=[^&]+/;
@@ -23,6 +24,7 @@ export interface AuthManagerOptions {
   organization?: string;
   audience?: string;
   connection?: string;
+  chromeExtension?: boolean;
 }
 
 /**
@@ -66,6 +68,8 @@ export class AuthManager {
 
   private connection?: string;
 
+  private chromeExtension?: boolean;
+
   /**
    * @param config - Photon AuthManager configuration options
    * @remarks - Note, that organization is optional for scenarios in which a provider supports more than themselves.
@@ -74,12 +78,14 @@ export class AuthManager {
     authentication,
     organization,
     audience = 'https://api.photon.health',
-    connection
+    connection,
+    chromeExtension
   }: AuthManagerOptions) {
     this.authentication = authentication;
     this.organization = organization;
     this.audience = audience;
     this.connection = connection;
+    this.chromeExtension = chromeExtension;
   }
 
   /**
@@ -88,6 +94,9 @@ export class AuthManager {
    * @returns
    */
   public async login({ organizationId, invitation, appState }: LoginOptions): Promise<void> {
+    if (this.chromeExtension) {
+      return chrome.runtime.sendMessage({ message: 'login' });
+    }
     const opts: RedirectLoginOptions<any> = {
       authorizationParams: {
         ...(this.audience ? { audience: this.audience } : {}),
@@ -109,6 +118,9 @@ export class AuthManager {
    * @returns
    */
   public async logout({ returnTo, federated = false }: LogoutOptions): Promise<void> {
+    if (this.chromeExtension) {
+      return chrome.runtime.sendMessage({ message: 'logout' });
+    }
     const opts: Auth0LogoutOptions = {
       logoutParams: {
         ...(returnTo ? { returnTo } : {}),
@@ -172,6 +184,9 @@ export class AuthManager {
       audience: this.audience
     }
   ): Promise<string> {
+    if (this.chromeExtension) {
+      return (await chrome.storage.sync.get('accessToken'))['accessToken'];
+    }
     return await this._getAccessToken({ audience: audience ?? this.audience });
   }
 
@@ -200,6 +215,11 @@ export class AuthManager {
    * @returns
    */
   public async checkSession(): Promise<void> {
+    if (this.chromeExtension) {
+      const all = await chrome.storage.sync.get(null);
+      console.log('chrome storage', all);
+      return;
+    }
     const opts = {
       authorizationParams: {
         audience: this.audience || undefined,
@@ -228,6 +248,10 @@ export class AuthManager {
    * @returns
    */
   public async getUser(): Promise<User | undefined> {
+    if (this.chromeExtension) {
+      const { idToken } = await chrome.storage.sync.get('idToken');
+      return jwtDecode(idToken);
+    }
     return this.authentication.getUser();
   }
 
@@ -236,6 +260,12 @@ export class AuthManager {
    * @returns
    */
   public async isAuthenticated(): Promise<boolean> {
+    if (this.chromeExtension) {
+      const all = await chrome.storage.sync.get(null);
+      const { accessToken } = await chrome.storage.sync.get('accessToken');
+      console.log('AT', accessToken, all);
+      return accessToken != null;
+    }
     try {
       await this.authentication.checkSession();
       return await this.authentication.isAuthenticated();

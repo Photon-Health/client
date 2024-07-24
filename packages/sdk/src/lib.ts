@@ -46,6 +46,7 @@ export interface PhotonClientOptions {
   connection?: string;
   uri?: string;
   developmentMode?: boolean;
+  chromeExtension?: boolean;
 }
 
 export class PhotonClient {
@@ -95,6 +96,7 @@ export class PhotonClient {
    */
   public apolloClinical: ApolloClient<undefined> | ApolloClient<NormalizedCacheObject>;
 
+  private chromeExtension?: boolean;
   /**
    * Constructs a new PhotonSDK instance
    * @param config - Photon SDK configuration options
@@ -110,10 +112,13 @@ export class PhotonClient {
       audience,
       connection,
       uri,
-      developmentMode = false
+      developmentMode = false,
+      chromeExtension = false
     }: PhotonClientOptions,
     elementsVersion?: string
   ) {
+    console.log('init with chrome extension', { chromeExtension });
+    this.chromeExtension = chromeExtension;
     this.audience = audience ? audience : lambdasApiUrl[env];
     this.uri = uri ? uri : `${lambdasApiUrl[env]}/graphql`;
     this.clinicalUrl = uri ? getClinicalUrl(uri) : clinicalAppUrl[env];
@@ -144,6 +149,7 @@ export class PhotonClient {
       authentication: this.auth0Client,
       organization: this.organization,
       audience: this.audience,
+      chromeExtension: chromeExtension,
       ...(connection ? { connection } : {})
     });
 
@@ -154,7 +160,10 @@ export class PhotonClient {
   }
 
   private constructApolloClient(
-    { elementsVersion, isServices }: { elementsVersion?: string; isServices: boolean } = {
+    {
+      elementsVersion,
+      isServices
+    }: { elementsVersion?: string; isServices: boolean; chromeExtension?: boolean } = {
       isServices: false
     }
   ) {
@@ -248,7 +257,8 @@ export class PhotonClient {
     this.authentication = new AuthManager({
       authentication: this.auth0Client,
       organization: organizationId,
-      audience: this.audience
+      audience: this.audience,
+      chromeExtension: this.chromeExtension
     });
     return this;
   }
@@ -262,7 +272,8 @@ export class PhotonClient {
     this.authentication = new AuthManager({
       authentication: this.auth0Client,
       organization: undefined,
-      audience: this.audience
+      audience: this.audience,
+      chromeExtension: this.chromeExtension
     });
     this.authentication.login({});
     return this;
