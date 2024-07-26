@@ -8,6 +8,7 @@ import {
   User
 } from '@auth0/auth0-spa-js';
 import jwtDecode from 'jwt-decode';
+import { sendToBackground, sendToBackgroundViaRelay } from '@plasmohq/messaging';
 
 const CODE_RE = /[?&]code=[^&]+/;
 const STATE_RE = /[?&]state=[^&]+/;
@@ -47,6 +48,27 @@ export interface LogoutOptions {
   returnTo?: string;
   federated?: boolean;
 }
+
+const login = async () =>
+  await sendToBackground({
+    name: 'boson-auth',
+    body: { message: 'login' },
+    extensionId: 'enpppcboibbjjfceakhiphkmgbigchcb'
+  } as any);
+
+const logout = async () =>
+  await sendToBackground({
+    name: 'boson-auth',
+    body: { message: 'logout' },
+    extensionId: 'enpppcboibbjjfceakhiphkmgbigchcb'
+  } as any);
+
+const getUserInfo = async () =>
+  await sendToBackground({
+    name: 'boson-auth',
+    body: { message: 'getUserInfo' },
+    extensionId: 'enpppcboibbjjfceakhiphkmgbigchcb'
+  } as any);
 
 /**
  * Configuration options for getAccessToken
@@ -94,8 +116,10 @@ export class AuthManager {
    * @returns
    */
   public async login({ organizationId, invitation, appState }: LoginOptions): Promise<void> {
+    console.log('auth manager login', this.chromeExtension);
+    console.log('auth manager login', this.chromeExtension);
     if (this.chromeExtension) {
-      return chrome.runtime.sendMessage({ message: 'login' });
+      return await login();
     }
     const opts: RedirectLoginOptions<any> = {
       authorizationParams: {
@@ -118,8 +142,10 @@ export class AuthManager {
    * @returns
    */
   public async logout({ returnTo, federated = false }: LogoutOptions): Promise<void> {
+    console.log('auth manager logout', this.chromeExtension);
+
     if (this.chromeExtension) {
-      return chrome.runtime.sendMessage({ message: 'logout' });
+      return await logout();
     }
     const opts: Auth0LogoutOptions = {
       logoutParams: {
@@ -184,6 +210,7 @@ export class AuthManager {
       audience: this.audience
     }
   ): Promise<string> {
+    console.log('auth manager getAccessToken', this.chromeExtension);
     if (this.chromeExtension) {
       return (await chrome.storage.sync.get('accessToken'))['accessToken'];
     }
@@ -200,6 +227,7 @@ export class AuthManager {
       audience: this.audience
     }
   ): Promise<string | undefined> {
+    console.log('auth manager getAccessTokenWithConsent', this.chromeExtension);
     const opts: GetTokenWithPopupOptions = {
       authorizationParams: {
         audience: audience || this.audience || undefined,
@@ -215,6 +243,7 @@ export class AuthManager {
    * @returns
    */
   public async checkSession(): Promise<void> {
+    console.log('auth manager checkSession', this.chromeExtension);
     if (this.chromeExtension) {
       const all = await chrome.storage.sync.get(null);
       console.log('chrome storage', all);
@@ -236,6 +265,7 @@ export class AuthManager {
    * @returns
    */
   public async handleRedirect(url?: string): Promise<RedirectLoginResult<any> | undefined> {
+    console.log('auth manager handleRedirect', this.chromeExtension);
     try {
       return this.authentication.handleRedirectCallback(url);
     } catch (err) {
@@ -248,6 +278,7 @@ export class AuthManager {
    * @returns
    */
   public async getUser(): Promise<User | undefined> {
+    console.log('auth manager getUser', this.chromeExtension);
     if (this.chromeExtension) {
       const { idToken } = await chrome.storage.sync.get('idToken');
       return jwtDecode(idToken);
@@ -260,6 +291,7 @@ export class AuthManager {
    * @returns
    */
   public async isAuthenticated(): Promise<boolean> {
+    console.log('auth manager isAuthenticated', this.chromeExtension);
     if (this.chromeExtension) {
       const all = await chrome.storage.sync.get(null);
       const { accessToken } = await chrome.storage.sync.get('accessToken');

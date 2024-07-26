@@ -104,6 +104,7 @@
     "@felte/validator-zod": "^1.0.17",
     "@nanostores/persistent": "^0.7.0",
     "@nanostores/react": "^0.4.1",
+    "@plasmohq/messaging": "^0.6.2",
     "@solid-primitives/scheduled": "^1.4.1",
     "@tanstack/react-table": "^8.10.3",
     "@tanstack/virtual-core": "^3.0.0-alpha.1",
