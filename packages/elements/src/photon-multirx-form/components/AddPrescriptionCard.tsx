@@ -1,4 +1,4 @@
-import { afterDate, message } from '../../validators';
+import { afterDate, message, between } from '../../validators';
 import { record, string, any, number, min, size, refine } from 'superstruct';
 import { format } from 'date-fns';
 import {
@@ -33,7 +33,7 @@ const validators = {
     'Please select a dispensing unit...'
   ),
   daysSupply: message(min(number(), 0), 'Days Supply must be at least 0'),
-  refillsInput: message(min(number(), 0), 'Refills must be at least 0'),
+  refillsInput: message(between(0, 11), 'Refills must be 0 to 11'),
   instructions: message(
     size(string(), 1, Infinity),
     'Please enter instructions for the patient...'
@@ -376,6 +376,7 @@ export const AddPrescriptionCard = (props: {
               value={props.store.refillsInput?.value}
               required="true"
               min={0}
+              max={11}
               invalid={props.store.refillsInput?.error ?? false}
               help-text={props.store.refillsInput?.error}
               on:photon-input-changed={(e: any) =>
