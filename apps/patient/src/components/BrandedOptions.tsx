@@ -21,7 +21,7 @@ export const BrandedOptions = ({ options, location, selectedId, handleSelect }: 
           <Heading as="h5" size="sm">
             {t.delivery}
           </Heading>
-          <Text size="sm">{t.selectDelivery}</Text>
+          <Text size="sm">{t.getDelivered}</Text>
         </VStack>
       </SlideFade>
 
