@@ -80,6 +80,7 @@ interface PharmacyInfoProps {
   tagline?: string;
   preferred?: boolean;
   showDetails?: boolean;
+  open7DaysAWeek?: boolean;
   boldPharmacyName?: boolean;
   isStatus?: boolean;
   selected?: boolean;
@@ -90,6 +91,7 @@ export const PharmacyInfo = ({
   tagline,
   preferred = false,
   showDetails = true,
+  open7DaysAWeek = false,
   boldPharmacyName = true,
   isStatus = false
 }: PharmacyInfoProps) => {
@@ -97,10 +99,11 @@ export const PharmacyInfo = ({
 
   const showPreferredTag = preferred;
   const showReadyIn30MinTag = pharmacy?.showReadyIn30Min && !isStatus;
+  const showOpen7DaysAWeekTag = open7DaysAWeek;
 
   return (
     <VStack align="start" w="full" spacing={1}>
-      {showPreferredTag || showReadyIn30MinTag ? (
+      {showPreferredTag || showReadyIn30MinTag || showOpen7DaysAWeekTag ? (
         <HStack spacing={2} m={0} p={0}>
           {showPreferredTag ? (
             <Tag size="sm" colorScheme="blue">
@@ -111,6 +114,11 @@ export const PharmacyInfo = ({
           {showReadyIn30MinTag ? (
             <Tag size="sm" bgColor="yellow.200">
               <TagLabel>Ready in 30 minutes</TagLabel>
+            </Tag>
+          ) : null}
+          {showOpen7DaysAWeekTag ? (
+            <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
+              <TagLabel fontWeight="bold">Open 7 Days a Week</TagLabel>
             </Tag>
           ) : null}
         </HStack>
@@ -136,9 +144,17 @@ export const PharmacyInfo = ({
       {showDetails ? (
         <VStack direction={isStatus ? 'column-reverse' : 'column'} spacing={1}>
           {tagline ? (
-            <Text fontSize="sm" color="gray.500">
-              {tagline}
-            </Text>
+            // Highlight FREE
+            tagline.startsWith('FREE') ? (
+              <Text fontSize="sm" color="gray.500">
+                <span style={{ color: 'black' }}>{tagline.split(' ')[0]}</span>{' '}
+                {tagline.split(' ').slice(1).join(' ')}
+              </Text>
+            ) : (
+              <Text fontSize="sm" color="gray.500">
+                {tagline}
+              </Text>
+            )
           ) : null}
           <Hours
             isOpen={pharmacy.isOpen}
