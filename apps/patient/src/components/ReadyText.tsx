@@ -50,8 +50,7 @@ interface PharmacyEstimatedReadyAtProps {
 }
 const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimatedReadyAtProps) => {
   const rounded = roundUpTo15MinInterval(pharmacyEstimatedReadyAt);
-  const timezone = dayjs.tz.guess();
-  const readyAtDayjs = dayjs.utc(rounded).tz(timezone);
+  const readyAtDayjs = dayjs(rounded);
   const timeFormat = readyAtDayjs.minute() ? 'h:mm a' : 'h a';
   const now = dayjs();
   const isFuture = now.isBefore(readyAtDayjs);
@@ -86,7 +85,6 @@ interface PatientDesiredReadyByProps {
   readyByTime: string;
 }
 const PatientDesiredReadyBy = ({ readyBy, readyByTime }: PatientDesiredReadyByProps) => {
-  // const timezone = dayjs.tz.guess();
   const readyByTimeDayJs = dayjs(readyByTime);
   const isToday = readyByTimeDayJs.isToday();
   const isTomorrow = readyByTimeDayJs.isTomorrow();
