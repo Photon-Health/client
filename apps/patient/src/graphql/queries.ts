@@ -7,7 +7,6 @@ export const GET_ORDER = gql`
       state
       isReroutable
       readyBy
-      readyByDay
       readyByTime
       address {
         street1
