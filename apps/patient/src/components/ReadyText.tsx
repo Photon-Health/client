@@ -59,8 +59,10 @@ const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimate
   const timezone = dayjs.tz.guess();
   const readyAtDayjs = dayjs.utc(rounded).tz(timezone);
   const timeFormat = readyAtDayjs.minute() ? 'h:mm a' : 'h a';
+  const now = dayjs();
+  const isFuture = now.isBefore(readyAtDayjs);
 
-  if (readyAtDayjs.isToday()) {
+  if (readyAtDayjs.isToday() && isFuture) {
     return (
       <Text>
         Ready at <b>{readyAtDayjs.format(timeFormat)}</b>
@@ -69,16 +71,16 @@ const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimate
   } else if (readyAtDayjs.isTomorrow()) {
     return (
       <Text>
-        Ready at <b>{readyAtDayjs.format(timeFormat)} tomorrow</b>
+        Ready <b>tomorrow at {readyAtDayjs.format(timeFormat)}</b>
       </Text>
     );
   } else {
     // For datetimes in the past or far in the future, just append the date
     return (
       <Text>
-        Ready at{' '}
+        Ready{' '}
         <b>
-          {readyAtDayjs.format(timeFormat)}, {readyAtDayjs.format('MMM D')}
+          {readyAtDayjs.format('ddd, MMM D')} at {readyAtDayjs.format(timeFormat)}
         </b>
       </Text>
     );
@@ -94,6 +96,8 @@ const PatientDesiredReadyBy = ({ readyBy, readyByTime }: PatientDesiredReadyByPr
   const readyByTimeDayJs = dayjs.utc(readyByTime).tz(timezone);
   const isToday = readyByTimeDayJs.isToday();
   const isTomorrow = readyByTimeDayJs.isTomorrow();
+  const now = dayjs();
+  const isFuture = now.isBefore(readyByTimeDayJs);
 
   if (readyBy === 'Urgent') {
     return (
@@ -102,7 +106,7 @@ const PatientDesiredReadyBy = ({ readyBy, readyByTime }: PatientDesiredReadyByPr
       </Text>
     );
   } else if (readyBy === 'After hours') {
-    if (isToday) {
+    if (isToday && isFuture) {
       return (
         <Text>
           Need order <b>this evening</b>
@@ -122,7 +126,7 @@ const PatientDesiredReadyBy = ({ readyBy, readyByTime }: PatientDesiredReadyByPr
     const [time, period] = readyBy.split(' ');
     const [hour] = time.split(':');
 
-    if (isToday) {
+    if (isToday && isFuture) {
       return (
         <Text>
           Need order by{' '}
@@ -136,7 +140,7 @@ const PatientDesiredReadyBy = ({ readyBy, readyByTime }: PatientDesiredReadyByPr
         <Text>
           Need order by{' '}
           <b>
-            {hour} {period} tomorrow
+            tomorrow at {hour} {period}
           </b>
         </Text>
       );
@@ -146,7 +150,7 @@ const PatientDesiredReadyBy = ({ readyBy, readyByTime }: PatientDesiredReadyByPr
         <Text>
           Need order by{' '}
           <b>
-            {hour} {period}, {readyByTimeDayJs.format('MMM D')}
+            {readyByTimeDayJs.format('ddd, MMM D')} at {hour} {period}
           </b>
         </Text>
       );
