@@ -93,7 +93,7 @@ const PatientDesiredReadyBy = ({ readyBy, readyByTime }: PatientDesiredReadyByPr
   const timezone = dayjs.tz.guess();
   const readyByTimeDayJs = dayjs.utc(readyByTime).tz(timezone);
   const isToday = readyByTimeDayJs.isToday();
-  const isTomorrow = readyByTimeDayJs.isToday();
+  const isTomorrow = readyByTimeDayJs.isTomorrow();
 
   if (readyBy === 'Urgent') {
     return (
