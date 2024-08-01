@@ -35,20 +35,14 @@ export const ReadyText = ({
 };
 
 const roundUpTo15MinInterval = (pharmacyEstimatedReadyAt: Date): Date => {
-  const estimatedReadyAt = new Date(pharmacyEstimatedReadyAt);
-  const minutes = estimatedReadyAt.getMinutes();
+  const estimatedReadyAtAsDayJs = dayjs(pharmacyEstimatedReadyAt);
+  const minutes = estimatedReadyAtAsDayJs.minute();
   const roundedMinutes = Math.ceil(minutes / 15) * 15;
-
   if (roundedMinutes >= 60) {
-    estimatedReadyAt.setHours(estimatedReadyAt.getHours() + 1);
-    estimatedReadyAt.setMinutes(0);
+    return estimatedReadyAtAsDayJs.add(1, 'hour').minute(0).toDate();
   } else {
-    estimatedReadyAt.setMinutes(roundedMinutes);
+    return estimatedReadyAtAsDayJs.minute(roundedMinutes).toDate();
   }
-
-  estimatedReadyAt.setSeconds(0);
-  estimatedReadyAt.setMilliseconds(0);
-  return estimatedReadyAt;
 };
 
 interface PharmacyEstimatedReadyAtProps {
@@ -92,8 +86,8 @@ interface PatientDesiredReadyByProps {
   readyByTime: string;
 }
 const PatientDesiredReadyBy = ({ readyBy, readyByTime }: PatientDesiredReadyByProps) => {
-  const timezone = dayjs.tz.guess();
-  const readyByTimeDayJs = dayjs.utc(readyByTime).tz(timezone);
+  // const timezone = dayjs.tz.guess();
+  const readyByTimeDayJs = dayjs(readyByTime);
   const isToday = readyByTimeDayJs.isToday();
   const isTomorrow = readyByTimeDayJs.isTomorrow();
   const now = dayjs();
