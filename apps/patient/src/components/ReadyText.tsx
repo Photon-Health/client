@@ -1,4 +1,4 @@
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { Text } from '@chakra-ui/react';
 import { OrderFulfillment, Maybe } from 'packages/sdk/dist/types';
 import isTomorrow from 'dayjs/plugin/isTomorrow';
@@ -7,7 +7,6 @@ dayjs.extend(isTomorrow);
 
 interface ReadyTextProps {
   readyBy?: string;
-  readyByDay?: string;
   readyByTime?: string;
   isDeliveryPharmacy?: boolean;
   fulfillment?: Maybe<OrderFulfillment>;
@@ -15,7 +14,6 @@ interface ReadyTextProps {
 
 export const ReadyText = ({
   readyBy,
-  readyByDay,
   readyByTime,
   isDeliveryPharmacy,
   fulfillment
@@ -23,10 +21,8 @@ export const ReadyText = ({
   if (isDeliveryPharmacy) return null;
 
   // No fulfillment means user came from pharmacy selection
-  if ((!fulfillment || fulfillment?.state === 'SENT') && readyBy && readyByDay && readyByTime) {
-    return (
-      <PatientDesiredReadyBy readyBy={readyBy} readyByDay={readyByDay} readyByTime={readyByTime} />
-    );
+  if ((!fulfillment || fulfillment?.state === 'SENT') && readyBy && readyByTime) {
+    return <PatientDesiredReadyBy readyBy={readyBy} readyByTime={readyByTime} />;
   }
 
   if (fulfillment?.state === 'RECEIVED' && fulfillment?.pharmacyEstimatedReadyAt) {
@@ -38,14 +34,14 @@ export const ReadyText = ({
   return null;
 };
 
-const roundUpTo15MinInterval = (pharmacyEstimatedReadyAt: Date): Dayjs => {
+const roundUpTo15MinInterval = (pharmacyEstimatedReadyAt: Date): Date => {
   const estimatedReadyAtAsDayJs = dayjs(pharmacyEstimatedReadyAt);
   const minutes = estimatedReadyAtAsDayJs.minute();
   const roundedMinutes = Math.ceil(minutes / 15) * 15;
   if (roundedMinutes >= 60) {
-    return estimatedReadyAtAsDayJs.add(1, 'hour').minute(0);
+    return estimatedReadyAtAsDayJs.add(1, 'hour').minute(0).toDate();
   } else {
-    return estimatedReadyAtAsDayJs.minute(roundedMinutes);
+    return estimatedReadyAtAsDayJs.minute(roundedMinutes).toDate();
   }
 };
 
@@ -53,32 +49,47 @@ interface PharmacyEstimatedReadyAtProps {
   pharmacyEstimatedReadyAt: Date;
 }
 const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimatedReadyAtProps) => {
-  const readyAt = roundUpTo15MinInterval(pharmacyEstimatedReadyAt);
-  const isTomorrow = readyAt.add(1, 'day').isTomorrow();
-  const timeFormat = readyAt.minute() ? 'h:mm a' : 'h a';
+  const rounded = roundUpTo15MinInterval(pharmacyEstimatedReadyAt);
+  const readyAtDayjs = dayjs(rounded);
+  const timeFormat = readyAtDayjs.minute() ? 'h:mm a' : 'h a';
+  const now = dayjs();
+  const isFuture = now.isBefore(readyAtDayjs);
 
-  return (
-    <Text>
-      Ready{isTomorrow ? <b> Tomorrow </b> : ' '} at <b>{readyAt.format(timeFormat)}</b>
-    </Text>
-  );
+  if (readyAtDayjs.isToday() && isFuture) {
+    return (
+      <Text>
+        Ready at <b>{readyAtDayjs.format(timeFormat)}</b>
+      </Text>
+    );
+  } else if (readyAtDayjs.isTomorrow()) {
+    return (
+      <Text>
+        Ready <b>tomorrow at {readyAtDayjs.format(timeFormat)}</b>
+      </Text>
+    );
+  } else {
+    // For datetimes in the past or far in the future, just append the date
+    return (
+      <Text>
+        Ready{' '}
+        <b>
+          {readyAtDayjs.format('ddd, MMM D')} at {readyAtDayjs.format(timeFormat)}
+        </b>
+      </Text>
+    );
+  }
 };
 
 interface PatientDesiredReadyByProps {
   readyBy: string;
-  readyByDay: string;
   readyByTime: string;
 }
-const PatientDesiredReadyBy = ({
-  readyBy,
-  readyByDay,
-  readyByTime
-}: PatientDesiredReadyByProps) => {
-  const now = dayjs();
-  const timezone = dayjs.tz.guess();
-  const readyByTimeDayJs = dayjs.utc(readyByTime).tz(timezone);
+const PatientDesiredReadyBy = ({ readyBy, readyByTime }: PatientDesiredReadyByProps) => {
+  const readyByTimeDayJs = dayjs(readyByTime);
   const isToday = readyByTimeDayJs.isToday();
-  const isPast = now.isAfter(readyByTimeDayJs);
+  const isTomorrow = readyByTimeDayJs.isTomorrow();
+  const now = dayjs();
+  const isFuture = now.isBefore(readyByTimeDayJs);
 
   if (readyBy === 'Urgent') {
     return (
@@ -87,40 +98,51 @@ const PatientDesiredReadyBy = ({
       </Text>
     );
   } else if (readyBy === 'After hours') {
-    if (isPast) {
-      // Let's not surface anything here until we decide on copy
-      return null;
-    } else if (isToday) {
+    if (isToday && isFuture) {
       return (
         <Text>
           Need order <b>this evening</b>
         </Text>
       );
-    } else {
+    } else if (isTomorrow) {
       return (
         <Text>
           Need order <b>tomorrow evening</b>
         </Text>
       );
+    } else {
+      // Let's not surface anything here until we decide on copy
+      return null;
     }
   } else {
     const [time, period] = readyBy.split(' ');
     const [hour] = time.split(':');
 
-    if (isPast) {
-      return (
-        <Text>
-          Need order by <b>{readyByTimeDayJs.format('h:mm A on MMM D')}</b>
-        </Text>
-      );
-    } else {
-      const displayTomorrow = readyByDay === 'Tomorrow' && !isToday;
+    if (isToday && isFuture) {
       return (
         <Text>
           Need order by{' '}
           <b>
             {hour} {period}
-            {displayTomorrow ? ' tomorrow' : ''}
+          </b>
+        </Text>
+      );
+    } else if (isTomorrow) {
+      return (
+        <Text>
+          Need order by{' '}
+          <b>
+            tomorrow at {hour} {period}
+          </b>
+        </Text>
+      );
+    } else {
+      // Requested time is in the past, this would happen if we don't get around to confirming it
+      return (
+        <Text>
+          Need order by{' '}
+          <b>
+            {readyByTimeDayJs.format('ddd, MMM D')} at {hour} {period}
           </b>
         </Text>
       );
