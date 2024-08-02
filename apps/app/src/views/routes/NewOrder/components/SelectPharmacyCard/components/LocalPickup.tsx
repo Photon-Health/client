@@ -104,8 +104,7 @@ export const LocalPickup = (props: LocalPickupProps) => {
     const resultPharmacies: any = await refetchPharmacies({
       location: {
         latitude,
-        longitude,
-        radius: 30
+        longitude
       },
       type: types.FulfillmentType.PickUp
     });

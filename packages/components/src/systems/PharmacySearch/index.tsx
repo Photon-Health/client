@@ -126,7 +126,7 @@ export default function PharmacySearch(props: PharmacySearchProps) {
     const { data } = await client!.apollo.query({
       query: GetPharmaciesQuery,
       variables: {
-        location: { latitude: location()?.latitude, longitude: location()?.longitude, radius: 20 }
+        location: { latitude: location()?.latitude, longitude: location()?.longitude }
       }
     });
 
