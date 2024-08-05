@@ -8,7 +8,7 @@ export const text = {
   changePharmacy: 'Change pharmacy',
   daysSupply: 'Days supply',
   delivered: 'Delivered',
-  delivery: 'Delivery',
+  delivery: 'Local Delivery',
   directions: 'Get directions',
   enterLoc: 'Enter a zipcode or address',
   enterLocLong: "Enter the zipcode or address where you'd like to search for a pharmacy.",
@@ -18,6 +18,8 @@ export const text = {
   fakeRx: 'This is not a real prescription.',
   fakeRxs: 'These are not real prescriptions.',
   findLoc: 'Find a location',
+  getDelivered: 'Get your medication delivered to your door',
+  getNearby: 'Get your medication at a nearby pharmacy',
   gettingLoc: 'Getting current location',
   inTransit: 'In transit',
   makePreferred: 'Make this my preferred pharmacy',
@@ -146,8 +148,7 @@ export const text = {
     }.`,
   searchPharmacy: 'Search for a pharmacy',
   selectAPharmacy: 'Select a pharmacy',
-  selectDelivery: 'Select a mail order or courier for delivery.',
-  selectLocal: 'Select a local pharmacy for pick up.',
+
   selectPharmacy: 'Select pharmacy',
   sendToNew: (isPlural: boolean, originalPharmacyName: string) =>
     `We'll cancel your ${

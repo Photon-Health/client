@@ -119,7 +119,7 @@ export const DraftPrescriptionCard = (props: {
   };
 
   return (
-    <div>
+    <div ref={ref}>
       <style>{photonStyles}</style>
       <photon-dialog
         open={editDialogOpen()}
