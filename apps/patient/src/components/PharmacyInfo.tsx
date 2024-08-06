@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom';
 import { Box, HStack, Tag, TagLabel, TagLeftIcon, Text, VStack, Image } from '@chakra-ui/react';
 import { FiStar } from 'react-icons/fi';
 import dayjs from 'dayjs';
@@ -97,9 +98,13 @@ export const PharmacyInfo = ({
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
+  const location = useLocation();
+
   const showPreferredTag = preferred;
   const showReadyIn30MinTag = pharmacy?.showReadyIn30Min && !isStatus;
   const showAvailableInYourAreaTag = availableInYourArea;
+  const whiteLabelDeliveryPharmacy =
+    pharmacy.name === 'Capsule Pharmacy' && location.pathname === '/pharmacy';
 
   return (
     <VStack align="start" w="full" spacing={1}>
@@ -125,7 +130,7 @@ export const PharmacyInfo = ({
       ) : null}
       <HStack w="full">
         <HStack>
-          {pharmacy?.logo ? (
+          {pharmacy?.logo && !whiteLabelDeliveryPharmacy ? (
             <Box boxSize="32px" overflow="hidden">
               <Image
                 src={pharmacy.logo}
@@ -137,7 +142,7 @@ export const PharmacyInfo = ({
             </Box>
           ) : null}
           <Text fontSize="md" fontWeight={boldPharmacyName ? 'bold' : 'medium'}>
-            {pharmacy.name === 'Capsule Pharmacy' ? 'Free Express Delivery' : pharmacy.name}
+            {whiteLabelDeliveryPharmacy ? 'Free Express Delivery' : pharmacy.name}
           </Text>
         </HStack>
       </HStack>
