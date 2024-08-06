@@ -1,6 +1,5 @@
 import { Card, CardBody } from '@chakra-ui/react';
 
-import capsuleLogo from '../assets/capsule_logo_small.png';
 import amazonPharmacyLogo from '../assets/amazon_pharmacy_logo_small.png';
 import altoLogo from '../assets/alto_logo.svg';
 import costcoLogo from '../assets/costco_logo_small.png';
@@ -34,9 +33,9 @@ export const PHARMACY_BRANDING = {
     Object.keys(capsulePharmacyIdLookup).map((id) => [
       id,
       {
-        logo: capsuleLogo,
+        logo: null,
         name: 'Capsule Pharmacy',
-        description: 'FREE Same or Next-Day Delivery'
+        description: 'Same or Next-Day Home Delivery'
       }
     ])
   )
@@ -62,7 +61,7 @@ export const BrandedPharmacyCard = ({ pharmacyId, selected, handleSelect }: Prop
         <PharmacyInfo
           pharmacy={pharmacy}
           tagline={brand.description}
-          open7DaysAWeek={brand.name === 'Capsule Pharmacy'}
+          availableInYourArea={brand.name === 'Capsule Pharmacy'}
           boldPharmacyName={false}
         />
       </CardBody>
