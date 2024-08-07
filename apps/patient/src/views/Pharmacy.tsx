@@ -649,7 +649,7 @@ export const Pharmacy = () => {
                     ? // For Sesame, check that there are no GLP1's before surfacing Capsule
                       [
                         'Sesame',
-                        'Updated Test Pharmacy 11' // So we can validate on neutron
+                        'Photon Test Org' // So we can validate on neutron
                       ].includes(order?.organization?.name) && !containsGLP
                       ? [capsulePharmacyId]
                       : []
