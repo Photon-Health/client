@@ -36,7 +36,7 @@ export const PHARMACY_BRANDING = {
       {
         logo: capsuleLogo,
         name: 'Capsule Pharmacy',
-        description: 'FREE Same or Next-Day Delivery'
+        description: 'Same or Next-Day Home Delivery'
       }
     ])
   )
@@ -62,7 +62,7 @@ export const BrandedPharmacyCard = ({ pharmacyId, selected, handleSelect }: Prop
         <PharmacyInfo
           pharmacy={pharmacy}
           tagline={brand.description}
-          open7DaysAWeek={brand.name === 'Capsule Pharmacy'}
+          availableInYourArea={brand.name === 'Capsule Pharmacy'}
           boldPharmacyName={false}
         />
       </CardBody>

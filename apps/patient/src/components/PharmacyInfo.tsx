@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom';
 import { Box, HStack, Tag, TagLabel, TagLeftIcon, Text, VStack, Image } from '@chakra-ui/react';
 import { FiStar } from 'react-icons/fi';
 import dayjs from 'dayjs';
@@ -80,7 +81,7 @@ interface PharmacyInfoProps {
   tagline?: string;
   preferred?: boolean;
   showDetails?: boolean;
-  open7DaysAWeek?: boolean;
+  availableInYourArea?: boolean;
   boldPharmacyName?: boolean;
   isStatus?: boolean;
   selected?: boolean;
@@ -91,19 +92,23 @@ export const PharmacyInfo = ({
   tagline,
   preferred = false,
   showDetails = true,
-  open7DaysAWeek = false,
+  availableInYourArea = false,
   boldPharmacyName = true,
   isStatus = false
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
+  const location = useLocation();
+
   const showPreferredTag = preferred;
   const showReadyIn30MinTag = pharmacy?.showReadyIn30Min && !isStatus;
-  const showOpen7DaysAWeekTag = open7DaysAWeek;
+  const showAvailableInYourAreaTag = availableInYourArea;
+  const whiteLabelDeliveryPharmacy =
+    pharmacy.name === 'Capsule Pharmacy' && location.pathname === '/pharmacy';
 
   return (
     <VStack align="start" w="full" spacing={1}>
-      {showPreferredTag || showReadyIn30MinTag || showOpen7DaysAWeekTag ? (
+      {showPreferredTag || showReadyIn30MinTag || showAvailableInYourAreaTag ? (
         <HStack spacing={2} m={0} p={0}>
           {showPreferredTag ? (
             <Tag size="sm" colorScheme="blue">
@@ -116,16 +121,16 @@ export const PharmacyInfo = ({
               <TagLabel>Ready in 30 minutes</TagLabel>
             </Tag>
           ) : null}
-          {showOpen7DaysAWeekTag ? (
+          {showAvailableInYourAreaTag ? (
             <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
-              <TagLabel fontWeight="bold">Open 7 Days a Week</TagLabel>
+              <TagLabel fontWeight="bold">Available in your area</TagLabel>
             </Tag>
           ) : null}
         </HStack>
       ) : null}
       <HStack w="full">
         <HStack>
-          {pharmacy?.logo ? (
+          {pharmacy?.logo && !whiteLabelDeliveryPharmacy ? (
             <Box boxSize="32px" overflow="hidden">
               <Image
                 src={pharmacy.logo}
@@ -137,24 +142,16 @@ export const PharmacyInfo = ({
             </Box>
           ) : null}
           <Text fontSize="md" fontWeight={boldPharmacyName ? 'bold' : 'medium'}>
-            {pharmacy.name}
+            {whiteLabelDeliveryPharmacy ? 'Free Express Delivery' : pharmacy.name}
           </Text>
         </HStack>
       </HStack>
       {showDetails ? (
         <VStack direction={isStatus ? 'column-reverse' : 'column'} spacing={1}>
           {tagline ? (
-            // Highlight FREE
-            tagline.startsWith('FREE') ? (
-              <Text fontSize="sm" color="gray.500">
-                <span style={{ color: 'black' }}>{tagline.split(' ')[0]}</span>{' '}
-                {tagline.split(' ').slice(1).join(' ')}
-              </Text>
-            ) : (
-              <Text fontSize="sm" color="gray.500">
-                {tagline}
-              </Text>
-            )
+            <Text fontSize="sm" color="gray.500">
+              {tagline}
+            </Text>
           ) : null}
           <Hours
             isOpen={pharmacy.isOpen}
