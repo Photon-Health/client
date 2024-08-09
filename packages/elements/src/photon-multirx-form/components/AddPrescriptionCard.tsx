@@ -90,8 +90,6 @@ export const AddPrescriptionCard = (props: {
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
 
-    console.log(props.store);
-
     if (!errorsPresent) {
       const draft = {
         effectiveDate: props.store.effectiveDate.value,

@@ -95,7 +95,6 @@ interface DraftPrescriptionsProps {
 }
 
 export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
-  console.log('Draft prescriptions mounted');
   const merged = mergeProps(
     {
       draftPrescriptions: [] as string[],
@@ -106,8 +105,6 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
     props
   );
 
-  console.log('Draft prescription props', props);
-  console.log('merged props', merged);
   const [isLoading, setIsLoading] = createSignal<boolean>(true);
   const client = usePhotonClient();
 
@@ -125,8 +122,6 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
           (acc: PrescriptionTemplate[], catalog: Catalog) => [...acc, ...catalog.templates],
           []
         );
-
-        console.log('BEFORE USING OVERRIDES');
 
         // for each templateId, find the template by id and set the draft prescription
         merged.templateIds.forEach((templateId: string) => {
@@ -149,16 +144,10 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
             console.error(`Template is missing required prescription details ${templateId}`);
           } else {
             // if template.id is in templateOverrides, apply the overrides
-
-            console.log('templateId,', template.id);
-            console.log('overrides', merged?.templateOverrides);
-
             const templateOverride = merged?.templateOverrides?.[template.id];
-            console.log('override', templateOverride);
             const updatedTemplate = templateOverride
               ? { ...template, ...templateOverride }
               : template;
-            console.log('updatedTemplate', updatedTemplate);
 
             draftPrescriptions.push(generateDraftPrescription(updatedTemplate));
           }
@@ -195,9 +184,7 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
   }
 
   onMount(() => {
-    console.log('MOUNT');
     if (merged.templateIds.length > 0 || merged.prescriptionIds.length > 0) {
-      console.log('calling fetchDrafts()');
       fetchDrafts();
     } else {
       setIsLoading(false);
