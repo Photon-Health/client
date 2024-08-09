@@ -90,6 +90,8 @@ export const AddPrescriptionCard = (props: {
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
 
+    console.log(props.store);
+
     if (!errorsPresent) {
       const draft = {
         effectiveDate: props.store.effectiveDate.value,
@@ -104,7 +106,8 @@ export const AddPrescriptionCard = (props: {
         fillsAllowed: props.store.refillsInput.value + 1,
         addToTemplates: props.store.addToTemplates?.value ?? false,
         templateName: props.store.templateName?.value ?? '',
-        catalogId: props.store.catalogId.value ?? undefined
+        catalogId: props.store.catalogId.value ?? undefined,
+        externalId: props.store.externalId.value ?? undefined
       };
 
       const duplicate = recentOrdersActions.checkDuplicateFill(draft.treatment.name);

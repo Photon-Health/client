@@ -653,6 +653,7 @@ export type PrescriptionTemplate = {
   treatment: Treatment;
   name: Maybe<Scalars['String']>;
   isPrivate: Scalars['Boolean'];
+  externalId?: Maybe<Scalars['String']>;
 };
 
 export type ProductFilter = {

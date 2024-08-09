@@ -230,7 +230,8 @@ const Component = (props: {
                 hide-templates={props.hideTemplates}
                 loading={triggerSubmit()}
                 patient-id={props.patientId}
-                template-ids={props.templateIds}
+                // template-ids={props.templateIds}
+                template-ids={'tmp_01J1DZVXP8QJW0MY0JSBFEDBA2'}
                 prescription-ids={props.prescriptionIds}
                 weight={props.weight}
                 weight-unit={props.weightUnit}
@@ -247,6 +248,13 @@ const Component = (props: {
                 trigger-submit={triggerSubmit()}
                 set-trigger-submit={setTriggerSubmit}
                 toast-buffer={props?.toastBuffer || 0}
+                // tmp_01J1DZVXP8QJW0MY0JSBFEDBA2
+                template-overrides={{
+                  tmp_01J1DZVXP8QJW0MY0JSBFEDBA2: {
+                    instructions: 'these instructions are overriding the previous instructions',
+                    externalId: 'ext_123'
+                  }
+                }}
                 on:photon-form-validate={(e: any) => {
                   setCanSubmit(e.detail.canSubmit);
                   setForm(e.detail.form);
