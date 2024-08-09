@@ -92,8 +92,7 @@ const createPharmacyStore = () => {
         name,
         location: {
           latitude,
-          longitude,
-          radius: 20
+          longitude
         }
       });
     } catch (err) {
@@ -112,7 +111,7 @@ const createPharmacyStore = () => {
       location: {
         latitude: number;
         longitude: number;
-        radius: number;
+        radius?: number;
       };
       first?: number;
     }

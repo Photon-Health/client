@@ -18,6 +18,7 @@ export type TemplateOverrides = {
     fillsAllowed?: number;
     instructions?: string;
     notes?: string;
+    externalId?: string;
   };
 };
 
@@ -103,6 +104,7 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
     },
     props
   );
+
   const [isLoading, setIsLoading] = createSignal<boolean>(true);
   const client = usePhotonClient();
 
