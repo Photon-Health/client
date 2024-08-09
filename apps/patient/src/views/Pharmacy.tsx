@@ -45,7 +45,6 @@ import { isGLP } from '../utils/isGLP';
 import ReactGA from 'react-ga4';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
-const PHARMACY_SEARCH_RADIUS_IN_MILES = 25;
 
 export const Pharmacy = () => {
   const { order, flattenedFills, setOrder, isDemo } = useOrderContext();
@@ -239,7 +238,7 @@ export const Pharmacy = () => {
       }
       try {
         const topRankedCostco: EnrichedPharmacy[] = await getPharmacies({
-          searchParams: { latitude, longitude, radius: PHARMACY_SEARCH_RADIUS_IN_MILES },
+          searchParams: { latitude, longitude },
           limit: 1,
           offset: 0,
           isOpenNow: enableOpenNow,
@@ -275,7 +274,7 @@ export const Pharmacy = () => {
 
       try {
         const topRankedWags: EnrichedPharmacy[] = await getPharmacies({
-          searchParams: { latitude, longitude, radius: PHARMACY_SEARCH_RADIUS_IN_MILES },
+          searchParams: { latitude, longitude },
           limit: 1,
           offset: 0,
           isOpenNow: enableOpenNow,
@@ -312,7 +311,7 @@ export const Pharmacy = () => {
       }
 
       const res = await getPharmacies({
-        searchParams: { latitude, longitude, radius: PHARMACY_SEARCH_RADIUS_IN_MILES },
+        searchParams: { latitude, longitude },
         limit: GET_PHARMACIES_COUNT,
         offset: pageOffset,
         isOpenNow: enableOpenNow,
