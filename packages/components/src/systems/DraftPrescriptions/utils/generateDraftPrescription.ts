@@ -18,7 +18,7 @@ const generateDraftPrescription = (prescription: Prescription | PrescriptionTemp
   catalogId: undefined,
   isPrivate: prescription.__typename === 'PrescriptionTemplate' ? prescription.isPrivate : true,
   name: prescription.__typename === 'PrescriptionTemplate' ? prescription.name : null,
-  externalId: prescription.externalId
+  externalId: 'externalId' in prescription ? prescription.externalId : undefined
 });
 
 export default generateDraftPrescription;
