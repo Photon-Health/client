@@ -75,8 +75,7 @@ export const PharmacySearch = (props: FieldAttributes<any>) => {
     return refetch({
       location: {
         latitude,
-        longitude,
-        radius: 20
+        longitude
       }
     });
   };
