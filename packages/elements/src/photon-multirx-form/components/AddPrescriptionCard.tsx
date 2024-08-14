@@ -104,7 +104,8 @@ export const AddPrescriptionCard = (props: {
         fillsAllowed: props.store.refillsInput.value + 1,
         addToTemplates: props.store.addToTemplates?.value ?? false,
         templateName: props.store.templateName?.value ?? '',
-        catalogId: props.store.catalogId.value ?? undefined
+        catalogId: props.store.catalogId.value ?? undefined,
+        externalId: props.store.externalId?.value ?? undefined
       };
 
       const duplicate = recentOrdersActions.checkDuplicateFill(draft.treatment.name);
