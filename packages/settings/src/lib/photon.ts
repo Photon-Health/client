@@ -260,7 +260,6 @@ const organizationSettings: {
   org_zc1RzzmSwd8eE94U: {
     logo: 'sesame_logo.jpg',
     accentColor: '#5224C7',
-    enableCourierNavigate: true,
     topRankedCostco: true
   },
   // DrTelx
