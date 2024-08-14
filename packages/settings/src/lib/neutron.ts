@@ -225,7 +225,6 @@ const organizationSettings: {
   org_QFoulY6Ornx7dMdw: {
     logo: 'sesame_logo.jpg',
     accentColor: '#5224C7',
-    enableCourierNavigate: true,
     topRankedCostco: true,
     mailOrder: true,
     mailOrderProviders: [FOOTHILLS_PHARMACY_ID]
