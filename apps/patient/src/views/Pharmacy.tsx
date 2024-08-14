@@ -109,6 +109,10 @@ export const Pharmacy = () => {
   const isCapsuleTerritory =
     order?.address?.postalCode != null && order.address.postalCode in capsuleZipcodeLookup;
   const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
+  const capsulePharmacyId = order?.address?.postalCode
+    ? capsuleZipcodeLookup[order.address.postalCode as keyof typeof capsuleZipcodeLookup]
+        ?.pharmacyId
+    : null;
 
   const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
   const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
@@ -639,7 +643,12 @@ export const Pharmacy = () => {
           <VStack spacing={6} align="stretch" pt={4}>
             {enableCourier || enableMailOrder ? (
               <BrandedOptions
-                options={[...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : [])]}
+                options={[
+                  ...(enableCourier && order?.address?.postalCode && capsulePharmacyId
+                    ? [capsulePharmacyId]
+                    : []),
+                  ...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : [])
+                ]}
                 location={location}
                 selectedId={selectedId}
                 handleSelect={handleSelect}
