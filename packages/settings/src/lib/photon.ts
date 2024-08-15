@@ -10,7 +10,8 @@ import {
   EMPOWER_PHARMACY_ID,
   INNOVASCRIPT_PHARMACY_ID,
   AMBROSIA_PHARMACY_ID,
-  WOMENS_INTERNATIONAL_PHARMACY_ID
+  WOMENS_INTERNATIONAL_PHARMACY_ID,
+  REDROCK_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -64,6 +65,12 @@ export const photon = function (organizationId: string | undefined) {
 const organizationSettings: {
   [key: string]: OrganizationSettings;
 } = {
+  // Photon Test Account
+  org_xqL46CdX49O1K5Ye: {
+    mailOrder: true,
+    pickUp: true,
+    mailOrderProviders: [REDROCK_PHARMACY_ID]
+  },
   // Weekend Health
   org_uZPt00PG0JElhh3d: {
     sendOrder: false,
