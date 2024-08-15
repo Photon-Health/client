@@ -12,7 +12,7 @@ import {
   AMBROSIA_PHARMACY_ID,
   WOMENS_INTERNATIONAL_PHARMACY_ID,
   REDROCK_SPRINGVILLE_PHARMACY_ID,
-  REDROCK_STGEORGE_PHARMACY_ID,
+  REDROCK_STGEORGE_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
