@@ -1,26 +1,33 @@
-import { Routes, Route, BrowserRouter } from 'react-router-dom';
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+  RouterProvider
+} from 'react-router-dom';
 
+import { Canceled } from './views/Canceled';
 import { Main } from './views/Main';
-import { Status } from './views/Status';
 import { NoMatch } from './views/NoMatch';
 import { Pharmacy } from './views/Pharmacy';
-import { Review } from './views/Review';
-import { Canceled } from './views/Canceled';
 import { ReadyBy } from './views/ReadyBy';
+import { Review } from './views/Review';
+import { Status } from './views/Status';
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route>
+      <Route path="/" element={<Main />}>
+        <Route path="/review" element={<Review />} />
+        <Route path="/readyBy" element={<ReadyBy />} />
+        <Route path="/pharmacy" element={<Pharmacy />} />
+        <Route path="/status" element={<Status />} />
+        <Route path="/canceled" element={<Canceled />} />
+      </Route>
+      <Route path="*" element={<NoMatch />} />
+    </Route>
+  )
+);
 
 export const App = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Main />}>
-          <Route path="/review" element={<Review />} />
-          <Route path="/readyBy" element={<ReadyBy />} />
-          <Route path="/pharmacy" element={<Pharmacy />} />
-          <Route path="/status" element={<Status />} />
-          <Route path="/canceled" element={<Canceled />} />
-        </Route>
-        <Route path="*" element={<NoMatch />} />
-      </Routes>
-    </BrowserRouter>
-  );
+  return <RouterProvider router={router} />;
 };
