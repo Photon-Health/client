@@ -11,7 +11,8 @@ import {
   INNOVASCRIPT_PHARMACY_ID,
   AMBROSIA_PHARMACY_ID,
   WOMENS_INTERNATIONAL_PHARMACY_ID,
-  REDROCK_PHARMACY_ID
+  REDROCK_SPRINGVILLE_PHARMACY_ID,
+  REDROCK_STGEORGE_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -69,7 +70,7 @@ const organizationSettings: {
   org_xqL46CdX49O1K5Ye: {
     mailOrder: true,
     pickUp: true,
-    mailOrderProviders: [REDROCK_PHARMACY_ID]
+    mailOrderProviders: [REDROCK_SPRINGVILLE_PHARMACY_ID, REDROCK_STGEORGE_PHARMACY_ID]
   },
   // Weekend Health
   org_uZPt00PG0JElhh3d: {
