@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@photonhealth/sdk": "*",
     "chakra-react-select": "^4.6.0",
     "dayjs": "^1.11.7",
     "eslint-config-prettier": "^9.1.0",

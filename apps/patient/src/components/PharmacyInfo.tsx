@@ -3,8 +3,7 @@ import { Box, HStack, Tag, TagLabel, TagLeftIcon, Text, VStack, Image } from '@c
 import { FiStar } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { types } from '@photonhealth/sdk';
-import { EnrichedPharmacy } from '../utils/models';
+import { Address, EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 
 import { formatAddress } from '../utils/general';
@@ -57,7 +56,7 @@ const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes }: HoursProps) => 
 
 interface DistanceAddressProps {
   distance?: number;
-  address?: types.Address | null;
+  address?: Address | null;
   fontSize?: string;
 }
 

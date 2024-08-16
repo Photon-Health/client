@@ -15,7 +15,6 @@ import {
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { Helmet } from 'react-helmet';
 import queryString from 'query-string';
-import { types } from '@photonhealth/sdk';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, preparePharmacy } from '../utils/general';
 import { ExtendedFulfillmentType } from '../utils/models';
@@ -43,6 +42,7 @@ import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { isGLP } from '../utils/isGLP';
 import ReactGA from 'react-ga4';
+import { FulfillmentType } from '../__generated__/graphql';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
@@ -499,8 +499,8 @@ export const Pharmacy = () => {
         : await setOrderPharmacy(
             order.id,
             selectedId,
-            order.readyBy,
-            order.readyByDay,
+            order.readyBy ?? undefined,
+            order.readyByDay ?? undefined,
             order.readyByTime
           );
 
@@ -513,7 +513,7 @@ export const Pharmacy = () => {
             // Fudge it so that we can show the pharmacy card on initial load of the
             // status view for all types. On my christmas list for 2024 is better
             // fulfillment types on pharmacies.
-            let type: ExtendedFulfillmentType = types.FulfillmentType.PickUp;
+            let type: ExtendedFulfillmentType = FulfillmentType.PickUp;
             let selectedPharmacy = null;
             if (selectedId in capsulePharmacyIdLookup) {
               type = 'COURIER';
@@ -522,13 +522,13 @@ export const Pharmacy = () => {
               type = 'COURIER';
               selectedPharmacy = { id: selectedId, name: 'Alto Pharmacy' };
             } else if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
-              type = types.FulfillmentType.MailOrder;
+              type = FulfillmentType.MailOrder;
               selectedPharmacy = { id: selectedId, name: 'Amazon Pharmacy' };
             } else if (selectedId === process.env.REACT_APP_COSTCO_PHARMACY_ID) {
-              type = types.FulfillmentType.MailOrder;
+              type = FulfillmentType.MailOrder;
               selectedPharmacy = { id: selectedId, name: 'Costco Pharmacy' };
             } else {
-              type = types.FulfillmentType.PickUp;
+              type = FulfillmentType.PickUp;
               selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
             }
 

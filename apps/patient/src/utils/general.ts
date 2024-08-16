@@ -1,4 +1,3 @@
-import { types } from '@photonhealth/sdk';
 import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import isToday from 'dayjs/plugin/isToday';
@@ -8,8 +7,14 @@ import utc from 'dayjs/plugin/utc';
 import costcoLogo from '../assets/costco_logo_small.png';
 import walgreensLogo from '../assets/walgreens_small.png';
 import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
-import { EnrichedPharmacy, Fill, OrderFulfillment, Pharmacy } from '../utils/models';
+import { Address, EnrichedPharmacy, Fill, OrderFulfillment, Pharmacy } from '../utils/models';
 import { ExtendedFulfillmentType } from './models';
+import {
+  FulfillmentType,
+  PharmacyCloseEvent,
+  PharmacyEvent,
+  PharmacyOpenEvent
+} from '../__generated__/graphql';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -24,7 +29,7 @@ export const titleCase = (str: string) =>
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 
-export const formatAddress = (address: types.Address) => {
+export const formatAddress = (address: Address) => {
   const { city, postalCode, state, street1, street2 } = address;
   return `${titleCase(street1)}${street2 ? `, ${titleCase(street2)}` : ''}, ${titleCase(
     city
@@ -55,8 +60,9 @@ export const getFulfillmentType = (
 
   // Next, try query param if it's set
   const fulfillmentTypes: ExtendedFulfillmentType[] = [
-    ...Object.values(types.FulfillmentType),
-    'COURIER' as ExtendedFulfillmentType
+    'COURIER',
+    FulfillmentType.MailOrder,
+    FulfillmentType.PickUp
   ];
   const foundType = fulfillmentTypes.find((val) => val === param);
   if (foundType) {
@@ -64,7 +70,7 @@ export const getFulfillmentType = (
   }
 
   // Fallback to pickup
-  return types.FulfillmentType.PickUp;
+  return FulfillmentType.PickUp;
 };
 
 /**
@@ -99,11 +105,11 @@ export const countFillsAndRemoveDuplicates = (fills: (Fill | FillWithCount)[]): 
   return Array.from(distinctFills.values());
 };
 
-function isOpenEvent(event: types.PharmacyEvent): event is types.PharmacyOpenEvent {
+function isOpenEvent(event: PharmacyEvent): event is PharmacyOpenEvent {
   return event.type === 'open';
 }
 
-function isCloseEvent(event: types.PharmacyEvent): event is types.PharmacyCloseEvent {
+function isCloseEvent(event: PharmacyEvent): event is PharmacyCloseEvent {
   return event.type === 'close';
 }
 
