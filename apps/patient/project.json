@@ -12,6 +12,13 @@
         "command": "npx graphql-codegen"
       }
     },
+    "codegen:watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "npx graphql-codegen --watch"
+      }
+    },
     "start": {
       "executor": "nx:run-commands",
       "options": {

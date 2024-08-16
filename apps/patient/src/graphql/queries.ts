@@ -1,4 +1,3 @@
-// import { gql } from 'graphql-request';
 import gql from 'graphql-tag';
 
 export const GET_ORDER = gql`
