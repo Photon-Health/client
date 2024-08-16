@@ -7,15 +7,15 @@ import { Helmet } from 'react-helmet';
 import { FiCheck, FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
-import { DemoCtaModal, PharmacyInfo, PoweredBy, PHARMACY_BRANDING } from '../components';
+import { DemoCtaModal, PHARMACY_BRANDING, PharmacyInfo, PoweredBy } from '../components';
 import { FAQ } from '../components/FAQ';
+import { HorizontalStatusStepper } from '../components/HorizontalStatusStepper';
 import { PrescriptionsList } from '../components/PrescriptionsList';
+import { ReadyText } from '../components/ReadyText';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
-import { HorizontalStatusStepper } from '../components/HorizontalStatusStepper';
-import { ReadyText } from '../components/ReadyText';
 
 export const Status = () => {
   const navigate = useNavigate();

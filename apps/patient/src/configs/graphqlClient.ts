@@ -1,17 +1,17 @@
 import { GraphQLClient } from 'graphql-request';
+import { getSdk } from '../__generated__/graphql';
 
-export const graphQLClient = new GraphQLClient(
-  (process.env as any).REACT_APP_GRAPHQL_API_ENDPOINT,
-  {
-    jsonSerializer: {
-      parse: JSON.parse,
-      stringify: JSON.stringify
-    }
+const client = new GraphQLClient((process.env as any).REACT_APP_GRAPHQL_API_ENDPOINT, {
+  jsonSerializer: {
+    parse: JSON.parse,
+    stringify: JSON.stringify
   }
-);
+});
+
+export const graphQLClient = getSdk(client);
 
 export const setAuthHeader = (token: string) => {
-  graphQLClient.setHeaders({
+  client.setHeaders({
     'x-photon-auth': token
   });
 };

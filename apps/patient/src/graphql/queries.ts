@@ -1,4 +1,5 @@
-import { gql } from 'graphql-request';
+// import { gql } from 'graphql-request';
+import gql from 'graphql-tag';
 
 export const GET_ORDER = gql`
   query order($id: ID!, $openAt: DateTime) {
@@ -8,6 +9,7 @@ export const GET_ORDER = gql`
       isReroutable
       readyBy
       readyByTime
+      readyByDay
       address {
         street1
         street2
@@ -95,6 +97,7 @@ export const GET_ORDER = gql`
           id
           daysSupply
           dispenseQuantity
+          dispenseUnit
           expirationDate
           fillsAllowed
         }

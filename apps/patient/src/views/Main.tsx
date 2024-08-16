@@ -92,7 +92,7 @@ export const Main = () => {
   const fetchOrder = useCallback(async () => {
     if (isDemo) return demoOrder;
     try {
-      const result: Order = await getOrder(orderId!);
+      const result = await getOrder(orderId!);
       if (result) {
         handleOrderResponse(result);
       }

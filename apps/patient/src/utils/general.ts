@@ -8,7 +8,7 @@ import utc from 'dayjs/plugin/utc';
 import costcoLogo from '../assets/costco_logo_small.png';
 import walgreensLogo from '../assets/walgreens_small.png';
 import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { EnrichedPharmacy, Fill, OrderFulfillment, Pharmacy } from '../utils/models';
 import { ExtendedFulfillmentType } from './models';
 
 dayjs.extend(utc);
@@ -40,7 +40,7 @@ export const formatDate = (date: string | Date) => new Date(date)?.toLocaleDateS
  */
 export const getFulfillmentType = (
   pharmacyId?: string,
-  fulfillment?: types.OrderFulfillment,
+  fulfillment?: OrderFulfillment,
   param?: string
 ): ExtendedFulfillmentType => {
   // We don't have COURIER fulfillment type yet, so manually check for those
@@ -71,19 +71,20 @@ export const getFulfillmentType = (
  * Flatten the returned fills array and count each unique
  * fill by treatment name
  */
-export type FillWithCount = types.Fill & { count: number };
-export const countFillsAndRemoveDuplicates = (
-  fills: (FillWithCount | types.Fill)[]
-): FillWithCount[] => {
+export type FillWithCount = Fill & { count: number };
+export const countFillsAndRemoveDuplicates = (fills: (Fill | FillWithCount)[]): FillWithCount[] => {
   // First, count the occurrences of each treatment.id
-  const counts = fills.reduce((acc, fill) => {
-    const id = fill.treatment.id;
-    if (!(id in acc)) {
-      acc[id] = 0;
-    }
-    acc[id] += 'count' in fill ? fill.count : 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const counts = fills.reduce(
+    (acc, fill) => {
+      const id = fill.treatment.id;
+      if (!(id in acc)) {
+        acc[id] = 0;
+      }
+      acc[id] += 'count' in fill ? fill.count : 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   // Then, create a map of distinct fills with updated counts
   const distinctFills = fills.reduce((acc: Map<string, FillWithCount>, fill) => {
@@ -106,7 +107,7 @@ function isCloseEvent(event: types.PharmacyEvent): event is types.PharmacyCloseE
   return event.type === 'close';
 }
 
-export const preparePharmacy = (pharmacy: types.Pharmacy): EnrichedPharmacy => {
+export const preparePharmacy = (pharmacy: Pharmacy): EnrichedPharmacy => {
   let is24Hr = false;
   let isClosingSoon = false;
   let opens = '';

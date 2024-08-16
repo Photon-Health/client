@@ -4,7 +4,7 @@ import { FiStar } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { types } from '@photonhealth/sdk';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 
 import { formatAddress } from '../utils/general';

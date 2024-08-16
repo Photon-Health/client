@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
 import { Text } from '@chakra-ui/react';
-import { OrderFulfillment, Maybe } from 'packages/sdk/dist/types';
 import isTomorrow from 'dayjs/plugin/isTomorrow';
+import { Maybe } from '../__generated__/graphql';
+import { OrderFulfillment } from '../utils/models';
 
 dayjs.extend(isTomorrow);
 

@@ -5,13 +5,20 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
+    "codegen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "npx graphql-codegen"
+      }
+    },
     "start": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
         "command": "env-cmd -f .env.boson react-app-rewired start"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen"]
     },
     "start:tau": {
       "executor": "nx:run-commands",
@@ -28,7 +35,7 @@
         "command": "env-cmd -f .env.boson react-app-rewired build",
         "outputs": "dist/apps/patient"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen"]
     },
     "build:neutron": {
       "executor": "nx:run-commands",
@@ -37,7 +44,7 @@
         "command": "env-cmd -f .env.neutron react-app-rewired build",
         "outputs": "dist/apps/patient"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen"]
     },
     "build:photon": {
       "executor": "nx:run-commands",
@@ -46,7 +53,7 @@
         "command": "env-cmd -f .env.photon react-app-rewired build",
         "outputs": "dist/apps/patient"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen"]
     },
     "test": {
       "executor": "nx:run-commands",
@@ -60,21 +67,24 @@
       "options": {
         "cwd": "apps/patient",
         "command": "npx eslint . --ext .tsx,.ts --quiet"
-      }
+      },
+      "dependsOn": ["codegen"]
     },
     "lint:fix": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
         "command": "npx eslint . --ext .tsx,.ts --fix && npx prettier --write src/**/*.{ts,tsx}"
-      }
+      },
+      "dependsOn": ["codegen"]
     },
     "tsc": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
         "command": "npx tsc --noEmit"
-      }
+      },
+      "dependsOn": ["codegen"]
     }
   }
 }
