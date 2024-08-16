@@ -7,7 +7,6 @@ import {
   TRUEPILL_PHARMACY_ID,
   HONEYBEE_PHARMACY_ID,
   EMPOWER_PHARMACY_ID,
-  COSTCO_PHARMACY_ID,
   REDBOX_PHARMACY_ID,
   GOGOMEDS_PHARMACY_ID,
   TAILORMADE_PHARMACY_ID,
@@ -94,11 +93,11 @@ const organizationSettings: {
   },
   // Demo (demo's)
   org_TY5GFYPIRo3xQGYM: {
-    logo: 'sesame_logo.jpg',
-    accentColor: '#5224C7',
+    logo: 'newco_logo.svg',
+    accentColor: '#506ef5',
     enableCourierNavigate: false,
     mailOrderNavigate: true,
-    mailOrderNavigateProviders: [COSTCO_PHARMACY_ID]
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
   },
   // Weekend Health
   org_u93EDGhy5I4Ia5Bb: {
