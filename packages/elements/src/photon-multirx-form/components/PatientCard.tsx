@@ -14,8 +14,15 @@ const patientAddressValidator = message(
   'Please enter an address for patient...'
 );
 
+interface PatientCardStoreProp {
+  patient?: {
+    value?: { id: string; address: any };
+    error: boolean;
+  };
+}
+
 export const PatientCard = (props: {
-  store: Record<string, any>;
+  store: PatientCardStoreProp;
   actions: Record<string, (...args: any) => any>;
   patientId?: string;
   client?: PhotonClientStore;
@@ -33,6 +40,7 @@ export const PatientCard = (props: {
   const [dialogOpen, setDialogOpen] = createSignal(false);
   const [medDialogOpen, setMedDialogOpen] = createSignal(false);
   const { actions, store } = PatientStore;
+  const [isUpdating, setIsUpdating] = createSignal(false);
 
   onMount(() => {
     props.actions.registerValidator({
@@ -75,7 +83,15 @@ export const PatientCard = (props: {
     }
   });
 
-  const patientId = createMemo(() => props.store.patient?.value?.id || props?.patientId);
+  const currentPatientId = createMemo(
+    () => (props.store.patient?.value?.id as string) || props?.patientId
+  );
+  // Listen for changes to the patient
+  const patientId = createMemo(() => {
+    if (isUpdating()) return '';
+    return currentPatientId() ?? '';
+  });
+
   // Show the address form only if the patient doesnt have an address
   const showAddressForm = createMemo(
     () =>
@@ -115,8 +131,13 @@ export const PatientCard = (props: {
             hide-create-prescription={true}
             open={dialogOpen()}
             on:photon-patient-updated={() => {
-              actions.getSelectedPatient(props.client!.getSDK(), props.store.patient?.value?.id);
-              setDialogOpen(false);
+              setIsUpdating(true);
+              actions.getSelectedPatient(props.client!.getSDK(), props.store.patient!.value!.id);
+              // Force a rerender of the above PatientInfo by quickly setting the patientId to null and then putting it back
+              setTimeout(() => {
+                setIsUpdating(false);
+                setDialogOpen(false);
+              }, 100);
             }}
             on:photon-patient-closed={() => {
               setDialogOpen(false);
@@ -160,7 +181,7 @@ export const PatientCard = (props: {
             props.actions.updateFormValue({
               key: 'patient',
               value: {
-                ...props.store.patient.value,
+                ...props.store.patient!.value,
                 address
               }
             });

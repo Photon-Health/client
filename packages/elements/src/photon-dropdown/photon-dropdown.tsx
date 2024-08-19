@@ -332,11 +332,11 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             class="bg-white overflow-x-hidden overflow-y-auto relative"
             style={{
               'max-height': '200px',
-              'min-height': '56px',
+              'min-height': '37px',
               width: '100%',
               display: 'flex',
               'flex-direction': 'column',
-              'justify-content': props.data.length === 0 ? 'center' : 'start'
+              'justify-content': 'start'
             }}
           >
             <div
@@ -346,7 +346,10 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
               }}
               ref={listRef}
             >
-              <For each={rowVirtualizer().getVirtualItems()}>
+              <For
+                each={rowVirtualizer().getVirtualItems()}
+                fallback={<EmptyEl noDataMsg={props.noDataMsg} isLoading={props.isLoading} />}
+              >
                 {(vr) => {
                   const isLoaderRow = vr.index > allItems().length - 1;
                   const datum = allItems()[vr.index];
@@ -385,19 +388,24 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                   );
                 }}
               </For>
-              <Show when={props.data.length == 0 && !props.isLoading}>
-                <sl-menu-item>{props.noDataMsg ? props.noDataMsg : 'No data found'}</sl-menu-item>
-              </Show>
-              <Show when={props.data.length == 0 && props.isLoading}>
-                <sl-menu-item>
-                  <p class="text-center text-gray-400 italic">Loading...</p>
-                </sl-menu-item>
-              </Show>
             </div>
           </div>
         </div>
       </sl-dropdown>
     </div>
+  );
+};
+
+const EmptyEl = (props: { isLoading: boolean; noDataMsg?: string }) => {
+  return (
+    <Show
+      when={props.isLoading}
+      fallback={<sl-menu-item>{props.noDataMsg ? props.noDataMsg : 'No data found'}</sl-menu-item>}
+    >
+      <sl-menu-item>
+        <p class="text-center text-gray-400 italic">Loading...</p>
+      </sl-menu-item>
+    </Show>
   );
 };
 

@@ -1,7 +1,13 @@
 import { Center, ChakraProvider, CircularProgress } from '@chakra-ui/react';
 import { datadogRum } from '@datadog/browser-rum';
 import { Context, createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import {
+  Outlet,
+  ScrollRestoration,
+  useLocation,
+  useNavigate,
+  useSearchParams
+} from 'react-router-dom';
 
 import { getOrder } from '../api/internal';
 import { Nav } from '../components';
@@ -182,6 +188,7 @@ export const Main = () => {
   return (
     <ChakraProvider theme={theme(order?.organization.id)}>
       <OrderContext.Provider value={orderContextValue}>
+        <ScrollRestoration />
         <Nav />
         <Outlet />
       </OrderContext.Provider>
