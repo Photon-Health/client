@@ -1,9 +1,11 @@
 import { useLazyQuery } from '@apollo/client';
 import { graphql } from 'apps/app/src/gql';
+import { AllRolesSelectQuery } from 'apps/app/src/gql/graphql';
 import { AsyncSelect, OptionProps, components } from 'chakra-react-select';
 import { Text } from '@chakra-ui/react';
 import * as yup from 'yup';
 import { usePhoton } from '@photonhealth/react';
+import { useState } from 'react';
 export const rolesSchema = yup.array(
   yup
     .object({
@@ -61,15 +63,20 @@ export const RolesSelect = (props: RolesSelectProps) => {
     // Not sure why, but looks like roles were cached with empty descriptions
     fetchPolicy: 'network-only'
   });
+  const [roleOptions, setRoleOptions] = useState<AllRolesSelectQuery['roles']>();
 
-  const loadOptions = async () => {
-    const roles = (await loadRoleOptions()).data?.roles ?? [];
+  const loadOptions = async (inputValue: string) => {
+    const roles = roleOptions ?? (await loadRoleOptions()).data?.roles ?? [];
+    if (!roleOptions) {
+      setRoleOptions(roles);
+    }
     return roles
       .map(({ name, id, description }) => ({
         value: id,
         label: name ?? id,
         description: description ?? undefined
       }))
+      .filter(({ label }) => label.toLowerCase().includes(inputValue.toLowerCase()))
       .sort();
   };
 
