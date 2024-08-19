@@ -52,7 +52,10 @@ export const getPharmacies = async ({
     const response: { pharmaciesByLocation: types.Pharmacy[] } = await graphQLClient.request(
       GET_PHARMACIES,
       {
-        location: searchParams,
+        location: {
+          radius: 100,
+          ...searchParams
+        },
         limit,
         offset,
         openAt: isOpenNow ? now : undefined,
