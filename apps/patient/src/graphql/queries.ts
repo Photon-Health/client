@@ -125,7 +125,6 @@ export const GET_PHARMACIES = gql`
       openAt: $openAt
       is24hr: $is24hr
       name: $name
-      radius: 100
     ) {
       id
       name
