@@ -54,7 +54,7 @@ export const getPharmacies = async ({
       GET_PHARMACIES,
       {
         location: {
-          radius: searchParams.radius ?? 100,
+          radius: 100,
           ...searchParams
         },
         limit,
