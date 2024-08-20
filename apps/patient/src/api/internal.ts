@@ -40,6 +40,7 @@ export const getPharmacies = async ({
   searchParams: {
     latitude: number;
     longitude: number;
+    radius?: number;
   };
   limit: number;
   offset: number;
@@ -53,7 +54,7 @@ export const getPharmacies = async ({
       GET_PHARMACIES,
       {
         location: {
-          radius: 100,
+          radius: searchParams.radius ?? 100,
           ...searchParams
         },
         limit,
