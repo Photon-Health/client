@@ -648,7 +648,7 @@ export const Pharmacy = () => {
       <Container pb={showFooter ? 28 : 8}>
         {location ? (
           <VStack spacing={6} align="stretch" pt={4}>
-            {!enableCourier || enableMailOrder ? (
+            {enableCourier || enableMailOrder ? (
               <BrandedOptions
                 options={[
                   ...(enableCourier && order?.address?.postalCode && capsulePharmacyId
