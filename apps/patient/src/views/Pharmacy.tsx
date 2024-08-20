@@ -245,7 +245,7 @@ export const Pharmacy = () => {
       }
       try {
         const topRankedCostco: EnrichedPharmacy[] = await getPharmacies({
-          searchParams: { latitude, longitude },
+          searchParams: { latitude, longitude, radius: 15 },
           limit: 1,
           offset: 0,
           isOpenNow: enableOpenNow,
@@ -281,7 +281,7 @@ export const Pharmacy = () => {
 
       try {
         const topRankedWags: EnrichedPharmacy[] = await getPharmacies({
-          searchParams: { latitude, longitude },
+          searchParams: { latitude, longitude, radius: 15 },
           limit: 1,
           offset: 0,
           isOpenNow: enableOpenNow,
