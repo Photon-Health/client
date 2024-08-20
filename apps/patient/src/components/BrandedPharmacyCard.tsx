@@ -63,6 +63,7 @@ export const BrandedPharmacyCard = ({ pharmacyId, selected, handleSelect }: Prop
           pharmacy={pharmacy}
           tagline={brand.description}
           availableInYourArea={brand.name === 'Capsule Pharmacy'}
+          freeDelivery={brand.name === 'Amazon Pharmacy'}
           boldPharmacyName={false}
         />
       </CardBody>
