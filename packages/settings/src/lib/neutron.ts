@@ -80,6 +80,8 @@ const organizationSettings: {
       FOOTHILLS_PHARMACY_ID
     ],
     topRankedWalgreens: true,
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
     enableCourierNavigate: true
   },
   // NewCo (demo's)
@@ -226,7 +228,9 @@ const organizationSettings: {
     accentColor: '#5224C7',
     topRankedCostco: true,
     mailOrder: true,
-    mailOrderProviders: [FOOTHILLS_PHARMACY_ID]
+    mailOrderProviders: [FOOTHILLS_PHARMACY_ID],
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
   },
   // Oshi Health
   org_yOgsgGMBVUZIBcwp: {
