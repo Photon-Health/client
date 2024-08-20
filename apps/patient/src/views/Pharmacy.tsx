@@ -103,26 +103,6 @@ export const Pharmacy = () => {
 
   const isMultiRx = flattenedFills.length > 1;
 
-  const enableMailOrder = !isDemo && orgSettings.mailOrderNavigate;
-
-  // capsule
-  const isCapsuleTerritory =
-    order?.address?.postalCode != null && order.address.postalCode in capsuleZipcodeLookup;
-  const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
-  const capsulePharmacyId = order?.address?.postalCode
-    ? capsuleZipcodeLookup[order.address.postalCode as keyof typeof capsuleZipcodeLookup]
-        ?.pharmacyId
-    : null;
-
-  const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
-  const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
-  const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
-
-  const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
-  const subheading = isReroute
-    ? t.sendToNew(isMultiRx, order.pharmacy!.name)
-    : t.sendToSelected(isMultiRx);
-
   // Pharmacy results
   const [topRankedPharmacies, setTopRankedPharmacies] = useState<EnrichedPharmacy[]>([]);
   const [pharmacyResults, setPharmacyResults] = useState<EnrichedPharmacy[]>([]);
@@ -138,6 +118,33 @@ export const Pharmacy = () => {
     }
     return combined.map(preparePharmacy);
   }, [isDemo, pharmacyResults, topRankedPharmacies]);
+
+  // capsule
+  const isCapsuleTerritory =
+    order?.address?.postalCode != null && order.address.postalCode in capsuleZipcodeLookup;
+  const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
+  const capsulePharmacyId = order?.address?.postalCode
+    ? capsuleZipcodeLookup[order.address.postalCode as keyof typeof capsuleZipcodeLookup]
+        ?.pharmacyId
+    : null;
+
+  // mail order
+  const hasTopRankedCostco = topRankedPharmacies.some((p) => p.name === 'Costco Pharmacy');
+  const enableMailOrder =
+    !isDemo &&
+    !hasTopRankedCostco && // this means org is Sesame, we don't want to show Amazon and top ranked Costco at the same time
+    orgSettings.mailOrderNavigate;
+
+  // top ranked pharmacies
+  const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
+  const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
+  const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
+
+  // headings
+  const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
+  const subheading = isReroute
+    ? t.sendToNew(isMultiRx, order.pharmacy!.name)
+    : t.sendToSelected(isMultiRx);
 
   const showToastWarning = () =>
     toast({

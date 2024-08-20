@@ -82,6 +82,7 @@ interface PharmacyInfoProps {
   preferred?: boolean;
   showDetails?: boolean;
   availableInYourArea?: boolean;
+  freeDelivery?: boolean;
   boldPharmacyName?: boolean;
   isStatus?: boolean;
   selected?: boolean;
@@ -93,6 +94,7 @@ export const PharmacyInfo = ({
   preferred = false,
   showDetails = true,
   availableInYourArea = false,
+  freeDelivery = false,
   boldPharmacyName = true,
   isStatus = false
 }: PharmacyInfoProps) => {
@@ -103,12 +105,16 @@ export const PharmacyInfo = ({
   const showPreferredTag = preferred;
   const showReadyIn30MinTag = pharmacy?.showReadyIn30Min && !isStatus;
   const showAvailableInYourAreaTag = availableInYourArea;
+  const showFreeDeliveryTag = freeDelivery;
   const whiteLabelDeliveryPharmacy =
     pharmacy.name === 'Capsule Pharmacy' && location.pathname === '/pharmacy';
 
   return (
     <VStack align="start" w="full" spacing={1}>
-      {showPreferredTag || showReadyIn30MinTag || showAvailableInYourAreaTag ? (
+      {showPreferredTag ||
+      showReadyIn30MinTag ||
+      showAvailableInYourAreaTag ||
+      showFreeDeliveryTag ? (
         <HStack spacing={2} m={0} p={0}>
           {showPreferredTag ? (
             <Tag size="sm" colorScheme="blue">
@@ -124,6 +130,11 @@ export const PharmacyInfo = ({
           {showAvailableInYourAreaTag ? (
             <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
               <TagLabel fontWeight="bold">Available in your area</TagLabel>
+            </Tag>
+          ) : null}
+          {showFreeDeliveryTag ? (
+            <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
+              <TagLabel fontWeight="bold">Free Delivery</TagLabel>
             </Tag>
           ) : null}
         </HStack>
