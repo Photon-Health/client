@@ -80,6 +80,8 @@ const organizationSettings: {
       FOOTHILLS_PHARMACY_ID
     ],
     topRankedWalgreens: true,
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
     enableCourierNavigate: true
   },
   // NewCo (demo's)
