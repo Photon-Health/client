@@ -226,7 +226,9 @@ const organizationSettings: {
     accentColor: '#5224C7',
     topRankedCostco: true,
     mailOrder: true,
-    mailOrderProviders: [FOOTHILLS_PHARMACY_ID]
+    mailOrderProviders: [FOOTHILLS_PHARMACY_ID],
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
   },
   // Oshi Health
   org_yOgsgGMBVUZIBcwp: {
