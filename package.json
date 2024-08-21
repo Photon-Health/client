@@ -6,6 +6,7 @@
     "app:local": "concurrently \"npx graphql-codegen --watch --config='apps/app/codegen.ts'\" \"npx nx run app:start\"",
     "app:tau": "concurrently \"npx graphql-codegen --watch --config='apps/app/codegen.ts'\" \"npx nx run app:start:tau\"",
     "patient": "npx nx run patient:start",
+    "patient:tau": "npx nx run patient:start:tau",
     "lint": "npx nx run-many --target=lint",
     "lint:fix": "npx nx run-many --target=lint:fix"
   },
