@@ -92,7 +92,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   );
   const [, recentOrdersActions] = useRecentOrders();
 
-  const newMedSearchTesters = ['Tim Porter', 'Josh Knapp'];
+  const newMedSearchTesters = ['Tim Porter', 'Rishi Khakhkhar', 'Josh Knapp'];
   // const [enableNewMedicationSearch, setEnableNewMedicationSearch] = createSignal<boolean>(
   //   newMedSearchTesters.includes(client?.authentication.state.user.name)
   // );
