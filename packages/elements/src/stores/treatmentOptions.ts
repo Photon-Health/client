@@ -14,8 +14,8 @@ export interface TreatmentOption {
   strength?: string;
 }
 
-const TREATMENT_OPTIONS_FIELDS = gql`
-  fragment TreatmentOptionsFields on TreatmentOption {
+const TREATMENT_OPTION_FIELDS = gql`
+  fragment TreatmentOptionFields on TreatmentOption {
     medicationId
     name
     ndc
@@ -26,7 +26,7 @@ const TREATMENT_OPTIONS_FIELDS = gql`
   }
 `;
 
-const TreatmentOptionsFieldsMap = { TreatmentOptionsFields: TREATMENT_OPTIONS_FIELDS };
+const TreatmentOptionFieldsMap = { TreatmentOptionFields: TREATMENT_OPTION_FIELDS };
 
 const createTreatmentOptionsStore = () => {
   const [store, setStore] = createStore<{
@@ -48,8 +48,8 @@ const createTreatmentOptionsStore = () => {
       ...store.treatmentOptions,
       isLoading: true
     });
-    const { data, errors } = await client.clinical.catalog.getCatalogs({
-      fragment: TreatmentOptionsFieldsMap
+    const { data, errors } = await client.clinical.treatmentOptions.searchTreatmentOptions({
+      fragment: TreatmentOptionFieldsMap
     });
     setStore('treatmentOptions', {
       ...store.treatmentOptions,
