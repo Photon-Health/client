@@ -31,7 +31,7 @@ function dispatchTreatmentSelected(
 
 function getFilteredData(
   props: ComponentProps,
-  filter: string
+  searchText: string
 ): (Treatment | PrescriptionTemplate)[] {
   const { store } = CatalogStore;
 
@@ -43,34 +43,57 @@ function getFilteredData(
     ...store.catalogs.data[0].treatments.map((x) => x as Treatment)
   ];
 
-  const filterValue = filter.toLowerCase();
-  if (filterValue.length === 0) return catalogData;
+  const searchTextLowerCase = searchText.toLowerCase();
+  if (searchTextLowerCase.length === 0) return catalogData;
 
   return catalogData.filter((x) => {
     if ('treatment' in x) {
       return (
-        x.treatment.name.toLowerCase().includes(filterValue) ||
-        x.name?.toLowerCase().includes(filterValue)
+        x.treatment.name.toLowerCase().includes(searchTextLowerCase) ||
+        x.name?.toLowerCase().includes(searchTextLowerCase)
       );
     }
-    return x.name.toLowerCase().includes(filterValue);
+    return x.name.toLowerCase().includes(searchTextLowerCase);
   });
 }
 
-function displayTreatment(t: Treatment, groupAccess: boolean) {
+export const boldSubstring = (inputString: string, substring: any) => {
+  // Split the substring into parts
+  const substrings = substring.split(' ').filter((part: string) => part.length > 0);
+
+  // Create a regular expression to match any of the substrings
+  const regex = new RegExp(`(${substrings.join('|')})`, 'gi');
+
+  // Split the inputString using the regex and map the parts
+  const parts = inputString.split(regex);
+  return parts.map((part) => {
+    if (substrings.some((sub: string) => sub.toLowerCase() === part.toLowerCase())) {
+      return <strong class="font-bold">{part}</strong>;
+    } else {
+      return part;
+    }
+  });
+};
+
+function displayTreatment(t: Treatment, groupAccess: boolean, searchText: string) {
+  const boldedName = boldSubstring(t.name, searchText);
   return groupAccess ? (
-    <p class="text-sm whitespace-normal leading-snug my-1">{t.name}</p>
+    <p class="text-sm whitespace-normal leading-snug my-1">{boldedName}</p>
   ) : (
-    t.name || ''
+    boldedName || ''
   );
 }
 
-function displayPrescriptionTemplate(t: PrescriptionTemplate, groupAccess: boolean) {
+function displayPrescriptionTemplate(
+  t: PrescriptionTemplate,
+  groupAccess: boolean,
+  searchText: string
+) {
   return groupAccess ? (
     <div class="my-1">
       <div class="text-sm whitespace-normal leading-snug">
-        {t.name ? <span class="font-bold">{t.name}: </span> : ''}
-        {t.treatment.name}
+        {t.name ? <span class="text-blue-600">({boldSubstring(t.name, searchText)}): </span> : ''}
+        {boldSubstring(t.treatment.name, searchText)}
       </div>
       <p class="text-xs text-gray-500 overflow-hidden whitespace-nowrap overflow-ellipsis">
         QTY: {t.dispenseQuantity} {t.dispenseUnit} | Days Supply: {t.daysSupply} | Refills:{' '}
@@ -78,7 +101,7 @@ function displayPrescriptionTemplate(t: PrescriptionTemplate, groupAccess: boole
       </p>
     </div>
   ) : (
-    t.treatment.name
+    boldSubstring(t.treatment.name, searchText)
   );
 }
 
@@ -105,6 +128,7 @@ function getGroupsConfig(props: ComponentProps) {
     {
       label: 'ALL TREATMENTS',
       filter: (t: any) =>
+        // TODO: What is the filter for this group?
         t && typeof t === 'object' && props.offCatalogOption && t.id === props.offCatalogOption.id
     }
   ];
@@ -128,20 +152,19 @@ const Component = (props: ComponentProps) => {
   let ref: any;
   const client = usePhoton();
   const { store, actions } = CatalogStore;
-  const [filter, setFilter] = createSignal<string>('');
+  const [searchText, setSearchText] = createSignal<string>('');
 
   onMount(async () => {
     await actions.getCatalogs(client!.getSDK());
-    // await actions.getTreatmentOptions(client!.getSDK());
   });
 
-  const data = createMemo(() => getFilteredData(props, filter()));
+  const data = createMemo(() => getFilteredData(props, searchText()));
 
   const displayAccessor = (t: Treatment | PrescriptionTemplate, groupAccess: boolean) => {
     if (t?.__typename !== 'PrescriptionTemplate') {
-      return displayTreatment(t as Treatment, groupAccess);
+      return displayTreatment(t as Treatment, groupAccess, searchText());
     } else {
-      return displayPrescriptionTemplate(t as PrescriptionTemplate, groupAccess);
+      return displayPrescriptionTemplate(t as PrescriptionTemplate, groupAccess, searchText());
     }
   };
 
@@ -164,8 +187,8 @@ const Component = (props: ComponentProps) => {
         hasMore={false}
         selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
         displayAccessor={displayAccessor}
-        onSearchChange={(s: string) => setFilter(s)}
-        onHide={() => setFilter('')}
+        onSearchChange={(s: string) => setSearchText(s)}
+        onHide={() => setSearchText('')}
         helpText={props.helpText}
       />
     </div>
