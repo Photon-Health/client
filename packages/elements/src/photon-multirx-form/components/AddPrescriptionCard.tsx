@@ -215,7 +215,7 @@ export const AddPrescriptionCard = (props: {
         >
           {props.enableNewMedicationSearch ? (
             <photon-medication-search
-              label="Search Treatment Catalog"
+              label="Search for Treatment"
               selected={props.store.treatment?.value ?? undefined}
               invalid={props.store.treatment?.error ?? false}
               help-text={props.store.treatment?.error}

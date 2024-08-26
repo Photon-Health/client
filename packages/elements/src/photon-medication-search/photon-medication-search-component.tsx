@@ -99,11 +99,11 @@ function getGroupsConfig(props: ComponentProps) {
       filter: (t: any) => t && typeof t === 'object' && 'treatment' in t && !t.isPrivate
     },
     {
-      label: 'CATALOG',
+      label: 'ORGANIZATION CATALOG',
       filter: (t: any) => t && typeof t === 'object' && 'name' in t && !('treatment' in t)
     },
     {
-      label: 'TREATMENTS',
+      label: 'ALL TREATMENTS',
       filter: (t: any) =>
         t && typeof t === 'object' && props.offCatalogOption && t.id === props.offCatalogOption.id
     }
@@ -132,7 +132,7 @@ const Component = (props: ComponentProps) => {
 
   onMount(async () => {
     await actions.getCatalogs(client!.getSDK());
-    await actions.getTreatmentOptions(client!.getSDK());
+    // await actions.getTreatmentOptions(client!.getSDK());
   });
 
   const data = createMemo(() => getFilteredData(props, filter()));
@@ -158,7 +158,7 @@ const Component = (props: ComponentProps) => {
         label={props.label}
         disabled={props.disabled}
         required={props.required}
-        placeholder="Select a treatment..."
+        placeholder="Type medication"
         invalid={props.invalid}
         isLoading={store.catalogs.isLoading}
         hasMore={false}
