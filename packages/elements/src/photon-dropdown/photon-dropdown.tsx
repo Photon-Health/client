@@ -1,5 +1,6 @@
 //Solid
 import { debounce } from '@solid-primitives/scheduled';
+import { Dynamic } from 'solid-js/web';
 import {
   Accessor,
   createEffect,
@@ -7,10 +8,10 @@ import {
   createSignal,
   For,
   JSXElement,
-  Match,
+  // Match,
   onMount,
-  Show,
-  Switch
+  Show
+  // Switch
 } from 'solid-js';
 
 //Shoelace
@@ -356,20 +357,18 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                   const isSelected =
                     'data' in datum && datum.data.id === selected()?.id && !isLoaderRow;
 
-                  return (
-                    <Switch>
-                      <Match when={'title' in datum}>
-                        <GroupLabelEl item={datum as GroupTitle} />
-                      </Match>
-                      <Match when={'data' in datum}>
-                        <ItemEl
-                          item={vr}
-                          isLoader={isLoaderRow}
-                          isSelected={isSelected}
-                          index={vr.index}
-                          hasMore={props.hasMore}
-                          showOverflow={props.showOverflow}
-                          onClick={() => {
+                  const ComponentToRender = 'title' in datum ? GroupLabelEl : ItemEl;
+                  const componentProps =
+                    'title' in datum
+                      ? { item: datum as GroupTitle }
+                      : {
+                          item: vr,
+                          isLoader: isLoaderRow,
+                          isSelected: isSelected,
+                          index: vr.index,
+                          hasMore: props.hasMore,
+                          showOverflow: props.showOverflow,
+                          onClick: () => {
                             if (!isLoaderRow) {
                               setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
                               setSelectedIndex((datum as DataItem<T>).allItemsIdx);
@@ -378,13 +377,14 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                               dispatchSelect((datum as DataItem<T>).data);
                               dropdownRef.hide();
                             }
-                          }}
-                          setLastIndex={setLastIndex}
-                        >
-                          {props.displayAccessor((datum as DataItem<T>).data, true)}
-                        </ItemEl>
-                      </Match>
-                    </Switch>
+                          },
+                          setLastIndex: setLastIndex
+                        };
+
+                  return (
+                    <Dynamic component={ComponentToRender} {...componentProps}>
+                      {'data' in datum && props.displayAccessor((datum as DataItem<T>).data, true)}
+                    </Dynamic>
                   );
                 }}
               </For>

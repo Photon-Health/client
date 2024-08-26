@@ -49,6 +49,7 @@ export const AddPrescriptionCard = (props: {
   weightUnit?: string;
   prefillNotes?: string;
   enableCombineAndDuplicate?: boolean;
+  enableNewMedicationSearch?: boolean;
 }) => {
   const client = usePhoton();
   const [medDialogOpen, setMedDialogOpen] = createSignal(false);
@@ -212,30 +213,57 @@ export const AddPrescriptionCard = (props: {
             });
           }}
         >
-          <photon-treatment-select
-            label="Search Treatment Catalog"
-            selected={props.store.treatment?.value ?? undefined}
-            invalid={props.store.treatment?.error ?? false}
-            help-text={props.store.treatment?.error}
-            off-catalog-option={offCatalog()}
-            on:photon-treatment-selected={(e: any) => {
-              if (e.detail.data.__typename === 'PrescriptionTemplate') {
-                repopulateForm(props.actions, {
-                  ...e.detail.data,
-                  notes: [e.detail.data?.notes, props.prefillNotes].filter((x) => x).join('\n\n')
-                });
-              } else {
+          {props.enableNewMedicationSearch ? (
+            <photon-medication-search
+              label="Search Treatment Catalog"
+              selected={props.store.treatment?.value ?? undefined}
+              invalid={props.store.treatment?.error ?? false}
+              help-text={props.store.treatment?.error}
+              off-catalog-option={offCatalog()}
+              on:photon-treatment-selected={(e: any) => {
+                if (e.detail.data.__typename === 'PrescriptionTemplate') {
+                  repopulateForm(props.actions, {
+                    ...e.detail.data,
+                    notes: [e.detail.data?.notes, props.prefillNotes].filter((x) => x).join('\n\n')
+                  });
+                } else {
+                  props.actions.updateFormValue({
+                    key: 'treatment',
+                    value: e.detail.data
+                  });
+                }
                 props.actions.updateFormValue({
-                  key: 'treatment',
-                  value: e.detail.data
+                  key: 'catalogId',
+                  value: e.detail.catalogId
                 });
-              }
-              props.actions.updateFormValue({
-                key: 'catalogId',
-                value: e.detail.catalogId
-              });
-            }}
-          />
+              }}
+            />
+          ) : (
+            <photon-treatment-select
+              label="Search Treatment Catalog"
+              selected={props.store.treatment?.value ?? undefined}
+              invalid={props.store.treatment?.error ?? false}
+              help-text={props.store.treatment?.error}
+              off-catalog-option={offCatalog()}
+              on:photon-treatment-selected={(e: any) => {
+                if (e.detail.data.__typename === 'PrescriptionTemplate') {
+                  repopulateForm(props.actions, {
+                    ...e.detail.data,
+                    notes: [e.detail.data?.notes, props.prefillNotes].filter((x) => x).join('\n\n')
+                  });
+                } else {
+                  props.actions.updateFormValue({
+                    key: 'treatment',
+                    value: e.detail.data
+                  });
+                }
+                props.actions.updateFormValue({
+                  key: 'catalogId',
+                  value: e.detail.catalogId
+                });
+              }}
+            />
+          )}
           <div class="flex flex-col sm:flex-none sm:grid sm:grid-cols-2 sm:gap-4">
             <div class="order-last sm:order-first">
               <photon-checkbox
@@ -251,7 +279,7 @@ export const AddPrescriptionCard = (props: {
                   })
                 }
               />
-              <photon-med-search-dialog
+              <photon-advanced-medication-search-dialog
                 title="Advanced Medication Search"
                 open={medDialogOpen()}
                 on:photon-medication-closed={() => setMedDialogOpen(false)}
