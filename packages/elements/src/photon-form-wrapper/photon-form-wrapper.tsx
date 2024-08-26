@@ -49,8 +49,8 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
       </photon-dialog>
 
       {/* Wrapper */}
-      <header class="flex flex-col md:flex-row items-center px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full z-10 shadow-card">
-        <div class="flex justify-start md:flex-1 absolute md:static left-4">
+      <header class="flex items-center px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full z-10 shadow-card">
+        <div class="flex items-center md:flex-1">
           <Button
             variant="naked"
             size="sm"
@@ -66,16 +66,26 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
               <Icon name="xMark" />
             </div>
           </Button>
+          {/* Left-Justified header on small screens */}
+          <div class="flex items-center space-x-2 ml-2 md:hidden">
+            <Show when={props.titleIconName}>
+              <sl-icon name={props.titleIconName} />
+            </Show>
+            <p class="font-sans text-sm md:text-xl font-medium">{props.title}</p>
+          </div>
         </div>
-        <div class="mb-2 md:mb-0 flex flex-0 md:flex-1 justify-center md:justify-center items-center">
-          <Show when={props.titleIconName}>
-            <sl-icon name={props.titleIconName} />
-          </Show>
-          <p class="ml-1 font-sans text-sm md:text-xl font-medium">{props.title}</p>
+        {/* Centered header on larger screens */}
+        <div class="hidden md:flex flex-1 justify-center items-center">
+          <div class="flex items-center space-x-2">
+            <Show when={props.titleIconName}>
+              <sl-icon name={props.titleIconName} />
+            </Show>
+            <p class="font-sans text-xl font-medium">{props.title}</p>
+          </div>
         </div>
-        <div class="flex flex-col md:flex-row flex-1">
+        <div class="flex-1 flex justify-end">
           <Show when={props.headerRight}>
-            <div class="flex-1 flex justify-end">{props.headerRight}</div>
+            <div class="flex justify-end">{props.headerRight}</div>
           </Show>
         </div>
       </header>

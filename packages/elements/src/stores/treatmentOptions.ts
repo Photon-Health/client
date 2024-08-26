@@ -4,7 +4,7 @@ import { GraphQLError } from 'graphql';
 import gql from 'graphql-tag';
 import { createStore } from 'solid-js/store';
 
-interface TreatmentOption {
+export interface TreatmentOption {
   medicationId: string;
   name: string;
   ndc: string;

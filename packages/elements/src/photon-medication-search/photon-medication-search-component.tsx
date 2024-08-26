@@ -7,8 +7,14 @@ import { usePhoton } from '../context';
 import { PhotonDropdown } from '../photon-dropdown';
 
 // Types
-import { Medication, Treatment, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
+import {
+  Medication,
+  Treatment,
+  PrescriptionTemplate,
+  MedicationType
+} from '@photonhealth/sdk/dist/types';
 import { CatalogStore } from '../stores/catalog';
+import { TreatmentOption } from '../stores/treatmentOptions';
 
 // Utility Functions
 
@@ -32,15 +38,31 @@ function dispatchTreatmentSelected(
 function getFilteredData(
   props: ComponentProps,
   searchText: string
-): (Treatment | PrescriptionTemplate)[] {
+): (Treatment | PrescriptionTemplate | TreatmentOption)[] {
   const { store } = CatalogStore;
 
+  // get new treatment options
+
+  const treatmentOptions: TreatmentOption[] = [
+    {
+      name: 'TESST',
+      medicationId: '34g34f',
+      ndc: '1234',
+      type: 'RX' as MedicationType,
+      route: 'oral',
+      form: 'tablet',
+      strength: '10mg'
+    }
+  ];
+
   if (store.catalogs.data.length === 0) return [];
+  // if (store.catalogs.data.length === 0 && treatmentOptions.length === 0) return [];
 
   const catalogData = [
     ...(props.offCatalogOption ? [props.offCatalogOption as Treatment] : []),
     ...store.catalogs.data[0].templates.map((x) => x as PrescriptionTemplate),
-    ...store.catalogs.data[0].treatments.map((x) => x as Treatment)
+    ...store.catalogs.data[0].treatments.map((x) => x as Treatment),
+    ...treatmentOptions
   ];
 
   const searchTextLowerCase = searchText.toLowerCase();
@@ -75,7 +97,11 @@ export const boldSubstring = (inputString: string, substring: any) => {
   });
 };
 
-function displayTreatment(t: Treatment, groupAccess: boolean, searchText: string) {
+function displayTreatment(
+  t: Treatment | TreatmentOption,
+  groupAccess: boolean,
+  searchText: string
+) {
   const boldedName = boldSubstring(t.name, searchText);
   return groupAccess ? (
     <p class="text-sm whitespace-normal leading-snug my-1">{boldedName}</p>
@@ -123,13 +149,14 @@ function getGroupsConfig(props: ComponentProps) {
     },
     {
       label: 'ORGANIZATION CATALOG',
-      filter: (t: any) => t && typeof t === 'object' && 'name' in t && !('treatment' in t)
+      filter: (t: any) =>
+        t && typeof t === 'object' && 'name' in t && !('treatment' in t) && !('medicationId' in t)
     },
     {
       label: 'ALL TREATMENTS',
       filter: (t: any) =>
         // TODO: What is the filter for this group?
-        t && typeof t === 'object' && props.offCatalogOption && t.id === props.offCatalogOption.id
+        t && typeof t === 'object' && 'medicationId' in t
     }
   ];
 }
@@ -160,12 +187,14 @@ const Component = (props: ComponentProps) => {
 
   const data = createMemo(() => getFilteredData(props, searchText()));
 
-  const displayAccessor = (t: Treatment | PrescriptionTemplate, groupAccess: boolean) => {
-    if (t?.__typename !== 'PrescriptionTemplate') {
-      return displayTreatment(t as Treatment, groupAccess, searchText());
-    } else {
+  const displayAccessor = (
+    t: Treatment | PrescriptionTemplate | TreatmentOption,
+    groupAccess: boolean
+  ) => {
+    if (t && '__typename' in t && t.__typename == 'PrescriptionTemplate') {
       return displayPrescriptionTemplate(t as PrescriptionTemplate, groupAccess, searchText());
     }
+    return displayTreatment(t as Treatment | TreatmentOption, groupAccess, searchText());
   };
 
   return (
