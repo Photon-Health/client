@@ -38,8 +38,6 @@ function dispatchTreatmentSelected(
   triggerCustomEvent(ref, 'photon-treatment-selected', { data: datum, catalogId });
 }
 
-// I have no idea if this stuff is right...
-
 type DataReturn<Type> = {
   data?: Type;
   loading?: boolean;
@@ -57,6 +55,7 @@ const SearchTreatmentoptions = gql`
       route
       strength
       type
+      __typename
     }
   }
 `;
@@ -68,7 +67,7 @@ export type TreatmentOption = {
   form?: string;
   route?: string;
   strength?: string;
-  type?: string;
+  type?: MedicationType;
   __typename: string;
 };
 
@@ -83,25 +82,19 @@ const searchTreatmentoptions = async (
   });
 };
 
-async function getFilteredData(
+async function loadData(client: ApolloClient<any>, searchText: string): Promise<TreatmentOption[]> {
+  const req = await searchTreatmentoptions(client, searchText);
+  return req?.data?.treatmentOptions ?? [];
+}
+
+function getFilteredData(
   props: ComponentProps,
   searchText: string,
-  client: ApolloClient<any>
-): Promise<(Treatment | PrescriptionTemplate | TreatmentOption)[]> {
+  treatmentOptions: TreatmentOption[]
+): (Treatment | PrescriptionTemplate | TreatmentOption)[] {
   const { store } = CatalogStore;
 
-  // get new treatment options
-  const req = await searchTreatmentoptions(client, searchText);
-  console.log(req);
-
-  // ... Down to here
-
-  const treatmentOptions: TreatmentOption[] = req?.data?.treatmentOptions ?? [];
-
-  console.log(treatmentOptions);
-
   if (store.catalogs.data.length === 0) return [];
-  // if (store.catalogs.data.length === 0 && treatmentOptions.length === 0) return [];
 
   const catalogData = [
     ...(props.offCatalogOption ? [props.offCatalogOption as Treatment] : []),
@@ -109,8 +102,6 @@ async function getFilteredData(
     ...store.catalogs.data[0].treatments.map((x) => x as Treatment),
     ...treatmentOptions
   ];
-
-  console.log(catalogData);
 
   const searchTextLowerCase = searchText.toLowerCase();
   if (searchTextLowerCase.length === 0) return catalogData;
@@ -127,13 +118,8 @@ async function getFilteredData(
 }
 
 export const boldSubstring = (inputString: string, substring: any) => {
-  // Split the substring into parts
   const substrings = substring.split(' ').filter((part: string) => part.length > 0);
-
-  // Create a regular expression to match any of the substrings
   const regex = new RegExp(`(${substrings.join('|')})`, 'gi');
-
-  // Split the inputString using the regex and map the parts
   const parts = inputString.split(regex);
   return parts.map((part) => {
     if (substrings.some((sub: string) => sub.toLowerCase() === part.toLowerCase())) {
@@ -181,7 +167,6 @@ function displayPrescriptionTemplate(
 function getGroupsConfig(props: ComponentProps) {
   return [
     {
-      // TODO: Double-check with Jomi on the naming of this section
       label: 'OFF CATALOG',
       filter: (t: any) =>
         t && typeof t === 'object' && props.offCatalogOption && t.id === props.offCatalogOption.id
@@ -201,9 +186,7 @@ function getGroupsConfig(props: ComponentProps) {
     },
     {
       label: 'ALL TREATMENTS',
-      filter: (t: any) =>
-        // TODO: What is the filter for this group?
-        t && typeof t === 'object' && 'medicationId' in t
+      filter: (t: any) => t && typeof t === 'object' && 'medicationId' in t
     }
   ];
 }
@@ -227,14 +210,18 @@ const Component = (props: ComponentProps) => {
   const client = usePhoton();
   const { store, actions } = CatalogStore;
   const [searchText, setSearchText] = createSignal<string>('');
+  const [treatmentOptions, setTreatmentOptions] = createSignal<TreatmentOption[]>([]);
 
   onMount(async () => {
     await actions.getCatalogs(client!.getSDK());
   });
 
-  const clinicalClient = client!.sdk.apolloClinical;
+  createMemo(async () => {
+    const options = await loadData(client!.sdk.apolloClinical, searchText());
+    setTreatmentOptions(options);
+  });
 
-  const data = createMemo(async () => await getFilteredData(props, searchText(), clinicalClient));
+  const data = createMemo(() => getFilteredData(props, searchText(), treatmentOptions()));
 
   const displayAccessor = (
     t: Treatment | PrescriptionTemplate | TreatmentOption,
