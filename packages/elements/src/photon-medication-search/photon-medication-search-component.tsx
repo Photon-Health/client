@@ -16,6 +16,9 @@ import {
 import { CatalogStore } from '../stores/catalog';
 import { TreatmentOption } from '../stores/treatmentOptions';
 
+import { ApolloClient } from '@apollo/client';
+import gql from 'graphql-tag';
+
 // Utility Functions
 
 function triggerCustomEvent(ref: any, eventName: string, detail: any) {
@@ -35,25 +38,67 @@ function dispatchTreatmentSelected(
   triggerCustomEvent(ref, 'photon-treatment-selected', { data: datum, catalogId });
 }
 
-function getFilteredData(
+// I have no idea if this stuff is right...
+
+type DataReturn<Type> = {
+  data?: Type;
+  loading?: boolean;
+  error?: any;
+  errors?: readonly any[];
+};
+
+const SearchTreatmentoptions = gql`
+  query SearchTreatmentOptions($searchTerm: String!) {
+    treatmentOptions(searchTerm: $searchTerm) {
+      medicationId
+      form
+      name
+      ndc
+      route
+      strength
+      type
+    }
+  }
+`;
+
+export type TreatmentOption = {
+  medicationId: string;
+  name: string;
+  ndc: string;
+  form?: string;
+  route?: string;
+  strength?: string;
+  type?: string;
+  __typename: string;
+};
+
+const searchTreatmentoptions = async (
+  client: ApolloClient<any>,
+  searchTerm: string
+): Promise<DataReturn<{ treatmentOptions: TreatmentOption[] }>> => {
+  return await client.query<{ treatmentOptions: TreatmentOption[] }>({
+    query: SearchTreatmentoptions,
+    variables: { searchTerm },
+    fetchPolicy: 'no-cache'
+  });
+};
+
+async function getFilteredData(
   props: ComponentProps,
-  searchText: string
-): (Treatment | PrescriptionTemplate | TreatmentOption)[] {
+  searchText: string,
+  client: ApolloClient<any>
+): Promise<(Treatment | PrescriptionTemplate | TreatmentOption)[]> {
   const { store } = CatalogStore;
 
   // get new treatment options
+  const req = await searchTreatmentoptions(client, searchText);
+  console.log(req);
 
-  const treatmentOptions: TreatmentOption[] = [
-    {
-      name: 'TESST',
-      medicationId: '34g34f',
-      ndc: '1234',
-      type: 'RX' as MedicationType,
-      route: 'oral',
-      form: 'tablet',
-      strength: '10mg'
-    }
-  ];
+  // ... Down to here
+
+  const treatmentOptions: TreatmentOption[] = req?.data?.treatmentOptions ?? [];
+
+  console.log(treatmentOptions);
 
   if (store.catalogs.data.length === 0) return [];
   // if (store.catalogs.data.length === 0 && treatmentOptions.length === 0) return [];
@@ -64,6 +109,8 @@ function getFilteredData(
     ...store.catalogs.data[0].treatments.map((x) => x as Treatment),
     ...treatmentOptions
   ];
+
+  console.log(catalogData);
 
   const searchTextLowerCase = searchText.toLowerCase();
   if (searchTextLowerCase.length === 0) return catalogData;
@@ -185,7 +232,9 @@ const Component = (props: ComponentProps) => {
     await actions.getCatalogs(client!.getSDK());
   });
 
-  const data = createMemo(() => getFilteredData(props, searchText()));
+  const clinicalClient = client!.sdk.apolloClinical;
+
+  const data = createMemo(async () => await getFilteredData(props, searchText(), clinicalClient));
 
   const displayAccessor = (
     t: Treatment | PrescriptionTemplate | TreatmentOption,
