@@ -8,10 +8,8 @@ import {
   createSignal,
   For,
   JSXElement,
-  // Match,
   onMount,
   Show
-  // Switch
 } from 'solid-js';
 
 //Shoelace
@@ -367,6 +365,8 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                   const datum = allItems()[vr.index];
                   const isSelected =
                     'data' in datum && datum.data.id === selected()?.id && !isLoaderRow;
+
+                  console.log(isSelected);
 
                   const ComponentToRender = 'title' in datum ? GroupLabelEl : ItemEl;
                   const componentProps =
