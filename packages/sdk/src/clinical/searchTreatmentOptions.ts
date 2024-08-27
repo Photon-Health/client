@@ -43,7 +43,7 @@ export class TreatmentOptionsQueryManager {
     const SEARCH_TREATMENT_OPTIONS = gql`
       ${fValue}
       query searchTreatmentOptions($searchTerm: ID) {
-        catalog(searchTerm: $searchTerm) {
+        searchTreatmentOptions(searchTerm: $searchTerm) {
           ...${fName}
         }
       }
