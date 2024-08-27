@@ -121,7 +121,7 @@ function displayPrescriptionTemplate(
         {t.name ? <span class="text-blue-600">({boldSubstring(t.name, searchText)}): </span> : ''}
         {boldSubstring(t.treatment.name, searchText)}
       </div>
-      <p class="text-xs text-gray-500 overflow-hidden whitespace-nowrap overflow-ellipsis">
+      <p class="text-xs text-gray-500 whitespace-nowrap truncate">
         QTY: {t.dispenseQuantity} {t.dispenseUnit} | Days Supply: {t.daysSupply} | Refills:{' '}
         {t.fillsAllowed ? t.fillsAllowed - 1 : 0} | Sig: {t.instructions}
       </p>
@@ -197,31 +197,68 @@ const Component = (props: ComponentProps) => {
     return displayTreatment(t as Treatment | TreatmentOption, groupAccess, searchText());
   };
 
-  return (
-    <div
-      ref={ref}
-      on:photon-data-selected={(e: any) => {
-        dispatchTreatmentSelected(ref, e.detail.data, store.catalogs.data![0]?.id || '');
-      }}
-    >
-      <PhotonDropdown
-        data={data()}
-        groups={getGroupsConfig(props)}
-        label={props.label}
-        disabled={props.disabled}
-        required={props.required}
-        placeholder="Type medication"
-        invalid={props.invalid}
-        isLoading={store.catalogs.isLoading}
-        hasMore={false}
-        selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
-        displayAccessor={displayAccessor}
-        onSearchChange={(s: string) => setSearchText(s)}
-        onHide={() => setSearchText('')}
-        helpText={props.helpText}
-      />
-    </div>
-  );
+  let comp;
+
+  // On mobile, go full screen
+  const isMobile = window.innerWidth < 768;
+  if (isMobile) {
+    comp = (
+      <div class="fixed top-0 left-0 w-full h-screen z-10 overflow-y-scroll bg-white">
+        <div
+          ref={ref}
+          on:photon-data-selected={(e: any) => {
+            dispatchTreatmentSelected(ref, e.detail.data, store.catalogs.data![0]?.id || '');
+          }}
+        >
+          <PhotonDropdown
+            data={data()}
+            groups={getGroupsConfig(props)}
+            label={props.label}
+            disabled={props.disabled}
+            required={props.required}
+            placeholder="Type medication"
+            invalid={props.invalid}
+            isLoading={store.catalogs.isLoading}
+            hasMore={false}
+            selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
+            displayAccessor={displayAccessor}
+            onSearchChange={(s: string) => setSearchText(s)}
+            onHide={() => setSearchText('')}
+            helpText={props.helpText}
+            fullScreen={true}
+          />
+        </div>
+      </div>
+    );
+  } else {
+    comp = (
+      <div
+        ref={ref}
+        on:photon-data-selected={(e: any) => {
+          dispatchTreatmentSelected(ref, e.detail.data, store.catalogs.data![0]?.id || '');
+        }}
+      >
+        <PhotonDropdown
+          data={data()}
+          groups={getGroupsConfig(props)}
+          label={props.label}
+          disabled={props.disabled}
+          required={props.required}
+          placeholder="Type medication"
+          invalid={props.invalid}
+          isLoading={store.catalogs.isLoading}
+          hasMore={false}
+          selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
+          displayAccessor={displayAccessor}
+          onSearchChange={(s: string) => setSearchText(s)}
+          onHide={() => setSearchText('')}
+          helpText={props.helpText}
+        />
+      </div>
+    );
+  }
+
+  return comp;
 };
 
 // Custom Element Registration

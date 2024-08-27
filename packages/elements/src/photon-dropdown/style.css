@@ -43,13 +43,18 @@
   @apply py-1;
   @apply text-gray-800;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
+}
+.group::part(checked-icon) {
+  display: none;
+  width: 0px;
+}
+.group::part(label) {
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
-.dropdown::part(panel) {
-  border-radius: var(--photon-border-radius, 0.5rem);
-}
-
-.dropdown-container {
-  border-radius: var(--photon-border-radius, 0.5rem);
+.treatment-option::part(checked-icon) {
+  display: none;
+  width: 0px;
 }

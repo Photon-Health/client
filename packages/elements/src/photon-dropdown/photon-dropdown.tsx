@@ -77,6 +77,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   optional?: boolean;
   clearable?: boolean;
   actionRef?: any;
+  fullScreen?: boolean;
 }) => {
   //refs
   let ref: any;
@@ -220,7 +221,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
       <style>{shoelaceLightStyles}</style>
       <style>{styles}</style>
       {props.label ? (
-        <div class="flex items-center pb-2">
+        <div class={`flex items-center pb-2 ${props.fullScreen ? 'pl-5 pr-5 pt-3' : ''}`}>
           <p class="text-gray-700 text-sm font-sans">{props.label}</p>
           {props.required ? <p class="pl-1 text-red-400">*</p> : null}
           {props.optional ? <p class="text-gray-400 text-xs pl-2 font-sans">Optional</p> : null}
@@ -256,6 +257,12 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
           autocomplete="off"
           disabled={props.disabled ?? false}
           size="medium"
+          style={{
+            'padding-left': '20px',
+            'padding-right': '20px',
+            'border-radius': props.fullScreen ? '0px' : 'default',
+            border: props.fullScreen ? '0px' : 'default'
+          }}
           classList={{
             invalid: props.invalid ?? false,
             input: true,
@@ -327,12 +334,16 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             <sl-icon name={open() ? 'chevron-up' : 'chevron-down'} />
           </div>
         </sl-input>
-        <div class="border border-gray-200 dropdown-container overflow-hidden relative">
+        <div
+          class={`border border-gray-200 dropdown-container overflow-hidden relative ${
+            props.fullScreen ? 'mt-3' : ''
+          }`}
+        >
           <div
             ref={overlayRef}
             class="bg-white overflow-x-hidden overflow-y-auto relative"
             style={{
-              'max-height': '300px',
+              // 'max-height': '300px',
               'min-height': '37px',
               width: '100%',
               display: 'flex',
@@ -410,7 +421,13 @@ const EmptyEl = (props: { isLoading: boolean; noDataMsg?: string }) => {
 };
 
 const GroupLabelEl = (props: { item: GroupTitle }) => (
-  <sl-menu-item class="group">{props.item.title}</sl-menu-item>
+  <sl-menu-item
+    classList={{
+      group: true
+    }}
+  >
+    {props.item.title}
+  </sl-menu-item>
 );
 
 const ItemEl = (props: {
@@ -426,7 +443,13 @@ const ItemEl = (props: {
 }) => {
   return (
     <sl-menu-item
-      class={props.isSelected ? 'selected default' : 'default'}
+      classList={{
+        selected: props.isSelected,
+        'treatment-option': true,
+        'px-3': true,
+        'overflow-hidden': true,
+        ellipsis: true
+      }}
       onClick={() => props.onClick()}
       ref={(r: Element) => {
         if (props.isLoader && props.index > 0) {
