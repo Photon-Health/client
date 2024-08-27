@@ -123,7 +123,7 @@ export const boldSubstring = (inputString: string, substring: any) => {
   const parts = inputString.split(regex);
   return parts.map((part) => {
     if (substrings.some((sub: string) => sub.toLowerCase() === part.toLowerCase())) {
-      return <strong class="font-bold">{part}</strong>;
+      return <strong class="font-extrabold">{part}</strong>;
     } else {
       return part;
     }
@@ -150,7 +150,7 @@ function displayPrescriptionTemplate(
 ) {
   return groupAccess ? (
     <div class="my-1">
-      <div class="text-sm whitespace-normal leading-snug">
+      <div class="text-sm whitespace-normal font-medium mb-1">
         {t.name ? <span class="text-blue-600">({boldSubstring(t.name, searchText)}): </span> : ''}
         {boldSubstring(t.treatment.name, searchText)}
       </div>
@@ -211,6 +211,7 @@ const Component = (props: ComponentProps) => {
   const { store, actions } = CatalogStore;
   const [searchText, setSearchText] = createSignal<string>('');
   const [treatmentOptions, setTreatmentOptions] = createSignal<TreatmentOption[]>([]);
+  const [openOverlay, setOpenOverlay] = createSignal<boolean>(false);
 
   onMount(async () => {
     await actions.getCatalogs(client!.getSDK());
@@ -239,7 +240,11 @@ const Component = (props: ComponentProps) => {
   const isMobile = window.innerWidth < 768;
   if (isMobile) {
     comp = (
-      <div class="fixed top-0 left-0 w-full h-screen z-10 overflow-y-scroll bg-white">
+      <div
+        class={
+          openOverlay() ? `fixed top-0 left-0 w-full h-screen z-10 overflow-y-scroll bg-white` : ''
+        }
+      >
         <div
           ref={ref}
           on:photon-data-selected={(e: any) => {
@@ -262,6 +267,7 @@ const Component = (props: ComponentProps) => {
             onHide={() => setSearchText('')}
             helpText={props.helpText}
             fullScreen={true}
+            setOpenOverlay={setOpenOverlay}
           />
         </div>
       </div>

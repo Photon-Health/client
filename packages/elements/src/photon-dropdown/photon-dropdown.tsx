@@ -12,6 +12,9 @@ import {
   Show
 } from 'solid-js';
 
+// Photon
+import { Button, Icon } from '@photonhealth/components';
+
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/dropdown/dropdown';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
@@ -20,6 +23,7 @@ import '@shoelace-style/shoelace/dist/components/menu-item/menu-item';
 import '@shoelace-style/shoelace/dist/components/menu/menu';
 import '@shoelace-style/shoelace/dist/components/spinner/spinner';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
+import { setDefaultAnimation } from '@shoelace-style/shoelace/dist/utilities/animation-registry.js';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -31,6 +35,9 @@ import styles from './style.css?inline';
 
 //Virtual List
 import { createVirtualizer, VirtualItem } from '@tanstack/solid-virtual';
+
+// Disable the default dropdown animation
+setDefaultAnimation('dropdown.show', null);
 
 interface DataItem<T> {
   data: T;
@@ -76,6 +83,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   clearable?: boolean;
   actionRef?: any;
   fullScreen?: boolean;
+  setOpenOverlay?: (open: boolean) => void;
 }) => {
   //refs
   let ref: any;
@@ -207,7 +215,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
     createVirtualizer({
       count: allItems().length,
       getScrollElement: () => listRef,
-      estimateSize: () => 36.8,
+      estimateSize: () => 42,
       overscan: 100
     })
   );
@@ -220,7 +228,25 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
       <style>{styles}</style>
       {props.label ? (
         <div class={`flex items-center pb-2 ${props.fullScreen ? 'pl-5 pr-5 pt-3' : ''}`}>
-          <p class="text-gray-700 text-sm font-sans">{props.label}</p>
+          <div class="flex items-center" style={{ 'font-size': '26px' }}>
+            <sl-icon-button
+              name="x"
+              label="Close medication search"
+              class="full-screen-close-btn"
+              style={{ padding: '0px' }}
+              on:click={() => {
+                // close full screen overlay
+                if (props.fullScreen) {
+                  props.setOpenOverlay(false);
+                }
+              }}
+            />
+          </div>
+          <div class="md:flex flex-1 justify-center items-center pl-2">
+            <div class="flex items-center space-x-2">
+              <p class="text-gray-700 text-sm font-sans inline font-medium">{props.label}</p>
+            </div>
+          </div>
           {props.required ? <p class="pl-1 text-red-400">*</p> : null}
           {props.optional ? <p class="text-gray-400 text-xs pl-2 font-sans">Optional</p> : null}
         </div>
@@ -262,6 +288,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             border: props.fullScreen ? '0px' : 'default'
           }}
           classList={{
+            'treatment-search': true,
             invalid: props.invalid ?? false,
             input: true,
             disabled: props.disabled ?? false,
@@ -275,6 +302,15 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             debounceSearch(e.target.value);
           }}
           on:sl-focus={() => {
+            if (props.fullScreen) {
+              // open full screen overlay
+              props.setOpenOverlay(true);
+
+              if (!open()) {
+                dropdownRef.show();
+              }
+            }
+
             dropdownRef.children[1].style.width = `${inputRef.clientWidth}px`;
             if (selectedIndex() > 0) {
               rowVirtualizer().scrollToIndex(selectedIndex());
@@ -322,15 +358,17 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
               />
             </div>
           </Show>
-          <div
-            slot="suffix"
-            classList={{
-              flex: true,
-              hidden: props.isLoading
-            }}
-          >
-            <sl-icon name={open() ? 'chevron-up' : 'chevron-down'} />
-          </div>
+          <Show when={!props.fullScreen}>
+            <div
+              slot="suffix"
+              classList={{
+                flex: true,
+                hidden: props.isLoading
+              }}
+            >
+              <sl-icon name={open() ? 'chevron-up' : 'chevron-down'} />
+            </div>
+          </Show>
         </sl-input>
         <div
           class={`border border-gray-200 dropdown-container overflow-hidden relative ${
@@ -365,8 +403,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                   const datum = allItems()[vr.index];
                   const isSelected =
                     'data' in datum && datum.data.id === selected()?.id && !isLoaderRow;
-
-                  console.log(isSelected);
 
                   const ComponentToRender = 'title' in datum ? GroupLabelEl : ItemEl;
                   const componentProps =
