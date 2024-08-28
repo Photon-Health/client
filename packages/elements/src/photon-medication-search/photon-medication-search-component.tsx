@@ -148,20 +148,24 @@ function displayPrescriptionTemplate(
   groupAccess: boolean,
   searchText: string
 ) {
-  return groupAccess ? (
-    <div class="my-1">
-      <div class="text-sm whitespace-normal font-medium mb-1">
-        {t.name ? <span class="text-blue-600">({boldSubstring(t.name, searchText)}): </span> : ''}
-        {boldSubstring(t.treatment.name, searchText)}
+  if (groupAccess) {
+    const refills = t.fillsAllowed ? t.fillsAllowed - 1 : 0;
+
+    return (
+      <div class="my-1">
+        <div class="text-sm whitespace-normal font-medium mb-1">
+          {t.name ? <span class="text-blue-600">({boldSubstring(t.name, searchText)}): </span> : ''}
+          {boldSubstring(t.treatment.name, searchText)}
+        </div>
+        <p class="text-xs text-gray-500 whitespace-nowrap truncate">
+          {t.dispenseQuantity} {t.dispenseUnit}, {t.daysSupply} {t.daysSupply === 1 ? 'day' : 'day'}{' '}
+          supply, {refills} {refills === 1 ? 'refill' : 'refills'}, {t.instructions}
+        </p>
       </div>
-      <p class="text-xs text-gray-500 whitespace-nowrap truncate">
-        QTY: {t.dispenseQuantity} {t.dispenseUnit} | Days Supply: {t.daysSupply} | Refills:{' '}
-        {t.fillsAllowed ? t.fillsAllowed - 1 : 0} | Sig: {t.instructions}
-      </p>
-    </div>
-  ) : (
-    boldSubstring(t.treatment.name, searchText)
-  );
+    );
+  }
+
+  return boldSubstring(t.treatment.name, searchText);
 }
 
 function getGroupsConfig(props: ComponentProps) {
