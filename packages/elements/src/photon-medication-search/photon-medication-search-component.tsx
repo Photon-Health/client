@@ -157,10 +157,11 @@ function displayPrescriptionTemplate(
           {t.name ? <span class="text-blue-600">({boldSubstring(t.name, searchText)}): </span> : ''}
           {boldSubstring(t.treatment.name, searchText)}
         </div>
-        <p class="text-xs text-gray-500 whitespace-nowrap truncate">
-          {t.dispenseQuantity} {t.dispenseUnit}, {t.daysSupply} {t.daysSupply === 1 ? 'day' : 'day'}{' '}
-          supply, {refills} {refills === 1 ? 'refill' : 'refills'}, {t.instructions}
-        </p>
+        <div class="text-xs text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap">
+          {t.dispenseQuantity} {t.dispenseUnit}, {t.daysSupply}{' '}
+          {t.daysSupply === 1 ? 'day' : 'days'} supply, {refills}{' '}
+          {refills === 1 ? 'refill' : 'refills'}, {t.instructions}
+        </div>
       </div>
     );
   }

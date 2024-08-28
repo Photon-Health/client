@@ -59,7 +59,7 @@ type Item<T = any> = DataItem<T> | GroupTitle;
 // eslint-disable-next-line @typescript-eslint/ban-types
 type ThisisNotAFunction<T> = Exclude<T, Function>;
 
-export const PhotonMedicationDropdownMobile = <T extends { id: string }>(props: {
+export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
   data: Array<T>;
   label?: string;
   required: boolean;
