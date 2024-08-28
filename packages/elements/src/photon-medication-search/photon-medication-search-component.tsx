@@ -266,7 +266,7 @@ const Component = (props: ComponentProps) => {
             onSearchChange={(s: string) => setSearchText(s)}
             onHide={() => setSearchText('')}
             helpText={props.helpText}
-            fullScreen={true}
+            fullScreen={openOverlay()}
             setOpenOverlay={setOpenOverlay}
           />
         </div>

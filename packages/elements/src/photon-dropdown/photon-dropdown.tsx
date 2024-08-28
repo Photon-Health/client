@@ -220,6 +220,18 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
     })
   );
 
+  const adjustDropdownHeight = () => {
+    if (overlayRef) {
+      const availableHeight = window.innerHeight - overlayRef.getBoundingClientRect().top;
+      overlayRef.style.maxHeight = `${availableHeight - 105}px`; // Subtract some padding if needed
+    }
+  };
+
+  // Call the adjustment function when the dropdown is shown
+  const handleDropdownShow = () => {
+    adjustDropdownHeight();
+  };
+
   return (
     <div ref={ref}>
       <style>{tailwind}</style>
@@ -228,23 +240,33 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
       <style>{styles}</style>
       {props.label ? (
         <div class={`flex items-center pb-2 ${props.fullScreen ? 'pl-5 pr-5 pt-3' : ''}`}>
-          <div class="flex items-center" style={{ 'font-size': '26px' }}>
-            <sl-icon-button
-              name="x"
-              label="Close medication search"
-              class="full-screen-close-btn"
-              style={{ padding: '0px' }}
-              on:click={() => {
-                // close full screen overlay
-                if (props.fullScreen) {
-                  props.setOpenOverlay(false);
-                }
-              }}
-            />
-          </div>
-          <div class="md:flex flex-1 justify-center items-center pl-2">
+          {props.fullScreen ? (
+            <div class="flex items-center" style={{ 'font-size': '26px' }}>
+              <sl-icon-button
+                name="x"
+                label="Close medication search"
+                class="full-screen-close-btn"
+                style={{ padding: '0px' }}
+                on:click={() => {
+                  // close full screen overlay
+                  if (props.fullScreen) {
+                    props.setOpenOverlay(false);
+                  }
+                }}
+              />
+            </div>
+          ) : null}
+          <div
+            class={`md:flex flex-1 justify-center items-center ${props.fullScreen ? 'pl-2' : ''}`}
+          >
             <div class="flex items-center space-x-2">
-              <p class="text-gray-700 text-sm font-sans inline font-medium">{props.label}</p>
+              <p
+                class={`text-gray-700 text-sm font-sans inline ${
+                  props.fullScreen ? 'font-medium' : ''
+                }`}
+              >
+                {props.label}
+              </p>
             </div>
           </div>
           {props.required ? <p class="pl-1 text-red-400">*</p> : null}
@@ -271,6 +293,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
           if (props.onOpen) {
             await props.onOpen();
           }
+          handleDropdownShow();
         }}
         style={{ width: '100%' }}
       >
@@ -282,10 +305,10 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
           disabled={props.disabled ?? false}
           size="medium"
           style={{
-            'padding-left': '20px',
-            'padding-right': '20px',
-            'border-radius': props.fullScreen ? '0px' : 'default',
-            border: props.fullScreen ? '0px' : 'default'
+            'padding-left': props.fullScreen ? '20px' : undefined,
+            'padding-right': props.fullScreen ? '20px' : undefined,
+            'border-radius': props.fullScreen ? '0px' : undefined,
+            border: props.fullScreen ? '0px' : undefined
           }}
           classList={{
             'treatment-search': true,
@@ -302,9 +325,12 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             debounceSearch(e.target.value);
           }}
           on:sl-focus={() => {
-            if (props.fullScreen) {
+            if (!props.fullScreen) {
               // open full screen overlay
-              props.setOpenOverlay(true);
+
+              if (props.setOpenOverlay) {
+                props.setOpenOverlay(true);
+              }
 
               if (!open()) {
                 dropdownRef.show();
@@ -379,7 +405,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             ref={overlayRef}
             class="bg-white overflow-x-hidden overflow-y-auto relative"
             style={{
-              // 'max-height': '300px',
+              'max-height': '85vh',
               'min-height': '37px',
               width: '100%',
               display: 'flex',
@@ -402,7 +428,10 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                   const isLoaderRow = vr.index > allItems().length - 1;
                   const datum = allItems()[vr.index];
                   const isSelected =
-                    'data' in datum && datum.data.id === selected()?.id && !isLoaderRow;
+                    selected()?.id &&
+                    !isLoaderRow &&
+                    'data' in datum &&
+                    datum?.data?.id === selected()?.id;
 
                   const ComponentToRender = 'title' in datum ? GroupLabelEl : ItemEl;
                   const componentProps =
