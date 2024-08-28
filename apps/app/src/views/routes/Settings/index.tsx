@@ -19,7 +19,7 @@ import { DevelopersTab } from './views/DevelopersTab';
 import { OrganizationTab } from './views/OrganizationTab';
 import { TeamTab } from './views/TeamTab';
 import { TemplateTab } from './views/TemplateTab';
-import { CatalogTab } from './views/TreatmentTab';
+import { CatalogTab } from './views/CatalogTab';
 import { UserTab } from './views/UserTab';
 
 const settingsPageQuery = graphql(/* GraphQL */ `
