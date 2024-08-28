@@ -4,6 +4,7 @@ import { createMemo, createSignal, onMount } from 'solid-js';
 
 // Photon
 import { usePhoton } from '../context';
+import { PhotonMedicationDropdownMobile } from '../photon-medication-dropdown-mobile';
 import { PhotonDropdown } from '../photon-dropdown';
 
 // Types
@@ -14,7 +15,6 @@ import {
   MedicationType
 } from '@photonhealth/sdk/dist/types';
 import { CatalogStore } from '../stores/catalog';
-import { TreatmentOption } from '../stores/treatmentOptions';
 
 import { ApolloClient } from '@apollo/client';
 import gql from 'graphql-tag';
@@ -251,7 +251,7 @@ const Component = (props: ComponentProps) => {
             dispatchTreatmentSelected(ref, e.detail.data, store.catalogs.data![0]?.id || '');
           }}
         >
-          <PhotonDropdown
+          <PhotonMedicationDropdownMobile
             data={data()}
             groups={getGroupsConfig(props)}
             label={props.label}
