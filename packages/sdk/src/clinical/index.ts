@@ -9,7 +9,6 @@ import { PrescriptionQueryManager } from './prescription';
 import { AllergenQueryManager } from './allergen';
 import { PrescriptionTemplateQueryManager } from './prescriptionTemplate';
 import { SearchMedicationQueryManager } from './searchMedication';
-import { TreatmentOptionsQueryManager } from './searchTreatmentOptions';
 
 /**
  * Contains various methods for Photon Clinical API
@@ -55,10 +54,6 @@ export class ClinicalQueryManager {
    * Methods for interacting with Photon Prescription Templates
    */
   public prescriptionTemplate: PrescriptionTemplateQueryManager;
-  /**
-   * Methods for interacting with Photon Treatment Options
-   */
-  public treatmentOption: TreatmentOptionsQueryManager;
 
   /**
    * @param apollo - An Apollo client instance
@@ -74,6 +69,5 @@ export class ClinicalQueryManager {
     this.prescription = new PrescriptionQueryManager(apollo);
     this.allergens = new AllergenQueryManager(apollo);
     this.prescriptionTemplate = new PrescriptionTemplateQueryManager(apollo);
-    this.treatmentOption = new TreatmentOptionsQueryManager(apollo);
   }
 }
