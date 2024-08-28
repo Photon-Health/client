@@ -21,9 +21,9 @@ export const PatientSelect = (props: any) => {
   const patient = getPatient({ id: '' });
 
   useEffect(() => {
-    if (!loading) {
-      setOptions(patients?.map(mapOption) ?? []);
-      setFinished(patients != null && patients.length === 0);
+    if (!loading && patients) {
+      setOptions(patients.map(mapOption) ?? []);
+      setFinished(patients.length === 0);
     }
   }, [loading, patients]);
 

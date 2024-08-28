@@ -26,6 +26,7 @@ import { StyledToast } from '../../../components/StyledToast';
 import { TreatmentActions } from '../components/treatments/TreatmentActions';
 import { TreatmentForm } from '../components/treatments/TreatmentForm';
 import { TreatmentTable } from '../components/treatments/TreatmentTable';
+import { Treatment } from 'packages/sdk/src/types';
 
 interface MedViewProps {
   name: string;
@@ -128,7 +129,7 @@ export const CatalogTab = ({
   useEffect(() => {
     if (!catalog.loading && catalog.catalog?.treatments) {
       const sorted = [...catalog.catalog.treatments]
-        .filter((t) => t != null)
+        .filter<Treatment>((t): t is Treatment => t != null)
         .sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1));
       const preppedRows = sorted;
       setRows(preppedRows);
