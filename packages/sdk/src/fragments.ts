@@ -258,15 +258,3 @@ export const PRESCRIPTION_TEMPLATE_FIELDS = gql`
     isPrivate
   }
 `;
-
-export const TREATMENT_OPTION_FIELDS = gql`
-  fragment TreatmentOptionFields on TreatmentOption {
-    medicationId
-    name
-    ndc
-    type
-    route
-    form
-    strength
-  }
-`;
