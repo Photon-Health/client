@@ -9,7 +9,7 @@ export const PharmacySelect = (props: any) => {
 
   if (error) return <Text color="red">{error.message}</Text>;
 
-  const options = pharmacies.map((org: any) => {
+  const options = pharmacies?.map((org: any) => {
     return {
       value: org.id,
       label: `${org.name}`

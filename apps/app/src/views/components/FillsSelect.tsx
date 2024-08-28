@@ -14,9 +14,10 @@ import {
 } from '@chakra-ui/react';
 
 import { usePhoton } from '@photonhealth/react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { formatDate } from '../../utils';
 import { LoadingInputField } from './LoadingInputField';
+import { PrescriptionState } from 'packages/sdk/src/types';
 
 interface FillsSelectProps {
   name: string;
@@ -52,26 +53,27 @@ export const FillsSelect = (props: FillsSelectProps) => {
   };
   const { prescriptions, loading, error, refetch } = getPrescriptions({
     patientId,
-    // @ts-ignore
-    state: 'ACTIVE'
+    state: PrescriptionState.Active
   });
 
-  const matchSelectedPatient = (prescription: { patient: { id: string } }) =>
-    prescription?.patient.id === patientId;
+  const matchSelectedPatient = useCallback(
+    (prescription: { patient: { id: string } }) => prescription?.patient.id === patientId,
+    [patientId]
+  );
 
   useEffect(() => {
-    if (!loading && patientId && prescriptions.every(matchSelectedPatient)) {
+    if (!loading && patientId && prescriptions?.every(matchSelectedPatient)) {
       setOptions(prescriptions.map(mapOption));
       setFinished(true);
     }
-  }, [loading]);
+  }, [loading, matchSelectedPatient, patientId, prescriptions]);
 
   useEffect(() => {
-    if (!loading && patientId && prescriptions.every(matchSelectedPatient)) {
+    if (!loading && patientId && prescriptions?.every(matchSelectedPatient)) {
       setOptions(prescriptions.map(mapOption));
       setFinished(true);
     }
-  }, [prescriptions]);
+  }, [loading, matchSelectedPatient, patientId, prescriptions]);
 
   useEffect(() => {
     setValue(selected.map((prescriptionId) => ({ prescriptionId })));

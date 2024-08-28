@@ -52,6 +52,7 @@ import usePermissions from '../../hooks/usePermissions';
 import { CANCEL_PRESCRIPTION } from '../../mutations';
 
 import { datadogRum } from '@datadog/browser-rum';
+import { Prescription as PrescriptionType } from 'packages/sdk/src/types';
 
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
@@ -70,7 +71,7 @@ export const Prescription = () => {
   const { prescription, loading, error } = getPrescription({ id: id! });
   const [accessToken, setAccessToken] = useState('');
   const [canceling, setCanceling] = useState(false);
-  const rx = prescription || {};
+  const rx: Partial<PrescriptionType> = prescription || {};
 
   const getAccessToken = async () => {
     try {
@@ -297,7 +298,7 @@ export const Prescription = () => {
                   <SkeletonText skeletonHeight={5} noOfLines={1} flexGrow={1} />
                 </HStack>
               ) : (
-                <NameView name={prescriber?.name?.full} />
+                <NameView name={prescriber!.name!.full} />
               )}
             </VStack>
           </Stack>

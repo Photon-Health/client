@@ -273,13 +273,13 @@ export const Patient = () => {
 
             {loading ? (
               <SkeletonText skeletonHeight={20} noOfLines={1} width="300px" />
-            ) : prescriptions.length === 0 ? (
+            ) : prescriptions?.length === 0 ? (
               <Text as="i" fontSize="sm" color="gray.500">
                 No prescriptions
               </Text>
             ) : (
               <VStack spacing={3} align="start">
-                {prescriptions.map(({ id: prescriptionId, treatment, state, writtenAt }, i) =>
+                {prescriptions?.map(({ id: prescriptionId, treatment, state, writtenAt }, i) =>
                   i < 5 ? (
                     <LinkBox key={prescriptionId} style={{ textDecoration: 'none' }} w="full">
                       <Card
@@ -341,13 +341,13 @@ export const Patient = () => {
 
             {loading ? (
               <SkeletonText skeletonHeight={20} noOfLines={1} width="300px" />
-            ) : orders.length === 0 ? (
+            ) : orders?.length === 0 ? (
               <Text as="i" fontSize="sm" color="gray.500">
                 No orders
               </Text>
             ) : (
               <VStack spacing={3} align="start">
-                {orders.map(({ id: orderId, fulfillment, fills, createdAt, state }, i) => {
+                {orders?.map(({ id: orderId, fulfillment, fills, createdAt, state }, i) => {
                   const medNames = getMedicationNames(fills).join(', ');
 
                   return i < 5 ? (

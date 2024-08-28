@@ -22,10 +22,10 @@ export const PatientSelect = (props: any) => {
 
   useEffect(() => {
     if (!loading) {
-      setOptions(patients.map(mapOption));
-      setFinished(patients.length === 0);
+      setOptions(patients?.map(mapOption) ?? []);
+      setFinished(patients != null && patients.length === 0);
     }
-  }, [loading]);
+  }, [loading, patients]);
 
   if (error) return <Text color="red">{error.message}</Text>;
 

@@ -14,7 +14,7 @@ import {
   useToast
 } from '@chakra-ui/react';
 import { usePhoton } from '@photonhealth/react';
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState, useMemo } from 'react';
 import { useDebounce } from 'use-debounce';
 
 import { FragmentType, useFragment } from 'apps/app/src/gql';
@@ -60,7 +60,7 @@ const organizationTreatmentTabFragment = graphql(/* GraphQL */ `
   }
 `);
 
-export const TreatmentTab = ({
+export const CatalogTab = ({
   organization: organizationFragment
 }: {
   organization?: FragmentType<typeof organizationTreatmentTabFragment>;
@@ -70,12 +70,13 @@ export const TreatmentTab = ({
   const organization = useFragment(organizationTreatmentTabFragment, organizationFragment);
   const { getCatalog, getCatalogs } = usePhoton();
   const catalogs = getCatalogs();
+  const catalogId = useMemo(() => catalogs.catalogs?.[0]?.id ?? '', [catalogs.catalogs]);
+
   const catalog = getCatalog({
-    id: catalogs.catalogs[0]?.id || '',
+    id: catalogId,
     fragment: CatalogTreatmentFieldsMap,
     defer: true
   });
-  const [catalogId, setCatalogId] = useState('');
   const [showModal, setShowModal] = useBoolean();
   // use this to reset the form after adding a treatment
   const [resetKey, setResetKey] = useState(0);
@@ -106,70 +107,68 @@ export const TreatmentTab = ({
       // TODO replace catalog SDK query
       // also setting timeout for now to allow for the mutation to complete, will have a better solution when we replace the SDK query
       setTimeout(() => {
-        catalog.query!({
-          id: catalogs.catalogs[0].id,
+        catalog.query({
+          id: catalogId,
           fragment: CatalogTreatmentFieldsMap
         });
       }, 500);
     }
   });
 
+  // Load catalog once the catalogs have been loaded
   useEffect(() => {
-    if (!catalogs.loading && catalogs.catalogs.length > 0) {
-      setCatalogId(catalogs.catalogs[0].id);
-      catalog.query!({
-        id: catalogs.catalogs[0].id,
+    if (!catalog.loading && catalogId && catalog.catalog == null) {
+      catalog.query({
+        id: catalogId,
         fragment: CatalogTreatmentFieldsMap
       });
     }
-  }, [catalogs.loading]);
+  }, [catalog, catalogId, catalog.loading]);
 
   useEffect(() => {
     if (!catalog.loading && catalog.catalog?.treatments) {
-      const sorted = [...catalog.catalog.treatments].sort((a: any, b: any) =>
-        a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
-      );
+      const sorted = [...catalog.catalog.treatments]
+        .filter((t) => t != null)
+        .sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1));
       const preppedRows = sorted;
       setRows(preppedRows);
       if (debouncedFilterText.length === 0 && filterText.length === 0) {
-        const fRows = preppedRows.map((y: any) =>
-          renderTreatmentRow(y, setChildLoading, y.id, catalogs.catalogs[0].id)
+        const fRows = preppedRows.map((y) =>
+          renderTreatmentRow(y, setChildLoading, y.id, catalogId)
         );
         setFilteredRows(fRows);
         setPages(Math.ceil(fRows.length / pageSize));
         setCurrentPage(1);
       } else {
         const fRows = preppedRows
-          .filter((x: any) =>
+          .filter((x) =>
             x.name
               .toLowerCase()
               .includes(debouncedFilterText.toLowerCase() || filterText.toLowerCase())
           )
-          .map((y: any) => renderTreatmentRow(y, setChildLoading, y.id, catalogs.catalogs[0].id));
+          .map((y) => renderTreatmentRow(y, setChildLoading, y.id, catalogId));
         setPages(Math.ceil(fRows.length / pageSize));
         setCurrentPage(1);
         setFilteredRows(fRows);
       }
     }
-  }, [catalog.loading, catalog.catalog?.treatments?.length]);
+  }, [catalog.catalog?.treatments, catalog.loading, catalogId, debouncedFilterText, filterText]);
 
   useEffect(() => {
     if (debouncedFilterText.length === 0 && filterText.length === 0) {
-      const fRows = rows.map((y: any) =>
-        renderTreatmentRow(y, setChildLoading, y.id, catalogs.catalogs[0].id)
-      );
+      const fRows = rows.map((y) => renderTreatmentRow(y, setChildLoading, y.id, catalogId));
       setPages(Math.ceil(fRows.length / pageSize));
       setCurrentPage(1);
       setFilteredRows(fRows);
     } else {
       const fRows = rows
         .filter((x) => x.name.toLowerCase().includes(debouncedFilterText.toLowerCase()))
-        .map((y: any) => renderTreatmentRow(y, setChildLoading, y.id, catalogs.catalogs[0].id));
+        .map((y) => renderTreatmentRow(y, setChildLoading, y.id, catalogId));
       setPages(Math.ceil(fRows.length / pageSize));
       setCurrentPage(1);
       setFilteredRows(fRows);
     }
-  }, [debouncedFilterText]);
+  }, [catalogId, debouncedFilterText, filterText.length, rows]);
 
   const isLoading = catalogs.loading || catalog.loading || loading || childLoading;
 

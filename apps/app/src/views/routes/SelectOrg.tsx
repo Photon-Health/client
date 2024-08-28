@@ -48,7 +48,16 @@ export const SelectOrg = () => {
         });
       }
     }
-  }, [organizations, loading]);
+  }, [
+    organizations,
+    loading,
+    location.search,
+    location.pathname,
+    logout,
+    setOrganization,
+    login,
+    from
+  ]);
 
   useEffect(() => {
     if (searchParams.has('orgs')) {
@@ -56,7 +65,7 @@ export const SelectOrg = () => {
       searchParams.delete('pathname');
       setSearchParams(searchParams);
     }
-  }, []);
+  }, [searchParams, setSearchParams]);
 
   const colorMode = useColorModeValue('sm', 'sm-dark');
 
@@ -101,7 +110,7 @@ export const SelectOrg = () => {
           <CircularProgress isIndeterminate color="green.300" />
         </Center>
       )}
-      {organizations?.length > 1 && (
+      {organizations && organizations.length > 1 && (
         <Box
           display="flex"
           alignItems="center"

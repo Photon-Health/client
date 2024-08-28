@@ -19,7 +19,7 @@ import { DevelopersTab } from './views/DevelopersTab';
 import { OrganizationTab } from './views/OrganizationTab';
 import { TeamTab } from './views/TeamTab';
 import { TemplateTab } from './views/TemplateTab';
-import { TreatmentTab } from './views/TreatmentTab';
+import { CatalogTab } from './views/TreatmentTab';
 import { UserTab } from './views/UserTab';
 
 const settingsPageQuery = graphql(/* GraphQL */ `
@@ -145,7 +145,7 @@ export const Settings = () => {
               <TemplateTab />
             </TabPanel>
             <TabPanel display="flex" flexDir="column" gap={{ md: '4' }} px={0}>
-              <TreatmentTab organization={data?.organization ?? undefined} />
+              <CatalogTab organization={data?.organization ?? undefined} />
             </TabPanel>
           </TabPanels>
         </Tabs>
