@@ -44,7 +44,7 @@ const newMedSearchTesters = [
   'Tim Porter', // Modern Pediatrics
   'Rishi Khakhkhar', // Counsel
   'Kristen Borchetta', // Blueberry Pediatrics
-  // buncha hooligans
+  // hooligans
   'Josh Knapp',
   'Michael Rochlin',
   'Jomi Cubol',
