@@ -71,3 +71,7 @@
 .treatment-search::part(input)::placeholder {
   @apply text-gray-300;
 }
+
+.dropdown::part(panel) {
+  box-shadow: none;
+}
