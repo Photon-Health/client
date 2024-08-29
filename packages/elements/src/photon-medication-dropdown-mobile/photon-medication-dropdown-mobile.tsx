@@ -189,7 +189,6 @@ export const PhotonMedicationDropdownMobile = <T extends { id: string }>(props: 
           inputRef.focus();
         }, 0);
 
-        debounceSearch(props.searchText);
       }
     }
   });
