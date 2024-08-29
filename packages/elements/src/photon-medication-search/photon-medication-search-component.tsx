@@ -259,6 +259,7 @@ const Component = (props: ComponentProps) => {
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
           displayAccessor={displayAccessor}
+          searchText={searchText() === '' && props.selected ? props.selected.name : searchText()}
           onSearchChange={(s: string) => setSearchText(s)}
           onHide={() => setSearchText('')}
           helpText={props.helpText}

@@ -86,6 +86,7 @@ export const PhotonMedicationDropdownMobile = <T extends { id: string }>(props: 
   clearable?: boolean;
   actionRef?: any;
   open: boolean;
+  searchText: string;
   onClose: () => void;
 }) => {
   //refs
@@ -187,6 +188,8 @@ export const PhotonMedicationDropdownMobile = <T extends { id: string }>(props: 
         setTimeout(() => {
           inputRef.focus();
         }, 0);
+
+        debounceSearch(props.searchText);
       }
     }
   });
@@ -276,7 +279,7 @@ export const PhotonMedicationDropdownMobile = <T extends { id: string }>(props: 
           style={{ width: '100%' }}
         >
           <sl-input
-            value={selected() ? props.displayAccessor(selected() as T, false) : ''}
+            value={props.searchText}
             ref={inputRef}
             slot="trigger"
             placeholder={props.placeholder}
@@ -400,9 +403,7 @@ export const PhotonMedicationDropdownMobile = <T extends { id: string }>(props: 
                                 inputRef.value = '';
                                 debounceSearch('');
                                 dispatchSelect((datum as DataItem<T>).data);
-                                // dropdownRef.hide();
 
-                                // close full screen overlay
                                 if (props.onClose) {
                                   props.onClose();
                                 }

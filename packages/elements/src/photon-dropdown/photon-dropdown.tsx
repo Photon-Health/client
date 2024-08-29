@@ -265,7 +265,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
           required={props.required}
           on:sl-input={(e: any) => {
             if (props.onInputFocus) {
-              console.log('HITTING WRONG FOCUS');
               props.onInputFocus();
             }
 
@@ -276,9 +275,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
           }}
           on:sl-focus={(e) => {
             if (props.onInputFocus) {
-              // console.log('TRIGGERING MODAL OPEN');
-              console.log('HITTING WRONG FOCUS');
-
               props.onInputFocus();
               e.stopImmediatePropagation();
             } else {
