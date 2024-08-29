@@ -268,7 +268,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           patientId: props.formStore.patient?.value.id,
           // +1 here because we're using the refillsInput
           fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
-          treatmentId: draft.treatment.id,
+          treatmentId:
+            draft.treatment.__typename === 'TreatmentOption'
+              ? draft.treatment.medicationId
+              : draft.treatment.id,
           externalId: draft.externalId
         };
         if (draft.addToTemplates) {

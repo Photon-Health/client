@@ -310,6 +310,13 @@ export const PhotonMedicationDropdownMobile = <T extends { id: string }>(props: 
                 rowVirtualizer().scrollToIndex(selectedIndex());
               }
             }}
+            on:sl-clear={() => {
+              setSelected(undefined);
+              setSelectedIndex(-1);
+              inputRef.value = '';
+              debounceSearch('');
+              dispatchDeselect();
+            }}
           >
             <p
               slot="help-text"
