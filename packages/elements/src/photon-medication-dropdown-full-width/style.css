@@ -8,13 +8,6 @@
   @apply hover:cursor-pointer;
 }
 
-.input::part(input) {
-  /* @apply overflow-hidden; */
-  /* @apply overflow-ellipsis; */
-  /* @apply whitespace-wrap; */
-  /* @apply whitespace-normal; */
-}
-
 .disabled::part(base) {
   @apply hover:cursor-not-allowed;
 }
