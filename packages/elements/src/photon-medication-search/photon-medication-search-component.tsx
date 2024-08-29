@@ -4,7 +4,7 @@ import { createMemo, createSignal, onMount, Show } from 'solid-js';
 
 // Photon
 import { usePhoton } from '../context';
-import { PhotonMedicationDropdownMobile } from '../photon-medication-dropdown-mobile';
+import { PhotonMedicationDropdownFullWidth } from '../photon-medication-dropdown-full-width';
 import { PhotonDropdown } from '../photon-dropdown';
 
 // Types
@@ -252,7 +252,7 @@ const Component = (props: ComponentProps) => {
       }}
     >
       <Show when={enableFullWidthMedicationSearch()}>
-        <PhotonMedicationDropdownMobile
+        <PhotonMedicationDropdownFullWidth
           data={data()}
           groups={getGroupsConfig(props)}
           label={props.label}
