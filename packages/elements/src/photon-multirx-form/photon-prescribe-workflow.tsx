@@ -94,9 +94,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   const newMedSearchTesters = [
     // actual testers
-    'Tim Porter',
-    'Rishi Khakhkhar',
-    'Kristen Borchetta',
+    'Tim Porter', // Modern Pediatrics
+    'Rishi Khakhkhar', // Counsel
+    'Kristen Borchetta', // Blueberry Pediatrics
     // buncha hooligans
     'Josh Knapp',
     'Michael Rochlin',
