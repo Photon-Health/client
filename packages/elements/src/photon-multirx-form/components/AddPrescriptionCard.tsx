@@ -232,10 +232,13 @@ export const AddPrescriptionCard = (props: {
                     value: e.detail.data
                   });
                 }
-                props.actions.updateFormValue({
-                  key: 'catalogId',
-                  value: e.detail.catalogId
-                });
+
+                if (e.detail.catalogId) {
+                  props.actions.updateFormValue({
+                    key: 'catalogId',
+                    value: e.detail.catalogId
+                  });
+                }
               }}
             />
           ) : (
