@@ -122,7 +122,7 @@ export const boldSubstring = (inputString: string, substring: any) => {
   const regex = new RegExp(`(${substrings.join('|')})`, 'gi');
   const parts = inputString.split(regex);
   return parts.map((part) => {
-    if (substrings.some((sub: string) => sub.toLowerCase() === part.toLowerCase())) {
+    if (substrings.some((sub: string) => sub.toLowerCase() === part?.toLowerCase())) {
       return <strong class="font-extrabold">{part}</strong>;
     } else {
       return part;
@@ -264,7 +264,10 @@ const Component = (props: ComponentProps) => {
           onHide={() => setSearchText('')}
           helpText={props.helpText}
           open={enableFullWidthMedicationSearch()}
-          onClose={() => setEnableFullWidthMedicationSearch(false)}
+          onClose={() => {
+            setEnableFullWidthMedicationSearch(false);
+            setSearchText('');
+          }}
         />
       </Show>
       <Show when={!enableFullWidthMedicationSearch()}>
