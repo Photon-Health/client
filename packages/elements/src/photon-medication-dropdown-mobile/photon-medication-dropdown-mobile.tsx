@@ -446,6 +446,12 @@ const GroupLabelEl = (props: { item: GroupTitle }) => (
     classList={{
       group: true
     }}
+    style={{
+      // fix the group headers on scroll
+      position: 'sticky',
+      top: '0px',
+      'z-index': 10
+    }}
   >
     {props.item.title}
   </sl-menu-item>
