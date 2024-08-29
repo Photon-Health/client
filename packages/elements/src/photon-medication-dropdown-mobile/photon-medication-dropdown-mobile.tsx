@@ -188,7 +188,6 @@ export const PhotonMedicationDropdownMobile = <T extends { id: string }>(props: 
         setTimeout(() => {
           inputRef.focus();
         }, 0);
-
       }
     }
   });
@@ -478,10 +477,7 @@ const ItemEl = (props: {
     <sl-menu-item
       classList={{
         selected: props.isSelected,
-        'treatment-option': true,
-        'px-3': true,
-        'overflow-hidden': true,
-        ellipsis: true
+        'treatment-option': true
       }}
       onClick={() => props.onClick()}
       ref={(r: Element) => {
@@ -496,21 +492,12 @@ const ItemEl = (props: {
     >
       {props.isLoader ? (
         props.hasMore ? (
-          <p class="text-center text-gray-400 italic">Loading...</p>
+          <p class="text-center text-gray-400 italic px-3">Loading...</p>
         ) : (
-          <p class="text-center text-gray-400 italic">Nothing more to load</p>
+          <p class="text-center text-gray-400 italic px-3">Nothing more to load</p>
         )
       ) : (
-        <p
-          classList={{
-            'overflow-hidden': !props.showOverflow,
-            'overflow-ellipsis': !props.showOverflow,
-            'whitespace-nowrap': !props.showOverflow,
-            'whitespace-normal': props.showOverflow
-          }}
-        >
-          {props.children}
-        </p>
+        <div class="px-3">{props.children}</div>
       )}
     </sl-menu-item>
   );

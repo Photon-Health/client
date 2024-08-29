@@ -82,7 +82,10 @@ const searchTreatmentoptions = async (
   });
 };
 
-async function loadData(client: ApolloClient<any>, searchText: string): Promise<TreatmentOption[]> {
+async function loadTreatmentOptions(
+  client: ApolloClient<any>,
+  searchText: string
+): Promise<TreatmentOption[]> {
   const req = await searchTreatmentoptions(client, searchText);
   return req?.data?.treatmentOptions ?? [];
 }
@@ -156,7 +159,7 @@ function displayPrescriptionTemplate(
           {t.name ? <span class="text-blue-600">({boldSubstring(t.name, searchText)}): </span> : ''}
           {boldSubstring(t.treatment.name, searchText)}
         </div>
-        <div class="text-xs text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap">
+        <div class="text-xs text-gray-500 truncate">
           {t.dispenseQuantity} {t.dispenseUnit}, {t.daysSupply}{' '}
           {t.daysSupply === 1 ? 'day' : 'days'} supply, {refills}{' '}
           {refills === 1 ? 'refill' : 'refills'}, {t.instructions}
@@ -223,7 +226,7 @@ const Component = (props: ComponentProps) => {
   });
 
   createMemo(async () => {
-    const options = await loadData(client!.sdk.apolloClinical, searchText());
+    const options = await loadTreatmentOptions(client!.sdk.apolloClinical, searchText());
     setTreatmentOptions(options);
   });
 
@@ -238,6 +241,8 @@ const Component = (props: ComponentProps) => {
     }
     return displayTreatment(t as Treatment | TreatmentOption, groupAccess, searchText());
   };
+
+  const isMobile = window.innerWidth < 768;
 
   return (
     <div
@@ -287,7 +292,9 @@ const Component = (props: ComponentProps) => {
           onHide={() => setSearchText('')}
           helpText={props.helpText}
           onInputFocus={() => {
-            setEnableFullWidthMedicationSearch(true);
+            if (isMobile) {
+              setEnableFullWidthMedicationSearch(true);
+            }
             if (props.selected) {
               setSearchText(props.selected.name);
             }

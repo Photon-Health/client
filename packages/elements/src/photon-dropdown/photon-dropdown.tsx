@@ -341,7 +341,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             ref={overlayRef}
             class="bg-white overflow-x-hidden overflow-y-auto relative"
             style={{
-              'max-height': '200px',
+              'max-height': '300px',
               'min-height': '37px',
               width: '100%',
               display: 'flex',
