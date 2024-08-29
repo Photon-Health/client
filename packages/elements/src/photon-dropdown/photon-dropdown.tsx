@@ -264,10 +264,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
           }}
           required={props.required}
           on:sl-input={(e: any) => {
-            if (props.onInputFocus) {
-              props.onInputFocus();
-            }
-
             if (!open()) {
               dropdownRef.show();
             }
