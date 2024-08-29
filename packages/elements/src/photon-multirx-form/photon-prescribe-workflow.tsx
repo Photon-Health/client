@@ -92,7 +92,21 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   );
   const [, recentOrdersActions] = useRecentOrders();
 
-  const newMedSearchTesters = ['Tim Porter', 'Rishi Khakhkhar', 'Kristen Borchetta', 'Josh Knapp'];
+  const newMedSearchTesters = [
+    // actual testers
+    'Tim Porter',
+    'Rishi Khakhkhar',
+    'Kristen Borchetta',
+    // buncha hooligans
+    'Josh Knapp',
+    'Michael Rochlin',
+    'Jomi Cubol',
+    'Sam Kotlove',
+    'Jason Whittle',
+    'Rita Bulman',
+    'Michael Rado',
+    'Otto Sipe'
+  ];
   const enableNewMedicationSearch = newMedSearchTesters.includes(
     client?.authentication.state.user.name
   );
