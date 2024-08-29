@@ -1,9 +1,3 @@
-/**
- * This file is a modified copy of photon-dropdown.
- * I separated the two to keep from breaking anything in the original file.
- * After we're done testing the new med search we can migrate over.
- */
-
 //Solid
 import { debounce } from '@solid-primitives/scheduled';
 import { Dynamic } from 'solid-js/web';
@@ -40,6 +34,7 @@ import styles from './style.css?inline';
 import { createVirtualizer, VirtualItem } from '@tanstack/solid-virtual';
 
 // Disable the default dropdown animation
+// TODO: Remove when the dropdown is swapped for a regular list
 setDefaultAnimation('dropdown.show', null);
 
 interface DataItem<T> {
