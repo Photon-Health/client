@@ -1,6 +1,6 @@
 // Solid
 import { customElement } from 'solid-element';
-import { createMemo, createSignal, onMount } from 'solid-js';
+import { createMemo, createSignal, onMount, Show } from 'solid-js';
 
 // Photon
 import { usePhoton } from '../context';
@@ -135,11 +135,10 @@ function displayTreatment(
   groupAccess: boolean,
   searchText: string
 ) {
-  const boldedName = boldSubstring(t.name, searchText);
   return groupAccess ? (
-    <p class="text-sm whitespace-normal leading-snug my-1">{boldedName}</p>
+    <p class="text-sm whitespace-normal leading-snug my-1">{boldSubstring(t.name, searchText)}</p>
   ) : (
-    boldedName || ''
+    t.name || ''
   );
 }
 
@@ -166,7 +165,7 @@ function displayPrescriptionTemplate(
     );
   }
 
-  return boldSubstring(t.treatment.name, searchText);
+  return t.treatment.name;
 }
 
 function getGroupsConfig(props: ComponentProps) {
@@ -216,7 +215,8 @@ const Component = (props: ComponentProps) => {
   const { store, actions } = CatalogStore;
   const [searchText, setSearchText] = createSignal<string>('');
   const [treatmentOptions, setTreatmentOptions] = createSignal<TreatmentOption[]>([]);
-  const [openOverlay, setOpenOverlay] = createSignal<boolean>(false);
+  const [enableFullWidthMedicationSearch, setEnableFullWidthMedicationSearch] =
+    createSignal<boolean>(false);
 
   onMount(async () => {
     await actions.getCatalogs(client!.getSDK());
@@ -239,52 +239,34 @@ const Component = (props: ComponentProps) => {
     return displayTreatment(t as Treatment | TreatmentOption, groupAccess, searchText());
   };
 
-  let comp;
-
-  // On mobile, go full screen
-  const isMobile = window.innerWidth < 768;
-  if (isMobile) {
-    comp = (
-      <div
-        class={
-          openOverlay() ? `fixed top-0 left-0 w-full h-screen z-10 overflow-y-scroll bg-white` : ''
-        }
-      >
-        <div
-          ref={ref}
-          on:photon-data-selected={(e: any) => {
-            dispatchTreatmentSelected(ref, e.detail.data, store.catalogs.data![0]?.id || '');
-          }}
-        >
-          <PhotonMedicationDropdownMobile
-            data={data()}
-            groups={getGroupsConfig(props)}
-            label={props.label}
-            disabled={props.disabled}
-            required={props.required}
-            placeholder="Type medication"
-            invalid={props.invalid}
-            isLoading={store.catalogs.isLoading}
-            hasMore={false}
-            selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
-            displayAccessor={displayAccessor}
-            onSearchChange={(s: string) => setSearchText(s)}
-            onHide={() => setSearchText('')}
-            helpText={props.helpText}
-            fullScreen={openOverlay()}
-            setOpenOverlay={setOpenOverlay}
-          />
-        </div>
-      </div>
-    );
-  } else {
-    comp = (
-      <div
-        ref={ref}
-        on:photon-data-selected={(e: any) => {
-          dispatchTreatmentSelected(ref, e.detail.data, store.catalogs.data![0]?.id || '');
-        }}
-      >
+  return (
+    <div
+      ref={ref}
+      on:photon-data-selected={(e: any) => {
+        dispatchTreatmentSelected(ref, e.detail.data, store.catalogs.data![0]?.id || '');
+      }}
+    >
+      <Show when={enableFullWidthMedicationSearch()}>
+        <PhotonMedicationDropdownMobile
+          data={data()}
+          groups={getGroupsConfig(props)}
+          label={props.label}
+          disabled={props.disabled}
+          required={props.required}
+          placeholder="Type medication"
+          invalid={props.invalid}
+          isLoading={store.catalogs.isLoading}
+          hasMore={false}
+          selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
+          displayAccessor={displayAccessor}
+          onSearchChange={(s: string) => setSearchText(s)}
+          onHide={() => setSearchText('')}
+          helpText={props.helpText}
+          open={enableFullWidthMedicationSearch()}
+          onClose={() => setEnableFullWidthMedicationSearch(false)}
+        />
+      </Show>
+      <Show when={!enableFullWidthMedicationSearch()}>
         <PhotonDropdown
           data={data()}
           groups={getGroupsConfig(props)}
@@ -300,12 +282,11 @@ const Component = (props: ComponentProps) => {
           onSearchChange={(s: string) => setSearchText(s)}
           onHide={() => setSearchText('')}
           helpText={props.helpText}
+          onInputFocus={() => setEnableFullWidthMedicationSearch(true)}
         />
-      </div>
-    );
-  }
-
-  return comp;
+      </Show>
+    </div>
+  );
 };
 
 // Custom Element Registration

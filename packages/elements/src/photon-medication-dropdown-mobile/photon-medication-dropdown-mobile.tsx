@@ -59,7 +59,7 @@ type Item<T = any> = DataItem<T> | GroupTitle;
 // eslint-disable-next-line @typescript-eslint/ban-types
 type ThisisNotAFunction<T> = Exclude<T, Function>;
 
-export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
+export const PhotonMedicationDropdownMobile = <T extends { id: string }>(props: {
   data: Array<T>;
   label?: string;
   required: boolean;
@@ -85,8 +85,8 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
   optional?: boolean;
   clearable?: boolean;
   actionRef?: any;
-  fullScreen?: boolean;
-  setOpenOverlay?: (open: boolean) => void;
+  open: boolean;
+  onClose: () => void;
 }) => {
   //refs
   let ref: any;
@@ -106,10 +106,8 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
   }
 
   //signals
-  const [open, setOpen] = createSignal(false);
   const [selected, setSelected] = createSignal<T | undefined>(undefined);
   const [selectedIndex, setSelectedIndex] = createSignal(-1);
-  const [lastIndex, setLastIndex] = createSignal();
 
   const debounceSearch = debounce(async (s: string) => {
     if (props.onSearchChange) {
@@ -117,11 +115,10 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
     }
   }, 250);
 
-  const observer = new IntersectionObserver(async (a) => {
-    if (a?.at(-1)?.isIntersecting && props.hasMore) {
-      if (props.fetchMore) {
-        await props.fetchMore();
-      }
+  createEffect(() => {
+    if (props.open) {
+      dropdownRef?.show();
+      handleDropdownShow();
     }
   });
 
@@ -129,12 +126,6 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
     if (props.data.length === 0) {
       // if the source data changes then reset the selected value
       setSelected(undefined);
-    }
-  });
-
-  createEffect(() => {
-    if (lastIndex()) {
-      observer.observe(lastIndex() as Element);
     }
   });
 
@@ -190,14 +181,14 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
           e.stopImmediatePropagation();
         }
       });
-    }
-  });
 
-  const placeholder = createMemo(() => {
-    const selectedValue = selected();
-    return selectedValue
-      ? props.displayAccessor(selectedValue, false)
-      : props.placeholder ?? 'Select data...';
+      if (props.open) {
+        // this is lame, but it's the only way i could get the focus to work
+        setTimeout(() => {
+          inputRef.focus();
+        }, 0);
+      }
+    }
   });
 
   // Title and group items as one flat array
@@ -241,236 +232,197 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
       <style>{shoelaceDarkStyles}</style>
       <style>{shoelaceLightStyles}</style>
       <style>{styles}</style>
-      {props.label ? (
-        <div class={`flex items-center pb-2 ${props.fullScreen ? 'pl-5 pr-5 pt-3' : ''}`}>
-          {props.fullScreen ? (
-            <div class="flex items-center" style={{ 'font-size': '26px' }}>
-              <sl-icon-button
-                name="x"
-                label="Close medication search"
-                class="full-screen-close-btn"
-                style={{ padding: '0px' }}
-                on:click={() => {
-                  // close full screen overlay
-                  if (props.fullScreen) {
-                    props.setOpenOverlay(false);
-                  }
-                }}
-              />
+      <div class="fixed top-0 left-0 w-full h-screen z-10 overflow-y-scroll bg-white">
+        <div class={`flex items-center pb-2 pl-5 pr-5 pt-3`}>
+          <div class="flex items-center" style={{ 'font-size': '26px' }}>
+            <sl-icon-button
+              name="x"
+              label="Close medication search"
+              class="full-screen-close-btn"
+              style={{ padding: '0px' }}
+              on:click={() => {
+                if (props.onClose) {
+                  props.onClose();
+                }
+              }}
+            />
+          </div>
+
+          {props.label ? (
+            <div class={`md:flex flex-1 justify-center items-center pl-2`}>
+              <div class="flex items-center space-x-2">
+                <p class={`text-gray-700 text-sm font-sans inline font-medium`}>{props.label}</p>
+              </div>
             </div>
           ) : null}
-          <div
-            class={`md:flex flex-1 justify-center items-center ${props.fullScreen ? 'pl-2' : ''}`}
-          >
-            <div class="flex items-center space-x-2">
-              <p
-                class={`text-gray-700 text-sm font-sans inline ${
-                  props.fullScreen ? 'font-medium' : ''
-                }`}
-              >
-                {props.label}
-              </p>
-            </div>
-          </div>
+
           {props.required ? <p class="pl-1 text-red-400">*</p> : null}
           {props.optional ? <p class="text-gray-400 text-xs pl-2 font-sans">Optional</p> : null}
         </div>
-      ) : null}
-      <sl-dropdown
-        ref={dropdownRef}
-        class="dropdown relative"
-        hoist
-        distance={props.forceLabelSize && !props.invalid ? -20 : props.invalid ? -18 : 0}
-        disabled={props.disabled ?? false}
-        on:sl-hide={async () => {
-          if (!selected()) {
-            inputRef.value = '';
-            if (props.onHide) {
-              await props.onHide();
-            }
-          }
-          setOpen(false);
-        }}
-        on:sl-show={async () => {
-          setOpen(true);
-          if (props.onOpen) {
-            await props.onOpen();
-          }
-          handleDropdownShow();
-        }}
-        style={{ width: '100%' }}
-      >
-        <sl-input
-          ref={inputRef}
-          slot="trigger"
-          placeholder={placeholder()}
-          autocomplete="off"
+        <sl-dropdown
+          ref={dropdownRef}
+          class="dropdown relative"
+          hoist
+          distance={props.forceLabelSize && !props.invalid ? -20 : props.invalid ? -18 : 0}
           disabled={props.disabled ?? false}
-          size="medium"
-          style={{
-            'padding-left': props.fullScreen ? '20px' : undefined,
-            'padding-right': props.fullScreen ? '20px' : undefined,
-            'border-radius': props.fullScreen ? '0px' : undefined,
-            border: props.fullScreen ? '0px' : undefined
-          }}
-          classList={{
-            'treatment-search': true,
-            invalid: props.invalid ?? false,
-            input: true,
-            disabled: props.disabled ?? false,
-            placeholder: !selected() && inputRef.value === ''
-          }}
-          required={props.required}
-          on:sl-input={(e: any) => {
-            if (!open()) {
-              dropdownRef.show();
-            }
-            debounceSearch(e.target.value);
-          }}
-          on:sl-focus={() => {
-            if (!props.fullScreen) {
-              // open full screen overlay
-
-              if (props.setOpenOverlay) {
-                props.setOpenOverlay(true);
-              }
-
-              if (!open()) {
-                dropdownRef.show();
+          on:sl-hide={async () => {
+            if (!selected()) {
+              inputRef.value = '';
+              if (props.onHide) {
+                await props.onHide();
               }
             }
-
-            dropdownRef.children[1].style.width = `${inputRef.clientWidth}px`;
-            if (selectedIndex() > 0) {
-              rowVirtualizer().scrollToIndex(selectedIndex());
-            }
           }}
+          style={{ width: '100%' }}
         >
-          <p
-            slot="help-text"
-            class="text-red-400 pt-1 font-sans"
-            classList={{
-              'h-[21px]': props.forceLabelSize
-            }}
-          >
-            {showHelpText(props.invalid ?? false)}
-          </p>
-          <div
-            slot="suffix"
-            classList={{
-              flex: true,
-              hidden: !props.isLoading
-            }}
-          >
-            <sl-spinner slot="suffix" />
-          </div>
-          <Show when={props.clearable}>
-            <div
-              slot="suffix"
-              classList={{
-                flex: true,
-                hidden: props.isLoading || selected() == undefined
-              }}
-            >
-              <sl-icon
-                class="text-gray-400 hover:text-gray-600"
-                name={'x-circle-fill'}
-                on:click={(e: any) => {
-                  e.stopImmediatePropagation();
-                  setSelected(undefined);
-                  setSelectedIndex(-1);
-                  inputRef.value = '';
-                  debounceSearch('');
-                  dispatchDeselect();
-                  dropdownRef.hide();
-                }}
-              />
-            </div>
-          </Show>
-          <Show when={!props.fullScreen}>
-            <div
-              slot="suffix"
-              classList={{
-                flex: true,
-                hidden: props.isLoading
-              }}
-            >
-              <sl-icon name={open() ? 'chevron-up' : 'chevron-down'} />
-            </div>
-          </Show>
-        </sl-input>
-        <div
-          class={`border border-gray-200 dropdown-container overflow-hidden relative ${
-            props.fullScreen ? 'mt-3' : ''
-          }`}
-        >
-          <div
-            ref={overlayRef}
-            class="bg-white overflow-x-hidden overflow-y-auto relative"
+          <sl-input
+            value={selected() ? props.displayAccessor(selected() as T, false) : ''}
+            ref={inputRef}
+            slot="trigger"
+            placeholder={props.placeholder}
+            clearable
+            autocomplete="off"
+            disabled={props.disabled ?? false}
+            size="medium"
             style={{
-              'max-height': '85vh',
-              'min-height': '37px',
-              width: '100%',
-              display: 'flex',
-              'flex-direction': 'column',
-              'justify-content': 'start'
+              'padding-left': '20px',
+              'padding-right': '20px',
+              'border-radius': '0px',
+              border: '0px'
+            }}
+            classList={{
+              'treatment-search': true,
+              invalid: props.invalid ?? false,
+              input: true,
+              disabled: props.disabled ?? false,
+              placeholder: !selected() && inputRef.value === ''
+            }}
+            required={props.required}
+            on:sl-input={(e: any) => {
+              debounceSearch(e.target.value);
+            }}
+            on:sl-focus={() => {
+              dropdownRef.children[1].style.width = `${inputRef.clientWidth}px`;
+              if (selectedIndex() > 0) {
+                rowVirtualizer().scrollToIndex(selectedIndex());
+              }
             }}
           >
-            <div
-              style={{
-                height: `${rowVirtualizer().getTotalSize()}px`,
-                width: '100%'
+            <p
+              slot="help-text"
+              class="text-red-400 pt-1 font-sans"
+              classList={{
+                'h-[21px]': props.forceLabelSize
               }}
-              ref={listRef}
             >
-              <For
-                each={rowVirtualizer().getVirtualItems()}
-                fallback={<EmptyEl noDataMsg={props.noDataMsg} isLoading={props.isLoading} />}
-              >
-                {(vr) => {
-                  const isLoaderRow = vr.index > allItems().length - 1;
-                  const datum = allItems()[vr.index];
-                  const isSelected =
-                    selected()?.id &&
-                    !isLoaderRow &&
-                    'data' in datum &&
-                    datum?.data?.id === selected()?.id;
-
-                  const ComponentToRender = 'title' in datum ? GroupLabelEl : ItemEl;
-                  const componentProps =
-                    'title' in datum
-                      ? { item: datum as GroupTitle }
-                      : {
-                          item: vr,
-                          isLoader: isLoaderRow,
-                          isSelected: isSelected,
-                          index: vr.index,
-                          hasMore: props.hasMore,
-                          showOverflow: props.showOverflow,
-                          onClick: () => {
-                            if (!isLoaderRow) {
-                              setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
-                              setSelectedIndex((datum as DataItem<T>).allItemsIdx);
-                              inputRef.value = '';
-                              debounceSearch('');
-                              dispatchSelect((datum as DataItem<T>).data);
-                              dropdownRef.hide();
-                            }
-                          },
-                          setLastIndex: setLastIndex
-                        };
-
-                  return (
-                    <Dynamic component={ComponentToRender} {...componentProps}>
-                      {'data' in datum && props.displayAccessor((datum as DataItem<T>).data, true)}
-                    </Dynamic>
-                  );
+              {showHelpText(props.invalid ?? false)}
+            </p>
+            <div
+              slot="suffix"
+              classList={{
+                flex: true,
+                hidden: !props.isLoading
+              }}
+            >
+              <sl-spinner slot="suffix" />
+            </div>
+            <Show when={props.clearable}>
+              <div
+                slot="suffix"
+                classList={{
+                  flex: true,
+                  hidden: props.isLoading || selected() == undefined
                 }}
-              </For>
+              >
+                <sl-icon
+                  class="text-gray-400 hover:text-gray-600"
+                  name={'x-circle-fill'}
+                  on:click={(e: any) => {
+                    e.stopImmediatePropagation();
+                    setSelected(undefined);
+                    setSelectedIndex(-1);
+                    inputRef.value = '';
+                    debounceSearch('');
+                    dispatchDeselect();
+                  }}
+                />
+              </div>
+            </Show>
+          </sl-input>
+          <div class={`border border-gray-200 overflow-hidden relative mt-3`}>
+            <div
+              ref={overlayRef}
+              class="bg-white overflow-x-hidden overflow-y-auto relative"
+              style={{
+                'max-height': '85vh',
+                'min-height': '37px',
+                width: '100%',
+                display: 'flex',
+                'flex-direction': 'column',
+                'justify-content': 'start'
+              }}
+            >
+              <div
+                style={{
+                  height: `${rowVirtualizer().getTotalSize()}px`,
+                  width: '100%'
+                }}
+                ref={listRef}
+              >
+                <For
+                  each={rowVirtualizer().getVirtualItems()}
+                  fallback={<EmptyEl noDataMsg={props.noDataMsg} isLoading={props.isLoading} />}
+                >
+                  {(vr) => {
+                    const isLoaderRow = vr.index > allItems().length - 1;
+                    const datum = allItems()[vr.index];
+                    const isSelected =
+                      selected()?.id &&
+                      !isLoaderRow &&
+                      'data' in datum &&
+                      datum?.data?.id === selected()?.id;
+
+                    const ComponentToRender = 'title' in datum ? GroupLabelEl : ItemEl;
+                    const componentProps =
+                      'title' in datum
+                        ? { item: datum as GroupTitle }
+                        : {
+                            item: vr,
+                            isLoader: isLoaderRow,
+                            isSelected: isSelected,
+                            index: vr.index,
+                            hasMore: props.hasMore,
+                            showOverflow: props.showOverflow,
+                            onClick: () => {
+                              if (!isLoaderRow) {
+                                setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
+                                setSelectedIndex((datum as DataItem<T>).allItemsIdx);
+                                inputRef.value = '';
+                                debounceSearch('');
+                                dispatchSelect((datum as DataItem<T>).data);
+                                // dropdownRef.hide();
+
+                                // close full screen overlay
+                                if (props.onClose) {
+                                  props.onClose();
+                                }
+                              }
+                            }
+                          };
+
+                    return (
+                      <Dynamic component={ComponentToRender} {...componentProps}>
+                        {'data' in datum &&
+                          props.displayAccessor((datum as DataItem<T>).data, true)}
+                      </Dynamic>
+                    );
+                  }}
+                </For>
+              </div>
             </div>
           </div>
-        </div>
-      </sl-dropdown>
+        </sl-dropdown>
+      </div>
     </div>
   );
 };
