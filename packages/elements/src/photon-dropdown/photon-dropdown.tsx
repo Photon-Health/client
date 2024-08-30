@@ -356,8 +356,10 @@ export const PhotonDropdown = <T extends { id: string } | { medicationId: string
                 {(vr) => {
                   const isLoaderRow = vr.index > allItems().length - 1;
                   const datum = allItems()[vr.index];
+
+                  const selectedValue = selected();
                   const isSelected =
-                    'data' in datum && datum.data.id === selected()?.id && !isLoaderRow;
+                    !!selectedValue && 'id' in selectedValue && selectedValue.id === datum.data.id;
 
                   return (
                     <Switch>
