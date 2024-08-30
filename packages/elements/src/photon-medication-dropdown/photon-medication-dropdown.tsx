@@ -378,6 +378,7 @@ export const PhotonMedicationDropdown = <
                     !isLoaderRow &&
                     !!selectedValue &&
                     'id' in selectedValue &&
+                    'data' in datum &&
                     selectedValue.id === datum.data.id;
 
                   return (

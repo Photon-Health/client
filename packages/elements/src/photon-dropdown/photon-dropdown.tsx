@@ -359,7 +359,11 @@ export const PhotonDropdown = <T extends { id: string } | { medicationId: string
 
                   const selectedValue = selected();
                   const isSelected =
-                    !!selectedValue && 'id' in selectedValue && selectedValue.id === datum.data.id;
+                    !isLoaderRow &&
+                    !!selectedValue &&
+                    'id' in selectedValue &&
+                    'data' in datum &&
+                    selectedValue.id === datum.data.id;
 
                   return (
                     <Switch>

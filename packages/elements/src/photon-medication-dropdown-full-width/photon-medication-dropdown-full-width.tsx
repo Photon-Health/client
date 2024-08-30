@@ -379,6 +379,7 @@ export const PhotonMedicationDropdownFullWidth = <
                       !isLoaderRow &&
                       !!selectedValue &&
                       'id' in selectedValue &&
+                      'data' in datum &&
                       selectedValue.id === datum.data.id;
 
                     const ComponentToRender = 'title' in datum ? GroupLabelEl : ItemEl;
