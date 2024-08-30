@@ -46,7 +46,7 @@ type DataReturn<Type> = {
   errors?: readonly any[];
 };
 
-const SearchTreatmentoptions = gql`
+const SearchTreatmentOptionsQuery = gql`
   query SearchTreatmentOptions($searchTerm: String!) {
     treatmentOptions(searchTerm: $searchTerm) {
       medicationId
@@ -61,12 +61,12 @@ const SearchTreatmentoptions = gql`
   }
 `;
 
-const searchTreatmentoptions = async (
+const searchTreatmentOptions = async (
   client: ApolloClient<any>,
   searchTerm: string
 ): Promise<DataReturn<{ treatmentOptions: TreatmentOption[] }>> => {
   return await client.query<{ treatmentOptions: TreatmentOption[] }>({
-    query: SearchTreatmentoptions,
+    query: SearchTreatmentOptionsQuery,
     variables: { searchTerm },
     fetchPolicy: 'no-cache'
   });
@@ -76,7 +76,7 @@ async function loadTreatmentOptions(
   client: ApolloClient<any>,
   searchText: string
 ): Promise<TreatmentOption[]> {
-  const req = await searchTreatmentoptions(client, searchText);
+  const req = await searchTreatmentOptions(client, searchText);
   return req?.data?.treatmentOptions ?? [];
 }
 
