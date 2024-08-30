@@ -29,9 +29,6 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import tailwind from '../tailwind.css?inline';
 import styles from './style.css?inline';
 
-//Types
-import { Treatment, PrescriptionTemplate, TreatmentOption } from '@photonhealth/sdk/dist/types';
-
 //Virtual List
 import { createVirtualizer, VirtualItem } from '@tanstack/solid-virtual';
 
@@ -51,7 +48,7 @@ interface GroupTitle {
 type ThisisNotAFunction<T> = Exclude<T, Function>;
 
 export const PhotonDropdown = <T extends { id: string }>(props: {
-  data: Array<Treatment | PrescriptionTemplate | TreatmentOption>;
+  data: Array<T>;
   label?: string;
   required: boolean;
   placeholder?: string;
