@@ -373,12 +373,13 @@ export const PhotonMedicationDropdownFullWidth = <
                   {(vr) => {
                     const isLoaderRow = vr.index > allItems().length - 1;
                     const datum = allItems()[vr.index];
-                    // bit of type coersion here
+
+                    const selectedValue = selected();
                     const isSelected =
-                      !!selected()?.id &&
                       !isLoaderRow &&
-                      'data' in datum &&
-                      !!(datum?.data?.id === selected()?.id);
+                      !!selectedValue &&
+                      'id' in selectedValue &&
+                      selectedValue.id === datum.data.id;
 
                     const ComponentToRender = 'title' in datum ? GroupLabelEl : ItemEl;
                     const componentProps =
