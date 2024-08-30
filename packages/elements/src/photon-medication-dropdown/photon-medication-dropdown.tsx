@@ -76,6 +76,8 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
   optional?: boolean;
   clearable?: boolean;
   actionRef?: any;
+  searchText: string;
+  setSearchText: (s: string) => void;
   onInputFocus?: () => void;
 }) => {
   //refs
@@ -87,6 +89,8 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
 
   if (props.actionRef) {
     props.actionRef['clear'] = () => {
+      console.log('clear1');
+
       setSelected(undefined);
       setSelectedIndex(-1);
       inputRef.value = '';
@@ -183,13 +187,6 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
     }
   });
 
-  const placeholder = createMemo(() => {
-    const selectedValue = selected();
-    return selectedValue
-      ? props.displayAccessor(selectedValue, false)
-      : props.placeholder ?? 'Select data...';
-  });
-
   // Title and group items as one flat array
   const allItems: Accessor<Item<T>[]> = createMemo(() =>
     props.groups
@@ -252,8 +249,10 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
       >
         <sl-input
           ref={inputRef}
+          value={props.searchText}
+          clearable
           slot="trigger"
-          placeholder={placeholder()}
+          placeholder={props.placeholder ?? undefined}
           autocomplete="off"
           disabled={props.disabled ?? false}
           size="medium"
@@ -280,6 +279,13 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
                 rowVirtualizer().scrollToIndex(selectedIndex());
               }
             }
+          }}
+          on:sl-clear={() => {
+            setSelected(undefined);
+            setSelectedIndex(-1);
+            inputRef.value = '';
+            debounceSearch('');
+            dispatchDeselect();
           }}
         >
           <p
@@ -367,7 +373,10 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
                   const isLoaderRow = vr.index > allItems().length - 1;
                   const datum = allItems()[vr.index];
                   const isSelected =
-                    'data' in datum && datum.data.id === selected()?.id && !isLoaderRow;
+                    selected()?.id &&
+                    !isLoaderRow &&
+                    'data' in datum &&
+                    datum?.data?.id === selected()?.id;
 
                   return (
                     <Switch>
@@ -386,8 +395,12 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
                             if (!isLoaderRow) {
                               setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
                               setSelectedIndex((datum as DataItem<T>).allItemsIdx);
-                              inputRef.value = '';
-                              debounceSearch('');
+
+                              if ('treatment' in datum.data) {
+                                props.setSearchText(datum.data.treatment.name);
+                              } else {
+                                props.setSearchText(datum.data.name);
+                              }
                               dispatchSelect((datum as DataItem<T>).data);
                               dropdownRef.hide();
                             }
