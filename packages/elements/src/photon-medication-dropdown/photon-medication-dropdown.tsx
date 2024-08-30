@@ -89,8 +89,6 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
 
   if (props.actionRef) {
     props.actionRef['clear'] = () => {
-      console.log('clear1');
-
       setSelected(undefined);
       setSelectedIndex(-1);
       inputRef.value = '';
