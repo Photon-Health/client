@@ -198,7 +198,7 @@ interface ComponentProps {
   catalogId?: string;
   disabled: boolean;
   formName?: string;
-  selected?: Treatment;
+  selected?: Treatment | PrescriptionTemplate | TreatmentOption;
   offCatalogOption?: Medication;
 }
 
