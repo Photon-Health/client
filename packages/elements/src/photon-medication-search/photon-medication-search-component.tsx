@@ -110,7 +110,7 @@ function getFilteredData(
   });
 }
 
-const boldSubstring = (inputString: string, substring: any) => {
+const boldSubstring = (inputString: string, substring: string) => {
   const substrings = substring.split(' ').filter((part: string) => part.length > 0);
   const regex = new RegExp(`(${substrings.join('|')})`, 'gi');
   const parts = inputString.split(regex);
