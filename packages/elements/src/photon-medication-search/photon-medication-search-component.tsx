@@ -5,6 +5,7 @@ import { createMemo, createSignal, onMount, Show } from 'solid-js';
 // Photon
 import { usePhoton } from '../context';
 import { PhotonMedicationDropdownFullWidth } from '../photon-medication-dropdown-full-width';
+import { PhotonMedicationDropdown } from '../photon-medication-dropdown';
 import { PhotonDropdown } from '../photon-dropdown';
 
 // Types
@@ -251,6 +252,9 @@ const Component = (props: ComponentProps) => {
         dispatchTreatmentSelected(ref, e.detail.data, store.catalogs.data![0]?.id || '');
       }}
     >
+      {/* Mobile */}
+
+      {/* Full size search */}
       <Show when={enableFullWidthMedicationSearch()}>
         <PhotonMedicationDropdownFullWidth
           data={data()}
@@ -275,7 +279,8 @@ const Component = (props: ComponentProps) => {
           }}
         />
       </Show>
-      <Show when={!enableFullWidthMedicationSearch()}>
+      {/* Dummy input that is primarily used to open full size */}
+      <Show when={isMobile && !enableFullWidthMedicationSearch()}>
         <PhotonDropdown
           data={data()}
           groups={getGroupsConfig(props)}
@@ -295,6 +300,33 @@ const Component = (props: ComponentProps) => {
             if (isMobile) {
               setEnableFullWidthMedicationSearch(true);
             }
+            if (props.selected) {
+              setSearchText(props.selected.name);
+            }
+          }}
+        />
+      </Show>
+
+      {/* Desktop */}
+
+      {/* Inline search */}
+      <Show when={!isMobile}>
+        <PhotonMedicationDropdown
+          data={data()}
+          groups={getGroupsConfig(props)}
+          label={props.label}
+          disabled={props.disabled}
+          required={props.required}
+          placeholder="Type medication"
+          invalid={props.invalid}
+          isLoading={store.catalogs.isLoading}
+          hasMore={false}
+          selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
+          displayAccessor={displayAccessor}
+          onSearchChange={(s: string) => setSearchText(s)}
+          onHide={() => setSearchText('')}
+          helpText={props.helpText}
+          onInputFocus={() => {
             if (props.selected) {
               setSearchText(props.selected.name);
             }
