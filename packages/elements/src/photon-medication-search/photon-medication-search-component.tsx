@@ -222,7 +222,7 @@ const Component = (props: ComponentProps) => {
 
   const data = createMemo(() => {
     const filteredData = getFilteredData(props, searchText(), treatmentOptions());
-    return filteredData.length > 0 ? filteredData : undefined;
+    return filteredData.length > 0 ? filteredData : [];
   });
 
   const displayAccessor = (
