@@ -1,6 +1,6 @@
 {
   "name": "@photonhealth/elements",
-  "version": "0.10.10",
+  "version": "0.10.09-rc.1",
   "description": "",
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
