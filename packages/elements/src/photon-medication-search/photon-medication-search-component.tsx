@@ -179,7 +179,11 @@ function getGroupsConfig(props: ComponentProps) {
     {
       label: 'Organization Catalog',
       filter: (t: any) =>
-        t && typeof t === 'object' && 'name' in t && !('treatment' in t) && !('medicationId' in t)
+        t &&
+        typeof t === 'object' &&
+        'name' in t &&
+        !('treatment' in t) &&
+        !(t.__typename === 'TreatmentOption')
     },
     {
       label: 'All Templates',
