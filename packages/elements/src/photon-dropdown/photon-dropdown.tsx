@@ -47,7 +47,7 @@ interface GroupTitle {
 // eslint-disable-next-line @typescript-eslint/ban-types
 type ThisisNotAFunction<T> = Exclude<T, Function>;
 
-export const PhotonDropdown = <T extends { id: string; medicationId: string }>(props: {
+export const PhotonDropdown = <T extends { id: string } | { medicationId: string }>(props: {
   data: Array<T>;
   label?: string;
   required: boolean;

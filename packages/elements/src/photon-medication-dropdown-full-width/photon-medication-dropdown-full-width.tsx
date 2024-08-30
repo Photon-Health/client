@@ -47,7 +47,7 @@ interface GroupTitle {
 type ThisisNotAFunction<T> = Exclude<T, Function>;
 
 export const PhotonMedicationDropdownFullWidth = <
-  T extends { id: string; medicationId: string }
+  T extends { id: string } | { medicationId: string }
 >(props: {
   data: Array<Treatment | PrescriptionTemplate | TreatmentOption>;
   label?: string;
