@@ -96,7 +96,6 @@ export const PhotonMedicationDropdownFullWidth = <T extends { id: string }>(prop
   //signals
   const [selected, setSelected] = createSignal<T | undefined>(undefined);
   const [selectedIndex, setSelectedIndex] = createSignal(-1);
-  // const [lastIndex, setLastIndex] = createSignal();
 
   const debounceSearch = debounce(async (s: string) => {
     if (props.onSearchChange) {
