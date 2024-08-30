@@ -292,7 +292,7 @@ const Component = (props: ComponentProps) => {
             if (isMobile) {
               setEnableFullWidthMedicationSearch(true);
             }
-            if (props.selected) {
+            if (props.selected?.name) {
               setSearchText(props.selected.name);
             }
           }}
@@ -321,7 +321,7 @@ const Component = (props: ComponentProps) => {
           onHide={() => setSearchText('')}
           helpText={props.helpText}
           onInputFocus={() => {
-            if (props.selected) {
+            if (props.selected?.name) {
               setSearchText(props.selected.name);
             }
           }}
