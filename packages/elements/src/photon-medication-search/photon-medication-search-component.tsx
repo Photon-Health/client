@@ -49,7 +49,7 @@ type DataReturn<Type> = {
 const SearchTreatmentOptionsQuery = gql`
   query SearchTreatmentOptions($searchTerm: String!) {
     treatmentOptions(searchTerm: $searchTerm) {
-      medicationId
+      id: medicationId
       form
       name
       ndc
@@ -183,7 +183,8 @@ function getGroupsConfig(props: ComponentProps) {
     },
     {
       label: 'All Templates',
-      filter: (t: any) => t && typeof t === 'object' && 'medicationId' in t
+      filter: (t: any) =>
+        t && typeof t === 'object' && !('treatment' in t) && t.__typename === 'TreatmentOption'
     }
   ];
 }
