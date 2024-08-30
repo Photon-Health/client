@@ -1,7 +1,6 @@
 //Solid
 import { debounce } from '@solid-primitives/scheduled';
 import {
-  Accessor,
   createEffect,
   createMemo,
   createSignal,
@@ -46,8 +45,6 @@ interface DataItem<T> {
 interface GroupTitle {
   title: string;
 }
-
-type Item<T = any> = DataItem<T> | GroupTitle;
 
 // Typescript and solid are annoying
 // eslint-disable-next-line @typescript-eslint/ban-types

@@ -1,7 +1,6 @@
 //Solid
 import { debounce } from '@solid-primitives/scheduled';
 import {
-  Accessor,
   createEffect,
   createMemo,
   createSignal,
@@ -30,6 +29,9 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import tailwind from '../tailwind.css?inline';
 import styles from './style.css?inline';
 
+//Types
+import { Treatment, PrescriptionTemplate, TreatmentOption } from '@photonhealth/sdk/dist/types';
+
 //Virtual List
 import { createVirtualizer, VirtualItem } from '@tanstack/solid-virtual';
 
@@ -43,8 +45,6 @@ interface DataItem<T> {
 interface GroupTitle {
   title: string;
 }
-
-type Item<T = any> = DataItem<T> | GroupTitle;
 
 // Typescript and solid are annoying
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -191,13 +191,13 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   });
 
   // Title and group items as one flat array
-  const allItems: Accessor<Item<T>[]> = createMemo(() =>
+  const allItems: any = createMemo(() =>
     props.groups
       ? props.groups
           .map((g) => {
             const data = props.data
               .map((d, idx) => ({ data: d, allItemsIdx: idx }))
-              .filter((d) => g.filter(d.data));
+              .filter((d: any) => g.filter(d.data));
             return data.length > 0 ? [{ title: g.label }, ...data] : [];
           })
           .flat()
