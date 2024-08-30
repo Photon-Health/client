@@ -439,7 +439,7 @@ const EmptyEl = (props: { isLoading: boolean; noDataMsg?: string }) => {
 };
 
 const GroupLabelEl = (props: { item: GroupTitle }) => (
-  <sl-menu-item class="group">{props.item.title}</sl-menu-item>
+  <sl-menu-item class="group uppercase">{props.item.title}</sl-menu-item>
 );
 
 const ItemEl = (props: {

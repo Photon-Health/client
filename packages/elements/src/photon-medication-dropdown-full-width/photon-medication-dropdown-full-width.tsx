@@ -441,9 +441,7 @@ const EmptyEl = (props: { isLoading: boolean; noDataMsg?: string }) => {
 
 const GroupLabelEl = (props: { item: GroupTitle }) => (
   <sl-menu-item
-    classList={{
-      group: true
-    }}
+    class="group uppercase"
     style={{
       // fix the group headers on scroll
       position: 'sticky',

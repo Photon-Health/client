@@ -164,25 +164,25 @@ function displayPrescriptionTemplate(
 function getGroupsConfig(props: ComponentProps) {
   return [
     {
-      label: 'OFF CATALOG',
+      label: 'Off Catalog',
       filter: (t: any) =>
         t && typeof t === 'object' && props.offCatalogOption && t.id === props.offCatalogOption.id
     },
     {
-      label: 'PERSONAL TEMPLATES',
+      label: 'Personal Templates',
       filter: (t: any) => t && typeof t === 'object' && 'treatment' in t && t.isPrivate
     },
     {
-      label: 'ORGANIZATION TEMPLATES',
+      label: 'Organization Templates',
       filter: (t: any) => t && typeof t === 'object' && 'treatment' in t && !t.isPrivate
     },
     {
-      label: 'ORGANIZATION CATALOG',
+      label: 'Organization Catalog',
       filter: (t: any) =>
         t && typeof t === 'object' && 'name' in t && !('treatment' in t) && !('medicationId' in t)
     },
     {
-      label: 'ALL TREATMENTS',
+      label: 'All Templates',
       filter: (t: any) => t && typeof t === 'object' && 'medicationId' in t
     }
   ];
@@ -289,9 +289,7 @@ const Component = (props: ComponentProps) => {
           onHide={() => setSearchText('')}
           helpText={props.helpText}
           onInputFocus={() => {
-            if (isMobile) {
-              setEnableFullWidthMedicationSearch(true);
-            }
+            setEnableFullWidthMedicationSearch(true);
             if (props.selected?.name) {
               setSearchText(props.selected.name);
             }
