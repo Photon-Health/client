@@ -1,16 +1,7 @@
 //Solid
 import { debounce } from '@solid-primitives/scheduled';
 import { Dynamic } from 'solid-js/web';
-import {
-  Accessor,
-  createEffect,
-  createMemo,
-  createSignal,
-  For,
-  JSXElement,
-  onMount,
-  Show
-} from 'solid-js';
+import { createEffect, createMemo, createSignal, For, JSXElement, onMount, Show } from 'solid-js';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/dropdown/dropdown';
@@ -30,6 +21,9 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import tailwind from '../tailwind.css?inline';
 import styles from './style.css?inline';
 
+//Types
+import { Treatment, PrescriptionTemplate, TreatmentOption } from '@photonhealth/sdk/dist/types';
+
 //Virtual List
 import { createVirtualizer, VirtualItem } from '@tanstack/solid-virtual';
 
@@ -48,14 +42,12 @@ interface GroupTitle {
   title: string;
 }
 
-type Item<T = any> = DataItem<T> | GroupTitle;
-
 // Typescript and solid are annoying
 // eslint-disable-next-line @typescript-eslint/ban-types
 type ThisisNotAFunction<T> = Exclude<T, Function>;
 
 export const PhotonMedicationDropdownFullWidth = <T extends { id: string }>(props: {
-  data: Array<T>;
+  data: Array<Treatment | PrescriptionTemplate | TreatmentOption>;
   label?: string;
   required: boolean;
   placeholder?: string;
@@ -104,6 +96,7 @@ export const PhotonMedicationDropdownFullWidth = <T extends { id: string }>(prop
   //signals
   const [selected, setSelected] = createSignal<T | undefined>(undefined);
   const [selectedIndex, setSelectedIndex] = createSignal(-1);
+  // const [lastIndex, setLastIndex] = createSignal();
 
   const debounceSearch = debounce(async (s: string) => {
     if (props.onSearchChange) {
@@ -188,13 +181,13 @@ export const PhotonMedicationDropdownFullWidth = <T extends { id: string }>(prop
   });
 
   // Title and group items as one flat array
-  const allItems: Accessor<Item<T>[]> = createMemo(() =>
+  const allItems: any = createMemo(() =>
     props.groups
       ? props.groups
           .map((g) => {
             const data = props.data
               .map((d, idx) => ({ data: d, allItemsIdx: idx }))
-              .filter((d) => g.filter(d.data));
+              .filter((d: any) => g.filter(d.data));
             return data.length > 0 ? [{ title: g.label }, ...data] : [];
           })
           .flat()
@@ -379,11 +372,12 @@ export const PhotonMedicationDropdownFullWidth = <T extends { id: string }>(prop
                   {(vr) => {
                     const isLoaderRow = vr.index > allItems().length - 1;
                     const datum = allItems()[vr.index];
+                    // bit of type coersion here
                     const isSelected =
-                      selected()?.id &&
+                      !!selected()?.id &&
                       !isLoaderRow &&
                       'data' in datum &&
-                      datum?.data?.id === selected()?.id;
+                      !!(datum?.data?.id === selected()?.id);
 
                     const ComponentToRender = 'title' in datum ? GroupLabelEl : ItemEl;
                     const componentProps =
@@ -409,6 +403,7 @@ export const PhotonMedicationDropdownFullWidth = <T extends { id: string }>(prop
                                 }
                               }
                             }
+                            // setLastIndex: setLastIndex
                           };
 
                     return (
@@ -463,7 +458,6 @@ const ItemEl = (props: {
   isLoader: boolean;
   isSelected: boolean;
   onClick: () => void;
-  setLastIndex: (r: Element) => void;
   hasMore: boolean;
   showOverflow?: boolean;
   children: JSXElement;
@@ -475,11 +469,6 @@ const ItemEl = (props: {
         'treatment-option': true
       }}
       onClick={() => props.onClick()}
-      ref={(r: Element) => {
-        if (props.isLoader && props.index > 0) {
-          props.setLastIndex(r);
-        }
-      }}
       style={{
         width: '100%',
         'min-height': `${props.item.size}px`

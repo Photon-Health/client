@@ -30,6 +30,9 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import tailwind from '../tailwind.css?inline';
 import styles from './style.css?inline';
 
+// Types
+import { Treatment, PrescriptionTemplate, TreatmentOption } from '@photonhealth/sdk/dist/types';
+
 //Virtual List
 import { createVirtualizer, VirtualItem } from '@tanstack/solid-virtual';
 
@@ -51,7 +54,7 @@ type Item<T = any> = DataItem<T> | GroupTitle;
 type ThisisNotAFunction<T> = Exclude<T, Function>;
 
 export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
-  data: Array<T>;
+  data: Array<Treatment | PrescriptionTemplate | TreatmentOption>;
   label?: string;
   required: boolean;
   placeholder?: string;
@@ -188,13 +191,13 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
   });
 
   // Title and group items as one flat array
-  const allItems: Accessor<Item<T>[]> = createMemo(() =>
+  const allItems: any = createMemo(() =>
     props.groups
       ? props.groups
           .map((g) => {
             const data = props.data
               .map((d, idx) => ({ data: d, allItemsIdx: idx }))
-              .filter((d) => g.filter(d.data));
+              .filter((d: any) => g.filter(d.data));
             return data.length > 0 ? [{ title: g.label }, ...data] : [];
           })
           .flat()
@@ -269,7 +272,7 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
             }
             debounceSearch(e.target.value);
           }}
-          on:sl-focus={(e) => {
+          on:sl-focus={(e: any) => {
             if (props.onInputFocus) {
               props.onInputFocus();
               e.stopImmediatePropagation();
@@ -372,11 +375,12 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
                 {(vr) => {
                   const isLoaderRow = vr.index > allItems().length - 1;
                   const datum = allItems()[vr.index];
+                  // bit of type coersion here
                   const isSelected =
-                    selected()?.id &&
+                    !!selected()?.id &&
                     !isLoaderRow &&
                     'data' in datum &&
-                    datum?.data?.id === selected()?.id;
+                    !!(datum?.data?.id === selected()?.id);
 
                   return (
                     <Switch>
@@ -396,10 +400,10 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
                               setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
                               setSelectedIndex((datum as DataItem<T>).allItemsIdx);
 
-                              if ('treatment' in datum.data) {
-                                props.setSearchText(datum.data.treatment.name);
+                              if ('treatment' in (datum as DataItem<any>).data) {
+                                props.setSearchText((datum as DataItem<any>).data.treatment.name);
                               } else {
-                                props.setSearchText(datum.data.name);
+                                props.setSearchText((datum as DataItem<any>).data.name);
                               }
                               dispatchSelect((datum as DataItem<T>).data);
                               dropdownRef.hide();

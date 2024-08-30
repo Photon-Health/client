@@ -51,7 +51,7 @@ type Item<T = any> = DataItem<T> | GroupTitle;
 type ThisisNotAFunction<T> = Exclude<T, Function>;
 
 export const PhotonDropdown = <T extends { id: string }>(props: {
-  data: Array<T>;
+  data: Array<Treatment | PrescriptionTemplate | TreatmentOption>;
   label?: string;
   required: boolean;
   placeholder?: string;
@@ -269,7 +269,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             }
             debounceSearch(e.target.value);
           }}
-          on:sl-focus={(e) => {
+          on:sl-focus={(e: any) => {
             if (props.onInputFocus) {
               props.onInputFocus();
               e.stopImmediatePropagation();

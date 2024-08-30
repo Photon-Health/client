@@ -13,7 +13,7 @@ import {
   Medication,
   Treatment,
   PrescriptionTemplate,
-  MedicationType
+  TreatmentOption
 } from '@photonhealth/sdk/dist/types';
 import { CatalogStore } from '../stores/catalog';
 
@@ -60,17 +60,6 @@ const SearchTreatmentoptions = gql`
     }
   }
 `;
-
-export type TreatmentOption = {
-  medicationId: string;
-  name: string;
-  ndc: string;
-  form?: string;
-  route?: string;
-  strength?: string;
-  type?: MedicationType;
-  __typename: string;
-};
 
 const searchTreatmentoptions = async (
   client: ApolloClient<any>,
