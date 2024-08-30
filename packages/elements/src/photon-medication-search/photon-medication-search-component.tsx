@@ -220,7 +220,10 @@ const Component = (props: ComponentProps) => {
     setTreatmentOptions(options);
   });
 
-  const data = createMemo(() => getFilteredData(props, searchText(), treatmentOptions()));
+  const data = createMemo(() => {
+    const filteredData = getFilteredData(props, searchText(), treatmentOptions());
+    return filteredData.length > 0 ? filteredData : undefined;
+  });
 
   const displayAccessor = (
     t: Treatment | PrescriptionTemplate | TreatmentOption,
@@ -268,7 +271,7 @@ const Component = (props: ComponentProps) => {
           }}
         />
       </Show>
-      {/* Dummy input that is primarily used to open full size */}
+      {/* Dummy input that is primarily used here to open the full size flavor */}
       <Show when={isMobile && !enableFullWidthMedicationSearch()}>
         <PhotonDropdown
           data={data()}
