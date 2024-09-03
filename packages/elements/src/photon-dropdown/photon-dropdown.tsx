@@ -334,7 +334,7 @@ export const PhotonDropdown = <T extends { id: string } | { medicationId: string
             ref={overlayRef}
             class="bg-white overflow-x-hidden overflow-y-auto relative"
             style={{
-              'max-height': '300px',
+              'max-height': '200px',
               'min-height': '37px',
               width: '100%',
               display: 'flex',
