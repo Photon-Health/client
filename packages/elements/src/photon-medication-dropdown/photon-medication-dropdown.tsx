@@ -58,7 +58,7 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
   forceLabelSize?: boolean;
   invalid?: boolean;
   onSearchChange?: (search: string) => void;
-  displayAccessor: (selected: T, groupDisplay: boolean) => string | JSXElement;
+  displaySearchOption: (selected: T, groupDisplay: boolean) => string | JSXElement;
   disabled?: boolean;
   onOpen?: () => void;
   onHide?: () => void;
@@ -408,7 +408,7 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
                           }}
                           setLastIndex={setLastIndex}
                         >
-                          {props.displayAccessor((datum as DataItem<T>).data, true)}
+                          {props.displaySearchOption((datum as DataItem<T>).data, true)}
                         </ItemEl>
                       </Match>
                     </Switch>

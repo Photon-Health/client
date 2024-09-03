@@ -126,10 +126,10 @@ const boldSubstring = (inputString: string, substring: string) => {
 
 function displayTreatment(
   t: Treatment | TreatmentOption,
-  groupAccess: boolean,
+  showFormattedMedicationName: boolean,
   searchText: string
 ) {
-  return groupAccess ? (
+  return showFormattedMedicationName ? (
     <p class="text-sm whitespace-normal leading-snug my-1">{boldSubstring(t.name, searchText)}</p>
   ) : (
     t.name || ''
@@ -138,10 +138,10 @@ function displayTreatment(
 
 function displayPrescriptionTemplate(
   t: PrescriptionTemplate,
-  groupAccess: boolean,
+  showFormattedMedicationName: boolean,
   searchText: string
 ) {
-  if (groupAccess) {
+  if (showFormattedMedicationName) {
     const refills = t.fillsAllowed ? t.fillsAllowed - 1 : 0;
 
     return (
@@ -236,14 +236,22 @@ const Component = (props: ComponentProps) => {
     return getFilteredData(props, searchText(), treatmentOptions());
   });
 
-  const displayAccessor = (
+  const displaySearchOption = (
     t: Treatment | PrescriptionTemplate | TreatmentOption,
-    groupAccess: boolean
+    showFormattedMedicationName: boolean
   ) => {
     if (t && '__typename' in t && t.__typename == 'PrescriptionTemplate') {
-      return displayPrescriptionTemplate(t as PrescriptionTemplate, groupAccess, searchText());
+      return displayPrescriptionTemplate(
+        t as PrescriptionTemplate,
+        showFormattedMedicationName,
+        searchText()
+      );
     }
-    return displayTreatment(t as Treatment | TreatmentOption, groupAccess, searchText());
+    return displayTreatment(
+      t as Treatment | TreatmentOption,
+      showFormattedMedicationName,
+      searchText()
+    );
   };
 
   const isMobile = window.innerWidth < 768;
@@ -270,7 +278,7 @@ const Component = (props: ComponentProps) => {
           isLoading={store.catalogs.isLoading}
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
-          displayAccessor={displayAccessor}
+          displaySearchOption={displaySearchOption}
           searchText={searchText()}
           onSearchChange={(s: string) => setSearchText(s)}
           onHide={() => setSearchText('')}
@@ -295,7 +303,7 @@ const Component = (props: ComponentProps) => {
           isLoading={store.catalogs.isLoading}
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
-          displayAccessor={displayAccessor}
+          displaySearchOption={displaySearchOption}
           onSearchChange={(s: string) => setSearchText(s)}
           onHide={() => setSearchText('')}
           helpText={props.helpText}
@@ -323,7 +331,7 @@ const Component = (props: ComponentProps) => {
           isLoading={store.catalogs.isLoading}
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
-          displayAccessor={displayAccessor}
+          displaySearchOption={displaySearchOption}
           searchText={searchText()}
           setSearchText={setSearchText}
           onSearchChange={(s: string) => setSearchText(s)}
