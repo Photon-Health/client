@@ -92,8 +92,8 @@ function getFilteredData(
 
   const catalogData = [
     ...(props.offCatalogOption ? [props.offCatalogOption as Treatment] : []),
-    ...store.catalogs.data[0].templates.map((x: PrescriptionTemplate) => x),
-    ...store.catalogs.data[0].treatments.map((x: Treatment) => x),
+    ...store.catalogs.data[0].templates.map((x) => x as PrescriptionTemplate),
+    ...store.catalogs.data[0].treatments.map((x) => x as Treatment),
     ...treatmentOptions
   ];
 
@@ -171,17 +171,17 @@ function getGroupsConfig(props: ComponentProps) {
     },
     {
       label: 'Personal Templates',
-      filter: (t: { id: string; isPrivate: boolean } | undefined) =>
+      filter: (t: { id: string; isPrivate?: boolean } | undefined) =>
         t && typeof t === 'object' && 'treatment' in t && t.isPrivate
     },
     {
       label: 'Organization Templates',
-      filter: (t: { id: string; isPrivate: boolean } | undefined) =>
+      filter: (t: { id: string; isPrivate?: boolean } | undefined) =>
         t && typeof t === 'object' && 'treatment' in t && !t.isPrivate
     },
     {
       label: 'Organization Catalog',
-      filter: (t: { id: string; __typename: string } | undefined) =>
+      filter: (t: { id: string; __typename?: string } | undefined) =>
         t &&
         typeof t === 'object' &&
         'name' in t &&
@@ -190,7 +190,7 @@ function getGroupsConfig(props: ComponentProps) {
     },
     {
       label: 'All Templates',
-      filter: (t: { id: string; __typename: string } | undefined) =>
+      filter: (t: { id: string; __typename?: string } | undefined) =>
         t && typeof t === 'object' && !('treatment' in t) && t.__typename === 'TreatmentOption'
     }
   ];

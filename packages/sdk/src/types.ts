@@ -896,7 +896,7 @@ export type TreatmentCodes = {
 
 export type TreatmentOption = {
   __typename?: 'TreatmentOption';
-  medicationId: Scalars['ID'];
+  id: Scalars['ID'];
   name: Scalars['String'];
   ndc: Scalars['String'];
   type: MedicationType;

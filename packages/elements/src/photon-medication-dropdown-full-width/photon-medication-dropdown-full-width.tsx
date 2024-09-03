@@ -46,8 +46,10 @@ interface GroupTitle {
 // eslint-disable-next-line @typescript-eslint/ban-types
 type ThisisNotAFunction<T> = Exclude<T, Function>;
 
-export const PhotonMedicationDropdownFullWidth = <T extends { id: string }>(props: {
-  data: Array<Treatment | PrescriptionTemplate | TreatmentOption>;
+export const PhotonMedicationDropdownFullWidth = <
+  T extends Treatment | PrescriptionTemplate | TreatmentOption
+>(props: {
+  data: Array<T>;
   label?: string;
   required?: boolean;
   placeholder?: string;
@@ -178,15 +180,18 @@ export const PhotonMedicationDropdownFullWidth = <T extends { id: string }>(prop
       }
     }
   });
+  type GroupedItem<T extends Treatment | PrescriptionTemplate | TreatmentOption> =
+    | GroupTitle
+    | DataItem<T>;
 
   // Title and group items as one flat array
-  const allItems: any = createMemo(() =>
+  const allItems = createMemo<GroupedItem<T>[]>(() =>
     props.groups
       ? props.groups
           .map((g) => {
             const data = props.data
               .map((d, idx) => ({ data: d, allItemsIdx: idx }))
-              .filter((d: any) => g.filter(d.data));
+              .filter((d) => g.filter(d.data));
             return data.length > 0 ? [{ title: g.label }, ...data] : [];
           })
           .flat()
