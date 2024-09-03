@@ -9,7 +9,8 @@ import {
   Match,
   onMount,
   Show,
-  Switch
+  Switch,
+  Accessor
 } from 'solid-js';
 
 //Shoelace
@@ -32,6 +33,8 @@ import styles from './style.css?inline';
 //Virtual List
 import { createVirtualizer, VirtualItem } from '@tanstack/solid-virtual';
 
+type Item<T = any> = DataItem<T> | GroupTitle;
+
 interface DataItem<T> {
   data: T;
   // TODO: setting this to scroll to the correct index
@@ -47,7 +50,7 @@ interface GroupTitle {
 // eslint-disable-next-line @typescript-eslint/ban-types
 type ThisisNotAFunction<T> = Exclude<T, Function>;
 
-export const PhotonDropdown = <T extends { id: string } | { medicationId: string }>(props: {
+export const PhotonDropdown = <T extends { id: string }>(props: {
   data: Array<T>;
   label?: string;
   required: boolean;
@@ -188,7 +191,7 @@ export const PhotonDropdown = <T extends { id: string } | { medicationId: string
   });
 
   // Title and group items as one flat array
-  const allItems: any = createMemo(() =>
+  const allItems: Accessor<Item<T>[]> = createMemo(() =>
     props.groups
       ? props.groups
           .map((g) => {
