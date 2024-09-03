@@ -197,7 +197,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
           .map((g) => {
             const data = props.data
               .map((d, idx) => ({ data: d, allItemsIdx: idx }))
-              .filter((d: any) => g.filter(d.data));
+              .filter((d) => g.filter(d.data));
             return data.length > 0 ? [{ title: g.label }, ...data] : [];
           })
           .flat()
