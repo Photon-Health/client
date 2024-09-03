@@ -1,6 +1,7 @@
 // Solid
 import { customElement } from 'solid-element';
 import { createMemo, createSignal, onMount, Show } from 'solid-js';
+import { debounce } from '@solid-primitives/scheduled';
 
 // Photon
 import { usePhoton } from '../context';
@@ -220,9 +221,13 @@ const Component = (props: ComponentProps) => {
     await actions.getCatalogs(client!.getSDK());
   });
 
-  createMemo(async () => {
-    const options = await loadTreatmentOptions(client!.sdk.apolloClinical, searchText());
+  const debouncedLoadTreatmentOptions = debounce(async (searchTerm: string) => {
+    const options = await loadTreatmentOptions(client!.sdk.apolloClinical, searchTerm);
     setTreatmentOptions(options);
+  }, 500);
+
+  createMemo(() => {
+    debouncedLoadTreatmentOptions(searchText());
   });
 
   const data = createMemo(() => {
