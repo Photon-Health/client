@@ -291,7 +291,7 @@ export const PhotonMedicationDropdownFullWidth = <
               placeholder: !selected() && inputRef.value === ''
             }}
             required={props.required}
-            on:sl-input={(e: any) => {
+            on:input={(e: any) => {
               debounceSearch(e.target.value);
             }}
             on:sl-focus={() => {
