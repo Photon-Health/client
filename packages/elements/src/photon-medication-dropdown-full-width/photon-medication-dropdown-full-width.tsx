@@ -404,7 +404,6 @@ export const PhotonMedicationDropdownFullWidth = <T extends { id: string }>(prop
                                 }
                               }
                             }
-                            // setLastIndex: setLastIndex
                           };
 
                     return (
