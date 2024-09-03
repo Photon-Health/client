@@ -166,20 +166,22 @@ function getGroupsConfig(props: ComponentProps) {
   return [
     {
       label: 'Off Catalog',
-      filter: (t: any) =>
+      filter: (t: { id: string } | undefined) =>
         t && typeof t === 'object' && props.offCatalogOption && t.id === props.offCatalogOption.id
     },
     {
       label: 'Personal Templates',
-      filter: (t: any) => t && typeof t === 'object' && 'treatment' in t && t.isPrivate
+      filter: (t: { id: string; isPrivate: boolean } | undefined) =>
+        t && typeof t === 'object' && 'treatment' in t && t.isPrivate
     },
     {
       label: 'Organization Templates',
-      filter: (t: any) => t && typeof t === 'object' && 'treatment' in t && !t.isPrivate
+      filter: (t: { id: string; isPrivate: boolean } | undefined) =>
+        t && typeof t === 'object' && 'treatment' in t && !t.isPrivate
     },
     {
       label: 'Organization Catalog',
-      filter: (t: any) =>
+      filter: (t: { id: string; __typename: string } | undefined) =>
         t &&
         typeof t === 'object' &&
         'name' in t &&
@@ -188,7 +190,7 @@ function getGroupsConfig(props: ComponentProps) {
     },
     {
       label: 'All Templates',
-      filter: (t: any) =>
+      filter: (t: { id: string; __typename: string } | undefined) =>
         t && typeof t === 'object' && !('treatment' in t) && t.__typename === 'TreatmentOption'
     }
   ];
