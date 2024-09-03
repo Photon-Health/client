@@ -92,8 +92,8 @@ function getFilteredData(
 
   const catalogData = [
     ...(props.offCatalogOption ? [props.offCatalogOption as Treatment] : []),
-    ...store.catalogs.data[0].templates.map((x) => x as PrescriptionTemplate),
-    ...store.catalogs.data[0].treatments.map((x) => x as Treatment),
+    ...store.catalogs.data[0].templates.map((x: PrescriptionTemplate) => x),
+    ...store.catalogs.data[0].treatments.map((x: Treatment) => x),
     ...treatmentOptions
   ];
 
