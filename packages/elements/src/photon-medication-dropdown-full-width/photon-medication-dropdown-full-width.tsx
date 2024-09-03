@@ -56,7 +56,7 @@ export const PhotonMedicationDropdownFullWidth = <
   forceLabelSize?: boolean;
   invalid?: boolean;
   onSearchChange?: (search: string) => void;
-  displaySearchOption: (selected: T, groupDisplay: boolean) => string | JSXElement;
+  displayAccessor: (selected: T, groupDisplay: boolean) => string | JSXElement;
   disabled?: boolean;
   onOpen?: () => void;
   onHide?: () => void;
@@ -414,7 +414,7 @@ export const PhotonMedicationDropdownFullWidth = <
                     return (
                       <Dynamic component={ComponentToRender} {...componentProps}>
                         {'data' in datum &&
-                          props.displaySearchOption((datum as DataItem<T>).data, true)}
+                          props.displayAccessor((datum as DataItem<T>).data, true)}
                       </Dynamic>
                     );
                   }}

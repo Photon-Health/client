@@ -58,7 +58,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   forceLabelSize?: boolean;
   invalid?: boolean;
   onSearchChange?: (search: string) => void;
-  displaySearchOption: (selected: T, groupDisplay: boolean) => string | JSXElement;
+  displayAccessor: (selected: T, groupDisplay: boolean) => string | JSXElement;
   disabled?: boolean;
   onOpen?: () => void;
   onHide?: () => void;
@@ -186,7 +186,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   const placeholder = createMemo(() => {
     const selectedValue = selected();
     return selectedValue
-      ? props.displaySearchOption(selectedValue, false)
+      ? props.displayAccessor(selectedValue, false)
       : props.placeholder ?? 'Select data...';
   });
 
@@ -393,7 +393,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                           }}
                           setLastIndex={setLastIndex}
                         >
-                          {props.displaySearchOption((datum as DataItem<T>).data, true)}
+                          {props.displayAccessor((datum as DataItem<T>).data, true)}
                         </ItemEl>
                       </Match>
                     </Switch>

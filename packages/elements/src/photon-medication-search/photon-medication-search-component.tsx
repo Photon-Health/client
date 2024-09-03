@@ -236,7 +236,7 @@ const Component = (props: ComponentProps) => {
     return getFilteredData(props, searchText(), treatmentOptions());
   });
 
-  const displaySearchOption = (
+  const displayAccessor = (
     t: Treatment | PrescriptionTemplate | TreatmentOption,
     showFormattedMedicationName: boolean
   ) => {
@@ -278,7 +278,7 @@ const Component = (props: ComponentProps) => {
           isLoading={store.catalogs.isLoading}
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
-          displaySearchOption={displaySearchOption}
+          displayAccessor={displayAccessor}
           searchText={searchText()}
           onSearchChange={(s: string) => setSearchText(s)}
           onHide={() => setSearchText('')}
@@ -303,7 +303,7 @@ const Component = (props: ComponentProps) => {
           isLoading={store.catalogs.isLoading}
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
-          displaySearchOption={displaySearchOption}
+          displayAccessor={displayAccessor}
           onSearchChange={(s: string) => setSearchText(s)}
           onHide={() => setSearchText('')}
           helpText={props.helpText}
@@ -331,7 +331,7 @@ const Component = (props: ComponentProps) => {
           isLoading={store.catalogs.isLoading}
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
-          displaySearchOption={displaySearchOption}
+          displayAccessor={displayAccessor}
           searchText={searchText()}
           setSearchText={setSearchText}
           onSearchChange={(s: string) => setSearchText(s)}
