@@ -226,8 +226,7 @@ const Component = (props: ComponentProps) => {
   });
 
   const data = createMemo(() => {
-    const filteredData = getFilteredData(props, searchText(), treatmentOptions());
-    return filteredData.length > 0 ? filteredData : [];
+    return getFilteredData(props, searchText(), treatmentOptions());
   });
 
   const displayAccessor = (
