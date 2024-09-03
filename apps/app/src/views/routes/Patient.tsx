@@ -25,7 +25,7 @@ import {
 import { FiEdit, FiChevronRight, FiPlus } from 'react-icons/fi';
 
 import { usePhoton } from '@photonhealth/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { formatDateLong, formatPhone, formatDate, getMedicationNames } from '../../utils';
 
 import { Page } from '../components/Page';
@@ -40,7 +40,7 @@ import { datadogRum } from '@datadog/browser-rum';
 
 export const Patient = () => {
   const [loading, setLoading] = useState<boolean>(true);
-  const { patientId: id } = useParams();
+  const { patientId: rawId } = useParams<{ patientId: string }>();
 
   const { getPatient, getPrescriptions, getOrders } = usePhoton();
   const {
@@ -48,13 +48,17 @@ export const Patient = () => {
     error,
     patient,
     refetch: refetchPatient
-  } = getPatient({ id: id ?? '' });
+  } = getPatient({ id: rawId ?? '' });
   const {
     loading: loadingPrescriptions,
     prescriptions,
     refetch: refetchPrescriptions
-  } = getPrescriptions({ patientId: id });
-  const { loading: loadingOrders, orders, refetch: refetchOrders } = getOrders({ patientId: id });
+  } = getPrescriptions({ patientId: rawId });
+  const {
+    loading: loadingOrders,
+    orders,
+    refetch: refetchOrders
+  } = getOrders({ patientId: rawId });
 
   useEffect(() => {
     setLoading(loadingPatient || loadingPrescriptions || loadingOrders);
@@ -66,14 +70,17 @@ export const Patient = () => {
     UNKNOWN: 'Unknown'
   };
 
+  // id passed into the url can be either the external id or our patient id, but many times we need our patient id
+  const patientId = useMemo(() => patient?.id, [patient]);
+
   useEffect(() => {
     const refetchData = async () => {
-      await refetchPatient({ id });
-      await refetchPrescriptions({ patientId: id });
-      await refetchOrders({ patientId: id });
+      await refetchPatient({ id: patientId });
+      await refetchPrescriptions({ patientId: patientId });
+      await refetchOrders({ patientId: patientId });
     };
     refetchData();
-  }, [id]);
+  }, [patientId, refetchOrders, refetchPatient, refetchPrescriptions]);
 
   useEffect(() => {
     // Scroll to top on initial load
@@ -111,7 +118,7 @@ export const Patient = () => {
         loading ? (
           <SkeletonText skeletonHeight={5} noOfLines={1} width="300px" mt={2} />
         ) : (
-          <CopyText text={id || ''} />
+          <CopyText text={rawId || ''} />
         )
       }
       buttons={
@@ -123,10 +130,10 @@ export const Patient = () => {
           <Button
             aria-label="Edit patient details"
             as={RouterLink}
-            to={`/patients/update/${id}`}
+            to={`/patients/update/${patientId}`}
             onClick={() => {
               datadogRum.addAction('edit_patient_btn_click', {
-                patientId: id
+                patientId
               });
             }}
             leftIcon={<FiEdit />}
@@ -141,10 +148,10 @@ export const Patient = () => {
             leftIcon={<FiPlus />}
             aria-label="New Order"
             as={RouterLink}
-            to={`/prescriptions/new?patientId=${id}`}
+            to={`/prescriptions/new?patientId=${patientId}`}
             onClick={() => {
               datadogRum.addAction('create_prescription_btn_click', {
-                patientId: id
+                patientId
               });
             }}
             colorScheme="blue"
@@ -324,12 +331,12 @@ export const Patient = () => {
                   leftIcon={<FiPlus />}
                   aria-label="New Order"
                   as={RouterLink}
-                  to={`/orders/new?patientId=${id}`}
+                  to={`/orders/new?patientId=${patientId}`}
                   colorScheme="blue"
                   size="sm"
                   onClick={() => {
                     datadogRum.addAction('create_order_btn_click', {
-                      patientId: id
+                      patientId
                     });
                   }}
                   isDisabled={loading}

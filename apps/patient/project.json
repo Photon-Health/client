@@ -13,6 +13,14 @@
       },
       "dependsOn": ["^build"]
     },
+    "start:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "env-cmd -f .env.tau react-app-rewired start"
+      },
+      "dependsOn": ["^build"]
+    },
     "build:boson": {
       "executor": "nx:run-commands",
       "options": {
