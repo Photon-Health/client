@@ -198,8 +198,8 @@ function getGroupsConfig(props: ComponentProps) {
 
 interface ComponentProps {
   label?: string;
-  required: boolean;
-  invalid: boolean;
+  required?: boolean;
+  invalid?: boolean;
   helpText?: string;
   catalogId?: string;
   disabled: boolean;
@@ -262,9 +262,9 @@ const Component = (props: ComponentProps) => {
           groups={getGroupsConfig(props)}
           label={props.label}
           disabled={props.disabled}
-          required={props.required}
+          required={props.required ?? false}
           placeholder="Type medication"
-          invalid={props.invalid}
+          invalid={props.invalid ?? false}
           isLoading={store.catalogs.isLoading}
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
@@ -287,9 +287,9 @@ const Component = (props: ComponentProps) => {
           groups={getGroupsConfig(props)}
           label={props.label}
           disabled={props.disabled}
-          required={props.required}
+          required={props.required ?? false}
           placeholder="Type medication"
-          invalid={props.invalid}
+          invalid={props.invalid ?? false}
           isLoading={store.catalogs.isLoading}
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
@@ -315,9 +315,9 @@ const Component = (props: ComponentProps) => {
           groups={getGroupsConfig(props)}
           label={props.label}
           disabled={props.disabled}
-          required={props.required}
+          required={props.required ?? false}
           placeholder="Type medication"
-          invalid={props.invalid}
+          invalid={props.invalid ?? false}
           isLoading={store.catalogs.isLoading}
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
