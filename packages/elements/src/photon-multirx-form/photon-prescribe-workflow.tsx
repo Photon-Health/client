@@ -106,11 +106,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const [authenticated, setAuthenticated] = createSignal<boolean>(
     client?.authentication.state.isAuthenticated || false
   );
+  const [enableNewMedicationSearch, setEnableNewMedicationSearch] = createSignal<boolean>(false);
   const [, recentOrdersActions] = useRecentOrders();
-
-  const enableNewMedicationSearch = newMedSearchTesters.includes(
-    client?.authentication.state.user?.name
-  );
 
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
   let prefillNotes = '';
@@ -152,6 +149,14 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   });
   createEffect(() => {
     setAuthenticated(client?.authentication.state.isAuthenticated || false);
+  });
+  createEffect(() => {
+    if (authenticated()) {
+      const enableNewMedicationSearch = newMedSearchTesters.includes(
+        client?.authentication.state.user?.name
+      );
+      setEnableNewMedicationSearch(enableNewMedicationSearch);
+    }
   });
 
   const hasPrescribePermission = createMemo(() =>
@@ -474,7 +479,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       weightUnit={props.weightUnit}
                       prefillNotes={prefillNotes}
                       enableCombineAndDuplicate={props.enableCombineAndDuplicate}
-                      enableNewMedicationSearch={enableNewMedicationSearch}
+                      enableNewMedicationSearch={enableNewMedicationSearch()}
                     />
                   </div>
                 </Show>
