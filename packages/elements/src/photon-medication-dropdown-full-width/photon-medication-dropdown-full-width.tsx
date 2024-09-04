@@ -222,7 +222,7 @@ export const PhotonMedicationDropdownFullWidth = <
       <style>{shoelaceDarkStyles}</style>
       <style>{shoelaceLightStyles}</style>
       <style>{styles}</style>
-      <div class="fixed top-0 left-0 w-full h-screen z-10 overflow-y-scroll bg-white">
+      <div class="fixed top-0 left-0 w-full h-screen z-10 overflow-y-scroll bg-white overflow-x-hidden">
         <div class={`flex items-center pb-2 pl-5 pr-5 pt-3`}>
           <div class="flex items-center" style={{ 'font-size': '26px' }}>
             <sl-icon-button
