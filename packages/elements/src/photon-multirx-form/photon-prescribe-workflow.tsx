@@ -109,7 +109,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const [, recentOrdersActions] = useRecentOrders();
 
   const enableNewMedicationSearch = newMedSearchTesters.includes(
-    client?.authentication.state.user.name
+    client?.authentication.state.user?.name
   );
 
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
