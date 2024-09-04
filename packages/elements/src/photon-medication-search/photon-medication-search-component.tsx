@@ -217,8 +217,7 @@ const Component = (props: ComponentProps) => {
   const [searchText, setSearchText] = createSignal<string>('');
   const [treatmentOptions, setTreatmentOptions] = createSignal<TreatmentOption[]>([]);
   const [loadingTreatmentOptions, setLoadingTreatmentOptions] = createSignal<boolean>(false);
-  const [showFullWidthMedicationSearch, setShowFullWidthMedicationSearch] =
-    createSignal<boolean>(false);
+  const [showFullWidthSearch, setShowFullWidthSearch] = createSignal<boolean>(false);
 
   onMount(async () => {
     await actions.getCatalogs(client!.getSDK());
@@ -269,7 +268,7 @@ const Component = (props: ComponentProps) => {
       {/* Mobile */}
 
       {/* Full size search */}
-      <Show when={showFullWidthMedicationSearch()}>
+      <Show when={showFullWidthSearch()}>
         <PhotonMedicationDropdownFullWidth
           data={data()}
           groups={getGroupsConfig(props)}
@@ -286,15 +285,15 @@ const Component = (props: ComponentProps) => {
           onSearchChange={(s: string) => setSearchText(s)}
           onHide={() => setSearchText('')}
           helpText={props.helpText}
-          open={showFullWidthMedicationSearch()}
+          open={showFullWidthSearch()}
           onClose={() => {
-            setShowFullWidthMedicationSearch(false);
+            setShowFullWidthSearch(false);
             setSearchText('');
           }}
         />
       </Show>
       {/* Dummy input that is primarily used here to open the full size flavor */}
-      <Show when={isMobile && !showFullWidthMedicationSearch()}>
+      <Show when={isMobile && !showFullWidthSearch()}>
         <PhotonDropdown
           data={data()}
           groups={getGroupsConfig(props)}
@@ -311,7 +310,7 @@ const Component = (props: ComponentProps) => {
           onHide={() => setSearchText('')}
           helpText={props.helpText}
           onInputFocus={() => {
-            setShowFullWidthMedicationSearch(true);
+            setShowFullWidthSearch(true);
             if (props.selected?.name) {
               setSearchText(props.selected.name);
             }
