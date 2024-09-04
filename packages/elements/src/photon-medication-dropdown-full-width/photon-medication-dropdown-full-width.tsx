@@ -269,7 +269,8 @@ export const PhotonMedicationDropdownFullWidth = <
             invalid: props.invalid ?? false,
             input: true,
             disabled: props.disabled ?? false,
-            placeholder: !selected() && inputRef.value === ''
+            placeholder: !selected() && inputRef.value === '',
+            'mb-2': true
           }}
           required={props.required}
           on:input={(e: any) => {
@@ -324,14 +325,7 @@ export const PhotonMedicationDropdownFullWidth = <
             </div>
           </Show>
         </sl-input>
-
-        <div
-          style={{
-            width: '100%'
-          }}
-          class="flex-1"
-          ref={listRef}
-        >
+        <div class="w-full flex-1" ref={listRef}>
           <For
             each={rowVirtualizer().getVirtualItems()}
             fallback={<EmptyEl noDataMsg={props.noDataMsg} isLoading={props.isLoading} />}
