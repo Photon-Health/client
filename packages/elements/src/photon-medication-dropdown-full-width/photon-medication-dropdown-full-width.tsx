@@ -180,6 +180,15 @@ export const PhotonMedicationDropdownFullWidth = <
           // inputRef.click(); // Simulate a user click
           inputRef.focus(); // Trigger focus after the click
         }, 300);
+        const event = new Event('touchend', {
+          bubbles: true,
+          cancelable: true
+        });
+
+        setTimeout(() => {
+          inputRef.dispatchEvent(event); // Simulate touch event
+          inputRef.focus(); // Programmatically focus
+        }, 300);
         // });
       }
     }
@@ -279,7 +288,7 @@ export const PhotonMedicationDropdownFullWidth = <
             placeholder={props.placeholder}
             clearable
             autocomplete="off"
-            disabled={props.disabled ?? false}
+            // disabled={props.disabled ?? false}
             size="medium"
             style={{
               'padding-left': '20px',
@@ -294,7 +303,7 @@ export const PhotonMedicationDropdownFullWidth = <
               disabled: props.disabled ?? false,
               placeholder: !selected() && inputRef.value === ''
             }}
-            required={props.required}
+            // required={props.required}
             on:input={(e: any) => {
               debounceSearch(e.target.value);
             }}
