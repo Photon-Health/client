@@ -168,17 +168,20 @@ export const PhotonMedicationDropdownFullWidth = <
 
   onMount(() => {
     if (inputRef) {
-      // inputRef.addEventListener('keydown', (e: KeyboardEvent) => {
-      //   if (e.code == 'Space' || e.key == ' ') {
-      //     e.stopImmediatePropagation();
-      //   }
-      // });
+      inputRef.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.code == 'Space' || e.key == ' ') {
+          e.stopImmediatePropagation();
+        }
+      });
 
-      const event = new Event('touchend', { bubbles: true, cancelable: true });
-      inputRef.dispatchEvent(event); // Dispatch a touch event
-      setTimeout(() => {
+      // const event = new Event('touchend', { bubbles: true, cancelable: true });
+      // inputRef.dispatchEvent(event); // Dispatch a touch event
+      // setTimeout(() => {
+      //   inputRef.focus(); // Focus input after the touch event
+      // }, 100);
+      requestAnimationFrame(() => {
         inputRef.focus(); // Focus input after the touch event
-      }, 100);
+      });
     }
   });
   type GroupedItem<T extends Treatment | PrescriptionTemplate | TreatmentOption> =
@@ -256,6 +259,7 @@ export const PhotonMedicationDropdownFullWidth = <
         <sl-dropdown
           ref={dropdownRef}
           class="dropdown relative"
+          open={true}
           hoist
           distance={props.forceLabelSize && !props.invalid ? -20 : props.invalid ? -18 : 0}
           disabled={props.disabled ?? false}
