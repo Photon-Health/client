@@ -164,8 +164,6 @@ export const PhotonMedicationDropdownFullWidth = <
     }
   });
 
-  // let hiddenInputRef: HTMLInputElement;
-
   onMount(() => {
     if (inputRef) {
       inputRef.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -174,14 +172,9 @@ export const PhotonMedicationDropdownFullWidth = <
         }
       });
 
-      // const event = new Event('touchend', { bubbles: true, cancelable: true });
-      // inputRef.dispatchEvent(event); // Dispatch a touch event
       setTimeout(() => {
         inputRef.focus(); // Focus input after the touch event
       }, 100);
-      // requestAnimationFrame(() => {
-      //   inputRef.focus(); // Focus input after the touch event
-      // });
     }
   });
   type GroupedItem<T extends Treatment | PrescriptionTemplate | TreatmentOption> =
@@ -332,65 +325,66 @@ export const PhotonMedicationDropdownFullWidth = <
           </Show>
         </sl-input>
 
-          <div
-            style={{
-              width: '100%'
-            }}
-            class="flex-1"
-            ref={listRef}
+        <div
+          style={{
+            width: '100%'
+          }}
+          class="flex-1"
+          ref={listRef}
+        >
+          <For
+            each={rowVirtualizer().getVirtualItems()}
+            fallback={<EmptyEl noDataMsg={props.noDataMsg} isLoading={props.isLoading} />}
           >
-            <For
-              each={rowVirtualizer().getVirtualItems()}
-              fallback={<EmptyEl noDataMsg={props.noDataMsg} isLoading={props.isLoading} />}
-            >
-              {(vr) => {
-                const isLoaderRow = vr.index > allItems().length - 1;
-                const datum = allItems()[vr.index];
+            {(vr) => {
+              const isLoaderRow = vr.index > allItems().length - 1;
+              const datum = allItems()[vr.index];
 
-                const selectedValue = selected();
-                const isSelected =
-                  !isLoaderRow &&
-                  !!selectedValue &&
-                  'id' in selectedValue &&
-                  'data' in datum &&
-                  selectedValue.id === datum.data.id;
+              const selectedValue = selected();
+              const isSelected =
+                !isLoaderRow &&
+                !!selectedValue &&
+                'id' in selectedValue &&
+                'data' in datum &&
+                selectedValue.id === datum.data.id;
 
-                const ComponentToRender = 'title' in datum ? GroupLabelEl : ItemEl;
-                const componentProps =
-                  'title' in datum
-                    ? { item: datum as GroupTitle }
-                    : {
-                        item: vr,
-                        isLoader: isLoaderRow,
-                        isSelected: isSelected,
-                        index: vr.index,
-                        hasMore: props.hasMore,
-                        showOverflow: props.showOverflow,
-                        onClick: () => {
-                          if (!isLoaderRow) {
-                            setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
-                            setSelectedIndex((datum as DataItem<T>).allItemsIdx);
-                            inputRef.value = '';
-                            debounceSearch('');
-                            dispatchSelect((datum as DataItem<T>).data);
+              const ComponentToRender = 'title' in datum ? GroupLabelEl : ItemEl;
+              const componentProps =
+                'title' in datum
+                  ? { item: datum as GroupTitle }
+                  : {
+                      item: vr,
+                      isLoader: isLoaderRow,
+                      isSelected: isSelected,
+                      index: vr.index,
+                      hasMore: props.hasMore,
+                      showOverflow: props.showOverflow,
+                      onClick: () => {
+                        if (!isLoaderRow) {
+                          setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
+                          setSelectedIndex((datum as DataItem<T>).allItemsIdx);
+                          inputRef.value = '';
+                          debounceSearch('');
+                          dispatchSelect((datum as DataItem<T>).data);
 
-                            if (props.onClose) {
-                              props.onClose();
-                            }
+                          if (props.onClose) {
+                            props.onClose();
                           }
                         }
-                      };
+                      }
+                    };
 
-                return (
-                  <Dynamic component={ComponentToRender} {...componentProps}>
-                    {'data' in datum && props.displayAccessor((datum as DataItem<T>).data, true)}
-                  </Dynamic>
-                );
-              }}
-            </For>
-          </div>
+              return (
+                <Dynamic component={ComponentToRender} {...componentProps}>
+                  {'data' in datum && props.displayAccessor((datum as DataItem<T>).data, true)}
+                </Dynamic>
+              );
+            }}
+          </For>
         </div>
       </div>
+    </div>
+  );
 };
 
 const EmptyEl = (props: { isLoading: boolean; noDataMsg?: string }) => {
