@@ -11,7 +11,6 @@ import '@shoelace-style/shoelace/dist/components/menu-item/menu-item';
 import '@shoelace-style/shoelace/dist/components/menu/menu';
 import '@shoelace-style/shoelace/dist/components/spinner/spinner';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-import { setDefaultAnimation } from '@shoelace-style/shoelace/dist/utilities/animation-registry.js';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -26,10 +25,6 @@ import { Treatment, PrescriptionTemplate, TreatmentOption } from '@photonhealth/
 
 //Virtual List
 import { createVirtualizer, VirtualItem } from '@tanstack/solid-virtual';
-
-// Disable the default dropdown animation
-// TODO: Remove when the dropdown is swapped for a regular list
-setDefaultAnimation('dropdown.show', null);
 
 interface DataItem<T> {
   data: T;
@@ -80,10 +75,8 @@ export const PhotonMedicationDropdownFullWidth = <
 }) => {
   //refs
   let ref: any;
-  // let dropdownRef: any;
   let listRef: HTMLDivElement | undefined;
   let inputRef: any;
-  let overlayRef: HTMLDivElement | undefined;
 
   if (props.actionRef) {
     props.actionRef['clear'] = () => {
@@ -104,13 +97,6 @@ export const PhotonMedicationDropdownFullWidth = <
       await props.onSearchChange(s);
     }
   }, 250);
-
-  createEffect(() => {
-    if (props.open) {
-      // dropdownRef?.show();
-      handleDropdownShow();
-    }
-  });
 
   createEffect(() => {
     if (props.data.length === 0) {
@@ -203,18 +189,6 @@ export const PhotonMedicationDropdownFullWidth = <
       overscan: 100
     })
   );
-
-  const adjustDropdownHeight = () => {
-    if (overlayRef) {
-      const availableHeight = window.innerHeight - overlayRef.getBoundingClientRect().top;
-      overlayRef.style.maxHeight = `${availableHeight - 105}px`; // Subtract some padding if needed
-    }
-  };
-
-  // Call the adjustment function when the dropdown is shown
-  const handleDropdownShow = () => {
-    adjustDropdownHeight();
-  };
 
   return (
     <div ref={ref}>
