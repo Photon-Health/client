@@ -52,10 +52,6 @@
   display: none;
   width: 0px;
 }
-.treatment-option::part(checked-icon) {
-  display: none;
-  width: 0px;
-}
 
 .full-screen-close-btn::part(base) {
   padding: 0;
