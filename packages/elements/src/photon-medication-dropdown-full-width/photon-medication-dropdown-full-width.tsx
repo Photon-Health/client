@@ -173,10 +173,14 @@ export const PhotonMedicationDropdownFullWidth = <
       });
 
       if (props.open) {
-        requestAnimationFrame(() => {
-          inputRef.focus();
-          inputRef.click();
-        });
+        // requestAnimationFrame(() => {
+        // inputRef.focus();
+        // inputRef.click();
+        setTimeout(() => {
+          inputRef.click(); // Simulate a user click
+          inputRef.focus(); // Trigger focus after the click
+        }, 300);
+        // });
       }
     }
   });
