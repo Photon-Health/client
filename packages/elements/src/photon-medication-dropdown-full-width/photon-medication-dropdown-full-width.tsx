@@ -174,8 +174,8 @@ export const PhotonMedicationDropdownFullWidth = <
 
       if (props.open) {
         requestAnimationFrame(() => {
+          inputRef.focus();
           inputRef.click();
-          // inputRef.focus();
         });
       }
     }
