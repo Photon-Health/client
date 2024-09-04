@@ -453,7 +453,10 @@ const ItemEl = (props: {
 }) => {
   return (
     <sl-menu-item
-      class={props.isSelected ? 'selected default' : 'default'}
+      classList={{
+        selected: props.isSelected,
+        'treatment-option': true
+      }}
       onClick={() => props.onClick()}
       ref={(r: Element) => {
         if (props.isLoader && props.index > 0) {
@@ -479,7 +482,8 @@ const ItemEl = (props: {
             'overflow-ellipsis': !props.showOverflow,
             'whitespace-nowrap': !props.showOverflow,
             'whitespace-normal': props.showOverflow,
-            'break-words': true
+            'break-words': true,
+            'px-3': true
           }}
         >
           {props.children}

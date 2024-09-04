@@ -52,7 +52,8 @@ const newMedSearchTesters = [
   'Jason Whittle',
   'Rita Bulman',
   'Michael Rado',
-  'Otto Sipe'
+  'Otto Sipe',
+  'Paul Christophe'
 ];
 
 export type Address = {
