@@ -173,10 +173,9 @@ export const PhotonMedicationDropdownFullWidth = <
       });
 
       if (props.open) {
-        // this is lame, but it's the only way i could get the focus to work
-        setTimeout(() => {
+        requestAnimationFrame(() => {
           inputRef.focus();
-        }, 0);
+        });
       }
     }
   });
