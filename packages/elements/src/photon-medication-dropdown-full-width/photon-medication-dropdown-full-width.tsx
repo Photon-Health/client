@@ -164,35 +164,21 @@ export const PhotonMedicationDropdownFullWidth = <
     }
   });
 
-  let hiddenInputRef: HTMLInputElement;
+  // let hiddenInputRef: HTMLInputElement;
 
   onMount(() => {
     if (inputRef) {
-      inputRef.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.code == 'Space' || e.key == ' ') {
-          e.stopImmediatePropagation();
-        }
-      });
+      // inputRef.addEventListener('keydown', (e: KeyboardEvent) => {
+      //   if (e.code == 'Space' || e.key == ' ') {
+      //     e.stopImmediatePropagation();
+      //   }
+      // });
 
-      if (props.open) {
-        hiddenInputRef = document.createElement('input');
-        hiddenInputRef.type = 'text';
-        hiddenInputRef.style.position = 'absolute';
-        hiddenInputRef.style.opacity = '0';
-        hiddenInputRef.style.height = '0';
-        hiddenInputRef.style.width = '0';
-        hiddenInputRef.style.pointerEvents = 'none';
-        document.body.appendChild(hiddenInputRef);
-
-        // Focus the hidden input briefly, then focus the actual input
-        setTimeout(() => {
-          hiddenInputRef.focus();
-          setTimeout(() => {
-            hiddenInputRef.blur(); // Blur the hidden input
-            inputRef.focus(); // Focus the visible input
-          }, 100); // Short delay before focusing the visible input
-        }, 300);
-      }
+      const event = new Event('touchend', { bubbles: true, cancelable: true });
+      inputRef.dispatchEvent(event); // Dispatch a touch event
+      setTimeout(() => {
+        inputRef.focus(); // Focus input after the touch event
+      }, 100);
     }
   });
   type GroupedItem<T extends Treatment | PrescriptionTemplate | TreatmentOption> =
