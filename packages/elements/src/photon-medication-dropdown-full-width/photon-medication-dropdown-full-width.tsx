@@ -256,23 +256,6 @@ export const PhotonMedicationDropdownFullWidth = <
           {props.required ? <p class="pl-1 text-red-400">*</p> : null}
           {props.optional ? <p class="text-gray-400 text-xs pl-2 font-sans">Optional</p> : null}
         </div>
-        {/* <sl-dropdown
-          ref={dropdownRef}
-          class="dropdown relative"
-          open={true}
-          hoist
-          distance={props.forceLabelSize && !props.invalid ? -20 : props.invalid ? -18 : 0}
-          disabled={props.disabled ?? false}
-          on:sl-hide={async () => {
-            if (!selected()) {
-              inputRef.value = '';
-              if (props.onHide) {
-                await props.onHide();
-              }
-            }
-          }}
-          style={{ width: '100%' }}
-        > */}
         <sl-input
           value={props.searchText}
           ref={inputRef}
@@ -280,7 +263,7 @@ export const PhotonMedicationDropdownFullWidth = <
           placeholder={props.placeholder}
           clearable
           autocomplete="off"
-          // disabled={props.disabled ?? false}
+          disabled={props.disabled ?? false}
           size="medium"
           style={{
             'padding-left': '20px',
@@ -295,16 +278,10 @@ export const PhotonMedicationDropdownFullWidth = <
             disabled: props.disabled ?? false,
             placeholder: !selected() && inputRef.value === ''
           }}
-          // required={props.required}
+          required={props.required}
           on:input={(e: any) => {
             debounceSearch(e.target.value);
           }}
-          // on:sl-focus={() => {
-          //   dropdownRef.children[1].style.width = `${inputRef.clientWidth}px`;
-          //   if (selectedIndex() > 0) {
-          //     rowVirtualizer().scrollToIndex(selectedIndex());
-          //   }
-          // }}
           on:sl-clear={() => {
             setSelected(undefined);
             setSelectedIndex(-1);
@@ -354,82 +331,66 @@ export const PhotonMedicationDropdownFullWidth = <
             </div>
           </Show>
         </sl-input>
-        <div class={`border border-gray-200 overflow-hidden relative mt-3`}>
+
           <div
-            ref={overlayRef}
-            class="bg-white overflow-x-hidden overflow-y-auto relative"
             style={{
-              'max-height': '85vh',
-              'min-height': '37px',
-              width: '100%',
-              display: 'flex',
-              'flex-direction': 'column',
-              'justify-content': 'start'
+              width: '100%'
             }}
+            class="flex-1"
+            ref={listRef}
           >
-            <div
-              style={{
-                height: `${rowVirtualizer().getTotalSize()}px`,
-                width: '100%'
-              }}
-              ref={listRef}
+            <For
+              each={rowVirtualizer().getVirtualItems()}
+              fallback={<EmptyEl noDataMsg={props.noDataMsg} isLoading={props.isLoading} />}
             >
-              <For
-                each={rowVirtualizer().getVirtualItems()}
-                fallback={<EmptyEl noDataMsg={props.noDataMsg} isLoading={props.isLoading} />}
-              >
-                {(vr) => {
-                  const isLoaderRow = vr.index > allItems().length - 1;
-                  const datum = allItems()[vr.index];
+              {(vr) => {
+                const isLoaderRow = vr.index > allItems().length - 1;
+                const datum = allItems()[vr.index];
 
-                  const selectedValue = selected();
-                  const isSelected =
-                    !isLoaderRow &&
-                    !!selectedValue &&
-                    'id' in selectedValue &&
-                    'data' in datum &&
-                    selectedValue.id === datum.data.id;
+                const selectedValue = selected();
+                const isSelected =
+                  !isLoaderRow &&
+                  !!selectedValue &&
+                  'id' in selectedValue &&
+                  'data' in datum &&
+                  selectedValue.id === datum.data.id;
 
-                  const ComponentToRender = 'title' in datum ? GroupLabelEl : ItemEl;
-                  const componentProps =
-                    'title' in datum
-                      ? { item: datum as GroupTitle }
-                      : {
-                          item: vr,
-                          isLoader: isLoaderRow,
-                          isSelected: isSelected,
-                          index: vr.index,
-                          hasMore: props.hasMore,
-                          showOverflow: props.showOverflow,
-                          onClick: () => {
-                            if (!isLoaderRow) {
-                              setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
-                              setSelectedIndex((datum as DataItem<T>).allItemsIdx);
-                              inputRef.value = '';
-                              debounceSearch('');
-                              dispatchSelect((datum as DataItem<T>).data);
+                const ComponentToRender = 'title' in datum ? GroupLabelEl : ItemEl;
+                const componentProps =
+                  'title' in datum
+                    ? { item: datum as GroupTitle }
+                    : {
+                        item: vr,
+                        isLoader: isLoaderRow,
+                        isSelected: isSelected,
+                        index: vr.index,
+                        hasMore: props.hasMore,
+                        showOverflow: props.showOverflow,
+                        onClick: () => {
+                          if (!isLoaderRow) {
+                            setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
+                            setSelectedIndex((datum as DataItem<T>).allItemsIdx);
+                            inputRef.value = '';
+                            debounceSearch('');
+                            dispatchSelect((datum as DataItem<T>).data);
 
-                              if (props.onClose) {
-                                props.onClose();
-                              }
+                            if (props.onClose) {
+                              props.onClose();
                             }
                           }
-                        };
+                        }
+                      };
 
-                  return (
-                    <Dynamic component={ComponentToRender} {...componentProps}>
-                      {'data' in datum && props.displayAccessor((datum as DataItem<T>).data, true)}
-                    </Dynamic>
-                  );
-                }}
-              </For>
-            </div>
+                return (
+                  <Dynamic component={ComponentToRender} {...componentProps}>
+                    {'data' in datum && props.displayAccessor((datum as DataItem<T>).data, true)}
+                  </Dynamic>
+                );
+              }}
+            </For>
           </div>
         </div>
-        {/* </sl-dropdown> */}
       </div>
-    </div>
-  );
 };
 
 const EmptyEl = (props: { isLoading: boolean; noDataMsg?: string }) => {
@@ -477,7 +438,6 @@ const ItemEl = (props: {
       }}
       onClick={() => props.onClick()}
       style={{
-        width: '100%',
         'min-height': `${props.item.size}px`
       }}
     >
