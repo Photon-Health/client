@@ -177,7 +177,7 @@ export const PhotonMedicationDropdownFullWidth = <
         // inputRef.focus();
         // inputRef.click();
         setTimeout(() => {
-          inputRef.click(); // Simulate a user click
+          // inputRef.click(); // Simulate a user click
           inputRef.focus(); // Trigger focus after the click
         }, 300);
         // });
