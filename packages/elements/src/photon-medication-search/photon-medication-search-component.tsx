@@ -189,7 +189,7 @@ function getGroupsConfig(props: ComponentProps) {
         !(t.__typename === 'TreatmentOption')
     },
     {
-      label: 'All Templates',
+      label: 'All Treatments',
       filter: (t: { id: string; __typename?: string } | undefined) =>
         t && typeof t === 'object' && !('treatment' in t) && t.__typename === 'TreatmentOption'
     }
