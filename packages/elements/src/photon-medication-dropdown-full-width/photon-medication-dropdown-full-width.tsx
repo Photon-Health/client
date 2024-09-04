@@ -80,7 +80,7 @@ export const PhotonMedicationDropdownFullWidth = <
 }) => {
   //refs
   let ref: any;
-  let dropdownRef: any;
+  // let dropdownRef: any;
   let listRef: HTMLDivElement | undefined;
   let inputRef: any;
   let overlayRef: HTMLDivElement | undefined;
@@ -107,7 +107,7 @@ export const PhotonMedicationDropdownFullWidth = <
 
   createEffect(() => {
     if (props.open) {
-      dropdownRef?.show();
+      // dropdownRef?.show();
       handleDropdownShow();
     }
   });
@@ -176,12 +176,12 @@ export const PhotonMedicationDropdownFullWidth = <
 
       // const event = new Event('touchend', { bubbles: true, cancelable: true });
       // inputRef.dispatchEvent(event); // Dispatch a touch event
-      // setTimeout(() => {
-      //   inputRef.focus(); // Focus input after the touch event
-      // }, 100);
-      requestAnimationFrame(() => {
+      setTimeout(() => {
         inputRef.focus(); // Focus input after the touch event
-      });
+      }, 100);
+      // requestAnimationFrame(() => {
+      //   inputRef.focus(); // Focus input after the touch event
+      // });
     }
   });
   type GroupedItem<T extends Treatment | PrescriptionTemplate | TreatmentOption> =
@@ -256,7 +256,7 @@ export const PhotonMedicationDropdownFullWidth = <
           {props.required ? <p class="pl-1 text-red-400">*</p> : null}
           {props.optional ? <p class="text-gray-400 text-xs pl-2 font-sans">Optional</p> : null}
         </div>
-        <sl-dropdown
+        {/* <sl-dropdown
           ref={dropdownRef}
           class="dropdown relative"
           open={true}
@@ -272,162 +272,161 @@ export const PhotonMedicationDropdownFullWidth = <
             }
           }}
           style={{ width: '100%' }}
+        > */}
+        <sl-input
+          value={props.searchText}
+          ref={inputRef}
+          slot="trigger"
+          placeholder={props.placeholder}
+          clearable
+          autocomplete="off"
+          // disabled={props.disabled ?? false}
+          size="medium"
+          style={{
+            'padding-left': '20px',
+            'padding-right': '20px',
+            'border-radius': '0px',
+            border: '0px'
+          }}
+          classList={{
+            'treatment-search': true,
+            invalid: props.invalid ?? false,
+            input: true,
+            disabled: props.disabled ?? false,
+            placeholder: !selected() && inputRef.value === ''
+          }}
+          // required={props.required}
+          on:input={(e: any) => {
+            debounceSearch(e.target.value);
+          }}
+          // on:sl-focus={() => {
+          //   dropdownRef.children[1].style.width = `${inputRef.clientWidth}px`;
+          //   if (selectedIndex() > 0) {
+          //     rowVirtualizer().scrollToIndex(selectedIndex());
+          //   }
+          // }}
+          on:sl-clear={() => {
+            setSelected(undefined);
+            setSelectedIndex(-1);
+            inputRef.value = '';
+            debounceSearch('');
+            dispatchDeselect();
+          }}
         >
-          <sl-input
-            value={props.searchText}
-            ref={inputRef}
-            slot="trigger"
-            placeholder={props.placeholder}
-            clearable
-            autocomplete="off"
-            // disabled={props.disabled ?? false}
-            size="medium"
-            style={{
-              'padding-left': '20px',
-              'padding-right': '20px',
-              'border-radius': '0px',
-              border: '0px'
-            }}
+          <p
+            slot="help-text"
+            class="text-red-400 pt-1 font-sans"
             classList={{
-              'treatment-search': true,
-              invalid: props.invalid ?? false,
-              input: true,
-              disabled: props.disabled ?? false,
-              placeholder: !selected() && inputRef.value === ''
-            }}
-            // required={props.required}
-            on:input={(e: any) => {
-              debounceSearch(e.target.value);
-            }}
-            on:sl-focus={() => {
-              dropdownRef.children[1].style.width = `${inputRef.clientWidth}px`;
-              if (selectedIndex() > 0) {
-                rowVirtualizer().scrollToIndex(selectedIndex());
-              }
-            }}
-            on:sl-clear={() => {
-              setSelected(undefined);
-              setSelectedIndex(-1);
-              inputRef.value = '';
-              debounceSearch('');
-              dispatchDeselect();
+              'h-[21px]': props.forceLabelSize
             }}
           >
-            <p
-              slot="help-text"
-              class="text-red-400 pt-1 font-sans"
-              classList={{
-                'h-[21px]': props.forceLabelSize
-              }}
-            >
-              {showHelpText(props.invalid ?? false)}
-            </p>
+            {showHelpText(props.invalid ?? false)}
+          </p>
+          <div
+            slot="suffix"
+            classList={{
+              flex: true,
+              hidden: !props.isLoading
+            }}
+          >
+            <sl-spinner slot="suffix" />
+          </div>
+          <Show when={props.clearable}>
             <div
               slot="suffix"
               classList={{
                 flex: true,
-                hidden: !props.isLoading
+                hidden: props.isLoading || selected() == undefined
               }}
             >
-              <sl-spinner slot="suffix" />
+              <sl-icon
+                class="text-gray-400 hover:text-gray-600"
+                name={'x-circle-fill'}
+                on:click={(e: any) => {
+                  e.stopImmediatePropagation();
+                  setSelected(undefined);
+                  setSelectedIndex(-1);
+                  inputRef.value = '';
+                  debounceSearch('');
+                  dispatchDeselect();
+                }}
+              />
             </div>
-            <Show when={props.clearable}>
-              <div
-                slot="suffix"
-                classList={{
-                  flex: true,
-                  hidden: props.isLoading || selected() == undefined
-                }}
-              >
-                <sl-icon
-                  class="text-gray-400 hover:text-gray-600"
-                  name={'x-circle-fill'}
-                  on:click={(e: any) => {
-                    e.stopImmediatePropagation();
-                    setSelected(undefined);
-                    setSelectedIndex(-1);
-                    inputRef.value = '';
-                    debounceSearch('');
-                    dispatchDeselect();
-                  }}
-                />
-              </div>
-            </Show>
-          </sl-input>
-          <div class={`border border-gray-200 overflow-hidden relative mt-3`}>
+          </Show>
+        </sl-input>
+        <div class={`border border-gray-200 overflow-hidden relative mt-3`}>
+          <div
+            ref={overlayRef}
+            class="bg-white overflow-x-hidden overflow-y-auto relative"
+            style={{
+              'max-height': '85vh',
+              'min-height': '37px',
+              width: '100%',
+              display: 'flex',
+              'flex-direction': 'column',
+              'justify-content': 'start'
+            }}
+          >
             <div
-              ref={overlayRef}
-              class="bg-white overflow-x-hidden overflow-y-auto relative"
               style={{
-                'max-height': '85vh',
-                'min-height': '37px',
-                width: '100%',
-                display: 'flex',
-                'flex-direction': 'column',
-                'justify-content': 'start'
+                height: `${rowVirtualizer().getTotalSize()}px`,
+                width: '100%'
               }}
+              ref={listRef}
             >
-              <div
-                style={{
-                  height: `${rowVirtualizer().getTotalSize()}px`,
-                  width: '100%'
-                }}
-                ref={listRef}
+              <For
+                each={rowVirtualizer().getVirtualItems()}
+                fallback={<EmptyEl noDataMsg={props.noDataMsg} isLoading={props.isLoading} />}
               >
-                <For
-                  each={rowVirtualizer().getVirtualItems()}
-                  fallback={<EmptyEl noDataMsg={props.noDataMsg} isLoading={props.isLoading} />}
-                >
-                  {(vr) => {
-                    const isLoaderRow = vr.index > allItems().length - 1;
-                    const datum = allItems()[vr.index];
+                {(vr) => {
+                  const isLoaderRow = vr.index > allItems().length - 1;
+                  const datum = allItems()[vr.index];
 
-                    const selectedValue = selected();
-                    const isSelected =
-                      !isLoaderRow &&
-                      !!selectedValue &&
-                      'id' in selectedValue &&
-                      'data' in datum &&
-                      selectedValue.id === datum.data.id;
+                  const selectedValue = selected();
+                  const isSelected =
+                    !isLoaderRow &&
+                    !!selectedValue &&
+                    'id' in selectedValue &&
+                    'data' in datum &&
+                    selectedValue.id === datum.data.id;
 
-                    const ComponentToRender = 'title' in datum ? GroupLabelEl : ItemEl;
-                    const componentProps =
-                      'title' in datum
-                        ? { item: datum as GroupTitle }
-                        : {
-                            item: vr,
-                            isLoader: isLoaderRow,
-                            isSelected: isSelected,
-                            index: vr.index,
-                            hasMore: props.hasMore,
-                            showOverflow: props.showOverflow,
-                            onClick: () => {
-                              if (!isLoaderRow) {
-                                setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
-                                setSelectedIndex((datum as DataItem<T>).allItemsIdx);
-                                inputRef.value = '';
-                                debounceSearch('');
-                                dispatchSelect((datum as DataItem<T>).data);
+                  const ComponentToRender = 'title' in datum ? GroupLabelEl : ItemEl;
+                  const componentProps =
+                    'title' in datum
+                      ? { item: datum as GroupTitle }
+                      : {
+                          item: vr,
+                          isLoader: isLoaderRow,
+                          isSelected: isSelected,
+                          index: vr.index,
+                          hasMore: props.hasMore,
+                          showOverflow: props.showOverflow,
+                          onClick: () => {
+                            if (!isLoaderRow) {
+                              setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
+                              setSelectedIndex((datum as DataItem<T>).allItemsIdx);
+                              inputRef.value = '';
+                              debounceSearch('');
+                              dispatchSelect((datum as DataItem<T>).data);
 
-                                if (props.onClose) {
-                                  props.onClose();
-                                }
+                              if (props.onClose) {
+                                props.onClose();
                               }
                             }
-                          };
+                          }
+                        };
 
-                    return (
-                      <Dynamic component={ComponentToRender} {...componentProps}>
-                        {'data' in datum &&
-                          props.displayAccessor((datum as DataItem<T>).data, true)}
-                      </Dynamic>
-                    );
-                  }}
-                </For>
-              </div>
+                  return (
+                    <Dynamic component={ComponentToRender} {...componentProps}>
+                      {'data' in datum && props.displayAccessor((datum as DataItem<T>).data, true)}
+                    </Dynamic>
+                  );
+                }}
+              </For>
             </div>
           </div>
-        </sl-dropdown>
+        </div>
+        {/* </sl-dropdown> */}
       </div>
     </div>
   );
