@@ -57,7 +57,6 @@ export const PhotonMedicationDropdownFullWidth = <
   onHide?: () => void;
   isLoading: boolean;
   hasMore: boolean;
-  noDataMsg?: string;
   helpText?: string;
   fetchMore?: () => void;
   selectedData?: T | undefined;
@@ -81,7 +80,6 @@ export const PhotonMedicationDropdownFullWidth = <
   if (props.actionRef) {
     props.actionRef['clear'] = () => {
       setSelected(undefined);
-      setSelectedIndex(-1);
       inputRef.value = '';
       debounceSearch('');
       dispatchDeselect();
@@ -90,7 +88,6 @@ export const PhotonMedicationDropdownFullWidth = <
 
   //signals
   const [selected, setSelected] = createSignal<T | undefined>(undefined);
-  const [selectedIndex, setSelectedIndex] = createSignal(-1);
 
   const debounceSearch = debounce(async (s: string) => {
     if (props.onSearchChange) {
@@ -252,7 +249,6 @@ export const PhotonMedicationDropdownFullWidth = <
           }}
           on:sl-clear={() => {
             setSelected(undefined);
-            setSelectedIndex(-1);
             inputRef.value = '';
             debounceSearch('');
             dispatchDeselect();
@@ -290,7 +286,6 @@ export const PhotonMedicationDropdownFullWidth = <
                 on:click={(e: any) => {
                   e.stopImmediatePropagation();
                   setSelected(undefined);
-                  setSelectedIndex(-1);
                   inputRef.value = '';
                   debounceSearch('');
                   dispatchDeselect();
@@ -302,7 +297,7 @@ export const PhotonMedicationDropdownFullWidth = <
         <div class="w-full flex-1" ref={listRef}>
           <For
             each={rowVirtualizer().getVirtualItems()}
-            fallback={<EmptyEl noDataMsg={props.noDataMsg} isLoading={props.isLoading} />}
+            fallback={<EmptyEl isLoading={props.isLoading} />}
           >
             {(vr) => {
               const isLoaderRow = vr.index > allItems().length - 1;
@@ -330,7 +325,6 @@ export const PhotonMedicationDropdownFullWidth = <
                       onClick: () => {
                         if (!isLoaderRow) {
                           setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
-                          setSelectedIndex((datum as DataItem<T>).allItemsIdx);
                           inputRef.value = '';
                           debounceSearch('');
                           dispatchSelect((datum as DataItem<T>).data);
@@ -359,10 +353,14 @@ const EmptyEl = (props: { isLoading: boolean; noDataMsg?: string }) => {
   return (
     <Show
       when={props.isLoading}
-      fallback={<sl-menu-item>{props.noDataMsg ? props.noDataMsg : 'No data found'}</sl-menu-item>}
+      fallback={
+        <sl-menu-item>
+          <p class="text-gray-400">No treatments found</p>
+        </sl-menu-item>
+      }
     >
       <sl-menu-item>
-        <p class="text-center text-gray-400 italic">Loading...</p>
+        <p class="text-gray-400">Loading...</p>
       </sl-menu-item>
     </Show>
   );

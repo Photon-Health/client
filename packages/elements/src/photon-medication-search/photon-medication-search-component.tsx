@@ -216,6 +216,7 @@ const Component = (props: ComponentProps) => {
   const { store, actions } = CatalogStore;
   const [searchText, setSearchText] = createSignal<string>('');
   const [treatmentOptions, setTreatmentOptions] = createSignal<TreatmentOption[]>([]);
+  const [loadingTreatmentOptions, setLoadingTreatmentOptions] = createSignal<boolean>(false);
   const [enableFullWidthMedicationSearch, setEnableFullWidthMedicationSearch] =
     createSignal<boolean>(false);
 
@@ -224,8 +225,10 @@ const Component = (props: ComponentProps) => {
   });
 
   const debouncedLoadTreatmentOptions = debounce(async (searchTerm: string) => {
+    setLoadingTreatmentOptions(true);
     const options = await loadTreatmentOptions(client!.sdk.apolloClinical, searchTerm);
     setTreatmentOptions(options);
+    setLoadingTreatmentOptions(false);
   }, 500);
 
   createMemo(() => {
@@ -275,7 +278,7 @@ const Component = (props: ComponentProps) => {
           required={props.required ?? false}
           placeholder="Type medication"
           invalid={props.invalid ?? false}
-          isLoading={store.catalogs.isLoading}
+          isLoading={store.catalogs.isLoading || loadingTreatmentOptions()}
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
           displayAccessor={displayAccessor}
