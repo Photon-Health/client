@@ -164,6 +164,8 @@ export const PhotonMedicationDropdownFullWidth = <
     }
   });
 
+  let hiddenInputRef: HTMLInputElement;
+
   onMount(() => {
     if (inputRef) {
       inputRef.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -173,23 +175,23 @@ export const PhotonMedicationDropdownFullWidth = <
       });
 
       if (props.open) {
-        // requestAnimationFrame(() => {
-        // inputRef.focus();
-        // inputRef.click();
-        setTimeout(() => {
-          // inputRef.click(); // Simulate a user click
-          inputRef.focus(); // Trigger focus after the click
-        }, 300);
-        const event = new Event('touchend', {
-          bubbles: true,
-          cancelable: true
-        });
+        hiddenInputRef = document.createElement('input');
+        hiddenInputRef.type = 'text';
+        hiddenInputRef.style.position = 'absolute';
+        hiddenInputRef.style.opacity = '0';
+        hiddenInputRef.style.height = '0';
+        hiddenInputRef.style.width = '0';
+        hiddenInputRef.style.pointerEvents = 'none';
+        document.body.appendChild(hiddenInputRef);
 
+        // Focus the hidden input briefly, then focus the actual input
         setTimeout(() => {
-          inputRef.dispatchEvent(event); // Simulate touch event
-          inputRef.focus(); // Programmatically focus
+          hiddenInputRef.focus();
+          setTimeout(() => {
+            hiddenInputRef.blur(); // Blur the hidden input
+            inputRef.focus(); // Focus the visible input
+          }, 100); // Short delay before focusing the visible input
         }, 300);
-        // });
       }
     }
   });
