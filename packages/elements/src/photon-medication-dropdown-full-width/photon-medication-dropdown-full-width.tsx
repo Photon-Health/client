@@ -230,8 +230,6 @@ export const PhotonMedicationDropdownFullWidth = <
           disabled={props.disabled ?? false}
           size="medium"
           style={{
-            'padding-left': '20px',
-            'padding-right': '20px',
             'border-radius': '0px',
             border: '0px'
           }}
@@ -241,7 +239,8 @@ export const PhotonMedicationDropdownFullWidth = <
             input: true,
             disabled: props.disabled ?? false,
             placeholder: !selected() && inputRef.value === '',
-            'mb-2': true
+            'mb-2': true,
+            'px-4': true
           }}
           required={props.required}
           on:input={(e: any) => {
