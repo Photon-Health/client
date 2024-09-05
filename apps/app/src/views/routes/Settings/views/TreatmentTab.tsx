@@ -192,7 +192,7 @@ export const TreatmentTab = ({
           </ModalBody>
         </ModalContent>
       </Modal>
-      <Text width="full" fontWeight="medium" fontSize="l">
+      <Text width="full" fontWeight="medium" fontSize="lg">
         Manage {organization ? `${organization.name}'s ` : ''}Catalog
       </Text>
       {error && (
