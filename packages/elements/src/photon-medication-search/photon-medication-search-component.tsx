@@ -1,7 +1,6 @@
 // Solid
 import { customElement } from 'solid-element';
-import { createEffect, createSignal, onMount, Show } from 'solid-js';
-import { debounce } from '@solid-primitives/scheduled';
+import { createSignal, onMount, Show } from 'solid-js';
 
 // Photon
 import { usePhoton } from '../context';
@@ -237,7 +236,7 @@ const Component = (props: ComponentProps) => {
     }
   });
 
-  const debouncedLoadTreatmentOptions = debounce(async (searchTerm: string) => {
+  const tryLoadTreatmentOptions = async (searchTerm: string) => {
     setLoadingTreatmentOptions(true);
 
     const treatmentOptions = searchTerm
@@ -248,11 +247,7 @@ const Component = (props: ComponentProps) => {
     setOptions(filteredData);
 
     setLoadingTreatmentOptions(false);
-  }, 250);
-
-  createEffect(() => {
-    debouncedLoadTreatmentOptions(searchText());
-  });
+  };
 
   const displayAccessor = (
     t: Treatment | PrescriptionTemplate | TreatmentOption,
@@ -301,7 +296,10 @@ const Component = (props: ComponentProps) => {
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
           displayAccessor={displayAccessor}
           searchText={searchText()}
-          onSearchChange={(s: string) => setSearchText(s)}
+          onSearchChange={(s: string) => {
+            setSearchText(s);
+            tryLoadTreatmentOptions(s);
+          }}
           onHide={() => setSearchText('')}
           helpText={props.helpText}
           open={showFullWidthSearch()}
@@ -355,7 +353,10 @@ const Component = (props: ComponentProps) => {
           displayAccessor={displayAccessor}
           searchText={searchText()}
           setSearchText={setSearchText}
-          onSearchChange={(s: string) => setSearchText(s)}
+          onSearchChange={(s: string) => {
+            setSearchText(s);
+            tryLoadTreatmentOptions(s);
+          }}
           onHide={() => setSearchText('')}
           helpText={props.helpText}
           onInputFocus={() => {
