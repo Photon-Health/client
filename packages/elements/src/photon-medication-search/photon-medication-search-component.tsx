@@ -1,6 +1,6 @@
 // Solid
 import { customElement } from 'solid-element';
-import { createMemo, createSignal, onMount, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, onMount, Show } from 'solid-js';
 import { debounce } from '@solid-primitives/scheduled';
 
 // Photon
@@ -88,26 +88,32 @@ function getFilteredData(
 ): (Treatment | PrescriptionTemplate | TreatmentOption)[] {
   const { store } = CatalogStore;
 
-  if (store.catalogs.data.length === 0) return [];
+  // If no data, return empty array
+  if (store.catalogs.data.length === 0 && treatmentOptions.length === 0) return [];
 
   const catalogData = [
     ...(props.offCatalogOption ? [props.offCatalogOption as Treatment] : []),
-    ...store.catalogs.data[0].templates.map((x) => x as PrescriptionTemplate),
-    ...store.catalogs.data[0].treatments.map((x) => x as Treatment),
+    ...(store.catalogs.data.length > 0
+      ? store.catalogs.data[0].templates.map((x) => x as PrescriptionTemplate)
+      : []),
+    ...(store.catalogs.data.length > 0
+      ? store.catalogs.data[0].treatments.map((x) => x as Treatment)
+      : []),
     ...treatmentOptions
   ];
 
-  const searchTextLowerCase = searchText.toLowerCase();
-  if (searchTextLowerCase.length === 0) return catalogData;
+  const searchTerms = searchText.toLowerCase().split(/\s+/); // Split search text by whitespace into individual words
 
-  return catalogData.filter((x) => {
-    if ('treatment' in x) {
-      return (
-        x.treatment.name.toLowerCase().includes(searchTextLowerCase) ||
-        x.name?.toLowerCase().includes(searchTextLowerCase)
-      );
-    }
-    return x.name.toLowerCase().includes(searchTextLowerCase);
+  // If no search text is provided, return all catalog data and treatment options
+  if (searchTerms.length === 0) return catalogData;
+
+  // Filter the catalog data and treatment options based on the search text
+  return catalogData.filter((item) => {
+    const itemName =
+      'treatment' in item ? item.treatment.name.toLowerCase() : item.name.toLowerCase();
+
+    // Ensure every search term is found in the item name
+    return searchTerms.every((term) => itemName.includes(term));
   });
 }
 
@@ -215,27 +221,29 @@ const Component = (props: ComponentProps) => {
   const client = usePhoton();
   const { store, actions } = CatalogStore;
   const [searchText, setSearchText] = createSignal<string>('');
-  const [treatmentOptions, setTreatmentOptions] = createSignal<TreatmentOption[]>([]);
+  const [options, setOptions] = createSignal<any[]>([]);
   const [loadingTreatmentOptions, setLoadingTreatmentOptions] = createSignal<boolean>(false);
   const [showFullWidthSearch, setShowFullWidthSearch] = createSignal<boolean>(false);
 
   onMount(async () => {
     await actions.getCatalogs(client!.getSDK());
+
+    // Once the catalogs are fetched and available, populate the initial options
+    if (store.catalogs.data.length > 0) {
+      setOptions(getFilteredData(props, searchText(), []));
+    }
   });
 
   const debouncedLoadTreatmentOptions = debounce(async (searchTerm: string) => {
     setLoadingTreatmentOptions(true);
-    const options = await loadTreatmentOptions(client!.sdk.apolloClinical, searchTerm);
-    setTreatmentOptions(options);
+    const treatmentOptions = await loadTreatmentOptions(client!.sdk.apolloClinical, searchTerm);
+    const filteredData = getFilteredData(props, searchText(), treatmentOptions);
+    setOptions(filteredData);
     setLoadingTreatmentOptions(false);
-  }, 500);
+  }, 250);
 
-  createMemo(() => {
+  createEffect(() => {
     debouncedLoadTreatmentOptions(searchText());
-  });
-
-  const data = createMemo(() => {
-    return getFilteredData(props, searchText(), treatmentOptions());
   });
 
   const displayAccessor = (
@@ -270,7 +278,7 @@ const Component = (props: ComponentProps) => {
       {/* Full size search */}
       <Show when={showFullWidthSearch()}>
         <PhotonMedicationDropdownFullWidth
-          data={data()}
+          data={options()}
           groups={getGroupsConfig(props)}
           label={props.label}
           disabled={props.disabled}
@@ -295,7 +303,7 @@ const Component = (props: ComponentProps) => {
       {/* Dummy input that is primarily used here to open the full size flavor */}
       <Show when={isMobile && !showFullWidthSearch()}>
         <PhotonDropdown
-          data={data()}
+          data={options()}
           groups={getGroupsConfig(props)}
           label={props.label}
           disabled={props.disabled}
@@ -323,7 +331,7 @@ const Component = (props: ComponentProps) => {
       {/* Inline search */}
       <Show when={!isMobile}>
         <PhotonMedicationDropdown
-          data={data()}
+          data={options()}
           groups={getGroupsConfig(props)}
           label={props.label}
           disabled={props.disabled}
