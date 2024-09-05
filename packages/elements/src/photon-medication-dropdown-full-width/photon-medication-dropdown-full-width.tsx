@@ -397,9 +397,6 @@ const ItemEl = (props: {
         'treatment-option': true
       }}
       onClick={() => props.onClick()}
-      style={{
-        'min-height': `${props.item.size}px`
-      }}
     >
       {props.isLoader ? (
         props.hasMore ? (
