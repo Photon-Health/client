@@ -2,7 +2,6 @@ import { useMutation } from '@apollo/client';
 import {
   Alert,
   AlertIcon,
-  Box,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -194,11 +193,9 @@ export const TreatmentTab = ({
         </ModalContent>
       </Modal>
 
-      <Box width="full">
-        <Text width="full" fontWeight="medium" fontSize="l">
-          Manage {organization ? `${organization.name}'s ` : ''}Catalog
-        </Text>
-      </Box>
+      <Text width="full" fontWeight="medium" fontSize="l">
+        Manage {organization ? `${organization.name}'s ` : ''}Catalog
+      </Text>
 
       {error && (
         <Alert status="error" rounded="lg">
