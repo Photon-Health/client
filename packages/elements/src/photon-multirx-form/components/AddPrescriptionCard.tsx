@@ -240,6 +240,12 @@ export const AddPrescriptionCard = (props: {
                   });
                 }
               }}
+              on:photon-treatment-unselected={() => {
+                clearForm(
+                  props.actions,
+                  props?.prefillNotes ? { notes: props.prefillNotes } : undefined
+                );
+              }}
             />
           ) : (
             <photon-treatment-select

@@ -23,7 +23,7 @@ import gql from 'graphql-tag';
 
 // Utility Functions
 
-function triggerCustomEvent(ref: any, eventName: string, detail: any) {
+function triggerCustomEvent(ref: any, eventName: string, detail?: any) {
   const event = new CustomEvent(eventName, {
     composed: true,
     bubbles: true,
@@ -34,10 +34,13 @@ function triggerCustomEvent(ref: any, eventName: string, detail: any) {
 
 function dispatchTreatmentSelected(
   ref: any,
-  datum: Treatment | PrescriptionTemplate,
+  datum: Treatment | PrescriptionTemplate | TreatmentOption,
   catalogId: string
 ) {
   triggerCustomEvent(ref, 'photon-treatment-selected', { data: datum, catalogId });
+}
+function dispatchTreatmentUnselected(ref: any) {
+  triggerCustomEvent(ref, 'photon-treatment-unselected');
 }
 
 type DataReturn<Type> = {
@@ -276,6 +279,9 @@ const Component = (props: ComponentProps) => {
       ref={ref}
       on:photon-data-selected={(e: any) => {
         dispatchTreatmentSelected(ref, e.detail.data, store.catalogs.data![0]?.id || '');
+      }}
+      on:photon-data-unselected={() => {
+        dispatchTreatmentUnselected(ref);
       }}
     >
       {/* Mobile */}
