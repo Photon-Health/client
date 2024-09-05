@@ -1,7 +1,7 @@
 //Solid
 import { debounce } from '@solid-primitives/scheduled';
 import { Dynamic } from 'solid-js/web';
-import { createEffect, createMemo, createSignal, For, JSXElement, onMount, Show } from 'solid-js';
+import { createMemo, For, JSXElement, onMount, Show } from 'solid-js';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/dropdown/dropdown';
@@ -36,10 +36,6 @@ interface DataItem<T> {
 interface GroupTitle {
   title: string;
 }
-
-// Typescript and solid are annoying
-// eslint-disable-next-line @typescript-eslint/ban-types
-type ThisisNotAFunction<T> = Exclude<T, Function>;
 
 export const PhotonMedicationDropdownFullWidth = <
   T extends Treatment | PrescriptionTemplate | TreatmentOption
@@ -79,28 +75,17 @@ export const PhotonMedicationDropdownFullWidth = <
 
   if (props.actionRef) {
     props.actionRef['clear'] = () => {
-      setSelected(undefined);
       inputRef.value = '';
       debounceSearch('');
       dispatchDeselect();
     };
   }
 
-  //signals
-  const [selected, setSelected] = createSignal<T | undefined>(undefined);
-
   const debounceSearch = debounce(async (s: string) => {
     if (props.onSearchChange) {
       await props.onSearchChange(s);
     }
   }, 250);
-
-  createEffect(() => {
-    if (props.data.length === 0) {
-      // if the source data changes then reset the selected value
-      setSelected(undefined);
-    }
-  });
 
   const showHelpText = (invalid: boolean) => {
     if (invalid) {
@@ -135,17 +120,6 @@ export const PhotonMedicationDropdownFullWidth = <
     });
     ref?.dispatchEvent(event);
   };
-
-  createEffect(() => {
-    if (props.selectedData) {
-      // @ts-ignore
-      setSelected(props.selectedData);
-      dispatchSelect(props.selectedData);
-    }
-    if (props.selectedData === undefined) {
-      setSelected(undefined);
-    }
-  });
 
   onMount(() => {
     if (inputRef) {
@@ -238,7 +212,6 @@ export const PhotonMedicationDropdownFullWidth = <
             invalid: props.invalid ?? false,
             input: true,
             disabled: props.disabled ?? false,
-            placeholder: !selected() && inputRef.value === '',
             'mb-2': true,
             'px-4': true
           }}
@@ -247,7 +220,6 @@ export const PhotonMedicationDropdownFullWidth = <
             debounceSearch(e.target.value);
           }}
           on:sl-clear={() => {
-            setSelected(undefined);
             inputRef.value = '';
             debounceSearch('');
             dispatchDeselect();
@@ -276,7 +248,7 @@ export const PhotonMedicationDropdownFullWidth = <
               slot="suffix"
               classList={{
                 flex: true,
-                hidden: props.isLoading || selected() == undefined
+                hidden: props.isLoading || !props.selectedData
               }}
             >
               <sl-icon
@@ -284,7 +256,7 @@ export const PhotonMedicationDropdownFullWidth = <
                 name={'x-circle-fill'}
                 on:click={(e: any) => {
                   e.stopImmediatePropagation();
-                  setSelected(undefined);
+                  // setSelected(undefined);
                   inputRef.value = '';
                   debounceSearch('');
                   dispatchDeselect();
@@ -302,7 +274,7 @@ export const PhotonMedicationDropdownFullWidth = <
               const isLoaderRow = vr.index > allItems().length - 1;
               const datum = allItems()[vr.index];
 
-              const selectedValue = selected();
+              const selectedValue = props.selectedData;
               const isSelected =
                 !isLoaderRow &&
                 !!selectedValue &&
@@ -323,7 +295,6 @@ export const PhotonMedicationDropdownFullWidth = <
                       showOverflow: props.showOverflow,
                       onClick: () => {
                         if (!isLoaderRow) {
-                          setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
                           inputRef.value = '';
                           debounceSearch('');
                           dispatchSelect((datum as DataItem<T>).data);
