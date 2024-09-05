@@ -236,9 +236,14 @@ const Component = (props: ComponentProps) => {
 
   const debouncedLoadTreatmentOptions = debounce(async (searchTerm: string) => {
     setLoadingTreatmentOptions(true);
-    const treatmentOptions = await loadTreatmentOptions(client!.sdk.apolloClinical, searchTerm);
+
+    const treatmentOptions = searchTerm
+      ? await loadTreatmentOptions(client!.sdk.apolloClinical, searchTerm)
+      : // Set treatment options to empty array if search term is empty
+        [];
     const filteredData = getFilteredData(props, searchText(), treatmentOptions);
     setOptions(filteredData);
+
     setLoadingTreatmentOptions(false);
   }, 250);
 
