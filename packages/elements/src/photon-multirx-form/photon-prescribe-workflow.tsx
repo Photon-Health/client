@@ -327,7 +327,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           dispatchPrescriptionsError(errors);
           return;
         }
+
         dispatchPrescriptionsCreated(prescriptionData!.createPrescriptions);
+
         if (props.enableOrder) {
           if (
             props.formStore.updatePreferredPharmacy?.value &&
