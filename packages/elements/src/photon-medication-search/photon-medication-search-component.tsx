@@ -1,6 +1,6 @@
 // Solid
 import { customElement } from 'solid-element';
-import { createEffect, createMemo, createSignal, onMount, Show } from 'solid-js';
+import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import { debounce } from '@solid-primitives/scheduled';
 
 // Photon
