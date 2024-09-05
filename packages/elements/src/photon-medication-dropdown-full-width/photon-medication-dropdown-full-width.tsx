@@ -256,7 +256,6 @@ export const PhotonMedicationDropdownFullWidth = <
                 name={'x-circle-fill'}
                 on:click={(e: any) => {
                   e.stopImmediatePropagation();
-                  // setSelected(undefined);
                   inputRef.value = '';
                   debounceSearch('');
                   dispatchDeselect();
@@ -324,12 +323,12 @@ const EmptyEl = (props: { isLoading: boolean; noDataMsg?: string }) => {
     <Show
       when={props.isLoading}
       fallback={
-        <div>
+        <div class="px-4">
           <p class="text-gray-400">No treatments found</p>
         </div>
       }
     >
-      <div>
+      <div class="px-4">
         <p class="text-gray-400">Loading...</p>
       </div>
     </Show>
