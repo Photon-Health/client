@@ -18,7 +18,6 @@ export const SplitLayout = (props: any) => {
         width={isMobileAndTablet ? '100%' : 'full'}
         alignSelf={isMobileAndTablet ? 'center' : 'flex-start'}
         mt={2}
-        px={isMobileAndTablet ? 4 : 0}
       >
         {children[0]}
       </Box>
