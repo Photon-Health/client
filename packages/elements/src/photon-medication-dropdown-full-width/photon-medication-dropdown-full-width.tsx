@@ -354,21 +354,21 @@ const EmptyEl = (props: { isLoading: boolean; noDataMsg?: string }) => {
     <Show
       when={props.isLoading}
       fallback={
-        <sl-menu-item>
+        <div>
           <p class="text-gray-400">No treatments found</p>
-        </sl-menu-item>
+        </div>
       }
     >
-      <sl-menu-item>
+      <div>
         <p class="text-gray-400">Loading...</p>
-      </sl-menu-item>
+      </div>
     </Show>
   );
 };
 
 const GroupLabelEl = (props: { item: GroupTitle }) => (
-  <sl-menu-item
-    class="group uppercase"
+  <div
+    class="group uppercase px-4"
     style={{
       // fix the group headers on scroll
       position: 'sticky',
@@ -377,7 +377,7 @@ const GroupLabelEl = (props: { item: GroupTitle }) => (
     }}
   >
     {props.item.title}
-  </sl-menu-item>
+  </div>
 );
 
 const ItemEl = (props: {
@@ -391,9 +391,10 @@ const ItemEl = (props: {
   children: JSXElement;
 }) => {
   return (
-    <sl-menu-item
+    <div
       classList={{
-        selected: props.isSelected,
+        'bg-blue-500': props.isSelected,
+        'text-white': props.isSelected,
         'treatment-option': true
       }}
       onClick={() => props.onClick()}
@@ -408,8 +409,8 @@ const ItemEl = (props: {
           <p class="text-center text-gray-400 italic px-3">Nothing more to load</p>
         )
       ) : (
-        <div class="px-3">{props.children}</div>
+        <div class="px-4 py-1">{props.children}</div>
       )}
-    </sl-menu-item>
+    </div>
   );
 };
