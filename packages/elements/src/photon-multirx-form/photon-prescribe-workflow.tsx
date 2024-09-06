@@ -41,9 +41,9 @@ import { checkHasPermission } from '../utils';
 
 const newMedSearchTesters = [
   // actual testers
-  'Tim Porter', // Modern Pediatrics
-  'Rishi Khakhkhar', // Counsel
-  'Kristen Borchetta', // Blueberry Pediatrics
+  // 'Tim Porter', // Modern Pediatrics
+  // 'Rishi Khakhkhar', // Counsel
+  // 'Kristen Borchetta', // Blueberry Pediatrics
   // hooligans
   'Josh Knapp',
   'Michael Rochlin',
