@@ -119,10 +119,24 @@ function getFilteredData(
   });
 }
 
+// Bolds the matching substring in the input string
 const boldSubstring = (inputString: string, substring: string) => {
-  const substrings = substring.split(' ').filter((part: string) => part.length > 0);
+  // Escape special characters in the substring
+  const escapeRegExp = (string: string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  };
+
+  // Escape the substring and split it into parts
+  const escapedSubstring = escapeRegExp(substring);
+  const substrings = escapedSubstring.split(' ').filter((part: string) => part.length > 0);
+
+  // Create the regular expression with the escaped substrings
   const regex = new RegExp(`(${substrings.join('|')})`, 'gi');
+
+  // Split the input string based on the regex
   const parts = inputString.split(regex);
+
+  // Map through the parts and bold matching substrings
   return parts.map((part) => {
     if (substrings.some((sub: string) => sub.toLowerCase() === part?.toLowerCase())) {
       return <strong class="font-extrabold">{part}</strong>;
