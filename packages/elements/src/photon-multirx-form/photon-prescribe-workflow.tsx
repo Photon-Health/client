@@ -45,7 +45,7 @@ const newMedSearchTesters = [
   'Rishi Khakhkhar', // Counsel
   'Kristen Borchetta', // Blueberry Pediatrics
   // hooligans
-  // 'Josh Knapp',
+  'Josh Knapp',
   'Michael Rochlin',
   'Jomi Cubol',
   'Sam Kotlove',
