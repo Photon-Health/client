@@ -49,6 +49,7 @@ export const AddPrescriptionCard = (props: {
   weightUnit?: string;
   prefillNotes?: string;
   enableCombineAndDuplicate?: boolean;
+  enableNewMedicationSearch?: boolean;
 }) => {
   const client = usePhoton();
   const [medDialogOpen, setMedDialogOpen] = createSignal(false);
@@ -56,6 +57,8 @@ export const AddPrescriptionCard = (props: {
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
   const [, recentOrdersActions] = useRecentOrders();
+  const [searchText, setSearchText] = createSignal<string>('');
+
   let ref: any;
 
   onMount(() => {
@@ -178,6 +181,8 @@ export const AddPrescriptionCard = (props: {
 
       // otherwise add it to the draft prescriptions list
       addDraftPrescription();
+
+      setSearchText('');
     } else {
       triggerToast({
         status: 'error',
@@ -212,30 +217,68 @@ export const AddPrescriptionCard = (props: {
             });
           }}
         >
-          <photon-treatment-select
-            label="Search Treatment Catalog"
-            selected={props.store.treatment?.value ?? undefined}
-            invalid={props.store.treatment?.error ?? false}
-            help-text={props.store.treatment?.error}
-            off-catalog-option={offCatalog()}
-            on:photon-treatment-selected={(e: any) => {
-              if (e.detail.data.__typename === 'PrescriptionTemplate') {
-                repopulateForm(props.actions, {
-                  ...e.detail.data,
-                  notes: [e.detail.data?.notes, props.prefillNotes].filter((x) => x).join('\n\n')
-                });
-              } else {
+          {props.enableNewMedicationSearch ? (
+            <photon-medication-search
+              label="Search for Treatment"
+              selected={props.store.treatment?.value ?? undefined}
+              invalid={props.store.treatment?.error ?? false}
+              help-text={props.store.treatment?.error}
+              off-catalog-option={offCatalog()}
+              search-text={searchText()}
+              on:photon-treatment-selected={(e: any) => {
+                if (e.detail.data.__typename === 'PrescriptionTemplate') {
+                  repopulateForm(props.actions, {
+                    ...e.detail.data,
+                    notes: [e.detail.data?.notes, props.prefillNotes].filter((x) => x).join('\n\n')
+                  });
+                } else {
+                  props.actions.updateFormValue({
+                    key: 'treatment',
+                    value: e.detail.data
+                  });
+                }
+
+                if (e.detail.catalogId) {
+                  props.actions.updateFormValue({
+                    key: 'catalogId',
+                    value: e.detail.catalogId
+                  });
+                }
+              }}
+              on:photon-treatment-unselected={() => {
+                clearForm(
+                  props.actions,
+                  props?.prefillNotes ? { notes: props.prefillNotes } : undefined
+                );
+              }}
+              on:photon-search-text-changed={(e: any) => setSearchText(e.detail.text)}
+            />
+          ) : (
+            <photon-treatment-select
+              label="Search Treatment Catalog"
+              selected={props.store.treatment?.value ?? undefined}
+              invalid={props.store.treatment?.error ?? false}
+              help-text={props.store.treatment?.error}
+              off-catalog-option={offCatalog()}
+              on:photon-treatment-selected={(e: any) => {
+                if (e.detail.data.__typename === 'PrescriptionTemplate') {
+                  repopulateForm(props.actions, {
+                    ...e.detail.data,
+                    notes: [e.detail.data?.notes, props.prefillNotes].filter((x) => x).join('\n\n')
+                  });
+                } else {
+                  props.actions.updateFormValue({
+                    key: 'treatment',
+                    value: e.detail.data
+                  });
+                }
                 props.actions.updateFormValue({
-                  key: 'treatment',
-                  value: e.detail.data
+                  key: 'catalogId',
+                  value: e.detail.catalogId
                 });
-              }
-              props.actions.updateFormValue({
-                key: 'catalogId',
-                value: e.detail.catalogId
-              });
-            }}
-          />
+              }}
+            />
+          )}
           <div class="flex flex-col sm:flex-none sm:grid sm:grid-cols-2 sm:gap-4">
             <div class="order-last sm:order-first">
               <photon-checkbox
@@ -251,7 +294,7 @@ export const AddPrescriptionCard = (props: {
                   })
                 }
               />
-              <photon-med-search-dialog
+              <photon-advanced-medication-search-dialog
                 title="Advanced Medication Search"
                 open={medDialogOpen()}
                 on:photon-medication-closed={() => setMedDialogOpen(false)}
