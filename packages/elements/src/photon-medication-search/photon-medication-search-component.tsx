@@ -1,6 +1,6 @@
 // Solid
 import { customElement } from 'solid-element';
-import { createSignal, onMount, Show } from 'solid-js';
+import { createEffect, createSignal, onMount, Show } from 'solid-js';
 
 // Photon
 import { usePhoton } from '../context';
@@ -247,6 +247,13 @@ const Component = (props: ComponentProps) => {
     // Once the catalogs are fetched and available, populate the initial options
     if (store.catalogs.data.length > 0) {
       setOptions(getFilteredData(props, searchText(), []));
+    }
+  });
+
+  createEffect(() => {
+    // Clear search text when draft is added
+    if (!props.selected) {
+      setSearchText('');
     }
   });
 
