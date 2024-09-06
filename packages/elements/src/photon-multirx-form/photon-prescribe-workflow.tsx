@@ -39,23 +39,24 @@ import clearForm from './util/clearForm';
 import { formatPatientWeight } from './util/formatPatientWeight';
 import { checkHasPermission } from '../utils';
 
-const newMedSearchTesters = [
-  // actual testers
-  // 'Tim Porter', // Modern Pediatrics
-  // 'Rishi Khakhkhar', // Counsel
-  // 'Kristen Borchetta', // Blueberry Pediatrics
-  // hooligans
-  'Josh Knapp',
-  'Michael Rochlin',
-  'Jomi Cubol',
-  'Sam Kotlove',
-  'Jason Whittle',
-  'Rita Bulman',
-  'Michael Rado',
-  'Otto Sipe',
-  'Paul Christophe',
-  'Bill Killoran'
-];
+// Not using this just yet
+// const newMedSearchTesters = [
+//   // actual testers
+//   // 'Tim Porter', // Modern Pediatrics
+//   // 'Rishi Khakhkhar', // Counsel
+//   // 'Kristen Borchetta', // Blueberry Pediatrics
+//   // hooligans
+//   'Josh Knapp',
+//   'Michael Rochlin',
+//   'Jomi Cubol',
+//   'Sam Kotlove',
+//   'Jason Whittle',
+//   'Rita Bulman',
+//   'Michael Rado',
+//   'Otto Sipe',
+//   'Paul Christophe',
+//   'Bill Killoran'
+// ];
 
 export type Address = {
   city: string;
