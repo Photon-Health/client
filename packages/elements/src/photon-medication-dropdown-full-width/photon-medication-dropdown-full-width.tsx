@@ -85,7 +85,7 @@ export const PhotonMedicationDropdownFullWidth = <
     if (props.onSearchChange) {
       await props.onSearchChange(s);
     }
-  }, 250);
+  }, 500);
 
   const showHelpText = (invalid: boolean) => {
     if (invalid) {

@@ -41,6 +41,9 @@ function dispatchTreatmentSelected(
 function dispatchTreatmentUnselected(ref: any) {
   triggerCustomEvent(ref, 'photon-treatment-unselected');
 }
+function dispatchSearchTextChanged(ref: any, searchText: string) {
+  triggerCustomEvent(ref, 'photon-search-text-changed', { text: searchText });
+}
 
 type DataReturn<Type> = {
   data?: Type;
@@ -230,30 +233,24 @@ interface ComponentProps {
   formName?: string;
   selected?: Treatment | PrescriptionTemplate | TreatmentOption;
   offCatalogOption?: Medication;
+  searchText: string;
 }
 
 const Component = (props: ComponentProps) => {
   let ref: any;
   const client = usePhoton();
   const { store, actions } = CatalogStore;
-  const [searchText, setSearchText] = createSignal<string>('');
   const [options, setOptions] = createSignal<any[]>([]);
   const [loadingTreatmentOptions, setLoadingTreatmentOptions] = createSignal<boolean>(false);
   const [showFullWidthSearch, setShowFullWidthSearch] = createSignal<boolean>(false);
 
   onMount(async () => {
     await actions.getCatalogs(client!.getSDK());
-
-    // Once the catalogs are fetched and available, populate the initial options
-    if (store.catalogs.data.length > 0) {
-      setOptions(getFilteredData(props, searchText(), []));
-    }
   });
 
   createEffect(() => {
-    // Clear search text when draft is added
-    if (!props.selected) {
-      setSearchText('');
+    if (store.catalogs.data.length > 0) {
+      tryLoadTreatmentOptions(props.searchText);
     }
   });
 
@@ -264,7 +261,7 @@ const Component = (props: ComponentProps) => {
       ? await loadTreatmentOptions(client!.sdk.apolloClinical, searchTerm)
       : // Set treatment options to empty array if search term is empty
         [];
-    const filteredData = getFilteredData(props, searchText(), treatmentOptions);
+    const filteredData = getFilteredData(props, props.searchText, treatmentOptions);
     setOptions(filteredData);
 
     setLoadingTreatmentOptions(false);
@@ -278,13 +275,13 @@ const Component = (props: ComponentProps) => {
       return displayPrescriptionTemplate(
         t as PrescriptionTemplate,
         showFormattedMedicationName,
-        searchText()
+        props.searchText
       );
     }
     return displayTreatment(
       t as Treatment | TreatmentOption,
       showFormattedMedicationName,
-      searchText()
+      props.searchText
     );
   };
 
@@ -295,9 +292,16 @@ const Component = (props: ComponentProps) => {
       ref={ref}
       on:photon-data-selected={(e: any) => {
         dispatchTreatmentSelected(ref, e.detail.data, store.catalogs.data![0]?.id || '');
+
+        if ('treatment' in e.detail.data) {
+          dispatchSearchTextChanged(ref, e.detail.data.treatment.name);
+        } else {
+          dispatchSearchTextChanged(ref, e.detail.data.name);
+        }
       }}
       on:photon-data-unselected={() => {
         dispatchTreatmentUnselected(ref);
+        dispatchSearchTextChanged(ref, '');
       }}
     >
       {/* Mobile */}
@@ -316,17 +320,16 @@ const Component = (props: ComponentProps) => {
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
           displayAccessor={displayAccessor}
-          searchText={searchText()}
+          searchText={props.searchText}
           onSearchChange={(s: string) => {
-            setSearchText(s);
-            tryLoadTreatmentOptions(s);
+            dispatchSearchTextChanged(ref, s);
           }}
-          onHide={() => setSearchText('')}
+          onHide={() => dispatchSearchTextChanged(ref, '')}
           helpText={props.helpText}
           open={showFullWidthSearch()}
           onClose={() => {
             setShowFullWidthSearch(false);
-            setSearchText('');
+            dispatchSearchTextChanged(ref, '');
           }}
         />
       </Show>
@@ -344,13 +347,13 @@ const Component = (props: ComponentProps) => {
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
           displayAccessor={displayAccessor}
-          onSearchChange={(s: string) => setSearchText(s)}
-          onHide={() => setSearchText('')}
+          onSearchChange={(s: string) => dispatchSearchTextChanged(ref, s)}
+          onHide={() => dispatchSearchTextChanged(ref, '')}
           helpText={props.helpText}
           onInputFocus={() => {
             setShowFullWidthSearch(true);
             if (props.selected?.name) {
-              setSearchText(props.selected.name);
+              dispatchSearchTextChanged(ref, props.selected.name);
             }
           }}
         />
@@ -372,17 +375,15 @@ const Component = (props: ComponentProps) => {
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
           displayAccessor={displayAccessor}
-          searchText={searchText()}
-          setSearchText={setSearchText}
+          searchText={props.searchText}
           onSearchChange={(s: string) => {
-            setSearchText(s);
-            tryLoadTreatmentOptions(s);
+            dispatchSearchTextChanged(ref, s);
           }}
-          onHide={() => setSearchText('')}
+          onHide={() => dispatchSearchTextChanged(ref, '')}
           helpText={props.helpText}
           onInputFocus={() => {
             if (props.selected?.name) {
-              setSearchText(props.selected.name);
+              dispatchSearchTextChanged(ref, props.selected.name);
             }
           }}
         />
@@ -404,7 +405,8 @@ customElement(
     disabled: false,
     formName: undefined,
     selected: undefined,
-    offCatalogOption: undefined
+    offCatalogOption: undefined,
+    searchText: ''
   },
   Component
 );

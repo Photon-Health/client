@@ -77,7 +77,6 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
   clearable?: boolean;
   actionRef?: any;
   searchText: string;
-  setSearchText: (s: string) => void;
   onInputFocus?: () => void;
 }) => {
   //refs
@@ -397,11 +396,6 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
                               setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
                               setSelectedIndex((datum as DataItem<T>).allItemsIdx);
 
-                              if ('treatment' in (datum as DataItem<any>).data) {
-                                props.setSearchText((datum as DataItem<any>).data.treatment.name);
-                              } else {
-                                props.setSearchText((datum as DataItem<any>).data.name);
-                              }
                               dispatchSelect((datum as DataItem<T>).data);
                               dropdownRef.hide();
                             }

@@ -57,6 +57,8 @@ export const AddPrescriptionCard = (props: {
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
   const [, recentOrdersActions] = useRecentOrders();
+  const [searchText, setSearchText] = createSignal<string>('');
+
   let ref: any;
 
   onMount(() => {
@@ -179,6 +181,8 @@ export const AddPrescriptionCard = (props: {
 
       // otherwise add it to the draft prescriptions list
       addDraftPrescription();
+
+      setSearchText('');
     } else {
       triggerToast({
         status: 'error',
@@ -220,6 +224,7 @@ export const AddPrescriptionCard = (props: {
               invalid={props.store.treatment?.error ?? false}
               help-text={props.store.treatment?.error}
               off-catalog-option={offCatalog()}
+              search-text={searchText()}
               on:photon-treatment-selected={(e: any) => {
                 if (e.detail.data.__typename === 'PrescriptionTemplate') {
                   repopulateForm(props.actions, {
@@ -246,6 +251,7 @@ export const AddPrescriptionCard = (props: {
                   props?.prefillNotes ? { notes: props.prefillNotes } : undefined
                 );
               }}
+              on:photon-search-text-changed={(e: any) => setSearchText(e.detail.text)}
             />
           ) : (
             <photon-treatment-select
