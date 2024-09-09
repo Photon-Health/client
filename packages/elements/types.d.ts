@@ -41,8 +41,9 @@ declare module 'solid-js' {
       'sl-radio': unknown;
       'photon-radio-card': unknown;
       'photon-radio-group': unknown;
-      'photon-med-search': unknown;
-      'photon-med-search-dialog': unknown;
+      'photon-medication-search': unknown;
+      'photon-advanced-medication-search': unknown;
+      'photon-advanced-medication-search-dialog': unknown;
       'photon-multirx-form': unknown;
     }
   }

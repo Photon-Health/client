@@ -39,6 +39,24 @@ import clearForm from './util/clearForm';
 import { formatPatientWeight } from './util/formatPatientWeight';
 import { checkHasPermission } from '../utils';
 
+const newMedSearchTesters = [
+  // actual testers
+  'Tim Porter', // Modern Pediatrics
+  'Rishi Khakhkhar', // Counsel
+  'Kristen Borchetta', // Blueberry Pediatrics
+  // hooligans
+  'Josh Knapp',
+  'Michael Rochlin',
+  'Jomi Cubol',
+  'Sam Kotlove',
+  'Jason Whittle',
+  'Rita Bulman',
+  'Michael Rado',
+  'Otto Sipe',
+  'Paul Christophe',
+  'Bill Killoran'
+];
+
 export type Address = {
   city: string;
   postalCode: string;
@@ -90,6 +108,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const [authenticated, setAuthenticated] = createSignal<boolean>(
     client?.authentication.state.isAuthenticated || false
   );
+  const [enableNewMedicationSearch, setEnableNewMedicationSearch] = createSignal<boolean>(false);
   const [, recentOrdersActions] = useRecentOrders();
 
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
@@ -132,6 +151,14 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   });
   createEffect(() => {
     setAuthenticated(client?.authentication.state.isAuthenticated || false);
+  });
+  createEffect(() => {
+    if (authenticated()) {
+      const enableNewMedicationSearch = newMedSearchTesters.includes(
+        client?.authentication.state.user?.name
+      );
+      setEnableNewMedicationSearch(enableNewMedicationSearch);
+    }
   });
 
   const hasPrescribePermission = createMemo(() =>
@@ -301,7 +328,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           dispatchPrescriptionsError(errors);
           return;
         }
+
         dispatchPrescriptionsCreated(prescriptionData!.createPrescriptions);
+
         if (props.enableOrder) {
           if (
             props.formStore.updatePreferredPharmacy?.value &&
@@ -454,6 +483,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       weightUnit={props.weightUnit}
                       prefillNotes={prefillNotes}
                       enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+                      enableNewMedicationSearch={enableNewMedicationSearch()}
                     />
                   </div>
                 </Show>
