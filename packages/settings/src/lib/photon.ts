@@ -269,8 +269,6 @@ const organizationSettings: {
     logo: 'sesame_logo.jpg',
     accentColor: '#5224C7',
     topRankedCostco: true,
-    mailOrderNavigate: true,
-    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
   },
   // DrTelx
   org_6DKb7celAunAoLzb: {
