@@ -177,7 +177,7 @@ export const text = {
   setLoc: 'Set location',
   setSearchLoc: 'Set search location',
   shipTo: (deliveryAddress: string) => `Ship to ${deliveryAddress}`,
-  showingLabel: 'Showing pharmacies near:',
+  showingLabel: 'Showing pharmacies near',
   showingAll: 'Showing all pharmacies',
   showMore: 'Show more pharmacies',
   thankYou: 'Thank you!',

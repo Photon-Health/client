@@ -3,12 +3,12 @@ import {
   HStack,
   IconButton,
   Image,
+  Spacer,
   Tag,
   TagLabel,
   TagLeftIcon,
   Text,
-  VStack,
-  Spacer
+  VStack
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
