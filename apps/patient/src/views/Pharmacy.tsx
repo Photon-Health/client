@@ -92,6 +92,9 @@ export const Pharmacy = () => {
   // loading state
   const isLoading = loadingLocation || loadingPharmacies;
 
+  // sorting
+  const [sortBy, setSortBy] = useState<'price' | 'distance'>('price');
+
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
     openNow !== null ? !!openNow : order?.readyBy === 'Urgent'
@@ -101,7 +104,7 @@ export const Pharmacy = () => {
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
 
-  const isMultiRx = flattenedFills.length > 1;
+  // const isMultiRx = flattenedFills.length > 1;
 
   // Pharmacy results
   const [topRankedPharmacies, setTopRankedPharmacies] = useState<EnrichedPharmacy[]>([]);
@@ -142,9 +145,9 @@ export const Pharmacy = () => {
 
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
-  const subheading = isReroute
-    ? t.sendToNew(isMultiRx, order.pharmacy!.name)
-    : t.sendToSelected(isMultiRx);
+  // const subheading = isReroute
+  //   ? t.sendToNew(isMultiRx, order.pharmacy!.name)
+  //   : t.sendToSelected(isMultiRx);
 
   const showToastWarning = () =>
     toast({
@@ -615,7 +618,7 @@ export const Pharmacy = () => {
               <Heading as="h3" size="lg">
                 {heading}
               </Heading>
-              <Text>{subheading}</Text>
+              {/* <Text>{subheading}</Text> */}
             </VStack>
 
             <HStack justify="space-between" w="full">
@@ -626,7 +629,7 @@ export const Pharmacy = () => {
                     onClick={() => setLocationModalOpen(true)}
                     display="inline"
                     color="link"
-                    fontWeight="medium"
+                    fontWeight="semibold"
                     size="sm"
                     data-dd-privacy="mask"
                     cursor={isDemo ? 'default' : 'auto'}
@@ -641,6 +644,54 @@ export const Pharmacy = () => {
                 </Button>
               )}
             </HStack>
+            <HStack>
+              <Text whiteSpace="nowrap">Sort by</Text>
+              <HStack w="full">
+                <Button
+                  w="50%"
+                  size="lg"
+                  isActive={sortBy === 'price'}
+                  _active={{
+                    backgroundColor: 'brand.500',
+                    color: 'white',
+                    borderColor: 'brand.500'
+                  }}
+                  border="2px"
+                  borderColor="gray.100"
+                  backgroundColor="white"
+                  onClick={() => setSortBy('price')}
+                  borderRadius="xl"
+                >
+                  Cash Price
+                </Button>
+                <Button
+                  w="50%"
+                  size="lg"
+                  isActive={sortBy === 'distance'}
+                  _active={{
+                    backgroundColor: 'brand.500',
+                    color: 'white',
+                    borderColor: 'brand.500'
+                  }}
+                  border="2px"
+                  borderColor="gray.100"
+                  backgroundColor="white"
+                  onClick={() => setSortBy('distance')}
+                  borderRadius="xl"
+                >
+                  Distance
+                </Button>
+              </HStack>
+            </HStack>
+            <Box p={3} bgColor={'blue.50'} borderRadius="lg">
+              <Text>
+                The displayed price is a coupon for the selected pharmacy.{' '}
+                <b>This is NOT insurance.</b>{' '}
+                <Link textDecoration="underline" textUnderlineOffset="2px" color="blue.500">
+                  Learn more.
+                </Link>
+              </Text>
+            </Box>
           </VStack>
         </Container>
       </Box>

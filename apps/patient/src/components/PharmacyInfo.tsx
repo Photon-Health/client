@@ -1,5 +1,15 @@
 import { useLocation } from 'react-router-dom';
-import { Box, HStack, Tag, TagLabel, TagLeftIcon, Text, VStack, Image } from '@chakra-ui/react';
+import {
+  Box,
+  HStack,
+  Tag,
+  TagLabel,
+  TagLeftIcon,
+  Text,
+  VStack,
+  Image,
+  Spacer
+} from '@chakra-ui/react';
 import { FiStar } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -140,22 +150,22 @@ export const PharmacyInfo = ({
         </HStack>
       ) : null}
       <HStack w="full">
-        <HStack>
-          {pharmacy?.logo && !whiteLabelDeliveryPharmacy ? (
-            <Box boxSize="32px" overflow="hidden">
-              <Image
-                src={pharmacy.logo}
-                width="auto"
-                height="32px"
-                boxSize="100%"
-                objectFit="contain"
-              />
-            </Box>
-          ) : null}
-          <Text fontSize="md" fontWeight={boldPharmacyName ? 'bold' : 'medium'}>
-            {whiteLabelDeliveryPharmacy ? 'Free Express Delivery' : pharmacy.name}
-          </Text>
-        </HStack>
+        {pharmacy?.logo && !whiteLabelDeliveryPharmacy ? (
+          <Box boxSize="32px" overflow="hidden">
+            <Image
+              src={pharmacy.logo}
+              width="auto"
+              height="32px"
+              boxSize="100%"
+              objectFit="contain"
+            />
+          </Box>
+        ) : null}
+        <Text fontSize="md" fontWeight={boldPharmacyName ? 'bold' : 'medium'}>
+          {whiteLabelDeliveryPharmacy ? 'Free Express Delivery' : pharmacy.name}
+        </Text>
+        <Spacer />
+        <Text fontWeight="bold">$9.50</Text>
       </HStack>
       {showDetails ? (
         <VStack direction={isStatus ? 'column-reverse' : 'column'} spacing={1}>
