@@ -257,10 +257,11 @@ const Component = (props: ComponentProps) => {
   const tryLoadTreatmentOptions = async (searchTerm: string) => {
     setLoadingTreatmentOptions(true);
 
-    const treatmentOptions = searchTerm
-      ? await loadTreatmentOptions(client!.sdk.apolloClinical, searchTerm)
-      : // Set treatment options to empty array if search term is empty
-        [];
+    const treatmentOptions =
+      searchTerm?.length >= 3 // 3 min chars for smaller responses
+        ? await loadTreatmentOptions(client!.sdk.apolloClinical, searchTerm)
+        : // Set treatment options to empty array if search term is empty
+          [];
     const filteredData = getFilteredData(props, props.searchText, treatmentOptions);
     setOptions(filteredData);
 
