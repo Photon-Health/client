@@ -1,3 +1,4 @@
+import EventEmitter from 'eventemitter3';
 import { Auth0Client, Auth0ClientOptions } from '@auth0/auth0-spa-js';
 import {
   ApolloClient,
@@ -48,7 +49,7 @@ export interface PhotonClientOptions {
   developmentMode?: boolean;
 }
 
-export class PhotonClient {
+export class PhotonClient extends EventEmitter {
   public organization?: string;
 
   private audience?: string;
@@ -114,6 +115,7 @@ export class PhotonClient {
     }: PhotonClientOptions,
     elementsVersion?: string
   ) {
+    super();
     this.audience = audience ? audience : lambdasApiUrl[env];
     this.uri = uri ? uri : `${lambdasApiUrl[env]}/graphql`;
     this.clinicalUrl = uri ? getClinicalUrl(uri) : clinicalAppUrl[env];
@@ -249,6 +251,9 @@ export class PhotonClient {
       authentication: this.auth0Client,
       organization: organizationId,
       audience: this.audience
+    });
+    this.authentication.on('error', ({ error, method }: { error: Error; method: string }) => {
+      this.emit('photon-auth-error', { error, method });
     });
     return this;
   }

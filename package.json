@@ -114,6 +114,7 @@
     "chakra-react-select": "^4.7.6",
     "dayjs": "^1.11.7",
     "dob-to-age": "^1.0.0",
+    "eventemitter3": "^5.0.1",
     "formik": "^2.2.9",
     "framer-motion": "^11.0.20",
     "git-revision-webpack-plugin": "^5.0.0",

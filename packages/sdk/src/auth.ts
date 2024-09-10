@@ -1,3 +1,4 @@
+import { EventEmitter } from 'eventemitter3';
 import {
   Auth0Client,
   LogoutOptions as Auth0LogoutOptions,
@@ -57,7 +58,7 @@ export interface GetAccessTokenOptions {
 /**
  * Contains various methods for authentication (Auth0)
  */
-export class AuthManager {
+export class AuthManager extends EventEmitter {
   private authentication: Auth0Client;
 
   private organization?: string;
@@ -76,10 +77,15 @@ export class AuthManager {
     audience = 'https://api.photon.health',
     connection
   }: AuthManagerOptions) {
+    super();
     this.authentication = authentication;
     this.organization = organization;
     this.audience = audience;
     this.connection = connection;
+  }
+
+  private emitError(method: string, error: Error) {
+    this.emit('error', { method, error });
   }
 
   /**
@@ -152,8 +158,10 @@ export class AuthManager {
     }
     if (!token) {
       await this.authentication.loginWithRedirect(opts);
+      const error = new Error('Failed to obtain access token.');
+      this.emitError('getAccessToken', error);
       if (throwIfFailure) {
-        throw new Error(); // Needed just because this needs to resolve to something
+        throw error;
       } else {
         // Retry once
         return await this._getAccessToken({ audience }, true);
@@ -219,7 +227,7 @@ export class AuthManager {
     try {
       return this.authentication.handleRedirectCallback(url);
     } catch (err) {
-      console.error(err);
+      this.emitError('handleRedirect', err as Error);
     }
   }
 

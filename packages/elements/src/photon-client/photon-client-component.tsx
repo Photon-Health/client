@@ -30,7 +30,7 @@ type PhotonClientProps = {
 const version = pkg?.version ?? 'unknown';
 
 const Component = (props: PhotonClientProps) => {
-  let ref: any;
+  let ref: HTMLDivElement | undefined;
 
   const baseRedirectURI = props.redirectUri ? props.redirectUri : window.location.origin;
   // In order to distinguish our requests from a potential other Auth0 instance on the same domain
@@ -64,6 +64,15 @@ const Component = (props: PhotonClientProps) => {
     await store()?.authentication.handleRedirect();
     if (props.redirectPath) window.location.replace(props.redirectPath);
   };
+
+  sdk.on('photon-auth-error', ({ error, method }: { error: Error; method: string }) => {
+    const event = new CustomEvent('photon-auth-error', {
+      detail: { method, error },
+      bubbles: true,
+      composed: true
+    });
+    ref?.dispatchEvent(event);
+  });
 
   const checkSession = async () => {
     await store()?.authentication.checkSession();
