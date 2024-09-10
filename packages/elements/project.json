@@ -40,7 +40,8 @@
       "options": {
         "cwd": "packages/elements",
         "command": "npx tsc --noEmit"
-      }
+      },
+      "dependsOn": ["^build"]
     }
   }
 }
