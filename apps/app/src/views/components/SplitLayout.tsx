@@ -10,15 +10,14 @@ export const SplitLayout = (props: any) => {
     <Stack
       flexDir={isMobileAndTablet ? 'column' : 'row'}
       gap={5}
-      width="95vw"
+      width="100%"
       maxW="1400"
       justify="center"
     >
       <Box
-        width={isMobileAndTablet ? '100vw' : 'full'}
+        width={isMobileAndTablet ? '100%' : 'full'}
         alignSelf={isMobileAndTablet ? 'center' : 'flex-start'}
-        pt={2}
-        px={isMobileAndTablet ? 4 : 0}
+        mt={2}
       >
         {children[0]}
       </Box>
@@ -29,6 +28,7 @@ export const SplitLayout = (props: any) => {
           shadow="md"
           minW="400px"
           alignSelf={isMobileAndTablet ? 'center' : 'flex-start'}
+          mt={2}
           p={6}
         >
           {children[1]}

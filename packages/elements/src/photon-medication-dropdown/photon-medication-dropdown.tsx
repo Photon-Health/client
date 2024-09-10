@@ -9,8 +9,7 @@ import {
   Match,
   onMount,
   Show,
-  Switch,
-  Accessor
+  Switch
 } from 'solid-js';
 
 //Shoelace
@@ -30,10 +29,11 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import tailwind from '../tailwind.css?inline';
 import styles from './style.css?inline';
 
+// Types
+import { Treatment, PrescriptionTemplate, TreatmentOption } from '@photonhealth/sdk/dist/types';
+
 //Virtual List
 import { createVirtualizer, VirtualItem } from '@tanstack/solid-virtual';
-
-type Item<T = any> = DataItem<T> | GroupTitle;
 
 interface DataItem<T> {
   data: T;
@@ -50,8 +50,8 @@ interface GroupTitle {
 // eslint-disable-next-line @typescript-eslint/ban-types
 type ThisisNotAFunction<T> = Exclude<T, Function>;
 
-export const PhotonDropdown = <T extends { id: string }>(props: {
-  data: Array<T>;
+export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
+  data: Array<Treatment | PrescriptionTemplate | TreatmentOption>;
   label?: string;
   required: boolean;
   placeholder?: string;
@@ -76,6 +76,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   optional?: boolean;
   clearable?: boolean;
   actionRef?: any;
+  searchText: string;
   onInputFocus?: () => void;
 }) => {
   //refs
@@ -183,21 +184,14 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
     }
   });
 
-  const placeholder = createMemo(() => {
-    const selectedValue = selected();
-    return selectedValue
-      ? props.displayAccessor(selectedValue, false)
-      : props.placeholder ?? 'Select data...';
-  });
-
   // Title and group items as one flat array
-  const allItems: Accessor<Item<T>[]> = createMemo(() =>
+  const allItems: any = createMemo(() =>
     props.groups
       ? props.groups
           .map((g) => {
             const data = props.data
               .map((d, idx) => ({ data: d, allItemsIdx: idx }))
-              .filter((d) => g.filter(d.data));
+              .filter((d: any) => g.filter(d.data));
             return data.length > 0 ? [{ title: g.label }, ...data] : [];
           })
           .flat()
@@ -219,6 +213,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
       <style>{shoelaceDarkStyles}</style>
       <style>{shoelaceLightStyles}</style>
       <style>{styles}</style>
+
       {props.label ? (
         <div class="flex items-center pb-2">
           <p class="text-gray-700 text-sm font-sans">{props.label}</p>
@@ -251,8 +246,10 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
       >
         <sl-input
           ref={inputRef}
+          value={props.searchText}
+          clearable
           slot="trigger"
-          placeholder={placeholder()}
+          placeholder={props.placeholder ?? undefined}
           autocomplete="off"
           disabled={props.disabled ?? false}
           size="medium"
@@ -279,6 +276,13 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                 rowVirtualizer().scrollToIndex(selectedIndex());
               }
             }
+          }}
+          on:sl-clear={() => {
+            setSelected(undefined);
+            setSelectedIndex(-1);
+            inputRef.value = '';
+            debounceSearch('');
+            dispatchDeselect();
           }}
         >
           <p
@@ -332,12 +336,18 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             <sl-icon name={open() ? 'chevron-up' : 'chevron-down'} />
           </div>
         </sl-input>
-        <div class="border border-gray-200 dropdown-container overflow-hidden relative">
+        <div
+          class="border border-gray-200 dropdown-container overflow-hidden relative"
+          // TODO: Fix this. This is not ideal, but since it's only used on desktop
+          // it works for now. I was unable to get to the root of why this dropdown
+          // keeps exceeding container width.s
+          style={{ width: '518px' }}
+        >
           <div
             ref={overlayRef}
             class="bg-white overflow-x-hidden overflow-y-auto relative"
             style={{
-              'max-height': '200px',
+              'max-height': '500px',
               'min-height': '37px',
               width: '100%',
               display: 'flex',
@@ -385,8 +395,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                             if (!isLoaderRow) {
                               setSelected((datum as DataItem<T>).data as ThisisNotAFunction<T>);
                               setSelectedIndex((datum as DataItem<T>).allItemsIdx);
-                              inputRef.value = '';
-                              debounceSearch('');
+
                               dispatchSelect((datum as DataItem<T>).data);
                               dropdownRef.hide();
                             }
@@ -422,7 +431,7 @@ const EmptyEl = (props: { isLoading: boolean; noDataMsg?: string }) => {
 };
 
 const GroupLabelEl = (props: { item: GroupTitle }) => (
-  <sl-menu-item class="group">{props.item.title}</sl-menu-item>
+  <sl-menu-item class="group uppercase">{props.item.title}</sl-menu-item>
 );
 
 const ItemEl = (props: {
@@ -438,7 +447,10 @@ const ItemEl = (props: {
 }) => {
   return (
     <sl-menu-item
-      class={props.isSelected ? 'selected default' : 'default'}
+      classList={{
+        selected: props.isSelected,
+        'treatment-option': true
+      }}
       onClick={() => props.onClick()}
       ref={(r: Element) => {
         if (props.isLoader && props.index > 0) {
@@ -447,7 +459,8 @@ const ItemEl = (props: {
       }}
       style={{
         width: '100%',
-        'min-height': `${props.item.size}px`
+        'min-height': `${props.item.size}px`,
+        'white-space': 'normal'
       }}
     >
       {props.isLoader ? (
@@ -462,7 +475,9 @@ const ItemEl = (props: {
             'overflow-hidden': !props.showOverflow,
             'overflow-ellipsis': !props.showOverflow,
             'whitespace-nowrap': !props.showOverflow,
-            'whitespace-normal': props.showOverflow
+            'whitespace-normal': props.showOverflow,
+            'break-words': true,
+            'px-3': true
           }}
         >
           {props.children}
