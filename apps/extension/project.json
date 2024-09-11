@@ -1,0 +1,24 @@
+{
+  "name": "extension",
+  "root": "apps/extension",
+  "sourceRoot": "apps/extension",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "targets": {
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/extension",
+        "command": "pnpm dev"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/extension",
+        "command": "pnpm build",
+        "outputs": ["dist/apps/extension"]
+      }
+    }
+  }
+}
