@@ -149,6 +149,11 @@ export class PhotonClient extends EventEmitter {
       ...(connection ? { connection } : {})
     });
 
+    // Add this new code to set up the event listener
+    this.authentication.on('error', ({ error, method }: { error: Error; method: string }) => {
+      this.emit('photon-auth-error', { error, method });
+    });
+
     this.apollo = this.constructApolloClient({ elementsVersion, isServices: false });
     this.apolloClinical = this.constructApolloClient({ elementsVersion, isServices: true });
     this.clinical = new ClinicalQueryManager(this.apollo);
@@ -251,9 +256,6 @@ export class PhotonClient extends EventEmitter {
       authentication: this.auth0Client,
       organization: organizationId,
       audience: this.audience
-    });
-    this.authentication.on('error', ({ error, method }: { error: Error; method: string }) => {
-      this.emit('photon-auth-error', { error, method });
     });
     return this;
   }
