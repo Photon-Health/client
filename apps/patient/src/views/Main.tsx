@@ -1,5 +1,6 @@
 import { Center, ChakraProvider, CircularProgress } from '@chakra-ui/react';
 import { datadogRum } from '@datadog/browser-rum';
+import { types } from '@photonhealth/sdk';
 import { Context, createContext, useCallback, useContext, useEffect, useState } from 'react';
 import {
   Outlet,
@@ -9,17 +10,16 @@ import {
   useSearchParams
 } from 'react-router-dom';
 
+import { getSettings } from '@client/settings';
+
 import { getOrder } from '../api/internal';
+import { AUTH_HEADER_ERRORS } from '../api/internal';
 import { Nav } from '../components';
+import { setAuthHeader } from '../configs/graphqlClient';
+import theme from '../configs/theme';
 import { demoOrder } from '../data/demoOrder';
 import { FillWithCount, countFillsAndRemoveDuplicates } from '../utils/general';
 import { Order } from '../utils/models';
-
-import { getSettings } from '@client/settings';
-import { types } from '@photonhealth/sdk';
-import { AUTH_HEADER_ERRORS } from '../api/internal';
-import { setAuthHeader } from '../configs/graphqlClient';
-import theme from '../configs/theme';
 
 interface OrderContextType {
   order: Order;
@@ -90,6 +90,7 @@ export const Main = () => {
   );
 
   const fetchOrder = useCallback(async () => {
+    console.log('refetch order');
     if (isDemo) return demoOrder;
     try {
       const result: Order = await getOrder(orderId!);

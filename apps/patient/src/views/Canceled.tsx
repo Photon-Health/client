@@ -1,6 +1,7 @@
 import { Box, Container, Heading, Text, VStack } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet';
-import { PrescriptionsList } from '../components/PrescriptionsList';
+
+import { PrescriptionsList } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 

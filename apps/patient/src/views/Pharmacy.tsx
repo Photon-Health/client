@@ -312,13 +312,15 @@ export const Pharmacy = () => {
       enableOpenNow,
       latitude,
       longitude,
-      pageOffset = 0
+      pageOffset = 0,
+      enablePrice = false
     }: {
       enable24Hr: boolean;
       enableOpenNow: boolean;
       latitude: number | undefined;
       longitude: number | undefined;
       pageOffset?: number;
+      enablePrice?: boolean;
     }) => {
       if (latitude == null || longitude == null) {
         return [];
@@ -329,7 +331,8 @@ export const Pharmacy = () => {
         limit: GET_PHARMACIES_COUNT,
         offset: pageOffset,
         isOpenNow: enableOpenNow,
-        is24hr: enable24Hr
+        is24hr: enable24Hr,
+        includePrice: enablePrice
       });
       setPageOffset(pageOffset + res.length);
       return res;

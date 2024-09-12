@@ -2,14 +2,22 @@ import { Link } from '@chakra-ui/react';
 import React from 'react';
 
 export const text = {
+  askForBestPrice: 'Ask your pharmacist to help you find the best possible price.',
+  bin: 'BIN',
   closed: 'Closed',
   closingSoon: 'Closing soon',
   contactSupport: 'Contact Support',
+  couponHelpsPayLess:
+    'The coupon price helps you pay less than the retail price for your prescription. It’s free to use. Just show it to the pharmacist when you pick up your prescription.',
+  couponWithInsurance: 'Can I use this coupon if I have health insurance?',
+  couponVsInsurance:
+    'The price on the coupon may be lower than your health insurance co-pay. It can be used instead of your co-pay and does not apply to your deductible.',
   changePharmacy: 'Change pharmacy',
   daysSupply: 'Days supply',
   delivered: 'Delivered',
   delivery: 'Local Delivery',
   directions: 'Get directions',
+  dismiss: 'Dismiss',
   enterLoc: 'Enter a zipcode or address',
   enterLocLong: "Enter the zipcode or address where you'd like to search for a pharmacy.",
   errorMarkPickedUp: 'Unable to mark order as picked up',
@@ -21,8 +29,11 @@ export const text = {
   getDelivered: 'Get your medication delivered to your door',
   getNearby: 'Get your medication at a nearby pharmacy',
   gettingLoc: 'Getting current location',
+  group: 'Group',
+  howToCoupon: 'How to use this coupon',
   inTransit: 'In transit',
   makePreferred: 'Make this my preferred pharmacy',
+  memberId: 'Member ID',
   next: 'Next',
   noMatch: "We couldn't find what you're looking for.",
   notifyPickUp: (isPlural: boolean) =>
@@ -43,6 +54,7 @@ export const text = {
       isPlural ? 'prescriptions' : 'prescription'
     }.`,
   patient: 'Patient',
+  pcn: 'PCN',
   pickedUp: 'Picked up',
   pickedUpRx: (isPlural: boolean) =>
     `I picked up my ${isPlural ? 'prescriptions' : 'prescription'}`,
@@ -148,7 +160,6 @@ export const text = {
     }.`,
   searchPharmacy: 'Search for a pharmacy',
   selectAPharmacy: 'Select a pharmacy',
-
   selectPharmacy: 'Select pharmacy',
   sendToNew: (isPlural: boolean, originalPharmacyName: string) =>
     `We'll cancel your ${
@@ -175,6 +186,8 @@ export const text = {
   setLoc: 'Set location',
   setSearchLoc: 'Set search location',
   shipTo: (deliveryAddress: string) => `Ship to ${deliveryAddress}`,
+  showThisCoupon: 'Show this coupon at the pharmacy',
+  showCouponToPharmacy: 'Just show it to the pharmacist when you pick up your prescription.',
   showingLabel: 'Showing pharmacies near',
   showingAll: 'Showing all pharmacies',
   showMore: 'Show more pharmacies',
@@ -184,7 +197,8 @@ export const text = {
   tryPhoton: 'Try Photon',
   useLoc: 'Use my current location',
   weSent: (isPlural: boolean) =>
-    `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`
+    `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`,
+  whatIsCouponPrice: 'What is the coupon price?'
 };
 
 export function PhoneLink({ children }: { children?: React.ReactNode }): React.ReactElement {

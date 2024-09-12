@@ -1,23 +1,23 @@
-import { useLocation } from 'react-router-dom';
 import {
   Box,
   HStack,
+  Image,
+  Spacer,
   Tag,
   TagLabel,
   TagLeftIcon,
   Text,
-  VStack,
-  Image,
-  Spacer
+  VStack
 } from '@chakra-ui/react';
-import { FiStar } from 'react-icons/fi';
+import { types } from '@photonhealth/sdk';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { types } from '@photonhealth/sdk';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { text as t } from '../utils/text';
+import { FiStar } from 'react-icons/fi';
+import { useLocation } from 'react-router-dom';
 
 import { formatAddress } from '../utils/general';
+import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { text as t } from '../utils/text';
 
 dayjs.extend(customParseFormat);
 
@@ -169,7 +169,7 @@ export const PharmacyInfo = ({
         {showPrice ? (
           <>
             <Spacer />
-            <Text fontWeight="bold">$9.50</Text>
+            <Text fontWeight="bold">${pharmacy.medicationPrice}</Text>
           </>
         ) : null}
       </HStack>
