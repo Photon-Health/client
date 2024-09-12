@@ -15,6 +15,7 @@ import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
+import { FulfillmentData, OrderSummary } from '../components/order-summary/OrderSummary';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -201,6 +202,24 @@ export const Status = () => {
     navigate(`/pharmacy?${query}`);
   };
 
+  const fulfillments: FulfillmentData[] = flattenedFills.flatMap((f) => [
+    {
+      rxName: f.treatment.name,
+      exceptions: [],
+      pharmacyEstimatedReadyTime: new Date('2024-09-13T20:00:00.000Z'),
+      state: 'PROCESSING'
+    },
+    {
+      rxName: f.treatment.name,
+      exceptions: [
+        { type: 'OOS', message: 'Zepbound is out of stock but will be in soon' },
+        { type: 'PA_REQUIRED', message: 'Zepbound is out of stock but will be in soon' }
+      ],
+      pharmacyEstimatedReadyTime: new Date('2024-09-13T21:00:00.000Z'),
+      state: 'PROCESSING'
+    }
+  ]);
+
   return (
     <Box>
       <DemoCtaModal isOpen={showDemoCtaModal} onClose={() => setShowDemoCtaModal(false)} />
@@ -208,15 +227,18 @@ export const Status = () => {
         <title>{t.track}</title>
       </Helmet>
 
-      <VStack p={4} bg="white" justifyContent={'center'}>
-        <OrderStatusHeader
-          status={'PROCESSING'}
-          pharmacyEstimatedReadyAt={new Date() ?? order.pharmacyEstimatedReadyAt}
-          patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
-          exception={order.pharmacy?.isOpen === false ? 'PHARMACY_CLOSED' : undefined}
-        />
-      </VStack>
+      <VStack spacing={4} width="full" alignItems={'stretch'}>
+        <VStack p={4} bg="white" justifyContent={'center'}>
+          <OrderStatusHeader
+            status={'PROCESSING'}
+            pharmacyEstimatedReadyAt={new Date() ?? order.pharmacyEstimatedReadyAt}
+            patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
+            exception={order.pharmacy?.isOpen === false ? 'PHARMACY_CLOSED' : undefined}
+          />
+        </VStack>
 
+        <OrderSummary fulfillments={fulfillments} onViewDetails={() => void {}} />
+      </VStack>
       <Box>
         <Container className="CONT">
           <VStack spacing={4} align="start" py={5} className="VSTACK">
