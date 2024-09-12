@@ -2,8 +2,8 @@ import {
   Box,
   Button,
   Container,
-  Heading,
   HStack,
+  Heading,
   Icon,
   Link,
   Text,
@@ -16,8 +16,15 @@ import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { FiCheck, FiInfo, FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
-import { DemoCtaModal, PHARMACY_BRANDING, PharmacyInfo, PoweredBy } from '../components';
+import {
+  CouponModal,
+  DemoCtaModal,
+  PHARMACY_BRANDING,
+  PharmacyInfo,
+  PoweredBy
+} from '../components';
 import { FAQ } from '../components/FAQ';
 import { HorizontalStatusStepper } from '../components/HorizontalStatusStepper';
 import { PrescriptionsList } from '../components/PrescriptionsList';
@@ -44,6 +51,7 @@ export const Status = () => {
       order?.fulfillment?.type !== 'MAIL_ORDER'
   );
   const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
+  const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
 
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
@@ -219,6 +227,8 @@ export const Status = () => {
         <title>{t.track}</title>
       </Helmet>
 
+      <CouponModal isOpen={couponModalOpen} onClose={() => setCouponModalOpen(false)} />
+
       <Box bgColor="white">
         <Container>
           <VStack spacing={4} align="start" py={5}>
@@ -337,41 +347,46 @@ export const Status = () => {
         </Container>
       </Box>
 
-      <Box bgColor="white" mt={2} p={4}>
-        <VStack w="full" spacing={4}>
-          <Text fontSize="4xl" fontWeight="700" py={0} lineHeight="1">
-            $8.71
-          </Text>
-          <HStack py={0} color="gray.500">
-            <Text>Retail price:</Text>
-            <Text as="s">$25.50</Text>
-          </HStack>
-          <Box bgColor="blue.50" w="full" textAlign="center" p={2} borderRadius="xl">
-            <Text fontWeight="semibold" fontSize="md">
-              Show this coupon at the pharmacy
+      <Box bgColor="white" mt={2} py={4}>
+        <Container>
+          <VStack w="full" spacing={4}>
+            <Text fontSize="4xl" fontWeight="700" py={0} lineHeight="1">
+              $8.71
             </Text>
-          </Box>
-          <HStack w="full" align="start">
-            <VStack w="30%" align="start">
-              <Text>BIN</Text>
-              <Text>PCN</Text>
-              <Text>Group</Text>
-              <Text>Member ID</Text>
-            </VStack>
-            <VStack w="70%" align="start">
-              <Text as="b">015995</Text>
-              <Text as="b">GDC</Text>
-              <Text as="b">DR33</Text>
-              <Text as="b">HFFF867485</Text>
-            </VStack>
-          </HStack>
-          <HStack color="blue.500">
-            <Icon as={FiInfo} />
-            <Text as="u" textUnderlineOffset="2px" fontSize="sm" fontWeight="semibold">
-              How to use this coupon
-            </Text>
-          </HStack>
-        </VStack>
+            <Box bgColor="blue.50" w="full" textAlign="center" p={2} borderRadius="xl">
+              <Text fontWeight="semibold" fontSize="md">
+                Show this coupon at the pharmacy
+              </Text>
+            </Box>
+            <HStack w="full" align="start">
+              <VStack w="30%" align="start">
+                <Text>BIN</Text>
+                <Text>PCN</Text>
+                <Text>Group</Text>
+                <Text>Member ID</Text>
+              </VStack>
+              <VStack w="70%" align="start">
+                <Text as="b">015995</Text>
+                <Text as="b">GDC</Text>
+                <Text as="b">DR33</Text>
+                <Text as="b">HFFF867485</Text>
+              </VStack>
+            </HStack>
+            <HStack color="blue.500">
+              <Icon as={FiInfo} />
+              <Text
+                as="u"
+                textUnderlineOffset="2px"
+                fontSize="sm"
+                fontWeight="semibold"
+                cursor="pointer"
+                onClick={() => setCouponModalOpen(true)}
+              >
+                How to use this coupon
+              </Text>
+            </HStack>
+          </VStack>
+        </Container>
       </Box>
 
       <Box bgColor="white" mt={2}>

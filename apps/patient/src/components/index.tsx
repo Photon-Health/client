@@ -13,3 +13,6 @@ export * from './PoweredBy';
 export * from './StatusStepper';
 export * from './ReadyText';
 export * from './CouponModal';
+export * from './FAQ';
+export { HorizontalStatusStepper } from './HorizontalStatusStepper';
+export * from './PrescriptionsList';
