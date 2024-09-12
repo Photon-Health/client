@@ -3,6 +3,7 @@ import { Text } from '@chakra-ui/react';
 import isTomorrow from 'dayjs/plugin/isTomorrow';
 import { Maybe } from '../__generated__/graphql';
 import { OrderFulfillment } from '../utils/models';
+import { roundUpTo15MinInterval } from '../utils/dates';
 
 dayjs.extend(isTomorrow);
 
@@ -33,17 +34,6 @@ export const ReadyText = ({
   }
 
   return null;
-};
-
-const roundUpTo15MinInterval = (pharmacyEstimatedReadyAt: Date): Date => {
-  const estimatedReadyAtAsDayJs = dayjs(pharmacyEstimatedReadyAt);
-  const minutes = estimatedReadyAtAsDayJs.minute();
-  const roundedMinutes = Math.ceil(minutes / 15) * 15;
-  if (roundedMinutes >= 60) {
-    return estimatedReadyAtAsDayJs.add(1, 'hour').minute(0).toDate();
-  } else {
-    return estimatedReadyAtAsDayJs.minute(roundedMinutes).toDate();
-  }
 };
 
 interface PharmacyEstimatedReadyAtProps {

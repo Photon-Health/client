@@ -80,14 +80,17 @@ export const getFulfillmentType = (
 export type FillWithCount = Fill & { count: number };
 export const countFillsAndRemoveDuplicates = (fills: (Fill | FillWithCount)[]): FillWithCount[] => {
   // First, count the occurrences of each treatment.id
-  const counts = fills.reduce((acc, fill) => {
-    const id = fill.treatment.id;
-    if (!(id in acc)) {
-      acc[id] = 0;
-    }
-    acc[id] += 'count' in fill ? fill.count : 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const counts = fills.reduce(
+    (acc, fill) => {
+      const id = fill.treatment.id;
+      if (!(id in acc)) {
+        acc[id] = 0;
+      }
+      acc[id] += 'count' in fill ? fill.count : 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   // Then, create a map of distinct fills with updated counts
   const distinctFills = fills.reduce((acc: Map<string, FillWithCount>, fill) => {
@@ -170,7 +173,7 @@ export const preparePharmacy = (pharmacy: Pharmacy): EnrichedPharmacy => {
   };
 };
 
-export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string): string => {
+export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string): Date => {
   // Get the timezone for dayjs
   const userTimezone = dayjs.tz.guess();
 
@@ -200,14 +203,14 @@ export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string
       targetTime = dayjs().tz(userTimezone);
       break;
     default:
-      return 'Invalid time selection';
+      throw new Error('Invalid time selection');
   }
 
   if (readyByDay === 'Tomorrow') {
     targetTime = targetTime.add(1, 'day');
   }
 
-  return targetTime.utc().format();
+  return targetTime.utc().toDate();
 };
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);

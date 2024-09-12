@@ -105,7 +105,7 @@ export const setOrderPharmacy = async (
   pharmacyId: string,
   readyBy?: string,
   readyByDay?: string,
-  readyByTime?: string
+  readyByTime?: Date
 ) => {
   try {
     const response = await graphQLClient.SetOrderPharmacy({

@@ -1,21 +1,20 @@
-import { Box, Button, Container, Heading, Link, Text, VStack, useToast } from '@chakra-ui/react';
+import { Box, Button, Container, Link, Text, VStack, useToast } from '@chakra-ui/react';
 import { getSettings } from '@client/settings';
 import queryString from 'query-string';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { FiCheck, FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { FulfillmentType } from '../__generated__/graphql';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
 import { DemoCtaModal, PHARMACY_BRANDING, PharmacyInfo, PoweredBy } from '../components';
 import { FAQ } from '../components/FAQ';
-import { HorizontalStatusStepper } from '../components/HorizontalStatusStepper';
 import { PrescriptionsList } from '../components/PrescriptionsList';
-import { ReadyText } from '../components/ReadyText';
+import { OrderStatusHeader } from '../components/statusV2/Header';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
-import { FulfillmentType } from '../__generated__/graphql';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -183,7 +182,7 @@ export const Status = () => {
     pharmacy?.name === 'Amazon Pharmacy';
 
   // TODO(mrochlin) Theres so typing issue here because MAIL_ORDER doesnt have RECEIVED as a valid state.
-  const copy = (m[fulfillmentType] as any)[fulfillmentState];
+  const copy = m[fulfillmentType][fulfillmentState]!;
 
   if (!order) {
     console.error('No order found');
@@ -209,20 +208,19 @@ export const Status = () => {
         <title>{t.track}</title>
       </Helmet>
 
-      <Box bgColor="white">
-        <Container>
-          <VStack spacing={4} align="start" py={5}>
-            <Heading as="h3" size="lg">
-              {copy.heading}
-            </Heading>
-            <Box bg="orange.100" p={4} borderRadius="lg" w="full">
-              <Text display="inline">
-                {typeof copy.subheading === 'function'
-                  ? copy.subheading(isMultiRx)
-                  : copy.subheading}
-              </Text>
-            </Box>
-            {fulfillmentType === FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
+      <VStack p={4} bg="white" justifyContent={'center'}>
+        <OrderStatusHeader
+          status={'PROCESSING'}
+          pharmacyEstimatedReadyAt={new Date() ?? order.pharmacyEstimatedReadyAt}
+          patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
+          exception={order.pharmacy?.isOpen === false ? 'PHARMACY_CLOSED' : undefined}
+        />
+      </VStack>
+
+      <Box>
+        <Container className="CONT">
+          <VStack spacing={4} align="start" py={5} className="VSTACK">
+            {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
               <Box alignSelf="start">
                 <Text display="inline" color="gray.600">
                   {t.tracking}
@@ -241,7 +239,7 @@ export const Status = () => {
               </Box>
             ) : null}
 
-            <ReadyText
+            {/* <ReadyText
               readyBy={readyBy}
               readyByTime={readyByTime}
               isDeliveryPharmacy={isDeliveryPharmacy}
@@ -251,7 +249,7 @@ export const Status = () => {
             <HorizontalStatusStepper
               fulfillmentType={fulfillmentType}
               status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
-            />
+            /> */}
 
             <VStack spacing={2} w="full" pt={2}>
               {order?.pharmacy?.id && isDeliveryPharmacy ? (
