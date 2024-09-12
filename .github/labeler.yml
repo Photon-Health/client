@@ -21,3 +21,7 @@ Settings:
 'Clinical App':
   - changed-files:
       - any-glob-to-any-file: 'apps/app/**'
+
+'Extension':
+  - changed-files:
+      - any-glob-to-any-file: 'apps/extension/**'
