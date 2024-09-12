@@ -16,6 +16,7 @@ import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
+import { OrderDetailsModal, PrescriptionData } from '../components/order-details/OrderDetailsModal';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -220,12 +221,36 @@ export const Status = () => {
     }
   ]);
 
+  const prescriptions: PrescriptionData[] = flattenedFills.flatMap((f) => [
+    {
+      rxName: f.treatment.name,
+      quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
+      daysSupply: f.prescription?.daysSupply ?? 0,
+      numRefills: f.prescription?.fillsAllowed ?? 0,
+      expiresAt: f.prescription?.expirationDate ?? new Date()
+    },
+    {
+      rxName: f.treatment.name,
+      quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
+      daysSupply: f.prescription?.daysSupply ?? 0,
+      numRefills: f.prescription?.fillsAllowed ?? 0,
+      expiresAt: f.prescription?.expirationDate ?? new Date()
+    }
+  ]);
+
   const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
+  const [orderDetailsIsOpen, setOrderDetailsIsOpen] = useState(false);
 
   return (
     <Box>
       <FAQModal isOpen={faqModalIsOpen} onClose={() => setFaqModalIsOpen(false)} />
       <DemoCtaModal isOpen={showDemoCtaModal} onClose={() => setShowDemoCtaModal(false)} />
+      <OrderDetailsModal
+        isOpen={orderDetailsIsOpen}
+        onClose={() => setOrderDetailsIsOpen(false)}
+        pharmacyName={order.pharmacy?.name ?? 'My Pharmacy'}
+        prescriptions={prescriptions}
+      />
       <Helmet>
         <title>{t.track}</title>
       </Helmet>
@@ -240,7 +265,10 @@ export const Status = () => {
           />
         </VStack>
 
-        <OrderSummary fulfillments={fulfillments} onViewDetails={() => void {}} />
+        <OrderSummary
+          fulfillments={fulfillments}
+          onViewDetails={() => setOrderDetailsIsOpen(true)}
+        />
 
         <VStack w="full" alignItems={'stretch'} px={4} spacing={4}>
           <Heading as="h4" size="md">
