@@ -9,16 +9,15 @@ import {
   useSearchParams
 } from 'react-router-dom';
 
-import { getOrder } from '../api/internal';
+import { getSettings } from '@client/settings';
+
+import { AUTH_HEADER_ERRORS, getOrder } from '../api/internal';
 import { Nav } from '../components';
+import { setAuthHeader } from '../configs/graphqlClient';
+import theme from '../configs/theme';
 import { demoOrder } from '../data/demoOrder';
 import { FillWithCount, countFillsAndRemoveDuplicates } from '../utils/general';
 import { Order } from '../utils/models';
-
-import { getSettings } from '@client/settings';
-import { AUTH_HEADER_ERRORS } from '../api/internal';
-import { setAuthHeader } from '../configs/graphqlClient';
-import theme from '../configs/theme';
 
 interface OrderContextType {
   order: Order;
@@ -92,6 +91,7 @@ export const Main = () => {
   );
 
   const fetchOrder = useCallback(async () => {
+    console.log('refetch order');
     if (isDemo) return demoOrder;
     try {
       const result = await getOrder(orderId!);

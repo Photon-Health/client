@@ -22,7 +22,8 @@ export const getPharmacies = async ({
   offset,
   isOpenNow,
   is24hr,
-  name
+  name,
+  includePrice
 }: {
   searchParams: {
     latitude: number;
@@ -34,6 +35,7 @@ export const getPharmacies = async ({
   isOpenNow: boolean;
   is24hr: boolean;
   name?: string;
+  includePrice?: boolean;
 }) => {
   try {
     const now = new Date();

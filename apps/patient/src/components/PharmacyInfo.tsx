@@ -286,7 +286,7 @@ export const PharmacyInfo = ({
           {showPrice ? (
             <>
               <Spacer />
-              <Text fontWeight="bold">$9.50</Text>
+              <Text fontWeight="bold">${pharmacy.medicationPrice}</Text>
             </>
           ) : null}
         </HStack>

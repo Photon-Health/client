@@ -10,6 +10,9 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { FC } from 'react';
+import { useLocation } from 'react-router-dom';
+
+import { text as t } from '../utils/text';
 
 interface CouponModalProps {
   isOpen: boolean;
@@ -17,31 +20,39 @@ interface CouponModalProps {
 }
 
 export const CouponModal: FC<CouponModalProps> = ({ isOpen, onClose }) => {
+  const location = useLocation();
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent py={3}>
         <ModalBody>
-          <VStack mb={5} spacing={2} align="start">
-            <Heading as="h5" size="sm">
-              How to use this coupon
-            </Heading>
-            <Text>Just show it to the pharmacist when you pick up your prescription.</Text>
-          </VStack>
+          {location.pathname === '/pharmacy' ? (
+            <VStack mb={5} spacing={2} align="start">
+              <Heading as="h5" size="sm">
+                {t.whatIsCouponPrice}
+              </Heading>
+              <Text>{t.couponHelpsPayLess}</Text>
+            </VStack>
+          ) : (
+            <VStack mb={5} spacing={2} align="start">
+              <Heading as="h5" size="sm">
+                {t.howToCoupon}
+              </Heading>
+              <Text>{t.showCouponToPharmacy}</Text>
+            </VStack>
+          )}
           <VStack spacing={2} align="start">
             <Heading as="h5" size="sm">
-              Can I use this coupon if I have health insurance?
+              {t.couponWithInsurance}
             </Heading>
-            <Text>
-              The price on the coupon may be lower than your health insurance co-pay. It can be used
-              instead of your co-pay and does not apply to your deductible.
-            </Text>
-            <Text>Ask your pharmacist to help you find the best possible price.</Text>
+            <Text>{t.couponVsInsurance}</Text>
+            <Text>{t.askForBestPrice}</Text>
           </VStack>
         </ModalBody>
         <ModalFooter>
           <Button variant="outline" colorScheme="blue" borderRadius="xl" onClick={onClose} w="full">
-            Dismiss
+            {t.dismiss}
           </Button>
         </ModalFooter>
       </ModalContent>

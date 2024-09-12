@@ -3,6 +3,7 @@ import { FC, useState } from 'react';
 import { FiInfo } from 'react-icons/fi';
 
 import { CouponModal } from '../components';
+import { text as t } from '../utils/text';
 
 export const CouponDetails: FC = () => {
   const [couponModalOpen, setCouponModalOpen] = useState(false);
@@ -16,15 +17,15 @@ export const CouponDetails: FC = () => {
         </Text>
         <Box bgColor="blue.50" w="full" textAlign="center" p={2} borderRadius="xl">
           <Text fontWeight="semibold" fontSize="md">
-            Show this coupon at the pharmacy
+            {t.showThisCoupon}
           </Text>
         </Box>
         <HStack w="full" align="start">
           <VStack w="30%" align="start">
-            <Text>BIN</Text>
-            <Text>PCN</Text>
-            <Text>Group</Text>
-            <Text>Member ID</Text>
+            <Text>{t.bin}</Text>
+            <Text>{t.pcn}</Text>
+            <Text>{t.group}</Text>
+            <Text>{t.memberId}</Text>
           </VStack>
           <VStack w="70%" align="start">
             <Text as="b">015995</Text>
@@ -43,7 +44,7 @@ export const CouponDetails: FC = () => {
             cursor="pointer"
             onClick={() => setCouponModalOpen(true)}
           >
-            How to use this coupon
+            {t.howToCoupon}
           </Text>
         </HStack>
       </VStack>
