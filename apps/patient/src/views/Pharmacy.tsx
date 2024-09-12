@@ -1,34 +1,25 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
   Container,
-  Heading,
   HStack,
+  Heading,
   Link,
   Text,
   VStack,
   useToast
 } from '@chakra-ui/react';
-import { FiCheck, FiMapPin } from 'react-icons/fi';
-import { Helmet } from 'react-helmet';
-import queryString from 'query-string';
 import { types } from '@photonhealth/sdk';
-import * as TOAST_CONFIG from '../configs/toast';
-import { formatAddress, preparePharmacy } from '../utils/general';
-import { ExtendedFulfillmentType } from '../utils/models';
-import { text as t } from '../utils/text';
-import {
-  BrandedOptions,
-  FixedFooter,
-  LocationModal,
-  PickupOptions,
-  PoweredBy
-} from '../components';
-import { useOrderContext } from './Main';
+import queryString from 'query-string';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import ReactGA from 'react-ga4';
+import { Helmet } from 'react-helmet';
+import { FiCheck, FiMapPin } from 'react-icons/fi';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+
 import { getSettings } from '@client/settings';
+
 import {
   geocode,
   getPharmacies,
@@ -37,12 +28,24 @@ import {
   setPreferredPharmacy,
   triggerDemoNotification
 } from '../api';
-import { demoPharmacies } from '../data/demoPharmacies';
+import {
+  BrandedOptions,
+  CouponModal,
+  FixedFooter,
+  LocationModal,
+  PickupOptions,
+  PoweredBy
+} from '../components';
+import * as TOAST_CONFIG from '../configs/toast';
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { demoPharmacies } from '../data/demoPharmacies';
+import { formatAddress, preparePharmacy } from '../utils/general';
 import { isGLP } from '../utils/isGLP';
-import ReactGA from 'react-ga4';
+import { ExtendedFulfillmentType } from '../utils/models';
+import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { text as t } from '../utils/text';
+import { useOrderContext } from './Main';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
@@ -610,6 +613,8 @@ export const Pharmacy = () => {
       <Helmet>
         <title>{t.selectAPharmacy}</title>
       </Helmet>
+
+      <CouponModal isOpen={true} onClose={() => {}} />
 
       <Box bgColor="white" shadow="sm">
         <Container>
