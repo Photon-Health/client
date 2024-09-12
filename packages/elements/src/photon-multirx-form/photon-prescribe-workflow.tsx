@@ -40,10 +40,13 @@ import { formatPatientWeight } from './util/formatPatientWeight';
 import { checkHasPermission } from '../utils';
 
 const newMedSearchTesters = [
-  // actual testers
-  'Tim Porter', // Modern Pediatrics
-  'Rishi Khakhkhar', // Counsel
-  'Kristen Borchetta', // Blueberry Pediatrics
+  // Modern Pediatrics
+  'Tim Porter',
+  // Counsel
+  'Rishi Khakhkhar',
+  'Muthu Alagappan',
+  // Blueberry Pediatrics
+  'Kristen Borchetta',
   // hooligans
   'Josh Knapp',
   'Michael Rochlin',
