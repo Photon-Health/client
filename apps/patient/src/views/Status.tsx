@@ -265,7 +265,7 @@ export const Status = () => {
           />
         </VStack>
 
-        <VStack maxW={'xl'} mx="auto" w="full">
+        <VStack maxW={'xl'} mx="auto" w="full" spacing={6}>
           <OrderSummary
             fulfillments={fulfillments}
             onViewDetails={() => setOrderDetailsIsOpen(true)}
@@ -362,10 +362,10 @@ export const Status = () => {
           </VStack>
         </VStack>
       </VStack>
-      <Box>
-        <Container className="CONT">
-          <VStack spacing={4} align="start" py={5} className="VSTACK">
-            {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
+      {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
+        <Box>
+          <Container>
+            <VStack spacing={4} align="start" py={5}>
               <Box alignSelf="start">
                 <Text display="inline" color="gray.600">
                   {t.tracking}
@@ -382,12 +382,12 @@ export const Status = () => {
                   {fulfillment.trackingNumber}
                 </Link>
               </Box>
-            ) : null}
-          </VStack>
-        </Container>
-      </Box>
+            </VStack>
+          </Container>
+        </Box>
+      ) : null}
 
-      <Container as={VStack} w="full" py={4}>
+      <Container as={VStack} w="full" my={4}>
         <PoweredBy />
       </Container>
     </Box>
