@@ -22,7 +22,7 @@ const router = createBrowserRouter(
         <Route path="/readyBy" element={<ReadyBy />} />
         <Route path="/pharmacy" element={<Pharmacy />} />
         <Route path="/status" element={<Status />} />
-        <Route path="/statusV2" element={<StatusV2 />} />
+        <Route path="/statusv2" element={<StatusV2 />} />
         <Route path="/canceled" element={<Canceled />} />
       </Route>
       <Route path="*" element={<NoMatch />} />

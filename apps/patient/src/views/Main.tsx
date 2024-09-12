@@ -38,6 +38,7 @@ export const Main = () => {
   const isDemo = searchParams.get('demo');
   const orderId = searchParams.get('orderId');
   const phone = searchParams.get('phone');
+  const useV2 = searchParams.get('v2');
 
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
 
@@ -82,9 +83,11 @@ export const Main = () => {
       }
 
       const hasPharmacy = order.pharmacy?.id;
-      const redirect = hasPharmacy ? '/status' : '/review';
+      const redirect = hasPharmacy ? (useV2 ? '/statusV2' : '/status') : '/review';
 
-      navigate(`${redirect}?orderId=${order.id}&token=${token}`, { replace: true });
+      navigate(`${redirect}?orderId=${order.id}&token=${token}${useV2 ? '&v2=true' : ''}`, {
+        replace: true
+      });
     },
     [navigate, orderId, token]
   );
