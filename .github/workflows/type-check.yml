@@ -20,14 +20,14 @@ jobs:
           version: 8
           run_install: true
 
-      - name: Install pnpm dependencies
-        run: pnpm install
-
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: 'pnpm'
+
+      - name: Install pnpm dependencies
+        run: pnpm install
 
       - name: Install Node.js dependencies
         run: npm ci
