@@ -47,7 +47,7 @@ const newMedSearchTesters = [
   'Muthu Alagappan',
   // Blueberry Pediatrics
   'Kristen Borchetta',
-  // hooligans
+  // Hooligans
   'Josh Knapp',
   'Michael Rochlin',
   'Jomi Cubol',
@@ -114,7 +114,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const [enableNewMedicationSearch, setEnableNewMedicationSearch] = createSignal<boolean>(false);
   const [, recentOrdersActions] = useRecentOrders();
 
-  // We can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
+  // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
   let prefillNotes = '';
   if (props.additionalNotes) {
     prefillNotes = `${props.additionalNotes}
