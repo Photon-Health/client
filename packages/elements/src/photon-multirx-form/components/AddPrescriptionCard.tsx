@@ -27,7 +27,7 @@ setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/')
 
 const validators = {
   treatment: message(record(string(), any()), 'Please select a treatment...'),
-  dispenseQuantity: message(min(number(), 1), 'Quantity must be positive'),
+  dispenseQuantity: message(min(number(), 0, { exclusive: true }), 'Quantity must be positive'),
   dispenseUnit: message(
     refine(string(), 'nonEmptyString', (value) => value.trim().length > 0),
     'Please select a dispensing unit...'
@@ -322,7 +322,7 @@ export const AddPrescriptionCard = (props: {
                 label="Quantity"
                 value={props.store.dispenseQuantity?.value ?? null}
                 required="true"
-                min={1}
+                min={0}
                 invalid={props.store.dispenseQuantity?.error ?? false}
                 help-text={props.store.dispenseQuantity?.error}
                 on:photon-input-changed={(e: any) => {
