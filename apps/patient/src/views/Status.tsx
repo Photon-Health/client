@@ -1,4 +1,4 @@
-import { Box, Button, Container, Link, Text, VStack, useToast } from '@chakra-ui/react';
+import { Box, Button, Container, Heading, Link, Text, VStack, useToast } from '@chakra-ui/react';
 import { getSettings } from '@client/settings';
 import queryString from 'query-string';
 import { useEffect, useState } from 'react';
@@ -8,14 +8,14 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FulfillmentType } from '../__generated__/graphql';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
 import { DemoCtaModal, PHARMACY_BRANDING, PharmacyInfo, PoweredBy } from '../components';
-import { FAQ } from '../components/FAQ';
-import { PrescriptionsList } from '../components/PrescriptionsList';
+import { Card } from '../components/Card';
+import { FAQModal } from '../components/FAQModal';
+import { FulfillmentData, OrderSummary } from '../components/order-summary/OrderSummary';
 import { OrderStatusHeader } from '../components/statusV2/Header';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
-import { FulfillmentData, OrderSummary } from '../components/order-summary/OrderSummary';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -220,8 +220,11 @@ export const Status = () => {
     }
   ]);
 
+  const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
+
   return (
     <Box>
+      <FAQModal isOpen={faqModalIsOpen} onClose={() => setFaqModalIsOpen(false)} />
       <DemoCtaModal isOpen={showDemoCtaModal} onClose={() => setShowDemoCtaModal(false)} />
       <Helmet>
         <title>{t.track}</title>
@@ -238,6 +241,96 @@ export const Status = () => {
         </VStack>
 
         <OrderSummary fulfillments={fulfillments} onViewDetails={() => void {}} />
+
+        <VStack w="full" alignItems={'stretch'} px={4} spacing={4}>
+          <Heading as="h4" size="md">
+            Pharmacy
+          </Heading>
+          <Card>
+            {order?.pharmacy?.id && isDeliveryPharmacy ? (
+              <PharmacyInfo
+                pharmacy={{
+                  id: order.pharmacy.id,
+                  ...PHARMACY_BRANDING[order.pharmacy.id]
+                }}
+                showDetails={false}
+                isStatus
+              />
+            ) : pharmacyWithHours ? (
+              <PharmacyInfo
+                pharmacy={pharmacyWithHours}
+                showDetails={fulfillmentType === 'PICK_UP'}
+                isStatus
+              />
+            ) : null}
+            <VStack spacing={2} w="full">
+              {pharmacyWithHours && !isDeliveryPharmacy ? (
+                <Button
+                  mt={2}
+                  mx="auto"
+                  size="md"
+                  py={6}
+                  variant="solid"
+                  onClick={handleGetDirections}
+                  leftIcon={<FiNavigation />}
+                  w="full"
+                  bg="blue.600"
+                  _hover={{ bg: 'blue.700' }}
+                  color="white"
+                >
+                  {t.directions}
+                </Button>
+              ) : null}
+              {!isDeliveryPharmacy && pharmacyWithHours && canReroute ? (
+                <Button
+                  mx="auto"
+                  size="md"
+                  py={6}
+                  variant="outline"
+                  onClick={handleRerouteLink}
+                  leftIcon={<FiRefreshCcw />}
+                  bg="gray.50"
+                  color="blue.500"
+                  w="full"
+                >
+                  {t.changePharmacy}
+                </Button>
+              ) : null}
+              {pharmacyWithHours && showReceivedButton ? (
+                <Button
+                  size="md"
+                  py={6}
+                  w="full"
+                  borderRadius="lg"
+                  variant="outline"
+                  bg="gray.50"
+                  color="blue.500"
+                  colorScheme={successfullySubmitted ? 'green' : undefined}
+                  leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
+                  onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
+                  isLoading={submitting}
+                >
+                  {successfullySubmitted ? t.thankYou : copy.cta(isMultiRx)}
+                </Button>
+              ) : null}
+            </VStack>
+          </Card>
+        </VStack>
+        <VStack w="full" alignItems={'stretch'} px={4} spacing={4}>
+          <Heading as="h4" size="md">
+            Need help?
+          </Heading>
+          <Card>
+            <Button
+              w="full"
+              variant="outline"
+              color="blue.500"
+              onClick={() => setFaqModalIsOpen(true)}
+            >
+              I have a pharmacy issue
+            </Button>
+          </Card>
+        </VStack>
       </VStack>
       <Box>
         <Container className="CONT">
@@ -260,99 +353,8 @@ export const Status = () => {
                 </Link>
               </Box>
             ) : null}
-
-            {/* <ReadyText
-              readyBy={readyBy}
-              readyByTime={readyByTime}
-              isDeliveryPharmacy={isDeliveryPharmacy}
-              fulfillment={fulfillment}
-            />
-
-            <HorizontalStatusStepper
-              fulfillmentType={fulfillmentType}
-              status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
-            /> */}
-
-            <VStack spacing={2} w="full" pt={2}>
-              {order?.pharmacy?.id && isDeliveryPharmacy ? (
-                <PharmacyInfo
-                  pharmacy={{
-                    id: order.pharmacy.id,
-                    ...PHARMACY_BRANDING[order.pharmacy.id]
-                  }}
-                  showDetails={false}
-                  isStatus
-                />
-              ) : pharmacyWithHours ? (
-                <PharmacyInfo
-                  pharmacy={pharmacyWithHours}
-                  showDetails={fulfillmentType === 'PICK_UP'}
-                  isStatus
-                />
-              ) : null}
-
-              <VStack spacing={2} w="full">
-                {pharmacyWithHours && !isDeliveryPharmacy ? (
-                  <Button
-                    mt={2}
-                    mx="auto"
-                    size="md"
-                    py={6}
-                    variant="solid"
-                    onClick={handleGetDirections}
-                    leftIcon={<FiNavigation />}
-                    w="full"
-                    bg="gray.900"
-                    _hover={{ bg: 'gray.600' }}
-                    color="white"
-                  >
-                    {t.directions}
-                  </Button>
-                ) : null}
-                {!isDeliveryPharmacy && pharmacyWithHours && canReroute ? (
-                  <Button
-                    mx="auto"
-                    size="md"
-                    py={6}
-                    variant="outline"
-                    onClick={handleRerouteLink}
-                    leftIcon={<FiRefreshCcw />}
-                    bg="gray.50"
-                    color="blue.500"
-                    w="full"
-                  >
-                    {t.changePharmacy}
-                  </Button>
-                ) : null}
-                {pharmacyWithHours && showReceivedButton ? (
-                  <Button
-                    size="md"
-                    py={6}
-                    w="full"
-                    borderRadius="lg"
-                    variant="outline"
-                    bg="gray.50"
-                    color="blue.500"
-                    colorScheme={successfullySubmitted ? 'green' : undefined}
-                    leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
-                    onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
-                    isLoading={submitting}
-                  >
-                    {successfullySubmitted ? t.thankYou : copy.cta(isMultiRx)}
-                  </Button>
-                ) : null}
-              </VStack>
-            </VStack>
           </VStack>
         </Container>
-      </Box>
-
-      <Box bgColor="white" mt={2}>
-        <PrescriptionsList />
-      </Box>
-
-      <Box bgColor="white" mt={2}>
-        <FAQ />
       </Box>
 
       <Container as={VStack} w="full" py={4}>

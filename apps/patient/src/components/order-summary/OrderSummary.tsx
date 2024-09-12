@@ -2,6 +2,7 @@ import { Box, Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import { groupBy } from 'lodash';
 import React from 'react';
+import { Card } from '../Card';
 
 export interface ExceptionData {
   message: string;
@@ -76,7 +77,7 @@ const ExceptionsBlock = ({ exception }: { exception: ExceptionData }) => {
           ? 'Approval required'
           : undefined;
   return (
-    <Box bg="yellow.400" borderRadius={'xl'} p={3}>
+    <Box bg="orange.100" borderRadius={'xl'} p={3}>
       <Text as="b">{exceptionName}</Text>: {exception.message}
     </Box>
   );
@@ -121,14 +122,6 @@ const BlockWithHeader = ({
       {fulfillments.map((f) => (
         <FulfillmentBlock key={`${state}-${readyAtText}-${f.rxName}`} fulfillment={f} />
       ))}
-    </VStack>
-  );
-};
-
-const Card = (props: { children: React.ReactNode | React.ReactNode[] }) => {
-  return (
-    <VStack bgColor="white" borderRadius="md" py={4} alignItems={'start'} px={4} spacing={5}>
-      {props.children}
     </VStack>
   );
 };
