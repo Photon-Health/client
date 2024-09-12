@@ -20,11 +20,26 @@
         "outputs": ["dist/apps/extension"]
       }
     },
+    "build:plasmo": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/extension",
+        "command": "pnpm build",
+        "outputs": ["dist/apps/extension"]
+      }
+    },
     "lint:fix": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
         "command": "npx eslint . --ext .tsx,.ts --fix && npx prettier --write src/**/*.{ts,tsx}"
+      }
+    },
+    "tsc": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/extension",
+        "command": "npx tsc --noEmit"
       }
     }
   }
