@@ -16,6 +16,9 @@ jobs:
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 8
+          run_install: true
 
       - name: Install pnpm dependencies
         run: pnpm install
