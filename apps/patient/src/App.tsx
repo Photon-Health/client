@@ -11,6 +11,7 @@ import { NoMatch } from './views/NoMatch';
 import { Pharmacy } from './views/Pharmacy';
 import { ReadyBy } from './views/ReadyBy';
 import { Review } from './views/Review';
+import { StatusV2 } from './views/StatusV2';
 import { Status } from './views/Status';
 
 const router = createBrowserRouter(
@@ -21,6 +22,7 @@ const router = createBrowserRouter(
         <Route path="/readyBy" element={<ReadyBy />} />
         <Route path="/pharmacy" element={<Pharmacy />} />
         <Route path="/status" element={<Status />} />
+        <Route path="/statusV2" element={<StatusV2 />} />
         <Route path="/canceled" element={<Canceled />} />
       </Route>
       <Route path="*" element={<NoMatch />} />

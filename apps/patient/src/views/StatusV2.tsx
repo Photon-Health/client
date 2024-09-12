@@ -1,23 +1,24 @@
 import { Box, Button, Container, Heading, Link, Text, VStack, useToast } from '@chakra-ui/react';
 import { getSettings } from '@client/settings';
+import { types } from '@photonhealth/sdk';
 import queryString from 'query-string';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { FiCheck, FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { FulfillmentType } from '../__generated__/graphql';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
-import { DemoCtaModal, PharmacyInfo, PoweredBy, PHARMACY_BRANDING } from '../components';
-import { FAQ } from '../components/FAQ';
-import { PrescriptionsList } from '../components/PrescriptionsList';
+import { DemoCtaModal, PHARMACY_BRANDING, PharmacyInfo, PoweredBy } from '../components';
+import { Card } from '../components/Card';
+import { FAQModal } from '../components/FAQModal';
+import { FulfillmentData, OrderSummary } from '../components/order-summary/OrderSummary';
+import { OrderStatusHeader } from '../components/statusV2/Header';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
-import { HorizontalStatusStepper } from '../components/HorizontalStatusStepper';
-import { ReadyText } from '../components/ReadyText';
+import { OrderDetailsModal, PrescriptionData } from '../components/order-details/OrderDetailsModal';
 
-export const Status = () => {
+export const StatusV2 = () => {
   const navigate = useNavigate();
   const { order, flattenedFills, setOrder, isDemo } = useOrderContext();
 
@@ -31,7 +32,7 @@ export const Status = () => {
   const showReceivedButtonStates = ['RECEIVED', 'READY'];
   const [showReceivedButton, setShowReceivedButton] = useState<boolean>(
     showReceivedButtonStates.includes(order?.fulfillment?.state ?? '') &&
-      order?.fulfillment?.type !== FulfillmentType.MailOrder
+      order?.fulfillment?.type !== types.FulfillmentType.MailOrder
   );
   const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
 
@@ -129,7 +130,7 @@ export const Status = () => {
           fulfillment: {
             ...order.fulfillment,
             state: 'RECEIVED',
-            type: FulfillmentType.PickUp
+            type: 'PICK_UP' as types.FulfillmentType
           }
         });
 
@@ -149,7 +150,7 @@ export const Status = () => {
             fulfillment: {
               ...order.fulfillment,
               state: 'READY',
-              type: FulfillmentType.PickUp
+              type: 'PICK_UP' as types.FulfillmentType
             }
           });
 
@@ -183,7 +184,7 @@ export const Status = () => {
     pharmacy?.name === 'Amazon Pharmacy';
 
   // TODO(mrochlin) Theres so typing issue here because MAIL_ORDER doesnt have RECEIVED as a valid state.
-  const copy = (m[fulfillmentType] as any)[fulfillmentState];
+  const copy = m[fulfillmentType][fulfillmentState]!;
 
   if (!order) {
     console.error('No order found');
@@ -202,58 +203,79 @@ export const Status = () => {
     navigate(`/pharmacy?${query}`);
   };
 
+  const fulfillments: FulfillmentData[] = flattenedFills.flatMap((f) => [
+    {
+      rxName: f.treatment.name,
+      exceptions: [],
+      pharmacyEstimatedReadyTime: new Date('2024-09-13T20:00:00.000Z'),
+      state: 'PROCESSING'
+    },
+    {
+      rxName: f.treatment.name,
+      exceptions: [
+        { type: 'OOS', message: 'Zepbound is out of stock but will be in soon' },
+        { type: 'PA_REQUIRED', message: 'Zepbound is out of stock but will be in soon' }
+      ],
+      pharmacyEstimatedReadyTime: new Date('2024-09-13T21:00:00.000Z'),
+      state: 'PROCESSING'
+    }
+  ]);
+
+  const prescriptions: PrescriptionData[] = flattenedFills.flatMap((f) => [
+    {
+      rxName: f.treatment.name,
+      quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
+      daysSupply: f.prescription?.daysSupply ?? 0,
+      numRefills: f.prescription?.fillsAllowed ?? 0,
+      expiresAt: f.prescription?.expirationDate ?? new Date()
+    },
+    {
+      rxName: f.treatment.name,
+      quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
+      daysSupply: f.prescription?.daysSupply ?? 0,
+      numRefills: f.prescription?.fillsAllowed ?? 0,
+      expiresAt: f.prescription?.expirationDate ?? new Date()
+    }
+  ]);
+
+  const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
+  const [orderDetailsIsOpen, setOrderDetailsIsOpen] = useState(false);
+
   return (
     <Box>
+      <FAQModal isOpen={faqModalIsOpen} onClose={() => setFaqModalIsOpen(false)} />
       <DemoCtaModal isOpen={showDemoCtaModal} onClose={() => setShowDemoCtaModal(false)} />
+      <OrderDetailsModal
+        isOpen={orderDetailsIsOpen}
+        onClose={() => setOrderDetailsIsOpen(false)}
+        pharmacyName={order.pharmacy?.name ?? 'My Pharmacy'}
+        prescriptions={prescriptions}
+      />
       <Helmet>
         <title>{t.track}</title>
       </Helmet>
 
-      <Box bgColor="white">
-        <Container>
-          <VStack spacing={4} align="start" py={5}>
-            <Heading as="h3" size="lg">
-              {copy.heading}
+      <VStack spacing={4} width="full" alignItems={'stretch'}>
+        <VStack p={4} bg="white" justifyContent={'center'}>
+          <OrderStatusHeader
+            status={'PROCESSING'}
+            pharmacyEstimatedReadyAt={new Date() ?? order.pharmacyEstimatedReadyAt}
+            patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
+            exception={order.pharmacy?.isOpen === false ? 'PHARMACY_CLOSED' : undefined}
+          />
+        </VStack>
+
+        <VStack maxW={'xl'} mx="auto" w="full" spacing={6}>
+          <OrderSummary
+            fulfillments={fulfillments}
+            onViewDetails={() => setOrderDetailsIsOpen(true)}
+          />
+
+          <VStack w="full" alignItems={'stretch'} px={4} spacing={4}>
+            <Heading as="h4" size="md">
+              Pharmacy
             </Heading>
-            <Box bg="orange.100" p={4} borderRadius="lg" w="full">
-              <Text display="inline">
-                {typeof copy.subheading === 'function'
-                  ? copy.subheading(isMultiRx)
-                  : copy.subheading}
-              </Text>
-            </Box>
-            {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
-              <Box alignSelf="start">
-                <Text display="inline" color="gray.600">
-                  {t.tracking}
-                </Text>
-                <Link
-                  href={`https://google.com/search?q=${fulfillment.trackingNumber}`}
-                  display="inline"
-                  ms={2}
-                  color="link"
-                  fontWeight="medium"
-                  target="_blank"
-                  data-dd-privacy="mask"
-                >
-                  {fulfillment.trackingNumber}
-                </Link>
-              </Box>
-            ) : null}
-
-            <ReadyText
-              readyBy={readyBy}
-              readyByTime={readyByTime}
-              isDeliveryPharmacy={isDeliveryPharmacy}
-              fulfillment={fulfillment}
-            />
-
-            <HorizontalStatusStepper
-              fulfillmentType={fulfillmentType}
-              status={successfullySubmitted ? 'PICKED_UP' : fulfillmentState || 'SENT'}
-            />
-
-            <VStack spacing={2} w="full" pt={2}>
+            <Card>
               {order?.pharmacy?.id && isDeliveryPharmacy ? (
                 <PharmacyInfo
                   pharmacy={{
@@ -270,7 +292,6 @@ export const Status = () => {
                   isStatus
                 />
               ) : null}
-
               <VStack spacing={2} w="full">
                 {pharmacyWithHours && !isDeliveryPharmacy ? (
                   <Button
@@ -282,8 +303,8 @@ export const Status = () => {
                     onClick={handleGetDirections}
                     leftIcon={<FiNavigation />}
                     w="full"
-                    bg="gray.900"
-                    _hover={{ bg: 'gray.600' }}
+                    bg="blue.600"
+                    _hover={{ bg: 'blue.700' }}
                     color="white"
                   >
                     {t.directions}
@@ -297,7 +318,7 @@ export const Status = () => {
                     variant="outline"
                     onClick={handleRerouteLink}
                     leftIcon={<FiRefreshCcw />}
-                    bg="gray.50"
+                    // bg="gray.50"
                     color="blue.500"
                     w="full"
                   >
@@ -311,7 +332,7 @@ export const Status = () => {
                     w="full"
                     borderRadius="lg"
                     variant="outline"
-                    bg="gray.50"
+                    // bg="gray.50"
                     color="blue.500"
                     colorScheme={successfullySubmitted ? 'green' : undefined}
                     leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
@@ -322,20 +343,51 @@ export const Status = () => {
                   </Button>
                 ) : null}
               </VStack>
-            </VStack>
+            </Card>
           </VStack>
-        </Container>
-      </Box>
+          <VStack w="full" alignItems={'stretch'} px={4} spacing={4}>
+            <Heading as="h4" size="md">
+              Need help?
+            </Heading>
+            <Card>
+              <Button
+                w="full"
+                variant="outline"
+                color="blue.500"
+                onClick={() => setFaqModalIsOpen(true)}
+              >
+                I have a pharmacy issue
+              </Button>
+            </Card>
+          </VStack>
+        </VStack>
+      </VStack>
+      {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
+        <Box>
+          <Container>
+            <VStack spacing={4} align="start" py={5}>
+              <Box alignSelf="start">
+                <Text display="inline" color="gray.600">
+                  {t.tracking}
+                </Text>
+                <Link
+                  href={`https://google.com/search?q=${fulfillment.trackingNumber}`}
+                  display="inline"
+                  ms={2}
+                  color="link"
+                  fontWeight="medium"
+                  target="_blank"
+                  data-dd-privacy="mask"
+                >
+                  {fulfillment.trackingNumber}
+                </Link>
+              </Box>
+            </VStack>
+          </Container>
+        </Box>
+      ) : null}
 
-      <Box bgColor="white" mt={2}>
-        <PrescriptionsList />
-      </Box>
-
-      <Box bgColor="white" mt={2}>
-        <FAQ />
-      </Box>
-
-      <Container as={VStack} w="full" py={4}>
+      <Container as={VStack} w="full" my={4}>
         <PoweredBy />
       </Container>
     </Box>
