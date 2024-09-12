@@ -18,14 +18,6 @@ import { Helmet } from 'react-helmet';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  geocode,
-  getPharmacies,
-  rerouteOrder,
-  setOrderPharmacy,
-  setPreferredPharmacy,
-  triggerDemoNotification
-} from '../api';
-import {
   BrandedOptions,
   FixedFooter,
   LocationModal,
@@ -33,14 +25,25 @@ import {
   PoweredBy
 } from '../components';
 import * as TOAST_CONFIG from '../configs/toast';
+import { formatAddress, preparePharmacy } from '../utils/general';
+import { ExtendedFulfillmentType } from '../utils/models';
+import { text as t } from '../utils/text';
+import { useOrderContext } from './Main';
+
+import {
+  geocode,
+  getPharmacies,
+  rerouteOrder,
+  setOrderPharmacy,
+  setPreferredPharmacy,
+  triggerDemoNotification
+} from '../api';
+import { CouponModal } from '../components';
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { demoPharmacies } from '../data/demoPharmacies';
-import { formatAddress, preparePharmacy } from '../utils/general';
 import { isGLP } from '../utils/isGLP';
-import { Pharmacy as EnrichedPharmacy, ExtendedFulfillmentType } from '../utils/models';
-import { text as t } from '../utils/text';
-import { useOrderContext } from './Main';
+import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
@@ -610,6 +613,8 @@ export const Pharmacy = () => {
       <Helmet>
         <title>{t.selectAPharmacy}</title>
       </Helmet>
+
+      <CouponModal isOpen={true} onClose={() => {}} />
 
       <Box bgColor="white" shadow="sm">
         <Container>
