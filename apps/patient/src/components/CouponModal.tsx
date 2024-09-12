@@ -18,7 +18,7 @@ export const CouponModal: React.FC<CouponModalProps> = ({ isOpen, onClose }) => 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent py={3}>
         <ModalBody>
           <Box mb={4}>
             <strong>How to use this coupon</strong>
@@ -34,7 +34,7 @@ export const CouponModal: React.FC<CouponModalProps> = ({ isOpen, onClose }) => 
           </Box>
         </ModalBody>
         <ModalFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" colorScheme="blue" borderRadius="xl" onClick={onClose} w="full">
             Dismiss
           </Button>
         </ModalFooter>

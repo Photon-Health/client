@@ -69,6 +69,7 @@ export const Pharmacy = () => {
   // View state
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
+  const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
 
   // selection state
   const [selectedId, setSelectedId] = useState<string>('');
@@ -614,7 +615,7 @@ export const Pharmacy = () => {
         <title>{t.selectAPharmacy}</title>
       </Helmet>
 
-      <CouponModal isOpen={true} onClose={() => {}} />
+      <CouponModal isOpen={couponModalOpen} onClose={() => setCouponModalOpen(false)} />
 
       <Box bgColor="white" shadow="sm">
         <Container>
@@ -623,7 +624,6 @@ export const Pharmacy = () => {
               <Heading as="h3" size="lg">
                 {heading}
               </Heading>
-              {/* <Text>{subheading}</Text> */}
             </VStack>
 
             <HStack justify="space-between" w="full">
@@ -692,7 +692,12 @@ export const Pharmacy = () => {
               <Text>
                 The displayed price is a coupon for the selected pharmacy.{' '}
                 <b>This is NOT insurance.</b>{' '}
-                <Link textDecoration="underline" textUnderlineOffset="2px" color="blue.500">
+                <Link
+                  textDecoration="underline"
+                  textUnderlineOffset="2px"
+                  color="blue.500"
+                  onClick={() => setCouponModalOpen(true)}
+                >
                   Learn more.
                 </Link>
               </Text>
