@@ -1,8 +1,8 @@
+import { Card } from '../Card';
 import { Box, Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import { groupBy } from 'lodash';
 import React from 'react';
-import { Card } from '../Card';
 
 export interface ExceptionData {
   message: string;
@@ -23,8 +23,8 @@ function groupFulfillments(fulfillments: FulfillmentData[]) {
       f.exceptions.length === 0
         ? f.state
         : f.pharmacyEstimatedReadyTime != null
-          ? ('EXCEPTION_WITH_READY_TIME' as const)
-          : ('EXCEPTION_NO_READY_TIME' as const)
+        ? ('EXCEPTION_WITH_READY_TIME' as const)
+        : ('EXCEPTION_NO_READY_TIME' as const)
   }));
 
   const groupedByDerivedState = groupBy(derivedState, 'derivedState') as {
@@ -40,8 +40,8 @@ function getLatestReadyTime(fulfillments: FulfillmentData[]) {
       time == null || f.pharmacyEstimatedReadyTime == null
         ? undefined
         : f.pharmacyEstimatedReadyTime > time
-          ? f.pharmacyEstimatedReadyTime
-          : time,
+        ? f.pharmacyEstimatedReadyTime
+        : time,
     fulfillments[0].pharmacyEstimatedReadyTime
   );
 }
@@ -72,10 +72,10 @@ const ExceptionsBlock = ({ exception }: { exception: ExceptionData }) => {
     exception.type === 'BACKORDERED'
       ? 'Backordered'
       : exception.type === 'OOS'
-        ? 'Out of stock'
-        : exception.type === 'PA_REQUIRED'
-          ? 'Approval required'
-          : undefined;
+      ? 'Out of stock'
+      : exception.type === 'PA_REQUIRED'
+      ? 'Approval required'
+      : undefined;
   return (
     <Box bg="orange.100" borderRadius={'xl'} p={3}>
       <Text as="b">{exceptionName}</Text>: {exception.message}

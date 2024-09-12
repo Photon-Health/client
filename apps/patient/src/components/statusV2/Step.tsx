@@ -17,8 +17,8 @@ export const Step = ({ color, icon, complete, iconProps }: StepProps) => {
             ? color === 'primary'
               ? 'blue.500'
               : color === 'danger'
-                ? 'red.500'
-                : 'orange.400'
+              ? 'red.500'
+              : 'orange.400'
             : 'gray.300'
         }
         w="full"
@@ -33,8 +33,8 @@ export const Step = ({ color, icon, complete, iconProps }: StepProps) => {
             ? color === 'primary'
               ? 'blue.500'
               : color === 'danger'
-                ? 'red.500'
-                : 'orange.400'
+              ? 'red.500'
+              : 'orange.400'
             : 'gray.300'
         }
         {...iconProps}
