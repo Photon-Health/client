@@ -28,7 +28,7 @@ or
 npx nx run elements:upload-s3:dist
 ```
 
-## Building the Chrome Extension Locally
+## Developing the Chrome Extension Locally
 
 In order to run the local server with support for live-reloading and HMR, run:
 
