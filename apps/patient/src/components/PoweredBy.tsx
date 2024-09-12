@@ -1,12 +1,13 @@
-import { HStack, Link, Text } from '@chakra-ui/react';
+import { VStack, Link, Text } from '@chakra-ui/react';
+import { Logo } from './Logo';
 
 export const PoweredBy = () => {
   return (
-    <HStack spacing={1}>
+    <VStack spacing={1}>
       <Text fontSize="sm">Powered by</Text>
       <Link isExternal href="https://photon.health" fontSize="sm" textDecoration="underline">
-        Photon
+        <Logo />
       </Link>
-    </HStack>
+    </VStack>
   );
 };
