@@ -1,5 +1,5 @@
-import { extendTheme, theme as baseTheme } from '@chakra-ui/react';
 import { theme } from '@chakra-ui/pro-theme';
+import { theme as baseTheme, extendTheme } from '@chakra-ui/react';
 import { mode, StyleFunctionProps } from '@chakra-ui/theme-tools';
 
 const blue = {

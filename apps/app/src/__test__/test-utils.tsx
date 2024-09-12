@@ -1,5 +1,5 @@
-import { render, RenderOptions } from '@testing-library/react';
 import { ChakraProvider, theme } from '@chakra-ui/react';
+import { render, RenderOptions } from '@testing-library/react';
 import { ReactElement, ReactNode } from 'react';
 
 function AllProviders({ children }: { children?: ReactNode }) {

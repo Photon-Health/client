@@ -1,5 +1,5 @@
-import { action, computed } from 'nanostores';
 import { persistentAtom } from '@nanostores/persistent';
+import { action, computed } from 'nanostores';
 import { ulid } from 'ulid';
 import { titleCase } from '../utils';
 
