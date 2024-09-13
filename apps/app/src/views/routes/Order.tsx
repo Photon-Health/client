@@ -87,6 +87,17 @@ const GET_ORDER = gql`
       id
       externalId
       state
+      address {
+        name {
+          full
+        }
+        city
+        country
+        postalCode
+        state
+        street1
+        street2
+      }
       fills {
         id
         prescription {
@@ -114,17 +125,6 @@ const GET_ORDER = gql`
         gender
         email
         phone
-        address {
-          name {
-            full
-          }
-          city
-          country
-          postalCode
-          state
-          street1
-          street2
-        }
       }
       pharmacy {
         ...PharmacyFragment
@@ -757,8 +757,8 @@ export const Order = () => {
               {!loading && order.fulfillment?.type === 'MAIL_ORDER' ? (
                 <>
                   <InfoGrid name="Delivery Address">
-                    {order.patient?.address ? (
-                      <Text fontSize="md">{formatAddress(order.patient.address)}</Text>
+                    {order?.address ? (
+                      <Text fontSize="md">{formatAddress(order.address)}</Text>
                     ) : (
                       <Text fontSize="md" as="i" color="gray.500">
                         None
