@@ -4,16 +4,31 @@ import { FiInfo } from 'react-icons/fi';
 
 import { CouponModal } from '../components';
 import { text as t } from '../utils/text';
+import { useOrderContext } from '../views/Main';
 
 export const CouponDetails: FC = () => {
   const [couponModalOpen, setCouponModalOpen] = useState(false);
+  const {
+    order: { coupon }
+  } = useOrderContext();
+
+  if (!coupon) {
+    return null;
+  }
+
+  const { price, BIN, PCN, Group, MemberId } = coupon;
+
+  // Make sure we have all coupon details
+  if (!price || !BIN || !PCN || !Group || !MemberId) {
+    return null;
+  }
 
   return (
     <Container>
       <CouponModal isOpen={couponModalOpen} onClose={() => setCouponModalOpen(false)} />
       <VStack w="full" spacing={4}>
         <Text fontSize="4xl" fontWeight="700" py={0} lineHeight="1">
-          $8.71
+          ${price}
         </Text>
         <Box bgColor="blue.50" w="full" textAlign="center" p={2} borderRadius="xl">
           <Text fontWeight="semibold" fontSize="md">
@@ -28,10 +43,10 @@ export const CouponDetails: FC = () => {
             <Text>{t.memberId}</Text>
           </VStack>
           <VStack w="70%" align="start">
-            <Text as="b">015995</Text>
-            <Text as="b">GDC</Text>
-            <Text as="b">DR33</Text>
-            <Text as="b">HFFF867485</Text>
+            <Text as="b">{BIN}</Text>
+            <Text as="b">{PCN}</Text>
+            <Text as="b">{Group}</Text>
+            <Text as="b">{MemberId}</Text>
           </VStack>
         </HStack>
         <HStack color="blue.500">
