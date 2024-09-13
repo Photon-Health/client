@@ -50,6 +50,8 @@ const newMedSearchTesters = [
   'Grace Hunter',
   // Summer
   'Ali Alhassani',
+  // Ognomy
+  'Ruby Saulog',
   // hooligans
   'Josh Knapp',
   'Michael Rochlin',
