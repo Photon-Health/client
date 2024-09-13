@@ -10,13 +10,13 @@ import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
 import { DemoCtaModal, PHARMACY_BRANDING, PharmacyInfo, PoweredBy } from '../components';
 import { Card } from '../components/Card';
 import { FAQModal } from '../components/FAQModal';
-import { FulfillmentData, OrderSummary } from '../components/order-summary/OrderSummary';
+import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal';
+import { OrderSummary } from '../components/order-summary/OrderSummary';
 import { OrderStatusHeader } from '../components/statusV2/Header';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
-import { OrderDetailsModal, PrescriptionData } from '../components/order-details/OrderDetailsModal';
 
 export const StatusV2 = () => {
   const navigate = useNavigate();
@@ -203,40 +203,52 @@ export const StatusV2 = () => {
     navigate(`/pharmacy?${query}`);
   };
 
-  const fulfillments: FulfillmentData[] = flattenedFills.flatMap((f) => [
-    {
-      rxName: f.treatment.name,
-      exceptions: [],
-      pharmacyEstimatedReadyTime: new Date('2024-09-13T20:00:00.000Z'),
-      state: 'PROCESSING'
-    },
-    {
-      rxName: f.treatment.name,
-      exceptions: [
-        { type: 'OOS', message: 'Zepbound is out of stock but will be in soon' },
-        { type: 'PA_REQUIRED', message: 'Zepbound is out of stock but will be in soon' }
-      ],
-      pharmacyEstimatedReadyTime: new Date('2024-09-13T21:00:00.000Z'),
-      state: 'PROCESSING'
-    }
-  ]);
+  // const fulfillments: FulfillmentData[] = flattenedFills.flatMap((f) => [
+  //   {
+  //     rxName: f.treatment.name,
+  //     exceptions: [],
+  //     pharmacyEstimatedReadyTime: new Date('2024-09-13T20:00:00.000Z'),
+  //     state: 'PROCESSING'
+  //   },
+  //   {
+  //     rxName: f.treatment.name,
+  //     exceptions: [
+  //       { type: 'OOS', message: 'Zepbound is out of stock but will be in soon' },
+  //       { type: 'PA_REQUIRED', message: 'Zepbound is out of stock but will be in soon' }
+  //     ],
+  //     pharmacyEstimatedReadyTime: new Date('2024-09-13T21:00:00.000Z'),
+  //     state: 'PROCESSING'
+  //   }
+  // ]);
 
-  const prescriptions: PrescriptionData[] = flattenedFills.flatMap((f) => [
-    {
-      rxName: f.treatment.name,
-      quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
-      daysSupply: f.prescription?.daysSupply ?? 0,
-      numRefills: f.prescription?.fillsAllowed ?? 0,
-      expiresAt: f.prescription?.expirationDate ?? new Date()
-    },
-    {
-      rxName: f.treatment.name,
-      quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
-      daysSupply: f.prescription?.daysSupply ?? 0,
-      numRefills: f.prescription?.fillsAllowed ?? 0,
-      expiresAt: f.prescription?.expirationDate ?? new Date()
-    }
-  ]);
+  const fulfillments = order.fulfillments.map((f) => ({
+    ...f,
+    rxName: f.prescription.treatment.name
+  }));
+
+  // const prescriptions: PrescriptionData[] = flattenedFills.flatMap((f) => [
+  //   {
+  // rxName: f.treatment.name,
+  // quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
+  // daysSupply: f.prescription?.daysSupply ?? 0,
+  // numRefills: f.prescription?.fillsAllowed ?? 0,
+  // expiresAt: f.prescription?.expirationDate ?? new Date()
+  //   },
+  //   {
+  //     rxName: f.treatment.name,
+  //     quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
+  //     daysSupply: f.prescription?.daysSupply ?? 0,
+  //     numRefills: f.prescription?.fillsAllowed ?? 0,
+  //     expiresAt: f.prescription?.expirationDate ?? new Date()
+  //   }
+  // ]);
+  const prescriptions = fulfillments.map((f) => ({
+    rxName: f.prescription.treatment.name,
+    quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
+    daysSupply: f.prescription?.daysSupply ?? 0,
+    numRefills: f.prescription?.fillsAllowed ?? 0,
+    expiresAt: f.prescription?.expirationDate ?? new Date()
+  }));
 
   const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
   const [orderDetailsIsOpen, setOrderDetailsIsOpen] = useState(false);

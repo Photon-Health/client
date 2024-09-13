@@ -5,14 +5,14 @@ import { groupBy } from 'lodash';
 import React from 'react';
 
 export interface ExceptionData {
-  message: string;
-  type: 'OOS' | 'BACKORDERED' | 'PA_REQUIRED';
+  message?: string;
+  exceptionType: 'OOS' | 'BACKORDERED' | 'PA_REQUIRED';
 }
 
 export interface FulfillmentData {
   rxName: string;
   exceptions: ExceptionData[];
-  pharmacyEstimatedReadyTime: Date | undefined;
+  pharmacyEstimatedReadyAt?: Date | undefined;
   state: 'CREATED' | 'SENT' | 'RECEIVED' | 'PROCESSING' | 'READY' | 'PICKED_UP';
 }
 
@@ -22,9 +22,9 @@ function groupFulfillments(fulfillments: FulfillmentData[]) {
     derivedState:
       f.exceptions.length === 0
         ? f.state
-        : f.pharmacyEstimatedReadyTime != null
-        ? ('EXCEPTION_WITH_READY_TIME' as const)
-        : ('EXCEPTION_NO_READY_TIME' as const)
+        : f.pharmacyEstimatedReadyAt != null
+          ? ('EXCEPTION_WITH_READY_TIME' as const)
+          : ('EXCEPTION_NO_READY_TIME' as const)
   }));
 
   const groupedByDerivedState = groupBy(derivedState, 'derivedState') as {
@@ -37,12 +37,12 @@ function groupFulfillments(fulfillments: FulfillmentData[]) {
 function getLatestReadyTime(fulfillments: FulfillmentData[]) {
   return fulfillments.reduce(
     (time: Date | undefined, f) =>
-      time == null || f.pharmacyEstimatedReadyTime == null
+      time == null || f.pharmacyEstimatedReadyAt == null
         ? undefined
-        : f.pharmacyEstimatedReadyTime > time
-        ? f.pharmacyEstimatedReadyTime
-        : time,
-    fulfillments[0].pharmacyEstimatedReadyTime
+        : f.pharmacyEstimatedReadyAt > time
+          ? f.pharmacyEstimatedReadyAt
+          : time,
+    fulfillments[0].pharmacyEstimatedReadyAt
   );
 }
 
@@ -69,16 +69,16 @@ function formatReadyText(d: Date | undefined) {
 
 const ExceptionsBlock = ({ exception }: { exception: ExceptionData }) => {
   const exceptionName =
-    exception.type === 'BACKORDERED'
+    exception.exceptionType === 'BACKORDERED'
       ? 'Backordered'
-      : exception.type === 'OOS'
-      ? 'Out of stock'
-      : exception.type === 'PA_REQUIRED'
-      ? 'Approval required'
-      : undefined;
+      : exception.exceptionType === 'OOS'
+        ? 'Out of stock'
+        : exception.exceptionType === 'PA_REQUIRED'
+          ? 'Approval required'
+          : undefined;
   return (
     <Box bg="orange.100" borderRadius={'xl'} p={3}>
-      <Text as="b">{exceptionName}</Text>: {exception.message}
+      <Text as="b">{exceptionName}</Text>: {exception.message ?? 'Let us know if you have an issue'}
     </Box>
   );
 };
@@ -88,7 +88,7 @@ const FulfillmentBlock = ({ fulfillment }: { fulfillment: FulfillmentData }) => 
     <VStack w="full" alignItems={'stretch'}>
       <Text>{fulfillment.rxName}</Text>
       {fulfillment.exceptions.map((e) => (
-        <ExceptionsBlock key={`${fulfillment.rxName}-${e.type}`} exception={e} />
+        <ExceptionsBlock key={`${fulfillment.rxName}-${e.exceptionType}`} exception={e} />
       ))}
     </VStack>
   );
