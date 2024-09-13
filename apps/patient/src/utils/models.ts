@@ -11,8 +11,8 @@ export type Fill = Order['fills'][number];
 export interface DiscountCard {
   id: string;
   price: number;
-  BIN: string;
-  PCN: string;
+  bin: string;
+  pcn: string;
   group: string;
   memberId: string;
 }
