@@ -8,13 +8,13 @@ import {
 type NotMaybe<T> = Exclude<T, null | undefined>;
 export type Order = NotMaybe<GetOrderQuery['order']>;
 export type Fill = Order['fills'][number];
-export interface Coupon {
+export interface DiscountCard {
   id: string;
   price: number;
   BIN: string;
   PCN: string;
-  Group: string;
-  MemberId: string;
+  group: string;
+  memberId: string;
 }
 
 export type Fulfillment = Order['fulfillments'][number];
