@@ -224,60 +224,58 @@ const Component = (props: {
         }
         form={
           <div class="w-full h-full bg-[#F9FAFB]">
-            <div class="w-full h-full">
-              <photon-prescribe-workflow
-                hide-submit="true"
-                hide-templates={props.hideTemplates}
-                loading={triggerSubmit()}
-                patient-id={props.patientId}
-                template-ids={props.templateIds}
-                prescription-ids={props.prescriptionIds}
-                weight={props.weight}
-                weight-unit={props.weightUnit}
-                external-order-id={props.externalOrderId}
-                additional-notes={props.additionalNotes}
-                enable-med-history={props.enableMedHistory}
-                enable-med-history-links={props.enableMedHistoryLinks}
-                enable-order={props.enableOrder}
-                enable-local-pickup={props.enableLocalPickup}
-                enable-send-to-patient={props.enableSendToPatient}
-                enable-combine-and-duplicate={props.enableCombineAndDuplicate}
-                pharmacy-id={props.pharmacyId}
-                mail-order-ids={props.mailOrderIds}
-                trigger-submit={triggerSubmit()}
-                set-trigger-submit={setTriggerSubmit}
-                toast-buffer={props?.toastBuffer || 0}
-                on:photon-form-validate={(e: any) => {
-                  setCanSubmit(e.detail.canSubmit);
-                  setForm(e.detail.form);
-                }}
-                on:photon-prescriptions-created={(e: any) => {
-                  e.stopPropagation();
-                  if (!props.enableOrder) {
-                    dispatchPrescriptionsCreated(
-                      isCreateOrder(),
-                      e.detail.prescriptions.map((p: { id: string }) => p.id),
-                      form()?.patient?.value?.id
-                    );
-                  }
-                }}
-                on:photon-order-error={(e: any) => {
-                  e.stopPropagation();
-                  setTriggerSubmit(false);
-                }}
-                on:photon-order-combine-error={(e: any) => {
-                  e.stopPropagation();
-                  setTriggerSubmit(false);
-                }}
-                on:photon-signature-attestation-agreed={() => {
-                  setHideOrderButton(false);
-                }}
-                on:photon-signature-attestation-canceled={() => {
-                  dispatchClosed();
-                  patientActions.clearSelectedPatient();
-                }}
-              />
-            </div>
+            <photon-prescribe-workflow
+              hide-submit="true"
+              hide-templates={props.hideTemplates}
+              loading={triggerSubmit()}
+              patient-id={props.patientId}
+              template-ids={props.templateIds}
+              prescription-ids={props.prescriptionIds}
+              weight={props.weight}
+              weight-unit={props.weightUnit}
+              external-order-id={props.externalOrderId}
+              additional-notes={props.additionalNotes}
+              enable-med-history={props.enableMedHistory}
+              enable-med-history-links={props.enableMedHistoryLinks}
+              enable-order={props.enableOrder}
+              enable-local-pickup={props.enableLocalPickup}
+              enable-send-to-patient={props.enableSendToPatient}
+              enable-combine-and-duplicate={props.enableCombineAndDuplicate}
+              pharmacy-id={props.pharmacyId}
+              mail-order-ids={props.mailOrderIds}
+              trigger-submit={triggerSubmit()}
+              set-trigger-submit={setTriggerSubmit}
+              toast-buffer={props?.toastBuffer || 0}
+              on:photon-form-validate={(e: any) => {
+                setCanSubmit(e.detail.canSubmit);
+                setForm(e.detail.form);
+              }}
+              on:photon-prescriptions-created={(e: any) => {
+                e.stopPropagation();
+                if (!props.enableOrder) {
+                  dispatchPrescriptionsCreated(
+                    isCreateOrder(),
+                    e.detail.prescriptions.map((p: { id: string }) => p.id),
+                    form()?.patient?.value?.id
+                  );
+                }
+              }}
+              on:photon-order-error={(e: any) => {
+                e.stopPropagation();
+                setTriggerSubmit(false);
+              }}
+              on:photon-order-combine-error={(e: any) => {
+                e.stopPropagation();
+                setTriggerSubmit(false);
+              }}
+              on:photon-signature-attestation-agreed={() => {
+                setHideOrderButton(false);
+              }}
+              on:photon-signature-attestation-canceled={() => {
+                dispatchClosed();
+                patientActions.clearSelectedPatient();
+              }}
+            />
           </div>
         }
       />

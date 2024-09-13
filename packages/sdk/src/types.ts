@@ -894,6 +894,17 @@ export type TreatmentCodes = {
   rxcui?: Maybe<Scalars['String']>;
 };
 
+export type TreatmentOption = {
+  __typename?: 'TreatmentOption';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  ndc: Scalars['String'];
+  type: MedicationType;
+  route?: Scalars['String'];
+  form?: Scalars['String'];
+  strength?: Scalars['String'];
+};
+
 export type User = {
   __typename?: 'User';
   address?: Maybe<Address>;

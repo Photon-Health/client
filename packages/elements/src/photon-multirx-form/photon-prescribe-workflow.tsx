@@ -1,13 +1,16 @@
-//Shoelace Components
-import '@shoelace-style/shoelace/dist/components/alert/alert';
-import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
-import '@shoelace-style/shoelace/dist/components/icon/icon';
-import '@shoelace-style/shoelace/dist/components/switch/switch';
-import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-
-setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
-
-//Styles
+import { usePhoton } from '../context';
+import { PhotonAuthorized } from '../photon-authorized';
+import type { FormError } from '../stores/form';
+import tailwind from '../tailwind.css?inline';
+import { checkHasPermission } from '../utils';
+import { AddPrescriptionCard } from './components/AddPrescriptionCard';
+import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
+import { OrderCard } from './components/OrderCard';
+import { PatientCard } from './components/PatientCard';
+import { PharmacyCard } from './components/PharmacyCard';
+import styles from './style.css?inline';
+import clearForm from './util/clearForm';
+import { formatPatientWeight } from './util/formatPatientWeight';
 import {
   Alert,
   Button,
@@ -21,23 +24,44 @@ import {
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { Order, Prescription } from '@photonhealth/sdk/dist/types';
+import '@shoelace-style/shoelace/dist/components/alert/alert';
+import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
+import '@shoelace-style/shoelace/dist/components/icon/icon';
+import '@shoelace-style/shoelace/dist/components/switch/switch';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
+import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLError } from 'graphql';
 import { For, Ref, Show, createEffect, createMemo, createSignal, onMount, untrack } from 'solid-js';
-import { usePhoton } from '../context';
-import { PhotonAuthorized } from '../photon-authorized';
-import type { FormError } from '../stores/form';
-import tailwind from '../tailwind.css?inline';
-import { AddPrescriptionCard } from './components/AddPrescriptionCard';
-import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
-import { OrderCard } from './components/OrderCard';
-import { PatientCard } from './components/PatientCard';
-import { PharmacyCard } from './components/PharmacyCard';
-import styles from './style.css?inline';
-import clearForm from './util/clearForm';
-import { formatPatientWeight } from './util/formatPatientWeight';
-import { checkHasPermission } from '../utils';
+
+setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
+
+const newMedSearchTesters = [
+  // Modern Pediatrics
+  'Tim Porter',
+  'Sara DeFoy',
+  'Kelsey Hyde, NP', // she put her creds in her name lol
+  // Counsel
+  'Rishi Khakhkhar',
+  'Muthu Alagappan',
+  // Blueberry Pediatrics
+  'Kristen Borchetta',
+  // Miga
+  'Grace Hunter',
+  // Summer
+  'Ali Alhassani',
+  // hooligans
+  'Josh Knapp',
+  'Michael Rochlin',
+  'Jomi Cubol',
+  'Sam Kotlove',
+  'Jason Whittle',
+  'Rita Bulman',
+  'Michael Rado',
+  'Otto Sipe',
+  'Paul Christophe',
+  'Bill Killoran'
+];
 
 export type Address = {
   city: string;
@@ -90,6 +114,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const [authenticated, setAuthenticated] = createSignal<boolean>(
     client?.authentication.state.isAuthenticated || false
   );
+  const [enableNewMedicationSearch, setEnableNewMedicationSearch] = createSignal<boolean>(false);
   const [, recentOrdersActions] = useRecentOrders();
 
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
@@ -132,6 +157,14 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   });
   createEffect(() => {
     setAuthenticated(client?.authentication.state.isAuthenticated || false);
+  });
+  createEffect(() => {
+    if (authenticated()) {
+      const enableNewMedicationSearch = newMedSearchTesters.includes(
+        client?.authentication.state.user?.name
+      );
+      setEnableNewMedicationSearch(enableNewMedicationSearch);
+    }
   });
 
   const hasPrescribePermission = createMemo(() =>
@@ -301,7 +334,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           dispatchPrescriptionsError(errors);
           return;
         }
+
         dispatchPrescriptionsCreated(prescriptionData!.createPrescriptions);
+
         if (props.enableOrder) {
           if (
             props.formStore.updatePreferredPharmacy?.value &&
@@ -454,6 +489,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       weightUnit={props.weightUnit}
                       prefillNotes={prefillNotes}
                       enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+                      enableNewMedicationSearch={enableNewMedicationSearch()}
                     />
                   </div>
                 </Show>
