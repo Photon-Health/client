@@ -3,8 +3,8 @@ import { types } from '@photonhealth/sdk';
 interface DiscountCard {
   id: string;
   price: number;
-  BIN: string;
-  PCN: string;
+  bin: string;
+  pcn: string;
   group: string;
   memberId: string;
 }
