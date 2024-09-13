@@ -132,11 +132,9 @@ export const Pharmacy = () => {
   const hasTopRankedCostco = topRankedPharmacies.some((p) => p.name === 'Costco Pharmacy');
   const enableMailOrder =
     !isDemo &&
-    // If we're loading we shouldn't show pharmacies of mail order (we don't even know if we want to show until
-    // we see if there are top ranked costcos)
-    !isLoading &&
-    pharmacyResults.length > 0;
-  !hasTopRankedCostco && // this means org is Sesame, we don't want to show Amazon and top ranked Costco at the same time
+    // If we're showing costco, we don't want to show mail order
+    !orgSettings.topRankedCostco &&
+    !hasTopRankedCostco && // this means org is Sesame, we don't want to show Amazon and top ranked Costco at the same time
     orgSettings.mailOrderNavigate;
 
   // top ranked pharmacies
