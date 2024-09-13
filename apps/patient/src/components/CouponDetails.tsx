@@ -9,17 +9,17 @@ import { useOrderContext } from '../views/Main';
 export const CouponDetails: FC = () => {
   const [couponModalOpen, setCouponModalOpen] = useState(false);
   const {
-    order: { coupon }
+    order: { discountCard }
   } = useOrderContext();
 
-  if (!coupon) {
+  if (!discountCard) {
     return null;
   }
 
-  const { price, BIN, PCN, Group, MemberId } = coupon;
+  const { price, BIN, PCN, group, memberId } = discountCard;
 
   // Make sure we have all coupon details
-  if (!price || !BIN || !PCN || !Group || !MemberId) {
+  if (!price || !BIN || !PCN || !group || !memberId) {
     return null;
   }
 
@@ -45,8 +45,8 @@ export const CouponDetails: FC = () => {
           <VStack w="70%" align="start">
             <Text as="b">{BIN}</Text>
             <Text as="b">{PCN}</Text>
-            <Text as="b">{Group}</Text>
-            <Text as="b">{MemberId}</Text>
+            <Text as="b">{group}</Text>
+            <Text as="b">{memberId}</Text>
           </VStack>
         </HStack>
         <HStack color="blue.500">

@@ -1,12 +1,12 @@
 import { types } from '@photonhealth/sdk';
 
-interface Coupon {
+interface DiscountCard {
   id: string;
   price: number;
   BIN: string;
   PCN: string;
-  Group: string;
-  MemberId: string;
+  group: string;
+  memberId: string;
 }
 
 export interface Order extends types.Order {
@@ -19,7 +19,7 @@ export interface Order extends types.Order {
   readyByTime?: string;
   isReroutable?: boolean;
   pharmacyEstimatedReadyAt?: Date;
-  coupon?: Coupon | null;
+  discountCard?: DiscountCard | null;
 }
 
 export interface Pharmacy extends types.Pharmacy {
