@@ -16,7 +16,6 @@ import { FillWithCount, countFillsAndRemoveDuplicates } from '../utils/general';
 import { Order } from '../utils/models';
 
 import { getSettings } from '@client/settings';
-import { OrderState } from '../__generated__/graphql';
 import { AUTH_HEADER_ERRORS } from '../api/internal';
 import { setAuthHeader } from '../configs/graphqlClient';
 import theme from '../configs/theme';
@@ -77,7 +76,7 @@ export const Main = () => {
       datadogRum.setGlobalContextProperty('orderId', orderId);
       datadogRum.setUser({ patientId: order.patient.id });
 
-      if (order.state === OrderState.Canceled) {
+      if (order.state === 'CANCELED') {
         navigate('/canceled', { replace: true });
         return;
       }

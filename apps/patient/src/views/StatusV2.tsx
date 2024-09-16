@@ -1,8 +1,7 @@
 import { Box, Button, Container, Heading, Link, Text, VStack, useToast } from '@chakra-ui/react';
 import { getSettings } from '@client/settings';
-import { types } from '@photonhealth/sdk';
 import queryString from 'query-string';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { FiCheck, FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -17,6 +16,8 @@ import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
+import { FulfillmentState } from 'packages/sdk/src/types';
+import { deriveOrderStatus, getLatestReadyTime } from '../utils/fulfillmentsHelpers';
 
 export const StatusV2 = () => {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ export const StatusV2 = () => {
   const showReceivedButtonStates = ['RECEIVED', 'READY'];
   const [showReceivedButton, setShowReceivedButton] = useState<boolean>(
     showReceivedButtonStates.includes(order?.fulfillment?.state ?? '') &&
-      order?.fulfillment?.type !== types.FulfillmentType.MailOrder
+      order?.fulfillment?.type !== 'MAIL_ORDER'
   );
   const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
 
@@ -130,7 +131,7 @@ export const StatusV2 = () => {
           fulfillment: {
             ...order.fulfillment,
             state: 'RECEIVED',
-            type: 'PICK_UP' as types.FulfillmentType
+            type: 'PICK_UP'
           }
         });
 
@@ -150,7 +151,7 @@ export const StatusV2 = () => {
             fulfillment: {
               ...order.fulfillment,
               state: 'READY',
-              type: 'PICK_UP' as types.FulfillmentType
+              type: 'PICK_UP'
             }
           });
 
@@ -173,7 +174,7 @@ export const StatusV2 = () => {
 
   // There's still a slight delay (1-3s) before fulfillment is created,
   // so default to SENT on first navigation
-  const fulfillmentState = fulfillment?.state ?? 'SENT';
+  const fulfillmentState = (fulfillment?.state as FulfillmentState) ?? 'SENT';
 
   // Demo pharmacies are already prepared
   const pharmacyWithHours = pharmacy ? (isDemo ? pharmacy : preparePharmacy(pharmacy)) : undefined;
@@ -289,6 +290,9 @@ export const StatusV2 = () => {
     </Button>
   );
 
+  const pharmacyEstimatedReadyAt = useMemo(() => getLatestReadyTime(fulfillments), [fulfillments]);
+  const orderState = useMemo(() => deriveOrderStatus(fulfillments), [fulfillments]);
+
   return (
     <Box>
       <FAQModal isOpen={faqModalIsOpen} onClose={() => setFaqModalIsOpen(false)} />
@@ -306,8 +310,8 @@ export const StatusV2 = () => {
       <VStack spacing={4} width="full" alignItems={'stretch'}>
         <VStack p={4} bg="white" justifyContent={'center'}>
           <OrderStatusHeader
-            status={'PROCESSING'}
-            pharmacyEstimatedReadyAt={order.pharmacyEstimatedReadyAt}
+            status={orderState}
+            pharmacyEstimatedReadyAt={pharmacyEstimatedReadyAt}
             patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
             exception={
               order.pharmacy?.isOpen === false
@@ -354,7 +358,7 @@ export const StatusV2 = () => {
           </VStack>
         </VStack>
       </VStack>
-      {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
+      {fulfillmentType === 'MAIL_ORDER' && fulfillment?.trackingNumber ? (
         <Box>
           <Container>
             <VStack spacing={4} align="start" py={5}>

@@ -1,8 +1,9 @@
-import { Card } from '../Card';
 import { Box, Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import { groupBy } from 'lodash';
-import React from 'react';
+import { getLatestReadyTime } from '../../utils/fulfillmentsHelpers';
+import { Card } from '../Card';
+import { PrescriptionFulfillmentState } from '../../__generated__/graphql';
 
 export interface ExceptionData {
   message?: string;
@@ -13,7 +14,7 @@ export interface FulfillmentData {
   rxName: string;
   exceptions: ExceptionData[];
   pharmacyEstimatedReadyAt?: Date | undefined;
-  state: 'CREATED' | 'SENT' | 'RECEIVED' | 'PROCESSING' | 'READY' | 'PICKED_UP';
+  state: PrescriptionFulfillmentState;
 }
 
 function groupFulfillments(fulfillments: FulfillmentData[]) {
@@ -32,18 +33,6 @@ function groupFulfillments(fulfillments: FulfillmentData[]) {
   };
 
   return groupedByDerivedState;
-}
-
-function getLatestReadyTime(fulfillments: FulfillmentData[]) {
-  return fulfillments.reduce(
-    (time: Date | undefined, f) =>
-      time == null || f.pharmacyEstimatedReadyAt == null
-        ? undefined
-        : f.pharmacyEstimatedReadyAt > time
-          ? f.pharmacyEstimatedReadyAt
-          : time,
-    fulfillments[0].pharmacyEstimatedReadyAt
-  );
 }
 
 function formatReadyText(d: Date | undefined) {

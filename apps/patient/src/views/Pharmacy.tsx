@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -9,25 +7,16 @@ import {
   HStack,
   Link,
   Text,
-  VStack,
-  useToast
+  useToast,
+  VStack
 } from '@chakra-ui/react';
-import { FiCheck, FiMapPin } from 'react-icons/fi';
-import { Helmet } from 'react-helmet';
-import queryString from 'query-string';
-import * as TOAST_CONFIG from '../configs/toast';
-import { formatAddress, preparePharmacy } from '../utils/general';
-import { ExtendedFulfillmentType } from '../utils/models';
-import { text as t } from '../utils/text';
-import {
-  BrandedOptions,
-  FixedFooter,
-  LocationModal,
-  PickupOptions,
-  PoweredBy
-} from '../components';
-import { useOrderContext } from './Main';
 import { getSettings } from '@client/settings';
+import queryString from 'query-string';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import ReactGA from 'react-ga4';
+import { Helmet } from 'react-helmet';
+import { FiCheck, FiMapPin } from 'react-icons/fi';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   geocode,
   getPharmacies,
@@ -36,13 +25,22 @@ import {
   setPreferredPharmacy,
   triggerDemoNotification
 } from '../api';
-import { demoPharmacies } from '../data/demoPharmacies';
+import {
+  BrandedOptions,
+  FixedFooter,
+  LocationModal,
+  PickupOptions,
+  PoweredBy
+} from '../components';
+import * as TOAST_CONFIG from '../configs/toast';
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { demoPharmacies } from '../data/demoPharmacies';
+import { formatAddress, preparePharmacy } from '../utils/general';
 import { isGLP } from '../utils/isGLP';
-import ReactGA from 'react-ga4';
-import { FulfillmentType } from '../__generated__/graphql';
+import { Pharmacy as EnrichedPharmacy, ExtendedFulfillmentType } from '../utils/models';
+import { text as t } from '../utils/text';
+import { useOrderContext } from './Main';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
@@ -513,7 +511,7 @@ export const Pharmacy = () => {
             // Fudge it so that we can show the pharmacy card on initial load of the
             // status view for all types. On my christmas list for 2024 is better
             // fulfillment types on pharmacies.
-            let type: ExtendedFulfillmentType = FulfillmentType.PickUp;
+            let type: ExtendedFulfillmentType = 'PICK_UP';
             let selectedPharmacy = null;
             if (selectedId in capsulePharmacyIdLookup) {
               type = 'COURIER';
@@ -522,13 +520,13 @@ export const Pharmacy = () => {
               type = 'COURIER';
               selectedPharmacy = { id: selectedId, name: 'Alto Pharmacy' };
             } else if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
-              type = FulfillmentType.MailOrder;
+              type = 'MAIL_ORDER';
               selectedPharmacy = { id: selectedId, name: 'Amazon Pharmacy' };
             } else if (selectedId === process.env.REACT_APP_COSTCO_PHARMACY_ID) {
-              type = FulfillmentType.MailOrder;
+              type = 'MAIL_ORDER';
               selectedPharmacy = { id: selectedId, name: 'Costco Pharmacy' };
             } else {
-              type = FulfillmentType.PickUp;
+              type = 'PICK_UP';
               selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
             }
 

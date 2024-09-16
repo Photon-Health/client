@@ -8,7 +8,7 @@ export const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHOR
 
 export const getOrder = async (orderId: string) => {
   // Not wrapped in try/catch so error handling can be done in Main
-  const response = await graphQLClient.order({ id: orderId });
+  const response = await graphQLClient.GetOrder({ id: orderId });
   if (response.order) {
     return response.order;
   } else {

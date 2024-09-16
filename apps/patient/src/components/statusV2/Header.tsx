@@ -6,9 +6,10 @@ import { FiPackage } from 'react-icons/fi';
 import { IoDocumentTextOutline } from 'react-icons/io5';
 import { roundUpTo15MinInterval } from '../../utils/dates';
 import { Step } from './Step';
+import { PrescriptionFulfillment } from '../../__generated__/graphql';
 
 export interface OrderStatusHeaderProps {
-  status: 'DELAYED' | 'PLACED' | 'RECEIVED' | 'PROCESSING' | 'READY' | 'PICKED_UP';
+  status: PrescriptionFulfillment['state'] | 'DELAYED';
   exception?:
     | 'BACKORDERED'
     | 'OOS'
@@ -29,15 +30,22 @@ function headerText(status: OrderStatusHeaderProps['status']) {
       return 'Preparing order...';
     case 'PICKED_UP':
       return 'Order complete';
-    case 'PLACED':
+    case 'CREATED':
+    case 'SENT':
       return 'Order placed';
     case 'READY':
+    case 'DELIVERED':
       return 'Your order is ready';
+    default: {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const _: never = status;
+      return '';
+    }
   }
 }
 
 function subheaderText(props: OrderStatusHeaderProps) {
-  if (props.status === 'PLACED') {
+  if (props.status === 'CREATED' || props.status === 'SENT') {
     return "We're confirming your order with the pharmacy.";
   }
   if (props.status === 'PICKED_UP' || props.status === 'READY') {
@@ -185,7 +193,7 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
         {secondBar}
         {thirdBar}
       </HStack>
-      {props.status === 'PLACED' && props.patientDesiredReadyAt && (
+      {(props.status === 'CREATED' || props.status === 'SENT') && props.patientDesiredReadyAt && (
         <Box
           borderWidth={1}
           borderRadius={16}
