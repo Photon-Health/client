@@ -8,7 +8,7 @@ dayjs.extend(isTomorrow);
 
 interface ReadyTextProps {
   readyBy?: string;
-  readyByTime?: string;
+  readyByTime?: Date;
   isDeliveryPharmacy?: boolean;
   fulfillment?: Maybe<OrderFulfillment>;
 }
@@ -83,7 +83,7 @@ const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimate
 
 interface PatientDesiredReadyByProps {
   readyBy: string;
-  readyByTime: string;
+  readyByTime: Date;
 }
 const PatientDesiredReadyBy = ({ readyBy, readyByTime }: PatientDesiredReadyByProps) => {
   const readyByTimeDayJs = dayjs(readyByTime);
