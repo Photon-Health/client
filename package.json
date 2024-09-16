@@ -5,8 +5,8 @@
   "scripts": {
     "app:local": "concurrently \"npx graphql-codegen --watch --config='apps/app/codegen.ts'\" \"npx nx run app:start\"",
     "app:tau": "concurrently \"npx graphql-codegen --watch --config='apps/app/codegen.ts'\" \"npx nx run app:start:tau\"",
-    "patient": "npx nx run patient:start",
-    "patient:tau": "npx nx run patient:start:tau",
+    "patient:tau": "concurrently \"npx nx run patient:codegen:watch\" \"npx nx run patient:start:tau\"",
+    "patient": "concurrently \"npx nx run patient:codegen:watch\" \"npx nx run patient:start\"",
     "lint": "npx nx run-many --target=lint",
     "lint:fix": "npx nx run-many --target=lint:fix"
   },
@@ -19,6 +19,7 @@
     "@babel/preset-react": "^7.14.5",
     "@graphql-codegen/cli": "^5.0.0",
     "@graphql-codegen/client-preset": "^4.1.0",
+    "@graphql-codegen/typescript-graphql-request": "^6.2.0",
     "@nrwl/cypress": "^15.6.3",
     "@nrwl/eslint-plugin-nx": "^15.6.3",
     "@nrwl/jest": "15.6.3",
@@ -120,6 +121,7 @@
     "graphiql": "^2.4.1",
     "graphql": ">=16.0.0 <16.7.0",
     "graphql-request": "^5.2.0",
+    "graphql-scalars": "^1.23.0",
     "graphql-tag": "^2.12.6",
     "jwt-decode": "^3.1.2",
     "libphonenumber-js": "^1.10.24",
