@@ -91,7 +91,7 @@ function progress(props: OrderStatusHeaderProps) {
   if (props.status === 'PICKED_UP' || props.status === 'READY') {
     return 3;
   }
-  if (props.status === 'PROCESSING' || props.status === 'RECEIVED') {
+  if (props.exception == null && (props.status === 'PROCESSING' || props.status === 'RECEIVED')) {
     return 2;
   }
   return 1;

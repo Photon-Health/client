@@ -67,6 +67,14 @@ function formatReadyText(d: Date | undefined) {
   );
 }
 
+const MESSAGE: { [key in ExceptionData['exceptionType']]: string | undefined } = {
+  OOS: 'Pharmacy does not have your medication in stock but is able to order it. Contact us if you need it sooner.',
+  BACKORDERED:
+    'The pharmacy can’t order the medication. Contact your provider for alternatives or locate a pharmacy that has it in stock and we will send it there.',
+  PA_REQUIRED:
+    'Your insurance needs information from your provider to cover this medication. Contact your provider for alternatives or pay the cash price.'
+};
+
 const ExceptionsBlock = ({ exception }: { exception: ExceptionData }) => {
   const exceptionName =
     exception.exceptionType === 'BACKORDERED'
@@ -78,7 +86,8 @@ const ExceptionsBlock = ({ exception }: { exception: ExceptionData }) => {
           : undefined;
   return (
     <Box bg="orange.100" borderRadius={'xl'} p={3}>
-      <Text as="b">{exceptionName}</Text>: {exception.message ?? 'Let us know if you have an issue'}
+      <Text as="b">{exceptionName}</Text>:{' '}
+      {MESSAGE[exception.exceptionType] ?? exception.message ?? 'Let us know if you have an issue'}
     </Box>
   );
 };

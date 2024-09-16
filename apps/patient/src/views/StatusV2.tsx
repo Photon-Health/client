@@ -308,7 +308,12 @@ export const StatusV2 = () => {
             status={'PROCESSING'}
             pharmacyEstimatedReadyAt={order.pharmacyEstimatedReadyAt}
             patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
-            exception={order.pharmacy?.isOpen === false ? 'PHARMACY_CLOSED' : undefined}
+            exception={
+              order.pharmacy?.isOpen === false
+                ? 'PHARMACY_CLOSED'
+                : fulfillments.map((f) => f.exceptions[0]?.exceptionType).find((e) => e != null) ??
+                  undefined
+            }
           />
         </VStack>
 
