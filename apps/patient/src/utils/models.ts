@@ -1,30 +1,26 @@
-import { types } from '@photonhealth/sdk';
+import {
+  GetPharmaciesByLocationQuery,
+  OrderQuery,
+  Address as GQLAddress,
+  FulfillmentType
+} from '../__generated__/graphql';
 
-export interface Order extends types.Order {
-  organization: {
-    id: string;
-    name: string;
-  };
-  readyBy?: string;
-  readyByDay?: string;
-  readyByTime?: string;
-  isReroutable?: boolean;
-  pharmacyEstimatedReadyAt?: Date;
-}
+type NotMaybe<T> = Exclude<T, null | undefined>;
+export type Order = NotMaybe<OrderQuery['order']>;
+export type Fill = Order['fills'][number];
 
-export interface Pharmacy extends types.Pharmacy {
-  id: string;
-  address?: types.Address | null;
-  name: string;
-  info?: string | undefined;
-  distance?: number | undefined;
-  isOpen?: boolean;
+export type Pharmacy = NotMaybe<GetPharmaciesByLocationQuery['pharmaciesByLocation'][number]>;
+
+export type OrderFulfillment = NotMaybe<Order['fulfillment']>;
+
+export type EnrichedPharmacy = Pharmacy & {
+  logo?: string | null;
+  showReadyIn30Min?: boolean;
   is24Hr?: boolean;
   isClosingSoon?: boolean;
-  showReadyIn30Min?: boolean;
-  closes?: string;
-  opens?: string;
-  logo?: string | null;
-}
+  opens?: string | undefined;
+  closes?: string | undefined;
+};
+export type ExtendedFulfillmentType = FulfillmentType | 'COURIER';
 
-export type ExtendedFulfillmentType = types.FulfillmentType | 'COURIER';
+export type Address = GQLAddress;

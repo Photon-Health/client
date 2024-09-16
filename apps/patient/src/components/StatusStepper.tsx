@@ -59,9 +59,7 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
           >
             {getStates(fulfillmentType).map((state, id) => {
               // Types are a bit screwy here
-              const text = t[fulfillmentType][
-                state as keyof (typeof t)[typeof fulfillmentType]
-              ] as (typeof t)[typeof fulfillmentType]['SENT'];
+              const text = t[fulfillmentType][state]!;
               const title = text.status;
               const description = `${text.description(isMultiRx)}${
                 isDelivery && (state === 'SHIPPED' || state === 'READY') ? patientAddress : ''

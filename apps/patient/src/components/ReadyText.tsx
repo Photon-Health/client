@@ -1,13 +1,14 @@
 import dayjs from 'dayjs';
 import { Text } from '@chakra-ui/react';
-import { OrderFulfillment, Maybe } from 'packages/sdk/dist/types';
 import isTomorrow from 'dayjs/plugin/isTomorrow';
+import { Maybe } from '../__generated__/graphql';
+import { OrderFulfillment } from '../utils/models';
 
 dayjs.extend(isTomorrow);
 
 interface ReadyTextProps {
   readyBy?: string;
-  readyByTime?: string;
+  readyByTime?: Date;
   isDeliveryPharmacy?: boolean;
   fulfillment?: Maybe<OrderFulfillment>;
 }
@@ -82,7 +83,7 @@ const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimate
 
 interface PatientDesiredReadyByProps {
   readyBy: string;
-  readyByTime: string;
+  readyByTime: Date;
 }
 const PatientDesiredReadyBy = ({ readyBy, readyByTime }: PatientDesiredReadyByProps) => {
   const readyByTimeDayJs = dayjs(readyByTime);

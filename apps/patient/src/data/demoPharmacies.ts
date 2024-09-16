@@ -1,4 +1,6 @@
-export const demoPharmacies = [
+import { EnrichedPharmacy } from '../utils/models';
+
+export const demoPharmacies: EnrichedPharmacy[] = [
   {
     id: 'asdfsafas889767546f',
     address: {
@@ -9,7 +11,6 @@ export const demoPharmacies = [
       street1: '121 Kent Ave'
     },
     name: 'Central Pharmacy',
-    info: 'preferred',
     distance: 0.2,
     isOpen: true,
     closes: 'Closes 4:30PM',
@@ -26,7 +27,6 @@ export const demoPharmacies = [
       street1: '559 Driggs Ave'
     },
     name: 'Northside Pharmacy',
-    info: 'preferred',
     distance: 0.4,
     isOpen: false,
     closes: 'Closes 7PM',
@@ -43,7 +43,6 @@ export const demoPharmacies = [
       street1: '250 Bedford Ave'
     },
     name: `Walgreens Pharmacy`,
-    info: 'preferred',
     distance: 0.5,
     isOpen: true,
     closes: '',
@@ -60,7 +59,6 @@ export const demoPharmacies = [
       street1: '27 N 6th St'
     },
     name: `CVS Pharmacy`,
-    info: 'preferred',
     distance: 0.8,
     isOpen: true,
     closes: 'Closes 6PM',
@@ -77,7 +75,6 @@ export const demoPharmacies = [
       street1: '250 Bedford Ave'
     },
     name: `Duane Reade Pharmacy`,
-    info: 'preferred',
     distance: 1.0,
     isOpen: true,
     closes: '',
@@ -94,7 +91,6 @@ export const demoPharmacies = [
       street1: '205 N 9th St'
     },
     name: `Organic Planet Pharmacy`,
-    info: 'preferred',
     distance: 1.1,
     isOpen: true,
     closes: 'Closes 4:30PM',
@@ -111,7 +107,6 @@ export const demoPharmacies = [
       street1: '556 Grand St'
     },
     name: `United Pharmacy`,
-    info: 'preferred',
     distance: 1.1,
     isOpen: true,
     closes: 'Closes 4:30PM',
@@ -128,7 +123,6 @@ export const demoPharmacies = [
       street1: '255 S 2nd St'
     },
     name: `Santa Maria Pharmacy`,
-    info: 'preferred',
     distance: 1.4,
     isOpen: false,
     closes: 'Closes 4:30PM',
@@ -145,7 +139,6 @@ export const demoPharmacies = [
       street1: '258 Bedford Ave'
     },
     name: `Walgreens Pharmacy`,
-    info: 'preferred',
     distance: 1.5,
     isOpen: true,
     closes: '',
@@ -162,7 +155,6 @@ export const demoPharmacies = [
       street1: '682 Grand St'
     },
     name: `Sisto Pharmacy`,
-    info: 'preferred',
     distance: 2.1,
     isOpen: true,
     closes: 'Closes 4:30PM',
