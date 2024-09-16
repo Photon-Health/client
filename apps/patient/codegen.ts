@@ -1,8 +1,7 @@
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
-  schema: 'http://patient-api.boson.health/graphql',
-  // schema: 'http://patient-api.tau.health:8080/graphql',
+  schema: `${process.env.GQL_SCHEMA_URL ?? 'http://patient-api.boson.health'}/graphql`,
   documents: ['**/*.ts'],
   config: {
     maybeValue: 'T | undefined'

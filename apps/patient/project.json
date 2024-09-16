@@ -19,6 +19,13 @@
         "command": "npx graphql-codegen --watch"
       }
     },
+    "codegen:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "GQL_SCHEMA_URL='http://patient-api.tau.health:8080' npx graphql-codegen --watch"
+      }
+    },
     "start": {
       "executor": "nx:run-commands",
       "options": {
@@ -33,7 +40,7 @@
         "cwd": "apps/patient",
         "command": "env-cmd -f .env.tau react-app-rewired start"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen:tau"]
     },
     "build:boson": {
       "executor": "nx:run-commands",
