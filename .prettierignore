@@ -6,3 +6,4 @@
 
 # gql codegen
 /apps/app/src/gql
+__generated__

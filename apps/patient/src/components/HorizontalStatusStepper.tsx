@@ -25,9 +25,7 @@ export const HorizontalStatusStepper = ({ status, fulfillmentType }: Props) => {
   return (
     <HStack w="full" justify="space-evenly">
       {getStates(fulfillmentType).map((state, i) => {
-        const text = t[fulfillmentType][
-          state as keyof (typeof t)[typeof fulfillmentType]
-        ] as (typeof t)[typeof fulfillmentType]['SENT'];
+        const text = t[fulfillmentType][state]!;
         return (
           <VStack key={state} w="full">
             <Box
