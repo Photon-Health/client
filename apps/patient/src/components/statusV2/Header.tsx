@@ -9,7 +9,7 @@ import { Step } from './Step';
 import { PrescriptionFulfillment } from '../../__generated__/graphql';
 
 export interface OrderStatusHeaderProps {
-  status: PrescriptionFulfillment['state'] | 'DELAYED';
+  status: PrescriptionFulfillment['state'] | 'DELAYED' | 'FILLING' | 'SHIPPED';
   exception?:
     | 'BACKORDERED'
     | 'OOS'
@@ -27,6 +27,7 @@ function headerText(status: OrderStatusHeaderProps['status']) {
       return 'Order delayed';
     case 'PROCESSING':
     case 'RECEIVED':
+    case 'FILLING':
       return 'Preparing order...';
     case 'PICKED_UP':
       return 'Order complete';
@@ -34,8 +35,11 @@ function headerText(status: OrderStatusHeaderProps['status']) {
     case 'SENT':
       return 'Order placed';
     case 'READY':
-    case 'DELIVERED':
       return 'Your order is ready';
+    case 'DELIVERED':
+      return 'Order delivered';
+    case 'SHIPPED':
+      return 'Order in transit';
     default: {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _: never = status;
@@ -50,6 +54,12 @@ function subheaderText(props: OrderStatusHeaderProps) {
   }
   if (props.status === 'PICKED_UP' || props.status === 'READY') {
     return null;
+  }
+  if (props.status === 'FILLING') {
+    return 'The pharmacy is preparing your order for delivery.';
+  }
+  if (props.status === 'SHIPPED') {
+    return 'Your order is out for delivery';
   }
   if (
     props.exception === 'BACKORDERED' ||
@@ -96,10 +106,16 @@ function progressLevel(props: OrderStatusHeaderProps) {
 }
 
 function progress(props: OrderStatusHeaderProps) {
-  if (props.status === 'PICKED_UP' || props.status === 'READY') {
+  if (props.status === 'PICKED_UP' || props.status === 'READY' || props.status === 'DELIVERED') {
     return 3;
   }
-  if (props.exception == null && (props.status === 'PROCESSING' || props.status === 'RECEIVED')) {
+  if (
+    props.exception == null &&
+    (props.status === 'PROCESSING' ||
+      props.status === 'RECEIVED' ||
+      props.status === 'FILLING' ||
+      props.status === 'SHIPPED')
+  ) {
     return 2;
   }
   return 1;

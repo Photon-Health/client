@@ -291,7 +291,13 @@ export const StatusV2 = () => {
   );
 
   const pharmacyEstimatedReadyAt = useMemo(() => getLatestReadyTime(fulfillments), [fulfillments]);
-  const orderState = useMemo(() => deriveOrderStatus(fulfillments), [fulfillments]);
+  const orderState = useMemo(
+    () =>
+      order.fulfillment?.type === 'MAIL_ORDER'
+        ? (order.fulfillment.state as 'FILLING' | 'SHIPPED' | 'DELIVERED')
+        : deriveOrderStatus(fulfillments),
+    [fulfillments, order.fulfillment]
+  );
 
   return (
     <Box>
