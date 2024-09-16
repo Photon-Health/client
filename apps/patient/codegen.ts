@@ -2,6 +2,7 @@ import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
   schema: 'http://patient-api.boson.health/graphql',
+  // schema: 'http://patient-api.tau.health:8080/graphql',
   documents: ['**/*.ts'],
   config: {
     maybeValue: 'T | undefined'
