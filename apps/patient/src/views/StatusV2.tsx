@@ -205,7 +205,8 @@ export const StatusV2 = () => {
 
   const fulfillments = order.fulfillments.map((f) => ({
     ...f,
-    rxName: f.prescription.treatment.name
+    rxName: f.prescription.treatment.name,
+    exceptions: f.exceptions.filter((e) => e.resolvedAt == null)
   }));
 
   const prescriptions = fulfillments.map((f) => ({
