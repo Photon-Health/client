@@ -222,7 +222,7 @@ export const Status = () => {
                   : copy.subheading}
               </Text>
             </Box>
-            {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
+            {fulfillmentType === FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
               <Box alignSelf="start">
                 <Text display="inline" color="gray.600">
                   {t.tracking}

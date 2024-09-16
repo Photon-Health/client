@@ -13,7 +13,7 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { FiStar } from 'react-icons/fi';
 import { useLocation } from 'react-router-dom';
-import { Address, Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { Address, EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 
 import { useMemo, useState } from 'react';
