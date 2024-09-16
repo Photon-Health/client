@@ -1,24 +1,24 @@
-import { useLocation } from 'react-router-dom';
 import {
   Box,
   HStack,
+  IconButton,
+  Image,
   Tag,
   TagLabel,
   TagLeftIcon,
   Text,
-  VStack,
-  Image,
-  Button
+  VStack
 } from '@chakra-ui/react';
-import { FiStar } from 'react-icons/fi';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { Address, EnrichedPharmacy } from '../utils/models';
+import { FiStar } from 'react-icons/fi';
+import { useLocation } from 'react-router-dom';
+import { Address, Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 
-import { formatAddress, titleCase } from '../utils/general';
 import { useMemo, useState } from 'react';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
+import { formatAddress, titleCase } from '../utils/general';
 
 dayjs.extend(customParseFormat);
 
@@ -149,10 +149,11 @@ const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes, hours, showHours 
           ) : null}
         </HStack>
         {showHours && hours && (
-          <Button
+          <IconButton
             variant="minimal"
             onClick={() => setHoursOpen(!hoursOpen)}
-            rightIcon={hoursOpen ? <IoChevronUpOutline /> : <IoChevronDownOutline />}
+            icon={hoursOpen ? <IoChevronUpOutline /> : <IoChevronDownOutline />}
+            aria-label={'View Hours'}
           />
         )}
       </HStack>
