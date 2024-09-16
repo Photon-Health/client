@@ -203,45 +203,11 @@ export const StatusV2 = () => {
     navigate(`/pharmacy?${query}`);
   };
 
-  // const fulfillments: FulfillmentData[] = flattenedFills.flatMap((f) => [
-  //   {
-  //     rxName: f.treatment.name,
-  //     exceptions: [],
-  //     pharmacyEstimatedReadyTime: new Date('2024-09-13T20:00:00.000Z'),
-  //     state: 'PROCESSING'
-  //   },
-  //   {
-  //     rxName: f.treatment.name,
-  //     exceptions: [
-  //       { type: 'OOS', message: 'Zepbound is out of stock but will be in soon' },
-  //       { type: 'PA_REQUIRED', message: 'Zepbound is out of stock but will be in soon' }
-  //     ],
-  //     pharmacyEstimatedReadyTime: new Date('2024-09-13T21:00:00.000Z'),
-  //     state: 'PROCESSING'
-  //   }
-  // ]);
-
   const fulfillments = order.fulfillments.map((f) => ({
     ...f,
     rxName: f.prescription.treatment.name
   }));
 
-  // const prescriptions: PrescriptionData[] = flattenedFills.flatMap((f) => [
-  //   {
-  // rxName: f.treatment.name,
-  // quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
-  // daysSupply: f.prescription?.daysSupply ?? 0,
-  // numRefills: f.prescription?.fillsAllowed ?? 0,
-  // expiresAt: f.prescription?.expirationDate ?? new Date()
-  //   },
-  //   {
-  //     rxName: f.treatment.name,
-  //     quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
-  //     daysSupply: f.prescription?.daysSupply ?? 0,
-  //     numRefills: f.prescription?.fillsAllowed ?? 0,
-  //     expiresAt: f.prescription?.expirationDate ?? new Date()
-  //   }
-  // ]);
   const prescriptions = fulfillments.map((f) => ({
     rxName: f.prescription.treatment.name,
     quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
@@ -271,7 +237,7 @@ export const StatusV2 = () => {
         <VStack p={4} bg="white" justifyContent={'center'}>
           <OrderStatusHeader
             status={'PROCESSING'}
-            pharmacyEstimatedReadyAt={new Date() ?? order.pharmacyEstimatedReadyAt}
+            pharmacyEstimatedReadyAt={order.pharmacyEstimatedReadyAt}
             patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
             exception={order.pharmacy?.isOpen === false ? 'PHARMACY_CLOSED' : undefined}
           />
@@ -302,6 +268,7 @@ export const StatusV2 = () => {
                   pharmacy={pharmacyWithHours}
                   showDetails={fulfillmentType === 'PICK_UP'}
                   isStatus
+                  showHours
                 />
               ) : null}
               <VStack spacing={2} w="full">
