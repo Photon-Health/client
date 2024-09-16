@@ -24,8 +24,8 @@ function groupFulfillments(fulfillments: FulfillmentData[]) {
       f.exceptions.length === 0
         ? f.state
         : f.pharmacyEstimatedReadyAt != null
-          ? ('EXCEPTION_WITH_READY_TIME' as const)
-          : ('EXCEPTION_NO_READY_TIME' as const)
+        ? ('EXCEPTION_WITH_READY_TIME' as const)
+        : ('EXCEPTION_NO_READY_TIME' as const)
   }));
 
   const groupedByDerivedState = groupBy(derivedState, 'derivedState') as {
@@ -69,10 +69,10 @@ const ExceptionsBlock = ({ exception }: { exception: ExceptionData }) => {
     exception.exceptionType === 'BACKORDERED'
       ? 'Backordered'
       : exception.exceptionType === 'OOS'
-        ? 'Out of stock'
-        : exception.exceptionType === 'PA_REQUIRED'
-          ? 'Approval required'
-          : undefined;
+      ? 'Out of stock'
+      : exception.exceptionType === 'PA_REQUIRED'
+      ? 'Approval required'
+      : undefined;
   return (
     <Box bg="orange.100" borderRadius={'xl'} p={3}>
       <Text as="b">{exceptionName}</Text>:{' '}
