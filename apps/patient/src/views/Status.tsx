@@ -1,21 +1,21 @@
 import { Box, Button, Container, Heading, Link, Text, VStack, useToast } from '@chakra-ui/react';
 import { getSettings } from '@client/settings';
-import { types } from '@photonhealth/sdk';
 import queryString from 'query-string';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { FiCheck, FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
-import { DemoCtaModal, PharmacyInfo, PoweredBy, PHARMACY_BRANDING } from '../components';
+import { DemoCtaModal, PHARMACY_BRANDING, PharmacyInfo, PoweredBy } from '../components';
 import { FAQ } from '../components/FAQ';
+import { HorizontalStatusStepper } from '../components/HorizontalStatusStepper';
 import { PrescriptionsList } from '../components/PrescriptionsList';
+import { ReadyText } from '../components/ReadyText';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
-import { HorizontalStatusStepper } from '../components/HorizontalStatusStepper';
-import { ReadyText } from '../components/ReadyText';
+import { FulfillmentType } from '../__generated__/graphql';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ export const Status = () => {
   const showReceivedButtonStates = ['RECEIVED', 'READY'];
   const [showReceivedButton, setShowReceivedButton] = useState<boolean>(
     showReceivedButtonStates.includes(order?.fulfillment?.state ?? '') &&
-      order?.fulfillment?.type !== types.FulfillmentType.MailOrder
+      order?.fulfillment?.type !== FulfillmentType.MailOrder
   );
   const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
 
@@ -129,7 +129,7 @@ export const Status = () => {
           fulfillment: {
             ...order.fulfillment,
             state: 'RECEIVED',
-            type: 'PICK_UP' as types.FulfillmentType
+            type: FulfillmentType.PickUp
           }
         });
 
@@ -149,7 +149,7 @@ export const Status = () => {
             fulfillment: {
               ...order.fulfillment,
               state: 'READY',
-              type: 'PICK_UP' as types.FulfillmentType
+              type: FulfillmentType.PickUp
             }
           });
 
@@ -222,7 +222,7 @@ export const Status = () => {
                   : copy.subheading}
               </Text>
             </Box>
-            {fulfillmentType === types.FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
+            {fulfillmentType === FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
               <Box alignSelf="start">
                 <Text display="inline" color="gray.600">
                   {t.tracking}

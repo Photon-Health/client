@@ -1,3 +1,4 @@
 node_modules
 dist
 apps/app/src/gql
+__generated__

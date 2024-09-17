@@ -1,5 +1,7 @@
 import { Link } from '@chakra-ui/react';
-import React from 'react';
+import { FulfillmentState } from 'packages/sdk/src/types';
+import React, { ReactNode } from 'react';
+import { ExtendedFulfillmentType } from './models';
 
 export const text = {
   closed: 'Closed',
@@ -201,7 +203,17 @@ export function PhoneLink({ children }: { children?: React.ReactNode }): React.R
   );
 }
 
-export const orderStateMapping = {
+export const orderStateMapping: {
+  [FT in ExtendedFulfillmentType]: Partial<{
+    [State in FulfillmentState]: {
+      heading: string;
+      subheading: string | ((isPlural: boolean) => string);
+      status: string;
+      description: (pl: boolean) => string;
+      cta: (pl: boolean) => string;
+    };
+  }> & { error: { title: string; description: ReactNode } };
+} = {
   PICK_UP: {
     SENT: {
       heading: text.orderWasPlaced,

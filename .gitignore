@@ -40,3 +40,4 @@ storybook-static/
 build-storybook.log
 
 .nx/cache/
+__generated__
