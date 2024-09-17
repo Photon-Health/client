@@ -36,37 +36,6 @@ import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrac
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
-const newMedSearchTesters = [
-  // Modern Pediatrics
-  'Tim Porter',
-  'Sara DeFoy',
-  'Kelsey Hyde, NP', // she put her creds in her name lol
-  // Counsel
-  'Rishi Khakhkhar',
-  'Muthu Alagappan',
-  // Blueberry Pediatrics
-  'Kristen Borchetta',
-  // Miga
-  'Grace Hunter',
-  // Summer
-  'Ali Alhassani',
-  // Ognomy
-  'Ruby Saulog',
-  // hooligans
-  'Josh Knapp',
-  'Michael Rochlin',
-  'Jomi Cubol',
-  'Sam Kotlove',
-  'Jason Whittle',
-  'Rita Bulman',
-  'Michael Rado',
-  'Otto Sipe',
-  'Paul Christophe',
-  'Bill Killoran',
-  'Caitlyn Call',
-  'Melissa Lotto'
-];
-
 export type Address = {
   city: string;
   postalCode: string;
@@ -161,11 +130,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   });
   createEffect(() => {
     setAuthenticated(client?.authentication.state.isAuthenticated || false);
-  });
-  createEffect(() => {
-    if (authenticated()) {
-      setEnableNewMedicationSearch(enableNewMedicationSearch);
-    }
   });
 
   const hasPrescribePermission = createMemo(() =>

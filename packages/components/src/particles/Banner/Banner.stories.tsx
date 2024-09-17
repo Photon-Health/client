@@ -20,9 +20,15 @@ export const Default: BannerStory = {
   render: () => {
     return (
       <div class="max-w-md flex flex-col items-start gap-y-10">
-        <Banner status="info">This is an info banner</Banner>
-        <Banner status="info" withoutIcon>
+        <Banner status="info" name="info-banner-1">
+          This is an info banner
+        </Banner>
+        <Banner status="info" withoutIcon name="info-banner-2">
           This is an info banner without an icon
+        </Banner>
+        {/* Add a "name" parameter and it will be saved in local storage so it doesn't show again */}
+        <Banner status="info" withoutIcon closable>
+          This is a closable info banner
         </Banner>
       </div>
     );

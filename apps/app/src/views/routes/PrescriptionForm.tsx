@@ -1,8 +1,8 @@
-import { MutableRefObject, useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { usePhoton } from '@photonhealth/react';
 import { getSettings } from '@client/settings';
 import { datadogRum } from '@datadog/browser-rum';
+import { usePhoton } from '@photonhealth/react';
+import { MutableRefObject, useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 declare global {
   namespace JSX {
@@ -121,6 +121,7 @@ export const PrescriptionForm = () => {
           enable-local-pickup={orgSettings?.pickUp ?? false}
           enable-send-to-patient={orgSettings?.sendToPatient ?? false}
           enable-combine-and-duplicate={orgSettings?.enableCombineAndDuplicate ?? false}
+          enable-new-medication-search={true}
           mail-order-ids={orgSettings?.mailOrderProviders?.join(',') ?? ''}
           toast-buffer={70}
           hide-templates={orgSettings?.hideTemplates ?? false}
