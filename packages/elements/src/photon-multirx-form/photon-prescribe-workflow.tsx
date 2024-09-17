@@ -66,6 +66,11 @@ const newMedSearchTesters = [
   'Caitlyn Call',
   'Melissa Lotto'
 ];
+// Note: this has to be environment specific
+const newMedSearchOrgs = [
+  // Piction
+  'org_v5It8IoY0RH1Rw80'
+];
 
 export type Address = {
   city: string;
@@ -164,9 +169,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   });
   createEffect(() => {
     if (authenticated()) {
-      const enableNewMedicationSearch = newMedSearchTesters.includes(
-        client?.authentication.state.user?.name
-      );
+      const enableNewMedicationSearch =
+        newMedSearchTesters.includes(client?.authentication.state.user?.name) ||
+        newMedSearchOrgs.includes(client?.authentication.state.user?.org_id);
       setEnableNewMedicationSearch(enableNewMedicationSearch);
     }
   });
