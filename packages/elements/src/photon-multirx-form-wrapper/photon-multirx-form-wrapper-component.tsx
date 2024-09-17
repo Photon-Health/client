@@ -36,6 +36,7 @@ const Component = (props: {
   enableLocalPickup?: boolean;
   enableSendToPatient?: boolean;
   enableCombineAndDuplicate?: boolean;
+  enableNewMedicationSearch?: boolean;
   mailOrderIds?: string;
   enableOrder?: boolean;
   toastBuffer?: number;
@@ -298,6 +299,7 @@ customElement(
     enableMedHistory: false,
     enableMedHistoryLinks: false,
     enableCombineAndDuplicate: false,
+    enableNewMedicationSearch: false,
     mailOrderIds: undefined,
     enableOrder: false,
     toastBuffer: 0,

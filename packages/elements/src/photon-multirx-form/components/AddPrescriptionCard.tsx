@@ -197,13 +197,15 @@ export const AddPrescriptionCard = (props: {
       <Card>
         <div class="flex items-center justify-between">
           <Text color="gray">Add Prescription</Text>
-          <div
-            class="md:py-2 text-left sm:text-right text-blue-600 flex gap-2 cursor-pointer items-center h-full"
-            onClick={() => setMedDialogOpen(true)}
-          >
-            <a class="font-sans text-sm ">Advanced Search</a>
-            <Icon name="magnifyingGlass" size="sm" />
-          </div>
+          <Show when={!props.enableNewMedicationSearch}>
+            <div
+              class="md:py-2 text-left sm:text-right text-blue-600 flex gap-2 cursor-pointer items-center h-full"
+              onClick={() => setMedDialogOpen(true)}
+            >
+              <a class="font-sans text-sm ">Advanced Search</a>
+              <Icon name="magnifyingGlass" size="sm" />
+            </div>
+          </Show>
         </div>
 
         <div
