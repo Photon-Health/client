@@ -1,27 +1,27 @@
-import { afterDate, message, between } from '../../validators';
-import { record, string, any, number, min, size, refine } from 'superstruct';
-import { format } from 'date-fns';
 import {
-  Card,
-  Text,
+  Banner,
   Button,
-  Icon,
+  Card,
   DoseCalculator,
+  Icon,
+  Text,
   triggerToast,
   useRecentOrders
 } from '@photonhealth/components';
-import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-
+import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
+import { format } from 'date-fns';
+import { any, min, number, record, refine, size, string } from 'superstruct';
+import { afterDate, between, message } from '../../validators';
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/button/button';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-import { createSignal, Show, onMount } from 'solid-js';
-import repopulateForm from '../util/repopulateForm';
-import clearForm from '../util/clearForm';
-import { usePhoton } from '../../context';
 import { GraphQLError } from 'graphql';
+import { createSignal, onMount, Show } from 'solid-js';
+import { usePhoton } from '../../context';
+import clearForm from '../util/clearForm';
+import repopulateForm from '../util/repopulateForm';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -197,13 +197,15 @@ export const AddPrescriptionCard = (props: {
       <Card>
         <div class="flex items-center justify-between">
           <Text color="gray">Add Prescription</Text>
-          <div
-            class="md:py-2 text-left sm:text-right text-blue-600 flex gap-2 cursor-pointer items-center h-full"
-            onClick={() => setMedDialogOpen(true)}
-          >
-            <a class="font-sans text-sm ">Advanced Search</a>
-            <Icon name="magnifyingGlass" size="sm" />
-          </div>
+          <Show when={!props.enableNewMedicationSearch}>
+            <div
+              class="md:py-2 text-left sm:text-right text-blue-600 flex gap-2 cursor-pointer items-center h-full"
+              onClick={() => setMedDialogOpen(true)}
+            >
+              <a class="font-sans text-sm ">Advanced Search</a>
+              <Icon name="magnifyingGlass" size="sm" />
+            </div>
+          </Show>
         </div>
 
         <div
@@ -217,7 +219,18 @@ export const AddPrescriptionCard = (props: {
             });
           }}
         >
-          {props.enableNewMedicationSearch ? (
+          <Show when={props.enableNewMedicationSearch}>
+            <div class="mb-2">
+              <Banner status="info" withoutIcon closable id="new-medication-search-banner">
+                <div class="flex flex-col gap-2">
+                  <div class="text-sm">New Medication Search</div>
+                  <div class="text-sm text-gray-700">
+                    You can now search for any treatment in the standard search without using
+                    advanced search.
+                  </div>
+                </div>
+              </Banner>
+            </div>
             <photon-medication-search
               label="Search for Treatment"
               selected={props.store.treatment?.value ?? undefined}
@@ -253,7 +266,8 @@ export const AddPrescriptionCard = (props: {
               }}
               on:photon-search-text-changed={(e: any) => setSearchText(e.detail.text)}
             />
-          ) : (
+          </Show>
+          <Show when={!props.enableNewMedicationSearch}>
             <photon-treatment-select
               label="Search Treatment Catalog"
               selected={props.store.treatment?.value ?? undefined}
@@ -278,7 +292,7 @@ export const AddPrescriptionCard = (props: {
                 });
               }}
             />
-          )}
+          </Show>
           <div class="flex flex-col sm:flex-none sm:grid sm:grid-cols-2 sm:gap-4">
             <div class="order-last sm:order-first">
               <photon-checkbox
