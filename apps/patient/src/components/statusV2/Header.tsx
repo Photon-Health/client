@@ -131,6 +131,9 @@ const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimate
   const now = dayjs();
   const isFuture = now.isBefore(readyAtDayjs);
 
+  if (isFuture) {
+    return <Text>Your prescriptions should be ready</Text>;
+  }
   if (readyAtDayjs.isToday() && isFuture) {
     return (
       <Text>
@@ -175,11 +178,19 @@ function patientDesiredReadyByText(readyByTime: Date | 'URGENT') {
 export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
   props: OrderStatusHeaderProps
 ) => {
-  const header = headerText(props.status);
+  const isReady =
+    props.status === 'READY' ||
+    props.status === 'PICKED_UP' ||
+    (props.status === 'PROCESSING' &&
+      props.pharmacyEstimatedReadyAt &&
+      props.pharmacyEstimatedReadyAt < new Date());
+
+  const derivedStatus = isReady && props.status === 'PROCESSING' ? 'READY' : props.status;
+
+  const header = headerText(derivedStatus);
   const subheader = subheaderText(props);
   const color = progressLevel(props);
   const progressBar = progress(props);
-  const isReady = props.status === 'READY' || props.status === 'PICKED_UP';
 
   const firstBar = (
     <Step
