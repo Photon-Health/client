@@ -29,12 +29,14 @@ export default function Banner(props: BannerProps) {
   return (
     <Show when={isVisible()}>
       <div class="text-blue-600 flex items-start justify-between gap-2 bg-blue-50 py-3 px-3 sm:px-4 rounded-lg">
-        <Show when={!props.withoutIcon}>
-          <div class="flex-shrink-0">
-            <Icon name="informationCircle" size="sm" />
-          </div>
-        </Show>
-        {props.children}
+        <div class="flex items-center w-full">
+          <Show when={!props.withoutIcon}>
+            <div class="flex-shrink-0 mr-2">
+              <Icon name="informationCircle" size="sm" />
+            </div>
+          </Show>
+          {props.children}
+        </div>
         <Show when={props.closable}>
           <button type="button" onClick={closeBanner} class="ml-auto text-blue-600" title="Close">
             <Icon name="xMark" size="sm" />
