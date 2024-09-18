@@ -17,6 +17,12 @@ export interface FulfillmentData {
   state: PrescriptionFulfillmentState;
 }
 
+function exceptionCmp(e1: ExceptionData, e2: ExceptionData) {
+  if (e1.exceptionType === 'PA_REQUIRED') return 1;
+  if (e2.exceptionType === 'PA_REQUIRED') return 2;
+  return e1.exceptionType.localeCompare(e2.exceptionType);
+}
+
 function groupFulfillments(fulfillments: FulfillmentData[]) {
   const derivedState = fulfillments.map((f) => ({
     ...f,
@@ -24,8 +30,8 @@ function groupFulfillments(fulfillments: FulfillmentData[]) {
       f.exceptions.length === 0
         ? f.state
         : f.pharmacyEstimatedReadyAt != null
-        ? ('EXCEPTION_WITH_READY_TIME' as const)
-        : ('EXCEPTION_NO_READY_TIME' as const)
+          ? ('EXCEPTION_WITH_READY_TIME' as const)
+          : ('EXCEPTION_NO_READY_TIME' as const)
   }));
 
   const groupedByDerivedState = groupBy(derivedState, 'derivedState') as {
@@ -37,7 +43,7 @@ function groupFulfillments(fulfillments: FulfillmentData[]) {
 
 function formatReadyText(d: Date | undefined) {
   if (d == null) {
-    return <Text as="i">No ready time</Text>;
+    return <Text as="i">No ready time available</Text>;
   }
 
   if (d < new Date()) {
@@ -69,10 +75,10 @@ const ExceptionsBlock = ({ exception }: { exception: ExceptionData }) => {
     exception.exceptionType === 'BACKORDERED'
       ? 'Backordered'
       : exception.exceptionType === 'OOS'
-      ? 'Out of stock'
-      : exception.exceptionType === 'PA_REQUIRED'
-      ? 'Approval required'
-      : undefined;
+        ? 'Out of stock'
+        : exception.exceptionType === 'PA_REQUIRED'
+          ? 'Approval required'
+          : undefined;
   return (
     <Box bg="orange.100" borderRadius={'xl'} p={3}>
       <Text as="b">{exceptionName}</Text>:{' '}
@@ -85,7 +91,7 @@ const FulfillmentBlock = ({ fulfillment }: { fulfillment: FulfillmentData }) => 
   return (
     <VStack w="full" alignItems={'stretch'}>
       <Text>{fulfillment.rxName}</Text>
-      {fulfillment.exceptions.map((e) => (
+      {fulfillment.exceptions.sort(exceptionCmp).map((e) => (
         <ExceptionsBlock key={`${fulfillment.rxName}-${e.exceptionType}`} exception={e} />
       ))}
     </VStack>
@@ -111,7 +117,7 @@ const BlockWithHeader = ({
           borderBottomColor={'gray.200'}
           pb={2}
         >
-          <Text as="b" textColor={state === 'Delayed' ? 'orange.500' : 'blue.500'}>
+          <Text as="b" textColor={state === 'Delayed' ? 'orange.400' : 'blue.500'}>
             {state}
           </Text>
           {readyAtText}

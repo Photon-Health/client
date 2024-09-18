@@ -30,18 +30,20 @@ export const FAQModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
               Still need help?
             </Heading>
             <Card>
-              <Box>
-                If you have other pharmacy related questions, we are available 24/7 for support. We
-                typically respond within 30 minutes.
-              </Box>
-              <Button
-                as="a"
-                variant="outline"
-                color="blue.500"
-                href={`sms:${process.env.REACT_APP_TWILIO_SMS_NUMBER}`}
-              >
-                Message support
-              </Button>
+              <VStack spacing={1} w="full">
+                <Box>
+                  If you have other pharmacy related questions, we are available 24/7 for support.
+                  We typically respond within 30 minutes.
+                </Box>
+                <Button
+                  as="a"
+                  variant="outline"
+                  color="blue.500"
+                  href={`sms:${process.env.REACT_APP_TWILIO_SMS_NUMBER}`}
+                >
+                  Message support
+                </Button>
+              </VStack>
             </Card>
           </VStack>
         </ModalBody>

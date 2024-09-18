@@ -1,27 +1,25 @@
-import { Box, Button, Container, Heading, Link, Text, VStack, useToast } from '@chakra-ui/react';
+import { Box, Button, Container, Heading, Link, Text, VStack } from '@chakra-ui/react';
 import { getSettings } from '@client/settings';
 import queryString from 'query-string';
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { FiCheck, FiNavigation, FiRefreshCcw } from 'react-icons/fi';
+import { FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { markOrderAsPickedUp, triggerDemoNotification } from '../api';
+import { triggerDemoNotification } from '../api';
 import { DemoCtaModal, PHARMACY_BRANDING, PharmacyInfo, PoweredBy } from '../components';
 import { Card } from '../components/Card';
 import { FAQModal } from '../components/FAQModal';
 import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal';
 import { OrderSummary } from '../components/order-summary/OrderSummary';
 import { OrderStatusHeader } from '../components/statusV2/Header';
-import * as TOAST_CONFIG from '../configs/toast';
-import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
-import { orderStateMapping as m, text as t } from '../utils/text';
-import { useOrderContext } from './Main';
-import { FulfillmentState } from 'packages/sdk/src/types';
 import { deriveOrderStatus, getLatestReadyTime } from '../utils/fulfillmentsHelpers';
+import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
+import { text as t } from '../utils/text';
+import { useOrderContext } from './Main';
 
 export const StatusV2 = () => {
   const navigate = useNavigate();
-  const { order, flattenedFills, setOrder, isDemo } = useOrderContext();
+  const { order, setOrder, isDemo } = useOrderContext();
 
   const orgSettings = getSettings(order?.organization.id);
 
@@ -30,15 +28,7 @@ export const StatusV2 = () => {
   const type = searchParams.get('type');
   const phone = searchParams.get('phone');
 
-  const showReceivedButtonStates = ['RECEIVED', 'READY'];
-  const [showReceivedButton, setShowReceivedButton] = useState<boolean>(
-    showReceivedButtonStates.includes(order?.fulfillment?.state ?? '') &&
-      order?.fulfillment?.type !== 'MAIL_ORDER'
-  );
   const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
-
-  const [submitting, setSubmitting] = useState<boolean>(false);
-  const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
 
   const { fulfillment, pharmacy, readyBy, readyByTime } = order;
 
@@ -47,62 +37,6 @@ export const StatusV2 = () => {
     fulfillment ?? undefined,
     type ?? undefined
   );
-
-  const toast = useToast();
-
-  const handleMarkOrderAsPickedUp = async () => {
-    if (!order) {
-      return;
-    }
-    setSubmitting(true);
-
-    // Show cta modal for demo
-    if (isDemo) {
-      setTimeout(() => {
-        setSuccessfullySubmitted(true);
-        setTimeout(() => {
-          setShowReceivedButton(false);
-          setShowDemoCtaModal(true);
-        }, 1000);
-        setSubmitting(false);
-      }, 1000);
-
-      return;
-    }
-
-    try {
-      const result: boolean = await markOrderAsPickedUp(order.id);
-
-      setTimeout(() => {
-        if (result) {
-          setSuccessfullySubmitted(true);
-          setTimeout(() => setShowReceivedButton(false), 1000);
-
-          setOrder({
-            ...order,
-            fulfillment: { ...order.fulfillment, state: 'PICKED_UP', type: fulfillment!.type }
-          });
-        } else {
-          toast({
-            title: m[fulfillmentType].error.title,
-            description: m[fulfillmentType].error.description,
-            ...TOAST_CONFIG.ERROR
-          });
-        }
-        setSubmitting(false);
-      }, 1000);
-    } catch (error: any) {
-      toast({
-        title: m[fulfillmentType].error.title,
-        description: m[fulfillmentType].error.description,
-        ...TOAST_CONFIG.ERROR
-      });
-
-      setSubmitting(false);
-
-      console.error(JSON.stringify(error, undefined, 2));
-    }
-  };
 
   const pharmacyFormattedAddress = pharmacy?.address ? formatAddress(pharmacy.address) : '';
 
@@ -120,7 +54,7 @@ export const StatusV2 = () => {
       setTimeout(async () => {
         // Send order received sms to demo participant
         await triggerDemoNotification(
-          phone!,
+          phone,
           'photon:order_fulfillment:received',
           pharmacy.name,
           pharmacyFormattedAddress
@@ -134,8 +68,6 @@ export const StatusV2 = () => {
             type: 'PICK_UP'
           }
         });
-
-        setShowReceivedButton(true);
 
         setTimeout(async () => {
           // Send ready sms
@@ -170,11 +102,8 @@ export const StatusV2 = () => {
     setOrder
   ]);
 
-  const isMultiRx = flattenedFills.length > 1;
-
-  // There's still a slight delay (1-3s) before fulfillment is created,
-  // so default to SENT on first navigation
-  const fulfillmentState = (fulfillment?.state as FulfillmentState) ?? 'SENT';
+  const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
+  const [orderDetailsIsOpen, setOrderDetailsIsOpen] = useState(false);
 
   // Demo pharmacies are already prepared
   const pharmacyWithHours = pharmacy ? (isDemo ? pharmacy : preparePharmacy(pharmacy)) : undefined;
@@ -183,9 +112,6 @@ export const StatusV2 = () => {
     fulfillmentType === 'MAIL_ORDER' ||
     fulfillmentType === 'COURIER' ||
     pharmacy?.name === 'Amazon Pharmacy';
-
-  // TODO(mrochlin) Theres so typing issue here because MAIL_ORDER doesnt have RECEIVED as a valid state.
-  const copy = m[fulfillmentType][fulfillmentState]!;
 
   if (!order) {
     console.error('No order found');
@@ -217,9 +143,6 @@ export const StatusV2 = () => {
     numRefills: f.prescription?.fillsAllowed ?? 0,
     expiresAt: f.prescription?.expirationDate ?? new Date()
   }));
-
-  const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
-  const [orderDetailsIsOpen, setOrderDetailsIsOpen] = useState(false);
 
   const pharmacyInfo =
     order?.pharmacy?.id && isDeliveryPharmacy ? (
@@ -273,23 +196,6 @@ export const StatusV2 = () => {
     </Button>
   );
 
-  const markReceivedButton = (
-    <Button
-      size="md"
-      py={6}
-      w="full"
-      borderRadius="lg"
-      variant="outline"
-      color="blue.500"
-      colorScheme={successfullySubmitted ? 'green' : undefined}
-      leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
-      onClick={!successfullySubmitted ? handleMarkOrderAsPickedUp : undefined}
-      isLoading={submitting}
-    >
-      {successfullySubmitted ? t.thankYou : copy.cta(isMultiRx)}
-    </Button>
-  );
-
   const pharmacyEstimatedReadyAt = useMemo(() => getLatestReadyTime(fulfillments), [fulfillments]);
   const orderState = useMemo(
     () =>
@@ -300,7 +206,7 @@ export const StatusV2 = () => {
   );
 
   return (
-    <Box>
+    <VStack flex={1}>
       <FAQModal isOpen={faqModalIsOpen} onClose={() => setFaqModalIsOpen(false)} />
       <DemoCtaModal isOpen={showDemoCtaModal} onClose={() => setShowDemoCtaModal(false)} />
       <OrderDetailsModal
@@ -312,8 +218,7 @@ export const StatusV2 = () => {
       <Helmet>
         <title>{t.track}</title>
       </Helmet>
-
-      <VStack spacing={4} width="full" alignItems={'stretch'}>
+      <VStack spacing={4} width="full" alignItems={'stretch'} flex={1}>
         <VStack p={4} bg="white" justifyContent={'center'}>
           <OrderStatusHeader
             status={orderState}
@@ -328,7 +233,7 @@ export const StatusV2 = () => {
           />
         </VStack>
 
-        <VStack maxW={'xl'} mx="auto" w="full" spacing={6}>
+        <VStack maxW={'xl'} mx="auto" w="full" spacing={6} flex={1}>
           <OrderSummary
             fulfillments={fulfillments}
             onViewDetails={() => setOrderDetailsIsOpen(true)}
@@ -339,11 +244,12 @@ export const StatusV2 = () => {
               Pharmacy
             </Heading>
             <Card>
-              {pharmacyInfo}
-              <VStack spacing={2} w="full">
-                {pharmacyWithHours && !isDeliveryPharmacy && navigateButton}
-                {!isDeliveryPharmacy && pharmacyWithHours && canReroute && rerouteButton}
-                {pharmacyWithHours && showReceivedButton && markReceivedButton}
+              <VStack w="full">
+                {pharmacyInfo}
+                <VStack spacing={2} w="full">
+                  {pharmacyWithHours && !isDeliveryPharmacy && navigateButton}
+                  {!isDeliveryPharmacy && pharmacyWithHours && canReroute && rerouteButton}
+                </VStack>
               </VStack>
             </Card>
           </VStack>
@@ -388,10 +294,9 @@ export const StatusV2 = () => {
           </Container>
         </Box>
       ) : null}
-
-      <Container as={VStack} w="full" my={4}>
+      <VStack w="full" pb={6}>
         <PoweredBy />
-      </Container>
-    </Box>
+      </VStack>
+    </VStack>
   );
 };

@@ -122,7 +122,12 @@ const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes, hours, showHours 
 
   return (
     <VStack w="full">
-      <HStack w="full" justifyContent={'space-between'}>
+      <HStack
+        w="full"
+        justifyContent={'space-between'}
+        onClick={() => setHoursOpen(!hoursOpen)}
+        cursor={showHours ? 'pointer' : undefined}
+      >
         <HStack w="full" whiteSpace="nowrap" overflow="hidden" height="fit-content">
           {isOpen != null || isClosingSoon ? (
             <Text fontSize="sm" color={color} as="b">
@@ -151,9 +156,9 @@ const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes, hours, showHours 
         {showHours && hours && (
           <IconButton
             variant="minimal"
-            onClick={() => setHoursOpen(!hoursOpen)}
             icon={hoursOpen ? <IoChevronUpOutline /> : <IoChevronDownOutline />}
             aria-label={'View Hours'}
+            size={'5'}
           />
         )}
       </HStack>
@@ -231,7 +236,7 @@ export const PharmacyInfo = ({
     pharmacy.name === 'Capsule Pharmacy' && location.pathname === '/pharmacy';
 
   return (
-    <VStack align="start" w="full" spacing={1}>
+    <VStack align="start" w="full">
       {showPreferredTag ||
       showReadyIn30MinTag ||
       showAvailableInYourAreaTag ||
@@ -279,12 +284,7 @@ export const PharmacyInfo = ({
         </HStack>
       </HStack>
       {showDetails ? (
-        <VStack
-          direction={isStatus ? 'column-reverse' : 'column'}
-          spacing={1}
-          w="full"
-          alignItems={'start'}
-        >
+        <VStack direction={isStatus ? 'column-reverse' : 'column'} w="full" alignItems={'start'}>
           {tagline ? (
             <Text fontSize="sm" color="gray.500">
               {tagline}

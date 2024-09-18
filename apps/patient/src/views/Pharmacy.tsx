@@ -645,7 +645,7 @@ export const Pharmacy = () => {
         </Container>
       </Box>
 
-      <Container pb={showFooter ? 28 : 8}>
+      <Container pb={showFooter ? 32 : 8}>
         {location ? (
           <VStack spacing={6} align="stretch" pt={4}>
             {enableCourier || enableMailOrder ? (

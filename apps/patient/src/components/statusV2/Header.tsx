@@ -35,7 +35,7 @@ function headerText(status: OrderStatusHeaderProps['status']) {
     case 'SENT':
       return 'Order placed';
     case 'READY':
-      return 'Your order is ready';
+      return 'Your order is likely ready';
     case 'DELIVERED':
       return 'Order delivered';
     case 'SHIPPED':
@@ -78,7 +78,7 @@ function subheaderText(props: OrderStatusHeaderProps) {
     return 'We’re unable to send your prescription to your pharmacy. Please select a new pharmacy below.';
   }
   if (props.status === 'RECEIVED') {
-    return 'Your pharmacy has received your order.';
+    return 'Your pharmacy has received your order. We weren’t able to get a ready time.';
   }
   if (props.status === 'PROCESSING') {
     if (props.pharmacyEstimatedReadyAt) {
@@ -129,12 +129,12 @@ const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimate
   const readyAtDayjs = dayjs(rounded);
   const timeFormat = readyAtDayjs.minute() ? 'h:mm a' : 'h a';
   const now = dayjs();
-  const isFuture = now.isBefore(readyAtDayjs);
+  const isPast = now.isAfter(readyAtDayjs);
 
-  if (isFuture) {
+  if (!isPast) {
     return <Text>Your prescriptions should be ready</Text>;
   }
-  if (readyAtDayjs.isToday() && isFuture) {
+  if (readyAtDayjs.isToday()) {
     return (
       <Text>
         Ready at <b>{readyAtDayjs.format(timeFormat)}</b>
@@ -187,10 +187,12 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
 
   const derivedStatus = isReady && props.status === 'PROCESSING' ? 'READY' : props.status;
 
+  const derivedProps = { ...props, status: derivedStatus };
+
   const header = headerText(derivedStatus);
-  const subheader = subheaderText(props);
-  const color = progressLevel(props);
-  const progressBar = progress(props);
+  const subheader = subheaderText(derivedProps);
+  const color = progressLevel(derivedProps);
+  const progressBar = progress(derivedProps);
 
   const firstBar = (
     <Step
@@ -207,11 +209,9 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
 
   return (
     <VStack w="full" alignItems={'start'} spacing={4} maxW={'xl'}>
-      <Heading as="h3" color={isReady ? 'blue.600' : undefined}>
-        {header}
-      </Heading>
+      <Heading as="h3">{header}</Heading>
       {subheader && (
-        <Text as={props.status !== 'PROCESSING' ? 'b' : undefined} fontSize={'lg'}>
+        <Text as={derivedProps.status !== 'PROCESSING' ? 'b' : undefined} fontSize={'lg'}>
           {subheader}
         </Text>
       )}
@@ -231,7 +231,7 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
         >
           Requested Pickup:{' '}
           <Text as="b" paddingLeft={3}>
-            {patientDesiredReadyByText('URGENT' ?? props.patientDesiredReadyAt)}
+            {patientDesiredReadyByText(props.patientDesiredReadyAt)}
           </Text>
         </Box>
       )}
