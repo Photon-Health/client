@@ -242,6 +242,7 @@ const Component = (props: {
               enable-local-pickup={props.enableLocalPickup}
               enable-send-to-patient={props.enableSendToPatient}
               enable-combine-and-duplicate={props.enableCombineAndDuplicate}
+              enable-new-medication-search={props.enableNewMedicationSearch}
               pharmacy-id={props.pharmacyId}
               mail-order-ids={props.mailOrderIds}
               trigger-submit={triggerSubmit()}

@@ -221,7 +221,7 @@ export const AddPrescriptionCard = (props: {
         >
           <Show when={props.enableNewMedicationSearch}>
             <div class="mb-2">
-              <Banner status="info" withoutIcon closable name="new-medication-search-banner">
+              <Banner status="info" withoutIcon closable id="new-medication-search-banner">
                 <div class="flex flex-col gap-2">
                   <div class="text-sm">New Medication Search</div>
                   <div class="text-sm text-gray-700">

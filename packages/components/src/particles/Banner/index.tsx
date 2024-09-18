@@ -6,14 +6,14 @@ export type BannerProps = {
   status: 'success' | 'info';
   withoutIcon?: boolean;
   closable?: boolean;
-  name?: string;
+  id?: string;
 };
 
 export default function Banner(props: BannerProps) {
   const [isVisible, setIsVisible] = createSignal(true);
 
   onMount(() => {
-    const storedState = localStorage.getItem(`banner-${props.name}`);
+    const storedState = sessionStorage.getItem(`banner-${props.id}`);
     if (storedState === 'closed') {
       setIsVisible(false);
     }
@@ -21,8 +21,8 @@ export default function Banner(props: BannerProps) {
 
   const closeBanner = () => {
     setIsVisible(false);
-    if (props.name) {
-      localStorage.setItem(`photon-banner-${props.name}`, 'closed');
+    if (props.id) {
+      sessionStorage.setItem(`banner-${props.id}`, 'closed');
     }
   };
 
