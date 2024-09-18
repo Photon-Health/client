@@ -22,7 +22,7 @@ export default function Banner(props: BannerProps) {
   const closeBanner = () => {
     setIsVisible(false);
     if (props.name) {
-      localStorage.setItem(`banner-${props.name}`, 'closed');
+      localStorage.setItem(`photon-banner-${props.name}`, 'closed');
     }
   };
 
