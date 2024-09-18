@@ -95,6 +95,7 @@ export const PrescriptionForm = () => {
   }, [ref.current, patientId]);
 
   const orgSettings = getSettings(user?.org_id);
+  //  TODO: remove enable-new-medication-search after discovery
   return (
     <div
       style={{
