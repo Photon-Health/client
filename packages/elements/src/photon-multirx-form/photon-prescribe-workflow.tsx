@@ -32,40 +32,9 @@ import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?in
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLError } from 'graphql';
-import { For, Ref, Show, createEffect, createMemo, createSignal, onMount, untrack } from 'solid-js';
+import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
-
-const newMedSearchTesters = [
-  // Modern Pediatrics
-  'Tim Porter',
-  'Sara DeFoy',
-  'Kelsey Hyde, NP', // she put her creds in her name lol
-  // Counsel
-  'Rishi Khakhkhar',
-  'Muthu Alagappan',
-  // Blueberry Pediatrics
-  'Kristen Borchetta',
-  // Miga
-  'Grace Hunter',
-  // Summer
-  'Ali Alhassani',
-  // Ognomy
-  'Ruby Saulog',
-  // hooligans
-  'Josh Knapp',
-  'Michael Rochlin',
-  'Jomi Cubol',
-  'Sam Kotlove',
-  'Jason Whittle',
-  'Rita Bulman',
-  'Michael Rado',
-  'Otto Sipe',
-  'Paul Christophe',
-  'Bill Killoran',
-  'Caitlyn Call',
-  'Melissa Lotto'
-];
 
 export type Address = {
   city: string;
@@ -90,6 +59,7 @@ export type PrescribeProps = {
   enableMedHistory: boolean;
   enableMedHistoryLinks: boolean;
   enableCombineAndDuplicate: boolean;
+  enableNewMedicationSearch: boolean;
   mailOrderIds?: string;
   pharmacyId?: string;
   loading: boolean;
@@ -118,7 +88,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const [authenticated, setAuthenticated] = createSignal<boolean>(
     client?.authentication.state.isAuthenticated || false
   );
-  const [enableNewMedicationSearch, setEnableNewMedicationSearch] = createSignal<boolean>(false);
   const [, recentOrdersActions] = useRecentOrders();
 
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
@@ -161,14 +130,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   });
   createEffect(() => {
     setAuthenticated(client?.authentication.state.isAuthenticated || false);
-  });
-  createEffect(() => {
-    if (authenticated()) {
-      const enableNewMedicationSearch = newMedSearchTesters.includes(
-        client?.authentication.state.user?.name
-      );
-      setEnableNewMedicationSearch(enableNewMedicationSearch);
-    }
   });
 
   const hasPrescribePermission = createMemo(() =>
@@ -493,7 +454,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       weightUnit={props.weightUnit}
                       prefillNotes={prefillNotes}
                       enableCombineAndDuplicate={props.enableCombineAndDuplicate}
-                      enableNewMedicationSearch={enableNewMedicationSearch()}
+                      enableNewMedicationSearch={props.enableNewMedicationSearch}
                     />
                   </div>
                 </Show>

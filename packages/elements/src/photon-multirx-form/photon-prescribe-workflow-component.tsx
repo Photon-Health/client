@@ -1,7 +1,7 @@
 import { RecentOrders } from '@photonhealth/components';
+import { customElement } from 'solid-element';
 import { createFormStore } from '../stores/form';
 import { PrescribeProps, PrescribeWorkflow } from './photon-prescribe-workflow';
-import { customElement } from 'solid-element';
 
 const Component = (props: PrescribeProps) => {
   const { store, actions } = createFormStore({
@@ -30,6 +30,7 @@ const Component = (props: PrescribeProps) => {
         enableMedHistory={props.enableMedHistory}
         enableMedHistoryLinks={props.enableMedHistoryLinks}
         enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+        enableNewMedicationSearch={props.enableNewMedicationSearch}
         mailOrderIds={props.mailOrderIds}
         pharmacyId={props.pharmacyId}
         loading={props.loading}
@@ -60,6 +61,7 @@ customElement(
     enableLocalPickup: false,
     enableSendToPatient: false,
     enableCombineAndDuplicate: false,
+    enableNewMedicationSearch: false,
     enableMedHistory: false,
     enableMedHistoryLinks: false,
     mailOrderIds: undefined,
