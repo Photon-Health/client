@@ -109,6 +109,58 @@ export const GET_ORDER = gql`
   }
 `;
 
+const PHARMACY_FIELDS = gql`
+  fragment PharmacyFields on Pharmacy {
+    id
+    name
+    address {
+      street1
+      street2
+      city
+      state
+      country
+      postalCode
+    }
+    distance
+    isOpen(at: $openAt)
+    nextEvents(at: $openAt) {
+      open {
+        ... on PharmacyOpenEvent {
+          type
+          datetime
+        }
+        ... on PharmacyCloseEvent {
+          type
+          datetime
+        }
+        ... on PharmacyOpen24HrEvent {
+          type
+        }
+      }
+      close {
+        ... on PharmacyOpenEvent {
+          type
+          datetime
+        }
+        ... on PharmacyCloseEvent {
+          type
+          datetime
+        }
+        ... on PharmacyOpen24HrEvent {
+          type
+        }
+      }
+    }
+    hours {
+      dayOfWeek
+      is24Hr
+      openFrom
+      openUntil
+      timezone
+    }
+  }
+`;
+
 export const GET_PHARMACIES = gql`
   query GetPharmaciesByLocation(
     $location: LatLongSearch!
@@ -128,54 +180,24 @@ export const GET_PHARMACIES = gql`
       name: $name
       includePrice: $includePrice
     ) {
-      id
-      name
-      address {
-        street1
-        street2
-        city
-        state
-        country
-        postalCode
-      }
-      distance
-      isOpen(at: $openAt)
-      nextEvents(at: $openAt) {
-        open {
-          ... on PharmacyOpenEvent {
-            type
-            datetime
-          }
-          ... on PharmacyCloseEvent {
-            type
-            datetime
-          }
-          ... on PharmacyOpen24HrEvent {
-            type
-          }
-        }
-        close {
-          ... on PharmacyOpenEvent {
-            type
-            datetime
-          }
-          ... on PharmacyCloseEvent {
-            type
-            datetime
-          }
-          ... on PharmacyOpen24HrEvent {
-            type
-          }
-        }
-      }
-      hours {
-        dayOfWeek
-        is24Hr
-        openFrom
-        openUntil
-        timezone
-      }
-      medicationPrice
+      ...PharmacyFields
     }
   }
+  ${PHARMACY_FIELDS}
+`;
+
+export const GET_PHARMACIES_WITH_PRICE = gql`
+  query GetPharmaciesWithPriceByLocation(
+    $location: LatLongSearch!
+    $openAt: DateTime
+    $is24hr: Boolean
+  ) {
+    pharmaciesWithPriceByLocation(location: $location, openAt: $openAt, is24hr: $is24hr) {
+      pharmacy {
+        ...PharmacyFields
+      }
+      price
+    }
+  }
+  ${PHARMACY_FIELDS}
 `;

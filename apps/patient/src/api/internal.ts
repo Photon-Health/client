@@ -4,6 +4,7 @@ import { graphQLClient } from '../configs/graphqlClient';
 import {
   GET_ORDER,
   GET_PHARMACIES,
+  GET_PHARMACIES_WITH_PRICE,
   MARK_ORDER_AS_PICKED_UP,
   REROUTE_ORDER,
   SET_ORDER_PHARMACY,
@@ -52,24 +53,36 @@ export const getPharmacies = async ({
 }) => {
   try {
     const now = new Date();
-    const response: { pharmaciesByLocation: types.Pharmacy[] } = await graphQLClient.request(
-      GET_PHARMACIES,
-      {
-        location: {
-          radius: 100,
-          ...searchParams
-        },
-        limit,
-        offset,
-        openAt: isOpenNow ? now : undefined,
-        is24hr,
-        name,
-        includePrice
-      }
-    );
+
+    // either the pharmaciesByLocation or pharmaciesWithPriceByLocation query is used
+    // depending on the includePrice flag
+    const query = includePrice ? GET_PHARMACIES_WITH_PRICE : GET_PHARMACIES;
+    const variables = {
+      location: {
+        radius: 100,
+        ...searchParams
+      },
+      openAt: isOpenNow ? now : undefined,
+      is24hr,
+      ...(!includePrice ? { limit, offset, name } : {})
+    };
+
+    const response: {
+      pharmaciesByLocation: types.Pharmacy[];
+      pharmaciesWithPriceByLocation: { pharmacy: types.Pharmacy; price: number }[];
+    } = await graphQLClient.request(query, variables);
 
     if (response?.pharmaciesByLocation?.length > 0) {
       return response.pharmaciesByLocation;
+    }
+
+    if (response?.pharmaciesWithPriceByLocation?.length > 0) {
+      // this query returns an array of objects with pharmacy and price side by side
+      // so I'm combining them into a single object to be compatible with the rest of the interface
+      return response.pharmaciesWithPriceByLocation.map(({ pharmacy, price }) => ({
+        ...pharmacy,
+        price
+      }));
     }
 
     return [];

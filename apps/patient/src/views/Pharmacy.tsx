@@ -343,7 +343,7 @@ export const Pharmacy = () => {
   );
 
   useEffect(() => {
-    const fetchPharmaciesOnLocationChange = async () => {
+    const fetchPharmaciesOnLocationOrSortChange = async () => {
       if (isDemo) return;
       if (latitude == null || longitude == null) {
         // Need to wait till we have lat/lng
@@ -370,7 +370,15 @@ export const Pharmacy = () => {
           ];
         }
 
-        const pharmacies = await loadPharmacies({ latitude, longitude, enable24Hr, enableOpenNow });
+        // using the exiting enablePrice flag to determine if we should fetch pharmacies with prices
+        // a different query than the original query
+        const pharmacies = await loadPharmacies({
+          latitude,
+          longitude,
+          enable24Hr,
+          enableOpenNow,
+          ...(sortBy === 'price' ? { enablePrice: true } : {})
+        });
 
         if (pharmacies?.length === 0) {
           toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
@@ -385,7 +393,7 @@ export const Pharmacy = () => {
       setLoadingPharmacies(false);
     };
 
-    fetchPharmaciesOnLocationChange();
+    fetchPharmaciesOnLocationOrSortChange();
   }, [
     containsGLP,
     enable24Hr,
@@ -399,7 +407,8 @@ export const Pharmacy = () => {
     loadPharmacies,
     longitude,
     order?.readyBy,
-    toast
+    toast,
+    sortBy
   ]);
 
   const handleShowMore = async () => {
