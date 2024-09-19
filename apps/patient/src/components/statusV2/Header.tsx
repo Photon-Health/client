@@ -131,7 +131,7 @@ const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimate
   const now = dayjs();
   const isPast = now.isAfter(readyAtDayjs);
 
-  if (!isPast) {
+  if (isPast) {
     return <Text>Your prescriptions should be ready</Text>;
   }
   if (readyAtDayjs.isToday()) {
