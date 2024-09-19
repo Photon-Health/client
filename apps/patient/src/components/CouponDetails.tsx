@@ -7,7 +7,7 @@ import { CouponModal } from '../components';
 import { text as t } from '../utils/text';
 
 interface CouponDetailsProps {
-  discountCardId: string;
+  discountCardId?: string;
 }
 
 export const CouponDetails: FC<CouponDetailsProps> = ({ discountCardId }) => {
@@ -15,14 +15,16 @@ export const CouponDetails: FC<CouponDetailsProps> = ({ discountCardId }) => {
   const [discountCard, setDiscountCard] = useState<DiscountCard | null>(null);
 
   const fetchDiscountCard = useCallback(async () => {
+    if (!discountCardId) {
+      return;
+    }
+
     const card = await getDiscountCard(discountCardId);
     setDiscountCard(card);
   }, [discountCardId]);
 
   useEffect(() => {
-    if (discountCardId) {
-      fetchDiscountCard();
-    }
+    fetchDiscountCard();
   }, [discountCardId, fetchDiscountCard]);
 
   const { price, bin, pcn, group, memberId } = discountCard || {};
