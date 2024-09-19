@@ -39,20 +39,34 @@ export const getPharmacies = async ({
 }) => {
   try {
     const now = new Date();
-    const response = await graphQLClient.GetPharmaciesByLocation({
-      location: {
-        radius: 100,
-        ...searchParams
-      },
-      limit,
-      offset,
-      openAt: isOpenNow ? now : undefined,
-      is24hr,
-      name
-    });
+    const fn = includePrice
+      ? graphQLClient.GetPharmaciesByLocation
+      : graphQLClient.GetPharmaciesByLocation;
+    const response = await fn(
+      // either the pharmaciesByLocation or pharmaciesWithPriceByLocation query is used
+      // depending on the includePrice flag
+      {
+        location: {
+          radius: 100,
+          ...searchParams
+        },
+        openAt: isOpenNow ? now : undefined,
+        is24hr,
+        ...(!includePrice ? { limit, offset, name } : {})
+      }
+    );
 
     if (response?.pharmaciesByLocation?.length > 0) {
       return response.pharmaciesByLocation;
+    }
+
+    if (response?.pharmaciesWithPriceByLocation?.length > 0) {
+      // this query returns an array of objects with pharmacy and price side by side
+      // so I'm combining them into a single object to be compatible with the rest of the interface
+      return response.pharmaciesWithPriceByLocation.map(({ pharmacy, price }) => ({
+        ...pharmacy,
+        price
+      }));
     }
 
     return [];
