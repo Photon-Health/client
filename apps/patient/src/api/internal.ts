@@ -1,7 +1,9 @@
 import { types } from 'packages/sdk/dist/lib';
 
 import { graphQLClient } from '../configs/graphqlClient';
+import { DiscountCard } from '../utils/models';
 import {
+  GET_DISCOUNT_CARD,
   GET_ORDER,
   GET_PHARMACIES,
   GET_PHARMACIES_WITH_PRICE,
@@ -89,6 +91,27 @@ export const getPharmacies = async ({
   } catch (e: any) {
     const errorMessage =
       e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on getPharmacies.';
+    throw new Error(errorMessage);
+  }
+};
+
+export const getDiscountCard = async (id: string) => {
+  try {
+    const response: { discountCard: DiscountCard } = await graphQLClient.request(
+      GET_DISCOUNT_CARD,
+      {
+        id
+      }
+    );
+
+    if (!response?.discountCard?.bin) {
+      throw new Error('No discount card returned');
+    }
+
+    return response.discountCard;
+  } catch (e: any) {
+    const errorMessage =
+      e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on getDiscountCard.';
     throw new Error(errorMessage);
   }
 };

@@ -178,7 +178,6 @@ export const GET_PHARMACIES = gql`
       openAt: $openAt
       is24hr: $is24hr
       name: $name
-      includePrice: $includePrice
     ) {
       ...PharmacyFields
     }
@@ -200,4 +199,18 @@ export const GET_PHARMACIES_WITH_PRICE = gql`
     }
   }
   ${PHARMACY_FIELDS}
+`;
+
+// TODO THIS IS TEMPORARY, I don't know what the query looks like yet
+export const GET_DISCOUNT_CARD = gql`
+  query GetDiscountCard($id: String!) {
+    discountCard(id: $id) {
+      id
+      price
+      bin
+      pcn
+      group
+      memberId
+    }
+  }
 `;

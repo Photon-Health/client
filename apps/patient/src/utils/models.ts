@@ -1,6 +1,6 @@
 import { types } from '@photonhealth/sdk';
 
-interface DiscountCard {
+export interface DiscountCard {
   id: string;
   price: number;
   bin: string;
