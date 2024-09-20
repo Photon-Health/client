@@ -82,7 +82,7 @@ export const Main = () => {
       }
 
       const hasPharmacy = order.pharmacy?.id;
-      const redirect = hasPharmacy ? (useV2 ? '/statusV2' : '/status') : '/review';
+      const redirect = hasPharmacy ? (useV2 ? '/status' : '/status') : '/review';
 
       navigate(`${redirect}?orderId=${order.id}&token=${token}${useV2 ? '&v2=true' : ''}`, {
         replace: true
