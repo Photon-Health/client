@@ -53,23 +53,22 @@ export const getPharmacies = async ({
 }) => {
   try {
     const now = new Date();
+
+    // either the pharmaciesByLocation or pharmaciesWithPriceByLocation query is used
+    // depending on the includePrice flag
     const fn = includePrice
       ? graphQLClient.GetPharmaciesWithPriceByLocation
       : graphQLClient.GetPharmaciesByLocation;
     return formatPharmacies(
-      await fn(
-        // either the pharmaciesByLocation or pharmaciesWithPriceByLocation query is used
-        // depending on the includePrice flag
-        {
-          location: {
-            radius: 100,
-            ...searchParams
-          },
-          openAt: isOpenNow ? now : undefined,
-          is24hr,
-          ...(!includePrice ? { limit, offset, name } : {})
-        }
-      )
+      await fn({
+        location: {
+          radius: 100,
+          ...searchParams
+        },
+        openAt: isOpenNow ? now : undefined,
+        is24hr,
+        ...(!includePrice ? { limit, offset, name } : {})
+      })
     );
   } catch (e: any) {
     const errorMessage =
