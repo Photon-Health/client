@@ -73,11 +73,11 @@ export const OrderDetailsModal = (props: OrderDetailsProps & OrderDetailsModalPr
   return (
     <Modal isOpen={props.isOpen} onClose={props.onClose} size="full">
       <ModalOverlay />
-      <ModalContent backgroundColor={'gray.100'}>
-        <ModalHeader>Order Details</ModalHeader>
+      <ModalContent backgroundColor={'gray.100'} as={VStack}>
+        <ModalHeader maxW={'md'}>Order Details</ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
-          <VStack spacing={4}>
+        <ModalBody alignItems={'center'} as={VStack}>
+          <VStack alignItems={'stretch'} spacing={4} maxW="md">
             <VStack
               bgColor="white"
               borderRadius="md"

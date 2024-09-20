@@ -17,12 +17,12 @@ export const FAQModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
   return (
     <Modal onClose={onClose} isOpen={isOpen} size="full" motionPreset="slideInBottom">
       <ModalOverlay />
-      <ModalContent backgroundColor={'gray.100'}>
-        <ModalHeader>Frequently Asked Questions</ModalHeader>
+      <ModalContent backgroundColor={'gray.100'} as={VStack}>
+        <ModalHeader maxW={'md'}>Frequently Asked Questions</ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
-          <VStack alignItems={'stretch'} spacing={4}>
-            <VStack bgColor="white" borderRadius="md" p={2} alignItems={'start'}>
+        <ModalBody alignItems={'center'} as={VStack}>
+          <VStack alignItems={'stretch'} spacing={4} maxW="md">
+            <VStack bgColor="white" borderRadius="md" p={2} alignItems={'start'} w="full">
               <FAQContents />
             </VStack>
 
@@ -40,6 +40,7 @@ export const FAQModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                   variant="outline"
                   color="blue.500"
                   href={`sms:${process.env.REACT_APP_TWILIO_SMS_NUMBER}`}
+                  w="full"
                 >
                   Message support
                 </Button>

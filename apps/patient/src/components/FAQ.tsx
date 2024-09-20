@@ -46,21 +46,19 @@ export const FAQContents = () => {
           borderTopWidth={idx === 0 || idx === question.length - 1 ? 0 : 1}
           borderBottomColor="white"
         >
-          <>
-            <AccordionButton px={0} py={3}>
-              <HStack justifyContent="space-between" w="full">
-                <Text align="start" color="gray.900">
-                  {question}
-                </Text>
-                <AccordionIcon />
-              </HStack>
-            </AccordionButton>
-            <AccordionPanel px={0} pb={4}>
+          <AccordionButton px={0} py={3}>
+            <HStack justifyContent="space-between" w="full">
               <Text align="start" color="gray.900">
-                {answer}
+                {question}
               </Text>
-            </AccordionPanel>
-          </>
+              <AccordionIcon />
+            </HStack>
+          </AccordionButton>
+          <AccordionPanel px={0} pb={4}>
+            <Text align="start" color="gray.900">
+              {answer}
+            </Text>
+          </AccordionPanel>
         </AccordionItem>
       ))}
     </Accordion>

@@ -7,7 +7,8 @@ import {
   TagLabel,
   TagLeftIcon,
   Text,
-  VStack
+  VStack,
+  Spacer
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -82,9 +83,7 @@ const HoursRow = ({
       {/* Include the rest of the hours but without day of week information */}
       {hours.slice(1).map((h) => (
         <HStack w="full" justifyContent={'space-between'} key={h.openFrom}>
-          <Text fontSize="sm" color="gray.500">
-            {''}
-          </Text>
+          <Spacer />
           <Text fontSize="sm" color="gray.500">
             {formatTime(h.openFrom)} - {formatTime(h.openUntil)}
           </Text>
@@ -162,7 +161,8 @@ const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes, hours, showHours 
           />
         )}
       </HStack>
-      {hoursOpen &&
+      {showHours &&
+        hoursOpen &&
         daysOfWeek.map((d) => {
           const h = withDaysClosed[d];
           return (
