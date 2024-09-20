@@ -1,3 +1,7 @@
+import {
+  GetPharmaciesByLocationQuery,
+  GetPharmaciesWithPriceByLocationQuery
+} from '../__generated__/graphql';
 import { graphQLClient } from '../configs/graphqlClient';
 
 export const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
@@ -15,6 +19,15 @@ export const getOrder = async (orderId: string) => {
     throw new Error('No order found');
   }
 };
+
+function formatPharmacies(
+  data: GetPharmaciesByLocationQuery | GetPharmaciesWithPriceByLocationQuery
+): GetPharmaciesWithPriceByLocationQuery['pharmaciesWithPriceByLocation'] {
+  if ('pharmaciesByLocation' in data) {
+    return data.pharmaciesByLocation.map((p) => ({ pharmacy: p, price: undefined }));
+  }
+  return data.pharmaciesWithPriceByLocation;
+}
 
 export const getPharmacies = async ({
   searchParams,
@@ -40,36 +53,23 @@ export const getPharmacies = async ({
   try {
     const now = new Date();
     const fn = includePrice
-      ? graphQLClient.GetPharmaciesByLocation
+      ? graphQLClient.GetPharmaciesWithPriceByLocation
       : graphQLClient.GetPharmaciesByLocation;
-    const response = await fn(
-      // either the pharmaciesByLocation or pharmaciesWithPriceByLocation query is used
-      // depending on the includePrice flag
-      {
-        location: {
-          radius: 100,
-          ...searchParams
-        },
-        openAt: isOpenNow ? now : undefined,
-        is24hr,
-        ...(!includePrice ? { limit, offset, name } : {})
-      }
+    return formatPharmacies(
+      await fn(
+        // either the pharmaciesByLocation or pharmaciesWithPriceByLocation query is used
+        // depending on the includePrice flag
+        {
+          location: {
+            radius: 100,
+            ...searchParams
+          },
+          openAt: isOpenNow ? now : undefined,
+          is24hr,
+          ...(!includePrice ? { limit, offset, name } : {})
+        }
+      )
     );
-
-    if (response?.pharmaciesByLocation?.length > 0) {
-      return response.pharmaciesByLocation;
-    }
-
-    if (response?.pharmaciesWithPriceByLocation?.length > 0) {
-      // this query returns an array of objects with pharmacy and price side by side
-      // so I'm combining them into a single object to be compatible with the rest of the interface
-      return response.pharmaciesWithPriceByLocation.map(({ pharmacy, price }) => ({
-        ...pharmacy,
-        price
-      }));
-    }
-
-    return [];
   } catch (e: any) {
     const errorMessage =
       e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on getPharmacies.';
@@ -79,12 +79,9 @@ export const getPharmacies = async ({
 
 export const getDiscountCard = async (id: string) => {
   try {
-    const response: { discountCard: DiscountCard } = await graphQLClient.request(
-      GET_DISCOUNT_CARD,
-      {
-        id
-      }
-    );
+    const response = await graphQLClient.GetDiscountCard({
+      id
+    });
 
     if (!response?.discountCard?.bin) {
       throw new Error('No discount card returned');
