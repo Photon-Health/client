@@ -21,6 +21,8 @@ import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
+import { FulfillmentType } from '../__generated__/graphql';
+import { getSettings } from '@client/settings';
 
 export const Status = () => {
   const navigate = useNavigate();

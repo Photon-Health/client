@@ -19,6 +19,7 @@ import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   BrandedOptions,
+  CouponModal,
   FixedFooter,
   LocationModal,
   PickupOptions,
@@ -38,12 +39,13 @@ import {
   setPreferredPharmacy,
   triggerDemoNotification
 } from '../api';
-import { CouponModal } from '../components';
+
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { demoPharmacies } from '../data/demoPharmacies';
 import { isGLP } from '../utils/isGLP';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { FulfillmentType } from '../__generated__/graphql';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
