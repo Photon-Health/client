@@ -475,8 +475,7 @@ export const Pharmacy = () => {
           organization: order.organization.name,
           pharmacyId: selectedPharmacyId,
           timestamp: new Date().toISOString(),
-          price:
-            pharmacies[index].price != null ? `${pharmacies[index].price}` : 'No price selected'
+          price: pharmacies[index].price
         });
       }
     }
