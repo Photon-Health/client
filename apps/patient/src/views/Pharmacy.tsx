@@ -46,6 +46,7 @@ import { demoPharmacies } from '../data/demoPharmacies';
 import { isGLP } from '../utils/isGLP';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { FulfillmentType } from '../__generated__/graphql';
+import { datadogRum } from '@datadog/browser-rum';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
@@ -468,6 +469,16 @@ export const Pharmacy = () => {
         label: 'Pharmacy Rank',
         value: index + 1
       });
+      if (sortBy === 'price') {
+        datadogRum.addAction('price_selection', {
+          orderId: order.id,
+          organization: order.organization.name,
+          pharmacyId: selectedPharmacyId,
+          timestamp: new Date().toISOString(),
+          price:
+            pharmacies[index].price != null ? `${pharmacies[index].price}` : 'No price selected'
+        });
+      }
     }
   };
 
