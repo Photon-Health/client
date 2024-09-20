@@ -1,6 +1,7 @@
 import {
   GetPharmaciesByLocationQuery,
-  GetPharmaciesWithPriceByLocationQuery
+  GetPharmaciesWithPriceByLocationQuery,
+  Pharmacy
 } from '../__generated__/graphql';
 import { graphQLClient } from '../configs/graphqlClient';
 
@@ -22,11 +23,11 @@ export const getOrder = async (orderId: string) => {
 
 function formatPharmacies(
   data: GetPharmaciesByLocationQuery | GetPharmaciesWithPriceByLocationQuery
-): GetPharmaciesWithPriceByLocationQuery['pharmaciesWithPriceByLocation'] {
+): Pharmacy[] {
   if ('pharmaciesByLocation' in data) {
-    return data.pharmaciesByLocation.map((p) => ({ pharmacy: p, price: undefined }));
+    return data.pharmaciesByLocation.map((p) => ({ ...p, price: undefined }));
   }
-  return data.pharmaciesWithPriceByLocation;
+  return data.pharmaciesWithPriceByLocation.map((p) => ({ ...p.pharmacy, price: p.price }));
 }
 
 export const getPharmacies = async ({

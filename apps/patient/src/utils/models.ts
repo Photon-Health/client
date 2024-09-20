@@ -2,7 +2,8 @@ import {
   GetPharmaciesByLocationQuery,
   GetOrderQuery,
   Address as GQLAddress,
-  FulfillmentType
+  FulfillmentType,
+  Maybe
 } from '../__generated__/graphql';
 
 type NotMaybe<T> = Exclude<T, null | undefined>;
@@ -10,7 +11,7 @@ export type Order = NotMaybe<GetOrderQuery['order']>;
 export type Fill = Order['fills'][number];
 export interface DiscountCard {
   id: string;
-  price: number;
+  price: string;
   bin: string;
   pcn: string;
   group: string;
@@ -21,7 +22,9 @@ export type Fulfillment = Order['fulfillments'][number];
 export type Exception = Fulfillment['exceptions'][number];
 export type PrescriptionFulfillmentState = Fulfillment['state'];
 
-export type Pharmacy = NotMaybe<GetPharmaciesByLocationQuery['pharmaciesByLocation'][number]>;
+export type Pharmacy = NotMaybe<GetPharmaciesByLocationQuery['pharmaciesByLocation'][number]> & {
+  price?: Maybe<number>;
+};
 
 export type OrderFulfillment = NotMaybe<Order['fulfillment']>;
 
