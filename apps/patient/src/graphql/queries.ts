@@ -264,14 +264,14 @@ export const GET_PHARMACIES_WITH_PRICE = gql`
 
 // TODO THIS IS TEMPORARY, I don't know what the query looks like yet
 export const GET_DISCOUNT_CARD = gql`
-  query GetDiscountCard($id: String!) {
-    discountCard(id: $id) {
+  query GetDiscountCard($id: ID!) {
+    order(id: $id) {
       id
-      price
-      bin
-      pcn
-      group
-      memberId
+      # price
+      # bin
+      # pcn
+      # group
+      # memberId
     }
   }
 `;
