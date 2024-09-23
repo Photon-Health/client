@@ -15,7 +15,6 @@ import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { orderStateMapping as m, text as t } from '../utils/text';
 import { useOrderContext } from './Main';
-import { FulfillmentType } from '../__generated__/graphql';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -31,7 +30,7 @@ export const Status = () => {
   const showReceivedButtonStates = ['RECEIVED', 'READY'];
   const [showReceivedButton, setShowReceivedButton] = useState<boolean>(
     showReceivedButtonStates.includes(order?.fulfillment?.state ?? '') &&
-      order?.fulfillment?.type !== FulfillmentType.MailOrder
+      order?.fulfillment?.type !== 'MAIL_ORDER'
   );
   const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
 
@@ -129,7 +128,7 @@ export const Status = () => {
           fulfillment: {
             ...order.fulfillment,
             state: 'RECEIVED',
-            type: FulfillmentType.PickUp
+            type: 'PICK_UP'
           }
         });
 
@@ -149,7 +148,7 @@ export const Status = () => {
             fulfillment: {
               ...order.fulfillment,
               state: 'READY',
-              type: FulfillmentType.PickUp
+              type: 'PICK_UP'
             }
           });
 
@@ -222,7 +221,7 @@ export const Status = () => {
                   : copy.subheading}
               </Text>
             </Box>
-            {fulfillmentType === FulfillmentType.MailOrder && fulfillment?.trackingNumber ? (
+            {fulfillmentType === 'MAIL_ORDER' && fulfillment?.trackingNumber ? (
               <Box alignSelf="start">
                 <Text display="inline" color="gray.600">
                   {t.tracking}

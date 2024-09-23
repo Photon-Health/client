@@ -37,37 +37,41 @@ const questions = [
   }
 ];
 
+export const FAQContents = () => {
+  return (
+    <Accordion allowToggle>
+      {questions.map(({ question, answer }, idx) => (
+        <AccordionItem
+          key={question}
+          borderTopWidth={idx === 0 || idx === question.length - 1 ? 0 : 1}
+          borderBottomColor="white"
+        >
+          <AccordionButton px={0} py={3}>
+            <HStack justifyContent="space-between" w="full">
+              <Text align="start" color="gray.900">
+                {question}
+              </Text>
+              <AccordionIcon />
+            </HStack>
+          </AccordionButton>
+          <AccordionPanel px={0} pb={4}>
+            <Text align="start" color="gray.900">
+              {answer}
+            </Text>
+          </AccordionPanel>
+        </AccordionItem>
+      ))}
+    </Accordion>
+  );
+};
+
 export const FAQ = () => {
   return (
     <Container pt={4} pb={1}>
       <Text align="start" fontWeight="semibold">
         Frequently Asked Questions
       </Text>
-      <Accordion allowToggle>
-        {questions.map(({ question, answer }, idx) => (
-          <AccordionItem
-            key={question}
-            borderTopWidth={idx === 0 || idx === question.length - 1 ? 0 : 1}
-            borderBottomColor="white"
-          >
-            <>
-              <AccordionButton px={0} py={3}>
-                <HStack justifyContent="space-between" w="full">
-                  <Text align="start" color="gray.900">
-                    {question}
-                  </Text>
-                  <AccordionIcon />
-                </HStack>
-              </AccordionButton>
-              <AccordionPanel px={0} pb={4}>
-                <Text align="start" color="gray.900">
-                  {answer}
-                </Text>
-              </AccordionPanel>
-            </>
-          </AccordionItem>
-        ))}
-      </Accordion>
+      <FAQContents />
     </Container>
   );
 };
