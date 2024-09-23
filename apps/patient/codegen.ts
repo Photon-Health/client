@@ -4,7 +4,9 @@ const config: CodegenConfig = {
   schema: `${process.env.GQL_SCHEMA_URL ?? 'http://patient-api.boson.health'}/graphql`,
   documents: ['**/*.ts'],
   config: {
-    maybeValue: 'T | undefined'
+    maybeValue: 'T | undefined',
+    enumsAsTypes: true,
+    allowEnumStringTypes: true
   },
   ignoreNoDocuments: true, // for better experience with the watcher
   generates: {

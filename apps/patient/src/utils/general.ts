@@ -9,12 +9,7 @@ import walgreensLogo from '../assets/walgreens_small.png';
 import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
 import { Address, EnrichedPharmacy, Fill, OrderFulfillment, Pharmacy } from '../utils/models';
 import { ExtendedFulfillmentType } from './models';
-import {
-  FulfillmentType,
-  PharmacyCloseEvent,
-  PharmacyEvent,
-  PharmacyOpenEvent
-} from '../__generated__/graphql';
+import { PharmacyCloseEvent, PharmacyEvent, PharmacyOpenEvent } from '../__generated__/graphql';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -59,18 +54,14 @@ export const getFulfillmentType = (
   }
 
   // Next, try query param if it's set
-  const fulfillmentTypes: ExtendedFulfillmentType[] = [
-    'COURIER',
-    FulfillmentType.MailOrder,
-    FulfillmentType.PickUp
-  ];
+  const fulfillmentTypes: ExtendedFulfillmentType[] = ['COURIER', 'MAIL_ORDER', 'PICK_UP'];
   const foundType = fulfillmentTypes.find((val) => val === param);
   if (foundType) {
     return foundType;
   }
 
   // Fallback to pickup
-  return FulfillmentType.PickUp;
+  return 'PICK_UP';
 };
 
 /**
@@ -170,7 +161,7 @@ export const preparePharmacy = (pharmacy: Pharmacy): EnrichedPharmacy => {
   };
 };
 
-export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string): string => {
+export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string): Date => {
   // Get the timezone for dayjs
   const userTimezone = dayjs.tz.guess();
 
@@ -200,14 +191,14 @@ export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string
       targetTime = dayjs().tz(userTimezone);
       break;
     default:
-      return 'Invalid time selection';
+      throw new Error('Invalid time selection');
   }
 
   if (readyByDay === 'Tomorrow') {
     targetTime = targetTime.add(1, 'day');
   }
 
-  return targetTime.utc().format();
+  return targetTime.utc().toDate();
 };
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);

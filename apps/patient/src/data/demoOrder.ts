@@ -1,4 +1,3 @@
-import { OrderState } from '../__generated__/graphql';
 import { Order } from '../utils/models';
 
 // TODO(mrochlin) need to fix this
@@ -59,5 +58,41 @@ export const demoOrder: Order = {
   fulfillment: undefined,
   id: 'ord_FGHDFYT4523465346',
   pharmacy: undefined,
-  state: OrderState.Routing
+  state: 'ROUTING',
+  fulfillments: [
+    {
+      id: 'ful-1',
+      state: 'PROCESSING',
+      exceptions: [],
+      prescription: {
+        daysSupply: 2,
+        dispenseUnit: 'tablets',
+        dispenseQuantity: '2 tablets' as unknown as number,
+        expirationDate: '2024-08-29T00:00:00.000Z',
+        fillsAllowed: 1,
+        id: 'rx_01H9154tgJW889FRF7QC5V3PYBNWD0',
+        treatment: {
+          id: 'med_01GZH4K86J1ZF85C061G14fe4DTGYZ',
+          name: 'dexamethasone 6 MG Oral Tablet'
+        }
+      }
+    },
+    {
+      id: 'ful-2',
+      state: 'PROCESSING',
+      exceptions: [],
+      prescription: {
+        daysSupply: 10,
+        dispenseUnit: 'ML',
+        dispenseQuantity: '100 ML' as unknown as number, // Make it format nicely for demo
+        expirationDate: '2024-08-29T00:00:00.000Z',
+        fillsAllowed: 1,
+        id: 'rx_01H91JW889FRF34ger7QC5V3PYBNWD0',
+        treatment: {
+          id: 'med_01GZH4K86J1ZF85C43rf061G1DTGYZ',
+          name: 'amoxicillin 400 MG in 5 mL Oral Suspension'
+        }
+      }
+    }
+  ]
 };
