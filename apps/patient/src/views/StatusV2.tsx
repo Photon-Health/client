@@ -244,6 +244,14 @@ export const StatusV2 = () => {
               Pharmacy
             </Heading>
             <Card>
+              <CouponDetails />
+            </Card>
+          </VStack>
+          <VStack w="full" alignItems={'stretch'} px={4} spacing={4}>
+            <Heading as="h4" size="md">
+              Pharmacy
+            </Heading>
+            <Card>
               <VStack w="full">
                 {pharmacyInfo}
                 <VStack spacing={2} w="full">

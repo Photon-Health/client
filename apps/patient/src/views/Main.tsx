@@ -18,7 +18,6 @@ import theme from '../configs/theme';
 import { demoOrder } from '../data/demoOrder';
 import { FillWithCount, countFillsAndRemoveDuplicates } from '../utils/general';
 import { Order } from '../utils/models';
-import { OrderState } from '../__generated__/graphql';
 
 interface OrderContextType {
   order: Order;
