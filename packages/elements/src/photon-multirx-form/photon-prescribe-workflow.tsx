@@ -59,7 +59,6 @@ export type PrescribeProps = {
   enableMedHistory: boolean;
   enableMedHistoryLinks: boolean;
   enableCombineAndDuplicate: boolean;
-  enableNewMedicationSearch: boolean;
   mailOrderIds?: string;
   pharmacyId?: string;
   loading: boolean;
@@ -454,7 +453,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       weightUnit={props.weightUnit}
                       prefillNotes={prefillNotes}
                       enableCombineAndDuplicate={props.enableCombineAndDuplicate}
-                      enableNewMedicationSearch={props.enableNewMedicationSearch}
                     />
                   </div>
                 </Show>
