@@ -49,7 +49,6 @@ export const AddPrescriptionCard = (props: {
   weightUnit?: string;
   prefillNotes?: string;
   enableCombineAndDuplicate?: boolean;
-  enableNewMedicationSearch?: boolean;
 }) => {
   const client = usePhoton();
   const [medDialogOpen, setMedDialogOpen] = createSignal(false);
@@ -197,15 +196,6 @@ export const AddPrescriptionCard = (props: {
       <Card>
         <div class="flex items-center justify-between">
           <Text color="gray">Add Prescription</Text>
-          <Show when={!props.enableNewMedicationSearch}>
-            <div
-              class="md:py-2 text-left sm:text-right text-blue-600 flex gap-2 cursor-pointer items-center h-full"
-              onClick={() => setMedDialogOpen(true)}
-            >
-              <a class="font-sans text-sm ">Advanced Search</a>
-              <Icon name="magnifyingGlass" size="sm" />
-            </div>
-          </Show>
         </div>
 
         <div
@@ -219,80 +209,52 @@ export const AddPrescriptionCard = (props: {
             });
           }}
         >
-          <Show when={props.enableNewMedicationSearch}>
-            <div class="mb-2">
-              <Banner status="info" withoutIcon closable id="new-medication-search-banner">
-                <div class="flex flex-col gap-2">
-                  <div class="text-sm">New Medication Search</div>
-                  <div class="text-sm text-gray-700">
-                    You can now search for any treatment in the standard search without using
-                    advanced search.
-                  </div>
+          <div class="mb-2">
+            <Banner status="info" withoutIcon closable id="new-medication-search-banner">
+              <div class="flex flex-col gap-2">
+                <div class="text-sm">New Medication Search</div>
+                <div class="text-sm text-gray-700">
+                  You can now search for any treatment in the standard search without using advanced
+                  search.
                 </div>
-              </Banner>
-            </div>
-            <photon-medication-search
-              label="Search for Treatment"
-              selected={props.store.treatment?.value ?? undefined}
-              invalid={props.store.treatment?.error ?? false}
-              help-text={props.store.treatment?.error}
-              off-catalog-option={offCatalog()}
-              search-text={searchText()}
-              on:photon-treatment-selected={(e: any) => {
-                if (e.detail.data.__typename === 'PrescriptionTemplate') {
-                  repopulateForm(props.actions, {
-                    ...e.detail.data,
-                    notes: [e.detail.data?.notes, props.prefillNotes].filter((x) => x).join('\n\n')
-                  });
-                } else {
-                  props.actions.updateFormValue({
-                    key: 'treatment',
-                    value: e.detail.data
-                  });
-                }
+              </div>
+            </Banner>
+          </div>
+          <photon-medication-search
+            label="Search for Treatment"
+            selected={props.store.treatment?.value ?? undefined}
+            invalid={props.store.treatment?.error ?? false}
+            help-text={props.store.treatment?.error}
+            off-catalog-option={offCatalog()}
+            search-text={searchText()}
+            on:photon-treatment-selected={(e: any) => {
+              if (e.detail.data.__typename === 'PrescriptionTemplate') {
+                repopulateForm(props.actions, {
+                  ...e.detail.data,
+                  notes: [e.detail.data?.notes, props.prefillNotes].filter((x) => x).join('\n\n')
+                });
+              } else {
+                props.actions.updateFormValue({
+                  key: 'treatment',
+                  value: e.detail.data
+                });
+              }
 
-                if (e.detail.catalogId) {
-                  props.actions.updateFormValue({
-                    key: 'catalogId',
-                    value: e.detail.catalogId
-                  });
-                }
-              }}
-              on:photon-treatment-unselected={() => {
-                clearForm(
-                  props.actions,
-                  props?.prefillNotes ? { notes: props.prefillNotes } : undefined
-                );
-              }}
-              on:photon-search-text-changed={(e: any) => setSearchText(e.detail.text)}
-            />
-          </Show>
-          <Show when={!props.enableNewMedicationSearch}>
-            <photon-treatment-select
-              label="Search Treatment Catalog"
-              selected={props.store.treatment?.value ?? undefined}
-              invalid={props.store.treatment?.error ?? false}
-              help-text={props.store.treatment?.error}
-              off-catalog-option={offCatalog()}
-              on:photon-treatment-selected={(e: any) => {
-                if (e.detail.data.__typename === 'PrescriptionTemplate') {
-                  repopulateForm(props.actions, {
-                    ...e.detail.data,
-                    notes: [e.detail.data?.notes, props.prefillNotes].filter((x) => x).join('\n\n')
-                  });
-                } else {
-                  props.actions.updateFormValue({
-                    key: 'treatment',
-                    value: e.detail.data
-                  });
-                }
+              if (e.detail.catalogId) {
                 props.actions.updateFormValue({
                   key: 'catalogId',
                   value: e.detail.catalogId
                 });
-              }}
-            />
-          </Show>
+              }
+            }}
+            on:photon-treatment-unselected={() => {
+              clearForm(
+                props.actions,
+                props?.prefillNotes ? { notes: props.prefillNotes } : undefined
+              );
+            }}
+            on:photon-search-text-changed={(e: any) => setSearchText(e.detail.text)}
+          />
           <div class="flex flex-col sm:flex-none sm:grid sm:grid-cols-2 sm:gap-4">
             <div class="order-last sm:order-first">
               <photon-checkbox
