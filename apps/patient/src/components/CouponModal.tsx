@@ -12,6 +12,7 @@ import {
 import { FC } from 'react';
 import { useLocation } from 'react-router-dom';
 
+import { useOrderContext } from '../views/Main';
 import { text as t } from '../utils/text';
 
 interface CouponModalProps {
@@ -21,6 +22,9 @@ interface CouponModalProps {
 
 export const CouponModal: FC<CouponModalProps> = ({ isOpen, onClose }) => {
   const location = useLocation();
+  const { flattenedFills } = useOrderContext();
+
+  const isMultiRx = flattenedFills.length > 1;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -39,7 +43,7 @@ export const CouponModal: FC<CouponModalProps> = ({ isOpen, onClose }) => {
               <Heading as="h5" size="sm">
                 {t.howToCoupon}
               </Heading>
-              <Text>{t.showCouponToPharmacy}</Text>
+              <Text>{t.showCouponToPharmacy(isMultiRx)}</Text>
             </VStack>
           )}
           <VStack spacing={2} align="start">

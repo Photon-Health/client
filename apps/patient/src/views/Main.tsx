@@ -91,7 +91,6 @@ export const Main = () => {
   );
 
   const fetchOrder = useCallback(async () => {
-    console.log('refetch order');
     if (isDemo) return demoOrder;
     try {
       const result = await getOrder(orderId!);

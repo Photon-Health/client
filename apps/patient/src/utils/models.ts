@@ -35,7 +35,7 @@ export type EnrichedPharmacy = Pharmacy & {
   isClosingSoon?: boolean;
   opens?: string | undefined;
   closes?: string | undefined;
-  medicationPrice?: number;
+  price?: number;
 };
 export type ExtendedFulfillmentType = FulfillmentType | 'COURIER';
 

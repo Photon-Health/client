@@ -166,6 +166,15 @@ export const GET_ORDER = gql`
           }
         }
       }
+      discountCards {
+        id
+        prescriptionId
+        price
+        bin
+        pcn
+        group
+        memberId
+      }
     }
   }
 `;
@@ -260,18 +269,4 @@ export const GET_PHARMACIES_WITH_PRICE = gql`
     }
   }
   ${PHARMACY_FIELDS}
-`;
-
-// TODO THIS IS TEMPORARY, I don't know what the query looks like yet
-export const GET_DISCOUNT_CARD = gql`
-  query GetDiscountCard($id: ID!) {
-    discountCard: order(id: $id) {
-      id
-      price: id
-      bin: id
-      pcn: id
-      group: id
-      memberId: id
-    }
-  }
 `;
