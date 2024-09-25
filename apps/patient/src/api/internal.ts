@@ -77,24 +77,6 @@ export const getPharmacies = async ({
   }
 };
 
-// export const getDiscountCard = async (id: string) => {
-//   try {
-//     const response = await graphQLClient.GetDiscountCard({
-//       id
-//     });
-
-//     if (!response?.discountCard?.bin) {
-//       throw new Error('No discount card returned');
-//     }
-
-//     return response.discountCard;
-//   } catch (e: any) {
-//     const errorMessage =
-//       e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on getDiscountCard.';
-//     throw new Error(errorMessage);
-//   }
-// };
-
 /**
  * Mutations
  */
