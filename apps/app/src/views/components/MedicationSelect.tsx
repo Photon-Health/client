@@ -12,12 +12,7 @@ const SearchTreatmentOptionsQuery = graphql(/* GraphQL */ `
   query SearchTreatmentOptions($searchTerm: String!) {
     treatmentOptions(searchTerm: $searchTerm) {
       id: medicationId
-      form
       name
-      ndc
-      route
-      strength
-      type
       __typename
     }
   }
@@ -127,18 +122,25 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
       }));
 
       const offCatalogOptions =
-        offCatalogTreatments?.treatmentOptions.map((med: any) => ({
+        offCatalogTreatments?.treatmentOptions.map((med) => ({
           value: med,
           label: `${med.name}`,
           selectGroupLabel: 'Treatments'
         })) || [];
-
+      console.log(
+        '!!! catalogOptions',
+        [...catalogOptions, ...offCatalogOptions].length,
+        offCatalogOptions.length
+      );
       setTreatmentOptions(
         [...catalogOptions, ...offCatalogOptions].sort((a, b) => a.label.localeCompare(b.label))
       );
     }
   }, [catalog.loading, catalog.catalog, offCatalogTreatments]);
 
+  useEffect(() => {
+    console.log('reinitializing');
+  }, [treatmentOptions]);
   if (catalog.error?.message) {
     return <Text color="red">{catalog.error.message}</Text>;
   }
