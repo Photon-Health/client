@@ -77,7 +77,7 @@ export const OrderDetailsModal = (props: OrderDetailsProps & OrderDetailsModalPr
       <ModalContent backgroundColor="gray.100" alignItems="center" w="full">
         <ModalHeader>Order Details</ModalHeader>
         <ModalCloseButton />
-        <ModalBody w="full" alignItems="center">
+        <ModalBody w="full" alignItems="center" px={0}>
           <Container>
             <VStack alignItems="stretch" spacing={4} w="full">
               <VStack
