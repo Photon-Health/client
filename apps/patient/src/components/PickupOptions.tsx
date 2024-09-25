@@ -157,7 +157,7 @@ export const PickupOptions = ({
           {t.showMore}
         </Button>
       ) : null}
-      {showingAllPharmacies ? (
+      {!loadingMore && showingAllPharmacies ? (
         <Text color="gray.500" textAlign="center">
           {t.showingAll}
         </Text>

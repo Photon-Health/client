@@ -185,12 +185,7 @@ export const Pharmacy = () => {
 
   // Reset when we toggle 24hr/open now
   useEffect(() => {
-    if (sortBy !== 'price') {
-      reset();
-    } else {
-      // If we're sorting by price, we want to hide the show more button
-      setShowingAllPharmacies(true);
-    }
+    reset();
   }, [sortBy, enable24Hr, enableOpenNow]);
 
   // Initialize demo data
@@ -376,6 +371,10 @@ export const Pharmacy = () => {
           toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
         }
 
+        if (sortBy === 'price') {
+          setShowingAllPharmacies(true);
+        }
+
         setTopRankedPharmacies(topRankedPharmacies);
         setPharmacyResults(pharmacies);
       } catch (error: any) {
@@ -402,6 +401,8 @@ export const Pharmacy = () => {
     toast,
     sortBy
   ]);
+
+  console.log(loadingPharmacies);
 
   const handleShowMore = async () => {
     setLoadingPharmacies(true);
