@@ -10,8 +10,7 @@ import {
   ModalHeader,
   ModalBody,
   Box,
-  Icon,
-  Heading
+  Icon
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import { ReactNode } from 'react';
@@ -91,11 +90,8 @@ export const OrderDetailsModal = (props: OrderDetailsProps & OrderDetailsModalPr
                 {props.pharmacyLogo ?? defaultIcon}
                 <Box>
                   <Text fontSize="xl" as="h4">
-                    This is your order summary for{' '}
+                    This is your order summary for <b>{props.pharmacyName}</b>
                   </Text>
-                  <Heading as="b" size="md">
-                    {props.pharmacyName}
-                  </Heading>
                 </Box>
               </VStack>
               <VStack

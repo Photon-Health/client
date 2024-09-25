@@ -702,20 +702,22 @@ export const Pharmacy = () => {
                 </Button>
               </HStack>
             </HStack>
-            <Box p={3} bgColor={'blue.50'} borderRadius="lg">
-              <Text>
-                The displayed price is a coupon for the selected pharmacy.{' '}
-                <b>This is NOT insurance.</b>{' '}
-                <Link
-                  textDecoration="underline"
-                  textUnderlineOffset="2px"
-                  color="blue.500"
-                  onClick={() => setCouponModalOpen(true)}
-                >
-                  Learn more.
-                </Link>
-              </Text>
-            </Box>
+            {sortBy === 'price' ? (
+              <Box p={3} bgColor={'blue.50'} borderRadius="lg">
+                <Text>
+                  The displayed price is a coupon for the selected pharmacy.{' '}
+                  <b>This is NOT insurance.</b>{' '}
+                  <Link
+                    textDecoration="underline"
+                    textUnderlineOffset="2px"
+                    color="blue.500"
+                    onClick={() => setCouponModalOpen(true)}
+                  >
+                    Learn more.
+                  </Link>
+                </Text>
+              </Box>
+            ) : null}
           </VStack>
         </Container>
       </Box>

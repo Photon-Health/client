@@ -125,6 +125,14 @@ export const Main = () => {
     }
   }, [order, orderId, fetchOrder, isDemo]);
 
+  useEffect(() => {
+    if (location.pathname === '/status') {
+      if (!order?.discountCards) {
+        fetchOrder();
+      }
+    }
+  }, [fetchOrder, location.pathname, order?.discountCards]);
+
   const preloadImage = (url: string) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
