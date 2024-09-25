@@ -22,7 +22,7 @@ export const FAQModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
         <ModalCloseButton />
         <ModalBody alignItems={'center'} as={VStack}>
           <VStack alignItems={'stretch'} spacing={4} maxW="md">
-            <VStack bgColor="white" borderRadius="md" p={2} alignItems={'start'} w="full">
+            <VStack bgColor="white" borderRadius="md" px={4} py={1} alignItems={'start'} w="full">
               <FAQContents />
             </VStack>
 

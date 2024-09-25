@@ -1,4 +1,5 @@
 import {
+  Container,
   VStack,
   Text,
   HStack,
@@ -37,7 +38,7 @@ export interface OrderDetailsModalProps {
 
 const Row = ({ k, value }: { k: string; value: ReactNode }) => {
   return (
-    <HStack justifyContent={'space-between'} w="full">
+    <HStack justifyContent="space-between" w="full">
       <Text>{k}</Text>
       <Text as="b">{value}</Text>
     </HStack>
@@ -46,12 +47,12 @@ const Row = ({ k, value }: { k: string; value: ReactNode }) => {
 
 const PrescriptionBlock = ({ rx }: { rx: PrescriptionData }) => {
   return (
-    <VStack alignItems={'start'} spacing={3}>
+    <VStack alignItems="start" spacing={3}>
       <Text as="b">{rx.rxName}</Text>
-      <Row k={'Quantity'} value={rx.quantity} />
-      <Row k={'Days Supply'} value={rx.daysSupply} />
-      <Row k={'Refills'} value={rx.numRefills} />
-      <Row k={'Expires'} value={dayjs(rx.expiresAt).format('M/D/YYYY')} />
+      <Row k="Quantity" value={rx.quantity} />
+      <Row k="Days Supply" value={rx.daysSupply} />
+      <Row k="Refills" value={rx.numRefills} />
+      <Row k="Expires" value={dayjs(rx.expiresAt).format('M/D/YYYY')} />
     </VStack>
   );
 };
@@ -59,11 +60,11 @@ const PrescriptionBlock = ({ rx }: { rx: PrescriptionData }) => {
 const defaultIcon = (
   <VStack
     color="blue.400"
-    bgColor={'blue.50'}
-    borderRadius={'full'}
+    bgColor="blue.50"
+    borderRadius="full"
     w="12"
     h="12"
-    justifyContent={'center'}
+    justifyContent="center"
   >
     <Icon as={MdOutlineLocalPharmacy} boxSize={6} />
   </VStack>
@@ -73,42 +74,44 @@ export const OrderDetailsModal = (props: OrderDetailsProps & OrderDetailsModalPr
   return (
     <Modal isOpen={props.isOpen} onClose={props.onClose} size="full">
       <ModalOverlay />
-      <ModalContent backgroundColor={'gray.100'} as={VStack}>
-        <ModalHeader maxW={'md'}>Order Details</ModalHeader>
+      <ModalContent backgroundColor="gray.100" alignItems="center" w="full">
+        <ModalHeader>Order Details</ModalHeader>
         <ModalCloseButton />
-        <ModalBody alignItems={'center'} as={VStack}>
-          <VStack alignItems={'stretch'} spacing={4} maxW="md">
-            <VStack
-              bgColor="white"
-              borderRadius="md"
-              p={4}
-              alignItems={'start'}
-              spacing={5}
-              w="full"
-            >
-              {props.pharmacyLogo ?? defaultIcon}
-              <Box>
-                <Text fontSize="xl" as="h4">
-                  This is your order summary for{' '}
-                </Text>
-                <Heading as="b" size="md">
-                  {props.pharmacyName}
-                </Heading>
-              </Box>
+        <ModalBody w="full" alignItems="center">
+          <Container>
+            <VStack alignItems="stretch" spacing={4} w="full">
+              <VStack
+                bgColor="white"
+                borderRadius="md"
+                p={4}
+                alignItems={'start'}
+                spacing={5}
+                w="full"
+              >
+                {props.pharmacyLogo ?? defaultIcon}
+                <Box>
+                  <Text fontSize="xl" as="h4">
+                    This is your order summary for{' '}
+                  </Text>
+                  <Heading as="b" size="md">
+                    {props.pharmacyName}
+                  </Heading>
+                </Box>
+              </VStack>
+              <VStack
+                bgColor="white"
+                borderRadius="md"
+                p={4}
+                alignItems={'stretch'}
+                spacing={5}
+                w="full"
+              >
+                {props.prescriptions.map((p, i) => (
+                  <PrescriptionBlock key={`${p.rxName}-${i}`} rx={p} />
+                ))}
+              </VStack>
             </VStack>
-            <VStack
-              bgColor="white"
-              borderRadius="md"
-              p={4}
-              alignItems={'stretch'}
-              spacing={5}
-              w="full"
-            >
-              {props.prescriptions.map((p, i) => (
-                <PrescriptionBlock key={`${p.rxName}-${i}`} rx={p} />
-              ))}
-            </VStack>
-          </VStack>
+          </Container>
         </ModalBody>
       </ModalContent>
     </Modal>
