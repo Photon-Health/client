@@ -6,7 +6,13 @@ import { Helmet } from 'react-helmet';
 import { FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { triggerDemoNotification } from '../api';
-import { DemoCtaModal, PHARMACY_BRANDING, PharmacyInfo, PoweredBy } from '../components';
+import {
+  DemoCtaModal,
+  PHARMACY_BRANDING,
+  PharmacyInfo,
+  PoweredBy,
+  CouponDetails
+} from '../components';
 import { Card } from '../components/Card';
 import { FAQModal } from '../components/FAQModal';
 import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal';

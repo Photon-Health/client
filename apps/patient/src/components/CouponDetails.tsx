@@ -1,33 +1,15 @@
 import { Box, Container, HStack, Icon, Text, VStack } from '@chakra-ui/react';
-import { FC, useEffect, useState, useCallback } from 'react';
+import { FC, useState } from 'react';
 import { FiInfo } from 'react-icons/fi';
-import { getDiscountCard } from '../api';
-import { DiscountCard } from '../utils/models';
 import { CouponModal } from '../components';
 import { text as t } from '../utils/text';
+import { useOrderContext } from '../views/Main';
 
-interface CouponDetailsProps {
-  discountCardId?: string;
-}
-
-export const CouponDetails: FC<CouponDetailsProps> = ({ discountCardId }) => {
+export const CouponDetails: FC = () => {
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
-  const [discountCard, setDiscountCard] = useState<DiscountCard | null>(null);
+  const { order } = useOrderContext();
 
-  const fetchDiscountCard = useCallback(async () => {
-    if (!discountCardId) {
-      return;
-    }
-
-    const card = await getDiscountCard(discountCardId);
-    setDiscountCard(card);
-  }, [discountCardId]);
-
-  useEffect(() => {
-    fetchDiscountCard();
-  }, [discountCardId, fetchDiscountCard]);
-
-  const { price, bin, pcn, group, memberId } = discountCard || {};
+  const { price, bin, pcn, group, memberId } = order.discountCard || {};
 
   if (!price || !bin || !pcn || !group || !memberId) {
     return null;
