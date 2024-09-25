@@ -45,7 +45,7 @@ import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { demoPharmacies } from '../data/demoPharmacies';
 import { isGLP } from '../utils/isGLP';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { FulfillmentType } from '../__generated__/graphql';
+// import { FulfillmentType } from '../__generated__/graphql';
 import { datadogRum } from '@datadog/browser-rum';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time

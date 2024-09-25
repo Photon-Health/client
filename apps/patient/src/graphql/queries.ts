@@ -239,7 +239,6 @@ export const GET_PHARMACIES = gql`
     $openAt: DateTime
     $is24hr: Boolean
     $name: String
-    $includePrice: Boolean
   ) {
     pharmaciesByLocation(
       location: $location

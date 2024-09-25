@@ -9,7 +9,7 @@ export const CouponDetails: FC = () => {
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
   const { order } = useOrderContext();
 
-  const { price, bin, pcn, group, memberId } = order.discountCard || {};
+  const { price, bin, pcn, group, memberId } = order.discountCards[0];
 
   if (!price || !bin || !pcn || !group || !memberId) {
     return null;
