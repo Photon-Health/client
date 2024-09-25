@@ -8,7 +8,8 @@
     "patient:tau": "concurrently \"npx nx run patient:codegen:watch\" \"npx nx run patient:start:tau\"",
     "patient": "concurrently \"npx nx run patient:codegen:watch\" \"npx nx run patient:start\"",
     "lint": "npx nx run-many --target=lint",
-    "lint:fix": "npx nx run-many --target=lint:fix"
+    "lint:fix": "npx nx run-many --target=lint:fix",
+    "prepare": "husky install"
   },
   "private": true,
   "workspaces": [
@@ -72,10 +73,12 @@
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-solid": "^0.12.1",
+    "husky": "^9.1.6",
     "install": "^0.13.0",
     "jest": "28.1.1",
     "jest-environment-jsdom": "28.1.1",
     "jsdom": "^22.1.0",
+    "lint-staged": "^15.2.10",
     "npm": "^10.5.2",
     "nx": "15.6.3",
     "postcss": "^8.4.31",
@@ -156,5 +159,14 @@
     "webpack": "^5.90.3",
     "yup": "^0.32.11",
     "zod": "^3.22.4"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,jsx,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "**/*.{json,css,scss,md}": [
+      "prettier --write"
+    ]
   }
 }
