@@ -127,7 +127,12 @@ export const Pharmacy = () => {
   // capsule
   const isCapsuleTerritory =
     order?.address?.postalCode != null && order.address.postalCode in capsuleZipcodeLookup;
-  const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
+  const enableCourier =
+    !isDemo &&
+    // Hide for cash price search
+    sortBy !== 'price' &&
+    isCapsuleTerritory &&
+    orgSettings.enableCourierNavigate;
   const capsulePharmacyId = order?.address?.postalCode
     ? capsuleZipcodeLookup[order.address.postalCode as keyof typeof capsuleZipcodeLookup]
         ?.pharmacyId
@@ -137,6 +142,8 @@ export const Pharmacy = () => {
   const hasTopRankedCostco = topRankedPharmacies.some((p) => p.name === 'Costco Pharmacy');
   const enableMailOrder =
     !isDemo &&
+    // Hide for cash price search
+    sortBy !== 'price' &&
     // If we're showing costco, we don't want to show mail order
     !orgSettings.topRankedCostco &&
     !hasTopRankedCostco && // this means org is Sesame, we don't want to show Amazon and top ranked Costco at the same time
