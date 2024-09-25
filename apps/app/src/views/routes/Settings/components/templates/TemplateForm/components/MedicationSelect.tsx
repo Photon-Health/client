@@ -4,9 +4,9 @@ import { GroupHeadingProps, OptionProps as SelectOptionProps } from 'chakra-reac
 import { useQuery } from '@apollo/client';
 import { usePhoton } from '@photonhealth/react';
 import { useEffect, useImperativeHandle, useState } from 'react';
-import { SelectField } from './SelectField';
-import { graphql } from '../../gql';
-import { CatalogTreatmentFieldsMap } from '../../model/fragments';
+import { SelectField } from '../../../../../../components/SelectField';
+import { graphql } from '../../../../../../../gql';
+import { CatalogTreatmentFieldsMap } from '../../../../../../../model/fragments';
 
 const SearchTreatmentOptionsQuery = graphql(/* GraphQL */ `
   query SearchTreatmentOptions($searchTerm: String!) {
@@ -87,6 +87,12 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
     skip: filterText.length <= 2
   });
 
+  // grabbed the type gql/graphql.ts
+  // caching treatments because on selection the options are cleared
+  // thus won't display, despite `skip: filterText.length <= 2` above
+  const [cachedOffCatalogTreatments, setCachedOffCatalogTreatments] =
+    useState<Array<{ __typename: 'TreatmentOption'; name: string; id?: string | null }>>();
+
   const [addToCatalogMutation] = addToCatalog({
     refetchQueries: ['getCatalog'],
     awaitRefetchQueries: true,
@@ -95,6 +101,12 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
       fragment: CatalogTreatmentFieldsMap
     }
   });
+
+  useEffect(() => {
+    if (offCatalogTreatments?.treatmentOptions?.length ?? 0 > 0) {
+      setCachedOffCatalogTreatments(offCatalogTreatments?.treatmentOptions ?? []);
+    }
+  }, [offCatalogTreatments]);
 
   useImperativeHandle(linkedMedRef, () => ({
     addToCatalog: ({ id, onComplete }: { id: string; onComplete: (data: any) => void }) => {
@@ -114,6 +126,7 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
   });
 
   useEffect(() => {
+    console.log('off catalog', cachedOffCatalogTreatments);
     if (!catalog.loading && catalog.catalog) {
       const catalogOptions = catalog.catalog.treatments.map((med: any) => ({
         value: med,
@@ -122,25 +135,22 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
       }));
 
       const offCatalogOptions =
-        offCatalogTreatments?.treatmentOptions.map((med) => ({
+        cachedOffCatalogTreatments?.map((med) => ({
           value: med,
           label: `${med.name}`,
           selectGroupLabel: 'Treatments'
         })) || [];
-      console.log(
-        '!!! catalogOptions',
-        [...catalogOptions, ...offCatalogOptions].length,
-        offCatalogOptions.length
-      );
+
       setTreatmentOptions(
         [...catalogOptions, ...offCatalogOptions].sort((a, b) => a.label.localeCompare(b.label))
       );
     }
-  }, [catalog.loading, catalog.catalog, offCatalogTreatments]);
+  }, [catalog.loading, catalog.catalog, cachedOffCatalogTreatments]);
 
   useEffect(() => {
     console.log('reinitializing');
-  }, [treatmentOptions]);
+  }, []);
+
   if (catalog.error?.message) {
     return <Text color="red">{catalog.error.message}</Text>;
   }
