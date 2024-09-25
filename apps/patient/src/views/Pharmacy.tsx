@@ -50,7 +50,7 @@ import { datadogRum } from '@datadog/browser-rum';
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
 export const Pharmacy = () => {
-  const { order, flattenedFills, setOrder, isDemo } = useOrderContext();
+  const { order, flattenedFills, setOrder, isDemo, fetchOrder } = useOrderContext();
 
   const orgSettings = getSettings(order?.organization.id);
 
@@ -402,8 +402,6 @@ export const Pharmacy = () => {
     sortBy
   ]);
 
-  console.log(loadingPharmacies);
-
   const handleShowMore = async () => {
     setLoadingPharmacies(true);
 
@@ -526,7 +524,7 @@ export const Pharmacy = () => {
       setTimeout(() => {
         if (result) {
           setSuccessfullySubmitted(true);
-          setTimeout(() => {
+          setTimeout(async () => {
             setShowFooter(false);
 
             // Fudge it so that we can show the pharmacy card on initial load of the
@@ -552,6 +550,12 @@ export const Pharmacy = () => {
             }
 
             setOrder({ ...order, isReroutable: !isReroute, pharmacy: selectedPharmacy });
+
+            // necessary to ensure the order is updated with the new coupon before navigating
+            if (selectedPharmacy?.price) {
+              await fetchOrder();
+            }
+
             const query = queryString.stringify({ orderId: order.id, token, type });
             return navigate(`/status?${query}`);
           }, 1000);

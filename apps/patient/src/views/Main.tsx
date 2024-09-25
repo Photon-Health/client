@@ -25,6 +25,7 @@ interface OrderContextType {
   setOrder: (order: Order) => void;
   logo: any;
   isDemo: boolean;
+  fetchOrder: () => void;
 }
 const OrderContext = createContext<OrderContextType | null>(null);
 export const useOrderContext = () =>
@@ -125,14 +126,6 @@ export const Main = () => {
     }
   }, [order, orderId, fetchOrder, isDemo]);
 
-  useEffect(() => {
-    if (location.pathname === '/status') {
-      if (!order?.discountCards) {
-        fetchOrder();
-      }
-    }
-  }, [fetchOrder, location.pathname, order?.discountCards]);
-
   const preloadImage = (url: string) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -191,7 +184,8 @@ export const Main = () => {
     order,
     flattenedFills,
     setOrder,
-    logo
+    logo,
+    fetchOrder
   };
 
   return (
