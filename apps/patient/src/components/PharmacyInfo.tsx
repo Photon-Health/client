@@ -283,10 +283,10 @@ export const PharmacyInfo = ({
           <Text fontSize="md" fontWeight={boldPharmacyName ? 'bold' : 'medium'}>
             {whiteLabelDeliveryPharmacy ? 'Free Express Delivery' : pharmacy.name}
           </Text>
-          {showPrice ? (
+          {showPrice && pharmacy.price != null ? (
             <>
               <Spacer />
-              <Text fontWeight="bold">${pharmacy.price}</Text>
+              <Text fontWeight="bold">${pharmacy.price.toFixed(2)}</Text>
             </>
           ) : null}
         </HStack>

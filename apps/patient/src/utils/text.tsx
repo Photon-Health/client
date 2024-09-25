@@ -190,7 +190,9 @@ export const text = {
   shipTo: (deliveryAddress: string) => `Ship to ${deliveryAddress}`,
   showThisCoupon: 'Show this coupon at the pharmacy',
   showCouponToPharmacy: (isPlural: boolean) =>
-    `Just show it to the pharmacist when you pick up your ${isPlural ? 'prescriptions' : 'prescription'}.`,
+    `Just show it to the pharmacist when you pick up your ${
+      isPlural ? 'prescriptions' : 'prescription'
+    }.`,
   showingLabel: 'Showing pharmacies near',
   showingAll: 'Showing all pharmacies',
   showMore: 'Show more pharmacies',

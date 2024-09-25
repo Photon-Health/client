@@ -239,13 +239,9 @@ export const Pharmacy = () => {
 
   const getCostco = useCallback(
     async ({
-      enable24Hr,
-      enableOpenNow,
       latitude,
       longitude
     }: {
-      enable24Hr: boolean;
-      enableOpenNow: boolean;
       latitude: number | undefined;
       longitude: number | undefined;
     }) => {
@@ -269,18 +265,14 @@ export const Pharmacy = () => {
       }
       return [];
     },
-    []
+    [enable24Hr, enableOpenNow]
   );
 
   const getWalgreens = useCallback(
     async ({
-      enable24Hr,
-      enableOpenNow,
       latitude,
       longitude
     }: {
-      enable24Hr: boolean;
-      enableOpenNow: boolean;
       latitude: number | undefined;
       longitude: number | undefined;
     }) => {
@@ -305,24 +297,20 @@ export const Pharmacy = () => {
       }
       return [];
     },
-    []
+    [enable24Hr, enableOpenNow]
   );
+
+  const enablePrice = useMemo(() => sortBy === 'price', [sortBy]);
 
   const loadPharmacies = useCallback(
     async ({
-      enable24Hr,
-      enableOpenNow,
       latitude,
       longitude,
-      pageOffset = 0,
-      enablePrice = false
+      pageOffset = 0
     }: {
-      enable24Hr: boolean;
-      enableOpenNow: boolean;
       latitude: number | undefined;
       longitude: number | undefined;
       pageOffset?: number;
-      enablePrice?: boolean;
     }) => {
       if (latitude == null || longitude == null) {
         return [];
@@ -339,7 +327,7 @@ export const Pharmacy = () => {
       setPageOffset(pageOffset + res.length);
       return res;
     },
-    []
+    [enable24Hr, enableOpenNow, enablePrice]
   );
 
   useEffect(() => {
@@ -358,14 +346,14 @@ export const Pharmacy = () => {
         // check if top ranked costco is enabled and there are GLP treatments
         if (enableTopRankedCostco) {
           topRankedPharmacies = [
-            ...(await getCostco({ latitude, longitude, enable24Hr, enableOpenNow })),
+            ...(await getCostco({ latitude, longitude })),
             ...topRankedPharmacies
           ];
         }
 
         if (enableTopRankedWalgreens && order?.readyBy === 'Urgent') {
           topRankedPharmacies = [
-            ...(await getWalgreens({ latitude, longitude, enable24Hr, enableOpenNow })),
+            ...(await getWalgreens({ latitude, longitude })),
             ...topRankedPharmacies
           ];
         }
@@ -374,10 +362,7 @@ export const Pharmacy = () => {
         // a different query than the original query
         const pharmacies = await loadPharmacies({
           latitude,
-          longitude,
-          enable24Hr,
-          enableOpenNow,
-          ...(sortBy === 'price' ? { enablePrice: true } : {})
+          longitude
         });
 
         if (pharmacies?.length === 0) {
@@ -438,8 +423,6 @@ export const Pharmacy = () => {
     const newPharmacies = await loadPharmacies({
       latitude,
       longitude,
-      enable24Hr,
-      enableOpenNow,
       pageOffset
     });
     setPharmacyResults([...pharmacyResults, ...newPharmacies]);

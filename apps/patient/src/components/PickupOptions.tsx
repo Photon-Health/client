@@ -138,7 +138,7 @@ export const PickupOptions = ({
               onSelect={() => handleSelect(pharmacy.id)}
               onSetPreferred={() => handleSetPreferred(pharmacy.id)}
               selectable={true}
-              showPrice={true}
+              showPrice
             />
           </SlideFade>
         ))}
