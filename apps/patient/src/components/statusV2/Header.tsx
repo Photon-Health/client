@@ -168,11 +168,11 @@ function patientDesiredReadyByText(readyByTime: Date | 'URGENT') {
   const isTomorrow = readyByTimeDayJs.isTomorrow();
 
   if (isToday) {
-    return readyByTimeDayJs.format('h:mma');
+    return readyByTimeDayJs.format('h:mm a');
   } else if (isTomorrow) {
-    return `Tomorrow at ${readyByTimeDayJs.format('h:mma')}`;
+    return `Tomorrow at ${readyByTimeDayJs.format('h:mm a')}`;
   }
-  return readyByTimeDayJs.format('MMM Do [at] h:mma');
+  return readyByTimeDayJs.format('MMM Do [at] h:mm a');
 }
 
 export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (

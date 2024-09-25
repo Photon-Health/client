@@ -80,10 +80,6 @@ export const Pharmacy = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
 
-  // loading state
-  const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(false);
-  const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
-
   // Address state
   const [latitude, setLatitude] = useState<number>();
   const [longitude, setLongitude] = useState<number>();
@@ -93,11 +89,15 @@ export const Pharmacy = () => {
   const [cleanAddress, setCleanAddress] = useState<string>();
   const [loadingLocation, setLoadingLocation] = useState(false);
 
-  // loading state
-  const isLoading = loadingLocation || loadingPharmacies;
-
   // sorting
   const [sortBy, setSortBy] = useState<'price' | 'distance'>('price');
+
+  // loading state
+  const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(false);
+  const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(sortBy === 'price');
+  const isLoading = loadingLocation || loadingPharmacies;
+
+  console.log('showingAllPharmacies', showingAllPharmacies);
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
@@ -107,8 +107,6 @@ export const Pharmacy = () => {
 
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
-
-  // const isMultiRx = flattenedFills.length > 1;
 
   // Pharmacy results
   const [topRankedPharmacies, setTopRankedPharmacies] = useState<EnrichedPharmacy[]>([]);
@@ -151,9 +149,6 @@ export const Pharmacy = () => {
 
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
-  // const subheading = isReroute
-  //   ? t.sendToNew(isMultiRx, order.pharmacy!.name)
-  //   : t.sendToSelected(isMultiRx);
 
   const showToastWarning = () =>
     toast({
@@ -183,8 +178,13 @@ export const Pharmacy = () => {
 
   // Reset when we toggle 24hr/open now
   useEffect(() => {
-    reset();
-  }, [enable24Hr, enableOpenNow]);
+    if (sortBy !== 'price') {
+      reset();
+    } else {
+      // If we're sorting by price, we want to hide the show more button
+      setShowingAllPharmacies(true);
+    }
+  }, [sortBy, enable24Hr, enableOpenNow]);
 
   // Initialize demo data
   useEffect(() => {
@@ -344,7 +344,7 @@ export const Pharmacy = () => {
         let topRankedPharmacies: EnrichedPharmacy[] = [];
 
         // check if top ranked costco is enabled and there are GLP treatments
-        if (enableTopRankedCostco) {
+        if (enableTopRankedCostco && sortBy !== 'price') {
           topRankedPharmacies = [
             ...(await getCostco({ latitude, longitude })),
             ...topRankedPharmacies
