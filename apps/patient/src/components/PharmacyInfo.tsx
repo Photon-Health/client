@@ -1,13 +1,25 @@
-import { useLocation } from 'react-router-dom';
-import { Box, HStack, Tag, TagLabel, TagLeftIcon, Text, VStack, Image } from '@chakra-ui/react';
-import { FiStar } from 'react-icons/fi';
+import {
+  Box,
+  HStack,
+  IconButton,
+  Image,
+  Tag,
+  TagLabel,
+  TagLeftIcon,
+  Text,
+  VStack,
+  Spacer
+} from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { types } from '@photonhealth/sdk';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { FiStar } from 'react-icons/fi';
+import { useLocation } from 'react-router-dom';
+import { Address, EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 
-import { formatAddress } from '../utils/general';
+import { useMemo, useState } from 'react';
+import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
+import { formatAddress, titleCase } from '../utils/general';
 
 dayjs.extend(customParseFormat);
 
@@ -17,47 +29,159 @@ interface HoursProps {
   is24Hr?: boolean;
   opens?: string;
   closes?: string;
+  hours?: EnrichedPharmacy['hours'];
+  showHours?: boolean;
 }
 
-const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes }: HoursProps) => {
-  const color = isClosingSoon ? 'orange.500' : isOpen ? 'green' : 'red';
+const daysOfWeek = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+
+const hoursLookup = Object.fromEntries(daysOfWeek.map((d, i) => [d, i]));
+
+const formatTime = (hstr: string) => {
+  const [h, m] = hstr.split(':');
+  const hoursInt = parseInt(h, 10);
+  return `${hoursInt === 12 ? 12 : hoursInt % 12}:${m} ${hoursInt >= 12 ? 'pm' : 'am'}`;
+};
+
+const HoursRow = ({
+  hours,
+  is24Hr,
+  isClosed,
+  dayOfWeek
+}: {
+  hours?: Array<{
+    openFrom: string;
+    openUntil: string;
+  }>;
+  is24Hr: boolean;
+  isClosed: boolean;
+  dayOfWeek: string;
+}) => {
+  if (isClosed || is24Hr) {
+    return (
+      <HStack w="full" justifyContent={'space-between'}>
+        <Text fontSize="sm" color="gray.500">
+          {titleCase(dayOfWeek)}
+        </Text>
+        <Text fontSize="sm" color="gray.500">
+          {is24Hr ? 'Open 24hr' : 'Closed'}
+        </Text>
+      </HStack>
+    );
+  }
+  if (hours == null || hours.length === 0) return null;
+  return (
+    <>
+      <HStack w="full" justifyContent={'space-between'}>
+        <Text fontSize="sm" color="gray.500">
+          {titleCase(dayOfWeek)}
+        </Text>
+        <Text fontSize="sm" color="gray.500">
+          {formatTime(hours[0].openFrom)} - {formatTime(hours[0].openUntil)}
+        </Text>
+      </HStack>
+      {/* Include the rest of the hours but without day of week information */}
+      {hours.slice(1).map((h) => (
+        <HStack w="full" justifyContent={'space-between'} key={h.openFrom}>
+          <Spacer />
+          <Text fontSize="sm" color="gray.500">
+            {formatTime(h.openFrom)} - {formatTime(h.openUntil)}
+          </Text>
+        </HStack>
+      ))}
+    </>
+  );
+};
+
+const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes, hours, showHours }: HoursProps) => {
+  const color = isClosingSoon ? 'orange.500' : isOpen ? 'green.500' : 'red.500';
   const text = is24Hr ? t.open24hrs : isClosingSoon ? t.closingSoon : isOpen ? t.open : t.closed;
   const hasHours = isOpen != null;
+  const [hoursOpen, setHoursOpen] = useState(false);
 
   if (!hasHours) return null;
 
+  const sortedHours = useMemo(
+    () =>
+      hours?.sort((a, b) =>
+        a.dayOfWeek === b.dayOfWeek
+          ? a.openFrom.localeCompare(b.openFrom)
+          : hoursLookup[a.dayOfWeek] - hoursLookup[b.dayOfWeek]
+      ),
+    [hours]
+  );
+
+  const withDaysClosed = useMemo(
+    () =>
+      Object.fromEntries(
+        daysOfWeek.map((d) => [d, sortedHours?.filter((h) => h.dayOfWeek === d) ?? []])
+      ),
+    [sortedHours]
+  );
+
   return (
-    <HStack w="full" whiteSpace="nowrap" overflow="hidden" height="fit-content">
-      {isOpen != null || isClosingSoon ? (
-        <Text fontSize="sm" color={color}>
-          {text}
-        </Text>
-      ) : null}
-      {!is24Hr && ((isOpen && closes) || (!isOpen && opens)) ? (
-        <Text color="gray.500">&bull;</Text>
-      ) : null}
-      {!is24Hr && isClosingSoon ? (
-        <Text fontSize="sm" color="gray.500" isTruncated>
-          {closes}
-        </Text>
-      ) : null}
-      {!is24Hr && !isClosingSoon && isOpen && closes ? (
-        <Text fontSize="sm" color="gray.500" isTruncated>
-          {closes}
-        </Text>
-      ) : null}
-      {!is24Hr && !isClosingSoon && !isOpen && opens ? (
-        <Text fontSize="sm" color="gray.500" isTruncated>
-          {opens}
-        </Text>
-      ) : null}
-    </HStack>
+    <VStack w="full">
+      <HStack
+        w="full"
+        justifyContent={'space-between'}
+        onClick={() => setHoursOpen(!hoursOpen)}
+        cursor={showHours ? 'pointer' : undefined}
+      >
+        <HStack w="full" whiteSpace="nowrap" overflow="hidden" height="fit-content">
+          {isOpen != null || isClosingSoon ? (
+            <Text fontSize="sm" color={color} as="b">
+              {text}
+            </Text>
+          ) : null}
+          {!is24Hr && ((isOpen && closes) || (!isOpen && opens)) ? (
+            <Text color="gray.500">&bull;</Text>
+          ) : null}
+          {!is24Hr && isClosingSoon ? (
+            <Text fontSize="sm" color="gray.500" isTruncated>
+              {closes}
+            </Text>
+          ) : null}
+          {!is24Hr && !isClosingSoon && isOpen && closes ? (
+            <Text fontSize="sm" color="gray.500" isTruncated>
+              {closes}
+            </Text>
+          ) : null}
+          {!is24Hr && !isClosingSoon && !isOpen && opens ? (
+            <Text fontSize="sm" color="gray.500" isTruncated>
+              {opens}
+            </Text>
+          ) : null}
+        </HStack>
+        {showHours && hours && (
+          <IconButton
+            variant="minimal"
+            icon={hoursOpen ? <IoChevronUpOutline /> : <IoChevronDownOutline />}
+            aria-label={'View Hours'}
+            size={'5'}
+          />
+        )}
+      </HStack>
+      {showHours &&
+        hoursOpen &&
+        daysOfWeek.map((d) => {
+          const h = withDaysClosed[d];
+          return (
+            <HoursRow
+              is24Hr={h[0]?.is24Hr}
+              isClosed={h.length === 0}
+              hours={h}
+              key={d}
+              dayOfWeek={d}
+            />
+          );
+        })}
+    </VStack>
   );
 };
 
 interface DistanceAddressProps {
   distance?: number;
-  address?: types.Address | null;
+  address?: Address | null;
   fontSize?: string;
 }
 
@@ -86,6 +210,7 @@ interface PharmacyInfoProps {
   boldPharmacyName?: boolean;
   isStatus?: boolean;
   selected?: boolean;
+  showHours?: boolean;
 }
 
 export const PharmacyInfo = ({
@@ -96,7 +221,8 @@ export const PharmacyInfo = ({
   availableInYourArea = false,
   freeDelivery = false,
   boldPharmacyName = true,
-  isStatus = false
+  isStatus = false,
+  showHours = false
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
@@ -110,7 +236,7 @@ export const PharmacyInfo = ({
     pharmacy.name === 'Capsule Pharmacy' && location.pathname === '/pharmacy';
 
   return (
-    <VStack align="start" w="full" spacing={1}>
+    <VStack align="start" w="full">
       {showPreferredTag ||
       showReadyIn30MinTag ||
       showAvailableInYourAreaTag ||
@@ -140,7 +266,7 @@ export const PharmacyInfo = ({
         </HStack>
       ) : null}
       <HStack w="full">
-        <HStack>
+        <HStack w="full">
           {pharmacy?.logo && !whiteLabelDeliveryPharmacy ? (
             <Box boxSize="32px" overflow="hidden">
               <Image
@@ -158,23 +284,25 @@ export const PharmacyInfo = ({
         </HStack>
       </HStack>
       {showDetails ? (
-        <VStack direction={isStatus ? 'column-reverse' : 'column'} spacing={1}>
+        <VStack direction={isStatus ? 'column-reverse' : 'column'} w="full" alignItems={'start'}>
           {tagline ? (
             <Text fontSize="sm" color="gray.500">
               {tagline}
             </Text>
           ) : null}
+          <DistanceAddress
+            distance={pharmacy.distance}
+            address={pharmacy.address}
+            fontSize={isStatus ? 'md' : 'sm'}
+          />
           <Hours
             isOpen={pharmacy.isOpen}
             is24Hr={pharmacy.is24Hr}
             isClosingSoon={pharmacy.isClosingSoon}
             opens={pharmacy.opens}
             closes={pharmacy.closes}
-          />
-          <DistanceAddress
-            distance={pharmacy.distance}
-            address={pharmacy.address}
-            fontSize={isStatus ? 'md' : 'sm'}
+            hours={pharmacy.hours}
+            showHours={showHours}
           />
         </VStack>
       ) : null}

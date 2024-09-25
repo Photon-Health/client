@@ -35,16 +35,16 @@ const GET_PRODUCTS = gql`
   }
 `;
 
-type MedSearchProps = {
+type AdvancedMedicationSearchProps = {
   open: boolean;
   withConcept?: boolean;
   title: string;
 };
 
 customElement(
-  'photon-med-search',
+  'photon-advanced-medication-search',
   { open: false, withConcept: false, title: '' },
-  (props: MedSearchProps) => {
+  (props: AdvancedMedicationSearchProps) => {
     let ref: any;
     const client = usePhotonClient();
     const [conceptId, setConceptId] = createSignal<string>('');
@@ -74,12 +74,12 @@ customElement(
       ref?.dispatchEvent(event);
     };
 
-    const dispatchMedSearchOpen = () => {
-      const event = new CustomEvent('photon-medication-search-open', {
+    const dispatchAdvancedMedicationSearchOpen = () => {
+      const event = new CustomEvent('photon-advanced-medication-search-open', {
         composed: true,
         bubbles: true,
         detail: {
-          action: 'photon-medication-search-open'
+          action: 'photon-advanced-medication-search-open'
         }
       });
       ref?.dispatchEvent(event);
@@ -90,7 +90,7 @@ customElement(
       if (data.catalogs.length > 0) {
         setCatalogId(data.catalogs[0].id);
       }
-      dispatchMedSearchOpen();
+      dispatchAdvancedMedicationSearchOpen();
     });
 
     createEffect(() => {

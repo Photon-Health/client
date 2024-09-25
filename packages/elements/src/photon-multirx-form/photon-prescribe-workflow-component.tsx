@@ -1,7 +1,7 @@
 import { RecentOrders } from '@photonhealth/components';
+import { customElement } from 'solid-element';
 import { createFormStore } from '../stores/form';
 import { PrescribeProps, PrescribeWorkflow } from './photon-prescribe-workflow';
-import { customElement } from 'solid-element';
 
 const Component = (props: PrescribeProps) => {
   const { store, actions } = createFormStore({

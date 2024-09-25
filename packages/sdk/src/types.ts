@@ -572,7 +572,7 @@ export type Pharmacy = {
   phone?: Maybe<Scalars['AWSPhone']>;
   is24Hr?: boolean;
   nextEvents?: PharmacyEvents;
-  hours?: [PharmacyHours];
+  hours?: Maybe<Array<PharmacyHours>>;
   isOpen?: boolean;
 };
 
@@ -892,6 +892,17 @@ export type TreatmentCodes = {
   packageNDC?: Maybe<Scalars['String']>;
   productNDC?: Maybe<Scalars['String']>;
   rxcui?: Maybe<Scalars['String']>;
+};
+
+export type TreatmentOption = {
+  __typename?: 'TreatmentOption';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  ndc: Scalars['String'];
+  type: MedicationType;
+  route?: Scalars['String'];
+  form?: Scalars['String'];
+  strength?: Scalars['String'];
 };
 
 export type User = {

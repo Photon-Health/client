@@ -1,7 +1,6 @@
 //Solid
 import { debounce } from '@solid-primitives/scheduled';
 import {
-  Accessor,
   createEffect,
   createMemo,
   createSignal,
@@ -10,7 +9,8 @@ import {
   Match,
   onMount,
   Show,
-  Switch
+  Switch,
+  Accessor
 } from 'solid-js';
 
 //Shoelace
@@ -33,6 +33,8 @@ import styles from './style.css?inline';
 //Virtual List
 import { createVirtualizer, VirtualItem } from '@tanstack/solid-virtual';
 
+type Item<T = any> = DataItem<T> | GroupTitle;
+
 interface DataItem<T> {
   data: T;
   // TODO: setting this to scroll to the correct index
@@ -43,8 +45,6 @@ interface DataItem<T> {
 interface GroupTitle {
   title: string;
 }
-
-type Item<T = any> = DataItem<T> | GroupTitle;
 
 // Typescript and solid are annoying
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -76,6 +76,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   optional?: boolean;
   clearable?: boolean;
   actionRef?: any;
+  onInputFocus?: () => void;
 }) => {
   //refs
   let ref: any;
@@ -268,10 +269,15 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             }
             debounceSearch(e.target.value);
           }}
-          on:sl-focus={() => {
-            dropdownRef.children[1].style.width = `${inputRef.clientWidth}px`;
-            if (selectedIndex() > 0) {
-              rowVirtualizer().scrollToIndex(selectedIndex());
+          on:sl-focus={(e: any) => {
+            if (props.onInputFocus) {
+              props.onInputFocus();
+              e.stopImmediatePropagation();
+            } else {
+              dropdownRef.children[1].style.width = `${inputRef.clientWidth}px`;
+              if (selectedIndex() > 0) {
+                rowVirtualizer().scrollToIndex(selectedIndex());
+              }
             }
           }}
         >
@@ -353,8 +359,14 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
                 {(vr) => {
                   const isLoaderRow = vr.index > allItems().length - 1;
                   const datum = allItems()[vr.index];
+
+                  const selectedValue = selected();
                   const isSelected =
-                    'data' in datum && datum.data.id === selected()?.id && !isLoaderRow;
+                    !isLoaderRow &&
+                    !!selectedValue &&
+                    'id' in selectedValue &&
+                    'data' in datum &&
+                    selectedValue.id === datum.data.id;
 
                   return (
                     <Switch>

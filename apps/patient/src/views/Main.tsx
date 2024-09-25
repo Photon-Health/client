@@ -16,7 +16,6 @@ import { FillWithCount, countFillsAndRemoveDuplicates } from '../utils/general';
 import { Order } from '../utils/models';
 
 import { getSettings } from '@client/settings';
-import { types } from '@photonhealth/sdk';
 import { AUTH_HEADER_ERRORS } from '../api/internal';
 import { setAuthHeader } from '../configs/graphqlClient';
 import theme from '../configs/theme';
@@ -38,6 +37,7 @@ export const Main = () => {
   const isDemo = searchParams.get('demo');
   const orderId = searchParams.get('orderId');
   const phone = searchParams.get('phone');
+  const useV2 = searchParams.get('v2');
 
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
 
@@ -76,15 +76,17 @@ export const Main = () => {
       datadogRum.setGlobalContextProperty('orderId', orderId);
       datadogRum.setUser({ patientId: order.patient.id });
 
-      if (order.state === types.OrderState.Canceled) {
+      if (order.state === 'CANCELED') {
         navigate('/canceled', { replace: true });
         return;
       }
 
       const hasPharmacy = order.pharmacy?.id;
-      const redirect = hasPharmacy ? '/status' : '/review';
+      const redirect = hasPharmacy ? (useV2 ? '/status' : '/status') : '/review';
 
-      navigate(`${redirect}?orderId=${order.id}&token=${token}`, { replace: true });
+      navigate(`${redirect}?orderId=${order.id}&token=${token}${useV2 ? '&v2=true' : ''}`, {
+        replace: true
+      });
     },
     [navigate, orderId, token]
   );
@@ -92,7 +94,7 @@ export const Main = () => {
   const fetchOrder = useCallback(async () => {
     if (isDemo) return demoOrder;
     try {
-      const result: Order = await getOrder(orderId!);
+      const result = await getOrder(orderId!);
       if (result) {
         handleOrderResponse(result);
       }

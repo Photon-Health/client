@@ -5,13 +5,13 @@ import { customElement } from 'solid-element';
 import { createSignal } from 'solid-js';
 import { usePhoton } from '../context';
 
-type MedSearchDialogProps = {
+type AdvancedMedicationSearchDialogProps = {
   open: boolean;
   withConcept?: boolean;
   title?: string;
 };
 
-const Component = (props: MedSearchDialogProps) => {
+const Component = (props: AdvancedMedicationSearchDialogProps) => {
   const client = usePhoton();
   let ref: any;
   const [medication, setMedication] = createSignal<Medication | SearchMedication | undefined>(
@@ -88,7 +88,11 @@ const Component = (props: MedSearchDialogProps) => {
         on:photon-dialog-canceled={handleCancel}
         on:photon-dialog-alt={handleCancel}
       >
-        <photon-med-search open={props.open} with-concept={props.withConcept} title={props.title} />
+        <photon-advanced-medication-search
+          open={props.open}
+          with-concept={props.withConcept}
+          title={props.title}
+        />
         <div class="mt-8 flex gap-4 justify-end">
           <Button variant="secondary" onClick={handleCancel}>
             Cancel
@@ -102,7 +106,7 @@ const Component = (props: MedSearchDialogProps) => {
   );
 };
 customElement(
-  'photon-med-search-dialog',
+  'photon-advanced-medication-search-dialog',
   {
     open: {
       value: false,

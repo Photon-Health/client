@@ -1,13 +1,15 @@
 import dayjs from 'dayjs';
 import { Text } from '@chakra-ui/react';
-import { OrderFulfillment, Maybe } from 'packages/sdk/dist/types';
 import isTomorrow from 'dayjs/plugin/isTomorrow';
+import { Maybe } from '../__generated__/graphql';
+import { OrderFulfillment } from '../utils/models';
+import { roundUpTo15MinInterval } from '../utils/dates';
 
 dayjs.extend(isTomorrow);
 
 interface ReadyTextProps {
   readyBy?: string;
-  readyByTime?: string;
+  readyByTime?: Date;
   isDeliveryPharmacy?: boolean;
   fulfillment?: Maybe<OrderFulfillment>;
 }
@@ -32,17 +34,6 @@ export const ReadyText = ({
   }
 
   return null;
-};
-
-const roundUpTo15MinInterval = (pharmacyEstimatedReadyAt: Date): Date => {
-  const estimatedReadyAtAsDayJs = dayjs(pharmacyEstimatedReadyAt);
-  const minutes = estimatedReadyAtAsDayJs.minute();
-  const roundedMinutes = Math.ceil(minutes / 15) * 15;
-  if (roundedMinutes >= 60) {
-    return estimatedReadyAtAsDayJs.add(1, 'hour').minute(0).toDate();
-  } else {
-    return estimatedReadyAtAsDayJs.minute(roundedMinutes).toDate();
-  }
 };
 
 interface PharmacyEstimatedReadyAtProps {
@@ -82,7 +73,7 @@ const PharmacyEstimatedReadyAt = ({ pharmacyEstimatedReadyAt }: PharmacyEstimate
 
 interface PatientDesiredReadyByProps {
   readyBy: string;
-  readyByTime: string;
+  readyByTime: Date;
 }
 const PatientDesiredReadyBy = ({ readyBy, readyByTime }: PatientDesiredReadyByProps) => {
   const readyByTimeDayJs = dayjs(readyByTime);

@@ -1,15 +1,4 @@
-import { types } from 'packages/sdk/dist/lib';
-
 import { graphQLClient } from '../configs/graphqlClient';
-import {
-  GET_ORDER,
-  GET_PHARMACIES,
-  MARK_ORDER_AS_PICKED_UP,
-  REROUTE_ORDER,
-  SET_ORDER_PHARMACY,
-  SET_PREFERRED_PHARMACY
-} from '../graphql';
-import { Order } from '../utils/models';
 
 export const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
 
@@ -19,9 +8,7 @@ export const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHOR
 
 export const getOrder = async (orderId: string) => {
   // Not wrapped in try/catch so error handling can be done in Main
-  const response: { order: Order } = await graphQLClient.request(GET_ORDER, {
-    id: orderId
-  });
+  const response = await graphQLClient.GetOrder({ id: orderId });
   if (response.order) {
     return response.order;
   } else {
@@ -50,20 +37,17 @@ export const getPharmacies = async ({
 }) => {
   try {
     const now = new Date();
-    const response: { pharmaciesByLocation: types.Pharmacy[] } = await graphQLClient.request(
-      GET_PHARMACIES,
-      {
-        location: {
-          radius: 100,
-          ...searchParams
-        },
-        limit,
-        offset,
-        openAt: isOpenNow ? now : undefined,
-        is24hr,
-        name
-      }
-    );
+    const response = await graphQLClient.GetPharmaciesByLocation({
+      location: {
+        radius: 100,
+        ...searchParams
+      },
+      limit,
+      offset,
+      openAt: isOpenNow ? now : undefined,
+      is24hr,
+      name
+    });
 
     if (response?.pharmaciesByLocation?.length > 0) {
       return response.pharmaciesByLocation;
@@ -83,10 +67,9 @@ export const getPharmacies = async ({
 
 export const markOrderAsPickedUp = async (orderId: string) => {
   try {
-    const response: { markOrderAsPickedUp: boolean } = await graphQLClient.request(
-      MARK_ORDER_AS_PICKED_UP,
-      { markOrderAsPickedUpId: orderId }
-    );
+    const response = await graphQLClient.MarkOrderAsPickedUp({
+      markOrderAsPickedUpId: orderId
+    });
     if (response?.markOrderAsPickedUp) {
       return true;
     } else {
@@ -101,7 +84,7 @@ export const markOrderAsPickedUp = async (orderId: string) => {
 
 export const rerouteOrder = async (orderId: string, pharmacyId: string) => {
   try {
-    const response: { rerouteOrder: boolean } = await graphQLClient.request(REROUTE_ORDER, {
+    const response = await graphQLClient.RerouteOrder({
       orderId,
       pharmacyId
     });
@@ -122,19 +105,16 @@ export const setOrderPharmacy = async (
   pharmacyId: string,
   readyBy?: string,
   readyByDay?: string,
-  readyByTime?: string
+  readyByTime?: Date
 ) => {
   try {
-    const response: { setOrderPharmacy: boolean } = await graphQLClient.request(
-      SET_ORDER_PHARMACY,
-      {
-        pharmacyId,
-        orderId,
-        readyBy,
-        readyByDay,
-        readyByTime
-      }
-    );
+    const response = await graphQLClient.SetOrderPharmacy({
+      pharmacyId,
+      orderId,
+      readyBy,
+      readyByDay,
+      readyByTime
+    });
 
     if (response?.setOrderPharmacy) {
       return true;
@@ -150,13 +130,10 @@ export const setOrderPharmacy = async (
 
 export const setPreferredPharmacy = async (patientId: string, pharmacyId: string) => {
   try {
-    const response: { setPreferredPharmacy: boolean } = await graphQLClient.request(
-      SET_PREFERRED_PHARMACY,
-      {
-        patientId,
-        pharmacyId
-      }
-    );
+    const response = await graphQLClient.SetPreferredPharmacy({
+      patientId,
+      pharmacyId
+    });
 
     if (response?.setPreferredPharmacy) {
       return true;

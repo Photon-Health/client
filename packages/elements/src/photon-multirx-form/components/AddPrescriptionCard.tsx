@@ -1,33 +1,33 @@
-import { afterDate, message, between } from '../../validators';
-import { record, string, any, number, min, size, refine } from 'superstruct';
-import { format } from 'date-fns';
 import {
-  Card,
-  Text,
+  Banner,
   Button,
-  Icon,
+  Card,
   DoseCalculator,
+  Icon,
+  Text,
   triggerToast,
   useRecentOrders
 } from '@photonhealth/components';
-import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-
+import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
+import { format } from 'date-fns';
+import { any, min, number, record, refine, size, string } from 'superstruct';
+import { afterDate, between, message } from '../../validators';
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/button/button';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-import { createSignal, Show, onMount } from 'solid-js';
-import repopulateForm from '../util/repopulateForm';
-import clearForm from '../util/clearForm';
-import { usePhoton } from '../../context';
 import { GraphQLError } from 'graphql';
+import { createSignal, onMount, Show } from 'solid-js';
+import { usePhoton } from '../../context';
+import clearForm from '../util/clearForm';
+import repopulateForm from '../util/repopulateForm';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 const validators = {
   treatment: message(record(string(), any()), 'Please select a treatment...'),
-  dispenseQuantity: message(min(number(), 1), 'Quantity must be positive'),
+  dispenseQuantity: message(min(number(), 0, { exclusive: true }), 'Quantity must be positive'),
   dispenseUnit: message(
     refine(string(), 'nonEmptyString', (value) => value.trim().length > 0),
     'Please select a dispensing unit...'
@@ -56,6 +56,8 @@ export const AddPrescriptionCard = (props: {
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
   const [, recentOrdersActions] = useRecentOrders();
+  const [searchText, setSearchText] = createSignal<string>('');
+
   let ref: any;
 
   onMount(() => {
@@ -178,6 +180,8 @@ export const AddPrescriptionCard = (props: {
 
       // otherwise add it to the draft prescriptions list
       addDraftPrescription();
+
+      setSearchText('');
     } else {
       triggerToast({
         status: 'error',
@@ -192,13 +196,6 @@ export const AddPrescriptionCard = (props: {
       <Card>
         <div class="flex items-center justify-between">
           <Text color="gray">Add Prescription</Text>
-          <div
-            class="md:py-2 text-left sm:text-right text-blue-600 flex gap-2 cursor-pointer items-center h-full"
-            onClick={() => setMedDialogOpen(true)}
-          >
-            <a class="font-sans text-sm ">Advanced Search</a>
-            <Icon name="magnifyingGlass" size="sm" />
-          </div>
         </div>
 
         <div
@@ -212,12 +209,24 @@ export const AddPrescriptionCard = (props: {
             });
           }}
         >
-          <photon-treatment-select
-            label="Search Treatment Catalog"
+          <div class="mb-2">
+            <Banner status="info" withoutIcon closable id="new-medication-search-banner">
+              <div class="flex flex-col gap-2">
+                <div class="text-sm">New Medication Search</div>
+                <div class="text-sm text-gray-700">
+                  You can now search for any treatment in the standard search without using advanced
+                  search.
+                </div>
+              </div>
+            </Banner>
+          </div>
+          <photon-medication-search
+            label="Search for Treatment"
             selected={props.store.treatment?.value ?? undefined}
             invalid={props.store.treatment?.error ?? false}
             help-text={props.store.treatment?.error}
             off-catalog-option={offCatalog()}
+            search-text={searchText()}
             on:photon-treatment-selected={(e: any) => {
               if (e.detail.data.__typename === 'PrescriptionTemplate') {
                 repopulateForm(props.actions, {
@@ -230,11 +239,21 @@ export const AddPrescriptionCard = (props: {
                   value: e.detail.data
                 });
               }
-              props.actions.updateFormValue({
-                key: 'catalogId',
-                value: e.detail.catalogId
-              });
+
+              if (e.detail.catalogId) {
+                props.actions.updateFormValue({
+                  key: 'catalogId',
+                  value: e.detail.catalogId
+                });
+              }
             }}
+            on:photon-treatment-unselected={() => {
+              clearForm(
+                props.actions,
+                props?.prefillNotes ? { notes: props.prefillNotes } : undefined
+              );
+            }}
+            on:photon-search-text-changed={(e: any) => setSearchText(e.detail.text)}
           />
           <div class="flex flex-col sm:flex-none sm:grid sm:grid-cols-2 sm:gap-4">
             <div class="order-last sm:order-first">
@@ -251,7 +270,7 @@ export const AddPrescriptionCard = (props: {
                   })
                 }
               />
-              <photon-med-search-dialog
+              <photon-advanced-medication-search-dialog
                 title="Advanced Medication Search"
                 open={medDialogOpen()}
                 on:photon-medication-closed={() => setMedDialogOpen(false)}
@@ -279,7 +298,7 @@ export const AddPrescriptionCard = (props: {
                 label="Quantity"
                 value={props.store.dispenseQuantity?.value ?? null}
                 required="true"
-                min={1}
+                min={0}
                 invalid={props.store.dispenseQuantity?.error ?? false}
                 help-text={props.store.dispenseQuantity?.error}
                 on:photon-input-changed={(e: any) => {
