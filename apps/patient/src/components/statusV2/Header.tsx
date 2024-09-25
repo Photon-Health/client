@@ -1,4 +1,4 @@
-import { Box, Heading, HStack, Text, VStack } from '@chakra-ui/react';
+import { Heading, HStack, Text, VStack } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import React from 'react';
 import { CiShop } from 'react-icons/ci';
@@ -221,19 +221,18 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
         {thirdBar}
       </HStack>
       {(props.status === 'CREATED' || props.status === 'SENT') && props.patientDesiredReadyAt && (
-        <Box
+        <HStack
           borderWidth={1}
-          borderRadius={16}
-          borderColor={'#EAECF0'}
-          shadow={'md'}
-          p={3}
-          w={'full'}
+          borderRadius="xl"
+          borderColor="#EAECF0"
+          shadow="md"
+          p={4}
+          w="full"
+          spacing={2}
         >
-          Requested Pickup:{' '}
-          <Text as="b" paddingLeft={3}>
-            {patientDesiredReadyByText(props.patientDesiredReadyAt)}
-          </Text>
-        </Box>
+          <Text>Requested Pickup:</Text>
+          <Text as="b">{patientDesiredReadyByText(props.patientDesiredReadyAt)}</Text>
+        </HStack>
       )}
     </VStack>
   );
