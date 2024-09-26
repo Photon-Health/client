@@ -195,7 +195,7 @@ const organizationSettings: {
   },
   // California Hair Surgeon (Xyon Health)
   org_XWFD5B6e8qhCxXfN: {
-    sendOrder: false,
+    sendOrder: true,
     pickUp: false,
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID],
