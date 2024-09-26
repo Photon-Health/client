@@ -66,25 +66,33 @@ export const Main = () => {
   }, [token]);
 
   const handleOrderResponse = useCallback(
-    (order: Order) => {
-      console.log('handleOrderResponse', order);
-      setOrder(order);
+    (ord: Order) => {
+      console.log('handleOrderResponse', ord);
 
-      setFlattenedFills(countFillsAndRemoveDuplicates(order.fills));
+      // This is weird, but it's necessary to show the selected pharmacy
+      // when the user goes from selection to the status page
+      if (order && order.pharmacy && location.pathname === '/status') {
+        const updatedOrder = { ...ord, pharmacy: { ...order.pharmacy } };
+        setOrder(updatedOrder);
+      } else {
+        setOrder(ord);
+      }
 
-      datadogRum.setGlobalContextProperty('organizationId', order.organization.id);
+      setFlattenedFills(countFillsAndRemoveDuplicates(ord.fills));
+
+      datadogRum.setGlobalContextProperty('organizationId', ord.organization.id);
       datadogRum.setGlobalContextProperty('orderId', orderId);
-      datadogRum.setUser({ patientId: order.patient.id });
+      datadogRum.setUser({ patientId: ord.patient.id });
 
-      if (order.state === 'CANCELED') {
+      if (ord.state === 'CANCELED') {
         navigate('/canceled', { replace: true });
         return;
       }
 
-      const hasPharmacy = order.pharmacy?.id;
+      const hasPharmacy = ord.pharmacy?.id;
       const redirect = hasPharmacy ? (useV2 ? '/status' : '/status') : '/review';
 
-      navigate(`${redirect}?orderId=${order.id}&token=${token}${useV2 ? '&v2=true' : ''}`, {
+      navigate(`${redirect}?orderId=${ord.id}&token=${token}${useV2 ? '&v2=true' : ''}`, {
         replace: true
       });
     },
