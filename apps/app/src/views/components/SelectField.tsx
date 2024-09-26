@@ -1,7 +1,7 @@
 import { Select, NoticeProps, chakraComponents } from 'chakra-react-select';
 import { useField, FieldAttributes } from 'formik';
 import { Button, Text, HStack, forwardRef } from '@chakra-ui/react';
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 
 const NoOptionsMessage = (
   onExpandedSearchClick: () => void,
@@ -66,6 +66,7 @@ export const SelectField = forwardRef((props: FieldAttributes<any>, ref: any) =>
 
   const onChanged = (selected: any) => {
     if (onChange && selected?.value) onChange(selected.value);
+
     if (!selected || !selected.value) {
       setValue({ value: '', label: '' });
     } else if (Array.isArray(selected)) {
@@ -76,7 +77,9 @@ export const SelectField = forwardRef((props: FieldAttributes<any>, ref: any) =>
     }
   };
 
-  const isEqual = useCallback((option: any) => option?.value === field.value, [field.value]);
+  const isEqual = (option: any) => {
+    return option?.value === field.value;
+  };
 
   const customNoOptions = NoOptionsMessage(
     () => onExpandedSearchClick(filterText),
@@ -92,8 +95,6 @@ export const SelectField = forwardRef((props: FieldAttributes<any>, ref: any) =>
     }
   };
 
-  const selectedOption = options?.find(isEqual) || null;
-
   return (
     <Select
       ref={ref}
@@ -101,7 +102,7 @@ export const SelectField = forwardRef((props: FieldAttributes<any>, ref: any) =>
       placeholder=""
       onChange={onChanged}
       onBlur={setTouched}
-      value={selectedOption}
+      value={options?.find(isEqual) || null}
       onInputChange={handleSearch}
       onMenuScrollToBottom={fetchMore}
       blurInputOnSelect={false}
