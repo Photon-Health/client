@@ -26,20 +26,32 @@ export const CouponDetails: FC = () => {
           {t.showThisCoupon}
         </Text>
       </Box>
-      <HStack w="full" align="start">
-        <VStack w="30%" align="start">
-          <Text>{t.bin}</Text>
-          <Text>{t.pcn}</Text>
-          <Text>{t.group}</Text>
-          <Text>{t.memberId}</Text>
-        </VStack>
-        <VStack w="70%" align="start">
-          <Text as="b">{bin}</Text>
-          <Text as="b">{pcn}</Text>
-          <Text as="b">{group}</Text>
-          <Text as="b">{memberId}</Text>
-        </VStack>
-      </HStack>
+      <VStack w="full" align="stretch">
+        <HStack w="full">
+          <Text w="40%">{t.bin}</Text>
+          <Text as="b" w="60%">
+            {bin}
+          </Text>
+        </HStack>
+        <HStack w="full">
+          <Text w="40%">{t.pcn}</Text>
+          <Text as="b" w="60%">
+            {pcn}
+          </Text>
+        </HStack>
+        <HStack w="full">
+          <Text w="40%">{t.group}</Text>
+          <Text as="b" w="60%">
+            {group}
+          </Text>
+        </HStack>
+        <HStack w="full">
+          <Text w="40%">{t.memberId}</Text>
+          <Text as="b" w="60%">
+            {memberId}
+          </Text>
+        </HStack>
+      </VStack>
       <HStack color="blue.500">
         <Icon as={FiInfo} />
         <Text
