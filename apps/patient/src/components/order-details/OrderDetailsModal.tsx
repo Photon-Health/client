@@ -81,7 +81,7 @@ export const OrderDetailsModal = (props: OrderDetailsProps & OrderDetailsModalPr
             <VStack alignItems="stretch" spacing={4} w="full">
               <VStack
                 bgColor="white"
-                borderRadius="md"
+                borderRadius="xl"
                 p={4}
                 alignItems={'start'}
                 spacing={5}
@@ -96,7 +96,7 @@ export const OrderDetailsModal = (props: OrderDetailsProps & OrderDetailsModalPr
               </VStack>
               <VStack
                 bgColor="white"
-                borderRadius="md"
+                borderRadius="xl"
                 p={4}
                 alignItems={'stretch'}
                 spacing={5}
