@@ -2,6 +2,8 @@
 import {
   Box,
   Button,
+  Center,
+  CircularProgress,
   Container,
   Heading,
   HStack,
@@ -72,6 +74,7 @@ export const Pharmacy = () => {
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
+  const [showSearchToggle, setShowSearchToggle] = useState(true);
 
   // selection state
   const [selectedId, setSelectedId] = useState<string>('');
@@ -93,11 +96,10 @@ export const Pharmacy = () => {
   const [sortBy, setSortBy] = useState<'price' | 'distance'>('price');
 
   // loading state
-  const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(false);
+  const [initialLoad, setInitialLoad] = useState(true);
+  const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(true);
   const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(sortBy === 'price');
   const isLoading = loadingLocation || loadingPharmacies;
-
-  console.log('showingAllPharmacies', showingAllPharmacies);
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
@@ -368,15 +370,32 @@ export const Pharmacy = () => {
         });
 
         if (pharmacies?.length === 0) {
-          toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
-        }
+          if (sortBy === 'price') {
+            // Hide the search toggle
+            // and re-fetch to get pharmacies by distance
+            setShowSearchToggle(false);
+            setSortBy('distance');
 
-        if (sortBy === 'price') {
-          setShowingAllPharmacies(true);
-        }
+            const pharmaciesReSearch = await loadPharmacies({
+              latitude,
+              longitude
+            });
 
-        setTopRankedPharmacies(topRankedPharmacies);
-        setPharmacyResults(pharmacies);
+            setTopRankedPharmacies(topRankedPharmacies);
+            setPharmacyResults(pharmaciesReSearch);
+            setInitialLoad(false);
+          } else {
+            toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
+          }
+        } else {
+          if (sortBy === 'price') {
+            setShowingAllPharmacies(true);
+          }
+
+          setTopRankedPharmacies(topRankedPharmacies);
+          setPharmacyResults(pharmacies);
+          setInitialLoad(false);
+        }
       } catch (error: any) {
         toast({ ...TOAST_CONFIG.WARNING, title: 'Unable to get pharmacies' });
         console.log('Get pharmacies error: ', error);
@@ -626,6 +645,21 @@ export const Pharmacy = () => {
     return null;
   }
 
+  if (initialLoad && showSearchToggle && isLoading) {
+    return (
+      <Box>
+        <Helmet>
+          <title>{t.selectAPharmacy}</title>
+        </Helmet>
+        <Container>
+          <Center h="100vh">
+            <CircularProgress isIndeterminate color="gray.800" />
+          </Center>
+        </Container>
+      </Box>
+    );
+  }
+
   return (
     <Box>
       {!isDemo && <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />}
@@ -667,45 +701,47 @@ export const Pharmacy = () => {
                 </Button>
               )}
             </HStack>
-            <HStack>
-              <Text whiteSpace="nowrap">Sort by</Text>
-              <HStack w="full">
-                <Button
-                  w="50%"
-                  size="lg"
-                  isActive={sortBy === 'price'}
-                  _active={{
-                    backgroundColor: 'brand.500',
-                    color: 'white',
-                    borderColor: 'brand.500'
-                  }}
-                  border="2px"
-                  borderColor="gray.100"
-                  backgroundColor="white"
-                  onClick={() => setSortBy('price')}
-                  borderRadius="xl"
-                >
-                  Cash Price
-                </Button>
-                <Button
-                  w="50%"
-                  size="lg"
-                  isActive={sortBy === 'distance'}
-                  _active={{
-                    backgroundColor: 'brand.500',
-                    color: 'white',
-                    borderColor: 'brand.500'
-                  }}
-                  border="2px"
-                  borderColor="gray.100"
-                  backgroundColor="white"
-                  onClick={() => setSortBy('distance')}
-                  borderRadius="xl"
-                >
-                  Distance
-                </Button>
+            {showSearchToggle ? (
+              <HStack>
+                <Text whiteSpace="nowrap">Sort by</Text>
+                <HStack w="full">
+                  <Button
+                    w="50%"
+                    size="lg"
+                    isActive={sortBy === 'price'}
+                    _active={{
+                      backgroundColor: 'brand.500',
+                      color: 'white',
+                      borderColor: 'brand.500'
+                    }}
+                    border="2px"
+                    borderColor="gray.100"
+                    backgroundColor="white"
+                    onClick={() => setSortBy('price')}
+                    borderRadius="xl"
+                  >
+                    Cash Price
+                  </Button>
+                  <Button
+                    w="50%"
+                    size="lg"
+                    isActive={sortBy === 'distance'}
+                    _active={{
+                      backgroundColor: 'brand.500',
+                      color: 'white',
+                      borderColor: 'brand.500'
+                    }}
+                    border="2px"
+                    borderColor="gray.100"
+                    backgroundColor="white"
+                    onClick={() => setSortBy('distance')}
+                    borderRadius="xl"
+                  >
+                    Distance
+                  </Button>
+                </HStack>
               </HStack>
-            </HStack>
+            ) : null}
             {sortBy === 'price' ? (
               <Box p={3} bgColor={'blue.50'} borderRadius="lg">
                 <Text>
