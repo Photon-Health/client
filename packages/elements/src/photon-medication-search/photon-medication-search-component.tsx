@@ -115,7 +115,9 @@ function getFilteredData(
   // Filter the catalog data and treatment options based on the search text
   return catalogData.filter((item) => {
     const itemName =
-      'treatment' in item ? item.treatment.name.toLowerCase() : item.name.toLowerCase();
+      'treatment' in item
+        ? `${item?.name?.toLowerCase() || ''} ${item.treatment.name.toLowerCase()} `
+        : item.name.toLowerCase();
 
     // Ensure every search term is found in the item name
     return searchTerms.every((term) => itemName.includes(term));
