@@ -98,12 +98,14 @@ export const Pharmacy = () => {
   const [loadingLocation, setLoadingLocation] = useState(false);
 
   // sorting
-  const [sortBy, setSortBy] = useState<'price' | 'distance'>('price');
+  const [sortBy, setSortBy] = useState<'price' | 'distance'>(
+    isOrgWithCouponsEnabled ? 'price' : 'distance'
+  );
 
   // loading state
   const [initialLoad, setInitialLoad] = useState(true);
   const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(true);
-  const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(sortBy === 'price');
+  const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
   const isLoading = loadingLocation || loadingPharmacies;
 
   // filters
@@ -309,7 +311,10 @@ export const Pharmacy = () => {
     [enable24Hr, enableOpenNow]
   );
 
-  const enablePrice = useMemo(() => sortBy === 'price', [sortBy]);
+  const enablePrice = useMemo(
+    () => sortBy === 'price' && isOrgWithCouponsEnabled,
+    [sortBy, isOrgWithCouponsEnabled]
+  );
 
   const loadPharmacies = useCallback(
     async ({
@@ -367,7 +372,7 @@ export const Pharmacy = () => {
           ];
         }
 
-        // using the exiting enablePrice flag to determine if we should fetch pharmacies with prices
+        // using the existing enablePrice flag to determine if we should fetch pharmacies with prices
         // a different query than the original query
         const pharmacies = await loadPharmacies({
           latitude,
