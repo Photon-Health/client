@@ -74,7 +74,12 @@ export const Pharmacy = () => {
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
-  const [showSearchToggle, setShowSearchToggle] = useState(true);
+  const isOrgWithCouponsEnabled = [
+    'Sesame',
+    'Updated Test Pharmacy 11',
+    'Photon Test Org'
+  ].includes(order?.organization.name ?? '');
+  const [showSearchToggle, setShowSearchToggle] = useState(isOrgWithCouponsEnabled);
 
   // selection state
   const [selectedId, setSelectedId] = useState<string>('');
@@ -371,23 +376,23 @@ export const Pharmacy = () => {
 
         if (pharmacies?.length === 0) {
           if (sortBy === 'price') {
-            // Hide the search toggle
-            setShowSearchToggle(false);
-
-            // Re-fetch to get pharmacies by distance
-            setSortBy('distance');
-            const pharmaciesReSearch = await loadPharmacies({
-              latitude,
-              longitude
-            });
-            setTopRankedPharmacies(topRankedPharmacies);
-            setPharmacyResults(pharmaciesReSearch);
-
-            // This is keeps us from having to show a spinner over the whole view each time
             if (initialLoad) {
+              // If we're on initial load and no pharmacies are found, we should try again with distance
+              setShowSearchToggle(false);
+              setSortBy('distance');
               setInitialLoad(false);
+
+              // Re-fetch to get pharmacies by distance
+              const pharmaciesReSearch = await loadPharmacies({
+                latitude,
+                longitude
+              });
+              setTopRankedPharmacies(topRankedPharmacies);
+              setPharmacyResults(pharmaciesReSearch);
+            } else {
+              toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
+              setShowingAllPharmacies(true);
             }
-            setLoadingPharmacies(false);
           } else {
             toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
           }
@@ -401,13 +406,12 @@ export const Pharmacy = () => {
           if (initialLoad) {
             setInitialLoad(false);
           }
-          setLoadingPharmacies(false);
         }
       } catch (error: any) {
-        setLoadingPharmacies(false);
         toast({ ...TOAST_CONFIG.WARNING, title: 'Unable to get pharmacies' });
         console.log('Get pharmacies error: ', error);
       }
+      setLoadingPharmacies(false);
     };
 
     fetchPharmaciesOnLocationOrSortChange();
@@ -750,7 +754,7 @@ export const Pharmacy = () => {
                 </HStack>
               </HStack>
             ) : null}
-            {sortBy === 'price' ? (
+            {showSearchToggle && sortBy === 'price' ? (
               <Box p={3} bgColor={'blue.50'} borderRadius="lg">
                 <Text>
                   The displayed price is a coupon for the selected pharmacy.{' '}
