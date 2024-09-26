@@ -19,7 +19,7 @@ export const CouponDetails: FC = () => {
     <VStack w="full" spacing={4} mx={0}>
       <CouponModal isOpen={couponModalOpen} onClose={() => setCouponModalOpen(false)} />
       <Text fontSize="4xl" fontWeight="700" py={0} lineHeight="1">
-        ${price}
+        ${price.toFixed(2)}
       </Text>
       <Box bgColor="blue.50" w="full" textAlign="center" p={2} borderRadius="xl">
         <Text fontWeight="semibold" fontSize="md">
