@@ -384,7 +384,7 @@ export const Pharmacy = () => {
             setPharmacyResults(pharmaciesReSearch);
 
             // This is keeps us from having to show a spinner over the whole view each time
-            if (!initialLoad) {
+            if (initialLoad) {
               setInitialLoad(false);
             }
             setLoadingPharmacies(false);
@@ -398,7 +398,7 @@ export const Pharmacy = () => {
 
           setTopRankedPharmacies(topRankedPharmacies);
           setPharmacyResults(pharmacies);
-          if (!initialLoad) {
+          if (initialLoad) {
             setInitialLoad(false);
           }
           setLoadingPharmacies(false);
