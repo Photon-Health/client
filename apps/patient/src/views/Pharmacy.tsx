@@ -384,7 +384,10 @@ export const Pharmacy = () => {
             setPharmacyResults(pharmaciesReSearch);
 
             // This is keeps us from having to show a spinner over the whole view each time
-            setInitialLoad(false);
+            if (!initialLoad) {
+              setInitialLoad(false);
+            }
+            setLoadingPharmacies(false);
           } else {
             toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
           }
@@ -395,13 +398,16 @@ export const Pharmacy = () => {
 
           setTopRankedPharmacies(topRankedPharmacies);
           setPharmacyResults(pharmacies);
-          setInitialLoad(false);
+          if (!initialLoad) {
+            setInitialLoad(false);
+          }
+          setLoadingPharmacies(false);
         }
       } catch (error: any) {
+        setLoadingPharmacies(false);
         toast({ ...TOAST_CONFIG.WARNING, title: 'Unable to get pharmacies' });
         console.log('Get pharmacies error: ', error);
       }
-      setLoadingPharmacies(false);
     };
 
     fetchPharmaciesOnLocationOrSortChange();
@@ -419,7 +425,8 @@ export const Pharmacy = () => {
     longitude,
     order?.readyBy,
     toast,
-    sortBy
+    sortBy,
+    initialLoad
   ]);
 
   const handleShowMore = async () => {
