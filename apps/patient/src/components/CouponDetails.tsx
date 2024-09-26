@@ -9,6 +9,10 @@ export const CouponDetails: FC = () => {
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
   const { order } = useOrderContext();
 
+  if (!order.discountCards || order.discountCards.length === 0) {
+    return null;
+  }
+
   const { price, bin, pcn, group, memberId } = order.discountCards[0];
 
   if (!price || !bin || !pcn || !group || !memberId) {
