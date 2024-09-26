@@ -138,6 +138,7 @@ export const PickupOptions = ({
               onSelect={() => handleSelect(pharmacy.id)}
               onSetPreferred={() => handleSetPreferred(pharmacy.id)}
               selectable={true}
+              showPrice
             />
           </SlideFade>
         ))}
@@ -156,7 +157,7 @@ export const PickupOptions = ({
           {t.showMore}
         </Button>
       ) : null}
-      {showingAllPharmacies ? (
+      {!loadingMore && showingAllPharmacies ? (
         <Text color="gray.500" textAlign="center">
           {t.showingAll}
         </Text>
