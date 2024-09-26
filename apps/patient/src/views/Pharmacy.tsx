@@ -372,17 +372,18 @@ export const Pharmacy = () => {
         if (pharmacies?.length === 0) {
           if (sortBy === 'price') {
             // Hide the search toggle
-            // and re-fetch to get pharmacies by distance
             setShowSearchToggle(false);
-            setSortBy('distance');
 
+            // Re-fetch to get pharmacies by distance
+            setSortBy('distance');
             const pharmaciesReSearch = await loadPharmacies({
               latitude,
               longitude
             });
-
             setTopRankedPharmacies(topRankedPharmacies);
             setPharmacyResults(pharmaciesReSearch);
+
+            // This is keeps us from having to show a spinner over the whole view each time
             setInitialLoad(false);
           } else {
             toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
