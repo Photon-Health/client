@@ -33,9 +33,9 @@ export const TreatmentOptionSearch = ({
   setSelectedTreatment: setSelectedTreatment
 }: TreatmentOptionSearchProps) => {
   const client = usePhoton();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState<string>();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string>();
 
   const [treatmentOptions, setTreatmentOptions] =
     useState<Array<{ value: string; label: string }>>();
@@ -47,7 +47,7 @@ export const TreatmentOptionSearch = ({
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      setError('');
+      setError(undefined);
 
       try {
         const { data } = await clinicalClient.query({
@@ -62,6 +62,7 @@ export const TreatmentOptionSearch = ({
           }))
         );
       } catch (err) {
+        setLoading(false);
         setError(err as string);
       } finally {
         setLoading(false);
