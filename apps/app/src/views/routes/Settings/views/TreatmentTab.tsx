@@ -24,7 +24,7 @@ import { ADD_TO_CATALOG } from '../../../../mutations';
 import { SplitLayout } from '../../../components/SplitLayout';
 import { StyledToast } from '../../../components/StyledToast';
 import { TreatmentActions } from '../components/treatments/TreatmentActions';
-import { TreatmentForm } from '../components/treatments/TreatmentForm';
+import { AddTreatmentToCatalogForm } from '../components/treatments/AddTreatmentToCatalogForm';
 import { TreatmentTable } from '../components/treatments/TreatmentTable';
 
 interface MedViewProps {
@@ -180,7 +180,7 @@ export const TreatmentTab = ({
         <ModalContent>
           <ModalCloseButton />
           <ModalBody p={8}>
-            <TreatmentForm
+            <AddTreatmentToCatalogForm
               key={resetKey}
               loading={loading}
               catalogId={catalogId}
@@ -215,7 +215,7 @@ export const TreatmentTab = ({
           setShowModal={setShowModal}
         />
         {!isMobileAndTablet ? (
-          <TreatmentForm
+          <AddTreatmentToCatalogForm
             key={resetKey}
             loading={loading}
             catalogId={catalogId}

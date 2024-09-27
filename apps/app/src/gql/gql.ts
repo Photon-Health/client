@@ -28,6 +28,7 @@ const documents = {
     "\n  mutation UpdateOrganization($input: OrganizationInput!) {\n    updateOrganization(input: $input)\n  }\n": types.UpdateOrganizationDocument,
     "\n  query MeProfileQuery {\n    me {\n      id\n      npi\n      phone\n      fax\n      email\n      address {\n        street1\n        street2\n        state\n        postalCode\n        country\n        city\n      }\n      name {\n        first\n        full\n        last\n        middle\n        title\n      }\n      roles {\n        description\n        id\n        name\n      }\n    }\n    organization {\n      id\n      name\n    }\n  }\n": types.MeProfileQueryDocument,
     "\n  mutation UpdateMyProfile($updateMyProfileInput: ProfileInput!) {\n    updateMyProfile(input: $updateMyProfileInput)\n  }\n": types.UpdateMyProfileDocument,
+    "\n  query SearchTreatmentOptions($searchTerm: String!) {\n    treatmentOptions(searchTerm: $searchTerm) {\n      id: medicationId\n      name\n    }\n  }\n": types.SearchTreatmentOptionsDocument,
     "\n  fragment EditRolesActionUserFragment on User {\n    id\n    npi\n    phone\n    fax\n    email\n    address {\n      street1\n      street2\n      state\n      postalCode\n      country\n      city\n    }\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n    roles {\n      description\n      id\n      name\n    }\n  }\n": types.EditRolesActionUserFragmentFragmentDoc,
     "\n  mutation UpdateProviderProfileAndSetUserRolesMutation(\n    $providerId: ID!\n    $updateProviderProfileInput: UpdateProviderProfileInput!\n    $roles: [ID!]!\n  ) {\n    updateProviderProfile(providerId: $providerId, input: $updateProviderProfileInput)\n    setUserRoles(userId: $providerId, roles: $roles)\n  }\n": types.UpdateProviderProfileAndSetUserRolesMutationDocument,
     "\n  fragment RemoveUserActionUserFragment on User {\n    id\n    email\n    name {\n      full\n    }\n  }\n": types.RemoveUserActionUserFragmentFragmentDoc,
@@ -118,6 +119,10 @@ export function graphql(source: "\n  query MeProfileQuery {\n    me {\n      id\
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation UpdateMyProfile($updateMyProfileInput: ProfileInput!) {\n    updateMyProfile(input: $updateMyProfileInput)\n  }\n"): (typeof documents)["\n  mutation UpdateMyProfile($updateMyProfileInput: ProfileInput!) {\n    updateMyProfile(input: $updateMyProfileInput)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query SearchTreatmentOptions($searchTerm: String!) {\n    treatmentOptions(searchTerm: $searchTerm) {\n      id: medicationId\n      name\n    }\n  }\n"): (typeof documents)["\n  query SearchTreatmentOptions($searchTerm: String!) {\n    treatmentOptions(searchTerm: $searchTerm) {\n      id: medicationId\n      name\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
