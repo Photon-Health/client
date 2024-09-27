@@ -16,7 +16,7 @@ import { useDebounce } from 'use-debounce';
 import { SelectField } from '../../../../components/SelectField';
 import { getMatchingPartsFromSubstring } from '../../../../../utils';
 
-const SearchTreatmentOptionsQuery = gql`
+export const SearchTreatmentOptionsQuery = gql`
   query SearchTreatmentOptions($searchTerm: String!) {
     treatmentOptions(searchTerm: $searchTerm) {
       id: medicationId
