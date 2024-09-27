@@ -13,8 +13,8 @@ import { useEffect, useState } from 'react';
 import { gql, useApolloClient } from '@apollo/client';
 import { usePhoton } from '@photonhealth/react';
 import { useDebounce } from 'use-debounce';
-import { SelectField } from './SelectField';
-import { getMatchingPartsFromSubstring } from '../../utils';
+import { SelectField } from '../../../../components/SelectField';
+import { getMatchingPartsFromSubstring } from '../../../../../utils';
 
 const SearchTreatmentOptionsQuery = gql`
   query SearchTreatmentOptions($searchTerm: String!) {

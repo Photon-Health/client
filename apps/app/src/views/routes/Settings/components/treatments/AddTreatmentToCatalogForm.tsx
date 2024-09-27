@@ -1,8 +1,7 @@
 import { Button, VStack, Heading, HStack, ModalFooter } from '@chakra-ui/react';
 import { RefObject, useState } from 'react';
 import { Formik } from 'formik';
-
-import { TreatmentOptionSearch } from 'apps/app/src/views/components/TreatmentOptionSearch';
+import { TreatmentOptionSearch } from './TreatmentOptionSearch';
 
 interface AddTreatmentToCatalogFormProps {
   loading: boolean;
