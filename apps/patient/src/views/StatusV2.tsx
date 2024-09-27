@@ -6,7 +6,13 @@ import { Helmet } from 'react-helmet';
 import { FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { triggerDemoNotification } from '../api';
-import { DemoCtaModal, PHARMACY_BRANDING, PharmacyInfo, PoweredBy } from '../components';
+import {
+  DemoCtaModal,
+  PHARMACY_BRANDING,
+  PharmacyInfo,
+  PoweredBy,
+  CouponDetails
+} from '../components';
 import { Card } from '../components/Card';
 import { FAQModal } from '../components/FAQModal';
 import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal';
@@ -219,56 +225,73 @@ export const StatusV2 = () => {
         <title>{t.track}</title>
       </Helmet>
       <VStack spacing={4} width="full" alignItems={'stretch'} flex={1}>
-        <VStack p={4} bg="white" justifyContent={'center'}>
-          <OrderStatusHeader
-            status={orderState}
-            pharmacyEstimatedReadyAt={pharmacyEstimatedReadyAt}
-            patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
-            exception={
-              order.pharmacy?.isOpen === false
-                ? 'PHARMACY_CLOSED'
-                : fulfillments.map((f) => f.exceptions[0]?.exceptionType).find((e) => e != null) ??
-                  undefined
-            }
-          />
-        </VStack>
+        <Box bgColor="white" shadow="sm">
+          <Container py={4}>
+            <OrderStatusHeader
+              status={orderState}
+              pharmacyEstimatedReadyAt={pharmacyEstimatedReadyAt}
+              patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
+              exception={
+                order.pharmacy?.isOpen === false
+                  ? 'PHARMACY_CLOSED'
+                  : fulfillments
+                      .map((f) => f.exceptions[0]?.exceptionType)
+                      .find((e) => e != null) ?? undefined
+              }
+            />
+          </Container>
+        </Box>
 
-        <VStack maxW={'xl'} mx="auto" w="full" spacing={6} flex={1}>
-          <OrderSummary
-            fulfillments={fulfillments}
-            onViewDetails={() => setOrderDetailsIsOpen(true)}
-          />
+        <Container>
+          <VStack spacing={6}>
+            <OrderSummary
+              fulfillments={fulfillments}
+              onViewDetails={() => setOrderDetailsIsOpen(true)}
+            />
 
-          <VStack w="full" alignItems={'stretch'} px={4} spacing={4}>
-            <Heading as="h4" size="md">
-              Pharmacy
-            </Heading>
-            <Card>
-              <VStack w="full">
-                {pharmacyInfo}
-                <VStack spacing={2} w="full">
-                  {pharmacyWithHours && !isDeliveryPharmacy && navigateButton}
-                  {!isDeliveryPharmacy && pharmacyWithHours && canReroute && rerouteButton}
-                </VStack>
+            {order.discountCards?.length > 0 ? (
+              <VStack w="full" alignItems="stretch" spacing={4}>
+                <Heading as="h4" size="md">
+                  Coupon
+                </Heading>
+                <Card>
+                  <CouponDetails />
+                </Card>
               </VStack>
-            </Card>
+            ) : null}
+
+            <VStack w="full" alignItems="stretch" spacing={4}>
+              <Heading as="h4" size="md">
+                Pharmacy
+              </Heading>
+              <Card>
+                <VStack w="full">
+                  {pharmacyInfo}
+                  <VStack spacing={2} w="full">
+                    {pharmacyWithHours && !isDeliveryPharmacy && navigateButton}
+                    {!isDeliveryPharmacy && pharmacyWithHours && canReroute && rerouteButton}
+                  </VStack>
+                </VStack>
+              </Card>
+            </VStack>
+
+            <VStack w="full" alignItems="stretch" spacing={4}>
+              <Heading as="h4" size="md">
+                Need help?
+              </Heading>
+              <Card>
+                <Button
+                  w="full"
+                  variant="outline"
+                  color="blue.500"
+                  onClick={() => setFaqModalIsOpen(true)}
+                >
+                  I have a pharmacy issue
+                </Button>
+              </Card>
+            </VStack>
           </VStack>
-          <VStack w="full" alignItems={'stretch'} px={4} spacing={4}>
-            <Heading as="h4" size="md">
-              Need help?
-            </Heading>
-            <Card>
-              <Button
-                w="full"
-                variant="outline"
-                color="blue.500"
-                onClick={() => setFaqModalIsOpen(true)}
-              >
-                I have a pharmacy issue
-              </Button>
-            </Card>
-          </VStack>
-        </VStack>
+        </Container>
       </VStack>
       {fulfillmentType === 'MAIL_ORDER' && fulfillment?.trackingNumber ? (
         <Box>

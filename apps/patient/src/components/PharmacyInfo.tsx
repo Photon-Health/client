@@ -3,12 +3,12 @@ import {
   HStack,
   IconButton,
   Image,
+  Spacer,
   Tag,
   TagLabel,
   TagLeftIcon,
   Text,
-  VStack,
-  Spacer
+  VStack
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -205,6 +205,7 @@ interface PharmacyInfoProps {
   tagline?: string;
   preferred?: boolean;
   showDetails?: boolean;
+  showPrice?: boolean;
   availableInYourArea?: boolean;
   freeDelivery?: boolean;
   boldPharmacyName?: boolean;
@@ -218,6 +219,7 @@ export const PharmacyInfo = ({
   tagline,
   preferred = false,
   showDetails = true,
+  showPrice = false,
   availableInYourArea = false,
   freeDelivery = false,
   boldPharmacyName = true,
@@ -281,6 +283,12 @@ export const PharmacyInfo = ({
           <Text fontSize="md" fontWeight={boldPharmacyName ? 'bold' : 'medium'}>
             {whiteLabelDeliveryPharmacy ? 'Free Express Delivery' : pharmacy.name}
           </Text>
+          {showPrice && pharmacy.price != null ? (
+            <>
+              <Spacer />
+              <Text fontWeight="bold">${pharmacy.price.toFixed(2)}</Text>
+            </>
+          ) : null}
         </HStack>
       </HStack>
       {showDetails ? (

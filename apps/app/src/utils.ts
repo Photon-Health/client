@@ -66,6 +66,41 @@ const unique = (array: any[], propertyName: string) => {
   );
 };
 
+/**
+ * This helper function will take in a provided input string and a substringToMatchOn
+ * and will return a list of parts of the input string and whether or not they match
+ * on any part of the substrcingToMatchOn
+ *
+ * This is useful for bolding parts of a search string that uses spaces.
+ */
+const getMatchingPartsFromSubstring = (
+  inputString: string,
+  substringToMatchOn: string
+): { part: string; matches: boolean }[] => {
+  // Escape special characters in the substring
+  const escapeRegExp = (string: string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  };
+
+  // Escape the substring and split it into parts
+  const escapedSubstring = escapeRegExp(substringToMatchOn);
+  const substrings = escapedSubstring.split(' ').filter((part: string) => part.length > 0);
+
+  // Create the regular expression with the escaped substrings
+  const regex = new RegExp(`(${substrings.join('|')})`, 'gi');
+
+  // Split the input string based on the regex
+  const parts = inputString.split(regex);
+
+  // Map through the parts and bold matching substrings
+  return parts.map((part) => {
+    return {
+      part,
+      matches: substrings.some((sub: string) => sub.toLowerCase() === part?.toLowerCase())
+    };
+  });
+};
+
 // list derived from dispense_unit table
 const quantityAbbreviations: { [key: string]: string } = {
   each: 'ea',
@@ -112,5 +147,6 @@ export {
   capitalizeFirst,
   titleCase,
   unique,
-  getUnitAbbreviation
+  getUnitAbbreviation,
+  getMatchingPartsFromSubstring
 };
