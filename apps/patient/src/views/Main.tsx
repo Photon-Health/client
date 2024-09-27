@@ -25,7 +25,7 @@ interface OrderContextType {
   setOrder: (order: Order) => void;
   logo: any;
   isDemo: boolean;
-  fetchOrder: () => void;
+  fetchOrder: (currentPharm: any) => void;
 }
 const OrderContext = createContext<OrderContextType | null>(null);
 export const useOrderContext = () =>
@@ -66,64 +66,64 @@ export const Main = () => {
   }, [token]);
 
   const handleOrderResponse = useCallback(
-    (ord: Order) => {
-      console.log('handleOrderResponse', ord);
+    (newOrder: Order, currentPharm?: any) => {
+      console.log('handleOrderResponse', newOrder);
 
       // This is weird, but it's necessary to show the selected pharmacy
       // when the user goes from selection to the status page
-      console.log('order', order);
-      console.log('ord', ord);
-      if (order && ord.discountCards.length > 0) {
-        console.log('HERE1');
-        const updatedOrder = { ...order, discountCards: { ...ord.discountCards } };
-        setOrder(updatedOrder);
-      } else {
-        setOrder({ ...ord, pharmacy: ord.pharmacy ?? order?.pharmacy });
-      }
+      setOrder({
+        ...newOrder,
+        pharmacy: currentPharm || newOrder?.pharmacy || order?.pharmacy
+      });
 
-      setFlattenedFills(countFillsAndRemoveDuplicates(ord.fills));
+      setFlattenedFills(countFillsAndRemoveDuplicates(newOrder.fills));
 
-      datadogRum.setGlobalContextProperty('organizationId', ord.organization.id);
+      datadogRum.setGlobalContextProperty('organizationId', newOrder.organization.id);
       datadogRum.setGlobalContextProperty('orderId', orderId);
-      datadogRum.setUser({ patientId: ord.patient.id });
+      datadogRum.setUser({ patientId: newOrder.patient.id });
 
-      if (ord.state === 'CANCELED') {
+      if (newOrder.state === 'CANCELED') {
         navigate('/canceled', { replace: true });
         return;
       }
 
-      const hasPharmacy = ord.pharmacy?.id;
+      const hasPharmacy = newOrder.pharmacy?.id;
       const redirect = hasPharmacy ? (useV2 ? '/status' : '/status') : '/review';
 
-      navigate(`${redirect}?orderId=${ord.id}&token=${token}${useV2 ? '&v2=true' : ''}`, {
+      navigate(`${redirect}?orderId=${newOrder.id}&token=${token}${useV2 ? '&v2=true' : ''}`, {
         replace: true
       });
     },
     [navigate, orderId, token, order, useV2]
   );
 
-  const fetchOrder = useCallback(async () => {
-    if (isDemo) return demoOrder;
-    try {
-      const result = await getOrder(orderId!);
-      if (result) {
-        handleOrderResponse(result);
-      }
-    } catch (e: any) {
-      const error = e as any;
-      console.log(error.response);
+  const fetchOrder = useCallback(
+    async (currentPharm?: any) => {
+      if (isDemo) return demoOrder;
+      try {
+        const result = await getOrder(orderId!);
+        if (result) {
+          handleOrderResponse(result, currentPharm);
+        }
+      } catch (e: any) {
+        const error = e as any;
+        console.log(error.response);
 
-      const isAuthError = AUTH_HEADER_ERRORS.includes(error?.response?.errors?.[0].extensions.code);
-      const hasOrder = !!error?.response?.data?.order;
-      if (isAuthError || !hasOrder) {
-        navigate('/no-match', { replace: true });
-        return;
-      }
+        const isAuthError = AUTH_HEADER_ERRORS.includes(
+          error?.response?.errors?.[0].extensions.code
+        );
+        const hasOrder = !!error?.response?.data?.order;
+        if (isAuthError || !hasOrder) {
+          navigate('/no-match', { replace: true });
+          return;
+        }
 
-      // If an order was returned, use it for routing
-      handleOrderResponse(error.response.data.order);
-    }
-  }, [handleOrderResponse, isDemo, navigate, orderId]);
+        // If an order was returned, use it for routing
+        handleOrderResponse(error.response.data.order);
+      }
+    },
+    [handleOrderResponse, isDemo, navigate, orderId]
+  );
 
   useEffect(() => {
     if (isDemo && (orderId || order?.id !== demoOrder.id || location.pathname === '/')) {

@@ -567,7 +567,7 @@ export const Pharmacy = () => {
             // status view for all types. On my christmas list for 2024 is better
             // fulfillment types on pharmacies.
             let type: ExtendedFulfillmentType = 'PICK_UP';
-            let selectedPharmacy = null;
+            let selectedPharmacy: any = null;
             if (selectedId in capsulePharmacyIdLookup) {
               type = 'COURIER';
               selectedPharmacy = { id: selectedId, name: 'Capsule Pharmacy' };
@@ -588,14 +588,11 @@ export const Pharmacy = () => {
             setOrder({
               ...order,
               isReroutable: !isReroute,
-              pharmacy: selectedPharmacy,
               discountCards: []
             });
 
             // necessary to ensure the order is updated with the new coupon before navigating
-            if (selectedPharmacy?.price) {
-              await fetchOrder();
-            }
+            await fetchOrder(selectedPharmacy);
 
             const query = queryString.stringify({ orderId: order.id, token, type });
             return navigate(`/status?${query}`);
