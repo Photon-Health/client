@@ -18,6 +18,7 @@ import theme from '../configs/theme';
 import { demoOrder } from '../data/demoOrder';
 import { FillWithCount, countFillsAndRemoveDuplicates } from '../utils/general';
 import { Order } from '../utils/models';
+import { Pharmacy } from '../__generated__/graphql';
 
 interface OrderContextType {
   order: Order;
@@ -25,7 +26,7 @@ interface OrderContextType {
   setOrder: (order: Order) => void;
   logo: any;
   isDemo: boolean;
-  fetchOrder: (currentPharm: any) => void;
+  fetchOrder: (currentPharmacy: Pharmacy) => void;
 }
 const OrderContext = createContext<OrderContextType | null>(null);
 export const useOrderContext = () =>
@@ -66,14 +67,14 @@ export const Main = () => {
   }, [token]);
 
   const handleOrderResponse = useCallback(
-    (newOrder: Order, currentPharm?: any) => {
+    (newOrder: Order, currentPharmacy?: Pharmacy) => {
       console.log('handleOrderResponse', newOrder);
 
       // This is weird, but it's necessary to show the selected pharmacy
       // when the user goes from selection to the status page
       setOrder({
         ...newOrder,
-        pharmacy: currentPharm || newOrder?.pharmacy || order?.pharmacy
+        pharmacy: currentPharmacy || newOrder?.pharmacy || order?.pharmacy
       });
 
       setFlattenedFills(countFillsAndRemoveDuplicates(newOrder.fills));
@@ -98,12 +99,12 @@ export const Main = () => {
   );
 
   const fetchOrder = useCallback(
-    async (currentPharm?: any) => {
+    async (currentPharmacy?: Pharmacy) => {
       if (isDemo) return demoOrder;
       try {
         const result = await getOrder(orderId!);
         if (result) {
-          handleOrderResponse(result, currentPharm);
+          handleOrderResponse(result, currentPharmacy);
         }
       } catch (e: any) {
         const error = e as any;
