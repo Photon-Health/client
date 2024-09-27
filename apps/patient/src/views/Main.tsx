@@ -71,11 +71,14 @@ export const Main = () => {
 
       // This is weird, but it's necessary to show the selected pharmacy
       // when the user goes from selection to the status page
-      if (order && order.pharmacy && location.pathname === '/status') {
-        const updatedOrder = { ...ord, pharmacy: { ...order.pharmacy } };
+      console.log('order', order);
+      console.log('ord', ord);
+      if (order && ord.discountCards.length > 0) {
+        console.log('HERE1');
+        const updatedOrder = { ...order, discountCards: { ...ord.discountCards } };
         setOrder(updatedOrder);
       } else {
-        setOrder(ord);
+        setOrder({ ...ord, pharmacy: ord.pharmacy ?? order?.pharmacy });
       }
 
       setFlattenedFills(countFillsAndRemoveDuplicates(ord.fills));
@@ -96,7 +99,7 @@ export const Main = () => {
         replace: true
       });
     },
-    [navigate, orderId, token]
+    [navigate, orderId, token, order, useV2]
   );
 
   const fetchOrder = useCallback(async () => {

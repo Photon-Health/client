@@ -585,7 +585,12 @@ export const Pharmacy = () => {
               selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
             }
 
-            setOrder({ ...order, isReroutable: !isReroute, pharmacy: selectedPharmacy });
+            setOrder({
+              ...order,
+              isReroutable: !isReroute,
+              pharmacy: selectedPharmacy,
+              discountCards: []
+            });
 
             // necessary to ensure the order is updated with the new coupon before navigating
             if (selectedPharmacy?.price) {
