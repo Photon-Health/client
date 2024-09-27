@@ -1,5 +1,4 @@
 import {
-  Banner,
   Button,
   Card,
   DoseCalculator,
