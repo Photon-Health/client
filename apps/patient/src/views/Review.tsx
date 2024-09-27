@@ -1,11 +1,10 @@
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Box, Button, Container, Heading, HStack, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Container, HStack, Heading, Text, VStack } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { useOrderContext } from './Main';
-import { FixedFooter, PoweredBy } from '../components';
+import { FixedFooter, PoweredBy, PrescriptionsList } from '../components';
 import { text as t } from '../utils/text';
-import { PrescriptionsList } from '../components/PrescriptionsList';
+import { useOrderContext } from './Main';
 
 export const Review = () => {
   const { order, flattenedFills } = useOrderContext();

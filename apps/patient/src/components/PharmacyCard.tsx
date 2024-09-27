@@ -18,6 +18,7 @@ interface PharmacyCardProps {
   onSetPreferred?: () => void;
   selectable?: boolean;
   showDetails?: boolean;
+  showPrice?: boolean;
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
@@ -28,7 +29,8 @@ export const PharmacyCard = memo(function PharmacyCard({
   onSelect,
   onSetPreferred,
   selectable = false,
-  showDetails = true
+  showDetails = true,
+  showPrice = false
 }: PharmacyCardProps) {
   if (!pharmacy) return null;
 
@@ -47,6 +49,7 @@ export const PharmacyCard = memo(function PharmacyCard({
           pharmacy={pharmacy}
           preferred={preferred}
           showDetails={showDetails}
+          showPrice={showPrice}
           boldPharmacyName={false}
           selected={selected}
         />
