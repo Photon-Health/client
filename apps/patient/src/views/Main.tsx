@@ -26,7 +26,7 @@ interface OrderContextType {
   setOrder: (order: Order) => void;
   logo: any;
   isDemo: boolean;
-  fetchOrder: (currentPharmacy: Pharmacy) => void;
+  fetchOrder: (currentPharmacy?: Pharmacy) => void;
 }
 const OrderContext = createContext<OrderContextType | null>(null);
 export const useOrderContext = () =>

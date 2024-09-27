@@ -48,6 +48,7 @@ import { demoPharmacies } from '../data/demoPharmacies';
 import { isGLP } from '../utils/isGLP';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { datadogRum } from '@datadog/browser-rum';
+import { Pharmacy as PharmacyType } from '../__generated__/graphql';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
@@ -567,7 +568,8 @@ export const Pharmacy = () => {
             // status view for all types. On my christmas list for 2024 is better
             // fulfillment types on pharmacies.
             let type: ExtendedFulfillmentType = 'PICK_UP';
-            let selectedPharmacy: any = null;
+            let selectedPharmacy: { id: string; name: string } | PharmacyType | undefined =
+              undefined;
             if (selectedId in capsulePharmacyIdLookup) {
               type = 'COURIER';
               selectedPharmacy = { id: selectedId, name: 'Capsule Pharmacy' };
