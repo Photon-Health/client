@@ -126,7 +126,6 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
   });
 
   useEffect(() => {
-    console.log('off catalog', cachedOffCatalogTreatments);
     if (!catalog.loading && catalog.catalog) {
       const catalogOptions = catalog.catalog.treatments.map((med: any) => ({
         value: med,
