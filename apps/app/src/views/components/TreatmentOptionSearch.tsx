@@ -20,13 +20,7 @@ const SearchTreatmentOptionsQuery = gql`
   query SearchTreatmentOptions($searchTerm: String!) {
     treatmentOptions(searchTerm: $searchTerm) {
       id: medicationId
-      form
       name
-      ndc
-      route
-      strength
-      type
-      __typename
     }
   }
 `;
