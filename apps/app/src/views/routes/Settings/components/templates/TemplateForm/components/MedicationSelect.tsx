@@ -147,10 +147,6 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
     }
   }, [catalog.loading, catalog.catalog, cachedOffCatalogTreatments]);
 
-  useEffect(() => {
-    console.log('reinitializing');
-  }, []);
-
   if (catalog.error?.message) {
     return <Text color="red">{catalog.error.message}</Text>;
   }
