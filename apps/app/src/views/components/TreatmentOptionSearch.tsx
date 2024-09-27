@@ -1,9 +1,20 @@
-import { Box, ChakraProvider, InputGroup, InputRightElement, Spinner } from '@chakra-ui/react';
+import {
+  Box,
+  ChakraProvider,
+  InputGroup,
+  InputRightElement,
+  Spinner,
+  VStack,
+  Text
+} from '@chakra-ui/react';
+
+import { OptionProps } from 'chakra-react-select';
 import { useEffect, useState } from 'react';
 import { gql, useApolloClient } from '@apollo/client';
 import { usePhoton } from '@photonhealth/react';
 import { useDebounce } from 'use-debounce';
 import { SelectField } from './SelectField';
+import { getMatchingPartsFromSubstring } from '../../utils';
 
 const SearchTreatmentOptionsQuery = gql`
   query SearchTreatmentOptions($searchTerm: String!) {
@@ -29,6 +40,36 @@ type TreatmentOptionSearchProps = {
   setSelectedTreatment: (s: SelectedTreatment | undefined) => void;
 };
 
+interface TreatmentOptionsOptionProps extends OptionProps {
+  data: {
+    searchTerm: string;
+  };
+}
+
+const Option = ({ innerProps, label, data }: TreatmentOptionsOptionProps) => (
+  <VStack
+    {...innerProps}
+    alignItems="left"
+    _hover={{ bg: 'gray.100' }}
+    p={3}
+    cursor="pointer"
+    title={label}
+  >
+    <Box ms={4}>
+      <Text as="b" fontWeight={500}>
+        {getMatchingPartsFromSubstring(label, data.searchTerm).map(({ part, matches }, index) => {
+          if (matches) {
+            return <strong key={index}>{part}</strong>;
+          } else {
+            return part;
+          }
+        })}
+        ;
+      </Text>
+    </Box>
+  </VStack>
+);
+
 export const TreatmentOptionSearch = ({
   setSelectedTreatment: setSelectedTreatment
 }: TreatmentOptionSearchProps) => {
@@ -42,7 +83,7 @@ export const TreatmentOptionSearch = ({
 
   const clinicalClient = useApolloClient(client?.clinicalClient);
 
-  const [searchTermDebounce] = useDebounce(searchTerm, 800);
+  const [searchTermDebounce] = useDebounce(searchTerm, 200);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,7 +99,8 @@ export const TreatmentOptionSearch = ({
         setTreatmentOptions(
           data.treatmentOptions?.map((treatmentOption: { id: string; name: string }) => ({
             value: treatmentOption.id,
-            label: treatmentOption.name
+            label: treatmentOption.name,
+            searchTerm: searchTermDebounce
           }))
         );
       } catch (err) {
@@ -107,10 +149,12 @@ export const TreatmentOptionSearch = ({
           name="treatmentOption"
           placeholder={'Search for Treatments'}
           onChange={handleSelectedTreatmentChange}
-          filterText={searchTerm}
           setFilterText={handleSearchTermChange}
+          filterText={searchTermDebounce}
           isLoading={loading}
           options={treatmentOptions}
+          components={{ Option }}
+          filterOption={() => true}
         />
 
         {error && (
