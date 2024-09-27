@@ -5,18 +5,8 @@ import { useQuery } from '@apollo/client';
 import { usePhoton } from '@photonhealth/react';
 import { useEffect, useImperativeHandle, useState } from 'react';
 import { SelectField } from '../../../../../../components/SelectField';
-import { graphql } from '../../../../../../../gql';
 import { CatalogTreatmentFieldsMap } from '../../../../../../../model/fragments';
-
-const SearchTreatmentOptionsQuery = graphql(/* GraphQL */ `
-  query SearchTreatmentOptions($searchTerm: String!) {
-    treatmentOptions(searchTerm: $searchTerm) {
-      id: medicationId
-      name
-      __typename
-    }
-  }
-`);
+import { SearchTreatmentOptionsQuery } from '../../../treatments/TreatmentOptionSearch';
 
 interface OptionProps extends SelectOptionProps {
   data: {
