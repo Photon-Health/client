@@ -2,7 +2,8 @@ import {
   GetPharmaciesByLocationQuery,
   GetOrderQuery,
   Address as GQLAddress,
-  FulfillmentType
+  FulfillmentType,
+  Maybe
 } from '../__generated__/graphql';
 
 type NotMaybe<T> = Exclude<T, null | undefined>;
@@ -13,7 +14,9 @@ export type Fulfillment = Order['fulfillments'][number];
 export type Exception = Fulfillment['exceptions'][number];
 export type PrescriptionFulfillmentState = Fulfillment['state'];
 
-export type Pharmacy = NotMaybe<GetPharmaciesByLocationQuery['pharmaciesByLocation'][number]>;
+export type Pharmacy = NotMaybe<GetPharmaciesByLocationQuery['pharmaciesByLocation'][number]> & {
+  price?: Maybe<number>;
+};
 
 export type OrderFulfillment = NotMaybe<Order['fulfillment']>;
 
@@ -24,6 +27,7 @@ export type EnrichedPharmacy = Pharmacy & {
   isClosingSoon?: boolean;
   opens?: string | undefined;
   closes?: string | undefined;
+  price?: number;
 };
 export type ExtendedFulfillmentType = FulfillmentType | 'COURIER';
 
