@@ -102,12 +102,13 @@ type FilterTypes = 'ALL' | 'GLOBAL' | 'INDIVIDUAL';
 export const TemplateTab = () => {
   const { getCatalog, getCatalogs } = usePhoton();
   const catalogs = getCatalogs();
+  const catalogId = useMemo(() => catalogs.catalogs?.[0]?.id ?? '', [catalogs.catalogs]);
+
   const catalog = getCatalog({
-    id: catalogs.catalogs[0]?.id || '',
+    id: catalogId,
     fragment: CatalogTreatmentFieldsMap,
     defer: true
   });
-  const [catalogId, setCatalogId] = useState<string>();
 
   const [filterType, setFilterType] = useState<FilterTypes>('ALL');
 
@@ -121,16 +122,17 @@ export const TemplateTab = () => {
   const [templateToEdit, setTemplateToEdit] = useState<PrescriptionTemplate | undefined>(undefined);
   const pageSize = 10;
 
+  // Load catalog
   useEffect(() => {
-    if (!catalogs.loading && catalogs.catalogs.length > 0 && catalogs.catalogs[0]?.id) {
-      setCatalogId(catalogs.catalogs[0]?.id);
-      catalog.query!({
-        id: catalogs.catalogs[0]?.id,
+    if (!catalog.loading && catalogId && catalog.catalog == null) {
+      catalog.query({
+        id: catalogId,
         fragment: CatalogTreatmentFieldsMap
       });
     }
-  }, [catalogs.loading, catalogs.catalogs.length, catalogs.catalogs[0]?.id]);
+  }, [catalog, catalogId, catalog.loading]);
 
+  // Once catalog is loaded, then prep and set rows
   useEffect(() => {
     if (!catalog.loading && catalog.catalog) {
       const preppedRows = catalog.catalog.templates
@@ -139,21 +141,21 @@ export const TemplateTab = () => {
       setRows(preppedRows);
       setCurrentPage(1);
     }
-  }, [catalog.loading, catalogId, catalog.catalog?.templates]);
+  }, [catalog.loading, catalogId, catalog.catalog?.templates, catalog.catalog]);
 
   useEffect(() => {
     // Reset current page to first page on debounce
     if (currentPage !== 1) {
       setCurrentPage(1);
     }
-  }, [debouncedFilterText]);
+  }, [currentPage, debouncedFilterText]);
 
   const templateRowRender = useCallback(
     (template: PrescriptionTemplate) =>
       renderTemplateRow(
         template,
         setSingleView,
-        catalogId ?? '',
+        catalogId,
         setChildLoading,
         setTemplateToEdit,
         setShowModal
@@ -177,7 +179,7 @@ export const TemplateTab = () => {
             x.name?.toLowerCase().includes(debouncedFilterText.toLowerCase())) &&
           typeFilter(x)
       ),
-    [debouncedFilterText, rows, pageSize, typeFilter]
+    [debouncedFilterText, rows, typeFilter]
   );
 
   const formattedRows = useMemo(() => {
@@ -185,7 +187,7 @@ export const TemplateTab = () => {
       rows: filteredRows.map(templateRowRender),
       pages: Math.ceil(filteredRows.length / pageSize)
     };
-  }, [filteredRows]);
+  }, [filteredRows, templateRowRender]);
 
   const [doseCalcVis, setDoseCalcVis] = useState(false);
   const quantityRef = useRef<HTMLInputElement>(null);
@@ -196,13 +198,16 @@ export const TemplateTab = () => {
 
   const isLoading = catalogs.loading || (catalog.loading && !catalog.catalog) || childLoading;
 
-  const onFilterChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
-    // Change event triggered even if no change
-    if (e.target.value !== filterType) {
-      setCurrentPage(1);
-      setFilterType(e.target.value as FilterTypes);
-    }
-  }, []);
+  const onFilterChange = useCallback(
+    (e: ChangeEvent<HTMLSelectElement>) => {
+      // Change event triggered even if no change
+      if (e.target.value !== filterType) {
+        setCurrentPage(1);
+        setFilterType(e.target.value as FilterTypes);
+      }
+    },
+    [filterType]
+  );
 
   if (catalogs.loading || !catalogId) {
     return null;

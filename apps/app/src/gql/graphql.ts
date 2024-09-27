@@ -110,6 +110,11 @@ export type Medication = Treatment & {
   strength?: Maybe<Scalars['String']['output']>;
 };
 
+export enum MedicationType {
+  Otc = 'OTC',
+  Rx = 'RX'
+}
+
 export type Mutation = {
   __typename?: 'Mutation';
   agreeToSignatureAttestation: Scalars['Boolean']['output'];
@@ -404,6 +409,8 @@ export type Query = {
   role?: Maybe<Role>;
   /** Retrieve a list of available roles for current user organization */
   roles: Array<Role>;
+  /** Retrieve a list of available treatment options by search string */
+  treatmentOptions: Array<TreatmentOption>;
   user?: Maybe<User>;
   /** Get number of users in the current organization */
   userCount: Scalars['Int']['output'];
@@ -434,6 +441,11 @@ export type QueryOrderArgs = {
 
 export type QueryRoleArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryTreatmentOptionsArgs = {
+  searchTerm: Scalars['String']['input'];
 };
 
 
@@ -480,6 +492,17 @@ export type TicketInput = {
 export type Treatment = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+};
+
+export type TreatmentOption = {
+  __typename?: 'TreatmentOption';
+  form?: Maybe<Scalars['String']['output']>;
+  medicationId?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  ndc: Scalars['String']['output'];
+  route?: Maybe<Scalars['String']['output']>;
+  strength?: Maybe<Scalars['String']['output']>;
+  type: MedicationType;
 };
 
 export type UpdateProviderProfileInput = {

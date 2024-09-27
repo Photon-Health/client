@@ -21,11 +21,11 @@ export const PatientSelect = (props: any) => {
   const patient = getPatient({ id: '' });
 
   useEffect(() => {
-    if (!loading) {
-      setOptions(patients.map(mapOption));
+    if (!loading && patients) {
+      setOptions(patients.map(mapOption) ?? []);
       setFinished(patients.length === 0);
     }
-  }, [loading]);
+  }, [loading, patients]);
 
   if (error) return <Text color="red">{error.message}</Text>;
 
