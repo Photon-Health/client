@@ -94,5 +94,6 @@ export const demoOrder: Order = {
         }
       }
     }
-  ]
+  ],
+  discountCards: []
 };

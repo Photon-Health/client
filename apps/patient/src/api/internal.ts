@@ -1,3 +1,8 @@
+import {
+  GetPharmaciesByLocationQuery,
+  GetPharmaciesWithPriceByLocationQuery,
+  Pharmacy
+} from '../__generated__/graphql';
 import { graphQLClient } from '../configs/graphqlClient';
 
 export const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
@@ -16,13 +21,23 @@ export const getOrder = async (orderId: string) => {
   }
 };
 
+function formatPharmacies(
+  data: GetPharmaciesByLocationQuery | GetPharmaciesWithPriceByLocationQuery
+): Pharmacy[] {
+  if ('pharmaciesByLocation' in data) {
+    return data.pharmaciesByLocation.map((p) => ({ ...p, price: undefined }));
+  }
+  return data.pharmaciesWithPriceByLocation.map((p) => ({ ...p.pharmacy, price: p.price }));
+}
+
 export const getPharmacies = async ({
   searchParams,
   limit,
   offset,
   isOpenNow,
   is24hr,
-  name
+  name,
+  includePrice
 }: {
   searchParams: {
     latitude: number;
@@ -34,26 +49,27 @@ export const getPharmacies = async ({
   isOpenNow: boolean;
   is24hr: boolean;
   name?: string;
+  includePrice?: boolean;
 }) => {
   try {
     const now = new Date();
-    const response = await graphQLClient.GetPharmaciesByLocation({
-      location: {
-        radius: 100,
-        ...searchParams
-      },
-      limit,
-      offset,
-      openAt: isOpenNow ? now : undefined,
-      is24hr,
-      name
-    });
 
-    if (response?.pharmaciesByLocation?.length > 0) {
-      return response.pharmaciesByLocation;
-    }
-
-    return [];
+    // either the pharmaciesByLocation or pharmaciesWithPriceByLocation query is used
+    // depending on the includePrice flag
+    const fn = includePrice
+      ? graphQLClient.GetPharmaciesWithPriceByLocation
+      : graphQLClient.GetPharmaciesByLocation;
+    return formatPharmacies(
+      await fn({
+        location: {
+          radius: 100,
+          ...searchParams
+        },
+        openAt: isOpenNow ? now : undefined,
+        is24hr,
+        ...(!includePrice ? { limit, offset, name } : {})
+      })
+    );
   } catch (e: any) {
     const errorMessage =
       e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on getPharmacies.';

@@ -9,16 +9,16 @@ import {
   useSearchParams
 } from 'react-router-dom';
 
-import { getOrder } from '../api/internal';
+import { getSettings } from '@client/settings';
+
+import { AUTH_HEADER_ERRORS, getOrder } from '../api/internal';
 import { Nav } from '../components';
+import { setAuthHeader } from '../configs/graphqlClient';
+import theme from '../configs/theme';
 import { demoOrder } from '../data/demoOrder';
 import { FillWithCount, countFillsAndRemoveDuplicates } from '../utils/general';
 import { Order } from '../utils/models';
-
-import { getSettings } from '@client/settings';
-import { AUTH_HEADER_ERRORS } from '../api/internal';
-import { setAuthHeader } from '../configs/graphqlClient';
-import theme from '../configs/theme';
+import { Pharmacy } from '../__generated__/graphql';
 
 interface OrderContextType {
   order: Order;
@@ -26,6 +26,7 @@ interface OrderContextType {
   setOrder: (order: Order) => void;
   logo: any;
   isDemo: boolean;
+  fetchOrder: (currentPharmacy?: Pharmacy) => void;
 }
 const OrderContext = createContext<OrderContextType | null>(null);
 export const useOrderContext = () =>
@@ -66,53 +67,64 @@ export const Main = () => {
   }, [token]);
 
   const handleOrderResponse = useCallback(
-    (order: Order) => {
-      console.log('handleOrderResponse', order);
-      setOrder(order);
+    (newOrder: Order, currentPharmacy?: Pharmacy) => {
+      console.log('handleOrderResponse', newOrder);
 
-      setFlattenedFills(countFillsAndRemoveDuplicates(order.fills));
+      // This is weird, but it's necessary to show the selected pharmacy
+      // when the user goes from selection to the status page
+      setOrder({
+        ...newOrder,
+        pharmacy: currentPharmacy || newOrder?.pharmacy || order?.pharmacy
+      });
 
-      datadogRum.setGlobalContextProperty('organizationId', order.organization.id);
+      setFlattenedFills(countFillsAndRemoveDuplicates(newOrder.fills));
+
+      datadogRum.setGlobalContextProperty('organizationId', newOrder.organization.id);
       datadogRum.setGlobalContextProperty('orderId', orderId);
-      datadogRum.setUser({ patientId: order.patient.id });
+      datadogRum.setUser({ patientId: newOrder.patient.id });
 
-      if (order.state === 'CANCELED') {
+      if (newOrder.state === 'CANCELED') {
         navigate('/canceled', { replace: true });
         return;
       }
 
-      const hasPharmacy = order.pharmacy?.id;
+      const hasPharmacy = newOrder.pharmacy?.id;
       const redirect = hasPharmacy ? (useV2 ? '/status' : '/status') : '/review';
 
-      navigate(`${redirect}?orderId=${order.id}&token=${token}${useV2 ? '&v2=true' : ''}`, {
+      navigate(`${redirect}?orderId=${newOrder.id}&token=${token}${useV2 ? '&v2=true' : ''}`, {
         replace: true
       });
     },
-    [navigate, orderId, token]
+    [navigate, orderId, token, order, useV2]
   );
 
-  const fetchOrder = useCallback(async () => {
-    if (isDemo) return demoOrder;
-    try {
-      const result = await getOrder(orderId!);
-      if (result) {
-        handleOrderResponse(result);
-      }
-    } catch (e: any) {
-      const error = e as any;
-      console.log(error.response);
+  const fetchOrder = useCallback(
+    async (currentPharmacy?: Pharmacy) => {
+      if (isDemo) return demoOrder;
+      try {
+        const result = await getOrder(orderId!);
+        if (result) {
+          handleOrderResponse(result, currentPharmacy);
+        }
+      } catch (e: any) {
+        const error = e as any;
+        console.log(error.response);
 
-      const isAuthError = AUTH_HEADER_ERRORS.includes(error?.response?.errors?.[0].extensions.code);
-      const hasOrder = !!error?.response?.data?.order;
-      if (isAuthError || !hasOrder) {
-        navigate('/no-match', { replace: true });
-        return;
-      }
+        const isAuthError = AUTH_HEADER_ERRORS.includes(
+          error?.response?.errors?.[0].extensions.code
+        );
+        const hasOrder = !!error?.response?.data?.order;
+        if (isAuthError || !hasOrder) {
+          navigate('/no-match', { replace: true });
+          return;
+        }
 
-      // If an order was returned, use it for routing
-      handleOrderResponse(error.response.data.order);
-    }
-  }, [handleOrderResponse, isDemo, navigate, orderId]);
+        // If an order was returned, use it for routing
+        handleOrderResponse(error.response.data.order);
+      }
+    },
+    [handleOrderResponse, isDemo, navigate, orderId]
+  );
 
   useEffect(() => {
     if (isDemo && (orderId || order?.id !== demoOrder.id || location.pathname === '/')) {
@@ -184,7 +196,8 @@ export const Main = () => {
     order,
     flattenedFills,
     setOrder,
-    logo
+    logo,
+    fetchOrder
   };
 
   return (

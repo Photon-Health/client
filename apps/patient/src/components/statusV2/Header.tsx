@@ -1,4 +1,4 @@
-import { Box, Heading, HStack, Text, VStack } from '@chakra-ui/react';
+import { Heading, HStack, Text, VStack } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import React from 'react';
 import { CiShop } from 'react-icons/ci';
@@ -168,11 +168,11 @@ function patientDesiredReadyByText(readyByTime: Date | 'URGENT') {
   const isTomorrow = readyByTimeDayJs.isTomorrow();
 
   if (isToday) {
-    return readyByTimeDayJs.format('h:mma');
+    return readyByTimeDayJs.format('h:mm a');
   } else if (isTomorrow) {
-    return `Tomorrow at ${readyByTimeDayJs.format('h:mma')}`;
+    return `Tomorrow at ${readyByTimeDayJs.format('h:mm a')}`;
   }
-  return readyByTimeDayJs.format('MMM Do [at] h:mma');
+  return readyByTimeDayJs.format('MMM D [at] h:mm a');
 }
 
 export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
@@ -208,7 +208,7 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
   );
 
   return (
-    <VStack w="full" alignItems={'start'} spacing={4} maxW={'xl'}>
+    <VStack w="full" alignItems={'start'} spacing={4}>
       <Heading as="h3">{header}</Heading>
       {subheader && (
         <Text as={derivedProps.status !== 'PROCESSING' ? 'b' : undefined} fontSize={'lg'}>
@@ -221,19 +221,18 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
         {thirdBar}
       </HStack>
       {(props.status === 'CREATED' || props.status === 'SENT') && props.patientDesiredReadyAt && (
-        <Box
+        <HStack
           borderWidth={1}
-          borderRadius={16}
-          borderColor={'#EAECF0'}
-          shadow={'md'}
-          p={3}
-          w={'full'}
+          borderRadius="xl"
+          borderColor="#EAECF0"
+          shadow="md"
+          p={4}
+          w="full"
+          spacing={2}
         >
-          Requested Pickup:{' '}
-          <Text as="b" paddingLeft={3}>
-            {patientDesiredReadyByText(props.patientDesiredReadyAt)}
-          </Text>
-        </Box>
+          <Text>Requested Pickup:</Text>
+          <Text as="b">{patientDesiredReadyByText(props.patientDesiredReadyAt)}</Text>
+        </HStack>
       )}
     </VStack>
   );
