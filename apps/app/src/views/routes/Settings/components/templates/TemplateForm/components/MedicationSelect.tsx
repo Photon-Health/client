@@ -1,12 +1,12 @@
 import { Box, Text, VStack, forwardRef } from '@chakra-ui/react';
 
 import { GroupHeadingProps, OptionProps as SelectOptionProps } from 'chakra-react-select';
-
+import { useQuery } from '@apollo/client';
 import { usePhoton } from '@photonhealth/react';
 import { useEffect, useImperativeHandle, useState } from 'react';
-import { SelectField } from './SelectField';
-
-import { CatalogTreatmentFieldsMap } from '../../model/fragments';
+import { SelectField } from '../../../../../../components/SelectField';
+import { CatalogTreatmentFieldsMap } from '../../../../../../../model/fragments';
+import { SearchTreatmentOptionsQuery } from '../../../treatments/TreatmentOptionSearch';
 
 interface OptionProps extends SelectOptionProps {
   data: {
@@ -63,12 +63,25 @@ const GroupHeading = ({ data }: GroupHeadingProps) => (
 
 export const MedicationSelect = forwardRef((props: any, ref: any) => {
   const { catalogId, linkedMedRef, onNotInCatalog, hideExpandedSearch } = props;
-  const { getCatalog, addToCatalog } = usePhoton();
+  const { getCatalog, addToCatalog, clinicalClient } = usePhoton();
+  const [filterText, setFilterText] = useState('');
   // By using a useState for options, we can hide options we don't want to show until
   // other conditions (loading) are true
   const [treatmentOptions, setTreatmentOptions] = useState<Array<{ value: string; label: string }>>(
     []
   );
+
+  const { data: offCatalogTreatments } = useQuery(SearchTreatmentOptionsQuery, {
+    client: clinicalClient,
+    variables: { searchTerm: filterText },
+    skip: filterText.length <= 2
+  });
+
+  // grabbed the type gql/graphql.ts
+  // caching treatments because on selection the options are cleared
+  // thus won't display, despite `skip: filterText.length <= 2` above
+  const [cachedOffCatalogTreatments, setCachedOffCatalogTreatments] =
+    useState<Array<{ __typename: 'TreatmentOption'; name: string; id?: string | null }>>();
 
   const [addToCatalogMutation] = addToCatalog({
     refetchQueries: ['getCatalog'],
@@ -78,6 +91,12 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
       fragment: CatalogTreatmentFieldsMap
     }
   });
+
+  useEffect(() => {
+    if (offCatalogTreatments?.treatmentOptions?.length ?? 0 > 0) {
+      setCachedOffCatalogTreatments(offCatalogTreatments?.treatmentOptions ?? []);
+    }
+  }, [offCatalogTreatments]);
 
   useImperativeHandle(linkedMedRef, () => ({
     addToCatalog: ({ id, onComplete }: { id: string; onComplete: (data: any) => void }) => {
@@ -91,27 +110,35 @@ export const MedicationSelect = forwardRef((props: any, ref: any) => {
     }
   }));
 
-  const [filterText, setFilterText] = useState('');
   const catalog = getCatalog({
     id: catalogId,
     fragment: CatalogTreatmentFieldsMap
   });
 
-  if (catalog.error?.message) {
-    return <Text color="red">{catalog.error.message}</Text>;
-  }
-
   useEffect(() => {
     if (!catalog.loading && catalog.catalog) {
-      const options: any = catalog.catalog.treatments.map((med: any) => ({
+      const catalogOptions = catalog.catalog.treatments.map((med: any) => ({
         value: med,
         label: `${med.name}`,
         selectGroupLabel: 'Treatments'
       }));
 
-      setTreatmentOptions(options);
+      const offCatalogOptions =
+        cachedOffCatalogTreatments?.map((med) => ({
+          value: med,
+          label: `${med.name}`,
+          selectGroupLabel: 'Treatments'
+        })) || [];
+
+      setTreatmentOptions(
+        [...catalogOptions, ...offCatalogOptions].sort((a, b) => a.label.localeCompare(b.label))
+      );
     }
-  }, [catalog.loading, catalogId]);
+  }, [catalog.loading, catalog.catalog, cachedOffCatalogTreatments]);
+
+  if (catalog.error?.message) {
+    return <Text color="red">{catalog.error.message}</Text>;
+  }
 
   return (
     <SelectField
