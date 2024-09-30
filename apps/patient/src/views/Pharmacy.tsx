@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { getSettings } from '@client/settings';
 import queryString from 'query-string';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import ReactGA from 'react-ga4';
 import { Helmet } from 'react-helmet';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
@@ -660,6 +660,19 @@ export const Pharmacy = () => {
       console.error(JSON.stringify(error, undefined, 2));
     }
   };
+
+  const actionTriggeredRef = useRef(false);
+
+  useEffect(() => {
+    if (showSearchToggle && !actionTriggeredRef.current) {
+      datadogRum.addAction('cash_price_displayed', {
+        orderId: order.id,
+        organization: order.organization.name,
+        timestamp: new Date().toISOString()
+      });
+      actionTriggeredRef.current = true;
+    }
+  }, [showSearchToggle, order]);
 
   if (!order) {
     console.error('No error');
