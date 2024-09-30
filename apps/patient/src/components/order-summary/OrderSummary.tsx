@@ -1,9 +1,11 @@
+import { PrescriptionFulfillmentState } from '../../__generated__/graphql';
+import { getLatestReadyTime } from '../../utils/fulfillmentsHelpers';
+import { Order } from '../../utils/models';
+import { useOrderContext } from '../../views/Main';
+import { Card } from '../Card';
 import { Box, Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import { groupBy } from 'lodash';
-import { getLatestReadyTime } from '../../utils/fulfillmentsHelpers';
-import { Card } from '../Card';
-import { PrescriptionFulfillmentState } from '../../__generated__/graphql';
 
 export interface ExceptionData {
   message?: string;
@@ -19,7 +21,7 @@ export interface FulfillmentData {
 
 function exceptionCmp(e1: ExceptionData, e2: ExceptionData) {
   if (e1.exceptionType === 'PA_REQUIRED') return 1;
-  if (e2.exceptionType === 'PA_REQUIRED') return 2;
+  if (e2.exceptionType === 'PA_REQUIRED') return -1;
   return e1.exceptionType.localeCompare(e2.exceptionType);
 }
 
@@ -62,11 +64,18 @@ function formatReadyText(d: Date | undefined) {
   );
 }
 
-const MESSAGE: { [key in ExceptionData['exceptionType']]: string | undefined } = {
-  OOS: 'Pharmacy does not have your medication in stock but is able to order it. Contact us if you need it sooner.',
-  BACKORDERED:
-    'The pharmacy can’t order the medication. Contact your provider for alternatives or locate a pharmacy that has it in stock and we will send it there.',
-  PA_REQUIRED:
+const MESSAGE: { [key in ExceptionData['exceptionType']]: (order: Order) => string } = {
+  OOS: ({ isReroutable }) =>
+    `Pharmacy does not have your medication in stock but is able to order it. ${
+      isReroutable ? 'You can change your pharmacy below' : 'Contact us'
+    } if you need it sooner.`,
+  BACKORDERED: ({ isReroutable }) =>
+    `The pharmacy can’t order the medication. Contact your provider for alternatives or ${
+      isReroutable
+        ? 'you can change your pharmacy below'
+        : 'locate a pharmacy that has it in stock and we will send it there'
+    }.`,
+  PA_REQUIRED: () =>
     'Your insurance needs information from your provider to cover this medication. Contact your provider for alternatives or pay the cash price.'
 };
 
@@ -79,10 +88,13 @@ const ExceptionsBlock = ({ exception }: { exception: ExceptionData }) => {
       : exception.exceptionType === 'PA_REQUIRED'
       ? 'Approval required'
       : undefined;
+  const { order } = useOrderContext();
   return (
     <Box bg="orange.100" borderRadius={'xl'} p={3}>
       <Text as="b">{exceptionName}</Text>:{' '}
-      {MESSAGE[exception.exceptionType] ?? exception.message ?? 'Let us know if you have an issue'}
+      {MESSAGE[exception.exceptionType](order) ??
+        exception.message ??
+        'Let us know if you have an issue'}
     </Box>
   );
 };
