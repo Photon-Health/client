@@ -319,6 +319,14 @@ const organizationSettings: {
   },
   // Measured
   org_pcPnPx5PVamzjS2p: {
+    sendToPatient: true,
+    pickUp: true,
+    mailOrder: true,
+    mailOrderProviders: [
+      REDROCK_SPRINGVILLE_PHARMACY_ID,
+      REDROCK_STGEORGE_PHARMACY_ID,
+      EMPOWER_PHARMACY_ID
+    ],
     logo: 'measured_logo.svg',
     accentColor: '#ffd100'
   }

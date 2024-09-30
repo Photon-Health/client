@@ -15,7 +15,8 @@ import {
   REDROCK_SPRINGVILLE_PHARMACY_ID,
   FOOTHILLS_PHARMACY_ID,
   SMARTSCRIPTS_PHARMACY_ID,
-  OLYMPIA_PHARMACY_ID
+  OLYMPIA_PHARMACY_ID,
+  REDROCK_STGEORGE_PHARMACY_ID
 } from '../pharmacies';
 
 /**
@@ -371,6 +372,14 @@ const organizationSettings: {
   },
   // Measured
   org_CsGKYnFZbMI3SY3X: {
+    sendToPatient: true,
+    pickUp: true,
+    mailOrder: true,
+    mailOrderProviders: [
+      REDROCK_SPRINGVILLE_PHARMACY_ID,
+      REDROCK_STGEORGE_PHARMACY_ID,
+      EMPOWER_PHARMACY_ID
+    ],
     logo: 'measured_logo.svg',
     accentColor: '#ffd100'
   }
