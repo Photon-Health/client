@@ -2,6 +2,8 @@
 import {
   Box,
   Button,
+  Center,
+  CircularProgress,
   Container,
   Heading,
   HStack,
@@ -18,6 +20,20 @@ import { Helmet } from 'react-helmet';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
+  BrandedOptions,
+  CouponModal,
+  FixedFooter,
+  LocationModal,
+  PickupOptions,
+  PoweredBy
+} from '../components';
+import * as TOAST_CONFIG from '../configs/toast';
+import { formatAddress, preparePharmacy } from '../utils/general';
+import { ExtendedFulfillmentType } from '../utils/models';
+import { text as t } from '../utils/text';
+import { useOrderContext } from './Main';
+
+import {
   geocode,
   getPharmacies,
   rerouteOrder,
@@ -25,27 +41,19 @@ import {
   setPreferredPharmacy,
   triggerDemoNotification
 } from '../api';
-import {
-  BrandedOptions,
-  FixedFooter,
-  LocationModal,
-  PickupOptions,
-  PoweredBy
-} from '../components';
-import * as TOAST_CONFIG from '../configs/toast';
+
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { demoPharmacies } from '../data/demoPharmacies';
-import { formatAddress, preparePharmacy } from '../utils/general';
 import { isGLP } from '../utils/isGLP';
-import { Pharmacy as EnrichedPharmacy, ExtendedFulfillmentType } from '../utils/models';
-import { text as t } from '../utils/text';
-import { useOrderContext } from './Main';
+import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { datadogRum } from '@datadog/browser-rum';
+import { Pharmacy as PharmacyType } from '../__generated__/graphql';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
 export const Pharmacy = () => {
-  const { order, flattenedFills, setOrder, isDemo } = useOrderContext();
+  const { order, flattenedFills, setOrder, isDemo, fetchOrder } = useOrderContext();
 
   const orgSettings = getSettings(order?.organization.id);
 
@@ -66,6 +74,13 @@ export const Pharmacy = () => {
   // View state
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
+  const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
+  const isOrgWithCouponsEnabled = [
+    'Sesame',
+    'Updated Test Pharmacy 11',
+    'Photon Test Org'
+  ].includes(order?.organization.name ?? '');
+  const [showSearchToggle, setShowSearchToggle] = useState(isOrgWithCouponsEnabled);
 
   // selection state
   const [selectedId, setSelectedId] = useState<string>('');
@@ -73,10 +88,6 @@ export const Pharmacy = () => {
   // Submitting state
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
-
-  // loading state
-  const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(false);
-  const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
 
   // Address state
   const [latitude, setLatitude] = useState<number>();
@@ -87,7 +98,15 @@ export const Pharmacy = () => {
   const [cleanAddress, setCleanAddress] = useState<string>();
   const [loadingLocation, setLoadingLocation] = useState(false);
 
+  // sorting
+  const [sortBy, setSortBy] = useState<'price' | 'distance'>(
+    isOrgWithCouponsEnabled ? 'price' : 'distance'
+  );
+
   // loading state
+  const [initialLoad, setInitialLoad] = useState(true);
+  const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(true);
+  const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
   const isLoading = loadingLocation || loadingPharmacies;
 
   // filters
@@ -98,8 +117,6 @@ export const Pharmacy = () => {
 
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
-
-  const isMultiRx = flattenedFills.length > 1;
 
   // Pharmacy results
   const [topRankedPharmacies, setTopRankedPharmacies] = useState<EnrichedPharmacy[]>([]);
@@ -120,7 +137,12 @@ export const Pharmacy = () => {
   // capsule
   const isCapsuleTerritory =
     order?.address?.postalCode != null && order.address.postalCode in capsuleZipcodeLookup;
-  const enableCourier = !isDemo && isCapsuleTerritory && orgSettings.enableCourierNavigate;
+  const enableCourier =
+    !isDemo &&
+    // Hide for cash price search
+    sortBy !== 'price' &&
+    isCapsuleTerritory &&
+    orgSettings.enableCourierNavigate;
   const capsulePharmacyId = order?.address?.postalCode
     ? capsuleZipcodeLookup[order.address.postalCode as keyof typeof capsuleZipcodeLookup]
         ?.pharmacyId
@@ -130,6 +152,8 @@ export const Pharmacy = () => {
   const hasTopRankedCostco = topRankedPharmacies.some((p) => p.name === 'Costco Pharmacy');
   const enableMailOrder =
     !isDemo &&
+    // Hide for cash price search
+    sortBy !== 'price' &&
     // If we're showing costco, we don't want to show mail order
     !orgSettings.topRankedCostco &&
     !hasTopRankedCostco && // this means org is Sesame, we don't want to show Amazon and top ranked Costco at the same time
@@ -142,9 +166,6 @@ export const Pharmacy = () => {
 
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
-  const subheading = isReroute
-    ? t.sendToNew(isMultiRx, order.pharmacy!.name)
-    : t.sendToSelected(isMultiRx);
 
   const showToastWarning = () =>
     toast({
@@ -175,7 +196,7 @@ export const Pharmacy = () => {
   // Reset when we toggle 24hr/open now
   useEffect(() => {
     reset();
-  }, [enable24Hr, enableOpenNow]);
+  }, [sortBy, enable24Hr, enableOpenNow]);
 
   // Initialize demo data
   useEffect(() => {
@@ -230,13 +251,9 @@ export const Pharmacy = () => {
 
   const getCostco = useCallback(
     async ({
-      enable24Hr,
-      enableOpenNow,
       latitude,
       longitude
     }: {
-      enable24Hr: boolean;
-      enableOpenNow: boolean;
       latitude: number | undefined;
       longitude: number | undefined;
     }) => {
@@ -260,18 +277,14 @@ export const Pharmacy = () => {
       }
       return [];
     },
-    []
+    [enable24Hr, enableOpenNow]
   );
 
   const getWalgreens = useCallback(
     async ({
-      enable24Hr,
-      enableOpenNow,
       latitude,
       longitude
     }: {
-      enable24Hr: boolean;
-      enableOpenNow: boolean;
       latitude: number | undefined;
       longitude: number | undefined;
     }) => {
@@ -296,19 +309,20 @@ export const Pharmacy = () => {
       }
       return [];
     },
-    []
+    [enable24Hr, enableOpenNow]
+  );
+
+  const enablePrice = useMemo(
+    () => sortBy === 'price' && isOrgWithCouponsEnabled,
+    [sortBy, isOrgWithCouponsEnabled]
   );
 
   const loadPharmacies = useCallback(
     async ({
-      enable24Hr,
-      enableOpenNow,
       latitude,
       longitude,
       pageOffset = 0
     }: {
-      enable24Hr: boolean;
-      enableOpenNow: boolean;
       latitude: number | undefined;
       longitude: number | undefined;
       pageOffset?: number;
@@ -322,16 +336,17 @@ export const Pharmacy = () => {
         limit: GET_PHARMACIES_COUNT,
         offset: pageOffset,
         isOpenNow: enableOpenNow,
-        is24hr: enable24Hr
+        is24hr: enable24Hr,
+        includePrice: enablePrice
       });
       setPageOffset(pageOffset + res.length);
       return res;
     },
-    []
+    [enable24Hr, enableOpenNow, enablePrice]
   );
 
   useEffect(() => {
-    const fetchPharmaciesOnLocationChange = async () => {
+    const fetchPharmaciesOnLocationOrSortChange = async () => {
       if (isDemo) return;
       if (latitude == null || longitude == null) {
         // Need to wait till we have lat/lng
@@ -344,28 +359,60 @@ export const Pharmacy = () => {
         let topRankedPharmacies: EnrichedPharmacy[] = [];
 
         // check if top ranked costco is enabled and there are GLP treatments
-        if (enableTopRankedCostco) {
+        if (enableTopRankedCostco && sortBy !== 'price') {
           topRankedPharmacies = [
-            ...(await getCostco({ latitude, longitude, enable24Hr, enableOpenNow })),
+            ...(await getCostco({ latitude, longitude })),
             ...topRankedPharmacies
           ];
         }
 
         if (enableTopRankedWalgreens && order?.readyBy === 'Urgent') {
           topRankedPharmacies = [
-            ...(await getWalgreens({ latitude, longitude, enable24Hr, enableOpenNow })),
+            ...(await getWalgreens({ latitude, longitude })),
             ...topRankedPharmacies
           ];
         }
 
-        const pharmacies = await loadPharmacies({ latitude, longitude, enable24Hr, enableOpenNow });
+        // using the existing enablePrice flag to determine if we should fetch pharmacies with prices
+        // a different query than the original query
+        const pharmacies = await loadPharmacies({
+          latitude,
+          longitude
+        });
 
         if (pharmacies?.length === 0) {
-          toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
-        }
+          if (sortBy === 'price') {
+            if (initialLoad) {
+              // If we're on initial load and no pharmacies are found, we should try again with distance
+              setShowSearchToggle(false);
+              setSortBy('distance');
+              setInitialLoad(false);
 
-        setTopRankedPharmacies(topRankedPharmacies);
-        setPharmacyResults(pharmacies);
+              // Re-fetch to get pharmacies by distance
+              const pharmaciesReSearch = await loadPharmacies({
+                latitude,
+                longitude
+              });
+              setTopRankedPharmacies(topRankedPharmacies);
+              setPharmacyResults(pharmaciesReSearch);
+            } else {
+              toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
+              setShowingAllPharmacies(true);
+            }
+          } else {
+            toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
+          }
+        } else {
+          if (sortBy === 'price') {
+            setShowingAllPharmacies(true);
+          }
+
+          setTopRankedPharmacies(topRankedPharmacies);
+          setPharmacyResults(pharmacies);
+          if (initialLoad) {
+            setInitialLoad(false);
+          }
+        }
       } catch (error: any) {
         toast({ ...TOAST_CONFIG.WARNING, title: 'Unable to get pharmacies' });
         console.log('Get pharmacies error: ', error);
@@ -373,7 +420,7 @@ export const Pharmacy = () => {
       setLoadingPharmacies(false);
     };
 
-    fetchPharmaciesOnLocationChange();
+    fetchPharmaciesOnLocationOrSortChange();
   }, [
     containsGLP,
     enable24Hr,
@@ -387,7 +434,9 @@ export const Pharmacy = () => {
     loadPharmacies,
     longitude,
     order?.readyBy,
-    toast
+    toast,
+    sortBy,
+    initialLoad
   ]);
 
   const handleShowMore = async () => {
@@ -417,8 +466,6 @@ export const Pharmacy = () => {
     const newPharmacies = await loadPharmacies({
       latitude,
       longitude,
-      enable24Hr,
-      enableOpenNow,
       pageOffset
     });
     setPharmacyResults([...pharmacyResults, ...newPharmacies]);
@@ -447,6 +494,15 @@ export const Pharmacy = () => {
         label: 'Pharmacy Rank',
         value: index + 1
       });
+      if (sortBy === 'price') {
+        datadogRum.addAction('price_selection', {
+          orderId: order.id,
+          organization: order.organization.name,
+          pharmacyId: selectedPharmacyId,
+          timestamp: new Date().toISOString(),
+          price: pharmacies[index].price
+        });
+      }
     }
   };
 
@@ -505,14 +561,15 @@ export const Pharmacy = () => {
       setTimeout(() => {
         if (result) {
           setSuccessfullySubmitted(true);
-          setTimeout(() => {
+          setTimeout(async () => {
             setShowFooter(false);
 
             // Fudge it so that we can show the pharmacy card on initial load of the
             // status view for all types. On my christmas list for 2024 is better
             // fulfillment types on pharmacies.
             let type: ExtendedFulfillmentType = 'PICK_UP';
-            let selectedPharmacy = null;
+            let selectedPharmacy: { id: string; name: string } | PharmacyType | undefined =
+              undefined;
             if (selectedId in capsulePharmacyIdLookup) {
               type = 'COURIER';
               selectedPharmacy = { id: selectedId, name: 'Capsule Pharmacy' };
@@ -530,7 +587,15 @@ export const Pharmacy = () => {
               selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
             }
 
-            setOrder({ ...order, isReroutable: !isReroute, pharmacy: selectedPharmacy });
+            setOrder({
+              ...order,
+              isReroutable: !isReroute,
+              discountCards: []
+            });
+
+            // necessary to ensure the order is updated with the new coupon before navigating
+            await fetchOrder(selectedPharmacy);
+
             const query = queryString.stringify({ orderId: order.id, token, type });
             return navigate(`/status?${query}`);
           }, 1000);
@@ -601,12 +666,29 @@ export const Pharmacy = () => {
     return null;
   }
 
+  if (initialLoad && showSearchToggle && isLoading) {
+    return (
+      <Box>
+        <Helmet>
+          <title>{t.selectAPharmacy}</title>
+        </Helmet>
+        <Container>
+          <Center h="100vh">
+            <CircularProgress isIndeterminate color="gray.800" />
+          </Center>
+        </Container>
+      </Box>
+    );
+  }
+
   return (
     <Box>
       {!isDemo && <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />}
       <Helmet>
         <title>{t.selectAPharmacy}</title>
       </Helmet>
+
+      <CouponModal isOpen={couponModalOpen} onClose={() => setCouponModalOpen(false)} />
 
       <Box bgColor="white" shadow="sm">
         <Container>
@@ -615,7 +697,6 @@ export const Pharmacy = () => {
               <Heading as="h3" size="lg">
                 {heading}
               </Heading>
-              <Text>{subheading}</Text>
             </VStack>
 
             <HStack justify="space-between" w="full">
@@ -626,7 +707,7 @@ export const Pharmacy = () => {
                     onClick={() => setLocationModalOpen(true)}
                     display="inline"
                     color="link"
-                    fontWeight="medium"
+                    fontWeight="semibold"
                     size="sm"
                     data-dd-privacy="mask"
                     cursor={isDemo ? 'default' : 'auto'}
@@ -641,6 +722,63 @@ export const Pharmacy = () => {
                 </Button>
               )}
             </HStack>
+            {showSearchToggle ? (
+              <HStack>
+                <Text whiteSpace="nowrap">Sort by</Text>
+                <HStack w="full">
+                  <Button
+                    w="50%"
+                    size="lg"
+                    isActive={sortBy === 'price'}
+                    _active={{
+                      backgroundColor: 'brand.500',
+                      color: 'white',
+                      borderColor: 'brand.500'
+                    }}
+                    border="2px"
+                    borderColor="gray.100"
+                    backgroundColor="white"
+                    onClick={() => setSortBy('price')}
+                    borderRadius="xl"
+                  >
+                    Cash Price
+                  </Button>
+                  <Button
+                    w="50%"
+                    size="lg"
+                    isActive={sortBy === 'distance'}
+                    _active={{
+                      backgroundColor: 'brand.500',
+                      color: 'white',
+                      borderColor: 'brand.500'
+                    }}
+                    border="2px"
+                    borderColor="gray.100"
+                    backgroundColor="white"
+                    onClick={() => setSortBy('distance')}
+                    borderRadius="xl"
+                  >
+                    Distance
+                  </Button>
+                </HStack>
+              </HStack>
+            ) : null}
+            {showSearchToggle && sortBy === 'price' ? (
+              <Box p={3} bgColor={'blue.50'} borderRadius="lg">
+                <Text>
+                  The displayed price is a coupon for the selected pharmacy.{' '}
+                  <b>This is NOT insurance.</b>{' '}
+                  <Link
+                    textDecoration="underline"
+                    textUnderlineOffset="2px"
+                    color="blue.500"
+                    onClick={() => setCouponModalOpen(true)}
+                  >
+                    Learn more.
+                  </Link>
+                </Text>
+              </Box>
+            ) : null}
           </VStack>
         </Container>
       </Box>
