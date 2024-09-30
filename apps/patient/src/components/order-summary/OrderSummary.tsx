@@ -170,18 +170,18 @@ export const OrderSummary = (props: {
   onViewDetails: () => void;
 }) => {
   const header = (
-    <HStack justifyContent={'space-between'} w={'full'} my={4}>
+    <HStack justifyContent="space-between" w="full" my={4}>
       <Heading as="h4" size="md">
         Order Details
       </Heading>
-      <Button variant={'solid'} bg="gray.300" onClick={props.onViewDetails} size={'sm'}>
+      <Button variant="solid" bg="gray.300" onClick={props.onViewDetails} size="sm">
         View Details
       </Button>
     </HStack>
   );
 
   return (
-    <VStack alignItems={'stretch'} w="full" px={4}>
+    <VStack alignItems="stretch" w="full">
       {header}
       <Card>
         <FulfillmentsListContent fulfillments={props.fulfillments} />
