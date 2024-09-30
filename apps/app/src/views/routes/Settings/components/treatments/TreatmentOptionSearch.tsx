@@ -58,7 +58,6 @@ const Option = ({ innerProps, label, data }: TreatmentOptionsOptionProps) => (
             return part;
           }
         })}
-        ;
       </Text>
     </Box>
   </VStack>
