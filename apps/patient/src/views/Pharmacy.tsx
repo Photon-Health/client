@@ -664,7 +664,8 @@ export const Pharmacy = () => {
   const actionTriggeredRef = useRef(false);
 
   useEffect(() => {
-    if (showSearchToggle && !actionTriggeredRef.current) {
+    // wait until pharmacies are loaded to determine if showing cash price
+    if (!loadingPharmacies && showSearchToggle && !actionTriggeredRef.current) {
       datadogRum.addAction('cash_price_displayed', {
         orderId: order.id,
         organization: order.organization.name,
@@ -672,7 +673,16 @@ export const Pharmacy = () => {
       });
       actionTriggeredRef.current = true;
     }
-  }, [showSearchToggle, order]);
+  }, [loadingPharmacies, showSearchToggle, order]);
+
+  useEffect(() => {
+    datadogRum.addAction('pharmacy_list_toggle_selection', {
+      sortBy,
+      orderId: order.id,
+      organization: order.organization.name,
+      timestamp: new Date().toISOString()
+    });
+  }, [sortBy, order]);
 
   if (!order) {
     console.error('No error');
