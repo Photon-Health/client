@@ -16,4 +16,4 @@ export * from './FAQ';
 export { HorizontalStatusStepper } from './HorizontalStatusStepper';
 export * from './PrescriptionsList';
 export * from './CouponModal';
-export * from './CouponDetails';
+export * from './Coupons';

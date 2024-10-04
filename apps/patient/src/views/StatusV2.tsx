@@ -6,13 +6,7 @@ import { Helmet } from 'react-helmet';
 import { FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { triggerDemoNotification } from '../api';
-import {
-  DemoCtaModal,
-  PHARMACY_BRANDING,
-  PharmacyInfo,
-  PoweredBy,
-  CouponDetails
-} from '../components';
+import { DemoCtaModal, PHARMACY_BRANDING, PharmacyInfo, PoweredBy, Coupons } from '../components';
 import { Card } from '../components/Card';
 import { FAQModal } from '../components/FAQModal';
 import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal';
@@ -252,11 +246,9 @@ export const StatusV2 = () => {
             {order.discountCards?.length > 0 ? (
               <VStack w="full" alignItems="stretch" spacing={4}>
                 <Heading as="h4" size="md">
-                  Coupon
+                  {order.discountCards.length > 1 ? 'Coupons' : 'Coupon'}
                 </Heading>
-                <Card>
-                  <CouponDetails />
-                </Card>
+                <Coupons />
               </VStack>
             ) : null}
 
