@@ -20,13 +20,7 @@ export const Coupons = () => {
     (card) => card.pharmacyId === order.pharmacy?.id
   );
 
-  return (
-    <VStack w="full" spacing={4} mx={0}>
-      {discountCards.map((card) => (
-        <Coupon key={card.id} coupon={card} />
-      ))}
-    </VStack>
-  );
+  return discountCards.map((card) => <Coupon key={card.id} coupon={card} />);
 };
 
 type CouponProps = Pick<DiscountCard, 'price' | 'bin' | 'pcn' | 'group' | 'memberId'>;
