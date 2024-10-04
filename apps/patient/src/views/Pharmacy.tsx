@@ -548,7 +548,7 @@ export const Pharmacy = () => {
     trackSelectedPharmacyRank(selectedId, allPharmacies);
 
     try {
-      const patientSelectedPrice = sortBy === 'price';
+      const patientSelectedPrice = !!allPharmacies.find((p) => p.id === selectedId)?.price;
       const result = isReroute
         ? await rerouteOrder(order.id, selectedId, patientSelectedPrice)
         : await setOrderPharmacy(
