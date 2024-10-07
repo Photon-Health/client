@@ -1,3 +1,4 @@
+import { gql } from '@apollo/client';
 import { usePhoton } from '../context';
 import { PhotonAuthorized } from '../photon-authorized';
 import type { FormError } from '../stores/form';
@@ -73,6 +74,19 @@ export type PrescribeProps = {
   formActions?: any;
   externalOrderId?: string;
 };
+
+export const ScreenDraftedPrescriptionsQuery = gql`
+  query Query($draftedPrescriptions: [DraftedPrescriptionInput!]!, $patientId: ID!) {
+    prescriptionScreen(draftedPrescriptions: $draftedPrescriptions, patientId: $patientId) {
+      alerts {
+        type
+        description
+        involvedEntityIds
+        severity
+      }
+    }
+  }
+`;
 
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
@@ -164,6 +178,24 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       }
     });
     ref?.dispatchEvent(event);
+  };
+
+  const screenDraftedPrescriptions = async () => {
+    console.log('yooooooooo we draftin out here');
+
+    const { data } = await clinicalClient.query({
+      query: ScreenDraftedPrescriptionsQuery,
+      variables: {
+        searchTerm: {
+          patientId: props.formStore.patient?.value.id,
+          draftedPrescriptions: props.formStore.draftPrescriptions.value
+        }
+      }
+    });
+
+    console.log('yoooooo');
+
+    console.log(data);
   };
 
   const dispatchPrescriptionsError = (errors: readonly GraphQLError[]) => {
@@ -453,6 +485,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       weightUnit={props.weightUnit}
                       prefillNotes={prefillNotes}
                       enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+                      screenDraftedPrescriptions={function () {
+                        screenDraftedPrescriptions();
+                      }}
                     />
                   </div>
                 </Show>

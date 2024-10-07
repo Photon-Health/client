@@ -48,6 +48,7 @@ export const AddPrescriptionCard = (props: {
   weightUnit?: string;
   prefillNotes?: string;
   enableCombineAndDuplicate?: boolean;
+  screenDraftedPrescriptions: (...args: any) => any;
 }) => {
   const client = usePhoton();
   const [medDialogOpen, setMedDialogOpen] = createSignal(false);
@@ -87,6 +88,7 @@ export const AddPrescriptionCard = (props: {
   };
 
   const handleAddPrescription = async () => {
+    console.log('yo addin prescription');
     const keys = Object.keys(validators);
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
@@ -170,6 +172,8 @@ export const AddPrescriptionCard = (props: {
           header: 'Prescription Added',
           body: 'You can send this order or add another prescription before sending it'
         });
+
+        props.screenDraftedPrescriptions();
       };
 
       if (props.enableCombineAndDuplicate && duplicate) {
