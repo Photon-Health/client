@@ -243,14 +243,7 @@ export const StatusV2 = () => {
               onViewDetails={() => setOrderDetailsIsOpen(true)}
             />
 
-            {order.discountCards?.length > 0 ? (
-              <VStack w="full" alignItems="stretch" spacing={4}>
-                <Heading as="h4" size="md">
-                  {order.discountCards.length > 1 ? 'Coupons' : 'Coupon'}
-                </Heading>
-                <Coupons />
-              </VStack>
-            ) : null}
+            <Coupons />
 
             <VStack w="full" alignItems="stretch" spacing={4}>
               <Heading as="h4" size="md">

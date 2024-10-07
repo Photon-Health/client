@@ -1,4 +1,4 @@
-import { Box, HStack, Icon, Text, VStack } from '@chakra-ui/react';
+import { Box, Heading, HStack, Icon, Text, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import { FiInfo } from 'react-icons/fi';
 import { CouponModal } from '.';
@@ -20,8 +20,15 @@ export const Coupons = () => {
     (card) => card.pharmacyId === order.pharmacy?.id
   );
 
+  if (discountCards.length === 0) {
+    return null;
+  }
+
   return (
-    <VStack spacing={4} w="full">
+    <VStack w="full" alignItems="stretch" spacing={4}>
+      <Heading as="h4" size="md">
+        {order.discountCards.length > 1 ? 'Coupons' : 'Coupon'}
+      </Heading>
       {discountCards.map((card) => (
         <Coupon key={card.id} coupon={card} />
       ))}
