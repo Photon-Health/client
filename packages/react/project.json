@@ -1,8 +1,7 @@
 {
   "name": "react",
-  "root": "packages/react",
-  "sourceRoot": "packages/react/src",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/react/src",
   "projectType": "package",
   "targets": {
     "start": {

@@ -4,6 +4,7 @@ import { Order } from '../../utils/models';
 import { useOrderContext } from '../../views/Main';
 import { Card } from '../Card';
 import { Box, Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
+import { getSettings } from '@client/settings';
 import dayjs from 'dayjs';
 import { groupBy } from 'lodash';
 
@@ -32,8 +33,8 @@ function groupFulfillments(fulfillments: FulfillmentData[]) {
       f.exceptions.length === 0
         ? f.state
         : f.pharmacyEstimatedReadyAt != null
-        ? ('EXCEPTION_WITH_READY_TIME' as const)
-        : ('EXCEPTION_NO_READY_TIME' as const)
+          ? ('EXCEPTION_WITH_READY_TIME' as const)
+          : ('EXCEPTION_NO_READY_TIME' as const)
   }));
 
   const groupedByDerivedState = groupBy(derivedState, 'derivedState') as {
@@ -75,8 +76,13 @@ const MESSAGE: { [key in ExceptionData['exceptionType']]: (order: Order) => stri
         ? 'you can change your pharmacy below'
         : 'locate a pharmacy that has it in stock and we will send it there'
     }.`,
-  PA_REQUIRED: () =>
-    'Your insurance needs information from your provider to cover this medication. Contact your provider for alternatives or pay the cash price.'
+  PA_REQUIRED: ({ organization }) => {
+    const { paExceptionMessage } = getSettings(organization.id);
+    return (
+      paExceptionMessage ??
+      'Your insurance needs information from your provider to cover this medication. Contact your provider for alternatives or pay the cash price.'
+    );
+  }
 };
 
 const ExceptionsBlock = ({ exception }: { exception: ExceptionData }) => {
@@ -84,10 +90,10 @@ const ExceptionsBlock = ({ exception }: { exception: ExceptionData }) => {
     exception.exceptionType === 'BACKORDERED'
       ? 'Backordered'
       : exception.exceptionType === 'OOS'
-      ? 'Out of stock'
-      : exception.exceptionType === 'PA_REQUIRED'
-      ? 'Approval required'
-      : undefined;
+        ? 'Out of stock'
+        : exception.exceptionType === 'PA_REQUIRED'
+          ? 'Approval required'
+          : undefined;
   const { order } = useOrderContext();
   return (
     <Box bg="orange.100" borderRadius={'xl'} p={3}>

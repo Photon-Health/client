@@ -1,8 +1,7 @@
 {
   "name": "app",
-  "root": "apps/app",
-  "sourceRoot": "apps/app/src",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/app/src",
   "projectType": "application",
   "targets": {
     "start": {

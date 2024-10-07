@@ -1,8 +1,7 @@
 {
   "name": "sdk",
-  "root": "packages/sdk",
-  "sourceRoot": "packages/sdk/src",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/sdk/src",
   "projectType": "package",
   "targets": {
     "start": {

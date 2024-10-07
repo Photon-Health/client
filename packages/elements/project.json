@@ -1,8 +1,7 @@
 {
   "name": "elements",
-  "root": "packages/elements",
-  "sourceRoot": "packages/elements/src",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/elements/src",
   "projectType": "package",
   "targets": {
     "start": {
