@@ -43,4 +43,5 @@ export type OrganizationSettings = {
   topRankedCostco?: boolean;
   topRankedWalgreens?: boolean;
   hideTemplates?: boolean;
+  paExceptionMessage?: string;
 };
