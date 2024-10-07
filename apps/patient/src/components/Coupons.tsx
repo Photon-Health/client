@@ -20,7 +20,13 @@ export const Coupons = () => {
     (card) => card.pharmacyId === order.pharmacy?.id
   );
 
-  return discountCards.map((card) => <Coupon key={card.id} coupon={card} />);
+  return (
+    <VStack spacing={4} w="full">
+      {discountCards.map((card) => (
+        <Coupon key={card.id} coupon={card} />
+      ))}
+    </VStack>
+  );
 };
 
 type CouponProps = Pick<DiscountCard, 'price' | 'bin' | 'pcn' | 'group' | 'memberId'>;
@@ -36,7 +42,7 @@ export const Coupon = ({ coupon }: { coupon: CouponProps }) => {
   return (
     <Card>
       <CouponModal isOpen={couponModalOpen} onClose={() => setCouponModalOpen(false)} />
-      <Text fontSize="4xl" fontWeight="700" py={0} lineHeight="1">
+      <Text fontSize="4xl" alignSelf="center" fontWeight="700" py={0} lineHeight="1">
         ${price.toFixed(2)}
       </Text>
       <Box bgColor="blue.50" w="full" textAlign="center" p={2} borderRadius="xl">
@@ -70,7 +76,7 @@ export const Coupon = ({ coupon }: { coupon: CouponProps }) => {
           </Text>
         </HStack>
       </VStack>
-      <HStack color="blue.500">
+      <HStack color="blue.500" w="full" justify="center">
         <Icon as={FiInfo} />
         <Text
           as="u"
