@@ -27,7 +27,7 @@ export const Coupons = () => {
   return (
     <VStack w="full" alignItems="stretch" spacing={4}>
       <Heading as="h4" size="md">
-        {order.discountCards.length > 1 ? 'Coupons' : 'Coupon'}
+        {discountCards.length > 1 ? 'Coupons' : 'Coupon'}
       </Heading>
       {discountCards.map((card) => (
         <Coupon key={card.id} coupon={card} />
