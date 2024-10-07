@@ -55,6 +55,9 @@
     "@types/tinycolor2": "^1.4.6",
     "@typescript-eslint/eslint-plugin": "^5.45.1",
     "@typescript-eslint/parser": "^5.45.1",
+    "@types/react-confirm": "^0.2.0",
+    "@types/react-table": "^7.7.16",
+    "@types/react-test-renderer": "^18.0.0",
     "@vitejs/plugin-react": "^4.0.0",
     "autoprefixer": "^10.4.14",
     "babel-jest": "29.7.0",
@@ -91,7 +94,8 @@
     "vite": "5.4.8",
     "vite-plugin-dts": "^2.3.0",
     "vite-plugin-solid": "^2.5.0",
-    "vitest": "^0.31.0"
+    "vitest": "^0.31.0",
+    "lint-staged": "^15.2.10"
   },
   "dependencies": {
     "@apollo/client": "^3.7.10",
@@ -111,9 +115,6 @@
     "@solid-primitives/scheduled": "^1.4.1",
     "@tanstack/react-table": "^8.10.3",
     "@tanstack/virtual-core": "^3.0.0-alpha.1",
-    "@types/react-confirm": "^0.2.0",
-    "@types/react-table": "^7.7.16",
-    "@types/react-test-renderer": "^18.0.0",
     "awesome-phonenumber": "^5.11.0",
     "chakra-react-select": "^4.7.6",
     "dayjs": "^1.11.7",
@@ -128,7 +129,6 @@
     "graphql-tag": "^2.12.6",
     "jwt-decode": "^3.1.2",
     "libphonenumber-js": "^1.10.24",
-    "lint-staged": "^15.2.10",
     "lodash": "^4.17.21",
     "nanostores": "^0.7.4",
     "query-string": "^9.0.0",
