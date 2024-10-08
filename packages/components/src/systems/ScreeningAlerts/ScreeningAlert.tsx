@@ -73,37 +73,43 @@ export const ScreeningAlert = (props: { owningId: string; screeningAlert: Screen
 
   return (
     <div
-      class={`flex flex-col border rounded-lg ${getSeverityBorderColor(
+      class={`border gap-4 rounded-lg ${getSeverityBorderColor(
         props.screeningAlert.severity
       )} ${getSeverityBackgroundColor(props.screeningAlert.severity)} `}
     >
-      <div>
-        <Icon
-          name="exclamationCircle"
-          class={`mr-2 ${getSeverityIconColor(props.screeningAlert.severity)}`}
-        />
-      </div>
-      <div>
-        <Text bold class="mb-2">
-          {getSeverityText(props.screeningAlert.severity)}
-        </Text>
-        {' interaction with '}
-        <Text bold class="mb-2">
-          {filterOutOwningId(props.owningId, props.screeningAlert.involvedEntityIds).join(' and ')}
-        </Text>
-        {` (${getDescriptorOfOwningId(props.owningId)})`}
-      </div>
-      <div class={`${!isExpanded() ? 'hidden' : ''}`}>
-        <Text size="sm">{props.screeningAlert.description}</Text>
-      </div>
-      <div
-        onClick={() => {
-          toggleExpandedState();
-        }}
-      >
-        <Text bold class="text-blue-40">
-          Show {isExpanded() ? 'Less' : 'More'}
-        </Text>
+      <div class="flex grid-flow-col justify-start">
+        <div>
+          <Icon
+            name="exclamationCircle"
+            class={`mr-2 ${getSeverityIconColor(props.screeningAlert.severity)}`}
+          />
+        </div>
+        <div>
+          <div>
+            <Text bold class="mb-2">
+              {getSeverityText(props.screeningAlert.severity)}
+            </Text>
+            {' interaction with '}
+            <Text bold class="mb-2">
+              {filterOutOwningId(props.owningId, props.screeningAlert.involvedEntityIds).join(
+                ' and '
+              )}
+            </Text>
+            {` (${getDescriptorOfOwningId(props.owningId)})`}
+          </div>
+          <div class={`${!isExpanded() ? 'hidden' : ''}`}>
+            <Text size="sm">{props.screeningAlert.description}</Text>
+          </div>
+          <div
+            onClick={() => {
+              toggleExpandedState();
+            }}
+          >
+            <Text bold class="text-blue-40">
+              Show {isExpanded() ? 'Less' : 'More'}
+            </Text>
+          </div>
+        </div>
       </div>
     </div>
   );
