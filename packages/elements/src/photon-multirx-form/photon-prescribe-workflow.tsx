@@ -182,27 +182,45 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   };
 
   const screenDraftedPrescriptions = async () => {
+    setIsLoading(true);
     const inProgressDraftedPrescriptionTreatmentId = props.formStore.treatment?.value?.id;
 
     const draftedPrescriptions = [...props.formStore.draftPrescriptions.value];
 
     if (inProgressDraftedPrescriptionTreatmentId) {
       draftedPrescriptions.push({
-        treatmentId: inProgressDraftedPrescriptionTreatmentId
+        treatment: { id: inProgressDraftedPrescriptionTreatmentId }
       });
     }
+
+    const sanitizedDraftedPrescriptions = draftedPrescriptions.map(
+      ({
+        id,
+        refillsInput,
+        addToTemplates,
+        templateName,
+        catalogId,
+        treatmentId,
+        __typename,
+        ...draftedPrescription
+      }) => {
+        draftedPrescription.treatment = { id: draftedPrescription.treatment.id };
+
+        return { ...draftedPrescription };
+      }
+    );
 
     const { data } = await clinicalClient.query({
       query: ScreenDraftedPrescriptionsQuery,
       variables: {
-        searchTerm: {
-          patientId: props.formStore.patient?.value.id,
-          draftedPrescriptions: props.formStore.draftPrescriptions.value
-        }
+        patientId: props.formStore.patient?.value.id,
+        draftedPrescriptions: sanitizedDraftedPrescriptions
       }
     });
 
-    setScreeningAlerts(data.prescriptionScreen.alerts);
+    setScreeningAlerts(data.prescriptionScreen?.alerts);
+
+    setIsLoading(false);
   };
 
   const dispatchPrescriptionsError = (errors: readonly GraphQLError[]) => {
