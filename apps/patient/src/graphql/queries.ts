@@ -174,6 +174,7 @@ export const GET_ORDER = gql`
         pcn
         group
         memberId
+        pharmacyId
       }
     }
   }

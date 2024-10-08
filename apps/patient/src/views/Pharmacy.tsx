@@ -548,14 +548,16 @@ export const Pharmacy = () => {
     trackSelectedPharmacyRank(selectedId, allPharmacies);
 
     try {
+      const patientSelectedPrice = sortBy === 'price';
       const result = isReroute
-        ? await rerouteOrder(order.id, selectedId)
+        ? await rerouteOrder(order.id, selectedId, patientSelectedPrice)
         : await setOrderPharmacy(
             order.id,
             selectedId,
             order.readyBy ?? undefined,
             order.readyByDay ?? undefined,
-            order.readyByTime
+            order.readyByTime,
+            patientSelectedPrice
           );
 
       setTimeout(() => {

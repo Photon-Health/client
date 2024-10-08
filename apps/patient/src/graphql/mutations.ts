@@ -13,8 +13,12 @@ export const SET_PREFERRED_PHARMACY = gql`
 `;
 
 export const REROUTE_ORDER = gql`
-  mutation RerouteOrder($orderId: ID!, $pharmacyId: ID!) {
-    rerouteOrder(orderId: $orderId, pharmacyId: $pharmacyId)
+  mutation RerouteOrder($orderId: ID!, $pharmacyId: ID!, $patientSelectedPrice: Boolean) {
+    rerouteOrder(
+      orderId: $orderId
+      pharmacyId: $pharmacyId
+      patientSelectedPrice: $patientSelectedPrice
+    )
   }
 `;
 
@@ -25,6 +29,7 @@ export const SET_ORDER_PHARMACY = gql`
     $readyBy: String
     $readyByDay: String
     $readyByTime: DateTime
+    $patientSelectedPrice: Boolean
   ) {
     setOrderPharmacy(
       orderId: $orderId
@@ -32,6 +37,7 @@ export const SET_ORDER_PHARMACY = gql`
       readyBy: $readyBy
       readyByDay: $readyByDay
       readyByTime: $readyByTime
+      patientSelectedPrice: $patientSelectedPrice
     )
   }
 `;
