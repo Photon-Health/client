@@ -66,7 +66,9 @@ const organizationSettings: {
     topRankedWalgreens: true,
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
-    enableCourierNavigate: true
+    enableCourierNavigate: true,
+    paExceptionMessage:
+      'Your insurance needs additional information from your provider before it will cover your prescription. Use the messaging feature in your Sesame profile to ask your provider to submit a prior authorization. If you’re paying cash, disregard and work with your pharmacy directly to pay the out-of-pocket price.'
   },
   // NewCo (demo's)
   org_w85CgjUjCi52yvOz: {
