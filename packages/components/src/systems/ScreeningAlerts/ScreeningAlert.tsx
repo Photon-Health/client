@@ -1,5 +1,7 @@
+import { createSignal } from 'solid-js';
 import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
+import Button from '../../particles/Button';
 
 export interface ScreeningAlertType {
   description: string;
@@ -60,6 +62,12 @@ const getDescriptorOfOwningId = (owningId: string) => {
 };
 
 export const ScreeningAlert = (props: { owningId: string; screeningAlert: ScreeningAlertType }) => {
+  const [isExpanded, setIsExpanded] = createSignal<boolean>(false);
+
+  const toggleExpandedState = () => {
+    setIsExpanded(!isExpanded());
+  };
+
   return (
     <div
       class={`flex flex-col border rounded-lg ${getSeverityBorderColor(
@@ -82,9 +90,16 @@ export const ScreeningAlert = (props: { owningId: string; screeningAlert: Screen
         </Text>
         {` (${getDescriptorOfOwningId(props.owningId)})`}
       </div>
-      <div>
+      <div class={`${!isExpanded() ? 'hidden' : ''}`}>
         <Text size="sm">{props.screeningAlert.description}</Text>
       </div>
+      <Button
+        onClick={() => {
+          toggleExpandedState();
+        }}
+      >
+        Show more
+      </Button>
     </div>
   );
 };
