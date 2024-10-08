@@ -23,6 +23,7 @@ export const DraftPrescriptionCard = (props: {
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
   setIsEditing: (isEditing: boolean) => void;
+  screeningAlerts: any[];
 }) => {
   let ref: Ref<any> | undefined;
   const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
@@ -178,6 +179,7 @@ export const DraftPrescriptionCard = (props: {
             });
           }}
           error={props.store['draftPrescriptions']?.error}
+          screeningAlerts={props.screeningAlerts}
         />
       </Card>
     </div>

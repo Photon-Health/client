@@ -102,6 +102,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     client?.authentication.state.isAuthenticated || false
   );
   const [, recentOrdersActions] = useRecentOrders();
+  const [screeningAlerts, setScreeningAlerts] = createSignal<unknown[]>([]);
 
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
   let prefillNotes = '';
@@ -181,7 +182,15 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   };
 
   const screenDraftedPrescriptions = async () => {
-    console.log('yooooooooo we draftin out here');
+    const inProgressDraftedPrescriptionTreatmentId = props.formStore.treatment?.value?.id;
+
+    const draftedPrescriptions = [...props.formStore.draftPrescriptions.value];
+
+    if (inProgressDraftedPrescriptionTreatmentId) {
+      draftedPrescriptions.push({
+        treatmentId: inProgressDraftedPrescriptionTreatmentId
+      });
+    }
 
     const { data } = await clinicalClient.query({
       query: ScreenDraftedPrescriptionsQuery,
@@ -193,9 +202,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       }
     });
 
-    console.log('yoooooo');
-
-    console.log(data);
+    setScreeningAlerts(data.prescriptionScreen.alerts);
   };
 
   const dispatchPrescriptionsError = (errors: readonly GraphQLError[]) => {
@@ -488,6 +495,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       screenDraftedPrescriptions={function () {
                         screenDraftedPrescriptions();
                       }}
+                      draftedPrescriptionChanged={function () {
+                        screenDraftedPrescriptions();
+                      }}
+                      screeningAlerts={screeningAlerts()}
                     />
                   </div>
                 </Show>
@@ -499,6 +510,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   actions={props.formActions}
                   store={props.formStore}
                   setIsEditing={setIsEditing}
+                  screeningAlerts={screeningAlerts()}
                 />
                 <Show when={props.enableOrder && !props.pharmacyId}>
                   <OrderCard

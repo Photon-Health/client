@@ -49,6 +49,8 @@ export const AddPrescriptionCard = (props: {
   prefillNotes?: string;
   enableCombineAndDuplicate?: boolean;
   screenDraftedPrescriptions: (...args: any) => any;
+  draftedPrescriptionChanged: (...args: any) => any;
+  screeningAlerts: any[];
 }) => {
   const client = usePhoton();
   const [medDialogOpen, setMedDialogOpen] = createSignal(false);
@@ -88,7 +90,6 @@ export const AddPrescriptionCard = (props: {
   };
 
   const handleAddPrescription = async () => {
-    console.log('yo addin prescription');
     const keys = Object.keys(validators);
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
@@ -238,6 +239,8 @@ export const AddPrescriptionCard = (props: {
                   value: e.detail.catalogId
                 });
               }
+
+              props.draftedPrescriptionChanged();
             }}
             on:photon-treatment-unselected={() => {
               clearForm(
@@ -247,6 +250,20 @@ export const AddPrescriptionCard = (props: {
             }}
             on:photon-search-text-changed={(e: any) => setSearchText(e.detail.text)}
           />
+
+          {props.screeningAlerts.filter((alert) =>
+            alert.involvedEntityIds.indexOf(props.store.treatment?.value?.id)
+          ).length > 0 ? (
+            <div>
+              {
+                props.screeningAlerts.filter((alert) =>
+                  alert.involvedEntityIds.indexOf(props.store.treatment?.value?.id)
+                )[0].description
+              }
+            </div>
+          ) : (
+            <></>
+          )}
           <div class="flex flex-col sm:flex-none sm:grid sm:grid-cols-2 sm:gap-4">
             <div class="order-last sm:order-first">
               <photon-checkbox
