@@ -1,7 +1,6 @@
 import { createSignal } from 'solid-js';
 import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
-import Button from '../../particles/Button';
 
 export interface ScreeningAlertType {
   description: string;
@@ -61,6 +60,10 @@ const getDescriptorOfOwningId = (owningId: string) => {
   return 'TBD';
 };
 
+const filterOutOwningId = (owningId: string, involvedEntityIds: string[]): string[] => {
+  return involvedEntityIds.filter((element) => element !== owningId);
+};
+
 export const ScreeningAlert = (props: { owningId: string; screeningAlert: ScreeningAlertType }) => {
   const [isExpanded, setIsExpanded] = createSignal<boolean>(false);
 
@@ -86,20 +89,22 @@ export const ScreeningAlert = (props: { owningId: string; screeningAlert: Screen
         </Text>
         {' interaction with '}
         <Text bold class="mb-2">
-          {props.owningId}
+          {filterOutOwningId(props.owningId, props.screeningAlert.involvedEntityIds).join(' and ')}
         </Text>
         {` (${getDescriptorOfOwningId(props.owningId)})`}
       </div>
       <div class={`${!isExpanded() ? 'hidden' : ''}`}>
         <Text size="sm">{props.screeningAlert.description}</Text>
       </div>
-      <Button
+      <div
         onClick={() => {
           toggleExpandedState();
         }}
       >
-        Show more
-      </Button>
+        <Text bold class="text-blue-40">
+          Show {isExpanded() ? 'Less' : 'More'}
+        </Text>
+      </div>
     </div>
   );
 };

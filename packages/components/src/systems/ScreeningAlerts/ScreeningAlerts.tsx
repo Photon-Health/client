@@ -1,6 +1,9 @@
-import { ScreeningAlert } from './ScreeningAlert';
+import { ScreeningAlert, ScreeningAlertType } from './ScreeningAlert';
 
-export const ScreeningAlerts = (props: { screeningAlerts: any[]; owningId: string }) => {
+export const ScreeningAlerts = (props: {
+  screeningAlerts: ScreeningAlertType[];
+  owningId: string;
+}) => {
   return (
     <>
       {props.screeningAlerts

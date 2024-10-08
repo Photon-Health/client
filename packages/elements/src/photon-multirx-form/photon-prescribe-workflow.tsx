@@ -34,6 +34,7 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
+import { ScreeningAlertType } from '@photonhealth/components/dist/src/systems/ScreeningAlerts';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -102,7 +103,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     client?.authentication.state.isAuthenticated || false
   );
   const [, recentOrdersActions] = useRecentOrders();
-  const [screeningAlerts, setScreeningAlerts] = createSignal<unknown[]>([]);
+  const [screeningAlerts, setScreeningAlerts] = createSignal<ScreeningAlertType[]>([]);
 
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
   let prefillNotes = '';
@@ -181,17 +182,24 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     ref?.dispatchEvent(event);
   };
 
+  // let's start screening all of the prescriptions we're drafting
   const screenDraftedPrescriptions = async () => {
+    // start out by getting the treatment id of the prescription we're drafting now -
+    // we'll want to knwo about it so we cn show an alert underneath it, before it gets
+    // added to the order
     const inProgressDraftedPrescriptionTreatmentId = props.formStore.treatment?.value?.id;
 
+    // and then get the ones already added to the order (but not persisted)
     const draftedPrescriptions = [...props.formStore.draftPrescriptions.value];
 
+    // if there is one, add in the prescription being created
     if (inProgressDraftedPrescriptionTreatmentId) {
       draftedPrescriptions.push({
         treatment: { id: inProgressDraftedPrescriptionTreatmentId }
       });
     }
 
+    // pluck out all the attributes we won't need so we can make a screening request
     const sanitizedDraftedPrescriptions = draftedPrescriptions.map(
       ({
         id,
@@ -209,6 +217,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       }
     );
 
+    // make the screening request
     const { data } = await clinicalClient.query({
       query: ScreenDraftedPrescriptionsQuery,
       variables: {
@@ -217,7 +226,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       }
     });
 
-    setScreeningAlerts(data.prescriptionScreen?.alerts);
+    setScreeningAlerts(data?.prescriptionScreen?.alerts ?? []);
   };
 
   const dispatchPrescriptionsError = (errors: readonly GraphQLError[]) => {

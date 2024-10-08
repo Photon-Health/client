@@ -22,6 +22,7 @@ import { createSignal, onMount, Show } from 'solid-js';
 import { usePhoton } from '../../context';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
+import { ScreeningAlertType } from '@photonhealth/components/dist/src/systems/ScreeningAlerts';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -51,7 +52,7 @@ export const AddPrescriptionCard = (props: {
   enableCombineAndDuplicate?: boolean;
   screenDraftedPrescriptions: (...args: any) => any;
   draftedPrescriptionChanged: (...args: any) => any;
-  screeningAlerts: any[];
+  screeningAlerts: ScreeningAlertType[];
 }) => {
   const client = usePhoton();
   const [medDialogOpen, setMedDialogOpen] = createSignal(false);

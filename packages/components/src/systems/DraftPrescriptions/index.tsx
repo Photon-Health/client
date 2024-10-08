@@ -8,7 +8,7 @@ import Text from '../../particles/Text';
 import formatRxString from '../../utils/formatRxString';
 import { usePhotonClient } from '../SDKProvider';
 import generateDraftPrescription from './utils/generateDraftPrescription';
-import { ScreeningAlerts } from '../ScreeningAlerts';
+import { ScreeningAlerts, ScreeningAlertType } from '../ScreeningAlerts';
 
 export type TemplateOverrides = {
   [key: string]: {
@@ -98,7 +98,7 @@ interface DraftPrescriptionsProps {
   handleEdit?: (draftId: string) => void;
   handleDelete?: (draftId: string) => void;
   error?: string;
-  screeningAlerts: any[];
+  screeningAlerts: ScreeningAlertType[];
 }
 
 export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
