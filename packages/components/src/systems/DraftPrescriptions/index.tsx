@@ -8,6 +8,7 @@ import Text from '../../particles/Text';
 import formatRxString from '../../utils/formatRxString';
 import { usePhotonClient } from '../SDKProvider';
 import generateDraftPrescription from './utils/generateDraftPrescription';
+import { ScreeningAlerts } from '../ScreeningAlerts';
 
 export type TemplateOverrides = {
   [key: string]: {
@@ -72,7 +73,11 @@ export type DraftPrescription = PrescriptionTemplate & {
   effectiveDate?: string;
 };
 
-const DraftPrescription = (props: { LeftChildren: JSXElement; RightChildren?: JSXElement }) => (
+const DraftPrescription = (props: {
+  LeftChildren: JSXElement;
+  RightChildren?: JSXElement;
+  BottomChildren?: JSXElement;
+}) => (
   <Card>
     <div class="flex justify-between items-center gap-4">
       <div class="flex flex-col items-start">{props.LeftChildren}</div>
@@ -80,6 +85,7 @@ const DraftPrescription = (props: { LeftChildren: JSXElement; RightChildren?: JS
         <div class="flex items-start gap-3">{props.RightChildren}</div>
       </Show>
     </div>
+    <Show when={props?.BottomChildren}>{props.BottomChildren}</Show>
   </Card>
 );
 
@@ -250,20 +256,15 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
                       </button>
                     </>
                   }
+                  BottomChildren={
+                    <>
+                      <ScreeningAlerts
+                        screeningAlerts={props.screeningAlerts}
+                        owningId={draft.treatment.id}
+                      />
+                    </>
+                  }
                 />
-                {props.screeningAlerts.filter((alert) =>
-                  alert.involvedEntityIds.indexOf(draft?.treatment?.id)
-                ).length > 0 ? (
-                  <div>
-                    {
-                      props.screeningAlerts.filter((alert) =>
-                        alert.involvedEntityIds.indexOf(draft?.treatment?.id)
-                      )[0].description
-                    }
-                  </div>
-                ) : (
-                  <></>
-                )}
               </>
             );
           }}

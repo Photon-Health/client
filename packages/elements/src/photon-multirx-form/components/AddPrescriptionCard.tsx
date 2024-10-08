@@ -5,7 +5,8 @@ import {
   Icon,
   Text,
   triggerToast,
-  useRecentOrders
+  useRecentOrders,
+  ScreeningAlerts
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
@@ -251,19 +252,11 @@ export const AddPrescriptionCard = (props: {
             on:photon-search-text-changed={(e: any) => setSearchText(e.detail.text)}
           />
 
-          {props.screeningAlerts.filter((alert) =>
-            alert.involvedEntityIds.indexOf(props.store.treatment?.value?.id)
-          ).length > 0 ? (
-            <div>
-              {
-                props.screeningAlerts.filter((alert) =>
-                  alert.involvedEntityIds.indexOf(props.store.treatment?.value?.id)
-                )[0].description
-              }
-            </div>
-          ) : (
-            <></>
-          )}
+          <ScreeningAlerts
+            screeningAlerts={props.screeningAlerts}
+            owningId={props.store.treatment?.value?.id}
+          />
+
           <div class="flex flex-col sm:flex-none sm:grid sm:grid-cols-2 sm:gap-4">
             <div class="order-last sm:order-first">
               <photon-checkbox

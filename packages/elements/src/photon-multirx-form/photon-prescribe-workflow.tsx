@@ -182,7 +182,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   };
 
   const screenDraftedPrescriptions = async () => {
-    setIsLoading(true);
     const inProgressDraftedPrescriptionTreatmentId = props.formStore.treatment?.value?.id;
 
     const draftedPrescriptions = [...props.formStore.draftPrescriptions.value];
@@ -219,8 +218,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     });
 
     setScreeningAlerts(data.prescriptionScreen?.alerts);
-
-    setIsLoading(false);
   };
 
   const dispatchPrescriptionsError = (errors: readonly GraphQLError[]) => {
