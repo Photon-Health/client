@@ -169,8 +169,7 @@ export default function RecentOrdersCombineDialog() {
           patientId: state.patientId,
           // +1 here because we're using the refillsInput
           fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
-          treatmentId: draft.treatment.id,
-          screeningAlerts: []
+          treatmentId: draft.treatment.id
         }))
       }
     });
