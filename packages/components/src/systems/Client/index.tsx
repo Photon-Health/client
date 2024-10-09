@@ -20,6 +20,7 @@ type ClientProps = {
   children?: JSXElement;
   context?: any;
   createStore?: typeof createStore;
+  connection?: string;
 };
 
 export default function Client(props: ClientProps) {
@@ -30,7 +31,8 @@ export default function Client(props: ClientProps) {
     clientId: props.id!,
     redirectURI: props.redirectUri ? props.redirectUri : window.location.origin,
     organization: props.org,
-    developmentMode: props.developmentMode
+    developmentMode: props.developmentMode,
+    connection: props.connection
   });
 
   const store = props?.createStore

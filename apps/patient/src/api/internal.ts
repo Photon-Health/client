@@ -98,11 +98,16 @@ export const markOrderAsPickedUp = async (orderId: string) => {
   }
 };
 
-export const rerouteOrder = async (orderId: string, pharmacyId: string) => {
+export const rerouteOrder = async (
+  orderId: string,
+  pharmacyId: string,
+  patientSelectedPrice: boolean
+) => {
   try {
     const response = await graphQLClient.RerouteOrder({
       orderId,
-      pharmacyId
+      pharmacyId,
+      patientSelectedPrice
     });
     if (response?.rerouteOrder) {
       return true;
@@ -121,7 +126,8 @@ export const setOrderPharmacy = async (
   pharmacyId: string,
   readyBy?: string,
   readyByDay?: string,
-  readyByTime?: Date
+  readyByTime?: Date,
+  patientSelectedPrice?: boolean
 ) => {
   try {
     const response = await graphQLClient.SetOrderPharmacy({
@@ -129,7 +135,8 @@ export const setOrderPharmacy = async (
       orderId,
       readyBy,
       readyByDay,
-      readyByTime
+      readyByTime,
+      patientSelectedPrice
     });
 
     if (response?.setOrderPharmacy) {

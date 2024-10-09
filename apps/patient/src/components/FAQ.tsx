@@ -39,7 +39,7 @@ const questions = [
 
 export const FAQContents = () => {
   return (
-    <Accordion allowToggle>
+    <Accordion allowToggle w="full">
       {questions.map(({ question, answer }, idx) => (
         <AccordionItem
           key={question}
