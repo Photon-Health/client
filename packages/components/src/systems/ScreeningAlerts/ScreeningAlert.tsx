@@ -100,7 +100,7 @@ export const ScreeningAlert = (props: { owningId: string; screeningAlert: Screen
                     <Text bold class="mb-2">
                       {entityId}
                     </Text>
-                    {descriptor}
+                    {' ' + descriptor}
                     {index() <
                       filterOutOwningId(props.owningId, props.screeningAlert.involvedEntityIds)
                         .length -
