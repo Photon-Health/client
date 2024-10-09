@@ -213,6 +213,8 @@ export const AddPrescriptionCard = (props: {
               key: 'treatment',
               value: e.detail.medication
             });
+
+            props.draftedPrescriptionChanged();
           }}
         >
           <photon-medication-search
@@ -249,6 +251,8 @@ export const AddPrescriptionCard = (props: {
                 props.actions,
                 props?.prefillNotes ? { notes: props.prefillNotes } : undefined
               );
+
+              props.draftedPrescriptionChanged();
             }}
             on:photon-search-text-changed={(e: any) => setSearchText(e.detail.text)}
           />

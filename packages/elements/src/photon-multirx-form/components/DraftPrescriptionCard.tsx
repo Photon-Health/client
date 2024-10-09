@@ -24,6 +24,7 @@ export const DraftPrescriptionCard = (props: {
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
   setIsEditing: (isEditing: boolean) => void;
+  draftedPrescriptionDeleted: () => void;
   screeningAlerts: ScreeningAlertType[];
 }) => {
   let ref: Ref<any> | undefined;
@@ -70,6 +71,8 @@ export const DraftPrescriptionCard = (props: {
           document.body.getBoundingClientRect().top -
           70
       });
+
+      props.draftedPrescriptionDeleted();
     }
   };
 
@@ -114,6 +117,8 @@ export const DraftPrescriptionCard = (props: {
       // reopen form if all drafts are deleted
       props.setIsEditing(true);
     }
+
+    props.draftedPrescriptionDeleted();
   };
   const handleDeleteCancel = () => {
     setDeleteDialogOpen(false);

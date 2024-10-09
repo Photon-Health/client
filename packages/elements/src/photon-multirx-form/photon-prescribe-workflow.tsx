@@ -541,6 +541,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   actions={props.formActions}
                   store={props.formStore}
                   setIsEditing={setIsEditing}
+                  draftedPrescriptionDeleted={function () {
+                    screenDraftedPrescriptions();
+                  }}
                   screeningAlerts={screeningAlerts()}
                 />
                 <Show when={props.enableOrder && !props.pharmacyId}>
