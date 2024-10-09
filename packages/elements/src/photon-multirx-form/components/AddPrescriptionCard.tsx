@@ -50,8 +50,8 @@ export const AddPrescriptionCard = (props: {
   weightUnit?: string;
   prefillNotes?: string;
   enableCombineAndDuplicate?: boolean;
-  screenDraftedPrescriptions: (...args: any) => any;
-  draftedPrescriptionChanged: (...args: any) => any;
+  screenDraftedPrescriptions: () => void;
+  draftedPrescriptionChanged: () => void;
   screeningAlerts: ScreeningAlertType[];
 }) => {
   const client = usePhoton();
