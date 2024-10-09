@@ -52,6 +52,13 @@ function showHolidayDisclaimer() {
   }
 }
 
+function showHurricaneAlert(location: string) {
+  if (!location.match(/FL|GA/)) return false;
+  const today = dayjs().format('YYYY-MM-DD');
+  console.log('today', today);
+  return today >= '2024-10-09' && today <= '2024-10-14';
+}
+
 interface PickupOptionsProps {
   pharmacies: EnrichedPharmacy[];
   preferredPharmacy: string;
@@ -67,9 +74,11 @@ interface PickupOptionsProps {
   enable24Hr: boolean;
   setEnableOpenNow: (isOpen: boolean) => void;
   setEnable24Hr: (is24Hr: boolean) => void;
+  location: string;
 }
 
 export const PickupOptions = ({
+  location,
   preferredPharmacy,
   savingPreferred,
   pharmacies,
@@ -121,6 +130,27 @@ export const PickupOptions = ({
               <HStack>
                 <Icon color="orange.500" as={FiInfo} fontWeight="bold" />
                 <Text fontWeight="semibold">Hours may differ due to holiday</Text>
+              </HStack>
+            </CardBody>
+          </Card>
+        </VStack>
+      ) : null}
+      {showHurricaneAlert(location) ? (
+        <VStack align="span" spacing={2}>
+          <Card
+            bgColor="white"
+            border="1px solid"
+            borderColor="orange.500"
+            borderRadius="lg"
+            mx={{ base: -3, md: undefined }}
+            color="orange.500"
+          >
+            <CardBody p={3}>
+              <HStack>
+                <Icon color="orange.500" as={FiInfo} fontWeight="bold" />
+                <Text fontWeight="semibold">
+                  Due to hurricane, pharmacies may be closed or experiencing delays.
+                </Text>
               </HStack>
             </CardBody>
           </Card>
