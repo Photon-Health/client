@@ -77,7 +77,10 @@ export type PrescribeProps = {
 };
 
 export const ScreenDraftedPrescriptionsQuery = gql`
-  query ScreenDraftedPrescriptionsQuery($draftedPrescriptions: [DraftedPrescriptionInput!]!, $patientId: ID!) {
+  query ScreenDraftedPrescriptionsQuery(
+    $draftedPrescriptions: [DraftedPrescriptionInput!]!
+    $patientId: ID!
+  ) {
     prescriptionScreen(draftedPrescriptions: $draftedPrescriptions, patientId: $patientId) {
       alerts {
         type
