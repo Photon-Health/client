@@ -232,46 +232,44 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
         <For each={merged.draftPrescriptions}>
           {(draft: DraftPrescription) => {
             return (
-              <>
-                <DraftPrescription
-                  LeftChildren={
-                    <>
-                      <Text>{draft.treatment.name}</Text>
-                      <Text color="gray" size="sm">
-                        {formatRxString({
-                          // need to use nullish coalescing here because draft types are eg `Maybe<number> | undefined`
-                          dispenseQuantity: draft?.dispenseQuantity ?? undefined,
-                          dispenseUnit: draft?.dispenseUnit ?? undefined,
-                          fillsAllowed: draft?.fillsAllowed ?? undefined,
-                          instructions: draft?.instructions ?? undefined
-                        })}
-                      </Text>
-                    </>
-                  }
-                  RightChildren={
-                    <>
-                      <button onClick={() => merged.handleEdit && merged.handleEdit(draft.id)}>
-                        <Icon
-                          name="pencilSquare"
-                          size="sm"
-                          class="text-gray-500 hover:text-amber-500"
-                        />
-                      </button>
-                      <button onClick={() => merged.handleDelete && merged.handleDelete(draft.id)}>
-                        <Icon name="trash" size="sm" class="text-gray-500 hover:text-red-500" />
-                      </button>
-                    </>
-                  }
-                  BottomChildren={
-                    <>
-                      <ScreeningAlerts
-                        screeningAlerts={props.screeningAlerts}
-                        owningId={draft.treatment.id}
+              <DraftPrescription
+                LeftChildren={
+                  <>
+                    <Text>{draft.treatment.name}</Text>
+                    <Text color="gray" size="sm">
+                      {formatRxString({
+                        // need to use nullish coalescing here because draft types are eg `Maybe<number> | undefined`
+                        dispenseQuantity: draft?.dispenseQuantity ?? undefined,
+                        dispenseUnit: draft?.dispenseUnit ?? undefined,
+                        fillsAllowed: draft?.fillsAllowed ?? undefined,
+                        instructions: draft?.instructions ?? undefined
+                      })}
+                    </Text>
+                  </>
+                }
+                RightChildren={
+                  <>
+                    <button onClick={() => merged.handleEdit && merged.handleEdit(draft.id)}>
+                      <Icon
+                        name="pencilSquare"
+                        size="sm"
+                        class="text-gray-500 hover:text-amber-500"
                       />
-                    </>
-                  }
-                />
-              </>
+                    </button>
+                    <button onClick={() => merged.handleDelete && merged.handleDelete(draft.id)}>
+                      <Icon name="trash" size="sm" class="text-gray-500 hover:text-red-500" />
+                    </button>
+                  </>
+                }
+                BottomChildren={
+                  <>
+                    <ScreeningAlerts
+                      screeningAlerts={props.screeningAlerts}
+                      owningId={draft.treatment.id}
+                    />
+                  </>
+                }
+              />
             );
           }}
         </For>
