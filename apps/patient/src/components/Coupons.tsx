@@ -1,28 +1,55 @@
-import { Box, HStack, Icon, Text, VStack } from '@chakra-ui/react';
-import { FC, useState } from 'react';
+import { Box, Heading, HStack, Icon, Text, VStack } from '@chakra-ui/react';
+import { useState } from 'react';
 import { FiInfo } from 'react-icons/fi';
-import { CouponModal } from '../components';
+import { CouponModal } from '.';
 import { text as t } from '../utils/text';
 import { useOrderContext } from '../views/Main';
+import { DiscountCard } from '../__generated__/graphql';
+import { Card } from './Card';
 
-export const CouponDetails: FC = () => {
-  const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
+export const Coupons = () => {
   const { order } = useOrderContext();
 
   if (!order.discountCards || order.discountCards.length === 0) {
     return null;
   }
 
-  const { price, bin, pcn, group, memberId } = order.discountCards[0];
+  const discountCards = order.discountCards.filter(
+    // Filter out discount cards that don't apply to the current pharmacy
+    // If the order was rerouted, we might have discount cards from the previous pharmacy
+    (card) => card.pharmacyId === order.pharmacy?.id
+  );
+
+  if (discountCards.length === 0) {
+    return null;
+  }
+
+  return (
+    <VStack w="full" alignItems="stretch" spacing={4}>
+      <Heading as="h4" size="md">
+        {discountCards.length > 1 ? 'Coupons' : 'Coupon'}
+      </Heading>
+      {discountCards.map((card) => (
+        <Coupon key={card.id} coupon={card} />
+      ))}
+    </VStack>
+  );
+};
+
+type CouponProps = Pick<DiscountCard, 'price' | 'bin' | 'pcn' | 'group' | 'memberId'>;
+export const Coupon = ({ coupon }: { coupon: CouponProps }) => {
+  const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
+
+  const { price, bin, pcn, group, memberId } = coupon;
 
   if (!price || !bin || !pcn || !group || !memberId) {
     return null;
   }
 
   return (
-    <VStack w="full" spacing={4} mx={0}>
+    <Card>
       <CouponModal isOpen={couponModalOpen} onClose={() => setCouponModalOpen(false)} />
-      <Text fontSize="4xl" fontWeight="700" py={0} lineHeight="1">
+      <Text fontSize="4xl" alignSelf="center" fontWeight="700" py={0} lineHeight="1">
         ${price.toFixed(2)}
       </Text>
       <Box bgColor="blue.50" w="full" textAlign="center" p={2} borderRadius="xl">
@@ -56,7 +83,7 @@ export const CouponDetails: FC = () => {
           </Text>
         </HStack>
       </VStack>
-      <HStack color="blue.500">
+      <HStack color="blue.500" w="full" justify="center">
         <Icon as={FiInfo} />
         <Text
           as="u"
@@ -69,6 +96,6 @@ export const CouponDetails: FC = () => {
           {t.howToCoupon}
         </Text>
       </HStack>
-    </VStack>
+    </Card>
   );
 };
