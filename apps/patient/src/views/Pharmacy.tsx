@@ -826,6 +826,7 @@ export const Pharmacy = () => {
             ) : null}
 
             <PickupOptions
+              location={location}
               pharmacies={allPharmacies}
               preferredPharmacy={preferredPharmacyId}
               savingPreferred={savingPreferred}
