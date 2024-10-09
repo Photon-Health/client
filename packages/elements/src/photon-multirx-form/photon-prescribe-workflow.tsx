@@ -85,7 +85,11 @@ export const ScreenDraftedPrescriptionsQuery = gql`
       alerts {
         type
         description
-        involvedEntityIds
+        involvedEntities {
+          id
+          name
+          type
+        }
         severity
       }
     }

@@ -13,7 +13,12 @@ export const ScreeningAlerts = (props: {
   return (
     <>
       {props.screeningAlerts
-        .filter((screeningAlert) => screeningAlert.involvedEntityIds.indexOf(props.owningId) > 0)
+        .filter(
+          (screeningAlert) =>
+            screeningAlert.involvedEntities
+              .map((involvedEntity) => involvedEntity.id)
+              .indexOf(props.owningId) > 0
+        )
         .map((screeningAlert) => (
           <ScreeningAlert screeningAlert={screeningAlert} owningId={props.owningId} />
         ))}

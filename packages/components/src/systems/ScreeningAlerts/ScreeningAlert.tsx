@@ -6,7 +6,7 @@ export interface ScreeningAlertType {
   description: string;
   type: string;
   severity: string;
-  involvedEntityIds: string[];
+  involvedEntities: { id: string; name: string; type: string }[];
 }
 
 /**
@@ -34,20 +34,19 @@ const getColorBySeverity = (
 };
 
 /**
- * Helper function to get the descriptor of the id to help contextualize the information
+ * Helper function to get the human readable descriptor returned by the screening endpoint
  */
-const getDescriptorOfId = (owningId: string) => {
-  const firstThreeChars = owningId.slice(0, 3);
+const getDescriptorByType = (type: string) => {
+  switch (type) {
+    case 'drafted_prescription':
+      return '(Pending Prescription)';
 
-  if (firstThreeChars === 'med') {
-    return 'Pending Rx';
+    case 'existing_prescription':
+      return '(Existing Prescription)';
+
+    default:
+      return '';
   }
-
-  if (firstThreeChars === 'rx_') {
-    return 'Existing Rx';
-  }
-
-  return 'TBD';
 };
 
 /**
@@ -55,8 +54,11 @@ const getDescriptorOfId = (owningId: string) => {
  * so we don't show unnecessary duplicate information that is present
  * by nature of the association
  */
-const filterOutOwningId = (owningId: string, involvedEntityIds: string[]): string[] => {
-  return involvedEntityIds.filter((element) => element !== owningId);
+const filterOutOwningId = (
+  owningId: string,
+  involvedEntities: { id: string; name: string; type: string }[]
+): { id: string; name: string; type: string }[] => {
+  return involvedEntities.filter((element) => element.id !== owningId);
 };
 
 /**
@@ -92,17 +94,16 @@ export const ScreeningAlert = (props: { owningId: string; screeningAlert: Screen
             </Text>
             {' interaction with '}
 
-            <For each={filterOutOwningId(props.owningId, props.screeningAlert.involvedEntityIds)}>
-              {(entityId, index) => {
-                const descriptor = `(${getDescriptorOfId(entityId)})`;
+            <For each={filterOutOwningId(props.owningId, props.screeningAlert.involvedEntities)}>
+              {(entity, index) => {
                 return (
                   <span>
                     <Text bold class="mb-2">
-                      {entityId}
+                      {entity.name}
                     </Text>
-                    {' ' + descriptor}
+                    {' ' + getDescriptorByType(entity.type)}
                     {index() <
-                      filterOutOwningId(props.owningId, props.screeningAlert.involvedEntityIds)
+                      filterOutOwningId(props.owningId, props.screeningAlert.involvedEntities)
                         .length -
                         1 && ' and '}
                   </span>
