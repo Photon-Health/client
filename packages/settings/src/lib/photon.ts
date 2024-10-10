@@ -12,7 +12,9 @@ import {
   AMBROSIA_PHARMACY_ID,
   WOMENS_INTERNATIONAL_PHARMACY_ID,
   REDROCK_SPRINGVILLE_PHARMACY_ID,
-  REDROCK_STGEORGE_PHARMACY_ID
+  REDROCK_STGEORGE_PHARMACY_ID,
+  COST_PLUS_PHARMACY_ID,
+  WALMART_MAIL_ORDER_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -225,8 +227,12 @@ const organizationSettings: {
   org_boRh5PcUzFhvyiue: {
     logo: 'sana_care_logo.png',
     accentColor: '#FBCC45',
-    mailOrderNavigate: false,
-    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [
+      AMAZON_PHARMACY_ID,
+      COST_PLUS_PHARMACY_ID,
+      WALMART_MAIL_ORDER_PHARMACY_ID
+    ],
     enableMedHistory: true
   },
   // Blueberry Pediatrics
