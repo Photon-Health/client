@@ -1,3 +1,4 @@
+import { getSettings } from '@client/settings';
 import { PrescriptionFulfillmentState } from '../../__generated__/graphql';
 import { getLatestReadyTime } from '../../utils/fulfillmentsHelpers';
 import { Order } from '../../utils/models';
@@ -75,8 +76,13 @@ const MESSAGE: { [key in ExceptionData['exceptionType']]: (order: Order) => stri
         ? 'you can change your pharmacy below'
         : 'locate a pharmacy that has it in stock and we will send it there'
     }.`,
-  PA_REQUIRED: () =>
-    'Your insurance needs information from your provider to cover this medication. Contact your provider for alternatives or pay the cash price.'
+  PA_REQUIRED: ({ organization }) => {
+    const { paExceptionMessage } = getSettings(organization.id);
+    return (
+      paExceptionMessage ??
+      'Your insurance needs information from your provider to cover this medication. Contact your provider for alternatives or pay the cash price.'
+    );
+  }
 };
 
 const ExceptionsBlock = ({ exception }: { exception: ExceptionData }) => {
