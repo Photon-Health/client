@@ -9,7 +9,7 @@ const CATALOG_FIELDS = gql`
     id
   }
 `;
-const CatalogtFieldsMap = { CatalogFields: CATALOG_FIELDS };
+const CatalogFieldsMap = { CatalogFields: CATALOG_FIELDS };
 
 const CATALOG_TREATMENTS_FIELDS = gql`
   fragment CatalogTreatmentsFields on Catalog {
@@ -70,7 +70,7 @@ const createCatalogStore = () => {
       isLoading: true
     });
     const { data, errors } = await client.clinical.catalog.getCatalogs({
-      fragment: CatalogtFieldsMap
+      fragment: CatalogFieldsMap
     });
     setStore('catalogs', {
       ...store.catalogs,
