@@ -72,6 +72,8 @@ export type PrescribeProps = {
   formStore?: any;
   formActions?: any;
   externalOrderId?: string;
+  catalogId?: string;
+  allowOffCatalogSearch?: boolean;
 };
 
 export function PrescribeWorkflow(props: PrescribeProps) {
@@ -453,6 +455,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       weightUnit={props.weightUnit}
                       prefillNotes={prefillNotes}
                       enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+                      catalogId={props.catalogId}
+                      allowOffCatalogSearch={props.allowOffCatalogSearch}
                     />
                   </div>
                 </Show>
