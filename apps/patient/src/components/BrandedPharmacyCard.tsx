@@ -4,8 +4,8 @@ import capsuleLogo from '../assets/capsule_logo_small.png';
 import amazonPharmacyLogo from '../assets/amazon_pharmacy_logo_small.png';
 import altoLogo from '../assets/alto_logo.svg';
 import costcoLogo from '../assets/costco_logo_small.png';
-import costPlusLogoSmall from '../assets/cost_plus_logo_small_1.svg';
-import walmartLogoSmall from '../assets/walmart_small.svg';
+import costPlusLogoSmall from '../assets/cost_plus_logo_small_circle.svg';
+import walmartLogoSmall from '../assets/walmart_logo_small_circle.svg';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import { PharmacyInfo } from './PharmacyInfo';
@@ -76,7 +76,7 @@ export const BrandedPharmacyCard = ({ pharmacyId, selected, handleSelect }: Prop
           availableInYourArea={brand.name === 'Capsule Pharmacy'}
           freeDelivery={brand.name === 'Amazon Pharmacy'}
           boldPharmacyName={false}
-          showDetails={brand.name !== 'Cost Plus Pharmacy' && brand.name !== 'Walmart Pharmacy'}
+          showDetails={brand.name !== 'Cost Plus Pharmacy'}
         />
       </CardBody>
     </Card>
