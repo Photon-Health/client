@@ -38,7 +38,8 @@ export const PHARMACY_BRANDING = {
   },
   [process.env.REACT_APP_WALMART_MAIL_ORDER_PHARMACY_ID as string]: {
     logo: walmartLogoSmall,
-    name: 'Walmart Pharmacy'
+    name: 'Walmart Pharmacy',
+    description: 'Overnight shipping available'
   },
   ...Object.fromEntries(
     Object.keys(capsulePharmacyIdLookup).map((id) => [
