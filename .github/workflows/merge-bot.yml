@@ -22,7 +22,7 @@ jobs:
           app_id: ${{ secrets.CPR_APP_ID }}
           private_key: ${{ secrets.CPR_APP_SECRET }}
       - name: Fail if not ready
-        if: ${{ !contains(github.event.pull_request.labels.*.name, 'ready') }}
+        if: ${{ !(contains(github.event.pull_request.labels.*.name, 'ready') || contains(github.event.pull_request.labels.*.name, 'ready to merge')) }}
         run: |
           gh pr merge --disable-auto --merge
           exit 1
