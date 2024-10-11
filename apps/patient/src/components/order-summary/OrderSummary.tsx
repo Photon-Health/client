@@ -5,6 +5,7 @@ import { Order } from '../../utils/models';
 import { useOrderContext } from '../../views/Main';
 import { Card } from '../Card';
 import { Box, Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
+import { getSettings } from '@client/settings';
 import dayjs from 'dayjs';
 import { groupBy } from 'lodash';
 

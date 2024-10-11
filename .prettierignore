@@ -7,3 +7,5 @@
 # gql codegen
 /apps/app/src/gql
 __generated__
+/.nx/cache
+/.nx/workspace-data

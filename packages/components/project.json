@@ -1,8 +1,7 @@
 {
   "name": "components",
-  "root": "packages/components",
-  "sourceRoot": "packages/components/src",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/components/src",
   "projectType": "package",
   "targets": {
     "build": {

@@ -1,8 +1,7 @@
 {
   "name": "patient",
-  "root": "apps/patient",
-  "sourceRoot": "apps/patient/src",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/patient/src",
   "projectType": "application",
   "targets": {
     "codegen": {
