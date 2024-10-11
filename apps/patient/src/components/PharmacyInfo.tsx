@@ -236,7 +236,6 @@ export const PharmacyInfo = ({
   const showFreeDeliveryTag = freeDelivery;
   const whiteLabelDeliveryPharmacy =
     pharmacy.name === 'Capsule Pharmacy' && location.pathname === '/pharmacy';
-
   return (
     <VStack align="start" w="full">
       {showPreferredTag ||
