@@ -34,7 +34,8 @@ export const PHARMACY_BRANDING = {
   },
   [process.env.REACT_APP_COST_PLUS_PHARMACY_ID as string]: {
     logo: costPlusLogoSmall,
-    name: 'Cost Plus Pharmacy'
+    name: 'Cost Plus Pharmacy',
+    description: 'Delivery starting at $5'
   },
   [process.env.REACT_APP_WALMART_MAIL_ORDER_PHARMACY_ID as string]: {
     logo: walmartLogoSmall,
@@ -76,7 +77,6 @@ export const BrandedPharmacyCard = ({ pharmacyId, selected, handleSelect }: Prop
           availableInYourArea={brand.name === 'Capsule Pharmacy'}
           freeDelivery={brand.name === 'Amazon Pharmacy'}
           boldPharmacyName={false}
-          showDetails={brand.name !== 'Cost Plus Pharmacy'}
         />
       </CardBody>
     </Card>
