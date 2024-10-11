@@ -94,16 +94,14 @@ function getFilteredData(
   const { store } = CatalogStore;
 
   // If no data, return empty array
-  if (store.catalogs.data.length === 0 && treatmentOptions.length === 0) return [];
+  if (!store.catalog.data) return [];
 
   const catalogData = [
     ...(props.offCatalogOption ? [props.offCatalogOption as Treatment] : []),
-    ...(store.catalogs.data.length > 0
-      ? store.catalogs.data[0].templates.map((x) => x as PrescriptionTemplate)
+    ...(store.catalog.data
+      ? store.catalog.data.templates.map((x) => x as PrescriptionTemplate)
       : []),
-    ...(store.catalogs.data.length > 0
-      ? store.catalogs.data[0].treatments.map((x) => x as Treatment)
-      : []),
+    ...(store.catalog.data ? store.catalog.data.treatments.map((x) => x as Treatment) : []),
     ...treatmentOptions
   ];
 
@@ -231,6 +229,7 @@ interface ComponentProps {
   invalid?: boolean;
   helpText?: string;
   catalogId?: string;
+  allowOffCatalogSearch?: boolean;
   disabled: boolean;
   formName?: string;
   selected?: Treatment | PrescriptionTemplate | TreatmentOption;
@@ -247,11 +246,18 @@ const Component = (props: ComponentProps) => {
   const [showFullWidthSearch, setShowFullWidthSearch] = createSignal<boolean>(false);
 
   onMount(async () => {
-    await actions.getCatalogs(client!.getSDK());
+    if (props.catalogId) {
+      await actions.getCatalog(client!.getSDK(), props.catalogId);
+    } else {
+      await actions.getCatalogs(client!.getSDK());
+      if (store.catalogs.data && store.catalogs.data.length > 0) {
+        await actions.getCatalog(client!.getSDK(), store.catalogs.data[0].id);
+      }
+    }
   });
 
   createEffect(() => {
-    if (store.catalogs.data.length > 0) {
+    if (store.catalog.data) {
       tryLoadTreatmentOptions(props.searchText);
     }
   });
@@ -260,7 +266,8 @@ const Component = (props: ComponentProps) => {
     setLoadingTreatmentOptions(true);
 
     const treatmentOptions =
-      searchTerm?.length >= 3 // 3 min chars for smaller responses
+      searchTerm?.length >= 3 && // 3 min chars for smaller responses
+      props.allowOffCatalogSearch
         ? await loadTreatmentOptions(client!.sdk.apolloClinical, searchTerm)
         : // Set treatment options to empty array if search term is empty
           [];
@@ -294,7 +301,7 @@ const Component = (props: ComponentProps) => {
     <div
       ref={ref}
       on:photon-data-selected={(e: any) => {
-        dispatchTreatmentSelected(ref, e.detail.data, store.catalogs.data![0]?.id || '');
+        dispatchTreatmentSelected(ref, e.detail.data, store.catalog.data!.id || '');
 
         if ('treatment' in e.detail.data) {
           dispatchSearchTextChanged(ref, e.detail.data.treatment.name);
@@ -319,7 +326,9 @@ const Component = (props: ComponentProps) => {
           required={props.required ?? false}
           placeholder="Type medication"
           invalid={props.invalid ?? false}
-          isLoading={store.catalogs.isLoading || loadingTreatmentOptions()}
+          isLoading={
+            store.catalogs.isLoading || store.catalog.isLoading || loadingTreatmentOptions()
+          }
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
           displayAccessor={displayAccessor}
@@ -346,7 +355,7 @@ const Component = (props: ComponentProps) => {
           required={props.required ?? false}
           placeholder="Type medication"
           invalid={props.invalid ?? false}
-          isLoading={store.catalogs.isLoading}
+          isLoading={store.catalogs.isLoading || store.catalog.isLoading}
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
           displayAccessor={displayAccessor}
@@ -374,7 +383,9 @@ const Component = (props: ComponentProps) => {
           required={props.required ?? false}
           placeholder="Type medication"
           invalid={props.invalid ?? false}
-          isLoading={store.catalogs.isLoading || loadingTreatmentOptions()}
+          isLoading={
+            store.catalogs.isLoading || store.catalog.isLoading || loadingTreatmentOptions()
+          }
           hasMore={false}
           selectedData={props.selected ?? (props.offCatalogOption as Treatment)}
           displayAccessor={displayAccessor}
@@ -405,6 +416,7 @@ customElement(
     invalid: false,
     helpText: undefined,
     catalogId: undefined,
+    allowOffCatalogSearch: true,
     disabled: false,
     formName: undefined,
     selected: undefined,
