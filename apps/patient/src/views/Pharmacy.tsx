@@ -581,6 +581,12 @@ export const Pharmacy = () => {
             } else if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
               type = 'MAIL_ORDER';
               selectedPharmacy = { id: selectedId, name: 'Amazon Pharmacy' };
+            } else if (selectedId === process.env.REACT_APP_COST_PLUS_PHARMACY_ID) {
+              type = 'MAIL_ORDER';
+              selectedPharmacy = { id: selectedId, name: 'Cost Plus Pharmacy' };
+            } else if (selectedId === process.env.REACT_APP_WALMART_MAIL_ORDER_PHARMACY_ID) {
+              type = 'MAIL_ORDER';
+              selectedPharmacy = { id: selectedId, name: 'Walmart Pharmacy' };
             } else if (selectedId === process.env.REACT_APP_COSTCO_PHARMACY_ID) {
               type = 'MAIL_ORDER';
               selectedPharmacy = { id: selectedId, name: 'Costco Pharmacy' };
