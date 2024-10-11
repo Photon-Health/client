@@ -16,7 +16,9 @@ import {
   FOOTHILLS_PHARMACY_ID,
   SMARTSCRIPTS_PHARMACY_ID,
   OLYMPIA_PHARMACY_ID,
-  REDROCK_STGEORGE_PHARMACY_ID
+  REDROCK_STGEORGE_PHARMACY_ID,
+  COST_PLUS_PHARMACY_ID,
+  WALMART_MAIL_ORDER_PHARMACY_ID
 } from '../pharmacies';
 
 /**
@@ -86,8 +88,11 @@ const organizationSettings: {
     ],
     topRankedWalgreens: true,
     mailOrderNavigate: true,
-    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
-    enableCourierNavigate: true
+    mailOrderNavigateProviders: [
+      AMAZON_PHARMACY_ID,
+      COST_PLUS_PHARMACY_ID,
+      WALMART_MAIL_ORDER_PHARMACY_ID
+    ]
   },
   // NewCo (demo's)
   org_YiUudCToTSrjOuow: {
