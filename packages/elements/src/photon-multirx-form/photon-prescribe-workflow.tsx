@@ -21,7 +21,8 @@ import {
   TemplateOverrides,
   Toaster,
   triggerToast,
-  useRecentOrders
+  useRecentOrders,
+  useScreeningAlertAcknowledgement
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { Order, Prescription } from '@photonhealth/sdk/dist/types';
@@ -88,7 +89,7 @@ export const ScreenDraftedPrescriptionsQuery = gql`
         involvedEntities {
           id
           name
-          type
+          __typename
         }
         severity
       }
@@ -110,6 +111,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     client?.authentication.state.isAuthenticated || false
   );
   const [, recentOrdersActions] = useRecentOrders();
+  const [, screeningAlertsAcknowledgementActions] = useScreeningAlertAcknowledgement();
   const [screeningAlerts, setScreeningAlerts] = createSignal<ScreeningAlertType[]>([]);
 
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
@@ -269,6 +271,14 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       }
     });
     ref?.dispatchEvent(event);
+  };
+
+  const displayAlertsWarning = () => {
+    return screeningAlertsAcknowledgementActions.setIsAlertAcknowledgementDialogOpen(
+      true,
+      screeningAlerts(),
+      () => submitForm(props.enableOrder)
+    );
   };
 
   // before submitting the form, show combine dialog if there is a routing order for the patient
@@ -436,6 +446,12 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   // decide whether to show the combine modal or submit the form
   const combineOrSubmit = () => {
+    // if we have allerts we'll want the prescriber to acknowledge them
+    // first
+    if (screeningAlerts().length > 0) {
+      return displayAlertsWarning();
+    }
+
     if (props.enableCombineAndDuplicate && recentOrdersActions.hasRoutingOrder()) {
       return displayCombineDialog();
     }

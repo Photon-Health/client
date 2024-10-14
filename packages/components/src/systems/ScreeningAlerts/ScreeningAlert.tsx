@@ -6,7 +6,7 @@ export interface ScreeningAlertType {
   description: string;
   type: string;
   severity: string;
-  involvedEntities: { id: string; name: string; type: string }[];
+  involvedEntities: { id: string; name: string; ___typename: string }[];
 }
 
 /**
@@ -24,11 +24,11 @@ const getColorBySeverity = (
 ): { icon: string; background: string; border: string } => {
   switch (severity) {
     default:
-    case 'minor':
+    case 'MINOR':
       return { icon: 'text-blue-800 ', background: 'bg-blue-50', border: 'border-blue-200' };
-    case 'moderate':
+    case 'MODERATE':
       return { icon: 'text-yellow-800 ', background: 'bg-yellow-50', border: 'border-yellow-200' };
-    case 'major':
+    case 'MAJOR':
       return { icon: 'text-red-800 ', background: 'bg-red-50', border: 'border-yellow-200' };
   }
 };
@@ -38,10 +38,10 @@ const getColorBySeverity = (
  */
 const getDescriptorByType = (type: string) => {
   switch (type) {
-    case 'drafted_prescription':
+    case 'PrescriptionScreeningAlertInvolvedDraftedPrescription':
       return '(Pending Prescription)';
 
-    case 'existing_prescription':
+    case 'PrescriptionScreeningAlertInvolvedExistingPrescription':
       return '(Existing Prescription)';
 
     default:
@@ -56,8 +56,8 @@ const getDescriptorByType = (type: string) => {
  */
 const filterOutOwningId = (
   owningId: string,
-  involvedEntities: { id: string; name: string; type: string }[]
-): { id: string; name: string; type: string }[] => {
+  involvedEntities: { id: string; name: string; ___typename: string }[]
+): { id: string; name: string; ___typename: string }[] => {
   return involvedEntities.filter((element) => element.id !== owningId);
 };
 
@@ -101,7 +101,7 @@ export const ScreeningAlert = (props: { owningId: string; screeningAlert: Screen
                     <Text bold class="mb-2">
                       {entity.name}
                     </Text>
-                    {' ' + getDescriptorByType(entity.type)}
+                    {' ' + getDescriptorByType(entity.___typename)}
                     {index() <
                       filterOutOwningId(props.owningId, props.screeningAlert.involvedEntities)
                         .length -
