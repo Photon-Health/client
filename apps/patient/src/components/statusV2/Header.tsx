@@ -14,6 +14,9 @@ export interface OrderStatusHeaderProps {
     | 'BACKORDERED'
     | 'OOS'
     | 'PA_REQUIRED'
+    | 'REFILL_TOO_SOON'
+    | 'HIGH_COPAY'
+    | 'NOT_COVERED'
     | 'PHARMACY_CLOSED'
     | 'PHARMACY_UNREACHABLE'
     | 'ORDER_ERROR';
@@ -64,7 +67,8 @@ function subheaderText(props: OrderStatusHeaderProps) {
   if (
     props.exception === 'BACKORDERED' ||
     props.exception === 'OOS' ||
-    props.exception === 'PA_REQUIRED'
+    props.exception === 'PA_REQUIRED' ||
+    props.exception === 'REFILL_TOO_SOON'
   ) {
     return 'Please review your order for details.';
   }
