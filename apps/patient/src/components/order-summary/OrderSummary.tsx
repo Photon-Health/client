@@ -10,7 +10,13 @@ import { groupBy } from 'lodash';
 
 export interface ExceptionData {
   message?: string;
-  exceptionType: 'OOS' | 'BACKORDERED' | 'PA_REQUIRED';
+  exceptionType:
+    | 'OOS'
+    | 'BACKORDERED'
+    | 'PA_REQUIRED'
+    | 'REFILL_TOO_SOON'
+    | 'HIGH_COPAY'
+    | 'NOT_COVERED';
 }
 
 export interface FulfillmentData {
@@ -82,18 +88,26 @@ const MESSAGE: { [key in ExceptionData['exceptionType']]: (order: Order) => stri
       paExceptionMessage ??
       'Your insurance needs information from your provider to cover this medication. Contact your provider for alternatives or pay the cash price.'
     );
-  }
+  },
+  REFILL_TOO_SOON: () =>
+    `Your insurance informed the pharmacy that it's too soon for a refill. You can wait, or you can pay cash or use a discount card if you need it sooner.`,
+  NOT_COVERED: () =>
+    `This prescription may not be covered by your insurance. You can still pay cash or use a discount card so you can get the medication you need. Your provider may also be able to help you find a covered alternative.`,
+  HIGH_COPAY: () =>
+    `This medication may have a high out of pocket cost. You may be able to use a discount card and pay significantly less.`
+};
+
+const TITLE: Partial<{ [key in ExceptionData['exceptionType']]: string }> = {
+  BACKORDERED: 'Backordered',
+  OOS: 'Out of stock',
+  PA_REQUIRED: 'Approval required',
+  REFILL_TOO_SOON: 'Refill too soon',
+  HIGH_COPAY: 'High cost alert',
+  NOT_COVERED: 'Not covered by insurance'
 };
 
 const ExceptionsBlock = ({ exception }: { exception: ExceptionData }) => {
-  const exceptionName =
-    exception.exceptionType === 'BACKORDERED'
-      ? 'Backordered'
-      : exception.exceptionType === 'OOS'
-      ? 'Out of stock'
-      : exception.exceptionType === 'PA_REQUIRED'
-      ? 'Approval required'
-      : undefined;
+  const exceptionName = TITLE[exception.exceptionType];
   const { order } = useOrderContext();
   return (
     <Box bg="orange.100" borderRadius={'xl'} p={3}>

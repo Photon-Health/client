@@ -194,7 +194,6 @@ export const text = {
       isPlural ? 'prescriptions' : 'prescription'
     }.`,
   showingLabel: 'Showing pharmacies near',
-  showingAll: 'Showing all pharmacies',
   showMore: 'Show more pharmacies',
   thankYou: 'Thank you!',
   track: 'Track your order',
