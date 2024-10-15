@@ -18,7 +18,7 @@ import { getMatchingPartsFromSubstring } from '../../../../../utils';
 
 export const SearchTreatmentOptionsQuery = gql`
   query SearchTreatmentOptions($searchTerm: String!) {
-    treatmentOptions(searchTerm: $searchTerm) {
+    treatments(searchTerm: $searchTerm) {
       id: medicationId
       name
     }
