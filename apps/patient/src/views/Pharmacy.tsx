@@ -756,7 +756,7 @@ export const Pharmacy = () => {
               <HStack>
                 <Text whiteSpace="nowrap">Sort by</Text>
                 <HStack w="full">
-                  {(['distance', 'price'] as SortBy[]).map((sort) => (
+                  {(['distance', 'price'] as const).map((sort) => (
                     <Button
                       key={sort}
                       w="50%"
