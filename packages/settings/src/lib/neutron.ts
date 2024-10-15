@@ -391,5 +391,12 @@ const organizationSettings: {
     ],
     logo: 'measured_logo.svg',
     accentColor: '#ffd100'
+  },
+  // Berry Street
+  org_utUz7i0OsFKN7m33: {
+    sendToPatient: true,
+    pickUp: true,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_PHARMACY_ID]
   }
 };
