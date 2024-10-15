@@ -18,7 +18,8 @@ import {
   OLYMPIA_PHARMACY_ID,
   REDROCK_STGEORGE_PHARMACY_ID,
   COST_PLUS_PHARMACY_ID,
-  WALMART_MAIL_ORDER_PHARMACY_ID
+  WALMART_MAIL_ORDER_PHARMACY_ID,
+  HEALTHWAREHOUSE_PHARMACY_ID
 } from '../pharmacies';
 
 /**
@@ -84,7 +85,8 @@ const organizationSettings: {
       REDROCK_SPRINGVILLE_PHARMACY_ID,
       FOOTHILLS_PHARMACY_ID,
       SMARTSCRIPTS_PHARMACY_ID,
-      OLYMPIA_PHARMACY_ID
+      OLYMPIA_PHARMACY_ID,
+      HEALTHWAREHOUSE_PHARMACY_ID
     ],
     topRankedWalgreens: true,
     mailOrderNavigate: true,
@@ -389,5 +391,12 @@ const organizationSettings: {
     ],
     logo: 'measured_logo.svg',
     accentColor: '#ffd100'
+  },
+  // Berry Street
+  org_utUz7i0OsFKN7m33: {
+    sendToPatient: true,
+    pickUp: true,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_PHARMACY_ID]
   }
 };
