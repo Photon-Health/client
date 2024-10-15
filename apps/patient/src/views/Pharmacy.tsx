@@ -100,7 +100,7 @@ export const Pharmacy = () => {
 
   // sorting
   type SortBy = 'price' | 'distance';
-  const [sortBy, setSortBy] = useState<SortBy>(isOrgWithCouponsEnabled ? 'price' : 'distance');
+  const [sortBy, setSortBy] = useState<SortBy>('distance');
 
   // loading state
   const [initialLoad, setInitialLoad] = useState(true);
