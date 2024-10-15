@@ -99,9 +99,8 @@ export const Pharmacy = () => {
   const [loadingLocation, setLoadingLocation] = useState(false);
 
   // sorting
-  const [sortBy, setSortBy] = useState<'price' | 'distance'>(
-    isOrgWithCouponsEnabled ? 'price' : 'distance'
-  );
+  type SortBy = 'price' | 'distance';
+  const [sortBy, setSortBy] = useState<SortBy>('distance');
 
   // loading state
   const [initialLoad, setInitialLoad] = useState(true);
@@ -757,45 +756,31 @@ export const Pharmacy = () => {
               <HStack>
                 <Text whiteSpace="nowrap">Sort by</Text>
                 <HStack w="full">
-                  <Button
-                    w="50%"
-                    size="lg"
-                    isActive={sortBy === 'price'}
-                    _active={{
-                      backgroundColor: 'brand.500',
-                      color: 'white',
-                      borderColor: 'brand.500'
-                    }}
-                    border="2px"
-                    borderColor="gray.100"
-                    backgroundColor="white"
-                    onClick={() => setSortBy('price')}
-                    borderRadius="xl"
-                  >
-                    Cash Price
-                  </Button>
-                  <Button
-                    w="50%"
-                    size="lg"
-                    isActive={sortBy === 'distance'}
-                    _active={{
-                      backgroundColor: 'brand.500',
-                      color: 'white',
-                      borderColor: 'brand.500'
-                    }}
-                    border="2px"
-                    borderColor="gray.100"
-                    backgroundColor="white"
-                    onClick={() => setSortBy('distance')}
-                    borderRadius="xl"
-                  >
-                    Distance
-                  </Button>
+                  {(['distance', 'price'] as const).map((sort) => (
+                    <Button
+                      key={sort}
+                      w="50%"
+                      size="lg"
+                      isActive={sortBy === sort}
+                      _active={{
+                        backgroundColor: 'brand.500',
+                        color: 'white',
+                        borderColor: 'brand.500'
+                      }}
+                      border="2px"
+                      borderColor="gray.100"
+                      backgroundColor="white"
+                      onClick={() => setSortBy(sort)}
+                      borderRadius="xl"
+                    >
+                      {sort === 'distance' ? 'Distance' : 'Cash Price'}
+                    </Button>
+                  ))}
                 </HStack>
               </HStack>
             ) : null}
             {showSearchToggle && sortBy === 'price' ? (
-              <Box p={3} bgColor={'blue.50'} borderRadius="lg">
+              <Box p={3} bgColor="blue.50" borderRadius="lg">
                 <Text>
                   The displayed price is a coupon for the selected pharmacy.{' '}
                   <b>This is NOT insurance.</b>{' '}
