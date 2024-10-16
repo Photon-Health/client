@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { getSettings } from '@client/settings';
 import queryString from 'query-string';
-import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactGA from 'react-ga4';
 import { Helmet } from 'react-helmet';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
@@ -674,19 +674,17 @@ export const Pharmacy = () => {
     }
   };
 
-  const actionTriggeredRef = useRef(false);
-
+  // TODO: remove after we start storing prices (<1wk)
   useEffect(() => {
     // wait until pharmacies are loaded to determine if showing cash price
-    if (!loadingPharmacies && showSearchToggle && !actionTriggeredRef.current) {
+    if (!loadingPharmacies && showSearchToggle && sortBy === 'price') {
       datadogRum.addAction('cash_price_displayed', {
         orderId: order.id,
         organization: order.organization.name,
         timestamp: new Date().toISOString()
       });
-      actionTriggeredRef.current = true;
     }
-  }, [loadingPharmacies, showSearchToggle, order]);
+  }, [loadingPharmacies, showSearchToggle, order, sortBy]);
 
   useEffect(() => {
     datadogRum.addAction('pharmacy_list_toggle_selection', {
