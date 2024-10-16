@@ -60,6 +60,9 @@ export const Pharmacy = () => {
   const navigate = useNavigate();
   const toast = useToast();
 
+  // multiple rx's
+  const isMultiRx = flattenedFills.length > 1;
+
   // search params
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
@@ -71,6 +74,11 @@ export const Pharmacy = () => {
   const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
 
+  // top ranked pharmacies
+  const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
+  const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
+  const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
+
   // View state
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
@@ -80,7 +88,11 @@ export const Pharmacy = () => {
     'Updated Test Pharmacy 11',
     'Photon Test Org'
   ].includes(order?.organization.name ?? '');
-  const [showSearchToggle, setShowSearchToggle] = useState(isOrgWithCouponsEnabled);
+  const [showSearchToggle, setShowSearchToggle] = useState(
+    isOrgWithCouponsEnabled && // select orgs
+      !containsGLP && // no glp1's
+      !isMultiRx // one rx
+  );
 
   // selection state
   const [selectedId, setSelectedId] = useState<string>('');
@@ -98,15 +110,15 @@ export const Pharmacy = () => {
   const [cleanAddress, setCleanAddress] = useState<string>();
   const [loadingLocation, setLoadingLocation] = useState(false);
 
-  // sorting
-  type SortBy = 'price' | 'distance';
-  const [sortBy, setSortBy] = useState<SortBy>('distance');
-
   // loading state
   const [initialLoad, setInitialLoad] = useState(true);
   const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(true);
   const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
   const isLoading = loadingLocation || loadingPharmacies;
+
+  // sorting
+  type SortBy = 'price' | 'distance';
+  const [sortBy, setSortBy] = useState<SortBy>('distance');
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
@@ -138,8 +150,7 @@ export const Pharmacy = () => {
     order?.address?.postalCode != null && order.address.postalCode in capsuleZipcodeLookup;
   const enableCourier =
     !isDemo &&
-    // Hide for cash price search
-    sortBy !== 'price' &&
+    sortBy !== 'price' && // Hide for cash price search
     isCapsuleTerritory &&
     orgSettings.enableCourierNavigate;
   const capsulePharmacyId = order?.address?.postalCode
@@ -157,11 +168,6 @@ export const Pharmacy = () => {
     !orgSettings.topRankedCostco &&
     !hasTopRankedCostco && // this means org is Sesame, we don't want to show Amazon and top ranked Costco at the same time
     orgSettings.mailOrderNavigate;
-
-  // top ranked pharmacies
-  const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
-  const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
-  const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
 
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
