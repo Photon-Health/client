@@ -71,8 +71,7 @@ export const TreatmentOptionSearch = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
 
-  const [treatmentOptions, setTreatmentOptions] =
-    useState<Array<{ value: string; label: string }>>();
+  const [treatments, setTreatments] = useState<Array<{ value: string; label: string }>>();
 
   const clinicalClient = useApolloClient(client?.clinicalClient);
 
@@ -89,8 +88,8 @@ export const TreatmentOptionSearch = ({
           variables: { filter: { term: searchTermDebounce } }
         });
 
-        setTreatmentOptions(
-          data.treatmentOptions?.map((treatmentOption: { id: string; name: string }) => ({
+        setTreatments(
+          data.treatments?.map((treatmentOption: { id: string; name: string }) => ({
             value: treatmentOption.id,
             label: treatmentOption.name,
             searchTerm: searchTermDebounce
@@ -114,7 +113,7 @@ export const TreatmentOptionSearch = ({
   };
 
   const handleSelectedTreatmentChange = (selectedTreatmentId: string) => {
-    const searchTerms = treatmentOptions?.filter(
+    const searchTerms = treatments?.filter(
       (treatmentOption) => treatmentOption.value === selectedTreatmentId
     );
 
@@ -145,7 +144,7 @@ export const TreatmentOptionSearch = ({
           setFilterText={handleSearchTermChange}
           filterText={searchTermDebounce}
           isLoading={loading}
-          options={treatmentOptions}
+          options={treatments}
           components={{ Option }}
           filterOption={() => true}
         />
