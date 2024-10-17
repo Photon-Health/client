@@ -8,6 +8,7 @@ import Text from '../../particles/Text';
 import formatRxString from '../../utils/formatRxString';
 import { usePhotonClient } from '../SDKProvider';
 import generateDraftPrescription from './utils/generateDraftPrescription';
+import { ScreeningAlerts, ScreeningAlertType } from '../ScreeningAlerts';
 
 export type TemplateOverrides = {
   [key: string]: {
@@ -72,13 +73,24 @@ export type DraftPrescription = PrescriptionTemplate & {
   effectiveDate?: string;
 };
 
-const DraftPrescription = (props: { LeftChildren: JSXElement; RightChildren?: JSXElement }) => (
+const DraftPrescription = (props: {
+  LeftChildren: JSXElement;
+  RightChildren?: JSXElement;
+  BottomChildren?: JSXElement;
+}) => (
   <Card>
-    <div class="flex justify-between items-center gap-4">
-      <div class="flex flex-col items-start">{props.LeftChildren}</div>
-      <Show when={props?.RightChildren}>
-        <div class="flex items-start gap-3">{props.RightChildren}</div>
-      </Show>
+    <div>
+      <div class="grid grid-cols-6 gap-4">
+        <div class="col-span-5">{props.LeftChildren}</div>
+        <Show when={props?.RightChildren}>
+          <div class="col-end-7 col-span-1 content-center content-evenly">
+            {props.RightChildren}
+          </div>
+        </Show>
+        <Show when={props?.BottomChildren}>
+          <div class="col-span-6">{props.BottomChildren}</div>
+        </Show>
+      </div>
     </div>
   </Card>
 );
@@ -92,6 +104,7 @@ interface DraftPrescriptionsProps {
   handleEdit?: (draftId: string) => void;
   handleDelete?: (draftId: string) => void;
   error?: string;
+  screeningAlerts: ScreeningAlertType[];
 }
 
 export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
@@ -246,6 +259,14 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
                     <button onClick={() => merged.handleDelete && merged.handleDelete(draft.id)}>
                       <Icon name="trash" size="sm" class="text-gray-500 hover:text-red-500" />
                     </button>
+                  </>
+                }
+                BottomChildren={
+                  <>
+                    <ScreeningAlerts
+                      screeningAlerts={props.screeningAlerts}
+                      owningId={draft.treatment.id}
+                    />
                   </>
                 }
               />

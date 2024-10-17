@@ -9,6 +9,7 @@ import type { TemplateOverrides, DraftPrescription } from '@photonhealth/compone
 import { PhotonTooltip } from '../../photon-tooltip';
 import { partition } from 'lodash';
 import { unwrap } from 'solid-js/store';
+import { ScreeningAlertType } from '@photonhealth/components/dist/src/systems/ScreeningAlerts';
 
 const draftPrescriptionsValidator = message(
   size(array(any()), 1, Infinity),
@@ -23,6 +24,8 @@ export const DraftPrescriptionCard = (props: {
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
   setIsEditing: (isEditing: boolean) => void;
+  draftedPrescriptionDeleted: () => void;
+  screeningAlerts: ScreeningAlertType[];
 }) => {
   let ref: Ref<any> | undefined;
   const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
@@ -68,6 +71,8 @@ export const DraftPrescriptionCard = (props: {
           document.body.getBoundingClientRect().top -
           70
       });
+
+      props.draftedPrescriptionDeleted();
     }
   };
 
@@ -112,6 +117,8 @@ export const DraftPrescriptionCard = (props: {
       // reopen form if all drafts are deleted
       props.setIsEditing(true);
     }
+
+    props.draftedPrescriptionDeleted();
   };
   const handleDeleteCancel = () => {
     setDeleteDialogOpen(false);
@@ -178,6 +185,7 @@ export const DraftPrescriptionCard = (props: {
             });
           }}
           error={props.store['draftPrescriptions']?.error}
+          screeningAlerts={props.screeningAlerts}
         />
       </Card>
     </div>

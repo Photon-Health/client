@@ -1,3 +1,4 @@
+import { gql } from '@apollo/client';
 import { usePhoton } from '../context';
 import { PhotonAuthorized } from '../photon-authorized';
 import type { FormError } from '../stores/form';
@@ -20,7 +21,8 @@ import {
   TemplateOverrides,
   Toaster,
   triggerToast,
-  useRecentOrders
+  useRecentOrders,
+  useScreeningAlertAcknowledgement
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { Order, Prescription } from '@photonhealth/sdk/dist/types';
@@ -33,6 +35,7 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
+import { ScreeningAlertType } from '@photonhealth/components/dist/src/systems/ScreeningAlerts';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -76,6 +79,26 @@ export type PrescribeProps = {
   allowOffCatalogSearch?: boolean;
 };
 
+export const ScreenDraftedPrescriptionsQuery = gql`
+  query ScreenDraftedPrescriptionsQuery(
+    $draftedPrescriptions: [DraftedPrescriptionInput!]!
+    $patientId: ID!
+  ) {
+    prescriptionScreen(draftedPrescriptions: $draftedPrescriptions, patientId: $patientId) {
+      alerts {
+        type
+        description
+        involvedEntities {
+          id
+          name
+          __typename
+        }
+        severity
+      }
+    }
+  }
+`;
+
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
 
@@ -90,6 +113,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     client?.authentication.state.isAuthenticated || false
   );
   const [, recentOrdersActions] = useRecentOrders();
+  const [, screeningAlertsAcknowledgementActions] = useScreeningAlertAcknowledgement();
+  const [screeningAlerts, setScreeningAlerts] = createSignal<ScreeningAlertType[]>([]);
 
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
   let prefillNotes = '';
@@ -168,6 +193,53 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     ref?.dispatchEvent(event);
   };
 
+  // let's start screening all of the prescriptions we're drafting
+  const screenDraftedPrescriptions = async () => {
+    // start out by getting the treatment id of the prescription we're drafting now -
+    // we'll want to knwo about it so we cn show an alert underneath it, before it gets
+    // added to the order
+    const inProgressDraftedPrescriptionTreatmentId = props.formStore.treatment?.value?.id;
+
+    // and then get the ones already added to the order (but not persisted)
+    const draftedPrescriptions = [...props.formStore.draftPrescriptions.value];
+
+    // if there is one, add in the prescription being created
+    if (inProgressDraftedPrescriptionTreatmentId) {
+      draftedPrescriptions.push({
+        treatment: { id: inProgressDraftedPrescriptionTreatmentId }
+      });
+    }
+
+    // pluck out all the attributes we won't need so we can make a screening request
+    const sanitizedDraftedPrescriptions = draftedPrescriptions.map(
+      ({
+        id,
+        refillsInput,
+        addToTemplates,
+        templateName,
+        catalogId,
+        treatmentId,
+        __typename,
+        ...draftedPrescription
+      }) => {
+        draftedPrescription.treatment = { id: draftedPrescription.treatment.id };
+
+        return { ...draftedPrescription };
+      }
+    );
+
+    // make the screening request
+    const { data } = await clinicalClient.query({
+      query: ScreenDraftedPrescriptionsQuery,
+      variables: {
+        patientId: props.formStore.patient?.value.id,
+        draftedPrescriptions: sanitizedDraftedPrescriptions
+      }
+    });
+
+    setScreeningAlerts(data?.prescriptionScreen?.alerts ?? []);
+  };
+
   const dispatchPrescriptionsError = (errors: readonly GraphQLError[]) => {
     const event = new CustomEvent('photon-prescriptions-error', {
       composed: true,
@@ -201,6 +273,14 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       }
     });
     ref?.dispatchEvent(event);
+  };
+
+  const displayAlertsWarning = () => {
+    return screeningAlertsAcknowledgementActions.setIsAlertAcknowledgementDialogOpen(
+      true,
+      screeningAlerts(),
+      () => submitForm(props.enableOrder)
+    );
   };
 
   // before submitting the form, show combine dialog if there is a routing order for the patient
@@ -368,6 +448,12 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   // decide whether to show the combine modal or submit the form
   const combineOrSubmit = () => {
+    // if we have allerts we'll want the prescriber to acknowledge them
+    // first
+    if (screeningAlerts().length > 0) {
+      return displayAlertsWarning();
+    }
+
     if (props.enableCombineAndDuplicate && recentOrdersActions.hasRoutingOrder()) {
       return displayCombineDialog();
     }
@@ -455,6 +541,13 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       weightUnit={props.weightUnit}
                       prefillNotes={prefillNotes}
                       enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+                      screenDraftedPrescriptions={function () {
+                        screenDraftedPrescriptions();
+                      }}
+                      draftedPrescriptionChanged={function () {
+                        screenDraftedPrescriptions();
+                      }}
+                      screeningAlerts={screeningAlerts()}
                       catalogId={props.catalogId}
                       allowOffCatalogSearch={props.allowOffCatalogSearch}
                     />
@@ -468,6 +561,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   actions={props.formActions}
                   store={props.formStore}
                   setIsEditing={setIsEditing}
+                  draftedPrescriptionDeleted={function () {
+                    screenDraftedPrescriptions();
+                  }}
+                  screeningAlerts={screeningAlerts()}
                 />
                 <Show when={props.enableOrder && !props.pharmacyId}>
                   <OrderCard

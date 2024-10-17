@@ -5,7 +5,8 @@ import {
   Icon,
   Text,
   triggerToast,
-  useRecentOrders
+  useRecentOrders,
+  ScreeningAlerts
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
@@ -21,6 +22,7 @@ import { createSignal, onMount, Show } from 'solid-js';
 import { usePhoton } from '../../context';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
+import { ScreeningAlertType } from '@photonhealth/components/dist/src/systems/ScreeningAlerts';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -48,6 +50,9 @@ export const AddPrescriptionCard = (props: {
   weightUnit?: string;
   prefillNotes?: string;
   enableCombineAndDuplicate?: boolean;
+  screenDraftedPrescriptions: () => void;
+  draftedPrescriptionChanged: () => void;
+  screeningAlerts: ScreeningAlertType[];
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
 }) => {
@@ -171,6 +176,8 @@ export const AddPrescriptionCard = (props: {
           header: 'Prescription Added',
           body: 'You can send this order or add another prescription before sending it'
         });
+
+        props.screenDraftedPrescriptions();
       };
 
       if (props.enableCombineAndDuplicate && duplicate) {
@@ -207,6 +214,8 @@ export const AddPrescriptionCard = (props: {
               key: 'treatment',
               value: e.detail.medication
             });
+
+            props.draftedPrescriptionChanged();
           }}
         >
           <photon-medication-search
@@ -237,15 +246,25 @@ export const AddPrescriptionCard = (props: {
                   value: e.detail.catalogId
                 });
               }
+
+              props.draftedPrescriptionChanged();
             }}
             on:photon-treatment-unselected={() => {
               clearForm(
                 props.actions,
                 props?.prefillNotes ? { notes: props.prefillNotes } : undefined
               );
+
+              props.draftedPrescriptionChanged();
             }}
             on:photon-search-text-changed={(e: any) => setSearchText(e.detail.text)}
           />
+
+          <ScreeningAlerts
+            screeningAlerts={props.screeningAlerts}
+            owningId={props.store.treatment?.value?.id}
+          />
+
           <div class="flex flex-col sm:flex-none sm:grid sm:grid-cols-2 sm:gap-4">
             <div class="order-last sm:order-first">
               <photon-checkbox
