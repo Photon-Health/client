@@ -62,6 +62,25 @@ export type Compound = Treatment & {
   name: Scalars['String']['output'];
 };
 
+export type DraftedPrescriptionInput = {
+  daysSupply?: InputMaybe<Scalars['Int']['input']>;
+  dispenseAsWritten?: InputMaybe<Scalars['Boolean']['input']>;
+  dispenseQuantity?: InputMaybe<Scalars['Float']['input']>;
+  dispenseUnit?: InputMaybe<Scalars['String']['input']>;
+  effectiveDate?: InputMaybe<Scalars['Date']['input']>;
+  expirationDate?: InputMaybe<Scalars['Date']['input']>;
+  fillsAllowed?: InputMaybe<Scalars['Int']['input']>;
+  fillsRemaining?: InputMaybe<Scalars['Int']['input']>;
+  instructions?: InputMaybe<Scalars['String']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  treatment: DraftedPrescriptionTreatmentInput;
+  writtenAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type DraftedPrescriptionTreatmentInput = {
+  id: Scalars['ID']['input'];
+};
+
 export type Fill = {
   __typename?: 'Fill';
   filledAt?: Maybe<Scalars['DateTime']['output']>;
@@ -358,6 +377,53 @@ export type Prescription = {
   writtenAt: Scalars['DateTime']['output'];
 };
 
+export type PrescriptionScreenResult = {
+  __typename?: 'PrescriptionScreenResult';
+  alerts: Array<PrescriptionScreeningAlert>;
+};
+
+export type PrescriptionScreeningAlert = {
+  __typename?: 'PrescriptionScreeningAlert';
+  description: Scalars['String']['output'];
+  involvedEntities: Array<PrescriptionScreeningAlertInvolvedEntity>;
+  severity: PrescriptionScreeningAlertSeverity;
+  type: PrescriptionScreeningAlertType;
+};
+
+export type PrescriptionScreeningAlertInvolvedAllergen = PrescriptionScreeningAlertInvolvedEntity & {
+  __typename?: 'PrescriptionScreeningAlertInvolvedAllergen';
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type PrescriptionScreeningAlertInvolvedDraftedPrescription = PrescriptionScreeningAlertInvolvedEntity & {
+  __typename?: 'PrescriptionScreeningAlertInvolvedDraftedPrescription';
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type PrescriptionScreeningAlertInvolvedEntity = {
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type PrescriptionScreeningAlertInvolvedExistingPrescription = PrescriptionScreeningAlertInvolvedEntity & {
+  __typename?: 'PrescriptionScreeningAlertInvolvedExistingPrescription';
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+};
+
+export enum PrescriptionScreeningAlertSeverity {
+  Major = 'MAJOR',
+  Minor = 'MINOR',
+  Moderate = 'MODERATE'
+}
+
+export enum PrescriptionScreeningAlertType {
+  Allergen = 'ALLERGEN',
+  Drug = 'DRUG'
+}
+
 export type ProfileInput = {
   address?: InputMaybe<AddressInput>;
   email?: InputMaybe<Scalars['String']['input']>;
@@ -407,12 +473,19 @@ export type Query = {
   medicationFromNdc: Medication;
   order?: Maybe<Order>;
   organization?: Maybe<Organization>;
+  /** Retrieve a list of all alerts for attempting to prescribe the propsed prescriptions to the given patientId */
+  prescriptionScreen: PrescriptionScreenResult;
   /** Retrieve a role */
   role?: Maybe<Role>;
   /** Retrieve a list of available roles for current user organization */
   roles: Array<Role>;
-  /** Retrieve a list of available treatment options by search string */
+  /**
+   * DEPRECATED: Retrieve a list of available treatment options by search string
+   * @deprecated Use the `treatments` query instead.
+   */
   treatmentOptions: Array<TreatmentOption>;
+  /** Retrieve a list of available treatment items by search string */
+  treatments: Array<Treatment>;
   user?: Maybe<User>;
   /** Get number of users in the current organization */
   userCount: Scalars['Int']['output'];
@@ -446,6 +519,12 @@ export type QueryOrderArgs = {
 };
 
 
+export type QueryPrescriptionScreenArgs = {
+  draftedPrescriptions: Array<DraftedPrescriptionInput>;
+  patientId: Scalars['ID']['input'];
+};
+
+
 export type QueryRoleArgs = {
   id: Scalars['ID']['input'];
 };
@@ -453,6 +532,11 @@ export type QueryRoleArgs = {
 
 export type QueryTreatmentOptionsArgs = {
   searchTerm: Scalars['String']['input'];
+};
+
+
+export type QueryTreatmentsArgs = {
+  filter: TreatmentFilter;
 };
 
 
@@ -499,6 +583,10 @@ export type TicketInput = {
 export type Treatment = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+};
+
+export type TreatmentFilter = {
+  term?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type TreatmentOption = {

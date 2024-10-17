@@ -1,42 +1,45 @@
-import { createSignal, For } from 'solid-js';
-import Icon from '../../particles/Icon';
+import { createSignal, For, JSXElement, Show } from 'solid-js';
 import Text from '../../particles/Text';
+import Banner, { BannerStatus } from '../../particles/Banner';
+import clsx from 'clsx';
 
 export interface ScreeningAlertType {
   description: string;
   type: string;
   severity: string;
-  involvedEntities: { id: string; name: string; ___typename: string }[];
+  involvedEntities: { id: string; name: string; __typename: string }[];
 }
 
 /**
  * Helper function to capitalize the severity
  */
 const getSeverityText = (severity: string) => {
-  return severity.charAt(0).toUpperCase() + severity.slice(1);
+  return severity.charAt(0).toUpperCase() + severity.slice(1).toLowerCase();
 };
 
 /**
  * Helper function to get class names for styling based off of the severity
  */
-const getColorBySeverity = (
-  severity: string
-): { icon: string; background: string; border: string } => {
+const getStatus = (severity: string, type: string): BannerStatus => {
+  if (type === 'ALLERGEN') {
+    return 'suggestion';
+  }
+
   switch (severity) {
     default:
     case 'MINOR':
-      return { icon: 'text-blue-800 ', background: 'bg-blue-50', border: 'border-blue-200' };
+      return 'info';
     case 'MODERATE':
-      return { icon: 'text-yellow-800 ', background: 'bg-yellow-50', border: 'border-yellow-200' };
+      return 'warning';
     case 'MAJOR':
-      return { icon: 'text-red-800 ', background: 'bg-red-50', border: 'border-yellow-200' };
+      return 'error';
   }
 };
 
 /**
  * Helper function to get the human readable descriptor returned by the screening endpoint
  */
-const getDescriptorByType = (type: string) => {
+const getDescriptorByType = (type: string): string => {
   switch (type) {
     case 'PrescriptionScreeningAlertInvolvedDraftedPrescription':
       return '(Pending Prescription)';
@@ -49,6 +52,43 @@ const getDescriptorByType = (type: string) => {
   }
 };
 
+const textClasses = () => clsx('mr-2', {});
+
+const getTitle = (props: { owningId: string; screeningAlert: ScreeningAlertType }): JSXElement => {
+  return (
+    <Show
+      when={props.screeningAlert.type === 'DRUG'}
+      fallback={
+        <Text bold class={textClasses()}>
+          Allergy Found
+        </Text>
+      }
+    >
+      <>
+        <Text bold class={textClasses()}>
+          {getSeverityText(props.screeningAlert.severity)}
+        </Text>
+        <Text class={textClasses()}> interaction with</Text>
+        <For each={filterOutOwningId(props.owningId, props.screeningAlert.involvedEntities)}>
+          {(entity, index) => {
+            return (
+              <>
+                <Text bold class={textClasses()}>
+                  {entity.name}
+                </Text>
+                <Text class={textClasses()}>{getDescriptorByType(entity.__typename)}</Text>
+                {index() <
+                  filterOutOwningId(props.owningId, props.screeningAlert.involvedEntities).length -
+                    1 && <Text class={textClasses()}>and</Text>}
+              </>
+            );
+          }}
+        </For>
+      </>
+    </Show>
+  );
+};
+
 /**
  * Helper function to filter out entities that are the same as the owningId
  * so we don't show unnecessary duplicate information that is present
@@ -56,8 +96,8 @@ const getDescriptorByType = (type: string) => {
  */
 const filterOutOwningId = (
   owningId: string,
-  involvedEntities: { id: string; name: string; ___typename: string }[]
-): { id: string; name: string; ___typename: string }[] => {
+  involvedEntities: { id: string; name: string; __typename: string }[]
+): { id: string; name: string; __typename: string }[] => {
   return involvedEntities.filter((element) => element.id !== owningId);
 };
 
@@ -75,56 +115,24 @@ export const ScreeningAlert = (props: { owningId: string; screeningAlert: Screen
   };
 
   return (
-    <div
-      class={`border gap-4 rounded-lg ${getColorBySeverity(props.screeningAlert.severity).border} ${
-        getColorBySeverity(props.screeningAlert.severity).background
-      } `}
-    >
+    <Banner status={getStatus(props.screeningAlert.severity, props.screeningAlert.type)}>
       <div class="flex grid-flow-col justify-start">
-        <div>
-          <Icon
-            name="exclamationCircle"
-            class={`mr-2 ${getColorBySeverity(props.screeningAlert.severity).icon}`}
-          />
-        </div>
-        <div>
-          <div>
-            <Text bold class="mb-2">
-              {getSeverityText(props.screeningAlert.severity)}
-            </Text>
-            {' interaction with '}
-
-            <For each={filterOutOwningId(props.owningId, props.screeningAlert.involvedEntities)}>
-              {(entity, index) => {
-                return (
-                  <span>
-                    <Text bold class="mb-2">
-                      {entity.name}
-                    </Text>
-                    {' ' + getDescriptorByType(entity.___typename)}
-                    {index() <
-                      filterOutOwningId(props.owningId, props.screeningAlert.involvedEntities)
-                        .length -
-                        1 && ' and '}
-                  </span>
-                );
-              }}
-            </For>
-          </div>
-          <div class={`${!isExpanded() ? 'hidden' : ''}`}>
-            <Text size="sm">{props.screeningAlert.description}</Text>
+        <div class="flex flex-col gap-2">
+          <div class="text-sm"> {getTitle(props)}</div>
+          <div class={`text-sm text-gray-700 ${!isExpanded() ? 'hidden' : ''}`}>
+            {props.screeningAlert.description}
           </div>
           <div
             onClick={() => {
               toggleExpandedState();
             }}
           >
-            <Text bold class="text-blue-40">
+            <Text bold class="text-blue-600">
               Show {isExpanded() ? 'Less' : 'More'}
             </Text>
           </div>
         </div>
       </div>
-    </div>
+    </Banner>
   );
 };
