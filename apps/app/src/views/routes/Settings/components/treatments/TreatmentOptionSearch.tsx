@@ -17,16 +17,16 @@ import { SelectField } from '../../../../components/SelectField';
 import { getMatchingPartsFromSubstring } from '../../../../../utils';
 
 export const SearchTreatmentOptionsQuery = gql`
-  query SearchTreatmentOptions($searchTerm: String!) {
-    treatmentOptions(searchTerm: $searchTerm) {
-      id: medicationId
+  query SearchTreatments($filter: TreatmentFilter!) {
+    treatments(filter: $filter) {
+      id
       name
     }
   }
 `;
 
 type SelectedTreatment = {
-  medicineId: string;
+  id: string;
   name: string;
 };
 
@@ -71,8 +71,7 @@ export const TreatmentOptionSearch = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
 
-  const [treatmentOptions, setTreatmentOptions] =
-    useState<Array<{ value: string; label: string }>>();
+  const [treatments, setTreatments] = useState<Array<{ value: string; label: string }>>();
 
   const clinicalClient = useApolloClient(client?.clinicalClient);
 
@@ -86,11 +85,11 @@ export const TreatmentOptionSearch = ({
       try {
         const { data } = await clinicalClient.query({
           query: SearchTreatmentOptionsQuery,
-          variables: { searchTerm: searchTermDebounce }
+          variables: { filter: { term: searchTermDebounce } }
         });
 
-        setTreatmentOptions(
-          data.treatmentOptions?.map((treatmentOption: { id: string; name: string }) => ({
+        setTreatments(
+          data.treatments?.map((treatmentOption: { id: string; name: string }) => ({
             value: treatmentOption.id,
             label: treatmentOption.name,
             searchTerm: searchTermDebounce
@@ -114,7 +113,7 @@ export const TreatmentOptionSearch = ({
   };
 
   const handleSelectedTreatmentChange = (selectedTreatmentId: string) => {
-    const searchTerms = treatmentOptions?.filter(
+    const searchTerms = treatments?.filter(
       (treatmentOption) => treatmentOption.value === selectedTreatmentId
     );
 
@@ -122,7 +121,7 @@ export const TreatmentOptionSearch = ({
       return;
     }
 
-    const treatment = { medicineId: selectedTreatmentId, name: searchTerms[0].label };
+    const treatment = { id: selectedTreatmentId, name: searchTerms[0].label };
 
     setSelectedTreatment(treatment);
   };
@@ -145,7 +144,7 @@ export const TreatmentOptionSearch = ({
           setFilterText={handleSearchTermChange}
           filterText={searchTermDebounce}
           isLoading={loading}
-          options={treatmentOptions}
+          options={treatments}
           components={{ Option }}
           filterOption={() => true}
         />

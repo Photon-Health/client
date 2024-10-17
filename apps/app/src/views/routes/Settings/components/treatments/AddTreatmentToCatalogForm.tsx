@@ -13,7 +13,8 @@ interface AddTreatmentToCatalogFormProps {
 }
 
 type SelectedTreatment = {
-  medicineId: string;
+  id: string;
+  name: string;
 };
 
 export const AddTreatmentToCatalogForm = ({
@@ -34,7 +35,7 @@ export const AddTreatmentToCatalogForm = ({
           addToCatalog({
             variables: {
               catalogId,
-              treatmentId: selectedTreatment?.medicineId
+              treatmentId: selectedTreatment?.id
             }
           });
           onClose();
@@ -59,7 +60,7 @@ export const AddTreatmentToCatalogForm = ({
                         ref={submitRef}
                         type="submit"
                         colorScheme="brand"
-                        isDisabled={loading || !selectedTreatment?.medicineId}
+                        isDisabled={loading || !selectedTreatment?.id}
                         isLoading={loading}
                         loadingText="Adding to catalog"
                       >
@@ -72,7 +73,7 @@ export const AddTreatmentToCatalogForm = ({
                     ref={submitRef}
                     type="submit"
                     colorScheme="brand"
-                    isDisabled={loading || !selectedTreatment?.medicineId}
+                    isDisabled={loading || !selectedTreatment?.id}
                     isLoading={loading}
                     loadingText="Adding to catalog"
                     mr="1"
