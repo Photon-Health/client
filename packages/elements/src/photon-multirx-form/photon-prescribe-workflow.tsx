@@ -75,6 +75,8 @@ export type PrescribeProps = {
   formStore?: any;
   formActions?: any;
   externalOrderId?: string;
+  catalogId?: string;
+  allowOffCatalogSearch?: boolean;
 };
 
 export const ScreenDraftedPrescriptionsQuery = gql`
@@ -546,6 +548,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                         screenDraftedPrescriptions();
                       }}
                       screeningAlerts={screeningAlerts()}
+                      catalogId={props.catalogId}
+                      allowOffCatalogSearch={props.allowOffCatalogSearch}
                     />
                   </div>
                 </Show>

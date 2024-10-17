@@ -4,7 +4,9 @@ import {
   CAREPOINT_PHARMACY_ID,
   AMAZON_PHARMACY_ID,
   TRUEPILL_PHARMACY_ID,
-  HONEYBEE_PHARMACY_ID
+  HONEYBEE_PHARMACY_ID,
+  COST_PLUS_PHARMACY_ID,
+  WALMART_MAIL_ORDER_PHARMACY_ID
 } from '../pharmacies';
 
 /**
@@ -65,7 +67,11 @@ const organizationSettings: {
     topRankedCostco: true,
     topRankedWalgreens: true,
     mailOrderNavigate: true,
-    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
+    mailOrderNavigateProviders: [
+      AMAZON_PHARMACY_ID,
+      COST_PLUS_PHARMACY_ID,
+      WALMART_MAIL_ORDER_PHARMACY_ID
+    ],
     enableCourierNavigate: true,
     paExceptionMessage:
       'Your insurance needs additional information from your provider before it will cover your prescription. Use the messaging feature in your Sesame profile to ask your provider to submit a prior authorization. If you’re paying cash, disregard and work with your pharmacy directly to pay the out-of-pocket price.'

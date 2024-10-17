@@ -42,6 +42,8 @@ const Component = (props: PrescribeProps) => {
         formStore={store}
         formActions={actions}
         externalOrderId={props.externalOrderId}
+        catalogId={props.catalogId}
+        allowOffCatalogSearch={props.allowOffCatalogSearch}
       />
     </RecentOrders>
   );
@@ -72,7 +74,9 @@ customElement(
     triggerSubmit: false,
     setTriggerSubmit: undefined,
     toastBuffer: 0,
-    externalOrderId: undefined
+    externalOrderId: undefined,
+    catalogId: undefined,
+    allowOffCatalogSearch: true
   },
   Component
 );

@@ -53,6 +53,8 @@ export const AddPrescriptionCard = (props: {
   screenDraftedPrescriptions: () => void;
   draftedPrescriptionChanged: () => void;
   screeningAlerts: ScreeningAlertType[];
+  catalogId?: string;
+  allowOffCatalogSearch?: boolean;
 }) => {
   const client = usePhoton();
   const [medDialogOpen, setMedDialogOpen] = createSignal(false);
@@ -61,7 +63,6 @@ export const AddPrescriptionCard = (props: {
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
   const [, recentOrdersActions] = useRecentOrders();
   const [searchText, setSearchText] = createSignal<string>('');
-
   let ref: any;
 
   onMount(() => {
@@ -219,6 +220,8 @@ export const AddPrescriptionCard = (props: {
         >
           <photon-medication-search
             label="Search for Treatment"
+            catalog-id={props.catalogId}
+            allow-off-catalog-search={props.allowOffCatalogSearch}
             selected={props.store.treatment?.value ?? undefined}
             invalid={props.store.treatment?.error ?? false}
             help-text={props.store.treatment?.error}

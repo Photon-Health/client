@@ -27,11 +27,10 @@ export const Coupons = () => {
   return (
     <VStack w="full" alignItems="stretch" spacing={4}>
       <Heading as="h4" size="md">
-        {discountCards.length > 1 ? 'Coupons' : 'Coupon'}
+        Coupon
       </Heading>
-      {discountCards.map((card) => (
-        <Coupon key={card.id} coupon={card} />
-      ))}
+      {/* Show one coupon only */}
+      <Coupon coupon={discountCards[0]} />
     </VStack>
   );
 };

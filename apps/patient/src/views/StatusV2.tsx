@@ -111,7 +111,11 @@ export const StatusV2 = () => {
   const isDeliveryPharmacy =
     fulfillmentType === 'MAIL_ORDER' ||
     fulfillmentType === 'COURIER' ||
-    pharmacy?.name === 'Amazon Pharmacy';
+    [
+      'phr_01GA9HPV5XYTC1NNX213VRRBZ3', // Amazon Pharmacy
+      'phr_01HH0B05XNYH876AY8JZ7BD256', // Cost Plus Pharmacy
+      'phr_01GA9HPXGSDTSB0Z70BRK5XEP0' // Walmart Mail Order Pharmacy
+    ].includes(pharmacy?.id as string);
 
   if (!order) {
     console.error('No order found');
@@ -250,7 +254,7 @@ export const StatusV2 = () => {
                 Pharmacy
               </Heading>
               <Card>
-                <VStack w="full">
+                <VStack w="full" spacing={0}>
                   {pharmacyInfo}
                   <VStack spacing={2} w="full">
                     {pharmacyWithHours && !isDeliveryPharmacy && navigateButton}
