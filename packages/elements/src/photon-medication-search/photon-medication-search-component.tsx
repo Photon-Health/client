@@ -84,7 +84,7 @@ async function loadTreatmentOptions(
 function getFilteredData(
   props: ComponentProps,
   searchText: string,
-  treatmentOptions: TreatmentOption[]
+  treatmentOptions: Treatment[]
 ): (Treatment | PrescriptionTemplate | TreatmentOption)[] {
   const { store } = CatalogStore;
 
