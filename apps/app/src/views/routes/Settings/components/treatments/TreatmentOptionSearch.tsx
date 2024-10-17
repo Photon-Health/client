@@ -17,16 +17,16 @@ import { SelectField } from '../../../../components/SelectField';
 import { getMatchingPartsFromSubstring } from '../../../../../utils';
 
 export const SearchTreatmentOptionsQuery = gql`
-  query SearchTreatmentOptions($searchTerm: String!) {
-    treatments(searchTerm: $searchTerm) {
-      id: medicationId
+  query SearchTreatments($filter: TreatmentFilter!) {
+    treatments(filter: $filter) {
+      id
       name
     }
   }
 `;
 
 type SelectedTreatment = {
-  medicineId: string;
+  id: string;
   name: string;
 };
 
@@ -86,7 +86,7 @@ export const TreatmentOptionSearch = ({
       try {
         const { data } = await clinicalClient.query({
           query: SearchTreatmentOptionsQuery,
-          variables: { searchTerm: searchTermDebounce }
+          variables: { filter: { term: searchTermDebounce } }
         });
 
         setTreatmentOptions(
@@ -122,7 +122,7 @@ export const TreatmentOptionSearch = ({
       return;
     }
 
-    const treatment = { medicineId: selectedTreatmentId, name: searchTerms[0].label };
+    const treatment = { id: selectedTreatmentId, name: searchTerms[0].label };
 
     setSelectedTreatment(treatment);
   };

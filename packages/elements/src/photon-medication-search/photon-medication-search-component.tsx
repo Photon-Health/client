@@ -53,8 +53,8 @@ type DataReturn<Type> = {
 };
 
 const SearchTreatmentOptionsQuery = gql`
-  query SearchTreatmentOptions($searchTerm: String!) {
-    treatments(searchTerm: $searchTerm) {
+  query SearchTreatments($filter: TreatmentFilter!) {
+    treatments(filter: $filter) {
       __typename
       id
       name
@@ -68,7 +68,7 @@ const searchTreatmentOptions = async (
 ): Promise<DataReturn<{ treatmentOptions: TreatmentOption[] }>> => {
   return await client.query<{ treatmentOptions: TreatmentOption[] }>({
     query: SearchTreatmentOptionsQuery,
-    variables: { searchTerm },
+    variables: { filter: { term: searchTerm } },
     fetchPolicy: 'no-cache'
   });
 };
