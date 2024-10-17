@@ -53,16 +53,11 @@ type DataReturn<Type> = {
 };
 
 const SearchTreatmentOptionsQuery = gql`
-  query SearchTreatmentOptions($searchTerm: String!) {
-    treatmentOptions(searchTerm: $searchTerm) {
-      id: medicationId
-      form
-      name
-      ndc
-      route
-      strength
-      type
+  query SearchTreatments($filter: TreatmentFilter!) {
+    treatments(filter: $filter) {
       __typename
+      id
+      name
     }
   }
 `;
@@ -70,10 +65,10 @@ const SearchTreatmentOptionsQuery = gql`
 const searchTreatmentOptions = async (
   client: ApolloClient<any>,
   searchTerm: string
-): Promise<DataReturn<{ treatmentOptions: TreatmentOption[] }>> => {
-  return await client.query<{ treatmentOptions: TreatmentOption[] }>({
+): Promise<DataReturn<{ treatments: Treatment[] }>> => {
+  return await client.query<{ treatments: Treatment[] }>({
     query: SearchTreatmentOptionsQuery,
-    variables: { searchTerm },
+    variables: { filter: { term: searchTerm } },
     fetchPolicy: 'no-cache'
   });
 };
@@ -81,15 +76,15 @@ const searchTreatmentOptions = async (
 async function loadTreatmentOptions(
   client: ApolloClient<any>,
   searchText: string
-): Promise<TreatmentOption[]> {
+): Promise<Treatment[]> {
   const req = await searchTreatmentOptions(client, searchText);
-  return req?.data?.treatmentOptions ?? [];
+  return req?.data?.treatments?.map((t) => ({ ...t, isOffCatalog: true })) ?? [];
 }
 
 function getFilteredData(
   props: ComponentProps,
   searchText: string,
-  treatmentOptions: TreatmentOption[]
+  treatmentOptions: Treatment[]
 ): (Treatment | PrescriptionTemplate | TreatmentOption)[] {
   const { store } = CatalogStore;
 
@@ -207,16 +202,12 @@ function getGroupsConfig(props: ComponentProps) {
     {
       label: 'Organization Catalog',
       filter: (t: { id: string; __typename?: string } | undefined) =>
-        t &&
-        typeof t === 'object' &&
-        'name' in t &&
-        !('treatment' in t) &&
-        !(t.__typename === 'TreatmentOption')
+        t && typeof t === 'object' && 'name' in t && !('treatment' in t) && !('isOffCatalog' in t)
     },
     {
       label: 'All Treatments',
       filter: (t: { id: string; __typename?: string } | undefined) =>
-        t && typeof t === 'object' && !('treatment' in t) && t.__typename === 'TreatmentOption'
+        t && typeof t === 'object' && !('treatment' in t) && 'isOffCatalog' in t
     }
   ];
 }
