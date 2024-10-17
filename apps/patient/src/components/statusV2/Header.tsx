@@ -16,7 +16,8 @@ export interface OrderStatusHeaderProps {
     | 'PA_REQUIRED'
     | 'PHARMACY_CLOSED'
     | 'PHARMACY_UNREACHABLE'
-    | 'ORDER_ERROR';
+    | 'ORDER_ERROR'
+    | 'HIGH_COPAY';
   pharmacyEstimatedReadyAt?: Date;
   patientDesiredReadyAt?: Date | 'URGENT';
 }

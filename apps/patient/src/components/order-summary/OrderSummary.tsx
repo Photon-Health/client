@@ -10,7 +10,7 @@ import { groupBy } from 'lodash';
 
 export interface ExceptionData {
   message?: string;
-  exceptionType: 'OOS' | 'BACKORDERED' | 'PA_REQUIRED';
+  exceptionType: 'OOS' | 'BACKORDERED' | 'PA_REQUIRED' | 'HIGH_COPAY';
 }
 
 export interface FulfillmentData {
