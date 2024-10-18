@@ -106,7 +106,7 @@ export default function PatientInfo(props: PatientInfoProps) {
   });
 
   return (
-    <Card>
+    <Card addChildrenDivider={true}>
       <div class="flex items-center justify-between">
         <Text color="gray">Patient Info</Text>
         <Show when={props?.editPatient}>
