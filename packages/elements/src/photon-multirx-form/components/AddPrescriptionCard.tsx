@@ -200,7 +200,7 @@ export const AddPrescriptionCard = (props: {
   return (
     <div ref={ref}>
       <style>{photonStyles}</style>
-      <Card>
+      <Card addChildrenDivider={true}>
         <div class="flex items-center justify-between">
           <Text color="gray">Add Prescription</Text>
         </div>
