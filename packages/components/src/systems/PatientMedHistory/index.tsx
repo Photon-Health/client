@@ -145,7 +145,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   });
 
   return (
-    <Card>
+    <Card addChildrenDivider={true}>
       <div class="flex items-center justify-between">
         <Text color="gray">Medication History</Text>
         <Show when={props?.openAddMedication}>

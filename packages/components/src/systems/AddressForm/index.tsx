@@ -83,7 +83,7 @@ export default function AddressForm(props: AddressFormProps) {
   });
 
   return (
-    <Card>
+    <Card addChildrenDivider={true}>
       <div class="flex items-center justify-between">
         <Text color="gray">Patient Address</Text>
         <Button type="submit" form="patient-address" disabled={submitting()} loading={submitting()}>

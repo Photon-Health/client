@@ -25,7 +25,7 @@ export const OrderCard = (props: {
   return (
     <div>
       <style>{photonStyles}</style>
-      <Card>
+      <Card addChildrenDivider={true}>
         <div class="flex items-center justify-between">
           <Text color="gray">Select Pharmacy</Text>
         </div>
