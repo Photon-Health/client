@@ -79,19 +79,15 @@ const DraftPrescription = (props: {
   BottomChildren?: JSXElement;
 }) => (
   <Card>
-    <div>
-      <div class="grid grid-cols-6 gap-4">
-        <div class="col-span-5">{props.LeftChildren}</div>
-        <Show when={props?.RightChildren}>
-          <div class="col-end-7 col-span-1 content-center content-evenly">
-            {props.RightChildren}
-          </div>
-        </Show>
-        <Show when={props?.BottomChildren}>
-          <div class="col-span-6">{props.BottomChildren}</div>
-        </Show>
-      </div>
+    <div class="flex justify-between items-center gap-4">
+      <div class="flex flex-col items-start">{props.LeftChildren}</div>
+      <Show when={props?.RightChildren}>
+        <div class="flex items-start gap-3">{props.RightChildren}</div>
+      </Show>
     </div>
+    <Show when={props?.BottomChildren}>
+      <div class="col-span-6">{props.BottomChildren}</div>
+    </Show>
   </Card>
 );
 
