@@ -125,9 +125,9 @@ export const ScreeningAlert = (props: {
       <div class="flex grid-flow-col justify-start">
         <div class="flex flex-col gap-2">
           <div class="text-sm"> {getTitle(props)}</div>
-          <div class={`text-sm text-gray-700 ${!isExpanded() ? 'hidden' : ''}`}>
-            {props.screeningAlert.description}
-          </div>
+          <Show when={isExpanded()}>
+            <div class={`text-sm text-gray-700`}>{props.screeningAlert.description}</div>
+          </Show>
           <div
             onClick={() => {
               toggleExpandedState();
