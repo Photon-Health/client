@@ -118,7 +118,7 @@ export const Pharmacy = () => {
 
   // sorting
   type SortBy = 'price' | 'distance';
-  const [sortBy, setSortBy] = useState<SortBy>('distance');
+  const [sortBy, setSortBy] = useState<SortBy>('price');
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
@@ -674,27 +674,6 @@ export const Pharmacy = () => {
     }
   };
 
-  // TODO: remove after we start storing prices (<1wk)
-  useEffect(() => {
-    // wait until pharmacies are loaded to determine if showing cash price
-    if (!loadingPharmacies && showSearchToggle && sortBy === 'price') {
-      datadogRum.addAction('cash_price_displayed', {
-        orderId: order.id,
-        organization: order.organization.name,
-        timestamp: new Date().toISOString()
-      });
-    }
-  }, [loadingPharmacies, showSearchToggle, order, sortBy]);
-
-  useEffect(() => {
-    datadogRum.addAction('pharmacy_list_toggle_selection', {
-      sortBy,
-      orderId: order.id,
-      organization: order.organization.name,
-      timestamp: new Date().toISOString()
-    });
-  }, [sortBy, order]);
-
   if (!order) {
     console.error('No error');
     return null;
@@ -760,7 +739,7 @@ export const Pharmacy = () => {
               <HStack>
                 <Text whiteSpace="nowrap">Sort by</Text>
                 <HStack w="full">
-                  {(['distance', 'price'] as const).map((sort) => (
+                  {(['price', 'distance'] as const).map((sort) => (
                     <Button
                       key={sort}
                       w="50%"
