@@ -85,9 +85,9 @@ const DraftPrescription = (props: {
         <div class="flex items-start gap-3">{props.RightChildren}</div>
       </Show>
     </div>
-    <Show when={props?.BottomChildren}>
-      <div class="col-span-6">{props.BottomChildren}</div>
-    </Show>
+    <div>
+      <Show when={props?.BottomChildren}>{props.BottomChildren}</Show>
+    </div>
   </Card>
 );
 
@@ -258,12 +258,12 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
                   </>
                 }
                 BottomChildren={
-                  <>
+                  <Show when={props.screeningAlerts.length > 0}>
                     <ScreeningAlerts
                       screeningAlerts={props.screeningAlerts}
                       owningId={draft.treatment.id}
                     />
-                  </>
+                  </Show>
                 }
               />
             );
