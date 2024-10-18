@@ -8,7 +8,7 @@ import { ScreeningAlert, ScreeningAlertType } from './ScreeningAlert';
  */
 export const ScreeningAlerts = (props: {
   screeningAlerts: ScreeningAlertType[];
-  owningId: string;
+  owningId?: string;
 }) => {
   return (
     <>
@@ -17,7 +17,7 @@ export const ScreeningAlerts = (props: {
           (screeningAlert) =>
             screeningAlert.involvedEntities
               .map((involvedEntity) => involvedEntity.id)
-              .indexOf(props.owningId) >= 0
+              .indexOf(props.owningId ?? '') >= 0
         )
         .map((screeningAlert) => (
           <ScreeningAlert screeningAlert={screeningAlert} owningId={props.owningId} />

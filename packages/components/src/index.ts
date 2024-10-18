@@ -18,7 +18,11 @@ import Button from './particles/Button';
 import SDKProvider, { usePhotonClient } from './systems/SDKProvider';
 import Text from './particles/Text';
 import Toaster from './particles/Toaster';
-import { ScreeningAlerts, useScreeningAlertAcknowledgement } from './systems/ScreeningAlerts';
+import {
+  ScreeningAlerts,
+  ScreeningAlertAcknowledgementDialog,
+  ScreeningAlertType
+} from './systems/ScreeningAlerts';
 
 import triggerToast from './utils/toastTriggers';
 
@@ -51,8 +55,8 @@ export {
   usePhotonClient,
   useRecentOrders,
   ScreeningAlerts,
-  useScreeningAlertAcknowledgement
+  ScreeningAlertAcknowledgementDialog
 };
 
 // Export types
-export type { DraftPrescription, TemplateOverrides };
+export type { DraftPrescription, TemplateOverrides, ScreeningAlertType };

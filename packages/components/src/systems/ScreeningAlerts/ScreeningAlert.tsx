@@ -47,6 +47,9 @@ const getDescriptorByType = (type: string): string => {
     case 'PrescriptionScreeningAlertInvolvedExistingPrescription':
       return '(Existing Prescription)';
 
+    case 'PrescriptionScreeningAlertInvolvedAllergen':
+      return '(Allergen)';
+
     default:
       return '';
   }
@@ -54,7 +57,7 @@ const getDescriptorByType = (type: string): string => {
 
 const textClasses = () => clsx('mr-2', {});
 
-const getTitle = (props: { owningId: string; screeningAlert: ScreeningAlertType }): JSXElement => {
+const getTitle = (props: { owningId?: string; screeningAlert: ScreeningAlertType }): JSXElement => {
   return (
     <Show
       when={props.screeningAlert.type === 'DRUG'}
@@ -69,7 +72,7 @@ const getTitle = (props: { owningId: string; screeningAlert: ScreeningAlertType 
           {getSeverityText(props.screeningAlert.severity)}
         </Text>
         <Text class={textClasses()}> interaction with</Text>
-        <For each={filterOutOwningId(props.owningId, props.screeningAlert.involvedEntities)}>
+        <For each={filterOutOwningId(props.screeningAlert.involvedEntities, props.owningId)}>
           {(entity, index) => {
             return (
               <>
@@ -78,7 +81,7 @@ const getTitle = (props: { owningId: string; screeningAlert: ScreeningAlertType 
                 </Text>
                 <Text class={textClasses()}>{getDescriptorByType(entity.__typename)}</Text>
                 {index() <
-                  filterOutOwningId(props.owningId, props.screeningAlert.involvedEntities).length -
+                  filterOutOwningId(props.screeningAlert.involvedEntities, props.owningId).length -
                     1 && <Text class={textClasses()}>and</Text>}
               </>
             );
@@ -95,8 +98,8 @@ const getTitle = (props: { owningId: string; screeningAlert: ScreeningAlertType 
  * by nature of the association
  */
 const filterOutOwningId = (
-  owningId: string,
-  involvedEntities: { id: string; name: string; __typename: string }[]
+  involvedEntities: { id: string; name: string; __typename: string }[],
+  owningId?: string
 ): { id: string; name: string; __typename: string }[] => {
   return involvedEntities.filter((element) => element.id !== owningId);
 };
@@ -107,7 +110,10 @@ const filterOutOwningId = (
  * The `owningId` property is used to demonstrate this alert's relationship to an entity
  * and will be used to filter out superfluous information otherwise highlighted by that relationship.
  */
-export const ScreeningAlert = (props: { owningId: string; screeningAlert: ScreeningAlertType }) => {
+export const ScreeningAlert = (props: {
+  owningId?: string;
+  screeningAlert: ScreeningAlertType;
+}) => {
   const [isExpanded, setIsExpanded] = createSignal<boolean>(false);
 
   const toggleExpandedState = () => {

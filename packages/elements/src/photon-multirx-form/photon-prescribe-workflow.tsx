@@ -16,13 +16,14 @@ import {
   Alert,
   Button,
   RecentOrders,
+  ScreeningAlertAcknowledgementDialog,
+  ScreeningAlertType,
   SignatureAttestationModal,
   Spinner,
   TemplateOverrides,
   Toaster,
   triggerToast,
-  useRecentOrders,
-  useScreeningAlertAcknowledgement
+  useRecentOrders
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { Order, Prescription } from '@photonhealth/sdk/dist/types';
@@ -35,7 +36,6 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
-import { ScreeningAlertType } from '@photonhealth/components/dist/src/systems/ScreeningAlerts';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -113,8 +113,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     client?.authentication.state.isAuthenticated || false
   );
   const [, recentOrdersActions] = useRecentOrders();
-  const [, screeningAlertsAcknowledgementActions] = useScreeningAlertAcknowledgement();
   const [screeningAlerts, setScreeningAlerts] = createSignal<ScreeningAlertType[]>([]);
+  const [isScreeningAlertWarningOpen, setIsScreeningAlertWarningOpen] = createSignal(false);
 
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
   let prefillNotes = '';
@@ -276,11 +276,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   };
 
   const displayAlertsWarning = () => {
-    return screeningAlertsAcknowledgementActions.setIsAlertAcknowledgementDialogOpen(
-      true,
-      screeningAlerts(),
-      () => submitForm(props.enableOrder)
-    );
+    setIsScreeningAlertWarningOpen(true);
   };
 
   // before submitting the form, show combine dialog if there is a routing order for the patient
@@ -485,6 +481,21 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       <style>{shoelaceLightStyles}</style>
       <style>{styles}</style>
       <style>{photonStyles}</style>
+
+      <Show when={isScreeningAlertWarningOpen() && screeningAlerts().length > 0}>
+        <ScreeningAlertAcknowledgementDialog
+          alerts={screeningAlerts()}
+          isOpen={isScreeningAlertWarningOpen()}
+          onIgnoreWarningAndCreateAnyway={() => {
+            setIsLoading(false);
+            setScreeningAlerts([]);
+            submitForm(props.enableOrder);
+          }}
+          onRevisitPrescriptions={() => {
+            setIsLoading(false);
+          }}
+        />
+      </Show>
 
       <Show when={props.enableCombineAndDuplicate}>
         <RecentOrders.DuplicateDialog />
