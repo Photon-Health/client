@@ -156,7 +156,7 @@ export const DraftPrescriptionCard = (props: {
           cannot be undone.
         </p>
       </photon-dialog>
-      <Card>
+      <Card addChildrenDivider={true}>
         <div class="flex items-center space-x-2 text-slate-500">
           <Text color="gray" class="pr-2">
             Pending Order
