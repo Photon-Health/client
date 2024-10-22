@@ -2,6 +2,7 @@ import { For, Show } from 'solid-js';
 import Banner from '../../particles/Banner';
 import { ScreeningAlertType } from './ScreeningAlert';
 import Text from '../../particles/Text';
+import { useMemo } from 'react';
 
 export interface AlertsForEntity {
   entity: { id: string; name: string; __typename: string };
@@ -15,29 +16,23 @@ const getSeverityText = (severity: string) => {
   return severity.charAt(0).toUpperCase() + severity.slice(1).toLowerCase();
 };
 
+const TYPE_TO_DESCRIPTOR_MAP: Record<string, string> = {
+  PrescriptionScreeningAlertInvolvedDraftedPrescription: '(Pending Prescription)',
+  PrescriptionScreeningAlertInvolvedExistingPrescription: '(Existing Prescription)',
+  PrescriptionScreeningAlertInvolvedAllergen: '(Allergen)'
+};
+
 /**
  * Helper function to get the human readable descriptor returned by the screening endpoint
  */
 const getDescriptorByType = (type: string): string => {
-  switch (type) {
-    case 'PrescriptionScreeningAlertInvolvedDraftedPrescription':
-      return '(Pending Prescription)';
-
-    case 'PrescriptionScreeningAlertInvolvedExistingPrescription':
-      return '(Existing Prescription)';
-
-    case 'PrescriptionScreeningAlertInvolvedAllergen':
-      return '(Allergen)';
-
-    default:
-      return '';
-  }
+  return TYPE_TO_DESCRIPTOR_MAP[type] ?? '';
 };
 
 /**
  * Helper function to determine if the entity is an allergen
  */
-const isTypenameAllergenBased = (typeName: string): boolean => {
+const isTypenameAllergenBasedFunction = (typeName: string): boolean => {
   return typeName === 'PrescriptionScreeningAlertInvolvedAllergen';
 };
 
@@ -45,11 +40,15 @@ const isTypenameAllergenBased = (typeName: string): boolean => {
  * This component is used to show all alerts associated with a given entity in a succinct way.
  */
 export const ScreeningAlertByEntity = (props: { screeningAlertByEntity: AlertsForEntity }) => {
+  const isTypenameAllergenBased = useMemo(() => {
+    return isTypenameAllergenBasedFunction(props.screeningAlertByEntity.entity.__typename);
+  }, [props.screeningAlertByEntity]);
+
   return (
     <Banner iconName="exclamationTriangle" status="suggestion">
       <div class="flex grid-flow-col justify-start">
         <div class="flex flex-col gap-2">
-          <Show when={!isTypenameAllergenBased(props.screeningAlertByEntity.entity.__typename)}>
+          <Show when={!isTypenameAllergenBased}>
             <Text bold>{props.screeningAlertByEntity.entity.name}</Text>
             <For each={props.screeningAlertByEntity.alerts}>
               {(alert) => {
@@ -70,7 +69,7 @@ export const ScreeningAlertByEntity = (props: { screeningAlertByEntity: AlertsFo
               }}
             </For>
           </Show>
-          <Show when={isTypenameAllergenBased(props.screeningAlertByEntity.entity.__typename)}>
+          <Show when={isTypenameAllergenBased}>
             <For each={props.screeningAlertByEntity.alerts}>
               {(alert) => {
                 return <div class={`text-sm text-gray-700`}>{alert.description}</div>;
