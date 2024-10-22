@@ -1,5 +1,5 @@
 import { createSignal, JSXElement, onMount, Show } from 'solid-js';
-import Icon, { IconProps } from '../Icon';
+import Icon, { IconName } from '../Icon';
 import clsx from 'clsx';
 
 export type BannerStatus = 'success' | 'info' | 'warning' | 'error' | 'suggestion';
@@ -7,7 +7,7 @@ export type BannerStatus = 'success' | 'info' | 'warning' | 'error' | 'suggestio
 export type BannerProps = {
   children: JSXElement;
   status: BannerStatus;
-  iconName?: IconProps;
+  iconName?: IconName;
   withoutIcon?: boolean;
   closable?: boolean;
   id?: string;
