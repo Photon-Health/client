@@ -17,6 +17,12 @@ const getSeverityText = (severity: string) => {
   return severity.charAt(0).toUpperCase() + severity.slice(1).toLowerCase();
 };
 
+const STATUS_TO_CLASS_MAP: Record<string, BannerStatus> = {
+  MINOR: 'info',
+  MODERATE: 'warning',
+  MAJOR: 'error'
+};
+
 /**
  * Helper function to get class names for styling based off of the severity
  */
@@ -25,34 +31,20 @@ const getStatus = (severity: string, type: string): BannerStatus => {
     return 'suggestion';
   }
 
-  switch (severity) {
-    default:
-    case 'MINOR':
-      return 'info';
-    case 'MODERATE':
-      return 'warning';
-    case 'MAJOR':
-      return 'error';
-  }
+  return STATUS_TO_CLASS_MAP[severity] ?? 'info';
+};
+
+const TYPE_TO_DESCRIPTOR_MAP: Record<string, string> = {
+  PrescriptionScreeningAlertInvolvedDraftedPrescription: '(Pending Prescription)',
+  PrescriptionScreeningAlertInvolvedExistingPrescription: '(Existing Prescription)',
+  PrescriptionScreeningAlertInvolvedAllergen: '(Allergen)'
 };
 
 /**
  * Helper function to get the human readable descriptor returned by the screening endpoint
  */
 const getDescriptorByType = (type: string): string => {
-  switch (type) {
-    case 'PrescriptionScreeningAlertInvolvedDraftedPrescription':
-      return '(Pending Prescription)';
-
-    case 'PrescriptionScreeningAlertInvolvedExistingPrescription':
-      return '(Existing Prescription)';
-
-    case 'PrescriptionScreeningAlertInvolvedAllergen':
-      return '(Allergen)';
-
-    default:
-      return '';
-  }
+  return TYPE_TO_DESCRIPTOR_MAP[type] ?? '';
 };
 
 const textClasses = () => clsx('mr-2', {});
