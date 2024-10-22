@@ -222,9 +222,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         __typename,
         ...draftedPrescription
       }) => {
-        draftedPrescription.treatment = { id: draftedPrescription.treatment.id };
-
-        return { ...draftedPrescription };
+        return { ...draftedPrescription, treatment: { id: draftedPrescription.treatment.id } };
       }
     );
 
