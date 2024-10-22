@@ -570,7 +570,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   actions={props.formActions}
                   store={props.formStore}
                   setIsEditing={setIsEditing}
-                  draftedPrescriptionDeleted={function () {
+                  handleDeletedDraftPrescription={function () {
                     screenDraftedPrescriptions();
                   }}
                   screeningAlerts={screeningAlerts()}
