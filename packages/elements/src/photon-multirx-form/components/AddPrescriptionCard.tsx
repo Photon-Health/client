@@ -42,6 +42,27 @@ const validators = {
   effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
 };
 
+type DraftPrescription = {
+  id: string;
+  effectiveDate: string;
+  treatment: {
+    id: string;
+    name: string;
+  };
+  dispenseAsWritten: boolean;
+  dispenseQuantity: number;
+  dispenseUnit: string;
+  daysSupply: number;
+  refillsInput: number;
+  instructions: string;
+  notes: string;
+  fillsAllowed: number;
+  addToTemplates: boolean;
+  templateName: string;
+  catalogId?: string;
+  externalId?: string;
+};
+
 export const AddPrescriptionCard = (props: {
   hideAddToTemplates: boolean;
   actions: Record<string, (...args: any) => any>;
@@ -92,13 +113,25 @@ export const AddPrescriptionCard = (props: {
     ref?.dispatchEvent(event);
   };
 
+  const dispatchDraftPrescriptionCreated = (draftPrescription: DraftPrescription) => {
+    const event = new CustomEvent('photon-draft-prescription-created', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        draft: draftPrescription
+      }
+    });
+    ref?.dispatchEvent(event);
+  };
+
   const handleAddPrescription = async () => {
     const keys = Object.keys(validators);
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
 
     if (!errorsPresent) {
-      const draft = {
+      const draft: DraftPrescription = {
+        id: String(Math.random()),
         effectiveDate: props.store.effectiveDate.value,
         treatment: props.store.treatment.value,
         dispenseAsWritten: props.store.dispenseAsWritten.value,
@@ -120,13 +153,7 @@ export const AddPrescriptionCard = (props: {
       const addDraftPrescription = async () => {
         props.actions.updateFormValue({
           key: 'draftPrescriptions',
-          value: [
-            ...(props.store.draftPrescriptions?.value || []),
-            {
-              id: String(Math.random()),
-              ...draft
-            }
-          ]
+          value: [...(props.store.draftPrescriptions?.value || []), draft]
         });
         props.actions.updateFormValue({
           key: 'effectiveDate',
@@ -178,6 +205,7 @@ export const AddPrescriptionCard = (props: {
         });
 
         props.screenDraftedPrescriptions();
+        dispatchDraftPrescriptionCreated(draft);
       };
 
       if (props.enableCombineAndDuplicate && duplicate) {
