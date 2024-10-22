@@ -46,7 +46,7 @@ const isTypenameAllergenBased = (typeName: string): boolean => {
  */
 export const ScreeningAlertByEntity = (props: { screeningAlertByEntity: AlertsForEntity }) => {
   return (
-    <Banner status="suggestion">
+    <Banner iconName="exclamationTriangle" status="suggestion">
       <div class="flex grid-flow-col justify-start">
         <div class="flex flex-col gap-2">
           <Show when={!isTypenameAllergenBased(props.screeningAlertByEntity.entity.__typename)}>

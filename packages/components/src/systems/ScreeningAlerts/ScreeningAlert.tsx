@@ -113,7 +113,10 @@ export const ScreeningAlert = (props: {
   };
 
   return (
-    <Banner status={getStatus(props.screeningAlert.severity, props.screeningAlert.type)}>
+    <Banner
+      iconName="exclamationTriangle"
+      status={getStatus(props.screeningAlert.severity, props.screeningAlert.type)}
+    >
       <div class="flex grid-flow-col justify-start">
         <div class="flex flex-col gap-2">
           <div class="text-sm"> {getTitle(props)}</div>

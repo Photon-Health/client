@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from 'graphql-tag';
 import { usePhoton } from '../context';
 import { PhotonAuthorized } from '../photon-authorized';
 import type { FormError } from '../stores/form';
