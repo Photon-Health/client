@@ -487,10 +487,32 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           onIgnoreWarningAndCreateAnyway={() => {
             setIsLoading(false);
             setScreeningAlerts([]);
+            setIsScreeningAlertWarningOpen(false);
             submitForm(props.enableOrder);
+
+            const event = new CustomEvent('photon-clinical-alert-acknowledge', {
+              composed: true,
+              bubbles: true,
+              detail: {
+                alerts: screeningAlerts()
+              }
+            });
+
+            ref?.dispatchEvent(event);
           }}
           onRevisitPrescriptions={() => {
             setIsLoading(false);
+            setIsScreeningAlertWarningOpen(false);
+
+            const event = new CustomEvent('photon-clinical-alert-cancel', {
+              composed: true,
+              bubbles: true,
+              detail: {
+                alerts: screeningAlerts()
+              }
+            });
+
+            ref?.dispatchEvent(event);
           }}
         />
       </Show>
