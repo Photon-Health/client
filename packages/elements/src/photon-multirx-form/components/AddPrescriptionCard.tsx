@@ -204,7 +204,6 @@ export const AddPrescriptionCard = (props: {
           body: 'You can send this order or add another prescription before sending it'
         });
 
-        props.screenDraftedPrescriptions();
         dispatchDraftPrescriptionCreated(draft);
       };
 
