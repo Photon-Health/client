@@ -43,8 +43,8 @@ export function ScreeningAlertAcknowledgementDialog(
     <Dialog
       open={isOpen()}
       onClose={() => {
-        props.onRevisitPrescriptions();
         setIsOpen(false);
+        props.onRevisitPrescriptions();
       }}
     >
       <div>
@@ -65,8 +65,8 @@ export function ScreeningAlertAcknowledgementDialog(
           <Button
             size="xl"
             onClick={() => {
-              props.onIgnoreWarningAndCreateAnyway();
               setIsOpen(false);
+              props.onIgnoreWarningAndCreateAnyway();
             }}
           >
             Send Order
@@ -75,8 +75,8 @@ export function ScreeningAlertAcknowledgementDialog(
             variant="secondary"
             size="xl"
             onClick={() => {
-              props.onRevisitPrescriptions();
               setIsOpen(false);
+              props.onRevisitPrescriptions();
             }}
           >
             Cancel

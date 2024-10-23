@@ -17,9 +17,6 @@ function groupAlertsByEntities(screeningAlerts: ScreeningAlertType[]): AlertsFor
       }, {} as Record<string, AlertsForEntity>)
   );
 
-  console.log('alerts by enttiy');
-  console.log(alertsByEntity);
-
   return alertsByEntity;
 }
 

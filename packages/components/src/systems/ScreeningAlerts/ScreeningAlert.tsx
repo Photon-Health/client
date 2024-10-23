@@ -1,4 +1,4 @@
-import { createSignal, For, JSXElement, Show } from 'solid-js';
+import { createEffect, createSignal, For, JSXElement, Show } from 'solid-js';
 import Text from '../../particles/Text';
 import Banner, { BannerStatus } from '../../particles/Banner';
 import clsx from 'clsx';
@@ -106,11 +106,16 @@ export const ScreeningAlert = (props: {
   owningId?: string;
   screeningAlert: ScreeningAlertType;
 }) => {
+  const [isAllergen, setIsAllergen] = createSignal<boolean>();
   const [isExpanded, setIsExpanded] = createSignal<boolean>(false);
 
   const toggleExpandedState = () => {
     setIsExpanded(!isExpanded());
   };
+
+  createEffect(() => {
+    setIsAllergen(props.screeningAlert.type === 'ALLERGEN');
+  });
 
   return (
     <Banner
@@ -120,18 +125,21 @@ export const ScreeningAlert = (props: {
       <div class="flex grid-flow-col justify-start">
         <div class="flex flex-col gap-2">
           <div class="text-sm"> {getTitle(props)}</div>
-          <Show when={isExpanded()}>
+          <Show when={isExpanded() || isAllergen()}>
             <div class={`text-sm text-gray-700`}>{props.screeningAlert.description}</div>
           </Show>
-          <div
-            onClick={() => {
-              toggleExpandedState();
-            }}
-          >
-            <Text bold class="text-blue-600">
-              Show {isExpanded() ? 'Less' : 'More'}
-            </Text>
-          </div>
+
+          <Show when={!isAllergen()}>
+            <div
+              onClick={() => {
+                toggleExpandedState();
+              }}
+            >
+              <Text bold class="text-blue-600">
+                Show {isExpanded() ? 'Less' : 'More'}
+              </Text>
+            </div>
+          </Show>
         </div>
       </div>
     </Banner>
