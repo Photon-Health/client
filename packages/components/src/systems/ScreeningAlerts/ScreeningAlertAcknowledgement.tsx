@@ -47,7 +47,7 @@ export function ScreeningAlertAcknowledgementDialog(
         props.onRevisitPrescriptions();
       }}
     >
-      <div>
+      <div class="grid gap-6">
         <div class="flex flex-col gap-6">
           <div>
             <div class="table bg-blue-50 text-blue-600 p-2 rounded-full mb-4">
