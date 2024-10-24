@@ -2,8 +2,14 @@ import { For, Show } from 'solid-js';
 import Banner from '../../particles/Banner';
 import { ScreeningAlertType } from './ScreeningAlert';
 import Text from '../../particles/Text';
+
+interface Entity {
+  id: string;
+  name: string;
+  __typename: string;
+}
 export interface AlertsForEntity {
-  entity: { id: string; name: string; __typename: string };
+  entity: Entity;
   alerts: ScreeningAlertType[];
 }
 
@@ -35,9 +41,28 @@ const isTypenameAllergenBased = (typeName: string): boolean => {
 };
 
 /**
+ * Helper function to remove re-subscribed drug entities
+ * from showing it more than once
+ */
+function removeDuplicateEntities(entities: Entity[]): Entity[] {
+  const seenIds = new Set<string>();
+  return entities.filter((entity) => {
+    if (seenIds.has(entity.id)) {
+      return false;
+    } else {
+      seenIds.add(entity.id);
+      return true;
+    }
+  });
+}
+
+/**
  * This component is used to show all alerts associated with a given entity in a succinct way.
  */
-export const ScreeningAlertByEntity = (props: { screeningAlertByEntity: AlertsForEntity }) => {
+export const ScreeningAlertByEntity = (props: {
+  screeningAlertByEntity: AlertsForEntity;
+  otherAlertsByEntity: AlertsForEntity[];
+}) => {
   return (
     <Banner iconName="exclamationTriangle" status="suggestion">
       <div class="flex grid-flow-col justify-start">
@@ -47,26 +72,52 @@ export const ScreeningAlertByEntity = (props: { screeningAlertByEntity: AlertsFo
             <For each={props.screeningAlertByEntity.alerts}>
               {(alert) => {
                 return (
-                  <For each={alert.involvedEntities}>
+                  <For each={removeDuplicateEntities(alert.involvedEntities)}>
                     {(involvedEntity) => {
                       return (
-                        <Show when={involvedEntity.id != props.screeningAlertByEntity.entity.id}>
-                          <div class={`text-sm text-gray-700`}>
-                            {getSeverityText(alert.severity)} interaction with {involvedEntity.name}{' '}
-                            {getDescriptorByType(involvedEntity.__typename)}
-                          </div>
-                        </Show>
+                        <>
+                          <Show when={!isTypenameAllergenBased(involvedEntity.__typename)}>
+                            <Show
+                              when={involvedEntity.id != props.screeningAlertByEntity.entity.id}
+                            >
+                              <div class={`text-sm text-gray-700`}>
+                                {getSeverityText(alert.severity)} interaction with{' '}
+                                {involvedEntity.name}{' '}
+                                {getDescriptorByType(involvedEntity.__typename)}
+                              </div>
+                            </Show>
+                          </Show>
+                          {/* if we're an allergen we'll need to show the contents of the alert
+                           instead of this text based off the names of the entities */}
+                          <Show when={isTypenameAllergenBased(involvedEntity.__typename)}>
+                            <For
+                              each={props.otherAlertsByEntity.filter(
+                                (otherAlertByEntity) =>
+                                  otherAlertByEntity.entity.id === involvedEntity.id
+                              )}
+                            >
+                              {(otherAlertByEntity) => {
+                                return (
+                                  <For
+                                    each={otherAlertByEntity.alerts.filter(
+                                      (otherAlertByEntity) => otherAlertByEntity.type === 'ALLERGEN'
+                                    )}
+                                  >
+                                    {(otherAlert) => (
+                                      <div class={`text-sm text-gray-700`}>
+                                        {otherAlert.description}
+                                      </div>
+                                    )}
+                                  </For>
+                                );
+                              }}
+                            </For>
+                          </Show>
+                        </>
                       );
                     }}
                   </For>
                 );
-              }}
-            </For>
-          </Show>
-          <Show when={isTypenameAllergenBased(props.screeningAlertByEntity.entity.__typename)}>
-            <For each={props.screeningAlertByEntity.alerts}>
-              {(alert) => {
-                return <div class={`text-sm text-gray-700`}>{alert.description}</div>;
               }}
             </For>
           </Show>

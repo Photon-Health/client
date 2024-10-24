@@ -27,9 +27,18 @@ function groupAlertsByEntities(screeningAlerts: ScreeningAlertType[]): AlertsFor
 export const ScreeningAlertsByEntity = (props: { screeningAlerts: ScreeningAlertType[] }) => {
   return (
     <div class="grid gap-4">
-      <For each={groupAlertsByEntities(props.screeningAlerts)}>
+      <For
+        each={groupAlertsByEntities(props.screeningAlerts).filter(
+          (
+            alertsForEntity // we'll never want allergens to show up as their own entity
+          ) => alertsForEntity.entity.__typename != 'PrescriptionScreeningAlertInvolvedAllergen'
+        )}
+      >
         {(screeningAlertByEntity) => (
-          <ScreeningAlertByEntity screeningAlertByEntity={screeningAlertByEntity} />
+          <ScreeningAlertByEntity
+            screeningAlertByEntity={screeningAlertByEntity}
+            otherAlertsByEntity={groupAlertsByEntities(props.screeningAlerts)}
+          />
         )}
       </For>
     </div>
