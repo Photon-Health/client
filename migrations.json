@@ -53,6 +53,7 @@
       "version": "16.8.0-beta.3",
       "description": "Escape $ in env variables",
       "implementation": "./src/migrations/update-16-8-0/escape-dollar-sign-env-variables",
+      "x-repair-skip": true,
       "package": "nx",
       "name": "16.8.0-escape-dollar-sign-env"
     },
@@ -86,6 +87,22 @@
       "implementation": "./src/migrations/update-17-3-0/update-nxw",
       "package": "nx",
       "name": "17.3.0-update-nx-wrapper"
+    },
+    {
+      "cli": "nx",
+      "version": "18.0.0-beta.2",
+      "description": "Updates nx.json to disabled adding plugins when generating projects in an existing Nx workspace",
+      "implementation": "./src/migrations/update-18-0-0/disable-crystal-for-existing-workspaces",
+      "x-repair-skip": true,
+      "package": "nx",
+      "name": "18.0.0-disable-adding-plugins-for-existing-workspaces"
+    },
+    {
+      "version": "18.1.0-beta.3",
+      "description": "Moves affected.defaultBase to defaultBase in `nx.json`",
+      "implementation": "./src/migrations/update-17-2-0/move-default-base",
+      "package": "nx",
+      "name": "move-default-base-to-nx-json-root"
     },
     {
       "version": "15.7.0-beta.0",
@@ -169,11 +186,51 @@
     },
     {
       "cli": "nx",
-      "version": "17-2-6-beta.1",
+      "version": "17.2.6-beta.1",
       "description": "Rename workspace rules from @nx/workspace/name to @nx/workspace-name",
       "implementation": "./src/migrations/update-17-2-6-rename-workspace-rules/rename-workspace-rules",
       "package": "@nrwl/eslint-plugin-nx",
       "name": "update-17-2-6-rename-workspace-rules"
+    },
+    {
+      "cli": "nx",
+      "version": "16.0.0-beta.1",
+      "description": "Replace @nrwl/cypress with @nx/cypress",
+      "implementation": "./src/migrations/update-16-0-0-add-nx-packages/update-16-0-0-add-nx-packages",
+      "package": "@nrwl/cypress",
+      "name": "update-16-0-0-add-nx-packages"
+    },
+    {
+      "cli": "nx",
+      "version": "16.2.0-beta.0",
+      "description": "Normalize tsconfig.cy.json files to be located at '<projectRoot>/cypress/tsconfig.json'",
+      "implementation": "./src/migrations/update-16-2-0/update-cy-tsconfig",
+      "package": "@nrwl/cypress",
+      "name": "update-16-2-0-normalize-tsconfigs"
+    },
+    {
+      "cli": "nx",
+      "version": "16.4.0-beta.10",
+      "description": "Remove tsconfig.e2e.json and add settings to project tsconfig.json. tsConfigs executor option is now deprecated. The project level tsconfig.json file should be used instead.",
+      "implementation": "./src/migrations/update-16-4-0/tsconfig-sourcemaps",
+      "package": "@nrwl/cypress",
+      "name": "update-16-3-0-remove-old-tsconfigs"
+    },
+    {
+      "cli": "nx",
+      "version": "16.8.0-beta.4",
+      "description": "Update to Cypress v13. Most noteable change is video recording is off by default. This migration will only update if the workspace is already on Cypress v12. https://docs.cypress.io/guides/references/migration-guide#Migrating-to-Cypress-130",
+      "implementation": "./src/migrations/update-16-8-0/cypress-13",
+      "package": "@nrwl/cypress",
+      "name": "update-16-8-0-cypress-13"
+    },
+    {
+      "cli": "nx",
+      "version": "18.1.0-beta.3",
+      "description": "Update to Cypress ^13.6.6 if the workspace is using Cypress v13 to ensure workspaces don't use v13.6.5 which has an issue when verifying Cypress.",
+      "implementation": "./src/migrations/update-18-1-0/update-cypress-version-13-6-6",
+      "package": "@nrwl/cypress",
+      "name": "update-cypress-version-13-6-6"
     },
     {
       "version": "15.8.0-beta.0",
@@ -217,38 +274,6 @@
     {
       "cli": "nx",
       "version": "16.0.0-beta.1",
-      "description": "Replace @nrwl/cypress with @nx/cypress",
-      "implementation": "./src/migrations/update-16-0-0-add-nx-packages/update-16-0-0-add-nx-packages",
-      "package": "@nrwl/cypress",
-      "name": "update-16-0-0-add-nx-packages"
-    },
-    {
-      "cli": "nx",
-      "version": "16.2.0-beta.0",
-      "description": "Normalize tsconfig.cy.json files to be located at '<projectRoot>/cypress/tsconfig.json'",
-      "implementation": "./src/migrations/update-16-2-0/update-cy-tsconfig",
-      "package": "@nrwl/cypress",
-      "name": "update-16-2-0-normalize-tsconfigs"
-    },
-    {
-      "cli": "nx",
-      "version": "16.4.0-beta.10",
-      "description": "Remove tsconfig.e2e.json and add settings to project tsconfig.json. tsConfigs executor option is now deprecated. The project level tsconfig.json file should be used instead.",
-      "implementation": "./src/migrations/update-16-4-0/tsconfig-sourcemaps",
-      "package": "@nrwl/cypress",
-      "name": "update-16-3-0-remove-old-tsconfigs"
-    },
-    {
-      "cli": "nx",
-      "version": "16.8.0-beta.4",
-      "description": "Update to Cypress v13. Most noteable change is video recording is off by default. This migration will only update if the workspace is already on Cypress v12. https://docs.cypress.io/guides/references/migration-guide#Migrating-to-Cypress-130",
-      "implementation": "./src/migrations/update-16-8-0/cypress-13",
-      "package": "@nrwl/cypress",
-      "name": "update-16-8-0-cypress-13"
-    },
-    {
-      "cli": "nx",
-      "version": "16.0.0-beta.1",
       "description": "Replace @nrwl/react with @nx/react",
       "implementation": "./src/migrations/update-16-0-0-add-nx-packages/update-16-0-0-add-nx-packages",
       "package": "@nrwl/react",
@@ -285,6 +310,22 @@
       "implementation": "./src/migrations/update-16-7-0-add-typings/update-16-7-0-add-typings",
       "package": "@nrwl/react",
       "name": "update-16-7-0-add-typings"
+    },
+    {
+      "cli": "nx",
+      "version": "18.0.0-beta.0",
+      "description": "Add NX_MF_DEV_SERVER_STATIC_REMOTES to inputs for task hashing when '@nx/webpack:webpack' is used for Module Federation.",
+      "factory": "./src/migrations/update-18-0-0/add-mf-env-var-to-target-defaults",
+      "package": "@nrwl/react",
+      "name": "add-module-federation-env-var-to-target-defaults"
+    },
+    {
+      "cli": "nx",
+      "version": "18.1.1-beta.0",
+      "description": "Ensure targetDefaults inputs for task hashing when '@nx/webpack:webpack' is used are correct for Module Federation.",
+      "factory": "./src/migrations/update-18-1-1/fix-target-defaults-inputs",
+      "package": "@nrwl/react",
+      "name": "fix-target-defaults-for-webpack"
     },
     {
       "cli": "nx",
