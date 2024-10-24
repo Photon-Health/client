@@ -1,3 +1,4 @@
+import { For } from 'solid-js';
 import { ScreeningAlertType } from './ScreeningAlert';
 import { AlertsForEntity, ScreeningAlertByEntity } from './ScreeningAlertByEntity';
 
@@ -25,10 +26,12 @@ function groupAlertsByEntities(screeningAlerts: ScreeningAlertType[]): AlertsFor
  */
 export const ScreeningAlertsByEntity = (props: { screeningAlerts: ScreeningAlertType[] }) => {
   return (
-    <>
-      {groupAlertsByEntities(props.screeningAlerts).map((screeningAlertByEntity) => (
-        <ScreeningAlertByEntity screeningAlertByEntity={screeningAlertByEntity} />
-      ))}
-    </>
+    <div class="grid gap-4">
+      <For each={groupAlertsByEntities(props.screeningAlerts)}>
+        {(screeningAlertByEntity) => (
+          <ScreeningAlertByEntity screeningAlertByEntity={screeningAlertByEntity} />
+        )}
+      </For>
+    </div>
   );
 };
