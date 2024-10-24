@@ -15,8 +15,8 @@ const getSeverityText = (severity: string) => {
 };
 
 const TYPE_TO_DESCRIPTOR_MAP: Record<string, string> = {
-  PrescriptionScreeningAlertInvolvedDraftedPrescription: '(Pending Prescription)',
-  PrescriptionScreeningAlertInvolvedExistingPrescription: '(Existing Prescription)',
+  PrescriptionScreeningAlertInvolvedDraftedPrescription: '(Pending Rx)',
+  PrescriptionScreeningAlertInvolvedExistingPrescription: '(Existing Rx)',
   PrescriptionScreeningAlertInvolvedAllergen: '(Allergen)'
 };
 

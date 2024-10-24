@@ -35,8 +35,8 @@ const getStatus = (severity: string, type: string): BannerStatus => {
 };
 
 const TYPE_TO_DESCRIPTOR_MAP: Record<string, string> = {
-  PrescriptionScreeningAlertInvolvedDraftedPrescription: '(Pending Prescription)',
-  PrescriptionScreeningAlertInvolvedExistingPrescription: '(Existing Prescription)',
+  PrescriptionScreeningAlertInvolvedDraftedPrescription: '(Pending Rx)',
+  PrescriptionScreeningAlertInvolvedExistingPrescription: '(Existing Rx)',
   PrescriptionScreeningAlertInvolvedAllergen: '(Allergen)'
 };
 
@@ -55,7 +55,7 @@ const getTitle = (props: { owningId?: string; screeningAlert: ScreeningAlertType
       when={props.screeningAlert.type === 'DRUG'}
       fallback={
         <Text bold class={textClasses()}>
-          Allergy Found
+          Allergy found
         </Text>
       }
     >
@@ -135,8 +135,8 @@ export const ScreeningAlert = (props: {
                 toggleExpandedState();
               }}
             >
-              <Text bold class="text-blue-600">
-                Show {isExpanded() ? 'Less' : 'More'}
+              <Text bold class="text-blue-600" size="xs">
+                See {isExpanded() ? 'less' : 'more'}
               </Text>
             </div>
           </Show>
