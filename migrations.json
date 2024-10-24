@@ -2,14 +2,6 @@
   "migrations": [
     {
       "cli": "nx",
-      "version": "15.8.2-beta.0",
-      "description": "Updates the nx wrapper.",
-      "implementation": "./src/migrations/update-15-8-2/update-nxw",
-      "package": "nx",
-      "name": "15.8.2-update-nx-wrapper"
-    },
-    {
-      "cli": "nx",
       "version": "16.0.0-beta.0",
       "description": "Remove @nrwl/cli.",
       "implementation": "./src/migrations/update-16-0-0/remove-nrwl-cli",
@@ -105,12 +97,28 @@
       "name": "move-default-base-to-nx-json-root"
     },
     {
-      "version": "15.7.0-beta.0",
-      "description": "Split global configuration files (e.g., workspace.json) into individual project.json files.",
       "cli": "nx",
-      "implementation": "./src/migrations/update-15-7-0/split-configuration-into-project-json-files",
-      "package": "@nrwl/workspace",
-      "name": "15-7-0-split-configuration-into-project-json-files"
+      "version": "19.2.0-beta.2",
+      "description": "Updates the default workspace data directory to .nx/workspace-data",
+      "implementation": "./src/migrations/update-19-2-0/move-workspace-data-directory",
+      "package": "nx",
+      "name": "19-2-0-move-graph-cache-directory"
+    },
+    {
+      "cli": "nx",
+      "version": "19.2.2-beta.0",
+      "description": "Updates the nx wrapper.",
+      "implementation": "./src/migrations/update-17-3-0/update-nxw",
+      "package": "nx",
+      "name": "19-2-2-update-nx-wrapper"
+    },
+    {
+      "version": "19.2.4-beta.0",
+      "description": "Set project name in nx.json explicitly",
+      "implementation": "./src/migrations/update-19-2-4/set-project-name",
+      "x-repair-skip": true,
+      "package": "nx",
+      "name": "19-2-4-set-project-name"
     },
     {
       "cli": "nx",
@@ -135,14 +143,6 @@
       "implementation": "./src/migrations/update-16-0-0/fix-invalid-babelrc",
       "package": "@nrwl/workspace",
       "name": "16-0-0-fix-invalid-babelrc"
-    },
-    {
-      "cli": "nx",
-      "version": "15.8.0-beta.0",
-      "description": "Rename .lib.swcrc to .swcrc for better SWC support throughout the workspace",
-      "factory": "./src/migrations/update-15-8-0/rename-swcrc-config",
-      "package": "@nrwl/js",
-      "name": "rename-swcrc-config"
     },
     {
       "cli": "nx",
@@ -194,6 +194,14 @@
     },
     {
       "cli": "nx",
+      "version": "19.1.0-beta.6",
+      "description": "Migrate no-extra-semi rules into user config, out of nx extendable configs",
+      "implementation": "./src/migrations/update-19-1-0-migrate-no-extra-semi/migrate-no-extra-semi",
+      "package": "@nrwl/eslint-plugin-nx",
+      "name": "update-19-1-0-rename-no-extra-semi"
+    },
+    {
+      "cli": "nx",
       "version": "16.0.0-beta.1",
       "description": "Replace @nrwl/cypress with @nx/cypress",
       "implementation": "./src/migrations/update-16-0-0-add-nx-packages/update-16-0-0-add-nx-packages",
@@ -233,20 +241,12 @@
       "name": "update-cypress-version-13-6-6"
     },
     {
-      "version": "15.8.0-beta.0",
       "cli": "nx",
-      "description": "Update jest configs to support jest 29 changes (https://jestjs.io/docs/upgrading-to-jest29)",
-      "factory": "./src/migrations/update-15-8-0/update-configs-jest-29",
-      "package": "@nrwl/jest",
-      "name": "update-configs-jest-29"
-    },
-    {
-      "version": "15.8.0-beta.0",
-      "cli": "nx",
-      "description": "Update jest test files to support jest 29 changes (https://jestjs.io/docs/upgrading-to-jest29)",
-      "factory": "./src/migrations/update-15-8-0/update-tests-jest-29",
-      "package": "@nrwl/jest",
-      "name": "update-tests-jest-29"
+      "version": "19.6.0-beta.4",
+      "description": "Update ciWebServerCommand to use static serve for the application.",
+      "implementation": "./src/migrations/update-19-6-0/update-ci-webserver-for-static-serve",
+      "package": "@nrwl/cypress",
+      "name": "update-19-6-0-update-ci-webserver-for-vite"
     },
     {
       "cli": "nx",
@@ -329,11 +329,27 @@
     },
     {
       "cli": "nx",
-      "version": "15.7.2-beta.0",
-      "description": "Add the babelUpwardRootMode option to the build executor options.",
-      "factory": "./src/migrations/update-15-7-2/add-babelUpwardRootMode-flag",
-      "package": "@nrwl/webpack",
-      "name": "add-babelUpwardRootMode-flag"
+      "version": "19.6.0-beta.4",
+      "description": "Ensure Module Federation DTS is turned off by default.",
+      "factory": "./src/migrations/update-19-6-0/turn-off-dts-by-default",
+      "package": "@nrwl/react",
+      "name": "update-19-6-0-turn-module-federation-dts-off"
+    },
+    {
+      "cli": "nx",
+      "version": "19.6.0-beta.4",
+      "description": "Update the server file for Module Federation SSR port value to be the same as the 'serve' target port value.",
+      "factory": "./src/migrations/update-19-6-0/update-ssr-server-port",
+      "package": "@nrwl/react",
+      "name": "update-module-federation-ssr-server-file"
+    },
+    {
+      "cli": "nx",
+      "version": "19.6.1-beta.0",
+      "description": "Ensure Target Defaults are set correctly for Module Federation.",
+      "factory": "./src/migrations/update-19-6-1/ensure-depends-on-for-mf",
+      "package": "@nrwl/react",
+      "name": "update-19-6-1-ensure-module-federation-target-defaults"
     },
     {
       "cli": "nx",
@@ -350,6 +366,14 @@
       "implementation": "./src/migrations/update-17-2-1/webpack-config-setup",
       "package": "@nrwl/webpack",
       "name": "update-17-2-1-webpack-config-setup"
+    },
+    {
+      "cli": "nx",
+      "version": "19.6.3-beta.0",
+      "description": "Migrate proxy config files to match new format from webpack-dev-server v5.",
+      "implementation": "./src/migrations/update-19-6-3/proxy-config",
+      "package": "@nrwl/webpack",
+      "name": "update-19-6-3-proxy-config"
     }
   ]
 }

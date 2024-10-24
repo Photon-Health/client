@@ -42,3 +42,14 @@
 [NX Daemon Server] - 2024-10-24T20:43:40.023Z - [WATCHER]: Stopping the watcher for /Users/paulchristophe/Documents/GitHub/client (sources)
 [NX Daemon Server] - 2024-10-24T20:43:40.023Z - Closed a connection. Number of open connections: 0
 [NX Daemon Server] - 2024-10-24T20:43:40.023Z - [WATCHER]: Stopping the watcher for /Users/paulchristophe/Documents/GitHub/client (outputs)
+[NX Daemon Server] - 2024-10-24T21:11:29.061Z - Started listening on: /var/folders/3c/_l3rsbkj58l904xp68r7g9h00000gn/T/8093b0932e0c75411c45/d.sock
+[NX Daemon Server] - 2024-10-24T21:11:29.063Z - [WATCHER]: Subscribed to changes within: /Users/paulchristophe/Documents/GitHub/client (native)
+[NX Daemon Server] - 2024-10-24T21:11:29.064Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-10-24T21:11:29.064Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2024-10-24T21:11:29.065Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-10-24T21:11:29.066Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2024-10-24T21:11:29.066Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2024-10-24T21:11:29.066Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 0.
+[NX Daemon Server] - 2024-10-24T21:11:29.067Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-10-24T21:11:29.067Z - [WATCHER]: Stopping the watcher for /Users/paulchristophe/Documents/GitHub/client (sources)
+[NX Daemon Server] - 2024-10-24T21:11:29.067Z - [WATCHER]: Stopping the watcher for /Users/paulchristophe/Documents/GitHub/client (outputs)
