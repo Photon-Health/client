@@ -86,7 +86,7 @@ const MESSAGE: { [key in ExceptionData['exceptionType']]: (order: Order) => stri
     const { paExceptionMessage } = getSettings(organization.id);
     return (
       paExceptionMessage ??
-      'Your insurance needs information from your provider to cover this medication. Contact your provider for alternatives or pay the cash price.'
+      'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Please reach out to your provider directly to request a prior authorization or discuss alternative medications. If you’re paying cash, you can work directly with your pharmacy to pay the out-of-pocket price.'
     );
   },
   REFILL_TOO_SOON: () =>
