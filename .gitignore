@@ -42,3 +42,5 @@ build-storybook.log
 .nx/cache/
 .nx/workspace-data/
 __generated__
+
+vite.config.ts.timestamp-*
