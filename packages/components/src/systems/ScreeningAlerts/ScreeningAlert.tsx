@@ -59,7 +59,7 @@ const getDescriptorByType = (type: string): string => {
   return TYPE_TO_DESCRIPTOR_MAP[type] ?? '';
 };
 
-const textClasses = () => clsx('mr-2', {});
+const textClasses = () => clsx('text-pretty mr-2 text-black text-base', {});
 
 const getTitle = (props: { owningId?: string; screeningAlert: ScreeningAlertType }): JSXElement => {
   return (
@@ -71,27 +71,23 @@ const getTitle = (props: { owningId?: string; screeningAlert: ScreeningAlertType
         </Text>
       }
     >
-      <>
-        <Text bold class={textClasses()}>
-          {getSeverityText(props.screeningAlert.severity)}
-        </Text>
-        <Text class={textClasses()}> interaction with</Text>
+      <div class={textClasses()}>
+        <span class="font-semibold">{getSeverityText(props.screeningAlert.severity)}</span>{' '}
+        interaction with{' '}
         <For each={filterOutOwningId(props.screeningAlert.involvedEntities, props.owningId)}>
           {(entity, index) => {
             return (
               <>
-                <Text bold class={textClasses()}>
-                  {entity.name}
-                </Text>
-                <Text class={textClasses()}>{getDescriptorByType(entity.__typename)}</Text>
+                <span class="font-semibold">{entity.name}</span>{' '}
+                {getDescriptorByType(entity.__typename)}
                 {index() <
                   filterOutOwningId(props.screeningAlert.involvedEntities, props.owningId).length -
-                    1 && <Text class={textClasses()}>and</Text>}
+                    1 && ' and '}
               </>
             );
           }}
         </For>
-      </>
+      </div>
     </Show>
   );
 };
