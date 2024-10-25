@@ -157,72 +157,28 @@
   "fileMap": {
     "nonProjectFiles": [
       {
-        "file": "tsconfig.base.json",
-        "hash": "2168830976703932189"
+        "file": "tools/generators/.gitkeep",
+        "hash": "3244421341483603138"
       },
       {
-        "file": ".github/labeler.yml",
-        "hash": "7984824041341252532"
+        "file": ".github/workflows/auto-bump-photon.yml",
+        "hash": "9177221168598079623"
+      },
+      {
+        "file": ".eslintrc.json",
+        "hash": "6772398975322045582"
       },
       {
         "file": "jest.config.ts",
         "hash": "15425408466444193875"
       },
       {
-        "file": ".github/workflows/prettier.yml",
-        "hash": "4102110017125137113"
+        "file": "tools/tsconfig.tools.json",
+        "hash": "16088922570277978783"
       },
       {
-        "file": ".github/workflows/auto-bump-neutron.yml",
-        "hash": "9480625163567614469"
-      },
-      {
-        "file": ".graphqlrc.yml",
-        "hash": "8025583073788151793"
-      },
-      {
-        "file": ".nvmrc",
-        "hash": "4574165909355572351"
-      },
-      {
-        "file": ".github/workflows/npm-publish.yml",
-        "hash": "18335246172217112197"
-      },
-      {
-        "file": ".github/workflows/chromatic.yml",
-        "hash": "13651639362963371701"
-      },
-      {
-        "file": "README.md",
-        "hash": "11631996678013826994"
-      },
-      {
-        "file": ".github/workflows/lint.yml",
-        "hash": "13721028349396324121"
-      },
-      {
-        "file": ".github/workflows/type-check.yml",
-        "hash": "8502891590469651554"
-      },
-      {
-        "file": "migrations.json",
-        "hash": "14302382205652626705"
-      },
-      {
-        "file": "package-lock.json",
-        "hash": "5762902855483281194"
-      },
-      {
-        "file": ".husky/.gitignore",
-        "hash": "10106645302852536800"
-      },
-      {
-        "file": "packages/.gitkeep",
-        "hash": "3244421341483603138"
-      },
-      {
-        "file": ".npmrc",
-        "hash": "18085261541358865259"
+        "file": ".github/workflows/merge-bot.yml",
+        "hash": "236149317246659397"
       },
       {
         "file": ".github/workflows/add-comment.yml",
@@ -233,8 +189,68 @@
         "hash": "8589065571768384200"
       },
       {
-        "file": ".husky/pre-commit",
-        "hash": "4086475412151944141"
+        "file": "package.json",
+        "hash": "16870992033601016915"
+      },
+      {
+        "file": ".github/workflows/prettier.yml",
+        "hash": "4102110017125137113"
+      },
+      {
+        "file": "migrations.json",
+        "hash": "14302382205652626705"
+      },
+      {
+        "file": ".github/workflows/lint.yml",
+        "hash": "13721028349396324121"
+      },
+      {
+        "file": ".eslintignore",
+        "hash": "1056963791625130224"
+      },
+      {
+        "file": ".nvmrc",
+        "hash": "4574165909355572351"
+      },
+      {
+        "file": ".editorconfig",
+        "hash": "5443105041930014821"
+      },
+      {
+        "file": ".github/workflows/chromatic.yml",
+        "hash": "13651639362963371701"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "5762902855483281194"
+      },
+      {
+        "file": "packages/.gitkeep",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "README.md",
+        "hash": "11631996678013826994"
+      },
+      {
+        "file": "tsconfig.base.json",
+        "hash": "2168830976703932189"
+      },
+      {
+        "file": ".prettierignore",
+        "hash": "999066152669483856"
+      },
+      {
+        "file": ".graphqlrc.yml",
+        "hash": "8025583073788151793"
+      },
+      {
+        "file": "apps/.gitkeep",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": ".github/workflows/auto-bump-neutron.yml",
+        "hash": "9480625163567614469"
       },
       {
         "file": "nx.json",
@@ -245,63 +261,1595 @@
         "hash": "2772139696069860212"
       },
       {
-        "file": "babel.config.json",
-        "hash": "5546405625092116747"
-      },
-      {
-        "file": ".eslintignore",
-        "hash": "1056963791625130224"
-      },
-      {
-        "file": "apps/.gitkeep",
-        "hash": "3244421341483603138"
-      },
-      {
-        "file": "package.json",
-        "hash": "16870992033601016915"
-      },
-      {
-        "file": ".github/workflows/labeler.yml",
-        "hash": "6106365868831805795"
+        "file": ".prettierrc",
+        "hash": "15456578705471582781"
       },
       {
         "file": ".github/workflows/vitest.yml",
         "hash": "14170402108687215653"
       },
       {
-        "file": ".github/workflows/merge-bot.yml",
-        "hash": "236149317246659397"
+        "file": ".npmrc",
+        "hash": "18085261541358865259"
       },
       {
-        "file": ".editorconfig",
-        "hash": "5443105041930014821"
+        "file": ".github/workflows/labeler.yml",
+        "hash": "6106365868831805795"
       },
       {
-        "file": "tools/generators/.gitkeep",
-        "hash": "3244421341483603138"
+        "file": "babel.config.json",
+        "hash": "5546405625092116747"
       },
       {
-        "file": ".eslintrc.json",
-        "hash": "6772398975322045582"
+        "file": ".husky/pre-commit",
+        "hash": "4086475412151944141"
       },
       {
-        "file": ".prettierrc",
-        "hash": "15456578705471582781"
+        "file": ".husky/.gitignore",
+        "hash": "10106645302852536800"
       },
       {
-        "file": ".github/workflows/auto-bump-photon.yml",
-        "hash": "9177221168598079623"
+        "file": ".github/labeler.yml",
+        "hash": "7984824041341252532"
       },
       {
-        "file": ".prettierignore",
-        "hash": "6921399667495966566"
+        "file": ".github/workflows/type-check.yml",
+        "hash": "8502891590469651554"
       },
       {
-        "file": "tools/tsconfig.tools.json",
-        "hash": "16088922570277978783"
+        "file": ".github/workflows/npm-publish.yml",
+        "hash": "18335246172217112197"
       }
     ],
     "projectFileMap": {
+      "sdk": [
+        {
+          "file": "packages/sdk/.babelrc",
+          "hash": "3250086131670327215"
+        },
+        {
+          "file": "packages/sdk/.gitignore",
+          "hash": "2421172961572960628"
+        },
+        {
+          "file": "packages/sdk/.npmignore",
+          "hash": "7524065579110942832"
+        },
+        {
+          "file": "packages/sdk/README.md",
+          "hash": "2021855636169545117"
+        },
+        {
+          "file": "packages/sdk/docs/.nojekyll",
+          "hash": "12301719336174243164"
+        },
+        {
+          "file": "packages/sdk/docs/assets/highlight.css",
+          "hash": "7386439614685815748"
+        },
+        {
+          "file": "packages/sdk/docs/assets/main.js",
+          "hash": "18427355287440413287"
+        },
+        {
+          "file": "packages/sdk/docs/assets/search.js",
+          "hash": "6234643105792957170"
+        },
+        {
+          "file": "packages/sdk/docs/assets/style.css",
+          "hash": "15305740068528278524"
+        },
+        {
+          "file": "packages/sdk/docs/assets/widgets.png",
+          "hash": "5804325276806323780"
+        },
+        {
+          "file": "packages/sdk/docs/assets/widgets@2x.png",
+          "hash": "4073148668301951777"
+        },
+        {
+          "file": "packages/sdk/docs/classes/auth.AuthManager.html",
+          "hash": "9295324559311742793"
+        },
+        {
+          "file": "packages/sdk/docs/classes/clinical.ClinicalQueryManager.html",
+          "hash": "9302661451977206987"
+        },
+        {
+          "file": "packages/sdk/docs/classes/clinical_catalog.CatalogQueryManager.html",
+          "hash": "4704388698312939243"
+        },
+        {
+          "file": "packages/sdk/docs/classes/clinical_medication.MedicationQueryManager.html",
+          "hash": "2581879510980818876"
+        },
+        {
+          "file": "packages/sdk/docs/classes/clinical_order.OrderQueryManager.html",
+          "hash": "9162424725602477737"
+        },
+        {
+          "file": "packages/sdk/docs/classes/clinical_patient.PatientQueryManager.html",
+          "hash": "16666202863057314264"
+        },
+        {
+          "file": "packages/sdk/docs/classes/clinical_pharmacy.PharmacyQueryManager.html",
+          "hash": "2525711678405443143"
+        },
+        {
+          "file": "packages/sdk/docs/classes/clinical_prescription.PrescriptionQueryManager.html",
+          "hash": "1471660871682806185"
+        },
+        {
+          "file": "packages/sdk/docs/classes/lib.PhotonClient.html",
+          "hash": "12503887829301063041"
+        },
+        {
+          "file": "packages/sdk/docs/classes/management.ManagementQueryManager.html",
+          "hash": "10366140825478763786"
+        },
+        {
+          "file": "packages/sdk/docs/classes/management_client.ClientQueryManager.html",
+          "hash": "17217872952358359676"
+        },
+        {
+          "file": "packages/sdk/docs/classes/management_organization.OrgQueryManager.html",
+          "hash": "1401030131194258649"
+        },
+        {
+          "file": "packages/sdk/docs/classes/management_webhook.WebhookQueryManager.html",
+          "hash": "4582624635841132598"
+        },
+        {
+          "file": "packages/sdk/docs/enums/types.DiagnosisType.html",
+          "hash": "3623225755804104157"
+        },
+        {
+          "file": "packages/sdk/docs/enums/types.DispenseUnit.html",
+          "hash": "1981926188957925467"
+        },
+        {
+          "file": "packages/sdk/docs/enums/types.FillState.html",
+          "hash": "12750937379988151730"
+        },
+        {
+          "file": "packages/sdk/docs/enums/types.MedicationType.html",
+          "hash": "14767615761204781596"
+        },
+        {
+          "file": "packages/sdk/docs/enums/types.OrderState.html",
+          "hash": "10900472013018740226"
+        },
+        {
+          "file": "packages/sdk/docs/enums/types.OrgType.html",
+          "hash": "13538076345742651789"
+        },
+        {
+          "file": "packages/sdk/docs/enums/types.PrescriptionState.html",
+          "hash": "15996512920318551595"
+        },
+        {
+          "file": "packages/sdk/docs/enums/types.SexType.html",
+          "hash": "11426062003455796609"
+        },
+        {
+          "file": "packages/sdk/docs/functions/utils.makeMutation.html",
+          "hash": "14092140614625673397"
+        },
+        {
+          "file": "packages/sdk/docs/functions/utils.makeQuery.html",
+          "hash": "5375594205507105266"
+        },
+        {
+          "file": "packages/sdk/docs/index.html",
+          "hash": "17775761243484057863"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/auth.AuthManagerOptions.html",
+          "hash": "3280961923787931589"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/auth.GetAccessTokenOptions.html",
+          "hash": "15629157644466697556"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/auth.LoginOptions.html",
+          "hash": "11818864763861837438"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/auth.LogoutOptions.html",
+          "hash": "1052173973755751696"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/clinical_catalog.GetCatalogOptions.html",
+          "hash": "6613706828079072068"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/clinical_catalog.GetCatalogsOptions.html",
+          "hash": "1211291264991450195"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/clinical_medication.GetMedicationsOptions.html",
+          "hash": "12138116367271496012"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/clinical_order.CreateOrderOptions.html",
+          "hash": "5611529813875360143"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/clinical_order.GetOrderOptions.html",
+          "hash": "16294832882067922961"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/clinical_order.GetOrdersOptions.html",
+          "hash": "15960754204228848378"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/clinical_patient.CreatePatientOptions.html",
+          "hash": "17639301741122424284"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/clinical_patient.GetPatientOptions.html",
+          "hash": "2917901599249552977"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/clinical_patient.GetPatientsOptions.html",
+          "hash": "2690379360885179286"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/clinical_pharmacy.GetPharmaciesOptions.html",
+          "hash": "3896274711245345033"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/clinical_prescription.CreatePrescriptionOptions.html",
+          "hash": "11260652651387144342"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/clinical_prescription.GetPrescriptionOptions.html",
+          "hash": "8286567074127170937"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/clinical_prescription.GetPrescriptionsOptions.html",
+          "hash": "1809171983499827630"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/lib.PhotonClientOptions.html",
+          "hash": "6035940728718194284"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/management_client.GetClientsOptions.html",
+          "hash": "5122163329214746283"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/management_client.RotateSecretOptions.html",
+          "hash": "13657921302779642103"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/management_organization.GetOrganizationOptions.html",
+          "hash": "15368428769970244093"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/management_organization.GetOrganizationsOptions.html",
+          "hash": "8100538066240157671"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/management_webhook.CreateWebhookOptions.html",
+          "hash": "3475341143582527775"
+        },
+        {
+          "file": "packages/sdk/docs/interfaces/management_webhook.GetWebhooksOptions.html",
+          "hash": "669631827926606305"
+        },
+        {
+          "file": "packages/sdk/docs/modules.html",
+          "hash": "15552522187533087154"
+        },
+        {
+          "file": "packages/sdk/docs/modules/auth.html",
+          "hash": "16549382035985471571"
+        },
+        {
+          "file": "packages/sdk/docs/modules/clinical.html",
+          "hash": "13685711008631721273"
+        },
+        {
+          "file": "packages/sdk/docs/modules/clinical_catalog.html",
+          "hash": "15370543291530993789"
+        },
+        {
+          "file": "packages/sdk/docs/modules/clinical_medication.html",
+          "hash": "6640202806954815754"
+        },
+        {
+          "file": "packages/sdk/docs/modules/clinical_order.html",
+          "hash": "4015598951317197004"
+        },
+        {
+          "file": "packages/sdk/docs/modules/clinical_patient.html",
+          "hash": "16611380324597146910"
+        },
+        {
+          "file": "packages/sdk/docs/modules/clinical_pharmacy.html",
+          "hash": "2542942746321174563"
+        },
+        {
+          "file": "packages/sdk/docs/modules/clinical_prescription.html",
+          "hash": "945072993364685459"
+        },
+        {
+          "file": "packages/sdk/docs/modules/fragments.html",
+          "hash": "14163123163279463558"
+        },
+        {
+          "file": "packages/sdk/docs/modules/lib.html",
+          "hash": "1280952439722168709"
+        },
+        {
+          "file": "packages/sdk/docs/modules/management.html",
+          "hash": "16801204002105180460"
+        },
+        {
+          "file": "packages/sdk/docs/modules/management_client.html",
+          "hash": "17115050473517717275"
+        },
+        {
+          "file": "packages/sdk/docs/modules/management_organization.html",
+          "hash": "1438184520239658816"
+        },
+        {
+          "file": "packages/sdk/docs/modules/management_webhook.html",
+          "hash": "1896051317647064283"
+        },
+        {
+          "file": "packages/sdk/docs/modules/types.html",
+          "hash": "2444896611393827603"
+        },
+        {
+          "file": "packages/sdk/docs/modules/utils.html",
+          "hash": "16141494250367907614"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Address.html",
+          "hash": "14454109369462817107"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.AddressInput.html",
+          "hash": "111319916296969485"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Allergy.html",
+          "hash": "17666422572210049385"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Catalog.html",
+          "hash": "13656068755492666196"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Client.html",
+          "hash": "6362190772643509514"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.ConceptInput.html",
+          "hash": "11188726560918728743"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Diagnosis.html",
+          "hash": "10379197963853903080"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Exact.html",
+          "hash": "15357437193139592603"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Fill.html",
+          "hash": "8415236855879778707"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.FillInput.html",
+          "hash": "5157059271739180601"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.InputMaybe.html",
+          "hash": "6196902440877251411"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.LatLongSearch.html",
+          "hash": "9398938035562689371"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.MakeMaybe.html",
+          "hash": "6481532597720708998"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.MakeOptional.html",
+          "hash": "2472719108428068126"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Maybe.html",
+          "hash": "1697735510426586378"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Medication.html",
+          "hash": "15862022261507114905"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.MedicationFilter.html",
+          "hash": "9847336838590583962"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Mutation.html",
+          "hash": "8006164362537174451"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.MutationAddToCatalogArgs.html",
+          "hash": "4708192280467962729"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.MutationCreateOrderArgs.html",
+          "hash": "11406363827503987740"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.MutationCreatePatientArgs.html",
+          "hash": "4112450422637260077"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.MutationCreatePrescriptionArgs.html",
+          "hash": "15743509976816883089"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.MutationCreateWebhookConfigArgs.html",
+          "hash": "13267283383702535498"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.MutationDeleteWebhookConfigArgs.html",
+          "hash": "8142080497424954320"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.MutationRotateSecretArgs.html",
+          "hash": "6552100506719650413"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.MutationUpdatePatientArgs.html",
+          "hash": "14578301978021713397"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.MutationUpdateWebhookConfigArgs.html",
+          "hash": "5803427144990687075"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Name.html",
+          "hash": "15793777961664799234"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.NameInput.html",
+          "hash": "7009555212064030823"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Order.html",
+          "hash": "607664456431755227"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.OrderFilter.html",
+          "hash": "791957385158324173"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Organization.html",
+          "hash": "8152091703928673863"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Patient.html",
+          "hash": "7581484249981201942"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.PatientFilter.html",
+          "hash": "17092089425216552938"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.PatientOrderFilter.html",
+          "hash": "16312145989050222670"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.PatientOrdersArgs.html",
+          "hash": "16529811152667414732"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.PatientPrescriptionFilter.html",
+          "hash": "10781285637074896784"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.PatientPrescriptionsArgs.html",
+          "hash": "7480308934933627542"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Pharmacy.html",
+          "hash": "672108644113212839"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Prescription.html",
+          "hash": "9772999375696133"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.PrescriptionFilter.html",
+          "hash": "5105326090144075414"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.PrescriptionTemplate.html",
+          "hash": "7694189800664509374"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Provider.html",
+          "hash": "6263169995369376498"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Query.html",
+          "hash": "14002905008392886064"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.QueryAllergiesArgs.html",
+          "hash": "17102733189878343868"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.QueryCatalogArgs.html",
+          "hash": "6898891372415375697"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.QueryFillArgs.html",
+          "hash": "2926120319770852813"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.QueryMedicationsArgs.html",
+          "hash": "10124666686826160900"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.QueryOrderArgs.html",
+          "hash": "704896879013693251"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.QueryOrdersArgs.html",
+          "hash": "13871837769946398293"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.QueryPatientArgs.html",
+          "hash": "3774241967597410765"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.QueryPatientsArgs.html",
+          "hash": "6561470403062608532"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.QueryPharmaciesArgs.html",
+          "hash": "2236154937819915254"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.QueryPharmacyArgs.html",
+          "hash": "11317453936004762998"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.QueryPrescriptionArgs.html",
+          "hash": "4986944530341525929"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.QueryPrescriptionsArgs.html",
+          "hash": "5180341129975091166"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Role.html",
+          "hash": "3157600424815890540"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Scalars.html",
+          "hash": "2581891426240259268"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.Treatment.html",
+          "hash": "4400580249287048819"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.TreatmentCodes.html",
+          "hash": "17694644470509732278"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.User.html",
+          "hash": "2073518247538945360"
+        },
+        {
+          "file": "packages/sdk/docs/types/types.WebhookConfig.html",
+          "hash": "4162488332365932836"
+        },
+        {
+          "file": "packages/sdk/docs/types/utils.MakeMutationReturn.html",
+          "hash": "661307148826781429"
+        },
+        {
+          "file": "packages/sdk/docs/types/utils.MakeMutationReturnOptions.html",
+          "hash": "17114651033779846602"
+        },
+        {
+          "file": "packages/sdk/docs/types/utils.MakeQueryReturn.html",
+          "hash": "9055202395645515391"
+        },
+        {
+          "file": "packages/sdk/docs/variables/fragments.CATALOG_FIELDS.html",
+          "hash": "16017175167322408044"
+        },
+        {
+          "file": "packages/sdk/docs/variables/fragments.CATALOG_MEDICATION_FIELDS.html",
+          "hash": "7906188621423877818"
+        },
+        {
+          "file": "packages/sdk/docs/variables/fragments.CLIENT_FIELDS.html",
+          "hash": "17831396742390378846"
+        },
+        {
+          "file": "packages/sdk/docs/variables/fragments.FILL_FIELDS.html",
+          "hash": "8851982039013030537"
+        },
+        {
+          "file": "packages/sdk/docs/variables/fragments.MEDICATION_FIELDS.html",
+          "hash": "10508960623428417297"
+        },
+        {
+          "file": "packages/sdk/docs/variables/fragments.ORDER_FIELDS.html",
+          "hash": "5744854042156601528"
+        },
+        {
+          "file": "packages/sdk/docs/variables/fragments.ORGANIZATION_FIELDS.html",
+          "hash": "10045833898153393977"
+        },
+        {
+          "file": "packages/sdk/docs/variables/fragments.PATIENT_FIELDS.html",
+          "hash": "5992050269685508612"
+        },
+        {
+          "file": "packages/sdk/docs/variables/fragments.PHARMACY_FIELDS.html",
+          "hash": "2133229762904080633"
+        },
+        {
+          "file": "packages/sdk/docs/variables/fragments.PRESCRIPTION_FIELDS.html",
+          "hash": "3897746544039648287"
+        },
+        {
+          "file": "packages/sdk/docs/variables/fragments.WEBHOOK_CONFIG_FIELDS.html",
+          "hash": "18224497347256454083"
+        },
+        {
+          "file": "packages/sdk/package.json",
+          "hash": "3783126128139667541"
+        },
+        {
+          "file": "packages/sdk/project.json",
+          "hash": "6558507450921912868"
+        },
+        {
+          "file": "packages/sdk/src/auth.ts",
+          "hash": "11873488026552601497",
+          "deps": [
+            "npm:@auth0/auth0-spa-js"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/clinical/allergen.ts",
+          "hash": "11470792986557812842",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/clinical/catalog.ts",
+          "hash": "10971748578195551573",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/clinical/index.ts",
+          "hash": "4392602130465030288",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/clinical/medicalEquipment.ts",
+          "hash": "16516631027834345710",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/clinical/medication.ts",
+          "hash": "13719173847921477991",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/clinical/order.ts",
+          "hash": "1732671036180773492",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/clinical/patient.ts",
+          "hash": "1332176537071834520",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/clinical/pharmacy.ts",
+          "hash": "10382148642402798240",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/clinical/prescription.ts",
+          "hash": "2244459118304995028",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/clinical/prescriptionTemplate.ts",
+          "hash": "1561213293556588172",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/clinical/searchMedication.ts",
+          "hash": "17099406806045970845",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/fragments.ts",
+          "hash": "5540517544607311003",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/lib.ts",
+          "hash": "7516051605281261837",
+          "deps": [
+            "npm:@auth0/auth0-spa-js",
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/management/client.ts",
+          "hash": "3928225439234281836",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/management/index.ts",
+          "hash": "458804569544218936",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/management/organization.ts",
+          "hash": "11403443865979997861",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/management/webhook.ts",
+          "hash": "10299846719365106353",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/src/types.ts",
+          "hash": "8918594362883628267"
+        },
+        {
+          "file": "packages/sdk/src/utils.ts",
+          "hash": "17959428661545882335",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "packages/sdk/tsconfig.json",
+          "hash": "9472932482458089771"
+        },
+        {
+          "file": "packages/sdk/vite.config.ts",
+          "hash": "6273563756385736393",
+          "deps": [
+            "npm:vite",
+            "npm:@rollup/plugin-typescript"
+          ]
+        }
+      ],
+      "react": [
+        {
+          "file": "packages/react/.gitignore",
+          "hash": "2421172961572960628"
+        },
+        {
+          "file": "packages/react/.npmignore",
+          "hash": "8095674908064720598"
+        },
+        {
+          "file": "packages/react/README.md",
+          "hash": "12316001819976155935"
+        },
+        {
+          "file": "packages/react/package.json",
+          "hash": "1023739090445488287",
+          "deps": [
+            "sdk"
+          ]
+        },
+        {
+          "file": "packages/react/project.json",
+          "hash": "4702653944626751023"
+        },
+        {
+          "file": "packages/react/src/index.ts",
+          "hash": "13628873452557707032",
+          "deps": [
+            "sdk"
+          ]
+        },
+        {
+          "file": "packages/react/src/provider.tsx",
+          "hash": "12073294243594290261",
+          "deps": [
+            "sdk"
+          ]
+        },
+        {
+          "file": "packages/react/tsconfig.json",
+          "hash": "9841964834141268668"
+        },
+        {
+          "file": "packages/react/vite.config.ts",
+          "hash": "10852366916110424779",
+          "deps": [
+            "npm:@vitejs/plugin-react",
+            "npm:vite",
+            "npm:vite-plugin-dts"
+          ]
+        }
+      ],
+      "patient": [
+        {
+          "file": "apps/patient/.env.boson",
+          "hash": "7469281588554533765"
+        },
+        {
+          "file": "apps/patient/.env.neutron",
+          "hash": "4849055626352440930"
+        },
+        {
+          "file": "apps/patient/.env.photon",
+          "hash": "7302015441199366953"
+        },
+        {
+          "file": "apps/patient/.env.tau",
+          "hash": "7532113468201502552"
+        },
+        {
+          "file": "apps/patient/.eslintrc.json",
+          "hash": "7194636396650983865"
+        },
+        {
+          "file": "apps/patient/.gitignore",
+          "hash": "5403484524555424706"
+        },
+        {
+          "file": "apps/patient/README.md",
+          "hash": "3725103818597990343"
+        },
+        {
+          "file": "apps/patient/buildspec.yml",
+          "hash": "4713631479381369677"
+        },
+        {
+          "file": "apps/patient/codegen.ts",
+          "hash": "1978337720162043045",
+          "deps": [
+            "npm:@graphql-codegen/cli"
+          ]
+        },
+        {
+          "file": "apps/patient/config-overrides.js",
+          "hash": "10075281367138450456",
+          "deps": [
+            "npm:tsconfig-paths-webpack-plugin",
+            "npm:react-dev-utils",
+            "npm:webpack",
+            "npm:git-revision-webpack-plugin"
+          ]
+        },
+        {
+          "file": "apps/patient/package.json",
+          "hash": "13343026301561903748"
+        },
+        {
+          "file": "apps/patient/project.json",
+          "hash": "482158163966772028"
+        },
+        {
+          "file": "apps/patient/public/favicon.ico",
+          "hash": "16981086585139778761"
+        },
+        {
+          "file": "apps/patient/public/index.html",
+          "hash": "2905328293331010173"
+        },
+        {
+          "file": "apps/patient/public/logo256.png",
+          "hash": "3016947981804235540"
+        },
+        {
+          "file": "apps/patient/public/manifest.json",
+          "hash": "4899832329521084967"
+        },
+        {
+          "file": "apps/patient/public/robots.txt",
+          "hash": "2790380794362165217"
+        },
+        {
+          "file": "apps/patient/src/App.tsx",
+          "hash": "6211542281951809218",
+          "deps": [
+            "npm:react-router-dom"
+          ]
+        },
+        {
+          "file": "apps/patient/src/api/external.ts",
+          "hash": "1393572546927575658"
+        },
+        {
+          "file": "apps/patient/src/api/index.ts",
+          "hash": "16423126407776097590"
+        },
+        {
+          "file": "apps/patient/src/api/internal.ts",
+          "hash": "16237803496488744383"
+        },
+        {
+          "file": "apps/patient/src/assets.d.ts",
+          "hash": "11791625205271766597"
+        },
+        {
+          "file": "apps/patient/src/assets/alto_logo.svg",
+          "hash": "7562636001482874512"
+        },
+        {
+          "file": "apps/patient/src/assets/amazon_pharmacy_logo_small.png",
+          "hash": "4370273387434500621"
+        },
+        {
+          "file": "apps/patient/src/assets/assure_health_logo.svg",
+          "hash": "7379464904890063751"
+        },
+        {
+          "file": "apps/patient/src/assets/blueberry_logo.png",
+          "hash": "9739342148068896489"
+        },
+        {
+          "file": "apps/patient/src/assets/bold_health_logo.svg",
+          "hash": "17498726258209953440"
+        },
+        {
+          "file": "apps/patient/src/assets/brightside_health_logo.svg",
+          "hash": "11666212670849304290"
+        },
+        {
+          "file": "apps/patient/src/assets/capsule_logo_small.png",
+          "hash": "13670336860221438849"
+        },
+        {
+          "file": "apps/patient/src/assets/carbon_health_logo.svg",
+          "hash": "17004415189815176644"
+        },
+        {
+          "file": "apps/patient/src/assets/circle_medical_logo.svg",
+          "hash": "12282510367550808038"
+        },
+        {
+          "file": "apps/patient/src/assets/conversation.png",
+          "hash": "12271341122035511433"
+        },
+        {
+          "file": "apps/patient/src/assets/cost_plus_logo_small_circle.svg",
+          "hash": "15635672570579309600"
+        },
+        {
+          "file": "apps/patient/src/assets/costco_logo_small.png",
+          "hash": "6447031852212748131"
+        },
+        {
+          "file": "apps/patient/src/assets/counsel_logo.png",
+          "hash": "9242870590138557959"
+        },
+        {
+          "file": "apps/patient/src/assets/found_logo.svg",
+          "hash": "2446510235521673286"
+        },
+        {
+          "file": "apps/patient/src/assets/frontier_direct_care_logo.png",
+          "hash": "1619571032560227228"
+        },
+        {
+          "file": "apps/patient/src/assets/grow_therapy_logo.svg",
+          "hash": "6856804205439513092"
+        },
+        {
+          "file": "apps/patient/src/assets/harbor_health_logo.png",
+          "hash": "6369279760457079593"
+        },
+        {
+          "file": "apps/patient/src/assets/heartbeat_health_logo.svg",
+          "hash": "10935748873487665407"
+        },
+        {
+          "file": "apps/patient/src/assets/hera_fertility_logo.svg",
+          "hash": "7282659771069903607"
+        },
+        {
+          "file": "apps/patient/src/assets/lifeforce_logo.jpeg",
+          "hash": "15602614792011779810"
+        },
+        {
+          "file": "apps/patient/src/assets/maven_logo.svg",
+          "hash": "14285942922165892217"
+        },
+        {
+          "file": "apps/patient/src/assets/measured_logo.svg",
+          "hash": "14777877414648840890"
+        },
+        {
+          "file": "apps/patient/src/assets/miga_health_logo.svg",
+          "hash": "18373132537365136772"
+        },
+        {
+          "file": "apps/patient/src/assets/mishe_logo.svg",
+          "hash": "10385120787291516102"
+        },
+        {
+          "file": "apps/patient/src/assets/modern_pediatrics_logo.png",
+          "hash": "1121476808691609513"
+        },
+        {
+          "file": "apps/patient/src/assets/modern_ritual_logo.webp",
+          "hash": "126634527288769968"
+        },
+        {
+          "file": "apps/patient/src/assets/moment_health_logo.webp",
+          "hash": "11147188976176160412"
+        },
+        {
+          "file": "apps/patient/src/assets/newco_logo.svg",
+          "hash": "5049644539638381039"
+        },
+        {
+          "file": "apps/patient/src/assets/oak_st_health.png",
+          "hash": "16208266858997826126"
+        },
+        {
+          "file": "apps/patient/src/assets/ognomy_logo.webp",
+          "hash": "3031798894607070243"
+        },
+        {
+          "file": "apps/patient/src/assets/one_medical.jpeg",
+          "hash": "932886557847972192"
+        },
+        {
+          "file": "apps/patient/src/assets/openloop_logo.png",
+          "hash": "12287433431119728315"
+        },
+        {
+          "file": "apps/patient/src/assets/oshi_logo.svg",
+          "hash": "15430758869762009972"
+        },
+        {
+          "file": "apps/patient/src/assets/peachy_logo.png",
+          "hash": "1438836691440333389"
+        },
+        {
+          "file": "apps/patient/src/assets/piction_health_logo.png",
+          "hash": "6838243768195989"
+        },
+        {
+          "file": "apps/patient/src/assets/pine_medical_logo.svg",
+          "hash": "5961109991668931496"
+        },
+        {
+          "file": "apps/patient/src/assets/pm_pediatrics_logo.svg",
+          "hash": "13710590861674599162"
+        },
+        {
+          "file": "apps/patient/src/assets/red_radish_logo.svg",
+          "hash": "5875130317507290005"
+        },
+        {
+          "file": "apps/patient/src/assets/redbox_logo.jpg",
+          "hash": "14853207712691698127"
+        },
+        {
+          "file": "apps/patient/src/assets/reside_health_logo.webp",
+          "hash": "648359952622629510"
+        },
+        {
+          "file": "apps/patient/src/assets/river_health_logo.svg",
+          "hash": "6973183387033731027"
+        },
+        {
+          "file": "apps/patient/src/assets/sana_care_logo.png",
+          "hash": "10264296227229185531"
+        },
+        {
+          "file": "apps/patient/src/assets/sesame_logo.jpg",
+          "hash": "4390590920155393041"
+        },
+        {
+          "file": "apps/patient/src/assets/summer_health_logo.svg",
+          "hash": "11283701565053457503"
+        },
+        {
+          "file": "apps/patient/src/assets/sunny_logo.svg",
+          "hash": "2438471355548723404"
+        },
+        {
+          "file": "apps/patient/src/assets/superpower_logo.svg",
+          "hash": "17070910379118373441"
+        },
+        {
+          "file": "apps/patient/src/assets/tbd_logo.svg",
+          "hash": "3477906245145144910"
+        },
+        {
+          "file": "apps/patient/src/assets/transcarent_logo.png",
+          "hash": "1761068590456701158"
+        },
+        {
+          "file": "apps/patient/src/assets/twentyeight_health_logo.svg",
+          "hash": "1701244532707307031"
+        },
+        {
+          "file": "apps/patient/src/assets/walgreens_small.png",
+          "hash": "10671788434267203059"
+        },
+        {
+          "file": "apps/patient/src/assets/walmart_logo_small.jpg",
+          "hash": "4321309193121887309"
+        },
+        {
+          "file": "apps/patient/src/assets/walmart_logo_small_circle.svg",
+          "hash": "17066990089429105857"
+        },
+        {
+          "file": "apps/patient/src/assets/walmart_small.svg",
+          "hash": "5296733608242202063"
+        },
+        {
+          "file": "apps/patient/src/assets/zzpeds_logo.png",
+          "hash": "10176026617505542392"
+        },
+        {
+          "file": "apps/patient/src/components/BrandedOptions.tsx",
+          "hash": "8558512684992427974",
+          "deps": [
+            "npm:@chakra-ui/react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/BrandedPharmacyCard.tsx",
+          "hash": "4473647305583319551",
+          "deps": [
+            "npm:@chakra-ui/react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/Card.tsx",
+          "hash": "131796814364955607",
+          "deps": [
+            "npm:@chakra-ui/react",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/CouponModal.tsx",
+          "hash": "13908738364389898880",
+          "deps": [
+            "npm:@chakra-ui/react",
+            "npm:react",
+            "npm:react-router-dom"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/Coupons.tsx",
+          "hash": "3365026605605717475",
+          "deps": [
+            "npm:@chakra-ui/react",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/DemoCtaModal.tsx",
+          "hash": "6450590967201591400",
+          "deps": [
+            "npm:@chakra-ui/react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/FAQ.tsx",
+          "hash": "16282595203672477405",
+          "deps": [
+            "npm:@chakra-ui/react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/FAQModal.tsx",
+          "hash": "15377904366227670754",
+          "deps": [
+            "npm:@chakra-ui/react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/FixedFooter.tsx",
+          "hash": "11527292017564234696",
+          "deps": [
+            "npm:@chakra-ui/react",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/HorizontalStatusStepper.tsx",
+          "hash": "14049701746516859088",
+          "deps": [
+            "npm:@chakra-ui/react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/LocationModal.tsx",
+          "hash": "12757939709899008520",
+          "deps": [
+            "npm:react",
+            "npm:react-router-dom",
+            "npm:@chakra-ui/react",
+            "npm:react-icons",
+            "npm:chakra-react-select",
+            "npm:lodash"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/Logo.tsx",
+          "hash": "14988443168136369428",
+          "deps": [
+            "npm:@chakra-ui/react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/Nav.tsx",
+          "hash": "6436343676377441803",
+          "deps": [
+            "npm:@chakra-ui/react",
+            "npm:react-router-dom",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/PharmacyCard.tsx",
+          "hash": "2538613057546849203",
+          "deps": [
+            "npm:react",
+            "npm:@chakra-ui/react",
+            "npm:react-icons",
+            "npm:dayjs"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/PharmacyFilters.tsx",
+          "hash": "13387635375064252222",
+          "deps": [
+            "npm:@chakra-ui/react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/PharmacyInfo.tsx",
+          "hash": "11449971017133975435",
+          "deps": [
+            "npm:@chakra-ui/react",
+            "npm:dayjs",
+            "npm:react-icons",
+            "npm:react-router-dom",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/PickupOptions.tsx",
+          "hash": "710052788182137090",
+          "deps": [
+            "npm:@chakra-ui/react",
+            "npm:react-icons",
+            "npm:dayjs"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/PoweredBy.tsx",
+          "hash": "8754908791351543188",
+          "deps": [
+            "npm:@chakra-ui/react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/PrescriptionsList.tsx",
+          "hash": "4318630640434874973",
+          "deps": [
+            "npm:@chakra-ui/react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/ReadyText.tsx",
+          "hash": "12487927122829524086",
+          "deps": [
+            "npm:dayjs",
+            "npm:@chakra-ui/react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/StatusStepper.tsx",
+          "hash": "5114971796900850368",
+          "deps": [
+            "npm:@chakra-ui/react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/index.tsx",
+          "hash": "1076572624787197438"
+        },
+        {
+          "file": "apps/patient/src/components/order-details/OrderDetailsModal.tsx",
+          "hash": "12357667675638530625",
+          "deps": [
+            "npm:@chakra-ui/react",
+            "npm:dayjs",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/order-summary/OrderSummary.tsx",
+          "hash": "8038973060180691521",
+          "deps": [
+            "settings"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/statusV2/Header.tsx",
+          "hash": "16359178864944358526",
+          "deps": [
+            "npm:@chakra-ui/react",
+            "npm:dayjs",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/patient/src/components/statusV2/Step.tsx",
+          "hash": "1089307772195141033",
+          "deps": [
+            "npm:@chakra-ui/react",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/configs/graphqlClient.ts",
+          "hash": "17618889407232059354",
+          "deps": [
+            "npm:graphql-request",
+            "npm:graphql-scalars"
+          ]
+        },
+        {
+          "file": "apps/patient/src/configs/theme.ts",
+          "hash": "5898711030787905850",
+          "deps": [
+            "settings"
+          ]
+        },
+        {
+          "file": "apps/patient/src/configs/toast.ts",
+          "hash": "278549442142731738",
+          "deps": [
+            "npm:@chakra-ui/react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/data/capsulePharmacyIds.json",
+          "hash": "18308423285966429070"
+        },
+        {
+          "file": "apps/patient/src/data/capsuleZipcodes.json",
+          "hash": "14840880344225163815"
+        },
+        {
+          "file": "apps/patient/src/data/courierPharmacys.ts",
+          "hash": "16514438891061832501"
+        },
+        {
+          "file": "apps/patient/src/data/demoOrder.ts",
+          "hash": "17474804872859034533"
+        },
+        {
+          "file": "apps/patient/src/data/demoPharmacies.ts",
+          "hash": "14460089083127520973"
+        },
+        {
+          "file": "apps/patient/src/data/demoPrescriptions.ts",
+          "hash": "8851572639232355228"
+        },
+        {
+          "file": "apps/patient/src/globals.d.ts",
+          "hash": "990620919449521080"
+        },
+        {
+          "file": "apps/patient/src/graphql/index.ts",
+          "hash": "88703959571392466"
+        },
+        {
+          "file": "apps/patient/src/graphql/mutations.ts",
+          "hash": "17450278024824585750",
+          "deps": [
+            "npm:graphql-request"
+          ]
+        },
+        {
+          "file": "apps/patient/src/graphql/queries.ts",
+          "hash": "17910173860846926173",
+          "deps": [
+            "npm:graphql-tag"
+          ]
+        },
+        {
+          "file": "apps/patient/src/index.tsx",
+          "hash": "12976048718564418385",
+          "deps": [
+            "npm:react-dom",
+            "npm:@datadog/browser-rum",
+            "npm:react-ga4"
+          ]
+        },
+        {
+          "file": "apps/patient/src/reportWebVitals.ts",
+          "hash": "12127447150923256761",
+          "deps": [
+            [
+              "npm:web-vitals",
+              "dynamic"
+            ]
+          ]
+        },
+        {
+          "file": "apps/patient/src/setupTests.js",
+          "hash": "16903885983588411080",
+          "deps": [
+            "npm:@testing-library/jest-dom"
+          ]
+        },
+        {
+          "file": "apps/patient/src/utils/dates.ts",
+          "hash": "11282068091244056472",
+          "deps": [
+            "npm:dayjs"
+          ]
+        },
+        {
+          "file": "apps/patient/src/utils/fulfillmentsHelpers.ts",
+          "hash": "9011882476796546855"
+        },
+        {
+          "file": "apps/patient/src/utils/general.ts",
+          "hash": "8055336476280667401",
+          "deps": [
+            "npm:dayjs"
+          ]
+        },
+        {
+          "file": "apps/patient/src/utils/isGLP.ts",
+          "hash": "17547968513864620015"
+        },
+        {
+          "file": "apps/patient/src/utils/models.ts",
+          "hash": "17683721630550953515"
+        },
+        {
+          "file": "apps/patient/src/utils/text.tsx",
+          "hash": "9212544053549117063",
+          "deps": [
+            "sdk"
+          ]
+        },
+        {
+          "file": "apps/patient/src/utils/useStep.ts",
+          "hash": "2032844773780752230",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/patient/src/views/Canceled.tsx",
+          "hash": "4414605242265323816",
+          "deps": [
+            "npm:@chakra-ui/react",
+            "npm:react-helmet"
+          ]
+        },
+        {
+          "file": "apps/patient/src/views/Main.tsx",
+          "hash": "11136305691040424147",
+          "deps": [
+            "settings"
+          ]
+        },
+        {
+          "file": "apps/patient/src/views/NoMatch.tsx",
+          "hash": "1789133274896104201",
+          "deps": [
+            "npm:@chakra-ui/react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/patient/src/views/Pharmacy.tsx",
+          "hash": "16516689411249224358",
+          "deps": [
+            "settings"
+          ]
+        },
+        {
+          "file": "apps/patient/src/views/ReadyBy.tsx",
+          "hash": "14748962764755639766",
+          "deps": [
+            "npm:react",
+            "npm:@chakra-ui/react",
+            "npm:react-router-dom",
+            "npm:react-helmet",
+            "npm:dayjs",
+            "npm:@datadog/browser-rum",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/patient/src/views/Review.tsx",
+          "hash": "5194933322105305483",
+          "deps": [
+            "npm:@chakra-ui/react",
+            "npm:react-helmet",
+            "npm:react-router-dom"
+          ]
+        },
+        {
+          "file": "apps/patient/src/views/StatusV2.tsx",
+          "hash": "14566523365756798097",
+          "deps": [
+            "settings"
+          ]
+        },
+        {
+          "file": "apps/patient/tsconfig.base.json",
+          "hash": "171598901503601024"
+        },
+        {
+          "file": "apps/patient/tsconfig.json",
+          "hash": "18440181143279179635"
+        }
+      ],
       "elements": [
         {
           "file": "packages/elements/.eslintrc.json",
@@ -2174,1552 +3722,50 @@
           "hash": "638118407805670524"
         }
       ],
-      "react": [
+      "settings": [
         {
-          "file": "packages/react/.gitignore",
-          "hash": "2421172961572960628"
+          "file": "packages/settings/README.md",
+          "hash": "14533086208237623413"
         },
         {
-          "file": "packages/react/.npmignore",
-          "hash": "8095674908064720598"
+          "file": "packages/settings/package.json",
+          "hash": "18245037887545584959"
         },
         {
-          "file": "packages/react/README.md",
-          "hash": "12316001819976155935"
+          "file": "packages/settings/project.json",
+          "hash": "12109291571447926373"
         },
         {
-          "file": "packages/react/package.json",
-          "hash": "1023739090445488287",
-          "deps": [
-            "sdk"
-          ]
+          "file": "packages/settings/src/index.ts",
+          "hash": "5844917046241890916"
         },
         {
-          "file": "packages/react/project.json",
-          "hash": "4702653944626751023"
+          "file": "packages/settings/src/lib/boson.ts",
+          "hash": "6172027041362307457"
         },
         {
-          "file": "packages/react/src/index.ts",
-          "hash": "13628873452557707032",
-          "deps": [
-            "sdk"
-          ]
+          "file": "packages/settings/src/lib/neutron.ts",
+          "hash": "10368529532949552723"
         },
         {
-          "file": "packages/react/src/provider.tsx",
-          "hash": "12073294243594290261",
-          "deps": [
-            "sdk"
-          ]
+          "file": "packages/settings/src/lib/photon.ts",
+          "hash": "17926876183301757320"
         },
         {
-          "file": "packages/react/tsconfig.json",
-          "hash": "9841964834141268668"
+          "file": "packages/settings/src/pharmacies.ts",
+          "hash": "5455138066475799397"
         },
         {
-          "file": "packages/react/vite.config.ts",
-          "hash": "10852366916110424779",
-          "deps": [
-            "npm:@vitejs/plugin-react",
-            "npm:vite",
-            "npm:vite-plugin-dts"
-          ]
-        }
-      ],
-      "sdk": [
-        {
-          "file": "packages/sdk/.babelrc",
-          "hash": "3250086131670327215"
-        },
-        {
-          "file": "packages/sdk/.gitignore",
-          "hash": "2421172961572960628"
-        },
-        {
-          "file": "packages/sdk/.npmignore",
-          "hash": "7524065579110942832"
-        },
-        {
-          "file": "packages/sdk/README.md",
-          "hash": "2021855636169545117"
-        },
-        {
-          "file": "packages/sdk/docs/.nojekyll",
-          "hash": "12301719336174243164"
-        },
-        {
-          "file": "packages/sdk/docs/assets/highlight.css",
-          "hash": "7386439614685815748"
-        },
-        {
-          "file": "packages/sdk/docs/assets/main.js",
-          "hash": "18427355287440413287"
-        },
-        {
-          "file": "packages/sdk/docs/assets/search.js",
-          "hash": "6234643105792957170"
-        },
-        {
-          "file": "packages/sdk/docs/assets/style.css",
-          "hash": "15305740068528278524"
-        },
-        {
-          "file": "packages/sdk/docs/assets/widgets.png",
-          "hash": "5804325276806323780"
-        },
-        {
-          "file": "packages/sdk/docs/assets/widgets@2x.png",
-          "hash": "4073148668301951777"
-        },
-        {
-          "file": "packages/sdk/docs/classes/auth.AuthManager.html",
-          "hash": "9295324559311742793"
-        },
-        {
-          "file": "packages/sdk/docs/classes/clinical.ClinicalQueryManager.html",
-          "hash": "9302661451977206987"
-        },
-        {
-          "file": "packages/sdk/docs/classes/clinical_catalog.CatalogQueryManager.html",
-          "hash": "4704388698312939243"
-        },
-        {
-          "file": "packages/sdk/docs/classes/clinical_medication.MedicationQueryManager.html",
-          "hash": "2581879510980818876"
-        },
-        {
-          "file": "packages/sdk/docs/classes/clinical_order.OrderQueryManager.html",
-          "hash": "9162424725602477737"
-        },
-        {
-          "file": "packages/sdk/docs/classes/clinical_patient.PatientQueryManager.html",
-          "hash": "16666202863057314264"
-        },
-        {
-          "file": "packages/sdk/docs/classes/clinical_pharmacy.PharmacyQueryManager.html",
-          "hash": "2525711678405443143"
-        },
-        {
-          "file": "packages/sdk/docs/classes/clinical_prescription.PrescriptionQueryManager.html",
-          "hash": "1471660871682806185"
-        },
-        {
-          "file": "packages/sdk/docs/classes/lib.PhotonClient.html",
-          "hash": "12503887829301063041"
-        },
-        {
-          "file": "packages/sdk/docs/classes/management.ManagementQueryManager.html",
-          "hash": "10366140825478763786"
-        },
-        {
-          "file": "packages/sdk/docs/classes/management_client.ClientQueryManager.html",
-          "hash": "17217872952358359676"
-        },
-        {
-          "file": "packages/sdk/docs/classes/management_organization.OrgQueryManager.html",
-          "hash": "1401030131194258649"
-        },
-        {
-          "file": "packages/sdk/docs/classes/management_webhook.WebhookQueryManager.html",
-          "hash": "4582624635841132598"
-        },
-        {
-          "file": "packages/sdk/docs/enums/types.DiagnosisType.html",
-          "hash": "3623225755804104157"
-        },
-        {
-          "file": "packages/sdk/docs/enums/types.DispenseUnit.html",
-          "hash": "1981926188957925467"
-        },
-        {
-          "file": "packages/sdk/docs/enums/types.FillState.html",
-          "hash": "12750937379988151730"
-        },
-        {
-          "file": "packages/sdk/docs/enums/types.MedicationType.html",
-          "hash": "14767615761204781596"
-        },
-        {
-          "file": "packages/sdk/docs/enums/types.OrderState.html",
-          "hash": "10900472013018740226"
-        },
-        {
-          "file": "packages/sdk/docs/enums/types.OrgType.html",
-          "hash": "13538076345742651789"
-        },
-        {
-          "file": "packages/sdk/docs/enums/types.PrescriptionState.html",
-          "hash": "15996512920318551595"
-        },
-        {
-          "file": "packages/sdk/docs/enums/types.SexType.html",
-          "hash": "11426062003455796609"
-        },
-        {
-          "file": "packages/sdk/docs/functions/utils.makeMutation.html",
-          "hash": "14092140614625673397"
-        },
-        {
-          "file": "packages/sdk/docs/functions/utils.makeQuery.html",
-          "hash": "5375594205507105266"
-        },
-        {
-          "file": "packages/sdk/docs/index.html",
-          "hash": "17775761243484057863"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/auth.AuthManagerOptions.html",
-          "hash": "3280961923787931589"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/auth.GetAccessTokenOptions.html",
-          "hash": "15629157644466697556"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/auth.LoginOptions.html",
-          "hash": "11818864763861837438"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/auth.LogoutOptions.html",
-          "hash": "1052173973755751696"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/clinical_catalog.GetCatalogOptions.html",
-          "hash": "6613706828079072068"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/clinical_catalog.GetCatalogsOptions.html",
-          "hash": "1211291264991450195"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/clinical_medication.GetMedicationsOptions.html",
-          "hash": "12138116367271496012"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/clinical_order.CreateOrderOptions.html",
-          "hash": "5611529813875360143"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/clinical_order.GetOrderOptions.html",
-          "hash": "16294832882067922961"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/clinical_order.GetOrdersOptions.html",
-          "hash": "15960754204228848378"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/clinical_patient.CreatePatientOptions.html",
-          "hash": "17639301741122424284"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/clinical_patient.GetPatientOptions.html",
-          "hash": "2917901599249552977"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/clinical_patient.GetPatientsOptions.html",
-          "hash": "2690379360885179286"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/clinical_pharmacy.GetPharmaciesOptions.html",
-          "hash": "3896274711245345033"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/clinical_prescription.CreatePrescriptionOptions.html",
-          "hash": "11260652651387144342"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/clinical_prescription.GetPrescriptionOptions.html",
-          "hash": "8286567074127170937"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/clinical_prescription.GetPrescriptionsOptions.html",
-          "hash": "1809171983499827630"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/lib.PhotonClientOptions.html",
-          "hash": "6035940728718194284"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/management_client.GetClientsOptions.html",
-          "hash": "5122163329214746283"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/management_client.RotateSecretOptions.html",
-          "hash": "13657921302779642103"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/management_organization.GetOrganizationOptions.html",
-          "hash": "15368428769970244093"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/management_organization.GetOrganizationsOptions.html",
-          "hash": "8100538066240157671"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/management_webhook.CreateWebhookOptions.html",
-          "hash": "3475341143582527775"
-        },
-        {
-          "file": "packages/sdk/docs/interfaces/management_webhook.GetWebhooksOptions.html",
-          "hash": "669631827926606305"
-        },
-        {
-          "file": "packages/sdk/docs/modules.html",
-          "hash": "15552522187533087154"
-        },
-        {
-          "file": "packages/sdk/docs/modules/auth.html",
-          "hash": "16549382035985471571"
-        },
-        {
-          "file": "packages/sdk/docs/modules/clinical.html",
-          "hash": "13685711008631721273"
-        },
-        {
-          "file": "packages/sdk/docs/modules/clinical_catalog.html",
-          "hash": "15370543291530993789"
-        },
-        {
-          "file": "packages/sdk/docs/modules/clinical_medication.html",
-          "hash": "6640202806954815754"
-        },
-        {
-          "file": "packages/sdk/docs/modules/clinical_order.html",
-          "hash": "4015598951317197004"
-        },
-        {
-          "file": "packages/sdk/docs/modules/clinical_patient.html",
-          "hash": "16611380324597146910"
-        },
-        {
-          "file": "packages/sdk/docs/modules/clinical_pharmacy.html",
-          "hash": "2542942746321174563"
-        },
-        {
-          "file": "packages/sdk/docs/modules/clinical_prescription.html",
-          "hash": "945072993364685459"
-        },
-        {
-          "file": "packages/sdk/docs/modules/fragments.html",
-          "hash": "14163123163279463558"
-        },
-        {
-          "file": "packages/sdk/docs/modules/lib.html",
-          "hash": "1280952439722168709"
-        },
-        {
-          "file": "packages/sdk/docs/modules/management.html",
-          "hash": "16801204002105180460"
-        },
-        {
-          "file": "packages/sdk/docs/modules/management_client.html",
-          "hash": "17115050473517717275"
-        },
-        {
-          "file": "packages/sdk/docs/modules/management_organization.html",
-          "hash": "1438184520239658816"
-        },
-        {
-          "file": "packages/sdk/docs/modules/management_webhook.html",
-          "hash": "1896051317647064283"
-        },
-        {
-          "file": "packages/sdk/docs/modules/types.html",
-          "hash": "2444896611393827603"
-        },
-        {
-          "file": "packages/sdk/docs/modules/utils.html",
-          "hash": "16141494250367907614"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Address.html",
-          "hash": "14454109369462817107"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.AddressInput.html",
-          "hash": "111319916296969485"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Allergy.html",
-          "hash": "17666422572210049385"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Catalog.html",
-          "hash": "13656068755492666196"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Client.html",
-          "hash": "6362190772643509514"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.ConceptInput.html",
-          "hash": "11188726560918728743"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Diagnosis.html",
-          "hash": "10379197963853903080"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Exact.html",
-          "hash": "15357437193139592603"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Fill.html",
-          "hash": "8415236855879778707"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.FillInput.html",
-          "hash": "5157059271739180601"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.InputMaybe.html",
-          "hash": "6196902440877251411"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.LatLongSearch.html",
-          "hash": "9398938035562689371"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.MakeMaybe.html",
-          "hash": "6481532597720708998"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.MakeOptional.html",
-          "hash": "2472719108428068126"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Maybe.html",
-          "hash": "1697735510426586378"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Medication.html",
-          "hash": "15862022261507114905"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.MedicationFilter.html",
-          "hash": "9847336838590583962"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Mutation.html",
-          "hash": "8006164362537174451"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.MutationAddToCatalogArgs.html",
-          "hash": "4708192280467962729"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.MutationCreateOrderArgs.html",
-          "hash": "11406363827503987740"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.MutationCreatePatientArgs.html",
-          "hash": "4112450422637260077"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.MutationCreatePrescriptionArgs.html",
-          "hash": "15743509976816883089"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.MutationCreateWebhookConfigArgs.html",
-          "hash": "13267283383702535498"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.MutationDeleteWebhookConfigArgs.html",
-          "hash": "8142080497424954320"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.MutationRotateSecretArgs.html",
-          "hash": "6552100506719650413"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.MutationUpdatePatientArgs.html",
-          "hash": "14578301978021713397"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.MutationUpdateWebhookConfigArgs.html",
-          "hash": "5803427144990687075"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Name.html",
-          "hash": "15793777961664799234"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.NameInput.html",
-          "hash": "7009555212064030823"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Order.html",
-          "hash": "607664456431755227"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.OrderFilter.html",
-          "hash": "791957385158324173"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Organization.html",
-          "hash": "8152091703928673863"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Patient.html",
-          "hash": "7581484249981201942"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.PatientFilter.html",
-          "hash": "17092089425216552938"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.PatientOrderFilter.html",
-          "hash": "16312145989050222670"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.PatientOrdersArgs.html",
-          "hash": "16529811152667414732"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.PatientPrescriptionFilter.html",
-          "hash": "10781285637074896784"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.PatientPrescriptionsArgs.html",
-          "hash": "7480308934933627542"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Pharmacy.html",
-          "hash": "672108644113212839"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Prescription.html",
-          "hash": "9772999375696133"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.PrescriptionFilter.html",
-          "hash": "5105326090144075414"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.PrescriptionTemplate.html",
-          "hash": "7694189800664509374"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Provider.html",
-          "hash": "6263169995369376498"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Query.html",
-          "hash": "14002905008392886064"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.QueryAllergiesArgs.html",
-          "hash": "17102733189878343868"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.QueryCatalogArgs.html",
-          "hash": "6898891372415375697"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.QueryFillArgs.html",
-          "hash": "2926120319770852813"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.QueryMedicationsArgs.html",
-          "hash": "10124666686826160900"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.QueryOrderArgs.html",
-          "hash": "704896879013693251"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.QueryOrdersArgs.html",
-          "hash": "13871837769946398293"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.QueryPatientArgs.html",
-          "hash": "3774241967597410765"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.QueryPatientsArgs.html",
-          "hash": "6561470403062608532"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.QueryPharmaciesArgs.html",
-          "hash": "2236154937819915254"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.QueryPharmacyArgs.html",
-          "hash": "11317453936004762998"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.QueryPrescriptionArgs.html",
-          "hash": "4986944530341525929"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.QueryPrescriptionsArgs.html",
-          "hash": "5180341129975091166"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Role.html",
-          "hash": "3157600424815890540"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Scalars.html",
-          "hash": "2581891426240259268"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.Treatment.html",
-          "hash": "4400580249287048819"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.TreatmentCodes.html",
-          "hash": "17694644470509732278"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.User.html",
-          "hash": "2073518247538945360"
-        },
-        {
-          "file": "packages/sdk/docs/types/types.WebhookConfig.html",
-          "hash": "4162488332365932836"
-        },
-        {
-          "file": "packages/sdk/docs/types/utils.MakeMutationReturn.html",
-          "hash": "661307148826781429"
-        },
-        {
-          "file": "packages/sdk/docs/types/utils.MakeMutationReturnOptions.html",
-          "hash": "17114651033779846602"
-        },
-        {
-          "file": "packages/sdk/docs/types/utils.MakeQueryReturn.html",
-          "hash": "9055202395645515391"
-        },
-        {
-          "file": "packages/sdk/docs/variables/fragments.CATALOG_FIELDS.html",
-          "hash": "16017175167322408044"
-        },
-        {
-          "file": "packages/sdk/docs/variables/fragments.CATALOG_MEDICATION_FIELDS.html",
-          "hash": "7906188621423877818"
-        },
-        {
-          "file": "packages/sdk/docs/variables/fragments.CLIENT_FIELDS.html",
-          "hash": "17831396742390378846"
-        },
-        {
-          "file": "packages/sdk/docs/variables/fragments.FILL_FIELDS.html",
-          "hash": "8851982039013030537"
-        },
-        {
-          "file": "packages/sdk/docs/variables/fragments.MEDICATION_FIELDS.html",
-          "hash": "10508960623428417297"
-        },
-        {
-          "file": "packages/sdk/docs/variables/fragments.ORDER_FIELDS.html",
-          "hash": "5744854042156601528"
-        },
-        {
-          "file": "packages/sdk/docs/variables/fragments.ORGANIZATION_FIELDS.html",
-          "hash": "10045833898153393977"
-        },
-        {
-          "file": "packages/sdk/docs/variables/fragments.PATIENT_FIELDS.html",
-          "hash": "5992050269685508612"
-        },
-        {
-          "file": "packages/sdk/docs/variables/fragments.PHARMACY_FIELDS.html",
-          "hash": "2133229762904080633"
-        },
-        {
-          "file": "packages/sdk/docs/variables/fragments.PRESCRIPTION_FIELDS.html",
-          "hash": "3897746544039648287"
-        },
-        {
-          "file": "packages/sdk/docs/variables/fragments.WEBHOOK_CONFIG_FIELDS.html",
-          "hash": "18224497347256454083"
-        },
-        {
-          "file": "packages/sdk/package.json",
-          "hash": "3783126128139667541"
-        },
-        {
-          "file": "packages/sdk/project.json",
-          "hash": "6558507450921912868"
-        },
-        {
-          "file": "packages/sdk/src/auth.ts",
-          "hash": "11873488026552601497",
-          "deps": [
-            "npm:@auth0/auth0-spa-js"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/clinical/allergen.ts",
-          "hash": "11470792986557812842",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/clinical/catalog.ts",
-          "hash": "10971748578195551573",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/clinical/index.ts",
-          "hash": "4392602130465030288",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/clinical/medicalEquipment.ts",
-          "hash": "16516631027834345710",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/clinical/medication.ts",
-          "hash": "13719173847921477991",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/clinical/order.ts",
-          "hash": "1732671036180773492",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/clinical/patient.ts",
-          "hash": "1332176537071834520",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/clinical/pharmacy.ts",
-          "hash": "10382148642402798240",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/clinical/prescription.ts",
-          "hash": "2244459118304995028",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/clinical/prescriptionTemplate.ts",
-          "hash": "1561213293556588172",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/clinical/searchMedication.ts",
-          "hash": "17099406806045970845",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/fragments.ts",
-          "hash": "5540517544607311003",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/lib.ts",
-          "hash": "7516051605281261837",
-          "deps": [
-            "npm:@auth0/auth0-spa-js",
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/management/client.ts",
-          "hash": "3928225439234281836",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/management/index.ts",
-          "hash": "458804569544218936",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/management/organization.ts",
-          "hash": "11403443865979997861",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/management/webhook.ts",
-          "hash": "10299846719365106353",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/src/types.ts",
-          "hash": "8918594362883628267"
-        },
-        {
-          "file": "packages/sdk/src/utils.ts",
-          "hash": "17959428661545882335",
-          "deps": [
-            "npm:@apollo/client"
-          ]
-        },
-        {
-          "file": "packages/sdk/tsconfig.json",
-          "hash": "9472932482458089771"
-        },
-        {
-          "file": "packages/sdk/vite.config.ts",
-          "hash": "6273563756385736393",
-          "deps": [
-            "npm:vite",
-            "npm:@rollup/plugin-typescript"
-          ]
-        }
-      ],
-      "patient": [
-        {
-          "file": "apps/patient/.env.boson",
-          "hash": "7469281588554533765"
-        },
-        {
-          "file": "apps/patient/.env.neutron",
-          "hash": "4849055626352440930"
-        },
-        {
-          "file": "apps/patient/.env.photon",
-          "hash": "7302015441199366953"
-        },
-        {
-          "file": "apps/patient/.env.tau",
-          "hash": "7532113468201502552"
-        },
-        {
-          "file": "apps/patient/.eslintrc.json",
-          "hash": "7194636396650983865"
-        },
-        {
-          "file": "apps/patient/.gitignore",
-          "hash": "5403484524555424706"
-        },
-        {
-          "file": "apps/patient/README.md",
-          "hash": "3725103818597990343"
-        },
-        {
-          "file": "apps/patient/buildspec.yml",
-          "hash": "4713631479381369677"
-        },
-        {
-          "file": "apps/patient/codegen.ts",
-          "hash": "1978337720162043045",
-          "deps": [
-            "npm:@graphql-codegen/cli"
-          ]
-        },
-        {
-          "file": "apps/patient/config-overrides.js",
-          "hash": "10075281367138450456",
-          "deps": [
-            "npm:tsconfig-paths-webpack-plugin",
-            "npm:react-dev-utils",
-            "npm:webpack",
-            "npm:git-revision-webpack-plugin"
-          ]
-        },
-        {
-          "file": "apps/patient/package.json",
-          "hash": "13343026301561903748"
-        },
-        {
-          "file": "apps/patient/project.json",
-          "hash": "482158163966772028"
-        },
-        {
-          "file": "apps/patient/public/favicon.ico",
-          "hash": "16981086585139778761"
-        },
-        {
-          "file": "apps/patient/public/index.html",
-          "hash": "2905328293331010173"
-        },
-        {
-          "file": "apps/patient/public/logo256.png",
-          "hash": "3016947981804235540"
-        },
-        {
-          "file": "apps/patient/public/manifest.json",
-          "hash": "4899832329521084967"
-        },
-        {
-          "file": "apps/patient/public/robots.txt",
-          "hash": "2790380794362165217"
-        },
-        {
-          "file": "apps/patient/src/App.tsx",
-          "hash": "6211542281951809218",
-          "deps": [
-            "npm:react-router-dom"
-          ]
-        },
-        {
-          "file": "apps/patient/src/api/external.ts",
-          "hash": "1393572546927575658"
-        },
-        {
-          "file": "apps/patient/src/api/index.ts",
-          "hash": "16423126407776097590"
-        },
-        {
-          "file": "apps/patient/src/api/internal.ts",
-          "hash": "16237803496488744383"
-        },
-        {
-          "file": "apps/patient/src/assets.d.ts",
-          "hash": "11791625205271766597"
-        },
-        {
-          "file": "apps/patient/src/assets/alto_logo.svg",
-          "hash": "7562636001482874512"
-        },
-        {
-          "file": "apps/patient/src/assets/amazon_pharmacy_logo_small.png",
-          "hash": "4370273387434500621"
-        },
-        {
-          "file": "apps/patient/src/assets/assure_health_logo.svg",
-          "hash": "7379464904890063751"
-        },
-        {
-          "file": "apps/patient/src/assets/blueberry_logo.png",
-          "hash": "9739342148068896489"
-        },
-        {
-          "file": "apps/patient/src/assets/bold_health_logo.svg",
-          "hash": "17498726258209953440"
-        },
-        {
-          "file": "apps/patient/src/assets/brightside_health_logo.svg",
-          "hash": "11666212670849304290"
-        },
-        {
-          "file": "apps/patient/src/assets/capsule_logo_small.png",
-          "hash": "13670336860221438849"
-        },
-        {
-          "file": "apps/patient/src/assets/carbon_health_logo.svg",
-          "hash": "17004415189815176644"
-        },
-        {
-          "file": "apps/patient/src/assets/circle_medical_logo.svg",
-          "hash": "12282510367550808038"
-        },
-        {
-          "file": "apps/patient/src/assets/conversation.png",
-          "hash": "12271341122035511433"
-        },
-        {
-          "file": "apps/patient/src/assets/cost_plus_logo_small_circle.svg",
-          "hash": "15635672570579309600"
-        },
-        {
-          "file": "apps/patient/src/assets/costco_logo_small.png",
-          "hash": "6447031852212748131"
-        },
-        {
-          "file": "apps/patient/src/assets/counsel_logo.png",
-          "hash": "9242870590138557959"
-        },
-        {
-          "file": "apps/patient/src/assets/found_logo.svg",
-          "hash": "2446510235521673286"
-        },
-        {
-          "file": "apps/patient/src/assets/frontier_direct_care_logo.png",
-          "hash": "1619571032560227228"
-        },
-        {
-          "file": "apps/patient/src/assets/grow_therapy_logo.svg",
-          "hash": "6856804205439513092"
-        },
-        {
-          "file": "apps/patient/src/assets/harbor_health_logo.png",
-          "hash": "6369279760457079593"
-        },
-        {
-          "file": "apps/patient/src/assets/heartbeat_health_logo.svg",
-          "hash": "10935748873487665407"
-        },
-        {
-          "file": "apps/patient/src/assets/hera_fertility_logo.svg",
-          "hash": "7282659771069903607"
-        },
-        {
-          "file": "apps/patient/src/assets/lifeforce_logo.jpeg",
-          "hash": "15602614792011779810"
-        },
-        {
-          "file": "apps/patient/src/assets/maven_logo.svg",
-          "hash": "14285942922165892217"
-        },
-        {
-          "file": "apps/patient/src/assets/measured_logo.svg",
-          "hash": "14777877414648840890"
-        },
-        {
-          "file": "apps/patient/src/assets/miga_health_logo.svg",
-          "hash": "18373132537365136772"
-        },
-        {
-          "file": "apps/patient/src/assets/mishe_logo.svg",
-          "hash": "10385120787291516102"
-        },
-        {
-          "file": "apps/patient/src/assets/modern_pediatrics_logo.png",
-          "hash": "1121476808691609513"
-        },
-        {
-          "file": "apps/patient/src/assets/modern_ritual_logo.webp",
-          "hash": "126634527288769968"
-        },
-        {
-          "file": "apps/patient/src/assets/moment_health_logo.webp",
-          "hash": "11147188976176160412"
-        },
-        {
-          "file": "apps/patient/src/assets/newco_logo.svg",
-          "hash": "5049644539638381039"
-        },
-        {
-          "file": "apps/patient/src/assets/oak_st_health.png",
-          "hash": "16208266858997826126"
-        },
-        {
-          "file": "apps/patient/src/assets/ognomy_logo.webp",
-          "hash": "3031798894607070243"
-        },
-        {
-          "file": "apps/patient/src/assets/one_medical.jpeg",
-          "hash": "932886557847972192"
-        },
-        {
-          "file": "apps/patient/src/assets/openloop_logo.png",
-          "hash": "12287433431119728315"
-        },
-        {
-          "file": "apps/patient/src/assets/oshi_logo.svg",
-          "hash": "15430758869762009972"
-        },
-        {
-          "file": "apps/patient/src/assets/peachy_logo.png",
-          "hash": "1438836691440333389"
-        },
-        {
-          "file": "apps/patient/src/assets/piction_health_logo.png",
-          "hash": "6838243768195989"
-        },
-        {
-          "file": "apps/patient/src/assets/pine_medical_logo.svg",
-          "hash": "5961109991668931496"
-        },
-        {
-          "file": "apps/patient/src/assets/pm_pediatrics_logo.svg",
-          "hash": "13710590861674599162"
-        },
-        {
-          "file": "apps/patient/src/assets/red_radish_logo.svg",
-          "hash": "5875130317507290005"
-        },
-        {
-          "file": "apps/patient/src/assets/redbox_logo.jpg",
-          "hash": "14853207712691698127"
-        },
-        {
-          "file": "apps/patient/src/assets/reside_health_logo.webp",
-          "hash": "648359952622629510"
-        },
-        {
-          "file": "apps/patient/src/assets/river_health_logo.svg",
-          "hash": "6973183387033731027"
-        },
-        {
-          "file": "apps/patient/src/assets/sana_care_logo.png",
-          "hash": "10264296227229185531"
-        },
-        {
-          "file": "apps/patient/src/assets/sesame_logo.jpg",
-          "hash": "4390590920155393041"
-        },
-        {
-          "file": "apps/patient/src/assets/summer_health_logo.svg",
-          "hash": "11283701565053457503"
-        },
-        {
-          "file": "apps/patient/src/assets/sunny_logo.svg",
-          "hash": "2438471355548723404"
-        },
-        {
-          "file": "apps/patient/src/assets/superpower_logo.svg",
-          "hash": "17070910379118373441"
-        },
-        {
-          "file": "apps/patient/src/assets/tbd_logo.svg",
-          "hash": "3477906245145144910"
-        },
-        {
-          "file": "apps/patient/src/assets/transcarent_logo.png",
-          "hash": "1761068590456701158"
-        },
-        {
-          "file": "apps/patient/src/assets/twentyeight_health_logo.svg",
-          "hash": "1701244532707307031"
-        },
-        {
-          "file": "apps/patient/src/assets/walgreens_small.png",
-          "hash": "10671788434267203059"
-        },
-        {
-          "file": "apps/patient/src/assets/walmart_logo_small.jpg",
-          "hash": "4321309193121887309"
-        },
-        {
-          "file": "apps/patient/src/assets/walmart_logo_small_circle.svg",
-          "hash": "17066990089429105857"
-        },
-        {
-          "file": "apps/patient/src/assets/walmart_small.svg",
-          "hash": "5296733608242202063"
-        },
-        {
-          "file": "apps/patient/src/assets/zzpeds_logo.png",
-          "hash": "10176026617505542392"
-        },
-        {
-          "file": "apps/patient/src/components/BrandedOptions.tsx",
-          "hash": "8558512684992427974",
-          "deps": [
-            "npm:@chakra-ui/react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/BrandedPharmacyCard.tsx",
-          "hash": "4473647305583319551",
-          "deps": [
-            "npm:@chakra-ui/react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/Card.tsx",
-          "hash": "131796814364955607",
-          "deps": [
-            "npm:@chakra-ui/react",
-            "npm:react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/CouponModal.tsx",
-          "hash": "13908738364389898880",
-          "deps": [
-            "npm:@chakra-ui/react",
-            "npm:react",
-            "npm:react-router-dom"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/Coupons.tsx",
-          "hash": "3365026605605717475",
-          "deps": [
-            "npm:@chakra-ui/react",
-            "npm:react",
-            "npm:react-icons"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/DemoCtaModal.tsx",
-          "hash": "6450590967201591400",
-          "deps": [
-            "npm:@chakra-ui/react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/FAQ.tsx",
-          "hash": "16282595203672477405",
-          "deps": [
-            "npm:@chakra-ui/react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/FAQModal.tsx",
-          "hash": "15377904366227670754",
-          "deps": [
-            "npm:@chakra-ui/react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/FixedFooter.tsx",
-          "hash": "11527292017564234696",
-          "deps": [
-            "npm:@chakra-ui/react",
-            "npm:react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/HorizontalStatusStepper.tsx",
-          "hash": "14049701746516859088",
-          "deps": [
-            "npm:@chakra-ui/react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/LocationModal.tsx",
-          "hash": "12757939709899008520",
-          "deps": [
-            "npm:react",
-            "npm:react-router-dom",
-            "npm:@chakra-ui/react",
-            "npm:react-icons",
-            "npm:chakra-react-select",
-            "npm:lodash"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/Logo.tsx",
-          "hash": "14988443168136369428",
-          "deps": [
-            "npm:@chakra-ui/react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/Nav.tsx",
-          "hash": "6436343676377441803",
-          "deps": [
-            "npm:@chakra-ui/react",
-            "npm:react-router-dom",
-            "npm:react-icons"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/PharmacyCard.tsx",
-          "hash": "2538613057546849203",
-          "deps": [
-            "npm:react",
-            "npm:@chakra-ui/react",
-            "npm:react-icons",
-            "npm:dayjs"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/PharmacyFilters.tsx",
-          "hash": "13387635375064252222",
-          "deps": [
-            "npm:@chakra-ui/react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/PharmacyInfo.tsx",
-          "hash": "11449971017133975435",
-          "deps": [
-            "npm:@chakra-ui/react",
-            "npm:dayjs",
-            "npm:react-icons",
-            "npm:react-router-dom",
-            "npm:react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/PickupOptions.tsx",
-          "hash": "710052788182137090",
-          "deps": [
-            "npm:@chakra-ui/react",
-            "npm:react-icons",
-            "npm:dayjs"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/PoweredBy.tsx",
-          "hash": "8754908791351543188",
-          "deps": [
-            "npm:@chakra-ui/react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/PrescriptionsList.tsx",
-          "hash": "4318630640434874973",
-          "deps": [
-            "npm:@chakra-ui/react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/ReadyText.tsx",
-          "hash": "12487927122829524086",
-          "deps": [
-            "npm:dayjs",
-            "npm:@chakra-ui/react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/StatusStepper.tsx",
-          "hash": "5114971796900850368",
-          "deps": [
-            "npm:@chakra-ui/react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/index.tsx",
-          "hash": "1076572624787197438"
-        },
-        {
-          "file": "apps/patient/src/components/order-details/OrderDetailsModal.tsx",
-          "hash": "12357667675638530625",
-          "deps": [
-            "npm:@chakra-ui/react",
-            "npm:dayjs",
-            "npm:react",
-            "npm:react-icons"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/order-summary/OrderSummary.tsx",
-          "hash": "8038973060180691521",
-          "deps": [
-            "settings"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/statusV2/Header.tsx",
-          "hash": "16359178864944358526",
-          "deps": [
-            "npm:@chakra-ui/react",
-            "npm:dayjs",
-            "npm:react",
-            "npm:react-icons"
-          ]
-        },
-        {
-          "file": "apps/patient/src/components/statusV2/Step.tsx",
-          "hash": "1089307772195141033",
-          "deps": [
-            "npm:@chakra-ui/react",
-            "npm:react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/configs/graphqlClient.ts",
-          "hash": "17618889407232059354",
-          "deps": [
-            "npm:graphql-request",
-            "npm:graphql-scalars"
-          ]
-        },
-        {
-          "file": "apps/patient/src/configs/theme.ts",
-          "hash": "5898711030787905850",
-          "deps": [
-            "settings"
-          ]
-        },
-        {
-          "file": "apps/patient/src/configs/toast.ts",
-          "hash": "278549442142731738",
-          "deps": [
-            "npm:@chakra-ui/react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/data/capsulePharmacyIds.json",
-          "hash": "18308423285966429070"
-        },
-        {
-          "file": "apps/patient/src/data/capsuleZipcodes.json",
-          "hash": "14840880344225163815"
-        },
-        {
-          "file": "apps/patient/src/data/courierPharmacys.ts",
-          "hash": "16514438891061832501"
-        },
-        {
-          "file": "apps/patient/src/data/demoOrder.ts",
-          "hash": "17474804872859034533"
-        },
-        {
-          "file": "apps/patient/src/data/demoPharmacies.ts",
-          "hash": "14460089083127520973"
-        },
-        {
-          "file": "apps/patient/src/data/demoPrescriptions.ts",
-          "hash": "8851572639232355228"
-        },
-        {
-          "file": "apps/patient/src/globals.d.ts",
-          "hash": "990620919449521080"
-        },
-        {
-          "file": "apps/patient/src/graphql/index.ts",
-          "hash": "88703959571392466"
-        },
-        {
-          "file": "apps/patient/src/graphql/mutations.ts",
-          "hash": "17450278024824585750",
-          "deps": [
-            "npm:graphql-request"
-          ]
-        },
-        {
-          "file": "apps/patient/src/graphql/queries.ts",
-          "hash": "17910173860846926173",
-          "deps": [
-            "npm:graphql-tag"
-          ]
-        },
-        {
-          "file": "apps/patient/src/index.tsx",
-          "hash": "12976048718564418385",
-          "deps": [
-            "npm:react-dom",
-            "npm:@datadog/browser-rum",
-            "npm:react-ga4"
-          ]
-        },
-        {
-          "file": "apps/patient/src/reportWebVitals.ts",
-          "hash": "12127447150923256761",
-          "deps": [
-            [
-              "npm:web-vitals",
-              "dynamic"
-            ]
-          ]
-        },
-        {
-          "file": "apps/patient/src/setupTests.js",
-          "hash": "16903885983588411080",
-          "deps": [
-            "npm:@testing-library/jest-dom"
-          ]
-        },
-        {
-          "file": "apps/patient/src/utils/dates.ts",
-          "hash": "11282068091244056472",
-          "deps": [
-            "npm:dayjs"
-          ]
-        },
-        {
-          "file": "apps/patient/src/utils/fulfillmentsHelpers.ts",
-          "hash": "1667869329726623065"
-        },
-        {
-          "file": "apps/patient/src/utils/general.ts",
-          "hash": "13588368537621111860",
-          "deps": [
-            "npm:dayjs"
-          ]
-        },
-        {
-          "file": "apps/patient/src/utils/isGLP.ts",
-          "hash": "17547968513864620015"
-        },
-        {
-          "file": "apps/patient/src/utils/models.ts",
-          "hash": "17683721630550953515"
-        },
-        {
-          "file": "apps/patient/src/utils/text.tsx",
-          "hash": "9212544053549117063",
-          "deps": [
-            "sdk"
-          ]
-        },
-        {
-          "file": "apps/patient/src/utils/useStep.ts",
-          "hash": "2032844773780752230",
-          "deps": [
-            "npm:react"
-          ]
-        },
-        {
-          "file": "apps/patient/src/views/Canceled.tsx",
-          "hash": "4414605242265323816",
-          "deps": [
-            "npm:@chakra-ui/react",
-            "npm:react-helmet"
-          ]
-        },
-        {
-          "file": "apps/patient/src/views/Main.tsx",
-          "hash": "11136305691040424147",
-          "deps": [
-            "settings"
-          ]
-        },
-        {
-          "file": "apps/patient/src/views/NoMatch.tsx",
-          "hash": "1789133274896104201",
-          "deps": [
-            "npm:@chakra-ui/react",
-            "npm:react-icons"
-          ]
-        },
-        {
-          "file": "apps/patient/src/views/Pharmacy.tsx",
-          "hash": "16516689411249224358",
-          "deps": [
-            "settings"
-          ]
-        },
-        {
-          "file": "apps/patient/src/views/ReadyBy.tsx",
-          "hash": "14748962764755639766",
-          "deps": [
-            "npm:react",
-            "npm:@chakra-ui/react",
-            "npm:react-router-dom",
-            "npm:react-helmet",
-            "npm:dayjs",
-            "npm:@datadog/browser-rum",
-            "npm:react-icons"
-          ]
-        },
-        {
-          "file": "apps/patient/src/views/Review.tsx",
-          "hash": "5194933322105305483",
-          "deps": [
-            "npm:@chakra-ui/react",
-            "npm:react-helmet",
-            "npm:react-router-dom"
-          ]
-        },
-        {
-          "file": "apps/patient/src/views/StatusV2.tsx",
-          "hash": "14566523365756798097",
-          "deps": [
-            "settings"
-          ]
+          "file": "packages/settings/src/types.ts",
+          "hash": "13240468101015434302"
         },
         {
-          "file": "apps/patient/tsconfig.base.json",
-          "hash": "171598901503601024"
+          "file": "packages/settings/tsconfig.json",
+          "hash": "634795086719220447"
         },
         {
-          "file": "apps/patient/tsconfig.json",
-          "hash": "18440181143279179635"
+          "file": "packages/settings/tsconfig.lib.json",
+          "hash": "13578272604037132002"
         }
       ],
       "components": [
@@ -4480,52 +4526,6 @@
             "npm:vite-plugin-solid",
             "npm:vite-plugin-dts"
           ]
-        }
-      ],
-      "settings": [
-        {
-          "file": "packages/settings/README.md",
-          "hash": "14533086208237623413"
-        },
-        {
-          "file": "packages/settings/package.json",
-          "hash": "18245037887545584959"
-        },
-        {
-          "file": "packages/settings/project.json",
-          "hash": "12109291571447926373"
-        },
-        {
-          "file": "packages/settings/src/index.ts",
-          "hash": "5844917046241890916"
-        },
-        {
-          "file": "packages/settings/src/lib/boson.ts",
-          "hash": "6172027041362307457"
-        },
-        {
-          "file": "packages/settings/src/lib/neutron.ts",
-          "hash": "10368529532949552723"
-        },
-        {
-          "file": "packages/settings/src/lib/photon.ts",
-          "hash": "17926876183301757320"
-        },
-        {
-          "file": "packages/settings/src/pharmacies.ts",
-          "hash": "5455138066475799397"
-        },
-        {
-          "file": "packages/settings/src/types.ts",
-          "hash": "13240468101015434302"
-        },
-        {
-          "file": "packages/settings/tsconfig.json",
-          "hash": "634795086719220447"
-        },
-        {
-          "file": "packages/settings/tsconfig.lib.json",
-          "hash": "13578272604037132002"
         }
       ]
     }

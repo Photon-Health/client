@@ -8,8 +8,8 @@ export function getLatestReadyTime(
       time == null || f.pharmacyEstimatedReadyAt == null
         ? undefined
         : f.pharmacyEstimatedReadyAt > time
-          ? f.pharmacyEstimatedReadyAt
-          : time,
+        ? f.pharmacyEstimatedReadyAt
+        : time,
     fulfillments[0].pharmacyEstimatedReadyAt
   );
 }
@@ -35,8 +35,8 @@ export function deriveOrderStatus(fulfillments: Fulfillment[]): keyof typeof ful
       f.exceptions.length > 0
         ? 'DELAYED'
         : fulfillmentStatuses[f.state] > fulfillmentStatuses[s]
-          ? s
-          : f.state,
+        ? s
+        : f.state,
     'DELIVERED'
   );
 }
