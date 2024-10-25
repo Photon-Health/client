@@ -215,6 +215,10 @@ export const AddPrescriptionCard = (props: {
       // otherwise add it to the draft prescriptions list
       addDraftPrescription();
 
+      // and screen it again, in case any of the
+      // new properties impact screening
+      props.screenDraftedPrescriptions();
+
       setSearchText('');
     } else {
       triggerToast({
