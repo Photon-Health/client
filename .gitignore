@@ -40,4 +40,5 @@ storybook-static/
 build-storybook.log
 
 .nx/cache/
+.nx/workspace-data/
 __generated__
