@@ -79,13 +79,13 @@ const DraftPrescription = (props: {
   BottomChildren?: JSXElement;
 }) => (
   <Card>
-    <div class="flex justify-between items-center gap-4">
-      <div class="flex flex-col items-start">{props.LeftChildren}</div>
-      <Show when={props?.RightChildren}>
-        <div class="flex items-start gap-3">{props.RightChildren}</div>
-      </Show>
-    </div>
-    <div>
+    <div class="flex flex-col gap-4">
+      <div class="flex justify-between items-center gap-4">
+        <div class="flex flex-col items-start">{props.LeftChildren}</div>
+        <Show when={props?.RightChildren}>
+          <div class="flex items-start gap-3">{props.RightChildren}</div>
+        </Show>
+      </div>
       <Show when={props?.BottomChildren}>{props.BottomChildren}</Show>
     </div>
   </Card>
@@ -227,6 +227,15 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
       <Show when={!isLoading() && merged.draftPrescriptions.length > 0}>
         <For each={merged.draftPrescriptions}>
           {(draft: DraftPrescription) => {
+            // we'll want to ensure that we're only rendering
+            // alerts for the prescription being rendered
+            const appropriatesSreeningAlerts = props.screeningAlerts.filter(
+              (screeningAlert) =>
+                screeningAlert.involvedEntities
+                  .map((involvedEntity) => involvedEntity.id)
+                  .indexOf(draft.treatment.id ?? '') >= 0
+            );
+
             return (
               <DraftPrescription
                 LeftChildren={
@@ -258,9 +267,9 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
                   </>
                 }
                 BottomChildren={
-                  <Show when={props.screeningAlerts.length > 0}>
+                  <Show when={appropriatesSreeningAlerts.length > 0}>
                     <ScreeningAlerts
-                      screeningAlerts={props.screeningAlerts}
+                      screeningAlerts={appropriatesSreeningAlerts}
                       owningId={draft.treatment.id}
                     />
                   </Show>

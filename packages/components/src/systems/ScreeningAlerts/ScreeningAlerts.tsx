@@ -1,4 +1,4 @@
-import { For } from 'solid-js';
+import { For, Show } from 'solid-js';
 import { ScreeningAlert, ScreeningAlertType } from './ScreeningAlert';
 
 /**
@@ -12,19 +12,14 @@ export const ScreeningAlerts = (props: {
   owningId?: string;
 }) => {
   return (
-    <div class="grid gap-4">
-      <For
-        each={props.screeningAlerts.filter(
-          (screeningAlert) =>
-            screeningAlert.involvedEntities
-              .map((involvedEntity) => involvedEntity.id)
-              .indexOf(props.owningId ?? '') >= 0
-        )}
-      >
-        {(screeningAlert) => (
-          <ScreeningAlert screeningAlert={screeningAlert} owningId={props.owningId} />
-        )}
-      </For>
-    </div>
+    <Show when={props.screeningAlerts.length > 0}>
+      <div class="grid gap-4">
+        <For each={props.screeningAlerts}>
+          {(screeningAlert) => (
+            <ScreeningAlert screeningAlert={screeningAlert} owningId={props.owningId} />
+          )}
+        </For>
+      </div>
+    </Show>
   );
 };

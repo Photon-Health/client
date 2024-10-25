@@ -135,7 +135,7 @@ export const ScreeningAlert = (props: {
                 toggleExpandedState();
               }}
             >
-              <Text bold class="text-blue-600" size="xs">
+              <Text bold class="text-blue-600 cursor-pointer" size="xs">
                 See {isExpanded() ? 'less' : 'more'}
               </Text>
             </div>

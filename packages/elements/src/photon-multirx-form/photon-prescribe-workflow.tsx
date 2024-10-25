@@ -114,6 +114,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   );
   const [, recentOrdersActions] = useRecentOrders();
   const [screeningAlerts, setScreeningAlerts] = createSignal<ScreeningAlertType[]>([]);
+
+  const [overrideScreenAlerts, setOverrideScreenAlerts] = createSignal<boolean>(false);
   const [isScreeningAlertWarningOpen, setIsScreeningAlertWarningOpen] = createSignal(false);
 
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
@@ -293,6 +295,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       return;
     }
     setErrors([]);
+    setOverrideScreenAlerts(false);
 
     if (!hasPrescribePermission()) {
       return triggerToast({
@@ -442,9 +445,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   // decide whether to show the combine modal or submit the form
   const combineOrSubmit = () => {
-    // if we have allerts we'll want the prescriber to acknowledge them
-    // first
-    if (screeningAlerts().length > 0) {
+    // if we have alerts we'll want the prescriber to acknowledge them
+    // first, unless we're overriding them
+    if (screeningAlerts().length > 0 && !overrideScreenAlerts()) {
       return displayAlertsWarning();
     }
 
@@ -480,13 +483,21 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       <style>{styles}</style>
       <style>{photonStyles}</style>
 
-      <Show when={isScreeningAlertWarningOpen() && screeningAlerts().length > 0}>
+      <Show
+        when={
+          isScreeningAlertWarningOpen() && screeningAlerts().length > 0 && !overrideScreenAlerts()
+        }
+      >
         <ScreeningAlertAcknowledgementDialog
           alerts={screeningAlerts()}
           isOpen={isScreeningAlertWarningOpen()}
           onIgnoreWarningAndCreateAnyway={() => {
             setIsLoading(false);
-            setScreeningAlerts([]);
+            // if this button is clicked
+            // we'll want to ignore any warnings
+            // and create the orders/prescriptions
+            // regardless of the presence of alerts
+            setOverrideScreenAlerts(true);
             setIsScreeningAlertWarningOpen(false);
             submitForm(props.enableOrder);
 
