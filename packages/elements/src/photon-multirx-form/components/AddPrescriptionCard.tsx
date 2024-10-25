@@ -288,7 +288,13 @@ export const AddPrescriptionCard = (props: {
           />
 
           <ScreeningAlerts
-            screeningAlerts={props.screeningAlerts}
+            /** we'll want to make sure we're only showing screening alerts that are involved with this entity */
+            screeningAlerts={props.screeningAlerts.filter(
+              (screeningAlert) =>
+                screeningAlert.involvedEntities
+                  .map((involvedEntity) => involvedEntity.id)
+                  .indexOf(props.store.treatment?.value?.id) >= 0
+            )}
             owningId={props.store.treatment?.value?.id}
           />
 

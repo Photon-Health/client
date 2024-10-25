@@ -229,11 +229,11 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
           {(draft: DraftPrescription) => {
             // we'll want to ensure that we're only rendering
             // alerts for the prescription being rendered
-            const appropriatesSreeningAlerts = props.screeningAlerts.filter(
+            const screeningAlertsForDraft = props.screeningAlerts.filter(
               (screeningAlert) =>
                 screeningAlert.involvedEntities
                   .map((involvedEntity) => involvedEntity.id)
-                  .indexOf(draft.treatment.id ?? '') >= 0
+                  .indexOf(draft.treatment.id) >= 0
             );
 
             return (
@@ -267,9 +267,9 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
                   </>
                 }
                 BottomChildren={
-                  <Show when={appropriatesSreeningAlerts.length > 0}>
+                  <Show when={screeningAlertsForDraft.length > 0}>
                     <ScreeningAlerts
-                      screeningAlerts={appropriatesSreeningAlerts}
+                      screeningAlerts={screeningAlertsForDraft}
                       owningId={draft.treatment.id}
                     />
                   </Show>

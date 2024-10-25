@@ -215,25 +215,33 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     // pluck out all the attributes we won't need so we can make a screening request
     const sanitizedDraftedPrescriptions = draftedPrescriptions.map(
       ({
-        id,
-        refillsInput,
-        addToTemplates,
-        templateName,
-        catalogId,
-        treatmentId,
-        __typename,
+        id, // the id can be a random number so let's ensure we don't pass it up
         ...draftedPrescription
       }) => {
         return { ...draftedPrescription, treatment: { id: draftedPrescription.treatment.id } };
       }
     );
 
+    // let's remove any duplicate treatment ids
+    // as there's no point to sending up multiple
+    // of the same medication
+    const seenTreatmentIds = new Set<number>();
+    const dedupedSanitizedPrescriptions = sanitizedDraftedPrescriptions.filter((entity) => {
+      const treatmentId = entity.treatment.id;
+      if (seenTreatmentIds.has(treatmentId)) {
+        return false;
+      } else {
+        seenTreatmentIds.add(treatmentId);
+        return true;
+      }
+    });
+
     // make the screening request
     const { data } = await clinicalClient.query({
       query: ScreenDraftedPrescriptionsQuery,
       variables: {
         patientId: props.formStore.patient?.value.id,
-        draftedPrescriptions: sanitizedDraftedPrescriptions
+        draftedPrescriptions: dedupedSanitizedPrescriptions
       }
     });
 

@@ -41,6 +41,18 @@ const TYPE_TO_DESCRIPTOR_MAP: Record<string, string> = {
 };
 
 /**
+ * Helper function to filter out entities that are the same as the owningId
+ * so we don't show unnecessary duplicate information that is present
+ * by nature of the association
+ */
+const filterOutOwningId = (
+  involvedEntities: { id: string; name: string; __typename: string }[],
+  owningId?: string
+): { id: string; name: string; __typename: string }[] => {
+  return involvedEntities.filter((element) => element.id !== owningId);
+};
+
+/**
  * Helper function to get the human readable descriptor returned by the screening endpoint
  */
 const getDescriptorByType = (type: string): string => {
@@ -82,18 +94,6 @@ const getTitle = (props: { owningId?: string; screeningAlert: ScreeningAlertType
       </>
     </Show>
   );
-};
-
-/**
- * Helper function to filter out entities that are the same as the owningId
- * so we don't show unnecessary duplicate information that is present
- * by nature of the association
- */
-const filterOutOwningId = (
-  involvedEntities: { id: string; name: string; __typename: string }[],
-  owningId?: string
-): { id: string; name: string; __typename: string }[] => {
-  return involvedEntities.filter((element) => element.id !== owningId);
 };
 
 /**
