@@ -216,6 +216,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     const sanitizedDraftedPrescriptions = draftedPrescriptions.map(
       ({
         id, // the id can be a random number so let's ensure we don't pass it up
+        addToTemplates,
+        templateName,
+        refillsInput,
+        catalogId,
         ...draftedPrescription
       }) => {
         return { ...draftedPrescription, treatment: { id: draftedPrescription.treatment.id } };
@@ -455,14 +459,18 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const combineOrSubmit = () => {
     // if we have alerts we'll want the prescriber to acknowledge them
     // first, unless we're overriding them
-    if (screeningAlerts().length > 0 && !overrideScreenAlerts()) {
+
+    console.log('overrideScreenAlerts');
+    console.log(overrideScreenAlerts());
+
+    if (screeningAlerts().length > 0 && overrideScreenAlerts() === false) {
       return displayAlertsWarning();
     }
 
     if (props.enableCombineAndDuplicate && recentOrdersActions.hasRoutingOrder()) {
       return displayCombineDialog();
     }
-    return submitForm(props.enableOrder);
+    //return submitForm(props.enableOrder);
   };
 
   createEffect(() => {
