@@ -101,7 +101,7 @@ export const PatientCard = (props: {
   return (
     <div class="flex flex-col gap-8">
       <Show when={!props?.patientId}>
-        <Card>
+        <Card addChildrenDivider={true}>
           <div class="flex items-center justify-between">
             <Text color="gray">{props?.patientId ? 'Patient' : 'Select Patient'}</Text>
           </div>
