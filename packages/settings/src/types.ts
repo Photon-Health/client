@@ -20,6 +20,7 @@
  * @param enableCombineAndDuplicate Enable the ability to combine and duplicate orders
  * @param topRankedCostco Enable Costco to rank at the top of pickup pharmacy list in the patient app
  * @param topRankedWalgreens Enable Walgreens to rank at the top of pickup pharmacy list in the patient app
+ * @param paExceptionMessage Enable organizations to customize their PA Exception copy
  *
  */
 export type OrganizationSettings = {

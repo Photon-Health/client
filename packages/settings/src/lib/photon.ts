@@ -82,17 +82,23 @@ const organizationSettings: {
   // Modern Pediatrics
   org_2utnNgp5NGCy9wOb: {
     logo: 'modern_pediatrics_logo.png',
-    accentColor: '#3f7a9c'
+    accentColor: '#3f7a9c',
+    paExceptionMessage:
+      'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Please email hello@modernpediatrics.sprucecare.com and ask them to submit a prior authorization on your behalf or suggest an alternative medication.'
   },
   // Summer Health
   org_66nHWvQRtHbjZt4A: {
     logo: 'summer_health_logo.svg',
-    accentColor: '#ffc21f'
+    accentColor: '#ffc21f',
+    paExceptionMessage:
+      'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Please email help@summerhealth.com and ask them to submit a prior authorization on your behalf or suggest an alternative medication.'
   },
   // Modern Ritual
   org_IWmodVdrQYpqh5x2: {
     logo: 'modern_ritual_logo.webp',
-    accentColor: '#202a36'
+    accentColor: '#202a36',
+    paExceptionMessage:
+      'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Please email hello@getmr.com and ask them to submit a prior authorization on your behalf or suggest an alternative medication.'
   },
   // Reside Health
   org_8fwLMYQGxj6Bg70X: {
@@ -120,7 +126,9 @@ const organizationSettings: {
     mailOrderProviders: [CUREXA_PHARMACY_ID],
     federated: true,
     sendToPatient: false,
-    enableRxAndOrder: false
+    enableRxAndOrder: false,
+    paExceptionMessage:
+      'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Please email hello@peachystudio.com and ask them to submit a prior authorization on your behalf or suggest an alternative medication.'
   },
   // ZZPeds
   org_pxcJ7Dlclcsg0OJw: {
@@ -148,7 +156,9 @@ const organizationSettings: {
   org_v5It8IoY0RH1Rw80: {
     logo: 'piction_health_logo.png',
     accentColor: '#3377e2',
-    enableRxAndOrder: false
+    enableRxAndOrder: false,
+    paExceptionMessage:
+      'Your insurance needs additional information from your provider before you pharmacy can fill your prescription. Please contact 781-650-4492 and ask them to submit a prior authorization on your behalf or suggest an alternative medication.'
   },
   // Shapiro Medical (Xyon Health)
   org_Y0EPcd3p5eqG4iZs: {
@@ -157,7 +167,9 @@ const organizationSettings: {
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID],
     sendToPatient: false,
-    enableRxAndOrder: false
+    enableRxAndOrder: false,
+    paExceptionMessage:
+      'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Please reach out to your provider and ask them to submit a prior authorization on your behalf or suggest an alternative medication.'
   },
   // Osei Tutu (Xyon Health)
   org_WeSplxuyqxdIph1f: {
@@ -233,14 +245,18 @@ const organizationSettings: {
       COST_PLUS_PHARMACY_ID,
       WALMART_MAIL_ORDER_PHARMACY_ID
     ],
-    enableMedHistory: true
+    enableMedHistory: true,
+    paExceptionMessage:
+      'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Please email sanacare@sanabenefits.com and ask them to submit a prior authorization on your behalf or suggest an alternative medication.'
   },
   // Blueberry Pediatrics
   org_ul8ojZgvzpqu299H: {
     logo: 'blueberry_logo.png',
     accentColor: '#235AFF',
     enableMedHistory: true,
-    topRankedWalgreens: true
+    topRankedWalgreens: true,
+    paExceptionMessage:
+      'Unfortunately, your insurance does not cover your medication. GoodRx provides affordable prices that you may want to consider. Blueberry members can access a GoodRx card through the Blueberry app under “More” > “Rx Saving Card.'
   },
   // TBD Health
   org_XoBVNLkIWL6BP8vZ: {
@@ -251,7 +267,9 @@ const organizationSettings: {
   org_Oxc0CSPfdiyWW3VM: {
     mailOrder: true,
     pickUp: true,
-    mailOrderProviders: [INNOVASCRIPT_PHARMACY_ID]
+    mailOrderProviders: [INNOVASCRIPT_PHARMACY_ID],
+    paExceptionMessage:
+      'Your insurance needs additional information from your provider before your pharmacy can fill your prescription for. Please email clientsupport@openloophealth.com and ask them to submit a prior authorization on your behalf or suggest an alternative medication.'
   },
   // PM Pediatrics Care
   org_2Mqu8Kf7dknKNFXb: {
@@ -283,7 +301,9 @@ const organizationSettings: {
   // Found
   org_wM4wI7rop0W1eNfM: {
     logo: 'found_logo.svg',
-    accentColor: '#1c3f28'
+    accentColor: '#1c3f28',
+    paExceptionMessage:
+      'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Found customer support will submit a prior authorization for you or suggest an alternative medication. The customer support team at Found will follow up with you if any additional information is needed.'
   },
   // Sesame
   org_zc1RzzmSwd8eE94U: {
@@ -305,7 +325,9 @@ const organizationSettings: {
       EMPOWER_PHARMACY_ID,
       AMBROSIA_PHARMACY_ID,
       WOMENS_INTERNATIONAL_PHARMACY_ID
-    ]
+    ],
+    paExceptionMessage:
+      'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Please reach out to your provider and ask them to submit a prior authorization on your behalf or suggest an alternative medication.'
   },
   // Redbox Rx
   org_fPIzyQJhFqvBAhJG: {
@@ -336,6 +358,18 @@ const organizationSettings: {
       EMPOWER_PHARMACY_ID
     ],
     logo: 'measured_logo.svg',
-    accentColor: '#ffd100'
+    accentColor: '#ffd100',
+    paExceptionMessage:
+      'Your prescription requires prior authorization from your insurance before it can be picked up. Your Care Team is working on this now and you should receive a determination in 2-5 business days. If your Measured provider has not mentioned a prior authorization, please reach out to your Care Team through the patient portal.'
+  },
+  // Norman MD
+  org_uXezwtzzt5uqhgHk: {
+    paExceptionMessage:
+      "Your health plan requires your primary doctor's approval for your prescription. Contact your primary doctor or start a new NormanMD visit to request a different medication."
+  },
+  // Piatek Institute (Phase Zero)
+  org_LxDuuZVgq9C065AX: {
+    paExceptionMessage:
+      'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Please contact 317-648-5801 via TEXT and ask them to submit a prior authorization on your behalf or suggest an alternative medication.'
   }
 };

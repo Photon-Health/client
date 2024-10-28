@@ -71,6 +71,7 @@ export type DraftedPrescriptionInput = {
   expirationDate?: InputMaybe<Scalars['Date']['input']>;
   fillsAllowed?: InputMaybe<Scalars['Int']['input']>;
   fillsRemaining?: InputMaybe<Scalars['Int']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   instructions?: InputMaybe<Scalars['String']['input']>;
   notes?: InputMaybe<Scalars['String']['input']>;
   treatment: DraftedPrescriptionTreatmentInput;
