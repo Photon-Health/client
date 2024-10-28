@@ -467,7 +467,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     if (props.enableCombineAndDuplicate && recentOrdersActions.hasRoutingOrder()) {
       return displayCombineDialog();
     }
-
     return submitForm(props.enableOrder);
   };
 
