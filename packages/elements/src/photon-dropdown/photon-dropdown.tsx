@@ -81,7 +81,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   //refs
   let ref: any;
   let dropdownRef: any;
-  let listRef: HTMLDivElement | undefined;
+  let listRef: Element | undefined;
   let inputRef: any;
   let overlayRef: HTMLDivElement | undefined;
 

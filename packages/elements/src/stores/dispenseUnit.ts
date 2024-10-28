@@ -1,5 +1,5 @@
 import { PhotonClient } from '@photonhealth/sdk';
-import { GraphQLError } from 'graphql';
+import { GraphQLFormattedError } from 'graphql';
 import { createStore } from 'solid-js/store';
 import { DispenseUnit } from '@photonhealth/sdk/dist/types';
 
@@ -9,7 +9,7 @@ const createDispenseUnitStore = () => {
   const [store, setStore] = createStore<{
     dispenseUnits: {
       data: StoreDispenseUnit[];
-      errors: readonly GraphQLError[];
+      errors: readonly GraphQLFormattedError[];
       isLoading: boolean;
     };
   }>({
@@ -26,7 +26,7 @@ const createDispenseUnitStore = () => {
       isLoading: true
     });
     const { data, errors } = await client.clinical.prescription.getDispenseUnits();
-    setStore('dispenseUnits', {
+    return setStore('dispenseUnits', {
       ...store.dispenseUnits,
       isLoading: false,
       data: data.dispenseUnits.map((x, idx) => ({
