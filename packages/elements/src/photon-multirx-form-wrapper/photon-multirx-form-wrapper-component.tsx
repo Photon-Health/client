@@ -275,6 +275,10 @@ const Component = (props: {
                 dispatchClosed();
                 patientActions.clearSelectedPatient();
               }}
+              on:photon-clinical-alert-cancel={(e: any) => {
+                e.stopPropagation();
+                setTriggerSubmit(false);
+              }}
             />
           </div>
         }
