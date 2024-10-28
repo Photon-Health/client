@@ -460,9 +460,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     // if we have alerts we'll want the prescriber to acknowledge them
     // first, unless we're overriding them
 
-    console.log('overrideScreenAlerts');
-    console.log(overrideScreenAlerts());
-
     if (screeningAlerts().length > 0 && overrideScreenAlerts() === false) {
       return displayAlertsWarning();
     }
@@ -470,7 +467,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     if (props.enableCombineAndDuplicate && recentOrdersActions.hasRoutingOrder()) {
       return displayCombineDialog();
     }
-    //return submitForm(props.enableOrder);
+
+    return submitForm(props.enableOrder);
   };
 
   createEffect(() => {
