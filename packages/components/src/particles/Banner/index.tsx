@@ -31,19 +31,19 @@ export default function Banner(props: BannerProps) {
     }
   };
 
-  const bannerClasses = (includeBorder: boolean) => {
+  const bannerClasses = () => {
     return clsx('flex place-items-start justify-between gap-2 py-3 px-3 sm:px-4 rounded-lg', {
-      'border-2 rounded border-solid': includeBorder,
+      'border-2 rounded border-solid': props.withBorder,
       'text-blue-600 bg-blue-50': props.status === 'info',
-      'border-blue-600': props.status === 'info' && includeBorder,
+      'border-blue-600': props.status === 'info' && props.withBorder,
       'text-red-600 bg-red-50': props.status === 'error',
-      'border-red-600': props.status === 'error' && includeBorder,
+      'border-red-600': props.status === 'error' && props.withBorder,
       'text-green-600 bg-green-50': props.status === 'success',
-      'border-green-600': props.status === 'success' && includeBorder,
+      'border-green-600': props.status === 'success' && props.withBorder,
       'text-yellow-600 bg-yellow-50': props.status === 'warning',
-      'border-yellow-600': props.status === 'warning' && includeBorder,
+      'border-yellow-600': props.status === 'warning' && props.withBorder,
       'text-slate-600 bg-slate-50': props.status === 'suggestion',
-      'border-slate-600': props.status === 'suggestion' && includeBorder
+      'border-slate-600': props.status === 'suggestion' && props.withBorder
     });
   };
 
