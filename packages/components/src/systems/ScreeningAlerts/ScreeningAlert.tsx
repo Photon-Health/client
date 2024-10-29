@@ -28,7 +28,7 @@ const STATUS_TO_CLASS_MAP: Record<string, BannerStatus> = {
  */
 const getStatus = (severity: string, type: string): BannerStatus => {
   if (type === 'ALLERGEN') {
-    return 'suggestion';
+    return 'error';
   }
 
   return STATUS_TO_CLASS_MAP[severity] ?? 'info';
@@ -117,6 +117,7 @@ export const ScreeningAlert = (props: {
     <Banner
       iconName="exclamationTriangle"
       status={getStatus(props.screeningAlert.severity, props.screeningAlert.type)}
+      withBorder
     >
       <div class="flex grid-flow-col justify-start">
         <div class="flex flex-col gap-2">
