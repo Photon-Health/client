@@ -59,7 +59,7 @@ export default function Banner(props: BannerProps) {
 
   return (
     <Show when={isVisible()}>
-      <div class={bannerClasses(props.withBorder ?? false)}>
+      <div class={bannerClasses()}>
         <div class="flex w-full">
           <Show when={!props.withoutIcon}>
             <div class="flex-shrink-0 mr-2">
