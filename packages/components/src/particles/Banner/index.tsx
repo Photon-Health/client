@@ -9,6 +9,7 @@ export type BannerProps = {
   status: BannerStatus;
   iconName?: IconName;
   withoutIcon?: boolean;
+  withBorder?: boolean;
   closable?: boolean;
   id?: string;
 };
@@ -30,13 +31,19 @@ export default function Banner(props: BannerProps) {
     }
   };
 
-  const bannerClasses = () => {
+  const bannerClasses = (includeBorder: boolean) => {
     return clsx('flex place-items-start justify-between gap-2 py-3 px-3 sm:px-4 rounded-lg', {
+      'border-2 rounded border-solid': includeBorder,
       'text-blue-600 bg-blue-50': props.status === 'info',
+      'border-blue-600': props.status === 'info' && includeBorder,
       'text-red-600 bg-red-50': props.status === 'error',
+      'border-red-600': props.status === 'error' && includeBorder,
       'text-green-600 bg-green-50': props.status === 'success',
+      'border-green-600': props.status === 'success' && includeBorder,
       'text-yellow-600 bg-yellow-50': props.status === 'warning',
-      'text-gray-600 bg-gray-50': props.status === 'suggestion'
+      'border-yellow-600': props.status === 'warning' && includeBorder,
+      'text-slate-600 bg-slate-50': props.status === 'suggestion',
+      'border-slate-600': props.status === 'suggestion' && includeBorder
     });
   };
 
@@ -46,13 +53,13 @@ export default function Banner(props: BannerProps) {
       'text-red-600': props.status === 'error',
       'text-green-600': props.status === 'success',
       'text-yellow-600': props.status === 'warning',
-      'text-gray-600': props.status === 'suggestion'
+      'text-slate-600': props.status === 'suggestion'
     });
   };
 
   return (
     <Show when={isVisible()}>
-      <div class={bannerClasses()}>
+      <div class={bannerClasses(props.withBorder ?? false)}>
         <div class="flex w-full">
           <Show when={!props.withoutIcon}>
             <div class="flex-shrink-0 mr-2">
