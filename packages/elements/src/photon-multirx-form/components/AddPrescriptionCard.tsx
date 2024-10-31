@@ -76,6 +76,7 @@ export const AddPrescriptionCard = (props: {
   screeningAlerts: ScreeningAlertType[];
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
+  enableOrder: boolean;
 }) => {
   const client = usePhoton();
   const [medDialogOpen, setMedDialogOpen] = createSignal(false);
@@ -512,7 +513,7 @@ export const AddPrescriptionCard = (props: {
             </Show>
             <div class="flex flex-grow justify-end">
               <Button class="w-full md:!w-auto" size="lg" onClick={handleAddPrescription}>
-                Add Prescription to Order
+                {props.enableOrder ? 'Add Prescription to Order' : 'Add Prescription to Drafts'}
               </Button>
             </div>
           </div>
