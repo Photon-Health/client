@@ -7,6 +7,9 @@
     "esModuleInterop": true,
     "strict": true,
     "noEmit": true,
-    "jsx": "preserve"
-  }
+    "jsx": "preserve",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "exclude": ["node_modules"]
 }
