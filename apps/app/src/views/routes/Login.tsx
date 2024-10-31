@@ -41,7 +41,7 @@ export const Login = () => {
     return <Navigate to="/" replace />;
   }
 
-  const from = `${(location.state?.from?.pathname || '/') + (location.state?.from?.search || '')}`;
+  const from = `${(location.pathname || '/') + (location.search || '')}`;
 
   return (
     <Container maxW="md" py={{ base: '12', md: '24' }}>
