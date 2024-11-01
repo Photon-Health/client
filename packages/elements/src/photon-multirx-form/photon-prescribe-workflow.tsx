@@ -606,6 +606,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       screeningAlerts={screeningAlerts()}
                       catalogId={props.catalogId}
                       allowOffCatalogSearch={props.allowOffCatalogSearch}
+                      enableOrder={props.enableOrder}
                     />
                   </div>
                 </Show>
@@ -621,6 +622,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     screenDraftedPrescriptions();
                   }}
                   screeningAlerts={screeningAlerts()}
+                  enableOrder={props.enableOrder}
                 />
                 <Show when={props.enableOrder && !props.pharmacyId}>
                   <OrderCard

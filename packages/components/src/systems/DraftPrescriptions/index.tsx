@@ -101,6 +101,7 @@ interface DraftPrescriptionsProps {
   handleDelete?: (draftId: string) => void;
   error?: string;
   screeningAlerts: ScreeningAlertType[];
+  enableOrder?: boolean;
 }
 
 export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
@@ -220,7 +221,11 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
 
       {/* Show when No Drafts */}
       <Show when={!isLoading() && merged.draftPrescriptions.length === 0}>
-        <Banner status="info">Add prescription(s) before sending an order</Banner>
+        <Banner status="info">
+          {merged.enableOrder
+            ? 'Add prescription(s) before sending an order'
+            : 'Add prescription(s) before saving'}
+        </Banner>
       </Show>
 
       {/* Show when Drafts */}
