@@ -512,7 +512,7 @@ export const AddPrescriptionCard = (props: {
               />
             </Show>
             <div class="flex flex-grow justify-end">
-              <Button class="w-full md:!w-auto" size="lg" onClick={handleAddPrescription}>
+              <Button class="w-full xs:!w-auto h-fit" size="lg" onClick={handleAddPrescription}>
                 {props.enableOrder ? 'Add Prescription to Order' : 'Add Prescription to Drafts'}
               </Button>
             </div>

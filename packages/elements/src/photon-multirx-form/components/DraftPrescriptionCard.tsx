@@ -187,6 +187,7 @@ export const DraftPrescriptionCard = (props: {
           }}
           error={props.store['draftPrescriptions']?.error}
           screeningAlerts={props.screeningAlerts}
+          enableOrder={props.enableOrder}
         />
       </Card>
     </div>
