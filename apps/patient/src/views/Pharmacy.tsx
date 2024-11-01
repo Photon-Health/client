@@ -117,8 +117,8 @@ export const Pharmacy = () => {
   const isLoading = loadingLocation || loadingPharmacies;
 
   // sorting
-  type SortBy = 'price' | 'distance';
-  const [sortBy, setSortBy] = useState<SortBy>('price');
+  type SortBy = 'price' | 'distance' | null;
+  const [sortBy, setSortBy] = useState<SortBy>(showSearchToggle ? 'price' : null);
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
@@ -317,10 +317,7 @@ export const Pharmacy = () => {
     [enable24Hr, enableOpenNow]
   );
 
-  const enablePrice = useMemo(
-    () => sortBy === 'price' && isOrgWithCouponsEnabled,
-    [sortBy, isOrgWithCouponsEnabled]
-  );
+  const enablePrice = useMemo(() => sortBy === 'price', [sortBy]);
 
   const loadPharmacies = useCallback(
     async ({
@@ -762,7 +759,7 @@ export const Pharmacy = () => {
                 </HStack>
               </HStack>
             ) : null}
-            {showSearchToggle && sortBy === 'price' ? (
+            {sortBy === 'price' ? (
               <Box p={3} bgColor="blue.50" borderRadius="lg">
                 <Text>
                   The displayed price is a coupon for the selected pharmacy.{' '}

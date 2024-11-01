@@ -64,7 +64,7 @@ export const ScreeningAlertByEntity = (props: {
   otherAlertsByEntity: AlertsForEntity[];
 }) => {
   return (
-    <Banner withoutIcon status="suggestion">
+    <Banner withoutIcon withBorder status="suggestion">
       <div class="flex grid-flow-col justify-start">
         <div class="flex flex-col gap-2">
           <Show when={!isTypenameAllergenBased(props.screeningAlertByEntity.entity.__typename)}>
