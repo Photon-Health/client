@@ -26,6 +26,7 @@ export const DraftPrescriptionCard = (props: {
   setIsEditing: (isEditing: boolean) => void;
   handleDeletedDraftPrescription: () => void;
   screeningAlerts: ScreeningAlertType[];
+  enableOrder: boolean;
 }) => {
   let ref: Ref<any> | undefined;
   const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
@@ -159,7 +160,7 @@ export const DraftPrescriptionCard = (props: {
       <Card addChildrenDivider={true}>
         <div class="flex items-center space-x-2 text-slate-500">
           <Text color="gray" class="pr-2">
-            Pending Order
+            {props.enableOrder ? 'Pending Order' : 'Pending Prescriptions'}
           </Text>
           <PhotonTooltip
             maxWidth="300px"
@@ -186,6 +187,7 @@ export const DraftPrescriptionCard = (props: {
           }}
           error={props.store['draftPrescriptions']?.error}
           screeningAlerts={props.screeningAlerts}
+          enableOrder={props.enableOrder}
         />
       </Card>
     </div>

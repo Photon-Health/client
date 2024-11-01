@@ -459,7 +459,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const combineOrSubmit = () => {
     // if we have alerts we'll want the prescriber to acknowledge them
     // first, unless we're overriding them
-
     if (screeningAlerts().length > 0 && overrideScreenAlerts() === false) {
       return displayAlertsWarning();
     }
@@ -467,6 +466,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     if (props.enableCombineAndDuplicate && recentOrdersActions.hasRoutingOrder()) {
       return displayCombineDialog();
     }
+
     return submitForm(props.enableOrder);
   };
 
@@ -512,7 +512,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             // regardless of the presence of alerts
             setOverrideScreenAlerts(true);
             setIsScreeningAlertWarningOpen(false);
-            submitForm(props.enableOrder);
 
             const event = new CustomEvent('photon-clinical-alert-acknowledge', {
               composed: true,
@@ -521,6 +520,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 alerts: screeningAlerts()
               }
             });
+
+            combineOrSubmit();
 
             ref?.dispatchEvent(event);
           }}
@@ -605,6 +606,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       screeningAlerts={screeningAlerts()}
                       catalogId={props.catalogId}
                       allowOffCatalogSearch={props.allowOffCatalogSearch}
+                      enableOrder={props.enableOrder}
                     />
                   </div>
                 </Show>
@@ -620,6 +622,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     screenDraftedPrescriptions();
                   }}
                   screeningAlerts={screeningAlerts()}
+                  enableOrder={props.enableOrder}
                 />
                 <Show when={props.enableOrder && !props.pharmacyId}>
                   <OrderCard
