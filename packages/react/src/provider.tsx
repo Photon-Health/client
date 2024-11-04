@@ -714,7 +714,7 @@ export const PhotonProvider = (opts: {
       if (client.authentication.hasAuthParams()) {
         try {
           // @ts-ignore
-          const { appState } = await client.authentication.handleRedirect();
+          const { appState } = await client.authentication.handleRedirect(state?.returnTo);
           onRedirectCallback(appState);
         } catch (e) {
           const message = (e as Error).message;
@@ -736,6 +736,13 @@ export const PhotonProvider = (opts: {
   const handleRedirect = useCallback(
     async (url?: string) => {
       try {
+        // eslint-disable-next-line no-debugger
+        debugger;
+        console.log('\n       url: ', url);
+
+        // eslint-disable-next-line no-debugger
+        debugger;
+
         await client.authentication.handleRedirect(url);
       } catch (e) {
         const message = (e as Error).message;

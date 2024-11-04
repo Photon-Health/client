@@ -30,7 +30,10 @@ export const Auth = (props: AuthProps) => {
     );
 
   return (
-    <Button colorScheme="blue" onClick={() => login({ appState: { returnTo } })}>
+    <Button
+      colorScheme="blue"
+      onClick={() => login({ appState: { returnTo: window.location.origin + returnTo } })}
+    >
       Log in
     </Button>
   );
