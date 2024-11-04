@@ -23,15 +23,23 @@ interface Exception {
   resolvedAt: string;
 }
 
-function exceptionColor(exceptionType: string) {
+function exceptionTagText(exceptionType: string): string {
   switch (exceptionType.toLowerCase()) {
     case 'backordered':
+      return 'On Backorder';
     case 'oos':
+      return 'Out of Stock';
     case 'pa_required':
-      return 'yellow';
+      return 'Prior Auth Required';
     default:
-      return 'gray';
+      return toTitleCase(exceptionType);
   }
+}
+
+function toTitleCase(str: string): string {
+  return str
+    .replaceAll('_', ' ')
+    .replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase());
 }
 
 function MedicationStack({ order, fills, loading }: MedicationStackProps) {
@@ -48,14 +56,8 @@ function MedicationStack({ order, fills, loading }: MedicationStackProps) {
             {fulfillment.exceptions
               .filter((e) => !e.resolvedAt)
               .map((exception, j: number) => (
-                <Tag
-                  key={j}
-                  size="sm"
-                  borderRadius="full"
-                  colorScheme={exceptionColor(exception.type)}
-                  flexShrink={0}
-                >
-                  <TagLabel>{exception.message}</TagLabel>
+                <Tag key={j} size="sm" borderRadius="full" colorScheme="yellow" flexShrink={0}>
+                  <TagLabel>{exceptionTagText(exception.type)}</TagLabel>
                 </Tag>
               ))}
           </HStack>
@@ -63,11 +65,9 @@ function MedicationStack({ order, fills, loading }: MedicationStackProps) {
       </VStack>
     );
   } else if (fills) {
-    const medicationNames = getMedicationNames(fills);
-
     return (
       <VStack w="full" align="start">
-        {medicationNames.map((med, i: number) => (
+        {getMedicationNames(fills).map((med, i: number) => (
           <Text key={i} fontWeight="medium" flex="1">
             {med}
           </Text>
