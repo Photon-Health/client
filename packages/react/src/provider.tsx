@@ -736,13 +736,6 @@ export const PhotonProvider = (opts: {
   const handleRedirect = useCallback(
     async (url?: string) => {
       try {
-        // eslint-disable-next-line no-debugger
-        debugger;
-        console.log('\n       url: ', url);
-
-        // eslint-disable-next-line no-debugger
-        debugger;
-
         await client.authentication.handleRedirect(url);
       } catch (e) {
         const message = (e as Error).message;
