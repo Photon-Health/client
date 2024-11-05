@@ -154,7 +154,7 @@ export class AuthManager {
       const redirectOpts: RedirectLoginOptions = {
         ...opts,
         appState: {
-          returnTo: window.location.pathname + window.location.search
+          returnTo: `${window.location.pathname}${window.location.search}`
         }
       };
       await this.authentication.loginWithRedirect(redirectOpts);
