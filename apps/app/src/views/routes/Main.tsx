@@ -82,17 +82,15 @@ export const Main = () => {
   }
 
   if (!isAuthenticated && !isLoading) {
-    const pathname = query.get('pathname');
+    const pathname = location.pathname;
     const queryString = query.toString() ? `?${query.toString()}` : '';
 
     return (
       <Navigate
         to={`/login${queryString}`}
         state={{
-          from: {
-            ...location,
-            ...(pathname ? { pathname } : {})
-          }
+          from: { location },
+          returnTo: `${pathname}${queryString}`
         }}
         replace
       />
