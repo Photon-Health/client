@@ -1,12 +1,4 @@
-import {
-  Box,
-  ChakraProvider,
-  InputGroup,
-  InputRightElement,
-  Spinner,
-  VStack,
-  Text
-} from '@chakra-ui/react';
+import { Box, InputGroup, InputRightElement, Spinner, VStack, Text } from '@chakra-ui/react';
 
 import { OptionProps } from 'chakra-react-select';
 import { useEffect, useState } from 'react';
@@ -127,34 +119,32 @@ export const TreatmentOptionSearch = ({
   };
 
   return (
-    <ChakraProvider>
-      <Box>
-        <InputGroup>
-          {loading && (
-            <InputRightElement>
-              <Spinner size="sm" />
-            </InputRightElement>
-          )}
-        </InputGroup>
-
-        <SelectField
-          name="treatmentOption"
-          placeholder={'Search for Treatments'}
-          onChange={handleSelectedTreatmentChange}
-          setFilterText={handleSearchTermChange}
-          filterText={searchTermDebounce}
-          isLoading={loading}
-          options={treatments}
-          components={{ Option }}
-          filterOption={() => true}
-        />
-
-        {error && (
-          <Box color="red.500" mt={2}>
-            {error}
-          </Box>
+    <Box>
+      <InputGroup>
+        {loading && (
+          <InputRightElement>
+            <Spinner size="sm" />
+          </InputRightElement>
         )}
-      </Box>
-    </ChakraProvider>
+      </InputGroup>
+
+      <SelectField
+        name="treatmentOption"
+        placeholder={'Search for Treatments'}
+        onChange={handleSelectedTreatmentChange}
+        setFilterText={handleSearchTermChange}
+        filterText={searchTermDebounce}
+        isLoading={loading}
+        options={treatments}
+        components={{ Option }}
+        filterOption={() => true}
+      />
+
+      {error && (
+        <Box color="red.500" mt={2}>
+          {error}
+        </Box>
+      )}
+    </Box>
   );
 };

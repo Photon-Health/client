@@ -1,14 +1,13 @@
 import {
-  Box,
   Button,
+  Card,
   Center,
   CircularProgress,
   Container,
   Divider,
   HStack,
   Stack,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react';
 
 import { FiLogIn } from 'react-icons/fi';
@@ -58,81 +57,61 @@ export const SelectOrg = () => {
     }
   }, []);
 
-  const colorMode = useColorModeValue('sm', 'sm-dark');
-
   const orgs = (organizations || []).map((organization: any) => {
     const { id, name } = organization;
 
     return (
-      <Container key={name} variant="outline" padding={{ base: '0', md: '0' }}>
-        <Stack spacing={3}>
-          <HStack justify="space-between">
-            <Text fontSize="lg" fontWeight="medium">
-              {name.charAt(0).toUpperCase() + name.slice(1)}
-            </Text>
-            <Button
-              key={id}
-              size="sm"
-              variant="primary"
-              rightIcon={<FiLogIn />}
-              value={id}
-              onClick={() => {
-                setOrganization(id);
-                login({
-                  organizationId: id,
-                  appState: {
-                    returnTo: from
-                  }
-                });
-              }}
-            >
-              Select
-            </Button>
-          </HStack>
-        </Stack>
-      </Container>
+      <HStack key={name} justify="space-between">
+        <Text fontSize="lg" fontWeight="medium">
+          {name.charAt(0).toUpperCase() + name.slice(1)}
+        </Text>
+        <Button
+          key={id}
+          size="sm"
+          variant="primary"
+          rightIcon={<FiLogIn />}
+          value={id}
+          onClick={() => {
+            setOrganization(id);
+            login({
+              organizationId: id,
+              appState: {
+                returnTo: from
+              }
+            });
+          }}
+        >
+          Select
+        </Button>
+      </HStack>
     );
   });
 
+  if (loading) {
+    return (
+      <Center padding="1.5em" height="100vh">
+        <CircularProgress isIndeterminate color="green.300" />
+      </Center>
+    );
+  }
+
   return (
-    <Box as="section" height="100vh" overflowY="auto">
-      {loading && (
-        <Center padding="1.5em" height="100vh">
-          <CircularProgress isIndeterminate color="green.300" />
-        </Center>
-      )}
+    <Container maxW="2xl">
       {organizations?.length > 1 && (
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          textAlign="center"
-          as="section"
-          pt={{ base: '4', md: '8' }}
-          pb={{ base: '12', md: '24' }}
-        >
-          <Box
-            bg="bg-surface"
-            px={{ base: '4', md: '6' }}
-            py="5"
-            boxShadow={colorMode}
-            borderTopWidth="4px"
-            borderColor="accent"
-          >
-            <Stack spacing="3">
-              <Text fontSize="lg" fontWeight="medium">
-                Select an organization
-              </Text>
-              <Text color="muted" fontSize="sm">
-                You are a member of multiple organizations. Please choose the organization you would
-                like to log in to.
-              </Text>
-              <Divider />
-              {orgs}
-            </Stack>
-          </Box>
-        </Box>
+        <Card p={5} mt={5} borderTopWidth="4px" borderColor="accent">
+          <Stack spacing="3">
+            <Text fontSize="lg" fontWeight="medium" alignSelf="center">
+              Select an organization
+            </Text>
+            <Text color="muted" fontSize="sm" alignSelf="center">
+              You are a member of multiple organizations. Please choose the organization you would
+              like to log in to.
+            </Text>
+            <Divider />
+            {orgs}
+          </Stack>
+        </Card>
       )}
-    </Box>
+    </Container>
   );
 };
