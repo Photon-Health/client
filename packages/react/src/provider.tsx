@@ -714,7 +714,7 @@ export const PhotonProvider = (opts: {
       if (client.authentication.hasAuthParams()) {
         try {
           // @ts-ignore
-          const { appState } = await client.authentication.handleRedirect();
+          const { appState } = await client.authentication.handleRedirect(state?.returnTo);
           onRedirectCallback(appState);
         } catch (e) {
           const message = (e as Error).message;
