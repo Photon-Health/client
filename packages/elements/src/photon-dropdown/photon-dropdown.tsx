@@ -81,7 +81,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   //refs
   let ref: any;
   let dropdownRef: any;
-  let listRef: Element | undefined;
+  let listRef: HTMLDivElement | undefined;
   let inputRef: any;
   let overlayRef: HTMLDivElement | undefined;
 
@@ -207,7 +207,7 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
   const rowVirtualizer = createMemo(() =>
     createVirtualizer({
       count: allItems().length,
-      getScrollElement: () => listRef,
+      getScrollElement: () => listRef ?? null,
       estimateSize: () => 36.8,
       overscan: 100
     })
@@ -426,7 +426,7 @@ const GroupLabelEl = (props: { item: GroupTitle }) => (
 );
 
 const ItemEl = (props: {
-  item: VirtualItem<unknown>;
+  item: VirtualItem;
   index: number;
   isLoader: boolean;
   isSelected: boolean;
