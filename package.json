@@ -9,7 +9,7 @@
     "patient": "concurrently \"npx nx run patient:codegen:watch\" \"npx nx run patient:start\"",
     "lint": "npx nx run-many --target=lint",
     "lint:fix": "npx nx run-many --target=lint:fix",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "private": true,
   "workspaces": [
