@@ -3,7 +3,41 @@
 /dist
 /coverage
 /node_modules
+/.nx
 
 # gql codegen
 /apps/app/src/gql
 __generated__
+
+# System files
+.DS_Store
+
+# Git and npm ignore files
+.gitignore
+.npmignore
+
+# Ignore all dot files
+.*
+
+# Ignore binary and image files
+*.ico
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.svg
+*.webp
+
+# Ignore specific file types
+*.json
+*.txt
+
+# Ignore specific directories
+**/public
+**/assets
+
+# Optional: Ignore specific file types that Prettier can't parse
+*.md
+*.yml
+*.yaml
