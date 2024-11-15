@@ -171,7 +171,7 @@ export const PickupOptions = ({
               onSetPreferred={() => handleSetPreferred(pharmacy.id)}
               selectable={true}
               showPrice
-              currentPharmacy={pharmacy.id === currentPharmacyId}
+              isCurrentPharmacy={pharmacy.id === currentPharmacyId}
             />
           </SlideFade>
         ))}

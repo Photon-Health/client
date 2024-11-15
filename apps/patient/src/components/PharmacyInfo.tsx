@@ -212,7 +212,7 @@ interface PharmacyInfoProps {
   isStatus?: boolean;
   selected?: boolean;
   showHours?: boolean;
-  currentPharmacy?: boolean;
+  isCurrentPharmacy?: boolean;
 }
 
 export const PharmacyInfo = ({
@@ -226,7 +226,7 @@ export const PharmacyInfo = ({
   boldPharmacyName = true,
   isStatus = false,
   showHours = false,
-  currentPharmacy = false
+  isCurrentPharmacy = false
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
@@ -315,7 +315,7 @@ export const PharmacyInfo = ({
           />
         </VStack>
       ) : null}
-      {currentPharmacy ? (
+      {isCurrentPharmacy ? (
         <Tag
           size="md"
           bgColor="red.50"
