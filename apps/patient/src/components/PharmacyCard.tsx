@@ -19,6 +19,7 @@ interface PharmacyCardProps {
   selectable?: boolean;
   showDetails?: boolean;
   showPrice?: boolean;
+  currentPharmacy?: boolean;
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
@@ -30,19 +31,23 @@ export const PharmacyCard = memo(function PharmacyCard({
   onSetPreferred,
   selectable = false,
   showDetails = true,
-  showPrice = false
+  showPrice = false,
+  currentPharmacy = false
 }: PharmacyCardProps) {
   if (!pharmacy) return null;
 
   return (
     <Card
-      bgColor="white"
-      border="2px solid"
-      borderColor={selected && onSelect ? 'brand.500' : 'white'}
+      bgColor={currentPharmacy ? 'gray.200' : 'white'}
+      borderWidth={selected ? '2px' : '1px'}
+      borderColor={selected && onSelect ? 'brand.500' : currentPharmacy ? 'gray.300' : 'gray.100'}
+      shadow={currentPharmacy ? 'none' : undefined}
       borderRadius="lg"
       onClick={() => onSelect && onSelect()}
       mx={{ base: -3, md: undefined }}
       cursor={selectable ? 'pointer' : undefined}
+      pointerEvents={currentPharmacy ? 'none' : undefined}
+      opacity={currentPharmacy ? 0.7 : undefined}
     >
       <CardBody p={3}>
         <PharmacyInfo
@@ -52,6 +57,7 @@ export const PharmacyCard = memo(function PharmacyCard({
           showPrice={showPrice}
           boldPharmacyName={false}
           selected={selected}
+          currentPharmacy={currentPharmacy}
         />
       </CardBody>
       {showDetails ? (
