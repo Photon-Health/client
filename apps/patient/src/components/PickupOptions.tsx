@@ -75,6 +75,7 @@ interface PickupOptionsProps {
   setEnableOpenNow: (isOpen: boolean) => void;
   setEnable24Hr: (is24Hr: boolean) => void;
   location: string;
+  currentPharmacyId?: string;
 }
 
 export const PickupOptions = ({
@@ -92,7 +93,8 @@ export const PickupOptions = ({
   enableOpenNow,
   enable24Hr,
   setEnableOpenNow,
-  setEnable24Hr
+  setEnable24Hr,
+  currentPharmacyId
 }: PickupOptionsProps) => {
   return (
     <VStack spacing={3} align="span" w="full">
@@ -169,6 +171,7 @@ export const PickupOptions = ({
               onSetPreferred={() => handleSetPreferred(pharmacy.id)}
               selectable={true}
               showPrice
+              isCurrentPharmacy={pharmacy.id === currentPharmacyId}
             />
           </SlideFade>
         ))}
