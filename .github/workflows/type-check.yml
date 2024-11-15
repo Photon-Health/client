@@ -23,7 +23,7 @@ jobs:
         run: npm ci
 
       - name: Build Packages
-        run: npx nx run-many --all --target=build
+        run: npx nx run-many --all --target=build --verbose --skip-nx-cache
 
       - name: Run Type Check
         run: npx nx run-many --all --target=tsc

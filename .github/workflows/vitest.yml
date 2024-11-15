@@ -23,6 +23,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+      # there was an issue with the rollup binary not being available in the runner https://github.com/npm/cli/issues/4828
       - name: Install Rollup
         run: npm install @rollup/rollup-linux-x64-gnu
       - run: npm ci
