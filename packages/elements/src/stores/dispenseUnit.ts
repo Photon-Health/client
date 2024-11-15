@@ -26,7 +26,7 @@ const createDispenseUnitStore = () => {
       isLoading: true
     });
     const { data, errors } = await client.clinical.prescription.getDispenseUnits();
-    return setStore('dispenseUnits', {
+    setStore('dispenseUnits', {
       ...store.dispenseUnits,
       isLoading: false,
       data: data.dispenseUnits.map((x, idx) => ({

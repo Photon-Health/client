@@ -72,7 +72,7 @@ const createCatalogStore = () => {
     const { data, errors } = await client.clinical.catalog.getCatalogs({
       fragment: CatalogFieldsMap
     });
-    return setStore('catalogs', {
+    setStore('catalogs', {
       ...store.catalogs,
       isLoading: false,
       data: data.catalogs,
@@ -89,7 +89,7 @@ const createCatalogStore = () => {
       id,
       fragment: CatalogTreatmentFieldsMap
     });
-    return setStore('catalog', {
+    setStore('catalog', {
       ...store.catalog,
       isLoading: false,
       data: data.catalog,

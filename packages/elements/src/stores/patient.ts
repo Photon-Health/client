@@ -85,7 +85,7 @@ const createPatientStore = () => {
         PatientOrderFields: PATIENT_ORDER_FIELDS
       }
     });
-    return setStore('selectedPatient', {
+    setStore('selectedPatient', {
       ...store.selectedPatient,
       isLoading: false,
       data: data.patient,
