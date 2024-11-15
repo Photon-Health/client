@@ -212,6 +212,7 @@ interface PharmacyInfoProps {
   isStatus?: boolean;
   selected?: boolean;
   showHours?: boolean;
+  isCurrentPharmacy?: boolean;
 }
 
 export const PharmacyInfo = ({
@@ -224,7 +225,8 @@ export const PharmacyInfo = ({
   freeDelivery = false,
   boldPharmacyName = true,
   isStatus = false,
-  showHours = false
+  showHours = false,
+  isCurrentPharmacy = false
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
@@ -312,6 +314,19 @@ export const PharmacyInfo = ({
             showHours={showHours}
           />
         </VStack>
+      ) : null}
+      {isCurrentPharmacy ? (
+        <Tag
+          size="md"
+          bgColor="red.50"
+          color="red.600"
+          borderColor="red.200"
+          borderRadius="full"
+          borderWidth="1px"
+          mb={1}
+        >
+          <TagLabel fontWeight="bold">Current Pharmacy</TagLabel>
+        </Tag>
       ) : null}
     </VStack>
   );
