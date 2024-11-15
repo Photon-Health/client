@@ -124,13 +124,7 @@ export const TicketModal = ({
             >
               {({ handleSubmit, errors, touched, setFieldTouched }) => {
                 return (
-                  <Form
-                    onSubmit={handleSubmit}
-                    style={{ width: '100%' }}
-                    placeholder={undefined}
-                    onPointerEnterCapture={undefined}
-                    onPointerLeaveCapture={undefined}
-                  >
+                  <Form onSubmit={handleSubmit} style={{ width: '100%' }}>
                     <VStack spacing={4} width="100%">
                       <FormControl
                         isInvalid={!!errors.description && touched.description}
