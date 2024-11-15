@@ -3,7 +3,7 @@
   "root": "packages/elements",
   "sourceRoot": "packages/elements/src",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "projectType": "package",
+  "projectType": "library",
   "targets": {
     "start": {
       "executor": "nx:run-commands",

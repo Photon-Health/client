@@ -1,6 +1,6 @@
 import { PhotonClient } from '@photonhealth/sdk';
 import { Patient } from '@photonhealth/sdk/dist/types';
-import { GraphQLError } from 'graphql';
+import { GraphQLFormattedError } from 'graphql';
 import { createStore } from 'solid-js/store';
 import gql from 'graphql-tag';
 
@@ -51,13 +51,13 @@ const createPatientStore = () => {
   const [store, setStore] = createStore<{
     patients: {
       data: Patient[];
-      errors: readonly GraphQLError[];
+      errors: readonly GraphQLFormattedError[];
       isLoading: boolean;
       finished: boolean;
     };
     selectedPatient: {
       data?: Patient;
-      errors: readonly GraphQLError[];
+      errors: readonly GraphQLFormattedError[];
       isLoading: boolean;
     };
   }>({

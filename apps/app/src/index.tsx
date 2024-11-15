@@ -10,8 +10,7 @@ import theme from './configs/theme';
 import { App } from './App';
 
 import pkg from '../package.json';
-
-import('@photonhealth/elements').catch(() => {});
+import '@photonhealth/elements';
 
 datadogRum.init({
   applicationId: process.env.REACT_APP_DATADOG_RUM_APPLICATION_ID as string,
