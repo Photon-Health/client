@@ -10,6 +10,8 @@ phases:
       - node -v
       - npm -v
       - npm install
+      - npm install @rollup/rollup-linux-x64-gnu
+      - npm rebuild
   build:
     commands:
       - export DD_GIT_COMMIT_SHA=$(git rev-parse HEAD)
