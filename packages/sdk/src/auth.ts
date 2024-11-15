@@ -151,7 +151,13 @@ export class AuthManager {
       }
     }
     if (!token) {
-      await this.authentication.loginWithRedirect(opts);
+      const redirectOpts: RedirectLoginOptions = {
+        ...opts,
+        appState: {
+          returnTo: `${window.location.pathname}${window.location.search}`
+        }
+      };
+      await this.authentication.loginWithRedirect(redirectOpts);
       if (throwIfFailure) {
         throw new Error(); // Needed just because this needs to resolve to something
       } else {
