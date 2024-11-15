@@ -4,12 +4,14 @@ phases:
   install:
     on-failure: ABORT
     runtime-versions:
-      nodejs: 16
+      nodejs: 20
     commands:
       - printenv
       - node -v
       - npm -v
       - npm install
+      - npm install @rollup/rollup-linux-x64-gnu
+      - npm rebuild
   build:
     commands:
       - export DD_GIT_COMMIT_SHA=$(git rev-parse HEAD)

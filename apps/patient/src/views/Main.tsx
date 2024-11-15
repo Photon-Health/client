@@ -192,7 +192,7 @@ export const Main = () => {
   }
 
   const orderContextValue = {
-    isDemo: isDemo != null ?? false,
+    isDemo: isDemo != null,
     order,
     flattenedFills,
     setOrder,

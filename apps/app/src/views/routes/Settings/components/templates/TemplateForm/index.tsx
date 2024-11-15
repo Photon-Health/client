@@ -90,7 +90,7 @@ const templateFormValue = (templateToEdit: PrescriptionTemplate | undefined): Te
         treatment: { __typename: '', ...templateToEdit.treatment },
         refillsInput:
           (templateToEdit.fillsAllowed ?? 0) > 0 ? (templateToEdit.fillsAllowed ?? 1) - 1 : 0,
-        isPublic: !templateToEdit.isPrivate ?? false
+        isPublic: !templateToEdit.isPrivate
       }
     : TEMPLATE_INITIAL_VALUES;
 
