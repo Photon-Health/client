@@ -144,7 +144,7 @@ export const StatusV2 = () => {
     rxName: f.prescription.treatment.name,
     quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
     daysSupply: f.prescription?.daysSupply ?? 0,
-    numRefills: f.prescription?.fillsAllowed ?? 0,
+    numRefills: f.prescription?.fillsAllowed ? f.prescription.fillsAllowed - 1 : 0,
     expiresAt: f.prescription?.expirationDate ?? new Date()
   }));
 
