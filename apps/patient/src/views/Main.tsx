@@ -19,6 +19,7 @@ import { demoOrder } from '../data/demoOrder';
 import { FillWithCount, countFillsAndRemoveDuplicates } from '../utils/general';
 import { Order } from '../utils/models';
 import { Pharmacy } from '../__generated__/graphql';
+import { FAQModal } from '../components/FAQModal';
 
 interface OrderContextType {
   order: Order;
@@ -27,6 +28,7 @@ interface OrderContextType {
   logo: any;
   isDemo: boolean;
   fetchOrder: (currentPharmacy?: Pharmacy) => void;
+  setFaqModalIsOpen: (isOpen: boolean) => void;
 }
 const OrderContext = createContext<OrderContextType | null>(null);
 export const useOrderContext = () =>
@@ -51,6 +53,7 @@ export const Main = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
 
   useEffect(() => {
     if (location.pathname !== '/canceled') {
@@ -197,7 +200,8 @@ export const Main = () => {
     flattenedFills,
     setOrder,
     logo,
-    fetchOrder
+    fetchOrder,
+    setFaqModalIsOpen
   };
 
   return (
@@ -206,6 +210,7 @@ export const Main = () => {
         <ScrollRestoration />
         <Nav />
         <Outlet />
+        <FAQModal isOpen={faqModalIsOpen} onClose={() => setFaqModalIsOpen(false)} />
       </OrderContext.Provider>
     </ChakraProvider>
   );
