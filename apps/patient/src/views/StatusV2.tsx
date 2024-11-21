@@ -6,9 +6,9 @@ import { Helmet } from 'react-helmet';
 import { FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { triggerDemoNotification } from '../api';
-import { DemoCtaModal, PHARMACY_BRANDING, PharmacyInfo, PoweredBy, Coupons } from '../components';
+import { Coupons, DemoCtaModal, PHARMACY_BRANDING, PharmacyInfo, PoweredBy } from '../components';
 import { Card } from '../components/Card';
-import { FAQModal } from '../components/FAQModal';
+import { HolidayAlert } from '../components/HolidayAlert';
 import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal';
 import { OrderSummary } from '../components/order-summary/OrderSummary';
 import { OrderStatusHeader } from '../components/statusV2/Header';
@@ -19,7 +19,7 @@ import { useOrderContext } from './Main';
 
 export const StatusV2 = () => {
   const navigate = useNavigate();
-  const { order, setOrder, isDemo } = useOrderContext();
+  const { order, setOrder, isDemo, setFaqModalIsOpen } = useOrderContext();
 
   const orgSettings = getSettings(order?.organization.id);
 
@@ -102,7 +102,6 @@ export const StatusV2 = () => {
     setOrder
   ]);
 
-  const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
   const [orderDetailsIsOpen, setOrderDetailsIsOpen] = useState(false);
 
   // Demo pharmacies are already prepared
@@ -211,7 +210,6 @@ export const StatusV2 = () => {
 
   return (
     <VStack flex={1}>
-      <FAQModal isOpen={faqModalIsOpen} onClose={() => setFaqModalIsOpen(false)} />
       <DemoCtaModal isOpen={showDemoCtaModal} onClose={() => setShowDemoCtaModal(false)} />
       <OrderDetailsModal
         isOpen={orderDetailsIsOpen}
@@ -225,30 +223,26 @@ export const StatusV2 = () => {
       <VStack spacing={4} width="full" alignItems={'stretch'} flex={1}>
         <Box bgColor="white" shadow="sm">
           <Container py={4}>
-            <OrderStatusHeader
-              status={orderState}
-              pharmacyEstimatedReadyAt={pharmacyEstimatedReadyAt}
-              patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
-              exception={
-                order.pharmacy?.isOpen === false
-                  ? 'PHARMACY_CLOSED'
-                  : fulfillments
-                      .map((f) => f.exceptions[0]?.exceptionType)
-                      .find((e) => e != null) ?? undefined
-              }
-            />
+            <VStack spacing={4} width="full" alignItems="stretch">
+              <HolidayAlert>Holiday may affect pharmacy hours.</HolidayAlert>
+              <OrderStatusHeader
+                status={orderState}
+                pharmacyEstimatedReadyAt={pharmacyEstimatedReadyAt}
+                patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
+                exception={
+                  order.pharmacy?.isOpen === false
+                    ? 'PHARMACY_CLOSED'
+                    : fulfillments
+                        .map((f) => f.exceptions[0]?.exceptionType)
+                        .find((e) => e != null) ?? undefined
+                }
+              />
+            </VStack>
           </Container>
         </Box>
 
         <Container>
           <VStack spacing={6}>
-            <OrderSummary
-              fulfillments={fulfillments}
-              onViewDetails={() => setOrderDetailsIsOpen(true)}
-            />
-
-            <Coupons />
-
             <VStack w="full" alignItems="stretch" spacing={4}>
               <Heading as="h4" size="md">
                 Pharmacy
@@ -263,6 +257,13 @@ export const StatusV2 = () => {
                 </VStack>
               </Card>
             </VStack>
+
+            <OrderSummary
+              fulfillments={fulfillments}
+              onViewDetails={() => setOrderDetailsIsOpen(true)}
+            />
+
+            <Coupons />
 
             <VStack w="full" alignItems="stretch" spacing={4}>
               <Heading as="h4" size="md">
