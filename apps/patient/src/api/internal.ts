@@ -35,7 +35,7 @@ export const getPharmacies = async ({
   limit,
   offset,
   isOpenNow,
-  is24hr,
+  is24Hr,
   name,
   includePrice
 }: {
@@ -47,7 +47,7 @@ export const getPharmacies = async ({
   limit: number;
   offset: number;
   isOpenNow: boolean;
-  is24hr: boolean;
+  is24Hr: boolean;
   name?: string;
   includePrice?: boolean;
 }) => {
@@ -66,7 +66,7 @@ export const getPharmacies = async ({
           ...searchParams
         },
         openAt: isOpenNow ? now : undefined,
-        is24hr,
+        is24Hr,
         ...(!includePrice ? { limit, offset, name } : {})
       })
     );

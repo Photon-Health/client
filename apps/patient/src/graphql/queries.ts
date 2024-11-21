@@ -238,7 +238,7 @@ export const GET_PHARMACIES = gql`
     $limit: Int
     $offset: Int
     $openAt: DateTime
-    $is24hr: Boolean
+    $is24Hr: Boolean
     $name: String
   ) {
     pharmaciesByLocation(
@@ -246,7 +246,7 @@ export const GET_PHARMACIES = gql`
       limit: $limit
       offset: $offset
       openAt: $openAt
-      is24hr: $is24hr
+      is24Hr: $is24Hr
       name: $name
     ) {
       ...PharmacyFields
@@ -259,9 +259,9 @@ export const GET_PHARMACIES_WITH_PRICE = gql`
   query GetPharmaciesWithPriceByLocation(
     $location: LatLongSearch!
     $openAt: DateTime
-    $is24hr: Boolean
+    $is24Hr: Boolean
   ) {
-    pharmaciesWithPriceByLocation(location: $location, openAt: $openAt, is24hr: $is24hr) {
+    pharmaciesWithPriceByLocation(location: $location, openAt: $openAt, is24Hr: $is24Hr) {
       pharmacy {
         ...PharmacyFields
       }

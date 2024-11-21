@@ -271,7 +271,7 @@ export const Pharmacy = () => {
           limit: 1,
           offset: 0,
           isOpenNow: enableOpenNow,
-          is24hr: enable24Hr,
+          is24Hr: enable24Hr,
           name: 'costco'
         });
         if (topRankedCostco.length > 0) {
@@ -303,7 +303,7 @@ export const Pharmacy = () => {
           limit: 1,
           offset: 0,
           isOpenNow: enableOpenNow,
-          is24hr: enable24Hr,
+          is24Hr: enable24Hr,
           name: 'walgreens'
         });
         if (topRankedWags.length > 0) {
@@ -338,7 +338,7 @@ export const Pharmacy = () => {
         limit: GET_PHARMACIES_COUNT,
         offset: pageOffset,
         isOpenNow: enableOpenNow,
-        is24hr: enable24Hr,
+        is24Hr: enable24Hr,
         includePrice: enablePrice
       });
       setPageOffset(pageOffset + res.length);
