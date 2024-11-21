@@ -1,23 +1,20 @@
 import {
   Alert,
   Box,
+  Button,
   Container,
   HStack,
   IconButton,
   Image,
   Link,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Spacer,
   Text
 } from '@chakra-ui/react';
+import { FiRefreshCw } from 'react-icons/fi';
 import { useSearchParams } from 'react-router-dom';
-import { FiHelpCircle, FiRefreshCw } from 'react-icons/fi';
 import { text as t } from '../utils/text';
-import { Logo as PhotonLogo } from './Logo';
 import { useOrderContext } from '../views/Main';
+import { Logo as PhotonLogo } from './Logo';
 
 interface NavProps {
   showRefresh?: boolean;
@@ -28,7 +25,7 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
   const isDemo = searchParams.get('demo');
   const isProd = process.env.REACT_APP_ENV_NAME === 'photon';
 
-  const { flattenedFills, logo } = useOrderContext();
+  const { flattenedFills, logo, setFaqModalIsOpen } = useOrderContext();
 
   const isMultiRx = flattenedFills.length > 1;
 
@@ -69,25 +66,10 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
               onClick={() => window.location.reload()}
             />
           ) : null}
-          <Menu>
-            <MenuButton
-              as={IconButton}
-              variant="ghost"
-              colorScheme="gray"
-              aria-label="Contact support"
-              icon={<FiHelpCircle size="1.5em" />}
-            />
-            <MenuList>
-              <MenuItem>
-                <Link
-                  href={`sms:${process.env.REACT_APP_TWILIO_SMS_NUMBER}`}
-                  style={{ textDecoration: 'none' }}
-                >
-                  {t.contactSupport}
-                </Link>
-              </MenuItem>
-            </MenuList>
-          </Menu>
+
+          <Button colorScheme="gray" size="sm" onClick={() => setFaqModalIsOpen(true)}>
+            Help
+          </Button>
         </HStack>
       </Container>
     </Box>
