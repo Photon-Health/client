@@ -1,63 +1,10 @@
-import {
-  Button,
-  Card,
-  CardBody,
-  Heading,
-  HStack,
-  Icon,
-  SlideFade,
-  Text,
-  VStack
-} from '@chakra-ui/react';
+import { Button, Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
 
-import { PharmacyCard } from './PharmacyCard';
-import { text as t } from '../utils/text';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { text as t } from '../utils/text';
+import { HolidayAlert } from './HolidayAlert';
+import { PharmacyCard } from './PharmacyCard';
 import { PharmacyFilters } from './PharmacyFilters';
-import { FiInfo } from 'react-icons/fi';
-import dayjs from 'dayjs';
-
-const holidays = [
-  '2024-05-27', // Memorial Day
-  '2024-07-04', // july 4
-  '2024-09-02', // labor day
-  '2024-11-28', // Thanksgiving
-  '2024-12-24', // Christmas Eve
-  '2024-12-25', // Christmas
-  '2025-01-01' // New years
-];
-
-/**
- * Checks if it's a holiday or the weekend before so that we can surface
- * an hours disclaimer on the pharmacy list
- */
-function showHolidayDisclaimer() {
-  const today = dayjs();
-  const formattedToday = today.format('YYYY-MM-DD');
-
-  // Check if today is a holiday
-  if (holidays.includes(formattedToday)) {
-    return true;
-  }
-
-  const dayOfWeek = today.day(); // 0 (Sunday) to 6 (Saturday)
-
-  // Check if today is Sunday or Saturday
-  if (dayOfWeek === 0 || dayOfWeek === 6) {
-    const nextMonday = today.day(8); // Get the next Monday
-    const isNextMondayHoliday = holidays.includes(nextMonday.format('YYYY-MM-DD'));
-    return isNextMondayHoliday; // true if the next Monday is a holiday, false otherwise
-  } else {
-    return false; // It's not the weekend
-  }
-}
-
-function showHurricaneAlert(location: string) {
-  if (!location.match(/FL|GA/)) return false;
-  const today = dayjs().format('YYYY-MM-DD');
-  console.log('today', today);
-  return today >= '2024-10-09' && today <= '2024-10-14';
-}
 
 interface PickupOptionsProps {
   pharmacies: EnrichedPharmacy[];
@@ -79,7 +26,6 @@ interface PickupOptionsProps {
 }
 
 export const PickupOptions = ({
-  location,
   preferredPharmacy,
   savingPreferred,
   pharmacies,
@@ -108,7 +54,6 @@ export const PickupOptions = ({
           </VStack>
         </SlideFade>
       ) : null}
-
       <SlideFade offsetY="60px" in={true}>
         <PharmacyFilters
           enableOpenNow={enableOpenNow}
@@ -117,48 +62,9 @@ export const PickupOptions = ({
           setEnable24Hr={setEnable24Hr}
         />
       </SlideFade>
-
-      {showHolidayDisclaimer() ? (
-        <VStack align="span" spacing={2}>
-          <Card
-            bgColor="white"
-            border="1px solid"
-            borderColor="orange.500"
-            borderRadius="lg"
-            mx={{ base: -3, md: undefined }}
-            color="orange.500"
-          >
-            <CardBody p={3}>
-              <HStack>
-                <Icon color="orange.500" as={FiInfo} fontWeight="bold" />
-                <Text fontWeight="semibold">Hours may differ due to holiday</Text>
-              </HStack>
-            </CardBody>
-          </Card>
-        </VStack>
-      ) : null}
-      {showHurricaneAlert(location) ? (
-        <VStack align="span" spacing={2}>
-          <Card
-            bgColor="white"
-            border="1px solid"
-            borderColor="orange.500"
-            borderRadius="lg"
-            mx={{ base: -3, md: undefined }}
-            color="orange.500"
-          >
-            <CardBody p={3}>
-              <HStack>
-                <Icon color="orange.500" as={FiInfo} fontWeight="bold" />
-                <Text fontWeight="semibold">
-                  Due to hurricane, pharmacies may be closed or experiencing delays.
-                </Text>
-              </HStack>
-            </CardBody>
-          </Card>
-        </VStack>
-      ) : null}
-
+      <HolidayAlert>
+        Holiday may affect pharmacy hours. Consider sending to a 24 hour pharmacy.
+      </HolidayAlert>
       <VStack align="span" spacing={2}>
         {pharmacies.map((pharmacy: EnrichedPharmacy, i: number) => (
           <SlideFade offsetY="60px" in={true} key={`pickup-pharmacy-${pharmacy.id}-${i}`}>
