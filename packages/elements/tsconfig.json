@@ -10,7 +10,9 @@
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "resolveJsonModule": true,
+    "skipLibCheck": true,
     "types": ["vite/client"]
   },
-  "include": ["src/**/*", "types.d.ts"]
+  "include": ["src/**/*", "types.d.ts"],
+  "exclude": ["node_modules"]
 }

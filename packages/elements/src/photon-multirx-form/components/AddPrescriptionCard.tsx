@@ -17,7 +17,7 @@ import { afterDate, between, message } from '../../validators';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/button/button';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-import { GraphQLError } from 'graphql';
+import { GraphQLFormattedError } from 'graphql';
 import { createSignal, onMount, Show } from 'solid-js';
 import { usePhoton } from '../../context';
 import clearForm from '../util/clearForm';
@@ -103,7 +103,7 @@ export const AddPrescriptionCard = (props: {
     .getSDK()
     .clinical.prescriptionTemplate.createPrescriptionTemplate({});
 
-  const dispatchOrderError = (errors: readonly GraphQLError[]) => {
+  const dispatchOrderError = (errors: readonly GraphQLFormattedError[]) => {
     const event = new CustomEvent('photon-order-error', {
       composed: true,
       bubbles: true,
@@ -196,7 +196,7 @@ export const AddPrescriptionCard = (props: {
               });
             }
           } catch (err) {
-            dispatchOrderError([err as GraphQLError]);
+            dispatchOrderError([err as GraphQLFormattedError]);
           }
         }
         triggerToast({

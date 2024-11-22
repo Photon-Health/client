@@ -795,33 +795,31 @@ export const Order = () => {
                 </Text>
               ) : (
                 <VStack spacing={3}>
-                  {prescriptions.map((fill: Fill, i: number) => {
-                    return i < 5 ? (
-                      <LinkBox key={fill.id} style={{ textDecoration: 'none' }} w="full">
-                        <Card
-                          variant="outline"
-                          p={3}
-                          shadow="none"
-                          backgroundColor="gray.50"
-                          _hover={{ backgroundColor: 'gray.100' }}
-                        >
-                          <HStack justify="space-between">
-                            <VStack alignItems="start" spacing={0}>
-                              <LinkOverlay href={`/prescriptions/${fill?.prescription?.id}`}>
-                                <Text fontSize="md">{fill.treatment.name}</Text>
-                              </LinkOverlay>
-                              <Text fontSize="md" color="gray.500">
-                                {rxSummary(fill)}
-                              </Text>
-                            </VStack>
-                            <Box alignItems="end">
-                              <FiChevronRight size="1.3em" />
-                            </Box>
-                          </HStack>
-                        </Card>
-                      </LinkBox>
-                    ) : null;
-                  })}
+                  {prescriptions.map((fill: Fill) => (
+                    <LinkBox key={fill.id} style={{ textDecoration: 'none' }} w="full">
+                      <Card
+                        variant="outline"
+                        p={3}
+                        shadow="none"
+                        backgroundColor="gray.50"
+                        _hover={{ backgroundColor: 'gray.100' }}
+                      >
+                        <HStack justify="space-between">
+                          <VStack alignItems="start" spacing={0}>
+                            <LinkOverlay href={`/prescriptions/${fill?.prescription?.id}`}>
+                              <Text fontSize="md">{fill.treatment.name}</Text>
+                            </LinkOverlay>
+                            <Text fontSize="md" color="gray.500">
+                              {rxSummary(fill)}
+                            </Text>
+                          </VStack>
+                          <Box alignItems="end">
+                            <FiChevronRight size="1.3em" />
+                          </Box>
+                        </HStack>
+                      </Card>
+                    </LinkBox>
+                  ))}
                 </VStack>
               )}
             </VStack>

@@ -1,7 +1,7 @@
 /// <reference types="@types/google.maps" />
 import { PhotonClient } from '@photonhealth/sdk';
 import { Pharmacy, FulfillmentType } from '@photonhealth/sdk/dist/types';
-import { GraphQLError } from 'graphql';
+import { GraphQLFormattedError } from 'graphql';
 import { createStore } from 'solid-js/store';
 import gql from 'graphql-tag';
 
@@ -28,17 +28,17 @@ const createPharmacyStore = () => {
     pharmacies: {
       data: Pharmacy[];
       address?: string;
-      errors: readonly (GraphQLError | Error)[];
+      errors: readonly GraphQLFormattedError[];
       isLoading: boolean;
     };
     selectedPharmacy: {
       data?: Pharmacy;
-      errors: readonly GraphQLError[];
+      errors: readonly GraphQLFormattedError[];
       isLoading: boolean;
     };
     preferredPharmacies: {
       data?: Pharmacy[];
-      errors: readonly GraphQLError[];
+      errors: readonly GraphQLFormattedError[];
       isLoading: boolean;
     };
   }>({

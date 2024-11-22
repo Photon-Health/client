@@ -812,6 +812,7 @@ export const Pharmacy = () => {
               enable24Hr={enable24Hr}
               setEnableOpenNow={setEnableOpenNow}
               setEnable24Hr={setEnable24Hr}
+              currentPharmacyId={order.pharmacy?.id}
             />
           </VStack>
         ) : null}

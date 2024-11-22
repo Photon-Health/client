@@ -34,7 +34,7 @@ import '@shoelace-style/shoelace/dist/components/switch/switch';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-import { GraphQLError } from 'graphql';
+import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
@@ -252,7 +252,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     setScreeningAlerts(data?.prescriptionScreen?.alerts ?? []);
   };
 
-  const dispatchPrescriptionsError = (errors: readonly GraphQLError[]) => {
+  const dispatchPrescriptionsError = (errors: readonly GraphQLFormattedError[]) => {
     const event = new CustomEvent('photon-prescriptions-error', {
       composed: true,
       bubbles: true,
@@ -263,7 +263,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     ref?.dispatchEvent(event);
   };
 
-  const dispatchOrderError = (errors: readonly GraphQLError[] = []) => {
+  const dispatchOrderError = (errors: readonly GraphQLFormattedError[] = []) => {
     const event = new CustomEvent('photon-order-error', {
       composed: true,
       bubbles: true,
@@ -368,7 +368,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
               dispatchOrderError(errors);
             }
           } catch (err) {
-            dispatchOrderError([err as GraphQLError]);
+            dispatchOrderError([err as GraphQLFormattedError]);
           }
         }
         prescriptions.push(args);
@@ -442,12 +442,12 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           dispatchOrderCreated(orderData!.createOrder);
         }
       } catch (err) {
-        dispatchOrderError([err as GraphQLError]);
+        dispatchOrderError([err as GraphQLFormattedError]);
         setIsLoading(false);
         triggerToast({
           status: 'error',
           header: 'Error Creating Order',
-          body: (err as GraphQLError)?.message
+          body: (err as GraphQLFormattedError)?.message
         });
       }
     } else {

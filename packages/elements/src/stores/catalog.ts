@@ -1,6 +1,6 @@
 import { PhotonClient } from '@photonhealth/sdk';
 import { Catalog } from '@photonhealth/sdk/dist/types';
-import { GraphQLError } from 'graphql';
+import { GraphQLFormattedError } from 'graphql';
 import gql from 'graphql-tag';
 import { createStore } from 'solid-js/store';
 
@@ -43,12 +43,12 @@ const createCatalogStore = () => {
   const [store, setStore] = createStore<{
     catalogs: {
       data: Catalog[];
-      errors: readonly GraphQLError[];
+      errors: readonly GraphQLFormattedError[];
       isLoading: boolean;
     };
     catalog: {
       data?: Catalog;
-      errors: readonly GraphQLError[];
+      errors: readonly GraphQLFormattedError[];
       isLoading: boolean;
     };
   }>({

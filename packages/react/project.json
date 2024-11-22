@@ -3,8 +3,27 @@
   "root": "packages/react",
   "sourceRoot": "packages/react/src",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "projectType": "package",
+  "projectType": "library",
   "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/react",
+        "commands": [
+          "rimraf dist",
+          "tsc",
+          "vite build"
+        ],
+        "parallel": false
+      },
+      "outputs": ["{workspaceRoot}/dist/packages/sdk"],
+      "dependsOn": [
+        {
+          "projects": ["sdk"],
+          "target": "build"
+        }
+      ]
+    },
     "start": {
       "executor": "nx:run-commands",
       "options": {
@@ -17,13 +36,6 @@
       "options": {
         "cwd": "packages/react",
         "command": "npx eslint . --ext .tsx,.ts --quiet"
-      }
-    },
-    "build": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "packages/react",
-        "command": "rimraf dist && vite build"
       }
     },
     "lint:fix": {

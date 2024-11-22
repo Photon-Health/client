@@ -12,7 +12,7 @@ import type {
   FetchResult
 } from '@apollo/client/core';
 import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
-import type { GraphQLError } from 'graphql';
+import type { GraphQLError, GraphQLFormattedError } from 'graphql';
 import type { Accessor } from 'solid-js';
 import { createResource, createSignal, untrack } from 'solid-js';
 
@@ -39,7 +39,7 @@ export const createMutation = <
   const resolvedOptions = typeof options === 'function' ? options() : options; // could be accessor or object
   const client = resolvedOptions.client;
   let resolveResultPromise: ((data: TData) => void) | null = null;
-  let rejectResultPromise: ((error: GraphQLError) => void) | null = null;
+  let rejectResultPromise: ((error: GraphQLFormattedError) => void) | null = null;
 
   const [executionOptions, setExecutionOptions] = createSignal<
     false | MutationOptions<TData, TVariables, TContext>
@@ -77,7 +77,10 @@ export const createMutation = <
 
   return [
     async (opts: Omit<BaseOptions<TData, TVariables, TContext>, 'client'>) => {
-      const mergedOptions = mergeOptions<MutationOptions<TData, TVariables, TContext>>(opts, {
+      const mergedOptions = mergeOptions<
+        MutationOptions<TData, TVariables, TContext>,
+        MutationOptions<TData, TVariables, TContext>
+      >(opts, {
         mutation,
         ...(typeof options === 'function' ? untrack(options) : options)
       });

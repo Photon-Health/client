@@ -243,6 +243,24 @@ const organizationSettings: {
     sendToPatient: false,
     enableRxAndOrder: false
   },
+  // Cooley Hair Center (Xyon Health)
+  org_7a9qctA33YSc62vI: {
+    sendOrder: false,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
+    sendToPatient: false,
+    enableRxAndOrder: false
+  },
+  // Hair 4 Life Az (Xyon Health)
+  org_fhJeej4u6rAoCWXq: {
+    sendOrder: false,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
+    sendToPatient: false,
+    enableRxAndOrder: false
+  },
   // Ognomy
   org_2B1yxV6yS9ROqV1g: {
     logo: 'ognomy_logo.webp',

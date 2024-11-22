@@ -41,8 +41,6 @@ export const Login = () => {
     return <Navigate to="/" replace />;
   }
 
-  const from = `${(location.state?.from?.pathname || '/') + (location.state?.from?.search || '')}`;
-
   return (
     <Container maxW="md" py={{ base: '12', md: '24' }}>
       <Stack spacing="8">
@@ -79,7 +77,7 @@ export const Login = () => {
           </Stack>
         </Stack>
         <Stack spacing="4">
-          <Auth returnTo={from} />
+          <Auth returnTo={location.state?.returnTo} />
         </Stack>
       </Stack>
     </Container>

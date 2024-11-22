@@ -11,7 +11,7 @@ import {
   Treatment
 } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
-import { GraphQLError } from 'graphql';
+import { GraphQLFormattedError } from 'graphql';
 import jwtDecode from 'jwt-decode';
 
 const defaultOnRedirectCallback = (appState?: any): void => {
@@ -115,12 +115,12 @@ export class PhotonClientStore {
       state: {
         isLoading: boolean;
         data?: Prescription;
-        errors: GraphQLError[];
+        errors: readonly GraphQLFormattedError[];
         error?: any;
       };
       createPrescription: (args: MutationCreatePrescriptionArgs) => Promise<{
         data: { createPrescription: Prescription } | null | undefined;
-        errors: readonly GraphQLError[] | undefined;
+        errors: readonly GraphQLFormattedError[] | undefined;
       }>;
     };
   };
@@ -163,7 +163,7 @@ export class PhotonClientStore {
       };
       prescription: {
         isLoading: boolean;
-        errors: GraphQLError[];
+        errors: GraphQLFormattedError[];
         error?: any;
         data?: Prescription;
       };

@@ -1,3 +1,4 @@
+/* eslint-env node */
 const path = require('path');
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
@@ -59,7 +60,7 @@ module.exports = {
     return paths;
   },
   jest: (config) => {
-    config.resolver = '@nrwl/jest/plugins/resolver';
+    config.resolver = '@nx/jest/plugins/resolver';
     return config;
   }
 };

@@ -1,8 +1,9 @@
-import { As, Button, ButtonProps, HStack, Icon, Text, useTheme } from '@chakra-ui/react';
+import { Button, ButtonProps, HStack, Icon, Text, useTheme } from '@chakra-ui/react';
 import { Link as RouterLink, useMatch, useResolvedPath } from 'react-router-dom';
+import { IconType } from 'react-icons/lib';
 
 interface NavButtonProps extends ButtonProps {
-  icon: As;
+  icon: IconType;
   label: string;
   link: string;
   bgIsWhite?: boolean;

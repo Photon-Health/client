@@ -155,7 +155,7 @@ export const PhotonMedicationDropdownFullWidth = <
   const rowVirtualizer = createMemo(() =>
     createVirtualizer({
       count: allItems().length,
-      getScrollElement: () => listRef,
+      getScrollElement: () => listRef ?? null,
       estimateSize: () => 42,
       overscan: 100
     })
@@ -350,7 +350,7 @@ const GroupLabelEl = (props: { item: GroupTitle }) => (
 );
 
 const ItemEl = (props: {
-  item: VirtualItem<unknown>;
+  item: VirtualItem;
   index: number;
   isLoader: boolean;
   isSelected: boolean;

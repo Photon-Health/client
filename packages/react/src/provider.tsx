@@ -7,7 +7,7 @@ import {
   NormalizedCacheObject
 } from '@apollo/client';
 import { useStore } from '@nanostores/react';
-import { GraphQLError } from 'graphql';
+import { GraphQLFormattedError } from 'graphql';
 import { action, map } from 'nanostores';
 import { PhotonClient } from '@photonhealth/sdk';
 import {
@@ -159,7 +159,7 @@ export interface PhotonClientContextInterface {
     }) => Promise<void>,
     {
       data: { createPatient: Patient } | undefined | null;
-      error: GraphQLError;
+      error: GraphQLFormattedError;
       loading: boolean;
     }
   ];
@@ -179,7 +179,7 @@ export interface PhotonClientContextInterface {
     }) => Promise<void>,
     {
       data: { updatePatient: Patient } | undefined | null;
-      error: GraphQLError;
+      error: GraphQLFormattedError;
       loading: boolean;
     }
   ];
@@ -199,7 +199,7 @@ export interface PhotonClientContextInterface {
     }) => Promise<void>,
     {
       data: { removePatientAllergy: Patient } | undefined | null;
-      error: GraphQLError;
+      error: GraphQLFormattedError;
       loading: boolean;
     }
   ];
@@ -219,7 +219,7 @@ export interface PhotonClientContextInterface {
     }) => Promise<void>,
     {
       data: { removePatientPreferredPharmacy: Patient } | undefined | null;
-      error: GraphQLError;
+      error: GraphQLFormattedError;
       loading: boolean;
     }
   ];
@@ -261,7 +261,7 @@ export interface PhotonClientContextInterface {
     }) => Promise<void>,
     {
       data: { createOrder: Order } | undefined | null;
-      error: GraphQLError;
+      error: GraphQLFormattedError;
       loading: boolean;
     }
   ];
@@ -283,7 +283,7 @@ export interface PhotonClientContextInterface {
     }) => Promise<void>,
     {
       data: { addToCatalog: Treatment } | undefined | null;
-      error: GraphQLError;
+      error: GraphQLFormattedError;
       loading: boolean;
     }
   ];
@@ -305,7 +305,7 @@ export interface PhotonClientContextInterface {
     }) => Promise<void>,
     {
       data: { removeFromCatalog: Treatment } | undefined | null;
-      error: GraphQLError;
+      error: GraphQLFormattedError;
       loading: boolean;
     }
   ];
@@ -327,7 +327,7 @@ export interface PhotonClientContextInterface {
     }) => Promise<void>,
     {
       data: { createPrescriptionTemplate: PrescriptionTemplate } | undefined | null;
-      error: GraphQLError;
+      error: GraphQLFormattedError;
       loading: boolean;
     }
   ];
@@ -349,7 +349,7 @@ export interface PhotonClientContextInterface {
     }) => Promise<void>,
     {
       data: { updatePrescriptionTemplate: PrescriptionTemplate } | undefined | null;
-      error: GraphQLError;
+      error: GraphQLFormattedError;
       loading: boolean;
     }
   ];
@@ -371,7 +371,7 @@ export interface PhotonClientContextInterface {
     }) => Promise<void>,
     {
       data: { deletePrescriptionTemplate: PrescriptionTemplate } | undefined | null;
-      error: GraphQLError;
+      error: GraphQLFormattedError;
       loading: boolean;
     }
   ];
@@ -483,7 +483,7 @@ export interface PhotonClientContextInterface {
     }) => Promise<void>,
     {
       data: { createPrescription: Prescription } | undefined | null;
-      error: GraphQLError;
+      error: GraphQLFormattedError;
       loading: boolean;
     }
   ];
@@ -575,7 +575,7 @@ export interface PhotonClientContextInterface {
     }) => Promise<void>,
     {
       data: { createWebhook: WebhookConfig } | undefined | null;
-      error: GraphQLError;
+      error: GraphQLFormattedError;
       loading: boolean;
     }
   ];
@@ -595,7 +595,7 @@ export interface PhotonClientContextInterface {
     }) => Promise<void>,
     {
       data: { deleteWebhook: boolean } | undefined | null;
-      error: GraphQLError;
+      error: GraphQLFormattedError;
       loading: boolean;
     }
   ];
@@ -621,7 +621,7 @@ export interface PhotonClientContextInterface {
     }) => Promise<void>,
     {
       data: { rotateSecret: Client } | undefined | null;
-      error: GraphQLError;
+      error: GraphQLFormattedError;
       loading: boolean;
     }
   ];
@@ -714,7 +714,7 @@ export const PhotonProvider = (opts: {
       if (client.authentication.hasAuthParams()) {
         try {
           // @ts-ignore
-          const { appState } = await client.authentication.handleRedirect();
+          const { appState } = await client.authentication.handleRedirect(state?.returnTo);
           onRedirectCallback(appState);
         } catch (e) {
           const message = (e as Error).message;
@@ -920,7 +920,7 @@ export const PhotonProvider = (opts: {
   const createPatientStore = map<{
     createPatient?: Patient;
     loading: boolean;
-    error?: GraphQLError;
+    error?: GraphQLFormattedError;
   }>({
     createPatient: undefined,
     loading: false,
@@ -956,7 +956,7 @@ export const PhotonProvider = (opts: {
           }
         } catch (err) {
           store.setKey('createPatient', undefined);
-          store.setKey('error', err as GraphQLError);
+          store.setKey('error', err as GraphQLFormattedError);
         }
 
         store.setKey('loading', false);
@@ -986,7 +986,7 @@ export const PhotonProvider = (opts: {
   const updatePatientStore = map<{
     updatePatient?: Patient;
     loading: boolean;
-    error?: GraphQLError;
+    error?: GraphQLFormattedError;
   }>({
     updatePatient: undefined,
     loading: false,
@@ -1022,7 +1022,7 @@ export const PhotonProvider = (opts: {
           }
         } catch (err) {
           store.setKey('updatePatient', undefined);
-          store.setKey('error', err as GraphQLError);
+          store.setKey('error', err as GraphQLFormattedError);
         }
 
         store.setKey('loading', false);
@@ -1045,7 +1045,7 @@ export const PhotonProvider = (opts: {
   const removePatientAllergyStore = map<{
     removePatientAllergy?: Patient;
     loading: boolean;
-    error?: GraphQLError;
+    error?: GraphQLFormattedError;
   }>({
     removePatientAllergy: undefined,
     loading: false,
@@ -1081,7 +1081,7 @@ export const PhotonProvider = (opts: {
           }
         } catch (err) {
           store.setKey('removePatientAllergy', undefined);
-          store.setKey('error', err as GraphQLError);
+          store.setKey('error', err as GraphQLFormattedError);
         }
 
         store.setKey('loading', false);
@@ -1108,7 +1108,7 @@ export const PhotonProvider = (opts: {
   const removePatientPreferredPharmacyStore = map<{
     removePatientPreferredPharmacy?: Patient;
     loading: boolean;
-    error?: GraphQLError;
+    error?: GraphQLFormattedError;
   }>({
     removePatientPreferredPharmacy: undefined,
     loading: false,
@@ -1145,7 +1145,7 @@ export const PhotonProvider = (opts: {
           }
         } catch (err) {
           store.setKey('removePatientPreferredPharmacy', undefined);
-          store.setKey('error', err as GraphQLError);
+          store.setKey('error', err as GraphQLFormattedError);
         }
 
         store.setKey('loading', false);
@@ -1279,7 +1279,7 @@ export const PhotonProvider = (opts: {
   const createOrderStore = map<{
     createOrder?: Order;
     loading: boolean;
-    error?: GraphQLError;
+    error?: GraphQLFormattedError;
   }>({
     createOrder: undefined,
     loading: false,
@@ -1312,7 +1312,7 @@ export const PhotonProvider = (opts: {
         }
       } catch (err) {
         store.setKey('createOrder', undefined);
-        store.setKey('error', err as GraphQLError);
+        store.setKey('error', err as GraphQLFormattedError);
       }
 
       store.setKey('loading', false);
@@ -1501,7 +1501,7 @@ export const PhotonProvider = (opts: {
   const createPrescriptionStore = map<{
     createPrescription?: Prescription;
     loading: boolean;
-    error?: GraphQLError;
+    error?: GraphQLFormattedError;
   }>({
     createPrescription: undefined,
     loading: false,
@@ -1536,7 +1536,7 @@ export const PhotonProvider = (opts: {
           }
         } catch (err) {
           store.setKey('createPrescription', undefined);
-          store.setKey('error', err as GraphQLError);
+          store.setKey('error', err as GraphQLFormattedError);
         }
 
         store.setKey('loading', false);
@@ -1653,7 +1653,7 @@ export const PhotonProvider = (opts: {
   const addToCatalogStore = map<{
     addToCatalog?: Treatment;
     loading: boolean;
-    error?: GraphQLError;
+    error?: GraphQLFormattedError;
   }>({
     addToCatalog: undefined,
     loading: false,
@@ -1688,7 +1688,7 @@ export const PhotonProvider = (opts: {
         }
       } catch (err) {
         store.setKey('addToCatalog', undefined);
-        store.setKey('error', err as GraphQLError);
+        store.setKey('error', err as GraphQLFormattedError);
       }
 
       store.setKey('loading', false);
@@ -1716,7 +1716,7 @@ export const PhotonProvider = (opts: {
   const removeFromCatalogStore = map<{
     removeFromCatalog?: Treatment;
     loading: boolean;
-    error?: GraphQLError;
+    error?: GraphQLFormattedError;
   }>({
     removeFromCatalog: undefined,
     loading: false,
@@ -1754,7 +1754,7 @@ export const PhotonProvider = (opts: {
           }
         } catch (err) {
           store.setKey('removeFromCatalog', undefined);
-          store.setKey('error', err as GraphQLError);
+          store.setKey('error', err as GraphQLFormattedError);
         }
 
         store.setKey('loading', false);
@@ -2174,7 +2174,7 @@ export const PhotonProvider = (opts: {
   const createWebhookStore = map<{
     createWebhook?: WebhookConfig;
     loading: boolean;
-    error?: GraphQLError;
+    error?: GraphQLFormattedError;
   }>({
     createWebhook: undefined,
     loading: false,
@@ -2210,7 +2210,7 @@ export const PhotonProvider = (opts: {
           }
         } catch (err) {
           store.setKey('createWebhook', undefined);
-          store.setKey('error', err as GraphQLError);
+          store.setKey('error', err as GraphQLFormattedError);
         }
 
         store.setKey('loading', false);
@@ -2233,7 +2233,7 @@ export const PhotonProvider = (opts: {
   const deleteWebhookStore = map<{
     deleteWebhook?: boolean;
     loading: boolean;
-    error?: GraphQLError;
+    error?: GraphQLFormattedError;
   }>({
     deleteWebhook: undefined,
     loading: false,
@@ -2269,7 +2269,7 @@ export const PhotonProvider = (opts: {
           }
         } catch (err) {
           store.setKey('deleteWebhook', undefined);
-          store.setKey('error', err as GraphQLError);
+          store.setKey('error', err as GraphQLFormattedError);
         }
 
         store.setKey('loading', false);
@@ -2294,7 +2294,7 @@ export const PhotonProvider = (opts: {
   const createPrescriptionTemplateStore = map<{
     createPrescriptionTemplate?: PrescriptionTemplate;
     loading: boolean;
-    error?: GraphQLError;
+    error?: GraphQLFormattedError;
   }>({
     createPrescriptionTemplate: undefined,
     loading: false,
@@ -2333,7 +2333,7 @@ export const PhotonProvider = (opts: {
           }
         } catch (err) {
           store.setKey('createPrescriptionTemplate', undefined);
-          store.setKey('error', err as GraphQLError);
+          store.setKey('error', err as GraphQLFormattedError);
         }
 
         store.setKey('loading', false);
@@ -2364,7 +2364,7 @@ export const PhotonProvider = (opts: {
   const updatePrescriptionTemplateStore = map<{
     updatePrescriptionTemplate?: PrescriptionTemplate;
     loading: boolean;
-    error?: GraphQLError;
+    error?: GraphQLFormattedError;
   }>({
     updatePrescriptionTemplate: undefined,
     loading: false,
@@ -2403,7 +2403,7 @@ export const PhotonProvider = (opts: {
           }
         } catch (err) {
           store.setKey('updatePrescriptionTemplate', undefined);
-          store.setKey('error', err as GraphQLError);
+          store.setKey('error', err as GraphQLFormattedError);
         }
 
         store.setKey('loading', false);
@@ -2434,7 +2434,7 @@ export const PhotonProvider = (opts: {
   const deletePrescriptionTemplateStore = map<{
     deletePrescriptionTemplate?: PrescriptionTemplate;
     loading: boolean;
-    error?: GraphQLError;
+    error?: GraphQLFormattedError;
   }>({
     deletePrescriptionTemplate: undefined,
     loading: false,
@@ -2473,7 +2473,7 @@ export const PhotonProvider = (opts: {
           }
         } catch (err) {
           store.setKey('deletePrescriptionTemplate', undefined);
-          store.setKey('error', err as GraphQLError);
+          store.setKey('error', err as GraphQLFormattedError);
         }
 
         store.setKey('loading', false);
@@ -2859,7 +2859,7 @@ export const PhotonProvider = (opts: {
   const rotateSecretStore = map<{
     rotateSecret?: Client;
     loading: boolean;
-    error?: GraphQLError;
+    error?: GraphQLFormattedError;
   }>({
     rotateSecret: undefined,
     loading: false,
@@ -2892,7 +2892,7 @@ export const PhotonProvider = (opts: {
         }
       } catch (err) {
         store.setKey('rotateSecret', undefined);
-        store.setKey('error', err as GraphQLError);
+        store.setKey('error', err as GraphQLFormattedError);
       }
 
       store.setKey('loading', false);

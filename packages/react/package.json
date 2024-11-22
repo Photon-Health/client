@@ -16,6 +16,7 @@
   "license": "ISC",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/react.es.js",
       "require": "./dist/react.cjs.js"
     }

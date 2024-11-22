@@ -17,13 +17,19 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
+
+      # there was an issue with the rollup binary not being available in the runner https://github.com/npm/cli/issues/4828
+      - name: Install Rollup
+        run: npm install @rollup/rollup-linux-x64-gnu
 
       - name: Install Node.js dependencies
         run: npm ci
 
+
       - name: Build Packages
-        run: npx nx run-many --all --target=build
+        run: |
+          npx nx run-many --all --target=build
 
       - name: Run Type Check
         run: npx nx run-many --all --target=tsc

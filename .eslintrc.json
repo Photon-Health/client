@@ -28,6 +28,7 @@
       "error",
       { "argsIgnorePattern": "^_", "ignoreRestSiblings": true }
     ],
+    "no-template-curly-in-string": "error",
     "prefer-const": ["error"],
     "no-undef": "error",
     "no-console": "off",

@@ -3,20 +3,26 @@
   "root": "packages/sdk",
   "sourceRoot": "packages/sdk/src",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "projectType": "package",
+  "projectType": "library",
   "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/sdk",
+        "commands": [
+          "rimraf dist",
+          "tsc --emitDeclarationOnly --outDir dist",
+          "vite build"
+        ],
+        "parallel": false
+      },
+      "outputs": ["{workspaceRoot}/dist/packages/sdk"]
+    },
     "start": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/sdk",
         "command": "vite --port 3000"
-      }
-    },
-    "build": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "packages/sdk",
-        "command": "rimraf dist && vite build"
       }
     },
     "lint": {
