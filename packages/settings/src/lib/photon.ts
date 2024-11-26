@@ -273,7 +273,7 @@ const organizationSettings: {
   },
   // Sana Care
   org_boRh5PcUzFhvyiue: {
-    logo: 'sana_care_logo.png',
+    logo: 'sana_care_logo.svg',
     accentColor: '#FBCC45',
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [
