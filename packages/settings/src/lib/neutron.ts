@@ -341,7 +341,7 @@ const organizationSettings: {
   },
   // Sana
   org_nWFRQpF5fK1Fd0Ap: {
-    logo: 'sana_care_logo.png',
+    logo: 'sana_care_logo.svg',
     accentColor: '#FBCC45',
     enableMedHistory: true,
     mailOrderNavigate: true,
