@@ -40,7 +40,6 @@ export const Main = () => {
   const isDemo = searchParams.get('demo');
   const orderId = searchParams.get('orderId');
   const phone = searchParams.get('phone');
-  const useV2 = searchParams.get('v2');
 
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
 
@@ -54,6 +53,22 @@ export const Main = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (location.pathname === '/' && token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        datadogRum.addAction('shortlink-opened', {
+          orderId: payload.orderId,
+          patientId: payload.sub,
+          context: payload.context,
+          metadata: payload.metadata
+        });
+      } catch (e) {
+        console.error('Failed to parse JWT token', e);
+      }
+    }
+  }, [location.pathname, token]);
 
   useEffect(() => {
     if (location.pathname !== '/canceled') {
@@ -92,13 +107,13 @@ export const Main = () => {
       }
 
       const hasPharmacy = newOrder.pharmacy?.id;
-      const redirect = hasPharmacy ? (useV2 ? '/status' : '/status') : '/review';
+      const redirect = hasPharmacy ? '/status' : '/review';
 
-      navigate(`${redirect}?orderId=${newOrder.id}&token=${token}${useV2 ? '&v2=true' : ''}`, {
+      navigate(`${redirect}?orderId=${newOrder.id}&token=${token}' : ''}`, {
         replace: true
       });
     },
-    [navigate, orderId, token, order, useV2]
+    [navigate, orderId, token, order]
   );
 
   const fetchOrder = useCallback(
