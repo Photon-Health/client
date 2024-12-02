@@ -8,7 +8,6 @@ import {
   REDBOX_PHARMACY_ID,
   GOGOMEDS_PHARMACY_ID,
   EMPOWER_PHARMACY_ID,
-  INNOVASCRIPT_PHARMACY_ID,
   AMBROSIA_PHARMACY_ID,
   WOMENS_INTERNATIONAL_PHARMACY_ID,
   REDROCK_SPRINGVILLE_PHARMACY_ID,
@@ -301,9 +300,7 @@ const organizationSettings: {
   },
   // Openloop Health
   org_Oxc0CSPfdiyWW3VM: {
-    mailOrder: true,
     pickUp: true,
-    mailOrderProviders: [INNOVASCRIPT_PHARMACY_ID],
     paExceptionMessage:
       'Your insurance needs additional information from your provider before your pharmacy can fill your prescription for. Please email clientsupport@openloophealth.com and ask them to submit a prior authorization on your behalf or suggest an alternative medication.'
   },
