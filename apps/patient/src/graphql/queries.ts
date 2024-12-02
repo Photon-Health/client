@@ -62,6 +62,7 @@ export const GET_ORDER = gql`
           country
           postalCode
         }
+        phone
         isOpen(at: $openAt)
         nextEvents(at: $openAt) {
           open {
