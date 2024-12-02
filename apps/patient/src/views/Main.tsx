@@ -109,7 +109,7 @@ export const Main = () => {
       const hasPharmacy = newOrder.pharmacy?.id;
       const redirect = hasPharmacy ? '/status' : '/review';
 
-      navigate(`${redirect}?orderId=${newOrder.id}&token=${token}' : ''}`, {
+      navigate(`${redirect}?orderId=${newOrder.id}&token=${token}`, {
         replace: true
       });
     },
