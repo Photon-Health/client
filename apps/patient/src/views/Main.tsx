@@ -55,6 +55,8 @@ export const Main = () => {
   const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
 
   useEffect(() => {
+    // If the user opens a shortlink, send an event to Datadog
+    // Only trigger on / because thats the first page they see when clicking a shortlink
     if (location.pathname === '/' && token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
