@@ -54,23 +54,26 @@ export const Main = () => {
   const location = useLocation();
   const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
 
-  useEffect(() => {
-    // If the user opens a shortlink, send an event to Datadog
-    // Only trigger on / because thats the first page they see when clicking a shortlink
-    if (location.pathname === '/' && token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        datadogRum.addAction('shortlink-opened', {
-          orderId: payload.orderId,
-          patientId: payload.sub,
-          context: payload.context,
-          metadata: payload.metadata
-        });
-      } catch (e) {
-        console.error('Failed to parse JWT token', e);
+  useEffect(
+    function triggerDatadogShortlinkOpenEvent() {
+      // If the user opens a shortlink, send an event to Datadog
+      // Only trigger on / because thats the first page they see when clicking a shortlink
+      if (location.pathname === '/' && token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          datadogRum.addAction('shortlink-opened', {
+            orderId: payload.orderId,
+            patientId: payload.sub,
+            context: payload.context,
+            metadata: payload.metadata
+          });
+        } catch (e) {
+          console.error('Failed to parse JWT token', e);
+        }
       }
-    }
-  }, [location.pathname, token]);
+    },
+    [location.pathname, token]
+  );
 
   useEffect(() => {
     if (location.pathname !== '/canceled') {
