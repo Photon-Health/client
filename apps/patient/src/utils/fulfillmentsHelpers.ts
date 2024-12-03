@@ -1,5 +1,5 @@
 import { PrescriptionFulfillment } from '../__generated__/graphql';
-import { Fulfillment } from './models';
+import { Fulfillment, OrderFulfillment } from './models';
 export function getLatestReadyTime(
   fulfillments: Pick<PrescriptionFulfillment, 'pharmacyEstimatedReadyAt'>[]
 ) {
@@ -39,4 +39,12 @@ export function deriveOrderStatus(fulfillments: Fulfillment[]): keyof typeof ful
         : f.state,
     'DELIVERED'
   );
+}
+
+export function getFulfillmentTrackingLink(fulfillment: OrderFulfillment) {
+  const missingTrackingInfo = !fulfillment.carrier || !fulfillment.trackingNumber;
+  if (fulfillment.type !== 'MAIL_ORDER' || missingTrackingInfo) return;
+
+  const searchQuery = encodeURIComponent(`${fulfillment.carrier} ${fulfillment.trackingNumber}`);
+  return `https://google.com/search?q=${searchQuery}`;
 }
