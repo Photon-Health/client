@@ -1,4 +1,4 @@
-import { Box, Button, Container, Heading, Link, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Container, Heading, VStack } from '@chakra-ui/react';
 import { getSettings } from '@client/settings';
 import queryString from 'query-string';
 import { useEffect, useMemo, useState } from 'react';
@@ -6,18 +6,14 @@ import { Helmet } from 'react-helmet';
 import { FiNavigation, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { triggerDemoNotification } from '../api';
-import { Coupons, DemoCtaModal, PHARMACY_BRANDING, PharmacyInfo, PoweredBy } from '../components';
+import { Coupons, DemoCtaModal, PharmacyInfo, PoweredBy } from '../components';
 import { Card } from '../components/Card';
 import { HolidayAlert } from '../components/HolidayAlert';
 import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal';
 import { OrderSummary } from '../components/order-summary/OrderSummary';
 import { OrderStatusHeader } from '../components/statusV2/Header';
-import {
-  deriveOrderStatus,
-  getFulfillmentTrackingLink,
-  getLatestReadyTime
-} from '../utils/fulfillmentsHelpers';
-import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
+import { deriveOrderStatus, getLatestReadyTime } from '../utils/fulfillmentsHelpers';
+import { formatAddress, getFulfillmentType, isDelivery, preparePharmacy } from '../utils/general';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -28,21 +24,15 @@ export const StatusV2 = () => {
   const orgSettings = getSettings(order?.organization.id);
 
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
-  const type = searchParams.get('type');
-  const phone = searchParams.get('phone');
+  const token = searchParams.get('token') ?? undefined;
+  const type = searchParams.get('type') ?? undefined;
+  const phone = searchParams.get('phone') ?? undefined;
 
   const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
 
   const { fulfillment, pharmacy, readyBy, readyByTime } = order;
 
-  const fulfillmentType = getFulfillmentType(
-    pharmacy?.id,
-    fulfillment ?? undefined,
-    type ?? undefined
-  );
-
-  const fulfillmentTrackingLink = fulfillment && getFulfillmentTrackingLink(fulfillment);
+  const fulfillmentType = getFulfillmentType(pharmacy?.id, fulfillment, type);
 
   const pharmacyFormattedAddress = pharmacy?.address ? formatAddress(pharmacy.address) : '';
 
@@ -111,16 +101,13 @@ export const StatusV2 = () => {
   const [orderDetailsIsOpen, setOrderDetailsIsOpen] = useState(false);
 
   // Demo pharmacies are already prepared
-  const pharmacyWithHours = pharmacy ? (isDemo ? pharmacy : preparePharmacy(pharmacy)) : undefined;
+  const displayPharmacy = pharmacy
+    ? isDemo
+      ? pharmacy
+      : preparePharmacy(pharmacy, fulfillmentType)
+    : undefined;
 
-  const isDeliveryPharmacy =
-    fulfillmentType === 'MAIL_ORDER' ||
-    fulfillmentType === 'COURIER' ||
-    [
-      'phr_01GA9HPV5XYTC1NNX213VRRBZ3', // Amazon Pharmacy
-      'phr_01HH0B05XNYH876AY8JZ7BD256', // Cost Plus Pharmacy
-      'phr_01GA9HPXGSDTSB0Z70BRK5XEP0' // Walmart Mail Order Pharmacy
-    ].includes(pharmacy?.id as string);
+  const isDeliveryPharmacy = isDelivery({ pharmacy, fulfillmentType });
 
   if (!order) {
     console.error('No order found');
@@ -134,7 +121,7 @@ export const StatusV2 = () => {
       orderId: order.id,
       token,
       reroute: true,
-      ...(!pharmacyWithHours?.isOpen ? { openNow: true } : {})
+      ...(!displayPharmacy?.isOpen ? { openNow: true } : {})
     });
     navigate(`/pharmacy?${query}`);
   };
@@ -152,25 +139,6 @@ export const StatusV2 = () => {
     numRefills: f.prescription?.fillsAllowed ? f.prescription.fillsAllowed - 1 : 0,
     expiresAt: f.prescription?.expirationDate ?? new Date()
   }));
-
-  const pharmacyInfo =
-    order?.pharmacy?.id && isDeliveryPharmacy ? (
-      <PharmacyInfo
-        pharmacy={{
-          id: order.pharmacy.id,
-          ...PHARMACY_BRANDING[order.pharmacy.id]
-        }}
-        showDetails={false}
-        isStatus
-      />
-    ) : pharmacyWithHours ? (
-      <PharmacyInfo
-        pharmacy={pharmacyWithHours}
-        showDetails={fulfillmentType === 'PICK_UP'}
-        isStatus
-        showHours
-      />
-    ) : null;
 
   const navigateButton = (
     <Button
@@ -255,10 +223,18 @@ export const StatusV2 = () => {
               </Heading>
               <Card>
                 <VStack w="full" spacing={0}>
-                  {pharmacyInfo}
+                  {displayPharmacy && (
+                    <PharmacyInfo
+                      pharmacy={displayPharmacy}
+                      showDetails={!isDeliveryPharmacy}
+                      showHours={!isDeliveryPharmacy}
+                      orderFulfillment={fulfillment}
+                      isStatus
+                    />
+                  )}
                   <VStack spacing={2} w="full">
-                    {pharmacyWithHours && !isDeliveryPharmacy && navigateButton}
-                    {!isDeliveryPharmacy && pharmacyWithHours && canReroute && rerouteButton}
+                    {displayPharmacy && !isDeliveryPharmacy && navigateButton}
+                    {!isDeliveryPharmacy && displayPharmacy && canReroute && rerouteButton}
                   </VStack>
                 </VStack>
               </Card>
@@ -289,30 +265,6 @@ export const StatusV2 = () => {
           </VStack>
         </Container>
       </VStack>
-      {fulfillmentType === 'MAIL_ORDER' && fulfillmentTrackingLink ? (
-        <Box>
-          <Container>
-            <VStack spacing={4} align="start" py={5}>
-              <Box alignSelf="start">
-                <Text display="inline" color="gray.600">
-                  {t.tracking}
-                </Text>
-                <Link
-                  href={fulfillmentTrackingLink}
-                  display="inline"
-                  ms={2}
-                  color="link"
-                  fontWeight="medium"
-                  target="_blank"
-                  data-dd-privacy="mask"
-                >
-                  {fulfillment.trackingNumber}
-                </Link>
-              </Box>
-            </VStack>
-          </Container>
-        </Box>
-      ) : null}
       <VStack w="full" pb={6}>
         <PoweredBy />
       </VStack>
