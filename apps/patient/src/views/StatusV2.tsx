@@ -217,13 +217,13 @@ export const StatusV2 = () => {
 
         <Container>
           <VStack spacing={6}>
-            <VStack w="full" alignItems="stretch" spacing={4}>
-              <Heading as="h4" size="md">
-                Pharmacy
-              </Heading>
-              <Card>
-                <VStack w="full" spacing={0}>
-                  {displayPharmacy && (
+            {displayPharmacy && (
+              <VStack w="full" alignItems="stretch" spacing={4}>
+                <Heading as="h4" size="md">
+                  Pharmacy
+                </Heading>
+                <Card>
+                  <VStack w="full" spacing={0}>
                     <PharmacyInfo
                       pharmacy={displayPharmacy}
                       showDetails={!isDeliveryPharmacy}
@@ -231,14 +231,14 @@ export const StatusV2 = () => {
                       orderFulfillment={fulfillment}
                       isStatus
                     />
-                  )}
-                  <VStack spacing={2} w="full">
-                    {displayPharmacy && !isDeliveryPharmacy && navigateButton}
-                    {!isDeliveryPharmacy && displayPharmacy && canReroute && rerouteButton}
+                    <VStack spacing={2} w="full">
+                      {displayPharmacy && !isDeliveryPharmacy && navigateButton}
+                      {!isDeliveryPharmacy && displayPharmacy && canReroute && rerouteButton}
+                    </VStack>
                   </VStack>
-                </VStack>
-              </Card>
-            </VStack>
+                </Card>
+              </VStack>
+            )}
 
             <OrderSummary
               fulfillments={fulfillments}
