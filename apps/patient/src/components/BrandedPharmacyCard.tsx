@@ -1,11 +1,11 @@
 import { Card, CardBody } from '@chakra-ui/react';
 
-import capsuleLogo from '../assets/capsule_logo_small.png';
-import amazonPharmacyLogo from '../assets/amazon_pharmacy_logo_small.png';
+import capsuleLogo from '../assets/capsule_logo_small_circle.png';
+import amazonPharmacyLogo from '../assets/amazon_pharmacy_logo_small_circle.png';
 import altoLogo from '../assets/alto_logo.svg';
 import costcoLogo from '../assets/costco_logo_small.png';
-import costPlusLogoSmall from '../assets/cost_plus_logo_small_circle.svg';
-import walmartLogoSmall from '../assets/walmart_logo_small_circle.svg';
+import costPlusLogo from '../assets/cost_plus_logo_small_circle.png';
+import walmartLogo from '../assets/walmart_logo_small_circle.png';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import { PharmacyInfo } from './PharmacyInfo';
@@ -33,12 +33,12 @@ export const PHARMACY_BRANDING = {
     description: 'Delivers in 1-2 days'
   },
   [process.env.REACT_APP_COST_PLUS_PHARMACY_ID as string]: {
-    logo: costPlusLogoSmall,
+    logo: costPlusLogo,
     name: 'Cost Plus Pharmacy',
     description: 'Delivery starting at $5'
   },
   [process.env.REACT_APP_WALMART_MAIL_ORDER_PHARMACY_ID as string]: {
-    logo: walmartLogoSmall,
+    logo: walmartLogo,
     name: 'Walmart Pharmacy',
     description: 'Overnight shipping available'
   },
