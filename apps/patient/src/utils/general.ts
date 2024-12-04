@@ -10,6 +10,7 @@ import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
 import { Address, EnrichedPharmacy, Fill, OrderFulfillment, Pharmacy } from '../utils/models';
 import { ExtendedFulfillmentType } from './models';
 import { PharmacyCloseEvent, PharmacyEvent, PharmacyOpenEvent } from '../__generated__/graphql';
+import { PHARMACY_BRANDING } from '../components';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -36,12 +37,12 @@ export const formatDate = (date: string | Date) => new Date(date)?.toLocaleDateS
 
 /**
  * There is a delay before order fulfillment is created, so a query
- * param is used to assume fulfillment type coming from pharmacy selection.
+ * defaultType is used to assume fulfillment type coming from pharmacy selection.
  */
 export const getFulfillmentType = (
   pharmacyId?: string,
   fulfillment?: OrderFulfillment,
-  param?: string
+  defaultType?: string
 ): ExtendedFulfillmentType => {
   // We don't have COURIER fulfillment type yet, so manually check for those
   if (COMMON_COURIER_PHARMACY_IDS.includes(pharmacyId ?? '')) {
@@ -53,9 +54,9 @@ export const getFulfillmentType = (
     return fulfillment.type;
   }
 
-  // Next, try query param if it's set
+  // Next, try query defaultType if it's set
   const fulfillmentTypes: ExtendedFulfillmentType[] = ['COURIER', 'MAIL_ORDER', 'PICK_UP'];
-  const foundType = fulfillmentTypes.find((val) => val === param);
+  const foundType = fulfillmentTypes.find((val) => val === defaultType);
   if (foundType) {
     return foundType;
   }
@@ -101,13 +102,42 @@ function isCloseEvent(event: PharmacyEvent): event is PharmacyCloseEvent {
   return event.type === 'close';
 }
 
-export const preparePharmacy = (pharmacy: Pharmacy): EnrichedPharmacy => {
+export function isDelivery({
+  pharmacy,
+  fulfillmentType
+}: {
+  pharmacy?: Pharmacy;
+  fulfillmentType: ExtendedFulfillmentType;
+}): boolean {
+  return (
+    fulfillmentType === 'MAIL_ORDER' ||
+    fulfillmentType === 'COURIER' ||
+    [
+      'phr_01GA9HPV5XYTC1NNX213VRRBZ3', // Amazon Pharmacy
+      'phr_01HH0B05XNYH876AY8JZ7BD256', // Cost Plus Pharmacy
+      'phr_01GA9HPXGSDTSB0Z70BRK5XEP0' // Walmart Mail Order Pharmacy
+    ].includes(pharmacy?.id as string)
+  );
+}
+
+export const preparePharmacy = (
+  pharmacy: Pharmacy,
+  fulfillmentType?: ExtendedFulfillmentType
+): EnrichedPharmacy => {
   let is24Hr = false;
   let isClosingSoon = false;
   let opens = '';
   let closes = '';
   let showReadyIn30Min = false;
   let logo = null;
+
+  // for mail-order pharmacies, use the info mapped by this branding constant
+  if (fulfillmentType && isDelivery({ pharmacy, fulfillmentType })) {
+    return {
+      ...pharmacy,
+      ...PHARMACY_BRANDING[pharmacy.id]
+    };
+  }
 
   // Add logo and urgent badge to certain pharmacies
   const pharmacyNameLowerCase = pharmacy.name.toLowerCase();
