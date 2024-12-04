@@ -12,7 +12,11 @@ import { HolidayAlert } from '../components/HolidayAlert';
 import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal';
 import { OrderSummary } from '../components/order-summary/OrderSummary';
 import { OrderStatusHeader } from '../components/statusV2/Header';
-import { deriveOrderStatus, getLatestReadyTime } from '../utils/fulfillmentsHelpers';
+import {
+  deriveOrderStatus,
+  getFulfillmentTrackingLink,
+  getLatestReadyTime
+} from '../utils/fulfillmentsHelpers';
 import { formatAddress, getFulfillmentType, preparePharmacy } from '../utils/general';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
@@ -37,6 +41,8 @@ export const StatusV2 = () => {
     fulfillment ?? undefined,
     type ?? undefined
   );
+
+  const fulfillmentTrackingLink = fulfillment && getFulfillmentTrackingLink(fulfillment);
 
   const pharmacyFormattedAddress = pharmacy?.address ? formatAddress(pharmacy.address) : '';
 
@@ -283,7 +289,7 @@ export const StatusV2 = () => {
           </VStack>
         </Container>
       </VStack>
-      {fulfillmentType === 'MAIL_ORDER' && fulfillment?.trackingNumber ? (
+      {fulfillmentType === 'MAIL_ORDER' && fulfillmentTrackingLink ? (
         <Box>
           <Container>
             <VStack spacing={4} align="start" py={5}>
@@ -292,7 +298,7 @@ export const StatusV2 = () => {
                   {t.tracking}
                 </Text>
                 <Link
-                  href={`https://google.com/search?q=${fulfillment.trackingNumber}`}
+                  href={fulfillmentTrackingLink}
                   display="inline"
                   ms={2}
                   color="link"
