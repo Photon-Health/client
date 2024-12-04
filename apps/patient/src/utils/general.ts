@@ -5,7 +5,7 @@ import isoWeek from 'dayjs/plugin/isoWeek';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import costcoLogo from '../assets/costco_logo_small.png';
-import walgreensLogo from '../assets/walgreens_small.png';
+import walgreensLogo from '../assets/walgreens_logo_small_circle.png';
 import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
 import { Address, EnrichedPharmacy, Fill, OrderFulfillment, Pharmacy } from '../utils/models';
 import { ExtendedFulfillmentType } from './models';
