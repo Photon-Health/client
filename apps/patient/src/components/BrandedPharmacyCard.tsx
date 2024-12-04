@@ -4,7 +4,7 @@ import capsuleLogo from '../assets/capsule_logo_small_circle.png';
 import amazonPharmacyLogo from '../assets/amazon_pharmacy_logo_small_circle.png';
 import altoLogo from '../assets/alto_logo.svg';
 import costcoLogo from '../assets/costco_logo_small.png';
-import costPlusLogo from '../assets/cost_plus_logo_small_circle.png';
+import costPlusLogo from '../assets/costplus_logo_small_circle.png';
 import walmartLogo from '../assets/walmart_logo_small_circle.png';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
