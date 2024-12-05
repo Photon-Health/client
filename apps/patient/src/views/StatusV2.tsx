@@ -43,7 +43,7 @@ export const StatusV2 = () => {
   };
 
   const handleCallPharmacy = () => {
-    if (!pharmacy?.name || !pharmacy?.phone) return;
+    if (!pharmacy?.phone) return;
     window.location.href = `tel:${pharmacy.phone}`;
   };
 
