@@ -3,7 +3,7 @@ import { getSettings } from '@client/settings';
 import queryString from 'query-string';
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { FiNavigation, FiRefreshCcw } from 'react-icons/fi';
+import { FiNavigation, FiPhoneCall, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { triggerDemoNotification } from '../api';
 import { Coupons, DemoCtaModal, PharmacyInfo, PoweredBy } from '../components';
@@ -40,6 +40,11 @@ export const StatusV2 = () => {
     if (!pharmacy?.name) return;
     const url = `http://maps.google.com/?q=${pharmacy?.name}, ${pharmacyFormattedAddress}`;
     window.open(url);
+  };
+
+  const handleCallPharmacy = () => {
+    if (!pharmacy?.phone) return;
+    window.location.href = `tel:${pharmacy.phone}`;
   };
 
   useEffect(() => {
@@ -158,6 +163,20 @@ export const StatusV2 = () => {
     </Button>
   );
 
+  const callPharmacyButton = (
+    <Button
+      mx="auto"
+      py={6}
+      variant="outline"
+      onClick={handleCallPharmacy}
+      leftIcon={<FiPhoneCall />}
+      w="full"
+      color="blue.500"
+    >
+      {t.callPharmacy}
+    </Button>
+  );
+
   const rerouteButton = (
     <Button
       mx="auto"
@@ -234,6 +253,7 @@ export const StatusV2 = () => {
                     <VStack spacing={2} w="full">
                       {displayPharmacy && !isDeliveryPharmacy && navigateButton}
                       {!isDeliveryPharmacy && displayPharmacy && canReroute && rerouteButton}
+                      {displayPharmacy && !isDeliveryPharmacy && !canReroute && callPharmacyButton}
                     </VStack>
                   </VStack>
                 </Card>
