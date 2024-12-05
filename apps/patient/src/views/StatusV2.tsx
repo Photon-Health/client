@@ -195,15 +195,13 @@ export const StatusV2 = () => {
       mx="auto"
       size="md"
       py={6}
-      variant="solid"
+      variant="outline"
       onClick={handleCallPharmacy}
       leftIcon={<FiPhoneCall />}
       w="full"
-      bg="blue.600"
-      _hover={{ bg: 'blue.700' }}
-      color="white"
+      color="blue.500"
     >
-      {t.directions}
+      {t.callPharmacy}
     </Button>
   );
 
