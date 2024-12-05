@@ -274,11 +274,9 @@ export const StatusV2 = () => {
                 <VStack w="full" spacing={0}>
                   {pharmacyInfo}
                   <VStack spacing={2} w="full">
-                    {pharmacyWithHours &&
-                      !isDeliveryPharmacy &&
-                      callPharmacyButton &&
-                      navigateButton}
+                    {pharmacyWithHours && !isDeliveryPharmacy && navigateButton}
                     {!isDeliveryPharmacy && pharmacyWithHours && canReroute && rerouteButton}
+                    {pharmacyWithHours && !isDeliveryPharmacy && !canReroute && callPharmacyButton}
                   </VStack>
                 </VStack>
               </Card>
