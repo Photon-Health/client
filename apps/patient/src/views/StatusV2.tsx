@@ -165,9 +165,7 @@ export const StatusV2 = () => {
 
   const callPharmacyButton = (
     <Button
-      mt={2}
       mx="auto"
-      size="md"
       py={6}
       variant="outline"
       onClick={handleCallPharmacy}
