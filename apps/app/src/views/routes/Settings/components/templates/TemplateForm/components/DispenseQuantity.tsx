@@ -43,7 +43,7 @@ export const DispenseQuantity = ({
               <NumberInput
                 id="dispenseQuantity"
                 ref={quantityRef}
-                min={1}
+                min={0}
                 {...field}
                 onChange={(val: any) => setFieldValue(field.name, val)}
               >

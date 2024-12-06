@@ -3,6 +3,7 @@ import {
   HStack,
   IconButton,
   Image,
+  Link,
   Spacer,
   Tag,
   TagLabel,
@@ -14,12 +15,13 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { FiStar } from 'react-icons/fi';
 import { useLocation } from 'react-router-dom';
-import { Address, EnrichedPharmacy } from '../utils/models';
+import { Address, EnrichedPharmacy, OrderFulfillment } from '../utils/models';
 import { text as t } from '../utils/text';
 
 import { useMemo, useState } from 'react';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
 import { formatAddress, titleCase } from '../utils/general';
+import { getFulfillmentTrackingLink } from '../utils/fulfillmentsHelpers';
 
 dayjs.extend(customParseFormat);
 
@@ -213,6 +215,7 @@ interface PharmacyInfoProps {
   selected?: boolean;
   showHours?: boolean;
   isCurrentPharmacy?: boolean;
+  orderFulfillment?: OrderFulfillment;
 }
 
 export const PharmacyInfo = ({
@@ -226,7 +229,8 @@ export const PharmacyInfo = ({
   boldPharmacyName = true,
   isStatus = false,
   showHours = false,
-  isCurrentPharmacy = false
+  isCurrentPharmacy = false,
+  orderFulfillment
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
@@ -238,6 +242,9 @@ export const PharmacyInfo = ({
   const showFreeDeliveryTag = freeDelivery;
   const whiteLabelDeliveryPharmacy =
     pharmacy.name === 'Capsule Pharmacy' && location.pathname === '/pharmacy';
+
+  const trackingLink = orderFulfillment && getFulfillmentTrackingLink(orderFulfillment);
+
   return (
     <VStack align="start" w="full">
       {showPreferredTag ||
@@ -328,6 +335,22 @@ export const PharmacyInfo = ({
           <TagLabel fontWeight="bold">Current Pharmacy</TagLabel>
         </Tag>
       ) : null}
+      {trackingLink && (
+        <HStack spacing={0}>
+          <Text>Tracking #:</Text>
+          <Link
+            href={trackingLink}
+            display="inline"
+            color="link"
+            fontWeight="medium"
+            target="_blank"
+            data-dd-privacy="mask"
+            ms={2}
+          >
+            {orderFulfillment.carrier} {orderFulfillment.trackingNumber}
+          </Link>
+        </HStack>
+      )}
     </VStack>
   );
 };
