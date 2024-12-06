@@ -6,6 +6,7 @@ import { ExtendedFulfillmentType } from './models';
 export const text = {
   askForBestPrice: 'Ask your pharmacist to help you find the best possible price.',
   bin: 'BIN',
+  callPharmacy: 'Call pharmacy',
   closed: 'Closed',
   closingSoon: 'Closing soon',
   contactSupport: 'Contact Support',

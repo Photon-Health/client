@@ -142,7 +142,7 @@ export const Pharmacy = () => {
       // demo pharmacies already are prepared
       return combined;
     }
-    return combined.map(preparePharmacy);
+    return combined.map((combinedItem) => preparePharmacy(combinedItem));
   }, [isDemo, pharmacyResults, topRankedPharmacies]);
 
   // capsule
