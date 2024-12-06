@@ -29,6 +29,7 @@ export const text = {
   fakeRx: 'This is not a real prescription.',
   fakeRxs: 'These are not real prescriptions.',
   findLoc: 'Find a location',
+  genericPriceDisclaimer: 'This price is for generic medication only',
   getDelivered: 'Get your medication delivered to your door',
   getNearby: 'Get your medication at a nearby pharmacy',
   gettingLoc: 'Getting current location',
