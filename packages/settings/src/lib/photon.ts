@@ -377,7 +377,7 @@ const organizationSettings: {
   },
   // Counsel Health
   org_YVKjNwccHKUm3DIa: {
-    logo: 'counsel_logo.png',
+    logo: 'counsel_logo.svg',
     accentColor: '#333333'
   },
   // Measured
