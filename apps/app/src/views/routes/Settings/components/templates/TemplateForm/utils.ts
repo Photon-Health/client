@@ -9,7 +9,12 @@ export const TEMPLATE_SCHEMA = yup.object({
     })
     .required('Please select a treatment...'),
   dispenseAsWritten: yup.boolean().nullable().optional(),
-  dispenseQuantity: yup.number().min(1, 'Must be 1 or more...').default(1).nullable().optional(),
+  dispenseQuantity: yup
+    .number()
+    .moreThan(0, 'Must be greater than 0...')
+    .default(1)
+    .nullable()
+    .optional(),
   dispenseUnit: yup.string().when('values.treatment.__typename', {
     is: 'MedicalEquipment',
     then: yup.string().default('Each'),
