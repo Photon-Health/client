@@ -123,6 +123,7 @@ export const GET_ORDER = gql`
           daysSupply
           dispenseQuantity
           dispenseUnit
+          dispenseAsWritten
           expirationDate
           fillsAllowed
         }
