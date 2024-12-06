@@ -8,7 +8,7 @@ import { DiscountCard } from '../__generated__/graphql';
 import { Card } from './Card';
 
 export const Coupons = () => {
-  const { order } = useOrderContext();
+  const { order, flattenedFills } = useOrderContext();
 
   if (!order.discountCards || order.discountCards.length === 0) {
     return null;
@@ -24,19 +24,29 @@ export const Coupons = () => {
     return null;
   }
 
+  const isDaw =
+    flattenedFills.find((fill) => fill.prescription?.id === discountCards[0].prescriptionId)
+      ?.prescription?.dispenseAsWritten ?? false;
+
   return (
     <VStack w="full" alignItems="stretch" spacing={4}>
       <Heading as="h4" size="md">
         Coupon
       </Heading>
       {/* Show one coupon only */}
-      <Coupon coupon={discountCards[0]} />
+      <Coupon coupon={discountCards[0]} showGenericPriceDisclaimer={!isDaw} />
     </VStack>
   );
 };
 
-type CouponProps = Pick<DiscountCard, 'price' | 'bin' | 'pcn' | 'group' | 'memberId'>;
-export const Coupon = ({ coupon }: { coupon: CouponProps }) => {
+type Coupon = Pick<DiscountCard, 'price' | 'bin' | 'pcn' | 'group' | 'memberId'>;
+export const Coupon = ({
+  coupon,
+  showGenericPriceDisclaimer
+}: {
+  coupon: Coupon;
+  showGenericPriceDisclaimer?: boolean;
+}) => {
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
 
   const { price, bin, pcn, group, memberId } = coupon;
@@ -48,15 +58,22 @@ export const Coupon = ({ coupon }: { coupon: CouponProps }) => {
   return (
     <Card>
       <CouponModal isOpen={couponModalOpen} onClose={() => setCouponModalOpen(false)} />
-      <Text fontSize="4xl" alignSelf="center" fontWeight="700" py={0} lineHeight="1">
-        ${price.toFixed(2)}
-      </Text>
-      <Box bgColor="blue.50" w="full" textAlign="center" p={2} borderRadius="xl">
-        <Text fontWeight="semibold" fontSize="md">
-          {t.showThisCoupon}
+      <VStack w="full" align="stretch" spacing={3}>
+        <Text fontSize="4xl" alignSelf="center" fontWeight="700" py={0} lineHeight="1">
+          ${price.toFixed(2)}
         </Text>
-      </Box>
-      <VStack w="full" align="stretch">
+        {showGenericPriceDisclaimer ? (
+          <Box w="full" textAlign="center">
+            <Text fontSize="md" fontWeight="medium" color="blackAlpha.600">
+              {t.genericPriceDisclaimer}
+            </Text>
+          </Box>
+        ) : null}
+        <Box bgColor="blue.50" w="full" textAlign="center" p={2} borderRadius="xl">
+          <Text fontWeight="semibold" fontSize="md">
+            {t.showThisCoupon}
+          </Text>
+        </Box>
         <HStack w="full">
           <Text w="40%">{t.bin}</Text>
           <Text as="b" w="60%">
