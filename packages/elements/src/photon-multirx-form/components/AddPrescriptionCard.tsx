@@ -22,7 +22,7 @@ import { createSignal, onMount, Show } from 'solid-js';
 import { usePhoton } from '../../context';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
-import { ScreeningAlertType } from '@photonhealth/components/dist/src/systems/ScreeningAlerts';
+import { ScreeningAlertType } from '@photonhealth/components';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
