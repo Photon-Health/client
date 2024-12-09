@@ -12,7 +12,8 @@ import { BaseOptions, createQuery } from '../../utils/createQuery';
 import {
   Order as FullOrder,
   Fill as FullFill,
-  Prescription as FullPrescription
+  Prescription as FullPrescription,
+  OrderState
 } from '@photonhealth/sdk/dist/types';
 
 const GetPatientOrdersQuery = gql`
@@ -182,7 +183,10 @@ function RecentOrders(props: SDKProviderProps) {
         });
       },
       checkDuplicateFill(treatmentName) {
-        for (const order of state.orders) {
+        const nonCanceledOrders = state.orders.filter(
+          (order) => order.state !== OrderState.Canceled
+        );
+        for (const order of nonCanceledOrders) {
           const fill = order.fills.find((fill) => fill.treatment.name === treatmentName);
           if (fill !== undefined) {
             return { order, fill };
