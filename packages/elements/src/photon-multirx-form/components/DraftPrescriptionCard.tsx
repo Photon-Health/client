@@ -9,7 +9,7 @@ import type { TemplateOverrides, DraftPrescription } from '@photonhealth/compone
 import { PhotonTooltip } from '../../photon-tooltip';
 import { partition } from 'lodash';
 import { unwrap } from 'solid-js/store';
-import { ScreeningAlertType } from '@photonhealth/components/dist/src/systems/ScreeningAlerts';
+import { ScreeningAlertType } from '@photonhealth/components';
 
 const draftPrescriptionsValidator = message(
   size(array(any()), 1, Infinity),
