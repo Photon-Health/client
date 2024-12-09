@@ -12,7 +12,8 @@
         "commands": [
           "rimraf dist",
           "tsc --emitDeclarationOnly --outDir dist",
-          "vite build"
+          "vite build",
+          "cp src/types.ts dist/types.ts"
         ],
         "parallel": false
       },
