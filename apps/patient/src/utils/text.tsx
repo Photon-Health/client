@@ -58,7 +58,6 @@ export const text = {
       isPlural ? 'prescriptions' : 'prescription'
     }.`,
   patient: 'Patient',
-  selectPaymentMethod: 'Select a payment method',
   paymentMethodOptions: [
     {
       label: 'Insurance Copay',
@@ -66,7 +65,8 @@ export const text = {
     },
     {
       label: 'Cash Price',
-      description: 'Pay without insurance using a discount card – my be cheaper than your copay'
+      description:
+        'Pay without insurance (some pharmacies will have discount prices and occasionally may be cheaper than your copay)'
     }
   ],
   pcn: 'PCN',
@@ -175,8 +175,13 @@ export const text = {
     }.`,
   searchPharmacy: 'Search for a pharmacy',
   selectAPharmacy: 'Select a pharmacy',
-  selectCashPrice:
-    'Select "Cash Price" to view potential savings with a discount card, or use insurance to get your copay price at the pharmacy. You can toggle this at any time.',
+  selectCashPrice: (
+    <>
+      Select <b>Cash Price</b> to view potential savings, or use <b>Insurance Copay</b> to get your
+      copay price at the pharmacy. You can toggle this any time.
+    </>
+  ),
+  selectPaymentMethod: 'Select a payment method',
   selectPharmacy: 'Select pharmacy',
   sendToNew: (isPlural: boolean, originalPharmacyName: string) =>
     `We'll cancel your ${
