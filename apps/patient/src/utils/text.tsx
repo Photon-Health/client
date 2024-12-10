@@ -207,7 +207,7 @@ export const text = {
   showCouponToPharmacy: (isPlural: boolean) =>
     `Just show it to the pharmacist when you pick up your ${
       isPlural ? 'prescriptions' : 'prescription'
-    }.`,
+    } so you won’t have to pay more than the coupon price.`,
   showingLabel: 'Showing pharmacies near',
   showMore: 'Show more pharmacies',
   thankYou: 'Thank you!',
