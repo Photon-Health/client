@@ -80,7 +80,7 @@ export const PaymentMethod = () => {
             <Heading as="h3" size="lg">
               {t.whatPaymentMethod}
             </Heading>
-            <Text>{t.selectCashPrice}</Text>
+            <Text>{t.payWithoutInsurance}</Text>
           </VStack>
         </Container>
       </Box>
