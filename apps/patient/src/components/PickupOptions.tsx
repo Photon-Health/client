@@ -1,4 +1,4 @@
-import { Button, Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Heading, Link, SlideFade, Text, VStack } from '@chakra-ui/react';
 
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
@@ -19,10 +19,13 @@ interface PickupOptionsProps {
   showHeading: boolean;
   enableOpenNow: boolean;
   enable24Hr: boolean;
+  enablePrice: boolean;
   setEnableOpenNow: (isOpen: boolean) => void;
   setEnable24Hr: (is24Hr: boolean) => void;
+  setEnablePrice: (isPrice: boolean) => void;
   location: string;
   currentPharmacyId?: string;
+  setCouponModalOpen: (isOpen: boolean) => void;
 }
 
 export const PickupOptions = ({
@@ -38,8 +41,11 @@ export const PickupOptions = ({
   showHeading,
   enableOpenNow,
   enable24Hr,
+  enablePrice,
   setEnableOpenNow,
   setEnable24Hr,
+  setEnablePrice,
+  setCouponModalOpen,
   currentPharmacyId
 }: PickupOptionsProps) => {
   return (
@@ -58,10 +64,30 @@ export const PickupOptions = ({
         <PharmacyFilters
           enableOpenNow={enableOpenNow}
           enable24Hr={enable24Hr}
+          enablePrice={enablePrice}
           setEnableOpenNow={setEnableOpenNow}
           setEnable24Hr={setEnable24Hr}
+          setEnablePrice={setEnablePrice}
         />
       </SlideFade>
+      {enablePrice ? (
+        <SlideFade offsetY="60px" in={true}>
+          <Box p={3} bgColor="blue.100" borderRadius="lg" mx={{ base: -3, md: undefined }}>
+            <Text>
+              The displayed price is a coupon for the selected pharmacy.{' '}
+              <b>This is NOT insurance.</b>{' '}
+              <Link
+                textDecoration="underline"
+                textUnderlineOffset="2px"
+                color="blue.500"
+                onClick={() => setCouponModalOpen(true)}
+              >
+                Learn more.
+              </Link>
+            </Text>
+          </Box>
+        </SlideFade>
+      ) : null}
       <HolidayAlert>
         Holiday may affect pharmacy hours. Consider sending to a 24 hour pharmacy.
       </HolidayAlert>
