@@ -60,9 +60,6 @@ export const Pharmacy = () => {
   const navigate = useNavigate();
   const toast = useToast();
 
-  // multiple rx's
-  const isMultiRx = flattenedFills.length > 1;
-
   // search params
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
@@ -83,16 +80,6 @@ export const Pharmacy = () => {
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
-  const isOrgWithCouponsEnabled = [
-    'Sesame',
-    'Updated Test Pharmacy 11',
-    'Photon Test Org'
-  ].includes(order?.organization.name ?? '');
-  const [showSearchToggle, setShowSearchToggle] = useState(
-    isOrgWithCouponsEnabled && // select orgs
-      !containsGLP && // no glp1's
-      !isMultiRx // one rx
-  );
 
   // selection state
   const [selectedId, setSelectedId] = useState<string>('');
@@ -115,10 +102,6 @@ export const Pharmacy = () => {
   const [loadingPharmacies, setLoadingPharmacies] = useState<boolean>(true);
   const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
   const isLoading = loadingLocation || loadingPharmacies;
-
-  // sorting
-  type SortBy = 'price' | 'distance' | null;
-  const [sortBy, setSortBy] = useState<SortBy>(showSearchToggle ? 'price' : null);
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
@@ -151,7 +134,7 @@ export const Pharmacy = () => {
     order?.address?.postalCode != null && order.address.postalCode in capsuleZipcodeLookup;
   const enableCourier =
     !isDemo &&
-    sortBy !== 'price' && // Hide for cash price search
+    !enablePrice && // Hide for price filter
     isCapsuleTerritory &&
     orgSettings.enableCourierNavigate;
   const capsulePharmacyId = order?.address?.postalCode
@@ -163,8 +146,7 @@ export const Pharmacy = () => {
   const hasTopRankedCostco = topRankedPharmacies.some((p) => p.name === 'Costco Pharmacy');
   const enableMailOrder =
     !isDemo &&
-    // Hide for cash price search
-    sortBy !== 'price' &&
+    !enablePrice && // Hide for price filter
     // If we're showing costco, we don't want to show mail order
     !orgSettings.topRankedCostco &&
     !hasTopRankedCostco && // this means org is Sesame, we don't want to show Amazon and top ranked Costco at the same time
@@ -202,7 +184,7 @@ export const Pharmacy = () => {
   // Reset when we toggle 24hr, open now, price
   useEffect(() => {
     reset();
-  }, [sortBy, enable24Hr, enableOpenNow, enablePrice]);
+  }, [enable24Hr, enableOpenNow, enablePrice]);
 
   // Initialize demo data
   useEffect(() => {
@@ -318,8 +300,6 @@ export const Pharmacy = () => {
     [enable24Hr, enableOpenNow]
   );
 
-  // const enablePrice = useMemo(() => paymentMethod === 'Cash Price', [paymentMethod]);
-
   const loadPharmacies = useCallback(
     async ({
       latitude,
@@ -362,7 +342,7 @@ export const Pharmacy = () => {
         let topRankedPharmacies: EnrichedPharmacy[] = [];
 
         // check if top ranked costco is enabled and there are GLP treatments
-        if (enableTopRankedCostco && sortBy !== 'price') {
+        if (enableTopRankedCostco && !enablePrice) {
           topRankedPharmacies = [
             ...(await getCostco({ latitude, longitude })),
             ...topRankedPharmacies
@@ -384,11 +364,10 @@ export const Pharmacy = () => {
         });
 
         if (pharmacies?.length === 0) {
-          if (sortBy === 'price') {
+          if (enablePrice) {
             if (initialLoad) {
               // If we're on initial load and no pharmacies are found, we should try again with distance
-              setShowSearchToggle(false);
-              setSortBy('distance');
+              setEnablePrice(false);
               setInitialLoad(false);
 
               // Re-fetch to get pharmacies by distance
@@ -406,7 +385,7 @@ export const Pharmacy = () => {
             toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
           }
         } else {
-          if (sortBy === 'price') {
+          if (enablePrice) {
             setShowingAllPharmacies(true);
           }
 
@@ -430,6 +409,7 @@ export const Pharmacy = () => {
     enableOpenNow,
     enableTopRankedCostco,
     enableTopRankedWalgreens,
+    enablePrice,
     getCostco,
     getWalgreens,
     isDemo,
@@ -438,7 +418,6 @@ export const Pharmacy = () => {
     longitude,
     order?.readyBy,
     toast,
-    sortBy,
     initialLoad
   ]);
 
@@ -497,7 +476,7 @@ export const Pharmacy = () => {
         label: 'Pharmacy Rank',
         value: index + 1
       });
-      if (sortBy === 'price') {
+      if (enablePrice) {
         datadogRum.addAction('price_selection', {
           orderId: order.id,
           organization: order.organization.name,
@@ -551,7 +530,7 @@ export const Pharmacy = () => {
     trackSelectedPharmacyRank(selectedId, allPharmacies);
 
     try {
-      const patientSelectedPrice = sortBy === 'price';
+      const patientSelectedPrice = enablePrice;
       const result = isReroute
         ? await rerouteOrder(order.id, selectedId, patientSelectedPrice)
         : await setOrderPharmacy(
@@ -677,7 +656,7 @@ export const Pharmacy = () => {
     return null;
   }
 
-  if (initialLoad && showSearchToggle && isLoading) {
+  if (initialLoad && isLoading) {
     return (
       <Box>
         <Helmet>

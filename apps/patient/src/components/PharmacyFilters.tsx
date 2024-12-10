@@ -1,4 +1,5 @@
 import { Button, HStack, Text } from '@chakra-ui/react';
+import { useOrderContext } from '../views/Main';
 
 interface PharmacyFiltersProps {
   enableOpenNow: boolean;
@@ -16,6 +17,8 @@ export const PharmacyFilters = ({
   setEnable24Hr,
   setEnablePrice
 }: PharmacyFiltersProps) => {
+  const { paymentMethod } = useOrderContext();
+
   return (
     <HStack>
       <Text>Filter by</Text>
@@ -43,18 +46,20 @@ export const PharmacyFilters = ({
       >
         24 Hours
       </Button>
-      <Button
-        size="sm"
-        borderRadius="lg"
-        variant="filter"
-        isActive={enablePrice}
-        onClick={() => {
-          if (setEnablePrice) setEnablePrice(false);
-          setEnablePrice(!enablePrice);
-        }}
-      >
-        Price
-      </Button>
+      {paymentMethod === 'Cash Price' ? (
+        <Button
+          size="sm"
+          borderRadius="lg"
+          variant="filter"
+          isActive={enablePrice}
+          onClick={() => {
+            if (setEnablePrice) setEnablePrice(false);
+            setEnablePrice(!enablePrice);
+          }}
+        >
+          Price
+        </Button>
+      ) : null}
     </HStack>
   );
 };
