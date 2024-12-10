@@ -53,7 +53,7 @@ import { Pharmacy as PharmacyType } from '../__generated__/graphql';
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
 export const Pharmacy = () => {
-  const { order, flattenedFills, setOrder, isDemo, fetchOrder } = useOrderContext();
+  const { order, flattenedFills, setOrder, isDemo, fetchOrder, paymentMethod } = useOrderContext();
 
   const orgSettings = getSettings(order?.organization.id);
 
@@ -125,6 +125,7 @@ export const Pharmacy = () => {
     openNow !== null ? !!openNow : order?.readyBy === 'Urgent'
   );
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
+  const [enablePrice, setEnablePrice] = useState(paymentMethod === 'Cash Price');
 
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
@@ -198,10 +199,10 @@ export const Pharmacy = () => {
     setLocationModalOpen(false);
   };
 
-  // Reset when we toggle 24hr/open now
+  // Reset when we toggle 24hr, open now, price
   useEffect(() => {
     reset();
-  }, [sortBy, enable24Hr, enableOpenNow]);
+  }, [sortBy, enable24Hr, enableOpenNow, enablePrice]);
 
   // Initialize demo data
   useEffect(() => {
@@ -225,7 +226,7 @@ export const Pharmacy = () => {
         setShowingAllPharmacies(true);
       }
     }
-  }, [enable24Hr, enableOpenNow, isDemo]);
+  }, [enable24Hr, enableOpenNow, enablePrice, isDemo]);
 
   // Update and geocode location
   useEffect(() => {
@@ -317,7 +318,7 @@ export const Pharmacy = () => {
     [enable24Hr, enableOpenNow]
   );
 
-  const enablePrice = useMemo(() => sortBy === 'price', [sortBy]);
+  // const enablePrice = useMemo(() => paymentMethod === 'Cash Price', [paymentMethod]);
 
   const loadPharmacies = useCallback(
     async ({
@@ -732,49 +733,6 @@ export const Pharmacy = () => {
                 </Button>
               )}
             </HStack>
-            {showSearchToggle ? (
-              <HStack>
-                <Text whiteSpace="nowrap">Sort by</Text>
-                <HStack w="full">
-                  {(['price', 'distance'] as const).map((sort) => (
-                    <Button
-                      key={sort}
-                      w="50%"
-                      size="lg"
-                      isActive={sortBy === sort}
-                      _active={{
-                        backgroundColor: 'brand.500',
-                        color: 'white',
-                        borderColor: 'brand.500'
-                      }}
-                      border="2px"
-                      borderColor="gray.100"
-                      backgroundColor="white"
-                      onClick={() => setSortBy(sort)}
-                      borderRadius="xl"
-                    >
-                      {sort === 'distance' ? 'Distance' : 'Cash Price'}
-                    </Button>
-                  ))}
-                </HStack>
-              </HStack>
-            ) : null}
-            {sortBy === 'price' ? (
-              <Box p={3} bgColor="blue.50" borderRadius="lg">
-                <Text>
-                  The displayed price is a coupon for the selected pharmacy.{' '}
-                  <b>This is NOT insurance.</b>{' '}
-                  <Link
-                    textDecoration="underline"
-                    textUnderlineOffset="2px"
-                    color="blue.500"
-                    onClick={() => setCouponModalOpen(true)}
-                  >
-                    Learn more.
-                  </Link>
-                </Text>
-              </Box>
-            ) : null}
           </VStack>
         </Container>
       </Box>
@@ -810,9 +768,12 @@ export const Pharmacy = () => {
               showHeading={(enableCourier || enableMailOrder) ?? false}
               enableOpenNow={enableOpenNow}
               enable24Hr={enable24Hr}
+              enablePrice={enablePrice}
               setEnableOpenNow={setEnableOpenNow}
               setEnable24Hr={setEnable24Hr}
+              setEnablePrice={setEnablePrice}
               currentPharmacyId={order.pharmacy?.id}
+              setCouponModalOpen={setCouponModalOpen}
             />
           </VStack>
         ) : null}

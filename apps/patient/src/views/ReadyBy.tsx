@@ -86,7 +86,14 @@ export const ReadyBy = () => {
       readyByTime
     });
 
-    navigate(`/pharmacy?orderId=${order?.id}&token=${token}`);
+    if (
+      order.organization.name === 'Sesame' ||
+      order.organization.name === 'Updated Test Pharmacy 11'
+    ) {
+      navigate(`/paymentMethod?orderId=${order?.id}&token=${token}`);
+    } else {
+      navigate(`/pharmacy?orderId=${order?.id}&token=${token}`);
+    }
   };
 
   const isMultiRx = flattenedFills.length > 1;
