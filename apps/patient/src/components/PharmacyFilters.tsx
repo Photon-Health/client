@@ -1,6 +1,7 @@
 import { Button, HStack, Text } from '@chakra-ui/react';
 import { useOrderContext } from '../views/Main';
 import { isGLP } from '../utils/isGLP';
+import { isOrgWithCouponsEnabled } from '../utils/general';
 
 interface PharmacyFiltersProps {
   enableOpenNow: boolean;
@@ -22,13 +23,9 @@ export const PharmacyFilters = ({
 
   // Show the price filter only in specific cases
   const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
-  const isOrgWithCouponsEnabled = [
-    'Sesame',
-    'Updated Test Pharmacy 11', // boson us
-    'Photon Test Org' // neutron us
-  ].includes(order.organization.name);
   const isMultiRx = flattenedFills.length > 1;
-  const showPriceFilter = isOrgWithCouponsEnabled && !isMultiRx && !containsGLP;
+  const showPriceFilter =
+    isOrgWithCouponsEnabled(order.organization.name) && !isMultiRx && !containsGLP;
 
   return (
     <HStack>
