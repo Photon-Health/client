@@ -122,7 +122,7 @@ const ExceptionsBlock = ({ exception }: { exception: ExceptionData }) => {
 const FulfillmentBlock = ({ fulfillment }: { fulfillment: FulfillmentData }) => {
   return (
     <VStack w="full" alignItems={'stretch'}>
-      <Text>{fulfillment.rxName}</Text>
+      <Text data-dd-privacy="mask">{fulfillment.rxName}</Text>
       {fulfillment.exceptions.sort(exceptionCmp).map((e) => (
         <ExceptionsBlock key={`${fulfillment.rxName}-${e.exceptionType}`} exception={e} />
       ))}
