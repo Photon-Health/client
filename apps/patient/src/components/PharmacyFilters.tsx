@@ -1,5 +1,6 @@
 import { Button, HStack, Text } from '@chakra-ui/react';
 import { useOrderContext } from '../views/Main';
+import { isGLP } from '../utils/isGLP';
 
 interface PharmacyFiltersProps {
   enableOpenNow: boolean;
@@ -17,7 +18,17 @@ export const PharmacyFilters = ({
   setEnable24Hr,
   setEnablePrice
 }: PharmacyFiltersProps) => {
-  const { paymentMethod } = useOrderContext();
+  const { order, flattenedFills } = useOrderContext();
+
+  // Show the price filter only in specific cases
+  const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
+  const isOrgWithCouponsEnabled = [
+    'Sesame',
+    'Updated Test Pharmacy 11', // boson us
+    'Photon Test Org' // neutron us
+  ].includes(order.organization.name);
+  const isMultiRx = flattenedFills.length > 1;
+  const showPriceFilter = isOrgWithCouponsEnabled && !isMultiRx && !containsGLP;
 
   return (
     <HStack>
@@ -46,8 +57,7 @@ export const PharmacyFilters = ({
       >
         24 Hours
       </Button>
-      {/* TODO: Show the price filter if the patient saw the cash v insurance fork */}
-      {['Cash Price', 'Insurance Copay'].includes(paymentMethod) ? (
+      {showPriceFilter ? (
         <Button
           size="sm"
           borderRadius="lg"
