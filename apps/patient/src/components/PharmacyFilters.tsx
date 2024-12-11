@@ -46,7 +46,8 @@ export const PharmacyFilters = ({
       >
         24 Hours
       </Button>
-      {paymentMethod === 'Cash Price' ? (
+      {/* TODO: Show the price filter if the patient saw the cash v insurance fork */}
+      {['Cash Price', 'Insurance Copay'].includes(paymentMethod) ? (
         <Button
           size="sm"
           borderRadius="lg"
