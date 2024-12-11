@@ -29,6 +29,8 @@ interface OrderContextType {
   isDemo: boolean;
   fetchOrder: (currentPharmacy?: Pharmacy) => void;
   setFaqModalIsOpen: (isOpen: boolean) => void;
+  paymentMethod: string;
+  setPaymentMethod: (paymentMethod: string) => void;
 }
 const OrderContext = createContext<OrderContextType | null>(null);
 export const useOrderContext = () =>
@@ -53,6 +55,7 @@ export const Main = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('');
 
   useEffect(
     function triggerDatadogShortlinkOpenEvent() {
@@ -221,7 +224,9 @@ export const Main = () => {
     setOrder,
     logo,
     fetchOrder,
-    setFaqModalIsOpen
+    setFaqModalIsOpen,
+    paymentMethod,
+    setPaymentMethod
   };
 
   return (

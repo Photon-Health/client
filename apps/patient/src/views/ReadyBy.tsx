@@ -28,6 +28,7 @@ import { FixedFooter, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { RxLightningBolt } from 'react-icons/rx';
+import { isGLP } from '../utils/isGLP';
 
 const checkDisabled = (option: string): boolean => {
   const currentTime = dayjs();
@@ -50,6 +51,8 @@ export const ReadyBy = () => {
   const [selectedDay, setSelectedDay] = useState<string | undefined>(undefined);
 
   const [activeTab, setActiveTab] = useState<keyof (typeof t)['readyByOptions']>('Today');
+
+  const isMultiRx = flattenedFills.length > 1;
 
   const handleSubmit = async () => {
     if (isDemo) {
@@ -86,10 +89,20 @@ export const ReadyBy = () => {
       readyByTime
     });
 
-    navigate(`/pharmacy?orderId=${order?.id}&token=${token}`);
-  };
+    // Redirect to payment method selection if applicable
+    const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
+    const isOrgWithCouponsEnabled = [
+      'Sesame',
+      'Updated Test Pharmacy 11', // boson us
+      'Photon Test Org' // neutron us
+    ].includes(order.organization.name);
 
-  const isMultiRx = flattenedFills.length > 1;
+    if (isOrgWithCouponsEnabled && !isMultiRx && !containsGLP) {
+      navigate(`/paymentMethod?orderId=${order?.id}&token=${token}`);
+    } else {
+      navigate(`/pharmacy?orderId=${order?.id}&token=${token}`);
+    }
+  };
 
   useEffect(() => {
     if (selectedTime) {

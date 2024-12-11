@@ -69,7 +69,7 @@ export const Coupon = ({
             </Text>
           </Box>
         ) : null}
-        <Box bgColor="blue.50" w="full" textAlign="center" p={2} borderRadius="xl">
+        <Box bgColor="blue.50" w="full" p={2} borderRadius="xl">
           <Text fontWeight="semibold" fontSize="md">
             {t.showThisCoupon}
           </Text>
