@@ -348,7 +348,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           effectiveDate: draft.effectiveDate,
           instructions: draft.instructions,
           notes: draft.notes,
-          patientId: props.formStore.patient?.value.id,
+          patientId: props?.patientId || props.formStore.patient?.value.id,
           // +1 here because we're using the refillsInput
           fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
           treatmentId: draft.treatment.id,
@@ -422,7 +422,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           const { data: orderData, errors } = await orderMutation({
             variables: {
               ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
-              patientId: props.formStore.patient?.value.id,
+              patientId: props?.patientId || props.formStore.patient?.value.id,
               pharmacyId: props?.pharmacyId || props.formStore.pharmacy?.value || '',
               fulfillmentType: props.formStore.fulfillmentType?.value || '',
               address: formattedAddress(),
