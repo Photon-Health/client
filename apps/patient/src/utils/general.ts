@@ -232,10 +232,3 @@ export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string
 };
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-
-export const isOrgWithCouponsEnabled = (orgName: string) =>
-  [
-    'Sesame',
-    'Updated Test Pharmacy 11', // boson us
-    'Photon Test Org' // neutron us
-  ].includes(orgName);

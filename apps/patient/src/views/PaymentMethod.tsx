@@ -119,9 +119,7 @@ export const PaymentMethod = () => {
                             />
                             <Text fontWeight="bold">{option.label}</Text>
                           </HStack>
-                          <Text fontSize="sm" color="blackAlpha.700">
-                            {option.description}
-                          </Text>
+                          <Text>{option.description}</Text>
                         </VStack>
                       </HStack>
                     </CardBody>

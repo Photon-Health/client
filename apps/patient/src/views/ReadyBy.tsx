@@ -20,11 +20,7 @@ import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
 import { datadogRum } from '@datadog/browser-rum';
 import timezone from 'dayjs/plugin/timezone';
-import {
-  capitalize,
-  convertReadyByToUTCTimestamp,
-  isOrgWithCouponsEnabled
-} from '../utils/general';
+import { capitalize, convertReadyByToUTCTimestamp } from '../utils/general';
 
 dayjs.extend(timezone);
 
@@ -95,8 +91,13 @@ export const ReadyBy = () => {
 
     // Redirect to payment method selection if applicable
     const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
+    const isOrgWithCouponsEnabled = [
+      'Sesame',
+      'Updated Test Pharmacy 11', // boson us
+      'Photon Test Org' // neutron us
+    ].includes(order.organization.name);
 
-    if (isOrgWithCouponsEnabled(order.organization.name) && !isMultiRx && !containsGLP) {
+    if (isOrgWithCouponsEnabled && !isMultiRx && !containsGLP) {
       navigate(`/paymentMethod?orderId=${order?.id}&token=${token}`);
     } else {
       navigate(`/pharmacy?orderId=${order?.id}&token=${token}`);
