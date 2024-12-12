@@ -217,7 +217,7 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
     <VStack w="full" alignItems={'start'} spacing={4}>
       <Heading as="h3">{header}</Heading>
       {subheader && (
-        <Text fontWeight="semibold" fontSize={'lg'}>
+        <Text fontWeight="semibold" fontSize="lg" color="gray.600">
           {subheader}
         </Text>
       )}
