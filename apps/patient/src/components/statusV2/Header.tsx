@@ -217,7 +217,7 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
     <VStack w="full" alignItems={'start'} spacing={4}>
       <Heading as="h3">{header}</Heading>
       {subheader && (
-        <Text as={derivedProps.status !== 'PROCESSING' ? 'b' : undefined} fontSize={'lg'}>
+        <Text fontWeight="semibold" fontSize={'lg'}>
           {subheader}
         </Text>
       )}
@@ -234,7 +234,7 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
           shadow="md"
           p={4}
           w="full"
-          spacing={2}
+          justify="space-between"
         >
           <Text>Requested Pickup:</Text>
           <Text as="b">{patientDesiredReadyByText(props.patientDesiredReadyAt)}</Text>

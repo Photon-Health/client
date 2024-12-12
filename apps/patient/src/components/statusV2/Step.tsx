@@ -9,36 +9,18 @@ export interface StepProps {
 }
 
 export const Step = ({ color, icon, complete, iconProps }: StepProps) => {
+  const uiColor = complete
+    ? color === 'primary'
+      ? 'blue.500'
+      : color === 'danger'
+      ? 'red.500'
+      : 'orange.400'
+    : 'blue.100';
+
   return (
     <VStack w="full">
-      <Box
-        bgColor={
-          complete
-            ? color === 'primary'
-              ? 'blue.500'
-              : color === 'danger'
-              ? 'red.500'
-              : 'orange.400'
-            : 'gray.300'
-        }
-        w="full"
-        h={1.5}
-        borderRadius="lg"
-      ></Box>
-      <Icon
-        boxSize={6}
-        as={icon}
-        color={
-          complete
-            ? color === 'primary'
-              ? 'blue.500'
-              : color === 'danger'
-              ? 'red.500'
-              : 'orange.400'
-            : 'gray.300'
-        }
-        {...iconProps}
-      />
+      <Box bgColor={uiColor} w="full" h={2} borderRadius="lg"></Box>
+      <Icon boxSize={6} as={icon} color={uiColor} {...iconProps} />
     </VStack>
   );
 };
