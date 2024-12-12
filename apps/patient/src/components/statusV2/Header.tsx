@@ -52,18 +52,7 @@ function headerText(status: OrderStatusHeaderProps['status']) {
 }
 
 function subheaderText(props: OrderStatusHeaderProps) {
-  if (props.status === 'CREATED' || props.status === 'SENT') {
-    return "We're confirming your order with the pharmacy.";
-  }
-  if (props.status === 'PICKED_UP' || props.status === 'READY') {
-    return null;
-  }
-  if (props.status === 'FILLING') {
-    return 'The pharmacy is preparing your order for delivery.';
-  }
-  if (props.status === 'SHIPPED') {
-    return 'Your order is out for delivery';
-  }
+  // Exceptions take precedence
   if (
     props.exception === 'BACKORDERED' ||
     props.exception === 'OOS' ||
@@ -80,6 +69,19 @@ function subheaderText(props: OrderStatusHeaderProps) {
   }
   if (props.exception === 'ORDER_ERROR') {
     return 'We’re unable to send your prescription to your pharmacy. Please select a new pharmacy below.';
+  }
+  // Then just check the status
+  if (props.status === 'CREATED' || props.status === 'SENT') {
+    return "We're confirming your order with the pharmacy.";
+  }
+  if (props.status === 'PICKED_UP' || props.status === 'READY') {
+    return null;
+  }
+  if (props.status === 'FILLING') {
+    return 'The pharmacy is preparing your order for delivery.';
+  }
+  if (props.status === 'SHIPPED') {
+    return 'Your order is out for delivery';
   }
   if (props.status === 'RECEIVED') {
     return 'Your pharmacy has received your order. We weren’t able to get a ready time.';
@@ -215,7 +217,7 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
     <VStack w="full" alignItems={'start'} spacing={4}>
       <Heading as="h3">{header}</Heading>
       {subheader && (
-        <Text as={derivedProps.status !== 'PROCESSING' ? 'b' : undefined} fontSize={'lg'}>
+        <Text fontWeight="semibold" fontSize="lg" color="gray.600">
           {subheader}
         </Text>
       )}
@@ -232,7 +234,7 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
           shadow="md"
           p={4}
           w="full"
-          spacing={2}
+          justify="space-between"
         >
           <Text>Requested Pickup:</Text>
           <Text as="b">{patientDesiredReadyByText(props.patientDesiredReadyAt)}</Text>

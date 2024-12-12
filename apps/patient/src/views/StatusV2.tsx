@@ -213,9 +213,9 @@ export const StatusV2 = () => {
       <Helmet>
         <title>{t.track}</title>
       </Helmet>
-      <VStack spacing={4} width="full" alignItems={'stretch'} flex={1}>
+      <VStack spacing={5} width="full" alignItems={'stretch'} flex={1}>
         <Box bgColor="white" shadow="sm">
-          <Container py={4}>
+          <Container py={6}>
             <VStack spacing={4} width="full" alignItems="stretch">
               <HolidayAlert>Holiday may affect pharmacy hours.</HolidayAlert>
               <OrderStatusHeader
@@ -235,7 +235,7 @@ export const StatusV2 = () => {
         </Box>
 
         <Container>
-          <VStack spacing={6}>
+          <VStack spacing={7}>
             {displayPharmacy && (
               <VStack w="full" alignItems="stretch" spacing={4}>
                 <Heading as="h4" size="md">
