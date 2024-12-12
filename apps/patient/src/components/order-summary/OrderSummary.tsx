@@ -202,7 +202,7 @@ export const OrderSummary = (props: {
   onViewDetails: () => void;
 }) => {
   const header = (
-    <HStack justifyContent="space-between" w="full" my={4}>
+    <HStack justifyContent="space-between" w="full">
       <Heading as="h4" size="md">
         Order Details
       </Heading>
@@ -213,7 +213,7 @@ export const OrderSummary = (props: {
   );
 
   return (
-    <VStack alignItems="stretch" w="full">
+    <VStack alignItems="stretch" w="full" spacing={4}>
       {header}
       <Card>
         <FulfillmentsListContent fulfillments={props.fulfillments} />
