@@ -1,20 +1,9 @@
 import { RecentOrders } from '@photonhealth/components';
 import { customElement } from 'solid-element';
 import { createFormStore } from '../stores/form';
-import { PatientStore } from '../stores/patient';
 import { PrescribeProps, PrescribeWorkflow } from './photon-prescribe-workflow';
-import { createEffect, onMount } from 'solid-js';
-import { usePhoton } from '../context';
 
 const Component = (props: PrescribeProps) => {
-  const client = usePhoton();
-  const { actions: patientActions, store: patientStore } = PatientStore;
-  onMount(() => {
-    if (props.patientId) {
-      patientActions.getSelectedPatient(client!.getSDK(), props.patientId);
-    }
-  });
-
   const { store, actions } = createFormStore({
     dispenseAsWritten: false,
     patient: undefined,
@@ -23,18 +12,6 @@ const Component = (props: PrescribeProps) => {
     pharmacy: undefined,
     errors: [],
     address: undefined
-  });
-
-  createEffect(() => {
-    const hasPatient =
-      !patientStore.selectedPatient.isLoading && !!patientStore.selectedPatient.data;
-
-    if (props.patientId && hasPatient) {
-      actions.updateFormValue({
-        key: 'patient',
-        value: patientStore.selectedPatient.data
-      });
-    }
   });
 
   return (
