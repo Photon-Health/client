@@ -1,5 +1,5 @@
 import { string, any, record } from 'superstruct';
-import { createSignal, Show, createEffect, createMemo, on } from 'solid-js';
+import { createSignal, Show, createEffect, createMemo, onMount } from 'solid-js';
 import { PatientInfo, PatientMedHistory, AddressForm, Card, Text } from '@photonhealth/components';
 import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
@@ -42,30 +42,24 @@ export const PatientCard = (props: {
   const { actions, store } = PatientStore;
   const [isUpdating, setIsUpdating] = createSignal(false);
 
-  createEffect(
-    on(
-      () => props.patientId,
-      () => {
-        console.log('fetching patient in patient card');
-        props.actions.registerValidator({
-          key: 'patient',
-          validator: patientValidator
-        });
+  onMount(() => {
+    props.actions.registerValidator({
+      key: 'patient',
+      validator: patientValidator
+    });
 
-        if (props.enableOrder) {
-          props.actions.registerValidator({
-            key: 'address',
-            validator: patientAddressValidator
-          });
-        }
+    if (props.enableOrder) {
+      props.actions.registerValidator({
+        key: 'address',
+        validator: patientAddressValidator
+      });
+    }
 
-        if (props?.patientId) {
-          // fetch patient on mount when patientId is passed
-          actions.getSelectedPatient(props.client!.getSDK(), props.patientId);
-        }
-      }
-    )
-  );
+    if (props?.patientId) {
+      // fetch patient on mount when patientId is passed
+      actions.getSelectedPatient(props.client!.getSDK(), props.patientId);
+    }
+  });
 
   const updatePatient = (e: any) => {
     props.actions.updateFormValue({
