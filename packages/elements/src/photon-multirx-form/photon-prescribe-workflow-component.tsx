@@ -2,6 +2,7 @@ import { RecentOrders } from '@photonhealth/components';
 import { customElement } from 'solid-element';
 import { createFormStore } from '../stores/form';
 import { PrescribeProps, PrescribeWorkflow } from './photon-prescribe-workflow';
+import { onCleanup } from 'solid-js';
 
 const Component = (props: PrescribeProps) => {
   const { store, actions } = createFormStore({
@@ -12,6 +13,10 @@ const Component = (props: PrescribeProps) => {
     pharmacy: undefined,
     errors: [],
     address: undefined
+  });
+
+  onCleanup(() => {
+    actions.reset();
   });
 
   return (
