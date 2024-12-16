@@ -423,7 +423,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             variables: {
               ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
               patientId: props.formStore.patient?.value.id,
-              pharmacyId: props?.pharmacyId || props.formStore.pharmacy?.value || '',
+              pharmacyId: props.pharmacyId ?? (props.formStore.pharmacy?.value || ''),
               fulfillmentType: props.formStore.fulfillmentType?.value || '',
               address: formattedAddress(),
               fills: prescriptionData?.createPrescriptions.map((x) => ({ prescriptionId: x.id }))
