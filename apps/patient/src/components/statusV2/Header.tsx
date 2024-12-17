@@ -19,7 +19,10 @@ export interface OrderStatusHeaderProps {
     | 'NOT_COVERED'
     | 'PHARMACY_CLOSED'
     | 'PHARMACY_UNREACHABLE'
-    | 'ORDER_ERROR';
+    | 'ORDER_ERROR'
+    | 'RX_CLARIFICATION'
+    | 'OTC'
+    | 'MEDICAL_DEVICE';
   pharmacyEstimatedReadyAt?: Date;
   patientDesiredReadyAt?: Date | 'URGENT';
 }
@@ -38,7 +41,7 @@ function headerText(status: OrderStatusHeaderProps['status']) {
     case 'SENT':
       return 'Order placed';
     case 'READY':
-      return 'Your order is likely ready';
+      return 'Order is likely ready';
     case 'DELIVERED':
       return 'Order delivered';
     case 'SHIPPED':
@@ -57,7 +60,10 @@ function subheaderText(props: OrderStatusHeaderProps) {
     props.exception === 'BACKORDERED' ||
     props.exception === 'OOS' ||
     props.exception === 'PA_REQUIRED' ||
-    props.exception === 'REFILL_TOO_SOON'
+    props.exception === 'REFILL_TOO_SOON' ||
+    props.exception === 'RX_CLARIFICATION' ||
+    props.exception === 'OTC' ||
+    props.exception === 'MEDICAL_DEVICE'
   ) {
     return 'Please review your order for details.';
   }
@@ -74,7 +80,10 @@ function subheaderText(props: OrderStatusHeaderProps) {
   if (props.status === 'CREATED' || props.status === 'SENT') {
     return "We're confirming your order with the pharmacy.";
   }
-  if (props.status === 'PICKED_UP' || props.status === 'READY') {
+  if (props.status === 'READY') {
+    return 'Our estimate is based on the time the pharmacy provided';
+  }
+  if (props.status === 'PICKED_UP') {
     return null;
   }
   if (props.status === 'FILLING') {
