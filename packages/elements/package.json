@@ -1,6 +1,6 @@
 {
   "name": "@photonhealth/elements",
-  "version": "0.13.3",
+  "version": "0.13.4",
   "description": "",
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
@@ -51,6 +51,7 @@
     "vite-plugin-static-copy": "^0.13.1"
   },
   "dependencies": {
+    "@apollo/client": "^3.6.9",
     "@photonhealth/components": "*",
     "@photonhealth/sdk": "*",
     "@shoelace-style/shoelace": "^2.4.0",
