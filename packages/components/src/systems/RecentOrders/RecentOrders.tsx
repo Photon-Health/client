@@ -36,6 +36,12 @@ const GetPatientOrdersQuery = gql`
             dispenseUnit
             fillsAllowed
             instructions
+            writtenAt
+            prescriber {
+              name {
+                full
+              }
+            }
           }
         }
       }
@@ -51,7 +57,7 @@ type GetPatientOrdersVars = {
 type Treatment = Pick<FullFill['treatment'], 'name'>;
 type Prescription = Pick<
   FullPrescription,
-  'dispenseQuantity' | 'dispenseUnit' | 'fillsAllowed' | 'instructions'
+  'dispenseQuantity' | 'dispenseUnit' | 'fillsAllowed' | 'instructions' | 'writtenAt' | 'prescriber'
 >;
 type Fill = {
   treatment: Treatment;
