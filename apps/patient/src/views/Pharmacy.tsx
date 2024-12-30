@@ -330,7 +330,12 @@ export const Pharmacy = () => {
 
   useEffect(() => {
     const fetchPharmaciesOnLocationOrSortChange = async () => {
-      if (isDemo) return;
+      if (isDemo) {
+        // if we're in demo mode, pharmacies are already loaded from a hardcoded list
+        setLoadingPharmacies(false);
+        return;
+      }
+
       if (latitude == null || longitude == null) {
         // Need to wait till we have lat/lng
         return;
