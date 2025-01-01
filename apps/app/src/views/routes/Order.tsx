@@ -39,7 +39,7 @@ import { FiChevronRight } from 'react-icons/fi';
 import { Page } from '../components/Page';
 import PatientView from '../components/PatientView';
 import { confirmWrapper } from '../components/GuardDialog';
-import { formatAddress, formatDate, formatPhone, getMedicationNames } from '../../utils';
+import { formatAddress, formatDate, formatPhone } from '../../utils';
 import OrderStatusBadge from '../components/OrderStatusBadge';
 import InfoGrid from '../components/InfoGrid';
 import CopyText from '../components/CopyText';
@@ -51,6 +51,7 @@ import { CANCEL_ORDER, REROUTE_ORDER } from '../../mutations';
 import { TicketModal } from '../components/TicketModal';
 import { Fill, Order as OrderType } from '@photonhealth/sdk/dist/types';
 import { datadogRum } from '@datadog/browser-rum';
+import MedicationStack from '../components/MedicationStack';
 
 const PHARMACY_FRAGMENT = gql`
   fragment PharmacyFragment on Pharmacy {
@@ -134,6 +135,23 @@ const GET_ORDER = gql`
         state
         carrier
         trackingNumber
+      }
+      fulfillments {
+        id
+        prescription {
+          id
+          treatment {
+            id
+            name
+          }
+        }
+        state
+        exceptions {
+          type
+          message
+          createdAt
+          resolvedAt
+        }
       }
       createdAt
     }
@@ -379,7 +397,6 @@ export const Order = () => {
   }
 
   const fills = order ? uniqueFills(order) : [];
-  const medicationNames = getMedicationNames(fills);
 
   return (
     <>
@@ -436,13 +453,21 @@ export const Order = () => {
       />
       <Page
         kicker="ORDER"
-        header={
-          loading ? (
+        header=<HStack>
+          {loading ? (
             <SkeletonText skeletonHeight={5} noOfLines={1} width="300px" mt={2} />
           ) : (
             <CopyText text={id || ''} />
-          )
-        }
+          )}
+          {loading ? (
+            <Skeleton width="70px" height="24px" borderRadius="xl" />
+          ) : (
+            <OrderStatusBadge
+              fulfillmentState={order.fulfillment?.state}
+              orderState={order.state}
+            />
+          )}
+        </HStack>
         buttons={
           <Stack
             direction={{ base: 'column-reverse', md: 'row' }}
@@ -518,33 +543,7 @@ export const Order = () => {
       >
         <Card>
           <CardHeader>
-            <Stack
-              direction={{ base: 'column', md: 'row' }}
-              justify="space-between"
-              align="start"
-              width="full"
-              spacing={4}
-            >
-              <VStack w="full" align="start">
-                {loading ? (
-                  <SkeletonText skeletonHeight={5} noOfLines={1} w="300px" />
-                ) : (
-                  medicationNames.map((med, i: number) => (
-                    <Text key={i} fontWeight="medium" flex="1">
-                      {med}
-                    </Text>
-                  ))
-                )}
-              </VStack>
-              {loading ? (
-                <Skeleton width="70px" height="24px" borderRadius="xl" />
-              ) : (
-                <OrderStatusBadge
-                  fulfillmentState={order.fulfillment?.state}
-                  orderState={order.state}
-                />
-              )}
-            </Stack>
+            <MedicationStack order={order} fills={fills} loading={loading} />
           </CardHeader>
           <Divider color="gray.100" />
           <CardBody>
