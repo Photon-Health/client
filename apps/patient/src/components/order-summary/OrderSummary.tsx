@@ -16,7 +16,10 @@ export interface ExceptionData {
     | 'PA_REQUIRED'
     | 'REFILL_TOO_SOON'
     | 'HIGH_COPAY'
-    | 'NOT_COVERED';
+    | 'NOT_COVERED'
+    | 'RX_CLARIFICATION'
+    | 'OTC'
+    | 'MEDICAL_DEVICE';
 }
 
 export interface FulfillmentData {
@@ -76,17 +79,13 @@ const MESSAGE: { [key in ExceptionData['exceptionType']]: (order: Order) => stri
     `Pharmacy does not have your medication in stock but is able to order it. ${
       isReroutable ? 'You can change your pharmacy below' : 'Contact us'
     } if you need it sooner.`,
-  BACKORDERED: ({ isReroutable }) =>
-    `The pharmacy can’t order the medication. Contact your provider for alternatives or ${
-      isReroutable
-        ? 'you can change your pharmacy below'
-        : 'locate a pharmacy that has it in stock and we will send it there'
-    }.`,
+  BACKORDERED: () =>
+    `The pharmacy can’t order the medication. Contact your provider for alternatives or change your pharmacy.`,
   PA_REQUIRED: ({ organization }) => {
     const { paExceptionMessage } = getSettings(organization.id);
     return (
       paExceptionMessage ??
-      'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Please reach out to your provider directly to request a prior authorization or discuss alternative medications. If you’re paying cash, you can work directly with your pharmacy to pay the out-of-pocket price.'
+      'Your insurance needs information from your provider to cover this medication. Contact your provider for alternatives or pay the cash price.'
     );
   },
   REFILL_TOO_SOON: () =>
@@ -94,7 +93,13 @@ const MESSAGE: { [key in ExceptionData['exceptionType']]: (order: Order) => stri
   NOT_COVERED: () =>
     `This prescription may not be covered by your insurance. You can still pay cash or use a discount card so you can get the medication you need. Your provider may also be able to help you find a covered alternative.`,
   HIGH_COPAY: () =>
-    `This medication may have a high out of pocket cost. You may be able to use a discount card and pay significantly less.`
+    `This medication may have a high out of pocket cost. You may be able to use a discount card and pay significantly less.`,
+  RX_CLARIFICATION: () =>
+    `Your pharmacy needs to speak with your provider before they can fill your prescription. We’ve reached out to them.`,
+  OTC: () =>
+    `Your pharmacy has informed us that the medication you were prescribed is available over the counter and can be picked up from the relevant aisle at your local pharmacy.`,
+  MEDICAL_DEVICE: () =>
+    `This pharmacy does not keep this device in stock and cannot fill your prescription. This product is available without a prescription at a medical supply or online store.`
 };
 
 const TITLE: Partial<{ [key in ExceptionData['exceptionType']]: string }> = {
@@ -103,7 +108,10 @@ const TITLE: Partial<{ [key in ExceptionData['exceptionType']]: string }> = {
   PA_REQUIRED: 'Approval required',
   REFILL_TOO_SOON: 'Refill too soon',
   HIGH_COPAY: 'High cost alert',
-  NOT_COVERED: 'Not covered by insurance'
+  NOT_COVERED: 'Not covered by insurance',
+  RX_CLARIFICATION: 'Needs Clarification',
+  OTC: 'Over the Counter',
+  MEDICAL_DEVICE: 'Medical Device'
 };
 
 const ExceptionsBlock = ({ exception }: { exception: ExceptionData }) => {
