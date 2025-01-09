@@ -335,7 +335,6 @@ export const Pharmacy = () => {
         setLoadingPharmacies(false);
         return;
       }
-
       if (latitude == null || longitude == null) {
         // Need to wait till we have lat/lng
         return;
