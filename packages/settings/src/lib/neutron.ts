@@ -115,6 +115,11 @@ const organizationSettings: {
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
   },
+  // RO
+  org_OY9R92S8roPh0hlX: {
+    logo: 'ro_logo.png',
+    accentColor: '#506ef5'
+  },
   // Weekend Health
   org_u93EDGhy5I4Ia5Bb: {
     sendOrder: false,
