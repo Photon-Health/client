@@ -115,7 +115,7 @@ const organizationSettings: {
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
   },
-  // RO
+  // RO health
   org_OY9R92S8roPh0hlX: {
     logo: 'ro_logo.png',
     accentColor: '#506ef5'
