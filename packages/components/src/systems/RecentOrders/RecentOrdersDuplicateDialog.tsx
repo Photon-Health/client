@@ -54,6 +54,10 @@ export default function RecentOrdersDuplicateDialog() {
               instructions: state?.duplicateFill?.prescription?.instructions
             })}
           </Text>
+          <Text size="sm" color="gray">
+            Written by {state?.duplicateFill?.prescription?.prescriber?.name?.full} on{' '}
+            {new Date(state?.duplicateFill?.prescription?.writtenAt).toLocaleDateString()}
+          </Text>
         </div>
 
         <div class="flex flex-col items-stretch gap-4">
