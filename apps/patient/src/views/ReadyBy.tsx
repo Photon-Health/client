@@ -96,7 +96,7 @@ export const ReadyBy = () => {
     // Redirect to payment method selection if applicable
     const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
 
-    if (isOrgWithCouponsEnabled(order.organization.name) && !isMultiRx && !containsGLP) {
+    if (isOrgWithCouponsEnabled(order.organization.id) && !isMultiRx && !containsGLP) {
       navigate(`/paymentMethod?orderId=${order?.id}&token=${token}`);
     } else {
       navigate(`/pharmacy?orderId=${order?.id}&token=${token}`);
