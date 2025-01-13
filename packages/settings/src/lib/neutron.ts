@@ -181,7 +181,8 @@ const organizationSettings: {
       GOGOMEDS_PHARMACY_ID,
       EMPOWER_PHARMACY_ID,
       AMBROSIA_PHARMACY_ID,
-      WOMENS_INTERNATIONAL_PHARMACY_ID
+      WOMENS_INTERNATIONAL_PHARMACY_ID,
+      STRIVE_PHARMACY_ID
     ]
   },
   // Emily's Test environment (us)
@@ -234,7 +235,8 @@ const organizationSettings: {
   // Found
   org_PwzQxriG4OcMD0iq: {
     logo: 'found_logo.svg',
-    accentColor: '#1c3f28'
+    accentColor: '#1c3f28',
+    mailOrderProviders: [STRIVE_PHARMACY_ID]
   },
   // Miga Health
   org_u3kKBHGj4MFfzOVz: {

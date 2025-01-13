@@ -25,7 +25,7 @@ export const PharmacyFilters = ({
   const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
   const isMultiRx = flattenedFills.length > 1;
   const showPriceFilter =
-    isOrgWithCouponsEnabled(order.organization.name) && !isMultiRx && !containsGLP;
+    isOrgWithCouponsEnabled(order.organization.id) && !isMultiRx && !containsGLP;
 
   return (
     <HStack>
