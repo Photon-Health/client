@@ -233,9 +233,10 @@ export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
-export const isOrgWithCouponsEnabled = (orgName: string) =>
+export const isOrgWithCouponsEnabled = (organizationId: string) =>
   [
-    'Sesame',
-    'Updated Test Pharmacy 11', // boson us
-    'Photon Test Org' // neutron us
-  ].includes(orgName);
+    'org_QFoulY6Ornx7dMdw', // Sesame neutron
+    'org_zc1RzzmSwd8eE94U', // Sesame photon
+    'org_KzSVZBQixLRkqj5d', // Test Organization 11, this is boson us
+    'org_kVS7AP4iuItESdMA' // Photon Test Org, this is neutron us
+  ].includes(organizationId);
