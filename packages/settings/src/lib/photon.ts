@@ -265,6 +265,15 @@ const organizationSettings: {
     sendToPatient: false,
     enableRxAndOrder: false
   },
+  // DJL Physician Services (Xyon Health)
+  org_7BeVTuZtlwXtRetc: {
+    sendOrder: false,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
+    sendToPatient: false,
+    enableRxAndOrder: false
+  },
   // Ognomy
   org_2B1yxV6yS9ROqV1g: {
     logo: 'ognomy_logo.webp',
