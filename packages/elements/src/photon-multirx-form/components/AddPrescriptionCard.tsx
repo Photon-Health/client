@@ -399,7 +399,7 @@ export const AddPrescriptionCard = (props: {
                   style={{
                     // ya, it ain't pretty, but it works. just need it for a lil bit longer
                     height: '40px',
-                    'margin-top': '34px'
+                    'margin-top': '32px'
                   }}
                 >
                   <Icon name="calculator" size="sm" />
