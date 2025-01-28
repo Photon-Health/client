@@ -14,7 +14,9 @@ import {
   REDROCK_STGEORGE_PHARMACY_ID,
   COST_PLUS_PHARMACY_ID,
   WALMART_MAIL_ORDER_PHARMACY_ID,
-  STRIVE_PHARMACY_ID
+  STRIVE_PHARMACY_ID,
+  HONEYBEE_PHARMACY_ID,
+  TRUEPILL_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -423,6 +425,8 @@ const organizationSettings: {
   // Bridge Dermatology
   org_YkpjWxuCmZsaWY1i: {
     logo: 'bridge_dermatology_logo.svg',
-    accentColor: '#0d527c'
+    accentColor: '#0d527c',
+    mailOrder: true,
+    mailOrderProviders: [CAREPOINT_PHARMACY_ID, HONEYBEE_PHARMACY_ID, TRUEPILL_PHARMACY_ID]
   }
 };

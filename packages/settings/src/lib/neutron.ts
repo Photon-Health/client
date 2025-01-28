@@ -407,5 +407,15 @@ const organizationSettings: {
     pickUp: true,
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID]
+  },
+  // Miiskin
+  org_VWgnbn3MVynEjoND: {
+    mailOrder: true,
+    mailOrderProviders: [CAREPOINT_PHARMACY_ID, HONEYBEE_PHARMACY_ID, TRUEPILL_PHARMACY_ID]
+  },
+  // Miiskin Sandbox test sub-org
+  org_HyrPueFq0JFqQIuf: {
+    mailOrder: true,
+    mailOrderProviders: [CAREPOINT_PHARMACY_ID, HONEYBEE_PHARMACY_ID, TRUEPILL_PHARMACY_ID]
   }
 };
