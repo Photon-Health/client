@@ -32,7 +32,6 @@ import { FixedFooter, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { RxLightningBolt } from 'react-icons/rx';
-import { isGLP } from '../utils/isGLP';
 
 const checkDisabled = (option: string): boolean => {
   const currentTime = dayjs();
@@ -94,9 +93,7 @@ export const ReadyBy = () => {
     });
 
     // Redirect to payment method selection if applicable
-    const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
-
-    if (isOrgWithCouponsEnabled(order.organization.id) && !isMultiRx && !containsGLP) {
+    if (isOrgWithCouponsEnabled(order.organization.id) && !isMultiRx) {
       navigate(`/paymentMethod?orderId=${order?.id}&token=${token}`);
     } else {
       navigate(`/pharmacy?orderId=${order?.id}&token=${token}`);
