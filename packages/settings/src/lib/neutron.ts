@@ -408,7 +408,7 @@ const organizationSettings: {
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID]
   },
-  // Miiskin
+  // Miiskin integration testing account
   org_VWgnbn3MVynEjoND: {
     mailOrder: true,
     mailOrderProviders: [CAREPOINT_PHARMACY_ID, HONEYBEE_PHARMACY_ID, TRUEPILL_PHARMACY_ID]
