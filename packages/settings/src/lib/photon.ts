@@ -14,7 +14,9 @@ import {
   REDROCK_STGEORGE_PHARMACY_ID,
   COST_PLUS_PHARMACY_ID,
   WALMART_MAIL_ORDER_PHARMACY_ID,
-  STRIVE_PHARMACY_ID
+  STRIVE_PHARMACY_ID,
+  HONEYBEE_PHARMACY_ID,
+  TRUEPILL_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -350,7 +352,8 @@ const organizationSettings: {
     logo: 'found_logo.svg',
     accentColor: '#1c3f28',
     paExceptionMessage:
-      'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Found customer support will submit a prior authorization for you or suggest an alternative medication. The customer support team at Found will follow up with you if any additional information is needed.'
+      'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Found customer support will submit a prior authorization for you or suggest an alternative medication. The customer support team at Found will follow up with you if any additional information is needed.',
+    mailOrderProviders: [STRIVE_PHARMACY_ID]
   },
   // Sesame
   org_zc1RzzmSwd8eE94U: {
@@ -418,5 +421,12 @@ const organizationSettings: {
   org_LxDuuZVgq9C065AX: {
     paExceptionMessage:
       'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Please contact 317-648-5801 via TEXT and ask them to submit a prior authorization on your behalf or suggest an alternative medication.'
+  },
+  // Bridge Dermatology
+  org_YkpjWxuCmZsaWY1i: {
+    logo: 'bridge_dermatology_logo.svg',
+    accentColor: '#0d527c',
+    mailOrder: true,
+    mailOrderProviders: [CAREPOINT_PHARMACY_ID, HONEYBEE_PHARMACY_ID, TRUEPILL_PHARMACY_ID]
   }
 };
