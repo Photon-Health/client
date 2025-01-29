@@ -422,7 +422,7 @@ const organizationSettings: {
     paExceptionMessage:
       'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Please contact 317-648-5801 via TEXT and ask them to submit a prior authorization on your behalf or suggest an alternative medication.'
   },
-  // Bridge Dermatology
+  // Bridge Dermatology (sub-org of Miiskin)
   org_YkpjWxuCmZsaWY1i: {
     logo: 'bridge_dermatology_logo.svg',
     accentColor: '#0d527c',
