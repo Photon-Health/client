@@ -276,7 +276,7 @@ const organizationSettings: {
     sendToPatient: false,
     enableRxAndOrder: false
   },
-  // Hair Restoration Center of Connecticut (Xyon Health)
+  // Hair Restoration Center of Connecticut - (Xyon Health)
   org_ArouZbOiqsGkyVsh: {
     sendOrder: false,
     pickUp: false,
