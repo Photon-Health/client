@@ -68,7 +68,7 @@ function subheaderText(props: OrderStatusHeaderProps) {
     return 'Please review your order for details.';
   }
   if (props.exception === 'PHARMACY_UNREACHABLE') {
-    return "We're unable to get updates for your order.";
+    return "We're unable to get updates for your order. You can call your current pharmacy or change pharmacies below.";
   }
   if (props.exception === 'PHARMACY_CLOSED') {
     return 'Your pharmacy is closed. You can change it if you need your order sooner.';
