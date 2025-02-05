@@ -383,7 +383,8 @@ const organizationSettings: {
       GOGOMEDS_PHARMACY_ID,
       EMPOWER_PHARMACY_ID,
       AMBROSIA_PHARMACY_ID,
-      WOMENS_INTERNATIONAL_PHARMACY_ID
+      WOMENS_INTERNATIONAL_PHARMACY_ID,
+      STRIVE_PHARMACY_ID
     ],
     paExceptionMessage:
       'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Please reach out to your provider and ask them to submit a prior authorization on your behalf or suggest an alternative medication.'
