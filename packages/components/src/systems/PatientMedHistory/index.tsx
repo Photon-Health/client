@@ -14,7 +14,7 @@ import formatDate from '../../utils/formatDate';
 import Button from '../../particles/Button';
 import Card from '../../particles/Card';
 import Icon from '../../particles/Icon';
-import { useQuery } from '@apollo/client';
+import { createQuery } from '../../utils/createQuery';
 
 const GET_PATIENT_MED_HISTORY = gql`
   query GetPatient($id: ID!) {
@@ -73,6 +73,13 @@ type PatientTreatmentHistoryElement = {
   prescription?: Prescription;
 };
 
+type GetPatientResponse = {
+  patient: {
+    id: string;
+    treatmentHistory: PatientTreatmentHistoryElement[];
+  };
+};
+
 export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const client = usePhotonClient();
   const [medHistory, setMedHistory] = createSignal<PatientTreatmentHistoryElement[] | undefined>(
@@ -82,9 +89,15 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
 
   const baseURL = createMemo(() => `${client?.clinicalUrl}/prescriptions/`);
 
-  const { data, loading } = useQuery(GET_PATIENT_MED_HISTORY, {
-    client: client?.clinical
-  });
+  const queryOptions = createMemo(() => ({
+    variables: { id: props.patientId },
+    client: client!.apolloClinical
+  }));
+
+  const patientMedHistory = createQuery<GetPatientResponse, { id: string }>(
+    GET_PATIENT_MED_HISTORY,
+    queryOptions
+  );
 
   createEffect(() => {
     const sortHistoryFunction = (
@@ -101,12 +114,12 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
       return dateB - dateA;
     };
 
-    const medicationHistory = data()?.patient?.treatmentHistory;
+    const medicationHistory = patientMedHistory()?.patient?.treatmentHistory;
     if (medicationHistory) {
       const sortedMedHistory = medicationHistory.slice().sort(sortHistoryFunction);
       setMedHistory(sortedMedHistory);
     }
-    if (!loading && !medicationHistory) {
+    if (!patientMedHistory.loading && !medicationHistory) {
       setMedHistory([]);
     }
   });
