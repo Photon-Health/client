@@ -14,7 +14,6 @@ import formatDate from '../../utils/formatDate';
 import Button from '../../particles/Button';
 import Card from '../../particles/Card';
 import Icon from '../../particles/Icon';
-import { usePhoton } from '@photonhealth/react';
 import { useQuery } from '@apollo/client';
 
 const GET_PATIENT_MED_HISTORY = gql`
@@ -76,7 +75,6 @@ type PatientTreatmentHistoryElement = {
 
 export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const client = usePhotonClient();
-  const { clinicalClient } = usePhoton();
   const [medHistory, setMedHistory] = createSignal<PatientTreatmentHistoryElement[] | undefined>(
     undefined
   );
@@ -85,7 +83,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const baseURL = createMemo(() => `${client?.clinicalUrl}/prescriptions/`);
 
   const { data, loading } = useQuery(GET_PATIENT_MED_HISTORY, {
-    client: clinicalClient
+    client: client?.clinical
   });
 
   createEffect(() => {
