@@ -407,5 +407,22 @@ const organizationSettings: {
     pickUp: true,
     mailOrder: true,
     mailOrderProviders: [CUREXA_PHARMACY_ID]
+  },
+  // Miiskin integration testing account
+  org_VWgnbn3MVynEjoND: {
+    mailOrder: true,
+    mailOrderProviders: [CAREPOINT_PHARMACY_ID, HONEYBEE_PHARMACY_ID, TRUEPILL_PHARMACY_ID]
+  },
+  // Miiskin Sandbox test sub-org
+  org_HyrPueFq0JFqQIuf: {
+    mailOrder: true,
+    mailOrderProviders: [CAREPOINT_PHARMACY_ID, HONEYBEE_PHARMACY_ID, TRUEPILL_PHARMACY_ID]
+  },
+  // Fifty 410
+  org_DFsDnAmXkPrtsrih: {
+    mailOrder: true,
+    mailOrderProviders: [HEALTHWAREHOUSE_PHARMACY_ID, EMPOWER_PHARMACY_ID],
+    logo: 'fifty410_logo.png',
+    accentColor: '#CB7052'
   }
 };

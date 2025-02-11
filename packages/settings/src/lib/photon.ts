@@ -14,7 +14,10 @@ import {
   REDROCK_STGEORGE_PHARMACY_ID,
   COST_PLUS_PHARMACY_ID,
   WALMART_MAIL_ORDER_PHARMACY_ID,
-  STRIVE_PHARMACY_ID
+  STRIVE_PHARMACY_ID,
+  HONEYBEE_PHARMACY_ID,
+  TRUEPILL_PHARMACY_ID,
+  HEALTHWAREHOUSE_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -274,6 +277,15 @@ const organizationSettings: {
     sendToPatient: false,
     enableRxAndOrder: false
   },
+  // Hair Restoration Center of Connecticut - (Xyon Health)
+  org_ArouZbOiqsGkyVsh: {
+    sendOrder: false,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
+    sendToPatient: false,
+    enableRxAndOrder: false
+  },
   // Ognomy
   org_2B1yxV6yS9ROqV1g: {
     logo: 'ognomy_logo.webp',
@@ -372,7 +384,8 @@ const organizationSettings: {
       GOGOMEDS_PHARMACY_ID,
       EMPOWER_PHARMACY_ID,
       AMBROSIA_PHARMACY_ID,
-      WOMENS_INTERNATIONAL_PHARMACY_ID
+      WOMENS_INTERNATIONAL_PHARMACY_ID,
+      STRIVE_PHARMACY_ID
     ],
     paExceptionMessage:
       'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Please reach out to your provider and ask them to submit a prior authorization on your behalf or suggest an alternative medication.'
@@ -419,5 +432,19 @@ const organizationSettings: {
   org_LxDuuZVgq9C065AX: {
     paExceptionMessage:
       'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Please contact 317-648-5801 via TEXT and ask them to submit a prior authorization on your behalf or suggest an alternative medication.'
+  },
+  // Bridge Dermatology (sub-org of Miiskin)
+  org_YkpjWxuCmZsaWY1i: {
+    logo: 'bridge_dermatology_logo.svg',
+    accentColor: '#0d527c',
+    mailOrder: true,
+    mailOrderProviders: [CAREPOINT_PHARMACY_ID, HONEYBEE_PHARMACY_ID, TRUEPILL_PHARMACY_ID]
+  },
+  // Fifty 410
+  org_BxZUVSH1m7cQVy1x: {
+    mailOrder: true,
+    mailOrderProviders: [HEALTHWAREHOUSE_PHARMACY_ID, EMPOWER_PHARMACY_ID],
+    logo: 'fifty410_logo.png',
+    accentColor: '#CB7052'
   }
 };
