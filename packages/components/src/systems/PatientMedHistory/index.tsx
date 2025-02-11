@@ -1,7 +1,12 @@
 import { createSignal, createEffect, Show, For, createMemo } from 'solid-js';
 import gql from 'graphql-tag';
 import { usePhotonClient } from '../SDKProvider';
-import { PatientMedication, Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
+import {
+  Medication,
+  SearchMedication,
+  Prescription,
+  Treatment
+} from '@photonhealth/sdk/dist/types';
 import Table from '../../particles/Table';
 import Text from '../../particles/Text';
 import generateString from '../../utils/generateString';
@@ -62,10 +67,19 @@ const LoadingRowFallback = (props: { enableLinks: boolean }) => (
   </Table.Row>
 );
 
+type PatientMedHistoryElement = {
+  active: boolean;
+  comment?: string;
+  treatment: Treatment;
+  prescription?: Prescription;
+};
+
 export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const client = usePhotonClient();
   const { clinicalClient } = usePhoton();
-  const [medHistory, setMedHistory] = createSignal<PatientMedication[] | undefined>(undefined);
+  const [medHistory, setMedHistory] = createSignal<PatientMedHistoryElement[] | undefined>(
+    undefined
+  );
   const [chronological, setChronological] = createSignal<boolean>(false);
 
   const baseURL = createMemo(() => `${client?.clinicalUrl}/prescriptions/`);
@@ -75,18 +89,20 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   });
 
   createEffect(() => {
+    const sortHistoryFunction = (a: PatientMedHistoryElement, b: PatientMedHistoryElement) => {
+      const dateA = a?.prescription?.writtenAt
+        ? new Date(a.prescription.writtenAt).getTime()
+        : -Infinity;
+      const dateB = b?.prescription?.writtenAt
+        ? new Date(b.prescription.writtenAt).getTime()
+        : -Infinity;
+      if (chronological()) return dateA - dateB;
+      return dateB - dateA;
+    };
+
     const medicationHistory = data()?.patient?.treatmentHistory;
     if (medicationHistory) {
-      const sortedMedHistory = medicationHistory.slice().sort((a, b) => {
-        const dateA = a?.prescription?.writtenAt
-          ? new Date(a.prescription.writtenAt).getTime()
-          : -Infinity;
-        const dateB = b?.prescription?.writtenAt
-          ? new Date(b.prescription.writtenAt).getTime()
-          : -Infinity;
-        if (chronological()) return dateA - dateB;
-        return dateB - dateA;
-      });
+      const sortedMedHistory = medicationHistory.slice().sort(sortHistoryFunction);
       setMedHistory(sortedMedHistory);
     }
     if (!loading && !medicationHistory) {
@@ -177,7 +193,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
               <For each={medHistory()}>
                 {(med) => (
                   <Table.Row>
-                    <Table.Cell width="16rem">{med.medication?.name}</Table.Cell>
+                    <Table.Cell width="16rem">{med.treatment?.name}</Table.Cell>
                     <Table.Cell>{formatDate(med.prescription?.writtenAt) || 'N/A'}</Table.Cell>
                     <Show when={props.enableLinks}>
                       <Table.Cell>
