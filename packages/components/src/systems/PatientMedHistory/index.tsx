@@ -67,7 +67,7 @@ const LoadingRowFallback = (props: { enableLinks: boolean }) => (
   </Table.Row>
 );
 
-type PatientMedHistoryElement = {
+type PatientTreatmentHistoryElement = {
   active: boolean;
   comment?: string;
   treatment: Treatment;
@@ -77,7 +77,7 @@ type PatientMedHistoryElement = {
 export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const client = usePhotonClient();
   const { clinicalClient } = usePhoton();
-  const [medHistory, setMedHistory] = createSignal<PatientMedHistoryElement[] | undefined>(
+  const [medHistory, setMedHistory] = createSignal<PatientTreatmentHistoryElement[] | undefined>(
     undefined
   );
   const [chronological, setChronological] = createSignal<boolean>(false);
@@ -89,7 +89,10 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   });
 
   createEffect(() => {
-    const sortHistoryFunction = (a: PatientMedHistoryElement, b: PatientMedHistoryElement) => {
+    const sortHistoryFunction = (
+      a: PatientTreatmentHistoryElement,
+      b: PatientTreatmentHistoryElement
+    ) => {
       const dateA = a?.prescription?.writtenAt
         ? new Date(a.prescription.writtenAt).getTime()
         : -Infinity;
