@@ -96,6 +96,7 @@ export const Pharmacy = () => {
   );
   const [cleanAddress, setCleanAddress] = useState<string>();
   const [loadingLocation, setLoadingLocation] = useState(false);
+  const [zipcode, setZipcode] = useState<string>();
 
   // loading state
   const [initialLoad, setInitialLoad] = useState(true);
@@ -222,6 +223,7 @@ export const Pharmacy = () => {
         setLatitude(locationData.lat);
         setLongitude(locationData.lng);
         setCleanAddress(locationData.address);
+        setZipcode(locationData.zipCode ?? '');
       } catch (e: any) {
         toast({
           title: 'Invalid location',
@@ -240,17 +242,19 @@ export const Pharmacy = () => {
   const getCostco = useCallback(
     async ({
       latitude,
-      longitude
+      longitude,
+      zipCode
     }: {
       latitude: number | undefined;
       longitude: number | undefined;
+      zipCode: string;
     }) => {
       if (latitude == null || longitude == null) {
         return [];
       }
       try {
         const topRankedCostco: EnrichedPharmacy[] = await getPharmacies({
-          searchParams: { latitude, longitude, radius: 15 },
+          searchParams: { latitude, longitude, zipCode, radius: 15 },
           limit: 1,
           offset: 0,
           isOpenNow: enableOpenNow,
@@ -271,10 +275,12 @@ export const Pharmacy = () => {
   const getWalgreens = useCallback(
     async ({
       latitude,
-      longitude
+      longitude,
+      zipCode
     }: {
       latitude: number | undefined;
       longitude: number | undefined;
+      zipCode: string;
     }) => {
       if (latitude == null || longitude == null) {
         return [];
@@ -282,7 +288,7 @@ export const Pharmacy = () => {
 
       try {
         const topRankedWags: EnrichedPharmacy[] = await getPharmacies({
-          searchParams: { latitude, longitude, radius: 15 },
+          searchParams: { latitude, longitude, zipCode, radius: 15 },
           limit: 1,
           offset: 0,
           isOpenNow: enableOpenNow,
@@ -304,10 +310,12 @@ export const Pharmacy = () => {
     async ({
       latitude,
       longitude,
+      zipCode,
       pageOffset = 0
     }: {
       latitude: number | undefined;
       longitude: number | undefined;
+      zipCode: string;
       pageOffset?: number;
     }) => {
       if (latitude == null || longitude == null) {
@@ -315,7 +323,7 @@ export const Pharmacy = () => {
       }
 
       const res = await getPharmacies({
-        searchParams: { latitude, longitude },
+        searchParams: { latitude, longitude, zipCode },
         limit: GET_PHARMACIES_COUNT,
         offset: pageOffset,
         isOpenNow: enableOpenNow,
@@ -348,14 +356,14 @@ export const Pharmacy = () => {
         // check if top ranked costco is enabled and there are GLP treatments
         if (enableTopRankedCostco && !enablePrice) {
           topRankedPharmacies = [
-            ...(await getCostco({ latitude, longitude })),
+            ...(await getCostco({ latitude, longitude, zipCode: zipcode ?? '' })),
             ...topRankedPharmacies
           ];
         }
 
         if (enableTopRankedWalgreens && order?.readyBy === 'Urgent') {
           topRankedPharmacies = [
-            ...(await getWalgreens({ latitude, longitude })),
+            ...(await getWalgreens({ latitude, longitude, zipCode: zipcode ?? '' })),
             ...topRankedPharmacies
           ];
         }
@@ -364,7 +372,8 @@ export const Pharmacy = () => {
         // a different query than the original query
         const pharmacies = await loadPharmacies({
           latitude,
-          longitude
+          longitude,
+          zipCode: zipcode ?? ''
         });
 
         if (pharmacies?.length === 0) {
@@ -377,7 +386,8 @@ export const Pharmacy = () => {
               // Re-fetch to get pharmacies by distance
               const pharmaciesReSearch = await loadPharmacies({
                 latitude,
-                longitude
+                longitude,
+                zipCode: zipcode ?? ''
               });
               setTopRankedPharmacies(topRankedPharmacies);
               setPharmacyResults(pharmaciesReSearch);
@@ -418,8 +428,9 @@ export const Pharmacy = () => {
     getWalgreens,
     isDemo,
     latitude,
-    loadPharmacies,
     longitude,
+    zipcode,
+    loadPharmacies,
     order?.readyBy,
     toast,
     initialLoad
@@ -452,6 +463,7 @@ export const Pharmacy = () => {
     const newPharmacies = await loadPharmacies({
       latitude,
       longitude,
+      zipCode: zipcode ?? '',
       pageOffset
     });
     setPharmacyResults([...pharmacyResults, ...newPharmacies]);

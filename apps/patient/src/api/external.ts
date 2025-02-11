@@ -8,10 +8,15 @@ export const geocode = async (address: string) => {
 
     const result = response.results?.[0];
     if (result?.geometry?.location) {
+      const zipCode = result.address_components?.find((component) =>
+        component.types.includes('postal_code')
+      )?.long_name;
+
       return {
         address: result.formatted_address,
         lat: result.geometry.location.lat(),
-        lng: result.geometry.location.lng()
+        lng: result.geometry.location.lng(),
+        zipCode: zipCode || null
       };
     } else {
       throw new Error('No results found for the provided address.');
