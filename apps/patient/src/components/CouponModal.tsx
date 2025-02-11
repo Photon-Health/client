@@ -46,12 +46,19 @@ export const CouponModal: FC<CouponModalProps> = ({ isOpen, onClose }) => {
               <Text>{t.showCouponToPharmacy(isMultiRx)}</Text>
             </VStack>
           )}
-          <VStack spacing={2} align="start">
+          <VStack mb={5} spacing={2} align="start">
             <Heading as="h5" size="sm">
               {t.couponWithInsurance}
             </Heading>
             <Text>{t.couponVsInsurance}</Text>
+            <Text>{t.noMedicare}</Text>
             <Text>{t.askForBestPrice}</Text>
+          </VStack>
+          <VStack spacing={2} align="start">
+            <Heading as="h5" size="sm">
+              {t.priceDifference}
+            </Heading>
+            <Text>{t.pricesCanChange}</Text>
           </VStack>
         </ModalBody>
         <ModalFooter>

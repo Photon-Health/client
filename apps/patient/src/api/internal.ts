@@ -42,6 +42,7 @@ export const getPharmacies = async ({
   searchParams: {
     latitude: number;
     longitude: number;
+    zipCode: string;
     radius?: number;
   };
   limit: number;
