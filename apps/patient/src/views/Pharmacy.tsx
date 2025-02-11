@@ -387,7 +387,7 @@ export const Pharmacy = () => {
               const pharmaciesReSearch = await loadPharmacies({
                 latitude,
                 longitude,
-                zipCode: order?.address?.postalCode ?? ''
+                zipCode: zipcode ?? ''
               });
               setTopRankedPharmacies(topRankedPharmacies);
               setPharmacyResults(pharmaciesReSearch);
@@ -431,7 +431,6 @@ export const Pharmacy = () => {
     longitude,
     zipcode,
     loadPharmacies,
-    order?.address?.postalCode,
     order?.readyBy,
     toast,
     initialLoad
@@ -464,7 +463,7 @@ export const Pharmacy = () => {
     const newPharmacies = await loadPharmacies({
       latitude,
       longitude,
-      zipCode: order?.address?.postalCode ?? '',
+      zipCode: zipcode ?? '',
       pageOffset
     });
     setPharmacyResults([...pharmacyResults, ...newPharmacies]);
