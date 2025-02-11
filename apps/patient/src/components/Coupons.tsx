@@ -1,4 +1,4 @@
-import { Box, Heading, HStack, Icon, Text, VStack } from '@chakra-ui/react';
+import { Box, Heading, HStack, Icon, Image, Text, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import { FiInfo } from 'react-icons/fi';
 import { CouponModal } from '.';
@@ -6,6 +6,7 @@ import { text as t } from '../utils/text';
 import { useOrderContext } from '../views/Main';
 import { DiscountCard } from '../__generated__/graphql';
 import { Card } from './Card';
+import goodrxLogo from '../assets/goodrx_logo.png';
 
 export const Coupons = () => {
   const { order, flattenedFills } = useOrderContext();
@@ -39,7 +40,7 @@ export const Coupons = () => {
   );
 };
 
-type Coupon = Pick<DiscountCard, 'price' | 'bin' | 'pcn' | 'group' | 'memberId'>;
+type Coupon = Pick<DiscountCard, 'price' | 'bin' | 'pcn' | 'group' | 'memberId' | 'source'>;
 export const Coupon = ({
   coupon,
   showGenericPriceDisclaimer
@@ -49,7 +50,7 @@ export const Coupon = ({
 }) => {
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
 
-  const { price, bin, pcn, group, memberId } = coupon;
+  const { price, bin, pcn, group, memberId, source } = coupon;
 
   if (!price || !bin || !pcn || !group || !memberId) {
     return null;
@@ -98,6 +99,12 @@ export const Coupon = ({
             {memberId}
           </Text>
         </HStack>
+        {source === 'goodrx' ? (
+          <HStack w="full" justify="center">
+            <Text fontSize="sm">Powered by</Text>
+            <Image src={goodrxLogo} alt="GoodRx" h="20px" />
+          </HStack>
+        ) : null}
       </VStack>
       <HStack color="blue.500" w="full" justify="center">
         <Icon as={FiInfo} />
