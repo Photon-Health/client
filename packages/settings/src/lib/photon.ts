@@ -16,7 +16,8 @@ import {
   WALMART_MAIL_ORDER_PHARMACY_ID,
   STRIVE_PHARMACY_ID,
   HONEYBEE_PHARMACY_ID,
-  TRUEPILL_PHARMACY_ID
+  TRUEPILL_PHARMACY_ID,
+  HEALTHWAREHOUSE_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -438,5 +439,12 @@ const organizationSettings: {
     accentColor: '#0d527c',
     mailOrder: true,
     mailOrderProviders: [CAREPOINT_PHARMACY_ID, HONEYBEE_PHARMACY_ID, TRUEPILL_PHARMACY_ID]
+  },
+  // Fifty 410
+  org_BxZUVSH1m7cQVy1x: {
+    mailOrder: true,
+    mailOrderProviders: [HEALTHWAREHOUSE_PHARMACY_ID, EMPOWER_PHARMACY_ID],
+    logo: 'fifty410_logo.png',
+    accentColor: '#CB7052'
   }
 };
