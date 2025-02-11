@@ -242,17 +242,19 @@ export const Pharmacy = () => {
   const getCostco = useCallback(
     async ({
       latitude,
-      longitude
+      longitude,
+      zipCode
     }: {
       latitude: number | undefined;
       longitude: number | undefined;
+      zipCode: string;
     }) => {
       if (latitude == null || longitude == null) {
         return [];
       }
       try {
         const topRankedCostco: EnrichedPharmacy[] = await getPharmacies({
-          searchParams: { latitude, longitude, zipCode: order?.address?.postalCode ?? '' },
+          searchParams: { latitude, longitude, zipCode, radius: 15 },
           limit: 1,
           offset: 0,
           isOpenNow: enableOpenNow,
@@ -273,10 +275,12 @@ export const Pharmacy = () => {
   const getWalgreens = useCallback(
     async ({
       latitude,
-      longitude
+      longitude,
+      zipCode
     }: {
       latitude: number | undefined;
       longitude: number | undefined;
+      zipCode: string;
     }) => {
       if (latitude == null || longitude == null) {
         return [];
@@ -284,7 +288,7 @@ export const Pharmacy = () => {
 
       try {
         const topRankedWags: EnrichedPharmacy[] = await getPharmacies({
-          searchParams: { latitude, longitude, zipCode: order?.address?.postalCode ?? '' },
+          searchParams: { latitude, longitude, zipCode, radius: 15 },
           limit: 1,
           offset: 0,
           isOpenNow: enableOpenNow,
@@ -352,14 +356,14 @@ export const Pharmacy = () => {
         // check if top ranked costco is enabled and there are GLP treatments
         if (enableTopRankedCostco && !enablePrice) {
           topRankedPharmacies = [
-            ...(await getCostco({ latitude, longitude })),
+            ...(await getCostco({ latitude, longitude, zipCode: zipcode ?? '' })),
             ...topRankedPharmacies
           ];
         }
 
         if (enableTopRankedWalgreens && order?.readyBy === 'Urgent') {
           topRankedPharmacies = [
-            ...(await getWalgreens({ latitude, longitude })),
+            ...(await getWalgreens({ latitude, longitude, zipCode: zipcode ?? '' })),
             ...topRankedPharmacies
           ];
         }
@@ -424,8 +428,9 @@ export const Pharmacy = () => {
     getWalgreens,
     isDemo,
     latitude,
-    loadPharmacies,
     longitude,
+    zipcode,
+    loadPharmacies,
     order?.address?.postalCode,
     order?.readyBy,
     toast,
