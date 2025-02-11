@@ -96,6 +96,7 @@ export const Pharmacy = () => {
   );
   const [cleanAddress, setCleanAddress] = useState<string>();
   const [loadingLocation, setLoadingLocation] = useState(false);
+  const [zipcode, setZipcode] = useState<string>();
 
   // loading state
   const [initialLoad, setInitialLoad] = useState(true);
@@ -222,6 +223,7 @@ export const Pharmacy = () => {
         setLatitude(locationData.lat);
         setLongitude(locationData.lng);
         setCleanAddress(locationData.address);
+        setZipcode(locationData.zipCode ?? '');
       } catch (e: any) {
         toast({
           title: 'Invalid location',
@@ -367,7 +369,7 @@ export const Pharmacy = () => {
         const pharmacies = await loadPharmacies({
           latitude,
           longitude,
-          zipCode: order?.address?.postalCode ?? ''
+          zipCode: zipcode ?? ''
         });
 
         if (pharmacies?.length === 0) {

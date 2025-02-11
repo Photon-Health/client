@@ -40,6 +40,7 @@ export const text = {
   memberId: 'Member ID',
   next: 'Next',
   noMatch: "We couldn't find what you're looking for.",
+  noMedicare: 'It cannot be used in conjunction with Medicare or Medicaid.',
   notifyPickUp: (isPlural: boolean) =>
     `Please notify us below when you’ve picked up your ${
       isPlural ? 'prescriptions' : 'prescription'
@@ -90,6 +91,9 @@ export const text = {
     `The pharmacy is preparing your ${isPlural ? 'prescriptions' : 'prescription'} for delivery.`,
   preparingTextUs: (isPlural: boolean) =>
     `The pharmacy is preparing your ${isPlural ? 'prescriptions' : 'prescription'} for pick up.`,
+  priceDifference: 'What if the price is different?',
+  pricesCanChange:
+    'Prices subject to change without notice and may change based on supply and demand. If there’s a huge price discrepancy, please message us.',
   quantity: 'Quantity',
   questionVerb: 'If you have any questions, please text us at ',
   questionsPhoneNumber: '+1 (513) 866 3212',
