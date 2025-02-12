@@ -11,6 +11,9 @@
         "cwd": "packages/sdk",
         "commands": [
           "rimraf dist",
+          "rimraf node_modules",
+          "rimraf package-lock.json",
+          "npm install",
           "tsc --emitDeclarationOnly --outDir dist",
           "vite build",
           "cp src/types.ts dist/types.ts"
