@@ -1,27 +1,32 @@
 import { createSignal, createEffect, Show, For, createMemo } from 'solid-js';
 import gql from 'graphql-tag';
 import { usePhotonClient } from '../SDKProvider';
-import { PatientMedication, Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
+import {
+  Medication,
+  SearchMedication,
+  Prescription,
+  Treatment
+} from '@photonhealth/sdk/dist/types';
 import Table from '../../particles/Table';
 import Text from '../../particles/Text';
 import generateString from '../../utils/generateString';
 import formatDate from '../../utils/formatDate';
 import Button from '../../particles/Button';
 import Card from '../../particles/Card';
-import { createQuery } from '../../utils/createQuery';
 import Icon from '../../particles/Icon';
+import { createQuery } from '../../utils/createQuery';
 
 const GET_PATIENT_MED_HISTORY = gql`
   query GetPatient($id: ID!) {
     patient(id: $id) {
       id
-      medicationHistory {
+      treatmentHistory {
         active
         prescription {
           id
           writtenAt
         }
-        medication {
+        treatment {
           id
           name
         }
@@ -45,15 +50,6 @@ type PatientMedHistoryProps = {
   newMedication?: Medication | SearchMedication;
 };
 
-type SelectedPatientMedication = Pick<PatientMedication, 'active' | 'medication' | 'prescription'>;
-
-type GetPatientResponse = {
-  patient: {
-    id: string;
-    medicationHistory: SelectedPatientMedication[];
-  };
-};
-
 const LoadingRowFallback = (props: { enableLinks: boolean }) => (
   <Table.Row>
     <Table.Cell>
@@ -70,16 +66,32 @@ const LoadingRowFallback = (props: { enableLinks: boolean }) => (
   </Table.Row>
 );
 
+type PatientTreatmentHistoryElement = {
+  active: boolean;
+  comment?: string;
+  treatment: Treatment;
+  prescription?: Prescription;
+};
+
+type GetPatientResponse = {
+  patient: {
+    id: string;
+    treatmentHistory: PatientTreatmentHistoryElement[];
+  };
+};
+
 export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const client = usePhotonClient();
-  const [medHistory, setMedHistory] = createSignal<PatientMedication[] | undefined>(undefined);
+  const [medHistory, setMedHistory] = createSignal<PatientTreatmentHistoryElement[] | undefined>(
+    undefined
+  );
   const [chronological, setChronological] = createSignal<boolean>(false);
 
   const baseURL = createMemo(() => `${client?.clinicalUrl}/prescriptions/`);
 
   const queryOptions = createMemo(() => ({
     variables: { id: props.patientId },
-    client: client!.apollo
+    client: client!.apolloClinical
   }));
 
   const patientMedHistory = createQuery<GetPatientResponse, { id: string }>(
@@ -88,18 +100,23 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   );
 
   createEffect(() => {
-    const medicationHistory = patientMedHistory()?.patient?.medicationHistory;
+    const sortHistoryFunction = (
+      a: PatientTreatmentHistoryElement,
+      b: PatientTreatmentHistoryElement
+    ) => {
+      const dateA = a?.prescription?.writtenAt
+        ? new Date(a.prescription.writtenAt).getTime()
+        : -Infinity;
+      const dateB = b?.prescription?.writtenAt
+        ? new Date(b.prescription.writtenAt).getTime()
+        : -Infinity;
+      if (chronological()) return dateA - dateB;
+      return dateB - dateA;
+    };
+
+    const medicationHistory = patientMedHistory()?.patient?.treatmentHistory;
     if (medicationHistory) {
-      const sortedMedHistory = medicationHistory.slice().sort((a, b) => {
-        const dateA = a?.prescription?.writtenAt
-          ? new Date(a.prescription.writtenAt).getTime()
-          : -Infinity;
-        const dateB = b?.prescription?.writtenAt
-          ? new Date(b.prescription.writtenAt).getTime()
-          : -Infinity;
-        if (chronological()) return dateA - dateB;
-        return dateB - dateA;
-      });
+      const sortedMedHistory = medicationHistory.slice().sort(sortHistoryFunction);
       setMedHistory(sortedMedHistory);
     }
     if (!patientMedHistory.loading && !medicationHistory) {
@@ -190,7 +207,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
               <For each={medHistory()}>
                 {(med) => (
                   <Table.Row>
-                    <Table.Cell width="16rem">{med.medication?.name}</Table.Cell>
+                    <Table.Cell width="16rem">{med.treatment?.name}</Table.Cell>
                     <Table.Cell>{formatDate(med.prescription?.writtenAt) || 'N/A'}</Table.Cell>
                     <Show when={props.enableLinks}>
                       <Table.Cell>
