@@ -212,7 +212,7 @@ export const OrderSummary = (props: {
   const header = (
     <HStack justifyContent="space-between" w="full">
       <Heading as="h4" size="md">
-        Order Details
+        Order Summary
       </Heading>
       <Button variant="solid" bg="gray.300" onClick={props.onViewDetails} size="sm">
         View Details
