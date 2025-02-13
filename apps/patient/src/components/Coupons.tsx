@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { FiInfo } from 'react-icons/fi';
 import { CouponModal } from '.';
 import { text as t } from '../utils/text';
+import { isGLP } from '../utils/isGLP';
 import { useOrderContext } from '../views/Main';
 import { DiscountCard } from '../__generated__/graphql';
 import { Card } from './Card';
@@ -25,9 +26,11 @@ export const Coupons = () => {
     return null;
   }
 
-  const isDaw =
-    flattenedFills.find((fill) => fill.prescription?.id === discountCards[0].prescriptionId)
-      ?.prescription?.dispenseAsWritten ?? false;
+  const fill = flattenedFills.find(
+    (fill) => fill.prescription?.id === discountCards[0].prescriptionId
+  );
+  const isDaw = fill?.prescription?.dispenseAsWritten ?? false;
+  const isGlp = isGLP(fill?.treatment.name ?? '');
 
   return (
     <VStack w="full" alignItems="stretch" spacing={4}>
@@ -35,7 +38,7 @@ export const Coupons = () => {
         Coupon
       </Heading>
       {/* Show one coupon only */}
-      <Coupon coupon={discountCards[0]} showGenericPriceDisclaimer={!isDaw} />
+      <Coupon coupon={discountCards[0]} showGenericPriceDisclaimer={!isDaw && !isGlp} />
     </VStack>
   );
 };
