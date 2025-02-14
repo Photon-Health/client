@@ -134,6 +134,8 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
           variables: { id: props.patientId }
         });
 
+        console.log('HERE9', existingPatient);
+
         const newPatient = {
           ...existingPatient.patient,
           medicationHistory: [
@@ -146,6 +148,8 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
             ...existingPatient.patient.medicationHistory
           ]
         };
+        console.log('HERE10', newPatient);
+
         cache.writeQuery({
           query: GET_PATIENT_MED_HISTORY,
           variables: { id: props.patientId },

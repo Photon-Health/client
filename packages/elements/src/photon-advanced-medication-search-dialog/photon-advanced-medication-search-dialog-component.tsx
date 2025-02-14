@@ -7,12 +7,12 @@ import { usePhoton } from '../context';
 
 type AdvancedMedicationSearchDialogProps = {
   open: boolean;
-  withConcept?: boolean;
   title?: string;
 };
 
 const Component = (props: AdvancedMedicationSearchDialogProps) => {
   const client = usePhoton();
+
   let ref: any;
   const [medication, setMedication] = createSignal<Medication | SearchMedication | undefined>(
     undefined
@@ -25,9 +25,7 @@ const Component = (props: AdvancedMedicationSearchDialogProps) => {
     const event = new CustomEvent('photon-medication-selected', {
       composed: true,
       bubbles: true,
-      detail: {
-        medication: medication()
-      }
+      detail: { medication: medication() }
     });
     ref?.dispatchEvent(event);
   };
@@ -43,8 +41,8 @@ const Component = (props: AdvancedMedicationSearchDialogProps) => {
   const handleConfirm = async () => {
     if (addToCatalog()) {
       setSubmitting(true);
-      const addCatalogMutation = client!.getSDK().clinical.catalog.addToCatalog({});
       try {
+        const addCatalogMutation = client!.getSDK().clinical.catalog.addToCatalog({});
         await addCatalogMutation({
           variables: {
             catalogId: catalogId(),
@@ -75,24 +73,11 @@ const Component = (props: AdvancedMedicationSearchDialogProps) => {
         setAddToCatalog(e.detail.addToCatalog);
         setCatalogId(e.detail.catalogId);
       }}
-      on:photon-med-and-concept-search={(e: any) => {
-        setMedication(e.detail.medication);
-      }}
     >
       <style>{photonStyles}</style>
-      <Dialog
-        open={props.open}
-        onClose={handleCancel}
-        size="lg"
-        on:photon-dialog-confirmed={handleConfirm}
-        on:photon-dialog-canceled={handleCancel}
-        on:photon-dialog-alt={handleCancel}
-      >
-        <photon-advanced-medication-search
-          open={props.open}
-          with-concept={props.withConcept}
-          title={props.title}
-        />
+      <Dialog open={props.open} onClose={handleCancel} size="lg">
+        <p class="text-lg font-semibold mt-0 mb-4">{props.title || 'Select a Medication'}</p>
+        <photon-advanced-medication-search open={props.open} />
         <div class="mt-8 flex gap-4 justify-end">
           <Button variant="secondary" onClick={handleCancel}>
             Cancel
@@ -105,17 +90,11 @@ const Component = (props: AdvancedMedicationSearchDialogProps) => {
     </div>
   );
 };
+
 customElement(
   'photon-advanced-medication-search-dialog',
   {
-    open: {
-      value: false,
-      reflect: true,
-      notify: false,
-      attribute: 'open',
-      parse: true
-    },
-    withConcept: false,
+    open: { value: false, reflect: true, notify: false, attribute: 'open', parse: true },
     title: ''
   },
   Component

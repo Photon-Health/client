@@ -83,9 +83,11 @@ export const PatientCard = (props: {
     }
   });
 
+  console.log('HERE5');
   const currentPatientId = createMemo(
     () => (props.store.patient?.value?.id as string) || props?.patientId
   );
+  console.log('HERE6');
   // Listen for changes to the patient
   const patientId = createMemo(() => {
     if (isUpdating()) return '';
@@ -93,11 +95,12 @@ export const PatientCard = (props: {
   });
 
   // Show the address form only if the patient doesnt have an address
+  console.log('HERE7');
   const showAddressForm = createMemo(
     () =>
       props.store.patient?.value?.id && !props.store.patient?.value?.address && props.enableOrder
   );
-
+  console.log('HERE8');
   return (
     <div class="flex flex-col gap-8">
       <Show when={!props?.patientId}>
@@ -161,7 +164,9 @@ export const PatientCard = (props: {
             on:photon-medication-selected={(e: {
               detail: { medication: Medication | SearchMedication };
             }) => {
+              console.log('HERE3');
               setNewMedication(e.detail.medication);
+              console.log('HERE4');
               setMedDialogOpen(false);
             }}
             on:photon-medication-closed={() => {

@@ -1,22 +1,38 @@
 import { customElement } from 'solid-element';
 
-//Shoelace Components
-import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
-import '@shoelace-style/shoelace/dist/components/alert/alert';
+//Shoelace
+import '@shoelace-style/shoelace/dist/components/dropdown/dropdown';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
-import '@shoelace-style/shoelace/dist/components/switch/switch';
+import '@shoelace-style/shoelace/dist/components/input/input';
+import '@shoelace-style/shoelace/dist/components/menu-item/menu-item';
+import '@shoelace-style/shoelace/dist/components/menu/menu';
+import '@shoelace-style/shoelace/dist/components/spinner/spinner';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
+// import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 //Styles
-import { createEffect, createSignal, For, onMount, Show, createMemo } from 'solid-js';
+import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
+import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
+import tailwind from '../tailwind.css?inline';
+import styles from './style.css?inline';
+
+// Types
+import { Treatment, TreatmentOption } from '@photonhealth/sdk/dist/types';
+
+import { debounce } from '@solid-primitives/scheduled';
 import { gql } from '@apollo/client';
+
+import { usePhoton } from '../context';
 import { usePhotonClient } from '@photonhealth/components';
-import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
-import { MedicationConceptDropdown } from './components/MedicationConceptDropdown';
-import { MedicationFilterDropdown } from './components/MedicationFilterDropdown';
+
+import { boldSubstring } from '../photon-medication-search/photon-medication-search-component';
+
+setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
+
+//Styles
+import { createEffect, createSignal, onMount } from 'solid-js';
 
 const GET_CATALOGS = gql`
   query GetCatalogs {
@@ -25,179 +41,144 @@ const GET_CATALOGS = gql`
     }
   }
 `;
-const GET_PRODUCTS = gql`
-  query GetProducts($medId: String!) {
-    medicationProducts(id: $medId) {
+
+const SEARCH_TREATMENTS = gql`
+  query SearchTreatments($filter: TreatmentFilter!) {
+    treatments(filter: $filter) {
       id
       name
-      controlled
     }
   }
 `;
 
-type AdvancedMedicationSearchProps = {
-  open: boolean;
-  withConcept?: boolean;
-  title: string;
+// type AdvancedMedicationSearchProps = {
+//   open: boolean;
+// };
+
+const Component = () => {
+  const client = usePhoton();
+  const client2 = usePhotonClient();
+
+  let ref: any;
+  let inputRef: any;
+  const [medication, setMedication] = createSignal<Medication | SearchMedication | undefined>(
+    undefined
+  );
+  const [searchTerm, setSearchTerm] = createSignal('');
+  const [searchResults, setSearchResults] = createSignal<Medication[]>([]);
+  const [isLoading, setIsLoading] = createSignal(false);
+  const [catalogId, setCatalogId] = createSignal<string>('');
+
+  const fetchSearchResults = debounce(async (term: string) => {
+    if (!term || term.length < 3) {
+      setSearchResults([]);
+      return;
+    }
+    try {
+      setIsLoading(true);
+      const { data } = await client!.sdk.apolloClinical.query({
+        query: SEARCH_TREATMENTS,
+        variables: { filter: { term } },
+        fetchPolicy: 'no-cache'
+      });
+      setSearchResults(data.treatments || []);
+    } catch (error) {
+      console.error('Search error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, 300);
+
+  createEffect(() => {
+    fetchSearchResults(searchTerm());
+  });
+
+  const dispatchAdvancedMedicationSearchOpen = () => {
+    const event = new CustomEvent('photon-advanced-medication-search-open', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        action: 'photon-advanced-medication-search-open'
+      }
+    });
+    ref?.dispatchEvent(event);
+  };
+
+  onMount(async () => {
+    const { data } = await client2!.apollo.query({ query: GET_CATALOGS });
+    if (data.catalogs.length > 0) {
+      setCatalogId(data.catalogs[0].id);
+    }
+    dispatchAdvancedMedicationSearchOpen();
+  });
+
+  const dispatchFormUpdated = (med: any) => {
+    const event = new CustomEvent('photon-form-updated', {
+      composed: true,
+      bubbles: true,
+      detail: { medication: med, catalogId: catalogId() }
+    });
+    setSearchTerm(med.name);
+    ref?.dispatchEvent(event);
+  };
+
+  return (
+    <div ref={ref}>
+      {/* <style>{photonStyles}</style> */}
+      <style>{tailwind}</style>
+      <style>{shoelaceDarkStyles}</style>
+      <style>{shoelaceLightStyles}</style>
+      <style>{styles}</style>
+      <sl-dropdown class="w-full" hoist>
+        <sl-input
+          ref={inputRef}
+          placeholder="Search for medication..."
+          autocomplete="off"
+          value={searchTerm()}
+          class="border border-none p-0"
+          size="medium"
+          clearable
+          on:sl-input={(e: any) => setSearchTerm(e.target.value)}
+          slot="trigger"
+        >
+          <div
+            slot="suffix"
+            classList={{
+              flex: true,
+              hidden: !isLoading()
+            }}
+          >
+            <sl-spinner slot="suffix" />
+          </div>
+        </sl-input>
+        <sl-menu>
+          {searchTerm()?.length < 3 ? (
+            <sl-menu-item disabled>Type at least 3 characters</sl-menu-item>
+          ) : searchResults().length > 0 ? (
+            searchResults().map((med) => (
+              <sl-menu-item
+                onClick={() => {
+                  console.log('ON CLICK', med);
+                  setMedication(med);
+                  dispatchFormUpdated(med);
+                }}
+              >
+                {boldSubstring(med.name, searchTerm())}
+              </sl-menu-item>
+            ))
+          ) : (
+            <sl-menu-item disabled>No results found</sl-menu-item>
+          )}
+        </sl-menu>
+      </sl-dropdown>
+    </div>
+  );
 };
 
 customElement(
   'photon-advanced-medication-search',
-  { open: false, withConcept: false, title: '' },
-  (props: AdvancedMedicationSearchProps) => {
-    let ref: any;
-    const client = usePhotonClient();
-    const [conceptId, setConceptId] = createSignal<string>('');
-    const [concept, setConcept] = createSignal<SearchMedication | undefined>(undefined);
-    const [medicationId, setMedicationId] = createSignal<string>('');
-    const [products, setProducts] = createSignal<(Medication | SearchMedication)[]>([]);
-    const [addToCatalog, setAddToCatalog] = createSignal<boolean>(true);
-    const [selectedMedication, setSelectedMedication] = createSignal<Medication | undefined>(
-      undefined
-    );
-    const [catalogId, setCatalogId] = createSignal<string>('');
-    const medId = createMemo(() => medicationId() || conceptId());
-
-    const dispatchFormUpdated = (medication: Medication, addToCatalog: boolean) => {
-      const event = new CustomEvent(
-        !props?.withConcept ? 'photon-form-updated' : 'photon-med-and-concept-search',
-        {
-          composed: true,
-          bubbles: true,
-          detail: {
-            medication: medication,
-            addToCatalog: addToCatalog,
-            catalogId: catalogId()
-          }
-        }
-      );
-      ref?.dispatchEvent(event);
-    };
-
-    const dispatchAdvancedMedicationSearchOpen = () => {
-      const event = new CustomEvent('photon-advanced-medication-search-open', {
-        composed: true,
-        bubbles: true,
-        detail: {
-          action: 'photon-advanced-medication-search-open'
-        }
-      });
-      ref?.dispatchEvent(event);
-    };
-
-    onMount(async () => {
-      const { data } = await client!.apollo.query({ query: GET_CATALOGS });
-      if (data.catalogs.length > 0) {
-        setCatalogId(data.catalogs[0].id);
-      }
-      dispatchAdvancedMedicationSearchOpen();
-    });
-
-    createEffect(() => {
-      if (!props.open) {
-        setConceptId('');
-        setMedicationId('');
-        setProducts([]);
-      }
-    });
-
-    createEffect(() => {
-      const searchProducts = async (id: string) => {
-        const { data } = await client!.apollo.query({
-          query: GET_PRODUCTS,
-          variables: { medId: id }
-        });
-
-        setSelectedMedication(undefined);
-        setProducts(data.medicationProducts);
-      };
-
-      if (medId()) {
-        searchProducts(medId());
-      }
-    });
-
-    createEffect(() => {
-      if (selectedMedication()) {
-        dispatchFormUpdated(selectedMedication()!, addToCatalog());
-      }
-    });
-
-    return (
-      <div ref={ref}>
-        <style>{photonStyles}</style>
-        <p class="font-sans text-lg text-gray-700 pb-2">{props.title}</p>
-        <div class="flex flex-col gap-2">
-          <MedicationConceptDropdown
-            conceptId={conceptId()}
-            setConcept={(concept) => {
-              setConceptId(concept.id);
-              setConcept(concept);
-              setMedicationId('');
-            }}
-          />
-          <MedicationFilterDropdown
-            filterType="FORM"
-            conceptId={conceptId()}
-            medicationId={medicationId()}
-            setMedicationId={setMedicationId}
-          />
-          <MedicationFilterDropdown
-            filterType="STRENGTH"
-            conceptId={conceptId()}
-            medicationId={medicationId()}
-            setMedicationId={setMedicationId}
-          />
-          <MedicationFilterDropdown
-            filterType="ROUTE"
-            conceptId={conceptId()}
-            medicationId={medicationId()}
-            setMedicationId={setMedicationId}
-          />
-        </div>
-        <Show when={products().length > 0}>
-          <hr class="my-8" />
-          <p class="font-sans text-gray-700 pb-4">Select a medication:</p>
-          <div
-            on:photon-option-selected={(e: any) => {
-              setSelectedMedication(e.detail.value);
-            }}
-          >
-            <photon-radio-group>
-              <Show when={props.withConcept && concept}>
-                <photon-radio-card value={concept()}>{concept()?.name}</photon-radio-card>
-              </Show>
-              <For
-                each={products()
-                  .filter(
-                    //We filter here in order to only display "unique" prescribable names via the UI
-                    //whereas we may have multiple different NDCs for the same prescribable name
-                    (value, currentIndex, self) => {
-                      // We find the first occurence of an item with the same prescribable name
-                      const firstOccurence = self.findIndex((p) => p.name === value.name);
-                      // If the current index is the same as the first occurence, let it through
-                      // otherwise filter it
-                      if (currentIndex === firstOccurence) {
-                        return true;
-                      }
-                    }
-                  )
-                  .sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1))}
-              >
-                {(product) => <photon-radio-card value={product}>{product.name}</photon-radio-card>}
-              </For>
-            </photon-radio-group>
-          </div>
-          <Show when={catalogId().length > 0}>
-            <photon-checkbox
-              on:photon-checkbox-toggled={(e: any) => setAddToCatalog(e.detail.checked)}
-              label="Add Medication to Catalog"
-              disabled={!selectedMedication()}
-              checked={addToCatalog()}
-            />
-          </Show>
-        </Show>
-      </div>
-    );
-  }
+  {
+    open: { value: false, reflect: true, notify: false, attribute: 'open', parse: true }
+  },
+  Component
 );
