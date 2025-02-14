@@ -22,7 +22,7 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
     },
     p
   );
-  let ref: HTMLDivElement;
+  let ref: any;
   const [closeDialogOpen, onCloseDialogOpen] = createSignal<boolean>(false);
 
   const handleConfirm = () => {
