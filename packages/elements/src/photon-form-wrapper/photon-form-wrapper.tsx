@@ -80,7 +80,7 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
         </div>
       </header>
       <div class="overflow-y-scroll w-full min-h-screen bg-[#F9FAFB] pt-28 xs:pt-28 lg:pt-20">
-        <div class="px-4 pb-40 md:pt-52 md:pb-52 md:px-4 w-full h-full sm:w-[600px] xs:mx-auto">
+        <div class="px-4 pb-40 md:pt-4 md:pb-52 md:px-4 w-full h-full sm:w-[600px] xs:mx-auto">
           {props.form}
         </div>
       </div>
