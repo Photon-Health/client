@@ -13,6 +13,7 @@ import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
 import { format } from 'date-fns';
 import { any, min, number, record, refine, size, string } from 'superstruct';
 import { afterDate, between, message } from '../../validators';
+
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/button/button';
@@ -79,7 +80,7 @@ export const AddPrescriptionCard = (props: {
   enableOrder: boolean;
 }) => {
   const client = usePhoton();
-  // const [medDialogOpen, setMedDialogOpen] = createSignal(false);
+
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
@@ -317,11 +318,6 @@ export const AddPrescriptionCard = (props: {
                   })
                 }
               />
-              {/* <photon-add-medication-history-dialog
-                title="Add Medication History"
-                open={medDialogOpen()}
-                on:photon-medication-closed={() => setMedDialogOpen(false)}
-              /> */}
             </div>
           </div>
           <div class="mt-2 sm:mt-0 w-full md:pr-2">
