@@ -24,6 +24,7 @@ import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import tailwind from '../tailwind.css?inline';
+import styles from './styles.css?inline';
 
 const SEARCH_TREATMENTS = gql`
   query SearchTreatments($filter: TreatmentFilter!) {
@@ -125,13 +126,14 @@ const Component = (props: AddMedicationHistoryDialogProps) => {
       <style>{tailwind}</style>
       <style>{shoelaceDarkStyles}</style>
       <style>{shoelaceLightStyles}</style>
+      <style>{styles}</style>
 
       <Dialog open={props.open} onClose={handleCancel} size="lg" position="center">
         <p class="text-lg font-semibold mt-0 mb-4">Add Medication History</p>
         <div class="flex items-center pb-2">
           <p class="text-gray-700 text-sm font-sans">Search for Treatment</p>
         </div>
-        <sl-dropdown class="w-full p-0">
+        <sl-dropdown class="w-full p-0 dropdown">
           <sl-input
             placeholder="Type medication name"
             autocomplete="off"
