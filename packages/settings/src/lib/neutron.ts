@@ -426,5 +426,10 @@ const organizationSettings: {
     mailOrderProviders: [HEALTHWAREHOUSE_PHARMACY_ID, EMPOWER_PHARMACY_ID],
     logo: 'fifty410_logo.png',
     accentColor: '#CB7052'
+  },
+  // Precision telemed
+  org_wmy57WStnHIFXBAr: {
+    mailOrder: true,
+    mailOrderProviders: [EMPOWER_PHARMACY_ID]
   }
 };
