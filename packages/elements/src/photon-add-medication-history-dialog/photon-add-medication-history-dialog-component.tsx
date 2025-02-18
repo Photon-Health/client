@@ -121,12 +121,12 @@ const Component = (props: AddMedicationHistoryDialogProps) => {
 
   return (
     <div ref={ref}>
-      <style>{shoelaceDarkStyles}</style>
-      <style>{shoelaceLightStyles}</style>
       <style>{photonStyles}</style>
       <style>{tailwind}</style>
+      <style>{shoelaceDarkStyles}</style>
+      <style>{shoelaceLightStyles}</style>
 
-      <Dialog open={props.open} onClose={handleCancel} size="lg">
+      <Dialog open={props.open} onClose={handleCancel} size="lg" position="center">
         <p class="text-lg font-semibold mt-0 mb-4">Add Medication History</p>
         <div class="flex items-center pb-2">
           <p class="text-gray-700 text-sm font-sans">Search for Treatment</p>
