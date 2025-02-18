@@ -161,7 +161,6 @@ export const PatientCard = (props: {
           <photon-add-medication-history-dialog
             title="Add Medication History"
             open={showAddMedDialog()}
-            // with-concept={true}
             on:photon-medication-selected={(e: {
               detail: { medication: Medication | SearchMedication };
             }) => {
