@@ -39,8 +39,9 @@ const Component = (props: AdvancedMedicationSearchDialogProps) => {
   };
 
   const handleConfirm = async () => {
+    setSubmitting(true);
+
     if (addToCatalog()) {
-      setSubmitting(true);
       try {
         const addCatalogMutation = client!.getSDK().clinical.catalog.addToCatalog({});
         await addCatalogMutation({
@@ -56,13 +57,11 @@ const Component = (props: AdvancedMedicationSearchDialogProps) => {
     }
 
     dispatchMedicationSelected();
-    props.open = false;
     setSubmitting(false);
   };
 
   const handleCancel = () => {
     dispatchMedicationClosed();
-    props.open = false;
   };
 
   return (
@@ -78,7 +77,7 @@ const Component = (props: AdvancedMedicationSearchDialogProps) => {
       <Dialog open={props.open} onClose={handleCancel} size="lg">
         <p class="text-lg font-semibold mt-0 mb-4">{props.title || 'Select a Medication'}</p>
         <photon-advanced-medication-search open={props.open} />
-        <div class="mt-8 flex gap-4 justify-end">
+        <div class="mt-2 flex gap-4 justify-end">
           <Button variant="secondary" onClick={handleCancel}>
             Cancel
           </Button>

@@ -16,6 +16,7 @@ import { useRecentOrders, RecentOrders } from './systems/RecentOrders';
 import Dialog from './particles/Dialog';
 import Button from './particles/Button';
 import SDKProvider, { usePhotonClient } from './systems/SDKProvider';
+import Table from './particles/Table';
 import Text from './particles/Text';
 import Toaster from './particles/Toaster';
 import {
@@ -25,6 +26,9 @@ import {
 } from './systems/ScreeningAlerts';
 
 import triggerToast from './utils/toastTriggers';
+import generateString from './utils/generateString';
+import { createQuery } from './utils/createQuery';
+import formatDate from './utils/formatDate';
 
 import type { DraftPrescription, TemplateOverrides } from './systems/DraftPrescriptions';
 import { SignatureAttestationModal } from './systems/SignatureAttestation';
@@ -47,15 +51,19 @@ export {
   RadioGroupCards,
   RecentOrders,
   SDKProvider,
+  ScreeningAlerts,
+  ScreeningAlertAcknowledgementDialog,
   SignatureAttestationModal,
   Spinner,
+  Table,
   Text,
   Toaster,
+  createQuery,
+  formatDate,
+  generateString,
   triggerToast,
   usePhotonClient,
-  useRecentOrders,
-  ScreeningAlerts,
-  ScreeningAlertAcknowledgementDialog
+  useRecentOrders
 };
 
 // Export types

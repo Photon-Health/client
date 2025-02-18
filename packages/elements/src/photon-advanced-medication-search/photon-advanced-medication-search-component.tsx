@@ -8,7 +8,6 @@ import '@shoelace-style/shoelace/dist/components/menu-item/menu-item';
 import '@shoelace-style/shoelace/dist/components/menu/menu';
 import '@shoelace-style/shoelace/dist/components/spinner/spinner';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-// import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -19,7 +18,7 @@ import tailwind from '../tailwind.css?inline';
 import styles from './style.css?inline';
 
 // Types
-import { Treatment, TreatmentOption } from '@photonhealth/sdk/dist/types';
+import { Treatment } from '@photonhealth/sdk/dist/types';
 
 import { debounce } from '@solid-primitives/scheduled';
 import { gql } from '@apollo/client';
@@ -32,7 +31,7 @@ import { boldSubstring } from '../photon-medication-search/photon-medication-sea
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 //Styles
-import { createEffect, createSignal, onMount } from 'solid-js';
+import { createEffect, createSignal, onMount, Show } from 'solid-js';
 
 const GET_CATALOGS = gql`
   query GetCatalogs {
@@ -51,23 +50,17 @@ const SEARCH_TREATMENTS = gql`
   }
 `;
 
-// type AdvancedMedicationSearchProps = {
-//   open: boolean;
-// };
-
 const Component = () => {
-  const client = usePhoton();
-  const client2 = usePhotonClient();
+  const store = usePhoton();
+  const client = usePhotonClient();
 
   let ref: any;
-  let inputRef: any;
-  const [medication, setMedication] = createSignal<Medication | SearchMedication | undefined>(
-    undefined
-  );
-  const [searchTerm, setSearchTerm] = createSignal('');
-  const [searchResults, setSearchResults] = createSignal<Medication[]>([]);
+
   const [isLoading, setIsLoading] = createSignal(false);
+  const [searchTerm, setSearchTerm] = createSignal('');
+  const [searchResults, setSearchResults] = createSignal<Treatment[]>([]);
   const [catalogId, setCatalogId] = createSignal<string>('');
+  const [addToCatalog, setAddToCatalog] = createSignal<boolean>(true);
 
   const fetchSearchResults = debounce(async (term: string) => {
     if (!term || term.length < 3) {
@@ -76,7 +69,7 @@ const Component = () => {
     }
     try {
       setIsLoading(true);
-      const { data } = await client!.sdk.apolloClinical.query({
+      const { data } = await store!.sdk.apolloClinical.query({
         query: SEARCH_TREATMENTS,
         variables: { filter: { term } },
         fetchPolicy: 'no-cache'
@@ -105,7 +98,7 @@ const Component = () => {
   };
 
   onMount(async () => {
-    const { data } = await client2!.apollo.query({ query: GET_CATALOGS });
+    const { data } = await client!.apollo.query({ query: GET_CATALOGS });
     if (data.catalogs.length > 0) {
       setCatalogId(data.catalogs[0].id);
     }
@@ -124,21 +117,28 @@ const Component = () => {
 
   return (
     <div ref={ref}>
-      {/* <style>{photonStyles}</style> */}
       <style>{tailwind}</style>
       <style>{shoelaceDarkStyles}</style>
       <style>{shoelaceLightStyles}</style>
       <style>{styles}</style>
-      <sl-dropdown class="w-full" hoist>
+      <sl-dropdown class="w-full">
         <sl-input
-          ref={inputRef}
           placeholder="Search for medication..."
           autocomplete="off"
           value={searchTerm()}
           class="border border-none p-0"
           size="medium"
           clearable
-          on:sl-input={(e: any) => setSearchTerm(e.target.value)}
+          on:sl-input={(e: any) => {
+            setSearchTerm(e.target.value);
+          }}
+          on:keydown={(e: KeyboardEvent) => {
+            if (e.code === 'Space' || e.key === ' ') {
+              e.preventDefault();
+              e.stopPropagation();
+              setSearchTerm(searchTerm() + ' ');
+            }
+          }}
           slot="trigger"
         >
           <div
@@ -156,13 +156,7 @@ const Component = () => {
             <sl-menu-item disabled>Type at least 3 characters</sl-menu-item>
           ) : searchResults().length > 0 ? (
             searchResults().map((med) => (
-              <sl-menu-item
-                onClick={() => {
-                  console.log('ON CLICK', med);
-                  setMedication(med);
-                  dispatchFormUpdated(med);
-                }}
-              >
+              <sl-menu-item onClick={() => dispatchFormUpdated(med)}>
                 {boldSubstring(med.name, searchTerm())}
               </sl-menu-item>
             ))
@@ -171,6 +165,16 @@ const Component = () => {
           )}
         </sl-menu>
       </sl-dropdown>
+      <Show when={catalogId().length > 0}>
+        <div class="mt-2">
+          <photon-checkbox
+            on:photon-checkbox-toggled={(e: any) => setAddToCatalog(e.detail.checked)}
+            label="Add Medication to Catalog"
+            disabled={!searchTerm()}
+            checked={addToCatalog()}
+          />
+        </div>
+      </Show>
     </div>
   );
 };
