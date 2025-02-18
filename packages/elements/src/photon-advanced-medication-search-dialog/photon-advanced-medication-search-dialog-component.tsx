@@ -59,7 +59,7 @@ const Component = (props: AdvancedMedicationSearchDialogProps) => {
       <Dialog open={props.open} onClose={handleCancel} size="lg">
         <p class="text-lg font-semibold mt-0 mb-4">{props.title || 'Select a Medication'}</p>
         <photon-advanced-medication-search open={props.open} />
-        <div class="mt-2 flex gap-4 justify-end">
+        <div class="mt-5 flex gap-4 justify-end">
           <Button variant="secondary" onClick={handleCancel}>
             Cancel
           </Button>
