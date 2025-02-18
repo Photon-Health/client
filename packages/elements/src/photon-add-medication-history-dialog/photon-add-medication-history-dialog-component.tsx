@@ -166,10 +166,7 @@ const Component = (props: AddMedicationHistoryDialogProps) => {
               <sl-menu-item disabled>Type at least 3 characters</sl-menu-item>
             ) : searchResults().length > 0 ? (
               searchResults().map((med) => (
-                <sl-menu-item
-                  class="hover:bg-gray-200"
-                  onClick={() => handleMedicationSelected(med)}
-                >
+                <sl-menu-item onClick={() => handleMedicationSelected(med)}>
                   {boldSubstring(med.name, searchTerm())}
                 </sl-menu-item>
               ))
