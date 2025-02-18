@@ -37,8 +37,8 @@ export const PatientCard = (props: {
   const [newMedication, setNewMedication] = createSignal<Medication | SearchMedication | undefined>(
     undefined
   );
-  const [dialogOpen, setDialogOpen] = createSignal(false);
-  const [medDialogOpen, setMedDialogOpen] = createSignal(false);
+  const [showEditPatientView, setShowEditPatientView] = createSignal(false);
+  const [showAddMedDialog, setShowAddMedDialog] = createSignal(false);
   const { actions, store } = PatientStore;
   const [isUpdating, setIsUpdating] = createSignal(false);
 
@@ -86,6 +86,7 @@ export const PatientCard = (props: {
   const currentPatientId = createMemo(
     () => (props.store.patient?.value?.id as string) || props?.patientId
   );
+
   // Listen for changes to the patient
   const patientId = createMemo(() => {
     if (isUpdating()) return '';
@@ -123,24 +124,26 @@ export const PatientCard = (props: {
             weight={props?.weight}
             weightUnit={props?.weightUnit}
             editPatient={
-              props?.enableOrder && !showAddressForm() ? () => setDialogOpen(true) : undefined
+              props?.enableOrder && !showAddressForm()
+                ? () => setShowEditPatientView(true)
+                : undefined
             }
             address={props?.address || props.store.patient?.value?.address}
           />
           <photon-patient-dialog
             hide-create-prescription={true}
-            open={dialogOpen()}
+            open={showEditPatientView()}
             on:photon-patient-updated={() => {
               setIsUpdating(true);
               actions.getSelectedPatient(props.client!.getSDK(), props.store.patient!.value!.id);
               // Force a rerender of the above PatientInfo by quickly setting the patientId to null and then putting it back
               setTimeout(() => {
                 setIsUpdating(false);
-                setDialogOpen(false);
+                setShowEditPatientView(false);
               }, 100);
             }}
             on:photon-patient-closed={() => {
-              setDialogOpen(false);
+              setShowEditPatientView(false);
             }}
             patient-id={patientId()}
           />
@@ -150,22 +153,21 @@ export const PatientCard = (props: {
         <div>
           <PatientMedHistory
             patientId={patientId()}
-            openAddMedication={() => setMedDialogOpen(true)}
             newMedication={newMedication()}
             enableLinks={props.enableMedHistoryLinks ?? false}
+            openAddMedicationDialog={() => setShowAddMedDialog(true)}
+            hideAddMedicationDialog={() => setShowAddMedDialog(false)}
           />
-          <photon-advanced-medication-search-dialog
+          <photon-add-medication-history-dialog
             title="Add Medication History"
-            open={medDialogOpen()}
-            with-concept={true}
+            open={showAddMedDialog()}
             on:photon-medication-selected={(e: {
               detail: { medication: Medication | SearchMedication };
             }) => {
               setNewMedication(e.detail.medication);
-              setMedDialogOpen(false);
             }}
             on:photon-medication-closed={() => {
-              setMedDialogOpen(false);
+              setShowAddMedDialog(false);
             }}
           />
         </div>

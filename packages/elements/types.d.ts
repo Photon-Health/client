@@ -42,8 +42,7 @@ declare module 'solid-js' {
       'photon-radio-card': unknown;
       'photon-radio-group': unknown;
       'photon-medication-search': unknown;
-      'photon-advanced-medication-search': unknown;
-      'photon-advanced-medication-search-dialog': unknown;
+      'photon-add-medication-history-dialog': unknown;
       'photon-multirx-form': unknown;
     }
   }

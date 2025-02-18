@@ -7,14 +7,18 @@ import {
   Prescription,
   Treatment
 } from '@photonhealth/sdk/dist/types';
-import Table from '../../particles/Table';
-import Text from '../../particles/Text';
-import generateString from '../../utils/generateString';
-import formatDate from '../../utils/formatDate';
-import Button from '../../particles/Button';
-import Card from '../../particles/Card';
-import Icon from '../../particles/Icon';
-import { createQuery } from '../../utils/createQuery';
+import {
+  Icon,
+  Card,
+  Button,
+  Text,
+  Table,
+  generateString,
+  createQuery,
+  formatDate,
+  triggerToast
+} from '../../';
+import { ApolloCache } from '@apollo/client';
 
 const GET_PATIENT_MED_HISTORY = gql`
   query GetPatient($id: ID!) {
@@ -46,8 +50,9 @@ const ADD_MED_HISTORY = gql`
 type PatientMedHistoryProps = {
   patientId: string;
   enableLinks: boolean;
-  openAddMedication?: () => void;
   newMedication?: Medication | SearchMedication;
+  openAddMedicationDialog?: () => void;
+  hideAddMedicationDialog?: () => void;
 };
 
 const LoadingRowFallback = (props: { enableLinks: boolean }) => (
@@ -99,24 +104,23 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
     queryOptions
   );
 
-  createEffect(() => {
-    const sortHistoryFunction = (
-      a: PatientTreatmentHistoryElement,
-      b: PatientTreatmentHistoryElement
-    ) => {
+  const sortHistoryByDate = (chronological: boolean) => {
+    return (a: PatientTreatmentHistoryElement, b: PatientTreatmentHistoryElement) => {
       const dateA = a?.prescription?.writtenAt
         ? new Date(a.prescription.writtenAt).getTime()
         : -Infinity;
       const dateB = b?.prescription?.writtenAt
         ? new Date(b.prescription.writtenAt).getTime()
         : -Infinity;
-      if (chronological()) return dateA - dateB;
+      if (chronological) return dateA - dateB;
       return dateB - dateA;
     };
+  };
 
+  createEffect(() => {
     const medicationHistory = patientMedHistory()?.patient?.treatmentHistory;
     if (medicationHistory) {
-      const sortedMedHistory = medicationHistory.slice().sort(sortHistoryFunction);
+      const sortedMedHistory = medicationHistory.slice().sort(sortHistoryByDate(chronological()));
       setMedHistory(sortedMedHistory);
     }
     if (!patientMedHistory.loading && !medicationHistory) {
@@ -125,34 +129,68 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   });
 
   const addMedHistory = async (medicationId: string) => {
+    const updateCache = (cache: ApolloCache<GetPatientResponse>) => {
+      const newTreatment = {
+        __typename: 'PatientMedication',
+        treatment: {
+          __typename: 'Treatment',
+          ...props.newMedication
+        },
+        active: false,
+        prescription: null
+      };
+
+      const existingData = cache.readQuery({
+        query: GET_PATIENT_MED_HISTORY,
+        variables: { id: props.patientId }
+      }) as GetPatientResponse | null;
+
+      const treatmentHistory = existingData?.patient?.treatmentHistory ?? [];
+
+      cache.writeQuery({
+        query: GET_PATIENT_MED_HISTORY,
+        variables: { id: props.patientId },
+        data: {
+          patient: {
+            __typename: 'Patient',
+            id: props.patientId,
+            treatmentHistory: [newTreatment, ...treatmentHistory]
+          }
+        }
+      });
+    };
+
     await client!.apollo.mutate({
       mutation: ADD_MED_HISTORY,
-      variables: { id: props.patientId, medicationHistory: [{ medicationId, active: false }] },
-      update: (cache) => {
-        const existingPatient: any = cache.readQuery({
+      variables: {
+        id: props.patientId,
+        medicationHistory: [{ medicationId, active: false }]
+      },
+      update: updateCache,
+      refetchQueries: [
+        {
           query: GET_PATIENT_MED_HISTORY,
           variables: { id: props.patientId }
-        });
-
-        const newPatient = {
-          ...existingPatient.patient,
-          medicationHistory: [
-            {
-              __typename: 'PatientMedication',
-              medication: props.newMedication,
-              active: false,
-              prescription: null
-            },
-            ...existingPatient.patient.medicationHistory
-          ]
-        };
-        cache.writeQuery({
-          query: GET_PATIENT_MED_HISTORY,
-          variables: { id: props.patientId },
-          data: { patient: newPatient }
-        });
-      }
+        }
+      ]
     });
+
+    // Update local state immediately
+    const newMed: PatientTreatmentHistoryElement = {
+      active: false,
+      treatment: props.newMedication as Treatment,
+      prescription: undefined
+    };
+    setMedHistory((prev) => (prev ? [newMed, ...prev] : [newMed]));
+
+    // Show toast notification
+    triggerToast({
+      header: 'Medication Added',
+      body: 'Medication has been added to patients history.',
+      status: 'success'
+    });
+
+    props.hideAddMedicationDialog?.();
   };
 
   createEffect(() => {
@@ -165,8 +203,8 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
     <Card addChildrenDivider={true}>
       <div class="flex items-center justify-between">
         <Text color="gray">Medication History</Text>
-        <Show when={props?.openAddMedication}>
-          <Button variant="secondary" size="sm" onClick={props?.openAddMedication}>
+        <Show when={props?.openAddMedicationDialog}>
+          <Button variant="secondary" size="sm" onClick={props?.openAddMedicationDialog}>
             + Add
           </Button>
         </Show>

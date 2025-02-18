@@ -3,14 +3,13 @@ import { useState } from 'react';
 import { FiInfo } from 'react-icons/fi';
 import { CouponModal } from '.';
 import { text as t } from '../utils/text';
-import { isGLP } from '../utils/isGLP';
 import { useOrderContext } from '../views/Main';
 import { DiscountCard } from '../__generated__/graphql';
 import { Card } from './Card';
 import goodrxLogo from '../assets/goodrx_logo.png';
 
 export const Coupons = () => {
-  const { order, flattenedFills } = useOrderContext();
+  const { order } = useOrderContext();
 
   if (!order.discountCards || order.discountCards.length === 0) {
     return null;
@@ -26,31 +25,19 @@ export const Coupons = () => {
     return null;
   }
 
-  const fill = flattenedFills.find(
-    (fill) => fill.prescription?.id === discountCards[0].prescriptionId
-  );
-  const isDaw = fill?.prescription?.dispenseAsWritten ?? false;
-  const isGlp = isGLP(fill?.treatment.name ?? '');
-
   return (
     <VStack w="full" alignItems="stretch" spacing={4}>
       <Heading as="h4" size="md">
         Coupon
       </Heading>
       {/* Show one coupon only */}
-      <Coupon coupon={discountCards[0]} showGenericPriceDisclaimer={!isDaw && !isGlp} />
+      <Coupon coupon={discountCards[0]} />
     </VStack>
   );
 };
 
 type Coupon = Pick<DiscountCard, 'price' | 'bin' | 'pcn' | 'group' | 'memberId' | 'source'>;
-export const Coupon = ({
-  coupon,
-  showGenericPriceDisclaimer
-}: {
-  coupon: Coupon;
-  showGenericPriceDisclaimer?: boolean;
-}) => {
+export const Coupon = ({ coupon }: { coupon: Coupon }) => {
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
 
   const { price, bin, pcn, group, memberId, source } = coupon;
@@ -66,13 +53,6 @@ export const Coupon = ({
         <Text fontSize="4xl" alignSelf="center" fontWeight="700" py={0} lineHeight="1">
           ${price.toFixed(2)}
         </Text>
-        {showGenericPriceDisclaimer ? (
-          <Box w="full" textAlign="center">
-            <Text fontSize="md" fontWeight="medium" color="blackAlpha.600">
-              {t.genericPriceDisclaimer}
-            </Text>
-          </Box>
-        ) : null}
         <Box bgColor="blue.50" w="full" p={2} borderRadius="xl">
           <Text fontWeight="semibold" fontSize="md">
             {t.showThisCoupon}
