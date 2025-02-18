@@ -31,7 +31,7 @@ import { boldSubstring } from '../photon-medication-search/photon-medication-sea
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 //Styles
-import { createEffect, createSignal, onMount, Show } from 'solid-js';
+import { createEffect, createSignal, onMount } from 'solid-js';
 
 const GET_CATALOGS = gql`
   query GetCatalogs {
@@ -60,7 +60,6 @@ const Component = () => {
   const [searchTerm, setSearchTerm] = createSignal('');
   const [searchResults, setSearchResults] = createSignal<Treatment[]>([]);
   const [catalogId, setCatalogId] = createSignal<string>('');
-  const [addToCatalog, setAddToCatalog] = createSignal<boolean>(true);
 
   const fetchSearchResults = debounce(async (term: string) => {
     if (!term || term.length < 3) {
@@ -174,16 +173,6 @@ const Component = () => {
           )}
         </sl-menu>
       </sl-dropdown>
-      <Show when={catalogId().length > 0}>
-        <div class="mt-2">
-          <photon-checkbox
-            on:photon-checkbox-toggled={(e: any) => setAddToCatalog(e.detail.checked)}
-            label="Add Medication to Catalog"
-            disabled={!searchTerm()}
-            checked={addToCatalog()}
-          />
-        </div>
-      </Show>
     </div>
   );
 };

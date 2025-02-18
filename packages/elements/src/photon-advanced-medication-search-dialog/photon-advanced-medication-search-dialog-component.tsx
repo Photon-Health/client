@@ -3,7 +3,6 @@ import { Button, Dialog } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { customElement } from 'solid-element';
 import { createSignal, createEffect } from 'solid-js';
-import { usePhoton } from '../context';
 
 type AdvancedMedicationSearchDialogProps = {
   open: boolean;
@@ -11,14 +10,10 @@ type AdvancedMedicationSearchDialogProps = {
 };
 
 const Component = (props: AdvancedMedicationSearchDialogProps) => {
-  const client = usePhoton();
-
   let ref: any;
   const [medication, setMedication] = createSignal<Medication | SearchMedication | undefined>(
     undefined
   );
-  const [addToCatalog, setAddToCatalog] = createSignal<boolean>(true);
-  const [catalogId, setCatalogId] = createSignal<string>('');
   const [submitting, setSubmitting] = createSignal(false);
 
   const dispatchMedicationSelected = () => {
@@ -40,22 +35,6 @@ const Component = (props: AdvancedMedicationSearchDialogProps) => {
 
   const handleConfirm = async () => {
     setSubmitting(true);
-
-    if (addToCatalog()) {
-      try {
-        const addCatalogMutation = client!.getSDK().clinical.catalog.addToCatalog({});
-        await addCatalogMutation({
-          variables: {
-            catalogId: catalogId(),
-            treatmentId: medication()?.id
-          },
-          awaitRefetchQueries: false
-        });
-      } catch (e: any) {
-        console.log('Error adding to catalog: ', e?.message);
-      }
-    }
-
     dispatchMedicationSelected();
   };
 
@@ -74,8 +53,6 @@ const Component = (props: AdvancedMedicationSearchDialogProps) => {
       ref={ref}
       on:photon-form-updated={(e: any) => {
         setMedication(e.detail.medication);
-        setAddToCatalog(e.detail.addToCatalog);
-        setCatalogId(e.detail.catalogId);
       }}
     >
       <style>{photonStyles}</style>
