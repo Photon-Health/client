@@ -20,7 +20,7 @@ const commonGLPs = [
   'albiglutide'
 ];
 
-export function isGLP(name: string) {
+export function isGLP(name: string): boolean {
   const regex = new RegExp(commonGLPs.join('|'), 'i');
   return regex.test(name);
 }
