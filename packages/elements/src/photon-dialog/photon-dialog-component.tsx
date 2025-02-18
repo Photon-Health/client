@@ -18,7 +18,7 @@ import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 type Proceed = 'photon-dialog-confirmed' | 'photon-dialog-alt' | 'photon-dialog-canceled';
 
-const Component = (props: {
+type DialogProps = {
   label?: string;
   header?: boolean;
   open: boolean;
@@ -30,7 +30,9 @@ const Component = (props: {
   disableSubmit: boolean;
   width?: string;
   overlayClose: boolean;
-}) => {
+};
+
+const Component = (props: DialogProps) => {
   let ref: any;
 
   const dispatchDecision = (proceed: Proceed) => {

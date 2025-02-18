@@ -24,7 +24,7 @@ import { debounce } from '@solid-primitives/scheduled';
 import { gql } from '@apollo/client';
 
 import { usePhoton } from '../context';
-import { usePhotonClient } from '@photonhealth/components';
+import { usePhotonClient, triggerToast } from '@photonhealth/components';
 
 import { boldSubstring } from '../photon-medication-search/photon-medication-search-component';
 
@@ -106,6 +106,15 @@ const Component = () => {
   });
 
   const dispatchFormUpdated = (med: any) => {
+    if (med.id.startsWith('dme')) {
+      triggerToast({
+        header: 'Invalid Selection',
+        body: 'Unable to add medical equipment to medication history.',
+        status: 'error'
+      });
+      return;
+    }
+
     const event = new CustomEvent('photon-form-updated', {
       composed: true,
       bubbles: true,

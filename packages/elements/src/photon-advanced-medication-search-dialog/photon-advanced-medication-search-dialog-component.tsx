@@ -2,7 +2,7 @@ import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
 import { Button, Dialog } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { customElement } from 'solid-element';
-import { createSignal } from 'solid-js';
+import { createSignal, createEffect } from 'solid-js';
 import { usePhoton } from '../context';
 
 type AdvancedMedicationSearchDialogProps = {
@@ -57,8 +57,13 @@ const Component = (props: AdvancedMedicationSearchDialogProps) => {
     }
 
     dispatchMedicationSelected();
-    setSubmitting(false);
   };
+
+  createEffect(() => {
+    if (!props.open) {
+      setSubmitting(false);
+    }
+  });
 
   const handleCancel = () => {
     dispatchMedicationClosed();
