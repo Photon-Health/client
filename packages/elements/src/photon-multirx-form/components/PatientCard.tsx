@@ -158,10 +158,10 @@ export const PatientCard = (props: {
             openAddMedicationDialog={() => setShowAddMedDialog(true)}
             hideAddMedicationDialog={() => setShowAddMedDialog(false)}
           />
-          <photon-advanced-medication-search-dialog
+          <photon-add-medication-history-dialog
             title="Add Medication History"
             open={showAddMedDialog()}
-            with-concept={true}
+            // with-concept={true}
             on:photon-medication-selected={(e: {
               detail: { medication: Medication | SearchMedication };
             }) => {
