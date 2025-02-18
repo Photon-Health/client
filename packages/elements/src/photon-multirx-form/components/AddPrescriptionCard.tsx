@@ -240,7 +240,6 @@ export const AddPrescriptionCard = (props: {
         <div
           class="flex flex-col sm:gap-3"
           on:photon-medication-selected={(e: any) => {
-            // setMedDialogOpen(false);
             setOffCatalog(e.detail.medication);
             props.actions.updateFormValue({
               key: 'treatment',
