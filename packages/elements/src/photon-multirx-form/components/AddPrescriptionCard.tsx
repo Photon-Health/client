@@ -13,6 +13,7 @@ import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
 import { format } from 'date-fns';
 import { any, min, number, record, refine, size, string } from 'superstruct';
 import { afterDate, between, message } from '../../validators';
+
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/button/button';
@@ -79,7 +80,7 @@ export const AddPrescriptionCard = (props: {
   enableOrder: boolean;
 }) => {
   const client = usePhoton();
-  const [medDialogOpen, setMedDialogOpen] = createSignal(false);
+
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
@@ -240,7 +241,6 @@ export const AddPrescriptionCard = (props: {
         <div
           class="flex flex-col sm:gap-3"
           on:photon-medication-selected={(e: any) => {
-            setMedDialogOpen(false);
             setOffCatalog(e.detail.medication);
             props.actions.updateFormValue({
               key: 'treatment',
@@ -317,11 +317,6 @@ export const AddPrescriptionCard = (props: {
                     value: e.detail.checked
                   })
                 }
-              />
-              <photon-advanced-medication-search-dialog
-                title="Advanced Medication Search"
-                open={medDialogOpen()}
-                on:photon-medication-closed={() => setMedDialogOpen(false)}
               />
             </div>
           </div>

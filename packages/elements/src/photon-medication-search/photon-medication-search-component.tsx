@@ -118,7 +118,7 @@ function getFilteredData(
 }
 
 // Bolds the matching substring in the input string
-const boldSubstring = (inputString: string, substring: string) => {
+export const boldSubstring = (inputString: string, substring: string) => {
   // Escape special characters in the substring
   const escapeRegExp = (string: string) => {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

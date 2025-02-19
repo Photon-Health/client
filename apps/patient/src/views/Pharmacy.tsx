@@ -259,7 +259,8 @@ export const Pharmacy = () => {
           offset: 0,
           isOpenNow: enableOpenNow,
           is24hr: enable24Hr,
-          name: 'costco'
+          name: 'costco',
+          includePrice: enablePrice
         });
         if (topRankedCostco.length > 0) {
           return [topRankedCostco[0]];
@@ -269,7 +270,7 @@ export const Pharmacy = () => {
       }
       return [];
     },
-    [enable24Hr, enableOpenNow]
+    [enable24Hr, enableOpenNow, enablePrice]
   );
 
   const getWalgreens = useCallback(
@@ -293,7 +294,8 @@ export const Pharmacy = () => {
           offset: 0,
           isOpenNow: enableOpenNow,
           is24hr: enable24Hr,
-          name: 'walgreens'
+          name: 'walgreens',
+          includePrice: enablePrice
         });
         if (topRankedWags.length > 0) {
           return [topRankedWags[0]];
@@ -303,7 +305,7 @@ export const Pharmacy = () => {
       }
       return [];
     },
-    [enable24Hr, enableOpenNow]
+    [enable24Hr, enableOpenNow, enablePrice]
   );
 
   const loadPharmacies = useCallback(
