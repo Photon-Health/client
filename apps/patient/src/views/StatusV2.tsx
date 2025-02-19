@@ -137,6 +137,13 @@ export const StatusV2 = () => {
     exceptions: f.exceptions.filter((e) => e.resolvedAt == null)
   }));
 
+  let exception;
+  const fulfillmentException =
+    fulfillments.map((f) => f.exceptions[0]?.exceptionType).find((e) => e != null) ?? undefined;
+  const orderException = order?.exceptions.map((e) =>
+    e.resolvedAt == null ? null : e.exceptionType
+  );
+
   const prescriptions = fulfillments.map((f) => ({
     rxName: f.prescription.treatment.name,
     quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
@@ -218,6 +225,7 @@ export const StatusV2 = () => {
           <Container py={6}>
             <VStack spacing={4} width="full" alignItems="stretch">
               <HolidayAlert>Holiday may affect pharmacy hours.</HolidayAlert>
+              <InsuranceAlert exceptions />
               <OrderStatusHeader
                 status={orderState}
                 pharmacyEstimatedReadyAt={pharmacyEstimatedReadyAt}

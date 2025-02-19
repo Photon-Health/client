@@ -22,12 +22,37 @@ export interface OrderStatusHeaderProps {
     | 'ORDER_ERROR'
     | 'RX_CLARIFICATION'
     | 'OTC'
-    | 'MEDICAL_DEVICE';
+    | 'MEDICAL_DEVICE'
+    | 'DEMOGRAPHIC_MISMATCH'
+    | 'PHARMACY_CLOSED'
+    | 'PHARMACY_UNREACHABLE'
+    | 'EXTERNAL_TRANSFER'
+    | 'PHARMACY_NEEDS_INSURANCE_INFO'
+    | 'PHARMACY_DOES_NOT_ACCEPT_INSURANCE';
   pharmacyEstimatedReadyAt?: Date;
   patientDesiredReadyAt?: Date | 'URGENT';
 }
 
-function headerText(status: OrderStatusHeaderProps['status']) {
+function headerText(props: OrderStatusHeaderProps) {
+  const exception = props.exception;
+  const status = props.status;
+  if (exception) {
+    switch (exception) {
+      case 'DEMOGRAPHIC_MISMATCH':
+        return 'Can’t process order';
+      case 'PHARMACY_CLOSED':
+      case 'PHARMACY_UNREACHABLE':
+        return 'Order placed';
+      case 'ORDER_ERROR':
+        return 'Order error';
+      case 'NOT_COVERED':
+        return 'Order issue';
+      case 'EXTERNAL_TRANSFER':
+        return 'Order transferred';
+      default:
+        break;
+    }
+  }
   switch (status) {
     case 'DELAYED':
       return 'Order delayed';
@@ -74,8 +99,15 @@ function subheaderText(props: OrderStatusHeaderProps) {
     return 'Your pharmacy is closed. You can change it if you need your order sooner.';
   }
   if (props.exception === 'ORDER_ERROR') {
-    return 'We’re unable to send your prescription to your pharmacy. Please select a new pharmacy below.';
+    return 'Unable to send to pharmacy. Please select a new pharmacy below.';
   }
+  if (props.exception === 'DEMOGRAPHIC_MISMATCH') {
+    return 'Please reach out to your provider with correct Legal Name / DoB / Address to write you a new prescription.';
+  }
+  if (props.exception === 'EXTERNAL_TRANSFER') {
+    return 'Please contact your original pharmacy if you have questions.';
+  }
+
   // Then just check the status
   if (props.status === 'CREATED' || props.status === 'SENT') {
     return "We're confirming your order with the pharmacy.";
@@ -204,7 +236,7 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
 
   const derivedProps = { ...props, status: derivedStatus };
 
-  const header = headerText(derivedStatus);
+  const header = headerText(derivedProps);
   const subheader = subheaderText(derivedProps);
   const color = progressLevel(derivedProps);
   const progressBar = progress(derivedProps);
