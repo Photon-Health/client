@@ -143,7 +143,7 @@ function subheaderText(props: OrderStatusHeaderProps) {
 }
 
 function progressLevel(props: OrderStatusHeaderProps) {
-  if (props.exception === 'ORDER_ERROR') {
+  if (props.exception === 'ORDER_ERROR' || props.exception === 'DEMOGRAPHIC_MISMATCH') {
     return 'danger';
   }
   if (props.exception != null) {
