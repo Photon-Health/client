@@ -131,7 +131,17 @@ export const AddPrescriptionCard = (props: {
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
 
-    if (!errorsPresent) {
+    const draftedPrescriptions = [...props.store.draftPrescriptions.value];
+    const prescriptionAlreadyExistsInOrder = draftedPrescriptions.some(
+      (draft) => draft.treatment.id === props.store.treatment?.value?.id
+    );
+
+    if (prescriptionAlreadyExistsInOrder) {
+      triggerToast({
+        status: 'error',
+        body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
+      });
+    } else if (!errorsPresent) {
       const draft: DraftPrescription = {
         id: String(Math.random()),
         effectiveDate: props.store.effectiveDate.value,
