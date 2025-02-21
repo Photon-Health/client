@@ -96,7 +96,14 @@ export const ReadyBy = () => {
     const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
 
     // Redirect to payment method selection if applicable
-    if (isOrgWithCouponsEnabled(order.organization.id) && !isMultiRx && !containsGLP) {
+    const isBosonTestOrg = order.organization.id === 'org_KzSVZBQixLRkqj5d'; // Test Organization 11, this is boson us
+    if (
+      isOrgWithCouponsEnabled(order.organization.id) &&
+      !isMultiRx &&
+      // This is a bit complex but it's temporary.
+      // We're testing goodrx glp1 pricing on boson at the moment.
+      (!containsGLP || isBosonTestOrg)
+    ) {
       navigate(`/paymentMethod?orderId=${order?.id}&token=${token}`);
     } else {
       navigate(`/pharmacy?orderId=${order?.id}&token=${token}`);

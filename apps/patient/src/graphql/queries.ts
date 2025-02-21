@@ -52,6 +52,12 @@ export const GET_ORDER = gql`
         trackingNumber
         pharmacyEstimatedReadyAt
       }
+
+      exceptions {
+        exceptionType
+        message
+        resolvedAt
+      }
       pharmacy {
         id
         name

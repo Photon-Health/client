@@ -14,6 +14,7 @@ import { OrderSummary } from '../components/order-summary/OrderSummary';
 import { OrderStatusHeader } from '../components/statusV2/Header';
 import { deriveOrderStatus, getLatestReadyTime } from '../utils/fulfillmentsHelpers';
 import { formatAddress, getFulfillmentType, isDelivery, preparePharmacy } from '../utils/general';
+import { InsuranceAlert } from '../components/InsuranceAlert';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -201,6 +202,12 @@ export const StatusV2 = () => {
     [fulfillments, order.fulfillment]
   );
 
+  const exception = order.exceptions[0]
+    ? order.exceptions[0].exceptionType
+    : order.pharmacy?.isOpen === false
+    ? 'PHARMACY_CLOSED'
+    : fulfillments.map((f) => f.exceptions[0]?.exceptionType).find((e) => e != null) ?? undefined;
+
   return (
     <VStack flex={1}>
       <DemoCtaModal isOpen={showDemoCtaModal} onClose={() => setShowDemoCtaModal(false)} />
@@ -218,17 +225,12 @@ export const StatusV2 = () => {
           <Container py={6}>
             <VStack spacing={4} width="full" alignItems="stretch">
               <HolidayAlert>Holiday may affect pharmacy hours.</HolidayAlert>
+              <InsuranceAlert exception={order.exceptions[0]?.exceptionType} />
               <OrderStatusHeader
                 status={orderState}
                 pharmacyEstimatedReadyAt={pharmacyEstimatedReadyAt}
                 patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
-                exception={
-                  order.pharmacy?.isOpen === false
-                    ? 'PHARMACY_CLOSED'
-                    : fulfillments
-                        .map((f) => f.exceptions[0]?.exceptionType)
-                        .find((e) => e != null) ?? undefined
-                }
+                exception={exception}
               />
             </VStack>
           </Container>
