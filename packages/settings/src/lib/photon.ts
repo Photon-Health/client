@@ -448,7 +448,7 @@ const organizationSettings: {
   },
   // Farm to functional medicine (Vibrant Practice)
   org_vh3vgdvVS6loQp5d: {
-    logo: 'farm_to_functional_medicine_logo.jpg',
+    logo: 'farm_to_functional_medicine_logo.png',
     accentColor: '#285a8c'
   },
   // Kuros Medical (Vibrant Practice)
