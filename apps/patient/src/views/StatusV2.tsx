@@ -225,7 +225,7 @@ export const StatusV2 = () => {
           <Container py={6}>
             <VStack spacing={4} width="full" alignItems="stretch">
               <HolidayAlert>Holiday may affect pharmacy hours.</HolidayAlert>
-              <InsuranceAlert exceptions={order.exceptions} />
+              <InsuranceAlert exception={order.exceptions[0]?.exceptionType} />
               <OrderStatusHeader
                 status={orderState}
                 pharmacyEstimatedReadyAt={pharmacyEstimatedReadyAt}

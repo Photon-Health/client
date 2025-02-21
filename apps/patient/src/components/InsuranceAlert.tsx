@@ -2,30 +2,23 @@ import { Card, CardBody, HStack, Icon, Text, VStack } from '@chakra-ui/react';
 import { OrderExceptionType } from 'apps/patient/src/__generated__/graphql';
 import { FiInfo } from 'react-icons/fi';
 
-function getInsuranceAlertDetails(exceptions: OrderExceptionType[]) {
-  if (exceptions.some((e) => e === 'PHARMACY_NEEDS_INSURANCE_INFO')) {
-    return {
-      text: 'Please bring your insurance card to pick up your prescription.',
-      color: 'blue'
-    };
+const insuranceAlertDetailsMap = {
+  PHARMACY_NEEDS_INSURANCE_INFO: {
+    text: 'Please bring your insurance card to pick up your prescription.',
+    color: 'blue'
+  },
+  PHARMACY_DOES_NOT_ACCEPT_INSURANCE: {
+    text: 'Your pharmacy does not accept your insurance on file. Use a discount card to pay cash price or change your pharmacy.',
+    color: 'orange'
   }
-  if (exceptions.some((e) => e === 'PHARMACY_DOES_NOT_ACCEPT_INSURANCE')) {
-    return {
-      text: 'Your pharmacy does not accept your insurance on file. Use a discount card to pay cash price or change your pharmacy.',
-      color: 'orange'
-    };
-  }
-  return null;
-}
+};
 
 interface InsuranceAlertProps {
-  exceptions: {
-    exceptionType: OrderExceptionType;
-  }[];
+  exception: OrderExceptionType;
 }
 
-export const InsuranceAlert = ({ exceptions }: InsuranceAlertProps) => {
-  const details = getInsuranceAlertDetails(exceptions.map((e) => e.exceptionType));
+export const InsuranceAlert = ({ exception }: InsuranceAlertProps) => {
+  const details = insuranceAlertDetailsMap[exception as keyof typeof insuranceAlertDetailsMap];
   return details ? (
     <VStack align="span" spacing={2} px="2">
       <Card
