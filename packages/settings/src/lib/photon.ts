@@ -410,7 +410,6 @@ const organizationSettings: {
   },
   // Measured
   org_pcPnPx5PVamzjS2p: {
-    sendToPatient: true,
     pickUp: true,
     mailOrder: true,
     mailOrderProviders: [
@@ -446,5 +445,24 @@ const organizationSettings: {
     mailOrderProviders: [HEALTHWAREHOUSE_PHARMACY_ID, EMPOWER_PHARMACY_ID],
     logo: 'fifty410_logo.png',
     accentColor: '#CB7052'
+  },
+  // Farm to functional medicine (Vibrant Practice)
+  org_vh3vgdvVS6loQp5d: {
+    logo: 'farm_to_functional_medicine_logo.jpg',
+    accentColor: '#285a8c'
+  },
+  // Kuros Medical (Vibrant Practice)
+  org_TxpwCLYJXIOEkSKu: {
+    logo: 'kuros_medical_logo.png',
+    accentColor: '#003048'
+  },
+  // Unger Medical (Xyon Health)
+  org_QeB1jtZVEvybXaO1: {
+    sendOrder: false,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
+    sendToPatient: false,
+    enableRxAndOrder: false
   }
 };
