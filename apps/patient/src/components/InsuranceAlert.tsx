@@ -31,15 +31,15 @@ export const InsuranceAlert = ({ exceptions }: InsuranceAlertProps) => {
       <Card
         bgColor="white"
         border="1px solid"
-        borderColor="orange.500"
+        borderColor={`${details.color}.500`}
         borderRadius="2xl"
-        background="#FFFAEB"
+        background={details.color === 'orange' ? '#FFFAEB' : '#EFF8FF'}
         mx={{ base: -3, md: undefined }}
-        color="orange.500"
+        color={`${details.color}.500`}
       >
         <CardBody p={3}>
           <HStack>
-            <Icon color="orange.500" as={FiInfo} fontWeight="bold" />
+            <Icon color={`${details.color}.500`} as={FiInfo} fontWeight="bold" />
             <Text fontWeight="semibold">{details?.text}</Text>
           </HStack>
         </CardBody>

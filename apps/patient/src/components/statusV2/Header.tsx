@@ -146,7 +146,11 @@ function progressLevel(props: OrderStatusHeaderProps) {
   if (props.exception === 'ORDER_ERROR' || props.exception === 'DEMOGRAPHIC_MISMATCH') {
     return 'danger';
   }
-  if (props.exception != null) {
+  if (
+    props.exception != null &&
+    props.exception !== 'PHARMACY_NEEDS_INSURANCE_INFO' &&
+    props.exception !== 'PHARMACY_DOES_NOT_ACCEPT_INSURANCE'
+  ) {
     return 'warning';
   }
   return 'primary';
@@ -237,6 +241,7 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
   const derivedProps = { ...props, status: derivedStatus };
 
   const header = headerText(derivedProps);
+  const displayProgressBar = props.exception !== 'EXTERNAL_TRANSFER';
   const subheader = subheaderText(derivedProps);
   const color = progressLevel(derivedProps);
   const progressBar = progress(derivedProps);
@@ -262,11 +267,13 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
           {subheader}
         </Text>
       )}
-      <HStack w="full">
-        {firstBar}
-        {secondBar}
-        {thirdBar}
-      </HStack>
+      {displayProgressBar && (
+        <HStack w="full">
+          {firstBar}
+          {secondBar}
+          {thirdBar}
+        </HStack>
+      )}
       {(props.status === 'CREATED' || props.status === 'SENT') && props.patientDesiredReadyAt && (
         <HStack
           borderWidth={1}
