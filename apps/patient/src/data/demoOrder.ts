@@ -58,6 +58,7 @@ export const demoOrder: Order = {
     }
   },
   fulfillment: undefined,
+  exceptions: [],
   id: 'ord_FGHDFYT4523465346',
   pharmacy: undefined,
   state: 'ROUTING',

@@ -135,6 +135,12 @@ const GET_ORDER = gql`
         carrier
         trackingNumber
       }
+      exceptions {
+        type
+        message
+        createdAt
+        resolvedAt
+      }
       createdAt
     }
   }

@@ -91,7 +91,7 @@ const MESSAGE: { [key in ExceptionData['exceptionType']]: (order: Order) => stri
   REFILL_TOO_SOON: () =>
     `Your insurance informed the pharmacy that it's too soon for a refill. You can wait, or you can pay cash or use a discount card if you need it sooner.`,
   NOT_COVERED: () =>
-    `This prescription may not be covered by your insurance. You can still pay cash or use a discount card so you can get the medication you need. Your provider may also be able to help you find a covered alternative.`,
+    `This prescription may not be covered by your insurance. You can still pay cash or use a discount card. Your provider may also be able to help you find a covered alternative.`,
   HIGH_COPAY: () =>
     `This medication may have a high out of pocket cost. You may be able to use a discount card and pay significantly less.`,
   RX_CLARIFICATION: () =>
