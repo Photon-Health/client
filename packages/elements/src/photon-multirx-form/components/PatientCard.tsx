@@ -84,7 +84,8 @@ export const PatientCard = (props: {
   });
 
   const currentPatientId = createMemo(
-    () => (props.store.patient?.value?.id as string) || props?.patientId
+    // prefer the passed-in patientId if it exists
+    () => props?.patientId || (props.store.patient?.value?.id as string)
   );
 
   // Listen for changes to the patient
