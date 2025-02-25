@@ -5,6 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Photon Components</title>
     <script src="./src/index.ts" type="module"></script>
+
+    <script>
+      window.addEventListener('photon-order-created', (e) => {
+        console.log(e);
+        const parent = document.getElementById('parent');
+        const one = document.getElementById('one');
+        one.remove();
+
+        const two = document.createElement('photon-prescribe-workflow');
+        two.id = 'two';
+        two.patientId = 'pat_01JGQ28XABSJGGJ7DRGZDB95X4';
+        two.pharmacyId = 'phr_01GA9HPXAF9BC9PC8XM25Q836N';
+        two.templateIds = 'tmp_01HF7H3J7J37458TEMT6R8JW84';
+        two.enableOrder = true;
+        two.hideTemplates = true;
+        setTimeout(() => {
+          parent.appendChild(two);
+        }, 1000);
+      });
+    </script>
   </head>
   <body style="margin: 0px">
     <photon-client
@@ -16,17 +36,14 @@
       uri="https://api.boson.health/graphql"
       auto-login="true"
     >
-      <div style="padding: 15px">
+      <div style="padding: 15px" id="parent">
         <photon-prescribe-workflow
-          patient-id="pat_01GQ0XFBHSH3YXN936A2D2SD7Y"
+          patient-id="pat_01JBHGD32EDTC0RAHC5CY39K85"
           enable-order="true"
-          enable-send-to-patient="true"
-          enable-local-pickup="true"
-          enable-med-history="true"
-          enable-new-medication-search="true"
-          mail-order-ids="phr_01GA9HPVBVJ0E65P819FD881N0,phr_01GCA54GVKA06C905DETQ9SY98"
-          additional-notes="Some additional notes to add to the message."
-          weight="23"
+          hide-templates="true"
+          pharmacy-id="phr_01GA9HPXAF9BC9PC8XM25Q836N"
+          template-ids="tmp_01J6DBEHZX11BPMY38G9PWASMH"
+          id="one"
         ></photon-prescribe-workflow>
       </div>
     </photon-client>

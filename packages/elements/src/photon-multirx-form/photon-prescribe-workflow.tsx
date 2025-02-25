@@ -488,6 +488,14 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   let prescriptionRef: HTMLDivElement | undefined;
 
+  const hasCorrectPatientData = createMemo(() => {
+    return (
+      !props.patientId ||
+      props.patientId === props.formStore.patient?.value?.id ||
+      props.patientId === props.formStore.patient?.value?.externalId
+    );
+  });
+
   return (
     <div ref={ref}>
       <style>{tailwind}</style>
@@ -580,8 +588,13 @@ export function PrescribeWorkflow(props: PrescribeProps) {
               />
               <Show
                 when={
-                  props.formStore.patient?.value?.address ||
-                  (props.formStore.patient?.value?.id && !props.enableOrder)
+                  // if patientId is passed in, we need to ensure it matches the patient id in our store
+                  // so we are not referencing stale data
+                  hasCorrectPatientData() &&
+                  // if orders are enabled, we need a patient's address
+                  (props.formStore.patient?.value?.address ||
+                    // if orders are disabled, we need only a patient id
+                    (props.formStore.patient?.value?.id && !props.enableOrder))
                 }
               >
                 <Show when={props.enableCombineAndDuplicate}>
