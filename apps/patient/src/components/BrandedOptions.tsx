@@ -7,10 +7,17 @@ interface Props {
   options: string[];
   location: string;
   selectedId: string;
+  isAmazonPharmacyTestEnabled: boolean;
   handleSelect: (id: string) => void;
 }
 
-export const BrandedOptions = ({ options, location, selectedId, handleSelect }: Props) => {
+export const BrandedOptions = ({
+  options,
+  location,
+  selectedId,
+  handleSelect,
+  isAmazonPharmacyTestEnabled
+}: Props) => {
   if (!location) return null;
   if (options.length === 0) return null;
 
@@ -31,6 +38,7 @@ export const BrandedOptions = ({ options, location, selectedId, handleSelect }: 
             pharmacyId={id}
             selected={selectedId === id}
             handleSelect={handleSelect}
+            isAmazonPharmacyTestEnabled={isAmazonPharmacyTestEnabled}
           />
         </SlideFade>
       ))}

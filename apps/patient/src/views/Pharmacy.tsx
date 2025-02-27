@@ -29,7 +29,7 @@ import {
 } from '../components';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, preparePharmacy } from '../utils/general';
-import { ExtendedFulfillmentType } from '../utils/models';
+import { ExtendedFulfillmentType, Order } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -155,6 +155,21 @@ export const Pharmacy = () => {
 
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
+
+  const determineIfElligibleForAmazonPharmacyEndOfFebruaryTest = (order: Order) => {
+    const isCorrectOrganization =
+      ['some_org_id', 'some_found_org_id'].indexOf(order?.organization.id) > -1;
+    const hasOnlyOneMedicine =
+      order.fulfillments.map((f) => f.prescription.treatment.id).length === 1;
+    const hasCorrectMedicine =
+      order.fulfillments.map((f) => f.prescription.treatment.id).indexOf('some_medicine_id') > -1;
+
+    return isCorrectOrganization && hasOnlyOneMedicine && hasCorrectMedicine;
+  };
+
+  // experiments
+  const isElligibleForAmazonPharmacyEndOfFebruaryTest =
+    determineIfElligibleForAmazonPharmacyEndOfFebruaryTest(order);
 
   const showToastWarning = () =>
     toast({
@@ -689,6 +704,16 @@ export const Pharmacy = () => {
     );
   }
 
+  const capsuleEnabled = enableCourier && order?.address?.postalCode && capsulePharmacyId;
+
+  const brandedOptions = [
+    ...(capsuleEnabled ? [capsulePharmacyId] : []),
+    ...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : []),
+    ...(isElligibleForAmazonPharmacyEndOfFebruaryTest
+      ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]
+      : [])
+  ];
+
   return (
     <Box>
       {!isDemo && <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />}
@@ -734,20 +759,18 @@ export const Pharmacy = () => {
         </Container>
       </Box>
 
+      {}
+
       <Container pb={showFooter ? 32 : 8}>
         {location ? (
           <VStack spacing={6} align="stretch" pt={4}>
             {enableCourier || enableMailOrder ? (
               <BrandedOptions
-                options={[
-                  ...(enableCourier && order?.address?.postalCode && capsulePharmacyId
-                    ? [capsulePharmacyId]
-                    : []),
-                  ...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : [])
-                ]}
+                options={brandedOptions}
                 location={location}
                 selectedId={selectedId}
                 handleSelect={handleSelect}
+                isAmazonPharmacyTestEnabled={isElligibleForAmazonPharmacyEndOfFebruaryTest}
               />
             ) : null}
 
