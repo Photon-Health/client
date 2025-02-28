@@ -49,7 +49,7 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
       </photon-dialog>
 
       {/* Wrapper */}
-      <header class="flex flex-col md:flex-row items-center px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full z-10 shadow-card z-1000">
+      <header class="flex flex-col md:flex-row items-center px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full shadow-card z-1000">
         <div class="flex justify-start md:flex-1 absolute md:static left-4">
           <Button
             variant="naked"
