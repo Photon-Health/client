@@ -115,14 +115,6 @@ export const StatusV2 = () => {
 
   const isDeliveryPharmacy = isDelivery({ pharmacy, fulfillmentType });
 
-  const orderHasPharmacyCallableException = order.exceptions.some(
-    (e) =>
-      e.exceptionType === 'PHARMACY_UNREACHABLE' ||
-      e.exceptionType === 'PHARMACY_CLOSED' ||
-      e.exceptionType === 'PHARMACY_DOES_NOT_ACCEPT_INSURANCE' ||
-      e.exceptionType === 'PHARMACY_NEEDS_INSURANCE_INFO'
-  );
-
   if (!order) {
     console.error('No order found');
     return null;
@@ -261,12 +253,11 @@ export const StatusV2 = () => {
                       isStatus
                     />
                     <VStack spacing={2} w="full">
+                      {displayPharmacy && !isDeliveryPharmacy && !exception && navigateButton}
                       {displayPharmacy &&
                         !isDeliveryPharmacy &&
-                        !orderHasPharmacyCallableException &&
-                        navigateButton}
-                      {(displayPharmacy && !isDeliveryPharmacy && !canReroute) ||
-                        (orderHasPharmacyCallableException && callPharmacyButton)}
+                        (canReroute || (exception && exception !== 'ORDER_ERROR')) &&
+                        callPharmacyButton}
                       {!isDeliveryPharmacy && displayPharmacy && canReroute && rerouteButton}
                     </VStack>
                   </VStack>
