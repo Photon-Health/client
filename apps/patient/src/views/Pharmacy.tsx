@@ -157,18 +157,21 @@ export const Pharmacy = () => {
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
 
   const determineIfElligibleForAmazonPharmacyEndOfFebruaryTest = (order: Order) => {
-    console.log("yo here's the check dude");
+    const acceptableMedicationIds = [
+      'med_01JAG6NESRV1W8HDGNNTJ7B4CP' // ella on boson
+    ];
+    const acceptableOrganizationIds = [
+      'org_KzSVZBQixLRkqj5d', // Test Organization 11 on boson
+      'some_found_org_id'
+    ];
 
-    console.log('order', JSON.stringify(order, null, 2));
-
-    const isCorrectOrganization =
-      ['org_KzSVZBQixLRkqj5d', 'some_found_org_id'].indexOf(order?.organization.id) > -1;
+    const isCorrectOrganization = acceptableOrganizationIds.indexOf(order?.organization.id) > -1;
     const hasOnlyOneMedicine =
       order.fulfillments.map((f) => f.prescription.treatment.id).length === 1;
     const hasCorrectMedicine =
       order.fulfillments
         .map((f) => f.prescription.treatment.id)
-        .indexOf('med_01JAG6NESRV1W8HDGNNTJ7B4CP') > -1;
+        .filter((id) => acceptableMedicationIds.includes(id)).length >= 1;
 
     return isCorrectOrganization && hasOnlyOneMedicine && hasCorrectMedicine;
   };
