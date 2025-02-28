@@ -157,12 +157,18 @@ export const Pharmacy = () => {
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
 
   const determineIfElligibleForAmazonPharmacyEndOfFebruaryTest = (order: Order) => {
+    console.log("yo here's the check dude");
+
+    console.log('order', JSON.stringify(order, null, 2));
+
     const isCorrectOrganization =
-      ['some_org_id', 'some_found_org_id'].indexOf(order?.organization.id) > -1;
+      ['org_KzSVZBQixLRkqj5d', 'some_found_org_id'].indexOf(order?.organization.id) > -1;
     const hasOnlyOneMedicine =
       order.fulfillments.map((f) => f.prescription.treatment.id).length === 1;
     const hasCorrectMedicine =
-      order.fulfillments.map((f) => f.prescription.treatment.id).indexOf('some_medicine_id') > -1;
+      order.fulfillments
+        .map((f) => f.prescription.treatment.id)
+        .indexOf('med_01JAG6NESRV1W8HDGNNTJ7B4CP') > -1;
 
     return isCorrectOrganization && hasOnlyOneMedicine && hasCorrectMedicine;
   };
@@ -758,8 +764,6 @@ export const Pharmacy = () => {
           </VStack>
         </Container>
       </Box>
-
-      {}
 
       <Container pb={showFooter ? 32 : 8}>
         {location ? (

@@ -216,6 +216,7 @@ interface PharmacyInfoProps {
   showHours?: boolean;
   isCurrentPharmacy?: boolean;
   orderFulfillment?: OrderFulfillment;
+  shouldRenderAmazonPharmacyTest?: boolean;
 }
 
 export const PharmacyInfo = ({
@@ -230,7 +231,8 @@ export const PharmacyInfo = ({
   isStatus = false,
   showHours = false,
   isCurrentPharmacy = false,
-  orderFulfillment
+  orderFulfillment,
+  shouldRenderAmazonPharmacyTest = false
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
@@ -268,7 +270,7 @@ export const PharmacyInfo = ({
               <TagLabel fontWeight="bold">Available in your area</TagLabel>
             </Tag>
           ) : null}
-          {showFreeDeliveryTag ? (
+          {showFreeDeliveryTag && !shouldRenderAmazonPharmacyTest ? (
             <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
               <TagLabel fontWeight="bold">Free Delivery</TagLabel>
             </Tag>
@@ -302,9 +304,20 @@ export const PharmacyInfo = ({
       {showDetails ? (
         <VStack direction={isStatus ? 'column-reverse' : 'column'} w="full" alignItems={'start'}>
           {tagline ? (
-            <Text fontSize="sm" color="gray.500">
-              {tagline}
-            </Text>
+            shouldRenderAmazonPharmacyTest ? (
+              <HStack>
+                <Tag size="sm" colorScheme="blue">
+                  <TagLabel fontWeight="bold">In Stock</TagLabel>
+                </Tag>
+                <Text fontSize="sm" color="gray.500">
+                  Delivers in 1 Day
+                </Text>
+              </HStack>
+            ) : (
+              <Text fontSize="sm" color="gray.500">
+                {tagline}
+              </Text>
+            )
           ) : null}
           <DistanceAddress
             distance={pharmacy.distance}

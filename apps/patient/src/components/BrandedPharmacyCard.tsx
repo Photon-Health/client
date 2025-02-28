@@ -66,9 +66,8 @@ export const BrandedPharmacyCard = ({
 
   const pharmacy = { id: pharmacyId, name: brand.name, logo: brand.logo };
 
-  if (isAmazonPharmacyTestEnabled && pharmacyId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
-    // display amazon pharmacy the way it looks in the mockups
-  }
+  const shouldRenderAmazonPharmacyTest =
+    isAmazonPharmacyTestEnabled && pharmacyId === process.env.REACT_APP_AMAZON_PHARMACY_ID;
 
   return (
     <Card
@@ -86,6 +85,7 @@ export const BrandedPharmacyCard = ({
           tagline={brand.description}
           availableInYourArea={brand.name === 'Capsule Pharmacy'}
           freeDelivery={brand.name === 'Amazon Pharmacy'}
+          shouldRenderAmazonPharmacyTest={shouldRenderAmazonPharmacyTest}
           boldPharmacyName={false}
         />
       </CardBody>
