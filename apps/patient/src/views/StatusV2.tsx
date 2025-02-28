@@ -115,6 +115,10 @@ export const StatusV2 = () => {
 
   const isDeliveryPharmacy = isDelivery({ pharmacy, fulfillmentType });
 
+  const orderHasPharmacyContactException = order.exceptions.some(
+    (e) => e.exceptionType === 'PHARMACY_UNREACHABLE' || e.exceptionType === 'PHARMACY_CLOSED'
+  );
+
   if (!order) {
     console.error('No order found');
     return null;
@@ -253,9 +257,13 @@ export const StatusV2 = () => {
                       isStatus
                     />
                     <VStack spacing={2} w="full">
-                      {displayPharmacy && !isDeliveryPharmacy && navigateButton}
+                      {displayPharmacy &&
+                        !isDeliveryPharmacy &&
+                        !orderHasPharmacyContactException &&
+                        navigateButton}
                       {!isDeliveryPharmacy && displayPharmacy && canReroute && rerouteButton}
-                      {displayPharmacy && !isDeliveryPharmacy && !canReroute && callPharmacyButton}
+                      {(displayPharmacy && !isDeliveryPharmacy && !canReroute) ||
+                        (orderHasPharmacyContactException && callPharmacyButton)}
                     </VStack>
                   </VStack>
                 </Card>
