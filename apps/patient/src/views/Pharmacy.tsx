@@ -590,6 +590,25 @@ export const Pharmacy = () => {
           setTimeout(async () => {
             setShowFooter(false);
 
+            if (isElligibleForAmazonPharmacyEndOfFebruaryTest) {
+              // there should only ever be one treatment if this test is active
+              const treatmentId = order.fulfillments[0].prescription.treatment.id;
+
+              if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
+                datadogRum.addAction('amazon_pharmacy_test_active_and_selected', {
+                  orderId: order.id,
+                  treatmentId,
+                  timestamp: new Date().toISOString()
+                });
+              } else {
+                datadogRum.addAction('amazon_pharmacy_test_active_and_not_selected', {
+                  orderId: order.id,
+                  treatmentId,
+                  timestamp: new Date().toISOString()
+                });
+              }
+            }
+
             // Fudge it so that we can show the pharmacy card on initial load of the
             // status view for all types. On my christmas list for 2024 is better
             // fulfillment types on pharmacies.
