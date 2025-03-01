@@ -829,7 +829,7 @@ export const Pharmacy = () => {
                 location={location}
                 selectedId={selectedId}
                 handleSelect={handleSelect}
-                isAmazonPharmacyTestEnabled={amazonPharmacyEndOfPharmacyTestSegment}
+                amazonPharmacyEndOfFebruaryTestSegment={amazonPharmacyEndOfPharmacyTestSegment}
               />
             ) : null}
 
