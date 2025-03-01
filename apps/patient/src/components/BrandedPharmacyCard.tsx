@@ -14,7 +14,7 @@ interface Props {
   pharmacyId: string;
   selected: boolean;
   handleSelect: (id: string) => void;
-  isAmazonPharmacyTestEnabled?: boolean;
+  amazonPharmacyEndOfFebruaryTestSegment?: string;
 }
 
 export const PHARMACY_BRANDING = {
@@ -59,15 +59,12 @@ export const BrandedPharmacyCard = ({
   pharmacyId,
   selected,
   handleSelect,
-  isAmazonPharmacyTestEnabled
+  amazonPharmacyEndOfFebruaryTestSegment
 }: Props) => {
   const brand = PHARMACY_BRANDING[pharmacyId];
   if (!brand) return null;
 
   const pharmacy = { id: pharmacyId, name: brand.name, logo: brand.logo };
-
-  const shouldRenderAmazonPharmacyTest =
-    isAmazonPharmacyTestEnabled && pharmacyId === process.env.REACT_APP_AMAZON_PHARMACY_ID;
 
   return (
     <Card
@@ -85,7 +82,11 @@ export const BrandedPharmacyCard = ({
           tagline={brand.description}
           availableInYourArea={brand.name === 'Capsule Pharmacy'}
           freeDelivery={brand.name === 'Amazon Pharmacy'}
-          shouldRenderAmazonPharmacyTest={shouldRenderAmazonPharmacyTest}
+          amazonPharmacyEndOfFebruaryTestSegment={
+            pharmacyId === process.env.REACT_APP_AMAZON_PHARMACY_ID
+              ? amazonPharmacyEndOfFebruaryTestSegment
+              : undefined
+          }
           boldPharmacyName={false}
         />
       </CardBody>

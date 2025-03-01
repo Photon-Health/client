@@ -156,29 +156,62 @@ export const Pharmacy = () => {
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
 
-  const determineIfElligibleForAmazonPharmacyEndOfFebruaryTest = (order: Order) => {
-    const acceptableMedicationIds = [
-      'med_01JAG6NESRV1W8HDGNNTJ7B4CP' // ella on boson
-    ];
-    const acceptableOrganizationIds = [
-      'org_KzSVZBQixLRkqj5d', // Test Organization 11 on boson
-      'some_found_org_id'
-    ];
+  // determine if the order is eligible for the Amazon Pharmacy End of February Test
+  // returns undefined if the order is not eligible
+  // or 'zepbound' if the order is eligible for the zepbound test
+  // or 'standard' if the order is eligible for the standard test
+  const determineAmazonPharamcyEndOfFeburaryTestSegment = (order: Order): string | undefined => {
+    const organizationId = order?.organization.id;
 
-    const isCorrectOrganization = acceptableOrganizationIds.indexOf(order?.organization.id) > -1;
+    const organizationsAndAcceptableMedicationNames: Record<string, string[]> = {
+      org_KzSVZBQixLRkqj5d: [
+        // test organization 11 on boson
+        'ondansetron',
+        'bupropion',
+        'zepbound'
+      ],
+      org_wM4wI7rop0W1eNfM: [
+        // found on photon
+        'ondansetron',
+        'bupropion',
+        'zepbound'
+      ]
+    };
+
+    if (!organizationId) {
+      return undefined;
+    }
+
+    const isCorrectOrganization =
+      Object.keys(organizationsAndAcceptableMedicationNames).indexOf(order?.organization.id) > -1;
+
     const hasOnlyOneMedicine =
       order.fulfillments.map((f) => f.prescription.treatment.id).length === 1;
-    const hasCorrectMedicine =
-      order.fulfillments
-        .map((f) => f.prescription.treatment.id)
-        .filter((id) => acceptableMedicationIds.includes(id)).length >= 1;
 
-    return isCorrectOrganization && hasOnlyOneMedicine && hasCorrectMedicine;
+    const correctMedicines = order.fulfillments
+      .map((f) => f.prescription.treatment.name.toLowerCase())
+      .filter((name) =>
+        organizationsAndAcceptableMedicationNames[organizationId]?.some((acceptableName) =>
+          name.includes(acceptableName.toLowerCase())
+        )
+      );
+
+    const hasCorrectMedicine = correctMedicines.length >= 1;
+
+    if (isCorrectOrganization && hasOnlyOneMedicine && hasCorrectMedicine) {
+      if (order.fulfillments[0].prescription.treatment.name.toLowerCase().includes('zepbound')) {
+        return 'zepbound';
+      } else {
+        return 'standard';
+      }
+    } else {
+      return undefined;
+    }
   };
 
   // experiments
-  const isElligibleForAmazonPharmacyEndOfFebruaryTest =
-    determineIfElligibleForAmazonPharmacyEndOfFebruaryTest(order);
+  const amazonPharmacyEndOfPharmacyTestSegment =
+    determineAmazonPharamcyEndOfFeburaryTestSegment(order);
 
   const showToastWarning = () =>
     toast({
@@ -590,7 +623,7 @@ export const Pharmacy = () => {
           setTimeout(async () => {
             setShowFooter(false);
 
-            if (isElligibleForAmazonPharmacyEndOfFebruaryTest) {
+            if (amazonPharmacyEndOfPharmacyTestSegment) {
               // there should only ever be one treatment if this test is active
               const treatmentId = order.fulfillments[0].prescription.treatment.id;
 
@@ -737,7 +770,7 @@ export const Pharmacy = () => {
   const brandedOptions = [
     ...(capsuleEnabled ? [capsulePharmacyId] : []),
     ...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : []),
-    ...(isElligibleForAmazonPharmacyEndOfFebruaryTest
+    ...(amazonPharmacyEndOfPharmacyTestSegment
       ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]
       : [])
   ];
@@ -796,7 +829,7 @@ export const Pharmacy = () => {
                 location={location}
                 selectedId={selectedId}
                 handleSelect={handleSelect}
-                isAmazonPharmacyTestEnabled={isElligibleForAmazonPharmacyEndOfFebruaryTest}
+                isAmazonPharmacyTestEnabled={amazonPharmacyEndOfPharmacyTestSegment}
               />
             ) : null}
 

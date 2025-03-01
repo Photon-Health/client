@@ -7,7 +7,7 @@ interface Props {
   options: string[];
   location: string;
   selectedId: string;
-  isAmazonPharmacyTestEnabled: boolean;
+  amazonPharmacyEndOfFebruaryTestSegment: string | undefined;
   handleSelect: (id: string) => void;
 }
 
@@ -16,7 +16,7 @@ export const BrandedOptions = ({
   location,
   selectedId,
   handleSelect,
-  isAmazonPharmacyTestEnabled
+  amazonPharmacyEndOfFebruaryTestSegment
 }: Props) => {
   if (!location) return null;
   if (options.length === 0) return null;
@@ -38,7 +38,7 @@ export const BrandedOptions = ({
             pharmacyId={id}
             selected={selectedId === id}
             handleSelect={handleSelect}
-            isAmazonPharmacyTestEnabled={isAmazonPharmacyTestEnabled}
+            amazonPharmacyEndOfFebruaryTestSegment={amazonPharmacyEndOfFebruaryTestSegment}
           />
         </SlideFade>
       ))}

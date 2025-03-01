@@ -216,7 +216,7 @@ interface PharmacyInfoProps {
   showHours?: boolean;
   isCurrentPharmacy?: boolean;
   orderFulfillment?: OrderFulfillment;
-  shouldRenderAmazonPharmacyTest?: boolean;
+  amazonPharmacyEndOfFebruaryTestSegment?: string;
 }
 
 export const PharmacyInfo = ({
@@ -232,7 +232,7 @@ export const PharmacyInfo = ({
   showHours = false,
   isCurrentPharmacy = false,
   orderFulfillment,
-  shouldRenderAmazonPharmacyTest = false
+  amazonPharmacyEndOfFebruaryTestSegment
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
@@ -246,6 +246,35 @@ export const PharmacyInfo = ({
     pharmacy.name === 'Capsule Pharmacy' && location.pathname === '/pharmacy';
 
   const trackingLink = orderFulfillment && getFulfillmentTrackingLink(orderFulfillment);
+
+  let amazonPharmacyEndOfFebruaryTestSegmentOverride = undefined;
+  switch (amazonPharmacyEndOfFebruaryTestSegment) {
+    case 'zepbound':
+      amazonPharmacyEndOfFebruaryTestSegmentOverride = (
+        <HStack>
+          <Tag size="sm" colorScheme="blue">
+            <TagLabel fontWeight="bold">In Stock</TagLabel>
+          </Tag>
+          <Text fontSize="sm" color="gray.500">
+            Delivers Overnight
+          </Text>
+        </HStack>
+      );
+      break;
+
+    case 'standard':
+      amazonPharmacyEndOfFebruaryTestSegmentOverride = (
+        <HStack>
+          <Tag size="sm" colorScheme="blue">
+            <TagLabel fontWeight="bold">In Stock</TagLabel>
+          </Tag>
+          <Text fontSize="sm" color="gray.500">
+            Delivers in 1 Day
+          </Text>
+        </HStack>
+      );
+      break;
+  }
 
   return (
     <VStack align="start" w="full">
@@ -270,7 +299,7 @@ export const PharmacyInfo = ({
               <TagLabel fontWeight="bold">Available in your area</TagLabel>
             </Tag>
           ) : null}
-          {showFreeDeliveryTag && !shouldRenderAmazonPharmacyTest ? (
+          {showFreeDeliveryTag && !amazonPharmacyEndOfFebruaryTestSegmentOverride ? (
             <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
               <TagLabel fontWeight="bold">Free Delivery</TagLabel>
             </Tag>
@@ -304,15 +333,8 @@ export const PharmacyInfo = ({
       {showDetails ? (
         <VStack direction={isStatus ? 'column-reverse' : 'column'} w="full" alignItems={'start'}>
           {tagline ? (
-            shouldRenderAmazonPharmacyTest ? (
-              <HStack>
-                <Tag size="sm" colorScheme="blue">
-                  <TagLabel fontWeight="bold">In Stock</TagLabel>
-                </Tag>
-                <Text fontSize="sm" color="gray.500">
-                  Delivers in 1 Day
-                </Text>
-              </HStack>
+            amazonPharmacyEndOfFebruaryTestSegmentOverride ? (
+              amazonPharmacyEndOfFebruaryTestSegmentOverride
             ) : (
               <Text fontSize="sm" color="gray.500">
                 {tagline}
