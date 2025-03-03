@@ -184,10 +184,15 @@ const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes, hours, showHours 
 interface DistanceAddressProps {
   distance?: number;
   address?: Address | null;
+  url?: string;
   fontSize?: string;
 }
 
-const DistanceAddress = ({ distance, address, fontSize = 'sm' }: DistanceAddressProps) => {
+const handleGetDirections = (url?: string) => {
+  window.open(url);
+};
+
+const DistanceAddress = ({ distance, address, url, fontSize = 'sm' }: DistanceAddressProps) => {
   if (!address) return null;
   return (
     <Text fontSize={fontSize} color="gray.500" display="inline">
@@ -197,7 +202,9 @@ const DistanceAddress = ({ distance, address, fontSize = 'sm' }: DistanceAddress
           &bull;
         </Box>
       )}
-      {formatAddress(address)}
+      <Text onClick={() => handleGetDirections(url)} cursor="pointer" color="blue.500">
+        {formatAddress(address)}
+      </Text>
     </Text>
   );
 };
@@ -244,6 +251,8 @@ export const PharmacyInfo = ({
     pharmacy.name === 'Capsule Pharmacy' && location.pathname === '/pharmacy';
 
   const trackingLink = orderFulfillment && getFulfillmentTrackingLink(orderFulfillment);
+  const pharmacyFormattedAddress = pharmacy?.address ? formatAddress(pharmacy.address) : '';
+  const directionsUrl = `http://maps.google.com/?q=${pharmacy?.name}, ${pharmacyFormattedAddress}`;
 
   return (
     <VStack align="start" w="full">
@@ -309,6 +318,7 @@ export const PharmacyInfo = ({
           <DistanceAddress
             distance={pharmacy.distance}
             address={pharmacy.address}
+            url={directionsUrl}
             fontSize={isStatus ? 'md' : 'sm'}
           />
           <Hours
