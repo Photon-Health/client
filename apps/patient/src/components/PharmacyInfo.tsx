@@ -202,7 +202,7 @@ const DistanceAddress = ({ distance, address, url, fontSize = 'sm' }: DistanceAd
           &bull;
         </Box>
       )}
-      <Text onClick={() => handleGetDirections(url)} cursor="pointer">
+      <Text onClick={() => handleGetDirections(url)} cursor="pointer" color="blue.500">
         {formatAddress(address)}
       </Text>
     </Text>
