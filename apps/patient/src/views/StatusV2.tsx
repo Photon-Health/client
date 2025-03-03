@@ -146,33 +146,36 @@ export const StatusV2 = () => {
     expiresAt: f.prescription?.expirationDate ?? new Date()
   }));
 
+  const primaryButtonStyle = {
+    variant: 'solid',
+    bg: 'blue.600',
+    _hover: { bg: 'blue.700' },
+    color: 'white'
+  };
+
   const navigateButton = (
     <Button
       mt={2}
       mx="auto"
       size="md"
       py={6}
-      variant="solid"
       onClick={handleGetDirections}
       leftIcon={<FiNavigation />}
       w="full"
-      bg="blue.600"
-      _hover={{ bg: 'blue.700' }}
-      color="white"
+      {...primaryButtonStyle}
     >
       {t.directions}
     </Button>
   );
 
-  const callPharmacyButton = (
+  const callPharmacyButton = (isPrimary: boolean) => (
     <Button
       mx="auto"
       py={6}
-      variant="outline"
       onClick={handleCallPharmacy}
       leftIcon={<FiPhoneCall />}
       w="full"
-      color="blue.500"
+      {...(isPrimary ? primaryButtonStyle : { variant: 'outline', color: 'blue.500' })}
     >
       {t.callPharmacy}
     </Button>
@@ -253,9 +256,17 @@ export const StatusV2 = () => {
                       isStatus
                     />
                     <VStack spacing={2} w="full">
-                      {displayPharmacy && !isDeliveryPharmacy && navigateButton}
+                      {displayPharmacy && !isDeliveryPharmacy && !exception && navigateButton}
+                      {displayPharmacy &&
+                        !isDeliveryPharmacy &&
+                        canReroute &&
+                        !exception &&
+                        callPharmacyButton(false)}
+                      {displayPharmacy &&
+                        !isDeliveryPharmacy &&
+                        exception &&
+                        callPharmacyButton(true)}
                       {!isDeliveryPharmacy && displayPharmacy && canReroute && rerouteButton}
-                      {displayPharmacy && !isDeliveryPharmacy && !canReroute && callPharmacyButton}
                     </VStack>
                   </VStack>
                 </Card>
