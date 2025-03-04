@@ -186,13 +186,20 @@ interface DistanceAddressProps {
   address?: Address | null;
   url?: string;
   fontSize?: string;
+  isStatus?: boolean;
 }
 
 const handleGetDirections = (url?: string) => {
   window.open(url);
 };
 
-const DistanceAddress = ({ distance, address, url, fontSize = 'sm' }: DistanceAddressProps) => {
+const DistanceAddress = ({
+  distance,
+  address,
+  url,
+  fontSize = 'sm',
+  isStatus
+}: DistanceAddressProps) => {
   if (!address) return null;
   return (
     <Text fontSize={fontSize} color="gray.500" display="inline">
@@ -202,9 +209,13 @@ const DistanceAddress = ({ distance, address, url, fontSize = 'sm' }: DistanceAd
           &bull;
         </Box>
       )}
-      <Text onClick={() => handleGetDirections(url)} cursor="pointer" color="blue.500">
-        {formatAddress(address)}
-      </Text>
+      {isStatus ? (
+        <Text onClick={() => handleGetDirections(url)} cursor="pointer" color="blue.500">
+          {formatAddress(address)}
+        </Text>
+      ) : (
+        <>{formatAddress(address)}</>
+      )}
     </Text>
   );
 };
@@ -320,6 +331,7 @@ export const PharmacyInfo = ({
             address={pharmacy.address}
             url={directionsUrl}
             fontSize={isStatus ? 'md' : 'sm'}
+            isStatus={isStatus}
           />
           <Hours
             isOpen={pharmacy.isOpen}
