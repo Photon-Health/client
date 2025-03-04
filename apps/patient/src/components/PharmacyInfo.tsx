@@ -331,7 +331,7 @@ export const PharmacyInfo = ({
             address={pharmacy.address}
             url={directionsUrl}
             fontSize={isStatus ? 'md' : 'sm'}
-            isStatus
+            isStatus={isStatus}
           />
           <Hours
             isOpen={pharmacy.isOpen}
