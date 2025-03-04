@@ -203,8 +203,8 @@ const DistanceAddress = ({
   if (!address) return null;
   return (
     <Text fontSize={fontSize} color="gray.500" display="inline">
-      {distance ? `${distance.toFixed(1)} mi` : ''}
-      {distance && (
+      {!isStatus && distance ? `${distance.toFixed(1)} mi` : ''}
+      {!isStatus && distance && (
         <Box as="span" display="inline" mx={2}>
           &bull;
         </Box>
