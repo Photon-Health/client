@@ -1,32 +1,17 @@
 import { Button, HStack, Text } from '@chakra-ui/react';
-import { useOrderContext } from '../views/Main';
-import { isOrgWithCouponsEnabled } from '../utils/general';
-import { isGLP } from '../utils/isGLP';
 
 interface PharmacyFiltersProps {
   enableOpenNow: boolean;
   enable24Hr: boolean;
-  enablePrice: boolean;
   setEnableOpenNow: (isOpenNow: boolean) => void;
   setEnable24Hr: (is24Hr: boolean) => void;
-  setEnablePrice: (price: boolean) => void;
 }
 export const PharmacyFilters = ({
   enableOpenNow,
   enable24Hr,
-  enablePrice,
   setEnableOpenNow,
-  setEnable24Hr,
-  setEnablePrice
+  setEnable24Hr
 }: PharmacyFiltersProps) => {
-  const { order, flattenedFills } = useOrderContext();
-
-  // Show the price filter only in specific cases
-  const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
-  const isMultiRx = flattenedFills.length > 1;
-  const showPriceFilter =
-    isOrgWithCouponsEnabled(order.organization.id) && !isMultiRx && !containsGLP;
-
   return (
     <HStack>
       <Text>Filter by</Text>
@@ -54,20 +39,6 @@ export const PharmacyFilters = ({
       >
         24 Hours
       </Button>
-      {showPriceFilter ? (
-        <Button
-          size="sm"
-          borderRadius="lg"
-          variant="filter"
-          isActive={enablePrice}
-          onClick={() => {
-            if (setEnablePrice) setEnablePrice(false);
-            setEnablePrice(!enablePrice);
-          }}
-        >
-          Price
-        </Button>
-      ) : null}
     </HStack>
   );
 };

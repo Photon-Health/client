@@ -1,8 +1,3 @@
-import {
-  GetPharmaciesByLocationQuery,
-  GetPharmaciesWithPriceByLocationQuery,
-  Pharmacy
-} from '../__generated__/graphql';
 import { graphQLClient } from '../configs/graphqlClient';
 
 export const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
@@ -20,15 +15,6 @@ export const getOrder = async (orderId: string) => {
     throw new Error('No order found');
   }
 };
-
-function formatPharmacies(
-  data: GetPharmaciesByLocationQuery | GetPharmaciesWithPriceByLocationQuery
-): Pharmacy[] {
-  if ('pharmaciesByLocation' in data) {
-    return data.pharmaciesByLocation.map((p) => ({ ...p, price: undefined }));
-  }
-  return data.pharmaciesWithPriceByLocation.map((p) => ({ ...p.pharmacy, price: p.price }));
-}
 
 export const getPharmacies = async ({
   searchParams,
@@ -55,22 +41,18 @@ export const getPharmacies = async ({
   try {
     const now = new Date();
 
-    // either the pharmaciesByLocation or pharmaciesWithPriceByLocation query is used
-    // depending on the includePrice flag
-    const fn = includePrice
-      ? graphQLClient.GetPharmaciesWithPriceByLocation
-      : graphQLClient.GetPharmaciesByLocation;
-    return formatPharmacies(
-      await fn({
-        location: {
-          radius: 100,
-          ...searchParams
-        },
-        openAt: isOpenNow ? now : undefined,
-        is24hr,
-        ...(!includePrice ? { limit, offset, name } : {})
-      })
-    );
+    return await graphQLClient.GetPharmaciesByLocation({
+      location: {
+        radius: 100,
+        ...searchParams
+      },
+      openAt: isOpenNow ? now : undefined,
+      is24hr,
+      limit,
+      offset,
+      name,
+      includePrice: includePrice ?? false
+    });
   } catch (e: any) {
     const errorMessage =
       e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on getPharmacies.';
