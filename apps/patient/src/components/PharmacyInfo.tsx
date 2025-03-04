@@ -210,11 +210,11 @@ const DistanceAddress = ({
         </Box>
       )}
       {isStatus ? (
-        <Text onClick={() => handleGetDirections(url)} cursor="pointer" color="blue.500">
+        <Box as="span" onClick={() => handleGetDirections(url)} cursor="pointer" color="blue.500">
           {formatAddress(address)}
-        </Text>
+        </Box>
       ) : (
-        <>{formatAddress(address)}</>
+        <Box as="span">{formatAddress(address)}</Box>
       )}
     </Text>
   );
