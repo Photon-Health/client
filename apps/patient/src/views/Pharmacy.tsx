@@ -394,8 +394,6 @@ export const Pharmacy = () => {
             toast({ ...TOAST_CONFIG.WARNING, title: 'No pharmacies found near location' });
           }
         } else {
-
-
           setTopRankedPharmacies(topRankedPharmacies);
           setPharmacyResults(pharmacies);
           if (initialLoad) {
