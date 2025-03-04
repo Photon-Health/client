@@ -152,6 +152,9 @@ export const Pharmacy = () => {
     !hasTopRankedCostco && // this means org is Sesame, we don't want to show Amazon and top ranked Costco at the same time
     orgSettings.mailOrderNavigate;
 
+  // discount cards
+  const enablePricing = orgSettings.enablePricing ?? false;
+
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
 
@@ -704,11 +707,8 @@ export const Pharmacy = () => {
                   <Link
                     onClick={() => setLocationModalOpen(true)}
                     display="inline"
-                    color="link"
-                    fontWeight="semibold"
                     size="sm"
                     data-dd-privacy="mask"
-                    cursor={isDemo ? 'default' : 'auto'}
                   >
                     <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
                     {cleanAddress}
@@ -753,6 +753,7 @@ export const Pharmacy = () => {
               loadingMore={isLoading}
               showingAllPharmacies={showingAllPharmacies}
               showHeading={(enableCourier || enableMailOrder) ?? false}
+              showPriceToggle={enablePricing}
               enableOpenNow={enableOpenNow}
               enable24Hr={enable24Hr}
               enablePrice={enablePrice}

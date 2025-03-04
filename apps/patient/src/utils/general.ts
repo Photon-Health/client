@@ -233,7 +233,7 @@ export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
-export const isOrgWithCouponsEnabled = (organizationId: string) =>
+export const isOrgWithDiscountCardsEnabled = (organizationId: string) =>
   [
     // Temporarily disabled Sesame discount cards
     // 'org_QFoulY6Ornx7dMdw', // Sesame neutron
