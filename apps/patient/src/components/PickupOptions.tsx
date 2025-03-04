@@ -1,4 +1,14 @@
-import { Box, Button, Heading, Link, SlideFade, Text, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Heading,
+  HStack,
+  Link,
+  Switch,
+  SlideFade,
+  Text,
+  VStack
+} from '@chakra-ui/react';
 
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
@@ -61,13 +71,23 @@ export const PickupOptions = ({
         </SlideFade>
       ) : null}
       <SlideFade offsetY="60px" in={true}>
+        <HStack justify="space-between" w="full">
+          <Text fontSize="sm" fontWeight="medium">
+            Show discount card prices if available
+          </Text>
+          <Switch
+            size="lg"
+            isChecked={enablePrice}
+            onChange={(e) => setEnablePrice(e.target.checked)}
+          />
+        </HStack>
+      </SlideFade>
+      <SlideFade offsetY="60px" in={true}>
         <PharmacyFilters
           enableOpenNow={enableOpenNow}
           enable24Hr={enable24Hr}
-          enablePrice={enablePrice}
           setEnableOpenNow={setEnableOpenNow}
           setEnable24Hr={setEnable24Hr}
-          setEnablePrice={setEnablePrice}
         />
       </SlideFade>
       {enablePrice ? (

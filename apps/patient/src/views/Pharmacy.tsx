@@ -48,7 +48,7 @@ import { demoPharmacies } from '../data/demoPharmacies';
 import { isGLP } from '../utils/isGLP';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { datadogRum } from '@datadog/browser-rum';
-import { Pharmacy as PharmacyType } from '../__generated__/graphql';
+import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__generated__/graphql';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
@@ -253,7 +253,7 @@ export const Pharmacy = () => {
         return [];
       }
       try {
-        const topRankedCostco: EnrichedPharmacy[] = await getPharmacies({
+        const res: GetPharmaciesByLocationQuery = await getPharmacies({
           searchParams: { latitude, longitude, zipCode, radius: 15 },
           limit: 1,
           offset: 0,
@@ -262,6 +262,7 @@ export const Pharmacy = () => {
           name: 'costco',
           includePrice: enablePrice
         });
+        const topRankedCostco = res?.pharmaciesByLocation ?? [];
         if (topRankedCostco.length > 0) {
           return [topRankedCostco[0]];
         }
@@ -288,7 +289,7 @@ export const Pharmacy = () => {
       }
 
       try {
-        const topRankedWags: EnrichedPharmacy[] = await getPharmacies({
+        const res: GetPharmaciesByLocationQuery = await getPharmacies({
           searchParams: { latitude, longitude, zipCode, radius: 15 },
           limit: 1,
           offset: 0,
@@ -297,6 +298,7 @@ export const Pharmacy = () => {
           name: 'walgreens',
           includePrice: enablePrice
         });
+        const topRankedWags = res?.pharmaciesByLocation ?? [];
         if (topRankedWags.length > 0) {
           return [topRankedWags[0]];
         }
@@ -332,8 +334,9 @@ export const Pharmacy = () => {
         is24hr: enable24Hr,
         includePrice: enablePrice
       });
-      setPageOffset(pageOffset + res.length);
-      return res;
+      const pharmacies = res?.pharmaciesByLocation ?? [];
+      setPageOffset(pageOffset + pharmacies.length);
+      return pharmacies;
     },
     [enable24Hr, enableOpenNow, enablePrice]
   );
@@ -494,13 +497,16 @@ export const Pharmacy = () => {
         label: 'Pharmacy Rank',
         value: index + 1
       });
-      if (enablePrice) {
+
+      // Only track price selection if price is enabled and the pharmacy has a price
+      const selectedPrice = pharmacies[index].price;
+      if (enablePrice && selectedPrice) {
         datadogRum.addAction('price_selection', {
           orderId: order.id,
           organization: order.organization.name,
           pharmacyId: selectedPharmacyId,
           timestamp: new Date().toISOString(),
-          price: pharmacies[index].price
+          price: selectedPrice
         });
       }
     }
