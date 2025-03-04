@@ -27,6 +27,7 @@ interface PickupOptionsProps {
   loadingMore: boolean;
   showingAllPharmacies: boolean;
   showHeading: boolean;
+  showPriceToggle: boolean;
   enableOpenNow: boolean;
   enable24Hr: boolean;
   enablePrice: boolean;
@@ -49,6 +50,7 @@ export const PickupOptions = ({
   loadingMore,
   showingAllPharmacies,
   showHeading,
+  showPriceToggle,
   enableOpenNow,
   enable24Hr,
   enablePrice,
@@ -70,18 +72,20 @@ export const PickupOptions = ({
           </VStack>
         </SlideFade>
       ) : null}
-      <SlideFade offsetY="60px" in={true}>
-        <HStack justify="space-between" w="full">
-          <Text fontSize="sm" fontWeight="medium">
-            Show discount card prices if available
-          </Text>
-          <Switch
-            size="lg"
-            isChecked={enablePrice}
-            onChange={(e) => setEnablePrice(e.target.checked)}
-          />
-        </HStack>
-      </SlideFade>
+      {showPriceToggle ? (
+        <SlideFade offsetY="60px" in={true}>
+          <HStack justify="space-between" w="full">
+            <Text fontSize="sm" fontWeight="medium">
+              {t.showDiscountCardPrices}
+            </Text>
+            <Switch
+              size="lg"
+              isChecked={enablePrice}
+              onChange={(e) => setEnablePrice(e.target.checked)}
+            />
+          </HStack>
+        </SlideFade>
+      ) : null}
       <SlideFade offsetY="60px" in={true}>
         <PharmacyFilters
           enableOpenNow={enableOpenNow}
@@ -130,10 +134,7 @@ export const PickupOptions = ({
       </VStack>
       {!showingAllPharmacies && (pharmacies?.length > 0 || loadingMore) ? (
         <Button
-          colorScheme="brand"
-          color="link"
           variant="link"
-          textDecoration="none"
           loadingText=""
           isLoading={loadingMore}
           onClick={handleShowMore}

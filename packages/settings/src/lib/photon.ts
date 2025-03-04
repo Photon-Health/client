@@ -42,6 +42,7 @@ const defaultSettings: OrganizationSettings = {
   enableMedHistory: false,
   enableRxAndOrder: true,
   enableCombineAndDuplicate: true,
+  enablePricing: false,
   topRankedCostco: false,
   topRankedWalgreens: false,
   hideTemplates: false
