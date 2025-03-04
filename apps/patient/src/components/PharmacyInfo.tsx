@@ -210,12 +210,7 @@ const DistanceAddress = ({
         </Box>
       )}
       {isStatus ? (
-        <Link
-          onClick={() => handleGetDirections(url)}
-          cursor="pointer"
-          color="blue.500"
-          fontSize="sm"
-        >
+        <Link onClick={() => handleGetDirections(url)} fontSize="sm">
           <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
           {formatAddress(address)}
         </Link>

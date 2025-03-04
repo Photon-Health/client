@@ -152,7 +152,7 @@ export const Pharmacy = () => {
     !hasTopRankedCostco && // this means org is Sesame, we don't want to show Amazon and top ranked Costco at the same time
     orgSettings.mailOrderNavigate;
 
-  // discount cards
+  // pricing
   const enablePricing = orgSettings.enablePricing ?? false;
 
   // headings
