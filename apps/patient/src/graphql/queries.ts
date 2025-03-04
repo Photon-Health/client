@@ -239,6 +239,8 @@ const PHARMACY_FIELDS = gql`
       openUntil
       timezone
     }
+    price
+    source
   }
 `;
 
