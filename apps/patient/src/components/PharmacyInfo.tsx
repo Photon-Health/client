@@ -269,27 +269,27 @@ export const PharmacyInfo = ({
 
   let amazonPharmacyEndOfFebruaryTestSegmentOverride = undefined;
   switch (amazonPharmacyEndOfFebruaryTestSegment) {
-    case 'zepbound':
+    case 'overnight':
       amazonPharmacyEndOfFebruaryTestSegmentOverride = (
         <HStack>
           <Tag size="sm" colorScheme="blue">
             <TagLabel fontWeight="bold">In Stock</TagLabel>
           </Tag>
           <Text fontSize="sm" color="gray.500">
-            Delivers Overnight
+            Overnight Delivery
           </Text>
         </HStack>
       );
       break;
 
-    case 'standard':
+    case 'one_day_delivery':
       amazonPharmacyEndOfFebruaryTestSegmentOverride = (
         <HStack>
           <Tag size="sm" colorScheme="blue">
             <TagLabel fontWeight="bold">In Stock</TagLabel>
           </Tag>
           <Text fontSize="sm" color="gray.500">
-            Delivers in 1 Day
+            1 Day Delivery
           </Text>
         </HStack>
       );

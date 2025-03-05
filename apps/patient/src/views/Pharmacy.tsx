@@ -162,19 +162,21 @@ export const Pharmacy = () => {
   const determineAmazonPharamcyEndOfFeburaryTestSegment = (order: Order): string | undefined => {
     const organizationId = order?.organization.id;
 
-    const organizationsAndAcceptableMedicationNames: Record<string, string[]> = {
-      org_KzSVZBQixLRkqj5d: [
+    const organizationsAndAcceptableMedicationNames: Record<string, Record<string, string>> = {
+      org_KzSVZBQixLRkqj5d: {
         // test organization 11 on boson
-        'ondansetron',
-        'bupropion',
-        'zepbound'
-      ],
-      org_wM4wI7rop0W1eNfM: [
+        'zepbound subcutaneous solution 2.5 mg/0.5ml': 'overnight',
+        'zepbound subcutaneous solution Auto-injector 2.5 mg/0.5ml': 'overnight',
+        'ondansetron.*oral': 'overnight',
+        'bupropion.*oral': 'one_day_delivery'
+      },
+      org_wM4wI7rop0W1eNfM: {
         // found on photon
-        'ondansetron',
-        'bupropion',
-        'zepbound'
-      ]
+        'zepbound subcutaneous solution 2.5 mg/0.5ml': 'overnight',
+        'zepbound subcutaneous solution Auto-injector 2.5 mg/0.5ml': 'overnight',
+        'ondansetron.*oral': 'overnight',
+        'bupropion.*oral': 'one_day_delivery'
+      }
     };
 
     if (!organizationId) {
@@ -187,22 +189,30 @@ export const Pharmacy = () => {
     const hasOnlyOneMedicine =
       order.fulfillments.map((f) => f.prescription.treatment.id).length === 1;
 
+    const acceptableMedicationNames = Object.keys(
+      organizationsAndAcceptableMedicationNames[organizationId] ?? {}
+    );
+
     const correctMedicines = order.fulfillments
       .map((f) => f.prescription.treatment.name.toLowerCase())
-      .filter((name) =>
-        organizationsAndAcceptableMedicationNames[organizationId]?.some((acceptableName) =>
-          name.includes(acceptableName.toLowerCase())
-        )
-      );
+      .map((name) => {
+        console.log('name', name);
+        const replacedName = 'Zepbound Subcutaneous Solution 2.5 MG/0.5ML';
+        const matches = acceptableMedicationNames.filter((acceptableName) =>
+          replacedName.toLowerCase().match(new RegExp(acceptableName.toLowerCase()))
+        );
+
+        if (matches.length > 0) {
+          return organizationsAndAcceptableMedicationNames[organizationId][matches[0]];
+        }
+        return undefined;
+      })
+      .filter((name) => name != null);
 
     const hasCorrectMedicine = correctMedicines.length >= 1;
 
     if (isCorrectOrganization && hasOnlyOneMedicine && hasCorrectMedicine) {
-      if (order.fulfillments[0].prescription.treatment.name.toLowerCase().includes('zepbound')) {
-        return 'zepbound';
-      } else {
-        return 'standard';
-      }
+      return correctMedicines[0];
     } else {
       return undefined;
     }
