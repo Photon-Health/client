@@ -166,15 +166,15 @@ export const Pharmacy = () => {
       org_KzSVZBQixLRkqj5d: {
         // test organization 11 on boson
         'zepbound subcutaneous solution 2.5 mg/0.5ml': 'overnight',
-        'zepbound subcutaneous solution Auto-injector 2.5 mg/0.5ml': 'overnight',
-        'ondansetron.*oral': 'overnight',
+        'zepbound subcutaneous solution auto-injector 2.5 mg/0.5ml': 'overnight',
+        'ondansetron.*oral': 'one_day_delivery',
         'bupropion.*oral': 'one_day_delivery'
       },
       org_wM4wI7rop0W1eNfM: {
         // found on photon
         'zepbound subcutaneous solution 2.5 mg/0.5ml': 'overnight',
-        'zepbound subcutaneous solution Auto-injector 2.5 mg/0.5ml': 'overnight',
-        'ondansetron.*oral': 'overnight',
+        'zepbound subcutaneous solution auto-injector 2.5 mg/0.5ml': 'overnight',
+        'ondansetron.*oral': 'one_day_delivery',
         'bupropion.*oral': 'one_day_delivery'
       }
     };
