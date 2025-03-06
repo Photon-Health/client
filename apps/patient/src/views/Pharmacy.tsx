@@ -53,7 +53,7 @@ import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__gen
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
 export const Pharmacy = () => {
-  const { order, flattenedFills, setOrder, isDemo, fetchOrder, paymentMethod } = useOrderContext();
+  const { order, flattenedFills, setOrder, isDemo, fetchOrder } = useOrderContext();
 
   const orgSettings = getSettings(order?.organization.id);
 
@@ -108,7 +108,7 @@ export const Pharmacy = () => {
     openNow !== null ? !!openNow : order?.readyBy === 'Urgent'
   );
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
-  const [enablePrice, setEnablePrice] = useState(paymentMethod === 'Cash Price');
+  const [enablePrice, setEnablePrice] = useState(false);
 
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
@@ -153,7 +153,10 @@ export const Pharmacy = () => {
     orgSettings.mailOrderNavigate;
 
   // pricing
-  const enablePricing = orgSettings.enablePricing ?? false;
+  const containsZepbound = flattenedFills.some((fill) =>
+    fill.treatment.name.toLowerCase().includes('zepbound')
+  );
+  const enablePricing = orgSettings.enablePricing && containsZepbound ? true : false;
 
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
