@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { FiStar } from 'react-icons/fi';
+import { FiMapPin, FiStar } from 'react-icons/fi';
 import { useLocation } from 'react-router-dom';
 import { Address, EnrichedPharmacy, OrderFulfillment } from '../utils/models';
 import { text as t } from '../utils/text';
@@ -203,16 +203,17 @@ const DistanceAddress = ({
   if (!address) return null;
   return (
     <Text fontSize={fontSize} color="gray.500" display="inline">
-      {distance ? `${distance.toFixed(1)} mi` : ''}
-      {distance && (
+      {!isStatus && distance ? `${distance.toFixed(1)} mi` : ''}
+      {!isStatus && distance && (
         <Box as="span" display="inline" mx={2}>
           &bull;
         </Box>
       )}
       {isStatus ? (
-        <Text onClick={() => handleGetDirections(url)} cursor="pointer" color="blue.500">
+        <Link onClick={() => handleGetDirections(url)} fontSize="sm">
+          <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
           {formatAddress(address)}
-        </Text>
+        </Link>
       ) : (
         <>{formatAddress(address)}</>
       )}

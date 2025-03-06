@@ -12,7 +12,6 @@ import { Pharmacy } from './views/Pharmacy';
 import { ReadyBy } from './views/ReadyBy';
 import { Review } from './views/Review';
 import { StatusV2 } from './views/StatusV2';
-import { PaymentMethod } from './views/PaymentMethod';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -20,7 +19,6 @@ const router = createBrowserRouter(
       <Route path="/" element={<Main />}>
         <Route path="/review" element={<Review />} />
         <Route path="/readyBy" element={<ReadyBy />} />
-        <Route path="/paymentMethod" element={<PaymentMethod />} />
         <Route path="/pharmacy" element={<Pharmacy />} />
         <Route path="/status" element={<StatusV2 />} />
         {/* Leaving this here in case we need to roll back */}

@@ -1,4 +1,4 @@
-import { Box, Heading, HStack, Icon, Image, Text, VStack } from '@chakra-ui/react';
+import { Box, Heading, HStack, Icon, Image, Link, Text, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import { FiInfo } from 'react-icons/fi';
 import { CouponModal } from '.';
@@ -28,7 +28,7 @@ export const Coupons = () => {
   return (
     <VStack w="full" alignItems="stretch" spacing={4}>
       <Heading as="h4" size="md">
-        Coupon
+        Discount Card
       </Heading>
       {/* Show one coupon only */}
       <Coupon coupon={discountCards[0]} />
@@ -36,11 +36,14 @@ export const Coupons = () => {
   );
 };
 
-type Coupon = Pick<DiscountCard, 'price' | 'bin' | 'pcn' | 'group' | 'memberId' | 'source'>;
+type Coupon = Pick<
+  DiscountCard,
+  'price' | 'retailPrice' | 'bin' | 'pcn' | 'group' | 'memberId' | 'source'
+>;
 export const Coupon = ({ coupon }: { coupon: Coupon }) => {
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
 
-  const { price, bin, pcn, group, memberId, source } = coupon;
+  const { price, retailPrice, bin, pcn, group, memberId, source } = coupon;
 
   if (!price || !bin || !pcn || !group || !memberId) {
     return null;
@@ -53,6 +56,12 @@ export const Coupon = ({ coupon }: { coupon: Coupon }) => {
         <Text fontSize="4xl" alignSelf="center" fontWeight="700" py={0} lineHeight="1">
           ${price.toFixed(2)}
         </Text>
+        {retailPrice ? (
+          <Text alignSelf="center" color="gray.500">
+            Retail price:{' '}
+            <span style={{ textDecoration: 'line-through' }}>${retailPrice.toFixed(2)}</span>
+          </Text>
+        ) : null}
         <Box bgColor="blue.50" w="full" p={2} borderRadius="xl">
           <Text fontWeight="semibold" fontSize="md">
             {t.showThisCoupon}
@@ -91,16 +100,9 @@ export const Coupon = ({ coupon }: { coupon: Coupon }) => {
       </VStack>
       <HStack color="blue.500" w="full" justify="center">
         <Icon as={FiInfo} />
-        <Text
-          as="u"
-          textUnderlineOffset="2px"
-          fontSize="sm"
-          fontWeight="semibold"
-          cursor="pointer"
-          onClick={() => setCouponModalOpen(true)}
-        >
+        <Link fontSize="sm" onClick={() => setCouponModalOpen(true)}>
           {t.howToCoupon}
-        </Text>
+        </Link>
       </HStack>
     </Card>
   );
