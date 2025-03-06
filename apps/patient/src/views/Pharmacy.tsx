@@ -72,9 +72,9 @@ export const Pharmacy = () => {
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
 
   // top ranked pharmacies
-  const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
-  const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
   const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
+  const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco && containsGLP; // only show costco if there are GLP treatments
+  const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
 
   // View state
   const [showFooter, setShowFooter] = useState<boolean>(false);
@@ -354,7 +354,7 @@ export const Pharmacy = () => {
         let topRankedPharmacies: EnrichedPharmacy[] = [];
 
         // check if top ranked costco is enabled and there are GLP treatments
-        if (enableTopRankedCostco && !enablePrice) {
+        if (enableTopRankedCostco) {
           topRankedPharmacies = [
             ...(await getCostco({ latitude, longitude })),
             ...topRankedPharmacies
