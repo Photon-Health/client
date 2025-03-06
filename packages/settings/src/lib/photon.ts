@@ -465,5 +465,9 @@ const organizationSettings: {
     mailOrderProviders: [CUREXA_PHARMACY_ID],
     sendToPatient: false,
     enableRxAndOrder: false
+  },
+  org_7IjlTEWfLpmTHjHn: {
+    accentColor: '#21201C',
+    logo: 'remo_logo.svg'
   }
 };
