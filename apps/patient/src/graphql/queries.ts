@@ -179,6 +179,7 @@ export const GET_ORDER = gql`
         id
         prescriptionId
         price
+        retailPrice
         bin
         pcn
         group
