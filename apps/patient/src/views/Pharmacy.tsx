@@ -170,9 +170,18 @@ export const Pharmacy = () => {
         patterns: ['wegovy subcutaneous solution auto-injector 0.25 MG/0.5ML'],
         deliveryType: 'overnight'
       },
-      { patterns: ['zepbound subcutaneous solution 2.5 mg/0.5ml'], deliveryType: 'overnight' },
-      { patterns: ['zepbound subcutaneous solution 5 mg/0.5ml'], deliveryType: 'overnight' },
-      { patterns: ['zepbound subcutaneous solution 7.5 mg/0.5ml'], deliveryType: 'overnight' },
+      {
+        patterns: ['Zepbound Subcutaneous Solution Auto-injector 2.5 MG/0.5ML'],
+        deliveryType: 'overnight'
+      },
+      {
+        patterns: ['Zepbound Subcutaneous Solution Auto-injector 5 MG/0.5ML'],
+        deliveryType: 'overnight'
+      },
+      {
+        patterns: ['zepbound subcutaneous solution Auto-injector 7.5 mg/0.5ml'],
+        deliveryType: 'overnight'
+      },
       { patterns: ['ondansetron.*oral'], deliveryType: 'one_day_delivery' },
       { patterns: ['bupropion.*oral'], deliveryType: 'one_day_delivery' },
 
