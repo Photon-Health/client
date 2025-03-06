@@ -212,7 +212,8 @@ export const text = {
   setLoc: 'Set location',
   setSearchLoc: 'Set search location',
   shipTo: (deliveryAddress: string) => `Ship to ${deliveryAddress}`,
-  showThisCoupon: 'You must show this coupon at the pharmacy to get this discounted price',
+  showDiscountCardPrices: 'Show discount card prices if available',
+  showThisCoupon: 'Show this coupon at the pharmacy to get this discounted price',
   showCouponToPharmacy: (isPlural: boolean) =>
     `Just show it to the pharmacist when you pick up your ${
       isPlural ? 'prescriptions' : 'prescription'

@@ -1,4 +1,14 @@
-import { Box, Button, Heading, Link, SlideFade, Text, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Heading,
+  HStack,
+  Link,
+  Switch,
+  SlideFade,
+  Text,
+  VStack
+} from '@chakra-ui/react';
 
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
@@ -17,6 +27,7 @@ interface PickupOptionsProps {
   loadingMore: boolean;
   showingAllPharmacies: boolean;
   showHeading: boolean;
+  showPriceToggle: boolean;
   enableOpenNow: boolean;
   enable24Hr: boolean;
   enablePrice: boolean;
@@ -39,6 +50,7 @@ export const PickupOptions = ({
   loadingMore,
   showingAllPharmacies,
   showHeading,
+  showPriceToggle,
   enableOpenNow,
   enable24Hr,
   enablePrice,
@@ -60,14 +72,26 @@ export const PickupOptions = ({
           </VStack>
         </SlideFade>
       ) : null}
+      {showPriceToggle ? (
+        <SlideFade offsetY="60px" in={true}>
+          <HStack justify="space-between" w="full">
+            <Text fontSize="sm" fontWeight="medium">
+              {t.showDiscountCardPrices}
+            </Text>
+            <Switch
+              size="lg"
+              isChecked={enablePrice}
+              onChange={(e) => setEnablePrice(e.target.checked)}
+            />
+          </HStack>
+        </SlideFade>
+      ) : null}
       <SlideFade offsetY="60px" in={true}>
         <PharmacyFilters
           enableOpenNow={enableOpenNow}
           enable24Hr={enable24Hr}
-          enablePrice={enablePrice}
           setEnableOpenNow={setEnableOpenNow}
           setEnable24Hr={setEnable24Hr}
-          setEnablePrice={setEnablePrice}
         />
       </SlideFade>
       {enablePrice ? (
@@ -110,10 +134,7 @@ export const PickupOptions = ({
       </VStack>
       {!showingAllPharmacies && (pharmacies?.length > 0 || loadingMore) ? (
         <Button
-          colorScheme="brand"
-          color="link"
           variant="link"
-          textDecoration="none"
           loadingText=""
           isLoading={loadingMore}
           onClick={handleShowMore}

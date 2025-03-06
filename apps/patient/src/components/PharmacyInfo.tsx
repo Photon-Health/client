@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { FiStar } from 'react-icons/fi';
+import { FiMapPin, FiStar } from 'react-icons/fi';
 import { useLocation } from 'react-router-dom';
 import { Address, EnrichedPharmacy, OrderFulfillment } from '../utils/models';
 import { text as t } from '../utils/text';
@@ -184,20 +184,39 @@ const Hours = ({ is24Hr, isOpen, isClosingSoon, opens, closes, hours, showHours 
 interface DistanceAddressProps {
   distance?: number;
   address?: Address | null;
+  url?: string;
   fontSize?: string;
+  isStatus?: boolean;
 }
 
-const DistanceAddress = ({ distance, address, fontSize = 'sm' }: DistanceAddressProps) => {
+const handleGetDirections = (url?: string) => {
+  window.open(url);
+};
+
+const DistanceAddress = ({
+  distance,
+  address,
+  url,
+  fontSize = 'sm',
+  isStatus
+}: DistanceAddressProps) => {
   if (!address) return null;
   return (
     <Text fontSize={fontSize} color="gray.500" display="inline">
-      {distance ? `${distance.toFixed(1)} mi` : ''}
-      {distance && (
+      {!isStatus && distance ? `${distance.toFixed(1)} mi` : ''}
+      {!isStatus && distance && (
         <Box as="span" display="inline" mx={2}>
           &bull;
         </Box>
       )}
-      {formatAddress(address)}
+      {isStatus ? (
+        <Link onClick={() => handleGetDirections(url)} fontSize="sm">
+          <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
+          {formatAddress(address)}
+        </Link>
+      ) : (
+        <>{formatAddress(address)}</>
+      )}
     </Text>
   );
 };
@@ -244,6 +263,8 @@ export const PharmacyInfo = ({
     pharmacy.name === 'Capsule Pharmacy' && location.pathname === '/pharmacy';
 
   const trackingLink = orderFulfillment && getFulfillmentTrackingLink(orderFulfillment);
+  const pharmacyFormattedAddress = pharmacy?.address ? formatAddress(pharmacy.address) : '';
+  const directionsUrl = `http://maps.google.com/?q=${pharmacy?.name}, ${pharmacyFormattedAddress}`;
 
   return (
     <VStack align="start" w="full">
@@ -309,7 +330,9 @@ export const PharmacyInfo = ({
           <DistanceAddress
             distance={pharmacy.distance}
             address={pharmacy.address}
+            url={directionsUrl}
             fontSize={isStatus ? 'md' : 'sm'}
+            isStatus={isStatus}
           />
           <Hours
             isOpen={pharmacy.isOpen}
