@@ -36,11 +36,14 @@ export const Coupons = () => {
   );
 };
 
-type Coupon = Pick<DiscountCard, 'price' | 'bin' | 'pcn' | 'group' | 'memberId' | 'source'>;
+type Coupon = Pick<
+  DiscountCard,
+  'price' | 'retailPrice' | 'bin' | 'pcn' | 'group' | 'memberId' | 'source'
+>;
 export const Coupon = ({ coupon }: { coupon: Coupon }) => {
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
 
-  const { price, bin, pcn, group, memberId, source } = coupon;
+  const { price, retailPrice, bin, pcn, group, memberId, source } = coupon;
 
   if (!price || !bin || !pcn || !group || !memberId) {
     return null;
@@ -53,6 +56,11 @@ export const Coupon = ({ coupon }: { coupon: Coupon }) => {
         <Text fontSize="4xl" alignSelf="center" fontWeight="700" py={0} lineHeight="1">
           ${price.toFixed(2)}
         </Text>
+        {retailPrice ? (
+          <Text fontSize="4xl" alignSelf="center" fontWeight="700" py={0} lineHeight="1">
+            Retail price: ${retailPrice.toFixed(2)}
+          </Text>
+        ) : null}
         <Box bgColor="blue.50" w="full" p={2} borderRadius="xl">
           <Text fontWeight="semibold" fontSize="md">
             {t.showThisCoupon}
