@@ -57,7 +57,7 @@ export const Coupon = ({ coupon }: { coupon: Coupon }) => {
           ${price.toFixed(2)}
         </Text>
         {retailPrice ? (
-          <Text fontSize="4xl" alignSelf="center" fontWeight="700" py={0} lineHeight="1">
+          <Text alignSelf="center" fontWeight="700" py={0} lineHeight="1">
             Retail price: ${retailPrice.toFixed(2)}
           </Text>
         ) : null}
