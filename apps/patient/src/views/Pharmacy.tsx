@@ -162,21 +162,34 @@ export const Pharmacy = () => {
   const determineAmazonPharamcyEndOfFeburaryTestSegment = (order: Order): string | undefined => {
     const organizationId = order?.organization.id;
 
-    const organizationsAndAcceptableMedicationNames: Record<string, Record<string, string>> = {
-      org_KzSVZBQixLRkqj5d: {
-        // test organization 11 on boson
-        'zepbound subcutaneous solution 2.5 mg/0.5ml': 'overnight',
-        'zepbound subcutaneous solution auto-injector 2.5 mg/0.5ml': 'overnight',
-        'ondansetron.*oral': 'one_day_delivery',
-        'bupropion.*oral': 'one_day_delivery'
+    const medicinesAndDeliveryTypes = [
+      { patterns: ['wegovy 0.25 MG in 0.5 ML Auto-Injector'], deliveryType: 'overnight' },
+      { patterns: ['zepbound subcutaneous solution 2.5 mg/0.5ml'], deliveryType: 'overnight' },
+      { patterns: ['zepbound subcutaneous solution 5 mg/0.5ml'], deliveryType: 'overnight' },
+      { patterns: ['zepbound subcutaneous solution 7.5 mg/0.5ml'], deliveryType: 'overnight' },
+      { patterns: ['ondansetron.*oral'], deliveryType: 'one_day_delivery' },
+      { patterns: ['bupropion.*oral'], deliveryType: 'one_day_delivery' },
+
+      {
+        patterns: ['zepbound subcutaneous solution 2.5 mg/0.5ml', 'ondansetron.*oral'],
+        deliveryType: 'overnight'
       },
-      org_wM4wI7rop0W1eNfM: {
-        // found on photon
-        'zepbound subcutaneous solution 2.5 mg/0.5ml': 'overnight',
-        'zepbound subcutaneous solution auto-injector 2.5 mg/0.5ml': 'overnight',
-        'ondansetron.*oral': 'one_day_delivery',
-        'bupropion.*oral': 'one_day_delivery'
+      {
+        patterns: ['zepbound subcutaneous solution 5 mg/0.5ml', 'ondansetron.*oral'],
+        deliveryType: 'overnight'
+      },
+      {
+        patterns: ['zepbound subcutaneous solution 7.5 mg/0.5ml', 'ondansetron.*oral'],
+        deliveryType: 'overnight'
       }
+    ];
+
+    const organizationsAndAcceptableMedicationNames: Record<
+      string,
+      { patterns: string[]; deliveryType: string }[]
+    > = {
+      org_KzSVZBQixLRkqj5d: medicinesAndDeliveryTypes,
+      org_wM4wI7rop0W1eNfM: medicinesAndDeliveryTypes
     };
 
     if (!organizationId) {
@@ -186,36 +199,37 @@ export const Pharmacy = () => {
     const isCorrectOrganization =
       Object.keys(organizationsAndAcceptableMedicationNames).indexOf(order?.organization.id) > -1;
 
-    const hasOnlyOneMedicine =
-      order.fulfillments.map((f) => f.prescription.treatment.id).length === 1;
-
-    const acceptableMedicationNames = Object.keys(
-      organizationsAndAcceptableMedicationNames[organizationId] ?? {}
-    );
-
-    const correctMedicines = order.fulfillments
-      .map((f) => f.prescription.treatment.name.toLowerCase())
-      .map((name) => {
-        console.log('name', name);
-        const replacedName = 'Zepbound Subcutaneous Solution 2.5 MG/0.5ML';
-        const matches = acceptableMedicationNames.filter((acceptableName) =>
-          replacedName.toLowerCase().match(new RegExp(acceptableName.toLowerCase()))
-        );
-
-        if (matches.length > 0) {
-          return organizationsAndAcceptableMedicationNames[organizationId][matches[0]];
-        }
-        return undefined;
-      })
-      .filter((name) => name != null);
-
-    const hasCorrectMedicine = correctMedicines.length >= 1;
-
-    if (isCorrectOrganization && hasOnlyOneMedicine && hasCorrectMedicine) {
-      return correctMedicines[0];
-    } else {
+    if (!isCorrectOrganization) {
       return undefined;
     }
+
+    const medications = order.fulfillments.map((f) => f.prescription.treatment.name.toLowerCase());
+
+    // For each combination in the organization
+    for (const combination of organizationsAndAcceptableMedicationNames[organizationId]) {
+      const patterns = combination.patterns.map((r) => new RegExp(r.toLowerCase()));
+
+      // If we have exactly the right number of medications
+      if (medications.length === patterns.length) {
+        // Check if we can match each pattern to a unique medication
+        const unmatchedMedications = [...medications];
+        const allPatternsMatch = patterns.every((pattern) => {
+          const matchIndex = unmatchedMedications.findIndex((med) => med.match(pattern));
+          if (matchIndex !== -1) {
+            // Remove the matched medication so it can't be matched again
+            unmatchedMedications.splice(matchIndex, 1);
+            return true;
+          }
+          return false;
+        });
+
+        if (allPatternsMatch) {
+          return combination.deliveryType;
+        }
+      }
+    }
+
+    return undefined;
   };
 
   // experiments
