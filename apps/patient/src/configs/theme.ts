@@ -80,7 +80,32 @@ function generateChakraTheme(key?: string) {
                 borderColor: 'blue.500'
               }
             }
-          })
+          }),
+          link: {
+            color: 'blue.500',
+            textUnderlineOffset: '0.1em',
+            _hover: {
+              color: 'blue.600',
+              textDecoration: 'underline'
+            },
+            _active: {
+              color: 'blue.700'
+            }
+          }
+        }
+      },
+      Link: {
+        baseStyle: {
+          color: 'blue.500',
+          fontWeight: 'semibold',
+          textUnderlineOffset: '0.1em',
+          _hover: {
+            color: 'blue.600',
+            textDecoration: 'underline'
+          },
+          _active: {
+            color: 'blue.700'
+          }
         }
       }
     }

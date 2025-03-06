@@ -1,4 +1,4 @@
-import { Box, Heading, HStack, Icon, Image, Text, VStack } from '@chakra-ui/react';
+import { Box, Heading, HStack, Icon, Image, Link, Text, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import { FiInfo } from 'react-icons/fi';
 import { CouponModal } from '.';
@@ -91,16 +91,9 @@ export const Coupon = ({ coupon }: { coupon: Coupon }) => {
       </VStack>
       <HStack color="blue.500" w="full" justify="center">
         <Icon as={FiInfo} />
-        <Text
-          as="u"
-          textUnderlineOffset="2px"
-          fontSize="sm"
-          fontWeight="semibold"
-          cursor="pointer"
-          onClick={() => setCouponModalOpen(true)}
-        >
+        <Link fontSize="sm" onClick={() => setCouponModalOpen(true)}>
           {t.howToCoupon}
-        </Text>
+        </Link>
       </HStack>
     </Card>
   );
