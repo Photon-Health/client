@@ -72,9 +72,9 @@ export const Pharmacy = () => {
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
 
   // top ranked pharmacies
-  const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
-  const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
   const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
+  const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco && containsGLP; // only show costco if there are GLP treatments
+  const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
 
   // View state
   const [showFooter, setShowFooter] = useState<boolean>(false);
@@ -151,6 +151,9 @@ export const Pharmacy = () => {
     !orgSettings.topRankedCostco &&
     !hasTopRankedCostco && // this means org is Sesame, we don't want to show Amazon and top ranked Costco at the same time
     orgSettings.mailOrderNavigate;
+
+  // pricing
+  const enablePricing = orgSettings.enablePricing ?? false;
 
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
@@ -436,7 +439,7 @@ export const Pharmacy = () => {
         let topRankedPharmacies: EnrichedPharmacy[] = [];
 
         // check if top ranked costco is enabled and there are GLP treatments
-        if (enableTopRankedCostco && !enablePrice) {
+        if (enableTopRankedCostco) {
           topRankedPharmacies = [
             ...(await getCostco({ latitude, longitude })),
             ...topRankedPharmacies
@@ -818,11 +821,8 @@ export const Pharmacy = () => {
                   <Link
                     onClick={() => setLocationModalOpen(true)}
                     display="inline"
-                    color="link"
-                    fontWeight="semibold"
                     size="sm"
                     data-dd-privacy="mask"
-                    cursor={isDemo ? 'default' : 'auto'}
                   >
                     <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
                     {cleanAddress}
@@ -863,6 +863,7 @@ export const Pharmacy = () => {
               loadingMore={isLoading}
               showingAllPharmacies={showingAllPharmacies}
               showHeading={(enableCourier || enableMailOrder) ?? false}
+              showPriceToggle={enablePricing}
               enableOpenNow={enableOpenNow}
               enable24Hr={enable24Hr}
               enablePrice={enablePrice}
