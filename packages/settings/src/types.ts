@@ -18,6 +18,7 @@
  * @param enableMedHistory Show the med history section in the prescribe flow
  * @param enableRxAndOrder Combine Rx and order creation into one prescribe flow
  * @param enableCombineAndDuplicate Enable the ability to combine and duplicate orders
+ * @param enablePricing Enable prices to show in the patient app
  * @param topRankedCostco Enable Costco to rank at the top of pickup pharmacy list in the patient app
  * @param topRankedWalgreens Enable Walgreens to rank at the top of pickup pharmacy list in the patient app
  * @param paExceptionMessage Enable organizations to customize their PA Exception copy
@@ -41,6 +42,7 @@ export type OrganizationSettings = {
   enableMedHistory?: boolean;
   enableRxAndOrder?: boolean;
   enableCombineAndDuplicate?: boolean;
+  enablePricing?: boolean;
   topRankedCostco?: boolean;
   topRankedWalgreens?: boolean;
   hideTemplates?: boolean;

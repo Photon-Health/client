@@ -179,6 +179,7 @@ export const GET_ORDER = gql`
         id
         prescriptionId
         price
+        retailPrice
         bin
         pcn
         group
@@ -239,6 +240,8 @@ const PHARMACY_FIELDS = gql`
       openUntil
       timezone
     }
+    price
+    source
   }
 `;
 
@@ -250,6 +253,7 @@ export const GET_PHARMACIES = gql`
     $openAt: DateTime
     $is24hr: Boolean
     $name: String
+    $includePrice: Boolean
   ) {
     pharmaciesByLocation(
       location: $location
@@ -258,24 +262,9 @@ export const GET_PHARMACIES = gql`
       openAt: $openAt
       is24hr: $is24hr
       name: $name
+      includePrice: $includePrice
     ) {
       ...PharmacyFields
-    }
-  }
-  ${PHARMACY_FIELDS}
-`;
-
-export const GET_PHARMACIES_WITH_PRICE = gql`
-  query GetPharmaciesWithPriceByLocation(
-    $location: LatLongSearch!
-    $openAt: DateTime
-    $is24hr: Boolean
-  ) {
-    pharmaciesWithPriceByLocation(location: $location, openAt: $openAt, is24hr: $is24hr) {
-      pharmacy {
-        ...PharmacyFields
-      }
-      price
     }
   }
   ${PHARMACY_FIELDS}

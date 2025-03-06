@@ -47,6 +47,7 @@ const defaultSettings: OrganizationSettings = {
   enableMedHistory: false,
   enableRxAndOrder: true,
   enableCombineAndDuplicate: true,
+  enablePricing: false,
   topRankedCostco: false,
   topRankedWalgreens: false,
   hideTemplates: false
@@ -78,6 +79,7 @@ const organizationSettings: {
     accentColor: '#b35724',
     mailOrder: true,
     enableMedHistory: true,
+    enablePricing: true,
     mailOrderProviders: [
       CUREXA_PHARMACY_ID,
       CAREPOINT_PHARMACY_ID,
