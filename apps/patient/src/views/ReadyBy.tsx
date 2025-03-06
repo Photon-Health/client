@@ -20,11 +20,7 @@ import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
 import { datadogRum } from '@datadog/browser-rum';
 import timezone from 'dayjs/plugin/timezone';
-import {
-  capitalize,
-  convertReadyByToUTCTimestamp,
-  isOrgWithCouponsEnabled
-} from '../utils/general';
+import { capitalize, convertReadyByToUTCTimestamp } from '../utils/general';
 
 dayjs.extend(timezone);
 
@@ -32,7 +28,6 @@ import { FixedFooter, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { RxLightningBolt } from 'react-icons/rx';
-import { isGLP } from '../utils/isGLP';
 
 const checkDisabled = (option: string): boolean => {
   const currentTime = dayjs();
@@ -93,21 +88,8 @@ export const ReadyBy = () => {
       readyByTime
     });
 
-    const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
-
-    // Redirect to payment method selection if applicable
-    const isBosonTestOrg = order.organization.id === 'org_KzSVZBQixLRkqj5d'; // Test Organization 11, this is boson us
-    if (
-      isOrgWithCouponsEnabled(order.organization.id) &&
-      !isMultiRx &&
-      // This is a bit complex but it's temporary.
-      // We're testing goodrx glp1 pricing on boson at the moment.
-      (!containsGLP || isBosonTestOrg)
-    ) {
-      navigate(`/paymentMethod?orderId=${order?.id}&token=${token}`);
-    } else {
-      navigate(`/pharmacy?orderId=${order?.id}&token=${token}`);
-    }
+    // Go to pharmacy selection
+    navigate(`/pharmacy?orderId=${order?.id}&token=${token}`);
   };
 
   useEffect(() => {
