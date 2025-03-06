@@ -186,15 +186,21 @@ export const Pharmacy = () => {
       { patterns: ['bupropion.*oral'], deliveryType: 'one_day_delivery' },
 
       {
-        patterns: ['zepbound subcutaneous solution 2.5 mg/0.5ml', 'ondansetron.*oral'],
+        patterns: [
+          'zepbound subcutaneous solution Auto-injector 2.5 mg/0.5ml',
+          'ondansetron.*oral'
+        ],
         deliveryType: 'one_day_delivery'
       },
       {
-        patterns: ['zepbound subcutaneous solution 5 mg/0.5ml', 'ondansetron.*oral'],
+        patterns: ['zepbound subcutaneous solution Auto-injector 5 mg/0.5ml', 'ondansetron.*oral'],
         deliveryType: 'one_day_delivery'
       },
       {
-        patterns: ['zepbound subcutaneous solution 7.5 mg/0.5ml', 'ondansetron.*oral'],
+        patterns: [
+          'zepbound subcutaneous solution Auto-injector 7.5 mg/0.5ml',
+          'ondansetron.*oral'
+        ],
         deliveryType: 'one_day_delivery'
       },
       {
