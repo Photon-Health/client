@@ -163,7 +163,10 @@ export const Pharmacy = () => {
     const organizationId = order?.organization.id;
 
     const medicinesAndDeliveryTypes = [
-      { patterns: ['wegovy 0.25 MG in 0.5 ML Auto-Injector'], deliveryType: 'overnight' },
+      {
+        patterns: ['wegovy subcutaneous solution auto-injector 0.25 MG/0.5ML'],
+        deliveryType: 'overnight'
+      },
       { patterns: ['zepbound subcutaneous solution 2.5 mg/0.5ml'], deliveryType: 'overnight' },
       { patterns: ['zepbound subcutaneous solution 5 mg/0.5ml'], deliveryType: 'overnight' },
       { patterns: ['zepbound subcutaneous solution 7.5 mg/0.5ml'], deliveryType: 'overnight' },
@@ -183,7 +186,7 @@ export const Pharmacy = () => {
         deliveryType: 'one_day_delivery'
       },
       {
-        patterns: ['wegovy 0.25 mg in 0.5 ml auto-injector', 'ondansetron.*oral'],
+        patterns: ['wegovy subcutaneous solution auto-injector 0.25 MG/0.5ML', 'ondansetron.*oral'],
         deliveryType: 'one_day_delivery'
       }
     ];
