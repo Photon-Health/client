@@ -28,7 +28,7 @@ export const Coupons = () => {
   return (
     <VStack w="full" alignItems="stretch" spacing={4}>
       <Heading as="h4" size="md">
-        Coupon
+        Discount Card
       </Heading>
       {/* Show one coupon only */}
       <Coupon coupon={discountCards[0]} />
@@ -57,8 +57,9 @@ export const Coupon = ({ coupon }: { coupon: Coupon }) => {
           ${price.toFixed(2)}
         </Text>
         {retailPrice ? (
-          <Text alignSelf="center" fontWeight="700" py={0} lineHeight="1">
-            Retail price: ${retailPrice.toFixed(2)}
+          <Text alignSelf="center" color="gray.500">
+            Retail price:{' '}
+            <span style={{ textDecoration: 'line-through' }}>${retailPrice.toFixed(2)}</span>
           </Text>
         ) : null}
         <Box bgColor="blue.50" w="full" p={2} borderRadius="xl">
