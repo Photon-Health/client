@@ -166,13 +166,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
         id: props.patientId,
         medicationHistory: [{ medicationId, active: false }]
       },
-      update: updateCache,
-      refetchQueries: [
-        {
-          query: GET_PATIENT_MED_HISTORY,
-          variables: { id: props.patientId }
-        }
-      ]
+      update: updateCache
     });
 
     // Update local state immediately
