@@ -50,7 +50,7 @@ const ADD_MED_HISTORY = gql`
 type PatientMedHistoryProps = {
   patientId: string;
   enableLinks: boolean;
-  newMedication?: Medication | SearchMedication;
+  newMedication?: Treatment;
   openAddMedicationDialog?: () => void;
   hideAddMedicationDialog?: () => void;
 };
@@ -96,7 +96,10 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
 
   const queryOptions = createMemo(() => ({
     variables: { id: props.patientId },
-    client: client!.apolloClinical
+    client: client!.apolloClinical,
+    skip: !props.patientId,
+    fetchPolicy: 'network-only' as const,
+    refetchQueries: [GET_PATIENT_MED_HISTORY]
   }));
 
   const patientMedHistory = createQuery<GetPatientResponse, { id: string }>(
@@ -130,6 +133,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
 
   const addMedHistory = async (medicationId: string) => {
     const updateCache = (cache: ApolloCache<GetPatientResponse>) => {
+      console.log('update cache', props.newMedication);
       const newTreatment = {
         __typename: 'PatientMedication',
         treatment: {
