@@ -1,12 +1,7 @@
 import { createSignal, createEffect, Show, For, createMemo } from 'solid-js';
 import gql from 'graphql-tag';
 import { usePhotonClient } from '../SDKProvider';
-import {
-  Medication,
-  SearchMedication,
-  Prescription,
-  Treatment
-} from '@photonhealth/sdk/dist/types';
+import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
 import {
   Icon,
   Card,
