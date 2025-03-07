@@ -133,7 +133,6 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
 
   const addMedHistory = async (medicationId: string) => {
     const updateCache = (cache: ApolloCache<GetPatientResponse>) => {
-      console.log('update cache', props.newMedication);
       const newTreatment = {
         __typename: 'PatientMedication',
         treatment: {
