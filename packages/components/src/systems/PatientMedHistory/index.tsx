@@ -1,12 +1,7 @@
 import { createSignal, createEffect, Show, For, createMemo } from 'solid-js';
 import gql from 'graphql-tag';
 import { usePhotonClient } from '../SDKProvider';
-import {
-  Medication,
-  SearchMedication,
-  Prescription,
-  Treatment
-} from '@photonhealth/sdk/dist/types';
+import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
 import {
   Icon,
   Card,
@@ -50,7 +45,7 @@ const ADD_MED_HISTORY = gql`
 type PatientMedHistoryProps = {
   patientId: string;
   enableLinks: boolean;
-  newMedication?: Medication | SearchMedication;
+  newMedication?: Treatment;
   openAddMedicationDialog?: () => void;
   hideAddMedicationDialog?: () => void;
 };
@@ -96,7 +91,10 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
 
   const queryOptions = createMemo(() => ({
     variables: { id: props.patientId },
-    client: client!.apolloClinical
+    client: client!.apolloClinical,
+    skip: !props.patientId,
+    fetchPolicy: 'network-only' as const,
+    refetchQueries: [GET_PATIENT_MED_HISTORY]
   }));
 
   const patientMedHistory = createQuery<GetPatientResponse, { id: string }>(
@@ -166,13 +164,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
         id: props.patientId,
         medicationHistory: [{ medicationId, active: false }]
       },
-      update: updateCache,
-      refetchQueries: [
-        {
-          query: GET_PATIENT_MED_HISTORY,
-          variables: { id: props.patientId }
-        }
-      ]
+      update: updateCache
     });
 
     // Update local state immediately
