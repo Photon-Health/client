@@ -862,7 +862,7 @@ export const Pharmacy = () => {
       <Container pb={showFooter ? 32 : 8}>
         {location ? (
           <VStack spacing={6} align="stretch" pt={4}>
-            {enableCourier || enableMailOrder ? (
+            {enableCourier || enableMailOrder || amazonPharmacyEndOfPharmacyTestSegment ? (
               <BrandedOptions
                 options={brandedOptions}
                 location={location}
