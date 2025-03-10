@@ -1,7 +1,7 @@
 import { string, any, record } from 'superstruct';
 import { createSignal, onMount, Show, createEffect, createMemo } from 'solid-js';
 import { PatientInfo, PatientMedHistory, AddressForm, Card, Text } from '@photonhealth/components';
-import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
+import { Treatment } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
 import { PhotonClientStore } from '../../store';
@@ -34,9 +34,8 @@ export const PatientCard = (props: {
   enableMedHistoryLinks?: boolean;
   hidePatientCard?: boolean;
 }) => {
-  const [newMedication, setNewMedication] = createSignal<Medication | SearchMedication | undefined>(
-    undefined
-  );
+  const [newMedication, setNewMedication] = createSignal<Treatment | undefined>();
+  undefined;
   const [showEditPatientView, setShowEditPatientView] = createSignal(false);
   const [showAddMedDialog, setShowAddMedDialog] = createSignal(false);
   const { actions, store } = PatientStore;
@@ -162,9 +161,7 @@ export const PatientCard = (props: {
           <photon-add-medication-history-dialog
             title="Add Medication History"
             open={showAddMedDialog()}
-            on:photon-medication-selected={(e: {
-              detail: { medication: Medication | SearchMedication };
-            }) => {
+            on:photon-medication-selected={(e: { detail: { medication: Treatment } }) => {
               setNewMedication(e.detail.medication);
             }}
             on:photon-medication-closed={() => {
