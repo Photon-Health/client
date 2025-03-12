@@ -5,11 +5,10 @@ import Banner from '../../particles/Banner';
 import Card from '../../particles/Card';
 import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
-import formatRxString from '../../utils/formatRxString';
 import { usePhotonClient } from '../SDKProvider';
 import generateDraftPrescription from './utils/generateDraftPrescription';
 import { ScreeningAlerts, ScreeningAlertType } from '../ScreeningAlerts';
-
+import Button from '../../particles/Button';
 export type TemplateOverrides = {
   [key: string]: {
     daysSupply?: number;
@@ -246,15 +245,6 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
                 LeftChildren={
                   <>
                     <Text>{draft.treatment.name}</Text>
-                    <Text color="gray" size="sm">
-                      {formatRxString({
-                        // need to use nullish coalescing here because draft types are eg `Maybe<number> | undefined`
-                        dispenseQuantity: draft?.dispenseQuantity ?? undefined,
-                        dispenseUnit: draft?.dispenseUnit ?? undefined,
-                        fillsAllowed: draft?.fillsAllowed ?? undefined,
-                        instructions: draft?.instructions ?? undefined
-                      })}
-                    </Text>
                   </>
                 }
                 RightChildren={
@@ -272,12 +262,114 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
                   </>
                 }
                 BottomChildren={
-                  <Show when={screeningAlertsForDraft.length > 0}>
-                    <ScreeningAlerts
-                      screeningAlerts={screeningAlertsForDraft}
-                      owningId={draft.treatment.id}
-                    />
-                  </Show>
+                  <>
+                    <Show when={screeningAlertsForDraft.length > 0}>
+                      <ScreeningAlerts
+                        screeningAlerts={screeningAlertsForDraft}
+                        owningId={draft.treatment.id}
+                      />
+                    </Show>
+
+                    <div class="flex flex-col">
+                      <div class="text-xs text-gray-500">
+                        Quantity / Days Supply: <b>3 ML / 30 d/s</b>
+                      </div>
+                      <div class="text-xs text-gray-500">
+                        Plan Pays: <b>$150</b>
+                      </div>
+                      <div class="text-xs text-gray-500">
+                        Pharmacy: <b>Patient's Preferred</b>
+                      </div>
+                    </div>
+                    <Banner status="success" withoutIcon={true}>
+                      <div class="flex justify-between w-full">
+                        <div class="text-xs">
+                          <b>Covered by Insurance</b>
+                        </div>
+                        <div class="text-xs">
+                          Est. Copay: <b>$291</b>
+                        </div>
+                      </div>
+                    </Banner>
+                    <div>Alternatives</div>
+                    <Card>
+                      <div class="flex flex-col gap-2">
+                        <div class="flex flex-col gap-2">
+                          <div class="flex flex-col gap-2">
+                            <div class="text-sm">
+                              Wegovy Subcutaneous Solution Auto-injector 0.25 MG/0.5ML
+                            </div>
+
+                            <div class="flex flex-col">
+                              <div class="text-xs text-gray-500">
+                                Quantity / Days Supply: <b>3 ML / 30 d/s </b>
+                              </div>
+                              <div class="text-xs text-gray-500">
+                                Plan Pays: <b>$150</b>
+                              </div>
+                              <div class="text-xs text-gray-500">
+                                Pharmacy: <b>CVS Pharmacy</b>
+                              </div>
+                            </div>
+                            <Banner status="warning" withoutIcon={true}>
+                              <div class="flex justify-between w-full">
+                                <div class="text-xs">
+                                  <b>PA Required</b>
+                                </div>
+                                <div class="text-xs">
+                                  Est. Copay: <b>$122</b>
+                                </div>
+                              </div>
+                            </Banner>
+                          </div>
+                        </div>
+                        <div class="flex justify-end mt-2">
+                          <Button size="sm" variant="naked">
+                            Select Alternative
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                    <Card>
+                      <div class="flex flex-col gap-2">
+                        <div class="flex flex-col gap-2">
+                          <div class="flex flex-col gap-2">
+                            <div class="text-sm">
+                              Ozempic (0.25 or 0.5 MG/DOSE) Subcutaneous Solution Pen-injector 2
+                              MG/3ML
+                            </div>
+
+                            <div class="flex flex-col">
+                              <div class="text-xs text-gray-500">
+                                Quantity / Days Supply: <b>3 ML / 30 d/s</b>
+                              </div>
+                              <div class="text-xs text-gray-500">
+                                Plan Pays: <b>$150</b>
+                              </div>
+                              <div class="text-xs text-gray-500">
+                                Pharmacy: <b>Walgreens Pharmacy</b>
+                              </div>
+                            </div>
+                            <Banner status="success" withoutIcon={true}>
+                              <div class="flex justify-between w-full">
+                                <div class="text-xs">
+                                  <b>Covered by Insurance</b>
+                                </div>
+                                <div class="text-xs">
+                                  Est. Copay: <b>$321</b>
+                                </div>
+                              </div>
+                            </Banner>
+                          </div>
+                        </div>
+                        <div class="flex justify-end mt-2">
+                          <Button size="sm" variant="naked">
+                            Select Alternative
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  </>
                 }
               />
             );
