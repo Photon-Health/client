@@ -34,7 +34,8 @@ export const ClientSecretView = (props: ClientSecretViewProps) => {
         <Input
           type={show ? 'text' : 'password'}
           value={clientSecret}
-          isReadOnly
+          disabled
+          variant="filled"
           placeholder={clientSecret}
         />
         <InputRightElement>

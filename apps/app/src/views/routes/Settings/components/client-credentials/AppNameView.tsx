@@ -18,7 +18,7 @@ export const AppNameView = (props: AppNameViewProps) => {
     <FormControl id="app_name">
       <FormLabel>Application Name</FormLabel>
       <InputGroup variant="outline">
-        <Input value={name} isReadOnly placeholder={name} />
+        <Input value={name} disabled variant="filled" placeholder={name} />
         <InputRightElement>
           <IconButton aria-label="Options" size="s" variant="ghost" />
         </InputRightElement>

@@ -22,7 +22,7 @@ export const ClientIdView = (props: ClientIdViewProps) => {
     <FormControl id="client_id">
       <FormLabel>Client ID</FormLabel>
       <InputGroup variant="outline">
-        <Input value={clientId} isReadOnly placeholder={clientId} />
+        <Input value={clientId} disabled variant="filled" placeholder={clientId} />
         <InputRightElement>
           <IconButton
             aria-label="Options"
