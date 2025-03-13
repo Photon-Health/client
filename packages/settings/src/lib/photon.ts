@@ -17,7 +17,8 @@ import {
   STRIVE_PHARMACY_ID,
   HONEYBEE_PHARMACY_ID,
   TRUEPILL_PHARMACY_ID,
-  HEALTHWAREHOUSE_PHARMACY_ID
+  HEALTHWAREHOUSE_PHARMACY_ID,
+  OPENLOOP_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -79,7 +80,8 @@ const organizationSettings: {
     mailOrderProviders: [
       REDROCK_SPRINGVILLE_PHARMACY_ID,
       REDROCK_STGEORGE_PHARMACY_ID,
-      STRIVE_PHARMACY_ID
+      STRIVE_PHARMACY_ID,
+      OPENLOOP_PHARMACY_ID
     ]
   },
   // Weekend Health
