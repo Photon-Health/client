@@ -47,6 +47,29 @@ const customTheme = extendTheme(
       brand: blue,
       navy: '#273D52',
       slate
+    },
+    components: {
+      Input: {
+        variants: {
+          outline: (props: StyleFunctionProps) => ({
+            field: {
+              _readOnly: {
+                bg: mode('gray.100', 'whiteAlpha.100')(props),
+                borderColor: mode('gray.200', 'whiteAlpha.300')(props),
+                cursor: 'not-allowed',
+                opacity: 0.8,
+                pointerEvents: 'none',
+                _hover: {
+                  borderColor: mode('gray.200', 'whiteAlpha.300')(props)
+                },
+                _focus: {
+                  borderColor: mode('gray.200', 'whiteAlpha.300')(props)
+                }
+              }
+            }
+          })
+        }
+      }
     }
   },
   theme
