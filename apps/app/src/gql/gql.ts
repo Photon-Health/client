@@ -15,7 +15,8 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "\n  mutation TicketModalCreateTicket($input: TicketInput!) {\n    createTicket(input: $input) {\n      id\n    }\n  }\n": types.TicketModalCreateTicketDocument,
-    "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n  }\n": types.ClientInfoCardFragmentFragmentDoc,
+    "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n  }\n": types.ClientInfoCardFragmentFragmentDoc,
+    "\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!) {\n    updateClient(clientId: $clientId, whiteListedUrls: $whiteListedUrls) {\n      id\n    }\n  }\n": types.UpdateClientDocument,
     "\n  query ClientsDeveloperTabQuery {\n    clients {\n      id\n      ...ClientInfoCardFragment\n    }\n  }\n": types.ClientsDeveloperTabQueryDocument,
     "\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n": types.RotateSecretDocument,
     "\n  fragment InviteFormFragment on Invite {\n    id\n    invitee\n    inviter\n    expires_at\n  }\n": types.InviteFormFragmentFragmentDoc,
@@ -67,7 +68,11 @@ export function graphql(source: "\n  mutation TicketModalCreateTicket($input: Ti
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n  }\n"): (typeof documents)["\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n  }\n"];
+export function graphql(source: "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n  }\n"): (typeof documents)["\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!) {\n    updateClient(clientId: $clientId, whiteListedUrls: $whiteListedUrls) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!) {\n    updateClient(clientId: $clientId, whiteListedUrls: $whiteListedUrls) {\n      id\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
