@@ -34,8 +34,8 @@ export const ClientSecretView = (props: ClientSecretViewProps) => {
         <Input
           type={show ? 'text' : 'password'}
           value={clientSecret}
-          placeholder={clientSecret}
           isReadOnly
+          placeholder={clientSecret}
         />
         <InputRightElement>
           <HStack paddingRight={5}>
