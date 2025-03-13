@@ -6,7 +6,8 @@ import {
   Textarea,
   Alert,
   AlertIcon,
-  Stack
+  Stack,
+  FormHelperText
 } from '@chakra-ui/react';
 import { useState } from 'react';
 
@@ -27,14 +28,14 @@ const updateClientMutation = graphql(/* GraphQL */ `
 const spaClientValidationSchema = yup.object({
   whiteListedUrls: yup
     .string()
-    .required('White Listed URLs are required')
-    .test('urls', 'Must be comma separated valid URLs', (value) => {
+    .test('urls', 'Must be valid comma separated URLs with no query parameters', (value) => {
       if (!value) return true;
       const urls = value.split(',').map((url) => url.trim());
       return urls.every((url) => {
         if (!url) return true;
         try {
-          new URL(url);
+          const urlObject = new URL(url);
+          if (urlObject.searchParams.size > 0) return false;
           return true;
         } catch {
           return false;
@@ -64,7 +65,7 @@ export function SPAClientEditForm({ clientId, whiteListedUrls }: SPAClientEditFo
   };
 
   const submitHandler = async (values: SPAClientEditFormValues) => {
-    const urls = values.whiteListedUrls
+    const urls = (values.whiteListedUrls ?? '')
       .split(',')
       .map((url) => url.trim())
       .filter((url) => !!url);
@@ -100,6 +101,9 @@ export function SPAClientEditForm({ clientId, whiteListedUrls }: SPAClientEditFo
           <Stack spacing={4}>
             <FormControl isInvalid={!!errors.whiteListedUrls}>
               <FormLabel htmlFor="whiteListedUrls">Whitelisted URLs</FormLabel>
+              <FormHelperText marginBottom={2}>
+                Enter URLs with no query parameters. Must begin with https://
+              </FormHelperText>
               <Field
                 as={Textarea}
                 id="whiteListedUrls"
