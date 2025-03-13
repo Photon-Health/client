@@ -29,6 +29,7 @@ import triggerToast from './utils/toastTriggers';
 import generateString from './utils/generateString';
 import { createQuery } from './utils/createQuery';
 import formatDate from './utils/formatDate';
+import { formatPrescriptionDetails } from './utils/formatPrescriptionDetail';
 
 import type { DraftPrescription, TemplateOverrides } from './systems/DraftPrescriptions';
 import { SignatureAttestationModal } from './systems/SignatureAttestation';
@@ -63,7 +64,8 @@ export {
   generateString,
   triggerToast,
   usePhotonClient,
-  useRecentOrders
+  useRecentOrders,
+  formatPrescriptionDetails
 };
 
 // Export types

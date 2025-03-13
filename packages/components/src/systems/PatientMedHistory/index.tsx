@@ -1,16 +1,17 @@
-import { createSignal, createEffect, Show, For, createMemo } from 'solid-js';
+import { createEffect, createMemo, createSignal, For, Show } from 'solid-js';
 import gql from 'graphql-tag';
 import { usePhotonClient } from '../SDKProvider';
 import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
 import {
-  Icon,
-  Card,
   Button,
-  Text,
-  Table,
-  generateString,
+  Card,
   createQuery,
   formatDate,
+  formatPrescriptionDetails,
+  generateString,
+  Icon,
+  Table,
+  Text,
   triggerToast
 } from '../../';
 import { ApolloCache } from '@apollo/client';
@@ -24,6 +25,10 @@ const GET_PATIENT_MED_HISTORY = gql`
         prescription {
           id
           writtenAt
+          instructions
+          dispenseQuantity
+          dispenseUnit
+          daysSupply
         }
         treatment {
           id
@@ -237,7 +242,14 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
               <For each={medHistory()}>
                 {(med) => (
                   <Table.Row>
-                    <Table.Cell width="16rem">{med.treatment?.name}</Table.Cell>
+                    <Table.Cell width="16rem">
+                      <div>{med.treatment?.name}</div>
+                      <div>
+                        <p class="text-ellipsis overflow-hidden text-gray-500">
+                          {formatPrescriptionDetails(med.prescription)}
+                        </p>
+                      </div>
+                    </Table.Cell>
                     <Table.Cell>{formatDate(med.prescription?.writtenAt) || 'N/A'}</Table.Cell>
                     <Show when={props.enableLinks}>
                       <Table.Cell>
