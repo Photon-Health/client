@@ -23,7 +23,9 @@ const testData: PatientTreatmentHistoryElement[] = [
   {
     active: false,
     prescription: createTestPrescription({ instructions: 'very long instructions '.repeat(10) }),
-    treatment: createTestTreatment({ name: 'treatment name 2' })
+    treatment: createTestTreatment({
+      name: 'treatment name 2 is very long and might get truncated on a small screen'
+    })
   }
 ];
 

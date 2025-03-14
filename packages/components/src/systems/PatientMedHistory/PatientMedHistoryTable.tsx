@@ -30,7 +30,6 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
   const [expandedRows, setExpandedRows] = createSignal<Set<string>>(new Set());
 
   const toggleExpand = (medId: string) => {
-    console.log('toggleExpand', medId);
     setExpandedRows((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(medId)) {
@@ -80,13 +79,17 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                 <Table.Cell width="16rem">
                   <div class="flex items-stretch h-full">
                     <div class="flex-col flex-1 min-w-0">
-                      <div class="whitespace-nowrap text-ellipsis overflow-hidden">
-                        {med.treatment?.name}
+                      <div
+                        class={`${
+                          expandedRows().has(med.treatment.id) ? '' : 'whitespace-nowrap'
+                        } text-ellipsis overflow-hidden`}
+                      >
+                        {med.treatment.name}
                       </div>
                       <div class="text-gray-500">
                         <div
                           class={`${
-                            expandedRows().has(med.treatment?.id) ? '' : 'whitespace-nowrap'
+                            expandedRows().has(med.treatment.id) ? '' : 'whitespace-nowrap'
                           } text-ellipsis overflow-hidden`}
                         >
                           {formatPrescriptionDetails(med.prescription)}
