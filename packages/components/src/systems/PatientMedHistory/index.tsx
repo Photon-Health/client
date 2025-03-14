@@ -1,20 +1,10 @@
-import { createEffect, createMemo, createSignal, For, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, Show } from 'solid-js';
 import gql from 'graphql-tag';
 import { usePhotonClient } from '../SDKProvider';
 import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
-import {
-  Button,
-  Card,
-  createQuery,
-  formatDate,
-  formatPrescriptionDetails,
-  generateString,
-  Icon,
-  Table,
-  Text,
-  triggerToast
-} from '../../';
+import { Button, Card, createQuery, Text, triggerToast } from '../../';
 import { ApolloCache } from '@apollo/client';
+import PatientMedHistoryTable from './PatientMedHistoryTable';
 
 const GET_PATIENT_MED_HISTORY = gql`
   query GetPatient($id: ID!) {
@@ -55,23 +45,7 @@ type PatientMedHistoryProps = {
   hideAddMedicationDialog?: () => void;
 };
 
-const LoadingRowFallback = (props: { enableLinks: boolean }) => (
-  <Table.Row>
-    <Table.Cell>
-      <Text sampleLoadingText={generateString(10, 25)} loading />
-    </Table.Cell>
-    <Table.Cell>
-      <Text sampleLoadingText={generateString(2, 8)} loading />
-    </Table.Cell>
-    <Show when={props.enableLinks}>
-      <Table.Cell>
-        <Text sampleLoadingText={generateString(4, 8)} loading />
-      </Table.Cell>
-    </Show>
-  </Table.Row>
-);
-
-type PatientTreatmentHistoryElement = {
+export type PatientTreatmentHistoryElement = {
   active: boolean;
   comment?: string;
   treatment: Treatment;
@@ -208,70 +182,13 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
       </div>
 
       <div class="max-h-80 overflow-y-auto">
-        <Table>
-          <Table.Header>
-            <Table.Col width="16rem">Medication</Table.Col>
-            <Table.Col>
-              <span class="cursor-pointer flex" onClick={() => setChronological(!chronological())}>
-                Written
-                <div class="ml-1">
-                  <Show when={chronological()}>
-                    <Icon name="chevronDown" size="sm" />
-                  </Show>
-                  <Show when={!chronological()}>
-                    <Icon name="chevronUp" size="sm" />
-                  </Show>
-                </div>
-              </span>
-            </Table.Col>
-            <Show when={props.enableLinks}>
-              <Table.Col>Source</Table.Col>
-            </Show>
-          </Table.Header>
-          <Table.Body>
-            <Show
-              when={medHistory()}
-              fallback={
-                <>
-                  <LoadingRowFallback enableLinks={props.enableLinks} />
-                  <LoadingRowFallback enableLinks={props.enableLinks} />
-                  <LoadingRowFallback enableLinks={props.enableLinks} />
-                </>
-              }
-            >
-              <For each={medHistory()}>
-                {(med) => (
-                  <Table.Row>
-                    <Table.Cell width="16rem">
-                      <div>{med.treatment?.name}</div>
-                      <div>
-                        <p class="text-ellipsis overflow-hidden text-gray-500">
-                          {formatPrescriptionDetails(med.prescription)}
-                        </p>
-                      </div>
-                    </Table.Cell>
-                    <Table.Cell>{formatDate(med.prescription?.writtenAt) || 'N/A'}</Table.Cell>
-                    <Show when={props.enableLinks}>
-                      <Table.Cell>
-                        {med.prescription?.id ? (
-                          <a
-                            class="text-blue-500 underline"
-                            target="_blank"
-                            href={`${baseURL()}${med.prescription?.id}`}
-                          >
-                            Link
-                          </a>
-                        ) : (
-                          'External'
-                        )}
-                      </Table.Cell>
-                    </Show>
-                  </Table.Row>
-                )}
-              </For>
-            </Show>
-          </Table.Body>
-        </Table>
+        <PatientMedHistoryTable
+          enableLinks={props.enableLinks}
+          baseURL={baseURL()}
+          medHistory={medHistory()}
+          chronological={chronological()}
+          onChronologicalChange={() => setChronological(!chronological())}
+        />
       </div>
     </Card>
   );
