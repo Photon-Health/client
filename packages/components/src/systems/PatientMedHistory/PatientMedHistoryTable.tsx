@@ -78,31 +78,29 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
               <Table.Row>
                 <Table.Cell width="16rem">
                   <div class="flex items-stretch h-full">
-                    <div class="flex-col flex-1 min-w-0">
-                      <div
-                        class={`${
-                          expandedRows().has(med.treatment.id) ? '' : 'whitespace-nowrap'
-                        } text-ellipsis overflow-hidden`}
-                      >
-                        {med.treatment.name}
-                      </div>
-                      <div class="text-gray-500">
-                        <div
-                          class={`${
-                            expandedRows().has(med.treatment.id) ? '' : 'whitespace-nowrap'
-                          } text-ellipsis overflow-hidden`}
-                        >
-                          {formatPrescriptionDetails(med.prescription)}
-                        </div>
-                      </div>
+                    <div
+                      class={`flex-col flex-1 min-w-0 text-ellipsis overflow-hidden ${
+                        expandedRows().has(med.treatment.id) ? '' : 'whitespace-nowrap'
+                      }`}
+                    >
+                      <div>{med.treatment.name}</div>
+                      <div class="text-gray-500">{formatPrescriptionDetails(med.prescription)}</div>
                     </div>
                     <button
+                      type="button"
                       onClick={() => toggleExpand(med.treatment?.id)}
                       class="text-blue-500 hover:text-blue-700 text-sm ml-2 self-stretch flex items-center"
+                      aria-expanded={expandedRows().has(med.treatment?.id)}
+                      aria-label={
+                        expandedRows().has(med.treatment?.id)
+                          ? 'Collapse medication details'
+                          : 'Expand medication details'
+                      }
                     >
                       <Icon
                         name={expandedRows().has(med.treatment?.id) ? 'minus' : 'plus'}
                         size="sm"
+                        aria-hidden="true"
                       />
                     </button>
                   </div>
