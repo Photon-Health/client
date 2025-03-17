@@ -84,7 +84,10 @@ export default function Client(props: ClientProps) {
 
 function getEnv(props: ClientProps): Env {
   const isEnv = (env: Env) =>
-    props.domain?.includes(env) || props.audience?.includes(env) || props.uri?.includes(env);
+    props.domain?.includes(env) ??
+    props.audience?.includes(env) ??
+    props.uri?.includes(env) ??
+    false;
 
   if (isEnv('tau')) {
     return 'tau';
