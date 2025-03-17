@@ -79,12 +79,14 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                 <Table.Cell width="16rem">
                   <div class="flex items-stretch h-full">
                     <div
-                      class={`flex-col flex-1 min-w-0 text-ellipsis overflow-hidden ${
+                      class={`flex-col flex-1 min-w-0 ${
                         expandedRows().has(med.treatment.id) ? '' : 'whitespace-nowrap'
                       }`}
                     >
-                      <div>{med.treatment.name}</div>
-                      <div class="text-gray-500">{formatPrescriptionDetails(med.prescription)}</div>
+                      <div class="text-ellipsis overflow-hidden">{med.treatment.name}</div>
+                      <div class="text-gray-500 text-ellipsis overflow-hidden">
+                        {formatPrescriptionDetails(med.prescription)}
+                      </div>
                     </div>
                     <button
                       type="button"
