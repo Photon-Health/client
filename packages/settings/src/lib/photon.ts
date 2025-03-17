@@ -289,6 +289,15 @@ const organizationSettings: {
     sendToPatient: false,
     enableRxAndOrder: false
   },
+  // Mass Derm Hair Transplant - (Xyon Health)
+  org_xAvSD8db2dZDijSE: {
+    sendOrder: false,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
+    sendToPatient: false,
+    enableRxAndOrder: false
+  },
   // Ognomy
   org_2B1yxV6yS9ROqV1g: {
     logo: 'ognomy_logo.webp',
