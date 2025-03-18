@@ -1,4 +1,4 @@
-import { PhotonClient } from '@photonhealth/sdk';
+import { Env, PhotonClient } from '@photonhealth/sdk';
 import { createEffect, JSXElement } from 'solid-js';
 import { PhotonContext } from '../../context';
 import { PhotonClientStore } from '../../store';
@@ -21,6 +21,7 @@ type ClientProps = {
   context?: any;
   createStore?: typeof createStore;
   connection?: string;
+  env?: Env;
 };
 
 export default function Client(props: ClientProps) {
@@ -32,7 +33,8 @@ export default function Client(props: ClientProps) {
     redirectURI: props.redirectUri ? props.redirectUri : window.location.origin,
     organization: props.org,
     developmentMode: props.developmentMode,
-    connection: props.connection
+    connection: props.connection,
+    env: props.env ?? getEnv(props)
   });
 
   const store = props?.createStore
@@ -78,4 +80,24 @@ export default function Client(props: ClientProps) {
       <SDKProvider client={sdk}>{props.children}</SDKProvider>
     </Provider>
   );
+}
+
+function getEnv(props: ClientProps): Env {
+  const isEnv = (env: Env) =>
+    props.domain?.includes(env) ??
+    props.audience?.includes(env) ??
+    props.uri?.includes(env) ??
+    false;
+
+  if (isEnv('tau')) {
+    return 'tau';
+  }
+  if (isEnv('boson')) {
+    return 'boson';
+  }
+  if (isEnv('neutron')) {
+    return 'neutron';
+  }
+
+  return 'photon';
 }
