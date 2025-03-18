@@ -46,7 +46,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
       <Table.Header>
         <Table.Col width="16rem">Medication</Table.Col>
         <Table.Col>
-          <span class="cursor-pointer flex" onClick={() => props.onChronologicalChange}>
+          <span class="cursor-pointer flex" onClick={() => props.onChronologicalChange()}>
             Written
             <div class="ml-1">
               <Show when={props.chronological}>
