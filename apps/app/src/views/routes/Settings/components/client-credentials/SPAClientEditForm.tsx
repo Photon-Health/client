@@ -31,10 +31,17 @@ const spaClientValidationSchema = yup.object({
     .test('urls', 'Must be valid comma separated URLs with no query parameters', (value) => {
       if (!value) return true;
       const urls = value.split(',').map((url) => url.trim());
-      return urls.every((url) => {
-        if (!url) return true;
+      return urls.every((item) => {
+        if (!item) return true;
+        let url = item;
+        // if the Url has a wildcard in the subdomain
+        if (url.includes('://*.')) {
+          url = url.replace('://*.', '://WILDCARD.');
+        }
+
         try {
           const urlObject = new URL(url);
+          if (!urlObject.protocol || !urlObject.hostname) return false;
           if (urlObject.searchParams.size > 0) return false;
           return true;
         } catch {

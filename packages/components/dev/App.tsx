@@ -116,12 +116,12 @@ const App = () => {
 
         <div class="mb-10">
           <h2>Patient Info</h2>
-          <PatientInfo patientId="pat_01GQ0XFBHSH3YXN936A2D2SD7Y" />
+          <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
         </div>
 
         <div class="mb-10">
           <h2>Patient Med History</h2>
-          <PatientMedHistory patientId="pat_01GQ0XFBHSH3YXN936A2D2SD7Y" enableLinks={false} />
+          <PatientMedHistory patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" enableLinks={false} />
         </div>
 
         <div class="mb-10">
@@ -208,7 +208,7 @@ const App = () => {
         <h4 class="mt-8">With Mail Order</h4>
         <Card>
           <PharmacySelect
-            patientIds={['pat_01GQ0XFBHSH3YXN936A2D2SD7Y']}
+            patientIds={['pat_01JEVF5DWQAQFHTVYK9ABG65JZ']}
             enableLocalPickup
             enableSendToPatient
             mailOrderPharmacyIds={[
