@@ -41,6 +41,7 @@ export default {
           baseURL={'test-base-url.com/'}
           chronological={true}
           onChronologicalChange={() => {}}
+          onRefillClick={() => {}}
         ></PatientMedHistoryTable>
       </div>
     );

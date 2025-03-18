@@ -157,6 +157,7 @@ export const PatientCard = (props: {
             enableLinks={props.enableMedHistoryLinks ?? false}
             openAddMedicationDialog={() => setShowAddMedDialog(true)}
             hideAddMedicationDialog={() => setShowAddMedDialog(false)}
+            onRefillClick={() => console.log('refill click')}
           />
           <photon-add-medication-history-dialog
             title="Add Medication History"

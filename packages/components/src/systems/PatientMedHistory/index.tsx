@@ -43,6 +43,7 @@ type PatientMedHistoryProps = {
   newMedication?: Treatment;
   openAddMedicationDialog?: () => void;
   hideAddMedicationDialog?: () => void;
+  onRefillClick?: (prescription: Prescription) => void;
 };
 
 export type PatientTreatmentHistoryElement = {
@@ -188,6 +189,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
           medHistory={medHistory()}
           chronological={chronological()}
           onChronologicalChange={() => setChronological(!chronological())}
+          onRefillClick={(rx) => props.onRefillClick && props.onRefillClick(rx)}
         />
       </div>
     </Card>
