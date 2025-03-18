@@ -1,39 +1,54 @@
 # Photon Clinical App
 
-## Scripts
+## Local Development
 
-### `npm start`
+### Run against Boson services
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+> Runs against remote Boson environment services
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+`npx nx run app:start`
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Run against local "Tau" services
 
-### `npm test -- -u`
+> Must be running [tau services](https://github.com/Photon-Health/services) locally
 
-Update test snapshots
+`npx nx run app:start:tau`
 
-### `npm test -- --coverage`
+### Tests
 
-Generate test coverage report
+`npx nx run app:test`
 
-### `npm run lint`
 
-Run ESLint manually, `:fix` will automatically make any possible fixes.
+Update test snapshots:
 
-### `npm run format`
+`npx nx run app:test -- -u`
 
-Format files via Prettier.
 
-### `npm run build`
+Generate test coverage report:
 
-Builds the app for production to the `build` folder.\
+`npx nx run app:test -- --coverage`
+
+### Linting
+
+Run ESLint manually:
+
+`npx nx run app:lint`
+
+Automatically fix ESLint issues:
+
+`npx nx run app:lint:fix` 
+
+
+### Build
+
+`npx nx run app:build:boson`
+
+`npx nx run app:build:neutron`
+
+`npx nx run app:build:photon`
+
+Builds the app for each environment into the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
 The build is minified and the filenames include the hashes.
