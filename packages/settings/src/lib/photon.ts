@@ -478,8 +478,16 @@ const organizationSettings: {
     sendToPatient: false,
     enableRxAndOrder: false
   },
+  // Remo
   org_7IjlTEWfLpmTHjHn: {
     accentColor: '#21201C',
     logo: 'remo_logo.svg'
+  },
+  // Om Dermatology (sub-org of Miiskin)
+  org_1eNnu0Wi14vBH7IM: {
+    accentColor: '#00285c',
+    logo: 'om_dermatology_logo.svg',
+    mailOrder: true,
+    mailOrderProviders: [HONEYBEE_PHARMACY_ID]
   }
 };
