@@ -2,9 +2,10 @@ import { createMemo } from 'solid-js';
 import { PharmacySelect } from '@photonhealth/components';
 import { Card, Text } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import { PrescribeFormStoreWrapper } from '../../stores/prescribeForm';
 export const OrderCard = (props: {
-  store: Record<string, any>;
-  actions: Record<string, (...args: any) => any>;
+  store: PrescribeFormStoreWrapper['store'];
+  actions: PrescribeFormStoreWrapper['actions'];
   enableLocalPickup: boolean;
   enableSendToPatient: boolean;
   mailOrderIds?: string;

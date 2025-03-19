@@ -5,7 +5,8 @@ import { Treatment } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
 import { PhotonClientStore } from '../../store';
-import type { Address } from '../photon-prescribe-workflow';
+import type { FormAddress } from '../photon-prescribe-workflow';
+import { PrescribeFormStoreWrapper } from '../../stores/prescribeForm';
 
 const patientValidator = message(record(string(), any()), 'Please select a patient...');
 
@@ -14,20 +15,20 @@ const patientAddressValidator = message(
   'Please enter an address for patient...'
 );
 
-interface PatientCardStoreProp {
-  patient?: {
-    value?: { id: string; address: any };
-    error: boolean;
-  };
-}
+// interface PatientCardStoreProp {
+//   patient?: {
+//     value: { id: string; address: any };
+//     error: boolean;
+//   };
+// }
 
 export const PatientCard = (props: {
-  store: PatientCardStoreProp;
+  store: PrescribeFormStoreWrapper['store'];
   actions: Record<string, (...args: any) => any>;
   patientId?: string;
   client?: PhotonClientStore;
   enableOrder?: boolean;
-  address?: Address;
+  address?: FormAddress;
   weight?: number;
   weightUnit?: string;
   enableMedHistory?: boolean;

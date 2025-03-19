@@ -1,7 +1,7 @@
 import { gql } from 'graphql-tag';
 import { usePhoton } from '../context';
 import { PhotonAuthorized } from '../photon-authorized';
-import type { FormError } from '../stores/form';
+import { FormError } from '../stores/form';
 import tailwind from '../tailwind.css?inline';
 import { checkHasPermission } from '../utils';
 import { AddPrescriptionCard } from './components/AddPrescriptionCard';
@@ -15,6 +15,7 @@ import { formatPatientWeight } from './util/formatPatientWeight';
 import {
   Alert,
   Button,
+  DraftPrescription,
   RecentOrders,
   ScreeningAlertAcknowledgementDialog,
   ScreeningAlertType,
@@ -36,10 +37,12 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
+import { PrescribeFormStoreKey, PrescribeFormStoreWrapper } from '../stores/prescribeForm';
+import { Address } from '@photonhealth/components/src/systems/PatientInfo';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
-export type Address = {
+export type FormAddress = {
   city: string;
   postalCode: string;
   state: string;
@@ -65,15 +68,15 @@ export type PrescribeProps = {
   mailOrderIds?: string;
   pharmacyId?: string;
   loading: boolean;
-  address?: Address;
+  address?: FormAddress;
   weight?: number;
   weightUnit?: string;
   additionalNotes?: string;
   triggerSubmit: boolean;
   setTriggerSubmit?: (val: boolean) => void;
   toastBuffer: number;
-  formStore?: any;
-  formActions?: any;
+  formStore: PrescribeFormStoreWrapper['store'];
+  formActions: PrescribeFormStoreWrapper['actions'];
   externalOrderId?: string;
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
@@ -166,11 +169,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   const formattedAddress = createMemo(() => {
     // remove unnecessary fields, and add country and street2 if missing
-    const patientAddress =
+    const patientAddress: Partial<Address> =
       props.formStore?.address?.value ?? props.formStore?.patient?.value?.address ?? {};
     const { __typename, name, ...filteredPatientAddress } = patientAddress;
     const address = { street2: '', country: 'US', ...filteredPatientAddress };
-    return address;
+    return address as Address;
   });
 
   const dispatchPrescriptionsCreated = (prescriptions: Prescription[]) => {
@@ -200,16 +203,20 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     // start out by getting the treatment id of the prescription we're drafting now -
     // we'll want to knwo about it so we cn show an alert underneath it, before it gets
     // added to the order
-    const inProgressDraftedPrescriptionTreatmentId = props.formStore.treatment?.value?.id;
+    const inProgressDraftedPrescriptionTreatmentId = props.formStore.treatment.value?.id;
 
     // and then get the ones already added to the order (but not persisted)
-    const draftedPrescriptions = [...props.formStore.draftPrescriptions.value];
+    // let draftedPrescriptions: Partial<DraftPrescription>[] = [];
+    let draftedPrescriptions: DraftPrescription[] = [];
+    if (props.formStore.draftPrescriptions.value) {
+      draftedPrescriptions = [...props.formStore.draftPrescriptions.value];
+    }
 
     // if there is one, add in the prescription being created
     if (inProgressDraftedPrescriptionTreatmentId) {
       draftedPrescriptions.push({
         treatment: { id: inProgressDraftedPrescriptionTreatmentId }
-      });
+      } as DraftPrescription);
     }
 
     // pluck out all the attributes we won't need so we can make a screening request
@@ -217,19 +224,19 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       ({
         id, // the id can be a random number so let's ensure we don't pass it up
         addToTemplates,
-        templateName,
+        // templateName,
         refillsInput,
         catalogId,
         ...draftedPrescription
       }) => {
-        return { ...draftedPrescription, treatment: { id: draftedPrescription.treatment.id } };
+        return { ...draftedPrescription, treatment: { id: draftedPrescription.treatment?.id } };
       }
     );
 
     // let's remove any duplicate treatment ids
     // as there's no point to sending up multiple
     // of the same medication
-    const seenTreatmentIds = new Set<number>();
+    const seenTreatmentIds = new Set<string>();
     const dedupedSanitizedPrescriptions = sanitizedDraftedPrescriptions.filter((entity) => {
       const treatmentId = entity.treatment.id;
       if (seenTreatmentIds.has(treatmentId)) {
@@ -244,7 +251,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     const { data } = await clinicalClient.query({
       query: ScreenDraftedPrescriptionsQuery,
       variables: {
-        patientId: props.formStore.patient?.value.id,
+        patientId: props.formStore.patient.value?.id,
         draftedPrescriptions: dedupedSanitizedPrescriptions
       }
     });
@@ -317,7 +324,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       });
     }
 
-    const keys = enableOrder
+    const keys: PrescribeFormStoreKey[] = enableOrder
       ? ['patient', 'draftPrescriptions', 'pharmacy', 'address']
       : ['patient', 'draftPrescriptions'];
     props.formActions.validate(keys);
@@ -339,7 +346,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         .getSDK()
         .clinical.prescriptionTemplate.createPrescriptionTemplate({});
 
-      for (const draft of props.formStore.draftPrescriptions!.value) {
+      for (const draft of props.formStore.draftPrescriptions.value) {
         const args = {
           daysSupply: draft.daysSupply,
           dispenseAsWritten: draft.dispenseAsWritten,
@@ -348,7 +355,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           effectiveDate: draft.effectiveDate,
           instructions: draft.instructions,
           notes: draft.notes,
-          patientId: props.formStore.patient?.value.id,
+          patientId: props.formStore.patient.value?.id,
           // +1 here because we're using the refillsInput
           fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
           treatmentId: draft.treatment.id,
@@ -412,7 +419,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             // add the new preferred pharmacy to the patient
             updatePatientMutation({
               variables: {
-                id: patient.id,
+                id: patient?.id,
                 preferredPharmacies: [props.formStore.pharmacy?.value]
               },
               awaitRefetchQueries: false
@@ -422,7 +429,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           const { data: orderData, errors } = await orderMutation({
             variables: {
               ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
-              patientId: props.formStore.patient?.value.id,
+              patientId: props.formStore.patient.value?.id,
               pharmacyId: props.pharmacyId ?? (props.formStore.pharmacy?.value || ''),
               fulfillmentType: props.formStore.fulfillmentType?.value || '',
               address: formattedAddress(),
@@ -479,7 +486,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   createEffect(() => {
     dispatchPrescriptionsFormValidate(
       Boolean(
-        props.formStore.draftPrescriptions?.value?.length > 0 && props.formStore.patient?.value
+        props.formStore.draftPrescriptions.value &&
+          props.formStore.draftPrescriptions.value.length > 0 &&
+          props.formStore.patient?.value
       )
     );
   });

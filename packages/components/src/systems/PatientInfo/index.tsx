@@ -1,4 +1,4 @@
-import { createSignal, createEffect, JSXElement, Show, createMemo } from 'solid-js';
+import { createEffect, createMemo, createSignal, JSXElement, Show } from 'solid-js';
 import gql from 'graphql-tag';
 import { parsePhoneNumber } from 'awesome-phonenumber';
 import { Patient } from '@photonhealth/sdk/dist/types';

@@ -132,7 +132,7 @@ const RecentOrdersContext = createContext<RecentOrdersContextValue>([
 ]);
 
 interface SDKProviderProps {
-  patientId: string;
+  patientId?: string;
   children: JSXElement;
 }
 
@@ -149,7 +149,7 @@ function RecentOrders(props: SDKProviderProps) {
   // we need to make this reactive because we need to re-query when the patientId changes
   const options = createMemo<BaseOptions<GetPatientOrdersResponse, GetPatientOrdersVars>>(() => ({
     variables: {
-      patientId: props.patientId
+      patientId: props.patientId ?? ''
     },
     skip: !props.patientId,
     client: client!.apollo,

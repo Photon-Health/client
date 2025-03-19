@@ -10,6 +10,7 @@ import { PhotonTooltip } from '../../photon-tooltip';
 import { partition } from 'lodash';
 import { unwrap } from 'solid-js/store';
 import { ScreeningAlertType } from '@photonhealth/components';
+import { PrescribeFormStoreWrapper } from '../../stores/prescribeForm';
 
 const draftPrescriptionsValidator = message(
   size(array(any()), 1, Infinity),
@@ -21,8 +22,8 @@ export const DraftPrescriptionCard = (props: {
   templateOverrides: TemplateOverrides;
   prescriptionIds: string[];
   prescriptionRef: HTMLDivElement | undefined;
-  actions: Record<string, (...args: any) => any>;
-  store: Record<string, any>;
+  actions: PrescribeFormStoreWrapper['actions'];
+  store: PrescribeFormStoreWrapper['store'];
   setIsEditing: (isEditing: boolean) => void;
   handleDeletedDraftPrescription: () => void;
   screeningAlerts: ScreeningAlertType[];
@@ -31,7 +32,7 @@ export const DraftPrescriptionCard = (props: {
   let ref: Ref<any> | undefined;
   const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = createSignal<boolean>(false);
-  const [editDraft, setEditDraft] = createSignal<any>(undefined);
+  const [editDraft, setEditDraft] = createSignal<DraftPrescription | undefined>(undefined);
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
 
   props.actions.registerValidator({
@@ -51,18 +52,21 @@ export const DraftPrescriptionCard = (props: {
   };
 
   const editPrescription = () => {
-    if (editDraft().treatment) {
-      repopulateForm(props.actions, editDraft());
+    const currentEditDraft = editDraft();
+    if (currentEditDraft) {
+      repopulateForm(props.actions, currentEditDraft);
 
       props.actions.updateFormValue({
         key: 'catalogId',
-        value: editDraft().catalogId
+        value: currentEditDraft.catalogId
       });
 
       // remove the draft from the list
       props.actions.updateFormValue({
         key: 'draftPrescriptions',
-        value: props.store['draftPrescriptions'].value.filter((x: any) => x.id !== editDraft().id)
+        value: props.store['draftPrescriptions'].value.filter(
+          (x: any) => x.id !== currentEditDraft.id
+        )
       });
 
       window.scrollTo({
@@ -78,7 +82,7 @@ export const DraftPrescriptionCard = (props: {
   };
 
   const checkEditPrescription = (id: string) => {
-    const draft = props.store['draftPrescriptions'].value.find((x: any) => x.id === id);
+    const draft = props.store.draftPrescriptions.value.find((x) => x.id === id);
     setEditDraft(draft);
 
     if (!props.store['treatment'].value) {
@@ -168,7 +172,7 @@ export const DraftPrescriptionCard = (props: {
           />
         </div>
         <DraftPrescriptions
-          draftPrescriptions={props.store['draftPrescriptions']?.value ?? []}
+          draftPrescriptions={props.store.draftPrescriptions.value ?? []}
           handleDelete={(draftId: string) => {
             setDeleteDialogOpen(true);
             setDeleteDraftId(draftId);

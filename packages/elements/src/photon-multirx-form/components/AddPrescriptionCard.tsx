@@ -24,6 +24,7 @@ import { usePhoton } from '../../context';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
 import { ScreeningAlertType } from '@photonhealth/components';
+import { PrescribeFormStoreWrapper } from '../../stores/prescribeForm';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -43,7 +44,7 @@ const validators = {
   effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
 };
 
-type DraftPrescription = {
+export type DraftPrescription = {
   id: string;
   effectiveDate: string;
   treatment: {
@@ -67,7 +68,7 @@ type DraftPrescription = {
 export const AddPrescriptionCard = (props: {
   hideAddToTemplates: boolean;
   actions: Record<string, (...args: any) => any>;
-  store: Record<string, any>;
+  store: PrescribeFormStoreWrapper['store'];
   weight?: number;
   weightUnit?: string;
   prefillNotes?: string;
