@@ -37,7 +37,7 @@
     "superstruct": "^1.0.3"
   },
   "peerDependencies": {
-    "solid-js": "1.6.11"
+    "solid-js": "^1.9.3"
   },
   "engines": {
     "node": ">=16"

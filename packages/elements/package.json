@@ -62,7 +62,7 @@
     "graphql-tag": "^2.12.6",
     "jwt-decode": "^3.1.2",
     "libphonenumber-js": "^1.10.14",
-    "solid-element": "^1.6.4",
+    "solid-element": "^1.9.1",
     "superstruct": "^1.0.3"
   },
   "exports": {
