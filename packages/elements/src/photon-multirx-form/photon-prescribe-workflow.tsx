@@ -504,15 +504,32 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     );
   });
 
+  function addRefillToDrafts(rxId: string) {
+    setPrescriptionIds((prev) => [...prev, rxId]);
+    triggerToast({
+      status: 'success',
+      header: 'Prescription Added',
+      body: 'You can send this order or add another prescription before sending it'
+    });
+  }
+
   function tryAddRefillToDrafts(rxId: string, treatment: Treatment) {
-    const isDuplicate = isTreatmentInOrder(treatment.id, props.formStore.draftPrescriptions.value);
-    if (!isDuplicate) {
-      setPrescriptionIds((prev) => [...prev, rxId]);
-    } else {
+    if (isTreatmentInOrder(treatment.id, props.formStore.draftPrescriptions.value)) {
       triggerToast({
         status: 'error',
         body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
       });
+    } else if (
+      props.enableCombineAndDuplicate &&
+      recentOrdersActions.checkDuplicateFill(treatment.name)
+    ) {
+      recentOrdersActions.setIsDuplicateDialogOpen(
+        true,
+        recentOrdersActions.checkDuplicateFill(treatment.name),
+        () => addRefillToDrafts(rxId)
+      );
+    } else {
+      addRefillToDrafts(rxId);
     }
   }
 
