@@ -61,6 +61,7 @@ export type PrescribeProps = {
   enableSendToPatient: boolean;
   enableMedHistory: boolean;
   enableMedHistoryLinks: boolean;
+  enableMedHistoryRefillButton: boolean;
   enableCombineAndDuplicate: boolean;
   mailOrderIds?: string;
   pharmacyId?: string;
@@ -603,6 +604,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 weightUnit={props.weightUnit}
                 enableMedHistory={props.enableMedHistory}
                 enableMedHistoryLinks={props.enableMedHistoryLinks ?? false}
+                enableMedHistoryRefillButton={props.enableMedHistoryRefillButton ?? false}
                 hidePatientCard={props.hidePatientCard}
                 onRefillClick={tryAddRefillToDrafts}
               />

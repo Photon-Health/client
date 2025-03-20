@@ -9,6 +9,7 @@ type Story = StoryObj<typeof PatientMedHistoryTable>;
 export const Default: Story = {
   args: {
     enableLinks: false,
+    enableRefillButton: false,
     medHistory: [],
     baseURL: 'test-base-url.com/'
   }
@@ -17,7 +18,11 @@ export const Default: Story = {
 const testData: PatientTreatmentHistoryElement[] = [
   {
     active: false,
-    prescription: createTestPrescription({ dispenseQuantity: 30, dispenseUnit: 'unit' }),
+    prescription: createTestPrescription({
+      id: 'rx-id-1',
+      dispenseQuantity: 30,
+      dispenseUnit: 'unit'
+    }),
     treatment: createTestTreatment({ name: 'treatment name 1' })
   },
   {
@@ -25,6 +30,13 @@ const testData: PatientTreatmentHistoryElement[] = [
     prescription: createTestPrescription({ instructions: 'very long instructions '.repeat(10) }),
     treatment: createTestTreatment({
       name: 'treatment name 2 is very long and might get truncated on a small screen'
+    })
+  },
+  {
+    active: false,
+    prescription: undefined,
+    treatment: createTestTreatment({
+      name: 'External Medication'
     })
   }
 ];
@@ -37,6 +49,7 @@ export default {
       <div>
         <PatientMedHistoryTable
           enableLinks={props.enableLinks}
+          enableRefillButton={props.enableRefillButton}
           medHistory={testData}
           baseURL={'test-base-url.com/'}
           chronological={true}

@@ -40,6 +40,7 @@ const ADD_MED_HISTORY = gql`
 type PatientMedHistoryProps = {
   patientId: string;
   enableLinks: boolean;
+  enableRefillButton: boolean;
   newMedication?: Treatment;
   openAddMedicationDialog?: () => void;
   hideAddMedicationDialog?: () => void;
@@ -185,6 +186,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
       <div class="max-h-80 overflow-y-auto">
         <PatientMedHistoryTable
           enableLinks={props.enableLinks}
+          enableRefillButton={props.enableRefillButton}
           baseURL={baseURL()}
           medHistory={medHistory()}
           chronological={chronological()}

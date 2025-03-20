@@ -21,6 +21,7 @@ const LoadingRowFallback = (props: { enableLinks: boolean }) => (
 
 export type PatientMedHistoryTableProps = {
   enableLinks: boolean;
+  enableRefillButton: boolean;
   medHistory?: PatientTreatmentHistoryElement[] | undefined;
   baseURL: string;
   onChronologicalChange: () => void;
@@ -63,7 +64,6 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
         <Show when={props.enableLinks}>
           <Table.Col>Source</Table.Col>
         </Show>
-        <Table.Col>Actions</Table.Col>
       </Table.Header>
       <Table.Body>
         <Show
@@ -126,7 +126,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                     )}
                   </Table.Cell>
                 </Show>
-                <Show when={med.prescription !== undefined}>
+                <Show when={props.enableRefillButton && med.prescription !== undefined}>
                   <Table.Cell>
                     <button
                       type="button"

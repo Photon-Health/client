@@ -32,6 +32,7 @@ export const PatientCard = (props: {
   weightUnit?: string;
   enableMedHistory?: boolean;
   enableMedHistoryLinks?: boolean;
+  enableMedHistoryRefillButton?: boolean;
   hidePatientCard?: boolean;
   onRefillClick?: (prescriptionId: string, treatment: Treatment) => void;
 }) => {
@@ -156,6 +157,7 @@ export const PatientCard = (props: {
             patientId={patientId()}
             newMedication={newMedication()}
             enableLinks={props.enableMedHistoryLinks ?? false}
+            enableRefillButton={props.enableMedHistoryRefillButton ?? false}
             openAddMedicationDialog={() => setShowAddMedDialog(true)}
             hideAddMedicationDialog={() => setShowAddMedDialog(false)}
             onRefillClick={(rxId, treatment) => {
