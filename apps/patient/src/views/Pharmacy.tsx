@@ -114,7 +114,7 @@ export const Pharmacy = () => {
     openNow !== null ? !!openNow : order?.readyBy === 'Urgent'
   );
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
-  const [enablePrice, setEnablePrice] = useState(true);
+  const [enablePrice, setEnablePrice] = useState(showPriceToggle);
 
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
