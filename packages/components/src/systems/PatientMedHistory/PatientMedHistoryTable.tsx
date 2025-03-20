@@ -1,6 +1,7 @@
 import { createSignal, For, Show } from 'solid-js';
 import { formatDate, formatPrescriptionDetails, generateString, Icon, Table, Text } from '../../';
 import { PatientTreatmentHistoryElement } from './index';
+import { Treatment } from '@photonhealth/sdk/dist/types';
 
 const LoadingRowFallback = (props: { enableLinks: boolean }) => (
   <Table.Row>
@@ -24,6 +25,7 @@ export type PatientMedHistoryTableProps = {
   baseURL: string;
   onChronologicalChange: () => void;
   chronological: boolean;
+  onRefillClick: (prescriptionId: string, treatment: Treatment) => void;
 };
 
 export default function PatientMedHistoryTable(props: PatientMedHistoryTableProps) {
@@ -61,6 +63,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
         <Show when={props.enableLinks}>
           <Table.Col>Source</Table.Col>
         </Show>
+        <Table.Col>Actions</Table.Col>
       </Table.Header>
       <Table.Body>
         <Show
@@ -121,6 +124,20 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                     ) : (
                       'External'
                     )}
+                  </Table.Cell>
+                </Show>
+                <Show when={med.prescription !== undefined}>
+                  <Table.Cell>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        med.prescription && props.onRefillClick(med.prescription.id, med.treatment);
+                      }}
+                      aria-label={`Refill ${med.treatment.name}`}
+                      class="text-blue-500 hover:text-blue-700 text-sm"
+                    >
+                      <Icon name="documentPlus" size="sm" aria-hidden="true" />
+                    </button>
                   </Table.Cell>
                 </Show>
               </Table.Row>
