@@ -2,6 +2,7 @@ import { createSignal, For, Show } from 'solid-js';
 import { formatDate, formatPrescriptionDetails, generateString, Icon, Table, Text } from '../../';
 import { PatientTreatmentHistoryElement } from './index';
 import { Treatment } from '@photonhealth/sdk/dist/types';
+import { FlyoutMenu, FlyoutOption } from '../../particles/FlyoutMenu';
 
 const LoadingRowFallback = (props: { enableLinks: boolean }) => (
   <Table.Row>
@@ -111,33 +112,9 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                   </div>
                 </Table.Cell>
                 <Table.Cell>{formatDate(med.prescription?.writtenAt) || 'N/A'}</Table.Cell>
-                <Show when={props.enableLinks}>
+                <Show when={props.enableLinks || props.enableRefillButton}>
                   <Table.Cell>
-                    {med.prescription?.id ? (
-                      <a
-                        class="text-blue-500 underline"
-                        target="_blank"
-                        href={`${props.baseURL}${med.prescription?.id}`}
-                      >
-                        Link
-                      </a>
-                    ) : (
-                      'External'
-                    )}
-                  </Table.Cell>
-                </Show>
-                <Show when={props.enableRefillButton && med.prescription !== undefined}>
-                  <Table.Cell>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        med.prescription && props.onRefillClick(med.prescription.id, med.treatment);
-                      }}
-                      aria-label={`Refill ${med.treatment.name}`}
-                      class="text-blue-500 hover:text-blue-700 text-sm"
-                    >
-                      <Icon name="documentPlus" size="sm" aria-hidden="true" />
-                    </button>
+                    <FlyoutMenu options={getOptions(props, med)} />
                   </Table.Cell>
                 </Show>
               </Table.Row>
@@ -147,4 +124,25 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
       </Table.Body>
     </Table>
   );
+}
+
+function getOptions(
+  props: PatientMedHistoryTableProps,
+  med: PatientTreatmentHistoryElement
+): FlyoutOption[] {
+  const options: FlyoutOption[] = [];
+  if (props.enableLinks) {
+    options.push({
+      link: `${props.baseURL}${med.prescription?.id}`,
+      label: 'Link'
+    });
+  }
+  if (props.enableRefillButton) {
+    options.push({
+      label: 'Refill',
+      icon: 'documentPlus',
+      onClick: () => med.prescription && props.onRefillClick(med.prescription.id, med.treatment)
+    });
+  }
+  return options;
 }
