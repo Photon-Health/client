@@ -1,8 +1,8 @@
-import { createSignal, For, Show } from 'solid-js';
+import { Component, createSignal, For, Show } from 'solid-js';
 import { formatDate, formatPrescriptionDetails, generateString, Icon, Table, Text } from '../../';
 import { PatientTreatmentHistoryElement } from './index';
 import { Treatment } from '@photonhealth/sdk/dist/types';
-import { FlyoutMenu, FlyoutOption } from '../../particles/FlyoutMenu';
+import { IconButton } from '../../particles/IconButton';
 
 const LoadingRowFallback = (props: { enableLinks: boolean }) => (
   <Table.Row>
@@ -62,8 +62,8 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
             </div>
           </span>
         </Table.Col>
-        <Show when={props.enableLinks}>
-          <Table.Col>Source</Table.Col>
+        <Show when={props.enableRefillButton}>
+          <Table.Col>Actions</Table.Col>
         </Show>
       </Table.Header>
       <Table.Body>
@@ -87,7 +87,11 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                         expandedRows().has(med.treatment.id) ? '' : 'whitespace-nowrap'
                       }`}
                     >
-                      <div class="text-ellipsis overflow-hidden">{med.treatment.name}</div>
+                      <MedicationName
+                        med={med}
+                        enableLinks={props.enableLinks}
+                        link={`${props.baseURL}${med.prescription?.id}`}
+                      />
                       <div class="text-gray-500 text-ellipsis overflow-hidden">
                         {formatPrescriptionDetails(med.prescription)}
                       </div>
@@ -112,9 +116,16 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                   </div>
                 </Table.Cell>
                 <Table.Cell>{formatDate(med.prescription?.writtenAt) || 'N/A'}</Table.Cell>
-                <Show when={props.enableLinks || props.enableRefillButton}>
+                <Show when={props.enableRefillButton}>
                   <Table.Cell>
-                    <FlyoutMenu options={getOptions(props, med)} />
+                    <IconButton
+                      iconName="documentPlus"
+                      label="Refill"
+                      onClick={() =>
+                        med.prescription && props.onRefillClick(med.prescription.id, med.treatment)
+                      }
+                      disabled={!med.prescription}
+                    />
                   </Table.Cell>
                 </Show>
               </Table.Row>
@@ -126,23 +137,27 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
   );
 }
 
-function getOptions(
-  props: PatientMedHistoryTableProps,
-  med: PatientTreatmentHistoryElement
-): FlyoutOption[] {
-  const options: FlyoutOption[] = [];
-  if (props.enableLinks) {
-    options.push({
-      link: `${props.baseURL}${med.prescription?.id}`,
-      label: 'Link'
-    });
-  }
-  if (props.enableRefillButton) {
-    options.push({
-      label: 'Refill',
-      icon: 'documentPlus',
-      onClick: () => med.prescription && props.onRefillClick(med.prescription.id, med.treatment)
-    });
-  }
-  return options;
+interface MedicationNameProps {
+  enableLinks: boolean;
+  link?: string;
+  med: PatientTreatmentHistoryElement;
 }
+
+const MedicationName: Component<MedicationNameProps> = (props) => {
+  return (
+    <>
+      <Show when={!props.enableLinks || !props.med.prescription}>
+        <div class="text-ellipsis overflow-hidden">{props.med.treatment.name}</div>
+      </Show>
+      <Show when={props.enableLinks && props.med.prescription}>
+        <a
+          href={props.link}
+          class="text-ellipsis block overflow-hidden text-blue-500 underline"
+          target="_blank"
+        >
+          {props.med.treatment.name}
+        </a>
+      </Show>
+    </>
+  );
+};
