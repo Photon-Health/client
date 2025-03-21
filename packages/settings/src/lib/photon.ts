@@ -489,5 +489,12 @@ const organizationSettings: {
     logo: 'om_dermatology_logo.svg',
     mailOrder: true,
     mailOrderProviders: [HONEYBEE_PHARMACY_ID]
+  },
+  // Geviti
+  org_Zdri0JlNxJfWjzpk: {
+    logo: 'geviti_logo.webp',
+    accentColor: '#04549D',
+    mailOrder: true,
+    mailOrderProviders: [STRIVE_PHARMACY_ID]
   }
 };
