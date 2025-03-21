@@ -103,12 +103,18 @@ export const Pharmacy = () => {
   const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
   const isLoading = loadingLocation || loadingPharmacies;
 
+  // pricing
+  const containsZepbound = flattenedFills.some((fill) =>
+    fill.treatment.name.toLowerCase().includes('zepbound')
+  );
+  const showPriceToggle = orgSettings.enablePricing && containsZepbound ? true : false;
+
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
     openNow !== null ? !!openNow : order?.readyBy === 'Urgent'
   );
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
-  const [enablePrice, setEnablePrice] = useState(false);
+  const [enablePrice, setEnablePrice] = useState(showPriceToggle);
 
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
@@ -151,12 +157,6 @@ export const Pharmacy = () => {
     !orgSettings.topRankedCostco &&
     !hasTopRankedCostco && // this means org is Sesame, we don't want to show Amazon and top ranked Costco at the same time
     orgSettings.mailOrderNavigate;
-
-  // pricing
-  const containsZepbound = flattenedFills.some((fill) =>
-    fill.treatment.name.toLowerCase().includes('zepbound')
-  );
-  const enablePricing = orgSettings.enablePricing && containsZepbound ? true : false;
 
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
@@ -884,7 +884,7 @@ export const Pharmacy = () => {
               loadingMore={isLoading}
               showingAllPharmacies={showingAllPharmacies}
               showHeading={(enableCourier || enableMailOrder) ?? false}
-              showPriceToggle={enablePricing}
+              showPriceToggle={showPriceToggle}
               enableOpenNow={enableOpenNow}
               enable24Hr={enable24Hr}
               enablePrice={enablePrice}
