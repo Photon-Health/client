@@ -1,8 +1,9 @@
-import { Component, createSignal, For, Show } from 'solid-js';
+import { Component, createMemo, createSignal, For, Show } from 'solid-js';
 import { formatDate, formatPrescriptionDetails, generateString, Icon, Table, Text } from '../../';
 import { PatientTreatmentHistoryElement } from './index';
 import { Treatment } from '@photonhealth/sdk/dist/types';
 import { IconButton } from '../../particles/IconButton';
+import { debounce } from '@solid-primitives/scheduled';
 
 const LoadingRowFallback = (props: { enableLinks: boolean }) => (
   <Table.Row>
@@ -44,6 +45,13 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
       return newSet;
     });
   };
+
+  const debouncedRefill = createMemo(() => {
+    const onRefillClick = props.onRefillClick;
+    return debounce(async (prescriptionId: string, treatment: Treatment) => {
+      onRefillClick(prescriptionId, treatment);
+    }, 300);
+  });
 
   return (
     <Table>
@@ -115,15 +123,17 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                     </button>
                   </div>
                 </Table.Cell>
-                <Table.Cell>{formatDate(med.prescription?.writtenAt) || 'N/A'}</Table.Cell>
+                <Table.Cell>{presentWrittenAt(med)}</Table.Cell>
                 <Show when={props.enableRefillButton}>
                   <Table.Cell>
                     <IconButton
                       iconName="documentPlus"
                       label="Refill"
-                      onClick={() =>
-                        med.prescription && props.onRefillClick(med.prescription.id, med.treatment)
-                      }
+                      onClick={() => {
+                        if (med.prescription) {
+                          debouncedRefill()(med.prescription.id, med.treatment);
+                        }
+                      }}
                       disabled={!med.prescription}
                     />
                   </Table.Cell>
@@ -135,6 +145,13 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
       </Table.Body>
     </Table>
   );
+}
+
+function presentWrittenAt(med: PatientTreatmentHistoryElement) {
+  if (!med.prescription) {
+    return 'External';
+  }
+  return formatDate(med.prescription?.writtenAt) || 'N/A';
 }
 
 interface MedicationNameProps {
