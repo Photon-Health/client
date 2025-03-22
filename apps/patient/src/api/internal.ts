@@ -16,6 +16,14 @@ export const getOrder = async (orderId: string) => {
   }
 };
 
+export const getOffers = async (orderId: string) => {
+  const response = await graphQLClient.offers({ id: orderId });
+  if (response.offers) {
+    return response.offers;
+  } else {
+    throw new Error('No offers found');
+  }
+};
 export const getPharmacies = async ({
   searchParams,
   limit,
