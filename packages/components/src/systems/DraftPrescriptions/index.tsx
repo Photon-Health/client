@@ -1,6 +1,14 @@
 import { Catalog, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
-import { createSignal, For, JSXElement, mergeProps, onMount, Show } from 'solid-js';
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  For,
+  JSXElement,
+  mergeProps,
+  Show
+} from 'solid-js';
 import Banner from '../../particles/Banner';
 import Card from '../../particles/Card';
 import Icon from '../../particles/Icon';
@@ -118,6 +126,11 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
   const [isLoading, setIsLoading] = createSignal<boolean>(true);
   const client = usePhotonClient();
 
+  const allDraftPrescriptionIds = createMemo(() => [
+    ...merged.templateIds,
+    ...merged.prescriptionIds
+  ]);
+
   async function fetchDrafts() {
     setIsLoading(true);
     const draftPrescriptions: DraftPrescription[] = [];
@@ -193,8 +206,8 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
     setIsLoading(false);
   }
 
-  onMount(() => {
-    if (merged.templateIds.length > 0 || merged.prescriptionIds.length > 0) {
+  createEffect(() => {
+    if (allDraftPrescriptionIds().length > 0) {
       fetchDrafts();
     } else {
       setIsLoading(false);
@@ -205,7 +218,7 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
     <div class="space-y-3">
       {/* Show when Loading */}
       <Show when={isLoading()}>
-        <For each={[...merged.templateIds, ...merged.prescriptionIds]}>
+        <For each={allDraftPrescriptionIds()}>
           {() => (
             <DraftPrescription
               LeftChildren={

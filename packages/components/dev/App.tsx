@@ -121,11 +121,15 @@ const App = () => {
 
         <div class="mb-10">
           <h2>Patient Med History</h2>
-          <PatientMedHistory patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" enableLinks={false} />
+          <PatientMedHistory
+            patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ"
+            enableLinks={false}
+            enableRefillButton={true}
+          />
         </div>
 
         <div class="mb-10">
-          <h2>Draft Presciptions</h2>
+          <h2>Draft Prescriptions</h2>
           <DraftPrescriptions
             draftPrescriptions={draftPrescriptions}
             setDraftPrescriptions={setDraftPrescriptions}

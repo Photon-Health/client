@@ -6,10 +6,11 @@ export interface CardProps extends JSX.HTMLAttributes<HTMLDivElement> {
   selected?: boolean;
   variant?: 'white' | 'gray';
   addChildrenDivider?: boolean;
+  autoPadding?: boolean;
 }
 
 function Card(preProps: CardProps) {
-  const props = mergeProps({ variant: 'white' }, preProps);
+  const props = mergeProps({ variant: 'white', autoPadding: true }, preProps);
 
   const cardClasses = createMemo(() =>
     clsx('border rounded-lg ', {
@@ -25,7 +26,9 @@ function Card(preProps: CardProps) {
     <div class={cardClasses()}>
       {/* addChildrenDivider adds a horizontal line between each child element */}
       <For each={Array.isArray(props.children) ? props.children : [props.children]}>
-        {(child) => <div class="px-4 py-3 sm:px-6 sm:py-4">{child}</div>}
+        {(child) => (
+          <div class={clsx({ 'px-4 py-3 sm:px-6 sm:py-4': props.autoPadding })}>{child}</div>
+        )}
       </For>
     </div>
   );
