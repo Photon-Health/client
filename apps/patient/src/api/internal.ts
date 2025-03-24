@@ -17,7 +17,7 @@ export const getOrder = async (orderId: string) => {
 };
 
 export const getOffers = async (orderId: string) => {
-  const response = await graphQLClient.offers({ id: orderId });
+  const response = await graphQLClient.GetOffersForOrder({ orderId: orderId });
   if (response.offers) {
     return response.offers;
   } else {
