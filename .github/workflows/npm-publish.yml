@@ -44,13 +44,8 @@ jobs:
             fi
           done
           echo $PACKAGES
-#          echo "::set-output name=packages::$PACKAGES"
           echo "::set-output name=packages::packages/elements"
-
-      # "Clean cache" resolves known issue when publishing after `npm ci`: https://github.com/npm/cli/issues/4828
-#      - name: Clean cache
-#        run: |
-#          rm -rf node_modules package-lock.json
+      #          echo "::set-output name=packages::$PACKAGES"
 
       - name: Publish changed packages
         run: |
