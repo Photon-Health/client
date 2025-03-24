@@ -19,8 +19,11 @@ jobs:
         with:
           node-version: 20
 
+      - name: Clear npm cache
+        run: npm cache clean --force
+
       - name: Install Node.js dependencies
-        run: npm ci
+        run: npm ci --force
 
       - name: Run Lint
         run: npx nx run-many --all --target=lint

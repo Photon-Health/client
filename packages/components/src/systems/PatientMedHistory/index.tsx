@@ -40,9 +40,11 @@ const ADD_MED_HISTORY = gql`
 type PatientMedHistoryProps = {
   patientId: string;
   enableLinks: boolean;
+  enableRefillButton: boolean;
   newMedication?: Treatment;
   openAddMedicationDialog?: () => void;
   hideAddMedicationDialog?: () => void;
+  onRefillClick?: (prescriptionId: string, treatment: Treatment) => void;
 };
 
 export type PatientTreatmentHistoryElement = {
@@ -171,8 +173,8 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   });
 
   return (
-    <Card addChildrenDivider={true}>
-      <div class="flex items-center justify-between">
+    <Card addChildrenDivider={true} autoPadding={false}>
+      <div class="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
         <Text color="gray">Medication History</Text>
         <Show when={props?.openAddMedicationDialog}>
           <Button variant="secondary" size="sm" onClick={props?.openAddMedicationDialog}>
@@ -184,10 +186,14 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
       <div class="max-h-80 overflow-y-auto">
         <PatientMedHistoryTable
           enableLinks={props.enableLinks}
+          enableRefillButton={props.enableRefillButton}
           baseURL={baseURL()}
           medHistory={medHistory()}
           chronological={chronological()}
           onChronologicalChange={() => setChronological(!chronological())}
+          onRefillClick={(rxId, treatment) =>
+            props.onRefillClick && props.onRefillClick(rxId, treatment)
+          }
         />
       </div>
     </Card>
