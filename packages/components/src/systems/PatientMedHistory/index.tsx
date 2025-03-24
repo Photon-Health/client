@@ -173,8 +173,8 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   });
 
   return (
-    <Card addChildrenDivider={true}>
-      <div class="flex items-center justify-between">
+    <Card addChildrenDivider={true} autoPadding={false}>
+      <div class="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
         <Text color="gray">Medication History</Text>
         <Show when={props?.openAddMedicationDialog}>
           <Button variant="secondary" size="sm" onClick={props?.openAddMedicationDialog}>
