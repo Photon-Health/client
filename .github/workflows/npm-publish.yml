@@ -3,7 +3,8 @@ name: Publish Packages
 on:
   push:
     branches:
-      - boson
+      - fix_elements_publish
+#      - boson
 
 jobs:
   publish:
@@ -23,8 +24,8 @@ jobs:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install Dependencies
-        run: npm ci
+#      - name: Install Dependencies
+#        run: npm ci
 
       - name: Set Git User
         run: |
@@ -44,6 +45,11 @@ jobs:
           echo $PACKAGES
           echo "::set-output name=packages::$PACKAGES"
 
+      # "Clean cache" resolves known issue when publishing after `npm ci`: https://github.com/npm/cli/issues/4828
+#      - name: Clean cache
+#        run: |
+#          rm -rf node_modules package-lock.json
+
       - name: Publish changed packages
         run: |
           PACKAGES="${{ steps.check.outputs.packages }}"
@@ -55,9 +61,9 @@ jobs:
               for PACKAGE in $PACKAGES
               do
                   echo "Publishing $PACKAGE..."
-                  
+
                   cd $PACKAGE
-                  
+
                   PACKAGE_VERSION=$(node -p "require('./package.json').version")
                   PACKAGE_NAME=$(basename $PACKAGE)
                   PACKAGE_TAG="${PACKAGE_NAME}_v${PACKAGE_VERSION}"
@@ -74,7 +80,7 @@ jobs:
 
                   git tag -a $PACKAGE_TAG -m "$PACKAGE_BODY"
                   git push origin $PACKAGE_TAG
-                  
+
                   cd -
               done
           fi
@@ -96,7 +102,7 @@ jobs:
                   then
                       echo "Package updates found for Elements"
                       cd $PACKAGE && npm run build:prod
-                      
+
                       PACKAGE_VERSION=$(node -p "require('./package.json').version")
                       PREFIX="elements/v${PACKAGE_VERSION}"
                       PREFIX_LATEST="elements/@latest"
