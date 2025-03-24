@@ -29,7 +29,7 @@ import {
 } from '../components';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, preparePharmacy } from '../utils/general';
-import { ExtendedFulfillmentType, Order } from '../utils/models';
+import { ExtendedFulfillmentType } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -175,7 +175,7 @@ export const Pharmacy = () => {
         .filter((offer) => offer.deliveryEstimate !== undefined);
 
       if (amazonOffers.length > 0) {
-        setAmazonPharmacyOverride(amazonOffers[0].deliveryEstimate.deliveryPromise);
+        setAmazonPharmacyOverride(amazonOffers[0]?.deliveryEstimate?.deliveryPromise);
       }
     }
 
