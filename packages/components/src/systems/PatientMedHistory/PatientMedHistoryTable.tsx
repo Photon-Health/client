@@ -1,15 +1,20 @@
 import { Component, createMemo, createSignal, For, Show } from 'solid-js';
 import { formatDate, formatPrescriptionDetails, generateString, Icon, Text } from '../../';
-import { PatientTreatmentHistoryElement } from './index';
-import { Treatment } from '@photonhealth/sdk/dist/types';
+import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
 import { IconButton } from '../../particles/IconButton';
 import { debounce } from '@solid-primitives/scheduled';
 import clsx from 'clsx';
 
+export type MedHistoryRowItem = {
+  rowId: string;
+  treatment: Treatment;
+  prescription?: Prescription;
+};
+
 export type PatientMedHistoryTableProps = {
   enableLinks: boolean;
   enableRefillButton: boolean;
-  medHistory?: PatientTreatmentHistoryElement[] | undefined;
+  rowItems?: MedHistoryRowItem[] | undefined;
   baseURL: string;
   onChronologicalChange: () => void;
   chronological: boolean;
@@ -19,13 +24,13 @@ export type PatientMedHistoryTableProps = {
 export default function PatientMedHistoryTable(props: PatientMedHistoryTableProps) {
   const [expandedRows, setExpandedRows] = createSignal<Set<string>>(new Set());
 
-  const toggleExpand = (medId: string) => {
+  const toggleExpand = (rowId: string) => {
     setExpandedRows((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(medId)) {
-        newSet.delete(medId);
+      if (newSet.has(rowId)) {
+        newSet.delete(rowId);
       } else {
-        newSet.add(medId);
+        newSet.add(rowId);
       }
       return newSet;
     });
@@ -78,7 +83,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
       </div>
 
       <Show
-        when={props.medHistory}
+        when={props.rowItems}
         fallback={
           <>
             <LoadingRowFallback enableRefill={props.enableRefillButton} />
@@ -87,45 +92,46 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
           </>
         }
       >
-        <For each={props.medHistory}>
-          {(med) => (
+        <For each={props.rowItems}>
+          {(rowItem) => (
             <>
               <div class="px-4 py-4 truncate">
                 <div class="flex">
                   <div
                     class={`flex-col flex-1 min-w-0 ${
-                      expandedRows().has(med.treatment.id) ? 'whitespace-normal' : ''
+                      expandedRows().has(rowItem.rowId) ? 'whitespace-normal' : ''
                     }`}
                   >
                     <MedicationName
-                      med={med}
+                      treatmentName={rowItem.treatment.name}
+                      prescriptionId={rowItem.prescription?.id}
                       enableLinks={props.enableLinks}
-                      link={`${props.baseURL}${med.prescription?.id}`}
+                      linkBaseUrl={props.baseURL}
                     />
                     <div class="text-gray-500 text-ellipsis overflow-hidden">
-                      {formatPrescriptionDetails(med.prescription)}
+                      {formatPrescriptionDetails(rowItem.prescription)}
                     </div>
                   </div>
                   <button
                     type="button"
-                    onClick={() => toggleExpand(med.treatment?.id)}
+                    onClick={() => toggleExpand(rowItem.rowId)}
                     class="text-blue-500 hover:text-blue-700 text-sm ml-2 self-stretch flex items-center"
-                    aria-expanded={expandedRows().has(med.treatment?.id)}
+                    aria-expanded={expandedRows().has(rowItem.rowId)}
                     aria-label={
-                      expandedRows().has(med.treatment?.id)
+                      expandedRows().has(rowItem.rowId)
                         ? 'Collapse medication details'
                         : 'Expand medication details'
                     }
                   >
                     <Icon
-                      name={expandedRows().has(med.treatment?.id) ? 'minus' : 'plus'}
+                      name={expandedRows().has(rowItem.rowId) ? 'minus' : 'plus'}
                       size="sm"
                       aria-hidden="true"
                     />
                   </button>
                 </div>
               </div>
-              <div class="px-4 py-4 self-center">{presentWrittenAt(med)}</div>
+              <div class="px-4 py-4 self-center">{presentWrittenAt(rowItem)}</div>
 
               <Show when={props.enableRefillButton}>
                 <div class="px-4 py-4 self-center">
@@ -134,11 +140,11 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                     iconSize="sm"
                     label="Refill"
                     onClick={() => {
-                      if (med.prescription) {
-                        debouncedRefill()(med.prescription.id, med.treatment);
+                      if (rowItem.prescription) {
+                        debouncedRefill()(rowItem.prescription.id, rowItem.treatment);
                       }
                     }}
-                    disabled={!med.prescription}
+                    disabled={!rowItem.prescription}
                   />
                 </div>
               </Show>
@@ -169,7 +175,7 @@ const LoadingRowFallback = (props: { enableRefill: boolean }) => {
   );
 };
 
-function presentWrittenAt(med: PatientTreatmentHistoryElement) {
+function presentWrittenAt(med: MedHistoryRowItem) {
   if (!med.prescription) {
     return 'External';
   }
@@ -179,22 +185,28 @@ function presentWrittenAt(med: PatientTreatmentHistoryElement) {
 interface MedicationNameProps {
   enableLinks: boolean;
   link?: string;
-  med: PatientTreatmentHistoryElement;
+  linkBaseUrl: string;
+  treatmentName: string;
+  prescriptionId?: string;
 }
 
 const MedicationName: Component<MedicationNameProps> = (props) => {
+  const canShowLink = createMemo<boolean>(() => {
+    return props.enableLinks && !!props.prescriptionId;
+  });
+
   return (
     <>
-      <Show when={!props.enableLinks || !props.med.prescription}>
-        <div class="text-ellipsis overflow-hidden">{props.med.treatment.name}</div>
+      <Show when={!canShowLink()}>
+        <div class="text-ellipsis overflow-hidden">{props.treatmentName}</div>
       </Show>
-      <Show when={props.enableLinks && props.med.prescription}>
+      <Show when={canShowLink()}>
         <a
-          href={props.link}
+          href={`${props.linkBaseUrl}${props.prescriptionId}`}
           class="text-ellipsis block overflow-hidden text-blue-500 underline"
           target="_blank"
         >
-          {props.med.treatment.name}
+          {props.treatmentName}
         </a>
       </Show>
     </>
