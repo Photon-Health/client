@@ -4,7 +4,10 @@ import { PhotonAuthorized } from '../photon-authorized';
 import type { FormError } from '../stores/form';
 import tailwind from '../tailwind.css?inline';
 import { checkHasPermission } from '../utils';
-import { AddPrescriptionCard, isTreatmentInOrder } from './components/AddPrescriptionCard';
+import {
+  AddPrescriptionCard,
+  isTreatmentInDraftPrescriptions
+} from './components/AddPrescriptionCard';
 import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
 import { OrderCard } from './components/OrderCard';
 import { PatientCard } from './components/PatientCard';
@@ -514,7 +517,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   }
 
   function tryAddRefillToDrafts(rxId: string, treatment: Treatment) {
-    if (isTreatmentInOrder(treatment.id, props.formStore.draftPrescriptions.value)) {
+    if (isTreatmentInDraftPrescriptions(treatment.id, props.formStore.draftPrescriptions.value)) {
       triggerToast({
         status: 'error',
         body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'

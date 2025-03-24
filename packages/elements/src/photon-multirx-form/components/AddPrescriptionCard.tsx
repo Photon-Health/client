@@ -132,12 +132,12 @@ export const AddPrescriptionCard = (props: {
     const errorsPresent = props.actions.hasErrors(keys);
 
     const draftedPrescriptions = [...props.store.draftPrescriptions.value];
-    const prescriptionAlreadyExistsInOrder = isTreatmentInOrder(
+    const isPrescriptionAlreadyAdded = isTreatmentInDraftPrescriptions(
       props.store.treatment?.value?.id,
       draftedPrescriptions
     );
 
-    if (prescriptionAlreadyExistsInOrder) {
+    if (isPrescriptionAlreadyAdded) {
       triggerToast({
         status: 'error',
         body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
@@ -529,7 +529,7 @@ export const AddPrescriptionCard = (props: {
   );
 };
 
-export function isTreatmentInOrder(
+export function isTreatmentInDraftPrescriptions(
   treatmentId: string,
   draftedPrescriptions: { treatment: { id: string } }[]
 ) {
