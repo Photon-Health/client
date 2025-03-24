@@ -4,7 +4,10 @@ import { PhotonAuthorized } from '../photon-authorized';
 import type { FormError } from '../stores/form';
 import tailwind from '../tailwind.css?inline';
 import { checkHasPermission } from '../utils';
-import { AddPrescriptionCard } from './components/AddPrescriptionCard';
+import {
+  AddPrescriptionCard,
+  isTreatmentInDraftPrescriptions
+} from './components/AddPrescriptionCard';
 import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
 import { OrderCard } from './components/OrderCard';
 import { PatientCard } from './components/PatientCard';
@@ -26,7 +29,7 @@ import {
   useRecentOrders
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { Order, Prescription } from '@photonhealth/sdk/dist/types';
+import { Order, Prescription, Treatment } from '@photonhealth/sdk/dist/types';
 import '@shoelace-style/shoelace/dist/components/alert/alert';
 import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
@@ -61,6 +64,7 @@ export type PrescribeProps = {
   enableSendToPatient: boolean;
   enableMedHistory: boolean;
   enableMedHistoryLinks: boolean;
+  enableMedHistoryRefillButton: boolean;
   enableCombineAndDuplicate: boolean;
   mailOrderIds?: string;
   pharmacyId?: string;
@@ -117,6 +121,13 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   const [overrideScreenAlerts, setOverrideScreenAlerts] = createSignal<boolean>(false);
   const [isScreeningAlertWarningOpen, setIsScreeningAlertWarningOpen] = createSignal(false);
+
+  const [prescriptionIds, setPrescriptionIds] = createSignal<string[]>([]);
+
+  createEffect(() => {
+    const initialIds = props.prescriptionIds?.split(',') ?? [];
+    setPrescriptionIds(initialIds);
+  });
 
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
   let prefillNotes = '';
@@ -496,6 +507,35 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     );
   });
 
+  function addRefillToDrafts(rxId: string) {
+    setPrescriptionIds((prev) => [...prev, rxId]);
+    triggerToast({
+      status: 'success',
+      header: 'Prescription Added',
+      body: 'You can send this order or add another prescription before sending it'
+    });
+  }
+
+  function tryAddRefillToDrafts(rxId: string, treatment: Treatment) {
+    if (isTreatmentInDraftPrescriptions(treatment.id, props.formStore.draftPrescriptions.value)) {
+      triggerToast({
+        status: 'error',
+        body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
+      });
+    } else if (
+      props.enableCombineAndDuplicate &&
+      recentOrdersActions.checkDuplicateFill(treatment.name)
+    ) {
+      recentOrdersActions.setIsDuplicateDialogOpen(
+        true,
+        recentOrdersActions.checkDuplicateFill(treatment.name),
+        () => addRefillToDrafts(rxId)
+      );
+    } else {
+      addRefillToDrafts(rxId);
+    }
+  }
+
   return (
     <div ref={ref}>
       <style>{tailwind}</style>
@@ -584,7 +624,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 weightUnit={props.weightUnit}
                 enableMedHistory={props.enableMedHistory}
                 enableMedHistoryLinks={props.enableMedHistoryLinks ?? false}
+                enableMedHistoryRefillButton={props.enableMedHistoryRefillButton ?? false}
                 hidePatientCard={props.hidePatientCard}
+                onRefillClick={tryAddRefillToDrafts}
               />
               <Show
                 when={
@@ -626,12 +668,12 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 <DraftPrescriptionCard
                   templateIds={props.templateIds?.split(',') || []}
                   templateOverrides={props.templateOverrides || {}}
-                  prescriptionIds={props.prescriptionIds?.split(',') || []}
+                  prescriptionIds={prescriptionIds()}
                   prescriptionRef={prescriptionRef}
                   actions={props.formActions}
                   store={props.formStore}
                   setIsEditing={setIsEditing}
-                  handleDeletedDraftPrescription={function () {
+                  handleDraftPrescriptionsChange={function () {
                     screenDraftedPrescriptions();
                   }}
                   screeningAlerts={screeningAlerts()}
