@@ -4,7 +4,8 @@ import { usePhotonClient } from '../SDKProvider';
 import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
 import { Button, Card, createQuery, Text, triggerToast } from '../../';
 import { ApolloCache } from '@apollo/client';
-import PatientMedHistoryTable from './PatientMedHistoryTable';
+import PatientMedHistoryTable, { MedHistoryRowItem } from './PatientMedHistoryTable';
+import { ulid } from 'ulid';
 
 const GET_PATIENT_MED_HISTORY = gql`
   query GetPatient($id: ID!) {
@@ -47,9 +48,7 @@ type PatientMedHistoryProps = {
   onRefillClick?: (prescriptionId: string, treatment: Treatment) => void;
 };
 
-export type PatientTreatmentHistoryElement = {
-  active: boolean;
-  comment?: string;
+export type GetPatientTreatmentHistoryItem = {
   treatment: Treatment;
   prescription?: Prescription;
 };
@@ -57,13 +56,20 @@ export type PatientTreatmentHistoryElement = {
 type GetPatientResponse = {
   patient: {
     id: string;
-    treatmentHistory: PatientTreatmentHistoryElement[];
+    treatmentHistory: GetPatientTreatmentHistoryItem[];
   };
 };
 
+const mapToMedHistoryRowItems = (getPatientResponse: GetPatientResponse): MedHistoryRowItem[] =>
+  getPatientResponse?.patient?.treatmentHistory.map((historyItem) => ({
+    rowId: ulid(),
+    treatment: historyItem.treatment,
+    prescription: historyItem.prescription
+  }));
+
 export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const client = usePhotonClient();
-  const [medHistory, setMedHistory] = createSignal<PatientTreatmentHistoryElement[] | undefined>(
+  const [medHistoryRowItems, setMedHistoryRowItems] = createSignal<MedHistoryRowItem[] | undefined>(
     undefined
   );
   const [chronological, setChronological] = createSignal<boolean>(false);
@@ -83,27 +89,16 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
     queryOptions
   );
 
-  const sortHistoryByDate = (chronological: boolean) => {
-    return (a: PatientTreatmentHistoryElement, b: PatientTreatmentHistoryElement) => {
-      const dateA = a?.prescription?.writtenAt
-        ? new Date(a.prescription.writtenAt).getTime()
-        : -Infinity;
-      const dateB = b?.prescription?.writtenAt
-        ? new Date(b.prescription.writtenAt).getTime()
-        : -Infinity;
-      if (chronological) return dateA - dateB;
-      return dateB - dateA;
-    };
-  };
-
   createEffect(() => {
-    const medicationHistory = patientMedHistory()?.patient?.treatmentHistory;
+    const getPatientResponse = patientMedHistory();
+    const medicationHistory = getPatientResponse?.patient?.treatmentHistory;
     if (medicationHistory) {
-      const sortedMedHistory = medicationHistory.slice().sort(sortHistoryByDate(chronological()));
-      setMedHistory(sortedMedHistory);
+      const rowItems = mapToMedHistoryRowItems(getPatientResponse);
+      const sortedRowItems = rowItems.slice().sort(sortHistoryByDate(chronological()));
+      setMedHistoryRowItems(sortedRowItems);
     }
     if (!patientMedHistory.loading && !medicationHistory) {
-      setMedHistory([]);
+      setMedHistoryRowItems([]);
     }
   });
 
@@ -149,12 +144,12 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
     });
 
     // Update local state immediately
-    const newMed: PatientTreatmentHistoryElement = {
-      active: false,
+    const newMed: MedHistoryRowItem = {
+      rowId: ulid(),
       treatment: props.newMedication as Treatment,
       prescription: undefined
     };
-    setMedHistory((prev) => (prev ? [newMed, ...prev] : [newMed]));
+    setMedHistoryRowItems((prev) => (prev ? [newMed, ...prev] : [newMed]));
 
     // Show toast notification
     triggerToast({
@@ -188,7 +183,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
           enableLinks={props.enableLinks}
           enableRefillButton={props.enableRefillButton}
           baseURL={baseURL()}
-          medHistory={medHistory()}
+          rowItems={medHistoryRowItems()}
           chronological={chronological()}
           onChronologicalChange={() => setChronological(!chronological())}
           onRefillClick={(rxId, treatment) =>
@@ -199,3 +194,16 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
     </Card>
   );
 }
+
+const sortHistoryByDate = (chronological: boolean) => {
+  return (a: GetPatientTreatmentHistoryItem, b: GetPatientTreatmentHistoryItem) => {
+    const dateA = a?.prescription?.writtenAt
+      ? new Date(a.prescription.writtenAt).getTime()
+      : -Infinity;
+    const dateB = b?.prescription?.writtenAt
+      ? new Date(b.prescription.writtenAt).getTime()
+      : -Infinity;
+    if (chronological) return dateA - dateB;
+    return dateB - dateA;
+  };
+};
