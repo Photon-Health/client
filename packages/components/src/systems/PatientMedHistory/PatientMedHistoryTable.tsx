@@ -6,24 +6,6 @@ import { IconButton } from '../../particles/IconButton';
 import { debounce } from '@solid-primitives/scheduled';
 import clsx from 'clsx';
 
-const LoadingRowFallback = (props: { enableRefill: boolean }) => {
-  const cellClasses = 'px-4 py-4 select-none';
-  return (
-    <>
-      <div class={cellClasses}>
-        <Text sampleLoadingText={generateString(10, 25)} loading />
-      </div>
-      <div class={cellClasses}>
-        <Text sampleLoadingText="aaaaa" loading />
-      </div>
-      <Show when={props.enableRefill}>
-        <div class={cellClasses}>
-          <Text sampleLoadingText="aaa" loading />
-        </div>
-      </Show>
-    </>
-  );
-};
 export type PatientMedHistoryTableProps = {
   enableLinks: boolean;
   enableRefillButton: boolean;
@@ -167,6 +149,25 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
     </div>
   );
 }
+
+const LoadingRowFallback = (props: { enableRefill: boolean }) => {
+  const cellClasses = 'px-4 py-4 select-none';
+  return (
+    <>
+      <div class={cellClasses}>
+        <Text sampleLoadingText={generateString(10, 25)} loading />
+      </div>
+      <div class={cellClasses}>
+        <Text sampleLoadingText="aaaaa" loading />
+      </div>
+      <Show when={props.enableRefill}>
+        <div class={cellClasses}>
+          <Text sampleLoadingText="aaa" loading />
+        </div>
+      </Show>
+    </>
+  );
+};
 
 function presentWrittenAt(med: PatientTreatmentHistoryElement) {
   if (!med.prescription) {
