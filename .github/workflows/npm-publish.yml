@@ -15,7 +15,8 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
         with:
-          ref: boson
+#          ref: boson
+          ref: fix_elements_publish
           fetch-depth: 0
 
       - name: Set up Node.js
