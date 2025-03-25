@@ -64,6 +64,7 @@ export const Main = () => {
           datadogRum.addAction('shortlink-opened', {
             orderId: payload.orderId,
             patientId: payload.sub,
+            organizationId: payload.organizationId,
             context: payload.context,
             metadata: payload.metadata
           });
