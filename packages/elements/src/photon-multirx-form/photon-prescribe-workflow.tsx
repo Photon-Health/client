@@ -105,6 +105,7 @@ export const ScreenDraftedPrescriptionsQuery = gql`
 
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
+  let draftPrescriptionCardRef!: HTMLDivElement;
 
   const client = usePhoton();
   const [showForm, setShowForm] = createSignal<boolean>(
@@ -507,16 +508,42 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     );
   });
 
+  createEffect((previousElement) => {
+    const show =
+      hasCorrectPatientData() &&
+      // if orders are enabled, we need a patient's address
+      (props.formStore.patient?.value?.address ||
+        // if orders are disabled, we need only a patient id
+        (props.formStore.patient?.value?.id && !props.enableOrder));
+    console.log('show: ', show);
+    console.log('draftPrescriptionCardRef: ', draftPrescriptionCardRef);
+    console.log('draftPrescriptionCardRef isConnected: ', draftPrescriptionCardRef?.isConnected);
+    console.log(
+      'previous and new are equal: ',
+      previousElement === draftPrescriptionCardRef,
+      previousElement,
+      draftPrescriptionCardRef
+    );
+    return draftPrescriptionCardRef;
+  }, null);
+
   function addRefillToDrafts(rxId: string) {
+    console.log('------> addRefillToDrafts');
     setPrescriptionIds((prev) => [...prev, rxId]);
     triggerToast({
       status: 'success',
       header: 'Prescription Added',
       body: 'You can send this order or add another prescription before sending it'
     });
+    console.log({ draftPrescriptionCardRef });
+    if (draftPrescriptionCardRef && draftPrescriptionCardRef.scrollIntoView) {
+      draftPrescriptionCardRef.scrollIntoView({ behavior: 'smooth' });
+    }
   }
 
   function tryAddRefillToDrafts(rxId: string, treatment: Treatment) {
+    console.log('------> tryAddRefillToDrafts');
+
     if (isTreatmentInDraftPrescriptions(treatment.id, props.formStore.draftPrescriptions.value)) {
       triggerToast({
         status: 'error',
@@ -665,20 +692,22 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     />
                   </div>
                 </Show>
-                <DraftPrescriptionCard
-                  templateIds={props.templateIds?.split(',') || []}
-                  templateOverrides={props.templateOverrides || {}}
-                  prescriptionIds={prescriptionIds()}
-                  prescriptionRef={prescriptionRef}
-                  actions={props.formActions}
-                  store={props.formStore}
-                  setIsEditing={setIsEditing}
-                  handleDraftPrescriptionsChange={function () {
-                    screenDraftedPrescriptions();
-                  }}
-                  screeningAlerts={screeningAlerts()}
-                  enableOrder={props.enableOrder}
-                />
+                <div ref={draftPrescriptionCardRef}>
+                  <DraftPrescriptionCard
+                    templateIds={props.templateIds?.split(',') || []}
+                    templateOverrides={props.templateOverrides || {}}
+                    prescriptionIds={prescriptionIds()}
+                    prescriptionRef={prescriptionRef}
+                    actions={props.formActions}
+                    store={props.formStore}
+                    setIsEditing={setIsEditing}
+                    handleDraftPrescriptionsChange={function () {
+                      screenDraftedPrescriptions();
+                    }}
+                    screeningAlerts={screeningAlerts()}
+                    enableOrder={props.enableOrder}
+                  />
+                </div>
                 <Show when={props.enableOrder && !props.pharmacyId}>
                   <OrderCard
                     store={props.formStore}
