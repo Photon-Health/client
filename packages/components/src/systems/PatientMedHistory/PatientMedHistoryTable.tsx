@@ -3,6 +3,7 @@ import { formatDate, formatPrescriptionDetails, generateString, Icon, Text } fro
 import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
 import { IconButton } from '../../particles/IconButton';
 import { debounce } from '@solid-primitives/scheduled';
+import { datadogRum } from '@datadog/browser-rum';
 import clsx from 'clsx';
 
 export type MedHistoryRowItem = {
@@ -24,7 +25,8 @@ export type PatientMedHistoryTableProps = {
 export default function PatientMedHistoryTable(props: PatientMedHistoryTableProps) {
   const [expandedRows, setExpandedRows] = createSignal<Set<string>>(new Set());
 
-  const toggleExpand = (rowId: string) => {
+  const toggleExpand = (rowItem: MedHistoryRowItem) => {
+    const rowId = rowItem.rowId;
     setExpandedRows((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(rowId)) {
@@ -34,12 +36,19 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
       }
       return newSet;
     });
+
+    datadogRum.addAction('med_history_toggle_expand_btn_click', {
+      prescriptionId: rowItem.prescription?.id && 'external-rx'
+    });
   };
 
   const debouncedRefill = createMemo(() => {
     const onRefillClick = props.onRefillClick;
     return debounce(async (prescriptionId: string, treatment: Treatment) => {
       onRefillClick(prescriptionId, treatment);
+      datadogRum.addAction('med_history_renew_btn_click', {
+        prescriptionId: prescriptionId
+      });
     }, 300);
   });
 
@@ -114,7 +123,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                   </div>
                   <button
                     type="button"
-                    onClick={() => toggleExpand(rowItem.rowId)}
+                    onClick={() => toggleExpand(rowItem)}
                     class="text-blue-500 hover:text-blue-700 text-sm ml-2 self-stretch flex items-center"
                     aria-expanded={expandedRows().has(rowItem.rowId)}
                     aria-label={
