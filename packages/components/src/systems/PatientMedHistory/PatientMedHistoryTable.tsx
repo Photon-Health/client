@@ -74,7 +74,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
       }}
     >
       <div class={gridHeaderClass()}>
-        <div class="px-4 py-3.5">Medication</div>
+        <div class="px-4 sm:px-6 py-3.5">Medication</div>
         <div class="px-4 py-3.5 cursor-pointer flex" onClick={() => props.onChronologicalChange()}>
           Written
           <div class="ml-1">
@@ -87,7 +87,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
           </div>
         </div>
         <Show when={props.enableRefillButton}>
-          <div class="px-4 py-3.5">Actions</div>
+          <div class="px-4 sm:px-6 py-3.5">Actions</div>
         </Show>
       </div>
 
@@ -104,7 +104,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
         <For each={props.rowItems}>
           {(rowItem) => (
             <>
-              <div class="px-4 py-4 truncate">
+              <div class="px-4 sm:px-6 py-4 truncate">
                 <div class="flex">
                   <div
                     class={`flex-col flex-1 min-w-0 ${
@@ -143,7 +143,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
               <div class="px-4 py-4 self-center">{presentWrittenAt(rowItem)}</div>
 
               <Show when={props.enableRefillButton}>
-                <div class="px-4 py-4 m-auto">
+                <div class="px-4 sm:px-6 py-4 m-auto">
                   <IconButton
                     iconName="documentPlus"
                     iconSize="sm"
@@ -160,6 +160,11 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
             </>
           )}
         </For>
+      </Show>
+      <Show when={!ordersState.isLoading && props.rowItems && props.rowItems.length === 0}>
+        <div class="p-4 col-span-3 text-center">
+          <Text color="gray">No medication history found.</Text>
+        </div>
       </Show>
     </div>
   );
