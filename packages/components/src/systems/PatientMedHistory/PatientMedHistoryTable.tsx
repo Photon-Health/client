@@ -134,7 +134,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
               <div class="px-4 py-4 self-center">{presentWrittenAt(rowItem)}</div>
 
               <Show when={props.enableRefillButton}>
-                <div class="px-4 py-4 self-center">
+                <div class="px-4 py-4 m-auto">
                   <IconButton
                     iconName="documentPlus"
                     iconSize="sm"
