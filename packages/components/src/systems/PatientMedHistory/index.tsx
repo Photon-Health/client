@@ -92,12 +92,13 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   createEffect(() => {
     const getPatientResponse = patientMedHistory();
     const medicationHistory = getPatientResponse?.patient?.treatmentHistory;
-    if (medicationHistory) {
+    if (patientMedHistory.loading) {
+      setMedHistoryRowItems(undefined);
+    } else if (medicationHistory) {
       const rowItems = mapToMedHistoryRowItems(getPatientResponse);
       const sortedRowItems = rowItems.slice().sort(sortHistoryByDate(chronological()));
       setMedHistoryRowItems(sortedRowItems);
-    }
-    if (!patientMedHistory.loading && !medicationHistory) {
+    } else {
       setMedHistoryRowItems([]);
     }
   });

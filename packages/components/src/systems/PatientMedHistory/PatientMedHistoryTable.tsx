@@ -92,7 +92,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
       </div>
 
       <Show
-        when={props.rowItems}
+        when={!ordersState.isLoading && props.rowItems}
         fallback={
           <>
             <LoadingRowFallback enableRefill={props.enableRefillButton} />
