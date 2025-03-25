@@ -10,7 +10,11 @@ const PatientMedHistoryWrapper = (props: PatientMedProps) => {
   return (
     <div>
       <style>{photonStyles}</style>
-      <PatientMedHistory patientId={props.patientId} enableLinks={false} />
+      <PatientMedHistory
+        patientId={props.patientId}
+        enableLinks={false}
+        enableRefillButton={false}
+      />
     </div>
   );
 };
