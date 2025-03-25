@@ -80,6 +80,7 @@ type RecentOrdersState = {
   isCombineDialogOpen: boolean;
   isDuplicateDialogOpen: boolean;
   isIssueDialogOpen: boolean;
+  isLoading: boolean;
   patientId?: string;
   patientName?: string;
   // in case the combine order fails, we need address to make a new order
@@ -118,6 +119,7 @@ type RecentOrdersContextValue = [RecentOrdersState, RecentOrdersActions];
 const RecentOrdersContext = createContext<RecentOrdersContextValue>([
   {
     orders: [],
+    isLoading: true,
     isCombineDialogOpen: false,
     isDuplicateDialogOpen: false,
     isIssueDialogOpen: false
@@ -140,6 +142,7 @@ function RecentOrders(props: SDKProviderProps) {
   const client = usePhotonClient();
   const [state, setState] = createStore<RecentOrdersState>({
     orders: [],
+    isLoading: true,
     isCombineDialogOpen: false,
     isDuplicateDialogOpen: false,
     isIssueDialogOpen: false,
@@ -207,6 +210,7 @@ function RecentOrders(props: SDKProviderProps) {
   ];
 
   createEffect(() => {
+    setState({ isLoading: data.loading });
     const patient = data()?.patient;
     if (!data.loading && patient) {
       const orders = patient?.orders;
@@ -221,6 +225,7 @@ function RecentOrders(props: SDKProviderProps) {
         });
 
         setState({
+          isLoading: false,
           orders: recentOrders,
           patientName: patient?.name?.full,
           patientId: patient?.id

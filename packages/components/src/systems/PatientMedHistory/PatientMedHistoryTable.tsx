@@ -1,5 +1,12 @@
 import { Component, createMemo, createSignal, For, Show } from 'solid-js';
-import { formatDate, formatPrescriptionDetails, generateString, Icon, Text } from '../../';
+import {
+  formatDate,
+  formatPrescriptionDetails,
+  generateString,
+  Icon,
+  Text,
+  useRecentOrders
+} from '../../';
 import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
 import { IconButton } from '../../particles/IconButton';
 import { debounce } from '@solid-primitives/scheduled';
@@ -23,6 +30,7 @@ export type PatientMedHistoryTableProps = {
 };
 
 export default function PatientMedHistoryTable(props: PatientMedHistoryTableProps) {
+  const [ordersState] = useRecentOrders();
   const [expandedRows, setExpandedRows] = createSignal<Set<string>>(new Set());
 
   const toggleExpand = (rowItem: MedHistoryRowItem) => {
@@ -153,7 +161,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                         debouncedRefill()(rowItem.prescription.id, rowItem.treatment);
                       }
                     }}
-                    disabled={!rowItem.prescription}
+                    disabled={ordersState.isLoading || !rowItem.prescription}
                   />
                 </div>
               </Show>
