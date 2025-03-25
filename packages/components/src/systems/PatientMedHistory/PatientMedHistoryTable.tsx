@@ -10,7 +10,6 @@ import {
 import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
 import { IconButton } from '../../particles/IconButton';
 import { debounce } from '@solid-primitives/scheduled';
-import { datadogRum } from '@datadog/browser-rum';
 import clsx from 'clsx';
 
 export type MedHistoryRowItem = {
@@ -44,19 +43,12 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
       }
       return newSet;
     });
-
-    datadogRum.addAction('med_history_toggle_expand_btn_click', {
-      prescriptionId: rowItem.prescription?.id && 'external-rx'
-    });
   };
 
   const debouncedRefill = createMemo(() => {
     const onRefillClick = props.onRefillClick;
     return debounce(async (prescriptionId: string, treatment: Treatment) => {
       onRefillClick(prescriptionId, treatment);
-      datadogRum.addAction('med_history_renew_btn_click', {
-        prescriptionId: prescriptionId
-      });
     }, 300);
   });
 
