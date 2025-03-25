@@ -119,6 +119,7 @@ export const PrescriptionForm = () => {
           enable-order={orgSettings?.enableRxAndOrder ?? true}
           enable-med-history={orgSettings?.enableMedHistory ?? false}
           enable-med-history-links={true}
+          enable-med-history-refill-button={false}
           enable-local-pickup={orgSettings?.pickUp ?? false}
           enable-send-to-patient={orgSettings?.sendToPatient ?? false}
           enable-combine-and-duplicate={orgSettings?.enableCombineAndDuplicate ?? false}
