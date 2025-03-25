@@ -14,6 +14,10 @@ To modify the embedded component, edit attributes of element `photon-prescribe-w
 
 To view available attributes/options, see [photon-prescribe-workflow-component.tsx](src/photon-multirx-form/photon-prescribe-workflow-component.tsx) or [official docs](https://docs.photon.health/docs/elements#prescribe-element)
 
+### Components
+
+After editing `packages/components`, re-run `npx nx run components:build` to see TypeScript and other changes load into `packages/elements`
+
 ## Usage
 
 ### Installation
