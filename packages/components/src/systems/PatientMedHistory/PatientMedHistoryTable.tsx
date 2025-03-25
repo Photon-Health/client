@@ -153,7 +153,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                         debouncedRefill()(rowItem.prescription.id, rowItem.treatment);
                       }
                     }}
-                    disabled={ordersState.isLoading || !rowItem.prescription}
+                    disabled={!rowItem.prescription}
                   />
                 </div>
               </Show>
