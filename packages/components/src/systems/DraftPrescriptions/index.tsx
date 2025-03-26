@@ -123,6 +123,14 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
     ...merged.prescriptionIds
   ]);
 
+  onMount(() => {
+    if (allDraftPrescriptionIds().length > 0) {
+      fetchDrafts();
+    } else {
+      setIsLoading(false);
+    }
+  });
+
   async function fetchDrafts() {
     setIsLoading(true);
     const draftPrescriptions: DraftPrescription[] = [];
@@ -197,14 +205,6 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
     }
     setIsLoading(false);
   }
-
-  onMount(() => {
-    if (allDraftPrescriptionIds().length > 0) {
-      fetchDrafts();
-    } else {
-      setIsLoading(false);
-    }
-  });
 
   return (
     <div class="space-y-3">
