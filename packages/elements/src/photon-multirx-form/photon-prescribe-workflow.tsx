@@ -191,6 +191,17 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     ref?.dispatchEvent(event);
   };
 
+  const dispatchDraftPrescriptionCreated = (draftPrescription: AddDraftPrescription) => {
+    const event = new CustomEvent('photon-draft-prescription-created', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        draft: draftPrescription
+      }
+    });
+    ref?.dispatchEvent(event);
+  };
+
   const dispatchOrderCreated = (order: Order) => {
     const event = new CustomEvent('photon-order-created', {
       composed: true,
@@ -531,6 +542,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       header: 'Prescription Added',
       body: 'You can send this order or add another prescription before sending it'
     });
+
+    dispatchDraftPrescriptionCreated(draft);
   }
 
   function tryAddRefillToDrafts(prescription: MedHistoryPrescription, treatment: Treatment) {
@@ -675,6 +688,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       draftedPrescriptionChanged={function () {
                         screenDraftedPrescriptions();
                       }}
+                      onDraftPrescriptionCreated={dispatchDraftPrescriptionCreated}
                       screeningAlerts={screeningAlerts()}
                       catalogId={props.catalogId}
                       allowOffCatalogSearch={props.allowOffCatalogSearch}
