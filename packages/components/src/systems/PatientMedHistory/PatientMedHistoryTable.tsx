@@ -1,4 +1,4 @@
-import { Component, createMemo, createSignal, For, Show } from 'solid-js';
+import { Component, createMemo, For, Show } from 'solid-js';
 import {
   formatDate,
   formatPrescriptionDetails,
@@ -30,20 +30,6 @@ export type PatientMedHistoryTableProps = {
 
 export default function PatientMedHistoryTable(props: PatientMedHistoryTableProps) {
   const [ordersState] = useRecentOrders();
-  const [expandedRows, setExpandedRows] = createSignal<Set<string>>(new Set());
-
-  const toggleExpand = (rowItem: MedHistoryRowItem) => {
-    const rowId = rowItem.rowId;
-    setExpandedRows((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(rowId)) {
-        newSet.delete(rowId);
-      } else {
-        newSet.add(rowId);
-      }
-      return newSet;
-    });
-  };
 
   const debouncedRefill = createMemo(() => {
     const onRefillClick = props.onRefillClick;
@@ -75,7 +61,10 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
     >
       <div class={gridHeaderClass()}>
         <div class="px-4 sm:px-6 py-3.5">Medication</div>
-        <div class="px-4 py-3.5 cursor-pointer flex" onClick={() => props.onChronologicalChange()}>
+        <div
+          class="px-4 sm:px-6 py-3.5 cursor-pointer flex"
+          onClick={() => props.onChronologicalChange()}
+        >
           Written
           <div class="ml-1">
             <Show when={props.chronological}>
@@ -105,42 +94,19 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
           {(rowItem) => (
             <>
               <div class="px-4 sm:px-6 py-4 truncate">
-                <div class="flex">
-                  <div
-                    class={`flex-col flex-1 min-w-0 ${
-                      expandedRows().has(rowItem.rowId) ? 'whitespace-normal' : ''
-                    }`}
-                  >
-                    <MedicationName
-                      treatmentName={rowItem.treatment.name}
-                      prescriptionId={rowItem.prescription?.id}
-                      enableLinks={props.enableLinks}
-                      linkBaseUrl={props.baseURL}
-                    />
-                    <div class="text-gray-500 text-ellipsis overflow-hidden">
-                      {formatPrescriptionDetails(rowItem.prescription)}
-                    </div>
+                <div class="flex-col flex-1 min-w-0 whitespace-normal">
+                  <MedicationName
+                    treatmentName={rowItem.treatment.name}
+                    prescriptionId={rowItem.prescription?.id}
+                    enableLinks={props.enableLinks}
+                    linkBaseUrl={props.baseURL}
+                  />
+                  <div class="text-gray-500 text-ellipsis overflow-hidden">
+                    {formatPrescriptionDetails(rowItem.prescription)}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => toggleExpand(rowItem)}
-                    class="text-blue-500 hover:text-blue-700 text-sm ml-2 self-stretch flex items-center"
-                    aria-expanded={expandedRows().has(rowItem.rowId)}
-                    aria-label={
-                      expandedRows().has(rowItem.rowId)
-                        ? 'Collapse medication details'
-                        : 'Expand medication details'
-                    }
-                  >
-                    <Icon
-                      name={expandedRows().has(rowItem.rowId) ? 'minus' : 'plus'}
-                      size="sm"
-                      aria-hidden="true"
-                    />
-                  </button>
                 </div>
               </div>
-              <div class="px-4 py-4 self-center">{presentWrittenAt(rowItem)}</div>
+              <div class="px-4 sm:px-6 py-4 self-center">{presentWrittenAt(rowItem)}</div>
 
               <Show when={props.enableRefillButton}>
                 <div class="px-4 sm:px-6 py-4 m-auto">
@@ -162,7 +128,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
         </For>
       </Show>
       <Show when={!ordersState.isLoading && props.rowItems && props.rowItems.length === 0}>
-        <div class="p-4 col-span-3 text-center">
+        <div class="px-4 sm:px-6 py-4 col-span-3 text-center">
           <Text color="gray">No medication history found.</Text>
         </div>
       </Show>
@@ -171,7 +137,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
 }
 
 const LoadingRowFallback = (props: { enableRefill: boolean }) => {
-  const cellClasses = 'px-4 py-4 select-none';
+  const cellClasses = 'px-4 sm:px-6 py-4 select-none';
   return (
     <>
       <div class={cellClasses}>
