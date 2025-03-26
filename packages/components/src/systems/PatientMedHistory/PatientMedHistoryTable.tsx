@@ -13,7 +13,6 @@ import { debounce } from '@solid-primitives/scheduled';
 import clsx from 'clsx';
 
 export type MedHistoryRowItem = {
-  rowId: string;
   treatment: Treatment;
   prescription?: Prescription;
 };

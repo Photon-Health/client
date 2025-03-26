@@ -5,7 +5,6 @@ import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
 import { Button, Card, createQuery, Text, triggerToast } from '../../';
 import { ApolloCache } from '@apollo/client';
 import PatientMedHistoryTable, { MedHistoryRowItem } from './PatientMedHistoryTable';
-import { ulid } from 'ulid';
 
 const GET_PATIENT_MED_HISTORY = gql`
   query GetPatient($id: ID!) {
@@ -60,13 +59,6 @@ type GetPatientResponse = {
   };
 };
 
-const mapToMedHistoryRowItems = (getPatientResponse: GetPatientResponse): MedHistoryRowItem[] =>
-  getPatientResponse?.patient?.treatmentHistory.map((historyItem) => ({
-    rowId: ulid(),
-    treatment: historyItem.treatment,
-    prescription: historyItem.prescription
-  }));
-
 export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const client = usePhotonClient();
   const [medHistoryRowItems, setMedHistoryRowItems] = createSignal<MedHistoryRowItem[] | undefined>(
@@ -91,10 +83,9 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
 
   createEffect(() => {
     const getPatientResponse = patientMedHistory();
-    const medicationHistory = getPatientResponse?.patient?.treatmentHistory;
     if (patientMedHistory.loading) {
       setMedHistoryRowItems(undefined);
-    } else if (medicationHistory) {
+    } else if (getPatientResponse) {
       const rowItems = mapToMedHistoryRowItems(getPatientResponse);
       const sortedRowItems = rowItems.slice().sort(sortHistoryByDate(chronological()));
       setMedHistoryRowItems(sortedRowItems);
@@ -146,7 +137,6 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
 
     // Update local state immediately
     const newMed: MedHistoryRowItem = {
-      rowId: ulid(),
       treatment: props.newMedication as Treatment,
       prescription: undefined
     };
@@ -195,6 +185,12 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
     </Card>
   );
 }
+
+const mapToMedHistoryRowItems = (getPatientResponse: GetPatientResponse): MedHistoryRowItem[] =>
+  getPatientResponse?.patient?.treatmentHistory.map((historyItem) => ({
+    treatment: historyItem.treatment,
+    prescription: historyItem.prescription
+  }));
 
 const sortHistoryByDate = (chronological: boolean) => {
   return (a: GetPatientTreatmentHistoryItem, b: GetPatientTreatmentHistoryItem) => {
