@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/html';
 import type { ComponentProps } from 'solid-js';
 import PatientMedHistoryTable, { MedHistoryRowItem } from './PatientMedHistoryTable';
 import { createTestPrescription, createTestTreatment } from '../../utils/storybookUtils';
-import { ulid } from 'ulid';
 
 type Story = StoryObj<typeof PatientMedHistoryTable>;
 
@@ -17,7 +16,6 @@ export const Default: Story = {
 
 const testData: MedHistoryRowItem[] = [
   {
-    rowId: ulid(),
     prescription: createTestPrescription({
       id: 'rx-id-1',
       dispenseQuantity: 30,
@@ -26,14 +24,12 @@ const testData: MedHistoryRowItem[] = [
     treatment: createTestTreatment({ name: 'treatment name 1' })
   },
   {
-    rowId: ulid(),
     prescription: createTestPrescription({ instructions: 'very long instructions '.repeat(10) }),
     treatment: createTestTreatment({
       name: 'treatment name 2 is very long and might get truncated on a small screen'
     })
   },
   {
-    rowId: ulid(),
     prescription: undefined,
     treatment: createTestTreatment({
       name: 'External Medication'
