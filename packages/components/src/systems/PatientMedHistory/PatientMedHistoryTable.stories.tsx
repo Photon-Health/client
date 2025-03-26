@@ -50,8 +50,8 @@ export default {
           enableRefillButton={props.enableRefillButton}
           rowItems={testData}
           baseURL={'test-base-url.com/'}
-          chronological={true}
-          onChronologicalChange={() => {}}
+          sortOrder={'desc'}
+          onSortOrderToggle={() => {}}
           onRefillClick={() => {}}
         ></PatientMedHistoryTable>
       </div>

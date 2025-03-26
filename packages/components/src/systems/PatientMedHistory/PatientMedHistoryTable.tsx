@@ -23,8 +23,8 @@ export type PatientMedHistoryTableProps = {
   enableRefillButton: boolean;
   rowItems?: MedHistoryRowItem[] | undefined;
   baseURL: string;
-  onChronologicalChange: () => void;
-  chronological: boolean;
+  onSortOrderToggle: () => void;
+  sortOrder: 'asc' | 'desc';
   onRefillClick: (prescription: MedHistoryPrescription, treatment: Treatment) => void;
 };
 
@@ -63,14 +63,14 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
         <div class="px-4 sm:px-6 py-3.5">Medication</div>
         <div
           class="px-4 sm:px-6 py-3.5 cursor-pointer flex"
-          onClick={() => props.onChronologicalChange()}
+          onClick={() => props.onSortOrderToggle()}
         >
           Written
           <div class="ml-1">
-            <Show when={props.chronological}>
+            <Show when={props.sortOrder === 'desc'}>
               <Icon name="chevronDown" size="sm" />
             </Show>
-            <Show when={!props.chronological}>
+            <Show when={props.sortOrder === 'asc'}>
               <Icon name="chevronUp" size="sm" />
             </Show>
           </div>

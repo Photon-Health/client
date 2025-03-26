@@ -95,7 +95,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const [medHistoryRowItems, setMedHistoryRowItems] = createSignal<MedHistoryRowItem[] | undefined>(
     undefined
   );
-  const [chronological, setChronological] = createSignal<boolean>(false);
+  const [sortOrder, setSortOrder] = createSignal<'asc' | 'desc'>('asc');
 
   const baseURL = createMemo(() => `${client?.clinicalUrl}/prescriptions/`);
 
@@ -118,7 +118,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
       setMedHistoryRowItems(undefined);
     } else if (getPatientResponse) {
       const rowItems = mapToMedHistoryRowItems(getPatientResponse);
-      const sortedRowItems = rowItems.slice().sort(sortHistoryByDate(chronological()));
+      const sortedRowItems = rowItems.slice().sort(sortHistoryByDate(sortOrder()));
       setMedHistoryRowItems(sortedRowItems);
     } else {
       setMedHistoryRowItems([]);
@@ -206,8 +206,8 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
           enableRefillButton={props.enableRefillButton}
           baseURL={baseURL()}
           rowItems={medHistoryRowItems()}
-          chronological={chronological()}
-          onChronologicalChange={() => setChronological(!chronological())}
+          sortOrder={sortOrder()}
+          onSortOrderToggle={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
           onRefillClick={(prescription, treatment) =>
             props.onRefillClick && props.onRefillClick(prescription, treatment)
           }
@@ -223,7 +223,7 @@ const mapToMedHistoryRowItems = (getPatientResponse: GetPatientResponse): MedHis
     prescription: historyItem.prescription as MedHistoryPrescription
   }));
 
-const sortHistoryByDate = (chronological: boolean) => {
+const sortHistoryByDate = (order: 'asc' | 'desc') => {
   return (a: MedHistoryRowItem, b: MedHistoryRowItem) => {
     const dateA = a?.prescription?.writtenAt
       ? new Date(a.prescription.writtenAt).getTime()
@@ -231,7 +231,7 @@ const sortHistoryByDate = (chronological: boolean) => {
     const dateB = b?.prescription?.writtenAt
       ? new Date(b.prescription.writtenAt).getTime()
       : -Infinity;
-    if (chronological) return dateA - dateB;
+    if (order === 'desc') return dateA - dateB;
     return dateB - dateA;
   };
 };
