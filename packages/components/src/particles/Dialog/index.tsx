@@ -3,6 +3,7 @@ import { Transition } from 'solid-transition-group';
 import Icon from '../Icon';
 import createTransition from '../../utils/createTransition';
 import clsx from 'clsx';
+import { ZendeskMessagingWidget } from '../../../types/zendesk';
 
 const transitionDuration = 100;
 export interface DialogProps {
@@ -27,11 +28,12 @@ function Dialog(props: DialogProps) {
   );
 
   createEffect(() => {
-    if (window?.zE) {
+    const ze = window?.zE as ZendeskMessagingWidget | undefined;
+    if (ze) {
       if (merged.open) {
-        window.zE('messenger', 'hide');
+        ze('messenger', 'hide');
       } else {
-        window.zE('messenger', 'show');
+        ze('messenger', 'show');
       }
     }
   });
