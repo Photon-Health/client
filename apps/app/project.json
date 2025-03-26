@@ -55,6 +55,25 @@
         "command": "react-app-rewired test --watchAll=false"
       }
     },
+    "e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "env-cmd -f .env.boson npx playwright test"
+      }
+    },
+    "e2e:boson": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "commands": [
+          "BROWSER=none nx start",
+          "npx wait-on http://localhost:3000 && nx e2e && npx kill-port 3000 && echo DONEZO"
+        ],
+        "readyWhen": "DONEZO",
+        "parallel": true
+      }
+    },
     "lint": {
       "executor": "nx:run-commands",
       "options": {

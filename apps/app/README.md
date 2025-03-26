@@ -15,6 +15,25 @@
 
 `npx nx run app:start:tau`
 
+### e2e Playwright Tests
+
+First time setup:
+1. Copy `apps/app/.env.local.sample` into a new file named `apps/app/.env.local`
+2. Go to 1password and search for "e2e boson test" in Shared
+3. Copy password into the `PLAYWRIGHT_E2E_ACCOUNT_PASSWORD` field inside `.env.local` 
+
+Start app then run tests:
+
+`npx nx run app:e2e:boson`
+
+Just run tests:
+
+```shell
+# after running `npx nx run app:start` 
+# or `npx nx run app:start:tau` in another process,
+$ npx nx run app:e2e
+```
+
 ### Tests
 
 `npx nx run app:test`
