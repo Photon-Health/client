@@ -175,9 +175,7 @@ export const Pharmacy = () => {
         .filter((offer) => offer.deliveryEstimate !== undefined);
 
       if (amazonOffers.length > 0 && amazonOffers[0]?.deliveryEstimate?.deliveryPromise) {
-        setAmazonPharmacyOverride(
-          'Arrives by ' + amazonOffers[0]?.deliveryEstimate?.deliveryPromise
-        );
+        setAmazonPharmacyOverride(amazonOffers[0]?.deliveryEstimate?.deliveryPromise);
       }
     }
 
