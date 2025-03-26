@@ -174,7 +174,7 @@ export const Pharmacy = () => {
         .filter((offer) => offer.supplier === 'AMAZON_PHARMACY')
         .filter((offer) => offer.deliveryEstimate !== undefined);
 
-      if (amazonOffers.length > 0) {
+      if (amazonOffers.length > 0 && amazonOffers[0]?.deliveryEstimate?.deliveryPromise) {
         setAmazonPharmacyOverride(
           'Arrives by ' + amazonOffers[0]?.deliveryEstimate?.deliveryPromise
         );
