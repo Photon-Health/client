@@ -7,14 +7,15 @@ import {
   Text,
   useRecentOrders
 } from '../../';
-import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
+import { Treatment } from '@photonhealth/sdk/dist/types';
 import { IconButton } from '../../particles/IconButton';
 import { debounce } from '@solid-primitives/scheduled';
 import clsx from 'clsx';
+import { MedHistoryPrescription } from './index';
 
 export type MedHistoryRowItem = {
   treatment: Treatment;
-  prescription?: Prescription;
+  prescription?: MedHistoryPrescription;
 };
 
 export type PatientMedHistoryTableProps = {
@@ -24,7 +25,7 @@ export type PatientMedHistoryTableProps = {
   baseURL: string;
   onChronologicalChange: () => void;
   chronological: boolean;
-  onRefillClick: (prescriptionId: string, treatment: Treatment) => void;
+  onRefillClick: (prescription: MedHistoryPrescription, treatment: Treatment) => void;
 };
 
 export default function PatientMedHistoryTable(props: PatientMedHistoryTableProps) {
@@ -32,8 +33,8 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
 
   const debouncedRefill = createMemo(() => {
     const onRefillClick = props.onRefillClick;
-    return debounce(async (prescriptionId: string, treatment: Treatment) => {
-      onRefillClick(prescriptionId, treatment);
+    return debounce(async (prescription: MedHistoryPrescription, treatment: Treatment) => {
+      onRefillClick(prescription, treatment);
     }, 300);
   });
 
@@ -115,7 +116,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                     label="Refill"
                     onClick={() => {
                       if (rowItem.prescription) {
-                        debouncedRefill()(rowItem.prescription.id, rowItem.treatment);
+                        debouncedRefill()(rowItem.prescription, rowItem.treatment);
                       }
                     }}
                     disabled={!rowItem.prescription}

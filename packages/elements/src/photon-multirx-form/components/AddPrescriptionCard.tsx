@@ -43,7 +43,7 @@ const validators = {
   effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
 };
 
-type DraftPrescription = {
+export type AddDraftPrescription = {
   id: string;
   effectiveDate: string;
   treatment: {
@@ -115,7 +115,7 @@ export const AddPrescriptionCard = (props: {
     ref?.dispatchEvent(event);
   };
 
-  const dispatchDraftPrescriptionCreated = (draftPrescription: DraftPrescription) => {
+  const dispatchDraftPrescriptionCreated = (draftPrescription: AddDraftPrescription) => {
     const event = new CustomEvent('photon-draft-prescription-created', {
       composed: true,
       bubbles: true,
@@ -143,7 +143,7 @@ export const AddPrescriptionCard = (props: {
         body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
       });
     } else if (!errorsPresent) {
-      const draft: DraftPrescription = {
+      const draft: AddDraftPrescription = {
         id: String(Math.random()),
         effectiveDate: props.store.effectiveDate.value,
         treatment: props.store.treatment.value,

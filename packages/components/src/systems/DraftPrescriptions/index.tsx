@@ -1,14 +1,6 @@
 import { Catalog, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
-import {
-  createEffect,
-  createMemo,
-  createSignal,
-  For,
-  JSXElement,
-  mergeProps,
-  Show
-} from 'solid-js';
+import { createMemo, createSignal, For, JSXElement, mergeProps, onMount, Show } from 'solid-js';
 import Banner from '../../particles/Banner';
 import Card from '../../particles/Card';
 import Icon from '../../particles/Icon';
@@ -206,7 +198,7 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
     setIsLoading(false);
   }
 
-  createEffect(() => {
+  onMount(() => {
     if (allDraftPrescriptionIds().length > 0) {
       fetchDrafts();
     } else {

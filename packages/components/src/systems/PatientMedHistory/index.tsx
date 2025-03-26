@@ -5,6 +5,7 @@ import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
 import { Button, Card, createQuery, Text, triggerToast } from '../../';
 import { ApolloCache } from '@apollo/client';
 import PatientMedHistoryTable, { MedHistoryRowItem } from './PatientMedHistoryTable';
+import { Maybe } from 'graphql/jsutils/Maybe';
 
 const GET_PATIENT_MED_HISTORY = gql`
   query GetPatient($id: ID!) {
@@ -16,8 +17,11 @@ const GET_PATIENT_MED_HISTORY = gql`
           id
           writtenAt
           instructions
+          notes
+          fillsAllowed
           dispenseQuantity
           dispenseUnit
+          dispenseAsWritten
           daysSupply
         }
         treatment {
@@ -28,6 +32,33 @@ const GET_PATIENT_MED_HISTORY = gql`
     }
   }
 `;
+
+type RemoveMaybe<T> = T extends Maybe<infer U>
+  ? Exclude<U, null>
+  : T extends undefined
+  ? never
+  : Exclude<T, null>;
+
+type RemoveMaybeFromArray<T> = T extends Array<Maybe<infer U>>
+  ? Array<Exclude<RemoveMaybe<U>, null>>
+  : RemoveMaybe<T>;
+
+type PrescriptionWithoutMaybes = {
+  [K in keyof Prescription]-?: RemoveMaybeFromArray<RemoveMaybe<Prescription[K]>>;
+};
+
+export type MedHistoryPrescription = Pick<
+  PrescriptionWithoutMaybes,
+  | 'id'
+  | 'writtenAt'
+  | 'dispenseQuantity'
+  | 'dispenseUnit'
+  | 'daysSupply'
+  | 'instructions'
+  | 'fillsAllowed'
+  | 'dispenseAsWritten'
+  | 'notes'
+>;
 
 const ADD_MED_HISTORY = gql`
   mutation UpdateMedicationHistory($id: ID!, $medicationHistory: [MedHistoryInput!]!) {
@@ -44,7 +75,7 @@ type PatientMedHistoryProps = {
   newMedication?: Treatment;
   openAddMedicationDialog?: () => void;
   hideAddMedicationDialog?: () => void;
-  onRefillClick?: (prescriptionId: string, treatment: Treatment) => void;
+  onRefillClick?: (prescription: MedHistoryPrescription, treatment: Treatment) => void;
 };
 
 export type GetPatientTreatmentHistoryItem = {
@@ -177,8 +208,8 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
           rowItems={medHistoryRowItems()}
           chronological={chronological()}
           onChronologicalChange={() => setChronological(!chronological())}
-          onRefillClick={(rxId, treatment) =>
-            props.onRefillClick && props.onRefillClick(rxId, treatment)
+          onRefillClick={(prescription, treatment) =>
+            props.onRefillClick && props.onRefillClick(prescription, treatment)
           }
         />
       </div>
@@ -189,11 +220,11 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
 const mapToMedHistoryRowItems = (getPatientResponse: GetPatientResponse): MedHistoryRowItem[] =>
   getPatientResponse?.patient?.treatmentHistory.map((historyItem) => ({
     treatment: historyItem.treatment,
-    prescription: historyItem.prescription
+    prescription: historyItem.prescription as MedHistoryPrescription
   }));
 
 const sortHistoryByDate = (chronological: boolean) => {
-  return (a: GetPatientTreatmentHistoryItem, b: GetPatientTreatmentHistoryItem) => {
+  return (a: MedHistoryRowItem, b: MedHistoryRowItem) => {
     const dateA = a?.prescription?.writtenAt
       ? new Date(a.prescription.writtenAt).getTime()
       : -Infinity;
