@@ -22,7 +22,8 @@ import {
   HEALTHWAREHOUSE_PHARMACY_ID,
   STRIVE_PHARMACY_ID,
   OPENLOOP_PHARMACY_ID,
-  GIFTHEALTH_PHARMACY_ID
+  GIFTHEALTH_PHARMACY_ID,
+  EPIQ_PHARMACY_ID
 } from '../pharmacies';
 
 /**
@@ -436,5 +437,11 @@ const organizationSettings: {
   org_wmy57WStnHIFXBAr: {
     mailOrder: true,
     mailOrderProviders: [EMPOWER_PHARMACY_ID]
+  },
+  // Remedymeds
+  org_YNHdqbbgnRWrsS9I: {
+    logo: 'remedymeds_logo.png',
+    mailOrder: true,
+    mailOrderProviders: [EPIQ_PHARMACY_ID]
   }
 };

@@ -14,7 +14,7 @@ interface Props {
   pharmacyId: string;
   selected: boolean;
   handleSelect: (id: string) => void;
-  amazonPharmacyEndOfFebruaryTestSegment?: string;
+  amazonPharmacyOverride?: string;
 }
 
 export const PHARMACY_BRANDING = {
@@ -59,7 +59,7 @@ export const BrandedPharmacyCard = ({
   pharmacyId,
   selected,
   handleSelect,
-  amazonPharmacyEndOfFebruaryTestSegment
+  amazonPharmacyOverride
 }: Props) => {
   const brand = PHARMACY_BRANDING[pharmacyId];
   if (!brand) return null;
@@ -82,9 +82,9 @@ export const BrandedPharmacyCard = ({
           tagline={brand.description}
           availableInYourArea={brand.name === 'Capsule Pharmacy'}
           freeDelivery={brand.name === 'Amazon Pharmacy'}
-          amazonPharmacyEndOfFebruaryTestSegment={
+          amazonPharmacyOverride={
             pharmacyId === process.env.REACT_APP_AMAZON_PHARMACY_ID
-              ? amazonPharmacyEndOfFebruaryTestSegment
+              ? amazonPharmacyOverride
               : undefined
           }
           boldPharmacyName={false}
