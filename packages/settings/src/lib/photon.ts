@@ -498,5 +498,12 @@ const organizationSettings: {
     accentColor: '#04549D',
     mailOrder: true,
     mailOrderProviders: [STRIVE_PHARMACY_ID]
+  },
+  // Precision Telemed
+  org_zlsgaZsKLpFrkpyK: {
+    logo: 'precision_telemed_logo.png',
+    accentColor: '#6ea3a6',
+    mailOrder: true,
+    mailOrderProviders: [EMPOWER_PHARMACY_ID]
   }
 };
