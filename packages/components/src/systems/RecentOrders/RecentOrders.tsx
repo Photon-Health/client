@@ -119,7 +119,7 @@ type RecentOrdersContextValue = [RecentOrdersState, RecentOrdersActions];
 const RecentOrdersContext = createContext<RecentOrdersContextValue>([
   {
     orders: [],
-    isLoading: true,
+    isLoading: false,
     isCombineDialogOpen: false,
     isDuplicateDialogOpen: false,
     isIssueDialogOpen: false
@@ -225,7 +225,6 @@ function RecentOrders(props: SDKProviderProps) {
         });
 
         setState({
-          isLoading: false,
           orders: recentOrders,
           patientName: patient?.name?.full,
           patientId: patient?.id
