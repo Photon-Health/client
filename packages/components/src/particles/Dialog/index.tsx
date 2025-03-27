@@ -77,7 +77,7 @@ function Dialog(props: DialogProps) {
         )}
       >
         {merged.open && (
-          <div class="fixed inset-0 z-10 overflow-y-auto">
+          <div class="fixed inset-0 z-20 overflow-y-auto">
             <div
               class={clsx('flex min-h-full justify-center p-4 text-center sm:items-center sm:p-0', {
                 'items-end': merged.position === 'bottom',
