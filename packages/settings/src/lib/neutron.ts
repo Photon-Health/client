@@ -23,7 +23,8 @@ import {
   STRIVE_PHARMACY_ID,
   OPENLOOP_PHARMACY_ID,
   GIFTHEALTH_PHARMACY_ID,
-  EPIQ_PHARMACY_ID
+  EPIQ_PHARMACY_ID,
+  PHOTON_TEST_PHARMACY_ID
 } from '../pharmacies';
 
 /**
@@ -95,7 +96,9 @@ const organizationSettings: {
       HEALTHWAREHOUSE_PHARMACY_ID,
       STRIVE_PHARMACY_ID,
       OPENLOOP_PHARMACY_ID,
-      GIFTHEALTH_PHARMACY_ID
+      GIFTHEALTH_PHARMACY_ID,
+      EMPOWER_PHARMACY_ID,
+      PHOTON_TEST_PHARMACY_ID
     ],
     topRankedWalgreens: true,
     mailOrderNavigate: true,
