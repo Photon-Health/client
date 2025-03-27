@@ -1,14 +1,6 @@
 import { Catalog, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
-import {
-  createEffect,
-  createMemo,
-  createSignal,
-  For,
-  JSXElement,
-  mergeProps,
-  Show
-} from 'solid-js';
+import { createMemo, createSignal, For, JSXElement, mergeProps, onMount, Show } from 'solid-js';
 import Banner from '../../particles/Banner';
 import Card from '../../particles/Card';
 import Icon from '../../particles/Icon';
@@ -131,6 +123,14 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
     ...merged.prescriptionIds
   ]);
 
+  onMount(() => {
+    if (allDraftPrescriptionIds().length > 0) {
+      fetchDrafts();
+    } else {
+      setIsLoading(false);
+    }
+  });
+
   async function fetchDrafts() {
     setIsLoading(true);
     const draftPrescriptions: DraftPrescription[] = [];
@@ -205,14 +205,6 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
     }
     setIsLoading(false);
   }
-
-  createEffect(() => {
-    if (allDraftPrescriptionIds().length > 0) {
-      fetchDrafts();
-    } else {
-      setIsLoading(false);
-    }
-  });
 
   return (
     <div class="space-y-3">
