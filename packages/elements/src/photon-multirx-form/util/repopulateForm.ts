@@ -29,10 +29,11 @@ const repopulateForm = (actions: Record<string, (...args: any) => any>, draft: a
   }
   // if a template is selected in the treatment dropdown, field needs to update to use the fillsAllowed value from the template.
   // this is why there is a -1 here.
-  if (draft.fillsAllowed) {
+  if (draft.fillsAllowed !== undefined && draft.fillsAllowed !== null) {
+    const fillsAllowed = Number(draft.fillsAllowed);
     actions.updateFormValue({
       key: 'refillsInput',
-      value: Number(draft.fillsAllowed) - 1
+      value: fillsAllowed > 0 ? fillsAllowed - 1 : 0
     });
   }
   if (draft.instructions) {
