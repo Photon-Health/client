@@ -154,8 +154,12 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               <Input
                 type="number"
                 inputmode="decimal"
+                min="0"
                 value={dosage()}
                 onInput={(e) => setDosage((e.currentTarget?.valueAsNumber ?? 0) as DosageValue)}
+                onFocusOut={(e) =>
+                  setDosage(Math.max(e.currentTarget?.valueAsNumber || 0, 0) as DosageValue)
+                }
               />
               <UnitSelect setSelected={setDosageUnit} options={dosageUnits} initialIdx={1} />
             </div>
@@ -173,8 +177,12 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               <Input
                 type="number"
                 inputmode="decimal"
+                min="0"
                 value={weight()}
                 onInput={(e) => setWeight((e.currentTarget?.valueAsNumber ?? 0) as WeightValue)}
+                onFocusOut={(e) =>
+                  setWeight(Math.max(e.currentTarget?.valueAsNumber || 0, 0) as WeightValue)
+                }
               />
               <UnitSelect
                 setSelected={setWeightUnit}
@@ -190,9 +198,15 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               <Input
                 type="number"
                 inputmode="decimal"
+                min="0"
                 value={liquidConcentration()}
                 onInput={(e) =>
                   setLiquidConcentration((e.currentTarget?.valueAsNumber ?? 0) as LiquidDoseValue)
+                }
+                onFocusOut={(e) =>
+                  setLiquidConcentration(
+                    Math.max(e.currentTarget?.valueAsNumber || 0, 0) as LiquidDoseValue
+                  )
                 }
               />
               <UnitSelect setSelected={setLiquidUnit} options={liquidDosageUnits} initialIdx={1} />
@@ -203,9 +217,15 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               <Input
                 type="number"
                 inputmode="decimal"
+                min="0"
                 value={perVolume()}
                 onInput={(e) =>
                   setPerVolume((e.currentTarget?.valueAsNumber ?? 0) as LiquidVolumeValue)
+                }
+                onFocusOut={(e) =>
+                  setPerVolume(
+                    Math.max(e.currentTarget?.valueAsNumber || 0, 0) as LiquidVolumeValue
+                  )
                 }
               />
               <UnitSelect setSelected={setPerVolumeUnit} options={liquidVolumeUnits} />
@@ -224,16 +244,20 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
             <Input
               type="number"
               inputmode="decimal"
+              min="1"
               value={daysSupply()}
               onInput={(e) => setDaysSupply(e.currentTarget?.valueAsNumber)}
+              onFocusOut={(e) => setDaysSupply(Math.max(e.currentTarget?.valueAsNumber || 1, 1))}
             />
           </InputGroup>
           <InputGroup label="Doses per Day">
             <Input
               type="number"
               inputmode="decimal"
+              min="1"
               value={dosesPerDay()}
               onInput={(e) => setDosesPerDay(e.currentTarget?.valueAsNumber)}
+              onFocusOut={(e) => setDosesPerDay(Math.max(e.currentTarget?.valueAsNumber || 1, 1))}
             />
           </InputGroup>
         </div>
