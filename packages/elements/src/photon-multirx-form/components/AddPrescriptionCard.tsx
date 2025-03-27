@@ -86,6 +86,7 @@ export const AddPrescriptionCard = (props: {
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
   const [, recentOrdersActions] = useRecentOrders();
   const [searchText, setSearchText] = createSignal<string>('');
+  const [isLoading, setIsLoading] = createSignal(false);
   let ref: any;
 
   onMount(() => {
@@ -103,6 +104,7 @@ export const AddPrescriptionCard = (props: {
   const templateMutation = client!
     .getSDK()
     .clinical.prescriptionTemplate.createPrescriptionTemplate({});
+  const rxMutation = client!.getSDK().clinical.prescription.createPrescriptions({});
 
   const dispatchOrderError = (errors: readonly GraphQLFormattedError[]) => {
     const event = new CustomEvent('photon-order-error', {
@@ -127,6 +129,7 @@ export const AddPrescriptionCard = (props: {
   };
 
   const handleAddPrescription = async () => {
+    setIsLoading(true);
     const keys = Object.keys(validators);
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
@@ -143,18 +146,61 @@ export const AddPrescriptionCard = (props: {
         body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
       });
     } else if (!errorsPresent) {
-      const draft: DraftPrescription = {
-        id: String(Math.random()),
+      const prescriptionArgs = {
         effectiveDate: props.store.effectiveDate.value,
-        treatment: props.store.treatment.value,
+        treatmentId: props.store.treatment.value.id,
         dispenseAsWritten: props.store.dispenseAsWritten.value,
         dispenseQuantity: props.store.dispenseQuantity.value,
         dispenseUnit: props.store.dispenseUnit.value,
         daysSupply: props.store.daysSupply.value,
-        refillsInput: props.store.refillsInput.value,
         instructions: props.store.instructions.value,
         notes: props.store.notes.value,
         fillsAllowed: props.store.refillsInput.value + 1,
+        patientId: props.store.patient?.value?.id
+      };
+
+      if (props.store.addToTemplates?.value ?? false) {
+        try {
+          const { errors } = await templateMutation({
+            variables: {
+              ...prescriptionArgs,
+              catalogId: props.store.catalogId?.value ?? undefined,
+              isPrivate: true
+            },
+            awaitRefetchQueries: false
+          });
+          if (errors) {
+            dispatchOrderError(errors);
+          }
+        } catch (err) {
+          dispatchOrderError([err as GraphQLFormattedError]);
+        }
+      }
+      console.log(prescriptionArgs);
+      const { data: prescriptionData, errors } = await rxMutation({
+        variables: {
+          prescriptions: [prescriptionArgs]
+        },
+        refetchQueries: [],
+        awaitRefetchQueries: false
+      });
+      console.log(prescriptionData, errors);
+      const prescriptionId = prescriptionData?.createPrescriptions[0].id;
+
+      if (errors || !prescriptionId) {
+        setIsLoading(false);
+        return triggerToast({
+          status: 'error',
+          header: 'Error Adding Prescription',
+          body: 'There was an issue adding the prescription. Please try again.'
+        });
+      }
+
+      const draft: DraftPrescription = {
+        id: prescriptionData?.createPrescriptions[0].id ?? '',
+        ...prescriptionArgs,
+        treatment: props.store.treatment.value,
+        refillsInput: props.store.refillsInput.value,
         addToTemplates: props.store.addToTemplates?.value ?? false,
         templateName: props.store.templateName?.value ?? '',
         catalogId: props.store.catalogId.value ?? undefined,
@@ -233,7 +279,9 @@ export const AddPrescriptionCard = (props: {
       props.screenDraftedPrescriptions();
 
       setSearchText('');
+      setIsLoading(false);
     } else {
+      setIsLoading(false);
       triggerToast({
         status: 'error',
         body: 'Some items in the form are incomplete, please check for errors'
