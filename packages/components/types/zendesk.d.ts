@@ -5,7 +5,7 @@
  * Zendesk messaging Web Widget SDK
  * https://developer.zendesk.com/api-reference/widget-messaging/introduction/
  */
-interface ZendeskMessagingWidget {
+export interface ZendeskMessagingWidget {
   /**
    * If your application has a login flow, or if a user needs to access the same conversation from multiple devices,
    * you can use the `loginUser` API.
@@ -166,6 +166,8 @@ interface ZendeskMessagingWidget {
   (type: 'messenger:set', setting: 'conversationTags', conversationTags: string[]): void;
 }
 
-interface Window {
-  zE?: ZendeskMessagingWidget;
+declare global {
+  interface Window {
+    zE?: ZendeskMessagingWidget;
+  }
 }

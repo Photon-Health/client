@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/html';
 import type { ComponentProps } from 'solid-js';
-import { PatientTreatmentHistoryElement } from './index';
-import PatientMedHistoryTable from './PatientMedHistoryTable';
-import { createTestPrescription, createTestTreatment } from '../../utils/storybookUtils';
+import PatientMedHistoryTable, { MedHistoryRowItem } from './PatientMedHistoryTable';
+import { createTestMedHistoryPrescription, createTestTreatment } from '../../utils/storybookUtils';
 
 type Story = StoryObj<typeof PatientMedHistoryTable>;
 
@@ -15,10 +14,9 @@ export const Default: Story = {
   }
 };
 
-const testData: PatientTreatmentHistoryElement[] = [
+const testData: MedHistoryRowItem[] = [
   {
-    active: false,
-    prescription: createTestPrescription({
+    prescription: createTestMedHistoryPrescription({
       id: 'rx-id-1',
       dispenseQuantity: 30,
       dispenseUnit: 'unit'
@@ -26,14 +24,14 @@ const testData: PatientTreatmentHistoryElement[] = [
     treatment: createTestTreatment({ name: 'treatment name 1' })
   },
   {
-    active: false,
-    prescription: createTestPrescription({ instructions: 'very long instructions '.repeat(10) }),
+    prescription: createTestMedHistoryPrescription({
+      instructions: 'very long instructions '.repeat(10)
+    }),
     treatment: createTestTreatment({
       name: 'treatment name 2 is very long and might get truncated on a small screen'
     })
   },
   {
-    active: false,
     prescription: undefined,
     treatment: createTestTreatment({
       name: 'External Medication'
@@ -50,10 +48,10 @@ export default {
         <PatientMedHistoryTable
           enableLinks={props.enableLinks}
           enableRefillButton={props.enableRefillButton}
-          medHistory={testData}
+          rowItems={testData}
           baseURL={'test-base-url.com/'}
-          chronological={true}
-          onChronologicalChange={() => {}}
+          sortOrder={'desc'}
+          onSortOrderToggle={() => {}}
           onRefillClick={() => {}}
         ></PatientMedHistoryTable>
       </div>

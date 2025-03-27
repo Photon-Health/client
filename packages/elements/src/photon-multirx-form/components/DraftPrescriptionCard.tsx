@@ -184,7 +184,6 @@ export const DraftPrescriptionCard = (props: {
               key: 'draftPrescriptions',
               value: draftPrescriptions
             });
-            props.handleDraftPrescriptionsChange();
           }}
           error={props.store['draftPrescriptions']?.error}
           screeningAlerts={props.screeningAlerts}
