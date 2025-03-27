@@ -176,7 +176,7 @@ export const AddPrescriptionCard = (props: {
           dispatchOrderError([err as GraphQLFormattedError]);
         }
       }
-      console.log(prescriptionArgs);
+
       const { data: prescriptionData, errors } = await rxMutation({
         variables: {
           prescriptions: [prescriptionArgs]

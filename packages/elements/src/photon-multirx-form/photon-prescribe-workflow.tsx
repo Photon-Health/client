@@ -263,16 +263,17 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     setScreeningAlerts(data?.prescriptionScreen?.alerts ?? []);
   };
 
-  const dispatchPrescriptionsError = (errors: readonly GraphQLFormattedError[]) => {
-    const event = new CustomEvent('photon-prescriptions-error', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        errors: errors
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
+  // TODO TODO: add this back in when we set prescriptions to active
+  // const dispatchPrescriptionsError = (errors: readonly GraphQLFormattedError[]) => {
+  //   const event = new CustomEvent('photon-prescriptions-error', {
+  //     composed: true,
+  //     bubbles: true,
+  //     detail: {
+  //       errors: errors
+  //     }
+  //   });
+  //   ref?.dispatchEvent(event);
+  // };
 
   const dispatchOrderError = (errors: readonly GraphQLFormattedError[] = []) => {
     const event = new CustomEvent('photon-order-error', {
@@ -344,64 +345,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         .getSDK()
         .clinical.patient.removePatientPreferredPharmacy({});
       const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
-      const rxMutation = client!.getSDK().clinical.prescription.createPrescriptions({});
-      const prescriptions = [];
-      const templateMutation = client!
-        .getSDK()
-        .clinical.prescriptionTemplate.createPrescriptionTemplate({});
 
-      for (const draft of props.formStore.draftPrescriptions!.value) {
-        const args = {
-          daysSupply: draft.daysSupply,
-          dispenseAsWritten: draft.dispenseAsWritten,
-          dispenseQuantity: draft.dispenseQuantity,
-          dispenseUnit: draft.dispenseUnit,
-          effectiveDate: draft.effectiveDate,
-          instructions: draft.instructions,
-          notes: draft.notes,
-          patientId: props.formStore.patient?.value.id,
-          // +1 here because we're using the refillsInput
-          fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
-          treatmentId: draft.treatment.id,
-          externalId: draft.externalId
-        };
-        if (draft.addToTemplates) {
-          try {
-            const { errors } = await templateMutation({
-              variables: {
-                ...args,
-                catalogId: draft.catalogId,
-                isPrivate: true
-              },
-              awaitRefetchQueries: false
-            });
-            if (errors) {
-              dispatchOrderError(errors);
-            }
-          } catch (err) {
-            dispatchOrderError([err as GraphQLFormattedError]);
-          }
-        }
-        prescriptions.push(args);
-      }
       try {
-        const { data: prescriptionData, errors } = await rxMutation({
-          variables: {
-            prescriptions
-          },
-          refetchQueries: [],
-          awaitRefetchQueries: false
-        });
-
-        if (!props.enableOrder) {
-          setIsLoading(false);
-        }
-        if (errors) {
-          dispatchPrescriptionsError(errors);
-          return;
-        }
-
-        dispatchPrescriptionsCreated(prescriptionData!.createPrescriptions);
+        // TODO TODO: set prescription as no longer in draft
+        // currently they are still all active
+        dispatchPrescriptionsCreated(props.formStore.draftPrescriptions.value);
 
         if (props.enableOrder) {
           if (
@@ -437,7 +385,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
               pharmacyId: props.pharmacyId ?? (props.formStore.pharmacy?.value || ''),
               fulfillmentType: props.formStore.fulfillmentType?.value || '',
               address: formattedAddress(),
-              fills: prescriptionData?.createPrescriptions.map((x) => ({ prescriptionId: x.id }))
+              fills: props.formStore.draftPrescriptions.value.map(({ id }: { id: string }) => ({
+                prescriptionId: id
+              }))
             },
             refetchQueries: [],
             awaitRefetchQueries: false
