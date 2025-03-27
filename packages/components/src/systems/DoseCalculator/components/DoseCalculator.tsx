@@ -18,7 +18,6 @@ import {
   liquidVolumeUnits
 } from '../utils/conversionFactors';
 import UnitSelect from './UnitSelect';
-import { number } from 'zod';
 
 const round = (num: number) => parseFloat(num.toFixed(1));
 
