@@ -32,7 +32,7 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
   const handleCancel = () => onCloseDialogOpen(false);
 
   return (
-    <div ref={ref} class="fixed top-0 left-0 w-full h-screen z-10 overflow-y-scroll bg-[#F9FAFB]">
+    <div ref={ref} class="fixed top-0 left-0 w-full h-screen z-20 overflow-y-scroll bg-[#F9FAFB]">
       <style>{tailwind}</style>
 
       {/* Close Wrapper Modal */}
