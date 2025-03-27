@@ -569,7 +569,11 @@ export const AddPrescriptionCard = (props: {
               <Button
                 class="w-full xs:!w-auto h-fit"
                 size="lg"
-                onClick={handleAddPrescription}
+                onClick={() => {
+                  if (!isLoading()) {
+                    handleAddPrescription();
+                  }
+                }}
                 loading={isLoading()}
               >
                 {props.enableOrder ? 'Add Prescription to Order' : 'Add Prescription to Drafts'}
