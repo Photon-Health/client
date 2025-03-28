@@ -110,25 +110,6 @@ const App = () => {
         uri="https://api.boson.health/graphql"
       >
         <div class="mb-10">
-          <h2>Address Form</h2>
-          <AddressForm patientId="pat_01HAW8GT14ZTJRBADVEY68NQKK" />
-        </div>
-
-        <div class="mb-10">
-          <h2>Patient Info</h2>
-          <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
-        </div>
-
-        <div class="mb-10">
-          <h2>Patient Med History</h2>
-          <PatientMedHistory
-            patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ"
-            enableLinks={false}
-            enableRefillButton={true}
-          />
-        </div>
-
-        <div class="mb-10">
           <h2>Draft Prescriptions</h2>
           <DraftPrescriptions
             draftPrescriptions={draftPrescriptions}
@@ -146,6 +127,25 @@ const App = () => {
               'tmp_01GQJDV39GPEJ03BATZV1X0SRJ'
             ]}
             prescriptionIds={['rx_01H82MN6S6FN9PN0K7FTKGWC60', 'rx_01H82RKH4K1RA4RS2VG4H8J8XG']}
+          />
+        </div>
+
+        <div class="mb-10">
+          <h2>Address Form</h2>
+          <AddressForm patientId="pat_01HAW8GT14ZTJRBADVEY68NQKK" />
+        </div>
+
+        <div class="mb-10">
+          <h2>Patient Info</h2>
+          <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
+        </div>
+
+        <div class="mb-10">
+          <h2>Patient Med History</h2>
+          <PatientMedHistory
+            patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ"
+            enableLinks={false}
+            enableRefillButton={true}
           />
         </div>
 
