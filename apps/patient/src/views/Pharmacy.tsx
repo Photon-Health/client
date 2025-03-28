@@ -181,8 +181,8 @@ export const Pharmacy = () => {
 
     const validOrganizationIds = [
       'org_KzSVZBQixLRkqj5d', // boson Test Organization 11
-      'org_kVS7AP4iuItESdMA' // neutron Photon Test Org
-      // 'org_wM4wI7rop0W1eNfM' // production found
+      'org_kVS7AP4iuItESdMA', // neutron Photon Test Org
+      'org_wM4wI7rop0W1eNfM' // production found
     ];
 
     if (!validOrganizationIds.includes(order.organization.id)) {
