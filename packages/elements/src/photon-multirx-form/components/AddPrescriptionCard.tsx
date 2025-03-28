@@ -114,24 +114,22 @@ export const AddPrescriptionCard = (props: {
 
   const handleAddPrescription = async () => {
     const keys = Object.keys(validators);
-    console.log('keys', keys);
+
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
-    console.log('errorsPresent', errorsPresent);
+
     const draftedPrescriptions = [...props.store.draftPrescriptions.value];
     const isPrescriptionAlreadyAdded = isTreatmentInDraftPrescriptions(
       props.store.treatment?.value?.id,
       draftedPrescriptions
     );
-    console.log('&&&&');
+
     if (isPrescriptionAlreadyAdded) {
       triggerToast({
         status: 'error',
         body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
       });
     } else if (!errorsPresent) {
-      console.log('----');
-      console.log('(((((', format(new Date(), 'yyyy-MM-dd').toString());
       const draft: AddDraftPrescription = {
         id: String(Math.random()),
         effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
@@ -149,7 +147,7 @@ export const AddPrescriptionCard = (props: {
         catalogId: props.store.catalogId.value ?? undefined,
         externalId: props.store.externalId?.value ?? undefined
       };
-      console.log('draft', draft);
+
       const duplicate = recentOrdersActions.checkDuplicateFill(draft.treatment.name);
 
       const addDraftPrescription = async () => {
