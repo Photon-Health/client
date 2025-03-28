@@ -5,6 +5,7 @@ import type { FormError } from '../stores/form';
 import tailwind from '../tailwind.css?inline';
 import { checkHasPermission } from '../utils';
 import {
+  AddDraftPrescription,
   AddPrescriptionCard,
   isTreatmentInDraftPrescriptions
 } from './components/AddPrescriptionCard';
@@ -39,6 +40,8 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
+import { format } from 'date-fns';
+import { MedHistoryPrescription } from '@photonhealth/components/src/systems/PatientMedHistory';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -122,13 +125,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const [overrideScreenAlerts, setOverrideScreenAlerts] = createSignal<boolean>(false);
   const [isScreeningAlertWarningOpen, setIsScreeningAlertWarningOpen] = createSignal(false);
 
-  const [prescriptionIds, setPrescriptionIds] = createSignal<string[]>([]);
-
-  createEffect(() => {
-    const initialIds = props.prescriptionIds?.split(',') ?? [];
-    setPrescriptionIds(initialIds);
-  });
-
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
   let prefillNotes = '';
   if (props.additionalNotes) {
@@ -190,6 +186,17 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       bubbles: true,
       detail: {
         prescriptions: prescriptions
+      }
+    });
+    ref?.dispatchEvent(event);
+  };
+
+  const dispatchDraftPrescriptionCreated = (draftPrescription: AddDraftPrescription) => {
+    const event = new CustomEvent('photon-draft-prescription-created', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        draft: draftPrescription
       }
     });
     ref?.dispatchEvent(event);
@@ -457,16 +464,39 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     );
   });
 
-  function addRefillToDrafts(rxId: string) {
-    setPrescriptionIds((prev) => [...prev, rxId]);
+  function addRefillToDrafts(prescription: MedHistoryPrescription, treatment: Treatment) {
+    const draft: AddDraftPrescription = {
+      id: String(Math.random()),
+      effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
+      treatment: treatment,
+      dispenseAsWritten: prescription.dispenseAsWritten,
+      dispenseQuantity: prescription.dispenseQuantity,
+      dispenseUnit: prescription.dispenseUnit,
+      daysSupply: prescription.daysSupply,
+      refillsInput: prescription.fillsAllowed ? prescription.fillsAllowed - 1 : 0,
+      instructions: prescription.instructions,
+      notes: prescription.notes,
+      fillsAllowed: prescription.fillsAllowed,
+      templateName: '',
+      addToTemplates: false,
+      catalogId: undefined
+    };
+
+    props.formActions.updateFormValue({
+      key: 'draftPrescriptions',
+      value: [...(props.formStore.draftPrescriptions?.value || []), draft]
+    });
+
     triggerToast({
       status: 'success',
       header: 'Prescription Added',
       body: 'You can send this order or add another prescription before sending it'
     });
+
+    dispatchDraftPrescriptionCreated(draft);
   }
 
-  function tryAddRefillToDrafts(rxId: string, treatment: Treatment) {
+  function tryAddRefillToDrafts(prescription: MedHistoryPrescription, treatment: Treatment) {
     if (isTreatmentInDraftPrescriptions(treatment.id, props.formStore.draftPrescriptions.value)) {
       triggerToast({
         status: 'error',
@@ -479,10 +509,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       recentOrdersActions.setIsDuplicateDialogOpen(
         true,
         recentOrdersActions.checkDuplicateFill(treatment.name),
-        () => addRefillToDrafts(rxId)
+        () => addRefillToDrafts(prescription, treatment)
       );
     } else {
-      addRefillToDrafts(rxId);
+      addRefillToDrafts(prescription, treatment);
     }
   }
 
@@ -608,6 +638,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       draftedPrescriptionChanged={function () {
                         screenDraftedPrescriptions();
                       }}
+                      onDraftPrescriptionCreated={dispatchDraftPrescriptionCreated}
                       screeningAlerts={screeningAlerts()}
                       catalogId={props.catalogId}
                       allowOffCatalogSearch={props.allowOffCatalogSearch}
@@ -618,7 +649,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 <DraftPrescriptionCard
                   templateIds={props.templateIds?.split(',') || []}
                   templateOverrides={props.templateOverrides || {}}
-                  prescriptionIds={prescriptionIds()}
+                  prescriptionIds={props.prescriptionIds?.split(',') || []}
                   prescriptionRef={prescriptionRef}
                   actions={props.formActions}
                   store={props.formStore}

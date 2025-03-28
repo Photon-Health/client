@@ -9,6 +9,7 @@ import {
   SexType,
   Treatment
 } from '@photonhealth/sdk/src/types';
+import { MedHistoryPrescription } from '../systems/PatientMedHistory';
 
 export function createTestPatient(): Patient {
   return {
@@ -69,6 +70,23 @@ export function createTestPrescription(options: Partial<Prescription> = {}): Pre
     prescriber: createTestPrescriber(),
     state: PrescriptionState.Expired,
     treatment: createTestTreatment(),
+    writtenAt: undefined,
+    dispenseUnit: 'Each',
+    ...options
+  };
+}
+
+export function createTestMedHistoryPrescription(
+  options: Partial<MedHistoryPrescription> = {}
+): MedHistoryPrescription {
+  return {
+    dispenseQuantity: 0,
+    daysSupply: 0,
+    dispenseAsWritten: false,
+    fillsAllowed: 0,
+    id: '',
+    instructions: '',
+    notes: '',
     writtenAt: undefined,
     dispenseUnit: 'Each',
     ...options

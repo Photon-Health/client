@@ -43,7 +43,7 @@ const validators = {
   effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
 };
 
-type DraftPrescription = {
+export type AddDraftPrescription = {
   id: string;
   effectiveDate: string;
   treatment: {
@@ -74,6 +74,7 @@ export const AddPrescriptionCard = (props: {
   enableCombineAndDuplicate?: boolean;
   screenDraftedPrescriptions: () => void;
   draftedPrescriptionChanged: () => void;
+  onDraftPrescriptionCreated: (draft: AddDraftPrescription) => void;
   screeningAlerts: ScreeningAlertType[];
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
@@ -112,17 +113,6 @@ export const AddPrescriptionCard = (props: {
       bubbles: true,
       detail: {
         errors: errors
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
-
-  const dispatchDraftPrescriptionCreated = (draftPrescription: DraftPrescription) => {
-    const event = new CustomEvent('photon-draft-prescription-created', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        draft: draftPrescription
       }
     });
     ref?.dispatchEvent(event);
@@ -196,7 +186,7 @@ export const AddPrescriptionCard = (props: {
         });
       }
 
-      const draft: DraftPrescription = {
+      const draft: AddDraftPrescription = {
         id: prescriptionData?.createPrescriptions[0].id ?? '',
         ...prescriptionArgs,
         treatment: props.store.treatment.value,
@@ -263,7 +253,7 @@ export const AddPrescriptionCard = (props: {
           body: 'You can send this order or add another prescription before sending it'
         });
 
-        dispatchDraftPrescriptionCreated(draft);
+        props.onDraftPrescriptionCreated(draft);
       };
 
       if (props.enableCombineAndDuplicate && duplicate) {
