@@ -1,5 +1,5 @@
 import { createEffect, createSignal, Show } from 'solid-js';
-import { usePhoton } from '../../context';
+import { usePhoton } from '@photonhealth/components';
 import { RadioGroupCards, Text } from '@photonhealth/components';
 import { Pharmacy } from '@photonhealth/sdk/dist/types';
 
