@@ -13,7 +13,7 @@ import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
 import { format } from 'date-fns';
 import { any, min, number, record, refine, size, string } from 'superstruct';
-import { afterDate, between, message } from '../../validators';
+import { between, message } from '../../validators';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/icon/icon';
@@ -36,11 +36,7 @@ const validators = {
   ),
   daysSupply: message(min(number(), 0), 'Days Supply must be at least 0'),
   refillsInput: message(between(0, 11), 'Refills must be 0 to 11'),
-  instructions: message(
-    size(string(), 1, Infinity),
-    'Please enter instructions for the patient...'
-  ),
-  effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
+  instructions: message(size(string(), 1, Infinity), 'Please enter instructions for the patient...')
 };
 
 export type AddDraftPrescription = {
@@ -118,21 +114,24 @@ export const AddPrescriptionCard = (props: {
 
   const handleAddPrescription = async () => {
     const keys = Object.keys(validators);
+    console.log('keys', keys);
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
-
+    console.log('errorsPresent', errorsPresent);
     const draftedPrescriptions = [...props.store.draftPrescriptions.value];
     const isPrescriptionAlreadyAdded = isTreatmentInDraftPrescriptions(
       props.store.treatment?.value?.id,
       draftedPrescriptions
     );
-
+    console.log('&&&&');
     if (isPrescriptionAlreadyAdded) {
       triggerToast({
         status: 'error',
         body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
       });
     } else if (!errorsPresent) {
+      console.log('----');
+      console.log('(((((', format(new Date(), 'yyyy-MM-dd').toString());
       const draft: AddDraftPrescription = {
         id: String(Math.random()),
         effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
@@ -150,17 +149,13 @@ export const AddPrescriptionCard = (props: {
         catalogId: props.store.catalogId.value ?? undefined,
         externalId: props.store.externalId?.value ?? undefined
       };
-
+      console.log('draft', draft);
       const duplicate = recentOrdersActions.checkDuplicateFill(draft.treatment.name);
 
       const addDraftPrescription = async () => {
         props.actions.updateFormValue({
           key: 'draftPrescriptions',
           value: [...(props.store.draftPrescriptions?.value || []), draft]
-        });
-        props.actions.updateFormValue({
-          key: 'effectiveDate',
-          value: format(new Date(), 'yyyy-MM-dd').toString()
         });
         const addToTemplate = props.store.addToTemplates?.value ?? false;
         const templateName = props.store.templateName?.value ?? '';
