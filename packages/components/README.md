@@ -25,3 +25,9 @@ npx nx run components:start
 ```
 
 Modify [dev/App.tsx](dev/App.tsx) to change the `systems`
+
+### tests
+
+```shell
+npx nx run components:test
+```
