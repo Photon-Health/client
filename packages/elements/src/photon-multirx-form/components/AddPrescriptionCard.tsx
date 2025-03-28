@@ -135,7 +135,7 @@ export const AddPrescriptionCard = (props: {
     } else if (!errorsPresent) {
       const draft: AddDraftPrescription = {
         id: String(Math.random()),
-        effectiveDate: props.store.effectiveDate.value,
+        effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
         treatment: props.store.treatment.value,
         dispenseAsWritten: props.store.dispenseAsWritten.value,
         dispenseQuantity: props.store.dispenseQuantity.value,
@@ -320,20 +320,6 @@ export const AddPrescriptionCard = (props: {
                 }
               />
             </div>
-          </div>
-          <div class="mt-2 sm:mt-0 w-full md:pr-2">
-            <photon-datepicker
-              label="Do Not Fill Before"
-              invalid={props.store.effectiveDate?.error ?? false}
-              help-text={props.store.effectiveDate?.error}
-              required="true"
-              on:photon-datepicker-selected={(e: any) =>
-                props.actions.updateFormValue({
-                  key: 'effectiveDate',
-                  value: e.detail.date
-                })
-              }
-            />
           </div>
           <div class="mt-2 sm:mt-0 sm:grid sm:grid-cols-2 sm:gap-4">
             <div class="flex items-end gap-1 items-stretch">
