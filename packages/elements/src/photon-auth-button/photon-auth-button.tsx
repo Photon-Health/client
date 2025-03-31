@@ -1,6 +1,6 @@
 import { customElement } from 'solid-element';
 import { createEffect } from 'solid-js';
-import { usePhoton } from '../context';
+import { usePhoton } from '@photonhealth/components';
 import tailwind from '../tailwind.css?inline';
 
 const Component = (props: { redirectPath: string | undefined }) => {
