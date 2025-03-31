@@ -32,12 +32,12 @@
     "graphql": "^16.6.0",
     "graphql-tag": "^2.12.6",
     "jwt-decode": "^3.1.2",
-    "solid-heroicons": "^3.1.1",
-    "solid-transition-group": "^0.2.2",
+    "solid-heroicons": "^3.2.4",
+    "solid-transition-group": "^0.3.0",
     "superstruct": "^1.0.3"
   },
   "peerDependencies": {
-    "solid-js": "^1.9.3"
+    "solid-js": "^1.9.5"
   },
   "engines": {
     "node": ">=16"
