@@ -1,4 +1,4 @@
-import { createSignal, Ref } from 'solid-js';
+import { createEffect, createSignal, Ref } from 'solid-js';
 import { DraftPrescriptions } from '@photonhealth/components';
 import { size, array, any } from 'superstruct';
 import { Card, Text } from '@photonhealth/components';
@@ -168,7 +168,9 @@ export const DraftPrescriptionCard = (props: {
           />
         </div>
         <DraftPrescriptions
-          draftPrescriptions={props.store['draftPrescriptions']?.value ?? []}
+          prescriptionIds={
+            props.store['draftPrescriptions']?.value.map((rx: { id: string }) => rx.id) ?? []
+          }
           handleDelete={(draftId: string) => {
             setDeleteDialogOpen(true);
             setDeleteDraftId(draftId);
@@ -176,16 +178,6 @@ export const DraftPrescriptionCard = (props: {
           handleEdit={(draftId: string) => {
             checkEditPrescription(draftId);
           }}
-          templateIds={props.templateIds}
-          templateOverrides={props.templateOverrides}
-          prescriptionIds={props.prescriptionIds}
-          setDraftPrescriptions={(draftPrescriptions: DraftPrescription[]) => {
-            props.actions.updateFormValue({
-              key: 'draftPrescriptions',
-              value: draftPrescriptions
-            });
-          }}
-          error={props.store['draftPrescriptions']?.error}
           screeningAlerts={props.screeningAlerts}
           enableOrder={props.enableOrder}
         />
