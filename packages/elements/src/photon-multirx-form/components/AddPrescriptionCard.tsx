@@ -7,6 +7,7 @@ import {
   ScreeningAlertType,
   Text,
   triggerToast,
+  usePhoton,
   useRecentOrders
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
@@ -21,7 +22,6 @@ import '@shoelace-style/shoelace/dist/components/button/button';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLFormattedError } from 'graphql';
 import { createSignal, onMount, Show } from 'solid-js';
-import { usePhoton } from '../../context';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
 
