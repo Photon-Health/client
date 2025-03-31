@@ -34,6 +34,11 @@ import { formatPrescriptionDetails } from './utils/formatPrescriptionDetail';
 import type { DraftPrescription, TemplateOverrides } from './systems/DraftPrescriptions';
 import { SignatureAttestationModal } from './systems/SignatureAttestation';
 
+import { PhotonContext, usePhoton } from './context';
+import { PhotonClientStore } from './store';
+
+export { usePhoton, PhotonClientStore, PhotonContext };
+
 export {
   AddressForm,
   Alert,
