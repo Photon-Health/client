@@ -19,6 +19,7 @@ import './photon-gender-input';
 import './photon-patient-form';
 import './photon-state-input';
 import './photon-patient-dialog';
+import './photon-patient-page';
 import './photon-update-patient-dialog';
 import './photon-medication-search';
 import './photon-add-medication-history-dialog';

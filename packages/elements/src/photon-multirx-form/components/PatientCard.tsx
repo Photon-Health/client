@@ -132,6 +132,8 @@ export const PatientCard = (props: {
             patientId={patientId()}
             weight={props?.weight}
             weightUnit={props?.weightUnit}
+            // todo: decide how to set 'enableEditPatient'
+            enableEditPatient={true}
             editPatient={
               props?.enableOrder && !showAddressForm()
                 ? () => setShowEditPatientView(true)
