@@ -77,7 +77,7 @@ export function useComboBox() {
 
 function ComboOptions(props: { children?: JSX.Element }) {
   const [state] = useContext(ComboBoxContext);
-  let ref: HTMLDivElement;
+  let ref: HTMLDivElement | undefined;
 
   const calculateDropdownPosition = createMemo(() => {
     // this defaults to the dropdown being below the input, but if it's near
