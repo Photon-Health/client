@@ -2,11 +2,11 @@
 import { customElement } from 'solid-element';
 
 //Photon
-import { usePhoton } from '../context';
+import { usePhoton } from '@photonhealth/components';
 import { PhotonDropdown } from '../photon-dropdown';
 
 //Types
-import { Medication, Treatment, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
+import { Medication, PrescriptionTemplate, Treatment } from '@photonhealth/sdk/dist/types';
 import { createMemo, createSignal, onMount } from 'solid-js';
 import { CatalogStore } from '../stores/catalog';
 

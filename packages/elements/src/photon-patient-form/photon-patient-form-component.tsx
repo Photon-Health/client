@@ -2,7 +2,7 @@ import { customElement } from 'solid-element';
 import { createEffect, onCleanup, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
 import { Spinner, PharmacySearch, Card } from '@photonhealth/components';
-import { usePhoton } from '../context';
+import { usePhoton } from '@photonhealth/components';
 import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
 import { PharmacyStore } from '../stores/pharmacy';
