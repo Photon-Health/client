@@ -1,18 +1,17 @@
 import { customElement } from 'solid-element';
 import { createSignal, Show } from 'solid-js';
 import { size, string } from 'superstruct';
-import { Button } from '@photonhealth/components';
-import { usePhoton } from '@photonhealth/components';
+import { Button, usePhoton } from '@photonhealth/components';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
 import { message } from '../validators';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
-type PatientDialogProps = {
+type PatientPageProps = {
   patientId: string;
   hideCreatePrescription: boolean;
 };
 
-const Component = (props: PatientDialogProps) => {
+const Component = (props: PatientPageProps) => {
   let ref: any;
   const client = usePhoton();
   const [loading, setLoading] = createSignal(false);
@@ -207,6 +206,7 @@ const Component = (props: PatientDialogProps) => {
                 <span class="block sm:inline">{globalError()}</span>
               </div>
             </Show>
+            {/*<PatientFormV2 />*/}
             <photon-patient-form
               slot="form"
               on:photon-form-updated={(e: any) => {
@@ -223,7 +223,7 @@ const Component = (props: PatientDialogProps) => {
   );
 };
 customElement(
-  'photon-patient-dialog',
+  'photon-patient-page',
   {
     patientId: '',
     hideCreatePrescription: false

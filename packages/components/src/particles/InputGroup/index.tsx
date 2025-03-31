@@ -79,6 +79,7 @@ export interface InputGroupProps {
   label: string | JSX.Element;
   subLabel?: string;
   error?: string;
+  errors?: string[] | null;
   contextText?: string | JSX.Element;
   helpText?: string | JSX.Element;
   children?: JSX.Element;

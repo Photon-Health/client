@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      'photon-patient-dialog': unknown;
+      'photon-patient-page': unknown;
     }
   }
 }
@@ -34,7 +34,7 @@ export const UpdatePatientForm = () => {
 
   return (
     <div>
-      <photon-patient-dialog ref={ref} patient-id={id} />
+      <photon-patient-page ref={ref} patient-id={id} />
     </div>
   );
 };
