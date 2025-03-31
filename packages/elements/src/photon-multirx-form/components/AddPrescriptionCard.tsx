@@ -13,7 +13,7 @@ import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
 import { format } from 'date-fns';
 import { any, min, number, record, refine, size, string } from 'superstruct';
-import { afterDate, between, message } from '../../validators';
+import { between, message } from '../../validators';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/icon/icon';
@@ -36,11 +36,7 @@ const validators = {
   ),
   daysSupply: message(min(number(), 0), 'Days Supply must be at least 0'),
   refillsInput: message(between(0, 11), 'Refills must be 0 to 11'),
-  instructions: message(
-    size(string(), 1, Infinity),
-    'Please enter instructions for the patient...'
-  ),
-  effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
+  instructions: message(size(string(), 1, Infinity), 'Please enter instructions for the patient...')
 };
 
 export type AddDraftPrescription = {
@@ -118,6 +114,7 @@ export const AddPrescriptionCard = (props: {
 
   const handleAddPrescription = async () => {
     const keys = Object.keys(validators);
+
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
 
@@ -135,7 +132,7 @@ export const AddPrescriptionCard = (props: {
     } else if (!errorsPresent) {
       const draft: AddDraftPrescription = {
         id: String(Math.random()),
-        effectiveDate: props.store.effectiveDate.value,
+        effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
         treatment: props.store.treatment.value,
         dispenseAsWritten: props.store.dispenseAsWritten.value,
         dispenseQuantity: props.store.dispenseQuantity.value,
@@ -157,10 +154,6 @@ export const AddPrescriptionCard = (props: {
         props.actions.updateFormValue({
           key: 'draftPrescriptions',
           value: [...(props.store.draftPrescriptions?.value || []), draft]
-        });
-        props.actions.updateFormValue({
-          key: 'effectiveDate',
-          value: format(new Date(), 'yyyy-MM-dd').toString()
         });
         const addToTemplate = props.store.addToTemplates?.value ?? false;
         const templateName = props.store.templateName?.value ?? '';
@@ -320,20 +313,6 @@ export const AddPrescriptionCard = (props: {
                 }
               />
             </div>
-          </div>
-          <div class="mt-2 sm:mt-0 w-full md:pr-2">
-            <photon-datepicker
-              label="Do Not Fill Before"
-              invalid={props.store.effectiveDate?.error ?? false}
-              help-text={props.store.effectiveDate?.error}
-              required="true"
-              on:photon-datepicker-selected={(e: any) =>
-                props.actions.updateFormValue({
-                  key: 'effectiveDate',
-                  value: e.detail.date
-                })
-              }
-            />
           </div>
           <div class="mt-2 sm:mt-0 sm:grid sm:grid-cols-2 sm:gap-4">
             <div class="flex items-end gap-1 items-stretch">
