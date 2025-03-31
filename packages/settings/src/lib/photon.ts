@@ -18,7 +18,8 @@ import {
   HONEYBEE_PHARMACY_ID,
   TRUEPILL_PHARMACY_ID,
   HEALTHWAREHOUSE_PHARMACY_ID,
-  OPENLOOP_PHARMACY_ID
+  OPENLOOP_PHARMACY_ID,
+  GIFTHEALTH_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -81,7 +82,8 @@ const organizationSettings: {
       REDROCK_SPRINGVILLE_PHARMACY_ID,
       REDROCK_STGEORGE_PHARMACY_ID,
       STRIVE_PHARMACY_ID,
-      OPENLOOP_PHARMACY_ID
+      OPENLOOP_PHARMACY_ID,
+      GIFTHEALTH_PHARMACY_ID
     ]
   },
   // Weekend Health
@@ -489,5 +491,19 @@ const organizationSettings: {
     logo: 'om_dermatology_logo.svg',
     mailOrder: true,
     mailOrderProviders: [HONEYBEE_PHARMACY_ID]
+  },
+  // Geviti
+  org_Zdri0JlNxJfWjzpk: {
+    logo: 'geviti_logo.webp',
+    accentColor: '#04549D',
+    mailOrder: true,
+    mailOrderProviders: [STRIVE_PHARMACY_ID]
+  },
+  // Precision Telemed
+  org_zlsgaZsKLpFrkpyK: {
+    logo: 'precision_telemed_logo.png',
+    accentColor: '#6ea3a6',
+    mailOrder: true,
+    mailOrderProviders: [EMPOWER_PHARMACY_ID]
   }
 };

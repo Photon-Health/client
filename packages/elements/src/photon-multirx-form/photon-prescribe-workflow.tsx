@@ -4,7 +4,11 @@ import { PhotonAuthorized } from '../photon-authorized';
 import type { FormError } from '../stores/form';
 import tailwind from '../tailwind.css?inline';
 import { checkHasPermission } from '../utils';
-import { AddPrescriptionCard } from './components/AddPrescriptionCard';
+import {
+  AddDraftPrescription,
+  AddPrescriptionCard,
+  isTreatmentInDraftPrescriptions
+} from './components/AddPrescriptionCard';
 import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
 import { OrderCard } from './components/OrderCard';
 import { PatientCard } from './components/PatientCard';
@@ -26,7 +30,7 @@ import {
   useRecentOrders
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { Order, Prescription } from '@photonhealth/sdk/dist/types';
+import { Order, Prescription, Treatment } from '@photonhealth/sdk/dist/types';
 import '@shoelace-style/shoelace/dist/components/alert/alert';
 import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
@@ -36,6 +40,8 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
+import { format } from 'date-fns';
+import { MedHistoryPrescription } from '@photonhealth/components/src/systems/PatientMedHistory';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -61,6 +67,7 @@ export type PrescribeProps = {
   enableSendToPatient: boolean;
   enableMedHistory: boolean;
   enableMedHistoryLinks: boolean;
+  enableMedHistoryRefillButton: boolean;
   enableCombineAndDuplicate: boolean;
   mailOrderIds?: string;
   pharmacyId?: string;
@@ -179,6 +186,17 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       bubbles: true,
       detail: {
         prescriptions: prescriptions
+      }
+    });
+    ref?.dispatchEvent(event);
+  };
+
+  const dispatchDraftPrescriptionCreated = (draftPrescription: AddDraftPrescription) => {
+    const event = new CustomEvent('photon-draft-prescription-created', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        draft: draftPrescription
       }
     });
     ref?.dispatchEvent(event);
@@ -496,6 +514,58 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     );
   });
 
+  function addRefillToDrafts(prescription: MedHistoryPrescription, treatment: Treatment) {
+    const draft: AddDraftPrescription = {
+      id: String(Math.random()),
+      effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
+      treatment: treatment,
+      dispenseAsWritten: prescription.dispenseAsWritten,
+      dispenseQuantity: prescription.dispenseQuantity,
+      dispenseUnit: prescription.dispenseUnit,
+      daysSupply: prescription.daysSupply,
+      refillsInput: prescription.fillsAllowed ? prescription.fillsAllowed - 1 : 0,
+      instructions: prescription.instructions,
+      notes: prescription.notes,
+      fillsAllowed: prescription.fillsAllowed,
+      templateName: '',
+      addToTemplates: false,
+      catalogId: undefined
+    };
+
+    props.formActions.updateFormValue({
+      key: 'draftPrescriptions',
+      value: [...(props.formStore.draftPrescriptions?.value || []), draft]
+    });
+
+    triggerToast({
+      status: 'success',
+      header: 'Prescription Added',
+      body: 'You can send this order or add another prescription before sending it'
+    });
+
+    dispatchDraftPrescriptionCreated(draft);
+  }
+
+  function tryAddRefillToDrafts(prescription: MedHistoryPrescription, treatment: Treatment) {
+    if (isTreatmentInDraftPrescriptions(treatment.id, props.formStore.draftPrescriptions.value)) {
+      triggerToast({
+        status: 'error',
+        body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
+      });
+    } else if (
+      props.enableCombineAndDuplicate &&
+      recentOrdersActions.checkDuplicateFill(treatment.name)
+    ) {
+      recentOrdersActions.setIsDuplicateDialogOpen(
+        true,
+        recentOrdersActions.checkDuplicateFill(treatment.name),
+        () => addRefillToDrafts(prescription, treatment)
+      );
+    } else {
+      addRefillToDrafts(prescription, treatment);
+    }
+  }
+
   return (
     <div ref={ref}>
       <style>{tailwind}</style>
@@ -584,7 +654,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 weightUnit={props.weightUnit}
                 enableMedHistory={props.enableMedHistory}
                 enableMedHistoryLinks={props.enableMedHistoryLinks ?? false}
+                enableMedHistoryRefillButton={props.enableMedHistoryRefillButton ?? false}
                 hidePatientCard={props.hidePatientCard}
+                onRefillClick={tryAddRefillToDrafts}
               />
               <Show
                 when={
@@ -616,6 +688,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       draftedPrescriptionChanged={function () {
                         screenDraftedPrescriptions();
                       }}
+                      onDraftPrescriptionCreated={dispatchDraftPrescriptionCreated}
                       screeningAlerts={screeningAlerts()}
                       catalogId={props.catalogId}
                       allowOffCatalogSearch={props.allowOffCatalogSearch}
@@ -631,7 +704,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   actions={props.formActions}
                   store={props.formStore}
                   setIsEditing={setIsEditing}
-                  handleDeletedDraftPrescription={function () {
+                  handleDraftPrescriptionsChange={function () {
                     screenDraftedPrescriptions();
                   }}
                   screeningAlerts={screeningAlerts()}

@@ -34,6 +34,7 @@ const Component = (props: PrescribeProps) => {
         enableSendToPatient={props.enableSendToPatient}
         enableMedHistory={props.enableMedHistory}
         enableMedHistoryLinks={props.enableMedHistoryLinks}
+        enableMedHistoryRefillButton={props.enableMedHistoryRefillButton}
         enableCombineAndDuplicate={props.enableCombineAndDuplicate}
         mailOrderIds={props.mailOrderIds}
         pharmacyId={props.pharmacyId}
@@ -68,6 +69,7 @@ customElement(
     enableSendToPatient: false,
     enableCombineAndDuplicate: false,
     enableMedHistory: false,
+    enableMedHistoryRefillButton: false,
     enableMedHistoryLinks: false,
     mailOrderIds: undefined,
     pharmacyId: undefined,

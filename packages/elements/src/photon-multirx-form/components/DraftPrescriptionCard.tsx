@@ -24,7 +24,7 @@ export const DraftPrescriptionCard = (props: {
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
   setIsEditing: (isEditing: boolean) => void;
-  handleDeletedDraftPrescription: () => void;
+  handleDraftPrescriptionsChange: () => void;
   screeningAlerts: ScreeningAlertType[];
   enableOrder: boolean;
 }) => {
@@ -73,7 +73,7 @@ export const DraftPrescriptionCard = (props: {
           70
       });
 
-      props.handleDeletedDraftPrescription();
+      props.handleDraftPrescriptionsChange();
     }
   };
 
@@ -119,7 +119,7 @@ export const DraftPrescriptionCard = (props: {
       props.setIsEditing(true);
     }
 
-    props.handleDeletedDraftPrescription();
+    props.handleDraftPrescriptionsChange();
   };
   const handleDeleteCancel = () => {
     setDeleteDialogOpen(false);

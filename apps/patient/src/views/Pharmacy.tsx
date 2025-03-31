@@ -29,12 +29,13 @@ import {
 } from '../components';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, preparePharmacy } from '../utils/general';
-import { ExtendedFulfillmentType, Order } from '../utils/models';
+import { ExtendedFulfillmentType } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
 import {
   geocode,
+  getOffers,
   getPharmacies,
   rerouteOrder,
   setOrderPharmacy,
@@ -116,6 +117,10 @@ export const Pharmacy = () => {
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
   const [enablePrice, setEnablePrice] = useState(showPriceToggle);
 
+  const [amazonPharmacyOverride, setAmazonPharmacyOverride] = useState<string | undefined>(
+    undefined
+  );
+
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
 
@@ -161,108 +166,31 @@ export const Pharmacy = () => {
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
 
-  // determine if the order is eligible for the Amazon Pharmacy End of February Test
-  // returns undefined if the order is not eligible
-  // or 'zepbound' if the order is eligible for the zepbound test
-  // or 'standard' if the order is eligible for the standard test
-  const determineAmazonPharamcyEndOfFeburaryTestSegment = (order: Order): string | undefined => {
-    const organizationId = order?.organization.id;
+  useEffect(() => {
+    async function fetchOffers() {
+      const offers = await getOffers(order.id);
 
-    const medicinesAndDeliveryTypes = [
-      {
-        patterns: ['wegovy subcutaneous solution auto-injector 0.25 MG/0.5ML'],
-        deliveryType: 'overnight'
-      },
-      {
-        patterns: ['Zepbound Subcutaneous Solution Auto-injector 2.5 MG/0.5ML'],
-        deliveryType: 'overnight'
-      },
-      {
-        patterns: ['Zepbound Subcutaneous Solution Auto-injector 5 MG/0.5ML'],
-        deliveryType: 'overnight'
-      },
-      {
-        patterns: ['zepbound subcutaneous solution Auto-injector 7.5 mg/0.5ml'],
-        deliveryType: 'overnight'
-      },
-      { patterns: ['ondansetron.*oral'], deliveryType: 'one_day_delivery' },
-      { patterns: ['bupropion.*oral'], deliveryType: 'one_day_delivery' },
+      const amazonOffers = offers
+        .filter((offer) => offer.supplier === 'AMAZON_PHARMACY')
+        .filter((offer) => offer.deliveryEstimate !== undefined);
 
-      {
-        patterns: [
-          'zepbound subcutaneous solution Auto-injector 2.5 mg/0.5ml',
-          'ondansetron.*oral'
-        ],
-        deliveryType: 'one_day_delivery'
-      },
-      {
-        patterns: ['zepbound subcutaneous solution Auto-injector 5 mg/0.5ml', 'ondansetron.*oral'],
-        deliveryType: 'one_day_delivery'
-      },
-      {
-        patterns: [
-          'zepbound subcutaneous solution Auto-injector 7.5 mg/0.5ml',
-          'ondansetron.*oral'
-        ],
-        deliveryType: 'one_day_delivery'
-      },
-      {
-        patterns: ['wegovy subcutaneous solution auto-injector 0.25 MG/0.5ML', 'ondansetron.*oral'],
-        deliveryType: 'one_day_delivery'
+      if (amazonOffers.length > 0 && amazonOffers[0]?.deliveryEstimate?.deliveryPromise) {
+        setAmazonPharmacyOverride(amazonOffers[0]?.deliveryEstimate?.deliveryPromise);
       }
+    }
+
+    const validOrganizationIds = [
+      'org_KzSVZBQixLRkqj5d', // boson Test Organization 11
+      'org_kVS7AP4iuItESdMA', // neutron Photon Test Org
+      'org_wM4wI7rop0W1eNfM' // production found
     ];
 
-    const organizationsAndAcceptableMedicationNames: Record<
-      string,
-      { patterns: string[]; deliveryType: string }[]
-    > = {
-      org_KzSVZBQixLRkqj5d: medicinesAndDeliveryTypes,
-      org_wM4wI7rop0W1eNfM: medicinesAndDeliveryTypes
-    };
-
-    if (!organizationId) {
+    if (!validOrganizationIds.includes(order.organization.id)) {
       return undefined;
     }
 
-    const isCorrectOrganization =
-      Object.keys(organizationsAndAcceptableMedicationNames).indexOf(order?.organization.id) > -1;
-
-    if (!isCorrectOrganization) {
-      return undefined;
-    }
-
-    const medications = order.fulfillments.map((f) => f.prescription.treatment.name.toLowerCase());
-
-    // For each combination in the organization
-    for (const combination of organizationsAndAcceptableMedicationNames[organizationId]) {
-      const patterns = combination.patterns.map((r) => new RegExp(r.toLowerCase()));
-
-      // If we have exactly the right number of medications
-      if (medications.length === patterns.length) {
-        // Check if we can match each pattern to a unique medication
-        const unmatchedMedications = [...medications];
-        const allPatternsMatch = patterns.every((pattern) => {
-          const matchIndex = unmatchedMedications.findIndex((med) => med.match(pattern));
-          if (matchIndex !== -1) {
-            // Remove the matched medication so it can't be matched again
-            unmatchedMedications.splice(matchIndex, 1);
-            return true;
-          }
-          return false;
-        });
-
-        if (allPatternsMatch) {
-          return combination.deliveryType;
-        }
-      }
-    }
-
-    return undefined;
-  };
-
-  // experiments
-  const amazonPharmacyEndOfPharmacyTestSegment =
-    determineAmazonPharamcyEndOfFeburaryTestSegment(order);
+    fetchOffers();
+  }, [order]);
 
   const showToastWarning = () =>
     toast({
@@ -665,20 +593,15 @@ export const Pharmacy = () => {
           setTimeout(async () => {
             setShowFooter(false);
 
-            if (amazonPharmacyEndOfPharmacyTestSegment) {
-              // there should only ever be one treatment if this test is active
-              const treatmentId = order.fulfillments[0].prescription.treatment.id;
-
+            if (amazonPharmacyOverride) {
               if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
-                datadogRum.addAction('amazon_pharmacy_test_active_and_selected', {
+                datadogRum.addAction('amazon_pharmacy_offer_active_and_selected', {
                   orderId: order.id,
-                  treatmentId,
                   timestamp: new Date().toISOString()
                 });
               } else {
-                datadogRum.addAction('amazon_pharmacy_test_active_and_not_selected', {
+                datadogRum.addAction('amazon_pharmacy_offer_active_and_not_selected', {
                   orderId: order.id,
-                  treatmentId,
                   timestamp: new Date().toISOString()
                 });
               }
@@ -812,9 +735,7 @@ export const Pharmacy = () => {
   const brandedOptions = [
     ...(capsuleEnabled ? [capsulePharmacyId] : []),
     ...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : []),
-    ...(amazonPharmacyEndOfPharmacyTestSegment
-      ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]
-      : [])
+    ...(amazonPharmacyOverride ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string] : [])
   ];
 
   return (
@@ -862,13 +783,13 @@ export const Pharmacy = () => {
       <Container pb={showFooter ? 32 : 8}>
         {location ? (
           <VStack spacing={6} align="stretch" pt={4}>
-            {enableCourier || enableMailOrder || amazonPharmacyEndOfPharmacyTestSegment ? (
+            {enableCourier || enableMailOrder || amazonPharmacyOverride ? (
               <BrandedOptions
                 options={brandedOptions}
                 location={location}
                 selectedId={selectedId}
                 handleSelect={handleSelect}
-                amazonPharmacyEndOfFebruaryTestSegment={amazonPharmacyEndOfPharmacyTestSegment}
+                amazonPharmacyOverride={amazonPharmacyOverride}
               />
             ) : null}
 
