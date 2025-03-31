@@ -5,7 +5,7 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 import { createEffect, createSignal, JSXElement, mergeProps, Show, createMemo } from 'solid-js';
-import { usePhoton } from '../context';
+import { usePhoton } from '@photonhealth/components';
 import { Spinner, Alert } from '@photonhealth/components';
 import { checkHasPermission } from '../utils';
 import { Permission } from '@photonhealth/sdk/dist/types';
@@ -65,7 +65,7 @@ export const PhotonAuthorized = (p: { children: JSXElement; permissions?: Permis
               when={client?.autoLogin}
               fallback={<AlertMessage message="You are not signed in" />}
             >
-              {/* 
+              {/*
                 If using auto login, we expect that this will only momentarily be visible
                 Either it'll kick out to an auth page, or it'll do the background OAuth dance
                 In either case, a spinner is the correct design

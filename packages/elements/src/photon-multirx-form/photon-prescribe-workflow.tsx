@@ -1,5 +1,4 @@
 import { gql } from 'graphql-tag';
-import { usePhoton } from '../context';
 import { PhotonAuthorized } from '../photon-authorized';
 import type { FormError } from '../stores/form';
 import tailwind from '../tailwind.css?inline';
@@ -27,6 +26,7 @@ import {
   TemplateOverrides,
   Toaster,
   triggerToast,
+  usePhoton,
   useRecentOrders
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';

@@ -1,10 +1,9 @@
 import { Treatment } from '@photonhealth/sdk/dist/types';
 
-import { Button, Dialog, triggerToast } from '@photonhealth/components';
+import { Button, Dialog, triggerToast, usePhoton } from '@photonhealth/components';
 import { customElement } from 'solid-element';
-import { createSignal, createEffect } from 'solid-js';
+import { createEffect, createSignal } from 'solid-js';
 import { gql } from '@apollo/client';
-import { usePhoton } from '../context';
 import { debounce } from '@solid-primitives/scheduled';
 import { boldSubstring } from '../photon-medication-search/photon-medication-search-component';
 
