@@ -15,7 +15,11 @@ import jwtDecode from 'jwt-decode';
 import type { GraphQLFormattedError } from 'graphql';
 
 const defaultOnRedirectCallback = (appState?: any): void => {
-  window.location.replace(appState?.returnTo || window.location.pathname);
+  if (appState?.returnTo) {
+    window.location.replace(appState?.returnTo);
+  } else {
+    window.history.pushState(null, window.document.title, window.location.pathname);
+  }
 };
 
 const CATALOG_TREATMENTS_FIELDS = gql`
@@ -111,7 +115,7 @@ export class PhotonClientStore {
       state: {
         isLoading: boolean;
         data?: Prescription;
-        errors: GraphQLFormattedError[];
+        errors: readonly GraphQLFormattedError[];
         error?: any;
       };
       createPrescription: (args: MutationCreatePrescriptionArgs) => Promise<{
@@ -120,13 +124,14 @@ export class PhotonClientStore {
       }>;
     };
   };
-  public constructor(sdk: PhotonClient, cs?: typeof createStore) {
-    this.sdk = sdk;
 
-    // TODO when we are no longer maintaining components inside of elements, we can remove this
-    // this fixes an issue where the reactivity is lost when using the store in elements
-    const _createStore = cs || createStore;
-    const [store, setStore] = _createStore<{
+  public autoLogin: boolean;
+
+  public constructor(sdk: PhotonClient, autoLogin = false) {
+    this.sdk = sdk;
+    this.autoLogin = autoLogin;
+
+    const [store, setStore] = createStore<{
       authentication: {
         isAuthenticated: boolean;
         isInOrg: boolean;
@@ -209,6 +214,7 @@ export class PhotonClientStore {
         try {
           const result = await this.sdk.authentication.handleRedirect(url);
           defaultOnRedirectCallback(result?.appState);
+          await this.authentication.checkSession();
         } catch (err: any) {
           const urlParams = new URLSearchParams(window.location.search);
           const errorMessage = urlParams.get('error_description');
@@ -280,13 +286,16 @@ export class PhotonClientStore {
       // @ts-ignore TODO: store will be updated soon, so this will change
       const hasOrgs = !!this.sdk?.organization && !!user?.org_id;
 
-      let permissions: Permission[];
-      try {
-        const token = await this.sdk.authentication.getAccessToken();
-        const decoded: { permissions: Permission[] } = jwtDecode(token);
-        permissions = decoded?.permissions || [];
-      } catch (err) {
-        permissions = [];
+      let permissions: Permission[] = [];
+      if (this.autoLogin || authenticated) {
+        // getAccessToken is triggering the SSO screen to appear, so for auto-login=false, we don't want to call it
+        try {
+          const token = await this.sdk.authentication.getAccessToken();
+          const decoded: { permissions: Permission[] } = jwtDecode(token);
+          permissions = decoded?.permissions || [];
+        } catch (err) {
+          permissions = [];
+        }
       }
 
       // @ts-ignore TODO store will be updated soon, so this will change
@@ -306,10 +315,12 @@ export class PhotonClientStore {
       });
     }
   }
+
   private async login(args = {}) {
     await this.sdk.authentication.login(args);
     await this.checkSession();
   }
+
   private async logout(args = {}) {
     await this.sdk.authentication.logout(args);
     this.setStore('authentication', {
@@ -320,6 +331,7 @@ export class PhotonClientStore {
       user: undefined
     });
   }
+
   private async getPatients(args?: {
     after?: string;
     first?: number;
@@ -341,6 +353,7 @@ export class PhotonClientStore {
       finished: data.patients.length == 0
     });
   }
+
   private async getPatient(args: { id: string }) {
     this.setStore('patient', {
       ...this.store.patient,
@@ -354,6 +367,7 @@ export class PhotonClientStore {
     });
     return data.patient;
   }
+
   private async getCatalog(args: { id: string }) {
     this.setStore('catalog', {
       ...this.store.catalog,
@@ -370,6 +384,7 @@ export class PhotonClientStore {
       templates: data.catalog.templates.map((x) => x!) || []
     });
   }
+
   private async getCatalogs() {
     this.setStore('catalogs', {
       ...this.store.catalogs,
@@ -382,6 +397,7 @@ export class PhotonClientStore {
       catalogs: data.catalogs
     });
   }
+
   private async getDispenseUnits() {
     this.setStore('dispenseUnits', {
       ...this.store.dispenseUnits,
@@ -397,6 +413,7 @@ export class PhotonClientStore {
       }))
     });
   }
+
   private async createPrescription(args: MutationCreatePrescriptionArgs) {
     this.setStore('prescription', {
       ...this.store.prescription,

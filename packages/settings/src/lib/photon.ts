@@ -19,7 +19,8 @@ import {
   TRUEPILL_PHARMACY_ID,
   HEALTHWAREHOUSE_PHARMACY_ID,
   OPENLOOP_PHARMACY_ID,
-  GIFTHEALTH_PHARMACY_ID
+  GIFTHEALTH_PHARMACY_ID,
+  DANIA_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -492,12 +493,19 @@ const organizationSettings: {
     mailOrder: true,
     mailOrderProviders: [HONEYBEE_PHARMACY_ID]
   },
-  // Geviti
+  // Geviti -- Sub org of CareTalk
   org_Zdri0JlNxJfWjzpk: {
     logo: 'geviti_logo.webp',
     accentColor: '#04549D',
     mailOrder: true,
     mailOrderProviders: [STRIVE_PHARMACY_ID]
+  },
+  // EveryMeds -- Sub org of CareTalk
+  org_sDXma6gDyEQDQK0o: {
+    logo: 'everymeds_logo.svg',
+    accentColor: '#03254c',
+    mailOrder: true,
+    mailOrderProviders: [DANIA_PHARMACY_ID]
   },
   // Precision Telemed
   org_zlsgaZsKLpFrkpyK: {

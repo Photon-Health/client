@@ -3,7 +3,7 @@ import { customElement } from 'solid-element';
 import { createEffect, createSignal, onMount, Show } from 'solid-js';
 
 // Photon
-import { usePhoton } from '../context';
+import { usePhoton } from '@photonhealth/components';
 import { PhotonMedicationDropdownFullWidth } from '../photon-medication-dropdown-full-width';
 import { PhotonMedicationDropdown } from '../photon-medication-dropdown';
 import { PhotonDropdown } from '../photon-dropdown';
@@ -11,8 +11,8 @@ import { PhotonDropdown } from '../photon-dropdown';
 // Types
 import {
   Medication,
-  Treatment,
   PrescriptionTemplate,
+  Treatment,
   TreatmentOption
 } from '@photonhealth/sdk/dist/types';
 import { CatalogStore } from '../stores/catalog';

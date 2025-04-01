@@ -1,12 +1,10 @@
 import { customElement } from 'solid-element';
 import { createEffect, createSignal } from 'solid-js';
-import { PhotonClient, Env } from '@photonhealth/sdk';
-import { SDKProvider } from '@photonhealth/components';
+import { Env, PhotonClient } from '@photonhealth/sdk';
+import { PhotonClientStore, PhotonContext, SDKProvider } from '@photonhealth/components';
 import { makeTimer } from '@solid-primitives/timer';
 import queryString from 'query-string';
-import { PhotonClientStore } from '../store';
 import { hasAuthParams } from '../utils';
-import { PhotonContext } from '../context';
 import pkg from '../../package.json';
 import { type User } from '@auth0/auth0-react';
 
