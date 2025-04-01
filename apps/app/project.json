@@ -66,8 +66,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
-        "command": "npx wait-on $PLAYWRIGHT_BASE_URL && npx playwright test",
-        "parallel": true
+        "command": "npx wait-on $PLAYWRIGHT_BASE_URL && npx playwright test"
       }
     },
     "lint": {
