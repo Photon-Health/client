@@ -59,6 +59,15 @@ phases:
           --service=$SERVICE_NAME \
           --release-version=$PACKAGE_VERSION \
           --minified-path-prefix=https://app.${ENVIRONMENT}.health
+      - echo "Sending codebuild-complete-webhook to GitHub"
+      - |
+        BRANCH_NAME=$(echo $CODEBUILD_WEBHOOK_HEAD_REF | sed -e "s/refs\/heads\///g")
+        echo "BRANCH_NAME: $BRANCH_NAME"
+        curl -X POST \
+          -H "Accept: application/vnd.github.v3+json" \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          https://api.github.com/repos/Photon-Health/client/dispatches \
+          -d '{"event_type":"codebuild-complete","client_payload":{"branchName":"'$BRANCH_NAME'"}}'
 
 artifacts:
   files:
