@@ -9,17 +9,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Debug CodeBuild completion event payload
+      - name: Print CodeBuild completion event payload
         run: |
           echo "CodeBuild deployment completed"
           echo "Branch Name: ${{ github.event.client_payload.branchName }}"
-          echo "Build Status: ${{ github.event.client_payload.build_status }}"
 
-      - name: Set PLAYWRIGHT_BASE_URL based on branch name
-        run: |
-          BRANCH_NAME=${{ github.event.client_payload.branchName }}
-          echo "PLAYWRIGHT_BASE_URL=https://app-$BRANCH_NAME.boson.health" >> $GITHUB_ENV
-          echo "Set PLAYWRIGHT_BASE_URL to: $PLAYWRIGHT_BASE_URL"
+      - name: Set playwright base url
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const branchName = "${{github.event.client_payload.branchName}}"
+            const ref = branchName.replace(/\//g, "_")
+            const baseUrl = `https://app-${ref}.boson.health`
+            core.exportVariable('PLAYWRIGHT_BASE_URL', baseUrl);
 
       - uses: actions/checkout@v4
       - name: Use Node.js 20.x
@@ -36,7 +38,7 @@ jobs:
 
       - name: Run Playwright tests
         run: |
-          echo $PLAYWRIGHT_BASE_URL
+          echo "Running tests against $PLAYWRIGHT_BASE_URL"
           npx nx run app:e2e:ci
 
       - uses: actions/upload-artifact@v4
