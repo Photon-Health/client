@@ -1,7 +1,8 @@
-import { createEffect, createSignal, JSXElement, mergeProps, Show, createMemo } from 'solid-js';
-import { Spinner, Alert } from '@photonhealth/components';
+import { createEffect, createMemo, createSignal, JSXElement, mergeProps, Show } from 'solid-js';
 import { Permission } from '@photonhealth/sdk/dist/types';
 import { usePhoton } from '../../context';
+import { Alert } from '../../particles/Alert';
+import Spinner from '../../particles/Spinner';
 
 function AlertMessage(props: { message: string }) {
   return <Alert type="error" header="Unauthorized" message={props.message} />;

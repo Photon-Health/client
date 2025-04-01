@@ -1,5 +1,4 @@
 import { createEffect, createMemo, onCleanup } from 'solid-js';
-import { Card, PharmacySearch } from '@photonhealth/components';
 import { isZip } from '../../../utils/isZip';
 import { Name, Patient, SexType } from '@photonhealth/sdk/dist/types';
 import { AuthorizedV2 } from '../../Authorized';
@@ -12,6 +11,8 @@ import * as zod from 'zod';
 import { undefined } from 'zod';
 import ListSelect from '../../../particles/ListBox';
 import { states } from '../../AddressForm/states';
+import Card from '../../../particles/Card';
+import PharmacySearch from '../../PharmacySearch';
 
 type FormDataType = {
   firstName: string | undefined;
