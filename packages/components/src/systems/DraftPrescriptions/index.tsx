@@ -93,7 +93,6 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
               id: prescriptionId
             }
           });
-          console.log('data', data);
           const prescription = data?.prescription;
 
           if (!prescription) {
@@ -115,7 +114,7 @@ export default function DraftPrescriptions(props: DraftPrescriptionsProps) {
 
   return (
     <div class="space-y-3">
-      {/* Show when Loading */}
+      {/* Show when fetching prescriptions */}
       <Show when={isLoading()}>
         <For each={props.prescriptionIds}>
           {() => (

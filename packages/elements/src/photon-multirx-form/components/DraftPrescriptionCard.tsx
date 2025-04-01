@@ -1,11 +1,11 @@
-import { createEffect, createSignal, Ref } from 'solid-js';
+import { createSignal, Ref } from 'solid-js';
 import { DraftPrescriptions } from '@photonhealth/components';
 import { size, array, any } from 'superstruct';
-import { Card, Text } from '@photonhealth/components';
+import { Card, Text, usePrescribe } from '@photonhealth/components';
 import { message } from '../../validators';
 import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import type { TemplateOverrides, DraftPrescription } from '@photonhealth/components';
+import type { DraftPrescription } from '@photonhealth/components';
 import { PhotonTooltip } from '../../photon-tooltip';
 import { partition } from 'lodash';
 import { unwrap } from 'solid-js/store';
@@ -18,7 +18,7 @@ const draftPrescriptionsValidator = message(
 
 export const DraftPrescriptionCard = (props: {
   templateIds: string[];
-  templateOverrides: TemplateOverrides;
+  templateOverrides: any;
   prescriptionIds: string[];
   prescriptionRef: HTMLDivElement | undefined;
   actions: Record<string, (...args: any) => any>;
@@ -33,6 +33,11 @@ export const DraftPrescriptionCard = (props: {
   const [editDialogOpen, setEditDialogOpen] = createSignal<boolean>(false);
   const [editDraft, setEditDraft] = createSignal<any>(undefined);
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
+  const prescribeContext = usePrescribe();
+  if (!prescribeContext) {
+    throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
+  }
+  const prescriptionIds = prescribeContext.prescriptionIds;
 
   props.actions.registerValidator({
     key: 'draftPrescriptions',
@@ -168,9 +173,7 @@ export const DraftPrescriptionCard = (props: {
           />
         </div>
         <DraftPrescriptions
-          prescriptionIds={
-            props.store['draftPrescriptions']?.value.map((rx: { id: string }) => rx.id) ?? []
-          }
+          prescriptionIds={prescriptionIds()}
           handleDelete={(draftId: string) => {
             setDeleteDialogOpen(true);
             setDeleteDraftId(draftId);

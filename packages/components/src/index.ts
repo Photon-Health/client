@@ -31,9 +31,9 @@ import { createQuery } from './utils/createQuery';
 import formatDate from './utils/formatDate';
 import { formatPrescriptionDetails } from './utils/formatPrescriptionDetail';
 
-import type { DraftPrescription, TemplateOverrides } from './systems/DraftPrescriptions';
+import type { DraftPrescription } from './systems/DraftPrescriptions';
 import { SignatureAttestationModal } from './systems/SignatureAttestation';
-
+import { PrescribeProvider, usePrescribe } from './systems/PrescribeProvider';
 export {
   AddressForm,
   Alert,
@@ -65,8 +65,10 @@ export {
   triggerToast,
   usePhotonClient,
   useRecentOrders,
-  formatPrescriptionDetails
+  formatPrescriptionDetails,
+  PrescribeProvider,
+  usePrescribe
 };
 
 // Export types
-export type { DraftPrescription, TemplateOverrides, ScreeningAlertType };
+export type { DraftPrescription, ScreeningAlertType };

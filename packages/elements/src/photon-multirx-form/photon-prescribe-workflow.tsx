@@ -24,10 +24,10 @@ import {
   ScreeningAlertType,
   SignatureAttestationModal,
   Spinner,
-  TemplateOverrides,
   Toaster,
   triggerToast,
-  useRecentOrders
+  useRecentOrders,
+  usePrescribe
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { Order, Prescription, Treatment } from '@photonhealth/sdk/dist/types';
@@ -108,6 +108,12 @@ export const ScreenDraftedPrescriptionsQuery = gql`
 
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
+
+  const prescribeContext = usePrescribe();
+  if (!prescribeContext) {
+    throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
+  }
+  const prescriptionIds = prescribeContext.prescriptionIds;
 
   const client = usePhoton();
   const [showForm, setShowForm] = createSignal<boolean>(
@@ -336,9 +342,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       });
     }
 
-    const keys = enableOrder
-      ? ['patient', 'draftPrescriptions', 'pharmacy', 'address']
-      : ['patient', 'draftPrescriptions'];
+    const keys = enableOrder ? ['patient', 'pharmacy', 'address'] : ['patient'];
     props.formActions.validate(keys);
     const errors = props.formActions.getErrors(keys);
     if (errors.length === 0) {
@@ -384,7 +388,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
               awaitRefetchQueries: false
             });
           }
-
+          console.log('prescriptionIds', prescriptionIds());
           const { data: orderData, errors } = await orderMutation({
             variables: {
               ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
@@ -392,7 +396,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
               pharmacyId: props.pharmacyId ?? (props.formStore.pharmacy?.value || ''),
               fulfillmentType: props.formStore.fulfillmentType?.value || '',
               address: formattedAddress(),
-              fills: props.formStore.draftPrescriptions.value.map(({ id }: { id: string }) => ({
+              fills: prescriptionIds().map((id) => ({
                 prescriptionId: id
               }))
             },
@@ -674,7 +678,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 </Show>
                 <Show when={!props.hideSubmit}>
                   {/* We're hiding this alert message if enable-order is set, a rough way to let us know this is not in the App.
-              The issue we're having is when props are passed and cards are hidden, the form is not showing validation errors. */}
+            The issue we're having is when props are passed and cards are hidden, the form is not showing validation errors. */}
                   <Show when={errors().length > 0 && props.enableOrder}>
                     <div class="m-3 gap-4">
                       <For each={errors()} fallback={<div>No errors...</div>}>
