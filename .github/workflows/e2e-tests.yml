@@ -2,7 +2,7 @@ name: Playwright e2e Tests
 on:
   repository_dispatch:
     types:
-      - codebuild-completed
+      - codebuild-complete
 jobs:
   test:
     timeout-minutes: 10
