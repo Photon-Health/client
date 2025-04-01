@@ -74,6 +74,14 @@
         "parallel": true
       }
     },
+    "e2e:ci": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "npx wait-on $PLAYWRIGHT_BASE_URL && npx playwright test",
+        "parallel": true
+      }
+    },
     "lint": {
       "executor": "nx:run-commands",
       "options": {

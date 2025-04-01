@@ -15,6 +15,12 @@ jobs:
           echo "Branch Name: ${{ github.event.client_payload.branchName }}"
           echo "Build Status: ${{ github.event.client_payload.build_status }}"
 
+      - name: Set PLAYWRIGHT_BASE_URL based on branch name
+        run: |
+          BRANCH_NAME=${{ github.event.client_payload.branchName }}
+          echo "PLAYWRIGHT_BASE_URL=https://app-$BRANCH_NAME.boson.health" >> $GITHUB_ENV
+          echo "Set PLAYWRIGHT_BASE_URL to: $PLAYWRIGHT_BASE_URL"
+
       - uses: actions/checkout@v4
       - name: Use Node.js 20.x
         uses: actions/setup-node@v4
@@ -28,12 +34,14 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-#      - name: Run Playwright tests
-#        run: npx nx run app:e2e:boson
-#
-#      - uses: actions/upload-artifact@v4
-#        if: ${{ !cancelled() }}
-#        with:
-#          name: playwright-report
-#          path: playwright-report/
-#          retention-days: 30
+      - name: Run Playwright tests
+        run: |
+          echo $PLAYWRIGHT_BASE_URL
+          npx nx run app:e2e:ci
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
