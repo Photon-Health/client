@@ -1,4 +1,4 @@
-import { JSX, Show, mergeProps, createMemo, createEffect } from 'solid-js';
+import { createEffect, createMemo, JSX, mergeProps, Show } from 'solid-js';
 import { Transition } from 'solid-transition-group';
 import Icon from '../Icon';
 import createTransition from '../../utils/createTransition';
@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { ZendeskMessagingWidget } from '../../../types/zendesk';
 
 const transitionDuration = 100;
+
 export interface DialogProps {
   open: boolean;
   size?: 'md' | 'lg';
@@ -39,7 +40,7 @@ function Dialog(props: DialogProps) {
   });
 
   return (
-    <div class="relative z-20">
+    <div class="relative z-2000">
       <Transition
         onEnter={createTransition([{ opacity: 0 }, { opacity: 1 }], {
           duration: transitionDuration,
@@ -77,7 +78,7 @@ function Dialog(props: DialogProps) {
         )}
       >
         {merged.open && (
-          <div class="fixed inset-0 z-20 overflow-y-auto">
+          <div class="fixed inset-0 z-2000 overflow-y-auto">
             <div
               class={clsx('flex min-h-full justify-center p-4 text-center sm:items-center sm:p-0', {
                 'items-end': merged.position === 'bottom',

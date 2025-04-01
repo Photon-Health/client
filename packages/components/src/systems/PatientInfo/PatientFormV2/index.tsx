@@ -1,4 +1,4 @@
-import { createEffect, createMemo, onCleanup } from 'solid-js';
+import { createEffect, createMemo } from 'solid-js';
 import { isZip } from '../../../utils/isZip';
 import { Name, Patient, SexType } from '@photonhealth/sdk/dist/types';
 import { AuthorizedV2 } from '../../Authorized';
@@ -59,11 +59,6 @@ function mapToPatient(data: FormDataType, existing?: Patient): EditFormPatient {
 }
 
 const PatientFormV2 = (props: PatientFormV2Props) => {
-  onCleanup(() => {
-    // pActions.clearSelectedPatient();
-    // actions.reset();
-  });
-
   const initialFormValues = createMemo(() => {
     return {
       firstName: props.patient?.name.first,
@@ -85,7 +80,7 @@ const PatientFormV2 = (props: PatientFormV2Props) => {
   const { form, errors, setData, data } = createForm({
     initialValues: initialFormValues(),
     onSubmit: async (_) => {
-      console.log('submit patient form');
+      console.log('submit patient form', { data });
     },
     extend: validator({ schema: patientSchema })
   });

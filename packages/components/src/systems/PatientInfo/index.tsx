@@ -1,4 +1,4 @@
-import { createSignal, createEffect, JSXElement, Show, createMemo } from 'solid-js';
+import { createEffect, createMemo, createSignal, JSXElement, Show } from 'solid-js';
 import gql from 'graphql-tag';
 import { parsePhoneNumber } from 'awesome-phonenumber';
 import { Patient } from '@photonhealth/sdk/dist/types';
@@ -14,7 +14,6 @@ type PatientInfoProps = {
   weight?: number;
   weightUnit?: string;
   enableEditPatient?: boolean;
-  editPatient?: () => void;
   updatedAt?: number;
   address?: Address;
 };
@@ -189,7 +188,7 @@ export default function PatientInfo(props: PatientInfoProps) {
           <Show when={patient()}>
             {(p) => (
               <>
-                <button onClick={onEditPatientFormSubmitted}></button>
+                <button onClick={onEditPatientFormSubmitted}>Submit Form</button>
                 <PatientFormV2 patient={p()} onFormUpdated={onEditPatientFormChange} />
               </>
             )}

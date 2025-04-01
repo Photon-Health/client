@@ -45,10 +45,8 @@ export const PatientCard = (props: {
 }) => {
   const [newMedication, setNewMedication] = createSignal<Treatment | undefined>();
   undefined;
-  const [showEditPatientView, setShowEditPatientView] = createSignal(false);
   const [showAddMedDialog, setShowAddMedDialog] = createSignal(false);
   const { actions, store } = PatientStore;
-  const [isUpdating, setIsUpdating] = createSignal(false);
 
   onMount(() => {
     props.actions.registerValidator({
@@ -98,7 +96,6 @@ export const PatientCard = (props: {
 
   // Listen for changes to the patient
   const patientId = createMemo(() => {
-    if (isUpdating()) return '';
     return currentPatientId() ?? '';
   });
 
@@ -132,32 +129,26 @@ export const PatientCard = (props: {
             patientId={patientId()}
             weight={props?.weight}
             weightUnit={props?.weightUnit}
-            // todo: decide how to set 'enableEditPatient'
-            enableEditPatient={true}
-            editPatient={
-              props?.enableOrder && !showAddressForm()
-                ? () => setShowEditPatientView(true)
-                : undefined
-            }
+            enableEditPatient={props?.enableOrder && !showAddressForm()}
             address={props?.address || props.store.patient?.value?.address}
           />
-          <photon-patient-dialog
-            hide-create-prescription={true}
-            open={showEditPatientView()}
-            on:photon-patient-updated={() => {
-              setIsUpdating(true);
-              actions.getSelectedPatient(props.client!.getSDK(), props.store.patient!.value!.id);
-              // Force a rerender of the above PatientInfo by quickly setting the patientId to null and then putting it back
-              setTimeout(() => {
-                setIsUpdating(false);
-                setShowEditPatientView(false);
-              }, 100);
-            }}
-            on:photon-patient-closed={() => {
-              setShowEditPatientView(false);
-            }}
-            patient-id={patientId()}
-          />
+          {/*<photon-patient-dialog*/}
+          {/*  hide-create-prescription={true}*/}
+          {/*  open={showEditPatientView()}*/}
+          {/*  on:photon-patient-updated={() => {*/}
+          {/*    setIsUpdating(true);*/}
+          {/*    actions.getSelectedPatient(props.client!.getSDK(), props.store.patient!.value!.id);*/}
+          {/*    // Force a rerender of the above PatientInfo by quickly setting the patientId to null and then putting it back*/}
+          {/*    setTimeout(() => {*/}
+          {/*      setIsUpdating(false);*/}
+          {/*      setShowEditPatientView(false);*/}
+          {/*    }, 100);*/}
+          {/*  }}*/}
+          {/*  on:photon-patient-closed={() => {*/}
+          {/*    setShowEditPatientView(false);*/}
+          {/*  }}*/}
+          {/*  patient-id={patientId()}*/}
+          {/*/>*/}
         </div>
       </Show>
       <Show when={props.enableMedHistory && patientId()}>
