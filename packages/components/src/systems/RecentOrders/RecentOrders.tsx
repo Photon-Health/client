@@ -1,4 +1,11 @@
-import { createContext, JSXElement, useContext, createEffect, createMemo } from 'solid-js';
+import {
+  createContext,
+  JSXElement,
+  useContext,
+  createEffect,
+  createMemo,
+  createSignal
+} from 'solid-js';
 import { gql } from '@apollo/client';
 import RecentOrdersCard from './RecentOrdersCard';
 import { usePhotonClient } from '../SDKProvider';
@@ -6,7 +13,6 @@ import { createStore } from 'solid-js/store';
 import RecentOrdersDuplicateDialog from './RecentOrdersDuplicateDialog';
 import RecentOrdersIssueDialog from './RecentOrdersIssueDialog';
 import RecentOrdersCombineDialog from './RecentOrdersCombineDialog';
-import type { DraftPrescription } from '../DraftPrescriptions';
 import { Address } from '../PatientInfo';
 import { BaseOptions, createQuery } from '../../utils/createQuery';
 import {
@@ -15,6 +21,8 @@ import {
   Prescription as FullPrescription,
   OrderState
 } from '@photonhealth/sdk/dist/types';
+import { usePrescribe } from '../PrescribeProvider';
+import { GetPrescription } from '../../fetch/queries';
 
 const GetPatientOrdersQuery = gql`
   query GetPatientOrders($patientId: ID!) {
@@ -57,7 +65,13 @@ type GetPatientOrdersVars = {
 type Treatment = Pick<FullFill['treatment'], 'name'>;
 type Prescription = Pick<
   FullPrescription,
-  'dispenseQuantity' | 'dispenseUnit' | 'fillsAllowed' | 'instructions' | 'writtenAt' | 'prescriber'
+  | 'dispenseQuantity'
+  | 'dispenseUnit'
+  | 'fillsAllowed'
+  | 'instructions'
+  | 'writtenAt'
+  | 'prescriber'
+  | 'id'
 >;
 type Fill = {
   treatment: Treatment;
@@ -85,8 +99,6 @@ type RecentOrdersState = {
   patientName?: string;
   // in case the combine order fails, we need address to make a new order
   address?: Address;
-  // for displaying combine orders
-  draftPrescriptions?: DraftPrescription[];
   // if provider chooses not to combine the order, call this to create a new order
   createOrder?: () => void;
   // if the user clicks "continue" on the duplicate dialog, we need to call the callback to add to draft prescriptions
@@ -101,7 +113,7 @@ type RecentOrdersActions = {
   setIsCombineDialogOpen: (
     isOpen: boolean,
     createOrder?: () => void,
-    draftPrescriptions?: DraftPrescription[],
+    draftPrescriptions?: Prescription[],
     address?: Address
   ) => void;
   setIsDuplicateDialogOpen: (
@@ -140,6 +152,13 @@ interface SDKProviderProps {
 
 function RecentOrders(props: SDKProviderProps) {
   const client = usePhotonClient();
+  const prescribeContext = usePrescribe();
+  if (!prescribeContext) {
+    throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
+  }
+  const { prescriptionIds } = prescribeContext;
+
+  const [draftPrescriptions, setDraftPrescriptions] = createSignal<Prescription[]>([]);
   const [state, setState] = createStore<RecentOrdersState>({
     orders: [],
     isLoading: true,
@@ -208,6 +227,43 @@ function RecentOrders(props: SDKProviderProps) {
       }
     }
   ];
+
+  // // fetch new prescriptions when the prescriptionIds change
+  // // set them as draft prescriptions to match against recent orders
+  // createEffect(() => {
+  //   if (prescriptionIds().length > 0) {
+  //     // make sure prescriptionIds don't exist in draftPrescriptions
+  //     const existingPrescriptionIds = draftPrescriptions().map(
+  //       (prescription: Prescription) => prescription.id
+  //     );
+  //     const newPrescriptionIds = prescriptionIds().filter(
+  //       (id) => !existingPrescriptionIds.includes(id)
+  //     );
+
+  //     // Create an async function to handle the prescription fetching
+  //     const fetchNewPrescriptions = async () => {
+  //       // fetch the new prescriptions
+  //       const newPrescriptions = await Promise.all(
+  //         newPrescriptionIds.map((id) =>
+  //           client!.apollo.query({
+  //             query: GetPrescription,
+  //             variables: { id }
+  //           })
+  //         )
+  //       );
+
+  //       //set the new prescriptions
+  //       setDraftPrescriptions(
+  //         newPrescriptions.map((prescription) => prescription.data.prescription)
+  //       );
+  //     };
+
+  //     if (newPrescriptionIds.length > 0) {
+  //       // Call the async function
+  //       fetchNewPrescriptions();
+  //     }
+  //   }
+  // });
 
   createEffect(() => {
     setState({ isLoading: data.loading });

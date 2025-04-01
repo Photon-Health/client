@@ -113,7 +113,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   if (!prescribeContext) {
     throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
   }
-  const prescriptionIds = prescribeContext.prescriptionIds;
+  const { prescriptionIds } = prescribeContext;
 
   const client = usePhoton();
   const [showForm, setShowForm] = createSignal<boolean>(
@@ -360,7 +360,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       try {
         // TODO TODO: set prescription as no longer in draft
         // currently they are still all active
-        dispatchPrescriptionsCreated(props.formStore.draftPrescriptions.value);
+        // dispatchPrescriptionsCreated(props.formStore.draftPrescriptions.value);
 
         if (props.enableOrder) {
           if (

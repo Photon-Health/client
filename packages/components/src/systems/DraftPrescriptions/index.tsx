@@ -1,5 +1,4 @@
 import { PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
-import gql from 'graphql-tag';
 import { createSignal, For, JSXElement, createEffect, Show } from 'solid-js';
 import Banner from '../../particles/Banner';
 import Card from '../../particles/Card';
@@ -9,26 +8,7 @@ import formatRxString from '../../utils/formatRxString';
 import { usePhotonClient } from '../SDKProvider';
 import generateDraftPrescription from './utils/generateDraftPrescription';
 import { ScreeningAlerts, ScreeningAlertType } from '../ScreeningAlerts';
-
-// Can't use a fragment because of the type difference between Prescription and PrescriptionTemplate
-const GetPrescription = gql`
-  query GetPrescription($id: ID!) {
-    prescription(id: $id) {
-      id
-      daysSupply
-      dispenseAsWritten
-      dispenseQuantity
-      dispenseUnit
-      instructions
-      notes
-      fillsAllowed
-      treatment {
-        id
-        name
-      }
-    }
-  }
-`;
+import { GetPrescription } from '../../fetch/queries';
 
 export type DraftPrescription = PrescriptionTemplate & {
   refillsInput?: number;

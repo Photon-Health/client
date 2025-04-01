@@ -9,7 +9,6 @@ const Component = (props: PrescribeProps) => {
     dispenseAsWritten: false,
     patient: undefined,
     treatment: undefined,
-    draftPrescriptions: [],
     pharmacy: undefined,
     errors: [],
     address: undefined
@@ -20,13 +19,13 @@ const Component = (props: PrescribeProps) => {
   });
 
   return (
-    <RecentOrders patientId={store.patient?.value?.id}>
-      <PrescribeProvider
-        templateIdsPrefill={props.templateIds?.split(',') || []}
-        templateOverrides={props.templateOverrides || {}}
-        prescriptionIdsPrefill={props.prescriptionIds?.split(',') || []}
-        patientId={store.patient?.value?.id}
-      >
+    <PrescribeProvider
+      templateIdsPrefill={props.templateIds?.split(',') || []}
+      templateOverrides={props.templateOverrides || {}}
+      prescriptionIdsPrefill={props.prescriptionIds?.split(',') || []}
+      patientId={store.patient?.value?.id}
+    >
+      <RecentOrders patientId={store.patient?.value?.id}>
         <PrescribeWorkflow
           patientId={props.patientId}
           templateIds={props.templateIds}
@@ -57,8 +56,8 @@ const Component = (props: PrescribeProps) => {
           catalogId={props.catalogId}
           allowOffCatalogSearch={props.allowOffCatalogSearch}
         />
-      </PrescribeProvider>
-    </RecentOrders>
+      </RecentOrders>
+    </PrescribeProvider>
   );
 };
 customElement(

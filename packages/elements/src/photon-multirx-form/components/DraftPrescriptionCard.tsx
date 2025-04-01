@@ -1,20 +1,11 @@
 import { createSignal, Ref } from 'solid-js';
 import { DraftPrescriptions } from '@photonhealth/components';
-import { size, array, any } from 'superstruct';
 import { Card, Text, usePrescribe } from '@photonhealth/components';
-import { message } from '../../validators';
 import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import type { DraftPrescription } from '@photonhealth/components';
 import { PhotonTooltip } from '../../photon-tooltip';
 import { partition } from 'lodash';
-import { unwrap } from 'solid-js/store';
 import { ScreeningAlertType } from '@photonhealth/components';
-
-const draftPrescriptionsValidator = message(
-  size(array(any()), 1, Infinity),
-  'You must add at least 1 Prescription'
-);
 
 export const DraftPrescriptionCard = (props: {
   templateIds: string[];
@@ -37,19 +28,14 @@ export const DraftPrescriptionCard = (props: {
   if (!prescribeContext) {
     throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
   }
-  const prescriptionIds = prescribeContext.prescriptionIds;
+  const { prescriptionIds, setPrescriptionIds } = prescribeContext;
 
-  props.actions.registerValidator({
-    key: 'draftPrescriptions',
-    validator: draftPrescriptionsValidator
-  });
-
-  const dispatchPrescriptionDraftDeleted = (prescription: DraftPrescription) => {
+  const dispatchPrescriptionDraftDeleted = (id: string) => {
     const event = new CustomEvent('photon-draft-prescription-deleted', {
       composed: true,
       bubbles: true,
       detail: {
-        prescription: unwrap(prescription)
+        prescriptionId: id
       }
     });
     ref?.dispatchEvent(event);
@@ -104,16 +90,9 @@ export const DraftPrescriptionCard = (props: {
     setEditDraft(undefined);
   };
   const handleDeleteConfirm = () => {
-    const [deleted, remaining] = partition<DraftPrescription>(
-      props.store['draftPrescriptions'].value,
-      (x) => x.id === deleteDraftId()
-    );
+    const [deleted, remaining] = partition(prescriptionIds(), (x) => x === deleteDraftId());
 
-    props.actions.updateFormValue({
-      key: 'draftPrescriptions',
-      value: remaining
-    });
-
+    setPrescriptionIds(remaining);
     dispatchPrescriptionDraftDeleted(deleted[0]);
 
     setDeleteDialogOpen(false);

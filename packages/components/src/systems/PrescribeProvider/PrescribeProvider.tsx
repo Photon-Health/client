@@ -194,7 +194,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
             const updatedTemplate = templateOverride
               ? { ...template, ...templateOverride }
               : template;
-
+            console.log('!!!!!!!!!!!!! updatedTemplate', updatedTemplate);
             prescriptionsToCreate.push(updatedTemplate);
           }
         });
@@ -213,12 +213,14 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
             return data?.prescription;
           })
         );
+        console.log('!!!!!!!!!!!!! fetchedPrescriptions', fetchedPrescriptions);
         prescriptionsToCreate.push(...fetchedPrescriptions);
       } catch (error) {
         console.error('Error fetching prescriptions:', error);
       }
     }
 
+    console.log('!!!!!!!!!!!!! prescriptionsToCreate', prescriptionsToCreate);
     // create prescriptions from template and prescription ids
     await Promise.all(
       prescriptionsToCreate.map(async (prescription: Prescription) => {
