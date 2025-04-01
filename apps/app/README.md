@@ -8,41 +8,39 @@
 
 `npx nx run app:start`
 
-
 ### Run against local "Tau" services
 
 > Must be running [tau services](https://github.com/Photon-Health/services) locally
 
 `npx nx run app:start:tau`
 
-### e2e Playwright Tests
+### Playwright e2e Tests
 
-First time setup:
+End-to-end tests run against the browser, testing the app "end" to the server "end".
+These are expensive to run, and are best suited to validating critical user flows within the application.
+
+#### First time setup:
+
 1. Copy `apps/app/.env.local.sample` into a new file named `apps/app/.env.local`
 2. Go to 1password and search for "e2e boson test" in Shared
-3. Copy password into the `PLAYWRIGHT_E2E_ACCOUNT_PASSWORD` field inside `.env.local` 
+3. Copy password into the `PLAYWRIGHT_E2E_ACCOUNT_PASSWORD` field inside `.env.local`
 
-Start app then run tests:
-
-`npx nx run app:e2e:boson`
-
-Just run tests:
+#### Run e2e tests:
 
 ```shell
-# after running `npx nx run app:start` 
-# or `npx nx run app:start:tau` in another process,
+# Spins up the app locally at localhost:3000 if needed, using `nx start`
+# See playwright.config.ts "webserver" settings
 $ npx nx run app:e2e
 ```
+
 
 ### Tests
 
 `npx nx run app:test`
 
-
 Update test snapshots:
 
 `npx nx run app:test -- -u`
-
 
 Generate test coverage report:
 
@@ -56,8 +54,7 @@ Run ESLint manually:
 
 Automatically fix ESLint issues:
 
-`npx nx run app:lint:fix` 
-
+`npx nx run app:lint:fix`
 
 ### Build
 
