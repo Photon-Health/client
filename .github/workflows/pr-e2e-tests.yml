@@ -22,16 +22,12 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      - name: Set playwright base url
-        uses: actions/github-script@v5
-        with:
-          script: |
-            core.exportVariable('PLAYWRIGHT_BASE_URL', 'http://localhost:3000');
-
       - name: Run Playwright tests
-        run: |
-          echo "Running tests against $PLAYWRIGHT_BASE_URL"
-          npx nx run app:e2e
+        env:
+          PLAYWRIGHT_BASE_URL: "http://localhost:3000"
+          PLAYWRIGHT_E2E_ACCOUNT_USERNAME: ${{ secrets.PLAYWRIGHT_E2E_ACCOUNT_USERNAME }}
+          PLAYWRIGHT_E2E_ACCOUNT_PASSWORD: ${{ secrets.PLAYWRIGHT_E2E_ACCOUNT_PASSWORD }}
+        run: npx nx run app:e2e
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
