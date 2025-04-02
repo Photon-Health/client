@@ -55,6 +55,20 @@
         "command": "react-app-rewired test --watchAll=false"
       }
     },
+    "e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "env-cmd -f .env.boson npx playwright test"
+      }
+    },
+    "e2e:ci": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "npx wait-on $PLAYWRIGHT_BASE_URL && npx playwright test"
+      }
+    },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
