@@ -13,7 +13,9 @@ test('user can login and create a new prescription', async ({ page }) => {
 
   await page.getByLabel('Email or phone').fill(process.env.PLAYWRIGHT_E2E_ACCOUNT_USERNAME);
   await page.getByRole('button', { name: 'Next' }).click();
-  await page.getByLabel('Enter your password').fill(process.env.PLAYWRIGHT_E2E_ACCOUNT_PASSWORD);
+  await page
+    .getByLabel('Enter your password')
+    .fill(process.env.PLAYWRIGHT_E2E_ACCOUNT_PASSWORD, { timeout: 60_000 });
   await page.getByRole('button', { name: 'Next' }).click();
 
   // await page.waitForURL(/localhost/, { timeout: 20_000 });
