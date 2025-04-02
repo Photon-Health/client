@@ -32,11 +32,11 @@ npx nx run elements:lint:only-errors
 
 ### Run clinical app
 
-See [app README](apps/app/README.md)
+See [clinical app README](apps/app/README.md)
 
 ### Run patient app
 
-See [app README](apps/patient/README.md)
+See [patient app README](apps/patient/README.md)
 
 ### Run components storybook
 
