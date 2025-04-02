@@ -1,0 +1,41 @@
+name: Playwright e2e Tests
+on:
+  pull_request:
+    branches: [ boson ]
+
+jobs:
+  test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Set playwright base url
+        uses: actions/github-script@v5
+        with:
+          script: |
+            core.exportVariable('PLAYWRIGHT_BASE_URL', 'http://localhost:3000');
+
+      - name: Run Playwright tests
+        run: |
+          echo "Running tests against $PLAYWRIGHT_BASE_URL"
+          npx nx run app:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
