@@ -32,7 +32,7 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
   const handleCancel = () => onCloseDialogOpen(false);
 
   return (
-    <div ref={ref} class="fixed top-0 left-0 w-full h-screen z-10 overflow-y-scroll bg-[#F9FAFB]">
+    <div ref={ref} class="z-50 fixed top-0 left-0 w-full h-screen overflow-y-scroll bg-[#F9FAFB]">
       <style>{tailwind}</style>
 
       {/* Close Wrapper Modal */}
@@ -49,7 +49,7 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
       </photon-dialog>
 
       {/* Wrapper */}
-      <header class="flex flex-col md:flex-row items-center px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full shadow-card z-1000">
+      <header class="z-40 flex flex-col md:flex-row items-center px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full shadow-card">
         <div class="flex justify-start md:flex-1 absolute md:static left-4">
           <Button
             variant="naked"
@@ -79,7 +79,7 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
           </Show>
         </div>
       </header>
-      <div class="overflow-y-scroll w-full min-h-screen bg-[#F9FAFB] pt-28 xs:pt-28 lg:pt-20">
+      <div class="z-30 overflow-y-scroll w-full min-h-screen bg-[#F9FAFB] pt-28 xs:pt-28 lg:pt-20">
         <div class="px-4 pb-40 md:pt-4 md:pb-52 md:px-4 w-full h-full sm:w-[600px] xs:mx-auto">
           {props.form}
         </div>
