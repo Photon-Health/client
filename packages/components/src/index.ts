@@ -4,7 +4,7 @@ import Banner from './particles/Banner';
 import DoseCalculator from './systems/DoseCalculator';
 import Card from './particles/Card';
 import ComboBox from './particles/ComboBox';
-import DraftPrescriptions from './systems/DraftPrescriptions';
+import { DraftPrescriptions } from './systems/DraftPrescriptions';
 import Icon from './particles/Icon';
 import PatientInfo from './systems/PatientInfo';
 import PatientMedHistory from './systems/PatientMedHistory';
@@ -31,7 +31,6 @@ import { createQuery } from './utils/createQuery';
 import formatDate from './utils/formatDate';
 import { formatPrescriptionDetails } from './utils/formatPrescriptionDetail';
 
-import type { DraftPrescription } from './systems/DraftPrescriptions';
 import { SignatureAttestationModal } from './systems/SignatureAttestation';
 import { PrescribeProvider, usePrescribe } from './systems/PrescribeProvider';
 export {
@@ -71,4 +70,4 @@ export {
 };
 
 // Export types
-export type { DraftPrescription, ScreeningAlertType };
+export type { ScreeningAlertType };

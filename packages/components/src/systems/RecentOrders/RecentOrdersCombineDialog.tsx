@@ -155,24 +155,26 @@ export default function RecentOrdersCombineDialog() {
     return [];
   });
 
-  const createPrescriptions = async () =>
-    createPrescriptionsMutation({
-      variables: {
-        prescriptions: (state.draftPrescriptions || []).map((draft) => ({
-          daysSupply: draft.daysSupply,
-          dispenseAsWritten: draft.dispenseAsWritten,
-          dispenseQuantity: draft.dispenseQuantity,
-          dispenseUnit: draft.dispenseUnit,
-          effectiveDate: draft.effectiveDate,
-          instructions: draft.instructions,
-          notes: draft.notes,
-          patientId: state.patientId,
-          // +1 here because we're using the refillsInput
-          fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
-          treatmentId: draft.treatment.id
-        }))
-      }
-    });
+  const createPrescriptions = async () => {
+    console.log('createPrescriptions called');
+    // TODO TODO TODO
+    // createPrescriptionsMutation({
+    //   variables: {
+    //     prescriptions: (state.draftPrescriptions || []).map((draft) => ({
+    //       daysSupply: draft.daysSupply,
+    //       dispenseAsWritten: draft.dispenseAsWritten,
+    //       dispenseQuantity: draft.dispenseQuantity,
+    //       dispenseUnit: draft.dispenseUnit,
+    //       effectiveDate: draft.effectiveDate,
+    //       instructions: draft.instructions,
+    //       notes: draft.notes,
+    //       patientId: state.patientId,
+    //       // +1 here because we're using the refillsInput
+    //       fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
+    //       treatmentId: draft.treatment.id
+    //     }))
+    //   }
+  };
 
   const updateOrder = async (orderId: string, prescriptionIds: string[]) =>
     combineOrdersMutation({
@@ -297,7 +299,8 @@ export default function RecentOrdersCombineDialog() {
               Select YES to combine orders and enable the patient to send it to the same pharmacy:
             </Text>
             <div class="border border-solid border-gray-200 rounded-lg bg-gray-50 py-3 px-4 flex flex-col gap-4">
-              <For each={state.draftPrescriptions}>
+              TODO TODO TODO
+              {/* <For each={state.draftPrescriptions}>
                 {(draft) => (
                   <div>
                     <Text size="sm">{draft.treatment.name}</Text>
@@ -312,7 +315,7 @@ export default function RecentOrdersCombineDialog() {
                     </Text>
                   </div>
                 )}
-              </For>
+              </For> */}
             </div>
           </div>
         </div>

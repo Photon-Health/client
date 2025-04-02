@@ -7,10 +7,11 @@ import {
   ScreeningAlertType,
   Text,
   triggerToast,
+  usePrescribe,
   useRecentOrders
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
+import { DispenseUnit, Medication, Prescription } from '@photonhealth/sdk/dist/types';
 import { format } from 'date-fns';
 import { any, min, number, record, refine, size, string } from 'superstruct';
 import { afterDate, between, message } from '../../validators';
@@ -74,13 +75,19 @@ export const AddPrescriptionCard = (props: {
   enableCombineAndDuplicate?: boolean;
   screenDraftedPrescriptions: () => void;
   draftedPrescriptionChanged: () => void;
-  onDraftPrescriptionCreated: (draft: AddDraftPrescription) => void;
+  onDraftPrescriptionCreated: (draft: Prescription) => void;
   screeningAlerts: ScreeningAlertType[];
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
   enableOrder: boolean;
 }) => {
   const client = usePhoton();
+
+  const prescribeContext = usePrescribe();
+  if (!prescribeContext) {
+    throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
+  }
+  const { createPrescription } = prescribeContext;
 
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
@@ -105,7 +112,6 @@ export const AddPrescriptionCard = (props: {
   const templateMutation = client!
     .getSDK()
     .clinical.prescriptionTemplate.createPrescriptionTemplate({});
-  const rxMutation = client!.getSDK().clinical.prescription.createPrescriptions({});
 
   const dispatchOrderError = (errors: readonly GraphQLFormattedError[]) => {
     const event = new CustomEvent('photon-order-error', {
@@ -120,15 +126,19 @@ export const AddPrescriptionCard = (props: {
 
   const handleAddPrescription = async () => {
     setIsLoading(true);
+
+    // TODO TODO TODO move validation to the prescribe provider
     const keys = Object.keys(validators);
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
 
-    const draftedPrescriptions = [...props.store.draftPrescriptions.value];
-    const isPrescriptionAlreadyAdded = isTreatmentInDraftPrescriptions(
-      props.store.treatment?.value?.id,
-      draftedPrescriptions
-    );
+    // TODO TODO TODO
+    // const draftedPrescriptions = [...props.store.draftPrescriptions.value];
+    // const isPrescriptionAlreadyAdded = isTreatmentInDraftPrescriptions(
+    //   props.store.treatment?.value?.id,
+    //   draftedPrescriptions
+    // );
+    const isPrescriptionAlreadyAdded = false;
 
     if (isPrescriptionAlreadyAdded) {
       triggerToast({
@@ -136,9 +146,12 @@ export const AddPrescriptionCard = (props: {
         body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
       });
     } else if (!errorsPresent) {
+      // check if duplicate in recent orders
+      const duplicate = recentOrdersActions.checkDuplicateFill(props.store.treatment.value.name);
+
       const prescriptionArgs = {
         effectiveDate: props.store.effectiveDate.value,
-        treatmentId: props.store.treatment.value.id,
+        treatment: { id: props.store.treatment.value.id },
         dispenseAsWritten: props.store.dispenseAsWritten.value,
         dispenseQuantity: props.store.dispenseQuantity.value,
         dispenseUnit: props.store.dispenseUnit.value,
@@ -149,67 +162,12 @@ export const AddPrescriptionCard = (props: {
         patientId: props.store.patient?.value?.id
       };
 
-      if (props.store.addToTemplates?.value ?? false) {
-        try {
-          const { errors } = await templateMutation({
-            variables: {
-              ...prescriptionArgs,
-              catalogId: props.store.catalogId?.value ?? undefined,
-              isPrivate: true
-            },
-            awaitRefetchQueries: false
-          });
-          if (errors) {
-            dispatchOrderError(errors);
-          }
-        } catch (err) {
-          dispatchOrderError([err as GraphQLFormattedError]);
-        }
-      }
-
-      const { data: prescriptionData, errors } = await rxMutation({
-        variables: {
-          prescriptions: [prescriptionArgs]
-        },
-        refetchQueries: [],
-        awaitRefetchQueries: false
-      });
-      console.log(prescriptionData, errors);
-      const prescriptionId = prescriptionData?.createPrescriptions[0].id;
-
-      if (errors || !prescriptionId) {
-        setIsLoading(false);
-        return triggerToast({
-          status: 'error',
-          header: 'Error Adding Prescription',
-          body: 'There was an issue adding the prescription. Please try again.'
-        });
-      }
-
-      const draft: AddDraftPrescription = {
-        id: prescriptionData?.createPrescriptions[0].id ?? '',
-        ...prescriptionArgs,
-        treatment: props.store.treatment.value,
-        refillsInput: props.store.refillsInput.value,
-        addToTemplates: props.store.addToTemplates?.value ?? false,
-        templateName: props.store.templateName?.value ?? '',
-        catalogId: props.store.catalogId.value ?? undefined,
-        externalId: props.store.externalId?.value ?? undefined
-      };
-
-      const duplicate = recentOrdersActions.checkDuplicateFill(draft.treatment.name);
-
       const addDraftPrescription = async () => {
-        props.actions.updateFormValue({
-          key: 'draftPrescriptions',
-          value: [...(props.store.draftPrescriptions?.value || []), draft]
-        });
+        // RESET THE FORM
         props.actions.updateFormValue({
           key: 'effectiveDate',
           value: format(new Date(), 'yyyy-MM-dd').toString()
         });
-        const addToTemplate = props.store.addToTemplates?.value ?? false;
-        const templateName = props.store.templateName?.value ?? '';
         props.actions.clearKeys([
           'treatment',
           'dispenseAsWritten',
@@ -224,13 +182,24 @@ export const AddPrescriptionCard = (props: {
         ]);
         setOffCatalog(undefined);
         clearForm(props.actions, props.prefillNotes ? { notes: props.prefillNotes } : undefined);
-        if (addToTemplate) {
+
+        // create the prescription
+        try {
+          await createPrescription(prescriptionArgs);
+        } catch (err) {
+          return triggerToast({
+            status: 'error',
+            header: 'Error Adding Prescription',
+            body: 'There was an issue adding the prescription. Please try again.'
+          });
+        }
+
+        if (props.store.addToTemplates?.value ?? false) {
           try {
             const { errors } = await templateMutation({
               variables: {
-                ...draft,
-                name: templateName,
-                treatmentId: draft.treatment.id,
+                ...prescriptionArgs,
+                catalogId: props.store.catalogId?.value ?? undefined,
                 isPrivate: true
               },
               awaitRefetchQueries: false
@@ -247,13 +216,21 @@ export const AddPrescriptionCard = (props: {
             dispatchOrderError([err as GraphQLFormattedError]);
           }
         }
+
         triggerToast({
           status: 'success',
           header: 'Prescription Added',
           body: 'You can send this order or add another prescription before sending it'
         });
 
-        props.onDraftPrescriptionCreated(draft);
+        props.onDraftPrescriptionCreated(prescriptionArgs);
+        // and screen it again, in case any of the
+        // new properties impact screening
+        // TODO TODO TODO
+        props.screenDraftedPrescriptions();
+
+        setSearchText('');
+        setIsLoading(false);
       };
 
       if (props.enableCombineAndDuplicate && duplicate) {
@@ -263,13 +240,6 @@ export const AddPrescriptionCard = (props: {
 
       // otherwise add it to the draft prescriptions list
       addDraftPrescription();
-
-      // and screen it again, in case any of the
-      // new properties impact screening
-      props.screenDraftedPrescriptions();
-
-      setSearchText('');
-      setIsLoading(false);
     } else {
       setIsLoading(false);
       triggerToast({

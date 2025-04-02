@@ -11,11 +11,13 @@ import { usePhotonClient } from '../SDKProvider';
 import { Catalog, Prescription } from '@photonhealth/sdk/dist/types';
 import { PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
 import gql from 'graphql-tag';
+import { GetPrescription } from '../../fetch/queries';
 
 const PrescribeContext = createContext<{
   prescriptionIds: Accessor<string[]>;
   isLoading: Accessor<boolean>;
   setPrescriptionIds: (ids: string[]) => void;
+  createPrescription: (prescription: Prescription) => Promise<void>;
 }>();
 
 export type TemplateOverrides = {
@@ -49,25 +51,6 @@ const GetTemplatesFromCatalogs = gql`
           id
           name
         }
-      }
-    }
-  }
-`;
-
-const GetPrescription = gql`
-  query GetPrescription($id: ID!) {
-    prescription(id: $id) {
-      id
-      daysSupply
-      dispenseAsWritten
-      dispenseQuantity
-      dispenseUnit
-      instructions
-      notes
-      fillsAllowed
-      treatment {
-        id
-        name
       }
     }
   }
@@ -123,14 +106,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const [hasCreatedPrescriptions, setHasCreatedPrescriptions] = createSignal<boolean>(false);
 
   const client = usePhotonClient();
-
-  const value = {
-    // values
-    prescriptionIds,
-    isLoading,
-    // actions
-    setPrescriptionIds
-  };
 
   // Prefill new prescriptions based on templateIds or prescriptionIds when we get a patientId
   createEffect(() => {
@@ -213,44 +188,70 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
             return data?.prescription;
           })
         );
-        console.log('!!!!!!!!!!!!! fetchedPrescriptions', fetchedPrescriptions);
         prescriptionsToCreate.push(...fetchedPrescriptions);
       } catch (error) {
         console.error('Error fetching prescriptions:', error);
       }
     }
 
-    console.log('!!!!!!!!!!!!! prescriptionsToCreate', prescriptionsToCreate);
     // create prescriptions from template and prescription ids
     await Promise.all(
-      prescriptionsToCreate.map(async (prescription: Prescription) => {
-        try {
-          const res = await client!.apollo.mutate({
-            mutation: CreatePrescription,
-            variables: {
-              externalId: prescription.externalId,
-              patientId: props.patientId,
-              treatmentId: prescription.treatment?.id,
-              dispenseAsWritten: prescription.dispenseAsWritten,
-              dispenseQuantity: prescription.dispenseQuantity,
-              dispenseUnit: prescription.dispenseUnit,
-              fillsAllowed: prescription.fillsAllowed,
-              daysSupply: prescription.daysSupply,
-              instructions: prescription.instructions,
-              notes: prescription.notes,
-              effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
-              diagnoses: prescription.diagnoses
-            }
-          });
-
-          setPrescriptionIds([...prescriptionIds(), res.data.createPrescription.id]);
-        } catch (error) {
-          console.error('Mutation error:', error);
-        }
-      })
+      prescriptionsToCreate.map(async (prescription: Prescription) =>
+        createPrescription(prescription)
+      )
     );
     setIsLoading(false);
   }
+
+  const createPrescription = async (prescription: Prescription) => {
+    try {
+      console.log('createPrescription called', prescription, {
+        externalId: prescription.externalId,
+        patientId: props.patientId,
+        treatmentId: prescription.treatment?.id,
+        dispenseAsWritten: prescription.dispenseAsWritten,
+        dispenseQuantity: prescription.dispenseQuantity,
+        dispenseUnit: prescription.dispenseUnit,
+        fillsAllowed: prescription.fillsAllowed,
+        daysSupply: prescription.daysSupply,
+        instructions: prescription.instructions,
+        notes: prescription.notes,
+        effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
+        diagnoses: prescription.diagnoses
+      });
+      const res = await client!.apollo.mutate({
+        mutation: CreatePrescription,
+        variables: {
+          externalId: prescription.externalId,
+          patientId: props.patientId,
+          treatmentId: prescription.treatment?.id,
+          dispenseAsWritten: prescription.dispenseAsWritten,
+          dispenseQuantity: prescription.dispenseQuantity,
+          dispenseUnit: prescription.dispenseUnit,
+          fillsAllowed: prescription.fillsAllowed,
+          daysSupply: prescription.daysSupply,
+          instructions: prescription.instructions,
+          notes: prescription.notes,
+          effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
+          diagnoses: prescription.diagnoses
+        }
+      });
+      console.log('createPrescription res', res);
+      console.log('prescriptionIds', [...prescriptionIds(), res.data.createPrescription.id]);
+      setPrescriptionIds([...prescriptionIds(), res.data.createPrescription.id]);
+    } catch (error) {
+      console.error('Mutation error:', error);
+    }
+  };
+
+  const value = {
+    // values
+    prescriptionIds,
+    isLoading,
+    // actions
+    setPrescriptionIds,
+    createPrescription
+  };
 
   return <PrescribeContext.Provider value={value}>{props.children}</PrescribeContext.Provider>;
 };

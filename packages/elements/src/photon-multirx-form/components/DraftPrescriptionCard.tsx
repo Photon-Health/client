@@ -1,5 +1,5 @@
 import { createSignal, Ref } from 'solid-js';
-import { DraftPrescriptions } from '@photonhealth/components';
+import { DraftPrescription, DraftPrescriptions } from '@photonhealth/components';
 import { Card, Text, usePrescribe } from '@photonhealth/components';
 import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
@@ -50,11 +50,8 @@ export const DraftPrescriptionCard = (props: {
         value: editDraft().catalogId
       });
 
-      // remove the draft from the list
-      props.actions.updateFormValue({
-        key: 'draftPrescriptions',
-        value: props.store['draftPrescriptions'].value.filter((x: any) => x.id !== editDraft().id)
-      });
+      const remaining = prescriptionIds().filter((x) => x !== editDraft().id);
+      setPrescriptionIds(remaining);
 
       window.scrollTo({
         behavior: 'smooth',
@@ -68,8 +65,7 @@ export const DraftPrescriptionCard = (props: {
     }
   };
 
-  const checkEditPrescription = (id: string) => {
-    const draft = props.store['draftPrescriptions'].value.find((x: any) => x.id === id);
+  const checkEditPrescription = (draft: DraftPrescription) => {
     setEditDraft(draft);
 
     if (!props.store['treatment'].value) {
@@ -157,8 +153,8 @@ export const DraftPrescriptionCard = (props: {
             setDeleteDialogOpen(true);
             setDeleteDraftId(draftId);
           }}
-          handleEdit={(draftId: string) => {
-            checkEditPrescription(draftId);
+          handleEdit={(draft) => {
+            checkEditPrescription(draft);
           }}
           screeningAlerts={props.screeningAlerts}
           enableOrder={props.enableOrder}
