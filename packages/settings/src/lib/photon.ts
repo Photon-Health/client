@@ -386,8 +386,7 @@ const organizationSettings: {
     accentColor: '#5224C7',
     topRankedCostco: true,
     paExceptionMessage:
-      'Your insurance needs additional information from your provider before it will cover your prescription. Use the messaging feature in your Sesame profile to ask your provider to submit a prior authorization. If you’re paying cash, disregard and work with your pharmacy directly to pay the out-of-pocket price.',
-    enablePricing: true
+      'Your insurance needs additional information from your provider before it will cover your prescription. Use the messaging feature in your Sesame profile to ask your provider to submit a prior authorization. If you’re paying cash, disregard and work with your pharmacy directly to pay the out-of-pocket price.'
   },
   // DrTelx
   org_6DKb7celAunAoLzb: {

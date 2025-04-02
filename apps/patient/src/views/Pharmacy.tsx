@@ -105,17 +105,14 @@ export const Pharmacy = () => {
   const isLoading = loadingLocation || loadingPharmacies;
 
   // pricing
-  const containsZepbound = flattenedFills.some((fill) =>
-    fill.treatment.name.toLowerCase().includes('zepbound')
-  );
-  const showPriceToggle = orgSettings.enablePricing && containsZepbound ? true : false;
+  const showPriceToggle = orgSettings.enablePricing ?? false;
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
     openNow !== null ? !!openNow : order?.readyBy === 'Urgent'
   );
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
-  const [enablePrice, setEnablePrice] = useState(showPriceToggle);
+  const [enablePrice, setEnablePrice] = useState(false);
 
   const [amazonPharmacyOverride, setAmazonPharmacyOverride] = useState<string | undefined>(
     undefined
