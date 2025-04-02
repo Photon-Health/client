@@ -1,11 +1,22 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { createThemes } = require('tw-colors');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const colors = require('tailwindcss/colors');
 
 /** @type {import('tailwindcss').Config} */
+// eslint-disable-next-line no-undef
 module.exports = {
   content: ['./src/**/*.{html,js,jsx,ts,tsx}'],
   theme: {
-    extend: {}
+    extend: {
+      zIndex: {
+        60: '60',
+        70: '70',
+        80: '80',
+        90: '90',
+        100: '100'
+      }
+    }
   },
   plugins: [
     require('@tailwindcss/forms'),
