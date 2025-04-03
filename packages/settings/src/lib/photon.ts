@@ -378,7 +378,7 @@ const organizationSettings: {
     accentColor: '#1c3f28',
     paExceptionMessage:
       'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Found customer support will submit a prior authorization for you or suggest an alternative medication. The customer support team at Found will follow up with you if any additional information is needed.',
-    mailOrderProviders: [STRIVE_PHARMACY_ID]
+    mailOrderProviders: [STRIVE_PHARMACY_ID, GIFTHEALTH_PHARMACY_ID]
   },
   // Sesame
   org_zc1RzzmSwd8eE94U: {
@@ -430,7 +430,8 @@ const organizationSettings: {
     mailOrderProviders: [
       REDROCK_SPRINGVILLE_PHARMACY_ID,
       REDROCK_STGEORGE_PHARMACY_ID,
-      EMPOWER_PHARMACY_ID
+      EMPOWER_PHARMACY_ID,
+      GIFTHEALTH_PHARMACY_ID
     ],
     logo: 'measured_logo.svg',
     accentColor: '#ffd100',
