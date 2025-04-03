@@ -205,8 +205,10 @@ export const StatusV2 = () => {
     [fulfillments, order.fulfillment]
   );
 
-  const exception = order.exceptions[0]
-    ? order.exceptions[0].exceptionType
+  const unresolvedExceptions = order.exceptions.filter((e) => e.resolvedAt == null);
+
+  const exception = unresolvedExceptions[0]
+    ? unresolvedExceptions[0].exceptionType
     : order.pharmacy?.isOpen === false
     ? 'PHARMACY_CLOSED'
     : fulfillments.map((f) => f.exceptions[0]?.exceptionType).find((e) => e != null) ?? undefined;
@@ -228,7 +230,7 @@ export const StatusV2 = () => {
           <Container py={6}>
             <VStack spacing={4} width="full" alignItems="stretch">
               <HolidayAlert>Holiday may affect pharmacy hours.</HolidayAlert>
-              <InsuranceAlert exception={order.exceptions[0]?.exceptionType} />
+              <InsuranceAlert exception={unresolvedExceptions[0]?.exceptionType} />
               <OrderStatusHeader
                 status={orderState}
                 pharmacyEstimatedReadyAt={pharmacyEstimatedReadyAt}
