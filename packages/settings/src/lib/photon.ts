@@ -17,7 +17,10 @@ import {
   STRIVE_PHARMACY_ID,
   HONEYBEE_PHARMACY_ID,
   TRUEPILL_PHARMACY_ID,
-  HEALTHWAREHOUSE_PHARMACY_ID
+  HEALTHWAREHOUSE_PHARMACY_ID,
+  OPENLOOP_PHARMACY_ID,
+  GIFTHEALTH_PHARMACY_ID,
+  DANIA_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -42,6 +45,7 @@ const defaultSettings: OrganizationSettings = {
   enableMedHistory: false,
   enableRxAndOrder: true,
   enableCombineAndDuplicate: true,
+  enablePricing: false,
   topRankedCostco: false,
   topRankedWalgreens: false,
   hideTemplates: false
@@ -78,7 +82,9 @@ const organizationSettings: {
     mailOrderProviders: [
       REDROCK_SPRINGVILLE_PHARMACY_ID,
       REDROCK_STGEORGE_PHARMACY_ID,
-      STRIVE_PHARMACY_ID
+      STRIVE_PHARMACY_ID,
+      OPENLOOP_PHARMACY_ID,
+      GIFTHEALTH_PHARMACY_ID
     ]
   },
   // Weekend Health
@@ -286,6 +292,15 @@ const organizationSettings: {
     sendToPatient: false,
     enableRxAndOrder: false
   },
+  // Mass Derm Hair Transplant - (Xyon Health)
+  org_xAvSD8db2dZDijSE: {
+    sendOrder: false,
+    pickUp: false,
+    mailOrder: true,
+    mailOrderProviders: [CUREXA_PHARMACY_ID],
+    sendToPatient: false,
+    enableRxAndOrder: false
+  },
   // Ognomy
   org_2B1yxV6yS9ROqV1g: {
     logo: 'ognomy_logo.webp',
@@ -371,7 +386,8 @@ const organizationSettings: {
     accentColor: '#5224C7',
     topRankedCostco: true,
     paExceptionMessage:
-      'Your insurance needs additional information from your provider before it will cover your prescription. Use the messaging feature in your Sesame profile to ask your provider to submit a prior authorization. If you’re paying cash, disregard and work with your pharmacy directly to pay the out-of-pocket price.'
+      'Your insurance needs additional information from your provider before it will cover your prescription. Use the messaging feature in your Sesame profile to ask your provider to submit a prior authorization. If you’re paying cash, disregard and work with your pharmacy directly to pay the out-of-pocket price.',
+    enablePricing: true
   },
   // DrTelx
   org_6DKb7celAunAoLzb: {
@@ -464,5 +480,38 @@ const organizationSettings: {
     mailOrderProviders: [CUREXA_PHARMACY_ID],
     sendToPatient: false,
     enableRxAndOrder: false
+  },
+  // Remo
+  org_7IjlTEWfLpmTHjHn: {
+    accentColor: '#21201C',
+    logo: 'remo_logo.svg'
+  },
+  // Om Dermatology (sub-org of Miiskin)
+  org_1eNnu0Wi14vBH7IM: {
+    accentColor: '#00285c',
+    logo: 'om_dermatology_logo.svg',
+    mailOrder: true,
+    mailOrderProviders: [HONEYBEE_PHARMACY_ID]
+  },
+  // Geviti -- Sub org of CareTalk
+  org_Zdri0JlNxJfWjzpk: {
+    logo: 'geviti_logo.webp',
+    accentColor: '#04549D',
+    mailOrder: true,
+    mailOrderProviders: [STRIVE_PHARMACY_ID]
+  },
+  // EveryMeds -- Sub org of CareTalk
+  org_sDXma6gDyEQDQK0o: {
+    logo: 'everymeds_logo.svg',
+    accentColor: '#03254c',
+    mailOrder: true,
+    mailOrderProviders: [DANIA_PHARMACY_ID]
+  },
+  // Precision Telemed
+  org_zlsgaZsKLpFrkpyK: {
+    logo: 'precision_telemed_logo.png',
+    accentColor: '#6ea3a6',
+    mailOrder: true,
+    mailOrderProviders: [EMPOWER_PHARMACY_ID]
   }
 };

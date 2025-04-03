@@ -13,11 +13,45 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
-const documents = {
+type Documents = {
+    "\n  mutation TicketModalCreateTicket($input: TicketInput!) {\n    createTicket(input: $input) {\n      id\n    }\n  }\n": typeof types.TicketModalCreateTicketDocument,
+    "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n  }\n": typeof types.ClientInfoCardFragmentFragmentDoc,
+    "\n  query ClientsDeveloperTabQuery {\n    clients {\n      id\n      ...ClientInfoCardFragment\n    }\n  }\n": typeof types.ClientsDeveloperTabQueryDocument,
+    "\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n": typeof types.RotateSecretDocument,
+    "\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!) {\n    updateClient(clientId: $clientId, whiteListedUrls: $whiteListedUrls) {\n      id\n    }\n  }\n": typeof types.UpdateClientDocument,
+    "\n  fragment InviteFormFragment on Invite {\n    id\n    invitee\n    inviter\n    expires_at\n  }\n": typeof types.InviteFormFragmentFragmentDoc,
+    "\n  query UserInviteFormQuery {\n    me {\n      id\n      name {\n        full\n      }\n    }\n  }\n": typeof types.UserInviteFormQueryDocument,
+    "\n  mutation InviteUser($email: String!, $roles: [String!]!, $provider: ProviderInput) {\n    inviteUser(email: $email, roles: $roles, provider: $provider) {\n      id\n    }\n  }\n": typeof types.InviteUserDocument,
+    "\n  fragment InviteFragment on Invite {\n    id\n    invitee\n    inviter\n    expired\n    expires_at\n  }\n": typeof types.InviteFragmentFragmentDoc,
+    "\n  mutation ResendInvite($inviteId: ID!) {\n    resendInvite(inviteId: $inviteId) {\n      id\n    }\n  }\n": typeof types.ResendInviteDocument,
+    "\n  mutation DeleteInvite($inviteId: ID!) {\n    deleteInvite(inviteId: $inviteId)\n  }\n": typeof types.DeleteInviteDocument,
+    "\n  query InvitesQuery {\n    invites {\n      ...InviteFragment\n      id\n      expired\n      expires_at\n    }\n  }\n": typeof types.InvitesQueryDocument,
+    "\n  query OrganizationQuery {\n    organization {\n      id\n      name\n      address {\n        street1\n        street2\n        postalCode\n        city\n        state\n        country\n      }\n      fax\n      phone\n      email\n    }\n  }\n": typeof types.OrganizationQueryDocument,
+    "\n  mutation UpdateOrganization($input: OrganizationInput!) {\n    updateOrganization(input: $input)\n  }\n": typeof types.UpdateOrganizationDocument,
+    "\n  query MeProfileQuery {\n    me {\n      id\n      npi\n      phone\n      fax\n      email\n      address {\n        street1\n        street2\n        state\n        postalCode\n        country\n        city\n      }\n      name {\n        first\n        full\n        last\n        middle\n        title\n      }\n      roles {\n        description\n        id\n        name\n      }\n    }\n    organization {\n      id\n      name\n    }\n  }\n": typeof types.MeProfileQueryDocument,
+    "\n  mutation UpdateMyProfile($updateMyProfileInput: ProfileInput!) {\n    updateMyProfile(input: $updateMyProfileInput)\n  }\n": typeof types.UpdateMyProfileDocument,
+    "\n  query SearchTreatments($filter: TreatmentFilter!) {\n    treatments(filter: $filter) {\n      id\n      name\n    }\n  }\n": typeof types.SearchTreatmentsDocument,
+    "\n  fragment EditRolesActionUserFragment on User {\n    id\n    npi\n    phone\n    fax\n    email\n    address {\n      street1\n      street2\n      state\n      postalCode\n      country\n      city\n    }\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n    roles {\n      description\n      id\n      name\n    }\n  }\n": typeof types.EditRolesActionUserFragmentFragmentDoc,
+    "\n  mutation UpdateProviderProfileAndSetUserRolesMutation(\n    $providerId: ID!\n    $updateProviderProfileInput: UpdateProviderProfileInput!\n    $roles: [ID!]!\n  ) {\n    updateProviderProfile(providerId: $providerId, input: $updateProviderProfileInput)\n    setUserRoles(userId: $providerId, roles: $roles)\n  }\n": typeof types.UpdateProviderProfileAndSetUserRolesMutationDocument,
+    "\n  fragment RemoveUserActionUserFragment on User {\n    id\n    email\n    name {\n      full\n    }\n  }\n": typeof types.RemoveUserActionUserFragmentFragmentDoc,
+    "\n  mutation UserItemActionRemoveUserFromOrganization($userId: ID!) {\n    removeUserFromOrganization(userId: $userId)\n  }\n": typeof types.UserItemActionRemoveUserFromOrganizationDocument,
+    "\n  fragment UserItemUserFragment on User {\n    ...UserFragment\n    id\n    npi\n    phone\n    fax\n    email\n    address {\n      street1\n      street2\n      state\n      postalCode\n      country\n      city\n    }\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n    roles {\n      description\n      id\n      name\n    }\n  }\n": typeof types.UserItemUserFragmentFragmentDoc,
+    "\n  fragment UserFragment on User {\n    ...RemoveUserActionUserFragment\n    ...EditRolesActionUserFragment\n    id\n    npi\n    phone\n    fax\n    email\n    address {\n      street1\n      street2\n      state\n      postalCode\n      country\n      city\n    }\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n    roles {\n      description\n      id\n      name\n    }\n  }\n": typeof types.UserFragmentFragmentDoc,
+    "\n  query UsersListQuery($page: Int, $pageSize: Int) {\n    userCount\n    users(pageNum: $page, pageSize: $pageSize) {\n      id\n      ...UserItemUserFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n": typeof types.UsersListQueryDocument,
+    "\n  query AllRolesSelect {\n    roles {\n      id\n      name\n      description\n    }\n  }\n": typeof types.AllRolesSelectDocument,
+    "\n  fragment WebhookItemFragment on WebhookConfig {\n    id\n    url\n  }\n": typeof types.WebhookItemFragmentFragmentDoc,
+    "\n  mutation WebhookItemDeleteMutation($webhookId: ID!) {\n    deleteWebhookConfig(webhookId: $webhookId)\n  }\n": typeof types.WebhookItemDeleteMutationDocument,
+    "\n  query WebhookListQuery {\n    webhooks {\n      id\n      ...WebhookItemFragment\n    }\n  }\n": typeof types.WebhookListQueryDocument,
+    "\n  mutation WebhookFormCreateMutation($url: String!, $sharedSecret: String!, $filters: [String!]!) {\n    createWebhookConfig(url: $url, filters: $filters, sharedSecret: $sharedSecret)\n  }\n": typeof types.WebhookFormCreateMutationDocument,
+    "\n  query SettingsPageQuery {\n    me {\n      roles {\n        id\n      }\n    }\n    organization {\n      id\n      name\n      ...OrganizationTreatmentTabFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n": typeof types.SettingsPageQueryDocument,
+    "\n  fragment OrganizationTreatmentTabFragment on Organization {\n    id\n    name\n  }\n": typeof types.OrganizationTreatmentTabFragmentFragmentDoc,
+};
+const documents: Documents = {
     "\n  mutation TicketModalCreateTicket($input: TicketInput!) {\n    createTicket(input: $input) {\n      id\n    }\n  }\n": types.TicketModalCreateTicketDocument,
-    "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n  }\n": types.ClientInfoCardFragmentFragmentDoc,
+    "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n  }\n": types.ClientInfoCardFragmentFragmentDoc,
     "\n  query ClientsDeveloperTabQuery {\n    clients {\n      id\n      ...ClientInfoCardFragment\n    }\n  }\n": types.ClientsDeveloperTabQueryDocument,
     "\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n": types.RotateSecretDocument,
+    "\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!) {\n    updateClient(clientId: $clientId, whiteListedUrls: $whiteListedUrls) {\n      id\n    }\n  }\n": types.UpdateClientDocument,
     "\n  fragment InviteFormFragment on Invite {\n    id\n    invitee\n    inviter\n    expires_at\n  }\n": types.InviteFormFragmentFragmentDoc,
     "\n  query UserInviteFormQuery {\n    me {\n      id\n      name {\n        full\n      }\n    }\n  }\n": types.UserInviteFormQueryDocument,
     "\n  mutation InviteUser($email: String!, $roles: [String!]!, $provider: ProviderInput) {\n    inviteUser(email: $email, roles: $roles, provider: $provider) {\n      id\n    }\n  }\n": types.InviteUserDocument,
@@ -67,7 +101,7 @@ export function graphql(source: "\n  mutation TicketModalCreateTicket($input: Ti
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n  }\n"): (typeof documents)["\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n  }\n"];
+export function graphql(source: "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n  }\n"): (typeof documents)["\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -76,6 +110,10 @@ export function graphql(source: "\n  query ClientsDeveloperTabQuery {\n    clien
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!) {\n    updateClient(clientId: $clientId, whiteListedUrls: $whiteListedUrls) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!) {\n    updateClient(clientId: $clientId, whiteListedUrls: $whiteListedUrls) {\n      id\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

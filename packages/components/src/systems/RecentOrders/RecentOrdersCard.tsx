@@ -12,7 +12,7 @@ export default function RecentOrdersCard() {
 
   return (
     <Show when={state.orders.length > 0}>
-      <Card>
+      <Card addChildrenDivider={true}>
         <div class="flex items-center justify-between">
           <Text color="gray">Recent Orders</Text>
         </div>

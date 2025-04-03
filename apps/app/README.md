@@ -1,39 +1,70 @@
 # Photon Clinical App
 
-## Scripts
+## Local Development
 
-### `npm start`
+### Run against Boson services
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+> Runs against remote Boson environment services
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+`npx nx run app:start`
 
-### `npm test`
+### Run against local "Tau" services
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+> Must be running [tau services](https://github.com/Photon-Health/services) locally
 
-### `npm test -- -u`
+`npx nx run app:start:tau`
 
-Update test snapshots
+### Playwright e2e Tests
 
-### `npm test -- --coverage`
+End-to-end tests run against the browser, testing the app "end" to the server "end".
+These are expensive to run, and are best suited to validating critical user flows within the application.
 
-Generate test coverage report
+#### First time setup:
 
-### `npm run lint`
+1. Copy `apps/app/.env.local.sample` into a new file named `apps/app/.env.local`
+2. Go to 1password and search for "e2e boson test" in Shared
+3. Copy password into the `PLAYWRIGHT_E2E_ACCOUNT_PASSWORD` field inside `.env.local`
 
-Run ESLint manually, `:fix` will automatically make any possible fixes.
+#### Run e2e tests:
 
-### `npm run format`
+```shell
+# Spins up the app locally at localhost:3000 if needed, using `nx start`
+# See playwright.config.ts "webserver" settings
+$ npx nx run app:e2e
+```
 
-Format files via Prettier.
 
-### `npm run build`
+### Tests
 
-Builds the app for production to the `build` folder.\
+`npx nx run app:test`
+
+Update test snapshots:
+
+`npx nx run app:test -- -u`
+
+Generate test coverage report:
+
+`npx nx run app:test -- --coverage`
+
+### Linting
+
+Run ESLint manually:
+
+`npx nx run app:lint`
+
+Automatically fix ESLint issues:
+
+`npx nx run app:lint:fix`
+
+### Build
+
+`npx nx run app:build:boson`
+
+`npx nx run app:build:neutron`
+
+`npx nx run app:build:photon`
+
+Builds the app for each environment into the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
 The build is minified and the filenames include the hashes.

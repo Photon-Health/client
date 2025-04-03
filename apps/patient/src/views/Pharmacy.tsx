@@ -35,6 +35,7 @@ import { useOrderContext } from './Main';
 
 import {
   geocode,
+  getOffers,
   getPharmacies,
   rerouteOrder,
   setOrderPharmacy,
@@ -53,7 +54,7 @@ import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__gen
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
 export const Pharmacy = () => {
-  const { order, flattenedFills, setOrder, isDemo, fetchOrder, paymentMethod } = useOrderContext();
+  const { order, flattenedFills, setOrder, isDemo, fetchOrder } = useOrderContext();
 
   const orgSettings = getSettings(order?.organization.id);
 
@@ -72,9 +73,9 @@ export const Pharmacy = () => {
   const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
 
   // top ranked pharmacies
-  const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco;
-  const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
   const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
+  const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco && containsGLP; // only show costco if there are GLP treatments
+  const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
 
   // View state
   const [showFooter, setShowFooter] = useState<boolean>(false);
@@ -103,12 +104,22 @@ export const Pharmacy = () => {
   const [showingAllPharmacies, setShowingAllPharmacies] = useState<boolean>(false);
   const isLoading = loadingLocation || loadingPharmacies;
 
+  // pricing
+  const containsZepbound = flattenedFills.some((fill) =>
+    fill.treatment.name.toLowerCase().includes('zepbound')
+  );
+  const showPriceToggle = orgSettings.enablePricing && containsZepbound ? true : false;
+
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
     openNow !== null ? !!openNow : order?.readyBy === 'Urgent'
   );
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
-  const [enablePrice, setEnablePrice] = useState(paymentMethod === 'Cash Price');
+  const [enablePrice, setEnablePrice] = useState(showPriceToggle);
+
+  const [amazonPharmacyOverride, setAmazonPharmacyOverride] = useState<string | undefined>(
+    undefined
+  );
 
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
@@ -154,6 +165,32 @@ export const Pharmacy = () => {
 
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
+
+  useEffect(() => {
+    async function fetchOffers() {
+      const offers = await getOffers(order.id);
+
+      const amazonOffers = offers
+        .filter((offer) => offer.supplier === 'AMAZON_PHARMACY')
+        .filter((offer) => offer.deliveryEstimate !== undefined);
+
+      if (amazonOffers.length > 0 && amazonOffers[0]?.deliveryEstimate?.deliveryPromise) {
+        setAmazonPharmacyOverride(amazonOffers[0]?.deliveryEstimate?.deliveryPromise);
+      }
+    }
+
+    const validOrganizationIds = [
+      'org_KzSVZBQixLRkqj5d', // boson Test Organization 11
+      'org_kVS7AP4iuItESdMA', // neutron Photon Test Org
+      'org_wM4wI7rop0W1eNfM' // production found
+    ];
+
+    if (!validOrganizationIds.includes(order.organization.id)) {
+      return undefined;
+    }
+
+    fetchOffers();
+  }, [order]);
 
   const showToastWarning = () =>
     toast({
@@ -351,7 +388,7 @@ export const Pharmacy = () => {
         let topRankedPharmacies: EnrichedPharmacy[] = [];
 
         // check if top ranked costco is enabled and there are GLP treatments
-        if (enableTopRankedCostco && !enablePrice) {
+        if (enableTopRankedCostco) {
           topRankedPharmacies = [
             ...(await getCostco({ latitude, longitude })),
             ...topRankedPharmacies
@@ -556,6 +593,20 @@ export const Pharmacy = () => {
           setTimeout(async () => {
             setShowFooter(false);
 
+            if (amazonPharmacyOverride) {
+              if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
+                datadogRum.addAction('amazon_pharmacy_offer_active_and_selected', {
+                  orderId: order.id,
+                  timestamp: new Date().toISOString()
+                });
+              } else {
+                datadogRum.addAction('amazon_pharmacy_offer_active_and_not_selected', {
+                  orderId: order.id,
+                  timestamp: new Date().toISOString()
+                });
+              }
+            }
+
             // Fudge it so that we can show the pharmacy card on initial load of the
             // status view for all types. On my christmas list for 2024 is better
             // fulfillment types on pharmacies.
@@ -679,6 +730,14 @@ export const Pharmacy = () => {
     );
   }
 
+  const capsuleEnabled = enableCourier && order?.address?.postalCode && capsulePharmacyId;
+
+  const brandedOptions = [
+    ...(capsuleEnabled ? [capsulePharmacyId] : []),
+    ...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : []),
+    ...(amazonPharmacyOverride ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string] : [])
+  ];
+
   return (
     <Box>
       {!isDemo && <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />}
@@ -704,11 +763,8 @@ export const Pharmacy = () => {
                   <Link
                     onClick={() => setLocationModalOpen(true)}
                     display="inline"
-                    color="link"
-                    fontWeight="semibold"
                     size="sm"
                     data-dd-privacy="mask"
-                    cursor={isDemo ? 'default' : 'auto'}
                   >
                     <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
                     {cleanAddress}
@@ -727,17 +783,13 @@ export const Pharmacy = () => {
       <Container pb={showFooter ? 32 : 8}>
         {location ? (
           <VStack spacing={6} align="stretch" pt={4}>
-            {enableCourier || enableMailOrder ? (
+            {enableCourier || enableMailOrder || amazonPharmacyOverride ? (
               <BrandedOptions
-                options={[
-                  ...(enableCourier && order?.address?.postalCode && capsulePharmacyId
-                    ? [capsulePharmacyId]
-                    : []),
-                  ...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : [])
-                ]}
+                options={brandedOptions}
                 location={location}
                 selectedId={selectedId}
                 handleSelect={handleSelect}
+                amazonPharmacyOverride={amazonPharmacyOverride}
               />
             ) : null}
 
@@ -753,6 +805,7 @@ export const Pharmacy = () => {
               loadingMore={isLoading}
               showingAllPharmacies={showingAllPharmacies}
               showHeading={(enableCourier || enableMailOrder) ?? false}
+              showPriceToggle={showPriceToggle}
               enableOpenNow={enableOpenNow}
               enable24Hr={enable24Hr}
               enablePrice={enablePrice}

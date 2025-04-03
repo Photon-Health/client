@@ -18,6 +18,16 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
 };
 
+export type Address = {
+  __typename?: 'Address';
+  city: Scalars['String']['output'];
+  country: Scalars['String']['output'];
+  postalCode: Scalars['String']['output'];
+  state: Scalars['String']['output'];
+  street1: Scalars['String']['output'];
+  street2?: Maybe<Scalars['String']['output']>;
+};
+
 export type AddressInput = {
   city: Scalars['String']['input'];
   country: Scalars['String']['input'];
@@ -27,8 +37,42 @@ export type AddressInput = {
   street2?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Allergen = {
+  __typename?: 'Allergen';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  rxNormId?: Maybe<Scalars['String']['output']>;
+};
+
+export type AllergenFilter = {
+  name?: InputMaybe<Scalars['String']['input']>;
+  rxNormId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type Client = {
+  __typename?: 'Client';
+  appType: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  secret?: Maybe<Scalars['String']['output']>;
+  whiteListedUrls: Array<Scalars['String']['output']>;
+};
+
 export type CommentTicketInput = {
   body: Scalars['String']['input'];
+};
+
+export type CompletedSignatureAttestation = {
+  __typename?: 'CompletedSignatureAttestation';
+  agreedAt: Scalars['DateTime']['output'];
+  version: Scalars['String']['output'];
+};
+
+export type Compound = Treatment & {
+  __typename?: 'Compound';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
 };
 
 export type DraftedPrescriptionInput = {
@@ -51,6 +95,17 @@ export type DraftedPrescriptionTreatmentInput = {
   id: Scalars['ID']['input'];
 };
 
+export type Fill = {
+  __typename?: 'Fill';
+  filledAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  order: Order;
+  prescription?: Maybe<Prescription>;
+  requestedAt: Scalars['DateTime']['output'];
+  state: FillState;
+  treatment: Treatment;
+};
+
 export enum FillState {
   Canceled = 'CANCELED',
   New = 'NEW',
@@ -63,10 +118,200 @@ export enum FulfillmentType {
   PickUp = 'PICK_UP'
 }
 
+export type Invite = {
+  __typename?: 'Invite';
+  email?: Maybe<Scalars['String']['output']>;
+  expired: Scalars['Boolean']['output'];
+  expires_at?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  invitee: Scalars['String']['output'];
+  inviter: Scalars['String']['output'];
+  roles: Array<Role>;
+  url?: Maybe<Scalars['String']['output']>;
+};
+
+export type MedicalEquipment = Treatment & {
+  __typename?: 'MedicalEquipment';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type Medication = Treatment & {
+  __typename?: 'Medication';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  strength?: Maybe<Scalars['String']['output']>;
+};
+
 export enum MedicationType {
   Otc = 'OTC',
   Rx = 'RX'
 }
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  agreeToSignatureAttestation: Scalars['Boolean']['output'];
+  createClient: Client;
+  createTicket: Ticket;
+  createWebhookConfig: Scalars['ID']['output'];
+  deleteInvite: Scalars['ID']['output'];
+  deleteWebhookConfig: Scalars['ID']['output'];
+  inviteUser: Invite;
+  removeUserFromOrganization: Scalars['ID']['output'];
+  resendInvite: Invite;
+  rotateClientSecret: Client;
+  setUserRoles: Scalars['ID']['output'];
+  updateClient: Client;
+  updateMyProfile: Scalars['ID']['output'];
+  updateOrganization: Scalars['ID']['output'];
+  updateProviderProfile: Scalars['ID']['output'];
+  updateProviderSignature: Scalars['ID']['output'];
+  updateWebhookConfig: Scalars['ID']['output'];
+};
+
+
+export type MutationAgreeToSignatureAttestationArgs = {
+  version: Scalars['String']['input'];
+};
+
+
+export type MutationCreateClientArgs = {
+  appType?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  whiteListedUrls?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+export type MutationCreateTicketArgs = {
+  input: TicketInput;
+};
+
+
+export type MutationCreateWebhookConfigArgs = {
+  filters: Array<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  sharedSecret: Scalars['String']['input'];
+  url: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteInviteArgs = {
+  inviteId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteWebhookConfigArgs = {
+  webhookId: Scalars['ID']['input'];
+};
+
+
+export type MutationInviteUserArgs = {
+  email: Scalars['String']['input'];
+  inviter?: InputMaybe<Scalars['String']['input']>;
+  provider?: InputMaybe<ProviderInput>;
+  roles: Array<Scalars['String']['input']>;
+};
+
+
+export type MutationRemoveUserFromOrganizationArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
+export type MutationResendInviteArgs = {
+  inviteId: Scalars['ID']['input'];
+};
+
+
+export type MutationRotateClientSecretArgs = {
+  clientId: Scalars['ID']['input'];
+};
+
+
+export type MutationSetUserRolesArgs = {
+  roles: Array<Scalars['ID']['input']>;
+  userId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateClientArgs = {
+  clientId: Scalars['ID']['input'];
+  whiteListedUrls?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+export type MutationUpdateMyProfileArgs = {
+  input: ProfileInput;
+};
+
+
+export type MutationUpdateOrganizationArgs = {
+  input: OrganizationInput;
+};
+
+
+export type MutationUpdateProviderProfileArgs = {
+  input: UpdateProviderProfileInput;
+  providerId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateProviderSignatureArgs = {
+  input: ProviderSignatureInput;
+  providerId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateWebhookConfigArgs = {
+  filters: Array<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  sharedSecret: Scalars['String']['input'];
+  url: Scalars['String']['input'];
+  webhookId: Scalars['ID']['input'];
+};
+
+export type Name = {
+  __typename?: 'Name';
+  first: Scalars['String']['output'];
+  /** Convenience method for getting a formated name */
+  full: Scalars['String']['output'];
+  last: Scalars['String']['output'];
+  middle?: Maybe<Scalars['String']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+export type NeedsSignatureAttestation = {
+  __typename?: 'NeedsSignatureAttestation';
+  content?: Maybe<Scalars['String']['output']>;
+  version: Scalars['String']['output'];
+};
+
+export type NotApplicableSignatureAttestation = {
+  __typename?: 'NotApplicableSignatureAttestation';
+  reason?: Maybe<Scalars['String']['output']>;
+};
+
+export type Order = {
+  __typename?: 'Order';
+  address?: Maybe<Address>;
+  createdAt: Scalars['DateTime']['output'];
+  externalId?: Maybe<Scalars['ID']['output']>;
+  fills: Array<Fill>;
+  fulfillment?: Maybe<OrderFulfillment>;
+  id: Scalars['ID']['output'];
+  organization: Organization;
+  patient: Patient;
+  pharmacy?: Maybe<Pharmacy>;
+  state: OrderState;
+};
+
+export type OrderFulfillment = {
+  __typename?: 'OrderFulfillment';
+  carrier?: Maybe<Scalars['String']['output']>;
+  state: Scalars['String']['output'];
+  trackingNumber?: Maybe<Scalars['String']['output']>;
+  type: FulfillmentType;
+};
 
 export enum OrderState {
   Canceled = 'CANCELED',
@@ -81,6 +326,18 @@ export enum OrgType {
   Prescriber = 'PRESCRIBER'
 }
 
+export type Organization = {
+  __typename?: 'Organization';
+  NPI?: Maybe<Scalars['String']['output']>;
+  address?: Maybe<Address>;
+  email?: Maybe<Scalars['String']['output']>;
+  fax?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  phone?: Maybe<Scalars['String']['output']>;
+  type: OrgType;
+};
+
 export type OrganizationInput = {
   NPI?: InputMaybe<Scalars['String']['input']>;
   address?: InputMaybe<AddressInput>;
@@ -89,6 +346,86 @@ export type OrganizationInput = {
   name: Scalars['String']['input'];
   phone: Scalars['String']['input'];
   type: OrgType;
+};
+
+export type Patient = {
+  __typename?: 'Patient';
+  dateOfBirth: Scalars['Date']['output'];
+  email?: Maybe<Scalars['String']['output']>;
+  gender?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Name;
+  phone: Scalars['String']['output'];
+  sex: SexType;
+  treatmentHistory: Array<TreatmentHistory>;
+};
+
+export type Pharmacy = {
+  __typename?: 'Pharmacy';
+  address?: Maybe<Address>;
+  distance?: Maybe<Scalars['Float']['output']>;
+  fax?: Maybe<Scalars['String']['output']>;
+  fulfillmentTypes?: Maybe<Array<Maybe<FulfillmentType>>>;
+  id: Scalars['ID']['output'];
+  latitude?: Maybe<Scalars['Float']['output']>;
+  longitude?: Maybe<Scalars['Float']['output']>;
+  name: Scalars['String']['output'];
+  npi?: Maybe<Scalars['String']['output']>;
+  phone?: Maybe<Scalars['String']['output']>;
+};
+
+export type Prescription = {
+  __typename?: 'Prescription';
+  daysSupply?: Maybe<Scalars['Int']['output']>;
+  dispenseAsWritten: Scalars['Boolean']['output'];
+  dispenseQuantity: Scalars['Float']['output'];
+  dispenseUnit: Scalars['String']['output'];
+  effectiveDate: Scalars['Date']['output'];
+  expirationDate: Scalars['Date']['output'];
+  fills: Array<Maybe<Fill>>;
+  fillsAllowed: Scalars['Int']['output'];
+  fillsRemaining: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  instructions: Scalars['String']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
+  treatment: Treatment;
+  writtenAt: Scalars['DateTime']['output'];
+};
+
+export type PrescriptionScreenResult = {
+  __typename?: 'PrescriptionScreenResult';
+  alerts: Array<PrescriptionScreeningAlert>;
+};
+
+export type PrescriptionScreeningAlert = {
+  __typename?: 'PrescriptionScreeningAlert';
+  description: Scalars['String']['output'];
+  involvedEntities: Array<PrescriptionScreeningAlertInvolvedEntity>;
+  severity: PrescriptionScreeningAlertSeverity;
+  type: PrescriptionScreeningAlertType;
+};
+
+export type PrescriptionScreeningAlertInvolvedAllergen = PrescriptionScreeningAlertInvolvedEntity & {
+  __typename?: 'PrescriptionScreeningAlertInvolvedAllergen';
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type PrescriptionScreeningAlertInvolvedDraftedPrescription = PrescriptionScreeningAlertInvolvedEntity & {
+  __typename?: 'PrescriptionScreeningAlertInvolvedDraftedPrescription';
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type PrescriptionScreeningAlertInvolvedEntity = {
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type PrescriptionScreeningAlertInvolvedExistingPrescription = PrescriptionScreeningAlertInvolvedEntity & {
+  __typename?: 'PrescriptionScreeningAlertInvolvedExistingPrescription';
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
 };
 
 export enum PrescriptionScreeningAlertSeverity {
@@ -135,19 +472,170 @@ export type ProviderSignatureInput = {
   signature: Scalars['String']['input'];
 };
 
+export type Query = {
+  __typename?: 'Query';
+  /** Retrieve a list of all allergens */
+  allergens: Array<Allergen>;
+  /** Retrieve a client */
+  client?: Maybe<Client>;
+  /** Retrieves all clients of org */
+  clients: Array<Client>;
+  /** Retrieve a invite */
+  invite?: Maybe<Invite>;
+  /** Retrieve a list of available invites for current user organization */
+  invites: Array<Invite>;
+  /** Retrieve the profile of the currently authenticated user */
+  me: User;
+  /** Retrieve the matching medication for a given package NDC */
+  medicationFromNdc: Medication;
+  order?: Maybe<Order>;
+  organization?: Maybe<Organization>;
+  /** Retrieve a patient */
+  patient?: Maybe<Patient>;
+  /** Retrieve a list of all alerts for attempting to prescribe the propsed prescriptions to the given patientId */
+  prescriptionScreen: PrescriptionScreenResult;
+  /** Retrieve a role */
+  role?: Maybe<Role>;
+  /** Retrieve a list of available roles for current user organization */
+  roles: Array<Role>;
+  /**
+   * DEPRECATED: Retrieve a list of available treatment options by search string
+   * @deprecated Use the `treatments` query instead.
+   */
+  treatmentOptions: Array<TreatmentOption>;
+  /** Retrieve a list of available treatment items by search string */
+  treatments: Array<Treatment>;
+  user?: Maybe<User>;
+  /** Get number of users in the current organization */
+  userCount: Scalars['Int']['output'];
+  /**
+   * Retrieve users for current user organization
+   * Default pageSize is 50, max 100
+   */
+  users: Array<User>;
+  webhook?: Maybe<WebhookConfig>;
+  webhooks: Array<WebhookConfig>;
+};
+
+
+export type QueryAllergensArgs = {
+  filter: AllergenFilter;
+};
+
+
+export type QueryClientArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryInviteArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryMedicationFromNdcArgs = {
+  packageNdc: Scalars['String']['input'];
+};
+
+
+export type QueryOrderArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryPatientArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryPrescriptionScreenArgs = {
+  draftedPrescriptions: Array<DraftedPrescriptionInput>;
+  patientId: Scalars['ID']['input'];
+};
+
+
+export type QueryRoleArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryTreatmentOptionsArgs = {
+  searchTerm: Scalars['String']['input'];
+};
+
+
+export type QueryTreatmentsArgs = {
+  filter: TreatmentFilter;
+};
+
+
+export type QueryUserArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryUsersArgs = {
+  pageNum?: InputMaybe<Scalars['Int']['input']>;
+  pageSize?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryWebhookArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type Role = {
+  __typename?: 'Role';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+};
+
 export enum SexType {
   Female = 'FEMALE',
   Male = 'MALE',
   Unknown = 'UNKNOWN'
 }
 
+export type SignatureAttestationStatus = CompletedSignatureAttestation | NeedsSignatureAttestation | NotApplicableSignatureAttestation;
+
+export type Ticket = {
+  __typename?: 'Ticket';
+  id: Scalars['String']['output'];
+};
+
 export type TicketInput = {
   comment: CommentTicketInput;
   subject: Scalars['String']['input'];
 };
 
+export type Treatment = {
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type TreatmentFilter = {
   term?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type TreatmentHistory = {
+  __typename?: 'TreatmentHistory';
+  active: Scalars['Boolean']['output'];
+  comment?: Maybe<Scalars['String']['output']>;
+  prescription?: Maybe<Prescription>;
+  treatment: Treatment;
+};
+
+export type TreatmentOption = {
+  __typename?: 'TreatmentOption';
+  form?: Maybe<Scalars['String']['output']>;
+  medicationId?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  ndc: Scalars['String']['output'];
+  route?: Maybe<Scalars['String']['output']>;
+  schedule?: Maybe<Scalars['String']['output']>;
+  strength?: Maybe<Scalars['String']['output']>;
+  type: MedicationType;
 };
 
 export type UpdateProviderProfileInput = {
@@ -168,11 +656,35 @@ export type UpdateUserNameInput = {
   title?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type User = {
+  __typename?: 'User';
+  address?: Maybe<Address>;
+  email?: Maybe<Scalars['String']['output']>;
+  externalId?: Maybe<Scalars['String']['output']>;
+  fax?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name?: Maybe<Name>;
+  npi?: Maybe<Scalars['String']['output']>;
+  phone?: Maybe<Scalars['String']['output']>;
+  roles: Array<Role>;
+  /** A base64 encoded string of the signature picture that can be rendered */
+  signature?: Maybe<Scalars['String']['output']>;
+  signatureAttestationStatus?: Maybe<SignatureAttestationStatus>;
+};
+
 export type UserNameInput = {
   first: Scalars['String']['input'];
   last: Scalars['String']['input'];
   middle?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type WebhookConfig = {
+  __typename?: 'WebhookConfig';
+  filters: Array<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+  url: Scalars['String']['output'];
 };
 
 export type TicketModalCreateTicketMutationVariables = Exact<{
@@ -182,7 +694,7 @@ export type TicketModalCreateTicketMutationVariables = Exact<{
 
 export type TicketModalCreateTicketMutation = { __typename?: 'Mutation', createTicket: { __typename?: 'Ticket', id: string } };
 
-export type ClientInfoCardFragmentFragment = { __typename?: 'Client', id: string, appType: string, name: string, secret?: string | null } & { ' $fragmentName'?: 'ClientInfoCardFragmentFragment' };
+export type ClientInfoCardFragmentFragment = { __typename?: 'Client', id: string, appType: string, name: string, secret?: string | null, whiteListedUrls: Array<string> } & { ' $fragmentName'?: 'ClientInfoCardFragmentFragment' };
 
 export type ClientsDeveloperTabQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -198,6 +710,14 @@ export type RotateSecretMutationVariables = Exact<{
 
 
 export type RotateSecretMutation = { __typename?: 'Mutation', rotateClientSecret: { __typename?: 'Client', id: string } };
+
+export type UpdateClientMutationVariables = Exact<{
+  clientId: Scalars['ID']['input'];
+  whiteListedUrls: Array<Scalars['String']['input']> | Scalars['String']['input'];
+}>;
+
+
+export type UpdateClientMutation = { __typename?: 'Mutation', updateClient: { __typename?: 'Client', id: string } };
 
 export type InviteFormFragmentFragment = { __typename?: 'Invite', id: string, invitee: string, inviter: string, expires_at?: any | null } & { ' $fragmentName'?: 'InviteFormFragmentFragment' };
 
@@ -352,7 +872,7 @@ export type SettingsPageQueryQuery = { __typename?: 'Query', me: { __typename?: 
 
 export type OrganizationTreatmentTabFragmentFragment = { __typename?: 'Organization', id: string, name: string } & { ' $fragmentName'?: 'OrganizationTreatmentTabFragmentFragment' };
 
-export const ClientInfoCardFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ClientInfoCardFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Client"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"appType"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"secret"}}]}}]} as unknown as DocumentNode<ClientInfoCardFragmentFragment, unknown>;
+export const ClientInfoCardFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ClientInfoCardFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Client"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"appType"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"secret"}},{"kind":"Field","name":{"kind":"Name","value":"whiteListedUrls"}}]}}]} as unknown as DocumentNode<ClientInfoCardFragmentFragment, unknown>;
 export const InviteFormFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"InviteFormFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Invite"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"invitee"}},{"kind":"Field","name":{"kind":"Name","value":"inviter"}},{"kind":"Field","name":{"kind":"Name","value":"expires_at"}}]}}]} as unknown as DocumentNode<InviteFormFragmentFragment, unknown>;
 export const InviteFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"InviteFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Invite"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"invitee"}},{"kind":"Field","name":{"kind":"Name","value":"inviter"}},{"kind":"Field","name":{"kind":"Name","value":"expired"}},{"kind":"Field","name":{"kind":"Name","value":"expires_at"}}]}}]} as unknown as DocumentNode<InviteFragmentFragment, unknown>;
 export const RemoveUserActionUserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"RemoveUserActionUserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"name"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"full"}}]}}]}}]} as unknown as DocumentNode<RemoveUserActionUserFragmentFragment, unknown>;
@@ -362,8 +882,9 @@ export const UserItemUserFragmentFragmentDoc = {"kind":"Document","definitions":
 export const WebhookItemFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"WebhookItemFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"WebhookConfig"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"url"}}]}}]} as unknown as DocumentNode<WebhookItemFragmentFragment, unknown>;
 export const OrganizationTreatmentTabFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OrganizationTreatmentTabFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Organization"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]} as unknown as DocumentNode<OrganizationTreatmentTabFragmentFragment, unknown>;
 export const TicketModalCreateTicketDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TicketModalCreateTicket"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"TicketInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createTicket"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<TicketModalCreateTicketMutation, TicketModalCreateTicketMutationVariables>;
-export const ClientsDeveloperTabQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ClientsDeveloperTabQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"clients"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"ClientInfoCardFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ClientInfoCardFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Client"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"appType"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"secret"}}]}}]} as unknown as DocumentNode<ClientsDeveloperTabQueryQuery, ClientsDeveloperTabQueryQueryVariables>;
+export const ClientsDeveloperTabQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ClientsDeveloperTabQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"clients"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"ClientInfoCardFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ClientInfoCardFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Client"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"appType"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"secret"}},{"kind":"Field","name":{"kind":"Name","value":"whiteListedUrls"}}]}}]} as unknown as DocumentNode<ClientsDeveloperTabQueryQuery, ClientsDeveloperTabQueryQueryVariables>;
 export const RotateSecretDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RotateSecret"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"clientId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rotateClientSecret"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"clientId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"clientId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<RotateSecretMutation, RotateSecretMutationVariables>;
+export const UpdateClientDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateClient"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"clientId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"whiteListedUrls"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateClient"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"clientId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"clientId"}}},{"kind":"Argument","name":{"kind":"Name","value":"whiteListedUrls"},"value":{"kind":"Variable","name":{"kind":"Name","value":"whiteListedUrls"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateClientMutation, UpdateClientMutationVariables>;
 export const UserInviteFormQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"UserInviteFormQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"full"}}]}}]}}]}}]} as unknown as DocumentNode<UserInviteFormQueryQuery, UserInviteFormQueryQueryVariables>;
 export const InviteUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InviteUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"roles"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"provider"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ProviderInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inviteUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}},{"kind":"Argument","name":{"kind":"Name","value":"roles"},"value":{"kind":"Variable","name":{"kind":"Name","value":"roles"}}},{"kind":"Argument","name":{"kind":"Name","value":"provider"},"value":{"kind":"Variable","name":{"kind":"Name","value":"provider"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<InviteUserMutation, InviteUserMutationVariables>;
 export const ResendInviteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ResendInvite"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"inviteId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"resendInvite"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"inviteId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"inviteId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ResendInviteMutation, ResendInviteMutationVariables>;

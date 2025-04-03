@@ -1,24 +1,11 @@
-import { createSignal, createEffect, Show, For, createMemo } from 'solid-js';
+import { createEffect, createMemo, createSignal, Show } from 'solid-js';
 import gql from 'graphql-tag';
 import { usePhotonClient } from '../SDKProvider';
-import {
-  Medication,
-  SearchMedication,
-  Prescription,
-  Treatment
-} from '@photonhealth/sdk/dist/types';
-import {
-  Icon,
-  Card,
-  Button,
-  Text,
-  Table,
-  generateString,
-  createQuery,
-  formatDate,
-  triggerToast
-} from '../../';
+import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
+import { Button, Card, createQuery, Text, triggerToast } from '../../';
 import { ApolloCache } from '@apollo/client';
+import PatientMedHistoryTable, { MedHistoryRowItem } from './PatientMedHistoryTable';
+import { Maybe } from 'graphql/jsutils/Maybe';
 
 const GET_PATIENT_MED_HISTORY = gql`
   query GetPatient($id: ID!) {
@@ -29,6 +16,13 @@ const GET_PATIENT_MED_HISTORY = gql`
         prescription {
           id
           writtenAt
+          instructions
+          notes
+          fillsAllowed
+          dispenseQuantity
+          dispenseUnit
+          dispenseAsWritten
+          daysSupply
         }
         treatment {
           id
@@ -38,6 +32,33 @@ const GET_PATIENT_MED_HISTORY = gql`
     }
   }
 `;
+
+type RemoveMaybe<T> = T extends Maybe<infer U>
+  ? Exclude<U, null>
+  : T extends undefined
+  ? never
+  : Exclude<T, null>;
+
+type RemoveMaybeFromArray<T> = T extends Array<Maybe<infer U>>
+  ? Array<Exclude<RemoveMaybe<U>, null>>
+  : RemoveMaybe<T>;
+
+type PrescriptionWithoutMaybes = {
+  [K in keyof Prescription]-?: RemoveMaybeFromArray<RemoveMaybe<Prescription[K]>>;
+};
+
+export type MedHistoryPrescription = Pick<
+  PrescriptionWithoutMaybes,
+  | 'id'
+  | 'writtenAt'
+  | 'dispenseQuantity'
+  | 'dispenseUnit'
+  | 'daysSupply'
+  | 'instructions'
+  | 'fillsAllowed'
+  | 'dispenseAsWritten'
+  | 'notes'
+>;
 
 const ADD_MED_HISTORY = gql`
   mutation UpdateMedicationHistory($id: ID!, $medicationHistory: [MedHistoryInput!]!) {
@@ -50,30 +71,14 @@ const ADD_MED_HISTORY = gql`
 type PatientMedHistoryProps = {
   patientId: string;
   enableLinks: boolean;
-  newMedication?: Medication | SearchMedication;
+  enableRefillButton: boolean;
+  newMedication?: Treatment;
   openAddMedicationDialog?: () => void;
   hideAddMedicationDialog?: () => void;
+  onRefillClick?: (prescription: MedHistoryPrescription, treatment: Treatment) => void;
 };
 
-const LoadingRowFallback = (props: { enableLinks: boolean }) => (
-  <Table.Row>
-    <Table.Cell>
-      <Text sampleLoadingText={generateString(10, 25)} loading />
-    </Table.Cell>
-    <Table.Cell>
-      <Text sampleLoadingText={generateString(2, 8)} loading />
-    </Table.Cell>
-    <Show when={props.enableLinks}>
-      <Table.Cell>
-        <Text sampleLoadingText={generateString(4, 8)} loading />
-      </Table.Cell>
-    </Show>
-  </Table.Row>
-);
-
-type PatientTreatmentHistoryElement = {
-  active: boolean;
-  comment?: string;
+export type GetPatientTreatmentHistoryItem = {
   treatment: Treatment;
   prescription?: Prescription;
 };
@@ -81,22 +86,25 @@ type PatientTreatmentHistoryElement = {
 type GetPatientResponse = {
   patient: {
     id: string;
-    treatmentHistory: PatientTreatmentHistoryElement[];
+    treatmentHistory: GetPatientTreatmentHistoryItem[];
   };
 };
 
 export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const client = usePhotonClient();
-  const [medHistory, setMedHistory] = createSignal<PatientTreatmentHistoryElement[] | undefined>(
+  const [medHistoryRowItems, setMedHistoryRowItems] = createSignal<MedHistoryRowItem[] | undefined>(
     undefined
   );
-  const [chronological, setChronological] = createSignal<boolean>(false);
+  const [sortOrder, setSortOrder] = createSignal<'asc' | 'desc'>('asc');
 
   const baseURL = createMemo(() => `${client?.clinicalUrl}/prescriptions/`);
 
   const queryOptions = createMemo(() => ({
     variables: { id: props.patientId },
-    client: client!.apolloClinical
+    client: client!.apolloClinical,
+    skip: !props.patientId,
+    fetchPolicy: 'network-only' as const,
+    refetchQueries: [GET_PATIENT_MED_HISTORY]
   }));
 
   const patientMedHistory = createQuery<GetPatientResponse, { id: string }>(
@@ -104,27 +112,16 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
     queryOptions
   );
 
-  const sortHistoryByDate = (chronological: boolean) => {
-    return (a: PatientTreatmentHistoryElement, b: PatientTreatmentHistoryElement) => {
-      const dateA = a?.prescription?.writtenAt
-        ? new Date(a.prescription.writtenAt).getTime()
-        : -Infinity;
-      const dateB = b?.prescription?.writtenAt
-        ? new Date(b.prescription.writtenAt).getTime()
-        : -Infinity;
-      if (chronological) return dateA - dateB;
-      return dateB - dateA;
-    };
-  };
-
   createEffect(() => {
-    const medicationHistory = patientMedHistory()?.patient?.treatmentHistory;
-    if (medicationHistory) {
-      const sortedMedHistory = medicationHistory.slice().sort(sortHistoryByDate(chronological()));
-      setMedHistory(sortedMedHistory);
-    }
-    if (!patientMedHistory.loading && !medicationHistory) {
-      setMedHistory([]);
+    const getPatientResponse = patientMedHistory();
+    if (patientMedHistory.loading) {
+      setMedHistoryRowItems(undefined);
+    } else if (getPatientResponse) {
+      const rowItems = mapToMedHistoryRowItems(getPatientResponse);
+      const sortedRowItems = rowItems.slice().sort(sortHistoryByDate(sortOrder()));
+      setMedHistoryRowItems(sortedRowItems);
+    } else {
+      setMedHistoryRowItems([]);
     }
   });
 
@@ -166,22 +163,15 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
         id: props.patientId,
         medicationHistory: [{ medicationId, active: false }]
       },
-      update: updateCache,
-      refetchQueries: [
-        {
-          query: GET_PATIENT_MED_HISTORY,
-          variables: { id: props.patientId }
-        }
-      ]
+      update: updateCache
     });
 
     // Update local state immediately
-    const newMed: PatientTreatmentHistoryElement = {
-      active: false,
+    const newMed: MedHistoryRowItem = {
       treatment: props.newMedication as Treatment,
       prescription: undefined
     };
-    setMedHistory((prev) => (prev ? [newMed, ...prev] : [newMed]));
+    setMedHistoryRowItems((prev) => (prev ? [newMed, ...prev] : [newMed]));
 
     // Show toast notification
     triggerToast({
@@ -200,8 +190,8 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   });
 
   return (
-    <Card addChildrenDivider={true}>
-      <div class="flex items-center justify-between">
+    <Card addChildrenDivider={true} autoPadding={false}>
+      <div class="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
         <Text color="gray">Medication History</Text>
         <Show when={props?.openAddMedicationDialog}>
           <Button variant="secondary" size="sm" onClick={props?.openAddMedicationDialog}>
@@ -211,64 +201,37 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
       </div>
 
       <div class="max-h-80 overflow-y-auto">
-        <Table>
-          <Table.Header>
-            <Table.Col width="16rem">Medication</Table.Col>
-            <Table.Col>
-              <span class="cursor-pointer flex" onClick={() => setChronological(!chronological())}>
-                Written
-                <div class="ml-1">
-                  <Show when={chronological()}>
-                    <Icon name="chevronDown" size="sm" />
-                  </Show>
-                  <Show when={!chronological()}>
-                    <Icon name="chevronUp" size="sm" />
-                  </Show>
-                </div>
-              </span>
-            </Table.Col>
-            <Show when={props.enableLinks}>
-              <Table.Col>Source</Table.Col>
-            </Show>
-          </Table.Header>
-          <Table.Body>
-            <Show
-              when={medHistory()}
-              fallback={
-                <>
-                  <LoadingRowFallback enableLinks={props.enableLinks} />
-                  <LoadingRowFallback enableLinks={props.enableLinks} />
-                  <LoadingRowFallback enableLinks={props.enableLinks} />
-                </>
-              }
-            >
-              <For each={medHistory()}>
-                {(med) => (
-                  <Table.Row>
-                    <Table.Cell width="16rem">{med.treatment?.name}</Table.Cell>
-                    <Table.Cell>{formatDate(med.prescription?.writtenAt) || 'N/A'}</Table.Cell>
-                    <Show when={props.enableLinks}>
-                      <Table.Cell>
-                        {med.prescription?.id ? (
-                          <a
-                            class="text-blue-500 underline"
-                            target="_blank"
-                            href={`${baseURL()}${med.prescription?.id}`}
-                          >
-                            Link
-                          </a>
-                        ) : (
-                          'External'
-                        )}
-                      </Table.Cell>
-                    </Show>
-                  </Table.Row>
-                )}
-              </For>
-            </Show>
-          </Table.Body>
-        </Table>
+        <PatientMedHistoryTable
+          enableLinks={props.enableLinks}
+          enableRefillButton={props.enableRefillButton}
+          baseURL={baseURL()}
+          rowItems={medHistoryRowItems()}
+          sortOrder={sortOrder()}
+          onSortOrderToggle={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
+          onRefillClick={(prescription, treatment) =>
+            props.onRefillClick && props.onRefillClick(prescription, treatment)
+          }
+        />
       </div>
     </Card>
   );
 }
+
+const mapToMedHistoryRowItems = (getPatientResponse: GetPatientResponse): MedHistoryRowItem[] =>
+  getPatientResponse?.patient?.treatmentHistory.map((historyItem) => ({
+    treatment: historyItem.treatment,
+    prescription: historyItem.prescription as MedHistoryPrescription
+  }));
+
+const sortHistoryByDate = (order: 'asc' | 'desc') => {
+  return (a: MedHistoryRowItem, b: MedHistoryRowItem) => {
+    const dateA = a?.prescription?.writtenAt
+      ? new Date(a.prescription.writtenAt).getTime()
+      : -Infinity;
+    const dateB = b?.prescription?.writtenAt
+      ? new Date(b.prescription.writtenAt).getTime()
+      : -Infinity;
+    if (order === 'desc') return dateA - dateB;
+    return dateB - dateA;
+  };
+};

@@ -179,6 +179,7 @@ export const GET_ORDER = gql`
         id
         prescriptionId
         price
+        retailPrice
         bin
         pcn
         group
@@ -267,4 +268,17 @@ export const GET_PHARMACIES = gql`
     }
   }
   ${PHARMACY_FIELDS}
+`;
+
+export const GET_OFFERS = gql`
+  query GetOffersForOrder($orderId: ID!) {
+    offers(orderId: $orderId) {
+      deliveryEstimate {
+        deliveryPromise
+        deliveryPromiseRangeEnd
+        deliveryPromiseRangeStart
+      }
+      supplier
+    }
+  }
 `;

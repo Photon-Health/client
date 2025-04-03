@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import jwtDecode from 'jwt-decode';
 import { customElement } from 'solid-element';
 import { createSignal, onMount } from 'solid-js';
-import { usePhoton } from '../context';
+import { usePhoton } from '@photonhealth/components';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
 import { PatientStore } from '../stores/patient';
 
@@ -25,6 +25,7 @@ const shouldWarn = (form: any) =>
 const Component = (props: {
   enableMedHistory: boolean;
   enableMedHistoryLinks: boolean;
+  enableMedHistoryRefillButton: boolean;
   hideTemplates?: boolean;
   patientId?: string;
   pharmacyId?: string;
@@ -237,6 +238,7 @@ const Component = (props: {
               additional-notes={props.additionalNotes}
               enable-med-history={props.enableMedHistory}
               enable-med-history-links={props.enableMedHistoryLinks}
+              enable-med-history-refill-button={props.enableMedHistoryRefillButton}
               enable-order={props.enableOrder}
               enable-local-pickup={props.enableLocalPickup}
               enable-send-to-patient={props.enableSendToPatient}
@@ -301,6 +303,7 @@ customElement(
     enableSendToPatient: false,
     enableMedHistory: false,
     enableMedHistoryLinks: false,
+    enableMedHistoryRefillButton: false,
     enableCombineAndDuplicate: false,
     mailOrderIds: undefined,
     enableOrder: false,

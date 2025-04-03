@@ -1,11 +1,18 @@
-import { string, any, record } from 'superstruct';
-import { createSignal, onMount, Show, createEffect, createMemo } from 'solid-js';
-import { PatientInfo, PatientMedHistory, AddressForm, Card, Text } from '@photonhealth/components';
-import { Medication, SearchMedication } from '@photonhealth/sdk/dist/types';
+import { any, record, string } from 'superstruct';
+import { createEffect, createMemo, createSignal, onMount, Show } from 'solid-js';
+import {
+  AddressForm,
+  Card,
+  PatientInfo,
+  PatientMedHistory,
+  PhotonClientStore,
+  Text
+} from '@photonhealth/components';
+import { Treatment } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
-import { PhotonClientStore } from '../../store';
 import type { Address } from '../photon-prescribe-workflow';
+import { MedHistoryPrescription } from '@photonhealth/components/dist/packages/components/src/systems/PatientMedHistory';
 
 const patientValidator = message(record(string(), any()), 'Please select a patient...');
 
@@ -32,11 +39,12 @@ export const PatientCard = (props: {
   weightUnit?: string;
   enableMedHistory?: boolean;
   enableMedHistoryLinks?: boolean;
+  enableMedHistoryRefillButton?: boolean;
   hidePatientCard?: boolean;
+  onRefillClick?: (prescription: MedHistoryPrescription, treatment: Treatment) => void;
 }) => {
-  const [newMedication, setNewMedication] = createSignal<Medication | SearchMedication | undefined>(
-    undefined
-  );
+  const [newMedication, setNewMedication] = createSignal<Treatment | undefined>();
+  undefined;
   const [showEditPatientView, setShowEditPatientView] = createSignal(false);
   const [showAddMedDialog, setShowAddMedDialog] = createSignal(false);
   const { actions, store } = PatientStore;
@@ -156,15 +164,17 @@ export const PatientCard = (props: {
             patientId={patientId()}
             newMedication={newMedication()}
             enableLinks={props.enableMedHistoryLinks ?? false}
+            enableRefillButton={props.enableMedHistoryRefillButton ?? false}
             openAddMedicationDialog={() => setShowAddMedDialog(true)}
             hideAddMedicationDialog={() => setShowAddMedDialog(false)}
+            onRefillClick={(prescription, treatment) => {
+              props.onRefillClick && props.onRefillClick(prescription, treatment);
+            }}
           />
           <photon-add-medication-history-dialog
             title="Add Medication History"
             open={showAddMedDialog()}
-            on:photon-medication-selected={(e: {
-              detail: { medication: Medication | SearchMedication };
-            }) => {
+            on:photon-medication-selected={(e: { detail: { medication: Treatment } }) => {
               setNewMedication(e.detail.medication);
             }}
             on:photon-medication-closed={() => {

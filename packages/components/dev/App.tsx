@@ -16,6 +16,8 @@ import AddressForm from '../src/systems/AddressForm';
 
 const draftPrescriptions: DraftPrescription[] = [
   {
+    name: 'Metropolol Draft',
+    isPrivate: false,
     id: '1',
     effectiveDate: '2021-01-01',
     treatment: {
@@ -41,6 +43,8 @@ const draftPrescriptions: DraftPrescription[] = [
     catalogId: 'catalogId'
   },
   {
+    name: 'Metropolol Draft 2',
+    isPrivate: false,
     id: '2',
     effectiveDate: '2021-01-01',
     treatment: {
@@ -112,24 +116,30 @@ const App = () => {
 
         <div class="mb-10">
           <h2>Patient Info</h2>
-          <PatientInfo patientId="pat_01GQ0XFBHSH3YXN936A2D2SD7Y" />
+          <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
         </div>
 
         <div class="mb-10">
           <h2>Patient Med History</h2>
-          <PatientMedHistory patientId="pat_01GQ0XFBHSH3YXN936A2D2SD7Y" />
+          <PatientMedHistory
+            patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ"
+            enableLinks={false}
+            enableRefillButton={true}
+          />
         </div>
 
         <div class="mb-10">
-          <h2>Draft Presciptions</h2>
+          <h2>Draft Prescriptions</h2>
           <DraftPrescriptions
             draftPrescriptions={draftPrescriptions}
             setDraftPrescriptions={setDraftPrescriptions}
+            screeningAlerts={[]}
           />
           <h2>Fetching Draft Presciptions</h2>
           <DraftPrescriptions
             draftPrescriptions={draftPrescriptionsFromTemplates()}
             setDraftPrescriptions={setDraftPrescriptions}
+            screeningAlerts={[]}
             templateIds={[
               'tmp_01H5JXWKYFMYT70RND1CGQCFKZ',
               'tmp_01H5JB37PPK9F64RE3QQ52WD7M',
@@ -202,7 +212,7 @@ const App = () => {
         <h4 class="mt-8">With Mail Order</h4>
         <Card>
           <PharmacySelect
-            patientIds={['pat_01GQ0XFBHSH3YXN936A2D2SD7Y']}
+            patientIds={['pat_01JEVF5DWQAQFHTVYK9ABG65JZ']}
             enableLocalPickup
             enableSendToPatient
             mailOrderPharmacyIds={[

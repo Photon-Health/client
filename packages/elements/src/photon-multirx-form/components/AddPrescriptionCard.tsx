@@ -3,10 +3,12 @@ import {
   Card,
   DoseCalculator,
   Icon,
+  ScreeningAlerts,
+  ScreeningAlertType,
   Text,
   triggerToast,
-  useRecentOrders,
-  ScreeningAlerts
+  usePhoton,
+  useRecentOrders
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
@@ -20,10 +22,8 @@ import '@shoelace-style/shoelace/dist/components/button/button';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLFormattedError } from 'graphql';
 import { createSignal, onMount, Show } from 'solid-js';
-import { usePhoton } from '../../context';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
-import { ScreeningAlertType } from '@photonhealth/components';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -43,7 +43,7 @@ const validators = {
   effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
 };
 
-type DraftPrescription = {
+export type AddDraftPrescription = {
   id: string;
   effectiveDate: string;
   treatment: {
@@ -74,6 +74,7 @@ export const AddPrescriptionCard = (props: {
   enableCombineAndDuplicate?: boolean;
   screenDraftedPrescriptions: () => void;
   draftedPrescriptionChanged: () => void;
+  onDraftPrescriptionCreated: (draft: AddDraftPrescription) => void;
   screeningAlerts: ScreeningAlertType[];
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
@@ -115,34 +116,24 @@ export const AddPrescriptionCard = (props: {
     ref?.dispatchEvent(event);
   };
 
-  const dispatchDraftPrescriptionCreated = (draftPrescription: DraftPrescription) => {
-    const event = new CustomEvent('photon-draft-prescription-created', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        draft: draftPrescription
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
-
   const handleAddPrescription = async () => {
     const keys = Object.keys(validators);
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
 
     const draftedPrescriptions = [...props.store.draftPrescriptions.value];
-    const prescriptionAlreadyExistsInOrder = draftedPrescriptions.some(
-      (draft) => draft.treatment.id === props.store.treatment?.value?.id
+    const isPrescriptionAlreadyAdded = isTreatmentInDraftPrescriptions(
+      props.store.treatment?.value?.id,
+      draftedPrescriptions
     );
 
-    if (prescriptionAlreadyExistsInOrder) {
+    if (isPrescriptionAlreadyAdded) {
       triggerToast({
         status: 'error',
         body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
       });
     } else if (!errorsPresent) {
-      const draft: DraftPrescription = {
+      const draft: AddDraftPrescription = {
         id: String(Math.random()),
         effectiveDate: props.store.effectiveDate.value,
         treatment: props.store.treatment.value,
@@ -216,7 +207,7 @@ export const AddPrescriptionCard = (props: {
           body: 'You can send this order or add another prescription before sending it'
         });
 
-        dispatchDraftPrescriptionCreated(draft);
+        props.onDraftPrescriptionCreated(draft);
       };
 
       if (props.enableCombineAndDuplicate && duplicate) {
@@ -527,3 +518,10 @@ export const AddPrescriptionCard = (props: {
     </div>
   );
 };
+
+export function isTreatmentInDraftPrescriptions(
+  treatmentId: string,
+  draftedPrescriptions: { treatment: { id: string } }[]
+) {
+  return draftedPrescriptions.some((draft) => draft.treatment.id === treatmentId);
+}

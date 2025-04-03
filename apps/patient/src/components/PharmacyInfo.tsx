@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { FiStar } from 'react-icons/fi';
+import { FiMapPin, FiStar } from 'react-icons/fi';
 import { useLocation } from 'react-router-dom';
 import { Address, EnrichedPharmacy, OrderFulfillment } from '../utils/models';
 import { text as t } from '../utils/text';
@@ -203,16 +203,17 @@ const DistanceAddress = ({
   if (!address) return null;
   return (
     <Text fontSize={fontSize} color="gray.500" display="inline">
-      {distance ? `${distance.toFixed(1)} mi` : ''}
-      {distance && (
+      {!isStatus && distance ? `${distance.toFixed(1)} mi` : ''}
+      {!isStatus && distance && (
         <Box as="span" display="inline" mx={2}>
           &bull;
         </Box>
       )}
       {isStatus ? (
-        <Text onClick={() => handleGetDirections(url)} cursor="pointer" color="blue.500">
+        <Link onClick={() => handleGetDirections(url)} fontSize="sm">
+          <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
           {formatAddress(address)}
-        </Text>
+        </Link>
       ) : (
         <>{formatAddress(address)}</>
       )}
@@ -234,6 +235,7 @@ interface PharmacyInfoProps {
   showHours?: boolean;
   isCurrentPharmacy?: boolean;
   orderFulfillment?: OrderFulfillment;
+  amazonPharmacyOverride?: string;
 }
 
 export const PharmacyInfo = ({
@@ -248,7 +250,8 @@ export const PharmacyInfo = ({
   isStatus = false,
   showHours = false,
   isCurrentPharmacy = false,
-  orderFulfillment
+  orderFulfillment,
+  amazonPharmacyOverride
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
@@ -264,6 +267,20 @@ export const PharmacyInfo = ({
   const trackingLink = orderFulfillment && getFulfillmentTrackingLink(orderFulfillment);
   const pharmacyFormattedAddress = pharmacy?.address ? formatAddress(pharmacy.address) : '';
   const directionsUrl = `http://maps.google.com/?q=${pharmacy?.name}, ${pharmacyFormattedAddress}`;
+
+  let amazonPharmacyElementOverride = undefined;
+  if (amazonPharmacyOverride) {
+    amazonPharmacyElementOverride = (
+      <HStack>
+        <Tag size="sm" colorScheme="blue">
+          <TagLabel fontWeight="bold">In Stock</TagLabel>
+        </Tag>
+        <Text fontSize="sm" color="gray.500">
+          {amazonPharmacyOverride}
+        </Text>
+      </HStack>
+    );
+  }
 
   return (
     <VStack align="start" w="full">
@@ -288,7 +305,7 @@ export const PharmacyInfo = ({
               <TagLabel fontWeight="bold">Available in your area</TagLabel>
             </Tag>
           ) : null}
-          {showFreeDeliveryTag ? (
+          {showFreeDeliveryTag && !amazonPharmacyElementOverride ? (
             <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
               <TagLabel fontWeight="bold">Free Delivery</TagLabel>
             </Tag>
@@ -322,9 +339,13 @@ export const PharmacyInfo = ({
       {showDetails ? (
         <VStack direction={isStatus ? 'column-reverse' : 'column'} w="full" alignItems={'start'}>
           {tagline ? (
-            <Text fontSize="sm" color="gray.500">
-              {tagline}
-            </Text>
+            amazonPharmacyElementOverride ? (
+              amazonPharmacyElementOverride
+            ) : (
+              <Text fontSize="sm" color="gray.500">
+                {tagline}
+              </Text>
+            )
           ) : null}
           <DistanceAddress
             distance={pharmacy.distance}

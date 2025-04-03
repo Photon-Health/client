@@ -3,6 +3,7 @@ import { Transition } from 'solid-transition-group';
 import Icon from '../Icon';
 import createTransition from '../../utils/createTransition';
 import clsx from 'clsx';
+import { ZendeskMessagingWidget } from '../../../types/zendesk';
 
 const transitionDuration = 100;
 export interface DialogProps {
@@ -27,17 +28,18 @@ function Dialog(props: DialogProps) {
   );
 
   createEffect(() => {
-    if (window?.zE) {
+    const ze = window?.zE as ZendeskMessagingWidget | undefined;
+    if (ze) {
       if (merged.open) {
-        window.zE('messenger', 'hide');
+        ze('messenger', 'hide');
       } else {
-        window.zE('messenger', 'show');
+        ze('messenger', 'show');
       }
     }
   });
 
   return (
-    <div class="relative z-10">
+    <div class="relative z-100">
       <Transition
         onEnter={createTransition([{ opacity: 0 }, { opacity: 1 }], {
           duration: transitionDuration,
@@ -75,7 +77,7 @@ function Dialog(props: DialogProps) {
         )}
       >
         {merged.open && (
-          <div class="fixed inset-0 z-10 overflow-y-auto">
+          <div class="fixed inset-0 z-20 overflow-y-auto">
             <div
               class={clsx('flex min-h-full justify-center p-4 text-center sm:items-center sm:p-0', {
                 'items-end': merged.position === 'bottom',

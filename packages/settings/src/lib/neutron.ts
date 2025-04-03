@@ -21,7 +21,11 @@ import {
   WALMART_MAIL_ORDER_PHARMACY_ID,
   HEALTHWAREHOUSE_PHARMACY_ID,
   STRIVE_PHARMACY_ID,
-  OPENLOOP_PHARMACY_ID
+  OPENLOOP_PHARMACY_ID,
+  GIFTHEALTH_PHARMACY_ID,
+  EPIQ_PHARMACY_ID,
+  PHOTON_TEST_PHARMACY_ID,
+  DANIA_PHARMACY_ID
 } from '../pharmacies';
 
 /**
@@ -47,6 +51,7 @@ const defaultSettings: OrganizationSettings = {
   enableMedHistory: false,
   enableRxAndOrder: true,
   enableCombineAndDuplicate: true,
+  enablePricing: false,
   topRankedCostco: false,
   topRankedWalgreens: false,
   hideTemplates: false
@@ -78,6 +83,7 @@ const organizationSettings: {
     accentColor: '#b35724',
     mailOrder: true,
     enableMedHistory: true,
+    enablePricing: true,
     mailOrderProviders: [
       CUREXA_PHARMACY_ID,
       CAREPOINT_PHARMACY_ID,
@@ -90,7 +96,11 @@ const organizationSettings: {
       OLYMPIA_PHARMACY_ID,
       HEALTHWAREHOUSE_PHARMACY_ID,
       STRIVE_PHARMACY_ID,
-      OPENLOOP_PHARMACY_ID
+      OPENLOOP_PHARMACY_ID,
+      GIFTHEALTH_PHARMACY_ID,
+      EMPOWER_PHARMACY_ID,
+      PHOTON_TEST_PHARMACY_ID,
+      DANIA_PHARMACY_ID
     ],
     topRankedWalgreens: true,
     mailOrderNavigate: true,
@@ -255,7 +265,8 @@ const organizationSettings: {
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
     paExceptionMessage:
-      'Your insurance needs additional information from your provider before it will cover your prescription. Use the messaging feature in your Sesame profile to ask your provider to submit a prior authorization. If you’re paying cash, disregard and work with your pharmacy directly to pay the out-of-pocket price.'
+      'Your insurance needs additional information from your provider before it will cover your prescription. Use the messaging feature in your Sesame profile to ask your provider to submit a prior authorization. If you’re paying cash, disregard and work with your pharmacy directly to pay the out-of-pocket price.',
+    enablePricing: true
   },
   // Oshi Health
   org_yOgsgGMBVUZIBcwp: {
@@ -431,5 +442,11 @@ const organizationSettings: {
   org_wmy57WStnHIFXBAr: {
     mailOrder: true,
     mailOrderProviders: [EMPOWER_PHARMACY_ID]
+  },
+  // Remedymeds
+  org_YNHdqbbgnRWrsS9I: {
+    logo: 'remedymeds_logo.png',
+    mailOrder: true,
+    mailOrderProviders: [EPIQ_PHARMACY_ID]
   }
 };
