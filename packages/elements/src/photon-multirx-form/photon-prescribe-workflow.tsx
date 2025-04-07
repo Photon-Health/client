@@ -111,6 +111,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   const client = usePhoton();
   const [showForm, setShowForm] = createSignal<boolean>(
+    // this logic keeps the rx form closed when refilling a particular template/prescription
     !props.templateIds && !props.prescriptionIds
   );
   const [errors, setErrors] = createSignal<FormError[]>([]);
@@ -566,6 +567,13 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     }
   }
 
+  const handleDraftPrescriptionCreated = (draft: AddDraftPrescription) => {
+    dispatchDraftPrescriptionCreated(draft);
+    if (isEditing()) {
+      setIsEditing(false);
+    }
+  };
+
   return (
     <div ref={ref}>
       <style>{tailwind}</style>
@@ -688,7 +696,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       draftedPrescriptionChanged={function () {
                         screenDraftedPrescriptions();
                       }}
-                      onDraftPrescriptionCreated={dispatchDraftPrescriptionCreated}
+                      onDraftPrescriptionCreated={handleDraftPrescriptionCreated}
                       screeningAlerts={screeningAlerts()}
                       catalogId={props.catalogId}
                       allowOffCatalogSearch={props.allowOffCatalogSearch}
