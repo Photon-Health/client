@@ -10,8 +10,13 @@ import { format } from 'date-fns';
 import { usePhotonClient } from '../SDKProvider';
 import { Catalog, Prescription } from '@photonhealth/sdk/dist/types';
 import { PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
-import gql from 'graphql-tag';
-import { GetPrescription } from '../../fetch/queries';
+import {
+  CreatePrescription,
+  CreatePrescriptionTemplate,
+  GetPrescription,
+  GetTemplatesFromCatalogs
+} from '../../fetch/queries';
+import { GraphQLFormattedError } from 'graphql';
 
 const PrescribeContext = createContext<{
   prescriptionIds: Accessor<string[]>;
@@ -32,66 +37,6 @@ export type TemplateOverrides = {
     externalId?: string;
   };
 };
-
-// TODO fetch individual template, to get a template currently you need to fetch catalogs and parse out the templates
-// https://www.notion.so/photons/Ability-to-Query-Individual-Template-75c2277db7f44d02bc7ffdd5ab44f17c
-const GetTemplatesFromCatalogs = gql`
-  query TemplatesFromCatalogs {
-    catalogs {
-      templates {
-        id
-        daysSupply
-        dispenseAsWritten
-        dispenseQuantity
-        dispenseUnit
-        instructions
-        notes
-        fillsAllowed
-        treatment {
-          id
-          name
-        }
-      }
-    }
-  }
-`;
-
-const CreatePrescription = gql`
-  mutation CreatePrescription(
-    $externalId: ID
-    $patientId: ID!
-    $treatmentId: ID!
-    $dispenseAsWritten: Boolean
-    $dispenseQuantity: Float!
-    $dispenseUnit: String!
-    $refillsAllowed: Int
-    $fillsAllowed: Int
-    $daysSupply: Int
-    $instructions: String!
-    $notes: String
-    $effectiveDate: AWSDate
-    $diagnoses: [ID]
-  ) {
-    createPrescription(
-      externalId: $externalId
-      patientId: $patientId
-      treatmentId: $treatmentId
-      dispenseAsWritten: $dispenseAsWritten
-      dispenseQuantity: $dispenseQuantity
-      dispenseUnit: $dispenseUnit
-      refillsAllowed: $refillsAllowed
-      fillsAllowed: $fillsAllowed
-      daysSupply: $daysSupply
-      instructions: $instructions
-      notes: $notes
-      effectiveDate: $effectiveDate
-      diagnoses: $diagnoses
-    ) {
-      id
-    }
-  }
-`;
-
 interface PrescribeProviderProps {
   children: JSXElement;
   templateIdsPrefill: string[];
@@ -203,22 +148,8 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     setIsLoading(false);
   }
 
-  const createPrescription = async (prescription: Prescription) => {
+  const createPrescription = async (prescription: Prescription, addToTemplates = false) => {
     try {
-      console.log('createPrescription called', prescription, {
-        externalId: prescription.externalId,
-        patientId: props.patientId,
-        treatmentId: prescription.treatment?.id,
-        dispenseAsWritten: prescription.dispenseAsWritten,
-        dispenseQuantity: prescription.dispenseQuantity,
-        dispenseUnit: prescription.dispenseUnit,
-        fillsAllowed: prescription.fillsAllowed,
-        daysSupply: prescription.daysSupply,
-        instructions: prescription.instructions,
-        notes: prescription.notes,
-        effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
-        diagnoses: prescription.diagnoses
-      });
       const res = await client!.apollo.mutate({
         mutation: CreatePrescription,
         variables: {
@@ -244,13 +175,30 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     }
   };
 
+  const addPrescriptionToTemplates = async (
+    prescription: Prescription,
+    catalogId: string,
+    isPrivate = true
+  ) => {
+    const res = await client!.apollo.mutate({
+      mutation: CreatePrescriptionTemplate,
+      variables: {
+        ...prescription,
+        catalogId,
+        isPrivate
+      }
+    });
+    return res;
+  };
+
   const value = {
     // values
     prescriptionIds,
     isLoading,
     // actions
     setPrescriptionIds,
-    createPrescription
+    createPrescription,
+    addPrescriptionToTemplates
   };
 
   return <PrescribeContext.Provider value={value}>{props.children}</PrescribeContext.Provider>;

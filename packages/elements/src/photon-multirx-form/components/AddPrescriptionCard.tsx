@@ -22,7 +22,6 @@ import '@shoelace-style/shoelace/dist/components/button/button';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLFormattedError } from 'graphql';
 import { createSignal, onMount, Show } from 'solid-js';
-import { usePhoton } from '../../context';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
 
@@ -81,13 +80,11 @@ export const AddPrescriptionCard = (props: {
   allowOffCatalogSearch?: boolean;
   enableOrder: boolean;
 }) => {
-  const client = usePhoton();
-
   const prescribeContext = usePrescribe();
   if (!prescribeContext) {
     throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
   }
-  const { createPrescription } = prescribeContext;
+  const { createPrescription, addPrescriptionToTemplates } = prescribeContext;
 
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
@@ -108,10 +105,6 @@ export const AddPrescriptionCard = (props: {
     // initialize values in the prescribe form
     clearForm(props.actions, props?.prefillNotes ? { notes: props.prefillNotes } : undefined);
   });
-
-  const templateMutation = client!
-    .getSDK()
-    .clinical.prescriptionTemplate.createPrescriptionTemplate({});
 
   const dispatchOrderError = (errors: readonly GraphQLFormattedError[]) => {
     const event = new CustomEvent('photon-order-error', {
@@ -194,24 +187,13 @@ export const AddPrescriptionCard = (props: {
           });
         }
 
-        if (props.store.addToTemplates?.value ?? false) {
+        if ((props.store.addToTemplates?.value ?? false) && !!props.store.catalogId?.value) {
           try {
-            const { errors } = await templateMutation({
-              variables: {
-                ...prescriptionArgs,
-                catalogId: props.store.catalogId?.value ?? undefined,
-                isPrivate: true
-              },
-              awaitRefetchQueries: false
+            await addPrescriptionToTemplates(prescriptionArgs, props.store.catalogId.value);
+            triggerToast({
+              status: 'success',
+              header: 'Personal Template Saved'
             });
-            if (errors) {
-              dispatchOrderError(errors);
-            } else {
-              triggerToast({
-                status: 'success',
-                header: 'Personal Template Saved'
-              });
-            }
           } catch (err) {
             dispatchOrderError([err as GraphQLFormattedError]);
           }

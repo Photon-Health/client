@@ -113,7 +113,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   if (!prescribeContext) {
     throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
   }
-  const { prescriptionIds } = prescribeContext;
+  const { prescriptionIds, createPrescription } = prescribeContext;
 
   const client = usePhoton();
   const [showForm, setShowForm] = createSignal<boolean>(
@@ -468,34 +468,20 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     );
   });
 
-  function addRefillToDrafts(prescription: MedHistoryPrescription, treatment: Treatment) {
-    const draft: AddDraftPrescription = {
-      id: String(Math.random()),
+  async function addRefillToDrafts(prescription: MedHistoryPrescription, treatment: Treatment) {
+    const draft: Prescription = {
       effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
       treatment: treatment,
       dispenseAsWritten: prescription.dispenseAsWritten,
       dispenseQuantity: prescription.dispenseQuantity,
       dispenseUnit: prescription.dispenseUnit,
       daysSupply: prescription.daysSupply,
-      refillsInput: prescription.fillsAllowed ? prescription.fillsAllowed - 1 : 0,
       instructions: prescription.instructions,
       notes: prescription.notes,
-      fillsAllowed: prescription.fillsAllowed,
-      templateName: '',
-      addToTemplates: false,
-      catalogId: undefined
+      fillsAllowed: prescription.fillsAllowed
     };
 
-    props.formActions.updateFormValue({
-      key: 'draftPrescriptions',
-      value: [...(props.formStore.draftPrescriptions?.value || []), draft]
-    });
-
-    triggerToast({
-      status: 'success',
-      header: 'Prescription Added',
-      body: 'You can send this order or add another prescription before sending it'
-    });
+    await createPrescription(draft);
 
     dispatchDraftPrescriptionCreated(draft);
   }
