@@ -1,4 +1,4 @@
-import { Component, createMemo, For, Show } from 'solid-js';
+import { Component, createMemo, createSignal, For, Show } from 'solid-js';
 import {
   formatDate,
   formatPrescriptionDetails,
@@ -7,9 +7,8 @@ import {
   Text,
   useRecentOrders
 } from '../../';
-import { Treatment } from '@photonhealth/sdk/dist/types';
+import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
 import { IconButton } from '../../particles/IconButton';
-import { debounce } from '@solid-primitives/scheduled';
 import clsx from 'clsx';
 import { MedHistoryPrescription } from './index';
 
@@ -25,18 +24,14 @@ export type PatientMedHistoryTableProps = {
   baseURL: string;
   onSortOrderToggle: () => void;
   sortOrder: 'asc' | 'desc';
-  onRefillClick: (prescription: MedHistoryPrescription, treatment: Treatment) => void;
+  onRefillClick: (prescription: Prescription) => Promise<void>;
 };
 
 export default function PatientMedHistoryTable(props: PatientMedHistoryTableProps) {
   const [ordersState] = useRecentOrders();
-
-  const debouncedRefill = createMemo(() => {
-    const onRefillClick = props.onRefillClick;
-    return debounce(async (prescription: MedHistoryPrescription, treatment: Treatment) => {
-      onRefillClick(prescription, treatment);
-    }, 300);
-  });
+  const [isCreatingPrescriptionId, setIsCreatingPrescriptionId] = createSignal<string | undefined>(
+    undefined
+  );
 
   const showRefillColumn = createMemo(() => {
     return props.enableRefillButton;
@@ -51,6 +46,14 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
       }
     )
   );
+
+  const callRefillClick = async (prescription: MedHistoryPrescription, treatment: Treatment) => {
+    if (isCreatingPrescriptionId() === undefined) {
+      setIsCreatingPrescriptionId(prescription.id);
+      await props.onRefillClick({ ...prescription, treatment: { id: treatment.id } });
+      setIsCreatingPrescriptionId(undefined);
+    }
+  };
 
   return (
     <div
@@ -116,10 +119,12 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                     label="Refill"
                     onClick={() => {
                       if (rowItem.prescription) {
-                        debouncedRefill()(rowItem.prescription, rowItem.treatment);
+                        console.log('rowItem.prescription', rowItem.prescription);
+                        callRefillClick(rowItem.prescription, rowItem.treatment);
                       }
                     }}
                     disabled={!rowItem.prescription}
+                    loading={isCreatingPrescriptionId() === rowItem.prescription?.id}
                   />
                 </div>
               </Show>

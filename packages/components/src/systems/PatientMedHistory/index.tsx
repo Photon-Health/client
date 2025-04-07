@@ -2,7 +2,7 @@ import { createEffect, createMemo, createSignal, Show } from 'solid-js';
 import gql from 'graphql-tag';
 import { usePhotonClient } from '../SDKProvider';
 import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
-import { Button, Card, createQuery, Text, triggerToast } from '../../';
+import { Button, Card, createQuery, Text, triggerToast, usePrescribe } from '../../';
 import { ApolloCache } from '@apollo/client';
 import PatientMedHistoryTable, { MedHistoryRowItem } from './PatientMedHistoryTable';
 import { Maybe } from 'graphql/jsutils/Maybe';
@@ -92,6 +92,12 @@ type GetPatientResponse = {
 
 export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const client = usePhotonClient();
+  const prescribeContext = usePrescribe();
+  if (!prescribeContext) {
+    throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
+  }
+  const { createPrescription } = prescribeContext;
+
   const [medHistoryRowItems, setMedHistoryRowItems] = createSignal<MedHistoryRowItem[] | undefined>(
     undefined
   );
@@ -189,6 +195,15 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
     }
   });
 
+  async function createPrescriptionFromMedHistory(prescription: Prescription) {
+    await createPrescription(prescription);
+    triggerToast({
+      status: 'success',
+      header: 'Prescription Added',
+      body: 'You can send this order or add another prescription before sending it'
+    });
+  }
+
   return (
     <Card addChildrenDivider={true} autoPadding={false}>
       <div class="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
@@ -208,9 +223,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
           rowItems={medHistoryRowItems()}
           sortOrder={sortOrder()}
           onSortOrderToggle={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
-          onRefillClick={(prescription, treatment) =>
-            props.onRefillClick && props.onRefillClick(prescription, treatment)
-          }
+          onRefillClick={createPrescriptionFromMedHistory}
         />
       </div>
     </Card>

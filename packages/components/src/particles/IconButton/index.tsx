@@ -14,7 +14,6 @@ interface IconButtonProps {
 
 export const IconButton: Component<IconButtonProps> = (props) => {
   const merged = mergeProps({ size: 'md' }, props);
-  console.log('merged', merged);
   const button = (
     <button
       class="text-gray-700 hover:text-gray-900 hover:bg-blue-50 rounded-md p-2 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-gray-700 disabled:cursor-not-allowed"
