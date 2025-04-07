@@ -45,6 +45,21 @@ interface PrescribeProviderProps {
   patientId: string;
 }
 
+const transformPrescription = (prescription: Prescription, patientId: string) => ({
+  externalId: prescription.externalId,
+  patientId: patientId,
+  treatmentId: prescription.treatment?.id,
+  dispenseAsWritten: prescription.dispenseAsWritten,
+  dispenseQuantity: prescription.dispenseQuantity,
+  dispenseUnit: prescription.dispenseUnit,
+  fillsAllowed: prescription.fillsAllowed,
+  daysSupply: prescription.daysSupply,
+  instructions: prescription.instructions,
+  notes: prescription.notes,
+  effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
+  diagnoses: prescription.diagnoses
+});
+
 export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const [prescriptionIds, setPrescriptionIds] = createSignal<string[]>([]);
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
@@ -148,24 +163,11 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     setIsLoading(false);
   }
 
-  const createPrescription = async (prescription: Prescription, addToTemplates = false) => {
+  const createPrescription = async (prescription: Prescription) => {
     try {
       const res = await client!.apollo.mutate({
         mutation: CreatePrescription,
-        variables: {
-          externalId: prescription.externalId,
-          patientId: props.patientId,
-          treatmentId: prescription.treatment?.id,
-          dispenseAsWritten: prescription.dispenseAsWritten,
-          dispenseQuantity: prescription.dispenseQuantity,
-          dispenseUnit: prescription.dispenseUnit,
-          fillsAllowed: prescription.fillsAllowed,
-          daysSupply: prescription.daysSupply,
-          instructions: prescription.instructions,
-          notes: prescription.notes,
-          effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
-          diagnoses: prescription.diagnoses
-        }
+        variables: transformPrescription(prescription, props.patientId)
       });
       console.log('createPrescription res', res);
       console.log('prescriptionIds', [...prescriptionIds(), res.data.createPrescription.id]);
@@ -178,14 +180,16 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const addPrescriptionToTemplates = async (
     prescription: Prescription,
     catalogId: string,
+    templateName = '',
     isPrivate = true
   ) => {
     const res = await client!.apollo.mutate({
       mutation: CreatePrescriptionTemplate,
       variables: {
-        ...prescription,
+        ...transformPrescription(prescription, props.patientId),
         catalogId,
-        isPrivate
+        isPrivate,
+        ...(templateName ? { name: templateName } : {})
       }
     });
     return res;

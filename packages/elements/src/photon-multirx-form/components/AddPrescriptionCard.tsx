@@ -156,26 +156,6 @@ export const AddPrescriptionCard = (props: {
       };
 
       const addDraftPrescription = async () => {
-        // RESET THE FORM
-        props.actions.updateFormValue({
-          key: 'effectiveDate',
-          value: format(new Date(), 'yyyy-MM-dd').toString()
-        });
-        props.actions.clearKeys([
-          'treatment',
-          'dispenseAsWritten',
-          'dispenseQuantity',
-          'dispenseUnit',
-          'daysSupply',
-          'refillsInput',
-          'instructions',
-          'notes',
-          'templateName',
-          'addToTemplates'
-        ]);
-        setOffCatalog(undefined);
-        clearForm(props.actions, props.prefillNotes ? { notes: props.prefillNotes } : undefined);
-
         // create the prescription
         try {
           await createPrescription(prescriptionArgs);
@@ -189,7 +169,11 @@ export const AddPrescriptionCard = (props: {
 
         if ((props.store.addToTemplates?.value ?? false) && !!props.store.catalogId?.value) {
           try {
-            await addPrescriptionToTemplates(prescriptionArgs, props.store.catalogId.value);
+            await addPrescriptionToTemplates(
+              prescriptionArgs,
+              props.store.catalogId.value,
+              props.store.templateName?.value
+            );
             triggerToast({
               status: 'success',
               header: 'Personal Template Saved'
@@ -210,6 +194,26 @@ export const AddPrescriptionCard = (props: {
         // new properties impact screening
         // TODO TODO TODO
         props.screenDraftedPrescriptions();
+
+        // RESET THE FORM
+        props.actions.updateFormValue({
+          key: 'effectiveDate',
+          value: format(new Date(), 'yyyy-MM-dd').toString()
+        });
+        props.actions.clearKeys([
+          'treatment',
+          'dispenseAsWritten',
+          'dispenseQuantity',
+          'dispenseUnit',
+          'daysSupply',
+          'refillsInput',
+          'instructions',
+          'notes',
+          'templateName',
+          'addToTemplates'
+        ]);
+        setOffCatalog(undefined);
+        clearForm(props.actions, props.prefillNotes ? { notes: props.prefillNotes } : undefined);
 
         setSearchText('');
         setIsLoading(false);
@@ -481,14 +485,15 @@ export const AddPrescriptionCard = (props: {
             <Show when={!props.hideAddToTemplates}>
               <photon-checkbox
                 label="Add To Personal Templates"
-                form-name="daw"
+                form-name="addToTemplates"
                 checked={props.store.addToTemplates?.value || false}
-                on:photon-checkbox-toggled={(e: any) =>
+                on:photon-checkbox-toggled={(e: any) => {
+                  console.log('e.detail.checked', e.detail.checked);
                   props.actions.updateFormValue({
                     key: 'addToTemplates',
                     value: e.detail.checked
-                  })
-                }
+                  });
+                }}
               />
             </Show>
             <Show when={props.store.addToTemplates?.value ?? false}>
