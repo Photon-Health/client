@@ -263,6 +263,12 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
             }
             debounceSearch(e.target.value);
           }}
+          on:click={async (e: any) => {
+            // prevent sl-input click and sl-dropdown's trigger click
+            // from causing a double-click and flickering the menu
+            // when clicking the input's label
+            e.preventDefault();
+          }}
           on:sl-focus={(e: any) => {
             if (props.onInputFocus) {
               props.onInputFocus();
