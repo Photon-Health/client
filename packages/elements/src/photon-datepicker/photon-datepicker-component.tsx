@@ -63,14 +63,10 @@ const Component = (props: {
       <style>{shoelaceLightStyles}</style>
       <style>{styles}</style>
       <div class="md:py-2  flex flex-col" ref={ref}>
-        {props.label ? (
-          <div class="flex items-center pb-2">
-            <p class="text-gray-700 text-sm font-sans">{props.label}</p>
-            {props.required ? <p class="pl-1 text-red-400">*</p> : null}
-          </div>
-        ) : null}
         <sl-input
           ref={inputRef}
+          label={props.label}
+          required={props.required}
           on:sl-input={(e: any) => {
             dispatchDateSelected(e.target.value);
           }}
@@ -82,10 +78,11 @@ const Component = (props: {
           type="date"
           value={date()}
           invalid={props.invalid}
-        />
-        <p slot="help-text" class="text-sm text-red-400 pt-1 h-[21px] font-sans">
-          {props.helpText}
-        </p>
+        >
+          <p slot="help-text" class="text-sm text-red-400 pt-1 h-[21px] font-sans">
+            {props.helpText}
+          </p>
+        </sl-input>
       </div>
     </>
   );
