@@ -431,7 +431,8 @@ const organizationSettings: {
       REDROCK_SPRINGVILLE_PHARMACY_ID,
       REDROCK_STGEORGE_PHARMACY_ID,
       EMPOWER_PHARMACY_ID,
-      GIFTHEALTH_PHARMACY_ID
+      GIFTHEALTH_PHARMACY_ID,
+      STRIVE_PHARMACY_ID
     ],
     logo: 'measured_logo.svg',
     accentColor: '#ffd100',
