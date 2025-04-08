@@ -378,7 +378,7 @@ const organizationSettings: {
     accentColor: '#1c3f28',
     paExceptionMessage:
       'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Found customer support will submit a prior authorization for you or suggest an alternative medication. The customer support team at Found will follow up with you if any additional information is needed.',
-    mailOrderProviders: [STRIVE_PHARMACY_ID]
+    mailOrderProviders: [STRIVE_PHARMACY_ID, GIFTHEALTH_PHARMACY_ID]
   },
   // Sesame
   org_zc1RzzmSwd8eE94U: {
@@ -386,8 +386,7 @@ const organizationSettings: {
     accentColor: '#5224C7',
     topRankedCostco: true,
     paExceptionMessage:
-      'Your insurance needs additional information from your provider before it will cover your prescription. Use the messaging feature in your Sesame profile to ask your provider to submit a prior authorization. If you’re paying cash, disregard and work with your pharmacy directly to pay the out-of-pocket price.',
-    enablePricing: true
+      'Your insurance needs additional information from your provider before it will cover your prescription. Use the messaging feature in your Sesame profile to ask your provider to submit a prior authorization. If you’re paying cash, disregard and work with your pharmacy directly to pay the out-of-pocket price.'
   },
   // DrTelx
   org_6DKb7celAunAoLzb: {
@@ -431,7 +430,9 @@ const organizationSettings: {
     mailOrderProviders: [
       REDROCK_SPRINGVILLE_PHARMACY_ID,
       REDROCK_STGEORGE_PHARMACY_ID,
-      EMPOWER_PHARMACY_ID
+      EMPOWER_PHARMACY_ID,
+      GIFTHEALTH_PHARMACY_ID,
+      STRIVE_PHARMACY_ID
     ],
     logo: 'measured_logo.svg',
     accentColor: '#ffd100',
@@ -513,5 +514,17 @@ const organizationSettings: {
     accentColor: '#6ea3a6',
     mailOrder: true,
     mailOrderProviders: [EMPOWER_PHARMACY_ID]
+  },
+  // Twentyeight Health
+  org_kFZU0twVQTOm5IPF: {
+    logo: 'twentyeight_health_logo.svg',
+    accentColor: '#f48273',
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [
+      AMAZON_PHARMACY_ID,
+      TRUEPILL_PHARMACY_ID,
+      CAREPOINT_PHARMACY_ID,
+      HONEYBEE_PHARMACY_ID
+    ]
   }
 };

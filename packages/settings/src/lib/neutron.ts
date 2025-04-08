@@ -265,8 +265,7 @@ const organizationSettings: {
     mailOrderNavigate: true,
     mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
     paExceptionMessage:
-      'Your insurance needs additional information from your provider before it will cover your prescription. Use the messaging feature in your Sesame profile to ask your provider to submit a prior authorization. If you’re paying cash, disregard and work with your pharmacy directly to pay the out-of-pocket price.',
-    enablePricing: true
+      'Your insurance needs additional information from your provider before it will cover your prescription. Use the messaging feature in your Sesame profile to ask your provider to submit a prior authorization. If you’re paying cash, disregard and work with your pharmacy directly to pay the out-of-pocket price.'
   },
   // Oshi Health
   org_yOgsgGMBVUZIBcwp: {
@@ -303,11 +302,16 @@ const organizationSettings: {
     accentColor: '#2e4985'
   },
   // Twentyeight Health
-  org_WhLKXXfPPwq8R4vX: {
+  org_tA6GiBBgGBZwnf4e: {
     logo: 'twentyeight_health_logo.svg',
     accentColor: '#f48273',
     mailOrderNavigate: true,
-    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
+    mailOrderNavigateProviders: [
+      AMAZON_PHARMACY_ID,
+      TRUEPILL_PHARMACY_ID,
+      CAREPOINT_PHARMACY_ID,
+      HONEYBEE_PHARMACY_ID
+    ]
   },
   // Frontier Direct Care
   org_b37dAjtODQmdded8: {
