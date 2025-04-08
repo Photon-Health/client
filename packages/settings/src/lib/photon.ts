@@ -513,5 +513,17 @@ const organizationSettings: {
     accentColor: '#6ea3a6',
     mailOrder: true,
     mailOrderProviders: [EMPOWER_PHARMACY_ID]
+  },
+  // Twentyeight Health
+  org_kFZU0twVQTOm5IPF: {
+    logo: 'twentyeight_health_logo.svg',
+    accentColor: '#f48273',
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [
+      AMAZON_PHARMACY_ID,
+      TRUEPILL_PHARMACY_ID,
+      CAREPOINT_PHARMACY_ID,
+      HONEYBEE_PHARMACY_ID
+    ]
   }
 };
