@@ -1,25 +1,12 @@
 import { test } from '@playwright/test';
 
 test('user can login and create a new prescription', async ({ page }) => {
-  // await page.goto('/');
-  console.log('=====> goodbye ');
+  await page.goto('/prescriptions');
 
-  // await expect(page).toHaveTitle(/Photon/);
-  //
-  // await page.getByRole('button', { name: 'Log in' }).click();
-  // await expect(page.getByText('Log in to continue to Photon Clinical App')).toBeVisible();
-  // await page.getByRole('button', { name: 'Continue with Google' }).click();
-  //
-  // await page.waitForURL(/accounts\.google\.com/, { timeout: 10_000 });
-  //
-  // await page.getByLabel('Email or phone').fill(process.env.PLAYWRIGHT_E2E_ACCOUNT_USERNAME);
-  // await page.getByRole('button', { name: 'Next' }).click();
-  // await page
-  //   .getByLabel('Enter your password')
-  //   .fill(process.env.PLAYWRIGHT_E2E_ACCOUNT_PASSWORD, { timeout: 60_000 });
-  // await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByRole('link', { name: /Patients/ }).click();
+  await page.getByRole('link', { name: /New Patient/ }).click();
 
-  // await page.waitForURL(/localhost/, { timeout: 20_000 });
-
-  await page.getByRole('link', { name: /New Prescription/ }).click();
+  // todo: make inputs accessible
+  // await page.getByLabel('First Name').fill('first_name_123');
+  // await page.getByLabel('Last Name').fill('last_name_123');
 });
