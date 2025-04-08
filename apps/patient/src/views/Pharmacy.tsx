@@ -594,11 +594,13 @@ export const Pharmacy = () => {
               if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
                 datadogRum.addAction('amazon_pharmacy_offer_active_and_selected', {
                   orderId: order.id,
+                  organizationId: order.organization.id,
                   timestamp: new Date().toISOString()
                 });
               } else {
                 datadogRum.addAction('amazon_pharmacy_offer_active_and_not_selected', {
                   orderId: order.id,
+                  organizationId: order.organization.id,
                   timestamp: new Date().toISOString()
                 });
               }
