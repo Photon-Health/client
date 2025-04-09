@@ -2,7 +2,7 @@ import { expect, test as setup } from '@playwright/test';
 import * as path from 'path';
 
 // eslint-disable-next-line no-undef
-const authFile = path.join(__dirname, '../playwright/.auth/user.json');
+const authFile = path.join(__dirname, './.auth/user.json');
 
 setup('authenticate', async ({ page }) => {
   await page.goto(`/`);
