@@ -75,7 +75,6 @@ type PatientMedHistoryProps = {
   newMedication?: Treatment;
   openAddMedicationDialog?: () => void;
   hideAddMedicationDialog?: () => void;
-  onRefillClick?: (prescription: MedHistoryPrescription, treatment: Treatment) => void;
 };
 
 export type GetPatientTreatmentHistoryItem = {
@@ -195,8 +194,8 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
     }
   });
 
-  async function createPrescriptionFromMedHistory(prescription: Prescription) {
-    await createPrescription(prescription);
+  async function createPrescriptionFromMedHistory(prescription: Partial<Prescription>) {
+    await createPrescription(prescription as Prescription);
     triggerToast({
       status: 'success',
       header: 'Prescription Added',

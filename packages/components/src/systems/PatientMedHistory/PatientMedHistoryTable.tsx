@@ -24,7 +24,7 @@ export type PatientMedHistoryTableProps = {
   baseURL: string;
   onSortOrderToggle: () => void;
   sortOrder: 'asc' | 'desc';
-  onRefillClick: (prescription: Prescription) => Promise<void>;
+  onRefillClick: (prescription: Partial<Prescription>) => Promise<void>;
 };
 
 export default function PatientMedHistoryTable(props: PatientMedHistoryTableProps) {
@@ -50,7 +50,10 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
   const callRefillClick = async (prescription: MedHistoryPrescription, treatment: Treatment) => {
     if (isCreatingPrescriptionId() === undefined) {
       setIsCreatingPrescriptionId(prescription.id);
-      await props.onRefillClick({ ...prescription, treatment: { id: treatment.id } });
+      await props.onRefillClick({
+        ...prescription,
+        treatment
+      });
       setIsCreatingPrescriptionId(undefined);
     }
   };

@@ -4,11 +4,7 @@ import { PhotonAuthorized } from '../photon-authorized';
 import type { FormError } from '../stores/form';
 import tailwind from '../tailwind.css?inline';
 import { checkHasPermission } from '../utils';
-import {
-  AddDraftPrescription,
-  AddPrescriptionCard,
-  isTreatmentInDraftPrescriptions
-} from './components/AddPrescriptionCard';
+import { AddDraftPrescription, AddPrescriptionCard } from './components/AddPrescriptionCard';
 import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
 import { OrderCard } from './components/OrderCard';
 import { PatientCard } from './components/PatientCard';
@@ -30,7 +26,7 @@ import {
   usePrescribe
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { Order, Prescription, Treatment } from '@photonhealth/sdk/dist/types';
+import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import '@shoelace-style/shoelace/dist/components/alert/alert';
 import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
@@ -40,8 +36,6 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
-import { format } from 'date-fns';
-import { MedHistoryPrescription } from '@photonhealth/components/src/systems/PatientMedHistory';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -468,44 +462,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     );
   });
 
-  async function addRefillToDrafts(prescription: MedHistoryPrescription, treatment: Treatment) {
-    const draft: Prescription = {
-      effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
-      treatment: treatment,
-      dispenseAsWritten: prescription.dispenseAsWritten,
-      dispenseQuantity: prescription.dispenseQuantity,
-      dispenseUnit: prescription.dispenseUnit,
-      daysSupply: prescription.daysSupply,
-      instructions: prescription.instructions,
-      notes: prescription.notes,
-      fillsAllowed: prescription.fillsAllowed
-    };
-
-    await createPrescription(draft);
-
-    dispatchDraftPrescriptionCreated(draft);
-  }
-
-  function tryAddRefillToDrafts(prescription: MedHistoryPrescription, treatment: Treatment) {
-    if (isTreatmentInDraftPrescriptions(treatment.id, props.formStore.draftPrescriptions.value)) {
-      triggerToast({
-        status: 'error',
-        body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
-      });
-    } else if (
-      props.enableCombineAndDuplicate &&
-      recentOrdersActions.checkDuplicateFill(treatment.name)
-    ) {
-      recentOrdersActions.setIsDuplicateDialogOpen(
-        true,
-        recentOrdersActions.checkDuplicateFill(treatment.name),
-        () => addRefillToDrafts(prescription, treatment)
-      );
-    } else {
-      addRefillToDrafts(prescription, treatment);
-    }
-  }
-
   return (
     <div ref={ref}>
       <style>{tailwind}</style>
@@ -596,7 +552,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 enableMedHistoryLinks={props.enableMedHistoryLinks ?? false}
                 enableMedHistoryRefillButton={props.enableMedHistoryRefillButton ?? false}
                 hidePatientCard={props.hidePatientCard}
-                onRefillClick={tryAddRefillToDrafts}
               />
               <Show
                 when={
