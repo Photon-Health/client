@@ -45,3 +45,5 @@ build-storybook.log
 __generated__
 
 vite.config.ts.timestamp-*
+
+vite.config.*.timestamp*

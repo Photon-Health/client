@@ -5,6 +5,7 @@
     "dbaeumer.vscode-eslint",
     "firsttris.vscode-jest-runner",
     "graphql.vscode-graphql",
-    "github.vscode-github-actions"
+    "github.vscode-github-actions",
+    "ms-playwright.playwright"
   ]
 }
