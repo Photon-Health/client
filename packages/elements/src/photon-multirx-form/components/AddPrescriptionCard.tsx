@@ -3,6 +3,7 @@ import {
   Card,
   DoseCalculator,
   Icon,
+  PrescriptionFormData,
   ScreeningAlerts,
   ScreeningAlertType,
   Text,
@@ -41,27 +42,6 @@ const validators = {
     'Please enter instructions for the patient...'
   ),
   effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
-};
-
-export type AddDraftPrescription = {
-  id: string;
-  effectiveDate: string;
-  treatment: {
-    id: string;
-    name: string;
-  };
-  dispenseAsWritten: boolean;
-  dispenseQuantity: number;
-  dispenseUnit: string;
-  daysSupply: number;
-  refillsInput: number;
-  instructions: string;
-  notes: string;
-  fillsAllowed: number;
-  addToTemplates: boolean;
-  templateName: string;
-  catalogId?: string;
-  externalId?: string;
 };
 
 export const AddPrescriptionCard = (props: {
@@ -142,7 +122,7 @@ export const AddPrescriptionCard = (props: {
       // check if duplicate in recent orders
       const duplicate = recentOrdersActions.checkDuplicateFill(props.store.treatment.value.name);
 
-      const prescriptionArgs = {
+      const prescriptionArgs: PrescriptionFormData = {
         effectiveDate: props.store.effectiveDate.value,
         treatment: { id: props.store.treatment.value.id },
         dispenseAsWritten: props.store.dispenseAsWritten.value,
@@ -151,14 +131,14 @@ export const AddPrescriptionCard = (props: {
         daysSupply: props.store.daysSupply.value,
         instructions: props.store.instructions.value,
         notes: props.store.notes.value,
-        fillsAllowed: props.store.refillsInput.value + 1,
-        patientId: props.store.patient?.value?.id
+        fillsAllowed: props.store.refillsInput.value + 1
       };
 
       const addDraftPrescription = async () => {
         // create the prescription
+        let createdPrescription: Prescription | undefined = undefined;
         try {
-          await createPrescription(prescriptionArgs);
+          createdPrescription = await createPrescription(prescriptionArgs);
         } catch (err) {
           return triggerToast({
             status: 'error',
@@ -172,7 +152,8 @@ export const AddPrescriptionCard = (props: {
             await addPrescriptionToTemplates(
               prescriptionArgs,
               props.store.catalogId.value,
-              props.store.templateName?.value
+              props.store.templateName?.value,
+              props.store.patient?.value?.id
             );
             triggerToast({
               status: 'success',
@@ -189,7 +170,7 @@ export const AddPrescriptionCard = (props: {
           body: 'You can send this order or add another prescription before sending it'
         });
 
-        props.onDraftPrescriptionCreated(prescriptionArgs);
+        props.onDraftPrescriptionCreated(createdPrescription);
         // and screen it again, in case any of the
         // new properties impact screening
         // TODO TODO TODO

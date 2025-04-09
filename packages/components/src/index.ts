@@ -41,8 +41,10 @@ export { usePhoton, PhotonClientStore, PhotonContext };
 import {
   PrescribeProvider,
   usePrescribe,
+  type PrescriptionFormData,
   type TemplateOverrides
 } from './systems/PrescribeProvider';
+
 export {
   AddressForm,
   Alert,
@@ -80,4 +82,4 @@ export {
 };
 
 // Export types
-export type { ScreeningAlertType, TemplateOverrides, DraftPrescription };
+export type { ScreeningAlertType, TemplateOverrides, DraftPrescription, PrescriptionFormData };

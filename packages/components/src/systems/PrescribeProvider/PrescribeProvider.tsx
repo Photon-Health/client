@@ -21,9 +21,9 @@ const PrescribeContext = createContext<{
   prescriptionIds: Accessor<string[]>;
   isLoading: Accessor<boolean>;
   setPrescriptionIds: (ids: string[]) => void;
-  createPrescription: (prescription: Prescription) => Promise<void>;
+  createPrescription: (prescription: PrescriptionFormData) => Promise<Prescription>;
   addPrescriptionToTemplates: (
-    prescription: Prescription,
+    prescription: PrescriptionFormData,
     catalogId: string,
     templateName?: string,
     isPrivate?: boolean
@@ -43,6 +43,22 @@ export type TemplateOverrides = {
   };
 };
 
+export type PrescriptionFormData = {
+  effectiveDate: string;
+  treatment: {
+    id: string;
+  };
+  dispenseAsWritten: boolean;
+  dispenseQuantity: number;
+  dispenseUnit: string;
+  daysSupply: number;
+  instructions: string;
+  notes: string;
+  fillsAllowed: number;
+  catalogId?: string;
+  externalId?: string;
+};
+
 interface PrescribeProviderProps {
   children: JSXElement;
   templateIdsPrefill: string[];
@@ -51,7 +67,7 @@ interface PrescribeProviderProps {
   patientId: string;
 }
 
-const transformPrescription = (prescription: Prescription, patientId: string) => ({
+const transformPrescription = (prescription: PrescriptionFormData, patientId: string) => ({
   externalId: prescription.externalId,
   patientId: patientId,
   treatmentId: prescription.treatment?.id,
@@ -62,8 +78,8 @@ const transformPrescription = (prescription: Prescription, patientId: string) =>
   daysSupply: prescription.daysSupply,
   instructions: prescription.instructions,
   notes: prescription.notes,
-  effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
-  diagnoses: prescription.diagnoses
+  effectiveDate: format(new Date(), 'yyyy-MM-dd').toString()
+  // TODO TODO TODO TODO-- diagnoses: prescription.diagnoses
 });
 
 export const PrescribeProvider = (props: PrescribeProviderProps) => {
@@ -90,7 +106,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   async function createPrescriptionsFromIds() {
     setHasCreatedPrescriptions(true);
     setIsLoading(true);
-    const prescriptionsToCreate = [];
+    const prescriptionsToCreate: PrescriptionFormData[] = [];
 
     // fetch templates
     if (props.templateIdsPrefill.length > 0) {
@@ -162,14 +178,14 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
 
     // create prescriptions from template and prescription ids
     await Promise.all(
-      prescriptionsToCreate.map(async (prescription: Prescription) =>
+      prescriptionsToCreate.map(async (prescription: PrescriptionFormData) =>
         createPrescription(prescription)
       )
     );
     setIsLoading(false);
   }
 
-  const createPrescription = async (prescription: Prescription) => {
+  const createPrescription = async (prescription: PrescriptionFormData) => {
     try {
       const res = await client!.apollo.mutate({
         mutation: CreatePrescription,
@@ -178,13 +194,15 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
       console.log('createPrescription res', res);
       console.log('prescriptionIds', [...prescriptionIds(), res.data.createPrescription.id]);
       setPrescriptionIds([...prescriptionIds(), res.data.createPrescription.id]);
+      return res.data.createPrescription as Prescription;
     } catch (error) {
       console.error('Mutation error:', error);
+      throw error;
     }
   };
 
   const addPrescriptionToTemplates = async (
-    prescription: Prescription,
+    prescription: PrescriptionFormData,
     catalogId: string,
     templateName = '',
     isPrivate = true

@@ -2,7 +2,15 @@ import { createEffect, createMemo, createSignal, Show } from 'solid-js';
 import gql from 'graphql-tag';
 import { usePhotonClient } from '../SDKProvider';
 import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
-import { Button, Card, createQuery, Text, triggerToast, usePrescribe } from '../../';
+import {
+  Button,
+  Card,
+  createQuery,
+  PrescriptionFormData,
+  Text,
+  triggerToast,
+  usePrescribe
+} from '../../';
 import { ApolloCache } from '@apollo/client';
 import PatientMedHistoryTable, { MedHistoryRowItem } from './PatientMedHistoryTable';
 import { Maybe } from 'graphql/jsutils/Maybe';
@@ -194,8 +202,8 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
     }
   });
 
-  async function createPrescriptionFromMedHistory(prescription: Partial<Prescription>) {
-    await createPrescription(prescription as Prescription);
+  async function createPrescriptionFromMedHistory(prescription: PrescriptionFormData) {
+    await createPrescription(prescription);
     triggerToast({
       status: 'success',
       header: 'Prescription Added',

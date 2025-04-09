@@ -4,13 +4,15 @@ import {
   formatPrescriptionDetails,
   generateString,
   Icon,
+  PrescriptionFormData,
   Text,
   useRecentOrders
 } from '../../';
-import { Prescription, Treatment } from '@photonhealth/sdk/dist/types';
+import { Treatment } from '@photonhealth/sdk/dist/types';
 import { IconButton } from '../../particles/IconButton';
 import clsx from 'clsx';
 import { MedHistoryPrescription } from './index';
+import { format } from 'date-fns';
 
 export type MedHistoryRowItem = {
   treatment: Treatment;
@@ -24,7 +26,7 @@ export type PatientMedHistoryTableProps = {
   baseURL: string;
   onSortOrderToggle: () => void;
   sortOrder: 'asc' | 'desc';
-  onRefillClick: (prescription: Partial<Prescription>) => Promise<void>;
+  onRefillClick: (prescription: PrescriptionFormData) => Promise<void>;
 };
 
 export default function PatientMedHistoryTable(props: PatientMedHistoryTableProps) {
@@ -52,7 +54,8 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
       setIsCreatingPrescriptionId(prescription.id);
       await props.onRefillClick({
         ...prescription,
-        treatment
+        treatment,
+        effectiveDate: format(new Date(), 'yyyy-MM-dd').toString()
       });
       setIsCreatingPrescriptionId(undefined);
     }
