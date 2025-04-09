@@ -1,10 +1,9 @@
 import { gql } from 'graphql-tag';
-import { usePhoton } from '../context';
 import { PhotonAuthorized } from '../photon-authorized';
 import type { FormError } from '../stores/form';
 import tailwind from '../tailwind.css?inline';
 import { checkHasPermission } from '../utils';
-import { AddDraftPrescription, AddPrescriptionCard } from './components/AddPrescriptionCard';
+import { AddPrescriptionCard } from './components/AddPrescriptionCard';
 import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
 import { OrderCard } from './components/OrderCard';
 import { PatientCard } from './components/PatientCard';
@@ -22,8 +21,10 @@ import {
   Spinner,
   Toaster,
   triggerToast,
+  usePhoton,
   useRecentOrders,
-  usePrescribe
+  usePrescribe,
+  TemplateOverrides
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { Order, Prescription } from '@photonhealth/sdk/dist/types';
@@ -107,10 +108,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   if (!prescribeContext) {
     throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
   }
-  const { prescriptionIds, createPrescription } = prescribeContext;
+  const { prescriptionIds } = prescribeContext;
 
   const client = usePhoton();
   const [showForm, setShowForm] = createSignal<boolean>(
+    // this logic keeps the rx form closed when refilling a particular template/prescription
     !props.templateIds && !props.prescriptionIds
   );
   const [errors, setErrors] = createSignal<FormError[]>([]);
@@ -191,7 +193,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     ref?.dispatchEvent(event);
   };
 
-  const dispatchDraftPrescriptionCreated = (draftPrescription: AddDraftPrescription) => {
+  const dispatchDraftPrescriptionCreated = (draftPrescription: Prescription) => {
     const event = new CustomEvent('photon-draft-prescription-created', {
       composed: true,
       bubbles: true,
@@ -462,6 +464,13 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     );
   });
 
+  const handleDraftPrescriptionCreated = (draft: Prescription) => {
+    dispatchDraftPrescriptionCreated(draft);
+    if (isEditing()) {
+      setIsEditing(false);
+    }
+  };
+
   return (
     <div ref={ref}>
       <style>{tailwind}</style>
@@ -583,7 +592,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       draftedPrescriptionChanged={function () {
                         screenDraftedPrescriptions();
                       }}
-                      onDraftPrescriptionCreated={dispatchDraftPrescriptionCreated}
+                      onDraftPrescriptionCreated={handleDraftPrescriptionCreated}
                       screeningAlerts={screeningAlerts()}
                       catalogId={props.catalogId}
                       allowOffCatalogSearch={props.allowOffCatalogSearch}

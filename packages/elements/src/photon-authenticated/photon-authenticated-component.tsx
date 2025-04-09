@@ -1,6 +1,6 @@
 import { customElement } from 'solid-element';
 import { createEffect, createSignal, Show } from 'solid-js';
-import { usePhoton } from '../context';
+import { usePhoton } from '@photonhealth/components';
 
 import '../photon-login';
 

@@ -1,28 +1,33 @@
 import {
+  Accessor,
   createContext,
   createEffect,
   createSignal,
   JSXElement,
-  useContext,
-  Accessor
+  useContext
 } from 'solid-js';
 import { format } from 'date-fns';
 import { usePhotonClient } from '../SDKProvider';
-import { Catalog, Prescription } from '@photonhealth/sdk/dist/types';
-import { PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
+import { Catalog, Prescription, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
 import {
   CreatePrescription,
   CreatePrescriptionTemplate,
   GetPrescription,
   GetTemplatesFromCatalogs
 } from '../../fetch/queries';
-import { GraphQLFormattedError } from 'graphql';
+import { FetchResult } from '@apollo/client/core';
 
 const PrescribeContext = createContext<{
   prescriptionIds: Accessor<string[]>;
   isLoading: Accessor<boolean>;
   setPrescriptionIds: (ids: string[]) => void;
   createPrescription: (prescription: Prescription) => Promise<void>;
+  addPrescriptionToTemplates: (
+    prescription: Prescription,
+    catalogId: string,
+    templateName?: string,
+    isPrivate?: boolean
+  ) => Promise<FetchResult>;
 }>();
 
 export type TemplateOverrides = {
@@ -37,6 +42,7 @@ export type TemplateOverrides = {
     externalId?: string;
   };
 };
+
 interface PrescribeProviderProps {
   children: JSXElement;
   templateIdsPrefill: string[];

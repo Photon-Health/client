@@ -24,7 +24,8 @@ import {
   OPENLOOP_PHARMACY_ID,
   GIFTHEALTH_PHARMACY_ID,
   EPIQ_PHARMACY_ID,
-  PHOTON_TEST_PHARMACY_ID
+  PHOTON_TEST_PHARMACY_ID,
+  DANIA_PHARMACY_ID
 } from '../pharmacies';
 
 /**
@@ -98,7 +99,8 @@ const organizationSettings: {
       OPENLOOP_PHARMACY_ID,
       GIFTHEALTH_PHARMACY_ID,
       EMPOWER_PHARMACY_ID,
-      PHOTON_TEST_PHARMACY_ID
+      PHOTON_TEST_PHARMACY_ID,
+      DANIA_PHARMACY_ID
     ],
     topRankedWalgreens: true,
     mailOrderNavigate: true,
@@ -301,11 +303,16 @@ const organizationSettings: {
     accentColor: '#2e4985'
   },
   // Twentyeight Health
-  org_WhLKXXfPPwq8R4vX: {
+  org_tA6GiBBgGBZwnf4e: {
     logo: 'twentyeight_health_logo.svg',
     accentColor: '#f48273',
     mailOrderNavigate: true,
-    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
+    mailOrderNavigateProviders: [
+      AMAZON_PHARMACY_ID,
+      TRUEPILL_PHARMACY_ID,
+      CAREPOINT_PHARMACY_ID,
+      HONEYBEE_PHARMACY_ID
+    ]
   },
   // Frontier Direct Care
   org_b37dAjtODQmdded8: {

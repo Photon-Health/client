@@ -4,7 +4,7 @@ import Banner from './particles/Banner';
 import DoseCalculator from './systems/DoseCalculator';
 import Card from './particles/Card';
 import ComboBox from './particles/ComboBox';
-import { DraftPrescriptions } from './systems/DraftPrescriptions';
+import { DraftPrescription, DraftPrescriptions } from './systems/DraftPrescriptions';
 import Icon from './particles/Icon';
 import PatientInfo from './systems/PatientInfo';
 import PatientMedHistory from './systems/PatientMedHistory';
@@ -32,7 +32,17 @@ import formatDate from './utils/formatDate';
 import { formatPrescriptionDetails } from './utils/formatPrescriptionDetail';
 
 import { SignatureAttestationModal } from './systems/SignatureAttestation';
-import { PrescribeProvider, usePrescribe } from './systems/PrescribeProvider';
+
+import { PhotonContext, usePhoton } from './context';
+import { PhotonClientStore } from './store';
+
+export { usePhoton, PhotonClientStore, PhotonContext };
+
+import {
+  PrescribeProvider,
+  usePrescribe,
+  type TemplateOverrides
+} from './systems/PrescribeProvider';
 export {
   AddressForm,
   Alert,
@@ -70,4 +80,4 @@ export {
 };
 
 // Export types
-export type { ScreeningAlertType };
+export type { ScreeningAlertType, TemplateOverrides, DraftPrescription };

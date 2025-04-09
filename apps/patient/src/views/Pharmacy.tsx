@@ -105,17 +105,17 @@ export const Pharmacy = () => {
   const isLoading = loadingLocation || loadingPharmacies;
 
   // pricing
-  const containsZepbound = flattenedFills.some((fill) =>
-    fill.treatment.name.toLowerCase().includes('zepbound')
-  );
-  const showPriceToggle = orgSettings.enablePricing && containsZepbound ? true : false;
+  const orderContainsGLP1Medication = flattenedFills.some((fill) => isGLP(fill.treatment.name));
+
+  // note: prices are only for Sesame, non-GLP-1 right now
+  const showPriceToggle = (orgSettings.enablePricing && !orderContainsGLP1Medication) ?? false;
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
     openNow !== null ? !!openNow : order?.readyBy === 'Urgent'
   );
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
-  const [enablePrice, setEnablePrice] = useState(showPriceToggle);
+  const [enablePrice, setEnablePrice] = useState(false);
 
   const [amazonPharmacyOverride, setAmazonPharmacyOverride] = useState<string | undefined>(
     undefined
@@ -181,8 +181,8 @@ export const Pharmacy = () => {
 
     const validOrganizationIds = [
       'org_KzSVZBQixLRkqj5d', // boson Test Organization 11
-      'org_kVS7AP4iuItESdMA' // neutron Photon Test Org
-      // 'org_wM4wI7rop0W1eNfM' // production found
+      'org_kVS7AP4iuItESdMA', // neutron Photon Test Org
+      'org_wM4wI7rop0W1eNfM' // production found
     ];
 
     if (!validOrganizationIds.includes(order.organization.id)) {
@@ -597,11 +597,13 @@ export const Pharmacy = () => {
               if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
                 datadogRum.addAction('amazon_pharmacy_offer_active_and_selected', {
                   orderId: order.id,
+                  organizationId: order.organization.id,
                   timestamp: new Date().toISOString()
                 });
               } else {
                 datadogRum.addAction('amazon_pharmacy_offer_active_and_not_selected', {
                   orderId: order.id,
+                  organizationId: order.organization.id,
                   timestamp: new Date().toISOString()
                 });
               }

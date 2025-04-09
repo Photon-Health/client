@@ -39,7 +39,7 @@ function Dialog(props: DialogProps) {
   });
 
   return (
-    <div class="relative z-20">
+    <div class="relative z-100">
       <Transition
         onEnter={createTransition([{ opacity: 0 }, { opacity: 1 }], {
           duration: transitionDuration,

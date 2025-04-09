@@ -19,7 +19,8 @@ import {
   TRUEPILL_PHARMACY_ID,
   HEALTHWAREHOUSE_PHARMACY_ID,
   OPENLOOP_PHARMACY_ID,
-  GIFTHEALTH_PHARMACY_ID
+  GIFTHEALTH_PHARMACY_ID,
+  DANIA_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -377,7 +378,7 @@ const organizationSettings: {
     accentColor: '#1c3f28',
     paExceptionMessage:
       'Your insurance needs additional information from your provider before your pharmacy can fill your prescription. Found customer support will submit a prior authorization for you or suggest an alternative medication. The customer support team at Found will follow up with you if any additional information is needed.',
-    mailOrderProviders: [STRIVE_PHARMACY_ID]
+    mailOrderProviders: [STRIVE_PHARMACY_ID, GIFTHEALTH_PHARMACY_ID]
   },
   // Sesame
   org_zc1RzzmSwd8eE94U: {
@@ -430,7 +431,9 @@ const organizationSettings: {
     mailOrderProviders: [
       REDROCK_SPRINGVILLE_PHARMACY_ID,
       REDROCK_STGEORGE_PHARMACY_ID,
-      EMPOWER_PHARMACY_ID
+      EMPOWER_PHARMACY_ID,
+      GIFTHEALTH_PHARMACY_ID,
+      STRIVE_PHARMACY_ID
     ],
     logo: 'measured_logo.svg',
     accentColor: '#ffd100',
@@ -492,12 +495,19 @@ const organizationSettings: {
     mailOrder: true,
     mailOrderProviders: [HONEYBEE_PHARMACY_ID]
   },
-  // Geviti
+  // Geviti -- Sub org of CareTalk
   org_Zdri0JlNxJfWjzpk: {
     logo: 'geviti_logo.webp',
     accentColor: '#04549D',
     mailOrder: true,
     mailOrderProviders: [STRIVE_PHARMACY_ID]
+  },
+  // EveryMeds -- Sub org of CareTalk
+  org_sDXma6gDyEQDQK0o: {
+    logo: 'everymeds_logo.svg',
+    accentColor: '#03254c',
+    mailOrder: true,
+    mailOrderProviders: [DANIA_PHARMACY_ID]
   },
   // Precision Telemed
   org_zlsgaZsKLpFrkpyK: {
@@ -505,5 +515,17 @@ const organizationSettings: {
     accentColor: '#6ea3a6',
     mailOrder: true,
     mailOrderProviders: [EMPOWER_PHARMACY_ID]
+  },
+  // Twentyeight Health
+  org_kFZU0twVQTOm5IPF: {
+    logo: 'twentyeight_health_logo.svg',
+    accentColor: '#f48273',
+    mailOrderNavigate: true,
+    mailOrderNavigateProviders: [
+      AMAZON_PHARMACY_ID,
+      TRUEPILL_PHARMACY_ID,
+      CAREPOINT_PHARMACY_ID,
+      HONEYBEE_PHARMACY_ID
+    ]
   }
 };
