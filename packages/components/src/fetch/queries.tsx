@@ -76,7 +76,7 @@ export const CreatePrescription = gql`
       dispenseAsWritten: $dispenseAsWritten
       dispenseQuantity: $dispenseQuantity
       dispenseUnit: $dispenseUnit
-      refillsAllowed: $refillsAllowed
+      refillsAllowed: $refillsAllowed #todo: remove this?
       fillsAllowed: $fillsAllowed
       daysSupply: $daysSupply
       instructions: $instructions
@@ -85,6 +85,22 @@ export const CreatePrescription = gql`
       diagnoses: $diagnoses
     ) {
       id
+      externalId
+      dispenseAsWritten
+      dispenseQuantity
+      dispenseUnit
+      fillsAllowed
+      daysSupply
+      instructions
+      notes
+      effectiveDate
+      diagnoses {
+        code
+      }
+      treatment {
+        id
+        name
+      }
     }
   }
 `;

@@ -1,11 +1,4 @@
-import {
-  createContext,
-  JSXElement,
-  useContext,
-  createEffect,
-  createMemo,
-  createSignal
-} from 'solid-js';
+import { createContext, JSXElement, useContext, createEffect, createMemo } from 'solid-js';
 import { gql } from '@apollo/client';
 import RecentOrdersCard from './RecentOrdersCard';
 import { usePhotonClient } from '../SDKProvider';
@@ -22,7 +15,6 @@ import {
   OrderState
 } from '@photonhealth/sdk/dist/types';
 import { usePrescribe } from '../PrescribeProvider';
-import { GetPrescription } from '../../fetch/queries';
 
 const GetPatientOrdersQuery = gql`
   query GetPatientOrders($patientId: ID!) {
@@ -110,12 +102,7 @@ type RecentOrdersState = {
 };
 
 type RecentOrdersActions = {
-  setIsCombineDialogOpen: (
-    isOpen: boolean,
-    createOrder?: () => void,
-    draftPrescriptions?: Prescription[],
-    address?: Address
-  ) => void;
+  setIsCombineDialogOpen: (isOpen: boolean, createOrder?: () => void, address?: Address) => void;
   setIsDuplicateDialogOpen: (
     isOpen: boolean,
     duplicate?: { order: Order; fill: Fill },
@@ -152,13 +139,12 @@ interface SDKProviderProps {
 
 function RecentOrders(props: SDKProviderProps) {
   const client = usePhotonClient();
-  const prescribeContext = usePrescribe();
-  if (!prescribeContext) {
-    throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
-  }
-  const { prescriptionIds } = prescribeContext;
+  // const prescribeContext = usePrescribe();
+  // if (!prescribeContext) {
+  //   throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
+  // }
+  // const { prescriptionIds } = prescribeContext;
 
-  const [draftPrescriptions, setDraftPrescriptions] = createSignal<Prescription[]>([]);
   const [state, setState] = createStore<RecentOrdersState>({
     orders: [],
     isLoading: true,
@@ -185,11 +171,10 @@ function RecentOrders(props: SDKProviderProps) {
   const value: RecentOrdersContextValue = [
     state,
     {
-      setIsCombineDialogOpen(isOpen, createOrder, draftPrescriptions, address) {
+      setIsCombineDialogOpen(isOpen, createOrder, address) {
         setState({
           isCombineDialogOpen: isOpen,
           ...(createOrder ? { createOrder } : { createOrderCb: undefined }),
-          ...(draftPrescriptions ? { draftPrescriptions } : { draftPrescriptions: [] }),
           ...(address ? { address } : { address: undefined })
         });
       },
@@ -269,7 +254,7 @@ function RecentOrders(props: SDKProviderProps) {
     setState({ isLoading: data.loading });
     const patient = data()?.patient;
     if (!data.loading && patient) {
-      const orders = patient?.orders;
+      const orders = patient.orders;
 
       if (orders?.length > 0) {
         const now = new Date();

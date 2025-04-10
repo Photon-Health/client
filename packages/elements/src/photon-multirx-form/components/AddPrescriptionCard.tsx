@@ -64,7 +64,7 @@ export const AddPrescriptionCard = (props: {
   if (!prescribeContext) {
     throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
   }
-  const { createPrescription, addPrescriptionToTemplates } = prescribeContext;
+  const { createPrescription, addPrescriptionToTemplates, prescriptions } = prescribeContext;
 
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
@@ -105,19 +105,18 @@ export const AddPrescriptionCard = (props: {
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
 
-    // TODO TODO TODO
-    // const draftedPrescriptions = [...props.store.draftPrescriptions.value];
-    // const isPrescriptionAlreadyAdded = isTreatmentInDraftPrescriptions(
-    //   props.store.treatment?.value?.id,
-    //   draftedPrescriptions
-    // );
-    const isPrescriptionAlreadyAdded = false;
+    const isPrescriptionAlreadyAdded = isTreatmentInDraftPrescriptions(
+      props.store.treatment?.value?.id,
+      prescriptions()
+    );
 
     if (isPrescriptionAlreadyAdded) {
+      setIsLoading(false);
       triggerToast({
         status: 'error',
         body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
       });
+      return;
     } else if (!errorsPresent) {
       // check if duplicate in recent orders
       const duplicate = recentOrdersActions.checkDuplicateFill(props.store.treatment.value.name);
@@ -131,7 +130,9 @@ export const AddPrescriptionCard = (props: {
         daysSupply: props.store.daysSupply.value,
         instructions: props.store.instructions.value,
         notes: props.store.notes.value,
-        fillsAllowed: props.store.refillsInput.value + 1
+        fillsAllowed: props.store.refillsInput.value + 1,
+        // TODO: set this from template-overrides. can we stop using the props.store, with this param as a starting point?
+        diagnoseCodes: []
       };
 
       const addDraftPrescription = async () => {
@@ -171,9 +172,6 @@ export const AddPrescriptionCard = (props: {
         });
 
         props.onDraftPrescriptionCreated(createdPrescription);
-        // and screen it again, in case any of the
-        // new properties impact screening
-        // TODO TODO TODO
         props.screenDraftedPrescriptions();
 
         // RESET THE FORM

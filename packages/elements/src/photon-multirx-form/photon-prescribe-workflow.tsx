@@ -108,7 +108,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   if (!prescribeContext) {
     throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
   }
-  const { prescriptionIds } = prescribeContext;
+  const { prescriptions, prescriptionIds } = prescribeContext;
 
   const client = usePhoton();
   const [showForm, setShowForm] = createSignal<boolean>(
@@ -217,13 +217,17 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   // let's start screening all of the prescriptions we're drafting
   const screenDraftedPrescriptions = async () => {
+    console.log('-=====> screenDraftedPrescriptions');
+
     // start out by getting the treatment id of the prescription we're drafting now -
     // we'll want to knwo about it so we cn show an alert underneath it, before it gets
     // added to the order
     const inProgressDraftedPrescriptionTreatmentId = props.formStore.treatment?.value?.id;
 
     // and then get the ones already added to the order (but not persisted)
-    const draftedPrescriptions = [...props.formStore.draftPrescriptions.value];
+    const draftedPrescriptions: ScreenablePrescription[] = prescriptions().map(
+      toScreenableDraftPrescription
+    );
 
     // if there is one, add in the prescription being created
     if (inProgressDraftedPrescriptionTreatmentId) {
@@ -232,25 +236,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       });
     }
 
-    // pluck out all the attributes we won't need so we can make a screening request
-    const sanitizedDraftedPrescriptions = draftedPrescriptions.map(
-      ({
-        id, // the id can be a random number so let's ensure we don't pass it up
-        addToTemplates,
-        templateName,
-        refillsInput,
-        catalogId,
-        ...draftedPrescription
-      }) => {
-        return { ...draftedPrescription, treatment: { id: draftedPrescription.treatment.id } };
-      }
-    );
-
     // let's remove any duplicate treatment ids
     // as there's no point to sending up multiple
     // of the same medication
-    const seenTreatmentIds = new Set<number>();
-    const dedupedSanitizedPrescriptions = sanitizedDraftedPrescriptions.filter((entity) => {
+    const seenTreatmentIds = new Set<string>();
+    const dedupedSanitizedPrescriptions = draftedPrescriptions.filter((entity) => {
       const treatmentId = entity.treatment.id;
       if (seenTreatmentIds.has(treatmentId)) {
         return false;
@@ -261,6 +251,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     });
 
     // make the screening request
+    console.log({ dedupedSanitizedPrescriptions });
     const { data } = await clinicalClient.query({
       query: ScreenDraftedPrescriptionsQuery,
       variables: {
@@ -269,10 +260,12 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       }
     });
 
+    console.log({ data });
+
     setScreeningAlerts(data?.prescriptionScreen?.alerts ?? []);
   };
 
-  // TODO TODO: add this back in when we set prescriptions to active
+  // TODO: add this back in when we set prescriptions to active
   // const dispatchPrescriptionsError = (errors: readonly GraphQLFormattedError[]) => {
   //   const event = new CustomEvent('photon-prescriptions-error', {
   //     composed: true,
@@ -317,7 +310,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     return recentOrdersActions.setIsCombineDialogOpen(
       true,
       () => submitForm(props.enableOrder),
-      props.formStore.draftPrescriptions.value,
       formattedAddress()
     );
   };
@@ -354,9 +346,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
 
       try {
-        // TODO TODO: set prescription as no longer in draft
-        // currently they are still all active
-        // dispatchPrescriptionsCreated(props.formStore.draftPrescriptions.value);
+        dispatchPrescriptionsCreated(prescriptions());
 
         if (props.enableOrder) {
           if (
@@ -446,9 +436,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   createEffect(() => {
     dispatchPrescriptionsFormValidate(
-      Boolean(
-        props.formStore.draftPrescriptions?.value?.length > 0 && props.formStore.patient?.value
-      )
+      Boolean(prescriptions().length > 0 && props.formStore.patient?.value)
     );
   });
 
@@ -657,3 +645,33 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     </div>
   );
 }
+
+type ScreenablePrescription = {
+  dispenseAsWritten?: boolean;
+  dispenseQuantity?: number;
+  dispenseUnit?: string;
+  fillsAllowed?: number;
+  daysSupply?: number;
+  instructions?: string;
+  notes?: string;
+  effectiveDate?: string;
+  treatment: {
+    id: string;
+  };
+};
+
+const toScreenableDraftPrescription = (prescription: Prescription): ScreenablePrescription => {
+  return {
+    dispenseAsWritten: prescription.dispenseAsWritten || undefined,
+    dispenseQuantity: prescription.dispenseQuantity,
+    dispenseUnit: prescription.dispenseUnit,
+    fillsAllowed: prescription.fillsAllowed,
+    daysSupply: prescription.daysSupply || undefined,
+    instructions: prescription.instructions,
+    notes: prescription.notes || undefined,
+    effectiveDate: prescription.effectiveDate,
+    treatment: {
+      id: prescription.treatment.id
+    }
+  };
+};

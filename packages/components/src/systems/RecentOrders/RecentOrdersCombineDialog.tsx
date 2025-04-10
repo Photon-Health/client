@@ -12,17 +12,8 @@ import triggerToast from '../../utils/toastTriggers';
 import { Address } from '../PatientInfo';
 import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 import { createMutation } from '../../utils/createMutation';
-import { DraftPrescription } from '../DraftPrescriptions';
 import { Order } from '@photonhealth/sdk/dist/types';
-import { GraphQLError } from 'graphql';
-
-const CREATE_PRESCRIPTIONS_MUTATION = gql`
-  mutation RecentOrdersCombineDialogCreatePrescriptions($prescriptions: [PrescriptionInput!]!) {
-    createPrescriptions(prescriptions: $prescriptions) {
-      id
-    }
-  }
-`;
+import { usePrescribe } from '../PrescribeProvider';
 
 const COMBINE_ORDERS_MUTATION = gql`
   mutation RecentOrdersCombineDialogUpdateOrder($orderId: ID!, $fills: [FillInput!]!) {
@@ -63,11 +54,6 @@ type SuccessResponse = {
   id: string;
 };
 
-type SuccessCreatePrescriptions = { createPrescriptions: SuccessResponse[] };
-type VariablesCreatePrescriptions = {
-  prescriptions: Omit<DraftPrescription, 'id' | 'name' | 'isPrivate' | 'treatment'>[];
-};
-
 type SuccessCombineOrders = { updateOrder: SuccessResponse };
 type VariablesCombineOrders = { orderId: string; fills: { prescriptionId: string }[] };
 
@@ -80,23 +66,25 @@ type VariablesCreateOrder = {
 
 export default function RecentOrdersCombineDialog() {
   let ref: Ref<any> | undefined;
+  const prescribeContext = usePrescribe();
+  if (!prescribeContext) {
+    throw new Error('RecentOrdersCombineDialog must be wrapped with PrescribeProvider');
+  }
+
+  const { prescriptions, prescriptionIds } = prescribeContext;
+
   const client = usePhotonClient();
   const [state, actions] = useRecentOrders();
   const [isCreatingOrder, setIsCreatingOrder] = createSignal(false);
   const [isCombiningOrders, setIsCombiningOrders] = createSignal(false);
 
-  const [createPrescriptionsMutation] = createMutation<
-    SuccessCreatePrescriptions,
-    VariablesCreatePrescriptions
-  >(CREATE_PRESCRIPTIONS_MUTATION, {
-    client: client!.apollo
-  });
   const [combineOrdersMutation] = createMutation<SuccessCombineOrders, VariablesCombineOrders>(
     COMBINE_ORDERS_MUTATION,
     {
       client: client!.apollo
     }
   );
+
   const [createOrderMutation] = createMutation<SuccessCreateOrder, VariablesCreateOrder>(
     CREATE_ORDER_MUTATION,
     {
@@ -124,17 +112,6 @@ export default function RecentOrdersCombineDialog() {
     ref?.dispatchEvent(event);
   };
 
-  const dispatchCombineOrderError = (err: GraphQLError) => {
-    const event = new CustomEvent('photon-order-combine-error', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        error: err.message
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
-
   createEffect(() => {
     if (state.isCombineDialogOpen) {
       dispatchDatadogAction('prescribe-combine-dialog-open', {}, ref);
@@ -155,42 +132,7 @@ export default function RecentOrdersCombineDialog() {
     return [];
   });
 
-  const createPrescriptions = async () => {
-    console.log('createPrescriptions called');
-    // TODO TODO TODO
-    // createPrescriptionsMutation({
-    //   variables: {
-    //     prescriptions: (state.draftPrescriptions || []).map((draft) => ({
-    //       daysSupply: draft.daysSupply,
-    //       dispenseAsWritten: draft.dispenseAsWritten,
-    //       dispenseQuantity: draft.dispenseQuantity,
-    //       dispenseUnit: draft.dispenseUnit,
-    //       effectiveDate: draft.effectiveDate,
-    //       instructions: draft.instructions,
-    //       notes: draft.notes,
-    //       patientId: state.patientId,
-    //       // +1 here because we're using the refillsInput
-    //       fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
-    //       treatmentId: draft.treatment.id
-    //     }))
-    //   }
-  };
-
-  const updateOrder = async (orderId: string, prescriptionIds: string[]) =>
-    combineOrdersMutation({
-      variables: { orderId, fills: prescriptionIds.map((id) => ({ prescriptionId: id })) }
-    });
-
-  const createOrder = async (patientId: string, prescriptionIds: string[], address: Address) =>
-    createOrderMutation({
-      variables: {
-        patientId,
-        fills: prescriptionIds.map((id) => ({ prescriptionId: id })),
-        address
-      }
-    });
-
-  const combineOrders = async () => {
+  const onCombineOrdersClick = async () => {
     const order = routingOrder();
 
     if (!order) {
@@ -200,32 +142,18 @@ export default function RecentOrdersCombineDialog() {
     setIsCombiningOrders(true);
     dispatchDatadogAction('prescribe-combine-dialog-combining', {}, ref);
 
-    let prescriptions;
+    const fills = prescriptionIds().map((id) => ({ prescriptionId: id }));
     try {
-      // Create prescriptions for the drafts
-      prescriptions = await createPrescriptions();
-    } catch (err) {
-      triggerToast({
-        header: 'Error Creating Prescriptions',
-        body: (err as GraphQLError).message,
-        status: 'error'
+      // Add rxs to the existing order
+      const updatedOrder = await combineOrdersMutation({
+        variables: { orderId: order.id, fills }
       });
-      setIsCombiningOrders(false);
-      setIsCreatingOrder(false);
-      actions.setIsCombineDialogOpen(false);
-      dispatchCombineOrderError(err as GraphQLError);
-      return;
-    }
 
-    try {
-      // Add rxs to the order
-      const updatedOrder = await updateOrder(
-        order.id,
-        prescriptions.createPrescriptions.map((rx: SuccessResponse) => rx.id)
-      );
       // Trigger message to redirect to order page
       dispatchCombineOrderUpdated(updatedOrder.updateOrder as Order);
+
       setIsCombiningOrders(false);
+      actions.setIsCombineDialogOpen(false);
       return;
     } catch {
       // if there is an error updating an order, most likely because the order state has
@@ -235,11 +163,13 @@ export default function RecentOrdersCombineDialog() {
           throw new Error('No address provided');
         }
 
-        const newOrder = await createOrder(
-          state.patientId,
-          prescriptions.createPrescriptions.map((rx: SuccessResponse) => rx.id),
-          state.address
-        );
+        const newOrder = await createOrderMutation({
+          variables: {
+            patientId: state.patientId,
+            fills,
+            address: state.address
+          }
+        });
 
         dispatchOrderCreated(newOrder.createOrder);
         setIsCombiningOrders(false);
@@ -299,23 +229,24 @@ export default function RecentOrdersCombineDialog() {
               Select YES to combine orders and enable the patient to send it to the same pharmacy:
             </Text>
             <div class="border border-solid border-gray-200 rounded-lg bg-gray-50 py-3 px-4 flex flex-col gap-4">
-              TODO TODO TODO
-              {/* <For each={state.draftPrescriptions}>
-                {(draft) => (
-                  <div>
-                    <Text size="sm">{draft.treatment.name}</Text>
-                    <br />
-                    <Text size="sm" color="gray">
-                      {formatRxString({
-                        dispenseQuantity: draft?.dispenseQuantity ?? 0,
-                        dispenseUnit: draft?.dispenseUnit ?? '',
-                        fillsAllowed: draft?.fillsAllowed ?? 0,
-                        instructions: draft?.instructions ?? ''
-                      })}
-                    </Text>
-                  </div>
-                )}
-              </For> */}
+              {
+                <For each={prescriptions()}>
+                  {(draft) => (
+                    <div>
+                      <Text size="sm">{draft.treatment.name}</Text>
+                      <br />
+                      <Text size="sm" color="gray">
+                        {formatRxString({
+                          dispenseQuantity: draft?.dispenseQuantity ?? 0,
+                          dispenseUnit: draft?.dispenseUnit ?? '',
+                          fillsAllowed: draft?.fillsAllowed ?? 0,
+                          instructions: draft?.instructions ?? ''
+                        })}
+                      </Text>
+                    </div>
+                  )}
+                </For>
+              }
             </div>
           </div>
         </div>
@@ -323,7 +254,7 @@ export default function RecentOrdersCombineDialog() {
         <div class="flex flex-col items-stretch gap-2">
           <Button
             size="xl"
-            onClick={combineOrders}
+            onClick={onCombineOrdersClick}
             disabled={isCreatingOrder() || isCombiningOrders()}
             loading={isCreatingOrder() || isCombiningOrders()}
           >

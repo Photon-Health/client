@@ -39,11 +39,16 @@ export default function RecentOrdersCard() {
                         </div>
                         <div>
                           <For each={[...treatments]}>
-                            {(treatment) => (
-                              <Text color="black" size="sm">
-                                {treatment}
-                              </Text>
-                            )}
+                            {(treatment, index) => {
+                              return (
+                                <>
+                                  {index() > 0 ? ', ' : null}
+                                  <Text color="black" size="sm">
+                                    {treatment}
+                                  </Text>
+                                </>
+                              );
+                            }}
                           </For>
                         </div>
                       </div>

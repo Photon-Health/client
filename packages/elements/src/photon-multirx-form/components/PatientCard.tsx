@@ -12,7 +12,6 @@ import { Treatment } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
 import type { Address } from '../photon-prescribe-workflow';
-import { MedHistoryPrescription } from '@photonhealth/components/dist/packages/components/src/systems/PatientMedHistory';
 
 const patientValidator = message(record(string(), any()), 'Please select a patient...');
 

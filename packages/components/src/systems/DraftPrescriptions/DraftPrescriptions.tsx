@@ -47,7 +47,7 @@ interface DraftPrescriptionsProps {
 
 export function DraftPrescriptions(props: DraftPrescriptionsProps) {
   const [isLoading, setIsLoading] = createSignal<boolean>(true);
-  const [draftPrescriptions, setDraftPrescriptions] = createSignal<DraftPrescription[]>([]);
+  const [draftPrescriptions, setDraftPrescriptions] = createSignal<DraftPrescription[]>([]); // todo: use PrescribeContext.prescriptions instead of re-fetching
   const client = usePhotonClient();
 
   createEffect(() => {

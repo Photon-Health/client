@@ -52,10 +52,14 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
   const callRefillClick = async (prescription: MedHistoryPrescription, treatment: Treatment) => {
     if (isCreatingPrescriptionId() === undefined) {
       setIsCreatingPrescriptionId(prescription.id);
+
+      console.log('refilling rx with diagnoses: ', prescription.diagnoses);
+
       await props.onRefillClick({
         ...prescription,
         treatment,
-        effectiveDate: format(new Date(), 'yyyy-MM-dd').toString()
+        effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
+        diagnoseCodes: prescription.diagnoses?.map((diagnosis) => diagnosis.code) || []
       });
       setIsCreatingPrescriptionId(undefined);
     }
@@ -126,6 +130,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                     onClick={() => {
                       if (rowItem.prescription) {
                         console.log('rowItem.prescription', rowItem.prescription);
+                        console.log('rowItem.treatment', rowItem.treatment);
                         callRefillClick(rowItem.prescription, rowItem.treatment);
                       }
                     }}

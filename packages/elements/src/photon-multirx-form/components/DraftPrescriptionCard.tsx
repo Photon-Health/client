@@ -4,7 +4,6 @@ import { Card, Text, usePrescribe } from '@photonhealth/components';
 import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { PhotonTooltip } from '../../photon-tooltip';
-import { partition } from 'lodash';
 import { ScreeningAlertType } from '@photonhealth/components';
 
 export const DraftPrescriptionCard = (props: {
@@ -28,7 +27,7 @@ export const DraftPrescriptionCard = (props: {
   if (!prescribeContext) {
     throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
   }
-  const { prescriptionIds, setPrescriptionIds } = prescribeContext;
+  const { prescriptionIds, setEditingPrescription, deletePrescription } = prescribeContext;
 
   const dispatchPrescriptionDraftDeleted = (id: string) => {
     const event = new CustomEvent('photon-draft-prescription-deleted', {
@@ -50,8 +49,7 @@ export const DraftPrescriptionCard = (props: {
         value: editDraft().catalogId
       });
 
-      const remaining = prescriptionIds().filter((x) => x !== editDraft().id);
-      setPrescriptionIds(remaining);
+      setEditingPrescription(editDraft().id);
 
       window.scrollTo({
         behavior: 'smooth',
@@ -86,15 +84,16 @@ export const DraftPrescriptionCard = (props: {
     setEditDraft(undefined);
   };
   const handleDeleteConfirm = () => {
-    const [deleted, remaining] = partition(prescriptionIds(), (x) => x === deleteDraftId());
-
-    setPrescriptionIds(remaining);
-    dispatchPrescriptionDraftDeleted(deleted[0]);
+    const deletedId = deleteDraftId();
+    if (deletedId) {
+      deletePrescription(deletedId);
+      dispatchPrescriptionDraftDeleted(deletedId);
+    }
 
     setDeleteDialogOpen(false);
     setDeleteDraftId(undefined);
 
-    if (props.store['draftPrescriptions']?.value?.length === 0) {
+    if (prescriptionIds().length === 0) {
       // reopen form if all drafts are deleted
       props.setIsEditing(true);
     }

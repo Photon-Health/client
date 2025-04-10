@@ -2,6 +2,7 @@ import {
   Accessor,
   createContext,
   createEffect,
+  createMemo,
   createSignal,
   JSXElement,
   useContext
@@ -17,11 +18,23 @@ import {
 } from '../../fetch/queries';
 import { FetchResult } from '@apollo/client/core';
 
+type CreatePrescriptionResult =
+  | { data: Prescription; error: null }
+  | {
+      data: null;
+      error: { isPrescriptionAlreadyAdded: boolean };
+    };
+
 const PrescribeContext = createContext<{
+  // values
+  prescriptions: Accessor<Prescription[]>;
   prescriptionIds: Accessor<string[]>;
   isLoading: Accessor<boolean>;
-  setPrescriptionIds: (ids: string[]) => void;
-  createPrescription: (prescription: PrescriptionFormData) => Promise<Prescription>;
+
+  // actions
+  setEditingPrescription: (id: string) => void;
+  deletePrescription: (id: string) => void;
+  createPrescription: (prescription: PrescriptionFormData) => Promise<CreatePrescriptionResult>;
   addPrescriptionToTemplates: (
     prescription: PrescriptionFormData,
     catalogId: string,
@@ -57,6 +70,7 @@ export type PrescriptionFormData = {
   fillsAllowed: number;
   catalogId?: string;
   externalId?: string;
+  diagnoseCodes: string[];
 };
 
 interface PrescribeProviderProps {
@@ -78,16 +92,19 @@ const transformPrescription = (prescription: PrescriptionFormData, patientId: st
   daysSupply: prescription.daysSupply,
   instructions: prescription.instructions,
   notes: prescription.notes,
-  effectiveDate: format(new Date(), 'yyyy-MM-dd').toString()
-  // TODO TODO TODO TODO-- diagnoses: prescription.diagnoses
+  effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
+  diagnoses: prescription.diagnoseCodes
 });
 
 export const PrescribeProvider = (props: PrescribeProviderProps) => {
-  const [prescriptionIds, setPrescriptionIds] = createSignal<string[]>([]);
+  // const [prescriptionIds, setPrescriptionIds] = createSignal<string[]>([]);
+  const [prescriptions, setPrescriptions] = createSignal<Prescription[]>([]);
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
   const [hasCreatedPrescriptions, setHasCreatedPrescriptions] = createSignal<boolean>(false);
 
   const client = usePhotonClient();
+
+  const prescriptionIds = createMemo(() => prescriptions().map((prescription) => prescription.id));
 
   // Prefill new prescriptions based on templateIds or prescriptionIds when we get a patientId
   createEffect(() => {
@@ -185,20 +202,47 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     setIsLoading(false);
   }
 
-  const createPrescription = async (prescription: PrescriptionFormData) => {
+  const setInitialPrescriptionsAndTemplates = () => {
+    console.log('todo: setInitialPrescriptionsAndTemplates');
+  };
+
+  const createPrescription = async (
+    prescription: PrescriptionFormData
+  ): Promise<CreatePrescriptionResult> => {
+    const isPrescriptionAlreadyAdded = isTreatmentInDraftPrescriptions(
+      prescription.treatment.id,
+      prescriptions()
+    );
+
+    if (isPrescriptionAlreadyAdded) {
+      return { data: null, error: { isPrescriptionAlreadyAdded: true } };
+    }
+
     try {
+      console.log({ prescriptionFormData: prescription });
       const res = await client!.apollo.mutate({
         mutation: CreatePrescription,
         variables: transformPrescription(prescription, props.patientId)
       });
-      console.log('createPrescription res', res);
-      console.log('prescriptionIds', [...prescriptionIds(), res.data.createPrescription.id]);
-      setPrescriptionIds([...prescriptionIds(), res.data.createPrescription.id]);
-      return res.data.createPrescription as Prescription;
+      const createdPrescription = res.data.createPrescription;
+      console.log({ createdPrescription });
+      setPrescriptions((prev) => [...prev, createdPrescription]);
+      return {
+        data: createdPrescription as Prescription,
+        error: null
+      };
     } catch (error) {
       console.error('Mutation error:', error);
       throw error;
     }
+  };
+
+  const setEditingPrescription = (toEditId: string) => {
+    setPrescriptions((prev) => prev.filter((rx) => rx.id !== toEditId));
+  };
+
+  const deletePrescription = (toDeleteId: string) => {
+    setPrescriptions((prev) => prev.filter((rx) => rx.id !== toDeleteId));
   };
 
   const addPrescriptionToTemplates = async (
@@ -222,10 +266,13 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const value = {
     // values
     prescriptionIds,
+    prescriptions,
     isLoading,
     // actions
-    setPrescriptionIds,
+    setInitialPrescriptionsAndTemplates,
     createPrescription,
+    setEditingPrescription,
+    deletePrescription,
     addPrescriptionToTemplates
   };
 
@@ -235,3 +282,10 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
 export const usePrescribe = () => {
   return useContext(PrescribeContext);
 };
+
+export function isTreatmentInDraftPrescriptions(
+  treatmentId: string,
+  draftedPrescriptions: { treatment: { id: string } }[]
+) {
+  return draftedPrescriptions.some((draft) => draft.treatment.id === treatmentId);
+}

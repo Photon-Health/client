@@ -66,6 +66,7 @@ export type MedHistoryPrescription = Pick<
   | 'fillsAllowed'
   | 'dispenseAsWritten'
   | 'notes'
+  | 'diagnoses'
 >;
 
 const ADD_MED_HISTORY = gql`
@@ -203,12 +204,20 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   });
 
   async function createPrescriptionFromMedHistory(prescription: PrescriptionFormData) {
-    await createPrescription(prescription);
-    triggerToast({
-      status: 'success',
-      header: 'Prescription Added',
-      body: 'You can send this order or add another prescription before sending it'
-    });
+    const result = await createPrescription(prescription);
+    // todo: this toast is duplicated in AddPrescription. can we centralize it in this file?
+    if (result.error) {
+      triggerToast({
+        status: 'error',
+        body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
+      });
+    } else {
+      triggerToast({
+        status: 'success',
+        header: 'Prescription Added',
+        body: 'You can send this order or add another prescription before sending it'
+      });
+    }
   }
 
   return (
@@ -237,11 +246,12 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
   );
 }
 
-const mapToMedHistoryRowItems = (getPatientResponse: GetPatientResponse): MedHistoryRowItem[] =>
-  getPatientResponse?.patient?.treatmentHistory.map((historyItem) => ({
+const mapToMedHistoryRowItems = (getPatientResponse: GetPatientResponse): MedHistoryRowItem[] => {
+  return getPatientResponse?.patient?.treatmentHistory.map((historyItem) => ({
     treatment: historyItem.treatment,
     prescription: historyItem.prescription as MedHistoryPrescription
   }));
+};
 
 const sortHistoryByDate = (order: 'asc' | 'desc') => {
   return (a: MedHistoryRowItem, b: MedHistoryRowItem) => {
