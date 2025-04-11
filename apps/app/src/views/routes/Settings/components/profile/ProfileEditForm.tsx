@@ -13,9 +13,9 @@ export const profileFormSchema = yup
     name: yup
       .object({
         title: yup.string(),
-        first: yup.string().required('first name is required'),
+        first: yup.string().required('First name is required'),
         middle: yup.string(),
-        last: yup.string().required('last name is required')
+        last: yup.string().required('Last name is required')
       })
       .required('Please enter an address'),
     fax: yup
@@ -194,6 +194,15 @@ export const ProfileForm: FC<FormikProps<ProfileYupType>> = ({
           </FormLabel>
           <Field name="fax" component={FieldComponent} />
         </FormControl>
+        {hasPrescriberRole(values.roles) && (
+          <FormControl pb="2" isRequired isReadOnly isInvalid={!!providerErrors?.npi}>
+            <FormLabel htmlFor="provider.npi" mb={1}>
+              NPI
+            </FormLabel>
+            <Field name="provider.npi" component={FieldComponent} />
+            <ErrorMessage name="provider.npi" component={FormErrorMessage} />
+          </FormControl>
+        )}
         <FormControl pb="2" isRequired isInvalid={!!errors?.email && touched?.email}>
           <FormLabel htmlFor="email" mb={1}>
             Email
