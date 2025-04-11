@@ -307,7 +307,7 @@ const organizationSettings: {
     logo: 'ognomy_logo.webp',
     accentColor: '#0a7ade',
     mailOrder: true,
-    mailOrderProviders: [GIFTHEALTH_PHARMACY_ID, TRUEPILL_LILLY_PHARMACY_ID, AMAZON_PHARMACY_ID],
+    mailOrderProviders: [GIFTHEALTH_PHARMACY_ID, TRUEPILL_LILLY_PHARMACY_ID, AMAZON_PHARMACY_ID]
   },
   // Carbon Health
   org_Dye8T9VAM1GHjjzS: {
