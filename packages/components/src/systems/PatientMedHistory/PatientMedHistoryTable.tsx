@@ -53,8 +53,6 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
     if (isCreatingPrescriptionId() === undefined) {
       setIsCreatingPrescriptionId(prescription.id);
 
-      console.log('refilling rx with diagnoses: ', prescription.diagnoses);
-
       try {
         await tryCreatePrescription({
           ...prescription,
@@ -132,8 +130,6 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                     label="Refill"
                     onClick={() => {
                       if (rowItem.prescription) {
-                        console.log('rowItem.prescription', rowItem.prescription);
-                        console.log('rowItem.treatment', rowItem.treatment);
                         callRefillClick(rowItem.prescription, rowItem.treatment);
                       }
                     }}

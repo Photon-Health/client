@@ -217,8 +217,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   // let's start screening all of the prescriptions we're drafting
   const screenDraftedPrescriptions = async () => {
-    console.log('-=====> screenDraftedPrescriptions');
-
     // start out by getting the treatment id of the prescription we're drafting now -
     // we'll want to knwo about it so we cn show an alert underneath it, before it gets
     // added to the order
@@ -251,7 +249,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     });
 
     // make the screening request
-    console.log({ dedupedSanitizedPrescriptions });
     const { data } = await clinicalClient.query({
       query: ScreenDraftedPrescriptionsQuery,
       variables: {
@@ -259,8 +256,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         draftedPrescriptions: dedupedSanitizedPrescriptions
       }
     });
-
-    console.log({ data });
 
     setScreeningAlerts(data?.prescriptionScreen?.alerts ?? []);
   };

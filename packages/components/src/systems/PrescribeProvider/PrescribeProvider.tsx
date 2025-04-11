@@ -219,7 +219,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
       prescriptionFormData.treatment.name
     );
 
-    console.log({ enableCombineAndDuplicate: props.enableCombineAndDuplicate, duplicateFill });
     if (props.enableCombineAndDuplicate && duplicateFill) {
       // if there's a duplicate order, check first if they want to report an issue
       // todo: can we pass the promise down instead of reject/resolve callbacks?
@@ -233,14 +232,10 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
         true,
         duplicateFill,
         async () => {
-          console.log('resolver');
           const result = await createPrescriptionOnApi(prescriptionFormData, options);
           resolver(result);
         },
-        () => {
-          console.log('rejector');
-          rejecter();
-        }
+        () => rejecter()
       );
       return promise;
     }

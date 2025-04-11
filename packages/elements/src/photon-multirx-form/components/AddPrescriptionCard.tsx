@@ -427,7 +427,6 @@ export const AddPrescriptionCard = (props: {
                 form-name="addToTemplates"
                 checked={props.store.addToTemplates?.value || false}
                 on:photon-checkbox-toggled={(e: any) => {
-                  console.log('e.detail.checked', e.detail.checked);
                   props.actions.updateFormValue({
                     key: 'addToTemplates',
                     value: e.detail.checked

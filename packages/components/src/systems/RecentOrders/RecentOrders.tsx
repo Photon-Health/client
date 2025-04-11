@@ -193,7 +193,6 @@ function RecentOrders(props: SDKProviderProps) {
         return undefined;
       },
       hasRoutingOrder() {
-        console.log({ recentOrders: state.orders });
         return state.orders.some((order) => order.state === 'ROUTING');
       }
     }
