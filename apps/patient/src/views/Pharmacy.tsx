@@ -106,9 +106,11 @@ export const Pharmacy = () => {
 
   // pricing
   const orderContainsGLP1Medication = flattenedFills.some((fill) => isGLP(fill.treatment.name));
+  const isMultiRx = flattenedFills.length > 1;
 
   // note: prices are only for Sesame, non-GLP-1 right now
-  const showPriceToggle = (orgSettings.enablePricing && !orderContainsGLP1Medication) ?? false;
+  const showPriceToggle =
+    (orgSettings.enablePricing && !orderContainsGLP1Medication && !isMultiRx) ?? false;
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
