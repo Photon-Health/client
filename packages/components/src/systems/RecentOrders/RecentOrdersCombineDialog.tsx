@@ -13,7 +13,7 @@ import { Address } from '../PatientInfo';
 import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 import { createMutation } from '../../utils/createMutation';
 import { Order } from '@photonhealth/sdk/dist/types';
-import { usePrescribe } from '../PrescribeProvider';
+import { useDraftPrescriptions } from '../DraftPrescriptions';
 
 const COMBINE_ORDERS_MUTATION = gql`
   mutation RecentOrdersCombineDialogUpdateOrder($orderId: ID!, $fills: [FillInput!]!) {
@@ -66,12 +66,9 @@ type VariablesCreateOrder = {
 
 export default function RecentOrdersCombineDialog() {
   let ref: Ref<any> | undefined;
-  const prescribeContext = usePrescribe();
-  if (!prescribeContext) {
-    throw new Error('RecentOrdersCombineDialog must be wrapped with PrescribeProvider');
-  }
+  const draftPrescriptionsContext = useDraftPrescriptions();
 
-  const { prescriptions, prescriptionIds } = prescribeContext;
+  const { draftPrescriptions } = draftPrescriptionsContext;
 
   const client = usePhotonClient();
   const [state, actions] = useRecentOrders();
@@ -81,14 +78,14 @@ export default function RecentOrdersCombineDialog() {
   const [combineOrdersMutation] = createMutation<SuccessCombineOrders, VariablesCombineOrders>(
     COMBINE_ORDERS_MUTATION,
     {
-      client: client!.apollo
+      client: client.apollo
     }
   );
 
   const [createOrderMutation] = createMutation<SuccessCreateOrder, VariablesCreateOrder>(
     CREATE_ORDER_MUTATION,
     {
-      client: client!.apollo
+      client: client.apollo
     }
   );
 
@@ -142,7 +139,7 @@ export default function RecentOrdersCombineDialog() {
     setIsCombiningOrders(true);
     dispatchDatadogAction('prescribe-combine-dialog-combining', {}, ref);
 
-    const fills = prescriptionIds().map((id) => ({ prescriptionId: id }));
+    const fills = draftPrescriptions().map((prescription) => ({ prescriptionId: prescription.id }));
     try {
       // Add rxs to the existing order
       const updatedOrder = await combineOrdersMutation({
@@ -230,7 +227,7 @@ export default function RecentOrdersCombineDialog() {
             </Text>
             <div class="border border-solid border-gray-200 rounded-lg bg-gray-50 py-3 px-4 flex flex-col gap-4">
               {
-                <For each={prescriptions()}>
+                <For each={draftPrescriptions()}>
                   {(draft) => (
                     <div>
                       <Text size="sm">{draft.treatment.name}</Text>

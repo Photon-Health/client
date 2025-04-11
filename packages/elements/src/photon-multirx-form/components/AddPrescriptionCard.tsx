@@ -8,8 +8,7 @@ import {
   ScreeningAlertType,
   Text,
   triggerToast,
-  usePrescribe,
-  useRecentOrders
+  usePrescribe
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { DispenseUnit, Medication, Prescription } from '@photonhealth/sdk/dist/types';
@@ -25,6 +24,7 @@ import { GraphQLFormattedError } from 'graphql';
 import { createSignal, onMount, Show } from 'solid-js';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
+import { TryCreatePrescriptionTemplateOptions } from '@photonhealth/components/src/systems/PrescribeProvider';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -64,12 +64,11 @@ export const AddPrescriptionCard = (props: {
   if (!prescribeContext) {
     throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
   }
-  const { createPrescription, addPrescriptionToTemplates, prescriptions } = prescribeContext;
+  const { tryCreatePrescription } = prescribeContext;
 
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
-  const [, recentOrdersActions] = useRecentOrders();
   const [searchText, setSearchText] = createSignal<string>('');
   const [isLoading, setIsLoading] = createSignal(false);
   let ref: any;
@@ -105,113 +104,74 @@ export const AddPrescriptionCard = (props: {
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
 
-    const isPrescriptionAlreadyAdded = isTreatmentInDraftPrescriptions(
-      props.store.treatment?.value?.id,
-      prescriptions()
-    );
-
-    if (isPrescriptionAlreadyAdded) {
-      setIsLoading(false);
-      triggerToast({
-        status: 'error',
-        body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
-      });
-      return;
-    } else if (!errorsPresent) {
-      // check if duplicate in recent orders
-      const duplicate = recentOrdersActions.checkDuplicateFill(props.store.treatment.value.name);
-
-      const prescriptionArgs: PrescriptionFormData = {
-        effectiveDate: props.store.effectiveDate.value,
-        treatment: { id: props.store.treatment.value.id },
-        dispenseAsWritten: props.store.dispenseAsWritten.value,
-        dispenseQuantity: props.store.dispenseQuantity.value,
-        dispenseUnit: props.store.dispenseUnit.value,
-        daysSupply: props.store.daysSupply.value,
-        instructions: props.store.instructions.value,
-        notes: props.store.notes.value,
-        fillsAllowed: props.store.refillsInput.value + 1,
-        // TODO: set this from template-overrides. can we stop using the props.store, with this param as a starting point?
-        diagnoseCodes: []
-      };
-
-      const addDraftPrescription = async () => {
-        // create the prescription
-        let createdPrescription: Prescription | undefined = undefined;
-        try {
-          createdPrescription = await createPrescription(prescriptionArgs);
-        } catch (err) {
-          return triggerToast({
-            status: 'error',
-            header: 'Error Adding Prescription',
-            body: 'There was an issue adding the prescription. Please try again.'
-          });
-        }
-
-        if ((props.store.addToTemplates?.value ?? false) && !!props.store.catalogId?.value) {
-          try {
-            await addPrescriptionToTemplates(
-              prescriptionArgs,
-              props.store.catalogId.value,
-              props.store.templateName?.value,
-              props.store.patient?.value?.id
-            );
-            triggerToast({
-              status: 'success',
-              header: 'Personal Template Saved'
-            });
-          } catch (err) {
-            dispatchOrderError([err as GraphQLFormattedError]);
-          }
-        }
-
-        triggerToast({
-          status: 'success',
-          header: 'Prescription Added',
-          body: 'You can send this order or add another prescription before sending it'
-        });
-
-        props.onDraftPrescriptionCreated(createdPrescription);
-        props.screenDraftedPrescriptions();
-
-        // RESET THE FORM
-        props.actions.updateFormValue({
-          key: 'effectiveDate',
-          value: format(new Date(), 'yyyy-MM-dd').toString()
-        });
-        props.actions.clearKeys([
-          'treatment',
-          'dispenseAsWritten',
-          'dispenseQuantity',
-          'dispenseUnit',
-          'daysSupply',
-          'refillsInput',
-          'instructions',
-          'notes',
-          'templateName',
-          'addToTemplates'
-        ]);
-        setOffCatalog(undefined);
-        clearForm(props.actions, props.prefillNotes ? { notes: props.prefillNotes } : undefined);
-
-        setSearchText('');
-        setIsLoading(false);
-      };
-
-      if (props.enableCombineAndDuplicate && duplicate) {
-        // if there's a duplicate order, check first if they want to report an issue
-        return recentOrdersActions.setIsDuplicateDialogOpen(true, duplicate, addDraftPrescription);
-      }
-
-      // otherwise add it to the draft prescriptions list
-      addDraftPrescription();
-    } else {
+    if (errorsPresent) {
       setIsLoading(false);
       triggerToast({
         status: 'error',
         body: 'Some items in the form are incomplete, please check for errors'
       });
+      return;
     }
+
+    const prescriptionFormData: PrescriptionFormData = {
+      effectiveDate: props.store.effectiveDate.value,
+      treatment: { id: props.store.treatment.value.id, name: props.store.treatment.value.name },
+      dispenseAsWritten: props.store.dispenseAsWritten.value,
+      dispenseQuantity: props.store.dispenseQuantity.value,
+      dispenseUnit: props.store.dispenseUnit.value,
+      daysSupply: props.store.daysSupply.value,
+      instructions: props.store.instructions.value,
+      notes: props.store.notes.value,
+      fillsAllowed: props.store.refillsInput.value + 1,
+      // TODO: set this from template-overrides. can we stop using the props.store, with this param as a starting point?
+      diagnoseCodes: []
+    };
+
+    let createdPrescription: Prescription | null = null;
+    try {
+      const options: TryCreatePrescriptionTemplateOptions = {
+        addToTemplates: props.store.addToTemplates?.value ?? false,
+        templateName: props.store.templateName?.value,
+        catalogId: props.store.catalogId?.value
+      };
+      createdPrescription = await tryCreatePrescription(prescriptionFormData, options);
+      if (createdPrescription) {
+        props.onDraftPrescriptionCreated(createdPrescription);
+      }
+    } catch (err) {
+      dispatchOrderError([err as GraphQLFormattedError]);
+    } finally {
+      setIsLoading(false);
+    }
+
+    if (!createdPrescription) {
+      return;
+    }
+
+    // todo: move screening up to prescribeContext (for med history Refill button clicks)
+    props.screenDraftedPrescriptions();
+
+    // RESET THE FORM
+    props.actions.updateFormValue({
+      key: 'effectiveDate',
+      value: format(new Date(), 'yyyy-MM-dd').toString()
+    });
+    props.actions.clearKeys([
+      'treatment',
+      'dispenseAsWritten',
+      'dispenseQuantity',
+      'dispenseUnit',
+      'daysSupply',
+      'refillsInput',
+      'instructions',
+      'notes',
+      'templateName',
+      'addToTemplates'
+    ]);
+    setOffCatalog(undefined);
+    clearForm(props.actions, props.prefillNotes ? { notes: props.prefillNotes } : undefined);
+
+    setSearchText('');
   };
 
   return (
@@ -511,10 +471,3 @@ export const AddPrescriptionCard = (props: {
     </div>
   );
 };
-
-export function isTreatmentInDraftPrescriptions(
-  treatmentId: string,
-  draftedPrescriptions: { treatment: { id: string } }[]
-) {
-  return draftedPrescriptions.some((draft) => draft.treatment.id === treatmentId);
-}

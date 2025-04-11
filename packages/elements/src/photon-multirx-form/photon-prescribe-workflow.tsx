@@ -23,7 +23,7 @@ import {
   triggerToast,
   usePhoton,
   useRecentOrders,
-  usePrescribe,
+  useDraftPrescriptions,
   TemplateOverrides
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
@@ -104,11 +104,11 @@ export const ScreenDraftedPrescriptionsQuery = gql`
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
 
-  const prescribeContext = usePrescribe();
-  if (!prescribeContext) {
-    throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
-  }
-  const { prescriptions, prescriptionIds } = prescribeContext;
+  const { draftPrescriptions } = useDraftPrescriptions();
+
+  const prescriptionIds = createMemo(() =>
+    draftPrescriptions().map((prescription) => prescription.id)
+  );
 
   const client = usePhoton();
   const [showForm, setShowForm] = createSignal<boolean>(
@@ -225,7 +225,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     const inProgressDraftedPrescriptionTreatmentId = props.formStore.treatment?.value?.id;
 
     // and then get the ones already added to the order (but not persisted)
-    const draftedPrescriptions: ScreenablePrescription[] = prescriptions().map(
+    const draftedPrescriptions: ScreenablePrescription[] = draftPrescriptions().map(
       toScreenableDraftPrescription
     );
 
@@ -346,7 +346,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
 
       try {
-        dispatchPrescriptionsCreated(prescriptions());
+        // this should eventually just reflect the prescription state
+        // changing from 'draft' to 'active'
+        dispatchPrescriptionsCreated(draftPrescriptions());
 
         if (props.enableOrder) {
           if (
@@ -374,7 +376,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
               awaitRefetchQueries: false
             });
           }
-          console.log('prescriptionIds', prescriptionIds());
+
           const { data: orderData, errors } = await orderMutation({
             variables: {
               ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
@@ -414,6 +416,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   };
 
   // decide whether to show the combine modal or submit the form
+  // todo: test combine scenario again
   const combineOrSubmit = () => {
     // if we have alerts we'll want the prescriber to acknowledge them
     // first, unless we're overriding them
@@ -436,7 +439,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   createEffect(() => {
     dispatchPrescriptionsFormValidate(
-      Boolean(prescriptions().length > 0 && props.formStore.patient?.value)
+      Boolean(draftPrescriptions().length > 0 && props.formStore.patient?.value)
     );
   });
 

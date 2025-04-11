@@ -1,14 +1,13 @@
-import { PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
-import { createSignal, For, JSXElement, createEffect, Show } from 'solid-js';
+import { Prescription, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
+import { For, JSXElement, Show } from 'solid-js';
 import Banner from '../../particles/Banner';
 import Card from '../../particles/Card';
 import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
 import formatRxString from '../../utils/formatRxString';
-import { usePhotonClient } from '../SDKProvider';
-import generateDraftPrescription from './utils/generateDraftPrescription';
 import { ScreeningAlerts, ScreeningAlertType } from '../ScreeningAlerts';
-import { GetPrescription } from '../../fetch/queries';
+import { useDraftPrescriptions } from './DraftPrescriptionsProvider';
+import { usePrescribe } from '../PrescribeProvider';
 
 export type DraftPrescription = PrescriptionTemplate & {
   refillsInput?: number;
@@ -37,8 +36,7 @@ const DraftPrescription = (props: {
 );
 
 interface DraftPrescriptionsProps {
-  prescriptionIds: string[];
-  handleEdit?: (prescription: DraftPrescription) => void;
+  handleEdit?: (prescription: Prescription) => void;
   handleDelete?: (prescriptionId: string) => void;
   error?: string;
   screeningAlerts: ScreeningAlertType[];
@@ -46,57 +44,13 @@ interface DraftPrescriptionsProps {
 }
 
 export function DraftPrescriptions(props: DraftPrescriptionsProps) {
-  const [isLoading, setIsLoading] = createSignal<boolean>(true);
-  const [draftPrescriptions, setDraftPrescriptions] = createSignal<DraftPrescription[]>([]); // todo: use PrescribeContext.prescriptions instead of re-fetching
-  const client = usePhotonClient();
-
-  createEffect(() => {
-    if (props.prescriptionIds.length > 0) {
-      fetchDrafts();
-    } else {
-      setDraftPrescriptions([]);
-      setIsLoading(false);
-    }
-  });
-
-  async function fetchDrafts() {
-    setIsLoading(true);
-
-    // fetch prescriptions
-    if (props.prescriptionIds.length > 0) {
-      // for each prescriptionId, find the prescription by id and set the draft prescription
-      const prescriptions = await Promise.allSettled(
-        props.prescriptionIds.map(async (prescriptionId: string) => {
-          const { data } = await client!.apollo.query({
-            query: GetPrescription,
-            variables: {
-              id: prescriptionId
-            }
-          });
-          const prescription = data?.prescription;
-
-          if (!prescription) {
-            return console.error(`Invalid prescription id ${prescriptionId}`);
-          }
-
-          return generateDraftPrescription(prescription);
-        })
-      );
-
-      const filteredPrescriptions = prescriptions
-        .map((p) => (p.status === 'fulfilled' ? p.value : null))
-        .filter((p): p is DraftPrescription => p !== null);
-
-      setDraftPrescriptions(filteredPrescriptions);
-    }
-    setIsLoading(false);
-  }
+  const { draftPrescriptions } = useDraftPrescriptions();
+  const { isLoadingPrefills, prescriptionIds } = usePrescribe();
 
   return (
     <div class="space-y-3">
-      {/* Show when fetching prescriptions */}
-      <Show when={isLoading()}>
-        <For each={props.prescriptionIds}>
+      <Show when={isLoadingPrefills()}>
+        <For each={prescriptionIds()}>
           {() => (
             <DraftPrescription
               LeftChildren={
@@ -110,7 +64,7 @@ export function DraftPrescriptions(props: DraftPrescriptionsProps) {
         </For>
       </Show>
       {/* Show when No Drafts */}
-      <Show when={!isLoading() && props.prescriptionIds.length === 0}>
+      <Show when={!isLoadingPrefills() && prescriptionIds().length === 0}>
         <Banner status="info">
           {props.enableOrder
             ? 'Add prescription(s) before sending an order'
@@ -119,9 +73,9 @@ export function DraftPrescriptions(props: DraftPrescriptionsProps) {
       </Show>
 
       {/* Show when Drafts */}
-      <Show when={!isLoading() && draftPrescriptions().length > 0}>
+      <Show when={!isLoadingPrefills() && draftPrescriptions().length > 0}>
         <For each={draftPrescriptions()}>
-          {(draft: DraftPrescription) => {
+          {(draft) => {
             // we'll want to ensure that we're only rendering
             // alerts for the prescription being rendered
             const screeningAlertsForDraft = props.screeningAlerts.filter(

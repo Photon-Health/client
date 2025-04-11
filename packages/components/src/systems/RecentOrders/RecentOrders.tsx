@@ -14,7 +14,6 @@ import {
   Prescription as FullPrescription,
   OrderState
 } from '@photonhealth/sdk/dist/types';
-import { usePrescribe } from '../PrescribeProvider';
 
 const GetPatientOrdersQuery = gql`
   query GetPatientOrders($patientId: ID!) {
@@ -94,7 +93,8 @@ type RecentOrdersState = {
   // if provider chooses not to combine the order, call this to create a new order
   createOrder?: () => void;
   // if the user clicks "continue" on the duplicate dialog, we need to call the callback to add to draft prescriptions
-  duplicateDialogContinueCb?: () => void;
+  duplicateDialogContinueCb: () => void;
+  duplicateDialogCancelCb: () => void;
   // reference for the order that the user clicked
   orderWithIssue?: Order;
   // reference for the fill with a duplicate treatment name
@@ -106,7 +106,8 @@ type RecentOrdersActions = {
   setIsDuplicateDialogOpen: (
     isOpen: boolean,
     duplicate?: { order: Order; fill: Fill },
-    continueCb?: () => void
+    continueCb?: () => void,
+    cancelCb?: () => void
   ) => void;
   setIsIssueDialogOpen: (isOpen: boolean, orderWithIssue?: Order) => void;
   checkDuplicateFill: (treatmentName: string) => { order: Order; fill: Fill } | undefined;
@@ -115,22 +116,7 @@ type RecentOrdersActions = {
 
 type RecentOrdersContextValue = [RecentOrdersState, RecentOrdersActions];
 
-const RecentOrdersContext = createContext<RecentOrdersContextValue>([
-  {
-    orders: [],
-    isLoading: false,
-    isCombineDialogOpen: false,
-    isDuplicateDialogOpen: false,
-    isIssueDialogOpen: false
-  },
-  {
-    setIsCombineDialogOpen: () => undefined,
-    setIsDuplicateDialogOpen: () => undefined,
-    setIsIssueDialogOpen: () => undefined,
-    checkDuplicateFill: () => undefined,
-    hasRoutingOrder: () => false
-  }
-]);
+const RecentOrdersContext = createContext<RecentOrdersContextValue>();
 
 interface SDKProviderProps {
   patientId: string;
@@ -139,11 +125,6 @@ interface SDKProviderProps {
 
 function RecentOrders(props: SDKProviderProps) {
   const client = usePhotonClient();
-  // const prescribeContext = usePrescribe();
-  // if (!prescribeContext) {
-  //   throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
-  // }
-  // const { prescriptionIds } = prescribeContext;
 
   const [state, setState] = createStore<RecentOrdersState>({
     orders: [],
@@ -151,7 +132,8 @@ function RecentOrders(props: SDKProviderProps) {
     isCombineDialogOpen: false,
     isDuplicateDialogOpen: false,
     isIssueDialogOpen: false,
-    duplicateDialogContinueCb: () => undefined
+    duplicateDialogContinueCb: () => undefined,
+    duplicateDialogCancelCb: () => undefined
   });
 
   // we need to make this reactive because we need to re-query when the patientId changes
@@ -160,7 +142,7 @@ function RecentOrders(props: SDKProviderProps) {
       patientId: props.patientId
     },
     skip: !props.patientId,
-    client: client!.apollo,
+    client: client.apollo,
     fetchPolicy: 'network-only'
   }));
   const data = createQuery<GetPatientOrdersResponse, GetPatientOrdersVars>(
@@ -178,12 +160,15 @@ function RecentOrders(props: SDKProviderProps) {
           ...(address ? { address } : { address: undefined })
         });
       },
-      setIsDuplicateDialogOpen(isOpen, duplicate, continueCb) {
+      setIsDuplicateDialogOpen(isOpen, duplicate, continueCb, cancelCb) {
         setState({
           isDuplicateDialogOpen: isOpen,
           ...(continueCb
             ? { duplicateDialogContinueCb: continueCb }
             : { duplicateDialogContinueCb: undefined }),
+          ...(cancelCb
+            ? { duplicateDialogCancelCb: cancelCb }
+            : { duplicateDialogCancelCb: undefined }),
           ...(duplicate ? { duplicateFill: duplicate.fill } : {}),
           ...(duplicate ? { orderWithIssue: duplicate.order } : {})
         });
@@ -208,6 +193,7 @@ function RecentOrders(props: SDKProviderProps) {
         return undefined;
       },
       hasRoutingOrder() {
+        console.log({ recentOrders: state.orders });
         return state.orders.some((order) => order.state === 'ROUTING');
       }
     }
@@ -280,7 +266,11 @@ function RecentOrders(props: SDKProviderProps) {
 }
 
 export function useRecentOrders() {
-  return useContext(RecentOrdersContext);
+  const context = useContext(RecentOrdersContext);
+  if (!context) {
+    throw new Error('useRecentOrders must be used within RecentOrdersContext');
+  }
+  return context;
 }
 
 RecentOrders.Card = RecentOrdersCard;

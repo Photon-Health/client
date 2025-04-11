@@ -16,31 +16,21 @@ import {
   GetPrescription,
   GetTemplatesFromCatalogs
 } from '../../fetch/queries';
-import { FetchResult } from '@apollo/client/core';
-
-type CreatePrescriptionResult =
-  | { data: Prescription; error: null }
-  | {
-      data: null;
-      error: { isPrescriptionAlreadyAdded: boolean };
-    };
+import { triggerToast, useRecentOrders } from '../../index';
+import { useDraftPrescriptions } from '../DraftPrescriptions';
 
 const PrescribeContext = createContext<{
   // values
-  prescriptions: Accessor<Prescription[]>;
   prescriptionIds: Accessor<string[]>;
-  isLoading: Accessor<boolean>;
+  isLoadingPrefills: Accessor<boolean>;
 
   // actions
   setEditingPrescription: (id: string) => void;
   deletePrescription: (id: string) => void;
-  createPrescription: (prescription: PrescriptionFormData) => Promise<CreatePrescriptionResult>;
-  addPrescriptionToTemplates: (
-    prescription: PrescriptionFormData,
-    catalogId: string,
-    templateName?: string,
-    isPrivate?: boolean
-  ) => Promise<FetchResult>;
+  tryCreatePrescription: (
+    prescriptionFormData: PrescriptionFormData,
+    options?: TryCreatePrescriptionTemplateOptions
+  ) => Promise<Prescription>;
 }>();
 
 export type TemplateOverrides = {
@@ -60,6 +50,7 @@ export type PrescriptionFormData = {
   effectiveDate: string;
   treatment: {
     id: string;
+    name: string;
   };
   dispenseAsWritten: boolean;
   dispenseQuantity: number;
@@ -79,6 +70,7 @@ interface PrescribeProviderProps {
   templateOverrides: TemplateOverrides;
   prescriptionIdsPrefill: string[];
   patientId: string;
+  enableCombineAndDuplicate: boolean;
 }
 
 const transformPrescription = (prescription: PrescriptionFormData, patientId: string) => ({
@@ -97,14 +89,16 @@ const transformPrescription = (prescription: PrescriptionFormData, patientId: st
 });
 
 export const PrescribeProvider = (props: PrescribeProviderProps) => {
-  // const [prescriptionIds, setPrescriptionIds] = createSignal<string[]>([]);
-  const [prescriptions, setPrescriptions] = createSignal<Prescription[]>([]);
-  const [isLoading, setIsLoading] = createSignal<boolean>(false);
+  const [isLoadingPrefills, setIsLoadingPrefills] = createSignal<boolean>(false);
   const [hasCreatedPrescriptions, setHasCreatedPrescriptions] = createSignal<boolean>(false);
 
   const client = usePhotonClient();
+  const { draftPrescriptions, setDraftPrescriptions } = useDraftPrescriptions();
+  const [, recentOrdersActions] = useRecentOrders();
 
-  const prescriptionIds = createMemo(() => prescriptions().map((prescription) => prescription.id));
+  const prescriptionIds = createMemo(() =>
+    draftPrescriptions().map((prescription) => prescription.id)
+  );
 
   // Prefill new prescriptions based on templateIds or prescriptionIds when we get a patientId
   createEffect(() => {
@@ -122,14 +116,14 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
 
   async function createPrescriptionsFromIds() {
     setHasCreatedPrescriptions(true);
-    setIsLoading(true);
+    setIsLoadingPrefills(true);
     const prescriptionsToCreate: PrescriptionFormData[] = [];
 
     // fetch templates
     if (props.templateIdsPrefill.length > 0) {
       let catalogs;
       try {
-        const { data } = await client!.apollo.query({ query: GetTemplatesFromCatalogs });
+        const { data } = await client.apollo.query({ query: GetTemplatesFromCatalogs });
         catalogs = data?.catalogs;
       } catch (error) {
         console.error('Error fetching templates:', error);
@@ -161,6 +155,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
             !template?.fillsAllowed ||
             !template?.instructions
           ) {
+            // todo: better error handling; show toast? throw error?
             console.error(`Template is missing required prescription details ${templateId}`);
           } else {
             // if template.id is in templateOverrides, apply the overrides
@@ -168,7 +163,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
             const updatedTemplate = templateOverride
               ? { ...template, ...templateOverride }
               : template;
-            console.log('!!!!!!!!!!!!! updatedTemplate', updatedTemplate);
             prescriptionsToCreate.push(updatedTemplate);
           }
         });
@@ -180,7 +174,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
       try {
         const fetchedPrescriptions = await Promise.all(
           props.prescriptionIdsPrefill.map(async (prescriptionId: string) => {
-            const { data } = await client!.apollo.query({
+            const { data } = await client.apollo.query({
               query: GetPrescription,
               variables: { id: prescriptionId }
             });
@@ -194,69 +188,130 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     }
 
     // create prescriptions from template and prescription ids
+    // todo: error handling
     await Promise.all(
       prescriptionsToCreate.map(async (prescription: PrescriptionFormData) =>
-        createPrescription(prescription)
+        tryCreatePrescription(prescription)
       )
     );
-    setIsLoading(false);
+    setIsLoadingPrefills(false);
   }
 
-  const setInitialPrescriptionsAndTemplates = () => {
-    console.log('todo: setInitialPrescriptionsAndTemplates');
-  };
-
-  const createPrescription = async (
-    prescription: PrescriptionFormData
-  ): Promise<CreatePrescriptionResult> => {
+  const tryCreatePrescription = async (
+    prescriptionFormData: PrescriptionFormData,
+    options: TryCreatePrescriptionTemplateOptions = {}
+  ): Promise<Prescription> => {
     const isPrescriptionAlreadyAdded = isTreatmentInDraftPrescriptions(
-      prescription.treatment.id,
-      prescriptions()
+      prescriptionFormData.treatment.id,
+      draftPrescriptions()
     );
 
     if (isPrescriptionAlreadyAdded) {
-      return { data: null, error: { isPrescriptionAlreadyAdded: true } };
+      triggerToast({
+        status: 'error',
+        body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
+      });
+
+      throw new Error('Prescription already added');
     }
 
-    try {
-      console.log({ prescriptionFormData: prescription });
-      const res = await client!.apollo.mutate({
-        mutation: CreatePrescription,
-        variables: transformPrescription(prescription, props.patientId)
+    const duplicateFill = recentOrdersActions.checkDuplicateFill(
+      prescriptionFormData.treatment.name
+    );
+
+    console.log({ enableCombineAndDuplicate: props.enableCombineAndDuplicate, duplicateFill });
+    if (props.enableCombineAndDuplicate && duplicateFill) {
+      // if there's a duplicate order, check first if they want to report an issue
+      // todo: can we pass the promise down instead of reject/resolve callbacks?
+      let resolver: (result: Prescription) => void;
+      let rejecter: () => void;
+      const promise = new Promise<Prescription>((resolve, reject) => {
+        resolver = resolve;
+        rejecter = reject;
       });
-      const createdPrescription = res.data.createPrescription;
-      console.log({ createdPrescription });
-      setPrescriptions((prev) => [...prev, createdPrescription]);
-      return {
-        data: createdPrescription as Prescription,
-        error: null
-      };
+      recentOrdersActions.setIsDuplicateDialogOpen(
+        true,
+        duplicateFill,
+        async () => {
+          console.log('resolver');
+          const result = await createPrescriptionOnApi(prescriptionFormData, options);
+          resolver(result);
+        },
+        () => {
+          console.log('rejector');
+          rejecter();
+        }
+      );
+      return promise;
+    }
+
+    return await createPrescriptionOnApi(prescriptionFormData, options);
+  };
+
+  const createPrescriptionOnApi = async (
+    prescriptionFormData: PrescriptionFormData,
+    options: TryCreatePrescriptionTemplateOptions = { addToTemplates: false }
+  ): Promise<Prescription> => {
+    let createdPrescription: Prescription | null = null;
+    try {
+      const res = await client.apollo.mutate({
+        mutation: CreatePrescription,
+        variables: transformPrescription(prescriptionFormData, props.patientId)
+      });
+      createdPrescription = res.data.createPrescription as Prescription;
     } catch (error) {
       console.error('Mutation error:', error);
+      triggerToast({
+        status: 'error',
+        header: 'Error Adding Prescription',
+        body: 'There was an issue adding the prescription. Please try again.'
+      });
       throw error;
     }
+
+    setDraftPrescriptions((prev) => [...prev, createdPrescription]);
+
+    if (options?.addToTemplates && options?.catalogId != null) {
+      await createPrescriptionTemplateOnApi(
+        prescriptionFormData,
+        options.catalogId,
+        options.templateName
+      );
+
+      triggerToast({
+        status: 'success',
+        header: 'Personal Template Saved'
+      });
+    }
+
+    triggerToast({
+      status: 'success',
+      header: 'Prescription Added',
+      body: 'You can send this order or add another prescription before sending it'
+    });
+
+    return createdPrescription;
   };
 
   const setEditingPrescription = (toEditId: string) => {
-    setPrescriptions((prev) => prev.filter((rx) => rx.id !== toEditId));
+    setDraftPrescriptions((prev) => prev.filter((rx) => rx.id !== toEditId));
   };
 
   const deletePrescription = (toDeleteId: string) => {
-    setPrescriptions((prev) => prev.filter((rx) => rx.id !== toDeleteId));
+    setDraftPrescriptions((prev) => prev.filter((rx) => rx.id !== toDeleteId));
   };
 
-  const addPrescriptionToTemplates = async (
+  const createPrescriptionTemplateOnApi = async (
     prescription: PrescriptionFormData,
     catalogId: string,
-    templateName = '',
-    isPrivate = true
+    templateName = ''
   ) => {
-    const res = await client!.apollo.mutate({
+    const res = await client.apollo.mutate({
       mutation: CreatePrescriptionTemplate,
       variables: {
         ...transformPrescription(prescription, props.patientId),
         catalogId,
-        isPrivate,
+        isPrivate: true,
         ...(templateName ? { name: templateName } : {})
       }
     });
@@ -266,21 +321,22 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const value = {
     // values
     prescriptionIds,
-    prescriptions,
-    isLoading,
+    isLoadingPrefills,
     // actions
-    setInitialPrescriptionsAndTemplates,
-    createPrescription,
+    tryCreatePrescription,
     setEditingPrescription,
-    deletePrescription,
-    addPrescriptionToTemplates
+    deletePrescription
   };
 
   return <PrescribeContext.Provider value={value}>{props.children}</PrescribeContext.Provider>;
 };
 
 export const usePrescribe = () => {
-  return useContext(PrescribeContext);
+  const context = useContext(PrescribeContext);
+  if (!context) {
+    throw new Error('usePrescribe must be used within the PrescribeProvider');
+  }
+  return context;
 };
 
 export function isTreatmentInDraftPrescriptions(
@@ -289,3 +345,9 @@ export function isTreatmentInDraftPrescriptions(
 ) {
   return draftedPrescriptions.some((draft) => draft.treatment.id === treatmentId);
 }
+
+export type TryCreatePrescriptionTemplateOptions = {
+  addToTemplates?: boolean;
+  templateName?: string;
+  catalogId?: string;
+};

@@ -4,8 +4,8 @@ import {
   formatPrescriptionDetails,
   generateString,
   Icon,
-  PrescriptionFormData,
   Text,
+  usePrescribe,
   useRecentOrders
 } from '../../';
 import { Treatment } from '@photonhealth/sdk/dist/types';
@@ -26,11 +26,11 @@ export type PatientMedHistoryTableProps = {
   baseURL: string;
   onSortOrderToggle: () => void;
   sortOrder: 'asc' | 'desc';
-  onRefillClick: (prescription: PrescriptionFormData) => Promise<void>;
 };
 
 export default function PatientMedHistoryTable(props: PatientMedHistoryTableProps) {
   const [ordersState] = useRecentOrders();
+  const { tryCreatePrescription } = usePrescribe();
   const [isCreatingPrescriptionId, setIsCreatingPrescriptionId] = createSignal<string | undefined>(
     undefined
   );
@@ -55,13 +55,16 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
 
       console.log('refilling rx with diagnoses: ', prescription.diagnoses);
 
-      await props.onRefillClick({
-        ...prescription,
-        treatment,
-        effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
-        diagnoseCodes: prescription.diagnoses?.map((diagnosis) => diagnosis.code) || []
-      });
-      setIsCreatingPrescriptionId(undefined);
+      try {
+        await tryCreatePrescription({
+          ...prescription,
+          treatment,
+          effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
+          diagnoseCodes: prescription.diagnoses?.map((diagnosis) => diagnosis.code) || []
+        });
+      } finally {
+        setIsCreatingPrescriptionId(undefined);
+      }
     }
   };
 

@@ -1,10 +1,11 @@
 import { createSignal, Ref } from 'solid-js';
-import { DraftPrescription, DraftPrescriptions } from '@photonhealth/components';
+import { DraftPrescriptions } from '@photonhealth/components';
 import { Card, Text, usePrescribe } from '@photonhealth/components';
 import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { PhotonTooltip } from '../../photon-tooltip';
 import { ScreeningAlertType } from '@photonhealth/components';
+import { Prescription } from '@photonhealth/sdk/dist/types';
 
 export const DraftPrescriptionCard = (props: {
   templateIds: string[];
@@ -23,11 +24,7 @@ export const DraftPrescriptionCard = (props: {
   const [editDialogOpen, setEditDialogOpen] = createSignal<boolean>(false);
   const [editDraft, setEditDraft] = createSignal<any>(undefined);
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
-  const prescribeContext = usePrescribe();
-  if (!prescribeContext) {
-    throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
-  }
-  const { prescriptionIds, setEditingPrescription, deletePrescription } = prescribeContext;
+  const { prescriptionIds, setEditingPrescription, deletePrescription } = usePrescribe();
 
   const dispatchPrescriptionDraftDeleted = (id: string) => {
     const event = new CustomEvent('photon-draft-prescription-deleted', {
@@ -63,7 +60,7 @@ export const DraftPrescriptionCard = (props: {
     }
   };
 
-  const checkEditPrescription = (draft: DraftPrescription) => {
+  const checkEditPrescription = (draft: Prescription) => {
     setEditDraft(draft);
 
     if (!props.store['treatment'].value) {
@@ -147,7 +144,6 @@ export const DraftPrescriptionCard = (props: {
           />
         </div>
         <DraftPrescriptions
-          prescriptionIds={prescriptionIds()}
           handleDelete={(draftId: string) => {
             setDeleteDialogOpen(true);
             setDeleteDraftId(draftId);
