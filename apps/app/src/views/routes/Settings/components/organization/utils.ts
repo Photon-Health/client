@@ -170,7 +170,7 @@ export async function uploadBrandLogo({ env, file }: { env: Env; file: File }) {
   const formData = new FormData();
   formData.append('file', file, file.name);
 
-  const response = await fetch(`${apiUrl}/logo/upload`, {
+  const response = await fetch(`${apiUrl}/uploads/logo`, {
     method: 'POST',
     body: formData
   });
