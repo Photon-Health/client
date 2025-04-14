@@ -52,7 +52,6 @@ export default {
           baseURL={'test-base-url.com/'}
           sortOrder={'desc'}
           onSortOrderToggle={() => {}}
-          onRefillClick={() => Promise.resolve()}
         ></PatientMedHistoryTable>
       </div>
     );
