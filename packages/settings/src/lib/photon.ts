@@ -20,7 +20,8 @@ import {
   HEALTHWAREHOUSE_PHARMACY_ID,
   OPENLOOP_PHARMACY_ID,
   GIFTHEALTH_PHARMACY_ID,
-  DANIA_PHARMACY_ID
+  DANIA_PHARMACY_ID,
+  TRUEPILL_LILLY_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -304,7 +305,9 @@ const organizationSettings: {
   // Ognomy
   org_2B1yxV6yS9ROqV1g: {
     logo: 'ognomy_logo.webp',
-    accentColor: '#0a7ade'
+    accentColor: '#0a7ade',
+    mailOrder: true,
+    mailOrderProviders: [GIFTHEALTH_PHARMACY_ID, TRUEPILL_LILLY_PHARMACY_ID, AMAZON_PHARMACY_ID]
   },
   // Carbon Health
   org_Dye8T9VAM1GHjjzS: {
