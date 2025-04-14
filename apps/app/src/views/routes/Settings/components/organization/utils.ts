@@ -1,4 +1,6 @@
+import { Env } from '@photonhealth/sdk';
 import { OrganizationSettings } from 'apps/app/src/gql/graphql';
+import { clinicalApiUrl } from 'packages/sdk/src/utils';
 import * as yup from 'yup';
 
 export const organizationSettingsFormSchema = yup.object({
@@ -160,4 +162,19 @@ export function createInitialOrgSettingsFormValues(
       patientFeaturedPharmacyName: args.patientUx?.patientFeaturedPharmacyName ?? undefined
     }
   };
+}
+
+export async function uploadBrandLogo({ env, file }: { env: Env; file: File }) {
+  const apiUrl = clinicalApiUrl[env];
+
+  const formData = new FormData();
+  formData.append('file', file, file.name);
+
+  const response = await fetch(`${apiUrl}/logo/upload`, {
+    method: 'POST',
+    body: formData
+  });
+  const data = await response.json();
+
+  return data.url;
 }

@@ -12,6 +12,9 @@ import {
 import { ErrorMessage, Field, FieldProps, FormikErrors } from 'formik';
 import { ChangeEvent } from 'react';
 import { OrganizationSettingsFormValues } from './utils';
+import { FileUploader } from '../../../../components/FileUpload';
+import { usePhoton } from 'packages/react/src/provider';
+import { uploadBrandLogo } from './utils';
 
 const InputField = ({ field }: FieldProps) => <Input {...field} />;
 
@@ -33,6 +36,7 @@ export function OrganizationSettingsForm({
     value: OrganizationSettingsFormValues[keyof OrganizationSettingsFormValues]
   ) => void;
 }) {
+  const { env } = usePhoton();
   return (
     <form>
       <VStack spacing={6} alignItems="flex-start">
@@ -40,7 +44,7 @@ export function OrganizationSettingsForm({
           <Text fontSize="lg" fontWeight="medium">
             Branding
           </Text>
-          <Flex gap={4} w="50%">
+          <Flex gap={4} w="100%" maxW={{ base: '100%', md: '50%' }} flexDirection="column">
             <FormControl isInvalid={!!errors.brandColor}>
               <FormLabel htmlFor="brandColor">Brand Color</FormLabel>
               <Flex gap={2}>
@@ -49,8 +53,21 @@ export function OrganizationSettingsForm({
               </Flex>
               <ErrorMessage name="brandColor" component={FormErrorMessage} />
             </FormControl>
+            <FormControl>
+              <FormLabel htmlFor="brandLogo">Brand Logo</FormLabel>
+              <Field
+                as={FileUploader}
+                name="brandLogo"
+                id="brandLogo"
+                onChange={(val: string) => {
+                  setFieldValue('brandLogo', val);
+                }}
+                upload={(file: File) => uploadBrandLogo({ env, file })}
+              />
+            </FormControl>
           </Flex>
         </VStack>
+        <VStack spacing={3} alignItems="flex-start" w="50%"></VStack>
         <VStack spacing={3} alignItems="flex-start" w="100%">
           <Text fontSize="lg" fontWeight="medium">
             Support
