@@ -146,6 +146,7 @@ const ActionsView = (props: ActionsViewProps) => {
 type PrescriptionState =
   | 'READY' // TODO: delete
   | 'PROCESSING' // TODO: delete
+  | 'DRAFT'
   | 'ACTIVE'
   | 'DEPLETED'
   | 'EXPIRED'
@@ -156,6 +157,7 @@ export type PrescriptionStateRecord = Record<PrescriptionState, string>;
 export const PRESCRIPTION_STATE_MAP: PrescriptionStateRecord = {
   READY: 'Active',
   PROCESSING: 'Active',
+  DRAFT: 'Draft',
   ACTIVE: 'Active',
   DEPLETED: 'Depleted',
   EXPIRED: 'Expired',
@@ -166,6 +168,7 @@ export const PRESCRIPTION_STATE_MAP: PrescriptionStateRecord = {
 export const PRESCRIPTION_COLOR_MAP: PrescriptionStateRecord = {
   READY: 'green',
   PROCESSING: 'yellow',
+  DRAFT: 'yellow',
   ACTIVE: 'green',
   DEPLETED: 'red',
   EXPIRED: 'red',
@@ -176,6 +179,7 @@ export const PRESCRIPTION_COLOR_MAP: PrescriptionStateRecord = {
 export const PRESCRIPTION_TIP_MAP: PrescriptionStateRecord = {
   READY: 'Prescription has active fills',
   PROCESSING: 'Prescription has active fills',
+  DRAFT: 'Prescription has not been ordered',
   ACTIVE: 'Prescription has unused fills',
   DEPLETED: 'All fills have been sent to a pharmacy',
   EXPIRED: 'All fills have passed prescription expiration date',
