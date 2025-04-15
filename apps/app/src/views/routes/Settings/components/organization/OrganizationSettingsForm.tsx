@@ -13,8 +13,7 @@ import { ErrorMessage, Field, FieldProps, FormikErrors } from 'formik';
 import { ChangeEvent } from 'react';
 import { OrganizationSettingsFormValues } from './utils';
 import { FileUploader } from '../../../../components/FileUpload';
-import { usePhoton } from 'packages/react/src/provider';
-import { uploadBrandLogo } from './utils';
+import { useClinicalRest } from 'apps/app/src/hooks/useClinicalRest';
 
 const InputField = ({ field }: FieldProps) => <Input {...field} />;
 
@@ -36,7 +35,8 @@ export function OrganizationSettingsForm({
     value: OrganizationSettingsFormValues[keyof OrganizationSettingsFormValues]
   ) => void;
 }) {
-  const { env } = usePhoton();
+  const restApi = useClinicalRest();
+
   return (
     <form>
       <VStack spacing={6} alignItems="flex-start">
@@ -62,7 +62,16 @@ export function OrganizationSettingsForm({
                 onChange={(val: string) => {
                   setFieldValue('brandLogo', val);
                 }}
-                upload={(file: File) => uploadBrandLogo({ env, file })}
+                upload={async (file: File) => {
+                  const formData = new FormData();
+                  formData.append('file', file);
+
+                  const data = await restApi.post<{ url: string }, FormData>(
+                    '/uploads/logo',
+                    formData
+                  );
+                  return data.url;
+                }}
               />
             </FormControl>
           </Flex>
