@@ -164,6 +164,7 @@ export type Mutation = {
   updateClient: Client;
   updateMyProfile: Scalars['ID']['output'];
   updateOrganization: Scalars['ID']['output'];
+  updateOrganizationSettings: OrganizationSettings;
   updateProviderProfile: Scalars['ID']['output'];
   updateProviderSignature: Scalars['ID']['output'];
   updateWebhookConfig: Scalars['ID']['output'];
@@ -247,6 +248,11 @@ export type MutationUpdateMyProfileArgs = {
 
 export type MutationUpdateOrganizationArgs = {
   input: OrganizationInput;
+};
+
+
+export type MutationUpdateOrganizationSettingsArgs = {
+  input: OrganizationSettingsInput;
 };
 
 
@@ -335,6 +341,7 @@ export type Organization = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   phone?: Maybe<Scalars['String']['output']>;
+  settings?: Maybe<OrganizationSettings>;
   type: OrgType;
 };
 
@@ -348,6 +355,87 @@ export type OrganizationInput = {
   type: OrgType;
 };
 
+export type OrganizationPatientUxSettings = {
+  __typename?: 'OrganizationPatientUxSettings';
+  enablePatientDeliveryPharmacies?: Maybe<Scalars['Boolean']['output']>;
+  enablePatientRerouting?: Maybe<Scalars['Boolean']['output']>;
+  patientFeaturedPharmacyName?: Maybe<Scalars['String']['output']>;
+};
+
+export type OrganizationPatientUxSettingsInput = {
+  enablePatientDeliveryPharmacies?: InputMaybe<Scalars['Boolean']['input']>;
+  enablePatientRerouting?: InputMaybe<Scalars['Boolean']['input']>;
+  patientFeaturedPharmacyName?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type OrganizationProviderUxSettings = {
+  __typename?: 'OrganizationProviderUxSettings';
+  enableDeliveryPharmacies?: Maybe<Scalars['Boolean']['output']>;
+  enableDuplicateRxWarnings?: Maybe<Scalars['Boolean']['output']>;
+  enablePatientRouting?: Maybe<Scalars['Boolean']['output']>;
+  enablePickupPharmacies?: Maybe<Scalars['Boolean']['output']>;
+  enablePrescribeToOrder?: Maybe<Scalars['Boolean']['output']>;
+  enablePrescriberOrdering?: Maybe<Scalars['Boolean']['output']>;
+  enableRxTemplates?: Maybe<Scalars['Boolean']['output']>;
+  enableTreatmentHistory?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type OrganizationProviderUxSettingsInput = {
+  enableDeliveryPharmacies?: InputMaybe<Scalars['Boolean']['input']>;
+  enableDuplicateRxWarnings?: InputMaybe<Scalars['Boolean']['input']>;
+  enablePatientRouting?: InputMaybe<Scalars['Boolean']['input']>;
+  enablePickupPharmacies?: InputMaybe<Scalars['Boolean']['input']>;
+  enablePrescribeToOrder?: InputMaybe<Scalars['Boolean']['input']>;
+  enablePrescriberOrdering?: InputMaybe<Scalars['Boolean']['input']>;
+  enableRxTemplates?: InputMaybe<Scalars['Boolean']['input']>;
+  enableTreatmentHistory?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type OrganizationSettings = {
+  __typename?: 'OrganizationSettings';
+  brandColor: Scalars['String']['output'];
+  brandLogo?: Maybe<Scalars['String']['output']>;
+  enablePriorAuthorizationSupport: Scalars['Boolean']['output'];
+  enableRxClarificationSupport: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  organizationId: Scalars['ID']['output'];
+  patientUx: OrganizationPatientUxSettings;
+  priorAuthorizationContactAdmin: Scalars['Boolean']['output'];
+  priorAuthorizationContactProvider: Scalars['Boolean']['output'];
+  priorAuthorizationEmail?: Maybe<Scalars['String']['output']>;
+  priorAuthorizationExceptionMessage?: Maybe<Scalars['String']['output']>;
+  priorAuthorizationName?: Maybe<Scalars['String']['output']>;
+  providerUx: OrganizationProviderUxSettings;
+  rxClarificationContactAdmin: Scalars['Boolean']['output'];
+  rxClarificationContactProvider: Scalars['Boolean']['output'];
+  rxClarificationEmail?: Maybe<Scalars['String']['output']>;
+  rxClarificationName?: Maybe<Scalars['String']['output']>;
+  supportContactAdmin: Scalars['Boolean']['output'];
+  supportEmail?: Maybe<Scalars['String']['output']>;
+  supportName?: Maybe<Scalars['String']['output']>;
+};
+
+export type OrganizationSettingsInput = {
+  brandColor?: InputMaybe<Scalars['String']['input']>;
+  brandLogo?: InputMaybe<Scalars['String']['input']>;
+  enablePriorAuthorizationSupport?: InputMaybe<Scalars['Boolean']['input']>;
+  enableRxClarificationSupport?: InputMaybe<Scalars['Boolean']['input']>;
+  patientUx?: InputMaybe<OrganizationPatientUxSettingsInput>;
+  priorAuthorizationContactAdmin?: InputMaybe<Scalars['Boolean']['input']>;
+  priorAuthorizationContactProvider?: InputMaybe<Scalars['Boolean']['input']>;
+  priorAuthorizationEmail?: InputMaybe<Scalars['String']['input']>;
+  priorAuthorizationExceptionMessage?: InputMaybe<Scalars['String']['input']>;
+  priorAuthorizationName?: InputMaybe<Scalars['String']['input']>;
+  providerUx?: InputMaybe<OrganizationProviderUxSettingsInput>;
+  rxClarificationContactAdmin?: InputMaybe<Scalars['Boolean']['input']>;
+  rxClarificationContactProvider?: InputMaybe<Scalars['Boolean']['input']>;
+  rxClarificationEmail?: InputMaybe<Scalars['String']['input']>;
+  rxClarificationName?: InputMaybe<Scalars['String']['input']>;
+  supportContactAdmin?: InputMaybe<Scalars['Boolean']['input']>;
+  supportEmail?: InputMaybe<Scalars['String']['input']>;
+  supportName?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Patient = {
   __typename?: 'Patient';
   dateOfBirth: Scalars['Date']['output'];
@@ -358,6 +446,11 @@ export type Patient = {
   phone: Scalars['String']['output'];
   sex: SexType;
   treatmentHistory: Array<TreatmentHistory>;
+};
+
+export type PatientsFilter = {
+  externalIds?: InputMaybe<Array<Scalars['String']['input']>>;
+  ids?: InputMaybe<Array<Scalars['ID']['input']>>;
 };
 
 export type Pharmacy = {
@@ -492,6 +585,8 @@ export type Query = {
   organization?: Maybe<Organization>;
   /** Retrieve a patient */
   patient?: Maybe<Patient>;
+  /** Retrieve patients by filter (functions as an OR query returning patients that match any of the filter fields) */
+  patients: Array<Patient>;
   /** Retrieve a list of all alerts for attempting to prescribe the propsed prescriptions to the given patientId */
   prescriptionScreen: PrescriptionScreenResult;
   /** Retrieve a role */
@@ -545,6 +640,11 @@ export type QueryOrderArgs = {
 
 export type QueryPatientArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryPatientsArgs = {
+  filter: PatientsFilter;
 };
 
 
@@ -771,6 +871,18 @@ export type UpdateOrganizationMutationVariables = Exact<{
 
 export type UpdateOrganizationMutation = { __typename?: 'Mutation', updateOrganization: string };
 
+export type OrganizationSettingsQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type OrganizationSettingsQueryQuery = { __typename?: 'Query', organization?: { __typename?: 'Organization', settings?: { __typename?: 'OrganizationSettings', id: string, organizationId: string, brandColor: string, brandLogo?: string | null, supportContactAdmin: boolean, supportName?: string | null, supportEmail?: string | null, enableRxClarificationSupport: boolean, rxClarificationContactProvider: boolean, rxClarificationContactAdmin: boolean, rxClarificationName?: string | null, rxClarificationEmail?: string | null, enablePriorAuthorizationSupport: boolean, priorAuthorizationContactProvider: boolean, priorAuthorizationContactAdmin: boolean, priorAuthorizationName?: string | null, priorAuthorizationEmail?: string | null, priorAuthorizationExceptionMessage?: string | null, providerUx: { __typename?: 'OrganizationProviderUxSettings', enablePrescriberOrdering?: boolean | null, enablePrescribeToOrder?: boolean | null, enableRxTemplates?: boolean | null, enableDuplicateRxWarnings?: boolean | null, enableTreatmentHistory?: boolean | null, enablePatientRouting?: boolean | null, enablePickupPharmacies?: boolean | null, enableDeliveryPharmacies?: boolean | null }, patientUx: { __typename?: 'OrganizationPatientUxSettings', enablePatientRerouting?: boolean | null, enablePatientDeliveryPharmacies?: boolean | null, patientFeaturedPharmacyName?: string | null } } | null } | null };
+
+export type UpdateOrganizationSettingsMutationVariables = Exact<{
+  input: OrganizationSettingsInput;
+}>;
+
+
+export type UpdateOrganizationSettingsMutation = { __typename?: 'Mutation', updateOrganizationSettings: { __typename?: 'OrganizationSettings', id: string } };
+
 export type MeProfileQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -892,6 +1004,8 @@ export const DeleteInviteDocument = {"kind":"Document","definitions":[{"kind":"O
 export const InvitesQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"InvitesQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"invites"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"InviteFragment"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"expired"}},{"kind":"Field","name":{"kind":"Name","value":"expires_at"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"InviteFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Invite"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"invitee"}},{"kind":"Field","name":{"kind":"Name","value":"inviter"}},{"kind":"Field","name":{"kind":"Name","value":"expired"}},{"kind":"Field","name":{"kind":"Name","value":"expires_at"}}]}}]} as unknown as DocumentNode<InvitesQueryQuery, InvitesQueryQueryVariables>;
 export const OrganizationQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"OrganizationQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"organization"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"address"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"street1"}},{"kind":"Field","name":{"kind":"Name","value":"street2"}},{"kind":"Field","name":{"kind":"Name","value":"postalCode"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}},{"kind":"Field","name":{"kind":"Name","value":"fax"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]}}]} as unknown as DocumentNode<OrganizationQueryQuery, OrganizationQueryQueryVariables>;
 export const UpdateOrganizationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateOrganization"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"OrganizationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateOrganization"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}]}]}}]} as unknown as DocumentNode<UpdateOrganizationMutation, UpdateOrganizationMutationVariables>;
+export const OrganizationSettingsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"OrganizationSettingsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"organization"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"settings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"organizationId"}},{"kind":"Field","name":{"kind":"Name","value":"brandColor"}},{"kind":"Field","name":{"kind":"Name","value":"brandLogo"}},{"kind":"Field","name":{"kind":"Name","value":"supportContactAdmin"}},{"kind":"Field","name":{"kind":"Name","value":"supportName"}},{"kind":"Field","name":{"kind":"Name","value":"supportEmail"}},{"kind":"Field","name":{"kind":"Name","value":"enableRxClarificationSupport"}},{"kind":"Field","name":{"kind":"Name","value":"rxClarificationContactProvider"}},{"kind":"Field","name":{"kind":"Name","value":"rxClarificationContactAdmin"}},{"kind":"Field","name":{"kind":"Name","value":"rxClarificationName"}},{"kind":"Field","name":{"kind":"Name","value":"rxClarificationEmail"}},{"kind":"Field","name":{"kind":"Name","value":"enablePriorAuthorizationSupport"}},{"kind":"Field","name":{"kind":"Name","value":"priorAuthorizationContactProvider"}},{"kind":"Field","name":{"kind":"Name","value":"priorAuthorizationContactAdmin"}},{"kind":"Field","name":{"kind":"Name","value":"priorAuthorizationName"}},{"kind":"Field","name":{"kind":"Name","value":"priorAuthorizationEmail"}},{"kind":"Field","name":{"kind":"Name","value":"priorAuthorizationExceptionMessage"}},{"kind":"Field","name":{"kind":"Name","value":"providerUx"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enablePrescriberOrdering"}},{"kind":"Field","name":{"kind":"Name","value":"enablePrescribeToOrder"}},{"kind":"Field","name":{"kind":"Name","value":"enableRxTemplates"}},{"kind":"Field","name":{"kind":"Name","value":"enableDuplicateRxWarnings"}},{"kind":"Field","name":{"kind":"Name","value":"enableTreatmentHistory"}},{"kind":"Field","name":{"kind":"Name","value":"enablePatientRouting"}},{"kind":"Field","name":{"kind":"Name","value":"enablePickupPharmacies"}},{"kind":"Field","name":{"kind":"Name","value":"enableDeliveryPharmacies"}}]}},{"kind":"Field","name":{"kind":"Name","value":"patientUx"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enablePatientRerouting"}},{"kind":"Field","name":{"kind":"Name","value":"enablePatientDeliveryPharmacies"}},{"kind":"Field","name":{"kind":"Name","value":"patientFeaturedPharmacyName"}}]}}]}}]}}]}}]} as unknown as DocumentNode<OrganizationSettingsQueryQuery, OrganizationSettingsQueryQueryVariables>;
+export const UpdateOrganizationSettingsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateOrganizationSettings"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"OrganizationSettingsInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateOrganizationSettings"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateOrganizationSettingsMutation, UpdateOrganizationSettingsMutationVariables>;
 export const MeProfileQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MeProfileQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"npi"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"fax"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"address"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"street1"}},{"kind":"Field","name":{"kind":"Name","value":"street2"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"postalCode"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"city"}}]}},{"kind":"Field","name":{"kind":"Name","value":"name"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"first"}},{"kind":"Field","name":{"kind":"Name","value":"full"}},{"kind":"Field","name":{"kind":"Name","value":"last"}},{"kind":"Field","name":{"kind":"Name","value":"middle"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"organization"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<MeProfileQueryQuery, MeProfileQueryQueryVariables>;
 export const UpdateMyProfileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateMyProfile"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"updateMyProfileInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ProfileInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateMyProfile"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"updateMyProfileInput"}}}]}]}}]} as unknown as DocumentNode<UpdateMyProfileMutation, UpdateMyProfileMutationVariables>;
 export const SearchTreatmentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SearchTreatments"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"TreatmentFilter"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"treatments"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<SearchTreatmentsQuery, SearchTreatmentsQueryVariables>;
