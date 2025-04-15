@@ -49,7 +49,7 @@ export function FileUploader({ label, value, onChange, upload, ...props }: FileU
       console.error(error);
       toast({
         title: 'Error uploading file',
-        description: 'Please try again',
+        description: error instanceof Error ? error.message : 'Please try again',
         status: 'error'
       });
     } finally {
