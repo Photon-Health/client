@@ -334,17 +334,13 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         key: 'errors',
         value: []
       });
-      const orderMutation = client!.getSDK().clinical.order.createOrder({});
-      const removePatientPreferredPharmacyMutation = client!
+      const orderMutation = client.getSDK().clinical.order.createOrder({});
+      const removePatientPreferredPharmacyMutation = client
         .getSDK()
         .clinical.patient.removePatientPreferredPharmacy({});
-      const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
+      const updatePatientMutation = client.getSDK().clinical.patient.updatePatient({});
 
       try {
-        // this should eventually just reflect the prescription state
-        // changing from 'draft' to 'active'
-        dispatchPrescriptionsCreated(draftPrescriptions());
-
         if (props.enableOrder) {
           if (
             props.formStore.updatePreferredPharmacy?.value &&
@@ -395,7 +391,17 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             return;
           }
           dispatchOrderCreated(orderData!.createOrder);
+        } else {
+          // disable order situation
+          // mutate prescriptions to DRAFT -> ACTIVE (Backend then fires system event for rx created)
+          // const prescriptionsMutation = client
+          //   .getSDK()
+          //   .clinical.prescription.updatePrescriptions({});
+          // await prescriptionsMutation();
         }
+
+        // this reflects the prescription state changing from 'draft' to 'active'
+        dispatchPrescriptionsCreated(draftPrescriptions());
       } catch (err) {
         dispatchOrderError([err as GraphQLFormattedError]);
         setIsLoading(false);
@@ -438,7 +444,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     );
   });
 
-  const clinicalClient = client!.sdk.apolloClinical;
+  const clinicalClient = client.sdk.apolloClinical;
 
   let prescriptionRef: HTMLDivElement | undefined;
 
@@ -538,7 +544,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 actions={props.formActions}
                 store={props.formStore}
                 patientId={props.patientId}
-                client={client!}
+                client={client}
                 enableOrder={props.enableOrder}
                 address={props.address}
                 weight={props.weight}
