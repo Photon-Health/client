@@ -105,7 +105,12 @@ export const Pharmacy = () => {
   const isLoading = loadingLocation || loadingPharmacies;
 
   // pricing
-  const showPriceToggle = orgSettings.enablePricing ?? false;
+  const orderContainsGLP1Medication = flattenedFills.some((fill) => isGLP(fill.treatment.name));
+  const isMultiRx = flattenedFills.length > 1;
+
+  // note: prices are only for Sesame, non-GLP-1 right now
+  const showPriceToggle =
+    (orgSettings.enablePricing && !orderContainsGLP1Medication && !isMultiRx) ?? false;
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
@@ -179,7 +184,8 @@ export const Pharmacy = () => {
     const validOrganizationIds = [
       'org_KzSVZBQixLRkqj5d', // boson Test Organization 11
       'org_kVS7AP4iuItESdMA', // neutron Photon Test Org
-      'org_wM4wI7rop0W1eNfM' // production found
+      'org_wM4wI7rop0W1eNfM', // production found
+      'org_pcPnPx5PVamzjS2p' // production measured
     ];
 
     if (!validOrganizationIds.includes(order.organization.id)) {
