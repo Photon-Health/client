@@ -644,7 +644,7 @@ const stub = (): never => {
 };
 
 const PhotonClientContext = createContext<PhotonClientContextInterface>({
-  env: 'boson',
+  env: process.env.REACT_APP_ENV_NAME as Env,
   clinicalClient: undefined,
   getAllergens: stub,
   getPatients: stub,
