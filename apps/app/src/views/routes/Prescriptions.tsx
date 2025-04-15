@@ -187,7 +187,7 @@ export const PRESCRIPTION_TIP_MAP: PrescriptionStateRecord = {
   ERROR: 'There’s an error with prescription'
 };
 
-const renderRow = (rx: any) => {
+const renderRow = (rx: Prescription) => {
   const { id, patient } = rx;
   const med = rx.treatment;
   const extId = rx.externalId || <Text as="i">None</Text>;
