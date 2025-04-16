@@ -12,7 +12,6 @@ import {
   useToast,
   VStack
 } from '@chakra-ui/react';
-import { getSettings } from '@client/settings';
 import queryString from 'query-string';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactGA from 'react-ga4';
@@ -50,13 +49,30 @@ import { isGLP } from '../utils/isGLP';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { datadogRum } from '@datadog/browser-rum';
 import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__generated__/graphql';
+import { getSettings } from '@client/settings';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
+
+const pricingEnabledOrgs = new Set([
+  // boson
+  'org_KzSVZBQixLRkqj5d', // boson Test Organization 11
+  // neutron
+  'org_kVS7AP4iuItESdMA', // Photon Test Org
+  'org_QFoulY6Ornx7dMdw', // Sesame
+  // photon
+  'org_xqL46CdX49O1K5Ye', // Photon Test Account
+  'org_zc1RzzmSwd8eE94U' // Sesame
+]);
 
 export const Pharmacy = () => {
   const { order, flattenedFills, setOrder, isDemo, fetchOrder } = useOrderContext();
 
-  const orgSettings = getSettings(order?.organization.id);
+  const clientSettings = getSettings(order?.organization.id);
+  const { enablePatientDeliveryPharmacies, patientFeaturedPharmacyName } =
+    order?.organization?.settings?.patientUx ?? {};
+
+  const topRankedCostco = patientFeaturedPharmacyName?.toLowerCase() === 'costco';
+  const topRankedWalgreens = patientFeaturedPharmacyName?.toLowerCase() === 'walgreens';
 
   const navigate = useNavigate();
   const toast = useToast();
@@ -74,8 +90,8 @@ export const Pharmacy = () => {
 
   // top ranked pharmacies
   const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
-  const enableTopRankedCostco = !isDemo && orgSettings.topRankedCostco && containsGLP; // only show costco if there are GLP treatments
-  const enableTopRankedWalgreens = !isDemo && orgSettings.topRankedWalgreens;
+  const enableTopRankedCostco = !isDemo && topRankedCostco && containsGLP; // only show costco if there are GLP treatments
+  const enableTopRankedWalgreens = !isDemo && topRankedWalgreens && containsGLP;
 
   // View state
   const [showFooter, setShowFooter] = useState<boolean>(false);
@@ -108,9 +124,9 @@ export const Pharmacy = () => {
   const orderContainsGLP1Medication = flattenedFills.some((fill) => isGLP(fill.treatment.name));
   const isMultiRx = flattenedFills.length > 1;
 
+  const pricingEnabled = pricingEnabledOrgs.has(order?.organization.id);
   // note: prices are only for Sesame, non-GLP-1 right now
-  const showPriceToggle =
-    (orgSettings.enablePricing && !orderContainsGLP1Medication && !isMultiRx) ?? false;
+  const showPriceToggle = (pricingEnabled && !orderContainsGLP1Medication && !isMultiRx) ?? false;
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
@@ -149,7 +165,7 @@ export const Pharmacy = () => {
     !isDemo &&
     !enablePrice && // Hide for price filter
     isCapsuleTerritory &&
-    orgSettings.enableCourierNavigate;
+    enablePatientDeliveryPharmacies;
   const capsulePharmacyId = order?.address?.postalCode
     ? capsuleZipcodeLookup[order.address.postalCode as keyof typeof capsuleZipcodeLookup]
         ?.pharmacyId
@@ -161,9 +177,9 @@ export const Pharmacy = () => {
     !isDemo &&
     !enablePrice && // Hide for price filter
     // If we're showing costco, we don't want to show mail order
-    !orgSettings.topRankedCostco &&
+    !topRankedCostco &&
     !hasTopRankedCostco && // this means org is Sesame, we don't want to show Amazon and top ranked Costco at the same time
-    orgSettings.mailOrderNavigate;
+    enablePatientDeliveryPharmacies;
 
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
@@ -739,7 +755,7 @@ export const Pharmacy = () => {
 
   const brandedOptions = [
     ...(capsuleEnabled ? [capsulePharmacyId] : []),
-    ...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : []),
+    ...(enableMailOrder ? clientSettings.mailOrderNavigateProviders ?? [] : []),
     ...(amazonPharmacyOverride ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string] : [])
   ];
 
