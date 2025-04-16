@@ -23,6 +23,13 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
+        "command": "GQL_SCHEMA_URL='http://patient-api.tau.health:8080' npx graphql-codegen"
+      }
+    },
+    "codegen:tau:watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
         "command": "GQL_SCHEMA_URL='http://patient-api.tau.health:8080' npx graphql-codegen --watch"
       }
     },
