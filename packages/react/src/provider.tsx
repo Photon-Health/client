@@ -9,7 +9,7 @@ import {
 import { useStore } from '@nanostores/react';
 import { GraphQLFormattedError } from 'graphql';
 import { action, map } from 'nanostores';
-import { PhotonClient } from '@photonhealth/sdk';
+import { Env, PhotonClient } from '@photonhealth/sdk';
 import {
   Allergen,
   AllergenFilter,
@@ -116,6 +116,7 @@ export type GetAllergensReturn = {
 };
 
 export interface PhotonClientContextInterface {
+  env: Env;
   clinicalClient: ApolloClient<NormalizedCacheObject> | undefined;
   getPatient: ({ id, fragment }: { id: string; fragment?: Record<string, DocumentNode> }) => {
     patient: Patient;
@@ -643,6 +644,7 @@ const stub = (): never => {
 };
 
 const PhotonClientContext = createContext<PhotonClientContextInterface>({
+  env: process.env.REACT_APP_ENV_NAME as Env,
   clinicalClient: undefined,
   getAllergens: stub,
   getPatients: stub,
@@ -696,6 +698,7 @@ const PhotonClientContext = createContext<PhotonClientContextInterface>({
 });
 
 export const PhotonProvider = (opts: {
+  env: Env;
   children: any;
   client: PhotonClient;
   searchParams?: string;
@@ -2928,6 +2931,7 @@ export const PhotonProvider = (opts: {
 
   const contextValue = {
     ...state,
+    env: opts.env,
     clinicalClient: client.apolloClinical,
     login,
     logout,

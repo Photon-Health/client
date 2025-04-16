@@ -1,22 +1,27 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-test('user can login and create a new prescription', async ({ page }) => {
+test('user can login and create patient', async ({ page }) => {
   await page.goto('/');
 
-  await expect(page).toHaveTitle(/Photon/);
+  await page.getByRole('link', { name: /Patients/ }).click();
+  await page.getByRole('link', { name: /New Patient/ }).click();
 
-  await page.getByRole('button', { name: 'Log in' }).click();
-  await expect(page.getByText('Log in to continue to Photon Clinical App')).toBeVisible();
-  await page.getByRole('button', { name: 'Continue with Google' }).click();
+  const patientNumber = getRandomInt(0, 100_000_000);
 
-  await page.waitForURL(/accounts\.google\.com/, { timeout: 10_000 });
+  await page.getByLabel('First Name').fill('Jimbob');
+  await page.getByLabel('Last Name').fill(`McTesterson_${patientNumber}`);
+  await page.getByLabel('Date of Birth').fill('1980-12-31');
+  await page.getByLabel('Mobile Number').fill('8886543210');
+  await page.getByLabel('Sex at Birth').click();
+  await page.getByRole('menuitem', { name: 'MALE', exact: true }).click();
 
-  await page.getByLabel('Email or phone').fill(process.env.PLAYWRIGHT_E2E_ACCOUNT_USERNAME);
-  await page.getByRole('button', { name: 'Next' }).click();
-  await page.getByLabel('Enter your password').fill(process.env.PLAYWRIGHT_E2E_ACCOUNT_PASSWORD);
-  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
 
-  // await page.waitForURL(/localhost/, { timeout: 20_000 });
-
-  await page.getByRole('link', { name: /New Prescription/ }).click();
+  await expect(page.getByRole('heading', { name: 'Patients' })).toBeVisible();
 });
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}

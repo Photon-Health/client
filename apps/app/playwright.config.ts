@@ -18,14 +18,20 @@ export default defineConfig({
     trace: 'on-first-retry'
   },
   projects: [
+    { name: 'setup', testMatch: /.*\.setup\.ts/ },
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] }
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/.auth/user.json'
+      },
+      dependencies: ['setup']
     }
   ],
   webServer: {
     command: 'nx start',
-    url: process.env.PLAYWRIGHT_BASE_URL,
-    reuseExistingServer: !process.env.CI
+    url: process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 180_000
   }
 });
