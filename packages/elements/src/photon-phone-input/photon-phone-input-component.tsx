@@ -61,18 +61,14 @@ const Component = (props: PhoneInputProps) => {
       <style>{shoelaceLightStyles}</style>
       <style>{styles}</style>
       <div class="md:py-2 flex flex-col font-sans" ref={ref}>
-        {props.label ? (
-          <div class="flex items-center pb-2">
-            <p class="text-gray-700 text-sm">{props.label}</p>
-            {props.required ? <p class="pl-1 text-red-400">*</p> : null}
-          </div>
-        ) : null}
         <sl-input
           classList={{
             invalid: props.invalid
           }}
           disabled={props.disabled}
           class="input"
+          label={props.label}
+          required={props.required}
           on:sl-input={(e: any) => {
             try {
               const parsed = parsePhoneNumber(e.target.value, 'US').format('E.164');
