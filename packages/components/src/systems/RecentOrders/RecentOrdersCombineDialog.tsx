@@ -253,7 +253,7 @@ export default function RecentOrdersCombineDialog() {
             size="xl"
             onClick={onCombineOrdersClick}
             disabled={isCreatingOrder() || isCombiningOrders()}
-            loading={isCreatingOrder() || isCombiningOrders()}
+            loading={isCombiningOrders()}
           >
             Yes, combine orders
           </Button>
@@ -266,7 +266,7 @@ export default function RecentOrdersCombineDialog() {
               setIsCreatingOrder(true);
             }}
             disabled={isCreatingOrder() || isCombiningOrders()}
-            loading={isCreatingOrder() || isCombiningOrders()}
+            loading={isCreatingOrder()}
           >
             {isCreatingOrder() ? 'Creating order...' : 'No, send new order'}
           </Button>
