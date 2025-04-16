@@ -11,7 +11,8 @@ import {
   Tag,
   Text,
   Tooltip,
-  useToast
+  useToast,
+  Link
 } from '@chakra-ui/react';
 import { FiInfo, FiShoppingCart } from 'react-icons/fi';
 import { useEffect, useRef, useState } from 'react';
@@ -77,15 +78,27 @@ const GET_PRESCRIPTIONS = gql`
 interface MedViewProps {
   name: string;
   sig: string;
+  prescriptionId: string;
 }
 
-const MedView = ({ name, sig }: MedViewProps) => {
+const MedView = ({ name, sig, prescriptionId }: MedViewProps) => {
   return (
     <Stack spacing="0">
-      <Text fontWeight="medium">{name}</Text>
-      <Text fontSize="sm" color="gray.600">
-        {sig}
-      </Text>
+      <Link
+        href={`/prescriptions/${prescriptionId}`}
+        style={{
+          textDecoration: 'none',
+          color: 'inherit'
+        }}
+        _hover={{
+          textDecoration: 'none'
+        }}
+      >
+        <Text fontWeight="medium">{name}</Text>
+        <Text fontSize="sm" color="gray.600">
+          {sig}
+        </Text>
+      </Link>
     </Stack>
   );
 };
@@ -201,7 +214,7 @@ const renderRow = (rx: Prescription) => {
   return {
     id,
     externalId: extId,
-    medication: <MedView name={med.name} sig={rx.instructions} />,
+    medication: <MedView name={med.name} sig={rx.instructions} prescriptionId={rx.id} />,
     quantity: (
       <Text color="gray.600">
         {rx.dispenseQuantity} {getUnitAbbreviation(rx.dispenseUnit)}
@@ -383,6 +396,7 @@ export const Prescriptions = () => {
         search: status ? `?status=${status}` : ''
       });
     }
+
     async function refetchData() {
       setRows([]);
       setFilterChangeLoading(true);
