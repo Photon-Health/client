@@ -27,8 +27,10 @@ import { Support } from './views/routes/Support';
 import { UpdatePatientForm } from './views/routes/UpdatePatientForm';
 import { Env } from '@photonhealth/sdk';
 
+const env = process.env.REACT_APP_ENV_NAME as Env;
+
 const client = new PhotonClient({
-  env: process.env.REACT_APP_ENV_NAME as Env,
+  env,
   domain: auth0Config.domain,
   clientId: auth0Config.clientId,
   redirectURI: auth0Config.redirectUri
@@ -51,7 +53,7 @@ export const App = () => {
 
   return (
     <BrowserRouter>
-      <PhotonProvider client={client} onRedirectCallback={onRedirectCallback}>
+      <PhotonProvider env={env} client={client} onRedirectCallback={onRedirectCallback}>
         <AlertDisplay />
         <Routes>
           <Route path="/" element={<Main />}>

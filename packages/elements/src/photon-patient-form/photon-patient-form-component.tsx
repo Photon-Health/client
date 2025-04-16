@@ -202,6 +202,7 @@ const PatientForm = (props: { patientId: string }) => {
                     invalid={store['firstName']?.error}
                     help-text={store['firstName']?.error}
                     label="First Name"
+                    required="true"
                     on:photon-input-changed={async (e: any) => {
                       actions.updateFormValue({
                         key: 'firstName',
@@ -216,6 +217,7 @@ const PatientForm = (props: { patientId: string }) => {
                     invalid={store['lastName']?.error}
                     help-text={store['lastName']?.error}
                     label="Last Name"
+                    required="true"
                     on:photon-input-changed={async (e: any) => {
                       actions.updateFormValue({
                         key: 'lastName',
@@ -232,6 +234,7 @@ const PatientForm = (props: { patientId: string }) => {
                     invalid={store['dateOfBirth']?.error}
                     help-text={store['dateOfBirth']?.error}
                     label="Date of Birth"
+                    required="true"
                     on:photon-datepicker-selected={async (e: any) => {
                       actions.updateFormValue({
                         key: 'dateOfBirth',
@@ -249,6 +252,7 @@ const PatientForm = (props: { patientId: string }) => {
                     invalid={store['phone']?.error}
                     help-text={store['phone']?.error}
                     label="Mobile Number"
+                    required="true"
                     on:photon-phone-changed={async (e: any) => {
                       actions.updateFormValue({
                         key: 'phone',
@@ -283,7 +287,7 @@ const PatientForm = (props: { patientId: string }) => {
                   <div class="flex-grow w-full xs:min-w-[40%]">
                     <photon-sex-input
                       label="Sex at Birth"
-                      required="false"
+                      required="true"
                       help-text={store['sex']?.error}
                       invalid={store['sex']?.error !== undefined}
                       on:photon-sex-selected={(e: any) => {

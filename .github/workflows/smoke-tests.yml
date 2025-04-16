@@ -1,8 +1,10 @@
-name: Playwright e2e Tests
+name: Playwright Smoke Tests
 on:
   repository_dispatch:
     types:
-      - codebuild-complete
+#      - codebuild-complete
+# todo: discuss with team when to run this workflow. (e.g. after client/backend deployments? before?)
+
 jobs:
   test:
     timeout-minutes: 10
