@@ -52,6 +52,7 @@ import usePermissions from '../../hooks/usePermissions';
 import { CANCEL_PRESCRIPTION } from '../../mutations';
 
 import { datadogRum } from '@datadog/browser-rum';
+import { Fill, Maybe } from 'packages/sdk/dist/types';
 
 export const graphQLClient = new GraphQLClient(process.env.REACT_APP_GRAPHQL_URI as string, {
   jsonSerializer: {
@@ -438,7 +439,7 @@ export const Prescription = () => {
               <Text>No orders for this prescription</Text>
             ) : (
               <VStack spacing={3}>
-                {orders.map((fill: types.Maybe<types.Fill>) => {
+                {orders.map((fill: Maybe<Fill>) => {
                   if (!fill) return null;
                   const address = fill?.order?.pharmacy?.address;
                   const addressString = formatAddress(address as FormatAddressProps);
