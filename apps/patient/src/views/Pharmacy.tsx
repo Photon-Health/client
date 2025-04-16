@@ -597,16 +597,25 @@ export const Pharmacy = () => {
             setShowFooter(false);
 
             if (amazonPharmacyOverride) {
+              const slugifiedOverride = amazonPharmacyOverride
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, '_')
+                .replace(/[^a-z0-9_]/g, '')
+                .replace(/_+/g, '_')
+                .replace(/^_+|_+$/g, '');
               if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
                 datadogRum.addAction('amazon_pharmacy_offer_active_and_selected', {
                   orderId: order.id,
                   organizationId: order.organization.id,
+                  description: slugifiedOverride,
                   timestamp: new Date().toISOString()
                 });
               } else {
                 datadogRum.addAction('amazon_pharmacy_offer_active_and_not_selected', {
                   orderId: order.id,
                   organizationId: order.organization.id,
+                  description: slugifiedOverride,
                   timestamp: new Date().toISOString()
                 });
               }
