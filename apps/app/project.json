@@ -62,6 +62,13 @@
         "command": "env-cmd -f .env.boson npx playwright test"
       }
     },
+    "e2e:ui": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "env-cmd -f .env.boson npx playwright test --ui"
+      }
+    },
     "e2e:ci": {
       "executor": "nx:run-commands",
       "options": {

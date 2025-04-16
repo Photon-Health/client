@@ -15,7 +15,7 @@ const NameView = (props: NameViewProps) => {
       <Box>
         {isPatient ? (
           <Text fontWeight="medium" whiteSpace="nowrap" data-dd-privacy="mask">
-            <ChakraLink as={RouterLink} to={`/patients/${patientId}`} width="fit-content">
+            <ChakraLink as={RouterLink} to={`/patients/${patientId}`} style={{ textWrap: 'wrap' }}>
               {name}
             </ChakraLink>
           </Text>
