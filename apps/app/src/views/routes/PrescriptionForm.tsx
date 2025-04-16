@@ -14,7 +14,7 @@ declare global {
 
 export const PrescriptionForm = () => {
   const ref: MutableRefObject<any> = useRef();
-  const { user } = usePhoton();
+  const { user, getOrganization } = usePhoton();
   const [params] = useSearchParams();
   const patientId = params.get('patientId') || '';
   const pharmacyId = params.get('pharmacyId') || '';
@@ -23,6 +23,9 @@ export const PrescriptionForm = () => {
   const weight = params.get('weight') || '';
   const weightUnit = params.get('weightUnit') || 'lbs';
   const externalId = params.get('externalId') || '';
+
+  const { organization } = getOrganization();
+  console.log({ organization });
 
   const navigate = useNavigate();
   const onClose = () => {

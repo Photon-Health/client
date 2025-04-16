@@ -4,6 +4,26 @@ export const ORGANIZATION_FIELDS = gql`
   fragment OrganizationFields on Organization {
     id
     name
+    settings {
+      brandColor
+      brandLogo
+      priorAuthorizationExceptionMessage
+      providerUx {
+        enablePrescriberOrdering
+        enablePrescribeToOrder
+        enableRxTemplates
+        enableDuplicateRxWarnings
+        enableTreatmentHistory
+        enablePatientRouting
+        enablePickupPharmacies
+        enableDeliveryPharmacies
+      }
+      patientUx {
+        enablePatientRerouting
+        enablePatientDeliveryPharmacies
+        patientFeaturedPharmacyName
+      }
+    }
   }
 `;
 
