@@ -49,7 +49,7 @@ import { isGLP } from '../utils/isGLP';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { datadogRum } from '@datadog/browser-rum';
 import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__generated__/graphql';
-import { getSettings } from '@client/settings';
+import { getOrgMailOrderPharms } from '@client/settings';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
@@ -67,7 +67,7 @@ const pricingEnabledOrgs = new Set([
 export const Pharmacy = () => {
   const { order, flattenedFills, setOrder, isDemo, fetchOrder } = useOrderContext();
 
-  const clientSettings = getSettings(order?.organization.id);
+  const mailOrderPharmacies = getOrgMailOrderPharms(order?.organization.id).patient;
   const { enablePatientDeliveryPharmacies, patientFeaturedPharmacyName } =
     order?.organization?.settings?.patientUx ?? {};
 
@@ -755,7 +755,7 @@ export const Pharmacy = () => {
 
   const brandedOptions = [
     ...(capsuleEnabled ? [capsulePharmacyId] : []),
-    ...(enableMailOrder ? clientSettings.mailOrderNavigateProviders ?? [] : []),
+    ...(enableMailOrder ? mailOrderPharmacies : []),
     ...(amazonPharmacyOverride ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string] : [])
   ];
 

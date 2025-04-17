@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client';
 import { MutableRefObject, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
-import { getSettings } from '@client/settings';
+import { getOrgMailOrderPharms } from '@client/settings';
 
 declare global {
   namespace JSX {
@@ -51,7 +51,7 @@ export const PrescriptionForm = () => {
   const enablePatientRouting = orgSettings?.providerUx?.enablePatientRouting ?? true;
   const enableDuplicateRxWarnings = orgSettings?.providerUx?.enableDuplicateRxWarnings ?? true;
   const enableRxTemplates = orgSettings?.providerUx?.enableRxTemplates ?? true;
-  const mailOrderProviders = getSettings(user?.org_id)?.mailOrderProviders;
+  const mailOrderProviders = getOrgMailOrderPharms(user?.org_id)?.provider;
 
   const navigate = useNavigate();
   const onClose = () => {
