@@ -37,8 +37,7 @@ export const MailOrder = ({
   const isVisible = useIsVisible(ref);
   const { getPharmacies } = usePhoton();
   const { refetch } = getPharmacies({});
-
-  const orgSettings = getSettings(user?.org_id);
+  const mailOrderProviders = getSettings(user?.org_id)?.mailOrderProviders;
 
   const [pharmOptions, setPharmOptions] = useState<any>([]);
 
@@ -47,9 +46,8 @@ export const MailOrder = ({
       type: types.FulfillmentType.MailOrder
     });
 
-    const mailOrderProviders = orgSettings.mailOrderProviders as string[];
     const options = result.data.pharmacies.filter(({ id }: { id: string }) =>
-      mailOrderProviders.includes(id)
+      mailOrderProviders?.includes(id)
     );
 
     setPharmOptions(options);
