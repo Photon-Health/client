@@ -495,7 +495,8 @@ const organizationSettings: {
   // Remo
   org_7IjlTEWfLpmTHjHn: {
     accentColor: '#21201C',
-    logo: 'remo_logo.svg'
+    logo: 'remo_logo.svg',
+    enableMedHistory: true
   },
   // Om Dermatology (sub-org of Miiskin)
   org_1eNnu0Wi14vBH7IM: {
