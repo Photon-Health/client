@@ -31,3 +31,6 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+/playwright/.auth
+/e2e/.auth
+/e2e/.cache

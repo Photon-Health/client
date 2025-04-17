@@ -22,15 +22,17 @@ These are expensive to run, and are best suited to validating critical user flow
 #### First time setup:
 
 1. Copy `apps/app/.env.local.sample` into a new file named `apps/app/.env.local`
-2. Go to 1password and search for "e2e boson test" in Shared
+2. Go to 1password and search for "e2e test user" (in Shared credentials)
 3. Copy password into the `PLAYWRIGHT_E2E_ACCOUNT_PASSWORD` field inside `.env.local`
 
 #### Run e2e tests:
 
 ```shell
-# Spins up the app locally at localhost:3000 if needed, using `nx start`
-# See playwright.config.ts "webserver" settings
+# run with headless browser
 $ npx nx run app:e2e
+
+# or run within UI popup window
+$ npx nx run app:e2e:ui
 ```
 
 
