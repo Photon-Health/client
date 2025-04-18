@@ -104,7 +104,7 @@ const MESSAGE: { [key in ExceptionData['exceptionType']]: (order: Order) => stri
 const TITLE: Partial<{ [key in ExceptionData['exceptionType']]: string }> = {
   BACKORDERED: 'Backordered',
   OOS: 'Out of stock',
-  PA_REQUIRED: 'Approval required',
+  PA_REQUIRED: 'Insurance approval needed',
   REFILL_TOO_SOON: 'Refill too soon',
   HIGH_COPAY: 'High cost alert',
   NOT_COVERED: 'Not covered by insurance',
