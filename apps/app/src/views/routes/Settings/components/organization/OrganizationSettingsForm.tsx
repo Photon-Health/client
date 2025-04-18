@@ -10,7 +10,7 @@ import {
   Grid
 } from '@chakra-ui/react';
 import { ErrorMessage, Field, FieldProps, FormikErrors } from 'formik';
-import { ChangeEvent } from 'react';
+
 import { OrganizationSettingsFormValues } from './utils';
 import { FileUploader } from '../../../../components/FileUpload';
 import { useClinicalRest } from 'apps/app/src/hooks/useClinicalRest';
@@ -24,7 +24,6 @@ const ColorField = ({ field }: FieldProps) => (
 const SwitchField = ({ field }: FieldProps) => <Switch {...field} isChecked={field.value} />;
 
 export function OrganizationSettingsForm({
-  values,
   errors,
   setFieldValue
 }: {
@@ -77,6 +76,8 @@ export function OrganizationSettingsForm({
           </Flex>
         </VStack>
         <VStack spacing={3} alignItems="flex-start" w="50%"></VStack>
+        {/* Commenting out this section temporarily until we add ability in backend to send emails to their chosen destinations */}
+        {/*
         <VStack spacing={3} alignItems="flex-start" w="100%">
           <Text fontSize="lg" fontWeight="medium">
             Support
@@ -291,6 +292,7 @@ export function OrganizationSettingsForm({
               </Flex>
             )}
         </VStack>
+        */}
         <VStack spacing={3} alignItems="flex-start" w="100%">
           <Text fontSize="lg" fontWeight="medium">
             Provider Experience
