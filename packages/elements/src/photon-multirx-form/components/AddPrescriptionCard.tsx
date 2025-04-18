@@ -3,15 +3,15 @@ import {
   Card,
   DoseCalculator,
   Icon,
+  PrescriptionFormData,
   ScreeningAlerts,
   ScreeningAlertType,
   Text,
   triggerToast,
-  usePhoton,
-  useRecentOrders
+  usePrescribe
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { DispenseUnit, Medication } from '@photonhealth/sdk/dist/types';
+import { DispenseUnit, Medication, Prescription } from '@photonhealth/sdk/dist/types';
 import { format } from 'date-fns';
 import { any, min, number, record, refine, size, string } from 'superstruct';
 import { afterDate, between, message } from '../../validators';
@@ -24,6 +24,7 @@ import { GraphQLFormattedError } from 'graphql';
 import { createSignal, onMount, Show } from 'solid-js';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
+import { TryCreatePrescriptionTemplateOptions } from '@photonhealth/components/src/systems/PrescribeProvider';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -43,27 +44,6 @@ const validators = {
   effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
 };
 
-export type AddDraftPrescription = {
-  id: string;
-  effectiveDate: string;
-  treatment: {
-    id: string;
-    name: string;
-  };
-  dispenseAsWritten: boolean;
-  dispenseQuantity: number;
-  dispenseUnit: string;
-  daysSupply: number;
-  refillsInput: number;
-  instructions: string;
-  notes: string;
-  fillsAllowed: number;
-  addToTemplates: boolean;
-  templateName: string;
-  catalogId?: string;
-  externalId?: string;
-};
-
 export const AddPrescriptionCard = (props: {
   hideAddToTemplates: boolean;
   actions: Record<string, (...args: any) => any>;
@@ -74,19 +54,23 @@ export const AddPrescriptionCard = (props: {
   enableCombineAndDuplicate?: boolean;
   screenDraftedPrescriptions: () => void;
   draftedPrescriptionChanged: () => void;
-  onDraftPrescriptionCreated: (draft: AddDraftPrescription) => void;
+  onDraftPrescriptionCreated: (draft: Prescription) => void;
   screeningAlerts: ScreeningAlertType[];
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
   enableOrder: boolean;
 }) => {
-  const client = usePhoton();
+  const prescribeContext = usePrescribe();
+  if (!prescribeContext) {
+    throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
+  }
+  const { tryCreatePrescription } = prescribeContext;
 
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
-  const [, recentOrdersActions] = useRecentOrders();
   const [searchText, setSearchText] = createSignal<string>('');
+  const [isLoading, setIsLoading] = createSignal(false);
   let ref: any;
 
   onMount(() => {
@@ -101,10 +85,6 @@ export const AddPrescriptionCard = (props: {
     clearForm(props.actions, props?.prefillNotes ? { notes: props.prefillNotes } : undefined);
   });
 
-  const templateMutation = client!
-    .getSDK()
-    .clinical.prescriptionTemplate.createPrescriptionTemplate({});
-
   const dispatchOrderError = (errors: readonly GraphQLFormattedError[]) => {
     const event = new CustomEvent('photon-order-error', {
       composed: true,
@@ -117,118 +97,81 @@ export const AddPrescriptionCard = (props: {
   };
 
   const handleAddPrescription = async () => {
+    setIsLoading(true);
+
+    // TODO TODO TODO move validation to the prescribe provider
     const keys = Object.keys(validators);
     props.actions.validate(keys);
     const errorsPresent = props.actions.hasErrors(keys);
 
-    const draftedPrescriptions = [...props.store.draftPrescriptions.value];
-    const isPrescriptionAlreadyAdded = isTreatmentInDraftPrescriptions(
-      props.store.treatment?.value?.id,
-      draftedPrescriptions
-    );
-
-    if (isPrescriptionAlreadyAdded) {
-      triggerToast({
-        status: 'error',
-        body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
-      });
-    } else if (!errorsPresent) {
-      const draft: AddDraftPrescription = {
-        id: String(Math.random()),
-        effectiveDate: props.store.effectiveDate.value,
-        treatment: props.store.treatment.value,
-        dispenseAsWritten: props.store.dispenseAsWritten.value,
-        dispenseQuantity: props.store.dispenseQuantity.value,
-        dispenseUnit: props.store.dispenseUnit.value,
-        daysSupply: props.store.daysSupply.value,
-        refillsInput: props.store.refillsInput.value,
-        instructions: props.store.instructions.value,
-        notes: props.store.notes.value,
-        fillsAllowed: props.store.refillsInput.value + 1,
-        addToTemplates: props.store.addToTemplates?.value ?? false,
-        templateName: props.store.templateName?.value ?? '',
-        catalogId: props.store.catalogId.value ?? undefined,
-        externalId: props.store.externalId?.value ?? undefined
-      };
-
-      const duplicate = recentOrdersActions.checkDuplicateFill(draft.treatment.name);
-
-      const addDraftPrescription = async () => {
-        props.actions.updateFormValue({
-          key: 'draftPrescriptions',
-          value: [...(props.store.draftPrescriptions?.value || []), draft]
-        });
-        props.actions.updateFormValue({
-          key: 'effectiveDate',
-          value: format(new Date(), 'yyyy-MM-dd').toString()
-        });
-        const addToTemplate = props.store.addToTemplates?.value ?? false;
-        const templateName = props.store.templateName?.value ?? '';
-        props.actions.clearKeys([
-          'treatment',
-          'dispenseAsWritten',
-          'dispenseQuantity',
-          'dispenseUnit',
-          'daysSupply',
-          'refillsInput',
-          'instructions',
-          'notes',
-          'templateName',
-          'addToTemplates'
-        ]);
-        setOffCatalog(undefined);
-        clearForm(props.actions, props.prefillNotes ? { notes: props.prefillNotes } : undefined);
-        if (addToTemplate) {
-          try {
-            const { errors } = await templateMutation({
-              variables: {
-                ...draft,
-                name: templateName,
-                treatmentId: draft.treatment.id,
-                isPrivate: true
-              },
-              awaitRefetchQueries: false
-            });
-            if (errors) {
-              dispatchOrderError(errors);
-            } else {
-              triggerToast({
-                status: 'success',
-                header: 'Personal Template Saved'
-              });
-            }
-          } catch (err) {
-            dispatchOrderError([err as GraphQLFormattedError]);
-          }
-        }
-        triggerToast({
-          status: 'success',
-          header: 'Prescription Added',
-          body: 'You can send this order or add another prescription before sending it'
-        });
-
-        props.onDraftPrescriptionCreated(draft);
-      };
-
-      if (props.enableCombineAndDuplicate && duplicate) {
-        // if there's a duplicate order, check first if they want to report an issue
-        return recentOrdersActions.setIsDuplicateDialogOpen(true, duplicate, addDraftPrescription);
-      }
-
-      // otherwise add it to the draft prescriptions list
-      addDraftPrescription();
-
-      // and screen it again, in case any of the
-      // new properties impact screening
-      props.screenDraftedPrescriptions();
-
-      setSearchText('');
-    } else {
+    if (errorsPresent) {
+      setIsLoading(false);
       triggerToast({
         status: 'error',
         body: 'Some items in the form are incomplete, please check for errors'
       });
+      return;
     }
+
+    const prescriptionFormData: PrescriptionFormData = {
+      effectiveDate: props.store.effectiveDate.value,
+      treatment: { id: props.store.treatment.value.id, name: props.store.treatment.value.name },
+      dispenseAsWritten: props.store.dispenseAsWritten.value,
+      dispenseQuantity: props.store.dispenseQuantity.value,
+      dispenseUnit: props.store.dispenseUnit.value,
+      daysSupply: props.store.daysSupply.value,
+      instructions: props.store.instructions.value,
+      notes: props.store.notes.value,
+      fillsAllowed: props.store.refillsInput.value + 1,
+      // TODO: set this from template-overrides. can we stop using the props.store, with this param as a starting point?
+      diagnoseCodes: []
+    };
+
+    let createdPrescription: Prescription | null = null;
+    try {
+      const options: TryCreatePrescriptionTemplateOptions = {
+        addToTemplates: props.store.addToTemplates?.value ?? false,
+        templateName: props.store.templateName?.value,
+        catalogId: props.store.catalogId?.value
+      };
+      createdPrescription = await tryCreatePrescription(prescriptionFormData, options);
+      if (createdPrescription) {
+        props.onDraftPrescriptionCreated(createdPrescription);
+      }
+    } catch (err) {
+      dispatchOrderError([err as GraphQLFormattedError]);
+    } finally {
+      setIsLoading(false);
+    }
+
+    if (!createdPrescription) {
+      return;
+    }
+
+    // todo: move screening up to prescribeContext (for med history Refill button clicks)
+    props.screenDraftedPrescriptions();
+
+    // RESET THE FORM
+    props.actions.updateFormValue({
+      key: 'effectiveDate',
+      value: format(new Date(), 'yyyy-MM-dd').toString()
+    });
+    props.actions.clearKeys([
+      'treatment',
+      'dispenseAsWritten',
+      'dispenseQuantity',
+      'dispenseUnit',
+      'daysSupply',
+      'refillsInput',
+      'instructions',
+      'notes',
+      'templateName',
+      'addToTemplates'
+    ]);
+    setOffCatalog(undefined);
+    clearForm(props.actions, props.prefillNotes ? { notes: props.prefillNotes } : undefined);
+
+    setSearchText('');
   };
 
   return (
@@ -481,14 +424,14 @@ export const AddPrescriptionCard = (props: {
             <Show when={!props.hideAddToTemplates}>
               <photon-checkbox
                 label="Add To Personal Templates"
-                form-name="daw"
+                form-name="addToTemplates"
                 checked={props.store.addToTemplates?.value || false}
-                on:photon-checkbox-toggled={(e: any) =>
+                on:photon-checkbox-toggled={(e: any) => {
                   props.actions.updateFormValue({
                     key: 'addToTemplates',
                     value: e.detail.checked
-                  })
-                }
+                  });
+                }}
               />
             </Show>
             <Show when={props.store.addToTemplates?.value ?? false}>
@@ -508,7 +451,16 @@ export const AddPrescriptionCard = (props: {
               />
             </Show>
             <div class="flex flex-grow justify-end">
-              <Button class="w-full xs:!w-auto h-fit" size="lg" onClick={handleAddPrescription}>
+              <Button
+                class="w-full xs:!w-auto h-fit"
+                size="lg"
+                onClick={() => {
+                  if (!isLoading()) {
+                    handleAddPrescription();
+                  }
+                }}
+                loading={isLoading()}
+              >
                 {props.enableOrder ? 'Add Prescription to Order' : 'Add Prescription to Drafts'}
               </Button>
             </div>
@@ -518,10 +470,3 @@ export const AddPrescriptionCard = (props: {
     </div>
   );
 };
-
-export function isTreatmentInDraftPrescriptions(
-  treatmentId: string,
-  draftedPrescriptions: { treatment: { id: string } }[]
-) {
-  return draftedPrescriptions.some((draft) => draft.treatment.id === treatmentId);
-}

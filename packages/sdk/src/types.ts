@@ -634,6 +634,7 @@ export type PrescriptionInput = {
 };
 
 export enum PrescriptionState {
+  Draft = 'DRAFT',
   Active = 'ACTIVE',
   Depleted = 'DEPLETED',
   Expired = 'EXPIRED',

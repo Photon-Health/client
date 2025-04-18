@@ -29,6 +29,7 @@ export default function RecentOrdersDuplicateDialog() {
       open={state.isDuplicateDialogOpen}
       onClose={() => {
         dispatchDatadogAction('prescribe-duplicate-dialog-exit', {}, ref);
+        state?.duplicateDialogCancelCb?.();
         actions.setIsDuplicateDialogOpen(false);
       }}
     >
@@ -64,6 +65,7 @@ export default function RecentOrdersDuplicateDialog() {
           <Button
             size="xl"
             onClick={() => {
+              state?.duplicateDialogCancelCb?.();
               actions.setIsDuplicateDialogOpen(false);
               actions.setIsIssueDialogOpen(true);
             }}
@@ -85,6 +87,7 @@ export default function RecentOrdersDuplicateDialog() {
             variant="naked"
             size="xl"
             onClick={() => {
+              state?.duplicateDialogCancelCb?.();
               dispatchDatadogAction('prescribe-duplicate-dialog-exit', {}, ref);
               actions.setIsDuplicateDialogOpen(false);
             }}

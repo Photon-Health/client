@@ -58,6 +58,7 @@ export type MedHistoryPrescription = Pick<
   | 'fillsAllowed'
   | 'dispenseAsWritten'
   | 'notes'
+  | 'diagnoses'
 >;
 
 const ADD_MED_HISTORY = gql`
@@ -75,7 +76,6 @@ type PatientMedHistoryProps = {
   newMedication?: Treatment;
   openAddMedicationDialog?: () => void;
   hideAddMedicationDialog?: () => void;
-  onRefillClick?: (prescription: MedHistoryPrescription, treatment: Treatment) => void;
 };
 
 export type GetPatientTreatmentHistoryItem = {
@@ -92,6 +92,7 @@ type GetPatientResponse = {
 
 export default function PatientMedHistory(props: PatientMedHistoryProps) {
   const client = usePhotonClient();
+
   const [medHistoryRowItems, setMedHistoryRowItems] = createSignal<MedHistoryRowItem[] | undefined>(
     undefined
   );
@@ -101,7 +102,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
 
   const queryOptions = createMemo(() => ({
     variables: { id: props.patientId },
-    client: client!.apolloClinical,
+    client: client.apolloClinical,
     skip: !props.patientId,
     fetchPolicy: 'network-only' as const,
     refetchQueries: [GET_PATIENT_MED_HISTORY]
@@ -157,7 +158,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
       });
     };
 
-    await client!.apollo.mutate({
+    await client.apollo.mutate({
       mutation: ADD_MED_HISTORY,
       variables: {
         id: props.patientId,
@@ -208,20 +209,18 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
           rowItems={medHistoryRowItems()}
           sortOrder={sortOrder()}
           onSortOrderToggle={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
-          onRefillClick={(prescription, treatment) =>
-            props.onRefillClick && props.onRefillClick(prescription, treatment)
-          }
         />
       </div>
     </Card>
   );
 }
 
-const mapToMedHistoryRowItems = (getPatientResponse: GetPatientResponse): MedHistoryRowItem[] =>
-  getPatientResponse?.patient?.treatmentHistory.map((historyItem) => ({
+const mapToMedHistoryRowItems = (getPatientResponse: GetPatientResponse): MedHistoryRowItem[] => {
+  return getPatientResponse?.patient?.treatmentHistory.map((historyItem) => ({
     treatment: historyItem.treatment,
     prescription: historyItem.prescription as MedHistoryPrescription
   }));
+};
 
 const sortHistoryByDate = (order: 'asc' | 'desc') => {
   return (a: MedHistoryRowItem, b: MedHistoryRowItem) => {

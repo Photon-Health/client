@@ -41,3 +41,11 @@ __generated__
 *.md
 *.yml
 *.yaml
+
+apps/app/coverage
+apps/app/playwright-report
+packages/components/dist
+packages/elements/dist
+packages/sdk/dist
+packages/components/storybook-static
+packages/react/dist

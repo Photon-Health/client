@@ -9,7 +9,7 @@ export interface SpinnerProps {
 export default function Spinner(props: SpinnerProps) {
   const mergedProps = mergeProps({ size: 'lg', color: 'blue' }, props);
 
-  const spinnerClasses = clsx('mr-2 text-gray-200 animate-spin dark:text-gray-600', {
+  const spinnerClasses = clsx('text-gray-200 animate-spin dark:text-gray-600', {
     'fill-blue-500': mergedProps.color === 'blue',
     'fill-green-500': mergedProps.color === 'green',
     'w-4 h-4': mergedProps.size === 'sm',
@@ -23,7 +23,7 @@ export default function Spinner(props: SpinnerProps) {
       <svg
         aria-hidden="true"
         class={spinnerClasses}
-        viewBox="0 0 100 101"
+        viewBox="0 0 100 100"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >

@@ -19,8 +19,7 @@ const shouldWarn = (form: any) =>
   form()['daysSupply']?.value != 30 ||
   form()['refillsInput']?.value != 0 ||
   form()['addToTemplates']?.value != false ||
-  form()['effectiveDate']?.value != format(new Date(), 'yyyy-MM-dd').toString() ||
-  form()['draftPrescriptions']?.value.length > 0;
+  form()['effectiveDate']?.value != format(new Date(), 'yyyy-MM-dd').toString();
 
 const Component = (props: {
   enableMedHistory: boolean;

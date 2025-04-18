@@ -12,7 +12,6 @@ import { Treatment } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
 import type { Address } from '../photon-prescribe-workflow';
-import { MedHistoryPrescription } from '@photonhealth/components/dist/packages/components/src/systems/PatientMedHistory';
 
 const patientValidator = message(record(string(), any()), 'Please select a patient...');
 
@@ -41,7 +40,6 @@ export const PatientCard = (props: {
   enableMedHistoryLinks?: boolean;
   enableMedHistoryRefillButton?: boolean;
   hidePatientCard?: boolean;
-  onRefillClick?: (prescription: MedHistoryPrescription, treatment: Treatment) => void;
 }) => {
   const [newMedication, setNewMedication] = createSignal<Treatment | undefined>();
   undefined;
@@ -167,9 +165,6 @@ export const PatientCard = (props: {
             enableRefillButton={props.enableMedHistoryRefillButton ?? false}
             openAddMedicationDialog={() => setShowAddMedDialog(true)}
             hideAddMedicationDialog={() => setShowAddMedDialog(false)}
-            onRefillClick={(prescription, treatment) => {
-              props.onRefillClick && props.onRefillClick(prescription, treatment);
-            }}
           />
           <photon-add-medication-history-dialog
             title="Add Medication History"
