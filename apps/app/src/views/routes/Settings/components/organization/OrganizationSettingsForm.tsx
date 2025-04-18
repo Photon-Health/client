@@ -426,6 +426,7 @@ export function OrganizationSettingsForm({
               </Flex>
             </FormControl>
           </Flex>
+          {/*
           <Flex gap={4} w="50%">
             <FormControl isInvalid={!!errors.patientUx?.patientFeaturedPharmacyName}>
               <FormLabel htmlFor="patientUx.patientFeaturedPharmacyName">
@@ -438,6 +439,7 @@ export function OrganizationSettingsForm({
               />
             </FormControl>
           </Flex>
+          */}
         </VStack>
       </VStack>
     </form>
