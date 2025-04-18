@@ -447,7 +447,7 @@ const organizationSettings: {
     logo: 'measured_logo.svg',
     accentColor: '#ffd100',
     paExceptionMessage:
-      'Your prescription requires prior authorization from your insurance before it can be picked up. Your Care Team is working on this now and you should receive a determination in 2-5 business days. If your Measured provider has not mentioned a prior authorization, please reach out to your Care Team through the patient portal.'
+      "Your prescription requires insurance prior authorization before it can be picked up. If you haven't heard from your Measured Care Team yet regarding your insurance’s determination, please wait for an update before picking up your prescription. Insurance determinations usually take 2-5 business days."
   },
   // Norman MD
   org_uXezwtzzt5uqhgHk: {
