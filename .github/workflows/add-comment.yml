@@ -13,14 +13,21 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
+            if (github.actor === 'dependabot[bot]') {
+              console.log('Skipping comment for Dependabot PR');
+              return;
+            }
+
             let ref = "${{github.head_ref}}"
             ref = ref.replace(/\//g, "_")
+
             const message = `
               To see this branch's clinical app [click here](https://app-${ref}.boson.health)
               
               To see this branch's patient app [click here](https://orders-${ref}.boson.health). 
               Then open a boson test text from \`#test-text\` and copy the url
             `.trim()
+            
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
