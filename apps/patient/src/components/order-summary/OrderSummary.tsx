@@ -1,4 +1,3 @@
-import { getSettings } from '@client/settings';
 import { PrescriptionFulfillmentState } from '../../__generated__/graphql';
 import { getLatestReadyTime } from '../../utils/fulfillmentsHelpers';
 import { Order } from '../../utils/models';
@@ -82,7 +81,7 @@ const MESSAGE: { [key in ExceptionData['exceptionType']]: (order: Order) => stri
   BACKORDERED: () =>
     `The pharmacy can’t order the medication. Contact your provider for alternatives or change your pharmacy.`,
   PA_REQUIRED: ({ organization }) => {
-    const { paExceptionMessage } = getSettings(organization.id);
+    const paExceptionMessage = organization.settings?.priorAuthorizationExceptionMessage;
     return (
       paExceptionMessage ??
       'Your insurance needs information from your provider to cover this medication. Contact your provider for alternatives or pay the cash price.'

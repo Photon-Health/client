@@ -69,6 +69,7 @@ export type PrescribeProps = {
   enableMedHistoryLinks: boolean;
   enableMedHistoryRefillButton: boolean;
   enableCombineAndDuplicate: boolean;
+  enableDeliveryPharmacies: boolean;
   mailOrderIds?: string;
   pharmacyId?: string;
   loading: boolean;
@@ -724,6 +725,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     actions={props.formActions}
                     enableLocalPickup={props.enableLocalPickup}
                     enableSendToPatient={props.enableSendToPatient}
+                    enableDeliveryPharmacies={props.enableDeliveryPharmacies}
                     mailOrderIds={props.mailOrderIds}
                   />
                 </Show>

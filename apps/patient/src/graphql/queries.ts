@@ -44,6 +44,16 @@ export const GET_ORDER = gql`
       organization {
         id
         name
+        settings {
+          brandColor
+          brandLogo
+          priorAuthorizationExceptionMessage
+          patientUx {
+            enablePatientRerouting
+            enablePatientDeliveryPharmacies
+            patientFeaturedPharmacyName
+          }
+        }
       }
       fulfillment {
         type

@@ -5,8 +5,7 @@ import { useState } from 'react';
 
 import { Alert, AlertIcon, ModalCloseButton, useColorMode, VStack } from '@chakra-ui/react';
 
-import { types } from '@photonhealth/react';
-import { getSettings } from '@client/settings';
+import { types, usePhoton } from '@photonhealth/react';
 
 import { confirmWrapper } from '../../../components/GuardDialog';
 import { PatientCard } from './PatientCard';
@@ -14,6 +13,9 @@ import { SelectPatientCard } from './SelectPatientCard';
 import { SelectPrescriptionsCard } from './SelectPrescriptionsCard';
 import { SelectPharmacyCard } from './SelectPharmacyCard';
 import { PatientAddressCard } from './PatientAddressCard';
+import { OrganizationSettings } from 'apps/app/src/gql/graphql';
+import { graphql } from 'apps/app/src/gql';
+import { useQuery } from '@apollo/client';
 
 const EMPTY_FORM_VALUES = {
   patientId: '',
@@ -86,15 +88,14 @@ export type FulfillmentOptions = {
 }[];
 
 const initOrder = (
-  orgSettings: any,
+  orgSettings: Partial<OrganizationSettings> | null | undefined,
   patient: types.Patient,
-  prescriptionIds: string,
-  auth0UserId: string
+  prescriptionIds: string
 ) => {
   // Create fulfillment options
-  const sendToPatientUsers = orgSettings.sendToPatientUsers as string[];
-  const sendToPatientEnabled =
-    orgSettings.sendToPatient || sendToPatientUsers.includes(auth0UserId);
+  const sendToPatientEnabled = orgSettings?.providerUx?.enablePatientRouting ?? true;
+  const pickupEnabled = orgSettings?.providerUx?.enablePickupPharmacies ?? true;
+  const mailOrderEnabled = orgSettings?.providerUx?.enableDeliveryPharmacies ?? false;
 
   const fulfillmentOptions: FulfillmentOptions = [
     {
@@ -105,12 +106,12 @@ const initOrder = (
     {
       name: 'Local Pickup',
       fulfillmentType: types.FulfillmentType.PickUp,
-      enabled: orgSettings.pickUp as boolean
+      enabled: pickupEnabled
     },
     {
       name: 'Mail Order',
       fulfillmentType: types.FulfillmentType.MailOrder,
-      enabled: orgSettings.mailOrder as boolean
+      enabled: mailOrderEnabled
     }
   ];
 
@@ -120,7 +121,7 @@ const initOrder = (
   let initialPharmacyId = '';
 
   // Send to patient takes precedence over preferred pharmacy
-  if (!sendToPatientEnabled && (orgSettings.pickUp || orgSettings.mailOrder)) {
+  if (!sendToPatientEnabled && (pickupEnabled || mailOrderEnabled)) {
     const preferredPharmacy = patient?.preferredPharmacies?.[0];
 
     const enabledFulfillmentTypes: FulfillmentOrEmpty[] = fulfillmentOptions
@@ -165,9 +166,23 @@ const initOrder = (
   return { initialFormValues, fulfillmentOptions };
 };
 
+const orgSettingsQuery = graphql(/* GraphQL */ `
+  query OrderFormOrgSettingsQuery {
+    organization {
+      settings {
+        providerUx {
+          enablePrescriberOrdering
+          enablePatientRouting
+          enablePickupPharmacies
+          enableDeliveryPharmacies
+        }
+      }
+    }
+  }
+`);
+
 export const OrderForm = ({
   user,
-  auth0UserId,
   loading,
   patient,
   onClose,
@@ -178,17 +193,23 @@ export const OrderForm = ({
   showAddress,
   setShowAddress
 }: OrderFormProps) => {
+  const { clinicalClient } = usePhoton();
   const { colorMode } = useColorMode();
   const [updatePreferredPharmacy, setUpdatePreferredPharmacy] = useState(false);
   const [updateAddress, setUpdateAddress] = useState(false);
 
-  const orgSettings = getSettings(user?.org_id);
+  const { data } = useQuery(orgSettingsQuery, {
+    client: clinicalClient
+  });
+  const orgSettings = data?.organization?.settings;
+  const enablePrescriberOrdering = orgSettings?.providerUx?.enablePrescriberOrdering ?? true;
+
+  if (!data) return null;
 
   const { initialFormValues, fulfillmentOptions } = initOrder(
     orgSettings,
     patient,
-    prescriptionIds,
-    auth0UserId
+    prescriptionIds
   );
 
   const onCancel = async (dirty: Boolean) => {
@@ -274,7 +295,7 @@ export const OrderForm = ({
               }}
             />
 
-            <Alert status="error" hidden={orgSettings.sendOrder} mb={5}>
+            <Alert status="error" hidden={enablePrescriberOrdering} mb={5}>
               <AlertIcon />
               You are not allowed to create orders via the Photon App.
             </Alert>

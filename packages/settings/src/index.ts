@@ -4,7 +4,7 @@ import { photon } from './lib/photon';
 
 const environment = process.env['REACT_APP_ENV_NAME'] as 'boson' | 'neutron' | 'photon' | 'tau';
 
-export function getSettings(organizationId: string | undefined) {
+export function getOrgMailOrderPharms(organizationId: string | undefined) {
   switch (environment) {
     case 'tau':
     case 'boson':

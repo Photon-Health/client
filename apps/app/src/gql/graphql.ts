@@ -50,6 +50,32 @@ export type AllergenFilter = {
   rxNormId?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type Benefit = {
+  __typename?: 'Benefit';
+  bin: Scalars['String']['output'];
+  groupId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  memberId: Scalars['String']['output'];
+  payerName?: Maybe<Scalars['String']['output']>;
+  pcn?: Maybe<Scalars['String']['output']>;
+  planName?: Maybe<Scalars['String']['output']>;
+  type: BenefitType;
+};
+
+export type BenefitInput = {
+  bin: Scalars['String']['input'];
+  groupId?: InputMaybe<Scalars['String']['input']>;
+  memberId: Scalars['String']['input'];
+  patientId: Scalars['ID']['input'];
+  pcn?: InputMaybe<Scalars['String']['input']>;
+};
+
+export enum BenefitType {
+  Coupon = 'coupon',
+  Discount = 'discount',
+  Insurance = 'insurance'
+}
+
 export type Client = {
   __typename?: 'Client';
   appType: Scalars['String']['output'];
@@ -151,6 +177,7 @@ export enum MedicationType {
 export type Mutation = {
   __typename?: 'Mutation';
   agreeToSignatureAttestation: Scalars['Boolean']['output'];
+  createBenefit: Benefit;
   createClient: Client;
   createTicket: Ticket;
   createWebhookConfig: Scalars['ID']['output'];
@@ -173,6 +200,11 @@ export type Mutation = {
 
 export type MutationAgreeToSignatureAttestationArgs = {
   version: Scalars['String']['input'];
+};
+
+
+export type MutationCreateBenefitArgs = {
+  input: BenefitInput;
 };
 
 
@@ -378,6 +410,7 @@ export type OrganizationProviderUxSettings = {
   enablePrescriberOrdering?: Maybe<Scalars['Boolean']['output']>;
   enableRxTemplates?: Maybe<Scalars['Boolean']['output']>;
   enableTreatmentHistory?: Maybe<Scalars['Boolean']['output']>;
+  federatedAuth?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type OrganizationProviderUxSettingsInput = {
@@ -389,6 +422,7 @@ export type OrganizationProviderUxSettingsInput = {
   enablePrescriberOrdering?: InputMaybe<Scalars['Boolean']['input']>;
   enableRxTemplates?: InputMaybe<Scalars['Boolean']['input']>;
   enableTreatmentHistory?: InputMaybe<Scalars['Boolean']['input']>;
+  federatedAuth?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type OrganizationSettings = {
@@ -438,6 +472,7 @@ export type OrganizationSettingsInput = {
 
 export type Patient = {
   __typename?: 'Patient';
+  benefits: Array<Benefit>;
   dateOfBirth: Scalars['Date']['output'];
   email?: Maybe<Scalars['String']['output']>;
   gender?: Maybe<Scalars['String']['output']>;
@@ -481,6 +516,7 @@ export type Prescription = {
   id: Scalars['ID']['output'];
   instructions: Scalars['String']['output'];
   notes?: Maybe<Scalars['String']['output']>;
+  state: PrescriptionState;
   treatment: Treatment;
   writtenAt: Scalars['DateTime']['output'];
 };
@@ -530,6 +566,14 @@ export enum PrescriptionScreeningAlertSeverity {
 export enum PrescriptionScreeningAlertType {
   Allergen = 'ALLERGEN',
   Drug = 'DRUG'
+}
+
+export enum PrescriptionState {
+  Active = 'ACTIVE',
+  Canceled = 'CANCELED',
+  Depleted = 'DEPLETED',
+  Draft = 'DRAFT',
+  Expired = 'EXPIRED'
 }
 
 export type ProfileInput = {
@@ -787,12 +831,37 @@ export type WebhookConfig = {
   url: Scalars['String']['output'];
 };
 
+export type AuthComponentOrgSettingsQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AuthComponentOrgSettingsQueryQuery = { __typename?: 'Query', organization?: { __typename?: 'Organization', settings?: { __typename?: 'OrganizationSettings', providerUx: { __typename?: 'OrganizationProviderUxSettings', federatedAuth?: boolean | null } } | null } | null };
+
+export type NavOrgSettingsQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type NavOrgSettingsQueryQuery = { __typename?: 'Query', organization?: { __typename?: 'Organization', settings?: { __typename?: 'OrganizationSettings', providerUx: { __typename?: 'OrganizationProviderUxSettings', federatedAuth?: boolean | null } } | null } | null };
+
 export type TicketModalCreateTicketMutationVariables = Exact<{
   input: TicketInput;
 }>;
 
 
 export type TicketModalCreateTicketMutation = { __typename?: 'Mutation', createTicket: { __typename?: 'Ticket', id: string } };
+
+export type OrderFormOrgSettingsQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type OrderFormOrgSettingsQueryQuery = { __typename?: 'Query', organization?: { __typename?: 'Organization', settings?: { __typename?: 'OrganizationSettings', providerUx: { __typename?: 'OrganizationProviderUxSettings', enablePrescriberOrdering?: boolean | null, enablePatientRouting?: boolean | null, enablePickupPharmacies?: boolean | null, enableDeliveryPharmacies?: boolean | null } } | null } | null };
+
+export type NewOrderOrgSettingsQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type NewOrderOrgSettingsQueryQuery = { __typename?: 'Query', organization?: { __typename?: 'Organization', settings?: { __typename?: 'OrganizationSettings', providerUx: { __typename?: 'OrganizationProviderUxSettings', enablePrescriberOrdering?: boolean | null } } | null } | null };
+
+export type PrescriptionFormOrgSettingsQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PrescriptionFormOrgSettingsQueryQuery = { __typename?: 'Query', organization?: { __typename?: 'Organization', settings?: { __typename?: 'OrganizationSettings', providerUx: { __typename?: 'OrganizationProviderUxSettings', enablePrescribeToOrder?: boolean | null, enableRxTemplates?: boolean | null, enableDuplicateRxWarnings?: boolean | null, enableTreatmentHistory?: boolean | null, enablePatientRouting?: boolean | null, enablePickupPharmacies?: boolean | null, enableDeliveryPharmacies?: boolean | null } } | null } | null };
 
 export type ClientInfoCardFragmentFragment = { __typename?: 'Client', id: string, appType: string, name: string, secret?: string | null, whiteListedUrls: Array<string> } & { ' $fragmentName'?: 'ClientInfoCardFragmentFragment' };
 
@@ -993,7 +1062,12 @@ export const UserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind"
 export const UserItemUserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"UserItemUserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"UserFragment"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"npi"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"fax"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"address"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"street1"}},{"kind":"Field","name":{"kind":"Name","value":"street2"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"postalCode"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"city"}}]}},{"kind":"Field","name":{"kind":"Name","value":"name"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"first"}},{"kind":"Field","name":{"kind":"Name","value":"full"}},{"kind":"Field","name":{"kind":"Name","value":"last"}},{"kind":"Field","name":{"kind":"Name","value":"middle"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"RemoveUserActionUserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"name"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"full"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"EditRolesActionUserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"npi"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"fax"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"address"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"street1"}},{"kind":"Field","name":{"kind":"Name","value":"street2"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"postalCode"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"city"}}]}},{"kind":"Field","name":{"kind":"Name","value":"name"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"first"}},{"kind":"Field","name":{"kind":"Name","value":"full"}},{"kind":"Field","name":{"kind":"Name","value":"last"}},{"kind":"Field","name":{"kind":"Name","value":"middle"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"RemoveUserActionUserFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"EditRolesActionUserFragment"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"npi"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"fax"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"address"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"street1"}},{"kind":"Field","name":{"kind":"Name","value":"street2"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"postalCode"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"city"}}]}},{"kind":"Field","name":{"kind":"Name","value":"name"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"first"}},{"kind":"Field","name":{"kind":"Name","value":"full"}},{"kind":"Field","name":{"kind":"Name","value":"last"}},{"kind":"Field","name":{"kind":"Name","value":"middle"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<UserItemUserFragmentFragment, unknown>;
 export const WebhookItemFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"WebhookItemFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"WebhookConfig"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"url"}}]}}]} as unknown as DocumentNode<WebhookItemFragmentFragment, unknown>;
 export const OrganizationTreatmentTabFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OrganizationTreatmentTabFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Organization"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]} as unknown as DocumentNode<OrganizationTreatmentTabFragmentFragment, unknown>;
+export const AuthComponentOrgSettingsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AuthComponentOrgSettingsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"organization"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"settings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"providerUx"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"federatedAuth"}}]}}]}}]}}]}}]} as unknown as DocumentNode<AuthComponentOrgSettingsQueryQuery, AuthComponentOrgSettingsQueryQueryVariables>;
+export const NavOrgSettingsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"NavOrgSettingsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"organization"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"settings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"providerUx"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"federatedAuth"}}]}}]}}]}}]}}]} as unknown as DocumentNode<NavOrgSettingsQueryQuery, NavOrgSettingsQueryQueryVariables>;
 export const TicketModalCreateTicketDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TicketModalCreateTicket"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"TicketInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createTicket"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<TicketModalCreateTicketMutation, TicketModalCreateTicketMutationVariables>;
+export const OrderFormOrgSettingsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"OrderFormOrgSettingsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"organization"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"settings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"providerUx"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enablePrescriberOrdering"}},{"kind":"Field","name":{"kind":"Name","value":"enablePatientRouting"}},{"kind":"Field","name":{"kind":"Name","value":"enablePickupPharmacies"}},{"kind":"Field","name":{"kind":"Name","value":"enableDeliveryPharmacies"}}]}}]}}]}}]}}]} as unknown as DocumentNode<OrderFormOrgSettingsQueryQuery, OrderFormOrgSettingsQueryQueryVariables>;
+export const NewOrderOrgSettingsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"NewOrderOrgSettingsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"organization"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"settings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"providerUx"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enablePrescriberOrdering"}}]}}]}}]}}]}}]} as unknown as DocumentNode<NewOrderOrgSettingsQueryQuery, NewOrderOrgSettingsQueryQueryVariables>;
+export const PrescriptionFormOrgSettingsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PrescriptionFormOrgSettingsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"organization"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"settings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"providerUx"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enablePrescribeToOrder"}},{"kind":"Field","name":{"kind":"Name","value":"enableRxTemplates"}},{"kind":"Field","name":{"kind":"Name","value":"enableDuplicateRxWarnings"}},{"kind":"Field","name":{"kind":"Name","value":"enableTreatmentHistory"}},{"kind":"Field","name":{"kind":"Name","value":"enablePatientRouting"}},{"kind":"Field","name":{"kind":"Name","value":"enablePickupPharmacies"}},{"kind":"Field","name":{"kind":"Name","value":"enableDeliveryPharmacies"}}]}}]}}]}}]}}]} as unknown as DocumentNode<PrescriptionFormOrgSettingsQueryQuery, PrescriptionFormOrgSettingsQueryQueryVariables>;
 export const ClientsDeveloperTabQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ClientsDeveloperTabQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"clients"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"ClientInfoCardFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ClientInfoCardFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Client"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"appType"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"secret"}},{"kind":"Field","name":{"kind":"Name","value":"whiteListedUrls"}}]}}]} as unknown as DocumentNode<ClientsDeveloperTabQueryQuery, ClientsDeveloperTabQueryQueryVariables>;
 export const RotateSecretDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RotateSecret"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"clientId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rotateClientSecret"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"clientId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"clientId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<RotateSecretMutation, RotateSecretMutationVariables>;
 export const UpdateClientDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateClient"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"clientId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"whiteListedUrls"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateClient"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"clientId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"clientId"}}},{"kind":"Argument","name":{"kind":"Name","value":"whiteListedUrls"},"value":{"kind":"Variable","name":{"kind":"Name","value":"whiteListedUrls"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateClientMutation, UpdateClientMutationVariables>;

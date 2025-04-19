@@ -1,4 +1,4 @@
-import { OrganizationSettings } from '../types';
+import { MailOrderPharmacyConfigs, OrganizationSettings } from '../types';
 import {
   CUREXA_PHARMACY_ID,
   CAREPOINT_PHARMACY_ID,
@@ -14,7 +14,7 @@ import {
  * to default settings can affect multiple orgs
  */
 
-const defaultSettings: OrganizationSettings = {
+const defaultSettings = {
   logo: undefined,
   accentColor: '#3182ce',
   sendOrder: true,
@@ -43,14 +43,12 @@ const defaultSettings: OrganizationSettings = {
   hideTemplates: false
 };
 
-export const boson = function (organizationId: string | undefined) {
-  if (organizationId && organizationSettings[organizationId]) {
-    return {
-      ...defaultSettings,
-      ...organizationSettings[organizationId]
-    };
-  }
-  return defaultSettings;
+export const boson = function (organizationId: string | undefined): MailOrderPharmacyConfigs {
+  const orgConfig = organizationId ? organizationSettings[organizationId] : undefined;
+  return {
+    provider: orgConfig?.mailOrderProviders ?? defaultSettings.mailOrderProviders,
+    patient: orgConfig?.mailOrderNavigateProviders ?? defaultSettings.mailOrderNavigateProviders
+  };
 };
 
 /**

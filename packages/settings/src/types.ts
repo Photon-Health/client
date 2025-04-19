@@ -1,5 +1,6 @@
 /**
  * Organization settings
+ * @deprecated Use MailOrderPharmacyConfigs and server side organization settings instead
  *
  * @param logo Primary logo
  * @param accentColor Primary theme color
@@ -48,3 +49,8 @@ export type OrganizationSettings = {
   hideTemplates?: boolean;
   paExceptionMessage?: string;
 };
+
+export interface MailOrderPharmacyConfigs {
+  provider: string[];
+  patient: string[];
+}
