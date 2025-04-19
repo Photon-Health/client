@@ -198,9 +198,13 @@ export const OrderForm = ({
   const [updatePreferredPharmacy, setUpdatePreferredPharmacy] = useState(false);
   const [updateAddress, setUpdateAddress] = useState(false);
 
-  const { data } = useQuery(orgSettingsQuery, { client: clinicalClient });
+  const { data } = useQuery(orgSettingsQuery, {
+    client: clinicalClient
+  });
   const orgSettings = data?.organization?.settings;
   const enablePrescriberOrdering = orgSettings?.providerUx?.enablePrescriberOrdering ?? true;
+
+  if (!data) return null;
 
   const { initialFormValues, fulfillmentOptions } = initOrder(
     orgSettings,
