@@ -29,7 +29,7 @@ import {
 } from '../components';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, preparePharmacy } from '../utils/general';
-import { ExtendedFulfillmentType } from '../utils/models';
+import { ExtendedFulfillmentType, Order } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -119,9 +119,9 @@ export const Pharmacy = () => {
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
   const [enablePrice, setEnablePrice] = useState(false);
 
-  const [amazonPharmacyOverride, setAmazonPharmacyOverride] = useState<string | undefined>(
-    undefined
-  );
+  const [brandedOptionsOverride, setBrandedOptionsOverride] = useState<
+    Record<string, string | undefined> | undefined
+  >(undefined);
 
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
@@ -177,9 +177,96 @@ export const Pharmacy = () => {
         .filter((offer) => offer.deliveryEstimate !== undefined);
 
       if (amazonOffers.length > 0 && amazonOffers[0]?.deliveryEstimate?.deliveryPromise) {
-        setAmazonPharmacyOverride(amazonOffers[0]?.deliveryEstimate?.deliveryPromise);
+        const newBrandedOptionsOverride = {
+          ...brandedOptionsOverride,
+          amazonPharmacyOverride: amazonOffers[0]?.deliveryEstimate?.deliveryPromise
+        };
+
+        if (JSON.stringify(newBrandedOptionsOverride) !== JSON.stringify(brandedOptionsOverride)) {
+          setBrandedOptionsOverride(newBrandedOptionsOverride);
+        }
       }
     }
+
+    const determineNovocareExperimentSegment = (order: Order): string | undefined => {
+      const organizationId = order?.organization.id;
+
+      const medicinesAndDeliveryTypes = [
+        {
+          patterns: [
+            'zepbound subcutaneous solution Auto-injector 7.5 mg/0.5ml',
+            'ondansetron.*oral'
+          ],
+          deliveryType: 'Delivers in 3-5 days'
+        },
+        {
+          patterns: ['wegovy subcutaneous solution auto-injector 0.25 MG/0.5ML'],
+          deliveryType: 'Delivers in 3-5 days'
+        }
+      ];
+
+      const organizationsAndAcceptableMedicationNames: Record<
+        string,
+        { patterns: string[]; deliveryType: string }[]
+      > = {
+        org_KzSVZBQixLRkqj5d: medicinesAndDeliveryTypes, // boson Test Organization 11
+        org_pcPnPx5PVamzjS2p: medicinesAndDeliveryTypes // production measured
+      };
+
+      if (!organizationId) {
+        return undefined;
+      }
+
+      const isCorrectOrganization =
+        Object.keys(organizationsAndAcceptableMedicationNames).indexOf(order?.organization.id) > -1;
+
+      if (!isCorrectOrganization) {
+        return undefined;
+      }
+
+      const medications = order.fulfillments.map((f) =>
+        f.prescription.treatment.name.toLowerCase()
+      );
+
+      const getDeliveryType = () => {
+        // For each combination in the organization
+        for (const combination of organizationsAndAcceptableMedicationNames[organizationId]) {
+          const patterns = combination.patterns.map((r) => new RegExp(r.toLowerCase()));
+
+          // If we have exactly the right number of medications
+          if (medications.length === patterns.length) {
+            // Check if we can match each pattern to a unique medication
+            const unmatchedMedications = [...medications];
+            const allPatternsMatch = patterns.every((pattern) => {
+              const matchIndex = unmatchedMedications.findIndex((med) => med.match(pattern));
+              if (matchIndex !== -1) {
+                // Remove the matched medication so it can't be matched again
+                unmatchedMedications.splice(matchIndex, 1);
+                return true;
+              }
+              return false;
+            });
+
+            if (allPatternsMatch) {
+              return combination.deliveryType;
+            }
+          }
+        }
+      };
+
+      const deliveryType = getDeliveryType();
+
+      if (deliveryType) {
+        const newBrandedOptionsOverride = {
+          ...brandedOptionsOverride,
+          novocareExperimentOverride: deliveryType
+        };
+
+        if (JSON.stringify(newBrandedOptionsOverride) !== JSON.stringify(brandedOptionsOverride)) {
+          setBrandedOptionsOverride(newBrandedOptionsOverride);
+        }
+      }
+    };
 
     const validOrganizationIds = [
       'org_KzSVZBQixLRkqj5d', // boson Test Organization 11
@@ -193,7 +280,8 @@ export const Pharmacy = () => {
     }
 
     fetchOffers();
-  }, [order]);
+    determineNovocareExperimentSegment(order);
+  }, [order, brandedOptionsOverride]);
 
   const showToastWarning = () =>
     toast({
@@ -596,9 +684,9 @@ export const Pharmacy = () => {
           setTimeout(async () => {
             setShowFooter(false);
 
-            if (amazonPharmacyOverride) {
-              const slugifiedOverride = amazonPharmacyOverride
-                .toLowerCase()
+            if (brandedOptionsOverride?.amazonPharmacyOverride) {
+              const slugifiedOverride = brandedOptionsOverride?.amazonPharmacyOverride
+                ?.toLowerCase()
                 .trim()
                 .replace(/\s+/g, '_')
                 .replace(/[^a-z0-9_]/g, '')
@@ -616,6 +704,22 @@ export const Pharmacy = () => {
                   orderId: order.id,
                   organizationId: order.organization.id,
                   description: slugifiedOverride,
+                  timestamp: new Date().toISOString()
+                });
+              }
+            }
+
+            if (brandedOptionsOverride?.novocareExperimentOverride) {
+              if (selectedId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID) {
+                datadogRum.addAction('novocare_experiment_offer_active_and_selected', {
+                  orderId: order.id,
+                  organizationId: order.organization.id,
+                  timestamp: new Date().toISOString()
+                });
+              } else {
+                datadogRum.addAction('novocare_experiment_offer_active_and_not_selected', {
+                  orderId: order.id,
+                  organizationId: order.organization.id,
                   timestamp: new Date().toISOString()
                 });
               }
@@ -643,6 +747,9 @@ export const Pharmacy = () => {
               type = 'MAIL_ORDER';
               selectedPharmacy = { id: selectedId, name: 'Walmart Pharmacy' };
             } else if (selectedId === process.env.REACT_APP_COSTCO_PHARMACY_ID) {
+              type = 'MAIL_ORDER';
+              selectedPharmacy = { id: selectedId, name: 'Costco Pharmacy' };
+            } else if (selectedId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID) {
               type = 'MAIL_ORDER';
               selectedPharmacy = { id: selectedId, name: 'Costco Pharmacy' };
             } else {
@@ -749,7 +856,12 @@ export const Pharmacy = () => {
   const brandedOptions = [
     ...(capsuleEnabled ? [capsulePharmacyId] : []),
     ...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : []),
-    ...(amazonPharmacyOverride ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string] : [])
+    ...(brandedOptionsOverride?.novocareExperimentOverride
+      ? [process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string]
+      : []),
+    ...(brandedOptionsOverride?.amazonPharmacyOverride
+      ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]
+      : [])
   ];
 
   return (
@@ -797,13 +909,13 @@ export const Pharmacy = () => {
       <Container pb={showFooter ? 32 : 8}>
         {location ? (
           <VStack spacing={6} align="stretch" pt={4}>
-            {enableCourier || enableMailOrder || amazonPharmacyOverride ? (
+            {enableCourier || enableMailOrder || brandedOptionsOverride ? (
               <BrandedOptions
                 options={brandedOptions}
                 location={location}
                 selectedId={selectedId}
                 handleSelect={handleSelect}
-                amazonPharmacyOverride={amazonPharmacyOverride}
+                brandedOptionOverrides={brandedOptionsOverride ?? {}}
               />
             ) : null}
 
