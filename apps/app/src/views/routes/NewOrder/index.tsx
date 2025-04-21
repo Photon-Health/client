@@ -17,26 +17,47 @@ import {
   useBreakpointValue,
   useColorModeValue
 } from '@chakra-ui/react';
-
+import { useQuery } from '@apollo/client';
 import { FiShoppingCart } from 'react-icons/fi';
 
-import { getSettings } from '@client/settings';
 import { usePhoton } from '@photonhealth/react';
 
 import { PatientFieldsFragmentMap } from '../../../model/fragments';
 import { OrderForm } from './components/OrderForm';
 
 import jwtDecode from 'jwt-decode';
+import { graphql } from 'apps/app/src/gql';
+
+const orgSettingsQuery = graphql(/* GraphQL */ `
+  query NewOrderOrgSettingsQuery {
+    organization {
+      settings {
+        providerUx {
+          enablePrescriberOrdering
+        }
+      }
+    }
+  }
+`);
 
 export const NewOrder = () => {
   const [params] = useSearchParams();
   const patientId = params.get('patientId') || '';
   const prescriptionIds = params.get('prescriptionIds') || '';
 
-  const { createOrder, getPatient, updatePatient, removePatientPreferredPharmacy, user, getToken } =
-    usePhoton();
+  const {
+    createOrder,
+    getPatient,
+    updatePatient,
+    removePatientPreferredPharmacy,
+    user,
+    getToken,
+    clinicalClient
+  } = usePhoton();
 
-  const orgSettings = getSettings(user?.org_id);
+  const { data } = useQuery(orgSettingsQuery, { client: clinicalClient });
+  const orgSettings = data?.organization?.settings;
+  const enablePrescriberOrdering = orgSettings?.providerUx?.enablePrescriberOrdering ?? true;
 
   const [auth0UserId, setAuth0UserId] = useState<string>('');
   const getAuth0UserId = async () => {
@@ -162,7 +183,7 @@ export const NewOrder = () => {
                 form="order-form"
                 isLoading={loadingCreateOrder}
                 loadingText="Sending"
-                isDisabled={!orgSettings.sendOrder}
+                isDisabled={!enablePrescriberOrdering}
               >
                 Send Order
               </Button>

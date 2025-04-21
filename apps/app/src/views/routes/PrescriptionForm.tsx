@@ -1,8 +1,10 @@
-import { getSettings } from '@client/settings';
 import { datadogRum } from '@datadog/browser-rum';
 import { usePhoton } from '@photonhealth/react';
+import { useQuery } from '@apollo/client';
 import { MutableRefObject, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { graphql } from 'apps/app/src/gql';
+import { getOrgMailOrderPharms } from '@client/settings';
 
 declare global {
   namespace JSX {
@@ -12,9 +14,27 @@ declare global {
   }
 }
 
+const orgSettingsQuery = graphql(/* GraphQL */ `
+  query PrescriptionFormOrgSettingsQuery {
+    organization {
+      settings {
+        providerUx {
+          enablePrescribeToOrder
+          enableRxTemplates
+          enableDuplicateRxWarnings
+          enableTreatmentHistory
+          enablePatientRouting
+          enablePickupPharmacies
+          enableDeliveryPharmacies
+        }
+      }
+    }
+  }
+`);
+
 export const PrescriptionForm = () => {
   const ref: MutableRefObject<any> = useRef();
-  const { user } = usePhoton();
+  const { user, clinicalClient } = usePhoton();
   const [params] = useSearchParams();
   const patientId = params.get('patientId') || '';
   const pharmacyId = params.get('pharmacyId') || '';
@@ -23,6 +43,17 @@ export const PrescriptionForm = () => {
   const weight = params.get('weight') || '';
   const weightUnit = params.get('weightUnit') || 'lbs';
   const externalId = params.get('externalId') || '';
+
+  const { data } = useQuery(orgSettingsQuery, { client: clinicalClient });
+  const orgSettings = data?.organization?.settings;
+  const enablePrescribeToOrder = orgSettings?.providerUx?.enablePrescribeToOrder ?? true;
+  const enableTreatmentHistory = orgSettings?.providerUx?.enableTreatmentHistory ?? false;
+  const enablePickupPharmacies = orgSettings?.providerUx?.enablePickupPharmacies ?? true;
+  const enableDeliveryPharmacies = orgSettings?.providerUx?.enableDeliveryPharmacies ?? false;
+  const enablePatientRouting = orgSettings?.providerUx?.enablePatientRouting ?? true;
+  const enableDuplicateRxWarnings = orgSettings?.providerUx?.enableDuplicateRxWarnings ?? true;
+  const enableRxTemplates = orgSettings?.providerUx?.enableRxTemplates ?? true;
+  const mailOrderProviders = getOrgMailOrderPharms(user?.org_id)?.provider;
 
   const navigate = useNavigate();
   const onClose = () => {
@@ -94,7 +125,6 @@ export const PrescriptionForm = () => {
     }
   }, [ref.current, patientId]);
 
-  const orgSettings = getSettings(user?.org_id);
   //  TODO: remove enable-new-medication-search after discovery
   return (
     <div
@@ -116,17 +146,18 @@ export const PrescriptionForm = () => {
           prescription-ids={prescriptionIds}
           weight={weight}
           weight-unit={weightUnit}
-          enable-order={orgSettings?.enableRxAndOrder ?? true}
-          enable-med-history={orgSettings?.enableMedHistory ?? false}
+          enable-order={enablePrescribeToOrder}
+          enable-med-history={enableTreatmentHistory}
           enable-med-history-links={true}
           enable-med-history-refill-button={true}
-          enable-local-pickup={orgSettings?.pickUp ?? false}
-          enable-send-to-patient={orgSettings?.sendToPatient ?? false}
-          enable-combine-and-duplicate={orgSettings?.enableCombineAndDuplicate ?? false}
+          enable-local-pickup={enablePickupPharmacies}
+          enable-delivery-pharmacies={enableDeliveryPharmacies}
+          enable-send-to-patient={enablePatientRouting}
+          enable-combine-and-duplicate={enableDuplicateRxWarnings}
           enable-new-medication-search={true}
-          mail-order-ids={orgSettings?.mailOrderProviders?.join(',') ?? ''}
+          mail-order-ids={mailOrderProviders?.join(',') ?? ''}
           toast-buffer={70}
-          hide-templates={orgSettings?.hideTemplates ?? false}
+          hide-templates={!enableRxTemplates}
           external-order-id={externalId}
         />
       ) : null}

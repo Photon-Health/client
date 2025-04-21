@@ -1,5 +1,4 @@
 import { Box, Button, Container, Heading, VStack } from '@chakra-ui/react';
-import { getSettings } from '@client/settings';
 import queryString from 'query-string';
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
@@ -22,7 +21,7 @@ export const StatusV2 = () => {
   const navigate = useNavigate();
   const { order, setOrder, isDemo, setFaqModalIsOpen } = useOrderContext();
 
-  const orgSettings = getSettings(order?.organization.id);
+  const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') ?? undefined;
@@ -120,7 +119,7 @@ export const StatusV2 = () => {
     return null;
   }
 
-  const canReroute = !isDemo && orgSettings.enablePatientRerouting && order.isReroutable;
+  const canReroute = !isDemo && enablePatientRerouting && order.isReroutable;
 
   const handleRerouteLink = () => {
     const query = queryString.stringify({
