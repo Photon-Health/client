@@ -28,6 +28,7 @@ export type FulfillmentOptions = FulfillmentOption[];
 interface PharmacySelectProps {
   enableSendToPatient?: boolean; // declaritively displays Send to Patient tab
   enableLocalPickup?: boolean; // declaritively displays Local Pickup tab
+  enableDeliveryPharmacies?: boolean; // declaritively displays Mail Order tab
   mailOrderPharmacyIds?: string[]; // implicitly displays Mail Order tab
   patientIds?: string[];
   address?: string;
@@ -67,7 +68,9 @@ export function PharmacySelect(props: PharmacySelectProps) {
     setTabs([
       ...(props.enableSendToPatient ? [TabNamesEnum.sendToPatient] : []),
       ...(props.enableLocalPickup ? [TabNamesEnum.localPickup] : []),
-      ...(props.mailOrderPharmacyIds ? [TabNamesEnum.mailOrder] : [])
+      ...(props.enableDeliveryPharmacies && props.mailOrderPharmacyIds
+        ? [TabNamesEnum.mailOrder]
+        : [])
     ]);
 
     // Fulfillment option from the first tab name
