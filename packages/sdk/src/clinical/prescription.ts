@@ -225,4 +225,27 @@ export class PrescriptionQueryManager {
       CREATE_PRESCRIPTIONS
     );
   }
+
+  // todo: do we want this to live here
+  // public updatePrescriptionStates({ fragment }: UpdatePrescriptionStatesOptions) {
+  //   if (!fragment) {
+  //     fragment = { PrescriptionFields: PRESCRIPTION_FIELDS };
+  //   }
+  //   const [fName, fValue] = Object.entries(fragment)[0];
+  //   const CREATE_PRESCRIPTIONS = gql`
+  //     ${fValue}
+  //     mutation createPrescriptions(
+  //       $prescriptions: [PrescriptionInput]!
+  //     ) {
+  //       createPrescriptions(
+  //         prescriptions: $prescriptions
+  //       ) {
+  //         ...${fName}
+  //       }
+  //     }`;
+  //   return makeMutation<{ createPrescriptions: [Prescription] } | undefined | null>(
+  //     this.,
+  //     CREATE_PRESCRIPTIONS
+  //   );
+  // }
 }

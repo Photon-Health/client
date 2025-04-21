@@ -37,6 +37,7 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
+import { createMutation } from '@photonhealth/components/src/utils/createMutation';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -395,10 +396,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         } else {
           // disable order situation
           // mutate prescriptions to DRAFT -> ACTIVE (Backend then fires system event for rx created)
-          // const prescriptionsMutation = client
-          //   .getSDK()
-          //   .clinical.prescription.updatePrescriptions({});
-          // await prescriptionsMutation();
+          const prescriptionsMutation = client.getSDK().apolloClinical.mutate({});
+
+          await prescriptionsMutation();
         }
 
         // this reflects the prescription state changing from 'draft' to 'active'
@@ -447,6 +447,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   const clinicalClient = client.sdk.apolloClinical;
 
+  // todo: do we want this to live here?
+  const [updatePrescriptionStatesMutation] = createMutation<
+    UpdatePrescriptionStatesResponse,
+    UpdatePrescriptionStatesVariables
+  >(UPDATE_PRESCRIPTION_STATES_MUTATION, variables);
   let prescriptionRef: HTMLDivElement | undefined;
 
   const hasCorrectPatientData = createMemo(() => {
