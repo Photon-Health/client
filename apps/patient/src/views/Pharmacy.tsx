@@ -767,7 +767,7 @@ export const Pharmacy = () => {
               selectedPharmacy = { id: selectedId, name: 'Costco Pharmacy' };
             } else if (selectedId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID) {
               type = 'MAIL_ORDER';
-              selectedPharmacy = { id: selectedId, name: 'Costco Pharmacy' };
+              selectedPharmacy = { id: selectedId, name: 'Novocare' };
             } else {
               type = 'PICK_UP';
               selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
