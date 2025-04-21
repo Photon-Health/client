@@ -871,14 +871,13 @@ export const Pharmacy = () => {
 
   const brandedOptions = [
     ...(capsuleEnabled ? [capsulePharmacyId] : []),
-    ...(enableMailOrder ? orgSettings.mailOrderNavigateProviders ?? [] : []),
     ...(brandedOptionsOverride?.novocareExperimentOverride
       ? [process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string]
       : []),
     ...(brandedOptionsOverride?.amazonPharmacyOverride
       ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]
       : []),
-    ...(enableMailOrder ? mailOrderPharmacies : []),
+    ...(enableMailOrder ? mailOrderPharmacies : [])
   ];
 
   return (
