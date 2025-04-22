@@ -198,43 +198,6 @@ function RecentOrders(props: SDKProviderProps) {
     }
   ];
 
-  // // fetch new prescriptions when the prescriptionIds change
-  // // set them as draft prescriptions to match against recent orders
-  // createEffect(() => {
-  //   if (prescriptionIds().length > 0) {
-  //     // make sure prescriptionIds don't exist in draftPrescriptions
-  //     const existingPrescriptionIds = draftPrescriptions().map(
-  //       (prescription: Prescription) => prescription.id
-  //     );
-  //     const newPrescriptionIds = prescriptionIds().filter(
-  //       (id) => !existingPrescriptionIds.includes(id)
-  //     );
-
-  //     // Create an async function to handle the prescription fetching
-  //     const fetchNewPrescriptions = async () => {
-  //       // fetch the new prescriptions
-  //       const newPrescriptions = await Promise.all(
-  //         newPrescriptionIds.map((id) =>
-  //           client!.apollo.query({
-  //             query: GetPrescription,
-  //             variables: { id }
-  //           })
-  //         )
-  //       );
-
-  //       //set the new prescriptions
-  //       setDraftPrescriptions(
-  //         newPrescriptions.map((prescription) => prescription.data.prescription)
-  //       );
-  //     };
-
-  //     if (newPrescriptionIds.length > 0) {
-  //       // Call the async function
-  //       fetchNewPrescriptions();
-  //     }
-  //   }
-  // });
-
   createEffect(() => {
     setState({ isLoading: data.loading });
     const patient = data()?.patient;
