@@ -299,7 +299,7 @@ export function OrganizationSettingsForm({
           <Text fontSize="lg" fontWeight="medium">
             Provider Experience
           </Text>
-          <Grid templateColumns="repeat(2, 1fr)" gap={4} w="100%">
+          <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={4} w="100%">
             <FormControl isInvalid={!!errors.providerUx?.enablePrescriberOrdering}>
               <Flex gap={2}>
                 <Field component={SwitchField} name="providerUx.enablePrescriberOrdering" />
