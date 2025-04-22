@@ -105,6 +105,12 @@ export const CreatePrescription = gql`
   }
 `;
 
+export const UpdatePrescriptionStates = gql`
+  mutation UpdatePrescriptionStates($input: UpdatePrescriptionStatesInput!) {
+    updatePrescriptionStates(input: $input)
+  }
+`;
+
 export const GetTemplatesFromCatalogs = gql`
   query TemplatesFromCatalogs {
     catalogs {

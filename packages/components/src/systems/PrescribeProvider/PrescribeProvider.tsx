@@ -9,12 +9,18 @@ import {
 } from 'solid-js';
 import { format } from 'date-fns';
 import { usePhotonClient } from '../SDKProvider';
-import { Catalog, Prescription, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
+import {
+  Catalog,
+  Prescription,
+  PrescriptionState,
+  PrescriptionTemplate
+} from '@photonhealth/sdk/dist/types';
 import {
   CreatePrescription,
   CreatePrescriptionTemplate,
   GetPrescription,
-  GetTemplatesFromCatalogs
+  GetTemplatesFromCatalogs,
+  UpdatePrescriptionStates
 } from '../../fetch/queries';
 import { triggerToast, useRecentOrders } from '../../index';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
@@ -31,6 +37,7 @@ const PrescribeContext = createContext<{
     prescriptionFormData: PrescriptionFormData,
     options?: TryCreatePrescriptionTemplateOptions
   ) => Promise<Prescription>;
+  tryUpdatePrescriptionStates: (ids: string[], state: PrescriptionState) => Promise<boolean>;
 }>();
 
 export type TemplateOverrides = {
@@ -243,6 +250,33 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     return await createPrescriptionOnApi(prescriptionFormData, options);
   };
 
+  const tryUpdatePrescriptionStates = async (
+    ids: string[],
+    state: PrescriptionState
+  ): Promise<boolean> => {
+    try {
+      const res = await client.apolloClinical.mutate({
+        mutation: UpdatePrescriptionStates,
+        variables: {
+          input: {
+            ids,
+            state
+          }
+        }
+      });
+
+      return res.data.updatePrescriptionStates as boolean;
+    } catch (error) {
+      console.error('Mutation error:', error);
+      triggerToast({
+        status: 'error',
+        header: 'Error Saving Prescription(s)',
+        body: (error as Error).message
+      });
+      throw error;
+    }
+  };
+
   const createPrescriptionOnApi = async (
     prescriptionFormData: PrescriptionFormData,
     options: TryCreatePrescriptionTemplateOptions = { addToTemplates: false }
@@ -319,6 +353,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     isLoadingPrefills,
     // actions
     tryCreatePrescription,
+    tryUpdatePrescriptionStates,
     setEditingPrescription,
     deletePrescription
   };
