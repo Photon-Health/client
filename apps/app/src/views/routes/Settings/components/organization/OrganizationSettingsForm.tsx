@@ -10,7 +10,7 @@ import {
   Grid
 } from '@chakra-ui/react';
 import { ErrorMessage, Field, FieldProps, FormikErrors } from 'formik';
-import { ChangeEvent } from 'react';
+
 import { OrganizationSettingsFormValues } from './utils';
 import { FileUploader } from '../../../../components/FileUpload';
 import { useClinicalRest } from 'apps/app/src/hooks/useClinicalRest';
@@ -21,10 +21,11 @@ const ColorField = ({ field }: FieldProps) => (
   <Input {...field} type="color" maxW={12} paddingX={0} />
 );
 
-const SwitchField = ({ field }: FieldProps) => <Switch {...field} isChecked={field.value} />;
+const SwitchField = ({ field }: FieldProps) => (
+  <Switch {...field} id={field.name} isChecked={field.value} />
+);
 
 export function OrganizationSettingsForm({
-  values,
   errors,
   setFieldValue
 }: {
@@ -77,6 +78,8 @@ export function OrganizationSettingsForm({
           </Flex>
         </VStack>
         <VStack spacing={3} alignItems="flex-start" w="50%"></VStack>
+        {/* Commenting out this section temporarily until we add ability in backend to send emails to their chosen destinations */}
+        {/*
         <VStack spacing={3} alignItems="flex-start" w="100%">
           <Text fontSize="lg" fontWeight="medium">
             Support
@@ -291,28 +294,21 @@ export function OrganizationSettingsForm({
               </Flex>
             )}
         </VStack>
+        */}
         <VStack spacing={3} alignItems="flex-start" w="100%">
           <Text fontSize="lg" fontWeight="medium">
             Provider Experience
           </Text>
-          <Grid templateColumns="repeat(2, 1fr)" gap={4} w="100%">
+          <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={4} w="100%">
             <FormControl isInvalid={!!errors.providerUx?.enablePrescriberOrdering}>
               <Flex gap={2}>
-                <Field
-                  component={SwitchField}
-                  name="providerUx.enablePrescriberOrdering"
-                  id="providerUx.enablePrescriberOrdering"
-                />
+                <Field component={SwitchField} name="providerUx.enablePrescriberOrdering" />
                 <FormLabel htmlFor="providerUx.enablePrescriberOrdering">Enable Ordering</FormLabel>
               </Flex>
             </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enablePrescribeToOrder}>
               <Flex gap={2}>
-                <Field
-                  component={SwitchField}
-                  name="providerUx.enablePrescribeToOrder"
-                  id="providerUx.enablePrescribeToOrder"
-                />
+                <Field component={SwitchField} name="providerUx.enablePrescribeToOrder" />
                 <FormLabel htmlFor="providerUx.enablePrescribeToOrder">
                   Enable Prescribe to Order
                 </FormLabel>
@@ -320,11 +316,7 @@ export function OrganizationSettingsForm({
             </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enableRxTemplates}>
               <Flex gap={2}>
-                <Field
-                  component={SwitchField}
-                  name="providerUx.enableRxTemplates"
-                  id="providerUx.enableRxTemplates"
-                />
+                <Field component={SwitchField} name="providerUx.enableRxTemplates" />
                 <FormLabel htmlFor="providerUx.enableRxTemplates">
                   Enable Prescription Templates
                 </FormLabel>
@@ -332,11 +324,7 @@ export function OrganizationSettingsForm({
             </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enableDuplicateRxWarnings}>
               <Flex gap={2}>
-                <Field
-                  component={SwitchField}
-                  name="providerUx.enableDuplicateRxWarnings"
-                  id="providerUx.enableDuplicateRxWarnings"
-                />
+                <Field component={SwitchField} name="providerUx.enableDuplicateRxWarnings" />
                 <FormLabel htmlFor="providerUx.enableDuplicateRxWarnings">
                   Enable Duplicate Prescription Warnings
                 </FormLabel>
@@ -344,11 +332,7 @@ export function OrganizationSettingsForm({
             </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enableTreatmentHistory}>
               <Flex gap={2}>
-                <Field
-                  component={SwitchField}
-                  name="providerUx.enableTreatmentHistory"
-                  id="providerUx.enableTreatmentHistory"
-                />
+                <Field component={SwitchField} name="providerUx.enableTreatmentHistory" />
                 <FormLabel htmlFor="providerUx.enableTreatmentHistory">
                   Enable Treatment History
                 </FormLabel>
@@ -356,11 +340,7 @@ export function OrganizationSettingsForm({
             </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enablePatientRouting}>
               <Flex gap={2}>
-                <Field
-                  component={SwitchField}
-                  name="providerUx.enablePatientRouting"
-                  id="providerUx.enablePatientRouting"
-                />
+                <Field component={SwitchField} name="providerUx.enablePatientRouting" />
                 <FormLabel htmlFor="providerUx.enablePatientRouting">
                   Enable Patient Routing
                 </FormLabel>
@@ -368,11 +348,7 @@ export function OrganizationSettingsForm({
             </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enablePickupPharmacies}>
               <Flex gap={2}>
-                <Field
-                  component={SwitchField}
-                  name="providerUx.enablePickupPharmacies"
-                  id="providerUx.enablePickupPharmacies"
-                />
+                <Field component={SwitchField} name="providerUx.enablePickupPharmacies" />
                 <FormLabel htmlFor="providerUx.enablePickupPharmacies">
                   Enable Pickup Pharmacies
                 </FormLabel>
@@ -380,11 +356,7 @@ export function OrganizationSettingsForm({
             </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enableDeliveryPharmacies}>
               <Flex gap={2}>
-                <Field
-                  component={SwitchField}
-                  name="providerUx.enableDeliveryPharmacies"
-                  id="providerUx.enableDeliveryPharmacies"
-                />
+                <Field component={SwitchField} name="providerUx.enableDeliveryPharmacies" />
                 <FormLabel htmlFor="providerUx.enableDeliveryPharmacies">
                   Enable Delivery Pharmacies
                 </FormLabel>
@@ -424,6 +396,7 @@ export function OrganizationSettingsForm({
               </Flex>
             </FormControl>
           </Flex>
+          {/*
           <Flex gap={4} w="50%">
             <FormControl isInvalid={!!errors.patientUx?.patientFeaturedPharmacyName}>
               <FormLabel htmlFor="patientUx.patientFeaturedPharmacyName">
@@ -436,6 +409,7 @@ export function OrganizationSettingsForm({
               />
             </FormControl>
           </Flex>
+          */}
         </VStack>
       </VStack>
     </form>

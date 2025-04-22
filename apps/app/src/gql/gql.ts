@@ -14,7 +14,12 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "\n  query AuthComponentOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          federatedAuth\n        }\n      }\n    }\n  }\n": typeof types.AuthComponentOrgSettingsQueryDocument,
+    "\n  query NavOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          federatedAuth\n        }\n      }\n    }\n  }\n": typeof types.NavOrgSettingsQueryDocument,
     "\n  mutation TicketModalCreateTicket($input: TicketInput!) {\n    createTicket(input: $input) {\n      id\n    }\n  }\n": typeof types.TicketModalCreateTicketDocument,
+    "\n  query OrderFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n": typeof types.OrderFormOrgSettingsQueryDocument,
+    "\n  query NewOrderOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n        }\n      }\n    }\n  }\n": typeof types.NewOrderOrgSettingsQueryDocument,
+    "\n  query PrescriptionFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescribeToOrder\n          enableRxTemplates\n          enableDuplicateRxWarnings\n          enableTreatmentHistory\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n": typeof types.PrescriptionFormOrgSettingsQueryDocument,
     "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n  }\n": typeof types.ClientInfoCardFragmentFragmentDoc,
     "\n  query ClientsDeveloperTabQuery {\n    clients {\n      id\n      ...ClientInfoCardFragment\n    }\n  }\n": typeof types.ClientsDeveloperTabQueryDocument,
     "\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n": typeof types.RotateSecretDocument,
@@ -49,7 +54,12 @@ type Documents = {
     "\n  fragment OrganizationTreatmentTabFragment on Organization {\n    id\n    name\n  }\n": typeof types.OrganizationTreatmentTabFragmentFragmentDoc,
 };
 const documents: Documents = {
+    "\n  query AuthComponentOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          federatedAuth\n        }\n      }\n    }\n  }\n": types.AuthComponentOrgSettingsQueryDocument,
+    "\n  query NavOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          federatedAuth\n        }\n      }\n    }\n  }\n": types.NavOrgSettingsQueryDocument,
     "\n  mutation TicketModalCreateTicket($input: TicketInput!) {\n    createTicket(input: $input) {\n      id\n    }\n  }\n": types.TicketModalCreateTicketDocument,
+    "\n  query OrderFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n": types.OrderFormOrgSettingsQueryDocument,
+    "\n  query NewOrderOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n        }\n      }\n    }\n  }\n": types.NewOrderOrgSettingsQueryDocument,
+    "\n  query PrescriptionFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescribeToOrder\n          enableRxTemplates\n          enableDuplicateRxWarnings\n          enableTreatmentHistory\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n": types.PrescriptionFormOrgSettingsQueryDocument,
     "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n  }\n": types.ClientInfoCardFragmentFragmentDoc,
     "\n  query ClientsDeveloperTabQuery {\n    clients {\n      id\n      ...ClientInfoCardFragment\n    }\n  }\n": types.ClientsDeveloperTabQueryDocument,
     "\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n": types.RotateSecretDocument,
@@ -101,7 +111,27 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  query AuthComponentOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          federatedAuth\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query AuthComponentOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          federatedAuth\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query NavOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          federatedAuth\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query NavOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          federatedAuth\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  mutation TicketModalCreateTicket($input: TicketInput!) {\n    createTicket(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation TicketModalCreateTicket($input: TicketInput!) {\n    createTicket(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query OrderFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query OrderFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query NewOrderOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query NewOrderOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query PrescriptionFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescribeToOrder\n          enableRxTemplates\n          enableDuplicateRxWarnings\n          enableTreatmentHistory\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query PrescriptionFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescribeToOrder\n          enableRxTemplates\n          enableDuplicateRxWarnings\n          enableTreatmentHistory\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

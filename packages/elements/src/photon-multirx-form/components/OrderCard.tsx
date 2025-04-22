@@ -7,6 +7,7 @@ export const OrderCard = (props: {
   actions: Record<string, (...args: any) => any>;
   enableLocalPickup: boolean;
   enableSendToPatient: boolean;
+  enableDeliveryPharmacies: boolean;
   mailOrderIds?: string;
 }) => {
   const patientIds = createMemo(() =>
@@ -31,6 +32,7 @@ export const OrderCard = (props: {
         </div>
         <PharmacySelect
           enableSendToPatient={props.enableSendToPatient}
+          enableDeliveryPharmacies={props.enableDeliveryPharmacies}
           // Defaults to Local Pickup if nothing is set
           enableLocalPickup={
             props.enableLocalPickup || (!props?.enableSendToPatient && !props?.mailOrderIds)
