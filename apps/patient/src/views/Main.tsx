@@ -9,8 +9,6 @@ import {
   useSearchParams
 } from 'react-router-dom';
 
-import { getSettings } from '@client/settings';
-
 import { AUTH_HEADER_ERRORS, getOrder } from '../api/internal';
 import { Nav } from '../components';
 import { setAuthHeader } from '../configs/graphqlClient';
@@ -53,6 +51,9 @@ export const Main = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
+
+  const orgId = order?.organization.id;
+  const settings = order?.organization.settings;
 
   useEffect(
     function triggerDatadogShortlinkOpenEvent() {
@@ -177,9 +178,14 @@ export const Main = () => {
       setLoadingLogo(false);
     } else {
       try {
-        const response = await import(`../assets/${fileName}`);
-        await preloadImage(response.default);
-        setLogo(response.default);
+        let imgHref = fileName;
+        // if the logo is not a url, it's a file in the assets folder
+        if (!imgHref.startsWith('http')) {
+          const response = await import(`../assets/${fileName}`);
+          imgHref = response.default as string;
+        }
+        await preloadImage(imgHref);
+        setLogo(imgHref);
         setLoadingLogo(false);
       } catch (e: any) {
         console.error(e);
@@ -190,20 +196,16 @@ export const Main = () => {
 
   // Set logo
   useEffect(() => {
-    if (order?.organization?.id) {
-      const theme = getSettings(order.organization.id);
-
+    if (orgId) {
       if (isDemo) {
         fetchLogo('newco_logo.svg');
+      } else if (settings?.brandLogo) {
+        fetchLogo(settings.brandLogo);
       } else {
-        if (theme.logo) {
-          fetchLogo(theme.logo);
-        } else {
-          setLoadingLogo(false);
-        }
+        setLoadingLogo(false);
       }
     }
-  }, [fetchLogo, isDemo, order?.organization.id]);
+  }, [fetchLogo, isDemo, settings, orgId]);
 
   if (!order || loadingLogo) {
     return (
@@ -226,7 +228,7 @@ export const Main = () => {
   };
 
   return (
-    <ChakraProvider theme={theme(order?.organization.id)}>
+    <ChakraProvider theme={theme({ accentColor: settings?.brandColor })}>
       <OrderContext.Provider value={orderContextValue}>
         <ScrollRestoration />
         <Nav />
