@@ -12,7 +12,8 @@ interface Props {
 }
 
 export interface BrandedOptionOverrides {
-  [key: string]: string | undefined;
+  amazonPharmacyOverride?: string;
+  novocareExperimentOverride?: string;
 }
 
 export const BrandedOptions = ({

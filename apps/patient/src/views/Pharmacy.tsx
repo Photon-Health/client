@@ -19,6 +19,7 @@ import { Helmet } from 'react-helmet';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
+  BrandedOptionOverrides,
   BrandedOptions,
   CouponModal,
   FixedFooter,
@@ -28,13 +29,12 @@ import {
 } from '../components';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, preparePharmacy } from '../utils/general';
-import { ExtendedFulfillmentType, Order } from '../utils/models';
+import { ExtendedFulfillmentType } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
 import {
   geocode,
-  getOffers,
   getPharmacies,
   rerouteOrder,
   setOrderPharmacy,
@@ -50,6 +50,8 @@ import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { datadogRum } from '@datadog/browser-rum';
 import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
+import { determineNovocareExperimentSegment } from './pharmacy.utils';
+import { fetchOffers } from './pharmacy.utils';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
@@ -136,7 +138,7 @@ export const Pharmacy = () => {
   const [enablePrice, setEnablePrice] = useState(false);
 
   const [brandedOptionsOverride, setBrandedOptionsOverride] = useState<
-    Record<string, string | undefined> | undefined
+    BrandedOptionOverrides | undefined
   >(undefined);
 
   // pagination
@@ -185,118 +187,34 @@ export const Pharmacy = () => {
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
 
   useEffect(() => {
-    async function fetchOffers() {
-      const offers = await getOffers(order.id);
-
-      const amazonOffers = offers
-        .filter((offer) => offer.supplier === 'AMAZON_PHARMACY')
-        .filter((offer) => offer.deliveryEstimate !== undefined);
-
-      if (amazonOffers.length > 0 && amazonOffers[0]?.deliveryEstimate?.deliveryPromise) {
-        const newBrandedOptionsOverride = {
-          ...brandedOptionsOverride,
-          amazonPharmacyOverride: amazonOffers[0]?.deliveryEstimate?.deliveryPromise
-        };
-
-        if (JSON.stringify(newBrandedOptionsOverride) !== JSON.stringify(brandedOptionsOverride)) {
-          setBrandedOptionsOverride(newBrandedOptionsOverride);
-        }
-      }
-    }
-
-    const determineNovocareExperimentSegment = (order: Order): string | undefined => {
-      const organizationId = order?.organization.id;
-
-      const medicinesAndDeliveryTypes = [
-        {
-          patterns: [
-            'zepbound subcutaneous solution Auto-injector 7.5 mg/0.5ml',
-            'ondansetron.*oral'
-          ],
-          deliveryType: 'Delivers in 3-5 days'
-        },
-        {
-          patterns: ['wegovy subcutaneous solution auto-injector 0.25 MG/0.5ML'],
-          deliveryType: 'Delivers in 3-5 days'
-        }
+    const determineOverrides = async () => {
+      const validOrganizationIds = [
+        'org_KzSVZBQixLRkqj5d', // boson Test Organization 11
+        'org_kVS7AP4iuItESdMA', // neutron Photon Test Org
+        'org_wM4wI7rop0W1eNfM', // production found
+        'org_pcPnPx5PVamzjS2p' // production measured
       ];
 
-      const organizationsAndAcceptableMedicationNames: Record<
-        string,
-        { patterns: string[]; deliveryType: string }[]
-      > = {
-        org_KzSVZBQixLRkqj5d: medicinesAndDeliveryTypes, // boson Test Organization 11
-        org_pcPnPx5PVamzjS2p: medicinesAndDeliveryTypes // production measured
-      };
-
-      if (!organizationId) {
+      if (!validOrganizationIds.includes(order.organization.id)) {
         return undefined;
       }
 
-      const isCorrectOrganization =
-        Object.keys(organizationsAndAcceptableMedicationNames).indexOf(order?.organization.id) > -1;
+      // these functions will be called and make a state change to brandedOptionsOverride using setBrandedOptionsOverride
+      // if there are branded option overrides
+      const amazonExperimentOverride = await fetchOffers(order);
+      const novocareExperimentOverride = determineNovocareExperimentSegment(order);
 
-      if (!isCorrectOrganization) {
-        return undefined;
-      }
-
-      const medications = order.fulfillments.map((f) =>
-        f.prescription.treatment.name.toLowerCase()
-      );
-
-      const getDeliveryType = () => {
-        // For each combination in the organization
-        for (const combination of organizationsAndAcceptableMedicationNames[organizationId]) {
-          const patterns = combination.patterns.map((r) => new RegExp(r.toLowerCase()));
-
-          // If we have exactly the right number of medications
-          if (medications.length === patterns.length) {
-            // Check if we can match each pattern to a unique medication
-            const unmatchedMedications = [...medications];
-            const allPatternsMatch = patterns.every((pattern) => {
-              const matchIndex = unmatchedMedications.findIndex((med) => med.match(pattern));
-              if (matchIndex !== -1) {
-                // Remove the matched medication so it can't be matched again
-                unmatchedMedications.splice(matchIndex, 1);
-                return true;
-              }
-              return false;
-            });
-
-            if (allPatternsMatch) {
-              return combination.deliveryType;
-            }
-          }
-        }
+      const newBrandedOptionsOverride: BrandedOptionOverrides = {
+        ...amazonExperimentOverride,
+        ...novocareExperimentOverride
       };
 
-      const deliveryType = getDeliveryType();
-
-      if (deliveryType) {
-        const newBrandedOptionsOverride = {
-          ...brandedOptionsOverride,
-          novocareExperimentOverride: deliveryType
-        };
-
-        if (JSON.stringify(newBrandedOptionsOverride) !== JSON.stringify(brandedOptionsOverride)) {
-          setBrandedOptionsOverride(newBrandedOptionsOverride);
-        }
+      if (JSON.stringify(newBrandedOptionsOverride) !== JSON.stringify(brandedOptionsOverride)) {
+        setBrandedOptionsOverride(newBrandedOptionsOverride);
       }
     };
 
-    const validOrganizationIds = [
-      'org_KzSVZBQixLRkqj5d', // boson Test Organization 11
-      'org_kVS7AP4iuItESdMA', // neutron Photon Test Org
-      'org_wM4wI7rop0W1eNfM', // production found
-      'org_pcPnPx5PVamzjS2p' // production measured
-    ];
-
-    if (!validOrganizationIds.includes(order.organization.id)) {
-      return undefined;
-    }
-
-    fetchOffers();
-    determineNovocareExperimentSegment(order);
+    determineOverrides();
   }, [order, brandedOptionsOverride]);
 
   const showToastWarning = () =>
