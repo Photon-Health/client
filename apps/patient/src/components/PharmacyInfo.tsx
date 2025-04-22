@@ -22,6 +22,7 @@ import { useMemo, useState } from 'react';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
 import { formatAddress, titleCase } from '../utils/general';
 import { getFulfillmentTrackingLink } from '../utils/fulfillmentsHelpers';
+import { BrandedOptionOverrides } from './BrandedOptions';
 
 dayjs.extend(customParseFormat);
 
@@ -236,10 +237,6 @@ interface PharmacyInfoProps {
   isCurrentPharmacy?: boolean;
   orderFulfillment?: OrderFulfillment;
   brandedOptionOverride?: BrandedOptionOverrides;
-}
-
-interface BrandedOptionOverrides {
-  [key: string]: string | undefined;
 }
 
 export const PharmacyInfo = ({

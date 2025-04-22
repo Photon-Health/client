@@ -10,16 +10,13 @@ import novocareLogo from '../assets/novo_circle.png';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import { PharmacyInfo } from './PharmacyInfo';
+import { BrandedOptionOverrides } from './BrandedOptions';
 
 interface Props {
   pharmacyId: string;
   selected: boolean;
   handleSelect: (id: string) => void;
   brandedOptionOverrides?: BrandedOptionOverrides;
-}
-
-interface BrandedOptionOverrides {
-  [key: string]: string | undefined;
 }
 
 export const PHARMACY_BRANDING = {

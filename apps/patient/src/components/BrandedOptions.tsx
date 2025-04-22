@@ -11,7 +11,7 @@ interface Props {
   handleSelect: (id: string) => void;
 }
 
-interface BrandedOptionOverrides {
+export interface BrandedOptionOverrides {
   [key: string]: string | undefined;
 }
 
