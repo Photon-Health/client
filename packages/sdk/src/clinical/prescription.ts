@@ -203,27 +203,4 @@ export class PrescriptionQueryManager {
       CREATE_PRESCRIPTION
     );
   }
-
-  // DEPRECATED
-  public createPrescriptions({ fragment }: CreatePrescriptionOptions) {
-    if (!fragment) {
-      fragment = { PrescriptionFields: PRESCRIPTION_FIELDS };
-    }
-    const [fName, fValue] = Object.entries(fragment)[0];
-    const CREATE_PRESCRIPTIONS = gql`
-      ${fValue}
-      mutation createPrescriptions(
-        $prescriptions: [PrescriptionInput]!
-      ) {
-        createPrescriptions(
-          prescriptions: $prescriptions
-        ) {
-          ...${fName}
-        }
-      }`;
-    return makeMutation<{ createPrescriptions: [Prescription] } | undefined | null>(
-      this.apollo,
-      CREATE_PRESCRIPTIONS
-    );
-  }
 }

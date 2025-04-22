@@ -181,7 +181,7 @@ export const PRESCRIPTION_STATE_MAP: PrescriptionStateRecord = {
 export const PRESCRIPTION_COLOR_MAP: PrescriptionStateRecord = {
   READY: 'green',
   PROCESSING: 'yellow',
-  DRAFT: 'yellow',
+  DRAFT: 'gray',
   ACTIVE: 'green',
   DEPLETED: 'red',
   EXPIRED: 'red',
