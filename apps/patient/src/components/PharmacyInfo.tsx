@@ -270,7 +270,7 @@ export const PharmacyInfo = ({
   const directionsUrl = `http://maps.google.com/?q=${pharmacy?.name}, ${pharmacyFormattedAddress}`;
 
   let amazonPharmacyElementOverride = undefined;
-  const isAmazonPharmacy = pharmacy.id === process.env.REACT_APP_AMAZON_PHARMACY_ID ? true : false;
+  const isAmazonPharmacy = pharmacy.id === process.env.REACT_APP_AMAZON_PHARMACY_ID;
   if (isAmazonPharmacy && brandedOptionOverride?.amazonPharmacyOverride) {
     amazonPharmacyElementOverride = (
       <HStack>
@@ -285,8 +285,7 @@ export const PharmacyInfo = ({
   }
 
   let novocarePharmacyElementOverride = undefined;
-  const isNovocarePharmacy =
-    pharmacy.id === process.env.REACT_APP_NOVOCARE_PHARMACY_ID ? true : false;
+  const isNovocarePharmacy = pharmacy.id === process.env.REACT_APP_NOVOCARE_PHARMACY_ID;
   if (isNovocarePharmacy && brandedOptionOverride?.novocareExperimentOverride) {
     novocarePharmacyElementOverride = (
       <HStack>
