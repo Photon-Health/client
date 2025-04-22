@@ -1,5 +1,5 @@
 import { createSignal, Ref } from 'solid-js';
-import { DraftPrescriptions } from '@photonhealth/components';
+import { DraftPrescriptions, useDraftPrescriptions } from '@photonhealth/components';
 import { Card, Text, usePrescribe } from '@photonhealth/components';
 import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
@@ -25,13 +25,14 @@ export const DraftPrescriptionCard = (props: {
   const [editDraft, setEditDraft] = createSignal<any>(undefined);
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
   const { prescriptionIds, setEditingPrescription, deletePrescription } = usePrescribe();
+  const { draftPrescriptions } = useDraftPrescriptions();
 
-  const dispatchPrescriptionDraftDeleted = (id: string) => {
+  const dispatchPrescriptionDraftDeleted = (prescription?: Prescription) => {
     const event = new CustomEvent('photon-draft-prescription-deleted', {
       composed: true,
       bubbles: true,
       detail: {
-        prescriptionId: id
+        prescription
       }
     });
     ref?.dispatchEvent(event);
@@ -83,8 +84,9 @@ export const DraftPrescriptionCard = (props: {
   const handleDeleteConfirm = () => {
     const deletedId = deleteDraftId();
     if (deletedId) {
+      const deletedRx = draftPrescriptions().find((rx) => rx.id === deletedId);
       deletePrescription(deletedId);
-      dispatchPrescriptionDraftDeleted(deletedId);
+      dispatchPrescriptionDraftDeleted(deletedRx);
     }
 
     setDeleteDialogOpen(false);
