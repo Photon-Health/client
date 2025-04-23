@@ -1,4 +1,4 @@
-import { MailOrderPharmacyConfigs, OrganizationSettings } from '../types';
+import { MailOrderPharmacyConfigs } from '../types';
 import {
   CUREXA_PHARMACY_ID,
   CAREPOINT_PHARMACY_ID,
@@ -15,39 +15,15 @@ import {
  */
 
 const defaultSettings = {
-  logo: undefined,
-  accentColor: '#3182ce',
-  sendOrder: true,
-  pickUp: true,
-  mailOrder: true,
-  mailOrderProviders: [
-    CUREXA_PHARMACY_ID,
-    CAREPOINT_PHARMACY_ID,
-    TRUEPILL_PHARMACY_ID,
-    HONEYBEE_PHARMACY_ID
-  ],
-  mailOrderNavigate: false,
-  mailOrderNavigateProviders: [],
-  sendToPatient: true,
-  sendToPatientUsers: [],
-  enablePatientRerouting: true,
-  enableCourierNavigate: false,
-  returnTo: window.location.origin,
-  federated: false,
-  enableMedHistory: false,
-  enableRxAndOrder: false,
-  enableCombineAndDuplicate: true,
-  enablePricing: false,
-  topRankedCostco: false,
-  topRankedWalgreens: false,
-  hideTemplates: false
+  provider: [CUREXA_PHARMACY_ID, CAREPOINT_PHARMACY_ID, TRUEPILL_PHARMACY_ID, HONEYBEE_PHARMACY_ID],
+  patient: []
 };
 
 export const boson = function (organizationId: string | undefined): MailOrderPharmacyConfigs {
-  const orgConfig = organizationId ? organizationSettings[organizationId] : undefined;
+  const orgConfig = organizationId ? orgMailOrders[organizationId] : undefined;
   return {
-    provider: orgConfig?.mailOrderProviders ?? defaultSettings.mailOrderProviders,
-    patient: orgConfig?.mailOrderNavigateProviders ?? defaultSettings.mailOrderNavigateProviders
+    provider: orgConfig?.provider ?? defaultSettings.provider,
+    patient: orgConfig?.patient ?? defaultSettings.patient
   };
 };
 
@@ -55,40 +31,17 @@ export const boson = function (organizationId: string | undefined): MailOrderPha
  * Org-specific settings overrides
  */
 
-const organizationSettings: {
-  [key: string]: OrganizationSettings;
-} = {
+const orgMailOrders: Record<string, Partial<MailOrderPharmacyConfigs>> = {
   // Test Telehealth (us)
   org_KzSVZBQixLRkqj5d: {
-    accentColor: '#b35724',
-    enableRxAndOrder: true,
-    enableMedHistory: true,
-    topRankedCostco: true,
-    topRankedWalgreens: true,
-    mailOrderNavigate: true,
-    mailOrderNavigateProviders: [
-      AMAZON_PHARMACY_ID,
-      COST_PLUS_PHARMACY_ID,
-      WALMART_MAIL_ORDER_PHARMACY_ID
-    ],
-    enableCourierNavigate: true,
-    enablePricing: true,
-    paExceptionMessage:
-      'Your insurance needs additional information from your provider before it will cover your prescription. Use the messaging feature in your Sesame profile to ask your provider to submit a prior authorization. If you’re paying cash, disregard and work with your pharmacy directly to pay the out-of-pocket price.'
+    patient: [AMAZON_PHARMACY_ID, COST_PLUS_PHARMACY_ID, WALMART_MAIL_ORDER_PHARMACY_ID]
   },
   // NewCo (demo's)
   org_w85CgjUjCi52yvOz: {
-    logo: 'newco_logo.svg',
-    accentColor: '#506ef5',
-    mailOrderNavigate: true,
-    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID]
+    patient: [AMAZON_PHARMACY_ID]
   },
   // test2
   org_zjqxDJzBNyuN9qcm: {
-    accentColor: '#b35724',
-    mailOrderNavigate: true,
-    mailOrderNavigateProviders: [AMAZON_PHARMACY_ID],
-    enableMedHistory: true,
-    enableRxAndOrder: true
+    patient: [AMAZON_PHARMACY_ID]
   }
 };
