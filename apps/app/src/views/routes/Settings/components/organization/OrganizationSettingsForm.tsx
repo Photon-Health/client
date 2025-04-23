@@ -7,7 +7,8 @@ import {
   Switch,
   VStack,
   Text,
-  Grid
+  Grid,
+  Textarea
 } from '@chakra-ui/react';
 import { ErrorMessage, Field, FieldProps, FormikErrors } from 'formik';
 
@@ -16,6 +17,8 @@ import { FileUploader } from '../../../../components/FileUpload';
 import { useClinicalRest } from 'apps/app/src/hooks/useClinicalRest';
 
 const InputField = ({ field }: FieldProps) => <Input {...field} />;
+
+const TextAreaField = ({ field }: FieldProps) => <Textarea {...field} />;
 
 const ColorField = ({ field }: FieldProps) => (
   <Input {...field} type="color" maxW={12} paddingX={0} />
@@ -394,6 +397,20 @@ export function OrganizationSettingsForm({
                   Enable Patient Delivery Pharmacies
                 </FormLabel>
               </Flex>
+            </FormControl>
+          </Flex>
+          <Flex gap={4} w={{ base: '100%', md: '50%' }}>
+            <FormControl isInvalid={!!errors.priorAuthorizationExceptionMessage}>
+              <FormLabel htmlFor="priorAuthorizationExceptionMessage">
+                Prior Authorization Exception Message
+              </FormLabel>
+              <Field
+                component={TextAreaField}
+                rows={4}
+                name="priorAuthorizationExceptionMessage"
+                id="priorAuthorizationExceptionMessage"
+                placeholder="Your insurance needs information from your provider to cover this medication. Contact your provider for alternatives or pay the cash price."
+              />
             </FormControl>
           </Flex>
           {/*
