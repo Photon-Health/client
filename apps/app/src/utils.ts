@@ -30,6 +30,9 @@ function formatDateLong(date: string | Date) {
 
 // Format phone number to (###) ###-####
 function formatPhone(phone: string) {
+  if (!phone) {
+    return '';
+  }
   return parsePhoneNumber(phone, 'US')?.formatNational();
 }
 
