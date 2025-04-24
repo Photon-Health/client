@@ -89,6 +89,7 @@ export function createTestMedHistoryPrescription(
     notes: '',
     writtenAt: undefined,
     dispenseUnit: 'Each',
+    diagnoses: [],
     ...options
   };
 }
