@@ -285,7 +285,7 @@ export const PharmacyInfo = ({
   }
 
   let novocarePharmacyElementOverride = undefined;
-  const isNovocarePharmacy = pharmacy.id === process.env.REACT_APP_NOVOCARE_PHARMACY_ID;
+  const isNovocarePharmacy = pharmacy.id === process.env.REACT_APP_NOVOCARE_PHARMACY_IDgi;
   if (isNovocarePharmacy && brandedOptionOverride?.novocareExperimentOverride) {
     novocarePharmacyElementOverride = (
       <HStack>
