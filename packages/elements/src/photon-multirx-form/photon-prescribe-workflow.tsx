@@ -3,11 +3,7 @@ import { PhotonAuthorized } from '../photon-authorized';
 import type { FormError } from '../stores/form';
 import tailwind from '../tailwind.css?inline';
 import { checkHasPermission } from '../utils';
-import {
-  AddDraftPrescription,
-  AddPrescriptionCard,
-  isTreatmentInDraftPrescriptions
-} from './components/AddPrescriptionCard';
+import { AddPrescriptionCard } from './components/AddPrescriptionCard';
 import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
 import { OrderCard } from './components/OrderCard';
 import { PatientCard } from './components/PatientCard';
@@ -26,11 +22,13 @@ import {
   TemplateOverrides,
   Toaster,
   triggerToast,
+  useDraftPrescriptions,
   usePhoton,
+  usePrescribe,
   useRecentOrders
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { Order, Prescription, Treatment } from '@photonhealth/sdk/dist/types';
+import { Order, Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
 import '@shoelace-style/shoelace/dist/components/alert/alert';
 import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
 import '@shoelace-style/shoelace/dist/components/icon/icon';
@@ -40,8 +38,6 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
-import { format } from 'date-fns';
-import { MedHistoryPrescription } from '@photonhealth/components/src/systems/PatientMedHistory';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -109,6 +105,13 @@ export const ScreenDraftedPrescriptionsQuery = gql`
 
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
+
+  const { draftPrescriptions } = useDraftPrescriptions();
+  const { tryUpdatePrescriptionStates } = usePrescribe();
+
+  const prescriptionIds = createMemo(() =>
+    draftPrescriptions().map((prescription) => prescription.id)
+  );
 
   const client = usePhoton();
   const [showForm, setShowForm] = createSignal<boolean>(
@@ -193,7 +196,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     ref?.dispatchEvent(event);
   };
 
-  const dispatchDraftPrescriptionCreated = (draftPrescription: AddDraftPrescription) => {
+  const dispatchDraftPrescriptionCreated = (draftPrescription: Prescription) => {
     const event = new CustomEvent('photon-draft-prescription-created', {
       composed: true,
       bubbles: true,
@@ -223,7 +226,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     const inProgressDraftedPrescriptionTreatmentId = props.formStore.treatment?.value?.id;
 
     // and then get the ones already added to the order (but not persisted)
-    const draftedPrescriptions = [...props.formStore.draftPrescriptions.value];
+    const draftedPrescriptions: ScreenablePrescription[] = draftPrescriptions().map(
+      toScreenableDraftPrescription
+    );
 
     // if there is one, add in the prescription being created
     if (inProgressDraftedPrescriptionTreatmentId) {
@@ -232,25 +237,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       });
     }
 
-    // pluck out all the attributes we won't need so we can make a screening request
-    const sanitizedDraftedPrescriptions = draftedPrescriptions.map(
-      ({
-        id, // the id can be a random number so let's ensure we don't pass it up
-        addToTemplates,
-        templateName,
-        refillsInput,
-        catalogId,
-        ...draftedPrescription
-      }) => {
-        return { ...draftedPrescription, treatment: { id: draftedPrescription.treatment.id } };
-      }
-    );
-
     // let's remove any duplicate treatment ids
     // as there's no point to sending up multiple
     // of the same medication
-    const seenTreatmentIds = new Set<number>();
-    const dedupedSanitizedPrescriptions = sanitizedDraftedPrescriptions.filter((entity) => {
+    const seenTreatmentIds = new Set<string>();
+    const dedupedSanitizedPrescriptions = draftedPrescriptions.filter((entity) => {
       const treatmentId = entity.treatment.id;
       if (seenTreatmentIds.has(treatmentId)) {
         return false;
@@ -272,7 +263,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     setScreeningAlerts(data?.prescriptionScreen?.alerts ?? []);
   };
 
-  const dispatchPrescriptionsError = (errors: readonly GraphQLFormattedError[]) => {
+  const dispatchPrescriptionsError = (errors: readonly Error[]) => {
     const event = new CustomEvent('photon-prescriptions-error', {
       composed: true,
       bubbles: true,
@@ -316,7 +307,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     return recentOrdersActions.setIsCombineDialogOpen(
       true,
       () => submitForm(props.enableOrder),
-      props.formStore.draftPrescriptions.value,
       formattedAddress()
     );
   };
@@ -337,9 +327,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       });
     }
 
-    const keys = enableOrder
-      ? ['patient', 'draftPrescriptions', 'pharmacy', 'address']
-      : ['patient', 'draftPrescriptions'];
+    const keys = enableOrder ? ['patient', 'pharmacy', 'address'] : ['patient'];
     props.formActions.validate(keys);
     const errors = props.formActions.getErrors(keys);
     if (errors.length === 0) {
@@ -348,130 +336,92 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         key: 'errors',
         value: []
       });
-      const orderMutation = client!.getSDK().clinical.order.createOrder({});
-      const removePatientPreferredPharmacyMutation = client!
-        .getSDK()
-        .clinical.patient.removePatientPreferredPharmacy({});
-      const updatePatientMutation = client!.getSDK().clinical.patient.updatePatient({});
-      const rxMutation = client!.getSDK().clinical.prescription.createPrescriptions({});
-      const prescriptions = [];
-      const templateMutation = client!
-        .getSDK()
-        .clinical.prescriptionTemplate.createPrescriptionTemplate({});
 
-      for (const draft of props.formStore.draftPrescriptions!.value) {
-        const args = {
-          daysSupply: draft.daysSupply,
-          dispenseAsWritten: draft.dispenseAsWritten,
-          dispenseQuantity: draft.dispenseQuantity,
-          dispenseUnit: draft.dispenseUnit,
-          effectiveDate: draft.effectiveDate,
-          instructions: draft.instructions,
-          notes: draft.notes,
-          patientId: props.formStore.patient?.value.id,
-          // +1 here because we're using the refillsInput
-          fillsAllowed: draft.refillsInput ? draft.refillsInput + 1 : 1,
-          treatmentId: draft.treatment.id,
-          externalId: draft.externalId
-        };
-        if (draft.addToTemplates) {
-          try {
-            const { errors } = await templateMutation({
-              variables: {
-                ...args,
-                catalogId: draft.catalogId,
-                isPrivate: true
-              },
-              awaitRefetchQueries: false
-            });
-            if (errors) {
-              dispatchOrderError(errors);
-            }
-          } catch (err) {
-            dispatchOrderError([err as GraphQLFormattedError]);
-          }
-        }
-        prescriptions.push(args);
+      if (props.enableOrder) {
+        await sendOrderToApi();
+      } else {
+        await activatePrescriptionsOnApi();
       }
-      try {
-        const { data: prescriptionData, errors } = await rxMutation({
-          variables: {
-            prescriptions
-          },
-          refetchQueries: [],
-          awaitRefetchQueries: false
-        });
 
-        if (!props.enableOrder) {
-          setIsLoading(false);
-        }
-        if (errors) {
-          dispatchPrescriptionsError(errors);
-          return;
-        }
-
-        dispatchPrescriptionsCreated(prescriptionData!.createPrescriptions);
-
-        if (props.enableOrder) {
-          if (
-            props.formStore.updatePreferredPharmacy?.value &&
-            props.formStore.pharmacy?.value &&
-            props.formStore.fulfillmentType?.value === 'PICK_UP'
-          ) {
-            const patient = props.formStore.patient?.value;
-            if (patient?.preferredPharmacies && patient?.preferredPharmacies?.length > 0) {
-              // remove the current preferred pharmacy
-              removePatientPreferredPharmacyMutation({
-                variables: {
-                  patientId: patient.id,
-                  pharmacyId: patient?.preferredPharmacies?.[0]?.id
-                },
-                awaitRefetchQueries: false
-              });
-            }
-            // add the new preferred pharmacy to the patient
-            updatePatientMutation({
-              variables: {
-                id: patient.id,
-                preferredPharmacies: [props.formStore.pharmacy?.value]
-              },
-              awaitRefetchQueries: false
-            });
-          }
-
-          const { data: orderData, errors } = await orderMutation({
-            variables: {
-              ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
-              patientId: props.formStore.patient?.value.id,
-              pharmacyId: props.pharmacyId ?? (props.formStore.pharmacy?.value || ''),
-              fulfillmentType: props.formStore.fulfillmentType?.value || '',
-              address: formattedAddress(),
-              fills: prescriptionData?.createPrescriptions.map((x) => ({ prescriptionId: x.id }))
-            },
-            refetchQueries: [],
-            awaitRefetchQueries: false
-          });
-
-          if (props.enableOrder) {
-            setIsLoading(false);
-          }
-          if (errors) {
-            dispatchOrderError(errors);
-            return;
-          }
-          dispatchOrderCreated(orderData!.createOrder);
-        }
-      } catch (err) {
-        dispatchOrderError([err as GraphQLFormattedError]);
-        setIsLoading(false);
-        triggerToast({
-          status: 'error',
-          header: 'Error Creating Order',
-          body: (err as GraphQLFormattedError)?.message
-        });
-      }
+      // this reflects the prescription state changing from 'draft' to 'active'
+      dispatchPrescriptionsCreated(draftPrescriptions());
     } else {
       setErrors(errors);
+    }
+  };
+
+  const activatePrescriptionsOnApi = async () => {
+    try {
+      await tryUpdatePrescriptionStates(prescriptionIds(), PrescriptionState.Active);
+    } catch (err) {
+      dispatchPrescriptionsError([err as Error]);
+    }
+    setIsLoading(false);
+  };
+
+  const sendOrderToApi = async () => {
+    const orderMutation = client.getSDK().clinical.order.createOrder({});
+    const removePatientPreferredPharmacyMutation = client
+      .getSDK()
+      .clinical.patient.removePatientPreferredPharmacy({});
+    const updatePatientMutation = client.getSDK().clinical.patient.updatePatient({});
+
+    try {
+      if (
+        props.formStore.updatePreferredPharmacy?.value &&
+        props.formStore.pharmacy?.value &&
+        props.formStore.fulfillmentType?.value === 'PICK_UP'
+      ) {
+        const patient = props.formStore.patient?.value;
+        if (patient?.preferredPharmacies && patient?.preferredPharmacies?.length > 0) {
+          // remove the current preferred pharmacy
+          removePatientPreferredPharmacyMutation({
+            variables: {
+              patientId: patient.id,
+              pharmacyId: patient?.preferredPharmacies?.[0]?.id
+            },
+            awaitRefetchQueries: false
+          });
+        }
+        // add the new preferred pharmacy to the patient
+        updatePatientMutation({
+          variables: {
+            id: patient.id,
+            preferredPharmacies: [props.formStore.pharmacy?.value]
+          },
+          awaitRefetchQueries: false
+        });
+      }
+
+      const { data: orderData, errors } = await orderMutation({
+        variables: {
+          ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
+          patientId: props.formStore.patient?.value.id,
+          pharmacyId: props.pharmacyId ?? (props.formStore.pharmacy?.value || ''),
+          fulfillmentType: props.formStore.fulfillmentType?.value || '',
+          address: formattedAddress(),
+          fills: prescriptionIds().map((id) => ({
+            prescriptionId: id
+          }))
+        },
+        refetchQueries: [],
+        awaitRefetchQueries: false
+      });
+
+      setIsLoading(false);
+      if (errors) {
+        dispatchOrderError(errors);
+        return;
+      }
+      dispatchOrderCreated(orderData!.createOrder);
+    } catch (err) {
+      dispatchOrderError([err as GraphQLFormattedError]);
+      setIsLoading(false);
+      triggerToast({
+        status: 'error',
+        header: 'Error Creating Order',
+        body: (err as GraphQLFormattedError)?.message
+      });
     }
   };
 
@@ -498,13 +448,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   createEffect(() => {
     dispatchPrescriptionsFormValidate(
-      Boolean(
-        props.formStore.draftPrescriptions?.value?.length > 0 && props.formStore.patient?.value
-      )
+      Boolean(draftPrescriptions().length > 0 && props.formStore.patient?.value)
     );
   });
 
-  const clinicalClient = client!.sdk.apolloClinical;
+  const clinicalClient = client.sdk.apolloClinical;
 
   let prescriptionRef: HTMLDivElement | undefined;
 
@@ -516,59 +464,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     );
   });
 
-  function addRefillToDrafts(prescription: MedHistoryPrescription, treatment: Treatment) {
-    const draft: AddDraftPrescription = {
-      id: String(Math.random()),
-      effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
-      treatment: treatment,
-      dispenseAsWritten: prescription.dispenseAsWritten,
-      dispenseQuantity: prescription.dispenseQuantity,
-      dispenseUnit: prescription.dispenseUnit,
-      daysSupply: prescription.daysSupply,
-      refillsInput: prescription.fillsAllowed ? prescription.fillsAllowed - 1 : 0,
-      instructions: prescription.instructions,
-      notes: prescription.notes,
-      fillsAllowed: prescription.fillsAllowed,
-      templateName: '',
-      addToTemplates: false,
-      catalogId: undefined
-    };
-
-    props.formActions.updateFormValue({
-      key: 'draftPrescriptions',
-      value: [...(props.formStore.draftPrescriptions?.value || []), draft]
-    });
-
-    triggerToast({
-      status: 'success',
-      header: 'Prescription Added',
-      body: 'You can send this order or add another prescription before sending it'
-    });
-
-    dispatchDraftPrescriptionCreated(draft);
-  }
-
-  function tryAddRefillToDrafts(prescription: MedHistoryPrescription, treatment: Treatment) {
-    if (isTreatmentInDraftPrescriptions(treatment.id, props.formStore.draftPrescriptions.value)) {
-      triggerToast({
-        status: 'error',
-        body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
-      });
-    } else if (
-      props.enableCombineAndDuplicate &&
-      recentOrdersActions.checkDuplicateFill(treatment.name)
-    ) {
-      recentOrdersActions.setIsDuplicateDialogOpen(
-        true,
-        recentOrdersActions.checkDuplicateFill(treatment.name),
-        () => addRefillToDrafts(prescription, treatment)
-      );
-    } else {
-      addRefillToDrafts(prescription, treatment);
-    }
-  }
-
-  const handleDraftPrescriptionCreated = (draft: AddDraftPrescription) => {
+  const handleDraftPrescriptionCreated = (draft: Prescription) => {
     dispatchDraftPrescriptionCreated(draft);
     if (isEditing()) {
       setIsEditing(false);
@@ -656,7 +552,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 actions={props.formActions}
                 store={props.formStore}
                 patientId={props.patientId}
-                client={client!}
+                client={client}
                 enableOrder={props.enableOrder}
                 address={props.address}
                 weight={props.weight}
@@ -665,7 +561,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 enableMedHistoryLinks={props.enableMedHistoryLinks ?? false}
                 enableMedHistoryRefillButton={props.enableMedHistoryRefillButton ?? false}
                 hidePatientCard={props.hidePatientCard}
-                onRefillClick={tryAddRefillToDrafts}
               />
               <Show
                 when={
@@ -734,7 +629,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 </Show>
                 <Show when={!props.hideSubmit}>
                   {/* We're hiding this alert message if enable-order is set, a rough way to let us know this is not in the App.
-              The issue we're having is when props are passed and cards are hidden, the form is not showing validation errors. */}
+            The issue we're having is when props are passed and cards are hidden, the form is not showing validation errors. */}
                   <Show when={errors().length > 0 && props.enableOrder}>
                     <div class="m-3 gap-4">
                       <For each={errors()} fallback={<div>No errors...</div>}>
@@ -763,3 +658,33 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     </div>
   );
 }
+
+type ScreenablePrescription = {
+  dispenseAsWritten?: boolean;
+  dispenseQuantity?: number;
+  dispenseUnit?: string;
+  fillsAllowed?: number;
+  daysSupply?: number;
+  instructions?: string;
+  notes?: string;
+  effectiveDate?: string;
+  treatment: {
+    id: string;
+  };
+};
+
+const toScreenableDraftPrescription = (prescription: Prescription): ScreenablePrescription => {
+  return {
+    dispenseAsWritten: prescription.dispenseAsWritten || undefined,
+    dispenseQuantity: prescription.dispenseQuantity,
+    dispenseUnit: prescription.dispenseUnit,
+    fillsAllowed: prescription.fillsAllowed,
+    daysSupply: prescription.daysSupply || undefined,
+    instructions: prescription.instructions,
+    notes: prescription.notes || undefined,
+    effectiveDate: prescription.effectiveDate,
+    treatment: {
+      id: prescription.treatment.id
+    }
+  };
+};

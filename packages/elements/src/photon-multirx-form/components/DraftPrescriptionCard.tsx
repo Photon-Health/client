@@ -1,24 +1,15 @@
 import { createSignal, Ref } from 'solid-js';
-import { DraftPrescriptions } from '@photonhealth/components';
-import { size, array, any } from 'superstruct';
-import { Card, Text } from '@photonhealth/components';
-import { message } from '../../validators';
+import { DraftPrescriptions, useDraftPrescriptions } from '@photonhealth/components';
+import { Card, Text, usePrescribe } from '@photonhealth/components';
 import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import type { TemplateOverrides, DraftPrescription } from '@photonhealth/components';
 import { PhotonTooltip } from '../../photon-tooltip';
-import { partition } from 'lodash';
-import { unwrap } from 'solid-js/store';
 import { ScreeningAlertType } from '@photonhealth/components';
-
-const draftPrescriptionsValidator = message(
-  size(array(any()), 1, Infinity),
-  'You must add at least 1 Prescription'
-);
+import { Prescription } from '@photonhealth/sdk/dist/types';
 
 export const DraftPrescriptionCard = (props: {
   templateIds: string[];
-  templateOverrides: TemplateOverrides;
+  templateOverrides: any;
   prescriptionIds: string[];
   prescriptionRef: HTMLDivElement | undefined;
   actions: Record<string, (...args: any) => any>;
@@ -33,18 +24,15 @@ export const DraftPrescriptionCard = (props: {
   const [editDialogOpen, setEditDialogOpen] = createSignal<boolean>(false);
   const [editDraft, setEditDraft] = createSignal<any>(undefined);
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
+  const { prescriptionIds, setEditingPrescription, deletePrescription } = usePrescribe();
+  const { draftPrescriptions } = useDraftPrescriptions();
 
-  props.actions.registerValidator({
-    key: 'draftPrescriptions',
-    validator: draftPrescriptionsValidator
-  });
-
-  const dispatchPrescriptionDraftDeleted = (prescription: DraftPrescription) => {
+  const dispatchPrescriptionDraftDeleted = (prescription?: Prescription) => {
     const event = new CustomEvent('photon-draft-prescription-deleted', {
       composed: true,
       bubbles: true,
       detail: {
-        prescription: unwrap(prescription)
+        prescription
       }
     });
     ref?.dispatchEvent(event);
@@ -59,11 +47,7 @@ export const DraftPrescriptionCard = (props: {
         value: editDraft().catalogId
       });
 
-      // remove the draft from the list
-      props.actions.updateFormValue({
-        key: 'draftPrescriptions',
-        value: props.store['draftPrescriptions'].value.filter((x: any) => x.id !== editDraft().id)
-      });
+      setEditingPrescription(editDraft().id);
 
       window.scrollTo({
         behavior: 'smooth',
@@ -77,8 +61,7 @@ export const DraftPrescriptionCard = (props: {
     }
   };
 
-  const checkEditPrescription = (id: string) => {
-    const draft = props.store['draftPrescriptions'].value.find((x: any) => x.id === id);
+  const checkEditPrescription = (draft: Prescription) => {
     setEditDraft(draft);
 
     if (!props.store['treatment'].value) {
@@ -99,22 +82,17 @@ export const DraftPrescriptionCard = (props: {
     setEditDraft(undefined);
   };
   const handleDeleteConfirm = () => {
-    const [deleted, remaining] = partition<DraftPrescription>(
-      props.store['draftPrescriptions'].value,
-      (x) => x.id === deleteDraftId()
-    );
-
-    props.actions.updateFormValue({
-      key: 'draftPrescriptions',
-      value: remaining
-    });
-
-    dispatchPrescriptionDraftDeleted(deleted[0]);
+    const deletedId = deleteDraftId();
+    if (deletedId) {
+      const deletedRx = draftPrescriptions().find((rx) => rx.id === deletedId);
+      deletePrescription(deletedId);
+      dispatchPrescriptionDraftDeleted(deletedRx);
+    }
 
     setDeleteDialogOpen(false);
     setDeleteDraftId(undefined);
 
-    if (props.store['draftPrescriptions']?.value?.length === 0) {
+    if (prescriptionIds().length === 0) {
       // reopen form if all drafts are deleted
       props.setIsEditing(true);
     }
@@ -168,24 +146,13 @@ export const DraftPrescriptionCard = (props: {
           />
         </div>
         <DraftPrescriptions
-          draftPrescriptions={props.store['draftPrescriptions']?.value ?? []}
           handleDelete={(draftId: string) => {
             setDeleteDialogOpen(true);
             setDeleteDraftId(draftId);
           }}
-          handleEdit={(draftId: string) => {
-            checkEditPrescription(draftId);
+          handleEdit={(draft) => {
+            checkEditPrescription(draft);
           }}
-          templateIds={props.templateIds}
-          templateOverrides={props.templateOverrides}
-          prescriptionIds={props.prescriptionIds}
-          setDraftPrescriptions={(draftPrescriptions: DraftPrescription[]) => {
-            props.actions.updateFormValue({
-              key: 'draftPrescriptions',
-              value: draftPrescriptions
-            });
-          }}
-          error={props.store['draftPrescriptions']?.error}
           screeningAlerts={props.screeningAlerts}
           enableOrder={props.enableOrder}
         />
