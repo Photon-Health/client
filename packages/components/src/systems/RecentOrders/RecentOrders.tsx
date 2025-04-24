@@ -6,7 +6,6 @@ import { createStore } from 'solid-js/store';
 import RecentOrdersDuplicateDialog from './RecentOrdersDuplicateDialog';
 import RecentOrdersIssueDialog from './RecentOrdersIssueDialog';
 import RecentOrdersCombineDialog from './RecentOrdersCombineDialog';
-import type { DraftPrescription } from '../DraftPrescriptions';
 import { Address } from '../PatientInfo';
 import { BaseOptions, createQuery } from '../../utils/createQuery';
 import {
@@ -57,7 +56,13 @@ type GetPatientOrdersVars = {
 type Treatment = Pick<FullFill['treatment'], 'name'>;
 type Prescription = Pick<
   FullPrescription,
-  'dispenseQuantity' | 'dispenseUnit' | 'fillsAllowed' | 'instructions' | 'writtenAt' | 'prescriber'
+  | 'dispenseQuantity'
+  | 'dispenseUnit'
+  | 'fillsAllowed'
+  | 'instructions'
+  | 'writtenAt'
+  | 'prescriber'
+  | 'id'
 >;
 type Fill = {
   treatment: Treatment;
@@ -85,12 +90,11 @@ type RecentOrdersState = {
   patientName?: string;
   // in case the combine order fails, we need address to make a new order
   address?: Address;
-  // for displaying combine orders
-  draftPrescriptions?: DraftPrescription[];
   // if provider chooses not to combine the order, call this to create a new order
   createOrder?: () => void;
   // if the user clicks "continue" on the duplicate dialog, we need to call the callback to add to draft prescriptions
-  duplicateDialogContinueCb?: () => void;
+  duplicateDialogContinueCb: () => void;
+  duplicateDialogCancelCb: () => void;
   // reference for the order that the user clicked
   orderWithIssue?: Order;
   // reference for the fill with a duplicate treatment name
@@ -98,16 +102,12 @@ type RecentOrdersState = {
 };
 
 type RecentOrdersActions = {
-  setIsCombineDialogOpen: (
-    isOpen: boolean,
-    createOrder?: () => void,
-    draftPrescriptions?: DraftPrescription[],
-    address?: Address
-  ) => void;
+  setIsCombineDialogOpen: (isOpen: boolean, createOrder?: () => void, address?: Address) => void;
   setIsDuplicateDialogOpen: (
     isOpen: boolean,
     duplicate?: { order: Order; fill: Fill },
-    continueCb?: () => void
+    continueCb?: () => void,
+    cancelCb?: () => void
   ) => void;
   setIsIssueDialogOpen: (isOpen: boolean, orderWithIssue?: Order) => void;
   checkDuplicateFill: (treatmentName: string) => { order: Order; fill: Fill } | undefined;
@@ -116,22 +116,7 @@ type RecentOrdersActions = {
 
 type RecentOrdersContextValue = [RecentOrdersState, RecentOrdersActions];
 
-const RecentOrdersContext = createContext<RecentOrdersContextValue>([
-  {
-    orders: [],
-    isLoading: false,
-    isCombineDialogOpen: false,
-    isDuplicateDialogOpen: false,
-    isIssueDialogOpen: false
-  },
-  {
-    setIsCombineDialogOpen: () => undefined,
-    setIsDuplicateDialogOpen: () => undefined,
-    setIsIssueDialogOpen: () => undefined,
-    checkDuplicateFill: () => undefined,
-    hasRoutingOrder: () => false
-  }
-]);
+const RecentOrdersContext = createContext<RecentOrdersContextValue>();
 
 interface SDKProviderProps {
   patientId: string;
@@ -140,13 +125,15 @@ interface SDKProviderProps {
 
 function RecentOrders(props: SDKProviderProps) {
   const client = usePhotonClient();
+
   const [state, setState] = createStore<RecentOrdersState>({
     orders: [],
     isLoading: true,
     isCombineDialogOpen: false,
     isDuplicateDialogOpen: false,
     isIssueDialogOpen: false,
-    duplicateDialogContinueCb: () => undefined
+    duplicateDialogContinueCb: () => undefined,
+    duplicateDialogCancelCb: () => undefined
   });
 
   // we need to make this reactive because we need to re-query when the patientId changes
@@ -155,7 +142,7 @@ function RecentOrders(props: SDKProviderProps) {
       patientId: props.patientId
     },
     skip: !props.patientId,
-    client: client!.apollo,
+    client: client.apollo,
     fetchPolicy: 'network-only'
   }));
   const data = createQuery<GetPatientOrdersResponse, GetPatientOrdersVars>(
@@ -166,20 +153,22 @@ function RecentOrders(props: SDKProviderProps) {
   const value: RecentOrdersContextValue = [
     state,
     {
-      setIsCombineDialogOpen(isOpen, createOrder, draftPrescriptions, address) {
+      setIsCombineDialogOpen(isOpen, createOrder, address) {
         setState({
           isCombineDialogOpen: isOpen,
           ...(createOrder ? { createOrder } : { createOrderCb: undefined }),
-          ...(draftPrescriptions ? { draftPrescriptions } : { draftPrescriptions: [] }),
           ...(address ? { address } : { address: undefined })
         });
       },
-      setIsDuplicateDialogOpen(isOpen, duplicate, continueCb) {
+      setIsDuplicateDialogOpen(isOpen, duplicate, continueCb, cancelCb) {
         setState({
           isDuplicateDialogOpen: isOpen,
           ...(continueCb
             ? { duplicateDialogContinueCb: continueCb }
             : { duplicateDialogContinueCb: undefined }),
+          ...(cancelCb
+            ? { duplicateDialogCancelCb: cancelCb }
+            : { duplicateDialogCancelCb: undefined }),
           ...(duplicate ? { duplicateFill: duplicate.fill } : {}),
           ...(duplicate ? { orderWithIssue: duplicate.order } : {})
         });
@@ -213,7 +202,7 @@ function RecentOrders(props: SDKProviderProps) {
     setState({ isLoading: data.loading });
     const patient = data()?.patient;
     if (!data.loading && patient) {
-      const orders = patient?.orders;
+      const orders = patient.orders;
 
       if (orders?.length > 0) {
         const now = new Date();
@@ -239,7 +228,11 @@ function RecentOrders(props: SDKProviderProps) {
 }
 
 export function useRecentOrders() {
-  return useContext(RecentOrdersContext);
+  const context = useContext(RecentOrdersContext);
+  if (!context) {
+    throw new Error('useRecentOrders must be used within RecentOrdersContext');
+  }
+  return context;
 }
 
 RecentOrders.Card = RecentOrdersCard;
