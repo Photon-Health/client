@@ -1,8 +1,10 @@
 import { format } from 'date-fns';
 import { Prescription, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
-
-const generateDraftPrescription = (prescription: Prescription | PrescriptionTemplate) => ({
-  id: String(Math.random()),
+import { DraftPrescription } from '../index';
+const generateDraftPrescription = (
+  prescription: Prescription | PrescriptionTemplate
+): DraftPrescription => ({
+  id: prescription.id,
   effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
   treatment: prescription.treatment,
   dispenseAsWritten: prescription.dispenseAsWritten,
@@ -18,7 +20,7 @@ const generateDraftPrescription = (prescription: Prescription | PrescriptionTemp
   catalogId: undefined,
   isPrivate: prescription.__typename === 'PrescriptionTemplate' ? prescription.isPrivate : true,
   name: prescription.__typename === 'PrescriptionTemplate' ? prescription.name : null,
-  externalId: 'externalId' in prescription ? prescription.externalId : undefined
+  externalId: 'externalId' in prescription ? prescription.externalId ?? undefined : undefined
 });
 
 export default generateDraftPrescription;
