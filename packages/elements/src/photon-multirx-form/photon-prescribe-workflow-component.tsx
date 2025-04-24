@@ -7,8 +7,10 @@ import { customElement } from 'solid-element';
 import { createFormStore } from '../stores/form';
 import { PrescribeProps, PrescribeWorkflow } from './photon-prescribe-workflow';
 import { onCleanup } from 'solid-js';
+import { PatientStore } from '../stores/patient';
 
 const Component = (props: PrescribeProps) => {
+  const { actions: patientActions } = PatientStore;
   const { store, actions } = createFormStore({
     dispenseAsWritten: false,
     patient: undefined,
@@ -19,6 +21,7 @@ const Component = (props: PrescribeProps) => {
   });
 
   onCleanup(() => {
+    patientActions.clearSelectedPatient();
     actions.reset();
   });
 
