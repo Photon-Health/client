@@ -13,5 +13,9 @@ export default function SDKProvider(props: SDKProviderProps) {
 }
 
 export function usePhotonClient() {
-  return useContext(SDKContext);
+  const context = useContext(SDKContext);
+  if (!context) {
+    throw new Error('SDKContext must be defined');
+  }
+  return context;
 }

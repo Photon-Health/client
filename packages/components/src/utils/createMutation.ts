@@ -36,14 +36,14 @@ export const createMutation = <
   mutation: DocumentNode<TData, TVariables>,
   options: CreateMutationOptions<TData, TVariables, TContext>
 ) => {
+  type MutationOptionsType = MutationOptions<TData, TVariables, TContext>;
+  type ExecutionOptionsType = false | MutationOptionsType;
+
   const resolvedOptions = typeof options === 'function' ? options() : options; // could be accessor or object
   const client = resolvedOptions.client;
   let resolveResultPromise: ((data: TData) => void) | null = null;
   let rejectResultPromise: ((error: GraphQLFormattedError) => void) | null = null;
-
-  const [executionOptions, setExecutionOptions] = createSignal<
-    false | MutationOptions<TData, TVariables, TContext>
-  >(false);
+  const [executionOptions, setExecutionOptions] = createSignal<ExecutionOptionsType>(false);
   const [resource] = createResource(executionOptions, async (opts) => {
     let result: FetchResult<TData>;
     try {
@@ -75,22 +75,19 @@ export const createMutation = <
     }
   });
 
-  return [
-    async (opts: Omit<BaseOptions<TData, TVariables, TContext>, 'client'>) => {
-      const mergedOptions = mergeOptions<
-        MutationOptions<TData, TVariables, TContext>,
-        MutationOptions<TData, TVariables, TContext>
-      >(opts, {
-        mutation,
-        ...(typeof options === 'function' ? untrack(options) : options)
-      });
+  const mutationFunc = async (opts: Omit<BaseOptions<TData, TVariables, TContext>, 'client'>) => {
+    const otherOpts = {
+      mutation,
+      ...(typeof options === 'function' ? untrack(options) : options)
+    };
+    const mergedOptions = mergeOptions<MutationOptionsType, MutationOptionsType>(opts, otherOpts);
 
-      setExecutionOptions(mergedOptions);
-      return new Promise<TData>((resolve, reject) => {
-        resolveResultPromise = resolve;
-        rejectResultPromise = reject;
-      });
-    },
-    resource
-  ] as const;
+    setExecutionOptions(mergedOptions);
+    return new Promise<TData>((resolve, reject) => {
+      resolveResultPromise = resolve;
+      rejectResultPromise = reject;
+    });
+  };
+
+  return [mutationFunc, resource] as const;
 };

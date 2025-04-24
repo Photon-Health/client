@@ -84,29 +84,29 @@ export class PrescriptionQueryManager {
     }
     const [fName, fValue] = Object.entries(fragment)[0];
     const GET_PRESCRIPTIONS = gql`
-          ${fValue}
-          query prescriptions(
-            $patientId: ID
-            $patientName: String
-            $prescriberId: ID
-            $state: PrescriptionState
-            $after: ID
-            $first: Int
-        ) {
-            prescriptions(
-                filter: {
-                    patientId: $patientId
-                    patientName: $patientName
-                    prescriberId: $prescriberId
-                    state: $state
-                }
-                after: $after
-                first: $first
-            ) {
-                ...${fName}
-            }
+      ${fValue}
+      query prescriptions(
+        $patientId: ID
+        $patientName: String
+        $prescriberId: ID
+        $state: PrescriptionState
+        $after: ID
+        $first: Int
+      ) {
+        prescriptions(
+          filter: {
+            patientId: $patientId
+            patientName: $patientName
+            prescriberId: $prescriberId
+            state: $state
           }
-        `;
+          after: $after
+          first: $first
+        ) {
+          ...${fName}
+        }
+      }
+    `;
     return makeQuery<{ prescriptions: Prescription[] }>(this.apollo, GET_PRESCRIPTIONS, {
       patientId,
       patientName,
@@ -128,13 +128,13 @@ export class PrescriptionQueryManager {
     }
     const [fName, fValue] = Object.entries(fragment)[0];
     const GET_PRESCRIPTION = gql`
-          ${fValue}
-          query prescription($id: ID!) {
-            prescription(id: $id) {
-              ...${fName}
-            }
-          }
-        `;
+      ${fValue}
+      query prescription($id: ID!) {
+        prescription(id: $id) {
+          ...${fName}
+        }
+      }
+    `;
     return makeQuery<{ prescription: Prescription }>(this.apollo, GET_PRESCRIPTION, {
       id
     });
@@ -150,13 +150,13 @@ export class PrescriptionQueryManager {
     }
     const [fName, fValue] = Object.entries(fragment)[0];
     const GET_DISPENSE_UNITS = gql`
-          ${fValue}
-          query dispenseUnits {
-            dispenseUnits {
-              ...${fName}
-            }
-          }
-        `;
+      ${fValue}
+      query dispenseUnits {
+        dispenseUnits {
+          ...${fName}
+        }
+      }
+    `;
     return makeQuery<{ dispenseUnits: DispenseUnit[] }>(this.apollo, GET_DISPENSE_UNITS, {});
   }
 
@@ -201,28 +201,6 @@ export class PrescriptionQueryManager {
     return makeMutation<{ createPrescription: Prescription } | undefined | null>(
       this.apollo,
       CREATE_PRESCRIPTION
-    );
-  }
-
-  public createPrescriptions({ fragment }: CreatePrescriptionOptions) {
-    if (!fragment) {
-      fragment = { PrescriptionFields: PRESCRIPTION_FIELDS };
-    }
-    const [fName, fValue] = Object.entries(fragment)[0];
-    const CREATE_PRESCRIPTIONS = gql`
-      ${fValue}
-      mutation createPrescriptions(
-        $prescriptions: [PrescriptionInput]!
-      ) {
-        createPrescriptions(
-          prescriptions: $prescriptions
-        ) {
-          ...${fName}
-        }
-      }`;
-    return makeMutation<{ createPrescriptions: [Prescription] } | undefined | null>(
-      this.apollo,
-      CREATE_PRESCRIPTIONS
     );
   }
 }
