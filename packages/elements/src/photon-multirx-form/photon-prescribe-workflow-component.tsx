@@ -34,6 +34,7 @@ const Component = (props: PrescribeProps) => {
           prescriptionIdsPrefill={props.prescriptionIds?.split(',') || []}
           patientId={store.patient?.value?.id}
           enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+          enableCoverageCheck={props.enableCoverageCheck}
         >
           <PrescribeWorkflow
             patientId={props.patientId}
@@ -101,7 +102,8 @@ customElement(
     toastBuffer: 0,
     externalOrderId: undefined,
     catalogId: undefined,
-    allowOffCatalogSearch: true
+    allowOffCatalogSearch: true,
+    enableCoverageCheck: false
   },
   Component
 );

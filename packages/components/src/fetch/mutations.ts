@@ -1,23 +1,4 @@
-import { gql } from '@apollo/client';
-
-export const GetPrescription = gql`
-  query GetPrescription($id: ID!) {
-    prescription(id: $id) {
-      id
-      daysSupply
-      dispenseAsWritten
-      dispenseQuantity
-      dispenseUnit
-      instructions
-      notes
-      fillsAllowed
-      treatment {
-        id
-        name
-      }
-    }
-  }
-`;
+import gql from 'graphql-tag';
 
 export const CreatePrescriptionTemplate = gql`
   mutation CreatePrescriptionTemplate(
@@ -108,26 +89,5 @@ export const CreatePrescription = gql`
 export const UpdatePrescriptionStates = gql`
   mutation UpdatePrescriptionStates($input: UpdatePrescriptionStatesInput!) {
     updatePrescriptionStates(input: $input)
-  }
-`;
-
-export const GetTemplatesFromCatalogs = gql`
-  query TemplatesFromCatalogs {
-    catalogs {
-      templates {
-        id
-        daysSupply
-        dispenseAsWritten
-        dispenseQuantity
-        dispenseUnit
-        instructions
-        notes
-        fillsAllowed
-        treatment {
-          id
-          name
-        }
-      }
-    }
   }
 `;

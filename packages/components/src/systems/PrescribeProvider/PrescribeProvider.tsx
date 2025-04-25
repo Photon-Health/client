@@ -21,9 +21,10 @@ import {
   GetPrescription,
   GetTemplatesFromCatalogs,
   UpdatePrescriptionStates
-} from '../../fetch/queries';
+} from '../../fetch';
 import { triggerToast, useRecentOrders } from '../../index';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
+import gql from 'graphql-tag';
 
 const PrescribeContext = createContext<{
   // values
@@ -39,6 +40,28 @@ const PrescribeContext = createContext<{
   ) => Promise<Prescription>;
   tryUpdatePrescriptionStates: (ids: string[], state: PrescriptionState) => Promise<boolean>;
 }>();
+
+export const GetPatientQuery = gql`
+  query GetPatient($id: ID!) {
+    patient(id: $id) {
+      benefits {
+        id
+        bin
+        pcn
+        groupId
+        memberId
+      }
+      preferredPharmacyId
+        name
+        address {
+          street1
+          city
+          state
+        }
+      }
+    }
+  }
+`;
 
 export type TemplateOverrides = {
   [key: string]: {
@@ -78,6 +101,7 @@ interface PrescribeProviderProps {
   prescriptionIdsPrefill: string[];
   patientId: string;
   enableCombineAndDuplicate: boolean;
+  enableCoverageCheck: boolean;
 }
 
 const transformPrescription = (prescription: PrescriptionFormData, patientId: string) => ({
@@ -95,9 +119,36 @@ const transformPrescription = (prescription: PrescriptionFormData, patientId: st
   diagnoses: prescription.diagnoseCodes
 });
 
+// TODO: hand typed for now
+export type Coverage = {
+  daysSupply: number;
+  dispenseQuantity: number;
+  dispenseUnit: string;
+  id: string;
+  isAlternative: boolean;
+  paRequired: boolean;
+  prescriptionId: string;
+  price: number;
+  status: string;
+  statusMessage: string;
+  treatment: { id: string; name: string };
+};
+export type Benefit = {
+  id: string;
+  bin: string;
+  groupId: string;
+  memberId: string;
+  pcn: string;
+};
+
 export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const [isLoadingPrefills, setIsLoadingPrefills] = createSignal<boolean>(false);
   const [hasCreatedPrescriptions, setHasCreatedPrescriptions] = createSignal<boolean>(false);
+  const [coverages, setCoverages] = createSignal<Coverage[]>([]);
+  const [patientPreferredPharmacyId, setPatientPreferredPharmacyId] = createSignal<string | null>(
+    null
+  );
+  const [patientBenefits, setPatientBenefits] = createSignal<Benefit[]>([]);
 
   const client = usePhotonClient();
   const { draftPrescriptions, setDraftPrescriptions } = useDraftPrescriptions();
@@ -118,6 +169,80 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
       !hasCreatedPrescriptions()
     ) {
       createPrescriptionsFromIds();
+    }
+  });
+
+  createEffect(() => {
+    if (props.patientId) {
+      const { data } = await client.apollo.query({
+        query: GetPatientQuery,
+        variables: { id: props.patientId }
+      });
+    }
+  });
+
+  // if we have prescriptions, coverage check is enabled, and the patient has a preferred pharmacy,
+  // then we need to check the coverage of the prescriptions
+  createEffect(() => {
+    if (prescriptionIds().length > 0 && props.enableCoverageCheck) {
+      // FOR TESTING, TODO REMOVE
+      // {
+      //   "data": {
+      //     "generateCoverageOptions": [
+      //       {
+      //         "daysSupply": 1,
+      //         "dispenseQuantity": 1,
+      //         "dispenseUnit": "C64933",
+      //         "id": "cov_01JSQ9GE2KF40F4FRG1TP18Z16",
+      //         "isAlternative": false,
+      //         "paRequired": false,
+      //         "prescriptionId": "rx_01JSCD5X9ZPE8FZC0SFJJNJZ35",
+      //         "price": 5,
+      //         "status": "COVERED",
+      //         "statusMessage": "This medication is covered by the patient's prescription benefit plan.",
+      //         "treatment": {
+      //           "id": "med_01J8JW94MWNPC1GMG8RRCB00YN",
+      //           "name": "Botox Cosmetic Intramuscular Solution Reconstituted 50 UNIT"
+      //         }
+      //       }
+      //     ]
+      //   }
+      // }
+
+      setCoverages([
+        {
+          daysSupply: 1,
+          dispenseQuantity: 1,
+          dispenseUnit: 'Each',
+          id: 'cov_01JSQ9GE2KF40F4FRG1TP18Z16',
+          isAlternative: false,
+          paRequired: false,
+          prescriptionId: 'rx_01JSCD5X9ZPE8FZC0SFJJNJZ35',
+          price: 5,
+          status: 'COVERED',
+          statusMessage: "This medication is covered by the patient's prescription benefit plan.",
+          treatment: {
+            id: 'med_01J8JW94MWNPC1GMG8RRCB00YN',
+            name: 'Botox Cosmetic Intramuscular Solution Reconstituted 50 UNIT'
+          }
+        },
+        {
+          daysSupply: 1,
+          dispenseQuantity: 1,
+          dispenseUnit: 'Each',
+          id: 'cov_01JSQ9GE2KF40F4FRG1TP18Z17',
+          isAlternative: true,
+          paRequired: false,
+          prescriptionId: 'rx_01JSCD5X9ZPE8FZC0SFJJNJZ35',
+          price: 5,
+          status: 'NOT_COVERED',
+          statusMessage: "This medication is covered by the patient's prescription benefit plan.",
+          treatment: {
+            id: 'med_01HGVCYENW6ABNA9X2C3NC1T4N',
+            name: 'Lipitor 40 MG Oral Tablet'
+          }
+        }
+      ]);
     }
   });
 
