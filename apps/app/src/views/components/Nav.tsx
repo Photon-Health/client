@@ -38,7 +38,6 @@ import {
 } from 'react-icons/fi';
 import { TbPrescription } from 'react-icons/tb';
 
-import { getSettings } from '@client/settings';
 import { usePhoton } from '@photonhealth/react';
 import { useCallback } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
@@ -46,19 +45,37 @@ import { Logo } from './Logo';
 import { NavButton } from './NavButton';
 import { UserProfile } from './UserProfile';
 
+import { graphql } from 'apps/app/src/gql';
+import { useQuery } from '@apollo/client';
+
+const orgSettingsQuery = graphql(/* GraphQL */ `
+  query NavOrgSettingsQuery {
+    organization {
+      settings {
+        providerUx {
+          federatedAuth
+        }
+      }
+    }
+  }
+`);
+
 export const Nav = () => {
   const theme = useTheme();
   const isDesktop = useBreakpointValue({ base: false, lg: true });
   const { isOpen, onClose, onToggle } = useDisclosure();
-  const { user, logout, getOrganization, getOrganizations, clearOrganization } = usePhoton();
-  const orgSettings = getSettings(user?.org_id);
+  const { user, logout, getOrganization, getOrganizations, clearOrganization, clinicalClient } =
+    usePhoton();
   const { organization } = getOrganization();
   const { organizations } = getOrganizations();
 
+  const { data } = useQuery(orgSettingsQuery, { client: clinicalClient });
+  const federated = data?.organization?.settings?.providerUx?.federatedAuth ?? false;
+
   const onLogout = useCallback(() => {
     localStorage.removeItem('previouslyAuthed');
-    logout({ returnTo: orgSettings.returnTo, federated: orgSettings.federated });
-  }, [logout, orgSettings]);
+    logout({ returnTo: window.location.href, federated });
+  }, [logout, federated]);
 
   const onSwitchOrganization = useCallback(() => {
     clearOrganization();
