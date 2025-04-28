@@ -35,7 +35,7 @@ export const Auth = (props: AuthProps) => {
           colorScheme="brand"
           onClick={() => {
             localStorage.removeItem('previouslyAuthed');
-            logout({ returnTo: window.location.href, federated });
+            logout({ returnTo: window.location.origin, federated });
           }}
         >
           Log out
