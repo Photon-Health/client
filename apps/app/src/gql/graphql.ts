@@ -56,6 +56,7 @@ export type Benefit = {
   groupId?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   memberId: Scalars['String']['output'];
+  payerId?: Maybe<Scalars['String']['output']>;
   payerName?: Maybe<Scalars['String']['output']>;
   pcn?: Maybe<Scalars['String']['output']>;
   planName?: Maybe<Scalars['String']['output']>;
@@ -67,7 +68,10 @@ export type BenefitInput = {
   groupId?: InputMaybe<Scalars['String']['input']>;
   memberId: Scalars['String']['input'];
   patientId: Scalars['ID']['input'];
+  payerId?: InputMaybe<Scalars['String']['input']>;
+  payerName?: InputMaybe<Scalars['String']['input']>;
   pcn?: InputMaybe<Scalars['String']['input']>;
+  planName?: InputMaybe<Scalars['String']['input']>;
 };
 
 export enum BenefitType {
@@ -107,6 +111,44 @@ export type Connection = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
 };
+
+export type Coverage = {
+  __typename?: 'Coverage';
+  alerts: Array<CoverageAlert>;
+  daysSupply: Scalars['Int']['output'];
+  dispenseQuantity: Scalars['Float']['output'];
+  dispenseUnit: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  isAlternative: Scalars['Boolean']['output'];
+  paRequired: Scalars['Boolean']['output'];
+  prescriptionId: Scalars['ID']['output'];
+  price?: Maybe<Scalars['Float']['output']>;
+  status: CoverageStatus;
+  statusMessage: Scalars['String']['output'];
+  treatment: Treatment;
+};
+
+export type CoverageAlert = {
+  __typename?: 'CoverageAlert';
+  label: Scalars['String']['output'];
+  text: Scalars['String']['output'];
+};
+
+export type CoverageResponse = {
+  __typename?: 'CoverageResponse';
+  coverages: Array<Coverage>;
+};
+
+export type CoverageRxInput = {
+  icd10Codes?: InputMaybe<Array<Scalars['String']['input']>>;
+  id: Scalars['ID']['input'];
+};
+
+export enum CoverageStatus {
+  Covered = 'COVERED',
+  CoveredWithRestrictions = 'COVERED_WITH_RESTRICTIONS',
+  NotCovered = 'NOT_COVERED'
+}
 
 export type DraftedPrescriptionInput = {
   daysSupply?: InputMaybe<Scalars['Int']['input']>;
@@ -190,6 +232,7 @@ export type Mutation = {
   createWebhookConfig: Scalars['ID']['output'];
   deleteInvite: Scalars['ID']['output'];
   deleteWebhookConfig: Scalars['ID']['output'];
+  generateCoverageOptions: Array<Coverage>;
   inviteUser: Invite;
   removeUserFromOrganization: Scalars['ID']['output'];
   resendInvite: Invite;
@@ -243,6 +286,12 @@ export type MutationDeleteInviteArgs = {
 
 export type MutationDeleteWebhookConfigArgs = {
   webhookId: Scalars['ID']['input'];
+};
+
+
+export type MutationGenerateCoverageOptionsArgs = {
+  pharmacyId: Scalars['ID']['input'];
+  prescriptions: Array<CoverageRxInput>;
 };
 
 
