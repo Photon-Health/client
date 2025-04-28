@@ -1,7 +1,7 @@
 import { createEffect, createMemo, createSignal, For } from 'solid-js';
 import Client from '../src/systems/Client';
 import {
-  DraftPrescriptions,
+  DraftPrescriptionList,
   DraftPrescriptionsProvider,
   PrescribeProvider,
   RecentOrders,
@@ -86,6 +86,7 @@ const App = () => {
               prescriptionIdsPrefill={prescriptionIds()}
               patientId={patientId}
               enableCombineAndDuplicate={true}
+              enableCoverageCheck={true}
             >
               <div class="mb-10">
                 <h2>Patient Info</h2>
@@ -95,7 +96,7 @@ const App = () => {
               <div class="mb-10">
                 <h2>Draft Prescriptions</h2>
               </div>
-              <DraftPrescriptions
+              <DraftPrescriptionList
                 handleDelete={(id) => setPrescriptionIds(prescriptionIds().filter((p) => p !== id))}
                 handleEdit={(rx) =>
                   setPrescriptionIds(prescriptionIds().filter((p) => p !== rx.id))

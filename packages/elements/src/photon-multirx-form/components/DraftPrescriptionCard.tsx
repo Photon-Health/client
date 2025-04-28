@@ -1,5 +1,5 @@
 import { createSignal, Ref } from 'solid-js';
-import { DraftPrescriptions, useDraftPrescriptions } from '@photonhealth/components';
+import { DraftPrescriptionList, useDraftPrescriptions } from '@photonhealth/components';
 import { Card, Text, usePrescribe } from '@photonhealth/components';
 import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
@@ -145,7 +145,7 @@ export const DraftPrescriptionCard = (props: {
             tip="Each prescription will include the prescriber’s digital signature and the date it was written when the order is sent to the pharmacy."
           />
         </div>
-        <DraftPrescriptions
+        <DraftPrescriptionList
           handleDelete={(draftId: string) => {
             setDeleteDialogOpen(true);
             setDeleteDraftId(draftId);

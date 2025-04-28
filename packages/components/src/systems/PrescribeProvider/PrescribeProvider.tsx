@@ -259,7 +259,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     pharmacyId: string
   ): Promise<Coverage[]> => {
     try {
-      console.log('generateCoverageOptions ===> ', { pharmacyId, prescriptions });
       const res = await client.apolloClinical.mutate({
         mutation: GenerateCoverageOptions,
         variables: {

@@ -6,7 +6,7 @@ import Card from './particles/Card';
 import ComboBox from './particles/ComboBox';
 import {
   DraftPrescription,
-  DraftPrescriptions,
+  DraftPrescriptionList,
   DraftPrescriptionsProvider,
   useDraftPrescriptions
 } from './systems/DraftPrescriptions';
@@ -59,7 +59,7 @@ export {
   ComboBox,
   Dialog,
   DoseCalculator,
-  DraftPrescriptions,
+  DraftPrescriptionList,
   DraftPrescriptionsProvider,
   useDraftPrescriptions,
   Icon,
