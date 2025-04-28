@@ -55,3 +55,14 @@ export const GetPatient = gql`
     }
   }
 `;
+
+export const GetPatientPreferredPharmacies = gql`
+  query GetPatient($id: ID!) {
+    patient(id: $id) {
+      preferredPharmacies {
+        id
+        name
+      }
+    }
+  }
+`;

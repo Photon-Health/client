@@ -91,3 +91,24 @@ export const UpdatePrescriptionStates = gql`
     updatePrescriptionStates(input: $input)
   }
 `;
+
+export const GenerateCoverageOptions = gql`
+  mutation GenerateCoverageOptions($pharmacyId: ID!, $prescriptions: [CoverageRxInput!]!) {
+    generateCoverageOptions(pharmacyId: $pharmacyId, prescriptions: $prescriptions) {
+      id
+      prescriptionId
+      isAlternative
+      status
+      statusMessage
+      paRequired
+      price
+      daysSupply
+      dispenseQuantity
+      dispenseUnit
+      treatment {
+        name
+        id
+      }
+    }
+  }
+`;

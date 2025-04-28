@@ -18,18 +18,20 @@ import {
 import {
   CreatePrescription,
   CreatePrescriptionTemplate,
+  GenerateCoverageOptions,
+  GetPatientPreferredPharmacies,
   GetPrescription,
   GetTemplatesFromCatalogs,
   UpdatePrescriptionStates
 } from '../../fetch';
 import { triggerToast, useRecentOrders } from '../../index';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
-import gql from 'graphql-tag';
 
 const PrescribeContext = createContext<{
   // values
   prescriptionIds: Accessor<string[]>;
   isLoadingPrefills: Accessor<boolean>;
+  coverages: Accessor<Coverage[]>;
 
   // actions
   setEditingPrescription: (id: string) => void;
@@ -40,28 +42,6 @@ const PrescribeContext = createContext<{
   ) => Promise<Prescription>;
   tryUpdatePrescriptionStates: (ids: string[], state: PrescriptionState) => Promise<boolean>;
 }>();
-
-export const GetPatientQuery = gql`
-  query GetPatient($id: ID!) {
-    patient(id: $id) {
-      benefits {
-        id
-        bin
-        pcn
-        groupId
-        memberId
-      }
-      preferredPharmacyId
-        name
-        address {
-          street1
-          city
-          state
-        }
-      }
-    }
-  }
-`;
 
 export type TemplateOverrides = {
   [key: string]: {
@@ -119,28 +99,6 @@ const transformPrescription = (prescription: PrescriptionFormData, patientId: st
   diagnoses: prescription.diagnoseCodes
 });
 
-// TODO: hand typed for now
-export type Coverage = {
-  daysSupply: number;
-  dispenseQuantity: number;
-  dispenseUnit: string;
-  id: string;
-  isAlternative: boolean;
-  paRequired: boolean;
-  prescriptionId: string;
-  price: number;
-  status: string;
-  statusMessage: string;
-  treatment: { id: string; name: string };
-};
-export type Benefit = {
-  id: string;
-  bin: string;
-  groupId: string;
-  memberId: string;
-  pcn: string;
-};
-
 export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const [isLoadingPrefills, setIsLoadingPrefills] = createSignal<boolean>(false);
   const [hasCreatedPrescriptions, setHasCreatedPrescriptions] = createSignal<boolean>(false);
@@ -148,7 +106,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const [patientPreferredPharmacyId, setPatientPreferredPharmacyId] = createSignal<string | null>(
     null
   );
-  const [patientBenefits, setPatientBenefits] = createSignal<Benefit[]>([]);
+  // const [patientBenefits, setPatientBenefits] = createSignal<Benefit[]>([]);
 
   const client = usePhotonClient();
   const { draftPrescriptions, setDraftPrescriptions } = useDraftPrescriptions();
@@ -174,9 +132,12 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
 
   createEffect(() => {
     if (props.patientId) {
-      const { data } = await client.apollo.query({
-        query: GetPatientQuery,
-        variables: { id: props.patientId }
+      console.log('getPatientPreferredPharmacies ===> effect triggered');
+      getPatientPreferredPharmacies(props.patientId).then((pharmacies) => {
+        console.log('getPatientPreferredPharmacies ===> ', { pharmacies });
+        if (pharmacies.length > 0) {
+          setPatientPreferredPharmacyId(pharmacies[0].id);
+        }
       });
     }
   });
@@ -184,65 +145,12 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   // if we have prescriptions, coverage check is enabled, and the patient has a preferred pharmacy,
   // then we need to check the coverage of the prescriptions
   createEffect(() => {
-    if (prescriptionIds().length > 0 && props.enableCoverageCheck) {
-      // FOR TESTING, TODO REMOVE
-      // {
-      //   "data": {
-      //     "generateCoverageOptions": [
-      //       {
-      //         "daysSupply": 1,
-      //         "dispenseQuantity": 1,
-      //         "dispenseUnit": "C64933",
-      //         "id": "cov_01JSQ9GE2KF40F4FRG1TP18Z16",
-      //         "isAlternative": false,
-      //         "paRequired": false,
-      //         "prescriptionId": "rx_01JSCD5X9ZPE8FZC0SFJJNJZ35",
-      //         "price": 5,
-      //         "status": "COVERED",
-      //         "statusMessage": "This medication is covered by the patient's prescription benefit plan.",
-      //         "treatment": {
-      //           "id": "med_01J8JW94MWNPC1GMG8RRCB00YN",
-      //           "name": "Botox Cosmetic Intramuscular Solution Reconstituted 50 UNIT"
-      //         }
-      //       }
-      //     ]
-      //   }
-      // }
-
-      setCoverages([
-        {
-          daysSupply: 1,
-          dispenseQuantity: 1,
-          dispenseUnit: 'Each',
-          id: 'cov_01JSQ9GE2KF40F4FRG1TP18Z16',
-          isAlternative: false,
-          paRequired: false,
-          prescriptionId: 'rx_01JSCD5X9ZPE8FZC0SFJJNJZ35',
-          price: 5,
-          status: 'COVERED',
-          statusMessage: "This medication is covered by the patient's prescription benefit plan.",
-          treatment: {
-            id: 'med_01J8JW94MWNPC1GMG8RRCB00YN',
-            name: 'Botox Cosmetic Intramuscular Solution Reconstituted 50 UNIT'
-          }
-        },
-        {
-          daysSupply: 1,
-          dispenseQuantity: 1,
-          dispenseUnit: 'Each',
-          id: 'cov_01JSQ9GE2KF40F4FRG1TP18Z17',
-          isAlternative: true,
-          paRequired: false,
-          prescriptionId: 'rx_01JSCD5X9ZPE8FZC0SFJJNJZ35',
-          price: 5,
-          status: 'NOT_COVERED',
-          statusMessage: "This medication is covered by the patient's prescription benefit plan.",
-          treatment: {
-            id: 'med_01HGVCYENW6ABNA9X2C3NC1T4N',
-            name: 'Lipitor 40 MG Oral Tablet'
-          }
-        }
-      ]);
+    const pharmacyId = patientPreferredPharmacyId();
+    const prescriptions = draftPrescriptions();
+    if (props.enableCoverageCheck && prescriptions.length > 0 && pharmacyId !== null) {
+      generateCoverageOptions(prescriptions, pharmacyId).then((options) => {
+        setCoverages(options);
+      });
     }
   });
 
@@ -328,6 +236,50 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     );
     setIsLoadingPrefills(false);
   }
+
+  const getPatientPreferredPharmacies = async (patientId: string) => {
+    try {
+      const response = await client.apollo.query({
+        query: GetPatientPreferredPharmacies,
+        variables: { id: patientId }
+      });
+      return response.data.patient.preferredPharmacies as PatientPreferredPharmacy[];
+    } catch (error) {
+      triggerToast({
+        status: 'error',
+        header: 'Error Looking Up Patient Pharmacy',
+        body: (error as Error).message
+      });
+      throw error;
+    }
+  };
+
+  const generateCoverageOptions = async (
+    prescriptions: Prescription[],
+    pharmacyId: string
+  ): Promise<Coverage[]> => {
+    try {
+      console.log('generateCoverageOptions ===> ', { pharmacyId, prescriptions });
+      const res = await client.apolloClinical.mutate({
+        mutation: GenerateCoverageOptions,
+        variables: {
+          pharmacyId,
+          prescriptions: prescriptions.map((prescription) => ({
+            id: prescription.id
+            // icd10codes: ['gotta get this']
+          }))
+        }
+      });
+      return res.data.generateCoverageOptions as Coverage[];
+    } catch (error) {
+      triggerToast({
+        status: 'error',
+        header: 'Error Looking Up Coverage Option(s)',
+        body: (error as Error).message
+      });
+      throw error;
+    }
+  };
 
   const tryCreatePrescription = async (
     prescriptionFormData: PrescriptionFormData,
@@ -476,6 +428,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     // values
     prescriptionIds,
     isLoadingPrefills,
+    coverages,
     // actions
     tryCreatePrescription,
     tryUpdatePrescriptionStates,
@@ -506,3 +459,30 @@ export type TryCreatePrescriptionTemplateOptions = {
   templateName?: string;
   catalogId?: string;
 };
+
+export type PatientPreferredPharmacy = {
+  id: string;
+  name: string;
+};
+
+export type Coverage = {
+  daysSupply: number;
+  dispenseQuantity: number;
+  dispenseUnit: string;
+  id: string;
+  isAlternative: boolean;
+  paRequired: boolean;
+  prescriptionId: string;
+  price: number;
+  status: string;
+  statusMessage: string;
+  treatment: { id: string; name: string };
+};
+
+// export type Benefit = {
+//   id: string;
+//   bin: string;
+//   groupId: string;
+//   memberId: string;
+//   pcn: string;
+// };

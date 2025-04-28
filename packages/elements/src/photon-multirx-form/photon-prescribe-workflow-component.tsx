@@ -52,6 +52,7 @@ const Component = (props: PrescribeProps) => {
             enableMedHistoryLinks={props.enableMedHistoryLinks}
             enableMedHistoryRefillButton={props.enableMedHistoryRefillButton}
             enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+            enableCoverageCheck={props.enableCoverageCheck}
             mailOrderIds={props.mailOrderIds}
             pharmacyId={props.pharmacyId}
             loading={props.loading}
