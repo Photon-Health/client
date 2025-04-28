@@ -1,85 +1,41 @@
-import { For, createMemo, createSignal, createEffect } from 'solid-js';
+import { createEffect, createMemo, createSignal, For } from 'solid-js';
+import Client from '../src/systems/Client';
+import {
+  DraftPrescriptions,
+  DraftPrescriptionsProvider,
+  PrescribeProvider,
+  RecentOrders,
+  triggerToast,
+  useDraftPrescriptions
+} from '../src';
 import PatientInfo from '../src/systems/PatientInfo';
 import PharmacySearch from '../src/systems/PharmacySearch';
 import DoseCalculator from '../src/systems/DoseCalculator';
-import Client from '../src/systems/Client';
 import Button from '../src/particles/Button';
 import Icon from '../src/particles/Icon';
 import { randomNames } from '../src/sampleData/randomNames';
 import ComboBox from '../src/particles/ComboBox';
-import { PharmacySelect } from '../src/systems/PharmacySelect';
+import { PharmacySelect } from '../src';
 import Card from '../src/particles/Card';
-import DraftPrescriptions, { DraftPrescription } from '../src/systems/DraftPrescriptions';
 import PatientMedHistory from '../src/systems/PatientMedHistory';
-import { triggerToast } from '../src';
 import AddressForm from '../src/systems/AddressForm';
+import { Prescription } from '@photonhealth/sdk/dist/types';
 
-const draftPrescriptions: DraftPrescription[] = [
-  {
-    name: 'Metropolol Draft',
-    isPrivate: false,
-    id: '1',
-    effectiveDate: '2021-01-01',
-    treatment: {
-      name: 'Metroprolol 50mg',
-      id: 'treatmentId',
-      codes: {
-        rxcui: 'String',
-        productNDC: 'String',
-        packageNDC: 'String',
-        SKU: 'String',
-        HCPCS: 'String'
-      }
-    },
-    dispenseAsWritten: false,
-    dispenseQuantity: 1,
-    dispenseUnit: 'dispenseUnit',
-    daysSupply: 1,
-    refillsInput: 1,
-    instructions: 'instructions',
-    notes: 'notes',
-    fillsAllowed: 1,
-    addToTemplates: false,
-    catalogId: 'catalogId'
-  },
-  {
-    name: 'Metropolol Draft 2',
-    isPrivate: false,
-    id: '2',
-    effectiveDate: '2021-01-01',
-    treatment: {
-      name: 'Metroprolol 50mg',
-      id: 'treatmentId',
-      codes: {
-        rxcui: 'String',
-        productNDC: 'String',
-        packageNDC: 'String',
-        SKU: 'String',
-        HCPCS: 'String'
-      }
-    },
-    dispenseAsWritten: false,
-    dispenseQuantity: 1,
-    dispenseUnit: 'dispenseUnit',
-    daysSupply: 1,
-    refillsInput: 1,
-    instructions: 'Here are some much longer instructions that will wrap around the card.',
-    notes: 'notes',
-    fillsAllowed: 1,
-    addToTemplates: false,
-    catalogId: 'catalogId'
-  }
-];
-
+// todo: fix this. it broke since we change how draft prescriptions work, and refactored logic into useContexts
 const App = () => {
+  const [prescriptionIds, setPrescriptionIds] = createSignal<string[]>([
+    'rx_01JQF5SG4G6WSMWFR3769PFR8E',
+    'rx_01JQF5G1HKVB0XAZYNSTK4V97J'
+  ]);
+
+  const { setDraftPrescriptions } = useDraftPrescriptions();
+  setDraftPrescriptions(draftPrescriptions);
+  const patientId = 'pat_01H28NXFX27PSADPYPR5JHTCD7';
   const [setPharmacy] = createSignal<any>();
   const [doseOpen, setDoseOpen] = createSignal(false);
   const [query, setQuery] = createSignal('');
   const [patientIds, setPatientIds] = createSignal<string[]>([]);
   const [timedAddress, setTimedAddress] = createSignal<string>('');
-  const [draftPrescriptionsFromTemplates, setDraftPrescriptions] = createSignal<
-    DraftPrescription[]
-  >([]);
   const rando = randomNames.slice(0, 3);
   const filteredPeople = createMemo(() => {
     return query() === ''
@@ -115,11 +71,6 @@ const App = () => {
         </div>
 
         <div class="mb-10">
-          <h2>Patient Info</h2>
-          <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
-        </div>
-
-        <div class="mb-10">
           <h2>Patient Med History</h2>
           <PatientMedHistory
             patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ"
@@ -127,27 +78,33 @@ const App = () => {
             enableRefillButton={true}
           />
         </div>
+        <DraftPrescriptionsProvider>
+          <RecentOrders patientId={patientId}>
+            <PrescribeProvider
+              templateIdsPrefill={[]}
+              templateOverrides={{}}
+              prescriptionIdsPrefill={prescriptionIds()}
+              patientId={patientId}
+              enableCombineAndDuplicate={true}
+            >
+              <div class="mb-10">
+                <h2>Patient Info</h2>
+                <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
+              </div>
 
-        <div class="mb-10">
-          <h2>Draft Prescriptions</h2>
-          <DraftPrescriptions
-            draftPrescriptions={draftPrescriptions}
-            setDraftPrescriptions={setDraftPrescriptions}
-            screeningAlerts={[]}
-          />
-          <h2>Fetching Draft Presciptions</h2>
-          <DraftPrescriptions
-            draftPrescriptions={draftPrescriptionsFromTemplates()}
-            setDraftPrescriptions={setDraftPrescriptions}
-            screeningAlerts={[]}
-            templateIds={[
-              'tmp_01H5JXWKYFMYT70RND1CGQCFKZ',
-              'tmp_01H5JB37PPK9F64RE3QQ52WD7M',
-              'tmp_01GQJDV39GPEJ03BATZV1X0SRJ'
-            ]}
-            prescriptionIds={['rx_01H82MN6S6FN9PN0K7FTKGWC60', 'rx_01H82RKH4K1RA4RS2VG4H8J8XG']}
-          />
-        </div>
+              <div class="mb-10">
+                <h2>Draft Prescriptions</h2>
+              </div>
+              <DraftPrescriptions
+                handleDelete={(id) => setPrescriptionIds(prescriptionIds().filter((p) => p !== id))}
+                handleEdit={(rx) =>
+                  setPrescriptionIds(prescriptionIds().filter((p) => p !== rx.id))
+                }
+                screeningAlerts={[]}
+              />
+            </PrescribeProvider>
+          </RecentOrders>
+        </DraftPrescriptionsProvider>
 
         <div class="mb-10">
           <div>
@@ -254,3 +211,36 @@ const App = () => {
 };
 
 export default App;
+
+const draftPrescriptions: Prescription[] = [
+  {
+    id: '1',
+    effectiveDate: '2021-01-01',
+    treatment: {
+      name: 'Metroprolol 50mg',
+      id: 'treatmentId'
+    },
+    dispenseAsWritten: false,
+    dispenseQuantity: 1,
+    dispenseUnit: 'dispenseUnit',
+    daysSupply: 1,
+    instructions: 'instructions',
+    notes: 'notes',
+    fillsAllowed: 1
+  } as Prescription,
+  {
+    id: '2',
+    effectiveDate: '2021-01-01',
+    treatment: {
+      name: 'Metroprolol 50mg',
+      id: 'treatmentId'
+    },
+    dispenseAsWritten: false,
+    dispenseQuantity: 1,
+    dispenseUnit: 'dispenseUnit',
+    daysSupply: 1,
+    instructions: 'Here are some much longer instructions that will wrap around the card.',
+    notes: 'notes',
+    fillsAllowed: 1
+  } as Prescription
+];

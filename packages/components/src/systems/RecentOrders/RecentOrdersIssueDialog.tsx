@@ -76,15 +76,15 @@ Order:
 
 ----
 Patient:
-  ID: ${patient.id} 
+  ID: ${patient.id}
   Name: ${patient.name}
 
 ----
 Prescriptions:
 ${prescriptionsString}
 
----- 
-Description: 
+----
+Description:
   ${values.description}
 `;
 };
@@ -97,7 +97,7 @@ export default function RecentOrdersIssueDialog() {
   const client = usePhotonClient();
 
   const [createTicketMutation, data] = createMutation<{ id: string }, InputValues>(CREATE_TICKET, {
-    client: client!.apolloClinical
+    client: client.apolloClinical
   });
 
   createEffect(() => {
