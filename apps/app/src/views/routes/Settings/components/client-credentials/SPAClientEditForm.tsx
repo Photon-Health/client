@@ -7,19 +7,32 @@ import {
   Alert,
   AlertIcon,
   Stack,
-  FormHelperText
+  FormHelperText,
+  Flex,
+  Switch,
+  Text
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { graphql } from 'apps/app/src/gql';
 import { usePhoton } from '@photonhealth/react';
 import { useMutation } from '@apollo/client';
 import { ErrorMessage, Field, Formik } from 'formik';
 import * as yup from 'yup';
+import { Client } from 'apps/app/src/gql/graphql';
+
+enum ConnectionOptions {
+  GOOGLE = 'google-oauth2',
+  MICROSOFT = 'Microsoft'
+}
 
 const updateClientMutation = graphql(/* GraphQL */ `
-  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!) {
-    updateClient(clientId: $clientId, whiteListedUrls: $whiteListedUrls) {
+  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!, $connections: [String!]!) {
+    updateClient(
+      clientId: $clientId
+      whiteListedUrls: $whiteListedUrls
+      connections: $connections
+    ) {
       id
     }
   }
@@ -48,7 +61,9 @@ const spaClientValidationSchema = yup.object({
           return false;
         }
       });
-    })
+    }),
+  googleAuthEnabled: yup.boolean().required(),
+  microsoftAuthEnabled: yup.boolean().required()
 });
 
 type SPAClientEditFormValues = yup.InferType<typeof spaClientValidationSchema>;
@@ -56,9 +71,14 @@ type SPAClientEditFormValues = yup.InferType<typeof spaClientValidationSchema>;
 interface SPAClientEditFormProps {
   clientId: string;
   whiteListedUrls: string[];
+  connections: Client['connections'];
 }
 
-export function SPAClientEditForm({ clientId, whiteListedUrls }: SPAClientEditFormProps) {
+export function SPAClientEditForm({
+  clientId,
+  whiteListedUrls,
+  connections
+}: SPAClientEditFormProps) {
   const { clinicalClient } = usePhoton();
   const [submitError, setSubmitError] = useState<string>();
 
@@ -67,21 +87,37 @@ export function SPAClientEditForm({ clientId, whiteListedUrls }: SPAClientEditFo
     client: clinicalClient
   });
 
-  const initialValues: SPAClientEditFormValues = {
-    whiteListedUrls: whiteListedUrls.join(', ')
-  };
+  const initialValues: SPAClientEditFormValues = useMemo(
+    () => ({
+      whiteListedUrls: whiteListedUrls.join(', '),
+      googleAuthEnabled:
+        connections?.some((connection) => connection.name === ConnectionOptions.GOOGLE) ?? false,
+      microsoftAuthEnabled:
+        connections?.some((connection) => connection.name === ConnectionOptions.MICROSOFT) ?? false
+    }),
+    [connections, whiteListedUrls]
+  );
 
   const submitHandler = async (values: SPAClientEditFormValues) => {
+    const connections: string[] = [];
     const urls = (values.whiteListedUrls ?? '')
       .split(',')
       .map((url) => url.trim())
       .filter((url) => !!url);
 
+    if (values.googleAuthEnabled) {
+      connections.push(ConnectionOptions.GOOGLE);
+    }
+    if (values.microsoftAuthEnabled) {
+      connections.push(ConnectionOptions.MICROSOFT);
+    }
+
     try {
       const response = await updateClient({
         variables: {
           clientId,
-          whiteListedUrls: urls
+          whiteListedUrls: urls,
+          connections
         }
       });
       if (response.errors?.length) {
@@ -121,6 +157,39 @@ export function SPAClientEditForm({ clientId, whiteListedUrls }: SPAClientEditFo
               />
               <ErrorMessage name="whiteListedUrls" component={FormErrorMessage} />
             </FormControl>
+            <Stack spacing={2}>
+              <Text fontSize="sm" fontWeight="medium">
+                SSO Options
+              </Text>
+              <Flex gap={4} justifyContent="flex-start" alignItems="center">
+                <FormControl w="fit-content">
+                  <Flex gap={2}>
+                    <Field
+                      as={Switch}
+                      id="googleAuthEnabled"
+                      name="googleAuthEnabled"
+                      isChecked={values.googleAuthEnabled}
+                    />
+                    <FormLabel cursor="pointer" htmlFor="googleAuthEnabled">
+                      Google OAuth
+                    </FormLabel>
+                  </Flex>
+                </FormControl>
+                <FormControl w="fit-content">
+                  <Flex gap={2}>
+                    <Field
+                      as={Switch}
+                      id="microsoftAuthEnabled"
+                      name="microsoftAuthEnabled"
+                      isChecked={values.microsoftAuthEnabled}
+                    />
+                    <FormLabel cursor="pointer" htmlFor="microsoftAuthEnabled">
+                      Microsoft OAuth
+                    </FormLabel>
+                  </Flex>
+                </FormControl>
+              </Flex>
+            </Stack>
             <Button
               type="submit"
               size="sm"
@@ -128,7 +197,7 @@ export function SPAClientEditForm({ clientId, whiteListedUrls }: SPAClientEditFo
               isLoading={isSubmitting}
               isDisabled={isSubmitting || !dirty}
             >
-              Update Whitelist
+              Update Client
             </Button>
             {submitError && (
               <Alert status="error">
