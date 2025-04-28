@@ -21,6 +21,11 @@ import { ErrorMessage, Field, Formik } from 'formik';
 import * as yup from 'yup';
 import { Client } from 'apps/app/src/gql/graphql';
 
+enum ConnectionOptions {
+  GOOGLE = 'google-oauth2',
+  MICROSOFT = 'Microsoft'
+}
+
 const updateClientMutation = graphql(/* GraphQL */ `
   mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!, $connections: [String!]!) {
     updateClient(
@@ -86,9 +91,9 @@ export function SPAClientEditForm({
     () => ({
       whiteListedUrls: whiteListedUrls.join(', '),
       googleAuthEnabled:
-        connections?.some((connection) => connection.name === 'google-oauth2') ?? false,
+        connections?.some((connection) => connection.name === ConnectionOptions.GOOGLE) ?? false,
       microsoftAuthEnabled:
-        connections?.some((connection) => connection.name === 'Microsoft') ?? false
+        connections?.some((connection) => connection.name === ConnectionOptions.MICROSOFT) ?? false
     }),
     [connections, whiteListedUrls]
   );
@@ -101,10 +106,10 @@ export function SPAClientEditForm({
       .filter((url) => !!url);
 
     if (values.googleAuthEnabled) {
-      connections.push('google-oauth2');
+      connections.push(ConnectionOptions.GOOGLE);
     }
     if (values.microsoftAuthEnabled) {
-      connections.push('Microsoft');
+      connections.push(ConnectionOptions.MICROSOFT);
     }
 
     try {
