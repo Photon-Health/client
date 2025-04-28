@@ -15,6 +15,10 @@ const clientFragment = graphql(/* GraphQL */ `
     name
     secret
     whiteListedUrls
+    connections {
+      id
+      name
+    }
   }
 `);
 
@@ -35,6 +39,7 @@ export const ClientInfoCard = (props: ClientInfoCardProps) => {
           <SPAClientEditForm
             clientId={clientCreds.id}
             whiteListedUrls={clientCreds.whiteListedUrls}
+            connections={clientCreds.connections}
           />
         ) : (
           <>
