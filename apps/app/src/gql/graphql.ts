@@ -56,6 +56,7 @@ export type Benefit = {
   groupId?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   memberId: Scalars['String']['output'];
+  payerId?: Maybe<Scalars['String']['output']>;
   payerName?: Maybe<Scalars['String']['output']>;
   pcn?: Maybe<Scalars['String']['output']>;
   planName?: Maybe<Scalars['String']['output']>;
@@ -67,7 +68,10 @@ export type BenefitInput = {
   groupId?: InputMaybe<Scalars['String']['input']>;
   memberId: Scalars['String']['input'];
   patientId: Scalars['ID']['input'];
+  payerId?: InputMaybe<Scalars['String']['input']>;
+  payerName?: InputMaybe<Scalars['String']['input']>;
   pcn?: InputMaybe<Scalars['String']['input']>;
+  planName?: InputMaybe<Scalars['String']['input']>;
 };
 
 export enum BenefitType {
@@ -79,6 +83,7 @@ export enum BenefitType {
 export type Client = {
   __typename?: 'Client';
   appType: Scalars['String']['output'];
+  connections?: Maybe<Array<Connection>>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   secret?: Maybe<Scalars['String']['output']>;
@@ -100,6 +105,50 @@ export type Compound = Treatment & {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
 };
+
+export type Connection = {
+  __typename?: 'Connection';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type Coverage = {
+  __typename?: 'Coverage';
+  alerts: Array<CoverageAlert>;
+  daysSupply: Scalars['Int']['output'];
+  dispenseQuantity: Scalars['Float']['output'];
+  dispenseUnit: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  isAlternative: Scalars['Boolean']['output'];
+  paRequired: Scalars['Boolean']['output'];
+  prescriptionId: Scalars['ID']['output'];
+  price?: Maybe<Scalars['Float']['output']>;
+  status: CoverageStatus;
+  statusMessage: Scalars['String']['output'];
+  treatment: Treatment;
+};
+
+export type CoverageAlert = {
+  __typename?: 'CoverageAlert';
+  label: Scalars['String']['output'];
+  text: Scalars['String']['output'];
+};
+
+export type CoverageResponse = {
+  __typename?: 'CoverageResponse';
+  coverages: Array<Coverage>;
+};
+
+export type CoverageRxInput = {
+  icd10Codes?: InputMaybe<Array<Scalars['String']['input']>>;
+  id: Scalars['ID']['input'];
+};
+
+export enum CoverageStatus {
+  Covered = 'COVERED',
+  CoveredWithRestrictions = 'COVERED_WITH_RESTRICTIONS',
+  NotCovered = 'NOT_COVERED'
+}
 
 export type DraftedPrescriptionInput = {
   daysSupply?: InputMaybe<Scalars['Int']['input']>;
@@ -183,6 +232,7 @@ export type Mutation = {
   createWebhookConfig: Scalars['ID']['output'];
   deleteInvite: Scalars['ID']['output'];
   deleteWebhookConfig: Scalars['ID']['output'];
+  generateCoverageOptions: Array<Coverage>;
   inviteUser: Invite;
   removeUserFromOrganization: Scalars['ID']['output'];
   resendInvite: Invite;
@@ -192,6 +242,7 @@ export type Mutation = {
   updateMyProfile: Scalars['ID']['output'];
   updateOrganization: Scalars['ID']['output'];
   updateOrganizationSettings: OrganizationSettings;
+  updatePrescriptionStates: Scalars['Boolean']['output'];
   updateProviderProfile: Scalars['ID']['output'];
   updateProviderSignature: Scalars['ID']['output'];
   updateWebhookConfig: Scalars['ID']['output'];
@@ -238,6 +289,12 @@ export type MutationDeleteWebhookConfigArgs = {
 };
 
 
+export type MutationGenerateCoverageOptionsArgs = {
+  pharmacyId: Scalars['ID']['input'];
+  prescriptions: Array<CoverageRxInput>;
+};
+
+
 export type MutationInviteUserArgs = {
   email: Scalars['String']['input'];
   inviter?: InputMaybe<Scalars['String']['input']>;
@@ -269,6 +326,7 @@ export type MutationSetUserRolesArgs = {
 
 export type MutationUpdateClientArgs = {
   clientId: Scalars['ID']['input'];
+  connections?: InputMaybe<Array<Scalars['String']['input']>>;
   whiteListedUrls?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
@@ -285,6 +343,11 @@ export type MutationUpdateOrganizationArgs = {
 
 export type MutationUpdateOrganizationSettingsArgs = {
   input: OrganizationSettingsInput;
+};
+
+
+export type MutationUpdatePrescriptionStatesArgs = {
+  input: UpdatePrescriptionStatesInput;
 };
 
 
@@ -782,6 +845,11 @@ export type TreatmentOption = {
   type: MedicationType;
 };
 
+export type UpdatePrescriptionStatesInput = {
+  ids: Array<Scalars['ID']['input']>;
+  state: PrescriptionState;
+};
+
 export type UpdateProviderProfileInput = {
   address?: InputMaybe<AddressInput>;
   email?: InputMaybe<Scalars['String']['input']>;
@@ -863,7 +931,7 @@ export type PrescriptionFormOrgSettingsQueryQueryVariables = Exact<{ [key: strin
 
 export type PrescriptionFormOrgSettingsQueryQuery = { __typename?: 'Query', organization?: { __typename?: 'Organization', settings?: { __typename?: 'OrganizationSettings', providerUx: { __typename?: 'OrganizationProviderUxSettings', enablePrescribeToOrder?: boolean | null, enableRxTemplates?: boolean | null, enableDuplicateRxWarnings?: boolean | null, enableTreatmentHistory?: boolean | null, enablePatientRouting?: boolean | null, enablePickupPharmacies?: boolean | null, enableDeliveryPharmacies?: boolean | null } } | null } | null };
 
-export type ClientInfoCardFragmentFragment = { __typename?: 'Client', id: string, appType: string, name: string, secret?: string | null, whiteListedUrls: Array<string> } & { ' $fragmentName'?: 'ClientInfoCardFragmentFragment' };
+export type ClientInfoCardFragmentFragment = { __typename?: 'Client', id: string, appType: string, name: string, secret?: string | null, whiteListedUrls: Array<string>, connections?: Array<{ __typename?: 'Connection', id: string, name: string }> | null } & { ' $fragmentName'?: 'ClientInfoCardFragmentFragment' };
 
 export type ClientsDeveloperTabQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -883,6 +951,7 @@ export type RotateSecretMutation = { __typename?: 'Mutation', rotateClientSecret
 export type UpdateClientMutationVariables = Exact<{
   clientId: Scalars['ID']['input'];
   whiteListedUrls: Array<Scalars['String']['input']> | Scalars['String']['input'];
+  connections: Array<Scalars['String']['input']> | Scalars['String']['input'];
 }>;
 
 
@@ -1053,7 +1122,7 @@ export type SettingsPageQueryQuery = { __typename?: 'Query', me: { __typename?: 
 
 export type OrganizationTreatmentTabFragmentFragment = { __typename?: 'Organization', id: string, name: string } & { ' $fragmentName'?: 'OrganizationTreatmentTabFragmentFragment' };
 
-export const ClientInfoCardFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ClientInfoCardFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Client"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"appType"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"secret"}},{"kind":"Field","name":{"kind":"Name","value":"whiteListedUrls"}}]}}]} as unknown as DocumentNode<ClientInfoCardFragmentFragment, unknown>;
+export const ClientInfoCardFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ClientInfoCardFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Client"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"appType"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"secret"}},{"kind":"Field","name":{"kind":"Name","value":"whiteListedUrls"}},{"kind":"Field","name":{"kind":"Name","value":"connections"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<ClientInfoCardFragmentFragment, unknown>;
 export const InviteFormFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"InviteFormFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Invite"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"invitee"}},{"kind":"Field","name":{"kind":"Name","value":"inviter"}},{"kind":"Field","name":{"kind":"Name","value":"expires_at"}}]}}]} as unknown as DocumentNode<InviteFormFragmentFragment, unknown>;
 export const InviteFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"InviteFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Invite"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"invitee"}},{"kind":"Field","name":{"kind":"Name","value":"inviter"}},{"kind":"Field","name":{"kind":"Name","value":"expired"}},{"kind":"Field","name":{"kind":"Name","value":"expires_at"}}]}}]} as unknown as DocumentNode<InviteFragmentFragment, unknown>;
 export const RemoveUserActionUserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"RemoveUserActionUserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"name"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"full"}}]}}]}}]} as unknown as DocumentNode<RemoveUserActionUserFragmentFragment, unknown>;
@@ -1068,9 +1137,9 @@ export const TicketModalCreateTicketDocument = {"kind":"Document","definitions":
 export const OrderFormOrgSettingsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"OrderFormOrgSettingsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"organization"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"settings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"providerUx"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enablePrescriberOrdering"}},{"kind":"Field","name":{"kind":"Name","value":"enablePatientRouting"}},{"kind":"Field","name":{"kind":"Name","value":"enablePickupPharmacies"}},{"kind":"Field","name":{"kind":"Name","value":"enableDeliveryPharmacies"}}]}}]}}]}}]}}]} as unknown as DocumentNode<OrderFormOrgSettingsQueryQuery, OrderFormOrgSettingsQueryQueryVariables>;
 export const NewOrderOrgSettingsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"NewOrderOrgSettingsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"organization"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"settings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"providerUx"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enablePrescriberOrdering"}}]}}]}}]}}]}}]} as unknown as DocumentNode<NewOrderOrgSettingsQueryQuery, NewOrderOrgSettingsQueryQueryVariables>;
 export const PrescriptionFormOrgSettingsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PrescriptionFormOrgSettingsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"organization"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"settings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"providerUx"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enablePrescribeToOrder"}},{"kind":"Field","name":{"kind":"Name","value":"enableRxTemplates"}},{"kind":"Field","name":{"kind":"Name","value":"enableDuplicateRxWarnings"}},{"kind":"Field","name":{"kind":"Name","value":"enableTreatmentHistory"}},{"kind":"Field","name":{"kind":"Name","value":"enablePatientRouting"}},{"kind":"Field","name":{"kind":"Name","value":"enablePickupPharmacies"}},{"kind":"Field","name":{"kind":"Name","value":"enableDeliveryPharmacies"}}]}}]}}]}}]}}]} as unknown as DocumentNode<PrescriptionFormOrgSettingsQueryQuery, PrescriptionFormOrgSettingsQueryQueryVariables>;
-export const ClientsDeveloperTabQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ClientsDeveloperTabQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"clients"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"ClientInfoCardFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ClientInfoCardFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Client"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"appType"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"secret"}},{"kind":"Field","name":{"kind":"Name","value":"whiteListedUrls"}}]}}]} as unknown as DocumentNode<ClientsDeveloperTabQueryQuery, ClientsDeveloperTabQueryQueryVariables>;
+export const ClientsDeveloperTabQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ClientsDeveloperTabQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"clients"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"ClientInfoCardFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ClientInfoCardFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Client"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"appType"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"secret"}},{"kind":"Field","name":{"kind":"Name","value":"whiteListedUrls"}},{"kind":"Field","name":{"kind":"Name","value":"connections"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<ClientsDeveloperTabQueryQuery, ClientsDeveloperTabQueryQueryVariables>;
 export const RotateSecretDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RotateSecret"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"clientId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rotateClientSecret"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"clientId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"clientId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<RotateSecretMutation, RotateSecretMutationVariables>;
-export const UpdateClientDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateClient"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"clientId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"whiteListedUrls"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateClient"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"clientId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"clientId"}}},{"kind":"Argument","name":{"kind":"Name","value":"whiteListedUrls"},"value":{"kind":"Variable","name":{"kind":"Name","value":"whiteListedUrls"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateClientMutation, UpdateClientMutationVariables>;
+export const UpdateClientDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateClient"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"clientId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"whiteListedUrls"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"connections"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateClient"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"clientId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"clientId"}}},{"kind":"Argument","name":{"kind":"Name","value":"whiteListedUrls"},"value":{"kind":"Variable","name":{"kind":"Name","value":"whiteListedUrls"}}},{"kind":"Argument","name":{"kind":"Name","value":"connections"},"value":{"kind":"Variable","name":{"kind":"Name","value":"connections"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateClientMutation, UpdateClientMutationVariables>;
 export const UserInviteFormQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"UserInviteFormQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"full"}}]}}]}}]}}]} as unknown as DocumentNode<UserInviteFormQueryQuery, UserInviteFormQueryQueryVariables>;
 export const InviteUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InviteUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"roles"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"provider"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ProviderInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inviteUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}},{"kind":"Argument","name":{"kind":"Name","value":"roles"},"value":{"kind":"Variable","name":{"kind":"Name","value":"roles"}}},{"kind":"Argument","name":{"kind":"Name","value":"provider"},"value":{"kind":"Variable","name":{"kind":"Name","value":"provider"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<InviteUserMutation, InviteUserMutationVariables>;
 export const ResendInviteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ResendInvite"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"inviteId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"resendInvite"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"inviteId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"inviteId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ResendInviteMutation, ResendInviteMutationVariables>;

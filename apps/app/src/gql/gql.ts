@@ -20,10 +20,10 @@ type Documents = {
     "\n  query OrderFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n": typeof types.OrderFormOrgSettingsQueryDocument,
     "\n  query NewOrderOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n        }\n      }\n    }\n  }\n": typeof types.NewOrderOrgSettingsQueryDocument,
     "\n  query PrescriptionFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescribeToOrder\n          enableRxTemplates\n          enableDuplicateRxWarnings\n          enableTreatmentHistory\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n": typeof types.PrescriptionFormOrgSettingsQueryDocument,
-    "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n  }\n": typeof types.ClientInfoCardFragmentFragmentDoc,
+    "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n    connections {\n      id\n      name\n    }\n  }\n": typeof types.ClientInfoCardFragmentFragmentDoc,
     "\n  query ClientsDeveloperTabQuery {\n    clients {\n      id\n      ...ClientInfoCardFragment\n    }\n  }\n": typeof types.ClientsDeveloperTabQueryDocument,
     "\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n": typeof types.RotateSecretDocument,
-    "\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!) {\n    updateClient(clientId: $clientId, whiteListedUrls: $whiteListedUrls) {\n      id\n    }\n  }\n": typeof types.UpdateClientDocument,
+    "\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!, $connections: [String!]!) {\n    updateClient(\n      clientId: $clientId\n      whiteListedUrls: $whiteListedUrls\n      connections: $connections\n    ) {\n      id\n    }\n  }\n": typeof types.UpdateClientDocument,
     "\n  fragment InviteFormFragment on Invite {\n    id\n    invitee\n    inviter\n    expires_at\n  }\n": typeof types.InviteFormFragmentFragmentDoc,
     "\n  query UserInviteFormQuery {\n    me {\n      id\n      name {\n        full\n      }\n    }\n  }\n": typeof types.UserInviteFormQueryDocument,
     "\n  mutation InviteUser($email: String!, $roles: [String!]!, $provider: ProviderInput) {\n    inviteUser(email: $email, roles: $roles, provider: $provider) {\n      id\n    }\n  }\n": typeof types.InviteUserDocument,
@@ -60,10 +60,10 @@ const documents: Documents = {
     "\n  query OrderFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n": types.OrderFormOrgSettingsQueryDocument,
     "\n  query NewOrderOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n        }\n      }\n    }\n  }\n": types.NewOrderOrgSettingsQueryDocument,
     "\n  query PrescriptionFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescribeToOrder\n          enableRxTemplates\n          enableDuplicateRxWarnings\n          enableTreatmentHistory\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n": types.PrescriptionFormOrgSettingsQueryDocument,
-    "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n  }\n": types.ClientInfoCardFragmentFragmentDoc,
+    "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n    connections {\n      id\n      name\n    }\n  }\n": types.ClientInfoCardFragmentFragmentDoc,
     "\n  query ClientsDeveloperTabQuery {\n    clients {\n      id\n      ...ClientInfoCardFragment\n    }\n  }\n": types.ClientsDeveloperTabQueryDocument,
     "\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n": types.RotateSecretDocument,
-    "\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!) {\n    updateClient(clientId: $clientId, whiteListedUrls: $whiteListedUrls) {\n      id\n    }\n  }\n": types.UpdateClientDocument,
+    "\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!, $connections: [String!]!) {\n    updateClient(\n      clientId: $clientId\n      whiteListedUrls: $whiteListedUrls\n      connections: $connections\n    ) {\n      id\n    }\n  }\n": types.UpdateClientDocument,
     "\n  fragment InviteFormFragment on Invite {\n    id\n    invitee\n    inviter\n    expires_at\n  }\n": types.InviteFormFragmentFragmentDoc,
     "\n  query UserInviteFormQuery {\n    me {\n      id\n      name {\n        full\n      }\n    }\n  }\n": types.UserInviteFormQueryDocument,
     "\n  mutation InviteUser($email: String!, $roles: [String!]!, $provider: ProviderInput) {\n    inviteUser(email: $email, roles: $roles, provider: $provider) {\n      id\n    }\n  }\n": types.InviteUserDocument,
@@ -135,7 +135,7 @@ export function graphql(source: "\n  query PrescriptionFormOrgSettingsQuery {\n 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n  }\n"): (typeof documents)["\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n  }\n"];
+export function graphql(source: "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n    connections {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n    connections {\n      id\n      name\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -147,7 +147,7 @@ export function graphql(source: "\n  mutation RotateSecret($clientId: ID!) {\n  
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!) {\n    updateClient(clientId: $clientId, whiteListedUrls: $whiteListedUrls) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!) {\n    updateClient(clientId: $clientId, whiteListedUrls: $whiteListedUrls) {\n      id\n    }\n  }\n"];
+export function graphql(source: "\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!, $connections: [String!]!) {\n    updateClient(\n      clientId: $clientId\n      whiteListedUrls: $whiteListedUrls\n      connections: $connections\n    ) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!, $connections: [String!]!) {\n    updateClient(\n      clientId: $clientId\n      whiteListedUrls: $whiteListedUrls\n      connections: $connections\n    ) {\n      id\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
