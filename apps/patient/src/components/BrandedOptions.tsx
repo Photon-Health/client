@@ -7,8 +7,13 @@ interface Props {
   options: string[];
   location: string;
   selectedId: string;
-  amazonPharmacyOverride: string | undefined;
+  brandedOptionOverrides: BrandedOptionOverrides;
   handleSelect: (id: string) => void;
+}
+
+export interface BrandedOptionOverrides {
+  amazonPharmacyOverride?: string;
+  novocareExperimentOverride?: string;
 }
 
 export const BrandedOptions = ({
@@ -16,7 +21,7 @@ export const BrandedOptions = ({
   location,
   selectedId,
   handleSelect,
-  amazonPharmacyOverride
+  brandedOptionOverrides
 }: Props) => {
   if (!location) return null;
   if (options.length === 0) return null;
@@ -38,7 +43,7 @@ export const BrandedOptions = ({
             pharmacyId={id}
             selected={selectedId === id}
             handleSelect={handleSelect}
-            amazonPharmacyOverride={amazonPharmacyOverride}
+            brandedOptionOverrides={brandedOptionOverrides}
           />
         </SlideFade>
       ))}
