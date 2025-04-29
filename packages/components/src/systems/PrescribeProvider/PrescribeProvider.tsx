@@ -467,10 +467,11 @@ export type CoverageOption = {
   isAlternative: boolean;
   paRequired: boolean;
   prescriptionId: string;
-  price: number;
-  status: string | 'COVERED';
+  price: number | null;
+  status: string | 'COVERED' | 'COVERED_WITH_RESTRICTIONS';
   statusMessage: string;
   treatment: { id: string; name: string };
+  alerts: Array<{ label: string; name: string }>;
 };
 
 // export type Benefit = {

@@ -1,6 +1,6 @@
 import { CoverageOption } from '../../PrescribeProvider';
 import { Banner } from '../../../index';
-import { createMemo } from 'solid-js';
+import { createMemo, For } from 'solid-js';
 import { BannerStatus } from '../../../particles/Banner';
 
 export type CoverageOptionSummaryProps = {
@@ -17,7 +17,27 @@ export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
       return 'success';
     }
 
+    if (props.coverageOption.status === 'COVERED_WITH_RESTRICTIONS') {
+      return 'warning';
+    }
+
     return 'error';
+  });
+
+  const bannerMessage = createMemo<string>(() => {
+    if (props.coverageOption.status === 'COVERED') {
+      if (props.coverageOption.paRequired) {
+        return 'PA Required';
+      }
+
+      return 'Covered by Insurance';
+    }
+
+    if (props.coverageOption.status === 'COVERED_WITH_RESTRICTIONS') {
+      return props.coverageOption.statusMessage;
+    }
+
+    return 'Not Covered';
   });
 
   return (
@@ -40,13 +60,25 @@ export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
       <Banner status={bannerStatus()} withoutIcon={true}>
         <div class="flex justify-between w-full">
           <div class="text-xs">
-            <b>{props.coverageOption.statusMessage}</b>
+            <b>{bannerMessage()}</b>
           </div>
           <div class="text-xs">
-            Est. Copay: <b>${props.coverageOption.price}</b>
+            Est. Copay: <b>{presentPrice(props.coverageOption.price)}</b>
           </div>
         </div>
       </Banner>
+      <For each={props.coverageOption.alerts}>
+        {(alert) => (
+          <>
+            <div>Label: {alert.label}</div>
+            <div>Name: {alert.name}</div>
+          </>
+        )}
+      </For>
     </>
   );
+}
+
+function presentPrice(price: number | null): string {
+  return price ? `$${price.toFixed(2)}` : 'N/A';
 }
