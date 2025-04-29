@@ -132,9 +132,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
 
   createEffect(() => {
     if (props.patientId) {
-      console.log('getPatientPreferredPharmacies ===> effect triggered');
       getPatientPreferredPharmacies(props.patientId).then((pharmacies) => {
-        console.log('getPatientPreferredPharmacies ===> ', { pharmacies });
         if (pharmacies.length > 0) {
           setPatientPreferredPharmacyId(pharmacies[0].id);
         }
