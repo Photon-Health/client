@@ -22,6 +22,7 @@ import { useMemo, useState } from 'react';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
 import { formatAddress, titleCase } from '../utils/general';
 import { getFulfillmentTrackingLink } from '../utils/fulfillmentsHelpers';
+import { BrandedOptionOverrides } from './BrandedOptions';
 
 dayjs.extend(customParseFormat);
 
@@ -235,7 +236,7 @@ interface PharmacyInfoProps {
   showHours?: boolean;
   isCurrentPharmacy?: boolean;
   orderFulfillment?: OrderFulfillment;
-  amazonPharmacyOverride?: string;
+  brandedOptionOverride?: BrandedOptionOverrides;
 }
 
 export const PharmacyInfo = ({
@@ -251,7 +252,7 @@ export const PharmacyInfo = ({
   showHours = false,
   isCurrentPharmacy = false,
   orderFulfillment,
-  amazonPharmacyOverride
+  brandedOptionOverride
 }: PharmacyInfoProps) => {
   if (!pharmacy) return null;
 
@@ -269,18 +270,36 @@ export const PharmacyInfo = ({
   const directionsUrl = `http://maps.google.com/?q=${pharmacy?.name}, ${pharmacyFormattedAddress}`;
 
   let amazonPharmacyElementOverride = undefined;
-  if (amazonPharmacyOverride) {
+  const isAmazonPharmacy = pharmacy.id === process.env.REACT_APP_AMAZON_PHARMACY_ID;
+  if (isAmazonPharmacy && brandedOptionOverride?.amazonPharmacyOverride) {
     amazonPharmacyElementOverride = (
       <HStack>
         <Tag size="sm" colorScheme="blue">
           <TagLabel fontWeight="bold">In Stock</TagLabel>
         </Tag>
         <Text fontSize="sm" color="gray.500">
-          {amazonPharmacyOverride}
+          {brandedOptionOverride?.amazonPharmacyOverride}
         </Text>
       </HStack>
     );
   }
+
+  let novocarePharmacyElementOverride = undefined;
+  const isNovocarePharmacy = pharmacy.id === process.env.REACT_APP_NOVOCARE_PHARMACY_IDgi;
+  if (isNovocarePharmacy && brandedOptionOverride?.novocareExperimentOverride) {
+    novocarePharmacyElementOverride = (
+      <HStack>
+        <Tag size="sm" colorScheme="blue">
+          <TagLabel fontWeight="bold">In Stock</TagLabel>
+        </Tag>
+        <Text fontSize="sm" color="gray.500">
+          {brandedOptionOverride?.novocareExperimentOverride}
+        </Text>
+      </HStack>
+    );
+  }
+
+  const overrideElement = novocarePharmacyElementOverride ?? amazonPharmacyElementOverride;
 
   return (
     <VStack align="start" w="full">
@@ -339,8 +358,8 @@ export const PharmacyInfo = ({
       {showDetails ? (
         <VStack direction={isStatus ? 'column-reverse' : 'column'} w="full" alignItems={'start'}>
           {tagline ? (
-            amazonPharmacyElementOverride ? (
-              amazonPharmacyElementOverride
+            overrideElement ? (
+              overrideElement
             ) : (
               <Text fontSize="sm" color="gray.500">
                 {tagline}

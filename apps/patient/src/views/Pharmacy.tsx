@@ -19,6 +19,7 @@ import { Helmet } from 'react-helmet';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
+  BrandedOptionOverrides,
   BrandedOptions,
   CouponModal,
   FixedFooter,
@@ -34,7 +35,6 @@ import { useOrderContext } from './Main';
 
 import {
   geocode,
-  getOffers,
   getPharmacies,
   rerouteOrder,
   setOrderPharmacy,
@@ -50,19 +50,10 @@ import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { datadogRum } from '@datadog/browser-rum';
 import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
+import { determineNovocareExperimentSegment } from './pharmacy.utils';
+import { fetchOffers } from './pharmacy.utils';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
-
-const pricingEnabledOrgs = new Set([
-  // boson
-  'org_KzSVZBQixLRkqj5d', // boson Test Organization 11
-  // neutron
-  'org_kVS7AP4iuItESdMA', // Photon Test Org
-  'org_QFoulY6Ornx7dMdw', // Sesame
-  // photon
-  'org_xqL46CdX49O1K5Ye', // Photon Test Account
-  'org_zc1RzzmSwd8eE94U' // Sesame
-]);
 
 export const Pharmacy = () => {
   const { order, flattenedFills, setOrder, isDemo, fetchOrder } = useOrderContext();
@@ -122,11 +113,9 @@ export const Pharmacy = () => {
 
   // pricing
   const orderContainsGLP1Medication = flattenedFills.some((fill) => isGLP(fill.treatment.name));
-  const isMultiRx = flattenedFills.length > 1;
-
-  const pricingEnabled = pricingEnabledOrgs.has(order?.organization.id);
-  // note: prices are only for Sesame, non-GLP-1 right now
-  const showPriceToggle = (pricingEnabled && !orderContainsGLP1Medication && !isMultiRx) ?? false;
+  const orderIsMultiRx = flattenedFills.length > 1;
+  // note: prices are only for single-rx, non-GLP-1 right now
+  const showPriceToggle = (!orderContainsGLP1Medication && !orderIsMultiRx) ?? false;
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
@@ -135,9 +124,9 @@ export const Pharmacy = () => {
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
   const [enablePrice, setEnablePrice] = useState(false);
 
-  const [amazonPharmacyOverride, setAmazonPharmacyOverride] = useState<string | undefined>(
-    undefined
-  );
+  const [brandedOptionsOverride, setBrandedOptionsOverride] = useState<
+    BrandedOptionOverrides | undefined
+  >(undefined);
 
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
@@ -185,33 +174,37 @@ export const Pharmacy = () => {
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
 
   useEffect(() => {
-    async function fetchOffers() {
-      const offers = await getOffers(order.id);
+    const determineOverrides = async () => {
+      const validOrganizationIds = [
+        'org_KzSVZBQixLRkqj5d', // boson Test Organization 11
+        'org_kVS7AP4iuItESdMA', // neutron Photon Test Org
+        'org_wM4wI7rop0W1eNfM', // production found
+        'org_pcPnPx5PVamzjS2p', // production measured
+        'org_jScrLol7ZMSfExSR', // production river
+        'org_zc1RzzmSwd8eE94U' // production sesame
+      ];
 
-      const amazonOffers = offers
-        .filter((offer) => offer.supplier === 'AMAZON_PHARMACY')
-        .filter((offer) => offer.deliveryEstimate !== undefined);
-
-      if (amazonOffers.length > 0 && amazonOffers[0]?.deliveryEstimate?.deliveryPromise) {
-        setAmazonPharmacyOverride(amazonOffers[0]?.deliveryEstimate?.deliveryPromise);
+      if (!validOrganizationIds.includes(order.organization.id)) {
+        return undefined;
       }
-    }
 
-    const validOrganizationIds = [
-      'org_KzSVZBQixLRkqj5d', // boson Test Organization 11
-      'org_kVS7AP4iuItESdMA', // neutron Photon Test Org
-      'org_wM4wI7rop0W1eNfM', // production found
-      'org_pcPnPx5PVamzjS2p', // production measured
-      'org_jScrLol7ZMSfExSR', // production river
-      'org_zc1RzzmSwd8eE94U' // production sesame
-    ];
+      // these functions will be called and make a state change to brandedOptionsOverride using setBrandedOptionsOverride
+      // if there are branded option overrides
+      const amazonExperimentOverride = await fetchOffers(order);
+      const novocareExperimentOverride = determineNovocareExperimentSegment(order);
 
-    if (!validOrganizationIds.includes(order.organization.id)) {
-      return undefined;
-    }
+      const newBrandedOptionsOverride: BrandedOptionOverrides = {
+        ...amazonExperimentOverride,
+        ...novocareExperimentOverride
+      };
 
-    fetchOffers();
-  }, [order]);
+      if (JSON.stringify(newBrandedOptionsOverride) !== JSON.stringify(brandedOptionsOverride)) {
+        setBrandedOptionsOverride(newBrandedOptionsOverride);
+      }
+    };
+
+    determineOverrides();
+  }, [order, brandedOptionsOverride]);
 
   const showToastWarning = () =>
     toast({
@@ -614,9 +607,9 @@ export const Pharmacy = () => {
           setTimeout(async () => {
             setShowFooter(false);
 
-            if (amazonPharmacyOverride) {
-              const slugifiedOverride = amazonPharmacyOverride
-                .toLowerCase()
+            if (brandedOptionsOverride?.amazonPharmacyOverride) {
+              const slugifiedOverride = brandedOptionsOverride?.amazonPharmacyOverride
+                ?.toLowerCase()
                 .trim()
                 .replace(/\s+/g, '_')
                 .replace(/[^a-z0-9_]/g, '')
@@ -634,6 +627,22 @@ export const Pharmacy = () => {
                   orderId: order.id,
                   organizationId: order.organization.id,
                   description: slugifiedOverride,
+                  timestamp: new Date().toISOString()
+                });
+              }
+            }
+
+            if (brandedOptionsOverride?.novocareExperimentOverride) {
+              if (selectedId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID) {
+                datadogRum.addAction('novocare_experiment_offer_active_and_selected', {
+                  orderId: order.id,
+                  organizationId: order.organization.id,
+                  timestamp: new Date().toISOString()
+                });
+              } else {
+                datadogRum.addAction('novocare_experiment_offer_active_and_not_selected', {
+                  orderId: order.id,
+                  organizationId: order.organization.id,
                   timestamp: new Date().toISOString()
                 });
               }
@@ -663,6 +672,9 @@ export const Pharmacy = () => {
             } else if (selectedId === process.env.REACT_APP_COSTCO_PHARMACY_ID) {
               type = 'MAIL_ORDER';
               selectedPharmacy = { id: selectedId, name: 'Costco Pharmacy' };
+            } else if (selectedId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID) {
+              type = 'MAIL_ORDER';
+              selectedPharmacy = { id: selectedId, name: 'Novocare' };
             } else {
               type = 'PICK_UP';
               selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
@@ -766,8 +778,13 @@ export const Pharmacy = () => {
 
   const brandedOptions = [
     ...(capsuleEnabled ? [capsulePharmacyId] : []),
-    ...(enableMailOrder ? mailOrderPharmacies : []),
-    ...(amazonPharmacyOverride ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string] : [])
+    ...(brandedOptionsOverride?.novocareExperimentOverride
+      ? [process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string]
+      : []),
+    ...(brandedOptionsOverride?.amazonPharmacyOverride
+      ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]
+      : []),
+    ...(enableMailOrder ? mailOrderPharmacies : [])
   ];
 
   return (
@@ -815,13 +832,13 @@ export const Pharmacy = () => {
       <Container pb={showFooter ? 32 : 8}>
         {location ? (
           <VStack spacing={6} align="stretch" pt={4}>
-            {enableCourier || enableMailOrder || amazonPharmacyOverride ? (
+            {enableCourier || enableMailOrder || brandedOptionsOverride ? (
               <BrandedOptions
                 options={brandedOptions}
                 location={location}
                 selectedId={selectedId}
                 handleSelect={handleSelect}
-                amazonPharmacyOverride={amazonPharmacyOverride}
+                brandedOptionOverrides={brandedOptionsOverride ?? {}}
               />
             ) : null}
 

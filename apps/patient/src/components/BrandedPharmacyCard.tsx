@@ -6,15 +6,17 @@ import altoLogo from '../assets/alto_logo.svg';
 import costcoLogo from '../assets/costco_logo_small.png';
 import costPlusLogo from '../assets/costplus_logo_small_circle.png';
 import walmartLogo from '../assets/walmart_logo_small_circle.png';
+import novocareLogo from '../assets/novo_circle.png';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import { PharmacyInfo } from './PharmacyInfo';
+import { BrandedOptionOverrides } from './BrandedOptions';
 
 interface Props {
   pharmacyId: string;
   selected: boolean;
   handleSelect: (id: string) => void;
-  amazonPharmacyOverride?: string;
+  brandedOptionOverrides?: BrandedOptionOverrides;
 }
 
 export const PHARMACY_BRANDING = {
@@ -43,6 +45,11 @@ export const PHARMACY_BRANDING = {
     name: 'Walmart Pharmacy',
     description: 'Overnight shipping available'
   },
+  [process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string]: {
+    logo: novocareLogo,
+    name: 'NovoCare',
+    description: 'Delivers in 3-5 days'
+  },
   ...Object.fromEntries(
     Object.keys(capsulePharmacyIdLookup).map((id) => [
       id,
@@ -59,7 +66,7 @@ export const BrandedPharmacyCard = ({
   pharmacyId,
   selected,
   handleSelect,
-  amazonPharmacyOverride
+  brandedOptionOverrides
 }: Props) => {
   const brand = PHARMACY_BRANDING[pharmacyId];
   if (!brand) return null;
@@ -82,11 +89,7 @@ export const BrandedPharmacyCard = ({
           tagline={brand.description}
           availableInYourArea={brand.name === 'Capsule Pharmacy'}
           freeDelivery={brand.name === 'Amazon Pharmacy'}
-          amazonPharmacyOverride={
-            pharmacyId === process.env.REACT_APP_AMAZON_PHARMACY_ID
-              ? amazonPharmacyOverride
-              : undefined
-          }
+          brandedOptionOverride={brandedOptionOverrides}
           boldPharmacyName={false}
         />
       </CardBody>

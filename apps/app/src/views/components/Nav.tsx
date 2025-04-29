@@ -74,7 +74,7 @@ export const Nav = () => {
 
   const onLogout = useCallback(() => {
     localStorage.removeItem('previouslyAuthed');
-    logout({ returnTo: window.location.href, federated });
+    logout({ returnTo: window.location.origin, federated });
   }, [logout, federated]);
 
   const onSwitchOrganization = useCallback(() => {
