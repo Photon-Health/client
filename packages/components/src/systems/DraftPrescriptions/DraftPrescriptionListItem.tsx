@@ -1,27 +1,21 @@
-import { Prescription, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
+import { Prescription } from '@photonhealth/sdk/dist/types';
 import { createMemo, JSXElement, Show } from 'solid-js';
 import Card from '../../particles/Card';
 import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
 import formatRxString from '../../utils/formatRxString';
 import { ScreeningAlerts, ScreeningAlertType } from '../ScreeningAlerts';
-import { CoverageOption } from '../PrescribeProvider';
+import { CoverageOption, PrescriptionFormData } from '../PrescribeProvider';
 import { CoverageOptionSummary } from './CoverageOptions/CoverageOptionSummary';
 import { AlternativeCoverageOptionList } from './CoverageOptions/AlternativeCoverageOptionList';
-
-export type DraftPrescriptionListItem = PrescriptionTemplate & {
-  refillsInput?: number;
-  addToTemplates?: boolean;
-  catalogId?: string;
-  effectiveDate?: string;
-  externalId?: string;
-};
+import { toPrescriptionFormData } from './utils/mappers';
 
 interface DraftPrescriptionListItemProps {
   draft: Prescription;
   coverageOptions: CoverageOption[];
-  handleEdit?: (prescription: Prescription) => void;
+  handleEdit?: (prescription: PrescriptionFormData) => void;
   handleDelete?: (prescriptionId: string) => void;
+  handleSwapToAlternative: (alternative: PrescriptionFormData) => void;
   screeningAlerts: ScreeningAlertType[];
 }
 
@@ -63,7 +57,12 @@ export function DraftPrescriptionListItem(props: DraftPrescriptionListItemProps)
       }
       RightChildren={
         <>
-          <button onClick={() => props.handleEdit && props.handleEdit(props.draft)} title="Edit">
+          <button
+            onClick={() =>
+              props.handleEdit && props.handleEdit(toPrescriptionFormData(props.draft))
+            }
+            title="Edit"
+          >
             <Icon name="pencilSquare" size="sm" class="text-gray-500 hover:text-amber-500" />
           </button>
           <button
@@ -87,7 +86,10 @@ export function DraftPrescriptionListItem(props: DraftPrescriptionListItemProps)
           </Show>
 
           <Show when={otherCoverageOptions().length > 0}>
-            <AlternativeCoverageOptionList coverageOptions={otherCoverageOptions()} />
+            <AlternativeCoverageOptionList
+              coverageOptions={otherCoverageOptions()}
+              handleSwapToAlternative={props.handleSwapToAlternative}
+            />
           </Show>
         </>
       }

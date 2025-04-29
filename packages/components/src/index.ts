@@ -5,9 +5,9 @@ import DoseCalculator from './systems/DoseCalculator';
 import Card from './particles/Card';
 import ComboBox from './particles/ComboBox';
 import {
-  DraftPrescription,
   DraftPrescriptionList,
   DraftPrescriptionsProvider,
+  toPrescriptionFormData,
   useDraftPrescriptions
 } from './systems/DraftPrescriptions';
 import Icon from './particles/Icon';
@@ -44,6 +44,7 @@ import { PhotonClientStore } from './store';
 export { usePhoton, PhotonClientStore, PhotonContext };
 
 import {
+  CoverageOption,
   PrescribeProvider,
   usePrescribe,
   type PrescriptionFormData,
@@ -85,8 +86,9 @@ export {
   useRecentOrders,
   formatPrescriptionDetails,
   PrescribeProvider,
-  usePrescribe
+  usePrescribe,
+  toPrescriptionFormData
 };
 
 // Export types
-export type { ScreeningAlertType, TemplateOverrides, DraftPrescription, PrescriptionFormData };
+export type { ScreeningAlertType, TemplateOverrides, PrescriptionFormData, CoverageOption };

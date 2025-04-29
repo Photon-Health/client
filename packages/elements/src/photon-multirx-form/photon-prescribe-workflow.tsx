@@ -602,9 +602,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   </div>
                 </Show>
                 <DraftPrescriptionCard
-                  templateIds={props.templateIds?.split(',') || []}
-                  templateOverrides={props.templateOverrides || {}}
-                  prescriptionIds={props.prescriptionIds?.split(',') || []}
                   prescriptionRef={prescriptionRef}
                   actions={props.formActions}
                   store={props.formStore}

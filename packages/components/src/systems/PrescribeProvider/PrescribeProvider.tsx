@@ -34,7 +34,6 @@ const PrescribeContext = createContext<{
   coverageOptions: Accessor<CoverageOption[]>;
 
   // actions
-  setEditingPrescription: (id: string) => void;
   deletePrescription: (id: string) => void;
   tryCreatePrescription: (
     prescriptionFormData: PrescriptionFormData,
@@ -57,18 +56,19 @@ export type TemplateOverrides = {
 };
 
 export type PrescriptionFormData = {
+  id?: string;
   effectiveDate: string;
   treatment: {
     id: string;
     name: string;
   };
   dispenseAsWritten: boolean;
-  dispenseQuantity: number;
-  dispenseUnit: string;
-  daysSupply: number;
+  dispenseQuantity?: number;
+  dispenseUnit?: string;
+  daysSupply?: number;
   instructions: string;
   notes: string;
-  fillsAllowed: number;
+  fillsAllowed?: number;
   catalogId?: string;
   externalId?: string;
   diagnoseCodes: string[];
@@ -363,7 +363,9 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
         mutation: CreatePrescription,
         variables: transformPrescription(prescriptionFormData, props.patientId)
       });
-      createdPrescription = res.data.createPrescription as Prescription;
+      const created = res.data.createPrescription as Prescription;
+      createdPrescription = created;
+      setDraftPrescriptions((prev) => [...prev, created]);
     } catch (error) {
       console.error('Mutation error:', error);
       triggerToast({
@@ -373,8 +375,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
       });
       throw error;
     }
-
-    setDraftPrescriptions((prev) => [...prev, createdPrescription]);
 
     if (options?.addToTemplates && options?.catalogId != null) {
       await createPrescriptionTemplateOnApi(
@@ -396,10 +396,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     });
 
     return createdPrescription;
-  };
-
-  const setEditingPrescription = (toEditId: string) => {
-    setDraftPrescriptions((prev) => prev.filter((rx) => rx.id !== toEditId));
   };
 
   const deletePrescription = (toDeleteId: string) => {
@@ -431,7 +427,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     // actions
     tryCreatePrescription,
     tryUpdatePrescriptionStates,
-    setEditingPrescription,
     deletePrescription
   };
 

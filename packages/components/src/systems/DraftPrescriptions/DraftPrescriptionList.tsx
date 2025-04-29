@@ -1,23 +1,15 @@
-import { Prescription, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
 import { For, Show } from 'solid-js';
 import Banner from '../../particles/Banner';
 import Text from '../../particles/Text';
 import { ScreeningAlertType } from '../ScreeningAlerts';
 import { useDraftPrescriptions } from './DraftPrescriptionsProvider';
-import { usePrescribe } from '../PrescribeProvider';
+import { PrescriptionFormData, usePrescribe } from '../PrescribeProvider';
 import { DraftPrescriptionLayout, DraftPrescriptionListItem } from './DraftPrescriptionListItem';
 
-export type DraftPrescription = PrescriptionTemplate & {
-  refillsInput?: number;
-  addToTemplates?: boolean;
-  catalogId?: string;
-  effectiveDate?: string;
-  externalId?: string;
-};
-
 interface DraftPrescriptionsProps {
-  handleEdit?: (prescription: Prescription) => void;
+  handleEdit?: (prescription: PrescriptionFormData) => void;
   handleDelete?: (prescriptionId: string) => void;
+  handleSwapToAlternative: (alternative: PrescriptionFormData) => void;
   error?: string;
   screeningAlerts: ScreeningAlertType[];
   enableOrder?: boolean;
@@ -64,6 +56,7 @@ export function DraftPrescriptionList(props: DraftPrescriptionsProps) {
               )}
               handleEdit={props.handleEdit}
               handleDelete={props.handleDelete}
+              handleSwapToAlternative={props.handleSwapToAlternative}
             />
           )}
         </For>
