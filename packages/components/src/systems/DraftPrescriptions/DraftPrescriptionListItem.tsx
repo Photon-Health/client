@@ -5,9 +5,9 @@ import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
 import formatRxString from '../../utils/formatRxString';
 import { ScreeningAlerts, ScreeningAlertType } from '../ScreeningAlerts';
-import { CoverageOptionsAlternatives } from './Coverage/CoverageOptionsAlternatives';
-import { CoverageSummary } from './Coverage/CoverageSummary';
-import { Coverage } from '../PrescribeProvider';
+import { CoverageOption } from '../PrescribeProvider';
+import { CoverageOptionSummary } from './CoverageOptions/CoverageOptionSummary';
+import { AlternativeCoverageOptionList } from './CoverageOptions/AlternativeCoverageOptionList';
 
 export type DraftPrescriptionListItem = PrescriptionTemplate & {
   refillsInput?: number;
@@ -19,7 +19,7 @@ export type DraftPrescriptionListItem = PrescriptionTemplate & {
 
 interface DraftPrescriptionListItemProps {
   draft: Prescription;
-  coverages: Coverage[];
+  coverageOptions: CoverageOption[];
   handleEdit?: (prescription: Prescription) => void;
   handleDelete?: (prescriptionId: string) => void;
   screeningAlerts: ScreeningAlertType[];
@@ -35,8 +35,12 @@ export function DraftPrescriptionListItem(props: DraftPrescriptionListItemProps)
         .indexOf(props.draft.treatment.id) >= 0
   );
 
-  const draftCoverage = createMemo(() => {
-    return props.coverages.find((coverage) => coverage.prescriptionId === props.draft.id);
+  const currentCoverageOption = createMemo(() => {
+    return props.coverageOptions.find((coverage) => !coverage.isAlternative);
+  });
+
+  const otherCoverageOptions = createMemo(() => {
+    return props.coverageOptions.filter((coverage) => coverage.isAlternative);
   });
 
   return (
@@ -76,12 +80,18 @@ export function DraftPrescriptionListItem(props: DraftPrescriptionListItemProps)
               owningId={props.draft.treatment.id}
             />
           </Show>
-          <Show when={draftCoverage()}>
-            {(coverage) => <CoverageSummary prescription={props.draft} coverage={coverage()} />}
+          <Show when={currentCoverageOption()}>
+            {(coverageOption) => (
+              <CoverageOptionSummary prescription={props.draft} coverageOption={coverageOption()} />
+            )}
           </Show>
 
-          <CoverageOptionsAlternatives prescription={props.draft} coverages={props.coverages} />
-          {/*<CoverageAlternatives  coverages={coverages} />*/}
+          <Show when={otherCoverageOptions().length > 0}>
+            <AlternativeCoverageOptionList
+              prescription={props.draft}
+              coverageOptions={otherCoverageOptions()}
+            />
+          </Show>
         </>
       }
     />

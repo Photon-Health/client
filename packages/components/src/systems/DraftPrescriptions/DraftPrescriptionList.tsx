@@ -25,7 +25,7 @@ interface DraftPrescriptionsProps {
 
 export function DraftPrescriptionList(props: DraftPrescriptionsProps) {
   const { draftPrescriptions } = useDraftPrescriptions();
-  const { isLoadingPrefills, prescriptionIds, coverages } = usePrescribe();
+  const { isLoadingPrefills, prescriptionIds, coverageOptions } = usePrescribe();
 
   return (
     <div class="space-y-3">
@@ -59,7 +59,7 @@ export function DraftPrescriptionList(props: DraftPrescriptionsProps) {
             <DraftPrescriptionListItem
               screeningAlerts={props.screeningAlerts}
               draft={draftPrescription}
-              coverages={coverages()}
+              coverageOptions={coverageOptions()}
               handleEdit={props.handleEdit}
               handleDelete={props.handleDelete}
             />

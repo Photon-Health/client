@@ -31,7 +31,7 @@ const PrescribeContext = createContext<{
   // values
   prescriptionIds: Accessor<string[]>;
   isLoadingPrefills: Accessor<boolean>;
-  coverages: Accessor<Coverage[]>;
+  coverageOptions: Accessor<CoverageOption[]>;
 
   // actions
   setEditingPrescription: (id: string) => void;
@@ -102,7 +102,7 @@ const transformPrescription = (prescription: PrescriptionFormData, patientId: st
 export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const [isLoadingPrefills, setIsLoadingPrefills] = createSignal<boolean>(false);
   const [hasCreatedPrescriptions, setHasCreatedPrescriptions] = createSignal<boolean>(false);
-  const [coverages, setCoverages] = createSignal<Coverage[]>([]);
+  const [coverageOptions, setCoverageOptions] = createSignal<CoverageOption[]>([]);
   const [patientPreferredPharmacyId, setPatientPreferredPharmacyId] = createSignal<string | null>(
     null
   );
@@ -148,8 +148,8 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     const pharmacyId = patientPreferredPharmacyId();
     const prescriptions = draftPrescriptions();
     if (props.enableCoverageCheck && prescriptions.length > 0 && pharmacyId !== null) {
-      generateCoverageOptions(prescriptions, pharmacyId).then((options) => {
-        setCoverages(options);
+      generateCoverageOptions(prescriptions, pharmacyId).then((generatedCoverageOptions) => {
+        setCoverageOptions(generatedCoverageOptions);
       });
     }
   });
@@ -257,7 +257,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const generateCoverageOptions = async (
     prescriptions: Prescription[],
     pharmacyId: string
-  ): Promise<Coverage[]> => {
+  ): Promise<CoverageOption[]> => {
     try {
       const res = await client.apolloClinical.mutate({
         mutation: GenerateCoverageOptions,
@@ -269,7 +269,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
           }))
         }
       });
-      return res.data.generateCoverageOptions as Coverage[];
+      return res.data.generateCoverageOptions as CoverageOption[];
     } catch (error) {
       triggerToast({
         status: 'error',
@@ -427,7 +427,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     // values
     prescriptionIds,
     isLoadingPrefills,
-    coverages,
+    coverageOptions,
     // actions
     tryCreatePrescription,
     tryUpdatePrescriptionStates,
@@ -464,7 +464,7 @@ export type PatientPreferredPharmacy = {
   name: string;
 };
 
-export type Coverage = {
+export type CoverageOption = {
   daysSupply: number;
   dispenseQuantity: number;
   dispenseUnit: string;

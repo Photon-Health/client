@@ -1,15 +1,15 @@
 import { Prescription } from '@photonhealth/sdk/dist/types';
-import { Coverage } from '../../PrescribeProvider';
+import { CoverageOption } from '../../PrescribeProvider';
 import { createMemo, For } from 'solid-js';
 
-export type CoverageSummaryProps = {
+export type AlternativeCoverageOptionListProps = {
   prescription: Prescription;
-  coverages: Coverage[];
+  coverageOptions: CoverageOption[];
 };
 
-export function CoverageOptionsAlternatives(props: CoverageSummaryProps) {
+export function AlternativeCoverageOptionList(props: AlternativeCoverageOptionListProps) {
   const alternatives = createMemo(() => {
-    return props.coverages.filter((c) => c.prescriptionId === props.prescription.id);
+    return props.coverageOptions.filter((c) => c.prescriptionId === props.prescription.id);
   });
 
   return (
