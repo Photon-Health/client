@@ -53,17 +53,6 @@ import { getOrgMailOrderPharms } from '@client/settings';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
-const pricingEnabledOrgs = new Set([
-  // boson
-  'org_KzSVZBQixLRkqj5d', // boson Test Organization 11
-  // neutron
-  'org_kVS7AP4iuItESdMA', // Photon Test Org
-  'org_QFoulY6Ornx7dMdw', // Sesame
-  // photon
-  'org_xqL46CdX49O1K5Ye', // Photon Test Account
-  'org_zc1RzzmSwd8eE94U' // Sesame
-]);
-
 export const Pharmacy = () => {
   const { order, flattenedFills, setOrder, isDemo, fetchOrder } = useOrderContext();
 
@@ -122,11 +111,9 @@ export const Pharmacy = () => {
 
   // pricing
   const orderContainsGLP1Medication = flattenedFills.some((fill) => isGLP(fill.treatment.name));
-  const isMultiRx = flattenedFills.length > 1;
-
-  const pricingEnabled = pricingEnabledOrgs.has(order?.organization.id);
-  // note: prices are only for Sesame, non-GLP-1 right now
-  const showPriceToggle = (pricingEnabled && !orderContainsGLP1Medication && !isMultiRx) ?? false;
+  const orderIsMultiRx = flattenedFills.length > 1;
+  // note: prices are only for single-rx, non-GLP-1 right now
+  const showPriceToggle = (!orderContainsGLP1Medication && !orderIsMultiRx) ?? false;
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
