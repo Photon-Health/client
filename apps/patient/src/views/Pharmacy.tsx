@@ -52,6 +52,7 @@ import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__gen
 import { getOrgMailOrderPharms } from '@client/settings';
 import { determineNovocareExperimentSegment } from './pharmacy.utils';
 import { fetchOffers } from './pharmacy.utils';
+import _ from 'lodash';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
@@ -776,7 +777,7 @@ export const Pharmacy = () => {
 
   const capsuleEnabled = enableCourier && order?.address?.postalCode && capsulePharmacyId;
 
-  const brandedOptions = [
+  const brandedOptions = _.uniq([
     ...(capsuleEnabled ? [capsulePharmacyId] : []),
     ...(brandedOptionsOverride?.novocareExperimentOverride
       ? [process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string]
@@ -785,7 +786,7 @@ export const Pharmacy = () => {
       ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]
       : []),
     ...(enableMailOrder ? mailOrderPharmacies : [])
-  ];
+  ]);
 
   return (
     <Box>
