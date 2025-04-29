@@ -25,11 +25,11 @@ export function determineNovocareExperimentSegment(
 
   const medicinesAndDeliveryTypes = [
     {
-      patterns: ['zepbound subcutaneous solution Auto-injector 7.5 mg/0.5ml', 'ondansetron.*oral'],
+      patterns: ['ozempic'],
       deliveryType: 'Delivers in 3-5 days'
     },
     {
-      patterns: ['wegovy subcutaneous solution auto-injector 0.25 MG/0.5ML'],
+      patterns: ['wegovy'],
       deliveryType: 'Delivers in 3-5 days'
     }
   ];
@@ -39,7 +39,7 @@ export function determineNovocareExperimentSegment(
     { patterns: string[]; deliveryType: string }[]
   > = {
     org_KzSVZBQixLRkqj5d: medicinesAndDeliveryTypes, // boson Test Organization 11
-    org_pcPnPx5PVamzjS2p: medicinesAndDeliveryTypes // production measured
+    org_wM4wI7rop0W1eNfM: medicinesAndDeliveryTypes // production found
   };
 
   if (!organizationId) {
