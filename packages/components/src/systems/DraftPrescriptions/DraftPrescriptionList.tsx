@@ -5,7 +5,7 @@ import Text from '../../particles/Text';
 import { ScreeningAlertType } from '../ScreeningAlerts';
 import { useDraftPrescriptions } from './DraftPrescriptionsProvider';
 import { usePrescribe } from '../PrescribeProvider';
-import { DraftPrescriptionListItem, DraftPrescriptionLayout } from './DraftPrescriptionListItem';
+import { DraftPrescriptionLayout, DraftPrescriptionListItem } from './DraftPrescriptionListItem';
 
 export type DraftPrescription = PrescriptionTemplate & {
   refillsInput?: number;
@@ -59,7 +59,9 @@ export function DraftPrescriptionList(props: DraftPrescriptionsProps) {
             <DraftPrescriptionListItem
               screeningAlerts={props.screeningAlerts}
               draft={draftPrescription}
-              coverageOptions={coverageOptions()}
+              coverageOptions={coverageOptions().filter(
+                (c) => c.prescriptionId === draftPrescription.id
+              )}
               handleEdit={props.handleEdit}
               handleDelete={props.handleDelete}
             />

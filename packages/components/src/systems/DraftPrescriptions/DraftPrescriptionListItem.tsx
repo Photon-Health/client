@@ -28,11 +28,13 @@ interface DraftPrescriptionListItemProps {
 export function DraftPrescriptionListItem(props: DraftPrescriptionListItemProps) {
   // we'll want to ensure that we're only rendering
   // alerts for the prescription being rendered
-  const screeningAlertsForDraft = props.screeningAlerts.filter(
-    (screeningAlert) =>
-      screeningAlert.involvedEntities
-        .map((involvedEntity) => involvedEntity.id)
-        .indexOf(props.draft.treatment.id) >= 0
+  const screeningAlertsForDraft = createMemo(() =>
+    props.screeningAlerts.filter(
+      (screeningAlert) =>
+        screeningAlert.involvedEntities
+          .map((involvedEntity) => involvedEntity.id)
+          .indexOf(props.draft.treatment.id) >= 0
+    )
   );
 
   const currentCoverageOption = createMemo(() => {
@@ -74,23 +76,18 @@ export function DraftPrescriptionListItem(props: DraftPrescriptionListItemProps)
       }
       BottomChildren={
         <>
-          <Show when={screeningAlertsForDraft.length > 0}>
+          <Show when={screeningAlertsForDraft().length > 0}>
             <ScreeningAlerts
-              screeningAlerts={screeningAlertsForDraft}
+              screeningAlerts={screeningAlertsForDraft()}
               owningId={props.draft.treatment.id}
             />
           </Show>
           <Show when={currentCoverageOption()}>
-            {(coverageOption) => (
-              <CoverageOptionSummary prescription={props.draft} coverageOption={coverageOption()} />
-            )}
+            {(coverageOption) => <CoverageOptionSummary coverageOption={coverageOption()} />}
           </Show>
 
           <Show when={otherCoverageOptions().length > 0}>
-            <AlternativeCoverageOptionList
-              prescription={props.draft}
-              coverageOptions={otherCoverageOptions()}
-            />
+            <AlternativeCoverageOptionList coverageOptions={otherCoverageOptions()} />
           </Show>
         </>
       }
@@ -108,10 +105,10 @@ export const DraftPrescriptionLayout = (props: {
       <div class="flex justify-between items-center gap-4">
         <div class="flex flex-col items-start">{props.LeftChildren}</div>
         <Show when={props?.RightChildren}>
-          <div class="flex items-start gap-3">{props.RightChildren}</div>
+          {(rightChildren) => <div class="flex items-start gap-3"> {rightChildren()}</div>}
         </Show>
       </div>
-      <Show when={props?.BottomChildren}>{props.BottomChildren}</Show>
+      <Show when={props?.BottomChildren}>{(bottomChildren) => bottomChildren()}</Show>
     </div>
   </Card>
 );

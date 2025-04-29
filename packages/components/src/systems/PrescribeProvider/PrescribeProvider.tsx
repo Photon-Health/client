@@ -473,7 +473,7 @@ export type CoverageOption = {
   paRequired: boolean;
   prescriptionId: string;
   price: number;
-  status: string;
+  status: string | 'COVERED';
   statusMessage: string;
   treatment: { id: string; name: string };
 };

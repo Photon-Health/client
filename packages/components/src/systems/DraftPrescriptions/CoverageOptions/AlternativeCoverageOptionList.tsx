@@ -1,27 +1,44 @@
-import { Prescription } from '@photonhealth/sdk/dist/types';
 import { CoverageOption } from '../../PrescribeProvider';
-import { createMemo, For } from 'solid-js';
+import { For } from 'solid-js';
+import { CoverageOptionSummary } from './CoverageOptionSummary';
+import Button from '../../../particles/Button';
+import Card from '../../../particles/Card';
 
 export type AlternativeCoverageOptionListProps = {
-  prescription: Prescription;
   coverageOptions: CoverageOption[];
 };
 
 export function AlternativeCoverageOptionList(props: AlternativeCoverageOptionListProps) {
-  const alternatives = createMemo(() => {
-    return props.coverageOptions.filter((c) => c.prescriptionId === props.prescription.id);
-  });
-
   return (
-    <div>
-      <h3>Alternatives</h3>
-      <For each={alternatives()}>
-        {(coverage) => (
-          <p>
-            {coverage.treatment.name} - ${coverage.price}
-          </p>
-        )}
+    <>
+      <div>Alternatives</div>
+      <For each={props.coverageOptions}>
+        {(coverageOption) => <AlternativeCoverageOptionListItem coverageOption={coverageOption} />}
       </For>
-    </div>
+    </>
+  );
+}
+
+export type AlternativeCoverageOptionListItemProps = {
+  coverageOption: CoverageOption;
+};
+
+export function AlternativeCoverageOptionListItem(props: AlternativeCoverageOptionListItemProps) {
+  return (
+    <Card class="mb-1">
+      <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2">
+          <div class="flex flex-col gap-2">
+            <div class="text-sm">{props.coverageOption.treatment.name}</div>
+            <CoverageOptionSummary coverageOption={props.coverageOption} />
+          </div>
+        </div>
+        <div class="flex justify-end mt-2">
+          <Button size="sm" variant="naked">
+            Select Alternative
+          </Button>
+        </div>
+      </div>
+    </Card>
   );
 }
