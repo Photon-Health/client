@@ -29,9 +29,9 @@ const Component = (props: PrescribeProps) => {
     <DraftPrescriptionsProvider>
       <RecentOrders patientId={store.patient?.value?.id}>
         <PrescribeProvider
-          templateIdsPrefill={props.templateIds?.split(',') || []}
+          templateIdsPrefill={props.templateIds?.split(',').map((id) => id.trim()) || []}
           templateOverrides={props.templateOverrides || {}}
-          prescriptionIdsPrefill={props.prescriptionIds?.split(',') || []}
+          prescriptionIdsPrefill={props.prescriptionIds?.split(',').map((id) => id.trim()) || []}
           patientId={store.patient?.value?.id}
           enableCombineAndDuplicate={props.enableCombineAndDuplicate}
           enableCoverageCheck={props.enableCoverageCheck}

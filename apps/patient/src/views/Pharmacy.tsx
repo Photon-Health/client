@@ -52,6 +52,7 @@ import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__gen
 import { getOrgMailOrderPharms } from '@client/settings';
 import { determineNovocareExperimentSegment } from './pharmacy.utils';
 import { fetchOffers } from './pharmacy.utils';
+import _ from 'lodash';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 
@@ -188,15 +189,37 @@ export const Pharmacy = () => {
         return undefined;
       }
 
-      // these functions will be called and make a state change to brandedOptionsOverride using setBrandedOptionsOverride
-      // if there are branded option overrides
-      const amazonExperimentOverride = await fetchOffers(order);
-      const novocareExperimentOverride = determineNovocareExperimentSegment(order);
+      let newBrandedOptionsOverride: BrandedOptionOverrides = {};
 
-      const newBrandedOptionsOverride: BrandedOptionOverrides = {
-        ...amazonExperimentOverride,
-        ...novocareExperimentOverride
-      };
+      // measured will only want to show amazon offers if we do not have a novocare offer
+      if (order.organization.id === 'org_pcPnPx5PVamzjS2p') {
+        const novocareExperimentOverride = determineNovocareExperimentSegment(order);
+
+        if (novocareExperimentOverride?.novocareExperimentOverride) {
+          // we have a novocare offer, so we don't want to show amazon offers
+
+          newBrandedOptionsOverride = {
+            ...novocareExperimentOverride
+          };
+        } else {
+          // we don't have a novocare offer, so we want to show amazon offers if we have any
+          const amazonExperimentOverride = await fetchOffers(order);
+
+          newBrandedOptionsOverride = {
+            ...amazonExperimentOverride
+          };
+        }
+      } else {
+        // these functions will be called and make a state change to brandedOptionsOverride using setBrandedOptionsOverride
+        // if there are branded option overrides
+        const amazonExperimentOverride = await fetchOffers(order);
+        const novocareExperimentOverride = determineNovocareExperimentSegment(order);
+
+        newBrandedOptionsOverride = {
+          ...amazonExperimentOverride,
+          ...novocareExperimentOverride
+        };
+      }
 
       if (JSON.stringify(newBrandedOptionsOverride) !== JSON.stringify(brandedOptionsOverride)) {
         setBrandedOptionsOverride(newBrandedOptionsOverride);
@@ -776,7 +799,7 @@ export const Pharmacy = () => {
 
   const capsuleEnabled = enableCourier && order?.address?.postalCode && capsulePharmacyId;
 
-  const brandedOptions = [
+  const brandedOptions = _.uniq([
     ...(capsuleEnabled ? [capsulePharmacyId] : []),
     ...(brandedOptionsOverride?.novocareExperimentOverride
       ? [process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string]
@@ -785,7 +808,7 @@ export const Pharmacy = () => {
       ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]
       : []),
     ...(enableMailOrder ? mailOrderPharmacies : [])
-  ];
+  ]);
 
   return (
     <Box>
