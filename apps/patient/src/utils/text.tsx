@@ -212,7 +212,7 @@ export const text = {
   setLoc: 'Set location',
   setSearchLoc: 'Set search location',
   shipTo: (deliveryAddress: string) => `Ship to ${deliveryAddress}`,
-  showDiscountCardPrices: (
+  showDiscountCardPrices: (onClick: () => void) => (
     <>
       <HStack>
         <Text fontWeight="semibold">Show coupon card prices</Text>
@@ -221,7 +221,7 @@ export const text = {
           textUnderlineOffset="2px"
           color="blue.500"
           fontSize="sm"
-          // onClick={() => setCouponModalOpen(true)}
+          onClick={onClick}
         >
           What's this?
         </Link>

@@ -852,9 +852,7 @@ export const Pharmacy = () => {
 
             {showPriceToggle ? (
               <HStack justify="space-between" w="full">
-                {/* <Text fontSize="sm" fontWeight="medium"> */}
-                {t.showDiscountCardPrices}
-                {/* </Text> */}
+                {t.showDiscountCardPrices(() => setCouponModalOpen(true))}
                 <Switch
                   size="lg"
                   isChecked={enablePrice}
