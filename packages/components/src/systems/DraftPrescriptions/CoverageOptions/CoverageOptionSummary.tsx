@@ -1,6 +1,6 @@
 import { CoverageOption } from '../../PrescribeProvider';
 import { Banner } from '../../../index';
-import { createMemo, For } from 'solid-js';
+import { createMemo, For, Show } from 'solid-js';
 import { BannerStatus } from '../../../particles/Banner';
 
 export type CoverageOptionSummaryProps = {
@@ -67,14 +67,21 @@ export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
           </div>
         </div>
       </Banner>
-      <For each={props.coverageOption.alerts}>
-        {(alert) => (
-          <>
-            <div>Label: {alert.label}</div>
-            <div>Name: {alert.name}</div>
-          </>
-        )}
-      </For>
+      <Show when={props.coverageOption.alerts.length > 0}>
+        <div>Alerts</div>
+        <For each={props.coverageOption.alerts}>
+          {(alert, i) => (
+            <>
+              <div class="text-xs text-gray-500">
+                Alert #{i()} Label: {alert.label}
+              </div>
+              <div class="text-xs text-gray-500">
+                Alert #{i()} Text: {alert.text}
+              </div>
+            </>
+          )}
+        </For>
+      </Show>
     </>
   );
 }

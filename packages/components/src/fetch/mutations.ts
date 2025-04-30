@@ -109,6 +109,10 @@ export const GenerateCoverageOptions = gql`
         name
         id
       }
+      alerts {
+        label
+        text
+      }
     }
   }
 `;

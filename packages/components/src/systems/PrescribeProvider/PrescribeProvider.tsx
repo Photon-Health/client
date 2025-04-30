@@ -469,7 +469,7 @@ export type CoverageOption = {
   status: string | 'COVERED' | 'COVERED_WITH_RESTRICTIONS';
   statusMessage: string;
   treatment: { id: string; name: string };
-  alerts: Array<{ label: string; name: string }>;
+  alerts: Array<{ label: string; text: string }>;
 };
 
 // export type Benefit = {
