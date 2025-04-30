@@ -470,6 +470,7 @@ export type CoverageOption = {
   statusMessage: string;
   treatment: { id: string; name: string };
   alerts: Array<{ label: string; text: string }>;
+  pharmacy: { id: string; name: string };
 };
 
 // export type Benefit = {

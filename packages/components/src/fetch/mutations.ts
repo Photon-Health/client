@@ -106,8 +106,12 @@ export const GenerateCoverageOptions = gql`
       dispenseQuantity
       dispenseUnit
       treatment {
-        name
         id
+        name
+      }
+      pharmacy {
+        id
+        name
       }
       alerts {
         label
