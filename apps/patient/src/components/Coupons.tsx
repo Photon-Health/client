@@ -28,7 +28,7 @@ export const Coupons = () => {
   return (
     <VStack w="full" alignItems="stretch" spacing={4}>
       <Heading as="h4" size="md">
-        Discount Card
+        Coupon Card
       </Heading>
       {/* Show one coupon only */}
       <Coupon coupon={discountCards[0]} />

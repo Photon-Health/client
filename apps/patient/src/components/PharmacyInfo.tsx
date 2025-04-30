@@ -353,9 +353,14 @@ export const PharmacyInfo = ({
               <VStack spacing={0} align="flex-end">
                 <Text fontSize="sm">Coupon Price</Text>
                 <Text fontWeight="bold">${pharmacy.price.toFixed(2)}</Text>
-                <Text fontSize="sm" textDecoration="line-through" color="gray.500">
-                  $269
-                </Text>
+                {pharmacy.retailPrice ? (
+                  <Text fontSize="sm" color="gray.500">
+                    Retail{' '}
+                    <Text as="span" textDecoration="line-through">
+                      ${pharmacy.retailPrice.toFixed(2)}
+                    </Text>
+                  </Text>
+                ) : null}
               </VStack>
             </>
           ) : null}
