@@ -25,10 +25,6 @@ export function determineNovocareExperimentSegment(
 
   const medicinesAndDeliveryTypes = [
     {
-      patterns: ['ozempic'],
-      deliveryType: 'Delivers in 3-5 days'
-    },
-    {
       patterns: ['wegovy'],
       deliveryType: 'Delivers in 3-5 days'
     }
