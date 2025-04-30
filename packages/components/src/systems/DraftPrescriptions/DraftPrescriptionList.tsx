@@ -9,7 +9,7 @@ import { DraftPrescriptionLayout, DraftPrescriptionListItem } from './DraftPresc
 interface DraftPrescriptionsProps {
   handleEdit?: (prescription: PrescriptionFormData) => void;
   handleDelete?: (prescriptionId: string) => void;
-  handleSwapToAlternative: (alternative: PrescriptionFormData) => void;
+  handleSwapToOtherPrescription: (alternative: PrescriptionFormData) => void;
   error?: string;
   screeningAlerts: ScreeningAlertType[];
   enableOrder?: boolean;
@@ -56,7 +56,7 @@ export function DraftPrescriptionList(props: DraftPrescriptionsProps) {
               )}
               handleEdit={props.handleEdit}
               handleDelete={props.handleDelete}
-              handleSwapToAlternative={props.handleSwapToAlternative}
+              handleSwapToOtherPrescription={props.handleSwapToOtherPrescription}
             />
           )}
         </For>

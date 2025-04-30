@@ -5,20 +5,20 @@ import Button from '../../../particles/Button';
 import Card from '../../../particles/Card';
 import { format } from 'date-fns';
 
-export type AlternativeCoverageOptionListProps = {
+export type OtherCoverageOptionsListProps = {
   coverageOptions: CoverageOption[];
-  handleSwapToAlternative: (alternative: PrescriptionFormData) => void;
+  handleSwapToOtherPrescription: (other: PrescriptionFormData) => void;
 };
 
-export function AlternativeCoverageOptionList(props: AlternativeCoverageOptionListProps) {
+export function OtherCoverageOptionsList(props: OtherCoverageOptionsListProps) {
   return (
     <>
-      <div>Alternatives</div>
+      <div>Other Options</div>
       <For each={props.coverageOptions}>
         {(coverageOption) => (
           <AlternativeCoverageOptionListItem
             coverageOption={coverageOption}
-            handleSwapToAlternative={props.handleSwapToAlternative}
+            handleSwapToOtherPrescription={props.handleSwapToOtherPrescription}
           />
         )}
       </For>
@@ -28,12 +28,12 @@ export function AlternativeCoverageOptionList(props: AlternativeCoverageOptionLi
 
 export type AlternativeCoverageOptionListItemProps = {
   coverageOption: CoverageOption;
-  handleSwapToAlternative: (alternative: PrescriptionFormData) => void;
+  handleSwapToOtherPrescription: (alternative: PrescriptionFormData) => void;
 };
 
 export function AlternativeCoverageOptionListItem(props: AlternativeCoverageOptionListItemProps) {
   const handleSelectAlternativeClick = async () => {
-    props.handleSwapToAlternative(toFormData(props.coverageOption));
+    props.handleSwapToOtherPrescription(toFormData(props.coverageOption));
   };
 
   return (
@@ -47,7 +47,7 @@ export function AlternativeCoverageOptionListItem(props: AlternativeCoverageOpti
         </div>
         <div class="flex justify-end mt-2">
           <Button size="sm" variant="naked" on:click={handleSelectAlternativeClick}>
-            Select Alternative
+            Select This Option
           </Button>
         </div>
       </div>

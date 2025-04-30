@@ -78,17 +78,6 @@ export const DraftPrescriptionCard = (props: {
     }
   };
 
-  const handleSelectAlternativeCoverageOption = (coverageOption: PrescriptionFormData) => {
-    setEditDraft(coverageOption);
-
-    if (!props.store['treatment'].value) {
-      props.setIsEditing(true);
-      editPrescription();
-    } else {
-      setEditDialogOpen(true);
-    }
-  };
-
   const handleEditConfirm = () => {
     editPrescription();
     setEditDialogOpen(false);
@@ -170,7 +159,7 @@ export const DraftPrescriptionCard = (props: {
           handleEdit={(draft) => {
             checkEditPrescription(draft);
           }}
-          handleSwapToAlternative={handleSelectAlternativeCoverageOption}
+          handleSwapToOtherPrescription={checkEditPrescription}
           screeningAlerts={props.screeningAlerts}
           enableOrder={props.enableOrder}
         />

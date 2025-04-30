@@ -7,7 +7,7 @@ import formatRxString from '../../utils/formatRxString';
 import { ScreeningAlerts, ScreeningAlertType } from '../ScreeningAlerts';
 import { CoverageOption, PrescriptionFormData } from '../PrescribeProvider';
 import { CoverageOptionSummary } from './CoverageOptions/CoverageOptionSummary';
-import { AlternativeCoverageOptionList } from './CoverageOptions/AlternativeCoverageOptionList';
+import { OtherCoverageOptionsList } from './CoverageOptions/OtherCoverageOptionsList';
 import { toPrescriptionFormData } from './utils/mappers';
 
 interface DraftPrescriptionListItemProps {
@@ -15,7 +15,7 @@ interface DraftPrescriptionListItemProps {
   coverageOptions: CoverageOption[];
   handleEdit?: (prescription: PrescriptionFormData) => void;
   handleDelete?: (prescriptionId: string) => void;
-  handleSwapToAlternative: (alternative: PrescriptionFormData) => void;
+  handleSwapToOtherPrescription: (alternative: PrescriptionFormData) => void;
   screeningAlerts: ScreeningAlertType[];
 }
 
@@ -86,9 +86,9 @@ export function DraftPrescriptionListItem(props: DraftPrescriptionListItemProps)
           </Show>
 
           <Show when={otherCoverageOptions().length > 0}>
-            <AlternativeCoverageOptionList
+            <OtherCoverageOptionsList
               coverageOptions={otherCoverageOptions()}
-              handleSwapToAlternative={props.handleSwapToAlternative}
+              handleSwapToOtherPrescription={props.handleSwapToOtherPrescription}
             />
           </Show>
         </>
