@@ -3,6 +3,7 @@ import Client from '../src/systems/Client';
 import {
   DraftPrescriptionList,
   DraftPrescriptionsProvider,
+  PharmacySelect,
   PrescribeProvider,
   RecentOrders,
   triggerToast,
@@ -15,7 +16,6 @@ import Button from '../src/particles/Button';
 import Icon from '../src/particles/Icon';
 import { randomNames } from '../src/sampleData/randomNames';
 import ComboBox from '../src/particles/ComboBox';
-import { PharmacySelect } from '../src';
 import Card from '../src/particles/Card';
 import PatientMedHistory from '../src/systems/PatientMedHistory';
 import AddressForm from '../src/systems/AddressForm';
@@ -101,6 +101,7 @@ const App = () => {
                 handleEdit={(rx) =>
                   setPrescriptionIds(prescriptionIds().filter((p) => p !== rx.id))
                 }
+                handleSwapToOtherPrescription={(_) => _}
                 screeningAlerts={[]}
               />
             </PrescribeProvider>
