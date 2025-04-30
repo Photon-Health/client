@@ -350,7 +350,13 @@ export const PharmacyInfo = ({
           {showPrice && pharmacy.price != null ? (
             <>
               <Spacer />
-              <Text fontWeight="bold">${pharmacy.price.toFixed(2)}</Text>
+              <VStack spacing={0} align="flex-end">
+                <Text fontSize="sm">Coupon Price</Text>
+                <Text fontWeight="bold">${pharmacy.price.toFixed(2)}</Text>
+                <Text fontSize="sm" textDecoration="line-through" color="gray.500">
+                  $269
+                </Text>
+              </VStack>
             </>
           ) : null}
         </HStack>

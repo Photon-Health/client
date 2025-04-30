@@ -8,6 +8,7 @@ import {
   Heading,
   HStack,
   Link,
+  Switch,
   Text,
   useToast,
   VStack
@@ -848,6 +849,28 @@ export const Pharmacy = () => {
                 </Button>
               )}
             </HStack>
+
+            {showPriceToggle ? (
+              <HStack justify="space-between" w="full">
+                {/* <Text fontSize="sm" fontWeight="medium"> */}
+                {t.showDiscountCardPrices}
+                {/* </Text> */}
+                <Switch
+                  size="lg"
+                  isChecked={enablePrice}
+                  onChange={(e) => setEnablePrice(e.target.checked)}
+                />
+              </HStack>
+            ) : null}
+
+            {enablePrice ? (
+              <Box p={3} bgColor="blue.100" borderRadius="lg">
+                <Text fontSize="sm">
+                  The displayed price is a coupon price for the pharmacy. Coupon details available
+                  after you select a pharmacy. <b>This is NOT insurance.</b>
+                </Text>
+              </Box>
+            ) : null}
           </VStack>
         </Container>
       </Box>
@@ -877,13 +900,11 @@ export const Pharmacy = () => {
               loadingMore={isLoading}
               showingAllPharmacies={showingAllPharmacies}
               showHeading={(enableCourier || enableMailOrder) ?? false}
-              showPriceToggle={showPriceToggle}
               enableOpenNow={enableOpenNow}
               enable24Hr={enable24Hr}
               enablePrice={enablePrice}
               setEnableOpenNow={setEnableOpenNow}
               setEnable24Hr={setEnable24Hr}
-              setEnablePrice={setEnablePrice}
               currentPharmacyId={order.pharmacy?.id}
               setCouponModalOpen={setCouponModalOpen}
             />
