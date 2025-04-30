@@ -189,15 +189,37 @@ export const Pharmacy = () => {
         return undefined;
       }
 
-      // these functions will be called and make a state change to brandedOptionsOverride using setBrandedOptionsOverride
-      // if there are branded option overrides
-      const amazonExperimentOverride = await fetchOffers(order);
-      const novocareExperimentOverride = determineNovocareExperimentSegment(order);
+      let newBrandedOptionsOverride: BrandedOptionOverrides = {};
 
-      const newBrandedOptionsOverride: BrandedOptionOverrides = {
-        ...amazonExperimentOverride,
-        ...novocareExperimentOverride
-      };
+      // measured will only want to show amazon offers if we do not have a novocare offer
+      if (order.organization.id === 'org_pcPnPx5PVamzjS2p') {
+        const novocareExperimentOverride = determineNovocareExperimentSegment(order);
+
+        if (novocareExperimentOverride?.novocareExperimentOverride) {
+          // we have a novocare offer, so we don't want to show amazon offers
+
+          newBrandedOptionsOverride = {
+            ...novocareExperimentOverride
+          };
+        } else {
+          // we don't have a novocare offer, so we want to show amazon offers if we have any
+          const amazonExperimentOverride = await fetchOffers(order);
+
+          newBrandedOptionsOverride = {
+            ...amazonExperimentOverride
+          };
+        }
+      } else {
+        // these functions will be called and make a state change to brandedOptionsOverride using setBrandedOptionsOverride
+        // if there are branded option overrides
+        const amazonExperimentOverride = await fetchOffers(order);
+        const novocareExperimentOverride = determineNovocareExperimentSegment(order);
+
+        newBrandedOptionsOverride = {
+          ...amazonExperimentOverride,
+          ...novocareExperimentOverride
+        };
+      }
 
       if (JSON.stringify(newBrandedOptionsOverride) !== JSON.stringify(brandedOptionsOverride)) {
         setBrandedOptionsOverride(newBrandedOptionsOverride);
