@@ -8,37 +8,38 @@ export type CoverageOptionSummaryProps = {
 };
 
 export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
-  const bannerStatus = createMemo<BannerStatus>(() => {
-    if (props.coverageOption.status === 'COVERED') {
-      if (props.coverageOption.paRequired) {
-        return 'warning';
-      }
+  const bannerData = createMemo<CoverageBannerData>(() => {
+    if (props.coverageOption.paRequired) {
+      return {
+        status: 'warning',
+        message: 'PA Required'
+      };
+    }
 
-      return 'success';
+    if (props.coverageOption.status === 'COVERED') {
+      return {
+        status: 'success',
+        message: 'Covered by Insurance'
+      };
     }
 
     if (props.coverageOption.status === 'COVERED_WITH_RESTRICTIONS') {
-      return 'warning';
+      return {
+        status: 'warning',
+        message: 'Covered with Restrictions',
+        subMessage: props.coverageOption.statusMessage
+      };
     }
 
-    return 'error';
+    return {
+      status: 'error',
+      message: 'Not Covered by Insurance'
+    };
   });
 
-  const bannerMessage = createMemo<string>(() => {
-    if (props.coverageOption.status === 'COVERED') {
-      if (props.coverageOption.paRequired) {
-        return 'PA Required';
-      }
-
-      return 'Covered by Insurance';
-    }
-
-    if (props.coverageOption.status === 'COVERED_WITH_RESTRICTIONS') {
-      return props.coverageOption.statusMessage;
-    }
-
-    return 'Not Covered';
-  });
+  const usefulAlerts = createMemo(() =>
+    props.coverageOption.alerts.filter((alert) => alert.text !== props.coverageOption.statusMessage)
+  );
 
   return (
     <div class="flex flex-col gap-2">
@@ -57,20 +58,24 @@ export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
           Pharmacy: <b>Patient's Preferred</b>
         </div>
       </div>
-      <Banner status={bannerStatus()} withoutIcon={true}>
-        <div class="flex justify-between w-full">
-          <div class="text-xs">
-            <b>{bannerMessage()}</b>
+      <Banner status={bannerData().status} withoutIcon={true}>
+        <div class="flex justify-between items-center gap-1 w-full">
+          <div class="flex flex-col text-xs">
+            <div class="font-bold">{bannerData().message}</div>
+            <div>{bannerData().subMessage}</div>
           </div>
-          <div class="text-xs">
-            Est. Copay: <b>{presentPrice(props.coverageOption.price)}</b>
+          <div class="text-xs text-right">
+            <span>Est. Copay: </span>
+            <span class="font-bold whitespace-nowrap">
+              {presentPrice(props.coverageOption.price)}
+            </span>
           </div>
         </div>
       </Banner>
-      <Show when={props.coverageOption.alerts.length > 0}>
+      <Show when={usefulAlerts().length > 0}>
         <div>Alerts</div>
         <ul>
-          <For each={props.coverageOption.alerts}>
+          <For each={usefulAlerts()}>
             {(alert) => (
               <li class="text-xs ">
                 <span class="text-gray-600">{alert.label}: </span>
@@ -87,3 +92,9 @@ export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
 function presentPrice(price: number | null): string {
   return price ? `$${price.toFixed(2)}` : 'N/A';
 }
+
+type CoverageBannerData = {
+  status: BannerStatus;
+  message: string;
+  subMessage?: string;
+};

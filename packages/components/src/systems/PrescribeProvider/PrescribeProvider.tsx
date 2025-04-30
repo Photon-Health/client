@@ -466,7 +466,7 @@ export type CoverageOption = {
   paRequired: boolean;
   prescriptionId: string;
   price: number | null;
-  status: string | 'COVERED' | 'COVERED_WITH_RESTRICTIONS';
+  status: 'COVERED' | 'COVERED_WITH_RESTRICTIONS' | 'NOT_COVERED';
   statusMessage: string;
   treatment: { id: string; name: string };
   alerts: Array<{ label: string; text: string }>;
