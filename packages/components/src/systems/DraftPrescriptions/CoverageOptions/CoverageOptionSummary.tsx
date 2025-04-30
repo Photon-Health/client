@@ -41,7 +41,7 @@ export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
   });
 
   return (
-    <>
+    <div class="flex flex-col gap-2">
       <div class="flex flex-col">
         <div class="text-xs text-gray-500">
           Quantity / Days Supply:
@@ -69,20 +69,18 @@ export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
       </Banner>
       <Show when={props.coverageOption.alerts.length > 0}>
         <div>Alerts</div>
-        <For each={props.coverageOption.alerts}>
-          {(alert, i) => (
-            <>
-              <div class="text-xs text-gray-500">
-                Alert #{i()} Label: {alert.label}
-              </div>
-              <div class="text-xs text-gray-500">
-                Alert #{i()} Text: {alert.text}
-              </div>
-            </>
-          )}
-        </For>
+        <ul>
+          <For each={props.coverageOption.alerts}>
+            {(alert) => (
+              <li class="text-xs ">
+                <span class="text-gray-600">{alert.label}: </span>
+                <span class="text-gray-500">{alert.text}</span>
+              </li>
+            )}
+          </For>
+        </ul>
       </Show>
-    </>
+    </div>
   );
 }
 
