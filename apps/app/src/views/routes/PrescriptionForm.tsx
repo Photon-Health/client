@@ -154,6 +154,7 @@ export const PrescriptionForm = () => {
           enable-delivery-pharmacies={enableDeliveryPharmacies}
           enable-send-to-patient={enablePatientRouting}
           enable-combine-and-duplicate={enableDuplicateRxWarnings}
+          enable-coverage-check={true}
           enable-new-medication-search={true}
           mail-order-ids={mailOrderProviders?.join(',') ?? ''}
           toast-buffer={70}
