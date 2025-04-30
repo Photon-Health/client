@@ -43,15 +43,20 @@ export function DraftPrescriptionListItem(props: DraftPrescriptionListItemProps)
       LeftChildren={
         <>
           <Text>{props.draft.treatment.name}</Text>
-          <Text color="gray" size="sm">
-            {formatRxString({
-              // need to use nullish coalescing here because draft types are eg `Maybe<number> | undefined`
-              dispenseQuantity: props.draft?.dispenseQuantity ?? undefined,
-              dispenseUnit: props.draft?.dispenseUnit ?? undefined,
-              fillsAllowed: props.draft?.fillsAllowed ?? undefined,
-              instructions: props.draft?.instructions ?? undefined
-            })}
-          </Text>
+          <Show when={currentCoverageOption() === undefined}>
+            {/*
+              The CoverageOptionSummary presents this data, so we can hide it here
+            */}
+            <Text color="gray" size="sm">
+              {formatRxString({
+                // need to use nullish coalescing here because draft types are eg `Maybe<number> | undefined`
+                dispenseQuantity: props.draft?.dispenseQuantity ?? undefined,
+                dispenseUnit: props.draft?.dispenseUnit ?? undefined,
+                fillsAllowed: props.draft?.fillsAllowed ?? undefined,
+                instructions: props.draft?.instructions ?? undefined
+              })}
+            </Text>
+          </Show>
         </>
       }
       RightChildren={
@@ -81,7 +86,9 @@ export function DraftPrescriptionListItem(props: DraftPrescriptionListItemProps)
             />
           </Show>
           <Show when={currentCoverageOption()}>
-            {(coverageOption) => <CoverageOptionSummary coverageOption={coverageOption()} />}
+            {(coverageOption) => (
+              <CoverageOptionSummary coverageOption={coverageOption()} prescription={props.draft} />
+            )}
           </Show>
 
           <Show when={otherCoverageOptions().length > 0}>

@@ -2,9 +2,12 @@ import { CoverageOption } from '../../PrescribeProvider';
 import { Banner } from '../../../index';
 import { createMemo, For, Show } from 'solid-js';
 import { BannerStatus } from '../../../particles/Banner';
+import { Prescription } from '@photonhealth/sdk/dist/types';
+import { getRefillsCount } from '../../../utils/formatRxString';
 
 export type CoverageOptionSummaryProps = {
   coverageOption: CoverageOption;
+  prescription?: Prescription;
 };
 
 export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
@@ -42,7 +45,7 @@ export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
   );
 
   return (
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-4">
       <div class="flex flex-col">
         <div class="text-xs text-gray-500">
           <span>Quantity / Days Supply: </span>
@@ -50,6 +53,20 @@ export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
             {`${props.coverageOption.dispenseQuantity} ${props.coverageOption.dispenseUnit} / ${props.coverageOption.daysSupply}`}
           </span>
         </div>
+        <Show when={props.prescription}>
+          {(rx) => (
+            <>
+              <div class="text-xs text-gray-500">
+                <span>Instructions: </span>
+                <span>{rx().instructions}</span>
+              </div>
+              <div class="text-xs text-gray-500">
+                <span>Refills: </span>
+                <span>{getRefillsCount(rx().fillsAllowed)}</span>
+              </div>
+            </>
+          )}
+        </Show>
         {/*<div class="text-xs text-gray-500">*/}
         {/*  <span>Plan Pays: </span>*/}
         {/*  <span class="whitespace-nowrap">N/A</span>*/}
