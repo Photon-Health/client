@@ -899,7 +899,9 @@ export const Pharmacy = () => {
               handleSetPreferred={handleSetPreferredPharmacy}
               loadingMore={isLoading}
               showingAllPharmacies={showingAllPharmacies}
-              showHeading={(enableCourier || enableMailOrder) ?? false}
+              showHeading={
+                (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined) ?? false
+              }
               enableOpenNow={enableOpenNow}
               enable24Hr={enable24Hr}
               enablePrice={enablePrice}

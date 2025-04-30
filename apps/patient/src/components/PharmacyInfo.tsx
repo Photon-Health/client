@@ -274,7 +274,7 @@ export const PharmacyInfo = ({
   if (isAmazonPharmacy && brandedOptionOverride?.amazonPharmacyOverride) {
     amazonPharmacyElementOverride = (
       <HStack>
-        <Tag size="sm" colorScheme="blue">
+        <Tag size="sm" colorScheme="blue" flexShrink={0}>
           <TagLabel fontWeight="bold">In Stock</TagLabel>
         </Tag>
         <Text fontSize="sm" color="gray.500">
@@ -289,7 +289,7 @@ export const PharmacyInfo = ({
   if (isNovocarePharmacy && brandedOptionOverride?.novocareExperimentOverride) {
     novocarePharmacyElementOverride = (
       <HStack>
-        <Tag size="sm" colorScheme="blue">
+        <Tag size="sm" colorScheme="blue" flexShrink={0}>
           <TagLabel fontWeight="bold">In Stock</TagLabel>
         </Tag>
         <Text fontSize="sm" color="gray.500">
