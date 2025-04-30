@@ -45,30 +45,28 @@ export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
     <div class="flex flex-col gap-2">
       <div class="flex flex-col">
         <div class="text-xs text-gray-500">
-          Quantity / Days Supply:
-          <b>
-            {props.coverageOption.dispenseQuantity} {props.coverageOption.dispenseUnit} /{' '}
-            {props.coverageOption.daysSupply} d/s
-          </b>
+          <span>Quantity / Days Supply: </span>
+          <span class="font-bold">
+            {`${props.coverageOption.dispenseQuantity} ${props.coverageOption.dispenseUnit} / ${props.coverageOption.daysSupply}`}
+          </span>
         </div>
         {/*<div class="text-xs text-gray-500">*/}
-        {/*  Plan Pays: <b>${props.coverageOption.planPays}</b>*/}
+        {/*  <span>Plan Pays: </span>*/}
+        {/*  <span class="whitespace-nowrap">N/A</span>*/}
         {/*</div>*/}
         <div class="text-xs text-gray-500">
           Pharmacy: <b>Patient's Preferred</b>
         </div>
       </div>
       <Banner status={bannerData().status} withoutIcon={true}>
-        <div class="flex justify-between items-center gap-1 w-full">
+        <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 md:gap-1 w-full">
           <div class="flex flex-col text-xs">
             <div class="font-bold">{bannerData().message}</div>
             <div>{bannerData().subMessage}</div>
           </div>
-          <div class="text-xs text-right">
+          <div class="text-xs text-left md:text-right whitespace-nowrap">
             <span>Est. Copay: </span>
-            <span class="font-bold whitespace-nowrap">
-              {presentPrice(props.coverageOption.price)}
-            </span>
+            <span class="font-bold">{presentPrice(props.coverageOption.price)}</span>
           </div>
         </div>
       </Banner>
@@ -77,7 +75,7 @@ export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
         <ul>
           <For each={usefulAlerts()}>
             {(alert) => (
-              <li class="text-xs ">
+              <li class="text-xs">
                 <span class="text-gray-600">{alert.label}: </span>
                 <span class="text-gray-500">{alert.text}</span>
               </li>
@@ -90,7 +88,7 @@ export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
 }
 
 function presentPrice(price: number | null): string {
-  return price ? `$${price.toFixed(2)}` : 'N/A';
+  return price ? `$${price.toFixed(0)}` : 'N/A';
 }
 
 type CoverageBannerData = {

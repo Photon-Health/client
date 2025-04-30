@@ -5,6 +5,7 @@ import { ScreeningAlertType } from '../ScreeningAlerts';
 import { useDraftPrescriptions } from './DraftPrescriptionsProvider';
 import { PrescriptionFormData, usePrescribe } from '../PrescribeProvider';
 import { DraftPrescriptionLayout, DraftPrescriptionListItem } from './DraftPrescriptionListItem';
+import Divider from '../../particles/Divider';
 
 interface DraftPrescriptionsProps {
   handleEdit?: (prescription: PrescriptionFormData) => void;
@@ -46,20 +47,27 @@ export function DraftPrescriptionList(props: DraftPrescriptionsProps) {
 
       {/* Show when Drafts */}
       <Show when={!isLoadingPrefills() && draftPrescriptions().length > 0}>
-        <For each={draftPrescriptions()}>
-          {(draftPrescription) => (
-            <DraftPrescriptionListItem
-              screeningAlerts={props.screeningAlerts}
-              draft={draftPrescription}
-              coverageOptions={coverageOptions().filter(
-                (c) => c.prescriptionId === draftPrescription.id
-              )}
-              handleEdit={props.handleEdit}
-              handleDelete={props.handleDelete}
-              handleSwapToOtherPrescription={props.handleSwapToOtherPrescription}
-            />
-          )}
-        </For>
+        <div class="flex flex-col gap-4">
+          <For each={draftPrescriptions()}>
+            {(draftPrescription, index) => (
+              <>
+                <Show when={index() > 0}>
+                  <Divider />
+                </Show>
+                <DraftPrescriptionListItem
+                  screeningAlerts={props.screeningAlerts}
+                  draft={draftPrescription}
+                  coverageOptions={coverageOptions().filter(
+                    (c) => c.prescriptionId === draftPrescription.id
+                  )}
+                  handleEdit={props.handleEdit}
+                  handleDelete={props.handleDelete}
+                  handleSwapToOtherPrescription={props.handleSwapToOtherPrescription}
+                />
+              </>
+            )}
+          </For>
+        </div>
       </Show>
     </div>
   );

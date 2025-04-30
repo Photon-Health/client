@@ -1,6 +1,5 @@
 import { Prescription } from '@photonhealth/sdk/dist/types';
 import { createMemo, JSXElement, Show } from 'solid-js';
-import Card from '../../particles/Card';
 import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
 import formatRxString from '../../utils/formatRxString';
@@ -102,15 +101,13 @@ export const DraftPrescriptionLayout = (props: {
   RightChildren?: JSXElement;
   BottomChildren?: JSXElement;
 }) => (
-  <Card>
-    <div class="flex flex-col gap-4">
-      <div class="flex justify-between items-center gap-4">
-        <div class="flex flex-col items-start">{props.LeftChildren}</div>
-        <Show when={props?.RightChildren}>
-          {(rightChildren) => <div class="flex items-start gap-3"> {rightChildren()}</div>}
-        </Show>
-      </div>
-      <Show when={props?.BottomChildren}>{(bottomChildren) => bottomChildren()}</Show>
+  <div class="flex flex-col gap-4">
+    <div class="flex justify-between items-center gap-4">
+      <div class="flex flex-col items-start">{props.LeftChildren}</div>
+      <Show when={props?.RightChildren}>
+        {(rightChildren) => <div class="flex items-start gap-3"> {rightChildren()}</div>}
+      </Show>
     </div>
-  </Card>
+    <Show when={props?.BottomChildren}>{(bottomChildren) => bottomChildren()}</Show>
+  </div>
 );
