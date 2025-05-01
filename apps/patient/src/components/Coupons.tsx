@@ -7,6 +7,7 @@ import { useOrderContext } from '../views/Main';
 import { DiscountCard } from '../__generated__/graphql';
 import { Card } from './Card';
 import goodrxLogo from '../assets/goodrx_logo.png';
+import { formatPrice } from '../utils/general';
 
 export const Coupons = () => {
   const { order } = useOrderContext();
@@ -54,12 +55,12 @@ export const Coupon = ({ coupon }: { coupon: Coupon }) => {
       <CouponModal isOpen={couponModalOpen} onClose={() => setCouponModalOpen(false)} />
       <VStack w="full" align="stretch" spacing={3}>
         <Text fontSize="4xl" alignSelf="center" fontWeight="700" py={0} lineHeight="1">
-          ${price.toFixed(2)}
+          ${formatPrice(price)}
         </Text>
         {retailPrice ? (
           <Text alignSelf="center" color="gray.500">
             Retail price:{' '}
-            <span style={{ textDecoration: 'line-through' }}>${retailPrice.toFixed(2)}</span>
+            <span style={{ textDecoration: 'line-through' }}>${formatPrice(retailPrice)}</span>
           </Text>
         ) : null}
         <Box bgColor="blue.50" w="full" p={2} borderRadius="xl">

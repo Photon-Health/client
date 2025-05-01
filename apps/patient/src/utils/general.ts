@@ -232,3 +232,7 @@ export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string
 };
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
+export const formatPrice = (price: number) => {
+  return Number.isInteger(price) ? Math.round(price) : price.toFixed(2);
+};

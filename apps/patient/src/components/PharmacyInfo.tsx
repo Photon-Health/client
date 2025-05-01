@@ -20,15 +20,11 @@ import { text as t } from '../utils/text';
 
 import { useMemo, useState } from 'react';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
-import { formatAddress, titleCase } from '../utils/general';
+import { formatAddress, titleCase, formatPrice } from '../utils/general';
 import { getFulfillmentTrackingLink } from '../utils/fulfillmentsHelpers';
 import { BrandedOptionOverrides } from './BrandedOptions';
 
 dayjs.extend(customParseFormat);
-
-const formatPrice = (price: number) => {
-  return Number.isInteger(price) ? Math.round(price) : price.toFixed(2);
-};
 
 interface HoursProps {
   isOpen?: boolean;
