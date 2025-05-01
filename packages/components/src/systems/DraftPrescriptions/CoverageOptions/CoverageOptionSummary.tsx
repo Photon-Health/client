@@ -36,7 +36,8 @@ export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
 
     return {
       status: 'error',
-      message: 'Not Covered by Insurance'
+      message: 'Not Covered by Insurance',
+      subMessage: props.coverageOption.statusMessage
     };
   });
 
