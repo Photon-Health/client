@@ -26,6 +26,10 @@ import { BrandedOptionOverrides } from './BrandedOptions';
 
 dayjs.extend(customParseFormat);
 
+const formatPrice = (price: number) => {
+  return Number.isInteger(price) ? Math.round(price) : price.toFixed(2);
+};
+
 interface HoursProps {
   isOpen?: boolean;
   isClosingSoon?: boolean;
@@ -303,69 +307,71 @@ export const PharmacyInfo = ({
 
   return (
     <VStack align="start" w="full">
-      {showPreferredTag ||
-      showReadyIn30MinTag ||
-      showAvailableInYourAreaTag ||
-      showFreeDeliveryTag ? (
-        <HStack spacing={2} m={0} p={0}>
-          {showPreferredTag ? (
-            <Tag size="sm" colorScheme="blue">
-              <TagLeftIcon boxSize="12px" as={FiStar} />
-              <TagLabel> {t.preferred}</TagLabel>
-            </Tag>
+      <HStack w="full" justify="space-between">
+        <VStack w="full">
+          {showPreferredTag ||
+          showReadyIn30MinTag ||
+          showAvailableInYourAreaTag ||
+          showFreeDeliveryTag ? (
+            <HStack spacing={2} m={0} p={0} alignItems="start" w="full">
+              {showPreferredTag ? (
+                <Tag size="sm" colorScheme="blue">
+                  <TagLeftIcon boxSize="12px" as={FiStar} />
+                  <TagLabel> {t.preferred}</TagLabel>
+                </Tag>
+              ) : null}
+              {showReadyIn30MinTag ? (
+                <Tag size="sm" bgColor="yellow.200">
+                  <TagLabel>Ready in 30 minutes</TagLabel>
+                </Tag>
+              ) : null}
+              {showAvailableInYourAreaTag ? (
+                <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
+                  <TagLabel fontWeight="bold">Available in your area</TagLabel>
+                </Tag>
+              ) : null}
+              {showFreeDeliveryTag && !amazonPharmacyElementOverride ? (
+                <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
+                  <TagLabel fontWeight="bold">Free Delivery</TagLabel>
+                </Tag>
+              ) : null}
+            </HStack>
           ) : null}
-          {showReadyIn30MinTag ? (
-            <Tag size="sm" bgColor="yellow.200">
-              <TagLabel>Ready in 30 minutes</TagLabel>
-            </Tag>
-          ) : null}
-          {showAvailableInYourAreaTag ? (
-            <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
-              <TagLabel fontWeight="bold">Available in your area</TagLabel>
-            </Tag>
-          ) : null}
-          {showFreeDeliveryTag && !amazonPharmacyElementOverride ? (
-            <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
-              <TagLabel fontWeight="bold">Free Delivery</TagLabel>
-            </Tag>
-          ) : null}
-        </HStack>
-      ) : null}
-      <HStack w="full">
-        <HStack w="full">
-          {pharmacy?.logo && !whiteLabelDeliveryPharmacy ? (
-            <Box boxSize="32px" overflow="hidden">
-              <Image
-                src={pharmacy.logo}
-                width="auto"
-                height="32px"
-                boxSize="100%"
-                objectFit="contain"
-              />
-            </Box>
-          ) : null}
-          <Text fontSize="md" fontWeight={boldPharmacyName ? 'bold' : 'medium'}>
-            {whiteLabelDeliveryPharmacy ? 'Free Express Delivery' : pharmacy.name}
-          </Text>
-          {showPrice && pharmacy.price != null ? (
-            <>
-              <Spacer />
-              <VStack spacing={0} align="flex-end">
-                <Text fontSize="sm">Coupon Price</Text>
-                <Text fontWeight="bold">${pharmacy.price.toFixed(2)}</Text>
-                {pharmacy.retailPrice ? (
-                  <Text fontSize="sm" color="gray.500">
-                    Retail{' '}
-                    <Text as="span" textDecoration="line-through">
-                      ${pharmacy.retailPrice.toFixed(2)}
-                    </Text>
-                  </Text>
-                ) : null}
-              </VStack>
-            </>
-          ) : null}
-        </HStack>
+
+          <HStack w="full">
+            {pharmacy?.logo && !whiteLabelDeliveryPharmacy ? (
+              <Box boxSize="32px" overflow="hidden">
+                <Image
+                  src={pharmacy.logo}
+                  width="auto"
+                  height="32px"
+                  boxSize="100%"
+                  objectFit="contain"
+                />
+              </Box>
+            ) : null}
+            <Text fontSize="md" fontWeight={boldPharmacyName ? 'bold' : 'medium'}>
+              {whiteLabelDeliveryPharmacy ? 'Free Express Delivery' : pharmacy.name}
+            </Text>
+          </HStack>
+        </VStack>
+
+        {showPrice && pharmacy.price != null ? (
+          <VStack spacing={0} align="flex-end" minW="fit-content">
+            <Text fontSize="sm">Coupon Price</Text>
+            <Text fontWeight="bold">${formatPrice(pharmacy.price)}</Text>
+            {pharmacy.retailPrice ? (
+              <Text fontSize="sm" color="gray.500">
+                Retail{' '}
+                <Text as="span" textDecoration="line-through">
+                  ${formatPrice(pharmacy.retailPrice)}
+                </Text>
+              </Text>
+            ) : null}
+          </VStack>
+        ) : null}
       </HStack>
+
       {showDetails ? (
         <VStack direction={isStatus ? 'column-reverse' : 'column'} w="full" alignItems={'start'}>
           {tagline ? (
