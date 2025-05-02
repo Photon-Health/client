@@ -40,6 +40,7 @@ const PrescribeContext = createContext<{
     options?: TryCreatePrescriptionTemplateOptions
   ) => Promise<Prescription>;
   tryUpdatePrescriptionStates: (ids: string[], state: PrescriptionState) => Promise<boolean>;
+  setDidSelectOtherCoverageOption: (value: boolean) => void;
 }>();
 
 export type TemplateOverrides = {
@@ -106,7 +107,8 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const [patientPreferredPharmacyId, setPatientPreferredPharmacyId] = createSignal<string | null>(
     null
   );
-  // const [patientBenefits, setPatientBenefits] = createSignal<Benefit[]>([]);
+  const [didSelectOtherCoverageOption, setDidSelectOtherCoverageOption] =
+    createSignal<boolean>(false);
 
   const client = usePhotonClient();
   const { draftPrescriptions, setDraftPrescriptions } = useDraftPrescriptions();
@@ -145,7 +147,12 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   createEffect(() => {
     const pharmacyId = patientPreferredPharmacyId();
     const prescriptions = draftPrescriptions();
-    if (props.enableCoverageCheck && prescriptions.length > 0 && pharmacyId !== null) {
+    if (
+      !didSelectOtherCoverageOption() && // after an alternate is chosen, stop fetching coverages for this patient
+      props.enableCoverageCheck &&
+      prescriptions.length > 0 &&
+      pharmacyId !== null
+    ) {
       generateCoverageOptions(prescriptions, pharmacyId).then((generatedCoverageOptions) => {
         setCoverageOptions(generatedCoverageOptions);
       });
@@ -425,7 +432,8 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     // actions
     tryCreatePrescription,
     tryUpdatePrescriptionStates,
-    deletePrescription
+    deletePrescription,
+    setDidSelectOtherCoverageOption
   };
 
   return <PrescribeContext.Provider value={value}>{props.children}</PrescribeContext.Provider>;

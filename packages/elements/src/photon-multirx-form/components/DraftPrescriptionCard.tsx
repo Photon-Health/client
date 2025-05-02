@@ -25,9 +25,10 @@ export const DraftPrescriptionCard = (props: {
   let ref: Ref<any> | undefined;
   const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = createSignal<boolean>(false);
+  const [editDialogConfirm, setEditDialogConfirm] = createSignal<(() => void) | undefined>();
   const [editDraft, setEditDraft] = createSignal<PrescriptionFormData | undefined>(undefined);
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
-  const { prescriptionIds, deletePrescription } = usePrescribe();
+  const { prescriptionIds, deletePrescription, setDidSelectOtherCoverageOption } = usePrescribe();
   const { draftPrescriptions } = useDraftPrescriptions();
 
   const dispatchPrescriptionDraftDeleted = (prescription?: Prescription) => {
@@ -67,21 +68,33 @@ export const DraftPrescriptionCard = (props: {
     }
   };
 
-  const checkEditPrescription = (draft: PrescriptionFormData) => {
+  const checkEditPrescription = (draft: PrescriptionFormData, onConfirm?: () => undefined) => {
     setEditDraft(draft);
 
     if (!props.store['treatment'].value) {
       props.setIsEditing(true);
       editPrescription();
+      onConfirm?.();
     } else {
       setEditDialogOpen(true);
+      setEditDialogConfirm(onConfirm);
     }
+  };
+
+  const handleSwapToOtherPrescription = (otherOptionDraftRx: PrescriptionFormData) => {
+    checkEditPrescription(otherOptionDraftRx, () => {
+      // setting this to throttle further calls to generateCoverageOptions after a swap is made
+      setDidSelectOtherCoverageOption(true);
+    });
   };
 
   const handleEditConfirm = () => {
     editPrescription();
     setEditDialogOpen(false);
     setEditDraft(undefined);
+
+    editDialogConfirm()?.();
+    setEditDialogConfirm(undefined);
   };
   const handleEditCancel = () => {
     setEditDialogOpen(false);
@@ -159,7 +172,7 @@ export const DraftPrescriptionCard = (props: {
           handleEdit={(draft) => {
             checkEditPrescription(draft);
           }}
-          handleSwapToOtherPrescription={checkEditPrescription}
+          handleSwapToOtherPrescription={handleSwapToOtherPrescription}
           screeningAlerts={props.screeningAlerts}
           enableOrder={props.enableOrder}
         />
