@@ -20,7 +20,7 @@ import { text as t } from '../utils/text';
 
 import { useMemo, useState } from 'react';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
-import { formatAddress, titleCase } from '../utils/general';
+import { formatAddress, titleCase, formatPrice } from '../utils/general';
 import { getFulfillmentTrackingLink } from '../utils/fulfillmentsHelpers';
 import { BrandedOptionOverrides } from './BrandedOptions';
 
@@ -274,7 +274,7 @@ export const PharmacyInfo = ({
   if (isAmazonPharmacy && brandedOptionOverride?.amazonPharmacyOverride) {
     amazonPharmacyElementOverride = (
       <HStack>
-        <Tag size="sm" colorScheme="blue">
+        <Tag size="sm" colorScheme="blue" flexShrink={0}>
           <TagLabel fontWeight="bold">In Stock</TagLabel>
         </Tag>
         <Text fontSize="sm" color="gray.500">
@@ -289,7 +289,7 @@ export const PharmacyInfo = ({
   if (isNovocarePharmacy && brandedOptionOverride?.novocareExperimentOverride) {
     novocarePharmacyElementOverride = (
       <HStack>
-        <Tag size="sm" colorScheme="blue">
+        <Tag size="sm" colorScheme="blue" flexShrink={0}>
           <TagLabel fontWeight="bold">In Stock</TagLabel>
         </Tag>
         <Text fontSize="sm" color="gray.500">
@@ -303,58 +303,71 @@ export const PharmacyInfo = ({
 
   return (
     <VStack align="start" w="full">
-      {showPreferredTag ||
-      showReadyIn30MinTag ||
-      showAvailableInYourAreaTag ||
-      showFreeDeliveryTag ? (
-        <HStack spacing={2} m={0} p={0}>
-          {showPreferredTag ? (
-            <Tag size="sm" colorScheme="blue">
-              <TagLeftIcon boxSize="12px" as={FiStar} />
-              <TagLabel> {t.preferred}</TagLabel>
-            </Tag>
+      <HStack w="full" justify="space-between">
+        <VStack w="full">
+          {showPreferredTag ||
+          showReadyIn30MinTag ||
+          showAvailableInYourAreaTag ||
+          showFreeDeliveryTag ? (
+            <HStack spacing={2} m={0} p={0} alignItems="start" w="full">
+              {showPreferredTag ? (
+                <Tag size="sm" colorScheme="blue">
+                  <TagLeftIcon boxSize="12px" as={FiStar} />
+                  <TagLabel> {t.preferred}</TagLabel>
+                </Tag>
+              ) : null}
+              {showReadyIn30MinTag ? (
+                <Tag size="sm" bgColor="yellow.200">
+                  <TagLabel>Ready in 30 minutes</TagLabel>
+                </Tag>
+              ) : null}
+              {showAvailableInYourAreaTag ? (
+                <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
+                  <TagLabel fontWeight="bold">Available in your area</TagLabel>
+                </Tag>
+              ) : null}
+              {showFreeDeliveryTag && !amazonPharmacyElementOverride ? (
+                <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
+                  <TagLabel fontWeight="bold">Free Delivery</TagLabel>
+                </Tag>
+              ) : null}
+            </HStack>
           ) : null}
-          {showReadyIn30MinTag ? (
-            <Tag size="sm" bgColor="yellow.200">
-              <TagLabel>Ready in 30 minutes</TagLabel>
-            </Tag>
-          ) : null}
-          {showAvailableInYourAreaTag ? (
-            <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
-              <TagLabel fontWeight="bold">Available in your area</TagLabel>
-            </Tag>
-          ) : null}
-          {showFreeDeliveryTag && !amazonPharmacyElementOverride ? (
-            <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
-              <TagLabel fontWeight="bold">Free Delivery</TagLabel>
-            </Tag>
-          ) : null}
-        </HStack>
-      ) : null}
-      <HStack w="full">
-        <HStack w="full">
-          {pharmacy?.logo && !whiteLabelDeliveryPharmacy ? (
-            <Box boxSize="32px" overflow="hidden">
-              <Image
-                src={pharmacy.logo}
-                width="auto"
-                height="32px"
-                boxSize="100%"
-                objectFit="contain"
-              />
-            </Box>
-          ) : null}
-          <Text fontSize="md" fontWeight={boldPharmacyName ? 'bold' : 'medium'}>
-            {whiteLabelDeliveryPharmacy ? 'Free Express Delivery' : pharmacy.name}
-          </Text>
-          {showPrice && pharmacy.price != null ? (
-            <>
-              <Spacer />
-              <Text fontWeight="bold">${pharmacy.price.toFixed(2)}</Text>
-            </>
-          ) : null}
-        </HStack>
+
+          <HStack w="full">
+            {pharmacy?.logo && !whiteLabelDeliveryPharmacy ? (
+              <Box boxSize="32px" overflow="hidden">
+                <Image
+                  src={pharmacy.logo}
+                  width="auto"
+                  height="32px"
+                  boxSize="100%"
+                  objectFit="contain"
+                />
+              </Box>
+            ) : null}
+            <Text fontSize="md" fontWeight={boldPharmacyName ? 'bold' : 'medium'}>
+              {whiteLabelDeliveryPharmacy ? 'Free Express Delivery' : pharmacy.name}
+            </Text>
+          </HStack>
+        </VStack>
+
+        {showPrice && pharmacy.price != null ? (
+          <VStack spacing={0} align="flex-end" minW="fit-content">
+            <Text fontSize="sm">Coupon Price</Text>
+            <Text fontWeight="bold">${formatPrice(pharmacy.price)}</Text>
+            {pharmacy.retailPrice ? (
+              <Text fontSize="sm" color="gray.500">
+                Retail{' '}
+                <Text as="span" textDecoration="line-through">
+                  ${formatPrice(pharmacy.retailPrice)}
+                </Text>
+              </Text>
+            ) : null}
+          </VStack>
+        ) : null}
       </HStack>
+
       {showDetails ? (
         <VStack direction={isStatus ? 'column-reverse' : 'column'} w="full" alignItems={'start'}>
           {tagline ? (
