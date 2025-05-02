@@ -28,6 +28,7 @@ export type EnrichedPharmacy = Pharmacy & {
   opens?: string | undefined;
   closes?: string | undefined;
   price?: number;
+  retailPrice?: number;
 };
 export type ExtendedFulfillmentType = FulfillmentType | 'COURIER';
 
