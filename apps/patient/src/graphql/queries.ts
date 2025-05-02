@@ -251,6 +251,7 @@ const PHARMACY_FIELDS = gql`
       timezone
     }
     price
+    retailPrice
     source
   }
 `;
