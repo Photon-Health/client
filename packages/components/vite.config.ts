@@ -23,6 +23,12 @@ export default defineConfig({
       external: ['solid-js']
     }
   },
+  resolve: {
+    alias: {
+      // eslint-disable-next-line
+      '@photonhealth/sdk': path.resolve(__dirname, '../sdk')
+    }
+  },
   test: {
     environment: 'jsdom',
     globals: true,
