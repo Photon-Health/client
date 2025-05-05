@@ -9,7 +9,7 @@ import {
   MockPrescribeProvider
 } from '../TestMocks/MockPrescribeProvider';
 import userEvent from '@testing-library/user-event';
-import { Prescription, PrescriptionState, SexType } from '@photonhealth/sdk/dist/types';
+import { Prescription } from '@photonhealth/sdk/dist/types';
 import { useContext } from 'solid-js';
 
 vi.mock('../SDKProvider', () => ({
@@ -85,72 +85,11 @@ function createPrescription(): Prescription {
   return {
     dispenseQuantity: 0,
     dispenseUnit: '',
-    effectiveDate: undefined,
-    expirationDate: undefined,
     fills: [],
     id: '',
     instructions: '',
-    patient: {
-      __typename: undefined,
-      address: undefined,
-      allergies: undefined,
-      dateOfBirth: undefined,
-      email: undefined,
-      externalId: undefined,
-      gender: undefined,
-      id: '',
-      medicationHistory: undefined,
-      name: {
-        __typename: undefined,
-        first: '',
-        full: '',
-        last: '',
-        middle: undefined,
-        title: undefined
-      },
-      orders: undefined,
-      phone: undefined,
-      preferredPharmacies: undefined,
-      prescriptions: undefined,
-      sex: SexType.Female,
-      benefits: null
-    },
-    prescriber: {
-      __typename: undefined,
-      NPI: undefined,
-      address: undefined,
-      email: undefined,
-      externalId: undefined,
-      fax: undefined,
-      id: '',
-      name: {
-        __typename: undefined,
-        first: '',
-        full: '',
-        last: '',
-        middle: undefined,
-        title: undefined
-      },
-      organizations: [],
-      phone: undefined
-    },
     fillsAllowed: 0,
     fillsRemaining: 0,
-    state: PrescriptionState.Draft,
-    treatment: {
-      codes: {
-        __typename: undefined,
-        HCPCS: undefined,
-        SKU: undefined,
-        packageNDC: undefined,
-        productNDC: undefined,
-        rxcui: undefined
-      },
-      description: undefined,
-      id: '',
-      name: '',
-      __typename: undefined
-    },
-    writtenAt: undefined
-  };
+    state: 'DRAFT'
+  } as unknown as Prescription;
 }

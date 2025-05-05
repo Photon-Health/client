@@ -11,7 +11,10 @@
     "resolveJsonModule": true,
     "declaration": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "@photonhealth/sdk": ["packages/sdk/src/lib.ts"]
+    }
   },
   "include": ["src", "types", "dev"],
   "exclude": ["node_modules", "tmp", "dist"]
