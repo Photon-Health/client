@@ -27,7 +27,7 @@ import {
 import { triggerToast, useRecentOrders } from '../../index';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
 
-const PrescribeContext = createContext<{
+export type PrescribeContextType = {
   // values
   prescriptionIds: Accessor<string[]>;
   isLoadingPrefills: Accessor<boolean>;
@@ -41,7 +41,9 @@ const PrescribeContext = createContext<{
   ) => Promise<Prescription>;
   tryUpdatePrescriptionStates: (ids: string[], state: PrescriptionState) => Promise<boolean>;
   setDidSelectOtherCoverageOption: (value: boolean) => void;
-}>();
+};
+
+const PrescribeContext = createContext<PrescribeContextType>();
 
 export type TemplateOverrides = {
   [key: string]: {
@@ -445,6 +447,10 @@ export const usePrescribe = () => {
     throw new Error('usePrescribe must be used within the PrescribeProvider');
   }
   return context;
+};
+
+export const usePrescribeOptional = () => {
+  return useContext(PrescribeContext);
 };
 
 export function isTreatmentInDraftPrescriptions(

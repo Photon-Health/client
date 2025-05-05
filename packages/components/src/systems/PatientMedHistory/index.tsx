@@ -83,7 +83,7 @@ export type GetPatientTreatmentHistoryItem = {
   prescription?: Prescription;
 };
 
-type GetPatientResponse = {
+export type GetPatientResponse = {
   patient: {
     id: string;
     treatmentHistory: GetPatientTreatmentHistoryItem[];
@@ -207,6 +207,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
           enableRefillButton={props.enableRefillButton}
           baseURL={baseURL()}
           rowItems={medHistoryRowItems()}
+          isLoading={patientMedHistory.loading}
           sortOrder={sortOrder()}
           onSortOrderToggle={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
         />
