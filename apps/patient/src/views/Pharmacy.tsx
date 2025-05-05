@@ -177,19 +177,6 @@ export const Pharmacy = () => {
 
   useEffect(() => {
     const determineOverrides = async () => {
-      const validOrganizationIds = [
-        'org_KzSVZBQixLRkqj5d', // boson Test Organization 11
-        'org_kVS7AP4iuItESdMA', // neutron Photon Test Org
-        'org_wM4wI7rop0W1eNfM', // production found
-        'org_pcPnPx5PVamzjS2p', // production measured
-        'org_jScrLol7ZMSfExSR', // production river
-        'org_zc1RzzmSwd8eE94U' // production sesame
-      ];
-
-      if (!validOrganizationIds.includes(order.organization.id)) {
-        return undefined;
-      }
-
       let newBrandedOptionsOverride: BrandedOptionOverrides = {};
 
       // measured will only want to show amazon offers if we do not have a novocare offer
