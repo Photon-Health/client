@@ -4,7 +4,7 @@ import { Card, Text, usePrescribe } from '@photonhealth/components';
 import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { PhotonTooltip } from '../../photon-tooltip';
-import { ScreeningAlertType } from '@photonhealth/components';
+import { ScreeningAlertType, RoutingConstraint } from '@photonhealth/components';
 import { Prescription } from '@photonhealth/sdk/dist/types';
 
 export const DraftPrescriptionCard = (props: {
@@ -17,6 +17,7 @@ export const DraftPrescriptionCard = (props: {
   setIsEditing: (isEditing: boolean) => void;
   handleDraftPrescriptionsChange: () => void;
   screeningAlerts: ScreeningAlertType[];
+  routingConstraints: RoutingConstraint[];
   enableOrder: boolean;
 }) => {
   let ref: Ref<any> | undefined;
@@ -154,6 +155,7 @@ export const DraftPrescriptionCard = (props: {
             checkEditPrescription(draft);
           }}
           screeningAlerts={props.screeningAlerts}
+          routingConstraints={props.routingConstraints}
           enableOrder={props.enableOrder}
         />
       </Card>

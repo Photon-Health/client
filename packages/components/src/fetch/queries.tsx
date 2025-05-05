@@ -100,6 +100,10 @@ export const CreatePrescription = gql`
       treatment {
         id
         name
+        codes {
+          packageNDC
+          productNDC
+        }
       }
     }
   }

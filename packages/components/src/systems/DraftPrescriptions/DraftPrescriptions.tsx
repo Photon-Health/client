@@ -1,11 +1,16 @@
 import { Prescription, PrescriptionTemplate } from '@photonhealth/sdk/dist/types';
-import { For, JSXElement, Show } from 'solid-js';
+import { createMemo, For, JSXElement, Show } from 'solid-js';
 import Banner from '../../particles/Banner';
 import Card from '../../particles/Card';
 import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
 import formatRxString from '../../utils/formatRxString';
 import { ScreeningAlerts, ScreeningAlertType } from '../ScreeningAlerts';
+import {
+  RoutingConstraint,
+  getPrescriptionRoutingConstraints,
+  PrescriptionRoutingAlert
+} from '../RoutingConstraints';
 import { useDraftPrescriptions } from './DraftPrescriptionsProvider';
 import { usePrescribe } from '../PrescribeProvider';
 
@@ -40,12 +45,16 @@ interface DraftPrescriptionsProps {
   handleDelete?: (prescriptionId: string) => void;
   error?: string;
   screeningAlerts: ScreeningAlertType[];
+  routingConstraints: RoutingConstraint[];
   enableOrder?: boolean;
 }
 
 export function DraftPrescriptions(props: DraftPrescriptionsProps) {
   const { draftPrescriptions } = useDraftPrescriptions();
   const { isLoadingPrefills, prescriptionIds } = usePrescribe();
+  const prescriptionRoutingConstraints = createMemo((): Map<string, RoutingConstraint> => {
+    return getPrescriptionRoutingConstraints(props.routingConstraints);
+  });
 
   return (
     <div class="space-y-3">
@@ -84,6 +93,13 @@ export function DraftPrescriptions(props: DraftPrescriptionsProps) {
                   .map((involvedEntity) => involvedEntity.id)
                   .indexOf(draft.treatment.id) >= 0
             );
+            const routingConstraintForDraft = prescriptionRoutingConstraints().get(draft.id);
+            const routingAlertForDraft =
+              routingConstraintForDraft &&
+              PrescriptionRoutingAlert({
+                prescription: draft,
+                routingConstraint: routingConstraintForDraft
+              });
 
             return (
               <DraftPrescription
@@ -122,12 +138,15 @@ export function DraftPrescriptions(props: DraftPrescriptionsProps) {
                   </>
                 }
                 BottomChildren={
-                  <Show when={screeningAlertsForDraft.length > 0}>
-                    <ScreeningAlerts
-                      screeningAlerts={screeningAlertsForDraft}
-                      owningId={draft.treatment.id}
-                    />
-                  </Show>
+                  <>
+                    <Show when={screeningAlertsForDraft.length > 0}>
+                      <ScreeningAlerts
+                        screeningAlerts={screeningAlertsForDraft}
+                        owningId={draft.treatment.id}
+                      />
+                    </Show>
+                    <Show when={routingAlertForDraft}>{routingAlertForDraft}</Show>
+                  </>
                 }
               />
             );

@@ -29,6 +29,7 @@ import {
   ScreeningAlertAcknowledgementDialog,
   ScreeningAlertType
 } from './systems/ScreeningAlerts';
+import { RoutingConstraint, getRoutingConstraint } from './systems/RoutingConstraints';
 
 import triggerToast from './utils/toastTriggers';
 import generateString from './utils/generateString';
@@ -80,6 +81,7 @@ export {
   createQuery,
   formatDate,
   generateString,
+  getRoutingConstraint,
   triggerToast,
   usePhotonClient,
   useRecentOrders,
@@ -89,4 +91,10 @@ export {
 };
 
 // Export types
-export type { ScreeningAlertType, TemplateOverrides, DraftPrescription, PrescriptionFormData };
+export type {
+  ScreeningAlertType,
+  RoutingConstraint,
+  TemplateOverrides,
+  DraftPrescription,
+  PrescriptionFormData
+};
