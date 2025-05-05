@@ -101,6 +101,7 @@ const App = () => {
                   setPrescriptionIds(prescriptionIds().filter((p) => p !== rx.id))
                 }
                 screeningAlerts={[]}
+                routingConstraints={[]}
               />
             </PrescribeProvider>
           </RecentOrders>
