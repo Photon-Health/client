@@ -1,18 +1,11 @@
 import { Component, createMemo, createSignal, For, Show } from 'solid-js';
-import {
-  formatDate,
-  formatPrescriptionDetails,
-  generateString,
-  Icon,
-  Text,
-  usePrescribe,
-  useRecentOrders
-} from '../../';
+import { formatDate, formatPrescriptionDetails, generateString, Icon, Text } from '../../';
 import { Treatment } from '@photonhealth/sdk/dist/types';
 import { IconButton } from '../../particles/IconButton';
 import clsx from 'clsx';
 import { MedHistoryPrescription } from './index';
 import { format } from 'date-fns';
+import { usePrescribeOptional } from '../PrescribeProvider';
 
 export type MedHistoryRowItem = {
   treatment: Treatment;
@@ -23,14 +16,15 @@ export type PatientMedHistoryTableProps = {
   enableLinks: boolean;
   enableRefillButton: boolean;
   rowItems?: MedHistoryRowItem[] | undefined;
+  isLoading: boolean;
   baseURL: string;
   onSortOrderToggle: () => void;
   sortOrder: 'asc' | 'desc';
 };
 
 export default function PatientMedHistoryTable(props: PatientMedHistoryTableProps) {
-  const [ordersState] = useRecentOrders();
-  const { tryCreatePrescription } = usePrescribe();
+  const prescribeContext = usePrescribeOptional();
+
   const [isCreatingPrescriptionId, setIsCreatingPrescriptionId] = createSignal<string | undefined>(
     undefined
   );
@@ -53,8 +47,12 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
     if (isCreatingPrescriptionId() === undefined) {
       setIsCreatingPrescriptionId(prescription.id);
 
+      if (!prescribeContext) {
+        throw new Error('Refill requires <PrescribeProvider>');
+      }
+
       try {
-        await tryCreatePrescription({
+        await prescribeContext.tryCreatePrescription({
           ...prescription,
           treatment,
           effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
@@ -95,7 +93,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
       </div>
 
       <Show
-        when={!ordersState.isLoading && props.rowItems}
+        when={!props.isLoading && props.rowItems}
         fallback={
           <>
             <LoadingRowFallback enableRefill={props.enableRefillButton} />
@@ -142,7 +140,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
           )}
         </For>
       </Show>
-      <Show when={!ordersState.isLoading && props.rowItems && props.rowItems.length === 0}>
+      <Show when={!props.isLoading && props.rowItems && props.rowItems.length === 0}>
         <div class="px-4 sm:px-6 py-4 col-span-3 text-center">
           <Text color="gray">No medication history found.</Text>
         </div>
