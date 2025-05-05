@@ -51,6 +51,7 @@ export default {
           rowItems={testData}
           baseURL={'test-base-url.com/'}
           sortOrder={'desc'}
+          isLoading={false}
           onSortOrderToggle={() => {}}
         ></PatientMedHistoryTable>
       </div>
