@@ -29,7 +29,7 @@ import {
   ScreeningAlertAcknowledgementDialog,
   ScreeningAlertType
 } from './systems/ScreeningAlerts';
-import { RoutingConstraint, getRoutingConstraint } from './systems/RoutingConstraints';
+import { RoutingConstraint } from './systems/RoutingConstraints';
 
 import triggerToast from './utils/toastTriggers';
 import generateString from './utils/generateString';
@@ -81,7 +81,6 @@ export {
   createQuery,
   formatDate,
   generateString,
-  getRoutingConstraint,
   triggerToast,
   usePhotonClient,
   useRecentOrders,

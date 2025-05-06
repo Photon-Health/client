@@ -18,8 +18,6 @@ import {
   ScreeningAlertAcknowledgementDialog,
   ScreeningAlertType,
   SignatureAttestationModal,
-  RoutingConstraint,
-  getRoutingConstraint,
   Spinner,
   TemplateOverrides,
   Toaster,
@@ -109,7 +107,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
 
   const { draftPrescriptions } = useDraftPrescriptions();
-  const { tryUpdatePrescriptionStates } = usePrescribe();
+  const { routingConstraints, tryUpdatePrescriptionStates } = usePrescribe();
 
   const prescriptionIds = createMemo(() =>
     draftPrescriptions().map((prescription) => prescription.id)
@@ -220,9 +218,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     ref?.dispatchEvent(event);
   };
 
-  const removeDuplicateTreatments = <T extends Prescription | ScreenablePrescription>(
-    prescriptions: T[]
-  ): T[] => {
+  const removeDuplicateTreatments = (
+    prescriptions: ScreenablePrescription[]
+  ): ScreenablePrescription[] => {
     // let's remove any duplicate treatment ids
     // as there's no point to sending up multiple
     // of the same medication
@@ -269,13 +267,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
     setScreeningAlerts(data?.prescriptionScreen?.alerts ?? []);
   };
-
-  const routingConstraints = createMemo((): RoutingConstraint[] => {
-    const dedupedPrescriptions: Prescription[] = removeDuplicateTreatments(draftPrescriptions());
-    return dedupedPrescriptions.map((prescription: Prescription) =>
-      getRoutingConstraint(prescription)
-    );
-  });
 
   const dispatchPrescriptionsError = (errors: readonly Error[]) => {
     const event = new CustomEvent('photon-prescriptions-error', {
