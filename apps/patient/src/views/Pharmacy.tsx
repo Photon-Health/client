@@ -631,7 +631,7 @@ export const Pharmacy = () => {
                   orderId: order.id,
                   organizationId: order.organization.id,
                   description: slugifiedOverride,
-                  treatmentId: flattenedFills[0].treatment.id,
+                  treatmentId: flattenedFills[0]?.treatment?.id,
                   timestamp: new Date().toISOString()
                 });
               } else {
@@ -639,7 +639,7 @@ export const Pharmacy = () => {
                   orderId: order.id,
                   organizationId: order.organization.id,
                   description: slugifiedOverride,
-                  treatmentId: flattenedFills[0].treatment.id,
+                  treatmentId: flattenedFills[0]?.treatment?.id,
                   timestamp: new Date().toISOString()
                 });
               }
