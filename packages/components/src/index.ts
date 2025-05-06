@@ -7,7 +7,6 @@ import ComboBox from './particles/ComboBox';
 import {
   DraftPrescriptionList,
   DraftPrescriptionsProvider,
-  toPrescriptionFormData,
   useDraftPrescriptions
 } from './systems/DraftPrescriptions';
 import Icon from './particles/Icon';
@@ -86,8 +85,7 @@ export {
   useRecentOrders,
   formatPrescriptionDetails,
   PrescribeProvider,
-  usePrescribe,
-  toPrescriptionFormData
+  usePrescribe
 };
 
 // Export types

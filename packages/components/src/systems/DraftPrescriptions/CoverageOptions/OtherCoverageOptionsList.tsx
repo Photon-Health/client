@@ -16,7 +16,7 @@ export function OtherCoverageOptionsList(props: OtherCoverageOptionsListProps) {
       <div>Other Options</div>
       <For each={props.coverageOptions}>
         {(coverageOption) => (
-          <AlternativeCoverageOptionListItem
+          <OtherCoverageOptionListItem
             coverageOption={coverageOption}
             handleSwapToOtherPrescription={props.handleSwapToOtherPrescription}
           />
@@ -26,13 +26,13 @@ export function OtherCoverageOptionsList(props: OtherCoverageOptionsListProps) {
   );
 }
 
-export type AlternativeCoverageOptionListItemProps = {
+export type OtherCoverageOptionListItemProps = {
   coverageOption: CoverageOption;
   handleSwapToOtherPrescription: (alternative: PrescriptionFormData) => void;
 };
 
-export function AlternativeCoverageOptionListItem(props: AlternativeCoverageOptionListItemProps) {
-  const handleSelectAlternativeClick = async () => {
+export function OtherCoverageOptionListItem(props: OtherCoverageOptionListItemProps) {
+  const handleSelectOtherOptionClick = async () => {
     props.handleSwapToOtherPrescription(toFormData(props.coverageOption));
   };
 
@@ -46,7 +46,7 @@ export function AlternativeCoverageOptionListItem(props: AlternativeCoverageOpti
           </div>
         </div>
         <div class="flex justify-end mt-2">
-          <Button size="sm" variant="naked" on:click={handleSelectAlternativeClick}>
+          <Button size="sm" variant="naked" on:click={handleSelectOtherOptionClick}>
             Select This Option
           </Button>
         </div>

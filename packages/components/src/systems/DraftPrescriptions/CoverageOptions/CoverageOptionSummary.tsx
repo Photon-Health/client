@@ -68,10 +68,6 @@ export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
             </>
           )}
         </Show>
-        {/*<div class="text-xs text-gray-500">*/}
-        {/*  <span>Plan Pays: </span>*/}
-        {/*  <span class="whitespace-nowrap">N/A</span>*/}
-        {/*</div>*/}
         <div class="text-xs text-gray-500">
           <span>Pharmacy: </span>
           <span class="font-bold">

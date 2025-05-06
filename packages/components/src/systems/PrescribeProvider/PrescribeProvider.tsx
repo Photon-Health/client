@@ -486,11 +486,3 @@ export type CoverageOption = {
   alerts: Array<{ label: string; text: string }>;
   pharmacy: { id: string; name: string };
 };
-
-// export type Benefit = {
-//   id: string;
-//   bin: string;
-//   groupId: string;
-//   memberId: string;
-//   pcn: string;
-// };
