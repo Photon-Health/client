@@ -99,6 +99,7 @@ export const DraftPrescriptionCard = (props: {
   const handleEditCancel = () => {
     setEditDialogOpen(false);
     setEditDraft(undefined);
+    setEditDialogConfirm(undefined);
   };
   const handleDeleteConfirm = () => {
     const deletedId = deleteDraftId();
