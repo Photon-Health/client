@@ -265,26 +265,17 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     prescriptions: Prescription[],
     pharmacyId: string
   ): Promise<CoverageOption[]> => {
-    try {
-      const res = await client.apolloClinical.mutate({
-        mutation: GenerateCoverageOptions,
-        variables: {
-          pharmacyId,
-          prescriptions: prescriptions.map((prescription) => ({
-            id: prescription.id
-            // icd10codes: ['gotta get this']
-          }))
-        }
-      });
-      return res.data.generateCoverageOptions as CoverageOption[];
-    } catch (error) {
-      triggerToast({
-        status: 'error',
-        header: 'Error Looking Up Coverage Option(s)',
-        body: (error as Error).message
-      });
-      throw error;
-    }
+    const response = await client.apolloClinical.mutate({
+      mutation: GenerateCoverageOptions,
+      variables: {
+        pharmacyId,
+        prescriptions: prescriptions.map((prescription) => ({
+          id: prescription.id
+          // icd10codes: ['gotta get this']
+        }))
+      }
+    });
+    return response.data.generateCoverageOptions as CoverageOption[];
   };
 
   const tryCreatePrescription = async (
