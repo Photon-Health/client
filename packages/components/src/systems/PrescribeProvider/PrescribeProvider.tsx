@@ -18,10 +18,12 @@ import {
 import {
   CreatePrescription,
   CreatePrescriptionTemplate,
+  GenerateCoverageOptions,
+  GetPatientPreferredPharmacies,
   GetPrescription,
   GetTemplatesFromCatalogs,
   UpdatePrescriptionStates
-} from '../../fetch/queries';
+} from '../../fetch';
 import { triggerToast, useRecentOrders } from '../../index';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
 
@@ -29,15 +31,16 @@ export type PrescribeContextType = {
   // values
   prescriptionIds: Accessor<string[]>;
   isLoadingPrefills: Accessor<boolean>;
+  coverageOptions: Accessor<CoverageOption[]>;
 
   // actions
-  setEditingPrescription: (id: string) => void;
   deletePrescription: (id: string) => void;
   tryCreatePrescription: (
     prescriptionFormData: PrescriptionFormData,
     options?: TryCreatePrescriptionTemplateOptions
   ) => Promise<Prescription>;
   tryUpdatePrescriptionStates: (ids: string[], state: PrescriptionState) => Promise<boolean>;
+  setDidSelectOtherCoverageOption: (value: boolean) => void;
 };
 
 const PrescribeContext = createContext<PrescribeContextType>();
@@ -56,18 +59,19 @@ export type TemplateOverrides = {
 };
 
 export type PrescriptionFormData = {
+  id?: string;
   effectiveDate: string;
   treatment: {
     id: string;
     name: string;
   };
   dispenseAsWritten: boolean;
-  dispenseQuantity: number;
-  dispenseUnit: string;
-  daysSupply: number;
+  dispenseQuantity?: number;
+  dispenseUnit?: string;
+  daysSupply?: number;
   instructions: string;
   notes: string;
-  fillsAllowed: number;
+  fillsAllowed?: number;
   catalogId?: string;
   externalId?: string;
   diagnoseCodes: string[];
@@ -80,6 +84,7 @@ interface PrescribeProviderProps {
   prescriptionIdsPrefill: string[];
   patientId: string;
   enableCombineAndDuplicate: boolean;
+  enableCoverageCheck: boolean;
 }
 
 const transformPrescription = (prescription: PrescriptionFormData, patientId: string) => ({
@@ -100,6 +105,12 @@ const transformPrescription = (prescription: PrescriptionFormData, patientId: st
 export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const [isLoadingPrefills, setIsLoadingPrefills] = createSignal<boolean>(false);
   const [hasCreatedPrescriptions, setHasCreatedPrescriptions] = createSignal<boolean>(false);
+  const [coverageOptions, setCoverageOptions] = createSignal<CoverageOption[]>([]);
+  const [patientPreferredPharmacyId, setPatientPreferredPharmacyId] = createSignal<string | null>(
+    null
+  );
+  const [didSelectOtherCoverageOption, setDidSelectOtherCoverageOption] =
+    createSignal<boolean>(false);
 
   const client = usePhotonClient();
   const { draftPrescriptions, setDraftPrescriptions } = useDraftPrescriptions();
@@ -120,6 +131,33 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
       !hasCreatedPrescriptions()
     ) {
       createPrescriptionsFromIds();
+    }
+  });
+
+  createEffect(() => {
+    if (props.patientId) {
+      getPatientPreferredPharmacies(props.patientId).then((pharmacies) => {
+        if (pharmacies.length > 0) {
+          setPatientPreferredPharmacyId(pharmacies[0].id);
+        }
+      });
+    }
+  });
+
+  // if we have prescriptions, coverage check is enabled, and the patient has a preferred pharmacy,
+  // then we need to check the coverage of the prescriptions
+  createEffect(() => {
+    const pharmacyId = patientPreferredPharmacyId();
+    const prescriptions = draftPrescriptions();
+    if (
+      !didSelectOtherCoverageOption() && // after an alternate is chosen, stop fetching coverages for this patient
+      props.enableCoverageCheck &&
+      prescriptions.length > 0 &&
+      pharmacyId !== null
+    ) {
+      generateCoverageOptions(prescriptions, pharmacyId).then((generatedCoverageOptions) => {
+        setCoverageOptions(generatedCoverageOptions);
+      });
     }
   });
 
@@ -206,6 +244,49 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     setIsLoadingPrefills(false);
   }
 
+  const getPatientPreferredPharmacies = async (patientId: string) => {
+    try {
+      const response = await client.apollo.query({
+        query: GetPatientPreferredPharmacies,
+        variables: { id: patientId }
+      });
+      return response.data.patient.preferredPharmacies as PatientPreferredPharmacy[];
+    } catch (error) {
+      triggerToast({
+        status: 'error',
+        header: 'Error Looking Up Patient Pharmacy',
+        body: (error as Error).message
+      });
+      throw error;
+    }
+  };
+
+  const generateCoverageOptions = async (
+    prescriptions: Prescription[],
+    pharmacyId: string
+  ): Promise<CoverageOption[]> => {
+    try {
+      const res = await client.apolloClinical.mutate({
+        mutation: GenerateCoverageOptions,
+        variables: {
+          pharmacyId,
+          prescriptions: prescriptions.map((prescription) => ({
+            id: prescription.id
+            // icd10codes: ['gotta get this']
+          }))
+        }
+      });
+      return res.data.generateCoverageOptions as CoverageOption[];
+    } catch (error) {
+      triggerToast({
+        status: 'error',
+        header: 'Error Looking Up Coverage Option(s)',
+        body: (error as Error).message
+      });
+      throw error;
+    }
+  };
+
   const tryCreatePrescription = async (
     prescriptionFormData: PrescriptionFormData,
     options: TryCreatePrescriptionTemplateOptions = {}
@@ -289,7 +370,9 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
         mutation: CreatePrescription,
         variables: transformPrescription(prescriptionFormData, props.patientId)
       });
-      createdPrescription = res.data.createPrescription as Prescription;
+      const created = res.data.createPrescription as Prescription;
+      createdPrescription = created;
+      setDraftPrescriptions((prev) => [...prev, created]);
     } catch (error) {
       console.error('Mutation error:', error);
       triggerToast({
@@ -299,8 +382,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
       });
       throw error;
     }
-
-    setDraftPrescriptions((prev) => [...prev, createdPrescription]);
 
     if (options?.addToTemplates && options?.catalogId != null) {
       await createPrescriptionTemplateOnApi(
@@ -322,10 +403,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     });
 
     return createdPrescription;
-  };
-
-  const setEditingPrescription = (toEditId: string) => {
-    setDraftPrescriptions((prev) => prev.filter((rx) => rx.id !== toEditId));
   };
 
   const deletePrescription = (toDeleteId: string) => {
@@ -353,11 +430,12 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     // values
     prescriptionIds,
     isLoadingPrefills,
+    coverageOptions,
     // actions
     tryCreatePrescription,
     tryUpdatePrescriptionStates,
-    setEditingPrescription,
-    deletePrescription
+    deletePrescription,
+    setDidSelectOtherCoverageOption
   };
 
   return <PrescribeContext.Provider value={value}>{props.children}</PrescribeContext.Provider>;
@@ -386,4 +464,25 @@ export type TryCreatePrescriptionTemplateOptions = {
   addToTemplates?: boolean;
   templateName?: string;
   catalogId?: string;
+};
+
+export type PatientPreferredPharmacy = {
+  id: string;
+  name: string;
+};
+
+export type CoverageOption = {
+  daysSupply: number;
+  dispenseQuantity: number;
+  dispenseUnit: string;
+  id: string;
+  isAlternative: boolean;
+  paRequired: boolean;
+  prescriptionId: string;
+  price: number | null;
+  status: 'COVERED' | 'COVERED_WITH_RESTRICTIONS' | 'NOT_COVERED';
+  statusMessage: string;
+  treatment: { id: string; name: string };
+  alerts: Array<{ label: string; text: string }>;
+  pharmacy: { id: string; name: string };
 };
