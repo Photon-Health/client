@@ -7,10 +7,10 @@ export const MockPrescribeContext = createContext<PrescribeContextType>();
 
 export const mockPrescribeContextValues = () => {
   return {
-    setEditingPrescription: vi.fn(),
     deletePrescription: vi.fn(),
     tryCreatePrescription: vi.fn(),
-    tryUpdatePrescriptionStates: vi.fn()
+    tryUpdatePrescriptionStates: vi.fn(),
+    setDidSelectOtherCoverageOption: vi.fn()
   };
 };
 
@@ -27,13 +27,14 @@ export function MockPrescribeProvider(props: MockPrescribeProviderProps) {
     // mock values
     prescriptionIds: () => [],
     isLoadingPrefills: () => false,
+    coverageOptions: () => [],
     routingConstraints: () => [],
 
-    // actions
-    setEditingPrescription: mocks.setEditingPrescription,
+    // mock actions
     deletePrescription: mocks.deletePrescription,
     tryCreatePrescription: mocks.tryCreatePrescription,
-    tryUpdatePrescriptionStates: mocks.tryUpdatePrescriptionStates
+    tryUpdatePrescriptionStates: mocks.tryUpdatePrescriptionStates,
+    setDidSelectOtherCoverageOption: mocks.setDidSelectOtherCoverageOption
   };
 
   return (

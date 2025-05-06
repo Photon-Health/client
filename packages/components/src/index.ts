@@ -5,8 +5,7 @@ import DoseCalculator from './systems/DoseCalculator';
 import Card from './particles/Card';
 import ComboBox from './particles/ComboBox';
 import {
-  DraftPrescription,
-  DraftPrescriptions,
+  DraftPrescriptionList,
   DraftPrescriptionsProvider,
   useDraftPrescriptions
 } from './systems/DraftPrescriptions';
@@ -45,6 +44,7 @@ import { PhotonClientStore } from './store';
 export { usePhoton, PhotonClientStore, PhotonContext };
 
 import {
+  CoverageOption,
   PrescribeProvider,
   usePrescribe,
   type PrescriptionFormData,
@@ -60,7 +60,7 @@ export {
   ComboBox,
   Dialog,
   DoseCalculator,
-  DraftPrescriptions,
+  DraftPrescriptionList,
   DraftPrescriptionsProvider,
   useDraftPrescriptions,
   Icon,
@@ -94,6 +94,6 @@ export type {
   ScreeningAlertType,
   RoutingConstraint,
   TemplateOverrides,
-  DraftPrescription,
-  PrescriptionFormData
+  PrescriptionFormData,
+  CoverageOption
 };
