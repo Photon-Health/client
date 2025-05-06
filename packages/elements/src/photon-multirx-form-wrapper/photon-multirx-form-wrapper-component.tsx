@@ -37,6 +37,7 @@ const Component = (props: {
   enableLocalPickup?: boolean;
   enableSendToPatient?: boolean;
   enableCombineAndDuplicate?: boolean;
+  enableCoverageCheck?: boolean;
   mailOrderIds?: string;
   enableOrder?: boolean;
   toastBuffer?: number;
@@ -244,6 +245,7 @@ const Component = (props: {
               enable-send-to-patient={props.enableSendToPatient}
               enable-combine-and-duplicate={props.enableCombineAndDuplicate}
               enable-delivery-pharmacies={props.enableDeliveryPharmacies}
+              enable-coverage-check={props.enableCoverageCheck}
               pharmacy-id={props.pharmacyId}
               mail-order-ids={props.mailOrderIds}
               trigger-submit={triggerSubmit()}
@@ -307,6 +309,7 @@ customElement(
     enableMedHistoryLinks: false,
     enableMedHistoryRefillButton: false,
     enableCombineAndDuplicate: false,
+    enableCoverageCheck: false,
     mailOrderIds: undefined,
     enableOrder: false,
     toastBuffer: 0,

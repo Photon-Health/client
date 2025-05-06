@@ -184,6 +184,7 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
       <div ref={inputContainer! as HTMLDivElement}>
         <Input
           {...restInput}
+          aria-label={props.label}
           value={selectedLocalValue() || ''}
           onClick={() => setOpen(!state.open)}
           onInput={(e) => {
@@ -225,13 +226,13 @@ function ComboBoxWrapper(props: ComboBoxProps) {
     if (props.value) {
       setSelected(props.value);
     }
-    if (props.setSelected) {
+    if (props.setSelected && props.value !== state.selected) {
       props.setSelected(state.selected);
     }
   });
 
   createEffect(() => {
-    if (state.selected) {
+    if (state.selected && props.value !== state.selected) {
       props.setSelected?.(state.selected);
     }
   });

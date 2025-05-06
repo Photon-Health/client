@@ -66,6 +66,7 @@ export type PrescribeProps = {
   enableMedHistoryRefillButton: boolean;
   enableCombineAndDuplicate: boolean;
   enableDeliveryPharmacies: boolean;
+  enableCoverageCheck: boolean;
   mailOrderIds?: string;
   pharmacyId?: string;
   loading: boolean;
@@ -601,9 +602,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   </div>
                 </Show>
                 <DraftPrescriptionCard
-                  templateIds={props.templateIds?.split(',').map((id) => id.trim()) || []}
-                  templateOverrides={props.templateOverrides || {}}
-                  prescriptionIds={props.prescriptionIds?.split(',').map((id) => id.trim()) || []}
                   prescriptionRef={prescriptionRef}
                   actions={props.formActions}
                   store={props.formStore}

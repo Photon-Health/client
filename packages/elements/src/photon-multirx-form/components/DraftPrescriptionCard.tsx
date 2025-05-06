@@ -1,16 +1,19 @@
 import { createSignal, Ref } from 'solid-js';
-import { DraftPrescriptions, useDraftPrescriptions } from '@photonhealth/components';
-import { Card, Text, usePrescribe } from '@photonhealth/components';
+import {
+  Card,
+  DraftPrescriptionList,
+  PrescriptionFormData,
+  ScreeningAlertType,
+  Text,
+  useDraftPrescriptions,
+  usePrescribe
+} from '@photonhealth/components';
 import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { PhotonTooltip } from '../../photon-tooltip';
-import { ScreeningAlertType } from '@photonhealth/components';
 import { Prescription } from '@photonhealth/sdk/dist/types';
 
 export const DraftPrescriptionCard = (props: {
-  templateIds: string[];
-  templateOverrides: any;
-  prescriptionIds: string[];
   prescriptionRef: HTMLDivElement | undefined;
   actions: Record<string, (...args: any) => any>;
   store: Record<string, any>;
@@ -22,9 +25,10 @@ export const DraftPrescriptionCard = (props: {
   let ref: Ref<any> | undefined;
   const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = createSignal<boolean>(false);
-  const [editDraft, setEditDraft] = createSignal<any>(undefined);
+  const [editDialogConfirm, setEditDialogConfirm] = createSignal<(() => void) | undefined>();
+  const [editDraft, setEditDraft] = createSignal<PrescriptionFormData | undefined>(undefined);
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
-  const { prescriptionIds, setEditingPrescription, deletePrescription } = usePrescribe();
+  const { prescriptionIds, deletePrescription, setDidSelectOtherCoverageOption } = usePrescribe();
   const { draftPrescriptions } = useDraftPrescriptions();
 
   const dispatchPrescriptionDraftDeleted = (prescription?: Prescription) => {
@@ -39,15 +43,18 @@ export const DraftPrescriptionCard = (props: {
   };
 
   const editPrescription = () => {
-    if (editDraft().treatment) {
-      repopulateForm(props.actions, editDraft());
+    const formData = editDraft();
+    if (formData && formData.treatment) {
+      repopulateForm(props.actions, formData);
 
       props.actions.updateFormValue({
         key: 'catalogId',
-        value: editDraft().catalogId
+        value: formData.catalogId
       });
 
-      setEditingPrescription(editDraft().id);
+      if (formData.id) {
+        deletePrescription(formData.id);
+      }
 
       window.scrollTo({
         behavior: 'smooth',
@@ -61,25 +68,38 @@ export const DraftPrescriptionCard = (props: {
     }
   };
 
-  const checkEditPrescription = (draft: Prescription) => {
+  const checkEditPrescription = (draft: PrescriptionFormData, onConfirm?: () => undefined) => {
     setEditDraft(draft);
 
     if (!props.store['treatment'].value) {
       props.setIsEditing(true);
       editPrescription();
+      onConfirm?.();
     } else {
       setEditDialogOpen(true);
+      setEditDialogConfirm(onConfirm);
     }
+  };
+
+  const handleSwapToOtherPrescription = (otherOptionDraftRx: PrescriptionFormData) => {
+    checkEditPrescription(otherOptionDraftRx, () => {
+      // setting this to throttle further calls to generateCoverageOptions after a swap is made
+      setDidSelectOtherCoverageOption(true);
+    });
   };
 
   const handleEditConfirm = () => {
     editPrescription();
     setEditDialogOpen(false);
     setEditDraft(undefined);
+
+    editDialogConfirm()?.();
+    setEditDialogConfirm(undefined);
   };
   const handleEditCancel = () => {
     setEditDialogOpen(false);
     setEditDraft(undefined);
+    setEditDialogConfirm(undefined);
   };
   const handleDeleteConfirm = () => {
     const deletedId = deleteDraftId();
@@ -145,7 +165,7 @@ export const DraftPrescriptionCard = (props: {
             tip="Each prescription will include the prescriber’s digital signature and the date it was written when the order is sent to the pharmacy."
           />
         </div>
-        <DraftPrescriptions
+        <DraftPrescriptionList
           handleDelete={(draftId: string) => {
             setDeleteDialogOpen(true);
             setDeleteDraftId(draftId);
@@ -153,6 +173,7 @@ export const DraftPrescriptionCard = (props: {
           handleEdit={(draft) => {
             checkEditPrescription(draft);
           }}
+          handleSwapToOtherPrescription={handleSwapToOtherPrescription}
           screeningAlerts={props.screeningAlerts}
           enableOrder={props.enableOrder}
         />
