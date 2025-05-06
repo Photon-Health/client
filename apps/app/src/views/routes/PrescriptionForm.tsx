@@ -1,7 +1,7 @@
 import { datadogRum } from '@datadog/browser-rum';
 import { usePhoton } from '@photonhealth/react';
 import { useQuery } from '@apollo/client';
-import { MutableRefObject, useEffect, useRef } from 'react';
+import { MutableRefObject, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { graphql } from 'apps/app/src/gql';
 import { getOrgMailOrderPharms } from '@client/settings';
@@ -125,6 +125,18 @@ export const PrescriptionForm = () => {
     }
   }, [ref.current, patientId]);
 
+  const enableCoverageCheck = useMemo(() => {
+    if (user) {
+      // For initial RTBC release, only enabling coverage check in Clinical App for Photon employees in these orgs
+      // Our first customers will enable RTBC via their elements config
+      const bosonPhotonOrg = 'org_KzSVZBQixLRkqj5d'; // Test Organization 11
+      const neutronPhotonOrg = 'org_kVS7AP4iuItESdMA'; // Photon Test Org
+      return [bosonPhotonOrg, neutronPhotonOrg].includes(user.org_id);
+    }
+
+    return false;
+  }, [user]);
+
   //  TODO: remove enable-new-medication-search after discovery
   return (
     <div
@@ -154,7 +166,7 @@ export const PrescriptionForm = () => {
           enable-delivery-pharmacies={enableDeliveryPharmacies}
           enable-send-to-patient={enablePatientRouting}
           enable-combine-and-duplicate={enableDuplicateRxWarnings}
-          enable-coverage-check={false}
+          enable-coverage-check={enableCoverageCheck}
           enable-new-medication-search={true}
           mail-order-ids={mailOrderProviders?.join(',') ?? ''}
           toast-buffer={70}
