@@ -28,6 +28,7 @@ export function MockPrescribeProvider(props: MockPrescribeProviderProps) {
     prescriptionIds: () => [],
     isLoadingPrefills: () => false,
     coverageOptions: () => [],
+    routingConstraints: () => [],
     selectedCoverageOption: () => undefined,
     // mock actions
     deletePrescription: mocks.deletePrescription,

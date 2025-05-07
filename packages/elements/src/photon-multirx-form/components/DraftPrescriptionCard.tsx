@@ -5,6 +5,7 @@ import {
   DraftPrescriptionList,
   PrescriptionFormData,
   ScreeningAlertType,
+  RoutingConstraint,
   Text,
   useDraftPrescriptions,
   usePrescribe
@@ -22,6 +23,7 @@ export const DraftPrescriptionCard = (props: {
   setIsEditing: (isEditing: boolean) => void;
   handleDraftPrescriptionsChange: () => void;
   screeningAlerts: ScreeningAlertType[];
+  routingConstraints: RoutingConstraint[];
   enableOrder: boolean;
 }) => {
   let ref: Ref<any> | undefined;
@@ -176,6 +178,7 @@ export const DraftPrescriptionCard = (props: {
           }}
           handleSwapToOtherPrescription={handleSwapToOtherPrescription}
           screeningAlerts={props.screeningAlerts}
+          routingConstraints={props.routingConstraints}
           enableOrder={props.enableOrder}
         />
       </Card>

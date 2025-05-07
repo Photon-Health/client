@@ -26,6 +26,7 @@ import {
 } from '../../fetch';
 import { triggerToast, useRecentOrders } from '../../index';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
+import { getRoutingConstraint, RoutingConstraint } from '../RoutingConstraints';
 import { createStore } from 'solid-js/store';
 
 // The order form data will consist of, at least, the list of selected prescription IDs and pharmacy ID.
@@ -40,6 +41,7 @@ export type PrescribeContextType = {
   prescriptionIds: Accessor<string[]>;
   isLoadingPrefills: Accessor<boolean>;
   coverageOptions: Accessor<CoverageOption[]>;
+  routingConstraints: Accessor<RoutingConstraint[]>;
   orderFormData: PrescribeOrderFormData;
   selectedCoverageOption: Accessor<CoverageOption | undefined>;
 
@@ -138,6 +140,12 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const prescriptionIds = createMemo(() =>
     draftPrescriptions().map((prescription) => prescription.id)
   );
+
+  const routingConstraints = createMemo((): RoutingConstraint[] => {
+    return draftPrescriptions().map((prescription: Prescription) =>
+      getRoutingConstraint(prescription)
+    );
+  });
 
   // Prefill new prescriptions based on templateIds or prescriptionIds when we get a patientId
   createEffect(() => {
@@ -447,6 +455,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     prescriptionIds,
     isLoadingPrefills,
     coverageOptions,
+    routingConstraints,
     orderFormData,
     selectedCoverageOption,
 

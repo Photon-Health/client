@@ -108,7 +108,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
 
   const { draftPrescriptions } = useDraftPrescriptions();
-  const { tryUpdatePrescriptionStates, orderFormData } = usePrescribe();
+  const { routingConstraints, tryUpdatePrescriptionStates, orderFormData } = usePrescribe();
 
   const prescriptionIds = createMemo(() =>
     draftPrescriptions().map((prescription) => prescription.id)
@@ -219,6 +219,24 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     ref?.dispatchEvent(event);
   };
 
+  const removeDuplicateTreatments = (
+    prescriptions: ScreenablePrescription[]
+  ): ScreenablePrescription[] => {
+    // let's remove any duplicate treatment ids
+    // as there's no point to sending up multiple
+    // of the same medication
+    const seenTreatmentIds = new Set<string>();
+    return prescriptions.filter((entity) => {
+      const treatmentId = entity.treatment.id;
+      if (seenTreatmentIds.has(treatmentId)) {
+        return false;
+      } else {
+        seenTreatmentIds.add(treatmentId);
+        return true;
+      }
+    });
+  };
+
   // let's start screening all of the prescriptions we're drafting
   const screenDraftedPrescriptions = async () => {
     // start out by getting the treatment id of the prescription we're drafting now -
@@ -237,20 +255,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         treatment: { id: inProgressDraftedPrescriptionTreatmentId }
       });
     }
-
-    // let's remove any duplicate treatment ids
-    // as there's no point to sending up multiple
-    // of the same medication
-    const seenTreatmentIds = new Set<string>();
-    const dedupedSanitizedPrescriptions = draftedPrescriptions.filter((entity) => {
-      const treatmentId = entity.treatment.id;
-      if (seenTreatmentIds.has(treatmentId)) {
-        return false;
-      } else {
-        seenTreatmentIds.add(treatmentId);
-        return true;
-      }
-    });
+    const dedupedSanitizedPrescriptions = removeDuplicateTreatments(draftedPrescriptions);
 
     // make the screening request
     const { data } = await clinicalClient.query({
@@ -617,6 +622,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     screenDraftedPrescriptions();
                   }}
                   screeningAlerts={screeningAlerts()}
+                  routingConstraints={routingConstraints()}
                   enableOrder={props.enableOrder}
                 />
                 <Show when={props.enableOrder && !props.pharmacyId}>
