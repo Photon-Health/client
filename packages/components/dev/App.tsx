@@ -103,6 +103,7 @@ const App = () => {
                 }
                 handleSwapToOtherPrescription={(_) => _}
                 screeningAlerts={[]}
+                routingConstraints={[]}
               />
             </PrescribeProvider>
           </RecentOrders>

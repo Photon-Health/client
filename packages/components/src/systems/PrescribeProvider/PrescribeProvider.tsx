@@ -26,12 +26,14 @@ import {
 } from '../../fetch';
 import { triggerToast, useRecentOrders } from '../../index';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
+import { RoutingConstraint, getRoutingConstraint } from '../RoutingConstraints';
 
 export type PrescribeContextType = {
   // values
   prescriptionIds: Accessor<string[]>;
   isLoadingPrefills: Accessor<boolean>;
   coverageOptions: Accessor<CoverageOption[]>;
+  routingConstraints: Accessor<RoutingConstraint[]>;
 
   // actions
   deletePrescription: (id: string) => void;
@@ -119,6 +121,12 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const prescriptionIds = createMemo(() =>
     draftPrescriptions().map((prescription) => prescription.id)
   );
+
+  const routingConstraints = createMemo((): RoutingConstraint[] => {
+    return draftPrescriptions().map((prescription: Prescription) =>
+      getRoutingConstraint(prescription)
+    );
+  });
 
   // Prefill new prescriptions based on templateIds or prescriptionIds when we get a patientId
   createEffect(() => {
@@ -422,6 +430,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     prescriptionIds,
     isLoadingPrefills,
     coverageOptions,
+    routingConstraints,
     // actions
     tryCreatePrescription,
     tryUpdatePrescriptionStates,

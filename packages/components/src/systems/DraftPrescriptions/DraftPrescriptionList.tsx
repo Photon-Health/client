@@ -1,7 +1,8 @@
-import { For, Show } from 'solid-js';
+import { createMemo, For, Show } from 'solid-js';
 import Banner from '../../particles/Banner';
 import Text from '../../particles/Text';
 import { ScreeningAlertType } from '../ScreeningAlerts';
+import { RoutingConstraint, getPrescriptionRoutingConstraints } from '../RoutingConstraints';
 import { useDraftPrescriptions } from './DraftPrescriptionsProvider';
 import { PrescriptionFormData, usePrescribe } from '../PrescribeProvider';
 import { DraftPrescriptionLayout, DraftPrescriptionListItem } from './DraftPrescriptionListItem';
@@ -13,12 +14,16 @@ interface DraftPrescriptionsProps {
   handleSwapToOtherPrescription: (alternative: PrescriptionFormData) => void;
   error?: string;
   screeningAlerts: ScreeningAlertType[];
+  routingConstraints: RoutingConstraint[];
   enableOrder?: boolean;
 }
 
 export function DraftPrescriptionList(props: DraftPrescriptionsProps) {
   const { draftPrescriptions } = useDraftPrescriptions();
   const { isLoadingPrefills, prescriptionIds, coverageOptions } = usePrescribe();
+  const prescriptionRoutingConstraints = createMemo((): Map<string, RoutingConstraint> => {
+    return getPrescriptionRoutingConstraints(props.routingConstraints);
+  });
 
   return (
     <div class="space-y-3">
@@ -56,6 +61,7 @@ export function DraftPrescriptionList(props: DraftPrescriptionsProps) {
                 </Show>
                 <DraftPrescriptionListItem
                   screeningAlerts={props.screeningAlerts}
+                  routingConstraint={prescriptionRoutingConstraints().get(draftPrescription.id)}
                   draft={draftPrescription}
                   coverageOptions={coverageOptions().filter(
                     (c) => c.prescriptionId === draftPrescription.id
