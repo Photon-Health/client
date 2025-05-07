@@ -28,11 +28,14 @@ export function MockPrescribeProvider(props: MockPrescribeProviderProps) {
     prescriptionIds: () => [],
     isLoadingPrefills: () => false,
     coverageOptions: () => [],
+    selectedCoverageOption: () => undefined,
     // mock actions
     deletePrescription: mocks.deletePrescription,
     tryCreatePrescription: mocks.tryCreatePrescription,
     tryUpdatePrescriptionStates: mocks.tryUpdatePrescriptionStates,
-    setDidSelectOtherCoverageOption: mocks.setDidSelectOtherCoverageOption
+    selectOtherCoverageOption: mocks.setDidSelectOtherCoverageOption,
+    orderFormData: { pharmacyId: 'test-pharmacy-id' },
+    setOrderFormData: () => undefined
   };
 
   return (
