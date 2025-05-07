@@ -28,9 +28,9 @@ import { triggerToast, useRecentOrders } from '../../index';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
 import { createStore } from 'solid-js/store';
 
-// The order form data consists will consist of the list of the selected prescriptions and pharmacy.
-// The prescription form (todo) will consist of a single prescription's data during user input
-// Multiple prescription "sub" forms can be opened/completed within a single order form
+// The order form data will consist of, at least, the list of selected prescription IDs and pharmacy ID.
+// The prescription form data (todo) will consist of a single prescription's data during user input
+// Note: Multiple prescription "sub" forms can be opened/completed within a single order form
 interface PrescribeOrderFormData {
   pharmacyId?: string;
 }
