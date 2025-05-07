@@ -26,12 +26,22 @@ import {
 } from '../../fetch';
 import { triggerToast, useRecentOrders } from '../../index';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
+import { createStore } from 'solid-js/store';
+
+// The order form data consists will consist of the list of the selected prescriptions and pharmacy.
+// The prescription form (todo) will consist of a single prescription's data during user input
+// Multiple prescription "sub" forms can be opened/completed within a single order form
+interface PrescribeOrderFormData {
+  pharmacyId?: string;
+}
 
 export type PrescribeContextType = {
   // values
   prescriptionIds: Accessor<string[]>;
   isLoadingPrefills: Accessor<boolean>;
   coverageOptions: Accessor<CoverageOption[]>;
+  orderFormData: PrescribeOrderFormData;
+  selectedCoverageOption: Accessor<CoverageOption | undefined>;
 
   // actions
   deletePrescription: (id: string) => void;
@@ -40,7 +50,11 @@ export type PrescribeContextType = {
     options?: TryCreatePrescriptionTemplateOptions
   ) => Promise<Prescription>;
   tryUpdatePrescriptionStates: (ids: string[], state: PrescriptionState) => Promise<boolean>;
-  setDidSelectOtherCoverageOption: (value: boolean) => void;
+  selectOtherCoverageOption: (value: CoverageOption) => void;
+  setOrderFormData: <K extends keyof PrescribeOrderFormData>(
+    key: K,
+    value: PrescribeOrderFormData[K]
+  ) => void;
 };
 
 const PrescribeContext = createContext<PrescribeContextType>();
@@ -111,6 +125,11 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   );
   const [didSelectOtherCoverageOption, setDidSelectOtherCoverageOption] =
     createSignal<boolean>(false);
+  const [selectedCoverageOption, setSelectedCoverageOption] = createSignal<
+    CoverageOption | undefined
+  >();
+
+  const [orderFormData, setOrderFormData] = createStore<PrescribeOrderFormData>();
 
   const client = usePhotonClient();
   const { draftPrescriptions, setDraftPrescriptions } = useDraftPrescriptions();
@@ -417,16 +436,26 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     return res;
   };
 
+  const selectOtherCoverageOption = (value: CoverageOption) => {
+    setOrderFormData('pharmacyId', value.pharmacy.id);
+    setSelectedCoverageOption(value);
+    setDidSelectOtherCoverageOption(true);
+  };
+
   const value = {
     // values
     prescriptionIds,
     isLoadingPrefills,
     coverageOptions,
+    orderFormData,
+    selectedCoverageOption,
+
     // actions
     tryCreatePrescription,
     tryUpdatePrescriptionStates,
     deletePrescription,
-    setDidSelectOtherCoverageOption
+    selectOtherCoverageOption,
+    setOrderFormData
   };
 
   return <PrescribeContext.Provider value={value}>{props.children}</PrescribeContext.Provider>;

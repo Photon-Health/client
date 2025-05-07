@@ -3,14 +3,14 @@ import Banner from '../../particles/Banner';
 import Text from '../../particles/Text';
 import { ScreeningAlertType } from '../ScreeningAlerts';
 import { useDraftPrescriptions } from './DraftPrescriptionsProvider';
-import { PrescriptionFormData, usePrescribe } from '../PrescribeProvider';
+import { CoverageOption, PrescriptionFormData, usePrescribe } from '../PrescribeProvider';
 import { DraftPrescriptionLayout, DraftPrescriptionListItem } from './DraftPrescriptionListItem';
 import Divider from '../../particles/Divider';
 
 interface DraftPrescriptionsProps {
   handleEdit?: (prescription: PrescriptionFormData) => void;
   handleDelete?: (prescriptionId: string) => void;
-  handleSwapToOtherPrescription: (alternative: PrescriptionFormData) => void;
+  handleSwapToOtherPrescription: (coverageOption: CoverageOption) => void;
   error?: string;
   screeningAlerts: ScreeningAlertType[];
   enableOrder?: boolean;

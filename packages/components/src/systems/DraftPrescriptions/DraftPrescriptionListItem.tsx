@@ -14,7 +14,7 @@ interface DraftPrescriptionListItemProps {
   coverageOptions: CoverageOption[];
   handleEdit?: (prescription: PrescriptionFormData) => void;
   handleDelete?: (prescriptionId: string) => void;
-  handleSwapToOtherPrescription: (alternative: PrescriptionFormData) => void;
+  handleSwapToOtherPrescription: (coverageOption: CoverageOption) => void;
   screeningAlerts: ScreeningAlertType[];
 }
 
