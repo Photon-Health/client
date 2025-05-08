@@ -1,6 +1,7 @@
 import { createSignal, Ref } from 'solid-js';
 import {
   Card,
+  CoverageOption,
   DraftPrescriptionList,
   PrescriptionFormData,
   ScreeningAlertType,
@@ -13,6 +14,7 @@ import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { PhotonTooltip } from '../../photon-tooltip';
 import { Prescription } from '@photonhealth/sdk/dist/types';
+import { format } from 'date-fns';
 
 export const DraftPrescriptionCard = (props: {
   prescriptionRef: HTMLDivElement | undefined;
@@ -30,7 +32,7 @@ export const DraftPrescriptionCard = (props: {
   const [editDialogConfirm, setEditDialogConfirm] = createSignal<(() => void) | undefined>();
   const [editDraft, setEditDraft] = createSignal<PrescriptionFormData | undefined>(undefined);
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
-  const { prescriptionIds, deletePrescription, setDidSelectOtherCoverageOption } = usePrescribe();
+  const { prescriptionIds, deletePrescription, selectOtherCoverageOption } = usePrescribe();
   const { draftPrescriptions } = useDraftPrescriptions();
 
   const dispatchPrescriptionDraftDeleted = (prescription?: Prescription) => {
@@ -83,10 +85,9 @@ export const DraftPrescriptionCard = (props: {
     }
   };
 
-  const handleSwapToOtherPrescription = (otherOptionDraftRx: PrescriptionFormData) => {
-    checkEditPrescription(otherOptionDraftRx, () => {
-      // setting this to throttle further calls to generateCoverageOptions after a swap is made
-      setDidSelectOtherCoverageOption(true);
+  const handleSwapToOtherPrescription = (coverage: CoverageOption) => {
+    checkEditPrescription(toFormData(coverage), () => {
+      selectOtherCoverageOption(coverage);
     });
   };
 
@@ -184,3 +185,30 @@ export const DraftPrescriptionCard = (props: {
     </div>
   );
 };
+
+// this should probably live in PrescribeProvider
+// but it'll be easier to migrate it there after we migrate the Edit Prescription
+// flow there
+function toFormData(coverageOption: CoverageOption): PrescriptionFormData {
+  return {
+    // re-using the prescriptionId (via coverageOption.prescriptionId) of the original Prescription
+    // so that the edit flow will remove it from the list of prescriptions
+    id: coverageOption.prescriptionId,
+
+    effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
+    dispenseAsWritten: false,
+    dispenseQuantity: coverageOption.dispenseQuantity,
+    dispenseUnit: coverageOption.dispenseUnit,
+    daysSupply: coverageOption.daysSupply,
+    instructions: '',
+    notes: '',
+    fillsAllowed: undefined,
+    diagnoseCodes: [],
+    externalId: undefined,
+    catalogId: undefined,
+    treatment: {
+      id: coverageOption.treatment.id,
+      name: coverageOption.treatment.name
+    }
+  };
+}
