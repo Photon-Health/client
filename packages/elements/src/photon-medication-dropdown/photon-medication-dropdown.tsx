@@ -30,7 +30,7 @@ import tailwind from '../tailwind.css?inline';
 import styles from './style.css?inline';
 
 // Types
-import { Treatment, PrescriptionTemplate, TreatmentOption } from '@photonhealth/sdk/dist/types';
+import { PrescriptionTemplate, Treatment, TreatmentOption } from '@photonhealth/sdk/dist/types';
 
 //Virtual List
 import { createVirtualizer, VirtualItem } from '@tanstack/solid-virtual';
@@ -167,7 +167,6 @@ export const PhotonMedicationDropdown = <T extends { id: string }>(props: {
     if (props.selectedData) {
       // @ts-ignore
       setSelected(props.selectedData);
-      dispatchSelect(props.selectedData);
     }
     if (props.selectedData === undefined) {
       setSelected(undefined);

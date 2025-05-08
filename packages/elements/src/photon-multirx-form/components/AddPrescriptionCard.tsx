@@ -21,7 +21,7 @@ import '@shoelace-style/shoelace/dist/components/icon/icon';
 import '@shoelace-style/shoelace/dist/components/button/button';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLFormattedError } from 'graphql';
-import { createSignal, onMount, Show } from 'solid-js';
+import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
 import { TryCreatePrescriptionTemplateOptions } from '@photonhealth/components/src/systems/PrescribeProvider';
@@ -173,6 +173,12 @@ export const AddPrescriptionCard = (props: {
 
     setSearchText('');
   };
+
+  createEffect(() => {
+    if (props.store.treatment?.value && searchText().length === 0) {
+      setSearchText(props.store.treatment.value.name);
+    }
+  });
 
   return (
     <div ref={ref}>
