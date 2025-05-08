@@ -1,13 +1,12 @@
-import { CoverageOption, PrescriptionFormData } from '../../PrescribeProvider';
+import { CoverageOption } from '../../PrescribeProvider';
 import { For } from 'solid-js';
 import { CoverageOptionSummary } from './CoverageOptionSummary';
 import Button from '../../../particles/Button';
 import Card from '../../../particles/Card';
-import { format } from 'date-fns';
 
 export type OtherCoverageOptionsListProps = {
   coverageOptions: CoverageOption[];
-  handleSwapToOtherPrescription: (other: PrescriptionFormData) => void;
+  handleSwapToOtherPrescription: (coverageOption: CoverageOption) => void;
 };
 
 export function OtherCoverageOptionsList(props: OtherCoverageOptionsListProps) {
@@ -28,12 +27,12 @@ export function OtherCoverageOptionsList(props: OtherCoverageOptionsListProps) {
 
 export type OtherCoverageOptionListItemProps = {
   coverageOption: CoverageOption;
-  handleSwapToOtherPrescription: (alternative: PrescriptionFormData) => void;
+  handleSwapToOtherPrescription: (coverageOption: CoverageOption) => void;
 };
 
 export function OtherCoverageOptionListItem(props: OtherCoverageOptionListItemProps) {
   const handleSelectOtherOptionClick = async () => {
-    props.handleSwapToOtherPrescription(toFormData(props.coverageOption));
+    props.handleSwapToOtherPrescription(props.coverageOption);
   };
 
   return (
@@ -53,28 +52,4 @@ export function OtherCoverageOptionListItem(props: OtherCoverageOptionListItemPr
       </div>
     </Card>
   );
-}
-
-function toFormData(coverageOption: CoverageOption): PrescriptionFormData {
-  return {
-    // re-using the prescriptionId (via coverageOption.prescriptionId) of the original Prescription
-    // so that the edit flow will remove it from the list of prescriptions
-    id: coverageOption.prescriptionId,
-
-    effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
-    dispenseAsWritten: false,
-    dispenseQuantity: coverageOption.dispenseQuantity,
-    dispenseUnit: coverageOption.dispenseUnit,
-    daysSupply: coverageOption.daysSupply,
-    instructions: '',
-    notes: '',
-    fillsAllowed: undefined,
-    diagnoseCodes: [],
-    externalId: undefined,
-    catalogId: undefined,
-    treatment: {
-      id: coverageOption.treatment.id,
-      name: coverageOption.treatment.name
-    }
-  };
 }
