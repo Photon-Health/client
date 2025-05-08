@@ -66,6 +66,7 @@ export type PrescribeProps = {
   enableMedHistoryRefillButton: boolean;
   enableCombineAndDuplicate: boolean;
   enableDeliveryPharmacies: boolean;
+  enableCoverageCheck: boolean;
   mailOrderIds?: string;
   pharmacyId?: string;
   loading: boolean;
@@ -107,7 +108,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
 
   const { draftPrescriptions } = useDraftPrescriptions();
-  const { tryUpdatePrescriptionStates } = usePrescribe();
+  const { routingConstraints, tryUpdatePrescriptionStates, orderFormData } = usePrescribe();
 
   const prescriptionIds = createMemo(() =>
     draftPrescriptions().map((prescription) => prescription.id)
@@ -218,6 +219,24 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     ref?.dispatchEvent(event);
   };
 
+  const removeDuplicateTreatments = (
+    prescriptions: ScreenablePrescription[]
+  ): ScreenablePrescription[] => {
+    // let's remove any duplicate treatment ids
+    // as there's no point to sending up multiple
+    // of the same medication
+    const seenTreatmentIds = new Set<string>();
+    return prescriptions.filter((entity) => {
+      const treatmentId = entity.treatment.id;
+      if (seenTreatmentIds.has(treatmentId)) {
+        return false;
+      } else {
+        seenTreatmentIds.add(treatmentId);
+        return true;
+      }
+    });
+  };
+
   // let's start screening all of the prescriptions we're drafting
   const screenDraftedPrescriptions = async () => {
     // start out by getting the treatment id of the prescription we're drafting now -
@@ -236,20 +255,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         treatment: { id: inProgressDraftedPrescriptionTreatmentId }
       });
     }
-
-    // let's remove any duplicate treatment ids
-    // as there's no point to sending up multiple
-    // of the same medication
-    const seenTreatmentIds = new Set<string>();
-    const dedupedSanitizedPrescriptions = draftedPrescriptions.filter((entity) => {
-      const treatmentId = entity.treatment.id;
-      if (seenTreatmentIds.has(treatmentId)) {
-        return false;
-      } else {
-        seenTreatmentIds.add(treatmentId);
-        return true;
-      }
-    });
+    const dedupedSanitizedPrescriptions = removeDuplicateTreatments(draftedPrescriptions);
 
     // make the screening request
     const { data } = await clinicalClient.query({
@@ -327,7 +333,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       });
     }
 
-    const keys = enableOrder ? ['patient', 'pharmacy', 'address'] : ['patient'];
+    const keys = enableOrder ? ['patient', 'address'] : ['patient'];
     props.formActions.validate(keys);
     const errors = props.formActions.getErrors(keys);
     if (errors.length === 0) {
@@ -369,7 +375,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     try {
       if (
         props.formStore.updatePreferredPharmacy?.value &&
-        props.formStore.pharmacy?.value &&
+        orderFormData.pharmacyId &&
         props.formStore.fulfillmentType?.value === 'PICK_UP'
       ) {
         const patient = props.formStore.patient?.value;
@@ -378,7 +384,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           removePatientPreferredPharmacyMutation({
             variables: {
               patientId: patient.id,
-              pharmacyId: patient?.preferredPharmacies?.[0]?.id
+              pharmacyId: patient.preferredPharmacies[0].id
             },
             awaitRefetchQueries: false
           });
@@ -387,17 +393,24 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         updatePatientMutation({
           variables: {
             id: patient.id,
-            preferredPharmacies: [props.formStore.pharmacy?.value]
+            preferredPharmacies: [orderFormData.pharmacyId]
           },
           awaitRefetchQueries: false
         });
+      }
+
+      // default to pharmacy passed in by customer using elements embed
+      let pharmacyId = props.pharmacyId;
+      if (orderFormData.pharmacyId) {
+        // use selected pharmacy if available
+        pharmacyId = orderFormData.pharmacyId;
       }
 
       const { data: orderData, errors } = await orderMutation({
         variables: {
           ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
           patientId: props.formStore.patient?.value.id,
-          pharmacyId: props.pharmacyId ?? (props.formStore.pharmacy?.value || ''),
+          pharmacyId,
           fulfillmentType: props.formStore.fulfillmentType?.value || '',
           address: formattedAddress(),
           fills: prescriptionIds().map((id) => ({
@@ -601,9 +614,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   </div>
                 </Show>
                 <DraftPrescriptionCard
-                  templateIds={props.templateIds?.split(',').map((id) => id.trim()) || []}
-                  templateOverrides={props.templateOverrides || {}}
-                  prescriptionIds={props.prescriptionIds?.split(',').map((id) => id.trim()) || []}
                   prescriptionRef={prescriptionRef}
                   actions={props.formActions}
                   store={props.formStore}
@@ -612,6 +622,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     screenDraftedPrescriptions();
                   }}
                   screeningAlerts={screeningAlerts()}
+                  routingConstraints={routingConstraints()}
                   enableOrder={props.enableOrder}
                 />
                 <Show when={props.enableOrder && !props.pharmacyId}>
