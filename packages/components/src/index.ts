@@ -5,8 +5,7 @@ import DoseCalculator from './systems/DoseCalculator';
 import Card from './particles/Card';
 import ComboBox from './particles/ComboBox';
 import {
-  DraftPrescription,
-  DraftPrescriptions,
+  DraftPrescriptionList,
   DraftPrescriptionsProvider,
   useDraftPrescriptions
 } from './systems/DraftPrescriptions';
@@ -29,6 +28,7 @@ import {
   ScreeningAlertAcknowledgementDialog,
   ScreeningAlertType
 } from './systems/ScreeningAlerts';
+import { RoutingConstraint } from './systems/RoutingConstraints';
 
 import triggerToast from './utils/toastTriggers';
 import generateString from './utils/generateString';
@@ -44,6 +44,7 @@ import { PhotonClientStore } from './store';
 export { usePhoton, PhotonClientStore, PhotonContext };
 
 import {
+  CoverageOption,
   PrescribeProvider,
   usePrescribe,
   type PrescriptionFormData,
@@ -59,7 +60,7 @@ export {
   ComboBox,
   Dialog,
   DoseCalculator,
-  DraftPrescriptions,
+  DraftPrescriptionList,
   DraftPrescriptionsProvider,
   useDraftPrescriptions,
   Icon,
@@ -89,4 +90,10 @@ export {
 };
 
 // Export types
-export type { ScreeningAlertType, TemplateOverrides, DraftPrescription, PrescriptionFormData };
+export type {
+  ScreeningAlertType,
+  RoutingConstraint,
+  TemplateOverrides,
+  PrescriptionFormData,
+  CoverageOption
+};

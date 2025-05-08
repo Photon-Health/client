@@ -36,7 +36,8 @@ export function determineNovocareExperimentSegment(
   > = {
     org_KzSVZBQixLRkqj5d: medicinesAndDeliveryTypes, // boson Test Organization 11
     org_wM4wI7rop0W1eNfM: medicinesAndDeliveryTypes, // production found
-    org_pcPnPx5PVamzjS2p: medicinesAndDeliveryTypes // production measured
+    org_pcPnPx5PVamzjS2p: medicinesAndDeliveryTypes, // production measured
+    org_Oxc0CSPfdiyWW3VM: medicinesAndDeliveryTypes // production openloop
   };
 
   if (!organizationId) {
