@@ -175,7 +175,7 @@ export const AddPrescriptionCard = (props: {
   };
 
   createEffect(() => {
-    if (props.store.treatment?.value && searchText().length === 0) {
+    if (props.store.treatment?.value) {
       setSearchText(props.store.treatment.value.name);
     }
   });
