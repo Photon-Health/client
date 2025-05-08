@@ -4,6 +4,7 @@ import Icon from '../../particles/Icon';
 import Text from '../../particles/Text';
 import formatRxString from '../../utils/formatRxString';
 import { ScreeningAlerts, ScreeningAlertType } from '../ScreeningAlerts';
+import { RoutingConstraint, PrescriptionRoutingAlert } from '../RoutingConstraints';
 import { CoverageOption, PrescriptionFormData } from '../PrescribeProvider';
 import { CoverageOptionSummary } from './CoverageOptions/CoverageOptionSummary';
 import { OtherCoverageOptionsList } from './CoverageOptions/OtherCoverageOptionsList';
@@ -14,8 +15,9 @@ interface DraftPrescriptionListItemProps {
   coverageOptions: CoverageOption[];
   handleEdit?: (prescription: PrescriptionFormData) => void;
   handleDelete?: (prescriptionId: string) => void;
-  handleSwapToOtherPrescription: (alternative: PrescriptionFormData) => void;
+  handleSwapToOtherPrescription: (coverageOption: CoverageOption) => void;
   screeningAlerts: ScreeningAlertType[];
+  routingConstraint?: RoutingConstraint;
 }
 
 export function DraftPrescriptionListItem(props: DraftPrescriptionListItemProps) {
@@ -29,6 +31,16 @@ export function DraftPrescriptionListItem(props: DraftPrescriptionListItemProps)
           .indexOf(props.draft.treatment.id) >= 0
     )
   );
+
+  const routingAlert = createMemo(() => {
+    return (
+      props.routingConstraint &&
+      PrescriptionRoutingAlert({
+        prescription: props.draft,
+        routingConstraint: props.routingConstraint
+      })
+    );
+  });
 
   const currentCoverageOption = createMemo(() => {
     return props.coverageOptions.find((coverage) => !coverage.isAlternative);
@@ -85,12 +97,12 @@ export function DraftPrescriptionListItem(props: DraftPrescriptionListItemProps)
               owningId={props.draft.treatment.id}
             />
           </Show>
+          <Show when={routingAlert()}>{routingAlert()}</Show>
           <Show when={currentCoverageOption()}>
             {(coverageOption) => (
               <CoverageOptionSummary coverageOption={coverageOption()} prescription={props.draft} />
             )}
           </Show>
-
           <Show when={otherCoverageOptions().length > 0}>
             <OtherCoverageOptionsList
               coverageOptions={otherCoverageOptions()}

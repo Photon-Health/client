@@ -26,12 +26,24 @@ import {
 } from '../../fetch';
 import { triggerToast, useRecentOrders } from '../../index';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
+import { getRoutingConstraint, RoutingConstraint } from '../RoutingConstraints';
+import { createStore } from 'solid-js/store';
+
+// The order form data will consist of, at least, the list of selected prescription IDs and pharmacy ID.
+// The prescription form data (todo) will consist of a single prescription's data during user input
+// Note: Multiple prescription "sub" forms can be opened/completed within a single order form
+interface PrescribeOrderFormData {
+  pharmacyId?: string;
+}
 
 export type PrescribeContextType = {
   // values
   prescriptionIds: Accessor<string[]>;
   isLoadingPrefills: Accessor<boolean>;
   coverageOptions: Accessor<CoverageOption[]>;
+  routingConstraints: Accessor<RoutingConstraint[]>;
+  orderFormData: PrescribeOrderFormData;
+  selectedCoverageOption: Accessor<CoverageOption | undefined>;
 
   // actions
   deletePrescription: (id: string) => void;
@@ -40,7 +52,11 @@ export type PrescribeContextType = {
     options?: TryCreatePrescriptionTemplateOptions
   ) => Promise<Prescription>;
   tryUpdatePrescriptionStates: (ids: string[], state: PrescriptionState) => Promise<boolean>;
-  setDidSelectOtherCoverageOption: (value: boolean) => void;
+  selectOtherCoverageOption: (value: CoverageOption) => void;
+  setOrderFormData: <K extends keyof PrescribeOrderFormData>(
+    key: K,
+    value: PrescribeOrderFormData[K]
+  ) => void;
 };
 
 const PrescribeContext = createContext<PrescribeContextType>();
@@ -111,6 +127,11 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   );
   const [didSelectOtherCoverageOption, setDidSelectOtherCoverageOption] =
     createSignal<boolean>(false);
+  const [selectedCoverageOption, setSelectedCoverageOption] = createSignal<
+    CoverageOption | undefined
+  >();
+
+  const [orderFormData, setOrderFormData] = createStore<PrescribeOrderFormData>();
 
   const client = usePhotonClient();
   const { draftPrescriptions, setDraftPrescriptions } = useDraftPrescriptions();
@@ -119,6 +140,12 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const prescriptionIds = createMemo(() =>
     draftPrescriptions().map((prescription) => prescription.id)
   );
+
+  const routingConstraints = createMemo((): RoutingConstraint[] => {
+    return draftPrescriptions().map((prescription: Prescription) =>
+      getRoutingConstraint(prescription)
+    );
+  });
 
   // Prefill new prescriptions based on templateIds or prescriptionIds when we get a patientId
   createEffect(() => {
@@ -417,16 +444,27 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     return res;
   };
 
+  const selectOtherCoverageOption = (value: CoverageOption) => {
+    setOrderFormData('pharmacyId', value.pharmacy.id);
+    setSelectedCoverageOption(value);
+    setDidSelectOtherCoverageOption(true);
+  };
+
   const value = {
     // values
     prescriptionIds,
     isLoadingPrefills,
     coverageOptions,
+    routingConstraints,
+    orderFormData,
+    selectedCoverageOption,
+
     // actions
     tryCreatePrescription,
     tryUpdatePrescriptionStates,
     deletePrescription,
-    setDidSelectOtherCoverageOption
+    selectOtherCoverageOption,
+    setOrderFormData
   };
 
   return <PrescribeContext.Provider value={value}>{props.children}</PrescribeContext.Provider>;

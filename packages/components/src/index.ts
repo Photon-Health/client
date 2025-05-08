@@ -28,6 +28,7 @@ import {
   ScreeningAlertAcknowledgementDialog,
   ScreeningAlertType
 } from './systems/ScreeningAlerts';
+import { RoutingConstraint } from './systems/RoutingConstraints';
 
 import triggerToast from './utils/toastTriggers';
 import generateString from './utils/generateString';
@@ -89,4 +90,10 @@ export {
 };
 
 // Export types
-export type { ScreeningAlertType, TemplateOverrides, PrescriptionFormData, CoverageOption };
+export type {
+  ScreeningAlertType,
+  RoutingConstraint,
+  TemplateOverrides,
+  PrescriptionFormData,
+  CoverageOption
+};
