@@ -1,4 +1,3 @@
-/// <reference types="google.maps" />
 import { createSignal, onMount, createEffect, For, Show } from 'solid-js';
 import Icon from '../../particles/Icon';
 import Button from '../../particles/Button';

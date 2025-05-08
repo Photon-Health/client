@@ -1,9 +1,8 @@
 import { createEffect, createMemo, createSignal, For } from 'solid-js';
 import Client from '../src/systems/Client';
 import {
-  DraftPrescriptionList,
+  DraftPrescriptions,
   DraftPrescriptionsProvider,
-  PharmacySelect,
   PrescribeProvider,
   RecentOrders,
   triggerToast,
@@ -16,6 +15,7 @@ import Button from '../src/particles/Button';
 import Icon from '../src/particles/Icon';
 import { randomNames } from '../src/sampleData/randomNames';
 import ComboBox from '../src/particles/ComboBox';
+import { PharmacySelect } from '../src';
 import Card from '../src/particles/Card';
 import PatientMedHistory from '../src/systems/PatientMedHistory';
 import AddressForm from '../src/systems/AddressForm';
@@ -86,7 +86,6 @@ const App = () => {
               prescriptionIdsPrefill={prescriptionIds()}
               patientId={patientId}
               enableCombineAndDuplicate={true}
-              enableCoverageCheck={true}
             >
               <div class="mb-10">
                 <h2>Patient Info</h2>
@@ -96,14 +95,12 @@ const App = () => {
               <div class="mb-10">
                 <h2>Draft Prescriptions</h2>
               </div>
-              <DraftPrescriptionList
+              <DraftPrescriptions
                 handleDelete={(id) => setPrescriptionIds(prescriptionIds().filter((p) => p !== id))}
                 handleEdit={(rx) =>
                   setPrescriptionIds(prescriptionIds().filter((p) => p !== rx.id))
                 }
-                handleSwapToOtherPrescription={(_) => _}
                 screeningAlerts={[]}
-                routingConstraints={[]}
               />
             </PrescribeProvider>
           </RecentOrders>

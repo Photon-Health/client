@@ -1,8 +1,7 @@
 import { createMemo } from 'solid-js';
-import { PharmacySelect, usePrescribe } from '@photonhealth/components';
+import { PharmacySelect } from '@photonhealth/components';
 import { Card, Text } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-
 export const OrderCard = (props: {
   store: Record<string, any>;
   actions: Record<string, (...args: any) => any>;
@@ -11,7 +10,6 @@ export const OrderCard = (props: {
   enableDeliveryPharmacies: boolean;
   mailOrderIds?: string;
 }) => {
-  const { setOrderFormData } = usePrescribe();
   const patientIds = createMemo(() =>
     props.store['patient']?.value ? [props.store['patient']?.value?.id] : []
   );
@@ -55,7 +53,11 @@ export const OrderCard = (props: {
             });
           }}
           setPharmacyId={(id: string | undefined) => {
-            setOrderFormData('pharmacyId', id);
+            // TODO need to fix types coming from components, shouldn't have to do the above
+            props.actions.updateFormValue({
+              key: 'pharmacy',
+              value: id
+            });
           }}
         />
       </Card>

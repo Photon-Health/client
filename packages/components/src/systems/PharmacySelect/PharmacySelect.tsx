@@ -1,11 +1,10 @@
 import { types } from '@photonhealth/sdk';
-import { createEffect, createSignal, For, onMount, Show, untrack } from 'solid-js';
+import { createSignal, For, onMount, Show } from 'solid-js';
 import RadioGroupCards from '../../particles/RadioGroupCards';
 import Tabs from '../../particles/Tabs';
 import PharmacySearch from '../PharmacySearch';
 import { MailOrderPharmacy } from './MailOrderPharmacy';
 import { SendToPatient } from './SendToPatient';
-import { usePrescribe } from '../PrescribeProvider';
 
 enum SendToPatientEnum {
   sendToPatient = 'SEND_TO_PATIENT'
@@ -59,8 +58,6 @@ const parseFulfillmentType = (type: FulfillmentType | undefined) => {
 };
 
 export function PharmacySelect(props: PharmacySelectProps) {
-  const { orderFormData, selectedCoverageOption } = usePrescribe();
-
   const [localPharmId, setLocalPharmId] = createSignal<string | undefined>();
   const [mailOrderId, setMailOrderId] = createSignal<string | undefined>();
   const [tabs, setTabs] = createSignal<TabNamesEnum[]>([]);
@@ -86,16 +83,6 @@ export function PharmacySelect(props: PharmacySelectProps) {
     setActiveTab(tabs()[0]);
   });
 
-  createEffect(() => {
-    // when coverage option is selected, navigate to Send to Patient
-    const coverageOption = selectedCoverageOption();
-    // untrack b/c we only want to change the tab on coverage selection, not on orderFormData changes
-    const untrackedId = untrack(() => orderFormData.pharmacyId);
-    if (coverageOption && untrackedId === coverageOption.pharmacy.id) {
-      setActiveTab(tabs()[0]);
-    }
-  });
-
   const handleTabChange = (newTab: TabNamesEnum) => {
     setActiveTab(newTab);
 
@@ -112,10 +99,7 @@ export function PharmacySelect(props: PharmacySelectProps) {
     } else if (newTab === TabNamesEnum.mailOrder && mailOrderId()) {
       props.setPharmacyId(mailOrderId());
     } else {
-      // Use the selectedCoverageOption's pharmacy, if available, for Send To Patient flow.
-      // This is a bit strange - doing this for our first version of RTBC feature.
-      // But we dont yet have a better way to show the Provider what pharmacy they selected by selecting a Coverage Option
-      props.setPharmacyId(selectedCoverageOption()?.pharmacy.id);
+      props.setPharmacyId(undefined);
     }
   };
 

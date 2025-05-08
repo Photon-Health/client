@@ -1,4 +1,23 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+
+export const GetPrescription = gql`
+  query GetPrescription($id: ID!) {
+    prescription(id: $id) {
+      id
+      daysSupply
+      dispenseAsWritten
+      dispenseQuantity
+      dispenseUnit
+      instructions
+      notes
+      fillsAllowed
+      treatment {
+        id
+        name
+      }
+    }
+  }
+`;
 
 export const CreatePrescriptionTemplate = gql`
   mutation CreatePrescriptionTemplate(
@@ -81,10 +100,6 @@ export const CreatePrescription = gql`
       treatment {
         id
         name
-        codes {
-          packageNDC
-          productNDC
-        }
       }
     }
   }
@@ -96,30 +111,22 @@ export const UpdatePrescriptionStates = gql`
   }
 `;
 
-export const GenerateCoverageOptions = gql`
-  mutation GenerateCoverageOptions($pharmacyId: ID!, $prescriptions: [CoverageRxInput!]!) {
-    generateCoverageOptions(pharmacyId: $pharmacyId, prescriptions: $prescriptions) {
-      id
-      prescriptionId
-      isAlternative
-      status
-      statusMessage
-      paRequired
-      price
-      daysSupply
-      dispenseQuantity
-      dispenseUnit
-      treatment {
+export const GetTemplatesFromCatalogs = gql`
+  query TemplatesFromCatalogs {
+    catalogs {
+      templates {
         id
-        name
-      }
-      pharmacy {
-        id
-        name
-      }
-      alerts {
-        label
-        text
+        daysSupply
+        dispenseAsWritten
+        dispenseQuantity
+        dispenseUnit
+        instructions
+        notes
+        fillsAllowed
+        treatment {
+          id
+          name
+        }
       }
     }
   }
