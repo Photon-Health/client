@@ -405,6 +405,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         // use selected pharmacy if available
         pharmacyId = orderFormData.pharmacyId;
       }
+      if (!pharmacyId) {
+        // api does not allow null/undefined
+        pharmacyId = '';
+      }
 
       const { data: orderData, errors } = await orderMutation({
         variables: {
