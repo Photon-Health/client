@@ -1,3 +1,3 @@
-export * from './DraftPrescriptionList';
+export * from './DraftPrescriptions';
 export * from './DraftPrescriptionsProvider';
-export * from './utils/mappers';
+export type { DraftPrescription } from './DraftPrescriptions';

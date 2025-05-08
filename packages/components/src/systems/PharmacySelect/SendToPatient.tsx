@@ -13,7 +13,6 @@ import {
   GetPreferredPharmaciesResponse
 } from '../PharmacySearch';
 import { usePhotonClient } from '../SDKProvider';
-import { usePrescribe } from '../PrescribeProvider';
 
 type STPState = {
   badgeColor: BadgeColor;
@@ -38,24 +37,17 @@ const stpStates: {
     badgeColor: 'blue',
     badgeText: 'Preferred Pharmacy',
     text: 'This patient selected this as their preferred pharmacy.'
-  },
-  coverageOptionPharmacy: {
-    badgeColor: 'gray',
-    badgeText: 'Selected Pharmacy',
-    text: 'The selected option was for this pharmacy.'
   }
 };
 
 export function SendToPatient(props: { patientId: string }) {
   const client = usePhotonClient();
-  const { orderFormData, selectedCoverageOption } = usePrescribe();
-
   const [stpState, setStpState] = createSignal<STPState>(stpStates.patientWillSelect);
   const [pharmacy, setPharmacy] = createSignal<Pharmacy | undefined>(undefined);
 
   const queryOptions = createMemo(() => ({
     variables: { id: props.patientId },
-    client: client.apollo
+    client: client!.apollo
   }));
 
   const preferredPharmaciesData = createQuery<GetPreferredPharmaciesResponse, { id: string }>(
@@ -110,16 +102,6 @@ export function SendToPatient(props: { patientId: string }) {
     }
   });
 
-  createEffect(() => {
-    const coverageOption = selectedCoverageOption();
-    if (coverageOption && coverageOption.pharmacy.id === orderFormData.pharmacyId) {
-      setStpState(stpStates.coverageOptionPharmacy);
-      client.clinical.pharmacy.getPharmacy({ id: orderFormData.pharmacyId }).then((result) => {
-        setPharmacy(result.data.pharmacy);
-      });
-    }
-  });
-
   return (
     <Show when={notLoading()} fallback={<Spinner size="sm" />}>
       <div class="mt-4">
@@ -132,18 +114,16 @@ export function SendToPatient(props: { patientId: string }) {
         </Text>
 
         <Show when={pharmacy()}>
-          {(phr) => (
-            <Card variant="gray">
+          <Card variant="gray">
+            <div>
+              <Text size="sm" bold>
+                {pharmacy()!.name}
+              </Text>
               <div>
-                <Text size="sm" bold>
-                  {phr().name}
-                </Text>
-                <div>
-                  <Text size="sm">{formatAddress(phr().address)}</Text>
-                </div>
+                <Text size="sm">{formatAddress(pharmacy()!.address)}</Text>
               </div>
-            </Card>
-          )}
+            </div>
+          </Card>
         </Show>
       </div>
     </Show>

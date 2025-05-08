@@ -10,7 +10,6 @@ export interface InputProps extends JSX.InputHTMLAttributes<HTMLInputElement> {
   copy?: boolean;
   onInput?: JSX.EventHandlerUnion<HTMLInputElement, InputEvent>;
   pointer?: boolean;
-  label?: string;
 }
 
 function valueToString(value: string | number | string[] | undefined): string {

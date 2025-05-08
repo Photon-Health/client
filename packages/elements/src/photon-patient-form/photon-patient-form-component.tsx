@@ -5,6 +5,7 @@ import { Spinner, PharmacySearch, Card } from '@photonhealth/components';
 import { usePhoton } from '@photonhealth/components';
 import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
+import { PharmacyStore } from '../stores/pharmacy';
 import tailwind from '../tailwind.css?inline';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { email, empty, message, zipString, notFutureDate } from '../validators';
@@ -42,6 +43,7 @@ const PatientForm = (props: { patientId: string }) => {
   let ref: any;
   const client = usePhoton();
   const { store: pStore, actions: pActions } = PatientStore;
+  const { actions: pharmActions } = PharmacyStore;
   const { store, actions } = createFormStore({
     firstName: undefined,
     lastName: undefined,
@@ -105,6 +107,7 @@ const PatientForm = (props: { patientId: string }) => {
         reset: () => {
           actions.reset();
           pActions.reset();
+          pharmActions.reset();
         }
       }
     });
