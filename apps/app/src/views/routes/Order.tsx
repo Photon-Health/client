@@ -78,10 +78,11 @@ const PHARMACY_QUERY = gql`
   }
 `;
 
+const GET_ORDER_QUERY_NAME = 'GetOrder';
 const GET_ORDER = gql`
   ${PHARMACY_FRAGMENT}
 
-  query GetOrder($id: ID!) {
+  query ${GET_ORDER_QUERY_NAME}($id: ID!) {
     order(id: $id) {
       __typename
       id
@@ -244,33 +245,9 @@ export const Order = () => {
   }, [cancelReason]);
 
   const [cancelOrder] = useMutation(CANCEL_ORDER, {
-    /*
-    optimisticResponse: {
-      cancelOrder: {
-        __typename: 'Order',
-        id: id,
-        state: 'CANCELED'
-      }
-    },
-    */
-    update: (cache) => {
-      // TODO manually updating, this can be automatic but current mutation returns wrong data
-      // https://www.notion.so/photons/Successful-Cancel-Order-Returns-Incorrect-State-6bca56ec94cf49d88246730f002500fd?pvs=4
-      const existingOrder: { order: types.Order } | null = cache.readQuery({
-        query: GET_ORDER,
-        variables: { id: id! }
-      });
-      if (existingOrder && existingOrder.order) {
-        cache.writeQuery({
-          query: GET_ORDER,
-          data: {
-            order: {
-              ...existingOrder?.order,
-              state: types.OrderState.Canceled
-            }
-          },
-          variables: { id: id! }
-        });
+    onQueryUpdated: (observableQuery) => {
+      if (observableQuery.queryName !== GET_ORDER_QUERY_NAME) {
+        return client?.defaultOptions?.mutate?.onQueryUpdated;
       }
     }
   });
@@ -306,9 +283,6 @@ export const Order = () => {
   });
 
   const order = data?.order;
-  if (data?.order.state == 'ROUTING') {
-    console.log('Order State:', order?.state);
-  }
   const {
     isOpen: isOpenLocation,
     onOpen: onOpenLocation,
