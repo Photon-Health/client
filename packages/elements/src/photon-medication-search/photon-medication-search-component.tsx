@@ -292,7 +292,7 @@ const Component = (props: ComponentProps) => {
     <div
       ref={ref}
       on:photon-data-selected={(e: any) => {
-        dispatchTreatmentSelected(ref, e.detail.data, store.catalog.data!.id || '');
+        dispatchTreatmentSelected(ref, e.detail.data, store.catalog.data?.id || '');
 
         if ('treatment' in e.detail.data) {
           dispatchSearchTextChanged(ref, e.detail.data.treatment.name);
