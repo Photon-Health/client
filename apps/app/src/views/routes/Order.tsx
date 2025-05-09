@@ -488,7 +488,7 @@ export const Order = () => {
                 }
               }}
             >
-              Cancel Order!!!!
+              Cancel Order
             </Button>
 
             <Button
