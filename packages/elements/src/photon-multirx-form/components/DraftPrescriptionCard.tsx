@@ -4,8 +4,8 @@ import {
   CoverageOption,
   DraftPrescriptionList,
   PrescriptionFormData,
-  ScreeningAlertType,
   RoutingConstraint,
+  ScreeningAlertType,
   Text,
   useDraftPrescriptions,
   usePrescribe
@@ -60,12 +60,9 @@ export const DraftPrescriptionCard = (props: {
         deletePrescription(formData.id);
       }
 
-      window.scrollTo({
+      props.prescriptionRef?.scrollIntoView({
         behavior: 'smooth',
-        top:
-          (props.prescriptionRef?.getBoundingClientRect().top || 0) -
-          document.body.getBoundingClientRect().top -
-          70
+        block: 'start'
       });
 
       props.handleDraftPrescriptionsChange();
