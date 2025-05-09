@@ -166,7 +166,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
     if (props.selectedData) {
       // @ts-ignore
       setSelected(props.selectedData);
-      dispatchSelect(props.selectedData);
     }
     if (props.selectedData === undefined) {
       setSelected(undefined);
