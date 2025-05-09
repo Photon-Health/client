@@ -490,7 +490,6 @@ export const Order = () => {
             >
               Cancel Order
             </Button>
-
             <Button
               aria-label="Report Issue"
               colorScheme="blue"
