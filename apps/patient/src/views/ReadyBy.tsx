@@ -135,9 +135,9 @@ export const ReadyBy = () => {
                 w="full"
                 size="lg"
                 isActive={day === activeTab}
+                variant={day === activeTab ? 'brand' : undefined}
                 _active={{
                   backgroundColor: 'brand.500',
-                  color: 'white',
                   borderColor: 'brand.500'
                 }}
                 border="2px"
