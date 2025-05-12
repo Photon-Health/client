@@ -269,71 +269,19 @@ export const PharmacyInfo = ({
   const pharmacyFormattedAddress = pharmacy?.address ? formatAddress(pharmacy.address) : '';
   const directionsUrl = `http://maps.google.com/?q=${pharmacy?.name}, ${pharmacyFormattedAddress}`;
 
-  let amazonPharmacyElementOverride = undefined;
   const isAmazonPharmacy = pharmacy.id === process.env.REACT_APP_AMAZON_PHARMACY_ID;
-  if (isAmazonPharmacy && brandedOptionOverride?.amazonPharmacyOverride) {
-    amazonPharmacyElementOverride = (
-      <HStack>
-        <Tag size="sm" colorScheme="blue" flexShrink={0}>
-          <TagLabel fontWeight="bold">In Stock</TagLabel>
-        </Tag>
-        <Text fontSize="sm" color="gray.500">
-          {brandedOptionOverride?.amazonPharmacyOverride}
-        </Text>
-      </HStack>
-    );
-  }
+  const showAmazonTagline = isAmazonPharmacy && brandedOptionOverride?.amazonPharmacyOverride;
 
-  let novocarePharmacyElementOverride = undefined;
   const isNovocarePharmacy = pharmacy.id === process.env.REACT_APP_NOVOCARE_PHARMACY_ID;
-  if (isNovocarePharmacy && brandedOptionOverride?.novocareExperimentOverride) {
-    novocarePharmacyElementOverride = (
-      <HStack>
-        <Tag size="sm" colorScheme="blue" flexShrink={0}>
-          <TagLabel fontWeight="bold">In Stock</TagLabel>
-        </Tag>
-        <Text fontSize="sm" color="gray.500">
-          {brandedOptionOverride?.novocareExperimentOverride}
-        </Text>
-      </HStack>
-    );
-  }
+  const showNovocareTagline =
+    isNovocarePharmacy && brandedOptionOverride?.novocareExperimentOverride;
 
-  const overrideElement = novocarePharmacyElementOverride ?? amazonPharmacyElementOverride;
+  const taglineOverride = showNovocareTagline ?? showAmazonTagline;
 
   return (
     <VStack align="start" w="full">
       <HStack w="full" justify="space-between">
         <VStack w="full">
-          {showPreferredTag ||
-          showReadyIn30MinTag ||
-          showAvailableInYourAreaTag ||
-          showFreeDeliveryTag ? (
-            <HStack spacing={2} m={0} p={0} alignItems="start" w="full">
-              {showPreferredTag ? (
-                <Tag size="sm" colorScheme="blue">
-                  <TagLeftIcon boxSize="12px" as={FiStar} />
-                  <TagLabel> {t.preferred}</TagLabel>
-                </Tag>
-              ) : null}
-              {showReadyIn30MinTag ? (
-                <Tag size="sm" bgColor="yellow.200">
-                  <TagLabel>Ready in 30 minutes</TagLabel>
-                </Tag>
-              ) : null}
-              {showAvailableInYourAreaTag ? (
-                <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
-                  <TagLabel fontWeight="bold">Available in your area</TagLabel>
-                </Tag>
-              ) : null}
-              {showFreeDeliveryTag && !amazonPharmacyElementOverride ? (
-                <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
-                  <TagLabel fontWeight="bold">Free Delivery</TagLabel>
-                </Tag>
-              ) : null}
-            </HStack>
-          ) : null}
-
           <HStack w="full">
             {pharmacy?.logo && !whiteLabelDeliveryPharmacy ? (
               <Box boxSize="32px" overflow="hidden">
@@ -370,22 +318,16 @@ export const PharmacyInfo = ({
 
       {showDetails ? (
         <VStack direction={isStatus ? 'column-reverse' : 'column'} w="full" alignItems={'start'}>
-          {tagline ? (
-            overrideElement ? (
-              overrideElement
-            ) : (
-              <Text fontSize="sm" color="gray.500">
-                {tagline}
-              </Text>
-            )
+          {taglineOverride ? (
+            <Text fontSize="sm" color="gray.500">
+              {taglineOverride}
+            </Text>
           ) : null}
-          <DistanceAddress
-            distance={pharmacy.distance}
-            address={pharmacy.address}
-            url={directionsUrl}
-            fontSize={isStatus ? 'md' : 'sm'}
-            isStatus={isStatus}
-          />
+          {!taglineOverride && tagline ? (
+            <Text fontSize="sm" color="gray.500">
+              {tagline}
+            </Text>
+          ) : null}
           <Hours
             isOpen={pharmacy.isOpen}
             is24Hr={pharmacy.is24Hr}
@@ -395,7 +337,52 @@ export const PharmacyInfo = ({
             hours={pharmacy.hours}
             showHours={showHours}
           />
+          <DistanceAddress
+            distance={pharmacy.distance}
+            address={pharmacy.address}
+            url={directionsUrl}
+            fontSize={isStatus ? 'md' : 'sm'}
+            isStatus={isStatus}
+          />
         </VStack>
+      ) : null}
+      {showPreferredTag ||
+      showReadyIn30MinTag ||
+      showAvailableInYourAreaTag ||
+      showFreeDeliveryTag ? (
+        <HStack spacing={2} m={0} p={0} alignItems="start" w="full">
+          {showPreferredTag ? (
+            <Tag size="sm" colorScheme="blue">
+              <TagLeftIcon boxSize="12px" as={FiStar} />
+              <TagLabel> {t.preferred}</TagLabel>
+            </Tag>
+          ) : null}
+          {showReadyIn30MinTag ? (
+            <Tag size="sm" bgColor="yellow.200">
+              <TagLabel>Ready in 30 minutes</TagLabel>
+            </Tag>
+          ) : null}
+          {showAvailableInYourAreaTag ? (
+            <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
+              <TagLabel fontWeight="bold">Available in your area</TagLabel>
+            </Tag>
+          ) : null}
+          {showFreeDeliveryTag && !showAmazonTagline && !showNovocareTagline ? (
+            <Tag size="sm" bgColor="green.100" color="green.600" mb={1}>
+              <TagLabel fontWeight="bold">Free Delivery</TagLabel>
+            </Tag>
+          ) : null}
+          {isAmazonPharmacy && showAmazonTagline ? (
+            <Tag size="sm" colorScheme="blue" flexShrink={0}>
+              <TagLabel fontWeight="bold">In Stock</TagLabel>
+            </Tag>
+          ) : null}
+          {isNovocarePharmacy && showNovocareTagline ? (
+            <Tag size="sm" colorScheme="blue" flexShrink={0}>
+              <TagLabel fontWeight="bold">In Stock</TagLabel>
+            </Tag>
+          ) : null}
+        </HStack>
       ) : null}
       {isCurrentPharmacy ? (
         <Tag
