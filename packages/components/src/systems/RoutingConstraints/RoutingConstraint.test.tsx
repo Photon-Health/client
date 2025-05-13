@@ -1,4 +1,5 @@
 import {
+  identityConstraint,
   combineAllRoutingConstraints,
   combineRoutingConstraints,
   RoutingConstraint
@@ -204,6 +205,50 @@ describe('combineRoutingConstraints', () => {
 
     expect(combinedRc).toStrictEqual(expectedRc);
   });
+
+  it('combining an include list with the identiy constraint returns the input include list (regardless of input order)', () => {
+    const rc: RoutingConstraint = {
+      prescription: { id: '', prescribable_name: '' },
+      routing_constraint_type: 'include',
+      constraint_pharmacies: [
+        {
+          id: 'fake_id1',
+          name: 'Fake Pharmacy 1'
+        },
+        {
+          id: 'fake_id2',
+          name: 'Fake Pharmacy 2'
+        }
+      ]
+    };
+
+    const combinedRc1 = combineRoutingConstraints(rc, identityConstraint);
+    const combinedRc2 = combineRoutingConstraints(identityConstraint, rc);
+    expect(combinedRc1).toStrictEqual(rc);
+    expect(combinedRc2).toStrictEqual(rc);
+  });
+
+  it('combining an exclude list with the identiy constraint returns the input exlude list (regardless of input order)', () => {
+    const rc: RoutingConstraint = {
+      prescription: { id: '', prescribable_name: '' },
+      routing_constraint_type: 'exclude',
+      constraint_pharmacies: [
+        {
+          id: 'fake_id1',
+          name: 'Fake Pharmacy 1'
+        },
+        {
+          id: 'fake_id2',
+          name: 'Fake Pharmacy 2'
+        }
+      ]
+    };
+
+    const combinedRc1 = combineRoutingConstraints(rc, identityConstraint);
+    const combinedRc2 = combineRoutingConstraints(identityConstraint, rc);
+    expect(combinedRc1).toStrictEqual(rc);
+    expect(combinedRc2).toStrictEqual(rc);
+  });
 });
 
 describe('combineAllRoutingConstraints', () => {
@@ -290,5 +335,10 @@ describe('combineAllRoutingConstraints', () => {
     };
 
     expect(combinedRc).toStrictEqual(expectedRc);
+  });
+
+  it('combining an empty array returns the identity constraint', () => {
+    const combinedRc = combineAllRoutingConstraints([]);
+    expect(combinedRc).toStrictEqual(identityConstraint);
   });
 });

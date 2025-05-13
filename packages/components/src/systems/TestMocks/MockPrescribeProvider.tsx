@@ -29,6 +29,13 @@ export function MockPrescribeProvider(props: MockPrescribeProviderProps) {
     isLoadingPrefills: () => false,
     coverageOptions: () => [],
     routingConstraints: () => [],
+    combinedRoutingConstraint: () => {
+      return {
+        prescription: { id: '', prescribable_name: '' },
+        routing_constraint_type: 'exclude',
+        constraint_pharmacies: []
+      };
+    },
     selectedCoverageOption: () => undefined,
     // mock actions
     deletePrescription: mocks.deletePrescription,

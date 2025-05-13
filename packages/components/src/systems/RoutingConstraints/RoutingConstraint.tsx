@@ -132,12 +132,12 @@ export function getPrescriptionRoutingConstraints(
   return map;
 }
 
-const identityMonoid: RoutingConstraint = {
+export const identityConstraint: RoutingConstraint = {
   prescription: {
     id: '',
     prescribable_name: ''
   },
-  routing_constraint_type: 'include',
+  routing_constraint_type: 'exclude',
   constraint_pharmacies: []
 };
 
@@ -174,7 +174,7 @@ export function combineRoutingConstraints(
   rc2 = convertFromNoRouting(rc2);
   rc2 = convertFromNoAdvice(rc2);
 
-  const createPharmacyIdSet = (rc: RoutingConstraint) => {
+  const createPharmacyIdSet = (rc: RoutingConstraint): Set<string> => {
     const pharmacyIds = rc.constraint_pharmacies?.map((pharmacy) => {
       return pharmacy.id;
     });
@@ -236,5 +236,5 @@ export function combineAllRoutingConstraints(
     return filters.includes(curConstraint.routing_constraint_type)
       ? combineRoutingConstraints(curCombination, curConstraint)
       : curCombination;
-  }, identityMonoid);
+  }, identityConstraint);
 }
