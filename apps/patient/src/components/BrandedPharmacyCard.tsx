@@ -77,10 +77,12 @@ export const BrandedPharmacyCard = ({
     <Card
       bgColor="white"
       border="2px solid"
-      borderColor={selected ? 'brand.500' : 'white'}
+      borderWidth={selected ? '2px' : '1px'}
+      borderColor={selected ? 'brand.500' : 'gray.200'}
       borderRadius="lg"
+      shadow={'none'}
       onClick={() => handleSelect(pharmacyId)}
-      mx={{ base: -3, md: undefined }}
+      mx={{ base: -2, md: undefined }}
       cursor="pointer"
     >
       <CardBody p={3}>

@@ -124,7 +124,8 @@ export const ReadyBy = () => {
           // z-index set here to sit above ready by options but still below nav so shadow looks good
           zIndex: 1
         }}
-        shadow="sm"
+        borderBottom="1px solid"
+        borderColor="gray.200"
       >
         <Container p={4}>
           <HStack>
@@ -158,23 +159,25 @@ export const ReadyBy = () => {
         </Container>
       </Box>
 
-      <Box pt={5} shadow="inner">
+      <Box pt={5}>
         <Container pb={selectedTime ? 32 : 8}>
           <RadioGroup value={`${selectedDay}-${selectedTime}`}>
             <VStack spacing={3} w="full" align="stretch">
               {t.readyByOptions[activeTab].map((option) => {
                 const isDisabled = activeTab === 'Today' ? checkDisabled(option.label) : false;
+                const isSelected = selectedTime === option.label && selectedDay === activeTab;
 
                 return (
                   <Fade key={activeTab + '-' + option.label} in={true}>
                     <Card
                       bgColor={isDisabled ? 'gray.300' : 'white'}
                       border={isDisabled ? 'gray.300' : '2px solid'}
-                      borderColor={
-                        selectedTime === option.label && selectedDay === activeTab
-                          ? 'brand.500'
-                          : 'white'
-                      }
+                      borderWidth={isSelected ? '2px' : '1px'}
+                      borderColor={isSelected ? 'brand.500' : 'gray.200'}
+                      // bgColor={isCurrentPharmacy ? 'gray.200' : 'white'}
+                      // borderWidth={selected ? '2px' : '1px'}
+                      // borderColor={selected && onSelect ? 'brand.500' : isCurrentPharmacy ? 'gray.300' : 'gray.200'}
+
                       borderRadius="lg"
                       color={isDisabled ? 'gray.600' : 'base'}
                       onClick={() => {
@@ -185,7 +188,7 @@ export const ReadyBy = () => {
                       }}
                       m="auto"
                       w="full"
-                      shadow={isDisabled ? 'none' : 'base'}
+                      shadow="none"
                       cursor={isDisabled ? 'not-allowed' : 'pointer'}
                     >
                       <CardBody p={3}>
