@@ -187,7 +187,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
       setSelectedCoverageOption(undefined);
       setDidSelectOtherCoverageOption(false);
       setCoverageOptions([]);
-      setHasCreatedPrescriptions(false);
     }
   });
 
