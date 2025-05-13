@@ -171,6 +171,17 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     }
   });
 
+  createEffect(() => {
+    // reset state on patient change
+    if (props.patientId) {
+      setDraftPrescriptions([]);
+      setSelectedCoverageOption(undefined);
+      setDidSelectOtherCoverageOption(false);
+      setCoverageOptions([]);
+      setHasCreatedPrescriptions(false);
+    }
+  });
+
   // if we have prescriptions, coverage check is enabled, and the patient has a preferred pharmacy,
   // then we need to check the coverage of the prescriptions
   createEffect(() => {
