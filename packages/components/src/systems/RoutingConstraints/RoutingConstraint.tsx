@@ -191,6 +191,16 @@ export function combineRoutingConstraints(
     pharmacyMap.set(pharmacy.id, pharmacy);
   }
 
+  const getPharmaciesIntersection = (idSet1: Set<string>, idSet2: Set<string>) => {
+    const pharmacies = [];
+    for (const id of Array.from(idSet2)) {
+      if (idSet1.has(id)) {
+        pharmacies.push(pharmacyMap.get(id));
+      }
+    }
+    return pharmacies;
+  };
+
   const getPharmaciesUnion = (idSet1: Set<string>, idSet2: Set<string>) => {
     const pharmacies = Array.from(idSet1).map((id) => pharmacyMap.get(id));
     for (const id of Array.from(idSet2)) {
@@ -214,7 +224,7 @@ export function combineRoutingConstraints(
   if (rc1.routing_constraint_type === 'include' && rc2.routing_constraint_type === 'include') {
     return {
       prescription: { id: '', prescribable_name: '' },
-      constraint_pharmacies: getPharmaciesUnion(rc1PharmacyIds, rc2PharmacyIds),
+      constraint_pharmacies: getPharmaciesIntersection(rc1PharmacyIds, rc2PharmacyIds),
       routing_constraint_type: 'include'
     };
   } else if (

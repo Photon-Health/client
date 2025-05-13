@@ -6,7 +6,7 @@ import {
 } from './RoutingConstraint';
 
 describe('combineRoutingConstraints', () => {
-  it('appends include lists when both routing constraints are type include', () => {
+  it('intersects include lists when both routing constraints are type include', () => {
     const rc1: RoutingConstraint = {
       prescription: { id: '', prescribable_name: '' },
       routing_constraint_type: 'include',
@@ -43,16 +43,8 @@ describe('combineRoutingConstraints', () => {
       routing_constraint_type: 'include',
       constraint_pharmacies: [
         {
-          id: 'fake_id1',
-          name: 'Fake Pharmacy 1'
-        },
-        {
           id: 'fake_id2',
           name: 'Fake Pharmacy 2'
-        },
-        {
-          id: 'fake_id3',
-          name: 'Fake Pharmacy 3'
         }
       ]
     };
@@ -152,7 +144,7 @@ describe('combineRoutingConstraints', () => {
     expect(combinedRc).toStrictEqual(expectedRc);
   });
 
-  it('appends exclude lists when both routing constraints are type exclude', () => {
+  it('unions exclude lists when both routing constraints are type exclude', () => {
     const rc1: RoutingConstraint = {
       prescription: { id: '', prescribable_name: '' },
       routing_constraint_type: 'exclude',
@@ -268,6 +260,14 @@ describe('combineAllRoutingConstraints', () => {
         {
           id: 'fake_id3',
           name: 'Fake Pharmacy 3'
+        },
+        {
+          id: 'fake_id4',
+          name: 'Fake Pharmacy 4'
+        },
+        {
+          id: 'fake_id5',
+          name: 'Fake Pharmacy 5'
         }
       ]
     };
@@ -277,8 +277,24 @@ describe('combineAllRoutingConstraints', () => {
       routing_constraint_type: 'include',
       constraint_pharmacies: [
         {
+          id: 'fake_id2',
+          name: 'Fake Pharmacy 2'
+        },
+        {
+          id: 'fake_id3',
+          name: 'Fake Pharmacy 3'
+        },
+        {
           id: 'fake_id4',
           name: 'Fake Pharmacy 4'
+        },
+        {
+          id: 'fake_id5',
+          name: 'Fake Pharmacy 5'
+        },
+        {
+          id: 'fake_id6',
+          name: 'Fake Pharmacy 6'
         }
       ]
     };
@@ -292,7 +308,7 @@ describe('combineAllRoutingConstraints', () => {
           name: 'Fake Pharmacy 1'
         },
         {
-          id: 'fake_id3',
+          id: 'fake_id5',
           name: 'Fake Pharmacy 5'
         }
       ]
@@ -303,8 +319,8 @@ describe('combineAllRoutingConstraints', () => {
       routing_constraint_type: 'exclude',
       constraint_pharmacies: [
         {
-          id: 'fake_id3',
-          name: 'Fake Pharmacy 3'
+          id: 'fake_id2',
+          name: 'Fake Pharmacy 2'
         },
         {
           id: 'fake_id6',
@@ -324,8 +340,8 @@ describe('combineAllRoutingConstraints', () => {
       routing_constraint_type: 'include',
       constraint_pharmacies: [
         {
-          id: 'fake_id2',
-          name: 'Fake Pharmacy 2'
+          id: 'fake_id3',
+          name: 'Fake Pharmacy 3'
         },
         {
           id: 'fake_id4',
