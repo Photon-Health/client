@@ -201,6 +201,10 @@ const organizationSettings: {
   org_1eNnu0Wi14vBH7IM: {
     provider: [HONEYBEE_PHARMACY_ID]
   },
+  // Eastern Dermatology and Pathology (sub-org of Miiskin)
+  org_W8Wuz6dYDjD0hNqT: {
+    provider: [HONEYBEE_PHARMACY_ID]
+  },
   // Geviti -- Sub org of CareTalk
   org_Zdri0JlNxJfWjzpk: {
     provider: [STRIVE_PHARMACY_ID]
