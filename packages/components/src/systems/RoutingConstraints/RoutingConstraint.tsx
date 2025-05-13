@@ -190,14 +190,31 @@ export function combineRoutingConstraints(
   for (const pharmacy of rc2?.constraint_pharmacies || []) {
     pharmacyMap.set(pharmacy.id, pharmacy);
   }
-  const getPharmaciesFromSet = (pharmacySet: Set<string>) => {
-    return Array.from(pharmacySet).map((pharmacyId) => pharmacyMap.get(pharmacyId));
+
+  const getPharmaciesUnion = (idSet1: Set<string>, idSet2: Set<string>) => {
+    const pharmacies = Array.from(idSet1).map((id) => pharmacyMap.get(id));
+    for (const id of Array.from(idSet2)) {
+      if (!idSet1.has(id)) {
+        pharmacies.push(pharmacyMap.get(id));
+      }
+    }
+    return pharmacies;
+  };
+
+  const getPharmaciesDifference = (idSet1: Set<string>, idSet2: Set<string>) => {
+    const pharmacies = [];
+    for (const id of Array.from(idSet1)) {
+      if (!idSet2.has(id)) {
+        pharmacies.push(pharmacyMap.get(id));
+      }
+    }
+    return pharmacies;
   };
 
   if (rc1.routing_constraint_type === 'include' && rc2.routing_constraint_type === 'include') {
     return {
       prescription: { id: '', prescribable_name: '' },
-      constraint_pharmacies: getPharmaciesFromSet(rc1PharmacyIds.union(rc2PharmacyIds)),
+      constraint_pharmacies: getPharmaciesUnion(rc1PharmacyIds, rc2PharmacyIds),
       routing_constraint_type: 'include'
     };
   } else if (
@@ -206,7 +223,7 @@ export function combineRoutingConstraints(
   ) {
     return {
       prescription: { id: '', prescribable_name: '' },
-      constraint_pharmacies: getPharmaciesFromSet(rc1PharmacyIds.difference(rc2PharmacyIds)),
+      constraint_pharmacies: getPharmaciesDifference(rc1PharmacyIds, rc2PharmacyIds),
       routing_constraint_type: 'include'
     };
   } else if (
@@ -215,14 +232,14 @@ export function combineRoutingConstraints(
   ) {
     return {
       prescription: { id: '', prescribable_name: '' },
-      constraint_pharmacies: getPharmaciesFromSet(rc2PharmacyIds.difference(rc1PharmacyIds)),
+      constraint_pharmacies: getPharmaciesDifference(rc2PharmacyIds, rc1PharmacyIds),
       routing_constraint_type: 'include'
     };
   } else {
     // rc1 and rc2 are type exclude
     return {
       prescription: { id: '', prescribable_name: '' },
-      constraint_pharmacies: getPharmaciesFromSet(rc1PharmacyIds.union(rc2PharmacyIds)),
+      constraint_pharmacies: getPharmaciesUnion(rc1PharmacyIds, rc2PharmacyIds),
       routing_constraint_type: 'exclude'
     };
   }
