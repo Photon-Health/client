@@ -10,8 +10,7 @@ export const text = {
   closed: 'Closed',
   closingSoon: 'Closing soon',
   contactSupport: 'Contact Support',
-  couponHelpsPayLess:
-    'The coupon price helps you pay less than the retail price for your prescription. It’s free to use. Just show it to the pharmacist when you pick up your prescription.',
+  couponHelpsPayLess: `The coupon price helps you pay less than the retail price for your prescription. It's available for select pharmacies through our partners and is free to use. Just show it to the pharmacist when you pick up your prescription.`,
   couponWithInsurance: 'Can I use this coupon if I have health insurance?',
   couponVsInsurance:
     'The price on the coupon may be lower than your health insurance co-pay. It can be used instead of your co-pay and does not apply to your deductible.',
@@ -34,7 +33,10 @@ export const text = {
   getNearby: 'Get your medication at a nearby pharmacy',
   gettingLoc: 'Getting current location',
   group: 'Group',
+  howDoIUseCouponCard: 'How do I use a coupon card?',
   howToCoupon: 'How to use this coupon',
+  howToUseCouponCard:
+    'Turn on coupons to see coupon prices. Details will be available after you select a pharmacy with a coupon price. Just show the coupon card to the pharmacist when you pick up your prescription.',
   inTransit: 'In transit',
   makePreferred: 'Make this my preferred pharmacy',
   memberId: 'Member ID',
@@ -240,6 +242,12 @@ export const text = {
   tracking: 'Tracking #:',
   tryPhoton: 'Try Photon',
   useLoc: 'Use my current location',
+  usingWithInsurance: (
+    <>
+      Anyone can use the coupon. The coupon may be lower than your health insurance co-pay. You can
+      use it <b>instead</b> of your co-pay and it does not apply to your deductible.
+    </>
+  ),
   weSent: (isPlural: boolean) =>
     `We sent your ${isPlural ? 'prescriptions' : 'prescription'} to the pharmacy.`,
   whatIsCouponPrice: 'What is the coupon price?',

@@ -800,46 +800,94 @@ export const Pharmacy = () => {
     ...(enableMailOrder ? mailOrderPharmacies : [])
   ]);
 
+  const locationPreview = (
+    <VStack w="full" align="start" spacing={1}>
+      <Text size="sm">{t.showingLabel}</Text>
+      <Link
+        onClick={() => setLocationModalOpen(true)}
+        display="inline"
+        size="sm"
+        data-dd-privacy="mask"
+      >
+        <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
+        {cleanAddress}
+      </Link>
+    </VStack>
+  );
+
+  const setLocationButton = (
+    <Button variant="brand" onClick={() => setLocationModalOpen(true)}>
+      {t.setLoc}
+    </Button>
+  );
+
+  const brandedPharmacyOptions = (location: string) => (
+    <BrandedOptions
+      options={brandedOptions}
+      location={location}
+      selectedId={selectedId}
+      handleSelect={handleSelect}
+      brandedOptionOverrides={brandedOptionsOverride ?? {}}
+    />
+  );
+
+  const showPickupHeading =
+    (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined) ?? false;
+
+  const pickupPharmacyOptions = (location: string) => (
+    <PickupOptions
+      location={location}
+      pharmacies={allPharmacies}
+      preferredPharmacy={preferredPharmacyId}
+      savingPreferred={savingPreferred}
+      selectedId={selectedId}
+      handleSelect={handleSelect}
+      handleShowMore={handleShowMore}
+      handleSetPreferred={handleSetPreferredPharmacy}
+      loadingMore={isLoading}
+      showingAllPharmacies={showingAllPharmacies}
+      showHeading={showPickupHeading}
+      enableOpenNow={enableOpenNow}
+      enable24Hr={enable24Hr}
+      enablePrice={enablePrice}
+      setEnableOpenNow={setEnableOpenNow}
+      setEnable24Hr={setEnable24Hr}
+      currentPharmacyId={order.pharmacy?.id}
+      setCouponModalOpen={setCouponModalOpen}
+    />
+  );
+
   return (
     <Box>
       {!isDemo && <LocationModal isOpen={locationModalOpen} onClose={handleModalClose} />}
+
       <Helmet>
         <title>{t.selectAPharmacy}</title>
       </Helmet>
 
       <CouponModal isOpen={couponModalOpen} onClose={() => setCouponModalOpen(false)} />
 
-      <Box bgColor="white" shadow="sm">
-        <Container>
-          <VStack spacing={4} align="span" py={4}>
-            <VStack spacing={2} align="start">
-              <Heading as="h3" size="lg">
-                {heading}
-              </Heading>
-            </VStack>
+      <Box bgColor="white">
+        <VStack spacing={4} align="span" pt={4}>
+          <VStack spacing={2} align="start" px={4}>
+            <Heading as="h3" size="lg">
+              {heading}
+            </Heading>
+          </VStack>
 
-            <HStack justify="space-between" w="full">
-              {location ? (
-                <VStack w="full" align="start" spacing={1}>
-                  <Text size="sm">{t.showingLabel}</Text>
-                  <Link
-                    onClick={() => setLocationModalOpen(true)}
-                    display="inline"
-                    size="sm"
-                    data-dd-privacy="mask"
-                  >
-                    <FiMapPin style={{ display: 'inline', marginRight: '4px' }} />
-                    {cleanAddress}
-                  </Link>
-                </VStack>
-              ) : (
-                <Button variant="brand" onClick={() => setLocationModalOpen(true)}>
-                  {t.setLoc}
-                </Button>
-              )}
-            </HStack>
+          <HStack justify="space-between" w="full" px={4}>
+            {location ? locationPreview : setLocationButton}
+          </HStack>
 
-            {showPriceToggle ? (
+          {showPriceToggle ? (
+            <VStack
+              spacing={2}
+              align="start"
+              borderY="2px solid"
+              borderColor="gray.300"
+              py={4}
+              px={4}
+            >
               <HStack justify="space-between" w="full">
                 {t.showDiscountCardPrices(() => setCouponModalOpen(true))}
                 <Switch
@@ -848,55 +896,26 @@ export const Pharmacy = () => {
                   onChange={(e) => setEnablePrice(e.target.checked)}
                 />
               </HStack>
-            ) : null}
-
-            {enablePrice ? (
-              <Box p={3} bgColor="blue.100" borderRadius="lg">
-                <Text fontSize="sm">
-                  The displayed price is a coupon price for the pharmacy. Coupon details available
-                  after you select a pharmacy. <b>This is NOT insurance.</b>
-                </Text>
-              </Box>
-            ) : null}
-          </VStack>
-        </Container>
+              {enablePrice ? (
+                <Box p={3} bgColor="blue.100" borderRadius="lg">
+                  <Text fontSize="sm">
+                    The displayed price is a coupon price for the pharmacy. Coupon details available
+                    after you select a pharmacy. <b>This is NOT insurance.</b>
+                  </Text>
+                </Box>
+              ) : null}
+            </VStack>
+          ) : null}
+        </VStack>
       </Box>
 
       <Container pb={showFooter ? 32 : 8}>
         {location ? (
           <VStack spacing={6} align="stretch" pt={4}>
-            {enableCourier || enableMailOrder || brandedOptionsOverride ? (
-              <BrandedOptions
-                options={brandedOptions}
-                location={location}
-                selectedId={selectedId}
-                handleSelect={handleSelect}
-                brandedOptionOverrides={brandedOptionsOverride ?? {}}
-              />
-            ) : null}
-
-            <PickupOptions
-              location={location}
-              pharmacies={allPharmacies}
-              preferredPharmacy={preferredPharmacyId}
-              savingPreferred={savingPreferred}
-              selectedId={selectedId}
-              handleSelect={handleSelect}
-              handleShowMore={handleShowMore}
-              handleSetPreferred={handleSetPreferredPharmacy}
-              loadingMore={isLoading}
-              showingAllPharmacies={showingAllPharmacies}
-              showHeading={
-                (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined) ?? false
-              }
-              enableOpenNow={enableOpenNow}
-              enable24Hr={enable24Hr}
-              enablePrice={enablePrice}
-              setEnableOpenNow={setEnableOpenNow}
-              setEnable24Hr={setEnable24Hr}
-              currentPharmacyId={order.pharmacy?.id}
-              setCouponModalOpen={setCouponModalOpen}
-            />
+            {enableCourier || enableMailOrder || brandedOptionsOverride
+              ? brandedPharmacyOptions(location)
+              : null}
+            {pickupPharmacyOptions(location)}
           </VStack>
         ) : null}
       </Container>
@@ -917,6 +936,7 @@ export const Pharmacy = () => {
           >
             {successfullySubmitted ? t.thankYou : t.selectPharmacy}
           </Button>
+
           <PoweredBy />
         </Container>
       </FixedFooter>

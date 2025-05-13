@@ -64,7 +64,8 @@ const organizationSettings: {
       REDROCK_STGEORGE_PHARMACY_ID,
       STRIVE_PHARMACY_ID,
       OPENLOOP_PHARMACY_ID,
-      GIFTHEALTH_PHARMACY_ID
+      GIFTHEALTH_PHARMACY_ID,
+      EMPOWER_PHARMACY_ID
     ]
   },
   // River Health
