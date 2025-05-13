@@ -5,6 +5,7 @@ import {
   createMemo,
   createSignal,
   JSXElement,
+  untrack,
   useContext
 } from 'solid-js';
 import { format } from 'date-fns';
@@ -125,8 +126,9 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const [patientPreferredPharmacyId, setPatientPreferredPharmacyId] = createSignal<string | null>(
     null
   );
-  const [didSelectOtherCoverageOption, setDidSelectOtherCoverageOption] =
-    createSignal<boolean>(false);
+  const [previousPrescriptionIds, setPreviousPrescriptionIds] = createSignal<string[]>([]);
+  const [generateCoverageOptionCallCount, setGenerateCoverageOptionCallCount] =
+    createSignal<number>(0);
   const [selectedCoverageOption, setSelectedCoverageOption] = createSignal<
     CoverageOption | undefined
   >();
@@ -176,7 +178,8 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     if (props.patientId) {
       setDraftPrescriptions([]);
       setSelectedCoverageOption(undefined);
-      setDidSelectOtherCoverageOption(false);
+      setGenerateCoverageOptionCallCount(0);
+      setPreviousPrescriptionIds([]);
       setCoverageOptions([]);
     }
   });
@@ -186,16 +189,25 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   createEffect(() => {
     const pharmacyId = patientPreferredPharmacyId();
     const prescriptions = draftPrescriptions();
+
+    const GENERATE_COVERAGE_OPTIONS_RATE_LIMIT = 5;
+    const callCount = untrack(() => generateCoverageOptionCallCount());
+    const isBelowRateLimit = callCount < GENERATE_COVERAGE_OPTIONS_RATE_LIMIT;
+    const previousPrescriptionCount = untrack(() => previousPrescriptionIds().length);
+    const hasAddedPrescriptions = prescriptions.length > previousPrescriptionCount;
+
     if (
-      !didSelectOtherCoverageOption() && // after an alternate is chosen, stop fetching coverages for this patient
+      isBelowRateLimit &&
       props.enableCoverageCheck &&
-      prescriptions.length > 0 &&
+      hasAddedPrescriptions &&
       pharmacyId !== null
     ) {
       generateCoverageOptions(prescriptions, pharmacyId).then((generatedCoverageOptions) => {
         setCoverageOptions(generatedCoverageOptions);
       });
     }
+
+    setPreviousPrescriptionIds(prescriptionIds());
   });
 
   async function createPrescriptionsFromIds() {
@@ -312,6 +324,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
         }))
       }
     });
+    setGenerateCoverageOptionCallCount((prev) => prev + 1);
     return response.data.generateCoverageOptions as CoverageOption[];
   };
 
@@ -457,7 +470,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const selectOtherCoverageOption = (value: CoverageOption) => {
     setOrderFormData('pharmacyId', value.pharmacy.id);
     setSelectedCoverageOption(value);
-    setDidSelectOtherCoverageOption(true);
   };
 
   const value = {
