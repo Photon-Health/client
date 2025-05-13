@@ -40,11 +40,11 @@ export const PharmacyCard = memo(function PharmacyCard({
     <Card
       bgColor={isCurrentPharmacy ? 'gray.200' : 'white'}
       borderWidth={selected ? '2px' : '1px'}
-      borderColor={selected && onSelect ? 'brand.500' : isCurrentPharmacy ? 'gray.300' : 'gray.100'}
-      shadow={isCurrentPharmacy ? 'none' : undefined}
+      borderColor={selected && onSelect ? 'brand.500' : isCurrentPharmacy ? 'gray.300' : 'gray.200'}
+      shadow={'none'}
       borderRadius="lg"
       onClick={() => onSelect && onSelect()}
-      mx={{ base: -3, md: undefined }}
+      mx={{ base: -2, md: undefined }}
       cursor={selectable ? 'pointer' : undefined}
       pointerEvents={isCurrentPharmacy ? 'none' : undefined}
       opacity={isCurrentPharmacy ? 0.7 : undefined}

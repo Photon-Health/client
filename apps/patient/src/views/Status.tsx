@@ -10,14 +10,14 @@ import { Card } from '../components/Card';
 import { HolidayAlert } from '../components/HolidayAlert';
 import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal';
 import { OrderSummary } from '../components/order-summary/OrderSummary';
-import { OrderStatusHeader } from '../components/statusV2/Header';
+import { OrderStatusHeader } from '../components/status/Header';
 import { deriveOrderStatus, getLatestReadyTime } from '../utils/fulfillmentsHelpers';
 import { formatAddress, getFulfillmentType, isDelivery, preparePharmacy } from '../utils/general';
 import { InsuranceAlert } from '../components/InsuranceAlert';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
-export const StatusV2 = () => {
+export const Status = () => {
   const navigate = useNavigate();
   const { order, setOrder, isDemo, setFaqModalIsOpen } = useOrderContext();
 
@@ -225,7 +225,7 @@ export const StatusV2 = () => {
         <title>{t.track}</title>
       </Helmet>
       <VStack spacing={5} width="full" alignItems={'stretch'} flex={1}>
-        <Box bgColor="white" shadow="sm">
+        <Box bgColor="white">
           <Container py={6}>
             <VStack spacing={4} width="full" alignItems="stretch">
               <HolidayAlert>Holiday may affect pharmacy hours.</HolidayAlert>

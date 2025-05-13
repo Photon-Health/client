@@ -11,7 +11,7 @@ import { NoMatch } from './views/NoMatch';
 import { Pharmacy } from './views/Pharmacy';
 import { ReadyBy } from './views/ReadyBy';
 import { Review } from './views/Review';
-import { StatusV2 } from './views/StatusV2';
+import { Status } from './views/Status';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -20,7 +20,7 @@ const router = createBrowserRouter(
         <Route path="/review" element={<Review />} />
         <Route path="/readyBy" element={<ReadyBy />} />
         <Route path="/pharmacy" element={<Pharmacy />} />
-        <Route path="/status" element={<StatusV2 />} />
+        <Route path="/status" element={<Status />} />
         {/* Leaving this here in case we need to roll back */}
         {/* <Route path="/status" element={<Status />} /> */}
         <Route path="/canceled" element={<Canceled />} />
