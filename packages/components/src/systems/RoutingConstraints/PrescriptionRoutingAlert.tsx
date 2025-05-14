@@ -1,7 +1,7 @@
 import { createEffect, createMemo } from 'solid-js';
 import Banner, { BannerStatus } from '../../particles/Banner';
 import { Prescription } from '@photonhealth/sdk/dist/types';
-import { RoutingConstraint, RoutingConstraintType } from './RoutingConstraint';
+import { isValidPrescriptionRoutingConstraint, RoutingConstraint } from './RoutingConstraint';
 
 const getStatus = (numValidPharmacies: number): BannerStatus => {
   if (numValidPharmacies <= 0) {
@@ -47,22 +47,19 @@ const getMessage = (
   }
 };
 
-const validTypes: RoutingConstraintType[] = ['include', 'no_routing'];
-
 export const PrescriptionRoutingAlert = (props: {
   prescription: Prescription;
   routingConstraint: RoutingConstraint;
 }) => {
   createEffect(() => {
-    if (!validTypes.includes(props.routingConstraint.routing_constraint_type)) {
-      throw new Error('Invalid RoutingConstraintType for PrescriptionRoutingAlert');
+    if (!isValidPrescriptionRoutingConstraint(props.routingConstraint)) {
+      throw new Error('Cannot create a PrescriptionRoutingAlert for the given routing constraint.');
     }
 
-    if (
-      props.routingConstraint.prescriptions.length !== 1 ||
-      props.routingConstraint.prescriptions[0].id !== props.prescription.id
-    ) {
-      throw new Error('Invalid Prescriptions Array for PrescriptionRoutingAlert');
+    if (props.routingConstraint.prescriptions[0].id !== props.prescription.id) {
+      throw new Error(
+        `Prescription ID ${props.prescription.id} and the constraint's prescription ID ${props.routingConstraint.prescriptions[0].id} do not match.`
+      );
     }
   });
 

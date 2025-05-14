@@ -127,16 +127,26 @@ export function getRoutingConstraint(prescription: Prescription): RoutingConstra
   }
 }
 
+export function isValidPrescriptionRoutingConstraint(
+  routingConstraint: RoutingConstraint
+): boolean {
+  const validTypes: RoutingConstraintType[] = ['include', 'no_routing'];
+  if (
+    validTypes.includes(routingConstraint.routing_constraint_type) &&
+    routingConstraint.prescriptions.length === 1
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 export function getPrescriptionRoutingConstraints(
   routingConstraints: RoutingConstraint[]
 ): Map<string, RoutingConstraint> {
   const map = new Map<string, RoutingConstraint>();
   for (const constraint of routingConstraints) {
-    if (
-      (constraint.routing_constraint_type === 'include' ||
-        constraint.routing_constraint_type === 'no_routing') &&
-      constraint.prescriptions.length === 1
-    ) {
+    if (isValidPrescriptionRoutingConstraint(constraint)) {
       map.set(constraint.prescriptions[0].id, constraint);
     }
   }
