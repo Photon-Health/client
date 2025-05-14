@@ -4,6 +4,7 @@ import { createMemo, For, JSX, mergeProps } from 'solid-js';
 export interface CardProps extends JSX.HTMLAttributes<HTMLDivElement> {
   children: JSX.Element | JSX.Element[];
   selected?: boolean;
+  disabled?: boolean;
   variant?: 'white' | 'gray';
   addChildrenDivider?: boolean;
   autoPadding?: boolean;
@@ -18,7 +19,8 @@ function Card(preProps: CardProps) {
       'border-blue-600 bg-blue-50': props?.selected,
       'border-gray-300': !props?.selected,
       'bg-white': props?.variant === 'white',
-      'bg-gray-50': props?.variant === 'gray'
+      'bg-gray-50': props?.variant === 'gray',
+      'opacity-35': props?.disabled
     })
   );
 
