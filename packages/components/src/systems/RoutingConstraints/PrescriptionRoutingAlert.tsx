@@ -57,6 +57,13 @@ export const PrescriptionRoutingAlert = (props: {
     if (!validTypes.includes(props.routingConstraint.routing_constraint_type)) {
       throw new Error('Invalid RoutingConstraintType for PrescriptionRoutingAlert');
     }
+
+    if (
+      props.routingConstraint.prescriptions.length !== 1 ||
+      props.routingConstraint.prescriptions[0].id !== props.prescription.id
+    ) {
+      throw new Error('Invalid Prescriptions Array for PrescriptionRoutingAlert');
+    }
   });
 
   const numValidPharmacies = createMemo((): number => {

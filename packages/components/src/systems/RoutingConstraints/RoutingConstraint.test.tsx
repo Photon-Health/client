@@ -1,5 +1,5 @@
 import {
-  identityConstraint,
+  noAdviceConstraint,
   combineAllRoutingConstraints,
   combineRoutingConstraints,
   RoutingConstraint
@@ -8,7 +8,7 @@ import {
 describe('combineRoutingConstraints', () => {
   it('intersects include lists when both routing constraints are type include', () => {
     const rc1: RoutingConstraint = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [{ id: 'fake_rx1', prescribable_name: 'Fake Rx 1' }],
       routing_constraint_type: 'include',
       constraint_pharmacies: [
         {
@@ -23,7 +23,10 @@ describe('combineRoutingConstraints', () => {
     };
 
     const rc2: RoutingConstraint = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [
+        { id: 'fake_rx2', prescribable_name: 'Fake Rx 2' },
+        { id: 'fake_rx3', prescribable_name: 'Fake Rx 3' }
+      ],
       routing_constraint_type: 'include',
       constraint_pharmacies: [
         {
@@ -39,7 +42,11 @@ describe('combineRoutingConstraints', () => {
 
     const combinedRc = combineRoutingConstraints(rc1, rc2);
     const expectedRc = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [
+        { id: 'fake_rx1', prescribable_name: 'Fake Rx 1' },
+        { id: 'fake_rx2', prescribable_name: 'Fake Rx 2' },
+        { id: 'fake_rx3', prescribable_name: 'Fake Rx 3' }
+      ],
       routing_constraint_type: 'include',
       constraint_pharmacies: [
         {
@@ -54,7 +61,7 @@ describe('combineRoutingConstraints', () => {
 
   it('takes the set difference when the first routing constraint is type include and the second is type exclude', () => {
     const rc1: RoutingConstraint = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [{ id: 'fake_rx1', prescribable_name: 'Fake Rx 1' }],
       routing_constraint_type: 'include',
       constraint_pharmacies: [
         {
@@ -69,7 +76,7 @@ describe('combineRoutingConstraints', () => {
     };
 
     const rc2: RoutingConstraint = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [{ id: 'fake_rx2', prescribable_name: 'Fake Rx 2' }],
       routing_constraint_type: 'exclude',
       constraint_pharmacies: [
         {
@@ -85,7 +92,10 @@ describe('combineRoutingConstraints', () => {
 
     const combinedRc = combineRoutingConstraints(rc1, rc2);
     const expectedRc = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [
+        { id: 'fake_rx1', prescribable_name: 'Fake Rx 1' },
+        { id: 'fake_rx2', prescribable_name: 'Fake Rx 2' }
+      ],
       routing_constraint_type: 'include',
       constraint_pharmacies: [
         {
@@ -100,7 +110,7 @@ describe('combineRoutingConstraints', () => {
 
   it('takes the set difference when the first routing constraint is type exclude and the second is type include', () => {
     const rc1: RoutingConstraint = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [{ id: 'fake_rx1', prescribable_name: 'Fake Rx 1' }],
       routing_constraint_type: 'exclude',
       constraint_pharmacies: [
         {
@@ -115,7 +125,7 @@ describe('combineRoutingConstraints', () => {
     };
 
     const rc2: RoutingConstraint = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [{ id: 'fake_rx2', prescribable_name: 'Fake Rx 2' }],
       routing_constraint_type: 'include',
       constraint_pharmacies: [
         {
@@ -131,7 +141,10 @@ describe('combineRoutingConstraints', () => {
 
     const combinedRc = combineRoutingConstraints(rc1, rc2);
     const expectedRc = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [
+        { id: 'fake_rx1', prescribable_name: 'Fake Rx 1' },
+        { id: 'fake_rx2', prescribable_name: 'Fake Rx 2' }
+      ],
       routing_constraint_type: 'include',
       constraint_pharmacies: [
         {
@@ -146,7 +159,7 @@ describe('combineRoutingConstraints', () => {
 
   it('unions exclude lists when both routing constraints are type exclude', () => {
     const rc1: RoutingConstraint = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [{ id: 'fake_rx1', prescribable_name: 'Fake Rx 1' }],
       routing_constraint_type: 'exclude',
       constraint_pharmacies: [
         {
@@ -161,7 +174,7 @@ describe('combineRoutingConstraints', () => {
     };
 
     const rc2: RoutingConstraint = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [{ id: 'fake_rx2', prescribable_name: 'Fake Rx 2' }],
       routing_constraint_type: 'exclude',
       constraint_pharmacies: [
         {
@@ -177,7 +190,10 @@ describe('combineRoutingConstraints', () => {
 
     const combinedRc = combineRoutingConstraints(rc1, rc2);
     const expectedRc = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [
+        { id: 'fake_rx1', prescribable_name: 'Fake Rx 1' },
+        { id: 'fake_rx2', prescribable_name: 'Fake Rx 2' }
+      ],
       routing_constraint_type: 'exclude',
       constraint_pharmacies: [
         {
@@ -198,9 +214,9 @@ describe('combineRoutingConstraints', () => {
     expect(combinedRc).toStrictEqual(expectedRc);
   });
 
-  it('combining an include list with the identiy constraint returns the input include list (regardless of input order)', () => {
+  it('combining an include list with the no_advice constraint returns the input include list (regardless of input order)', () => {
     const rc: RoutingConstraint = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [{ id: 'fake_rx1', prescribable_name: 'Fake Rx 1' }],
       routing_constraint_type: 'include',
       constraint_pharmacies: [
         {
@@ -214,15 +230,15 @@ describe('combineRoutingConstraints', () => {
       ]
     };
 
-    const combinedRc1 = combineRoutingConstraints(rc, identityConstraint);
-    const combinedRc2 = combineRoutingConstraints(identityConstraint, rc);
+    const combinedRc1 = combineRoutingConstraints(rc, noAdviceConstraint);
+    const combinedRc2 = combineRoutingConstraints(noAdviceConstraint, rc);
     expect(combinedRc1).toStrictEqual(rc);
     expect(combinedRc2).toStrictEqual(rc);
   });
 
-  it('combining an exclude list with the identiy constraint returns the input exlude list (regardless of input order)', () => {
+  it('combining an exclude list with the no_advice constraint returns the input exlude list (regardless of input order)', () => {
     const rc: RoutingConstraint = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [{ id: 'fake_rx1', prescribable_name: 'Fake Rx 1' }],
       routing_constraint_type: 'exclude',
       constraint_pharmacies: [
         {
@@ -236,8 +252,8 @@ describe('combineRoutingConstraints', () => {
       ]
     };
 
-    const combinedRc1 = combineRoutingConstraints(rc, identityConstraint);
-    const combinedRc2 = combineRoutingConstraints(identityConstraint, rc);
+    const combinedRc1 = combineRoutingConstraints(rc, noAdviceConstraint);
+    const combinedRc2 = combineRoutingConstraints(noAdviceConstraint, rc);
     expect(combinedRc1).toStrictEqual(rc);
     expect(combinedRc2).toStrictEqual(rc);
   });
@@ -246,7 +262,7 @@ describe('combineRoutingConstraints', () => {
 describe('combineAllRoutingConstraints', () => {
   it('rolls up all routing constraints', () => {
     const rc1: RoutingConstraint = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [{ id: 'fake_rx1', prescribable_name: 'Fake Rx 1' }],
       routing_constraint_type: 'include',
       constraint_pharmacies: [
         {
@@ -273,7 +289,7 @@ describe('combineAllRoutingConstraints', () => {
     };
 
     const rc2: RoutingConstraint = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [{ id: 'fake_rx2', prescribable_name: 'Fake Rx 2' }],
       routing_constraint_type: 'include',
       constraint_pharmacies: [
         {
@@ -300,7 +316,7 @@ describe('combineAllRoutingConstraints', () => {
     };
 
     const rc3: RoutingConstraint = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [{ id: 'fake_rx3', prescribable_name: 'Fake Rx 3' }],
       routing_constraint_type: 'exclude',
       constraint_pharmacies: [
         {
@@ -315,7 +331,7 @@ describe('combineAllRoutingConstraints', () => {
     };
 
     const rc4: RoutingConstraint = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [{ id: 'fake_rx4', prescribable_name: 'Fake Rx 4' }],
       routing_constraint_type: 'exclude',
       constraint_pharmacies: [
         {
@@ -330,13 +346,23 @@ describe('combineAllRoutingConstraints', () => {
     };
 
     const rc5: RoutingConstraint = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [
+        { id: 'fake_rx5', prescribable_name: 'Fake Rx 5' },
+        { id: 'fake_rx6', prescribable_name: 'Fake Rx 6' }
+      ],
       routing_constraint_type: 'no_advice'
     };
 
     const combinedRc = combineAllRoutingConstraints([rc1, rc2, rc3, rc4, rc5]);
     const expectedRc = {
-      prescription: { id: '', prescribable_name: '' },
+      prescriptions: [
+        { id: 'fake_rx1', prescribable_name: 'Fake Rx 1' },
+        { id: 'fake_rx2', prescribable_name: 'Fake Rx 2' },
+        { id: 'fake_rx3', prescribable_name: 'Fake Rx 3' },
+        { id: 'fake_rx4', prescribable_name: 'Fake Rx 4' },
+        { id: 'fake_rx5', prescribable_name: 'Fake Rx 5' },
+        { id: 'fake_rx6', prescribable_name: 'Fake Rx 6' }
+      ],
       routing_constraint_type: 'include',
       constraint_pharmacies: [
         {
@@ -353,8 +379,8 @@ describe('combineAllRoutingConstraints', () => {
     expect(combinedRc).toStrictEqual(expectedRc);
   });
 
-  it('combining an empty array returns the identity constraint', () => {
+  it('combining an empty array returns the no_advice constraint', () => {
     const combinedRc = combineAllRoutingConstraints([]);
-    expect(combinedRc).toStrictEqual(identityConstraint);
+    expect(combinedRc).toStrictEqual(noAdviceConstraint);
   });
 });

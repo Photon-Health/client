@@ -31,7 +31,7 @@ export function MockPrescribeProvider(props: MockPrescribeProviderProps) {
     routingConstraints: () => [],
     combinedRoutingConstraint: () => {
       return {
-        prescription: { id: '', prescribable_name: '' },
+        prescriptions: [],
         routing_constraint_type: 'exclude',
         constraint_pharmacies: []
       };
