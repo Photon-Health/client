@@ -108,11 +108,29 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
 
   const { draftPrescriptions } = useDraftPrescriptions();
-  const { routingConstraints, tryUpdatePrescriptionStates, orderFormData } = usePrescribe();
+  const {
+    routingConstraints,
+    combinedRoutingConstraint,
+    tryUpdatePrescriptionStates,
+    orderFormData
+  } = usePrescribe();
 
   const prescriptionIds = createMemo(() =>
     draftPrescriptions().map((prescription) => prescription.id)
   );
+
+  const autoRoutedPharmacyId = createMemo(() => {
+    if (props.pharmacyId) {
+      return props.pharmacyId;
+    }
+
+    if (
+      combinedRoutingConstraint()?.routing_constraint_type === 'include' &&
+      combinedRoutingConstraint()?.constraint_pharmacies?.length === 1
+    ) {
+      return combinedRoutingConstraint().constraint_pharmacies?.[0].id;
+    }
+  });
 
   const client = usePhoton();
   const [showForm, setShowForm] = createSignal<boolean>(
@@ -399,8 +417,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         });
       }
 
-      // default to pharmacy passed in by customer using elements embed
-      let pharmacyId = props.pharmacyId;
+      // default to auto-routed pharmacy passed in by customer using
+      // elements embed or determined based on routing constraints
+      let pharmacyId = autoRoutedPharmacyId();
       if (orderFormData.pharmacyId) {
         // use selected pharmacy if available
         pharmacyId = orderFormData.pharmacyId;
@@ -629,7 +648,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   routingConstraints={routingConstraints()}
                   enableOrder={props.enableOrder}
                 />
-                <Show when={props.enableOrder && !props.pharmacyId}>
+                <Show when={props.enableOrder && !autoRoutedPharmacyId()}>
                   <OrderCard
                     store={props.formStore}
                     actions={props.formActions}
@@ -639,8 +658,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     mailOrderIds={props.mailOrderIds}
                   />
                 </Show>
-                <Show when={props.enableOrder && props.pharmacyId}>
-                  <PharmacyCard pharmacyId={props.pharmacyId} />
+                <Show when={props.enableOrder && autoRoutedPharmacyId()}>
+                  <PharmacyCard pharmacyId={autoRoutedPharmacyId()} />
                 </Show>
                 <Show when={!props.hideSubmit}>
                   {/* We're hiding this alert message if enable-order is set, a rough way to let us know this is not in the App.
