@@ -80,7 +80,7 @@ export function getRoutingConstraint(prescription: Prescription): RoutingConstra
       routing_constraint_type: 'include',
       constraint_pharmacies: [
         {
-          id: 'phr_01J6APWHGNFJCE74SB031VYPHW',
+          id: 'phr_01GA9HPX60H1W0GT02AAHMF75J',
           name: 'LillyDirect Self Pay Pharmacy Solutions'
         }
       ]
@@ -109,7 +109,7 @@ export function getRoutingConstraint(prescription: Prescription): RoutingConstra
       routing_constraint_type: 'exclude',
       constraint_pharmacies: [
         {
-          id: 'phr_01J6APWHGNFJCE74SB031VYPHW',
+          id: 'phr_01GA9HPX60H1W0GT02AAHMF75J',
           name: 'LillyDirect Self Pay Pharmacy Solutions'
         }
       ]

@@ -1,4 +1,12 @@
-import { createContext, createMemo, JSXElement, onMount, useContext, Show } from 'solid-js';
+import {
+  createContext,
+  createMemo,
+  JSXElement,
+  onMount,
+  useContext,
+  Show,
+  createRoot
+} from 'solid-js';
 import { createStore } from 'solid-js/store';
 import Card from '../Card';
 import Icon from '../Icon';
@@ -158,3 +166,20 @@ function RadioGroupCards(props: RadioGroupCardsProps) {
 RadioGroupCards.Option = Option;
 
 export default RadioGroupCards;
+
+export function createRadioGroupCardsController(controllerProps: RadioGroupCardsProps) {
+  return createRoot(() => {
+    return {
+      setSelected: controllerProps.setSelected,
+      RadioGroupCards: (props: { children: JSXElement }) => (
+        <RadioGroupCards
+          label={controllerProps.label}
+          initSelected={controllerProps.initSelected}
+          setSelected={controllerProps.setSelected}
+        >
+          {props.children}
+        </RadioGroupCards>
+      )
+    };
+  });
+}

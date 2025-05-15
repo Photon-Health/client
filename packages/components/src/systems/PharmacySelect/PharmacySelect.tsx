@@ -1,11 +1,13 @@
 import { types } from '@photonhealth/sdk';
-import { createEffect, createSignal, For, onMount, Show, untrack } from 'solid-js';
-import RadioGroupCards from '../../particles/RadioGroupCards';
+import { createEffect, createMemo, createSignal, For, onMount, Show, untrack } from 'solid-js';
+import RadioGroupCards, { RadioGroupCardsProps } from '../../particles/RadioGroupCards';
+import { createRadioGroupCardsController } from '../../particles/RadioGroupCards';
 import Tabs from '../../particles/Tabs';
 import PharmacySearch from '../PharmacySearch';
 import { MailOrderPharmacy } from './MailOrderPharmacy';
 import { SendToPatient } from './SendToPatient';
 import { usePrescribe } from '../PrescribeProvider';
+import { Dynamic } from 'solid-js/web';
 
 enum SendToPatientEnum {
   sendToPatient = 'SEND_TO_PATIENT'
@@ -59,12 +61,42 @@ const parseFulfillmentType = (type: FulfillmentType | undefined) => {
 };
 
 export function PharmacySelect(props: PharmacySelectProps) {
-  const { orderFormData, selectedCoverageOption } = usePrescribe();
+  const { orderFormData, selectedCoverageOption, unroutablePharmacyIds } = usePrescribe();
 
   const [localPharmId, setLocalPharmId] = createSignal<string | undefined>();
   const [mailOrderId, setMailOrderId] = createSignal<string | undefined>();
   const [tabs, setTabs] = createSignal<TabNamesEnum[]>([]);
   const [activeTab, setActiveTab] = createSignal<TabNamesEnum>(TabNamesEnum.sendToPatient);
+
+  const routableMailOrderPharmacyIds = createMemo(() => {
+    return props.mailOrderPharmacyIds?.filter((id) => !unroutablePharmacyIds().has(id));
+  });
+
+  const initMailOrderPharmacyId = createMemo(() => {
+    return routableMailOrderPharmacyIds()?.[0];
+  });
+
+  const radioGroupCardsController = createMemo(() => {
+    const radioGroupCardProps: RadioGroupCardsProps = {
+      label: 'Pharmacies',
+      initSelected: initMailOrderPharmacyId(),
+      setSelected: (pharmacyId: string) => {
+        setMailOrderId(pharmacyId);
+        if (activeTab() === TabNamesEnum.mailOrder) {
+          props.setPharmacyId(pharmacyId);
+        }
+      },
+      children: null
+    };
+    return createRadioGroupCardsController(radioGroupCardProps);
+  });
+
+  createEffect(() => {
+    console.log('test');
+    if (unroutablePharmacyIds().has(mailOrderId() || '')) {
+      radioGroupCardsController().setSelected?.(initMailOrderPharmacyId() || '');
+    }
+  });
 
   onMount(() => {
     // add the tabs to tabs
@@ -154,24 +186,15 @@ export function PharmacySelect(props: PharmacySelectProps) {
 
         <Show when={tabs().includes(TabNamesEnum.mailOrder)}>
           <div class={activeTab() !== TabNamesEnum.mailOrder ? 'hidden' : ''}>
-            <RadioGroupCards
-              label="Pharmacies"
-              initSelected={props?.mailOrderPharmacyIds?.[0]}
-              setSelected={(pharmacyId) => {
-                setMailOrderId(pharmacyId);
-                if (activeTab() === TabNamesEnum.mailOrder) {
-                  props.setPharmacyId(pharmacyId);
-                }
-              }}
-            >
+            <Dynamic component={radioGroupCardsController().RadioGroupCards}>
               <For each={props?.mailOrderPharmacyIds || []}>
                 {(id) => (
-                  <RadioGroupCards.Option value={id}>
+                  <RadioGroupCards.Option value={id} disabled={unroutablePharmacyIds().has(id)}>
                     <MailOrderPharmacy pharmacyId={id} />
                   </RadioGroupCards.Option>
                 )}
               </For>
-            </RadioGroupCards>
+            </Dynamic>
           </div>
         </Show>
       </div>
