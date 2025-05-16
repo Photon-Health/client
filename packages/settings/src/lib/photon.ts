@@ -27,7 +27,8 @@ import {
   TWENTYEIGHT_PARTNER_COSMO_PHARMACY_ID,
   TWENTYEIGHT_PARTNER_CARE_FIRST_PHARMACY_ID,
   TWENTYEIGHT_PARTNER_CATTLES_PHARMACY_ID,
-  TWENTYEIGHT_PARTNER_MEADOWS_PHARMACY_ID
+  TWENTYEIGHT_PARTNER_MEADOWS_PHARMACY_ID,
+  EPIQ_PHARMACY_ID
 } from '../pharmacies';
 /**
  * All orgs inherit from default settings, so updates
@@ -65,7 +66,8 @@ const organizationSettings: {
       STRIVE_PHARMACY_ID,
       OPENLOOP_PHARMACY_ID,
       GIFTHEALTH_PHARMACY_ID,
-      EMPOWER_PHARMACY_ID
+      EMPOWER_PHARMACY_ID,
+      EPIQ_PHARMACY_ID
     ]
   },
   // River Health
@@ -199,6 +201,10 @@ const organizationSettings: {
   },
   // Om Dermatology (sub-org of Miiskin)
   org_1eNnu0Wi14vBH7IM: {
+    provider: [HONEYBEE_PHARMACY_ID]
+  },
+  // Eastern Dermatology and Pathology (sub-org of Miiskin)
+  org_W8Wuz6dYDjD0hNqT: {
     provider: [HONEYBEE_PHARMACY_ID]
   },
   // Geviti -- Sub org of CareTalk
