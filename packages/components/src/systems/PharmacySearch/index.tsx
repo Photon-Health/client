@@ -1,4 +1,4 @@
-import { For, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
+import { For, Show, createEffect, createMemo, createSignal } from 'solid-js';
 import { gql } from '@apollo/client';
 import { Address, Pharmacy as _Pharmacy } from '@photonhealth/sdk/dist/types';
 import InputGroup from '../../particles/InputGroup';
@@ -9,12 +9,11 @@ import Icon from '../../particles/Icon';
 import { types } from '@photonhealth/sdk';
 import { usePhotonClient } from '../SDKProvider';
 import getLocations, { Location } from '../../utils/getLocations';
-import loadGoogleScript from '../../utils/loadGoogleScript';
 import Badge from '../../particles/Badge';
 import Checkbox from '../../particles/Checkbox';
 import formatAddress from '../../utils/formatAddress';
 import Spinner from '../../particles/Spinner';
-import { asyncInterval } from '../../utils/asyncInterval';
+import { usePrescribe } from '../PrescribeProvider';
 
 export const GetPharmaciesQuery = gql`
   query GetPharmacies($location: LatLongSearch!) {
@@ -111,6 +110,7 @@ interface PharmacyExtended extends Pharmacy {
 
 export default function PharmacySearch(props: PharmacySearchProps) {
   const client = usePhotonClient();
+  const { googleMapsServices } = usePrescribe();
   const [selected, setSelected] = createSignal<any>();
   const [query, setQuery] = createSignal('');
   const [location, setLocation] = createSignal<Location | null>(null);
@@ -119,7 +119,6 @@ export default function PharmacySearch(props: PharmacySearchProps) {
   const [fetchingPharmacies, setFetchingPharmacies] = createSignal(false);
   const [fetchingPreferred, setFetchingPreferred] = createSignal(false);
   const [openLocationSearch, setOpenLocationSearch] = createSignal(false);
-  const [geocoder, setGeocoder] = createSignal<google.maps.Geocoder | undefined>();
   const [previousId, setPreviousId] = createSignal<string | null>(null);
 
   async function fetchPharmacies() {
@@ -139,6 +138,9 @@ export default function PharmacySearch(props: PharmacySearchProps) {
   async function fetchPreferredAndPrevious(patientId: string) {
     setFetchingPreferred(true);
     try {
+      const { geocoder } = googleMapsServices();
+      if (!geocoder) throw new Error('Geocoder not loaded');
+
       const { data: preferredData } = await client!.apollo.query({
         query: GetPreferredPharmaciesQuery,
         variables: { id: patientId }
@@ -153,13 +155,8 @@ export default function PharmacySearch(props: PharmacySearchProps) {
       if (address) {
         const addressStr = formatAddress(address);
 
-        const geo = geocoder();
-
-        // Make sure that the geocoder is loaded
-        await asyncInterval(() => !!geo, 10, 20);
-
-        if (geo) {
-          await getAndSetLocation(addressStr, geo);
+        if (geocoder) {
+          await getAndSetLocation(addressStr);
         } else {
           throw new Error('Hit max attempts to load geocoder');
         }
@@ -235,28 +232,15 @@ export default function PharmacySearch(props: PharmacySearchProps) {
       pharmacy.address?.city || ''
     )}, ${pharmacy.address?.state}`;
 
-  async function getAndSetLocation(address: string, geocoder: google.maps.Geocoder) {
+  async function getAndSetLocation(address: string) {
+    const { geocoder } = googleMapsServices();
+    if (!geocoder) throw new Error('Geocoder not loaded');
+
     const locations = await getLocations(address || '', geocoder);
     if (locations.length > 0) {
       setLocation(locations[0]);
     }
   }
-
-  onMount(() => {
-    if (props?.address) {
-      setFetchingPharmacies(true);
-    }
-
-    loadGoogleScript({
-      onLoad: async () => {
-        const geo = new google.maps.Geocoder();
-        setGeocoder(geo);
-        if (props?.address) {
-          getAndSetLocation(props.address || '', geo);
-        }
-      }
-    });
-  });
 
   createEffect(() => {
     // if patient id, fetch preferred Pharmacies
@@ -269,7 +253,7 @@ export default function PharmacySearch(props: PharmacySearchProps) {
     // if address is set later in lifecycle, fetch
     if (props?.address) {
       setFetchingPharmacies(true);
-      getAndSetLocation(props.address, geocoder()!);
+      getAndSetLocation(props.address);
     }
   });
 
