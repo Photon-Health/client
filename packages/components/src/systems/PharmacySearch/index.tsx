@@ -138,9 +138,6 @@ export default function PharmacySearch(props: PharmacySearchProps) {
   async function fetchPreferredAndPrevious(patientId: string) {
     setFetchingPreferred(true);
     try {
-      const { geocoder } = googleMapsServices();
-      if (!geocoder) throw new Error('Geocoder not loaded');
-
       const { data: preferredData } = await client!.apollo.query({
         query: GetPreferredPharmaciesQuery,
         variables: { id: patientId }
@@ -154,12 +151,7 @@ export default function PharmacySearch(props: PharmacySearchProps) {
 
       if (address) {
         const addressStr = formatAddress(address);
-
-        if (geocoder) {
-          await getAndSetLocation(addressStr);
-        } else {
-          throw new Error('Hit max attempts to load geocoder');
-        }
+        await getAndSetLocation(addressStr);
       }
 
       if (preferredData?.patient?.preferredPharmacies?.length > 0) {
