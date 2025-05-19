@@ -1,11 +1,11 @@
 import {
   createContext,
   createMemo,
+  createEffect,
   JSXElement,
   onMount,
   useContext,
-  Show,
-  createRoot
+  Show
 } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import Card from '../Card';
@@ -25,7 +25,7 @@ interface RadioGroupCardsActions {
   addOption: (option: string) => void;
 }
 
-type RadioGroupCardsContextValue = [RadioGroupCardsState, RadioGroupCardsActions];
+export type RadioGroupCardsContextValue = [RadioGroupCardsState, RadioGroupCardsActions];
 
 export const RadioGroupCardsContext = createContext<RadioGroupCardsContextValue>([
   { selected: '', options: [], fieldsetLabel: '' },
@@ -60,6 +60,12 @@ export function RadioGroupCardsProvider(props: RadioGroupCardsProps) {
       }
     }
   ];
+
+  createEffect(() => {
+    if (props.contextRef) {
+      props.contextRef(radioGroup);
+    }
+  });
 
   return (
     <RadioGroupCardsContext.Provider value={radioGroup}>
@@ -136,6 +142,7 @@ export interface RadioGroupCardsProps {
   initSelected?: string;
   children: JSXElement;
   setSelected?: (selected: string) => void;
+  contextRef?: (context: RadioGroupCardsContextValue) => void;
 }
 
 function RadioGroupCardsRoot(props: RadioGroupCardsProps) {
@@ -166,20 +173,3 @@ function RadioGroupCards(props: RadioGroupCardsProps) {
 RadioGroupCards.Option = Option;
 
 export default RadioGroupCards;
-
-export function createRadioGroupCardsController(controllerProps: RadioGroupCardsProps) {
-  return createRoot(() => {
-    return {
-      setSelected: controllerProps.setSelected,
-      RadioGroupCards: (props: { children: JSXElement }) => (
-        <RadioGroupCards
-          label={controllerProps.label}
-          initSelected={controllerProps.initSelected}
-          setSelected={controllerProps.setSelected}
-        >
-          {props.children}
-        </RadioGroupCards>
-      )
-    };
-  });
-}
