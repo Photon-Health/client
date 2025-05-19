@@ -243,8 +243,9 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
         });
       } else {
         // check coverage on a walgreens or cvs pharmacy near the patient
-        if (patientAddress()) {
-          fetchLocalPharmacies(patientAddress()!).then((pharmacies) => {
+        const address = patientAddress();
+        if (address) {
+          fetchLocalPharmacies(address).then((pharmacies) => {
             let localPharmacyId: string | null = null;
             const majorChainPharmacy = pharmacies.find(
               (pharmacy: { id: string; name: string }) =>
