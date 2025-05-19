@@ -14,43 +14,7 @@ import Checkbox from '../../particles/Checkbox';
 import formatAddress from '../../utils/formatAddress';
 import Spinner from '../../particles/Spinner';
 import { usePrescribe } from '../PrescribeProvider';
-
-export const GetPharmaciesQuery = gql`
-  query GetPharmacies($location: LatLongSearch!) {
-    pharmacies(location: $location) {
-      id
-      name
-      address {
-        street1
-        city
-        state
-      }
-    }
-  }
-`;
-
-export const GetPreferredPharmaciesQuery = gql`
-  query GetPatient($id: ID!) {
-    patient(id: $id) {
-      address {
-        street1
-        street2
-        city
-        state
-        postalCode
-      }
-      preferredPharmacies {
-        id
-        name
-        address {
-          street1
-          city
-          state
-        }
-      }
-    }
-  }
-`;
+import { GetPatientPreferredPharmaciesAndAddress, GetPharmaciesQuery } from '../../fetch';
 
 type Pharmacy = Pick<_Pharmacy, 'id' | 'name'> & {
   address: Pick<Address, 'street1' | 'city' | 'state'>;
@@ -139,7 +103,7 @@ export default function PharmacySearch(props: PharmacySearchProps) {
     setFetchingPreferred(true);
     try {
       const { data: preferredData } = await client!.apollo.query({
-        query: GetPreferredPharmaciesQuery,
+        query: GetPatientPreferredPharmaciesAndAddress,
         variables: { id: patientId }
       });
       const { data: previousData } = await client!.apollo.query({
