@@ -13,7 +13,7 @@ import Badge from '../../particles/Badge';
 import Checkbox from '../../particles/Checkbox';
 import formatAddress from '../../utils/formatAddress';
 import Spinner from '../../particles/Spinner';
-import { usePrescribe } from '../PrescribeProvider';
+import { useGoogleService } from '../GoogleServiceProvider';
 import { GetPatientPreferredPharmaciesAndAddress, GetPharmaciesQuery } from '../../fetch';
 
 type Pharmacy = Pick<_Pharmacy, 'id' | 'name'> & {
@@ -74,7 +74,7 @@ interface PharmacyExtended extends Pharmacy {
 
 export default function PharmacySearch(props: PharmacySearchProps) {
   const client = usePhotonClient();
-  const { googleMapsServices } = usePrescribe();
+  const { googleMapsServices } = useGoogleService();
   const [selected, setSelected] = createSignal<any>();
   const [query, setQuery] = createSignal('');
   const [location, setLocation] = createSignal<Location | null>(null);
