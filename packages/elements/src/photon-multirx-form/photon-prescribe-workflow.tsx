@@ -287,6 +287,16 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     setScreeningAlerts(data?.prescriptionScreen?.alerts ?? []);
   };
 
+  createEffect(() => {
+    if (draftPrescriptions().length > 0) {
+      // if drafted prescriptions gets appended to,
+      // such as in the case of re-prescribing from
+      // med history, we need to screen the new
+      // prescriptions
+      screenDraftedPrescriptions();
+    }
+  });
+
   const dispatchPrescriptionsError = (errors: readonly Error[]) => {
     const event = new CustomEvent('photon-prescriptions-error', {
       composed: true,
