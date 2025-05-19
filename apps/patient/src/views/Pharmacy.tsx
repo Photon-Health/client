@@ -83,7 +83,7 @@ export const Pharmacy = () => {
 
   // top ranked pharmacies
   const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
-  const enableTopRankedCostco = !isDemo && topRankedCostco && containsGLP; // only show costco if there are GLP treatments
+  const enableTopRankedCostco = !isDemo && topRankedCostco;
   const enableTopRankedWalgreens = !isDemo && topRankedWalgreens && containsGLP;
 
   // View state
