@@ -9,7 +9,7 @@ import getNavigatorLocation from '../../utils/getNavigatorLocation';
 import getLocations, { Location } from '../../utils/getLocations';
 import autocompleteLocation from '../../utils/autocompleteLocation';
 import ComboBox from '../../particles/ComboBox';
-import { usePrescribe } from '../PrescribeProvider';
+import { useGoogleService } from '../GoogleServiceProvider';
 
 interface LocationSelectProps {
   open: boolean;
@@ -22,7 +22,7 @@ export default function LocationSelect(props: LocationSelectProps) {
   const [loadingNavigator, setLoadingNavigator] = createSignal(false);
   const [navigatorError, setNavigatorError] = createSignal(false);
   const [options, setOptions] = createSignal<any[]>([]);
-  const { googleMapsServices } = usePrescribe();
+  const { googleMapsServices } = useGoogleService();
 
   const handleAddressSubmit = async (address: string) => {
     const { geocoder } = googleMapsServices();

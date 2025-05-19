@@ -5,8 +5,7 @@ import {
   createMemo,
   createSignal,
   JSXElement,
-  useContext,
-  onMount
+  useContext
 } from 'solid-js';
 import { format } from 'date-fns';
 import { usePhotonClient } from '../SDKProvider';
@@ -34,9 +33,8 @@ import {
   RoutingConstraint
 } from '../RoutingConstraints';
 import { createStore } from 'solid-js/store';
-import loadGoogleScript from '../../utils/loadGoogleScript';
 import getLocation from '../../utils/getLocations';
-
+import { useGoogleService } from '../GoogleServiceProvider';
 // The order form data will consist of, at least, the list of selected prescription IDs and pharmacy ID.
 // The prescription form data (todo) will consist of a single prescription's data during user input
 // Note: Multiple prescription "sub" forms can be opened/completed within a single order form
@@ -66,10 +64,6 @@ export type PrescribeContextType = {
     key: K,
     value: PrescribeOrderFormData[K]
   ) => void;
-  googleMapsServices: Accessor<{
-    geocoder: google.maps.Geocoder | null;
-    autocompleteService: google.maps.places.AutocompleteService | null;
-  }>;
 };
 
 const PrescribeContext = createContext<PrescribeContextType>();
@@ -132,6 +126,7 @@ const transformPrescription = (prescription: PrescriptionFormData, patientId: st
 });
 
 export const PrescribeProvider = (props: PrescribeProviderProps) => {
+  const { googleMapsServices } = useGoogleService();
   const [isLoadingPrefills, setIsLoadingPrefills] = createSignal<boolean>(false);
   const [hasCreatedPrescriptions, setHasCreatedPrescriptions] = createSignal<boolean>(false);
   const [coverageOptions, setCoverageOptions] = createSignal<CoverageOption[]>([]);
@@ -273,28 +268,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
         }
       }
     }
-  });
-
-  const [googleMapsServices, setGoogleMapsServices] = createSignal<{
-    geocoder: google.maps.Geocoder | null;
-    autocompleteService: google.maps.places.AutocompleteService | null;
-  }>({
-    geocoder: null,
-    autocompleteService: null
-  });
-
-  onMount(() => {
-    loadGoogleScript({
-      onLoad: () => {
-        setGoogleMapsServices({
-          geocoder: new google.maps.Geocoder(),
-          autocompleteService: new google.maps.places.AutocompleteService()
-        });
-      },
-      onError: (error) => {
-        console.error('Error loading Google Maps script:', error);
-      }
-    });
   });
 
   async function createPrescriptionsFromIds() {
@@ -572,7 +545,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     combinedRoutingConstraint,
     orderFormData,
     selectedCoverageOption,
-    googleMapsServices,
 
     // actions
     tryCreatePrescription,
