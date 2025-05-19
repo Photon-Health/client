@@ -32,14 +32,15 @@ export const Login = () => {
   useEffect(() => {
     const invite = searchParams.get('invitation');
     const org = searchParams.get('organization');
-
     if (invite && org) {
-      login({
-        organizationId: org,
-        invitation: invite
-      }).catch((err) => {
-        console.error('Login failed:', err);
-      });
+      const loginWithInvite = async () => {
+        try {
+          await login({ organizationId: org, invitation: invite });
+        } catch (err) {
+          console.error('Login with invitefailed:', err);
+        }
+      };
+      loginWithInvite();
     }
   }, [searchParams, login]);
 
