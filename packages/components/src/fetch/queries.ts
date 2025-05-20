@@ -56,12 +56,38 @@ export const GetPatient = gql`
   }
 `;
 
-export const GetPatientPreferredPharmacies = gql`
+export const GetPatientPreferredPharmaciesAndAddress = gql`
   query GetPatient($id: ID!) {
     patient(id: $id) {
       preferredPharmacies {
         id
         name
+        address {
+          street1
+          city
+          state
+        }
+      }
+      address {
+        street1
+        street2
+        city
+        state
+        postalCode
+      }
+    }
+  }
+`;
+
+export const GetPharmaciesQuery = gql`
+  query GetPharmacies($location: LatLongSearch!) {
+    pharmacies(location: $location) {
+      id
+      name
+      address {
+        street1
+        city
+        state
       }
     }
   }

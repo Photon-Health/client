@@ -19,7 +19,8 @@ import {
   CreatePrescription,
   CreatePrescriptionTemplate,
   GenerateCoverageOptions,
-  GetPatientPreferredPharmacies,
+  GetPatientPreferredPharmaciesAndAddress,
+  GetPharmaciesQuery,
   GetPrescription,
   GetTemplatesFromCatalogs,
   UpdatePrescriptionStates
@@ -32,7 +33,8 @@ import {
   RoutingConstraint
 } from '../RoutingConstraints';
 import { createStore } from 'solid-js/store';
-
+import getLocation from '../../utils/getLocations';
+import { useGoogleService } from '../GoogleServiceProvider';
 // The order form data will consist of, at least, the list of selected prescription IDs and pharmacy ID.
 // The prescription form data (todo) will consist of a single prescription's data during user input
 // Note: Multiple prescription "sub" forms can be opened/completed within a single order form
@@ -125,12 +127,14 @@ const transformPrescription = (prescription: PrescriptionFormData, patientId: st
 });
 
 export const PrescribeProvider = (props: PrescribeProviderProps) => {
+  const { googleMapsServices } = useGoogleService();
   const [isLoadingPrefills, setIsLoadingPrefills] = createSignal<boolean>(false);
   const [hasCreatedPrescriptions, setHasCreatedPrescriptions] = createSignal<boolean>(false);
   const [coverageOptions, setCoverageOptions] = createSignal<CoverageOption[]>([]);
   const [patientPreferredPharmacyId, setPatientPreferredPharmacyId] = createSignal<string | null>(
     null
   );
+  const [patientAddress, setPatientAddress] = createSignal<Address | null>(null);
   const [didSelectOtherCoverageOption, setDidSelectOtherCoverageOption] =
     createSignal<boolean>(false);
   const [selectedCoverageOption, setSelectedCoverageOption] = createSignal<
@@ -166,6 +170,32 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     );
   });
 
+  async function fetchPharmacies(location: { latitude: number; longitude: number }) {
+    const { data } = await client!.apollo.query({
+      query: GetPharmaciesQuery,
+      variables: {
+        location: { latitude: location?.latitude, longitude: location?.longitude }
+      }
+    });
+    if (!data?.pharmacies) {
+      return [];
+    }
+
+    return data.pharmacies;
+  }
+
+  async function fetchLocalPharmacies(address: Address) {
+    const { geocoder } = googleMapsServices();
+    if (!geocoder) throw new Error('Geocoder not loaded');
+
+    const stringAddress = `${address?.street1}, ${address?.city}, ${address?.state} ${address?.postalCode}`;
+
+    const locations = await getLocation(stringAddress, geocoder);
+
+    const pharmacies = await fetchPharmacies(locations[0]);
+    return pharmacies;
+  }
+
   // Prefill new prescriptions based on templateIds or prescriptionIds when we get a patientId
   createEffect(() => {
     if (
@@ -182,9 +212,12 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
 
   createEffect(() => {
     if (props.patientId) {
-      getPatientPreferredPharmacies(props.patientId).then((pharmacies) => {
+      getPatientPreferredPharmaciesAndAddress(props.patientId).then(({ pharmacies, address }) => {
         if (pharmacies.length > 0) {
           setPatientPreferredPharmacyId(pharmacies[0].id);
+        }
+        if (address) {
+          setPatientAddress(address);
         }
       });
     }
@@ -201,19 +234,50 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   });
 
   // if we have prescriptions, coverage check is enabled, and the patient has a preferred pharmacy,
-  // then we need to check the coverage of the prescriptions
+  // then we need to check the coverage of the prescriptions on the preferred pharmacy
+  // -- IF the patient does NOT have a preferred pharmacy, then we need to check the coverage
+  // based on pharmacy near the patient
   createEffect(() => {
-    const pharmacyId = patientPreferredPharmacyId();
+    const preferredId = patientPreferredPharmacyId();
     const prescriptions = draftPrescriptions();
+
     if (
       !didSelectOtherCoverageOption() && // after an alternate is chosen, stop fetching coverages for this patient
       props.enableCoverageCheck &&
-      prescriptions.length > 0 &&
-      pharmacyId !== null
+      prescriptions.length > 0
     ) {
-      generateCoverageOptions(prescriptions, pharmacyId).then((generatedCoverageOptions) => {
-        setCoverageOptions(generatedCoverageOptions);
-      });
+      if (preferredId) {
+        // check coverage on the preferred pharmacy
+        generateCoverageOptions(prescriptions, preferredId).then((generatedCoverageOptions) => {
+          setCoverageOptions(generatedCoverageOptions);
+        });
+      } else {
+        // check coverage on a walgreens or cvs pharmacy near the patient
+        const address = patientAddress();
+        if (address) {
+          fetchLocalPharmacies(address).then((pharmacies) => {
+            let localPharmacyId: string | null = null;
+            const majorChainPharmacy = pharmacies.find(
+              (pharmacy: { id: string; name: string }) =>
+                pharmacy.name.toLowerCase().includes('cvs') ||
+                pharmacy.name.toLowerCase().includes('walgreens') ||
+                pharmacy.name.toLowerCase().includes('walmart') ||
+                pharmacy.name.toLowerCase().includes('rite aid')
+            );
+
+            // if we found a major chain pharmacy, use that otherwise use the first pharmacy in the list
+            localPharmacyId = majorChainPharmacy?.id || pharmacies[0]?.id;
+
+            if (localPharmacyId) {
+              generateCoverageOptions(prescriptions, localPharmacyId).then(
+                (generatedCoverageOptions) => {
+                  setCoverageOptions(generatedCoverageOptions);
+                }
+              );
+            }
+          });
+        }
+      }
     }
   });
 
@@ -300,13 +364,17 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     setIsLoadingPrefills(false);
   }
 
-  const getPatientPreferredPharmacies = async (patientId: string) => {
+  const getPatientPreferredPharmaciesAndAddress = async (patientId: string) => {
     try {
       const response = await client.apollo.query({
-        query: GetPatientPreferredPharmacies,
+        query: GetPatientPreferredPharmaciesAndAddress,
         variables: { id: patientId }
       });
-      return response.data.patient.preferredPharmacies as PatientPreferredPharmacy[];
+
+      return {
+        pharmacies: response.data.patient.preferredPharmacies as PatientPreferredPharmacy[],
+        address: response.data.patient.address as Address
+      };
     } catch (error) {
       triggerToast({
         status: 'error',
@@ -545,4 +613,12 @@ export type CoverageOption = {
   treatment: { id: string; name: string };
   alerts: Array<{ label: string; text: string }>;
   pharmacy: { id: string; name: string };
+};
+
+export type Address = {
+  street1: string;
+  street2: string;
+  city: string;
+  state: string;
+  postalCode: string;
 };
