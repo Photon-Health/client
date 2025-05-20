@@ -21,7 +21,6 @@ import useQueryParams from '../../hooks/useQueryParams';
 export const Login = () => {
   const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });
   const query = useQueryParams();
-
   const { isAuthenticated, login, error, isLoading } = usePhoton();
   const location = useLocation() as any;
 
