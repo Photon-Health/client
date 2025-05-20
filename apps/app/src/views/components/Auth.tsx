@@ -6,8 +6,6 @@ import { useQuery } from '@apollo/client';
 
 interface AuthProps {
   returnTo?: string;
-  organizationId?: string | undefined;
-  invitation?: string | undefined;
 }
 
 const orgSettingsQuery = graphql(/* GraphQL */ `
@@ -23,7 +21,7 @@ const orgSettingsQuery = graphql(/* GraphQL */ `
 `);
 
 export const Auth = (props: AuthProps) => {
-  const { returnTo, organizationId, invitation } = props;
+  const { returnTo } = props;
   const { clinicalClient, isLoading, isAuthenticated, login, logout } = usePhoton();
   const { data } = useQuery(orgSettingsQuery, { client: clinicalClient });
   const federated = data?.organization?.settings?.providerUx?.federatedAuth ?? false;
@@ -46,10 +44,7 @@ export const Auth = (props: AuthProps) => {
     );
 
   return (
-    <Button
-      colorScheme="blue"
-      onClick={() => login({ organizationId, invitation, appState: { returnTo } })}
-    >
+    <Button colorScheme="blue" onClick={() => login({ appState: { returnTo } })}>
       Log in
     </Button>
   );
