@@ -187,7 +187,7 @@ export function PharmacySelect(props: PharmacySelectProps) {
                   <RadioGroupCards.Option
                     value={id}
                     disabled={unroutablePharmacyIds().has(id)}
-                    alert={<PharmacyRoutingAlert />}
+                    alert={unroutablePharmacyIds().has(id) && <PharmacyRoutingAlert />}
                   >
                     <MailOrderPharmacy pharmacyId={id} />
                   </RadioGroupCards.Option>
