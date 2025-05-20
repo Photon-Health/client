@@ -6,6 +6,7 @@ import PharmacySearch from '../PharmacySearch';
 import { MailOrderPharmacy } from './MailOrderPharmacy';
 import { SendToPatient } from './SendToPatient';
 import { usePrescribe } from '../PrescribeProvider';
+import { PharmacyRoutingAlert } from '../RoutingConstraints';
 
 enum SendToPatientEnum {
   sendToPatient = 'SEND_TO_PATIENT'
@@ -183,7 +184,11 @@ export function PharmacySelect(props: PharmacySelectProps) {
             >
               <For each={props?.mailOrderPharmacyIds || []}>
                 {(id) => (
-                  <RadioGroupCards.Option value={id} disabled={unroutablePharmacyIds().has(id)}>
+                  <RadioGroupCards.Option
+                    value={id}
+                    disabled={unroutablePharmacyIds().has(id)}
+                    alert={<PharmacyRoutingAlert />}
+                  >
                     <MailOrderPharmacy pharmacyId={id} />
                   </RadioGroupCards.Option>
                 )}
