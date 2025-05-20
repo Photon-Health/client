@@ -21,14 +21,20 @@ import useQueryParams from '../../hooks/useQueryParams';
 export const Login = () => {
   const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });
   const query = useQueryParams();
-
-  const { isAuthenticated, error, isLoading } = usePhoton();
+  const { isAuthenticated, login, error, isLoading } = usePhoton();
   const location = useLocation() as any;
 
   // Handle invite with redirect, even if logged in
   const [searchParams] = useSearchParams();
-  const invite = searchParams.get('invitation') ?? undefined;
-  const org = searchParams.get('organization') ?? undefined;
+  const invite = searchParams.get('invitation');
+  const org = searchParams.get('organization');
+
+  if (invite && org) {
+    login({
+      organizationId: org,
+      invitation: invite
+    });
+  }
 
   if (isAuthenticated) {
     return <Navigate to="/" replace />;
@@ -70,7 +76,7 @@ export const Login = () => {
           </Stack>
         </Stack>
         <Stack spacing="4">
-          <Auth returnTo={location.state?.returnTo} organizationId={org} invitation={invite} />
+          <Auth returnTo={location.state?.returnTo} />
         </Stack>
       </Stack>
     </Container>
