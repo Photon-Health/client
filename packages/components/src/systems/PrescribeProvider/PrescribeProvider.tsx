@@ -49,6 +49,7 @@ export type PrescribeContextType = {
   coverageOptions: Accessor<CoverageOption[]>;
   routingConstraints: Accessor<RoutingConstraint[]>;
   combinedRoutingConstraint: Accessor<RoutingConstraint>;
+  unroutablePharmacyIds: Accessor<Set<string>>;
   orderFormData: PrescribeOrderFormData;
   selectedCoverageOption: Accessor<CoverageOption | undefined>;
 
@@ -158,6 +159,15 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
 
   const combinedRoutingConstraint = createMemo(() => {
     return combineAllRoutingConstraints(routingConstraints());
+  });
+
+  const unroutablePharmacyIds = createMemo(() => {
+    const combinedExcludeRoutingConstraint = combineAllRoutingConstraints(routingConstraints(), [
+      'exclude'
+    ]);
+    return new Set(
+      combinedExcludeRoutingConstraint.constraint_pharmacies?.map((pharmacy) => pharmacy.id) || []
+    );
   });
 
   async function fetchPharmacies(location: { latitude: number; longitude: number }) {
@@ -544,6 +554,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     coverageOptions,
     routingConstraints,
     combinedRoutingConstraint,
+    unroutablePharmacyIds,
     orderFormData,
     selectedCoverageOption,
 

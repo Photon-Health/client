@@ -1,4 +1,12 @@
-import { createContext, createMemo, JSXElement, onMount, useContext, Show } from 'solid-js';
+import {
+  createContext,
+  createMemo,
+  createEffect,
+  JSXElement,
+  onMount,
+  useContext,
+  Show
+} from 'solid-js';
 import { createStore } from 'solid-js/store';
 import Card from '../Card';
 import Icon from '../Icon';
@@ -17,7 +25,7 @@ interface RadioGroupCardsActions {
   addOption: (option: string) => void;
 }
 
-type RadioGroupCardsContextValue = [RadioGroupCardsState, RadioGroupCardsActions];
+export type RadioGroupCardsContextValue = [RadioGroupCardsState, RadioGroupCardsActions];
 
 export const RadioGroupCardsContext = createContext<RadioGroupCardsContextValue>([
   { selected: '', options: [], fieldsetLabel: '' },
@@ -52,6 +60,12 @@ export function RadioGroupCardsProvider(props: RadioGroupCardsProps) {
       }
     }
   ];
+
+  createEffect(() => {
+    if (props.contextRef) {
+      props.contextRef(radioGroup);
+    }
+  });
 
   return (
     <RadioGroupCardsContext.Provider value={radioGroup}>
@@ -128,6 +142,7 @@ export interface RadioGroupCardsProps {
   initSelected?: string;
   children: JSXElement;
   setSelected?: (selected: string) => void;
+  contextRef?: (context: RadioGroupCardsContextValue) => void;
 }
 
 function RadioGroupCardsRoot(props: RadioGroupCardsProps) {
