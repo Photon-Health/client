@@ -86,6 +86,10 @@ const orgMailOrders: Record<string, Partial<MailOrderPharmacyConfigs>> = {
   org_TY5GFYPIRo3xQGYM: {
     patient: [AMAZON_PHARMACY_ID]
   },
+  // Jake's Test Org (photon as non-honeybee partner prescriber)
+  org_FR93NzavObFoddnt: {
+    provider: [HONEYBEE_PHARMACY_ID]
+  },
   // River Health
   org_U3ofDUVRsNTYt7d8: {
     provider: [CAREPOINT_PHARMACY_ID]
