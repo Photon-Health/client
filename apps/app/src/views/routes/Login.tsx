@@ -17,6 +17,7 @@ import { usePhoton } from '@photonhealth/react';
 import { Logo } from '../components/Logo';
 import { Auth } from '../components/Auth';
 import useQueryParams from '../../hooks/useQueryParams';
+import { useEffect } from 'react';
 
 export const Login = () => {
   const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });
@@ -27,15 +28,21 @@ export const Login = () => {
 
   // Handle invite with redirect, even if logged in
   const [searchParams] = useSearchParams();
-  const invite = searchParams.get('invitation');
-  const org = searchParams.get('organization');
 
-  if (invite && org) {
-    login({
-      organizationId: org,
-      invitation: invite
-    });
-  }
+  useEffect(() => {
+    const invite = searchParams.get('invitation');
+    const org = searchParams.get('organization');
+    if (invite && org) {
+      const loginWithInvite = async () => {
+        try {
+          await login({ organizationId: org, invitation: invite });
+        } catch (err) {
+          console.error('Login with invitefailed:', err);
+        }
+      };
+      loginWithInvite();
+    }
+  }, [searchParams, login]);
 
   if (isAuthenticated) {
     return <Navigate to="/" replace />;
