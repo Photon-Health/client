@@ -51,6 +51,8 @@ import {
   type TemplateOverrides
 } from './systems/PrescribeProvider';
 
+import { GoogleServiceProvider, useGoogleService } from './systems/GoogleServiceProvider';
+
 export {
   AddressForm,
   Alert,
@@ -86,7 +88,9 @@ export {
   useRecentOrders,
   formatPrescriptionDetails,
   PrescribeProvider,
-  usePrescribe
+  GoogleServiceProvider,
+  usePrescribe,
+  useGoogleService
 };
 
 // Export types
