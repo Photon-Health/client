@@ -1,4 +1,12 @@
-import { createContext, createMemo, JSXElement, onMount, useContext, Show } from 'solid-js';
+import {
+  createContext,
+  createMemo,
+  createEffect,
+  JSXElement,
+  onMount,
+  useContext,
+  Show
+} from 'solid-js';
 import { createStore } from 'solid-js/store';
 import Card from '../Card';
 import Icon from '../Icon';
@@ -17,7 +25,7 @@ interface RadioGroupCardsActions {
   addOption: (option: string) => void;
 }
 
-type RadioGroupCardsContextValue = [RadioGroupCardsState, RadioGroupCardsActions];
+export type RadioGroupCardsContextValue = [RadioGroupCardsState, RadioGroupCardsActions];
 
 export const RadioGroupCardsContext = createContext<RadioGroupCardsContextValue>([
   { selected: '', options: [], fieldsetLabel: '' },
@@ -53,6 +61,12 @@ export function RadioGroupCardsProvider(props: RadioGroupCardsProps) {
     }
   ];
 
+  createEffect(() => {
+    if (props.contextRef) {
+      props.contextRef(radioGroup);
+    }
+  });
+
   return (
     <RadioGroupCardsContext.Provider value={radioGroup}>
       {props.children}
@@ -72,6 +86,7 @@ export interface RadioGroupCardsOptionProps {
   value: string;
   label?: string;
   disabled?: boolean;
+  alert?: JSXElement;
   children: JSXElement;
 }
 
@@ -91,29 +106,34 @@ function Option(props: RadioGroupCardsOptionProps) {
       class={props.disabled ? '' : 'cursor-pointer'}
     >
       <Card selected={selected()} disabled={props.disabled}>
-        <div class="flex justify-between items-center">
-          {props.children}
+        <div>
+          <div class="flex justify-between items-center">
+            {props.children}
 
-          <div>
-            <Show when={selected()}>
-              <Icon name="checkCircle" class="text-blue-600" />
-            </Show>
-            <Show when={!selected() && !props.disabled}>
-              <div class="rounded-full bg-slate-100 h-5 w-5 mr-1" />
-            </Show>
-            <label class="sr-only" for={props.value}>
-              {props.label}
-            </label>
-            <input
-              type="radio"
-              name={state.fieldsetLabel}
-              id={props.value}
-              value={props.value}
-              checked={selected()}
-              disabled={props.disabled}
-              class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600 sr-only"
-            />
+            <div>
+              <Show when={selected()}>
+                <Icon name="checkCircle" class="text-blue-600" />
+              </Show>
+              <Show when={!selected() && !props.disabled}>
+                <div class="rounded-full bg-slate-100 h-5 w-5 mr-1" />
+              </Show>
+              <label class="sr-only" for={props.value}>
+                {props.label}
+              </label>
+              <input
+                type="radio"
+                name={state.fieldsetLabel}
+                id={props.value}
+                value={props.value}
+                checked={selected()}
+                disabled={props.disabled}
+                class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600 sr-only"
+              />
+            </div>
           </div>
+          <Show when={props.alert}>
+            <div class="pt-4">{props.alert}</div>
+          </Show>
         </div>
       </Card>
     </div>
@@ -128,6 +148,7 @@ export interface RadioGroupCardsProps {
   initSelected?: string;
   children: JSXElement;
   setSelected?: (selected: string) => void;
+  contextRef?: (context: RadioGroupCardsContextValue) => void;
 }
 
 function RadioGroupCardsRoot(props: RadioGroupCardsProps) {
