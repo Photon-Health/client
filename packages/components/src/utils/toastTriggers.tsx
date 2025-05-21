@@ -3,7 +3,7 @@ import Icon from '../particles/Icon';
 import { Show } from 'solid-js';
 import Text from '../particles/Text';
 
-type ToastProps = {
+export type ToastProps = {
   header?: string;
   body?: string;
   status: 'success' | 'info' | 'error';

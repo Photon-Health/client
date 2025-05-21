@@ -35,6 +35,7 @@ const Component = (props: PrescribeProps) => {
           patientId={store.patient?.value?.id}
           enableCombineAndDuplicate={props.enableCombineAndDuplicate}
           enableCoverageCheck={props.enableCoverageCheck}
+          enableToasts={props.enableToasts}
         >
           <PrescribeWorkflow
             patientId={props.patientId}
@@ -53,6 +54,7 @@ const Component = (props: PrescribeProps) => {
             enableMedHistoryRefillButton={props.enableMedHistoryRefillButton}
             enableCombineAndDuplicate={props.enableCombineAndDuplicate}
             enableCoverageCheck={props.enableCoverageCheck}
+            enableToasts={props.enableToasts}
             mailOrderIds={props.mailOrderIds}
             pharmacyId={props.pharmacyId}
             loading={props.loading}
@@ -91,6 +93,7 @@ customElement(
     enableMedHistory: false,
     enableMedHistoryRefillButton: false,
     enableMedHistoryLinks: false,
+    enableToasts: true,
     mailOrderIds: undefined,
     pharmacyId: undefined,
     loading: false,

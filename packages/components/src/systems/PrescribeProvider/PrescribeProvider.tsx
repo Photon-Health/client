@@ -28,13 +28,14 @@ import {
 import { triggerToast, useRecentOrders } from '../../index';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
 import {
-  getRoutingConstraint,
   combineAllRoutingConstraints,
+  getRoutingConstraint,
   RoutingConstraint
 } from '../RoutingConstraints';
 import { createStore } from 'solid-js/store';
 import getLocation from '../../utils/getLocations';
 import { useGoogleService } from '../GoogleServiceProvider';
+import { ToastProps } from '../../utils/toastTriggers';
 // The order form data will consist of, at least, the list of selected prescription IDs and pharmacy ID.
 // The prescription form data (todo) will consist of a single prescription's data during user input
 // Note: Multiple prescription "sub" forms can be opened/completed within a single order form
@@ -109,6 +110,7 @@ interface PrescribeProviderProps {
   patientId: string;
   enableCombineAndDuplicate: boolean;
   enableCoverageCheck: boolean;
+  enableToasts: boolean;
 }
 
 const transformPrescription = (prescription: PrescriptionFormData, patientId: string) => ({
@@ -146,6 +148,12 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const client = usePhotonClient();
   const { draftPrescriptions, setDraftPrescriptions } = useDraftPrescriptions();
   const [, recentOrdersActions] = useRecentOrders();
+
+  const tryTriggerToast = (options: ToastProps) => {
+    if (options.status === 'error' || props.enableToasts) {
+      triggerToast(options);
+    }
+  };
 
   const prescriptionIds = createMemo(() =>
     draftPrescriptions().map((prescription) => prescription.id)
@@ -376,7 +384,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
         address: response.data.patient.address as Address
       };
     } catch (error) {
-      triggerToast({
+      tryTriggerToast({
         status: 'error',
         header: 'Error Looking Up Patient Pharmacy',
         body: (error as Error).message
@@ -412,7 +420,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     );
 
     if (isPrescriptionAlreadyAdded) {
-      triggerToast({
+      tryTriggerToast({
         status: 'error',
         body: 'You already have this prescription in your order. You can modify the prescription or delete it in Pending Order.'
       });
@@ -466,7 +474,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
       return res.data.updatePrescriptionStates as boolean;
     } catch (error) {
       console.error('Mutation error:', error);
-      triggerToast({
+      tryTriggerToast({
         status: 'error',
         header: 'Error Saving Prescription(s)',
         body: (error as Error).message
@@ -490,7 +498,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
       setDraftPrescriptions((prev) => [...prev, created]);
     } catch (error) {
       console.error('Mutation error:', error);
-      triggerToast({
+      tryTriggerToast({
         status: 'error',
         header: 'Error Adding Prescription',
         body: 'There was an issue adding the prescription. Please try again.'
@@ -505,13 +513,13 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
         options.templateName
       );
 
-      triggerToast({
+      tryTriggerToast({
         status: 'success',
         header: 'Personal Template Saved'
       });
     }
 
-    triggerToast({
+    tryTriggerToast({
       status: 'success',
       header: 'Prescription Added',
       body: 'You can send this order or add another prescription before sending it'

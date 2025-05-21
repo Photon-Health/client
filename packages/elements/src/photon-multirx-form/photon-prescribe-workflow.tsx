@@ -67,6 +67,7 @@ export type PrescribeProps = {
   enableCombineAndDuplicate: boolean;
   enableDeliveryPharmacies: boolean;
   enableCoverageCheck: boolean;
+  enableToasts: boolean;
   mailOrderIds?: string;
   pharmacyId?: string;
   loading: boolean;
