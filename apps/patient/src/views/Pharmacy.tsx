@@ -56,6 +56,8 @@ import { fetchOffers } from './pharmacy.utils';
 import _ from 'lodash';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
+const COSTCO_PHARMACY_RADIUS = 30; // miles
+const WALGREENS_PHARMACY_RADIUS = 15; // miles
 
 export const Pharmacy = () => {
   const { order, flattenedFills, setOrder, isDemo, fetchOrder } = useOrderContext();
@@ -312,7 +314,7 @@ export const Pharmacy = () => {
       }
       try {
         const res: GetPharmaciesByLocationQuery = await getPharmacies({
-          searchParams: { latitude, longitude, radius: 30 },
+          searchParams: { latitude, longitude, radius: COSTCO_PHARMACY_RADIUS },
           limit: 1,
           offset: 0,
           isOpenNow: enableOpenNow,
@@ -346,7 +348,7 @@ export const Pharmacy = () => {
 
       try {
         const res: GetPharmaciesByLocationQuery = await getPharmacies({
-          searchParams: { latitude, longitude, radius: 15 },
+          searchParams: { latitude, longitude, radius: WALGREENS_PHARMACY_RADIUS },
           limit: 1,
           offset: 0,
           isOpenNow: enableOpenNow,
