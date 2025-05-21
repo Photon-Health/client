@@ -1,7 +1,12 @@
 import { customElement } from 'solid-element';
 import { createEffect, createSignal } from 'solid-js';
 import { Env, PhotonClient } from '@photonhealth/sdk';
-import { PhotonClientStore, PhotonContext, SDKProvider } from '@photonhealth/components';
+import {
+  PhotonClientStore,
+  PhotonContext,
+  SDKProvider,
+  GoogleServiceProvider
+} from '@photonhealth/components';
 import { makeTimer } from '@solid-primitives/timer';
 import queryString from 'query-string';
 import { hasAuthParams } from '../utils';
@@ -113,9 +118,11 @@ const Component = (props: PhotonClientProps) => {
   return (
     <div ref={ref}>
       <PhotonContext.Provider value={store()}>
-        <SDKProvider client={sdk}>
-          <slot />
-        </SDKProvider>
+        <GoogleServiceProvider>
+          <SDKProvider client={sdk}>
+            <slot />
+          </SDKProvider>
+        </GoogleServiceProvider>
       </PhotonContext.Provider>
     </div>
   );

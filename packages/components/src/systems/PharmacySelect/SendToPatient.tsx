@@ -9,9 +9,9 @@ import formatAddress from '../../utils/formatAddress';
 import {
   GetLastOrderQuery,
   GetLastOrderResponse,
-  GetPreferredPharmaciesQuery,
   GetPreferredPharmaciesResponse
 } from '../PharmacySearch';
+import { GetPatientPreferredPharmaciesAndAddress } from '../../fetch';
 import { usePhotonClient } from '../SDKProvider';
 import { usePrescribe } from '../PrescribeProvider';
 
@@ -59,7 +59,7 @@ export function SendToPatient(props: { patientId: string }) {
   }));
 
   const preferredPharmaciesData = createQuery<GetPreferredPharmaciesResponse, { id: string }>(
-    GetPreferredPharmaciesQuery,
+    GetPatientPreferredPharmaciesAndAddress,
     queryOptions
   );
 

@@ -26,9 +26,9 @@ export const TEMPLATE_SCHEMA = yup.object({
     then: yup.number().default(0),
     otherwise: yup.number().min(0, 'Must be at least 0...').default(0)
   }),
-  daysSupply: yup.number().when('values.treatment.__typename', {
-    is: 'MedicalEquipment',
-    then: yup.number().default(0),
+  daysSupply: yup.number().when('treatment', {
+    is: (treatment: { __typename: string }) => treatment.__typename === 'MedicalEquipment',
+    then: yup.number().nullable().optional(),
     otherwise: yup.number().min(1, 'Must be 1 or more...').default(0)
   }),
   instructions: yup.string().min(1, 'Please enter instructions for the patient...'),

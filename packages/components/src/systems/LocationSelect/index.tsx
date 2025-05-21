@@ -1,16 +1,15 @@
 /// <reference types="google.maps" />
-import { createSignal, onMount, createEffect, For, Show } from 'solid-js';
+import { createSignal, createEffect, For, Show } from 'solid-js';
 import Icon from '../../particles/Icon';
 import Button from '../../particles/Button';
 import Dialog from '../../particles/Dialog';
 import InputGroup from '../../particles/InputGroup';
 import Spinner from '../../particles/Spinner';
 import getNavigatorLocation from '../../utils/getNavigatorLocation';
-import loadGoogleScript from '../../utils/loadGoogleScript';
 import getLocations, { Location } from '../../utils/getLocations';
 import autocompleteLocation from '../../utils/autocompleteLocation';
 import ComboBox from '../../particles/ComboBox';
-import { asyncInterval } from '../../utils/asyncInterval';
+import { useGoogleService } from '../GoogleServiceProvider';
 
 interface LocationSelectProps {
   open: boolean;
@@ -23,24 +22,16 @@ export default function LocationSelect(props: LocationSelectProps) {
   const [loadingNavigator, setLoadingNavigator] = createSignal(false);
   const [navigatorError, setNavigatorError] = createSignal(false);
   const [options, setOptions] = createSignal<any[]>([]);
-  const [geocoder, setGeocoder] = createSignal<google.maps.Geocoder | undefined>();
-  let autocompleteService: google.maps.places.AutocompleteService | undefined;
-
-  onMount(async () => {
-    loadGoogleScript({
-      onLoad: async () => {
-        const geo = new google.maps.Geocoder();
-        setGeocoder(geo);
-        autocompleteService = new google.maps.places.AutocompleteService();
-      }
-    });
-  });
+  const { googleMapsServices } = useGoogleService();
 
   const handleAddressSubmit = async (address: string) => {
+    const { geocoder } = googleMapsServices();
+    if (!geocoder) return;
+
     // get location with address
     setNavigatorError(false);
-    await asyncInterval(() => !!geocoder(), 10, 20);
-    const locations = await getLocations(address, geocoder()!);
+
+    const locations = await getLocations(address, geocoder);
     if (locations.length > 0) {
       props.setLocation(locations[0]);
       props.setOpen(false);
@@ -48,6 +39,9 @@ export default function LocationSelect(props: LocationSelectProps) {
   };
 
   const getCurrentLocation = async () => {
+    const { geocoder } = googleMapsServices();
+    if (!geocoder) throw new Error('Geocoder not loaded');
+
     // get current location with lat/long
     setLoadingNavigator(true);
     setNavigatorError(false);
@@ -55,8 +49,7 @@ export default function LocationSelect(props: LocationSelectProps) {
       const {
         coords: { latitude, longitude }
       } = await getNavigatorLocation({ timeout: 5000 });
-      await asyncInterval(() => !!geocoder(), 10, 20);
-      const locations = await getLocations({ latitude, longitude }, geocoder()!);
+      const locations = await getLocations({ latitude, longitude }, geocoder);
       if (locations.length > 0) {
         props.setLocation(locations[0]);
       }
@@ -68,7 +61,10 @@ export default function LocationSelect(props: LocationSelectProps) {
   };
 
   const fetchOptions = async () => {
-    const results = await autocompleteLocation(address(), autocompleteService!);
+    const { autocompleteService } = googleMapsServices();
+    if (!autocompleteService) return;
+
+    const results = await autocompleteLocation(address(), autocompleteService);
     setOptions(results);
   };
 

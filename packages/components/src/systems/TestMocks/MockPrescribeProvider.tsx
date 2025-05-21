@@ -36,6 +36,7 @@ export function MockPrescribeProvider(props: MockPrescribeProviderProps) {
         constraint_pharmacies: []
       };
     },
+    unroutablePharmacyIds: () => new Set(),
     selectedCoverageOption: () => undefined,
     // mock actions
     deletePrescription: mocks.deletePrescription,
