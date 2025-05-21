@@ -87,6 +87,7 @@ const App = () => {
               patientId={patientId}
               enableCombineAndDuplicate={true}
               enableCoverageCheck={true}
+              enableToasts={true}
             >
               <div class="mb-10">
                 <h2>Patient Info</h2>
