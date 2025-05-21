@@ -110,7 +110,7 @@ interface PrescribeProviderProps {
   patientId: string;
   enableCombineAndDuplicate: boolean;
   enableCoverageCheck: boolean;
-  enableToasts: boolean;
+  disableToasts?: string;
 }
 
 const transformPrescription = (prescription: PrescriptionFormData, patientId: string) => ({
@@ -150,9 +150,11 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const [, recentOrdersActions] = useRecentOrders();
 
   const tryTriggerToast = (options: ToastProps) => {
-    if (options.status === 'error' || props.enableToasts) {
-      triggerToast(options);
+    const disabledTypes = props.disableToasts?.split(',');
+    if (disabledTypes && disabledTypes.includes(options.status)) {
+      return;
     }
+    triggerToast(options);
   };
 
   const prescriptionIds = createMemo(() =>
