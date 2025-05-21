@@ -312,7 +312,7 @@ export const Pharmacy = () => {
       }
       try {
         const res: GetPharmaciesByLocationQuery = await getPharmacies({
-          searchParams: { latitude, longitude, radius: 15 },
+          searchParams: { latitude, longitude, radius: 30 },
           limit: 1,
           offset: 0,
           isOpenNow: enableOpenNow,
