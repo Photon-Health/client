@@ -67,7 +67,10 @@ const organizationSettings: {
       OPENLOOP_PHARMACY_ID,
       GIFTHEALTH_PHARMACY_ID,
       EMPOWER_PHARMACY_ID,
-      EPIQ_PHARMACY_ID
+      EPIQ_PHARMACY_ID,
+      TRUEPILL_PHARMACY_ID,
+      CAREPOINT_PHARMACY_ID,
+      HONEYBEE_PHARMACY_ID
     ]
   },
   // River Health
