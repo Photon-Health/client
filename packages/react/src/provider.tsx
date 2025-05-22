@@ -714,11 +714,15 @@ export const PhotonProvider = (opts: {
 
   useEffect(() => {
     const initialize = async () => {
-      // Check if we're in an invitation flow
+      // Check if we're in an invitation flow so we don't call check session and lose the invitation context
       const searchParams = new URLSearchParams(window.location.search);
       const invitation = searchParams.get('invitation');
       const organization = searchParams.get('organization');
       if (invitation && organization) {
+        console.log(
+          '*** invitation and organization found, Daoeusnth aosnetuh santheo uISPATCHING NULL USER'
+        );
+        dispatch({ type: 'INITIALISED', user: null });
         return;
       }
 
@@ -792,10 +796,8 @@ export const PhotonProvider = (opts: {
     client.authentication.logout({ returnTo, federated });
 
   const getToken = async ({ audience }: { audience?: string } = {}) => {
-    console.log('*** getToken: 1');
     try {
       const token = await client.authentication.getAccessToken({ audience });
-      console.log('*** getToken: 2', token);
       dispatch({
         type: 'GET_ACCESS_TOKEN_COMPLETE',
         user: await client.authentication.getUser()
