@@ -186,7 +186,7 @@ const orgMailOrders: Record<string, Partial<MailOrderPharmacyConfigs>> = {
   },
   // Fifty 410
   org_DFsDnAmXkPrtsrih: {
-    provider: [HEALTHWAREHOUSE_PHARMACY_ID, EMPOWER_PHARMACY_ID]
+    provider: [HEALTHWAREHOUSE_PHARMACY_ID, EMPOWER_PHARMACY_ID, EPIQ_PHARMACY_ID]
   },
   // Precision telemed
   org_wmy57WStnHIFXBAr: {
