@@ -719,9 +719,6 @@ export const PhotonProvider = (opts: {
       const invitation = searchParams.get('invitation');
       const organization = searchParams.get('organization');
       if (invitation && organization) {
-        console.log(
-          '*** invitation and organization found, Daoeusnth aosnetuh santheo uISPATCHING NULL USER'
-        );
         dispatch({ type: 'INITIALISED', user: null });
         return;
       }
