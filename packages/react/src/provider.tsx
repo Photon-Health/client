@@ -714,6 +714,15 @@ export const PhotonProvider = (opts: {
 
   useEffect(() => {
     const initialize = async () => {
+      // Check if we're in an invitation flow so we don't call check session and lose the invitation context
+      const searchParams = new URLSearchParams(window.location.search);
+      const invitation = searchParams.get('invitation');
+      const organization = searchParams.get('organization');
+      if (invitation && organization) {
+        dispatch({ type: 'INITIALISED', user: null });
+        return;
+      }
+
       if (client.authentication.hasAuthParams()) {
         try {
           // @ts-ignore
