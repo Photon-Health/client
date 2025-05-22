@@ -477,7 +477,7 @@ export type Patient = {
   medicationHistory?: Maybe<Array<Maybe<PatientMedication>>>;
   name: Name;
   orders?: Maybe<Array<Maybe<Order>>>;
-  phone: Scalars['AWSPhone'];
+  phone?: Maybe<Scalars['AWSPhone']>;
   preferredPharmacies?: Maybe<Array<Maybe<Pharmacy>>>;
   prescriptions?: Maybe<Array<Maybe<Prescription>>>;
   sex: SexType;

@@ -192,7 +192,7 @@ const organizationSettings: {
   },
   // Fifty 410
   org_BxZUVSH1m7cQVy1x: {
-    provider: [HEALTHWAREHOUSE_PHARMACY_ID, EMPOWER_PHARMACY_ID]
+    provider: [HEALTHWAREHOUSE_PHARMACY_ID, EMPOWER_PHARMACY_ID, EPIQ_PHARMACY_ID]
   },
   // Unger Medical (Xyon Health)
   org_QeB1jtZVEvybXaO1: {
