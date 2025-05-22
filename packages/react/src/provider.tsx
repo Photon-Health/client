@@ -714,6 +714,14 @@ export const PhotonProvider = (opts: {
 
   useEffect(() => {
     const initialize = async () => {
+      // Check if we're in an invitation flow
+      const searchParams = new URLSearchParams(window.location.search);
+      const invitation = searchParams.get('invitation');
+      const organization = searchParams.get('organization');
+      if (invitation && organization) {
+        return;
+      }
+
       if (client.authentication.hasAuthParams()) {
         try {
           // @ts-ignore
@@ -784,8 +792,10 @@ export const PhotonProvider = (opts: {
     client.authentication.logout({ returnTo, federated });
 
   const getToken = async ({ audience }: { audience?: string } = {}) => {
+    console.log('*** getToken: 1');
     try {
       const token = await client.authentication.getAccessToken({ audience });
+      console.log('*** getToken: 2', token);
       dispatch({
         type: 'GET_ACCESS_TOKEN_COMPLETE',
         user: await client.authentication.getUser()
