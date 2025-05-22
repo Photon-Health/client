@@ -25,7 +25,7 @@ import {
   GetTemplatesFromCatalogs,
   UpdatePrescriptionStates
 } from '../../fetch';
-import { triggerToast, useRecentOrders } from '../../index';
+import { useRecentOrders } from '../../index';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
 import {
   combineAllRoutingConstraints,
@@ -35,7 +35,7 @@ import {
 import { createStore } from 'solid-js/store';
 import getLocation from '../../utils/getLocations';
 import { useGoogleService } from '../GoogleServiceProvider';
-import { ToastProps } from '../../utils/toastTriggers';
+import { useToasts } from '../ToastProvider';
 // The order form data will consist of, at least, the list of selected prescription IDs and pharmacy ID.
 // The prescription form data (todo) will consist of a single prescription's data during user input
 // Note: Multiple prescription "sub" forms can be opened/completed within a single order form
@@ -148,14 +148,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const client = usePhotonClient();
   const { draftPrescriptions, setDraftPrescriptions } = useDraftPrescriptions();
   const [, recentOrdersActions] = useRecentOrders();
-
-  const tryTriggerToast = (options: ToastProps) => {
-    const disabledTypes = props.disableToasts?.split(',');
-    if (disabledTypes && disabledTypes.includes(options.status)) {
-      return;
-    }
-    triggerToast(options);
-  };
+  const { tryTriggerToast } = useToasts();
 
   const prescriptionIds = createMemo(() =>
     draftPrescriptions().map((prescription) => prescription.id)

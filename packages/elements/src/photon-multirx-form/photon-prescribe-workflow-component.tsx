@@ -1,12 +1,15 @@
 import {
   DraftPrescriptionsProvider,
+  isToastStatus,
   PrescribeProvider,
-  RecentOrders
+  RecentOrders,
+  ToastProvider,
+  ToastStatus
 } from '@photonhealth/components';
 import { customElement } from 'solid-element';
 import { createFormStore } from '../stores/form';
 import { PrescribeProps, PrescribeWorkflow } from './photon-prescribe-workflow';
-import { onCleanup } from 'solid-js';
+import { createMemo, onCleanup } from 'solid-js';
 import { PatientStore } from '../stores/patient';
 
 const Component = (props: PrescribeProps) => {
@@ -25,54 +28,67 @@ const Component = (props: PrescribeProps) => {
     actions.reset();
   });
 
+  const disableToastStatuses = createMemo<ToastStatus[]>(() => {
+    let toastStatuses: ToastStatus[] = [];
+    if (props.disableToasts) {
+      toastStatuses = props.disableToasts
+        .split(',')
+        .map((value) => value.toLowerCase().trim())
+        .filter(isToastStatus);
+    }
+    return toastStatuses;
+  });
+
   return (
-    <DraftPrescriptionsProvider>
-      <RecentOrders patientId={store.patient?.value?.id}>
-        <PrescribeProvider
-          templateIdsPrefill={props.templateIds?.split(',').map((id) => id.trim()) || []}
-          templateOverrides={props.templateOverrides || {}}
-          prescriptionIdsPrefill={props.prescriptionIds?.split(',').map((id) => id.trim()) || []}
-          patientId={store.patient?.value?.id}
-          enableCombineAndDuplicate={props.enableCombineAndDuplicate}
-          enableCoverageCheck={props.enableCoverageCheck}
-          disableToasts={props.disableToasts}
-        >
-          <PrescribeWorkflow
-            patientId={props.patientId}
-            templateIds={props.templateIds}
-            templateOverrides={props.templateOverrides}
-            prescriptionIds={props.prescriptionIds}
-            hideSubmit={props.hideSubmit}
-            hideTemplates={props.hideTemplates}
-            hidePatientCard={props.hidePatientCard}
-            enableOrder={props.enableOrder}
-            enableLocalPickup={props.enableLocalPickup}
-            enableSendToPatient={props.enableSendToPatient}
-            enableDeliveryPharmacies={props.enableDeliveryPharmacies}
-            enableMedHistory={props.enableMedHistory}
-            enableMedHistoryLinks={props.enableMedHistoryLinks}
-            enableMedHistoryRefillButton={props.enableMedHistoryRefillButton}
+    <ToastProvider disableToastStatuses={disableToastStatuses()}>
+      <DraftPrescriptionsProvider>
+        <RecentOrders patientId={store.patient?.value?.id}>
+          <PrescribeProvider
+            templateIdsPrefill={props.templateIds?.split(',').map((id) => id.trim()) || []}
+            templateOverrides={props.templateOverrides || {}}
+            prescriptionIdsPrefill={props.prescriptionIds?.split(',').map((id) => id.trim()) || []}
+            patientId={store.patient?.value?.id}
             enableCombineAndDuplicate={props.enableCombineAndDuplicate}
             enableCoverageCheck={props.enableCoverageCheck}
             disableToasts={props.disableToasts}
-            mailOrderIds={props.mailOrderIds}
-            pharmacyId={props.pharmacyId}
-            loading={props.loading}
-            address={props.address}
-            weight={props.weight}
-            weightUnit={props.weightUnit}
-            additionalNotes={props.additionalNotes}
-            triggerSubmit={props.triggerSubmit}
-            toastBuffer={props.toastBuffer}
-            formStore={store}
-            formActions={actions}
-            externalOrderId={props.externalOrderId}
-            catalogId={props.catalogId}
-            allowOffCatalogSearch={props.allowOffCatalogSearch}
-          />
-        </PrescribeProvider>
-      </RecentOrders>
-    </DraftPrescriptionsProvider>
+          >
+            <PrescribeWorkflow
+              patientId={props.patientId}
+              templateIds={props.templateIds}
+              templateOverrides={props.templateOverrides}
+              prescriptionIds={props.prescriptionIds}
+              hideSubmit={props.hideSubmit}
+              hideTemplates={props.hideTemplates}
+              hidePatientCard={props.hidePatientCard}
+              enableOrder={props.enableOrder}
+              enableLocalPickup={props.enableLocalPickup}
+              enableSendToPatient={props.enableSendToPatient}
+              enableDeliveryPharmacies={props.enableDeliveryPharmacies}
+              enableMedHistory={props.enableMedHistory}
+              enableMedHistoryLinks={props.enableMedHistoryLinks}
+              enableMedHistoryRefillButton={props.enableMedHistoryRefillButton}
+              enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+              enableCoverageCheck={props.enableCoverageCheck}
+              disableToasts={props.disableToasts}
+              mailOrderIds={props.mailOrderIds}
+              pharmacyId={props.pharmacyId}
+              loading={props.loading}
+              address={props.address}
+              weight={props.weight}
+              weightUnit={props.weightUnit}
+              additionalNotes={props.additionalNotes}
+              triggerSubmit={props.triggerSubmit}
+              toastBuffer={props.toastBuffer}
+              formStore={store}
+              formActions={actions}
+              externalOrderId={props.externalOrderId}
+              catalogId={props.catalogId}
+              allowOffCatalogSearch={props.allowOffCatalogSearch}
+            />
+          </PrescribeProvider>
+        </RecentOrders>
+      </DraftPrescriptionsProvider>
+    </ToastProvider>
   );
 };
 customElement(

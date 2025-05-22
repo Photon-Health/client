@@ -3,11 +3,19 @@ import Icon from '../particles/Icon';
 import { Show } from 'solid-js';
 import Text from '../particles/Text';
 
+export type ToastStatus = 'success' | 'info' | 'error';
 export type ToastProps = {
   header?: string;
   body?: string;
-  status: 'success' | 'info' | 'error';
+  status: ToastStatus;
 };
+
+export function isToastStatus(value: string): value is ToastStatus {
+  if (value === 'success' || value === 'error' || value === 'info') {
+    return true;
+  }
+  return false;
+}
 
 const triggerToast = (props: ToastProps) => {
   toast.custom(
