@@ -541,7 +541,7 @@ export type Patient = {
   gender?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   name: Name;
-  phone: Scalars['String']['output'];
+  phone?: Maybe<Scalars['String']['output']>;
   sex: SexType;
   treatmentHistory: Array<TreatmentHistory>;
 };
