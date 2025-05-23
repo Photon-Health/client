@@ -28,8 +28,8 @@ import {
 import { triggerToast, useRecentOrders } from '../../index';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
 import {
-  getRoutingConstraint,
   combineAllRoutingConstraints,
+  getRoutingConstraint,
   RoutingConstraint
 } from '../RoutingConstraints';
 import { createStore } from 'solid-js/store';
@@ -358,7 +358,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     // todo: error handling
     await Promise.all(
       prescriptionsToCreate.map(async (prescription: PrescriptionFormData) =>
-        tryCreatePrescription(prescription)
+        tryCreatePrescription(prescription, { showSuccessToast: false })
       )
     );
     setIsLoadingPrefills(false);
@@ -404,7 +404,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
 
   const tryCreatePrescription = async (
     prescriptionFormData: PrescriptionFormData,
-    options: TryCreatePrescriptionTemplateOptions = {}
+    options: TryCreatePrescriptionTemplateOptions = { showSuccessToast: true }
   ): Promise<Prescription> => {
     const isPrescriptionAlreadyAdded = isTreatmentInDraftPrescriptions(
       prescriptionFormData.treatment.id,
@@ -477,7 +477,10 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
 
   const createPrescriptionOnApi = async (
     prescriptionFormData: PrescriptionFormData,
-    options: TryCreatePrescriptionTemplateOptions = { addToTemplates: false }
+    options: TryCreatePrescriptionTemplateOptions = {
+      addToTemplates: false,
+      showSuccessToast: true
+    }
   ): Promise<Prescription> => {
     let createdPrescription: Prescription | null = null;
     try {
@@ -505,17 +508,21 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
         options.templateName
       );
 
-      triggerToast({
-        status: 'success',
-        header: 'Personal Template Saved'
-      });
+      if (options.showSuccessToast) {
+        triggerToast({
+          status: 'success',
+          header: 'Personal Template Saved'
+        });
+      }
     }
 
-    triggerToast({
-      status: 'success',
-      header: 'Prescription Added',
-      body: 'You can send this order or add another prescription before sending it'
-    });
+    if (options.showSuccessToast) {
+      triggerToast({
+        status: 'success',
+        header: 'Prescription Added',
+        body: 'You can send this order or add another prescription before sending it'
+      });
+    }
 
     return createdPrescription;
   };
@@ -592,6 +599,7 @@ export type TryCreatePrescriptionTemplateOptions = {
   addToTemplates?: boolean;
   templateName?: string;
   catalogId?: string;
+  showSuccessToast?: boolean;
 };
 
 export type PatientPreferredPharmacy = {
