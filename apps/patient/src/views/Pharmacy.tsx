@@ -870,43 +870,51 @@ export const Pharmacy = () => {
       <CouponModal isOpen={couponModalOpen} onClose={() => setCouponModalOpen(false)} />
 
       <Box bgColor="white">
-        <VStack spacing={4} align="span" pt={4}>
-          <VStack spacing={2} align="start" px={4}>
-            <Heading as="h3" size="lg">
-              {heading}
-            </Heading>
-          </VStack>
-
-          <HStack justify="space-between" w="full" px={4}>
-            {location ? locationPreview : setLocationButton}
-          </HStack>
+        <VStack
+          spacing={4}
+          align="span"
+          pt={4}
+          pb={!showPriceToggle ? 4 : 0} // don't remove, this padding is needed when price toggle section is not shown
+        >
+          <Container px={-3}>
+            <VStack spacing={2} align="start" px={4}>
+              <Heading as="h3" size="lg">
+                {heading}
+              </Heading>
+              <HStack justify="space-between" w="full">
+                {location ? locationPreview : setLocationButton}
+              </HStack>
+            </VStack>
+          </Container>
 
           {showPriceToggle ? (
-            <VStack
-              spacing={2}
-              align="start"
-              borderY="2px solid"
-              borderColor="gray.300"
-              py={4}
-              px={4}
-            >
-              <HStack justify="space-between" w="full">
-                {t.showDiscountCardPrices(() => setCouponModalOpen(true))}
-                <Switch
-                  size="lg"
-                  isChecked={enablePrice}
-                  onChange={(e) => setEnablePrice(e.target.checked)}
-                />
-              </HStack>
-              {enablePrice ? (
-                <Box p={3} bgColor="blue.100" borderRadius="lg">
-                  <Text fontSize="sm">
-                    The displayed price is a coupon price for the pharmacy. Coupon details available
-                    after you select a pharmacy. <b>This is NOT insurance.</b>
-                  </Text>
-                </Box>
-              ) : null}
-            </VStack>
+            <Container px={-3}>
+              <VStack
+                spacing={2}
+                align="start"
+                borderY="2px solid"
+                borderColor="gray.300"
+                py={4}
+                px={4}
+              >
+                <HStack justify="space-between" w="full">
+                  {t.showDiscountCardPrices(() => setCouponModalOpen(true))}
+                  <Switch
+                    size="lg"
+                    isChecked={enablePrice}
+                    onChange={(e) => setEnablePrice(e.target.checked)}
+                  />
+                </HStack>
+                {enablePrice ? (
+                  <Box p={3} bgColor="blue.100" borderRadius="lg">
+                    <Text fontSize="sm">
+                      The displayed price is a coupon price for the pharmacy. Coupon details
+                      available after you select a pharmacy. <b>This is NOT insurance.</b>
+                    </Text>
+                  </Box>
+                ) : null}
+              </VStack>
+            </Container>
           ) : null}
         </VStack>
       </Box>
