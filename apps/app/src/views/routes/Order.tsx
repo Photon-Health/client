@@ -495,7 +495,7 @@ export const Order = () => {
                       render: ({ onClose }) => (
                         <StyledToast
                           onClose={onClose}
-                          type="info"
+                          type="error"
                           title="Error Canceling Order"
                           description={`There was an error canceling the order: ${error}`}
                         />
