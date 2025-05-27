@@ -8,7 +8,8 @@ import {
   VStack,
   Text,
   Grid,
-  Textarea
+  Textarea,
+  FormHelperText
 } from '@chakra-ui/react';
 import { ErrorMessage, Field, FieldProps, FormikErrors } from 'formik';
 
@@ -51,6 +52,10 @@ export function OrganizationSettingsForm({
           <Flex gap={4} w="100%" maxW={{ base: '100%', md: '50%' }} flexDirection="column">
             <FormControl isInvalid={!!errors.brandColor}>
               <FormLabel htmlFor="brandColor">Brand Color</FormLabel>
+              <FormHelperText mb={2}>
+                If set, this hex code will be the primary color for CTA buttons in the
+                patient-facing experience.
+              </FormHelperText>
               <Flex gap={2}>
                 <Field component={InputField} name="brandColor" id="brandColor" />
                 <Field component={ColorField} name="brandColor" />
@@ -59,6 +64,11 @@ export function OrganizationSettingsForm({
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="brandLogo">Brand Logo</FormLabel>
+              <FormHelperText mb={2}>
+                If set, this logo will be displayed in the navigation bar in the patient-facing
+                experience. Use a small, fully-cropped image. Recommended maximum size: 150×40px
+                (PNG with transparent background).
+              </FormHelperText>
               <Field
                 as={FileUploader}
                 name="brandLogo"
@@ -302,68 +312,101 @@ export function OrganizationSettingsForm({
           <Text fontSize="lg" fontWeight="medium">
             Provider Experience
           </Text>
-          <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={4} w="100%">
+          <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={7} w="100%">
             <FormControl isInvalid={!!errors.providerUx?.enablePrescriberOrdering}>
               <Flex gap={2}>
                 <Field component={SwitchField} name="providerUx.enablePrescriberOrdering" />
-                <FormLabel htmlFor="providerUx.enablePrescriberOrdering">Enable Ordering</FormLabel>
+                <FormLabel htmlFor="providerUx.enablePrescriberOrdering" mb={0}>
+                  Enable Ordering
+                </FormLabel>
               </Flex>
+              <FormHelperText>
+                Allow prescribers to create prescription orders to pharmacies.
+              </FormHelperText>
             </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enablePrescribeToOrder}>
               <Flex gap={2}>
                 <Field component={SwitchField} name="providerUx.enablePrescribeToOrder" />
-                <FormLabel htmlFor="providerUx.enablePrescribeToOrder">
+                <FormLabel htmlFor="providerUx.enablePrescribeToOrder" mb={0}>
                   Enable Prescribe to Order
                 </FormLabel>
               </Flex>
+              <FormHelperText>
+                Allow prescribers to write prescriptions and submit them within an order from a
+                single view.
+              </FormHelperText>
             </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enableRxTemplates}>
               <Flex gap={2}>
                 <Field component={SwitchField} name="providerUx.enableRxTemplates" />
-                <FormLabel htmlFor="providerUx.enableRxTemplates">
+                <FormLabel htmlFor="providerUx.enableRxTemplates" mb={0}>
                   Enable Prescription Templates
                 </FormLabel>
               </Flex>
+              <FormHelperText>
+                Allow prescribers to check a box to save commonly prescribed medications to personal
+                templates in workflow.
+              </FormHelperText>
             </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enableDuplicateRxWarnings}>
               <Flex gap={2}>
                 <Field component={SwitchField} name="providerUx.enableDuplicateRxWarnings" />
-                <FormLabel htmlFor="providerUx.enableDuplicateRxWarnings">
+                <FormLabel htmlFor="providerUx.enableDuplicateRxWarnings" mb={0}>
                   Enable Duplicate Prescription Warnings
                 </FormLabel>
               </Flex>
+              <FormHelperText>
+                Warn prescribers when a new prescription matches a recent one for the same patient.
+              </FormHelperText>
             </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enableTreatmentHistory}>
               <Flex gap={2}>
                 <Field component={SwitchField} name="providerUx.enableTreatmentHistory" />
-                <FormLabel htmlFor="providerUx.enableTreatmentHistory">
+                <FormLabel htmlFor="providerUx.enableTreatmentHistory" mb={0}>
                   Enable Treatment History
                 </FormLabel>
               </Flex>
+              <FormHelperText>
+                Show a patient's medication history while prescribing. This will include any
+                medications written on Photon in addition to any external med history synced on the
+                patients profile.
+              </FormHelperText>
             </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enablePatientRouting}>
               <Flex gap={2}>
                 <Field component={SwitchField} name="providerUx.enablePatientRouting" />
-                <FormLabel htmlFor="providerUx.enablePatientRouting">
+                <FormLabel htmlFor="providerUx.enablePatientRouting" mb={0}>
                   Enable Patient Routing
                 </FormLabel>
               </Flex>
+              <FormHelperText>
+                Give prescribers the option to select “Send to Patient” when choosing a pharmacy to
+                defer pharmacy selection to the patient.
+              </FormHelperText>
             </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enablePickupPharmacies}>
               <Flex gap={2}>
                 <Field component={SwitchField} name="providerUx.enablePickupPharmacies" />
-                <FormLabel htmlFor="providerUx.enablePickupPharmacies">
+                <FormLabel htmlFor="providerUx.enablePickupPharmacies" mb={0}>
                   Enable Pickup Pharmacies
                 </FormLabel>
               </Flex>
+              <FormHelperText>
+                Give prescribers the option to search for local pickup pharmacies.
+              </FormHelperText>
             </FormControl>
             <FormControl isInvalid={!!errors.providerUx?.enableDeliveryPharmacies}>
               <Flex gap={2}>
                 <Field component={SwitchField} name="providerUx.enableDeliveryPharmacies" />
-                <FormLabel htmlFor="providerUx.enableDeliveryPharmacies">
+                <FormLabel htmlFor="providerUx.enableDeliveryPharmacies" mb={0}>
                   Enable Delivery Pharmacies
                 </FormLabel>
               </Flex>
+              <FormHelperText>
+                Give prescribers the option to select from Partner mail order pharmacies. Please
+                reach out to customer@photon.health if you would like to add a pharmacy to this
+                list.
+              </FormHelperText>
             </FormControl>
           </Grid>
         </VStack>
@@ -399,11 +442,15 @@ export function OrganizationSettingsForm({
               </Flex>
             </FormControl>
           </Flex>
-          <Flex gap={4} w={{ base: '100%', md: '50%' }}>
+          <Flex gap={5} w={{ base: '100%', md: '50%' }}>
             <FormControl isInvalid={!!errors.priorAuthorizationExceptionMessage}>
               <FormLabel htmlFor="priorAuthorizationExceptionMessage">
                 Prior Authorization Exception Message
               </FormLabel>
+              <FormHelperText mb={2}>
+                This message is displayed to patients when a pharmacy notifies Photon a prior
+                authorization is required to inform them of next steps.
+              </FormHelperText>
               <Field
                 component={TextAreaField}
                 rows={4}
