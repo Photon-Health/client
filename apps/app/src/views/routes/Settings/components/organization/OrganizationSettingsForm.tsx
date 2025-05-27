@@ -90,7 +90,6 @@ export function OrganizationSettingsForm({
             </FormControl>
           </Flex>
         </VStack>
-        <VStack spacing={3} alignItems="flex-start" w="50%"></VStack>
         {/* Commenting out this section temporarily until we add ability in backend to send emails to their chosen destinations */}
         {/*
         <VStack spacing={3} alignItems="flex-start" w="100%">
