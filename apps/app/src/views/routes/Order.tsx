@@ -32,7 +32,8 @@ import {
   Show,
   RadioGroup,
   Radio,
-  useTheme
+  useTheme,
+  useToast
 } from '@chakra-ui/react';
 import { usePhoton, types } from '@photonhealth/react';
 import { FiChevronRight } from 'react-icons/fi';
@@ -51,6 +52,7 @@ import { CANCEL_ORDER, REROUTE_ORDER } from '../../mutations';
 import { TicketModal } from '../components/TicketModal';
 import { Fill, Order as OrderType } from '@photonhealth/sdk/dist/types';
 import { datadogRum } from '@datadog/browser-rum';
+import { StyledToast } from '../components/StyledToast';
 
 const PHARMACY_FRAGMENT = gql`
   fragment PharmacyFragment on Pharmacy {
@@ -239,6 +241,7 @@ export const Order = () => {
   const cancelReasonRef = useRef(cancelReason);
   const client = useApolloClient();
   const theme = useTheme();
+  const toast = useToast();
 
   useEffect(() => {
     cancelReasonRef.current = cancelReason;
@@ -479,12 +482,29 @@ export const Order = () => {
                 });
                 if (decision) {
                   setUpdating(true);
-                  const variables = {
-                    id,
-                    ...(cancelReasonRef.current && { reason: cancelReasonRef.current })
-                  };
-                  await cancelOrder({ variables });
-                  setUpdating(false);
+                  try {
+                    const variables = {
+                      id,
+                      ...(cancelReasonRef.current && { reason: cancelReasonRef.current })
+                    };
+                    await cancelOrder({ variables });
+                  } catch (error) {
+                    console.error('Error canceling order:', error);
+                    toast({
+                      position: 'top-right',
+                      duration: 4000,
+                      render: ({ onClose }) => (
+                        <StyledToast
+                          onClose={onClose}
+                          type="info"
+                          title="Error Canceling Order"
+                          description={`There was an error canceling the order: ${error}`}
+                        />
+                      )
+                    });
+                  } finally {
+                    setUpdating(false);
+                  }
                 }
               }}
             >
