@@ -132,7 +132,8 @@ export const AddPrescriptionCard = (props: {
       const options: TryCreatePrescriptionTemplateOptions = {
         addToTemplates: props.store.addToTemplates?.value ?? false,
         templateName: props.store.templateName?.value,
-        catalogId: props.store.catalogId?.value
+        catalogId: props.store.catalogId?.value,
+        showSuccessToast: true
       };
       createdPrescription = await tryCreatePrescription(prescriptionFormData, options);
       if (createdPrescription) {

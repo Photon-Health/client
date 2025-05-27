@@ -70,10 +70,7 @@ export function CoverageOptionSummary(props: CoverageOptionSummaryProps) {
         </Show>
         <div class="text-xs text-gray-500">
           <span>Pharmacy: </span>
-          <span class="font-bold">
-            <Show when={props.prescription}>Patient's Preferred</Show>
-            <Show when={!props.prescription}>{props.coverageOption.pharmacy.name}</Show>
-          </span>
+          <span class="font-bold">{props.coverageOption.pharmacy.name}</span>
         </div>
       </div>
       <Banner status={bannerData().status} withoutIcon={true}>
