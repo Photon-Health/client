@@ -489,7 +489,6 @@ export const Order = () => {
                     };
                     await cancelOrder({ variables });
                   } catch (error) {
-                    console.error('Error canceling order:', error);
                     toast({
                       position: 'top-right',
                       duration: 4000,
