@@ -127,7 +127,7 @@ export const Status = () => {
     return null;
   }
 
-  const canReroute = !isDemo && enablePatientRerouting && order.isReroutable;
+  const canOrderReroute = !isDemo && enablePatientRerouting && order.isReroutable;
 
   const handleRerouteLink = () => {
     const query = queryString.stringify({
@@ -268,7 +268,7 @@ export const Status = () => {
                       {displayPharmacy && !isDeliveryPharmacy && !exception && navigateButton}
                       {displayPharmacy &&
                         !isDeliveryPharmacy &&
-                        canReroute &&
+                        canOrderReroute &&
                         !exception &&
                         callPharmacyButton(false)}
                       {displayPharmacy &&
@@ -278,7 +278,7 @@ export const Status = () => {
                       {/* right now mail order (aka delivery pharmacies) are considered to not be re-routable but this will eventually change*/}
                       {(!isDeliveryPharmacy || isRerouteable) &&
                         displayPharmacy &&
-                        canReroute &&
+                        canOrderReroute &&
                         rerouteButton}
                     </VStack>
                   </VStack>
