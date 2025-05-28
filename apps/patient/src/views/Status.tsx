@@ -220,8 +220,6 @@ export const Status = () => {
     ? 'PHARMACY_CLOSED'
     : fulfillments.map((f) => f.exceptions[0]?.exceptionType).find((e) => e != null) ?? undefined;
 
-  console.log(isDeliveryPharmacy, displayPharmacy, canReroute, rerouteButton);
-
   return (
     <VStack flex={1}>
       <DemoCtaModal isOpen={showDemoCtaModal} onClose={() => setShowDemoCtaModal(false)} />
