@@ -120,6 +120,14 @@ export function isDelivery({
   );
 }
 
+/**
+ * Currently we only allow re-routing to non-delivery pharmacies. This is changing and we'll need
+ * a more robust solution. This function is the first pipe.
+ */
+export function isRerouteablePharmacy({ pharmacy }: { pharmacy?: Pharmacy }): boolean {
+  return pharmacy?.id === 'phr_01GA9HPV5XYTC1NNX213VRRBZ3'; // amazon pharmacy
+}
+
 export const preparePharmacy = (
   pharmacy: Pharmacy,
   fulfillmentType?: ExtendedFulfillmentType
