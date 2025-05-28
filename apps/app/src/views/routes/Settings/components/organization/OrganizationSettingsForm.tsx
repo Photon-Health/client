@@ -45,11 +45,18 @@ export function OrganizationSettingsForm({
   return (
     <form>
       <VStack spacing={6} alignItems="flex-start">
+        <Text fontSize="sm">
+          These organization settings affect both the provider and patient experiences.
+          Provider-related updates apply only to the web application flow. If your organization uses
+          an embedded experience, please refer to our documentation to learn how to modify the
+          prescriber experience accordingly.
+        </Text>
+
         <VStack spacing={3} alignItems="flex-start" w="100%">
           <Text fontSize="lg" fontWeight="medium">
             Branding
           </Text>
-          <Flex gap={4} w="100%" maxW={{ base: '100%', md: '50%' }} flexDirection="column">
+          <Flex gap={7} w="100%" maxW={{ base: '100%', md: '50%' }} flexDirection="column">
             <FormControl isInvalid={!!errors.brandColor}>
               <FormLabel htmlFor="brandColor">Brand Color</FormLabel>
               <FormHelperText mb={2}>
@@ -413,35 +420,7 @@ export function OrganizationSettingsForm({
           <Text fontSize="lg" fontWeight="medium">
             Patient Experience
           </Text>
-          <Flex gap={4} w="100%">
-            <FormControl isInvalid={!!errors.patientUx?.enablePatientRerouting}>
-              <Flex gap={2}>
-                <Field
-                  component={SwitchField}
-                  name="patientUx.enablePatientRerouting"
-                  id="patientUx.enablePatientRerouting"
-                />
-                <FormLabel htmlFor="patientUx.enablePatientRerouting">
-                  Enable Patient Rerouting
-                </FormLabel>
-              </Flex>
-            </FormControl>
-          </Flex>
-          <Flex gap={4} w="100%">
-            <FormControl isInvalid={!!errors.patientUx?.enablePatientDeliveryPharmacies}>
-              <Flex gap={2}>
-                <Field
-                  component={SwitchField}
-                  name="patientUx.enablePatientDeliveryPharmacies"
-                  id="patientUx.enablePatientDeliveryPharmacies"
-                />
-                <FormLabel htmlFor="patientUx.enablePatientDeliveryPharmacies">
-                  Enable Patient Delivery Pharmacies
-                </FormLabel>
-              </Flex>
-            </FormControl>
-          </Flex>
-          <Flex gap={5} w={{ base: '100%', md: '50%' }}>
+          <Flex gap={7} w={{ base: '100%', md: '50%' }}>
             <FormControl isInvalid={!!errors.priorAuthorizationExceptionMessage}>
               <FormLabel htmlFor="priorAuthorizationExceptionMessage">
                 Prior Authorization Exception Message
