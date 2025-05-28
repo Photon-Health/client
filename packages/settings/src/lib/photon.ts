@@ -202,6 +202,10 @@ const organizationSettings: {
   org_HGmpRAOzaWsBOnXG: {
     provider: [CUREXA_PHARMACY_ID]
   },
+  // LongevityCenter (Xyon Health)
+  org_mUNnITdhvvYWetc0: {
+    provider: [CUREXA_PHARMACY_ID]
+  },
   // Om Dermatology (sub-org of Miiskin)
   org_1eNnu0Wi14vBH7IM: {
     provider: [HONEYBEE_PHARMACY_ID]
