@@ -120,6 +120,10 @@ export function isDelivery({
   );
 }
 
+export function isRerouteablePharmacy({ pharmacy }: { pharmacy?: Pharmacy }): boolean {
+  return pharmacy?.id === 'phr_01GA9HPV5XYTC1NNX213VRRBZ3'; // amazon pharmacy
+}
+
 export const preparePharmacy = (
   pharmacy: Pharmacy,
   fulfillmentType?: ExtendedFulfillmentType

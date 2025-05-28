@@ -12,7 +12,13 @@ import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal
 import { OrderSummary } from '../components/order-summary/OrderSummary';
 import { OrderStatusHeader } from '../components/status/Header';
 import { deriveOrderStatus, getLatestReadyTime } from '../utils/fulfillmentsHelpers';
-import { formatAddress, getFulfillmentType, isDelivery, preparePharmacy } from '../utils/general';
+import {
+  formatAddress,
+  getFulfillmentType,
+  isDelivery,
+  isRerouteablePharmacy,
+  preparePharmacy
+} from '../utils/general';
 import { InsuranceAlert } from '../components/InsuranceAlert';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
@@ -114,6 +120,8 @@ export const Status = () => {
 
   const isDeliveryPharmacy = isDelivery({ pharmacy, fulfillmentType });
 
+  const isRerouteable = isRerouteablePharmacy({ pharmacy });
+
   if (!order) {
     console.error('No order found');
     return null;
@@ -212,6 +220,8 @@ export const Status = () => {
     ? 'PHARMACY_CLOSED'
     : fulfillments.map((f) => f.exceptions[0]?.exceptionType).find((e) => e != null) ?? undefined;
 
+  console.log(isDeliveryPharmacy, displayPharmacy, canReroute, rerouteButton);
+
   return (
     <VStack flex={1}>
       <DemoCtaModal isOpen={showDemoCtaModal} onClose={() => setShowDemoCtaModal(false)} />
@@ -267,7 +277,11 @@ export const Status = () => {
                         !isDeliveryPharmacy &&
                         exception &&
                         callPharmacyButton(true)}
-                      {!isDeliveryPharmacy && displayPharmacy && canReroute && rerouteButton}
+                      {/* right now mail order (aka delivery pharmacies) are considered to not be re-routable but this will eventually change*/}
+                      {(!isDeliveryPharmacy || isRerouteable) &&
+                        displayPharmacy &&
+                        canReroute &&
+                        rerouteButton}
                     </VStack>
                   </VStack>
                 </Card>
