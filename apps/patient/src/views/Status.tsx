@@ -12,13 +12,7 @@ import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal
 import { OrderSummary } from '../components/order-summary/OrderSummary';
 import { OrderStatusHeader } from '../components/status/Header';
 import { deriveOrderStatus, getLatestReadyTime } from '../utils/fulfillmentsHelpers';
-import {
-  formatAddress,
-  getFulfillmentType,
-  isDelivery,
-  isRerouteablePharmacy,
-  preparePharmacy
-} from '../utils/general';
+import { formatAddress, getFulfillmentType, isDelivery, preparePharmacy } from '../utils/general';
 import { InsuranceAlert } from '../components/InsuranceAlert';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
@@ -120,14 +114,12 @@ export const Status = () => {
 
   const isDeliveryPharmacy = isDelivery({ pharmacy, fulfillmentType });
 
-  const isRerouteable = isRerouteablePharmacy({ pharmacy });
-
   if (!order) {
     console.error('No order found');
     return null;
   }
 
-  const canOrderReroute = !isDemo && enablePatientRerouting && order.isReroutable;
+  const canReroute = !isDemo && enablePatientRerouting && order.isReroutable;
 
   const handleRerouteLink = () => {
     const query = queryString.stringify({
@@ -268,18 +260,14 @@ export const Status = () => {
                       {displayPharmacy && !isDeliveryPharmacy && !exception && navigateButton}
                       {displayPharmacy &&
                         !isDeliveryPharmacy &&
-                        canOrderReroute &&
+                        canReroute &&
                         !exception &&
                         callPharmacyButton(false)}
                       {displayPharmacy &&
                         !isDeliveryPharmacy &&
                         exception &&
                         callPharmacyButton(true)}
-                      {/* right now mail order (aka delivery pharmacies) are considered to not be re-routable but this will eventually change*/}
-                      {(!isDeliveryPharmacy || isRerouteable) &&
-                        displayPharmacy &&
-                        canOrderReroute &&
-                        rerouteButton}
+                      {!isDeliveryPharmacy && displayPharmacy && canReroute && rerouteButton}
                     </VStack>
                   </VStack>
                 </Card>
