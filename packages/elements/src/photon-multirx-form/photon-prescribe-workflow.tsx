@@ -112,6 +112,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     routingConstraints,
     combinedRoutingConstraint,
     tryUpdatePrescriptionStates,
+    isLoadingPrefills,
     orderFormData
   } = usePrescribe();
 
@@ -689,7 +690,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                         Add Prescription
                       </Button>
                     </Show>
-                    <Button loading={isLoading()} onClick={combineOrSubmit}>
+                    <Button loading={isLoadingPrefills() || isLoading()} onClick={combineOrSubmit}>
                       {props.enableOrder ? 'Send Order' : 'Save Prescriptions'}
                     </Button>
                   </div>
