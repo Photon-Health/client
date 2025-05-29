@@ -45,14 +45,19 @@ export default function Button(props: ButtonProps) {
         'bg-blue-50 text-blue-600 hover:bg-blue-100': otherProps.variant === 'tertiary',
         'text-blue-600 hover:text-blue-500 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300':
           otherProps.variant === 'naked',
-        'opacity-50 cursor-not-allowed': buttonProps.disabled
+        'opacity-50 cursor-not-allowed': buttonProps.disabled || otherProps.loading
       },
       props?.class
     )
   );
 
   return (
-    <button {...buttonProps} class={buttonClasses()} type={props?.type}>
+    <button
+      {...buttonProps}
+      class={buttonClasses()}
+      disabled={buttonProps.disabled || otherProps.loading}
+      type={props?.type}
+    >
       <Show when={otherProps?.loading}>
         <Spinner size="sm" />
       </Show>
