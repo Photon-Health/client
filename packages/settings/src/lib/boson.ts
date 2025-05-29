@@ -65,5 +65,9 @@ const orgMailOrders: Record<string, Partial<MailOrderPharmacyConfigs>> = {
       TWENTYEIGHT_PARTNER_COSMO_PHARMACY_ID,
       TWENTYEIGHT_PARTNER_HOLLY_PARK_PHARMACY_ID
     ]
+  },
+  // Remedy Test
+  org_4aLQHXJ1XLuYfxe7: {
+    provider: [WELLS_PHARMACY_ID]
   }
 };
