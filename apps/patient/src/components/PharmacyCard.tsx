@@ -2,9 +2,7 @@ import { memo } from 'react';
 import { Card, CardBody } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-// import { EnrichedPharmacy } from '../utils/models';
 import { PharmacyInfo } from './PharmacyInfo';
-// import { DeliveryOptionOverrides } from '../views/Pharmacy';
 import { EnrichedPharmacy } from '../utils/models';
 
 dayjs.extend(customParseFormat);
@@ -18,7 +16,6 @@ interface PharmacyCardProps {
   showDetails?: boolean;
   showPrice?: boolean;
   isCurrentPharmacy?: boolean;
-  // deliveryOptionOverride?: DeliveryOptionOverrides;
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
@@ -30,8 +27,7 @@ export const PharmacyCard = memo(function PharmacyCard({
   showDetails = true,
   showPrice = false,
   isCurrentPharmacy = false
-}: // deliveryOptionOverride
-PharmacyCardProps) {
+}: PharmacyCardProps) {
   if (!pharmacy) return null;
 
   return (
@@ -58,7 +54,6 @@ PharmacyCardProps) {
           selected={selected}
           isCurrentPharmacy={isCurrentPharmacy}
           isStatus={false}
-          // deliveryOptionOverride={deliveryOptionOverride}
         />
       </CardBody>
     </Card>
