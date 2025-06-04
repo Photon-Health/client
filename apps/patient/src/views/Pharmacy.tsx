@@ -179,7 +179,8 @@ export const Pharmacy = () => {
   const orderContainsGLP1Medication = flattenedFills.some((fill) => isGLP(fill.treatment.name));
   const orderIsMultiRx = flattenedFills.length > 1;
   // note: prices are only for single-rx, non-GLP-1 right now
-  const showPriceToggle = isDemo ?? (!orderContainsGLP1Medication && !orderIsMultiRx) ?? false;
+  const showPriceToggle =
+    isDemo || (!orderContainsGLP1Medication && !orderIsMultiRx) ? true : false;
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
@@ -1000,7 +1001,7 @@ export const Pharmacy = () => {
                     />
                   </HStack>
                   {enablePrice ? (
-                    <Box p={3} bgColor="blue.100" borderRadius="lg">
+                    <Box p={3} bgColor="blue.100" borderRadius="lg" w="full">
                       <Text fontSize="sm">
                         If a price is shown, you can pay out of pocket instead of insurance.{' '}
                         <Link
