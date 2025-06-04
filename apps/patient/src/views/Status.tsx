@@ -18,7 +18,13 @@ import {
   OrderStatusHeader
 } from '../components';
 import { deriveOrderStatus, getLatestReadyTime } from '../utils/fulfillmentsHelpers';
-import { formatAddress, getFulfillmentType, isDelivery, preparePharmacy } from '../utils/general';
+import {
+  formatAddress,
+  getFulfillmentType,
+  isDelivery,
+  isRerouteablePharmacy,
+  preparePharmacy
+} from '../utils/general';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import * as TOAST_CONFIG from '../configs/toast';
@@ -173,12 +179,14 @@ export const Status = () => {
 
   const isDeliveryPharmacy = isDelivery({ pharmacy, fulfillmentType });
 
+  const isRerouteable = isRerouteablePharmacy({ pharmacy });
+
   if (!order) {
     console.error('No order found');
     return null;
   }
 
-  const canReroute = !isDemo && enablePatientRerouting && order.isReroutable;
+  const canOrderReroute = !isDemo && enablePatientRerouting && order.isReroutable;
 
   const handleRerouteLink = () => {
     const query = queryString.stringify({
@@ -336,14 +344,18 @@ export const Status = () => {
                     {displayPharmacy && !isDeliveryPharmacy && !exception && navigateButton}
                     {displayPharmacy &&
                       !isDeliveryPharmacy &&
-                      canReroute &&
+                      canOrderReroute &&
                       !exception &&
                       callPharmacyButton(false)}
                     {displayPharmacy &&
                       !isDeliveryPharmacy &&
                       exception &&
                       callPharmacyButton(true)}
-                    {displayPharmacy && !isDeliveryPharmacy && canReroute && rerouteButton}
+                    {/* right now mail order (aka delivery pharmacies) are considered to not be re-routable but this will eventually change*/}
+                    {(!isDeliveryPharmacy || isRerouteable) &&
+                      displayPharmacy &&
+                      canOrderReroute &&
+                      rerouteButton}
                     {displayPharmacy && !isDeliveryPharmacy && preferredButton}
                   </VStack>
                 </Card>
