@@ -1,5 +1,4 @@
 export const prescriptions = [
-  // standard moped meds
   {
     id: 'sdfgfdgdgafsdfsaffssd',
     name: 'amoxicillin 400 MG in 5 mL Oral Suspension',
