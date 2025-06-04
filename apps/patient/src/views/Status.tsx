@@ -1,4 +1,4 @@
-import { Button, Container, Heading, useToast, VStack } from '@chakra-ui/react';
+import { Box, Button, Container, Heading, useToast, VStack } from '@chakra-ui/react';
 import queryString from 'query-string';
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
@@ -312,18 +312,20 @@ export const Status = () => {
         <title>{t.track}</title>
       </Helmet>
       <VStack spacing={5} width="full" alignItems={'stretch'}>
-        <Container py={6} bgColor="white">
-          <VStack spacing={4} width="full" alignItems="stretch">
-            <HolidayAlert>Holiday may affect pharmacy hours.</HolidayAlert>
-            <InsuranceAlert exception={unresolvedExceptions[0]?.exceptionType} />
-            <OrderStatusHeader
-              status={orderState}
-              pharmacyEstimatedReadyAt={pharmacyEstimatedReadyAt}
-              patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
-              exception={exception}
-            />
-          </VStack>
-        </Container>
+        <Box bgColor="white">
+          <Container py={6}>
+            <VStack spacing={4} width="full" alignItems="stretch">
+              <HolidayAlert>Holiday may affect pharmacy hours.</HolidayAlert>
+              <InsuranceAlert exception={unresolvedExceptions[0]?.exceptionType} />
+              <OrderStatusHeader
+                status={orderState}
+                pharmacyEstimatedReadyAt={pharmacyEstimatedReadyAt}
+                patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
+                exception={exception}
+              />
+            </VStack>
+          </Container>
+        </Box>
 
         <Container>
           <VStack spacing={7}>
