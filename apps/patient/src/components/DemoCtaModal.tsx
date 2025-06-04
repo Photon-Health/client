@@ -20,9 +20,9 @@ interface DemoCtaModalProps {
 
 export const DemoCtaModal = ({ isOpen, onClose }: DemoCtaModalProps) => {
   const handleCtaClick = () => {
-    window.open(
-      'https://blog.photon.health/how-found-scaled-access-to-personalized-weight-loss-treatment-with-photon'
-    );
+    const caseStudyLink =
+      'https://blog.photon.health/how-found-scaled-access-to-personalized-weight-loss-treatment-with-photon';
+    window.open(caseStudyLink);
   };
 
   return (
