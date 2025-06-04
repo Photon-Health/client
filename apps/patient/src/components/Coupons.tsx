@@ -8,18 +8,9 @@ import { DiscountCard } from '../__generated__/graphql';
 import { Card } from './Card';
 import goodrxLogo from '../assets/goodrx_logo.png';
 import { formatPrice } from '../utils/general';
-import { demoDiscountCards } from '../data/demoDiscountCards';
-import { useSearchParams } from 'react-router-dom';
 
 export const Coupons = () => {
   const { order } = useOrderContext();
-  const [searchParams] = useSearchParams();
-
-  const isDemo = searchParams.get('demo');
-
-  console.log(demoDiscountCards, isDemo);
-
-  // const discountCards = isDemo ? demoDiscountCards : order.discountCards;
 
   const discountCards = order.discountCards;
 
