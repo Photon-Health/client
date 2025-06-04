@@ -22,7 +22,6 @@ import { useMemo, useState } from 'react';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
 import { formatAddress, titleCase, formatPrice } from '../utils/general';
 import { getFulfillmentTrackingLink } from '../utils/fulfillmentsHelpers';
-// import { DeliveryOptionOverrides } from '../views/Pharmacy';
 
 dayjs.extend(customParseFormat);
 
