@@ -8,21 +8,32 @@ import { DiscountCard } from '../__generated__/graphql';
 import { Card } from './Card';
 import goodrxLogo from '../assets/goodrx_logo.png';
 import { formatPrice } from '../utils/general';
+import { demoDiscountCards } from '../data/demoDiscountCards';
+import { useSearchParams } from 'react-router-dom';
 
 export const Coupons = () => {
   const { order } = useOrderContext();
+  const [searchParams] = useSearchParams();
 
-  if (!order.discountCards || order.discountCards.length === 0) {
+  const isDemo = searchParams.get('demo');
+
+  console.log(demoDiscountCards, isDemo);
+
+  // const discountCards = isDemo ? demoDiscountCards : order.discountCards;
+
+  const discountCards = order.discountCards;
+
+  if (!discountCards || discountCards.length === 0) {
     return null;
   }
 
-  const discountCards = order.discountCards.filter(
+  const discountCardsForCurrentPharmacy = discountCards.filter(
     // Filter out discount cards that don't apply to the current pharmacy
     // If the order was rerouted, we might have discount cards from the previous pharmacy
     (card) => card.pharmacyId === order.pharmacy?.id
   );
 
-  if (discountCards.length === 0) {
+  if (discountCardsForCurrentPharmacy.length === 0) {
     return null;
   }
 
@@ -32,7 +43,7 @@ export const Coupons = () => {
         Coupon Card
       </Heading>
       {/* Show one coupon only */}
-      <Coupon coupon={discountCards[0]} />
+      <Coupon coupon={discountCardsForCurrentPharmacy[0]} />
     </VStack>
   );
 };

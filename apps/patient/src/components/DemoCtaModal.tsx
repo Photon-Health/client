@@ -8,7 +8,7 @@ import {
   ModalContent,
   ModalBody,
   Text,
-  VStack
+  ModalFooter
 } from '@chakra-ui/react';
 
 import image from '../assets/conversation.png';
@@ -20,7 +20,9 @@ interface DemoCtaModalProps {
 
 export const DemoCtaModal = ({ isOpen, onClose }: DemoCtaModalProps) => {
   const handleCtaClick = () => {
-    window.open('https://www.photon.health/sign-up');
+    window.open(
+      'https://blog.photon.health/how-found-scaled-access-to-personalized-weight-loss-treatment-with-photon'
+    );
   };
 
   return (
@@ -30,22 +32,20 @@ export const DemoCtaModal = ({ isOpen, onClose }: DemoCtaModalProps) => {
         <ModalBody>
           <Image src={image} width="auto" height="120px" mx="auto" pt={6} />
         </ModalBody>
-        <ModalHeader alignSelf="center">Take your time back</ModalHeader>
         <ModalCloseButton onClick={onClose} />
-        <ModalBody pb={6}>
-          <VStack spacing={1} align="stretch" textAlign="center" w="full">
-            <Text align="start">
-              Send prescriptions with Photon and let your patients manage their own orders. So your
-              doctors can get back to being doctors. You know, how prescriptions should work.
-            </Text>
-            <Text mt={5} fontSize="sm">
-              30 day free trial
-            </Text>
-            <Button w="full" size="lg" variant="brand" onClick={handleCtaClick}>
-              Try it out
-            </Button>
-          </VStack>
+        <ModalHeader alignSelf="center">Empower Rx access while protecting your time</ModalHeader>
+        <ModalBody>
+          <Text>
+            By prescribing with Photon, you unlock transparency, choice, and support that patients
+            love. And, you offload pharmacy issues to us, removing up to 70% of Rx requests and
+            saving 2 hours weekly per prescriber.
+          </Text>
         </ModalBody>
+        <ModalFooter>
+          <Button w="full" size="lg" variant="brand" onClick={handleCtaClick}>
+            Learn more
+          </Button>
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );

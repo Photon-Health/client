@@ -1,39 +1,37 @@
 import { memo } from 'react';
-import { Button, Card, CardBody, CardFooter, Collapse, Divider } from '@chakra-ui/react';
-import { FiStar } from 'react-icons/fi';
+import { Card, CardBody } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { text as t } from '../utils/text';
+// import { EnrichedPharmacy } from '../utils/models';
 import { PharmacyInfo } from './PharmacyInfo';
+// import { DeliveryOptionOverrides } from '../views/Pharmacy';
+import { EnrichedPharmacy } from '../utils/models';
 
 dayjs.extend(customParseFormat);
 
 interface PharmacyCardProps {
   pharmacy: EnrichedPharmacy;
   preferred?: boolean;
-  savingPreferred?: boolean;
   selected?: boolean;
   onSelect?: () => void;
-  onSetPreferred?: () => void;
   selectable?: boolean;
   showDetails?: boolean;
   showPrice?: boolean;
   isCurrentPharmacy?: boolean;
+  // deliveryOptionOverride?: DeliveryOptionOverrides;
 }
 
 export const PharmacyCard = memo(function PharmacyCard({
   pharmacy,
   preferred = false,
-  savingPreferred = false,
   selected = false,
   onSelect,
-  onSetPreferred,
   selectable = false,
   showDetails = true,
   showPrice = false,
   isCurrentPharmacy = false
-}: PharmacyCardProps) {
+}: // deliveryOptionOverride
+PharmacyCardProps) {
   if (!pharmacy) return null;
 
   return (
@@ -52,6 +50,7 @@ export const PharmacyCard = memo(function PharmacyCard({
       <CardBody p={3}>
         <PharmacyInfo
           pharmacy={pharmacy}
+          tagline={pharmacy.tagline ?? undefined}
           preferred={preferred}
           showDetails={showDetails}
           showPrice={showPrice}
@@ -59,28 +58,9 @@ export const PharmacyCard = memo(function PharmacyCard({
           selected={selected}
           isCurrentPharmacy={isCurrentPharmacy}
           isStatus={false}
+          // deliveryOptionOverride={deliveryOptionOverride}
         />
       </CardBody>
-      {showDetails ? (
-        <Collapse in={selected && !preferred} animateOpacity>
-          <Divider />
-          <CardFooter p={2}>
-            {onSetPreferred ? (
-              <Button
-                mx="auto"
-                size="sm"
-                variant="ghost"
-                color="link"
-                onClick={onSetPreferred}
-                isLoading={savingPreferred}
-                leftIcon={<FiStar />}
-              >
-                {t.makePreferred}
-              </Button>
-            ) : null}
-          </CardFooter>
-        </Collapse>
-      ) : null}
     </Card>
   );
 });

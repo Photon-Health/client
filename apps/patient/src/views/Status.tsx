@@ -1,25 +1,36 @@
-import { Box, Button, Container, Heading, VStack } from '@chakra-ui/react';
+import { Button, Container, Heading, useToast, VStack } from '@chakra-ui/react';
 import queryString from 'query-string';
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { FiNavigation, FiPhoneCall, FiRefreshCcw } from 'react-icons/fi';
+import { FiNavigation, FiPhoneCall, FiRefreshCcw, FiStar } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { triggerDemoNotification } from '../api';
-import { Coupons, DemoCtaModal, PharmacyInfo, PoweredBy } from '../components';
-import { Card } from '../components/Card';
-import { HolidayAlert } from '../components/HolidayAlert';
-import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal';
-import { OrderSummary } from '../components/order-summary/OrderSummary';
-import { OrderStatusHeader } from '../components/status/Header';
+import { triggerDemoNotification, setPreferredPharmacy } from '../api';
+import {
+  Card,
+  Coupons,
+  DemoCtaModal,
+  PharmacyInfo,
+  PoweredBy,
+  HolidayAlert,
+  InsuranceAlert,
+  OrderDetailsModal,
+  OrderSummary,
+  OrderStatusHeader
+} from '../components';
 import { deriveOrderStatus, getLatestReadyTime } from '../utils/fulfillmentsHelpers';
 import { formatAddress, getFulfillmentType, isDelivery, preparePharmacy } from '../utils/general';
-import { InsuranceAlert } from '../components/InsuranceAlert';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
+import * as TOAST_CONFIG from '../configs/toast';
+import { demoDiscountCards } from '../data/demoDiscountCards';
+import { PHARMACY_LOGO_LOOKUP } from './Pharmacy';
 
 export const Status = () => {
   const navigate = useNavigate();
+  const toast = useToast();
+
   const { order, setOrder, isDemo, setFaqModalIsOpen } = useOrderContext();
+  console.log('order on status page', order);
 
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
 
@@ -30,11 +41,13 @@ export const Status = () => {
 
   const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
 
+  const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
+
   const { fulfillment, pharmacy, readyBy, readyByTime } = order;
 
   const fulfillmentType = getFulfillmentType(pharmacy?.id, fulfillment, type);
 
-  const pharmacyFormattedAddress = pharmacy?.address ? formatAddress(pharmacy.address) : '';
+  const pharmacyFormattedAddress = pharmacy?.address ? formatAddress(pharmacy.address) : undefined;
 
   const handleGetDirections = () => {
     if (!pharmacy?.name) return;
@@ -61,13 +74,17 @@ export const Status = () => {
           pharmacyFormattedAddress
         );
 
+        const discountCard = demoDiscountCards.find((card) => card.pharmacyId === pharmacy.id);
+
         setOrder({
           ...order,
           fulfillment: {
             ...order.fulfillment,
             state: 'RECEIVED',
             type: 'PICK_UP'
-          }
+          },
+
+          discountCards: discountCard ? [discountCard] : []
         });
 
         setTimeout(async () => {
@@ -85,7 +102,8 @@ export const Status = () => {
               ...order.fulfillment,
               state: 'READY',
               type: 'PICK_UP'
-            }
+            },
+            discountCards: discountCard ? [discountCard] : []
           });
 
           setTimeout(() => setShowDemoCtaModal(true), 1500);
@@ -102,6 +120,47 @@ export const Status = () => {
     phone,
     setOrder
   ]);
+
+  const handleSetPreferredPharmacy = async (pharmacyId: string) => {
+    if (!pharmacyId) return;
+
+    setSavingPreferred(true);
+
+    // Handle stp demo
+    if (isDemo) {
+      setTimeout(() => {
+        toast({ ...TOAST_CONFIG.SUCCESS, title: 'Set preferred pharmacy' });
+        setSavingPreferred(false);
+      }, 750);
+      return;
+    }
+
+    try {
+      const result: boolean = await setPreferredPharmacy(order.patient.id, pharmacyId);
+      setTimeout(() => {
+        if (result) {
+          toast({ ...TOAST_CONFIG.SUCCESS, title: 'Set preferred pharmacy' });
+        } else {
+          toast({
+            title: 'Unable to set preferred pharmacy',
+            description: 'Please refresh and try again',
+            ...TOAST_CONFIG.ERROR
+          });
+        }
+        setSavingPreferred(false);
+      }, 750);
+    } catch (error: any) {
+      toast({
+        ...TOAST_CONFIG.ERROR,
+        title: 'Unable to set preferred pharmacy',
+        description: 'Please refresh and try again'
+      });
+
+      setSavingPreferred(false);
+
+      console.error(JSON.stringify(error, undefined, 2));
+    }
+  };
 
   const [orderDetailsIsOpen, setOrderDetailsIsOpen] = useState(false);
 
@@ -154,7 +213,6 @@ export const Status = () => {
 
   const navigateButton = (
     <Button
-      mt={2}
       mx="auto"
       size="md"
       py={6}
@@ -195,6 +253,20 @@ export const Status = () => {
     </Button>
   );
 
+  const preferredButton = (
+    <Button
+      mx="auto"
+      size="sm"
+      variant="ghost"
+      color="link"
+      onClick={() => handleSetPreferredPharmacy(order.pharmacy?.id ?? '')}
+      isLoading={savingPreferred}
+      leftIcon={<FiStar />}
+    >
+      {t.makePreferred}
+    </Button>
+  );
+
   const pharmacyEstimatedReadyAt = useMemo(() => getLatestReadyTime(fulfillments), [fulfillments]);
   const orderState = useMemo(
     () =>
@@ -212,8 +284,15 @@ export const Status = () => {
     ? 'PHARMACY_CLOSED'
     : fulfillments.map((f) => f.exceptions[0]?.exceptionType).find((e) => e != null) ?? undefined;
 
+  const pharmacyWithLogo = displayPharmacy
+    ? {
+        ...displayPharmacy,
+        logo: PHARMACY_LOGO_LOOKUP[pharmacy?.name as keyof typeof PHARMACY_LOGO_LOOKUP] ?? undefined
+      }
+    : displayPharmacy;
+
   return (
-    <VStack flex={1}>
+    <VStack>
       <DemoCtaModal isOpen={showDemoCtaModal} onClose={() => setShowDemoCtaModal(false)} />
       <OrderDetailsModal
         isOpen={orderDetailsIsOpen}
@@ -224,51 +303,48 @@ export const Status = () => {
       <Helmet>
         <title>{t.track}</title>
       </Helmet>
-      <VStack spacing={5} width="full" alignItems={'stretch'} flex={1}>
-        <Box bgColor="white">
-          <Container py={6}>
-            <VStack spacing={4} width="full" alignItems="stretch">
-              <HolidayAlert>Holiday may affect pharmacy hours.</HolidayAlert>
-              <InsuranceAlert exception={unresolvedExceptions[0]?.exceptionType} />
-              <OrderStatusHeader
-                status={orderState}
-                pharmacyEstimatedReadyAt={pharmacyEstimatedReadyAt}
-                patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
-                exception={exception}
-              />
-            </VStack>
-          </Container>
-        </Box>
+      <VStack spacing={5} width="full" alignItems={'stretch'}>
+        <Container py={6} bgColor="white">
+          <VStack spacing={4} width="full" alignItems="stretch">
+            <HolidayAlert>Holiday may affect pharmacy hours.</HolidayAlert>
+            <InsuranceAlert exception={unresolvedExceptions[0]?.exceptionType} />
+            <OrderStatusHeader
+              status={orderState}
+              pharmacyEstimatedReadyAt={pharmacyEstimatedReadyAt}
+              patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
+              exception={exception}
+            />
+          </VStack>
+        </Container>
 
         <Container>
           <VStack spacing={7}>
-            {displayPharmacy && (
+            {pharmacyWithLogo && (
               <VStack w="full" alignItems="stretch" spacing={4}>
                 <Heading as="h4" size="md">
                   Pharmacy
                 </Heading>
                 <Card>
-                  <VStack w="full" spacing={0}>
+                  <VStack w="full" spacing={3}>
                     <PharmacyInfo
-                      pharmacy={displayPharmacy}
+                      pharmacy={pharmacyWithLogo}
                       showDetails={!isDeliveryPharmacy}
                       showHours={!isDeliveryPharmacy}
                       orderFulfillment={fulfillment}
                       isStatus
                     />
-                    <VStack spacing={2} w="full">
-                      {displayPharmacy && !isDeliveryPharmacy && !exception && navigateButton}
-                      {displayPharmacy &&
-                        !isDeliveryPharmacy &&
-                        canReroute &&
-                        !exception &&
-                        callPharmacyButton(false)}
-                      {displayPharmacy &&
-                        !isDeliveryPharmacy &&
-                        exception &&
-                        callPharmacyButton(true)}
-                      {!isDeliveryPharmacy && displayPharmacy && canReroute && rerouteButton}
-                    </VStack>
+                    {displayPharmacy && !isDeliveryPharmacy && !exception && navigateButton}
+                    {displayPharmacy &&
+                      !isDeliveryPharmacy &&
+                      canReroute &&
+                      !exception &&
+                      callPharmacyButton(false)}
+                    {displayPharmacy &&
+                      !isDeliveryPharmacy &&
+                      exception &&
+                      callPharmacyButton(true)}
+                    {displayPharmacy && !isDeliveryPharmacy && canReroute && rerouteButton}
+                    {displayPharmacy && !isDeliveryPharmacy && preferredButton}
                   </VStack>
                 </Card>
               </VStack>

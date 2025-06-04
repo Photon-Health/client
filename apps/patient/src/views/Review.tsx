@@ -1,10 +1,22 @@
-import { Box, Button, Container, HStack, Heading, Text, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Container,
+  Divider,
+  HStack,
+  Heading,
+  Icon,
+  Text,
+  VStack
+} from '@chakra-ui/react';
+import { TbPrescription } from 'react-icons/tb';
 import { Helmet } from 'react-helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { FixedFooter, PoweredBy, PrescriptionsList } from '../components';
+import { FixedFooter, PoweredBy, Stepper } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
+import { formatDate } from '../utils/general';
 
 export const Review = () => {
   const { order, flattenedFills } = useOrderContext();
@@ -35,18 +47,24 @@ export const Review = () => {
 
       <Box bgColor="white">
         <Container>
-          <VStack spacing={4} align="span" py={4}>
-            <VStack spacing={2} align="start">
-              <Heading as="h3" size="lg">
-                {t.reviewYourRx(isMultiRx)}
-              </Heading>
-              <Text>{t.pleaseReview(isMultiRx)}</Text>
-            </VStack>
-            <HStack spacing={2}>
-              <Text display="inline" color="gray.500">
+          <VStack spacing={2} align="span" py={4}>
+            <Stepper currentStep={1} />
+            <Heading as="h3" size="lg">
+              {t.reviewYourRx(isMultiRx)}
+            </Heading>
+            <Text>{t.pleaseReview(isMultiRx)}</Text>
+            <HStack
+              spacing={2}
+              border="1px solid"
+              borderColor="gray.200"
+              p={3}
+              borderRadius="lg"
+              justify="space-between"
+            >
+              <Text display="inline" color="gray.700">
                 {t.patient}
               </Text>
-              <Text display="inline" data-dd-privacy="mask">
+              <Text display="inline" data-dd-privacy="mask" fontWeight="semibold">
                 {patient.name.full}
               </Text>
             </HStack>
@@ -54,8 +72,45 @@ export const Review = () => {
         </Container>
       </Box>
 
-      <Box bgColor="white" mt={2} mb={32}>
-        <PrescriptionsList />
+      <Box mt={3} mb={32}>
+        {flattenedFills.map(({ id, treatment, prescription: rx, count }) => {
+          const prescription = rx!;
+          return (
+            <Container key={id}>
+              <Box border="1px solid" borderColor="gray.200" borderRadius="lg" bgColor="white">
+                <HStack p={3}>
+                  <Icon as={TbPrescription} mr={1} fontSize="1.2rem" />
+                  <Text align="start" data-dd-privacy="mask" fontWeight="semibold">
+                    {treatment.name}
+                  </Text>
+                </HStack>
+                <Divider my={0} />
+                <VStack align="span" p={3} fontSize="sm">
+                  <HStack>
+                    <HStack w="50%">
+                      <Text color="gray.700">{t.quantity}</Text>
+                      <Text data-dd-privacy="mask">{prescription.dispenseQuantity}</Text>
+                    </HStack>
+                    <HStack w="50%">
+                      <Text color="gray.700">{t.daysSupply}</Text>
+                      <Text data-dd-privacy="mask">{prescription.daysSupply}</Text>
+                    </HStack>
+                  </HStack>
+                  <HStack>
+                    <HStack w="50%">
+                      <Text color="gray.700">{t.refills}</Text>
+                      <Text data-dd-privacy="mask">{count - 1}</Text>
+                    </HStack>
+                    <HStack w="50%">
+                      <Text color="gray.700">{t.expires}</Text>
+                      <Text data-dd-privacy="mask">{formatDate(prescription.expirationDate)}</Text>
+                    </HStack>
+                  </HStack>
+                </VStack>
+              </Box>
+            </Container>
+          );
+        })}
       </Box>
 
       <FixedFooter show={true}>

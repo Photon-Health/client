@@ -8,6 +8,7 @@ import {
   Heading,
   HStack,
   Link,
+  SlideFade,
   Switch,
   Text,
   useToast,
@@ -20,13 +21,14 @@ import { Helmet } from 'react-helmet';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  BrandedOptionOverrides,
-  BrandedOptions,
   CouponModal,
   FixedFooter,
   LocationModal,
-  PickupOptions,
-  PoweredBy
+  PharmacyOptions,
+  PoweredBy,
+  PharmacyFilters,
+  HolidayAlert,
+  Stepper
 } from '../components';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, preparePharmacy } from '../utils/general';
@@ -39,13 +41,20 @@ import {
   getPharmacies,
   rerouteOrder,
   setOrderPharmacy,
-  setPreferredPharmacy,
   triggerDemoNotification
 } from '../api';
 
+import capsuleLogo from '../assets/capsule_logo_small_circle.png';
+import amazonPharmacyLogo from '../assets/amazon_pharmacy_logo_small_circle.png';
+import altoLogo from '../assets/alto_logo.svg';
+import costcoLogo from '../assets/costco_logo_small.png';
+import costPlusLogo from '../assets/costplus_logo_small_circle.png';
+import walgreensLogo from '../assets/walgreens_logo_small_circle.png';
+import walmartLogo from '../assets/walmart_logo_small_circle.png';
+import novocareLogo from '../assets/novo_circle.png';
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
-import { demoPharmacies } from '../data/demoPharmacies';
+import { demoPickupPharmacies } from '../data/demoPharmacies';
 import { isGLP } from '../utils/isGLP';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { datadogRum } from '@datadog/browser-rum';
@@ -54,10 +63,65 @@ import { getOrgMailOrderPharms } from '@client/settings';
 import { determineNovocareExperimentSegment } from './pharmacy.utils';
 import { fetchOffers } from './pharmacy.utils';
 import _ from 'lodash';
+import cvsLogo from '../assets/cvs_logo_small_circle.png';
+import { demoDiscountCards } from '../data/demoDiscountCards';
+
+export interface DeliveryOptionOverrides {
+  amazonPharmacyOverride?: string;
+  novocareExperimentOverride?: string;
+}
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
 const WALGREENS_PHARMACY_RADIUS = 15; // miles
+
+export const DELIVERY_PHARMACY_MARKETING_LOOKUP = {
+  [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]: {
+    name: 'Amazon Pharmacy',
+    tagline: 'Delivers in 2-5 days'
+  },
+  [process.env.REACT_APP_ALTO_PHARMACY_ID as string]: {
+    name: 'Alto Pharmacy',
+    tagline: 'Delivers as soon as today'
+  },
+  [process.env.REACT_APP_COSTCO_PHARMACY_ID as string]: {
+    name: 'Costco Pharmacy',
+    tagline: 'Delivers in 1-2 days'
+  },
+  [process.env.REACT_APP_COST_PLUS_PHARMACY_ID as string]: {
+    name: 'Cost Plus Pharmacy',
+    tagline: 'Delivery starting at $5'
+  },
+  [process.env.REACT_APP_WALMART_MAIL_ORDER_PHARMACY_ID as string]: {
+    name: 'Walmart Pharmacy',
+    tagline: 'Overnight shipping available'
+  },
+  [process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string]: {
+    name: 'NovoCare',
+    tagline: 'Delivers in 3-5 days'
+  },
+  ...Object.fromEntries(
+    Object.keys(capsulePharmacyIdLookup).map((id) => [
+      id,
+      {
+        name: 'Capsule Pharmacy',
+        tagline: 'Same or Next-Day Home Delivery'
+      }
+    ])
+  )
+};
+
+export const PHARMACY_LOGO_LOOKUP = {
+  'Amazon Pharmacy': amazonPharmacyLogo,
+  'Alto Pharmacy': altoLogo,
+  'Costco Pharmacy': costcoLogo,
+  'Cost Plus Pharmacy': costPlusLogo,
+  'Walmart Pharmacy': walmartLogo,
+  NovoCare: novocareLogo,
+  'Capsule Pharmacy': capsuleLogo,
+  'Walgreens Pharmacy': walgreensLogo,
+  'CVS Pharmacy': cvsLogo
+};
 
 export const Pharmacy = () => {
   const { order, flattenedFills, setOrder, isDemo, fetchOrder } = useOrderContext();
@@ -78,10 +142,6 @@ export const Pharmacy = () => {
   const isReroute = searchParams.get('reroute');
   const openNow = searchParams.get('openNow');
   const phone = searchParams.get('phone');
-
-  // preferred pharmacy
-  const [preferredPharmacyId, setPreferredPharmacyId] = useState<string>('');
-  const [savingPreferred, setSavingPreferred] = useState<boolean>(false);
 
   // top ranked pharmacies
   const containsGLP = flattenedFills.some((fill) => isGLP(fill.treatment.name));
@@ -119,7 +179,7 @@ export const Pharmacy = () => {
   const orderContainsGLP1Medication = flattenedFills.some((fill) => isGLP(fill.treatment.name));
   const orderIsMultiRx = flattenedFills.length > 1;
   // note: prices are only for single-rx, non-GLP-1 right now
-  const showPriceToggle = (!orderContainsGLP1Medication && !orderIsMultiRx) ?? false;
+  const showPriceToggle = isDemo ?? (!orderContainsGLP1Medication && !orderIsMultiRx) ?? false;
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
@@ -128,8 +188,8 @@ export const Pharmacy = () => {
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
   const [enablePrice, setEnablePrice] = useState(false);
 
-  const [brandedOptionsOverride, setBrandedOptionsOverride] = useState<
-    BrandedOptionOverrides | undefined
+  const [deliveryOptionsOverride, setDeliveryOptionsOverride] = useState<
+    DeliveryOptionOverrides | undefined
   >(undefined);
 
   // pagination
@@ -138,7 +198,7 @@ export const Pharmacy = () => {
   // Pharmacy results
   const [topRankedPharmacies, setTopRankedPharmacies] = useState<EnrichedPharmacy[]>([]);
   const [pharmacyResults, setPharmacyResults] = useState<EnrichedPharmacy[]>([]);
-  const allPharmacies = useMemo(() => {
+  const allPickupPharmacies = useMemo(() => {
     const topRankedIds = topRankedPharmacies.map((p) => p.id);
     const combined = [
       ...topRankedPharmacies,
@@ -179,7 +239,7 @@ export const Pharmacy = () => {
 
   useEffect(() => {
     const determineOverrides = async () => {
-      let newBrandedOptionsOverride: BrandedOptionOverrides = {};
+      let newDeliveryOptionsOverride: DeliveryOptionOverrides = {};
 
       // measured will only want to show amazon offers if we do not have a novocare offer
       if (order.organization.id === 'org_pcPnPx5PVamzjS2p') {
@@ -188,36 +248,39 @@ export const Pharmacy = () => {
         if (novocareExperimentOverride?.novocareExperimentOverride) {
           // we have a novocare offer, so we don't want to show amazon offers
 
-          newBrandedOptionsOverride = {
+          newDeliveryOptionsOverride = {
             ...novocareExperimentOverride
           };
         } else {
           // we don't have a novocare offer, so we want to show amazon offers if we have any
           const amazonExperimentOverride = await fetchOffers(order);
 
-          newBrandedOptionsOverride = {
+          newDeliveryOptionsOverride = {
             ...amazonExperimentOverride
           };
         }
       } else {
-        // these functions will be called and make a state change to brandedOptionsOverride using setBrandedOptionsOverride
-        // if there are branded option overrides
+        // these functions will be called and make a state change to deliveryOptionsOverride using setDeliveryOptionsOverride
+        // if there are delivery option overrides
         const amazonExperimentOverride = await fetchOffers(order);
         const novocareExperimentOverride = determineNovocareExperimentSegment(order);
 
-        newBrandedOptionsOverride = {
+        newDeliveryOptionsOverride = {
           ...amazonExperimentOverride,
           ...novocareExperimentOverride
         };
       }
 
-      if (JSON.stringify(newBrandedOptionsOverride) !== JSON.stringify(brandedOptionsOverride)) {
-        setBrandedOptionsOverride(newBrandedOptionsOverride);
+      if (JSON.stringify(newDeliveryOptionsOverride) !== JSON.stringify(deliveryOptionsOverride)) {
+        setDeliveryOptionsOverride(newDeliveryOptionsOverride);
       }
     };
 
-    determineOverrides();
-  }, [order, brandedOptionsOverride]);
+    // if we're in demo mode, we don't show offers
+    if (!isDemo) {
+      determineOverrides();
+    }
+  }, [order, deliveryOptionsOverride, isDemo]);
 
   const showToastWarning = () =>
     toast({
@@ -261,8 +324,10 @@ export const Pharmacy = () => {
 
       let pharmacies =
         enableOpenNow || enable24Hr
-          ? demoPharmacies.filter((p) => (enableOpenNow && p.isOpen) || (enable24Hr && p.is24Hr))
-          : demoPharmacies;
+          ? demoPickupPharmacies.filter(
+              (p) => (enableOpenNow && p.isOpen) || (enable24Hr && p.is24Hr)
+            )
+          : demoPickupPharmacies;
 
       pharmacies = pharmacies.slice(0, 5);
 
@@ -496,8 +561,10 @@ export const Pharmacy = () => {
     if (isDemo) {
       const pharmacies =
         enableOpenNow || enable24Hr
-          ? demoPharmacies.filter((p) => (enableOpenNow && p.isOpen) || (enable24Hr && p.is24Hr))
-          : demoPharmacies;
+          ? demoPickupPharmacies.filter(
+              (p) => (enableOpenNow && p.isOpen) || (enable24Hr && p.is24Hr)
+            )
+          : demoPickupPharmacies;
 
       const newPharmacyOptions = pharmacies.slice(
         pharmacyResults.length,
@@ -579,16 +646,38 @@ export const Pharmacy = () => {
         setTimeout(() => {
           setShowFooter(false);
 
-          // Add selected pharmacy to order context so /status shows pharmacy on render
-          const selectedPharmacy = allPharmacies.find((p) => p.id === selectedId)!;
-          setOrder({ ...order, pharmacy: selectedPharmacy });
+          let selectedPharmacy;
+          if (selectedId && selectedId in DELIVERY_PHARMACY_MARKETING_LOOKUP) {
+            selectedPharmacy = {
+              ...DELIVERY_PHARMACY_MARKETING_LOOKUP[selectedId],
+              id: selectedId,
+              // Delivery pharmacies don't have an address
+              address: undefined
+            };
+          } else {
+            // Use the found pickup pharmacy or undefined if not found
+            selectedPharmacy = allPickupPharmacies.find((p) => p.id === selectedId);
+          }
+
+          const discountCard = demoDiscountCards.find(
+            (card) => card.pharmacyId === selectedPharmacy?.id
+          );
+
+          setOrder({
+            ...order,
+            pharmacy: selectedPharmacy,
+            // Add discount card only if toggle waas on and pharmacy had a price
+            discountCards: enablePrice && discountCard ? [discountCard] : []
+          });
 
           // Send order placed sms to demo participant
           triggerDemoNotification(
             phone!,
             'photon:order:placed',
-            selectedPharmacy.name,
-            formatAddress(selectedPharmacy.address!)
+            selectedPharmacy?.name,
+            selectedPharmacy && selectedPharmacy.address
+              ? formatAddress(selectedPharmacy.address)
+              : undefined
           );
 
           navigate(`/status?demo=true&phone=${phone}`);
@@ -599,7 +688,7 @@ export const Pharmacy = () => {
       return;
     }
 
-    trackSelectedPharmacyRank(selectedId, allPharmacies);
+    trackSelectedPharmacyRank(selectedId, allPickupPharmacies);
 
     try {
       const patientSelectedPrice = enablePrice;
@@ -620,8 +709,8 @@ export const Pharmacy = () => {
           setTimeout(async () => {
             setShowFooter(false);
 
-            if (brandedOptionsOverride?.amazonPharmacyOverride) {
-              const slugifiedOverride = brandedOptionsOverride?.amazonPharmacyOverride
+            if (deliveryOptionsOverride?.amazonPharmacyOverride) {
+              const slugifiedOverride = deliveryOptionsOverride?.amazonPharmacyOverride
                 ?.toLowerCase()
                 .trim()
                 .replace(/\s+/g, '_')
@@ -647,7 +736,7 @@ export const Pharmacy = () => {
               }
             }
 
-            if (brandedOptionsOverride?.novocareExperimentOverride) {
+            if (deliveryOptionsOverride?.novocareExperimentOverride) {
               if (selectedId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID) {
                 datadogRum.addAction('novocare_experiment_offer_active_and_selected', {
                   orderId: order.id,
@@ -692,7 +781,7 @@ export const Pharmacy = () => {
               selectedPharmacy = { id: selectedId, name: 'Novocare' };
             } else {
               type = 'PICK_UP';
-              selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
+              selectedPharmacy = allPickupPharmacies.find((p) => p.id === selectedId);
             }
 
             setOrder({
@@ -726,49 +815,6 @@ export const Pharmacy = () => {
     }
   };
 
-  const handleSetPreferredPharmacy = async (pharmacyId: string) => {
-    if (!pharmacyId) return;
-
-    setSavingPreferred(true);
-
-    // Handle stp demo
-    if (isDemo) {
-      setTimeout(() => {
-        setPreferredPharmacyId(pharmacyId);
-        toast({ ...TOAST_CONFIG.SUCCESS, title: 'Set preferred pharmacy' });
-        setSavingPreferred(false);
-      }, 750);
-      return;
-    }
-
-    try {
-      const result: boolean = await setPreferredPharmacy(order.patient.id, pharmacyId);
-      setTimeout(() => {
-        if (result) {
-          setPreferredPharmacyId(pharmacyId);
-          toast({ ...TOAST_CONFIG.SUCCESS, title: 'Set preferred pharmacy' });
-        } else {
-          toast({
-            title: 'Unable to set preferred pharmacy',
-            description: 'Please refresh and try again',
-            ...TOAST_CONFIG.ERROR
-          });
-        }
-        setSavingPreferred(false);
-      }, 750);
-    } catch (error: any) {
-      toast({
-        ...TOAST_CONFIG.ERROR,
-        title: 'Unable to set preferred pharmacy',
-        description: 'Please refresh and try again'
-      });
-
-      setSavingPreferred(false);
-
-      console.error(JSON.stringify(error, undefined, 2));
-    }
-  };
-
   if (!order) {
     console.error('No error');
     return null;
@@ -791,16 +837,28 @@ export const Pharmacy = () => {
 
   const capsuleEnabled = enableCourier && order?.address?.postalCode && capsulePharmacyId;
 
-  const brandedOptions = _.uniq([
+  const deliveryOptions = _.uniq([
     ...(capsuleEnabled ? [capsulePharmacyId] : []),
-    ...(brandedOptionsOverride?.novocareExperimentOverride
+    ...(deliveryOptionsOverride?.novocareExperimentOverride
       ? [process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string]
       : []),
-    ...(brandedOptionsOverride?.amazonPharmacyOverride
+    ...(deliveryOptionsOverride?.amazonPharmacyOverride || isDemo
       ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]
       : []),
     ...(enableMailOrder ? mailOrderPharmacies : [])
   ]);
+
+  const deliveryOptionsWithBranding: EnrichedPharmacy[] = deliveryOptions.map((id) => {
+    const deliveryPharmacyInfo = DELIVERY_PHARMACY_MARKETING_LOOKUP[id];
+    const logo =
+      PHARMACY_LOGO_LOOKUP[deliveryPharmacyInfo?.name as keyof typeof PHARMACY_LOGO_LOOKUP];
+    return {
+      id,
+      name: deliveryPharmacyInfo?.name ?? '',
+      logo: logo ?? undefined,
+      tagline: deliveryPharmacyInfo?.tagline ?? undefined
+    };
+  });
 
   const locationPreview = (
     <VStack w="full" align="start" spacing={1}>
@@ -823,40 +881,70 @@ export const Pharmacy = () => {
     </Button>
   );
 
-  const brandedPharmacyOptions = (location: string) => (
-    <BrandedOptions
-      options={brandedOptions}
-      location={location}
-      selectedId={selectedId}
-      handleSelect={handleSelect}
-      brandedOptionOverrides={brandedOptionsOverride ?? {}}
-    />
+  const deliverySection = () => (
+    <VStack spacing={3} align="span" w="full">
+      <SlideFade offsetY="60px" in={true}>
+        <VStack spacing={1} align="start">
+          <Heading as="h5" size="sm">
+            {t.delivery}
+          </Heading>
+          <Text size="sm">{t.getDelivered}</Text>
+        </VStack>
+      </SlideFade>
+      <PharmacyOptions
+        pharmacies={deliveryOptionsWithBranding}
+        selectedId={selectedId}
+        handleSelect={handleSelect}
+      />
+    </VStack>
   );
 
-  const showPickupHeading =
-    (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined) ?? false;
+  const pickupOptionsWithBranding: EnrichedPharmacy[] = allPickupPharmacies.map((pharmacy) => {
+    const logo = PHARMACY_LOGO_LOOKUP[pharmacy.name as keyof typeof PHARMACY_LOGO_LOOKUP];
+    return {
+      ...pharmacy,
+      logo: logo ?? undefined
+    };
+  });
 
-  const pickupPharmacyOptions = (location: string) => (
-    <PickupOptions
-      location={location}
-      pharmacies={allPharmacies}
-      preferredPharmacy={preferredPharmacyId}
-      savingPreferred={savingPreferred}
-      selectedId={selectedId}
-      handleSelect={handleSelect}
-      handleShowMore={handleShowMore}
-      handleSetPreferred={handleSetPreferredPharmacy}
-      loadingMore={isLoading}
-      showingAllPharmacies={showingAllPharmacies}
-      showHeading={showPickupHeading}
-      enableOpenNow={enableOpenNow}
-      enable24Hr={enable24Hr}
-      enablePrice={enablePrice}
-      setEnableOpenNow={setEnableOpenNow}
-      setEnable24Hr={setEnable24Hr}
-      currentPharmacyId={order.pharmacy?.id}
-      setCouponModalOpen={setCouponModalOpen}
-    />
+  const showPickupHeading = deliveryOptionsWithBranding.length > 0 ? true : false;
+
+  const pickupSection = () => (
+    <VStack spacing={3} align="span" w="full">
+      {showPickupHeading ? (
+        <SlideFade offsetY="60px" in={true}>
+          <VStack spacing={1} align="start">
+            <Heading as="h5" size="sm">
+              {t.pickUp}
+            </Heading>
+            <Text>{t.getNearby}</Text>
+          </VStack>
+        </SlideFade>
+      ) : null}
+      <SlideFade offsetY="60px" in={true}>
+        <PharmacyFilters
+          enableOpenNow={enableOpenNow}
+          enable24Hr={enable24Hr}
+          setEnableOpenNow={setEnableOpenNow}
+          setEnable24Hr={setEnable24Hr}
+        />
+      </SlideFade>
+      <HolidayAlert>
+        Holiday may affect pharmacy hours. Consider sending to a 24 hour pharmacy.
+      </HolidayAlert>
+      <PharmacyOptions
+        pharmacies={pickupOptionsWithBranding}
+        selectedId={selectedId}
+        handleSelect={handleSelect}
+        currentPharmacyId={order.pharmacy?.id}
+        showPrice={enablePrice}
+      />
+      {!showingAllPharmacies && (allPickupPharmacies?.length > 0 || isLoading) ? (
+        <Button variant="link" loadingText="" isLoading={isLoading} onClick={handleShowMore} p={3}>
+          {t.showMore}
+        </Button>
+      ) : null}
+    </VStack>
   );
 
   return (
@@ -876,8 +964,9 @@ export const Pharmacy = () => {
           pt={4}
           pb={!showPriceToggle ? 4 : 0} // don't remove, this padding is needed when price toggle section is not shown
         >
-          <Container px={-3}>
+          <Container px={-3} py={0}>
             <VStack spacing={2} align="start" px={4}>
+              <Stepper currentStep={3} />
               <Heading as="h3" size="lg">
                 {heading}
               </Heading>
@@ -889,31 +978,45 @@ export const Pharmacy = () => {
 
           {showPriceToggle ? (
             <Container px={-3}>
-              <VStack
-                spacing={2}
-                align="start"
-                borderY="2px solid"
-                borderColor="gray.300"
-                py={4}
-                px={4}
-              >
-                <HStack justify="space-between" w="full">
-                  {t.showDiscountCardPrices(() => setCouponModalOpen(true))}
-                  <Switch
-                    size="lg"
-                    isChecked={enablePrice}
-                    onChange={(e) => setEnablePrice(e.target.checked)}
-                  />
-                </HStack>
-                {enablePrice ? (
-                  <Box p={3} bgColor="blue.100" borderRadius="lg">
-                    <Text fontSize="sm">
-                      The displayed price is a coupon price for the pharmacy. Coupon details
-                      available after you select a pharmacy. <b>This is NOT insurance.</b>
-                    </Text>
-                  </Box>
-                ) : null}
-              </VStack>
+              <Box borderY="2px solid" borderColor="gray.200" py={4} px={4}>
+                <VStack
+                  align="start"
+                  spacing={2}
+                  border="1px solid"
+                  borderColor="gray.300"
+                  borderRadius="lg"
+                  p={3}
+                  w="full"
+                >
+                  <HStack justify="space-between" w="full">
+                    <VStack align="start" spacing={1}>
+                      <Text fontWeight="semibold">Show cheaper cash prices</Text>
+                      <Text>May be cheaper than your copay</Text>
+                    </VStack>
+                    <Switch
+                      size="lg"
+                      isChecked={enablePrice}
+                      onChange={(e) => setEnablePrice(e.target.checked)}
+                    />
+                  </HStack>
+                  {enablePrice ? (
+                    <Box p={3} bgColor="blue.100" borderRadius="lg">
+                      <Text fontSize="sm">
+                        If a price is shown, you can pay out of pocket instead of insurance.{' '}
+                        <Link
+                          textDecoration="underline"
+                          textUnderlineOffset="2px"
+                          color="blue.500"
+                          fontSize="sm"
+                          onClick={() => setCouponModalOpen(true)}
+                        >
+                          More info.
+                        </Link>
+                      </Text>
+                    </Box>
+                  ) : null}
+                </VStack>
+              </Box>
             </Container>
           ) : null}
         </VStack>
@@ -922,10 +1025,10 @@ export const Pharmacy = () => {
       <Container pb={showFooter ? 32 : 8}>
         {location ? (
           <VStack spacing={6} align="stretch" pt={4}>
-            {enableCourier || enableMailOrder || brandedOptionsOverride
-              ? brandedPharmacyOptions(location)
+            {enableCourier || enableMailOrder || deliveryOptionsOverride || isDemo
+              ? deliverySection()
               : null}
-            {pickupPharmacyOptions(location)}
+            {pickupSection()}
           </VStack>
         ) : null}
       </Container>

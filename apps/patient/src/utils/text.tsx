@@ -1,4 +1,4 @@
-import { Link, HStack, Text } from '@chakra-ui/react';
+import { Link, HStack, Text, VStack } from '@chakra-ui/react';
 import { FulfillmentState } from 'packages/sdk/src/types';
 import React, { ReactNode } from 'react';
 import { ExtendedFulfillmentType } from './models';
@@ -214,21 +214,13 @@ export const text = {
   setLoc: 'Set location',
   setSearchLoc: 'Set search location',
   shipTo: (deliveryAddress: string) => `Ship to ${deliveryAddress}`,
-  showDiscountCardPrices: (onClick: () => void) => (
-    <>
-      <HStack>
-        <Text fontWeight="semibold">Show coupon card prices</Text>
-        <Link
-          textDecoration="underline"
-          textUnderlineOffset="2px"
-          color="blue.500"
-          fontSize="sm"
-          onClick={onClick}
-        >
-          What's this?
-        </Link>
-      </HStack>
-    </>
+  showDiscountCardPrices: () => (
+    <HStack>
+      <VStack>
+        <Text fontWeight="semibold">Show cheaper cash prices</Text>
+        <Text>May be cheaper than your copay</Text>
+      </VStack>
+    </HStack>
   ),
   showThisCoupon: 'Show this at the pharmacy to get this coupon price',
   showCouponToPharmacy: (isPlural: boolean) =>

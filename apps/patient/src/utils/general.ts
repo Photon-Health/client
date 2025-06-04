@@ -10,7 +10,7 @@ import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
 import { Address, EnrichedPharmacy, Fill, OrderFulfillment, Pharmacy } from '../utils/models';
 import { ExtendedFulfillmentType } from './models';
 import { PharmacyCloseEvent, PharmacyEvent, PharmacyOpenEvent } from '../__generated__/graphql';
-import { PHARMACY_BRANDING } from '../components';
+import { DELIVERY_PHARMACY_MARKETING_LOOKUP, PHARMACY_LOGO_LOOKUP } from '../views/Pharmacy';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -135,7 +135,8 @@ export const preparePharmacy = (
   if (fulfillmentType && isDelivery({ pharmacy, fulfillmentType })) {
     return {
       ...pharmacy,
-      ...PHARMACY_BRANDING[pharmacy.id]
+      ...DELIVERY_PHARMACY_MARKETING_LOOKUP[pharmacy.id],
+      logo: PHARMACY_LOGO_LOOKUP[pharmacy.name as keyof typeof PHARMACY_LOGO_LOOKUP]
     };
   }
 
