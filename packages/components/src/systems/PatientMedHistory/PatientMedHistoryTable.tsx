@@ -132,7 +132,9 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
                       }
                     }}
                     disabled={!rowItem.prescription}
-                    loading={isCreatingPrescriptionId() === rowItem.prescription?.id}
+                    loading={
+                      rowItem.prescription && isCreatingPrescriptionId() === rowItem.prescription.id
+                    }
                   />
                 </div>
               </Show>
