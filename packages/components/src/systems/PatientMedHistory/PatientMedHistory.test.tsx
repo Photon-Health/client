@@ -1,4 +1,4 @@
-import { render, screen } from '@solidjs/testing-library';
+import { cleanup, render, screen } from '@solidjs/testing-library';
 import PatientMedHistory, { GetPatientResponse } from './index';
 import { vi } from 'vitest';
 import { MockPhotonClient, MockSDKProvider } from '../TestMocks/MockSDKProvider';
@@ -29,6 +29,7 @@ vi.mock('../../utils/createQuery', () => ({
 
 afterEach(() => {
   vi.resetAllMocks();
+  cleanup();
 });
 
 test('PatientMedHistory renders without PrescribeContext', async () => {
