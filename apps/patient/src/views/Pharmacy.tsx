@@ -31,7 +31,7 @@ import {
 } from '../components';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, preparePharmacy } from '../utils/general';
-import { ExtendedFulfillmentType } from '../utils/models';
+import { EnrichedPharmacy, ExtendedFulfillmentType } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -55,7 +55,8 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { demoPickupPharmacies } from '../data/demoPharmacies';
 import { isGLP } from '../utils/isGLP';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
+// todo: We should not cast Pharmacy to another type that already exists. Prefixing with Bad for now.
+import { Pharmacy as BadEnrichedPharmacy } from '../utils/models';
 import { datadogRum } from '@datadog/browser-rum';
 import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
@@ -77,34 +78,48 @@ const WALGREENS_PHARMACY_RADIUS = 15; // miles
 export const DELIVERY_PHARMACY_MARKETING_LOOKUP = {
   [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]: {
     name: 'Amazon Pharmacy',
-    tagline: 'Delivers in 2-5 days'
+    tagline: 'Same day delivery after you place your order',
+    freeDelivery: true,
+    availableInYourArea: false
   },
   [process.env.REACT_APP_ALTO_PHARMACY_ID as string]: {
     name: 'Alto Pharmacy',
-    tagline: 'Delivers as soon as today'
+    tagline: 'Delivers as soon as today',
+    freeDelivery: false,
+    availableInYourArea: false
   },
   [process.env.REACT_APP_COSTCO_PHARMACY_ID as string]: {
     name: 'Costco Pharmacy',
-    tagline: 'Delivers in 1-2 days'
+    tagline: 'Delivers in 1-2 days',
+    freeDelivery: false,
+    availableInYourArea: false
   },
   [process.env.REACT_APP_COST_PLUS_PHARMACY_ID as string]: {
     name: 'Cost Plus Pharmacy',
-    tagline: 'Delivery starting at $5'
+    tagline: 'Delivery starting at $5',
+    freeDelivery: false,
+    availableInYourArea: false
   },
   [process.env.REACT_APP_WALMART_MAIL_ORDER_PHARMACY_ID as string]: {
     name: 'Walmart Pharmacy',
-    tagline: 'Overnight shipping available'
+    tagline: 'Overnight shipping available',
+    freeDelivery: false,
+    availableInYourArea: false
   },
   [process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string]: {
     name: 'NovoCare',
-    tagline: 'Delivers in 3-5 days'
+    tagline: 'Delivers in 3-5 days',
+    freeDelivery: false,
+    availableInYourArea: false
   },
   ...Object.fromEntries(
     Object.keys(capsulePharmacyIdLookup).map((id) => [
       id,
       {
         name: 'Capsule Pharmacy',
-        tagline: 'Same or Next-Day Home Delivery'
+        tagline: 'Same or Next-Day Home Delivery',
+        freeDelivery: false,
+        availableInYourArea: true
       }
     ])
   )
@@ -196,9 +211,9 @@ export const Pharmacy = () => {
   const [pageOffset, setPageOffset] = useState(0);
 
   // Pharmacy results
-  const [topRankedPharmacies, setTopRankedPharmacies] = useState<EnrichedPharmacy[]>([]);
-  const [pharmacyResults, setPharmacyResults] = useState<EnrichedPharmacy[]>([]);
-  const allPickupPharmacies = useMemo(() => {
+  const [topRankedPharmacies, setTopRankedPharmacies] = useState<BadEnrichedPharmacy[]>([]);
+  const [pharmacyResults, setPharmacyResults] = useState<BadEnrichedPharmacy[]>([]);
+  const allPickupPharmacies: EnrichedPharmacy[] = useMemo(() => {
     const topRankedIds = topRankedPharmacies.map((p) => p.id);
     const combined = [
       ...topRankedPharmacies,
@@ -477,7 +492,7 @@ export const Pharmacy = () => {
       setLoadingPharmacies(true);
       try {
         // Get pharmacies from photon db
-        let topRankedPharmacies: EnrichedPharmacy[] = [];
+        let topRankedPharmacies: BadEnrichedPharmacy[] = [];
 
         // check if top ranked costco is enabled and there are GLP treatments
         if (enableTopRankedCostco) {
@@ -856,7 +871,9 @@ export const Pharmacy = () => {
       id,
       name: deliveryPharmacyInfo?.name ?? '',
       logo: logo ?? undefined,
-      tagline: deliveryPharmacyInfo?.tagline ?? undefined
+      tagline: deliveryPharmacyInfo?.tagline ?? undefined,
+      isFreeDelivery: deliveryPharmacyInfo?.freeDelivery ?? false,
+      availableInYourArea: deliveryPharmacyInfo?.availableInYourArea ?? false
     };
   });
 

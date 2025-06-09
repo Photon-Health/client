@@ -54,6 +54,8 @@ export const PharmacyCard = memo(function PharmacyCard({
           selected={selected}
           isCurrentPharmacy={isCurrentPharmacy}
           isStatus={false}
+          freeDelivery={pharmacy.isFreeDelivery}
+          availableInYourArea={pharmacy.availableInYourArea}
         />
       </CardBody>
     </Card>

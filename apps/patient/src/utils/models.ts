@@ -31,6 +31,8 @@ export type EnrichedPharmacy = Pharmacy & {
   retailPrice?: number;
   isDeliveryPharmacy?: boolean;
   tagline?: string | null;
+  isFreeDelivery?: boolean;
+  availableInYourArea?: boolean;
 };
 export type ExtendedFulfillmentType = FulfillmentType | 'COURIER';
 
