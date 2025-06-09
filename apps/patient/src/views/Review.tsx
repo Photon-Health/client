@@ -13,7 +13,7 @@ import { TbPrescription } from 'react-icons/tb';
 import { Helmet } from 'react-helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { FixedFooter, PoweredBy, Stepper } from '../components';
+import { FixedFooter, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { formatDate } from '../utils/general';
@@ -48,7 +48,6 @@ export const Review = () => {
       <Box bgColor="white">
         <Container>
           <VStack spacing={2} align="span" py={4}>
-            <Stepper currentStep={1} />
             <Heading as="h3" size="lg">
               {t.reviewYourRx(isMultiRx)}
             </Heading>

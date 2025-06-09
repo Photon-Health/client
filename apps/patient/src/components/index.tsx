@@ -15,7 +15,6 @@ export * from './PrescriptionsList';
 export * from './CouponModal';
 export * from './Coupons';
 export * from './HolidayAlert';
-export * from './Stepper';
 export * from './Card';
 export * from './InsuranceAlert';
 export * from './order-details/OrderDetailsModal';

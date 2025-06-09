@@ -27,8 +27,7 @@ import {
   PharmacyOptions,
   PoweredBy,
   PharmacyFilters,
-  HolidayAlert,
-  Stepper
+  HolidayAlert
 } from '../components';
 import * as TOAST_CONFIG from '../configs/toast';
 import { formatAddress, preparePharmacy } from '../utils/general';
@@ -967,7 +966,6 @@ export const Pharmacy = () => {
         >
           <Container px={-3} py={0}>
             <VStack spacing={2} align="start" px={4}>
-              <Stepper currentStep={3} />
               <Heading as="h3" size="lg">
                 {heading}
               </Heading>

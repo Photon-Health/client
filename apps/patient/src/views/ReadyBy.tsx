@@ -21,7 +21,6 @@ import dayjs from 'dayjs';
 import { datadogRum } from '@datadog/browser-rum';
 import timezone from 'dayjs/plugin/timezone';
 import { capitalize, convertReadyByToUTCTimestamp } from '../utils/general';
-import { Stepper } from '../components';
 
 dayjs.extend(timezone);
 
@@ -109,7 +108,6 @@ export const ReadyBy = () => {
       <Box bgColor="white">
         <Container>
           <VStack spacing={2} align="span" pt={4}>
-            <Stepper currentStep={2} />
             <Heading as="h3" size="lg">
               {t.readyWhen}
             </Heading>
