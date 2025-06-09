@@ -121,6 +121,7 @@ test('PatientMedHistory disables External Medication refill button', async () =>
 
   const refillButton = screen.getByRole('button', { name: 'Refill' });
   expect(refillButton).toBeDisabled();
+  expect(refillButton).not.toHaveTextContent('Loading...');
   await user.click(refillButton);
   expect(mockPrescribeFunctions.tryCreatePrescription).not.toHaveBeenCalled();
 });
