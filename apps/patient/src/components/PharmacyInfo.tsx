@@ -276,7 +276,7 @@ export const PharmacyInfo = ({
   const showNovocareTagline =
     isNovocarePharmacy && brandedOptionOverride?.novocareExperimentOverride;
 
-  const taglineOverride = showNovocareTagline ?? showAmazonTagline;
+  const taglineOverride = showNovocareTagline || showAmazonTagline;
 
   return (
     <VStack align="start" w="full">
