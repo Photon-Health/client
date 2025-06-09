@@ -179,7 +179,6 @@ export const text = {
     } ready to be picked up. Please notify us below when you’ve picked up your ${
       isPlural ? 'prescriptions' : 'prescription'
     }.`,
-  searchPharmacy: 'Search for a pharmacy',
   selectAPharmacy: 'Select a pharmacy',
   selectCashPrice: (
     <>

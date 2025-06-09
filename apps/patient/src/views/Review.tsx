@@ -115,7 +115,7 @@ export const Review = () => {
       <FixedFooter show={true}>
         <Container as={VStack} w="full">
           <Button size="lg" borderRadius="lg" w="full" variant="brand" onClick={handleCtaClick}>
-            {t.searchPharmacy}
+            {t.next}
           </Button>
           <PoweredBy />
         </Container>
