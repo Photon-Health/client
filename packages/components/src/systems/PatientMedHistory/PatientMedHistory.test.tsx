@@ -1,4 +1,4 @@
-import { render, screen } from '@solidjs/testing-library';
+import { cleanup, render, screen } from '@solidjs/testing-library';
 import PatientMedHistory, { GetPatientResponse } from './index';
 import { vi } from 'vitest';
 import { MockPhotonClient, MockSDKProvider } from '../TestMocks/MockSDKProvider';
@@ -22,29 +22,27 @@ vi.mock('../PrescribeProvider', () => {
   };
 });
 
+const createQueryMock = vi.fn();
 vi.mock('../../utils/createQuery', () => ({
-  createQuery: () => {
-    const mockResponse: GetPatientResponse = {
-      patient: {
-        id: 'test-patient-id',
-        treatmentHistory: [
-          {
-            treatment: { name: 'test-treatment-name', id: 'test-treatment-id', codes: {} },
-            prescription: createPrescription()
-          }
-        ]
-      }
-    };
-    return vi.fn().mockImplementation(() => mockResponse);
-  }
+  createQuery: () => createQueryMock()
 }));
 
 afterEach(() => {
   vi.resetAllMocks();
+  cleanup();
 });
 
 test('PatientMedHistory renders without PrescribeContext', async () => {
   const mockClient = new MockPhotonClient();
+
+  createQueryMock.mockReturnValueOnce(() =>
+    generatePatientMedHistoryResponse([
+      {
+        treatment: { name: 'test-treatment-name', id: 'test-treatment-id', codes: {} },
+        prescription: createPrescription()
+      }
+    ])
+  );
 
   render(() => (
     <MockSDKProvider client={mockClient as unknown as PhotonClient}>
@@ -64,6 +62,15 @@ test('PatientMedHistory allows refills', async () => {
   const mockClient = new MockPhotonClient();
   const mockPrescribeFunctions = mockPrescribeContextValues();
 
+  createQueryMock.mockReturnValueOnce(() =>
+    generatePatientMedHistoryResponse([
+      {
+        treatment: { name: 'test-treatment-name', id: 'test-treatment-id', codes: {} },
+        prescription: createPrescription()
+      }
+    ])
+  );
+
   render(() => (
     <MockSDKProvider client={mockClient as unknown as PhotonClient}>
       <MockPrescribeProvider mockFunctions={mockPrescribeFunctions}>
@@ -76,9 +83,48 @@ test('PatientMedHistory allows refills', async () => {
     </MockSDKProvider>
   ));
 
-  await user.click(screen.getByRole('button', { name: 'Refill' }));
+  const refillButton = screen.getByRole('button', { name: 'Refill' });
+  expect(refillButton).not.toBeDisabled();
+  await user.click(refillButton);
 
   expect(mockPrescribeFunctions.tryCreatePrescription).toHaveBeenCalledTimes(1);
+});
+
+test('PatientMedHistory disables External Medication refill button', async () => {
+  const user = userEvent.setup();
+  const mockClient = new MockPhotonClient();
+  const mockPrescribeFunctions = mockPrescribeContextValues();
+
+  createQueryMock.mockReturnValueOnce(() =>
+    generatePatientMedHistoryResponse([
+      {
+        treatment: {
+          name: 'test-externally-added-medication-name',
+          id: 'test-treatment-id',
+          codes: {}
+        },
+        prescription: undefined
+      }
+    ])
+  );
+
+  render(() => (
+    <MockSDKProvider client={mockClient as unknown as PhotonClient}>
+      <MockPrescribeProvider mockFunctions={mockPrescribeFunctions}>
+        <PatientMedHistory
+          patientId="test-patient-id"
+          enableLinks={false}
+          enableRefillButton={true}
+        />
+      </MockPrescribeProvider>
+    </MockSDKProvider>
+  ));
+
+  const refillButton = screen.getByRole('button', { name: 'Refill' });
+  expect(refillButton).toBeDisabled();
+  expect(refillButton).not.toHaveTextContent('Loading...');
+  await user.click(refillButton);
+  expect(mockPrescribeFunctions.tryCreatePrescription).not.toHaveBeenCalled();
 });
 
 function createPrescription(): Prescription {
@@ -92,4 +138,15 @@ function createPrescription(): Prescription {
     fillsRemaining: 0,
     state: 'DRAFT'
   } as unknown as Prescription;
+}
+
+function generatePatientMedHistoryResponse(
+  treatmentHistoryItems: GetPatientResponse['patient']['treatmentHistory'] = []
+): GetPatientResponse {
+  return {
+    patient: {
+      id: 'test-patient-id',
+      treatmentHistory: treatmentHistoryItems
+    }
+  };
 }
