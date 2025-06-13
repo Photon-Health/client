@@ -407,7 +407,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     options: TryCreatePrescriptionTemplateOptions = { showSuccessToast: true }
   ): Promise<Prescription> => {
     const isPrescriptionAlreadyAdded = isTreatmentInDraftPrescriptions(
-      prescriptionFormData.treatment.id,
+      prescriptionFormData,
       draftPrescriptions()
     );
 
@@ -589,10 +589,10 @@ export const usePrescribeOptional = () => {
 };
 
 export function isTreatmentInDraftPrescriptions(
-  treatmentId: string,
+  prescription: PrescriptionFormData,
   draftedPrescriptions: { treatment: { id: string } }[]
 ) {
-  return draftedPrescriptions.some((draft) => draft.treatment.id === treatmentId);
+  return draftedPrescriptions.some((draft) => draft.treatment.id === prescription.treatment.id);
 }
 
 export type TryCreatePrescriptionTemplateOptions = {
