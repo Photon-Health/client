@@ -1,18 +1,38 @@
 import { getOffers } from '../api/internal';
+import { AmazonOffer } from '../components';
 import { Order } from '../utils/models';
 
 // this function will update the state for amazonPharmacyOverride if there are offers
 // belonging to the amazon pharmacy type
-export async function fetchOffers(order: Order) {
+export async function fetchOffers(order: Order): Promise<
+  | {
+      amazonPharmacyOverride: { cashOffer: AmazonOffer; insuranceOffer: AmazonOffer };
+    }
+  | undefined
+> {
   const offers = await getOffers(order.id);
 
   const amazonOffers = offers
     .filter((offer) => offer.supplier === 'AMAZON_PHARMACY')
     .filter((offer) => offer.deliveryEstimate !== undefined);
 
+  const cashOffer = offers.find((offer) => offer.cost?.type == 'CASH');
+  const insuranceOffer = offers.find((offer) => offer.cost?.type == 'INSURANCE_ESTIMATE');
+
   if (amazonOffers.length > 0 && amazonOffers[0]?.deliveryEstimate?.deliveryPromise) {
     return {
-      amazonPharmacyOverride: amazonOffers[0]?.deliveryEstimate?.deliveryPromise
+      amazonPharmacyOverride: {
+        cashOffer: {
+          deliveryEstimate: cashOffer?.deliveryEstimate?.deliveryPromise,
+          costType: cashOffer?.cost?.type,
+          costAmount: cashOffer?.cost?.amount
+        },
+        insuranceOffer: {
+          deliveryEstimate: insuranceOffer?.deliveryEstimate?.deliveryPromise,
+          costType: insuranceOffer?.cost?.type,
+          costAmount: insuranceOffer?.cost?.amount
+        }
+      }
     };
   }
 }

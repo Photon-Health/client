@@ -9,10 +9,17 @@ interface Props {
   selectedId: string;
   brandedOptionOverrides: BrandedOptionOverrides;
   handleSelect: (id: string) => void;
+  showPrice: boolean;
+}
+
+export interface AmazonOffer {
+  deliveryEstimate?: string;
+  costType?: string;
+  costAmount?: string;
 }
 
 export interface BrandedOptionOverrides {
-  amazonPharmacyOverride?: string;
+  amazonPharmacyOverride?: { cashOffer?: AmazonOffer; insuranceOffer?: AmazonOffer };
   novocareExperimentOverride?: string;
 }
 
@@ -21,7 +28,8 @@ export const BrandedOptions = ({
   location,
   selectedId,
   handleSelect,
-  brandedOptionOverrides
+  brandedOptionOverrides,
+  showPrice = false
 }: Props) => {
   if (!location) return null;
   if (options.length === 0) return null;
@@ -44,6 +52,7 @@ export const BrandedOptions = ({
             selected={selectedId === id}
             handleSelect={handleSelect}
             brandedOptionOverrides={brandedOptionOverrides}
+            showPrice={showPrice}
           />
         </SlideFade>
       ))}

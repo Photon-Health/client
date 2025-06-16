@@ -621,13 +621,14 @@ export const Pharmacy = () => {
             setShowFooter(false);
 
             if (brandedOptionsOverride?.amazonPharmacyOverride) {
-              const slugifiedOverride = brandedOptionsOverride?.amazonPharmacyOverride
-                ?.toLowerCase()
-                .trim()
-                .replace(/\s+/g, '_')
-                .replace(/[^a-z0-9_]/g, '')
-                .replace(/_+/g, '_')
-                .replace(/^_+|_+$/g, '');
+              const slugifiedOverride =
+                brandedOptionsOverride?.amazonPharmacyOverride.cashOffer?.deliveryEstimate
+                  ?.toLowerCase()
+                  .trim()
+                  .replace(/\s+/g, '_')
+                  .replace(/[^a-z0-9_]/g, '')
+                  .replace(/_+/g, '_')
+                  .replace(/^_+|_+$/g, '');
               if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
                 datadogRum.addAction('amazon_pharmacy_offer_active_and_selected', {
                   orderId: order.id,
@@ -829,6 +830,7 @@ export const Pharmacy = () => {
       location={location}
       selectedId={selectedId}
       handleSelect={handleSelect}
+      showPrice={enablePrice}
       brandedOptionOverrides={brandedOptionsOverride ?? {}}
     />
   );

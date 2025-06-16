@@ -251,7 +251,6 @@ const PHARMACY_FIELDS = gql`
       timezone
     }
     price
-    retailPrice
     source
   }
 `;
@@ -288,6 +287,10 @@ export const GET_OFFERS = gql`
         deliveryPromise
         deliveryPromiseRangeEnd
         deliveryPromiseRangeStart
+      }
+      cost {
+        type
+        amount
       }
       supplier
     }
