@@ -15,7 +15,7 @@ interface Props {
 export interface AmazonOffer {
   deliveryEstimate?: string;
   costType?: string;
-  costAmount?: string;
+  costAmount?: number;
 }
 
 export interface BrandedOptionOverrides {

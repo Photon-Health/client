@@ -223,7 +223,7 @@ const DistanceAddress = ({
 };
 
 const CostWidget = ({ costAmount, costType }: AmazonOffer) => {
-  if (costAmount == '0' || !costAmount) {
+  if (costAmount == 0 || !costAmount) {
     return null;
   }
 
@@ -232,7 +232,7 @@ const CostWidget = ({ costAmount, costType }: AmazonOffer) => {
       <Text fontSize="sm">
         {costType === 'INSURANCE_ESTIMATE' ? 'Avg. Copay Price' : 'As Low As'}
       </Text>
-      <Text fontWeight="bold">${formatPrice(parseFloat(costAmount))}</Text>
+      <Text fontWeight="bold">${formatPrice(costAmount)}</Text>
     </VStack>
   );
 };
