@@ -181,7 +181,7 @@ export const Pharmacy = () => {
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
 
   useEffect(() => {
-    const determineOverrides = async () => {
+    const getOffers = async () => {
       let fetchedOffers: AmazonOffer[] | undefined;
 
       if (offers !== undefined) {
@@ -215,7 +215,7 @@ export const Pharmacy = () => {
       }
     };
 
-    determineOverrides();
+    getOffers();
   }, [order, offers]);
 
   useEffect(() => {
