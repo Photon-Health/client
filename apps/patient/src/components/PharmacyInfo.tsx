@@ -294,11 +294,6 @@ export const PharmacyInfo = ({
 
   const taglineOverride = showNovocareTagline || showAmazonTagline;
 
-  if (isAmazonPharmacy) {
-    console.log('brandedOptionOverride');
-    console.log(brandedOptionOverride);
-  }
-
   return (
     <VStack align="start" w="full">
       <HStack w="full" justify="space-between">
