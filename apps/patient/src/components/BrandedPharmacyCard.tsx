@@ -17,7 +17,6 @@ interface Props {
   selected: boolean;
   handleSelect: (id: string) => void;
   brandedOptionOverrides?: BrandedOptionOverrides;
-  showPrice: boolean;
 }
 
 export const PHARMACY_BRANDING = {
@@ -67,8 +66,7 @@ export const BrandedPharmacyCard = ({
   pharmacyId,
   selected,
   handleSelect,
-  brandedOptionOverrides,
-  showPrice = false
+  brandedOptionOverrides
 }: Props) => {
   const brand = PHARMACY_BRANDING[pharmacyId];
   if (!brand) return null;
@@ -95,7 +93,6 @@ export const BrandedPharmacyCard = ({
           freeDelivery={brand.name === 'Amazon Pharmacy'}
           brandedOptionOverride={brandedOptionOverrides}
           boldPharmacyName={false}
-          showPrice={showPrice}
         />
       </CardBody>
     </Card>

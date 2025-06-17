@@ -853,7 +853,6 @@ export const Pharmacy = () => {
       location={location}
       selectedId={selectedId}
       handleSelect={handleSelect}
-      showPrice={!enablePrice}
       brandedOptionOverrides={brandedOptionsOverride ?? {}}
     />
   );
