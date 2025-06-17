@@ -286,13 +286,18 @@ export const PharmacyInfo = ({
 
   const isAmazonPharmacy = pharmacy.id === process.env.REACT_APP_AMAZON_PHARMACY_ID;
   const showAmazonTagline =
-    isAmazonPharmacy && brandedOptionOverride?.amazonPharmacyOverride?.cashOffer?.deliveryEstimate;
+    isAmazonPharmacy && brandedOptionOverride?.amazonPharmacyOverride?.deliveryEstimate;
 
   const isNovocarePharmacy = pharmacy.id === process.env.REACT_APP_NOVOCARE_PHARMACY_ID;
   const showNovocareTagline =
     isNovocarePharmacy && brandedOptionOverride?.novocareExperimentOverride;
 
   const taglineOverride = showNovocareTagline || showAmazonTagline;
+
+  if (isAmazonPharmacy) {
+    console.log('brandedOptionOverride');
+    console.log(brandedOptionOverride);
+  }
 
   return (
     <VStack align="start" w="full">
@@ -332,17 +337,10 @@ export const PharmacyInfo = ({
         ) : null}
 
         {isAmazonPharmacy && showAmazonTagline ? (
-          showPrice ? (
-            <CostWidget
-              costAmount={brandedOptionOverride?.amazonPharmacyOverride?.insuranceOffer?.costAmount}
-              costType={brandedOptionOverride?.amazonPharmacyOverride?.insuranceOffer?.costType}
-            />
-          ) : (
-            <CostWidget
-              costAmount={brandedOptionOverride?.amazonPharmacyOverride?.cashOffer?.costAmount}
-              costType={brandedOptionOverride?.amazonPharmacyOverride?.cashOffer?.costType}
-            />
-          )
+          <CostWidget
+            costAmount={brandedOptionOverride?.amazonPharmacyOverride?.costAmount}
+            costType={brandedOptionOverride?.amazonPharmacyOverride?.costType}
+          />
         ) : null}
       </HStack>
 

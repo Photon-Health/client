@@ -20,6 +20,7 @@ import { Helmet } from 'react-helmet';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
+  AmazonOffer,
   BrandedOptionOverrides,
   BrandedOptions,
   CouponModal,
@@ -132,6 +133,8 @@ export const Pharmacy = () => {
     BrandedOptionOverrides | undefined
   >(undefined);
 
+  const [offers, setOffers] = useState<AmazonOffer[] | undefined>(undefined);
+
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
 
@@ -179,45 +182,65 @@ export const Pharmacy = () => {
 
   useEffect(() => {
     const determineOverrides = async () => {
-      let newBrandedOptionsOverride: BrandedOptionOverrides = {};
+      let fetchedOffers: AmazonOffer[] | undefined;
+
+      if (offers !== undefined) {
+        return;
+      }
 
       // measured will only want to show amazon offers if we do not have a novocare offer
       if (order.organization.id === 'org_pcPnPx5PVamzjS2p') {
-        const novocareExperimentOverride = determineNovocareExperimentSegment(order);
+        const novocareExperimentSegment = determineNovocareExperimentSegment(order);
 
-        if (novocareExperimentOverride?.novocareExperimentOverride) {
+        if (novocareExperimentSegment) {
           // we have a novocare offer, so we don't want to show amazon offers
-
-          newBrandedOptionsOverride = {
-            ...novocareExperimentOverride
-          };
+          fetchedOffers = [
+            {
+              costType: 'NOVOCARE_OFFER',
+              deliveryEstimate: novocareExperimentSegment
+            }
+          ];
         } else {
           // we don't have a novocare offer, so we want to show amazon offers if we have any
-          const amazonExperimentOverride = await fetchOffers(order);
-
-          newBrandedOptionsOverride = {
-            ...amazonExperimentOverride
-          };
+          fetchedOffers = await fetchOffers(order);
         }
       } else {
         // these functions will be called and make a state change to brandedOptionsOverride using setBrandedOptionsOverride
         // if there are branded option overrides
-        const amazonExperimentOverride = await fetchOffers(order);
-        const novocareExperimentOverride = determineNovocareExperimentSegment(order);
-
-        newBrandedOptionsOverride = {
-          ...amazonExperimentOverride,
-          ...novocareExperimentOverride
-        };
+        fetchedOffers = await fetchOffers(order);
       }
 
-      if (JSON.stringify(newBrandedOptionsOverride) !== JSON.stringify(brandedOptionsOverride)) {
-        setBrandedOptionsOverride(newBrandedOptionsOverride);
+      if (JSON.stringify(fetchedOffers) !== JSON.stringify(offers)) {
+        setOffers(fetchedOffers);
       }
     };
 
     determineOverrides();
-  }, [order, brandedOptionsOverride]);
+  }, [order, offers]);
+
+  useEffect(() => {
+    const cashOffer = offers?.find((offer) => offer.costType == 'CASH');
+    const insuranceOffer = offers?.find((offer) => offer.costType == 'INSURANCE_ESTIMATE');
+
+    const novocareOffer = offers?.find((offer) => offer.costType == 'NOVOCARE_OFFER');
+
+    let amazonPharmacyOverride;
+
+    if (enablePrice) {
+      amazonPharmacyOverride = cashOffer;
+    } else {
+      amazonPharmacyOverride = insuranceOffer;
+    }
+
+    const newBrandedOptionsOverride = {
+      amazonPharmacyOverride,
+      novocareExperimentOverride: novocareOffer?.deliveryEstimate
+    };
+
+    if (JSON.stringify(newBrandedOptionsOverride) !== JSON.stringify(brandedOptionsOverride)) {
+      setBrandedOptionsOverride(newBrandedOptionsOverride);
+    }
+  }, [enablePrice, offers, order, brandedOptionsOverride]);
 
   const showToastWarning = () =>
     toast({
@@ -622,7 +645,7 @@ export const Pharmacy = () => {
 
             if (brandedOptionsOverride?.amazonPharmacyOverride) {
               const slugifiedOverride =
-                brandedOptionsOverride?.amazonPharmacyOverride.cashOffer?.deliveryEstimate
+                brandedOptionsOverride?.amazonPharmacyOverride.deliveryEstimate
                   ?.toLowerCase()
                   .trim()
                   .replace(/\s+/g, '_')

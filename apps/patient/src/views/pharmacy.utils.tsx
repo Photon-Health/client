@@ -4,43 +4,24 @@ import { Order } from '../utils/models';
 
 // this function will update the state for amazonPharmacyOverride if there are offers
 // belonging to the amazon pharmacy type
-export async function fetchOffers(order: Order): Promise<
-  | {
-      amazonPharmacyOverride: { cashOffer: AmazonOffer; insuranceOffer: AmazonOffer };
-    }
-  | undefined
-> {
+export async function fetchOffers(order: Order): Promise<AmazonOffer[] | undefined> {
   const offers = await getOffers(order.id);
 
   const amazonOffers = offers
     .filter((offer) => offer.supplier === 'AMAZON_PHARMACY')
     .filter((offer) => offer.deliveryEstimate !== undefined);
 
-  const cashOffer = offers.find((offer) => offer.cost?.type == 'CASH');
-  const insuranceOffer = offers.find((offer) => offer.cost?.type == 'INSURANCE_ESTIMATE');
-
   if (amazonOffers.length > 0 && amazonOffers[0]?.deliveryEstimate?.deliveryPromise) {
-    return {
-      amazonPharmacyOverride: {
-        cashOffer: {
-          deliveryEstimate: cashOffer?.deliveryEstimate?.deliveryPromise,
-          costType: cashOffer?.cost?.type,
-          costAmount: cashOffer?.cost?.amount
-        },
-        insuranceOffer: {
-          deliveryEstimate: insuranceOffer?.deliveryEstimate?.deliveryPromise,
-          costType: insuranceOffer?.cost?.type,
-          costAmount: insuranceOffer?.cost?.amount
-        }
-      }
-    };
+    return amazonOffers.map((offer) => ({
+      deliveryEstimate: offer.deliveryEstimate?.deliveryPromise,
+      costType: offer.cost?.type,
+      costAmount: offer.cost?.amount
+    }));
   }
 }
 
 // this function will update the state for novocareExperimentOverride if there are specific medications inside the order
-export function determineNovocareExperimentSegment(
-  order: Order
-): { novocareExperimentOverride: string | undefined } | undefined {
+export function determineNovocareExperimentSegment(order: Order): string | undefined {
   const organizationId = order?.organization.id;
 
   const medicinesAndDeliveryTypes = [
@@ -101,9 +82,5 @@ export function determineNovocareExperimentSegment(
 
   const deliveryType = getDeliveryType();
 
-  if (deliveryType) {
-    return {
-      novocareExperimentOverride: deliveryType
-    };
-  }
+  return deliveryType;
 }

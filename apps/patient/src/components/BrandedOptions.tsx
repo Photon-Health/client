@@ -19,7 +19,7 @@ export interface AmazonOffer {
 }
 
 export interface BrandedOptionOverrides {
-  amazonPharmacyOverride?: { cashOffer?: AmazonOffer; insuranceOffer?: AmazonOffer };
+  amazonPharmacyOverride?: AmazonOffer;
   novocareExperimentOverride?: string;
 }
 
