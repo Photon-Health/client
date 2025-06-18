@@ -17,8 +17,7 @@ function getNovocareOffers(order: Order): AmazonOffer[] {
   }
 }
 
-// this function will update the state for amazonPharmacyOverride if there are offers
-// belonging to the amazon pharmacy type
+// this function will return the offers available for the given order
 export async function fetchOffers(order: Order): Promise<AmazonOffer[] | undefined> {
   const offers = await getOffers(order.id);
 
