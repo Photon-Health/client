@@ -6,7 +6,6 @@ function getNovocareOffers(order: Order): AmazonOffer[] {
   const novocareExperimentSegment = determineNovocareExperimentSegment(order);
 
   if (novocareExperimentSegment) {
-    // we have a novocare offer, so we don't want to show amazon offers
     return [
       {
         costType: 'NOVOCARE_OFFER',
