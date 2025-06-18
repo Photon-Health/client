@@ -2,6 +2,22 @@ import { getOffers } from '../api/internal';
 import { AmazonOffer } from '../components';
 import { Order } from '../utils/models';
 
+function getNovocareOffers(order: Order): AmazonOffer[] {
+  const novocareExperimentSegment = determineNovocareExperimentSegment(order);
+
+  if (novocareExperimentSegment) {
+    // we have a novocare offer, so we don't want to show amazon offers
+    return [
+      {
+        costType: 'NOVOCARE_OFFER',
+        deliveryEstimate: novocareExperimentSegment
+      }
+    ];
+  } else {
+    return [];
+  }
+}
+
 // this function will update the state for amazonPharmacyOverride if there are offers
 // belonging to the amazon pharmacy type
 export async function fetchOffers(order: Order): Promise<AmazonOffer[] | undefined> {
@@ -9,15 +25,25 @@ export async function fetchOffers(order: Order): Promise<AmazonOffer[] | undefin
 
   const amazonOffers = offers
     .filter((offer) => offer.supplier === 'AMAZON_PHARMACY')
-    .filter((offer) => offer.deliveryEstimate !== undefined);
-
-  if (amazonOffers.length > 0 && amazonOffers[0]?.deliveryEstimate?.deliveryPromise) {
-    return amazonOffers.map((offer) => ({
+    .filter((offer) => offer.deliveryEstimate !== undefined)
+    .map((offer) => ({
       deliveryEstimate: offer.deliveryEstimate?.deliveryPromise,
       costType: offer.cost?.type,
       costAmount: offer.cost?.amount
     }));
+
+  const novocareOffers = getNovocareOffers(order);
+
+  // measured will only want to show amazon offers if we do not have a novocare offer
+  if (order.organization.id === 'org_pcPnPx5PVamzjS2p') {
+    if (novocareOffers.length === 0) {
+      return amazonOffers;
+    } else {
+      return novocareOffers;
+    }
   }
+
+  return [...amazonOffers, ...novocareOffers];
 }
 
 // this function will update the state for novocareExperimentOverride if there are specific medications inside the order

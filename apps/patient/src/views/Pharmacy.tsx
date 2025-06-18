@@ -52,7 +52,6 @@ import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { datadogRum } from '@datadog/browser-rum';
 import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
-import { determineNovocareExperimentSegment } from './pharmacy.utils';
 import { fetchOffers } from './pharmacy.utils';
 import _ from 'lodash';
 
@@ -184,34 +183,13 @@ export const Pharmacy = () => {
     const getOffers = async () => {
       let fetchedOffers: AmazonOffer[] | undefined;
 
-      if (offers !== undefined) {
-        return;
-      }
-
-      // measured will only want to show amazon offers if we do not have a novocare offer
-      if (order.organization.id === 'org_pcPnPx5PVamzjS2p') {
-        const novocareExperimentSegment = determineNovocareExperimentSegment(order);
-
-        if (novocareExperimentSegment) {
-          // we have a novocare offer, so we don't want to show amazon offers
-          fetchedOffers = [
-            {
-              costType: 'NOVOCARE_OFFER',
-              deliveryEstimate: novocareExperimentSegment
-            }
-          ];
-        } else {
-          // we don't have a novocare offer, so we want to show amazon offers if we have any
-          fetchedOffers = await fetchOffers(order);
-        }
-      } else {
-        // these functions will be called and make a state change to brandedOptionsOverride using setBrandedOptionsOverride
-        // if there are branded option overrides
+      // only fetch offers if we don't have any
+      if (!offers) {
         fetchedOffers = await fetchOffers(order);
-      }
 
-      if (JSON.stringify(fetchedOffers) !== JSON.stringify(offers)) {
-        setOffers(fetchedOffers);
+        if (JSON.stringify(fetchedOffers) !== JSON.stringify(offers)) {
+          setOffers(fetchedOffers);
+        }
       }
     };
 
