@@ -4,9 +4,10 @@ import {
   CAREPOINT_PHARMACY_ID,
   COST_PLUS_PHARMACY_ID,
   CUREXA_PHARMACY_ID,
+  GOGOMEDS_PHARMACY_ID,
   HONEYBEE_PHARMACY_ID,
+  STRIVE_PHARMACY_ID,
   TRUEPILL_PHARMACY_ID,
-  WELLS_PHARMACY_ID,
   TWENTYEIGHT_PARTNER_CARE_FIRST_PHARMACY_ID,
   TWENTYEIGHT_PARTNER_CATTLES_PHARMACY_ID,
   TWENTYEIGHT_PARTNER_COMPREHENSIVE_CARE_PHARMACY_ID,
@@ -14,7 +15,7 @@ import {
   TWENTYEIGHT_PARTNER_HOLLY_PARK_PHARMACY_ID,
   TWENTYEIGHT_PARTNER_MEADOWS_PHARMACY_ID,
   WALMART_MAIL_ORDER_PHARMACY_ID,
-  GOGOMEDS_PHARMACY_ID
+  WELLS_PHARMACY_ID
 } from '../pharmacies';
 
 /**
@@ -42,7 +43,11 @@ export const boson = function (organizationId: string | undefined): MailOrderPha
 const orgMailOrders: Record<string, Partial<MailOrderPharmacyConfigs>> = {
   // Test Telehealth (us)
   org_KzSVZBQixLRkqj5d: {
-    provider: defaultSettings.provider.concat([WELLS_PHARMACY_ID, GOGOMEDS_PHARMACY_ID]),
+    provider: defaultSettings.provider.concat([
+      WELLS_PHARMACY_ID,
+      GOGOMEDS_PHARMACY_ID,
+      STRIVE_PHARMACY_ID
+    ]),
     patient: [AMAZON_PHARMACY_ID, COST_PLUS_PHARMACY_ID, WALMART_MAIL_ORDER_PHARMACY_ID]
   },
   // NewCo (demo's)
