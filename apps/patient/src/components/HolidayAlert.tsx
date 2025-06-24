@@ -18,7 +18,8 @@ const holidays = [
   '2025-11-27', // Thanksgiving
   '2025-12-24', // Christmas Eve
   '2025-12-25', // Christmas
-  '2025-12-31' // New Years Eve
+  '2025-12-31', // New Years Eve
+  '2025-06-19' // Juneteenth
 ];
 
 function showHolidayDisclaimer() {
