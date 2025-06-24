@@ -207,9 +207,9 @@ export const Pharmacy = () => {
     // so the price won't be shown
     let amazonPharmacyOverride;
     if (enablePrice) {
-      amazonPharmacyOverride = { ...cashOffer, cost: undefined };
+      amazonPharmacyOverride = { ...cashOffer, costAmount: undefined };
     } else {
-      amazonPharmacyOverride = { ...insuranceOffer, cost: undefined };
+      amazonPharmacyOverride = { ...insuranceOffer, costAmount: undefined };
     }
 
     const newBrandedOptionsOverride = {
