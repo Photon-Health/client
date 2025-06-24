@@ -202,12 +202,14 @@ export const Pharmacy = () => {
 
     const novocareOffer = offers?.find((offer) => offer.costType == 'NOVOCARE_OFFER');
 
+    // we're not ready to share price yet
+    // so we're forcibly nulling out the cost
+    // so the price won't be shown
     let amazonPharmacyOverride;
-
     if (enablePrice) {
-      amazonPharmacyOverride = cashOffer;
+      amazonPharmacyOverride = { ...cashOffer, cost: undefined };
     } else {
-      amazonPharmacyOverride = insuranceOffer;
+      amazonPharmacyOverride = { ...insuranceOffer, cost: undefined };
     }
 
     const newBrandedOptionsOverride = {
