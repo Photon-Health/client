@@ -181,8 +181,14 @@ export const Main = () => {
         let imgHref = fileName;
         // if the logo is not a url, it's a file in the assets folder
         if (!imgHref.startsWith('http')) {
-          const response = await import(`../assets/${fileName}`);
-          imgHref = response.default as string;
+          // Use explicit imports for each supported file type
+          try {
+            const response = await import(`../assets/${fileName}`);
+            imgHref = response.default as string;
+          } catch {
+            // Fallback: construct URL for static assets
+            imgHref = new URL(`../assets/${fileName}`, import.meta.url).href;
+          }
         }
         await preloadImage(imgHref);
         setLogo(imgHref);

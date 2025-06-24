@@ -11,6 +11,11 @@
     "react-helmet": "^6.1.0",
     "tinycolor2": "^1.6.0"
   },
+  "devDependencies": {
+    "vite": "5.4.9",
+    "@vitejs/plugin-react": "^4.0.0",
+    "vitest": "^0.31.0"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",

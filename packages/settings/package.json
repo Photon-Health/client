@@ -1,5 +1,10 @@
 {
   "name": "@client/settings",
   "version": "0.0.1",
-  "type": "commonjs"
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  }
 }
