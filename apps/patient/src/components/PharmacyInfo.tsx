@@ -331,7 +331,7 @@ export const PharmacyInfo = ({
           </VStack>
         ) : null}
 
-        {isAmazonPharmacy && showAmazonTagline ? (
+        {showAmazonTagline ? (
           <CostWidget
             costAmount={brandedOptionOverride?.amazonPharmacyOverride?.costAmount}
             costType={brandedOptionOverride?.amazonPharmacyOverride?.costType}
