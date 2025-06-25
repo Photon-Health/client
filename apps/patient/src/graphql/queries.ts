@@ -289,6 +289,10 @@ export const GET_OFFERS = gql`
         deliveryPromiseRangeEnd
         deliveryPromiseRangeStart
       }
+      cost {
+        type
+        amount
+      }
       supplier
     }
   }
