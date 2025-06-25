@@ -1,13 +1,10 @@
-import { render, screen, act } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { ChakraProvider } from '@chakra-ui/react';
 import { MemoryRouter } from 'react-router-dom';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Pharmacy } from './Pharmacy';
-import { useOrderContext } from './Main';
-
-vi.mock('./Main', () => ({
-  useOrderContext: vi.fn()
-}));
+import { OrderContext, OrderContextType } from './Main';
+import { Order } from '../utils/models';
 
 vi.mock('../api', () => ({
   geocode: vi.fn().mockResolvedValue({
@@ -33,20 +30,6 @@ vi.mock('../components', () => ({
   PoweredBy: () => <div data-testid="powered-by">Powered By</div>
 }));
 
-vi.mock('react-ga4', () => ({
-  event: vi.fn()
-}));
-
-vi.mock('@datadog/browser-rum', () => ({
-  datadogRum: {
-    addAction: vi.fn()
-  }
-}));
-
-vi.mock('@client/settings', () => ({
-  getOrgMailOrderPharms: vi.fn(() => ({ patient: [] }))
-}));
-
 vi.mock('../configs/graphqlClient', () => ({
   setAuthHeader: vi.fn(),
   graphQLClient: {
@@ -59,27 +42,125 @@ vi.mock('../configs/graphqlClient', () => ({
   }
 }));
 
-const mockUseOrderContext = vi.mocked(useOrderContext);
+describe('Pharmacy Component - Switch Visibility', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
 
-const createMockOrder = (fills: any[] = [], organizationSettings: any = {}) => ({
+  describe('showPriceToggle visibility', () => {
+    describe('when order has single non-GLP medication', () => {
+      beforeEach(async () => {
+        const singleNonGLPFill = [createMockFill('Metformin')];
+        const order = generateOrder(singleNonGLPFill);
+
+        await renderPharmacy({ order });
+      });
+
+      it('shows the price toggle switch', async () => {
+        expect(screen.getByRole('checkbox')).toBeInTheDocument();
+      });
+
+      it('shows the price toggle text', async () => {
+        expect(screen.getByText('Show coupon card prices')).toBeInTheDocument();
+      });
+    });
+
+    describe('when order contains GLP-1 medication', () => {
+      beforeEach(async () => {
+        const glp1MedicationName = 'Semaglutide';
+        const glpFill = [createMockFill(glp1MedicationName)];
+
+        await renderPharmacy({ flattenedFills: glpFill });
+      });
+      it('hides the price toggle checkbox', async () => {
+        expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+      });
+      it('hides the price toggle text', async () => {
+        expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
+      });
+    });
+
+    describe('when order has multiple prescriptions', () => {
+      beforeEach(async () => {
+        const multipleFills = [createMockFill('Metformin'), createMockFill('Lisinopril')];
+
+        await renderPharmacy({ flattenedFills: multipleFills });
+      });
+      it('hides the price toggle checkbox', async () => {
+        expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+      });
+      it('hides the price toggle text', async () => {
+        expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
+      });
+    });
+
+    describe('when order has multiple prescriptions including GLP-1', () => {
+      beforeEach(async () => {
+        const glp1MedicationName = 'Ozempic';
+        const multipleFillsWithGLP = [
+          createMockFill('Metformin'),
+          createMockFill(glp1MedicationName)
+        ];
+
+        await renderPharmacy({ flattenedFills: multipleFillsWithGLP });
+      });
+      it('hides the price toggle checkbox', async () => {
+        expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+      });
+      it('hides the price toggle text', async () => {
+        expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
+      });
+    });
+  });
+});
+
+const renderPharmacy = async (orderContextValueOverride: Partial<OrderContextType> = {}) => {
+  let component;
+  const orderContextValue: OrderContextType = {
+    fetchOrder(currentPharmacy: Order['pharmacy'] | undefined): void {},
+    flattenedFills: [],
+    isDemo: false,
+    logo: undefined,
+    order: generateOrder(),
+    setFaqModalIsOpen(isOpen: boolean): void {},
+    setOrder(order: Order): void {},
+    ...orderContextValueOverride
+  };
+  await act(async () => {
+    component = render(
+      <MemoryRouter initialEntries={['?token=test-token&orderId=order-123']}>
+        <OrderContext.Provider value={orderContextValue}>
+          <ChakraProvider>
+            <Pharmacy />
+          </ChakraProvider>
+        </OrderContext.Provider>
+      </MemoryRouter>
+    );
+  });
+  return component;
+};
+
+const generateOrder = (fills: any[] = [], organizationSettings: any = {}): Order => ({
   id: 'order-123',
   patient: { id: 'patient-123', name: { full: 'John Doe' } },
   organization: {
     id: 'org-123',
-    name: 'Test Org',
-    settings: {
-      patientUx: organizationSettings
-    }
+    name: 'Test Org'
   },
   address: {
     street1: '123 Main St',
     city: 'New York',
     state: 'NY',
-    postalCode: '10001'
+    postalCode: '10001',
+    country: ''
   },
   fills,
   readyBy: 'Regular',
-  pharmacy: null
+  state: 'CANCELED',
+  isReroutable: false,
+  exceptions: [],
+  fulfillments: [],
+  discountCards: []
 });
 
 const createMockFill = (treatmentName: string) => ({
@@ -89,111 +170,4 @@ const createMockFill = (treatmentName: string) => ({
     name: treatmentName
   },
   count: 1
-});
-
-const renderPharmacy = async (searchParams = '?token=test-token&orderId=order-123') => {
-  let component;
-  await act(async () => {
-    component = render(
-      <MemoryRouter initialEntries={[searchParams]}>
-        <ChakraProvider>
-          <Pharmacy />
-        </ChakraProvider>
-      </MemoryRouter>
-    );
-  });
-  return component;
-};
-
-describe('Pharmacy Component - Switch Visibility', () => {
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
-  describe('showPriceToggle visibility', () => {
-    it('shows the price toggle switch when order has single non-GLP medication', async () => {
-      const singleNonGLPFill = [createMockFill('Metformin')];
-      const mockOrder = createMockOrder(singleNonGLPFill);
-
-      mockUseOrderContext.mockReturnValue({
-        order: mockOrder,
-        flattenedFills: singleNonGLPFill,
-        setOrder: vi.fn(),
-        isDemo: false,
-        fetchOrder: vi.fn(),
-        logo: null,
-        setFaqModalIsOpen: vi.fn()
-      } as any);
-
-      await renderPharmacy();
-
-      expect(screen.getByRole('checkbox')).toBeInTheDocument();
-      expect(screen.getByText('Show coupon card prices')).toBeInTheDocument();
-    });
-
-    it('hides the price toggle switch when order contains GLP-1 medication', async () => {
-      const glp1MedicationName = 'Semaglutide';
-      const glpFill = [createMockFill(glp1MedicationName)];
-      const mockOrder = createMockOrder(glpFill);
-
-      mockUseOrderContext.mockReturnValue({
-        order: mockOrder,
-        flattenedFills: glpFill,
-        setOrder: vi.fn(),
-        isDemo: false,
-        fetchOrder: vi.fn(),
-        logo: null,
-        setFaqModalIsOpen: vi.fn()
-      } as any);
-
-      await renderPharmacy();
-
-      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
-      expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
-    });
-
-    it('hides the price toggle switch when order has multiple prescriptions', async () => {
-      const multipleFills = [createMockFill('Metformin'), createMockFill('Lisinopril')];
-      const mockOrder = createMockOrder(multipleFills);
-
-      mockUseOrderContext.mockReturnValue({
-        order: mockOrder,
-        flattenedFills: multipleFills,
-        setOrder: vi.fn(),
-        isDemo: false,
-        fetchOrder: vi.fn(),
-        logo: null,
-        setFaqModalIsOpen: vi.fn()
-      } as any);
-
-      await renderPharmacy();
-
-      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
-      expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
-    });
-
-    it('hides the price toggle switch when order has multiple prescriptions including GLP-1', async () => {
-      const glp1MedicationName = 'Ozempic';
-      const multipleFillsWithGLP = [
-        createMockFill('Metformin'),
-        createMockFill(glp1MedicationName)
-      ];
-      const mockOrder = createMockOrder(multipleFillsWithGLP);
-
-      mockUseOrderContext.mockReturnValue({
-        order: mockOrder,
-        flattenedFills: multipleFillsWithGLP,
-        setOrder: vi.fn(),
-        isDemo: false,
-        fetchOrder: vi.fn(),
-        logo: null,
-        setFaqModalIsOpen: vi.fn()
-      } as any);
-
-      await renderPharmacy();
-
-      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
-      expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
-    });
-  });
 });
