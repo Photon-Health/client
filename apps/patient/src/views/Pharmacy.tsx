@@ -20,6 +20,7 @@ import { Helmet } from 'react-helmet';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
+  AmazonOffer,
   BrandedOptionOverrides,
   BrandedOptions,
   CouponModal,
@@ -51,7 +52,6 @@ import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { datadogRum } from '@datadog/browser-rum';
 import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
-import { determineNovocareExperimentSegment } from './pharmacy.utils';
 import { fetchOffers } from './pharmacy.utils';
 import _ from 'lodash';
 
@@ -132,6 +132,8 @@ export const Pharmacy = () => {
     BrandedOptionOverrides | undefined
   >(undefined);
 
+  const [offers, setOffers] = useState<AmazonOffer[] | undefined>(undefined);
+
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
 
@@ -178,46 +180,47 @@ export const Pharmacy = () => {
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
 
   useEffect(() => {
-    const determineOverrides = async () => {
-      let newBrandedOptionsOverride: BrandedOptionOverrides = {};
+    const getOffers = async () => {
+      let fetchedOffers: AmazonOffer[] | undefined;
 
-      // measured will only want to show amazon offers if we do not have a novocare offer
-      if (order.organization.id === 'org_pcPnPx5PVamzjS2p') {
-        const novocareExperimentOverride = determineNovocareExperimentSegment(order);
+      // only fetch offers if we don't have any
+      if (!offers) {
+        fetchedOffers = await fetchOffers(order);
 
-        if (novocareExperimentOverride?.novocareExperimentOverride) {
-          // we have a novocare offer, so we don't want to show amazon offers
-
-          newBrandedOptionsOverride = {
-            ...novocareExperimentOverride
-          };
-        } else {
-          // we don't have a novocare offer, so we want to show amazon offers if we have any
-          const amazonExperimentOverride = await fetchOffers(order);
-
-          newBrandedOptionsOverride = {
-            ...amazonExperimentOverride
-          };
+        if (JSON.stringify(fetchedOffers) !== JSON.stringify(offers)) {
+          setOffers(fetchedOffers);
         }
-      } else {
-        // these functions will be called and make a state change to brandedOptionsOverride using setBrandedOptionsOverride
-        // if there are branded option overrides
-        const amazonExperimentOverride = await fetchOffers(order);
-        const novocareExperimentOverride = determineNovocareExperimentSegment(order);
-
-        newBrandedOptionsOverride = {
-          ...amazonExperimentOverride,
-          ...novocareExperimentOverride
-        };
-      }
-
-      if (JSON.stringify(newBrandedOptionsOverride) !== JSON.stringify(brandedOptionsOverride)) {
-        setBrandedOptionsOverride(newBrandedOptionsOverride);
       }
     };
 
-    determineOverrides();
-  }, [order, brandedOptionsOverride]);
+    getOffers();
+  }, [order, offers]);
+
+  useEffect(() => {
+    const cashOffer = offers?.find((offer) => offer.costType == 'CASH');
+    const insuranceOffer = offers?.find((offer) => offer.costType == 'INSURANCE_ESTIMATE');
+
+    const novocareOffer = offers?.find((offer) => offer.costType == 'NOVOCARE_OFFER');
+
+    // we're not ready to share price yet
+    // so we're forcibly nulling out the cost
+    // so the price won't be shown
+    let amazonPharmacyOverride;
+    if (enablePrice) {
+      amazonPharmacyOverride = { ...cashOffer, costAmount: undefined };
+    } else {
+      amazonPharmacyOverride = { ...insuranceOffer, costAmount: undefined };
+    }
+
+    const newBrandedOptionsOverride = {
+      amazonPharmacyOverride,
+      novocareExperimentOverride: novocareOffer?.deliveryEstimate
+    };
+
+    if (JSON.stringify(newBrandedOptionsOverride) !== JSON.stringify(brandedOptionsOverride)) {
+      setBrandedOptionsOverride(newBrandedOptionsOverride);
+    }
+  }, [enablePrice, offers, order, brandedOptionsOverride]);
 
   const showToastWarning = () =>
     toast({
@@ -621,13 +624,14 @@ export const Pharmacy = () => {
             setShowFooter(false);
 
             if (brandedOptionsOverride?.amazonPharmacyOverride) {
-              const slugifiedOverride = brandedOptionsOverride?.amazonPharmacyOverride
-                ?.toLowerCase()
-                .trim()
-                .replace(/\s+/g, '_')
-                .replace(/[^a-z0-9_]/g, '')
-                .replace(/_+/g, '_')
-                .replace(/^_+|_+$/g, '');
+              const slugifiedOverride =
+                brandedOptionsOverride?.amazonPharmacyOverride.deliveryEstimate
+                  ?.toLowerCase()
+                  .trim()
+                  .replace(/\s+/g, '_')
+                  .replace(/[^a-z0-9_]/g, '')
+                  .replace(/_+/g, '_')
+                  .replace(/^_+|_+$/g, '');
               if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
                 datadogRum.addAction('amazon_pharmacy_offer_active_and_selected', {
                   orderId: order.id,
