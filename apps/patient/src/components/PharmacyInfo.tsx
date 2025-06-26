@@ -20,7 +20,8 @@ import { text as t } from '../utils/text';
 
 import { useMemo, useState } from 'react';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
-import { formatAddress, titleCase, formatPrice } from '../utils/general';
+import { formatAddress, titleCase } from '../utils/general';
+import { formatPrice } from '../utils/formatters';
 import { getFulfillmentTrackingLink } from '../utils/fulfillmentsHelpers';
 import { AmazonOffer, BrandedOptionOverrides } from './BrandedOptions';
 
