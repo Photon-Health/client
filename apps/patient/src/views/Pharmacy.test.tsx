@@ -9,6 +9,7 @@ import {
   generateFill,
   generateFlattenedFill,
   generateOrder,
+  generatePharmacy,
   generateTreatment
 } from '../test-utils/generators';
 
@@ -32,7 +33,6 @@ vi.mock('../components', () => ({
     <div data-testid="fixed-footer">{children}</div>
   ),
   LocationModal: () => <div data-testid="location-modal">Location Modal</div>,
-  PickupOptions: () => <div data-testid="pickup-options">Pickup Options</div>,
   PoweredBy: () => <div data-testid="powered-by">Powered By</div>
 }));
 
@@ -48,9 +48,33 @@ vi.mock('../configs/graphqlClient', () => ({
   }
 }));
 
-describe('Pharmacy Component - Switch Visibility', () => {
+describe('Pharmacy Component', () => {
   afterEach(() => {
     vi.clearAllMocks();
+  });
+
+  describe('default state', () => {
+    beforeEach(async () => {
+      const { getPharmacies } = await import('../api');
+      const getPharmaciesMock = vi.mocked(getPharmacies);
+      getPharmaciesMock.mockResolvedValueOnce({
+        pharmaciesByLocation: [generatePharmacy({ id: 'pharmacy-123', price: 101 })]
+      });
+
+      await renderPharmacy();
+    });
+
+    it('should request priced pharmacies', async () => {
+      const { getPharmacies } = await import('../api');
+      const getPharmaciesMock = vi.mocked(getPharmacies);
+      const firstGetPharmacyCall = getPharmaciesMock.mock.calls[0][0];
+      expect(firstGetPharmacyCall.includePrice).toEqual(true);
+    });
+
+    it('should show coupon prices/discount cards', () => {
+      expect(screen.getByText('Coupon Price')).toBeInTheDocument();
+      expect(screen.getByText('$101')).toBeInTheDocument();
+    });
   });
 
   describe('showPriceToggle visibility', () => {
