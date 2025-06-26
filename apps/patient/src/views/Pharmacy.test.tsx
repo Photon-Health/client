@@ -5,7 +5,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Pharmacy } from './Pharmacy';
 import { OrderContext, OrderContextType } from './Main';
 import { Order } from '../utils/models';
-import { generateFill, generateOrder } from '../test-utils/generators';
+import {
+  generateFill,
+  generateFlattenedFill,
+  generateOrder,
+  generateTreatment
+} from '../test-utils/generators';
 
 vi.mock('../api', () => ({
   geocode: vi.fn().mockResolvedValue({
@@ -69,9 +74,11 @@ describe('Pharmacy Component - Switch Visibility', () => {
     describe('when order contains GLP-1 medication', () => {
       beforeEach(async () => {
         const glp1MedicationName = 'Semaglutide';
-        const glpFill = [generateFill(glp1MedicationName)];
+        const glpFill = generateFlattenedFill({
+          treatment: generateTreatment({ name: glp1MedicationName })
+        });
 
-        await renderPharmacy({ flattenedFills: glpFill });
+        await renderPharmacy({ flattenedFills: [glpFill] });
       });
       it('hides the price toggle checkbox', async () => {
         expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
@@ -83,7 +90,14 @@ describe('Pharmacy Component - Switch Visibility', () => {
 
     describe('when order has multiple prescriptions', () => {
       beforeEach(async () => {
-        const multipleFills = [generateFill('Metformin'), generateFill('Lisinopril')];
+        const multipleFills = [
+          generateFlattenedFill({
+            treatment: generateTreatment({ name: 'Metformin' })
+          }),
+          generateFlattenedFill({
+            treatment: generateTreatment({ name: 'Lisinopril' })
+          })
+        ];
 
         await renderPharmacy({ flattenedFills: multipleFills });
       });
@@ -98,7 +112,14 @@ describe('Pharmacy Component - Switch Visibility', () => {
     describe('when order has multiple prescriptions including GLP-1', () => {
       beforeEach(async () => {
         const glp1MedicationName = 'Ozempic';
-        const multipleFillsWithGLP = [generateFill('Metformin'), generateFill(glp1MedicationName)];
+        const multipleFillsWithGLP = [
+          generateFlattenedFill({
+            treatment: generateTreatment({ name: 'Metformin' })
+          }),
+          generateFlattenedFill({
+            treatment: generateTreatment({ name: glp1MedicationName })
+          })
+        ];
 
         await renderPharmacy({ flattenedFills: multipleFillsWithGLP });
       });

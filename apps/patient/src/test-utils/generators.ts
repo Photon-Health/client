@@ -1,4 +1,5 @@
 import { Order } from '../utils/models';
+import { FillWithCount } from '../utils/general';
 
 export const generateOrder = (overrides: Partial<Order> = {}): Order => ({
   id: 'ord_test_defaultId',
@@ -36,4 +37,19 @@ export const generateFill = (treatmentName: string): Order['fills'][number] => (
     id: `med_testIdDefault`,
     name: treatmentName
   }
+});
+
+export const generateFlattenedFill = (override: Partial<FillWithCount>): FillWithCount => ({
+  id: `fil_testIdDefault`,
+  count: 1,
+  treatment: generateTreatment(),
+  ...override
+});
+
+export const generateTreatment = (
+  override: Partial<FillWithCount['treatment']> = {}
+): FillWithCount['treatment'] => ({
+  id: 'med_testIdDefault',
+  name: 'test-treatment-name',
+  ...override
 });
