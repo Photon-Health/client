@@ -30,3 +30,4 @@ jobs:
       - run: npm run build --if-present
       - run: npx nx run sdk:build
       - run: npx nx run components:test
+      - run: npx nx run patient:test
