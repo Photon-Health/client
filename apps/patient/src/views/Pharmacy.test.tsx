@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Pharmacy } from './Pharmacy';
 import { OrderContext, OrderContextType } from './Main';
 import { Order } from '../utils/models';
-import { generateOrder } from '../test-utils/generators';
+import { generateFill, generateOrder } from '../test-utils/generators';
 
 vi.mock('../api', () => ({
   geocode: vi.fn().mockResolvedValue({
@@ -137,12 +137,3 @@ const renderPharmacy = async (orderContextValueOverride: Partial<OrderContextTyp
   });
   return component;
 };
-
-const generateFill = (treatmentName: string) => ({
-  id: `fill-${treatmentName}`,
-  treatment: {
-    id: `treatment-${treatmentName}`,
-    name: treatmentName
-  },
-  count: 1
-});

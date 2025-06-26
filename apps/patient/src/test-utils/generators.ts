@@ -29,3 +29,11 @@ export const generatePatient = (overrides: Partial<Order['patient']> = {}): Orde
   name: { full: 'John Doe' },
   ...overrides
 });
+
+export const generateFill = (treatmentName: string): Order['fills'][number] => ({
+  id: `fil_testIdDefault`,
+  treatment: {
+    id: `med_testIdDefault`,
+    name: treatmentName
+  }
+});
