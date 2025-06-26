@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Pharmacy } from './Pharmacy';
 import { OrderContext, OrderContextType } from './Main';
 import { Order } from '../utils/models';
+import { generateOrder } from '../test-utils/generators';
 
 vi.mock('../api', () => ({
   geocode: vi.fn().mockResolvedValue({
@@ -50,8 +51,8 @@ describe('Pharmacy Component - Switch Visibility', () => {
   describe('showPriceToggle visibility', () => {
     describe('when order has single non-GLP medication', () => {
       beforeEach(async () => {
-        const singleNonGLPFill = [createMockFill('Metformin')];
-        const order = generateOrder(singleNonGLPFill);
+        const singleNonGLPFill = [generateFill('Metformin')];
+        const order = generateOrder({ fills: singleNonGLPFill });
 
         await renderPharmacy({ order });
       });
@@ -68,7 +69,7 @@ describe('Pharmacy Component - Switch Visibility', () => {
     describe('when order contains GLP-1 medication', () => {
       beforeEach(async () => {
         const glp1MedicationName = 'Semaglutide';
-        const glpFill = [createMockFill(glp1MedicationName)];
+        const glpFill = [generateFill(glp1MedicationName)];
 
         await renderPharmacy({ flattenedFills: glpFill });
       });
@@ -82,7 +83,7 @@ describe('Pharmacy Component - Switch Visibility', () => {
 
     describe('when order has multiple prescriptions', () => {
       beforeEach(async () => {
-        const multipleFills = [createMockFill('Metformin'), createMockFill('Lisinopril')];
+        const multipleFills = [generateFill('Metformin'), generateFill('Lisinopril')];
 
         await renderPharmacy({ flattenedFills: multipleFills });
       });
@@ -97,10 +98,7 @@ describe('Pharmacy Component - Switch Visibility', () => {
     describe('when order has multiple prescriptions including GLP-1', () => {
       beforeEach(async () => {
         const glp1MedicationName = 'Ozempic';
-        const multipleFillsWithGLP = [
-          createMockFill('Metformin'),
-          createMockFill(glp1MedicationName)
-        ];
+        const multipleFillsWithGLP = [generateFill('Metformin'), generateFill(glp1MedicationName)];
 
         await renderPharmacy({ flattenedFills: multipleFillsWithGLP });
       });
@@ -140,30 +138,7 @@ const renderPharmacy = async (orderContextValueOverride: Partial<OrderContextTyp
   return component;
 };
 
-const generateOrder = (fills: any[] = [], organizationSettings: any = {}): Order => ({
-  id: 'order-123',
-  patient: { id: 'patient-123', name: { full: 'John Doe' } },
-  organization: {
-    id: 'org-123',
-    name: 'Test Org'
-  },
-  address: {
-    street1: '123 Main St',
-    city: 'New York',
-    state: 'NY',
-    postalCode: '10001',
-    country: ''
-  },
-  fills,
-  readyBy: 'Regular',
-  state: 'CANCELED',
-  isReroutable: false,
-  exceptions: [],
-  fulfillments: [],
-  discountCards: []
-});
-
-const createMockFill = (treatmentName: string) => ({
+const generateFill = (treatmentName: string) => ({
   id: `fill-${treatmentName}`,
   treatment: {
     id: `treatment-${treatmentName}`,
