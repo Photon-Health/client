@@ -131,7 +131,8 @@ export const PrescriptionForm = () => {
       // Our first customers will enable RTBC via their elements config
       const bosonPhotonOrg = 'org_KzSVZBQixLRkqj5d'; // Test Organization 11
       const neutronPhotonOrg = 'org_kVS7AP4iuItESdMA'; // Photon Test Org
-      return [bosonPhotonOrg, neutronPhotonOrg].includes(user.org_id);
+      const neutronDemoOrg = 'org_TY5GFYPIRo3xQGYM'; // Demo Health
+      return [bosonPhotonOrg, neutronPhotonOrg, neutronDemoOrg].includes(user.org_id);
     }
 
     return false;
