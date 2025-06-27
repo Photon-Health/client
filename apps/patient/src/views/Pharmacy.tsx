@@ -639,7 +639,8 @@ export const Pharmacy = () => {
                   organizationId: order.organization.id,
                   description: slugifiedOverride,
                   treatmentId: flattenedFills[0]?.treatment?.id,
-                  timestamp: new Date().toISOString()
+                  timestamp: new Date().toISOString(),
+                  offers
                 });
               } else {
                 datadogRum.addAction('amazon_pharmacy_offer_active_and_not_selected', {
@@ -647,7 +648,8 @@ export const Pharmacy = () => {
                   organizationId: order.organization.id,
                   description: slugifiedOverride,
                   treatmentId: flattenedFills[0]?.treatment?.id,
-                  timestamp: new Date().toISOString()
+                  timestamp: new Date().toISOString(),
+                  offers
                 });
               }
             }
