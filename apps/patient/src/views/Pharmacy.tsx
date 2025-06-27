@@ -29,7 +29,7 @@ import {
   PoweredBy
 } from '../components';
 import * as TOAST_CONFIG from '../configs/toast';
-import { formatAddress, preparePharmacy } from '../utils/general';
+import { preparePharmacy } from '../utils/general';
 import { ExtendedFulfillmentType, Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
@@ -53,6 +53,7 @@ import { getOrgMailOrderPharms } from '@client/settings';
 import { fetchOffers } from './pharmacy.utils';
 import _ from 'lodash';
 import { PickupPharmacyCardList } from '../components/pharmacy-card-list';
+import { formatAddress } from '../utils/formatters';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
