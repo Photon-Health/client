@@ -53,10 +53,11 @@ describe('Pharmacy Component', () => {
     vi.clearAllMocks();
   });
 
-  describe('default state', () => {
+  describe('default page state', async () => {
+    const { getPharmacies } = await import('../api');
+    const getPharmaciesMock = vi.mocked(getPharmacies);
+
     beforeEach(async () => {
-      const { getPharmacies } = await import('../api');
-      const getPharmaciesMock = vi.mocked(getPharmacies);
       getPharmaciesMock.mockResolvedValueOnce({
         pharmaciesByLocation: [generatePharmacy({ id: 'pharmacy-123', price: 101 })]
       });
@@ -65,8 +66,6 @@ describe('Pharmacy Component', () => {
     });
 
     it('should request priced pharmacies', async () => {
-      const { getPharmacies } = await import('../api');
-      const getPharmaciesMock = vi.mocked(getPharmacies);
       const firstGetPharmacyCall = getPharmaciesMock.mock.calls[0][0];
       expect(firstGetPharmacyCall.includePrice).toEqual(true);
     });
