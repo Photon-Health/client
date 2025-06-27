@@ -19,6 +19,6 @@ export const formatDate = (date: string | Date) => new Date(date)?.toLocaleDateS
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
-export const formatPrice = (price: number) => {
-  return Number.isInteger(price) ? Math.round(price) : price.toFixed(2);
+export const formatPrice = (price: number): string => {
+  return Number.isInteger(price) ? String(Math.round(price)) : price.toFixed(2);
 };
