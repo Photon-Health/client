@@ -12,6 +12,7 @@ import {
   generatePharmacy,
   generateTreatment
 } from '../test-utils/generators';
+import userEvent from '@testing-library/user-event';
 
 vi.mock('../api', () => ({
   geocode: vi.fn().mockResolvedValue({
@@ -48,31 +49,72 @@ vi.mock('../configs/graphqlClient', () => ({
   }
 }));
 
-describe('Pharmacy Component', () => {
+describe('Pharmacy Component', async () => {
+  const { getPharmacies } = await import('../api');
+  const getPharmaciesMock = vi.mocked(getPharmacies);
+
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   describe('default page state', async () => {
-    const { getPharmacies } = await import('../api');
-    const getPharmaciesMock = vi.mocked(getPharmacies);
-
     beforeEach(async () => {
-      getPharmaciesMock.mockResolvedValueOnce({
-        pharmaciesByLocation: [generatePharmacy({ id: 'pharmacy-123', price: 101 })]
+      getPharmaciesMock.mockResolvedValue({
+        pharmaciesByLocation: [generatePharmacy({ id: 'test-pharmacy-123' })]
       });
 
       await renderPharmacy();
     });
 
-    it('should request priced pharmacies', async () => {
-      const firstGetPharmacyCall = getPharmaciesMock.mock.calls[0][0];
-      expect(firstGetPharmacyCall.includePrice).toEqual(true);
+    it('should request pharmacies with prices', async () => {
+      const firstCallArgs = getPharmaciesMock.mock.calls[0][0];
+      expect(firstCallArgs.includePrice).toEqual(true);
     });
 
-    it('should show coupon prices/discount cards', () => {
+    it('should request pharmacies without prices on toggle click', async () => {
+      getPharmaciesMock.mockClear();
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Show coupon card prices' }));
+      const recentCallArgs = getPharmaciesMock.mock.calls[0][0];
+      expect(recentCallArgs.includePrice).toEqual(false);
+    });
+  });
+
+  describe('when pharmacy has coupon and retail price', async () => {
+    beforeEach(async () => {
+      getPharmaciesMock.mockResolvedValue({
+        pharmaciesByLocation: [
+          generatePharmacy({ id: 'pharmacy-123', price: 101, retailPrice: 1000 })
+        ]
+      });
+
+      await renderPharmacy();
+    });
+
+    it('should show coupon price', () => {
       expect(screen.getByText('Coupon Price')).toBeInTheDocument();
       expect(screen.getByText('$101')).toBeInTheDocument();
+    });
+
+    it('should show retail price', () => {
+      expect(screen.getByText('Retail')).toBeInTheDocument();
+      expect(screen.getByText('$1000')).toBeInTheDocument();
+    });
+  });
+
+  describe('when pharmacy has no coupons', async () => {
+    beforeEach(async () => {
+      getPharmaciesMock.mockResolvedValue({
+        pharmaciesByLocation: [
+          generatePharmacy({ id: 'pharmacy-123', price: undefined, retailPrice: undefined })
+        ]
+      });
+
+      await renderPharmacy();
+    });
+
+    it('should NOT show coupon or retail prices', () => {
+      expect(screen.queryByText('Coupon Price')).not.toBeInTheDocument();
+      expect(screen.queryByText('Retail')).not.toBeInTheDocument();
     });
   });
 
@@ -86,7 +128,9 @@ describe('Pharmacy Component', () => {
       });
 
       it('shows the price toggle switch', async () => {
-        expect(screen.getByRole('checkbox')).toBeInTheDocument();
+        expect(
+          screen.getByRole('checkbox', { name: 'Show coupon card prices' })
+        ).toBeInTheDocument();
       });
 
       it('shows the price toggle text', async () => {

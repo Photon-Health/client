@@ -906,6 +906,7 @@ export const Pharmacy = () => {
                   {t.showDiscountCardPrices(() => setCouponModalOpen(true))}
                   <Switch
                     size="lg"
+                    aria-label="Show coupon card prices"
                     isChecked={enablePrice}
                     onChange={(e) => setEnablePrice(e.target.checked)}
                   />
