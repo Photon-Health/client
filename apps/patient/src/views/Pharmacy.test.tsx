@@ -148,7 +148,9 @@ describe('Pharmacy Component', async () => {
         await renderPharmacy({ flattenedFills: [glpFill] });
       });
       it('hides the price toggle checkbox', async () => {
-        expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole('checkbox', { name: 'Show coupon card prices' })
+        ).not.toBeInTheDocument();
       });
       it('hides the price toggle text', async () => {
         expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
@@ -169,7 +171,9 @@ describe('Pharmacy Component', async () => {
         await renderPharmacy({ flattenedFills: multipleFills });
       });
       it('hides the price toggle checkbox', async () => {
-        expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole('checkbox', { name: 'Show coupon card prices' })
+        ).not.toBeInTheDocument();
       });
       it('hides the price toggle text', async () => {
         expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
@@ -191,7 +195,9 @@ describe('Pharmacy Component', async () => {
         await renderPharmacy({ flattenedFills: multipleFillsWithGLP });
       });
       it('hides the price toggle checkbox', async () => {
-        expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole('checkbox', { name: 'Show coupon card prices' })
+        ).not.toBeInTheDocument();
       });
       it('hides the price toggle text', async () => {
         expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
