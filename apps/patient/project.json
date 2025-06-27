@@ -80,7 +80,21 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "react-app-rewired test --watchAll=false"
+        "command": "vitest run"
+      }
+    },
+    "test:watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "vitest"
+      }
+    },
+    "test:ui": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "vitest --ui"
       }
     },
     "lint": {

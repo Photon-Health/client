@@ -1,26 +1,51 @@
 import { getOffers } from '../api/internal';
+import { AmazonOffer } from '../components';
 import { Order } from '../utils/models';
 
-// this function will update the state for amazonPharmacyOverride if there are offers
-// belonging to the amazon pharmacy type
-export async function fetchOffers(order: Order) {
+function getNovocareOffers(order: Order): AmazonOffer[] {
+  const novocareExperimentSegment = determineNovocareExperimentSegment(order);
+
+  if (novocareExperimentSegment) {
+    return [
+      {
+        costType: 'NOVOCARE_OFFER',
+        deliveryEstimate: novocareExperimentSegment
+      }
+    ];
+  } else {
+    return [];
+  }
+}
+
+// this function will return the offers available for the given order
+export async function fetchOffers(order: Order): Promise<AmazonOffer[] | undefined> {
   const offers = await getOffers(order.id);
 
   const amazonOffers = offers
     .filter((offer) => offer.supplier === 'AMAZON_PHARMACY')
-    .filter((offer) => offer.deliveryEstimate !== undefined);
+    .filter((offer) => offer.deliveryEstimate !== undefined)
+    .map((offer) => ({
+      deliveryEstimate: offer.deliveryEstimate?.deliveryPromise,
+      costType: offer.cost?.type,
+      costAmount: offer.cost?.amount
+    }));
 
-  if (amazonOffers.length > 0 && amazonOffers[0]?.deliveryEstimate?.deliveryPromise) {
-    return {
-      amazonPharmacyOverride: amazonOffers[0]?.deliveryEstimate?.deliveryPromise
-    };
+  const novocareOffers = getNovocareOffers(order);
+
+  // measured will only want to show amazon offers if we do not have a novocare offer
+  if (order.organization.id === 'org_pcPnPx5PVamzjS2p') {
+    if (novocareOffers.length === 0) {
+      return amazonOffers;
+    } else {
+      return novocareOffers;
+    }
   }
+
+  return [...amazonOffers, ...novocareOffers];
 }
 
 // this function will update the state for novocareExperimentOverride if there are specific medications inside the order
-export function determineNovocareExperimentSegment(
-  order: Order
-): { novocareExperimentOverride: string | undefined } | undefined {
+export function determineNovocareExperimentSegment(order: Order): string | undefined {
   const organizationId = order?.organization.id;
 
   const medicinesAndDeliveryTypes = [
@@ -81,9 +106,5 @@ export function determineNovocareExperimentSegment(
 
   const deliveryType = getDeliveryType();
 
-  if (deliveryType) {
-    return {
-      novocareExperimentOverride: deliveryType
-    };
-  }
+  return deliveryType;
 }

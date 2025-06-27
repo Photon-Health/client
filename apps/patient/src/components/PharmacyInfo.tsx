@@ -22,7 +22,7 @@ import { useMemo, useState } from 'react';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
 import { formatAddress, titleCase, formatPrice } from '../utils/general';
 import { getFulfillmentTrackingLink } from '../utils/fulfillmentsHelpers';
-import { BrandedOptionOverrides } from './BrandedOptions';
+import { AmazonOffer, BrandedOptionOverrides } from './BrandedOptions';
 
 dayjs.extend(customParseFormat);
 
@@ -222,6 +222,21 @@ const DistanceAddress = ({
   );
 };
 
+const CostWidget = ({ costAmount, costType }: AmazonOffer) => {
+  if (costAmount == 0 || !costAmount) {
+    return null;
+  }
+
+  return (
+    <VStack spacing={0} align="flex-end" minW="fit-content">
+      <Text fontSize="sm">
+        {costType === 'INSURANCE_ESTIMATE' ? 'Avg. Copay Price' : 'As Low As'}
+      </Text>
+      <Text fontWeight="bold">${formatPrice(costAmount)}</Text>
+    </VStack>
+  );
+};
+
 interface PharmacyInfoProps {
   pharmacy: EnrichedPharmacy;
   tagline?: string;
@@ -270,7 +285,8 @@ export const PharmacyInfo = ({
   const directionsUrl = `http://maps.google.com/?q=${pharmacy?.name}, ${pharmacyFormattedAddress}`;
 
   const isAmazonPharmacy = pharmacy.id === process.env.REACT_APP_AMAZON_PHARMACY_ID;
-  const showAmazonTagline = isAmazonPharmacy && brandedOptionOverride?.amazonPharmacyOverride;
+  const showAmazonTagline =
+    isAmazonPharmacy && brandedOptionOverride?.amazonPharmacyOverride?.deliveryEstimate;
 
   const isNovocarePharmacy = pharmacy.id === process.env.REACT_APP_NOVOCARE_PHARMACY_ID;
   const showNovocareTagline =
@@ -313,6 +329,13 @@ export const PharmacyInfo = ({
               </Text>
             ) : null}
           </VStack>
+        ) : null}
+
+        {showAmazonTagline ? (
+          <CostWidget
+            costAmount={brandedOptionOverride?.amazonPharmacyOverride?.costAmount}
+            costType={brandedOptionOverride?.amazonPharmacyOverride?.costType}
+          />
         ) : null}
       </HStack>
 
