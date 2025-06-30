@@ -1,0 +1,57 @@
+import { render, screen } from '@testing-library/react';
+import { ChakraProvider } from '@chakra-ui/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { Canceled } from './Canceled';
+import { OrderContext, OrderContextType } from './Main';
+import { Order } from '../utils/models';
+import { generateOrder, generatePatient } from '../test-utils/generators';
+
+vi.mock('../components', () => ({
+  PrescriptionsList: () => <div>Mock Prescriptions List</div>
+}));
+
+describe('Canceled', () => {
+  const testOrder = generateOrder({
+    patient: generatePatient({ name: { full: 'Jane Doe' } })
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  beforeEach(() => {
+    renderCanceled({ order: testOrder });
+  });
+
+  it('renders the canceled order heading', () => {
+    expect(screen.getByRole('heading', { name: 'This order was canceled.' })).toBeInTheDocument();
+  });
+
+  it('displays the patient name', () => {
+    expect(screen.getByText('Jane Doe')).toBeInTheDocument();
+  });
+
+  it('renders the prescriptions list component', () => {
+    expect(screen.getByText('Mock Prescriptions List')).toBeInTheDocument();
+  });
+});
+
+const renderCanceled = (orderContextValueOverride: Partial<OrderContextType> = {}) => {
+  const orderContextValue: OrderContextType = {
+    fetchOrder(currentPharmacy: Order['pharmacy'] | undefined): void {},
+    flattenedFills: [],
+    isDemo: false,
+    logo: undefined,
+    order: generateOrder(),
+    setFaqModalIsOpen(isOpen: boolean): void {},
+    setOrder(order: Order): void {},
+    ...orderContextValueOverride
+  };
+  return render(
+    <ChakraProvider>
+      <OrderContext.Provider value={orderContextValue}>
+        <Canceled />
+      </OrderContext.Provider>
+    </ChakraProvider>
+  );
+};
