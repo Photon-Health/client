@@ -11,8 +11,14 @@ interface Props {
   handleSelect: (id: string) => void;
 }
 
+export interface AmazonOffer {
+  deliveryEstimate?: string;
+  costType?: string;
+  costAmount?: number;
+}
+
 export interface BrandedOptionOverrides {
-  amazonPharmacyOverride?: string;
+  amazonPharmacyOverride?: AmazonOffer;
   novocareExperimentOverride?: string;
 }
 
