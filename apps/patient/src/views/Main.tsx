@@ -19,7 +19,7 @@ import { Order } from '../utils/models';
 import { Pharmacy } from '../__generated__/graphql';
 import { FAQModal } from '../components/FAQModal';
 
-interface OrderContextType {
+export interface OrderContextType {
   order: Order;
   flattenedFills: FillWithCount[];
   setOrder: (order: Order) => void;
@@ -28,7 +28,7 @@ interface OrderContextType {
   fetchOrder: (currentPharmacy?: Pharmacy) => void;
   setFaqModalIsOpen: (isOpen: boolean) => void;
 }
-const OrderContext = createContext<OrderContextType | null>(null);
+export const OrderContext = createContext<OrderContextType | null>(null);
 export const useOrderContext = () =>
   useContext<OrderContextType>(OrderContext as Context<OrderContextType>);
 
