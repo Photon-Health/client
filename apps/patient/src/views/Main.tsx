@@ -89,6 +89,7 @@ export const Main = () => {
     if (token) {
       setAuthHeader(token);
     }
+    console.log('THIS IS A TEST AND WONT BE MERGED');
   }, [token]);
 
   const handleOrderResponse = useCallback(
