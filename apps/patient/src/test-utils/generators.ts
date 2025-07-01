@@ -1,5 +1,6 @@
 import { Order } from '../utils/models';
 import { FillWithCount } from '../utils/general';
+import { type Offer, type Pharmacy } from '../__generated__/graphql';
 
 export const generateOrder = (overrides: Partial<Order> = {}): Order => ({
   id: 'ord_test_defaultId',
@@ -52,4 +53,30 @@ export const generateTreatment = (
   id: 'med_testIdDefault',
   name: 'test-treatment-name',
   ...override
+});
+
+export const generateOffer = (overrides: Partial<Offer> = {}): Offer => ({
+  supplier: 'UNKNOWN',
+  ...overrides
+});
+
+export const generateDiscountCard = (
+  overrides: Partial<Order['discountCards'][number]> = {}
+): Order['discountCards'][number] => ({
+  id: '',
+  prescriptionId: '',
+  price: 0,
+  bin: '',
+  pcn: '',
+  group: '',
+  memberId: '',
+  pharmacyId: '',
+  source: '',
+  ...overrides
+});
+
+export const generatePharmacy = (overrides: Partial<Pharmacy> = {}): Pharmacy => ({
+  id: 'phr_defaultTestId',
+  name: 'default-test-pharmacy-name',
+  ...overrides
 });

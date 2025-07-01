@@ -1,12 +1,12 @@
 import { Button, Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
 
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
-import { text as t } from '../utils/text';
-import { HolidayAlert } from './HolidayAlert';
-import { PharmacyCard } from './PharmacyCard';
-import { PharmacyFilters } from './PharmacyFilters';
+import { Pharmacy as EnrichedPharmacy } from '../../utils/models';
+import { text as t } from '../../utils/text';
+import { HolidayAlert } from '../HolidayAlert';
+import { PharmacyCard } from '../PharmacyCard';
+import { PharmacyFilters } from '../PharmacyFilters';
 
-interface PickupOptionsProps {
+interface PickupPharmacyCardListProps {
   pharmacies: EnrichedPharmacy[];
   preferredPharmacy: string;
   savingPreferred: boolean;
@@ -27,7 +27,7 @@ interface PickupOptionsProps {
   setCouponModalOpen: (isOpen: boolean) => void;
 }
 
-export const PickupOptions = ({
+export const PickupPharmacyCardList = ({
   preferredPharmacy,
   savingPreferred,
   pharmacies,
@@ -43,7 +43,7 @@ export const PickupOptions = ({
   setEnableOpenNow,
   setEnable24Hr,
   currentPharmacyId
-}: PickupOptionsProps) => {
+}: PickupPharmacyCardListProps) => {
   return (
     <VStack spacing={3} align="span" w="full">
       {showHeading ? (
