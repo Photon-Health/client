@@ -8,7 +8,6 @@ export * from './Nav';
 export * from './PharmacyCard';
 export * from './PharmacyInfo';
 export * from './PharmacyFilters';
-export * from './PickupOptions';
 export * from './PoweredBy';
 export * from './StatusStepper';
 export * from './ReadyText';
