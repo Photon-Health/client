@@ -7,7 +7,7 @@ import utc from 'dayjs/plugin/utc';
 import costcoLogo from '../assets/costco_logo_small.png';
 import walgreensLogo from '../assets/walgreens_logo_small_circle.png';
 import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
-import { Address, EnrichedPharmacy, Fill, OrderFulfillment, Pharmacy } from '../utils/models';
+import { EnrichedPharmacy, Fill, OrderFulfillment, Pharmacy } from './models';
 import { ExtendedFulfillmentType } from './models';
 import { PharmacyCloseEvent, PharmacyEvent, PharmacyOpenEvent } from '../__generated__/graphql';
 import { PHARMACY_BRANDING } from '../components';
@@ -17,23 +17,6 @@ dayjs.extend(timezone);
 dayjs.extend(isoWeek);
 dayjs.extend(isBetween);
 dayjs.extend(isToday);
-
-export const titleCase = (str: string) =>
-  str
-    .toLowerCase()
-    .split(' ')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-
-export const formatAddress = (address: Address) => {
-  const { city, postalCode, state, street1, street2 } = address;
-  return `${titleCase(street1)}${street2 ? `, ${titleCase(street2)}` : ''}, ${titleCase(
-    city
-  )}, ${state} ${postalCode}`;
-};
-
-// Format date to local date string (MM/DD/YYYY)
-export const formatDate = (date: string | Date) => new Date(date)?.toLocaleDateString();
 
 /**
  * There is a delay before order fulfillment is created, so a query
@@ -237,10 +220,4 @@ export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string
   }
 
   return targetTime.utc().toDate();
-};
-
-export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-
-export const formatPrice = (price: number) => {
-  return Number.isInteger(price) ? Math.round(price) : price.toFixed(2);
 };
