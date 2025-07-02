@@ -206,10 +206,13 @@ export const Pharmacy = () => {
     // so we're forcibly nulling out the cost
     // so the price won't be shown
     let amazonPharmacyOverride;
-    if (enablePrice) {
-      if (cashOffer) {
+
+    // we'll only want to set the override
+    // if we have at least one offer
+    if (insuranceOffer || cashOffer) {
+      if (enablePrice) {
         amazonPharmacyOverride = { ...cashOffer, costAmount: undefined };
-      } else if (insuranceOffer) {
+      } else {
         amazonPharmacyOverride = { ...insuranceOffer, costAmount: undefined };
       }
     }
