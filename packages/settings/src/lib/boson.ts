@@ -1,6 +1,7 @@
 import { MailOrderPharmacyConfigs } from '../types';
 import {
   AMAZON_PHARMACY_ID,
+  BOSON_NEUTRON_NOVOCARE_PHARMACY_ID,
   CAREPOINT_PHARMACY_ID,
   COST_PLUS_PHARMACY_ID,
   CUREXA_PHARMACY_ID,
@@ -46,7 +47,8 @@ const orgMailOrders: Record<string, Partial<MailOrderPharmacyConfigs>> = {
     provider: defaultSettings.provider.concat([
       WELLS_PHARMACY_ID,
       GOGOMEDS_PHARMACY_ID,
-      STRIVE_PHARMACY_ID
+      STRIVE_PHARMACY_ID,
+      BOSON_NEUTRON_NOVOCARE_PHARMACY_ID
     ]),
     patient: [AMAZON_PHARMACY_ID, COST_PLUS_PHARMACY_ID, WALMART_MAIL_ORDER_PHARMACY_ID]
   },
