@@ -26,12 +26,11 @@ import {
   CouponModal,
   FixedFooter,
   LocationModal,
-  PickupOptions,
   PoweredBy
 } from '../components';
 import * as TOAST_CONFIG from '../configs/toast';
-import { formatAddress, preparePharmacy } from '../utils/general';
-import { ExtendedFulfillmentType } from '../utils/models';
+import { preparePharmacy } from '../utils/general';
+import { ExtendedFulfillmentType, Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -48,12 +47,13 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { demoPharmacies } from '../data/demoPharmacies';
 import { isGLP } from '../utils/isGLP';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { datadogRum } from '@datadog/browser-rum';
 import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { fetchOffers } from './pharmacy.utils';
 import _ from 'lodash';
+import { PickupPharmacyCardList } from '../components/pharmacy-card-list';
+import { formatAddress } from '../utils/formatters';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
@@ -126,7 +126,7 @@ export const Pharmacy = () => {
     openNow !== null ? !!openNow : order?.readyBy === 'Urgent'
   );
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
-  const [enablePrice, setEnablePrice] = useState(false);
+  const [enablePrice, setEnablePrice] = useState(true);
 
   const [brandedOptionsOverride, setBrandedOptionsOverride] = useState<
     BrandedOptionOverrides | undefined
@@ -206,10 +206,15 @@ export const Pharmacy = () => {
     // so we're forcibly nulling out the cost
     // so the price won't be shown
     let amazonPharmacyOverride;
-    if (enablePrice) {
-      amazonPharmacyOverride = { ...cashOffer, costAmount: undefined };
-    } else {
-      amazonPharmacyOverride = { ...insuranceOffer, costAmount: undefined };
+
+    // we'll only want to set the override
+    // if we have at least one offer
+    if (insuranceOffer || cashOffer) {
+      if (enablePrice) {
+        amazonPharmacyOverride = { ...cashOffer, costAmount: undefined };
+      } else {
+        amazonPharmacyOverride = { ...insuranceOffer, costAmount: undefined };
+      }
     }
 
     const newBrandedOptionsOverride = {
@@ -393,6 +398,7 @@ export const Pharmacy = () => {
         is24hr: enable24Hr,
         includePrice: enablePrice
       });
+
       const pharmacies = res?.pharmaciesByLocation ?? [];
       setPageOffset(pageOffset + pharmacies.length);
       return pharmacies;
@@ -843,7 +849,7 @@ export const Pharmacy = () => {
     (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined) ?? false;
 
   const pickupPharmacyOptions = (location: string) => (
-    <PickupOptions
+    <PickupPharmacyCardList
       location={location}
       pharmacies={allPharmacies}
       preferredPharmacy={preferredPharmacyId}
@@ -907,6 +913,7 @@ export const Pharmacy = () => {
                   {t.showDiscountCardPrices(() => setCouponModalOpen(true))}
                   <Switch
                     size="lg"
+                    aria-label="Show coupon card prices"
                     isChecked={enablePrice}
                     onChange={(e) => setEnablePrice(e.target.checked)}
                   />

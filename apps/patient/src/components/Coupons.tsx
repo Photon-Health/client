@@ -7,7 +7,7 @@ import { useOrderContext } from '../views/Main';
 import { DiscountCard } from '../__generated__/graphql';
 import { Card } from './Card';
 import goodrxLogo from '../assets/goodrx_logo.png';
-import { formatPrice } from '../utils/general';
+import { formatPrice } from '../utils/formatters';
 
 export const Coupons = () => {
   const { order } = useOrderContext();
