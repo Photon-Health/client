@@ -11,8 +11,8 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { text as t } from '../utils/text';
-import { formatDate } from '../utils/general';
 import { useOrderContext } from '../views/Main';
+import { formatDate } from '../utils/formatters';
 
 export const PrescriptionsList = () => {
   const { flattenedFills } = useOrderContext();
