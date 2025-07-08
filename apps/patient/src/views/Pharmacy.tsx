@@ -630,6 +630,10 @@ export const Pharmacy = () => {
             setShowFooter(false);
 
             if (brandedOptionsOverride?.amazonPharmacyOverride) {
+              const sawPrice =
+                brandedOptionsOverride?.amazonPharmacyOverride?.costAmount !== undefined;
+              const priceType = brandedOptionsOverride?.amazonPharmacyOverride?.costType;
+
               const slugifiedOverride =
                 brandedOptionsOverride?.amazonPharmacyOverride.deliveryEstimate
                   ?.toLowerCase()
@@ -645,6 +649,9 @@ export const Pharmacy = () => {
                   description: slugifiedOverride,
                   treatmentId: flattenedFills[0]?.treatment?.id,
                   timestamp: new Date().toISOString(),
+                  sawPrice,
+                  costAmount: brandedOptionsOverride?.amazonPharmacyOverride?.costAmount,
+                  priceType,
                   offers
                 });
               } else {
@@ -654,6 +661,9 @@ export const Pharmacy = () => {
                   description: slugifiedOverride,
                   treatmentId: flattenedFills[0]?.treatment?.id,
                   timestamp: new Date().toISOString(),
+                  sawPrice,
+                  costAmount: brandedOptionsOverride?.amazonPharmacyOverride?.costAmount,
+                  priceType,
                   offers
                 });
               }
