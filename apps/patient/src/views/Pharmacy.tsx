@@ -211,9 +211,9 @@ export const Pharmacy = () => {
     // if we have at least one offer
     if (insuranceOffer || cashOffer) {
       if (enablePrice) {
-        amazonPharmacyOverride = { ...cashOffer, costAmount: undefined };
+        amazonPharmacyOverride = cashOffer;
       } else {
-        amazonPharmacyOverride = { ...insuranceOffer, costAmount: undefined };
+        amazonPharmacyOverride = insuranceOffer;
       }
     }
 
