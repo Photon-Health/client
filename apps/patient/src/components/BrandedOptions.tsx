@@ -7,7 +7,7 @@ interface Props {
   options: string[];
   location: string;
   selectedId: string;
-  currentPharmacyId?: string;
+  fulfillingPharmacyId?: string;
   brandedOptionOverrides: BrandedOptionOverrides;
   handleSelect: (id: string) => void;
 }
@@ -28,7 +28,7 @@ export const BrandedOptions = ({
   location,
   selectedId,
   handleSelect,
-  currentPharmacyId,
+  fulfillingPharmacyId,
   brandedOptionOverrides
 }: Props) => {
   if (!location) return null;
@@ -49,7 +49,7 @@ export const BrandedOptions = ({
         <SlideFade offsetY="60px" in={true} key={`courier-pharmacy-${id}`}>
           <BrandedPharmacyCard
             pharmacyId={id}
-            isCurrentPharmacy={currentPharmacyId === id}
+            isPharmacyFulfillingCurrentOrder={fulfillingPharmacyId === id}
             selected={selectedId === id}
             handleSelect={handleSelect}
             brandedOptionOverrides={brandedOptionOverrides}

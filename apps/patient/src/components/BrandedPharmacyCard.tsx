@@ -14,7 +14,7 @@ import { BrandedOptionOverrides } from './BrandedOptions';
 
 interface Props {
   pharmacyId: string;
-  isCurrentPharmacy: boolean;
+  isPharmacyFulfillingCurrentOrder: boolean;
   selected: boolean;
   handleSelect: (id: string) => void;
   brandedOptionOverrides?: BrandedOptionOverrides;
@@ -67,7 +67,7 @@ export const BrandedPharmacyCard = ({
   pharmacyId,
   selected,
   handleSelect,
-  isCurrentPharmacy,
+  isPharmacyFulfillingCurrentOrder,
   brandedOptionOverrides
 }: Props) => {
   const brand = PHARMACY_BRANDING[pharmacyId];
@@ -77,24 +77,28 @@ export const BrandedPharmacyCard = ({
 
   return (
     <Card
-      bgColor={isCurrentPharmacy ? 'gray.200' : 'white'}
+      // if the pharmacy is fulfilling the current order
+      // we should not be able to select it again
+      bgColor={isPharmacyFulfillingCurrentOrder ? 'gray.200' : 'white'}
       border="2px solid"
       borderWidth={selected ? '2px' : '1px'}
-      borderColor={selected ? 'brand.500' : isCurrentPharmacy ? 'gray.300' : 'gray.200'}
+      borderColor={
+        selected ? 'brand.500' : isPharmacyFulfillingCurrentOrder ? 'gray.300' : 'gray.200'
+      }
       borderRadius="lg"
       shadow={'none'}
       onClick={() => handleSelect(pharmacyId)}
       mx={{ base: -2, md: undefined }}
-      cursor="pointer"
-      pointerEvents={isCurrentPharmacy ? 'none' : undefined}
-      opacity={isCurrentPharmacy ? 0.7 : undefined}
+      cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
+      pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}
+      opacity={isPharmacyFulfillingCurrentOrder ? 0.7 : undefined}
     >
       <CardBody p={3}>
         <PharmacyInfo
           pharmacy={pharmacy}
           tagline={brand.description}
           availableInYourArea={brand.name === 'Capsule Pharmacy'}
-          isCurrentPharmacy={isCurrentPharmacy}
+          isCurrentPharmacy={isPharmacyFulfillingCurrentOrder}
           freeDelivery={brand.name === 'Amazon Pharmacy'}
           brandedOptionOverride={brandedOptionOverrides}
           boldPharmacyName={false}
