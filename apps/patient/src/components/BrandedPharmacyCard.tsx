@@ -14,6 +14,7 @@ import { BrandedOptionOverrides } from './BrandedOptions';
 
 interface Props {
   pharmacyId: string;
+  isCurrentPharmacy: boolean;
   selected: boolean;
   handleSelect: (id: string) => void;
   brandedOptionOverrides?: BrandedOptionOverrides;
@@ -66,6 +67,7 @@ export const BrandedPharmacyCard = ({
   pharmacyId,
   selected,
   handleSelect,
+  isCurrentPharmacy,
   brandedOptionOverrides
 }: Props) => {
   const brand = PHARMACY_BRANDING[pharmacyId];
@@ -75,21 +77,24 @@ export const BrandedPharmacyCard = ({
 
   return (
     <Card
-      bgColor="white"
+      bgColor={isCurrentPharmacy ? 'gray.200' : 'white'}
       border="2px solid"
       borderWidth={selected ? '2px' : '1px'}
-      borderColor={selected ? 'brand.500' : 'gray.200'}
+      borderColor={selected ? 'brand.500' : isCurrentPharmacy ? 'gray.300' : 'gray.200'}
       borderRadius="lg"
       shadow={'none'}
       onClick={() => handleSelect(pharmacyId)}
       mx={{ base: -2, md: undefined }}
       cursor="pointer"
+      pointerEvents={isCurrentPharmacy ? 'none' : undefined}
+      opacity={isCurrentPharmacy ? 0.7 : undefined}
     >
       <CardBody p={3}>
         <PharmacyInfo
           pharmacy={pharmacy}
           tagline={brand.description}
           availableInYourArea={brand.name === 'Capsule Pharmacy'}
+          isCurrentPharmacy={isCurrentPharmacy}
           freeDelivery={brand.name === 'Amazon Pharmacy'}
           brandedOptionOverride={brandedOptionOverrides}
           boldPharmacyName={false}
