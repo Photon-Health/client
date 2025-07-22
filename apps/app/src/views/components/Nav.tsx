@@ -128,13 +128,13 @@ export const Nav = () => {
                   <MenuItem
                     as={RouterLink}
                     to="/settings"
-                    icon={<Icon as={FiSettings} boxSize="4" color={theme.colors.slate['500']} />}
+                    icon={<Icon as={FiSettings} boxSize="4" color={theme.colors.navy['500']} />}
                     fontSize={'sm'}
                   >
                     Settings
                   </MenuItem>
                   <MenuItem
-                    icon={<Icon as={FiRepeat} boxSize="4" color={theme.colors.slate['500']} />}
+                    icon={<Icon as={FiRepeat} boxSize="4" color={theme.colors.navy['500']} />}
                     fontSize={'sm'}
                     onClick={onSwitchOrganization}
                     hidden={!organizations || organizations.length <= 1}
