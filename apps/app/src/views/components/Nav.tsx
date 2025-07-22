@@ -82,7 +82,7 @@ export const Nav = () => {
   }, [clearOrganization]);
 
   return (
-    <Box as="nav" bg="navy" py="3">
+    <Box as="nav" bg="#001740" py="3">
       <Container>
         <Flex justifyContent="space-between">
           <HStack>
@@ -128,13 +128,13 @@ export const Nav = () => {
                   <MenuItem
                     as={RouterLink}
                     to="/settings"
-                    icon={<Icon as={FiSettings} boxSize="4" color={theme.colors.slate['500']} />}
+                    icon={<Icon as={FiSettings} boxSize="4" color={theme.colors.navy['500']} />}
                     fontSize={'sm'}
                   >
                     Settings
                   </MenuItem>
                   <MenuItem
-                    icon={<Icon as={FiRepeat} boxSize="4" color={theme.colors.slate['500']} />}
+                    icon={<Icon as={FiRepeat} boxSize="4" color={theme.colors.navy['500']} />}
                     fontSize={'sm'}
                     onClick={onSwitchOrganization}
                     hidden={!organizations || organizations.length <= 1}
@@ -158,7 +158,7 @@ export const Nav = () => {
             <>
               <IconButton
                 aria-label="Options"
-                colorScheme="gray"
+                colorScheme="navy"
                 icon={<FiMenu />}
                 onClick={onToggle}
               />
