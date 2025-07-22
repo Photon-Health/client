@@ -158,7 +158,7 @@ export const Nav = () => {
             <>
               <IconButton
                 aria-label="Options"
-                colorScheme="gray"
+                colorScheme="navy"
                 icon={<FiMenu />}
                 onClick={onToggle}
               />
