@@ -8,7 +8,7 @@ export const Logo = ({
   bgIsWhite?: boolean;
   width?: string | number;
 }) => {
-  const text = useColorModeValue('#273D52', 'white');
+  const text = useColorModeValue('#001740', 'white');
 
   return (
     <chakra.svg
