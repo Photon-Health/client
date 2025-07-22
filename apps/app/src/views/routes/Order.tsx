@@ -386,15 +386,15 @@ export const Order = () => {
             <Text>Start an email thread with the Photon team to discuss next steps.</Text>
             <Card
               p={4}
-              bg={theme.colors.slate['50']}
+              bg={theme.colors.navy['50']}
               borderWidth="1px"
-              borderColor={theme.colors.slate['200']}
+              borderColor={theme.colors.navy['200']}
               borderRadius="lg"
               variant="outline"
             >
               <VStack spacing={4}>
                 <Box w="100%">
-                  <Text fontSize="xs" color={theme.colors.slate['700']}>
+                  <Text fontSize="xs" color={theme.colors.navy['700']}>
                     PATIENT
                   </Text>
                   <Text fontSize="sm" fontWeight="medium">
@@ -402,7 +402,7 @@ export const Order = () => {
                   </Text>
                 </Box>
                 <VStack w="100%" align="left">
-                  <Text fontSize="xs" color={theme.colors.slate['700']}>
+                  <Text fontSize="xs" color={theme.colors.navy['700']}>
                     PRESCRIPTION
                   </Text>
                   {fills?.length > 0 &&
@@ -411,7 +411,7 @@ export const Order = () => {
                         <Text fontSize="sm" fontWeight="medium">
                           {fill?.treatment?.name}
                         </Text>
-                        <Text fontSize="sm" color={theme.colors.slate['500']}>
+                        <Text fontSize="sm" color={theme.colors.navy['500']}>
                           {formatRxString({
                             dispenseQuantity: fill?.prescription?.dispenseQuantity,
                             dispenseUnit: fill?.prescription?.dispenseUnit,
