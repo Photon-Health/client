@@ -851,6 +851,7 @@ export const Pharmacy = () => {
       location={location}
       selectedId={selectedId}
       handleSelect={handleSelect}
+      fulfillingPharmacyId={order.pharmacy?.id}
       brandedOptionOverrides={brandedOptionsOverride ?? {}}
     />
   );
