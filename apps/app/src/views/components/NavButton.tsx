@@ -16,11 +16,11 @@ export const NavButton = (props: NavButtonProps) => {
 
   const resolved = useResolvedPath(link);
   const isActive = useMatch({ path: resolved.pathname, end: true });
-  const iconSlateShade = isActive ? '400' : '500';
+  const iconSlateShade = isActive ? '200' : '300';
 
-  const bgColor = bgIsWhite ? theme.colors.slate['200'] : theme.colors.slate['900'];
-  const bgHoverColor = bgIsWhite ? theme.colors.slate['100'] : theme.colors.slate['800'];
-  const textColor = bgIsWhite ? theme.colors.slate['900'] : 'white';
+  const bgColor = bgIsWhite ? theme.colors.navy['200'] : theme.colors.navy['900'];
+  const bgHoverColor = bgIsWhite ? theme.colors.navy['100'] : theme.colors.navy['700'];
+  const textColor = bgIsWhite ? theme.colors.navy['900'] : 'white';
 
   return (
     <Button
@@ -43,7 +43,7 @@ export const NavButton = (props: NavButtonProps) => {
         <Icon
           as={icon}
           boxSize="5"
-          color={iconColor ?? (!label ? 'white' : theme.colors.slate[iconSlateShade])}
+          color={iconColor ?? (!label ? 'white' : theme.colors.navy[iconSlateShade])}
         />
         {label && <Text>{label}</Text>}
       </HStack>
