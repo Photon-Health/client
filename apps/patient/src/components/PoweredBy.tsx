@@ -6,7 +6,7 @@ export const PoweredBy = () => {
     <HStack spacing={1} mt={2}>
       <Text fontSize="xs">Powered by</Text>
       <Link isExternal href="https://photon.health" fontSize="xs" textDecoration="underline">
-        <Logo height={4} />
+        <Logo height={4} width="100px" />
       </Link>
     </HStack>
   );

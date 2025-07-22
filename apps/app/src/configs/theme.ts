@@ -2,34 +2,18 @@ import { extendTheme, theme as baseTheme } from '@chakra-ui/react';
 import { theme } from '@chakra-ui/pro-theme';
 import { mode, StyleFunctionProps } from '@chakra-ui/theme-tools';
 
-const blue = {
-  // tailwind
-  50: '#eff6ff',
-  100: '#dbeafe',
-  200: '#bfdbfe',
-  300: '#93c5fd',
-  400: '#60a5fa',
-  500: '#3b82f6',
-  600: '#2563eb',
-  700: '#1d4ed8',
-  800: '#1e40af',
-  900: '#1e3a8a',
-  950: '#172554'
-};
-
-const slate = {
-  // tailwind
-  50: '#f8fafc',
-  100: '#f1f5f9',
-  200: '#e2e8f0',
-  300: '#cbd5e1',
-  400: '#94a3b8',
-  500: '#64748b',
-  600: '#475569',
-  700: '#334155',
-  800: '#1e293b',
-  900: '#0f172a',
-  950: '#020617'
+const navy = {
+  50: '#f5f7fb',
+  100: '#e6ecf7',
+  200: '#c3d2ec',
+  300: '#96aad9',
+  400: '#647fbe',
+  500: '#3b579d',
+  600: '#20387a',
+  700: '#10285c',
+  800: '#061a41',
+  900: '#001740',
+  950: '#000d22'
 };
 
 const customTheme = extendTheme(
@@ -43,10 +27,8 @@ const customTheme = extendTheme(
     },
     colors: {
       ...baseTheme.colors,
-      blue,
-      brand: blue,
-      navy: '#273D52',
-      slate
+      brand: navy,
+      navy
     },
     components: {
       Input: {

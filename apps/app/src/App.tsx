@@ -45,7 +45,6 @@ export const App = () => {
 
   useEffect(() => {
     // TODO: Remove this once we have a better solution for dark mode.
-    // This will set anyones dark mode to light mode
     if (colorMode === 'dark') {
       toggleColorMode();
     }
