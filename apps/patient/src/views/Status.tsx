@@ -3,7 +3,7 @@ import queryString from 'query-string';
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { FiNavigation, FiPhoneCall, FiRefreshCcw } from 'react-icons/fi';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { triggerDemoNotification } from '../api';
 import { Coupons, DemoCtaModal, PharmacyInfo, PoweredBy } from '../components';
 import { Card } from '../components/Card';
@@ -22,11 +22,12 @@ import { InsuranceAlert } from '../components/InsuranceAlert';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { formatAddress } from '../utils/formatters';
+import { patientAnalytics } from '../configs/analytics';
 
 export const Status = () => {
   const navigate = useNavigate();
   const { order, setOrder, isDemo, setFaqModalIsOpen } = useOrderContext();
-
+  const location = useLocation();
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
 
   const [searchParams] = useSearchParams();
@@ -52,6 +53,10 @@ export const Status = () => {
     if (!pharmacy?.phone) return;
     window.location.href = `tel:${pharmacy.phone}`;
   };
+
+  useEffect(() => {
+    patientAnalytics.page(location.pathname, 'Order Status');
+  }, [location.pathname]);
 
   useEffect(() => {
     if (!phone || !pharmacy || !order) {
