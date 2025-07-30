@@ -1,13 +1,7 @@
 import { Center, ChakraProvider, CircularProgress } from '@chakra-ui/react';
 import { datadogRum } from '@datadog/browser-rum';
 import { Context, createContext, useCallback, useContext, useEffect, useState } from 'react';
-import {
-  Outlet,
-  ScrollRestoration,
-  useLocation,
-  useNavigate,
-  useSearchParams
-} from 'react-router-dom';
+import { Outlet, ScrollRestoration, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { AUTH_HEADER_ERRORS, getOrder } from '../api/internal';
 import { Nav } from '../components';
@@ -18,7 +12,6 @@ import { FillWithCount, countFillsAndRemoveDuplicates } from '../utils/general';
 import { Order } from '../utils/models';
 import { Pharmacy } from '../__generated__/graphql';
 import { FAQModal } from '../components/FAQModal';
-import { patientAnalytics } from '../configs/analytics';
 
 export interface OrderContextType {
   order: Order;
@@ -50,15 +43,10 @@ export const Main = () => {
   );
 
   const navigate = useNavigate();
-  const location = useLocation();
   const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
 
   const orgId = order?.organization.id;
   const settings = order?.organization.settings;
-
-  useEffect(() => {
-    patientAnalytics.page(location.pathname, 'Home');
-  }, [location.pathname]);
 
   useEffect(
     function triggerDatadogShortlinkOpenEvent() {

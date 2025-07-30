@@ -104,7 +104,7 @@ export const Pharmacy = () => {
   // Address state
   const [latitude, setLatitude] = useState<number>();
   const [longitude, setLongitude] = useState<number>();
-  const [location, setLocation] = useState(
+  const [patientLocation, setPatientLocation] = useState(
     order?.address ? formatAddress(order.address) : undefined
   );
   const [cleanAddress, setCleanAddress] = useState<string>();
@@ -253,7 +253,7 @@ export const Pharmacy = () => {
   const handleModalClose = ({ loc = undefined }: { loc?: string | undefined }) => {
     if (loc) {
       reset();
-      setLocation(loc);
+      setPatientLocation(loc);
     }
     setLocationModalOpen(false);
   };
@@ -267,7 +267,7 @@ export const Pharmacy = () => {
   useEffect(() => {
     if (isDemo) {
       // Mock geocode data
-      setLocation('201 N 8th St, Brooklyn, NY 11211');
+      setPatientLocation('201 N 8th St, Brooklyn, NY 11211');
       setCleanAddress('201 N 8th St, Brooklyn, NY 11211');
       setLatitude(40.717484);
       setLongitude(-73.955662397568);
@@ -287,15 +287,15 @@ export const Pharmacy = () => {
     }
   }, [enable24Hr, enableOpenNow, enablePrice, isDemo]);
 
-  // Update and geocode location
+  // Update and geocode patient's location
   useEffect(() => {
     const onUpdateLocation = async () => {
-      if (location == null) {
+      if (patientLocation == null) {
         return;
       }
       setLoadingLocation(true);
       try {
-        const locationData = await geocode(location);
+        const locationData = await geocode(patientLocation);
         setLatitude(locationData.lat);
         setLongitude(locationData.lng);
         setCleanAddress(locationData.address);
@@ -312,7 +312,7 @@ export const Pharmacy = () => {
       setLoadingLocation(false);
     };
     onUpdateLocation();
-  }, [location, toast]);
+  }, [patientLocation, toast]);
 
   const getCostco = useCallback(
     async ({
@@ -850,10 +850,10 @@ export const Pharmacy = () => {
     </Button>
   );
 
-  const brandedPharmacyOptions = (location: string) => (
+  const brandedPharmacyOptions = (patientLocation: string) => (
     <BrandedOptions
       options={brandedOptions}
-      location={location}
+      location={patientLocation}
       selectedId={selectedId}
       handleSelect={handleSelect}
       fulfillingPharmacyId={order.pharmacy?.id}
@@ -864,9 +864,9 @@ export const Pharmacy = () => {
   const showPickupHeading =
     (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined) ?? false;
 
-  const pickupPharmacyOptions = (location: string) => (
+  const pickupPharmacyOptions = (patientLocation: string) => (
     <PickupPharmacyCardList
-      location={location}
+      location={patientLocation}
       pharmacies={allPharmacies}
       preferredPharmacy={preferredPharmacyId}
       savingPreferred={savingPreferred}
@@ -910,7 +910,7 @@ export const Pharmacy = () => {
                 {heading}
               </Heading>
               <HStack justify="space-between" w="full">
-                {location ? locationPreview : setLocationButton}
+                {patientLocation ? locationPreview : setLocationButton}
               </HStack>
             </VStack>
           </Container>
@@ -949,12 +949,12 @@ export const Pharmacy = () => {
       </Box>
 
       <Container pb={showFooter ? 32 : 8}>
-        {location ? (
+        {patientLocation ? (
           <VStack spacing={6} align="stretch" pt={4}>
             {enableCourier || enableMailOrder || brandedOptionsOverride
-              ? brandedPharmacyOptions(location)
+              ? brandedPharmacyOptions(patientLocation)
               : null}
-            {pickupPharmacyOptions(location)}
+            {pickupPharmacyOptions(patientLocation)}
           </VStack>
         ) : null}
       </Container>

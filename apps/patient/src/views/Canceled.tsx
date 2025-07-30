@@ -14,7 +14,7 @@ export const Canceled = () => {
   } = useOrderContext();
   const location = useLocation();
   useEffect(() => {
-    patientAnalytics.page(location.pathname, 'Canceled');
+    patientAnalytics.page(location.pathname, 'Order Canceled');
   }, [location.pathname]);
 
   return (

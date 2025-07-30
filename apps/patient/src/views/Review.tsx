@@ -31,7 +31,7 @@ export const Review = () => {
   const isMultiRx = flattenedFills.length > 1;
 
   useEffect(() => {
-    patientAnalytics.page(location.pathname, 'Review');
+    patientAnalytics.page(location.pathname, 'Review Prescriptions');
   }, [location.pathname]);
 
   return (

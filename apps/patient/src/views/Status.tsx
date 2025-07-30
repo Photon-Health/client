@@ -55,7 +55,7 @@ export const Status = () => {
   };
 
   useEffect(() => {
-    patientAnalytics.page(location.pathname, 'Status');
+    patientAnalytics.page(location.pathname, 'Order Status');
   }, [location.pathname]);
 
   useEffect(() => {

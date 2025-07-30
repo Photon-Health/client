@@ -55,7 +55,7 @@ export const ReadyBy = () => {
   const isMultiRx = flattenedFills.length > 1;
 
   useEffect(() => {
-    patientAnalytics.page(location.pathname, 'ReadyBy');
+    patientAnalytics.page(location.pathname, "Patient's Ready By Time");
   }, [location.pathname]);
 
   const handleSubmit = async () => {

@@ -9,7 +9,7 @@ import { useLocation } from 'react-router-dom';
 export const NoMatch = () => {
   const location = useLocation();
   useEffect(() => {
-    patientAnalytics.page(location.pathname, 'NoMatch');
+    patientAnalytics.page(location.pathname, 'No Page or Order Found');
   }, [location.pathname]);
 
   return (
