@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { ChakraProvider } from '@chakra-ui/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import { Canceled } from './Canceled';
 import { OrderContext, OrderContextType } from './Main';
 import { Order } from '../utils/models';
@@ -48,10 +49,12 @@ const renderCanceled = (orderContextValueOverride: Partial<OrderContextType> = {
     ...orderContextValueOverride
   };
   return render(
-    <ChakraProvider>
-      <OrderContext.Provider value={orderContextValue}>
-        <Canceled />
-      </OrderContext.Provider>
-    </ChakraProvider>
+    <MemoryRouter>
+      <ChakraProvider>
+        <OrderContext.Provider value={orderContextValue}>
+          <Canceled />
+        </OrderContext.Provider>
+      </ChakraProvider>
+    </MemoryRouter>
   );
 };
