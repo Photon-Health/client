@@ -18,7 +18,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactGA from 'react-ga4';
 import { Helmet } from 'react-helmet';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   AmazonOffer,
   BrandedOptionOverrides,
@@ -54,6 +54,7 @@ import { fetchOffers } from './pharmacy.utils';
 import _ from 'lodash';
 import { PickupPharmacyCardList } from '../components/pharmacy-card-list';
 import { formatAddress } from '../utils/formatters';
+import { patientAnalytics } from '../configs/analytics';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
@@ -61,7 +62,7 @@ const WALGREENS_PHARMACY_RADIUS = 15; // miles
 
 export const Pharmacy = () => {
   const { order, flattenedFills, setOrder, isDemo, fetchOrder } = useOrderContext();
-
+  const location = useLocation();
   const mailOrderPharmacies = getOrgMailOrderPharms(order?.organization.id).patient;
   const { enablePatientDeliveryPharmacies, patientFeaturedPharmacyName } =
     order?.organization?.settings?.patientUx ?? {};
@@ -178,6 +179,10 @@ export const Pharmacy = () => {
 
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
+
+  useEffect(() => {
+    patientAnalytics.page(location.pathname, 'Pharmacy');
+  }, [location.pathname]);
 
   useEffect(() => {
     const getOffers = async () => {

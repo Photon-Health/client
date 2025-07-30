@@ -15,7 +15,7 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
 import { datadogRum } from '@datadog/browser-rum';
@@ -26,6 +26,7 @@ import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { RxLightningBolt } from 'react-icons/rx';
 import { capitalize } from '../utils/formatters';
+import { patientAnalytics } from '../configs/analytics';
 
 dayjs.extend(timezone);
 
@@ -38,7 +39,7 @@ const checkDisabled = (option: string): boolean => {
 
 export const ReadyBy = () => {
   const { order, flattenedFills, setOrder } = useOrderContext();
-
+  const location = useLocation();
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
@@ -52,6 +53,10 @@ export const ReadyBy = () => {
   const [activeTab, setActiveTab] = useState<keyof (typeof t)['readyByOptions']>('Today');
 
   const isMultiRx = flattenedFills.length > 1;
+
+  useEffect(() => {
+    patientAnalytics.page(location.pathname, 'ReadyBy');
+  }, [location.pathname]);
 
   const handleSubmit = async () => {
     if (isDemo) {

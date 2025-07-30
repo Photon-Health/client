@@ -4,11 +4,18 @@ import { Helmet } from 'react-helmet';
 import { PrescriptionsList } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
+import { patientAnalytics } from '../configs/analytics';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 export const Canceled = () => {
   const {
     order: { patient }
   } = useOrderContext();
+  const location = useLocation();
+  useEffect(() => {
+    patientAnalytics.page(location.pathname, 'Canceled');
+  }, [location.pathname]);
 
   return (
     <Box>

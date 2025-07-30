@@ -18,6 +18,7 @@ import { FillWithCount, countFillsAndRemoveDuplicates } from '../utils/general';
 import { Order } from '../utils/models';
 import { Pharmacy } from '../__generated__/graphql';
 import { FAQModal } from '../components/FAQModal';
+import { patientAnalytics } from '../configs/analytics';
 
 export interface OrderContextType {
   order: Order;
@@ -54,6 +55,10 @@ export const Main = () => {
 
   const orgId = order?.organization.id;
   const settings = order?.organization.settings;
+
+  useEffect(() => {
+    patientAnalytics.page(location.pathname, 'Home');
+  }, [location.pathname]);
 
   useEffect(
     function triggerDatadogShortlinkOpenEvent() {
