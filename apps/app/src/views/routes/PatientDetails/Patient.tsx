@@ -24,7 +24,7 @@ import { usePhoton } from '@photonhealth/react';
 import { useEffect, useMemo, useState } from 'react';
 import { formatDate, formatDateLong, formatPhone, getMedicationNames } from '../../../utils';
 import { Page } from '../../components/Page';
-import { PatientPrescriptions } from './PatientPrescriptions';
+import { PatientPrescriptions } from './components/PatientPrescriptions';
 import OrderStatusBadge, { OrderFulfillmentState } from '../../components/OrderStatusBadge';
 import InfoGrid from '../../components/InfoGrid';
 import CopyText from '../../components/CopyText';

@@ -10,9 +10,9 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { FiChevronRight } from 'react-icons/fi';
-import { formatDate } from '../../../utils';
-import { PRESCRIPTION_COLOR_MAP, PRESCRIPTION_STATE_MAP } from '../Prescriptions';
-import SectionTitleRow from '../../components/SectionTitleRow';
+import { formatDate } from '../../../../utils';
+import { PRESCRIPTION_COLOR_MAP, PRESCRIPTION_STATE_MAP } from '../../Prescriptions';
+import SectionTitleRow from '../../../components/SectionTitleRow';
 
 interface PresentablePrescription {
   id: string;
