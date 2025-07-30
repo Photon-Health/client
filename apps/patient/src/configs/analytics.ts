@@ -5,12 +5,13 @@ const RUDDERSTACK_DATA_PLANE_URL = process.env.REACT_APP_RUDDERSTACK_DATA_PLANE_
 const ENVIRONMENT = process.env.REACT_APP_ENV_NAME || 'development';
 
 export class PatientAnalytics {
-  private rudderanalytics: RudderAnalytics;
+  private rudderanalytics?: RudderAnalytics;
   private environment = 'development';
 
   constructor() {
     if (!RUDDERSTACK_WRITE_KEY || !RUDDERSTACK_DATA_PLANE_URL) {
-      throw new Error('RudderStack write key and data plane URL are required');
+      console.error('RudderStack write key and data plane URL are required');
+      return;
     }
 
     this.rudderanalytics = new RudderAnalytics();
