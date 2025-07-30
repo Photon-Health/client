@@ -26,15 +26,15 @@ import { FiEdit, FiChevronRight, FiPlus } from 'react-icons/fi';
 
 import { usePhoton } from '@photonhealth/react';
 import { useEffect, useMemo, useState } from 'react';
-import { formatDateLong, formatPhone, formatDate, getMedicationNames } from '../../utils';
+import { formatDateLong, formatPhone, formatDate, getMedicationNames } from '../../../utils';
 
-import { Page } from '../components/Page';
+import { Page } from '../../components/Page';
 
-import { PRESCRIPTION_STATE_MAP, PRESCRIPTION_COLOR_MAP } from './Prescriptions';
-import OrderStatusBadge, { OrderFulfillmentState } from '../components/OrderStatusBadge';
-import InfoGrid from '../components/InfoGrid';
-import CopyText from '../components/CopyText';
-import SectionTitleRow from '../components/SectionTitleRow';
+import { PRESCRIPTION_STATE_MAP, PRESCRIPTION_COLOR_MAP } from '../Prescriptions';
+import OrderStatusBadge, { OrderFulfillmentState } from '../../components/OrderStatusBadge';
+import InfoGrid from '../../components/InfoGrid';
+import CopyText from '../../components/CopyText';
+import SectionTitleRow from '../../components/SectionTitleRow';
 
 import { datadogRum } from '@datadog/browser-rum';
 
