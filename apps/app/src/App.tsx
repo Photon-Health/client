@@ -15,7 +15,7 @@ import { NewOrder } from './views/routes/NewOrder';
 import { NotFound } from './views/routes/NotFound';
 import { Order } from './views/routes/Order';
 import { Orders } from './views/routes/Orders';
-import { Patient } from './views/routes/Patient';
+import { Patient } from './views/routes/PatientDetails';
 import { PatientForm } from './views/routes/PatientForm';
 import { Patients } from './views/routes/Patients';
 import { Playground } from './views/routes/Playground';
