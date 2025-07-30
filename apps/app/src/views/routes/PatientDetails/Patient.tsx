@@ -4,7 +4,6 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
-  Badge,
   Box,
   Button,
   Card,
@@ -25,7 +24,7 @@ import { usePhoton } from '@photonhealth/react';
 import { useEffect, useMemo, useState } from 'react';
 import { formatDate, formatDateLong, formatPhone, getMedicationNames } from '../../../utils';
 import { Page } from '../../components/Page';
-import { PRESCRIPTION_COLOR_MAP, PRESCRIPTION_STATE_MAP } from '../Prescriptions';
+import { PatientPrescriptions } from './PatientPrescriptions';
 import OrderStatusBadge, { OrderFulfillmentState } from '../../components/OrderStatusBadge';
 import InfoGrid from '../../components/InfoGrid';
 import CopyText from '../../components/CopyText';
@@ -270,53 +269,7 @@ export const Patient = () => {
             w="100%"
             mt={0}
           >
-            <SectionTitleRow headerText="Prescriptions" />
-
-            {loading ? (
-              <SkeletonText skeletonHeight={20} noOfLines={1} width="300px" />
-            ) : prescriptions.length === 0 ? (
-              <Text as="i" fontSize="sm" color="gray.500">
-                No prescriptions
-              </Text>
-            ) : (
-              <VStack spacing={3} align="start">
-                {prescriptions.map(({ id: prescriptionId, treatment, state, writtenAt }, i) =>
-                  i < 5 ? (
-                    <LinkBox key={prescriptionId} style={{ textDecoration: 'none' }} w="full">
-                      <Card
-                        variant="outline"
-                        p={3}
-                        shadow="none"
-                        backgroundColor="gray.50"
-                        _hover={{ backgroundColor: 'gray.100' }}
-                      >
-                        <HStack w="full" justify="space-between">
-                          <VStack alignItems="start">
-                            <LinkOverlay href={`/prescriptions/${prescriptionId}`}>
-                              <Text fontSize="md">{treatment.name}</Text>
-                            </LinkOverlay>
-                            <HStack>
-                              <Badge
-                                size="sm"
-                                colorScheme={PRESCRIPTION_COLOR_MAP[state as keyof object] || ''}
-                              >
-                                {PRESCRIPTION_STATE_MAP[state as keyof object] || ''}
-                              </Badge>
-                              <Text fontSize="md" color="gray.500">
-                                {formatDate(writtenAt)}
-                              </Text>
-                            </HStack>
-                          </VStack>
-                          <Box alignItems="end">
-                            <FiChevronRight size="1.3em" />
-                          </Box>
-                        </HStack>
-                      </Card>
-                    </LinkBox>
-                  ) : null
-                )}
-              </VStack>
-            )}
+            <PatientPrescriptions loading={loading} prescriptions={prescriptions} />
 
             <SectionTitleRow
               headerText="Orders"
