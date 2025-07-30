@@ -1,13 +1,16 @@
 import { Box, Button, Container, HStack, Heading, Text, VStack } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { FixedFooter, PoweredBy, PrescriptionsList } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
+import { patientAnalytics } from '../configs/analytics';
+import { useEffect } from 'react';
 
 export const Review = () => {
   const { order, flattenedFills } = useOrderContext();
+  const location = useLocation();
 
   const navigate = useNavigate();
 
@@ -26,6 +29,10 @@ export const Review = () => {
   };
 
   const isMultiRx = flattenedFills.length > 1;
+
+  useEffect(() => {
+    patientAnalytics.page(location.pathname, 'Review Prescriptions');
+  }, [location.pathname]);
 
   return (
     <Box>
