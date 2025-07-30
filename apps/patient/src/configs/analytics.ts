@@ -35,6 +35,27 @@ export class PatientAnalytics {
       this.rudderanalytics.page(category, pageProperties);
     }
   }
+
+  track(eventName: string, properties: ApiObject = {}) {
+    if (!this.rudderanalytics) {
+      return;
+    }
+
+    const trackProperties = {
+      environment: this.environment,
+      ...properties
+    };
+
+    this.rudderanalytics.track(eventName, trackProperties);
+  }
+
+  identify(userId: string) {
+    if (!this.rudderanalytics) {
+      return;
+    }
+
+    this.rudderanalytics.identify(userId);
+  }
 }
 
 export const patientAnalytics = new PatientAnalytics();
