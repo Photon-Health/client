@@ -1,7 +1,13 @@
 import { Center, ChakraProvider, CircularProgress } from '@chakra-ui/react';
 import { datadogRum } from '@datadog/browser-rum';
 import { Context, createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { Outlet, ScrollRestoration, useNavigate, useSearchParams } from 'react-router-dom';
+import {
+  Outlet,
+  ScrollRestoration,
+  useLocation,
+  useNavigate,
+  useSearchParams
+} from 'react-router-dom';
 
 import { AUTH_HEADER_ERRORS, getOrder } from '../api/internal';
 import { Nav } from '../components';
@@ -32,6 +38,7 @@ export const Main = () => {
   const isDemo = searchParams.get('demo');
   const orderId = searchParams.get('orderId');
   const phone = searchParams.get('phone');
+  const location = useLocation();
 
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
 
