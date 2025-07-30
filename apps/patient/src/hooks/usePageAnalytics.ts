@@ -17,8 +17,17 @@ export const usePageAnalytics = ({ pageName, properties }: UsePageAnalyticsProps
     if (order?.id) {
       patientAnalytics.page(location.pathname, pageName, {
         ...properties,
-        orderId: order.id
+        orderId: order.id,
+        organizationId: order.organization.id,
+        organizationName: order.organization.name
       });
     }
-  }, [location.pathname, pageName, properties, order?.id]);
+  }, [
+    location.pathname,
+    pageName,
+    properties,
+    order?.id,
+    order?.organization.id,
+    order?.organization.name
+  ]);
 };
