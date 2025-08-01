@@ -49,12 +49,17 @@ export class PatientAnalytics {
     this.rudderanalytics.track(eventName, trackProperties);
   }
 
-  identify(userId: string) {
+  identify(userId: string, properties: ApiObject = {}) {
     if (!this.rudderanalytics) {
       return;
     }
 
-    this.rudderanalytics.identify(userId);
+    const identifyProperties = {
+      environment: this.environment,
+      ...properties
+    };
+
+    this.rudderanalytics.identify(userId, identifyProperties);
   }
 }
 
