@@ -205,7 +205,7 @@ Order:
 
 ----
 Patient:
-  ID: ${order?.patient?.id} 
+  ID: ${order?.patient?.id}
   Name: ${order?.patient?.name?.full}
 
 ----
@@ -222,8 +222,8 @@ ${fills.map(
 `
 )}
 
----- 
-Description: 
+----
+Description:
   `;
 }
 
@@ -386,15 +386,15 @@ export const Order = () => {
             <Text>Start an email thread with the Photon team to discuss next steps.</Text>
             <Card
               p={4}
-              bg={theme.colors.slate['50']}
+              bg={theme.colors.navy['50']}
               borderWidth="1px"
-              borderColor={theme.colors.slate['200']}
+              borderColor={theme.colors.navy['200']}
               borderRadius="lg"
               variant="outline"
             >
               <VStack spacing={4}>
                 <Box w="100%">
-                  <Text fontSize="xs" color={theme.colors.slate['700']}>
+                  <Text fontSize="xs" color={theme.colors.navy['700']}>
                     PATIENT
                   </Text>
                   <Text fontSize="sm" fontWeight="medium">
@@ -402,7 +402,7 @@ export const Order = () => {
                   </Text>
                 </Box>
                 <VStack w="100%" align="left">
-                  <Text fontSize="xs" color={theme.colors.slate['700']}>
+                  <Text fontSize="xs" color={theme.colors.navy['700']}>
                     PRESCRIPTION
                   </Text>
                   {fills?.length > 0 &&
@@ -411,7 +411,7 @@ export const Order = () => {
                         <Text fontSize="sm" fontWeight="medium">
                           {fill?.treatment?.name}
                         </Text>
-                        <Text fontSize="sm" color={theme.colors.slate['500']}>
+                        <Text fontSize="sm" color={theme.colors.navy['500']}>
                           {formatRxString({
                             dispenseQuantity: fill?.prescription?.dispenseQuantity,
                             dispenseUnit: fill?.prescription?.dispenseUnit,
@@ -621,26 +621,28 @@ export const Order = () => {
                       <VStack spacing={1} align="start">
                         <VStack spacing={0} align="start">
                           <Text fontSize="md" fontWeight="medium">
-                            This order is pending pharmacy selection by the patient.
+                            {getRoutingOrderStatusText(order)}
                           </Text>
                           <Text fontSize="md" color="gray.500">
-                            Select a pharmacy for the patient if needed.
+                            {getRoutingOrderSubText(order)}
                           </Text>
                         </VStack>
-                        <Button
-                          onClick={() => {
-                            datadogRum.addAction('select_pharmacy_btn_click', {
-                              orderId: id
-                            });
+                        {shouldShowSelectPharmacyButton(order) ? (
+                          <Button
+                            onClick={() => {
+                              datadogRum.addAction('select_pharmacy_btn_click', {
+                                orderId: id
+                              });
 
-                            onOpen();
-                          }}
-                          colorScheme="blue"
-                          variant="link"
-                          mt={2}
-                        >
-                          Select Pharmacy
-                        </Button>
+                              onOpen();
+                            }}
+                            colorScheme="blue"
+                            variant="link"
+                            mt={2}
+                          >
+                            Select Pharmacy
+                          </Button>
+                        ) : null}
                       </VStack>
                     </CardBody>
                   </Card>
@@ -840,3 +842,24 @@ export const Order = () => {
     </>
   );
 };
+
+function getRoutingOrderStatusText(order: OrderType) {
+  return isOrderMissingPharmacy(order)
+    ? 'This order is pending pharmacy selection by the patient.'
+    : 'This order is pending pharmacy confirmation by the patient.';
+}
+
+function getRoutingOrderSubText(order: OrderType) {
+  return isOrderMissingPharmacy(order)
+    ? 'Select a pharmacy for the patient if needed.'
+    : 'The order will be routed to the below pharmacy if the patient does not confirm within 15 minutes.';
+}
+
+function shouldShowSelectPharmacyButton(order: OrderType): boolean {
+  const shouldShowButton = isOrderMissingPharmacy(order);
+  return shouldShowButton;
+}
+
+function isOrderMissingPharmacy(order: OrderType): boolean {
+  return order.pharmacy === null || order.pharmacy === undefined;
+}

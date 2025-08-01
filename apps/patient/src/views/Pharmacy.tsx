@@ -26,12 +26,11 @@ import {
   CouponModal,
   FixedFooter,
   LocationModal,
-  PickupOptions,
   PoweredBy
 } from '../components';
 import * as TOAST_CONFIG from '../configs/toast';
-import { formatAddress, preparePharmacy } from '../utils/general';
-import { ExtendedFulfillmentType } from '../utils/models';
+import { preparePharmacy } from '../utils/general';
+import { ExtendedFulfillmentType, Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -48,12 +47,14 @@ import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { demoPharmacies } from '../data/demoPharmacies';
 import { isGLP } from '../utils/isGLP';
-import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { datadogRum } from '@datadog/browser-rum';
 import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { fetchOffers } from './pharmacy.utils';
 import _ from 'lodash';
+import { PickupPharmacyCardList } from '../components/pharmacy-card-list';
+import { formatAddress } from '../utils/formatters';
+import { usePageAnalytics } from '../hooks/usePageAnalytics';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
@@ -61,7 +62,6 @@ const WALGREENS_PHARMACY_RADIUS = 15; // miles
 
 export const Pharmacy = () => {
   const { order, flattenedFills, setOrder, isDemo, fetchOrder } = useOrderContext();
-
   const mailOrderPharmacies = getOrgMailOrderPharms(order?.organization.id).patient;
   const { enablePatientDeliveryPharmacies, patientFeaturedPharmacyName } =
     order?.organization?.settings?.patientUx ?? {};
@@ -103,7 +103,7 @@ export const Pharmacy = () => {
   // Address state
   const [latitude, setLatitude] = useState<number>();
   const [longitude, setLongitude] = useState<number>();
-  const [location, setLocation] = useState(
+  const [patientLocation, setPatientLocation] = useState(
     order?.address ? formatAddress(order.address) : undefined
   );
   const [cleanAddress, setCleanAddress] = useState<string>();
@@ -126,7 +126,7 @@ export const Pharmacy = () => {
     openNow !== null ? !!openNow : order?.readyBy === 'Urgent'
   );
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
-  const [enablePrice, setEnablePrice] = useState(false);
+  const [enablePrice, setEnablePrice] = useState(true);
 
   const [brandedOptionsOverride, setBrandedOptionsOverride] = useState<
     BrandedOptionOverrides | undefined
@@ -179,6 +179,8 @@ export const Pharmacy = () => {
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
 
+  usePageAnalytics({ pageName: 'Pharmacy Select' });
+
   useEffect(() => {
     const getOffers = async () => {
       let fetchedOffers: AmazonOffer[] | undefined;
@@ -206,10 +208,15 @@ export const Pharmacy = () => {
     // so we're forcibly nulling out the cost
     // so the price won't be shown
     let amazonPharmacyOverride;
-    if (enablePrice) {
-      amazonPharmacyOverride = { ...cashOffer, costAmount: undefined };
-    } else {
-      amazonPharmacyOverride = { ...insuranceOffer, costAmount: undefined };
+
+    // we'll only want to set the override
+    // if we have at least one offer
+    if (insuranceOffer || cashOffer) {
+      if (enablePrice) {
+        amazonPharmacyOverride = cashOffer;
+      } else {
+        amazonPharmacyOverride = insuranceOffer;
+      }
     }
 
     const newBrandedOptionsOverride = {
@@ -243,7 +250,7 @@ export const Pharmacy = () => {
   const handleModalClose = ({ loc = undefined }: { loc?: string | undefined }) => {
     if (loc) {
       reset();
-      setLocation(loc);
+      setPatientLocation(loc);
     }
     setLocationModalOpen(false);
   };
@@ -257,7 +264,7 @@ export const Pharmacy = () => {
   useEffect(() => {
     if (isDemo) {
       // Mock geocode data
-      setLocation('201 N 8th St, Brooklyn, NY 11211');
+      setPatientLocation('201 N 8th St, Brooklyn, NY 11211');
       setCleanAddress('201 N 8th St, Brooklyn, NY 11211');
       setLatitude(40.717484);
       setLongitude(-73.955662397568);
@@ -277,15 +284,15 @@ export const Pharmacy = () => {
     }
   }, [enable24Hr, enableOpenNow, enablePrice, isDemo]);
 
-  // Update and geocode location
+  // Update and geocode patient's location
   useEffect(() => {
     const onUpdateLocation = async () => {
-      if (location == null) {
+      if (patientLocation == null) {
         return;
       }
       setLoadingLocation(true);
       try {
-        const locationData = await geocode(location);
+        const locationData = await geocode(patientLocation);
         setLatitude(locationData.lat);
         setLongitude(locationData.lng);
         setCleanAddress(locationData.address);
@@ -302,7 +309,7 @@ export const Pharmacy = () => {
       setLoadingLocation(false);
     };
     onUpdateLocation();
-  }, [location, toast]);
+  }, [patientLocation, toast]);
 
   const getCostco = useCallback(
     async ({
@@ -393,6 +400,7 @@ export const Pharmacy = () => {
         is24hr: enable24Hr,
         includePrice: enablePrice
       });
+
       const pharmacies = res?.pharmaciesByLocation ?? [];
       setPageOffset(pageOffset + pharmacies.length);
       return pharmacies;
@@ -624,6 +632,10 @@ export const Pharmacy = () => {
             setShowFooter(false);
 
             if (brandedOptionsOverride?.amazonPharmacyOverride) {
+              const sawPrice =
+                brandedOptionsOverride?.amazonPharmacyOverride?.costAmount !== undefined;
+              const priceType = brandedOptionsOverride?.amazonPharmacyOverride?.costType;
+
               const slugifiedOverride =
                 brandedOptionsOverride?.amazonPharmacyOverride.deliveryEstimate
                   ?.toLowerCase()
@@ -639,6 +651,9 @@ export const Pharmacy = () => {
                   description: slugifiedOverride,
                   treatmentId: flattenedFills[0]?.treatment?.id,
                   timestamp: new Date().toISOString(),
+                  sawPrice,
+                  costAmount: brandedOptionsOverride?.amazonPharmacyOverride?.costAmount,
+                  priceType,
                   offers
                 });
               } else {
@@ -648,6 +663,9 @@ export const Pharmacy = () => {
                   description: slugifiedOverride,
                   treatmentId: flattenedFills[0]?.treatment?.id,
                   timestamp: new Date().toISOString(),
+                  sawPrice,
+                  costAmount: brandedOptionsOverride?.amazonPharmacyOverride?.costAmount,
+                  priceType,
                   offers
                 });
               }
@@ -829,12 +847,13 @@ export const Pharmacy = () => {
     </Button>
   );
 
-  const brandedPharmacyOptions = (location: string) => (
+  const brandedPharmacyOptions = (patientLocation: string) => (
     <BrandedOptions
       options={brandedOptions}
-      location={location}
+      location={patientLocation}
       selectedId={selectedId}
       handleSelect={handleSelect}
+      fulfillingPharmacyId={order.pharmacy?.id}
       brandedOptionOverrides={brandedOptionsOverride ?? {}}
     />
   );
@@ -842,9 +861,9 @@ export const Pharmacy = () => {
   const showPickupHeading =
     (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined) ?? false;
 
-  const pickupPharmacyOptions = (location: string) => (
-    <PickupOptions
-      location={location}
+  const pickupPharmacyOptions = (patientLocation: string) => (
+    <PickupPharmacyCardList
+      location={patientLocation}
       pharmacies={allPharmacies}
       preferredPharmacy={preferredPharmacyId}
       savingPreferred={savingPreferred}
@@ -888,7 +907,7 @@ export const Pharmacy = () => {
                 {heading}
               </Heading>
               <HStack justify="space-between" w="full">
-                {location ? locationPreview : setLocationButton}
+                {patientLocation ? locationPreview : setLocationButton}
               </HStack>
             </VStack>
           </Container>
@@ -907,6 +926,7 @@ export const Pharmacy = () => {
                   {t.showDiscountCardPrices(() => setCouponModalOpen(true))}
                   <Switch
                     size="lg"
+                    aria-label="Show coupon card prices"
                     isChecked={enablePrice}
                     onChange={(e) => setEnablePrice(e.target.checked)}
                   />
@@ -926,12 +946,12 @@ export const Pharmacy = () => {
       </Box>
 
       <Container pb={showFooter ? 32 : 8}>
-        {location ? (
+        {patientLocation ? (
           <VStack spacing={6} align="stretch" pt={4}>
             {enableCourier || enableMailOrder || brandedOptionsOverride
-              ? brandedPharmacyOptions(location)
+              ? brandedPharmacyOptions(patientLocation)
               : null}
-            {pickupPharmacyOptions(location)}
+            {pickupPharmacyOptions(patientLocation)}
           </VStack>
         ) : null}
       </Container>

@@ -18,6 +18,7 @@ import { FillWithCount, countFillsAndRemoveDuplicates } from '../utils/general';
 import { Order } from '../utils/models';
 import { Pharmacy } from '../__generated__/graphql';
 import { FAQModal } from '../components/FAQModal';
+import { patientAnalytics } from '../configs/analytics';
 
 export interface OrderContextType {
   order: Order;
@@ -38,6 +39,7 @@ export const Main = () => {
   const isDemo = searchParams.get('demo');
   const orderId = searchParams.get('orderId');
   const phone = searchParams.get('phone');
+  const location = useLocation();
 
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
 
@@ -49,11 +51,16 @@ export const Main = () => {
   );
 
   const navigate = useNavigate();
-  const location = useLocation();
   const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
 
   const orgId = order?.organization.id;
   const settings = order?.organization.settings;
+
+  useEffect(() => {
+    if (order?.patient.id) {
+      patientAnalytics.identify(order.patient.id);
+    }
+  }, [order?.patient.id]);
 
   useEffect(
     function triggerDatadogShortlinkOpenEvent() {
@@ -63,6 +70,14 @@ export const Main = () => {
         try {
           const payload = JSON.parse(atob(token.split('.')[1]));
           datadogRum.addAction('shortlink-opened', {
+            orderId: payload.orderId,
+            patientId: payload.sub,
+            organizationId: payload.organizationId,
+            context: payload.context,
+            metadata: payload.metadata
+          });
+
+          patientAnalytics.track('Patient App Opened', {
             orderId: payload.orderId,
             patientId: payload.sub,
             organizationId: payload.organizationId,

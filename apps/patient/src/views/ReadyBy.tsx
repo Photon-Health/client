@@ -5,12 +5,12 @@ import {
   Card,
   CardBody,
   Container,
+  Fade,
   Heading,
   HStack,
   Icon,
   Radio,
   RadioGroup,
-  Fade,
   Tag,
   Text,
   VStack
@@ -20,14 +20,15 @@ import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
 import { datadogRum } from '@datadog/browser-rum';
 import timezone from 'dayjs/plugin/timezone';
-import { capitalize, convertReadyByToUTCTimestamp } from '../utils/general';
-
-dayjs.extend(timezone);
-
+import { convertReadyByToUTCTimestamp } from '../utils/general';
 import { FixedFooter, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { RxLightningBolt } from 'react-icons/rx';
+import { capitalize } from '../utils/formatters';
+import { usePageAnalytics } from '../hooks/usePageAnalytics';
+
+dayjs.extend(timezone);
 
 const checkDisabled = (option: string): boolean => {
   const currentTime = dayjs();
@@ -38,7 +39,6 @@ const checkDisabled = (option: string): boolean => {
 
 export const ReadyBy = () => {
   const { order, flattenedFills, setOrder } = useOrderContext();
-
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
@@ -52,6 +52,8 @@ export const ReadyBy = () => {
   const [activeTab, setActiveTab] = useState<keyof (typeof t)['readyByOptions']>('Today');
 
   const isMultiRx = flattenedFills.length > 1;
+
+  usePageAnalytics({ pageName: "Patient's Ready By Time" });
 
   const handleSubmit = async () => {
     if (isDemo) {

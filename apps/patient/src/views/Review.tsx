@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FixedFooter, PoweredBy, PrescriptionsList } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
+import { usePageAnalytics } from '../hooks/usePageAnalytics';
 
 export const Review = () => {
   const { order, flattenedFills } = useOrderContext();
@@ -26,6 +27,8 @@ export const Review = () => {
   };
 
   const isMultiRx = flattenedFills.length > 1;
+
+  usePageAnalytics({ pageName: 'Review Prescriptions' });
 
   return (
     <Box>

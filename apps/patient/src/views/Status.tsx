@@ -13,7 +13,6 @@ import { OrderSummary } from '../components/order-summary/OrderSummary';
 import { OrderStatusHeader } from '../components/status/Header';
 import { deriveOrderStatus, getLatestReadyTime } from '../utils/fulfillmentsHelpers';
 import {
-  formatAddress,
   getFulfillmentType,
   isDelivery,
   isRerouteablePharmacy,
@@ -22,11 +21,12 @@ import {
 import { InsuranceAlert } from '../components/InsuranceAlert';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
+import { formatAddress } from '../utils/formatters';
+import { usePageAnalytics } from '../hooks/usePageAnalytics';
 
 export const Status = () => {
   const navigate = useNavigate();
   const { order, setOrder, isDemo, setFaqModalIsOpen } = useOrderContext();
-
   const { enablePatientRerouting } = order?.organization?.settings?.patientUx ?? {};
 
   const [searchParams] = useSearchParams();
@@ -52,6 +52,8 @@ export const Status = () => {
     if (!pharmacy?.phone) return;
     window.location.href = `tel:${pharmacy.phone}`;
   };
+
+  usePageAnalytics({ pageName: 'Order Status' });
 
   useEffect(() => {
     if (!phone || !pharmacy || !order) {
