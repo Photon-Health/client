@@ -58,7 +58,11 @@ export const Main = () => {
 
   useEffect(() => {
     if (order?.patient.id) {
-      patientAnalytics.identify(order.patient.id);
+      patientAnalytics.identify({
+        userId: order.patient.id,
+        orgId: order.organization.id,
+        orgName: order.organization.name
+      });
     }
   }, [order?.patient.id]);
 
