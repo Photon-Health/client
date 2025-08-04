@@ -60,6 +60,9 @@ export const Main = () => {
     if (order?.patient.id && order?.organization.id && order?.organization.name) {
       patientAnalytics.identify({
         userId: order.patient.id,
+        patientProperties: {
+          address: order.address
+        },
         orgId: order.organization.id,
         orgName: order.organization.name
       });

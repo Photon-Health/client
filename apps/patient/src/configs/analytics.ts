@@ -49,12 +49,22 @@ export class PatientAnalytics {
     this.rudderanalytics.track(eventName, trackProperties);
   }
 
-  identify({ userId, orgId, orgName }: { userId: string; orgId: string; orgName: string }) {
+  identify({
+    userId,
+    patientProperties,
+    orgId,
+    orgName
+  }: {
+    userId: string;
+    patientProperties: ApiObject;
+    orgId: string;
+    orgName: string;
+  }) {
     if (!this.rudderanalytics) {
       return;
     }
 
-    this.rudderanalytics.identify(userId);
+    this.rudderanalytics.identify(userId, patientProperties);
     this.rudderanalytics.group(orgId, { name: orgName });
   }
 }
