@@ -57,14 +57,14 @@ export const Main = () => {
   const settings = order?.organization.settings;
 
   useEffect(() => {
-    if (order?.patient.id) {
+    if (order?.patient.id && order?.organization.id && order?.organization.name) {
       patientAnalytics.identify({
         userId: order.patient.id,
         orgId: order.organization.id,
         orgName: order.organization.name
       });
     }
-  }, [order?.patient.id]);
+  }, [order?.patient.id, order?.organization.id, order?.organization.name]);
 
   useEffect(
     function triggerDatadogShortlinkOpenEvent() {
