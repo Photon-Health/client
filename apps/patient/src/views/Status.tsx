@@ -23,6 +23,7 @@ import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
+import { patientAnalytics } from '../configs/analytics';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -46,11 +47,27 @@ export const Status = () => {
     if (!pharmacy?.name) return;
     const url = `http://maps.google.com/?q=${pharmacy?.name}, ${pharmacyFormattedAddress}`;
     window.open(url);
+
+    patientAnalytics.track('Get Directions', {
+      orderId: order?.id,
+      pharmacyId: pharmacy?.id,
+      pharmacyName: pharmacy?.name,
+      pharmacyAddress: pharmacyFormattedAddress,
+      fulfillmentType: fulfillmentType
+    });
   };
 
   const handleCallPharmacy = () => {
     if (!pharmacy?.phone) return;
     window.location.href = `tel:${pharmacy.phone}`;
+
+    patientAnalytics.track('Call Pharmacy', {
+      orderId: order?.id,
+      pharmacyId: pharmacy?.id,
+      pharmacyName: pharmacy?.name,
+      pharmacyPhone: pharmacy?.phone,
+      fulfillmentType: fulfillmentType
+    });
   };
 
   usePageAnalytics({ pageName: 'Order Status' });
@@ -139,6 +156,14 @@ export const Status = () => {
       ...(!displayPharmacy?.isOpen ? { openNow: true } : {})
     });
     navigate(`/pharmacy?${query}`);
+
+    patientAnalytics.track('Reroute Order', {
+      orderId: order?.id,
+      pharmacyId: pharmacy?.id,
+      pharmacyName: pharmacy?.name,
+      isPharmacyOpen: displayPharmacy?.isOpen,
+      fulfillmentType: fulfillmentType
+    });
   };
 
   const fulfillments = order.fulfillments.map((f) => ({
@@ -290,7 +315,16 @@ export const Status = () => {
 
             <OrderSummary
               fulfillments={fulfillments}
-              onViewDetails={() => setOrderDetailsIsOpen(true)}
+              onViewDetails={() => {
+                setOrderDetailsIsOpen(true);
+                patientAnalytics.track('Status, View Order Details', {
+                  orderId: order?.id,
+                  pharmacyId: pharmacy?.id,
+                  pharmacyName: pharmacy?.name,
+                  fulfillmentType: fulfillmentType,
+                  prescriptionCount: fulfillments.length
+                });
+              }}
             />
 
             <Coupons />
@@ -304,7 +338,15 @@ export const Status = () => {
                   w="full"
                   variant="outline"
                   color="blue.500"
-                  onClick={() => setFaqModalIsOpen(true)}
+                  onClick={() => {
+                    setFaqModalIsOpen(true);
+                    patientAnalytics.track('Status, Open FAQ Modal', {
+                      orderId: order?.id,
+                      pharmacyId: pharmacy?.id,
+                      pharmacyName: pharmacy?.name,
+                      fulfillmentType: fulfillmentType
+                    });
+                  }}
                 >
                   I have a pharmacy issue
                 </Button>
