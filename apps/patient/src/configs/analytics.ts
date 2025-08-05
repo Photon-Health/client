@@ -1,4 +1,4 @@
-import { ApiObject, RudderAnalytics } from '@rudderstack/analytics-js';
+import { ApiObject, IdentifyTraits, RudderAnalytics } from '@rudderstack/analytics-js';
 
 const RUDDERSTACK_WRITE_KEY = process.env.REACT_APP_RUDDERSTACK_WRITE_KEY;
 const RUDDERSTACK_DATA_PLANE_URL = process.env.REACT_APP_RUDDERSTACK_DATA_PLANE_URL;
@@ -49,12 +49,23 @@ export class PatientAnalytics {
     this.rudderanalytics.track(eventName, trackProperties);
   }
 
-  identify(userId: string) {
+  identify({
+    userId,
+    address,
+    orgId,
+    orgName
+  }: {
+    userId: string;
+    address: IdentifyTraits['address'];
+    orgId: string;
+    orgName: string;
+  }) {
     if (!this.rudderanalytics) {
       return;
     }
 
-    this.rudderanalytics.identify(userId);
+    this.rudderanalytics.identify(userId, { address });
+    this.rudderanalytics.group(orgId, { name: orgName });
   }
 }
 

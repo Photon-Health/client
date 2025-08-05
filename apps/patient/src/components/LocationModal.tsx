@@ -20,6 +20,7 @@ import { AsyncSelect } from 'chakra-react-select';
 import { debounce } from 'lodash';
 
 import { text as t } from '../utils/text';
+import { patientAnalytics } from '../configs/analytics';
 
 interface Option {
   value: string;
@@ -79,6 +80,13 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
   const geocode = async (address: string) => {
     const data = await geocoder.geocode({ address });
     if (data?.results) {
+      patientAnalytics.track('Select Location from Search', {
+        selectedAddress: address,
+        formattedAddress: data.results[0].formatted_address,
+        latitude: data.results[0].geometry.location.lat(),
+        longitude: data.results[0].geometry.location.lng()
+      });
+
       handleClose({
         loc: data.results[0].formatted_address,
         lat: data.results[0].geometry.location.lat(),
@@ -95,6 +103,14 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
         const lng = pos.coords.longitude;
         const data = await geocoder.geocode({ location: { lat, lng } });
         setGettingCurrentLocation(false);
+
+        patientAnalytics.track('Get location from GPS', {
+          latitude: lat,
+          longitude: lng,
+          formattedAddress: data.results[0].formatted_address,
+          accuracy: pos.coords.accuracy
+        });
+
         handleClose({
           loc: data.results[0].formatted_address,
           lat: data.results[0].geometry.location.lat(),
@@ -147,6 +163,7 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
               <AsyncSelect<Option>
                 placeholder=""
                 loadOptions={(inputValue: string, callback: (options: Option[]) => void) => {
+                  patientAnalytics.track('Typing for location', { inputValue });
                   debouncedSearchForLocations(inputValue, callback);
                 }}
                 defaultOptions={[] as Option[]}
