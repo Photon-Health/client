@@ -596,6 +596,8 @@ export const Pharmacy = () => {
           price: selectedPrice
         });
       }
+
+      patientAnalytics.track('Offer Selected', pharmacies[index]);
     }
   };
 
@@ -671,10 +673,16 @@ export const Pharmacy = () => {
           setTimeout(async () => {
             setShowFooter(false);
 
+            const extraOfferMetadata: Record<string, any> = {};
+
             if (brandedOptionsOverride?.amazonPharmacyOverride) {
               const sawPrice =
                 brandedOptionsOverride?.amazonPharmacyOverride?.costAmount !== undefined;
               const priceType = brandedOptionsOverride?.amazonPharmacyOverride?.costType;
+
+              extraOfferMetadata.sawPrice = sawPrice;
+              extraOfferMetadata.price = brandedOptionsOverride?.amazonPharmacyOverride?.costAmount;
+              extraOfferMetadata.priceType = priceType;
 
               const slugifiedOverride =
                 brandedOptionsOverride?.amazonPharmacyOverride.deliveryEstimate
@@ -758,6 +766,11 @@ export const Pharmacy = () => {
               type = 'PICK_UP';
               selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
             }
+
+            patientAnalytics.track('Offer Selected', {
+              ...selectedPharmacy,
+              ...extraOfferMetadata
+            });
 
             setOrder({
               ...order,
@@ -929,6 +942,7 @@ export const Pharmacy = () => {
       setEnable24Hr={setEnable24Hr}
       currentPharmacyId={order.pharmacy?.id}
       setCouponModalOpen={setCouponModalOpen}
+      numberOfBrandedOptions={brandedOptions.length}
     />
   );
 

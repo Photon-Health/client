@@ -2,6 +2,7 @@ import { Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
 
 import { text as t } from '../utils/text';
 import { BrandedPharmacyCard } from './BrandedPharmacyCard';
+import { OfferImpressionTracker } from '../utils/tracking/OfferImpressionTracker';
 
 interface Props {
   options: string[];
@@ -45,15 +46,21 @@ export const BrandedOptions = ({
         </VStack>
       </SlideFade>
 
-      {options.map((id) => (
+      {options.map((id, index) => (
         <SlideFade offsetY="60px" in={true} key={`courier-pharmacy-${id}`}>
-          <BrandedPharmacyCard
-            pharmacyId={id}
-            isPharmacyFulfillingCurrentOrder={fulfillingPharmacyId === id}
-            selected={selectedId === id}
-            handleSelect={handleSelect}
-            brandedOptionOverrides={brandedOptionOverrides}
-          />
+          <OfferImpressionTracker
+            pharmacy={{ id, name: 'Branded Option' }}
+            ordinalPosition={index}
+            isAlreadySelected={selectedId === id}
+          >
+            <BrandedPharmacyCard
+              pharmacyId={id}
+              isPharmacyFulfillingCurrentOrder={fulfillingPharmacyId === id}
+              selected={selectedId === id}
+              handleSelect={handleSelect}
+              brandedOptionOverrides={brandedOptionOverrides}
+            />
+          </OfferImpressionTracker>
         </SlideFade>
       ))}
     </VStack>
