@@ -15,6 +15,7 @@ import { useSearchParams } from 'react-router-dom';
 import { text as t } from '../utils/text';
 import { useOrderContext } from '../views/Main';
 import { Logo as PhotonLogo } from './Logo';
+import { patientAnalytics } from '../configs/analytics';
 
 interface NavProps {
   showRefresh?: boolean;
@@ -70,11 +71,21 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
               variant="ghost"
               aria-label="Refresh"
               icon={<FiRefreshCw size="1.5em" />}
-              onClick={() => window.location.reload()}
+              onClick={() => {
+                window.location.reload();
+                patientAnalytics.track('Refresh Page');
+              }}
             />
           ) : null}
 
-          <Button colorScheme="gray" size="sm" onClick={() => setFaqModalIsOpen(true)}>
+          <Button
+            colorScheme="gray"
+            size="sm"
+            onClick={() => {
+              setFaqModalIsOpen(true);
+              patientAnalytics.track('Open Help Modal');
+            }}
+          >
             Help
           </Button>
         </HStack>
