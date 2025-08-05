@@ -28,7 +28,9 @@ export interface OrderStatusHeaderProps {
     | 'PHARMACY_UNREACHABLE'
     | 'EXTERNAL_TRANSFER'
     | 'PHARMACY_NEEDS_INSURANCE_INFO'
-    | 'PHARMACY_DOES_NOT_ACCEPT_INSURANCE';
+    | 'PHARMACY_DOES_NOT_ACCEPT_INSURANCE'
+    | 'DOCTOR_NOT_LICENSED_IN_STATE'
+    | 'SUPERVISING_PHYSICIAN_NEEDED';
   pharmacyEstimatedReadyAt?: Date;
   patientDesiredReadyAt?: Date | 'URGENT';
 }

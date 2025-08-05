@@ -55,6 +55,7 @@ import _ from 'lodash';
 import { PickupPharmacyCardList } from '../components/pharmacy-card-list';
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
+import { patientAnalytics } from '../configs/analytics';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
@@ -253,6 +254,14 @@ export const Pharmacy = () => {
       setPatientLocation(loc);
     }
     setLocationModalOpen(false);
+
+    if (loc) {
+      patientAnalytics.track('Update Location', {
+        orderId: order?.id,
+        newLocation: loc,
+        previousLocation: cleanAddress
+      });
+    }
   };
 
   // Reset when we toggle 24hr, open now, price
@@ -541,6 +550,17 @@ export const Pharmacy = () => {
   const handleSelect = (pharmacyId: string) => {
     setSelectedId(pharmacyId);
     setShowFooter(true);
+
+    const selectedPharmacy = allPharmacies.find((p) => p.id === pharmacyId);
+    patientAnalytics.track('Pharmacy Selected', {
+      orderId: order?.id,
+      pharmacyId: pharmacyId,
+      pharmacyName: selectedPharmacy?.name,
+      pharmacyRank: allPharmacies.findIndex((p) => p.id === pharmacyId) + 1,
+      isReroute: !!isReroute,
+      enablePrice: enablePrice,
+      hasPrice: selectedPharmacy?.price !== undefined
+    });
   };
 
   const trackSelectedPharmacyRank = (
@@ -567,6 +587,14 @@ export const Pharmacy = () => {
           timestamp: new Date().toISOString(),
           price: selectedPrice
         });
+
+        patientAnalytics.track('Pharmacy Price Selected', {
+          orderId: order.id,
+          organization: order.organization.name,
+          pharmacyId: selectedPharmacyId,
+          timestamp: new Date().toISOString(),
+          price: selectedPrice
+        });
       }
     }
   };
@@ -583,6 +611,18 @@ export const Pharmacy = () => {
     }
 
     setSubmitting(true);
+
+    const selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
+
+    patientAnalytics.track('Pharmacy Selection Submitted', {
+      orderId: order?.id,
+      pharmacyId: selectedId,
+      pharmacyName: selectedPharmacy?.name,
+      isReroute: !!isReroute,
+      enablePrice: enablePrice,
+      hasPrice: selectedPharmacy?.price !== undefined,
+      price: selectedPharmacy?.price
+    });
 
     if (isDemo) {
       setTimeout(() => {
@@ -754,6 +794,14 @@ export const Pharmacy = () => {
     if (!pharmacyId) return;
 
     setSavingPreferred(true);
+
+    const selectedPharmacy = allPharmacies.find((p) => p.id === pharmacyId);
+
+    patientAnalytics.track('Set Preferred Pharmacy', {
+      orderId: order?.id,
+      pharmacyId: pharmacyId,
+      pharmacyName: selectedPharmacy?.name
+    });
 
     // Handle stp demo
     if (isDemo) {
