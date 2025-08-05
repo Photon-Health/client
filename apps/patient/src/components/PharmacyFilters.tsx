@@ -1,4 +1,5 @@
 import { Button, HStack, Text } from '@chakra-ui/react';
+import { patientAnalytics } from '../configs/analytics';
 
 interface PharmacyFiltersProps {
   enableOpenNow: boolean;
@@ -23,6 +24,10 @@ export const PharmacyFilters = ({
         onClick={() => {
           if (enable24Hr) setEnable24Hr(false);
           setEnableOpenNow(!enableOpenNow);
+          patientAnalytics.track('Toggle 24 Hours Filter', {
+            enabled: !enable24Hr,
+            previousOpenNowState: enableOpenNow
+          });
         }}
       >
         Open Now
@@ -35,6 +40,10 @@ export const PharmacyFilters = ({
         onClick={() => {
           if (setEnableOpenNow) setEnableOpenNow(false);
           setEnable24Hr(!enable24Hr);
+          patientAnalytics.track('Toggle Open Now Filter', {
+            enabled: !enable24Hr,
+            previous24HrState: enable24Hr
+          });
         }}
       >
         24 Hours

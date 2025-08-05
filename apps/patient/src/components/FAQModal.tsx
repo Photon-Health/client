@@ -13,10 +13,20 @@ import {
 } from '@chakra-ui/react';
 import { Card } from './Card';
 import { FAQContents } from './FAQ';
+import { patientAnalytics } from '../configs/analytics';
 
 export const FAQModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const handleClose = () => {
+    patientAnalytics.track('Close FAQ Modal');
+    onClose();
+  };
+
+  const handleMessageSupport = () => {
+    patientAnalytics.track('Message Support');
+  };
+
   return (
-    <Modal onClose={onClose} isOpen={isOpen} size="full">
+    <Modal onClose={handleClose} isOpen={isOpen} size="full">
       <ModalOverlay />
       <ModalContent backgroundColor="gray.100" alignItems="center" w="full">
         <ModalHeader>Frequently Asked Questions</ModalHeader>
@@ -44,6 +54,7 @@ export const FAQModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       color="blue.500"
                       href={`sms:${process.env.REACT_APP_TWILIO_SMS_NUMBER}`}
                       w="full"
+                      onClick={handleMessageSupport}
                     >
                       Message support
                     </Button>
