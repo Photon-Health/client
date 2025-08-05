@@ -51,6 +51,10 @@ function headerText(props: OrderStatusHeaderProps) {
         return 'Order issue';
       case 'EXTERNAL_TRANSFER':
         return 'Order transferred';
+      case 'DOCTOR_NOT_LICENSED_IN_STATE':
+        return 'Order issue';
+      case 'SUPERVISING_PHYSICIAN_NEEDED':
+        return 'Order issue';
       default:
         break;
     }
@@ -108,6 +112,12 @@ function subheaderText(props: OrderStatusHeaderProps) {
   }
   if (props.exception === 'EXTERNAL_TRANSFER') {
     return 'Please contact your original pharmacy if you have questions.';
+  }
+  if (props.exception === 'DOCTOR_NOT_LICENSED_IN_STATE') {
+    return 'Please contact your provider to resolve this issue.';
+  }
+  if (props.exception === 'SUPERVISING_PHYSICIAN_NEEDED') {
+    return 'Please contact your provider to resolve this issue.';
   }
 
   // Then just check the status
