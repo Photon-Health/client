@@ -26,6 +26,8 @@ import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { RxLightningBolt } from 'react-icons/rx';
 import { capitalize } from '../utils/formatters';
+import { usePageAnalytics } from '../hooks/usePageAnalytics';
+import { patientAnalytics } from '../configs/analytics';
 
 dayjs.extend(timezone);
 
@@ -38,7 +40,6 @@ const checkDisabled = (option: string): boolean => {
 
 export const ReadyBy = () => {
   const { order, flattenedFills, setOrder } = useOrderContext();
-
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
@@ -52,6 +53,8 @@ export const ReadyBy = () => {
   const [activeTab, setActiveTab] = useState<keyof (typeof t)['readyByOptions']>('Today');
 
   const isMultiRx = flattenedFills.length > 1;
+
+  usePageAnalytics({ pageName: "Patient's Ready By Time" });
 
   const handleSubmit = async () => {
     if (isDemo) {
@@ -79,6 +82,15 @@ export const ReadyBy = () => {
       organization: order.organization.name,
       timestamp: new Date().toISOString(),
       timezone: dayjs.tz.guess()
+    });
+
+    patientAnalytics.track('Submit Ready By Time', {
+      orderId: order?.id,
+      readyBy: selectedTime,
+      readyByDay: selectedDay,
+      readyByTime: readyByTime,
+      timezone: dayjs.tz.guess(),
+      isMultiRx: isMultiRx
     });
 
     setOrder({
@@ -184,6 +196,13 @@ export const ReadyBy = () => {
                         if (!isDisabled) {
                           setSelectedTime(option.label);
                           setSelectedDay(activeTab);
+
+                          patientAnalytics.track('Select Ready By Time', {
+                            orderId: order?.id,
+                            selectedTime: option.label,
+                            selectedDay: activeTab,
+                            isMultiRx: isMultiRx
+                          });
                         }
                       }}
                       m="auto"
