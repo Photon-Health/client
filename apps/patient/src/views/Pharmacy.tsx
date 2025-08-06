@@ -596,6 +596,10 @@ export const Pharmacy = () => {
           price: selectedPrice
         });
       }
+
+      if (shouldTrackOfferImpressionsAndSelections) {
+        patientAnalytics.track('Offer Clicked', pharmacies[index]);
+      }
     }
   };
 
