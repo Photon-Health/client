@@ -8,6 +8,7 @@ import { DiscountCard } from '../__generated__/graphql';
 import { Card } from './Card';
 import goodrxLogo from '../assets/goodrx_logo.png';
 import { formatPrice } from '../utils/formatters';
+import { patientAnalytics } from '../configs/analytics';
 
 export const Coupons = () => {
   const { order } = useOrderContext();
@@ -49,6 +50,11 @@ export const Coupon = ({ coupon }: { coupon: Coupon }) => {
   if (!price || !bin || !pcn || !group || !memberId) {
     return null;
   }
+
+  const handleOpenCouponModal = () => {
+    patientAnalytics.track('Open Coupon Modal', { coupon });
+    setCouponModalOpen(true);
+  };
 
   return (
     <Card>
@@ -101,7 +107,7 @@ export const Coupon = ({ coupon }: { coupon: Coupon }) => {
       </VStack>
       <HStack color="blue.500" w="full" justify="center">
         <Icon as={FiInfo} />
-        <Link fontSize="sm" onClick={() => setCouponModalOpen(true)}>
+        <Link fontSize="sm" onClick={handleOpenCouponModal}>
           {t.howToCoupon}
         </Link>
       </HStack>

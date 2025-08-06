@@ -13,6 +13,7 @@ import {
 import { text as t } from '../utils/text';
 import { useOrderContext } from '../views/Main';
 import { formatDate } from '../utils/formatters';
+import { patientAnalytics } from '../configs/analytics';
 
 export const PrescriptionsList = () => {
   const { flattenedFills } = useOrderContext();
@@ -35,6 +36,9 @@ export const PrescriptionsList = () => {
                         p={0}
                         _expanded={{ bg: 'transparent' }}
                         _focus={{ bg: 'transparent' }}
+                        onClick={() =>
+                          patientAnalytics.track('Toggle Prescription Details', { isExpanded })
+                        }
                       >
                         <VStack me="auto" w="full" align="start">
                           <Text align="start" data-dd-privacy="mask" fontWeight="semibold">
