@@ -79,7 +79,7 @@ export const PickupPharmacyCardList = ({
               pharmacy={pharmacy}
               ordinalPosition={i + numberOfBrandedOptions}
               isAlreadySelected={selectedId === pharmacy.id}
-              shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
+              enabled={shouldTrackOfferImpressionsAndSelections}
             >
               <PharmacyCard
                 pharmacy={pharmacy}

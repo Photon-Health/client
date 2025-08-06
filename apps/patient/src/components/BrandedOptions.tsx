@@ -58,7 +58,7 @@ export const BrandedOptions = ({
             }}
             ordinalPosition={index}
             isAlreadySelected={selectedId === id}
-            shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
+            enabled={shouldTrackOfferImpressionsAndSelections}
           >
             <BrandedPharmacyCard
               pharmacyId={id}
