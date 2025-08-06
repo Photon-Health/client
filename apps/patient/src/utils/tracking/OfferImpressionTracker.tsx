@@ -35,7 +35,8 @@ const OfferImpressionTracker = ({
           isClosingSoon: pharmacy.isClosingSoon,
           isAlreadySelected: isAlreadySelected,
           orderId: order.id,
-          organizationId: order.organization.id
+          organizationId: order.organization.id,
+          organizationName: order.organization.name
         });
       }
     }
