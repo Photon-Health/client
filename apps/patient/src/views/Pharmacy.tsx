@@ -596,10 +596,6 @@ export const Pharmacy = () => {
           price: selectedPrice
         });
       }
-
-      if (shouldTrackOfferImpressionsAndSelections) {
-        patientAnalytics.track('Offer Selected', pharmacies[index]);
-      }
     }
   };
 
@@ -742,7 +738,10 @@ export const Pharmacy = () => {
             if (shouldTrackOfferImpressionsAndSelections) {
               patientAnalytics.track('Offer Selected', {
                 ...selectedPharmacy,
-                ...extraOfferMetadata
+                ...extraOfferMetadata,
+                orderId: order.id,
+                organizationId: order.organization.id + 1,
+                isReroute: !!isReroute
               });
             }
 
