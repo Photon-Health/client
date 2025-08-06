@@ -1,6 +1,10 @@
 import { getOffers } from '../api/internal';
 import { AmazonOffer } from '../components';
-import { Order } from '../utils/models';
+import { EnrichedPharmacy, Order } from '../utils/models';
+import { ExtendedFulfillmentType } from '../utils/models';
+import { Pharmacy as PharmacyType } from '../__generated__/graphql';
+
+import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
 function getNovocareOffers(order: Order): AmazonOffer[] {
   const novocareExperimentSegment = determineNovocareExperimentSegment(order);
@@ -107,4 +111,45 @@ export function determineNovocareExperimentSegment(order: Order): string | undef
   const deliveryType = getDeliveryType();
 
   return deliveryType;
+}
+
+export function getPharmacy(
+  allPharmacies: EnrichedPharmacy[],
+  selectedId: string
+): {
+  type: ExtendedFulfillmentType;
+  selectedPharmacy: { id: string; name: string } | PharmacyType | undefined;
+} {
+  // Fudge it so that we can show the pharmacy card on initial load of the
+  // status view for all types. On my christmas list for 2024 is better
+  // fulfillment types on pharmacies.
+  let type: ExtendedFulfillmentType = 'PICK_UP';
+  let selectedPharmacy: { id: string; name: string } | PharmacyType | undefined = undefined;
+  if (selectedId in capsulePharmacyIdLookup) {
+    type = 'COURIER';
+    selectedPharmacy = { id: selectedId, name: 'Capsule Pharmacy' };
+  } else if (selectedId === process.env.REACT_APP_ALTO_PHARMACY_ID) {
+    type = 'COURIER';
+    selectedPharmacy = { id: selectedId, name: 'Alto Pharmacy' };
+  } else if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
+    type = 'MAIL_ORDER';
+    selectedPharmacy = { id: selectedId, name: 'Amazon Pharmacy' };
+  } else if (selectedId === process.env.REACT_APP_COST_PLUS_PHARMACY_ID) {
+    type = 'MAIL_ORDER';
+    selectedPharmacy = { id: selectedId, name: 'Cost Plus Pharmacy' };
+  } else if (selectedId === process.env.REACT_APP_WALMART_MAIL_ORDER_PHARMACY_ID) {
+    type = 'MAIL_ORDER';
+    selectedPharmacy = { id: selectedId, name: 'Walmart Pharmacy' };
+  } else if (selectedId === process.env.REACT_APP_COSTCO_PHARMACY_ID) {
+    type = 'MAIL_ORDER';
+    selectedPharmacy = { id: selectedId, name: 'Costco Pharmacy' };
+  } else if (selectedId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID) {
+    type = 'MAIL_ORDER';
+    selectedPharmacy = { id: selectedId, name: 'Novocare' };
+  } else {
+    type = 'PICK_UP';
+    selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
+  }
+
+  return { type, selectedPharmacy };
 }
