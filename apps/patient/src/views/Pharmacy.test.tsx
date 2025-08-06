@@ -57,28 +57,6 @@ describe('Pharmacy Component', async () => {
     vi.clearAllMocks();
   });
 
-  describe('default page state', async () => {
-    beforeEach(async () => {
-      getPharmaciesMock.mockResolvedValue({
-        pharmaciesByLocation: [generatePharmacy({ id: 'test-pharmacy-123' })]
-      });
-
-      await renderPharmacy();
-    });
-
-    it('should request pharmacies with prices', async () => {
-      const firstCallArgs = getPharmaciesMock.mock.calls[0][0];
-      expect(firstCallArgs.includePrice).toEqual(true);
-    });
-
-    it('should request pharmacies without prices on toggle click', async () => {
-      getPharmaciesMock.mockClear();
-      await userEvent.click(screen.getByRole('checkbox', { name: 'Show coupon card prices' }));
-      const recentCallArgs = getPharmaciesMock.mock.calls[0][0];
-      expect(recentCallArgs.includePrice).toEqual(false);
-    });
-  });
-
   describe('when pharmacy has coupon and retail price', async () => {
     beforeEach(async () => {
       getPharmaciesMock.mockResolvedValue({
@@ -118,23 +96,34 @@ describe('Pharmacy Component', async () => {
     });
   });
 
-  describe('showPriceToggle visibility', () => {
+  describe('showing prices', () => {
     describe('when order has single non-GLP medication', () => {
       beforeEach(async () => {
+        getPharmaciesMock.mockResolvedValue({
+          pharmaciesByLocation: [generatePharmacy({ id: 'test-pharmacy-123' })]
+        });
         const singleNonGLPFill = [generateFill('Metformin')];
         const order = generateOrder({ fills: singleNonGLPFill });
 
         await renderPharmacy({ order });
       });
-
       it('shows the price toggle switch', async () => {
         expect(
           screen.getByRole('checkbox', { name: 'Show coupon card prices' })
         ).toBeInTheDocument();
       });
-
       it('shows the price toggle text', async () => {
         expect(screen.getByText('Show coupon card prices')).toBeInTheDocument();
+      });
+      it('does request price immediately', async () => {
+        const firstCallArgs = getPharmaciesMock.mock.calls[0][0];
+        expect(firstCallArgs.includePrice).toEqual(true);
+      });
+      it('should request pharmacies without prices on toggle click', async () => {
+        getPharmaciesMock.mockClear();
+        await userEvent.click(screen.getByRole('checkbox', { name: 'Show coupon card prices' }));
+        const recentCallArgs = getPharmaciesMock.mock.calls[0][0];
+        expect(recentCallArgs.includePrice).toEqual(false);
       });
     });
 
@@ -154,6 +143,10 @@ describe('Pharmacy Component', async () => {
       });
       it('hides the price toggle text', async () => {
         expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
+      });
+      it('does not request price', async () => {
+        const firstCallArgs = getPharmaciesMock.mock.calls[0][0];
+        expect(firstCallArgs.includePrice).toEqual(false);
       });
     });
 
@@ -178,6 +171,10 @@ describe('Pharmacy Component', async () => {
       it('hides the price toggle text', async () => {
         expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
       });
+      it('does not request prices', async () => {
+        const firstCallArgs = getPharmaciesMock.mock.calls[0][0];
+        expect(firstCallArgs.includePrice).toEqual(false);
+      });
     });
 
     describe('when order has multiple prescriptions including GLP-1', () => {
@@ -201,6 +198,10 @@ describe('Pharmacy Component', async () => {
       });
       it('hides the price toggle text', async () => {
         expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
+      });
+      it('does not request prices', async () => {
+        const firstCallArgs = getPharmaciesMock.mock.calls[0][0];
+        expect(firstCallArgs.includePrice).toEqual(false);
       });
     });
   });
