@@ -14,3 +14,26 @@ vi.mock('@datadog/browser-rum', () => ({
 vi.mock('@client/settings', () => ({
   getOrgMailOrderPharms: vi.fn(() => ({ patient: [] }))
 }));
+
+if (typeof window !== 'undefined' && !('IntersectionObserver' in window)) {
+  class IntersectionObserver {
+    constructor() {}
+    observe() {
+      return null;
+    }
+    unobserve() {
+      return null;
+    }
+    disconnect() {
+      return null;
+    }
+    takeRecords() {
+      return [];
+    }
+  }
+  // @ts-ignore
+  window.IntersectionObserver = IntersectionObserver;
+  // @ts-ignore
+  // eslint-disable-next-line no-undef
+  global.IntersectionObserver = IntersectionObserver;
+}
