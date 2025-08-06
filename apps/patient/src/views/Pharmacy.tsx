@@ -598,7 +598,12 @@ export const Pharmacy = () => {
       }
 
       if (shouldTrackOfferImpressionsAndSelections) {
-        patientAnalytics.track('Offer Clicked', pharmacies[index]);
+        patientAnalytics.track('Offer Clicked', {
+          ...pharmacies[index],
+          orderId: order.id,
+          organizationName: order.organization.name,
+          pharmacyId: selectedPharmacyId
+        });
       }
     }
   };
@@ -740,11 +745,22 @@ export const Pharmacy = () => {
             const { type, selectedPharmacy } = getPharmacy(allPharmacies, selectedId);
 
             if (shouldTrackOfferImpressionsAndSelections) {
+              const brandedOptionObjects = brandedOptions.map((id) => ({
+                id
+              }));
+
               patientAnalytics.track('Offer Selected', {
                 ...selectedPharmacy,
                 ...extraOfferMetadata,
+                pharmacyId: selectedId,
                 orderId: order.id,
-                organizationId: order.organization.id + 1
+                organizationId: order.organization.id,
+                organizationName: order.organization.name,
+                // allPharmacies does not included branded options so we must combine them
+                ordinalPosition:
+                  [...brandedOptionObjects, ...allPharmacies].findIndex(
+                    (p) => p.id === selectedId
+                  ) + 1
               });
             }
 
