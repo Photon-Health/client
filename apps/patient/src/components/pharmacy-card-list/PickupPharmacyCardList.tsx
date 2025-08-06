@@ -5,6 +5,7 @@ import { text as t } from '../../utils/text';
 import { HolidayAlert } from '../HolidayAlert';
 import { PharmacyCard } from '../PharmacyCard';
 import { PharmacyFilters } from '../PharmacyFilters';
+import { OfferImpressionTracker } from '../../utils/tracking/OfferImpressionTracker';
 
 interface PickupPharmacyCardListProps {
   pharmacies: EnrichedPharmacy[];
@@ -25,6 +26,8 @@ interface PickupPharmacyCardListProps {
   location: string;
   currentPharmacyId?: string;
   setCouponModalOpen: (isOpen: boolean) => void;
+  numberOfBrandedOptions: number;
+  shouldTrackOfferImpressionsAndSelections: boolean;
 }
 
 export const PickupPharmacyCardList = ({
@@ -42,7 +45,9 @@ export const PickupPharmacyCardList = ({
   enable24Hr,
   setEnableOpenNow,
   setEnable24Hr,
-  currentPharmacyId
+  currentPharmacyId,
+  numberOfBrandedOptions = 0,
+  shouldTrackOfferImpressionsAndSelections
 }: PickupPharmacyCardListProps) => {
   return (
     <VStack spacing={3} align="span" w="full">
@@ -70,17 +75,24 @@ export const PickupPharmacyCardList = ({
       <VStack align="span" spacing={2}>
         {pharmacies.map((pharmacy: EnrichedPharmacy, i: number) => (
           <SlideFade offsetY="60px" in={true} key={`pickup-pharmacy-${pharmacy.id}-${i}`}>
-            <PharmacyCard
+            <OfferImpressionTracker
               pharmacy={pharmacy}
-              preferred={pharmacy.id === preferredPharmacy}
-              savingPreferred={savingPreferred}
-              selected={selectedId === pharmacy.id}
-              onSelect={() => handleSelect(pharmacy.id)}
-              onSetPreferred={() => handleSetPreferred(pharmacy.id)}
-              selectable={true}
-              showPrice
-              isCurrentPharmacy={pharmacy.id === currentPharmacyId}
-            />
+              ordinalPosition={i + numberOfBrandedOptions}
+              isAlreadySelected={selectedId === pharmacy.id}
+              enabled={shouldTrackOfferImpressionsAndSelections}
+            >
+              <PharmacyCard
+                pharmacy={pharmacy}
+                preferred={pharmacy.id === preferredPharmacy}
+                savingPreferred={savingPreferred}
+                selected={selectedId === pharmacy.id}
+                onSelect={() => handleSelect(pharmacy.id)}
+                onSetPreferred={() => handleSetPreferred(pharmacy.id)}
+                selectable={true}
+                showPrice
+                isCurrentPharmacy={pharmacy.id === currentPharmacyId}
+              />
+            </OfferImpressionTracker>
           </SlideFade>
         ))}
       </VStack>
