@@ -30,7 +30,7 @@ import {
 } from '../components';
 import * as TOAST_CONFIG from '../configs/toast';
 import { preparePharmacy } from '../utils/general';
-import { ExtendedFulfillmentType, Pharmacy as EnrichedPharmacy } from '../utils/models';
+import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 
@@ -43,14 +43,13 @@ import {
   triggerDemoNotification
 } from '../api';
 
-import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { demoPharmacies } from '../data/demoPharmacies';
 import { isGLP } from '../utils/isGLP';
 import { datadogRum } from '@datadog/browser-rum';
-import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__generated__/graphql';
+import { GetPharmaciesByLocationQuery } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
-import { fetchOffers } from './pharmacy.utils';
+import { fetchOffers, getPharmacy } from './pharmacy.utils';
 import _ from 'lodash';
 import { PickupPharmacyCardList } from '../components/pharmacy-card-list';
 import { formatAddress } from '../utils/formatters';
@@ -596,6 +595,8 @@ export const Pharmacy = () => {
           price: selectedPrice
         });
       }
+
+      patientAnalytics.track('Offer Selected', pharmacies[index]);
     }
   };
 
@@ -671,10 +672,16 @@ export const Pharmacy = () => {
           setTimeout(async () => {
             setShowFooter(false);
 
+            const extraOfferMetadata: Record<string, any> = {};
+
             if (brandedOptionsOverride?.amazonPharmacyOverride) {
               const sawPrice =
                 brandedOptionsOverride?.amazonPharmacyOverride?.costAmount !== undefined;
               const priceType = brandedOptionsOverride?.amazonPharmacyOverride?.costType;
+
+              extraOfferMetadata.sawPrice = sawPrice;
+              extraOfferMetadata.price = brandedOptionsOverride?.amazonPharmacyOverride?.costAmount;
+              extraOfferMetadata.priceType = priceType;
 
               const slugifiedOverride =
                 brandedOptionsOverride?.amazonPharmacyOverride.deliveryEstimate
@@ -727,37 +734,12 @@ export const Pharmacy = () => {
               }
             }
 
-            // Fudge it so that we can show the pharmacy card on initial load of the
-            // status view for all types. On my christmas list for 2024 is better
-            // fulfillment types on pharmacies.
-            let type: ExtendedFulfillmentType = 'PICK_UP';
-            let selectedPharmacy: { id: string; name: string } | PharmacyType | undefined =
-              undefined;
-            if (selectedId in capsulePharmacyIdLookup) {
-              type = 'COURIER';
-              selectedPharmacy = { id: selectedId, name: 'Capsule Pharmacy' };
-            } else if (selectedId === process.env.REACT_APP_ALTO_PHARMACY_ID) {
-              type = 'COURIER';
-              selectedPharmacy = { id: selectedId, name: 'Alto Pharmacy' };
-            } else if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
-              type = 'MAIL_ORDER';
-              selectedPharmacy = { id: selectedId, name: 'Amazon Pharmacy' };
-            } else if (selectedId === process.env.REACT_APP_COST_PLUS_PHARMACY_ID) {
-              type = 'MAIL_ORDER';
-              selectedPharmacy = { id: selectedId, name: 'Cost Plus Pharmacy' };
-            } else if (selectedId === process.env.REACT_APP_WALMART_MAIL_ORDER_PHARMACY_ID) {
-              type = 'MAIL_ORDER';
-              selectedPharmacy = { id: selectedId, name: 'Walmart Pharmacy' };
-            } else if (selectedId === process.env.REACT_APP_COSTCO_PHARMACY_ID) {
-              type = 'MAIL_ORDER';
-              selectedPharmacy = { id: selectedId, name: 'Costco Pharmacy' };
-            } else if (selectedId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID) {
-              type = 'MAIL_ORDER';
-              selectedPharmacy = { id: selectedId, name: 'Novocare' };
-            } else {
-              type = 'PICK_UP';
-              selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
-            }
+            const { type, selectedPharmacy } = getPharmacy(allPharmacies, selectedId);
+
+            patientAnalytics.track('Offer Selected', {
+              ...selectedPharmacy,
+              ...extraOfferMetadata
+            });
 
             setOrder({
               ...order,
@@ -929,6 +911,7 @@ export const Pharmacy = () => {
       setEnable24Hr={setEnable24Hr}
       currentPharmacyId={order.pharmacy?.id}
       setCouponModalOpen={setCouponModalOpen}
+      numberOfBrandedOptions={brandedOptions.length}
     />
   );
 
