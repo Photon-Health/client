@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useInView } from 'react-intersection-observer';
 import { patientAnalytics } from '../../configs/analytics';
 import { EnrichedPharmacy } from '../models';
+import { useOrderContext } from '../../views/Main';
 
 const OfferImpressionTracker = ({
   children,
@@ -16,6 +17,8 @@ const OfferImpressionTracker = ({
   isAlreadySelected: boolean;
   enabled: boolean;
 }) => {
+  const { order } = useOrderContext();
+
   const { ref } = useInView({
     triggerOnce: true,
     rootMargin: '-100px',
@@ -30,7 +33,9 @@ const OfferImpressionTracker = ({
           showReadyIn30Min: pharmacy.showReadyIn30Min,
           is24Hr: pharmacy.is24Hr,
           isClosingSoon: pharmacy.isClosingSoon,
-          isAlreadySelected: isAlreadySelected
+          isAlreadySelected: isAlreadySelected,
+          orderId: order.id,
+          organizationId: order.organization.id
         });
       }
     }
