@@ -7,18 +7,20 @@ const OfferImpressionTracker = ({
   children,
   pharmacy,
   ordinalPosition,
-  isAlreadySelected
+  isAlreadySelected,
+  shouldTrackOfferImpressionsAndSelections
 }: {
   children: React.ReactNode;
   pharmacy: EnrichedPharmacy;
   ordinalPosition: number;
   isAlreadySelected: boolean;
+  shouldTrackOfferImpressionsAndSelections: boolean;
 }) => {
   const { ref } = useInView({
     triggerOnce: true,
     rootMargin: '-100px',
     onChange: (inView) => {
-      if (inView) {
+      if (inView && shouldTrackOfferImpressionsAndSelections) {
         patientAnalytics.track('Offer Impression', {
           pharmacy_id: pharmacy.id,
           pharmacy_name: pharmacy.name,

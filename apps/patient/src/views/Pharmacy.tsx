@@ -120,6 +120,7 @@ export const Pharmacy = () => {
   const orderIsMultiRx = flattenedFills.length > 1;
   // note: prices are only for single-rx, non-GLP-1 right now
   const showPriceToggle = (!orderContainsGLP1Medication && !orderIsMultiRx) ?? false;
+  const shouldTrackOfferImpressionsAndSelections = showPriceToggle && !isDemo;
 
   // filters
   const [enableOpenNow, setEnableOpenNow] = useState(
@@ -596,7 +597,9 @@ export const Pharmacy = () => {
         });
       }
 
-      patientAnalytics.track('Offer Selected', pharmacies[index]);
+      if (shouldTrackOfferImpressionsAndSelections) {
+        patientAnalytics.track('Offer Selected', pharmacies[index]);
+      }
     }
   };
 
@@ -736,10 +739,12 @@ export const Pharmacy = () => {
 
             const { type, selectedPharmacy } = getPharmacy(allPharmacies, selectedId);
 
-            patientAnalytics.track('Offer Selected', {
-              ...selectedPharmacy,
-              ...extraOfferMetadata
-            });
+            if (shouldTrackOfferImpressionsAndSelections) {
+              patientAnalytics.track('Offer Selected', {
+                ...selectedPharmacy,
+                ...extraOfferMetadata
+              });
+            }
 
             setOrder({
               ...order,
@@ -885,6 +890,7 @@ export const Pharmacy = () => {
       handleSelect={handleSelect}
       fulfillingPharmacyId={order.pharmacy?.id}
       brandedOptionOverrides={brandedOptionsOverride ?? {}}
+      shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
     />
   );
 
@@ -912,6 +918,7 @@ export const Pharmacy = () => {
       currentPharmacyId={order.pharmacy?.id}
       setCouponModalOpen={setCouponModalOpen}
       numberOfBrandedOptions={brandedOptions.length}
+      shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
     />
   );
 
