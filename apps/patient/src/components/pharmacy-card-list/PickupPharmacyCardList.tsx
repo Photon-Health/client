@@ -27,6 +27,7 @@ interface PickupPharmacyCardListProps {
   currentPharmacyId?: string;
   setCouponModalOpen: (isOpen: boolean) => void;
   numberOfBrandedOptions: number;
+  shouldTrackOfferImpressionsAndSelections: boolean;
 }
 
 export const PickupPharmacyCardList = ({
@@ -45,7 +46,8 @@ export const PickupPharmacyCardList = ({
   setEnableOpenNow,
   setEnable24Hr,
   currentPharmacyId,
-  numberOfBrandedOptions = 0
+  numberOfBrandedOptions = 0,
+  shouldTrackOfferImpressionsAndSelections
 }: PickupPharmacyCardListProps) => {
   return (
     <VStack spacing={3} align="span" w="full">
@@ -77,6 +79,7 @@ export const PickupPharmacyCardList = ({
               pharmacy={pharmacy}
               ordinalPosition={i + numberOfBrandedOptions}
               isAlreadySelected={selectedId === pharmacy.id}
+              enabled={shouldTrackOfferImpressionsAndSelections}
             >
               <PharmacyCard
                 pharmacy={pharmacy}
