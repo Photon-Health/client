@@ -740,8 +740,7 @@ export const Pharmacy = () => {
                 ...selectedPharmacy,
                 ...extraOfferMetadata,
                 orderId: order.id,
-                organizationId: order.organization.id + 1,
-                isReroute: !!isReroute
+                organizationId: order.organization.id + 1
               });
             }
 
