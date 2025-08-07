@@ -57,6 +57,18 @@ export const Main = () => {
   const settings = order?.organization.settings;
 
   useEffect(() => {
+    // track when a user closes the tab or browses away
+    return () => {
+      patientAnalytics.track('Patient App Closed', {
+        orderId: order?.id,
+        patientId: order?.patient.id,
+        organizationId: order?.organization.id,
+        environment: process.env.REACT_APP_ENV_NAME || 'development'
+      });
+    };
+  }, [order]);
+
+  useEffect(() => {
     if (order?.patient.id && order?.organization.id && order?.organization.name && order?.address) {
       patientAnalytics.identify({
         userId: order.patient.id,
@@ -95,7 +107,8 @@ export const Main = () => {
             patientId: payload.sub,
             organizationId: payload.organizationId,
             context: payload.context,
-            metadata: payload.metadata
+            metadata: payload.metadata,
+            environment: process.env.REACT_APP_ENV_NAME || 'development'
           });
         } catch (e) {
           console.error('Failed to parse JWT token', e);
@@ -121,8 +134,6 @@ export const Main = () => {
 
   const handleOrderResponse = useCallback(
     (newOrder: Order, currentPharmacy?: Pharmacy) => {
-      console.log('handleOrderResponse', newOrder);
-
       // This is weird, but it's necessary to show the selected pharmacy
       // when the user goes from selection to the status page
       setOrder({
