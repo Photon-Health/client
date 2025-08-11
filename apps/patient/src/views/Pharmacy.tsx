@@ -654,6 +654,8 @@ export const Pharmacy = () => {
 
       setTimeout(() => {
         if (result) {
+          // setSuccessfullySubmitted(true) shows a "Thank you" message in the button temporarily, during the setTimeout
+          // refactoring to an "await delay(1000)"-style timeout breaks this for some reason
           setSuccessfullySubmitted(true);
           setTimeout(async () => {
             setShowFooter(false);
