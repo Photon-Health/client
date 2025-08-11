@@ -174,5 +174,10 @@
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.37.0"
+  },
+  "overrides": {
+    "@chakra-ui/react": {
+      "@zag-js/focus-visible": "^1.18.0"
+    }
   }
 }

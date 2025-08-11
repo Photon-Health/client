@@ -24,7 +24,8 @@ vi.mock('../api', () => ({
   rerouteOrder: vi.fn(),
   setOrderPharmacy: vi.fn(),
   setPreferredPharmacy: vi.fn(),
-  triggerDemoNotification: vi.fn()
+  triggerDemoNotification: vi.fn(),
+  getOffers: vi.fn().mockResolvedValue([])
 }));
 
 vi.mock('../components', () => ({
