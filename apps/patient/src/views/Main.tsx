@@ -9,12 +9,12 @@ import {
   useSearchParams
 } from 'react-router-dom';
 
-import { AUTH_HEADER_ERRORS, getOrder } from '../api/internal';
+import { AUTH_HEADER_ERRORS, getOrder } from '../api';
 import { Nav } from '../components';
 import { setAuthHeader } from '../configs/graphqlClient';
 import theme from '../configs/theme';
 import { demoOrder } from '../data/demoOrder';
-import { FillWithCount, countFillsAndRemoveDuplicates } from '../utils/general';
+import { countFillsAndRemoveDuplicates, FillWithCount } from '../utils/general';
 import { Order } from '../utils/models';
 import { Pharmacy } from '../__generated__/graphql';
 import { FAQModal } from '../components/FAQModal';

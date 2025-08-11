@@ -1,7 +1,6 @@
-import { getOffers } from '../api/internal';
-import { AmazonOffer } from '../components';
-import { EnrichedPharmacy, Order } from '../utils/models';
-import { ExtendedFulfillmentType } from '../utils/models';
+import { getOffers } from '../api';
+import { AmazonOffer } from '../components/pharmacy-card-list';
+import { EnrichedPharmacy, ExtendedFulfillmentType, Order } from '../utils/models';
 import { Pharmacy as PharmacyType } from '../__generated__/graphql';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
