@@ -1,9 +1,9 @@
 import { Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
 
-import { text as t } from '../utils/text';
+import { text as t } from '../../utils/text';
 import { BrandedPharmacyCard } from './BrandedPharmacyCard';
-import { OfferImpressionTracker } from '../utils/tracking/OfferImpressionTracker';
-import { getPharmacy } from '../views/pharmacy.utils';
+import { OfferImpressionTracker } from '../../utils/tracking/OfferImpressionTracker';
+import { getPharmacy } from '../../views/pharmacy.utils';
 
 interface Props {
   options: string[];
