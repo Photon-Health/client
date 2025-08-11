@@ -40,6 +40,29 @@ export const generateFill = (treatmentName: string): Order['fills'][number] => (
   }
 });
 
+type Fulfillment = Order['fulfillments'][number];
+export const generateFulfillment = (overrides: Partial<Fulfillment> = {}): Fulfillment => ({
+  id: `ful_testIdDefault`,
+  state: 'READY',
+  exceptions: [],
+  prescription: generatePrescription(),
+  ...overrides
+});
+
+type Prescription = Fulfillment['prescription'];
+export const generatePrescription = (): Prescription => ({
+  id: `rx_testIdDefault`,
+  dispenseQuantity: 0,
+  dispenseUnit: '',
+  expirationDate: undefined,
+  fillsAllowed: 0,
+  treatment: {
+    __typename: undefined,
+    id: '',
+    name: ''
+  }
+});
+
 export const generateFlattenedFill = (override: Partial<FillWithCount>): FillWithCount => ({
   id: `fil_testIdDefault`,
   count: 1,
