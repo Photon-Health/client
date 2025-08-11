@@ -107,7 +107,7 @@ export const ReadyBy = () => {
   useEffect(() => {
     if (selectedTime) {
       // Scroll to bottom to make sure selection isn't hidden by footer
-      window.scrollTo({ top: document.getElementById('root')!.scrollHeight, behavior: 'smooth' });
+      window.scrollTo({ top: document.getElementById('root')?.scrollHeight, behavior: 'smooth' });
     }
   }, [selectedTime]);
 

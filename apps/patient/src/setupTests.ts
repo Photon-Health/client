@@ -37,3 +37,5 @@ if (typeof window !== 'undefined' && !('IntersectionObserver' in window)) {
   // eslint-disable-next-line no-undef
   global.IntersectionObserver = IntersectionObserver;
 }
+
+vi.stubGlobal('scrollTo', vi.fn());
