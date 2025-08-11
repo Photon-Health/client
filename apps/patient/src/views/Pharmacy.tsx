@@ -39,7 +39,7 @@ import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { demoPharmacies } from '../data/demoPharmacies';
 import { isGLP } from '../utils/isGLP';
 import { datadogRum } from '@datadog/browser-rum';
-import { GetPharmaciesByLocationQuery } from '../__generated__/graphql';
+import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { fetchOffers, getPharmacy } from './pharmacy.utils';
 import _ from 'lodash';
@@ -631,28 +631,7 @@ export const Pharmacy = () => {
     });
 
     if (isDemo) {
-      setTimeout(() => {
-        setSuccessfullySubmitted(true);
-        setTimeout(() => {
-          setShowFooter(false);
-
-          // Add selected pharmacy to order context so /status shows pharmacy on render
-          const selectedPharmacy = allPharmacies.find((p) => p.id === selectedId)!;
-          setOrder({ ...order, pharmacy: selectedPharmacy });
-
-          // Send order placed sms to demo participant
-          triggerDemoNotification(
-            phone!,
-            'photon:order:placed',
-            selectedPharmacy.name,
-            formatAddress(selectedPharmacy.address!)
-          );
-
-          navigate(`/status?demo=true&phone=${phone}`);
-        }, 1000);
-        setSubmitting(false);
-      }, 1000);
-
+      handleDemoSubmit();
       return;
     }
 
@@ -671,95 +650,15 @@ export const Pharmacy = () => {
             patientSelectedPrice
           );
 
+      const { type, selectedPharmacy } = getPharmacy(allPharmacies, selectedId);
+
       setTimeout(() => {
         if (result) {
           setSuccessfullySubmitted(true);
           setTimeout(async () => {
             setShowFooter(false);
 
-            const extraOfferMetadata: Record<string, any> = {};
-
-            if (brandedOptionsOverride?.amazonPharmacyOverride) {
-              const sawPrice =
-                brandedOptionsOverride?.amazonPharmacyOverride?.costAmount !== undefined;
-              const priceType = brandedOptionsOverride?.amazonPharmacyOverride?.costType;
-
-              extraOfferMetadata.sawPrice = sawPrice;
-              extraOfferMetadata.price = brandedOptionsOverride?.amazonPharmacyOverride?.costAmount;
-              extraOfferMetadata.priceType = priceType;
-
-              const slugifiedOverride =
-                brandedOptionsOverride?.amazonPharmacyOverride.deliveryEstimate
-                  ?.toLowerCase()
-                  .trim()
-                  .replace(/\s+/g, '_')
-                  .replace(/[^a-z0-9_]/g, '')
-                  .replace(/_+/g, '_')
-                  .replace(/^_+|_+$/g, '');
-              if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
-                datadogRum.addAction('amazon_pharmacy_offer_active_and_selected', {
-                  orderId: order.id,
-                  organizationId: order.organization.id,
-                  description: slugifiedOverride,
-                  treatmentId: flattenedFills[0]?.treatment?.id,
-                  timestamp: new Date().toISOString(),
-                  sawPrice,
-                  costAmount: brandedOptionsOverride?.amazonPharmacyOverride?.costAmount,
-                  priceType,
-                  offers
-                });
-              } else {
-                datadogRum.addAction('amazon_pharmacy_offer_active_and_not_selected', {
-                  orderId: order.id,
-                  organizationId: order.organization.id,
-                  description: slugifiedOverride,
-                  treatmentId: flattenedFills[0]?.treatment?.id,
-                  timestamp: new Date().toISOString(),
-                  sawPrice,
-                  costAmount: brandedOptionsOverride?.amazonPharmacyOverride?.costAmount,
-                  priceType,
-                  offers
-                });
-              }
-            }
-
-            if (brandedOptionsOverride?.novocareExperimentOverride) {
-              if (selectedId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID) {
-                datadogRum.addAction('novocare_experiment_offer_active_and_selected', {
-                  orderId: order.id,
-                  organizationId: order.organization.id,
-                  timestamp: new Date().toISOString()
-                });
-              } else {
-                datadogRum.addAction('novocare_experiment_offer_active_and_not_selected', {
-                  orderId: order.id,
-                  organizationId: order.organization.id,
-                  timestamp: new Date().toISOString()
-                });
-              }
-            }
-
-            const { type, selectedPharmacy } = getPharmacy(allPharmacies, selectedId);
-
-            if (shouldTrackOfferImpressionsAndSelections) {
-              const brandedOptionObjects = brandedOptions.map((id) => ({
-                id
-              }));
-
-              patientAnalytics.track('Offer Selected', {
-                ...selectedPharmacy,
-                ...extraOfferMetadata,
-                pharmacyId: selectedId,
-                orderId: order.id,
-                organizationId: order.organization.id,
-                organizationName: order.organization.name,
-                // allPharmacies does not included branded options so we must combine them
-                ordinalPosition:
-                  [...brandedOptionObjects, ...allPharmacies].findIndex(
-                    (p) => p.id === selectedId
-                  ) + 1
-              });
-            }
+            handleSubmitSuccessAnalytics(selectedPharmacy);
 
             setOrder({
               ...order,
@@ -840,6 +739,112 @@ export const Pharmacy = () => {
       setSavingPreferred(false);
 
       console.error(JSON.stringify(error, undefined, 2));
+    }
+  };
+
+  const handleDemoSubmit = () => {
+    setTimeout(() => {
+      setSuccessfullySubmitted(true);
+      setTimeout(() => {
+        setShowFooter(false);
+
+        // Add selected pharmacy to order context so /status shows pharmacy on render
+        const selectedPharmacy = allPharmacies.find((p) => p.id === selectedId)!;
+        setOrder({ ...order, pharmacy: selectedPharmacy });
+
+        // Send order placed sms to demo participant
+        triggerDemoNotification(
+          phone!,
+          'photon:order:placed',
+          selectedPharmacy.name,
+          formatAddress(selectedPharmacy.address!)
+        );
+
+        navigate(`/status?demo=true&phone=${phone}`);
+      }, 1000);
+      setSubmitting(false);
+    }, 1000);
+  };
+
+  const handleSubmitSuccessAnalytics = (
+    selectedPharmacy: { id: string; name: string } | PharmacyType | undefined
+  ) => {
+    const extraOfferMetadata: Record<string, any> = {};
+
+    if (brandedOptionsOverride?.amazonPharmacyOverride) {
+      const sawPrice = brandedOptionsOverride?.amazonPharmacyOverride?.costAmount !== undefined;
+      const priceType = brandedOptionsOverride?.amazonPharmacyOverride?.costType;
+
+      extraOfferMetadata.sawPrice = sawPrice;
+      extraOfferMetadata.price = brandedOptionsOverride?.amazonPharmacyOverride?.costAmount;
+      extraOfferMetadata.priceType = priceType;
+
+      const slugifiedOverride = brandedOptionsOverride?.amazonPharmacyOverride.deliveryEstimate
+        ?.toLowerCase()
+        .trim()
+        .replace(/\s+/g, '_')
+        .replace(/[^a-z0-9_]/g, '')
+        .replace(/_+/g, '_')
+        .replace(/^_+|_+$/g, '');
+      if (selectedId === process.env.REACT_APP_AMAZON_PHARMACY_ID) {
+        datadogRum.addAction('amazon_pharmacy_offer_active_and_selected', {
+          orderId: order.id,
+          organizationId: order.organization.id,
+          description: slugifiedOverride,
+          treatmentId: flattenedFills[0]?.treatment?.id,
+          timestamp: new Date().toISOString(),
+          sawPrice,
+          costAmount: brandedOptionsOverride?.amazonPharmacyOverride?.costAmount,
+          priceType,
+          offers
+        });
+      } else {
+        datadogRum.addAction('amazon_pharmacy_offer_active_and_not_selected', {
+          orderId: order.id,
+          organizationId: order.organization.id,
+          description: slugifiedOverride,
+          treatmentId: flattenedFills[0]?.treatment?.id,
+          timestamp: new Date().toISOString(),
+          sawPrice,
+          costAmount: brandedOptionsOverride?.amazonPharmacyOverride?.costAmount,
+          priceType,
+          offers
+        });
+      }
+    }
+
+    if (brandedOptionsOverride?.novocareExperimentOverride) {
+      if (selectedId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID) {
+        datadogRum.addAction('novocare_experiment_offer_active_and_selected', {
+          orderId: order.id,
+          organizationId: order.organization.id,
+          timestamp: new Date().toISOString()
+        });
+      } else {
+        datadogRum.addAction('novocare_experiment_offer_active_and_not_selected', {
+          orderId: order.id,
+          organizationId: order.organization.id,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+
+    if (shouldTrackOfferImpressionsAndSelections) {
+      const brandedOptionObjects = brandedOptions.map((id) => ({
+        id
+      }));
+
+      patientAnalytics.track('Offer Selected', {
+        ...selectedPharmacy,
+        ...extraOfferMetadata,
+        pharmacyId: selectedId,
+        orderId: order.id,
+        organizationId: order.organization.id,
+        organizationName: order.organization.name,
+        // allPharmacies does not included branded options so we must combine them
+        ordinalPosition:
+          [...brandedOptionObjects, ...allPharmacies].findIndex((p) => p.id === selectedId) + 1
+      });
     }
   };
 
