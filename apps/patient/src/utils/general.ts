@@ -7,10 +7,15 @@ import utc from 'dayjs/plugin/utc';
 import costcoLogo from '../assets/costco_logo_small.png';
 import walgreensLogo from '../assets/walgreens_logo_small_circle.png';
 import { COMMON_COURIER_PHARMACY_IDS } from '../data/courierPharmacys';
-import { EnrichedPharmacy, Fill, OrderFulfillment, Pharmacy } from './models';
-import { ExtendedFulfillmentType } from './models';
+import {
+  EnrichedPharmacy,
+  ExtendedFulfillmentType,
+  Fill,
+  OrderFulfillment,
+  Pharmacy
+} from './models';
 import { PharmacyCloseEvent, PharmacyEvent, PharmacyOpenEvent } from '../__generated__/graphql';
-import { PHARMACY_BRANDING } from '../components';
+import { PHARMACY_BRANDING } from '../components/pharmacy-card-list';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -55,14 +60,17 @@ export const getFulfillmentType = (
 export type FillWithCount = Fill & { count: number };
 export const countFillsAndRemoveDuplicates = (fills: (Fill | FillWithCount)[]): FillWithCount[] => {
   // First, count the occurrences of each treatment.id
-  const counts = fills.reduce((acc, fill) => {
-    const id = fill.treatment.id;
-    if (!(id in acc)) {
-      acc[id] = 0;
-    }
-    acc[id] += 'count' in fill ? fill.count : 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const counts = fills.reduce(
+    (acc, fill) => {
+      const id = fill.treatment.id;
+      if (!(id in acc)) {
+        acc[id] = 0;
+      }
+      acc[id] += 'count' in fill ? fill.count : 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   // Then, create a map of distinct fills with updated counts
   const distinctFills = fills.reduce((acc: Map<string, FillWithCount>, fill) => {
