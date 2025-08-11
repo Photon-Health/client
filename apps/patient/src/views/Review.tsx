@@ -22,8 +22,8 @@ export const Review = () => {
 
   const handleCtaClick = () => {
     const toUrl = isDemo
-      ? `/readyBy?demo=true&phone=${phone}`
-      : `/readyBy?orderId=${order.id}&token=${token}`;
+      ? `/pharmacy?demo=true&phone=${phone}`
+      : `/pharmacy?orderId=${order.id}&token=${token}`;
     navigate(toUrl);
 
     patientAnalytics.track('Proceed to Ready By', {

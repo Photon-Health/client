@@ -58,7 +58,10 @@ vi.mock('./components', () => ({
   Coupons: () => <div data-testid="coupons">Coupons</div>
 }));
 
-describe('App', () => {
+const testMailOrderPharmacyId = 'test-mail-order-pharmacy-id';
+process.env.REACT_APP_AMAZON_PHARMACY_ID = testMailOrderPharmacyId;
+
+describe('App Navigation', () => {
   const testOrder = generateOrder({
     id: 'ord_testId777',
     state: 'ROUTING',
@@ -71,7 +74,7 @@ describe('App', () => {
     vi.clearAllMocks();
   });
 
-  test('navigates from review page to readyBy to pharmacy to status', async () => {
+  test('pickup pharmacy selection navigates from review page to pharmacy to readyAt to status', async () => {
     const { getPharmacies, setOrderPharmacy, getOrder } = await import('./api');
     const getOrderMock = vi.mocked(getOrder);
     getOrderMock.mockResolvedValue(testOrder);
@@ -93,19 +96,58 @@ describe('App', () => {
 
     expect(await screen.findByText('Review your prescription')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
-    expect(await screen.findByText('When do you need your order ready by?')).toBeInTheDocument();
-    await userEvent.click(screen.getByText('Urgent'));
-    await userEvent.click(screen.getByText('Next'));
-    expect(setOrderPharmacyMock).not.toHaveBeenCalled();
     expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
     await userEvent.click(screen.getByText('Test Local Pickup Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
+    expect(setOrderPharmacyMock).not.toHaveBeenCalled();
+
+    expect(await screen.findByText('When do you need your order ready by?')).toBeInTheDocument();
+    await userEvent.click(screen.getByText('Urgent'));
+    await userEvent.click(screen.getByText('Next'));
+
     expect(setOrderPharmacyMock).toHaveBeenCalledWith(
       'ord_testId777',
       'phr_testId123',
       'Urgent',
       'Today',
       expect.anything(),
+      true
+    );
+    await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
+    expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
+  }, 10_000);
+
+  test('mail order skips readyAt page', async () => {
+    const { getPharmacies, setOrderPharmacy, getOrder } = await import('./api');
+    const getOrderMock = vi.mocked(getOrder);
+    getOrderMock.mockResolvedValue(testOrder);
+    const getPharmaciesMock = vi.mocked(getPharmacies);
+    getPharmaciesMock.mockResolvedValue({
+      pharmaciesByLocation: [
+        generatePharmacy({
+          id: testMailOrderPharmacyId,
+          name: 'Test Local Pickup Pharmacy',
+          price: 101,
+          retailPrice: 1000
+        })
+      ]
+    });
+    const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
+    setOrderPharmacyMock.mockResolvedValue(true);
+
+    renderApp({ order: testOrder });
+
+    expect(await screen.findByText('Review your prescription')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
+    expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
+    await userEvent.click(screen.getByText('Test Local Pickup Pharmacy'));
+    await userEvent.click(screen.getByText('Select pharmacy'));
+    expect(setOrderPharmacyMock).toHaveBeenCalledWith(
+      'ord_testId777',
+      'phr_testId123',
+      null,
+      null,
+      null,
       true
     );
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
