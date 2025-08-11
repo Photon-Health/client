@@ -20,6 +20,7 @@ vi.mock('./api', () => ({
   }),
   getOrder: vi.fn(),
   getPharmacies: vi.fn().mockResolvedValue({ pharmaciesByLocation: [] }),
+  getOffers: vi.fn().mockResolvedValue([]),
   rerouteOrder: vi.fn(),
   setOrderPharmacy: vi.fn(),
   setPreferredPharmacy: vi.fn(),
@@ -30,8 +31,7 @@ vi.mock('./api', () => ({
 vi.mock('./configs/graphqlClient', () => ({
   setAuthHeader: vi.fn(),
   graphQLClient: {
-    request: vi.fn().mockResolvedValue({}),
-    GetOffersForOrder: vi.fn().mockResolvedValue({ offers: [] })
+    request: vi.fn().mockResolvedValue({})
   },
   gqlSerializer: {
     parse: vi.fn(),

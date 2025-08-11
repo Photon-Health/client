@@ -11,6 +11,14 @@ vi.mock('../components', () => ({
   PrescriptionsList: () => <div>Mock Prescriptions List</div>
 }));
 
+vi.mock('../api', () => ({
+  geocode: vi.fn().mockResolvedValue({
+    lat: 40.7128,
+    lng: -74.006,
+    address: '123 Main St, New York, NY 10001'
+  })
+}));
+
 describe('Canceled', () => {
   const testOrder = generateOrder({
     patient: generatePatient({ name: { full: 'Jane Doe' } })

@@ -33,7 +33,7 @@ describe('ReadyBy', () => {
     vi.clearAllMocks();
   });
 
-  test('renders the canceled order heading', async () => {
+  test('renders the page and buttons', async () => {
     renderReadyBy({ order: testOrder });
     expect(
       await screen.findByRole('heading', { name: 'When do you need your order ready by?' })
