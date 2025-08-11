@@ -121,8 +121,6 @@ export const Main = () => {
 
   const handleOrderResponse = useCallback(
     (newOrder: Order, currentPharmacy?: Pharmacy) => {
-      console.log('handleOrderResponse', newOrder);
-
       // This is weird, but it's necessary to show the selected pharmacy
       // when the user goes from selection to the status page
       setOrder({
