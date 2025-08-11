@@ -19,15 +19,7 @@ import ReactGA from 'react-ga4';
 import { Helmet } from 'react-helmet';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import {
-  AmazonOffer,
-  BrandedOptionOverrides,
-  BrandedOptions,
-  CouponModal,
-  FixedFooter,
-  LocationModal,
-  PoweredBy
-} from '../components';
+import { CouponModal, FixedFooter, LocationModal, PoweredBy } from '../components';
 import * as TOAST_CONFIG from '../configs/toast';
 import { preparePharmacy } from '../utils/general';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
@@ -51,7 +43,12 @@ import { GetPharmaciesByLocationQuery } from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { fetchOffers, getPharmacy } from './pharmacy.utils';
 import _ from 'lodash';
-import { PickupPharmacyCardList } from '../components/pharmacy-card-list';
+import {
+  AmazonOffer,
+  BrandedOptionOverrides,
+  BrandedOptions,
+  PickupPharmacyCardList
+} from '../components/pharmacy-card-list';
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
