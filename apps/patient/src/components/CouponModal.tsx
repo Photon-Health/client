@@ -14,6 +14,7 @@ import { useLocation } from 'react-router-dom';
 
 import { useOrderContext } from '../views/Main';
 import { text as t } from '../utils/text';
+import { patientAnalytics } from '../configs/analytics';
 
 interface CouponModalProps {
   isOpen: boolean;
@@ -27,6 +28,10 @@ export const CouponModal: FC<CouponModalProps> = ({ isOpen, onClose }) => {
   const isMultiRx = flattenedFills.length > 1;
 
   const handleClose = () => {
+    patientAnalytics.track('Dismiss Coupon Modal', {
+      currentPath: location.pathname,
+      isMultiRx: isMultiRx
+    });
     onClose();
   };
 
