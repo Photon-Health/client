@@ -8,7 +8,6 @@ import { DiscountCard } from '../__generated__/graphql';
 import { Card } from './Card';
 import goodrxLogo from '../assets/goodrx_logo.png';
 import { formatPrice } from '../utils/formatters';
-import { patientAnalytics } from '../configs/analytics';
 
 export const Coupons = () => {
   const { order } = useOrderContext();
@@ -52,7 +51,6 @@ export const Coupon = ({ coupon }: { coupon: Coupon }) => {
   }
 
   const handleOpenCouponModal = () => {
-    patientAnalytics.track('Open Coupon Modal', { coupon });
     setCouponModalOpen(true);
   };
 
