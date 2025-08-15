@@ -15,6 +15,7 @@ import {
 import dayjs from 'dayjs';
 import { ReactNode } from 'react';
 import { MdOutlineLocalPharmacy } from 'react-icons/md';
+import { patientAnalytics } from '../../configs/analytics';
 
 export interface PrescriptionData {
   rxName: string;
@@ -71,6 +72,10 @@ const defaultIcon = (
 
 export const OrderDetailsModal = (props: OrderDetailsProps & OrderDetailsModalProps) => {
   const handleClose = () => {
+    patientAnalytics.track('Close Order Details Modal', {
+      pharmacyName: props.pharmacyName,
+      prescriptionCount: props.prescriptions.length
+    });
     props.onClose();
   };
 

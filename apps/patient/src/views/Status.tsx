@@ -48,7 +48,7 @@ export const Status = () => {
     const url = `http://maps.google.com/?q=${pharmacy?.name}, ${pharmacyFormattedAddress}`;
     window.open(url);
 
-    patientAnalytics.track('Get Directions', order, {
+    patientAnalytics.track('Get Directions', {
       orderId: order?.id,
       pharmacyId: pharmacy?.id,
       pharmacyName: pharmacy?.name,
@@ -61,7 +61,7 @@ export const Status = () => {
     if (!pharmacy?.phone) return;
     window.location.href = `tel:${pharmacy.phone}`;
 
-    patientAnalytics.track('Call Pharmacy', order, {
+    patientAnalytics.track('Call Pharmacy', {
       orderId: order?.id,
       pharmacyId: pharmacy?.id,
       pharmacyName: pharmacy?.name,
@@ -157,7 +157,8 @@ export const Status = () => {
     });
     navigate(`/pharmacy?${query}`);
 
-    patientAnalytics.track('Reroute Order', order, {
+    patientAnalytics.track('Reroute Order', {
+      orderId: order?.id,
       pharmacyId: pharmacy?.id,
       pharmacyName: pharmacy?.name,
       isPharmacyOpen: displayPharmacy?.isOpen,
@@ -316,7 +317,7 @@ export const Status = () => {
               fulfillments={fulfillments}
               onViewDetails={() => {
                 setOrderDetailsIsOpen(true);
-                patientAnalytics.track('Status, View Order Details', order, {
+                patientAnalytics.track('Status, View Order Details', {
                   orderId: order?.id,
                   pharmacyId: pharmacy?.id,
                   pharmacyName: pharmacy?.name,
@@ -339,6 +340,12 @@ export const Status = () => {
                   color="blue.500"
                   onClick={() => {
                     setFaqModalIsOpen(true);
+                    patientAnalytics.track('Status, Open FAQ Modal', {
+                      orderId: order?.id,
+                      pharmacyId: pharmacy?.id,
+                      pharmacyName: pharmacy?.name,
+                      fulfillmentType: fulfillmentType
+                    });
                   }}
                 >
                   I have a pharmacy issue
