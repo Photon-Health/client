@@ -253,8 +253,7 @@ export const Pharmacy = () => {
     setLocationModalOpen(false);
 
     if (loc) {
-      patientAnalytics.track('Update Location', {
-        orderId: order?.id,
+      patientAnalytics.track('Update Location', order, {
         newLocation: loc,
         previousLocation: cleanAddress
       });
@@ -549,8 +548,7 @@ export const Pharmacy = () => {
     setShowFooter(true);
 
     const selectedPharmacy = allPharmacies.find((p) => p.id === pharmacyId);
-    patientAnalytics.track('Pharmacy Selected', {
-      orderId: order?.id,
+    patientAnalytics.track('Pharmacy Selected', order, {
       pharmacyId: pharmacyId,
       pharmacyName: selectedPharmacy?.name,
       pharmacyRank: allPharmacies.findIndex((p) => p.id === pharmacyId) + 1,
@@ -584,19 +582,11 @@ export const Pharmacy = () => {
           timestamp: new Date().toISOString(),
           price: selectedPrice
         });
-
-        patientAnalytics.track('Pharmacy Price Selected', {
-          orderId: order.id,
-          organization: order.organization.name,
-          pharmacyId: selectedPharmacyId,
-          timestamp: new Date().toISOString(),
-          price: selectedPrice
-        });
       }
 
       if (shouldTrackOfferImpressionsAndSelections) {
-        patientAnalytics.track('Offer Clicked', {
-          ...pharmacies[index],
+        patientAnalytics.track('Offer Clicked', order, {
+          clickedPharmacy: pharmacies[index],
           orderId: order.id,
           organizationName: order.organization.name,
           pharmacyId: selectedPharmacyId
@@ -620,8 +610,7 @@ export const Pharmacy = () => {
 
     const selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
 
-    patientAnalytics.track('Pharmacy Selection Submitted', {
-      orderId: order?.id,
+    patientAnalytics.track('Pharmacy Selection Submitted', order, {
       pharmacyId: selectedId,
       pharmacyName: selectedPharmacy?.name,
       isReroute: !!isReroute,
@@ -700,8 +689,7 @@ export const Pharmacy = () => {
 
     const selectedPharmacy = allPharmacies.find((p) => p.id === pharmacyId);
 
-    patientAnalytics.track('Set Preferred Pharmacy', {
-      orderId: order?.id,
+    patientAnalytics.track('Set Preferred Pharmacy', order, {
       pharmacyId: pharmacyId,
       pharmacyName: selectedPharmacy?.name
     });
@@ -836,13 +824,10 @@ export const Pharmacy = () => {
         id
       }));
 
-      patientAnalytics.track('Offer Selected', {
+      patientAnalytics.track('Offer Selected', order, {
         ...selectedPharmacy,
         ...extraOfferMetadata,
         pharmacyId: selectedId,
-        orderId: order.id,
-        organizationId: order.organization.id,
-        organizationName: order.organization.name,
         // allPharmacies does not included branded options so we must combine them
         ordinalPosition:
           [...brandedOptionObjects, ...allPharmacies].findIndex((p) => p.id === selectedId) + 1
