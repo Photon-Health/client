@@ -1,10 +1,13 @@
 import { Link, Text, HStack } from '@chakra-ui/react';
 import { Logo } from './Logo';
 import { patientAnalytics } from '../configs/analytics';
+import { useOrderContext } from '../views/Main';
 
 export const PoweredBy = () => {
+  const { order } = useOrderContext();
+
   const handlePhotonClick = () => {
-    patientAnalytics.track('Click Powered By Photon', {
+    patientAnalytics.track('Click Powered By Photon', order, {
       photonUrl: 'https://photon.health'
     });
   };
