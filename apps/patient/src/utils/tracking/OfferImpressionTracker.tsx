@@ -24,7 +24,7 @@ const OfferImpressionTracker = ({
     rootMargin: '-100px',
     onChange: (inView) => {
       if (inView && enabled) {
-        patientAnalytics.track('Offer Impression', {
+        patientAnalytics.track('Offer Impression', order, {
           pharmacy_id: pharmacy.id,
           pharmacy_name: pharmacy.name,
           ordinal_position: ordinalPosition,
@@ -33,10 +33,7 @@ const OfferImpressionTracker = ({
           showReadyIn30Min: pharmacy.showReadyIn30Min,
           is24Hr: pharmacy.is24Hr,
           isClosingSoon: pharmacy.isClosingSoon,
-          isAlreadySelected: isAlreadySelected,
-          orderId: order.id,
-          organizationId: order.organization.id,
-          organizationName: order.organization.name
+          isAlreadySelected: isAlreadySelected
         });
       }
     }
