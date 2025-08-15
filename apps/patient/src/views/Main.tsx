@@ -89,14 +89,6 @@ export const Main = () => {
             context: payload.context,
             metadata: payload.metadata
           });
-
-          patientAnalytics.track('Patient App Opened', {
-            orderId: payload.orderId,
-            patientId: payload.sub,
-            organizationId: payload.organizationId,
-            context: payload.context,
-            metadata: payload.metadata
-          });
         } catch (e) {
           console.error('Failed to parse JWT token', e);
         }
@@ -133,6 +125,8 @@ export const Main = () => {
       datadogRum.setGlobalContextProperty('organizationId', newOrder.organization.id);
       datadogRum.setGlobalContextProperty('orderId', orderId);
       datadogRum.setUser({ patientId: newOrder.patient.id });
+
+      patientAnalytics.track('Patient App Opened', newOrder, {});
 
       if (newOrder.state === 'CANCELED') {
         navigate('/canceled', { replace: true });

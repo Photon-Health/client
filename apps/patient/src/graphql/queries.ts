@@ -41,6 +41,20 @@ export const GET_ORDER = gql`
         country
         postalCode
       }
+      metadata {
+        type
+        marketIsRequired
+        fulfillmentMethod
+        transmissionType
+        routingHistory {
+          pharmacy {
+            id
+            name
+          }
+          selector
+          createdAt
+        }
+      }
       organization {
         id
         name
@@ -62,7 +76,6 @@ export const GET_ORDER = gql`
         trackingNumber
         pharmacyEstimatedReadyAt
       }
-
       exceptions {
         exceptionType
         message
@@ -149,6 +162,9 @@ export const GET_ORDER = gql`
         name {
           full
         }
+        dateOfBirth
+        gender
+        sex
       }
       fulfillments {
         id
