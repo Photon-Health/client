@@ -689,8 +689,7 @@ export const Pharmacy = () => {
 
     const selectedPharmacy = allPharmacies.find((p) => p.id === pharmacyId);
 
-    patientAnalytics.track('Set Preferred Pharmacy', {
-      orderId: order?.id,
+    patientAnalytics.track('Set Preferred Pharmacy', order, {
       pharmacyId: pharmacyId,
       pharmacyName: selectedPharmacy?.name
     });
