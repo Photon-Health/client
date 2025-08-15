@@ -137,7 +137,7 @@ function subheaderText(props: OrderStatusHeaderProps) {
     return 'Your order is out for delivery';
   }
   if (props.status === 'RECEIVED') {
-    return 'Your pharmacy has received your order. We weren’t able to get a ready time.';
+    return 'Your pharmacy has received your order.';
   }
   if (props.status === 'PROCESSING') {
     if (props.pharmacyEstimatedReadyAt) {
