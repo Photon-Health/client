@@ -6,7 +6,6 @@ import { FixedFooter, PoweredBy, PrescriptionsList } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
-import { patientAnalytics } from '../configs/analytics';
 
 export const Review = () => {
   const { order, flattenedFills } = useOrderContext();
@@ -25,13 +24,6 @@ export const Review = () => {
       ? `/readyBy?demo=true&phone=${phone}`
       : `/readyBy?orderId=${order.id}&token=${token}`;
     navigate(toUrl);
-
-    patientAnalytics.track('Proceed to Ready By', {
-      orderId: order?.id,
-      isDemo: !!isDemo,
-      isMultiRx: isMultiRx,
-      prescriptionCount: flattenedFills.length
-    });
   };
 
   const isMultiRx = flattenedFills.length > 1;
