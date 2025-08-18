@@ -13,13 +13,17 @@ import {
 } from '@chakra-ui/react';
 import { Card } from './Card';
 import { FAQContents } from './FAQ';
+import { patientAnalytics } from '../configs/analytics';
 
 export const FAQModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const handleClose = () => {
+    patientAnalytics.track('Close FAQ Modal');
     onClose();
   };
 
-  const handleMessageSupport = () => {};
+  const handleMessageSupport = () => {
+    patientAnalytics.track('Message Support');
+  };
 
   return (
     <Modal onClose={handleClose} isOpen={isOpen} size="full">

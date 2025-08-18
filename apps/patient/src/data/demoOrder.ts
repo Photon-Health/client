@@ -55,9 +55,7 @@ export const demoOrder: Order = {
     id: 'pat_01H7KBFG7BQRAYQF735EWMK4CX',
     name: {
       full: 'Jessie Demo'
-    },
-    dateOfBirth: '1990-01-01',
-    sex: 'FEMALE'
+    }
   },
   fulfillment: undefined,
   exceptions: [],

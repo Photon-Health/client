@@ -29,8 +29,6 @@ export const generateOrder = (overrides: Partial<Order> = {}): Order => ({
 export const generatePatient = (overrides: Partial<Order['patient']> = {}): Order['patient'] => ({
   id: 'pat_defaultTestId',
   name: { full: 'John Doe' },
-  dateOfBirth: new Date(),
-  sex: 'MALE',
   ...overrides
 });
 

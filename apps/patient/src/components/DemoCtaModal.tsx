@@ -12,6 +12,8 @@ import {
 } from '@chakra-ui/react';
 
 import image from '../assets/conversation.png';
+import { patientAnalytics } from '../configs/analytics';
+
 interface DemoCtaModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -19,10 +21,14 @@ interface DemoCtaModalProps {
 
 export const DemoCtaModal = ({ isOpen, onClose }: DemoCtaModalProps) => {
   const handleCtaClick = () => {
+    patientAnalytics.track('Demo CTA Click', {
+      ctaUrl: 'https://www.photon.health/sign-up'
+    });
     window.open('https://www.photon.health/sign-up');
   };
 
   const handleClose = () => {
+    patientAnalytics.track('Close Demo CTA Modal', {});
     onClose();
   };
 
