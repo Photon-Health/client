@@ -15,4 +15,4 @@ export function shouldShowPriceToggle(flattenedFills: FillWithCount[], order: Or
   return (!hideGlp1Prices && !orderIsMultiRx) ?? false;
 }
 
-const orgsThatHideGlp1Prices = ['org_QFoulY6Ornx7dMdw'];
+const orgsThatHideGlp1Prices = ['org_QFoulY6Ornx7dMdw', 'org_hidesGlp1Prices'];
