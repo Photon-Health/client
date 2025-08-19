@@ -52,6 +52,7 @@ import {
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
+import { shouldShowPriceToggle } from '../utils/shouldShowPriceToggle';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
@@ -113,10 +114,7 @@ export const Pharmacy = () => {
   const isLoading = loadingLocation || loadingPharmacies;
 
   // pricing
-  const orderContainsGLP1Medication = flattenedFills.some((fill) => isGLP(fill.treatment.name));
-  const orderIsMultiRx = flattenedFills.length > 1;
-  // note: prices are only for single-rx, non-GLP-1 right now
-  const showPriceToggle = (!orderContainsGLP1Medication && !orderIsMultiRx) ?? false;
+  const showPriceToggle = shouldShowPriceToggle(flattenedFills, order);
   const shouldTrackOfferImpressionsAndSelections = showPriceToggle && !isDemo;
 
   // filters
