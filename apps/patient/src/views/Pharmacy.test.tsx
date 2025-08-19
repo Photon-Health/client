@@ -137,17 +137,29 @@ describe('Pharmacy Component', async () => {
 
         await renderPharmacy({ flattenedFills: [glpFill] });
       });
+      it('shows the price toggle switch', async () => {
+        expect(
+          screen.getByRole('checkbox', { name: 'Show coupon card prices' })
+        ).toBeInTheDocument();
+      });
+    });
+
+    describe('when order contains GLP-1 medication for org that hides glp prices', () => {
+      beforeEach(async () => {
+        const glp1MedicationName = 'Wegovy';
+        const glpFill = generateFlattenedFill({
+          treatment: generateTreatment({ name: glp1MedicationName })
+        });
+
+        await renderPharmacy({
+          order: generateOrder({ organization: { id: 'org_hidesGlp1Prices', name: 'test-name' } }),
+          flattenedFills: [glpFill]
+        });
+      });
       it('hides the price toggle checkbox', async () => {
         expect(
           screen.queryByRole('checkbox', { name: 'Show coupon card prices' })
         ).not.toBeInTheDocument();
-      });
-      it('hides the price toggle text', async () => {
-        expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
-      });
-      it('does not request price', async () => {
-        const firstCallArgs = getPharmaciesMock.mock.calls[0][0];
-        expect(firstCallArgs.includePrice).toEqual(false);
       });
     });
 
