@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   Alert,
@@ -38,9 +38,6 @@ const formatLocationOptions = (p: any[]) => {
   return options;
 };
 
-const autocompleteService = new google.maps.places.AutocompleteService();
-const geocoder = new google.maps.Geocoder();
-
 interface LocationModalProps {
   isOpen: boolean;
   onClose: (args: { loc?: string; lat?: number; lng?: number }) => void;
@@ -48,6 +45,9 @@ interface LocationModalProps {
 
 export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
   const [gettingCurrentLocation, setGettingCurrentLocation] = useState<boolean>(false);
+
+  const autocompleteService = useMemo(() => new google.maps.places.AutocompleteService(), []);
+  const geocoder = useMemo(() => new google.maps.Geocoder(), []);
 
   const { order } = useOrderContext();
 

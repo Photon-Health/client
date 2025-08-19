@@ -211,7 +211,9 @@ describe('Pharmacy Component', async () => {
 const renderPharmacy = async (orderContextValueOverride: Partial<OrderContextType> = {}) => {
   let component;
   const orderContextValue: OrderContextType = {
-    fetchOrder(currentPharmacy: Order['pharmacy'] | undefined): void {},
+    fetchOrder(currentPharmacy: Order['pharmacy'] | undefined) {
+      return Promise.resolve(undefined);
+    },
     flattenedFills: [],
     isDemo: false,
     logo: undefined,

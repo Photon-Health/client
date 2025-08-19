@@ -651,14 +651,20 @@ export const Pharmacy = () => {
 
             handleSubmitSuccessAnalytics(selectedPharmacy);
 
-            setOrder({
-              ...order,
-              isReroutable: !isReroute,
-              discountCards: []
-            });
-
             // necessary to ensure the order is updated with the new coupon before navigating
-            await fetchOrder(selectedPharmacy);
+            const updatedOrder = await fetchOrder(selectedPharmacy);
+
+            if (updatedOrder) {
+              setOrder({
+                ...updatedOrder,
+                isReroutable: !isReroute,
+                exceptions: updatedOrder.exceptions.map((exception) => ({
+                  ...exception,
+                  resolvedAt: new Date().toISOString()
+                })),
+                pharmacy: selectedPharmacy
+              });
+            }
 
             const query = queryString.stringify({ orderId: order.id, token, type });
             return navigate(`/status?${query}`);
