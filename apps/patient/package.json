@@ -2,6 +2,9 @@
   "name": "patient",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "test": "vitest"
+  },
   "dependencies": {
     "@rudderstack/analytics-js": "^3.22.0",
     "chakra-react-select": "^4.6.0",
