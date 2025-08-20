@@ -46,7 +46,9 @@ describe('ReadyBy', () => {
 
 const renderReadyBy = (orderContextValueOverride: Partial<OrderContextType> = {}) => {
   const orderContextValue: OrderContextType = {
-    fetchOrder(currentPharmacy: Order['pharmacy'] | undefined): void {},
+    fetchOrder(currentPharmacy: Order['pharmacy'] | undefined) {
+      return Promise.resolve(undefined);
+    },
     flattenedFills: [],
     isDemo: false,
     logo: undefined,

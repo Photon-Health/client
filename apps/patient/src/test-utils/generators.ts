@@ -2,6 +2,8 @@ import { Order } from '../utils/models';
 import { FillWithCount } from '../utils/general';
 import { type Offer, type Pharmacy } from '../__generated__/graphql';
 
+export const generateId = (prefix?: string) => `${prefix}${Math.random().toString(16).slice(2)}`;
+
 export const generateOrder = (overrides: Partial<Order> = {}): Order => ({
   id: 'ord_test_defaultId',
   patient: generatePatient(),
