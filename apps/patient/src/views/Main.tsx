@@ -26,7 +26,7 @@ export interface OrderContextType {
   setOrder: (order: Order) => void;
   logo: any;
   isDemo: boolean;
-  fetchOrder: (currentPharmacy?: Pharmacy) => void;
+  fetchOrder: (currentPharmacy?: Pharmacy) => Promise<Order | undefined>;
   setFaqModalIsOpen: (isOpen: boolean) => void;
 }
 export const OrderContext = createContext<OrderContextType | null>(null);
@@ -151,6 +151,7 @@ export const Main = () => {
         if (result) {
           handleOrderResponse(result, currentPharmacy);
         }
+        return result;
       } catch (e: any) {
         const error = e as any;
         console.log(error.response);

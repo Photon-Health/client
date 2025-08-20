@@ -295,7 +295,7 @@ export const PharmacyInfo = ({
   const taglineOverride = showNovocareTagline || showAmazonTagline;
 
   return (
-    <VStack align="start" w="full">
+    <VStack data-testid="pharmacy-info" align="start" w="full">
       <HStack w="full" justify="space-between">
         <VStack w="full">
           <HStack w="full">
@@ -310,7 +310,11 @@ export const PharmacyInfo = ({
                 />
               </Box>
             ) : null}
-            <Text fontSize="md" fontWeight={boldPharmacyName ? 'bold' : 'medium'}>
+            <Text
+              data-testid="pharmacy-info-name"
+              fontSize="md"
+              fontWeight={boldPharmacyName ? 'bold' : 'medium'}
+            >
               {whiteLabelDeliveryPharmacy ? 'Free Express Delivery' : pharmacy.name}
             </Text>
           </HStack>
@@ -417,7 +421,9 @@ export const PharmacyInfo = ({
           borderWidth="1px"
           mb={1}
         >
-          <TagLabel fontWeight="bold">Current Pharmacy</TagLabel>
+          <TagLabel data-testid="pharmacy-info-current-pharmacy" fontWeight="bold">
+            Current Pharmacy
+          </TagLabel>
         </Tag>
       ) : null}
       {trackingLink && (
