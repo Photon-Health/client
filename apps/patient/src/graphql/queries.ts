@@ -63,6 +63,7 @@ export const GET_ORDER = gql`
           brandLogo
           priorAuthorizationExceptionMessage
           patientUx {
+            enableAutomatedOps
             enablePatientRerouting
             enablePatientDeliveryPharmacies
             patientFeaturedPharmacyName
