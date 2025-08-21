@@ -14,7 +14,15 @@ import {
 import { Card } from './Card';
 import { FAQContents } from './FAQ';
 
-export const FAQModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+export const FAQModal = ({
+  isOpen,
+  onClose,
+  allowMessageSupport = true
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  allowMessageSupport?: boolean;
+}) => {
   const handleClose = () => {
     onClose();
   };
@@ -34,29 +42,31 @@ export const FAQModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 <FAQContents />
               </VStack>
 
-              <VStack w="full" alignItems="stretch" spacing={4}>
-                <Heading as="h4" size="md">
-                  Still need help?
-                </Heading>
-                <Card>
-                  <VStack spacing={1} w="full">
-                    <Box>
-                      If you have other pharmacy related questions, we are available 24/7 for
-                      support. We typically respond within 30 minutes.
-                    </Box>
-                    <Button
-                      as="a"
-                      variant="outline"
-                      color="blue.500"
-                      href={`sms:${process.env.REACT_APP_TWILIO_SMS_NUMBER}`}
-                      w="full"
-                      onClick={handleMessageSupport}
-                    >
-                      Message support
-                    </Button>
-                  </VStack>
-                </Card>
-              </VStack>
+              {allowMessageSupport && (
+                <VStack w="full" alignItems="stretch" spacing={4}>
+                  <Heading as="h4" size="md">
+                    Still need help?
+                  </Heading>
+                  <Card>
+                    <VStack spacing={1} w="full">
+                      <Box>
+                        If you have other pharmacy related questions, we are available 24/7 for
+                        support. We typically respond within 30 minutes.
+                      </Box>
+                      <Button
+                        as="a"
+                        variant="outline"
+                        color="blue.500"
+                        href={`sms:${process.env.REACT_APP_TWILIO_SMS_NUMBER}`}
+                        w="full"
+                        onClick={handleMessageSupport}
+                      >
+                        Message support
+                      </Button>
+                    </VStack>
+                  </Card>
+                </VStack>
+              )}
             </VStack>
           </Container>
         </ModalBody>
