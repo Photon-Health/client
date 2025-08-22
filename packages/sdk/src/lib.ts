@@ -1,8 +1,9 @@
 import { Auth0Client, Auth0ClientOptions } from '@auth0/auth0-spa-js';
 import {
   ApolloClient,
-  InMemoryCache,
+  from,
   HttpLink,
+  InMemoryCache,
   NormalizedCacheObject,
   OnQueryUpdated
 } from '@apollo/client';
@@ -11,17 +12,16 @@ import { AuthManager } from './auth';
 import { ClinicalQueryManager } from './clinical';
 import { ManagementQueryManager } from './management';
 import {
+  clinicalApiUrl,
+  clinicalAppUrl,
   Env as Environment,
   getClinicalUrl,
-  clinicalApiUrl,
-  lambdasApiUrl,
-  clinicalAppUrl
+  lambdasApiUrl
 } from './utils';
+import pkg from '../package.json';
 
 export * as types from './types';
 export * as fragments from './fragments';
-
-import pkg from '../package.json';
 
 const version: string = pkg?.version ?? 'unknown';
 
@@ -158,38 +158,42 @@ export class PhotonClient {
       isServices: false
     }
   ) {
+    const authLink = setContext(async (_, { headers: baseHeaders, ...rest }) => {
+      const token = await this.authentication.getAccessToken();
+
+      const headers = {
+        ...baseHeaders,
+        'x-photon-sdk-version': version,
+        ...(elementsVersion ? { 'x-photon-elements-version': elementsVersion } : {})
+      };
+
+      if (!token) {
+        return { headers, ...rest };
+      }
+
+      return {
+        ...rest,
+        headers: isServices
+          ? {
+              ...headers,
+              'x-photon-auth-token': token,
+              'x-photon-auth-token-type': 'auth0'
+            }
+          : {
+              ...headers,
+              authorization: token
+            }
+      };
+    });
+
+    const httpLink = new HttpLink({
+      uri: isServices ? this.clinicalApiUri : this.uri
+    });
+
+    // const datadogLink = createDatadogInstrumentationLink();
+
     const apollo = new ApolloClient({
-      link: setContext(async (_, { headers: baseHeaders, ...rest }) => {
-        const token = await this.authentication.getAccessToken();
-
-        const headers = {
-          ...baseHeaders,
-          'x-photon-sdk-version': version,
-          ...(elementsVersion ? { 'x-photon-elements-version': elementsVersion } : {})
-        };
-
-        if (!token) {
-          return { headers, ...rest };
-        }
-
-        return {
-          ...rest,
-          headers: isServices
-            ? {
-                ...headers,
-                'x-photon-auth-token': token,
-                'x-photon-auth-token-type': 'auth0'
-              }
-            : {
-                ...headers,
-                authorization: token
-              }
-        };
-      }).concat(
-        new HttpLink({
-          uri: isServices ? this.clinicalApiUri : this.uri
-        })
-      ),
+      link: from([authLink, httpLink]),
       defaultOptions: {
         query: {
           fetchPolicy: 'cache-first',
