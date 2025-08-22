@@ -27,10 +27,7 @@ export class DatadogInstrumentationLink extends ApolloLink {
     }
 
     const operationName = operation.operationName || 'unnamed_operation';
-    const operationType =
-      operation.query.definitions[0]?.kind === 'OperationDefinition'
-        ? (operation.query.definitions[0] as any).operation
-        : 'query';
+    const operationType = this.getOperationType(operation);
 
     const startTime = performance.now();
     const isServices = operation.getContext().uri?.includes('clinical-api') || false;
@@ -99,6 +96,16 @@ export class DatadogInstrumentationLink extends ApolloLink {
 
       return () => subscription.unsubscribe();
     });
+  }
+
+  private getOperationType(operation: Operation) {
+    const operationDefinition = operation.query.definitions.find(
+      (def) => def.kind === 'OperationDefinition'
+    );
+    if (operationDefinition) {
+      return operationDefinition.operation;
+    }
+    return 'unknown';
   }
 }
 
