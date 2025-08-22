@@ -33,7 +33,8 @@ const client = new PhotonClient({
   env,
   domain: auth0Config.domain,
   clientId: auth0Config.clientId,
-  redirectURI: auth0Config.redirectUri
+  redirectURI: auth0Config.redirectUri,
+  enableInstrumentation: true
 });
 
 const onRedirectCallback = (appState?: AppState) => {

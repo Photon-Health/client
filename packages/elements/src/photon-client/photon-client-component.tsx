@@ -2,16 +2,17 @@ import { customElement } from 'solid-element';
 import { createEffect, createSignal } from 'solid-js';
 import { Env, PhotonClient } from '@photonhealth/sdk';
 import {
+  GoogleServiceProvider,
   PhotonClientStore,
   PhotonContext,
-  SDKProvider,
-  GoogleServiceProvider
+  SDKProvider
 } from '@photonhealth/components';
 import { makeTimer } from '@solid-primitives/timer';
 import queryString from 'query-string';
 import { hasAuthParams } from '../utils';
 import pkg from '../../package.json';
 import { type User } from '@auth0/auth0-react';
+import { getEmbedDatadogConfig } from './embed-datadog-config';
 
 type PhotonClientProps = {
   domain?: string;
@@ -23,6 +24,7 @@ type PhotonClientProps = {
   redirectPath?: string;
   org?: string;
   developmentMode?: boolean;
+  enableInstrumentation?: boolean;
   errorMessage?: string;
   autoLogin: boolean;
   toastBuffer?: number;
@@ -53,7 +55,9 @@ const Component = (props: PhotonClientProps) => {
       clientId: props.id!,
       redirectURI,
       organization: props.org,
-      developmentMode: props.developmentMode
+      developmentMode: props.developmentMode,
+      enableInstrumentation: props.enableInstrumentation,
+      instrumentationConfig: getEmbedDatadogConfig()
     },
     version
   );
@@ -192,6 +196,13 @@ customElement(
       reflect: true,
       notify: false,
       parse: true
+    },
+    enableInstrumentation: {
+      attribute: 'enable-instrumentation',
+      value: true,
+      reflect: false,
+      notify: false,
+      parse: false
     },
     errorMessage: {
       attribute: 'error-message',

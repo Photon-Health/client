@@ -19,6 +19,7 @@ import {
   lambdasApiUrl
 } from './utils';
 import pkg from '../package.json';
+import { createDatadogInstrumentationLink, initializeEmbeddedDatadogRUM } from './instrumentation';
 
 export * as types from './types';
 export * as fragments from './fragments';
@@ -46,6 +47,11 @@ export interface PhotonClientOptions {
   connection?: string;
   uri?: string;
   developmentMode?: boolean;
+  enableInstrumentation?: boolean;
+  instrumentationConfig?: {
+    applicationId: string;
+    clientToken: string;
+  };
 }
 
 export class PhotonClient {
@@ -110,7 +116,9 @@ export class PhotonClient {
       audience,
       connection,
       uri,
-      developmentMode = false
+      developmentMode = false,
+      enableInstrumentation = false,
+      instrumentationConfig
     }: PhotonClientOptions,
     elementsVersion?: string
   ) {
@@ -146,6 +154,14 @@ export class PhotonClient {
       audience: this.audience,
       ...(connection ? { connection } : {})
     });
+    if (enableInstrumentation && instrumentationConfig) {
+      initializeEmbeddedDatadogRUM({
+        applicationId: instrumentationConfig.applicationId,
+        clientToken: instrumentationConfig.clientToken,
+        env: env,
+        version
+      });
+    }
 
     this.apollo = this.constructApolloClient({ elementsVersion, isServices: false });
     this.apolloClinical = this.constructApolloClient({ elementsVersion, isServices: true });
@@ -190,10 +206,10 @@ export class PhotonClient {
       uri: isServices ? this.clinicalApiUri : this.uri
     });
 
-    // const datadogLink = createDatadogInstrumentationLink();
+    const datadogLink = createDatadogInstrumentationLink();
 
     const apollo = new ApolloClient({
-      link: from([authLink, httpLink]),
+      link: from([datadogLink, authLink, httpLink]),
       defaultOptions: {
         query: {
           fetchPolicy: 'cache-first',
