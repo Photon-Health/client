@@ -1,4 +1,4 @@
-import { ApolloLink, Operation, NextLink, FetchResult } from '@apollo/client';
+import { ApolloLink, FetchResult, NextLink, Operation } from '@apollo/client';
 import { Observable } from '@apollo/client/utilities';
 import { datadogRum } from '@datadog/browser-rum';
 
@@ -6,19 +6,17 @@ interface DatadogRum {
   addAction: (name: string, context?: Record<string, any>) => void;
   addTiming: (name: string, time?: number) => void;
   addError: (error: Error, context?: Record<string, any>) => void;
-  getSessionReplayLink?: () => string | undefined;
   init: (config: any) => void;
-  getInternalContext: any;
 }
 
-let sdkDatadogRum: DatadogRum | null = null;
+let embedDatadogRum: DatadogRum | null = null;
 
 export class DatadogInstrumentationLink extends ApolloLink {
   private isEnabled = false;
 
   constructor() {
     super();
-    this.isEnabled = !!sdkDatadogRum;
+    this.isEnabled = !!embedDatadogRum;
   }
 
   public request(operation: Operation, forward: NextLink): Observable<FetchResult> | null {
@@ -38,7 +36,7 @@ export class DatadogInstrumentationLink extends ApolloLink {
         next: (result) => {
           const duration = performance.now() - startTime;
 
-          sdkDatadogRum?.addAction('graphql_operation_success', {
+          embedDatadogRum?.addAction('graphql_operation_success', {
             operation_name: operationName,
             operation_type: operationType,
             endpoint,
@@ -49,11 +47,14 @@ export class DatadogInstrumentationLink extends ApolloLink {
             variables_count: Object.keys(operation.variables || {}).length
           });
 
-          sdkDatadogRum?.addTiming(`graphql_${endpoint}_${operationName.toLowerCase()}`, duration);
+          embedDatadogRum?.addTiming(
+            `graphql_${endpoint}_${operationName.toLowerCase()}`,
+            duration
+          );
 
           if (result.errors && result.errors.length > 0) {
             result.errors.forEach((error, index) => {
-              sdkDatadogRum?.addError(new Error(`GraphQL Error: ${error.message}`), {
+              embedDatadogRum?.addError(new Error(`GraphQL Error: ${error.message}`), {
                 operation_name: operationName,
                 operation_type: operationType,
                 endpoint,
@@ -69,7 +70,7 @@ export class DatadogInstrumentationLink extends ApolloLink {
         error: (error) => {
           const duration = performance.now() - startTime;
 
-          sdkDatadogRum?.addAction('graphql_operation_error', {
+          embedDatadogRum?.addAction('graphql_operation_error', {
             operation_name: operationName,
             operation_type: operationType,
             endpoint,
@@ -80,7 +81,7 @@ export class DatadogInstrumentationLink extends ApolloLink {
             variables_count: Object.keys(operation.variables || {}).length
           });
 
-          sdkDatadogRum?.addError(error, {
+          embedDatadogRum?.addError(error, {
             operation_name: operationName,
             operation_type: operationType,
             endpoint,
@@ -113,7 +114,7 @@ export function createDatadogInstrumentationLink(): DatadogInstrumentationLink {
   return new DatadogInstrumentationLink();
 }
 
-export function initializeEmbeddedDatadogRUM(config: {
+export function initializeEmbedDatadogRUM(config: {
   applicationId: string;
   clientToken: string;
   env?: string;
@@ -121,11 +122,11 @@ export function initializeEmbeddedDatadogRUM(config: {
 }): void {
   if (typeof window === 'undefined') return;
 
-  const sdkRumConfig = {
+  const rumConfig = {
     applicationId: config.applicationId,
     clientToken: config.clientToken,
     site: 'datadoghq.com',
-    service: 'photon-sdk',
+    service: 'photon-embed',
     env: config.env,
     version: config.version,
     sessionSampleRate: 100,
@@ -136,13 +137,13 @@ export function initializeEmbeddedDatadogRUM(config: {
     defaultPrivacyLevel: 'mask-user-input'
   };
 
-  sdkDatadogRum = datadogRum;
+  embedDatadogRum = datadogRum;
 
   try {
-    sdkDatadogRum.init(sdkRumConfig);
-    console.log('SDK Datadog RUM initialized');
+    embedDatadogRum.init(rumConfig);
+    console.log('Embed Datadog RUM initialized');
   } catch (error) {
-    console.warn('Failed to initialize SDK Datadog RUM:', error);
-    sdkDatadogRum = null;
+    console.warn('Failed to initialize Embed Datadog RUM:', error);
+    embedDatadogRum = null;
   }
 }

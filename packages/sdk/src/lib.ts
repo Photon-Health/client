@@ -19,7 +19,7 @@ import {
   lambdasApiUrl
 } from './utils';
 import pkg from '../package.json';
-import { createDatadogInstrumentationLink, initializeEmbeddedDatadogRUM } from './instrumentation';
+import { createDatadogInstrumentationLink, initializeEmbedDatadogRUM } from './instrumentation';
 
 export * as types from './types';
 export * as fragments from './fragments';
@@ -155,7 +155,7 @@ export class PhotonClient {
       ...(connection ? { connection } : {})
     });
     if (enableInstrumentation && instrumentationConfig) {
-      initializeEmbeddedDatadogRUM({
+      initializeEmbedDatadogRUM({
         applicationId: instrumentationConfig.applicationId,
         clientToken: instrumentationConfig.clientToken,
         env: env,
