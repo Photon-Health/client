@@ -124,7 +124,7 @@ export function initializeEmbeddedDatadogRUM(config: {
     sessionSampleRate: 100,
     sessionReplaySampleRate: 0,
     trackUserInteractions: false,
-    trackResources: true,
+    trackResources: false,
     trackLongTasks: false,
     defaultPrivacyLevel: 'mask-user-input'
   };
