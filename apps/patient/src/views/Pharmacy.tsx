@@ -53,6 +53,7 @@ import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
 import { shouldShowPriceToggle } from '../utils/shouldShowPriceToggle';
+import { isMailOrderPharmacy } from '../utils/isMailOrderPharmacy';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
@@ -665,7 +666,15 @@ export const Pharmacy = () => {
             }
 
             const query = queryString.stringify({ orderId: order.id, token, type });
-            return navigate(`/status?${query}`);
+
+            // If it's a mail order pharmacy, go directly to status since we don't
+            // need to get a time.
+            // Otherwise, go to ready by selection view
+            if (isMailOrderPharmacy(selectedId)) {
+              return navigate(`/status?${query}`);
+            } else {
+              return navigate(`/readyBy?orderId=${order.id}&token=${token}`);
+            }
           }, 1000);
         } else {
           showToastWarning();
@@ -754,7 +763,12 @@ export const Pharmacy = () => {
           formatAddress(selectedPharmacy.address!)
         );
 
-        navigate(`/status?demo=true&phone=${phone}`);
+        // For demo, follow the same logic as non-demo
+        if (isMailOrderPharmacy(selectedId)) {
+          navigate(`/status?demo=true&phone=${phone}`);
+        } else {
+          navigate(`/readyBy?demo=true&phone=${phone}`);
+        }
       }, 1000);
       setSubmitting(false);
     }, 1000);

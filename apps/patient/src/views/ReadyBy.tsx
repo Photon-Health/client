@@ -20,6 +20,7 @@ import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
 import { datadogRum } from '@datadog/browser-rum';
 import timezone from 'dayjs/plugin/timezone';
+import queryString from 'query-string';
 import { convertReadyByToUTCTimestamp } from '../utils/general';
 import { FixedFooter, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
@@ -90,8 +91,9 @@ export const ReadyBy = () => {
       readyByTime
     });
 
-    // Go to pharmacy selection
-    navigate(`/pharmacy?orderId=${order?.id}&token=${token}`);
+    // Go to status page
+    const query = queryString.stringify({ orderId: order?.id, token });
+    navigate(`/status?${query}`);
   };
 
   useEffect(() => {
