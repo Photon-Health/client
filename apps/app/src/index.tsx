@@ -1,8 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import { ChakraProvider } from '@chakra-ui/react';
 
-import { datadogRum } from '@datadog/browser-rum';
-
+import { datadogBeforeSendHandler } from '@photonhealth/sdk';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorker from './serviceWorker';
 
@@ -12,7 +11,7 @@ import { App } from './App';
 import pkg from '../package.json';
 import '@photonhealth/elements';
 
-datadogRum.init({
+window.DD_RUM.init({
   applicationId: process.env.REACT_APP_DATADOG_RUM_APPLICATION_ID as string,
   clientToken: process.env.REACT_APP_DATADOG_RUM_CLIENT_TOKEN as string,
   site: 'datadoghq.com',
@@ -24,10 +23,11 @@ datadogRum.init({
   trackUserInteractions: true,
   trackResources: true,
   trackLongTasks: true,
-  defaultPrivacyLevel: 'mask-user-input'
+  defaultPrivacyLevel: 'mask-user-input',
+  beforeSend: datadogBeforeSendHandler
 });
 
-datadogRum.startSessionReplayRecording();
+window.DD_RUM.startSessionReplayRecording();
 
 const container = document.getElementById('root')!;
 const root = createRoot(container); // createRoot(container!) if you use TypeScript

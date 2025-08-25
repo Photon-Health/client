@@ -34,7 +34,8 @@ const client = new PhotonClient({
   domain: auth0Config.domain,
   clientId: auth0Config.clientId,
   redirectURI: auth0Config.redirectUri,
-  enableInstrumentation: true
+  // disable Embed Datadog instrumentation because Clinical App has its own configuration
+  enableInstrumentation: false
 });
 
 const onRedirectCallback = (appState?: AppState) => {

@@ -23,6 +23,7 @@ import { createDatadogInstrumentationLink, initializeEmbedDatadogRUM } from './i
 
 export * as types from './types';
 export * as fragments from './fragments';
+export { datadogBeforeSendHandler } from './instrumentation';
 
 const version: string = pkg?.version ?? 'unknown';
 
@@ -117,8 +118,7 @@ export class PhotonClient {
       connection,
       uri,
       developmentMode = false,
-      enableInstrumentation = false,
-      instrumentationConfig
+      enableInstrumentation = false
     }: PhotonClientOptions,
     elementsVersion?: string
   ) {
@@ -154,11 +154,9 @@ export class PhotonClient {
       audience: this.audience,
       ...(connection ? { connection } : {})
     });
-    if (enableInstrumentation && instrumentationConfig) {
+    if (enableInstrumentation) {
       initializeEmbedDatadogRUM({
-        applicationId: instrumentationConfig.applicationId,
-        clientToken: instrumentationConfig.clientToken,
-        env: env,
+        env,
         version
       });
     }

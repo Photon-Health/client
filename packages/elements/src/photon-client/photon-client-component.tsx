@@ -12,7 +12,6 @@ import queryString from 'query-string';
 import { hasAuthParams } from '../utils';
 import pkg from '../../package.json';
 import { type User } from '@auth0/auth0-react';
-import { getEmbedDatadogConfig } from './embed-datadog-config';
 
 type PhotonClientProps = {
   domain?: string;
@@ -56,8 +55,7 @@ const Component = (props: PhotonClientProps) => {
       redirectURI,
       organization: props.org,
       developmentMode: props.developmentMode,
-      enableInstrumentation: props.enableInstrumentation,
-      instrumentationConfig: getEmbedDatadogConfig()
+      enableInstrumentation: props.enableInstrumentation
     },
     version
   );

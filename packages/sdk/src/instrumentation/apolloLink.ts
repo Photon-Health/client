@@ -1,6 +1,7 @@
 import { ApolloLink, FetchResult, NextLink, Operation } from '@apollo/client';
 import { Observable } from '@apollo/client/utilities';
 import { datadogRum } from '@datadog/browser-rum';
+import { getClinicalDatadogAppId, getEmbedDatadogConfig } from './embed-datadog-config';
 
 interface DatadogRum {
   addAction: (name: string, context?: Record<string, any>) => void;
@@ -112,17 +113,13 @@ export function createDatadogInstrumentationLink(): DatadogInstrumentationLink {
   return new DatadogInstrumentationLink();
 }
 
-export function initializeEmbedDatadogRUM(config: {
-  applicationId: string;
-  clientToken: string;
-  env?: string;
-  version?: string;
-}): void {
-  if (typeof window === 'undefined') return;
+export function initializeEmbedDatadogRUM(config: { env?: string; version?: string }): void {
+  if (isClinicalPhotonAppAlreadyConfigured()) return;
 
+  const { applicationId, clientToken } = getEmbedDatadogConfig();
   const rumConfig = {
-    applicationId: config.applicationId,
-    clientToken: config.clientToken,
+    applicationId,
+    clientToken,
     site: 'datadoghq.com',
     service: 'photon-embed',
     env: config.env,
@@ -144,4 +141,12 @@ export function initializeEmbedDatadogRUM(config: {
     console.warn('Failed to initialize Embed Datadog RUM:', error);
     embedDatadogRum = null;
   }
+}
+
+function isClinicalPhotonAppAlreadyConfigured(): boolean {
+  const globalInitConfiguration = window.DD_RUM.getInitConfiguration();
+  const hasExistingGlobalConfig = !!globalInitConfiguration;
+  return (
+    hasExistingGlobalConfig && globalInitConfiguration.applicationId === getClinicalDatadogAppId()
+  );
 }

@@ -9,3 +9,7 @@ const decode = (encoded: string) => {
   const bytes = Uint8Array.from(window.atob(encoded), (c) => c.charCodeAt(0));
   return new TextDecoder().decode(bytes).trim();
 };
+
+export function getClinicalDatadogAppId(): string {
+  return decode('OWVkNDUxNDYtNDFjOC00YmZhLWE3NGQtZTZmYmRhODQxMmUwCg==');
+}
