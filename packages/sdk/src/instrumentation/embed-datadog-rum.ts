@@ -1,6 +1,6 @@
 import { datadogRum } from '@datadog/browser-rum';
 import { getClinicalDatadogAppId, getEmbedDatadogConfig } from './embed-datadog-config';
-import { RumInitConfiguration } from '@datadog/browser-rum-core/src/domain/configuration';
+import type { RumInitConfiguration } from '@datadog/browser-rum-core';
 import { embedDatadogBeforeSendHandler } from './beforeSend';
 
 export function initializeEmbedDatadogRUM(config: {
