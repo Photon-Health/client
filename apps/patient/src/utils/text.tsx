@@ -97,13 +97,9 @@ export const text = {
   pricesCanChange:
     'Prices subject to change without notice and may change based on supply and demand. If there’s a huge price discrepancy, please message us.',
   quantity: 'Quantity',
-  questionVerb: 'If you have any questions, please text us at ',
+  questionVerb: 'If you have any questions, please contact support',
   questionsPhoneNumber: '+1 (513) 866 3212',
-  reachOut: (
-    <>
-      If you have any questions, please <PhoneLink>text us</PhoneLink> or reach out to your provider
-    </>
-  ),
+  reachOut: 'If you have any questions, please reach out to your provider',
   readyBy: 'Ready by',
   readyByOptions: {
     Today: [
