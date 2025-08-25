@@ -1,14 +1,26 @@
-import type { RumInitConfiguration } from '@datadog/browser-rum-core/src/domain/configuration';
 import {
   RumEvent,
   RumEventDomainContext,
   RumFetchResourceEventDomainContext
 } from '@datadog/browser-rum';
 
-export const datadogBeforeSendHandler: RumInitConfiguration['beforeSend'] = (
+export const datadogBeforeSendHandler = (event: RumEvent, context: RumEventDomainContext) => {
+  addGraphqlToContext(event, context);
+  return true;
+};
+
+export const embedDatadogBeforeSendHandler = (
   event: RumEvent,
-  context
+  context: RumEventDomainContext,
+  allowedUrls: string[]
 ) => {
+  addGraphqlToContext(event, context);
+
+  // for customers using the embed, we need to prevent logging of their internal fetch requests
+  return isResourceFetch(event, context) && isAllowedResource(context, allowedUrls);
+};
+
+function addGraphqlToContext(event: RumEvent, context: RumEventDomainContext) {
   if (isResourceFetch(event, context) && event.context && hasRequestBody(context)) {
     try {
       const requestBody = JSON.parse(context.requestInit.body as string);
@@ -19,8 +31,7 @@ export const datadogBeforeSendHandler: RumInitConfiguration['beforeSend'] = (
       console.warn('Error parsing request body:', e);
     }
   }
-  return true;
-};
+}
 
 function isResourceFetch(
   event: RumEvent,
@@ -33,6 +44,15 @@ function hasRequestBody(
   context: RumFetchResourceEventDomainContext
 ): context is RumFetchResourceEventDomainContextWithRequestInit {
   return !!context.requestInit?.body;
+}
+
+function isAllowedResource(context: RumFetchResourceEventDomainContext, allowedUrls: string[]) {
+  const requestInput = context.requestInput;
+  return isStringUri(requestInput) && allowedUrls.some((url) => requestInput.includes(url));
+}
+
+function isStringUri(requestInput: RequestInfo): requestInput is string {
+  return typeof requestInput === 'string';
 }
 
 interface RumFetchResourceEventDomainContextWithRequestInit

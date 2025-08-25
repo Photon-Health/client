@@ -1,7 +1,6 @@
 import { Auth0Client, Auth0ClientOptions } from '@auth0/auth0-spa-js';
 import {
   ApolloClient,
-  from,
   HttpLink,
   InMemoryCache,
   NormalizedCacheObject,
@@ -19,7 +18,7 @@ import {
   lambdasApiUrl
 } from './utils';
 import pkg from '../package.json';
-import { createDatadogInstrumentationLink, initializeEmbedDatadogRUM } from './instrumentation';
+import { initializeEmbedDatadogRUM } from './instrumentation';
 
 export * as types from './types';
 export * as fragments from './fragments';
@@ -157,7 +156,8 @@ export class PhotonClient {
     if (enableInstrumentation) {
       initializeEmbedDatadogRUM({
         env,
-        version
+        version,
+        allowedResourceUrls: [this.clinicalApiUri, this.uri]
       });
     }
 
@@ -172,47 +172,38 @@ export class PhotonClient {
       isServices: false
     }
   ) {
-    const authLink = setContext(async (_, { headers: baseHeaders, ...rest }) => {
-      const token = await this.authentication.getAccessToken();
-
-      const headers = {
-        ...baseHeaders,
-        'x-photon-sdk-version': version,
-        ...(elementsVersion ? { 'x-photon-elements-version': elementsVersion } : {})
-      };
-
-      if (!token) {
-        return { headers, ...rest };
-      }
-
-      return {
-        ...rest,
-        headers: isServices
-          ? {
-              ...headers,
-              'x-photon-auth-token': token,
-              'x-photon-auth-token-type': 'auth0'
-            }
-          : {
-              ...headers,
-              authorization: token
-            }
-      };
-    });
-
-    const httpLink = new HttpLink({
-      uri: isServices ? this.clinicalApiUri : this.uri
-    });
-
-    // allows datadogLink to access isServices bool from the context object
-    const isServicesLink = setContext(async (_request, _previousContext) => {
-      return { isServices };
-    });
-
-    const datadogLink = createDatadogInstrumentationLink();
-
     const apollo = new ApolloClient({
-      link: from([isServicesLink, datadogLink, authLink, httpLink]),
+      link: setContext(async (_, { headers: baseHeaders, ...rest }) => {
+        const token = await this.authentication.getAccessToken();
+
+        const headers = {
+          ...baseHeaders,
+          'x-photon-sdk-version': version,
+          ...(elementsVersion ? { 'x-photon-elements-version': elementsVersion } : {})
+        };
+
+        if (!token) {
+          return { headers, ...rest };
+        }
+
+        return {
+          ...rest,
+          headers: isServices
+            ? {
+                ...headers,
+                'x-photon-auth-token': token,
+                'x-photon-auth-token-type': 'auth0'
+              }
+            : {
+                ...headers,
+                authorization: token
+              }
+        };
+      }).concat(
+        new HttpLink({
+          uri: isServices ? this.clinicalApiUri : this.uri
+        })
+      ),
       defaultOptions: {
         query: {
           fetchPolicy: 'cache-first',
