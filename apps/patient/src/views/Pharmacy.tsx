@@ -687,7 +687,7 @@ export const Pharmacy = () => {
         }
       }
     } else {
-      // For regular pharmacies, just navigate to ready by selection
+      // For regular pharmacies, show success state then navigate to ready by selection
       // Store the selected pharmacy in the order context temporarily
       const { selectedPharmacy } = getPharmacy(allPharmacies, selectedId);
       setOrder({
@@ -695,8 +695,12 @@ export const Pharmacy = () => {
         pharmacy: selectedPharmacy
       });
 
-      setSubmitting(false);
-      return navigate(`/readyBy?orderId=${order.id}&token=${token}`);
+      setSuccessfullySubmitted(true);
+      setTimeout(() => {
+        setShowFooter(false);
+        setSubmitting(false);
+        return navigate(`/readyBy?orderId=${order.id}&token=${token}`);
+      }, 1000);
     }
   };
 

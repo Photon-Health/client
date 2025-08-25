@@ -26,6 +26,7 @@ import { FixedFooter, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { RxLightningBolt } from 'react-icons/rx';
+import { FiCheck } from 'react-icons/fi';
 import { capitalize } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 
@@ -51,6 +52,9 @@ export const ReadyBy = () => {
   const [selectedDay, setSelectedDay] = useState<string | undefined>(undefined);
 
   const [activeTab, setActiveTab] = useState<keyof (typeof t)['readyByOptions']>('Today');
+
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
 
   const isMultiRx = flattenedFills.length > 1;
 
@@ -88,6 +92,8 @@ export const ReadyBy = () => {
       timezone: dayjs.tz.guess()
     });
 
+    setSubmitting(true);
+
     // Submit the pharmacy to the order with the ready-by time
     try {
       const { setOrderPharmacy } = await import('../api');
@@ -108,9 +114,12 @@ export const ReadyBy = () => {
           readyByTime
         });
 
-        // Go to status page
-        const query = queryString.stringify({ orderId: order?.id, token });
-        navigate(`/status?${query}`);
+        setSuccessfullySubmitted(true);
+        setTimeout(() => {
+          // Go to status page
+          const query = queryString.stringify({ orderId: order?.id, token });
+          navigate(`/status?${query}`);
+        }, 1000);
       } else {
         // Handle error
         console.error('Failed to set pharmacy on order');
@@ -118,6 +127,7 @@ export const ReadyBy = () => {
     } catch (error) {
       console.error('Error setting pharmacy on order:', error);
     }
+    setSubmitting(false);
   };
 
   useEffect(() => {
@@ -265,8 +275,19 @@ export const ReadyBy = () => {
 
       <FixedFooter show={!!selectedTime}>
         <Container as={VStack} w="full">
-          <Button size="lg" borderRadius="lg" w="full" variant="brand" onClick={handleSubmit}>
-            {t.next}
+          <Button
+            size="lg"
+            borderRadius="lg"
+            w="full"
+            variant={successfullySubmitted ? undefined : 'brand'}
+            colorScheme={successfullySubmitted ? 'green' : undefined}
+            leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
+            onClick={!successfullySubmitted ? handleSubmit : undefined}
+            isLoading={submitting}
+            disabled={selectedTime == null}
+            isDisabled={selectedTime == null}
+          >
+            {successfullySubmitted ? t.thankYou : t.next}
           </Button>
           <PoweredBy />
         </Container>
