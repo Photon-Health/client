@@ -106,7 +106,7 @@ describe('App', () => {
       'Urgent',
       'Today',
       expect.anything(),
-      true
+      false
     );
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
     expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
