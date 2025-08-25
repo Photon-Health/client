@@ -70,6 +70,10 @@ export const ReadyBy = () => {
       console.error('No selected readyBy time/day.');
       return;
     }
+    if (!order.pharmacy?.id) {
+      console.error('No pharmacy selected.');
+      return;
+    }
 
     const readyByTime = convertReadyByToUTCTimestamp(selectedTime, selectedDay);
 
@@ -84,16 +88,36 @@ export const ReadyBy = () => {
       timezone: dayjs.tz.guess()
     });
 
-    setOrder({
-      ...order,
-      readyBy: selectedTime,
-      readyByDay: selectedDay,
-      readyByTime
-    });
+    // Submit the pharmacy to the order with the ready-by time
+    try {
+      const { setOrderPharmacy } = await import('../api');
+      const result = await setOrderPharmacy(
+        order.id,
+        order.pharmacy.id,
+        selectedTime,
+        selectedDay,
+        readyByTime,
+        false // enablePrice is false for regular pharmacies in this flow
+      );
 
-    // Go to status page
-    const query = queryString.stringify({ orderId: order?.id, token });
-    navigate(`/status?${query}`);
+      if (result) {
+        setOrder({
+          ...order,
+          readyBy: selectedTime,
+          readyByDay: selectedDay,
+          readyByTime
+        });
+
+        // Go to status page
+        const query = queryString.stringify({ orderId: order?.id, token });
+        navigate(`/status?${query}`);
+      } else {
+        // Handle error
+        console.error('Failed to set pharmacy on order');
+      }
+    } catch (error) {
+      console.error('Error setting pharmacy on order:', error);
+    }
   };
 
   useEffect(() => {
