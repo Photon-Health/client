@@ -1,0 +1,13 @@
+{
+  "extends": ["../../.eslintrc.json"],
+  "overrides": [
+    {
+      "globals": {
+        "RequestInit": true,
+        "RequestInfo": true,
+        "BodyInit": true
+      },
+      "files": ["*.ts"]
+    }
+  ]
+}
