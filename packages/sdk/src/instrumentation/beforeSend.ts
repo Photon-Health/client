@@ -5,7 +5,11 @@ import {
 } from '@datadog/browser-rum';
 
 export const datadogBeforeSendHandler = (event: RumEvent, context: RumEventDomainContext) => {
-  addGraphqlToContext(event, context);
+  if (isResourceFetch(event, context) && hasRequestBody(context)) {
+    addGraphqlAttributesToContext(event, context);
+  }
+  // for Photon's clinical app, we can log all the resources
+  // by returning true
   return true;
 };
 
@@ -14,22 +18,29 @@ export const embedDatadogBeforeSendHandler = (
   context: RumEventDomainContext,
   allowedUrls: string[]
 ) => {
-  addGraphqlToContext(event, context);
+  if (isResourceFetch(event, context) && hasRequestBody(context)) {
+    addGraphqlAttributesToContext(event, context);
+    return isAllowedResource(context, allowedUrls);
+  }
 
   // for customers using the embed, we need to prevent logging of their internal fetch requests
-  return isResourceFetch(event, context) && isAllowedResource(context, allowedUrls);
+  // by returning false
+  return false;
 };
 
-function addGraphqlToContext(event: RumEvent, context: RumEventDomainContext) {
-  if (isResourceFetch(event, context) && event.context && hasRequestBody(context)) {
-    try {
-      const requestBody = JSON.parse(context.requestInit.body as string);
-      event.context.operationName = requestBody.operationName;
-      event.context.variables = requestBody.variables;
-      event.context.query = requestBody.query;
-    } catch (e) {
-      console.warn('Error parsing request body:', e);
-    }
+function addGraphqlAttributesToContext(
+  event: RumEvent,
+  context: RumFetchResourceEventDomainContextWithRequestInit
+) {
+  if (!event.context) return;
+
+  try {
+    const requestBody = JSON.parse(context.requestInit.body as string);
+    event.context.operationName = requestBody.operationName;
+    event.context.variables = requestBody.variables;
+    event.context.query = requestBody.query;
+  } catch (e) {
+    console.warn('Error parsing request body:', e);
   }
 }
 
