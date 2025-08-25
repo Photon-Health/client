@@ -103,7 +103,7 @@ export const ReadyBy = () => {
         selectedTime,
         selectedDay,
         readyByTime,
-        false // enablePrice is false for regular pharmacies in this flow
+        false // enablePrice is false for non mail order pharmacies in this flow
       );
 
       if (result) {

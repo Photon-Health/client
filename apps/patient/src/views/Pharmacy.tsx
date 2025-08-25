@@ -687,7 +687,7 @@ export const Pharmacy = () => {
         }
       }
     } else {
-      // For regular pharmacies, just navigate to ready by selection
+      // for non mail order pharmacies, just navigate to ready by selection
       // Store the selected pharmacy in the order context temporarily
       const { selectedPharmacy } = getPharmacy(allPharmacies, selectedId);
       setOrder({
