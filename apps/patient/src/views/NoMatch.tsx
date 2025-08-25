@@ -1,6 +1,6 @@
 import { Center, Heading, Text, VStack, ChakraProvider } from '@chakra-ui/react';
 import { MdSearch } from 'react-icons/md';
-import { text as t, PhoneLink } from '../utils/text';
+import { text as t } from '../utils/text';
 import theme from '../configs/theme';
 import { patientAnalytics } from '../configs/analytics';
 
@@ -15,10 +15,7 @@ export const NoMatch = () => {
           <Heading as="h4" size="md" textAlign="center">
             {t.noMatch}
           </Heading>
-          <Text textAlign="center">
-            {t.questionVerb}
-            <PhoneLink />
-          </Text>
+          <Text textAlign="center">{t.questionVerb}</Text>
         </VStack>
       </Center>
     </ChakraProvider>
