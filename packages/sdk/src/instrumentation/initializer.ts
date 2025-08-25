@@ -30,6 +30,8 @@ export function initializeEmbedDatadogRUM(config: {
   };
 
   try {
+    // important to use the imported datadogRum, not the global,
+    // in case customers are using datadog in the app where the photon SDK is embedded
     datadogRum.init(rumConfig);
     console.log('Embed Datadog RUM initialized');
   } catch (error) {
