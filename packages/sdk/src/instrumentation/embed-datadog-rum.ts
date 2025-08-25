@@ -1,6 +1,6 @@
-import { datadogRum } from '@datadog/browser-rum';
-import { getClinicalDatadogAppId, getEmbedDatadogConfig } from './embed-datadog-config';
 import type { RumInitConfiguration } from '@datadog/browser-rum-core';
+import { datadogRum } from '@datadog/browser-rum';
+import { getClinicalDatadogAppId, getEmbedDatadogConfig } from './config';
 import { embedDatadogBeforeSendHandler } from './beforeSend';
 
 export function initializeEmbedDatadogRUM(config: {
@@ -43,4 +43,10 @@ function isClinicalPhotonAppAlreadyConfigured(): boolean {
   return (
     hasExistingGlobalConfig && globalInitConfiguration.applicationId === getClinicalDatadogAppId()
   );
+}
+
+declare global {
+  interface Window {
+    DD_RUM: typeof datadogRum;
+  }
 }

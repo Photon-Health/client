@@ -11,6 +11,8 @@ import { App } from './App';
 import pkg from '../package.json';
 import '@photonhealth/elements';
 
+// we use the global DD_RUM instance rather than the import
+// because the config context is then accessible from within the Clinical Embed Web Component
 window.DD_RUM.init({
   applicationId: process.env.REACT_APP_DATADOG_RUM_APPLICATION_ID as string,
   clientToken: process.env.REACT_APP_DATADOG_RUM_CLIENT_TOKEN as string,
