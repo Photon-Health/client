@@ -1,3 +1,3 @@
 export { datadogBeforeSendHandler } from './beforeSend';
-export { initializeEmbedDatadogRUM } from './embed-datadog-rum';
-export { getEmbedDatadogConfig } from './embed-datadog-config';
+export { initializeEmbedDatadogRUM } from './initializer';
+export { getEmbedDatadogConfig } from './config';

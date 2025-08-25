@@ -8,7 +8,7 @@ export const datadogBeforeSendHandler = (event: RumEvent, context: RumEventDomai
   if (isResourceFetch(event, context) && hasRequestBody(context)) {
     addGraphqlAttributesToContext(event, context);
   }
-  // for Photon's clinical app, we can log all the resources
+  // for Photon's clinical app, we can log all the events
   // by returning true
   return true;
 };
@@ -20,12 +20,14 @@ export const embedDatadogBeforeSendHandler = (
 ) => {
   if (isResourceFetch(event, context) && hasRequestBody(context)) {
     addGraphqlAttributesToContext(event, context);
+
+    // for customers using the embed, we need to prevent logging of their internal fetch requests
+    // by returning false
     return isAllowedResource(context, allowedUrls);
   }
 
-  // for customers using the embed, we need to prevent logging of their internal fetch requests
-  // by returning false
-  return false;
+  // prevents warning log Datadog Browser SDK: Can't dismiss view events using beforeSend!
+  return event.type === 'view';
 };
 
 function addGraphqlAttributesToContext(
