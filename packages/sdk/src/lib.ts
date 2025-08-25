@@ -157,7 +157,8 @@ export class PhotonClient {
       initializeEmbedDatadogRUM({
         env,
         version,
-        allowedResourceUrls: [this.clinicalApiUri, this.uri]
+        allowedResourceUrls: [this.clinicalApiUri, this.uri],
+        organizationId: organization
       });
     }
 

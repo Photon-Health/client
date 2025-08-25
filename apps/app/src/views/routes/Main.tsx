@@ -9,7 +9,6 @@ import { addAlert } from '../../stores/alert';
 import { auth0Config } from '../../configs/auth';
 import useQueryParams from '../../hooks/useQueryParams';
 import { Env } from '@photonhealth/sdk';
-import { datadogRum } from '@datadog/browser-rum';
 
 declare global {
   namespace JSX {
@@ -42,10 +41,10 @@ export const Main = () => {
     }
     if (isAuthenticated && !isLoading) {
       // global context to the datadog RUM session
-      datadogRum.setGlobalContextProperty('org', {
+      window.DD_RUM.setGlobalContextProperty('org', {
         orgId: user.org_id
       });
-      datadogRum.setUser({
+      window.DD_RUM.setUser({
         email: user.email,
         name: user.name
       });

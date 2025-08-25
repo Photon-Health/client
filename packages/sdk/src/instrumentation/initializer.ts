@@ -7,6 +7,7 @@ export function initializeEmbedDatadogRUM(config: {
   env?: string;
   version?: string;
   allowedResourceUrls: string[];
+  organizationId?: string;
 }): void {
   if (isClinicalPhotonAppAlreadyConfigured()) return;
 
@@ -33,6 +34,7 @@ export function initializeEmbedDatadogRUM(config: {
     // important to use the imported datadogRum, not the global,
     // in case customers are using datadog in the app where the photon SDK is embedded
     datadogRum.init(rumConfig);
+    datadogRum.setGlobalContextProperty('org', { orgId: config.organizationId });
     console.log('Embed Datadog RUM initialized');
   } catch (error) {
     console.warn('Failed to initialize Embed Datadog RUM:', error);
