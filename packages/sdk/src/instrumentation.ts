@@ -28,8 +28,7 @@ export class DatadogInstrumentationLink extends ApolloLink {
     const operationType = this.getOperationType(operation);
 
     const startTime = performance.now();
-    const isServices = operation.getContext().uri?.includes('clinical-api') || false;
-    const endpoint = isServices ? 'clinical-api' : 'api';
+    const apiTarget = operation.getContext().isServices ? 'services' : 'lambdas';
 
     return new Observable((observer) => {
       const subscription = forward(operation).subscribe({
@@ -39,16 +38,15 @@ export class DatadogInstrumentationLink extends ApolloLink {
           embedDatadogRum?.addAction('graphql_operation_success', {
             operation_name: operationName,
             operation_type: operationType,
-            endpoint,
+            apiTarget,
             duration_ms: Math.round(duration),
             has_errors: !!(result.errors && result.errors.length > 0),
             error_count: result.errors?.length || 0,
-            cache_status: operation.getContext().cache ? 'hit' : 'miss',
             variables_count: Object.keys(operation.variables || {}).length
           });
 
           embedDatadogRum?.addTiming(
-            `graphql_${endpoint}_${operationName.toLowerCase()}`,
+            `graphql_${apiTarget}_${operationName.toLowerCase()}`,
             duration
           );
 
@@ -57,7 +55,7 @@ export class DatadogInstrumentationLink extends ApolloLink {
               embedDatadogRum?.addError(new Error(`GraphQL Error: ${error.message}`), {
                 operation_name: operationName,
                 operation_type: operationType,
-                endpoint,
+                apiTarget,
                 error_index: index,
                 error_path: error.path?.join('.') || 'unknown',
                 error_code: (error.extensions as any)?.code || 'unknown'
@@ -73,7 +71,7 @@ export class DatadogInstrumentationLink extends ApolloLink {
           embedDatadogRum?.addAction('graphql_operation_error', {
             operation_name: operationName,
             operation_type: operationType,
-            endpoint,
+            apiTarget,
             duration_ms: Math.round(duration),
             has_errors: true,
             error_type: error.name || 'unknown',
@@ -84,7 +82,7 @@ export class DatadogInstrumentationLink extends ApolloLink {
           embedDatadogRum?.addError(error, {
             operation_name: operationName,
             operation_type: operationType,
-            endpoint,
+            apiTarget,
             error_source: 'apollo_client'
           });
 

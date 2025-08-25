@@ -206,10 +206,15 @@ export class PhotonClient {
       uri: isServices ? this.clinicalApiUri : this.uri
     });
 
+    // allows datadogLink to access isServices bool from the context object
+    const isServicesLink = setContext(async (_request, _previousContext) => {
+      return { isServices };
+    });
+
     const datadogLink = createDatadogInstrumentationLink();
 
     const apollo = new ApolloClient({
-      link: from([datadogLink, authLink, httpLink]),
+      link: from([isServicesLink, datadogLink, authLink, httpLink]),
       defaultOptions: {
         query: {
           fetchPolicy: 'cache-first',
