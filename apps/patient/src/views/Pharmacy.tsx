@@ -53,11 +53,17 @@ import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
 import { shouldShowPriceToggle } from '../utils/shouldShowPriceToggle';
-import { isMailOrderPharmacy } from '../utils/isMailOrderPharmacy';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
 const WALGREENS_PHARMACY_RADIUS = 15; // miles
+
+function isMailOrderPharmacy(pharmacyId: string): boolean {
+  return (
+    pharmacyId === process.env.REACT_APP_AMAZON_PHARMACY_ID ||
+    pharmacyId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID
+  );
+}
 
 export const Pharmacy = () => {
   const { order, flattenedFills, setOrder, isDemo, fetchOrder, enablePrice, setEnablePrice } =
