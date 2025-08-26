@@ -1,6 +1,5 @@
-import { Outlet, useLocation, Navigate, useNavigate } from 'react-router-dom';
-import { Center, CircularProgress, Box } from '@chakra-ui/react';
-
+import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Box, Center, CircularProgress } from '@chakra-ui/react';
 import { usePhoton } from '@photonhealth/react';
 import { useEffect, useState } from 'react';
 import { Nav } from '../components/Nav';
@@ -9,7 +8,7 @@ import { addAlert } from '../../stores/alert';
 import { auth0Config } from '../../configs/auth';
 import useQueryParams from '../../hooks/useQueryParams';
 import { Env } from '@photonhealth/sdk';
-import { datadogRum } from '@datadog/browser-rum';
+import { setInstrumentationUserContext } from '../../instrumentation/setInstrumentationUserContext';
 
 declare global {
   namespace JSX {
@@ -41,14 +40,7 @@ export const Main = () => {
       setPreviouslyAuthed(false);
     }
     if (isAuthenticated && !isLoading) {
-      // global context to the datadog RUM session
-      datadogRum.setGlobalContextProperty('org', {
-        orgId: user.org_id
-      });
-      datadogRum.setUser({
-        email: user.email,
-        name: user.name
-      });
+      setInstrumentationUserContext(user);
     }
   }, [isAuthenticated, isLoading]);
 
