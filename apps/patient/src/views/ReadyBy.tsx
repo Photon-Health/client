@@ -40,7 +40,7 @@ const checkDisabled = (option: string): boolean => {
 };
 
 export const ReadyBy = () => {
-  const { order, flattenedFills, setOrder } = useOrderContext();
+  const { order, flattenedFills, setOrder, enablePrice } = useOrderContext();
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
@@ -103,7 +103,7 @@ export const ReadyBy = () => {
         selectedTime,
         selectedDay,
         readyByTime,
-        false // enablePrice is false for non mail order pharmacies in this flow
+        enablePrice
       );
 
       if (result) {
@@ -212,10 +212,6 @@ export const ReadyBy = () => {
                       border={isDisabled ? 'gray.300' : '2px solid'}
                       borderWidth={isSelected ? '2px' : '1px'}
                       borderColor={isSelected ? 'brand.500' : 'gray.200'}
-                      // bgColor={isCurrentPharmacy ? 'gray.200' : 'white'}
-                      // borderWidth={selected ? '2px' : '1px'}
-                      // borderColor={selected && onSelect ? 'brand.500' : isCurrentPharmacy ? 'gray.300' : 'gray.200'}
-
                       borderRadius="lg"
                       color={isDisabled ? 'gray.600' : 'base'}
                       onClick={() => {

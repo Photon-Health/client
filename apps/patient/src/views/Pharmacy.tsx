@@ -60,7 +60,8 @@ const COSTCO_PHARMACY_RADIUS = 30; // miles
 const WALGREENS_PHARMACY_RADIUS = 15; // miles
 
 export const Pharmacy = () => {
-  const { order, flattenedFills, setOrder, isDemo, fetchOrder } = useOrderContext();
+  const { order, flattenedFills, setOrder, isDemo, fetchOrder, enablePrice, setEnablePrice } =
+    useOrderContext();
   const mailOrderPharmacies = getOrgMailOrderPharms(order?.organization.id).patient;
   const { enablePatientDeliveryPharmacies, patientFeaturedPharmacyName } =
     order?.organization?.settings?.patientUx ?? {};
@@ -123,7 +124,6 @@ export const Pharmacy = () => {
     openNow !== null ? !!openNow : order?.readyBy === 'Urgent'
   );
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
-  const [enablePrice, setEnablePrice] = useState(showPriceToggle);
 
   const [brandedOptionsOverride, setBrandedOptionsOverride] = useState<
     BrandedOptionOverrides | undefined
@@ -613,7 +613,7 @@ export const Pharmacy = () => {
       pharmacyId: selectedId,
       pharmacyName: selectedPharmacy?.name,
       isReroute: !!isReroute,
-      enablePrice: enablePrice,
+      enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined,
       price: selectedPharmacy?.price
     });

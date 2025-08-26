@@ -24,6 +24,8 @@ export interface OrderContextType {
   order: Order;
   flattenedFills: FillWithCount[];
   setOrder: (order: Order) => void;
+  enablePrice: boolean;
+  setEnablePrice: (enablePrice: boolean) => void;
   logo: any;
   isDemo: boolean;
   fetchOrder: (currentPharmacy?: Pharmacy) => Promise<Order | undefined>;
@@ -42,6 +44,8 @@ export const Main = () => {
   const location = useLocation();
 
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
+  // This is used to track whether the patient has enabled price on the pharmacy page
+  const [enablePrice, setEnablePrice] = useState<boolean>(false);
 
   const [logo, setLogo] = useState<any>(undefined);
   const [loadingLogo, setLoadingLogo] = useState(true);
@@ -243,6 +247,8 @@ export const Main = () => {
     order,
     flattenedFills,
     setOrder,
+    enablePrice,
+    setEnablePrice,
     logo,
     fetchOrder,
     setFaqModalIsOpen
