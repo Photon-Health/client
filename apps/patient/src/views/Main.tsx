@@ -248,13 +248,19 @@ export const Main = () => {
     setFaqModalIsOpen
   };
 
+  const isAutomatedOrder = order.organization.settings?.patientUx.enableAutomatedOps;
+
   return (
     <ChakraProvider theme={theme({ accentColor: settings?.brandColor })}>
       <OrderContext.Provider value={orderContextValue}>
         <ScrollRestoration />
         <Nav />
         <Outlet />
-        <FAQModal isOpen={faqModalIsOpen} onClose={() => setFaqModalIsOpen(false)} />
+        <FAQModal
+          isOpen={faqModalIsOpen}
+          onClose={() => setFaqModalIsOpen(false)}
+          allowMessageSupport={!isAutomatedOrder}
+        />
       </OrderContext.Provider>
     </ChakraProvider>
   );
