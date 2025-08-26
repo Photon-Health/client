@@ -1,14 +1,11 @@
 import { createRoot } from 'react-dom/client';
 import { ChakraProvider } from '@chakra-ui/react';
-
 import { datadogRum } from '@datadog/browser-rum';
-
+import { beforeSendHandler } from './instrumentation';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorker from './serviceWorker';
-
 import theme from './configs/theme';
 import { App } from './App';
-
 import pkg from '../package.json';
 import '@photonhealth/elements';
 
@@ -24,7 +21,8 @@ datadogRum.init({
   trackUserInteractions: true,
   trackResources: true,
   trackLongTasks: true,
-  defaultPrivacyLevel: 'mask-user-input'
+  defaultPrivacyLevel: 'mask-user-input',
+  beforeSend: beforeSendHandler
 });
 
 datadogRum.startSessionReplayRecording();
