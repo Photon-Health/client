@@ -232,6 +232,8 @@ const renderPharmacy = async (orderContextValueOverride: Partial<OrderContextTyp
     order: generateOrder(),
     setFaqModalIsOpen(isOpen: boolean): void {},
     setOrder(order: Order): void {},
+    enablePrice: false,
+    setEnablePrice(enablePrice: boolean): void {},
     ...orderContextValueOverride
   };
   await act(async () => {

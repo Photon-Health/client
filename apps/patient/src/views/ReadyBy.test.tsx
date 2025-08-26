@@ -55,6 +55,8 @@ const renderReadyBy = (orderContextValueOverride: Partial<OrderContextType> = {}
     order: generateOrder(),
     setFaqModalIsOpen(isOpen: boolean): void {},
     setOrder(order: Order): void {},
+    enablePrice: false,
+    setEnablePrice(enablePrice: boolean): void {},
     ...orderContextValueOverride
   };
   return render(
