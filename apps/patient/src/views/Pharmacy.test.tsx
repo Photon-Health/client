@@ -103,10 +103,14 @@ describe('Pharmacy Component', async () => {
         getPharmaciesMock.mockResolvedValue({
           pharmaciesByLocation: [generatePharmacy({ id: 'test-pharmacy-123' })]
         });
-        const singleNonGLPFill = [generateFill('Metformin')];
-        const order = generateOrder({ fills: singleNonGLPFill });
+        const singleNonGLPFill = generateFlattenedFill({
+          treatment: generateTreatment({ name: 'Metformin' })
+        });
 
-        await renderPharmacy({ order });
+        await renderPharmacy({
+          flattenedFills: [singleNonGLPFill],
+          enablePrice: true
+        });
       });
       it('shows the price toggle switch', async () => {
         expect(
@@ -123,6 +127,10 @@ describe('Pharmacy Component', async () => {
       it('should request pharmacies without prices on toggle click', async () => {
         getPharmaciesMock.mockClear();
         await userEvent.click(screen.getByRole('checkbox', { name: 'Show coupon card prices' }));
+
+        // Wait for the API call to be made after the toggle
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
         const recentCallArgs = getPharmaciesMock.mock.calls[0][0];
         expect(recentCallArgs.includePrice).toEqual(false);
       });
