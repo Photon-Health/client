@@ -8,6 +8,7 @@ import {
   useNavigate,
   useSearchParams
 } from 'react-router-dom';
+import queryString from 'query-string';
 
 import { AUTH_HEADER_ERRORS, getOrder } from '../api';
 import { Nav } from '../components';
@@ -140,7 +141,8 @@ export const Main = () => {
       const hasPharmacy = newOrder.pharmacy?.id;
       const redirect = hasPharmacy ? '/status' : '/review';
 
-      navigate(`${redirect}?orderId=${newOrder.id}&token=${token}`, {
+      const query = queryString.stringify({ orderId: newOrder.id, token });
+      navigate(`${redirect}?${query}`, {
         replace: true
       });
     },
@@ -178,7 +180,8 @@ export const Main = () => {
 
   useEffect(() => {
     if (isDemo && (orderId || order?.id !== demoOrder.id || location.pathname === '/')) {
-      navigate(`/review?demo=true&phone=${phone}`, { replace: true });
+      const query = queryString.stringify({ demo: true, phone });
+      navigate(`/review?${query}`, { replace: true });
     }
   }, [isDemo, location.pathname, navigate, order, orderId, phone]);
 

@@ -1,6 +1,7 @@
 import { Box, Button, Container, HStack, Heading, Text, VStack } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import queryString from 'query-string';
 
 import { FixedFooter, PoweredBy, PrescriptionsList } from '../components';
 import { text as t } from '../utils/text';
@@ -20,10 +21,10 @@ export const Review = () => {
   const { patient } = order;
 
   const handleCtaClick = () => {
-    const toUrl = isDemo
-      ? `/pharmacy?demo=true&phone=${phone}`
-      : `/pharmacy?orderId=${order.id}&token=${token}`;
-    navigate(toUrl);
+    const query = isDemo
+      ? queryString.stringify({ demo: true, phone })
+      : queryString.stringify({ orderId: order.id, token });
+    navigate(`/pharmacy?${query}`);
   };
 
   const isMultiRx = flattenedFills.length > 1;

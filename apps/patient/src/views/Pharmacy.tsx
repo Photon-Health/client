@@ -696,7 +696,8 @@ export const Pharmacy = () => {
       });
 
       setSubmitting(false);
-      return navigate(`/readyBy?orderId=${order.id}&token=${token}`);
+      const query = queryString.stringify({ orderId: order.id, token });
+      return navigate(`/readyBy?${query}`);
     }
   };
 
@@ -770,9 +771,11 @@ export const Pharmacy = () => {
 
         // For demo, follow the same logic as non-demo
         if (isMailOrderPharmacy(selectedId)) {
-          navigate(`/status?demo=true&phone=${phone}`);
+          const query = queryString.stringify({ demo: true, phone });
+          navigate(`/status?${query}`);
         } else {
-          navigate(`/readyBy?demo=true&phone=${phone}`);
+          const query = queryString.stringify({ demo: true, phone });
+          navigate(`/readyBy?${query}`);
         }
       }, 1000);
       setSubmitting(false);
