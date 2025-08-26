@@ -25,6 +25,8 @@ export interface OrderContextType {
   order: Order;
   flattenedFills: FillWithCount[];
   setOrder: (order: Order) => void;
+  // enablePrice is used to track whether the patient has enabled price on the pharmacy page
+  // but we need it set the pharmacy after the ready by page
   enablePrice: boolean;
   setEnablePrice: (enablePrice: boolean) => void;
   logo: any;
