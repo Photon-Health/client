@@ -36,8 +36,7 @@ function hasRequestBody(
 
 function isPhotonApiRequest(requestInput: RequestInfo): boolean {
   const url = typeof requestInput === 'string' ? requestInput : requestInput.url;
-  const isPhoton = photonApiHostnames.includes(getHostnameFromUrl(url));
-  return isPhoton;
+  return photonApiHostnames.includes(getHostnameFromUrl(url));
 }
 
 function addGraphqlAttributesToContext(
