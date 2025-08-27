@@ -71,7 +71,7 @@ describe('App', () => {
     vi.clearAllMocks();
   });
 
-  test('navigates from review page to pharmacy to readyBy to status', async () => {
+  test('For Local Pickup Pharmacies: navigate from review > pharmacy > readyBy > status', async () => {
     const { getPharmacies, setOrderPharmacy, getOrder } = await import('./api');
     const getOrderMock = vi.mocked(getOrder);
     getOrderMock.mockResolvedValue(testOrder);
@@ -111,11 +111,50 @@ describe('App', () => {
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
     expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
   }, 10_000);
+
+  test('For Mail Order Pharmacies: skips the readyBy page', async () => {
+    const { getPharmacies, setOrderPharmacy, getOrder } = await import('./api');
+    const getOrderMock = vi.mocked(getOrder);
+    getOrderMock.mockResolvedValue(testOrder);
+    const getPharmaciesMock = vi.mocked(getPharmacies);
+    getPharmaciesMock.mockResolvedValue({
+      pharmaciesByLocation: [
+        generatePharmacy({
+          id: 'SUPER_TEST_MAIL_ORDER_PHARMACY',
+          name: 'Test Mail Order Pharmacy',
+          price: 101,
+          retailPrice: 1000
+        })
+      ]
+    });
+    const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
+    setOrderPharmacyMock.mockResolvedValue(true);
+
+    renderApp({ order: testOrder });
+
+    expect(await screen.findByText('Review your prescription')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
+    expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
+    await userEvent.click(screen.getByText('Test Mail Order Pharmacy'));
+    await userEvent.click(screen.getByText('Select pharmacy'));
+    expect(setOrderPharmacyMock).toHaveBeenCalled();
+    expect(setOrderPharmacyMock).toHaveBeenCalledWith(
+      'ord_testId777',
+      'SUPER_TEST_MAIL_ORDER_PHARMACY',
+      'Regular',
+      undefined,
+      undefined,
+      false
+    );
+
+    await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
+    expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
+  }, 10_000);
 });
 
 const renderApp = (order: Partial<OrderContextType> = {}) => {
   const memoryRouter = createMemoryRouter(createRoutesFromElements(routeElements), {
-    initialEntries: ['/']
+    initialEntries: ['/?token=testToken']
   });
 
   return { render: render(<RouterProvider router={memoryRouter} />), memoryRouter };

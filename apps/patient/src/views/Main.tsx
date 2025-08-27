@@ -107,6 +107,7 @@ export const Main = () => {
   useEffect(() => {
     if (location.pathname !== '/canceled') {
       if (!isDemo && (!orderId || !token)) {
+        console.log('hi jake 2');
         navigate('/no-match', { replace: true });
       }
     }
@@ -169,6 +170,7 @@ export const Main = () => {
         );
         const hasOrder = !!error?.response?.data?.order;
         if (isAuthError || !hasOrder) {
+          console.log('hi jake 1');
           navigate('/no-match', { replace: true });
           return;
         }

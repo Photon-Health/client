@@ -24,6 +24,7 @@ export const Review = () => {
     const query = isDemo
       ? queryString.stringify({ demo: true, phone })
       : queryString.stringify({ orderId: order.id, token });
+    console.log('query', query);
     navigate(`/pharmacy?${query}`);
   };
 

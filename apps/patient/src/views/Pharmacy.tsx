@@ -61,7 +61,8 @@ const WALGREENS_PHARMACY_RADIUS = 15; // miles
 function isMailOrderPharmacy(pharmacyId: string): boolean {
   return (
     pharmacyId === process.env.REACT_APP_AMAZON_PHARMACY_ID ||
-    pharmacyId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID
+    pharmacyId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID ||
+    pharmacyId === 'SUPER_TEST_MAIL_ORDER_PHARMACY'
   );
 }
 
