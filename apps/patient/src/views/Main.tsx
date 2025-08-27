@@ -94,7 +94,7 @@ export const Main = () => {
             patientId: payload.sub,
             organizationId: payload.organizationId,
             context: payload.context,
-            metadata: payload.metadatas
+            metadata: payload.metadata
           });
         } catch (e) {
           console.error('Failed to parse JWT token', e);
