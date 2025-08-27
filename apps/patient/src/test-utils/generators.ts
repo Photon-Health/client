@@ -18,7 +18,7 @@ export const generateOrder = (overrides: Partial<Order> = {}): Order => ({
     postalCode: '10001',
     country: ''
   },
-  readyBy: 'Regular',
+  readyBy: undefined,
   state: 'CANCELED',
   isReroutable: false,
   exceptions: [],
