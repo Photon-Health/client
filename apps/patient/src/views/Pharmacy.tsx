@@ -58,8 +58,17 @@ const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
 const WALGREENS_PHARMACY_RADIUS = 15; // miles
 
+function isMailOrderPharmacy(pharmacyId: string): boolean {
+  return (
+    pharmacyId === process.env.REACT_APP_AMAZON_PHARMACY_ID ||
+    pharmacyId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID ||
+    pharmacyId === 'SUPER_TEST_MAIL_ORDER_PHARMACY'
+  );
+}
+
 export const Pharmacy = () => {
-  const { order, flattenedFills, setOrder, isDemo, fetchOrder } = useOrderContext();
+  const { order, flattenedFills, setOrder, isDemo, fetchOrder, enablePrice, setEnablePrice } =
+    useOrderContext();
   const mailOrderPharmacies = getOrgMailOrderPharms(order?.organization.id).patient;
   const { enablePatientDeliveryPharmacies, patientFeaturedPharmacyName } =
     order?.organization?.settings?.patientUx ?? {};
@@ -122,7 +131,6 @@ export const Pharmacy = () => {
     openNow !== null ? !!openNow : order?.readyBy === 'Urgent'
   );
   const [enable24Hr, setEnable24Hr] = useState(order?.readyBy === 'After hours');
-  const [enablePrice, setEnablePrice] = useState(showPriceToggle);
 
   const [brandedOptionsOverride, setBrandedOptionsOverride] = useState<
     BrandedOptionOverrides | undefined
@@ -493,6 +501,7 @@ export const Pharmacy = () => {
     enableTopRankedCostco,
     enableTopRankedWalgreens,
     enablePrice,
+    setEnablePrice,
     getCostco,
     getWalgreens,
     isDemo,
@@ -612,7 +621,7 @@ export const Pharmacy = () => {
       pharmacyId: selectedId,
       pharmacyName: selectedPharmacy?.name,
       isReroute: !!isReroute,
-      enablePrice: enablePrice,
+      enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined,
       price: selectedPharmacy?.price
     });
@@ -622,67 +631,81 @@ export const Pharmacy = () => {
       return;
     }
 
-    trackSelectedPharmacyRank(selectedId, allPharmacies);
+    // If it's a mail order pharmacy, submit the pharmacy to the order
+    // Otherwise, just navigate to ready by selection
+    if (isMailOrderPharmacy(selectedId) || isReroute) {
+      trackSelectedPharmacyRank(selectedId, allPharmacies);
 
-    try {
-      const patientSelectedPrice = enablePrice;
-      const result = isReroute
-        ? await rerouteOrder(order.id, selectedId, patientSelectedPrice)
-        : await setOrderPharmacy(
-            order.id,
-            selectedId,
-            order.readyBy ?? undefined,
-            order.readyByDay ?? undefined,
-            order.readyByTime,
-            patientSelectedPrice
-          );
+      try {
+        const patientSelectedPrice = enablePrice;
+        const result = isReroute
+          ? await rerouteOrder(order.id, selectedId, patientSelectedPrice)
+          : await setOrderPharmacy(
+              order.id,
+              selectedId,
+              order.readyBy ?? undefined,
+              order.readyByDay ?? undefined,
+              order.readyByTime,
+              patientSelectedPrice
+            );
 
-      const { type, selectedPharmacy } = getPharmacy(allPharmacies, selectedId);
+        const { type, selectedPharmacy } = getPharmacy(allPharmacies, selectedId);
 
-      setTimeout(() => {
-        if (result) {
-          // setSuccessfullySubmitted(true) shows a "Thank you" message in the button temporarily, during the setTimeout
-          // refactoring to an "await delay(1000)"-style timeout breaks this for some reason
-          setSuccessfullySubmitted(true);
-          setTimeout(async () => {
-            setShowFooter(false);
+        setTimeout(() => {
+          if (result) {
+            setSuccessfullySubmitted(true);
+            setTimeout(async () => {
+              setShowFooter(false);
 
-            handleSubmitSuccessAnalytics(selectedPharmacy);
+              handleSubmitSuccessAnalytics(selectedPharmacy);
 
-            // necessary to ensure the order is updated with the new coupon before navigating
-            const updatedOrder = await fetchOrder(selectedPharmacy);
+              // necessary to ensure the order is updated with the new coupon before navigating
+              const updatedOrder = await fetchOrder(selectedPharmacy);
 
-            if (updatedOrder) {
-              setOrder({
-                ...updatedOrder,
-                isReroutable: !isReroute,
-                exceptions: updatedOrder.exceptions.map((exception) => ({
-                  ...exception,
-                  resolvedAt: new Date().toISOString()
-                })),
-                pharmacy: selectedPharmacy
-              });
-            }
+              if (updatedOrder) {
+                setOrder({
+                  ...updatedOrder,
+                  isReroutable: !isReroute,
+                  exceptions: updatedOrder.exceptions.map((exception) => ({
+                    ...exception,
+                    resolvedAt: new Date().toISOString()
+                  })),
+                  pharmacy: selectedPharmacy
+                });
+              }
 
-            const query = queryString.stringify({ orderId: order.id, token, type });
-            return navigate(`/status?${query}`);
-          }, 1000);
-        } else {
-          showToastWarning();
-        }
+              const query = queryString.stringify({ orderId: order.id, token, type });
+              return navigate(`/status?${query}`);
+            }, 1000);
+          } else {
+            showToastWarning();
+          }
+          setSubmitting(false);
+        }, 1000);
+      } catch (error: any) {
+        showToastWarning();
         setSubmitting(false);
-      }, 1000);
-    } catch (error: any) {
-      showToastWarning();
-      setSubmitting(false);
-      if (isReroute) {
-        setOrder({ ...order, isReroutable: false });
-        const query = queryString.stringify({
-          orderId: order.id,
-          token
-        });
-        return navigate(`/status?${query}`);
+        if (isReroute) {
+          setOrder({ ...order, isReroutable: false });
+          const query = queryString.stringify({
+            orderId: order.id,
+            token
+          });
+          return navigate(`/status?${query}`);
+        }
       }
+    } else {
+      // for non mail order pharmacies, just navigate to ready by selection
+      // Store the selected pharmacy in the order context temporarily
+      const { selectedPharmacy } = getPharmacy(allPharmacies, selectedId);
+      setOrder({
+        ...order,
+        pharmacy: selectedPharmacy
+      });
+
+      setSubmitting(false);
+      const query = queryString.stringify({ orderId: order.id, token });
+      return navigate(`/readyBy?${query}`);
     }
   };
 
@@ -754,7 +777,14 @@ export const Pharmacy = () => {
           formatAddress(selectedPharmacy.address!)
         );
 
-        navigate(`/status?demo=true&phone=${phone}`);
+        // For demo, follow the same logic as non-demo
+        if (isMailOrderPharmacy(selectedId)) {
+          const query = queryString.stringify({ demo: true, phone });
+          navigate(`/status?${query}`);
+        } else {
+          const query = queryString.stringify({ demo: true, phone });
+          navigate(`/readyBy?${query}`);
+        }
       }, 1000);
       setSubmitting(false);
     }, 1000);
