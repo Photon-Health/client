@@ -98,7 +98,7 @@ describe('Pharmacy Component', async () => {
   });
 
   describe('showing prices', () => {
-    describe('when order has single non-GLP medication', () => {
+    describe('when order has single medication', () => {
       beforeEach(async () => {
         getPharmaciesMock.mockResolvedValue({
           pharmaciesByLocation: [generatePharmacy({ id: 'test-pharmacy-123' })]
