@@ -20,11 +20,13 @@ import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
 import { datadogRum } from '@datadog/browser-rum';
 import timezone from 'dayjs/plugin/timezone';
+import queryString from 'query-string';
 import { convertReadyByToUTCTimestamp } from '../utils/general';
 import { FixedFooter, PoweredBy } from '../components';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { RxLightningBolt } from 'react-icons/rx';
+import { FiCheck } from 'react-icons/fi';
 import { capitalize } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 
@@ -38,7 +40,7 @@ const checkDisabled = (option: string): boolean => {
 };
 
 export const ReadyBy = () => {
-  const { order, flattenedFills, setOrder } = useOrderContext();
+  const { order, flattenedFills, setOrder, enablePrice } = useOrderContext();
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
@@ -51,13 +53,17 @@ export const ReadyBy = () => {
 
   const [activeTab, setActiveTab] = useState<keyof (typeof t)['readyByOptions']>('Today');
 
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [successfullySubmitted, setSuccessfullySubmitted] = useState<boolean>(false);
+
   const isMultiRx = flattenedFills.length > 1;
 
   usePageAnalytics({ pageName: "Patient's Ready By Time" });
 
   const handleSubmit = async () => {
     if (isDemo) {
-      navigate(`/pharmacy?demo=true&phone=${phone}`);
+      const query = queryString.stringify({ demo: true, phone });
+      navigate(`/pharmacy?${query}`);
       return;
     }
 
@@ -67,6 +73,10 @@ export const ReadyBy = () => {
     }
     if (!selectedTime || !selectedDay) {
       console.error('No selected readyBy time/day.');
+      return;
+    }
+    if (!order.pharmacy?.id) {
+      console.error('No pharmacy selected.');
       return;
     }
 
@@ -83,15 +93,42 @@ export const ReadyBy = () => {
       timezone: dayjs.tz.guess()
     });
 
-    setOrder({
-      ...order,
-      readyBy: selectedTime,
-      readyByDay: selectedDay,
-      readyByTime
-    });
+    setSubmitting(true);
 
-    // Go to pharmacy selection
-    navigate(`/pharmacy?orderId=${order?.id}&token=${token}`);
+    // Submit the pharmacy to the order with the ready-by time
+    try {
+      const { setOrderPharmacy } = await import('../api');
+      const result = await setOrderPharmacy(
+        order.id,
+        order.pharmacy.id,
+        selectedTime,
+        selectedDay,
+        readyByTime,
+        enablePrice
+      );
+
+      if (result) {
+        setOrder({
+          ...order,
+          readyBy: selectedTime,
+          readyByDay: selectedDay,
+          readyByTime
+        });
+
+        setSuccessfullySubmitted(true);
+        setTimeout(() => {
+          // Go to status page
+          const query = queryString.stringify({ orderId: order?.id, token });
+          navigate(`/status?${query}`);
+        }, 1000);
+      } else {
+        // Handle error
+        console.error('Failed to set pharmacy on order');
+      }
+    } catch (error) {
+      console.error('Error setting pharmacy on order:', error);
+    }
+    setSubmitting(false);
   };
 
   useEffect(() => {
@@ -176,10 +213,6 @@ export const ReadyBy = () => {
                       border={isDisabled ? 'gray.300' : '2px solid'}
                       borderWidth={isSelected ? '2px' : '1px'}
                       borderColor={isSelected ? 'brand.500' : 'gray.200'}
-                      // bgColor={isCurrentPharmacy ? 'gray.200' : 'white'}
-                      // borderWidth={selected ? '2px' : '1px'}
-                      // borderColor={selected && onSelect ? 'brand.500' : isCurrentPharmacy ? 'gray.300' : 'gray.200'}
-
                       borderRadius="lg"
                       color={isDisabled ? 'gray.600' : 'base'}
                       onClick={() => {
@@ -239,8 +272,19 @@ export const ReadyBy = () => {
 
       <FixedFooter show={!!selectedTime}>
         <Container as={VStack} w="full">
-          <Button size="lg" borderRadius="lg" w="full" variant="brand" onClick={handleSubmit}>
-            {t.next}
+          <Button
+            size="lg"
+            borderRadius="lg"
+            w="full"
+            variant={successfullySubmitted ? undefined : 'brand'}
+            colorScheme={successfullySubmitted ? 'green' : undefined}
+            leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
+            onClick={!successfullySubmitted ? handleSubmit : undefined}
+            isLoading={submitting}
+            disabled={selectedTime == null}
+            isDisabled={selectedTime == null}
+          >
+            {successfullySubmitted ? t.thankYou : t.next}
           </Button>
           <PoweredBy />
         </Container>

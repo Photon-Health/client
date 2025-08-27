@@ -8,6 +8,7 @@ import {
   useNavigate,
   useSearchParams
 } from 'react-router-dom';
+import queryString from 'query-string';
 
 import { AUTH_HEADER_ERRORS, getOrder } from '../api';
 import { Nav } from '../components';
@@ -24,6 +25,10 @@ export interface OrderContextType {
   order: Order;
   flattenedFills: FillWithCount[];
   setOrder: (order: Order) => void;
+  // enablePrice is used to track whether the patient has enabled price on the pharmacy page
+  // but we need it set the pharmacy after the ready by page
+  enablePrice: boolean;
+  setEnablePrice: (enablePrice: boolean) => void;
   logo: any;
   isDemo: boolean;
   fetchOrder: (currentPharmacy?: Pharmacy) => Promise<Order | undefined>;
@@ -42,6 +47,8 @@ export const Main = () => {
   const location = useLocation();
 
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
+  // This is used to track whether the patient has enabled price on the pharmacy page
+  const [enablePrice, setEnablePrice] = useState<boolean>(false);
 
   const [logo, setLogo] = useState<any>(undefined);
   const [loadingLogo, setLoadingLogo] = useState(true);
@@ -136,7 +143,8 @@ export const Main = () => {
       const hasPharmacy = newOrder.pharmacy?.id;
       const redirect = hasPharmacy ? '/status' : '/review';
 
-      navigate(`${redirect}?orderId=${newOrder.id}&token=${token}`, {
+      const query = queryString.stringify({ orderId: newOrder.id, token });
+      navigate(`${redirect}?${query}`, {
         replace: true
       });
     },
@@ -174,7 +182,8 @@ export const Main = () => {
 
   useEffect(() => {
     if (isDemo && (orderId || order?.id !== demoOrder.id || location.pathname === '/')) {
-      navigate(`/review?demo=true&phone=${phone}`, { replace: true });
+      const query = queryString.stringify({ demo: true, phone });
+      navigate(`/review?${query}`, { replace: true });
     }
   }, [isDemo, location.pathname, navigate, order, orderId, phone]);
 
@@ -243,6 +252,8 @@ export const Main = () => {
     order,
     flattenedFills,
     setOrder,
+    enablePrice,
+    setEnablePrice,
     logo,
     fetchOrder,
     setFaqModalIsOpen
