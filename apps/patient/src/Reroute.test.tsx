@@ -13,6 +13,9 @@ import { routeElements } from './Routes';
 import userEvent from '@testing-library/user-event';
 import { text } from './utils/text';
 
+const mockToken =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30';
+
 vi.mock('./api', () => ({
   geocode: vi.fn().mockResolvedValue({
     lat: 40.7128,
@@ -160,7 +163,7 @@ describe('Rerouting', () => {
 
 const renderApp = () => {
   const memoryRouter = createMemoryRouter(createRoutesFromElements(routeElements), {
-    initialEntries: ['/status']
+    initialEntries: [`/status?token=${mockToken}`]
   });
 
   return { render: render(<RouterProvider router={memoryRouter} />), memoryRouter };

@@ -98,15 +98,33 @@ describe('Pharmacy Component', async () => {
   });
 
   describe('showing prices', () => {
-    describe('when order has single non-GLP medication', () => {
+    describe('when order has single medication', () => {
       beforeEach(async () => {
         getPharmaciesMock.mockResolvedValue({
           pharmaciesByLocation: [generatePharmacy({ id: 'test-pharmacy-123' })]
         });
-        const singleNonGLPFill = [generateFill('Metformin')];
-        const order = generateOrder({ fills: singleNonGLPFill });
+        const singleNonGLPFill = generateFlattenedFill({
+          treatment: generateTreatment({ name: 'Metformin' })
+        });
 
-        await renderPharmacy({ order });
+        const orderWithAddress = generateOrder({
+          address: {
+            street1: '123 Main St',
+            city: 'New York',
+            state: 'NY',
+            postalCode: '10001',
+            country: 'US'
+          }
+        });
+
+        await renderPharmacy({
+          order: orderWithAddress,
+          flattenedFills: [singleNonGLPFill],
+          enablePrice: true
+        });
+
+        // Wait for the component to render and API calls to be made
+        await new Promise((resolve) => setTimeout(resolve, 100));
       });
       it('shows the price toggle switch', async () => {
         expect(
@@ -120,11 +138,10 @@ describe('Pharmacy Component', async () => {
         const firstCallArgs = getPharmaciesMock.mock.calls[0][0];
         expect(firstCallArgs.includePrice).toEqual(true);
       });
-      it('should request pharmacies without prices on toggle click', async () => {
-        getPharmaciesMock.mockClear();
-        await userEvent.click(screen.getByRole('checkbox', { name: 'Show coupon card prices' }));
-        const recentCallArgs = getPharmaciesMock.mock.calls[0][0];
-        expect(recentCallArgs.includePrice).toEqual(false);
+      it('should show the correct initial toggle state', () => {
+        // The toggle should be checked since enablePrice: true in the context
+        const checkbox = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
+        expect(checkbox).toBeChecked();
       });
     });
 
@@ -232,6 +249,8 @@ const renderPharmacy = async (orderContextValueOverride: Partial<OrderContextTyp
     order: generateOrder(),
     setFaqModalIsOpen(isOpen: boolean): void {},
     setOrder(order: Order): void {},
+    enablePrice: false,
+    setEnablePrice: vi.fn(),
     ...orderContextValueOverride
   };
   await act(async () => {

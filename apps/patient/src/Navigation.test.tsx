@@ -12,6 +12,9 @@ import {
 import userEvent from '@testing-library/user-event';
 import { routeElements } from './Routes';
 
+const mockToken =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30';
+
 vi.mock('./api', () => ({
   geocode: vi.fn().mockResolvedValue({
     lat: 40.7128,
@@ -71,7 +74,7 @@ describe('App', () => {
     vi.clearAllMocks();
   });
 
-  test('navigates from review page to readyBy to pharmacy to status', async () => {
+  test('For Local Pickup Pharmacies: navigate from review > pharmacy > readyBy > status', async () => {
     const { getPharmacies, setOrderPharmacy, getOrder } = await import('./api');
     const getOrderMock = vi.mocked(getOrder);
     getOrderMock.mockResolvedValue(testOrder);
@@ -93,21 +96,60 @@ describe('App', () => {
 
     expect(await screen.findByText('Review your prescription')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
-    expect(await screen.findByText('When do you need your order ready by?')).toBeInTheDocument();
-    await userEvent.click(screen.getByText('Urgent'));
-    await userEvent.click(screen.getByText('Next'));
-    expect(setOrderPharmacyMock).not.toHaveBeenCalled();
     expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
     await userEvent.click(screen.getByText('Test Local Pickup Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
+    expect(setOrderPharmacyMock).not.toHaveBeenCalled();
+    expect(await screen.findByText('When do you need your order ready by?')).toBeInTheDocument();
+    await userEvent.click(screen.getByText('Urgent'));
+    await userEvent.click(screen.getByText('Next'));
     expect(setOrderPharmacyMock).toHaveBeenCalledWith(
       'ord_testId777',
       'phr_testId123',
       'Urgent',
       'Today',
       expect.anything(),
-      true
+      false
     );
+    await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
+    expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
+  }, 10_000);
+
+  test('For Mail Order Pharmacies: skips the readyBy page', async () => {
+    const { getPharmacies, setOrderPharmacy, getOrder } = await import('./api');
+    const getOrderMock = vi.mocked(getOrder);
+    getOrderMock.mockResolvedValue(testOrder);
+    const getPharmaciesMock = vi.mocked(getPharmacies);
+    getPharmaciesMock.mockResolvedValue({
+      pharmaciesByLocation: [
+        generatePharmacy({
+          id: 'SUPER_TEST_MAIL_ORDER_PHARMACY',
+          name: 'Test Mail Order Pharmacy',
+          price: 101,
+          retailPrice: 1000
+        })
+      ]
+    });
+    const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
+    setOrderPharmacyMock.mockResolvedValue(true);
+
+    renderApp({ order: testOrder });
+
+    expect(await screen.findByText('Review your prescription')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
+    expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
+    await userEvent.click(screen.getByText('Test Mail Order Pharmacy'));
+    await userEvent.click(screen.getByText('Select pharmacy'));
+    expect(setOrderPharmacyMock).toHaveBeenCalled();
+    expect(setOrderPharmacyMock).toHaveBeenCalledWith(
+      'ord_testId777',
+      'SUPER_TEST_MAIL_ORDER_PHARMACY',
+      undefined,
+      undefined,
+      undefined,
+      false
+    );
+
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
     expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
   }, 10_000);
@@ -115,7 +157,7 @@ describe('App', () => {
 
 const renderApp = (order: Partial<OrderContextType> = {}) => {
   const memoryRouter = createMemoryRouter(createRoutesFromElements(routeElements), {
-    initialEntries: ['/']
+    initialEntries: [`/?token=${mockToken}`]
   });
 
   return { render: render(<RouterProvider router={memoryRouter} />), memoryRouter };
