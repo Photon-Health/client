@@ -501,6 +501,7 @@ export const Pharmacy = () => {
     enableTopRankedCostco,
     enableTopRankedWalgreens,
     enablePrice,
+    setEnablePrice,
     getCostco,
     getWalgreens,
     isDemo,
@@ -632,7 +633,23 @@ export const Pharmacy = () => {
 
     // If it's a mail order pharmacy, submit the pharmacy to the order
     // Otherwise, just navigate to ready by selection
-    if (isMailOrderPharmacy(selectedId)) {
+
+    // console log EVERYTHING
+    console.log('selectedId', selectedId);
+    console.log('allPharmacies', allPharmacies);
+    console.log('isMailOrderPharmacy', isMailOrderPharmacy(selectedId));
+    console.log('isReroute', isReroute);
+    console.log('enablePrice', enablePrice);
+    console.log('order', order);
+    console.log('order.readyBy', order.readyBy);
+    console.log('order.readyByDay', order.readyByDay);
+    console.log('order.readyByTime', order.readyByTime);
+    console.log('order.pharmacy', order.pharmacy);
+    console.log('order.pharmacy.id', order.pharmacy?.id);
+    console.log('order.pharmacy.name', order.pharmacy?.name);
+    console.log('order.pharmacy.address', order.pharmacy?.address);
+
+    if (isMailOrderPharmacy(selectedId) || isReroute) {
       trackSelectedPharmacyRank(selectedId, allPharmacies);
 
       try {

@@ -12,6 +12,9 @@ import {
 import userEvent from '@testing-library/user-event';
 import { routeElements } from './Routes';
 
+const mockToken =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30';
+
 vi.mock('./api', () => ({
   geocode: vi.fn().mockResolvedValue({
     lat: 40.7128,
@@ -141,7 +144,7 @@ describe('App', () => {
     expect(setOrderPharmacyMock).toHaveBeenCalledWith(
       'ord_testId777',
       'SUPER_TEST_MAIL_ORDER_PHARMACY',
-      'Regular',
+      undefined,
       undefined,
       undefined,
       false
@@ -154,7 +157,7 @@ describe('App', () => {
 
 const renderApp = (order: Partial<OrderContextType> = {}) => {
   const memoryRouter = createMemoryRouter(createRoutesFromElements(routeElements), {
-    initialEntries: ['/?token=testToken']
+    initialEntries: [`/?token=${mockToken}`]
   });
 
   return { render: render(<RouterProvider router={memoryRouter} />), memoryRouter };
