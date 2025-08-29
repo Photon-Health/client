@@ -19,7 +19,14 @@ export function getRoutingConstraint(prescription: Prescription): RoutingConstra
   // const { data } = await clinicalClient.query(...)
   // for now this is hard-coded to handle Zepbound edge cases
 
-  const validZepboundVialPackages = ['00002015204', '00002024304', '00002121404', '00002134004'];
+  const validZepboundVialPackages = [
+    '00002015204',
+    '00002024304',
+    '00002121404',
+    '00002134004',
+    '00002200204',
+    '00002142304'
+  ];
   const invalidZepboundVialProducts = [
     '000021423',
     '000021214',
