@@ -1,6 +1,7 @@
 import {
   Alert,
   AlertIcon,
+  Button,
   Container,
   Heading,
   HStack,
@@ -15,7 +16,6 @@ import { useLocation, useSearchParams, Navigate } from 'react-router-dom';
 
 import { usePhoton } from '@photonhealth/react';
 import { Logo } from '../components/Logo';
-import { Auth } from '../components/Auth';
 import useQueryParams from '../../hooks/useQueryParams';
 
 export const Login = () => {
@@ -40,12 +40,18 @@ export const Login = () => {
     return <Navigate to="/" replace />;
   }
 
+  if (isLoading) {
+    return <Button isLoading loadingText="Loading" colorScheme="gray" />;
+  }
+
+  const returnTo = location.state?.returnTo ?? '/';
+
   return (
     <Container maxW="md" py={{ base: '12', md: '24' }}>
       <Stack spacing="8">
         <Stack spacing="6">
           <Logo style={{ paddingLeft: '19.75px' }} bgIsWhite />
-          {error && !isLoading && (
+          {error && (
             <Alert status="error">
               <AlertIcon />
               Access Denied
@@ -76,7 +82,9 @@ export const Login = () => {
           </Stack>
         </Stack>
         <Stack spacing="4">
-          <Auth returnTo={location.state?.returnTo} />
+          <Button colorScheme="blue" onClick={() => login({ appState: { returnTo } })}>
+            Log in
+          </Button>
         </Stack>
       </Stack>
     </Container>
