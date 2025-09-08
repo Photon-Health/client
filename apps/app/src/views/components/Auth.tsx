@@ -20,8 +20,7 @@ const orgSettingsQuery = graphql(/* GraphQL */ `
   }
 `);
 
-export const Auth = (props: AuthProps) => {
-  const { returnTo } = props;
+export const Auth = ({ returnTo = '/' }: AuthProps) => {
   const { clinicalClient, isLoading, isAuthenticated, login, logout } = usePhoton();
   const { data } = useQuery(orgSettingsQuery, { client: clinicalClient });
   const federated = data?.organization?.settings?.providerUx?.federatedAuth ?? false;
@@ -49,5 +48,3 @@ export const Auth = (props: AuthProps) => {
     </Button>
   );
 };
-
-Auth.defaultProps = { returnTo: '/' };
