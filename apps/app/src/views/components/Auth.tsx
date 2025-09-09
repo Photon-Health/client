@@ -1,30 +1,12 @@
 import { Button, Stack } from '@chakra-ui/react';
-
 import { usePhoton } from '@photonhealth/react';
-import { graphql } from 'apps/app/src/gql';
-import { useQuery } from '@apollo/client';
 
 interface AuthProps {
   returnTo?: string;
 }
 
-const orgSettingsQuery = graphql(/* GraphQL */ `
-  query AuthComponentOrgSettingsQuery {
-    organization {
-      settings {
-        providerUx {
-          federatedAuth
-        }
-      }
-    }
-  }
-`);
-
-export const Auth = (props: AuthProps) => {
-  const { returnTo } = props;
-  const { clinicalClient, isLoading, isAuthenticated, login, logout } = usePhoton();
-  const { data } = useQuery(orgSettingsQuery, { client: clinicalClient });
-  const federated = data?.organization?.settings?.providerUx?.federatedAuth ?? false;
+export const Auth = ({ returnTo = '/' }: AuthProps) => {
+  const { isLoading, isAuthenticated, login, logout } = usePhoton();
 
   if (isLoading) return <Button isLoading loadingText="Loading" colorScheme="gray" />;
 
@@ -35,7 +17,7 @@ export const Auth = (props: AuthProps) => {
           colorScheme="brand"
           onClick={() => {
             localStorage.removeItem('previouslyAuthed');
-            logout({ returnTo: window.location.origin, federated });
+            logout({ returnTo: window.location.origin });
           }}
         >
           Log out
@@ -49,5 +31,3 @@ export const Auth = (props: AuthProps) => {
     </Button>
   );
 };
-
-Auth.defaultProps = { returnTo: '/' };
