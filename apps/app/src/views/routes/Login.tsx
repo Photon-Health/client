@@ -21,7 +21,7 @@ export const Login = () => {
   const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });
   const query = useQueryParams();
   const { isAuthenticated, login, error, isLoading } = usePhoton();
-  const authError = query.get('error_description');
+  const auth0QueryError = query.get('error_description');
   const location = useLocation() as any;
 
   // Handle invite with redirect, even if logged in
@@ -40,7 +40,7 @@ export const Login = () => {
     return <Navigate to="/" replace />;
   }
 
-  const presentedError = presentError(error, authError);
+  const presentedError = presentError(error, auth0QueryError);
 
   return (
     <Container maxW="md" py={{ base: '12', md: '24' }}>
@@ -87,17 +87,17 @@ export const Login = () => {
   );
 };
 
-const INVITE_ACCEPTED_BY_WRONG_EMAIL =
+const AUTH0_INVITE_ACCEPTED_BY_WRONG_EMAIL =
   'the specified account is not allowed to accept the current invitation';
 
-const INVITE_NOT_FOUND_OR_ALREADY_USED = 'invitation not found or already used';
+const AUTH0_INVITE_NOT_FOUND_OR_ALREADY_USED = 'invitation not found or already used';
 
 type PresentedError = {
   line1: string;
   line2?: string;
 };
 
-function presentError(error: any, authError: string | null): PresentedError | null {
+function presentError(error: any, auth0QueryError: string | null): PresentedError | null {
   if (error) {
     return {
       line1: 'Access Denied',
@@ -105,7 +105,7 @@ function presentError(error: any, authError: string | null): PresentedError | nu
     };
   }
 
-  if (authError === INVITE_ACCEPTED_BY_WRONG_EMAIL) {
+  if (auth0QueryError === AUTH0_INVITE_ACCEPTED_BY_WRONG_EMAIL) {
     return {
       line1: 'This account was not the invited email address.',
       line2:
@@ -113,7 +113,7 @@ function presentError(error: any, authError: string | null): PresentedError | nu
     };
   }
 
-  if (authError === INVITE_NOT_FOUND_OR_ALREADY_USED) {
+  if (auth0QueryError === AUTH0_INVITE_NOT_FOUND_OR_ALREADY_USED) {
     return {
       line1: 'This invitation has expired or is no longer valid.',
       line2: 'Please ask your administrator for another invite.'
