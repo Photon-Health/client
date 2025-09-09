@@ -35,46 +35,71 @@ import {
 } from '@photonhealth/sdk/dist/types';
 import { useEffect, createContext, useContext, useReducer, useCallback } from 'react';
 import { GetAllergensOptions } from '@photonhealth/sdk/dist/clinical/allergen';
+import { User } from '@auth0/auth0-spa-js';
 
-const reducer = (state: any, action: any) => {
+type PhotonAuthUser = User;
+
+type PhotonAuthState = {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error?: string;
+  user?: PhotonAuthUser | null;
+};
+
+type PhotonAuthActionKind =
+  | 'INITIALISED'
+  | 'HANDLE_REDIRECT_COMPLETE'
+  | 'GET_ACCESS_TOKEN_COMPLETE'
+  | 'CLEAR_ERROR'
+  | 'ERROR';
+
+type PhotonAuthAction = {
+  type: PhotonAuthActionKind;
+  user?: PhotonAuthUser | null;
+  error?: string;
+};
+
+const reducer = (authState: PhotonAuthState, action: PhotonAuthAction): PhotonAuthState => {
   switch (action.type) {
     case 'INITIALISED':
       return {
-        ...state,
+        ...authState,
         isAuthenticated: !!action.user,
         user: action.user,
         isLoading: false,
         error: undefined
       };
     case 'HANDLE_REDIRECT_COMPLETE':
-      if (state.user?.updated_at === action.user?.updated_at) {
-        return state;
+      if (authState.user?.updated_at === action.user?.updated_at) {
+        return authState;
       }
       return {
-        ...state,
+        ...authState,
         isAuthenticated: !!action.user,
         user: action.user
       };
     case 'GET_ACCESS_TOKEN_COMPLETE':
-      if (state.user?.updated_at === action.user?.updated_at) {
-        return state;
+      if (authState.user?.updated_at === action.user?.updated_at) {
+        return authState;
       }
       return {
-        ...state,
+        ...authState,
         isAuthenticated: !!action.user,
         user: action.user
       };
     case 'ERROR':
       return {
-        ...state,
+        ...authState,
         isLoading: false,
         error: action.error
       };
     case 'CLEAR_ERROR':
       return {
-        ...state,
+        ...authState,
         error: undefined
       };
+    default:
+      return authState;
   }
 };
 
@@ -633,8 +658,8 @@ export interface PhotonClientContextInterface {
   logout: PhotonClient['authentication']['logout'];
   isLoading: boolean;
   isAuthenticated: boolean;
-  user: any;
-  error: any;
+  user?: PhotonAuthUser | null;
+  error?: string;
   setOrganization: (organizationId: string) => void;
   clearOrganization: () => void;
 }
@@ -705,7 +730,7 @@ export const PhotonProvider = (opts: {
   onRedirectCallback?: any;
 }) => {
   const { children, client, onRedirectCallback = defaultOnRedirectCallback, searchParams } = opts;
-  const [state, dispatch] = useReducer(reducer, {
+  const [authState, dispatch] = useReducer(reducer, {
     isAuthenticated: false,
     isLoading: true
   });
@@ -726,7 +751,7 @@ export const PhotonProvider = (opts: {
       if (client.authentication.hasAuthParams()) {
         try {
           // @ts-ignore
-          const { appState } = await client.authentication.handleRedirect(state?.returnTo);
+          const { appState } = await client.authentication.handleRedirect(authState?.returnTo);
           onRedirectCallback(appState);
         } catch (e) {
           const message = (e as Error).message;
@@ -2939,7 +2964,7 @@ export const PhotonProvider = (opts: {
   };
 
   const contextValue = {
-    ...state,
+    ...authState,
     env: opts.env,
     clinicalClient: client.apolloClinical,
     login,
@@ -2991,6 +3016,9 @@ export const PhotonProvider = (opts: {
 
   return (
     <ApolloProvider client={client.apollo}>
+      {/*TS-Ignoring because adding typesafety to authState removed the "any" object spread on the context object, */}
+      {/*which had effectively hidden tons of type errors we've had all along*/}
+      {/*@ts-ignore*/}
       <PhotonClientContext.Provider value={contextValue}>{children}</PhotonClientContext.Provider>
     </ApolloProvider>
   );
