@@ -56,7 +56,6 @@ export const Login = () => {
             {query.get('orgs') === '0' ? (
               <Alert status="warning">
                 <AlertIcon />
-                {/* the text below, but left aligned */}
                 <VStack>
                   <Text textAlign="left">
                     You tried logging in with an account not associated with any organizations.
