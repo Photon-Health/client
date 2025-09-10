@@ -55,6 +55,7 @@ export const Main = () => {
       } else {
         addAlert({ message: error, type: 'error' });
         clearError();
+        navigate('/', { replace: true });
       }
     }
   }, [isLoading, error]);
