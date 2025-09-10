@@ -107,16 +107,16 @@ function presentError(error: any, auth0QueryError: string | null): PresentedErro
 
   if (auth0QueryError === AUTH0_INVITE_ACCEPTED_BY_WRONG_EMAIL) {
     return {
-      line1: 'This account was not the invited email address.',
+      line1: 'This account cannot accept this invitation.',
       line2:
-        'Please contact your administrator for another invite, and accept the invite from the invited email address account.'
+        'Please contact your administrator for another invitation, and accept the invitation from the invited email address account.'
     };
   }
 
   if (auth0QueryError === AUTH0_INVITE_NOT_FOUND_OR_ALREADY_USED) {
     return {
-      line1: 'This invitation has expired or is no longer valid.',
-      line2: 'Please ask your administrator for another invite.'
+      line1: 'This invitation is no longer valid.',
+      line2: 'Please contact your administrator for another invitation.'
     };
   }
 
