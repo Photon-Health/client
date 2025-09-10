@@ -33,7 +33,7 @@ import {
   Treatment,
   WebhookConfig
 } from '@photonhealth/sdk/dist/types';
-import { useEffect, createContext, useContext, useReducer, useCallback } from 'react';
+import { useEffect, createContext, useContext, useReducer } from 'react';
 import { GetAllergensOptions } from '@photonhealth/sdk/dist/clinical/allergen';
 
 const reducer = (state: any, action: any) => {
@@ -701,10 +701,9 @@ export const PhotonProvider = (opts: {
   env: Env;
   children: any;
   client: PhotonClient;
-  searchParams?: string;
   onRedirectCallback?: any;
 }) => {
-  const { children, client, onRedirectCallback = defaultOnRedirectCallback, searchParams } = opts;
+  const { children, client, onRedirectCallback = defaultOnRedirectCallback } = opts;
   const [state, dispatch] = useReducer(reducer, {
     isAuthenticated: false,
     isLoading: true
@@ -744,28 +743,6 @@ export const PhotonProvider = (opts: {
   }, [client, onRedirectCallback]);
 
   /// Auth0
-
-  const handleRedirect = useCallback(
-    async (url?: string) => {
-      try {
-        await client.authentication.handleRedirect(url);
-      } catch (e) {
-        const message = (e as Error).message;
-        dispatch({ type: 'ERROR', error: message });
-      }
-      dispatch({
-        type: 'HANDLE_REDIRECT_COMPLETE',
-        user: await client.authentication.getUser()
-      });
-    },
-    [client.authentication]
-  );
-
-  useEffect(() => {
-    if (client.authentication.hasAuthParams(searchParams)) {
-      handleRedirect();
-    }
-  }, [client.authentication, handleRedirect, searchParams]);
 
   const login = ({
     organizationId,
@@ -2945,7 +2922,6 @@ export const PhotonProvider = (opts: {
     login,
     logout,
     getToken,
-    handleRedirect,
     getPatient: useGetPatient,
     getPatients: useGetPatients,
     createPatient: useCreatePatient,
