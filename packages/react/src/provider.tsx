@@ -730,6 +730,7 @@ export const PhotonProvider = (opts: {
         } catch (e) {
           const message = (e as Error).message;
           dispatch({ type: 'ERROR', error: message });
+          return;
         }
       }
       const user = await client.authentication.getUser();
