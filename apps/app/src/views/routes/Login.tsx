@@ -21,7 +21,6 @@ export const Login = () => {
   const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });
   const query = useQueryParams();
   const { isAuthenticated, login, error, isLoading } = usePhoton();
-  const auth0QueryError = query.get('error_description');
   const location = useLocation() as any;
 
   // Handle invite with redirect, even if logged in
@@ -40,7 +39,7 @@ export const Login = () => {
     return <Navigate to="/" replace />;
   }
 
-  const presentedError = presentError(error, auth0QueryError);
+  const presentedError = presentError(error);
 
   return (
     <Container maxW="md" py={{ base: '12', md: '24' }}>
@@ -52,7 +51,7 @@ export const Login = () => {
               <AlertIcon />
               <VStack>
                 <Text textAlign="left">{presentedError.line1}</Text>
-                {presentedError.line2 ? <Text textAlign="left">{presentedError.line2}</Text> : null}
+                <Text textAlign="left">{presentedError.line2}</Text>
               </VStack>
             </Alert>
           )}
@@ -94,26 +93,19 @@ const AUTH0_INVITE_NOT_FOUND_OR_ALREADY_USED = 'invitation not found or already 
 
 type PresentedError = {
   line1: string;
-  line2?: string;
+  line2: string;
 };
 
-function presentError(error: any, auth0QueryError: string | null): PresentedError | null {
-  if (error) {
-    return {
-      line1: 'Access Denied',
-      line2: typeof error === 'string' ? error : undefined
-    };
-  }
-
-  if (auth0QueryError === AUTH0_INVITE_ACCEPTED_BY_WRONG_EMAIL) {
+function presentError(authError: string): PresentedError | null {
+  if (authError === AUTH0_INVITE_ACCEPTED_BY_WRONG_EMAIL) {
     return {
       line1: 'This account cannot accept this invitation.',
       line2:
-        'Please contact your administrator for another invitation, and accept the invitation from the invited email address account.'
+        'Please contact your administrator for another invitation. Make sure to accept the invitation with the correct email address.'
     };
   }
 
-  if (auth0QueryError === AUTH0_INVITE_NOT_FOUND_OR_ALREADY_USED) {
+  if (authError === AUTH0_INVITE_NOT_FOUND_OR_ALREADY_USED) {
     return {
       line1: 'This invitation is no longer valid.',
       line2: 'Please contact your administrator for another invitation.'
