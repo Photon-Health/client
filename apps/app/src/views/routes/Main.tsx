@@ -4,7 +4,6 @@ import { usePhoton } from '@photonhealth/react';
 import { useEffect, useState } from 'react';
 import { Nav } from '../components/Nav';
 import { SelectOrg } from './SelectOrg';
-import { addAlert } from '../../stores/alert';
 import { auth0Config } from '../../configs/auth';
 import useQueryParams from '../../hooks/useQueryParams';
 import { Env } from '@photonhealth/sdk';
@@ -23,7 +22,7 @@ export const Main = () => {
 
   // Detect is browser is Safari
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  const { user, isAuthenticated, isLoading, error, clearError } = usePhoton();
+  const { user, isAuthenticated, isLoading, error } = usePhoton();
   const [previouslyAuthed, setPreviouslyAuthed] = useState(
     localStorage.getItem('previouslyAuthed') != null || false
   );
@@ -46,17 +45,7 @@ export const Main = () => {
 
   useEffect(() => {
     if (!isLoading && error) {
-      if (error.includes('Invalid state')) {
-        clearError();
-      } else if (error.includes('invitation not found or already used')) {
-        addAlert({ message: error, type: 'error' });
-        clearError();
-        navigate('/', { replace: true });
-      } else {
-        addAlert({ message: error, type: 'error' });
-        clearError();
-        navigate('/', { replace: true });
-      }
+      navigate('/', { replace: true });
     }
   }, [isLoading, error]);
 
