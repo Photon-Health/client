@@ -344,8 +344,3 @@ export const Patient = () => {
     </Page>
   );
 };
-
-Patient.defaultProps = {
-  loading: false,
-  error: undefined
-};

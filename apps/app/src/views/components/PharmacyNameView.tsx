@@ -1,7 +1,7 @@
 import { Box, HStack, Link, Text } from '@chakra-ui/react';
 import { Address } from 'packages/sdk/dist/types';
 
-import { formatPhone, formatAddress } from '../../utils';
+import { formatAddress, formatPhone } from '../../utils';
 
 interface PharmacyNameViewProps {
   name: string;
@@ -9,8 +9,18 @@ interface PharmacyNameViewProps {
   address?: Address | null | undefined;
 }
 
-const PharmacyNameView = (props: PharmacyNameViewProps) => {
-  const { name, phone, address } = props;
+const PharmacyNameView = ({
+  name,
+  phone = '',
+  address = {
+    city: '',
+    country: '',
+    postalCode: '',
+    state: '',
+    street1: '',
+    street2: ''
+  }
+}: PharmacyNameViewProps) => {
   return (
     <HStack spacing="3">
       <Box>
@@ -28,18 +38,6 @@ const PharmacyNameView = (props: PharmacyNameViewProps) => {
       </Box>
     </HStack>
   );
-};
-
-PharmacyNameView.defaultProps = {
-  phone: '',
-  address: {
-    city: '',
-    country: '',
-    postalCode: '',
-    state: '',
-    street1: '',
-    street2: ''
-  }
 };
 
 export default PharmacyNameView;
