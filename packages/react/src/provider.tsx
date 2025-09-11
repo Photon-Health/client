@@ -46,15 +46,6 @@ const reducer = (state: any, action: any) => {
         isLoading: false,
         error: undefined
       };
-    case 'HANDLE_REDIRECT_COMPLETE':
-      if (state.user?.updated_at === action.user?.updated_at) {
-        return state;
-      }
-      return {
-        ...state,
-        isAuthenticated: !!action.user,
-        user: action.user
-      };
     case 'GET_ACCESS_TOKEN_COMPLETE':
       if (state.user?.updated_at === action.user?.updated_at) {
         return state;
