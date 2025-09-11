@@ -7,7 +7,6 @@ import { PhotonClient, PhotonProvider } from '@photonhealth/react';
 
 import { useEffect } from 'react';
 import { auth0Config } from './configs/auth';
-import { AlertDisplay } from './views/components/AlertDisplay';
 import { Login } from './views/routes/Login';
 import { Logout } from './views/routes/Logout';
 import { Main } from './views/routes/Main';
@@ -53,7 +52,6 @@ export const App = () => {
   return (
     <BrowserRouter>
       <PhotonProvider env={env} client={client} onRedirectCallback={onRedirectCallback}>
-        <AlertDisplay />
         <Routes>
           <Route path="/" element={<Main />}>
             <Route path="/patients">
