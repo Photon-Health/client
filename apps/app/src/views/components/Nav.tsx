@@ -73,7 +73,6 @@ export const Nav = () => {
   const federated = data?.organization?.settings?.providerUx?.federatedAuth ?? false;
 
   const onLogout = useCallback(() => {
-    localStorage.removeItem('previouslyAuthed');
     logout({ returnTo: window.location.origin, federated });
   }, [logout, federated]);
 

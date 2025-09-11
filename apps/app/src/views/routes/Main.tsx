@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Box, Center, CircularProgress } from '@chakra-ui/react';
 import { usePhoton } from '@photonhealth/react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Nav } from '../components/Nav';
 import { SelectOrg } from './SelectOrg';
 import { auth0Config } from '../../configs/auth';
@@ -23,21 +23,10 @@ export const Main = () => {
   // Detect is browser is Safari
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
   const { user, isAuthenticated, isLoading, error } = usePhoton();
-  const [previouslyAuthed, setPreviouslyAuthed] = useState(
-    localStorage.getItem('previouslyAuthed') != null || false
-  );
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      localStorage.setItem('previouslyAuthed', 'true');
-      setPreviouslyAuthed(true);
-    }
-    if (!isLoading && !isAuthenticated && !error) {
-      localStorage.removeItem('previouslyAuthed');
-      setPreviouslyAuthed(false);
-    }
     if (isAuthenticated && !isLoading) {
       setInstrumentationUserContext(user);
     }
@@ -49,7 +38,7 @@ export const Main = () => {
     }
   }, [isLoading, error]);
 
-  if (isLoading || (previouslyAuthed && !isAuthenticated) || query.get('code')) {
+  if (isLoading || query.get('code')) {
     return (
       <Center h="100vh">
         <CircularProgress isIndeterminate color="green.300" />
