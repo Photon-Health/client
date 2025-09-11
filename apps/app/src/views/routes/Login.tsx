@@ -49,9 +49,9 @@ export const Login = () => {
           {presentedError && !isLoading && (
             <Alert status="error">
               <AlertIcon />
-              <VStack>
-                <Text textAlign="left">{presentedError.line1}</Text>
-                <Text textAlign="left">{presentedError.line2}</Text>
+              <VStack alignItems="start">
+                <Text>{presentedError.line1}</Text>
+                <Text>{presentedError.line2}</Text>
               </VStack>
             </Alert>
           )}
@@ -60,11 +60,11 @@ export const Login = () => {
             {query.get('orgs') === '0' ? (
               <Alert status="warning">
                 <AlertIcon />
-                <VStack>
-                  <Text textAlign="left">
+                <VStack alignItems="start" textAlign="left">
+                  <Text>
                     You tried logging in with an account not associated with any organizations.
                   </Text>
-                  <Text textAlign="left">
+                  <Text>
                     Please check your email for an invite, or ask your administrator for assistance.
                   </Text>
                 </VStack>
