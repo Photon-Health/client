@@ -90,7 +90,3 @@ export const StatusStepper = ({ status, fulfillmentType, patientAddress }: Props
     </Box>
   );
 };
-
-StatusStepper.defaultProps = {
-  patientAddress: undefined
-};

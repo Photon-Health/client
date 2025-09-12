@@ -1,5 +1,5 @@
 import { Link as RouterLink } from 'react-router-dom';
-import { Link as ChakraLink, Box, HStack, Text } from '@chakra-ui/react';
+import { Box, HStack, Link as ChakraLink, Text } from '@chakra-ui/react';
 
 interface NameViewProps {
   name: string;
@@ -8,8 +8,7 @@ interface NameViewProps {
   patientId?: string;
 }
 
-const NameView = (props: NameViewProps) => {
-  const { name, sub, isPatient, patientId } = props;
+const NameView = ({ name, sub = '', isPatient = false, patientId = '' }: NameViewProps) => {
   return (
     <HStack spacing="3">
       <Box>
@@ -31,7 +30,5 @@ const NameView = (props: NameViewProps) => {
     </HStack>
   );
 };
-
-NameView.defaultProps = { sub: '', isPatient: false, patientId: '' };
 
 export default NameView;

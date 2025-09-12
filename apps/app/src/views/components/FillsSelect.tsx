@@ -24,9 +24,7 @@ interface FillsSelectProps {
   initialFills?: string[];
 }
 
-export const FillsSelect = (props: FillsSelectProps) => {
-  const { patientId, name, initialFills } = props;
-
+export const FillsSelect = ({ initialFills = [], patientId, name }: FillsSelectProps) => {
   const [, , { setValue }] = useField(name);
   const [selected, setSelected] = useState<any[]>(initialFills ?? []);
 
@@ -167,8 +165,4 @@ export const FillsSelect = (props: FillsSelectProps) => {
       loading={(patientId && loading) || (patientId && !finished) ? 1 : 0}
     />
   );
-};
-
-FillsSelect.defaultProps = {
-  initialFills: []
 };
