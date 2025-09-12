@@ -45,7 +45,7 @@ export const Login = () => {
     <Container maxW="md" py={{ base: '12', md: '24' }}>
       <Stack spacing="8">
         <Stack spacing="6">
-          <Logo style={{ paddingLeft: '19.75px' }} bgIsWhite />
+          <Logo bgIsWhite margin="auto" />
           {presentedError && !isLoading && (
             <Alert status="error">
               <AlertIcon />
