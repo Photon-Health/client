@@ -48,7 +48,7 @@ export const Login = () => {
           {error && !isLoading && (
             <Alert status="error">
               <AlertIcon />
-              Access Denied
+              {error}
             </Alert>
           )}
           <Stack spacing={{ base: '2', md: '3' }} textAlign="center">
