@@ -96,7 +96,7 @@ type PresentedError = {
   line2: string;
 };
 
-function presentError(authError: string): PresentedError | null {
+function presentError(authError: string | undefined): PresentedError | null {
   if (authError === AUTH0_INVITE_ACCEPTED_BY_WRONG_EMAIL) {
     return {
       line1: 'Wrong email used',
@@ -110,6 +110,13 @@ function presentError(authError: string): PresentedError | null {
       line1: 'Invitation expired',
       line2:
         'This invitation has expired and is no longer valid. Contact your team admin for a new invitation.'
+    };
+  }
+
+  if (authError) {
+    return {
+      line1: 'Something went wrong',
+      line2: typeof authError === 'string' ? authError : JSON.stringify(authError)
     };
   }
 
