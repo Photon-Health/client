@@ -1,3 +1,4 @@
+import { ReactElement, useCallback, useMemo, useRef } from 'react';
 import {
   Alert,
   AlertIcon,
@@ -21,13 +22,9 @@ import {
   useBreakpointValue,
   useColorModeValue
 } from '@chakra-ui/react';
-import { ReactElement, useCallback, useMemo, useRef } from 'react';
-
 import InfiniteScroll from 'react-infinite-scroll-component';
-
 import { FiSearch } from 'react-icons/fi';
-import { Outlet, Link as RouterLink } from 'react-router-dom';
-
+import { Link as RouterLink, Outlet } from 'react-router-dom';
 import { Column, useSortBy, useTable } from 'react-table';
 
 interface TablePageProps {
@@ -39,7 +36,7 @@ interface TablePageProps {
   hideHeaders?: boolean;
   setFilterText: (filter: string) => void;
   filterText: string;
-  fetchMoreData: () => void;
+  fetchMoreData?: () => void;
   hasMore?: boolean;
   searchPlaceholder?: string;
   ctaText?: string;
@@ -54,31 +51,30 @@ interface TablePageProps {
   ctaRight?: boolean;
 }
 
-export const TablePage = (props: TablePageProps) => {
+export const TablePage = ({
+  loading = false,
+  error = undefined,
+  enableSorting = false,
+  hideHeaders = false,
+  hasMore = false,
+  fetchMoreData = () => null,
+  searchPlaceholder = 'Search',
+  ctaText = undefined,
+  ctaColor = undefined,
+  ctaRoute = undefined,
+  ctaOnClick = undefined,
+  paginationIndicator = undefined,
+  paginationActions = undefined,
+  total = undefined,
+  useLoadingOverlay = false,
+  data,
+  columns,
+  setFilterText,
+  filterText,
+  filter,
+  ctaRight
+}: TablePageProps) => {
   const scrollableContainerRef = useRef(null);
-  let { data, columns } = props;
-  const {
-    loading,
-    error,
-    hideHeaders,
-    enableSorting,
-    setFilterText,
-    filterText,
-    fetchMoreData,
-    hasMore,
-    searchPlaceholder,
-    ctaText,
-    ctaColor,
-    ctaRoute,
-    ctaOnClick,
-    filter,
-    paginationIndicator,
-    paginationActions,
-    total,
-    useLoadingOverlay,
-    ctaRight
-  } = props;
-
   const handleInputChange = useCallback(
     (e: any) => {
       setFilterText(e.target.value);
@@ -283,22 +279,4 @@ export const TablePage = (props: TablePageProps) => {
       <Outlet />
     </Box>
   );
-};
-
-TablePage.defaultProps = {
-  loading: false,
-  error: undefined,
-  enableSorting: false,
-  hideHeaders: false,
-  hasMore: false,
-  fetchMoreData: undefined,
-  searchPlaceholder: 'Search',
-  ctaText: undefined,
-  ctaColor: undefined,
-  ctaRoute: undefined,
-  ctaOnClick: undefined,
-  paginationIndicator: undefined,
-  paginationActions: undefined,
-  total: undefined,
-  useLoadingOverlay: false
 };

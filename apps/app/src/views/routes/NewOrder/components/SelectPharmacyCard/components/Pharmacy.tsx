@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -13,7 +13,7 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { RepeatIcon, StarIcon } from '@chakra-ui/icons';
-import { usePhoton, types } from '@photonhealth/react';
+import { types, usePhoton } from '@photonhealth/react';
 
 import { formatAddress } from '../../../../../../utils';
 
@@ -28,9 +28,9 @@ interface PharmacyProps {
 
 export const Pharmacy = ({
   pharmacyId,
-  isPreferred,
+  isPreferred = false,
   isPrevious,
-  showTags,
+  showTags = true,
   resetSelection,
   disableChange = false
 }: PharmacyProps) => {
@@ -110,10 +110,4 @@ export const Pharmacy = ({
       </HStack>
     </VStack>
   );
-};
-
-Pharmacy.defaultProps = {
-  isPreferred: false,
-  showTags: true,
-  handleChangeBtnClick: undefined
 };
