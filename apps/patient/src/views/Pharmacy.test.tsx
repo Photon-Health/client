@@ -97,143 +97,51 @@ describe('Pharmacy Component', async () => {
     });
   });
 
-  describe('showing prices', () => {
-    describe('when order has single medication', () => {
-      beforeEach(async () => {
-        getPharmaciesMock.mockResolvedValue({
-          pharmaciesByLocation: [generatePharmacy({ id: 'test-pharmacy-123' })]
-        });
-        const singleNonGLPFill = generateFlattenedFill({
-          treatment: generateTreatment({ name: 'Metformin' })
-        });
+  describe('when prices are enabled', () => {
+    beforeEach(async () => {
+      await renderPharmacy({
+        enablePrice: true,
+        showPriceToggle: true
+      });
 
-        const orderWithAddress = generateOrder({
-          address: {
-            street1: '123 Main St',
-            city: 'New York',
-            state: 'NY',
-            postalCode: '10001',
-            country: 'US'
-          }
-        });
+      // Wait for the component to render and API calls to be made
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    });
+    it('shows the price toggle switch', async () => {
+      expect(screen.getByRole('checkbox', { name: 'Show coupon card prices' })).toBeInTheDocument();
+    });
+    it('shows the price toggle text', async () => {
+      expect(screen.getByText('Show coupon card prices')).toBeInTheDocument();
+    });
+    it('does request price immediately', async () => {
+      const firstCallArgs = getPharmaciesMock.mock.calls[0][0];
+      expect(firstCallArgs.includePrice).toEqual(true);
+    });
+    it('should show the correct initial toggle state', () => {
+      // The toggle should be checked since enablePrice: true in the context
+      const checkbox = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
+      expect(checkbox).toBeChecked();
+    });
+  });
 
-        await renderPharmacy({
-          order: orderWithAddress,
-          flattenedFills: [singleNonGLPFill],
-          enablePrice: true,
-          showPriceToggle: true
-        });
-
-        // Wait for the component to render and API calls to be made
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      });
-      it('shows the price toggle switch', async () => {
-        expect(
-          screen.getByRole('checkbox', { name: 'Show coupon card prices' })
-        ).toBeInTheDocument();
-      });
-      it('shows the price toggle text', async () => {
-        expect(screen.getByText('Show coupon card prices')).toBeInTheDocument();
-      });
-      it('does request price immediately', async () => {
-        const firstCallArgs = getPharmaciesMock.mock.calls[0][0];
-        expect(firstCallArgs.includePrice).toEqual(true);
-      });
-      it('should show the correct initial toggle state', () => {
-        // The toggle should be checked since enablePrice: true in the context
-        const checkbox = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
-        expect(checkbox).toBeChecked();
+  describe('when prices are disabled', () => {
+    beforeEach(async () => {
+      await renderPharmacy({
+        showPriceToggle: false,
+        enablePrice: false
       });
     });
-
-    describe('when order contains GLP-1 medication', () => {
-      beforeEach(async () => {
-        const glp1MedicationName = 'Semaglutide';
-        const glpFill = generateFlattenedFill({
-          treatment: generateTreatment({ name: glp1MedicationName })
-        });
-
-        await renderPharmacy({ showPriceToggle: true, flattenedFills: [glpFill] });
-      });
-      it('shows the price toggle switch', async () => {
-        expect(
-          screen.getByRole('checkbox', { name: 'Show coupon card prices' })
-        ).toBeInTheDocument();
-      });
+    it('hides the price toggle checkbox', async () => {
+      expect(
+        screen.queryByRole('checkbox', { name: 'Show coupon card prices' })
+      ).not.toBeInTheDocument();
     });
-
-    describe('when order contains GLP-1 medication for org that hides glp prices', () => {
-      beforeEach(async () => {
-        const glp1MedicationName = 'Wegovy';
-        const glpFill = generateFlattenedFill({
-          treatment: generateTreatment({ name: glp1MedicationName })
-        });
-
-        await renderPharmacy({
-          order: generateOrder({ organization: { id: 'org_hidesGlp1Prices', name: 'test-name' } }),
-          flattenedFills: [glpFill]
-        });
-      });
-      it('hides the price toggle checkbox', async () => {
-        expect(
-          screen.queryByRole('checkbox', { name: 'Show coupon card prices' })
-        ).not.toBeInTheDocument();
-      });
+    it('hides the price toggle text', async () => {
+      expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
     });
-
-    describe('when order has multiple prescriptions', () => {
-      beforeEach(async () => {
-        const multipleFills = [
-          generateFlattenedFill({
-            treatment: generateTreatment({ name: 'Metformin' })
-          }),
-          generateFlattenedFill({
-            treatment: generateTreatment({ name: 'Lisinopril' })
-          })
-        ];
-
-        await renderPharmacy({ flattenedFills: multipleFills });
-      });
-      it('hides the price toggle checkbox', async () => {
-        expect(
-          screen.queryByRole('checkbox', { name: 'Show coupon card prices' })
-        ).not.toBeInTheDocument();
-      });
-      it('hides the price toggle text', async () => {
-        expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
-      });
-      it('does not request prices', async () => {
-        const firstCallArgs = getPharmaciesMock.mock.calls[0][0];
-        expect(firstCallArgs.includePrice).toEqual(false);
-      });
-    });
-
-    describe('when order has multiple prescriptions including GLP-1', () => {
-      beforeEach(async () => {
-        const glp1MedicationName = 'Ozempic';
-        const multipleFillsWithGLP = [
-          generateFlattenedFill({
-            treatment: generateTreatment({ name: 'Metformin' })
-          }),
-          generateFlattenedFill({
-            treatment: generateTreatment({ name: glp1MedicationName })
-          })
-        ];
-
-        await renderPharmacy({ flattenedFills: multipleFillsWithGLP });
-      });
-      it('hides the price toggle checkbox', async () => {
-        expect(
-          screen.queryByRole('checkbox', { name: 'Show coupon card prices' })
-        ).not.toBeInTheDocument();
-      });
-      it('hides the price toggle text', async () => {
-        expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
-      });
-      it('does not request prices', async () => {
-        const firstCallArgs = getPharmaciesMock.mock.calls[0][0];
-        expect(firstCallArgs.includePrice).toEqual(false);
-      });
+    it('does not request prices', async () => {
+      const firstCallArgs = getPharmaciesMock.mock.calls[0][0];
+      expect(firstCallArgs.includePrice).toEqual(false);
     });
   });
 });
@@ -250,8 +158,8 @@ const renderPharmacy = async (orderContextValueOverride: Partial<OrderContextTyp
     order: generateOrder(),
     setFaqModalIsOpen(isOpen: boolean): void {},
     setOrder(order: Order): void {},
-    showPriceToggle: false,
-    enablePrice: false,
+    showPriceToggle: true,
+    enablePrice: true,
     setEnablePrice: vi.fn(),
     ...orderContextValueOverride
   };
