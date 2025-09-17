@@ -50,7 +50,7 @@ export const Login = () => {
             <Alert status="error">
               <AlertIcon />
               <VStack alignItems="start">
-                <Text>{presentedError.line1}</Text>
+                <Text fontWeight="bold">{presentedError.line1}</Text>
                 <Text>{presentedError.line2}</Text>
               </VStack>
             </Alert>
@@ -99,16 +99,17 @@ type PresentedError = {
 function presentError(authError: string): PresentedError | null {
   if (authError === AUTH0_INVITE_ACCEPTED_BY_WRONG_EMAIL) {
     return {
-      line1: 'This account cannot accept this invitation.',
+      line1: 'Wrong email used',
       line2:
-        'Please contact your administrator for another invitation. Make sure to accept the invitation with the correct email address.'
+        'This invitation was sent to a different email address. Your invitation link has been invalidated for security reasons. Contact your team admin for a new invitation.'
     };
   }
 
   if (authError === AUTH0_INVITE_NOT_FOUND_OR_ALREADY_USED) {
     return {
-      line1: 'This invitation is no longer valid.',
-      line2: 'Please contact your administrator for another invitation.'
+      line1: 'Invitation expired',
+      line2:
+        'This invitation has expired and is no longer valid. Contact your team admin for a new invitation.'
     };
   }
 
