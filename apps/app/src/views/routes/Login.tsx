@@ -116,7 +116,10 @@ function presentError(authError: string | undefined): PresentedError | null {
   if (authError) {
     return {
       line1: 'Something went wrong',
-      line2: typeof authError === 'string' ? authError : JSON.stringify(authError)
+      line2:
+        typeof authError === 'string'
+          ? authError
+          : 'Please try again later. If you are trying to accept an invitation, contact your team admin for a new invitation.'
     };
   }
 
