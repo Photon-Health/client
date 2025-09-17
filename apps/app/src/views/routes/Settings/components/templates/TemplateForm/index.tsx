@@ -3,8 +3,8 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   Heading,
+  HStack,
   Input,
   Modal,
   ModalBody,
@@ -13,8 +13,8 @@ import {
   ModalOverlay,
   Text,
   Textarea,
-  VStack,
-  useToast
+  useToast,
+  VStack
 } from '@chakra-ui/react';
 
 import { Field, Formik, FormikConfig } from 'formik';
@@ -96,7 +96,7 @@ const templateFormValue = (templateToEdit: PrescriptionTemplate | undefined): Te
 
 export const TemplateForm = ({
   isOpen,
-  edit,
+  edit = false,
   catalogId,
   medicationSelectRef,
   quantityRef,
@@ -398,9 +398,4 @@ export const TemplateForm = ({
       }}
     </Formik>
   );
-};
-
-TemplateForm.defaultProps = {
-  edit: false,
-  isModal: false
 };

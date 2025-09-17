@@ -1,6 +1,5 @@
-import { Container, Heading, Stack, Text, useBreakpointValue, VStack } from '@chakra-ui/react';
-
 import { ReactNode } from 'react';
+import { Container, Heading, Stack, Text, useBreakpointValue, VStack } from '@chakra-ui/react';
 
 export interface PageProps {
   kicker?: string;
@@ -10,8 +9,13 @@ export interface PageProps {
   disableScroll?: boolean;
 }
 
-export const Page = (props: PageProps) => {
-  const { kicker, header, buttons, children, disableScroll } = props;
+export const Page = ({
+  kicker = '',
+  header = '',
+  children = undefined,
+  buttons = undefined,
+  disableScroll = false
+}: PageProps) => {
   return (
     <Container py="8" flex="1" height={disableScroll ? window.innerHeight - 64 : '100%'}>
       <Stack spacing={{ base: kicker ? '3' : '8', lg: kicker ? '3' : '6' }}>
@@ -33,13 +37,4 @@ export const Page = (props: PageProps) => {
       </Stack>
     </Container>
   );
-};
-
-Page.defaultProps = {
-  kicker: '',
-  header: '',
-  subheader: '',
-  children: undefined,
-  buttons: undefined,
-  disableScroll: false
 };
