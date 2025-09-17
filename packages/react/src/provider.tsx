@@ -721,6 +721,7 @@ export const PhotonProvider = (opts: {
         } catch (e) {
           const message = (e as Error).message;
           dispatch({ type: 'ERROR', error: message });
+          console.error('authentication handleRedirect error: ', message);
           return;
         }
       }
