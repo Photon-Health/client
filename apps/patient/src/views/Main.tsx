@@ -60,6 +60,10 @@ export const Main = () => {
   const navigate = useNavigate();
   const [faqModalIsOpen, setFaqModalIsOpen] = useState(false);
 
+  // This is used to track whether the patient has enabled price on the pharmacy page
+  const [showPriceToggle, setShowPriceToggle] = useState<boolean>(false);
+  const [enablePrice, setEnablePrice] = useState<boolean>(false);
+
   const orgId = order?.organization.id;
   const settings = order?.organization.settings;
 
@@ -127,7 +131,9 @@ export const Main = () => {
         pharmacy: currentPharmacy || newOrder?.pharmacy || order?.pharmacy
       });
 
-      setFlattenedFills(countFillsAndRemoveDuplicates(newOrder.fills));
+      const newFlattenedFills = countFillsAndRemoveDuplicates(newOrder.fills);
+      setFlattenedFills(newFlattenedFills);
+      setShowPriceToggle(shouldShowPriceToggle(newFlattenedFills, newOrder));
 
       datadogRum.setGlobalContextProperty('organizationId', newOrder.organization.id);
       datadogRum.setGlobalContextProperty('orderId', orderId);
@@ -246,10 +252,6 @@ export const Main = () => {
       </ChakraProvider>
     );
   }
-
-  const showPriceToggle = shouldShowPriceToggle(flattenedFills, order);
-  // This is used to track whether the patient has enabled price on the pharmacy page
-  const [enablePrice, setEnablePrice] = useState<boolean>(showPriceToggle);
 
   const orderContextValue = {
     isDemo: isDemo != null,
