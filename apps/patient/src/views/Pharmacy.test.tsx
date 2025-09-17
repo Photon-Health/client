@@ -120,7 +120,8 @@ describe('Pharmacy Component', async () => {
         await renderPharmacy({
           order: orderWithAddress,
           flattenedFills: [singleNonGLPFill],
-          enablePrice: true
+          enablePrice: true,
+          showPriceToggle: true
         });
 
         // Wait for the component to render and API calls to be made
@@ -152,7 +153,7 @@ describe('Pharmacy Component', async () => {
           treatment: generateTreatment({ name: glp1MedicationName })
         });
 
-        await renderPharmacy({ flattenedFills: [glpFill] });
+        await renderPharmacy({ showPriceToggle: true, flattenedFills: [glpFill] });
       });
       it('shows the price toggle switch', async () => {
         expect(
@@ -249,6 +250,7 @@ const renderPharmacy = async (orderContextValueOverride: Partial<OrderContextTyp
     order: generateOrder(),
     setFaqModalIsOpen(isOpen: boolean): void {},
     setOrder(order: Order): void {},
+    showPriceToggle: false,
     enablePrice: false,
     setEnablePrice: vi.fn(),
     ...orderContextValueOverride
