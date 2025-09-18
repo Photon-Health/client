@@ -52,7 +52,6 @@ import {
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
-import { shouldShowPriceToggle } from '../utils/shouldShowPriceToggle';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
@@ -67,8 +66,16 @@ function isMailOrderPharmacy(pharmacyId: string): boolean {
 }
 
 export const Pharmacy = () => {
-  const { order, flattenedFills, setOrder, isDemo, fetchOrder, enablePrice, setEnablePrice } =
-    useOrderContext();
+  const {
+    order,
+    flattenedFills,
+    setOrder,
+    isDemo,
+    fetchOrder,
+    showPriceToggle,
+    enablePrice,
+    setEnablePrice
+  } = useOrderContext();
   const mailOrderPharmacies = getOrgMailOrderPharms(order?.organization.id).patient;
   const { enablePatientDeliveryPharmacies, patientFeaturedPharmacyName } =
     order?.organization?.settings?.patientUx ?? {};
@@ -123,7 +130,6 @@ export const Pharmacy = () => {
   const isLoading = loadingLocation || loadingPharmacies;
 
   // pricing
-  const showPriceToggle = shouldShowPriceToggle(flattenedFills, order);
   const shouldTrackOfferImpressionsAndSelections = showPriceToggle && !isDemo;
 
   // filters
