@@ -20,6 +20,7 @@ import { Order } from '../utils/models';
 import { Pharmacy } from '../__generated__/graphql';
 import { FAQModal } from '../components/FAQModal';
 import { patientAnalytics } from '../configs/analytics';
+import { shouldShowPriceToggle } from '../utils/shouldShowPriceToggle';
 
 export interface OrderContextType {
   order: Order;
@@ -28,6 +29,7 @@ export interface OrderContextType {
   // enablePrice is used to track whether the patient has enabled price on the pharmacy page
   // but we need it set the pharmacy after the ready by page
   enablePrice: boolean;
+  showPriceToggle: boolean;
   setEnablePrice: (enablePrice: boolean) => void;
   logo: any;
   isDemo: boolean;
@@ -48,6 +50,7 @@ export const Main = () => {
 
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
   // This is used to track whether the patient has enabled price on the pharmacy page
+  const [showPriceToggle, setShowPriceToggle] = useState<boolean>(false);
   const [enablePrice, setEnablePrice] = useState<boolean>(false);
 
   const [logo, setLogo] = useState<any>(undefined);
@@ -127,7 +130,12 @@ export const Main = () => {
         pharmacy: currentPharmacy || newOrder?.pharmacy || order?.pharmacy
       });
 
-      setFlattenedFills(countFillsAndRemoveDuplicates(newOrder.fills));
+      const newFlattenedFills = countFillsAndRemoveDuplicates(newOrder.fills);
+      setFlattenedFills(newFlattenedFills);
+
+      const showPriceToggle = shouldShowPriceToggle(newFlattenedFills, newOrder);
+      setShowPriceToggle(showPriceToggle);
+      setEnablePrice(showPriceToggle);
 
       datadogRum.setGlobalContextProperty('organizationId', newOrder.organization.id);
       datadogRum.setGlobalContextProperty('orderId', orderId);
@@ -252,6 +260,7 @@ export const Main = () => {
     order,
     flattenedFills,
     setOrder,
+    showPriceToggle,
     enablePrice,
     setEnablePrice,
     logo,
