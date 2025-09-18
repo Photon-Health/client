@@ -109,7 +109,7 @@ describe('App', () => {
       'Urgent',
       'Today',
       expect.anything(),
-      false
+      true
     );
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
     expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
@@ -147,7 +147,7 @@ describe('App', () => {
       undefined,
       undefined,
       undefined,
-      false
+      true
     );
 
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
