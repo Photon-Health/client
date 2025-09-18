@@ -13,7 +13,7 @@ import { routeElements } from '../Routes';
 const mockToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30';
 
-vi.mock('./api', () => ({
+vi.mock('../api', () => ({
   geocode: vi.fn().mockResolvedValue({
     lat: 40.7128,
     lng: -74.006,
@@ -29,7 +29,7 @@ vi.mock('./api', () => ({
   AUTH_HEADER_ERRORS: []
 }));
 
-vi.mock('./configs/graphqlClient', () => ({
+vi.mock('../configs/graphqlClient', () => ({
   setAuthHeader: vi.fn(),
   graphQLClient: {
     request: vi.fn().mockResolvedValue({})
@@ -41,11 +41,11 @@ vi.mock('./configs/graphqlClient', () => ({
 }));
 
 vi.mock('@datadog/browser-rum');
-vi.mock('./configs/analytics');
-vi.mock('./hooks/usePageAnalytics');
+vi.mock('../configs/analytics');
+vi.mock('../hooks/usePageAnalytics');
 vi.mock('react-ga4');
 
-vi.mock('./components', () => ({
+vi.mock('../components', () => ({
   CouponModal: () => <div data-testid="coupon-modal">Coupon Modal</div>,
   FixedFooter: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="fixed-footer">{children}</div>
@@ -59,7 +59,7 @@ vi.mock('./components', () => ({
   Coupons: () => <div data-testid="coupons">Coupons</div>
 }));
 
-describe('App', () => {
+describe('Pharmacy page', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
