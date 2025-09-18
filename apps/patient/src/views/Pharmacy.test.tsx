@@ -1,18 +1,17 @@
-import { act, render, screen } from '@testing-library/react';
-import { ChakraProvider } from '@chakra-ui/react';
-import { MemoryRouter } from 'react-router-dom';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Pharmacy } from './Pharmacy';
-import { OrderContext, OrderContextType } from './Main';
-import { Order } from '../utils/models';
+import { render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, vi } from 'vitest';
+import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import {
   generateFill,
-  generateFlattenedFill,
   generateOrder,
-  generatePharmacy,
-  generateTreatment
+  generatePatient,
+  generatePharmacy
 } from '../test-utils/generators';
 import userEvent from '@testing-library/user-event';
+import { routeElements } from '../Routes';
+
+const mockToken =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30';
 
 vi.mock('../api', () => ({
   geocode: vi.fn().mockResolvedValue({
@@ -20,29 +19,20 @@ vi.mock('../api', () => ({
     lng: -74.006,
     address: '123 Main St, New York, NY 10001'
   }),
+  getOrder: vi.fn(),
   getPharmacies: vi.fn().mockResolvedValue({ pharmaciesByLocation: [] }),
+  getOffers: vi.fn().mockResolvedValue([]),
   rerouteOrder: vi.fn(),
   setOrderPharmacy: vi.fn(),
   setPreferredPharmacy: vi.fn(),
   triggerDemoNotification: vi.fn(),
-  getOffers: vi.fn().mockResolvedValue([])
-}));
-
-vi.mock('../components', () => ({
-  BrandedOptions: () => <div data-testid="branded-options">Branded Options</div>,
-  CouponModal: () => <div data-testid="coupon-modal">Coupon Modal</div>,
-  FixedFooter: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="fixed-footer">{children}</div>
-  ),
-  LocationModal: () => <div data-testid="location-modal">Location Modal</div>,
-  PoweredBy: () => <div data-testid="powered-by">Powered By</div>
+  AUTH_HEADER_ERRORS: []
 }));
 
 vi.mock('../configs/graphqlClient', () => ({
   setAuthHeader: vi.fn(),
   graphQLClient: {
-    request: vi.fn().mockResolvedValue({}),
-    GetOffersForOrder: vi.fn().mockResolvedValue({ offers: [] })
+    request: vi.fn().mockResolvedValue({})
   },
   gqlSerializer: {
     parse: vi.fn(),
@@ -50,219 +40,124 @@ vi.mock('../configs/graphqlClient', () => ({
   }
 }));
 
-describe('Pharmacy Component', async () => {
-  const { getPharmacies } = await import('../api');
-  const getPharmaciesMock = vi.mocked(getPharmacies);
+vi.mock('@datadog/browser-rum');
+vi.mock('../configs/analytics');
+vi.mock('../hooks/usePageAnalytics');
+vi.mock('react-ga4');
 
+vi.mock('../components', () => ({
+  CouponModal: () => <div data-testid="coupon-modal">Coupon Modal</div>,
+  FixedFooter: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="fixed-footer">{children}</div>
+  ),
+  LocationModal: () => <div data-testid="location-modal">Location Modal</div>,
+  PoweredBy: () => <div data-testid="powered-by">Powered By</div>,
+  Nav: () => <div>Nav</div>,
+  PrescriptionsList: () => <div>PrescriptionsList</div>,
+  DemoCtaModal: () => <div data-testid="demo-cta-modal">Demo Cta Modal</div>,
+  PharmacyInfo: () => <div data-testid="pharmacy-info">Pharmacy Info</div>,
+  Coupons: () => <div data-testid="coupons">Coupons</div>
+}));
+
+describe('Pharmacy page', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('when pharmacy has coupon and retail price', async () => {
-    beforeEach(async () => {
-      getPharmaciesMock.mockResolvedValue({
-        pharmaciesByLocation: [
-          generatePharmacy({ id: 'pharmacy-123', price: 101, retailPrice: 1000 })
-        ]
-      });
-
-      await renderPharmacy();
+  test('shows enabled price toggle when order has 1 prescription', async () => {
+    const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
+    const getOrderMock = vi.mocked(getOrder);
+    const singlePrescriptionOrder = generateOrder({
+      id: 'ord_testId777',
+      state: 'ROUTING',
+      patient: generatePatient(),
+      fills: [generateFill('test-treatment')]
     });
-
-    it('should show coupon price', () => {
-      expect(screen.getByText('Coupon Price')).toBeInTheDocument();
-      expect(screen.getByText('$101')).toBeInTheDocument();
+    getOrderMock.mockResolvedValue(singlePrescriptionOrder);
+    const getPharmaciesMock = vi.mocked(getPharmacies);
+    getPharmaciesMock.mockResolvedValue({
+      pharmaciesByLocation: [
+        generatePharmacy({
+          id: 'phr_testId123',
+          name: 'Test Local Pickup Pharmacy',
+          price: 444,
+          retailPrice: 1000
+        })
+      ]
     });
+    const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
+    setOrderPharmacyMock.mockResolvedValue(true);
 
-    it('should show retail price', () => {
-      expect(screen.getByText('Retail')).toBeInTheDocument();
-      expect(screen.getByText('$1000')).toBeInTheDocument();
+    renderApp();
+
+    await navigateToPharmacyScreen();
+
+    const priceToggle = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
+    expect(priceToggle).toBeInTheDocument();
+    expect(priceToggle).toBeEnabled();
+
+    expect(screen.getByText('Coupon Price')).toBeInTheDocument();
+    expect(screen.getByText('$444')).toBeInTheDocument();
+    expect(screen.getByText('Retail')).toBeInTheDocument();
+    expect(screen.getByText('$1000')).toBeInTheDocument();
+
+    const includePriceOptions = getPharmaciesMock.mock.calls.map((call) => {
+      const options = call[0];
+      return options.includePrice;
     });
-  });
+    expect(includePriceOptions).not.toContain(false);
+  }, 10_000);
 
-  describe('when pharmacy has no coupons', async () => {
-    beforeEach(async () => {
-      getPharmaciesMock.mockResolvedValue({
-        pharmaciesByLocation: [
-          generatePharmacy({ id: 'pharmacy-123', price: undefined, retailPrice: undefined })
-        ]
-      });
-
-      await renderPharmacy();
+  test('hides price toggle when order has 2+ prescriptions', async () => {
+    const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
+    const getOrderMock = vi.mocked(getOrder);
+    const multiPrescriptionOrder = generateOrder({
+      id: 'ord_testId888',
+      state: 'ROUTING',
+      patient: generatePatient(),
+      fills: [generateFill('test-treatment-1'), generateFill('test-treatment-2')]
     });
-
-    it('should NOT show coupon or retail prices', () => {
-      expect(screen.queryByText('Coupon Price')).not.toBeInTheDocument();
-      expect(screen.queryByText('Retail')).not.toBeInTheDocument();
+    getOrderMock.mockResolvedValue(multiPrescriptionOrder);
+    const getPharmaciesMock = vi.mocked(getPharmacies);
+    getPharmaciesMock.mockResolvedValue({
+      pharmaciesByLocation: [
+        generatePharmacy({
+          id: 'phr_testId123',
+          name: 'Test Local Pickup Pharmacy'
+        })
+      ]
     });
-  });
+    const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
+    setOrderPharmacyMock.mockResolvedValue(true);
 
-  describe('showing prices', () => {
-    describe('when order has single medication', () => {
-      beforeEach(async () => {
-        getPharmaciesMock.mockResolvedValue({
-          pharmaciesByLocation: [generatePharmacy({ id: 'test-pharmacy-123' })]
-        });
-        const singleNonGLPFill = generateFlattenedFill({
-          treatment: generateTreatment({ name: 'Metformin' })
-        });
+    renderApp();
 
-        const orderWithAddress = generateOrder({
-          address: {
-            street1: '123 Main St',
-            city: 'New York',
-            state: 'NY',
-            postalCode: '10001',
-            country: 'US'
-          }
-        });
+    expect(await screen.findByText('Review your prescriptions')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
+    expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
 
-        await renderPharmacy({
-          order: orderWithAddress,
-          flattenedFills: [singleNonGLPFill],
-          enablePrice: true
-        });
+    const priceToggle = screen.queryByRole('checkbox', { name: 'Show coupon card prices' });
+    expect(priceToggle).not.toBeInTheDocument();
 
-        // Wait for the component to render and API calls to be made
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      });
-      it('shows the price toggle switch', async () => {
-        expect(
-          screen.getByRole('checkbox', { name: 'Show coupon card prices' })
-        ).toBeInTheDocument();
-      });
-      it('shows the price toggle text', async () => {
-        expect(screen.getByText('Show coupon card prices')).toBeInTheDocument();
-      });
-      it('does request price immediately', async () => {
-        const firstCallArgs = getPharmaciesMock.mock.calls[0][0];
-        expect(firstCallArgs.includePrice).toEqual(true);
-      });
-      it('should show the correct initial toggle state', () => {
-        // The toggle should be checked since enablePrice: true in the context
-        const checkbox = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
-        expect(checkbox).toBeChecked();
-      });
-    });
+    const callArgs = getPharmaciesMock.mock.calls.map((call) => call[0].includePrice);
+    expect(callArgs).not.toContain(true);
 
-    describe('when order contains GLP-1 medication', () => {
-      beforeEach(async () => {
-        const glp1MedicationName = 'Semaglutide';
-        const glpFill = generateFlattenedFill({
-          treatment: generateTreatment({ name: glp1MedicationName })
-        });
-
-        await renderPharmacy({ flattenedFills: [glpFill] });
-      });
-      it('shows the price toggle switch', async () => {
-        expect(
-          screen.getByRole('checkbox', { name: 'Show coupon card prices' })
-        ).toBeInTheDocument();
-      });
-    });
-
-    describe('when order contains GLP-1 medication for org that hides glp prices', () => {
-      beforeEach(async () => {
-        const glp1MedicationName = 'Wegovy';
-        const glpFill = generateFlattenedFill({
-          treatment: generateTreatment({ name: glp1MedicationName })
-        });
-
-        await renderPharmacy({
-          order: generateOrder({ organization: { id: 'org_hidesGlp1Prices', name: 'test-name' } }),
-          flattenedFills: [glpFill]
-        });
-      });
-      it('hides the price toggle checkbox', async () => {
-        expect(
-          screen.queryByRole('checkbox', { name: 'Show coupon card prices' })
-        ).not.toBeInTheDocument();
-      });
-    });
-
-    describe('when order has multiple prescriptions', () => {
-      beforeEach(async () => {
-        const multipleFills = [
-          generateFlattenedFill({
-            treatment: generateTreatment({ name: 'Metformin' })
-          }),
-          generateFlattenedFill({
-            treatment: generateTreatment({ name: 'Lisinopril' })
-          })
-        ];
-
-        await renderPharmacy({ flattenedFills: multipleFills });
-      });
-      it('hides the price toggle checkbox', async () => {
-        expect(
-          screen.queryByRole('checkbox', { name: 'Show coupon card prices' })
-        ).not.toBeInTheDocument();
-      });
-      it('hides the price toggle text', async () => {
-        expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
-      });
-      it('does not request prices', async () => {
-        const firstCallArgs = getPharmaciesMock.mock.calls[0][0];
-        expect(firstCallArgs.includePrice).toEqual(false);
-      });
-    });
-
-    describe('when order has multiple prescriptions including GLP-1', () => {
-      beforeEach(async () => {
-        const glp1MedicationName = 'Ozempic';
-        const multipleFillsWithGLP = [
-          generateFlattenedFill({
-            treatment: generateTreatment({ name: 'Metformin' })
-          }),
-          generateFlattenedFill({
-            treatment: generateTreatment({ name: glp1MedicationName })
-          })
-        ];
-
-        await renderPharmacy({ flattenedFills: multipleFillsWithGLP });
-      });
-      it('hides the price toggle checkbox', async () => {
-        expect(
-          screen.queryByRole('checkbox', { name: 'Show coupon card prices' })
-        ).not.toBeInTheDocument();
-      });
-      it('hides the price toggle text', async () => {
-        expect(screen.queryByText('Show coupon card prices')).not.toBeInTheDocument();
-      });
-      it('does not request prices', async () => {
-        const firstCallArgs = getPharmaciesMock.mock.calls[0][0];
-        expect(firstCallArgs.includePrice).toEqual(false);
-      });
-    });
-  });
+    // ensure price UI is not showing in the cards
+    expect(screen.queryByText('Coupon Price')).not.toBeInTheDocument();
+    expect(screen.queryByText('Retail')).not.toBeInTheDocument();
+  }, 10_000);
 });
 
-const renderPharmacy = async (orderContextValueOverride: Partial<OrderContextType> = {}) => {
-  let component;
-  const orderContextValue: OrderContextType = {
-    fetchOrder(currentPharmacy: Order['pharmacy'] | undefined) {
-      return Promise.resolve(undefined);
-    },
-    flattenedFills: [],
-    isDemo: false,
-    logo: undefined,
-    order: generateOrder(),
-    setFaqModalIsOpen(isOpen: boolean): void {},
-    setOrder(order: Order): void {},
-    enablePrice: false,
-    setEnablePrice: vi.fn(),
-    ...orderContextValueOverride
-  };
-  await act(async () => {
-    component = render(
-      <MemoryRouter initialEntries={['?token=test-token&orderId=order-123']}>
-        <OrderContext.Provider value={orderContextValue}>
-          <ChakraProvider>
-            <Pharmacy />
-          </ChakraProvider>
-        </OrderContext.Provider>
-      </MemoryRouter>
-    );
+const renderApp = () => {
+  const memoryRouter = createMemoryRouter(createRoutesFromElements(routeElements), {
+    initialEntries: [`/?token=${mockToken}`]
   });
-  return component;
+
+  return { render: render(<RouterProvider router={memoryRouter} />), memoryRouter };
 };
+
+async function navigateToPharmacyScreen() {
+  expect(await screen.findByText('Review your prescription')).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
+  expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
+}

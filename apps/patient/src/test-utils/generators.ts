@@ -36,13 +36,17 @@ export const generatePatient = (overrides: Partial<Order['patient']> = {}): Orde
   ...overrides
 });
 
-export const generateFill = (treatmentName: string): Order['fills'][number] => ({
-  id: `fil_testIdDefault`,
-  treatment: {
-    id: `med_testIdDefault`,
-    name: treatmentName
-  }
-});
+let fillIdCounter = 0;
+export const generateFill = (treatmentName: string): Order['fills'][number] => {
+  fillIdCounter += 1;
+  return {
+    id: `fil_testIdDefault_${fillIdCounter}`,
+    treatment: {
+      id: `med_testIdDefault_${fillIdCounter}`,
+      name: treatmentName
+    }
+  };
+};
 
 type Fulfillment = Order['fulfillments'][number];
 export const generateFulfillment = (overrides: Partial<Fulfillment> = {}): Fulfillment => ({
