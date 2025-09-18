@@ -142,6 +142,7 @@ describe('App', () => {
     const callArgs = getPharmaciesMock.mock.calls.map((call) => call[0].includePrice);
     expect(callArgs).not.toContain(true);
 
+    // ensure price UI is not showing in the cards
     expect(screen.queryByText('Coupon Price')).not.toBeInTheDocument();
     expect(screen.queryByText('Retail')).not.toBeInTheDocument();
   }, 10_000);
