@@ -1,7 +1,6 @@
 import { shouldShowPriceToggle } from './shouldShowPriceToggle';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { expect } from 'vitest';
 import { generateFlattenedFill, generateOrder, generateTreatment } from '../test-utils/generators';
-import { screen } from '@testing-library/react';
 
 test('shows the price toggle switch when order has single medication', async () => {
   const singleNonGLPFill = generateFlattenedFill({

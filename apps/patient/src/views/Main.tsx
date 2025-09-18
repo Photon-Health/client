@@ -133,7 +133,10 @@ export const Main = () => {
 
       const newFlattenedFills = countFillsAndRemoveDuplicates(newOrder.fills);
       setFlattenedFills(newFlattenedFills);
-      setShowPriceToggle(shouldShowPriceToggle(newFlattenedFills, newOrder));
+
+      const showPriceToggle = shouldShowPriceToggle(newFlattenedFills, newOrder);
+      setShowPriceToggle(showPriceToggle);
+      setEnablePrice(showPriceToggle);
 
       datadogRum.setGlobalContextProperty('organizationId', newOrder.organization.id);
       datadogRum.setGlobalContextProperty('orderId', orderId);
