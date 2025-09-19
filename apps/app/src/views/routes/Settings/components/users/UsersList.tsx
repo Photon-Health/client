@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { ChevronLeftIcon, ChevronRightIcon, CloseIcon } from '@chakra-ui/icons';
 import {
   Alert,
   AlertIcon,
@@ -7,6 +7,10 @@ import {
   Button,
   Container,
   HStack,
+  IconButton,
+  Input,
+  InputGroup,
+  InputRightElement,
   Stack,
   Table,
   TableContainer,
@@ -21,16 +25,16 @@ import {
 import { usePhoton } from '@photonhealth/react';
 import { graphql } from 'apps/app/src/gql';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { PaginationIndicator } from '../PaginationIndicator';
 import { InviteForm } from '../invites/InviteForm';
 import { UserItem } from './UserItem';
 
 const usersQuery = graphql(/* GraphQL */ `
-  query UsersListQuery($page: Int, $pageSize: Int) {
-    userCount
-    users(pageNum: $page, pageSize: $pageSize) {
+  query UsersListQuery($page: Int, $pageSize: Int, $filter: UsersFilter) {
+    userCount(filter: $filter)
+    users(pageNum: $page, pageSize: $pageSize, filter: $filter) {
       id
       ...UserItemUserFragment
     }
@@ -53,11 +57,15 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
 
   // The Pagination component is 1-indexed for some reason
   const [currentPage, setCurrentPage] = useState(1);
+  const [filterInputValue, setFilterInputValue] = useState('');
+  const [nameFilter, setNameFilter] = useState('');
+
   const page = currentPage - 1;
   const PAGE_SIZE = 10;
+  const filter = nameFilter.trim().length > 0 ? { name: nameFilter } : undefined;
   const { data, error, loading } = useQuery(usersQuery, {
     client: clinicalClient,
-    variables: { page, pageSize: PAGE_SIZE }
+    variables: { page, pageSize: PAGE_SIZE, filter }
   });
 
   const pages = Math.ceil((data?.userCount ?? 0) / PAGE_SIZE);
@@ -86,14 +94,57 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
 
   if (!hasUsers) return null;
 
+  const submitFilterSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setNameFilter(filterInputValue);
+    setCurrentPage(1);
+  };
+
+  const handleClearFilterClick = () => {
+    setFilterInputValue('');
+    setNameFilter('');
+    setCurrentPage(1);
+  };
+
   return (
     <Box borderRadius="lg" bg="white" boxShadow="base">
       <Container padding={{ base: '0', md: '0' }}>
         <Stack spacing={3}>
           <HStack justify="space-between" pt={6} pb={2} px={4}>
-            <Text fontSize="xl" fontWeight="medium">
-              Users
-            </Text>
+            <Stack>
+              <Text fontSize="xl" fontWeight="medium">
+                Users
+              </Text>
+              <form onSubmit={submitFilterSearch}>
+                <HStack>
+                  <InputGroup>
+                    <Input
+                      placeholder="Search by name"
+                      value={filterInputValue}
+                      onChange={(e) => setFilterInputValue(e.target.value)}
+                      size="sm"
+                      width="200px"
+                    />
+                    {filterInputValue.length > 0 ? (
+                      <InputRightElement pointerEvents="all">
+                        <IconButton
+                          aria-label="Clear search filter"
+                          size="xs"
+                          variant="ghost"
+                          _hover={{ bg: 'transparent' }}
+                          onClick={handleClearFilterClick}
+                          icon={<CloseIcon w={2} h={2} />}
+                          {...props}
+                        />
+                      </InputRightElement>
+                    ) : undefined}
+                  </InputGroup>
+                  <Button type="submit" size="sm">
+                    Search
+                  </Button>
+                </HStack>
+              </form>
+            </Stack>
             {hasInvite && (
               <Button
                 onClick={onOpen}
@@ -220,8 +271,8 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
                   <Button
                     variant="ghost"
                     rightIcon={<ChevronRightIcon />}
-                    disabled={currentPage === pages}
-                    isDisabled={currentPage === pages}
+                    disabled={pages === 0 || currentPage === pages}
+                    isDisabled={pages === 0 || currentPage === pages}
                     onClick={() => setCurrentPage(Math.min(currentPage + 1, pages))}
                   >
                     Next
