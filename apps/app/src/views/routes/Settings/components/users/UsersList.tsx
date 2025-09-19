@@ -20,7 +20,8 @@ import {
   Thead,
   Tr,
   useBreakpointValue,
-  useDisclosure
+  useDisclosure,
+  VStack
 } from '@chakra-ui/react';
 import { usePhoton } from '@photonhealth/react';
 import { graphql } from 'apps/app/src/gql';
@@ -158,15 +159,13 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
             )}
           </HStack>
           {error ? (
-            <HStack justify="space-between">
-              <Text fontSize="lg" fontWeight="medium">
-                Error: Could not load users
-              </Text>
-              <Alert status="error">
-                <AlertIcon />
-                {error.message}
-              </Alert>
-            </HStack>
+            <Alert status="error">
+              <AlertIcon />
+              <VStack alignItems="start">
+                <Text fontWeight="bold">Error: Could not load users</Text>
+                <Text>{presentError(error.message)}</Text>
+              </VStack>
+            </Alert>
           ) : (
             <>
               <Outlet />
@@ -285,4 +284,12 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
       </Container>
     </Box>
   );
+};
+
+const presentError = (message: string) => {
+  const AUTH0_REQUIRES_3_CHARS_ERROR_MESSAGE = 'at least 3 chars';
+  if (message.includes(AUTH0_REQUIRES_3_CHARS_ERROR_MESSAGE)) {
+    return 'Please enter at least 3 characters.';
+  }
+  return message;
 };
