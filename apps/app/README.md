@@ -2,6 +2,10 @@
 
 ## Local Development
 
+### Graphql Codegen
+
+`npx graphql-codegen --config='apps/app/codegen.ts'`
+
 ### Run against Boson services
 
 > Runs against remote Boson environment services
