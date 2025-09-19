@@ -14,7 +14,6 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "\n  query AuthComponentOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          federatedAuth\n        }\n      }\n    }\n  }\n": typeof types.AuthComponentOrgSettingsQueryDocument,
     "\n  query NavOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          federatedAuth\n        }\n      }\n    }\n  }\n": typeof types.NavOrgSettingsQueryDocument,
     "\n  mutation TicketModalCreateTicket($input: TicketInput!) {\n    createTicket(input: $input) {\n      id\n    }\n  }\n": typeof types.TicketModalCreateTicketDocument,
     "\n  query OrderFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n": typeof types.OrderFormOrgSettingsQueryDocument,
@@ -44,7 +43,7 @@ type Documents = {
     "\n  mutation UserItemActionRemoveUserFromOrganization($userId: ID!) {\n    removeUserFromOrganization(userId: $userId)\n  }\n": typeof types.UserItemActionRemoveUserFromOrganizationDocument,
     "\n  fragment UserItemUserFragment on User {\n    ...UserFragment\n    id\n    npi\n    phone\n    fax\n    email\n    address {\n      street1\n      street2\n      state\n      postalCode\n      country\n      city\n    }\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n    roles {\n      description\n      id\n      name\n    }\n  }\n": typeof types.UserItemUserFragmentFragmentDoc,
     "\n  fragment UserFragment on User {\n    ...RemoveUserActionUserFragment\n    ...EditRolesActionUserFragment\n    id\n    npi\n    phone\n    fax\n    email\n    address {\n      street1\n      street2\n      state\n      postalCode\n      country\n      city\n    }\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n    roles {\n      description\n      id\n      name\n    }\n  }\n": typeof types.UserFragmentFragmentDoc,
-    "\n  query UsersListQuery($page: Int, $pageSize: Int) {\n    userCount\n    users(pageNum: $page, pageSize: $pageSize) {\n      id\n      ...UserItemUserFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n": typeof types.UsersListQueryDocument,
+    "\n  query UsersListQuery($page: Int, $pageSize: Int, $filter: UsersFilter) {\n    userCount(filter: $filter)\n    users(pageNum: $page, pageSize: $pageSize, filter: $filter) {\n      id\n      ...UserItemUserFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n": typeof types.UsersListQueryDocument,
     "\n  query AllRolesSelect {\n    roles {\n      id\n      name\n      description\n    }\n  }\n": typeof types.AllRolesSelectDocument,
     "\n  fragment WebhookItemFragment on WebhookConfig {\n    id\n    url\n  }\n": typeof types.WebhookItemFragmentFragmentDoc,
     "\n  mutation WebhookItemDeleteMutation($webhookId: ID!) {\n    deleteWebhookConfig(webhookId: $webhookId)\n  }\n": typeof types.WebhookItemDeleteMutationDocument,
@@ -54,7 +53,6 @@ type Documents = {
     "\n  fragment OrganizationTreatmentTabFragment on Organization {\n    id\n    name\n  }\n": typeof types.OrganizationTreatmentTabFragmentFragmentDoc,
 };
 const documents: Documents = {
-    "\n  query AuthComponentOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          federatedAuth\n        }\n      }\n    }\n  }\n": types.AuthComponentOrgSettingsQueryDocument,
     "\n  query NavOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          federatedAuth\n        }\n      }\n    }\n  }\n": types.NavOrgSettingsQueryDocument,
     "\n  mutation TicketModalCreateTicket($input: TicketInput!) {\n    createTicket(input: $input) {\n      id\n    }\n  }\n": types.TicketModalCreateTicketDocument,
     "\n  query OrderFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n": types.OrderFormOrgSettingsQueryDocument,
@@ -84,7 +82,7 @@ const documents: Documents = {
     "\n  mutation UserItemActionRemoveUserFromOrganization($userId: ID!) {\n    removeUserFromOrganization(userId: $userId)\n  }\n": types.UserItemActionRemoveUserFromOrganizationDocument,
     "\n  fragment UserItemUserFragment on User {\n    ...UserFragment\n    id\n    npi\n    phone\n    fax\n    email\n    address {\n      street1\n      street2\n      state\n      postalCode\n      country\n      city\n    }\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n    roles {\n      description\n      id\n      name\n    }\n  }\n": types.UserItemUserFragmentFragmentDoc,
     "\n  fragment UserFragment on User {\n    ...RemoveUserActionUserFragment\n    ...EditRolesActionUserFragment\n    id\n    npi\n    phone\n    fax\n    email\n    address {\n      street1\n      street2\n      state\n      postalCode\n      country\n      city\n    }\n    name {\n      first\n      full\n      last\n      middle\n      title\n    }\n    roles {\n      description\n      id\n      name\n    }\n  }\n": types.UserFragmentFragmentDoc,
-    "\n  query UsersListQuery($page: Int, $pageSize: Int) {\n    userCount\n    users(pageNum: $page, pageSize: $pageSize) {\n      id\n      ...UserItemUserFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n": types.UsersListQueryDocument,
+    "\n  query UsersListQuery($page: Int, $pageSize: Int, $filter: UsersFilter) {\n    userCount(filter: $filter)\n    users(pageNum: $page, pageSize: $pageSize, filter: $filter) {\n      id\n      ...UserItemUserFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n": types.UsersListQueryDocument,
     "\n  query AllRolesSelect {\n    roles {\n      id\n      name\n      description\n    }\n  }\n": types.AllRolesSelectDocument,
     "\n  fragment WebhookItemFragment on WebhookConfig {\n    id\n    url\n  }\n": types.WebhookItemFragmentFragmentDoc,
     "\n  mutation WebhookItemDeleteMutation($webhookId: ID!) {\n    deleteWebhookConfig(webhookId: $webhookId)\n  }\n": types.WebhookItemDeleteMutationDocument,
@@ -108,10 +106,6 @@ const documents: Documents = {
  */
 export function graphql(source: string): unknown;
 
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  query AuthComponentOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          federatedAuth\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query AuthComponentOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          federatedAuth\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -231,7 +225,7 @@ export function graphql(source: "\n  fragment UserFragment on User {\n    ...Rem
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query UsersListQuery($page: Int, $pageSize: Int) {\n    userCount\n    users(pageNum: $page, pageSize: $pageSize) {\n      id\n      ...UserItemUserFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n"): (typeof documents)["\n  query UsersListQuery($page: Int, $pageSize: Int) {\n    userCount\n    users(pageNum: $page, pageSize: $pageSize) {\n      id\n      ...UserItemUserFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n"];
+export function graphql(source: "\n  query UsersListQuery($page: Int, $pageSize: Int, $filter: UsersFilter) {\n    userCount(filter: $filter)\n    users(pageNum: $page, pageSize: $pageSize, filter: $filter) {\n      id\n      ...UserItemUserFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n"): (typeof documents)["\n  query UsersListQuery($page: Int, $pageSize: Int, $filter: UsersFilter) {\n    userCount(filter: $filter)\n    users(pageNum: $page, pageSize: $pageSize, filter: $filter) {\n      id\n      ...UserItemUserFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
