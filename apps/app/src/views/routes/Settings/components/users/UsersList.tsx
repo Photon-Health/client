@@ -121,6 +121,7 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
                   <InputGroup>
                     <Input
                       placeholder="Search by name"
+                      aria-label="Search by name"
                       value={filterInputValue}
                       onChange={(e) => setFilterInputValue(e.target.value)}
                       size="sm"
