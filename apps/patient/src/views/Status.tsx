@@ -175,7 +175,7 @@ export const Status = () => {
     rxName: f.prescription.treatment.name,
     quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
     daysSupply: f.prescription?.daysSupply ?? 0,
-    numRefills: f.prescription?.fillsAllowed ? f.prescription.fillsAllowed - 1 : 0,
+    numRefills: Math.max(0, (order.fills?.length ?? 0) - 1),
     expiresAt: f.prescription?.expirationDate ?? new Date()
   }));
 
