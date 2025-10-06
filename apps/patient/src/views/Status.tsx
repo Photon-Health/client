@@ -171,15 +171,16 @@ export const Status = () => {
     exceptions: f.exceptions.filter((e) => e.resolvedAt == null)
   }));
 
-  const prescriptions = fulfillments.map((f) => ({
-    rxName: f.prescription.treatment.name,
-    quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
-    daysSupply: f.prescription?.daysSupply ?? 0,
+  const prescriptions = fulfillments.map((fulfillment) => ({
+    rxName: fulfillment.prescription.treatment.name,
+    quantity: `${fulfillment.prescription?.dispenseQuantity} ${fulfillment.prescription?.dispenseUnit}`,
+    daysSupply: fulfillment.prescription?.daysSupply ?? 0,
     numRefills: Math.max(
       0,
-      (order.fills?.filter((of) => of?.prescription?.id === f.prescription?.id).length ?? 0) - 1
+      (order.fills?.filter((fill) => fill?.prescription?.id === fulfillment.prescription?.id)
+        .length ?? 0) - 1
     ),
-    expiresAt: f.prescription?.expirationDate ?? new Date()
+    expiresAt: fulfillment.prescription?.expirationDate ?? new Date()
   }));
 
   const primaryButtonStyle = {
