@@ -1,3 +1,14 @@
+import { vi } from 'vitest';
+
+vi.mock('../api', () => ({
+  triggerDemoNotification: vi.fn(),
+  geocode: vi.fn().mockResolvedValue({
+    lat: 0,
+    lng: 0,
+    address: 'mocked address'
+  })
+}));
+
 import { computeNumRefillsForPrescription } from './Status';
 
 describe('computeNumRefillsForPrescription', () => {
