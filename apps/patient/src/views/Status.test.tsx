@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import { computeNumRefillsForPrescription } from './Status';
 
 describe('computeNumRefillsForPrescription', () => {
