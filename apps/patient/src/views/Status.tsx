@@ -25,6 +25,15 @@ import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
 
+export const computeNumRefillsForPrescription = (
+  orderFills: Array<{ prescription?: { id?: string } } | null | undefined> | undefined,
+  prescriptionId: string | undefined
+): number => {
+  if (!prescriptionId) return 0;
+  const fillsForRx = orderFills?.filter((fill) => fill?.prescription?.id === prescriptionId).length;
+  return Math.max(0, (fillsForRx ?? 0) - 1);
+};
+
 export const Status = () => {
   const navigate = useNavigate();
   const { order, setOrder, isDemo, setFaqModalIsOpen } = useOrderContext();
@@ -171,12 +180,12 @@ export const Status = () => {
     exceptions: f.exceptions.filter((e) => e.resolvedAt == null)
   }));
 
-  const prescriptions = fulfillments.map((f) => ({
-    rxName: f.prescription.treatment.name,
-    quantity: `${f.prescription?.dispenseQuantity} ${f.prescription?.dispenseUnit}`,
-    daysSupply: f.prescription?.daysSupply ?? 0,
-    numRefills: f.prescription?.fillsAllowed ? f.prescription.fillsAllowed - 1 : 0,
-    expiresAt: f.prescription?.expirationDate ?? new Date()
+  const prescriptions = fulfillments.map((fulfillment) => ({
+    rxName: fulfillment.prescription.treatment.name,
+    quantity: `${fulfillment.prescription?.dispenseQuantity} ${fulfillment.prescription?.dispenseUnit}`,
+    daysSupply: fulfillment.prescription?.daysSupply ?? 0,
+    numRefills: computeNumRefillsForPrescription(order.fills, fulfillment.prescription?.id),
+    expiresAt: fulfillment.prescription?.expirationDate ?? new Date()
   }));
 
   const primaryButtonStyle = {
