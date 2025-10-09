@@ -3,12 +3,14 @@ import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 're
 import { routeElements } from '../Routes';
 import { render, screen } from '@testing-library/react';
 import {
+  generateDiscountCard,
   generateFill,
   generateOrder,
   generatePatient,
   generatePharmacy
 } from '../test-utils/generators';
 import { Order } from '../utils/models';
+import { getOrder } from '../api';
 
 vi.mock('../api', () => ({
   triggerDemoNotification: vi.fn(),
@@ -26,14 +28,61 @@ vi.mock('../configs/analytics');
 vi.mock('../hooks/usePageAnalytics');
 vi.mock('react-ga4');
 
-test('shows coupon external URL', async () => {
-  renderAppAtStatusView();
+describe('Status page Coupon cards', () => {
+  test('shows external URL if present', async () => {
+    renderAppAtStatusView({
+      discountCards: [generateDiscountCard({ externalUrl: 'coupon-card-test-url' })]
+    });
 
-  expect(await screen.findByText('Order is likely ready')).toBeInTheDocument();
+    expect(await screen.findByText('Order is likely ready')).toBeInTheDocument();
+
+    const couponButton = await screen.findByRole('button', { name: /get coupon/i });
+    expect(couponButton).toHaveAttribute('href', 'coupon-card-test-url');
+  });
+
+  test('shows coupon details when there is no external URL', async () => {
+    renderAppAtStatusView({
+      pharmacy: generatePharmacy({ id: 'phr_forDiscountCardTest' }),
+      discountCards: [
+        generateDiscountCard({
+          pharmacyId: 'phr_forDiscountCardTest',
+          bin: 'test-bin',
+          pcn: 'test-pcn',
+          group: 'test-group',
+          memberId: 'test-member-id',
+          externalUrl: undefined
+        })
+      ]
+    });
+
+    expect(await screen.findByText('Order is likely ready')).toBeInTheDocument();
+
+    expect(screen.queryByRole('button', { name: /get coupon/i })).not.toBeInTheDocument();
+
+    expect(screen.getByText('test-bin')).toBeInTheDocument();
+    expect(screen.getByText('test-pcn')).toBeInTheDocument();
+    expect(screen.getByText('test-group')).toBeInTheDocument();
+    expect(screen.getByText('test-member-id')).toBeInTheDocument();
+  });
+
+  test('hides coupon details when fields are missing', async () => {
+    renderAppAtStatusView({
+      pharmacy: generatePharmacy({ id: 'phr_forDiscountCardTest' }),
+      discountCards: [
+        generateDiscountCard({
+          pharmacyId: 'phr_forDiscountCardTest',
+          bin: undefined
+        })
+      ]
+    });
+
+    expect(await screen.findByText('Order is likely ready')).toBeInTheDocument();
+
+    expect(screen.queryByText('Coupon card')).not.toBeInTheDocument();
+  });
 });
 
 const renderAppAtStatusView = async (orderOverrides: Partial<Order> = {}) => {
-  const { getOrder } = await import('../api');
   const getOrderMock = vi.mocked(getOrder);
   const order = generateOrder({
     id: 'ord_statusViewTestId',

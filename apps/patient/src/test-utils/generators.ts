@@ -94,15 +94,15 @@ export const generateOffer = (overrides: Partial<Offer> = {}): Offer => ({
 export const generateDiscountCard = (
   overrides: Partial<Order['discountCards'][number]> = {}
 ): Order['discountCards'][number] => ({
-  id: '',
+  id: 'dsc_test-default',
   prescriptionId: '',
-  price: 0,
-  bin: '',
-  pcn: '',
-  group: '',
-  memberId: '',
-  pharmacyId: '',
-  source: '',
+  price: 1,
+  bin: 'test-default-bin',
+  pcn: 'test-default-pcn',
+  group: 'test-default-group',
+  memberId: 'test-default-member-id',
+  pharmacyId: 'test-default-pharmacy-id',
+  source: 'test-source',
   ...overrides
 });
 

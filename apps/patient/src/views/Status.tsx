@@ -5,7 +5,7 @@ import { Helmet } from 'react-helmet';
 import { FiNavigation, FiPhoneCall, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { triggerDemoNotification } from '../api';
-import { Coupons, DemoCtaModal, PharmacyInfo, PoweredBy } from '../components';
+import { DemoCtaModal, PharmacyInfo, PoweredBy } from '../components';
 import { Card } from '../components/Card';
 import { HolidayAlert } from '../components/HolidayAlert';
 import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal';
@@ -25,6 +25,7 @@ import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
 import { computeNumRefillsForPrescription } from '../utils/presenters';
+import { CouponCardList } from '../components/coupons';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -327,7 +328,7 @@ export const Status = () => {
               }}
             />
 
-            <Coupons />
+            <CouponCardList />
 
             <VStack w="full" alignItems="stretch" spacing={4}>
               <Heading as="h4" size="md">
