@@ -24,15 +24,7 @@ import { useOrderContext } from './Main';
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
-
-export const computeNumRefillsForPrescription = (
-  orderFills: Array<{ prescription?: { id?: string } } | null | undefined> | undefined,
-  prescriptionId: string | undefined
-): number => {
-  if (!prescriptionId) return 0;
-  const fillsForRx = orderFills?.filter((fill) => fill?.prescription?.id === prescriptionId).length;
-  return Math.max(0, (fillsForRx ?? 0) - 1);
-};
+import { computeNumRefillsForPrescription } from '../utils/presenters';
 
 export const Status = () => {
   const navigate = useNavigate();
