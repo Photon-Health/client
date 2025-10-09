@@ -953,7 +953,7 @@ export const Pharmacy = () => {
     <OffersList
       offers={offers || []}
       shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
-      selectedId={selectedId}
+      selectedPharmacyId={selectedId}
       preferredPharmacyId={preferredPharmacyId}
     />
   );

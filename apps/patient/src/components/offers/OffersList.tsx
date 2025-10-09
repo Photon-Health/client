@@ -6,12 +6,12 @@ import { OfferCard } from './OfferCard';
 export const OffersList = ({
   offers,
   shouldTrackOfferImpressionsAndSelections,
-  selectedId,
+  selectedPharmacyId,
   preferredPharmacyId
 }: {
   offers: Offer[];
   shouldTrackOfferImpressionsAndSelections: boolean;
-  selectedId: string;
+  selectedPharmacyId: string;
   preferredPharmacyId: string;
 }) => {
   return (
@@ -25,7 +25,7 @@ export const OffersList = ({
               name: offer.pharmacyName || 'Unknown Pharmacy Name'
             }}
             ordinalPosition={index}
-            isAlreadySelected={selectedId === offer.pharmacyId}
+            isAlreadySelected={selectedPharmacyId === offer.pharmacyId}
             enabled={shouldTrackOfferImpressionsAndSelections}
           >
             <OfferCard
@@ -33,7 +33,7 @@ export const OffersList = ({
               offer={offer}
               pharmacyId={offer.pharmacyId || 'Unknown Pharmacy ID'}
               isPharmacyFulfillingCurrentOrder={false}
-              selected={selectedId === offer.pharmacyId}
+              selected={selectedPharmacyId === offer.pharmacyId}
               isPreferred={preferredPharmacyId === offer.pharmacyId}
               handleSelect={() => {}}
             />
