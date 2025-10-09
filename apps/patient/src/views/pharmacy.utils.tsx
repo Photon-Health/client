@@ -1,11 +1,11 @@
 import { getOffers } from '../api';
-import { AmazonOffer } from '../components/pharmacy-card-list';
+import { Offer } from '../components/pharmacy-card-list';
 import { EnrichedPharmacy, ExtendedFulfillmentType, Order } from '../utils/models';
 import { Pharmacy as PharmacyType } from '../__generated__/graphql';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
-function getNovocareOffers(order: Order): AmazonOffer[] {
+function getNovocareOffers(order: Order): Offer[] {
   const novocareExperimentSegment = determineNovocareExperimentSegment(order);
 
   if (novocareExperimentSegment) {
@@ -21,7 +21,7 @@ function getNovocareOffers(order: Order): AmazonOffer[] {
 }
 
 // this function will return the offers available for the given order
-export async function fetchOffers(order: Order): Promise<AmazonOffer[] | undefined> {
+export async function fetchOffers(order: Order): Promise<Offer[] | undefined> {
   const offers = await getOffers(order.id);
 
   const amazonOffers = offers
@@ -30,7 +30,13 @@ export async function fetchOffers(order: Order): Promise<AmazonOffer[] | undefin
     .map((offer) => ({
       deliveryEstimate: offer.deliveryEstimate?.deliveryPromise,
       costType: offer.cost?.type,
-      costAmount: offer.cost?.amount
+      costAmount: offer.cost?.amount,
+      costAmountTitle: offer.cost?.amountTitle,
+      retailAmount: offer.cost?.retailAmount,
+      retailAmountTitle: offer.cost?.retailAmountTitle,
+      pharmacyId: process.env.REACT_APP_AMAZON_PHARMACY_ID,
+      pharmacyName: 'Amazon Pharmacy',
+      tags: ['In Stock']
     }));
 
   const novocareOffers = getNovocareOffers(order);

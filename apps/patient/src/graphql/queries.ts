@@ -309,6 +309,9 @@ export const GET_OFFERS = gql`
       cost {
         type
         amount
+        amountTitle
+        retailAmount
+        retailAmountTitle
       }
       supplier
     }

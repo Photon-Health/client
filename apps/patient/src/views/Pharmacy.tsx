@@ -44,14 +44,16 @@ import { getOrgMailOrderPharms } from '@client/settings';
 import { fetchOffers, getPharmacy } from './pharmacy.utils';
 import _ from 'lodash';
 import {
-  AmazonOffer,
+  Offer,
   BrandedOptionOverrides,
   BrandedOptions,
+  BrandedOptionsHeader,
   PickupPharmacyCardList
 } from '../components/pharmacy-card-list';
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
+import { OffersList } from '../components/offers/OffersList';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
@@ -142,7 +144,7 @@ export const Pharmacy = () => {
     BrandedOptionOverrides | undefined
   >(undefined);
 
-  const [offers, setOffers] = useState<AmazonOffer[] | undefined>(undefined);
+  const [offers, setOffers] = useState<Offer[] | undefined>(undefined);
 
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
@@ -193,7 +195,7 @@ export const Pharmacy = () => {
 
   useEffect(() => {
     const getOffers = async () => {
-      let fetchedOffers: AmazonOffer[] | undefined;
+      let fetchedOffers: Offer[] | undefined;
 
       // only fetch offers if we don't have any
       if (!offers) {
@@ -895,19 +897,6 @@ export const Pharmacy = () => {
     );
   }
 
-  const capsuleEnabled = enableCourier && order?.address?.postalCode && capsulePharmacyId;
-
-  const brandedOptions = _.uniq([
-    ...(capsuleEnabled ? [capsulePharmacyId] : []),
-    ...(brandedOptionsOverride?.novocareExperimentOverride
-      ? [process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string]
-      : []),
-    ...(brandedOptionsOverride?.amazonPharmacyOverride
-      ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]
-      : []),
-    ...(enableMailOrder ? mailOrderPharmacies : [])
-  ]);
-
   const locationPreview = (
     <VStack w="full" align="start" spacing={1}>
       <Text size="sm">{t.showingLabel}</Text>
@@ -928,6 +917,25 @@ export const Pharmacy = () => {
       {t.setLoc}
     </Button>
   );
+  const capsuleEnabled = enableCourier && order?.address?.postalCode && capsulePharmacyId;
+
+  const brandedOptions = _.uniq([
+    ...(capsuleEnabled ? [capsulePharmacyId] : []),
+    ...(brandedOptionsOverride?.novocareExperimentOverride
+      ? [process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string]
+      : []),
+    ...(brandedOptionsOverride?.amazonPharmacyOverride
+      ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]
+      : []),
+    ...(enableMailOrder ? mailOrderPharmacies : [])
+  ]).filter((id) => !offers?.map((offer) => offer.pharmacyId).includes(id));
+  // filter out any branded options that are in the offers list
+
+  const showBrandedOptionsHeader = brandedOptions.length > 0 && patientLocation;
+
+  const brandedOptionsHeader = showBrandedOptionsHeader ? (
+    <BrandedOptionsHeader title={t.delivery} />
+  ) : null;
 
   const brandedPharmacyOptions = (patientLocation: string) => (
     <BrandedOptions
@@ -938,6 +946,15 @@ export const Pharmacy = () => {
       fulfillingPharmacyId={order.pharmacy?.id}
       brandedOptionOverrides={brandedOptionsOverride ?? {}}
       shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
+    />
+  );
+
+  const offersList = () => (
+    <OffersList
+      offers={offers || []}
+      shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
+      selectedId={selectedId}
+      preferredPharmacyId={preferredPharmacyId}
     />
   );
 
@@ -1033,10 +1050,14 @@ export const Pharmacy = () => {
       <Container pb={showFooter ? 32 : 8}>
         {patientLocation ? (
           <VStack spacing={6} align="stretch" pt={4}>
-            {enableCourier || enableMailOrder || brandedOptionsOverride
-              ? brandedPharmacyOptions(patientLocation)
-              : null}
-            {pickupPharmacyOptions(patientLocation)}
+            <VStack spacing={2} align="span" w="full">
+              {brandedOptionsHeader}
+              {enableCourier || enableMailOrder ? offersList(patientLocation) : null}
+              {enableCourier || enableMailOrder || brandedOptionsOverride
+                ? brandedPharmacyOptions(patientLocation)
+                : null}
+              {pickupPharmacyOptions(patientLocation)}
+            </VStack>
           </VStack>
         ) : null}
       </Container>
