@@ -21,6 +21,7 @@ export const CouponCardList = () => {
   }
 
   const discountCardToShow = discountCards[0];
+
   const { price, bin, pcn, group, memberId } = discountCardToShow;
 
   if (!price || !bin || !pcn || !group || !memberId) {
