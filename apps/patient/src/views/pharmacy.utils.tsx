@@ -12,7 +12,8 @@ function getNovocareOffers(order: Order): Offer[] {
     return [
       {
         costType: 'NOVOCARE_OFFER',
-        deliveryEstimate: novocareExperimentSegment
+        deliveryEstimate: novocareExperimentSegment,
+        tags: ['Delivers in 3-5 days']
       }
     ];
   } else {

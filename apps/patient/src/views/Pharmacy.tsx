@@ -1052,7 +1052,7 @@ export const Pharmacy = () => {
           <VStack spacing={6} align="stretch" pt={4}>
             <VStack spacing={2} align="span" w="full">
               {brandedOptionsHeader}
-              {enableCourier || enableMailOrder ? offersList(patientLocation) : null}
+              {enableCourier || enableMailOrder ? offersList() : null}
               {enableCourier || enableMailOrder || brandedOptionsOverride
                 ? brandedPharmacyOptions(patientLocation)
                 : null}
