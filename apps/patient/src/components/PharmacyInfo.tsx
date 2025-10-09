@@ -339,6 +339,7 @@ export const PharmacyInfo = ({
           <CostWidget
             costAmount={brandedOptionOverride?.amazonPharmacyOverride?.costAmount}
             costType={brandedOptionOverride?.amazonPharmacyOverride?.costType}
+            tags={brandedOptionOverride?.amazonPharmacyOverride?.tags ?? []}
           />
         ) : null}
       </HStack>
