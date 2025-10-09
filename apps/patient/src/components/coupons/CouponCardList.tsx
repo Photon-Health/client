@@ -1,7 +1,7 @@
 import { Heading, VStack } from '@chakra-ui/react';
 import { useOrderContext } from '../../views/Main';
-import { Card } from '../Card';
 import { EmbeddedCouponCard } from './EmbeddedCouponCard';
+import { ExternalLinkCouponCard } from './ExternalLinkCouponCard';
 
 export const CouponCardList = () => {
   const { order } = useOrderContext();
@@ -32,9 +32,11 @@ export const CouponCardList = () => {
       <Heading as="h4" size="md">
         Coupon Card
       </Heading>
-      <Card>
-        <EmbeddedCouponCard coupon={discountCardToShow}></EmbeddedCouponCard>
-      </Card>
+      {discountCardToShow.externalUrl ? (
+        <ExternalLinkCouponCard coupon={discountCardToShow} />
+      ) : (
+        <EmbeddedCouponCard coupon={discountCardToShow} />
+      )}
     </VStack>
   );
 };

@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { CouponModal } from './CouponModal';
-import { Box, HStack, Icon, Image, Link, Text, VStack } from '@chakra-ui/react';
+import { Box, HStack, Icon, Link, Text, VStack } from '@chakra-ui/react';
 import { formatPrice } from '../../utils/formatters';
 import { text as t } from '../../utils/text';
-import goodrxLogo from '../../assets/goodrx_logo.png';
 import { FiInfo } from 'react-icons/fi';
 import { DiscountCard } from '../../__generated__/graphql';
+import { CouponSourceLogo } from './CouponSourceLogo';
+import { Card } from '../Card';
 
 export type Coupon = Pick<
   DiscountCard,
@@ -21,7 +22,7 @@ export const EmbeddedCouponCard = ({ coupon }: { coupon: Coupon }) => {
   };
 
   return (
-    <>
+    <Card>
       <CouponModal isOpen={couponModalOpen} onClose={() => setCouponModalOpen(false)} />
       <VStack w="full" align="stretch" spacing={3}>
         <Text fontSize="4xl" alignSelf="center" fontWeight="700" py={0} lineHeight="1">
@@ -62,12 +63,7 @@ export const EmbeddedCouponCard = ({ coupon }: { coupon: Coupon }) => {
             {memberId}
           </Text>
         </HStack>
-        {source === 'goodrx' ? (
-          <HStack w="full" justify="center">
-            <Text fontSize="sm">Powered by</Text>
-            <Image src={goodrxLogo} alt="GoodRx" h="20px" />
-          </HStack>
-        ) : null}
+        {CouponSourceLogo(source)}
       </VStack>
       <HStack color="blue.500" w="full" justify="center">
         <Icon as={FiInfo} />
@@ -75,6 +71,6 @@ export const EmbeddedCouponCard = ({ coupon }: { coupon: Coupon }) => {
           {t.howToCoupon}
         </Link>
       </HStack>
-    </>
+    </Card>
   );
 };

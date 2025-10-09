@@ -31,12 +31,18 @@ vi.mock('react-ga4');
 describe('Status page Coupon cards', () => {
   test('shows external URL if present', async () => {
     renderAppAtStatusView({
-      discountCards: [generateDiscountCard({ externalUrl: 'coupon-card-test-url' })]
+      pharmacy: generatePharmacy({ id: 'phr_forDiscountCardTest' }),
+      discountCards: [
+        generateDiscountCard({
+          pharmacyId: 'phr_forDiscountCardTest',
+          externalUrl: 'coupon-card-test-url'
+        })
+      ]
     });
 
     expect(await screen.findByText('Order is likely ready')).toBeInTheDocument();
 
-    const couponButton = await screen.findByRole('button', { name: /get coupon/i });
+    const couponButton = await screen.findByRole('link', { name: /get coupon/i });
     expect(couponButton).toHaveAttribute('href', 'coupon-card-test-url');
   });
 
