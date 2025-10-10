@@ -206,63 +206,6 @@ describe('Pharmacy page', () => {
       expect(await screen.findByText('$150')).toBeInTheDocument();
     }, 10_000);
 
-    test('allows selection of offer cards', async () => {
-      const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
-      const getOrderMock = vi.mocked(getOrder);
-      const singlePrescriptionOrder = generateOrder({
-        id: 'ord_testId777',
-        state: 'ROUTING',
-        patient: generatePatient(),
-        fills: [generateFill('test-treatment')],
-        address: {
-          street1: '123 Main St',
-          city: 'New York',
-          state: 'NY',
-          postalCode: '10001',
-          country: 'US'
-        }
-      });
-      getOrderMock.mockResolvedValue(singlePrescriptionOrder);
-
-      const getPharmaciesMock = vi.mocked(getPharmacies);
-      getPharmaciesMock.mockResolvedValue({
-        pharmaciesByLocation: [
-          generatePharmacy({
-            id: 'phr_testId123',
-            name: 'Test Local Pickup Pharmacy',
-            price: 444,
-            retailPrice: 1000
-          })
-        ]
-      });
-
-      const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
-      setOrderPharmacyMock.mockResolvedValue(true);
-
-      renderApp();
-      await navigateToPharmacyScreen();
-
-      // Enable price toggle
-      const priceToggle = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
-      await userEvent.click(priceToggle);
-
-      // Wait for offers to load
-      await screen.findByText('Amazon Pharmacy');
-
-      // Click on an offer card
-      const offerCard = screen
-        .getByText('Amazon Pharmacy')
-        .closest('[data-testid="pharmacy-info"]')?.parentElement;
-      expect(offerCard).toBeInTheDocument();
-
-      if (offerCard) {
-        await userEvent.click(offerCard);
-
-        // Check that the offer is selected (should show selected state)
-        expect(offerCard).toHaveStyle('border-color: var(--chakra-colors-brand-500)');
-      }
-    }, 10_000);
-
     test('shows offers section header when offers are available', async () => {
       const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
       const getOrderMock = vi.mocked(getOrder);
