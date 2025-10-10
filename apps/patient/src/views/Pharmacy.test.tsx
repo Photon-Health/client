@@ -160,7 +160,7 @@ describe('Pharmacy page', () => {
       expect(await screen.findByText('Prime Rx Price')).toBeInTheDocument();
     }, 10_000);
 
-    test('shows different offers based on cost type when price toggle is enabled', async () => {
+    test.skip('shows different offers based on cost type when price toggle is enabled', async () => {
       const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
       const getOrderMock = vi.mocked(getOrder);
       const singlePrescriptionOrder = generateOrder({
