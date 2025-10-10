@@ -46,7 +46,6 @@ vi.mock('../hooks/usePageAnalytics');
 vi.mock('react-ga4');
 
 vi.mock('../components', () => ({
-  CouponModal: () => <div data-testid="coupon-modal">Coupon Modal</div>,
   FixedFooter: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="fixed-footer">{children}</div>
   ),
@@ -55,8 +54,7 @@ vi.mock('../components', () => ({
   Nav: () => <div>Nav</div>,
   PrescriptionsList: () => <div>PrescriptionsList</div>,
   DemoCtaModal: () => <div data-testid="demo-cta-modal">Demo Cta Modal</div>,
-  PharmacyInfo: () => <div data-testid="pharmacy-info">Pharmacy Info</div>,
-  Coupons: () => <div data-testid="coupons">Coupons</div>
+  PharmacyInfo: () => <div data-testid="pharmacy-info">Pharmacy Info</div>
 }));
 
 describe('Pharmacy page', () => {

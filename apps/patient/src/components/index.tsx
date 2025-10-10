@@ -12,5 +12,3 @@ export * from './ReadyText';
 export * from './FAQ';
 export { HorizontalStatusStepper } from './HorizontalStatusStepper';
 export * from './PrescriptionsList';
-export * from './CouponModal';
-export * from './Coupons';
