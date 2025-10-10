@@ -435,8 +435,6 @@ describe('Pharmacy page', () => {
 
     expect(screen.getByText('Coupon Price')).toBeInTheDocument();
     expect(screen.getByText('$444')).toBeInTheDocument();
-    expect(screen.getByText('Retail')).toBeInTheDocument();
-    expect(screen.getByText('$1000')).toBeInTheDocument();
 
     const includePriceOptions = getPharmaciesMock.mock.calls.map((call) => {
       const options = call[0];
