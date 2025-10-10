@@ -1,6 +1,12 @@
 import { Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
 
-export const BrandedOptionsHeader = ({ title }: { title: string }) => {
+export const BrandedOptionsHeader = ({
+  title,
+  description
+}: {
+  title: string;
+  description: string;
+}) => {
   return (
     <VStack spacing={2} align="span" w="full">
       <SlideFade offsetY="60px" in={true}>
@@ -8,7 +14,7 @@ export const BrandedOptionsHeader = ({ title }: { title: string }) => {
           <Heading as="h5" size="sm">
             {title}
           </Heading>
-          <Text size="sm">{title}</Text>
+          <Text size="sm">{description}</Text>
         </VStack>
       </SlideFade>
     </VStack>

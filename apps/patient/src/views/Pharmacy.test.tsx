@@ -9,6 +9,49 @@ import {
 } from '../test-utils/generators';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from '../Routes';
+import {
+  COST_PLUS_PHARMACY_ID,
+  WALMART_MAIL_ORDER_PHARMACY_ID
+} from 'packages/settings/src/pharmacies';
+import { AMAZON_PHARMACY_ID } from 'packages/settings/src/pharmacies';
+
+// Mock the settings and pharmacy utils before any imports
+vi.mock('@client/settings', () => ({
+  getOrgMailOrderPharms: vi.fn().mockReturnValue({
+    patient: ['amazon_pharmacy_id', 'cost_plus_pharmacy_id', 'walmart_mail_order_pharmacy_id']
+  })
+}));
+
+vi.mock('./pharmacy.utils', () => ({
+  fetchOffers: vi.fn().mockResolvedValue([
+    {
+      costType: 'INSURANCE_ESTIMATE',
+      deliveryEstimate: 'Delivers in 2-3 days',
+      costAmount: 25.99,
+      costAmountTitle: 'Insurance Price',
+      retailAmount: 150.0,
+      retailAmountTitle: 'Retail',
+      pharmacyId: 'amazon_pharmacy_id',
+      pharmacyName: 'Amazon Pharmacy',
+      tags: ['In Stock', 'Free Shipping']
+    },
+    {
+      costType: 'PRIME_RX',
+      deliveryEstimate: 'Delivers in 1-2 days',
+      costAmount: 19.99,
+      costAmountTitle: 'Prime Rx Price',
+      retailAmount: 120.0,
+      retailAmountTitle: 'Retail',
+      pharmacyId: 'amazon_pharmacy_id',
+      pharmacyName: 'Amazon Pharmacy',
+      tags: ['Prime Member', 'Fast Delivery']
+    }
+  ]),
+  getPharmacy: vi.fn().mockReturnValue({
+    type: 'MAIL_ORDER',
+    selectedPharmacy: { id: 'amazon_pharmacy_id', name: 'Amazon Pharmacy' }
+  })
+}));
 
 const mockToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30';
@@ -64,6 +107,256 @@ describe('Pharmacy page', () => {
     vi.clearAllMocks();
   });
 
+  describe('offers', () => {
+    test('shows offers when they are available and price toggle is enabled', async () => {
+      const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
+      const getOrderMock = vi.mocked(getOrder);
+      const singlePrescriptionOrder = generateOrder({
+        id: 'ord_testId777',
+        state: 'ROUTING',
+        patient: generatePatient(),
+        fills: [generateFill('test-treatment')],
+        address: {
+          street1: '123 Main St',
+          street2: null,
+          city: 'New York',
+          state: 'NY',
+          postalCode: '10001'
+        }
+      });
+      getOrderMock.mockResolvedValue(singlePrescriptionOrder);
+
+      const getPharmaciesMock = vi.mocked(getPharmacies);
+      getPharmaciesMock.mockResolvedValue({
+        pharmaciesByLocation: [
+          generatePharmacy({
+            id: 'phr_testId123',
+            name: 'Test Local Pickup Pharmacy',
+            price: 444,
+            retailPrice: 1000
+          })
+        ]
+      });
+
+      const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
+      setOrderPharmacyMock.mockResolvedValue(true);
+
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      // Enable price toggle to show offers
+      const priceToggle = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
+      await userEvent.click(priceToggle);
+
+      // Wait for offers to load and check they are displayed
+      expect(await screen.findByText('Amazon Pharmacy')).toBeInTheDocument();
+      expect(await screen.findByText('Delivers in 2-3 days')).toBeInTheDocument();
+      expect(await screen.findByText('$25.99')).toBeInTheDocument();
+      expect(await screen.findByText('Insurance Price')).toBeInTheDocument();
+    }, 10_000);
+
+    test('shows different offers based on cost type when price toggle is enabled', async () => {
+      const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
+      const getOrderMock = vi.mocked(getOrder);
+      const singlePrescriptionOrder = generateOrder({
+        id: 'ord_testId777',
+        state: 'ROUTING',
+        patient: generatePatient(),
+        fills: [generateFill('test-treatment')],
+        address: {
+          street1: '123 Main St',
+          street2: null,
+          city: 'New York',
+          state: 'NY',
+          postalCode: '10001'
+        }
+      });
+      getOrderMock.mockResolvedValue(singlePrescriptionOrder);
+
+      const getPharmaciesMock = vi.mocked(getPharmacies);
+      getPharmaciesMock.mockResolvedValue({
+        pharmaciesByLocation: [
+          generatePharmacy({
+            id: 'phr_testId123',
+            name: 'Test Local Pickup Pharmacy',
+            price: 444,
+            retailPrice: 1000
+          })
+        ]
+      });
+
+      const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
+      setOrderPharmacyMock.mockResolvedValue(true);
+
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      // Enable price toggle
+      const priceToggle = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
+      await userEvent.click(priceToggle);
+
+      // Check that insurance estimate offer is shown (should be prioritized over Prime Rx)
+      expect(await screen.findByText('Insurance Price')).toBeInTheDocument();
+      expect(await screen.findByText('$25.99')).toBeInTheDocument();
+      expect(await screen.findByText('$150')).toBeInTheDocument();
+    }, 10_000);
+
+    test('allows selection of offer cards', async () => {
+      const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
+      const getOrderMock = vi.mocked(getOrder);
+      const singlePrescriptionOrder = generateOrder({
+        id: 'ord_testId777',
+        state: 'ROUTING',
+        patient: generatePatient(),
+        fills: [generateFill('test-treatment')],
+        address: {
+          street1: '123 Main St',
+          street2: null,
+          city: 'New York',
+          state: 'NY',
+          postalCode: '10001'
+        }
+      });
+      getOrderMock.mockResolvedValue(singlePrescriptionOrder);
+
+      const getPharmaciesMock = vi.mocked(getPharmacies);
+      getPharmaciesMock.mockResolvedValue({
+        pharmaciesByLocation: [
+          generatePharmacy({
+            id: 'phr_testId123',
+            name: 'Test Local Pickup Pharmacy',
+            price: 444,
+            retailPrice: 1000
+          })
+        ]
+      });
+
+      const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
+      setOrderPharmacyMock.mockResolvedValue(true);
+
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      // Enable price toggle
+      const priceToggle = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
+      await userEvent.click(priceToggle);
+
+      // Wait for offers to load
+      await screen.findByText('Amazon Pharmacy');
+
+      // Click on an offer card
+      const offerCard = screen
+        .getByText('Amazon Pharmacy')
+        .closest('[data-testid="pharmacy-info"]')?.parentElement;
+      expect(offerCard).toBeInTheDocument();
+
+      if (offerCard) {
+        await userEvent.click(offerCard);
+
+        // Check that the offer is selected (should show selected state)
+        expect(offerCard).toHaveStyle('border-color: var(--chakra-colors-brand-500)');
+      }
+    }, 10_000);
+
+    test('shows offers section header when offers are available', async () => {
+      const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
+      const getOrderMock = vi.mocked(getOrder);
+      const singlePrescriptionOrder = generateOrder({
+        id: 'ord_testId777',
+        state: 'ROUTING',
+        patient: generatePatient(),
+        fills: [generateFill('test-treatment')],
+        address: {
+          street1: '123 Main St',
+          street2: null,
+          city: 'New York',
+          state: 'NY',
+          postalCode: '10001'
+        }
+      });
+      getOrderMock.mockResolvedValue(singlePrescriptionOrder);
+
+      const getPharmaciesMock = vi.mocked(getPharmacies);
+      getPharmaciesMock.mockResolvedValue({
+        pharmaciesByLocation: [
+          generatePharmacy({
+            id: 'phr_testId123',
+            name: 'Test Local Pickup Pharmacy',
+            price: 444,
+            retailPrice: 1000
+          })
+        ]
+      });
+
+      const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
+      setOrderPharmacyMock.mockResolvedValue(true);
+
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      // Enable price toggle
+      const priceToggle = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
+      await userEvent.click(priceToggle);
+
+      // Check that delivery section header is shown
+      expect(await screen.findByText('Delivery')).toBeInTheDocument();
+      expect(await screen.findByText('Get delivered')).toBeInTheDocument();
+    }, 10_000);
+
+    test('does not show offers when no offers are available', async () => {
+      // Mock fetchOffers to return empty array
+      vi.doMock('./pharmacy.utils', () => ({
+        fetchOffers: vi.fn().mockResolvedValue([]),
+        getPharmacy: vi.fn().mockReturnValue({
+          type: 'MAIL_ORDER',
+          selectedPharmacy: { id: 'amazon_pharmacy_id', name: 'Amazon Pharmacy' }
+        })
+      }));
+
+      const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
+      const getOrderMock = vi.mocked(getOrder);
+      const singlePrescriptionOrder = generateOrder({
+        id: 'ord_testId777',
+        state: 'ROUTING',
+        patient: generatePatient(),
+        fills: [generateFill('test-treatment')],
+        address: {
+          street1: '123 Main St',
+          street2: null,
+          city: 'New York',
+          state: 'NY',
+          postalCode: '10001'
+        }
+      });
+      getOrderMock.mockResolvedValue(singlePrescriptionOrder);
+
+      const getPharmaciesMock = vi.mocked(getPharmacies);
+      getPharmaciesMock.mockResolvedValue({
+        pharmaciesByLocation: [
+          generatePharmacy({
+            id: 'phr_testId123',
+            name: 'Test Local Pickup Pharmacy',
+            price: 444,
+            retailPrice: 1000
+          })
+        ]
+      });
+
+      const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
+      setOrderPharmacyMock.mockResolvedValue(true);
+
+      renderApp();
+      await navigateToPharmacyScreen();
+
+      // Enable price toggle
+      const priceToggle = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
+      await userEvent.click(priceToggle);
+
+      // Check that no offers are displayed
+      expect(screen.queryByText('Amazon Pharmacy')).not.toBeInTheDocument();
+      expect(screen.queryByText('Novocare')).not.toBeInTheDocument();
+    }, 10_000);
+  });
   test('shows enabled price toggle when order has 1 prescription', async () => {
     const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
     const getOrderMock = vi.mocked(getOrder);

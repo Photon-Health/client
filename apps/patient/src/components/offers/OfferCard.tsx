@@ -10,7 +10,7 @@ interface Props {
   isPharmacyFulfillingCurrentOrder: boolean;
   selected: boolean;
   isPreferred: boolean;
-  handleSelect: (id: string) => void;
+  handleSelect: (id: string, offer?: Offer) => void;
 }
 export const OfferCard = ({
   offer,
@@ -37,7 +37,7 @@ export const OfferCard = ({
       }
       borderRadius="lg"
       shadow={'none'}
-      onClick={() => handleSelect(pharmacyId)}
+      onClick={() => handleSelect(pharmacyId, offer)}
       mx={{ base: -2, md: undefined }}
       cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
       pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}

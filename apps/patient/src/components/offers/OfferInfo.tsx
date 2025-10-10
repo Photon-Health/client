@@ -56,7 +56,6 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
       default:
         return (
           <Tag key={tag} size="sm" colorScheme="blue">
-            <TagLeftIcon boxSize="12px" as={FiStar} />
             <TagLabel> {tag}</TagLabel>
           </Tag>
         );

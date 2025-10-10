@@ -145,6 +145,7 @@ export const Pharmacy = () => {
   >(undefined);
 
   const [offers, setOffers] = useState<Offer[] | undefined>(undefined);
+  const [filteredOffers, setFilteredOffers] = useState<Offer[] | undefined>(undefined);
 
   // pagination
   const [pageOffset, setPageOffset] = useState(0);
@@ -211,8 +212,8 @@ export const Pharmacy = () => {
   }, [order, offers]);
 
   useEffect(() => {
-    const cashOffer = offers?.find((offer) => offer.costType == 'CASH');
     const insuranceOffer = offers?.find((offer) => offer.costType == 'INSURANCE_ESTIMATE');
+    const primeRxOffer = offers?.find((offer) => offer.costType == 'PRIME_RX');
 
     const novocareOffer = offers?.find((offer) => offer.costType == 'NOVOCARE_OFFER');
 
@@ -221,13 +222,17 @@ export const Pharmacy = () => {
     // so the price won't be shown
     let amazonPharmacyOverride;
 
+    const filteringOffers = [];
+
     // we'll only want to set the override
     // if we have at least one offer
-    if (insuranceOffer || cashOffer) {
-      if (enablePrice) {
-        amazonPharmacyOverride = cashOffer;
-      } else {
+    if (insuranceOffer || primeRxOffer) {
+      if (enablePrice && primeRxOffer) {
+        amazonPharmacyOverride = primeRxOffer;
+        filteringOffers.push(primeRxOffer);
+      } else if (enablePrice && insuranceOffer) {
         amazonPharmacyOverride = insuranceOffer;
+        filteringOffers.push(insuranceOffer);
       }
     }
 
@@ -236,8 +241,13 @@ export const Pharmacy = () => {
       novocareExperimentOverride: novocareOffer?.deliveryEstimate
     };
 
+    if (novocareOffer) {
+      filteringOffers.push(novocareOffer);
+    }
+
     if (JSON.stringify(newBrandedOptionsOverride) !== JSON.stringify(brandedOptionsOverride)) {
       setBrandedOptionsOverride(newBrandedOptionsOverride);
+      setFilteredOffers(filteringOffers);
     }
   }, [enablePrice, offers, order, brandedOptionsOverride]);
 
@@ -921,6 +931,8 @@ export const Pharmacy = () => {
 
   const brandedOptions = _.uniq([
     ...(capsuleEnabled ? [capsulePharmacyId] : []),
+    // the destructuring for novo and amazon can be removed once we remove brandedOptionsOverrides
+    // and switch fully over the offers-based approach
     ...(brandedOptionsOverride?.novocareExperimentOverride
       ? [process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string]
       : []),
@@ -928,35 +940,52 @@ export const Pharmacy = () => {
       ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]
       : []),
     ...(enableMailOrder ? mailOrderPharmacies : [])
-  ]).filter((id) => !offers?.map((offer) => offer.pharmacyId).includes(id));
+  ]).filter((id) => !filteredOffers?.map((offer) => offer.pharmacyId).includes(id));
   // filter out any branded options that are in the offers list
 
-  const showBrandedOptionsHeader = brandedOptions.length > 0 && patientLocation;
+  const showBrandedOptionsHeader =
+    (brandedOptions.length > 0 || (filteredOffers || []).length > 0) && !!patientLocation;
 
-  const brandedOptionsHeader = showBrandedOptionsHeader ? (
-    <BrandedOptionsHeader title={t.delivery} />
-  ) : null;
+  const showOffers =
+    enableCourier ||
+    enableMailOrder ||
+    showBrandedOptionsHeader ||
+    (filteredOffers || []).length > 0;
 
-  const brandedPharmacyOptions = (patientLocation: string) => (
-    <BrandedOptions
-      options={brandedOptions}
-      location={patientLocation}
-      selectedId={selectedId}
-      handleSelect={handleSelect}
-      fulfillingPharmacyId={order.pharmacy?.id}
-      brandedOptionOverrides={brandedOptionsOverride ?? {}}
-      shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
-    />
-  );
+  const showBrandedOptions =
+    enableCourier ||
+    enableMailOrder ||
+    brandedOptionsOverride !== undefined ||
+    showBrandedOptionsHeader;
 
-  const offersList = () => (
-    <OffersList
-      offers={offers || []}
-      shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
-      selectedPharmacyId={selectedId}
-      preferredPharmacyId={preferredPharmacyId}
-    />
-  );
+  const brandedOptionsHeader = () =>
+    showBrandedOptionsHeader ? (
+      <BrandedOptionsHeader title={t.delivery} description={t.getDelivered} />
+    ) : null;
+
+  const brandedPharmacyOptions = (patientLocation: string) =>
+    showBrandedOptions ? (
+      <BrandedOptions
+        options={brandedOptions}
+        location={patientLocation}
+        selectedId={selectedId}
+        handleSelect={handleSelect}
+        fulfillingPharmacyId={order.pharmacy?.id}
+        brandedOptionOverrides={brandedOptionsOverride ?? {}}
+        shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
+      />
+    ) : null;
+
+  const offersList = () =>
+    showOffers ? (
+      <OffersList
+        offers={filteredOffers || []}
+        shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
+        selectedPharmacyId={selectedId}
+        preferredPharmacyId={preferredPharmacyId}
+        handleSelect={handleSelect}
+      />
+    ) : null;
 
   const showPickupHeading =
     (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined) ?? false;
@@ -1051,11 +1080,9 @@ export const Pharmacy = () => {
         {patientLocation ? (
           <VStack spacing={6} align="stretch" pt={4}>
             <VStack spacing={2} align="span" w="full">
-              {brandedOptionsHeader}
-              {enableCourier || enableMailOrder ? offersList() : null}
-              {enableCourier || enableMailOrder || brandedOptionsOverride
-                ? brandedPharmacyOptions(patientLocation)
-                : null}
+              {brandedOptionsHeader()}
+              {offersList()}
+              {brandedPharmacyOptions(patientLocation)}
               {pickupPharmacyOptions(patientLocation)}
             </VStack>
           </VStack>
