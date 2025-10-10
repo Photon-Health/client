@@ -278,6 +278,22 @@ export const Status = () => {
 
         <Container>
           <VStack spacing={7}>
+            <OrderSummary
+              fulfillments={fulfillments}
+              onViewDetails={() => {
+                setOrderDetailsIsOpen(true);
+                patientAnalytics.track('Status, View Order Details', order, {
+                  orderId: order?.id,
+                  pharmacyId: pharmacy?.id,
+                  pharmacyName: pharmacy?.name,
+                  fulfillmentType: fulfillmentType,
+                  prescriptionCount: fulfillments.length
+                });
+              }}
+            />
+
+            <CouponCardList />
+
             {displayPharmacy && (
               <VStack w="full" alignItems="stretch" spacing={4}>
                 <Heading as="h4" size="md">
@@ -313,22 +329,6 @@ export const Status = () => {
                 </Card>
               </VStack>
             )}
-
-            <OrderSummary
-              fulfillments={fulfillments}
-              onViewDetails={() => {
-                setOrderDetailsIsOpen(true);
-                patientAnalytics.track('Status, View Order Details', order, {
-                  orderId: order?.id,
-                  pharmacyId: pharmacy?.id,
-                  pharmacyName: pharmacy?.name,
-                  fulfillmentType: fulfillmentType,
-                  prescriptionCount: fulfillments.length
-                });
-              }}
-            />
-
-            <CouponCardList />
 
             <VStack w="full" alignItems="stretch" spacing={4}>
               <Heading as="h4" size="md">
