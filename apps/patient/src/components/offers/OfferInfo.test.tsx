@@ -85,7 +85,7 @@ describe('OfferInfo', () => {
       />
     );
 
-    const retailPriceElement = screen.getByText('$150.00');
+    const retailPriceElement = screen.getByText('$150');
     expect(retailPriceElement).toBeInTheDocument();
     expect(retailPriceElement).toHaveStyle('text-decoration: line-through');
   });
