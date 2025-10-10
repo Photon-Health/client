@@ -40,7 +40,7 @@ const checkDisabled = (option: string): boolean => {
 };
 
 export const ReadyBy = () => {
-  const { order, flattenedFills, setOrder, enablePrice } = useOrderContext();
+  const { order, flattenedFills, enablePrice, fetchOrder } = useOrderContext();
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
@@ -108,12 +108,8 @@ export const ReadyBy = () => {
       );
 
       if (result) {
-        setOrder({
-          ...order,
-          readyBy: selectedTime,
-          readyByDay: selectedDay,
-          readyByTime
-        });
+        // necessary to ensure the order is updated with the new coupon before navigating
+        await fetchOrder(order.pharmacy);
 
         setSuccessfullySubmitted(true);
         setTimeout(() => {
