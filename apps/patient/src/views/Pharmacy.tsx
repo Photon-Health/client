@@ -231,7 +231,7 @@ export const Pharmacy = () => {
       if (enablePrice && primeRxOffer) {
         amazonPharmacyOverride = primeRxOffer;
         filteringOffers.push(primeRxOffer);
-      } else if (enablePrice && insuranceOffer) {
+      } else if (!enablePrice && insuranceOffer) {
         amazonPharmacyOverride = insuranceOffer;
         filteringOffers.push(insuranceOffer);
       }
