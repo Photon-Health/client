@@ -170,6 +170,7 @@ describe('Pharmacy page', () => {
         fills: [generateFill('test-treatment')],
         address: {
           street1: '123 Main St',
+          street2: undefined,
           city: 'New York',
           state: 'NY',
           postalCode: '10001',
@@ -216,6 +217,7 @@ describe('Pharmacy page', () => {
         fills: [generateFill('test-treatment')],
         address: {
           street1: '123 Main St',
+          street2: undefined,
           city: 'New York',
           state: 'NY',
           postalCode: '10001',
