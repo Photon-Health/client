@@ -118,10 +118,11 @@ describe('Pharmacy page', () => {
         fills: [generateFill('test-treatment')],
         address: {
           street1: '123 Main St',
-          street2: null,
+          street2: undefined,
           city: 'New York',
           state: 'NY',
-          postalCode: '10001'
+          postalCode: '10001',
+          country: 'US'
         }
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
@@ -165,10 +166,10 @@ describe('Pharmacy page', () => {
         fills: [generateFill('test-treatment')],
         address: {
           street1: '123 Main St',
-          street2: null,
           city: 'New York',
           state: 'NY',
-          postalCode: '10001'
+          postalCode: '10001',
+          country: 'US'
         }
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
@@ -211,10 +212,10 @@ describe('Pharmacy page', () => {
         fills: [generateFill('test-treatment')],
         address: {
           street1: '123 Main St',
-          street2: null,
           city: 'New York',
           state: 'NY',
-          postalCode: '10001'
+          postalCode: '10001',
+          country: 'US'
         }
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
@@ -268,10 +269,10 @@ describe('Pharmacy page', () => {
         fills: [generateFill('test-treatment')],
         address: {
           street1: '123 Main St',
-          street2: null,
           city: 'New York',
           state: 'NY',
-          postalCode: '10001'
+          postalCode: '10001',
+          country: 'US'
         }
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
@@ -322,10 +323,10 @@ describe('Pharmacy page', () => {
         fills: [generateFill('test-treatment')],
         address: {
           street1: '123 Main St',
-          street2: null,
           city: 'New York',
           state: 'NY',
-          postalCode: '10001'
+          postalCode: '10001',
+          country: 'US'
         }
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
