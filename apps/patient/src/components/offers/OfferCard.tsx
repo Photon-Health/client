@@ -21,9 +21,12 @@ export const OfferCard = ({
   isPreferred
 }: Props) => {
   const brand = PHARMACY_BRANDING[pharmacyId];
-  if (!brand) return null;
 
-  const pharmacy = { id: pharmacyId, name: brand.name, logo: brand.logo };
+  const pharmacy = {
+    id: pharmacyId,
+    name: offer.pharmacyName ? offer.pharmacyName : brand?.name ?? '',
+    logo: brand?.logo ? brand.logo : ''
+  };
 
   return (
     <Card

@@ -1,3 +1,6 @@
+// Set environment variable BEFORE any imports
+process.env.REACT_APP_AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
+
 import { render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, vi } from 'vitest';
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
@@ -18,7 +21,11 @@ import { AMAZON_PHARMACY_ID } from 'packages/settings/src/pharmacies';
 // Mock the settings and pharmacy utils before any imports
 vi.mock('@client/settings', () => ({
   getOrgMailOrderPharms: vi.fn().mockReturnValue({
-    patient: ['amazon_pharmacy_id', 'cost_plus_pharmacy_id', 'walmart_mail_order_pharmacy_id']
+    patient: [
+      'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
+      'phr_01GA9HPV5XYTC1NNX213VRRBZ4',
+      'phr_01GA9HPV5XYTC1NNX213VRRBZ5'
+    ]
   })
 }));
 
@@ -31,7 +38,7 @@ vi.mock('./pharmacy.utils', () => ({
       costAmountTitle: 'Insurance Price',
       retailAmount: 150.0,
       retailAmountTitle: 'Retail',
-      pharmacyId: 'amazon_pharmacy_id',
+      pharmacyId: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
       pharmacyName: 'Amazon Pharmacy',
       tags: ['In Stock', 'Free Shipping']
     },
@@ -42,7 +49,7 @@ vi.mock('./pharmacy.utils', () => ({
       costAmountTitle: 'Prime Rx Price',
       retailAmount: 120.0,
       retailAmountTitle: 'Retail',
-      pharmacyId: 'amazon_pharmacy_id',
+      pharmacyId: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
       pharmacyName: 'Amazon Pharmacy',
       tags: ['Prime Member', 'Fast Delivery']
     }
@@ -145,15 +152,12 @@ describe('Pharmacy page', () => {
       renderApp();
       await navigateToPharmacyScreen();
 
-      // Enable price toggle to show offers
-      // const priceToggle = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
-      // await userEvent.click(priceToggle);
-
+      // Price toggle is already enabled by default, so offers should show
       // Wait for offers to load and check they are displayed
       expect(await screen.findByText('Amazon Pharmacy')).toBeInTheDocument();
-      expect(await screen.findByText('Delivers in 2-3 days')).toBeInTheDocument();
-      expect(await screen.findByText('$25.99')).toBeInTheDocument();
-      expect(await screen.findByText('Insurance Price')).toBeInTheDocument();
+      expect(await screen.findByText('Delivers in 1-2 days')).toBeInTheDocument();
+      expect(await screen.findByText('$19.99')).toBeInTheDocument();
+      expect(await screen.findByText('Prime Rx Price')).toBeInTheDocument();
     }, 10_000);
 
     test('shows different offers based on cost type when price toggle is enabled', async () => {
