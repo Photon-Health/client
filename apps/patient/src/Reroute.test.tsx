@@ -52,7 +52,6 @@ vi.mock('./components', async () => {
   const mod = await vi.importActual('./components');
   return {
     ...mod,
-    CouponModal: () => <div data-testid="coupon-modal">Coupon Modal</div>,
     FixedFooter: ({ children }: { children: React.ReactNode }) => (
       <div data-testid="fixed-footer">{children}</div>
     ),
@@ -60,8 +59,7 @@ vi.mock('./components', async () => {
     PoweredBy: () => <div data-testid="powered-by">Powered By</div>,
     Nav: () => <div>Nav</div>,
     PrescriptionsList: () => <div>PrescriptionsList</div>,
-    DemoCtaModal: () => <div data-testid="demo-cta-modal">Demo Cta Modal</div>,
-    Coupons: () => <div data-testid="coupons">Coupons</div>
+    DemoCtaModal: () => <div data-testid="demo-cta-modal">Demo Cta Modal</div>
   };
 });
 

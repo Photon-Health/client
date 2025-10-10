@@ -5,7 +5,7 @@ import { Helmet } from 'react-helmet';
 import { FiNavigation, FiPhoneCall, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { triggerDemoNotification } from '../api';
-import { Coupons, DemoCtaModal, PharmacyInfo, PoweredBy } from '../components';
+import { DemoCtaModal, PharmacyInfo, PoweredBy } from '../components';
 import { Card } from '../components/Card';
 import { HolidayAlert } from '../components/HolidayAlert';
 import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal';
@@ -24,15 +24,8 @@ import { useOrderContext } from './Main';
 import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
-
-export const computeNumRefillsForPrescription = (
-  orderFills: Array<{ prescription?: { id?: string } } | null | undefined> | undefined,
-  prescriptionId: string | undefined
-): number => {
-  if (!prescriptionId) return 0;
-  const fillsForRx = orderFills?.filter((fill) => fill?.prescription?.id === prescriptionId).length;
-  return Math.max(0, (fillsForRx ?? 0) - 1);
-};
+import { computeNumRefillsForPrescription } from '../utils/presenters';
+import { CouponCardList } from '../components/coupons';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -285,6 +278,22 @@ export const Status = () => {
 
         <Container>
           <VStack spacing={7}>
+            <OrderSummary
+              fulfillments={fulfillments}
+              onViewDetails={() => {
+                setOrderDetailsIsOpen(true);
+                patientAnalytics.track('Status, View Order Details', order, {
+                  orderId: order?.id,
+                  pharmacyId: pharmacy?.id,
+                  pharmacyName: pharmacy?.name,
+                  fulfillmentType: fulfillmentType,
+                  prescriptionCount: fulfillments.length
+                });
+              }}
+            />
+
+            <CouponCardList />
+
             {displayPharmacy && (
               <VStack w="full" alignItems="stretch" spacing={4}>
                 <Heading as="h4" size="md">
@@ -320,22 +329,6 @@ export const Status = () => {
                 </Card>
               </VStack>
             )}
-
-            <OrderSummary
-              fulfillments={fulfillments}
-              onViewDetails={() => {
-                setOrderDetailsIsOpen(true);
-                patientAnalytics.track('Status, View Order Details', order, {
-                  orderId: order?.id,
-                  pharmacyId: pharmacy?.id,
-                  pharmacyName: pharmacy?.name,
-                  fulfillmentType: fulfillmentType,
-                  prescriptionCount: fulfillments.length
-                });
-              }}
-            />
-
-            <Coupons />
 
             <VStack w="full" alignItems="stretch" spacing={4}>
               <Heading as="h4" size="md">
