@@ -213,6 +213,7 @@ export const GET_ORDER = gql`
         memberId
         pharmacyId
         source
+        externalUrl
       }
     }
   }

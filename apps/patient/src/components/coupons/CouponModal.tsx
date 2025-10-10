@@ -12,8 +12,8 @@ import {
 import { FC } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { useOrderContext } from '../views/Main';
-import { text as t } from '../utils/text';
+import { useOrderContext } from '../../views/Main';
+import { text as t } from '../../utils/text';
 
 interface CouponModalProps {
   isOpen: boolean;
