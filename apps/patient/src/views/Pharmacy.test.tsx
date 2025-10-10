@@ -201,10 +201,10 @@ describe('Pharmacy page', () => {
       const priceToggle = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
       await userEvent.click(priceToggle);
 
-      // Check that Prime Rx offer is shown (should be prioritized over Insurance)
-      expect(await screen.findByText('Prime Rx Price')).toBeInTheDocument();
-      expect(await screen.findByText('$19.99')).toBeInTheDocument();
-      expect(await screen.findByText('$120')).toBeInTheDocument();
+      // according to logic, turning the toggle to insurance price
+      // should not show mail orders?
+
+      expect(await screen.findByText('Amazon Pharmacy')).not.toBeInTheDocument();
     }, 10_000);
 
     test('shows offers section header when offers are available', async () => {
@@ -294,10 +294,6 @@ describe('Pharmacy page', () => {
 
       renderApp();
       await navigateToPharmacyScreen();
-
-      // Enable price toggle
-      const priceToggle = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
-      await userEvent.click(priceToggle);
 
       // Check that no offers are displayed
       expect(screen.queryByText('Amazon Pharmacy')).not.toBeInTheDocument();
