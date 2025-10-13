@@ -206,7 +206,6 @@ export const Pharmacy = () => {
         if (JSON.stringify(fetchedOffers) !== JSON.stringify(offers)) {
           setOffers(fetchedOffers);
         }
-      } else {
       }
     };
 
