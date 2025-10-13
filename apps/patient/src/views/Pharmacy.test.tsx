@@ -2,7 +2,7 @@
 process.env.REACT_APP_AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 
 import { render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, vi } from 'vitest';
+import { afterEach, describe, expect, MockedFunction, vi } from 'vitest';
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import {
   generateFill,
@@ -12,11 +12,7 @@ import {
 } from '../test-utils/generators';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from '../Routes';
-import {
-  COST_PLUS_PHARMACY_ID,
-  WALMART_MAIL_ORDER_PHARMACY_ID
-} from 'packages/settings/src/pharmacies';
-import { AMAZON_PHARMACY_ID } from 'packages/settings/src/pharmacies';
+import { getOrder } from '../api';
 
 // Mock the settings and pharmacy utils before any imports
 vi.mock('@client/settings', () => ({
@@ -26,37 +22,6 @@ vi.mock('@client/settings', () => ({
       'phr_01GA9HPV5XYTC1NNX213VRRBZ4',
       'phr_01GA9HPV5XYTC1NNX213VRRBZ5'
     ]
-  })
-}));
-
-vi.mock('./pharmacy.utils', () => ({
-  fetchOffers: vi.fn().mockResolvedValue([
-    {
-      costType: 'INSURANCE_ESTIMATE',
-      deliveryEstimate: 'Delivers in 2-3 days',
-      costAmount: 25.99,
-      costAmountTitle: 'Insurance Price',
-      retailAmount: 150.0,
-      retailAmountTitle: 'Retail',
-      pharmacyId: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
-      pharmacyName: 'Amazon Pharmacy',
-      tags: ['In Stock', 'Free Shipping']
-    },
-    {
-      costType: 'PRIME_RX',
-      deliveryEstimate: 'Delivers in 1-2 days',
-      costAmount: 19.99,
-      costAmountTitle: 'Prime Rx Price',
-      retailAmount: 120.0,
-      retailAmountTitle: 'Retail',
-      pharmacyId: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
-      pharmacyName: 'Amazon Pharmacy',
-      tags: ['Prime Member', 'Fast Delivery']
-    }
-  ]),
-  getPharmacy: vi.fn().mockReturnValue({
-    type: 'MAIL_ORDER',
-    selectedPharmacy: { id: 'amazon_pharmacy_id', name: 'Amazon Pharmacy' }
   })
 }));
 
@@ -114,10 +79,52 @@ describe('Pharmacy page', () => {
     vi.clearAllMocks();
   });
 
-  describe('offers', () => {
+  describe('offers', async () => {
+    const { fetchOffers, getPharmacy } = await import('./pharmacy.utils');
+    const { getOrder, getPharmacies, setOrderPharmacy } = await import('../api');
+
+    let fetchOffersMock: MockedFunction<typeof fetchOffers>;
+    let getPharmacyMock: MockedFunction<typeof getPharmacy>;
+    let getOrderMock: MockedFunction<typeof getOrder>;
+    let getPharmaciesMock: MockedFunction<typeof getPharmacies>;
+    let setOrderPharmacyMock: MockedFunction<typeof setOrderPharmacy>;
+
+    beforeAll(async () => {
+      fetchOffersMock = vi.mocked(fetchOffers).mockResolvedValue([
+        {
+          costType: 'INSURANCE_ESTIMATE',
+          deliveryEstimate: 'Delivers in 2-3 days',
+          costAmount: 25.99,
+          costAmountTitle: 'Insurance Price',
+          retailAmount: 150.0,
+          retailAmountTitle: 'Retail',
+          pharmacyId: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
+          pharmacyName: 'Amazon Pharmacy',
+          tags: ['In Stock', 'Free Shipping']
+        },
+        {
+          costType: 'PRIME_RX',
+          deliveryEstimate: 'Delivers in 1-2 days',
+          costAmount: 19.99,
+          costAmountTitle: 'Prime Rx Price',
+          retailAmount: 120.0,
+          retailAmountTitle: 'Retail',
+          pharmacyId: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
+          pharmacyName: 'Amazon Pharmacy',
+          tags: ['Prime Member', 'Fast Delivery']
+        }
+      ]);
+
+      getPharmacyMock = vi.mocked(getPharmacy).mockReturnValue({
+        type: 'MAIL_ORDER',
+        selectedPharmacy: { id: 'amazon_pharmacy_id', name: 'Amazon Pharmacy' }
+      });
+
+      getOrderMock = vi.mocked(getOrder);
+      getPharmaciesMock = vi.mocked(getPharmacies);
+      setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
+    });
     test('shows offers when they are available and price toggle is enabled', async () => {
-      const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
-      const getOrderMock = vi.mocked(getOrder);
       const singlePrescriptionOrder = generateOrder({
         id: 'ord_testId777',
         state: 'ROUTING',
