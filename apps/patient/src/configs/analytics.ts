@@ -167,12 +167,24 @@ function mapOrderToContextData(order: Order): ContextData {
     })
   );
 
+  const contextDataDiscountCards = order.discountCards.map((discountCard) => ({
+    id: discountCard.id,
+    externalUrl: discountCard.externalUrl,
+    price: discountCard.price,
+    retailPrice: discountCard.retailPrice,
+    source: discountCard.source,
+    memberId: discountCard.memberId,
+    bin: discountCard.bin,
+    pcn: discountCard.pcn
+  }));
+
   return {
     order: contextDataOrder,
     patient: contextDataPatient,
     organization: contextDataOrganization,
     pharmacy: contextDataPharmacy,
     fulfillments: contextDataFulfillments,
+    discountCards: contextDataDiscountCards,
     medications
   };
 }
