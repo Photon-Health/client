@@ -1062,13 +1062,13 @@ export const Pharmacy = () => {
       </Box>
 
       <Container pb={showFooter ? 32 : 8}>
-        {patientLocation ? (
+        {patientLocation && (
           <VStack spacing={6} align="stretch" pt={4}>
             <VStack spacing={2} align="span" w="full">
-              {showBrandedOptionsHeader ? (
+              {showBrandedOptionsHeader && (
                 <BrandedOptionsHeader title={t.delivery} description={t.getDelivered} />
-              ) : null}
-              {showOffers ? (
+              )}
+              {showOffers && (
                 <OffersList
                   offers={filteredOffers || []}
                   shouldTrackOfferImpressionsAndSelections={
@@ -1078,8 +1078,8 @@ export const Pharmacy = () => {
                   preferredPharmacyId={preferredPharmacyId}
                   handleSelect={handleSelect}
                 />
-              ) : null}
-              {showBrandedOptions ? (
+              )}
+              {showBrandedOptions && (
                 <BrandedOptions
                   options={brandedOptions}
                   location={patientLocation}
@@ -1091,11 +1091,11 @@ export const Pharmacy = () => {
                     shouldTrackOfferImpressionsAndSelections
                   }
                 />
-              ) : null}
+              )}
               {pickupPharmacyOptions(patientLocation)}
             </VStack>
           </VStack>
-        ) : null}
+        )}
       </Container>
 
       <FixedFooter show={showFooter}>
