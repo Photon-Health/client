@@ -12,7 +12,8 @@ import {
 } from '../test-utils/generators';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from '../Routes';
-import { getOrder } from '../api';
+import { getOffers, getOrder, getPharmacies, setOrderPharmacy } from '../api';
+import { fetchOffers, getPharmacy } from './pharmacy.utils';
 
 // Mock the settings and pharmacy utils before any imports
 vi.mock('@client/settings', () => ({
@@ -55,6 +56,11 @@ vi.mock('../configs/graphqlClient', () => ({
   }
 }));
 
+vi.mock('./pharmacy.utils', () => ({
+  fetchOffers: vi.fn(),
+  getPharmacy: vi.fn()
+}));
+
 vi.mock('@datadog/browser-rum');
 vi.mock('../configs/analytics');
 vi.mock('../hooks/usePageAnalytics');
@@ -78,9 +84,6 @@ describe('Pharmacy page', () => {
   });
 
   describe('offers', async () => {
-    const { fetchOffers, getPharmacy } = await import('./pharmacy.utils');
-    const { getOrder, getPharmacies, setOrderPharmacy } = await import('../api');
-
     let fetchOffersMock: MockedFunction<typeof fetchOffers>;
     let getPharmacyMock: MockedFunction<typeof getPharmacy>;
     let getOrderMock: MockedFunction<typeof getOrder>;
@@ -88,7 +91,8 @@ describe('Pharmacy page', () => {
     let setOrderPharmacyMock: MockedFunction<typeof setOrderPharmacy>;
 
     beforeAll(async () => {
-      fetchOffersMock = vi.mocked(fetchOffers).mockResolvedValue([
+      fetchOffersMock = vi.mocked(fetchOffers);
+      fetchOffersMock.mockResolvedValue([
         {
           costType: 'INSURANCE_ESTIMATE',
           deliveryEstimate: 'Delivers in 2-3 days',
@@ -113,7 +117,8 @@ describe('Pharmacy page', () => {
         }
       ]);
 
-      getPharmacyMock = vi.mocked(getPharmacy).mockReturnValue({
+      getPharmacyMock = vi.mocked(getPharmacy);
+      getPharmacyMock.mockReturnValue({
         type: 'MAIL_ORDER',
         selectedPharmacy: { id: 'amazon_pharmacy_id', name: 'Amazon Pharmacy' }
       });
@@ -258,11 +263,7 @@ describe('Pharmacy page', () => {
 
   describe('address requirements', () => {
     test('does not show offers when order has no address', async () => {
-      // Override the mock to return empty array for this test
-      const { fetchOffers } = await import('./pharmacy.utils');
-      vi.mocked(fetchOffers).mockResolvedValueOnce([]);
-
-      const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
+      const { getPharmacies, setOrderPharmacy, getOrder, getOffers } = await import('../api');
       const getOrderMock = vi.mocked(getOrder);
       const singlePrescriptionOrder = generateOrder({
         id: 'ord_testId777',
@@ -272,6 +273,8 @@ describe('Pharmacy page', () => {
         // No address provided
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
+      const { fetchOffers } = await import('./pharmacy.utils');
+      vi.mocked(fetchOffers).mockResolvedValueOnce([]);
 
       const getPharmaciesMock = vi.mocked(getPharmacies);
       getPharmaciesMock.mockResolvedValue({
@@ -313,10 +316,6 @@ describe('Pharmacy page', () => {
     }, 10_000);
 
     test('shows location even when order has no address (current behavior)', async () => {
-      // Override the mock to return empty array for this test
-      const { fetchOffers } = await import('./pharmacy.utils');
-      vi.mocked(fetchOffers).mockResolvedValueOnce([]);
-
       const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
       const getOrderMock = vi.mocked(getOrder);
       const singlePrescriptionOrder = generateOrder({
@@ -451,6 +450,9 @@ describe('Pharmacy page', () => {
   }, 10_000);
 
   test('hides price toggle when order has 2+ prescriptions', async () => {
+    // fetchOffers endpoint will never return anything for multiple prescriptions
+    const { fetchOffers } = await import('./pharmacy.utils');
+    vi.mocked(fetchOffers).mockResolvedValueOnce([]);
     const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
     const getOrderMock = vi.mocked(getOrder);
     const multiPrescriptionOrder = generateOrder({
@@ -469,6 +471,8 @@ describe('Pharmacy page', () => {
         })
       ]
     });
+    const getOffersMock = vi.mocked(getOffers);
+    getOffersMock.mockResolvedValue([]);
     const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
     setOrderPharmacyMock.mockResolvedValue(true);
 
