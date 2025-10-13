@@ -231,7 +231,7 @@ export const Pharmacy = () => {
       if (enablePrice && primeRxOffer) {
         amazonPharmacyOverride = primeRxOffer;
         filteringOffers.push(primeRxOffer);
-      } else if (enablePrice && insuranceOffer) {
+      } else if (!enablePrice && insuranceOffer) {
         amazonPharmacyOverride = insuranceOffer;
         filteringOffers.push(insuranceOffer);
       }
@@ -635,6 +635,7 @@ export const Pharmacy = () => {
     setSubmitting(true);
 
     const selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
+    const selectedOffer = filteredOffers?.find((o) => o.pharmacyId === selectedId);
 
     patientAnalytics.track('Pharmacy Selection Submitted', order, {
       pharmacyId: selectedId,
@@ -642,7 +643,8 @@ export const Pharmacy = () => {
       isReroute: !!isReroute,
       enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined,
-      price: selectedPharmacy?.price
+      price: selectedPharmacy?.price || selectedOffer?.costAmount,
+      retailPrice: selectedPharmacy?.retailPrice || selectedOffer?.retailAmount
     });
 
     if (isDemo) {

@@ -12,6 +12,7 @@ interface Props {
   brandedOptionOverrides: BrandedOptionOverrides;
   handleSelect: (id: string) => void;
   shouldTrackOfferImpressionsAndSelections: boolean;
+  numberOfOffers?: number;
 }
 
 export interface Offer {
@@ -38,7 +39,8 @@ export const BrandedOptions = ({
   handleSelect,
   fulfillingPharmacyId,
   brandedOptionOverrides,
-  shouldTrackOfferImpressionsAndSelections
+  shouldTrackOfferImpressionsAndSelections,
+  numberOfOffers = 0
 }: Props) => {
   if (!location) return null;
   if (options.length === 0) return null;
@@ -52,7 +54,7 @@ export const BrandedOptions = ({
               id,
               name: getPharmacy([], selectedId).selectedPharmacy?.name || 'Unknown Branded Pharmacy'
             }}
-            ordinalPosition={index}
+            ordinalPosition={index + numberOfOffers}
             isAlreadySelected={selectedId === id}
             enabled={shouldTrackOfferImpressionsAndSelections}
           >
