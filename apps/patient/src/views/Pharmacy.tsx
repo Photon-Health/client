@@ -219,7 +219,7 @@ export const Pharmacy = () => {
     const novocareOffer = offers?.find((offer) => offer.costType == 'NOVOCARE_OFFER');
 
     // we're not ready to share price yet
-    // so we're forcibly nulling out the cost
+    // so we're forcibly nulling out the costas
     // so the price won't be shown
     let amazonPharmacyOverride;
 
@@ -644,7 +644,7 @@ export const Pharmacy = () => {
       enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined,
       price: selectedPharmacy?.price || selectedOffer?.costAmount,
-      retailPrice: selectedPharmacy?.retailPrice || selectedOffer?.retailAmount
+      retailPrice: selectedPharmacy?.retailPrice
     });
 
     if (isDemo) {
@@ -822,6 +822,7 @@ export const Pharmacy = () => {
 
       extraOfferMetadata.sawPrice = sawPrice;
       extraOfferMetadata.price = brandedOptionsOverride?.amazonPharmacyOverride?.costAmount;
+      extraOfferMetadata.retailPrice = brandedOptionsOverride?.amazonPharmacyOverride?.retailAmount;
       extraOfferMetadata.priceType = priceType;
 
       const slugifiedOverride = brandedOptionsOverride?.amazonPharmacyOverride.deliveryEstimate
@@ -840,6 +841,7 @@ export const Pharmacy = () => {
           timestamp: new Date().toISOString(),
           sawPrice,
           costAmount: brandedOptionsOverride?.amazonPharmacyOverride?.costAmount,
+          retailAmount: brandedOptionsOverride?.amazonPharmacyOverride?.retailAmount,
           priceType,
           offers
         });
@@ -852,6 +854,7 @@ export const Pharmacy = () => {
           timestamp: new Date().toISOString(),
           sawPrice,
           costAmount: brandedOptionsOverride?.amazonPharmacyOverride?.costAmount,
+          retailAmount: brandedOptionsOverride?.amazonPharmacyOverride?.retailAmount,
           priceType,
           offers
         });
@@ -879,13 +882,20 @@ export const Pharmacy = () => {
         id
       }));
 
+      const offersArray =
+        filteredOffers?.map((o) => ({
+          id: o.pharmacyId
+        })) || [];
+
       patientAnalytics.track('Offer Selected', order, {
         ...selectedPharmacy,
         ...extraOfferMetadata,
         pharmacyId: selectedId,
         // allPharmacies does not included branded options so we must combine them
         ordinalPosition:
-          [...brandedOptionObjects, ...allPharmacies].findIndex((p) => p.id === selectedId) + 1
+          [...offersArray, ...brandedOptionObjects, ...allPharmacies].findIndex(
+            (p) => p.id === selectedId
+          ) + 1
       });
     }
   };
