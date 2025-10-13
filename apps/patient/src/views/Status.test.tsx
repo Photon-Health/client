@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import { routeElements } from '../Routes';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {
   generateDiscountCard,
   generateFill,
@@ -43,7 +44,15 @@ describe('Status page Coupon cards', () => {
     expect(await screen.findByText('Order is likely ready')).toBeInTheDocument();
 
     const couponButton = await screen.findByRole('link', { name: /get coupon/i });
-    expect(couponButton).toHaveAttribute('href', 'coupon-card-test-url');
+
+    window.open = vi.fn();
+    await userEvent.click(couponButton);
+    expect(window.open).toHaveBeenCalledWith(
+      'coupon-card-test-url',
+      '_blank',
+      'noopener,noreferrer'
+    );
+    vi.mocked(window.open).mockRestore();
   });
 
   test('shows coupon details when there is no external URL', async () => {
