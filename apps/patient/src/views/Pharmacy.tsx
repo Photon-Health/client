@@ -972,35 +972,6 @@ export const Pharmacy = () => {
     brandedOptionsOverride !== undefined ||
     showBrandedOptionsHeader;
 
-  const brandedOptionsHeader = () =>
-    showBrandedOptionsHeader ? (
-      <BrandedOptionsHeader title={t.delivery} description={t.getDelivered} />
-    ) : null;
-
-  const brandedPharmacyOptions = (patientLocation: string) =>
-    showBrandedOptions ? (
-      <BrandedOptions
-        options={brandedOptions}
-        location={patientLocation}
-        selectedId={selectedId}
-        handleSelect={handleSelect}
-        fulfillingPharmacyId={order.pharmacy?.id}
-        brandedOptionOverrides={brandedOptionsOverride ?? {}}
-        shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
-      />
-    ) : null;
-
-  const offersList = () =>
-    showOffers ? (
-      <OffersList
-        offers={filteredOffers || []}
-        shouldTrackOfferImpressionsAndSelections={shouldTrackOfferImpressionsAndSelections}
-        selectedPharmacyId={selectedId}
-        preferredPharmacyId={preferredPharmacyId}
-        handleSelect={handleSelect}
-      />
-    ) : null;
-
   const showPickupHeading =
     (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined) ?? false;
 
@@ -1094,9 +1065,33 @@ export const Pharmacy = () => {
         {patientLocation ? (
           <VStack spacing={6} align="stretch" pt={4}>
             <VStack spacing={2} align="span" w="full">
-              {brandedOptionsHeader()}
-              {offersList()}
-              {brandedPharmacyOptions(patientLocation)}
+              {showBrandedOptionsHeader ? (
+                <BrandedOptionsHeader title={t.delivery} description={t.getDelivered} />
+              ) : null}
+              {showOffers ? (
+                <OffersList
+                  offers={filteredOffers || []}
+                  shouldTrackOfferImpressionsAndSelections={
+                    shouldTrackOfferImpressionsAndSelections
+                  }
+                  selectedPharmacyId={selectedId}
+                  preferredPharmacyId={preferredPharmacyId}
+                  handleSelect={handleSelect}
+                />
+              ) : null}
+              {showBrandedOptions ? (
+                <BrandedOptions
+                  options={brandedOptions}
+                  location={patientLocation}
+                  selectedId={selectedId}
+                  handleSelect={handleSelect}
+                  fulfillingPharmacyId={order.pharmacy?.id}
+                  brandedOptionOverrides={brandedOptionsOverride ?? {}}
+                  shouldTrackOfferImpressionsAndSelections={
+                    shouldTrackOfferImpressionsAndSelections
+                  }
+                />
+              ) : null}
               {pickupPharmacyOptions(patientLocation)}
             </VStack>
           </VStack>
