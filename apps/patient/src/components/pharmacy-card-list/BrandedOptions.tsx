@@ -1,6 +1,5 @@
-import { Heading, SlideFade, Text, VStack } from '@chakra-ui/react';
+import { SlideFade } from '@chakra-ui/react';
 
-import { text as t } from '../../utils/text';
 import { BrandedPharmacyCard } from './BrandedPharmacyCard';
 import { OfferImpressionTracker } from '../../utils/tracking/OfferImpressionTracker';
 import { getPharmacy } from '../../views/pharmacy.utils';
@@ -13,16 +12,23 @@ interface Props {
   brandedOptionOverrides: BrandedOptionOverrides;
   handleSelect: (id: string) => void;
   shouldTrackOfferImpressionsAndSelections: boolean;
+  numberOfOffers?: number;
 }
 
-export interface AmazonOffer {
+export interface Offer {
   deliveryEstimate?: string;
   costType?: string;
   costAmount?: number;
+  costAmountTitle?: string;
+  retailAmount?: number;
+  retailAmountTitle?: string;
+  pharmacyId?: string;
+  pharmacyName?: string;
+  tags: string[];
 }
 
 export interface BrandedOptionOverrides {
-  amazonPharmacyOverride?: AmazonOffer;
+  amazonPharmacyOverride?: Offer;
   novocareExperimentOverride?: string;
 }
 
@@ -33,22 +39,14 @@ export const BrandedOptions = ({
   handleSelect,
   fulfillingPharmacyId,
   brandedOptionOverrides,
-  shouldTrackOfferImpressionsAndSelections
+  shouldTrackOfferImpressionsAndSelections,
+  numberOfOffers = 0
 }: Props) => {
   if (!location) return null;
   if (options.length === 0) return null;
 
   return (
-    <VStack spacing={2} align="span" w="full">
-      <SlideFade offsetY="60px" in={true}>
-        <VStack spacing={1} align="start">
-          <Heading as="h5" size="sm">
-            {t.delivery}
-          </Heading>
-          <Text size="sm">{t.getDelivered}</Text>
-        </VStack>
-      </SlideFade>
-
+    <>
       {options.map((id, index) => (
         <SlideFade offsetY="60px" in={true} key={`courier-pharmacy-${id}`}>
           <OfferImpressionTracker
@@ -56,7 +54,7 @@ export const BrandedOptions = ({
               id,
               name: getPharmacy([], selectedId).selectedPharmacy?.name || 'Unknown Branded Pharmacy'
             }}
-            ordinalPosition={index}
+            ordinalPosition={index + numberOfOffers}
             isAlreadySelected={selectedId === id}
             enabled={shouldTrackOfferImpressionsAndSelections}
           >
@@ -70,6 +68,6 @@ export const BrandedOptions = ({
           </OfferImpressionTracker>
         </SlideFade>
       ))}
-    </VStack>
+    </>
   );
 };
