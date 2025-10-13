@@ -3,9 +3,12 @@ import { DiscountCard } from '../../__generated__/graphql';
 import { CouponSourceLogo } from './CouponSourceLogo';
 import { formatPrice } from '../../utils/formatters';
 import { Card } from '../Card';
+import { patientAnalytics } from '../../configs/analytics';
+import { Order } from '../../utils/models';
 
 interface ExternalLinkCouponCardProps {
   coupon: ExternalLinkCoupon;
+  order: Order;
 }
 
 export type ExternalLinkCoupon = Pick<
@@ -15,6 +18,18 @@ export type ExternalLinkCoupon = Pick<
 
 export const ExternalLinkCouponCard = (props: ExternalLinkCouponCardProps) => {
   const { price, externalUrl, source, retailPrice } = props.coupon;
+  const { order } = props;
+
+  const handleGetCouponClick = () => {
+    patientAnalytics.track('Click External Offer Link', order, {
+      source,
+      externalUrl,
+      price,
+      retailPrice
+    });
+    window.open(externalUrl, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <>
       <Box p={3} bgColor="blue.100" borderRadius="lg">
@@ -33,11 +48,8 @@ export const ExternalLinkCouponCard = (props: ExternalLinkCouponCardProps) => {
           </Text>
         ) : null}
         <Button
-          as="a"
+          onClick={handleGetCouponClick}
           role="link"
-          href={externalUrl}
-          target="_blank"
-          rel="noopener noreferrer"
           w="full"
           variant="solid"
           bg="blue.600"
