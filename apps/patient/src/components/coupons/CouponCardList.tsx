@@ -34,7 +34,7 @@ export const CouponCardList = () => {
         Coupon Card
       </Heading>
       {discountCardToShow.externalUrl ? (
-        <ExternalLinkCouponCard coupon={discountCardToShow} />
+        <ExternalLinkCouponCard coupon={discountCardToShow} order={order} />
       ) : (
         <EmbeddedCouponCard coupon={discountCardToShow} />
       )}
