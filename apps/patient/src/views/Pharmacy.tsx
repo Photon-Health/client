@@ -644,7 +644,7 @@ export const Pharmacy = () => {
       enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined,
       price: selectedPharmacy?.price || selectedOffer?.costAmount,
-      retailPrice: selectedPharmacy?.retailPrice
+      retailPrice: selectedPharmacy?.retailPrice || selectedOffer?.retailAmount
     });
 
     if (isDemo) {
