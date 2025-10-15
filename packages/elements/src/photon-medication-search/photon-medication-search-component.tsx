@@ -16,11 +16,37 @@ import {
   TreatmentOption
 } from '@photonhealth/sdk/dist/types';
 import { CatalogStore } from '../stores/catalog';
+import { DisableList } from '../photon-multirx-form/photon-prescribe-workflow';
 
 import { ApolloClient } from '@apollo/client';
 import gql from 'graphql-tag';
 
 // Utility Functions
+
+function isNdcDisabled(
+  ndc: string | undefined,
+  disableList: DisableList | undefined
+): { disabled: boolean; reason?: string } {
+  if (!ndc || !disableList || disableList.length === 0) {
+    return { disabled: false };
+  }
+
+  // Normalize NDC by removing hyphens for comparison
+  const normalizedNdc = ndc.replace(/-/g, '');
+
+  for (const item of disableList) {
+    if (item.ndcs) {
+      for (const disabledNdc of item.ndcs) {
+        const normalizedDisabledNdc = disabledNdc.replace(/-/g, '');
+        if (normalizedNdc === normalizedDisabledNdc) {
+          return { disabled: true, reason: item.reason };
+        }
+      }
+    }
+  }
+
+  return { disabled: false };
+}
 
 function triggerCustomEvent(ref: any, eventName: string, detail?: any) {
   const event = new CustomEvent(eventName, {
@@ -58,6 +84,9 @@ const SearchTreatmentOptionsQuery = gql`
       __typename
       id
       name
+      ... on Medication {
+        ndc
+      }
     }
   }
 `;
@@ -147,13 +176,24 @@ export const boldSubstring = (inputString: string, substring: string) => {
 function displayTreatment(
   t: Treatment | TreatmentOption,
   showFormattedMedicationName: boolean,
-  searchText: string
+  searchText: string,
+  disableList?: DisableList
 ) {
-  return showFormattedMedicationName ? (
-    <p class="text-sm whitespace-normal leading-snug my-1">{boldSubstring(t.name, searchText)}</p>
-  ) : (
-    t.name || ''
-  );
+  const ndc = 'ndc' in t ? t.ndc : undefined;
+  const { disabled, reason } = isNdcDisabled(ndc, disableList);
+
+  if (showFormattedMedicationName) {
+    return (
+      <div class={`my-1 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
+        <p class={`text-sm whitespace-normal leading-snug ${disabled ? 'text-gray-500' : ''}`}>
+          {boldSubstring(t.name, searchText)}
+        </p>
+        {disabled && reason && <p class="text-xs text-red-500 mt-1 italic">{reason}</p>}
+      </div>
+    );
+  }
+
+  return t.name || '';
 }
 
 function displayPrescriptionTemplate(
@@ -226,6 +266,7 @@ interface ComponentProps {
   selected?: Treatment | PrescriptionTemplate | TreatmentOption;
   offCatalogOption?: Medication;
   searchText: string;
+  disableList?: DisableList;
 }
 
 const Component = (props: ComponentProps) => {
@@ -282,7 +323,8 @@ const Component = (props: ComponentProps) => {
     return displayTreatment(
       t as Treatment | TreatmentOption,
       showFormattedMedicationName,
-      props.searchText
+      props.searchText,
+      props.disableList
     );
   };
 
@@ -292,12 +334,23 @@ const Component = (props: ComponentProps) => {
     <div
       ref={ref}
       on:photon-data-selected={(e: any) => {
-        dispatchTreatmentSelected(ref, e.detail.data, store.catalog.data?.id || '');
+        const selectedItem = e.detail.data;
 
-        if ('treatment' in e.detail.data) {
-          dispatchSearchTextChanged(ref, e.detail.data.treatment.name);
+        // Check if the selected item is disabled
+        if ('ndc' in selectedItem) {
+          const { disabled } = isNdcDisabled(selectedItem.ndc, props.disableList);
+          if (disabled) {
+            // Don't dispatch selection event for disabled items
+            return;
+          }
+        }
+
+        dispatchTreatmentSelected(ref, selectedItem, store.catalog.data?.id || '');
+
+        if ('treatment' in selectedItem) {
+          dispatchSearchTextChanged(ref, selectedItem.treatment.name);
         } else {
-          dispatchSearchTextChanged(ref, e.detail.data.name);
+          dispatchSearchTextChanged(ref, selectedItem.name);
         }
       }}
       on:photon-data-unselected={() => {
@@ -412,7 +465,8 @@ customElement(
     formName: undefined,
     selected: undefined,
     offCatalogOption: undefined,
-    searchText: ''
+    searchText: '',
+    disableList: undefined
   },
   Component
 );

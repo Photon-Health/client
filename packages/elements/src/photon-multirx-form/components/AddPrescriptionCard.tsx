@@ -212,6 +212,7 @@ export const AddPrescriptionCard = (props: {
             help-text={props.store.treatment?.error}
             off-catalog-option={offCatalog()}
             search-text={searchText()}
+            disable-list={props.disableList}
             on:photon-treatment-selected={(e: any) => {
               if (e.detail.data.__typename === 'PrescriptionTemplate') {
                 repopulateForm(props.actions, {
