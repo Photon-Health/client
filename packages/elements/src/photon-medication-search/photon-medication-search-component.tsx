@@ -192,22 +192,29 @@ function displayTreatment(
 function displayPrescriptionTemplate(
   t: PrescriptionTemplate,
   showFormattedMedicationName: boolean,
-  searchText: string
+  searchText: string,
+  disableList?: DisableList
 ) {
+  const treatmentId = t.treatment.id;
+  const { disabled, reason } = isTreatmentDisabled(treatmentId, disableList);
+
   if (showFormattedMedicationName) {
     const refills = t.fillsAllowed ? t.fillsAllowed - 1 : 0;
 
     return (
-      <div class="my-1">
-        <div class="text-sm whitespace-normal font-medium mb-1">
+      <div class={`my-1 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
+        <div
+          class={`text-sm whitespace-normal font-medium mb-1 ${disabled ? 'text-gray-500' : ''}`}
+        >
           {t.name ? <span class="text-blue-600">({boldSubstring(t.name, searchText)}): </span> : ''}
           {boldSubstring(t.treatment.name, searchText)}
         </div>
-        <div class="text-xs text-gray-500 truncate">
+        <div class={`text-xs truncate ${disabled ? 'text-gray-400' : 'text-gray-500'}`}>
           {t.dispenseQuantity} {t.dispenseUnit}, {t.daysSupply}{' '}
           {t.daysSupply === 1 ? 'day' : 'days'} supply, {refills}{' '}
           {refills === 1 ? 'refill' : 'refills'}, {t.instructions}
         </div>
+        {disabled && reason && <p class="text-xs text-red-500 mt-1 italic">Disabled: {reason}</p>}
       </div>
     );
   }
@@ -310,7 +317,8 @@ const Component = (props: ComponentProps) => {
       return displayPrescriptionTemplate(
         t as PrescriptionTemplate,
         showFormattedMedicationName,
-        props.searchText
+        props.searchText,
+        props.disableList
       );
     }
     return displayTreatment(
@@ -330,8 +338,18 @@ const Component = (props: ComponentProps) => {
         const selectedItem = e.detail.data;
 
         // Check if the selected item is disabled
-        if ('id' in selectedItem) {
-          const { disabled } = isTreatmentDisabled(selectedItem.id, props.disableList);
+        let treatmentId: string | undefined;
+
+        if ('treatment' in selectedItem) {
+          // This is a PrescriptionTemplate - check the treatment ID
+          treatmentId = selectedItem.treatment.id;
+        } else if ('id' in selectedItem) {
+          // This is a Treatment or TreatmentOption - use the ID directly
+          treatmentId = selectedItem.id;
+        }
+
+        if (treatmentId) {
+          const { disabled } = isTreatmentDisabled(treatmentId, props.disableList);
           if (disabled) {
             // Don't dispatch selection event for disabled items
             return;
