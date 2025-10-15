@@ -50,6 +50,13 @@ export type Address = {
   country?: string;
 };
 
+export interface DisabledItem {
+  ndcs?: string[];
+  reason?: string;
+}
+
+export type DisableList = DisabledItem[];
+
 export type PrescribeProps = {
   patientId?: string;
   templateIds?: string;
@@ -82,6 +89,7 @@ export type PrescribeProps = {
   externalOrderId?: string;
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
+  disableList?: DisableList;
 };
 
 export const ScreenDraftedPrescriptionsQuery = gql`
@@ -644,6 +652,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       catalogId={props.catalogId}
                       allowOffCatalogSearch={props.allowOffCatalogSearch}
                       enableOrder={props.enableOrder}
+                      disableList={props.disableList}
                     />
                   </div>
                 </Show>
