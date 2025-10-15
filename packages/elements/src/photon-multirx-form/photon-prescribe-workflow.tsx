@@ -51,7 +51,7 @@ export type Address = {
 };
 
 export interface DisabledItem {
-  ndcs?: string[];
+  treatmentIds?: string[];
   reason?: string;
 }
 

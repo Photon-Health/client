@@ -23,22 +23,18 @@ import gql from 'graphql-tag';
 
 // Utility Functions
 
-function isNdcDisabled(
-  ndc: string | undefined,
+function isTreatmentDisabled(
+  treatmentId: string | undefined,
   disableList: DisableList | undefined
 ): { disabled: boolean; reason?: string } {
-  if (!ndc || !disableList || disableList.length === 0) {
+  if (!treatmentId || !disableList || disableList.length === 0) {
     return { disabled: false };
   }
 
-  // Normalize NDC by removing hyphens for comparison
-  const normalizedNdc = ndc.replace(/-/g, '');
-
   for (const item of disableList) {
-    if (item.ndcs) {
-      for (const disabledNdc of item.ndcs) {
-        const normalizedDisabledNdc = disabledNdc.replace(/-/g, '');
-        if (normalizedNdc === normalizedDisabledNdc) {
+    if (item.treatmentIds) {
+      for (const disabledTreatmentId of item.treatmentIds) {
+        if (treatmentId === disabledTreatmentId) {
           return { disabled: true, reason: item.reason };
         }
       }
@@ -84,9 +80,6 @@ const SearchTreatmentOptionsQuery = gql`
       __typename
       id
       name
-      ... on Medication {
-        ndc
-      }
     }
   }
 `;
@@ -179,8 +172,8 @@ function displayTreatment(
   searchText: string,
   disableList?: DisableList
 ) {
-  const ndc = 'ndc' in t ? t.ndc : undefined;
-  const { disabled, reason } = isNdcDisabled(ndc, disableList);
+  const treatmentId = t.id;
+  const { disabled, reason } = isTreatmentDisabled(treatmentId, disableList);
 
   if (showFormattedMedicationName) {
     return (
@@ -337,8 +330,8 @@ const Component = (props: ComponentProps) => {
         const selectedItem = e.detail.data;
 
         // Check if the selected item is disabled
-        if ('ndc' in selectedItem) {
-          const { disabled } = isNdcDisabled(selectedItem.ndc, props.disableList);
+        if ('id' in selectedItem) {
+          const { disabled } = isTreatmentDisabled(selectedItem.id, props.disableList);
           if (disabled) {
             // Don't dispatch selection event for disabled items
             return;
