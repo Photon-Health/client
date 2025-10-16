@@ -182,11 +182,9 @@ function displayTreatment(
   t: Treatment | TreatmentOption,
   showFormattedMedicationName: boolean,
   searchText: string,
-  blockedMedsMap: Record<string, string | undefined>
+  disabled = false,
+  disableReason?: string
 ) {
-  const treatmentId = t.id;
-  const { disabled, disableReason } = isTreatmentDisabled(treatmentId, blockedMedsMap);
-
   if (showFormattedMedicationName) {
     return (
       <div class={`my-1 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
@@ -207,11 +205,9 @@ function displayPrescriptionTemplate(
   t: PrescriptionTemplate,
   showFormattedMedicationName: boolean,
   searchText: string,
-  blockedMedsMap: Record<string, string | undefined>
+  disabled = false,
+  disableReason?: string
 ) {
-  const treatmentId = t.treatment.id;
-  const { disabled, disableReason } = isTreatmentDisabled(treatmentId, blockedMedsMap);
-
   if (showFormattedMedicationName) {
     const refills = t.fillsAllowed ? t.fillsAllowed - 1 : 0;
 
@@ -331,19 +327,23 @@ const Component = (props: ComponentProps) => {
     t: Treatment | PrescriptionTemplate | TreatmentOption,
     showFormattedMedicationName: boolean
   ) => {
+    const treatmentId = 'treatment' in t ? t.treatment.id : t.id;
+    const { disabled, disableReason } = isTreatmentDisabled(treatmentId, blockedMedsMap());
     if (t && '__typename' in t && t.__typename == 'PrescriptionTemplate') {
       return displayPrescriptionTemplate(
         t as PrescriptionTemplate,
         showFormattedMedicationName,
         props.searchText,
-        blockedMedsMap()
+        disabled,
+        disableReason
       );
     }
     return displayTreatment(
       t as Treatment | TreatmentOption,
       showFormattedMedicationName,
       props.searchText,
-      blockedMedsMap()
+      disabled,
+      disableReason
     );
   };
 
