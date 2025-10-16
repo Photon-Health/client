@@ -1,6 +1,6 @@
 // Solid
 import { customElement } from 'solid-element';
-import { createEffect, createSignal, onMount, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, onMount, Show } from 'solid-js';
 
 // Photon
 import { usePhoton } from '@photonhealth/components';
@@ -23,22 +23,34 @@ import gql from 'graphql-tag';
 
 // Utility Functions
 
+function createBlockedMedsMap(disableList: DisableList | undefined) {
+  if (!disableList || disableList.length === 0) {
+    return {} as Record<string, string | undefined>;
+  }
+
+  return disableList.reduce((acc, cur) => {
+    // Only skip if treatmentIds is missing - reason is optional
+    if (!cur.treatmentIds) return acc;
+
+    for (const treatmentId of cur.treatmentIds) {
+      acc[treatmentId] = cur.reason; // reason can be undefined
+    }
+    return acc;
+  }, {} as Record<string, string | undefined>);
+}
+
 function isTreatmentDisabled(
   treatmentId: string | undefined,
-  disableList: DisableList | undefined
+  blockedMedsMap: Record<string, string | undefined>
 ): { disabled?: boolean; disableReason?: string } {
-  if (!treatmentId || !disableList || disableList.length === 0) {
+  if (!treatmentId) {
     return { disabled: false };
   }
 
-  const disableListsByReason = disableList.reduce((acc, cur) => {
-    if (!cur.reason || !cur.treatmentIds) return acc;
-    acc[cur.reason] = new Set(cur.treatmentIds);
-    return acc;
-  }, {} as Record<string, Set<string>>);
-
-  for (const [reason, disabledTreatments] of Object.entries(disableListsByReason)) {
-    if (disabledTreatments.has(treatmentId)) return { disabled: true, disableReason: reason };
+  // Check if treatment ID exists in the map (regardless of reason value)
+  if (treatmentId in blockedMedsMap) {
+    // Treatment is blocked - reason may be undefined (no reason provided)
+    return { disabled: true, disableReason: blockedMedsMap[treatmentId] };
   }
 
   return { disabled: false };
@@ -170,10 +182,10 @@ function displayTreatment(
   t: Treatment | TreatmentOption,
   showFormattedMedicationName: boolean,
   searchText: string,
-  disableList?: DisableList
+  blockedMedsMap: Record<string, string | undefined>
 ) {
   const treatmentId = t.id;
-  const { disabled, disableReason } = isTreatmentDisabled(treatmentId, disableList);
+  const { disabled, disableReason } = isTreatmentDisabled(treatmentId, blockedMedsMap);
 
   if (showFormattedMedicationName) {
     return (
@@ -195,10 +207,10 @@ function displayPrescriptionTemplate(
   t: PrescriptionTemplate,
   showFormattedMedicationName: boolean,
   searchText: string,
-  disableList?: DisableList
+  blockedMedsMap: Record<string, string | undefined>
 ) {
   const treatmentId = t.treatment.id;
-  const { disabled, disableReason } = isTreatmentDisabled(treatmentId, disableList);
+  const { disabled, disableReason } = isTreatmentDisabled(treatmentId, blockedMedsMap);
 
   if (showFormattedMedicationName) {
     const refills = t.fillsAllowed ? t.fillsAllowed - 1 : 0;
@@ -217,7 +229,7 @@ function displayPrescriptionTemplate(
           {refills === 1 ? 'refill' : 'refills'}, {t.instructions}
         </div>
         {disabled && disableReason && (
-          <p class="text-xs text-red-500 mt-1 italic">Disabled: {disableReason}</p>
+          <p class="text-xs text-red-500 mt-1 italic">{disableReason}</p>
         )}
       </div>
     );
@@ -281,6 +293,8 @@ const Component = (props: ComponentProps) => {
   const [loadingTreatmentOptions, setLoadingTreatmentOptions] = createSignal<boolean>(false);
   const [showFullWidthSearch, setShowFullWidthSearch] = createSignal<boolean>(false);
 
+  const blockedMedsMap = createMemo(() => createBlockedMedsMap(props.disableList));
+
   onMount(async () => {
     if (props.catalogId) {
       await actions.getCatalog(client!.getSDK(), props.catalogId);
@@ -322,14 +336,14 @@ const Component = (props: ComponentProps) => {
         t as PrescriptionTemplate,
         showFormattedMedicationName,
         props.searchText,
-        props.disableList
+        blockedMedsMap()
       );
     }
     return displayTreatment(
       t as Treatment | TreatmentOption,
       showFormattedMedicationName,
       props.searchText,
-      props.disableList
+      blockedMedsMap()
     );
   };
 
@@ -353,7 +367,7 @@ const Component = (props: ComponentProps) => {
         }
 
         if (treatmentId) {
-          const { disabled } = isTreatmentDisabled(treatmentId, props.disableList);
+          const { disabled } = isTreatmentDisabled(treatmentId, blockedMedsMap());
           if (disabled) {
             // Don't dispatch selection event for disabled items
             return;
