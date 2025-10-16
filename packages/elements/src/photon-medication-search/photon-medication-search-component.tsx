@@ -26,19 +26,19 @@ import gql from 'graphql-tag';
 function isTreatmentDisabled(
   treatmentId: string | undefined,
   disableList: DisableList | undefined
-): { disabled: boolean; reason?: string } {
+): { disabled?: boolean; disableReason?: string } {
   if (!treatmentId || !disableList || disableList.length === 0) {
     return { disabled: false };
   }
 
-  for (const item of disableList) {
-    if (item.treatmentIds) {
-      for (const disabledTreatmentId of item.treatmentIds) {
-        if (treatmentId === disabledTreatmentId) {
-          return { disabled: true, reason: item.reason };
-        }
-      }
-    }
+  const disableListsByReason = disableList.reduce((acc, cur) => {
+    if (!cur.reason || !cur.treatmentIds) return acc;
+    acc[cur.reason] = new Set(cur.treatmentIds);
+    return acc;
+  }, {} as Record<string, Set<string>>);
+
+  for (const [reason, disabledTreatments] of Object.entries(disableListsByReason)) {
+    if (disabledTreatments.has(treatmentId)) return { disabled: true, disableReason: reason };
   }
 
   return { disabled: false };
@@ -173,7 +173,7 @@ function displayTreatment(
   disableList?: DisableList
 ) {
   const treatmentId = t.id;
-  const { disabled, reason } = isTreatmentDisabled(treatmentId, disableList);
+  const { disabled, disableReason } = isTreatmentDisabled(treatmentId, disableList);
 
   if (showFormattedMedicationName) {
     return (
@@ -181,7 +181,9 @@ function displayTreatment(
         <p class={`text-sm whitespace-normal leading-snug ${disabled ? 'text-gray-500' : ''}`}>
           {boldSubstring(t.name, searchText)}
         </p>
-        {disabled && reason && <p class="text-xs text-red-500 mt-1 italic">{reason}</p>}
+        {disabled && disableReason && (
+          <p class="text-xs text-red-500 mt-1 italic">{disableReason}</p>
+        )}
       </div>
     );
   }
@@ -196,7 +198,7 @@ function displayPrescriptionTemplate(
   disableList?: DisableList
 ) {
   const treatmentId = t.treatment.id;
-  const { disabled, reason } = isTreatmentDisabled(treatmentId, disableList);
+  const { disabled, disableReason } = isTreatmentDisabled(treatmentId, disableList);
 
   if (showFormattedMedicationName) {
     const refills = t.fillsAllowed ? t.fillsAllowed - 1 : 0;
@@ -214,7 +216,9 @@ function displayPrescriptionTemplate(
           {t.daysSupply === 1 ? 'day' : 'days'} supply, {refills}{' '}
           {refills === 1 ? 'refill' : 'refills'}, {t.instructions}
         </div>
-        {disabled && reason && <p class="text-xs text-red-500 mt-1 italic">Disabled: {reason}</p>}
+        {disabled && disableReason && (
+          <p class="text-xs text-red-500 mt-1 italic">Disabled: {disableReason}</p>
+        )}
       </div>
     );
   }
