@@ -25,6 +25,7 @@ import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
 import { TryCreatePrescriptionTemplateOptions } from '@photonhealth/components/src/systems/PrescribeProvider';
+import { DisableList } from '../photon-prescribe-workflow';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -59,6 +60,7 @@ export const AddPrescriptionCard = (props: {
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
   enableOrder: boolean;
+  disableList?: DisableList;
 }) => {
   const prescribeContext = usePrescribe();
   if (!prescribeContext) {
@@ -210,6 +212,7 @@ export const AddPrescriptionCard = (props: {
             help-text={props.store.treatment?.error}
             off-catalog-option={offCatalog()}
             search-text={searchText()}
+            disable-list={props.disableList}
             on:photon-treatment-selected={(e: any) => {
               if (e.detail.data.__typename === 'PrescriptionTemplate') {
                 repopulateForm(props.actions, {
