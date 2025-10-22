@@ -95,12 +95,12 @@ describe('Rerouting', () => {
   };
 
   beforeAll(async () => {
-    const { getPharmacies, setOrderPharmacy, getOrder } = await import('./api');
+    const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('./api');
 
     const getOrderMock = vi.mocked(getOrder);
     getOrderMock.mockResolvedValue(testOrder);
 
-    const getPharmaciesMock = vi.mocked(getPharmacies);
+    const getPharmaciesMock = vi.mocked(getPharmaciesByLocation);
     getPharmaciesMock.mockResolvedValue({
       pharmaciesByLocation: [testFirstPharmacy, testSecondPharmacy]
     });
