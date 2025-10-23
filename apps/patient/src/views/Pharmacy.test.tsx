@@ -1,7 +1,7 @@
 // Set environment variable BEFORE any imports
 process.env.REACT_APP_AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, MockedFunction, vi } from 'vitest';
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import {
@@ -14,6 +14,7 @@ import userEvent from '@testing-library/user-event';
 import { routeElements } from '../Routes';
 import { getOffers, getOrder, getPharmaciesByLocation, setOrderPharmacy } from '../api';
 import { fetchOffers, getPharmacy } from './pharmacy.utils';
+import { FulfillmentType } from '../__generated__/graphql';
 
 // Mock the settings and pharmacy utils before any imports
 vi.mock('@client/settings', () => ({
@@ -88,7 +89,7 @@ describe('Pharmacy page', () => {
     let fetchOffersMock: MockedFunction<typeof fetchOffers>;
     let getPharmacyMock: MockedFunction<typeof getPharmacy>;
     let getOrderMock: MockedFunction<typeof getOrder>;
-    let getPharmaciesMock: MockedFunction<typeof getPharmaciesByLocation>;
+    let getPharmaciesByLocationMock: MockedFunction<typeof getPharmaciesByLocation>;
     let setOrderPharmacyMock: MockedFunction<typeof setOrderPharmacy>;
 
     beforeAll(async () => {
@@ -125,7 +126,7 @@ describe('Pharmacy page', () => {
       });
 
       getOrderMock = vi.mocked(getOrder);
-      getPharmaciesMock = vi.mocked(getPharmaciesByLocation);
+      getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
       setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
     });
     test('shows offers when they are available and price toggle is enabled', async () => {
@@ -145,8 +146,8 @@ describe('Pharmacy page', () => {
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
 
-      const getPharmaciesMock = vi.mocked(getPharmaciesByLocation);
-      getPharmaciesMock.mockResolvedValue({
+      const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+      getPharmaciesByLocationMock.mockResolvedValue({
         pharmaciesByLocation: [
           generatePharmacy({
             id: 'phr_testId123',
@@ -190,8 +191,8 @@ describe('Pharmacy page', () => {
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
 
-      const getPharmaciesMock = vi.mocked(getPharmaciesByLocation);
-      getPharmaciesMock.mockResolvedValue({
+      const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+      getPharmaciesByLocationMock.mockResolvedValue({
         pharmaciesByLocation: [
           generatePharmacy({
             id: 'phr_testId123',
@@ -238,8 +239,8 @@ describe('Pharmacy page', () => {
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
 
-      const getPharmaciesMock = vi.mocked(getPharmaciesByLocation);
-      getPharmaciesMock.mockResolvedValue({
+      const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+      getPharmaciesByLocationMock.mockResolvedValue({
         pharmaciesByLocation: [
           generatePharmacy({
             id: 'phr_testId123',
@@ -279,8 +280,8 @@ describe('Pharmacy page', () => {
       const { fetchOffers } = await import('./pharmacy.utils');
       vi.mocked(fetchOffers).mockResolvedValueOnce([]);
 
-      const getPharmaciesMock = vi.mocked(getPharmaciesByLocation);
-      getPharmaciesMock.mockResolvedValue({
+      const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+      getPharmaciesByLocationMock.mockResolvedValue({
         pharmaciesByLocation: [
           generatePharmacy({
             id: 'phr_testId123',
@@ -330,8 +331,8 @@ describe('Pharmacy page', () => {
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
 
-      const getPharmaciesMock = vi.mocked(getPharmaciesByLocation);
-      getPharmaciesMock.mockResolvedValue({
+      const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+      getPharmaciesByLocationMock.mockResolvedValue({
         pharmaciesByLocation: []
       });
 
@@ -369,8 +370,8 @@ describe('Pharmacy page', () => {
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
 
-      const getPharmaciesMock = vi.mocked(getPharmaciesByLocation);
-      getPharmaciesMock.mockResolvedValue({
+      const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+      getPharmaciesByLocationMock.mockResolvedValue({
         pharmaciesByLocation: [
           generatePharmacy({
             id: 'phr_testId123',
@@ -418,8 +419,8 @@ describe('Pharmacy page', () => {
       fills: [generateFill('test-treatment')]
     });
     getOrderMock.mockResolvedValue(singlePrescriptionOrder);
-    const getPharmaciesMock = vi.mocked(getPharmaciesByLocation);
-    getPharmaciesMock.mockResolvedValue({
+    const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+    getPharmaciesByLocationMock.mockResolvedValue({
       pharmaciesByLocation: [
         generatePharmacy({
           id: 'phr_testId123',
@@ -445,7 +446,7 @@ describe('Pharmacy page', () => {
     expect(screen.getAllByText('Retail')).toHaveLength(2);
     expect(screen.getByText('$1000')).toBeInTheDocument();
 
-    const includePriceOptions = getPharmaciesMock.mock.calls.map((call) => {
+    const includePriceOptions = getPharmaciesByLocationMock.mock.calls.map((call) => {
       const options = call[0];
       return options.includePrice;
     });
@@ -465,8 +466,8 @@ describe('Pharmacy page', () => {
       fills: [generateFill('test-treatment-1'), generateFill('test-treatment-2')]
     });
     getOrderMock.mockResolvedValue(multiPrescriptionOrder);
-    const getPharmaciesMock = vi.mocked(getPharmaciesByLocation);
-    getPharmaciesMock.mockResolvedValue({
+    const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+    getPharmaciesByLocationMock.mockResolvedValue({
       pharmaciesByLocation: [
         generatePharmacy({
           id: 'phr_testId123',
@@ -488,12 +489,117 @@ describe('Pharmacy page', () => {
     const priceToggle = screen.queryByRole('checkbox', { name: 'Show coupon card prices' });
     expect(priceToggle).not.toBeInTheDocument();
 
-    const callArgs = getPharmaciesMock.mock.calls.map((call) => call[0].includePrice);
+    const callArgs = getPharmaciesByLocationMock.mock.calls.map((call) => call[0].includePrice);
     expect(callArgs).not.toContain(true);
 
     // ensure price UI is not showing in the cards
     expect(screen.queryByText('Coupon Price')).not.toBeInTheDocument();
     expect(screen.queryByText('Retail')).not.toBeInTheDocument();
+  }, 10_000);
+
+  test('shows mail order select modal and submits order to mail order pharmacy', async () => {
+    const testOrder = generateOrder({
+      id: 'ord_testId666',
+      state: 'ROUTING',
+      patient: generatePatient(),
+      fills: [generateFill('test-treatment')],
+      address: {
+        street1: '123 Main St',
+        street2: undefined,
+        city: 'New York',
+        state: 'NY',
+        postalCode: '10001',
+        country: 'US'
+      }
+    });
+    const mailOrderPharmacyData = [
+      {
+        id: 'phr_01GRGYMEZBF6516YSH8J88KACN',
+        name: 'Capsule Pharmacy',
+        logo: 'https://logos.boson.health/pharmacies/capsule-logo.png',
+        fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[]
+      },
+      {
+        id: 'phr_01GB9IPTA45KPVHG1H871Z7PZS',
+        name: 'CenterWell Pharmacy',
+        logo: 'https://logos.boson.health/pharmacies/centerwell-logo.png',
+        fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[]
+      },
+      {
+        id: 'phr_01GA9HPVYB0QF1N59AMMGMGVEF',
+        name: 'Express Scripts Specty Dis Svc Inc',
+        logo: 'https://logos.boson.health/pharmacies/express-scripts-logo.png',
+        fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[]
+      },
+      {
+        id: 'phr_01GA9HPVF90QZD5E3PJVT9TD30',
+        name: 'Optumrx Inc',
+        logo: 'https://logos.boson.health/pharmacies/optum-logo.png',
+        fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[]
+      }
+    ];
+
+    const { getPharmacies, getOrder, setOrderPharmacy } = await import('../api');
+
+    const getOrderMock = vi.mocked(getOrder);
+    const getPharmaciesMock = vi.mocked(getPharmacies);
+    const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
+
+    getOrderMock.mockResolvedValueOnce(testOrder);
+    getPharmaciesMock.mockResolvedValueOnce({
+      pharmacies: mailOrderPharmacyData
+    });
+    setOrderPharmacyMock.mockResolvedValue(true);
+
+    renderApp();
+    await navigateToPharmacyScreen();
+
+    const modalOpenButton = await screen.findByText('See all mail orders');
+    expect(modalOpenButton).toBeInTheDocument();
+
+    await userEvent.click(modalOpenButton);
+
+    // find the modal Header
+    await waitFor(() => screen.findByText(/Mail Order Pharmacies/i));
+
+    const mailOrderOption = await screen.findByText(mailOrderPharmacyData.at(-1)?.name ?? '');
+    expect(mailOrderOption).toBeInTheDocument();
+
+    await userEvent.click(mailOrderOption);
+
+    const placeOrderButton = await screen.findByText(/Place order/i);
+    expect(placeOrderButton).toBeInTheDocument();
+
+    testOrder.fulfillment = {
+      type: 'MAIL_ORDER',
+      state: 'CREATED'
+    };
+    testOrder.fulfillments = [
+      {
+        id: '',
+        state: 'PROCESSING',
+        exceptions: [],
+        prescription: {
+          __typename: undefined,
+          id: '',
+          daysSupply: undefined,
+          dispenseQuantity: 0,
+          dispenseUnit: '',
+          expirationDate: undefined,
+          fillsAllowed: 0,
+          treatment: {
+            __typename: undefined,
+            id: '',
+            name: ''
+          }
+        }
+      }
+    ];
+
+    getOrderMock.mockResolvedValueOnce(testOrder);
+
+    await userEvent.click(placeOrderButton);
+    await waitFor(() => screen.findByText(/Order placed/i), { timeout: 5_000 });
   }, 10_000);
 });
 
@@ -506,7 +612,7 @@ const renderApp = () => {
 };
 
 async function navigateToPharmacyScreen() {
-  expect(await screen.findByText('Review your prescription')).toBeInTheDocument();
+  expect(await screen.findByText(/^Review your prescription/gi)).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
   expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
 }
