@@ -8,6 +8,7 @@ import {
   ModalHeader,
   ModalProps,
   Slide,
+  Spinner,
   Text,
   VStack
 } from '@chakra-ui/react';
@@ -27,7 +28,7 @@ export function MailOrderSelectModal({ onConfirm, ...modalProps }: MailOrderSele
   const [pharmacyOptions, setPharmacyOptions] = useState<MailOrderPharmacyOption[] | undefined>();
 
   const handleConfirm = async () => {
-    if (!selectedOption) return;
+    if (!selectedOption || confirming) return;
 
     setConfirming(true);
     try {
@@ -115,8 +116,8 @@ export function MailOrderSelectModal({ onConfirm, ...modalProps }: MailOrderSele
                 variant="brand"
                 padding="4"
                 h="auto"
-                isLoading={confirming}
                 onClick={handleConfirm}
+                leftIcon={confirming ? <Spinner h="4" w="4" /> : undefined}
               >
                 <Text as="span" lineHeight="none">
                   Place Order
