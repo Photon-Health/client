@@ -679,37 +679,45 @@ export const Pharmacy = () => {
           ? override.type
           : selectedPharmacy.fulfillmentTypes?.[0];
 
-        setTimeout(() => {
-          if (result) {
-            setSuccessfullySubmitted(true);
-            setTimeout(async () => {
-              setShowFooter(false);
+        await new Promise<void>((resolve) =>
+          setTimeout(() => {
+            if (result) {
+              setSuccessfullySubmitted(true);
+              setTimeout(async () => {
+                setShowFooter(false);
 
-              handleSubmitSuccessAnalytics(overridePharmacy);
+                handleSubmitSuccessAnalytics(overridePharmacy);
 
-              // necessary to ensure the order is updated with the new coupon before navigating
-              const updatedOrder = await fetchOrder(overridePharmacy);
+                // necessary to ensure the order is updated with the new coupon before navigating
+                const updatedOrder = await fetchOrder(overridePharmacy);
 
-              if (updatedOrder) {
-                setOrder({
-                  ...updatedOrder,
-                  isReroutable: !isReroute,
-                  exceptions: updatedOrder.exceptions.map((exception) => ({
-                    ...exception,
-                    resolvedAt: new Date().toISOString()
-                  })),
-                  pharmacy: overridePharmacy
+                if (updatedOrder) {
+                  setOrder({
+                    ...updatedOrder,
+                    isReroutable: !isReroute,
+                    exceptions: updatedOrder.exceptions.map((exception) => ({
+                      ...exception,
+                      resolvedAt: new Date().toISOString()
+                    })),
+                    pharmacy: overridePharmacy
+                  });
+                }
+
+                const query = queryString.stringify({
+                  orderId: order.id,
+                  token,
+                  type: overrideType
                 });
-              }
-
-              const query = queryString.stringify({ orderId: order.id, token, type: overrideType });
-              return navigate(`/status?${query}`);
-            }, 1000);
-          } else {
-            showToastWarning();
-          }
-          setSubmitting(false);
-        }, 1000);
+                resolve();
+                return navigate(`/status?${query}`);
+              }, 1000);
+            } else {
+              showToastWarning();
+              resolve();
+            }
+          }, 1000)
+        );
+        setSubmitting(false);
       } catch (error: any) {
         showToastWarning();
         setSubmitting(false);
