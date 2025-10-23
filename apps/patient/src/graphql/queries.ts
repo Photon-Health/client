@@ -85,6 +85,7 @@ export const GET_ORDER = gql`
       pharmacy {
         id
         name
+        integrated
         address {
           street1
           street2
@@ -231,6 +232,8 @@ const PHARMACY_FIELDS = gql`
       country
       postalCode
     }
+    fulfillmentTypes
+    integrated
     distance
     isOpen(at: $openAt)
     nextEvents(at: $openAt) {
@@ -315,6 +318,7 @@ export const GET_PHARMACIES = gql`
       id
       name
       logo
+      fulfillmentTypes
     }
   }
 `;

@@ -268,6 +268,8 @@ export const Status = () => {
               <InsuranceAlert exception={unresolvedExceptions[0]?.exceptionType} />
               <OrderStatusHeader
                 status={orderState}
+                fulfillmentType={order.fulfillment?.type}
+                integrated={order.pharmacy?.integrated}
                 pharmacyEstimatedReadyAt={pharmacyEstimatedReadyAt}
                 patientDesiredReadyAt={readyBy === 'Urgent' ? 'URGENT' : readyByTime}
                 exception={exception}
