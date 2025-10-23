@@ -37,6 +37,7 @@ vi.mock('../api', () => ({
   }),
   getOrder: vi.fn(),
   getPharmaciesByLocation: vi.fn().mockResolvedValue({ pharmaciesByLocation: [] }),
+  getPharmacies: vi.fn().mockResolvedValue({ pharmacies: [] }),
   getOffers: vi.fn().mockResolvedValue([]),
   rerouteOrder: vi.fn(),
   setOrderPharmacy: vi.fn(),

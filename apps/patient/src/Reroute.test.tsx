@@ -23,7 +23,8 @@ vi.mock('./api', () => ({
     address: '123 Main St, New York, NY 10001'
   }),
   getOrder: vi.fn(),
-  getPharmacies: vi.fn().mockResolvedValue({ pharmaciesByLocation: [] }),
+  getPharmacies: vi.fn().mockResolvedValue({ pharmacies: [] }),
+  getPharmaciesByLocation: vi.fn().mockResolvedValue({ pharmaciesByLocation: [] }),
   getOffers: vi.fn().mockResolvedValue([]),
   rerouteOrder: vi.fn().mockReturnValue(Promise.resolve(true)),
   setOrderPharmacy: vi.fn(),
