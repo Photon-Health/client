@@ -506,26 +506,14 @@ describe('Pharmacy page', () => {
     });
     const mailOrderPharmacyData = [
       {
-        id: 'phr_01GRGYMEZBF6516YSH8J88KACN',
-        name: 'Capsule Pharmacy',
+        id: 'test-mail-order-1',
+        name: 'Testpill',
         logo: 'https://logos.boson.health/pharmacies/capsule-logo.png',
         fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[]
       },
       {
-        id: 'phr_01GB9IPTA45KPVHG1H871Z7PZS',
-        name: 'CenterWell Pharmacy',
-        logo: 'https://logos.boson.health/pharmacies/centerwell-logo.png',
-        fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[]
-      },
-      {
-        id: 'phr_01GA9HPVYB0QF1N59AMMGMGVEF',
-        name: 'Express Scripts Specty Dis Svc Inc',
-        logo: 'https://logos.boson.health/pharmacies/express-scripts-logo.png',
-        fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[]
-      },
-      {
-        id: 'phr_01GA9HPVF90QZD5E3PJVT9TD30',
-        name: 'Optumrx Inc',
+        id: 'test-mail-order-2',
+        name: 'TestRx',
         logo: 'https://logos.boson.health/pharmacies/optum-logo.png',
         fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[]
       }
@@ -554,7 +542,7 @@ describe('Pharmacy page', () => {
     // find the modal Header
     await waitFor(() => screen.findByText(/Mail Order Pharmacies/i));
 
-    const mailOrderOption = await screen.findByText(mailOrderPharmacyData.at(-1)?.name ?? '');
+    const mailOrderOption = await screen.findByText(mailOrderPharmacyData.at(-1)!.name);
     expect(mailOrderOption).toBeInTheDocument();
 
     await userEvent.click(mailOrderOption);
