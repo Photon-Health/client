@@ -1,4 +1,4 @@
-import { Container, Heading, Stack, useBreakpointValue } from '@chakra-ui/react';
+import { CircularProgress, Container, Heading, Stack, useBreakpointValue } from '@chakra-ui/react';
 import { useSearchParams } from 'react-router-dom';
 
 import { usePhoton } from '@photonhealth/react';
@@ -14,21 +14,18 @@ export const SSOLogin = () => {
   const connection = searchParams.get('connection') ?? undefined;
 
   useEffect(() => {
-    (async () => {
-      await login({
-        organizationId: orgId,
-        connection
-      });
-    })();
+    login({
+      organizationId: orgId,
+      connection
+    });
   });
 
   return (
     <Container maxW="md" py={{ base: '12', md: '24' }}>
-      <Stack spacing="8">
-        <Stack spacing="6" margin="auto">
-          <Logo bgIsWhite margin="auto" />
-          <Heading size={breakpoint}>Signing in...</Heading>
-        </Stack>
+      <Stack spacing="8" textAlign="center">
+        <Logo bgIsWhite margin="auto" />
+        <Heading size={breakpoint}>Signing in...</Heading>
+        <CircularProgress isIndeterminate color="green.300" margin="auto" />
       </Stack>
     </Container>
   );
