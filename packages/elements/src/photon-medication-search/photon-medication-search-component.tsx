@@ -1,6 +1,6 @@
 // Solid
 import { customElement } from 'solid-element';
-import { createEffect, createSignal, onMount, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, onMount, Show } from 'solid-js';
 
 // Photon
 import { usePhoton } from '@photonhealth/components';
@@ -16,11 +16,45 @@ import {
   TreatmentOption
 } from '@photonhealth/sdk/dist/types';
 import { CatalogStore } from '../stores/catalog';
+import { DisableList } from '../photon-multirx-form/photon-prescribe-workflow';
 
 import { ApolloClient } from '@apollo/client';
 import gql from 'graphql-tag';
 
 // Utility Functions
+
+function createBlockedMedsMap(disableList: DisableList | undefined) {
+  if (!disableList || disableList.length === 0) {
+    return {} as Record<string, string | undefined>;
+  }
+
+  return disableList.reduce((acc, cur) => {
+    // Only skip if treatmentIds is missing - reason is optional
+    if (!cur.treatmentIds) return acc;
+
+    for (const treatmentId of cur.treatmentIds) {
+      acc[treatmentId] = cur.reason; // reason can be undefined
+    }
+    return acc;
+  }, {} as Record<string, string | undefined>);
+}
+
+function isTreatmentDisabled(
+  treatmentId: string | undefined,
+  blockedMedsMap: Record<string, string | undefined>
+): { disabled?: boolean; disableReason?: string } {
+  if (!treatmentId) {
+    return { disabled: false };
+  }
+
+  // Check if treatment ID exists in the map (regardless of reason value)
+  if (treatmentId in blockedMedsMap) {
+    // Treatment is blocked - reason may be undefined (no reason provided)
+    return { disabled: true, disableReason: blockedMedsMap[treatmentId] };
+  }
+
+  return { disabled: false };
+}
 
 function triggerCustomEvent(ref: any, eventName: string, detail?: any) {
   const event = new CustomEvent(eventName, {
@@ -147,34 +181,52 @@ export const boldSubstring = (inputString: string, substring: string) => {
 function displayTreatment(
   t: Treatment | TreatmentOption,
   showFormattedMedicationName: boolean,
-  searchText: string
+  searchText: string,
+  disabled = false,
+  disableReason?: string
 ) {
-  return showFormattedMedicationName ? (
-    <p class="text-sm whitespace-normal leading-snug my-1">{boldSubstring(t.name, searchText)}</p>
-  ) : (
-    t.name || ''
-  );
+  if (showFormattedMedicationName) {
+    return (
+      <div class={`my-1 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
+        <p class={`text-sm whitespace-normal leading-snug ${disabled ? 'text-gray-500' : ''}`}>
+          {boldSubstring(t.name, searchText)}
+        </p>
+        {disabled && disableReason && (
+          <p class="text-xs text-red-500 mt-1 italic">{disableReason}</p>
+        )}
+      </div>
+    );
+  }
+
+  return t.name || '';
 }
 
 function displayPrescriptionTemplate(
   t: PrescriptionTemplate,
   showFormattedMedicationName: boolean,
-  searchText: string
+  searchText: string,
+  disabled = false,
+  disableReason?: string
 ) {
   if (showFormattedMedicationName) {
     const refills = t.fillsAllowed ? t.fillsAllowed - 1 : 0;
 
     return (
-      <div class="my-1">
-        <div class="text-sm whitespace-normal font-medium mb-1">
+      <div class={`my-1 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
+        <div
+          class={`text-sm whitespace-normal font-medium mb-1 ${disabled ? 'text-gray-500' : ''}`}
+        >
           {t.name ? <span class="text-blue-600">({boldSubstring(t.name, searchText)}): </span> : ''}
           {boldSubstring(t.treatment.name, searchText)}
         </div>
-        <div class="text-xs text-gray-500 truncate">
+        <div class={`text-xs truncate ${disabled ? 'text-gray-400' : 'text-gray-500'}`}>
           {t.dispenseQuantity} {t.dispenseUnit}, {t.daysSupply}{' '}
           {t.daysSupply === 1 ? 'day' : 'days'} supply, {refills}{' '}
           {refills === 1 ? 'refill' : 'refills'}, {t.instructions}
         </div>
+        {disabled && disableReason && (
+          <p class="text-xs text-red-500 mt-1 italic">{disableReason}</p>
+        )}
       </div>
     );
   }
@@ -226,6 +278,7 @@ interface ComponentProps {
   selected?: Treatment | PrescriptionTemplate | TreatmentOption;
   offCatalogOption?: Medication;
   searchText: string;
+  disableList?: DisableList;
 }
 
 const Component = (props: ComponentProps) => {
@@ -235,6 +288,8 @@ const Component = (props: ComponentProps) => {
   const [options, setOptions] = createSignal<any[]>([]);
   const [loadingTreatmentOptions, setLoadingTreatmentOptions] = createSignal<boolean>(false);
   const [showFullWidthSearch, setShowFullWidthSearch] = createSignal<boolean>(false);
+
+  const blockedMedsMap = createMemo(() => createBlockedMedsMap(props.disableList));
 
   onMount(async () => {
     if (props.catalogId) {
@@ -272,17 +327,23 @@ const Component = (props: ComponentProps) => {
     t: Treatment | PrescriptionTemplate | TreatmentOption,
     showFormattedMedicationName: boolean
   ) => {
+    const treatmentId = 'treatment' in t ? t.treatment.id : t.id;
+    const { disabled, disableReason } = isTreatmentDisabled(treatmentId, blockedMedsMap());
     if (t && '__typename' in t && t.__typename == 'PrescriptionTemplate') {
       return displayPrescriptionTemplate(
         t as PrescriptionTemplate,
         showFormattedMedicationName,
-        props.searchText
+        props.searchText,
+        disabled,
+        disableReason
       );
     }
     return displayTreatment(
       t as Treatment | TreatmentOption,
       showFormattedMedicationName,
-      props.searchText
+      props.searchText,
+      disabled,
+      disableReason
     );
   };
 
@@ -292,12 +353,33 @@ const Component = (props: ComponentProps) => {
     <div
       ref={ref}
       on:photon-data-selected={(e: any) => {
-        dispatchTreatmentSelected(ref, e.detail.data, store.catalog.data?.id || '');
+        const selectedItem = e.detail.data;
 
-        if ('treatment' in e.detail.data) {
-          dispatchSearchTextChanged(ref, e.detail.data.treatment.name);
+        // Check if the selected item is disabled
+        let treatmentId: string | undefined;
+
+        if ('treatment' in selectedItem) {
+          // This is a PrescriptionTemplate - check the treatment ID
+          treatmentId = selectedItem.treatment.id;
+        } else if ('id' in selectedItem) {
+          // This is a Treatment or TreatmentOption - use the ID directly
+          treatmentId = selectedItem.id;
+        }
+
+        if (treatmentId) {
+          const { disabled } = isTreatmentDisabled(treatmentId, blockedMedsMap());
+          if (disabled) {
+            // Don't dispatch selection event for disabled items
+            return;
+          }
+        }
+
+        dispatchTreatmentSelected(ref, selectedItem, store.catalog.data?.id || '');
+
+        if ('treatment' in selectedItem) {
+          dispatchSearchTextChanged(ref, selectedItem.treatment.name);
         } else {
-          dispatchSearchTextChanged(ref, e.detail.data.name);
+          dispatchSearchTextChanged(ref, selectedItem.name);
         }
       }}
       on:photon-data-unselected={() => {
@@ -412,7 +494,8 @@ customElement(
     formName: undefined,
     selected: undefined,
     offCatalogOption: undefined,
-    searchText: ''
+    searchText: '',
+    disableList: undefined
   },
   Component
 );
