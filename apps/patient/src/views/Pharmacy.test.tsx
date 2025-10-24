@@ -502,15 +502,7 @@ describe('Pharmacy page', () => {
       id: 'ord_testId666',
       state: 'ROUTING',
       patient: generatePatient(),
-      fills: [generateFill('test-treatment')],
-      address: {
-        street1: '123 Main St',
-        street2: undefined,
-        city: 'New York',
-        state: 'NY',
-        postalCode: '10001',
-        country: 'US'
-      }
+      fills: [generateFill('test-treatment')]
     });
     const mailOrderPharmacyData = [
       {
