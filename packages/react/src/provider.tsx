@@ -619,6 +619,7 @@ export interface PhotonClientContextInterface {
   ];
   clearError: () => void;
   login: PhotonClient['authentication']['login'];
+  loginWithPopup: PhotonClient['authentication']['loginWithPopup'];
   getToken: PhotonClient['authentication']['getAccessToken'];
   handleRedirect: PhotonClient['authentication']['handleRedirect'];
   logout: PhotonClient['authentication']['logout'];
@@ -667,6 +668,7 @@ const PhotonClientContext = createContext<PhotonClientContextInterface>({
   createWebhook: stub,
   deleteWebhook: stub,
   login: stub,
+  loginWithPopup: stub,
   rotateSecret: stub,
   handleRedirect: stub,
   logout: stub,
@@ -754,6 +756,32 @@ export const PhotonProvider = (opts: {
       connection,
       appState
     });
+  };
+
+  const loginWithPopup = async ({
+    organizationId,
+    invitation,
+    connection,
+    appState
+  }: {
+    organizationId?: string;
+    invitation?: string;
+    connection?: string;
+    appState?: object;
+  } = {}) => {
+    const result = await client.authentication.loginWithPopup({
+      organizationId,
+      invitation,
+      connection,
+      appState
+    });
+
+    dispatch({
+      type: 'INITIALISED',
+      user: await client.authentication.getUser()
+    });
+
+    return result;
   };
 
   const clearError = () => {
@@ -2916,6 +2944,7 @@ export const PhotonProvider = (opts: {
     env: opts.env,
     clinicalClient: client.apolloClinical,
     login,
+    loginWithPopup,
     logout,
     getToken,
     getPatient: useGetPatient,

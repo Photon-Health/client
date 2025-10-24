@@ -1,8 +1,9 @@
 import {
   Auth0Client,
-  LogoutOptions as Auth0LogoutOptions,
   GetTokenSilentlyOptions,
   GetTokenWithPopupOptions,
+  LogoutOptions as Auth0LogoutOptions,
+  PopupLoginOptions,
   RedirectLoginOptions,
   RedirectLoginResult,
   User
@@ -107,6 +108,26 @@ export class AuthManager {
     };
 
     return this.authentication.loginWithRedirect(opts);
+  }
+
+  public async loginWithPopup({
+    organizationId,
+    invitation,
+    connection,
+    appState
+  }: LoginOptions): Promise<void> {
+    const opts: PopupLoginOptions = {
+      authorizationParams: {
+        ...(this.audience ? { audience: this.audience } : {}),
+        ...(connection || this.connection ? { connection: connection || this.connection } : {}),
+        ...(organizationId || this.organization
+          ? { organization: organizationId || this.organization }
+          : {}),
+        ...(invitation ? { invitation } : {})
+      },
+      ...(appState ? { appState } : {})
+    };
+    return this.authentication.loginWithPopup(opts);
   }
 
   /**
