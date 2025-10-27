@@ -40,7 +40,11 @@ import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { demoPharmacies } from '../data/demoPharmacies';
 import { isGLP } from '../utils/isGLP';
 import { datadogRum } from '@datadog/browser-rum';
-import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__generated__/graphql';
+import {
+  FulfillmentType,
+  GetPharmaciesByLocationQuery,
+  Pharmacy as PharmacyType
+} from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { fetchOffers, getPharmacy } from './pharmacy.utils';
 import _ from 'lodash';
@@ -692,6 +696,11 @@ export const Pharmacy = () => {
                 const updatedOrder = await fetchOrder(overridePharmacy);
 
                 if (updatedOrder) {
+                  updatedOrder.fulfillment = {
+                    ...updatedOrder.fulfillment,
+                    type: overrideType as FulfillmentType,
+                    state: updatedOrder.fulfillment?.state ?? 'CREATED'
+                  };
                   setOrder({
                     ...updatedOrder,
                     isReroutable: !isReroute,
