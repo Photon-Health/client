@@ -127,7 +127,7 @@ function subheaderText(props: OrderStatusHeaderProps) {
     (props.fulfillmentType === 'MAIL_ORDER' || props.integrated) &&
     (props.status === 'CREATED' || props.status === 'SENT')
   ) {
-    return "We've sent your order to the pharmacy. They will reach out shortly.'";
+    return "We've sent your order to the pharmacy. They will reach out shortly.";
   }
   if (props.status === 'CREATED' || props.status === 'SENT') {
     return "We're confirming your order with the pharmacy.";
