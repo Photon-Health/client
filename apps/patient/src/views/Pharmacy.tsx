@@ -29,7 +29,7 @@ import { useOrderContext } from './Main';
 
 import {
   geocode,
-  getPharmacies,
+  getPharmaciesByLocation,
   rerouteOrder,
   setOrderPharmacy,
   setPreferredPharmacy,
@@ -40,7 +40,11 @@ import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { demoPharmacies } from '../data/demoPharmacies';
 import { isGLP } from '../utils/isGLP';
 import { datadogRum } from '@datadog/browser-rum';
-import { GetPharmaciesByLocationQuery, Pharmacy as PharmacyType } from '../__generated__/graphql';
+import {
+  FulfillmentType,
+  GetPharmaciesByLocationQuery,
+  Pharmacy as PharmacyType
+} from '../__generated__/graphql';
 import { getOrgMailOrderPharms } from '@client/settings';
 import { fetchOffers, getPharmacy } from './pharmacy.utils';
 import _ from 'lodash';
@@ -55,13 +59,18 @@ import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
 import { OffersList } from '../components/offers/OffersList';
+import { MailOrderSelectModal } from '../components/mail-order-select/MailOrderSelectModal';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
 const WALGREENS_PHARMACY_RADIUS = 15; // miles
 
-function isMailOrderPharmacy(pharmacyId: string): boolean {
+function isMailOrderPharmacy(pharmacy: EnrichedPharmacy): boolean {
+  const pharmacyId = pharmacy.id;
+  const hasMailOrderFulfillment = pharmacy.fulfillmentTypes?.includes('MAIL_ORDER');
+
   return (
+    hasMailOrderFulfillment ||
     pharmacyId === process.env.REACT_APP_AMAZON_PHARMACY_ID ||
     pharmacyId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID ||
     pharmacyId === 'SUPER_TEST_MAIL_ORDER_PHARMACY'
@@ -109,6 +118,7 @@ export const Pharmacy = () => {
   const [showFooter, setShowFooter] = useState<boolean>(false);
   const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
+  const [mailOrderModalOpen, setMailOrderModalOpen] = useState<boolean>(false);
 
   // selection state
   const [selectedId, setSelectedId] = useState<string>('');
@@ -353,7 +363,7 @@ export const Pharmacy = () => {
         return [];
       }
       try {
-        const res: GetPharmaciesByLocationQuery = await getPharmacies({
+        const res: GetPharmaciesByLocationQuery = await getPharmaciesByLocation({
           searchParams: { latitude, longitude, radius: COSTCO_PHARMACY_RADIUS },
           limit: 1,
           offset: 0,
@@ -387,7 +397,7 @@ export const Pharmacy = () => {
       }
 
       try {
-        const res: GetPharmaciesByLocationQuery = await getPharmacies({
+        const res: GetPharmaciesByLocationQuery = await getPharmaciesByLocation({
           searchParams: { latitude, longitude, radius: WALGREENS_PHARMACY_RADIUS },
           limit: 1,
           offset: 0,
@@ -422,7 +432,7 @@ export const Pharmacy = () => {
         return [];
       }
 
-      const res = await getPharmacies({
+      const res = await getPharmaciesByLocation({
         searchParams: { latitude, longitude },
         limit: GET_PHARMACIES_COUNT,
         offset: pageOffset,
@@ -621,26 +631,21 @@ export const Pharmacy = () => {
     }
   };
 
-  const handleSubmit = async () => {
-    if (!selectedId) {
-      console.error('No selectedId. Cannot set pharmacy on order.');
-      return;
-    }
-
+  const handleSubmit = async (selectedPharmacy: EnrichedPharmacy) => {
     if (!order) {
       console.error('No order present');
       return;
     }
-
     setSubmitting(true);
 
-    const selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
-    const selectedOffer = filteredOffers?.find((o) => o.pharmacyId === selectedId);
+    const selectedOffer = filteredOffers?.find((o) => o.pharmacyId === selectedPharmacy.id);
+    const isMailOrder = isMailOrderPharmacy(selectedPharmacy);
 
     patientAnalytics.track('Pharmacy Selection Submitted', order, {
-      pharmacyId: selectedId,
+      pharmacyId: selectedPharmacy.id,
       pharmacyName: selectedPharmacy?.name,
       isReroute: !!isReroute,
+      isMailOrder,
       enablePrice,
       hasPrice: selectedPharmacy?.price !== undefined,
       price: selectedPharmacy?.price || selectedOffer?.costAmount,
@@ -654,55 +659,74 @@ export const Pharmacy = () => {
 
     // If it's a mail order pharmacy, submit the pharmacy to the order
     // Otherwise, just navigate to ready by selection
-    if (isMailOrderPharmacy(selectedId) || isReroute) {
-      trackSelectedPharmacyRank(selectedId, allPharmacies);
+    if (isMailOrder || isReroute) {
+      trackSelectedPharmacyRank(selectedPharmacy.id, allPharmacies);
 
       try {
         const patientSelectedPrice = enablePrice;
         const result = isReroute
-          ? await rerouteOrder(order.id, selectedId, patientSelectedPrice)
+          ? await rerouteOrder(order.id, selectedPharmacy.id, patientSelectedPrice)
           : await setOrderPharmacy(
               order.id,
-              selectedId,
+              selectedPharmacy.id,
               order.readyBy ?? undefined,
               order.readyByDay ?? undefined,
               order.readyByTime,
               patientSelectedPrice
             );
 
-        const { type, selectedPharmacy } = getPharmacy(allPharmacies, selectedId);
+        // TODO: Remove this once we've got all pharmacies marked correctly in the db
+        // this historically was overriding pharmaicy type and presentation due to an inept datamodel
+        const override = getPharmacy(allPharmacies, selectedPharmacy.id);
+        const overridePharmacy = override.selectedPharmacy ?? selectedPharmacy;
+        const overrideType = override.selectedPharmacy
+          ? override.type
+          : selectedPharmacy.fulfillmentTypes?.[0];
 
-        setTimeout(() => {
-          if (result) {
-            setSuccessfullySubmitted(true);
-            setTimeout(async () => {
-              setShowFooter(false);
+        await new Promise<void>((resolve) =>
+          setTimeout(() => {
+            if (result) {
+              setSuccessfullySubmitted(true);
+              setTimeout(async () => {
+                setShowFooter(false);
 
-              handleSubmitSuccessAnalytics(selectedPharmacy);
+                handleSubmitSuccessAnalytics(overridePharmacy);
 
-              // necessary to ensure the order is updated with the new coupon before navigating
-              const updatedOrder = await fetchOrder(selectedPharmacy);
+                // necessary to ensure the order is updated with the new coupon before navigating
+                const updatedOrder = await fetchOrder(overridePharmacy);
 
-              if (updatedOrder) {
-                setOrder({
-                  ...updatedOrder,
-                  isReroutable: !isReroute,
-                  exceptions: updatedOrder.exceptions.map((exception) => ({
-                    ...exception,
-                    resolvedAt: new Date().toISOString()
-                  })),
-                  pharmacy: selectedPharmacy
+                if (updatedOrder) {
+                  updatedOrder.fulfillment = {
+                    ...updatedOrder.fulfillment,
+                    type: overrideType as FulfillmentType,
+                    state: updatedOrder.fulfillment?.state ?? 'CREATED'
+                  };
+                  setOrder({
+                    ...updatedOrder,
+                    isReroutable: !isReroute,
+                    exceptions: updatedOrder.exceptions.map((exception) => ({
+                      ...exception,
+                      resolvedAt: new Date().toISOString()
+                    })),
+                    pharmacy: overridePharmacy
+                  });
+                }
+
+                const query = queryString.stringify({
+                  orderId: order.id,
+                  token,
+                  type: overrideType
                 });
-              }
-
-              const query = queryString.stringify({ orderId: order.id, token, type });
-              return navigate(`/status?${query}`);
-            }, 1000);
-          } else {
-            showToastWarning();
-          }
-          setSubmitting(false);
-        }, 1000);
+                resolve();
+                return navigate(`/status?${query}`);
+              }, 1000);
+            } else {
+              showToastWarning();
+              resolve();
+            }
+          }, 1000)
+        );
+        setSubmitting(false);
       } catch (error: any) {
         showToastWarning();
         setSubmitting(false);
@@ -799,7 +823,7 @@ export const Pharmacy = () => {
         );
 
         // For demo, follow the same logic as non-demo
-        if (isMailOrderPharmacy(selectedId)) {
+        if (isMailOrderPharmacy(selectedPharmacy)) {
           const query = queryString.stringify({ demo: true, phone });
           navigate(`/status?${query}`);
         } else {
@@ -1009,6 +1033,12 @@ export const Pharmacy = () => {
 
       <CouponModal isOpen={couponModalOpen} onClose={() => setCouponModalOpen(false)} />
 
+      <MailOrderSelectModal
+        isOpen={mailOrderModalOpen}
+        onClose={() => setMailOrderModalOpen(false)}
+        onConfirm={handleSubmit}
+      />
+
       <Box bgColor="white">
         <VStack
           spacing={4}
@@ -1063,7 +1093,7 @@ export const Pharmacy = () => {
       <Container pb={showFooter ? 32 : 8}>
         {patientLocation && (
           <VStack spacing={6} align="stretch" pt={4}>
-            <VStack spacing={2} align="span" w="full">
+            <VStack spacing={2} align="span" w="full" rowGap="6">
               {showBrandedOptionsHeader && (
                 <BrandedOptionsHeader title={t.delivery} description={t.getDelivered} />
               )}
@@ -1091,6 +1121,18 @@ export const Pharmacy = () => {
                   }
                 />
               )}
+              <HStack
+                w="full"
+                justifyContent="space-between"
+                background="Background"
+                padding="2"
+                borderRadius="md"
+              >
+                <Text fontSize="sm">Don't see your pharmacy?</Text>
+                <Link as="button" onClick={() => setMailOrderModalOpen(true)} fontSize="sm">
+                  See all mail orders
+                </Link>
+              </HStack>
               {pickupPharmacyOptions(patientLocation)}
             </VStack>
           </VStack>
@@ -1106,10 +1148,20 @@ export const Pharmacy = () => {
             variant={successfullySubmitted ? undefined : 'brand'}
             colorScheme={successfullySubmitted ? 'green' : undefined}
             leftIcon={successfullySubmitted ? <FiCheck /> : undefined}
-            onClick={!successfullySubmitted ? handleSubmit : undefined}
-            isLoading={submitting}
             disabled={selectedId == null}
             isDisabled={selectedId == null}
+            isLoading={submitting}
+            onClick={async () => {
+              if (successfullySubmitted) return;
+
+              const selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
+              if (!selectedId || !selectedPharmacy) {
+                console.error('No selectedId. Cannot set pharmacy on order.');
+                return;
+              }
+
+              await handleSubmit(selectedPharmacy);
+            }}
           >
             {successfullySubmitted ? t.thankYou : t.selectPharmacy}
           </Button>

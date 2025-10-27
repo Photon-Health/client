@@ -1,7 +1,7 @@
 // Set environment variable BEFORE any imports
 process.env.REACT_APP_AMAZON_PHARMACY_ID = 'phr_01GA9HPV5XYTC1NNX213VRRBZ3';
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, MockedFunction, vi } from 'vitest';
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import {
@@ -12,8 +12,9 @@ import {
 } from '../test-utils/generators';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from '../Routes';
-import { getOffers, getOrder, getPharmacies, setOrderPharmacy } from '../api';
+import { getOffers, getOrder, getPharmaciesByLocation, setOrderPharmacy } from '../api';
 import { fetchOffers, getPharmacy } from './pharmacy.utils';
+import { FulfillmentType } from '../__generated__/graphql';
 
 // Mock the settings and pharmacy utils before any imports
 vi.mock('@client/settings', () => ({
@@ -36,7 +37,8 @@ vi.mock('../api', () => ({
     address: '123 Main St, New York, NY 10001'
   }),
   getOrder: vi.fn(),
-  getPharmacies: vi.fn().mockResolvedValue({ pharmaciesByLocation: [] }),
+  getPharmaciesByLocation: vi.fn().mockResolvedValue({ pharmaciesByLocation: [] }),
+  getPharmacies: vi.fn().mockResolvedValue({ pharmacies: [] }),
   getOffers: vi.fn().mockResolvedValue([]),
   rerouteOrder: vi.fn(),
   setOrderPharmacy: vi.fn(),
@@ -87,7 +89,7 @@ describe('Pharmacy page', () => {
     let fetchOffersMock: MockedFunction<typeof fetchOffers>;
     let getPharmacyMock: MockedFunction<typeof getPharmacy>;
     let getOrderMock: MockedFunction<typeof getOrder>;
-    let getPharmaciesMock: MockedFunction<typeof getPharmacies>;
+    let getPharmaciesByLocationMock: MockedFunction<typeof getPharmaciesByLocation>;
     let setOrderPharmacyMock: MockedFunction<typeof setOrderPharmacy>;
 
     beforeAll(async () => {
@@ -124,7 +126,7 @@ describe('Pharmacy page', () => {
       });
 
       getOrderMock = vi.mocked(getOrder);
-      getPharmaciesMock = vi.mocked(getPharmacies);
+      getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
       setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
     });
     test('shows offers when they are available and price toggle is enabled', async () => {
@@ -144,8 +146,8 @@ describe('Pharmacy page', () => {
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
 
-      const getPharmaciesMock = vi.mocked(getPharmacies);
-      getPharmaciesMock.mockResolvedValue({
+      const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+      getPharmaciesByLocationMock.mockResolvedValue({
         pharmaciesByLocation: [
           generatePharmacy({
             id: 'phr_testId123',
@@ -171,7 +173,7 @@ describe('Pharmacy page', () => {
     }, 10_000);
 
     test('shows offers when they are available and price toggle is enabled - doing the same thing again', async () => {
-      const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
+      const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
       const getOrderMock = vi.mocked(getOrder);
       const singlePrescriptionOrder = generateOrder({
         id: 'ord_testId777',
@@ -189,8 +191,8 @@ describe('Pharmacy page', () => {
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
 
-      const getPharmaciesMock = vi.mocked(getPharmacies);
-      getPharmaciesMock.mockResolvedValue({
+      const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+      getPharmaciesByLocationMock.mockResolvedValue({
         pharmaciesByLocation: [
           generatePharmacy({
             id: 'phr_testId123',
@@ -220,7 +222,7 @@ describe('Pharmacy page', () => {
       const { fetchOffers } = await import('./pharmacy.utils');
       vi.mocked(fetchOffers).mockResolvedValueOnce([]);
 
-      const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
+      const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
       const getOrderMock = vi.mocked(getOrder);
       const singlePrescriptionOrder = generateOrder({
         id: 'ord_testId777',
@@ -237,8 +239,8 @@ describe('Pharmacy page', () => {
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
 
-      const getPharmaciesMock = vi.mocked(getPharmacies);
-      getPharmaciesMock.mockResolvedValue({
+      const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+      getPharmaciesByLocationMock.mockResolvedValue({
         pharmaciesByLocation: [
           generatePharmacy({
             id: 'phr_testId123',
@@ -263,7 +265,9 @@ describe('Pharmacy page', () => {
 
   describe('address requirements', () => {
     test('does not show offers when order has no address', async () => {
-      const { getPharmacies, setOrderPharmacy, getOrder, getOffers } = await import('../api');
+      const { getPharmaciesByLocation, setOrderPharmacy, getOrder, getOffers } = await import(
+        '../api'
+      );
       const getOrderMock = vi.mocked(getOrder);
       const singlePrescriptionOrder = generateOrder({
         id: 'ord_testId777',
@@ -276,8 +280,8 @@ describe('Pharmacy page', () => {
       const { fetchOffers } = await import('./pharmacy.utils');
       vi.mocked(fetchOffers).mockResolvedValueOnce([]);
 
-      const getPharmaciesMock = vi.mocked(getPharmacies);
-      getPharmaciesMock.mockResolvedValue({
+      const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+      getPharmaciesByLocationMock.mockResolvedValue({
         pharmaciesByLocation: [
           generatePharmacy({
             id: 'phr_testId123',
@@ -316,7 +320,7 @@ describe('Pharmacy page', () => {
     }, 10_000);
 
     test('shows location even when order has no address (current behavior)', async () => {
-      const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
+      const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
       const getOrderMock = vi.mocked(getOrder);
       const singlePrescriptionOrder = generateOrder({
         id: 'ord_testId777',
@@ -327,8 +331,8 @@ describe('Pharmacy page', () => {
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
 
-      const getPharmaciesMock = vi.mocked(getPharmacies);
-      getPharmaciesMock.mockResolvedValue({
+      const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+      getPharmaciesByLocationMock.mockResolvedValue({
         pharmaciesByLocation: []
       });
 
@@ -349,7 +353,7 @@ describe('Pharmacy page', () => {
       const { fetchOffers } = await import('./pharmacy.utils');
       vi.mocked(fetchOffers).mockResolvedValueOnce([]);
 
-      const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
+      const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
       const getOrderMock = vi.mocked(getOrder);
       const singlePrescriptionOrder = generateOrder({
         id: 'ord_testId777',
@@ -366,8 +370,8 @@ describe('Pharmacy page', () => {
       });
       getOrderMock.mockResolvedValue(singlePrescriptionOrder);
 
-      const getPharmaciesMock = vi.mocked(getPharmacies);
-      getPharmaciesMock.mockResolvedValue({
+      const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+      getPharmaciesByLocationMock.mockResolvedValue({
         pharmaciesByLocation: [
           generatePharmacy({
             id: 'phr_testId123',
@@ -406,7 +410,7 @@ describe('Pharmacy page', () => {
   });
 
   test('shows enabled price toggle when order has 1 prescription', async () => {
-    const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
+    const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
     const getOrderMock = vi.mocked(getOrder);
     const singlePrescriptionOrder = generateOrder({
       id: 'ord_testId777',
@@ -415,8 +419,8 @@ describe('Pharmacy page', () => {
       fills: [generateFill('test-treatment')]
     });
     getOrderMock.mockResolvedValue(singlePrescriptionOrder);
-    const getPharmaciesMock = vi.mocked(getPharmacies);
-    getPharmaciesMock.mockResolvedValue({
+    const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+    getPharmaciesByLocationMock.mockResolvedValue({
       pharmaciesByLocation: [
         generatePharmacy({
           id: 'phr_testId123',
@@ -442,7 +446,7 @@ describe('Pharmacy page', () => {
     expect(screen.getAllByText('Retail')).toHaveLength(2);
     expect(screen.getByText('$1000')).toBeInTheDocument();
 
-    const includePriceOptions = getPharmaciesMock.mock.calls.map((call) => {
+    const includePriceOptions = getPharmaciesByLocationMock.mock.calls.map((call) => {
       const options = call[0];
       return options.includePrice;
     });
@@ -453,7 +457,7 @@ describe('Pharmacy page', () => {
     // fetchOffers endpoint will never return anything for multiple prescriptions
     const { fetchOffers } = await import('./pharmacy.utils');
     vi.mocked(fetchOffers).mockResolvedValueOnce([]);
-    const { getPharmacies, setOrderPharmacy, getOrder } = await import('../api');
+    const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('../api');
     const getOrderMock = vi.mocked(getOrder);
     const multiPrescriptionOrder = generateOrder({
       id: 'ord_testId888',
@@ -462,8 +466,8 @@ describe('Pharmacy page', () => {
       fills: [generateFill('test-treatment-1'), generateFill('test-treatment-2')]
     });
     getOrderMock.mockResolvedValue(multiPrescriptionOrder);
-    const getPharmaciesMock = vi.mocked(getPharmacies);
-    getPharmaciesMock.mockResolvedValue({
+    const getPharmaciesByLocationMock = vi.mocked(getPharmaciesByLocation);
+    getPharmaciesByLocationMock.mockResolvedValue({
       pharmaciesByLocation: [
         generatePharmacy({
           id: 'phr_testId123',
@@ -485,12 +489,97 @@ describe('Pharmacy page', () => {
     const priceToggle = screen.queryByRole('checkbox', { name: 'Show coupon card prices' });
     expect(priceToggle).not.toBeInTheDocument();
 
-    const callArgs = getPharmaciesMock.mock.calls.map((call) => call[0].includePrice);
+    const callArgs = getPharmaciesByLocationMock.mock.calls.map((call) => call[0].includePrice);
     expect(callArgs).not.toContain(true);
 
     // ensure price UI is not showing in the cards
     expect(screen.queryByText('Coupon Price')).not.toBeInTheDocument();
     expect(screen.queryByText('Retail')).not.toBeInTheDocument();
+  }, 10_000);
+
+  test('shows mail order select modal and submits order to mail order pharmacy', async () => {
+    const testOrder = generateOrder({
+      id: 'ord_testId666',
+      state: 'ROUTING',
+      patient: generatePatient(),
+      fills: [generateFill('test-treatment')]
+    });
+    const mailOrderPharmacyData = [
+      {
+        id: 'test-mail-order-1',
+        name: 'Testpill',
+        logo: 'https://logos.boson.health/pharmacies/capsule-logo.png',
+        fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[]
+      },
+      {
+        id: 'test-mail-order-2',
+        name: 'TestRx',
+        logo: 'https://logos.boson.health/pharmacies/optum-logo.png',
+        fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[]
+      }
+    ];
+
+    const { getPharmacies, getOrder, setOrderPharmacy } = await import('../api');
+
+    const getOrderMock = vi.mocked(getOrder);
+    const getPharmaciesMock = vi.mocked(getPharmacies);
+    const setOrderPharmacyMock = vi.mocked(setOrderPharmacy);
+
+    getOrderMock.mockResolvedValueOnce(testOrder);
+    getPharmaciesMock.mockResolvedValueOnce({
+      pharmacies: mailOrderPharmacyData
+    });
+    setOrderPharmacyMock.mockResolvedValue(true);
+
+    renderApp();
+    await navigateToPharmacyScreen();
+
+    const modalOpenButton = await screen.findByText('See all mail orders');
+    expect(modalOpenButton).toBeInTheDocument();
+
+    await userEvent.click(modalOpenButton);
+
+    // find the modal Header
+    await waitFor(() => screen.findByText(/Mail Order Pharmacies/i));
+
+    const mailOrderOption = await screen.findByText(mailOrderPharmacyData.at(-1)!.name);
+    expect(mailOrderOption).toBeInTheDocument();
+
+    await userEvent.click(mailOrderOption);
+
+    const placeOrderButton = await screen.findByText(/Place order/i);
+    expect(placeOrderButton).toBeInTheDocument();
+
+    testOrder.fulfillment = {
+      type: 'MAIL_ORDER',
+      state: 'CREATED'
+    };
+    testOrder.fulfillments = [
+      {
+        id: '',
+        state: 'PROCESSING',
+        exceptions: [],
+        prescription: {
+          __typename: undefined,
+          id: '',
+          daysSupply: undefined,
+          dispenseQuantity: 0,
+          dispenseUnit: '',
+          expirationDate: undefined,
+          fillsAllowed: 0,
+          treatment: {
+            __typename: undefined,
+            id: '',
+            name: ''
+          }
+        }
+      }
+    ];
+
+    getOrderMock.mockResolvedValueOnce(testOrder);
+
+    await userEvent.click(placeOrderButton);
+    await waitFor(() => screen.findByText(/Order placed/i), { timeout: 5_000 });
   }, 10_000);
 });
 
@@ -503,7 +592,7 @@ const renderApp = () => {
 };
 
 async function navigateToPharmacyScreen() {
-  expect(await screen.findByText('Review your prescription')).toBeInTheDocument();
+  expect(await screen.findByText(/^Review your prescription/gi)).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
   expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
 }
