@@ -85,6 +85,7 @@ export const GET_ORDER = gql`
       pharmacy {
         id
         name
+        integrated
         address {
           street1
           street2
@@ -231,6 +232,8 @@ const PHARMACY_FIELDS = gql`
       country
       postalCode
     }
+    fulfillmentTypes
+    integrated
     distance
     isOpen(at: $openAt)
     nextEvents(at: $openAt) {
@@ -274,7 +277,7 @@ const PHARMACY_FIELDS = gql`
   }
 `;
 
-export const GET_PHARMACIES = gql`
+export const GET_PHARMACIES_BY_LOCATION = gql`
   query GetPharmaciesByLocation(
     $location: LatLongSearch!
     $limit: Int
@@ -297,6 +300,27 @@ export const GET_PHARMACIES = gql`
     }
   }
   ${PHARMACY_FIELDS}
+`;
+
+export const GET_PHARMACIES = gql`
+  query GetPharmacies(
+    $fulfillmentType: FulfillmentType
+    $integrated: Boolean
+    $limit: Int
+    $offset: Int
+  ) {
+    pharmacies(
+      fulfillmentType: $fulfillmentType
+      integrated: $integrated
+      limit: $limit
+      offset: $offset
+    ) {
+      id
+      name
+      logo
+      fulfillmentTypes
+    }
+  }
 `;
 
 export const GET_OFFERS = gql`
