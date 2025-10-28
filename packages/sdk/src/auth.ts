@@ -1,8 +1,8 @@
 import {
   Auth0Client,
+  LogoutOptions as Auth0LogoutOptions,
   GetTokenSilentlyOptions,
   GetTokenWithPopupOptions,
-  LogoutOptions as Auth0LogoutOptions,
   RedirectLoginOptions,
   RedirectLoginResult,
   User
