@@ -22,7 +22,8 @@ vi.mock('./api', () => ({
     address: '123 Main St, New York, NY 10001'
   }),
   getOrder: vi.fn(),
-  getPharmacies: vi.fn().mockResolvedValue({ pharmaciesByLocation: [] }),
+  getPharmacies: vi.fn().mockResolvedValue({ pharmacies: [] }),
+  getPharmaciesByLocation: vi.fn().mockResolvedValue({ pharmaciesByLocation: [] }),
   getOffers: vi.fn().mockResolvedValue([]),
   rerouteOrder: vi.fn(),
   setOrderPharmacy: vi.fn(),
@@ -73,10 +74,10 @@ describe('App', () => {
   });
 
   test('For Local Pickup Pharmacies: navigate from review > pharmacy > readyBy > status', async () => {
-    const { getPharmacies, setOrderPharmacy, getOrder } = await import('./api');
+    const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('./api');
     const getOrderMock = vi.mocked(getOrder);
     getOrderMock.mockResolvedValue(testOrder);
-    const getPharmaciesMock = vi.mocked(getPharmacies);
+    const getPharmaciesMock = vi.mocked(getPharmaciesByLocation);
     getPharmaciesMock.mockResolvedValue({
       pharmaciesByLocation: [
         generatePharmacy({
@@ -114,10 +115,10 @@ describe('App', () => {
   }, 10_000);
 
   test('For Mail Order Pharmacies: skips the readyBy page', async () => {
-    const { getPharmacies, setOrderPharmacy, getOrder } = await import('./api');
+    const { getPharmaciesByLocation, setOrderPharmacy, getOrder } = await import('./api');
     const getOrderMock = vi.mocked(getOrder);
     getOrderMock.mockResolvedValue(testOrder);
-    const getPharmaciesMock = vi.mocked(getPharmacies);
+    const getPharmaciesMock = vi.mocked(getPharmaciesByLocation);
     getPharmaciesMock.mockResolvedValue({
       pharmaciesByLocation: [
         generatePharmacy({

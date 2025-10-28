@@ -1,3 +1,4 @@
+import { FulfillmentType } from '../__generated__/graphql';
 import { graphQLClient } from '../configs/graphqlClient';
 
 export const AUTH_HEADER_ERRORS = ['EMPTY_AUTHORIZATION_HEADER', 'INVALID_AUTHORIZATION_HEADER'];
@@ -24,7 +25,7 @@ export const getOffers = async (orderId: string) => {
     throw new Error('No offers found');
   }
 };
-export const getPharmacies = async ({
+export const getPharmaciesByLocation = async ({
   searchParams,
   limit,
   offset,
@@ -62,10 +63,35 @@ export const getPharmacies = async ({
     });
   } catch (e: any) {
     const errorMessage =
-      e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on getPharmacies.';
+      e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on getPharmaciesByLocation.';
     throw new Error(errorMessage);
   }
 };
+
+export async function getPharmacies({
+  fulfillmentType,
+  integrated,
+  limit,
+  offset
+}: {
+  fulfillmentType?: FulfillmentType;
+  integrated?: boolean;
+  limit?: number;
+  offset?: number;
+}) {
+  try {
+    return await graphQLClient.GetPharmacies({
+      fulfillmentType,
+      integrated,
+      limit,
+      offset
+    });
+  } catch (e: any) {
+    const errorMessage =
+      e?.response?.errors?.[0]?.message ?? 'Unkown error occurred on getPharmacies';
+    throw new Error(errorMessage);
+  }
+}
 
 /**
  * Mutations
