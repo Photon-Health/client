@@ -17,6 +17,7 @@ import { getPharmacies } from '../../api';
 import { PoweredBy } from '../PoweredBy';
 import { MailOrderSelectList } from './MailOrderSelectList';
 import { MailOrderPharmacyOption } from './MailOrderSelectCard';
+import { datadogRum } from '@datadog/browser-rum';
 
 type MailOrderSelectModalProps = Omit<ModalProps, 'children'> & {
   onConfirm: (val: MailOrderPharmacyOption) => unknown;
@@ -27,12 +28,25 @@ export function MailOrderSelectModal({ onConfirm, ...modalProps }: MailOrderSele
   const [selectedOption, setSelectedOption] = useState<MailOrderPharmacyOption | undefined>();
   const [pharmacyOptions, setPharmacyOptions] = useState<MailOrderPharmacyOption[] | undefined>();
 
+  const handleOptionSelect = (val: MailOrderPharmacyOption) => {
+    const newSelection = val.id !== selectedOption?.id;
+    if (newSelection) {
+      datadogRum.addAction('patient_mail_order_pharmacy_selected', {
+        pharmacyId: val.id
+      });
+    }
+    setSelectedOption(newSelection ? val : undefined);
+  };
+
   const handleConfirm = async () => {
     if (!selectedOption || confirming) return;
 
     setConfirming(true);
     try {
       await onConfirm(selectedOption);
+      datadogRum.addAction('patient_mail_order_pharmacy_confirmed', {
+        pharmacyId: selectedOption.id
+      });
     } finally {
       setConfirming(false);
     }
@@ -57,6 +71,13 @@ export function MailOrderSelectModal({ onConfirm, ...modalProps }: MailOrderSele
     // clear out the selected option when the modal closes
     if (!modalProps.isOpen && !!selectedOption) {
       setSelectedOption(undefined);
+    }
+
+    // track the modal opening event
+    if (modalProps.isOpen) {
+      datadogRum.addAction('patient_mail_order_modal_opened');
+    } else {
+      datadogRum.addAction('patient_mail_order_modal_closed');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modalProps.isOpen]);
@@ -97,9 +118,7 @@ export function MailOrderSelectModal({ onConfirm, ...modalProps }: MailOrderSele
               <MailOrderSelectList
                 options={pharmacyOptions}
                 selectedId={selectedOption?.id}
-                onSelect={(val) =>
-                  setSelectedOption(val.id !== selectedOption?.id ? val : undefined)
-                }
+                onSelect={handleOptionSelect}
               />
             )}
           </VStack>
