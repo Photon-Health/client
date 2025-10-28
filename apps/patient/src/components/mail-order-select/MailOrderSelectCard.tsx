@@ -34,11 +34,20 @@ export function MailOrderSelectCard({
     >
       <HStack>
         {mailOrderPharmacyOption.logo && (
-          <Box h="8" w="8" borderRadius="full" overflow="clip">
+          <Box minWidth="8" w="8" borderRadius="full" overflow="clip">
             <Image src={mailOrderPharmacyOption.logo} />
           </Box>
         )}
-        <Text fontSize="md" fontWeight="medium">
+        <Text
+          as="span"
+          fontSize="md"
+          fontWeight="medium"
+          whiteSpace="nowrap"
+          overflow="hidden"
+          textOverflow="ellipsis"
+          display="inline-block"
+          title={mailOrderPharmacyOption.name}
+        >
           {mailOrderPharmacyOption.name}
         </Text>
       </HStack>
