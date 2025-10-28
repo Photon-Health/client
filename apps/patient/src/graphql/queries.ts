@@ -41,6 +41,10 @@ export const GET_ORDER = gql`
         country
         postalCode
       }
+      group {
+        id
+        name
+      }
       metadata {
         type
         marketIsRequired

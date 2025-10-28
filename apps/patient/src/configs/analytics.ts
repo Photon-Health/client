@@ -102,6 +102,7 @@ function mapOrderToContextData(order: Order): ContextData {
     marketIsRequired: order.metadata?.marketIsRequired || false,
     fulfillmentMethod: order.metadata?.fulfillmentMethod || '',
     transmissionType: order.metadata?.transmissionType || '',
+    group: order.group || {},
     routingHistory: (order.metadata?.routingHistory || [])
       .filter((history): history is NonNullable<typeof history> =>
         Boolean(history?.selector && history?.createdAt)
