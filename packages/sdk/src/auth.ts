@@ -30,14 +30,12 @@ export interface AuthManagerOptions {
  * @param organizationId An id of an organization to login as
  * @param invitation An Auth0 invitation string
  * @param appState State to pass Auth0, which will be restored on redirect. Useful for redirecting back to the same page after login
- * @param returnTo URL to redirect to after successful authentication
  */
 export interface LoginOptions {
   organizationId?: string;
   invitation?: string;
   connection?: string;
   appState?: object;
-  returnTo?: string;
 }
 
 /**
@@ -94,13 +92,8 @@ export class AuthManager {
     organizationId,
     invitation,
     connection,
-    appState,
-    returnTo
+    appState
   }: LoginOptions): Promise<void> {
-    if (returnTo) {
-      localStorage.setItem('photon_auth_returnTo', returnTo);
-    }
-
     const opts: RedirectLoginOptions<any> = {
       authorizationParams: {
         ...(this.audience ? { audience: this.audience } : {}),
@@ -236,7 +229,7 @@ export class AuthManager {
    */
   public async handleRedirect(url?: string): Promise<RedirectLoginResult<any> | undefined> {
     try {
-      return await this.authentication.handleRedirectCallback(url);
+      return this.authentication.handleRedirectCallback(url);
     } catch (err) {
       console.error(err);
     }

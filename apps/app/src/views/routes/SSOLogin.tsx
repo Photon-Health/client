@@ -15,10 +15,13 @@ export const SSOLogin = () => {
   const returnTo = searchParams.get('returnTo') ?? undefined;
 
   useEffect(() => {
+    if (returnTo) {
+      localStorage.setItem('photon_auth_returnTo', returnTo);
+    }
+
     login({
       organizationId: orgId,
-      connection,
-      returnTo
+      connection
     });
   });
 
