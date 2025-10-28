@@ -1,8 +1,8 @@
 import {
   Auth0Client,
-  LogoutOptions as Auth0LogoutOptions,
   GetTokenSilentlyOptions,
   GetTokenWithPopupOptions,
+  LogoutOptions as Auth0LogoutOptions,
   RedirectLoginOptions,
   RedirectLoginResult,
   User
@@ -236,17 +236,7 @@ export class AuthManager {
    */
   public async handleRedirect(url?: string): Promise<RedirectLoginResult<any> | undefined> {
     try {
-      const result = await this.authentication.handleRedirectCallback(url);
-
-      const returnTo = localStorage.getItem('photon_auth_returnTo');
-      if (returnTo) {
-        localStorage.removeItem('photon_auth_returnTo');
-        window.location.replace(returnTo);
-        return new Promise(() => {
-          return undefined;
-        });
-      }
-      return result;
+      return await this.authentication.handleRedirectCallback(url);
     } catch (err) {
       console.error(err);
     }

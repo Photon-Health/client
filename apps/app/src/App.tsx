@@ -37,7 +37,12 @@ const client = new PhotonClient({
 });
 
 const onRedirectCallback = (appState?: AppState) => {
-  window.location.replace(appState?.returnTo || window.location.pathname);
+  let returnTo = localStorage.getItem('photon_auth_returnTo');
+  localStorage.removeItem('photon_auth_returnTo');
+  if (!returnTo) {
+    returnTo = appState?.returnTo || window.location.pathname;
+  }
+  window.location.replace(returnTo);
 };
 
 export const App = () => {
