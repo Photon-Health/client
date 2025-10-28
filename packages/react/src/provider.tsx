@@ -741,17 +741,20 @@ export const PhotonProvider = (opts: {
     organizationId,
     invitation,
     connection,
+    returnTo,
     appState
   }: {
     organizationId?: string;
     invitation?: string;
     connection?: string;
+    returnTo?: string;
     appState?: object;
   } = {}) => {
     return client.authentication.login({
       organizationId,
       invitation,
       connection,
+      returnTo,
       appState
     });
   };

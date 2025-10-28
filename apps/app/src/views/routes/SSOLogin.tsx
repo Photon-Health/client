@@ -12,11 +12,13 @@ export const SSOLogin = () => {
 
   const orgId = searchParams.get('orgId') ?? undefined;
   const connection = searchParams.get('connection') ?? undefined;
+  const returnTo = searchParams.get('returnTo') ?? undefined;
 
   useEffect(() => {
     login({
       organizationId: orgId,
-      connection
+      connection,
+      returnTo
     });
   });
 
