@@ -75,11 +75,13 @@ export function MailOrderSelectModal({ onConfirm, ...modalProps }: MailOrderSele
           top="0"
           zIndex="10"
         >
-          Mail Order Pharmacies
+          <Text maxWidth="xl" marginX="auto">
+            Mail Order Pharmacies
+          </Text>
         </ModalHeader>
         <ModalCloseButton marginTop="54px" zIndex="10" position="fixed" />
         <ModalBody padding="3" rowGap="4" backgroundColor="gray.50">
-          <VStack rowGap="4">
+          <VStack rowGap="4" paddingBottom="32" marginX="auto" maxWidth="xl">
             <Text
               paddingX="3"
               paddingY="2"
@@ -113,6 +115,8 @@ export function MailOrderSelectModal({ onConfirm, ...modalProps }: MailOrderSele
             <VStack w="full" rowGap="3">
               <Button
                 w="full"
+                maxWidth="xl"
+                marginX="auto"
                 variant="brand"
                 padding="4"
                 h="auto"
