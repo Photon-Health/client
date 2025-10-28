@@ -8,6 +8,7 @@ import { PhotonClient, PhotonProvider } from '@photonhealth/react';
 import { useEffect } from 'react';
 import { auth0Config } from './configs/auth';
 import { Login } from './views/routes/Login';
+import { SSOLogin } from './views/routes/SSOLogin';
 import { Logout } from './views/routes/Logout';
 import { Main } from './views/routes/Main';
 import { NewOrder } from './views/routes/NewOrder';
@@ -82,6 +83,7 @@ export const App = () => {
             </Route>
           </Route>
           <Route path="/login" element={<Login />} />
+          <Route path="/sso" element={<SSOLogin />} />
           <Route path="/logout" element={<Logout />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
