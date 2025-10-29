@@ -102,6 +102,7 @@ function mapOrderToContextData(order: Order): ContextData {
     marketIsRequired: order.metadata?.marketIsRequired || false,
     fulfillmentMethod: order.metadata?.fulfillmentMethod || '',
     transmissionType: order.metadata?.transmissionType || '',
+    group: order.group || {},
     routingHistory: (order.metadata?.routingHistory || [])
       .filter((history): history is NonNullable<typeof history> =>
         Boolean(history?.selector && history?.createdAt)
@@ -178,6 +179,11 @@ function mapOrderToContextData(order: Order): ContextData {
     pcn: discountCard.pcn
   }));
 
+  const contextDataProvider = order.fills.map((fill) => ({
+    id: fill.prescription?.provider?.id || '',
+    name: fill.prescription?.provider?.name?.full || ''
+  }))[0];
+
   return {
     order: contextDataOrder,
     patient: contextDataPatient,
@@ -185,6 +191,7 @@ function mapOrderToContextData(order: Order): ContextData {
     pharmacy: contextDataPharmacy,
     fulfillments: contextDataFulfillments,
     discountCards: contextDataDiscountCards,
+    provider: contextDataProvider,
     medications
   };
 }
