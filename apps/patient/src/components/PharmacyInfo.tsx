@@ -298,7 +298,7 @@ export const PharmacyInfo = ({
     <VStack data-testid="pharmacy-info" align="start" w="full">
       <HStack w="full" justify="space-between">
         <VStack w="full">
-          <HStack w="full">
+          <HStack w="full" paddingBottom="2">
             {pharmacy?.logo && !whiteLabelDeliveryPharmacy ? (
               <Box boxSize="32px" overflow="hidden">
                 <Image
