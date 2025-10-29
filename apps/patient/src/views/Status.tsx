@@ -12,12 +12,7 @@ import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal
 import { OrderSummary } from '../components/order-summary/OrderSummary';
 import { OrderStatusHeader } from '../components/status/Header';
 import { deriveOrderStatus, getLatestReadyTime } from '../utils/fulfillmentsHelpers';
-import {
-  getFulfillmentType,
-  isDelivery,
-  isRerouteablePharmacy,
-  preparePharmacy
-} from '../utils/general';
+import { getFulfillmentType, isDelivery, preparePharmacy } from '../utils/general';
 import { InsuranceAlert } from '../components/InsuranceAlert';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
@@ -140,8 +135,6 @@ export const Status = () => {
     : undefined;
 
   const isDeliveryPharmacy = isDelivery({ pharmacy, fulfillmentType });
-
-  const isRerouteable = isRerouteablePharmacy({ pharmacy });
 
   if (!order) {
     console.error('No order found');
@@ -321,11 +314,7 @@ export const Status = () => {
                         !isDeliveryPharmacy &&
                         exception &&
                         callPharmacyButton(true)}
-                      {/* right now mail order (aka delivery pharmacies) are considered to not be re-routable but this will eventually change*/}
-                      {(!isDeliveryPharmacy || isRerouteable) &&
-                        displayPharmacy &&
-                        canOrderReroute &&
-                        rerouteButton}
+                      {displayPharmacy && canOrderReroute && rerouteButton}
                     </VStack>
                   </VStack>
                 </Card>
