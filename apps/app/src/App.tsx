@@ -26,6 +26,7 @@ import { Settings } from './views/routes/Settings';
 import { Support } from './views/routes/Support';
 import { UpdatePatientForm } from './views/routes/UpdatePatientForm';
 import { Env } from '@photonhealth/sdk';
+import { TermsOfServicePage } from './views/routes/TermsOfService';
 
 const env = process.env.REACT_APP_ENV_NAME as Env;
 
@@ -89,6 +90,7 @@ export const App = () => {
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/sso" element={<SSOLogin />} />
+          <Route path="/tos" element={<TermsOfServicePage />} />
           <Route path="/logout" element={<Logout />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
