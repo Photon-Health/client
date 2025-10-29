@@ -179,6 +179,11 @@ function mapOrderToContextData(order: Order): ContextData {
     pcn: discountCard.pcn
   }));
 
+  const contextDataProvider = order.fills.map((fill) => ({
+    id: fill.prescription?.provider?.id || '',
+    name: fill.prescription?.provider?.name?.full || ''
+  }))[0];
+
   return {
     order: contextDataOrder,
     patient: contextDataPatient,
@@ -186,6 +191,7 @@ function mapOrderToContextData(order: Order): ContextData {
     pharmacy: contextDataPharmacy,
     fulfillments: contextDataFulfillments,
     discountCards: contextDataDiscountCards,
+    provider: contextDataProvider,
     medications
   };
 }

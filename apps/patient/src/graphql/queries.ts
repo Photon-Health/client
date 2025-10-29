@@ -161,6 +161,13 @@ export const GET_ORDER = gql`
           dispenseAsWritten
           expirationDate
           fillsAllowed
+
+          provider {
+            id
+            name {
+              full
+            }
+          }
         }
       }
       patient {
