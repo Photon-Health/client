@@ -89,6 +89,7 @@ export const GET_ORDER = gql`
       pharmacy {
         id
         name
+        logo
         integrated
         address {
           street1
