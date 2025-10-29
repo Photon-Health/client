@@ -41,6 +41,10 @@ export const GET_ORDER = gql`
         country
         postalCode
       }
+      group {
+        id
+        name
+      }
       metadata {
         type
         marketIsRequired
@@ -157,6 +161,13 @@ export const GET_ORDER = gql`
           dispenseAsWritten
           expirationDate
           fillsAllowed
+
+          provider {
+            id
+            name {
+              full
+            }
+          }
         }
       }
       patient {
