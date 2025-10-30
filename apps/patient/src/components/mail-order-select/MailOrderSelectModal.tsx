@@ -13,20 +13,23 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
-import { getPharmacies } from '../../api';
 import { PoweredBy } from '../PoweredBy';
 import { MailOrderSelectList } from './MailOrderSelectList';
 import { MailOrderPharmacyOption } from './MailOrderSelectCard';
 import { datadogRum } from '@datadog/browser-rum';
 
 type MailOrderSelectModalProps = Omit<ModalProps, 'children'> & {
+  options?: MailOrderPharmacyOption[];
   onConfirm: (val: MailOrderPharmacyOption) => unknown;
 };
 
-export function MailOrderSelectModal({ onConfirm, ...modalProps }: MailOrderSelectModalProps) {
+export function MailOrderSelectModal({
+  options,
+  onConfirm,
+  ...modalProps
+}: MailOrderSelectModalProps) {
   const [confirming, setConfirming] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<MailOrderPharmacyOption | undefined>();
-  const [pharmacyOptions, setPharmacyOptions] = useState<MailOrderPharmacyOption[] | undefined>();
 
   const handleOptionSelect = (val: MailOrderPharmacyOption) => {
     const newSelection = val.id !== selectedOption?.id;
@@ -51,21 +54,6 @@ export function MailOrderSelectModal({ onConfirm, ...modalProps }: MailOrderSele
       setConfirming(false);
     }
   };
-
-  useEffect(() => {
-    // load all the pharmacy options on mount
-    async function loadMailOrderPharmacies() {
-      const { pharmacies } = await getPharmacies({
-        limit: 50,
-        offset: 0,
-        fulfillmentType: 'MAIL_ORDER',
-        integrated: false
-      });
-      setPharmacyOptions(pharmacies);
-    }
-
-    loadMailOrderPharmacies();
-  }, []);
 
   useEffect(() => {
     // clear out the selected option when the modal closes
@@ -114,9 +102,9 @@ export function MailOrderSelectModal({ onConfirm, ...modalProps }: MailOrderSele
             >
               If you can't find your pharmacy, please reach out to your provider.
             </Text>
-            {pharmacyOptions && (
+            {options && (
               <MailOrderSelectList
-                options={pharmacyOptions}
+                options={options}
                 selectedId={selectedOption?.id}
                 onSelect={handleOptionSelect}
               />
