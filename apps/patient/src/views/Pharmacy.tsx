@@ -170,6 +170,7 @@ export const Pharmacy = () => {
       ...topRankedPharmacies,
       ...pharmacyResults.filter((p) => !topRankedIds.includes(p.id))
     ];
+
     if (isDemo) {
       // demo pharmacies already are prepared
       return combined;
@@ -583,7 +584,18 @@ export const Pharmacy = () => {
     setSelectedId(pharmacyId);
     setShowFooter(true);
 
-    const selectedPharmacy = allPharmacies.find((p) => p.id === pharmacyId);
+    // because offers aren't actually pharmacies
+    // we'll transform them into things that resemble pharamcy objects
+    const pharmaciesFromOffers = (filteredOffers || []).map((o) => ({
+      id: o.pharmacyId ?? 'unknown pharmacy offer id',
+      name: o.pharmacyName ?? 'unknown pharmacy offer name',
+      price: o.costAmount ?? 0,
+      retailPrice: o.retailAmount ?? 0
+    }));
+
+    const selectedPharmacy = [...allPharmacies, ...pharmaciesFromOffers].find(
+      (p) => p.id === pharmacyId
+    );
     patientAnalytics.track('Pharmacy Selected', order, {
       pharmacyId: pharmacyId,
       pharmacyName: selectedPharmacy?.name,
@@ -657,10 +669,21 @@ export const Pharmacy = () => {
       return;
     }
 
+    // because offers aren't actually pharmacies
+    // we'll transform them into things that resemble pharamcy objects
+    const pharmaciesFromOffers = (filteredOffers || []).map((o) => ({
+      id: o.pharmacyId ?? 'unknown pharmacy offer id',
+      name: o.pharmacyName ?? 'unknown pharmacy offer name',
+      price: o.costAmount ?? 0,
+      retailPrice: o.retailAmount ?? 0
+    }));
+
+    const allPharmaciesIncludingOffers = [...pharmaciesFromOffers, ...allPharmacies];
+
     // If it's a mail order pharmacy, submit the pharmacy to the order
     // Otherwise, just navigate to ready by selection
     if (isMailOrder || isReroute) {
-      trackSelectedPharmacyRank(selectedPharmacy.id, allPharmacies);
+      trackSelectedPharmacyRank(selectedPharmacy.id, allPharmaciesIncludingOffers);
 
       try {
         const patientSelectedPrice = enablePrice;
@@ -677,7 +700,7 @@ export const Pharmacy = () => {
 
         // TODO: Remove this once we've got all pharmacies marked correctly in the db
         // this historically was overriding pharmaicy type and presentation due to an inept datamodel
-        const override = getPharmacy(allPharmacies, selectedPharmacy.id);
+        const override = getPharmacy(allPharmaciesIncludingOffers, selectedPharmacy.id);
         const overridePharmacy = override.selectedPharmacy ?? selectedPharmacy;
         const overrideType = override.selectedPharmacy
           ? override.type
@@ -742,7 +765,7 @@ export const Pharmacy = () => {
     } else {
       // for non mail order pharmacies, just navigate to ready by selection
       // Store the selected pharmacy in the order context temporarily
-      const { selectedPharmacy } = getPharmacy(allPharmacies, selectedId);
+      const { selectedPharmacy } = getPharmacy(allPharmaciesIncludingOffers, selectedId);
       setOrder({
         ...order,
         pharmacy: selectedPharmacy
@@ -1154,7 +1177,20 @@ export const Pharmacy = () => {
             onClick={async () => {
               if (successfullySubmitted) return;
 
-              const selectedPharmacy = allPharmacies.find((p) => p.id === selectedId);
+              // because offers aren't actually pharmacies
+              // we'll transform them into things that resemble pharamcy objects
+              const pharmaciesFromOffers = (filteredOffers || []).map((o) => ({
+                id: o.pharmacyId ?? 'unknown pharmacy offer id',
+                name: o.pharmacyName ?? 'unknown pharmacy offer name',
+                price: o.costAmount ?? 0,
+                retailPrice: o.retailAmount ?? 0
+              }));
+
+              const allPharmaciesIncludingOffers = [...pharmaciesFromOffers, ...allPharmacies];
+
+              const selectedPharmacy = allPharmaciesIncludingOffers.find(
+                (p) => p.id === selectedId
+              );
               if (!selectedId || !selectedPharmacy) {
                 console.error('No selectedId. Cannot set pharmacy on order.');
                 return;
