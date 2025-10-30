@@ -920,7 +920,7 @@ export const Pharmacy = () => {
         })) || [];
 
       patientAnalytics.track('Offer Selected', order, {
-        selectedPharmacy: selectedPharmacy,
+        ...selectedPharmacy,
         ...extraOfferMetadata,
         pharmacyId: selectedId,
         // allPharmacies does not included branded options so we must combine them
