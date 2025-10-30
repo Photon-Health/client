@@ -170,12 +170,20 @@ export const Pharmacy = () => {
       ...topRankedPharmacies,
       ...pharmacyResults.filter((p) => !topRankedIds.includes(p.id))
     ];
+
+    // because offers aren't actually pharmacies
+    // we'll transform them into things that resemble pharamcy objects
+    const offerPharmacies = (offers || []).map((o) => ({
+      id: o.pharmacyId ?? 'unknown',
+      name: o.pharmacyName ?? 'unknown'
+    }));
+
     if (isDemo) {
       // demo pharmacies already are prepared
       return combined;
     }
-    return combined.map((combinedItem) => preparePharmacy(combinedItem));
-  }, [isDemo, pharmacyResults, topRankedPharmacies]);
+    return [...combined, ...offerPharmacies].map((combinedItem) => preparePharmacy(combinedItem));
+  }, [isDemo, pharmacyResults, topRankedPharmacies, offers]);
 
   // capsule
   const isCapsuleTerritory =
@@ -912,7 +920,7 @@ export const Pharmacy = () => {
         })) || [];
 
       patientAnalytics.track('Offer Selected', order, {
-        ...selectedPharmacy,
+        selectedPharmacy: selectedPharmacy,
         ...extraOfferMetadata,
         pharmacyId: selectedId,
         // allPharmacies does not included branded options so we must combine them
