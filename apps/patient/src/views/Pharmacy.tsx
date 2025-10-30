@@ -29,6 +29,7 @@ import { useOrderContext } from './Main';
 
 import {
   geocode,
+  getPharmacies,
   getPharmaciesByLocation,
   rerouteOrder,
   setOrderPharmacy,
@@ -60,6 +61,7 @@ import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
 import { OffersList } from '../components/offers/OffersList';
 import { MailOrderSelectModal } from '../components/mail-order-select/MailOrderSelectModal';
+import { MailOrderPharmacyOption } from '../components/mail-order-select/MailOrderSelectCard';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
 const COSTCO_PHARMACY_RADIUS = 30; // miles
@@ -177,6 +179,11 @@ export const Pharmacy = () => {
     }
     return combined.map((combinedItem) => preparePharmacy(combinedItem));
   }, [isDemo, pharmacyResults, topRankedPharmacies]);
+
+  // Non-integrated patient mail order pharmacies
+  const [patientMailOrderOptions, setPatientMailOrderOptions] = useState<
+    MailOrderPharmacyOption[] | undefined
+  >();
 
   // capsule
   const isCapsuleTerritory =
@@ -542,6 +549,21 @@ export const Pharmacy = () => {
     toast,
     initialLoad
   ]);
+
+  useEffect(() => {
+    // load all the pharmacy options on mount
+    async function loadMailOrderPharmacies() {
+      const { pharmacies } = await getPharmacies({
+        limit: 50,
+        offset: 0,
+        fulfillmentType: 'MAIL_ORDER',
+        integrated: false
+      });
+      setPatientMailOrderOptions(pharmacies);
+    }
+
+    loadMailOrderPharmacies();
+  }, []);
 
   const handleShowMore = async () => {
     setLoadingPharmacies(true);
@@ -1060,6 +1082,7 @@ export const Pharmacy = () => {
         isOpen={mailOrderModalOpen}
         onClose={() => setMailOrderModalOpen(false)}
         onConfirm={handleSubmit}
+        options={patientMailOrderOptions}
       />
 
       <Box bgColor="white">
@@ -1144,18 +1167,20 @@ export const Pharmacy = () => {
                   }
                 />
               )}
-              <HStack
-                w="full"
-                justifyContent="space-between"
-                background="Background"
-                padding="2"
-                borderRadius="md"
-              >
-                <Text fontSize="sm">Don't see your pharmacy?</Text>
-                <Link as="button" onClick={() => setMailOrderModalOpen(true)} fontSize="sm">
-                  See all mail orders
-                </Link>
-              </HStack>
+              {patientMailOrderOptions?.length && (
+                <HStack
+                  w="full"
+                  justifyContent="space-between"
+                  background="Background"
+                  padding="2"
+                  borderRadius="md"
+                >
+                  <Text fontSize="sm">Don't see your pharmacy?</Text>
+                  <Link as="button" onClick={() => setMailOrderModalOpen(true)} fontSize="sm">
+                    See all mail orders
+                  </Link>
+                </HStack>
+              )}
               {pickupPharmacyOptions(patientLocation)}
             </VStack>
           </VStack>
