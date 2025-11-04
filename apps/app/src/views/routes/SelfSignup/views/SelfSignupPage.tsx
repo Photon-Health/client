@@ -2,7 +2,7 @@ import { Button, Container, Stack } from '@chakra-ui/react';
 import { useSearchParams } from 'react-router-dom';
 import { auth0Config } from '../../../../configs/auth';
 
-export const TermsOfServicePage = () => {
+export const SelfSignupPage = () => {
   const [searchParams] = useSearchParams();
   const state = searchParams.get('state') ?? undefined;
   const sessionToken = searchParams.get('session_token') ?? undefined;
