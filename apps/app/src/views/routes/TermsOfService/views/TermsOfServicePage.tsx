@@ -5,13 +5,13 @@ import { auth0Config } from '../../../../configs/auth';
 export const TermsOfServicePage = () => {
   const [searchParams] = useSearchParams();
   const state = searchParams.get('state') ?? undefined;
-  const tosSessionToken = searchParams.get('tos_session_token') ?? undefined;
+  const sessionToken = searchParams.get('session_token') ?? undefined;
 
   if (!state) {
     return <div>Error: no state</div>;
   }
 
-  const { firstName, lastName, email } = extractTokenData(tosSessionToken);
+  const { firstName, lastName, email } = extractTokenData(sessionToken);
 
   const onAcceptClick = async () => {
     window.location.href = `https://${auth0Config.domain}/continue?state=${state}&did_accept_tos=true`;
