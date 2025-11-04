@@ -1136,6 +1136,36 @@ export const Pharmacy = () => {
         </VStack>
       </Box>
 
+      <Box
+        bgColor="white"
+        borderBottom="2px solid"
+        borderColor="gray.300"
+        style={{
+          position: 'sticky',
+          top: process.env.REACT_APP_ENV_NAME === 'photon' ? '54px' : '89px',
+          zIndex: 1
+        }}
+      >
+        <Container px={-3}>
+          <VStack spacing={2} align="start" py={3} px={4}>
+            <HStack justify="space-between" w="full">
+              <Text>Want to see insurance prices?</Text>
+              <Button
+                size="md"
+                variant="solid"
+                colorScheme="gray"
+                onClick={() => {
+                  // TODO: Handle insurance entry
+                  console.log('Enter insurance clicked');
+                }}
+              >
+                Enter insurance
+              </Button>
+            </HStack>
+          </VStack>
+        </Container>
+      </Box>
+
       <Container pb={showFooter ? 32 : 8}>
         {patientLocation && (
           <VStack spacing={6} align="stretch" pt={4}>
