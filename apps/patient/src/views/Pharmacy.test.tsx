@@ -299,7 +299,7 @@ describe('Pharmacy page', () => {
       await navigateToPharmacyScreen();
 
       // Enable price toggle
-      const priceToggle = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
+      const priceToggle = screen.getByRole('checkbox', { name: 'Show lowest cash prices' });
       await userEvent.click(priceToggle);
 
       // Wait for component to render
@@ -389,7 +389,7 @@ describe('Pharmacy page', () => {
       await navigateToPharmacyScreen();
 
       // Enable price toggle
-      const priceToggle = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
+      const priceToggle = screen.getByRole('checkbox', { name: 'Show lowest cash prices' });
       await userEvent.click(priceToggle);
 
       // Should show location information
@@ -437,7 +437,7 @@ describe('Pharmacy page', () => {
 
     await navigateToPharmacyScreen();
 
-    const priceToggle = screen.getByRole('checkbox', { name: 'Show coupon card prices' });
+    const priceToggle = screen.getByRole('checkbox', { name: 'Show lowest cash prices' });
     expect(priceToggle).toBeInTheDocument();
     expect(priceToggle).toBeEnabled();
 
@@ -486,7 +486,7 @@ describe('Pharmacy page', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
     expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
 
-    const priceToggle = screen.queryByRole('checkbox', { name: 'Show coupon card prices' });
+    const priceToggle = screen.queryByRole('checkbox', { name: 'Show lowest cash prices' });
     expect(priceToggle).not.toBeInTheDocument();
 
     const callArgs = getPharmaciesByLocationMock.mock.calls.map((call) => call[0].includePrice);

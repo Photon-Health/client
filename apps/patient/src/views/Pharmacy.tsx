@@ -122,6 +122,7 @@ export const Pharmacy = () => {
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
   const [mailOrderModalOpen, setMailOrderModalOpen] = useState<boolean>(false);
   const [insuranceModalOpen, setInsuranceModalOpen] = useState<boolean>(false);
+  const [insuranceSubmitted, setInsuranceSubmitted] = useState<boolean>(false);
 
   // selection state
   const [selectedId, setSelectedId] = useState<string>('');
@@ -1085,6 +1086,7 @@ export const Pharmacy = () => {
         onSubmit={(data) => {
           // TODO: Handle insurance form submission
           console.log('Insurance data submitted:', data);
+          setInsuranceSubmitted(true);
         }}
       />
 
@@ -1124,10 +1126,10 @@ export const Pharmacy = () => {
                 px={4}
               >
                 <HStack justify="space-between" w="full">
-                  {t.showDiscountCardPrices(() => setCouponModalOpen(true))}
+                  {t.showDiscountCardPrices()}
                   <Switch
                     size="lg"
-                    aria-label="Show coupon card prices"
+                    aria-label="Show lowest cash prices"
                     isChecked={enablePrice}
                     onChange={(e) => setEnablePrice(e.target.checked)}
                   />
@@ -1135,8 +1137,8 @@ export const Pharmacy = () => {
                 {enablePrice ? (
                   <Box p={3} bgColor="blue.100" borderRadius="lg">
                     <Text fontSize="sm">
-                      The displayed price is a coupon price for the pharmacy. Coupon details
-                      available after you select a pharmacy. <b>This is NOT insurance.</b>
+                      Coupon will be generated after you select a pharmacy.{' '}
+                      <Link onClick={() => setCouponModalOpen(true)}>More info</Link>
                     </Text>
                   </Box>
                 ) : null}
@@ -1146,32 +1148,34 @@ export const Pharmacy = () => {
         </VStack>
       </Box>
 
-      <Box
-        bgColor="white"
-        borderBottom="2px solid"
-        borderColor="gray.300"
-        style={{
-          position: 'sticky',
-          top: process.env.REACT_APP_ENV_NAME === 'photon' ? '54px' : '89px',
-          zIndex: 1
-        }}
-      >
-        <Container px={-3}>
-          <VStack spacing={2} align="start" py={3} px={4}>
-            <HStack justify="space-between" w="full">
-              <Text>Want to see insurance prices?</Text>
-              <Button
-                size="sm"
-                variant="solid"
-                colorScheme="gray"
-                onClick={() => setInsuranceModalOpen(true)}
-              >
-                Enter insurance
-              </Button>
-            </HStack>
-          </VStack>
-        </Container>
-      </Box>
+      {!insuranceSubmitted ? (
+        <Box
+          bgColor="white"
+          borderBottom="2px solid"
+          borderColor="gray.300"
+          style={{
+            position: 'sticky',
+            top: process.env.REACT_APP_ENV_NAME === 'photon' ? '54px' : '89px',
+            zIndex: 1
+          }}
+        >
+          <Container px={-3}>
+            <VStack spacing={2} align="start" py={3} px={4}>
+              <HStack justify="space-between" w="full">
+                <Text>Want to see insurance prices?</Text>
+                <Button
+                  size="sm"
+                  variant="solid"
+                  colorScheme="gray"
+                  onClick={() => setInsuranceModalOpen(true)}
+                >
+                  Enter insurance
+                </Button>
+              </HStack>
+            </VStack>
+          </Container>
+        </Box>
+      ) : null}
 
       <Container pb={showFooter ? 32 : 8}>
         {patientLocation && (

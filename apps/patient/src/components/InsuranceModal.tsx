@@ -51,6 +51,7 @@ export const InsuranceModal = ({ isOpen, onClose, onSubmit }: InsuranceModalProp
   const [memberId, setMemberId] = useState('');
   const [groupNumber, setGroupNumber] = useState('');
   const [rxBin, setRxBin] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = () => {
     if (onSubmit) {
@@ -61,7 +62,12 @@ export const InsuranceModal = ({ isOpen, onClose, onSubmit }: InsuranceModalProp
         rxBin
       });
     }
-    handleClose();
+
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      handleClose();
+    }, 1000);
   };
 
   const handleClose = () => {
@@ -159,7 +165,13 @@ export const InsuranceModal = ({ isOpen, onClose, onSubmit }: InsuranceModalProp
         </ModalBody>
         <ModalFooter position="sticky" bottom="0" w="full" padding="4" backgroundColor="gray.100">
           <VStack w="full" rowGap="3" maxWidth="xl" marginX="auto">
-            <Button w="full" variant="brand" onClick={handleSubmit} isDisabled={!memberId}>
+            <Button
+              w="full"
+              colorScheme="blue"
+              onClick={handleSubmit}
+              isDisabled={!memberId}
+              isLoading={isLoading}
+            >
               Submit
             </Button>
             <Button w="full" variant="outline" onClick={handleClose}>
