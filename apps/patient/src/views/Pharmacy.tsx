@@ -19,7 +19,7 @@ import ReactGA from 'react-ga4';
 import { Helmet } from 'react-helmet';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { FixedFooter, LocationModal, PoweredBy } from '../components';
+import { FixedFooter, InsuranceModal, LocationModal, PoweredBy } from '../components';
 import { CouponModal } from '../components/coupons';
 import * as TOAST_CONFIG from '../configs/toast';
 import { preparePharmacy } from '../utils/general';
@@ -121,6 +121,7 @@ export const Pharmacy = () => {
   const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
   const [mailOrderModalOpen, setMailOrderModalOpen] = useState<boolean>(false);
+  const [insuranceModalOpen, setInsuranceModalOpen] = useState<boolean>(false);
 
   // selection state
   const [selectedId, setSelectedId] = useState<string>('');
@@ -1078,6 +1079,15 @@ export const Pharmacy = () => {
 
       <CouponModal isOpen={couponModalOpen} onClose={() => setCouponModalOpen(false)} />
 
+      <InsuranceModal
+        isOpen={insuranceModalOpen}
+        onClose={() => setInsuranceModalOpen(false)}
+        onSubmit={(data) => {
+          // TODO: Handle insurance form submission
+          console.log('Insurance data submitted:', data);
+        }}
+      />
+
       <MailOrderSelectModal
         isOpen={mailOrderModalOpen}
         onClose={() => setMailOrderModalOpen(false)}
@@ -1151,13 +1161,10 @@ export const Pharmacy = () => {
             <HStack justify="space-between" w="full">
               <Text>Want to see insurance prices?</Text>
               <Button
-                size="md"
+                size="sm"
                 variant="solid"
                 colorScheme="gray"
-                onClick={() => {
-                  // TODO: Handle insurance entry
-                  console.log('Enter insurance clicked');
-                }}
+                onClick={() => setInsuranceModalOpen(true)}
               >
                 Enter insurance
               </Button>
