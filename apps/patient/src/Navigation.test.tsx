@@ -48,17 +48,22 @@ vi.mock('./configs/analytics');
 vi.mock('./hooks/usePageAnalytics');
 vi.mock('react-ga4');
 
-vi.mock('./components', () => ({
-  FixedFooter: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="fixed-footer">{children}</div>
-  ),
-  LocationModal: () => <div data-testid="location-modal">Location Modal</div>,
-  PoweredBy: () => <div data-testid="powered-by">Powered By</div>,
-  Nav: () => <div>Nav</div>,
-  PrescriptionsList: () => <div>PrescriptionsList</div>,
-  DemoCtaModal: () => <div data-testid="demo-cta-modal">Demo Cta Modal</div>,
-  PharmacyInfo: () => <div data-testid="pharmacy-info">Pharmacy Info</div>
-}));
+vi.mock('./components', async () => {
+  const mod = await vi.importActual('./components');
+  return {
+    ...mod,
+    FixedFooter: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="fixed-footer">{children}</div>
+    ),
+    LocationModal: () => <div data-testid="location-modal">Location Modal</div>,
+    InsuranceModal: () => <div data-testid="insurance-modal">Insurance Modal</div>,
+    PoweredBy: () => <div data-testid="powered-by">Powered By</div>,
+    Nav: () => <div>Nav</div>,
+    PrescriptionsList: () => <div>PrescriptionsList</div>,
+    DemoCtaModal: () => <div data-testid="demo-cta-modal">Demo Cta Modal</div>,
+    PharmacyInfo: () => <div data-testid="pharmacy-info">Pharmacy Info</div>
+  };
+});
 
 describe('App', () => {
   const testOrder = generateOrder({
