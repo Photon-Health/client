@@ -73,6 +73,7 @@ vi.mock('../components', () => ({
     <div data-testid="fixed-footer">{children}</div>
   ),
   LocationModal: () => <div data-testid="location-modal">Location Modal</div>,
+  InsuranceModal: () => <div data-testid="insurance-modal">Insurance Modal</div>,
   PoweredBy: () => <div data-testid="powered-by">Powered By</div>,
   Nav: () => <div>Nav</div>,
   PrescriptionsList: () => <div>PrescriptionsList</div>,
