@@ -133,6 +133,7 @@ export const InsuranceModal = ({ isOpen, onClose, onSubmit }: InsuranceModalProp
               <FormLabel htmlFor="insurance-provider">Health Insurance Provider</FormLabel>
               <Select
                 id="insurance-provider"
+                name="insurance-provider"
                 title="Health Insurance Provider"
                 placeholder="Select insurance"
                 value={provider}
@@ -151,8 +152,10 @@ export const InsuranceModal = ({ isOpen, onClose, onSubmit }: InsuranceModalProp
             </FormControl>
 
             <FormControl>
-              <FormLabel>Member ID</FormLabel>
+              <FormLabel htmlFor="member-id">Member ID</FormLabel>
               <Input
+                id="member-id"
+                name="member-id"
                 placeholder="e.g. W0987654321"
                 value={memberId}
                 onChange={(e) => setMemberId(e.target.value)}
@@ -161,8 +164,10 @@ export const InsuranceModal = ({ isOpen, onClose, onSubmit }: InsuranceModalProp
             </FormControl>
 
             <FormControl>
-              <FormLabel>Group Number (GRP)</FormLabel>
+              <FormLabel htmlFor="group-number">Group Number (GRP)</FormLabel>
               <Input
+                id="group-number"
+                name="group-number"
                 placeholder="e.g. ABCDE"
                 value={groupNumber}
                 onChange={(e) => setGroupNumber(e.target.value)}
@@ -171,8 +176,10 @@ export const InsuranceModal = ({ isOpen, onClose, onSubmit }: InsuranceModalProp
             </FormControl>
 
             <FormControl>
-              <FormLabel>Rx BIN</FormLabel>
+              <FormLabel htmlFor="rx-bin">Rx BIN</FormLabel>
               <Input
+                id="rx-bin"
+                name="rx-bin"
                 placeholder="e.g. 076123"
                 value={rxBin}
                 onChange={(e) => setRxBin(e.target.value)}
