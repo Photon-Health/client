@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
   Center,
@@ -1087,6 +1089,35 @@ export const Pharmacy = () => {
           // TODO: Handle insurance form submission
           console.log('Insurance data submitted:', data);
           setInsuranceSubmitted(true);
+          // Show alert after modal closes (modal closes after 1 second)
+          setTimeout(() => {
+            toast({
+              position: 'top',
+              duration: 4000,
+              isClosable: true,
+              containerStyle: {
+                width: 'calc(100% - 32px)',
+                maxWidth: 'none',
+                margin: '16px 16px 0 16px'
+              },
+              render: () => (
+                <Alert
+                  status="warning"
+                  borderRadius="md"
+                  bg="yellow.50"
+                  p={4}
+                  w="full"
+                  border="1px solid"
+                  borderColor="yellow.200"
+                >
+                  <AlertIcon color="yellow.600" />
+                  <Text flex="1" color="black.800" fontWeight="semibold">
+                    Sorry, we can't find prices with your insurance information.
+                  </Text>
+                </Alert>
+              )
+            });
+          }, 1000);
         }}
       />
 
