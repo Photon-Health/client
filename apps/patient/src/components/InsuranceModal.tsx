@@ -14,6 +14,8 @@ import {
   VStack
 } from '@chakra-ui/react';
 import { useState } from 'react';
+import { patientAnalytics } from '../configs/analytics';
+import { useOrderContext } from '../views/Main';
 
 interface InsuranceModalProps {
   isOpen: boolean;
@@ -47,13 +49,25 @@ const INSURANCE_PROVIDERS = [
 // TODO: This is currently a fake door test component, I assume it will be modified and hardened
 // before going into production collecting actual insurance information.
 export const InsuranceModal = ({ isOpen, onClose, onSubmit }: InsuranceModalProps) => {
+  const { order } = useOrderContext();
   const [provider, setProvider] = useState('');
   const [memberId, setMemberId] = useState('');
   const [groupNumber, setGroupNumber] = useState('');
   const [rxBin, setRxBin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const getFormData = () => ({
+    provider,
+    memberId,
+    groupNumber,
+    rxBin
+  });
+
   const handleSubmit = () => {
+    if (order) {
+      patientAnalytics.track('Insurance Form Submitted', order, getFormData());
+    }
+
     if (onSubmit) {
       onSubmit({
         provider,
@@ -71,6 +85,10 @@ export const InsuranceModal = ({ isOpen, onClose, onSubmit }: InsuranceModalProp
   };
 
   const handleClose = () => {
+    if (order) {
+      patientAnalytics.track('Insurance Modal Closed', order, getFormData());
+    }
+
     // Reset form on close
     setProvider('');
     setMemberId('');
