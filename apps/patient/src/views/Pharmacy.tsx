@@ -215,7 +215,12 @@ export const Pharmacy = () => {
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
 
-  usePageAnalytics({ pageName: 'Pharmacy Select' });
+  usePageAnalytics({
+    pageName: 'Pharmacy Select',
+    properties: {
+      insuranceBannerDisplayed: true
+    }
+  });
 
   useEffect(() => {
     const getOffers = async () => {
@@ -1198,7 +1203,10 @@ export const Pharmacy = () => {
                   size="sm"
                   variant="solid"
                   colorScheme="gray"
-                  onClick={() => setInsuranceModalOpen(true)}
+                  onClick={() => {
+                    patientAnalytics.track('Insurance Banner Button Clicked', order, {});
+                    setInsuranceModalOpen(true);
+                  }}
                 >
                   Enter insurance
                 </Button>
