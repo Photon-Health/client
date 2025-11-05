@@ -1090,11 +1090,10 @@ export const Pharmacy = () => {
       <InsuranceModal
         isOpen={insuranceModalOpen}
         onClose={() => setInsuranceModalOpen(false)}
-        onSubmit={(data) => {
-          // TODO: Handle insurance form submission
-          console.log('Insurance data submitted:', data);
+        onSubmit={() => {
           setInsuranceSubmitted(true);
           // Show alert after modal closes (modal closes after 1 second)
+          // prentending like the round trip has no results
           setTimeout(() => {
             toast({
               position: 'top',
