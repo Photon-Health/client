@@ -224,7 +224,7 @@ const buildSignupContinueParams = (state: string, formData: SignupFormData): str
     street2: formData.street2 || '',
     city: formData.city,
     state_address: formData.state.value,
-    postalCode: formData.postalCode,
+    postal_code: formData.postalCode,
     did_accept_tos: formData.didAgreeToTerms.toString()
   });
 
