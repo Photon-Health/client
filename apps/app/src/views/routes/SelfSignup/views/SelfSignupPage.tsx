@@ -6,6 +6,7 @@ import {
   Checkbox,
   Container,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Heading,
   Input,
@@ -57,8 +58,10 @@ export const SelfSignupPage = () => {
   const [stateInput, setStateInput] = useState('');
   const [didAgreeInput, setDidAgreeInput] = useState(false);
 
-  const onAcceptClick = async () => {
-    const queryParams = buildSignupContinueParams(state, {
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const onCreateAccountClick = async () => {
+    const formData: SignupFormData = {
       firstName: firstNameInput,
       lastName: lastNameInput,
       email: emailInput,
@@ -69,7 +72,17 @@ export const SelfSignupPage = () => {
       state: stateInput,
       zip: zipInput,
       didAgreeToTerms: didAgreeInput
-    });
+    };
+
+    const validationErrors = validateSignupForm(formData);
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setErrors({});
+    const queryParams = buildSignupContinueParams(state, formData);
     window.location.href = `https://${auth0Config.domain}/continue?${queryParams}`;
   };
 
@@ -92,7 +105,7 @@ export const SelfSignupPage = () => {
             Create Your Prescriber Account
             <Text fontSize="md">Please confirm your details:</Text>
           </Heading>
-          <FormControl>
+          <FormControl isInvalid={!!errors.firstName}>
             <FormLabel htmlFor="firstName">First Name</FormLabel>
             <Input
               id="firstName"
@@ -100,9 +113,10 @@ export const SelfSignupPage = () => {
               onChange={(e) => setFirstNameInput(e.target.value)}
               placeholder="First Name"
             />
+            <FormErrorMessage>{errors.firstName}</FormErrorMessage>
           </FormControl>
 
-          <FormControl>
+          <FormControl isInvalid={!!errors.lastName}>
             <FormLabel htmlFor="lastName">Last Name</FormLabel>
             <Input
               id="lastName"
@@ -110,9 +124,10 @@ export const SelfSignupPage = () => {
               onChange={(e) => setLastNameInput(e.target.value)}
               placeholder="Last Name"
             />
+            <FormErrorMessage>{errors.lastName}</FormErrorMessage>
           </FormControl>
 
-          <FormControl>
+          <FormControl isInvalid={!!errors.email}>
             <FormLabel htmlFor="email">Email</FormLabel>
             <Input
               id="email"
@@ -121,9 +136,10 @@ export const SelfSignupPage = () => {
               onChange={(e) => setEmailInput(e.target.value)}
               placeholder="Email Address"
             />
+            <FormErrorMessage>{errors.email}</FormErrorMessage>
           </FormControl>
 
-          <FormControl>
+          <FormControl isInvalid={!!errors.npi}>
             <FormLabel htmlFor="npi">NPI</FormLabel>
             <Input
               id="npi"
@@ -133,11 +149,12 @@ export const SelfSignupPage = () => {
               maxLength={10}
               minLength={10}
             />
+            <FormErrorMessage>{errors.npi}</FormErrorMessage>
           </FormControl>
 
           <p>Address</p>
 
-          <FormControl>
+          <FormControl isInvalid={!!errors.street1}>
             <FormLabel htmlFor="street1">Street 1</FormLabel>
             <Input
               id="street1"
@@ -145,6 +162,7 @@ export const SelfSignupPage = () => {
               onChange={(e) => setStreet1Input(e.target.value)}
               placeholder="Street 1"
             />
+            <FormErrorMessage>{errors.street1}</FormErrorMessage>
           </FormControl>
 
           <FormControl>
@@ -157,7 +175,7 @@ export const SelfSignupPage = () => {
             />
           </FormControl>
 
-          <FormControl>
+          <FormControl isInvalid={!!errors.city}>
             <FormLabel htmlFor="city">City</FormLabel>
             <Input
               id="city"
@@ -165,9 +183,10 @@ export const SelfSignupPage = () => {
               onChange={(e) => setCityInput(e.target.value)}
               placeholder="City"
             />
+            <FormErrorMessage>{errors.city}</FormErrorMessage>
           </FormControl>
 
-          <FormControl>
+          <FormControl isInvalid={!!errors.state}>
             <FormLabel htmlFor="state">State</FormLabel>
             <Input
               id="state"
@@ -175,9 +194,10 @@ export const SelfSignupPage = () => {
               onChange={(e) => setStateInput(e.target.value)}
               placeholder="State"
             />
+            <FormErrorMessage>{errors.state}</FormErrorMessage>
           </FormControl>
 
-          <FormControl>
+          <FormControl isInvalid={!!errors.zip}>
             <FormLabel htmlFor="zip">ZIP Code</FormLabel>
             <Input
               id="zip"
@@ -185,9 +205,10 @@ export const SelfSignupPage = () => {
               onChange={(e) => setZipInput(e.target.value)}
               placeholder="ZIP Code"
             />
+            <FormErrorMessage>{errors.zip}</FormErrorMessage>
           </FormControl>
 
-          <FormControl>
+          <FormControl isInvalid={!!errors.agreement}>
             <Checkbox
               isChecked={didAgreeInput}
               onChange={(e) => setDidAgreeInput(e.target.checked)}
@@ -198,13 +219,14 @@ export const SelfSignupPage = () => {
             </Checkbox>{' '}
             <Text fontSize="md" display="inline">
               that by creating an account and prescribing with Photon Health, Inc., I am authorized
-              and licensed to prescribe, and I accept Photon Healths{' '}
+              and licensed to prescribe, and I accept Photon Health's{' '}
               <Link href="https://www.photon.health/terms">Terms of Service</Link> and{' '}
-              <Link href="https://www.photon.health/baa">Business Associate Agreement (BAA)</Link>
+              <Link href="https://www.photon.health/baa">Business Associate Agreement (BAA)</Link>.
             </Text>
+            <FormErrorMessage>{errors.agreement}</FormErrorMessage>
           </FormControl>
 
-          <Button onClick={onAcceptClick}>Accept</Button>
+          <Button onClick={onCreateAccountClick}>Create Account</Button>
         </Stack>
       </Container>
     </>
@@ -240,4 +262,40 @@ const buildSignupContinueParams = (state: string, formData: SignupFormData): str
   });
 
   return params.toString();
+};
+
+const validateSignupForm = (formData: SignupFormData): Record<string, string> => {
+  const errors: Record<string, string> = {};
+
+  if (!formData.firstName.trim()) {
+    errors.firstName = 'First name is required';
+  }
+  if (!formData.lastName.trim()) {
+    errors.lastName = 'Last name is required';
+  }
+  if (!formData.email.trim()) {
+    errors.email = 'Email is required';
+  }
+  if (!formData.npi.trim()) {
+    errors.npi = 'NPI is required';
+  } else if (!/^\d{10}$/.test(formData.npi)) {
+    errors.npi = 'NPI must be a 10-digit number';
+  }
+  if (!formData.street1.trim()) {
+    errors.street1 = 'Street address is required';
+  }
+  if (!formData.city.trim()) {
+    errors.city = 'City is required';
+  }
+  if (!formData.state.trim()) {
+    errors.state = 'State is required';
+  }
+  if (!formData.zip.trim()) {
+    errors.zip = 'ZIP code is required';
+  }
+  if (!formData.didAgreeToTerms) {
+    errors.agreement = 'You must agree to the Terms of Service and BAA';
+  }
+
+  return errors;
 };
