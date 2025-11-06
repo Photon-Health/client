@@ -90,6 +90,34 @@ export const CreatePrescription = gql`
   }
 `;
 
+export const CreatePrescriptions = gql`
+  mutation CreatePrescriptions($prescriptions: [PrescriptionInput]!) {
+    createPrescriptions(prescriptions: $prescriptions) {
+      id
+      externalId
+      dispenseAsWritten
+      dispenseQuantity
+      dispenseUnit
+      fillsAllowed
+      daysSupply
+      instructions
+      notes
+      effectiveDate
+      diagnoses {
+        code
+      }
+      treatment {
+        id
+        name
+        codes {
+          packageNDC
+          productNDC
+        }
+      }
+    }
+  }
+`;
+
 export const UpdatePrescriptionStates = gql`
   mutation UpdatePrescriptionStates($input: UpdatePrescriptionStatesInput!) {
     updatePrescriptionStates(input: $input)
