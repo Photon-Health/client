@@ -387,23 +387,9 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
 
     if (props.enableCombineAndDuplicate && duplicateFill) {
       // if there's a duplicate order, check first if they want to report an issue
-      // todo: can we pass the promise down instead of reject/resolve callbacks?
-      let resolver: (result: Prescription) => void;
-      let rejecter: () => void;
-      const promise = new Promise<Prescription>((resolve, reject) => {
-        resolver = resolve;
-        rejecter = reject;
+      await new Promise<void>((resolve, reject) => {
+        recentOrdersActions.setIsDuplicateDialogOpen(true, duplicateFill, resolve, reject);
       });
-      recentOrdersActions.setIsDuplicateDialogOpen(
-        true,
-        duplicateFill,
-        async () => {
-          const result = await createPrescriptionOnApi(prescriptionFormData, options);
-          resolver(result);
-        },
-        () => rejecter()
-      );
-      return promise;
     }
 
     return await createPrescriptionOnApi(prescriptionFormData, options);
