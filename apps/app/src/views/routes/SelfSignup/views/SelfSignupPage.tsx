@@ -94,7 +94,7 @@ export const SelfSignupPage = () => {
         </Container>
       </Box>
       <Container maxW="md" py={{ base: '12' }} bgColor="white">
-        <Stack spacing="8" textAlign="left">
+        <Stack spacing="4" textAlign="left">
           <Alert status="warning">
             <AlertIcon />
             <VStack alignItems="start">
@@ -112,6 +112,7 @@ export const SelfSignupPage = () => {
               value={firstNameInput}
               onChange={(e) => setFirstNameInput(e.target.value)}
               placeholder="First Name"
+              autoComplete="given-name"
             />
             <FormErrorMessage>{errors.firstName}</FormErrorMessage>
           </FormControl>
@@ -123,6 +124,7 @@ export const SelfSignupPage = () => {
               value={lastNameInput}
               onChange={(e) => setLastNameInput(e.target.value)}
               placeholder="Last Name"
+              autoComplete="family-name"
             />
             <FormErrorMessage>{errors.lastName}</FormErrorMessage>
           </FormControl>
@@ -135,6 +137,7 @@ export const SelfSignupPage = () => {
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
               placeholder="Email Address"
+              autoComplete="email"
             />
             <FormErrorMessage>{errors.email}</FormErrorMessage>
           </FormControl>
@@ -152,7 +155,7 @@ export const SelfSignupPage = () => {
             <FormErrorMessage>{errors.npi}</FormErrorMessage>
           </FormControl>
 
-          <p>Address</p>
+          <Heading size="xs">Address</Heading>
 
           <FormControl isInvalid={!!errors.street1}>
             <FormLabel htmlFor="street1">Street 1</FormLabel>
@@ -161,6 +164,7 @@ export const SelfSignupPage = () => {
               value={street1Input}
               onChange={(e) => setStreet1Input(e.target.value)}
               placeholder="Street 1"
+              autoComplete="address-line1"
             />
             <FormErrorMessage>{errors.street1}</FormErrorMessage>
           </FormControl>
@@ -172,6 +176,7 @@ export const SelfSignupPage = () => {
               value={street2Input}
               onChange={(e) => setStreet2Input(e.target.value)}
               placeholder="Street 2 (optional)"
+              autoComplete="address-line2"
             />
           </FormControl>
 
@@ -182,6 +187,7 @@ export const SelfSignupPage = () => {
               value={cityInput}
               onChange={(e) => setCityInput(e.target.value)}
               placeholder="City"
+              autoComplete="address-level2"
             />
             <FormErrorMessage>{errors.city}</FormErrorMessage>
           </FormControl>
@@ -193,6 +199,7 @@ export const SelfSignupPage = () => {
               value={stateInput}
               onChange={(e) => setStateInput(e.target.value)}
               placeholder="State"
+              autoComplete="address-level1"
             />
             <FormErrorMessage>{errors.state}</FormErrorMessage>
           </FormControl>
@@ -204,6 +211,7 @@ export const SelfSignupPage = () => {
               value={zipInput}
               onChange={(e) => setZipInput(e.target.value)}
               placeholder="ZIP Code"
+              autoComplete="postal-code"
             />
             <FormErrorMessage>{errors.zip}</FormErrorMessage>
           </FormControl>
