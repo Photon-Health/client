@@ -44,7 +44,7 @@ export const SelfSignupPage = () => {
     street2: '',
     city: '',
     state: { value: '' },
-    zip: '',
+    postalCode: '',
     didAgreeToTerms: false
   };
 
@@ -159,10 +159,10 @@ export const SelfSignupPage = () => {
                   <ErrorMessage name="state.value" component={FormErrorMessage} />
                 </FormControl>
 
-                <FormControl isRequired isInvalid={!!errors.zip && touched.zip}>
-                  <FormLabel htmlFor="zip">ZIP Code</FormLabel>
-                  <Field as={Input} id="zip" name="zip" autoComplete="postal-code" />
-                  <ErrorMessage name="zip" component={FormErrorMessage} />
+                <FormControl isRequired isInvalid={!!errors.postalCode && touched.postalCode}>
+                  <FormLabel htmlFor="postalCode">ZIP Code</FormLabel>
+                  <Field as={Input} id="postalCode" name="postalCode" autoComplete="postal-code" />
+                  <ErrorMessage name="postalCode" component={FormErrorMessage} />
                 </FormControl>
 
                 <FormControl isInvalid={!!errors.didAgreeToTerms && touched.didAgreeToTerms}>
@@ -224,7 +224,7 @@ const buildSignupContinueParams = (state: string, formData: SignupFormData): str
     street2: formData.street2 || '',
     city: formData.city,
     state_address: formData.state.value,
-    zip: formData.zip,
+    postalCode: formData.postalCode,
     did_accept_tos: formData.didAgreeToTerms.toString()
   });
 

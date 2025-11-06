@@ -13,7 +13,7 @@ export const signupFormSchema = yup.object({
   street2: yup.string(),
   city: yup.string().required('City is required'),
   state: yupStateSchema,
-  zip: yup
+  postalCode: yup
     .string()
     .required('ZIP code is required')
     .matches(/^[0-9]{5}(?:-[0-9]{4})?$/, 'Enter a valid zip code'),
