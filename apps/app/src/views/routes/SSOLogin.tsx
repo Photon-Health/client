@@ -40,20 +40,12 @@ function isAllowedReturnTo(returnTo: string | undefined): returnTo is string {
   if (!returnTo) return false;
 
   const allowedDomains = [
+    'https://localhost:3000',
     'https://doximity.dev.doximity.cloud',
     'https://doximity.partners.doximity-staging.services'
   ];
 
   try {
-    const url = new URL(returnTo);
-
-    if (
-      url.hostname === 'localhost' &&
-      url.protocol === 'http:' &&
-      (url.port === '3000' || url.port === '4000')
-    ) {
-      return true;
-    }
     return allowedDomains.some((domain) => {
       return returnTo.startsWith(domain);
     });
