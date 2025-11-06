@@ -38,7 +38,7 @@ function isAllowedReturnTo(returnTo: string | undefined): returnTo is string {
   if (!returnTo) return false;
 
   const allowedDomains = [
-    'https://localhost:3000',
+    'http://localhost:3000',
     'https://doximity.dev.doximity.cloud',
     'https://doximity.partners.doximity-staging.services'
   ];
