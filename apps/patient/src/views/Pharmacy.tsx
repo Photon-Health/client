@@ -1092,7 +1092,7 @@ export const Pharmacy = () => {
         onClose={() => setInsuranceModalOpen(false)}
         onSubmit={() => {
           setInsuranceSubmitted(true);
-          // Show alert after modal closes (modal closes after 1 second)
+          // Show alert after modal closes (modal closes after 1.5 seconds)
           // prentending like the round trip has no results
           setTimeout(() => {
             toast({
@@ -1121,7 +1121,7 @@ export const Pharmacy = () => {
                 </Alert>
               )
             });
-          }, 1000);
+          }, 2500);
         }}
       />
 
