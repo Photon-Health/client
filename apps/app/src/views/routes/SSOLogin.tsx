@@ -10,7 +10,6 @@ export const SSOLogin = () => {
   const { login } = usePhoton();
   const [searchParams] = useSearchParams();
 
-  const orgId = searchParams.get('orgId') ?? undefined;
   const connection = searchParams.get('connection') ?? undefined;
   const returnTo = searchParams.get('returnTo') ?? undefined;
 
@@ -20,7 +19,6 @@ export const SSOLogin = () => {
     }
 
     login({
-      organizationId: orgId,
       connection
     });
   });
