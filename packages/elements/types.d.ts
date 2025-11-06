@@ -23,7 +23,6 @@ declare module 'solid-js' {
       'photon-patient-dialog': unknown;
       'photon-update-patient-dialog': unknown;
       'photon-prescribe-workflow': unknown;
-      'photon-self-signup-workflow': unknown;
       'sl-input': unknown;
       'sl-dropdown': unknown;
       'sl-menu': unknown;
