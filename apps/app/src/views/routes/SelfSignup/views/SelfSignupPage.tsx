@@ -16,23 +16,12 @@ import {
   useBreakpointValue,
   VStack
 } from '@chakra-ui/react';
+import { ErrorMessage, Field, Formik, FormikHelpers } from 'formik';
 import { useSearchParams } from 'react-router-dom';
 import { auth0Config } from '../../../../configs/auth';
-import { useState } from 'react';
 import { Logo } from '../../../components/Logo';
-
-interface SignupFormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  npi: string;
-  street1: string;
-  street2: string;
-  city: string;
-  state: string;
-  zip: string;
-  didAgreeToTerms: boolean;
-}
+import { FormikStateSelect } from '../../Settings/components/utils/States';
+import { SignupFormData, signupFormSchema } from './form';
 
 export const SelfSignupPage = () => {
   const [searchParams] = useSearchParams();
@@ -46,44 +35,26 @@ export const SelfSignupPage = () => {
 
   const { firstName, lastName, email } = extractTokenData(sessionToken);
 
-  const [firstNameInput, setFirstNameInput] = useState(firstName || '');
-  const [lastNameInput, setLastNameInput] = useState(lastName || '');
-  const [emailInput, setEmailInput] = useState(email || '');
-  const [npiInput, setNpiInput] = useState('');
+  const initialFormData: SignupFormData = {
+    firstName: firstName || '',
+    lastName: lastName || '',
+    email: email || '',
+    npi: '',
+    street1: '',
+    street2: '',
+    city: '',
+    state: { value: '' },
+    zip: '',
+    didAgreeToTerms: false
+  };
 
-  const [street1Input, setStreet1Input] = useState('');
-  const [street2Input, setStreet2Input] = useState('');
-  const [zipInput, setZipInput] = useState('');
-  const [cityInput, setCityInput] = useState('');
-  const [stateInput, setStateInput] = useState('');
-  const [didAgreeInput, setDidAgreeInput] = useState(false);
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const onCreateAccountClick = async () => {
-    const formData: SignupFormData = {
-      firstName: firstNameInput,
-      lastName: lastNameInput,
-      email: emailInput,
-      npi: npiInput,
-      street1: street1Input,
-      street2: street2Input,
-      city: cityInput,
-      state: stateInput,
-      zip: zipInput,
-      didAgreeToTerms: didAgreeInput
-    };
-
-    const validationErrors = validateSignupForm(formData);
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    setErrors({});
-    const queryParams = buildSignupContinueParams(state, formData);
+  const handleSubmit = async (
+    values: SignupFormData,
+    { setSubmitting }: FormikHelpers<SignupFormData>
+  ) => {
+    const queryParams = buildSignupContinueParams(state, values);
     window.location.href = `https://${auth0Config.domain}/continue?${queryParams}`;
+    setSubmitting(false);
   };
 
   return (
@@ -94,148 +65,134 @@ export const SelfSignupPage = () => {
         </Container>
       </Box>
       <Container maxW="md" py={{ base: '12' }} bgColor="white">
-        <Stack spacing="4" textAlign="left">
-          <Alert status="warning">
-            <AlertIcon />
-            <VStack alignItems="start">
-              <Text fontWeight="bold">Required before writing prescriptions</Text>
-            </VStack>
-          </Alert>
-          <Heading size={useBreakpointValue({ base: 'xs' })}>
-            Create Your Prescriber Account
-            <Text fontSize="md">Please confirm your details:</Text>
-          </Heading>
-          <FormControl isInvalid={!!errors.firstName}>
-            <FormLabel htmlFor="firstName">First Name</FormLabel>
-            <Input
-              id="firstName"
-              value={firstNameInput}
-              onChange={(e) => setFirstNameInput(e.target.value)}
-              placeholder="First Name"
-              autoComplete="given-name"
-            />
-            <FormErrorMessage>{errors.firstName}</FormErrorMessage>
-          </FormControl>
+        <Formik
+          initialValues={initialFormData}
+          validationSchema={signupFormSchema}
+          onSubmit={handleSubmit}
+        >
+          {({
+            errors,
+            touched,
+            isSubmitting,
+            handleSubmit,
+            values,
+            setFieldValue,
+            setFieldTouched
+          }) => (
+            <form onSubmit={handleSubmit}>
+              <Stack spacing="4" textAlign="left">
+                <Alert status="warning">
+                  <AlertIcon />
+                  <VStack alignItems="start">
+                    <Text fontWeight="bold">Required before writing prescriptions</Text>
+                  </VStack>
+                </Alert>
+                <Heading size={useBreakpointValue({ base: 'xs' })}>
+                  Create Your Prescriber Account
+                  <Text fontSize="md">Please confirm your details:</Text>
+                </Heading>
 
-          <FormControl isInvalid={!!errors.lastName}>
-            <FormLabel htmlFor="lastName">Last Name</FormLabel>
-            <Input
-              id="lastName"
-              value={lastNameInput}
-              onChange={(e) => setLastNameInput(e.target.value)}
-              placeholder="Last Name"
-              autoComplete="family-name"
-            />
-            <FormErrorMessage>{errors.lastName}</FormErrorMessage>
-          </FormControl>
+                <FormControl isRequired isInvalid={!!errors.firstName && touched.firstName}>
+                  <FormLabel htmlFor="firstName">First Name</FormLabel>
+                  <Field as={Input} id="firstName" name="firstName" autoComplete="given-name" />
+                  <ErrorMessage name="firstName" component={FormErrorMessage} />
+                </FormControl>
 
-          <FormControl isInvalid={!!errors.email}>
-            <FormLabel htmlFor="email">Email</FormLabel>
-            <Input
-              id="email"
-              type="email"
-              value={emailInput}
-              onChange={(e) => setEmailInput(e.target.value)}
-              placeholder="Email Address"
-              autoComplete="email"
-            />
-            <FormErrorMessage>{errors.email}</FormErrorMessage>
-          </FormControl>
+                <FormControl isRequired isInvalid={!!errors.lastName && touched.lastName}>
+                  <FormLabel htmlFor="lastName">Last Name</FormLabel>
+                  <Field as={Input} id="lastName" name="lastName" autoComplete="family-name" />
+                  <ErrorMessage name="lastName" component={FormErrorMessage} />
+                </FormControl>
 
-          <FormControl isInvalid={!!errors.npi}>
-            <FormLabel htmlFor="npi">NPI</FormLabel>
-            <Input
-              id="npi"
-              value={npiInput}
-              onChange={(e) => setNpiInput(e.target.value)}
-              placeholder="Enter your 10-digit NPI"
-              maxLength={10}
-              minLength={10}
-            />
-            <FormErrorMessage>{errors.npi}</FormErrorMessage>
-          </FormControl>
+                <FormControl isRequired isInvalid={!!errors.email && touched.email}>
+                  <FormLabel htmlFor="email">Email</FormLabel>
+                  <Field as={Input} id="email" name="email" type="email" autoComplete="email" />
+                  <ErrorMessage name="email" component={FormErrorMessage} />
+                </FormControl>
 
-          <Heading size="xs">Address</Heading>
+                <FormControl isRequired isInvalid={!!errors.npi && touched.npi}>
+                  <FormLabel htmlFor="npi">NPI</FormLabel>
+                  <Field
+                    as={Input}
+                    id="npi"
+                    name="npi"
+                    placeholder="Enter your 10-digit NPI"
+                    maxLength={10}
+                  />
+                  <ErrorMessage name="npi" component={FormErrorMessage} />
+                </FormControl>
 
-          <FormControl isInvalid={!!errors.street1}>
-            <FormLabel htmlFor="street1">Street 1</FormLabel>
-            <Input
-              id="street1"
-              value={street1Input}
-              onChange={(e) => setStreet1Input(e.target.value)}
-              placeholder="Street 1"
-              autoComplete="address-line1"
-            />
-            <FormErrorMessage>{errors.street1}</FormErrorMessage>
-          </FormControl>
+                <Heading size="xs">Address</Heading>
 
-          <FormControl>
-            <FormLabel htmlFor="street2">Street 2</FormLabel>
-            <Input
-              id="street2"
-              value={street2Input}
-              onChange={(e) => setStreet2Input(e.target.value)}
-              placeholder="Street 2 (optional)"
-              autoComplete="address-line2"
-            />
-          </FormControl>
+                <FormControl isRequired isInvalid={!!errors.street1 && touched.street1}>
+                  <FormLabel htmlFor="street1">Street 1</FormLabel>
+                  <Field as={Input} id="street1" name="street1" autoComplete="address-line1" />
+                  <ErrorMessage name="street1" component={FormErrorMessage} />
+                </FormControl>
 
-          <FormControl isInvalid={!!errors.city}>
-            <FormLabel htmlFor="city">City</FormLabel>
-            <Input
-              id="city"
-              value={cityInput}
-              onChange={(e) => setCityInput(e.target.value)}
-              placeholder="City"
-              autoComplete="address-level2"
-            />
-            <FormErrorMessage>{errors.city}</FormErrorMessage>
-          </FormControl>
+                <FormControl isInvalid={!!errors.street2 && touched.street2}>
+                  <FormLabel htmlFor="street2">Street 2</FormLabel>
+                  <Field
+                    as={Input}
+                    id="street2"
+                    name="street2"
+                    placeholder="Street 2 (optional)"
+                    autoComplete="address-line2"
+                  />
+                  <ErrorMessage name="street2" component={FormErrorMessage} />
+                </FormControl>
 
-          <FormControl isInvalid={!!errors.state}>
-            <FormLabel htmlFor="state">State</FormLabel>
-            <Input
-              id="state"
-              value={stateInput}
-              onChange={(e) => setStateInput(e.target.value)}
-              placeholder="State"
-              autoComplete="address-level1"
-            />
-            <FormErrorMessage>{errors.state}</FormErrorMessage>
-          </FormControl>
+                <FormControl isRequired isInvalid={!!errors.city && touched.city}>
+                  <FormLabel htmlFor="city">City</FormLabel>
+                  <Field as={Input} id="city" name="city" autoComplete="address-level2" />
+                  <ErrorMessage name="city" component={FormErrorMessage} />
+                </FormControl>
 
-          <FormControl isInvalid={!!errors.zip}>
-            <FormLabel htmlFor="zip">ZIP Code</FormLabel>
-            <Input
-              id="zip"
-              value={zipInput}
-              onChange={(e) => setZipInput(e.target.value)}
-              placeholder="ZIP Code"
-              autoComplete="postal-code"
-            />
-            <FormErrorMessage>{errors.zip}</FormErrorMessage>
-          </FormControl>
+                <FormControl isRequired isInvalid={!!errors.state?.value && touched.state?.value}>
+                  <FormLabel htmlFor="state">State</FormLabel>
+                  <FormikStateSelect
+                    value={values.state}
+                    setFieldValue={setFieldValue}
+                    setFieldTouched={setFieldTouched}
+                    fieldName="state"
+                  />
+                  <ErrorMessage name="state.value" component={FormErrorMessage} />
+                </FormControl>
 
-          <FormControl isInvalid={!!errors.agreement}>
-            <Checkbox
-              isChecked={didAgreeInput}
-              onChange={(e) => setDidAgreeInput(e.target.checked)}
-            >
-              <Text fontWeight="bold" fontSize="md" display="inline">
-                I agree
-              </Text>
-            </Checkbox>{' '}
-            <Text fontSize="md" display="inline">
-              that by creating an account and prescribing with Photon Health, Inc., I am authorized
-              and licensed to prescribe, and I accept Photon Health's{' '}
-              <Link href="https://www.photon.health/terms">Terms of Service</Link> and{' '}
-              <Link href="https://www.photon.health/baa">Business Associate Agreement (BAA)</Link>.
-            </Text>
-            <FormErrorMessage>{errors.agreement}</FormErrorMessage>
-          </FormControl>
+                <FormControl isRequired isInvalid={!!errors.zip && touched.zip}>
+                  <FormLabel htmlFor="zip">ZIP Code</FormLabel>
+                  <Field as={Input} id="zip" name="zip" autoComplete="postal-code" />
+                  <ErrorMessage name="zip" component={FormErrorMessage} />
+                </FormControl>
 
-          <Button onClick={onCreateAccountClick}>Create Account</Button>
-        </Stack>
+                <FormControl isInvalid={!!errors.didAgreeToTerms && touched.didAgreeToTerms}>
+                  <Checkbox
+                    isChecked={values.didAgreeToTerms}
+                    onChange={(e) => setFieldValue('didAgreeToTerms', e.target.checked)}
+                  >
+                    <Text fontWeight="bold" fontSize="md" display="inline">
+                      I agree
+                    </Text>
+                  </Checkbox>{' '}
+                  <Text fontSize="md" display="inline">
+                    that by creating an account and prescribing with Photon Health, Inc., I am
+                    authorized and licensed to prescribe, and I accept Photon Health's{' '}
+                    <Link href="https://www.photon.health/terms">Terms of Service</Link> and{' '}
+                    <Link href="https://www.photon.health/baa">
+                      Business Associate Agreement (BAA)
+                    </Link>
+                    .
+                  </Text>
+                  <ErrorMessage name="didAgreeToTerms" component={FormErrorMessage} />
+                </FormControl>
+
+                <Button type="submit" isLoading={isSubmitting}>
+                  Create Account
+                </Button>
+              </Stack>
+            </form>
+          )}
+        </Formik>
       </Container>
     </>
   );
@@ -262,48 +219,12 @@ const buildSignupContinueParams = (state: string, formData: SignupFormData): str
     email: formData.email,
     npi: formData.npi,
     street1: formData.street1,
-    street2: formData.street2,
+    street2: formData.street2 || '',
     city: formData.city,
-    state_address: formData.state,
+    state_address: formData.state.value,
     zip: formData.zip,
     didAgreeToTerms: formData.didAgreeToTerms.toString()
   });
 
   return params.toString();
-};
-
-const validateSignupForm = (formData: SignupFormData): Record<string, string> => {
-  const errors: Record<string, string> = {};
-
-  if (!formData.firstName.trim()) {
-    errors.firstName = 'First name is required';
-  }
-  if (!formData.lastName.trim()) {
-    errors.lastName = 'Last name is required';
-  }
-  if (!formData.email.trim()) {
-    errors.email = 'Email is required';
-  }
-  if (!formData.npi.trim()) {
-    errors.npi = 'NPI is required';
-  } else if (!/^\d{10}$/.test(formData.npi)) {
-    errors.npi = 'NPI must be a 10-digit number';
-  }
-  if (!formData.street1.trim()) {
-    errors.street1 = 'Street address is required';
-  }
-  if (!formData.city.trim()) {
-    errors.city = 'City is required';
-  }
-  if (!formData.state.trim()) {
-    errors.state = 'State is required';
-  }
-  if (!formData.zip.trim()) {
-    errors.zip = 'ZIP code is required';
-  }
-  if (!formData.didAgreeToTerms) {
-    errors.agreement = 'You must agree to the Terms of Service and BAA';
-  }
-
-  return errors;
 };
