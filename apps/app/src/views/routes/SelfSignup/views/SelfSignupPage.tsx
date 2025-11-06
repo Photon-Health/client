@@ -216,7 +216,6 @@ function extractTokenData(tosSessionToken?: string) {
 const buildSignupContinueParams = (state: string, formData: SignupFormData): string => {
   const params = new URLSearchParams({
     state,
-    did_accept_tos: 'true',
     first_name: formData.firstName,
     last_name: formData.lastName,
     email: formData.email,
@@ -226,7 +225,7 @@ const buildSignupContinueParams = (state: string, formData: SignupFormData): str
     city: formData.city,
     state_address: formData.state.value,
     zip: formData.zip,
-    didAgreeToTerms: formData.didAgreeToTerms.toString()
+    did_accept_tos: formData.didAgreeToTerms.toString()
   });
 
   return params.toString();
