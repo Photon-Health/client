@@ -1,7 +1,22 @@
-import { Button, Container, FormControl, FormLabel, Input, Stack } from '@chakra-ui/react';
+import {
+  Alert,
+  AlertIcon,
+  Box,
+  Button,
+  Container,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  Stack,
+  Text,
+  useBreakpointValue,
+  VStack
+} from '@chakra-ui/react';
 import { useSearchParams } from 'react-router-dom';
 import { auth0Config } from '../../../../configs/auth';
 import { useState } from 'react';
+import { Logo } from '../../../components/Logo';
 
 interface SignupFormData {
   firstName: string;
@@ -54,108 +69,123 @@ export const SelfSignupPage = () => {
   };
 
   return (
-    <Container maxW="md" py={{ base: '12' }}>
-      <Stack spacing="8" textAlign="center">
-        <h1>Terms of Service</h1>
+    <>
+      <Box as="nav" bg="#001740" py="3">
+        <Container>
+          <Logo pr="4" />
+        </Container>
+      </Box>
+      <Container maxW="md" py={{ base: '12' }} bgColor="white">
+        <Stack spacing="8" textAlign="left">
+          <Alert status="warning">
+            <AlertIcon />
+            <VStack alignItems="start">
+              <Text fontWeight="bold">Required before writing prescriptions</Text>
+            </VStack>
+          </Alert>
+          <Heading size={useBreakpointValue({ base: 'xs' })}>
+            Create Your Prescriber Account
+            <Text fontSize="md">Please confirm your details:</Text>
+          </Heading>
+          <FormControl>
+            <FormLabel htmlFor="firstName">First Name</FormLabel>
+            <Input
+              id="firstName"
+              value={firstNameInput}
+              onChange={(e) => setFirstNameInput(e.target.value)}
+              placeholder="First Name"
+            />
+          </FormControl>
 
-        <FormControl>
-          <FormLabel htmlFor="firstName">First Name</FormLabel>
-          <Input
-            id="firstName"
-            value={firstNameInput}
-            onChange={(e) => setFirstNameInput(e.target.value)}
-            placeholder="First Name"
-          />
-        </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="lastName">Last Name</FormLabel>
+            <Input
+              id="lastName"
+              value={lastNameInput}
+              onChange={(e) => setLastNameInput(e.target.value)}
+              placeholder="Last Name"
+            />
+          </FormControl>
 
-        <FormControl>
-          <FormLabel htmlFor="lastName">Last Name</FormLabel>
-          <Input
-            id="lastName"
-            value={lastNameInput}
-            onChange={(e) => setLastNameInput(e.target.value)}
-            placeholder="Last Name"
-          />
-        </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="email">Email</FormLabel>
+            <Input
+              id="email"
+              type="email"
+              value={emailInput}
+              onChange={(e) => setEmailInput(e.target.value)}
+              placeholder="Email Address"
+            />
+          </FormControl>
 
-        <FormControl>
-          <FormLabel htmlFor="email">Email</FormLabel>
-          <Input
-            id="email"
-            type="email"
-            value={emailInput}
-            onChange={(e) => setEmailInput(e.target.value)}
-            placeholder="Email Address"
-          />
-        </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="npi">NPI</FormLabel>
+            <Input
+              id="npi"
+              value={npiInput}
+              onChange={(e) => setNpiInput(e.target.value)}
+              placeholder="Enter your 10-digit NPI"
+              maxLength={10}
+              minLength={10}
+            />
+          </FormControl>
 
-        <FormControl>
-          <FormLabel htmlFor="npi">NPI</FormLabel>
-          <Input
-            id="npi"
-            value={npiInput}
-            onChange={(e) => setNpiInput(e.target.value)}
-            placeholder="Enter your 10-digit NPI"
-            maxLength={10}
-            minLength={10}
-          />
-        </FormControl>
+          <p>Address</p>
 
-        <p>Address</p>
+          <FormControl>
+            <FormLabel htmlFor="street1">Street 1</FormLabel>
+            <Input
+              id="street1"
+              value={street1Input}
+              onChange={(e) => setStreet1Input(e.target.value)}
+              placeholder="Street 1"
+            />
+          </FormControl>
 
-        <FormControl>
-          <FormLabel htmlFor="street1">Street 1</FormLabel>
-          <Input
-            id="street1"
-            value={street1Input}
-            onChange={(e) => setStreet1Input(e.target.value)}
-            placeholder="Street 1"
-          />
-        </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="street2">Street 2</FormLabel>
+            <Input
+              id="street2"
+              value={street2Input}
+              onChange={(e) => setStreet2Input(e.target.value)}
+              placeholder="Street 2 (optional)"
+            />
+          </FormControl>
 
-        <FormControl>
-          <FormLabel htmlFor="street2">Street 2</FormLabel>
-          <Input
-            id="street2"
-            value={street2Input}
-            onChange={(e) => setStreet2Input(e.target.value)}
-            placeholder="Street 2 (optional)"
-          />
-        </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="city">City</FormLabel>
+            <Input
+              id="city"
+              value={cityInput}
+              onChange={(e) => setCityInput(e.target.value)}
+              placeholder="City"
+            />
+          </FormControl>
 
-        <FormControl>
-          <FormLabel htmlFor="city">City</FormLabel>
-          <Input
-            id="city"
-            value={cityInput}
-            onChange={(e) => setCityInput(e.target.value)}
-            placeholder="City"
-          />
-        </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="state">State</FormLabel>
+            <Input
+              id="state"
+              value={stateInput}
+              onChange={(e) => setStateInput(e.target.value)}
+              placeholder="State"
+            />
+          </FormControl>
 
-        <FormControl>
-          <FormLabel htmlFor="state">State</FormLabel>
-          <Input
-            id="state"
-            value={stateInput}
-            onChange={(e) => setStateInput(e.target.value)}
-            placeholder="State"
-          />
-        </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="zip">ZIP Code</FormLabel>
+            <Input
+              id="zip"
+              value={zipInput}
+              onChange={(e) => setZipInput(e.target.value)}
+              placeholder="ZIP Code"
+            />
+          </FormControl>
 
-        <FormControl>
-          <FormLabel htmlFor="zip">ZIP Code</FormLabel>
-          <Input
-            id="zip"
-            value={zipInput}
-            onChange={(e) => setZipInput(e.target.value)}
-            placeholder="ZIP Code"
-          />
-        </FormControl>
-
-        <Button onClick={onAcceptClick}>Accept</Button>
-      </Stack>
-    </Container>
+          <Button onClick={onAcceptClick}>Accept</Button>
+        </Stack>
+      </Container>
+    </>
   );
 };
 
