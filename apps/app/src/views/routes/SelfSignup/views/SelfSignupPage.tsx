@@ -1,9 +1,11 @@
-import { Button, Container, Stack } from '@chakra-ui/react';
+import { Button, Container, FormControl, FormLabel, Input, Stack } from '@chakra-ui/react';
 import { useSearchParams } from 'react-router-dom';
 import { auth0Config } from '../../../../configs/auth';
+import { useState } from 'react';
 
 export const SelfSignupPage = () => {
   const [searchParams] = useSearchParams();
+  const [npiInput, setNpiInput] = useState('');
   const state = searchParams.get('state') ?? undefined;
   const sessionToken = searchParams.get('session_token') ?? undefined;
 
@@ -14,7 +16,7 @@ export const SelfSignupPage = () => {
   const { firstName, lastName, email } = extractTokenData(sessionToken);
 
   const onAcceptClick = async () => {
-    window.location.href = `https://${auth0Config.domain}/continue?state=${state}&did_accept_tos=true`;
+    window.location.href = `https://${auth0Config.domain}/continue?state=${state}&did_accept_tos=true&npi=${npiInput}`;
   };
 
   return (
@@ -25,6 +27,17 @@ export const SelfSignupPage = () => {
           {firstName} {lastName}
         </p>
         <p>{email}</p>
+        <FormControl>
+          <FormLabel htmlFor="npi">NPI</FormLabel>
+          <Input
+            id="npi"
+            value={npiInput}
+            onChange={(e) => setNpiInput(e.target.value)}
+            placeholder="Enter your 10-digit NPI"
+            maxLength={10}
+            minLength={10}
+          />
+        </FormControl>
         <Button onClick={onAcceptClick}>Accept</Button>
       </Stack>
     </Container>
