@@ -64,7 +64,7 @@ export const SelfSignupPage = () => {
           <Logo pr="4" />
         </Container>
       </Box>
-      <Container maxW="md" py={{ base: '12' }} bgColor="white">
+      <Container maxW="md" py={{ base: '6' }} bgColor="white">
         <Formik
           initialValues={initialFormData}
           validationSchema={signupFormSchema}
@@ -177,8 +177,11 @@ export const SelfSignupPage = () => {
                   <Text fontSize="md" display="inline">
                     that by creating an account and prescribing with Photon Health, Inc., I am
                     authorized and licensed to prescribe, and I accept Photon Health's{' '}
-                    <Link href="https://www.photon.health/terms">Terms of Service</Link> and{' '}
-                    <Link href="https://www.photon.health/baa">
+                    <Link href="https://www.photon.health/terms" target="_blank">
+                      Terms of Service
+                    </Link>{' '}
+                    and{' '}
+                    <Link href="https://www.photon.health/baa" target="_blank">
                       Business Associate Agreement (BAA)
                     </Link>
                     .
