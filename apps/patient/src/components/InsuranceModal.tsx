@@ -81,7 +81,7 @@ export const InsuranceModal = ({ isOpen, onClose, onSubmit }: InsuranceModalProp
     setTimeout(() => {
       setIsLoading(false);
       handleClose();
-    }, 1000);
+    }, 2000);
   };
 
   const handleClose = () => {
