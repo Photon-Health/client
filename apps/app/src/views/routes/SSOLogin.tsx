@@ -46,7 +46,12 @@ function isAllowedReturnTo(returnTo: string | undefined): returnTo is string {
 
   try {
     const url = new URL(returnTo);
-    if (url.hostname === 'localhost' && url.protocol === 'http:' && url.port === '4000') {
+
+    if (
+      url.hostname === 'localhost' &&
+      url.protocol === 'http:' &&
+      (url.port === '3000' || url.port === '4000')
+    ) {
       return true;
     }
     return allowedDomains.some((domain) => {
