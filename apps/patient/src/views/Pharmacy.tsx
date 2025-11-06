@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
   Center,
@@ -19,7 +21,7 @@ import ReactGA from 'react-ga4';
 import { Helmet } from 'react-helmet';
 import { FiCheck, FiMapPin } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { FixedFooter, LocationModal, PoweredBy } from '../components';
+import { FixedFooter, InsuranceModal, LocationModal, PoweredBy } from '../components';
 import { CouponModal } from '../components/coupons';
 import * as TOAST_CONFIG from '../configs/toast';
 import { preparePharmacy } from '../utils/general';
@@ -121,6 +123,8 @@ export const Pharmacy = () => {
   const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
   const [couponModalOpen, setCouponModalOpen] = useState<boolean>(false);
   const [mailOrderModalOpen, setMailOrderModalOpen] = useState<boolean>(false);
+  const [insuranceModalOpen, setInsuranceModalOpen] = useState<boolean>(false);
+  const [insuranceSubmitted, setInsuranceSubmitted] = useState<boolean>(false);
 
   // selection state
   const [selectedId, setSelectedId] = useState<string>('');
@@ -211,7 +215,12 @@ export const Pharmacy = () => {
   // headings
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
 
-  usePageAnalytics({ pageName: 'Pharmacy Select' });
+  usePageAnalytics({
+    pageName: 'Pharmacy Select',
+    properties: {
+      insuranceBannerDisplayed: true
+    }
+  });
 
   useEffect(() => {
     const getOffers = async () => {
@@ -1078,6 +1087,44 @@ export const Pharmacy = () => {
 
       <CouponModal isOpen={couponModalOpen} onClose={() => setCouponModalOpen(false)} />
 
+      <InsuranceModal
+        isOpen={insuranceModalOpen}
+        onClose={() => setInsuranceModalOpen(false)}
+        onSubmit={() => {
+          setInsuranceSubmitted(true);
+          // Show alert after modal closes (modal closes after 1 second)
+          // prentending like the round trip has no results
+          setTimeout(() => {
+            toast({
+              position: 'top',
+              duration: 4000,
+              isClosable: true,
+              containerStyle: {
+                width: 'calc(100% - 32px)',
+                maxWidth: 'none',
+                margin: '16px 16px 0 16px'
+              },
+              render: () => (
+                <Alert
+                  status="warning"
+                  borderRadius="md"
+                  bg="yellow.50"
+                  p={4}
+                  w="full"
+                  border="1px solid"
+                  borderColor="yellow.200"
+                >
+                  <AlertIcon color="yellow.600" />
+                  <Text flex="1" color="black.800" fontWeight="semibold">
+                    Sorry, we can't find prices with your insurance information.
+                  </Text>
+                </Alert>
+              )
+            });
+          }, 1000);
+        }}
+      />
+
       <MailOrderSelectModal
         isOpen={mailOrderModalOpen}
         onClose={() => setMailOrderModalOpen(false)}
@@ -1114,10 +1161,10 @@ export const Pharmacy = () => {
                 px={4}
               >
                 <HStack justify="space-between" w="full">
-                  {t.showDiscountCardPrices(() => setCouponModalOpen(true))}
+                  {t.showDiscountCardPrices()}
                   <Switch
                     size="lg"
-                    aria-label="Show coupon card prices"
+                    aria-label="Show lowest cash prices"
                     isChecked={enablePrice}
                     onChange={(e) => setEnablePrice(e.target.checked)}
                   />
@@ -1125,8 +1172,8 @@ export const Pharmacy = () => {
                 {enablePrice ? (
                   <Box p={3} bgColor="blue.100" borderRadius="lg">
                     <Text fontSize="sm">
-                      The displayed price is a coupon price for the pharmacy. Coupon details
-                      available after you select a pharmacy. <b>This is NOT insurance.</b>
+                      Coupon will be generated after you select a pharmacy.{' '}
+                      <Link onClick={() => setCouponModalOpen(true)}>More info</Link>
                     </Text>
                   </Box>
                 ) : null}
@@ -1135,6 +1182,38 @@ export const Pharmacy = () => {
           ) : null}
         </VStack>
       </Box>
+
+      {!insuranceSubmitted ? (
+        <Box
+          bgColor="white"
+          borderBottom="2px solid"
+          borderColor="gray.300"
+          style={{
+            position: 'sticky',
+            top: process.env.REACT_APP_ENV_NAME === 'photon' ? '54px' : '89px',
+            zIndex: 1
+          }}
+        >
+          <Container px={-3}>
+            <VStack spacing={2} align="start" py={3} px={4}>
+              <HStack justify="space-between" w="full">
+                <Text>Want to see insurance prices?</Text>
+                <Button
+                  size="sm"
+                  variant="solid"
+                  colorScheme="gray"
+                  onClick={() => {
+                    patientAnalytics.track('Insurance Banner Button Clicked', order, {});
+                    setInsuranceModalOpen(true);
+                  }}
+                >
+                  Enter insurance
+                </Button>
+              </HStack>
+            </VStack>
+          </Container>
+        </Box>
+      ) : null}
 
       <Container pb={showFooter ? 32 : 8}>
         {patientLocation && (
