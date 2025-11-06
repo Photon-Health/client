@@ -3,11 +3,13 @@ import {
   AlertIcon,
   Box,
   Button,
+  Checkbox,
   Container,
   FormControl,
   FormLabel,
   Heading,
   Input,
+  Link,
   Stack,
   Text,
   useBreakpointValue,
@@ -28,6 +30,7 @@ interface SignupFormData {
   city: string;
   state: string;
   zip: string;
+  didAgreeToTerms: boolean;
 }
 
 export const SelfSignupPage = () => {
@@ -52,6 +55,7 @@ export const SelfSignupPage = () => {
   const [zipInput, setZipInput] = useState('');
   const [cityInput, setCityInput] = useState('');
   const [stateInput, setStateInput] = useState('');
+  const [didAgreeInput, setDidAgreeInput] = useState(false);
 
   const onAcceptClick = async () => {
     const queryParams = buildSignupContinueParams(state, {
@@ -63,7 +67,8 @@ export const SelfSignupPage = () => {
       street2: street2Input,
       city: cityInput,
       state: stateInput,
-      zip: zipInput
+      zip: zipInput,
+      didAgreeToTerms: didAgreeInput
     });
     window.location.href = `https://${auth0Config.domain}/continue?${queryParams}`;
   };
@@ -182,6 +187,23 @@ export const SelfSignupPage = () => {
             />
           </FormControl>
 
+          <FormControl>
+            <Checkbox
+              isChecked={didAgreeInput}
+              onChange={(e) => setDidAgreeInput(e.target.checked)}
+            >
+              <Text fontWeight="bold" fontSize="md" display="inline">
+                I agree
+              </Text>
+            </Checkbox>{' '}
+            <Text fontSize="md" display="inline">
+              that by creating an account and prescribing with Photon Health, Inc., I am authorized
+              and licensed to prescribe, and I accept Photon Healths{' '}
+              <Link href="https://www.photon.health/terms">Terms of Service</Link> and{' '}
+              <Link href="https://www.photon.health/baa">Business Associate Agreement (BAA)</Link>
+            </Text>
+          </FormControl>
+
           <Button onClick={onAcceptClick}>Accept</Button>
         </Stack>
       </Container>
@@ -213,7 +235,8 @@ const buildSignupContinueParams = (state: string, formData: SignupFormData): str
     street2: formData.street2,
     city: formData.city,
     state_address: formData.state,
-    zip: formData.zip
+    zip: formData.zip,
+    didAgreeToTerms: formData.didAgreeToTerms.toString()
   });
 
   return params.toString();
