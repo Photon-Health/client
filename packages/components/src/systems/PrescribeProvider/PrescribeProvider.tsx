@@ -9,20 +9,15 @@ import {
 } from 'solid-js';
 import { format } from 'date-fns';
 import { usePhotonClient } from '../SDKProvider';
-import {
-  Catalog,
-  Prescription,
-  PrescriptionState,
-  PrescriptionTemplate
-} from '@photonhealth/sdk/dist/types';
+import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
 import {
   CreatePrescription,
+  CreatePrescriptions,
   CreatePrescriptionTemplate,
   GenerateCoverageOptions,
   GetPatientPreferredPharmaciesAndAddress,
   GetPharmaciesQuery,
   GetPrescription,
-  GetTemplatesFromCatalogs,
   UpdatePrescriptionStates
 } from '../../fetch';
 import { triggerToast, useRecentOrders } from '../../index';
@@ -284,61 +279,27 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   async function createPrescriptionsFromIds() {
     setHasCreatedPrescriptions(true);
     setIsLoadingPrefills(true);
-    const prescriptionsToCreate: PrescriptionFormData[] = [];
 
-    // fetch templates
-    if (props.templateIdsPrefill.length > 0) {
-      let catalogs;
-      try {
-        const { data } = await client.apollo.query({ query: GetTemplatesFromCatalogs });
-        catalogs = data?.catalogs;
-      } catch (error) {
-        console.error('Error fetching templates:', error);
-        return;
-      }
+    try {
+      // Create prescriptions from template ids with a few optional override values
+      if (props.templateIdsPrefill.length > 0) {
+        const dedupedTemplateIds = Array.from(new Set(props.templateIdsPrefill));
+        const templatedCreateRxList = dedupedTemplateIds.map((templateId) => ({
+          ...props.templateOverrides?.[templateId],
+          patientId: props.patientId,
+          templateId
+        }));
 
-      if (catalogs) {
-        // get all templates, most likely only one catalog
-        const templates = catalogs.reduce(
-          (acc: PrescriptionTemplate[], catalog: Catalog) => [...acc, ...catalog.templates],
-          []
-        );
-
-        // for each templateId, find the template by id and set the draft prescription
-        props.templateIdsPrefill.forEach((templateId: string) => {
-          const template = templates.find(
-            (template: PrescriptionTemplate) => template.id === templateId
-          );
-
-          if (!template) {
-            return console.error(`Invalid template id ${templateId}`);
-          }
-
-          if (
-            // minimum template fields required to create a prescription
-            !template?.treatment ||
-            !template?.dispenseQuantity ||
-            !template?.dispenseUnit ||
-            !template?.fillsAllowed ||
-            !template?.instructions
-          ) {
-            // todo: better error handling; show toast? throw error?
-            console.error(`Template is missing required prescription details ${templateId}`);
-          } else {
-            // if template.id is in templateOverrides, apply the overrides
-            const templateOverride = props.templateOverrides?.[template.id];
-            const updatedTemplate = templateOverride
-              ? { ...template, ...templateOverride }
-              : template;
-            prescriptionsToCreate.push(updatedTemplate);
-          }
+        const res = await client.apollo.mutate({
+          mutation: CreatePrescriptions,
+          variables: { prescriptions: templatedCreateRxList }
         });
+        const newRxs = res.data.createPrescriptions as Prescription[];
+        setDraftPrescriptions((prev) => [...prev, ...newRxs]);
       }
-    }
 
-    // Fetch prescriptions if needed
-    if (props.prescriptionIdsPrefill.length > 0) {
-      try {
+      // Fetch prescriptions if needed
+      if (props.prescriptionIdsPrefill.length > 0) {
         const fetchedPrescriptions = await Promise.all(
           props.prescriptionIdsPrefill.map(async (prescriptionId: string) => {
             const { data } = await client.apollo.query({
@@ -348,20 +309,20 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
             return data?.prescription;
           })
         );
-        prescriptionsToCreate.push(...fetchedPrescriptions);
-      } catch (error) {
-        console.error('Error fetching prescriptions:', error);
-      }
-    }
 
-    // create prescriptions from template and prescription ids
-    // todo: error handling
-    await Promise.all(
-      prescriptionsToCreate.map(async (prescription: PrescriptionFormData) =>
-        tryCreatePrescription(prescription, { showSuccessToast: false })
-      )
-    );
-    setIsLoadingPrefills(false);
+        // create prescriptions from template and prescription ids
+        // todo: error handling
+        await Promise.all(
+          fetchedPrescriptions.map(async (prescription: PrescriptionFormData) =>
+            tryCreatePrescription(prescription, { showSuccessToast: false })
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error while trying to create prescriptions from prefill IDs', { error });
+    } finally {
+      setIsLoadingPrefills(false);
+    }
   }
 
   const getPatientPreferredPharmaciesAndAddress = async (patientId: string) => {
@@ -426,23 +387,9 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
 
     if (props.enableCombineAndDuplicate && duplicateFill) {
       // if there's a duplicate order, check first if they want to report an issue
-      // todo: can we pass the promise down instead of reject/resolve callbacks?
-      let resolver: (result: Prescription) => void;
-      let rejecter: () => void;
-      const promise = new Promise<Prescription>((resolve, reject) => {
-        resolver = resolve;
-        rejecter = reject;
+      await new Promise<void>((resolve, reject) => {
+        recentOrdersActions.setIsDuplicateDialogOpen(true, duplicateFill, resolve, reject);
       });
-      recentOrdersActions.setIsDuplicateDialogOpen(
-        true,
-        duplicateFill,
-        async () => {
-          const result = await createPrescriptionOnApi(prescriptionFormData, options);
-          resolver(result);
-        },
-        () => rejecter()
-      );
-      return promise;
     }
 
     return await createPrescriptionOnApi(prescriptionFormData, options);
