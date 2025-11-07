@@ -39,6 +39,7 @@ export const SSOLogin = () => {
 function isCurrentOriginAllowed(): boolean {
   const allowedDomains = [
     'http://localhost:3000',
+    'https://app.boson.health',
     'https://app.neutron.health',
     'https://app.photon.health'
   ];
