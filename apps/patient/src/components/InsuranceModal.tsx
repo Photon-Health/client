@@ -63,6 +63,13 @@ export const InsuranceModal = ({ isOpen, onClose, onSubmit }: InsuranceModalProp
     rxBin
   });
 
+  const isFormValid = () => {
+    const hasProvider = provider.trim() !== '';
+    const hasAtLeastOneOther =
+      memberId.trim() !== '' || groupNumber.trim() !== '' || rxBin.trim() !== '';
+    return hasProvider && hasAtLeastOneOther;
+  };
+
   const handleSubmit = () => {
     if (order) {
       patientAnalytics.track('Insurance Form Submitted', order, getFormData());
@@ -129,12 +136,13 @@ export const InsuranceModal = ({ isOpen, onClose, onSubmit }: InsuranceModalProp
               though one may not always be available.
             </Text>
 
-            <FormControl>
+            <FormControl isRequired>
               <FormLabel htmlFor="insurance-provider">Health Insurance Provider</FormLabel>
               <Select
                 id="insurance-provider"
                 name="insurance-provider"
                 title="Health Insurance Provider"
+                aria-label="Health Insurance Provider"
                 placeholder="Select insurance"
                 value={provider}
                 onChange={(e) => setProvider(e.target.value)}
@@ -146,9 +154,18 @@ export const InsuranceModal = ({ isOpen, onClose, onSubmit }: InsuranceModalProp
                   </option>
                 ))}
               </Select>
-              <Text fontSize="sm" color="gray.500" mt={1}>
-                Required
-              </Text>
+            </FormControl>
+
+            <FormControl>
+              <FormLabel htmlFor="rx-bin">Rx BIN</FormLabel>
+              <Input
+                id="rx-bin"
+                name="rx-bin"
+                placeholder="e.g. 076123"
+                value={rxBin}
+                onChange={(e) => setRxBin(e.target.value)}
+                backgroundColor="white"
+              />
             </FormControl>
 
             <FormControl>
@@ -175,17 +192,9 @@ export const InsuranceModal = ({ isOpen, onClose, onSubmit }: InsuranceModalProp
               />
             </FormControl>
 
-            <FormControl>
-              <FormLabel htmlFor="rx-bin">Rx BIN</FormLabel>
-              <Input
-                id="rx-bin"
-                name="rx-bin"
-                placeholder="e.g. 076123"
-                value={rxBin}
-                onChange={(e) => setRxBin(e.target.value)}
-                backgroundColor="white"
-              />
-            </FormControl>
+            <Text fontSize="sm" color="gray.500">
+              At least one of Rx BIN, Member ID, or Group Number is required
+            </Text>
           </VStack>
         </ModalBody>
         <ModalFooter position="sticky" bottom="0" w="full" padding="4" backgroundColor="gray.100">
@@ -194,7 +203,7 @@ export const InsuranceModal = ({ isOpen, onClose, onSubmit }: InsuranceModalProp
               w="full"
               colorScheme="blue"
               onClick={handleSubmit}
-              isDisabled={!memberId}
+              isDisabled={!isFormValid()}
               isLoading={isLoading}
             >
               Submit
