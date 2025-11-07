@@ -14,8 +14,10 @@ export const SSOLogin = () => {
   const returnTo = searchParams.get('returnTo') ?? undefined;
 
   useEffect(() => {
-    if (isAllowedReturnTo(returnTo)) {
-      localStorage.setItem('authReturnTo', returnTo);
+    if (isCurrentOriginAllowed()) {
+      if (returnTo) {
+        localStorage.setItem('authReturnTo', returnTo);
+      }
     }
 
     login({
@@ -34,18 +36,18 @@ export const SSOLogin = () => {
   );
 };
 
-function isAllowedReturnTo(returnTo: string | undefined): returnTo is string {
-  if (!returnTo) return false;
-
+function isCurrentOriginAllowed(): boolean {
   const allowedDomains = [
     'http://localhost:3000',
-    'https://doximity.dev.doximity.cloud',
-    'https://doximity.partners.doximity-staging.services'
+    'https://app.boson.health',
+    'https://app.neutron.health',
+    'https://app.photon.health'
   ];
 
   try {
+    const currentOrigin = window.location.origin;
     return allowedDomains.some((domain) => {
-      return returnTo.startsWith(domain);
+      return currentOrigin === domain;
     });
   } catch {
     return false;
