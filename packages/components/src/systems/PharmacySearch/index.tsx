@@ -1,20 +1,17 @@
-import { For, Show, createEffect, createMemo, createSignal } from 'solid-js';
+import { Show, createEffect, createMemo, createSignal } from 'solid-js';
 import { gql } from '@apollo/client';
 import { Address, Pharmacy as _Pharmacy } from '@photonhealth/sdk/dist/types';
-import InputGroup from '../../particles/InputGroup';
-import ComboBox from '../../particles/ComboBox';
-import capitalizeFirstLetter from '../../utils/capitalizeFirstLetter';
 import LocationSelect from '../LocationSelect';
 import Icon from '../../particles/Icon';
 import { types } from '@photonhealth/sdk';
 import { usePhotonClient } from '../SDKProvider';
 import getLocations, { Location } from '../../utils/getLocations';
-import Badge from '../../particles/Badge';
 import Checkbox from '../../particles/Checkbox';
 import formatAddress from '../../utils/formatAddress';
 import Spinner from '../../particles/Spinner';
 import { useGoogleService } from '../GoogleServiceProvider';
 import { GetPatientPreferredPharmaciesAndAddress, GetPharmaciesQuery } from '../../fetch';
+import { PharmacyOption, PharmacySearchInput } from './PharmacySearch';
 
 type Pharmacy = Pick<_Pharmacy, 'id' | 'name'> & {
   address: Pick<Address, 'street1' | 'city' | 'state'>;
@@ -68,18 +65,14 @@ export interface PharmacySearchProps {
   setPreferred?: (shouldSetPreferred: boolean) => void;
 }
 
-interface PharmacyExtended extends Pharmacy {
-  preferred: boolean | undefined;
-}
-
-export default function PharmacySearch(props: PharmacySearchProps) {
+export default function PickupPharmacySearch(props: PharmacySearchProps) {
   const client = usePhotonClient();
   const { googleMapsServices } = useGoogleService();
   const [selected, setSelected] = createSignal<any>();
   const [query, setQuery] = createSignal('');
   const [location, setLocation] = createSignal<Location | null>(null);
-  const [pharmacies, setPharmacies] = createSignal<PharmacyExtended[] | null>(null);
-  const [preferredPharmacies, setPreferredPharmacies] = createSignal<PharmacyExtended[]>([]);
+  const [pharmacies, setPharmacies] = createSignal<PharmacyOption[] | null>(null);
+  const [preferredPharmacies, setPreferredPharmacies] = createSignal<PharmacyOption[]>([]);
   const [fetchingPharmacies, setFetchingPharmacies] = createSignal(false);
   const [fetchingPreferred, setFetchingPreferred] = createSignal(false);
   const [openLocationSearch, setOpenLocationSearch] = createSignal(false);
@@ -94,7 +87,7 @@ export default function PharmacySearch(props: PharmacySearchProps) {
     });
 
     if (data?.pharmacies?.length > 0) {
-      setPharmacies(data.pharmacies.map((ph: Pharmacy) => ({ ...ph, preferred: false })));
+      setPharmacies(data.pharmacies.map((ph: Pharmacy) => ({ ...ph, isPreferred: false })));
     }
     setFetchingPharmacies(false);
   }
@@ -122,7 +115,7 @@ export default function PharmacySearch(props: PharmacySearchProps) {
         setPreferredPharmacies(
           preferredData?.patient?.preferredPharmacies.map((ph: Pharmacy) => ({
             ...ph,
-            preferred: true
+            isPreferred: true
           }))
         );
       }
@@ -146,12 +139,23 @@ export default function PharmacySearch(props: PharmacySearchProps) {
       localPharmacies.some((regularPharmacy) => regularPharmacy.id === preferredPharmacy.id)
     );
 
+    const previousPharmacyId = previousId();
+
     // -- merge preferred and local lists and remove duplicates
     const allPharmacies = [...crossoverPreferredPharmacies, ...localPharmacies];
-    const ids = allPharmacies.map((pharmacy) => pharmacy.id);
 
-    // could optimize with Set, but fine for amount of pharms
-    return allPharmacies.filter((pharmacy, index) => ids.indexOf(pharmacy.id) === index);
+    // dedupe pharmacies in favor of preferred pharmacy if there's a duplicate in local pharmacies
+    const pharmacyLookup = allPharmacies.reduce((acc, cur) => {
+      if (!acc[cur.id]) {
+        // while we're scanning, if we have a matching previous id here, mark it as so
+        const isPrevious = previousPharmacyId === cur.id;
+        acc[cur.id] = { ...cur, isPrevious };
+      }
+      return acc;
+    }, {} as Record<string, PharmacyOption>);
+    const dedupedPharmacies = Object.values(pharmacyLookup);
+
+    return dedupedPharmacies;
   });
 
   createEffect(() => {
@@ -183,11 +187,6 @@ export default function PharmacySearch(props: PharmacySearchProps) {
     }
   });
 
-  const formattedAddress = (pharmacy: Pharmacy) =>
-    `${capitalizeFirstLetter(pharmacy.address?.street1 || '')}, ${capitalizeFirstLetter(
-      pharmacy.address?.city || ''
-    )}, ${pharmacy.address?.state}`;
-
   async function getAndSetLocation(address: string) {
     const { geocoder } = googleMapsServices();
     if (!geocoder) throw new Error('Geocoder not loaded');
@@ -213,6 +212,16 @@ export default function PharmacySearch(props: PharmacySearchProps) {
     }
   });
 
+  createEffect(() => {
+    // set the default value to be the first preferred pharmacy if it exists
+    const noSelection = !selected()?.id;
+    const hasPreferredPharmacies = preferredPharmacies()?.length > 0;
+    const defaultPharmacy = mergedPharmacies()?.[0];
+    if (noSelection && hasPreferredPharmacies && defaultPharmacy) {
+      setSelected(defaultPharmacy);
+    }
+  });
+
   return (
     <div>
       <LocationSelect
@@ -220,7 +229,12 @@ export default function PharmacySearch(props: PharmacySearchProps) {
         open={openLocationSearch()}
         setOpen={setOpenLocationSearch}
       />
-      <InputGroup
+      <PharmacySearchInput
+        value={selected()?.id ? selected() : undefined}
+        setValue={setSelected}
+        options={filteredPharmacies()}
+        onSearch={setQuery}
+        loading={fetchingPharmacies()}
         label={
           <div class="w-full flex flex-col sm:flex-row sm:items-center mb-2">
             <label class="whitespace-nowrap mr-1">Showing near:</label>
@@ -240,83 +254,24 @@ export default function PharmacySearch(props: PharmacySearchProps) {
             </Show>
           </div>
         }
-        helpText={
-          <div class="flex gap-x-1">
-            <Show when={selected()?.preferred}>
-              <Badge size="sm" color="blue">
-                Preferred
-              </Badge>
-            </Show>
-            <Show
-              when={!!previousId() && previousId() === selected()?.id && !selected()?.preferred}
-            >
-              <Badge size="sm" color="green">
-                Previous
-              </Badge>
-            </Show>
-          </div>
-        }
-        loading={fetchingPharmacies()}
-      >
-        <ComboBox
-          value={(preferredPharmacies()?.length > 0 && mergedPharmacies()?.[0]) || undefined}
-          setSelected={setSelected}
-        >
-          <ComboBox.Input
-            onInput={(e) => setQuery(e.currentTarget.value)}
-            displayValue={(pharmacy) => {
-              return pharmacy?.name
-                ? `${pharmacy.name}, ${capitalizeFirstLetter(pharmacy.address?.street1 || '')}`
-                : '';
-            }}
-          />
-          <ComboBox.Options>
-            <Show when={(filteredPharmacies()?.length || 0) > 0}>
-              <For each={filteredPharmacies()}>
-                {(pharmacy) => {
-                  return (
-                    <ComboBox.Option key={pharmacy.id} value={pharmacy}>
-                      <div class="flex gap-x-1 items-center">
-                        {pharmacy.name}{' '}
-                        <Show when={pharmacy.preferred}>
-                          <Badge size="sm" color="blue">
-                            Preferred
-                          </Badge>
-                        </Show>
-                        <Show when={previousId() === pharmacy.id && !pharmacy.preferred}>
-                          <Badge size="sm" color="green">
-                            Previous
-                          </Badge>
-                        </Show>
-                      </div>
-
-                      <div class="text-xs">{formattedAddress(pharmacy)}</div>
-                    </ComboBox.Option>
-                  );
-                }}
-              </For>
-            </Show>
-            <Show when={filteredPharmacies()?.length === 0}>
-              <div class="p-4">No pharmacy matches that search</div>
-            </Show>
-          </ComboBox.Options>
-        </ComboBox>
-      </InputGroup>
+      />
       <Show
         when={
           !props?.hidePreferred &&
           !fetchingPharmacies() &&
           !fetchingPreferred() &&
           !!selected() &&
-          !selected()?.preferred
+          !selected()?.isPreferred
         }
       >
-        <Checkbox
-          id="set-preferred-pharmacy"
-          mainText="Set as preferred pharmacy"
-          checked={false}
-          onChange={(isChecked) => props?.setPreferred?.(isChecked)}
-        />
+        <div class="mt-4">
+          <Checkbox
+            id="set-preferred-pharmacy"
+            mainText="Set as preferred pharmacy"
+            checked={false}
+            onChange={(isChecked) => props?.setPreferred?.(isChecked)}
+          />
+        </div>
       </Show>
     </div>
   );
