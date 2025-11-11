@@ -77,7 +77,6 @@ export function PharmacySearchInput(props: PharmacySearchInputProps) {
                         </Badge>
                       </Show>
                     </div>
-
                     <div class="text-xs">{formattedAddress(option)}</div>
                   </ComboBox.Option>
                 );

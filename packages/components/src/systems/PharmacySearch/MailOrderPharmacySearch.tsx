@@ -8,7 +8,12 @@ type PharmacyListResult = Pick<Pharmacy, 'id' | 'name'> & {
   address: Pick<Address, 'street1' | 'city' | 'state'>;
 };
 
-export function MailOrderPharmacySearch() {
+type MailOrderPharmacySearchProps = {
+  selected?: PharmacyOption;
+  selectPharmacy: (val: PharmacyOption) => unknown;
+};
+
+export function MailOrderPharmacySearch(props: MailOrderPharmacySearchProps) {
   const client = usePhotonClient();
   const [loading, setLoading] = createSignal<boolean>(false);
   const [nameQuery, setNameQuery] = createSignal<string>();
@@ -17,9 +22,6 @@ export function MailOrderPharmacySearch() {
   const pharmacyOptions = createMemo(() =>
     pharmacies()?.map((option) => ({ ...option, isPreferred: false, isPrevious: false }))
   );
-
-  // GASDGASDFASDF
-  const [selected, setSelected] = createSignal<PharmacyOption>();
 
   createEffect(() => {
     async function loadPharmacies() {
@@ -54,8 +56,8 @@ export function MailOrderPharmacySearch() {
       }
       options={pharmacyOptions()}
       onSearch={setNameQuery}
-      value={selected()}
-      setValue={setSelected}
+      value={props.selected}
+      setValue={props.selectPharmacy}
       loading={loading()}
     />
   );
