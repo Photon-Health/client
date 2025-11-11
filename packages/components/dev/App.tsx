@@ -10,7 +10,7 @@ import {
   useDraftPrescriptions
 } from '../src';
 import PatientInfo from '../src/systems/PatientInfo';
-import PharmacySearch from '../src/systems/PharmacySearch';
+import PickupPharmacySearch from '../src/systems/PharmacySearch';
 import DoseCalculator from '../src/systems/DoseCalculator';
 import Button from '../src/particles/Button';
 import Icon from '../src/particles/Icon';
@@ -134,11 +134,11 @@ const App = () => {
         <div class="mb-10">
           <div>
             <h2>Pharmacy Search</h2>
-            <PharmacySearch setPharmacy={setPharmacy} />
+            <PickupPharmacySearch setPharmacy={setPharmacy} />
             <h2>Pharmacy Search Initialized with Address</h2>
-            <PharmacySearch setPharmacy={setPharmacy} address="11221" />
+            <PickupPharmacySearch setPharmacy={setPharmacy} address="11221" />
             <h2>Pharmacy Search set with Address after 2 seconds</h2>
-            <PharmacySearch setPharmacy={setPharmacy} address={timedAddress()} />
+            <PickupPharmacySearch setPharmacy={setPharmacy} address={timedAddress()} />
           </div>
         </div>
 
