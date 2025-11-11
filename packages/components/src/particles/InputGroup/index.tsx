@@ -141,14 +141,16 @@ function InputGroupWrapper(props: InputGroupProps) {
 
       {props.children}
 
-      <div class="h-6">
-        <p
-          class={`mt-1 text-sm ${props.error ? 'text-red-600' : 'text-gray-500'}`}
-          id={ariaDescribedBy}
-        >
-          {props.error || props.helpText}
-        </p>
-      </div>
+      {(props.error || props.helpText) && (
+        <div class="h-6">
+          <p
+            class={`mt-1 text-sm ${props.error ? 'text-red-600' : 'text-gray-500'}`}
+            id={ariaDescribedBy}
+          >
+            {props.error || props.helpText}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
