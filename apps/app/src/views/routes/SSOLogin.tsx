@@ -7,13 +7,19 @@ import { useEffect } from 'react';
 
 export const SSOLogin = () => {
   const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });
-  const { login } = usePhoton();
+  const { login, logout, isAuthenticated, isLoading } = usePhoton();
   const [searchParams] = useSearchParams();
 
   const connection = searchParams.get('connection') ?? undefined;
   const returnTo = searchParams.get('returnTo') ?? undefined;
 
   useEffect(() => {
+    if (isLoading) return;
+    if (isAuthenticated) {
+      logout({ federated: false, returnTo: window.location.href });
+      return;
+    }
+
     if (isCurrentOriginAllowed()) {
       if (returnTo) {
         localStorage.setItem('authReturnTo', returnTo);
@@ -23,7 +29,7 @@ export const SSOLogin = () => {
     login({
       connection
     });
-  });
+  }, [isLoading, isAuthenticated, login, logout, connection, returnTo]);
 
   return (
     <Container maxW="md" py={{ base: '12', md: '24' }}>
