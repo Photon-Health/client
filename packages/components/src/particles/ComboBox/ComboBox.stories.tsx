@@ -26,9 +26,12 @@ export const Default: InputGroupStory = {
             return person.name.toLowerCase().includes(query().toLowerCase());
           });
     });
+    const [selectedPerson, setSelectedPerson] = createSignal<
+      { id: string; name: string } | undefined
+    >();
 
     return (
-      <ComboBox>
+      <ComboBox value={selectedPerson()} setSelected={setSelectedPerson}>
         <ComboBox.Input
           onInput={(e) => setQuery(e.currentTarget.value)}
           displayValue={(person) => person.name}

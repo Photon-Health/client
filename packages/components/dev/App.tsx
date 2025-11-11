@@ -44,6 +44,9 @@ const App = () => {
           return person.name.toLowerCase().includes(query().toLowerCase());
         });
   });
+  const [selectedPerson, setSelectedPerson] = createSignal<
+    { id: string; name: string } | undefined
+  >();
 
   createEffect(() => {
     setTimeout(() => {
@@ -113,7 +116,7 @@ const App = () => {
           <div>
             <h2>ComboBox</h2>
 
-            <ComboBox>
+            <ComboBox value={selectedPerson()} setSelected={setSelectedPerson}>
               <ComboBox.Input
                 onInput={(e) => setQuery(e.currentTarget.value)}
                 displayValue={(person) => person.name}
