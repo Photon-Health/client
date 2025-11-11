@@ -16,6 +16,8 @@ export const SSOLogin = () => {
   useEffect(() => {
     if (isLoading) return;
     if (isAuthenticated) {
+      // logout before attempting a login, in case user has existing session with another org
+      // that doesn't use the SSO connection
       logout({ federated: false, returnTo: window.location.href });
       return;
     }
