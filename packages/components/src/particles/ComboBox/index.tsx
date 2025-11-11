@@ -73,7 +73,9 @@ export function ComboBox(props: ComboBoxProps) {
         // set selected will call the prop setSelected to ideally update props.value
         // we now listen for props.value to change and update internal selected state in an effect right below
         // this allows for outside components to update the internal state of this component rather than isolate it
-        props.setSelected(selected);
+        if (props.value?.id !== selected?.id || props.value?.id === undefined) {
+          props.setSelected(selected);
+        }
       },
       setActive(active: string) {
         setState('active', active);
