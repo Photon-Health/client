@@ -130,19 +130,23 @@ export default function PickupPharmacySearch(props: PharmacySearchProps) {
     }
   }
 
-  const mergedPharmacies = createMemo(() => {
-    const localPharmacies = pharmacies() || [];
+  const localPreferredPharmacies = createMemo(() => {
     // -- verify preferred pharmacy is included in local pharmacy search
     // e.g. I live in Brooklyn where my preferred pharm is, but if I'm traveling in Texas,
     // I don't want my Brooklyn preferred to show up in the Texas list
-    const crossoverPreferredPharmacies = preferredPharmacies().filter((preferredPharmacy) =>
+    const localPharmacies = pharmacies() || [];
+    return preferredPharmacies().filter((preferredPharmacy) =>
       localPharmacies.some((regularPharmacy) => regularPharmacy.id === preferredPharmacy.id)
     );
+  });
 
+  const mergedPharmacies = createMemo(() => {
+    const localPharmacies = pharmacies() || [];
+    const localPreferred = localPreferredPharmacies();
     const previousPharmacyId = previousId();
 
     // -- merge preferred and local lists and remove duplicates
-    const allPharmacies = [...crossoverPreferredPharmacies, ...localPharmacies];
+    const allPharmacies = [...localPreferred, ...localPharmacies];
 
     // dedupe pharmacies in favor of preferred pharmacy if there's a duplicate in local pharmacies
     const pharmacyLookup = allPharmacies.reduce((acc, cur) => {
@@ -215,7 +219,7 @@ export default function PickupPharmacySearch(props: PharmacySearchProps) {
   createEffect(() => {
     // set the default value to be the first preferred pharmacy if it exists
     const noSelection = !selected()?.id;
-    const hasPreferredPharmacies = preferredPharmacies()?.length > 0;
+    const hasPreferredPharmacies = localPreferredPharmacies()?.length > 0;
     const defaultPharmacy = mergedPharmacies()?.[0];
     if (noSelection && hasPreferredPharmacies && defaultPharmacy) {
       setSelected(defaultPharmacy);
