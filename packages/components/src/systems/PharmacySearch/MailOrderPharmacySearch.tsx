@@ -16,8 +16,8 @@ type MailOrderPharmacySearchProps = {
 export function MailOrderPharmacySearch(props: MailOrderPharmacySearchProps) {
   const client = usePhotonClient();
   const [loading, setLoading] = createSignal<boolean>(false);
-  const [nameQuery, setNameQuery] = createSignal<string>();
-  const [debouncedNameQuery, setDebouncedNameQuery] = createSignal<string>();
+  const [nameSearch, setNameSearch] = createSignal<string>();
+  const [debouncedNameSearch, setDebouncedNameSearch] = createSignal<string>();
   const [pharmacies, setPharmacies] = createSignal<PharmacyListResult[]>();
 
   const pharmacyOptions = createMemo(() =>
@@ -29,7 +29,7 @@ export function MailOrderPharmacySearch(props: MailOrderPharmacySearchProps) {
     async function loadPharmacies() {
       setLoading(true);
       try {
-        const name = debouncedNameQuery() || undefined;
+        const name = debouncedNameSearch() || undefined;
         const { data } = await client.apolloClinical.query({
           query: ListPharmaciesQuery,
           variables: {
@@ -52,9 +52,9 @@ export function MailOrderPharmacySearch(props: MailOrderPharmacySearchProps) {
 
   createEffect(() => {
     // debounce the search query usage
-    const name = nameQuery();
+    const name = nameSearch();
     const timeoutId = setTimeout(() => {
-      setDebouncedNameQuery(name);
+      setDebouncedNameSearch(name);
     }, 600);
 
     onCleanup(() => clearTimeout(timeoutId));
@@ -68,7 +68,7 @@ export function MailOrderPharmacySearch(props: MailOrderPharmacySearchProps) {
         </div>
       }
       options={pharmacyOptions()}
-      onSearch={setNameQuery}
+      onSearch={setNameSearch}
       value={props.selected}
       setValue={props.selectPharmacy}
       loading={loading()}
