@@ -2,7 +2,7 @@ import { Address, Pharmacy } from '@photonhealth/sdk/dist/types';
 import { ListPharmaciesQuery } from '../../fetch';
 import { usePhotonClient } from '../SDKProvider';
 import { PharmacyOption, PharmacySearchInput } from './PharmacySearch';
-import { createEffect, createMemo, createSignal } from 'solid-js';
+import { createEffect, createMemo, createSignal, onCleanup } from 'solid-js';
 
 type PharmacyListResult = Pick<Pharmacy, 'id' | 'name'> & {
   address: Pick<Address, 'street1' | 'city' | 'state'>;
@@ -17,6 +17,7 @@ export function MailOrderPharmacySearch(props: MailOrderPharmacySearchProps) {
   const client = usePhotonClient();
   const [loading, setLoading] = createSignal<boolean>(false);
   const [nameQuery, setNameQuery] = createSignal<string>();
+  const [debouncedNameQuery, setDebouncedNameQuery] = createSignal<string>();
   const [pharmacies, setPharmacies] = createSignal<PharmacyListResult[]>();
 
   const pharmacyOptions = createMemo(() =>
@@ -24,15 +25,17 @@ export function MailOrderPharmacySearch(props: MailOrderPharmacySearchProps) {
   );
 
   createEffect(() => {
+    // effect hook for loading the pharmacies
     async function loadPharmacies() {
       setLoading(true);
       try {
+        const name = debouncedNameQuery() || undefined;
         const { data } = await client.apolloClinical.query({
           query: ListPharmaciesQuery,
           variables: {
             offset: 0,
             limit: 40,
-            name: nameQuery() || undefined,
+            name,
             fulfillmentType: 'MAIL_ORDER',
             integrated: false
           }
@@ -45,6 +48,16 @@ export function MailOrderPharmacySearch(props: MailOrderPharmacySearchProps) {
       }
     }
     loadPharmacies();
+  });
+
+  createEffect(() => {
+    // debounce the search query usage
+    const name = nameQuery();
+    const timeoutId = setTimeout(() => {
+      setDebouncedNameQuery(name);
+    }, 600);
+
+    onCleanup(() => clearTimeout(timeoutId));
   });
 
   return (
