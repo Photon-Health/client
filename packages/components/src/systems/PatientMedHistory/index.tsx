@@ -126,7 +126,7 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
     }
   });
 
-  const addMedHistory = async (medicationId: string) => {
+  const addMedHistory = async (treatmentId: string) => {
     const updateCache = (cache: ApolloCache<GetPatientResponse>) => {
       const newTreatment = {
         __typename: 'PatientMedication',
@@ -158,11 +158,31 @@ export default function PatientMedHistory(props: PatientMedHistoryProps) {
       });
     };
 
+    // Determine which field to use based on ID prefix
+    const medHistoryInput: { active: boolean; medicationId?: string; medicalEquipmentId?: string } =
+      {
+        active: false
+      };
+
+    if (treatmentId.startsWith('dme_')) {
+      medHistoryInput.medicalEquipmentId = treatmentId;
+    } else if (treatmentId.startsWith('med_')) {
+      medHistoryInput.medicationId = treatmentId;
+    } else {
+      triggerToast({
+        header: `Invalid Treatment Id ${treatmentId}`,
+        body: 'The treatment Id is not valid.',
+        status: 'error'
+      });
+      console.error(`Invalid Treatment Id ${treatmentId}`);
+      return;
+    }
+
     await client.apollo.mutate({
       mutation: ADD_MED_HISTORY,
       variables: {
         id: props.patientId,
-        medicationHistory: [{ medicationId, active: false }]
+        medicationHistory: [medHistoryInput]
       },
       update: updateCache
     });

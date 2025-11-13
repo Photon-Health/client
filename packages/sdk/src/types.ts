@@ -166,7 +166,8 @@ export type LatLongSearch = {
 export type MedHistoryInput = {
   active: Scalars['Boolean'];
   comment?: InputMaybe<Scalars['String']>;
-  medicationId: Scalars['ID'];
+  medicationId?: InputMaybe<Scalars['ID']>;
+  medicalEquipmentId?: InputMaybe<Scalars['ID']>;
 };
 
 export type MedicalEquipment = Treatment & {
