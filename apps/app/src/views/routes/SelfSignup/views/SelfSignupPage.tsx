@@ -16,7 +16,7 @@ import {
   useBreakpointValue,
   VStack
 } from '@chakra-ui/react';
-import { ErrorMessage, Field, Formik, FormikHelpers } from 'formik';
+import { ErrorMessage, Field, Formik } from 'formik';
 import { useSearchParams } from 'react-router-dom';
 import { auth0Config } from '../../../../configs/auth';
 import { Logo } from '../../../components/Logo';
@@ -40,6 +40,8 @@ export const SelfSignupPage = () => {
     lastName: lastName || '',
     email: email || '',
     npi: '',
+    phone: '',
+    fax: '',
     street1: '',
     street2: '',
     city: '',
@@ -48,13 +50,10 @@ export const SelfSignupPage = () => {
     didAgreeToTerms: false
   };
 
-  const handleSubmit = async (
-    values: SignupFormData,
-    { setSubmitting }: FormikHelpers<SignupFormData>
-  ) => {
+  const submitForm = async (values: SignupFormData) => {
+    await wait(100);
     const queryParams = buildSignupContinueParams(state, values);
     window.location.href = `https://${auth0Config.domain}/continue?${queryParams}`;
-    setSubmitting(false);
   };
 
   return (
@@ -68,7 +67,7 @@ export const SelfSignupPage = () => {
         <Formik
           initialValues={initialFormData}
           validationSchema={signupFormSchema}
-          onSubmit={handleSubmit}
+          onSubmit={submitForm}
         >
           {({
             errors,
@@ -125,6 +124,30 @@ export const SelfSignupPage = () => {
                         maxLength={10}
                       />
                       <ErrorMessage name="npi" component={FormErrorMessage} />
+                    </FormControl>
+
+                    <FormControl isRequired isInvalid={!!errors.phone && touched.phone}>
+                      <FormLabel htmlFor="phone">Phone</FormLabel>
+                      <Field
+                        as={Input}
+                        id="phone"
+                        name="phone"
+                        placeholder="Enter your phone number"
+                        maxLength={10}
+                      />
+                      <ErrorMessage name="phone" component={FormErrorMessage} />
+                    </FormControl>
+
+                    <FormControl isInvalid={!!errors.fax && touched.fax}>
+                      <FormLabel htmlFor="fax">Fax</FormLabel>
+                      <Field
+                        as={Input}
+                        id="fax"
+                        name="fax"
+                        placeholder="Enter your fax number"
+                        maxLength={10}
+                      />
+                      <ErrorMessage name="fax" component={FormErrorMessage} />
                     </FormControl>
                   </Stack>
                 </Stack>
@@ -234,13 +257,25 @@ const buildSignupContinueParams = (state: string, formData: SignupFormData): str
     last_name: formData.lastName,
     email: formData.email,
     npi: formData.npi,
+    phone: formData.phone,
     street1: formData.street1,
-    street2: formData.street2 || '',
     city: formData.city,
     state_address: formData.state.value,
     postal_code: formData.postalCode,
     did_accept_tos: formData.didAgreeToTerms.toString()
   });
 
+  if (formData.street2) {
+    params.set('street2', formData.street2);
+  }
+
+  if (formData.fax) {
+    params.set('fax', formData.fax);
+  }
+
   return params.toString();
 };
+
+async function wait(number: number) {
+  return new Promise((resolve) => setTimeout(resolve, number));
+}
