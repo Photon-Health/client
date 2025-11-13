@@ -63,12 +63,13 @@ export interface PharmacySearchProps {
   hidePreferred?: boolean;
   setPharmacy: (pharmacy: types.Pharmacy) => void;
   setPreferred?: (shouldSetPreferred: boolean) => void;
+  initialValue?: PharmacyOption;
 }
 
 export default function PickupPharmacySearch(props: PharmacySearchProps) {
   const client = usePhotonClient();
   const { googleMapsServices } = useGoogleService();
-  const [selected, setSelected] = createSignal<any>();
+  const [selected, setSelected] = createSignal<any>(props.initialValue);
   const [query, setQuery] = createSignal('');
   const [location, setLocation] = createSignal<Location | null>(null);
   const [pharmacies, setPharmacies] = createSignal<PharmacyOption[] | null>(null);
