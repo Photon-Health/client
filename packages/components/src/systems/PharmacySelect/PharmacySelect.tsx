@@ -188,7 +188,7 @@ export function PharmacySelect(props: PharmacySelectProps) {
               />
               {(props.mailOrderPharmacyIds?.length ?? 0) > 0 && (
                 <div class="space-y-2">
-                  <label>Or choose a partner pharmacy</label>
+                  <label>Choose a partner pharmacy</label>
                   <RadioGroupCards
                     label="Pharmacies"
                     value={mailOrderId()}
