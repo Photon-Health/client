@@ -9,6 +9,14 @@ export const signupFormSchema = yup.object({
     .string()
     .required('NPI is required')
     .matches(/^\d{10}$/, 'NPI must be a 10-digit number'),
+  phone: yup
+    .string()
+    .required('Phone number is required')
+    .matches(/^\d{10}$/, 'Phone must be a 10-digit number'),
+  fax: yup
+    .string()
+    .optional()
+    .matches(/^\d{10}$/, 'Fax must be a 10-digit number'),
   street1: yup.string().required('Street address is required'),
   street2: yup.string(),
   city: yup.string().required('City is required'),

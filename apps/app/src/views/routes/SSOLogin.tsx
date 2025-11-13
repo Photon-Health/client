@@ -7,21 +7,31 @@ import { useEffect } from 'react';
 
 export const SSOLogin = () => {
   const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });
-  const { login } = usePhoton();
+  const { login, logout, isAuthenticated, isLoading } = usePhoton();
   const [searchParams] = useSearchParams();
 
   const connection = searchParams.get('connection') ?? undefined;
   const returnTo = searchParams.get('returnTo') ?? undefined;
 
   useEffect(() => {
-    if (isAllowedReturnTo(returnTo)) {
-      localStorage.setItem('authReturnTo', returnTo);
+    if (isLoading) return;
+    if (isAuthenticated) {
+      // logout before attempting a login, in case user has existing session with another org
+      // that doesn't use the SSO connection
+      logout({ federated: false, returnTo: window.location.href });
+      return;
+    }
+
+    if (isCurrentOriginAllowed()) {
+      if (returnTo) {
+        localStorage.setItem('authReturnTo', returnTo);
+      }
     }
 
     login({
       connection
     });
-  });
+  }, [isLoading, isAuthenticated, login, logout, connection, returnTo]);
 
   return (
     <Container maxW="md" py={{ base: '12', md: '24' }}>
@@ -34,21 +44,18 @@ export const SSOLogin = () => {
   );
 };
 
-function isAllowedReturnTo(returnTo: string | undefined): returnTo is string {
-  if (!returnTo) return false;
-
+function isCurrentOriginAllowed(): boolean {
   const allowedDomains = [
-    'https://doximity.dev.doximity.cloud',
-    'https://doximity.partners.doximity-staging.services'
+    'http://localhost:3000',
+    'https://app.boson.health',
+    'https://app.neutron.health',
+    'https://app.photon.health'
   ];
 
   try {
-    const url = new URL(returnTo);
-    if (url.hostname === 'localhost' && url.protocol === 'http:' && url.port === '4000') {
-      return true;
-    }
+    const currentOrigin = window.location.origin;
     return allowedDomains.some((domain) => {
-      return returnTo.startsWith(domain);
+      return currentOrigin === domain;
     });
   } catch {
     return false;
