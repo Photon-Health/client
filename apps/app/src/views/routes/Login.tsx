@@ -72,8 +72,8 @@ export const Login = () => {
             ) : null}
             <HStack spacing="1" justify="center">
               <Text color="muted">Don't have an account?</Text>
-              <Link color="teal.500" href="mailto:sales@photon.health">
-                Contact Sales
+              <Link color="teal.500" href="mailto:support@photon.health">
+                Contact Support
               </Link>
             </HStack>
           </Stack>
