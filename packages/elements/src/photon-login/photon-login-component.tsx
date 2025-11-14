@@ -42,10 +42,10 @@ const Component = (props: { redirectPath?: string }) => {
           <p class="text-gray-500 font-sans text-center mb-8">
             Don't have an account?{' '}
             <a
-              href="mailto:rado@photon.health"
+              href="mailto:support@photon.health"
               class="text-teal-600 hover:underline hover:cursor-pointer font-sans font-light"
             >
-              Contact Sales
+              Contact Support
             </a>
           </p>
           <photon-auth-button redirect-path={props.redirectPath} />
