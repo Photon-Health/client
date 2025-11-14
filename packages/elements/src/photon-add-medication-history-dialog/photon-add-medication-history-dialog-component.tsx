@@ -1,6 +1,6 @@
 import { Treatment } from '@photonhealth/sdk/dist/types';
 
-import { Button, Dialog, triggerToast, usePhoton } from '@photonhealth/components';
+import { Button, Dialog, usePhoton } from '@photonhealth/components';
 import { customElement } from 'solid-element';
 import { createEffect, createSignal } from 'solid-js';
 import { gql } from '@apollo/client';
@@ -106,15 +106,6 @@ const Component = (props: AddMedicationHistoryDialogProps) => {
   };
 
   const handleMedicationSelected = (med: Treatment) => {
-    if (med.id.startsWith('dme')) {
-      triggerToast({
-        header: 'Invalid Selection',
-        body: 'Unable to add medical equipment to medication history.',
-        status: 'error'
-      });
-      return;
-    }
-
     setMedication(med);
     setSearchTerm(med.name);
   };
