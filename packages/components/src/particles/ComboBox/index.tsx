@@ -42,7 +42,19 @@ export const ComboBoxContext = createContext<ComboBoxContextValue>([
   }
 ]);
 
-export function ComboBoxProvider(props: { children?: JSX.Element }) {
+export function useComboBox() {
+  return useContext(ComboBoxContext);
+}
+
+export interface ComboBoxProps {
+  children?: JSX.Element;
+  value?: any;
+  onChange?: (value: any) => void;
+  loading?: boolean;
+  setSelected: (selected: any) => void;
+}
+
+export function ComboBox(props: ComboBoxProps) {
   const [state, setState] = createStore<ComboBoxState>({
     open: false,
     selected: {},
@@ -50,6 +62,7 @@ export function ComboBoxProvider(props: { children?: JSX.Element }) {
     typing: false
   });
 
+  // setup the combobox context value to pass to the provider component
   const comboBox: ComboBoxContextValue = [
     state,
     {
@@ -57,7 +70,12 @@ export function ComboBoxProvider(props: { children?: JSX.Element }) {
         setState('open', open);
       },
       setSelected(selected: any) {
-        setState('selected', selected);
+        // set selected will call the prop setSelected to ideally update props.value
+        // we now listen for props.value to change and update internal selected state in an effect right below
+        // this allows for outside components to update the internal state of this component rather than isolate it
+        if (props.value?.id !== selected?.id || props.value?.id === undefined) {
+          props.setSelected(selected);
+        }
       },
       setActive(active: string) {
         setState('active', active);
@@ -68,11 +86,18 @@ export function ComboBoxProvider(props: { children?: JSX.Element }) {
     }
   ];
 
-  return <ComboBoxContext.Provider value={comboBox}>{props.children}</ComboBoxContext.Provider>;
-}
+  createEffect(() => {
+    if (props.value?.id !== state.selected?.id) {
+      // update internal selected state when the passed value changes
+      setState('selected', props.value);
+    }
+  });
 
-export function useComboBox() {
-  return useContext(ComboBoxContext);
+  return (
+    <ComboBoxContext.Provider value={comboBox}>
+      <div class="relative">{props.children}</div>
+    </ComboBoxContext.Provider>
+  );
 }
 
 function ComboOptions(props: { children?: JSX.Element }) {
@@ -168,12 +193,17 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
   });
 
   createEffect(() => {
+    // update localSelectedValue when internal selected state is changed
     if (state.selected) {
       setLocalSelectedValue(props.displayValue(state.selected));
     }
-    if (state.typing) {
+    if (state.selected === undefined) {
       setLocalSelectedValue('');
     }
+  });
+
+  createEffect(() => {
+    // separately, listen for open state to change and reset the display value
     if (!state.open) {
       setLocalSelectedValue(props.displayValue(state.selected) || '');
     }
@@ -208,49 +238,6 @@ function ComboInput(props: ComboBoxInputProps & InputProps) {
         </Show>
       </button>
     </>
-  );
-}
-
-export interface ComboBoxProps {
-  children?: JSX.Element;
-  value?: any;
-  onChange?: (value: any) => void;
-  loading?: boolean;
-  setSelected?: (selected: any) => void;
-}
-
-function ComboBoxWrapper(props: ComboBoxProps) {
-  const [state, { setSelected }] = useComboBox();
-
-  onMount(() => {
-    if (props.value) {
-      setSelected(props.value);
-    }
-    if (props.setSelected && props.value !== state.selected) {
-      props.setSelected(state.selected);
-    }
-  });
-
-  createEffect(() => {
-    if (state.selected && props.value !== state.selected) {
-      props.setSelected?.(state.selected);
-    }
-  });
-
-  createEffect(() => {
-    if (props.value) {
-      setSelected(props.value);
-    }
-  });
-
-  return <div class="relative">{props.children}</div>;
-}
-
-export function ComboBox(props: ComboBoxProps) {
-  return (
-    <ComboBoxProvider>
-      <ComboBoxWrapper {...props}>{props.children}</ComboBoxWrapper>
-    </ComboBoxProvider>
   );
 }
 

@@ -92,3 +92,29 @@ export const GetPharmaciesQuery = gql`
     }
   }
 `;
+
+export const ListPharmaciesQuery = gql`
+  query GetMailOrderPharmacies(
+    $name: String
+    $fulfillmentType: FulfillmentType
+    $integrated: Boolean
+    $limit: Int
+    $offset: Int
+  ) {
+    pharmacies(
+      name: $name
+      fulfillmentType: $fulfillmentType
+      integrated: $integrated
+      limit: $limit
+      offset: $offset
+    ) {
+      id
+      name
+      address {
+        street1
+        city
+        state
+      }
+    }
+  }
+`;

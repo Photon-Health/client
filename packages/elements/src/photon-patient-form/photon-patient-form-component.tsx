@@ -1,5 +1,5 @@
 import { customElement } from 'solid-element';
-import { createEffect, onCleanup, onMount, Show } from 'solid-js';
+import { createEffect, createMemo, onCleanup, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
 import { Spinner, PharmacySearch, Card } from '@photonhealth/components';
 import { usePhoton } from '@photonhealth/components';
@@ -20,6 +20,7 @@ import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?in
 import { isZip } from '../utils';
 import { sexes } from '../photon-sex-input/photon-sex-input-component';
 import { PhotonAuthorized } from '../photon-authorized';
+import { PharmacyOption } from '@photonhealth/components/dist/packages/components/src/systems/PharmacySearch/PharmacySearch';
 
 const getPatientAddress = (pStore: any, store: any) => {
   const patientAddress = pStore.selectedPatient.data?.address;
@@ -172,6 +173,21 @@ const PatientForm = (props: { patientId: string }) => {
   onCleanup(() => {
     pActions.clearSelectedPatient();
     actions.reset();
+  });
+
+  const preferredPharmacy = createMemo(() => {
+    const pref = pStore.selectedPatient.data?.preferredPharmacies?.[0];
+    if (!pref) return;
+
+    const address = pref.address as PharmacyOption['address'];
+    const prefOption: PharmacyOption = {
+      ...pref,
+      address,
+      isPrevious: true,
+      isPreferred: true
+    };
+
+    return prefOption;
   });
 
   return (
@@ -416,6 +432,7 @@ const PatientForm = (props: { patientId: string }) => {
                     });
                   }}
                   patientId={props.patientId}
+                  initialValue={preferredPharmacy()}
                   hidePreferred
                 />
               </div>
