@@ -698,6 +698,7 @@ export type Query = {
   patient?: Maybe<Patient>;
   /** Retrieve patients by filter (functions as an OR query returning patients that match any of the filter fields) */
   patients: Array<Patient>;
+  pharmacies: Array<Pharmacy>;
   /** Retrieve a list of all alerts for attempting to prescribe the propsed prescriptions to the given patientId */
   prescriptionScreen: PrescriptionScreenResult;
   /** Retrieve a role */
@@ -758,6 +759,15 @@ export type QueryPatientArgs = {
 
 export type QueryPatientsArgs = {
   filter: PatientsFilter;
+};
+
+
+export type QueryPharmaciesArgs = {
+  fulfillmentType?: InputMaybe<FulfillmentType>;
+  integrated?: InputMaybe<Scalars['Boolean']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 

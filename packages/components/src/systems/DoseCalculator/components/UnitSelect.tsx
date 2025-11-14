@@ -6,15 +6,13 @@ const arrayToRecordMap = (arr: string[]): RecordWithId[] =>
   arr.map((a, i) => ({ id: i.toString(), name: a }));
 
 function UnitSelect<T extends string>(props: {
+  selected?: T;
   setSelected: (value: T) => void;
   options: T[];
-  initialIdx?: number;
-  initialValue?: T;
 }) {
   const optionsWithIds = createMemo(() => arrayToRecordMap(props.options));
   const idx = createMemo(() => {
-    if (props.initialIdx) return props.initialIdx;
-    if (props.initialValue) return props.options.indexOf(props.initialValue);
+    if (props.selected) return props.options.indexOf(props.selected);
     return 0;
   });
 

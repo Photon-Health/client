@@ -59,14 +59,14 @@ const sanitizeValue = (value: number): number => (isNaN(value) || !isFinite(valu
 
 export default function DoseCalculator(props: DoseCalculatorProps) {
   const [dosage, setDosage] = createSignal(0 as DosageValue);
-  const [dosageUnit, setDosageUnit] = createSignal(dosageUnits[0]);
+  const [dosageUnit, setDosageUnit] = createSignal(dosageUnits[1]);
   const [dosageFrequency, setDosageFrequency] = createSignal(dosageFrequencies[0]);
 
   const [weight, setWeight] = createSignal(0 as WeightValue);
   const [weightUnit, setWeightUnit] = createSignal(weightUnits[0]);
 
   const [liquidConcentration, setLiquidConcentration] = createSignal(0 as LiquidDoseValue);
-  const [liquidUnit, setLiquidUnit] = createSignal(liquidDosageUnits[0]);
+  const [liquidUnit, setLiquidUnit] = createSignal(liquidDosageUnits[1]);
 
   const [perVolume, setPerVolume] = createSignal(0 as LiquidVolumeValue);
   const [perVolumeUnit, setPerVolumeUnit] = createSignal(liquidVolumeUnits[0]);
@@ -161,12 +161,20 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
                   setDosage(Math.max(e.currentTarget?.valueAsNumber || 0, 0) as DosageValue)
                 }
               />
-              <UnitSelect setSelected={setDosageUnit} options={dosageUnits} initialIdx={1} />
+              <UnitSelect
+                selected={dosageUnit()}
+                setSelected={setDosageUnit}
+                options={dosageUnits}
+              />
             </div>
             <div class="flex gap-4 items-center">
               <div>per</div>
               <div class="grow">
-                <UnitSelect setSelected={setDosageFrequency} options={dosageFrequencies} />
+                <UnitSelect
+                  selected={dosageFrequency()}
+                  setSelected={setDosageFrequency}
+                  options={dosageFrequencies}
+                />
               </div>
             </div>
           </div>
@@ -187,7 +195,7 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
               <UnitSelect
                 setSelected={setWeightUnit}
                 options={weightUnits}
-                initialValue={weightUnit()}
+                selected={weightUnit()}
               />
             </div>
           </div>
@@ -209,7 +217,11 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
                   )
                 }
               />
-              <UnitSelect setSelected={setLiquidUnit} options={liquidDosageUnits} initialIdx={1} />
+              <UnitSelect
+                selected={liquidUnit()}
+                setSelected={setLiquidUnit}
+                options={liquidDosageUnits}
+              />
             </div>
           </InputGroup>
           <InputGroup label="Per Volume">
@@ -228,7 +240,11 @@ export default function DoseCalculator(props: DoseCalculatorProps) {
                   )
                 }
               />
-              <UnitSelect setSelected={setPerVolumeUnit} options={liquidVolumeUnits} />
+              <UnitSelect
+                selected={perVolumeUnit()}
+                setSelected={setPerVolumeUnit}
+                options={liquidVolumeUnits}
+              />
             </div>
           </InputGroup>
         </div>
