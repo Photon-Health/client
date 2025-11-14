@@ -1,6 +1,7 @@
 import {
   Alert,
   AlertIcon,
+  Button,
   Container,
   Heading,
   HStack,
@@ -14,14 +15,13 @@ import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
 
 import { usePhoton } from '@photonhealth/react';
 import { Logo } from '../components/Logo';
-import { Auth } from '../components/Auth';
 import useQueryParams from '../../hooks/useQueryParams';
 
 export const Login = () => {
   const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });
   const query = useQueryParams();
   const { isAuthenticated, login, error, isLoading } = usePhoton();
-  const location = useLocation() as any;
+  const location = useLocation();
 
   // Handle invite with redirect, even if logged in
   const [searchParams] = useSearchParams();
@@ -38,6 +38,10 @@ export const Login = () => {
   if (isAuthenticated) {
     return <Navigate to="/" replace />;
   }
+
+  const onLoginClick = () => {
+    login({ appState: { returnTo: location.state?.returnToAfterLogin } });
+  };
 
   const presentedError = presentError(error);
 
@@ -79,7 +83,13 @@ export const Login = () => {
           </Stack>
         </Stack>
         <Stack spacing="4">
-          <Auth returnTo={location.state?.returnTo} />
+          {isLoading ? (
+            <Button isLoading loadingText="Loading" colorScheme="gray" />
+          ) : (
+            <Button colorScheme="blue" onClick={onLoginClick}>
+              Log in
+            </Button>
+          )}
         </Stack>
       </Stack>
     </Container>
