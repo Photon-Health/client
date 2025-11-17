@@ -68,6 +68,7 @@ const Component = (props: PrescribeProps) => {
             catalogId={props.catalogId}
             allowOffCatalogSearch={props.allowOffCatalogSearch}
             disableList={props.disableList}
+            groupId={props.groupId}
           />
         </PrescribeProvider>
       </RecentOrders>
@@ -106,7 +107,8 @@ customElement(
     catalogId: undefined,
     allowOffCatalogSearch: true,
     enableCoverageCheck: false,
-    disableList: undefined
+    disableList: undefined,
+    groupId: undefined
   },
   Component
 );

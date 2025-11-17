@@ -90,6 +90,7 @@ export type PrescribeProps = {
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
   disableList?: DisableList;
+  groupId?: string;
 };
 
 export const ScreenDraftedPrescriptionsQuery = gql`
@@ -451,6 +452,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       const { data: orderData, errors } = await orderMutation({
         variables: {
           ...(props.externalOrderId ? { externalId: props.externalOrderId } : {}),
+          ...(props.groupId ? { groupId: props.groupId } : {}),
           patientId: props.formStore.patient?.value.id,
           pharmacyId,
           fulfillmentType: props.formStore.fulfillmentType?.value || '',
