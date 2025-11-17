@@ -141,6 +141,7 @@ export class OrderQueryManager {
         $fills: [FillInput!]!
         $address: AddressInput!
         $pharmacyId: ID!
+        $groupId: ID!
       ) {
         createOrder(
           externalId: $externalId
@@ -148,6 +149,7 @@ export class OrderQueryManager {
           fills: $fills
           address: $address
           pharmacyId: $pharmacyId
+          groupId: $groupId
         ) {
           ...${fName}
         }
