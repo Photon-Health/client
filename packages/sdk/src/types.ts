@@ -260,6 +260,7 @@ export type MutationCreateOrderArgs = {
   fills: Array<FillInput>;
   patientId: Scalars['ID'];
   pharmacyId?: InputMaybe<Scalars['ID']>;
+  groupId?: InputMaybe<Scalars['ID']>;
 };
 
 export type MutationCreatePatientArgs = {
