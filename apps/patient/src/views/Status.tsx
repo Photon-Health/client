@@ -332,6 +332,7 @@ export const Status = () => {
                   color="blue.500"
                   onClick={() => {
                     setFaqModalIsOpen(true);
+                    patientAnalytics.track('Clicked Pharmacy Issue Button', order);
                   }}
                 >
                   I have a pharmacy issue
