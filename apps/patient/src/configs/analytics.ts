@@ -137,6 +137,7 @@ function mapOrderToContextData(order: Order): ContextData {
   const contextDataOrganization: ContextDataOrganization = {
     id: order.organization?.id || '',
     name: order.organization?.name || '',
+    automatedOps: order.organization?.settings?.patientUx?.enableAutomatedOps,
     address: {
       city: order.address?.city || '',
       state: order.address?.state || '',
