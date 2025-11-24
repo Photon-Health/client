@@ -17,7 +17,7 @@ import theme from '../configs/theme';
 import { demoOrder } from '../data/demoOrder';
 import { countFillsAndRemoveDuplicates, FillWithCount } from '../utils/general';
 import { Order } from '../utils/models';
-import { Pharmacy } from '../__generated__/graphql';
+import { Pharmacy, Prescription } from '../__generated__/graphql';
 import { FAQModal } from '../components/FAQModal';
 import { patientAnalytics } from '../configs/analytics';
 import { shouldShowPriceToggle } from '../utils/shouldShowPriceToggle';
@@ -39,6 +39,24 @@ export interface OrderContextType {
 export const OrderContext = createContext<OrderContextType | null>(null);
 export const useOrderContext = () =>
   useContext<OrderContextType>(OrderContext as Context<OrderContextType>);
+
+export enum PatientExperienceType {
+  CONTROLLED = 'CONTROLLED_SUBSTANCE',
+  UNCONTROLLED = 'UNCONTROLLED'
+}
+
+export type TokenPayload = {
+  organizationId: string;
+  context: PatientExperienceType;
+  metadata?: {
+    reason: PatientExperienceType;
+  };
+  prescriptions?: Prescription[];
+  pharmacyId: string;
+  iat: number;
+  exp: number;
+  sub: string; // the subject is the patient id
+};
 
 export const Main = () => {
   const [searchParams] = useSearchParams();
@@ -108,7 +126,23 @@ export const Main = () => {
   );
 
   useEffect(() => {
-    if (location.pathname !== '/canceled') {
+    // need to parse the token and see if this is a controlled substance link
+    let tokenData: TokenPayload | undefined;
+    try {
+      const base64TokenData = token?.split('.')?.[1];
+      tokenData = base64TokenData ? JSON.parse(atob(base64TokenData)) : undefined;
+    } catch (err) {
+      console.error('failed to parse token data', { err });
+    }
+
+    const isControlled =
+      tokenData?.context === PatientExperienceType.CONTROLLED ||
+      tokenData?.metadata?.reason === PatientExperienceType.CONTROLLED;
+
+    if (location.pathname === '/' && isControlled) {
+      // info lives outside of the main path, so none of these effect hooks will affect the ux
+      navigate('/info', { replace: true });
+    } else if (!['/canceled', '/info'].includes(location.pathname)) {
       if (!isDemo && (!orderId || !token)) {
         navigate('/no-match', { replace: true });
       }
@@ -196,7 +230,8 @@ export const Main = () => {
   }, [isDemo, location.pathname, navigate, order, orderId, phone]);
 
   useEffect(() => {
-    if (!order) {
+    // it's valid to not have an orderId since we're notifying patients of controlled substances in athena
+    if (!order && orderId) {
       fetchOrder();
     }
   }, [order, orderId, fetchOrder, isDemo]);
