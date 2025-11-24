@@ -124,7 +124,7 @@ export const SelfSignupPage = () => {
                     </FormControl>
                     <Text fontSize="sm" color="gray">
                       Photon will use this email to contact you if issues arise with your
-                      prescriptions
+                      prescriptions.
                     </Text>
 
                     <FormControl isRequired isInvalid={!!errors.npi && touched.npi}>
