@@ -90,10 +90,19 @@ export const SelfSignupPage = () => {
 
                   <Heading size={useBreakpointValue({ base: 'xs' })}>
                     Create Your Prescriber Account
-                    <Text fontSize="md" color="gray">
-                      Please confirm your details:
-                    </Text>
                   </Heading>
+                  <Alert status="info">
+                    <AlertIcon />
+                    <VStack alignItems="start">
+                      <Text fontSize="sm">
+                        Please note that your NPI, Phone, and Address will be required. Pharmacies
+                        use this information to ensure safe and compliant prescription fulfillment.
+                      </Text>
+                    </VStack>
+                  </Alert>
+                  <Text fontSize="md" color="gray">
+                    Please confirm your details:
+                  </Text>
 
                   <Stack>
                     <FormControl isRequired isInvalid={!!errors.firstName && touched.firstName}>
@@ -113,6 +122,10 @@ export const SelfSignupPage = () => {
                       <Field as={Input} id="email" name="email" type="email" autoComplete="email" />
                       <ErrorMessage name="email" component={FormErrorMessage} />
                     </FormControl>
+                    <Text fontSize="sm" color="gray">
+                      Photon will use this email to contact you if issues arise with your
+                      prescriptions
+                    </Text>
 
                     <FormControl isRequired isInvalid={!!errors.npi && touched.npi}>
                       <FormLabel htmlFor="npi">NPI</FormLabel>
@@ -149,6 +162,10 @@ export const SelfSignupPage = () => {
                       />
                       <ErrorMessage name="fax" component={FormErrorMessage} />
                     </FormControl>
+                    <Text fontSize="sm" color="gray">
+                      Pharmacies may use this fax number to reach you if there are questions or
+                      issues with your prescriptions.
+                    </Text>
                   </Stack>
                 </Stack>
                 <Stack spacing="4">
