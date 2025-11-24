@@ -141,7 +141,7 @@ export const Main = () => {
 
     if (location.pathname === '/' && isControlled) {
       // info lives outside of the main path, so none of these effect hooks will affect the ux
-      navigate('/info', { replace: true });
+      navigate(`/info?token=${token}`, { replace: true });
     } else if (!['/canceled', '/info'].includes(location.pathname)) {
       if (!isDemo && (!orderId || !token)) {
         navigate('/no-match', { replace: true });
