@@ -1,26 +1,24 @@
 import { customElement } from 'solid-element';
 import { createEffect, createMemo, onCleanup, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
-import { Spinner, PharmacySearch, Card } from '@photonhealth/components';
-import { usePhoton } from '@photonhealth/components';
+import { Card, PharmacySearch, Spinner, usePhoton } from '@photonhealth/components';
 import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
 import tailwind from '../tailwind.css?inline';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { email, empty, message, zipString, notFutureDate } from '../validators';
+import { email, empty, message, notFutureDate, zipString } from '../validators';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/spinner/spinner';
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-
-setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
-
 import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
 import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
 import { isZip } from '../utils';
-import { sexes } from '../photon-sex-input/photon-sex-input-component';
+import { sexes } from '../photon-sex-input';
 import { PhotonAuthorized } from '../photon-authorized';
 import { PharmacyOption } from '@photonhealth/components/dist/packages/components/src/systems/PharmacySearch/PharmacySearch';
+
+setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 const getPatientAddress = (pStore: any, store: any) => {
   const patientAddress = pStore.selectedPatient.data?.address;
@@ -82,9 +80,22 @@ const PatientForm = (props: { patientId: string }) => {
     key: 'email',
     validator: message(union([email(), empty()]), 'Please enter a valid email.')
   });
+
+  actions.registerValidator({
+    key: 'address_street1',
+    validator: message(size(string(), 1, Infinity), 'Please enter a valid Street 1.')
+  });
+  actions.registerValidator({
+    key: 'address_city',
+    validator: message(size(string(), 1, Infinity), 'Please enter a valid City.')
+  });
+  actions.registerValidator({
+    key: 'address_state',
+    validator: message(size(string(), 2, 2), 'Please enter a valid State.')
+  });
   actions.registerValidator({
     key: 'address_zip',
-    validator: message(union([zipString(), empty()]), 'Please enter a valid zip code...')
+    validator: message(zipString(), 'Please enter a valid zip code.')
   });
 
   onMount(() => {
@@ -345,6 +356,7 @@ const PatientForm = (props: { patientId: string }) => {
                   invalid={store['address_street1']?.error}
                   help-text={store['address_street1']?.error}
                   label="Street 1"
+                  required="true"
                   on:photon-input-changed={async (e: any) => {
                     actions.updateFormValue({
                       key: 'address_street1',
@@ -376,6 +388,7 @@ const PatientForm = (props: { patientId: string }) => {
                   invalid={store['address_city']?.error}
                   help-text={store['address_city']?.error}
                   label="City"
+                  required="true"
                   on:photon-input-changed={async (e: any) => {
                     actions.updateFormValue({
                       key: 'address_city',
@@ -388,7 +401,7 @@ const PatientForm = (props: { patientId: string }) => {
                   <photon-state-input
                     class="flex-grow min-w-[40%]"
                     label="State"
-                    required="false"
+                    required="true"
                     help-text={store['address_state']?.error}
                     invalid={store['address_state']?.error !== undefined}
                     on:photon-state-selected={(e: any) => {
@@ -405,6 +418,7 @@ const PatientForm = (props: { patientId: string }) => {
                     invalid={store['address_zip']?.error}
                     help-text={store['address_zip']?.error}
                     label="Zip Code"
+                    required="true"
                     on:photon-input-changed={async (e: any) => {
                       actions.updateFormValue({
                         key: 'address_zip',
