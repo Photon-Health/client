@@ -1,8 +1,7 @@
 import { customElement } from 'solid-element';
 import { createSignal, Show } from 'solid-js';
 import { size, string } from 'superstruct';
-import { Button } from '@photonhealth/components';
-import { usePhoton } from '@photonhealth/components';
+import { Button, usePhoton } from '@photonhealth/components';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
 import { message } from '../validators';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
