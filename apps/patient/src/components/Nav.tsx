@@ -15,6 +15,7 @@ import { useSearchParams } from 'react-router-dom';
 import { text as t } from '../utils/text';
 import { useOrderContext } from '../views/Main';
 import { Logo as PhotonLogo } from './Logo';
+import { patientAnalytics } from '../configs/analytics';
 
 interface NavProps {
   showRefresh?: boolean;
@@ -25,7 +26,7 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
   const isDemo = searchParams.get('demo');
   const isProd = process.env.REACT_APP_ENV_NAME === 'photon';
 
-  const { flattenedFills, logo, setFaqModalIsOpen } = useOrderContext();
+  const { order, flattenedFills, logo, setFaqModalIsOpen } = useOrderContext();
 
   const isMultiRx = flattenedFills.length > 1;
 
@@ -81,6 +82,7 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
             size="sm"
             onClick={() => {
               setFaqModalIsOpen(true);
+              patientAnalytics.track('Clicked Help Button', order);
             }}
           >
             Help
