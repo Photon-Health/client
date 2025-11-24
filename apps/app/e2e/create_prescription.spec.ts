@@ -4,7 +4,7 @@ test('user can login and create patient', async ({ page }) => {
   await page.goto('/');
 
   await page.getByRole('link', { name: /Patients/ }).click();
-  await page.getByRole('link', { name: /New Patient/ }).click();
+  await page.getByRole('link', { name: /New patient/ }).click();
 
   const patientNumber = getRandomInt(0, 100_000_000);
 

@@ -158,7 +158,7 @@ const Component = (props: PatientDialogProps) => {
             actions().resetStores();
             props.open = false;
           }}
-          title={props?.patientId ? 'Update Patient' : 'Create Patient'}
+          title={props?.patientId ? 'Update patient' : 'New patient'}
           titleIconName={props?.patientId ? 'pencil-square' : 'person-plus'}
           headerRight={
             <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
@@ -170,7 +170,7 @@ const Component = (props: PatientDialogProps) => {
                   loading={loading() && isCreatePrescription()}
                   onClick={() => submitForm(formStore(), actions(), selectedStore(), true)}
                 >
-                  Save and Create Prescription
+                  {props?.patientId ? 'Update' : 'Create'} and start prescription
                 </Button>
               </Show>
               <Button
@@ -179,7 +179,7 @@ const Component = (props: PatientDialogProps) => {
                 loading={loading() && !isCreatePrescription()}
                 onClick={() => submitForm(formStore(), actions(), selectedStore(), false)}
               >
-                Save
+                {props?.patientId ? 'Update' : 'Create'} patient
               </Button>
             </div>
           }
