@@ -14,6 +14,11 @@ test('user can login and create patient', async ({ page }) => {
   await page.getByLabel('Mobile Number').fill('8886543210');
   await page.getByLabel('Sex at Birth').click();
   await page.getByRole('menuitem', { name: 'MALE', exact: true }).click();
+  await page.getByLabel('Street 1').fill('1 E2E Test St.');
+  await page.getByLabel('City').fill('e2e-test-city');
+  await page.getByLabel('State').click();
+  await page.getByRole('menuitem', { name: 'AL', exact: true }).click();
+  await page.getByLabel('Zip Code').fill('12345');
 
   await page.getByRole('button', { name: 'Save', exact: true }).click();
 
