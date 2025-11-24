@@ -9,8 +9,15 @@ import {
   FormErrorMessage,
   FormLabel,
   Heading,
+  HStack,
+  IconButton,
   Input,
   Link,
+  Popover,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
+  Portal,
   Stack,
   Text,
   useBreakpointValue,
@@ -22,6 +29,7 @@ import { auth0Config } from '../../../../configs/auth';
 import { Logo } from '../../../components/Logo';
 import { FormikStateSelect } from '../../Settings/components/utils/States';
 import { SignupFormData, signupFormSchema } from './form';
+import { FaInfoCircle } from 'react-icons/fa';
 
 export const SelfSignupPage = () => {
   const [searchParams] = useSearchParams();
@@ -84,16 +92,24 @@ export const SelfSignupPage = () => {
                   <Alert status="warning">
                     <AlertIcon />
                     <VStack alignItems="start">
-                      <Text fontWeight="bold">Required before writing prescriptions</Text>
+                      <Text fontWeight="medium" color="yellow.600">
+                        Required before writing prescriptions
+                      </Text>
                     </VStack>
                   </Alert>
 
-                  <Heading size={useBreakpointValue({ base: 'xs' })}>
-                    Create Your Prescriber Account
+                  <VStack alignItems="start">
+                    <Heading size={useBreakpointValue({ base: 'xs' })}>
+                      Create Your Prescriber Account
+                    </Heading>
+                    <Text fontSize="md" color="gray">
+                      Please note that your NPI, Phone, and Address will be required. Pharmacies use
+                      this information to ensure safe and compliant prescription fulfillment.
+                    </Text>
                     <Text fontSize="md" color="gray">
                       Please confirm your details:
                     </Text>
-                  </Heading>
+                  </VStack>
 
                   <Stack>
                     <FormControl isRequired isInvalid={!!errors.firstName && touched.firstName}>
@@ -109,7 +125,31 @@ export const SelfSignupPage = () => {
                     </FormControl>
 
                     <FormControl isRequired isInvalid={!!errors.email && touched.email}>
-                      <FormLabel htmlFor="email">Email</FormLabel>
+                      <HStack spacing="0" alignItems="center">
+                        <FormLabel htmlFor="email" marginRight="0" marginBottom="0">
+                          Email
+                        </FormLabel>
+                        <Popover placement={'top-start'}>
+                          <PopoverTrigger>
+                            <IconButton
+                              variant="ghost"
+                              color="gray"
+                              size="xs"
+                              aria-label="Why is email required?"
+                              icon={<FaInfoCircle />}
+                            />
+                          </PopoverTrigger>
+                          <Portal>
+                            <PopoverContent>
+                              <PopoverBody>
+                                Photon will use this email to contact you if issues arise with your
+                                prescriptions.
+                              </PopoverBody>
+                            </PopoverContent>
+                          </Portal>
+                        </Popover>
+                      </HStack>
+
                       <Field as={Input} id="email" name="email" type="email" autoComplete="email" />
                       <ErrorMessage name="email" component={FormErrorMessage} />
                     </FormControl>
@@ -139,7 +179,30 @@ export const SelfSignupPage = () => {
                     </FormControl>
 
                     <FormControl isInvalid={!!errors.fax && touched.fax}>
-                      <FormLabel htmlFor="fax">Fax</FormLabel>
+                      <HStack spacing="0" alignItems="center">
+                        <FormLabel htmlFor="fax" marginRight="0" marginBottom="0">
+                          Fax
+                        </FormLabel>
+                        <Popover placement={'top-start'}>
+                          <PopoverTrigger>
+                            <IconButton
+                              variant="ghost"
+                              color="gray"
+                              size="xs"
+                              aria-label="Why provide my fax?"
+                              icon={<FaInfoCircle />}
+                            />
+                          </PopoverTrigger>
+                          <Portal>
+                            <PopoverContent>
+                              <PopoverBody>
+                                Pharmacies may use this fax number to reach you if there are
+                                questions or issues with your prescriptions.
+                              </PopoverBody>
+                            </PopoverContent>
+                          </Portal>
+                        </Popover>
+                      </HStack>
                       <Field
                         as={Input}
                         id="fax"
