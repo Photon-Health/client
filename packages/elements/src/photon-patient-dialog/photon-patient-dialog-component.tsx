@@ -105,7 +105,7 @@ const Component = (props: PatientDialogProps) => {
         last: store['lastName']!.value
       },
       gender: store['gender']!.value,
-      email: store['email']!.value,
+      email: store['email']!.value ? store['email']!.value : undefined,
       phone: store['phone']!.value,
       dateOfBirth: store['dateOfBirth']!.value,
       sex: store['sex']!.value,
