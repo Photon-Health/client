@@ -1,10 +1,7 @@
 import { customElement } from 'solid-element';
 import { createSignal, Show } from 'solid-js';
-import { size, string } from 'superstruct';
-import { Button } from '@photonhealth/components';
-import { usePhoton } from '@photonhealth/components';
+import { Button, usePhoton } from '@photonhealth/components';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
-import { message } from '../validators';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 
 type PatientDialogProps = {
@@ -60,33 +57,18 @@ const Component = (props: PatientDialogProps) => {
     setGlobalError(undefined);
     setIsCreatePrescription(createPrescription);
     setLoading(true);
-    let keys: string[] = ['firstName', 'lastName', 'dateOfBirth', 'phone', 'sex', 'email'];
-
-    if (
-      store['address_street1']?.value !== undefined ||
-      store['address_city']?.value !== undefined ||
-      store['address_state']?.value !== undefined ||
-      store['address_zip']?.value !== undefined
-    ) {
-      actions.registerValidator({
-        key: 'address_street1',
-        validator: message(size(string(), 1, Infinity), 'Please enter a valid Street 1..')
-      });
-      actions.registerValidator({
-        key: 'address_city',
-        validator: message(size(string(), 1, Infinity), 'Please enter a valid City..')
-      });
-      actions.registerValidator({
-        key: 'address_state',
-        validator: message(size(string(), 2, 2), 'Please enter a valid State..')
-      });
-      keys = [...keys, 'address_zip', 'address_street1', 'address_city', 'address_state'];
-    } else {
-      const keysToRemove = ['address_street1', 'address_city', 'address_state'];
-      for (const key of keysToRemove) {
-        actions.unRegisterValidator(key);
-      }
-    }
+    const keys = [
+      'firstName',
+      'lastName',
+      'dateOfBirth',
+      'phone',
+      'sex',
+      'email',
+      'address_street1',
+      'address_city',
+      'address_state',
+      'address_zip'
+    ];
 
     actions.validate(keys);
     if (actions.hasErrors(keys)) {
@@ -123,7 +105,7 @@ const Component = (props: PatientDialogProps) => {
         last: store['lastName']!.value
       },
       gender: store['gender']!.value,
-      email: store['email']!.value,
+      email: store['email']!.value ? store['email']!.value : undefined,
       phone: store['phone']!.value,
       dateOfBirth: store['dateOfBirth']!.value,
       sex: store['sex']!.value,
