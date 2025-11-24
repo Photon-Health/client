@@ -92,7 +92,7 @@ export const SelfSignupPage = () => {
                   <Alert status="warning">
                     <AlertIcon />
                     <VStack alignItems="start">
-                      <Text fontWeight="bold" color="yellow.600">
+                      <Text fontWeight="medium" color="yellow.600">
                         Required before writing prescriptions
                       </Text>
                     </VStack>
