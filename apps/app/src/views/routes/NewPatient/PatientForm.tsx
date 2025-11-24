@@ -1,4 +1,4 @@
-import { useRef, MutableRefObject, useEffect } from 'react';
+import { MutableRefObject, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 declare global {
