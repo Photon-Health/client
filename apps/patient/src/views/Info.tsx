@@ -84,11 +84,12 @@ export function InfoPage() {
         setOrganization(pageData.organization);
       } catch (err) {
         console.error('Failed to fetch data', { err });
+        navigate('/no-match', { replace: true });
       }
     }
 
     fetchInfoData();
-  }, [tokenPayload]);
+  }, [navigate, tokenPayload]);
 
   useEffect(() => {
     async function preloadLogo() {
