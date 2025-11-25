@@ -288,27 +288,6 @@ const PatientForm = (props: { patientId: string }) => {
                 </div>
                 <div class="flex flex-col xs:flex-row justify-between xs:gap-4">
                   <div class="flex-grow w-full xs:min-w-[40%]">
-                    <photon-gender-input
-                      label="Gender"
-                      required="false"
-                      help-text={store['gender']?.error}
-                      invalid={store['gender']?.error !== undefined}
-                      on:photon-gender-selected={(e: any) => {
-                        actions.updateFormValue({
-                          key: 'gender',
-                          value: e.detail.gender
-                        });
-                      }}
-                      on:photon-gender-deselected={() => {
-                        actions.updateFormValue({
-                          key: 'gender',
-                          value: undefined
-                        });
-                      }}
-                      selected={pStore.selectedPatient.data?.gender}
-                    />
-                  </div>
-                  <div class="flex-grow w-full xs:min-w-[40%]">
                     <photon-sex-input
                       label="Sex at Birth"
                       required="true"
@@ -327,6 +306,27 @@ const PatientForm = (props: { patientId: string }) => {
                         });
                       }}
                       selected={pStore.selectedPatient.data?.sex}
+                    />
+                  </div>
+                  <div class="flex-grow w-full xs:min-w-[40%]">
+                    <photon-gender-input
+                      label="Gender"
+                      required="false"
+                      help-text={store['gender']?.error}
+                      invalid={store['gender']?.error !== undefined}
+                      on:photon-gender-selected={(e: any) => {
+                        actions.updateFormValue({
+                          key: 'gender',
+                          value: e.detail.gender
+                        });
+                      }}
+                      on:photon-gender-deselected={() => {
+                        actions.updateFormValue({
+                          key: 'gender',
+                          value: undefined
+                        });
+                      }}
+                      selected={pStore.selectedPatient.data?.gender}
                     />
                   </div>
                 </div>
