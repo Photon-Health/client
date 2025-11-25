@@ -146,13 +146,19 @@ export function InfoPage() {
         </Box>
       )}
       <Box bgColor="white">
-        <Container py={6}>
+        <Container pt={6} pb={3}>
           <OrderStatusHeader
             status="SENT"
             fulfillmentType={pharmacy.fulfillmentTypes?.[0]}
             integrated={false}
             subHeaderOverride="Your order was sent to the pharmacy"
           />
+          <Text mt={6}>
+            <Text as="span" color="gray.500">
+              Patient{' '}
+            </Text>
+            <Text as="span">{me.name.full}</Text>
+          </Text>
         </Container>
       </Box>
       <Container my={4}>
