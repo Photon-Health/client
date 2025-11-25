@@ -176,8 +176,7 @@ export const Status = () => {
 
   const primaryButtonStyle = {
     variant: 'solid',
-    bg: 'blue.600',
-    _hover: { bg: 'blue.700' },
+    colorScheme: 'blue',
     color: 'white'
   };
 
@@ -203,7 +202,7 @@ export const Status = () => {
       onClick={handleCallPharmacy}
       leftIcon={<FiPhoneCall />}
       w="full"
-      {...(isPrimary ? primaryButtonStyle : { variant: 'outline', color: 'blue.500' })}
+      {...(isPrimary ? primaryButtonStyle : { variant: 'outline', color: 'blue.600' })}
     >
       {t.callPharmacy}
     </Button>
