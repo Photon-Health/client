@@ -202,7 +202,7 @@ export const Status = () => {
       onClick={handleCallPharmacy}
       leftIcon={<FiPhoneCall />}
       w="full"
-      {...(isPrimary ? primaryButtonStyle : { variant: 'outline', color: 'blue.600' })}
+      {...(isPrimary ? primaryButtonStyle : { variant: 'outline', color: 'blue.500' })}
     >
       {t.callPharmacy}
     </Button>
