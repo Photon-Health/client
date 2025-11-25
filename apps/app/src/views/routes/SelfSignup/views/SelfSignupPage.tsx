@@ -106,7 +106,7 @@ export const SelfSignupPage = () => {
                       Please note that your NPI, Phone, and Address will be required. Pharmacies use
                       this information to ensure safe and compliant prescription fulfillment.
                     </Text>
-                    <Text fontSize="md" color="gray">
+                    <Text fontSize="md" marginTop="4">
                       Please confirm your details:
                     </Text>
                   </VStack>
@@ -289,7 +289,7 @@ export const SelfSignupPage = () => {
                   </FormControl>
 
                   <Button type="submit" isLoading={isSubmitting}>
-                    Create Account
+                    Submit
                   </Button>
                 </Stack>
               </Stack>

@@ -1,12 +1,14 @@
 import { clsx } from 'clsx';
-import { JSX, Show, mergeProps, splitProps, createMemo } from 'solid-js';
+import { createMemo, JSX, mergeProps, Show, splitProps } from 'solid-js';
 import Spinner from '../Spinner';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'tertiary' | 'naked';
 export type ButtonSize = 'xl' | 'lg' | 'md' | 'sm' | 'xs';
+export type ButtonColor = 'blue' | 'gray' | 'red';
 
 export interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
+  color?: ButtonColor;
   size?: ButtonSize;
   iconLeft?: JSX.Element;
   loading?: boolean;
@@ -17,13 +19,20 @@ export default function Button(props: ButtonProps) {
   const [otherProps, buttonProps] = splitProps(merged, [
     'variant',
     'size',
+    'color',
     'children',
     'iconLeft',
     'loading'
   ]);
 
-  const buttonClasses = createMemo(() =>
-    clsx(
+  const buttonClasses = createMemo(() => {
+    const color = otherProps.color || 'gray';
+    const secondaryClasses =
+      otherProps.variant === 'secondary' && otherProps.color
+        ? `rounded bg-white text-${color}-600 shadow-sm ring-1 ring-inset ring-${color}-500 hover:bg-${color}-50`
+        : '';
+
+    return clsx(
       'font-semibold flex justify-center inline-flex items-center gap-x-1',
       {
         'shadow-sm': otherProps.variant !== 'naked',
@@ -39,7 +48,7 @@ export default function Button(props: ButtonProps) {
         'text-white bg-blue-500 hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2':
           otherProps.variant === 'primary',
         'rounded bg-white text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50':
-          otherProps.variant === 'secondary',
+          otherProps.variant === 'secondary' && !otherProps.color,
         'text-white bg-red-500 hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2':
           otherProps.variant === 'danger',
         'bg-blue-50 text-blue-600 hover:bg-blue-100': otherProps.variant === 'tertiary',
@@ -47,9 +56,10 @@ export default function Button(props: ButtonProps) {
           otherProps.variant === 'naked',
         'opacity-50 cursor-not-allowed': buttonProps.disabled || otherProps.loading
       },
+      secondaryClasses,
       props?.class
-    )
-  );
+    );
+  });
 
   return (
     <button
