@@ -24,6 +24,7 @@ import theme from '../configs/theme';
 import { OrderStatusHeader } from '../components/status/Header';
 import { getInfoPageData } from '../api';
 import { OrderDetailsModal, PrescriptionData } from '../components/order-details/OrderDetailsModal';
+import { Helmet } from 'react-helmet';
 
 export function InfoPage() {
   const navigate = useNavigate();
@@ -127,6 +128,9 @@ export function InfoPage() {
 
   return (
     <ChakraProvider theme={theme({ accentColor: organization?.settings?.brandColor })}>
+      <Helmet>
+        <title>Order was sent</title>
+      </Helmet>
       <ScrollRestoration />
       {logo && (
         <Box
