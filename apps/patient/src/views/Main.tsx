@@ -17,7 +17,7 @@ import theme from '../configs/theme';
 import { demoOrder } from '../data/demoOrder';
 import { countFillsAndRemoveDuplicates, FillWithCount } from '../utils/general';
 import { Order } from '../utils/models';
-import { Pharmacy, Prescription } from '../__generated__/graphql';
+import { Pharmacy } from '../__generated__/graphql';
 import { FAQModal } from '../components/FAQModal';
 import { patientAnalytics } from '../configs/analytics';
 import { shouldShowPriceToggle } from '../utils/shouldShowPriceToggle';
@@ -45,13 +45,25 @@ export enum PatientExperienceType {
   UNCONTROLLED = 'UNCONTROLLED'
 }
 
+type TokenPrescriptionData = {
+  dispenseQuantity: number;
+  dispenseUnit: string;
+  externalId: string;
+  instructions: string;
+  notes: string;
+  refillsAllowed: number;
+  daysSupply?: number;
+  expiresAt?: string;
+  treatment: { id: string; name: string; schedule: string };
+};
+
 export type TokenPayload = {
   organizationId: string;
   context: PatientExperienceType;
   metadata?: {
     reason: PatientExperienceType;
   };
-  prescriptions?: Prescription[];
+  prescriptions?: TokenPrescriptionData[];
   pharmacyId: string;
   iat: number;
   exp: number;
