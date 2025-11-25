@@ -125,8 +125,6 @@ export function InfoPage() {
     );
   }
 
-  console.log({ tokenPayload });
-
   return (
     <ChakraProvider theme={theme({ accentColor: organization?.settings?.brandColor })}>
       <ScrollRestoration />
