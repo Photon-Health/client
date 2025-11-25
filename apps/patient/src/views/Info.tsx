@@ -52,7 +52,7 @@ export function InfoPage() {
     [tokenPayload?.prescriptions]
   );
 
-  // effect hook to parse the token from the query params, then wipe it from query params
+  // effect hook to parse the token from the query params
   useEffect(() => {
     const tokenParam = searchParams.get('token');
     if (tokenParam) {
@@ -61,7 +61,6 @@ export function InfoPage() {
         const base64TokenData = tokenParam?.split('.')?.[1];
         const tokenData = base64TokenData ? JSON.parse(atob(base64TokenData)) : undefined;
         setTokenPayload(tokenData);
-        navigate('/info', { replace: true });
       } catch (err) {
         console.error('failed to parse token data', { err });
         navigate('/no-match', { replace: true });
