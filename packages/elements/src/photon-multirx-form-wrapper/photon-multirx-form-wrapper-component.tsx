@@ -1,10 +1,9 @@
-import { Button, triggerToast } from '@photonhealth/components';
+import { Button, triggerToast, usePhoton } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { format } from 'date-fns';
 import jwtDecode from 'jwt-decode';
 import { customElement } from 'solid-element';
 import { createSignal, onMount } from 'solid-js';
-import { usePhoton } from '@photonhealth/components';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
 import { PatientStore } from '../stores/patient';
 
@@ -197,17 +196,25 @@ const Component = (props: {
           patientActions.clearSelectedPatient();
         }}
         checkShouldWarn={() => shouldWarn(form)}
-        title="New Prescriptions"
+        title="New prescription"
         titleIconName="prescription"
-        headerRight={
+        footer={
           hideOrderButton() ? null : props.enableOrder ? (
-            <Button size="md" loading={triggerSubmit()} onClick={handleCreateOrder}>
-              Send Order
-            </Button>
-          ) : (
-            <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
+            <div class="flex flex-col md:items-center">
               <Button
-                size="md"
+                class="w-full md:w-80"
+                size="lg"
+                loading={triggerSubmit()}
+                onClick={handleCreateOrder}
+              >
+                Send Order
+              </Button>
+            </div>
+          ) : (
+            <div class="flex flex-col gap-2 md:items-center">
+              <Button
+                class="w-full md:w-80"
+                size="lg"
                 variant="secondary"
                 loading={triggerSubmit() && !isCreateOrder()}
                 onClick={handleCreatePrescriptions}
@@ -215,7 +222,8 @@ const Component = (props: {
                 Save prescriptions
               </Button>
               <Button
-                size="md"
+                class="w-full md:w-80"
+                size="lg"
                 loading={triggerSubmit() && isCreateOrder()}
                 onClick={handleCreateOrder}
               >

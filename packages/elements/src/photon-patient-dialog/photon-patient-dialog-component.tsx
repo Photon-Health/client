@@ -160,11 +160,12 @@ const Component = (props: PatientDialogProps) => {
           }}
           title={props?.patientId ? 'Update patient' : 'New patient'}
           titleIconName={props?.patientId ? 'pencil-square' : 'person-plus'}
-          headerRight={
-            <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
+          footer={
+            <div class="flex flex-col gap-2 md:items-center">
               <Show when={!props?.hideCreatePrescription}>
                 <Button
-                  size="sm"
+                  class="w-full md:w-80"
+                  size="lg"
                   variant="secondary"
                   disabled={loading()}
                   loading={loading() && isCreatePrescription()}
@@ -174,7 +175,8 @@ const Component = (props: PatientDialogProps) => {
                 </Button>
               </Show>
               <Button
-                size="sm"
+                class="w-full md:w-80"
+                size="lg"
                 disabled={loading()}
                 loading={loading() && !isCreatePrescription()}
                 onClick={() => submitForm(formStore(), actions(), selectedStore(), false)}
