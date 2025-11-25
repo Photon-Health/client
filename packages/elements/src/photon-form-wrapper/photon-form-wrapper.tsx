@@ -49,28 +49,31 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
       </photon-dialog>
 
       {/* Wrapper */}
-      <header class="z-40 flex items-center gap-2 px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full shadow-card">
-        <Button
-          variant="naked"
-          size="sm"
-          onClick={() => {
-            if (props.checkShouldWarn()) {
-              onCloseDialogOpen(true);
-            } else {
-              props.onClosed();
-            }
-          }}
-        >
-          <div class="text-black text-xl md:text-3xl">
-            <Icon name="xMark" />
-          </div>
-        </Button>
-        <div class="flex-1 flex justify-center items-center min-w-0">
+      <header class="z-40 flex items-center px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full shadow-card">
+        <div class="flex items-center">
+          <Button
+            variant="naked"
+            size="sm"
+            onClick={() => {
+              if (props.checkShouldWarn()) {
+                onCloseDialogOpen(true);
+              } else {
+                props.onClosed();
+              }
+            }}
+          >
+            <div class="text-black text-xl md:text-3xl">
+              <Icon name="xMark" />
+            </div>
+          </Button>
+        </div>
+        <div class="flex-1 flex justify-center items-center min-w-0 px-2">
           <Show when={props.titleIconName}>
             <sl-icon name={props.titleIconName} class="flex-shrink-0" />
           </Show>
           <p class="ml-1 font-sans text-lg md:text-xl font-medium truncate">{props.title}</p>
         </div>
+        <div class="flex items-center w-[44px]" />
       </header>
       <div class="z-30 w-full min-h-screen bg-[#F9FAFB] pt-14">
         <div class="px-4 pb-40 md:pt-4 md:pb-52 md:px-4 w-full h-full sm:w-[600px] xs:mx-auto">
