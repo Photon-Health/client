@@ -337,8 +337,34 @@ export const GET_PHARMACIES = gql`
   }
 `;
 
-export const GET_PHARMACY = gql`
-  query GetPharmacy($pharmacyId: ID!, $openAt: DateTime) {
+export const GET_INFO_PAGE_DATA = gql`
+  query GetInfoPageData($organizationId: ID!, $pharmacyId: ID!, $openAt: DateTime) {
+    me {
+      name {
+        full
+        title
+        first
+        middle
+        last
+      }
+    }
+    organization(id: $organizationId) {
+      id
+      name
+      settings {
+        id
+        organizationId
+        brandColor
+        brandLogo
+        priorAuthorizationExceptionMessage
+        patientUx {
+          enableAutomatedOps
+          enablePatientRerouting
+          enablePatientDeliveryPharmacies
+          patientFeaturedPharmacyName
+        }
+      }
+    }
     pharmacy(id: $pharmacyId) {
       ...PharmacyFields
     }
