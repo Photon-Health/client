@@ -93,6 +93,16 @@ export async function getPharmacies({
   }
 }
 
+export async function getPharmacy({ id, openAt = new Date() }: { id: string; openAt?: Date }) {
+  try {
+    return await graphQLClient.GetPharmacy({ pharmacyId: id, openAt });
+  } catch (e: any) {
+    const errorMessage =
+      e?.response?.errors?.[0]?.message ?? 'Unkown error occurred on getPharmacies';
+    throw new Error(errorMessage);
+  }
+}
+
 /**
  * Mutations
  */

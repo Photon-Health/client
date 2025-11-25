@@ -236,6 +236,7 @@ const PHARMACY_FIELDS = gql`
   fragment PharmacyFields on Pharmacy {
     id
     name
+    logo
     address {
       street1
       street2
@@ -244,6 +245,7 @@ const PHARMACY_FIELDS = gql`
       country
       postalCode
     }
+    phone
     fulfillmentTypes
     integrated
     distance
@@ -333,6 +335,15 @@ export const GET_PHARMACIES = gql`
       fulfillmentTypes
     }
   }
+`;
+
+export const GET_PHARMACY = gql`
+  query GetPharmacy($pharmacyId: ID!, $openAt: DateTime) {
+    pharmacy(id: $pharmacyId) {
+      ...PharmacyFields
+    }
+  }
+  ${PHARMACY_FIELDS}
 `;
 
 export const GET_OFFERS = gql`
