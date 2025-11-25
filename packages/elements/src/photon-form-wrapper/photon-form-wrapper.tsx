@@ -82,7 +82,7 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
       </div>
       <Show when={props.footer}>
         <footer class="z-40 fixed bottom-0 w-full bg-white shadow-card px-4 py-4 md:px-8">
-          <div class="flex flex-col md:flex-row-reverse md:justify-start gap-2 items-center w-full sm:w-[600px] xs:mx-auto sm:px-4">
+          <div class="flex flex-col xs:flex-row-reverse xs:justify-start gap-2 items-center w-full sm:w-[600px] xs:mx-auto sm:px-4">
             {props.footer}
           </div>
         </footer>

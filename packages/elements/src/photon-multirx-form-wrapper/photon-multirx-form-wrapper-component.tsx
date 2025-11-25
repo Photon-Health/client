@@ -201,7 +201,7 @@ const Component = (props: {
         footer={
           hideOrderButton() ? null : props.enableOrder ? (
             <Button
-              class="w-full md:w-fit"
+              class="w-full xs:w-fit"
               size="lg"
               loading={triggerSubmit()}
               onClick={handleCreateOrder}
@@ -211,7 +211,7 @@ const Component = (props: {
           ) : (
             <>
               <Button
-                class="w-full md:w-fit"
+                class="w-full xs:w-fit"
                 size="lg"
                 loading={triggerSubmit() && isCreateOrder()}
                 onClick={handleCreateOrder}
@@ -219,7 +219,7 @@ const Component = (props: {
                 Save and create order
               </Button>
               <Button
-                class="w-full md:w-fit"
+                class="w-full xs:w-fit"
                 size="lg"
                 variant="secondary"
                 loading={triggerSubmit() && !isCreateOrder()}

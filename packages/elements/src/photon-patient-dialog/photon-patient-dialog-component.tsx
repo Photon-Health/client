@@ -163,7 +163,7 @@ const Component = (props: PatientDialogProps) => {
           footer={
             <Show when={!props?.hideCreatePrescription}>
               <Button
-                class="w-full md:w-fit"
+                class="w-full xs:w-fit"
                 size="lg"
                 disabled={loading()}
                 loading={loading() && !isCreatePrescription()}
@@ -172,7 +172,7 @@ const Component = (props: PatientDialogProps) => {
                 {props?.patientId ? 'Update' : 'Create'} patient
               </Button>
               <Button
-                class="w-full md:w-fit"
+                class="w-full xs:w-fit"
                 size="lg"
                 variant="secondary"
                 disabled={loading()}
