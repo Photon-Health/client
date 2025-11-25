@@ -194,9 +194,8 @@ export function InfoPage() {
                       leftIcon={<FiMapPin />}
                       w="full"
                       variant="outline"
-                      borderColor="blue.500"
-                      borderWidth="2px"
-                      color="blue.500"
+                      borderColor="blue.300"
+                      color="blue.700"
                     >
                       {text.directions}
                     </Button>
