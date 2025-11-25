@@ -167,7 +167,7 @@ const Component = (props: {
         label="Save prescriptions without an order?"
         open={continueSaveOnly()}
         confirm-text="Save and create order"
-        cancel-text="Yes, Save Only"
+        cancel-text="Yes, save only"
         on:photon-dialog-confirmed={() => {
           setContinueSaveOnly(false);
           setIsCreateOrder(true);
@@ -200,20 +200,26 @@ const Component = (props: {
         titleIconName="prescription"
         footer={
           hideOrderButton() ? null : props.enableOrder ? (
-            <div class="flex flex-col md:items-center">
+            <Button
+              class="w-full md:w-fit"
+              size="lg"
+              loading={triggerSubmit()}
+              onClick={handleCreateOrder}
+            >
+              Send order
+            </Button>
+          ) : (
+            <>
               <Button
-                class="w-full md:w-80"
+                class="w-full md:w-fit"
                 size="lg"
-                loading={triggerSubmit()}
+                loading={triggerSubmit() && isCreateOrder()}
                 onClick={handleCreateOrder}
               >
-                Send Order
+                Save and create order
               </Button>
-            </div>
-          ) : (
-            <div class="flex flex-col gap-2 md:items-center">
               <Button
-                class="w-full md:w-80"
+                class="w-full md:w-fit"
                 size="lg"
                 variant="secondary"
                 loading={triggerSubmit() && !isCreateOrder()}
@@ -221,15 +227,7 @@ const Component = (props: {
               >
                 Save prescriptions
               </Button>
-              <Button
-                class="w-full md:w-80"
-                size="lg"
-                loading={triggerSubmit() && isCreateOrder()}
-                onClick={handleCreateOrder}
-              >
-                Save and create order
-              </Button>
-            </div>
+            </>
           )
         }
         form={

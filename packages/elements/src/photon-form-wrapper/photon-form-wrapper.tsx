@@ -49,29 +49,27 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
       </photon-dialog>
 
       {/* Wrapper */}
-      <header class="z-40 flex items-center px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full shadow-card">
-        <div class="flex justify-start">
-          <Button
-            variant="naked"
-            size="sm"
-            onClick={() => {
-              if (props.checkShouldWarn()) {
-                onCloseDialogOpen(true);
-              } else {
-                props.onClosed();
-              }
-            }}
-          >
-            <div class="text-black text-xl md:text-3xl">
-              <Icon name="xMark" />
-            </div>
-          </Button>
-        </div>
-        <div class="absolute left-1/2 transform -translate-x-1/2 flex justify-center items-center">
+      <header class="z-40 flex items-center gap-2 px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full shadow-card">
+        <Button
+          variant="naked"
+          size="sm"
+          onClick={() => {
+            if (props.checkShouldWarn()) {
+              onCloseDialogOpen(true);
+            } else {
+              props.onClosed();
+            }
+          }}
+        >
+          <div class="text-black text-xl md:text-3xl">
+            <Icon name="xMark" />
+          </div>
+        </Button>
+        <div class="flex-1 flex justify-center items-center min-w-0">
           <Show when={props.titleIconName}>
-            <sl-icon name={props.titleIconName} />
+            <sl-icon name={props.titleIconName} class="flex-shrink-0" />
           </Show>
-          <p class="ml-1 font-sans text-lg md:text-xl font-medium">{props.title}</p>
+          <p class="ml-1 font-sans text-lg md:text-xl font-medium truncate">{props.title}</p>
         </div>
       </header>
       <div class="z-30 w-full min-h-screen bg-[#F9FAFB] pt-14">
@@ -81,7 +79,9 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
       </div>
       <Show when={props.footer}>
         <footer class="z-40 fixed bottom-0 w-full bg-white shadow-card px-4 py-4 md:px-8">
-          {props.footer}
+          <div class="flex flex-col md:flex-row-reverse md:justify-start gap-2 items-center w-full sm:w-[600px] xs:mx-auto sm:px-4">
+            {props.footer}
+          </div>
         </footer>
       </Show>
     </div>
