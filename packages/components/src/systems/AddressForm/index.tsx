@@ -87,7 +87,7 @@ export default function AddressForm(props: AddressFormProps) {
       <div class="flex items-center justify-between">
         <Text color="gray">Patient Address</Text>
         <Button type="submit" form="patient-address" disabled={submitting()} loading={submitting()}>
-          Save Address
+          Save address
         </Button>
       </div>
       <div>

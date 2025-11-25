@@ -218,7 +218,7 @@ const PatientForm = (props: { patientId: string }) => {
           <div class="flex flex-col gap-8">
             <Card>
               <div>
-                <p class="font-sans text-lg flex-grow">Personal</p>
+                <p class="font-sans text-lg flex-grow">Patient Info</p>
                 <div class="flex flex-col xs:flex-row xs:gap-4">
                   <photon-text-input
                     class="flex-grow min-w-[40%]"
@@ -436,7 +436,11 @@ const PatientForm = (props: { patientId: string }) => {
 
             <Card>
               <div>
-                <p class="font-sans text-lg flex-grow">Preferred Local Pharmacy</p>
+                <div class="flex items-baseline gap-2">
+                  <p class="font-sans text-lg">Preferred Pharmacy</p>
+                  <p class="font-sans text-sm text-gray-500">Optional</p>
+                </div>
+
                 <PharmacySearch
                   address={getPatientAddress(pStore, store)}
                   setPharmacy={(pharmacy: any) => {
