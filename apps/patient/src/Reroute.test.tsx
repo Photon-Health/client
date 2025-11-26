@@ -162,7 +162,7 @@ describe('Rerouting', () => {
 
 const renderApp = () => {
   const memoryRouter = createMemoryRouter(createRoutesFromElements(routeElements), {
-    initialEntries: [`/status?token=${mockToken}`]
+    initialEntries: [`/status?orderId=ord_testId777&token=${mockToken}`]
   });
 
   return { render: render(<RouterProvider router={memoryRouter} />), memoryRouter };
