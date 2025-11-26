@@ -16,6 +16,21 @@ const navy = {
   950: '#000d22'
 };
 
+const blue = {
+  25: '#EFF8FF',
+  50: '#D1E9FF',
+  100: '#B2DDFF',
+  200: '#84CAFF',
+  300: '#53B1FD',
+  400: '#2E90FA',
+  500: '#1570EF',
+  600: '#175CD3',
+  700: '#1849A9',
+  800: '#194185',
+  900: '#102A56',
+  950: '#102A56'
+};
+
 const customTheme = extendTheme(
   {
     styles: {
@@ -27,7 +42,8 @@ const customTheme = extendTheme(
     },
     colors: {
       ...baseTheme.colors,
-      brand: navy,
+      brand: blue,
+      blue,
       navy
     },
     components: {
