@@ -7,6 +7,7 @@ import {
   Container,
   FormControl,
   FormErrorMessage,
+  FormHelperText,
   FormLabel,
   Heading,
   HStack,
@@ -41,13 +42,14 @@ export const SelfSignupPage = () => {
     return <div>Error: no state</div>;
   }
 
-  const { firstName, lastName, email } = extractTokenData(sessionToken);
+  const { firstName, lastName, email, npi } = extractTokenData(sessionToken);
+  const canPrefillNpi = npi && npi?.length === 10;
 
   const initialFormData: SignupFormData = {
     firstName: firstName || '',
     lastName: lastName || '',
     email: email || '',
-    npi: '',
+    npi: npi || '',
     phone: '',
     fax: '',
     street1: '',
@@ -154,7 +156,10 @@ export const SelfSignupPage = () => {
                       <ErrorMessage name="email" component={FormErrorMessage} />
                     </FormControl>
 
-                    <FormControl isRequired isInvalid={!!errors.npi && touched.npi}>
+                    <FormControl
+                      isRequired={!canPrefillNpi}
+                      isInvalid={!!errors.npi && touched.npi}
+                    >
                       <FormLabel htmlFor="npi">NPI</FormLabel>
                       <Field
                         as={Input}
@@ -162,7 +167,21 @@ export const SelfSignupPage = () => {
                         name="npi"
                         placeholder="Enter your 10-digit NPI"
                         maxLength={10}
+                        isReadOnly={canPrefillNpi}
                       />
+                      {canPrefillNpi ? (
+                        <FormHelperText marginBottom="4">
+                          If your NPI is incorrect, please contact{' '}
+                          <Link
+                            href="mailto:support@doximity.com"
+                            textDecoration="underline"
+                            _before={{ display: 'none' }}
+                          >
+                            support@doximity.com
+                          </Link>
+                          .
+                        </FormHelperText>
+                      ) : null}
                       <ErrorMessage name="npi" component={FormErrorMessage} />
                     </FormControl>
 
@@ -301,7 +320,14 @@ export const SelfSignupPage = () => {
   );
 };
 
-function extractTokenData(tosSessionToken?: string) {
+type SelfSignupFormPrefillData = {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  npi?: string;
+};
+
+function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
   if (!tosSessionToken) {
     return {};
   }
@@ -310,7 +336,19 @@ function extractTokenData(tosSessionToken?: string) {
   const firstName: string = decodedPayload.first_name;
   const lastName: string = decodedPayload.last_name;
   const email: string = decodedPayload.email;
-  return { firstName, lastName, email };
+  const npi: string | undefined = decodedPayload.npi ? String(decodedPayload.npi) : undefined;
+
+  if (!npi || !firstName || !lastName || !email) {
+    const missingFields = [];
+    if (!npi) missingFields.push('npi');
+    if (!firstName) missingFields.push('firstName');
+    if (!lastName) missingFields.push('lastName');
+    if (!email) missingFields.push('email');
+    // logging this so we can see errors in DataDog RUM
+    console.error(`Prefill data missing from token for ${email}: ${missingFields.join(', ')}`);
+  }
+
+  return { firstName, lastName, email, npi };
 }
 
 const buildSignupContinueParams = (state: string, formData: SignupFormData): string => {
