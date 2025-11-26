@@ -35,6 +35,7 @@ export interface OrderStatusHeaderProps {
   patientDesiredReadyAt?: Date | 'URGENT';
   fulfillmentType?: FulfillmentType;
   integrated?: boolean;
+  subHeaderOverride?: string;
 }
 
 function headerText(props: OrderStatusHeaderProps) {
@@ -262,7 +263,7 @@ export const OrderStatusHeader: React.FC<OrderStatusHeaderProps> = (
 
   const header = headerText(derivedProps);
   const displayProgressBar = props.exception !== 'EXTERNAL_TRANSFER';
-  const subheader = subheaderText(derivedProps);
+  const subheader = props.subHeaderOverride || subheaderText(derivedProps);
   const color = progressLevel(derivedProps);
   const progressBar = progress(derivedProps);
 

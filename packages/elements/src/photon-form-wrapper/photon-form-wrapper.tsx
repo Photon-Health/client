@@ -5,7 +5,7 @@ import tailwind from '../tailwind.css?inline';
 export type PhotonFormWrapperProps = {
   closeTitle?: string;
   closeBody?: string;
-  headerRight?: JSX.Element;
+  footer?: JSX.Element;
   title: string;
   titleIconName?: string;
   form?: JSX.Element;
@@ -49,8 +49,8 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
       </photon-dialog>
 
       {/* Wrapper */}
-      <header class="z-40 flex flex-col md:flex-row items-center px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full shadow-card">
-        <div class="flex justify-start md:flex-1 absolute md:static left-4">
+      <header class="z-40 flex items-center px-4 py-2 md:px-8 md:py-3 bg-white fixed w-full shadow-card">
+        <div class="flex items-center">
           <Button
             variant="naked"
             size="sm"
@@ -67,23 +67,26 @@ export const PhotonFormWrapper = (p: PhotonFormWrapperProps) => {
             </div>
           </Button>
         </div>
-        <div class="mb-2 md:mb-0 flex flex-0 md:flex-1 justify-center md:justify-center items-center">
+        <div class="flex-1 flex justify-center items-center min-w-0 px-2">
           <Show when={props.titleIconName}>
-            <sl-icon name={props.titleIconName} />
+            <sl-icon name={props.titleIconName} class="flex-shrink-0" />
           </Show>
-          <p class="ml-1 font-sans text-sm md:text-xl font-medium">{props.title}</p>
+          <p class="ml-1 font-sans text-lg md:text-xl font-medium truncate">{props.title}</p>
         </div>
-        <div class="flex flex-col md:flex-row flex-1">
-          <Show when={props.headerRight}>
-            <div class="flex-1 flex justify-end">{props.headerRight}</div>
-          </Show>
-        </div>
+        <div class="flex items-center w-[44px]" />
       </header>
-      <div class="z-30 w-full min-h-screen bg-[#F9FAFB] pt-28 xs:pt-28 lg:pt-20">
+      <div class="z-30 w-full min-h-screen bg-[#F9FAFB] pt-14">
         <div class="px-4 pb-40 md:pt-4 md:pb-52 md:px-4 w-full h-full sm:w-[600px] xs:mx-auto">
           {props.form}
         </div>
       </div>
+      <Show when={props.footer}>
+        <footer class="z-40 fixed bottom-0 w-full bg-white shadow-card px-4 py-4 md:px-8">
+          <div class="flex flex-col xs:flex-row-reverse xs:justify-start gap-2 items-center w-full sm:w-[600px] xs:mx-auto sm:px-4">
+            {props.footer}
+          </div>
+        </footer>
+      </Show>
     </div>
   );
 };

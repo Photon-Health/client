@@ -1,10 +1,9 @@
-import { Button, triggerToast } from '@photonhealth/components';
+import { Button, triggerToast, usePhoton } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { format } from 'date-fns';
 import jwtDecode from 'jwt-decode';
 import { customElement } from 'solid-element';
 import { createSignal, onMount } from 'solid-js';
-import { usePhoton } from '@photonhealth/components';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
 import { PatientStore } from '../stores/patient';
 
@@ -168,7 +167,7 @@ const Component = (props: {
         label="Save prescriptions without an order?"
         open={continueSaveOnly()}
         confirm-text="Save and create order"
-        cancel-text="Yes, Save Only"
+        cancel-text="Yes, save only"
         on:photon-dialog-confirmed={() => {
           setContinueSaveOnly(false);
           setIsCreateOrder(true);
@@ -197,31 +196,38 @@ const Component = (props: {
           patientActions.clearSelectedPatient();
         }}
         checkShouldWarn={() => shouldWarn(form)}
-        title="New Prescriptions"
+        title="New prescription"
         titleIconName="prescription"
-        headerRight={
+        footer={
           hideOrderButton() ? null : props.enableOrder ? (
-            <Button size="md" loading={triggerSubmit()} onClick={handleCreateOrder}>
-              Send Order
+            <Button
+              class="w-full xs:w-fit"
+              size="lg"
+              loading={triggerSubmit()}
+              onClick={handleCreateOrder}
+            >
+              Send order
             </Button>
           ) : (
-            <div class="flex flex-row gap-1 lg:gap-2 justify-end items-end">
+            <>
               <Button
-                size="md"
+                class="w-full xs:w-fit"
+                size="lg"
+                loading={triggerSubmit() && isCreateOrder()}
+                onClick={handleCreateOrder}
+              >
+                Save and create order
+              </Button>
+              <Button
+                class="w-full xs:w-fit"
+                size="lg"
                 variant="secondary"
                 loading={triggerSubmit() && !isCreateOrder()}
                 onClick={handleCreatePrescriptions}
               >
                 Save prescriptions
               </Button>
-              <Button
-                size="md"
-                loading={triggerSubmit() && isCreateOrder()}
-                onClick={handleCreateOrder}
-              >
-                Save and create order
-              </Button>
-            </div>
+            </>
           )
         }
         form={

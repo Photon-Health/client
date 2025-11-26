@@ -470,6 +470,8 @@ export const AddPrescriptionCard = (props: {
                   }
                 }}
                 loading={isLoading()}
+                variant="secondary"
+                color="blue"
               >
                 {props.enableOrder ? 'Add Prescription to Order' : 'Add Prescription to Drafts'}
               </Button>

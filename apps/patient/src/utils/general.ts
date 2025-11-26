@@ -125,7 +125,7 @@ export const preparePharmacy = (
   let opens = '';
   let closes = '';
   let showReadyIn30Min = false;
-  let logo = null;
+  let logo: string | undefined = undefined;
 
   // for mail-order pharmacies, use the info mapped by this branding constant
   if (fulfillmentType && isDelivery({ pharmacy, fulfillmentType })) {

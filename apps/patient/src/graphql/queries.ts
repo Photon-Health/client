@@ -236,6 +236,7 @@ const PHARMACY_FIELDS = gql`
   fragment PharmacyFields on Pharmacy {
     id
     name
+    logo
     address {
       street1
       street2
@@ -244,6 +245,7 @@ const PHARMACY_FIELDS = gql`
       country
       postalCode
     }
+    phone
     fulfillmentTypes
     integrated
     distance
@@ -333,6 +335,41 @@ export const GET_PHARMACIES = gql`
       fulfillmentTypes
     }
   }
+`;
+
+export const GET_INFO_PAGE_DATA = gql`
+  query GetInfoPageData($organizationId: ID!, $pharmacyId: ID!, $openAt: DateTime) {
+    me {
+      name {
+        full
+        title
+        first
+        middle
+        last
+      }
+    }
+    organization(id: $organizationId) {
+      id
+      name
+      settings {
+        id
+        organizationId
+        brandColor
+        brandLogo
+        priorAuthorizationExceptionMessage
+        patientUx {
+          enableAutomatedOps
+          enablePatientRerouting
+          enablePatientDeliveryPharmacies
+          patientFeaturedPharmacyName
+        }
+      }
+    }
+    pharmacy(id: $pharmacyId) {
+      ...PharmacyFields
+    }
+  }
+  ${PHARMACY_FIELDS}
 `;
 
 export const GET_OFFERS = gql`
