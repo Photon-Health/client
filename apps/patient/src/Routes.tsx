@@ -6,6 +6,7 @@ import { Pharmacy } from './views/Pharmacy';
 import { Status } from './views/Status';
 import { Canceled } from './views/Canceled';
 import { NoMatch } from './views/NoMatch';
+import { InfoPage } from './views/Info';
 
 export const routeElements = (
   <Route>
@@ -18,6 +19,7 @@ export const routeElements = (
       {/* <Route path="/status" element={<Status />} /> */}
       <Route path="/canceled" element={<Canceled />} />
     </Route>
+    <Route path="/info" element={<InfoPage />} />
     <Route path="*" element={<NoMatch />} />
   </Route>
 );

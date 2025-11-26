@@ -176,8 +176,7 @@ export const Status = () => {
 
   const primaryButtonStyle = {
     variant: 'solid',
-    bg: 'blue.600',
-    _hover: { bg: 'blue.700' },
+    colorScheme: 'blue',
     color: 'white'
   };
 

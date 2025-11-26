@@ -161,7 +161,7 @@ describe('App', () => {
 
 const renderApp = (order: Partial<OrderContextType> = {}) => {
   const memoryRouter = createMemoryRouter(createRoutesFromElements(routeElements), {
-    initialEntries: [`/?token=${mockToken}`]
+    initialEntries: [`/?orderId=ord_testId777&token=${mockToken}`]
   });
 
   return { render: render(<RouterProvider router={memoryRouter} />), memoryRouter };

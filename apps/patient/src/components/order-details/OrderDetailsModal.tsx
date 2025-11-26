@@ -19,9 +19,9 @@ import { MdOutlineLocalPharmacy } from 'react-icons/md';
 export interface PrescriptionData {
   rxName: string;
   quantity: string;
-  daysSupply: number;
+  daysSupply?: number;
   numRefills: number;
-  expiresAt: Date;
+  expiresAt?: Date;
 }
 
 export interface OrderDetailsProps {
@@ -49,9 +49,9 @@ const PrescriptionBlock = ({ rx }: { rx: PrescriptionData }) => {
     <VStack alignItems="start" spacing={3}>
       <Text as="b">{rx.rxName}</Text>
       <Row k="Quantity" value={rx.quantity} />
-      <Row k="Days Supply" value={rx.daysSupply} />
+      {rx.daysSupply && <Row k="Days Supply" value={rx.daysSupply} />}
       <Row k="Refills" value={rx.numRefills} />
-      <Row k="Expires" value={dayjs(rx.expiresAt).format('M/D/YYYY')} />
+      {rx.expiresAt && <Row k="Expires" value={dayjs(rx.expiresAt).format('M/D/YYYY')} />}
     </VStack>
   );
 };

@@ -702,7 +702,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       </Button>
                     </Show>
                     <Button loading={isLoadingPrefills() || isLoading()} onClick={combineOrSubmit}>
-                      {props.enableOrder ? 'Send Order' : 'Save Prescriptions'}
+                      {props.enableOrder ? 'Send order' : 'Save prescriptions'}
                     </Button>
                   </div>
                 </Show>

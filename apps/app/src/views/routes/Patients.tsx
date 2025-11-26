@@ -60,7 +60,7 @@ const EditView = (props: EditViewProps) => {
         />
         <MenuList>
           <MenuItem icon={<FiEye fontSize="1.2em" />} as={RouterLink} to={`/patients/${id}`}>
-            View Patient
+            View patient
           </MenuItem>
           <MenuItem
             icon={<FiEdit fontSize="1.2em" />}
@@ -70,21 +70,21 @@ const EditView = (props: EditViewProps) => {
               setDisableScroll(true);
             }}
           >
-            Edit Patient
+            Edit patient
           </MenuItem>
           <MenuItem
             icon={<TbPrescription fontSize="1.2em" />}
             as={RouterLink}
             to={`/prescriptions/new?patientId=${id}`}
           >
-            New Prescription
+            New prescription
           </MenuItem>
           <MenuItem
             icon={<FiShoppingCart fontSize="1.2em" />}
             as={RouterLink}
             to={`/orders/new?patientId=${id}`}
           >
-            New Order
+            New order
           </MenuItem>
         </MenuList>
       </Menu>
@@ -193,7 +193,7 @@ export const Patients = () => {
         columns={columns}
         loading={loading}
         error={error}
-        ctaText="New Patient"
+        ctaText="New patient"
         ctaColor="blue"
         ctaRoute="/patients/new"
         filterText={filterText}

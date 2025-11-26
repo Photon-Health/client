@@ -1,9 +1,10 @@
-import { Link as RouterLink, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import {
-  Select,
   HStack,
   IconButton,
+  Link,
+  Select,
   Skeleton,
   SkeletonCircle,
   SkeletonText,
@@ -11,8 +12,7 @@ import {
   Tag,
   Text,
   Tooltip,
-  useToast,
-  Link
+  useToast
 } from '@chakra-ui/react';
 import { FiInfo, FiShoppingCart } from 'react-icons/fi';
 import { useEffect, useRef, useState } from 'react';
@@ -422,7 +422,7 @@ export const Prescriptions = () => {
         columns={columns}
         loading={loading}
         error={error}
-        ctaText="New Prescription"
+        ctaText="New prescription"
         ctaColor="blue"
         ctaRoute="/prescriptions/new"
         filterText={filterText}
