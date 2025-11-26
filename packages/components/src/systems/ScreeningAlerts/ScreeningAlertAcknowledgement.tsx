@@ -95,7 +95,7 @@ export function ScreeningAlertAcknowledgementDialog(
               ignoreWarningAndCreateAnyway();
             }}
           >
-            Send Order
+            Send order
           </Button>
           <Button
             variant="secondary"

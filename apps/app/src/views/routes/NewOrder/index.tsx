@@ -185,7 +185,7 @@ export const NewOrder = () => {
                 loadingText="Sending"
                 isDisabled={!enablePrescriberOrdering}
               >
-                Send Order
+                Send order
               </Button>
             </Box>
           </Flex>

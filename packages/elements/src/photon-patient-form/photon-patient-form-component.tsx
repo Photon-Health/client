@@ -70,7 +70,7 @@ const PatientForm = (props: { patientId: string }) => {
   });
   actions.registerValidator({
     key: 'sex',
-    validator: message(enums(sexes.map((s) => s.name)), 'Please enter Sex at Birth.')
+    validator: message(enums(sexes.map((s) => s.name.toUpperCase())), 'Please enter Sex at Birth.')
   });
   actions.registerValidator({
     key: 'phone',
@@ -218,7 +218,7 @@ const PatientForm = (props: { patientId: string }) => {
           <div class="flex flex-col gap-8">
             <Card>
               <div>
-                <p class="font-sans text-lg flex-grow">Personal</p>
+                <p class="font-sans text-lg flex-grow">Patient Info</p>
                 <div class="flex flex-col xs:flex-row xs:gap-4">
                   <photon-text-input
                     class="flex-grow min-w-[40%]"
@@ -288,27 +288,6 @@ const PatientForm = (props: { patientId: string }) => {
                 </div>
                 <div class="flex flex-col xs:flex-row justify-between xs:gap-4">
                   <div class="flex-grow w-full xs:min-w-[40%]">
-                    <photon-gender-input
-                      label="Gender"
-                      required="false"
-                      help-text={store['gender']?.error}
-                      invalid={store['gender']?.error !== undefined}
-                      on:photon-gender-selected={(e: any) => {
-                        actions.updateFormValue({
-                          key: 'gender',
-                          value: e.detail.gender
-                        });
-                      }}
-                      on:photon-gender-deselected={() => {
-                        actions.updateFormValue({
-                          key: 'gender',
-                          value: undefined
-                        });
-                      }}
-                      selected={pStore.selectedPatient.data?.gender}
-                    />
-                  </div>
-                  <div class="flex-grow w-full xs:min-w-[40%]">
                     <photon-sex-input
                       label="Sex at Birth"
                       required="true"
@@ -327,6 +306,27 @@ const PatientForm = (props: { patientId: string }) => {
                         });
                       }}
                       selected={pStore.selectedPatient.data?.sex}
+                    />
+                  </div>
+                  <div class="flex-grow w-full xs:min-w-[40%]">
+                    <photon-gender-input
+                      label="Gender"
+                      required="false"
+                      help-text={store['gender']?.error}
+                      invalid={store['gender']?.error !== undefined}
+                      on:photon-gender-selected={(e: any) => {
+                        actions.updateFormValue({
+                          key: 'gender',
+                          value: e.detail.gender
+                        });
+                      }}
+                      on:photon-gender-deselected={() => {
+                        actions.updateFormValue({
+                          key: 'gender',
+                          value: undefined
+                        });
+                      }}
+                      selected={pStore.selectedPatient.data?.gender}
                     />
                   </div>
                 </div>
@@ -436,7 +436,11 @@ const PatientForm = (props: { patientId: string }) => {
 
             <Card>
               <div>
-                <p class="font-sans text-lg flex-grow">Preferred Local Pharmacy</p>
+                <div class="flex items-baseline gap-2">
+                  <p class="font-sans text-lg">Preferred Pharmacy</p>
+                  <p class="font-sans text-sm text-gray-500">Optional</p>
+                </div>
+
                 <PharmacySearch
                   address={getPatientAddress(pStore, store)}
                   setPharmacy={(pharmacy: any) => {

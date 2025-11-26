@@ -13,6 +13,14 @@
       },
       "dependsOn": ["^build"]
     },
+    "start:neutron": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "env-cmd -f .env.neutron react-app-rewired start"
+      },
+      "dependsOn": ["^build"]
+    },
     "start:tau": {
       "executor": "nx:run-commands",
       "options": {

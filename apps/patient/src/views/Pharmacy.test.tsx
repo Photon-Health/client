@@ -590,7 +590,7 @@ describe('Pharmacy page', () => {
 
 const renderApp = () => {
   const memoryRouter = createMemoryRouter(createRoutesFromElements(routeElements), {
-    initialEntries: [`/?token=${mockToken}`]
+    initialEntries: [`/?orderId=ord_testId777&token=${mockToken}`]
   });
 
   return { render: render(<RouterProvider router={memoryRouter} />), memoryRouter };
