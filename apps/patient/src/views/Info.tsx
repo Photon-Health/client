@@ -181,8 +181,7 @@ export function InfoPage() {
                       leftIcon={<FiPhone />}
                       w="full"
                       variant="solid"
-                      bg="blue.600"
-                      _hover={{ bg: 'blue.700' }}
+                      colorScheme="blue"
                       color="white"
                     >
                       {text.callPharmacy}
@@ -195,8 +194,8 @@ export function InfoPage() {
                       leftIcon={<FiMapPin />}
                       w="full"
                       variant="outline"
+                      colorScheme="blue"
                       borderColor="blue.300"
-                      color="blue.700"
                     >
                       {text.directions}
                     </Button>
