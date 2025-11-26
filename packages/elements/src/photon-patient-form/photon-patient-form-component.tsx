@@ -70,7 +70,7 @@ const PatientForm = (props: { patientId: string }) => {
   });
   actions.registerValidator({
     key: 'sex',
-    validator: message(enums(sexes.map((s) => s.name)), 'Please enter Sex at Birth.')
+    validator: message(enums(sexes.map((s) => s.name.toUpperCase())), 'Please enter Sex at Birth.')
   });
   actions.registerValidator({
     key: 'phone',
