@@ -77,14 +77,14 @@ const EditView = (props: EditViewProps) => {
             as={RouterLink}
             to={`/prescriptions/new?patientId=${id}`}
           >
-            New prescription
+            Create prescription
           </MenuItem>
           <MenuItem
             icon={<FiShoppingCart fontSize="1.2em" />}
             as={RouterLink}
             to={`/orders/new?patientId=${id}`}
           >
-            New order
+            Create order
           </MenuItem>
         </MenuList>
       </Menu>
@@ -193,7 +193,7 @@ export const Patients = () => {
         columns={columns}
         loading={loading}
         error={error}
-        ctaText="New patient"
+        ctaText="Create patient"
         ctaColor="blue"
         ctaRoute="/patients/new"
         filterText={filterText}
