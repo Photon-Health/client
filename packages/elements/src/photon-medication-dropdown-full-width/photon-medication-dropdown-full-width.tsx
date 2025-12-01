@@ -297,10 +297,6 @@ export const PhotonMedicationDropdownFullWidth = <
                           inputRef.value = '';
                           debounceSearch('');
                           dispatchSelect((datum as DataItem<T>).data);
-
-                          if (props.onClose) {
-                            props.onClose();
-                          }
                         }
                       }
                     };
