@@ -161,27 +161,29 @@ const Component = (props: PatientDialogProps) => {
           title={props?.patientId ? 'Update patient' : 'New patient'}
           titleIconName={props?.patientId ? 'pencil-square' : 'person-plus'}
           footer={
-            <Show when={!props?.hideCreatePrescription}>
+            <>
+              <Show when={!props?.hideCreatePrescription}>
+                <Button
+                  class="w-full xs:w-fit"
+                  size="lg"
+                  disabled={loading()}
+                  loading={loading() && isCreatePrescription()}
+                  onClick={() => submitForm(formStore(), actions(), selectedStore(), true)}
+                >
+                  {props?.patientId ? 'Update' : 'Create'} and start prescription
+                </Button>
+              </Show>
               <Button
                 class="w-full xs:w-fit"
                 size="lg"
+                variant={props?.hideCreatePrescription ? 'primary' : 'secondary'}
                 disabled={loading()}
                 loading={loading() && !isCreatePrescription()}
                 onClick={() => submitForm(formStore(), actions(), selectedStore(), false)}
               >
                 {props?.patientId ? 'Update' : 'Create'} patient
               </Button>
-              <Button
-                class="w-full xs:w-fit"
-                size="lg"
-                variant="secondary"
-                disabled={loading()}
-                loading={loading() && isCreatePrescription()}
-                onClick={() => submitForm(formStore(), actions(), selectedStore(), true)}
-              >
-                {props?.patientId ? 'Update' : 'Create'} and start prescription
-              </Button>
-            </Show>
+            </>
           }
           form={
             <>
