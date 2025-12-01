@@ -353,6 +353,7 @@ const Component = (props: ComponentProps) => {
     <div
       ref={ref}
       on:photon-data-selected={(e: any) => {
+        setShowFullWidthSearch(false);
         const selectedItem = e.detail.data;
 
         // Check if the selected item is disabled
