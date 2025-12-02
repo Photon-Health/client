@@ -1,7 +1,7 @@
 //Solid
 import { debounce } from '@solid-primitives/scheduled';
 import { Dynamic } from 'solid-js/web';
-import { createMemo, For, JSXElement, onMount, Show } from 'solid-js';
+import { createEffect, createMemo, For, JSXElement, onCleanup, onMount, Show } from 'solid-js';
 
 //Shoelace
 import '@shoelace-style/shoelace/dist/components/dropdown/dropdown';
@@ -134,6 +134,26 @@ export const PhotonMedicationDropdownFullWidth = <
       }, 100);
     }
   });
+
+  createEffect(() => {
+    // Lock body scroll when dropdown fullscreen takeover is open (fixes iOS Safari background scroll issue)
+    if (props.open) {
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+
+      onCleanup(() => {
+        const scrollY = document.body.style.top;
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      });
+    }
+  });
   type GroupedItem<T extends Treatment | PrescriptionTemplate | TreatmentOption> =
     | GroupTitle
     | DataItem<T>;
@@ -167,8 +187,8 @@ export const PhotonMedicationDropdownFullWidth = <
       <style>{shoelaceDarkStyles}</style>
       <style>{shoelaceLightStyles}</style>
       <style>{styles}</style>
-      <div class="fixed top-0 left-0 w-full max-h-screen h-screen bg-white overflow-x-hidden z-2000">
-        <div class={`flex items-center pb-2 pl-5 pr-5 pt-3`}>
+      <div class="dropdown-container fixed top-0 left-0 w-full bg-white overflow-hidden z-2000 flex flex-col">
+        <div class={`flex items-center pb-2 pl-5 pr-5 pt-3 flex-shrink-0`}>
           <div class="flex items-center" style={{ 'font-size': '26px' }}>
             <sl-icon-button
               name="x"
@@ -213,7 +233,8 @@ export const PhotonMedicationDropdownFullWidth = <
             input: true,
             disabled: props.disabled ?? false,
             'mb-2': true,
-            'px-4': true
+            'px-4': true,
+            'flex-shrink-0': true
           }}
           required={props.required}
           on:input={(e: any) => {
@@ -264,7 +285,7 @@ export const PhotonMedicationDropdownFullWidth = <
             </div>
           </Show>
         </sl-input>
-        <div class="w-full flex-1" ref={listRef}>
+        <div class="w-full flex-1 overflow-y-auto .dropdown-container-list-items" ref={listRef}>
           <For
             each={rowVirtualizer().getVirtualItems()}
             fallback={<EmptyEl isLoading={props.isLoading} />}

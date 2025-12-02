@@ -59,3 +59,16 @@
 .dropdown::part(panel) {
   box-shadow: none;
 }
+
+.dropdown-container {
+  /* duplicate height settings are intentional to have a fallback for old browsers that don't support dvh */
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
+}
+
+.dropdown-container-list-items {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
