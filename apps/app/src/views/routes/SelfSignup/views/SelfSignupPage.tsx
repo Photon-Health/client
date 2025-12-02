@@ -65,7 +65,7 @@ export const SelfSignupPage = () => {
   const submitForm = async (values: SignupFormData) => {
     // Track form submission
     await trackSelfSignupEvent(
-      'self_signup_form_submitted',
+      'Self Signup Page Submitted',
       {
         hasNpi: !!values.npi,
         hasPhone: !!values.phone,
@@ -84,7 +84,7 @@ export const SelfSignupPage = () => {
   // Track page view on mount
   useEffect(() => {
     trackSelfSignupEvent(
-      'self_signup_page_viewed',
+      'Self Signup Page Viewed',
       {
         hasPrefilledNpi: canPrefillNpi,
         hasPrefilledEmail: !!email,
