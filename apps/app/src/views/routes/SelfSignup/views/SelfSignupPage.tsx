@@ -27,7 +27,7 @@ import {
 import { ErrorMessage, Field, Formik } from 'formik';
 import { useSearchParams } from 'react-router-dom';
 import { auth0Config } from '../../../../configs/auth';
-import { trackAuth0Event } from '../../../../configs/analytics';
+import { trackSelfSignupEvent } from '../../../../configs/analytics';
 import { Logo } from '../../../components/Logo';
 import { FormikStateSelect } from '../../Settings/components/utils/States';
 import { SignupFormData, signupFormSchema } from './form';
@@ -64,7 +64,7 @@ export const SelfSignupPage = () => {
 
   const submitForm = async (values: SignupFormData) => {
     // Track form submission
-    await trackAuth0Event(
+    await trackSelfSignupEvent(
       'self_signup_form_submitted',
       {
         hasNpi: !!values.npi,
@@ -83,7 +83,7 @@ export const SelfSignupPage = () => {
 
   // Track page view on mount
   useEffect(() => {
-    trackAuth0Event(
+    trackSelfSignupEvent(
       'self_signup_page_viewed',
       {
         hasPrefilledNpi: canPrefillNpi,

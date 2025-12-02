@@ -1,4 +1,4 @@
-//import { clinicalApiUrl, Env } from 'packages/sdk/src/utils';
+import { clinicalApiUrl, Env } from 'packages/sdk/src/utils';
 
 /**
  * Tracks an analytics event by sending it to the auth0/track-event endpoint
@@ -7,13 +7,13 @@
  * @param sessionToken - The session token for authentication (optional)
  * @returns Promise that resolves when the tracking request completes
  */
-export async function trackAuth0Event(
+export async function trackSelfSignupEvent(
   event: string,
   properties: Record<string, unknown> = {},
   sessionToken?: string
 ): Promise<void> {
-  //const environment = (process.env.REACT_APP_ENV_NAME || 'photon') as Env;
-  const baseUrl = 'http://clinical-api.tau.health:8080'; //clinicalApiUrl[environment];
+  const environment = (process.env.REACT_APP_ENV_NAME || 'photon') as Env;
+  const baseUrl = clinicalApiUrl[environment];
   const url = `${baseUrl}/auth0/track-event`;
 
   try {
