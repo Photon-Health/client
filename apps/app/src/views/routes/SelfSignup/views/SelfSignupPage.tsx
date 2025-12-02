@@ -27,10 +27,12 @@ import {
 import { ErrorMessage, Field, Formik } from 'formik';
 import { useSearchParams } from 'react-router-dom';
 import { auth0Config } from '../../../../configs/auth';
+import { trackSelfSignupEvent } from '../../../../configs/analytics';
 import { Logo } from '../../../components/Logo';
 import { FormikStateSelect } from '../../Settings/components/utils/States';
 import { SignupFormData, signupFormSchema } from './form';
 import { FaInfoCircle } from 'react-icons/fa';
+import { useEffect } from 'react';
 
 export const SelfSignupPage = () => {
   const [searchParams] = useSearchParams();
@@ -61,10 +63,38 @@ export const SelfSignupPage = () => {
   };
 
   const submitForm = async (values: SignupFormData) => {
+    // Track form submission
+    await trackSelfSignupEvent(
+      'Self Signup Page Submitted',
+      {
+        hasNpi: !!values.npi,
+        hasPhone: !!values.phone,
+        hasFax: !!values.fax,
+        hasStreet2: !!values.street2,
+        didAgreeToTerms: values.didAgreeToTerms
+      },
+      sessionToken
+    );
+
     await wait(100);
     const queryParams = buildSignupContinueParams(state, values);
     window.location.href = `https://${auth0Config.domain}/continue?${queryParams}`;
   };
+
+  // Track page view on mount
+  useEffect(() => {
+    trackSelfSignupEvent(
+      'Self Signup Page Viewed',
+      {
+        hasPrefilledNpi: canPrefillNpi,
+        hasPrefilledEmail: !!email,
+        hasPrefilledName: !!(firstName && lastName),
+        fullName: `${firstName} ${lastName}`
+      },
+      sessionToken
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only track once on mount - these values are derived from URL params and won't change
 
   return (
     <>
