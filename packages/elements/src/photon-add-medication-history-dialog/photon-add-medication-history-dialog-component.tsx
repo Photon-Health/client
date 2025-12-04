@@ -98,6 +98,7 @@ const Component = (props: AddMedicationHistoryDialogProps) => {
   createEffect(() => {
     if (!props.open) {
       setSubmitting(false);
+      setSearchTerm('');
     }
   });
 
