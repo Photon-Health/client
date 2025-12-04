@@ -1,6 +1,4 @@
 import {
-  Alert,
-  AlertIcon,
   Box,
   Button,
   Checkbox,
@@ -21,7 +19,6 @@ import {
   Portal,
   Stack,
   Text,
-  useBreakpointValue,
   VStack
 } from '@chakra-ui/react';
 import { ErrorMessage, Field, Formik } from 'formik';
@@ -121,22 +118,13 @@ export const SelfSignupPage = () => {
             <form onSubmit={handleSubmit}>
               <Stack spacing="8">
                 <Stack spacing="4" textAlign="left">
-                  <Alert status="warning">
-                    <AlertIcon />
-                    <VStack alignItems="start">
-                      <Text fontWeight="medium" color="yellow.600">
-                        Required before writing prescriptions
-                      </Text>
-                    </VStack>
-                  </Alert>
-
                   <VStack alignItems="start">
-                    <Heading size={useBreakpointValue({ base: 'xs' })}>
+                    <Heading as="h1" size="sm">
                       Create Your Prescriber Account
                     </Heading>
                     <Text fontSize="md" color="gray">
-                      Please note that your NPI, Phone, and Address will be required. Pharmacies use
-                      this information to ensure safe and compliant prescription fulfillment.
+                      Pharmacies may use this information to ensure safe and compliant prescription
+                      fulfillment.
                     </Text>
                     <Text fontSize="md" marginTop="4">
                       Please confirm your details:
@@ -256,7 +244,7 @@ export const SelfSignupPage = () => {
                         as={Input}
                         id="fax"
                         name="fax"
-                        placeholder="Enter your fax number"
+                        placeholder="Enter your fax number (optional)"
                         maxLength={10}
                       />
                       <ErrorMessage name="fax" component={FormErrorMessage} />
@@ -264,7 +252,9 @@ export const SelfSignupPage = () => {
                   </Stack>
                 </Stack>
                 <Stack spacing="4">
-                  <Heading size="xs">Address</Heading>
+                  <Heading as="h2" size="xs">
+                    Address
+                  </Heading>
 
                   <FormControl isRequired isInvalid={!!errors.street1 && touched.street1}>
                     <FormLabel htmlFor="street1">Street 1</FormLabel>
