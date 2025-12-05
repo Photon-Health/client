@@ -42,7 +42,6 @@ export const PatientCard = (props: {
   hidePatientCard?: boolean;
 }) => {
   const [newMedication, setNewMedication] = createSignal<Treatment | undefined>();
-  undefined;
   const [showEditPatientView, setShowEditPatientView] = createSignal(false);
   const [showAddMedDialog, setShowAddMedDialog] = createSignal(false);
   const { actions, store } = PatientStore;
@@ -167,7 +166,6 @@ export const PatientCard = (props: {
             hideAddMedicationDialog={() => setShowAddMedDialog(false)}
           />
           <photon-add-medication-history-dialog
-            title="Add Medication History"
             open={showAddMedDialog()}
             on:photon-medication-selected={(e: { detail: { medication: Treatment } }) => {
               setNewMedication(e.detail.medication);
