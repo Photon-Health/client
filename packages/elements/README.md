@@ -10,6 +10,8 @@ To run at http://localhost:3000:
 npx nx run elements:start
 ```
 
+This command recompiles components code on change, but does not hot refresh the client. You'll need to refresh the webpage manually to see changes.
+
 To modify the embedded component, edit attributes of element `photon-prescribe-workflow` inside [index.html](index.html)
 
 To view available attributes/options, see [photon-prescribe-workflow-component.tsx](src/photon-multirx-form/photon-prescribe-workflow-component.tsx) or [official docs](https://docs.photon.health/docs/elements#prescribe-element)

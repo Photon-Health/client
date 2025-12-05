@@ -2,10 +2,6 @@
 
 ## Local Development
 
-### Graphql Codegen
-
-`npx graphql-codegen --config='apps/app/codegen.ts'`
-
 ### Run against Boson services
 
 > Runs against remote Boson environment services
@@ -17,6 +13,10 @@
 > Must be running [tau services](https://github.com/Photon-Health/services) locally
 
 `npx nx run app:start:tau`
+
+### Graphql Codegen
+
+`npx graphql-codegen --config='apps/app/codegen.ts'`
 
 ### Playwright e2e Tests
 
@@ -38,7 +38,6 @@ $ npx nx run app:e2e
 # or run within UI popup window
 $ npx nx run app:e2e:ui
 ```
-
 
 ### Tests
 
