@@ -252,9 +252,7 @@ export const SelfSignupPage = () => {
                   </Stack>
                 </Stack>
                 <Stack spacing="4">
-                  <Heading as="h2" size="xs">
-                    Address
-                  </Heading>
+                  <Text fontSize="md">Address</Text>
 
                   <FormControl isRequired isInvalid={!!errors.street1 && touched.street1}>
                     <FormLabel htmlFor="street1">Street 1</FormLabel>

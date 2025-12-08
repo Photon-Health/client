@@ -20,7 +20,7 @@ test('user can login and create patient', async ({ page }) => {
   await page.getByRole('menuitem', { name: 'AL', exact: true }).click();
   await page.getByLabel('Zip Code').fill('12345');
 
-  await page.getByRole('button', { name: 'Create patient', exact: true }).click();
+  await page.getByRole('button', { name: 'Create', exact: true }).click();
 
   await expect(page.getByRole('heading', { name: 'Patients' })).toBeVisible();
 });
