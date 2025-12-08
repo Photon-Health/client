@@ -111,7 +111,7 @@ export default function PatientInfo(props: PatientInfoProps) {
         <Text color="gray">Patient Info</Text>
         <Show when={props?.editPatient}>
           <Button variant="secondary" size="sm" onClick={props?.editPatient}>
-            Edit Patient
+            Edit patient
           </Button>
         </Show>
       </div>
