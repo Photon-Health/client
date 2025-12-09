@@ -1,7 +1,7 @@
 import { customElement } from 'solid-element';
-import { createEffect, createMemo, onCleanup, onMount, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import { enums, size, string, union } from 'superstruct';
-import { Card, PharmacySearch, Spinner, usePhoton } from '@photonhealth/components';
+import { Card, Icon, PharmacySearch, Spinner, usePhoton } from '@photonhealth/components';
 import { createFormStore } from '../stores/form';
 import { PatientStore } from '../stores/patient';
 import tailwind from '../tailwind.css?inline';
@@ -40,6 +40,7 @@ const getPatientAddress = (pStore: any, store: any) => {
 const PatientForm = (props: { patientId: string }) => {
   let ref: any;
   const client = usePhoton();
+  const [showOptionalFields, setShowOptionalFields] = createSignal(false);
   const { store: pStore, actions: pActions } = PatientStore;
   const { store, actions } = createFormStore({
     firstName: undefined,
@@ -384,52 +385,67 @@ const PatientForm = (props: { patientId: string }) => {
                     }
                   />
                 </div>
-                <photon-gender-input
-                  label="Gender"
-                  required="false"
-                  help-text={store['gender']?.error}
-                  invalid={store['gender']?.error !== undefined}
-                  on:photon-gender-selected={(e: any) => {
-                    actions.updateFormValue({
-                      key: 'gender',
-                      value: e.detail.gender
-                    });
-                  }}
-                  on:photon-gender-deselected={() => {
-                    actions.updateFormValue({
-                      key: 'gender',
-                      value: undefined
-                    });
-                  }}
-                  selected={pStore.selectedPatient.data?.gender}
-                />
-                <photon-text-input
-                  class="w-full"
-                  debounce-time="0"
-                  invalid={store['email']?.error}
-                  help-text={store['email']?.error}
-                  label="Email"
-                  on:photon-input-changed={async (e: any) => {
-                    actions.updateFormValue({
-                      key: 'email',
-                      value: e.detail.input
-                    });
-                  }}
-                  value={store['email']?.value ?? pStore.selectedPatient.data?.email}
-                />
-                <p class="font-sans text-lg">Preferred pharmacy</p>
-                <PharmacySearch
-                  address={getPatientAddress(pStore, store)}
-                  setPharmacy={(pharmacy: any) => {
-                    actions.updateFormValue({
-                      key: 'preferredPharmacy',
-                      value: pharmacy.id
-                    });
-                  }}
-                  patientId={props.patientId}
-                  initialValue={preferredPharmacy()}
-                  hidePreferred
-                />
+                <button
+                  class="mb-4 flex items-center"
+                  onClick={() => setShowOptionalFields((value) => !value)}
+                >
+                  <span class="font-sans text-lg">Show optional fields</span>
+                  <Icon
+                    name={showOptionalFields() ? 'chevronUp' : 'chevronDown'}
+                    size="md"
+                    class="inline-block ml-1 mt-1"
+                  />
+                </button>
+                <Show when={showOptionalFields()}>
+                  <div class="mb-4">
+                    <photon-gender-input
+                      label="Gender (optional)"
+                      required="false"
+                      help-text={store['gender']?.error}
+                      invalid={store['gender']?.error !== undefined}
+                      on:photon-gender-selected={(e: any) => {
+                        actions.updateFormValue({
+                          key: 'gender',
+                          value: e.detail.gender
+                        });
+                      }}
+                      on:photon-gender-deselected={() => {
+                        actions.updateFormValue({
+                          key: 'gender',
+                          value: undefined
+                        });
+                      }}
+                      selected={pStore.selectedPatient.data?.gender}
+                    />
+                    <photon-text-input
+                      class="w-full"
+                      debounce-time="0"
+                      invalid={store['email']?.error}
+                      help-text={store['email']?.error}
+                      label="Email (optional)"
+                      on:photon-input-changed={async (e: any) => {
+                        actions.updateFormValue({
+                          key: 'email',
+                          value: e.detail.input
+                        });
+                      }}
+                      value={store['email']?.value ?? pStore.selectedPatient.data?.email}
+                    />
+                    <p class="font-sans text-sm m-0">Preferred pharmacy (optional)</p>
+                    <PharmacySearch
+                      address={getPatientAddress(pStore, store)}
+                      setPharmacy={(pharmacy: any) => {
+                        actions.updateFormValue({
+                          key: 'preferredPharmacy',
+                          value: pharmacy.id
+                        });
+                      }}
+                      patientId={props.patientId}
+                      initialValue={preferredPharmacy()}
+                      hidePreferred
+                    />
+                  </div>
+                </Show>
               </div>
             </Card>
           </div>
