@@ -218,14 +218,14 @@ const PatientForm = (props: { patientId: string }) => {
           <div class="flex flex-col gap-8">
             <Card>
               <div>
-                <p class="font-sans text-lg flex-grow">Patient Info</p>
+                <p class="font-sans text-lg flex-grow">Patient info</p>
                 <div class="flex flex-col xs:flex-row xs:gap-4">
                   <photon-text-input
                     class="flex-grow min-w-[40%]"
                     debounce-time="0"
                     invalid={store['firstName']?.error}
                     help-text={store['firstName']?.error}
-                    label="First Name"
+                    label="First name"
                     required="true"
                     on:photon-input-changed={async (e: any) => {
                       actions.updateFormValue({
@@ -240,7 +240,7 @@ const PatientForm = (props: { patientId: string }) => {
                     debounce-time="0"
                     invalid={store['lastName']?.error}
                     help-text={store['lastName']?.error}
-                    label="Last Name"
+                    label="Last name"
                     required="true"
                     on:photon-input-changed={async (e: any) => {
                       actions.updateFormValue({
@@ -257,7 +257,7 @@ const PatientForm = (props: { patientId: string }) => {
                     class="flex-grow w-full xs:min-w-[40%]"
                     invalid={store['dateOfBirth']?.error}
                     help-text={store['dateOfBirth']?.error}
-                    label="Date of Birth"
+                    label="Date of birth"
                     required="true"
                     on:photon-datepicker-selected={async (e: any) => {
                       actions.updateFormValue({
@@ -275,7 +275,7 @@ const PatientForm = (props: { patientId: string }) => {
                     class="w-full xs:min-w-[48%]"
                     invalid={store['phone']?.error}
                     help-text={store['phone']?.error}
-                    label="Mobile Number"
+                    label="Mobile number"
                     required="true"
                     on:photon-phone-changed={async (e: any) => {
                       actions.updateFormValue({
@@ -289,7 +289,7 @@ const PatientForm = (props: { patientId: string }) => {
                 <div class="flex flex-col xs:flex-row justify-between xs:gap-4">
                   <div class="flex-grow w-full xs:min-w-[40%]">
                     <photon-sex-input
-                      label="Sex at Birth"
+                      label="Sex at birth"
                       required="true"
                       help-text={store['sex']?.error}
                       invalid={store['sex']?.error !== undefined}
@@ -412,7 +412,7 @@ const PatientForm = (props: { patientId: string }) => {
                     class="flex-grow min-w-[40%]"
                     invalid={store['address_zip']?.error}
                     help-text={store['address_zip']?.error}
-                    label="Zip Code"
+                    label="Zip code"
                     required="true"
                     on:photon-input-changed={async (e: any) => {
                       actions.updateFormValue({
@@ -427,7 +427,7 @@ const PatientForm = (props: { patientId: string }) => {
                   />
                 </div>
                 <div class="flex items-baseline gap-2">
-                  <p class="font-sans text-lg">Preferred Pharmacy</p>
+                  <p class="font-sans text-lg">Preferred pharmacy</p>
                   <p class="font-sans text-sm text-gray-500">Optional</p>
                 </div>
                 <PharmacySearch
