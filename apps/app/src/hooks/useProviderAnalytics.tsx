@@ -1,0 +1,149 @@
+import { createContext, useContext, useMemo, ReactNode, useCallback } from 'react';
+import { gql, useQuery } from '@apollo/client';
+import { usePhoton } from '@photonhealth/react';
+import { ApiObject } from '@rudderstack/analytics-js';
+import { providerAnalytics } from '../configs/providerAnalytics';
+
+const ENVIRONMENT = process.env.REACT_APP_ENV_NAME || 'development';
+
+const ANALYTICS_CONTEXT_QUERY = gql`
+  query AnalyticsContextQuery {
+    me {
+      email
+      id
+      name {
+        first
+        full
+        last
+        middle
+        title
+      }
+    }
+    organization {
+      customer {
+        id
+        name
+      }
+      name
+      id
+    }
+  }
+`;
+
+export interface ProviderContextData {
+  // Environment
+  environment: string;
+  // User info (from me query)
+  meId?: string;
+  meEmail?: string;
+  meName?: string;
+  meNameFirst?: string;
+  meNameLast?: string;
+  // Organization info
+  orgId?: string;
+  orgName?: string;
+  // Customer info
+  customerId?: string;
+  customerName?: string;
+}
+
+interface ProviderAnalyticsContextValue {
+  /**
+   * Track a user event with automatic context injection
+   */
+  track: (eventName: string, properties?: ApiObject) => void;
+
+  /**
+   * Current provider context data (user, org info)
+   */
+  contextData: ProviderContextData;
+
+  /**
+   * Whether analytics is ready (user is authenticated and data loaded)
+   */
+  isReady: boolean;
+}
+
+const ProviderAnalyticsContext = createContext<ProviderAnalyticsContextValue | null>(null);
+
+interface ProviderAnalyticsProviderProps {
+  children: ReactNode;
+}
+
+export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProviderProps) => {
+  const { isAuthenticated, isLoading, clinicalClient } = usePhoton();
+
+  // Fetch me + organization data via GraphQL
+  const { data, loading: queryLoading } = useQuery(ANALYTICS_CONTEXT_QUERY, {
+    client: clinicalClient,
+    skip: !isAuthenticated || isLoading || !clinicalClient
+  });
+
+  // Build context data from query response
+  const contextData: ProviderContextData = useMemo(
+    () => ({
+      // Environment
+      environment: ENVIRONMENT,
+      // User info from me query
+      meId: data?.me?.id,
+      meEmail: data?.me?.email,
+      meName: data?.me?.name?.full,
+      meNameFirst: data?.me?.name?.first,
+      meNameLast: data?.me?.name?.last,
+      // Organization info
+      orgId: data?.organization?.id,
+      orgName: data?.organization?.name,
+      // Customer info
+      customerId: data?.organization?.customer?.id,
+      customerName: data?.organization?.customer?.name
+    }),
+    [data]
+  );
+
+  // Wrapped track function that auto-includes context
+  const track = useCallback(
+    (eventName: string, properties: ApiObject = {}) => {
+      providerAnalytics.track(eventName, {
+        ...contextData,
+        ...properties
+      });
+    },
+    [contextData]
+  );
+
+  const value: ProviderAnalyticsContextValue = useMemo(
+    () => ({
+      track,
+      contextData,
+      isReady: isAuthenticated && !isLoading && !queryLoading && !!data
+    }),
+    [track, contextData, isAuthenticated, isLoading, queryLoading, data]
+  );
+
+  return (
+    <ProviderAnalyticsContext.Provider value={value}>{children}</ProviderAnalyticsContext.Provider>
+  );
+};
+
+/**
+ * Hook to access analytics tracking functions with automatic context injection.
+ *
+ * @example
+ * ```tsx
+ * const { track } = useProviderAnalytics();
+ *
+ * // Track a button click
+ * const handleClick = () => {
+ *   track('Button Clicked', { buttonName: 'Create Patient' });
+ * };
+ * ```
+ */
+export const useProviderAnalytics = (): ProviderAnalyticsContextValue => {
+  const context = useContext(ProviderAnalyticsContext);
+
+  if (!context) {
+    throw new Error('useProviderAnalytics must be used within a ProviderAnalyticsProvider');
+  }
+
+  return context;
+};
