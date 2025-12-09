@@ -13,6 +13,17 @@
       },
       "dependsOn": ["^build"]
     },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "commands": [
+          "env-cmd -f .env.boson react-app-rewired start",
+          "nx watch --projects=app --includeDependentProjects -- nx run-many -t build --projects=elements,react,sdk"
+        ]
+      },
+      "dependsOn": ["^build"]
+    },
     "start:neutron": {
       "executor": "nx:run-commands",
       "options": {
