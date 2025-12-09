@@ -381,7 +381,11 @@ const buildSignupContinueParams = (state: string, formData: SignupFormData): str
     city: formData.city,
     state_address: formData.state.value,
     postal_code: formData.postalCode,
-    did_accept_tos: formData.didAgreeToTerms.toString()
+    did_accept_tos: formData.didAgreeToTerms.toString(),
+    // these version numbers must match an entry in the attestations table
+    // otherwise an error will occur during signup
+    tos_version: '1.0.0',
+    baa_version: '1.0.0'
   });
 
   if (formData.street2) {
