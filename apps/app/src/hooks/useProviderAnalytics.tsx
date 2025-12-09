@@ -35,11 +35,11 @@ export interface ProviderContextData {
   // Environment
   environment: string;
   // User info (from me query)
-  meId?: string;
-  meEmail?: string;
-  meName?: string;
-  meNameFirst?: string;
-  meNameLast?: string;
+  providerId?: string;
+  providerEmail?: string;
+  providerName?: string;
+  providerNameFirst?: string;
+  providerNameLast?: string;
   // Organization info
   orgId?: string;
   orgName?: string;
@@ -86,11 +86,11 @@ export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProvide
       // Environment
       environment: ENVIRONMENT,
       // User info from me query
-      meId: data?.me?.id,
-      meEmail: data?.me?.email,
-      meName: data?.me?.name?.full,
-      meNameFirst: data?.me?.name?.first,
-      meNameLast: data?.me?.name?.last,
+      providerId: data?.me?.id,
+      providerEmail: data?.me?.email,
+      providerName: data?.me?.name?.full,
+      providerNameFirst: data?.me?.name?.first,
+      providerNameLast: data?.me?.name?.last,
       // Organization info
       orgId: data?.organization?.id,
       orgName: data?.organization?.name,
