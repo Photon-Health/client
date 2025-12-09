@@ -1,8 +1,9 @@
-import { createContext, useContext, useMemo, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useMemo, ReactNode, useCallback, useEffect } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { usePhoton } from '@photonhealth/react';
 import { ApiObject } from '@rudderstack/analytics-js';
 import { providerAnalytics } from '../configs/providerAnalytics';
+import { setInstrumentationUserContext } from '../instrumentation/setInstrumentationUserContext';
 
 const ENVIRONMENT = process.env.REACT_APP_ENV_NAME || 'development';
 
@@ -99,6 +100,18 @@ export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProvide
     }),
     [data]
   );
+
+  // Set Datadog instrumentation context when data is loaded
+  useEffect(() => {
+    if (data?.me && data?.organization) {
+      setInstrumentationUserContext({
+        org_id: data.organization.id,
+        email: data.me.email,
+        name: data.me.name?.full ?? '',
+        customer_id: data.organization.customer?.id
+      });
+    }
+  }, [data]);
 
   // Wrapped track function that auto-includes context
   const track = useCallback(
