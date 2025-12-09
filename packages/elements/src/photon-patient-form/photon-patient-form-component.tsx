@@ -345,11 +345,6 @@ const PatientForm = (props: { patientId: string }) => {
                     value={store['email']?.value ?? pStore.selectedPatient.data?.email}
                   />
                 </div>
-              </div>
-            </Card>
-
-            <Card>
-              <div>
                 <p class="font-sans text-lg flex-grow">Address</p>
                 <photon-text-input
                   debounce-time="0"
@@ -397,7 +392,7 @@ const PatientForm = (props: { patientId: string }) => {
                   }}
                   value={store['address_city']?.value ?? pStore.selectedPatient.data?.address?.city}
                 />
-                <div class="flex gap-4 pb-5 xs:pb-2">
+                <div class="flex gap-4">
                   <photon-state-input
                     class="flex-grow min-w-[40%]"
                     label="State"
@@ -431,16 +426,10 @@ const PatientForm = (props: { patientId: string }) => {
                     }
                   />
                 </div>
-              </div>
-            </Card>
-
-            <Card>
-              <div>
                 <div class="flex items-baseline gap-2">
                   <p class="font-sans text-lg">Preferred Pharmacy</p>
                   <p class="font-sans text-sm text-gray-500">Optional</p>
                 </div>
-
                 <PharmacySearch
                   address={getPatientAddress(pStore, store)}
                   setPharmacy={(pharmacy: any) => {
