@@ -187,12 +187,9 @@ export const AddPrescriptionCard = (props: {
     <div ref={ref}>
       <style>{photonStyles}</style>
       <Card addChildrenDivider={true}>
-        <div class="flex items-center justify-between">
-          <Text color="gray">Add Prescription</Text>
-        </div>
-
+        <Text color="gray">Add Prescription</Text>
         <div
-          class="flex flex-col sm:gap-3"
+          class="flex flex-col"
           on:photon-medication-selected={(e: any) => {
             setOffCatalog(e.detail.medication);
             props.actions.updateFormValue({
