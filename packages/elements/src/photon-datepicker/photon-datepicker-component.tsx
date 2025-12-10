@@ -70,7 +70,7 @@ const Component = (props: {
           }}
           class="input"
           type="date"
-          value={props.value || ''}
+          value={props.value}
           invalid={props.invalid}
           min={props.min ? format(props.min, 'yyyy-MM-dd').toString() : undefined}
         >

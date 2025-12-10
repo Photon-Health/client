@@ -12,7 +12,7 @@ import {
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { DispenseUnit, Medication, Prescription } from '@photonhealth/sdk/dist/types';
-import { any, min, number, record, refine, size, string } from 'superstruct';
+import { any, min, number, optional, record, refine, size, string } from 'superstruct';
 import { afterDate, between, message } from '../../validators';
 
 //Shoelace
@@ -38,7 +38,10 @@ const validators = {
   daysSupply: message(min(number(), 0), 'Days Supply must be at least 0'),
   refillsInput: message(between(0, 11), 'Refills must be 0 to 11'),
   instructions: message(size(string(), 1, Infinity), 'Please enter instructions for the patient'),
-  effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
+  effectiveDate: message(
+    optional(afterDate(new Date())),
+    "Please choose a date that isn't in the past"
+  )
 };
 
 export const AddPrescriptionCard = (props: {
@@ -112,7 +115,7 @@ export const AddPrescriptionCard = (props: {
     }
 
     const prescriptionFormData: PrescriptionFormData = {
-      effectiveDate: props.store.effectiveDate.value,
+      effectiveDate: props.store.effectiveDate?.value,
       treatment: { id: props.store.treatment.value.id, name: props.store.treatment.value.name },
       dispenseAsWritten: props.store.dispenseAsWritten.value,
       dispenseQuantity: props.store.dispenseQuantity.value,
@@ -153,7 +156,7 @@ export const AddPrescriptionCard = (props: {
     // RESET THE FORM
     props.actions.updateFormValue({
       key: 'effectiveDate',
-      value: ''
+      value: undefined
     });
     props.actions.clearKeys([
       'treatment',
