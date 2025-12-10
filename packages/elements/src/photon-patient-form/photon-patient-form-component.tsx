@@ -398,7 +398,7 @@ const PatientForm = (props: { patientId: string }) => {
                 <Show when={showOptionalFields()}>
                   <div class="mb-4">
                     <photon-gender-input
-                      label="Gender (optional)"
+                      label="Gender"
                       required="false"
                       help-text={store['gender']?.error}
                       invalid={store['gender']?.error !== undefined}
@@ -421,7 +421,7 @@ const PatientForm = (props: { patientId: string }) => {
                       debounce-time="0"
                       invalid={store['email']?.error}
                       help-text={store['email']?.error}
-                      label="Email (optional)"
+                      label="Email"
                       on:photon-input-changed={async (e: any) => {
                         actions.updateFormValue({
                           key: 'email',
@@ -430,7 +430,7 @@ const PatientForm = (props: { patientId: string }) => {
                       }}
                       value={store['email']?.value ?? pStore.selectedPatient.data?.email}
                     />
-                    <p class="font-sans text-sm m-0">Preferred pharmacy (optional)</p>
+                    <p class="font-sans text-sm m-0">Preferred pharmacy</p>
                     <PharmacySearch
                       address={getPatientAddress(pStore, store)}
                       setPharmacy={(pharmacy: any) => {
