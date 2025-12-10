@@ -110,7 +110,7 @@ export const Prescription = () => {
   const stateTip = PRESCRIPTION_TIP_MAP[rx.state as keyof PrescriptionStateRecord] || '';
 
   const writtenAt = formatDate(rx.writtenAt);
-  const effectiveDate = formatDate(rx.effectiveDate);
+  const effectiveDate = rx.effectiveDate ? formatDate(rx.effectiveDate) : 'N/A';
   const expirationDate = formatDate(rx.expirationDate);
 
   const { colorMode } = useColorMode();
