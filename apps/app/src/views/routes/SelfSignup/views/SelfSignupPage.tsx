@@ -217,11 +217,11 @@ export const SelfSignupPage = () => {
                           <FormHelperText marginBottom="4">
                             If your NPI is incorrect, please contact{' '}
                             <Link
-                              href="mailto:support@doximity.com"
+                              href={`mailto:${supportEmail}`}
                               textDecoration="underline"
                               _before={{ display: 'none' }}
                             >
-                              support@doximity.com
+                              {supportEmail}
                             </Link>
                             .
                           </FormHelperText>
