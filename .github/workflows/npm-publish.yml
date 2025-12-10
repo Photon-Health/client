@@ -3,7 +3,11 @@ name: Publish Packages
 on:
   push:
     branches:
-      - boson
+      - photon
+
+permissions:
+  id-token: write # Required for OIDC trusted publishing
+  contents: write # Required for pushing git tags
 
 jobs:
   publish:
@@ -12,16 +16,19 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          ref: boson
+          ref: photon
           fetch-depth: 0
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Update npm for trusted publishing
+        run: npm install -g npm@latest
 
       - name: Install Dependencies
         run: npm ci
@@ -78,8 +85,6 @@ jobs:
                   cd -
               done
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Upload to S3
         run: |

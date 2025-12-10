@@ -1,4 +1,7 @@
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
   Box,
   Button,
   Checkbox,
@@ -29,7 +32,9 @@ import { Logo } from '../../../components/Logo';
 import { FormikStateSelect } from '../../Settings/components/utils/States';
 import { SignupFormData, signupFormSchema } from './form';
 import { FaInfoCircle } from 'react-icons/fa';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+
+const VALID_LICENSES = new Set(['MD', 'DO']);
 
 export const SelfSignupPage = () => {
   const [searchParams] = useSearchParams();
@@ -41,8 +46,12 @@ export const SelfSignupPage = () => {
     return <div>Error: no state</div>;
   }
 
-  const { firstName, lastName, email, npi } = extractTokenData(sessionToken);
+  const { firstName, lastName, email, npi, verified, credentials, supportEmail } = useMemo(
+    () => extractTokenData(sessionToken),
+    [sessionToken]
+  );
   const canPrefillNpi = npi && npi?.length === 10;
+  const isVerifiedPrescriber = verified && VALID_LICENSES.has(credentials ?? 'none');
 
   const initialFormData: SignupFormData = {
     firstName: firstName || '',
@@ -100,240 +109,286 @@ export const SelfSignupPage = () => {
           <Logo pr="4" />
         </Container>
       </Box>
-      <Container maxW="md" py={{ base: '6' }} bgColor="white">
-        <Formik
-          initialValues={initialFormData}
-          validationSchema={signupFormSchema}
-          onSubmit={submitForm}
-        >
-          {({
-            errors,
-            touched,
-            isSubmitting,
-            handleSubmit,
-            values,
-            setFieldValue,
-            setFieldTouched
-          }) => (
-            <form onSubmit={handleSubmit}>
-              <Stack spacing="8">
-                <Stack spacing="4" textAlign="left">
-                  <VStack alignItems="start">
-                    <Heading as="h1" size="sm">
-                      Create Your Prescriber Account
-                    </Heading>
-                    <Text fontSize="md" color="gray">
-                      Pharmacies may use this information to ensure safe and compliant prescription
-                      fulfillment.
-                    </Text>
-                    <Text fontSize="md" marginTop="4">
-                      Please confirm your details:
-                    </Text>
-                  </VStack>
+      {isVerifiedPrescriber ? (
+        <Container maxW="md" py={{ base: '6' }} bgColor="white">
+          <Formik
+            initialValues={initialFormData}
+            validationSchema={signupFormSchema}
+            onSubmit={submitForm}
+          >
+            {({
+              errors,
+              touched,
+              isSubmitting,
+              handleSubmit,
+              values,
+              setFieldValue,
+              setFieldTouched
+            }) => (
+              <form onSubmit={handleSubmit}>
+                <Stack spacing="8">
+                  <Stack spacing="4" textAlign="left">
+                    <VStack alignItems="start">
+                      <Heading as="h1" size="xs">
+                        Create Your Prescriber Account
+                      </Heading>
+                      <Text fontSize="md" color="gray">
+                        Pharmacies use this information to ensure safe and compliant prescription
+                        fulfillment.
+                      </Text>
+                      <Text fontSize="md" marginTop="4">
+                        Please confirm your details:
+                      </Text>
+                    </VStack>
 
-                  <Stack>
-                    <FormControl isRequired isInvalid={!!errors.firstName && touched.firstName}>
-                      <FormLabel htmlFor="firstName">First Name</FormLabel>
-                      <Field as={Input} id="firstName" name="firstName" autoComplete="given-name" />
-                      <ErrorMessage name="firstName" component={FormErrorMessage} />
+                    <Stack>
+                      <FormControl isRequired isInvalid={!!errors.firstName && touched.firstName}>
+                        <FormLabel htmlFor="firstName">First Name</FormLabel>
+                        <Field
+                          as={Input}
+                          id="firstName"
+                          name="firstName"
+                          autoComplete="given-name"
+                        />
+                        <ErrorMessage name="firstName" component={FormErrorMessage} />
+                      </FormControl>
+
+                      <FormControl isRequired isInvalid={!!errors.lastName && touched.lastName}>
+                        <FormLabel htmlFor="lastName">Last Name</FormLabel>
+                        <Field
+                          as={Input}
+                          id="lastName"
+                          name="lastName"
+                          autoComplete="family-name"
+                        />
+                        <ErrorMessage name="lastName" component={FormErrorMessage} />
+                      </FormControl>
+
+                      <FormControl isRequired isInvalid={!!errors.email && touched.email}>
+                        <HStack spacing="0" alignItems="center">
+                          <FormLabel htmlFor="email" marginRight="0" marginBottom="0">
+                            Email
+                          </FormLabel>
+                          <Popover placement={'top-start'}>
+                            <PopoverTrigger>
+                              <IconButton
+                                variant="ghost"
+                                color="gray"
+                                size="xs"
+                                aria-label="Why is email required?"
+                                icon={<FaInfoCircle />}
+                              />
+                            </PopoverTrigger>
+                            <Portal>
+                              <PopoverContent>
+                                <PopoverBody>
+                                  Photon will use this email to contact you if issues arise with
+                                  your prescriptions.
+                                </PopoverBody>
+                              </PopoverContent>
+                            </Portal>
+                          </Popover>
+                        </HStack>
+
+                        <Field
+                          as={Input}
+                          id="email"
+                          name="email"
+                          type="email"
+                          autoComplete="email"
+                        />
+                        <ErrorMessage name="email" component={FormErrorMessage} />
+                      </FormControl>
+
+                      <FormControl
+                        isRequired={!canPrefillNpi}
+                        isInvalid={!!errors.npi && touched.npi}
+                      >
+                        <FormLabel htmlFor="npi">NPI</FormLabel>
+                        <Field
+                          as={Input}
+                          id="npi"
+                          name="npi"
+                          placeholder="Enter your 10-digit NPI"
+                          maxLength={10}
+                          isReadOnly={canPrefillNpi}
+                        />
+                        {canPrefillNpi ? (
+                          <FormHelperText marginBottom="4">
+                            If your NPI is incorrect, please contact{' '}
+                            <Link
+                              href={`mailto:${supportEmail}`}
+                              textDecoration="underline"
+                              _before={{ display: 'none' }}
+                            >
+                              {supportEmail}
+                            </Link>
+                            .
+                          </FormHelperText>
+                        ) : null}
+                        <ErrorMessage name="npi" component={FormErrorMessage} />
+                      </FormControl>
+
+                      <FormControl isRequired isInvalid={!!errors.phone && touched.phone}>
+                        <FormLabel htmlFor="phone">Phone</FormLabel>
+                        <Field
+                          as={Input}
+                          id="phone"
+                          name="phone"
+                          placeholder="Enter your phone number"
+                          maxLength={10}
+                        />
+                        <ErrorMessage name="phone" component={FormErrorMessage} />
+                      </FormControl>
+
+                      <FormControl isInvalid={!!errors.fax && touched.fax}>
+                        <HStack spacing="0" alignItems="center">
+                          <FormLabel htmlFor="fax" marginRight="0" marginBottom="0">
+                            Fax
+                          </FormLabel>
+                          <Popover placement={'top-start'}>
+                            <PopoverTrigger>
+                              <IconButton
+                                variant="ghost"
+                                color="gray"
+                                size="xs"
+                                aria-label="Why provide my fax?"
+                                icon={<FaInfoCircle />}
+                              />
+                            </PopoverTrigger>
+                            <Portal>
+                              <PopoverContent>
+                                <PopoverBody>
+                                  Pharmacies may use this fax number to reach you if there are
+                                  questions or issues with your prescriptions.
+                                </PopoverBody>
+                              </PopoverContent>
+                            </Portal>
+                          </Popover>
+                        </HStack>
+                        <Field
+                          as={Input}
+                          id="fax"
+                          name="fax"
+                          placeholder="Enter your fax number (optional)"
+                          maxLength={10}
+                        />
+                        <ErrorMessage name="fax" component={FormErrorMessage} />
+                      </FormControl>
+                    </Stack>
+                  </Stack>
+                  <Stack spacing="4">
+                    <Text fontSize="md">Address</Text>
+
+                    <FormControl isRequired isInvalid={!!errors.street1 && touched.street1}>
+                      <FormLabel htmlFor="street1">Street 1</FormLabel>
+                      <Field as={Input} id="street1" name="street1" autoComplete="address-line1" />
+                      <ErrorMessage name="street1" component={FormErrorMessage} />
                     </FormControl>
 
-                    <FormControl isRequired isInvalid={!!errors.lastName && touched.lastName}>
-                      <FormLabel htmlFor="lastName">Last Name</FormLabel>
-                      <Field as={Input} id="lastName" name="lastName" autoComplete="family-name" />
-                      <ErrorMessage name="lastName" component={FormErrorMessage} />
+                    <FormControl isInvalid={!!errors.street2 && touched.street2}>
+                      <FormLabel htmlFor="street2">Street 2</FormLabel>
+                      <Field
+                        as={Input}
+                        id="street2"
+                        name="street2"
+                        placeholder="Street 2 (optional)"
+                        autoComplete="address-line2"
+                      />
+                      <ErrorMessage name="street2" component={FormErrorMessage} />
                     </FormControl>
 
-                    <FormControl isRequired isInvalid={!!errors.email && touched.email}>
-                      <HStack spacing="0" alignItems="center">
-                        <FormLabel htmlFor="email" marginRight="0" marginBottom="0">
-                          Email
-                        </FormLabel>
-                        <Popover placement={'top-start'}>
-                          <PopoverTrigger>
-                            <IconButton
-                              variant="ghost"
-                              color="gray"
-                              size="xs"
-                              aria-label="Why is email required?"
-                              icon={<FaInfoCircle />}
-                            />
-                          </PopoverTrigger>
-                          <Portal>
-                            <PopoverContent>
-                              <PopoverBody>
-                                Photon will use this email to contact you if issues arise with your
-                                prescriptions.
-                              </PopoverBody>
-                            </PopoverContent>
-                          </Portal>
-                        </Popover>
-                      </HStack>
-
-                      <Field as={Input} id="email" name="email" type="email" autoComplete="email" />
-                      <ErrorMessage name="email" component={FormErrorMessage} />
+                    <FormControl isRequired isInvalid={!!errors.city && touched.city}>
+                      <FormLabel htmlFor="city">City</FormLabel>
+                      <Field as={Input} id="city" name="city" autoComplete="address-level2" />
+                      <ErrorMessage name="city" component={FormErrorMessage} />
                     </FormControl>
 
                     <FormControl
-                      isRequired={!canPrefillNpi}
-                      isInvalid={!!errors.npi && touched.npi}
+                      isRequired
+                      isInvalid={!!errors.state?.value && touched.state?.value}
                     >
-                      <FormLabel htmlFor="npi">NPI</FormLabel>
+                      <FormLabel htmlFor="state">State</FormLabel>
+                      <FormikStateSelect
+                        value={values.state}
+                        setFieldValue={setFieldValue}
+                        setFieldTouched={setFieldTouched}
+                        fieldName="state"
+                      />
+                      <ErrorMessage name="state.value" component={FormErrorMessage} />
+                    </FormControl>
+
+                    <FormControl isRequired isInvalid={!!errors.postalCode && touched.postalCode}>
+                      <FormLabel htmlFor="postalCode">ZIP Code</FormLabel>
                       <Field
                         as={Input}
-                        id="npi"
-                        name="npi"
-                        placeholder="Enter your 10-digit NPI"
-                        maxLength={10}
-                        isReadOnly={canPrefillNpi}
+                        id="postalCode"
+                        name="postalCode"
+                        autoComplete="postal-code"
                       />
-                      {canPrefillNpi ? (
-                        <FormHelperText marginBottom="4">
-                          If your NPI is incorrect, please contact{' '}
-                          <Link
-                            href="mailto:support@doximity.com"
-                            textDecoration="underline"
-                            _before={{ display: 'none' }}
-                          >
-                            support@doximity.com
+                      <ErrorMessage name="postalCode" component={FormErrorMessage} />
+                    </FormControl>
+
+                    <FormControl isInvalid={!!errors.didAgreeToTerms && touched.didAgreeToTerms}>
+                      <Checkbox
+                        isChecked={values.didAgreeToTerms}
+                        alignItems={'baseline'}
+                        onChange={(e) => setFieldValue('didAgreeToTerms', e.target.checked)}
+                      >
+                        <Text as="span" fontWeight="bold" fontSize="md" display="inline">
+                          I agree
+                        </Text>{' '}
+                        <Text as="span" fontSize="md" display="inline">
+                          that by creating an account and prescribing with Photon Health, Inc., I am
+                          authorized and licensed to prescribe, and I accept Photon Health's{' '}
+                          <Link href="https://www.photon.health/terms" target="_blank">
+                            Terms of Service
+                          </Link>{' '}
+                          and{' '}
+                          <Link href="https://www.photon.health/baa" target="_blank">
+                            Business Associate Agreement (BAA)
                           </Link>
                           .
-                        </FormHelperText>
-                      ) : null}
-                      <ErrorMessage name="npi" component={FormErrorMessage} />
+                        </Text>
+                      </Checkbox>{' '}
+                      <ErrorMessage name="didAgreeToTerms" component={FormErrorMessage} />
                     </FormControl>
 
-                    <FormControl isRequired isInvalid={!!errors.phone && touched.phone}>
-                      <FormLabel htmlFor="phone">Phone</FormLabel>
-                      <Field
-                        as={Input}
-                        id="phone"
-                        name="phone"
-                        placeholder="Enter your phone number"
-                        maxLength={10}
-                      />
-                      <ErrorMessage name="phone" component={FormErrorMessage} />
-                    </FormControl>
-
-                    <FormControl isInvalid={!!errors.fax && touched.fax}>
-                      <HStack spacing="0" alignItems="center">
-                        <FormLabel htmlFor="fax" marginRight="0" marginBottom="0">
-                          Fax
-                        </FormLabel>
-                        <Popover placement={'top-start'}>
-                          <PopoverTrigger>
-                            <IconButton
-                              variant="ghost"
-                              color="gray"
-                              size="xs"
-                              aria-label="Why provide my fax?"
-                              icon={<FaInfoCircle />}
-                            />
-                          </PopoverTrigger>
-                          <Portal>
-                            <PopoverContent>
-                              <PopoverBody>
-                                Pharmacies may use this fax number to reach you if there are
-                                questions or issues with your prescriptions.
-                              </PopoverBody>
-                            </PopoverContent>
-                          </Portal>
-                        </Popover>
-                      </HStack>
-                      <Field
-                        as={Input}
-                        id="fax"
-                        name="fax"
-                        placeholder="Enter your fax number (optional)"
-                        maxLength={10}
-                      />
-                      <ErrorMessage name="fax" component={FormErrorMessage} />
-                    </FormControl>
+                    <Button type="submit" isLoading={isSubmitting}>
+                      Submit
+                    </Button>
                   </Stack>
                 </Stack>
-                <Stack spacing="4">
-                  <Text fontSize="md">Address</Text>
-
-                  <FormControl isRequired isInvalid={!!errors.street1 && touched.street1}>
-                    <FormLabel htmlFor="street1">Street 1</FormLabel>
-                    <Field as={Input} id="street1" name="street1" autoComplete="address-line1" />
-                    <ErrorMessage name="street1" component={FormErrorMessage} />
-                  </FormControl>
-
-                  <FormControl isInvalid={!!errors.street2 && touched.street2}>
-                    <FormLabel htmlFor="street2">Street 2</FormLabel>
-                    <Field
-                      as={Input}
-                      id="street2"
-                      name="street2"
-                      placeholder="Street 2 (optional)"
-                      autoComplete="address-line2"
-                    />
-                    <ErrorMessage name="street2" component={FormErrorMessage} />
-                  </FormControl>
-
-                  <FormControl isRequired isInvalid={!!errors.city && touched.city}>
-                    <FormLabel htmlFor="city">City</FormLabel>
-                    <Field as={Input} id="city" name="city" autoComplete="address-level2" />
-                    <ErrorMessage name="city" component={FormErrorMessage} />
-                  </FormControl>
-
-                  <FormControl isRequired isInvalid={!!errors.state?.value && touched.state?.value}>
-                    <FormLabel htmlFor="state">State</FormLabel>
-                    <FormikStateSelect
-                      value={values.state}
-                      setFieldValue={setFieldValue}
-                      setFieldTouched={setFieldTouched}
-                      fieldName="state"
-                    />
-                    <ErrorMessage name="state.value" component={FormErrorMessage} />
-                  </FormControl>
-
-                  <FormControl isRequired isInvalid={!!errors.postalCode && touched.postalCode}>
-                    <FormLabel htmlFor="postalCode">ZIP Code</FormLabel>
-                    <Field
-                      as={Input}
-                      id="postalCode"
-                      name="postalCode"
-                      autoComplete="postal-code"
-                    />
-                    <ErrorMessage name="postalCode" component={FormErrorMessage} />
-                  </FormControl>
-
-                  <FormControl isInvalid={!!errors.didAgreeToTerms && touched.didAgreeToTerms}>
-                    <Checkbox
-                      isChecked={values.didAgreeToTerms}
-                      alignItems={'baseline'}
-                      onChange={(e) => setFieldValue('didAgreeToTerms', e.target.checked)}
-                    >
-                      <Text as="span" fontWeight="bold" fontSize="md" display="inline">
-                        I agree
-                      </Text>{' '}
-                      <Text as="span" fontSize="md" display="inline">
-                        that by creating an account and prescribing with Photon Health, Inc., I am
-                        authorized and licensed to prescribe, and I accept Photon Health's{' '}
-                        <Link href="https://www.photon.health/terms" target="_blank">
-                          Terms of Service
-                        </Link>{' '}
-                        and{' '}
-                        <Link href="https://www.photon.health/baa" target="_blank">
-                          Business Associate Agreement (BAA)
-                        </Link>
-                        .
-                      </Text>
-                    </Checkbox>{' '}
-                    <ErrorMessage name="didAgreeToTerms" component={FormErrorMessage} />
-                  </FormControl>
-
-                  <Button type="submit" isLoading={isSubmitting}>
-                    Submit
-                  </Button>
-                </Stack>
-              </Stack>
-            </form>
+              </form>
+            )}
+          </Formik>
+        </Container>
+      ) : (
+        <Container maxW="lg" marginY="8">
+          <Alert status="error">
+            <AlertIcon />
+            <AlertDescription fontSize="sm">
+              Your identity or prescribing credentials haven’t been verified, so you can’t access
+              this page
+            </AlertDescription>
+          </Alert>
+          {supportEmail && (
+            <Text fontSize="sm" marginY="4" textAlign="center">
+              <span>
+                Please reach out to{' '}
+                <Link
+                  href={`mailto:${supportEmail}`}
+                  textDecoration="underline"
+                  _before={{ display: 'none' }}
+                >
+                  {supportEmail}
+                </Link>{' '}
+                if you believe this is an error or need help completing verification
+              </span>
+            </Text>
           )}
-        </Formik>
-      </Container>
+        </Container>
+      )}
     </>
   );
 };
@@ -343,6 +398,9 @@ type SelfSignupFormPrefillData = {
   lastName?: string;
   email?: string;
   npi?: string;
+  verified?: boolean;
+  credentials?: string;
+  supportEmail?: string;
 };
 
 function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
@@ -356,6 +414,10 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
   const email: string = decodedPayload.email;
   const npi: string | undefined = decodedPayload.npi ? String(decodedPayload.npi) : undefined;
 
+  const verified: boolean = decodedPayload.verified ?? false;
+  const credentials: string | undefined = decodedPayload.credentials;
+  const supportEmail: string | undefined = decodedPayload.supportEmail;
+
   if (!npi || !firstName || !lastName || !email) {
     const missingFields = [];
     if (!npi) missingFields.push('npi');
@@ -366,7 +428,11 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
     console.error(`Prefill data missing from token for ${email}: ${missingFields.join(', ')}`);
   }
 
-  return { firstName, lastName, email, npi };
+  if (!verified || !VALID_LICENSES.has(credentials ?? 'none')) {
+    console.error(`Non verified prescriber attempted to sign up`, decodedPayload);
+  }
+
+  return { firstName, lastName, email, npi, verified, credentials, supportEmail };
 }
 
 const buildSignupContinueParams = (state: string, formData: SignupFormData): string => {
