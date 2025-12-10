@@ -252,7 +252,6 @@ const PatientForm = (props: { patientId: string }) => {
                     value={store['lastName']?.value ?? pStore.selectedPatient.data?.name.last}
                   />
                   <photon-datepicker
-                    no-initial-date="true"
                     class="w-full"
                     invalid={store['dateOfBirth']?.error}
                     help-text={store['dateOfBirth']?.error}

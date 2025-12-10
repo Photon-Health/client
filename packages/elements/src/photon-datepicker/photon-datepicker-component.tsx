@@ -24,21 +24,18 @@ const Component = (props: {
   helpText?: string;
   disabled: boolean;
   value?: string;
-  noInitialDate?: boolean;
   min?: Date;
 }) => {
   let ref: any;
   let inputRef: any;
-  // initialized with today's date
-  const initialDate = props?.noInitialDate ? '' : format(new Date(), 'yyyy-MM-dd').toString();
-  const [date, setDate] = createSignal(props?.value || initialDate);
+  const [date, setDate] = createSignal(props?.value || '');
 
   const dispatchDateSelected = (date: string) => {
     const event = new CustomEvent('photon-datepicker-selected', {
       composed: true,
       bubbles: true,
       detail: {
-        date: date
+        date
       }
     });
     ref?.dispatchEvent(event);
@@ -98,7 +95,6 @@ customElement(
     helpText: undefined,
     disabled: false,
     value: undefined,
-    noInitialDate: undefined,
     min: undefined
   },
   Component
