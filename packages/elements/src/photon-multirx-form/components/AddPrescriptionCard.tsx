@@ -418,6 +418,7 @@ export const AddPrescriptionCard = (props: {
               label="Do Not Fill Before"
               invalid={props.store.effectiveDate?.error ?? false}
               help-text={props.store.effectiveDate?.error}
+              min={new Date()}
               on:photon-datepicker-selected={(e: any) =>
                 props.actions.updateFormValue({
                   key: 'effectiveDate',

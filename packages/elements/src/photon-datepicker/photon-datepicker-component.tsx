@@ -25,6 +25,7 @@ const Component = (props: {
   disabled: boolean;
   value?: string;
   noInitialDate?: boolean;
+  min?: Date;
 }) => {
   let ref: any;
   let inputRef: any;
@@ -78,6 +79,7 @@ const Component = (props: {
           type="date"
           value={date()}
           invalid={props.invalid}
+          min={props.min ? format(props.min, 'yyyy-MM-dd').toString() : undefined}
         >
           <p slot="help-text" class="text-sm text-red-400 pt-1 h-[21px] font-sans">
             {props.helpText}
@@ -96,7 +98,8 @@ customElement(
     helpText: undefined,
     disabled: false,
     value: undefined,
-    noInitialDate: undefined
+    noInitialDate: undefined,
+    min: undefined
   },
   Component
 );
