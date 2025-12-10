@@ -146,6 +146,12 @@ export enum CoverageStatus {
   NotCovered = 'NOT_COVERED'
 }
 
+export type Customer = {
+  __typename?: 'Customer';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type DraftedPrescriptionInput = {
   daysSupply?: InputMaybe<Scalars['Int']['input']>;
   dispenseAsWritten?: InputMaybe<Scalars['Boolean']['input']>;
@@ -235,6 +241,7 @@ export type Mutation = {
   resendInvite: Invite;
   rotateClientSecret: Client;
   setUserRoles: Scalars['ID']['output'];
+  trackEvent: Scalars['Boolean']['output'];
   updateClient: Client;
   updateMyProfile: Scalars['ID']['output'];
   updateOrganization: Scalars['ID']['output'];
@@ -318,6 +325,12 @@ export type MutationRotateClientSecretArgs = {
 export type MutationSetUserRolesArgs = {
   roles: Array<Scalars['ID']['input']>;
   userId: Scalars['ID']['input'];
+};
+
+
+export type MutationTrackEventArgs = {
+  event: Scalars['String']['input'];
+  properties?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -428,6 +441,7 @@ export type Organization = {
   __typename?: 'Organization';
   NPI?: Maybe<Scalars['String']['output']>;
   address?: Maybe<Address>;
+  customer?: Maybe<Customer>;
   email?: Maybe<Scalars['String']['output']>;
   fax?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];

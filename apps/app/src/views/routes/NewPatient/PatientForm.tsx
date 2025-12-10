@@ -1,5 +1,6 @@
 import { MutableRefObject, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useProviderAnalytics } from '../../../hooks/useProviderAnalytics';
 
 declare global {
   namespace JSX {
@@ -12,12 +13,17 @@ declare global {
 export const PatientForm = () => {
   const ref: MutableRefObject<any> = useRef(null);
   const navigate = useNavigate();
+  const { track } = useProviderAnalytics();
 
   useEffect(() => {
     if (ref.current) {
       ref.current.open = true;
+      track('patient_form_opened');
+
       ref.current.addEventListener('photon-patient-created', (e: any) => {
         const id = e?.detail?.patientId;
+        track('patient_form_created', { patientId: id });
+
         if (e?.detail?.createPrescription) {
           navigate(`/prescriptions/new?patientId=${id}`);
         } else {
@@ -28,7 +34,7 @@ export const PatientForm = () => {
         navigate(`/patients`);
       });
     }
-  }, [ref.current]);
+  }, [navigate, track]);
 
   return (
     <div>
