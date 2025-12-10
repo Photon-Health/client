@@ -251,7 +251,7 @@ export default function PickupPharmacySearch(props: PharmacySearchProps) {
                   e.preventDefault();
                   setOpenLocationSearch(true);
                 }}
-                class="text-left truncate text-blue-600 font-semibold text-sm"
+                class="text-left truncate text-blue-600 font-semibold text-sm flex items-center"
               >
                 <Icon name="mapPin" size="sm" class="inline-block mr-1" />
                 {location()?.address || 'Set a location'}

@@ -7,6 +7,7 @@ import { PhotonClient, PhotonProvider } from '@photonhealth/react';
 
 import { useEffect } from 'react';
 import { auth0Config } from './configs/auth';
+import { ProviderAnalyticsProvider } from './hooks/useProviderAnalytics';
 import { Login } from './views/routes/Login';
 import { SSOLogin } from './views/routes/SSOLogin';
 import { Logout } from './views/routes/Logout';
@@ -59,41 +60,43 @@ export const App = () => {
   return (
     <BrowserRouter>
       <PhotonProvider env={env} client={client} onRedirectCallback={onRedirectCallback}>
-        <Routes>
-          <Route path="/" element={<Main />}>
-            <Route path="/patients">
-              <Route path="/patients" element={<Patients />} />
-              <Route path="new" element={<PatientForm />} />
-              <Route path="update/:patientId" element={<UpdatePatientForm />} />
+        <ProviderAnalyticsProvider>
+          <Routes>
+            <Route path="/" element={<Main />}>
+              <Route path="/patients">
+                <Route path="/patients" element={<Patients />} />
+                <Route path="new" element={<PatientForm />} />
+                <Route path="update/:patientId" element={<UpdatePatientForm />} />
+              </Route>
+              <Route path="/patients/:patientId" element={<Patient />} />
+              <Route path="/prescriptions">
+                <Route path="/prescriptions" element={<Prescriptions />} />
+                <Route path="new" element={<PrescriptionForm />} />
+                <Route path=":prescriptionId" element={<Prescription />} />
+              </Route>
+              <Route path="/orders">
+                <Route path="/orders" element={<Orders />} />
+                <Route path="new" element={<NewOrder />} />
+                <Route path=":orderId" element={<Order />} />
+              </Route>
+              <Route path="/support" element={<Support />} />
+              <Route path="/playground" element={<Playground />} />={' '}
+              <Route path="/settings" element={<Settings />}>
+                <Route path="user" />
+                <Route path="team" />
+                <Route path="organization" />
+                <Route path="developers" />
+                <Route path="templates" />
+                <Route path="catalog" />
+              </Route>
             </Route>
-            <Route path="/patients/:patientId" element={<Patient />} />
-            <Route path="/prescriptions">
-              <Route path="/prescriptions" element={<Prescriptions />} />
-              <Route path="new" element={<PrescriptionForm />} />
-              <Route path=":prescriptionId" element={<Prescription />} />
-            </Route>
-            <Route path="/orders">
-              <Route path="/orders" element={<Orders />} />
-              <Route path="new" element={<NewOrder />} />
-              <Route path=":orderId" element={<Order />} />
-            </Route>
-            <Route path="/support" element={<Support />} />
-            <Route path="/playground" element={<Playground />} />={' '}
-            <Route path="/settings" element={<Settings />}>
-              <Route path="user" />
-              <Route path="team" />
-              <Route path="organization" />
-              <Route path="developers" />
-              <Route path="templates" />
-              <Route path="catalog" />
-            </Route>
-          </Route>
-          <Route path="/login" element={<Login />} />
-          <Route path="/sso" element={<SSOLogin />} />
-          <Route path="/signup" element={<SelfSignupPage />} />
-          <Route path="/logout" element={<Logout />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/sso" element={<SSOLogin />} />
+            <Route path="/signup" element={<SelfSignupPage />} />
+            <Route path="/logout" element={<Logout />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ProviderAnalyticsProvider>
       </PhotonProvider>
     </BrowserRouter>
   );

@@ -2,6 +2,12 @@
 
 ## Local Development
 
+### Run against Boson services with code refresh
+
+Starts the clinical app dev server with hot refresh. Files in `app` dependencies will automatically rebuild, but you'll need to manually refresh the webpage to see your changes.
+
+`npx nx run app:dev`
+
 ### Run against Boson services
 
 > Runs against remote Boson environment services
