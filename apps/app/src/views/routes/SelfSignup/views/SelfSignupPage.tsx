@@ -129,12 +129,12 @@ export const SelfSignupPage = () => {
                 <Stack spacing="8">
                   <Stack spacing="4" textAlign="left">
                     <VStack alignItems="start">
-                      <Heading as="h1" size="sm">
+                      <Heading as="h1" size="xs">
                         Create Your Prescriber Account
                       </Heading>
                       <Text fontSize="md" color="gray">
-                        Pharmacies may use this information to ensure safe and compliant
-                        prescription fulfillment.
+                        Pharmacies use this information to ensure safe and compliant prescription
+                        fulfillment.
                       </Text>
                       <Text fontSize="md" marginTop="4">
                         Please confirm your details:
