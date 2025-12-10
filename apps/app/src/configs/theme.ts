@@ -67,6 +67,13 @@ const customTheme = extendTheme(
             }
           })
         }
+      },
+      Alert: {
+        baseStyle: {
+          container: {
+            borderRadius: 'lg'
+          }
+        }
       }
     }
   },
