@@ -12,7 +12,6 @@ import {
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { DispenseUnit, Medication, Prescription } from '@photonhealth/sdk/dist/types';
-import { format } from 'date-fns';
 import { any, min, number, record, refine, size, string } from 'superstruct';
 import { afterDate, between, message } from '../../validators';
 
@@ -30,18 +29,15 @@ import { DisableList } from '../photon-prescribe-workflow';
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 const validators = {
-  treatment: message(record(string(), any()), 'Please select a treatment...'),
+  treatment: message(record(string(), any()), 'Please select a treatment'),
   dispenseQuantity: message(min(number(), 0, { exclusive: true }), 'Quantity must be positive'),
   dispenseUnit: message(
     refine(string(), 'nonEmptyString', (value) => value.trim().length > 0),
-    'Please select a dispensing unit...'
+    'Please select a dispensing unit'
   ),
   daysSupply: message(min(number(), 0), 'Days Supply must be at least 0'),
   refillsInput: message(between(0, 11), 'Refills must be 0 to 11'),
-  instructions: message(
-    size(string(), 1, Infinity),
-    'Please enter instructions for the patient...'
-  ),
+  instructions: message(size(string(), 1, Infinity), 'Please enter instructions for the patient'),
   effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
 };
 
@@ -157,7 +153,7 @@ export const AddPrescriptionCard = (props: {
     // RESET THE FORM
     props.actions.updateFormValue({
       key: 'effectiveDate',
-      value: format(new Date(), 'yyyy-MM-dd').toString()
+      value: ''
     });
     props.actions.clearKeys([
       'treatment',
@@ -415,6 +411,7 @@ export const AddPrescriptionCard = (props: {
           />
           <div class="w-full">
             <photon-datepicker
+              value={props.store.effectiveDate?.value}
               label="Do Not Fill Before"
               invalid={props.store.effectiveDate?.error ?? false}
               help-text={props.store.effectiveDate?.error}

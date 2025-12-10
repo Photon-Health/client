@@ -13,7 +13,7 @@ import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?in
 import styles from './style.css?inline';
 
 import { format } from 'date-fns';
-import { onMount, createSignal } from 'solid-js';
+import { onMount } from 'solid-js';
 import formatDate from './formatDate';
 
 const Component = (props: {
@@ -28,8 +28,6 @@ const Component = (props: {
 }) => {
   let ref: any;
   let inputRef: any;
-  const [date, setDate] = createSignal(props?.value || '');
-
   const dispatchDateSelected = (date: string) => {
     const event = new CustomEvent('photon-datepicker-selected', {
       composed: true,
@@ -42,13 +40,11 @@ const Component = (props: {
   };
 
   onMount(() => {
-    dispatchDateSelected(date());
     inputRef?.addEventListener('paste', (e: any) => {
       const pasteText = e.clipboardData.getData('Text');
       const formattedDate = formatDate(pasteText);
 
       if (formattedDate) {
-        setDate(formattedDate);
         dispatchDateSelected(formattedDate);
       }
     });
@@ -74,7 +70,7 @@ const Component = (props: {
           }}
           class="input"
           type="date"
-          value={date()}
+          value={props.value || ''}
           invalid={props.invalid}
           min={props.min ? format(props.min, 'yyyy-MM-dd').toString() : undefined}
         >
