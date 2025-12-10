@@ -274,20 +274,6 @@ export const AddPrescriptionCard = (props: {
               />
             </div>
           </div>
-          <div class="mt-2 sm:mt-0 w-full md:pr-2">
-            <photon-datepicker
-              label="Do Not Fill Before"
-              invalid={props.store.effectiveDate?.error ?? false}
-              help-text={props.store.effectiveDate?.error}
-              required="true"
-              on:photon-datepicker-selected={(e: any) =>
-                props.actions.updateFormValue({
-                  key: 'effectiveDate',
-                  value: e.detail.date
-                })
-              }
-            />
-          </div>
           <div class="mt-2 sm:mt-0 sm:grid sm:grid-cols-2 sm:gap-4">
             <div class="flex items-end gap-1 items-stretch">
               <photon-number-input
@@ -430,6 +416,19 @@ export const AddPrescriptionCard = (props: {
             }
             value={props.store.notes?.value}
           />
+          <div class="w-full">
+            <photon-datepicker
+              label="Do Not Fill Before"
+              invalid={props.store.effectiveDate?.error ?? false}
+              help-text={props.store.effectiveDate?.error}
+              on:photon-datepicker-selected={(e: any) =>
+                props.actions.updateFormValue({
+                  key: 'effectiveDate',
+                  value: e.detail.date
+                })
+              }
+            />
+          </div>
           <div class="flex flex-col xs:flex-row gap-2">
             <Show when={!props.hideAddToTemplates}>
               <photon-checkbox
