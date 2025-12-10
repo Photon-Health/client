@@ -326,7 +326,6 @@ const PatientForm = (props: { patientId: string }) => {
                   invalid={store['address_street2']?.error}
                   help-text={store['address_street2']?.error}
                   label="Street 2"
-                  optional={true}
                   on:photon-input-changed={async (e: any) => {
                     actions.updateFormValue({
                       key: 'address_street2',

@@ -451,7 +451,6 @@ export const AddPrescriptionCard = (props: {
                 value={props.store.templateName?.value ?? ''}
                 invalid={props.store.templateName?.error ?? false}
                 help-text={props.store.templateName?.error}
-                optional="true"
                 on:photon-input-changed={(e: any) =>
                   props.actions.updateFormValue({
                     key: 'templateName',
