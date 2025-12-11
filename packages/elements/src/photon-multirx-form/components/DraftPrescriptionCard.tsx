@@ -14,7 +14,6 @@ import repopulateForm from '../util/repopulateForm';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { PhotonTooltip } from '../../photon-tooltip';
 import { Prescription } from '@photonhealth/sdk/dist/types';
-import { format } from 'date-fns';
 
 export const DraftPrescriptionCard = (props: {
   prescriptionRef: HTMLDivElement | undefined;
@@ -192,7 +191,7 @@ function toFormData(coverageOption: CoverageOption): PrescriptionFormData {
     // so that the edit flow will remove it from the list of prescriptions
     id: coverageOption.prescriptionId,
 
-    effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
+    effectiveDate: undefined,
     dispenseAsWritten: false,
     dispenseQuantity: coverageOption.dispenseQuantity,
     dispenseUnit: coverageOption.dispenseUnit,

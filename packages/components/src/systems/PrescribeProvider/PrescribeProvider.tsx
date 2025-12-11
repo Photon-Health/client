@@ -7,7 +7,6 @@ import {
   JSXElement,
   useContext
 } from 'solid-js';
-import { format } from 'date-fns';
 import { usePhotonClient } from '../SDKProvider';
 import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
 import {
@@ -79,7 +78,7 @@ export type TemplateOverrides = {
 
 export type PrescriptionFormData = {
   id?: string;
-  effectiveDate: string;
+  effectiveDate?: string;
   treatment: {
     id: string;
     name: string;
@@ -106,7 +105,7 @@ interface PrescribeProviderProps {
   enableCoverageCheck: boolean;
 }
 
-const transformPrescription = (prescription: PrescriptionFormData, patientId: string) => ({
+const transformPrescriptionFormData = (prescription: PrescriptionFormData, patientId: string) => ({
   externalId: prescription.externalId,
   patientId: patientId,
   treatmentId: prescription.treatment?.id,
@@ -117,7 +116,7 @@ const transformPrescription = (prescription: PrescriptionFormData, patientId: st
   daysSupply: prescription.daysSupply,
   instructions: prescription.instructions,
   notes: prescription.notes,
-  effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
+  effectiveDate: prescription.effectiveDate,
   diagnoses: prescription.diagnoseCodes
 });
 
@@ -433,7 +432,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     try {
       const res = await client.apollo.mutate({
         mutation: CreatePrescription,
-        variables: transformPrescription(prescriptionFormData, props.patientId)
+        variables: transformPrescriptionFormData(prescriptionFormData, props.patientId)
       });
       const created = res.data.createPrescription as Prescription;
       createdPrescription = created;
@@ -486,7 +485,9 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     const res = await client.apollo.mutate({
       mutation: CreatePrescriptionTemplate,
       variables: {
-        ...transformPrescription(prescription, props.patientId),
+        ...transformPrescriptionFormData(prescription, props.patientId),
+        // If effectiveDate is defined, don't save to template
+        effectiveDate: null,
         catalogId,
         isPrivate: true,
         ...(templateName ? { name: templateName } : {})

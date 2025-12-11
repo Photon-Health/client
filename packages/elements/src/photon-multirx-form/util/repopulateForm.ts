@@ -48,6 +48,12 @@ const repopulateForm = (actions: Record<string, (...args: any) => any>, draft: a
       value: draft.notes
     });
   }
+  if (draft.effectiveDate) {
+    actions.updateFormValue({
+      key: 'effectiveDate',
+      value: draft.effectiveDate
+    });
+  }
 };
 
 export default repopulateForm;
