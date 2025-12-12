@@ -16,6 +16,10 @@
     "apps/*",
     "packages/*"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Photon-Health/client"
+  },
   "devDependencies": {
     "@babel/preset-react": "^7.14.5",
     "@graphql-codegen/cli": "^5.0.0",
