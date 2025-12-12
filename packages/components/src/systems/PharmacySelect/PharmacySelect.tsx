@@ -92,9 +92,7 @@ export function PharmacySelect(props: PharmacySelectProps) {
     setTabs([
       ...(props.enableSendToPatient ? [TabNamesEnum.sendToPatient] : []),
       ...(props.enableLocalPickup ? [TabNamesEnum.localPickup] : []),
-      ...(props.enableDeliveryPharmacies && props.mailOrderPharmacyIds
-        ? [TabNamesEnum.mailOrder]
-        : [])
+      ...(props.enableDeliveryPharmacies ? [TabNamesEnum.mailOrder] : [])
     ]);
 
     // Fulfillment option from the first tab name
