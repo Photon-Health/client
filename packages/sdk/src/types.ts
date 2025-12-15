@@ -585,7 +585,7 @@ export type Prescription = {
   dispenseAsWritten?: Maybe<Scalars['Boolean']>;
   dispenseQuantity: Scalars['Float'];
   dispenseUnit: Scalars['String'];
-  effectiveDate?: Scalars['AWSDate'];
+  effectiveDate?: Maybe<Scalars['AWSDate']>;
   expirationDate: Scalars['AWSDate'];
   externalId?: Maybe<Scalars['ID']>;
   fills: Array<Maybe<Fill>>;
