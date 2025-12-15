@@ -81,7 +81,9 @@ export const Main = () => {
           env={process.env.REACT_APP_ENV_NAME as Env}
         >
           <Nav />
-          <Outlet />
+          <Box as="main" marginTop="16">
+            <Outlet />
+          </Box>
         </photon-client>
       ) : null}
     </Box>

@@ -111,54 +111,54 @@ export const UsersList = (props: { rolesMap: Record<string, string> }) => {
     <Box borderRadius="lg" bg="white" boxShadow="base">
       <Container padding={{ base: '0', md: '0' }}>
         <Stack spacing={3}>
-          <HStack justify="space-between" pt={6} pb={2} px={4}>
-            <Stack>
+          <Stack pt={6} pb={2} px={4}>
+            <HStack justify="space-between">
               <Text fontSize="xl" fontWeight="medium">
                 Users
               </Text>
-              <form onSubmit={submitFilterSearch}>
-                <HStack>
-                  <InputGroup>
-                    <Input
-                      placeholder="Search by name"
-                      aria-label="Search by name"
-                      value={filterInputValue}
-                      onChange={(e) => setFilterInputValue(e.target.value)}
-                      size="sm"
-                      width="200px"
-                    />
-                    {filterInputValue.length > 0 ? (
-                      <InputRightElement pointerEvents="all">
-                        <IconButton
-                          aria-label="Clear search filter"
-                          size="xs"
-                          variant="ghost"
-                          _hover={{ bg: 'transparent' }}
-                          onClick={handleClearFilterClick}
-                          icon={<CloseIcon w={2} h={2} />}
-                          {...props}
-                        />
-                      </InputRightElement>
-                    ) : undefined}
-                  </InputGroup>
-                  <Button type="submit" size="sm">
-                    Search
-                  </Button>
-                </HStack>
-              </form>
-            </Stack>
-            {hasInvite && (
-              <Button
-                onClick={onOpen}
-                colorScheme="blue"
-                aria-label="Invite user"
-                size="sm"
-                disabled={isOpen}
-              >
-                Invite user
-              </Button>
-            )}
-          </HStack>
+              {hasInvite && (
+                <Button
+                  onClick={onOpen}
+                  colorScheme="blue"
+                  aria-label="Invite user"
+                  size="sm"
+                  disabled={isOpen}
+                >
+                  Invite user
+                </Button>
+              )}
+            </HStack>
+            <form onSubmit={submitFilterSearch}>
+              <HStack justifyItems="flex-start">
+                <InputGroup w="auto">
+                  <Input
+                    placeholder="Search by name"
+                    aria-label="Search by name"
+                    value={filterInputValue}
+                    onChange={(e) => setFilterInputValue(e.target.value)}
+                    size="sm"
+                    width="200px"
+                  />
+                  {filterInputValue.length > 0 ? (
+                    <InputRightElement pointerEvents="all">
+                      <IconButton
+                        aria-label="Clear search filter"
+                        size="xs"
+                        variant="ghost"
+                        _hover={{ bg: 'transparent' }}
+                        onClick={handleClearFilterClick}
+                        icon={<CloseIcon w={2} h={2} />}
+                        {...props}
+                      />
+                    </InputRightElement>
+                  ) : undefined}
+                </InputGroup>
+                <Button type="submit" size="sm">
+                  Search
+                </Button>
+              </HStack>
+            </form>
+          </Stack>
           {error ? (
             <Alert status="error">
               <AlertIcon />

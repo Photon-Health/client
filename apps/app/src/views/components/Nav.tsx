@@ -81,7 +81,7 @@ export const Nav = () => {
   }, [clearOrganization]);
 
   return (
-    <Box as="nav" bg="#001740" py="3">
+    <Box as="nav" bg="#001740" py="3" position="fixed" top={0} insetX={0} zIndex={40}>
       <Container>
         <Flex justifyContent="space-between">
           <HStack>
