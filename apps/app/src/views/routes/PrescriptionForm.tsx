@@ -156,8 +156,7 @@ export const PrescriptionForm = () => {
         top: 0,
         left: 0,
         backgroundColor: 'white',
-        width: '100%',
-        zIndex: 15
+        width: '100%'
       }}
     >
       {user?.org_id ? (
