@@ -34,7 +34,10 @@ const Component = (props: {
       composed: true,
       bubbles: true,
       detail: {
-        date
+        // Handle edge case where clicking Clear
+        // sets value to an empty string instead of `undefined`
+        // which interferes with validation
+        date: date || undefined
       }
     });
     ref?.dispatchEvent(event);
