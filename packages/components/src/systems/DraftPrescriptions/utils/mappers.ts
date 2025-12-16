@@ -7,9 +7,14 @@ export function toPrescriptionFormData(
   prescription: Prescription,
   catalogId?: string
 ): PrescriptionFormData {
-  const written = new Date(prescription.writtenAt);
-  const effectiveDate = parse(prescription.effectiveDate, CALENDAR_DATE_FORMAT, new Date());
-  const didPrescriberChooseEffectiveDate = !isSameDay(written, effectiveDate);
+  // We default non-nullable effectiveDate to the day the prescription was written
+  // so we assume if the effectiveDate is the same day as writtenAt
+  // then the prescriber didn't actively choose an effectiveDate and we don't
+  // need to preserve the effectiveDate value
+  const didPrescriberChooseEffectiveDate = !isSameDay(
+    new Date(prescription.writtenAt),
+    parse(prescription.effectiveDate, CALENDAR_DATE_FORMAT, new Date())
+  );
 
   return {
     id: prescription.id,
