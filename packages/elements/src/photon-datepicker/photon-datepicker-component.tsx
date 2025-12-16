@@ -15,6 +15,7 @@ import styles from './style.css?inline';
 import { format } from 'date-fns';
 import { onMount } from 'solid-js';
 import formatDate from './formatDate';
+import { CALENDAR_DATE_FORMAT } from '@photonhealth/components';
 
 const Component = (props: {
   label?: string;
@@ -72,7 +73,7 @@ const Component = (props: {
           type="date"
           value={props.value}
           invalid={props.invalid}
-          min={props.min ? format(props.min, 'yyyy-MM-dd').toString() : undefined}
+          min={props.min ? format(props.min, CALENDAR_DATE_FORMAT).toString() : undefined}
         >
           <p slot="help-text" class="text-sm text-red-400 pt-1 h-[21px] font-sans">
             {props.helpText}

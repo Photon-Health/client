@@ -19,7 +19,7 @@ import {
   GetPrescription,
   UpdatePrescriptionStates
 } from '../../fetch';
-import { triggerToast, useRecentOrders } from '../../index';
+import { CALENDAR_DATE_FORMAT, triggerToast, useRecentOrders } from '../../index';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
 import {
   combineAllRoutingConstraints,
@@ -117,7 +117,7 @@ const transformPrescriptionFormData = (prescription: PrescriptionFormData, patie
   daysSupply: prescription.daysSupply,
   instructions: prescription.instructions,
   notes: prescription.notes,
-  effectiveDate: prescription.effectiveDate || format(new Date(), 'yyyy-MM-dd').toString(),
+  effectiveDate: prescription.effectiveDate || format(new Date(), CALENDAR_DATE_FORMAT).toString(),
   diagnoses: prescription.diagnoseCodes
 });
 
