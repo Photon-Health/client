@@ -15,7 +15,7 @@ export interface DialogProps {
 }
 
 function Dialog(props: DialogProps) {
-  const merged = mergeProps({ size: 'md', open: false, position: 'bottom' }, props);
+  const merged = mergeProps({ size: 'md', open: false, position: 'center' }, props);
 
   const panelClasses = createMemo(() =>
     clsx(
@@ -79,7 +79,7 @@ function Dialog(props: DialogProps) {
         {merged.open && (
           <div class="fixed inset-0 z-20 overflow-y-auto">
             <div
-              class={clsx('flex min-h-full justify-center p-4 text-center sm:items-center sm:p-0', {
+              class={clsx('flex min-h-full justify-center p-4 text-center sm:p-0', {
                 'items-end': merged.position === 'bottom',
                 'items-center': merged.position === 'center'
               })}

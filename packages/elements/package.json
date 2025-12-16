@@ -22,6 +22,10 @@
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Photon-Health/client"
+  },
   "files": [
     "dist",
     "package.json"
