@@ -1,6 +1,5 @@
 import { Button, triggerToast, usePhoton } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { format } from 'date-fns';
 import jwtDecode from 'jwt-decode';
 import { customElement } from 'solid-element';
 import { createSignal, onMount } from 'solid-js';
@@ -18,7 +17,7 @@ const shouldWarn = (form: any) =>
   form()['daysSupply']?.value != 30 ||
   form()['refillsInput']?.value != 0 ||
   form()['addToTemplates']?.value != false ||
-  form()['effectiveDate']?.value != format(new Date(), 'yyyy-MM-dd').toString();
+  form()['effectiveDate']?.value;
 
 const Component = (props: {
   enableMedHistory: boolean;

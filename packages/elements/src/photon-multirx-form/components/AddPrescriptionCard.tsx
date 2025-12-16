@@ -154,10 +154,6 @@ export const AddPrescriptionCard = (props: {
     props.screenDraftedPrescriptions();
 
     // RESET THE FORM
-    props.actions.updateFormValue({
-      key: 'effectiveDate',
-      value: undefined
-    });
     props.actions.clearKeys([
       'treatment',
       'dispenseAsWritten',
@@ -168,7 +164,8 @@ export const AddPrescriptionCard = (props: {
       'instructions',
       'notes',
       'templateName',
-      'addToTemplates'
+      'addToTemplates',
+      'effectiveDate'
     ]);
     setOffCatalog(undefined);
     clearForm(props.actions, props.prefillNotes ? { notes: props.prefillNotes } : undefined);

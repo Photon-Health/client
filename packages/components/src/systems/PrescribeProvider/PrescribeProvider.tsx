@@ -29,6 +29,7 @@ import {
 import { createStore } from 'solid-js/store';
 import getLocation from '../../utils/getLocations';
 import { useGoogleService } from '../GoogleServiceProvider';
+import { format } from 'date-fns';
 // The order form data will consist of, at least, the list of selected prescription IDs and pharmacy ID.
 // The prescription form data (todo) will consist of a single prescription's data during user input
 // Note: Multiple prescription "sub" forms can be opened/completed within a single order form
@@ -116,7 +117,7 @@ const transformPrescriptionFormData = (prescription: PrescriptionFormData, patie
   daysSupply: prescription.daysSupply,
   instructions: prescription.instructions,
   notes: prescription.notes,
-  effectiveDate: prescription.effectiveDate,
+  effectiveDate: prescription.effectiveDate || format(new Date(), 'yyyy-MM-dd').toString(),
   diagnoses: prescription.diagnoseCodes
 });
 
