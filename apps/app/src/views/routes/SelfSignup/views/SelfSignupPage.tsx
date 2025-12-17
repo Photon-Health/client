@@ -278,7 +278,7 @@ export const SelfSignupPage = () => {
                     </Stack>
                   </Stack>
                   <Stack spacing="4">
-                    <Text fontSize="md">Address</Text>
+                    <Text fontSize="md">Practice Address</Text>
 
                     <FormControl isRequired isInvalid={!!errors.street1 && touched.street1}>
                       <FormLabel htmlFor="street1">Street 1</FormLabel>
