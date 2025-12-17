@@ -24,6 +24,7 @@ import { TablePage } from '../components/TablePage';
 import PatientView from '../components/PatientView';
 import ContactView from '../components/ContactView';
 import { Patient } from 'packages/sdk/dist/types';
+import { compact } from 'lodash';
 
 const GET_PATIENTS = gql`
   query GetPatients($name: String, $after: ID, $first: Int) {
@@ -123,7 +124,22 @@ const renderSkeletonRow = () => ({
 });
 
 export const Patients = () => {
-  const columns = [
+  const [filterText, setFilterText] = useState('');
+  const [rows, setRows] = useState<any[]>([]);
+  const [finished, setFinished] = useState<boolean>(false);
+  const [disableScroll, setDisableScroll] = useState<boolean>(false);
+  const [filterTextDebounce] = useDebounce(filterText, 250);
+
+  const patientFilters = {
+    first: 25,
+    name: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
+  };
+  const { data, loading, error, fetchMore, refetch } = useQuery(GET_PATIENTS, {
+    variables: patientFilters
+  });
+  const patients: Patient[] | undefined = data?.patients;
+  const showExternalIdColumn = patients?.some((p) => !!p.externalId);
+  const columns = compact([
     {
       Header: 'Name',
       accessor: 'name' // accessor is the "key" in the data
@@ -136,30 +152,17 @@ export const Patients = () => {
       Header: 'Contact',
       accessor: 'contact'
     },
-    {
-      Header: 'Ext. Id',
-      accessor: 'externalId'
-    },
+    showExternalIdColumn
+      ? {
+          Header: 'Ext. Id',
+          accessor: 'externalId'
+        }
+      : undefined,
     {
       Header: '',
       accessor: 'edit'
     }
-  ];
-
-  const [filterText, setFilterText] = useState('');
-  const [rows, setRows] = useState<any[]>([]);
-  const [finished, setFinished] = useState<boolean>(false);
-  const [disableScroll, setDisableScroll] = useState<boolean>(false);
-  const [filterTextDebounce] = useDebounce(filterText, 250);
-
-  const getPatientsData = {
-    first: 25,
-    name: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
-  };
-  const { data, loading, error, fetchMore, refetch } = useQuery(GET_PATIENTS, {
-    variables: getPatientsData
-  });
-  const patients: Patient[] | undefined = data?.patients;
+  ]);
 
   useEffect(() => {
     if (filterTextDebounce) {
@@ -203,7 +206,7 @@ export const Patients = () => {
         fetchMoreData={async () => {
           await fetchMore({
             variables: {
-              ...getPatientsData,
+              ...patientFilters,
               after: rows?.at(-1)?.id,
               name: filterTextDebounce.length > 0 ? filterTextDebounce : undefined
             },
