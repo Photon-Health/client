@@ -184,7 +184,6 @@ export const Profile = () => {
     () =>
       compact([
         { title: 'Full Name', value: user?.name?.full },
-        // Handle Doximity case where each provider is in their own org
         organization?.name.toLowerCase() !== user?.name?.full.toLowerCase() && {
           title: 'Organization',
           value: organization?.name
