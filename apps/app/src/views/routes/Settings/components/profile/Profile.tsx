@@ -27,6 +27,7 @@ import { usePhoton } from '@photonhealth/react';
 import { ProfileForm, profileFormSchema } from './ProfileEditForm';
 import { formatAddress } from 'apps/app/src/utils';
 import { StyledToast } from 'apps/app/src/views/components/StyledToast';
+import { compact } from 'lodash';
 
 const profileQuery = graphql(/* GraphQL */ `
   query MeProfileQuery {
@@ -170,6 +171,7 @@ export const Profile = () => {
       phone: user?.phone ?? ''
     }
   };
+
   const address = useMemo(() => {
     const addressData = user?.address;
     if (!addressData) {
@@ -180,15 +182,19 @@ export const Profile = () => {
 
   const rows = useMemo(
     () =>
-      [
+      compact([
         { title: 'Full Name', value: user?.name?.full },
-        { title: 'Organization', value: organization?.name },
+        // Handle Doximity case where each provider is in their own org
+        organization?.name.toLowerCase() !== user?.name?.full.toLowerCase() && {
+          title: 'Organization',
+          value: organization?.name
+        },
         { title: 'Email Address', value: user?.email },
         { title: 'Phone', value: user?.phone },
         { title: 'Fax', value: user?.fax },
         { title: 'Address', value: address },
         { title: 'NPI', value: user?.npi }
-      ].map(({ title, value }) => ({
+      ]).map(({ title, value }) => ({
         title,
         value: value ? (
           <Text fontSize="sm">{value}</Text>
