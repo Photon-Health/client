@@ -119,9 +119,12 @@ export const Nav = () => {
                     <Text color="muted" fontSize="sm">
                       {user?.email}
                     </Text>
-                    <Text color="muted" fontSize="sm">
-                      {organization?.name && organization.name}
-                    </Text>
+                    {organization?.name &&
+                      user?.name.toLowerCase() !== organization?.name.toLowerCase() && (
+                        <Text color="muted" fontSize="sm">
+                          {organization.name}
+                        </Text>
+                      )}
                   </VStack>
                   <MenuDivider my={0} py={0} />
                   <MenuItem
