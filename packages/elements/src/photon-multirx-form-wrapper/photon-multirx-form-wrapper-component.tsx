@@ -196,7 +196,7 @@ const Component = (props: {
           patientActions.clearSelectedPatient();
         }}
         checkShouldWarn={() => shouldWarn(form)}
-        title="New prescription"
+        title="New prescriptions"
         titleIconName="prescription"
         footer={
           hideOrderButton() ? null : props.enableOrder ? (
@@ -206,7 +206,7 @@ const Component = (props: {
               loading={triggerSubmit()}
               onClick={handleCreateOrder}
             >
-              Send order
+              Send
             </Button>
           ) : (
             <>
