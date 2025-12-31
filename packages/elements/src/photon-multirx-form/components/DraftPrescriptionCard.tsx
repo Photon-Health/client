@@ -158,7 +158,7 @@ export const DraftPrescriptionCard = (props: {
       <Card addChildrenDivider={true}>
         <div class="flex items-center space-x-2 text-slate-500">
           <Text color="gray" class="pr-2">
-            {props.enableOrder ? 'Pending Order' : 'Pending Prescriptions'}
+            Draft Prescriptions
           </Text>
           <PhotonTooltip
             maxWidth="300px"
