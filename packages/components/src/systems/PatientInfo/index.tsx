@@ -117,14 +117,14 @@ export default function PatientInfo(props: PatientInfoProps) {
           </Button>
         </Show>
       </div>
-      <div class="pt-4" data-dd-privacy="mask">
+      <div class="pt-2" data-dd-privacy="mask">
         <div>
           <Text size="lg" bold loading={!patient()} sampleLoadingText="Sally Patient">
             {patient()?.name.full || 'N/A'}
           </Text>
           <button
             type="button"
-            class="sm:hidden flex items-center gap-1 text-gray-400 hover:text-gray-500 mt-1"
+            class="sm:hidden flex items-center gap-1 text-gray-400 hover:text-gray-500 mt-3"
             onClick={() => setIsExpanded(!isExpanded())}
             aria-expanded={isExpanded() ? 'true' : 'false'}
           >
