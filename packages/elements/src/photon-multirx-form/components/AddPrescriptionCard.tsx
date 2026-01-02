@@ -466,7 +466,7 @@ export const AddPrescriptionCard = (props: {
                 variant="secondary"
                 color="blue"
               >
-                {props.enableOrder ? 'Add Prescription to Order' : 'Add Prescription to Drafts'}
+                Add to Drafts
               </Button>
             </div>
           </div>

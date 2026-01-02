@@ -173,7 +173,7 @@ export default function RecentOrdersCombineDialog() {
       } catch {
         triggerToast({
           header: 'Error Creating Order',
-          body: 'The prescription was created but not turned into an order.',
+          body: 'The draft was created but not turned into an active prescription.',
           status: 'info'
         });
         setIsCombiningOrders(false);
@@ -200,7 +200,7 @@ export default function RecentOrdersCombineDialog() {
 
         <div class="flex flex-col gap-4">
           <div class="flex flex-col gap-2">
-            <Text>This patient currently has an order for:</Text>
+            <Text>This patient currently has prescriptions for:</Text>
             <div class="border border-solid border-gray-200 rounded-lg bg-gray-50 py-3 px-4">
               <For each={fillsWithRoutingState()}>
                 {(fill) => (

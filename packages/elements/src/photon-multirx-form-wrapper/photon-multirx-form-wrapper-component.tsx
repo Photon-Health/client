@@ -99,7 +99,7 @@ const Component = (props: {
     if (!canSubmit()) {
       return triggerToast({
         status: 'info',
-        body: 'You need to add prescription(s) to this order before you can send it.'
+        body: 'You need to add prescription(s) before sending.'
       });
     }
 
@@ -126,7 +126,7 @@ const Component = (props: {
     if (!canSubmit()) {
       return triggerToast({
         status: 'info',
-        body: 'You need to add prescription(s) to this order before you can send it.'
+        body: 'You need to add prescription(s) before sending.'
       });
     }
 
@@ -194,7 +194,7 @@ const Component = (props: {
           patientActions.clearSelectedPatient();
         }}
         checkShouldWarn={() => shouldWarn(form)}
-        title="New prescription"
+        title="New prescriptions"
         titleIconName="prescription"
         footer={
           hideOrderButton() ? null : props.enableOrder ? (
@@ -204,7 +204,7 @@ const Component = (props: {
               loading={triggerSubmit()}
               onClick={handleCreateOrder}
             >
-              Send order
+              Send
             </Button>
           ) : (
             <>
