@@ -602,7 +602,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 <Alert
                   type="warning"
                   header="You do not have permission to prescribe"
-                  message="You have access to see the form but you will not be able to submit an order."
+                  message="You have access to see the form but you will not be able to submit any prescriptions."
                 />
               </Show>
               <PatientCard
@@ -702,7 +702,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                       </Button>
                     </Show>
                     <Button loading={isLoadingPrefills() || isLoading()} onClick={combineOrSubmit}>
-                      {props.enableOrder ? 'Send order' : 'Save prescriptions'}
+                      Send
                     </Button>
                   </div>
                 </Show>
