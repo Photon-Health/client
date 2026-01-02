@@ -27,7 +27,7 @@ const stpStates: {
   patientWillSelect: {
     badgeColor: 'purple',
     badgeText: 'Patient Will Select',
-    text: 'Patient will select a pharmacy after you send an order.'
+    text: 'Patient will select a pharmacy after you send the prescription(s).'
   },
   recentPharmacy: {
     badgeColor: 'yellow',

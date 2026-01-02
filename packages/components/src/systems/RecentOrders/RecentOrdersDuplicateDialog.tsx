@@ -41,7 +41,7 @@ export default function RecentOrdersDuplicateDialog() {
           <Text bold class="mb-2">
             Looks like a duplicate order
           </Text>
-          <Text>This patient already has an order for the same prescription:</Text>
+          <Text>This patient already has the same prescription:</Text>
         </div>
 
         <div class="border border-solid border-gray-200 rounded-lg bg-gray-50 py-3 px-4">

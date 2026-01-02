@@ -45,7 +45,7 @@ export function DraftPrescriptionList(props: DraftPrescriptionsProps) {
       <Show when={!isLoadingPrefills() && prescriptionIds().length === 0}>
         <Banner status="info">
           {props.enableOrder
-            ? 'Add prescription(s) before sending an order'
+            ? 'Add prescription(s) before sending'
             : 'Add prescription(s) before saving'}
         </Banner>
       </Show>
