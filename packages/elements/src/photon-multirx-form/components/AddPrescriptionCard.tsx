@@ -38,7 +38,7 @@ const validators = {
   daysSupply: message(min(number(), 0), 'Days Supply must be at least 0'),
   refillsInput: message(between(0, 11), 'Refills must be 0 to 11'),
   instructions: message(size(string(), 1, Infinity), 'Please enter instructions for the patient'),
-  effectiveDate: message(
+  doNotFillBeforeDate: message(
     optional(afterDate(new Date())),
     "Please choose a date that isn't in the past"
   )
@@ -115,7 +115,7 @@ export const AddPrescriptionCard = (props: {
     }
 
     const prescriptionFormData: PrescriptionFormData = {
-      effectiveDate: props.store.effectiveDate?.value,
+      doNotFillBeforeDate: props.store.doNotFillBeforeDate?.value,
       treatment: { id: props.store.treatment.value.id, name: props.store.treatment.value.name },
       dispenseAsWritten: props.store.dispenseAsWritten.value,
       dispenseQuantity: props.store.dispenseQuantity.value,
@@ -165,7 +165,7 @@ export const AddPrescriptionCard = (props: {
       'notes',
       'templateName',
       'addToTemplates',
-      'effectiveDate'
+      'doNotFillBeforeDate'
     ]);
     setOffCatalog(undefined);
     clearForm(props.actions, props.prefillNotes ? { notes: props.prefillNotes } : undefined);
@@ -411,14 +411,14 @@ export const AddPrescriptionCard = (props: {
           />
           <div class="w-full">
             <photon-datepicker
-              value={props.store.effectiveDate?.value}
+              value={props.store.doNotFillBeforeDate?.value}
               label="Do Not Fill Before"
-              invalid={props.store.effectiveDate?.error ?? false}
-              help-text={props.store.effectiveDate?.error}
+              invalid={props.store.doNotFillBeforeDate?.error ?? false}
+              help-text={props.store.doNotFillBeforeDate?.error}
               min={new Date()}
               on:photon-datepicker-selected={(e: any) =>
                 props.actions.updateFormValue({
-                  key: 'effectiveDate',
+                  key: 'doNotFillBeforeDate',
                   value: e.detail.date
                 })
               }

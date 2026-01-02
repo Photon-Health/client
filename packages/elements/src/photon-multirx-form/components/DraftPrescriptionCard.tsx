@@ -190,8 +190,7 @@ function toFormData(coverageOption: CoverageOption): PrescriptionFormData {
     // re-using the prescriptionId (via coverageOption.prescriptionId) of the original Prescription
     // so that the edit flow will remove it from the list of prescriptions
     id: coverageOption.prescriptionId,
-
-    effectiveDate: undefined,
+    doNotFillBeforeDate: undefined,
     dispenseAsWritten: false,
     dispenseQuantity: coverageOption.dispenseQuantity,
     dispenseUnit: coverageOption.dispenseUnit,

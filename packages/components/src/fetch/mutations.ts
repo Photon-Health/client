@@ -47,7 +47,7 @@ export const CreatePrescription = gql`
     $daysSupply: Int
     $instructions: String!
     $notes: String
-    $effectiveDate: AWSDate!
+    $doNotFillBeforeDate: AWSDate
     $diagnoses: [ID]
   ) {
     createPrescription(
@@ -62,7 +62,7 @@ export const CreatePrescription = gql`
       daysSupply: $daysSupply
       instructions: $instructions
       notes: $notes
-      effectiveDate: $effectiveDate
+      doNotFillBeforeDate: $doNotFillBeforeDate
       diagnoses: $diagnoses
     ) {
       id
@@ -75,7 +75,7 @@ export const CreatePrescription = gql`
       instructions
       notes
       effectiveDate
-      writtenAt
+      doNotFillBeforeDate
       diagnoses {
         code
       }
@@ -103,7 +103,7 @@ export const CreatePrescriptions = gql`
       daysSupply
       instructions
       notes
-      effectiveDate
+      doNotFillBeforeDate
       diagnoses {
         code
       }

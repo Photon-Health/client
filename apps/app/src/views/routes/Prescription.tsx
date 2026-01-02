@@ -110,7 +110,8 @@ export const Prescription = () => {
   const stateTip = PRESCRIPTION_TIP_MAP[rx.state as keyof PrescriptionStateRecord] || '';
 
   const writtenAt = formatDate(rx.writtenAt);
-  const effectiveDate = rx.effectiveDate ? formatDate(rx.effectiveDate) : 'N/A';
+  const effectiveDate = formatDate(rx.effectiveDate);
+  const doNotFillBeforeDate = rx.doNotFillBeforeDate ? formatDate(rx.doNotFillBeforeDate) : 'N/A';
   const expirationDate = formatDate(rx.expirationDate);
 
   const { colorMode } = useColorMode();
@@ -392,11 +393,19 @@ export const Prescription = () => {
               )}
             </InfoGrid>
 
-            <InfoGrid name="Do Not Fill Before">
+            <InfoGrid name="Effective">
               {loading ? (
                 <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
               ) : (
                 <Text fontSize="md">{effectiveDate}</Text>
+              )}
+            </InfoGrid>
+
+            <InfoGrid name="Do Not Fill Before">
+              {loading ? (
+                <SkeletonText skeletonHeight={5} noOfLines={1} width="100px" />
+              ) : (
+                <Text fontSize="md">{doNotFillBeforeDate}</Text>
               )}
             </InfoGrid>
 

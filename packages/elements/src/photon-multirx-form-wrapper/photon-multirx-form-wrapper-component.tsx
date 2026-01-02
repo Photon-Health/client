@@ -7,17 +7,16 @@ import { PhotonFormWrapper } from '../photon-form-wrapper';
 import { PatientStore } from '../stores/patient';
 
 const shouldWarn = (form: any) =>
-  form()['notes']?.value.length > 0 ||
-  form()['instructions']?.value.length > 0 ||
-  form()['treatment']?.value ||
-  form()['patient']?.value ||
-  form()['dispenseAsWritten']?.value != false ||
-  form()['dispenseQuantity']?.value != 1 ||
-  form()['dispenseUnit']?.value != 'Each' ||
-  form()['daysSupply']?.value != 30 ||
-  form()['refillsInput']?.value != 0 ||
   form()['addToTemplates']?.value != false ||
-  form()['effectiveDate']?.value;
+  form()['daysSupply']?.value ||
+  form()['dispenseAsWritten']?.value != false ||
+  form()['dispenseQuantity']?.value ||
+  form()['dispenseUnit']?.value ||
+  form()['doNotFillBeforeDate']?.value ||
+  form()['instructions']?.value ||
+  form()['notes']?.value ||
+  form()['refillsInput']?.value ||
+  form()['treatment']?.value;
 
 const Component = (props: {
   enableMedHistory: boolean;

@@ -19,7 +19,7 @@ import {
   GetPrescription,
   UpdatePrescriptionStates
 } from '../../fetch';
-import { CALENDAR_DATE_FORMAT, triggerToast, useRecentOrders } from '../../index';
+import { triggerToast, useRecentOrders } from '../../index';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
 import {
   combineAllRoutingConstraints,
@@ -29,7 +29,6 @@ import {
 import { createStore } from 'solid-js/store';
 import getLocation from '../../utils/getLocations';
 import { useGoogleService } from '../GoogleServiceProvider';
-import { format } from 'date-fns';
 // The order form data will consist of, at least, the list of selected prescription IDs and pharmacy ID.
 // The prescription form data (todo) will consist of a single prescription's data during user input
 // Note: Multiple prescription "sub" forms can be opened/completed within a single order form
@@ -79,7 +78,7 @@ export type TemplateOverrides = {
 
 export type PrescriptionFormData = {
   id?: string;
-  effectiveDate?: string;
+  doNotFillBeforeDate?: string;
   treatment: {
     id: string;
     name: string;
@@ -117,7 +116,7 @@ const transformPrescriptionFormData = (prescription: PrescriptionFormData, patie
   daysSupply: prescription.daysSupply,
   instructions: prescription.instructions,
   notes: prescription.notes,
-  effectiveDate: prescription.effectiveDate || format(new Date(), CALENDAR_DATE_FORMAT).toString(),
+  doNotFillBeforeDate: prescription.doNotFillBeforeDate,
   diagnoses: prescription.diagnoseCodes
 });
 
@@ -487,8 +486,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
       mutation: CreatePrescriptionTemplate,
       variables: {
         ...transformPrescriptionFormData(prescription, props.patientId),
-        // If effectiveDate is defined, don't save to template
-        effectiveDate: null,
         catalogId,
         isPrivate: true,
         ...(templateName ? { name: templateName } : {})
