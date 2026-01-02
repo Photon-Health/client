@@ -34,7 +34,7 @@ export const FillsSelect = ({ initialFills = [], patientId, name }: FillsSelectP
   const { getPrescriptions } = usePhoton();
 
   const mapOption = (script: any) => {
-    const effective = script.effectiveDate ? formatDate(script.effectiveDate) : 'N/A';
+    const effective = formatDate(script.effectiveDate);
     const expires = formatDate(script.expirationDate);
     return {
       value: {
