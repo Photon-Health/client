@@ -50,10 +50,10 @@ import { getOrgMailOrderPharms } from '@client/settings';
 import { fetchOffers, getPharmacy } from './pharmacy.utils';
 import _ from 'lodash';
 import {
-  Offer,
   BrandedOptionOverrides,
   BrandedOptions,
   BrandedOptionsHeader,
+  Offer,
   PickupPharmacyCardList
 } from '../components/pharmacy-card-list';
 import { formatAddress } from '../utils/formatters';
@@ -219,6 +219,8 @@ export const Pharmacy = () => {
   });
 
   useEffect(() => {
+    if (isDemo) return;
+
     const getOffers = async () => {
       let fetchedOffers: Offer[] | undefined;
 
@@ -233,7 +235,7 @@ export const Pharmacy = () => {
     };
 
     getOffers();
-  }, [order, offers]);
+  }, [order, offers, isDemo]);
 
   useEffect(() => {
     const insuranceOffer = offers?.find((offer) => offer.costType == 'INSURANCE_ESTIMATE');
@@ -556,6 +558,8 @@ export const Pharmacy = () => {
   ]);
 
   useEffect(() => {
+    if (isDemo) return;
+
     // load all the pharmacy options on mount
     async function loadMailOrderPharmacies() {
       const { pharmacies } = await getPharmacies({
@@ -568,7 +572,7 @@ export const Pharmacy = () => {
     }
 
     loadMailOrderPharmacies();
-  }, []);
+  }, [isDemo]);
 
   const handleShowMore = async () => {
     setLoadingPharmacies(true);
