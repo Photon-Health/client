@@ -19,7 +19,7 @@ import { graphql } from 'apps/app/src/gql';
 import { OrgType } from 'apps/app/src/gql/graphql';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
 import InfoGrid from 'apps/app/src/views/components/InfoGrid';
-import { Formik } from 'formik';
+import { Formik, validateYupSchema, yupToFormErrors } from 'formik';
 import { useMemo, useState } from 'react';
 import * as yup from 'yup';
 import { usePhoton } from '@photonhealth/react';
@@ -158,7 +158,14 @@ export const Organization = () => {
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={organizationFormSchema}
+      validate={(value) => {
+        try {
+          validateYupSchema(value, organizationFormSchema, true, { initialValues });
+        } catch (err) {
+          return yupToFormErrors(err);
+        }
+        return {};
+      }}
       enableReinitialize // if organization changes so should this form
       onSubmit={async (values) => {
         try {
@@ -166,9 +173,9 @@ export const Organization = () => {
             variables: {
               input: {
                 name: values.name,
-                email: values.email ?? '', // TODO: make email not required
-                fax: values.fax ?? '', // TODO: make fax not required
-                phone: values.phone ?? '', // TODO: make phone not required
+                email: values.email ?? '',
+                fax: values.fax ?? '',
+                phone: values.phone ?? '',
                 type: OrgType.Prescriber,
                 address: { ...values.address, country: 'USA', state: values.address.state.value }
               }

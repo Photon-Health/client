@@ -10,12 +10,34 @@ const phoneRegex =
 export const organizationFormSchema = yup.object({
   name: yup.string().required('Organization name is required'),
   email: yup.string().required('Email is required').email('Enter a valid email'),
-  fax: yup.string().matches(phoneRegex, {
-    message: 'Enter a valid fax number'
-  }),
-  phone: yup.string().matches(phoneRegex, {
-    message: 'Enter a valid phone number'
-  }),
+  fax: yup
+    .string()
+    .matches(phoneRegex, {
+      message: 'Enter a valid fax number'
+    })
+    .test({
+      message: 'Organization fax cannot be removed',
+      test: (value, context) => {
+        if (context.options.context?.initialValues.fax) {
+          return !!value;
+        }
+        return true;
+      }
+    }),
+  phone: yup
+    .string()
+    .matches(phoneRegex, {
+      message: 'Enter a valid phone number'
+    })
+    .test({
+      message: 'Organization phone cannot be removed',
+      test: (value, context) => {
+        if (context.options.context?.initialValues.phone) {
+          return !!value;
+        }
+        return true;
+      }
+    }),
   address: yup
     .object({
       street1: yup.string().required('Address is required'),
@@ -35,6 +57,7 @@ const FieldComponent = ({ field }: FieldProps) => <Input {...field} />;
 export const OrganizationForm: FC<FormikProps<yup.InferType<typeof organizationFormSchema>>> = ({
   values,
   errors,
+  initialValues,
   setFieldTouched,
   setFieldValue
 }) => {
@@ -55,14 +78,14 @@ export const OrganizationForm: FC<FormikProps<yup.InferType<typeof organizationF
           <Field name="email" component={FieldComponent} />
           <ErrorMessage name="email" component={FormErrorMessage} />
         </FormControl>
-        <FormControl pb="2" isRequired isInvalid={!!errors.fax}>
+        <FormControl pb="2" isRequired={!!initialValues.fax} isInvalid={!!errors.fax}>
           <FormLabel htmlFor="fax" mb={1}>
             Fax
           </FormLabel>
           <Field name="fax" component={FieldComponent} />
           <ErrorMessage name="fax" component={FormErrorMessage} />
         </FormControl>
-        <FormControl pb="2" isRequired isInvalid={!!errors.phone}>
+        <FormControl pb="2" isRequired={!!initialValues.phone} isInvalid={!!errors.phone}>
           <FormLabel htmlFor="phone" mb={1}>
             Phone
           </FormLabel>
