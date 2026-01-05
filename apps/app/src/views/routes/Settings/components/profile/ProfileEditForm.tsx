@@ -1,5 +1,5 @@
 import { FormControl, FormErrorMessage, FormLabel, Input, VStack } from '@chakra-ui/react';
-import { ErrorMessage, Field, FieldProps, FormikErrors, FormikProps, FormikTouched } from 'formik';
+import { ErrorMessage, Field, FieldProps, FormikErrors, FormikProps } from 'formik';
 import { FC } from 'react';
 import * as yup from 'yup';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
@@ -17,20 +17,20 @@ export const profileFormSchema = yup
         middle: yup.string(),
         last: yup.string().required('Last name is required')
       })
-      .required('Please enter an address'),
+      .required('Name is required'),
     fax: yup
       .string()
       .matches(/^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/, {
-        message: 'Please enter a valid fax number'
+        message: 'Enter a valid fax number'
       }),
-    email: yup.string().email('Invalid email').required('email is required for providers'),
+    email: yup.string().required('Email is required').email('Enter a valid email'),
     roles: rolesSchema.required().min(1, 'Must have at least one role'),
     provider: yup
       .object({
         npi: yup
           .string()
           .required('NPI is required for prescribers')
-          .matches(/^[0-9]+$/, { message: 'Invalid NPI' }),
+          .matches(/^[0-9]+$/, { message: 'Enter a valid NPI' }),
         address: yup
           .object({
             street1: yup.string().required('Address is required'),
@@ -39,17 +39,17 @@ export const profileFormSchema = yup
             state: yupStateSchema,
             postalCode: yup
               .string()
-              .required('Zip is required')
-              .matches(/^[0-9]{5}(?:-[0-9]{4})?$/, { message: 'Enter a valid zipcode' })
+              .required('Zip code is required')
+              .matches(/^[0-9]{5}(?:-[0-9]{4})?$/, { message: 'Enter a valid zip code' })
           })
-          .required('Please enter an address'),
+          .required('Enter an address'),
         phone: yup
           .string()
+          .required('Phone number is required for prescribers')
           .matches(
             /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/,
-            { message: 'Please enter a valid phone number' }
+            { message: 'Enter a valid phone number' }
           )
-          .required('Please enter a valid phone number')
       })
       .notRequired()
       .default(undefined)
@@ -71,7 +71,6 @@ export const profileFormSchema = yup
 
 type ProfileYupType = yup.InferType<typeof profileFormSchema>;
 type ProviderYupType = ProfileYupType['provider'];
-type ProviderFormikTouchedType = FormikTouched<ProviderYupType>;
 type ProviderFormikErrorsType = FormikErrors<ProviderYupType>;
 
 const FieldComponent = ({ field }: FieldProps) => <Input {...field} />;
@@ -79,120 +78,102 @@ const FieldComponent = ({ field }: FieldProps) => <Input {...field} />;
 export const ProfileForm: FC<FormikProps<ProfileYupType>> = ({
   values,
   errors,
-  touched,
   setFieldTouched,
   setFieldValue
 }) => {
   const providerErrors = errors.provider as ProviderFormikErrorsType | undefined;
-  const providerTouched = touched.provider as ProviderFormikTouchedType | undefined;
 
   return (
     <form>
       <VStack align="stretch">
-        <FormControl pb="2">
+        <FormControl pb="2" isInvalid={!!errors.name?.title}>
           <FormLabel htmlFor="name.title" mb={1}>
             Title
           </FormLabel>
           <Field name="name.title" component={FieldComponent} />
           <ErrorMessage name="name.title" component={FormErrorMessage} />
         </FormControl>
-        <FormControl isRequired isInvalid={!!errors.name?.first && touched?.name?.first} pb="2">
+        <FormControl isRequired isInvalid={!!errors.name?.first} pb="2">
           <FormLabel htmlFor="name.first" mb={1}>
-            First name
+            First Name
           </FormLabel>
           <Field name="name.first" component={FieldComponent} />
           <ErrorMessage name="name.first" component={FormErrorMessage} />
         </FormControl>
-        <FormControl pb="2">
+        <FormControl pb="2" isInvalid={!!errors.name?.middle}>
           <FormLabel htmlFor="name.middle" mb={1}>
             Middle Name
           </FormLabel>
           <Field name="name.middle" component={FieldComponent} />
           <ErrorMessage name="name.middle" component={FormErrorMessage} />
         </FormControl>
-        <FormControl isRequired isInvalid={!!errors.name?.last && touched?.name?.last} pb="2">
+        <FormControl isRequired isInvalid={!!errors.name?.last} pb="2">
           <FormLabel htmlFor="name.first" mb={1}>
-            Last name
+            Last Name
           </FormLabel>
           <Field name="name.last" component={FieldComponent} />
           <ErrorMessage name="name.last" component={FormErrorMessage} />
         </FormControl>
-        <FormControl
-          isRequired
-          isInvalid={!!providerErrors?.address?.street1 && providerTouched?.address?.street1}
-          pb="2"
-        >
+        <FormControl pb="2" isRequired isInvalid={!!errors?.email}>
+          <FormLabel htmlFor="email" mb={1}>
+            Email
+          </FormLabel>
+          <Field name="email" component={FieldComponent} />
+          <ErrorMessage name="email" component={FormErrorMessage} />
+        </FormControl>
+        <FormControl pb="2" isRequired isInvalid={!!providerErrors?.phone}>
+          <FormLabel htmlFor="provider.phone" mb={1}>
+            Phone
+          </FormLabel>
+          <Field name="provider.phone" component={FieldComponent} />
+          <ErrorMessage name="provider.phone" component={FormErrorMessage} />
+        </FormControl>
+        <FormControl pb="2" isInvalid={!!errors?.fax}>
+          <FormLabel htmlFor="fax" mb={1}>
+            Fax
+          </FormLabel>
+          <Field name="fax" component={FieldComponent} />
+          <ErrorMessage name="fax" component={FormErrorMessage} />
+        </FormControl>
+        <FormControl isRequired isInvalid={!!providerErrors?.address?.street1} pb="2">
           <FormLabel htmlFor="provider.address.street1" mb={1}>
             Address 1
           </FormLabel>
           <Field name="provider.address.street1" component={FieldComponent} />
           <ErrorMessage name="provider.address.street1" component={FormErrorMessage} />
         </FormControl>
-        <FormControl
-          isInvalid={!!providerErrors?.address?.street2 && providerTouched?.address?.street2}
-          pb="2"
-        >
+        <FormControl isInvalid={!!providerErrors?.address?.street2} pb="2">
           <FormLabel htmlFor="provider.address.street2" mb={1}>
             Address 2
           </FormLabel>
           <Field name="provider.address.street2" component={FieldComponent} />
+          <ErrorMessage name="provider.address.street2" component={FormErrorMessage} />
         </FormControl>
-        <FormControl
-          isRequired
-          isInvalid={!!providerErrors?.address?.city && providerTouched?.address?.city}
-          pb="2"
-        >
+        <FormControl isRequired isInvalid={!!providerErrors?.address?.city} pb="2">
           <FormLabel htmlFor="provider.address.city" mb={1}>
             City
           </FormLabel>
           <Field name="provider.address.city" component={FieldComponent} />
+          <ErrorMessage name="provider.address.city" component={FormErrorMessage} />
         </FormControl>
-        <FormControl
-          isRequired
-          isInvalid={
-            !!providerErrors?.address?.state?.value && providerTouched?.address?.state?.value
-          }
-          pb="2"
-        >
+        <FormControl isRequired isInvalid={!!providerErrors?.address?.state} pb="2">
           <FormLabel htmlFor="provider.address.state" mb={1}>
             State
           </FormLabel>
           <FormikStateSelect
-            value={
-              values.provider?.address?.state?.value
-                ? { value: values.provider?.address?.state?.value }
-                : undefined
-            }
+            value={values.provider?.address?.state}
             setFieldTouched={setFieldTouched}
             setFieldValue={setFieldValue}
             fieldName="provider.address.state"
           />
+          <ErrorMessage name="provider.address.state" component={FormErrorMessage} />
         </FormControl>
-        <FormControl
-          isRequired
-          isInvalid={!!providerErrors?.address?.postalCode && providerTouched?.address?.postalCode}
-          pb="2"
-        >
+        <FormControl isRequired isInvalid={!!providerErrors?.address?.postalCode} pb="2">
           <FormLabel htmlFor="provider.address.postalCode" mb={1}>
             Zip Code
           </FormLabel>
           <Field name="provider.address.postalCode" component={FieldComponent} />
-        </FormControl>
-        <FormControl
-          pb="2"
-          isRequired
-          isInvalid={!!providerErrors?.phone && providerTouched?.phone}
-        >
-          <FormLabel htmlFor="provider.phone" mb={1}>
-            Phone
-          </FormLabel>
-          <Field name="provider.phone" component={FieldComponent} />
-        </FormControl>
-        <FormControl pb="2">
-          <FormLabel htmlFor="fax" mb={1}>
-            Fax
-          </FormLabel>
-          <Field name="fax" component={FieldComponent} />
+          <ErrorMessage name="provider.address.postalCode" component={FormErrorMessage} />
         </FormControl>
         {hasPrescriberRole(values.roles) && (
           <FormControl pb="2" isRequired isReadOnly isInvalid={!!providerErrors?.npi}>
@@ -203,12 +184,6 @@ export const ProfileForm: FC<FormikProps<ProfileYupType>> = ({
             <ErrorMessage name="provider.npi" component={FormErrorMessage} />
           </FormControl>
         )}
-        <FormControl pb="2" isRequired isInvalid={!!errors?.email && touched?.email}>
-          <FormLabel htmlFor="email" mb={1}>
-            Email
-          </FormLabel>
-          <Field name="email" component={FieldComponent} />
-        </FormControl>
       </VStack>
     </form>
   );

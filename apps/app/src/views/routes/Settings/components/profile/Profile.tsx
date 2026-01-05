@@ -84,19 +84,21 @@ function mapAndSortRoles(roles: Role[]): { value: string; label: string; descrip
 const EditButtons = ({
   onSave,
   onCancel,
-  loading
+  loading,
+  isInvalid
 }: {
   onSave: () => void;
   onCancel: () => void;
   loading: boolean;
+  isInvalid: boolean;
 }) => (
   <>
     <Button
       size={'sm'}
       colorScheme={'green'}
       leftIcon={loading ? <Spinner size={'xs'} /> : <CheckIcon />}
-      isDisabled={loading}
-      disabled={loading}
+      isDisabled={loading || isInvalid}
+      disabled={loading || isInvalid}
       onClick={onSave}
     >
       Save
@@ -128,22 +130,7 @@ export const Profile = () => {
     client: clinicalClient
   });
 
-  const handleSaveRoles = (formVariables: any) => {
-    updateMyProfile({
-      variables: {
-        updateMyProfileInput: {
-          name: formVariables.variables.name ?? user?.name,
-          address: formVariables.variables.provider.address ?? user?.address,
-          email: formVariables.variables.email ?? user?.email,
-          npi: formVariables.variables.provider.npi ?? user?.npi,
-          phone: formVariables.variables.provider.phone ?? user?.phone,
-          fax: formVariables.variables.fax ?? user?.fax
-        }
-      }
-    });
-  };
-
-  const hasOrgEdit = usePermissions(['edit:profile']);
+  const canEdit = usePermissions(['edit:profile']);
   const user = data?.me;
   const organization = data?.organization;
 
@@ -214,31 +201,29 @@ export const Profile = () => {
       onSubmit={async (values, { validateForm, resetForm }) => {
         try {
           await validateForm(values);
-          await handleSaveRoles({
+          await updateMyProfile({
             variables: {
-              name: {
-                first: values.name.first,
-                title: values.name.title ?? undefined,
-                middle: values.name.middle ?? undefined,
-                last: values.name.last
-              },
-              fax: values.fax ?? undefined,
-              email: values.email,
-              roles: values.roles,
-              ...(values.provider == null
-                ? {}
-                : {
-                    provider: {
-                      ...values.provider,
-                      address: {
-                        ...values.provider.address,
-                        street1: values.provider.address.street1,
-                        street2: values.provider.address.street2 ?? undefined,
-                        state: values?.provider?.address?.state?.value ?? '',
-                        country: 'US'
-                      }
-                    }
-                  })
+              updateMyProfileInput: {
+                name: {
+                  first: values.name.first,
+                  title: values.name.title ?? undefined,
+                  middle: values.name.middle ?? undefined,
+                  last: values.name.last
+                },
+                address: {
+                  ...values.provider?.address,
+                  street1: values.provider?.address.street1 ?? '',
+                  street2: values.provider?.address.street2 ?? undefined,
+                  city: values?.provider?.address?.city ?? '',
+                  postalCode: values?.provider?.address?.postalCode ?? '',
+                  state: values?.provider?.address?.state?.value ?? '',
+                  country: 'US'
+                },
+                email: values.email,
+                npi: values.provider?.npi ?? user?.npi,
+                phone: values.provider?.phone ?? user?.phone,
+                fax: values.fax ?? user?.fax
+              }
             }
           });
           toast({
@@ -267,13 +252,14 @@ export const Profile = () => {
                   {user && isEditing ? (
                     <EditButtons
                       loading={mutationLoading}
+                      isInvalid={!formikProps.isValid}
                       onSave={formikProps.submitForm}
                       onCancel={() => {
                         formikProps.resetForm();
                         setIsEditing(false);
                       }}
                     />
-                  ) : hasOrgEdit ? (
+                  ) : canEdit ? (
                     <Button
                       size={'sm'}
                       colorScheme={'brand'}
