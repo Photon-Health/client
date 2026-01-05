@@ -15,6 +15,10 @@ vi.mock('./api', () => ({
   triggerDemoNotification: vi.fn()
 }));
 
+vi.mock('./utils/preloadImage', () => ({
+  preloadImage: vi.fn().mockResolvedValue(undefined)
+}));
+
 vi.mock('@datadog/browser-rum');
 vi.mock('./configs/analytics');
 vi.mock('./hooks/usePageAnalytics');
