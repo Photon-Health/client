@@ -123,7 +123,6 @@ const Component = (props: {
           setFilter('');
         }}
         noDataMsg={''}
-        optional={false}
         helpText={props.helpText}
         selectedData={states.filter((x) => x.name === props.selected)?.[0]}
       />

@@ -48,6 +48,12 @@ const repopulateForm = (actions: Record<string, (...args: any) => any>, draft: a
       value: draft.notes
     });
   }
+  if (draft.doNotFillBeforeDate) {
+    actions.updateFormValue({
+      key: 'doNotFillBeforeDate',
+      value: draft.doNotFillBeforeDate
+    });
+  }
 };
 
 export default repopulateForm;

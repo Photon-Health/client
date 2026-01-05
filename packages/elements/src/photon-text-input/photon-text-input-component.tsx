@@ -21,7 +21,6 @@ const Component = (props: {
   formName?: string;
   invalid: boolean;
   helpText?: string;
-  optional?: boolean;
   disabled: boolean;
   debounceTime?: number;
   dispatchOnMount?: boolean;
@@ -91,8 +90,7 @@ customElement(
     helpText: undefined,
     disabled: false,
     debounceTime: 250,
-    dispatchOnMount: false,
-    optional: false
+    dispatchOnMount: false
   },
   Component
 );

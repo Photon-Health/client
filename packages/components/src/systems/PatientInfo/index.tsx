@@ -6,6 +6,7 @@ import { usePhotonClient } from '../SDKProvider';
 import Button from '../../particles/Button';
 import Text from '../../particles/Text';
 import Card from '../../particles/Card';
+import formatDate from '../../utils/formatDate';
 import Icon from '../../particles/Icon';
 
 const GET_PATIENT = gql`
@@ -65,13 +66,6 @@ type PatientInfoProps = {
   editPatient?: () => void;
   updatedAt?: number;
   address?: Address;
-};
-
-// Takes a date string in the format 'YYYY-MM-DD'
-// and returns it in the format 'MM-DD-YYYY'.
-const formatDate = (dateString: string) => {
-  const [year, month, day] = dateString.split('-');
-  return `${month}-${day}-${year}`;
 };
 
 export default function PatientInfo(props: PatientInfoProps) {
