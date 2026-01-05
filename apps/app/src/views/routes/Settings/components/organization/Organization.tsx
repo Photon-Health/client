@@ -54,19 +54,21 @@ const updateOrganizationMutation = graphql(/* GraphQL */ `
 const EditButtons = ({
   onSave,
   onCancel,
-  loading
+  loading,
+  isInvalid
 }: {
   onSave: () => void;
   onCancel: () => void;
   loading: boolean;
+  isInvalid: boolean;
 }) => (
   <>
     <Button
       size={'sm'}
       colorScheme={'green'}
       leftIcon={loading ? <Spinner size={'xs'} /> : <CheckIcon />}
-      isDisabled={loading}
-      disabled={loading}
+      isDisabled={loading || isInvalid}
+      disabled={loading || isInvalid}
       onClick={onSave}
     >
       Save
@@ -100,7 +102,6 @@ export const Organization = () => {
   const organization = data?.organization;
 
   const initialValues: yup.InferType<typeof organizationFormSchema> = {
-    id: organization?.id ?? '',
     name: organization?.name ?? '',
     email: organization?.email ?? '',
     fax: organization?.fax ?? '',
@@ -191,6 +192,7 @@ export const Organization = () => {
                   {isEditing ? (
                     <EditButtons
                       loading={mutationLoading}
+                      isInvalid={!formikProps.isValid}
                       onSave={formikProps.submitForm}
                       onCancel={() => {
                         formikProps.resetForm();
