@@ -283,7 +283,7 @@ export const Main = () => {
   useEffect(() => {
     if (orgId) {
       if (isDemo) {
-        fetchLogo('newco_logo.svg');
+        fetchLogo('photon');
       } else if (settings?.brandLogo) {
         fetchLogo(settings.brandLogo);
       } else {
