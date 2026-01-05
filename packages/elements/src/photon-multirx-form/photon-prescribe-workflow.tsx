@@ -738,6 +738,7 @@ const toScreenableDraftPrescription = (prescription: Prescription): ScreenablePr
     daysSupply: prescription.daysSupply || undefined,
     instructions: prescription.instructions,
     notes: prescription.notes || undefined,
+    // TODO: is effectiveDate needed to screen prescription?
     effectiveDate: prescription.effectiveDate,
     treatment: {
       id: prescription.treatment.id

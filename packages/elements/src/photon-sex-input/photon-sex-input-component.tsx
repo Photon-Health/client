@@ -68,7 +68,6 @@ const Component = (props: {
         displayAccessor={(p) => p?.name || ''}
         showOverflow={true}
         noDataMsg={''}
-        optional={false}
         helpText={props.helpText}
         selectedData={sexes.filter((x) => x.name.toUpperCase() === props.selected)?.[0]}
       />

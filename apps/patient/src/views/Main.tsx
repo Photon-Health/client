@@ -21,6 +21,7 @@ import { Pharmacy } from '../__generated__/graphql';
 import { FAQModal } from '../components/FAQModal';
 import { patientAnalytics } from '../configs/analytics';
 import { shouldShowPriceToggle } from '../utils/shouldShowPriceToggle';
+import { preloadImage } from '../utils/preloadImage';
 
 export interface OrderContextType {
   order: Order;
@@ -247,15 +248,6 @@ export const Main = () => {
       fetchOrder();
     }
   }, [order, orderId, fetchOrder, isDemo]);
-
-  const preloadImage = (url: string) => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = resolve;
-      img.onerror = reject;
-      img.src = url;
-    });
-  };
 
   const fetchLogo = useCallback(async (fileName: string) => {
     if (fileName === 'photon') {
