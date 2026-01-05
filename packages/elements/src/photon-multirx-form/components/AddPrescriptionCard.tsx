@@ -12,8 +12,7 @@ import {
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { DispenseUnit, Medication, Prescription } from '@photonhealth/sdk/dist/types';
-import { format } from 'date-fns';
-import { any, min, number, record, refine, size, string } from 'superstruct';
+import { any, min, number, optional, record, refine, size, string } from 'superstruct';
 import { afterDate, between, message } from '../../validators';
 
 //Shoelace
@@ -30,19 +29,19 @@ import { DisableList } from '../photon-prescribe-workflow';
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 const validators = {
-  treatment: message(record(string(), any()), 'Please select a treatment...'),
+  treatment: message(record(string(), any()), 'Please select a treatment'),
   dispenseQuantity: message(min(number(), 0, { exclusive: true }), 'Quantity must be positive'),
   dispenseUnit: message(
     refine(string(), 'nonEmptyString', (value) => value.trim().length > 0),
-    'Please select a dispensing unit...'
+    'Please select a dispensing unit'
   ),
   daysSupply: message(min(number(), 0), 'Days Supply must be at least 0'),
   refillsInput: message(between(0, 11), 'Refills must be 0 to 11'),
-  instructions: message(
-    size(string(), 1, Infinity),
-    'Please enter instructions for the patient...'
-  ),
-  effectiveDate: message(afterDate(new Date()), "Please choose a date that isn't in the past")
+  instructions: message(size(string(), 1, Infinity), 'Please enter instructions for the patient'),
+  doNotFillBeforeDate: message(
+    optional(afterDate(new Date())),
+    "Please choose a date that isn't in the past"
+  )
 };
 
 export const AddPrescriptionCard = (props: {
@@ -116,7 +115,7 @@ export const AddPrescriptionCard = (props: {
     }
 
     const prescriptionFormData: PrescriptionFormData = {
-      effectiveDate: props.store.effectiveDate.value,
+      doNotFillBeforeDate: props.store.doNotFillBeforeDate?.value,
       treatment: { id: props.store.treatment.value.id, name: props.store.treatment.value.name },
       dispenseAsWritten: props.store.dispenseAsWritten.value,
       dispenseQuantity: props.store.dispenseQuantity.value,
@@ -155,10 +154,6 @@ export const AddPrescriptionCard = (props: {
     props.screenDraftedPrescriptions();
 
     // RESET THE FORM
-    props.actions.updateFormValue({
-      key: 'effectiveDate',
-      value: format(new Date(), 'yyyy-MM-dd').toString()
-    });
     props.actions.clearKeys([
       'treatment',
       'dispenseAsWritten',
@@ -169,7 +164,8 @@ export const AddPrescriptionCard = (props: {
       'instructions',
       'notes',
       'templateName',
-      'addToTemplates'
+      'addToTemplates',
+      'doNotFillBeforeDate'
     ]);
     setOffCatalog(undefined);
     clearForm(props.actions, props.prefillNotes ? { notes: props.prefillNotes } : undefined);
@@ -187,12 +183,9 @@ export const AddPrescriptionCard = (props: {
     <div ref={ref}>
       <style>{photonStyles}</style>
       <Card addChildrenDivider={true}>
-        <div class="flex items-center justify-between">
-          <Text color="gray">Add Prescription</Text>
-        </div>
-
+        <Text color="gray">Add Prescription</Text>
         <div
-          class="flex flex-col sm:gap-3"
+          class="flex flex-col"
           on:photon-medication-selected={(e: any) => {
             setOffCatalog(e.detail.medication);
             props.actions.updateFormValue({
@@ -273,20 +266,6 @@ export const AddPrescriptionCard = (props: {
                 }
               />
             </div>
-          </div>
-          <div class="mt-2 sm:mt-0 w-full md:pr-2">
-            <photon-datepicker
-              label="Do Not Fill Before"
-              invalid={props.store.effectiveDate?.error ?? false}
-              help-text={props.store.effectiveDate?.error}
-              required="true"
-              on:photon-datepicker-selected={(e: any) =>
-                props.actions.updateFormValue({
-                  key: 'effectiveDate',
-                  value: e.detail.date
-                })
-              }
-            />
           </div>
           <div class="mt-2 sm:mt-0 sm:grid sm:grid-cols-2 sm:gap-4">
             <div class="flex items-end gap-1 items-stretch">
@@ -430,6 +409,21 @@ export const AddPrescriptionCard = (props: {
             }
             value={props.store.notes?.value}
           />
+          <div class="w-full">
+            <photon-datepicker
+              value={props.store.doNotFillBeforeDate?.value}
+              label="Do Not Fill Before"
+              invalid={props.store.doNotFillBeforeDate?.error ?? false}
+              help-text={props.store.doNotFillBeforeDate?.error}
+              min={new Date()}
+              on:photon-datepicker-selected={(e: any) =>
+                props.actions.updateFormValue({
+                  key: 'doNotFillBeforeDate',
+                  value: e.detail.date
+                })
+              }
+            />
+          </div>
           <div class="flex flex-col xs:flex-row gap-2">
             <Show when={!props.hideAddToTemplates}>
               <photon-checkbox
@@ -451,7 +445,6 @@ export const AddPrescriptionCard = (props: {
                 value={props.store.templateName?.value ?? ''}
                 invalid={props.store.templateName?.error ?? false}
                 help-text={props.store.templateName?.error}
-                optional="true"
                 on:photon-input-changed={(e: any) =>
                   props.actions.updateFormValue({
                     key: 'templateName',

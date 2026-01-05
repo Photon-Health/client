@@ -4,7 +4,6 @@ import { Treatment } from '@photonhealth/sdk/dist/types';
 import { IconButton } from '../../particles/IconButton';
 import clsx from 'clsx';
 import { MedHistoryPrescription } from './index';
-import { format } from 'date-fns';
 import { usePrescribeOptional } from '../PrescribeProvider';
 
 export type MedHistoryRowItem = {
@@ -55,7 +54,6 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
         await prescribeContext.tryCreatePrescription({
           ...prescription,
           treatment,
-          effectiveDate: format(new Date(), 'yyyy-MM-dd').toString(),
           diagnoseCodes: prescription.diagnoses?.map((diagnosis) => diagnosis.code) || []
         });
       } finally {
