@@ -149,6 +149,7 @@ export const PRESCRIPTION_FIELDS = gql`
     instructions
     notes
     effectiveDate
+    doNotFillBeforeDate
     expirationDate
     writtenAt
   }

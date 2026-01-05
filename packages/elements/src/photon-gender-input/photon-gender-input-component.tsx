@@ -110,7 +110,6 @@ const Component = (props: {
           setFilter('');
         }}
         noDataMsg={''}
-        optional={!props.required}
         helpText={props.helpText}
         selectedData={genders.filter((x) => x.name === props.selected)?.[0]}
       />

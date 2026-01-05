@@ -33,7 +33,7 @@ import { RoutingConstraint } from './systems/RoutingConstraints';
 import triggerToast from './utils/toastTriggers';
 import generateString from './utils/generateString';
 import { createQuery } from './utils/createQuery';
-import formatDate from './utils/formatDate';
+import formatDate, { CALENDAR_DATE_FORMAT } from './utils/formatDate';
 import { formatPrescriptionDetails } from './utils/formatPrescriptionDetail';
 
 import { SignatureAttestationModal } from './systems/SignatureAttestation';
@@ -90,7 +90,8 @@ export {
   PrescribeProvider,
   GoogleServiceProvider,
   usePrescribe,
-  useGoogleService
+  useGoogleService,
+  CALENDAR_DATE_FORMAT
 };
 
 // Export types

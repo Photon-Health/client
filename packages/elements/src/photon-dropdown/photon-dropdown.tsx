@@ -73,7 +73,6 @@ export const PhotonDropdown = <T extends { id: string }>(props: {
     filter: (arr: T) => boolean | undefined;
   }>;
   showOverflow?: boolean;
-  optional?: boolean;
   clearable?: boolean;
   actionRef?: any;
   onInputFocus?: () => void;
