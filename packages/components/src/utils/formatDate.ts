@@ -5,3 +5,5 @@ export default function formatDate(dateString: string): string {
 
   return new Date(dateString).toLocaleDateString('en-US', { timeZone: 'UTC' });
 }
+
+export const CALENDAR_DATE_FORMAT = 'yyyy-MM-dd';

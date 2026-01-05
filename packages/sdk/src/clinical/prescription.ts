@@ -178,7 +178,7 @@ export class PrescriptionQueryManager {
         $daysSupply: Int
         $instructions: String!
         $notes: String
-        $effectiveDate: AWSDate
+        $doNotFillBeforeDate: AWSDate
         $diagnoses: [ID]
       ) {
         createPrescription(
@@ -192,7 +192,7 @@ export class PrescriptionQueryManager {
           daysSupply: $daysSupply
           instructions: $instructions
           notes: $notes
-          effectiveDate: $effectiveDate
+          doNotFillBeforeDate: $doNotFillBeforeDate
           diagnoses: $diagnoses
         ) {
           ...${fName}
