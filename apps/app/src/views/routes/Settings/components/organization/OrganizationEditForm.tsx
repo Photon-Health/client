@@ -48,6 +48,24 @@ export const OrganizationForm: FC<FormikProps<yup.InferType<typeof organizationF
         </FormLabel>
         <Field name="name" component={FieldComponent} />
       </FormControl>
+      <FormControl pb="2" isRequired>
+        <FormLabel htmlFor="email" mb={1}>
+          Email
+        </FormLabel>
+        <Field name="email" component={FieldComponent} />
+      </FormControl>
+      <FormControl pb="2" isRequired>
+        <FormLabel htmlFor="fax" mb={1}>
+          Fax
+        </FormLabel>
+        <Field name="fax" component={FieldComponent} />
+      </FormControl>
+      <FormControl pb="2" isRequired>
+        <FormLabel htmlFor="phone" mb={1}>
+          Phone
+        </FormLabel>
+        <Field name="phone" component={FieldComponent} />
+      </FormControl>
       <FormControl
         isRequired
         isInvalid={!!errors.address?.street1 && touched.address?.street1}
@@ -95,24 +113,6 @@ export const OrganizationForm: FC<FormikProps<yup.InferType<typeof organizationF
           Zip Code
         </FormLabel>
         <Field name="address.postalCode" component={FieldComponent} />
-      </FormControl>
-      <FormControl pb="2" isRequired>
-        <FormLabel htmlFor="phone" mb={1}>
-          Phone
-        </FormLabel>
-        <Field name="phone" component={FieldComponent} />
-      </FormControl>
-      <FormControl pb="2" isRequired>
-        <FormLabel htmlFor="fax" mb={1}>
-          Fax
-        </FormLabel>
-        <Field name="fax" component={FieldComponent} />
-      </FormControl>
-      <FormControl pb="2" isRequired>
-        <FormLabel htmlFor="email" mb={1}>
-          Email
-        </FormLabel>
-        <Field name="email" component={FieldComponent} />
       </FormControl>
     </VStack>
   </form>
