@@ -4,9 +4,7 @@ import { FC } from 'react';
 import * as yup from 'yup';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 import { hasPrescriberRole, rolesSchema } from '../utils/Roles';
-
-const phoneRegex =
-  /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
+import { phoneRegex } from '../utils/Validation';
 
 export const profileFormSchema = yup.object({
   name: yup.object({

@@ -27,6 +27,7 @@ import React from 'react';
 import * as yup from 'yup';
 import { RolesSelect, hasPrescriberRole, rolesSchema } from '../utils/Roles';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
+import { phoneRegex } from '../utils/Validation';
 
 export const userFragment = graphql(/* GraphQL */ `
   fragment EditRolesActionUserFragment on User {
@@ -115,7 +116,7 @@ const roleSchema = yup
         then: yup.string().required('Please enter a valid phone number'),
         otherwise: yup.string()
       })
-      .matches(/^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/, {
+      .matches(phoneRegex, {
         message: 'Please enter a valid phone number'
       })
   })
