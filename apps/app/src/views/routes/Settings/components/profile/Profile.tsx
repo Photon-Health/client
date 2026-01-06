@@ -19,7 +19,7 @@ import { CheckIcon, EditIcon } from '@chakra-ui/icons';
 import { graphql } from 'apps/app/src/gql';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
 import InfoGrid from 'apps/app/src/views/components/InfoGrid';
-import { Formik } from 'formik';
+import { Formik, validateYupSchema, yupToFormErrors } from 'formik';
 import { useMemo, useState } from 'react';
 import * as yup from 'yup';
 import { Role } from 'packages/sdk/dist/types';
@@ -141,21 +141,20 @@ export const Profile = () => {
       middle: user?.name?.middle ?? undefined,
       last: user?.name?.last ?? ''
     },
-    fax: user?.fax ?? undefined,
     email: user?.email ?? '',
     roles: mapAndSortRoles(user?.roles ?? []),
-    provider: {
-      npi: user?.npi ?? '',
-      address: {
-        street1: user?.address?.street1 ?? '',
-        street2: user?.address?.street2 ?? undefined,
-        city: user?.address?.city ?? '',
-        state: {
-          value: (user?.address?.state as string) ?? ''
-        },
-        postalCode: user?.address?.postalCode ?? ''
+    phone: user?.phone ?? '',
+
+    fax: user?.fax ?? '',
+    npi: user?.npi ?? '',
+    address: {
+      street1: user?.address?.street1 ?? '',
+      street2: user?.address?.street2 ?? undefined,
+      city: user?.address?.city ?? '',
+      state: {
+        value: (user?.address?.state as string) ?? ''
       },
-      phone: user?.phone ?? ''
+      postalCode: user?.address?.postalCode ?? ''
     }
   };
 
@@ -196,7 +195,14 @@ export const Profile = () => {
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={profileFormSchema}
+      validate={(value) => {
+        try {
+          validateYupSchema(value, profileFormSchema, true, { initialValues });
+        } catch (err) {
+          return yupToFormErrors(err);
+        }
+        return {};
+      }}
       enableReinitialize // if organization changes so should this form
       onSubmit={async (values, { validateForm, resetForm }) => {
         try {
@@ -211,18 +217,18 @@ export const Profile = () => {
                   last: values.name.last
                 },
                 address: {
-                  ...values.provider?.address,
-                  street1: values.provider?.address.street1 ?? '',
-                  street2: values.provider?.address.street2 ?? undefined,
-                  city: values?.provider?.address?.city ?? '',
-                  postalCode: values?.provider?.address?.postalCode ?? '',
-                  state: values?.provider?.address?.state?.value ?? '',
+                  ...values.address,
+                  street1: values.address.street1 ?? '',
+                  street2: values.address.street2 ?? undefined,
+                  city: values?.address?.city ?? '',
+                  postalCode: values?.address?.postalCode ?? '',
+                  state: values?.address?.state?.value ?? '',
                   country: 'US'
                 },
                 email: values.email,
-                npi: values.provider?.npi ?? user?.npi,
-                phone: values.provider?.phone ?? user?.phone,
-                fax: values.fax ?? user?.fax
+                npi: values.npi,
+                phone: values.phone,
+                fax: values.fax
               }
             }
           });
