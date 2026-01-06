@@ -25,7 +25,7 @@ import { ErrorMessage, Field, Formik, FormikErrors, FormikTouched } from 'formik
 import { Role } from 'packages/sdk/dist/types';
 import React from 'react';
 import * as yup from 'yup';
-import { RolesSelect, rolesSchema } from '../utils/Roles';
+import { RolesSelect, hasPrescriberRole, rolesSchema } from '../utils/Roles';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 
 export const userFragment = graphql(/* GraphQL */ `
@@ -73,9 +73,6 @@ const UpdateProviderProfileAndSetUserRolesMutation = graphql(/* GraphQL */ `
     setUserRoles(userId: $providerId, roles: $roles)
   }
 `);
-
-const hasPrescriberRole = (roles: { value: string; label: string }[]) =>
-  roles.some((r) => r.label === 'Prescriber');
 
 const roleSchema = yup
   .object({

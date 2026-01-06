@@ -3,13 +3,10 @@ import { ErrorMessage, Field, FieldProps, FormikProps } from 'formik';
 import { FC } from 'react';
 import * as yup from 'yup';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
-import { rolesSchema } from '../utils/Roles';
+import { hasPrescriberRole, rolesSchema } from '../utils/Roles';
 
 const phoneRegex =
   /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
-
-const hasPrescriberRole = (roles: { value: string; label: string }[]) =>
-  roles.some((r) => r.label === 'Prescriber');
 
 export const profileFormSchema = yup.object({
   name: yup.object({

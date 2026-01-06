@@ -21,7 +21,7 @@ import { InvitesQueryDocument } from 'apps/app/src/gql/graphql';
 import { ErrorMessage, Field, Formik, FormikErrors, FormikTouched } from 'formik';
 import * as yup from 'yup';
 import { usePhoton } from '@photonhealth/react';
-import { RolesSelect, rolesSchema } from '../utils/Roles';
+import { RolesSelect, hasPrescriberRole, rolesSchema } from '../utils/Roles';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 
 export const inviteFormFragment = graphql(/* GraphQL */ `
@@ -51,9 +51,6 @@ const inviteUserMutation = graphql(/* GraphQL */ `
     }
   }
 `);
-
-const hasPrescriberRole = (roles: { value: string; label: string }[]) =>
-  roles.some((r) => r.label === 'Prescriber');
 
 const inviteSchema = yup
   .object({

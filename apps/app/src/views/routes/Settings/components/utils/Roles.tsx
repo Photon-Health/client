@@ -6,6 +6,7 @@ import { Text } from '@chakra-ui/react';
 import * as yup from 'yup';
 import { usePhoton } from '@photonhealth/react';
 import { useState } from 'react';
+
 export const rolesSchema = yup.array(
   yup
     .object({
@@ -14,6 +15,9 @@ export const rolesSchema = yup.array(
     })
     .required()
 );
+
+export const hasPrescriberRole = (roles: { value: string; label: string }[]) =>
+  roles.some((r) => r.label === 'Prescriber');
 
 const allRolesQuery = graphql(/* GraphQL */ `
   query AllRolesSelect {
