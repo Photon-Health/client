@@ -4,7 +4,7 @@ import { FC } from 'react';
 import * as yup from 'yup';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 import { hasPrescriberRole, rolesSchema } from '../utils/Roles';
-import { phoneRegex } from '../utils/Validation';
+import { phoneRegex, zipCodeRegex } from '../utils/Validation';
 
 export const profileFormSchema = yup.object({
   name: yup.object({
@@ -67,7 +67,7 @@ export const profileFormSchema = yup.object({
     postalCode: yup
       .string()
       .required('Zip code is required')
-      .matches(/^[0-9]{5}(?:-[0-9]{4})?$/, { message: 'Enter a valid zip code' })
+      .matches(zipCodeRegex, { message: 'Enter a valid zip code' })
   })
 });
 

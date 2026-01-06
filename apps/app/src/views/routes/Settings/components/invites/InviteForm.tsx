@@ -23,7 +23,7 @@ import * as yup from 'yup';
 import { usePhoton } from '@photonhealth/react';
 import { RolesSelect, hasPrescriberRole, rolesSchema } from '../utils/Roles';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
-import { phoneRegex } from '../utils/Validation';
+import { phoneRegex, zipCodeRegex } from '../utils/Validation';
 
 export const inviteFormFragment = graphql(/* GraphQL */ `
   fragment InviteFormFragment on Invite {
@@ -75,7 +75,7 @@ const inviteSchema = yup
             postalCode: yup
               .string()
               .required('Zip is required')
-              .matches(/^[0-9]{5}(?:-[0-9]{4})?$/, { message: 'Enter a valid zipcode' })
+              .matches(zipCodeRegex, { message: 'Enter a valid zipcode' })
           })
           .required('Please enter an address'),
         phone: yup
