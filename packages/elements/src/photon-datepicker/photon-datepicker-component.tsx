@@ -13,8 +13,9 @@ import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?in
 import styles from './style.css?inline';
 
 import { format } from 'date-fns';
-import { onMount, createSignal } from 'solid-js';
+import { onMount } from 'solid-js';
 import formatDate from './formatDate';
+import { CALENDAR_DATE_FORMAT } from '@photonhealth/components';
 
 const Component = (props: {
   label?: string;
@@ -24,33 +25,30 @@ const Component = (props: {
   helpText?: string;
   disabled: boolean;
   value?: string;
-  noInitialDate?: boolean;
+  min?: Date;
 }) => {
   let ref: any;
   let inputRef: any;
-  // initialized with today's date
-  const initialDate = props?.noInitialDate ? '' : format(new Date(), 'yyyy-MM-dd').toString();
-  const [date, setDate] = createSignal(props?.value || initialDate);
-
   const dispatchDateSelected = (date: string) => {
     const event = new CustomEvent('photon-datepicker-selected', {
       composed: true,
       bubbles: true,
       detail: {
-        date: date
+        // Handle edge case where clicking Clear
+        // sets value to an empty string instead of `undefined`
+        // which interferes with validation
+        date: date || undefined
       }
     });
     ref?.dispatchEvent(event);
   };
 
   onMount(() => {
-    dispatchDateSelected(date());
     inputRef?.addEventListener('paste', (e: any) => {
       const pasteText = e.clipboardData.getData('Text');
       const formattedDate = formatDate(pasteText);
 
       if (formattedDate) {
-        setDate(formattedDate);
         dispatchDateSelected(formattedDate);
       }
     });
@@ -76,8 +74,9 @@ const Component = (props: {
           }}
           class="input"
           type="date"
-          value={date()}
+          value={props.value}
           invalid={props.invalid}
+          min={props.min ? format(props.min, CALENDAR_DATE_FORMAT).toString() : undefined}
         >
           <p slot="help-text" class="text-sm text-red-400 pt-1 h-[21px] font-sans">
             {props.helpText}
@@ -96,7 +95,7 @@ customElement(
     helpText: undefined,
     disabled: false,
     value: undefined,
-    noInitialDate: undefined
+    min: undefined
   },
   Component
 );

@@ -283,7 +283,7 @@ export type MutationCreatePrescriptionArgs = {
   dispenseAsWritten?: InputMaybe<Scalars['Boolean']>;
   dispenseQuantity: Scalars['Float'];
   dispenseUnit: Scalars['String'];
-  effectiveDate?: InputMaybe<Scalars['AWSDate']>;
+  doNotFillBeforeDate?: InputMaybe<Scalars['AWSDate']>;
   externalId?: InputMaybe<Scalars['ID']>;
   instructions: Scalars['String'];
   notes?: InputMaybe<Scalars['String']>;
@@ -586,6 +586,7 @@ export type Prescription = {
   dispenseQuantity: Scalars['Float'];
   dispenseUnit: Scalars['String'];
   effectiveDate: Scalars['AWSDate'];
+  doNotFillBeforeDate?: Maybe<Scalars['AWSDate']>;
   expirationDate: Scalars['AWSDate'];
   externalId?: Maybe<Scalars['ID']>;
   fills: Array<Maybe<Fill>>;
@@ -619,8 +620,8 @@ export type PrescriptionInput = {
   dispenseQuantity: Scalars['Float'];
   /** Unit to dispense treatment in */
   dispenseUnit: Scalars['String'];
-  /** Date when the script is first valid */
-  effectiveDate?: InputMaybe<Scalars['AWSDate']>;
+  /** Pharmacy cannot fill prescription before this date */
+  doNotFillBeforeDate?: InputMaybe<Scalars['AWSDate']>;
   /** Reference ID for linking to external objects */
   externalId?: InputMaybe<Scalars['ID']>;
   /** Prescriber instructions for patient */

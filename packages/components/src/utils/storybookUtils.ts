@@ -60,6 +60,7 @@ export function createTestPrescription(options: Partial<Prescription> = {}): Pre
   return {
     dispenseQuantity: 0,
     effectiveDate: undefined,
+    doNotFillBeforeDate: undefined,
     expirationDate: undefined,
     fills: [testFill],
     fillsAllowed: 0,
