@@ -466,7 +466,7 @@ export const AddPrescriptionCard = (props: {
                 variant="secondary"
                 color="blue"
               >
-                Add to Drafts
+                Add to drafts
               </Button>
             </div>
           </div>
