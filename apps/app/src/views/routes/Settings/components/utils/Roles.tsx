@@ -7,6 +7,8 @@ import * as yup from 'yup';
 import { usePhoton } from '@photonhealth/react';
 import { useState } from 'react';
 
+type Role = { value: string; label: string; description?: string };
+
 export const rolesSchema = yup.array(
   yup
     .object({
@@ -16,8 +18,7 @@ export const rolesSchema = yup.array(
     .required()
 );
 
-export const hasPrescriberRole = (roles: { value: string; label: string }[]) =>
-  roles.some((r) => r.label === 'Prescriber');
+export const hasPrescriberRole = (roles: Role[]) => roles.some((r) => r.label === 'Prescriber');
 
 const allRolesQuery = graphql(/* GraphQL */ `
   query AllRolesSelect {
@@ -28,8 +29,6 @@ const allRolesQuery = graphql(/* GraphQL */ `
     }
   }
 `);
-
-type Role = { value: string; label: string; description?: string };
 
 const Option = (props: OptionProps<Role>) => {
   return (
