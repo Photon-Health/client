@@ -19,11 +19,12 @@ import { graphql } from 'apps/app/src/gql';
 import { OrgType } from 'apps/app/src/gql/graphql';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
 import InfoGrid from 'apps/app/src/views/components/InfoGrid';
-import { Formik } from 'formik';
+import { Formik, validateYupSchema, yupToFormErrors } from 'formik';
 import { useMemo, useState } from 'react';
 import * as yup from 'yup';
 import { usePhoton } from '@photonhealth/react';
 import { OrganizationForm, organizationFormSchema } from './OrganizationEditForm';
+import { formatAddress } from 'apps/app/src/utils';
 
 const organizationQuery = graphql(/* GraphQL */ `
   query OrganizationQuery {
@@ -54,19 +55,21 @@ const updateOrganizationMutation = graphql(/* GraphQL */ `
 const EditButtons = ({
   onSave,
   onCancel,
-  loading
+  loading,
+  isInvalid
 }: {
   onSave: () => void;
   onCancel: () => void;
   loading: boolean;
+  isInvalid: boolean;
 }) => (
   <>
     <Button
       size={'sm'}
       colorScheme={'green'}
       leftIcon={loading ? <Spinner size={'xs'} /> : <CheckIcon />}
-      isDisabled={loading}
-      disabled={loading}
+      isDisabled={loading || isInvalid}
+      disabled={loading || isInvalid}
       onClick={onSave}
     >
       Save
@@ -100,7 +103,6 @@ export const Organization = () => {
   const organization = data?.organization;
 
   const initialValues: yup.InferType<typeof organizationFormSchema> = {
-    id: organization?.id ?? '',
     name: organization?.name ?? '',
     email: organization?.email ?? '',
     fax: organization?.fax ?? '',
@@ -119,9 +121,7 @@ export const Organization = () => {
     if (!addressData) {
       return undefined;
     }
-    return `${addressData.street1} ${addressData.street2 ? `${addressData.street2} ` : ''}${
-      addressData.city
-    }, ${addressData.state} ${addressData.postalCode}`;
+    return formatAddress(addressData);
   }, [organization?.address?.street1]);
 
   const rows = useMemo(
@@ -129,8 +129,8 @@ export const Organization = () => {
       [
         { title: 'Organization Name', value: organization?.name },
         { title: 'Email', value: organization?.email },
-        { title: 'Fax', value: organization?.fax },
         { title: 'Phone', value: organization?.phone },
+        { title: 'Fax', value: organization?.fax },
         { title: 'Address', value: address },
         { title: 'Organization ID', value: organization?.id }
       ].map(({ title, value }) => ({
@@ -154,30 +154,39 @@ export const Organization = () => {
     ]
   );
 
+  const handleSubmit = async (values: yup.InferType<typeof organizationFormSchema>) => {
+    try {
+      await updateOrganization({
+        variables: {
+          input: {
+            name: values.name,
+            email: values.email ?? '',
+            fax: values.fax ?? '',
+            phone: values.phone ?? '',
+            type: OrgType.Prescriber,
+            address: { ...values.address, country: 'USA', state: values.address.state.value }
+          }
+        }
+      });
+    } catch (e) {
+      console.error('Failed to update', e);
+    }
+    setIsEditing(false);
+  };
+
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={organizationFormSchema}
-      enableReinitialize // if organization changes so should this form
-      onSubmit={async (values) => {
+      validate={(value) => {
         try {
-          await updateOrganization({
-            variables: {
-              input: {
-                name: values.name,
-                email: values.email ?? '', // TODO: make email not required
-                fax: values.fax ?? '', // TODO: make fax not required
-                phone: values.phone ?? '', // TODO: make phone not required
-                type: OrgType.Prescriber,
-                address: { ...values.address, country: 'USA', state: values.address.state.value }
-              }
-            }
-          });
-        } catch (e) {
-          console.error('Failed to update', e);
+          validateYupSchema(value, organizationFormSchema, true, { initialValues });
+        } catch (err) {
+          return yupToFormErrors(err);
         }
-        setIsEditing(false);
+        return {};
       }}
+      enableReinitialize // if organization changes so should this form
+      onSubmit={handleSubmit}
     >
       {(formikProps) => (
         <Box p={{ base: '4', md: '8' }} borderRadius="lg" bg="white" boxShadow="base" w="full">
@@ -191,6 +200,7 @@ export const Organization = () => {
                   {isEditing ? (
                     <EditButtons
                       loading={mutationLoading}
+                      isInvalid={!formikProps.isValid}
                       onSave={formikProps.submitForm}
                       onCancel={() => {
                         formikProps.resetForm();
