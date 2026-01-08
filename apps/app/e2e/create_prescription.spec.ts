@@ -10,7 +10,7 @@ test('user can login and create patient', async ({ page }) => {
 
   await page.getByLabel('First name').fill('Jimbob');
   await page.getByLabel('Last name').fill(`McTesterson_${patientNumber}`);
-  await page.getByLabel('Date of birth').fill('1980-12-31');
+  await page.locator('input[type="date"]').fill('1980-12-31');
   await page.getByLabel('Mobile number').fill('8886543210');
   await page.getByLabel('Sex at birth').click();
   await page.getByRole('menuitem', { name: 'Male', exact: true }).click();

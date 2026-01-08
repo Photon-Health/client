@@ -85,7 +85,7 @@ const Component = (props: {
               for="input"
               aria-hidden="false"
             >
-              <span>{props.label}</span>
+              {props.label}
               {props.required ? (
                 <span class="pl-1 text-red-400">*</span>
               ) : (
