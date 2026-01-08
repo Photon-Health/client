@@ -192,6 +192,46 @@ export const Profile = () => {
     [user, organization, address]
   );
 
+  const handleSubmit = async (values: yup.InferType<typeof profileFormSchema>) => {
+    try {
+      await updateMyProfile({
+        variables: {
+          updateMyProfileInput: {
+            name: {
+              first: values.name.first,
+              title: values.name.title ?? undefined,
+              middle: values.name.middle ?? undefined,
+              last: values.name.last
+            },
+            address: {
+              ...values.address,
+              street1: values.address.street1 ?? '',
+              street2: values.address.street2 ?? undefined,
+              city: values?.address?.city ?? '',
+              postalCode: values?.address?.postalCode ?? '',
+              state: values?.address?.state?.value ?? '',
+              country: 'US'
+            },
+            email: values.email,
+            npi: values.npi,
+            phone: values.phone,
+            fax: values.fax
+          }
+        }
+      });
+      toast({
+        position: 'top-right',
+        duration: 4000,
+        render: ({ onClose }) => (
+          <StyledToast onClose={onClose} type="success" description="Profile updated" />
+        )
+      });
+    } catch (e) {
+      console.error('Failed to update', e);
+    }
+    setIsEditing(false);
+  };
+
   return (
     <Formik
       initialValues={initialValues}
@@ -204,47 +244,7 @@ export const Profile = () => {
         return {};
       }}
       enableReinitialize // if organization changes so should this form
-      onSubmit={async (values, { validateForm, resetForm }) => {
-        try {
-          await validateForm(values);
-          await updateMyProfile({
-            variables: {
-              updateMyProfileInput: {
-                name: {
-                  first: values.name.first,
-                  title: values.name.title ?? undefined,
-                  middle: values.name.middle ?? undefined,
-                  last: values.name.last
-                },
-                address: {
-                  ...values.address,
-                  street1: values.address.street1 ?? '',
-                  street2: values.address.street2 ?? undefined,
-                  city: values?.address?.city ?? '',
-                  postalCode: values?.address?.postalCode ?? '',
-                  state: values?.address?.state?.value ?? '',
-                  country: 'US'
-                },
-                email: values.email,
-                npi: values.npi,
-                phone: values.phone,
-                fax: values.fax
-              }
-            }
-          });
-          toast({
-            position: 'top-right',
-            duration: 4000,
-            render: ({ onClose }) => (
-              <StyledToast onClose={onClose} type="success" description="Profile updated" />
-            )
-          });
-          resetForm();
-        } catch (e) {
-          console.error('Failed to update', e);
-        }
-        setIsEditing(false);
-      }}
+      onSubmit={handleSubmit}
     >
       {(formikProps) => (
         <Box p={{ base: '4', md: '8' }} borderRadius="lg" bg="white" boxShadow="base" w="full">

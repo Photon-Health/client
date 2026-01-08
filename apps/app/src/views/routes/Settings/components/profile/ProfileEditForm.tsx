@@ -25,13 +25,9 @@ export const profileFormSchema = yup.object({
     .test({
       message: 'Prescriber phone cannot be removed',
       test: (value, context) => {
-        if (!hasPrescriberRole(context.options.context?.initialValues.roles)) {
-          return true;
-        }
-        if (context.options.context?.initialValues.phone) {
-          return !!value;
-        }
-        return true;
+        const isPrescriber = hasPrescriberRole(context.options.context?.initialValues.roles);
+        const startedWithValue = context.options.context?.initialValues.phone;
+        return !isPrescriber ? true : startedWithValue ? !!value : true;
       }
     }),
   fax: yup
@@ -42,23 +38,19 @@ export const profileFormSchema = yup.object({
     .test({
       message: 'Prescriber fax cannot be removed',
       test: (value, context) => {
-        if (!hasPrescriberRole(context.options.context?.initialValues.roles)) {
-          return true;
-        }
-        if (context.options.context?.initialValues.fax) {
-          return !!value;
-        }
-        return true;
+        const isPrescriber = hasPrescriberRole(context.options.context?.initialValues.roles);
+        const startedWithValue = context.options.context?.initialValues.fax;
+        return !isPrescriber ? true : startedWithValue ? !!value : true;
       }
     }),
   npi: yup
     .string()
+    .matches(/^[0-9]+$/, { message: 'Enter a valid NPI' })
     .when('roles', (roles: { value: string; label: string }[], schema: yup.BaseSchema) => {
       return hasPrescriberRole(roles)
         ? schema.required('NPI is required for prescribers')
         : schema.notRequired();
-    })
-    .matches(/^[0-9]+$/, { message: 'Enter a valid NPI' }),
+    }),
   address: yup.object({
     street1: yup.string().required('Address is required'),
     street2: yup.string(),

@@ -24,6 +24,7 @@ import { useMemo, useState } from 'react';
 import * as yup from 'yup';
 import { usePhoton } from '@photonhealth/react';
 import { OrganizationForm, organizationFormSchema } from './OrganizationEditForm';
+import { formatAddress } from 'apps/app/src/utils';
 
 const organizationQuery = graphql(/* GraphQL */ `
   query OrganizationQuery {
@@ -120,9 +121,7 @@ export const Organization = () => {
     if (!addressData) {
       return undefined;
     }
-    return `${addressData.street1} ${addressData.street2 ? `${addressData.street2} ` : ''}${
-      addressData.city
-    }, ${addressData.state} ${addressData.postalCode}`;
+    return formatAddress(addressData);
   }, [organization?.address?.street1]);
 
   const rows = useMemo(
@@ -130,8 +129,8 @@ export const Organization = () => {
       [
         { title: 'Organization Name', value: organization?.name },
         { title: 'Email', value: organization?.email },
-        { title: 'Fax', value: organization?.fax },
         { title: 'Phone', value: organization?.phone },
+        { title: 'Fax', value: organization?.fax },
         { title: 'Address', value: address },
         { title: 'Organization ID', value: organization?.id }
       ].map(({ title, value }) => ({
@@ -155,6 +154,26 @@ export const Organization = () => {
     ]
   );
 
+  const handleSubmit = async (values: yup.InferType<typeof organizationFormSchema>) => {
+    try {
+      await updateOrganization({
+        variables: {
+          input: {
+            name: values.name,
+            email: values.email ?? '',
+            fax: values.fax ?? '',
+            phone: values.phone ?? '',
+            type: OrgType.Prescriber,
+            address: { ...values.address, country: 'USA', state: values.address.state.value }
+          }
+        }
+      });
+    } catch (e) {
+      console.error('Failed to update', e);
+    }
+    setIsEditing(false);
+  };
+
   return (
     <Formik
       initialValues={initialValues}
@@ -167,25 +186,7 @@ export const Organization = () => {
         return {};
       }}
       enableReinitialize // if organization changes so should this form
-      onSubmit={async (values) => {
-        try {
-          await updateOrganization({
-            variables: {
-              input: {
-                name: values.name,
-                email: values.email ?? '',
-                fax: values.fax ?? '',
-                phone: values.phone ?? '',
-                type: OrgType.Prescriber,
-                address: { ...values.address, country: 'USA', state: values.address.state.value }
-              }
-            }
-          });
-        } catch (e) {
-          console.error('Failed to update', e);
-        }
-        setIsEditing(false);
-      }}
+      onSubmit={handleSubmit}
     >
       {(formikProps) => (
         <Box p={{ base: '4', md: '8' }} borderRadius="lg" bg="white" boxShadow="base" w="full">

@@ -97,13 +97,9 @@ const roleSchema = yup
       .test({
         message: 'Prescriber phone cannot be removed',
         test: (value, context) => {
-          if (!hasPrescriberRole(context.parent.roles)) {
-            return true;
-          }
-          if (context.options.context?.initialValues.phone) {
-            return !!value;
-          }
-          return true;
+          const isPrescriber = hasPrescriberRole(context.parent.roles);
+          const startedWithValue = context.options.context?.initialValues.phone;
+          return !isPrescriber ? true : startedWithValue ? !!value : true;
         }
       }),
     fax: yup
@@ -112,15 +108,11 @@ const roleSchema = yup
         message: 'Enter a valid fax number'
       })
       .test({
-        message: 'Prescriber fax cannot be removed',
+        message: 'Prescriber phone cannot be removed',
         test: (value, context) => {
-          if (!hasPrescriberRole(context.parent.roles)) {
-            return true;
-          }
-          if (context.options.context?.initialValues.fax) {
-            return !!value;
-          }
-          return true;
+          const isPrescriber = hasPrescriberRole(context.parent.roles);
+          const startedWithValue = context.options.context?.initialValues.fax;
+          return !isPrescriber ? true : startedWithValue ? !!value : true;
         }
       }),
     street1: yup.string().when('roles', requiredForPrescribers('Address is required')),
@@ -175,7 +167,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
     }
   );
 
-  const handleSaveRoles = async (formVariables: RoleYupType) => {
+  const handleSubmit = async (formVariables: RoleYupType) => {
     const maybeAddress: Partial<AddressInput> = {
       country: 'US',
       street1: formVariables.street1,
@@ -272,7 +264,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
             }}
             onSubmit={async (values, { validateForm, resetForm }) => {
               await validateForm(values);
-              await handleSaveRoles(values);
+              await handleSubmit(values);
               toast({
                 position: 'top-right',
                 duration: 4000,
