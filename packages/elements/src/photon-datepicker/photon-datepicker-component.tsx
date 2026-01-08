@@ -61,9 +61,15 @@ const Component = (props: {
       <style>{shoelaceLightStyles}</style>
       <style>{styles}</style>
       <div class="md:py-2  flex flex-col" ref={ref}>
+        {props.label ? (
+          <div class="flex items-center pb-2 font-sans">
+            <label class="text-gray-700 text-sm">{props.label}</label>
+            {props.required ? <p class="pl-1 text-red-400">*</p> : null}
+            {!props.required ? <p class="text-gray-400 text-xs pl-2">Optional</p> : null}
+          </div>
+        ) : null}
         <sl-input
           ref={inputRef}
-          label={props.label}
           required={props.required}
           on:sl-input={(e: any) => {
             dispatchDateSelected(e.target.value);
