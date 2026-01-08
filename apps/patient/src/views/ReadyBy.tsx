@@ -63,7 +63,7 @@ export const ReadyBy = () => {
   const handleSubmit = async () => {
     if (isDemo) {
       const query = queryString.stringify({ demo: true, phone });
-      navigate(`/pharmacy?${query}`);
+      navigate(`/status?${query}`);
       return;
     }
 
