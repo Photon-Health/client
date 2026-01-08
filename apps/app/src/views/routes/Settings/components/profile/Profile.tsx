@@ -19,7 +19,7 @@ import { CheckIcon, EditIcon } from '@chakra-ui/icons';
 import { graphql } from 'apps/app/src/gql';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
 import InfoGrid from 'apps/app/src/views/components/InfoGrid';
-import { Formik } from 'formik';
+import { Formik, validateYupSchema, yupToFormErrors } from 'formik';
 import { useMemo, useState } from 'react';
 import * as yup from 'yup';
 import { Role } from 'packages/sdk/dist/types';
@@ -84,19 +84,21 @@ function mapAndSortRoles(roles: Role[]): { value: string; label: string; descrip
 const EditButtons = ({
   onSave,
   onCancel,
-  loading
+  loading,
+  isInvalid
 }: {
   onSave: () => void;
   onCancel: () => void;
   loading: boolean;
+  isInvalid: boolean;
 }) => (
   <>
     <Button
       size={'sm'}
       colorScheme={'green'}
       leftIcon={loading ? <Spinner size={'xs'} /> : <CheckIcon />}
-      isDisabled={loading}
-      disabled={loading}
+      isDisabled={loading || isInvalid}
+      disabled={loading || isInvalid}
       onClick={onSave}
     >
       Save
@@ -128,22 +130,7 @@ export const Profile = () => {
     client: clinicalClient
   });
 
-  const handleSaveRoles = (formVariables: any) => {
-    updateMyProfile({
-      variables: {
-        updateMyProfileInput: {
-          name: formVariables.variables.name ?? user?.name,
-          address: formVariables.variables.provider.address ?? user?.address,
-          email: formVariables.variables.email ?? user?.email,
-          npi: formVariables.variables.provider.npi ?? user?.npi,
-          phone: formVariables.variables.provider.phone ?? user?.phone,
-          fax: formVariables.variables.fax ?? user?.fax
-        }
-      }
-    });
-  };
-
-  const hasOrgEdit = usePermissions(['edit:profile']);
+  const canEdit = usePermissions(['edit:profile']);
   const user = data?.me;
   const organization = data?.organization;
 
@@ -154,21 +141,20 @@ export const Profile = () => {
       middle: user?.name?.middle ?? undefined,
       last: user?.name?.last ?? ''
     },
-    fax: user?.fax ?? undefined,
     email: user?.email ?? '',
     roles: mapAndSortRoles(user?.roles ?? []),
-    provider: {
-      npi: user?.npi ?? '',
-      address: {
-        street1: user?.address?.street1 ?? '',
-        street2: user?.address?.street2 ?? undefined,
-        city: user?.address?.city ?? '',
-        state: {
-          value: (user?.address?.state as string) ?? ''
-        },
-        postalCode: user?.address?.postalCode ?? ''
+    phone: user?.phone ?? '',
+
+    fax: user?.fax ?? '',
+    npi: user?.npi ?? '',
+    address: {
+      street1: user?.address?.street1 ?? '',
+      street2: user?.address?.street2 ?? undefined,
+      city: user?.address?.city ?? '',
+      state: {
+        value: (user?.address?.state as string) ?? ''
       },
-      phone: user?.phone ?? ''
+      postalCode: user?.address?.postalCode ?? ''
     }
   };
 
@@ -206,54 +192,59 @@ export const Profile = () => {
     [user, organization, address]
   );
 
+  const handleSubmit = async (values: yup.InferType<typeof profileFormSchema>) => {
+    try {
+      await updateMyProfile({
+        variables: {
+          updateMyProfileInput: {
+            name: {
+              first: values.name.first,
+              title: values.name.title ?? undefined,
+              middle: values.name.middle ?? undefined,
+              last: values.name.last
+            },
+            address: {
+              ...values.address,
+              street1: values.address.street1 ?? '',
+              street2: values.address.street2 ?? undefined,
+              city: values?.address?.city ?? '',
+              postalCode: values?.address?.postalCode ?? '',
+              state: values?.address?.state?.value ?? '',
+              country: 'US'
+            },
+            email: values.email,
+            npi: values.npi,
+            phone: values.phone,
+            fax: values.fax
+          }
+        }
+      });
+      toast({
+        position: 'top-right',
+        duration: 4000,
+        render: ({ onClose }) => (
+          <StyledToast onClose={onClose} type="success" description="Profile updated" />
+        )
+      });
+    } catch (e) {
+      console.error('Failed to update', e);
+    }
+    setIsEditing(false);
+  };
+
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={profileFormSchema}
-      enableReinitialize // if organization changes so should this form
-      onSubmit={async (values, { validateForm, resetForm }) => {
+      validate={(value) => {
         try {
-          await validateForm(values);
-          await handleSaveRoles({
-            variables: {
-              name: {
-                first: values.name.first,
-                title: values.name.title ?? undefined,
-                middle: values.name.middle ?? undefined,
-                last: values.name.last
-              },
-              fax: values.fax ?? undefined,
-              email: values.email,
-              roles: values.roles,
-              ...(values.provider == null
-                ? {}
-                : {
-                    provider: {
-                      ...values.provider,
-                      address: {
-                        ...values.provider.address,
-                        street1: values.provider.address.street1,
-                        street2: values.provider.address.street2 ?? undefined,
-                        state: values?.provider?.address?.state?.value ?? '',
-                        country: 'US'
-                      }
-                    }
-                  })
-            }
-          });
-          toast({
-            position: 'top-right',
-            duration: 4000,
-            render: ({ onClose }) => (
-              <StyledToast onClose={onClose} type="success" description="Profile updated" />
-            )
-          });
-          resetForm();
-        } catch (e) {
-          console.error('Failed to update', e);
+          validateYupSchema(value, profileFormSchema, true, { initialValues });
+        } catch (err) {
+          return yupToFormErrors(err);
         }
-        setIsEditing(false);
+        return {};
       }}
+      enableReinitialize // if organization changes so should this form
+      onSubmit={handleSubmit}
     >
       {(formikProps) => (
         <Box p={{ base: '4', md: '8' }} borderRadius="lg" bg="white" boxShadow="base" w="full">
@@ -267,13 +258,14 @@ export const Profile = () => {
                   {user && isEditing ? (
                     <EditButtons
                       loading={mutationLoading}
+                      isInvalid={!formikProps.isValid}
                       onSave={formikProps.submitForm}
                       onCancel={() => {
                         formikProps.resetForm();
                         setIsEditing(false);
                       }}
                     />
-                  ) : hasOrgEdit ? (
+                  ) : canEdit ? (
                     <Button
                       size={'sm'}
                       colorScheme={'brand'}
