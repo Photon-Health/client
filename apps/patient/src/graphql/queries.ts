@@ -179,6 +179,14 @@ export const GET_ORDER = gql`
         dateOfBirth
         gender
         sex
+        address {
+          street1
+          street2
+          city
+          state
+          postalCode
+          country
+        }
       }
       fulfillments {
         id

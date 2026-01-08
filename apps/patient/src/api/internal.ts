@@ -208,6 +208,35 @@ export const setPreferredPharmacy = async (patientId: string, pharmacyId: string
   }
 };
 
+export const updatePatientAddress = async (
+  patientId: string,
+  address: {
+    street1: string;
+    street2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  }
+) => {
+  try {
+    const response = await graphQLClient.UpdatePatient({
+      patientId,
+      input: { address }
+    });
+
+    if (response?.updatePatient) {
+      return response.updatePatient;
+    } else {
+      throw new Error('Unable to update patient address');
+    }
+  } catch (e: any) {
+    const errorMessage =
+      e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on updatePatientAddress.';
+    throw new Error(errorMessage);
+  }
+};
+
 export const triggerDemoNotification = async (
   phoneNumber: string,
   eventName:

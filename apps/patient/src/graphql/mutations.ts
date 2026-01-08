@@ -41,3 +41,19 @@ export const SET_ORDER_PHARMACY = gql`
     )
   }
 `;
+
+export const UPDATE_PATIENT = gql`
+  mutation UpdatePatient($patientId: ID!, $input: UpdatePatientInput!) {
+    updatePatient(patientId: $patientId, input: $input) {
+      id
+      address {
+        street1
+        street2
+        city
+        state
+        postalCode
+        country
+      }
+    }
+  }
+`;

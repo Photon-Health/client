@@ -1,15 +1,17 @@
+import { useState } from 'react';
 import { Box, Button, Container, HStack, Heading, Text, VStack } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import queryString from 'query-string';
 
 import { FixedFooter, PoweredBy, PrescriptionsList } from '../components';
+import { AddressForm } from '../components/AddressForm';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 
 export const Review = () => {
-  const { order, flattenedFills } = useOrderContext();
+  const { order, flattenedFills, fetchOrder } = useOrderContext();
 
   const navigate = useNavigate();
 
@@ -20,6 +22,12 @@ export const Review = () => {
 
   const { patient } = order;
 
+  // Track if user has just submitted their address
+  const [addressSubmitted, setAddressSubmitted] = useState(false);
+
+  // Show address form if patient has no address and hasn't just submitted one
+  const needsAddress = !patient.address && !isDemo && !addressSubmitted;
+
   const handleCtaClick = () => {
     const query = isDemo
       ? queryString.stringify({ demo: true, phone })
@@ -27,9 +35,27 @@ export const Review = () => {
     navigate(`/pharmacy?${query}`);
   };
 
+  const handleAddressSuccess = async () => {
+    setAddressSubmitted(true);
+    // Refetch order to get updated patient address
+    await fetchOrder();
+  };
+
   const isMultiRx = flattenedFills.length > 1;
 
-  usePageAnalytics({ pageName: 'Review Prescriptions' });
+  usePageAnalytics({ pageName: needsAddress ? 'Add Address' : 'Review Prescriptions' });
+
+  // Show address form if patient doesn't have an address
+  if (needsAddress) {
+    return (
+      <>
+        <Helmet>
+          <title>Add your address</title>
+        </Helmet>
+        <AddressForm patientId={patient.id} order={order} onSuccess={handleAddressSuccess} />
+      </>
+    );
+  }
 
   return (
     <Box>
