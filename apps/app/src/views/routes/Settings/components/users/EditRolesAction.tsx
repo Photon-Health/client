@@ -21,12 +21,13 @@ import { usePhoton } from '@photonhealth/react';
 import { FragmentType, graphql, useFragment } from 'apps/app/src/gql';
 import { AddressInput } from 'apps/app/src/gql/graphql';
 import { StyledToast } from 'apps/app/src/views/components/StyledToast';
-import { ErrorMessage, Field, Formik, FormikErrors, FormikTouched } from 'formik';
+import { ErrorMessage, Field, Formik, validateYupSchema, yupToFormErrors } from 'formik';
 import { Role } from 'packages/sdk/dist/types';
 import React from 'react';
 import * as yup from 'yup';
-import { RolesSelect, rolesSchema } from '../utils/Roles';
+import { RolesSelect, hasPrescriberRole, rolesSchema } from '../utils/Roles';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
+import { phoneRegex, zipCodeRegex } from '../utils/Validation';
 
 export const userFragment = graphql(/* GraphQL */ `
   fragment EditRolesActionUserFragment on User {
@@ -74,66 +75,85 @@ const UpdateProviderProfileAndSetUserRolesMutation = graphql(/* GraphQL */ `
   }
 `);
 
-const hasPrescriberRole = (roles: { value: string; label: string }[]) =>
-  roles.some((r) => r.label === 'Prescriber');
+const requiredForPrescribers =
+  (message: string) => (roles: { value: string; label: string }[], schema: yup.BaseSchema) => {
+    return hasPrescriberRole(roles) ? schema.required(message) : schema.notRequired();
+  };
 
 const roleSchema = yup
   .object({
-    first: yup.string().required(),
-    last: yup.string().required(),
-    email: yup.string().email('Invalid email').required('email is required for providers'),
+    first: yup.string().required('First name is required'),
+    last: yup.string().required('Last name is required'),
     roles: rolesSchema.required().min(1, 'Must have at least one role'),
-    provider: yup
-      .object({
-        npi: yup
-          .string()
-          .required('NPI is required for prescribers')
-          .matches(/^[0-9]+$/, { message: 'Invalid NPI' }),
-        address: yup
-          .object({
-            street1: yup.string().required('Address is required'),
-            street2: yup.string(),
-            city: yup.string().required('City is required'),
-            state: yupStateSchema,
-            postalCode: yup
-              .string()
-              .required('Zip is required')
-              .matches(/^[0-9]{5}(?:-[0-9]{4})?$/, { message: 'Enter a valid zipcode' })
-          })
-          .required('Please enter an address')
-      })
-      .notRequired()
-      .default(undefined)
-      .when('roles', (roles: { value: string; label: string }[], schema) => {
-        return hasPrescriberRole(roles)
-          ? schema.required(
-              "Address, NPI and phone are required for users with 'Prescriber' permissions"
-            )
-          : schema.notRequired();
-      }),
+    npi: yup
+      .string()
+      .matches(/^[0-9]+$/, { message: 'Enter a valid NPI' })
+      .when('roles', requiredForPrescribers('NPI is required')),
     phone: yup
       .string()
-      .when('roles', {
-        is: (roles: { value: string; label: string }[]) => hasPrescriberRole(roles),
-        then: yup.string().required('Please enter a valid phone number'),
-        otherwise: yup.string()
+      .matches(phoneRegex, {
+        message: 'Enter a valid phone number'
       })
-      .matches(/^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/, {
-        message: 'Please enter a valid phone number'
+      .test({
+        message: 'Prescriber phone cannot be removed',
+        test: (value, context) => {
+          const isPrescriber = hasPrescriberRole(context.parent.roles);
+          const startedWithValue = context.options.context?.initialValues.phone;
+          return !isPrescriber ? true : startedWithValue ? !!value : true;
+        }
+      }),
+    fax: yup
+      .string()
+      .matches(phoneRegex, {
+        message: 'Enter a valid fax number'
       })
+      .test({
+        message: 'Prescriber phone cannot be removed',
+        test: (value, context) => {
+          const isPrescriber = hasPrescriberRole(context.parent.roles);
+          const startedWithValue = context.options.context?.initialValues.fax;
+          return !isPrescriber ? true : startedWithValue ? !!value : true;
+        }
+      }),
+    street1: yup.string().when('roles', requiredForPrescribers('Address is required')),
+    street2: yup.string(),
+    city: yup.string().when('roles', requiredForPrescribers('City is required')),
+    state: yupStateSchema,
+    postalCode: yup
+      .string()
+      .matches(zipCodeRegex, { message: 'Enter a valid zip code' })
+      .when('roles', requiredForPrescribers('Zip code is required'))
   })
-  // If not a prescriber, set the provider to undefined
+  // If not a prescriber, don't validate values required for prescriber
   .transform((value) => {
     if (hasPrescriberRole(value.roles)) {
       return value;
     }
-    return { ...value, provider: undefined };
+    const blankValues = {
+      npi: undefined,
+      phone: undefined,
+      fax: undefined,
+      street1: undefined,
+      street2: undefined,
+      city: undefined,
+      postalCode: undefined
+      // Not including state for now since
+      // `yupStateSchema` makes it difficult to skip validation
+    };
+    return { ...value, ...blankValues };
   });
 
 type RoleYupType = yup.InferType<typeof roleSchema>;
-type ProviderYupType = RoleYupType['provider'];
-type ProviderFormikTouchedType = FormikTouched<ProviderYupType>;
-type ProviderFormikErrorsType = FormikErrors<ProviderYupType>;
+
+function mapAndSortRoles(roles: Role[]): { value: string; label: string; description?: string }[] {
+  const mappedRoles = roles.map(({ name, id, description }) => ({
+    value: id,
+    label: name ?? id,
+    description: description ?? undefined
+  }));
+  const sortedRoles = mappedRoles.sort();
+  return sortedRoles;
+}
 
 export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose }) => {
   const toast = useToast();
@@ -147,11 +167,14 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
     }
   );
 
-  const handleSaveRoles = async (formVariables: RoleYupType) => {
+  const handleSubmit = async (formVariables: RoleYupType) => {
     const maybeAddress: Partial<AddressInput> = {
       country: 'US',
-      ...(formVariables.provider?.address ?? userData.address),
-      state: formVariables.provider?.address.state.value ?? userData.address?.state
+      street1: formVariables.street1,
+      street2: formVariables.street2,
+      city: formVariables.city,
+      postalCode: formVariables.postalCode,
+      state: formVariables.state.value
     };
 
     const address =
@@ -168,10 +191,16 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
               first: formVariables.first,
               last: formVariables.last
             },
-            ...(address ? { address } : {}),
-            email: formVariables.email ?? userData.email,
-            npi: formVariables.provider?.npi ?? userData.npi,
-            phone: formVariables.phone ?? userData.phone
+            ...(hasPrescriberRole(formVariables.roles)
+              ? {
+                  address,
+                  npi: formVariables.npi,
+                  phone: formVariables.phone,
+                  fax: formVariables.fax
+                }
+              : // Otherwise, these fields aren't present in the form
+                // so user doesn't intend to update them
+                {})
           },
           roles: formVariables.roles.map((role: any) => role.value)
         }
@@ -179,34 +208,18 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
     ]);
   };
 
-  function mapAndSortRoles(
-    roles: Role[]
-  ): { value: string; label: string; description?: string }[] {
-    const mappedRoles = roles.map(({ name, id, description }) => ({
-      value: id,
-      label: name ?? id,
-      description: description ?? undefined
-    }));
-    const sortedRoles = mappedRoles.sort();
-    return sortedRoles;
-  }
-
   const initialValues: yup.InferType<typeof roleSchema> = {
-    email: userData.email ?? '',
     roles: mapAndSortRoles(userData.roles ?? []),
     first: userData.name?.first ?? '',
     last: userData.name?.last ?? '',
-    provider: {
-      npi: userData.npi ?? '',
-      address: {
-        street1: userData.address?.street1 ?? '',
-        street2: userData.address?.street2 ?? undefined,
-        city: userData.address?.city ?? '',
-        state: { value: (userData.address?.state as string) ?? '' },
-        postalCode: userData.address?.postalCode ?? ''
-      }
-    },
-    phone: userData.phone ?? ''
+    npi: userData.npi ?? '',
+    street1: userData.address?.street1 ?? '',
+    street2: userData.address?.street2 ?? undefined,
+    city: userData.address?.city ?? '',
+    state: { value: (userData.address?.state as string) ?? '' },
+    postalCode: userData.address?.postalCode ?? '',
+    phone: userData.phone ?? '',
+    fax: userData.fax ?? ''
   };
 
   return (
@@ -240,13 +253,18 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
         </Box>
         {userData && (
           <Formik
-            validateOnBlur
-            validateOnChange
             initialValues={initialValues}
-            validationSchema={roleSchema}
+            validate={(value) => {
+              try {
+                validateYupSchema(value, roleSchema, true, { initialValues });
+              } catch (err) {
+                return yupToFormErrors(err);
+              }
+              return {};
+            }}
             onSubmit={async (values, { validateForm, resetForm }) => {
               await validateForm(values);
-              await handleSaveRoles(values);
+              await handleSubmit(values);
               toast({
                 position: 'top-right',
                 duration: 4000,
@@ -258,14 +276,12 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
               onClose();
             }}
           >
-            {({ setFieldValue, handleSubmit, errors, touched, values, setFieldTouched }) => {
+            {({ setFieldValue, handleSubmit, errors, values, setFieldTouched, isValid }) => {
               const hasPrescriber = hasPrescriberRole(values.roles);
-              const providerErrors = errors.provider as ProviderFormikErrorsType | undefined;
-              const providerTouched = touched.provider as ProviderFormikTouchedType | undefined;
               return (
                 <form onSubmit={handleSubmit} noValidate>
                   <VStack spacing={2} align="stretch">
-                    <FormControl isInvalid={!!errors.roles && !!touched.roles} pb="4" isRequired>
+                    <FormControl isInvalid={!!errors.roles} pb="4" isRequired>
                       <FormLabel htmlFor="roles" m={2} mt={3}>
                         Roles
                       </FormLabel>
@@ -279,159 +295,82 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
                       />
                       <ErrorMessage name="roles" component={FormErrorMessage} />
                     </FormControl>
-                    <HStack>
-                      <FormControl
-                        isRequired
-                        isInvalid={!!errors?.first && !!touched?.first}
-                        pb="4"
-                      >
-                        <FormLabel htmlFor="first" mb={1}>
-                          First name
-                        </FormLabel>
-
-                        <Field name="first" default={userData.name?.first} as={Input} />
-                        <ErrorMessage name="first" component={FormErrorMessage} />
-                      </FormControl>
-                      <FormControl isRequired isInvalid={!!errors?.last && !!touched?.last} pb="4">
-                        <FormLabel htmlFor="last" mb={1}>
-                          Last name
-                        </FormLabel>
-
-                        <Field name="last" default={userData.name?.last} as={Input} />
-                        <ErrorMessage name="last" component={FormErrorMessage} />
-                      </FormControl>
-                    </HStack>
-
+                    <FormControl isRequired isInvalid={!!errors?.first} pb="4">
+                      <FormLabel htmlFor="first" mb={1}>
+                        First Name
+                      </FormLabel>
+                      <Field name="first" as={Input} />
+                      <ErrorMessage name="first" component={FormErrorMessage} />
+                    </FormControl>
+                    <FormControl isRequired isInvalid={!!errors?.last} pb="4">
+                      <FormLabel htmlFor="last" mb={1}>
+                        Last Name
+                      </FormLabel>
+                      <Field name="last" as={Input} />
+                      <ErrorMessage name="last" component={FormErrorMessage} />
+                    </FormControl>
                     {hasPrescriber && (
                       <>
-                        <FormControl
-                          isRequired={hasPrescriber}
-                          isInvalid={!!providerErrors?.npi && !!providerTouched?.npi}
-                          pb="4"
-                        >
+                        <FormControl isRequired isInvalid={!!errors?.npi} pb="4">
                           <FormLabel htmlFor="npi" mb={1}>
                             NPI
                           </FormLabel>
-
-                          <Field name="provider.npi" default={userData.npi} as={Input} />
-                          <ErrorMessage name="provider.npi" component={FormErrorMessage} />
+                          <Field name="npi" as={Input} />
+                          <ErrorMessage name="npi" component={FormErrorMessage} />
                         </FormControl>
-                        <FormControl
-                          isRequired={hasPrescriber}
-                          isInvalid={
-                            !!providerErrors?.address?.street1 && providerTouched?.address?.street1
-                          }
-                          pb="4"
-                        >
-                          <FormLabel htmlFor="provider.address.street1" mb={1}>
-                            Address 1
-                          </FormLabel>
-                          <Field
-                            name="provider.address.street1"
-                            default={userData.address?.street1}
-                            as={Input}
-                          />
-                          <ErrorMessage
-                            name="provider.address.street1"
-                            component={FormErrorMessage}
-                          />
-                        </FormControl>
-                        <FormControl
-                          isInvalid={
-                            !!providerErrors?.address?.street2 && providerTouched?.address?.street2
-                          }
-                          pb="4"
-                        >
-                          <FormLabel htmlFor="provider.address.street2" mb={1}>
-                            Address 2
-                          </FormLabel>
-                          <Field
-                            name="provider.address.street2"
-                            default={userData.address?.street2}
-                            as={Input}
-                          />
-                          <ErrorMessage
-                            name="provider.address.street2"
-                            component={FormErrorMessage}
-                          />
-                        </FormControl>
-                        <FormControl
-                          isRequired={hasPrescriber}
-                          isInvalid={
-                            !!providerErrors?.address?.city && providerTouched?.address?.city
-                          }
-                          pb="4"
-                        >
-                          <FormLabel htmlFor="provider.address.city" mb={1}>
-                            City
-                          </FormLabel>
-                          <Field
-                            name="provider.address.city"
-                            default={userData.address?.city}
-                            as={Input}
-                          />
-                          <ErrorMessage name="provider.address.city" component={FormErrorMessage} />
-                        </FormControl>
-                        <FormControl
-                          isRequired={hasPrescriber}
-                          isInvalid={
-                            (!!providerErrors?.address?.state?.value &&
-                              providerTouched?.address?.state?.value) ??
-                            false
-                          }
-                          pb="4"
-                        >
-                          <FormLabel htmlFor="provider.address.state" mb={1}>
-                            State {values.provider?.address?.state?.value}
-                          </FormLabel>
-                          <FormikStateSelect
-                            value={
-                              values.provider?.address?.state?.value
-                                ? { value: values.provider?.address?.state?.value }
-                                : undefined
-                            }
-                            setFieldTouched={setFieldTouched}
-                            setFieldValue={setFieldValue}
-                            fieldName="provider.address.state"
-                          />
-                          <ErrorMessage
-                            name="provider.address.state"
-                            component={FormErrorMessage}
-                          />
-                        </FormControl>
-                        <FormControl
-                          isRequired={hasPrescriber}
-                          isInvalid={
-                            !!providerErrors?.address?.postalCode &&
-                            providerTouched?.address?.postalCode
-                          }
-                          pb="4"
-                        >
-                          <FormLabel htmlFor="provider.address.postalCode" mb={1}>
-                            Zip Code
-                          </FormLabel>
-                          <Field
-                            name="provider.address.postalCode"
-                            default={userData.address?.postalCode}
-                            as={Input}
-                          />
-                          <ErrorMessage
-                            name="provider.address.postalCode"
-                            component={FormErrorMessage}
-                          />
-                        </FormControl>
-                        <ErrorMessage name="provider.address" component={FormErrorMessage} />
-
-                        <FormControl
-                          isRequired={hasPrescriber}
-                          isInvalid={!!errors.phone && touched.phone}
-                          pb="4"
-                        >
+                        <FormControl isRequired isInvalid={!!errors.phone} pb="4">
                           <FormLabel htmlFor="phone" mb={1}>
                             Phone
                           </FormLabel>
-                          <Field name="phone" default={userData.phone} as={Input} />
+                          <Field name="phone" as={Input} />
                           <ErrorMessage name="phone" component={FormErrorMessage} />
+                        </FormControl>
+                        <FormControl isRequired isInvalid={!!errors.fax} pb="4">
+                          <FormLabel htmlFor="fax" mb={1}>
+                            Fax
+                          </FormLabel>
+                          <Field name="fax" as={Input} />
+                          <ErrorMessage name="fax" component={FormErrorMessage} />
+                        </FormControl>
+                        <FormControl isRequired isInvalid={!!errors?.street1} pb="4">
+                          <FormLabel htmlFor="street1" mb={1}>
+                            Address 1
+                          </FormLabel>
+                          <Field name="street1" as={Input} />
+                          <ErrorMessage name="street1" component={FormErrorMessage} />
+                        </FormControl>
+                        <FormControl isInvalid={!!errors?.street2} pb="4">
+                          <FormLabel htmlFor="street2" mb={1}>
+                            Address 2
+                          </FormLabel>
+                          <Field name="street2" as={Input} />
+                          <ErrorMessage name="street2" component={FormErrorMessage} />
+                        </FormControl>
+                        <FormControl isRequired isInvalid={!!errors?.city} pb="4">
+                          <FormLabel htmlFor="city" mb={1}>
+                            City
+                          </FormLabel>
+                          <Field name="city" as={Input} />
+                          <ErrorMessage name="city" component={FormErrorMessage} />
+                        </FormControl>
+                        <FormControl isRequired isInvalid={!!errors?.state?.value} pb="4">
+                          <FormLabel htmlFor="state" mb={1}>
+                            State
+                          </FormLabel>
+                          <FormikStateSelect
+                            value={values.state?.value ? { value: values.state?.value } : undefined}
+                            setFieldTouched={setFieldTouched}
+                            setFieldValue={setFieldValue}
+                            fieldName="state"
+                          />
+                          <ErrorMessage name="state" component={FormErrorMessage} />
+                        </FormControl>
+                        <FormControl isRequired isInvalid={!!errors?.postalCode} pb="4">
+                          <FormLabel htmlFor="postalCode" mb={1}>
+                            Zip Code
+                          </FormLabel>
+                          <Field name="postalCode" as={Input} />
+                          <ErrorMessage name="postalCode" component={FormErrorMessage} />
                         </FormControl>
                       </>
                     )}
@@ -446,15 +385,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
                         <Button
                           type="submit"
                           colorScheme="blue"
-                          isDisabled={
-                            !touched ||
-                            !!errors.roles ||
-                            !!errors.email ||
-                            !!errors.first ||
-                            !!errors.last ||
-                            !!(errors.provider && hasPrescriberRole(values.roles)) ||
-                            !touched.roles
-                          }
+                          isDisabled={!isValid}
                           isLoading={loading}
                         >
                           Update
