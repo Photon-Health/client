@@ -1,8 +1,6 @@
-import { useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import {
   Box,
-  Button,
-  Container,
   FormControl,
   FormLabel,
   FormErrorMessage,
@@ -76,7 +74,6 @@ const US_STATES = [
 interface AddressFormProps {
   patientId: string;
   order: Order;
-  onSuccess: () => void;
 }
 
 interface FormErrors {
@@ -86,92 +83,115 @@ interface FormErrors {
   postalCode?: string;
 }
 
-export const AddressForm = ({ patientId, order, onSuccess }: AddressFormProps) => {
-  const [street1, setStreet1] = useState('');
-  const [street2, setStreet2] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
-  const [postalCode, setPostalCode] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [submitError, setSubmitError] = useState<string | null>(null);
+export interface AddressFormHandle {
+  submit: () => Promise<boolean>;
+  isSubmitting: boolean;
+}
 
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
+export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(
+  ({ patientId, order }, ref) => {
+    const [street1, setStreet1] = useState('');
+    const [street2, setStreet2] = useState('');
+    const [city, setCity] = useState('');
+    const [state, setState] = useState('');
+    const [postalCode, setPostalCode] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errors, setErrors] = useState<FormErrors>({});
+    const [submitError, setSubmitError] = useState<string | null>(null);
 
-    if (!street1.trim()) {
-      newErrors.street1 = 'Street address is required';
-    }
+    const validateForm = (): boolean => {
+      const newErrors: FormErrors = {};
 
-    if (!city.trim()) {
-      newErrors.city = 'City is required';
-    }
+      if (!street1.trim()) {
+        newErrors.street1 = 'Street address is required';
+      }
 
-    if (!state) {
-      newErrors.state = 'State is required';
-    }
+      if (!city.trim()) {
+        newErrors.city = 'City is required';
+      }
 
-    if (!postalCode.trim()) {
-      newErrors.postalCode = 'ZIP code is required';
-    } else if (!/^\d{5}(-\d{4})?$/.test(postalCode.trim())) {
-      newErrors.postalCode = 'Please enter a valid ZIP code';
-    }
+      if (!state) {
+        newErrors.state = 'State is required';
+      }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+      if (!postalCode.trim()) {
+        newErrors.postalCode = 'ZIP code is required';
+      } else if (!/^\d{5}(-\d{4})?$/.test(postalCode.trim())) {
+        newErrors.postalCode = 'Please enter a valid ZIP code';
+      }
 
-  const handleSubmit = async () => {
-    if (!validateForm()) {
-      return;
-    }
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    };
 
-    setIsSubmitting(true);
-    setSubmitError(null);
+    const handleSubmit = async (): Promise<boolean> => {
+      if (!validateForm()) {
+        return false;
+      }
 
-    try {
-      await updatePatientAddress(patientId, {
-        street1: street1.trim(),
-        street2: street2.trim() || undefined,
-        city: city.trim(),
-        state,
-        postalCode: postalCode.trim(),
-        country: 'US'
-      });
+      setIsSubmitting(true);
+      setSubmitError(null);
 
-      patientAnalytics.track('Patient Address Updated', order, {
-        city,
-        state,
-        postalCode
-      });
+      try {
+        await updatePatientAddress(patientId, {
+          street1: street1.trim(),
+          street2: street2.trim() || undefined,
+          city: city.trim(),
+          state,
+          postalCode: postalCode.trim(),
+          country: 'US'
+        });
 
-      onSuccess();
-    } catch (e: any) {
-      setSubmitError(e.message || 'Failed to update address. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+        patientAnalytics.track('Patient Address Updated', order, {
+          city,
+          state,
+          postalCode
+        });
 
-  return (
-    <Box bgColor="white" minH="100vh">
-      <Container py={8}>
-        <VStack spacing={6} align="stretch">
-          <VStack spacing={3} align="center" textAlign="center">
-            <Box p={3} borderRadius="full" bgColor="blue.50" color="blue.500">
-              <Icon as={FiMapPin} boxSize={6} />
+        return true;
+      } catch (e: any) {
+        setSubmitError(e.message || 'Failed to update address. Please try again.');
+        return false;
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+
+    // Expose submit method to parent
+    useImperativeHandle(ref, () => ({
+      submit: handleSubmit,
+      isSubmitting
+    }));
+
+    return (
+      <Box bgColor="white" borderRadius="lg" p={5}>
+        <VStack spacing={5} align="stretch">
+          <HStack spacing={3} align="start">
+            <Box
+              p={2}
+              borderRadius="full"
+              bgColor="yellow.100"
+              color="yellow.700"
+              flexShrink={0}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Icon as={FiMapPin} boxSize={5} />
             </Box>
-            <Heading as="h2" size="lg">
-              Add your address
-            </Heading>
-            <Text color="gray.600">
-              We need your address to help you find nearby pharmacies and for delivery options.
-            </Text>
-          </VStack>
+            <VStack spacing={0} align="start">
+              <Heading as="h3" size="md">
+                Add your address
+              </Heading>
+              <Text fontSize="sm" color="gray.600">
+                Required to find nearby pharmacies
+              </Text>
+            </VStack>
+          </HStack>
 
-          <VStack spacing={4} align="stretch" pt={4}>
+          <VStack spacing={4} align="stretch">
             <FormControl isInvalid={!!errors.street1} isRequired>
-              <FormLabel>Street address</FormLabel>
+              <FormLabel fontSize="sm">Street address</FormLabel>
               <Input
                 placeholder="123 Main St"
                 value={street1}
@@ -179,25 +199,23 @@ export const AddressForm = ({ patientId, order, onSuccess }: AddressFormProps) =
                   setStreet1(e.target.value);
                   if (errors.street1) setErrors({ ...errors, street1: undefined });
                 }}
-                size="lg"
                 data-dd-privacy="mask"
               />
               <FormErrorMessage>{errors.street1}</FormErrorMessage>
             </FormControl>
 
             <FormControl>
-              <FormLabel>Apartment, suite, etc. (optional)</FormLabel>
+              <FormLabel fontSize="sm">Apartment, suite, etc. (optional)</FormLabel>
               <Input
                 placeholder="Apt 4B"
                 value={street2}
                 onChange={(e) => setStreet2(e.target.value)}
-                size="lg"
                 data-dd-privacy="mask"
               />
             </FormControl>
 
             <FormControl isInvalid={!!errors.city} isRequired>
-              <FormLabel>City</FormLabel>
+              <FormLabel fontSize="sm">City</FormLabel>
               <Input
                 placeholder="New York"
                 value={city}
@@ -205,7 +223,6 @@ export const AddressForm = ({ patientId, order, onSuccess }: AddressFormProps) =
                   setCity(e.target.value);
                   if (errors.city) setErrors({ ...errors, city: undefined });
                 }}
-                size="lg"
                 data-dd-privacy="mask"
               />
               <FormErrorMessage>{errors.city}</FormErrorMessage>
@@ -213,7 +230,7 @@ export const AddressForm = ({ patientId, order, onSuccess }: AddressFormProps) =
 
             <HStack spacing={4} align="start">
               <FormControl isInvalid={!!errors.state} isRequired flex={1}>
-                <FormLabel>State</FormLabel>
+                <FormLabel fontSize="sm">State</FormLabel>
                 <Select
                   id="state-select"
                   name="state-select"
@@ -225,7 +242,6 @@ export const AddressForm = ({ patientId, order, onSuccess }: AddressFormProps) =
                     setState(e.target.value);
                     if (errors.state) setErrors({ ...errors, state: undefined });
                   }}
-                  size="lg"
                 >
                   {US_STATES.map((s) => (
                     <option key={s.value} value={s.value}>
@@ -237,7 +253,7 @@ export const AddressForm = ({ patientId, order, onSuccess }: AddressFormProps) =
               </FormControl>
 
               <FormControl isInvalid={!!errors.postalCode} isRequired flex={1}>
-                <FormLabel>ZIP code</FormLabel>
+                <FormLabel fontSize="sm">ZIP code</FormLabel>
                 <Input
                   placeholder="10001"
                   value={postalCode}
@@ -245,7 +261,6 @@ export const AddressForm = ({ patientId, order, onSuccess }: AddressFormProps) =
                     setPostalCode(e.target.value);
                     if (errors.postalCode) setErrors({ ...errors, postalCode: undefined });
                   }}
-                  size="lg"
                   maxLength={10}
                   data-dd-privacy="mask"
                 />
@@ -254,25 +269,15 @@ export const AddressForm = ({ patientId, order, onSuccess }: AddressFormProps) =
             </HStack>
 
             {submitError && (
-              <Text color="red.500" fontSize="sm" textAlign="center">
+              <Text color="red.500" fontSize="sm">
                 {submitError}
               </Text>
             )}
-
-            <Button
-              variant="brand"
-              size="lg"
-              w="full"
-              mt={4}
-              onClick={handleSubmit}
-              isLoading={isSubmitting}
-              loadingText="Saving..."
-            >
-              Continue
-            </Button>
           </VStack>
         </VStack>
-      </Container>
-    </Box>
-  );
-};
+      </Box>
+    );
+  }
+);
+
+AddressForm.displayName = 'AddressForm';
