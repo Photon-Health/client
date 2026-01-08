@@ -40,6 +40,7 @@ export const PatientCard = (props: {
   enableMedHistoryLinks?: boolean;
   enableMedHistoryRefillButton?: boolean;
   hidePatientCard?: boolean;
+  patientAddressInProviderUxIsOptional?: boolean;
 }) => {
   const [newMedication, setNewMedication] = createSignal<Treatment | undefined>();
   const [showEditPatientView, setShowEditPatientView] = createSignal(false);
@@ -100,9 +101,13 @@ export const PatientCard = (props: {
   });
 
   // Show the address form only if the patient doesnt have an address
+  // and the address is not marked as optional in the provider UX
   const showAddressForm = createMemo(
     () =>
-      props.store.patient?.value?.id && !props.store.patient?.value?.address && props.enableOrder
+      props.store.patient?.value?.id &&
+      !props.store.patient?.value?.address &&
+      props.enableOrder &&
+      !props.patientAddressInProviderUxIsOptional
   );
 
   return (

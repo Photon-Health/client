@@ -74,6 +74,7 @@ export type PrescribeProps = {
   enableCombineAndDuplicate: boolean;
   enableDeliveryPharmacies: boolean;
   enableCoverageCheck: boolean;
+  patientAddressInProviderUxIsOptional: boolean;
   mailOrderIds?: string;
   pharmacyId?: string;
   loading: boolean;
@@ -618,16 +619,20 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 enableMedHistoryLinks={props.enableMedHistoryLinks ?? false}
                 enableMedHistoryRefillButton={props.enableMedHistoryRefillButton ?? false}
                 hidePatientCard={props.hidePatientCard}
+                patientAddressInProviderUxIsOptional={props.patientAddressInProviderUxIsOptional}
               />
               <Show
                 when={
                   // if patientId is passed in, we need to ensure it matches the patient id in our store
                   // so we are not referencing stale data
                   hasCorrectPatientData() &&
-                  // if orders are enabled, we need a patient's address
+                  // if orders are enabled, we need a patient's address (unless address is optional)
                   (props.formStore.patient?.value?.address ||
                     // if orders are disabled, we need only a patient id
-                    (props.formStore.patient?.value?.id && !props.enableOrder))
+                    (props.formStore.patient?.value?.id && !props.enableOrder) ||
+                    // if address is optional, we only need a patient id
+                    (props.formStore.patient?.value?.id &&
+                      props.patientAddressInProviderUxIsOptional))
                 }
               >
                 <Show when={props.enableCombineAndDuplicate}>
