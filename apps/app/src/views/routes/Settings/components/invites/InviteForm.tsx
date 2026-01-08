@@ -21,8 +21,9 @@ import { InvitesQueryDocument } from 'apps/app/src/gql/graphql';
 import { ErrorMessage, Field, Formik, FormikErrors, FormikTouched } from 'formik';
 import * as yup from 'yup';
 import { usePhoton } from '@photonhealth/react';
-import { RolesSelect, rolesSchema } from '../utils/Roles';
+import { RolesSelect, hasPrescriberRole, rolesSchema } from '../utils/Roles';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
+import { phoneRegex, zipCodeRegex } from '../utils/Validation';
 
 export const inviteFormFragment = graphql(/* GraphQL */ `
   fragment InviteFormFragment on Invite {
@@ -52,9 +53,6 @@ const inviteUserMutation = graphql(/* GraphQL */ `
   }
 `);
 
-const hasPrescriberRole = (roles: { value: string; label: string }[]) =>
-  roles.some((r) => r.label === 'Prescriber');
-
 const inviteSchema = yup
   .object({
     email: yup
@@ -77,15 +75,12 @@ const inviteSchema = yup
             postalCode: yup
               .string()
               .required('Zip is required')
-              .matches(/^[0-9]{5}(?:-[0-9]{4})?$/, { message: 'Enter a valid zipcode' })
+              .matches(zipCodeRegex, { message: 'Enter a valid zipcode' })
           })
           .required('Please enter an address'),
         phone: yup
           .string()
-          .matches(
-            /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/,
-            { message: 'Please enter a valid phone number' }
-          )
+          .matches(phoneRegex, { message: 'Please enter a valid phone number' })
           .required('Please enter a valid phone number')
       })
       .notRequired()
