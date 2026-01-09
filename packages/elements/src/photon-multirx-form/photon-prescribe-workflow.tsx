@@ -372,7 +372,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       });
     }
 
-    const keys = enableOrder ? ['patient', 'address'] : ['patient'];
+    const keys =
+      enableOrder && !props.patientAddressInProviderUxIsOptional
+        ? ['patient', 'address']
+        : ['patient'];
     props.formActions.validate(keys);
     const errors = props.formActions.getErrors(keys);
     if (errors.length === 0) {

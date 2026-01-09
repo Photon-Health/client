@@ -54,7 +54,7 @@ export const PatientCard = (props: {
       validator: patientValidator
     });
 
-    if (props.enableOrder) {
+    if (props.enableOrder && !props.patientAddressInProviderUxIsOptional) {
       props.actions.registerValidator({
         key: 'address',
         validator: patientAddressValidator
