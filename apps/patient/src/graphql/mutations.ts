@@ -47,6 +47,7 @@ export const UPDATE_PATIENT = gql`
     updatePatient(patientId: $patientId, input: $input) {
       id
       address {
+        id
         street1
         street2
         city
@@ -63,6 +64,7 @@ export const UPDATE_ORDER = gql`
     updateOrder(orderId: $orderId, input: $input) {
       id
       address {
+        id
         street1
         street2
         city

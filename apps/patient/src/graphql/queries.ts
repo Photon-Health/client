@@ -34,6 +34,7 @@ export const GET_ORDER = gql`
       readyByTime
       readyByDay
       address {
+        id
         street1
         street2
         city
@@ -180,6 +181,7 @@ export const GET_ORDER = gql`
         gender
         sex
         address {
+          id
           street1
           street2
           city
