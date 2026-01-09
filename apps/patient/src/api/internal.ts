@@ -237,6 +237,25 @@ export const updatePatientAddress = async (
   }
 };
 
+export const updateOrderAddress = async (orderId: string, addressId: string) => {
+  try {
+    const response = await graphQLClient.UpdateOrder({
+      orderId,
+      input: { addressId }
+    });
+
+    if (response?.updateOrder) {
+      return response.updateOrder;
+    } else {
+      throw new Error('Unable to update order address');
+    }
+  } catch (e: any) {
+    const errorMessage =
+      e?.response?.errors?.[0]?.message ?? 'Unknown error occurred on updateOrderAddress.';
+    throw new Error(errorMessage);
+  }
+};
+
 export const triggerDemoNotification = async (
   phoneNumber: string,
   eventName:

@@ -13,7 +13,7 @@ import {
   Icon
 } from '@chakra-ui/react';
 import { FiMapPin } from 'react-icons/fi';
-import { updatePatientAddress } from '../api';
+import { updatePatientAddress, updateOrderAddress } from '../api';
 import { patientAnalytics } from '../configs/analytics';
 import { Order } from '../utils/models';
 
@@ -73,6 +73,7 @@ const US_STATES = [
 
 interface AddressFormProps {
   patientId: string;
+  orderId: string;
   order: Order;
 }
 
@@ -89,7 +90,7 @@ export interface AddressFormHandle {
 }
 
 export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(
-  ({ patientId, order }, ref) => {
+  ({ patientId, orderId, order }, ref) => {
     const [street1, setStreet1] = useState('');
     const [street2, setStreet2] = useState('');
     const [city, setCity] = useState('');
@@ -133,7 +134,8 @@ export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(
       setSubmitError(null);
 
       try {
-        await updatePatientAddress(patientId, {
+        // Step 1: Update patient address
+        const updatedPatient = await updatePatientAddress(patientId, {
           street1: street1.trim(),
           street2: street2.trim() || undefined,
           city: city.trim(),
@@ -146,6 +148,18 @@ export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(
           city,
           state,
           postalCode
+        });
+
+        // Step 2: Update order with the new address ID
+        const addressId = updatedPatient?.address?.id;
+        if (!addressId) {
+          throw new Error('Address was saved but no ID was returned');
+        }
+
+        await updateOrderAddress(orderId, addressId);
+
+        patientAnalytics.track('Order Address Updated', order, {
+          addressId
         });
 
         return true;

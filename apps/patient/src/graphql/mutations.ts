@@ -57,3 +57,19 @@ export const UPDATE_PATIENT = gql`
     }
   }
 `;
+
+export const UPDATE_ORDER = gql`
+  mutation UpdateOrder($orderId: ID!, $input: UpdateOrderInput!) {
+    updateOrder(orderId: $orderId, input: $input) {
+      id
+      address {
+        street1
+        street2
+        city
+        state
+        postalCode
+        country
+      }
+    }
+  }
+`;
