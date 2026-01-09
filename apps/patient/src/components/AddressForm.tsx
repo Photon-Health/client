@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState, useCallback } from 'react';
 import {
   Box,
   FormControl,
@@ -13,6 +13,8 @@ import {
   Icon
 } from '@chakra-ui/react';
 import { FiMapPin } from 'react-icons/fi';
+import { Formik, Form, Field, FieldProps, FormikProps } from 'formik';
+import * as Yup from 'yup';
 import { updatePatientAddress, updateOrderAddress } from '../api';
 import { patientAnalytics } from '../configs/analytics';
 import { Order } from '../utils/models';
@@ -71,17 +73,37 @@ const US_STATES = [
   { value: 'WY', label: 'Wyoming' }
 ];
 
+const addressValidationSchema = Yup.object().shape({
+  street1: Yup.string().trim().required('Street address is required'),
+  street2: Yup.string().trim(),
+  city: Yup.string().trim().required('City is required'),
+  state: Yup.string().required('State is required'),
+  postalCode: Yup.string()
+    .trim()
+    .required('ZIP code is required')
+    .matches(/^\d{5}(-\d{4})?$/, 'Please enter a valid ZIP code')
+});
+
+interface AddressFormValues {
+  street1: string;
+  street2: string;
+  city: string;
+  state: string;
+  postalCode: string;
+}
+
+const initialValues: AddressFormValues = {
+  street1: '',
+  street2: '',
+  city: '',
+  state: '',
+  postalCode: ''
+};
+
 interface AddressFormProps {
   patientId: string;
   orderId: string;
   order: Order;
-}
-
-interface FormErrors {
-  street1?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
 }
 
 export interface AddressFormHandle {
@@ -91,91 +113,88 @@ export interface AddressFormHandle {
 
 export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(
   ({ patientId, orderId, order }, ref) => {
-    const [street1, setStreet1] = useState('');
-    const [street2, setStreet2] = useState('');
-    const [city, setCity] = useState('');
-    const [state, setState] = useState('');
-    const [postalCode, setPostalCode] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [errors, setErrors] = useState<FormErrors>({});
     const [submitError, setSubmitError] = useState<string | null>(null);
+    const formikRef = useRef<FormikProps<AddressFormValues>>(null);
+    const submitResultRef = useRef<boolean>(false);
 
-    const validateForm = (): boolean => {
-      const newErrors: FormErrors = {};
+    const submitAddress = useCallback(
+      async (values: AddressFormValues): Promise<boolean> => {
+        setIsSubmitting(true);
+        setSubmitError(null);
+        submitResultRef.current = false;
 
-      if (!street1.trim()) {
-        newErrors.street1 = 'Street address is required';
-      }
+        try {
+          // Step 1: Update patient address
+          const updatedPatient = await updatePatientAddress(patientId, {
+            street1: values.street1.trim(),
+            street2: values.street2.trim() || undefined,
+            city: values.city.trim(),
+            state: values.state,
+            postalCode: values.postalCode.trim(),
+            country: 'US'
+          });
 
-      if (!city.trim()) {
-        newErrors.city = 'City is required';
-      }
+          patientAnalytics.track('Patient Address Updated', order, {
+            city: values.city,
+            state: values.state,
+            postalCode: values.postalCode
+          });
 
-      if (!state) {
-        newErrors.state = 'State is required';
-      }
+          // Step 2: Update order with the new address ID
+          const addressId = updatedPatient?.address?.id;
+          if (!addressId) {
+            throw new Error('Address was saved but no ID was returned');
+          }
 
-      if (!postalCode.trim()) {
-        newErrors.postalCode = 'ZIP code is required';
-      } else if (!/^\d{5}(-\d{4})?$/.test(postalCode.trim())) {
-        newErrors.postalCode = 'Please enter a valid ZIP code';
-      }
+          await updateOrderAddress(orderId, addressId);
 
-      setErrors(newErrors);
-      return Object.keys(newErrors).length === 0;
-    };
+          patientAnalytics.track('Order Address Updated', order, {
+            addressId
+          });
 
-    const handleSubmit = async (): Promise<boolean> => {
-      if (!validateForm()) {
-        return false;
-      }
-
-      setIsSubmitting(true);
-      setSubmitError(null);
-
-      try {
-        // Step 1: Update patient address
-        const updatedPatient = await updatePatientAddress(patientId, {
-          street1: street1.trim(),
-          street2: street2.trim() || undefined,
-          city: city.trim(),
-          state,
-          postalCode: postalCode.trim(),
-          country: 'US'
-        });
-
-        patientAnalytics.track('Patient Address Updated', order, {
-          city,
-          state,
-          postalCode
-        });
-
-        // Step 2: Update order with the new address ID
-        const addressId = updatedPatient?.address?.id;
-        if (!addressId) {
-          throw new Error('Address was saved but no ID was returned');
+          submitResultRef.current = true;
+          return true;
+        } catch (e: any) {
+          setSubmitError(e.message || 'Failed to update address. Please try again.');
+          submitResultRef.current = false;
+          return false;
+        } finally {
+          setIsSubmitting(false);
         }
+      },
+      [patientId, orderId, order]
+    );
 
-        await updateOrderAddress(orderId, addressId);
+    // Expose submit method to parent via ref
+    useImperativeHandle(
+      ref,
+      () => ({
+        submit: async () => {
+          if (!formikRef.current) return false;
 
-        patientAnalytics.track('Order Address Updated', order, {
-          addressId
-        });
+          // Validate and touch all fields to show errors
+          const errors = await formikRef.current.validateForm();
+          formikRef.current.setTouched({
+            street1: true,
+            street2: true,
+            city: true,
+            state: true,
+            postalCode: true
+          });
 
-        return true;
-      } catch (e: any) {
-        setSubmitError(e.message || 'Failed to update address. Please try again.');
-        return false;
-      } finally {
-        setIsSubmitting(false);
-      }
-    };
+          if (Object.keys(errors).length > 0) {
+            return false;
+          }
 
-    // Expose submit method to parent
-    useImperativeHandle(ref, () => ({
-      submit: handleSubmit,
-      isSubmitting
-    }));
+          // Submit the form
+          const result = await submitAddress(formikRef.current.values);
+          return result;
+        },
+        isSubmitting
+      }),
+      [isSubmitting, submitAddress]
+    );
 
     return (
       <Box bgColor="white" borderRadius="lg" p={5}>
@@ -203,105 +222,100 @@ export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(
             </VStack>
           </HStack>
 
-          <VStack spacing={4} align="stretch">
-            <FormControl isInvalid={!!errors.street1} isRequired>
-              <FormLabel htmlFor="street1" fontSize="sm">
-                Street address
-              </FormLabel>
-              <Input
-                id="street1"
-                placeholder="123 Main St"
-                value={street1}
-                onChange={(e) => {
-                  setStreet1(e.target.value);
-                  if (errors.street1) setErrors({ ...errors, street1: undefined });
-                }}
-                data-dd-privacy="mask"
-              />
-              <FormErrorMessage>{errors.street1}</FormErrorMessage>
-            </FormControl>
+          <Formik
+            innerRef={formikRef}
+            initialValues={initialValues}
+            validationSchema={addressValidationSchema}
+            onSubmit={submitAddress}
+            validateOnBlur={true}
+            validateOnChange={false}
+          >
+            {() => (
+              <Form>
+                <VStack spacing={4} align="stretch">
+                  <Field name="street1">
+                    {({ field, meta }: FieldProps) => (
+                      <FormControl isInvalid={!!(meta.error && meta.touched)} isRequired>
+                        <FormLabel htmlFor="street1" fontSize="sm">
+                          Street address
+                        </FormLabel>
+                        <Input {...field} id="street1" data-dd-privacy="mask" />
+                        <FormErrorMessage>{meta.error}</FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
 
-            <FormControl>
-              <FormLabel htmlFor="street2" fontSize="sm">
-                Apartment, suite, etc. (optional)
-              </FormLabel>
-              <Input
-                id="street2"
-                placeholder="Apt 4B"
-                value={street2}
-                onChange={(e) => setStreet2(e.target.value)}
-                data-dd-privacy="mask"
-              />
-            </FormControl>
+                  <Field name="street2">
+                    {({ field }: FieldProps) => (
+                      <FormControl>
+                        <FormLabel htmlFor="street2" fontSize="sm">
+                          Apartment, suite, etc. (optional)
+                        </FormLabel>
+                        <Input {...field} id="street2" data-dd-privacy="mask" />
+                      </FormControl>
+                    )}
+                  </Field>
 
-            <FormControl isInvalid={!!errors.city} isRequired>
-              <FormLabel htmlFor="city" fontSize="sm">
-                City
-              </FormLabel>
-              <Input
-                id="city"
-                placeholder="New York"
-                value={city}
-                onChange={(e) => {
-                  setCity(e.target.value);
-                  if (errors.city) setErrors({ ...errors, city: undefined });
-                }}
-                data-dd-privacy="mask"
-              />
-              <FormErrorMessage>{errors.city}</FormErrorMessage>
-            </FormControl>
+                  <Field name="city">
+                    {({ field, meta }: FieldProps) => (
+                      <FormControl isInvalid={!!(meta.error && meta.touched)} isRequired>
+                        <FormLabel htmlFor="city" fontSize="sm">
+                          City
+                        </FormLabel>
+                        <Input {...field} id="city" data-dd-privacy="mask" />
+                        <FormErrorMessage>{meta.error}</FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
 
-            <HStack spacing={4} align="start">
-              <FormControl isInvalid={!!errors.state} isRequired flex={1}>
-                <FormLabel htmlFor="state" fontSize="sm">
-                  State
-                </FormLabel>
-                <Select
-                  id="state"
-                  name="state"
-                  title="State"
-                  aria-label="State"
-                  placeholder="Select state"
-                  value={state}
-                  onChange={(e) => {
-                    setState(e.target.value);
-                    if (errors.state) setErrors({ ...errors, state: undefined });
-                  }}
-                >
-                  {US_STATES.map((s) => (
-                    <option key={s.value} value={s.value}>
-                      {s.label}
-                    </option>
-                  ))}
-                </Select>
-                <FormErrorMessage>{errors.state}</FormErrorMessage>
-              </FormControl>
+                  <HStack spacing={4} align="start">
+                    <Field name="state">
+                      {({ field, meta }: FieldProps) => (
+                        <FormControl isInvalid={!!(meta.error && meta.touched)} isRequired flex={1}>
+                          <FormLabel htmlFor="state" fontSize="sm">
+                            State
+                          </FormLabel>
+                          <Select
+                            {...field}
+                            id="state"
+                            name="state"
+                            title="State"
+                            aria-label="State"
+                            placeholder="Select state"
+                          >
+                            {US_STATES.map((s) => (
+                              <option key={s.value} value={s.value}>
+                                {s.label}
+                              </option>
+                            ))}
+                          </Select>
+                          <FormErrorMessage>{meta.error}</FormErrorMessage>
+                        </FormControl>
+                      )}
+                    </Field>
 
-              <FormControl isInvalid={!!errors.postalCode} isRequired flex={1}>
-                <FormLabel htmlFor="postalCode" fontSize="sm">
-                  ZIP code
-                </FormLabel>
-                <Input
-                  id="postalCode"
-                  placeholder="10001"
-                  value={postalCode}
-                  onChange={(e) => {
-                    setPostalCode(e.target.value);
-                    if (errors.postalCode) setErrors({ ...errors, postalCode: undefined });
-                  }}
-                  maxLength={10}
-                  data-dd-privacy="mask"
-                />
-                <FormErrorMessage>{errors.postalCode}</FormErrorMessage>
-              </FormControl>
-            </HStack>
+                    <Field name="postalCode">
+                      {({ field, meta }: FieldProps) => (
+                        <FormControl isInvalid={!!(meta.error && meta.touched)} isRequired flex={1}>
+                          <FormLabel htmlFor="postalCode" fontSize="sm">
+                            ZIP code
+                          </FormLabel>
+                          <Input {...field} id="postalCode" maxLength={10} data-dd-privacy="mask" />
+                          <FormErrorMessage>{meta.error}</FormErrorMessage>
+                        </FormControl>
+                      )}
+                    </Field>
+                  </HStack>
 
-            {submitError && (
-              <Text color="red.500" fontSize="sm">
-                {submitError}
-              </Text>
+                  {submitError && (
+                    <Text color="red.500" fontSize="sm">
+                      {submitError}
+                    </Text>
+                  )}
+                </VStack>
+              </Form>
             )}
-          </VStack>
+          </Formik>
         </VStack>
       </Box>
     );
