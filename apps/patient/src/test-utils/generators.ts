@@ -33,6 +33,27 @@ export const generatePatient = (overrides: Partial<Order['patient']> = {}): Orde
   name: { full: 'John Doe' },
   dateOfBirth: new Date(),
   sex: 'MALE',
+  address: {
+    id: 'addr_defaultTestId',
+    street1: '123 Test St',
+    city: 'New York',
+    state: 'NY',
+    postalCode: '10001',
+    country: 'US'
+  },
+  ...overrides
+});
+
+export const generateAddress = (
+  overrides: Partial<NonNullable<Order['patient']['address']>> = {}
+): NonNullable<Order['patient']['address']> => ({
+  id: 'addr_defaultTestId',
+  street1: '123 Test St',
+  street2: undefined,
+  city: 'New York',
+  state: 'NY',
+  postalCode: '10001',
+  country: 'US',
   ...overrides
 });
 

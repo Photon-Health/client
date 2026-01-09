@@ -205,8 +205,11 @@ export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(
 
           <VStack spacing={4} align="stretch">
             <FormControl isInvalid={!!errors.street1} isRequired>
-              <FormLabel fontSize="sm">Street address</FormLabel>
+              <FormLabel htmlFor="street1" fontSize="sm">
+                Street address
+              </FormLabel>
               <Input
+                id="street1"
                 placeholder="123 Main St"
                 value={street1}
                 onChange={(e) => {
@@ -219,8 +222,11 @@ export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(
             </FormControl>
 
             <FormControl>
-              <FormLabel fontSize="sm">Apartment, suite, etc. (optional)</FormLabel>
+              <FormLabel htmlFor="street2" fontSize="sm">
+                Apartment, suite, etc. (optional)
+              </FormLabel>
               <Input
+                id="street2"
                 placeholder="Apt 4B"
                 value={street2}
                 onChange={(e) => setStreet2(e.target.value)}
@@ -229,8 +235,11 @@ export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(
             </FormControl>
 
             <FormControl isInvalid={!!errors.city} isRequired>
-              <FormLabel fontSize="sm">City</FormLabel>
+              <FormLabel htmlFor="city" fontSize="sm">
+                City
+              </FormLabel>
               <Input
+                id="city"
                 placeholder="New York"
                 value={city}
                 onChange={(e) => {
@@ -244,10 +253,12 @@ export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(
 
             <HStack spacing={4} align="start">
               <FormControl isInvalid={!!errors.state} isRequired flex={1}>
-                <FormLabel fontSize="sm">State</FormLabel>
+                <FormLabel htmlFor="state" fontSize="sm">
+                  State
+                </FormLabel>
                 <Select
-                  id="state-select"
-                  name="state-select"
+                  id="state"
+                  name="state"
                   title="State"
                   aria-label="State"
                   placeholder="Select state"
@@ -267,8 +278,11 @@ export const AddressForm = forwardRef<AddressFormHandle, AddressFormProps>(
               </FormControl>
 
               <FormControl isInvalid={!!errors.postalCode} isRequired flex={1}>
-                <FormLabel fontSize="sm">ZIP code</FormLabel>
+                <FormLabel htmlFor="postalCode" fontSize="sm">
+                  ZIP code
+                </FormLabel>
                 <Input
+                  id="postalCode"
                   placeholder="10001"
                   value={postalCode}
                   onChange={(e) => {
