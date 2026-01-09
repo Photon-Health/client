@@ -118,7 +118,16 @@ const roleSchema = yup
     street1: yup.string().when('roles', requiredForPrescribers('Address is required')),
     street2: yup.string(),
     city: yup.string().when('roles', requiredForPrescribers('City is required')),
-    state: yupStateSchema,
+    state: yup.object({
+      value: yupStateSchema.test({
+        message: 'State is required',
+        test: (value, context: any) => {
+          // Wish there was a more intuitive way to access roles value
+          const isPrescriber = hasPrescriberRole(context.from[1]?.value.roles);
+          return isPrescriber ? !!value : true;
+        }
+      })
+    }),
     postalCode: yup
       .string()
       .matches(zipCodeRegex, { message: 'Enter a valid zip code' })
@@ -381,11 +390,10 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
                         <Button variant="outline" onClick={onClose} isDisabled={loading}>
                           Cancel
                         </Button>
-
                         <Button
                           type="submit"
                           colorScheme="blue"
-                          isDisabled={!isValid}
+                          isDisabled={loading || !isValid}
                           isLoading={loading}
                         >
                           Update
