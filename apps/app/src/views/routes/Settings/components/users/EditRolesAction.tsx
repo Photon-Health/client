@@ -108,7 +108,7 @@ const roleSchema = yup
         message: 'Enter a valid fax number'
       })
       .test({
-        message: 'Prescriber phone cannot be removed',
+        message: 'Prescriber fax cannot be removed',
         test: (value, context) => {
           const isPrescriber = hasPrescriberRole(context.parent.roles);
           const startedWithValue = context.options.context?.initialValues.fax;
@@ -176,7 +176,7 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
     }
   );
 
-  const handleSubmit = async (formVariables: RoleYupType) => {
+  const handleSubmit = (formVariables: RoleYupType) => {
     const maybeAddress: Partial<AddressInput> = {
       country: 'US',
       street1: formVariables.street1,
@@ -191,33 +191,31 @@ export const EditRolesAction: React.FC<EditRolesActionProps> = ({ user, onClose 
         ? (maybeAddress as AddressInput)
         : undefined;
 
-    await Promise.all([
-      updateProviderProfileAndSetUserRolesMutation({
-        variables: {
-          providerId: userData.id ?? '',
-          updateProviderProfileInput: {
-            name: {
-              first: formVariables.first,
-              last: formVariables.last
-            },
-            ...(hasPrescriberRole(formVariables.roles)
-              ? {
-                  address,
-                  npi: formVariables.npi,
-                  phone: formVariables.phone,
-                  fax: formVariables.fax
-                }
-              : // Otherwise, these fields aren't present in the form
-                // so user doesn't intend to update them
-                {})
+    return updateProviderProfileAndSetUserRolesMutation({
+      variables: {
+        providerId: userData.id ?? '',
+        updateProviderProfileInput: {
+          name: {
+            first: formVariables.first,
+            last: formVariables.last
           },
-          roles: formVariables.roles.map((role: any) => role.value)
-        }
-      })
-    ]);
+          ...(hasPrescriberRole(formVariables.roles)
+            ? {
+                address,
+                npi: formVariables.npi,
+                phone: formVariables.phone,
+                fax: formVariables.fax
+              }
+            : // Otherwise, these fields aren't present in the form
+              // so user doesn't intend to update them
+              {})
+        },
+        roles: formVariables.roles.map((role: any) => role.value)
+      }
+    });
   };
 
-  const initialValues: yup.InferType<typeof roleSchema> = {
+  const initialValues: RoleYupType = {
     roles: mapAndSortRoles(userData.roles ?? []),
     first: userData.name?.first ?? '',
     last: userData.name?.last ?? '',
