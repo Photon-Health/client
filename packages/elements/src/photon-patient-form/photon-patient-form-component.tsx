@@ -37,7 +37,7 @@ const getPatientAddress = (pStore: any, store: any) => {
   return '';
 };
 
-const PatientForm = (props: { patientId: string }) => {
+const PatientForm = (props: { patientId: string; addressIsOptional: boolean }) => {
   let ref: any;
   const client = usePhoton();
   const [showOptionalFields, setShowOptionalFields] = createSignal(false);
@@ -82,21 +82,26 @@ const PatientForm = (props: { patientId: string }) => {
     validator: message(union([email(), empty()]), 'Please enter a valid email.')
   });
 
+  // Address validators - these will be used conditionally based on whether
+  // address is optional and whether any address field has been filled
   actions.registerValidator({
     key: 'address_street1',
-    validator: message(size(string(), 1, Infinity), 'Please enter a valid Street 1.')
+    validator: message(
+      union([size(string(), 1, Infinity), empty()]),
+      'Please enter a valid Street 1.'
+    )
   });
   actions.registerValidator({
     key: 'address_city',
-    validator: message(size(string(), 1, Infinity), 'Please enter a valid City.')
+    validator: message(union([size(string(), 1, Infinity), empty()]), 'Please enter a valid City.')
   });
   actions.registerValidator({
     key: 'address_state',
-    validator: message(size(string(), 2, 2), 'Please enter a valid State.')
+    validator: message(union([size(string(), 2, 2), empty()]), 'Please enter a valid State.')
   });
   actions.registerValidator({
     key: 'address_zip',
-    validator: message(zipString(), 'Please enter a valid zip code.')
+    validator: message(union([zipString(), empty()]), 'Please enter a valid zip code.')
   });
 
   onMount(() => {
@@ -115,6 +120,7 @@ const PatientForm = (props: { patientId: string }) => {
         form: form,
         actions: actions,
         selected: pStore,
+        addressIsOptional: props.addressIsOptional,
         reset: () => {
           actions.reset();
           pActions.reset();
@@ -176,6 +182,17 @@ const PatientForm = (props: { patientId: string }) => {
         value: pStore.selectedPatient.data.preferredPharmacies?.[0]?.id
       });
     }
+  });
+
+  // Check if any address field has a value
+  const hasAnyAddressField = createMemo(() => {
+    return !!(
+      store['address_street1']?.value ||
+      store['address_street2']?.value ||
+      store['address_city']?.value ||
+      store['address_state']?.value ||
+      store['address_zip']?.value
+    );
   });
 
   createEffect(() => {
@@ -303,13 +320,18 @@ const PatientForm = (props: { patientId: string }) => {
                     selected={pStore.selectedPatient.data?.sex}
                   />
                 </div>
-                <p class="font-sans text-lg mt-8">Address</p>
+                <p class="font-sans text-lg mt-8">
+                  Address
+                  <Show when={props.addressIsOptional && !hasAnyAddressField()}>
+                    <span class="text-gray-500 text-sm font-normal"> (optional)</span>
+                  </Show>
+                </p>
                 <photon-text-input
                   debounce-time="0"
                   invalid={store['address_street1']?.error}
                   help-text={store['address_street1']?.error}
                   label="Street 1"
-                  required="true"
+                  required={!props.addressIsOptional || hasAnyAddressField()}
                   on:photon-input-changed={async (e: any) => {
                     actions.updateFormValue({
                       key: 'address_street1',
@@ -340,7 +362,7 @@ const PatientForm = (props: { patientId: string }) => {
                   invalid={store['address_city']?.error}
                   help-text={store['address_city']?.error}
                   label="City"
-                  required="true"
+                  required={!props.addressIsOptional || hasAnyAddressField()}
                   on:photon-input-changed={async (e: any) => {
                     actions.updateFormValue({
                       key: 'address_city',
@@ -353,7 +375,7 @@ const PatientForm = (props: { patientId: string }) => {
                   <photon-state-input
                     class="flex-grow min-w-[40%]"
                     label="State"
-                    required="true"
+                    required={!props.addressIsOptional || hasAnyAddressField()}
                     help-text={store['address_state']?.error}
                     invalid={store['address_state']?.error !== undefined}
                     on:photon-state-selected={(e: any) => {
@@ -370,7 +392,7 @@ const PatientForm = (props: { patientId: string }) => {
                     invalid={store['address_zip']?.error}
                     help-text={store['address_zip']?.error}
                     label="Zip code"
-                    required="true"
+                    required={!props.addressIsOptional || hasAnyAddressField()}
                     on:photon-input-changed={async (e: any) => {
                       actions.updateFormValue({
                         key: 'address_zip',
@@ -453,4 +475,4 @@ const PatientForm = (props: { patientId: string }) => {
   );
 };
 
-customElement('photon-patient-form', { patientId: '' }, PatientForm);
+customElement('photon-patient-form', { patientId: '', addressIsOptional: false }, PatientForm);

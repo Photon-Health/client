@@ -157,6 +157,7 @@ export const PatientCard = (props: {
               setShowEditPatientView(false);
             }}
             patient-id={patientId()}
+            address-is-optional={props.patientAddressInProviderUxIsOptional}
           />
         </div>
       </Show>
