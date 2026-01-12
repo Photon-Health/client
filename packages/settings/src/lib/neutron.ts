@@ -96,7 +96,7 @@ const orgMailOrders: Record<string, Partial<MailOrderPharmacyConfigs>> = {
     ],
     patient: [AMAZON_PHARMACY_ID, COST_PLUS_PHARMACY_ID, WALMART_MAIL_ORDER_PHARMACY_ID]
   },
-  // NewCo (demo's)
+  // NewCo (i.e. Photon send-to-patient demo)
   org_YiUudCToTSrjOuow: {
     provider: [CAREPOINT_PHARMACY_ID],
     patient: [AMAZON_PHARMACY_ID]

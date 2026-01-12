@@ -49,7 +49,7 @@ export const demoOrder: Order = {
   },
   organization: {
     id: 'org_YiUudCToTSrjOuow',
-    name: 'NewCo'
+    name: 'Photon'
   },
   patient: {
     id: 'pat_01H7KBFG7BQRAYQF735EWMK4CX',

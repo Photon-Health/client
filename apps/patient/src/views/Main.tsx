@@ -274,9 +274,7 @@ export const Main = () => {
   // Set logo
   useEffect(() => {
     if (orgId) {
-      if (isDemo) {
-        fetchLogo('newco_logo.svg');
-      } else if (settings?.brandLogo) {
+      if (settings?.brandLogo) {
         fetchLogo(settings.brandLogo);
       } else {
         setLoadingLogo(false);
