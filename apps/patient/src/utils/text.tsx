@@ -25,8 +25,7 @@ export const text = {
   errorMarkPickedUp: 'Unable to mark order as picked up',
   errorMarkDelivered: 'Unable to mark order as delivered',
   expires: 'Expires',
-  fakeRx: 'This is not a real prescription.',
-  fakeRxs: 'These are not real prescriptions.',
+  nonProdNavTitle: 'Patient experience demo',
   findLoc: 'Find a location',
   genericPriceDisclaimer: 'This price is for generic medication only',
   getDelivered: 'Get your medication delivered to your door',
@@ -226,7 +225,7 @@ export const text = {
   thankYou: 'Thank you!',
   track: 'Track your order',
   tracking: 'Tracking #:',
-  tryPhoton: 'Try Photon',
+  learnMore: 'Learn More',
   useLoc: 'Use my current location',
   usingWithInsurance: (
     <>
