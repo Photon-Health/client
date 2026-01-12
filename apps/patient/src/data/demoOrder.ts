@@ -57,7 +57,14 @@ export const demoOrder: Order = {
       full: 'Jessie Demo'
     },
     dateOfBirth: '1990-01-01',
-    sex: 'FEMALE'
+    sex: 'FEMALE',
+    address: {
+      street1: '201 N 8th St',
+      city: 'Brooklyn',
+      state: 'NY',
+      postalCode: '11211',
+      country: 'US'
+    }
   },
   fulfillment: undefined,
   exceptions: [],
