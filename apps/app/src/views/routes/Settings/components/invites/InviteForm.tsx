@@ -25,26 +25,6 @@ import { RolesSelect, hasPrescriberRole, rolesSchema } from '../utils/Roles';
 import { FormikStateSelect, yupStateSchema } from '../utils/States';
 import { phoneRegex, zipCodeRegex } from '../utils/Validation';
 
-export const inviteFormFragment = graphql(/* GraphQL */ `
-  fragment InviteFormFragment on Invite {
-    id
-    invitee
-    inviter
-    expires_at
-  }
-`);
-
-export const userInviteFormQuery = graphql(/* GraphQL */ `
-  query UserInviteFormQuery {
-    me {
-      id
-      name {
-        full
-      }
-    }
-  }
-`);
-
 const inviteUserMutation = graphql(/* GraphQL */ `
   mutation InviteUser($email: String!, $roles: [String!]!, $provider: ProviderInput) {
     inviteUser(email: $email, roles: $roles, provider: $provider) {
