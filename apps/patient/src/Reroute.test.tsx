@@ -59,8 +59,7 @@ vi.mock('./components', async () => {
     LocationModal: () => <div data-testid="location-modal">Location Modal</div>,
     PoweredBy: () => <div data-testid="powered-by">Powered By</div>,
     Nav: () => <div>Nav</div>,
-    PrescriptionsList: () => <div>PrescriptionsList</div>,
-    DemoCtaModal: () => <div data-testid="demo-cta-modal">Demo Cta Modal</div>
+    PrescriptionsList: () => <div>PrescriptionsList</div>
   };
 });
 
