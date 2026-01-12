@@ -26,9 +26,7 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
   const isDemo = searchParams.get('demo');
   const isProd = process.env.REACT_APP_ENV_NAME === 'photon';
 
-  const { order, flattenedFills, logo, setFaqModalIsOpen } = useOrderContext();
-
-  const isMultiRx = flattenedFills.length > 1;
+  const { order, logo, setFaqModalIsOpen } = useOrderContext();
 
   return (
     // If you're going to modify z-index here, just double-check that the readyBy buttons
@@ -44,16 +42,16 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
       {isDemo || !isProd ? (
         <Alert status="info" variant="subtle" w="full" py={2}>
           <HStack spacing={1} mx="auto">
-            <Text fontSize="sm">{isMultiRx ? t.fakeRxs : t.fakeRx}</Text>
+            <Text fontSize="sm">{t.nonProdNavTitle}</Text>
             <Link
               fontSize="sm"
               isExternal
-              href="https://www.photon.health/sign-up"
+              href="https://www.photon.health/"
               color="link"
               fontWeight="medium"
               textDecoration="underline"
             >
-              {t.tryPhoton}
+              {t.learnMore}
             </Link>
           </HStack>
         </Alert>
