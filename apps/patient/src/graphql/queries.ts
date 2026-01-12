@@ -34,6 +34,7 @@ export const GET_ORDER = gql`
       readyByTime
       readyByDay
       address {
+        id
         street1
         street2
         city
@@ -179,6 +180,15 @@ export const GET_ORDER = gql`
         dateOfBirth
         gender
         sex
+        address {
+          id
+          street1
+          street2
+          city
+          state
+          postalCode
+          country
+        }
       }
       fulfillments {
         id
