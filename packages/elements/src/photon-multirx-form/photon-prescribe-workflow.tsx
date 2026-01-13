@@ -206,6 +206,12 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     checkHasPermission(['write:prescription'], client?.authentication.state.permissions || [])
   );
 
+  const hasValidAddress = createMemo(() => {
+    const patientAddress =
+      props.formStore?.address?.value ?? props.formStore?.patient?.value?.address;
+    return patientAddress && patientAddress.street1;
+  });
+
   const formattedAddress = createMemo(() => {
     // remove unnecessary fields, and add country and street2 if missing
     const patientAddress =
@@ -458,7 +464,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           patientId: props.formStore.patient?.value.id,
           pharmacyId,
           fulfillmentType: props.formStore.fulfillmentType?.value || '',
-          address: formattedAddress(),
+          ...(hasValidAddress() ? { address: formattedAddress() } : {}),
           fills: prescriptionIds().map((id) => ({
             prescriptionId: id
           }))
