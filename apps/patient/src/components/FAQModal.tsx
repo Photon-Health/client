@@ -9,10 +9,12 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  useToast,
   VStack
 } from '@chakra-ui/react';
 import { Card } from './Card';
 import { FAQContents } from './FAQ';
+import { useOrderContext } from '../views/Main';
 
 export const FAQModal = ({
   isOpen,
@@ -23,11 +25,25 @@ export const FAQModal = ({
   onClose: () => void;
   allowMessageSupport?: boolean;
 }) => {
+  const { isDemo } = useOrderContext();
+  const toast = useToast();
+
   const handleClose = () => {
     onClose();
   };
 
-  const handleMessageSupport = () => {};
+  const handleMessageSupport = () => {
+    if (isDemo) {
+      toast({
+        title: 'Feature unavailable',
+        description: 'Support is disabled for the patient demo',
+        status: 'warning',
+        position: 'top',
+        duration: 4000,
+        isClosable: true
+      });
+    }
+  };
 
   return (
     <Modal onClose={handleClose} isOpen={isOpen} size="full">
@@ -53,16 +69,27 @@ export const FAQModal = ({
                         If you have other pharmacy related questions, we are available 24/7 for
                         support. We typically respond within 30 minutes.
                       </Box>
-                      <Button
-                        as="a"
-                        variant="outline"
-                        color="blue.500"
-                        href={`sms:${process.env.REACT_APP_TWILIO_SMS_NUMBER}`}
-                        w="full"
-                        onClick={handleMessageSupport}
-                      >
-                        Message support
-                      </Button>
+                      {isDemo ? (
+                        <Button
+                          variant="outline"
+                          color="blue.500"
+                          w="full"
+                          onClick={handleMessageSupport}
+                        >
+                          Message support
+                        </Button>
+                      ) : (
+                        <Button
+                          as="a"
+                          variant="outline"
+                          color="blue.500"
+                          href={`sms:${process.env.REACT_APP_TWILIO_SMS_NUMBER}`}
+                          w="full"
+                          onClick={handleMessageSupport}
+                        >
+                          Message support
+                        </Button>
+                      )}
                     </VStack>
                   </Card>
                 </VStack>
