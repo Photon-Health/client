@@ -51,6 +51,34 @@
       },
       "dependsOn": ["^build"]
     },
+    "codegen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "npx graphql-codegen"
+      }
+    },
+    "codegen:watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "npx graphql-codegen --watch"
+      }
+    },
+    "codegen:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "GQL_SCHEMA_URL='http://clinical-api.tau.health:8080' npx graphql-codegen"
+      }
+    },
+    "codegen:tau:watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "GQL_SCHEMA_URL='http://clinical-api.tau.health:8080' npx graphql-codegen --watch"
+      }
+    },
     "build:boson": {
       "executor": "nx:run-commands",
       "options": {
