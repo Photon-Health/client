@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "app:local": "concurrently \"npx nx run app:codegen:watch\" \"npx nx run app:dev\"",
-    "app:tau": "concurrently \"npx nx run app:codegen:tau:watch\" \"npx nx run app:dev:tau\"",
+    "app:local": "concurrently \"npx graphql-codegen --watch --config='apps/app/codegen.ts'\" \"npx nx run app:dev\"",
+    "app:tau": "concurrently \"npx graphql-codegen --watch --config='apps/app/codegen.ts'\" \"npx nx run app:dev:tau\"",
     "patient:tau": "concurrently \"npx nx run patient:codegen:watch\" \"npx nx run patient:start:tau\"",
     "patient": "concurrently \"npx nx run patient:codegen:watch\" \"npx nx run patient:start\"",
     "lint": "npx nx run-many --target=lint",

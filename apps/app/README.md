@@ -2,11 +2,11 @@
 
 ## Local Development
 
-### Default setup
+### Run against Boson services with code refresh
 
-> Starts the clinical app dev server with hot refresh and codegen to monitor schema changes. Files in `app` dependencies will automatically rebuild, but you'll need to manually refresh the webpage to see your changes.
+Starts the clinical app dev server with hot refresh. Files in `app` dependencies will automatically rebuild, but you'll need to manually refresh the webpage to see your changes.
 
-`npm run app:local`
+`npx nx run app:dev`
 
 ### Run against Boson services
 
