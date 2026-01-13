@@ -53,7 +53,7 @@ const Component = (props: PrescribeProps) => {
             enableMedHistoryRefillButton={props.enableMedHistoryRefillButton}
             enableCombineAndDuplicate={props.enableCombineAndDuplicate}
             enableCoverageCheck={props.enableCoverageCheck}
-            patientAddressInProviderUxIsOptional={props.patientAddressInProviderUxIsOptional}
+            optionalPatientAddress={props.optionalPatientAddress}
             mailOrderIds={props.mailOrderIds}
             pharmacyId={props.pharmacyId}
             loading={props.loading}
@@ -94,7 +94,7 @@ customElement(
     enableMedHistory: false,
     enableMedHistoryRefillButton: false,
     enableMedHistoryLinks: false,
-    patientAddressInProviderUxIsOptional: false,
+    optionalPatientAddress: false,
     mailOrderIds: undefined,
     pharmacyId: undefined,
     loading: false,

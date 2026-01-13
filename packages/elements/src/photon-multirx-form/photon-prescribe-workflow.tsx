@@ -74,7 +74,7 @@ export type PrescribeProps = {
   enableCombineAndDuplicate: boolean;
   enableDeliveryPharmacies: boolean;
   enableCoverageCheck: boolean;
-  patientAddressInProviderUxIsOptional: boolean;
+  optionalPatientAddress: boolean;
   mailOrderIds?: string;
   pharmacyId?: string;
   loading: boolean;
@@ -373,9 +373,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     }
 
     const keys =
-      enableOrder && !props.patientAddressInProviderUxIsOptional
-        ? ['patient', 'address']
-        : ['patient'];
+      enableOrder && !props.optionalPatientAddress ? ['patient', 'address'] : ['patient'];
     props.formActions.validate(keys);
     const errors = props.formActions.getErrors(keys);
     if (errors.length === 0) {
@@ -622,7 +620,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 enableMedHistoryLinks={props.enableMedHistoryLinks ?? false}
                 enableMedHistoryRefillButton={props.enableMedHistoryRefillButton ?? false}
                 hidePatientCard={props.hidePatientCard}
-                patientAddressInProviderUxIsOptional={props.patientAddressInProviderUxIsOptional}
+                optionalPatientAddress={props.optionalPatientAddress}
               />
               <Show
                 when={
@@ -634,8 +632,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     // if orders are disabled, we need only a patient id
                     (props.formStore.patient?.value?.id && !props.enableOrder) ||
                     // if address is optional, we only need a patient id
-                    (props.formStore.patient?.value?.id &&
-                      props.patientAddressInProviderUxIsOptional))
+                    (props.formStore.patient?.value?.id && props.optionalPatientAddress))
                 }
               >
                 <Show when={props.enableCombineAndDuplicate}>

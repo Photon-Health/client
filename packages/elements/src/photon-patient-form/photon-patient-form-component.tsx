@@ -37,7 +37,7 @@ const getPatientAddress = (pStore: any, store: any) => {
   return '';
 };
 
-const PatientForm = (props: { patientId: string; addressIsOptional: boolean }) => {
+const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean }) => {
   let ref: any;
   const client = usePhoton();
   const [showOptionalFields, setShowOptionalFields] = createSignal(false);
@@ -120,7 +120,7 @@ const PatientForm = (props: { patientId: string; addressIsOptional: boolean }) =
         form: form,
         actions: actions,
         selected: pStore,
-        addressIsOptional: props.addressIsOptional,
+        optionalPatientAddress: props.optionalPatientAddress,
         reset: () => {
           actions.reset();
           pActions.reset();
@@ -322,7 +322,7 @@ const PatientForm = (props: { patientId: string; addressIsOptional: boolean }) =
                 </div>
                 <p class="font-sans text-lg mt-8">
                   Address
-                  <Show when={props.addressIsOptional && !hasAnyAddressField()}>
+                  <Show when={props.optionalPatientAddress && !hasAnyAddressField()}>
                     <span class="text-gray-500 text-sm font-normal"> (optional)</span>
                   </Show>
                 </p>
@@ -331,7 +331,7 @@ const PatientForm = (props: { patientId: string; addressIsOptional: boolean }) =
                   invalid={store['address_street1']?.error}
                   help-text={store['address_street1']?.error}
                   label="Street 1"
-                  required={!props.addressIsOptional || hasAnyAddressField()}
+                  required={!props.optionalPatientAddress || hasAnyAddressField()}
                   on:photon-input-changed={async (e: any) => {
                     actions.updateFormValue({
                       key: 'address_street1',
@@ -362,7 +362,7 @@ const PatientForm = (props: { patientId: string; addressIsOptional: boolean }) =
                   invalid={store['address_city']?.error}
                   help-text={store['address_city']?.error}
                   label="City"
-                  required={!props.addressIsOptional || hasAnyAddressField()}
+                  required={!props.optionalPatientAddress || hasAnyAddressField()}
                   on:photon-input-changed={async (e: any) => {
                     actions.updateFormValue({
                       key: 'address_city',
@@ -375,7 +375,7 @@ const PatientForm = (props: { patientId: string; addressIsOptional: boolean }) =
                   <photon-state-input
                     class="flex-grow min-w-[40%]"
                     label="State"
-                    required={!props.addressIsOptional || hasAnyAddressField()}
+                    required={!props.optionalPatientAddress || hasAnyAddressField()}
                     help-text={store['address_state']?.error}
                     invalid={store['address_state']?.error !== undefined}
                     on:photon-state-selected={(e: any) => {
@@ -392,7 +392,7 @@ const PatientForm = (props: { patientId: string; addressIsOptional: boolean }) =
                     invalid={store['address_zip']?.error}
                     help-text={store['address_zip']?.error}
                     label="Zip code"
-                    required={!props.addressIsOptional || hasAnyAddressField()}
+                    required={!props.optionalPatientAddress || hasAnyAddressField()}
                     on:photon-input-changed={async (e: any) => {
                       actions.updateFormValue({
                         key: 'address_zip',
@@ -475,4 +475,4 @@ const PatientForm = (props: { patientId: string; addressIsOptional: boolean }) =
   );
 };
 
-customElement('photon-patient-form', { patientId: '', addressIsOptional: false }, PatientForm);
+customElement('photon-patient-form', { patientId: '', optionalPatientAddress: false }, PatientForm);

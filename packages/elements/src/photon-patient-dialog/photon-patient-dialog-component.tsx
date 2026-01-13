@@ -8,7 +8,7 @@ type PatientDialogProps = {
   patientId: string;
   open: boolean;
   hideCreatePrescription: boolean;
-  addressIsOptional: boolean;
+  optionalPatientAddress: boolean;
 };
 
 const Component = (props: PatientDialogProps) => {
@@ -67,7 +67,7 @@ const Component = (props: PatientDialogProps) => {
     const addressKeys = ['address_street1', 'address_city', 'address_state', 'address_zip'];
 
     // If address is optional and no address fields are filled, skip address validation
-    const shouldValidateAddress = !props.addressIsOptional || hasAnyAddressField();
+    const shouldValidateAddress = !props.optionalPatientAddress || hasAnyAddressField();
     const keys = shouldValidateAddress ? [...baseKeys, ...addressKeys] : baseKeys;
 
     actions.validate(keys);
@@ -214,7 +214,7 @@ const Component = (props: PatientDialogProps) => {
                   );
                 }}
                 patient-id={props.patientId}
-                address-is-optional={props.addressIsOptional}
+                optional-patient-address={props.optionalPatientAddress}
               />
             </>
           }
@@ -229,7 +229,7 @@ customElement(
     patientId: '',
     hideCreatePrescription: false,
     open: false,
-    addressIsOptional: false
+    optionalPatientAddress: false
   },
   Component
 );

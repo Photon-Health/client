@@ -40,7 +40,7 @@ export const PatientCard = (props: {
   enableMedHistoryLinks?: boolean;
   enableMedHistoryRefillButton?: boolean;
   hidePatientCard?: boolean;
-  patientAddressInProviderUxIsOptional?: boolean;
+  optionalPatientAddress?: boolean;
 }) => {
   const [newMedication, setNewMedication] = createSignal<Treatment | undefined>();
   const [showEditPatientView, setShowEditPatientView] = createSignal(false);
@@ -54,7 +54,7 @@ export const PatientCard = (props: {
       validator: patientValidator
     });
 
-    if (props.enableOrder && !props.patientAddressInProviderUxIsOptional) {
+    if (props.enableOrder && !props.optionalPatientAddress) {
       props.actions.registerValidator({
         key: 'address',
         validator: patientAddressValidator
@@ -107,7 +107,7 @@ export const PatientCard = (props: {
       props.store.patient?.value?.id &&
       !props.store.patient?.value?.address &&
       props.enableOrder &&
-      !props.patientAddressInProviderUxIsOptional
+      !props.optionalPatientAddress
   );
 
   return (
@@ -157,7 +157,7 @@ export const PatientCard = (props: {
               setShowEditPatientView(false);
             }}
             patient-id={patientId()}
-            address-is-optional={props.patientAddressInProviderUxIsOptional}
+            optional-patient-address={props.optionalPatientAddress}
           />
         </div>
       </Show>
