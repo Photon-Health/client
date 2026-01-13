@@ -5,7 +5,7 @@ import { Helmet } from 'react-helmet';
 import { FiNavigation, FiPhoneCall, FiRefreshCcw } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { triggerDemoNotification } from '../api';
-import { DemoCtaModal, PharmacyInfo, PoweredBy } from '../components';
+import { PharmacyInfo, PoweredBy } from '../components';
 import { Card } from '../components/Card';
 import { HolidayAlert } from '../components/HolidayAlert';
 import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal';
@@ -31,8 +31,6 @@ export const Status = () => {
   const token = searchParams.get('token') ?? undefined;
   const type = searchParams.get('type') ?? undefined;
   const phone = searchParams.get('phone') ?? undefined;
-
-  const [showDemoCtaModal, setShowDemoCtaModal] = useState<boolean>(false);
 
   const { fulfillment, pharmacy, readyBy, readyByTime } = order;
 
@@ -109,8 +107,6 @@ export const Status = () => {
               type: 'PICK_UP'
             }
           });
-
-          setTimeout(() => setShowDemoCtaModal(true), 1500);
         }, 1000);
       }, 1000);
     }
@@ -242,7 +238,6 @@ export const Status = () => {
 
   return (
     <VStack flex={1}>
-      <DemoCtaModal isOpen={showDemoCtaModal} onClose={() => setShowDemoCtaModal(false)} />
       <OrderDetailsModal
         isOpen={orderDetailsIsOpen}
         onClose={() => setOrderDetailsIsOpen(false)}

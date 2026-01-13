@@ -1,6 +1,7 @@
 import { Order } from '../utils/models';
 
-// TODO(mrochlin) need to fix this
+const oneYearFromNow = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString();
+
 export const demoOrder: Order = {
   __typename: 'Order',
   readyBy: undefined,
@@ -14,7 +15,7 @@ export const demoOrder: Order = {
         dispenseUnit: 'ML',
         dispenseQuantity: '100 ML' as unknown as number, // Make it format nicely for demo
         dispenseAsWritten: false,
-        expirationDate: '2024-08-29T00:00:00.000Z',
+        expirationDate: oneYearFromNow,
         fillsAllowed: 1,
         id: 'rx_01H91JW889FRF34ger7QC5V3PYBNWD0'
       },
@@ -30,7 +31,7 @@ export const demoOrder: Order = {
         dispenseUnit: 'tablets',
         dispenseQuantity: '2 tablets' as unknown as number,
         dispenseAsWritten: false,
-        expirationDate: '2024-08-29T00:00:00.000Z',
+        expirationDate: oneYearFromNow,
         fillsAllowed: 1,
         id: 'rx_01H9154tgJW889FRF7QC5V3PYBNWD0'
       },
@@ -49,7 +50,7 @@ export const demoOrder: Order = {
   },
   organization: {
     id: 'org_YiUudCToTSrjOuow',
-    name: 'NewCo'
+    name: 'Photon'
   },
   patient: {
     id: 'pat_01H7KBFG7BQRAYQF735EWMK4CX',
@@ -57,7 +58,14 @@ export const demoOrder: Order = {
       full: 'Jessie Demo'
     },
     dateOfBirth: '1990-01-01',
-    sex: 'FEMALE'
+    sex: 'FEMALE',
+    address: {
+      street1: '201 N 8th St',
+      city: 'Brooklyn',
+      state: 'NY',
+      postalCode: '11211',
+      country: 'US'
+    }
   },
   fulfillment: undefined,
   exceptions: [],
@@ -73,7 +81,7 @@ export const demoOrder: Order = {
         daysSupply: 2,
         dispenseUnit: 'tablets',
         dispenseQuantity: '2 tablets' as unknown as number,
-        expirationDate: '2024-08-29T00:00:00.000Z',
+        expirationDate: oneYearFromNow,
         fillsAllowed: 1,
         id: 'rx_01H9154tgJW889FRF7QC5V3PYBNWD0',
         treatment: {
@@ -90,7 +98,7 @@ export const demoOrder: Order = {
         daysSupply: 10,
         dispenseUnit: 'ML',
         dispenseQuantity: '100 ML' as unknown as number, // Make it format nicely for demo
-        expirationDate: '2024-08-29T00:00:00.000Z',
+        expirationDate: oneYearFromNow,
         fillsAllowed: 1,
         id: 'rx_01H91JW889FRF34ger7QC5V3PYBNWD0',
         treatment: {
