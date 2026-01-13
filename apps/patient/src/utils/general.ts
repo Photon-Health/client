@@ -226,3 +226,5 @@ export const convertReadyByToUTCTimestamp = (readyBy: string, readyByDay: string
 
   return targetTime.utc().toDate();
 };
+
+export const wait = (ms: number) => new Promise((res) => setTimeout(res, ms));

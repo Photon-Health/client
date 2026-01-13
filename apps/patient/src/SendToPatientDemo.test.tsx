@@ -49,6 +49,21 @@ describe('Send To Patient Demo', () => {
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
     expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
   }, 10_000);
+
+  test('shows mail order pharmacies', async () => {
+    renderDemoApp();
+
+    expect(await screen.findByText('Review your prescriptions')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
+    expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
+    await userEvent.click(screen.getByText('See all mail orders'));
+
+    await userEvent.click(screen.getByText('Amazon Pharmacy'));
+    await userEvent.click(screen.getByText('Place Order'));
+
+    await waitFor(() => screen.findByText('Order placed'), { timeout: 2500 });
+    expect(await screen.findByText('Amazon Pharmacy')).toBeInTheDocument();
+  }, 10_000);
 });
 
 const renderDemoApp = () => {

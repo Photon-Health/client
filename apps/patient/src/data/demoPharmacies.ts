@@ -1,4 +1,5 @@
 import { EnrichedPharmacy } from '../utils/models';
+import { GetPharmaciesQuery } from '../__generated__/graphql';
 
 export const demoPharmacies: EnrichedPharmacy[] = [
   {
@@ -160,5 +161,62 @@ export const demoPharmacies: EnrichedPharmacy[] = [
     closes: 'Closes 4:30PM',
     opens: 'Opens 9AM Sat',
     is24Hr: false
+  }
+];
+
+export const demoMailOrderPharmacies: GetPharmaciesQuery['pharmacies'] = [
+  {
+    id: 'phr_demoAmazon',
+    name: 'Amazon Pharmacy',
+    fulfillmentTypes: ['MAIL_ORDER'],
+    logo: 'https://logos.photon.health/amazon_pharmacy_logo_small_circle.png'
+  },
+  {
+    id: 'phr_demoCapsule',
+    name: 'Capsule Pharmacy',
+    logo: 'https://logos.boson.health/pharmacies/capsule-logo.png',
+    fulfillmentTypes: ['MAIL_ORDER']
+  },
+  {
+    id: 'phr_demoCvsCaremark',
+    name: 'CVS Caremark',
+    logo: 'https://logos.boson.health/pharmacies/cvs-caremark-logo.png',
+    fulfillmentTypes: ['MAIL_ORDER']
+  },
+  {
+    id: 'phr_demoEvernorthEnguide',
+    name: 'Evernorth Enguide Pharmacy',
+    logo: 'https://logos.boson.health/pharmacies/evernorth-logo.png',
+    fulfillmentTypes: ['MAIL_ORDER']
+  },
+  {
+    id: 'phr_demoExpressScripts',
+    name: 'Express Scripts Pharmacy ',
+    logo: 'https://logos.boson.health/pharmacies/express-scripts-logo.png',
+    fulfillmentTypes: ['MAIL_ORDER']
+  },
+  {
+    id: 'phr_demoFuzerxHayward',
+    name: 'FuzeRx Hayward',
+    logo: 'https://logos.boson.health/pharmacies/truepill-logo.png',
+    fulfillmentTypes: ['MAIL_ORDER']
+  },
+  {
+    id: 'phr_demoMarkCubanCostPlusDrugs',
+    name: 'Mark Cuban Cost Plus Drugs',
+    logo: 'https://logos.boson.health/pharmacies/costplus-logo.png',
+    fulfillmentTypes: ['MAIL_ORDER']
+  },
+  {
+    id: 'phr_demoNovocare',
+    name: 'Novocare Pharmacy',
+    logo: 'https://logos.neutron.health/pharmacies/novo-nordisk.png',
+    fulfillmentTypes: ['MAIL_ORDER']
+  },
+  {
+    id: 'phr_demoOptumrx',
+    name: 'Optumrx ',
+    logo: 'https://logos.boson.health/pharmacies/optum-logo.png',
+    fulfillmentTypes: ['MAIL_ORDER']
   }
 ];

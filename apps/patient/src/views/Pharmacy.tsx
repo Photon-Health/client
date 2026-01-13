@@ -22,7 +22,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FixedFooter, LocationModal, PoweredBy } from '../components';
 import { CouponModal } from '../components/coupons';
 import * as TOAST_CONFIG from '../configs/toast';
-import { preparePharmacy } from '../utils/general';
+import { preparePharmacy, wait } from '../utils/general';
 import { Pharmacy as EnrichedPharmacy } from '../utils/models';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
@@ -38,7 +38,7 @@ import {
 } from '../api';
 
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
-import { demoPharmacies } from '../data/demoPharmacies';
+import { demoMailOrderPharmacies, demoPharmacies } from '../data/demoPharmacies';
 import { isGLP } from '../utils/isGLP';
 import { datadogRum } from '@datadog/browser-rum';
 import {
@@ -558,8 +558,6 @@ export const Pharmacy = () => {
   ]);
 
   useEffect(() => {
-    if (isDemo) return;
-
     // load all the pharmacy options on mount
     async function loadMailOrderPharmacies() {
       const { pharmacies } = await getPharmacies({
@@ -571,7 +569,11 @@ export const Pharmacy = () => {
       setPatientMailOrderOptions(pharmacies);
     }
 
-    loadMailOrderPharmacies();
+    if (isDemo) {
+      setPatientMailOrderOptions(demoMailOrderPharmacies);
+    } else {
+      loadMailOrderPharmacies();
+    }
   }, [isDemo]);
 
   const handleShowMore = async () => {
@@ -696,7 +698,7 @@ export const Pharmacy = () => {
     });
 
     if (isDemo) {
-      handleDemoSubmit();
+      handleDemoSubmit(selectedPharmacy);
       return;
     }
 
@@ -858,35 +860,35 @@ export const Pharmacy = () => {
     }
   };
 
-  const handleDemoSubmit = () => {
-    setTimeout(() => {
-      setSuccessfullySubmitted(true);
-      setTimeout(() => {
-        setShowFooter(false);
+  const handleDemoSubmit = async (selectedPharmacy: EnrichedPharmacy) => {
+    await wait(1000);
+    setSuccessfullySubmitted(true);
+    await wait(1000);
 
-        // Add selected pharmacy to order context so /status shows pharmacy on render
-        const selectedPharmacy = allPharmacies.find((p) => p.id === selectedId)!;
-        setOrder({ ...order, pharmacy: selectedPharmacy });
+    setShowFooter(false);
 
-        // Send order placed sms to demo participant
-        triggerDemoNotification(
-          phone!,
-          'photon:order:placed',
-          selectedPharmacy.name,
-          formatAddress(selectedPharmacy.address!)
-        );
+    // Add selected pharmacy to order context so /status shows pharmacy on render
+    // const selectedPharmacy = allPharmacies.find((p) => p.id === selectedId)!;
+    setOrder({ ...order, pharmacy: selectedPharmacy });
 
-        // For demo, follow the same logic as non-demo
-        if (isMailOrderPharmacy(selectedPharmacy)) {
-          const query = queryString.stringify({ demo: true, phone });
-          navigate(`/status?${query}`);
-        } else {
-          const query = queryString.stringify({ demo: true, phone });
-          navigate(`/readyBy?${query}`);
-        }
-      }, 1000);
-      setSubmitting(false);
-    }, 1000);
+    // Send order placed sms to demo participant
+    triggerDemoNotification(
+      phone!,
+      'photon:order:placed',
+      selectedPharmacy.name,
+      selectedPharmacy.address ? formatAddress(selectedPharmacy.address) : undefined
+    );
+
+    // For demo, follow the same logic as non-demo
+    if (isMailOrderPharmacy(selectedPharmacy)) {
+      const query = queryString.stringify({ demo: true, phone });
+      navigate(`/status?${query}`);
+    } else {
+      const query = queryString.stringify({ demo: true, phone });
+      navigate(`/readyBy?${query}`);
+    }
+
+    setSubmitting(false);
   };
 
   const handleSubmitSuccessAnalytics = (
