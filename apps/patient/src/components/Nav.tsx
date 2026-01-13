@@ -26,7 +26,16 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
   const isDemo = searchParams.get('demo');
   const isProd = process.env.REACT_APP_ENV_NAME === 'photon';
 
-  const { order, logo, setFaqModalIsOpen } = useOrderContext();
+  const { order, flattenedFills, logo, setFaqModalIsOpen } = useOrderContext();
+
+  function getNavigationBannerTitle() {
+    if (isDemo) return t.demoTitle;
+
+    const isMultiRx = flattenedFills.length > 1;
+    return isMultiRx ? t.fakeRxs : t.fakeRx;
+  }
+
+  const showNavigationBanner = isDemo || !isProd;
 
   return (
     // If you're going to modify z-index here, just double-check that the readyBy buttons
@@ -39,10 +48,10 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
       borderWidth="2px"
       style={{ position: 'sticky', top: 0, zIndex: 2 }}
     >
-      {isDemo || !isProd ? (
+      {showNavigationBanner ? (
         <Alert status="info" variant="subtle" w="full" py={2}>
           <HStack spacing={1} mx="auto">
-            <Text fontSize="sm">{t.nonProdNavTitle}</Text>
+            <Text fontSize="sm">{getNavigationBannerTitle()}</Text>
             <Link
               fontSize="sm"
               isExternal
