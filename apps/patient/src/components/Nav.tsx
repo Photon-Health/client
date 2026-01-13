@@ -1,27 +1,11 @@
-import {
-  Alert,
-  Box,
-  Button,
-  Container,
-  HStack,
-  IconButton,
-  Image,
-  Link,
-  Spacer,
-  Text
-} from '@chakra-ui/react';
-import { FiRefreshCw } from 'react-icons/fi';
+import { Alert, Box, Button, Container, HStack, Image, Link, Spacer, Text } from '@chakra-ui/react';
 import { useSearchParams } from 'react-router-dom';
 import { text as t } from '../utils/text';
 import { useOrderContext } from '../views/Main';
 import { Logo as PhotonLogo } from './Logo';
 import { patientAnalytics } from '../configs/analytics';
 
-interface NavProps {
-  showRefresh?: boolean;
-}
-
-export const Nav = ({ showRefresh = false }: NavProps) => {
+export const Nav = () => {
   const [searchParams] = useSearchParams();
   const isDemo = searchParams.get('demo');
   const isProd = process.env.REACT_APP_ENV_NAME === 'photon';
@@ -73,17 +57,6 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
             <PhotonLogo />
           )}
           <Spacer />
-          {showRefresh ? (
-            <IconButton
-              variant="ghost"
-              aria-label="Refresh"
-              icon={<FiRefreshCw size="1.5em" />}
-              onClick={() => {
-                window.location.reload();
-              }}
-            />
-          ) : null}
-
           <Button
             colorScheme="gray"
             size="sm"
