@@ -18,7 +18,8 @@ type Documents = {
     "\n  mutation TicketModalCreateTicket($input: TicketInput!) {\n    createTicket(input: $input) {\n      id\n    }\n  }\n": typeof types.TicketModalCreateTicketDocument,
     "\n  query OrderFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n": typeof types.OrderFormOrgSettingsQueryDocument,
     "\n  query NewOrderOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n        }\n      }\n    }\n  }\n": typeof types.NewOrderOrgSettingsQueryDocument,
-    "\n  query PrescriptionFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescribeToOrder\n          enableRxTemplates\n          enableDuplicateRxWarnings\n          enableTreatmentHistory\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n": typeof types.PrescriptionFormOrgSettingsQueryDocument,
+    "\n  query PatientFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          optionalPatientAddress\n        }\n      }\n    }\n  }\n": typeof types.PatientFormOrgSettingsQueryDocument,
+    "\n  query PrescriptionFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescribeToOrder\n          enableRxTemplates\n          enableDuplicateRxWarnings\n          enableTreatmentHistory\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n          optionalPatientAddress\n        }\n      }\n    }\n  }\n": typeof types.PrescriptionFormOrgSettingsQueryDocument,
     "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n    connections {\n      id\n      name\n    }\n  }\n": typeof types.ClientInfoCardFragmentFragmentDoc,
     "\n  query ClientsDeveloperTabQuery {\n    clients {\n      id\n      ...ClientInfoCardFragment\n    }\n  }\n": typeof types.ClientsDeveloperTabQueryDocument,
     "\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n": typeof types.RotateSecretDocument,
@@ -51,13 +52,15 @@ type Documents = {
     "\n  mutation WebhookFormCreateMutation($url: String!, $sharedSecret: String!, $filters: [String!]!) {\n    createWebhookConfig(url: $url, filters: $filters, sharedSecret: $sharedSecret)\n  }\n": typeof types.WebhookFormCreateMutationDocument,
     "\n  query SettingsPageQuery {\n    me {\n      roles {\n        id\n      }\n    }\n    organization {\n      id\n      name\n      ...OrganizationTreatmentTabFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n": typeof types.SettingsPageQueryDocument,
     "\n  fragment OrganizationTreatmentTabFragment on Organization {\n    id\n    name\n  }\n": typeof types.OrganizationTreatmentTabFragmentFragmentDoc,
+    "\n  query UpdatePatientFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          optionalPatientAddress\n        }\n      }\n    }\n  }\n": typeof types.UpdatePatientFormOrgSettingsQueryDocument,
 };
 const documents: Documents = {
     "\n  query NavOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          federatedAuth\n        }\n      }\n    }\n  }\n": types.NavOrgSettingsQueryDocument,
     "\n  mutation TicketModalCreateTicket($input: TicketInput!) {\n    createTicket(input: $input) {\n      id\n    }\n  }\n": types.TicketModalCreateTicketDocument,
     "\n  query OrderFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n": types.OrderFormOrgSettingsQueryDocument,
     "\n  query NewOrderOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescriberOrdering\n        }\n      }\n    }\n  }\n": types.NewOrderOrgSettingsQueryDocument,
-    "\n  query PrescriptionFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescribeToOrder\n          enableRxTemplates\n          enableDuplicateRxWarnings\n          enableTreatmentHistory\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n": types.PrescriptionFormOrgSettingsQueryDocument,
+    "\n  query PatientFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          optionalPatientAddress\n        }\n      }\n    }\n  }\n": types.PatientFormOrgSettingsQueryDocument,
+    "\n  query PrescriptionFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescribeToOrder\n          enableRxTemplates\n          enableDuplicateRxWarnings\n          enableTreatmentHistory\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n          optionalPatientAddress\n        }\n      }\n    }\n  }\n": types.PrescriptionFormOrgSettingsQueryDocument,
     "\n  fragment ClientInfoCardFragment on Client {\n    id\n    appType\n    name\n    secret\n    whiteListedUrls\n    connections {\n      id\n      name\n    }\n  }\n": types.ClientInfoCardFragmentFragmentDoc,
     "\n  query ClientsDeveloperTabQuery {\n    clients {\n      id\n      ...ClientInfoCardFragment\n    }\n  }\n": types.ClientsDeveloperTabQueryDocument,
     "\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n": types.RotateSecretDocument,
@@ -90,6 +93,7 @@ const documents: Documents = {
     "\n  mutation WebhookFormCreateMutation($url: String!, $sharedSecret: String!, $filters: [String!]!) {\n    createWebhookConfig(url: $url, filters: $filters, sharedSecret: $sharedSecret)\n  }\n": types.WebhookFormCreateMutationDocument,
     "\n  query SettingsPageQuery {\n    me {\n      roles {\n        id\n      }\n    }\n    organization {\n      id\n      name\n      ...OrganizationTreatmentTabFragment\n    }\n    roles {\n      name\n      id\n    }\n  }\n": types.SettingsPageQueryDocument,
     "\n  fragment OrganizationTreatmentTabFragment on Organization {\n    id\n    name\n  }\n": types.OrganizationTreatmentTabFragmentFragmentDoc,
+    "\n  query UpdatePatientFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          optionalPatientAddress\n        }\n      }\n    }\n  }\n": types.UpdatePatientFormOrgSettingsQueryDocument,
 };
 
 /**
@@ -125,7 +129,11 @@ export function graphql(source: "\n  query NewOrderOrgSettingsQuery {\n    organ
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query PrescriptionFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescribeToOrder\n          enableRxTemplates\n          enableDuplicateRxWarnings\n          enableTreatmentHistory\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query PrescriptionFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescribeToOrder\n          enableRxTemplates\n          enableDuplicateRxWarnings\n          enableTreatmentHistory\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n        }\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  query PatientFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          optionalPatientAddress\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query PatientFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          optionalPatientAddress\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query PrescriptionFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescribeToOrder\n          enableRxTemplates\n          enableDuplicateRxWarnings\n          enableTreatmentHistory\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n          optionalPatientAddress\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query PrescriptionFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          enablePrescribeToOrder\n          enableRxTemplates\n          enableDuplicateRxWarnings\n          enableTreatmentHistory\n          enablePatientRouting\n          enablePickupPharmacies\n          enableDeliveryPharmacies\n          optionalPatientAddress\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -254,6 +262,10 @@ export function graphql(source: "\n  query SettingsPageQuery {\n    me {\n      
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  fragment OrganizationTreatmentTabFragment on Organization {\n    id\n    name\n  }\n"): (typeof documents)["\n  fragment OrganizationTreatmentTabFragment on Organization {\n    id\n    name\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query UpdatePatientFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          optionalPatientAddress\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query UpdatePatientFormOrgSettingsQuery {\n    organization {\n      settings {\n        providerUx {\n          optionalPatientAddress\n        }\n      }\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

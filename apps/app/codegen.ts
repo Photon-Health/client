@@ -6,6 +6,8 @@ const config: CodegenConfig = {
   documents: [
     'apps/app/src/**/Settings/**/*.tsx',
     'apps/app/src/views/routes/PrescriptionForm.tsx',
+    'apps/app/src/views/routes/UpdatePatientForm.tsx',
+    'apps/app/src/views/routes/NewPatient/PatientForm.tsx',
     'apps/app/src/views/routes/NewOrder/index.tsx',
     'apps/app/src/views/routes/NewOrder/components/OrderForm.tsx',
     'apps/app/src/views/components/TicketModal.tsx',
