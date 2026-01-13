@@ -145,9 +145,8 @@ const roleSchema = yup
       street1: undefined,
       street2: undefined,
       city: undefined,
+      state: undefined,
       postalCode: undefined
-      // Not including state for now since
-      // `yupStateSchema` makes it difficult to skip validation
     };
     return { ...value, ...blankValues };
   });
