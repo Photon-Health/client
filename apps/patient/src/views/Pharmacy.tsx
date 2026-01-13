@@ -39,6 +39,7 @@ import {
 
 import capsuleZipcodeLookup from '../data/capsuleZipcodes.json';
 import { demoMailOrderPharmacies, demoPharmacies } from '../data/demoPharmacies';
+import { demoOffers } from '../data/demoOffers';
 import { isGLP } from '../utils/isGLP';
 import { datadogRum } from '@datadog/browser-rum';
 import {
@@ -60,7 +61,7 @@ import { formatAddress } from '../utils/formatters';
 import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
 import { OffersList } from '../components/offers/OffersList';
-import { MailOrderSelectModal } from '../components/mail-order-select/MailOrderSelectModal';
+import { MailOrderSelectModal } from '../components/mail-order-select';
 import { MailOrderPharmacyOption } from '../components/mail-order-select/MailOrderSelectCard';
 
 const GET_PHARMACIES_COUNT = 5; // Number of pharmacies to fetch at a time
@@ -201,7 +202,6 @@ export const Pharmacy = () => {
   // mail order
   const hasTopRankedCostco = topRankedPharmacies.some((p) => p.name === 'Costco Pharmacy');
   const enableMailOrder =
-    !isDemo &&
     !enablePrice && // Hide for price filter
     // If we're showing costco, we don't want to show mail order
     !topRankedCostco &&
@@ -219,8 +219,6 @@ export const Pharmacy = () => {
   });
 
   useEffect(() => {
-    if (isDemo) return;
-
     const getOffers = async () => {
       let fetchedOffers: Offer[] | undefined;
 
@@ -234,7 +232,11 @@ export const Pharmacy = () => {
       }
     };
 
-    getOffers();
+    if (isDemo) {
+      setOffers(demoOffers);
+    } else {
+      getOffers();
+    }
   }, [order, offers, isDemo]);
 
   useEffect(() => {
@@ -273,6 +275,7 @@ export const Pharmacy = () => {
 
     if (JSON.stringify(newBrandedOptionsOverride) !== JSON.stringify(brandedOptionsOverride)) {
       setBrandedOptionsOverride(newBrandedOptionsOverride);
+      console.log('setFilteredOffers: ', { filteringOffers });
       setFilteredOffers(filteringOffers);
     }
   }, [enablePrice, offers, order, brandedOptionsOverride]);
@@ -1044,6 +1047,8 @@ export const Pharmacy = () => {
     enableMailOrder ||
     showBrandedOptionsHeader ||
     (filteredOffers || []).length > 0;
+
+  console.log({ enableMailOrder, showOffers });
 
   const showBrandedOptions =
     enableCourier ||
