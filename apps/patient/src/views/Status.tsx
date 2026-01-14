@@ -107,6 +107,7 @@ export const Status = () => {
       handleDemoStatusPage(phone, pharmacy);
     }
   }, [
+    handleDemoStatusPage,
     isDemo,
     order,
     pharmacy,
