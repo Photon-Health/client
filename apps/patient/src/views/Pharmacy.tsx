@@ -860,10 +860,8 @@ export const Pharmacy = () => {
 
     setShowFooter(false);
 
-    // Add selected pharmacy to order context so /status shows pharmacy on render
     setOrder({ ...order, pharmacy: selectedPharmacy });
 
-    // Send order placed sms to demo participant
     triggerDemoNotification(
       phone!,
       'photon:order:placed',
@@ -871,7 +869,6 @@ export const Pharmacy = () => {
       selectedPharmacy.address ? formatAddress(selectedPharmacy.address) : undefined
     );
 
-    // For demo, follow the same logic as non-demo
     if (isMailOrderPharmacy(selectedPharmacy)) {
       const query = queryString.stringify({ demo: true, phone });
       navigate(`/status?${query}`);
