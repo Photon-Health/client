@@ -12,7 +12,7 @@ import { OrderDetailsModal } from '../components/order-details/OrderDetailsModal
 import { OrderSummary } from '../components/order-summary/OrderSummary';
 import { OrderStatusHeader } from '../components/status/Header';
 import { deriveOrderStatus, getLatestReadyTime } from '../utils/fulfillmentsHelpers';
-import { getFulfillmentType, isDelivery, preparePharmacy } from '../utils/general';
+import { getFulfillmentType, isDelivery, preparePharmacy, wait } from '../utils/general';
 import { InsuranceAlert } from '../components/InsuranceAlert';
 import { text as t } from '../utils/text';
 import { useOrderContext } from './Main';
@@ -21,6 +21,7 @@ import { usePageAnalytics } from '../hooks/usePageAnalytics';
 import { patientAnalytics } from '../configs/analytics';
 import { computeNumRefillsForPrescription } from '../utils/presenters';
 import { CouponCardList } from '../components/coupons';
+import { Pharmacy } from '../utils/models';
 
 export const Status = () => {
   const navigate = useNavigate();
@@ -67,48 +68,43 @@ export const Status = () => {
 
   usePageAnalytics({ pageName: 'Order Status' });
 
+  const handleDemoStatusPage = async (demoUserPhone: string, selectedDemoPharmacy: Pharmacy) => {
+    const isMailOrder = !!order.pharmacy?.fulfillmentTypes?.includes('MAIL_ORDER');
+
+    setOrder({
+      ...order,
+      fulfillment: {
+        state: isMailOrder ? 'SENT' : 'READY',
+        type: isMailOrder ? 'MAIL_ORDER' : 'PICK_UP'
+      }
+    });
+
+    if (!isMailOrder) {
+      await wait(1000);
+      await triggerDemoNotification(
+        demoUserPhone,
+        'photon:order_fulfillment:received',
+        selectedDemoPharmacy.name,
+        pharmacyFormattedAddress
+      );
+      await wait(1000);
+
+      await triggerDemoNotification(
+        demoUserPhone,
+        'photon:order_fulfillment:ready',
+        selectedDemoPharmacy.name,
+        pharmacyFormattedAddress
+      );
+    }
+  };
+
   useEffect(() => {
     if (!phone || !pharmacy || !order) {
       return;
     }
-    if (isDemo && !order.fulfillment) {
-      setTimeout(async () => {
-        // Send order received sms to demo participant
-        await triggerDemoNotification(
-          phone,
-          'photon:order_fulfillment:received',
-          pharmacy.name,
-          pharmacyFormattedAddress
-        );
-
-        setOrder({
-          ...order,
-          fulfillment: {
-            ...order.fulfillment,
-            state: 'RECEIVED',
-            type: 'PICK_UP'
-          }
-        });
-
-        setTimeout(async () => {
-          // Send ready sms
-          await triggerDemoNotification(
-            phone,
-            'photon:order_fulfillment:ready',
-            pharmacy.name,
-            pharmacyFormattedAddress
-          );
-
-          setOrder({
-            ...order,
-            fulfillment: {
-              ...order.fulfillment,
-              state: 'READY',
-              type: 'PICK_UP'
-            }
-          });
-        }, 1000);
-      }, 1000);
+    const hasNotSetDemoFulfillment = isDemo && !order.fulfillment;
+    if (hasNotSetDemoFulfillment) {
+      handleDemoStatusPage(phone, pharmacy);
     }
   }, [
     isDemo,

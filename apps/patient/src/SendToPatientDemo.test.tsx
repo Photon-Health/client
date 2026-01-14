@@ -75,7 +75,7 @@ describe('Send To Patient Demo', () => {
     expect(await screen.findByText('Capsule Pharmacy')).toBeInTheDocument();
   }, 10_000);
 
-  test('allows Offer-based pharmacy selection (i.e. Amazon)', async () => {
+  test('allows offer-based pharmacy selection (i.e. Amazon)', async () => {
     renderDemoApp();
 
     expect(await screen.findByText('Review your prescriptions')).toBeInTheDocument();
@@ -85,7 +85,7 @@ describe('Send To Patient Demo', () => {
     await userEvent.click(screen.getByText('Amazon Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
 
-    await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
+    await waitFor(() => screen.findByText('Order placed'), { timeout: 2500 });
     expect(await screen.findByText('Amazon Pharmacy')).toBeInTheDocument();
   }, 10_000);
 });
