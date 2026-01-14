@@ -9,28 +9,42 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "npx graphql-codegen"
+        "command": "env-cmd -f .env.boson npx graphql-codegen"
       }
     },
     "codegen:tau": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "GQL_SCHEMA_URL='http://patient-api.tau.health:8080' npx graphql-codegen"
+        "command": "env-cmd -f .env.tau npx graphql-codegen"
+      }
+    },
+    "codegen:neutron": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "env-cmd -f .env.neutron npx graphql-codegen"
+      }
+    },
+    "codegen:photon": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "env-cmd -f .env.photon npx graphql-codegen"
       }
     },
     "codegen:watch": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "npx graphql-codegen --watch"
+        "command": "env-cmd -f .env.boson npx graphql-codegen --watch"
       }
     },
     "codegen:tau:watch": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",
-        "command": "GQL_SCHEMA_URL='http://patient-api.tau.health:8080' npx graphql-codegen --watch"
+        "command": "env-cmd -f .env.tau npx graphql-codegen --watch"
       }
     },
     "start": {
@@ -118,6 +132,22 @@
         "command": "npx tsc --noEmit"
       },
       "dependsOn": ["codegen"]
+    },
+    "tsc:neutron": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "npx tsc --noEmit"
+      },
+      "dependsOn": ["codegen:neutron"]
+    },
+    "tsc:photon": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "command": "npx tsc --noEmit"
+      },
+      "dependsOn": ["codegen:photon"]
     }
   }
 }
