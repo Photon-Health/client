@@ -5,11 +5,55 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
+    "codegen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "npx graphql-codegen"
+      }
+    },
+    "codegen:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "GQL_SCHEMA_URL='http://clinical-api.tau.health:8080' npx graphql-codegen"
+      }
+    },
+    "codegen:watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "npx graphql-codegen --watch"
+      }
+    },
+    "codegen:tau:watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "GQL_SCHEMA_URL='http://clinical-api.tau.health:8080' npx graphql-codegen --watch"
+      }
+    },
     "start": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
         "command": "env-cmd -f .env.boson react-app-rewired start"
+      },
+      "dependsOn": ["^build"]
+    },
+    "start:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "env-cmd -f .env.tau react-app-rewired start"
+      },
+      "dependsOn": ["^build"]
+    },
+    "start:neutron": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "env-cmd -f .env.neutron react-app-rewired start"
       },
       "dependsOn": ["^build"]
     },
@@ -24,22 +68,6 @@
       },
       "dependsOn": ["^build"]
     },
-    "start:neutron": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/app",
-        "command": "env-cmd -f .env.neutron react-app-rewired start"
-      },
-      "dependsOn": ["^build"]
-    },
-    "start:tau": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/app",
-        "command": "env-cmd -f .env.tau react-app-rewired start"
-      },
-      "dependsOn": ["^build"]
-    },
     "dev:tau": {
       "executor": "nx:run-commands",
       "options": {
@@ -50,34 +78,6 @@
         ]
       },
       "dependsOn": ["^build"]
-    },
-    "codegen": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/app",
-        "command": "npx graphql-codegen"
-      }
-    },
-    "codegen:watch": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/app",
-        "command": "npx graphql-codegen --watch"
-      }
-    },
-    "codegen:tau": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/app",
-        "command": "GQL_SCHEMA_URL='http://clinical-api.tau.health:8080' npx graphql-codegen"
-      }
-    },
-    "codegen:tau:watch": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/app",
-        "command": "GQL_SCHEMA_URL='http://clinical-api.tau.health:8080' npx graphql-codegen --watch"
-      }
     },
     "build:boson": {
       "executor": "nx:run-commands",
@@ -153,7 +153,8 @@
       "options": {
         "cwd": "apps/app",
         "command": "npx tsc --noEmit"
-      }
+      },
+      "dependsOn": ["codegen"]
     }
   }
 }
