@@ -4,25 +4,27 @@
 
 ### Default setup
 
-> Starts the clinical app dev server with hot refresh and codegen to monitor schema changes. Files in `app` dependencies will automatically rebuild, but you'll need to manually refresh the webpage to see your changes.
+Starts the clinical app dev server with hot refresh and codegen to generate types for any new queries/mutations. Files in `app` dependencies will automatically rebuild, but you'll need to manually refresh the webpage to see your changes.
 
 `npm run app`
 
 ### Run against Boson services
 
-> Runs against remote Boson environment services
+Run against remote Boson environment services
 
 `npx nx run app:start`
 
 ### Run against local "Tau" services
 
-> Must be running [tau services](https://github.com/Photon-Health/services) locally
+Must be running [tau services](https://github.com/Photon-Health/services) locally
 
 `npx nx run app:start:tau`
 
-### Graphql Codegen
+### Update GraphQL schema types
 
-`npx graphql-codegen --config='apps/app/codegen.ts'`
+The codegen watch command doesn't automatically detect updates in the backend `services` schema. You'll need to run codegen to generate new types for any changes.
+
+`npx nx run app:codegen:tau`
 
 ### Playwright e2e Tests
 
