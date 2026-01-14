@@ -9,7 +9,6 @@ export const demoOffers: Offer[] = [
     costAmountTitle: 'Prime Rx Price',
     retailAmount: 100,
     retailAmountTitle: 'Retail Price',
-    pharmacyId: 'phr_demoAmazon',
-    pharmacyName: 'Amazon Pharmacy'
+    pharmacy: { id: 'phr_demoAmazon', name: 'Amazon Pharmacy', fulfillmentTypes: ['MAIL_ORDER'] }
   }
 ];

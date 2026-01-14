@@ -3,6 +3,7 @@ import { afterEach, describe, expect, vi } from 'vitest';
 import { createMemoryRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from './Routes';
+import { triggerDemoNotification } from './api';
 
 vi.mock('./api', () => ({
   geocode: vi.fn().mockResolvedValue({
@@ -29,7 +30,7 @@ describe('Send To Patient Demo', () => {
     vi.clearAllMocks();
   });
 
-  test('navigates from review > pharmacy > readyBy > status', async () => {
+  test('allows pickup pharmacy selection', async () => {
     renderDemoApp();
 
     expect(await screen.findByText('Review your prescriptions')).toBeInTheDocument();
@@ -62,7 +63,15 @@ describe('Send To Patient Demo', () => {
     await userEvent.click(screen.getByText('Capsule Pharmacy'));
     await userEvent.click(screen.getByText('Place Order'));
 
-    await waitFor(() => screen.findByText('Order placed'), { timeout: 2500 });
+    await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
+
+    expect(triggerDemoNotification).toHaveBeenCalledWith(
+      '8005551212',
+      'photon:order:placed',
+      'Capsule Pharmacy',
+      undefined
+    );
+
     expect(await screen.findByText('Capsule Pharmacy')).toBeInTheDocument();
   }, 10_000);
 
@@ -76,7 +85,7 @@ describe('Send To Patient Demo', () => {
     await userEvent.click(screen.getByText('Amazon Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
 
-    await waitFor(() => screen.findByText('Order placed'), { timeout: 2500 });
+    await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
     expect(await screen.findByText('Amazon Pharmacy')).toBeInTheDocument();
   }, 10_000);
 });

@@ -3,6 +3,7 @@ import { SlideFade } from '@chakra-ui/react';
 import { BrandedPharmacyCard } from './BrandedPharmacyCard';
 import { OfferImpressionTracker } from '../../utils/tracking/OfferImpressionTracker';
 import { getPharmacy } from '../../views/pharmacy.utils';
+import { FulfillmentType } from '../../__generated__/graphql';
 
 interface Props {
   options: string[];
@@ -22,8 +23,11 @@ export interface Offer {
   costAmountTitle?: string;
   retailAmount?: number;
   retailAmountTitle?: string;
-  pharmacyId?: string;
-  pharmacyName?: string;
+  pharmacy: {
+    id: string;
+    name: string;
+    fulfillmentTypes: FulfillmentType[];
+  };
   tags: string[];
 }
 

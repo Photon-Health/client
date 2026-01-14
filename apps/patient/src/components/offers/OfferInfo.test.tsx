@@ -18,8 +18,11 @@ describe('OfferInfo', () => {
   };
 
   const baseOffer: Offer = {
-    pharmacyId: 'test-pharmacy-id',
-    pharmacyName: 'Test Pharmacy',
+    pharmacy: {
+      id: 'test-pharmacy-id',
+      name: 'Test Pharmacy',
+      fulfillmentTypes: ['MAIL_ORDER']
+    },
     deliveryEstimate: 'Delivers in 2-3 days',
     costType: 'INSURANCE_ESTIMATE',
     costAmount: 25.99,

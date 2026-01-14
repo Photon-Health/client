@@ -69,15 +69,7 @@ const COSTCO_PHARMACY_RADIUS = 30; // miles
 const WALGREENS_PHARMACY_RADIUS = 15; // miles
 
 function isMailOrderPharmacy(pharmacy: EnrichedPharmacy): boolean {
-  const pharmacyId = pharmacy.id;
-  const hasMailOrderFulfillment = pharmacy.fulfillmentTypes?.includes('MAIL_ORDER');
-
-  return (
-    hasMailOrderFulfillment ||
-    pharmacyId === process.env.REACT_APP_AMAZON_PHARMACY_ID ||
-    pharmacyId === process.env.REACT_APP_NOVOCARE_PHARMACY_ID ||
-    pharmacyId === 'SUPER_TEST_MAIL_ORDER_PHARMACY'
-  );
+  return !!pharmacy.fulfillmentTypes?.includes('MAIL_ORDER');
 }
 
 export const Pharmacy = () => {
@@ -619,8 +611,9 @@ export const Pharmacy = () => {
     // because offers aren't actually pharmacies
     // we'll transform them into things that resemble pharamcy objects
     const pharmaciesFromOffers = (filteredOffers || []).map((o) => ({
-      id: o.pharmacyId ?? 'unknown pharmacy offer id',
-      name: o.pharmacyName ?? 'unknown pharmacy offer name',
+      id: o.pharmacy.id,
+      name: o.pharmacy.name,
+      fulfillmentTypes: o.pharmacy.fulfillmentTypes,
       price: o.costAmount ?? 0,
       retailPrice: o.retailAmount ?? 0
     }));
@@ -682,7 +675,7 @@ export const Pharmacy = () => {
     }
     setSubmitting(true);
 
-    const selectedOffer = filteredOffers?.find((o) => o.pharmacyId === selectedPharmacy.id);
+    const selectedOffer = filteredOffers?.find((o) => o.pharmacy.id === selectedPharmacy.id);
     const isMailOrder = isMailOrderPharmacy(selectedPharmacy);
 
     patientAnalytics.track('Pharmacy Selection Submitted', order, {
@@ -704,8 +697,9 @@ export const Pharmacy = () => {
     // because offers aren't actually pharmacies
     // we'll transform them into things that resemble pharamcy objects
     const pharmaciesFromOffers = (filteredOffers || []).map((o) => ({
-      id: o.pharmacyId ?? 'unknown pharmacy offer id',
-      name: o.pharmacyName ?? 'unknown pharmacy offer name',
+      id: o.pharmacy.id,
+      name: o.pharmacy.name,
+      fulfillmentTypes: o.pharmacy.fulfillmentTypes,
       price: o.costAmount ?? 0,
       retailPrice: o.retailAmount ?? 0
     }));
@@ -962,7 +956,7 @@ export const Pharmacy = () => {
 
       const offersArray =
         filteredOffers?.map((o) => ({
-          id: o.pharmacyId
+          id: o.pharmacy.id
         })) || [];
 
       patientAnalytics.track('Offer Selected', order, {
@@ -1031,7 +1025,7 @@ export const Pharmacy = () => {
       ? [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]
       : []),
     ...(enableMailOrder ? mailOrderPharmacies : [])
-  ]).filter((id) => !filteredOffers?.map((offer) => offer.pharmacyId).includes(id));
+  ]).filter((id) => !filteredOffers?.map((offer) => offer.pharmacy.id).includes(id));
   // filter out any branded options that are in the offers list
 
   const showBrandedOptionsHeader =
@@ -1219,8 +1213,9 @@ export const Pharmacy = () => {
               // because offers aren't actually pharmacies
               // we'll transform them into things that resemble pharamcy objects
               const pharmaciesFromOffers = (filteredOffers || []).map((o) => ({
-                id: o.pharmacyId ?? 'unknown pharmacy offer id',
-                name: o.pharmacyName ?? 'unknown pharmacy offer name',
+                id: o.pharmacy.id,
+                name: o.pharmacy.name,
+                fulfillmentTypes: o.pharmacy.fulfillmentTypes,
                 price: o.costAmount ?? 0,
                 retailPrice: o.retailAmount ?? 0
               }));
