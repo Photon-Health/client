@@ -245,9 +245,6 @@ export const Pharmacy = () => {
 
     const novocareOffer = offers?.find((offer) => offer.costType == 'NOVOCARE_OFFER');
 
-    // we're not ready to share price yet
-    // so we're forcibly nulling out the costas
-    // so the price won't be shown
     let amazonPharmacyOverride;
 
     const filteringOffers = [];
@@ -275,7 +272,6 @@ export const Pharmacy = () => {
 
     if (JSON.stringify(newBrandedOptionsOverride) !== JSON.stringify(brandedOptionsOverride)) {
       setBrandedOptionsOverride(newBrandedOptionsOverride);
-      console.log('setFilteredOffers: ', { filteringOffers });
       setFilteredOffers(filteringOffers);
     }
   }, [enablePrice, offers, order, brandedOptionsOverride]);
@@ -871,7 +867,6 @@ export const Pharmacy = () => {
     setShowFooter(false);
 
     // Add selected pharmacy to order context so /status shows pharmacy on render
-    // const selectedPharmacy = allPharmacies.find((p) => p.id === selectedId)!;
     setOrder({ ...order, pharmacy: selectedPharmacy });
 
     // Send order placed sms to demo participant
@@ -1048,13 +1043,12 @@ export const Pharmacy = () => {
     showBrandedOptionsHeader ||
     (filteredOffers || []).length > 0;
 
-  console.log({ enableMailOrder, showOffers });
-
   const showBrandedOptions =
-    enableCourier ||
-    enableMailOrder ||
-    brandedOptionsOverride !== undefined ||
-    showBrandedOptionsHeader;
+    !isDemo &&
+    (enableCourier ||
+      enableMailOrder ||
+      brandedOptionsOverride !== undefined ||
+      showBrandedOptionsHeader);
 
   const showPickupHeading =
     (enableCourier || enableMailOrder || brandedOptionsOverride !== undefined) ?? false;

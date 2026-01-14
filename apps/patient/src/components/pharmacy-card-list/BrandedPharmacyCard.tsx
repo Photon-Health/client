@@ -21,6 +21,11 @@ interface Props {
 }
 
 export const PHARMACY_BRANDING = {
+  ['phr_demoAmazon']: {
+    logo: amazonPharmacyLogo,
+    name: 'Amazon Pharmacy',
+    description: 'Delivers in 2-5 days'
+  },
   [process.env.REACT_APP_AMAZON_PHARMACY_ID as string]: {
     logo: amazonPharmacyLogo,
     name: 'Amazon Pharmacy',

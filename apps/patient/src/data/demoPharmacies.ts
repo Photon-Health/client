@@ -16,7 +16,8 @@ export const demoPharmacies: EnrichedPharmacy[] = [
     isOpen: true,
     closes: 'Closes 4:30PM',
     opens: 'Opens 9AM Sat',
-    is24Hr: false
+    is24Hr: false,
+    fulfillmentTypes: ['PICK_UP']
   },
   {
     id: 'as4563456dfsafasdf',
@@ -32,7 +33,8 @@ export const demoPharmacies: EnrichedPharmacy[] = [
     isOpen: false,
     closes: 'Closes 7PM',
     opens: 'Opens 9AM Sat',
-    is24Hr: false
+    is24Hr: false,
+    fulfillmentTypes: ['PICK_UP']
   },
   {
     id: 'asdfsa2435236fasdf',
@@ -48,7 +50,8 @@ export const demoPharmacies: EnrichedPharmacy[] = [
     isOpen: true,
     closes: '',
     opens: '',
-    is24Hr: true
+    is24Hr: true,
+    fulfillmentTypes: ['PICK_UP']
   },
   {
     id: 'as324gfdsf5236fasdf',
@@ -64,7 +67,8 @@ export const demoPharmacies: EnrichedPharmacy[] = [
     isOpen: true,
     closes: 'Closes 6PM',
     opens: 'Opens 9AM Tue',
-    is24Hr: false
+    is24Hr: false,
+    fulfillmentTypes: ['PICK_UP']
   },
   {
     id: 'as324gf6h5ehgrgsdf',
@@ -80,7 +84,8 @@ export const demoPharmacies: EnrichedPharmacy[] = [
     isOpen: true,
     closes: '',
     opens: '',
-    is24Hr: true
+    is24Hr: true,
+    fulfillmentTypes: ['PICK_UP']
   },
   {
     id: 'as324gf6h6g45wgrfwefrgsdf',
@@ -96,7 +101,8 @@ export const demoPharmacies: EnrichedPharmacy[] = [
     isOpen: true,
     closes: 'Closes 4:30PM',
     opens: 'Opens 9AM Sat',
-    is24Hr: false
+    is24Hr: false,
+    fulfillmentTypes: ['PICK_UP']
   },
   {
     id: 'as324gf65j5hgersdf',
@@ -112,7 +118,8 @@ export const demoPharmacies: EnrichedPharmacy[] = [
     isOpen: true,
     closes: 'Closes 4:30PM',
     opens: 'Opens 9AM Sat',
-    is24Hr: false
+    is24Hr: false,
+    fulfillmentTypes: ['PICK_UP']
   },
   {
     id: 'a328798frfafgf',
@@ -128,7 +135,8 @@ export const demoPharmacies: EnrichedPharmacy[] = [
     isOpen: false,
     closes: 'Closes 4:30PM',
     opens: 'Opens 9AM Sat',
-    is24Hr: false
+    is24Hr: false,
+    fulfillmentTypes: ['PICK_UP']
   },
   {
     id: 'a32843y6hgwrgwrtgwgf',
@@ -144,7 +152,8 @@ export const demoPharmacies: EnrichedPharmacy[] = [
     isOpen: true,
     closes: '',
     opens: '',
-    is24Hr: true
+    is24Hr: true,
+    fulfillmentTypes: ['PICK_UP']
   },
   {
     id: 'a3284334t54gdgdfwrtgwgf',
@@ -160,17 +169,12 @@ export const demoPharmacies: EnrichedPharmacy[] = [
     isOpen: true,
     closes: 'Closes 4:30PM',
     opens: 'Opens 9AM Sat',
-    is24Hr: false
+    is24Hr: false,
+    fulfillmentTypes: ['PICK_UP']
   }
 ];
 
 export const demoMailOrderPharmacies: GetPharmaciesQuery['pharmacies'] = [
-  {
-    id: 'phr_demoAmazon',
-    name: 'Amazon Pharmacy',
-    fulfillmentTypes: ['MAIL_ORDER'],
-    logo: 'https://logos.photon.health/amazon_pharmacy_logo_small_circle.png'
-  },
   {
     id: 'phr_demoCapsule',
     name: 'Capsule Pharmacy',

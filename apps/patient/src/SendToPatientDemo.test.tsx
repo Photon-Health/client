@@ -59,11 +59,11 @@ describe('Send To Patient Demo', () => {
     expect(screen.getByText('Home Delivery')).toBeInTheDocument();
     await userEvent.click(screen.getByText('See all mail orders'));
 
-    await userEvent.click(screen.getByText('Amazon Pharmacy'));
+    await userEvent.click(screen.getByText('Capsule Pharmacy'));
     await userEvent.click(screen.getByText('Place Order'));
 
     await waitFor(() => screen.findByText('Order placed'), { timeout: 2500 });
-    expect(await screen.findByText('Amazon Pharmacy')).toBeInTheDocument();
+    expect(await screen.findByText('Capsule Pharmacy')).toBeInTheDocument();
   }, 10_000);
 
   test('allows Offer-based pharmacy selection (i.e. Amazon)', async () => {
