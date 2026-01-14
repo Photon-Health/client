@@ -40,7 +40,7 @@
         "command": "env-cmd -f .env.boson npx graphql-codegen --watch"
       }
     },
-    "codegen:tau:watch": {
+    "codegen:watch:tau": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/patient",

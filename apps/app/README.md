@@ -6,7 +6,7 @@
 
 > Starts the clinical app dev server with hot refresh and codegen to monitor schema changes. Files in `app` dependencies will automatically rebuild, but you'll need to manually refresh the webpage to see your changes.
 
-`npm run app:local`
+`npm run app`
 
 ### Run against Boson services
 
