@@ -22,7 +22,7 @@ import { useMemo, useState } from 'react';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
 import { formatAddress, formatPrice, titleCase } from '../utils/formatters';
 import { getFulfillmentTrackingLink } from '../utils/fulfillmentsHelpers';
-import { Offer, BrandedOptionOverrides } from './pharmacy-card-list/BrandedOptions';
+import { BrandedOptionOverrides } from './pharmacy-card-list';
 
 dayjs.extend(customParseFormat);
 
@@ -222,7 +222,12 @@ const DistanceAddress = ({
   );
 };
 
-const CostWidget = ({ costAmount, costType }: Offer) => {
+type CostWidgetProps = {
+  costAmount?: number;
+  costType?: string;
+};
+
+const CostWidget = ({ costAmount, costType }: CostWidgetProps) => {
   if (costAmount == 0 || !costAmount) {
     return null;
   }
@@ -339,7 +344,6 @@ export const PharmacyInfo = ({
           <CostWidget
             costAmount={brandedOptionOverride?.amazonPharmacyOverride?.costAmount}
             costType={brandedOptionOverride?.amazonPharmacyOverride?.costType}
-            tags={brandedOptionOverride?.amazonPharmacyOverride?.tags ?? []}
           />
         ) : null}
       </HStack>

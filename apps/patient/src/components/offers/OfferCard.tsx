@@ -1,8 +1,7 @@
 import { Card, CardBody } from '@chakra-ui/react';
 
-import { PHARMACY_BRANDING } from '../pharmacy-card-list';
+import { Offer, PHARMACY_BRANDING } from '../pharmacy-card-list';
 import { OfferInfo } from './OfferInfo';
-import { Offer } from '../pharmacy-card-list';
 
 interface Props {
   offer: Offer;
@@ -24,7 +23,7 @@ export const OfferCard = ({
 
   const pharmacy = {
     id: pharmacyId,
-    name: offer.pharmacyName ? offer.pharmacyName : brand?.name ?? '',
+    name: offer.pharmacy.name,
     logo: brand?.logo ? brand.logo : ''
   };
 
