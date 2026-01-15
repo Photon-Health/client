@@ -82,7 +82,7 @@ export const Main = () => {
   const [order, setOrder] = useState<Order | undefined>(isDemo ? demoOrder : undefined);
   // This is used to track whether the patient has enabled price on the pharmacy page
   const [showPriceToggle, setShowPriceToggle] = useState<boolean>(false);
-  const [enablePrice, setEnablePrice] = useState<boolean>(false);
+  const [enablePrice, setEnablePrice] = useState<boolean>(!!isDemo);
 
   const [logo, setLogo] = useState<any>(undefined);
   const [loadingLogo, setLoadingLogo] = useState(true);
@@ -274,9 +274,7 @@ export const Main = () => {
   // Set logo
   useEffect(() => {
     if (orgId) {
-      if (isDemo) {
-        fetchLogo('newco_logo.svg');
-      } else if (settings?.brandLogo) {
+      if (settings?.brandLogo) {
         fetchLogo(settings.brandLogo);
       } else {
         setLoadingLogo(false);

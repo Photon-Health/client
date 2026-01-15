@@ -60,7 +60,6 @@ vi.mock('./components', async () => {
     PoweredBy: () => <div data-testid="powered-by">Powered By</div>,
     Nav: () => <div>Nav</div>,
     PrescriptionsList: () => <div>PrescriptionsList</div>,
-    DemoCtaModal: () => <div data-testid="demo-cta-modal">Demo Cta Modal</div>,
     PharmacyInfo: () => <div data-testid="pharmacy-info">Pharmacy Info</div>
   };
 });
@@ -130,7 +129,8 @@ describe('App', () => {
           id: 'SUPER_TEST_MAIL_ORDER_PHARMACY',
           name: 'Test Mail Order Pharmacy',
           price: 101,
-          retailPrice: 1000
+          retailPrice: 1000,
+          fulfillmentTypes: ['MAIL_ORDER']
         })
       ]
     });

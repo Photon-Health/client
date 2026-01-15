@@ -89,7 +89,7 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
               </Box>
             ) : null}
             <Text data-testid="pharmacy-info-name" fontSize="md" fontWeight={'medium'}>
-              {offer.pharmacyName}
+              {offer.pharmacy.name}
             </Text>
           </HStack>
         </VStack>
