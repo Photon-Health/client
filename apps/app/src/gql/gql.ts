@@ -23,8 +23,7 @@ type Documents = {
     "\n  query ClientsDeveloperTabQuery {\n    clients {\n      id\n      ...ClientInfoCardFragment\n    }\n  }\n": typeof types.ClientsDeveloperTabQueryDocument,
     "\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n": typeof types.RotateSecretDocument,
     "\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!, $connections: [String!]!) {\n    updateClient(\n      clientId: $clientId\n      whiteListedUrls: $whiteListedUrls\n      connections: $connections\n    ) {\n      id\n    }\n  }\n": typeof types.UpdateClientDocument,
-    "\n  fragment InviteFormFragment on Invite {\n    id\n    invitee\n    inviter\n    expires_at\n  }\n": typeof types.InviteFormFragmentFragmentDoc,
-    "\n  query UserInviteFormQuery {\n    me {\n      id\n      name {\n        full\n      }\n    }\n  }\n": typeof types.UserInviteFormQueryDocument,
+    "\n  query FaxPreferenceQuery {\n    organization {\n      settings {\n        contact {\n          rxPdf {\n            fromFaxPreference\n          }\n        }\n      }\n    }\n  }\n": typeof types.FaxPreferenceQueryDocument,
     "\n  mutation InviteUser($email: String!, $roles: [String!]!, $provider: ProviderInput) {\n    inviteUser(email: $email, roles: $roles, provider: $provider) {\n      id\n    }\n  }\n": typeof types.InviteUserDocument,
     "\n  fragment InviteFragment on Invite {\n    id\n    invitee\n    inviter\n    expired\n    expires_at\n  }\n": typeof types.InviteFragmentFragmentDoc,
     "\n  mutation ResendInvite($inviteId: ID!) {\n    resendInvite(inviteId: $inviteId) {\n      id\n    }\n  }\n": typeof types.ResendInviteDocument,
@@ -62,8 +61,7 @@ const documents: Documents = {
     "\n  query ClientsDeveloperTabQuery {\n    clients {\n      id\n      ...ClientInfoCardFragment\n    }\n  }\n": types.ClientsDeveloperTabQueryDocument,
     "\n  mutation RotateSecret($clientId: ID!) {\n    rotateClientSecret(clientId: $clientId) {\n      id\n    }\n  }\n": types.RotateSecretDocument,
     "\n  mutation UpdateClient($clientId: ID!, $whiteListedUrls: [String!]!, $connections: [String!]!) {\n    updateClient(\n      clientId: $clientId\n      whiteListedUrls: $whiteListedUrls\n      connections: $connections\n    ) {\n      id\n    }\n  }\n": types.UpdateClientDocument,
-    "\n  fragment InviteFormFragment on Invite {\n    id\n    invitee\n    inviter\n    expires_at\n  }\n": types.InviteFormFragmentFragmentDoc,
-    "\n  query UserInviteFormQuery {\n    me {\n      id\n      name {\n        full\n      }\n    }\n  }\n": types.UserInviteFormQueryDocument,
+    "\n  query FaxPreferenceQuery {\n    organization {\n      settings {\n        contact {\n          rxPdf {\n            fromFaxPreference\n          }\n        }\n      }\n    }\n  }\n": types.FaxPreferenceQueryDocument,
     "\n  mutation InviteUser($email: String!, $roles: [String!]!, $provider: ProviderInput) {\n    inviteUser(email: $email, roles: $roles, provider: $provider) {\n      id\n    }\n  }\n": types.InviteUserDocument,
     "\n  fragment InviteFragment on Invite {\n    id\n    invitee\n    inviter\n    expired\n    expires_at\n  }\n": types.InviteFragmentFragmentDoc,
     "\n  mutation ResendInvite($inviteId: ID!) {\n    resendInvite(inviteId: $inviteId) {\n      id\n    }\n  }\n": types.ResendInviteDocument,
@@ -145,11 +143,7 @@ export function graphql(source: "\n  mutation UpdateClient($clientId: ID!, $whit
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment InviteFormFragment on Invite {\n    id\n    invitee\n    inviter\n    expires_at\n  }\n"): (typeof documents)["\n  fragment InviteFormFragment on Invite {\n    id\n    invitee\n    inviter\n    expires_at\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  query UserInviteFormQuery {\n    me {\n      id\n      name {\n        full\n      }\n    }\n  }\n"): (typeof documents)["\n  query UserInviteFormQuery {\n    me {\n      id\n      name {\n        full\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  query FaxPreferenceQuery {\n    organization {\n      settings {\n        contact {\n          rxPdf {\n            fromFaxPreference\n          }\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query FaxPreferenceQuery {\n    organization {\n      settings {\n        contact {\n          rxPdf {\n            fromFaxPreference\n          }\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
