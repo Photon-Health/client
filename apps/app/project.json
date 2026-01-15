@@ -53,7 +53,7 @@
         "cwd": "apps/app",
         "command": "env-cmd -f .env.boson react-app-rewired start"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen"]
     },
     "start:tau": {
       "executor": "nx:run-commands",
@@ -61,7 +61,7 @@
         "cwd": "apps/app",
         "command": "env-cmd -f .env.tau react-app-rewired start"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen:tau"]
     },
     "start:neutron": {
       "executor": "nx:run-commands",
@@ -69,7 +69,7 @@
         "cwd": "apps/app",
         "command": "env-cmd -f .env.neutron react-app-rewired start"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen:neutron"]
     },
     "dev": {
       "executor": "nx:run-commands",
@@ -80,7 +80,7 @@
           "nx watch --projects=app --includeDependentProjects -- nx affected -t build --uncommitted=true --exclude=app"
         ]
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen"]
     },
     "dev:tau": {
       "executor": "nx:run-commands",
@@ -91,7 +91,7 @@
           "nx watch --projects=app --includeDependentProjects -- nx affected -t build --uncommitted=true --exclude=app"
         ]
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen:tau"]
     },
     "build:boson": {
       "executor": "nx:run-commands",
