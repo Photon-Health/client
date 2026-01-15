@@ -1,7 +1,6 @@
 name: 'Chromatic'
 
 on:
-  push:
   pull_request:
     branches: [neutron, photon]
 
