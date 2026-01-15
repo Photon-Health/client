@@ -129,7 +129,8 @@ describe('App', () => {
           id: 'SUPER_TEST_MAIL_ORDER_PHARMACY',
           name: 'Test Mail Order Pharmacy',
           price: 101,
-          retailPrice: 1000
+          retailPrice: 1000,
+          fulfillmentTypes: ['MAIL_ORDER']
         })
       ]
     });

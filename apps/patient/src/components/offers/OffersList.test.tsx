@@ -21,7 +21,7 @@ vi.mock('./OfferCard', () => ({
       onClick={() => handleSelect(pharmacyId, offer)}
     >
       <div data-testid="pharmacy-info">
-        <div data-testid="pharmacy-info-name">{offer.pharmacyName}</div>
+        <div data-testid="pharmacy-info-name">{offer.pharmacy.name}</div>
         <div>{offer.deliveryEstimate}</div>
         {offer.costAmount && <div>${offer.costAmount}</div>}
         {offer.tags?.map((tag: string) => (
@@ -37,8 +37,11 @@ vi.mock('./OfferCard', () => ({
 describe('OffersList', () => {
   const mockOffers: Offer[] = [
     {
-      pharmacyId: 'amazon-pharmacy',
-      pharmacyName: 'Amazon Pharmacy',
+      pharmacy: {
+        id: 'amazon-pharmacy',
+        name: 'Amazon Pharmacy',
+        fulfillmentTypes: ['MAIL_ORDER']
+      },
       deliveryEstimate: 'Delivers in 2-3 days',
       costType: 'INSURANCE_ESTIMATE',
       costAmount: 25.99,
@@ -48,8 +51,11 @@ describe('OffersList', () => {
       tags: ['In Stock', 'Free Shipping']
     },
     {
-      pharmacyId: 'novocare-pharmacy',
-      pharmacyName: 'Novocare',
+      pharmacy: {
+        id: 'novocare-pharmacy',
+        name: 'Novocare',
+        fulfillmentTypes: ['MAIL_ORDER']
+      },
       deliveryEstimate: 'Delivers in 3-5 days',
       costType: 'NOVOCARE_OFFER',
       tags: ['Special Offer']
@@ -138,23 +144,6 @@ describe('OffersList', () => {
 
     expect(screen.queryByTestId('offer-card-amazon-pharmacy')).not.toBeInTheDocument();
     expect(screen.queryByTestId('offer-card-novocare-pharmacy')).not.toBeInTheDocument();
-  });
-
-  test('handles offers with missing pharmacy information', () => {
-    const offersWithMissingInfo: Offer[] = [
-      {
-        pharmacyId: undefined,
-        pharmacyName: undefined,
-        deliveryEstimate: 'Delivers in 2-3 days',
-        costType: 'INSURANCE_ESTIMATE',
-        tags: ['Test']
-      }
-    ];
-
-    render(<OffersList {...defaultProps} offers={offersWithMissingInfo} />);
-
-    // Should still render the card with fallback values
-    expect(screen.getByTestId('pharmacy-info-name')).toBeInTheDocument();
   });
 
   test('passes correct props to OfferCard components', () => {
