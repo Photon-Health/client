@@ -1,4 +1,4 @@
-import { Offer } from '../components/pharmacy-card-list';
+import { Offer, PHARMACY_BRANDING } from '../components/pharmacy-card-list';
 
 export const demoOffers: Offer[] = [
   {
@@ -9,6 +9,11 @@ export const demoOffers: Offer[] = [
     costAmountTitle: 'Prime Rx Price',
     retailAmount: 100,
     retailAmountTitle: 'Retail Price',
-    pharmacy: { id: 'phr_demoAmazon', name: 'Amazon Pharmacy', fulfillmentTypes: ['MAIL_ORDER'] }
+    pharmacy: {
+      id: 'phr_demoAmazon',
+      name: 'Amazon Pharmacy',
+      fulfillmentTypes: ['MAIL_ORDER'],
+      logo: PHARMACY_BRANDING['phr_demoAmazon'].logo
+    }
   }
 ];

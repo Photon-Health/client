@@ -614,6 +614,7 @@ export const Pharmacy = () => {
       id: o.pharmacy.id,
       name: o.pharmacy.name,
       fulfillmentTypes: o.pharmacy.fulfillmentTypes,
+      logo: o.pharmacy.logo,
       price: o.costAmount ?? 0,
       retailPrice: o.retailAmount ?? 0
     }));
@@ -700,6 +701,7 @@ export const Pharmacy = () => {
       id: o.pharmacy.id,
       name: o.pharmacy.name,
       fulfillmentTypes: o.pharmacy.fulfillmentTypes,
+      logo: o.pharmacy.logo,
       price: o.costAmount ?? 0,
       retailPrice: o.retailAmount ?? 0
     }));
@@ -1213,6 +1215,7 @@ export const Pharmacy = () => {
                 id: o.pharmacy.id,
                 name: o.pharmacy.name,
                 fulfillmentTypes: o.pharmacy.fulfillmentTypes,
+                logo: o.pharmacy.logo,
                 price: o.costAmount ?? 0,
                 retailPrice: o.retailAmount ?? 0
               }));

@@ -27,6 +27,7 @@ export interface Offer {
     id: string;
     name: string;
     fulfillmentTypes: FulfillmentType[];
+    logo?: string;
   };
   tags: string[];
 }

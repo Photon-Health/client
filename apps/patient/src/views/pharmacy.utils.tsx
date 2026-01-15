@@ -1,5 +1,5 @@
 import { getOffers } from '../api';
-import { Offer } from '../components/pharmacy-card-list';
+import { Offer, PHARMACY_BRANDING } from '../components/pharmacy-card-list';
 import { EnrichedPharmacy, ExtendedFulfillmentType, Order } from '../utils/models';
 import { FulfillmentType, Pharmacy as PharmacyType } from '../__generated__/graphql';
 
@@ -43,7 +43,8 @@ export async function fetchOffers(order: Order): Promise<Offer[] | undefined> {
       pharmacy: {
         id: process.env.REACT_APP_AMAZON_PHARMACY_ID as string,
         name: 'Amazon Pharmacy',
-        fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[]
+        fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[],
+        logo: PHARMACY_BRANDING['phr_demoAmazon'].logo
       },
       tags: ['In Stock']
     }));
