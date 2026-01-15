@@ -36,7 +36,7 @@ export const organizationFormSchema = yup.object({
     street1: yup.string().required('Address is required'),
     street2: yup.string(),
     city: yup.string().required('City is required'),
-    state: yupStateSchema,
+    state: yup.object({ value: yupStateSchema.required('State is required') }),
     postalCode: yup
       .string()
       .required('Zip code is required')
