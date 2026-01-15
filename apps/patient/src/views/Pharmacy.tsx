@@ -691,7 +691,7 @@ export const Pharmacy = () => {
     });
 
     if (isDemo) {
-      handleDemoSubmit(selectedPharmacy);
+      await handleDemoSubmit(selectedPharmacy);
       return;
     }
 
