@@ -34,4 +34,4 @@ jobs:
         run: npx nx run-many --all --target=tsc
 
       - name: Run Type Check For Apps
-      - run: npx nx run-many --all --target=tsc:${{ github.event.pull_request.base.ref }}
+        run: npx nx run-many --all --target=tsc:${{ github.event.pull_request.base.ref }}
