@@ -2,7 +2,7 @@ name: Lint
 
 on:
   pull_request:
-    branches: [neutron, photon, boson]
+    branches: [neutron, photon]
 
 jobs:
   run-linters:

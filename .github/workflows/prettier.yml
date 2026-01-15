@@ -2,7 +2,7 @@ name: Prettier Check
 
 on:
   pull_request:
-    branches: [neutron, photon, boson]
+    branches: [neutron, photon]
 
 jobs:
   prettier:

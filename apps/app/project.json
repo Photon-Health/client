@@ -162,14 +162,6 @@
         "command": "npx eslint . --ext .tsx,.ts --fix && npx prettier --write src/**/*.{ts,tsx}"
       }
     },
-    "tsc:boson": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/app",
-        "command": "npx tsc --noEmit"
-      },
-      "dependsOn": ["codegen"]
-    },
     "tsc:neutron": {
       "executor": "nx:run-commands",
       "options": {
