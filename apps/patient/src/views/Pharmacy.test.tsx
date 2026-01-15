@@ -80,7 +80,6 @@ vi.mock('../components', async () => {
     PoweredBy: () => <div data-testid="powered-by">Powered By</div>,
     Nav: () => <div>Nav</div>,
     PrescriptionsList: () => <div>PrescriptionsList</div>,
-    DemoCtaModal: () => <div data-testid="demo-cta-modal">Demo Cta Modal</div>,
     PharmacyInfo: () => <div data-testid="pharmacy-info">Pharmacy Info</div>
   };
 });
@@ -107,8 +106,11 @@ describe('Pharmacy page', () => {
           costAmountTitle: 'Insurance Price',
           retailAmount: 150.0,
           retailAmountTitle: 'Retail',
-          pharmacyId: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
-          pharmacyName: 'Amazon Pharmacy',
+          pharmacy: {
+            id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
+            name: 'Amazon Pharmacy',
+            fulfillmentTypes: ['MAIL_ORDER']
+          },
           tags: ['In Stock', 'Free Shipping']
         },
         {
@@ -118,8 +120,11 @@ describe('Pharmacy page', () => {
           costAmountTitle: 'Prime Rx Price',
           retailAmount: 120.0,
           retailAmountTitle: 'Retail',
-          pharmacyId: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
-          pharmacyName: 'Amazon Pharmacy',
+          pharmacy: {
+            id: 'phr_01GA9HPV5XYTC1NNX213VRRBZ3',
+            name: 'Amazon Pharmacy',
+            fulfillmentTypes: ['MAIL_ORDER']
+          },
           tags: ['Prime Member', 'Fast Delivery']
         }
       ]);

@@ -19,24 +19,24 @@ export const OffersList = ({
   return (
     <>
       {offers.map((offer, index) => (
-        <SlideFade offsetY="60px" in={true} key={`pharmacy-${offer.pharmacyId}`}>
+        <SlideFade offsetY="60px" in={true} key={`pharmacy-${offer.pharmacy.id}`}>
           <OfferImpressionTracker
-            key={offer.pharmacyId}
+            key={offer.pharmacy.id}
             pharmacy={{
-              id: offer.pharmacyId || 'Unknown Pharmacy ID',
-              name: offer.pharmacyName || 'Unknown Pharmacy Name'
+              id: offer.pharmacy.id,
+              name: offer.pharmacy.name
             }}
             ordinalPosition={index}
-            isAlreadySelected={selectedPharmacyId === offer.pharmacyId}
+            isAlreadySelected={selectedPharmacyId === offer.pharmacy.id}
             enabled={shouldTrackOfferImpressionsAndSelections}
           >
             <OfferCard
-              key={offer.pharmacyId}
+              key={offer.pharmacy.id}
               offer={offer}
-              pharmacyId={offer.pharmacyId || 'Unknown Pharmacy ID'}
+              pharmacyId={offer.pharmacy.id || 'Unknown Pharmacy ID'}
               isPharmacyFulfillingCurrentOrder={false}
-              selected={selectedPharmacyId === offer.pharmacyId}
-              isPreferred={preferredPharmacyId === offer.pharmacyId}
+              selected={selectedPharmacyId === offer.pharmacy.id}
+              isPreferred={preferredPharmacyId === offer.pharmacy.id}
               handleSelect={handleSelect}
             />
           </OfferImpressionTracker>

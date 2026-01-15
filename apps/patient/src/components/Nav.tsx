@@ -1,34 +1,25 @@
-import {
-  Alert,
-  Box,
-  Button,
-  Container,
-  HStack,
-  IconButton,
-  Image,
-  Link,
-  Spacer,
-  Text
-} from '@chakra-ui/react';
-import { FiRefreshCw } from 'react-icons/fi';
+import { Alert, Box, Button, Container, HStack, Image, Link, Spacer, Text } from '@chakra-ui/react';
 import { useSearchParams } from 'react-router-dom';
 import { text as t } from '../utils/text';
 import { useOrderContext } from '../views/Main';
 import { Logo as PhotonLogo } from './Logo';
 import { patientAnalytics } from '../configs/analytics';
 
-interface NavProps {
-  showRefresh?: boolean;
-}
-
-export const Nav = ({ showRefresh = false }: NavProps) => {
+export const Nav = () => {
   const [searchParams] = useSearchParams();
   const isDemo = searchParams.get('demo');
   const isProd = process.env.REACT_APP_ENV_NAME === 'photon';
 
   const { order, flattenedFills, logo, setFaqModalIsOpen } = useOrderContext();
 
-  const isMultiRx = flattenedFills.length > 1;
+  function getNavigationBannerTitle() {
+    if (isDemo) return t.demoTitle;
+
+    const isMultiRx = flattenedFills.length > 1;
+    return isMultiRx ? t.fakeRxs : t.fakeRx;
+  }
+
+  const showNavigationBanner = isDemo || !isProd;
 
   return (
     // If you're going to modify z-index here, just double-check that the readyBy buttons
@@ -41,19 +32,19 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
       borderWidth="2px"
       style={{ position: 'sticky', top: 0, zIndex: 2 }}
     >
-      {isDemo || !isProd ? (
+      {showNavigationBanner ? (
         <Alert status="info" variant="subtle" w="full" py={2}>
           <HStack spacing={1} mx="auto">
-            <Text fontSize="sm">{isMultiRx ? t.fakeRxs : t.fakeRx}</Text>
+            <Text fontSize="sm">{getNavigationBannerTitle()}</Text>
             <Link
               fontSize="sm"
               isExternal
-              href="https://www.photon.health/sign-up"
+              href="https://www.photon.health/"
               color="link"
               fontWeight="medium"
               textDecoration="underline"
             >
-              {t.tryPhoton}
+              {t.learnMore}
             </Link>
           </HStack>
         </Alert>
@@ -66,17 +57,6 @@ export const Nav = ({ showRefresh = false }: NavProps) => {
             <PhotonLogo />
           )}
           <Spacer />
-          {showRefresh ? (
-            <IconButton
-              variant="ghost"
-              aria-label="Refresh"
-              icon={<FiRefreshCw size="1.5em" />}
-              onClick={() => {
-                window.location.reload();
-              }}
-            />
-          ) : null}
-
           <Button
             colorScheme="gray"
             size="sm"
