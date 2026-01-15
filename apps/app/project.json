@@ -100,7 +100,7 @@
         "command": "env-cmd -f .env.boson react-app-rewired build",
         "outputs": "dist/apps/app"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen"]
     },
     "build:neutron": {
       "executor": "nx:run-commands",
@@ -109,7 +109,7 @@
         "command": "env-cmd -f .env.neutron react-app-rewired build",
         "outputs": "dist/apps/app"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen:neutron"]
     },
     "build:photon": {
       "executor": "nx:run-commands",
@@ -118,7 +118,7 @@
         "command": "env-cmd -f .env.photon react-app-rewired build",
         "outputs": "dist/apps/app"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen:photon"]
     },
     "test": {
       "executor": "nx:run-commands",
