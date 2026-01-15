@@ -56,15 +56,12 @@ const STATES = [
 import { Select, Props as SelectProps } from 'chakra-react-select';
 import * as yup from 'yup';
 
-export const yupStateSchema = yup.object({
-  value: yup
-    .string()
-    .required()
-    .matches(
-      /^(AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|PR|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY)$/,
-      { message: 'Please select a valid state' }
-    )
-});
+export const yupStateSchema = yup
+  .string()
+  .matches(
+    /^(AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|PR|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY)$/,
+    { message: 'Please select a valid state' }
+  );
 
 export interface FormikStateSelectProps extends SelectProps<{ value: string }, false> {
   value: { value: string } | undefined;

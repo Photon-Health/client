@@ -144,7 +144,6 @@ export const Profile = () => {
     email: user?.email ?? '',
     roles: mapAndSortRoles(user?.roles ?? []),
     phone: user?.phone ?? '',
-
     fax: user?.fax ?? '',
     npi: user?.npi ?? '',
     address: {
