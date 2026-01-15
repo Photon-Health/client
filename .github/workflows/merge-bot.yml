@@ -6,12 +6,12 @@ on:
       - labeled
       - synchronize
       - unlabeled
+    branches: [neutron, photon]
 
 jobs:
   merge:
     name: Merge
     runs-on: ubuntu-latest
-    if: ${{github.event.pull_request.base.ref == 'neutron' || github.event.pull_request.base.ref == 'photon'}}
     steps:
       - uses: actions/checkout@v2
         with:
