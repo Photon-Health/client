@@ -1,9 +1,8 @@
 name: Check Types
 
 on:
-  push:
   pull_request:
-    branches: [neutron, photon]
+    branches: [boson, neutron, photon]
 
 jobs:
   run-linters:
@@ -26,10 +25,12 @@ jobs:
       - name: Install Node.js dependencies
         run: npm ci
 
-
       - name: Build Packages
         run: |
           npx nx run-many --all --target=build
 
       - name: Run Type Check
         run: npx nx run-many --all --target=tsc
+
+      - name: Run Type Check For Apps
+        run: npx nx run-many --all --target=tsc:${{ github.event.pull_request.base.ref }}
