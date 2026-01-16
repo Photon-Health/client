@@ -30,6 +30,7 @@ const OfferImpressionTracker = ({
           ordinal_position: ordinalPosition,
           distance: pharmacy.distance,
           price: pharmacy.price,
+          retailPrice: pharmacy.retailPrice,
           showReadyIn30Min: pharmacy.showReadyIn30Min,
           is24Hr: pharmacy.is24Hr,
           isClosingSoon: pharmacy.isClosingSoon,
