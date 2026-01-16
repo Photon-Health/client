@@ -2,27 +2,41 @@
 
 ## Local Development
 
-### Run against Boson services with code refresh
+In local development, it is possible to run the client against your local "tau" environment, or the remote "boson" dev environment. npm commands and Nx targets without an environment name attached run against boson by default, since we currently cannot spin up the entire backend architecture in tau.
 
-Starts the clinical app dev server with hot refresh. Files in `app` dependencies will automatically rebuild, but you'll need to manually refresh the webpage to see your changes.
+### Default setup
 
-`npx nx run app:dev`
+Start the clinical app dev server with hot refresh and codegen to generate TS types for any new queries/mutations. Files in `app` dependencies will automatically rebuild, but you'll need to manually refresh the webpage to see your changes.
 
-### Run against Boson services
+```
+npm run app
 
-> Runs against remote Boson environment services
+npm run app:tau
+```
 
-`npx nx run app:start`
+### Update GraphQL schema types
 
-### Run against local "Tau" services
+The codegen watch command doesn't automatically detect updates in the backend services schema. You'll need to run codegen one-off to update types in the `client` repo.
 
-> Must be running [tau services](https://github.com/Photon-Health/services) locally
+If running locally, ensure [tau services](https://github.com/Photon-Health/services) is running first.
 
-`npx nx run app:start:tau`
+```
+npx nx run app:codegen
 
-### Graphql Codegen
+npx nx run app:codegen:tau
+```
 
-`npx graphql-codegen --config='apps/app/codegen.ts'`
+### Start
+
+Start the app
+
+If running locally, ensure [tau services](https://github.com/Photon-Health/services) is running first.
+
+```
+npx nx run app:start
+
+npx nx run app:start:tau
+```
 
 ### Playwright e2e Tests
 

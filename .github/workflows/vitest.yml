@@ -1,8 +1,6 @@
 name: Vitest
 
 on:
-  push:
-    branches: ['boson']
   pull_request:
     branches: ['boson']
 

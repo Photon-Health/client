@@ -1,9 +1,8 @@
 name: Lint
 
 on:
-  push:
   pull_request:
-    branches: [neutron, photon]
+    branches: [boson, neutron, photon]
 
 jobs:
   run-linters:
