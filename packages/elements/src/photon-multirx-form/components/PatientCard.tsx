@@ -41,6 +41,9 @@ interface PatientCardStoreProp {
     value?: { id: string; address: any };
     error: boolean;
   };
+  address?: {
+    value?: any;
+  };
 }
 
 export const PatientCard = (props: {

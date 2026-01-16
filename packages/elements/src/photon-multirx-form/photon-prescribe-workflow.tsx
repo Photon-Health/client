@@ -56,6 +56,7 @@ import {
   useRecentOrders
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import { types } from '@photonhealth/sdk';
 import { Order, Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
 import '@shoelace-style/shoelace/dist/components/alert/alert';
 import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
@@ -196,9 +197,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     if (!props.optionalPatientAddress || !props.enableOrder) {
       return false;
     }
-    return (
-      fulfillmentNeedsAddress(props.formStore?.fulfillmentType?.value) && !hasPatientAddress()
-    );
+    return fulfillmentNeedsAddress(props.formStore?.fulfillmentType?.value) && !hasPatientAddress();
   });
   const [isScreeningAlertWarningOpen, setIsScreeningAlertWarningOpen] = createSignal(false);
 
@@ -422,10 +421,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
     if (
       props.enableOrder &&
-      shouldBlockOrderWithoutAddress(
-        props.formStore?.fulfillmentType?.value,
-        hasPatientAddress()
-      )
+      shouldBlockOrderWithoutAddress(props.formStore?.fulfillmentType?.value, hasPatientAddress())
     ) {
       setIsLoading(false);
       triggerToast({
