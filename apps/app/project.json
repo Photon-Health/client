@@ -5,13 +5,71 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
+    "codegen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "env-cmd -f .env.boson npx graphql-codegen"
+      }
+    },
+    "codegen:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "env-cmd -f .env.tau npx graphql-codegen"
+      }
+    },
+    "codegen:neutron": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "env-cmd -f .env.neutron npx graphql-codegen"
+      }
+    },
+    "codegen:photon": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "env-cmd -f .env.photon npx graphql-codegen"
+      }
+    },
+    "codegen:watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "env-cmd -f .env.boson npx graphql-codegen --watch"
+      }
+    },
+    "codegen:watch:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "env-cmd -f .env.tau npx graphql-codegen --watch"
+      }
+    },
     "start": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
         "command": "env-cmd -f .env.boson react-app-rewired start"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen"]
+    },
+    "start:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "env-cmd -f .env.tau react-app-rewired start"
+      },
+      "dependsOn": ["^build", "codegen:tau"]
+    },
+    "start:neutron": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "env-cmd -f .env.neutron react-app-rewired start"
+      },
+      "dependsOn": ["^build", "codegen:neutron"]
     },
     "dev": {
       "executor": "nx:run-commands",
@@ -22,23 +80,7 @@
           "nx watch --projects=app --includeDependentProjects -- nx affected -t build --uncommitted=true --exclude=app"
         ]
       },
-      "dependsOn": ["^build"]
-    },
-    "start:neutron": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/app",
-        "command": "env-cmd -f .env.neutron react-app-rewired start"
-      },
-      "dependsOn": ["^build"]
-    },
-    "start:tau": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/app",
-        "command": "env-cmd -f .env.tau react-app-rewired start"
-      },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen"]
     },
     "dev:tau": {
       "executor": "nx:run-commands",
@@ -49,7 +91,7 @@
           "nx watch --projects=app --includeDependentProjects -- nx affected -t build --uncommitted=true --exclude=app"
         ]
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen:tau"]
     },
     "build:boson": {
       "executor": "nx:run-commands",
@@ -58,7 +100,7 @@
         "command": "env-cmd -f .env.boson react-app-rewired build",
         "outputs": "dist/apps/app"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen"]
     },
     "build:neutron": {
       "executor": "nx:run-commands",
@@ -67,7 +109,7 @@
         "command": "env-cmd -f .env.neutron react-app-rewired build",
         "outputs": "dist/apps/app"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen:neutron"]
     },
     "build:photon": {
       "executor": "nx:run-commands",
@@ -76,7 +118,7 @@
         "command": "env-cmd -f .env.photon react-app-rewired build",
         "outputs": "dist/apps/app"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "codegen:photon"]
     },
     "test": {
       "executor": "nx:run-commands",
@@ -120,12 +162,21 @@
         "command": "npx eslint . --ext .tsx,.ts --fix && npx prettier --write src/**/*.{ts,tsx}"
       }
     },
-    "tsc": {
+    "tsc:neutron": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/app",
         "command": "npx tsc --noEmit"
-      }
+      },
+      "dependsOn": ["codegen:neutron"]
+    },
+    "tsc:photon": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/app",
+        "command": "npx tsc --noEmit"
+      },
+      "dependsOn": ["codegen:photon"]
     }
   }
 }
