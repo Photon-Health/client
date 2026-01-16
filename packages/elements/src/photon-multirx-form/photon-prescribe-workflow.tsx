@@ -11,8 +11,36 @@ import { PharmacyCard } from './components/PharmacyCard';
 import styles from './style.css?inline';
 import clearForm from './util/clearForm';
 import { formatPatientWeight } from './util/formatPatientWeight';
+const hasUsableAddress = (address?: {
+  street1?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+}) => {
+  if (!address) {
+    return false;
+  }
+  return Boolean(
+    address.street1?.trim() &&
+      address.city?.trim() &&
+      address.state?.trim() &&
+      address.postalCode?.trim()
+  );
+};
+
+const fulfillmentNeedsAddress = (fulfillmentType?: string) => {
+  return (
+    fulfillmentType === types.FulfillmentType.PickUp ||
+    fulfillmentType === types.FulfillmentType.MailOrder
+  );
+};
+
+const shouldBlockOrderWithoutAddress = (fulfillmentType?: string, hasAddress?: boolean) => {
+  return fulfillmentNeedsAddress(fulfillmentType) && !hasAddress;
+};
 import {
   Alert,
+  AddressForm,
   Button,
   RecentOrders,
   ScreeningAlertAcknowledgementDialog,
@@ -158,6 +186,20 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const [screeningAlerts, setScreeningAlerts] = createSignal<ScreeningAlertType[]>([]);
 
   const [overrideScreenAlerts, setOverrideScreenAlerts] = createSignal<boolean>(false);
+
+  const hasPatientAddress = createMemo(() => {
+    const address = props.formStore?.address?.value ?? props.formStore?.patient?.value?.address;
+    return hasUsableAddress(address);
+  });
+
+  const forceAddressForm = createMemo(() => {
+    if (!props.optionalPatientAddress || !props.enableOrder) {
+      return false;
+    }
+    return (
+      fulfillmentNeedsAddress(props.formStore?.fulfillmentType?.value) && !hasPatientAddress()
+    );
+  });
   const [isScreeningAlertWarningOpen, setIsScreeningAlertWarningOpen] = createSignal(false);
 
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
@@ -376,6 +418,28 @@ export function PrescribeWorkflow(props: PrescribeProps) {
         header: 'Unauthorized',
         body: 'You do not have permission to prescribe'
       });
+    }
+
+    if (
+      props.enableOrder &&
+      shouldBlockOrderWithoutAddress(
+        props.formStore?.fulfillmentType?.value,
+        hasPatientAddress()
+      )
+    ) {
+      setIsLoading(false);
+      triggerToast({
+        status: 'error',
+        header: 'Address required',
+        body: 'Please add a patient address to place a local pickup or mail order.'
+      });
+      setErrors([
+        {
+          key: 'address',
+          error: 'Please enter an address for patient...'
+        }
+      ]);
+      return;
     }
 
     const keys =
@@ -689,6 +753,25 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     enableSendToPatient={props.enableSendToPatient}
                     enableDeliveryPharmacies={props.enableDeliveryPharmacies}
                     mailOrderIds={props.mailOrderIds}
+                  />
+                </Show>
+                <Show when={forceAddressForm() && props.formStore.patient?.value?.id}>
+                  <AddressForm
+                    patientId={props.formStore.patient?.value?.id}
+                    showRequiredBanner={false}
+                    setAddress={(address: Address) => {
+                      props.formActions.updateFormValue({
+                        key: 'address',
+                        value: address
+                      });
+                      props.formActions.updateFormValue({
+                        key: 'patient',
+                        value: {
+                          ...props.formStore.patient!.value,
+                          address
+                        }
+                      });
+                    }}
                   />
                 </Show>
                 <Show when={props.enableOrder && autoRoutedPharmacyId()}>

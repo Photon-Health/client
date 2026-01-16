@@ -12,6 +12,22 @@ import { Treatment } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
 import type { Address } from '../photon-prescribe-workflow';
+const hasUsableAddress = (address?: {
+  street1?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+}) => {
+  if (!address) {
+    return false;
+  }
+  return Boolean(
+    address.street1?.trim() &&
+      address.city?.trim() &&
+      address.state?.trim() &&
+      address.postalCode?.trim()
+  );
+};
 
 const patientValidator = message(record(string(), any()), 'Please select a patient...');
 
@@ -100,15 +116,22 @@ export const PatientCard = (props: {
     return currentPatientId() ?? '';
   });
 
+  const hasAddress = createMemo(() => {
+    const address = props.store.address?.value || props.store.patient?.value?.address;
+    return hasUsableAddress(address);
+  });
+
   // Show the address form only if the patient doesnt have an address
   // and the address is not marked as optional in the provider UX
-  const showAddressForm = createMemo(
-    () =>
-      props.store.patient?.value?.id &&
-      !props.store.patient?.value?.address &&
-      props.enableOrder &&
-      !props.optionalPatientAddress
-  );
+  const showAddressForm = createMemo(() => {
+    if (!props.store.patient?.value?.id || !props.enableOrder) {
+      return false;
+    }
+    if (!props.optionalPatientAddress) {
+      return !hasAddress();
+    }
+    return false;
+  });
 
   return (
     <div class="flex flex-col gap-8">
