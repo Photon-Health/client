@@ -107,6 +107,13 @@ export type Connection = {
   name: Scalars['String']['output'];
 };
 
+export enum ContactPreference {
+  Admin = 'admin',
+  Group = 'group',
+  Photon = 'photon',
+  Provider = 'provider'
+}
+
 export type Coverage = {
   __typename?: 'Coverage';
   alerts: Array<CoverageAlert>;
@@ -452,6 +459,17 @@ export type Organization = {
   type: OrgType;
 };
 
+export type OrganizationContactRxPdfSettings = {
+  __typename?: 'OrganizationContactRxPdfSettings';
+  fromFaxPreference?: Maybe<ContactPreference>;
+  fromPhonePreference?: Maybe<ContactPreference>;
+};
+
+export type OrganizationContactSettings = {
+  __typename?: 'OrganizationContactSettings';
+  rxPdf?: Maybe<OrganizationContactRxPdfSettings>;
+};
+
 export type OrganizationInput = {
   NPI?: InputMaybe<Scalars['String']['input']>;
   address?: InputMaybe<AddressInput>;
@@ -506,6 +524,7 @@ export type OrganizationSettings = {
   __typename?: 'OrganizationSettings';
   brandColor: Scalars['String']['output'];
   brandLogo?: Maybe<Scalars['String']['output']>;
+  contact?: Maybe<OrganizationContactSettings>;
   enablePriorAuthorizationSupport: Scalars['Boolean']['output'];
   enableRxClarificationSupport: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
@@ -674,6 +693,7 @@ export type ProfileInput = {
 
 export type ProviderInput = {
   address: AddressInput;
+  fax?: InputMaybe<Scalars['String']['input']>;
   npi: Scalars['String']['input'];
   phone: Scalars['String']['input'];
 };
