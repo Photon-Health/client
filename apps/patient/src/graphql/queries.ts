@@ -92,6 +92,7 @@ export const GET_ORDER = gql`
         name
         logo
         integrated
+        fulfillmentTypes
         address {
           street1
           street2

@@ -1,7 +1,7 @@
 import { getOffers } from '../api';
-import { Offer } from '../components/pharmacy-card-list';
+import { Offer, PHARMACY_BRANDING } from '../components/pharmacy-card-list';
 import { EnrichedPharmacy, ExtendedFulfillmentType, Order } from '../utils/models';
-import { Pharmacy as PharmacyType } from '../__generated__/graphql';
+import { FulfillmentType, Pharmacy as PharmacyType } from '../__generated__/graphql';
 
 import capsulePharmacyIdLookup from '../data/capsulePharmacyIds.json';
 
@@ -13,7 +13,12 @@ function getNovocareOffers(order: Order): Offer[] {
       {
         costType: 'NOVOCARE_OFFER',
         deliveryEstimate: novocareExperimentSegment,
-        tags: ['Delivers in 3-5 days']
+        tags: ['Delivers in 3-5 days'],
+        pharmacy: {
+          id: process.env.REACT_APP_NOVOCARE_PHARMACY_ID as string,
+          name: 'Novocare',
+          fulfillmentTypes: ['MAIL_ORDER']
+        }
       }
     ];
   } else {
@@ -35,8 +40,12 @@ export async function fetchOffers(order: Order): Promise<Offer[] | undefined> {
       costAmountTitle: offer.cost?.amountTitle,
       retailAmount: offer.cost?.retailAmount,
       retailAmountTitle: offer.cost?.retailAmountTitle,
-      pharmacyId: process.env.REACT_APP_AMAZON_PHARMACY_ID,
-      pharmacyName: 'Amazon Pharmacy',
+      pharmacy: {
+        id: process.env.REACT_APP_AMAZON_PHARMACY_ID as string,
+        name: 'Amazon Pharmacy',
+        fulfillmentTypes: ['MAIL_ORDER'] as FulfillmentType[],
+        logo: PHARMACY_BRANDING['phr_demoAmazon'].logo
+      },
       tags: ['In Stock']
     }));
 
