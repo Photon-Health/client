@@ -23,6 +23,10 @@ import { patientAnalytics } from '../configs/analytics';
 import { shouldShowPriceToggle } from '../utils/shouldShowPriceToggle';
 import { preloadImage } from '../utils/preloadImage';
 
+type FetchOrderOptions = {
+  triggerAutoNavigation: boolean;
+};
+
 export interface OrderContextType {
   order: Order;
   flattenedFills: FillWithCount[];
@@ -34,7 +38,10 @@ export interface OrderContextType {
   setEnablePrice: (enablePrice: boolean) => void;
   logo: any;
   isDemo: boolean;
-  fetchOrder: (currentPharmacy?: Pharmacy) => Promise<Order | undefined>;
+  fetchOrder: (
+    currentPharmacy?: Pharmacy,
+    options?: FetchOrderOptions
+  ) => Promise<Order | undefined>;
   setFaqModalIsOpen: (isOpen: boolean) => void;
 }
 export const OrderContext = createContext<OrderContextType | null>(null);
@@ -199,6 +206,7 @@ export const Main = () => {
       const redirect = hasPharmacy ? '/status' : '/review';
 
       const query = queryString.stringify({ orderId: newOrder.id, token });
+      console.trace(`navigate(${redirect}?${query})`);
       navigate(`${redirect}?${query}`, {
         replace: true
       });
@@ -207,7 +215,7 @@ export const Main = () => {
   );
 
   const fetchOrder = useCallback(
-    async (currentPharmacy?: Pharmacy) => {
+    async (currentPharmacy?: Pharmacy, options: FetchOrderOptions) => {
       if (isDemo) return demoOrder;
       try {
         const result = await getOrder(orderId!);

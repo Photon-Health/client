@@ -741,7 +741,9 @@ export const Pharmacy = () => {
                 handleSubmitSuccessAnalytics(overridePharmacy);
 
                 // necessary to ensure the order is updated with the new coupon before navigating
-                const updatedOrder = await fetchOrder(overridePharmacy);
+                const updatedOrder = await fetchOrder(overridePharmacy, {
+                  triggerAutoNavigation: false
+                });
 
                 if (updatedOrder) {
                   updatedOrder.fulfillment = {
