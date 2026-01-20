@@ -73,7 +73,7 @@ export const PatientCard = (props: {
       validator: patientValidator
     });
 
-    if (props.enableOrder && !props.optionalPatientAddress) {
+    if (props.enableOrder) {
       props.actions.registerValidator({
         key: 'address',
         validator: patientAddressValidator
@@ -123,6 +123,9 @@ export const PatientCard = (props: {
     const address = props.store.address?.value || props.store.patient?.value?.address;
     return hasUsableAddress(address);
   });
+  const hasPreferredPharmacy = createMemo(() => {
+    return Boolean(props.store.patient?.value?.preferredPharmacies?.length);
+  });
 
   // Show the address form only if the patient doesnt have an address
   // and the address is not marked as optional in the provider UX
@@ -133,7 +136,8 @@ export const PatientCard = (props: {
     if (!props.optionalPatientAddress) {
       return !hasAddress();
     }
-    return false;
+    // optionalpatientaddress skips address requirement unless a preferred pharmacy is set
+    return hasPreferredPharmacy() && !hasAddress();
   });
 
   return (

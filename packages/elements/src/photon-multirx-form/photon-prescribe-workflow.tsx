@@ -192,6 +192,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     const address = props.formStore?.address?.value ?? props.formStore?.patient?.value?.address;
     return hasUsableAddress(address);
   });
+  const hasPreferredPharmacy = createMemo(() => {
+    return Boolean(props.formStore?.patient?.value?.preferredPharmacies?.length);
+  });
 
   const forceAddressForm = createMemo(() => {
     if (!props.optionalPatientAddress || !props.enableOrder) {
@@ -438,8 +441,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       return;
     }
 
-    const keys =
-      enableOrder && !props.optionalPatientAddress ? ['patient', 'address'] : ['patient'];
+    const requiresAddress =
+      enableOrder && (!props.optionalPatientAddress || hasPreferredPharmacy());
+    const keys = requiresAddress ? ['patient', 'address'] : ['patient'];
     props.formActions.validate(keys);
     const errors = props.formActions.getErrors(keys);
     if (errors.length === 0) {
@@ -697,8 +701,10 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   (props.formStore.patient?.value?.address ||
                     // if orders are disabled, we need only a patient id
                     (props.formStore.patient?.value?.id && !props.enableOrder) ||
-                    // if address is optional, we only need a patient id
-                    (props.formStore.patient?.value?.id && props.optionalPatientAddress))
+                    // optionalpatientaddress skips address requirement unless a preferred pharmacy is set
+                    (props.formStore.patient?.value?.id &&
+                      props.optionalPatientAddress &&
+                      !hasPreferredPharmacy()))
                 }
               >
                 <Show when={props.enableCombineAndDuplicate}>
