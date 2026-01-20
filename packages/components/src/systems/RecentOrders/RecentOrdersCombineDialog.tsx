@@ -42,7 +42,7 @@ const CREATE_ORDER_MUTATION = gql`
   mutation RecentOrdersCombineDialogCreateOrder(
     $patientId: ID!
     $fills: [FillInput!]!
-    $address: AddressInput!
+    $address: AddressInput
   ) {
     createOrder(patientId: $patientId, fills: $fills, address: $address) {
       id
@@ -61,7 +61,7 @@ type SuccessCreateOrder = { createOrder: SuccessResponse };
 type VariablesCreateOrder = {
   patientId: string;
   fills: { prescriptionId: string }[];
-  address: Address;
+  address?: Address;
 };
 
 export default function RecentOrdersCombineDialog() {

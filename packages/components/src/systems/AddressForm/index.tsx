@@ -42,11 +42,13 @@ type AddressProps = {
 type AddressFormProps = {
   patientId: string;
   setAddress?: (address: AddressProps) => void;
+  showRequiredBanner?: boolean;
 };
 
 export default function AddressForm(props: AddressFormProps) {
   const [submitting, setSubmitting] = createSignal(false);
   const client = usePhotonClient();
+  const showRequiredBanner = () => props.showRequiredBanner ?? true;
 
   const updatePatientAddress = async (address: AddressProps) => {
     await client!.apollo.mutate({
@@ -91,7 +93,9 @@ export default function AddressForm(props: AddressFormProps) {
         </Button>
       </div>
       <div>
-        <Banner status="info">Patient address is required to write a prescription</Banner>
+        {showRequiredBanner() && (
+          <Banner status="info">Patient address is required to write a prescription</Banner>
+        )}
         <form ref={form} id="patient-address" class="mt-4">
           <InputGroup
             label="Address Line 1 *"

@@ -8,6 +8,7 @@ type PatientDialogProps = {
   patientId: string;
   open: boolean;
   hideCreatePrescription: boolean;
+  optionalPatientAddress: boolean;
 };
 
 const Component = (props: PatientDialogProps) => {
@@ -19,6 +20,7 @@ const Component = (props: PatientDialogProps) => {
   const [selectedStore, setSelectedStore] = createSignal<any>(undefined);
   const [actions, setActions] = createSignal<any>(undefined);
   const [globalError, setGlobalError] = createSignal<string | undefined>(undefined);
+  const [hasAnyAddressField, setHasAnyAddressField] = createSignal<boolean>(false);
 
   const dispatchUpdate = (patientId: string, createPrescription = false) => {
     const event = new CustomEvent('photon-patient-updated', {
@@ -57,18 +59,16 @@ const Component = (props: PatientDialogProps) => {
     setGlobalError(undefined);
     setIsCreatePrescription(createPrescription);
     setLoading(true);
-    const keys = [
-      'firstName',
-      'lastName',
-      'dateOfBirth',
-      'phone',
-      'sex',
-      'email',
-      'address_street1',
-      'address_city',
-      'address_state',
-      'address_zip'
-    ];
+
+    // Base keys that are always required
+    const baseKeys = ['firstName', 'lastName', 'dateOfBirth', 'phone', 'sex', 'email'];
+
+    // Address keys - only validate if address is required OR if any address field has been filled
+    const addressKeys = ['address_street1', 'address_city', 'address_state', 'address_zip'];
+
+    // If address is optional and no address fields are filled, skip address validation
+    const shouldValidateAddress = !props.optionalPatientAddress || hasAnyAddressField();
+    const keys = shouldValidateAddress ? [...baseKeys, ...addressKeys] : baseKeys;
 
     actions.validate(keys);
     if (actions.hasErrors(keys)) {
@@ -98,6 +98,7 @@ const Component = (props: PatientDialogProps) => {
       });
     }
 
+    const includeAddress = shouldValidateAddress;
     const patientData = {
       ...(props?.patientId ? { id: props.patientId } : {}),
       name: {
@@ -109,17 +110,16 @@ const Component = (props: PatientDialogProps) => {
       phone: store['phone']!.value,
       dateOfBirth: store['dateOfBirth']!.value,
       sex: store['sex']!.value,
-      address:
-        store['address_street1']!.value !== undefined
-          ? {
-              street1: store['address_street1']!.value,
-              street2: store['address_street2']!.value,
-              city: store['address_city']!.value,
-              state: store['address_state']!.value,
-              postalCode: store['address_zip']!.value,
-              country: 'US'
-            }
-          : undefined,
+      address: includeAddress
+        ? {
+            street1: store['address_street1']!.value,
+            street2: store['address_street2']!.value,
+            city: store['address_city']!.value,
+            state: store['address_state']!.value,
+            postalCode: store['address_zip']!.value,
+            country: 'US'
+          }
+        : undefined,
       preferredPharmacies: store['preferredPharmacy']!.value
         ? [store['preferredPharmacy']!.value]
         : []
@@ -201,8 +201,20 @@ const Component = (props: PatientDialogProps) => {
                   setFormStore(e.detail.form);
                   setActions(Object.assign({}, e.detail.actions, { resetStores: e.detail.reset }));
                   setSelectedStore(e.detail.selected);
+                  // Check if any address field has a value
+                  const form = e.detail.form;
+                  setHasAnyAddressField(
+                    !!(
+                      form['address_street1']?.value ||
+                      form['address_street2']?.value ||
+                      form['address_city']?.value ||
+                      form['address_state']?.value ||
+                      form['address_zip']?.value
+                    )
+                  );
                 }}
                 patient-id={props.patientId}
+                optional-patient-address={props.optionalPatientAddress}
               />
             </>
           }
@@ -216,7 +228,8 @@ customElement(
   {
     patientId: '',
     hideCreatePrescription: false,
-    open: false
+    open: false,
+    optionalPatientAddress: false
   },
   Component
 );
