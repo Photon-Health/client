@@ -38,7 +38,7 @@ const patientAddressValidator = message(
 
 interface PatientCardStoreProp {
   patient?: {
-    value?: { id: string; address: any };
+    value?: { id: string; address: any; preferredPharmacies?: any[] };
     error: boolean;
   };
   address?: {
