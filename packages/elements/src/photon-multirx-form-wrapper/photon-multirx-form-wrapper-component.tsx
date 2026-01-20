@@ -39,6 +39,7 @@ const Component = (props: {
   enableOrder?: boolean;
   toastBuffer?: number;
   externalOrderId?: string;
+  optionalPatientAddress?: boolean;
 }) => {
   let ref: any;
   const client = usePhoton();
@@ -250,6 +251,7 @@ const Component = (props: {
               enable-combine-and-duplicate={props.enableCombineAndDuplicate}
               enable-delivery-pharmacies={props.enableDeliveryPharmacies}
               enable-coverage-check={props.enableCoverageCheck}
+              optional-patient-address={props.optionalPatientAddress}
               pharmacy-id={props.pharmacyId}
               mail-order-ids={props.mailOrderIds}
               trigger-submit={triggerSubmit()}
@@ -317,7 +319,8 @@ customElement(
     mailOrderIds: undefined,
     enableOrder: false,
     toastBuffer: 0,
-    externalOrderId: undefined
+    externalOrderId: undefined,
+    optionalPatientAddress: false
   },
   Component
 );
