@@ -27,6 +27,7 @@ const orgSettingsQuery = graphql(/* GraphQL */ `
           enablePatientRouting
           enablePickupPharmacies
           enableDeliveryPharmacies
+          optionalPatientAddress
         }
       }
     }
@@ -51,6 +52,7 @@ export const PrescriptionForm = () => {
   const enablePrescribeToOrder = orgSettings?.providerUx?.enablePrescribeToOrder ?? true;
   const enableTreatmentHistory = orgSettings?.providerUx?.enableTreatmentHistory ?? false;
   const enablePickupPharmacies = orgSettings?.providerUx?.enablePickupPharmacies ?? true;
+  const optionalPatientAddress = orgSettings?.providerUx?.optionalPatientAddress ?? false;
   const enableDeliveryPharmacies = orgSettings?.providerUx?.enableDeliveryPharmacies ?? false;
   const enablePatientRouting = orgSettings?.providerUx?.enablePatientRouting ?? true;
   const enableDuplicateRxWarnings = orgSettings?.providerUx?.enableDuplicateRxWarnings ?? true;
@@ -178,6 +180,7 @@ export const PrescriptionForm = () => {
           enable-combine-and-duplicate={enableDuplicateRxWarnings}
           enable-coverage-check={enableCoverageCheck}
           enable-new-medication-search={true}
+          optional-patient-address={optionalPatientAddress}
           mail-order-ids={mailOrderProviders?.join(',') ?? ''}
           toast-buffer={70}
           hide-templates={!enableRxTemplates}
