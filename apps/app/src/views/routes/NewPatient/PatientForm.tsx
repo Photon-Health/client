@@ -1,5 +1,8 @@
+import { useQuery } from '@apollo/client';
+import { usePhoton } from '@photonhealth/react';
 import { MutableRefObject, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { graphql } from 'apps/app/src/gql';
 import { useProviderAnalytics } from '../../../hooks/useProviderAnalytics';
 
 declare global {
@@ -10,10 +13,27 @@ declare global {
   }
 }
 
+const orgSettingsQuery = graphql(/* GraphQL */ `
+  query PatientFormOrgSettingsQuery {
+    organization {
+      settings {
+        providerUx {
+          optionalPatientAddress
+        }
+      }
+    }
+  }
+`);
+
 export const PatientForm = () => {
   const ref: MutableRefObject<any> = useRef(null);
   const navigate = useNavigate();
   const { track } = useProviderAnalytics();
+  const { clinicalClient } = usePhoton();
+
+  const { data } = useQuery(orgSettingsQuery, { client: clinicalClient });
+  const optionalPatientAddress =
+    data?.organization?.settings?.providerUx?.optionalPatientAddress ?? false;
 
   useEffect(() => {
     if (ref.current) {
@@ -38,7 +58,7 @@ export const PatientForm = () => {
 
   return (
     <div>
-      <photon-patient-dialog ref={ref} />
+      <photon-patient-dialog ref={ref} optional-patient-address={optionalPatientAddress} />
     </div>
   );
 };
