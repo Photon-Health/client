@@ -82,26 +82,22 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
     validator: message(union([email(), empty()]), 'Please enter a valid email.')
   });
 
-  // Address validators - these will be used conditionally based on whether
-  // address is optional and whether any address field has been filled
+  // Address validators - only run when address is required.
   actions.registerValidator({
     key: 'address_street1',
-    validator: message(
-      union([size(string(), 1, Infinity), empty()]),
-      'Please enter a valid Street 1.'
-    )
+    validator: message(size(string(), 1, Infinity), 'Please enter a valid Street 1.')
   });
   actions.registerValidator({
     key: 'address_city',
-    validator: message(union([size(string(), 1, Infinity), empty()]), 'Please enter a valid City.')
+    validator: message(size(string(), 1, Infinity), 'Please enter a valid City.')
   });
   actions.registerValidator({
     key: 'address_state',
-    validator: message(union([size(string(), 2, 2), empty()]), 'Please enter a valid State.')
+    validator: message(size(string(), 2, 2), 'Please enter a valid State.')
   });
   actions.registerValidator({
     key: 'address_zip',
-    validator: message(union([zipString(), empty()]), 'Please enter a valid zip code.')
+    validator: message(zipString(), 'Please enter a valid zip code.')
   });
 
   onMount(() => {

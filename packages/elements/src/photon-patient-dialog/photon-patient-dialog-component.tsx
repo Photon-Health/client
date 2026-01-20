@@ -98,6 +98,7 @@ const Component = (props: PatientDialogProps) => {
       });
     }
 
+    const includeAddress = shouldValidateAddress;
     const patientData = {
       ...(props?.patientId ? { id: props.patientId } : {}),
       name: {
@@ -109,17 +110,16 @@ const Component = (props: PatientDialogProps) => {
       phone: store['phone']!.value,
       dateOfBirth: store['dateOfBirth']!.value,
       sex: store['sex']!.value,
-      address:
-        store['address_street1']!.value !== undefined
-          ? {
-              street1: store['address_street1']!.value,
-              street2: store['address_street2']!.value,
-              city: store['address_city']!.value,
-              state: store['address_state']!.value,
-              postalCode: store['address_zip']!.value,
-              country: 'US'
-            }
-          : undefined,
+      address: includeAddress
+        ? {
+            street1: store['address_street1']!.value,
+            street2: store['address_street2']!.value,
+            city: store['address_city']!.value,
+            state: store['address_state']!.value,
+            postalCode: store['address_zip']!.value,
+            country: 'US'
+          }
+        : undefined,
       preferredPharmacies: store['preferredPharmacy']!.value
         ? [store['preferredPharmacy']!.value]
         : []
