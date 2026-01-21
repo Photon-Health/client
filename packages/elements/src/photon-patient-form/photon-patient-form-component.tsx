@@ -41,7 +41,6 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   let ref: any;
   const client = usePhoton();
   const [showOptionalFields, setShowOptionalFields] = createSignal(false);
-  const [isDesktop, setIsDesktop] = createSignal(false);
   const { store: pStore, actions: pActions } = PatientStore;
   const { store, actions } = createFormStore({
     firstName: undefined,
@@ -102,24 +101,6 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   });
 
   onMount(() => {
-    const mediaQuery = window.matchMedia('(min-width: 768px)');
-    const handleMediaChange = (event: MediaQueryListEvent | MediaQueryList) => {
-      setIsDesktop(event.matches);
-    };
-    handleMediaChange(mediaQuery);
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handleMediaChange);
-    } else {
-      mediaQuery.addListener(handleMediaChange);
-    }
-    onCleanup(() => {
-      if (mediaQuery.removeEventListener) {
-        mediaQuery.removeEventListener('change', handleMediaChange);
-      } else {
-        mediaQuery.removeListener(handleMediaChange);
-      }
-    });
-
     if (props.patientId) {
       pActions.getSelectedPatient(client!.getSDK(), props.patientId);
     } else {
@@ -237,6 +218,22 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   return (
     <div class="w-full h-full relative" ref={ref}>
       <style>{tailwind}</style>
+      <style>{`
+        .optional-fields {
+          display: none;
+        }
+        .optional-fields.optional-fields--open {
+          display: block;
+        }
+        @media (min-width: 768px) {
+          .optional-fields-toggle {
+            display: none;
+          }
+          .optional-fields {
+            display: block;
+          }
+        }
+      `}</style>
       <style>{shoelaceDarkStyles}</style>
       <style>{shoelaceLightStyles}</style>
       <style>{photonStyles}</style>
@@ -420,22 +417,21 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                     }
                   />
                 </div>
-                <Show when={!isDesktop()}>
-                  <button
-                    class="mb-4 flex items-center"
-                    onClick={() => setShowOptionalFields((value) => !value)}
-                  >
-                    <span class="font-sans text-lg">Show optional fields</span>
-                    <Icon
-                      name={showOptionalFields() ? 'chevronUp' : 'chevronDown'}
-                      size="md"
-                      class="inline-block ml-1 mt-1"
-                    />
-                  </button>
-                </Show>
+                <button
+                  class="mb-4 flex items-center optional-fields-toggle"
+                  onClick={() => setShowOptionalFields((value) => !value)}
+                >
+                  <span class="font-sans text-lg">Show optional fields</span>
+                  <Icon
+                    name={showOptionalFields() ? 'chevronUp' : 'chevronDown'}
+                    size="md"
+                    class="inline-block ml-1 mt-1"
+                  />
+                </button>
                 <div
-                  class="mb-4"
-                  style={{ display: isDesktop() || showOptionalFields() ? 'block' : 'none' }}
+                  class={`mb-4 optional-fields ${
+                    showOptionalFields() ? 'optional-fields--open' : ''
+                  }`}
                 >
                   <photon-gender-input
                     label="Gender"
