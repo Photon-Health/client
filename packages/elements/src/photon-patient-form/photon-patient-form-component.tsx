@@ -218,22 +218,6 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   return (
     <div class="w-full h-full relative" ref={ref}>
       <style>{tailwind}</style>
-      <style>{`
-        .optional-fields {
-          display: none;
-        }
-        .optional-fields.optional-fields--open {
-          display: block;
-        }
-        @media (min-width: 768px) {
-          .optional-fields-toggle {
-            display: none;
-          }
-          .optional-fields {
-            display: block;
-          }
-        }
-      `}</style>
       <style>{shoelaceDarkStyles}</style>
       <style>{shoelaceLightStyles}</style>
       <style>{photonStyles}</style>
@@ -418,7 +402,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                   />
                 </div>
                 <button
-                  class="mb-4 flex items-center optional-fields-toggle"
+                  class="mb-4 flex items-center md:!hidden"
                   onClick={() => setShowOptionalFields((value) => !value)}
                 >
                   <span class="font-sans text-lg">Show optional fields</span>
@@ -428,11 +412,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                     class="inline-block ml-1 mt-1"
                   />
                 </button>
-                <div
-                  class={`mb-4 optional-fields ${
-                    showOptionalFields() ? 'optional-fields--open' : ''
-                  }`}
-                >
+                <div class={`mb-4 ${showOptionalFields() ? 'block' : 'hidden md:!block'}`}>
                   <photon-gender-input
                     label="Gender"
                     required="false"
