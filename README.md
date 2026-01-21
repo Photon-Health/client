@@ -30,6 +30,8 @@ or, run an `elements` target:
 npx nx run elements:lint:only-errors
 ```
 
+Available targets can be found in a project's `project.json`.
+
 ### Run clinical app
 
 See [clinical app README](apps/app/README.md)

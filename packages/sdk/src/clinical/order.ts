@@ -139,8 +139,8 @@ export class OrderQueryManager {
         $externalId: ID
         $patientId: ID!
         $fills: [FillInput!]!
-        $address: AddressInput!
-        $pharmacyId: ID!
+        $address: AddressInput
+        $pharmacyId: ID
         $groupId: ID
       ) {
         createOrder(

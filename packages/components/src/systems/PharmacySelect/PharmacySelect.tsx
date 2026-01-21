@@ -7,6 +7,7 @@ import { MailOrderPharmacy } from './MailOrderPharmacy';
 import { SendToPatient } from './SendToPatient';
 import { usePrescribe } from '../PrescribeProvider';
 import { PharmacyRoutingAlert } from '../RoutingConstraints';
+import { Alert } from '../../particles/Alert';
 import { MailOrderPharmacySearch } from '../PharmacySearch/MailOrderPharmacySearch';
 import { PharmacyOption } from '../PharmacySearch/PharmacySearch';
 
@@ -63,6 +64,7 @@ const parseFulfillmentType = (type: FulfillmentType | undefined) => {
 
 export function PharmacySelect(props: PharmacySelectProps) {
   const { orderFormData, selectedCoverageOption, unroutablePharmacyIds } = usePrescribe();
+  const hasAddress = createMemo(() => Boolean(props.address?.trim()));
 
   const [localPharmId, setLocalPharmId] = createSignal<string | undefined>();
   const [mailOrderId, setMailOrderId] = createSignal<string | undefined>();
@@ -155,65 +157,87 @@ export function PharmacySelect(props: PharmacySelectProps) {
 
         <Show when={tabs().includes(TabNamesEnum.localPickup)}>
           <div class={activeTab() !== TabNamesEnum.localPickup ? 'hidden' : ''}>
-            <PickupPharmacySearch
-              address={props?.address || ''}
-              patientId={props?.patientIds?.[0]}
-              setPharmacy={(pharmacy) => {
-                setLocalPharmId(pharmacy.id);
-                if (activeTab() === TabNamesEnum.localPickup) {
-                  props.setPharmacyId(pharmacy.id);
-                }
-              }}
-              setPreferred={(shouldSetPreferred) =>
-                props?.setPreferredPharmacy?.(shouldSetPreferred)
+            <Show
+              when={hasAddress()}
+              fallback={
+                <Alert
+                  type="warning"
+                  header="Address required"
+                  message="Please add a patient address to select a pharmacy."
+                />
               }
-            />
+            >
+              <PickupPharmacySearch
+                address={props?.address || ''}
+                patientId={props?.patientIds?.[0]}
+                setPharmacy={(pharmacy) => {
+                  setLocalPharmId(pharmacy.id);
+                  if (activeTab() === TabNamesEnum.localPickup) {
+                    props.setPharmacyId(pharmacy.id);
+                  }
+                }}
+                setPreferred={(shouldSetPreferred) =>
+                  props?.setPreferredPharmacy?.(shouldSetPreferred)
+                }
+              />
+            </Show>
           </div>
         </Show>
 
         <Show when={tabs().includes(TabNamesEnum.mailOrder)}>
           <div class={activeTab() !== TabNamesEnum.mailOrder ? 'hidden' : ''}>
-            <div class="space-y-4">
-              <MailOrderPharmacySearch
-                selected={mailOrderOption()}
-                selectPharmacy={(pharmacy) => {
-                  setMailOrderOption(pharmacy);
-                  setMailOrderId(pharmacy.id);
-                  if (activeTab() === TabNamesEnum.mailOrder) {
-                    props.setPharmacyId(pharmacy.id);
-                  }
-                }}
-              />
-              {(props.mailOrderPharmacyIds?.length ?? 0) > 0 && (
-                <div class="space-y-2">
-                  <label>Choose a partner pharmacy</label>
-                  <RadioGroupCards
-                    label="Pharmacies"
-                    value={mailOrderId()}
-                    setSelected={(pharmacyId) => {
-                      setMailOrderOption(undefined);
-                      setMailOrderId(pharmacyId);
-                      if (activeTab() === TabNamesEnum.mailOrder) {
-                        props.setPharmacyId(pharmacyId);
-                      }
-                    }}
-                    contextRef={(context) => (radioGroupContext = context)}
-                  >
-                    <For each={props?.mailOrderPharmacyIds || []}>
-                      {(id) => (
-                        <RadioGroupCards.Option
-                          value={id}
-                          disabled={unroutablePharmacyIds().has(id)}
-                          alert={unroutablePharmacyIds().has(id) && <PharmacyRoutingAlert />}
-                        >
-                          <MailOrderPharmacy pharmacyId={id} />
-                        </RadioGroupCards.Option>
-                      )}
-                    </For>
-                  </RadioGroupCards>
-                </div>
-              )}
-            </div>
+            <Show
+              when={hasAddress()}
+              fallback={
+                <Alert
+                  type="warning"
+                  header="Address required"
+                  message="Please add a patient address to select a pharmacy."
+                />
+              }
+            >
+              <div class="space-y-4">
+                <MailOrderPharmacySearch
+                  selected={mailOrderOption()}
+                  selectPharmacy={(pharmacy) => {
+                    setMailOrderOption(pharmacy);
+                    setMailOrderId(pharmacy.id);
+                    if (activeTab() === TabNamesEnum.mailOrder) {
+                      props.setPharmacyId(pharmacy.id);
+                    }
+                  }}
+                />
+                {(props.mailOrderPharmacyIds?.length ?? 0) > 0 && (
+                  <div class="space-y-2">
+                    <label>Choose a partner pharmacy</label>
+                    <RadioGroupCards
+                      label="Pharmacies"
+                      value={mailOrderId()}
+                      setSelected={(pharmacyId) => {
+                        setMailOrderOption(undefined);
+                        setMailOrderId(pharmacyId);
+                        if (activeTab() === TabNamesEnum.mailOrder) {
+                          props.setPharmacyId(pharmacyId);
+                        }
+                      }}
+                      contextRef={(context) => (radioGroupContext = context)}
+                    >
+                      <For each={props?.mailOrderPharmacyIds || []}>
+                        {(id) => (
+                          <RadioGroupCards.Option
+                            value={id}
+                            disabled={unroutablePharmacyIds().has(id)}
+                            alert={unroutablePharmacyIds().has(id) && <PharmacyRoutingAlert />}
+                          >
+                            <MailOrderPharmacy pharmacyId={id} />
+                          </RadioGroupCards.Option>
+                        )}
+                      </For>
+                    </RadioGroupCards>
+                  </div>
+                )}
+              </div>
+            </Show>
           </div>
         </Show>
       </div>
