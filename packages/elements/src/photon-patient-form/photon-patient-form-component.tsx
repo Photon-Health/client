@@ -41,6 +41,7 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   let ref: any;
   const client = usePhoton();
   const [showOptionalFields, setShowOptionalFields] = createSignal(false);
+  const [isDesktop, setIsDesktop] = createSignal(false);
   const { store: pStore, actions: pActions } = PatientStore;
   const { store, actions } = createFormStore({
     firstName: undefined,
@@ -101,6 +102,24 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
   });
 
   onMount(() => {
+    const mediaQuery = window.matchMedia('(min-width: 768px)');
+    const handleMediaChange = (event: MediaQueryListEvent | MediaQueryList) => {
+      setIsDesktop(event.matches);
+    };
+    handleMediaChange(mediaQuery);
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleMediaChange);
+    } else {
+      mediaQuery.addListener(handleMediaChange);
+    }
+    onCleanup(() => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleMediaChange);
+      } else {
+        mediaQuery.removeListener(handleMediaChange);
+      }
+    });
+
     if (props.patientId) {
       pActions.getSelectedPatient(client!.getSDK(), props.patientId);
     } else {
@@ -401,67 +420,70 @@ const PatientForm = (props: { patientId: string; optionalPatientAddress: boolean
                     }
                   />
                 </div>
-                <button
-                  class="mb-4 flex items-center"
-                  onClick={() => setShowOptionalFields((value) => !value)}
-                >
-                  <span class="font-sans text-lg">Show optional fields</span>
-                  <Icon
-                    name={showOptionalFields() ? 'chevronUp' : 'chevronDown'}
-                    size="md"
-                    class="inline-block ml-1 mt-1"
-                  />
-                </button>
-                <Show when={showOptionalFields()}>
-                  <div class="mb-4">
-                    <photon-gender-input
-                      label="Gender"
-                      required="false"
-                      help-text={store['gender']?.error}
-                      invalid={store['gender']?.error !== undefined}
-                      on:photon-gender-selected={(e: any) => {
-                        actions.updateFormValue({
-                          key: 'gender',
-                          value: e.detail.gender
-                        });
-                      }}
-                      on:photon-gender-deselected={() => {
-                        actions.updateFormValue({
-                          key: 'gender',
-                          value: undefined
-                        });
-                      }}
-                      selected={pStore.selectedPatient.data?.gender}
+                <Show when={!isDesktop()}>
+                  <button
+                    class="mb-4 flex items-center"
+                    onClick={() => setShowOptionalFields((value) => !value)}
+                  >
+                    <span class="font-sans text-lg">Show optional fields</span>
+                    <Icon
+                      name={showOptionalFields() ? 'chevronUp' : 'chevronDown'}
+                      size="md"
+                      class="inline-block ml-1 mt-1"
                     />
-                    <photon-text-input
-                      class="w-full"
-                      debounce-time="0"
-                      invalid={store['email']?.error}
-                      help-text={store['email']?.error}
-                      label="Email"
-                      on:photon-input-changed={async (e: any) => {
-                        actions.updateFormValue({
-                          key: 'email',
-                          value: e.detail.input
-                        });
-                      }}
-                      value={store['email']?.value ?? pStore.selectedPatient.data?.email}
-                    />
-                    <p class="font-sans text-sm m-0">Preferred pharmacy</p>
-                    <PharmacySearch
-                      address={getPatientAddress(pStore, store)}
-                      setPharmacy={(pharmacy: any) => {
-                        actions.updateFormValue({
-                          key: 'preferredPharmacy',
-                          value: pharmacy.id
-                        });
-                      }}
-                      patientId={props.patientId}
-                      initialValue={preferredPharmacy()}
-                      hidePreferred
-                    />
-                  </div>
+                  </button>
                 </Show>
+                <div
+                  class="mb-4"
+                  style={{ display: isDesktop() || showOptionalFields() ? 'block' : 'none' }}
+                >
+                  <photon-gender-input
+                    label="Gender"
+                    required="false"
+                    help-text={store['gender']?.error}
+                    invalid={store['gender']?.error !== undefined}
+                    on:photon-gender-selected={(e: any) => {
+                      actions.updateFormValue({
+                        key: 'gender',
+                        value: e.detail.gender
+                      });
+                    }}
+                    on:photon-gender-deselected={() => {
+                      actions.updateFormValue({
+                        key: 'gender',
+                        value: undefined
+                      });
+                    }}
+                    selected={pStore.selectedPatient.data?.gender}
+                  />
+                  <photon-text-input
+                    class="w-full"
+                    debounce-time="0"
+                    invalid={store['email']?.error}
+                    help-text={store['email']?.error}
+                    label="Email"
+                    on:photon-input-changed={async (e: any) => {
+                      actions.updateFormValue({
+                        key: 'email',
+                        value: e.detail.input
+                      });
+                    }}
+                    value={store['email']?.value ?? pStore.selectedPatient.data?.email}
+                  />
+                  <p class="font-sans text-sm m-0">Preferred pharmacy</p>
+                  <PharmacySearch
+                    address={getPatientAddress(pStore, store)}
+                    setPharmacy={(pharmacy: any) => {
+                      actions.updateFormValue({
+                        key: 'preferredPharmacy',
+                        value: pharmacy.id
+                      });
+                    }}
+                    patientId={props.patientId}
+                    initialValue={preferredPharmacy()}
+                    hidePreferred
+                  />
+                </div>
               </div>
             </Card>
           </div>
