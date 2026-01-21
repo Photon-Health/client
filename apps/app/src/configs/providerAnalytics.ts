@@ -43,5 +43,13 @@ export class ProviderAnalytics {
   }
 }
 
-// Singleton instance
-export const providerAnalytics = new ProviderAnalytics();
+// Lazy singleton instance - only instantiates when first accessed
+// to fix /sso redirect page from throwing many Rudderstack errors on page load
+let _providerAnalytics: ProviderAnalytics | undefined;
+
+export function getProviderAnalytics(): ProviderAnalytics {
+  if (!_providerAnalytics) {
+    _providerAnalytics = new ProviderAnalytics();
+  }
+  return _providerAnalytics;
+}

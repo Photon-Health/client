@@ -2,7 +2,7 @@ import { createContext, useContext, useMemo, ReactNode, useCallback, useEffect }
 import { gql, useQuery } from '@apollo/client';
 import { usePhoton } from '@photonhealth/react';
 import { ApiObject } from '@rudderstack/analytics-js';
-import { providerAnalytics } from '../configs/providerAnalytics';
+import { getProviderAnalytics } from '../configs/providerAnalytics';
 import { setInstrumentationUserContext } from '../instrumentation/setInstrumentationUserContext';
 
 const ENVIRONMENT = process.env.REACT_APP_ENV_NAME || 'development';
@@ -116,7 +116,7 @@ export const ProviderAnalyticsProvider = ({ children }: ProviderAnalyticsProvide
   // Wrapped track function that auto-includes context
   const track = useCallback(
     (eventName: string, properties: ApiObject = {}) => {
-      providerAnalytics.track(eventName, {
+      getProviderAnalytics().track(eventName, {
         ...contextData,
         ...properties
       });
