@@ -11,8 +11,36 @@ import { PharmacyCard } from './components/PharmacyCard';
 import styles from './style.css?inline';
 import clearForm from './util/clearForm';
 import { formatPatientWeight } from './util/formatPatientWeight';
+const hasUsableAddress = (address?: {
+  street1?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+}) => {
+  if (!address) {
+    return false;
+  }
+  return Boolean(
+    address.street1?.trim() &&
+      address.city?.trim() &&
+      address.state?.trim() &&
+      address.postalCode?.trim()
+  );
+};
+
+const fulfillmentNeedsAddress = (fulfillmentType?: string) => {
+  return (
+    fulfillmentType === types.FulfillmentType.PickUp ||
+    fulfillmentType === types.FulfillmentType.MailOrder
+  );
+};
+
+const shouldBlockOrderWithoutAddress = (fulfillmentType?: string, hasAddress?: boolean) => {
+  return fulfillmentNeedsAddress(fulfillmentType) && !hasAddress;
+};
 import {
   Alert,
+  AddressForm,
   Button,
   RecentOrders,
   ScreeningAlertAcknowledgementDialog,
@@ -28,6 +56,7 @@ import {
   useRecentOrders
 } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import { types } from '@photonhealth/sdk';
 import { Order, Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
 import '@shoelace-style/shoelace/dist/components/alert/alert';
 import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
@@ -74,6 +103,7 @@ export type PrescribeProps = {
   enableCombineAndDuplicate: boolean;
   enableDeliveryPharmacies: boolean;
   enableCoverageCheck: boolean;
+  optionalPatientAddress: boolean;
   mailOrderIds?: string;
   pharmacyId?: string;
   loading: boolean;
@@ -157,6 +187,21 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const [screeningAlerts, setScreeningAlerts] = createSignal<ScreeningAlertType[]>([]);
 
   const [overrideScreenAlerts, setOverrideScreenAlerts] = createSignal<boolean>(false);
+
+  const hasPatientAddress = createMemo(() => {
+    const address = props.formStore?.address?.value ?? props.formStore?.patient?.value?.address;
+    return hasUsableAddress(address);
+  });
+  const hasPreferredPharmacy = createMemo(() => {
+    return Boolean(props.formStore?.patient?.value?.preferredPharmacies?.length);
+  });
+
+  const forceAddressForm = createMemo(() => {
+    if (!props.optionalPatientAddress || !props.enableOrder) {
+      return false;
+    }
+    return fulfillmentNeedsAddress(props.formStore?.fulfillmentType?.value) && !hasPatientAddress();
+  });
   const [isScreeningAlertWarningOpen, setIsScreeningAlertWarningOpen] = createSignal(false);
 
   // we can ignore the warnings to put inside of a createEffect, the additionalNotes or weight shouldn't be updating
@@ -204,6 +249,12 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   const hasPrescribePermission = createMemo(() =>
     checkHasPermission(['write:prescription'], client?.authentication.state.permissions || [])
   );
+
+  const hasValidAddress = createMemo(() => {
+    const patientAddress =
+      props.formStore?.address?.value ?? props.formStore?.patient?.value?.address;
+    return patientAddress && patientAddress.street1;
+  });
 
   const formattedAddress = createMemo(() => {
     // remove unnecessary fields, and add country and street2 if missing
@@ -371,7 +422,28 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       });
     }
 
-    const keys = enableOrder ? ['patient', 'address'] : ['patient'];
+    if (
+      props.enableOrder &&
+      shouldBlockOrderWithoutAddress(props.formStore?.fulfillmentType?.value, hasPatientAddress())
+    ) {
+      setIsLoading(false);
+      triggerToast({
+        status: 'error',
+        header: 'Address required',
+        body: 'Please add a patient address to place a local pickup or mail order.'
+      });
+      setErrors([
+        {
+          key: 'address',
+          error: 'Please enter an address for patient...'
+        }
+      ]);
+      return;
+    }
+
+    const requiresAddress =
+      enableOrder && (!props.optionalPatientAddress || hasPreferredPharmacy());
+    const keys = requiresAddress ? ['patient', 'address'] : ['patient'];
     props.formActions.validate(keys);
     const errors = props.formActions.getErrors(keys);
     if (errors.length === 0) {
@@ -456,7 +528,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           patientId: props.formStore.patient?.value.id,
           pharmacyId,
           fulfillmentType: props.formStore.fulfillmentType?.value || '',
-          address: formattedAddress(),
+          ...(hasValidAddress() ? { address: formattedAddress() } : {}),
           fills: prescriptionIds().map((id) => ({
             prescriptionId: id
           }))
@@ -618,16 +690,21 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                 enableMedHistoryLinks={props.enableMedHistoryLinks ?? false}
                 enableMedHistoryRefillButton={props.enableMedHistoryRefillButton ?? false}
                 hidePatientCard={props.hidePatientCard}
+                optionalPatientAddress={props.optionalPatientAddress}
               />
               <Show
                 when={
                   // if patientId is passed in, we need to ensure it matches the patient id in our store
                   // so we are not referencing stale data
                   hasCorrectPatientData() &&
-                  // if orders are enabled, we need a patient's address
+                  // if orders are enabled, we need a patient's address (unless address is optional)
                   (props.formStore.patient?.value?.address ||
                     // if orders are disabled, we need only a patient id
-                    (props.formStore.patient?.value?.id && !props.enableOrder))
+                    (props.formStore.patient?.value?.id && !props.enableOrder) ||
+                    // optionalpatientaddress skips address requirement unless a preferred pharmacy is set
+                    (props.formStore.patient?.value?.id &&
+                      props.optionalPatientAddress &&
+                      !hasPreferredPharmacy()))
                 }
               >
                 <Show when={props.enableCombineAndDuplicate}>
@@ -678,6 +755,25 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                     enableSendToPatient={props.enableSendToPatient}
                     enableDeliveryPharmacies={props.enableDeliveryPharmacies}
                     mailOrderIds={props.mailOrderIds}
+                  />
+                </Show>
+                <Show when={forceAddressForm() && props.formStore.patient?.value?.id}>
+                  <AddressForm
+                    patientId={props.formStore.patient?.value?.id}
+                    showRequiredBanner={false}
+                    setAddress={(address: Address) => {
+                      props.formActions.updateFormValue({
+                        key: 'address',
+                        value: address
+                      });
+                      props.formActions.updateFormValue({
+                        key: 'patient',
+                        value: {
+                          ...props.formStore.patient!.value,
+                          address
+                        }
+                      });
+                    }}
                   />
                 </Show>
                 <Show when={props.enableOrder && autoRoutedPharmacyId()}>
