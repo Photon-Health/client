@@ -11,6 +11,7 @@ import {
 } from './test-utils/generators';
 import userEvent from '@testing-library/user-event';
 import { routeElements } from './Routes';
+import { patientAnalytics } from './configs/analytics';
 
 const mockToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30';
@@ -44,8 +45,13 @@ vi.mock('./configs/graphqlClient', () => ({
 }));
 
 vi.mock('@datadog/browser-rum');
-vi.mock('./configs/analytics');
-vi.mock('./hooks/usePageAnalytics');
+vi.mock('./configs/analytics', () => ({
+  patientAnalytics: {
+    page: vi.fn(),
+    identify: vi.fn(),
+    track: vi.fn()
+  }
+}));
 vi.mock('react-ga4');
 
 vi.mock('./components', async () => {
@@ -98,12 +104,15 @@ describe('App', () => {
     renderApp({ order: testOrder });
 
     expect(await screen.findByText('Review your prescription')).toBeInTheDocument();
+    expectTotalPageViewAnalyticsCountToBe(1);
     await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
     expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
+    expectTotalPageViewAnalyticsCountToBe(2);
     await userEvent.click(screen.getByText('Test Local Pickup Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
     expect(setOrderPharmacyMock).not.toHaveBeenCalled();
     expect(await screen.findByText('When do you need your order ready by?')).toBeInTheDocument();
+    expectTotalPageViewAnalyticsCountToBe(3);
     await userEvent.click(screen.getByText('Urgent'));
     await userEvent.click(screen.getByText('Next'));
     expect(setOrderPharmacyMock).toHaveBeenCalledWith(
@@ -116,6 +125,7 @@ describe('App', () => {
     );
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
     expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
+    expectTotalPageViewAnalyticsCountToBe(4);
   }, 10_000);
 
   test('For Mail Order Pharmacies: skips the readyBy page', async () => {
@@ -166,3 +176,7 @@ const renderApp = (order: Partial<OrderContextType> = {}) => {
 
   return { render: render(<RouterProvider router={memoryRouter} />), memoryRouter };
 };
+
+function expectTotalPageViewAnalyticsCountToBe(times: number) {
+  expect(patientAnalytics.page).toHaveBeenCalledTimes(times);
+}
