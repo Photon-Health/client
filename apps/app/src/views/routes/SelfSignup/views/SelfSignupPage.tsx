@@ -46,7 +46,7 @@ export const SelfSignupPage = () => {
     return <div>Error: no state</div>;
   }
 
-  const { firstName, lastName, email, npi, verified, credentials, supportEmail } = useMemo(
+  const { firstName, lastName, email, npi, phone, verified, credentials, supportEmail } = useMemo(
     () => extractTokenData(sessionToken),
     [sessionToken]
   );
@@ -58,7 +58,7 @@ export const SelfSignupPage = () => {
     lastName: lastName || '',
     email: email || '',
     npi: npi || '',
-    phone: '',
+    phone: phone || '',
     fax: '',
     street1: '',
     street2: '',
@@ -398,6 +398,7 @@ type SelfSignupFormPrefillData = {
   lastName?: string;
   email?: string;
   npi?: string;
+  phone?: string;
   verified?: boolean;
   credentials?: string;
   supportEmail?: string;
@@ -413,26 +414,28 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
   const lastName: string = decodedPayload.last_name;
   const email: string = decodedPayload.email;
   const npi: string | undefined = decodedPayload.npi ? String(decodedPayload.npi) : undefined;
+  const phone: string | undefined = decodedPayload.phone ? String(decodedPayload.phone) : undefined;
 
   const verified: boolean = decodedPayload.verified ?? false;
   const credentials: string | undefined = decodedPayload.credentials;
   const supportEmail: string | undefined = decodedPayload.supportEmail;
 
-  if (!npi || !firstName || !lastName || !email) {
+  if (!npi || !firstName || !lastName || !email || !phone) {
     const missingFields = [];
     if (!npi) missingFields.push('npi');
     if (!firstName) missingFields.push('firstName');
     if (!lastName) missingFields.push('lastName');
     if (!email) missingFields.push('email');
-    // logging this so we can see errors in DataDog RUM
-    console.error(`Prefill data missing from token for ${email}: ${missingFields.join(', ')}`);
+    if (!phone) missingFields.push('phone');
+    // logging this so we can see occurrences in DataDog RUM
+    console.warn(`Prefill data missing from token for ${email}: ${missingFields.join(', ')}`);
   }
 
   if (!verified || !VALID_LICENSES.has(credentials ?? 'none')) {
     console.error(`Non verified prescriber attempted to sign up`, decodedPayload);
   }
 
-  return { firstName, lastName, email, npi, verified, credentials, supportEmail };
+  return { firstName, lastName, email, npi, phone, verified, credentials, supportEmail };
 }
 
 const buildSignupContinueParams = (state: string, formData: SignupFormData): string => {
