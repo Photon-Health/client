@@ -246,20 +246,25 @@ export const OrderForm = ({
           })
         ) {
           setSubmitting(true);
-          const addressId = !showAddress ? patient?.address?.id : undefined;
+          let orderAddressId: string | undefined;
           const { address, ...rest } = values;
-          const variables = addressId ? { ...rest, addressId } : values;
-          createOrderMutation({ variables, onCompleted: onClose });
 
           // if the user has selected to set the customer's address
           if (updateAddress) {
-            updatePatientMutation({
+            const updateResult = await updatePatientMutation({
               variables: {
                 id: patient.id,
                 address: { ...values.address }
               }
             });
+            orderAddressId = updateResult?.data?.updatePatient?.address?.id ?? undefined;
+          } else if (!showAddress) {
+            orderAddressId = patient?.address?.id ?? undefined;
           }
+
+          const variables = orderAddressId ? { ...rest, addressId: orderAddressId } : rest;
+
+          await createOrderMutation({ variables, onCompleted: onClose });
 
           // if the user has selected to save the pharmacy as their preferred pharmacy
           if (updatePreferredPharmacy) {
