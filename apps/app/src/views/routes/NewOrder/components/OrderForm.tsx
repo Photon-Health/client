@@ -246,7 +246,10 @@ export const OrderForm = ({
           })
         ) {
           setSubmitting(true);
-          createOrderMutation({ variables: values, onCompleted: onClose });
+          const addressId = !showAddress ? patient?.address?.id : undefined;
+          const { address, ...rest } = values;
+          const variables = addressId ? { ...rest, addressId } : values;
+          createOrderMutation({ variables, onCompleted: onClose });
 
           // if the user has selected to set the customer's address
           if (updateAddress) {

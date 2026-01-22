@@ -22,6 +22,7 @@ const GET_PATIENT = gql`
       gender
       dateOfBirth
       address {
+        id
         street1
         street2
         city
@@ -51,6 +52,7 @@ const InfoRow = (props: InfoRowProps) => {
 };
 
 export type Address = {
+  id?: string;
   city: string;
   postalCode: string;
   state: string;

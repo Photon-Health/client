@@ -22,6 +22,7 @@ export type Scalars = {
 
 export type Address = {
   __typename?: 'Address';
+  id?: Maybe<Scalars['ID']>;
   city: Scalars['String'];
   country: Scalars['String'];
   name?: Maybe<Name>;
@@ -255,7 +256,8 @@ export type MutationAddToCatalogArgs = {
 };
 
 export type MutationCreateOrderArgs = {
-  address: AddressInput;
+  address?: InputMaybe<AddressInput>;
+  addressId?: InputMaybe<Scalars['ID']>;
   externalId?: InputMaybe<Scalars['ID']>;
   fills: Array<FillInput>;
   patientId: Scalars['ID'];
