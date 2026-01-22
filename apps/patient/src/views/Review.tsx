@@ -58,7 +58,10 @@ export const Review = () => {
 
   const isMultiRx = flattenedFills.length > 1;
 
-  usePageAnalytics({ pageName: 'Review Prescriptions' });
+  usePageAnalytics({
+    pageName: 'Review Prescriptions',
+    properties: { needsAddress }
+  });
 
   return (
     <Box>
