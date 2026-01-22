@@ -24,7 +24,7 @@ import { shouldShowPriceToggle } from '../utils/shouldShowPriceToggle';
 import { preloadImage } from '../utils/preloadImage';
 
 type FetchOrderOptions = {
-  triggerAutoNavigation: boolean;
+  triggerNavigationAfterFetch: boolean;
 };
 
 export interface OrderContextType {
@@ -175,7 +175,7 @@ export const Main = () => {
     }
   }, [token]);
 
-  const handleOrderResponse = useCallback(
+  const setOrderDataLocally = useCallback(
     (newOrder: Order, currentPharmacy?: Pharmacy) => {
       // This is weird, but it's necessary to show the selected pharmacy
       // when the user goes from selection to the status page
@@ -196,7 +196,11 @@ export const Main = () => {
       datadogRum.setUser({ patientId: newOrder.patient.id });
 
       patientAnalytics.track('Patient App Opened', newOrder, {});
-
+    },
+    [orderId, order]
+  );
+  const navigateForOrder = useCallback(
+    (newOrder: Order) => {
       if (newOrder.state === 'CANCELED') {
         navigate('/canceled', { replace: true });
         return;
@@ -206,21 +210,27 @@ export const Main = () => {
       const redirect = hasPharmacy ? '/status' : '/review';
 
       const query = queryString.stringify({ orderId: newOrder.id, token });
-      console.trace(`navigate(${redirect}?${query})`);
       navigate(`${redirect}?${query}`, {
         replace: true
       });
     },
-    [navigate, orderId, token, order]
+    [navigate, token]
   );
 
   const fetchOrder = useCallback(
-    async (currentPharmacy?: Pharmacy, options: FetchOrderOptions) => {
+    async (
+      currentPharmacy?: Pharmacy,
+      options: FetchOrderOptions = { triggerNavigationAfterFetch: true }
+    ) => {
       if (isDemo) return demoOrder;
       try {
         const result = await getOrder(orderId!);
         if (result) {
-          handleOrderResponse(result, currentPharmacy);
+          setOrderDataLocally(result, currentPharmacy);
+
+          if (options.triggerNavigationAfterFetch) {
+            navigateForOrder(result);
+          }
         }
         return result;
       } catch (e: any) {
@@ -237,10 +247,11 @@ export const Main = () => {
         }
 
         // If an order was returned, use it for routing
-        handleOrderResponse(error.response.data.order);
+        setOrderDataLocally(error.response.data.order);
+        navigateForOrder(error.response.data.order);
       }
     },
-    [handleOrderResponse, isDemo, navigate, orderId]
+    [isDemo, orderId, setOrderDataLocally, navigateForOrder, navigate]
   );
 
   useEffect(() => {
