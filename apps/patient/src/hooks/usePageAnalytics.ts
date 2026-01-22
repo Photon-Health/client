@@ -24,12 +24,5 @@ export const usePageAnalytics = ({ pageName, properties }: UsePageAnalyticsProps
         organizationName: order.organization.name
       });
     }
-  }, [
-    location.pathname,
-    pageName,
-    onLoadProperties,
-    order?.id,
-    order?.organization.id,
-    order?.organization.name
-  ]);
+  }, [location.pathname, pageName, order?.id, order?.organization.id, order?.organization.name]);
 };
