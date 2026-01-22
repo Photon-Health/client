@@ -109,7 +109,7 @@ export const ReadyBy = () => {
 
       if (result) {
         // necessary to ensure the order is updated with the new coupon before navigating
-        await fetchOrder(order.pharmacy);
+        await fetchOrder(order.pharmacy, { triggerNavigationAfterFetch: false });
 
         setSuccessfullySubmitted(true);
         setTimeout(() => {
