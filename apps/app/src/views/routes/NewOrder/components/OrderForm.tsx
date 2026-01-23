@@ -254,7 +254,7 @@ export const OrderForm = ({
             const updateResult = await updatePatientMutation({
               variables: {
                 id: patient.id,
-                address: { ...values.address }
+                address
               }
             });
             orderAddressId = updateResult?.data?.updatePatient?.address?.id ?? undefined;
@@ -262,7 +262,7 @@ export const OrderForm = ({
 
           // override with provided address when not saving to patient
           if (!updateAddress && showAddress) {
-            await createOrderMutation({ variables: { ...rest, address }, onCompleted: onClose });
+            await createOrderMutation({ variables: values, onCompleted: onClose });
           } else {
             // fall back to updated or existing address id
             if (!orderAddressId) {
