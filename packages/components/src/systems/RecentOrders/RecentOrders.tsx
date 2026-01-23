@@ -89,6 +89,7 @@ type RecentOrdersState = {
   patientId?: string;
   patientName?: string;
   // in case the combine order fails, we need address to make a new order
+  addressId?: string;
   address?: Address;
   // if provider chooses not to combine the order, call this to create a new order
   createOrder?: () => void;
@@ -102,7 +103,12 @@ type RecentOrdersState = {
 };
 
 type RecentOrdersActions = {
-  setIsCombineDialogOpen: (isOpen: boolean, createOrder?: () => void, address?: Address) => void;
+  setIsCombineDialogOpen: (
+    isOpen: boolean,
+    createOrder?: () => void,
+    addressId?: string,
+    address?: Address
+  ) => void;
   setIsDuplicateDialogOpen: (
     isOpen: boolean,
     duplicate?: { order: Order; fill: Fill },
@@ -153,10 +159,11 @@ function RecentOrders(props: SDKProviderProps) {
   const value: RecentOrdersContextValue = [
     state,
     {
-      setIsCombineDialogOpen(isOpen, createOrder, address) {
+      setIsCombineDialogOpen(isOpen, createOrder, addressId, address) {
         setState({
           isCombineDialogOpen: isOpen,
           ...(createOrder ? { createOrder } : { createOrderCb: undefined }),
+          ...(addressId ? { addressId } : { addressId: undefined }),
           ...(address ? { address } : { address: undefined })
         });
       },

@@ -26,6 +26,15 @@ const UPDATE_PATIENT_ADDRESS = gql`
   mutation UpdateAddress($id: ID!, $address: AddressInput) {
     updatePatient(id: $id, address: $address) {
       id
+      address {
+        id
+        street1
+        street2
+        city
+        state
+        postalCode
+        country
+      }
     }
   }
 `;
@@ -51,29 +60,28 @@ export default function AddressForm(props: AddressFormProps) {
   const showRequiredBanner = () => props.showRequiredBanner ?? true;
 
   const updatePatientAddress = async (address: AddressProps) => {
-    await client!.apollo.mutate({
+    const { data } = await client!.apollo.mutate({
       mutation: UPDATE_PATIENT_ADDRESS,
-      variables: { id: props.patientId, address },
-      update: () => {
-        setSubmitting(false);
-        triggerToast({
-          header: 'Address Updated',
-          body: 'The patient address has been updated.',
-          status: 'success'
-        });
-        if (props?.setAddress) {
-          props.setAddress(address);
-        }
-      }
+      variables: { id: props.patientId, address }
     });
+    setSubmitting(false);
+    triggerToast({
+      header: 'Address Updated',
+      body: 'The patient address has been updated.',
+      status: 'success'
+    });
+    if (props?.setAddress) {
+      props.setAddress(data?.updatePatient?.address ?? address);
+    }
   };
 
   const { form, errors } = createForm({
     onSubmit: async (values) => {
       setSubmitting(true);
       try {
-        updatePatientAddress({ country: 'US', ...values });
+        await updatePatientAddress({ country: 'US', ...values });
       } catch (e) {
+        setSubmitting(false);
         triggerToast({
           header: 'Error Updating Patient',
           body: 'The patient address has not been updated.',
