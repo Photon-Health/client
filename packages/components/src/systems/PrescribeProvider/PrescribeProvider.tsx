@@ -128,6 +128,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const [patientPreferredPharmacyId, setPatientPreferredPharmacyId] = createSignal<string | null>(
     null
   );
+  const [lastPatientId, setLastPatientId] = createSignal<string | null>(null);
   const [patientAddress, setPatientAddress] = createSignal<Address | null>(null);
   const [didSelectOtherCoverageOption, setDidSelectOtherCoverageOption] =
     createSignal<boolean>(false);
@@ -218,12 +219,19 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   });
 
   createEffect(() => {
-    // reset state on patient change
-    if (props.patientId) {
+    // reset state only when the patient id changes or is cleared
+    if (props.patientId && props.patientId !== lastPatientId()) {
       setDraftPrescriptions([]);
       setSelectedCoverageOption(undefined);
       setDidSelectOtherCoverageOption(false);
       setCoverageOptions([]);
+      setLastPatientId(props.patientId);
+    } else if (!props.patientId && lastPatientId() !== null) {
+      setDraftPrescriptions([]);
+      setSelectedCoverageOption(undefined);
+      setDidSelectOtherCoverageOption(false);
+      setCoverageOptions([]);
+      setLastPatientId(null);
     }
   });
 
