@@ -256,6 +256,12 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     return patientAddress && patientAddress.street1;
   });
 
+  const addressId = createMemo(() => {
+    const patientAddress =
+      props.formStore?.address?.value ?? props.formStore?.patient?.value?.address;
+    return patientAddress?.id;
+  });
+
   const formattedAddress = createMemo(() => {
     // remove unnecessary fields, and add country and street2 if missing
     const patientAddress =
@@ -402,6 +408,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     return recentOrdersActions.setIsCombineDialogOpen(
       true,
       () => submitForm(props.enableOrder),
+      addressId(),
       formattedAddress()
     );
   };
@@ -528,7 +535,11 @@ export function PrescribeWorkflow(props: PrescribeProps) {
           patientId: props.formStore.patient?.value.id,
           pharmacyId,
           fulfillmentType: props.formStore.fulfillmentType?.value || '',
-          ...(hasValidAddress() ? { address: formattedAddress() } : {}),
+          ...(addressId()
+            ? { addressId: addressId() }
+            : hasValidAddress()
+            ? { address: formattedAddress() }
+            : {}),
           fills: prescriptionIds().map((id) => ({
             prescriptionId: id
           }))

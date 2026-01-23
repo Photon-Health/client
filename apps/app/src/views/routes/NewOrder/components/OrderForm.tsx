@@ -246,15 +246,31 @@ export const OrderForm = ({
           })
         ) {
           setSubmitting(true);
-          createOrderMutation({ variables: values, onCompleted: onClose });
+          let orderAddressId: string | undefined;
+          const { address, ...rest } = values;
 
-          // if the user has selected to set the customer's address
+          // update patient address when requested
           if (updateAddress) {
-            updatePatientMutation({
+            const updateResult = await updatePatientMutation({
               variables: {
                 id: patient.id,
-                address: { ...values.address }
+                address
               }
+            });
+            orderAddressId = updateResult?.data?.updatePatient?.address?.id ?? undefined;
+          }
+
+          // override with provided address when not saving to patient
+          if (!updateAddress && showAddress) {
+            await createOrderMutation({ variables: values, onCompleted: onClose });
+          } else {
+            // fall back to updated or existing address id
+            if (!orderAddressId) {
+              orderAddressId = patient?.address?.id ?? undefined;
+            }
+            await createOrderMutation({
+              variables: orderAddressId ? { ...rest, addressId: orderAddressId } : rest,
+              onCompleted: onClose
             });
           }
 

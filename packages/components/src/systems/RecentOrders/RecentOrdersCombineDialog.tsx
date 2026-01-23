@@ -42,9 +42,10 @@ const CREATE_ORDER_MUTATION = gql`
   mutation RecentOrdersCombineDialogCreateOrder(
     $patientId: ID!
     $fills: [FillInput!]!
+    $addressId: ID
     $address: AddressInput
   ) {
-    createOrder(patientId: $patientId, fills: $fills, address: $address) {
+    createOrder(patientId: $patientId, fills: $fills, addressId: $addressId, address: $address) {
       id
     }
   }
@@ -61,6 +62,7 @@ type SuccessCreateOrder = { createOrder: SuccessResponse };
 type VariablesCreateOrder = {
   patientId: string;
   fills: { prescriptionId: string }[];
+  addressId?: string;
   address?: Address;
 };
 
@@ -156,7 +158,7 @@ export default function RecentOrdersCombineDialog() {
       // if there is an error updating an order, most likely because the order state has
       // changed since it was first fetched so we need to create a new order
       try {
-        if (!state?.address || !state?.patientId) {
+        if ((!state?.addressId && !state?.address) || !state?.patientId) {
           throw new Error('No address provided');
         }
 
@@ -164,7 +166,7 @@ export default function RecentOrdersCombineDialog() {
           variables: {
             patientId: state.patientId,
             fills,
-            address: state.address
+            ...(state.addressId ? { addressId: state.addressId } : { address: state.address })
           }
         });
 
