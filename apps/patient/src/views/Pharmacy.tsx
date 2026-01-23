@@ -204,10 +204,7 @@ export const Pharmacy = () => {
   const heading = isReroute ? t.changePharmacy : t.selectAPharmacy;
 
   usePageAnalytics({
-    pageName: 'Pharmacy Select',
-    properties: {
-      insuranceBannerDisplayed: true
-    }
+    pageName: 'Pharmacy Select'
   });
 
   useEffect(() => {
