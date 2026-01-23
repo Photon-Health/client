@@ -42,6 +42,7 @@ const PATIENT_FIELDS = gql`
     email
     phone
     address {
+      id
       name {
         full
       }

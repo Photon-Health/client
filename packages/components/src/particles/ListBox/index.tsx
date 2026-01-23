@@ -39,7 +39,7 @@ export default function ListSelect(props: ListSelectProps): JSX.Element {
         value={selected()}
         onSelectChange={(item?: ListItem) => {
           setSelected(item ?? { name: props.selectMessage });
-          onInput(item?.name ?? '');
+          onInput(item?.value ?? item?.id ?? item?.name ?? '');
         }}
         class="relative shadow-sm rounded-lg"
       >
