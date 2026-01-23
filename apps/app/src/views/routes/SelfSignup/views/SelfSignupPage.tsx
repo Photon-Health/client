@@ -414,7 +414,9 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
   const lastName: string = decodedPayload.last_name;
   const email: string = decodedPayload.email;
   const npi: string | undefined = decodedPayload.npi ? String(decodedPayload.npi) : undefined;
-  const phone: string | undefined = decodedPayload.phone ? String(decodedPayload.phone) : undefined;
+  const phone: string | undefined = decodedPayload.phone
+    ? formatPhoneToTenDigits(decodedPayload.phone)
+    : undefined;
 
   const verified: boolean = decodedPayload.verified ?? false;
   const credentials: string | undefined = decodedPayload.credentials;
@@ -436,6 +438,14 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
   }
 
   return { firstName, lastName, email, npi, phone, verified, credentials, supportEmail };
+}
+
+function formatPhoneToTenDigits(phone: string | number): string {
+  const digits = String(phone).replace(/\D/g, '');
+  if (digits.length === 11 && digits.startsWith('1')) {
+    return digits.slice(1);
+  }
+  return digits;
 }
 
 const buildSignupContinueParams = (state: string, formData: SignupFormData): string => {
