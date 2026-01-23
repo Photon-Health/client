@@ -1,5 +1,6 @@
 import { Button, triggerToast, usePhoton } from '@photonhealth/components';
 import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import { types } from '@photonhealth/sdk';
 import jwtDecode from 'jwt-decode';
 import { customElement } from 'solid-element';
 import { createSignal, onMount } from 'solid-js';
@@ -17,6 +18,26 @@ const shouldWarn = (form: any) =>
   form()['notes']?.value ||
   form()['refillsInput']?.value ||
   form()['treatment']?.value;
+
+const hasUsableAddress = (address?: { id?: string }) => {
+  return Boolean(address?.id);
+};
+
+const fulfillmentNeedsAddress = (fulfillmentType?: string) => {
+  return (
+    fulfillmentType === types.FulfillmentType.PickUp ||
+    fulfillmentType === types.FulfillmentType.MailOrder
+  );
+};
+
+const shouldBlockOrderWithoutAddress = (
+  fulfillmentType?: string,
+  address?: {
+    id?: string;
+  }
+) => {
+  return fulfillmentNeedsAddress(fulfillmentType) && !hasUsableAddress(address);
+};
 
 const Component = (props: {
   enableMedHistory: boolean;
@@ -89,9 +110,25 @@ const Component = (props: {
     ref?.dispatchEvent(event);
   };
 
+  const attemptCreateOrder = () => {
+    const fulfillmentType = form()?.fulfillmentType?.value;
+    const address = form()?.address?.value ?? form()?.patient?.value?.address;
+    if (shouldBlockOrderWithoutAddress(fulfillmentType, address)) {
+      setTriggerSubmit(false);
+      return triggerToast({
+        status: 'error',
+        header: 'Address required',
+        body: 'Please add a patient address to place a local pickup or mail order.'
+      });
+    }
+
+    setIsCreateOrder(true);
+    setTriggerSubmit(true);
+  };
+
   const handleUnsavedConfirm = () => {
     setContinueSubmitOpen(false);
-    setTriggerSubmit(true);
+    attemptCreateOrder();
   };
   const handleUnsavedCancel = () => setContinueSubmitOpen(false);
 
@@ -118,8 +155,7 @@ const Component = (props: {
     }
 
     // else if all good, create the order
-    setIsCreateOrder(true);
-    setTriggerSubmit(true);
+    attemptCreateOrder();
   };
 
   const handleCreatePrescriptions = () => {
@@ -169,8 +205,7 @@ const Component = (props: {
         cancel-text="Yes, save only"
         on:photon-dialog-confirmed={() => {
           setContinueSaveOnly(false);
-          setIsCreateOrder(true);
-          setTriggerSubmit(true);
+          attemptCreateOrder();
         }}
         on:photon-dialog-canceled={() => {
           setContinueSaveOnly(false);

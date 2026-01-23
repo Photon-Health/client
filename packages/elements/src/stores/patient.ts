@@ -21,6 +21,7 @@ const PATIENT_ORDER_FIELDS = gql`
     email
     phone
     address {
+      id
       name {
         full
       }
