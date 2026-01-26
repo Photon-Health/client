@@ -51,6 +51,7 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
       }
 
       try {
+        // todo: this does not trigger photon-draft-prescription-created event, but it should!
         await prescribeContext.tryCreatePrescription({
           ...prescription,
           treatment,

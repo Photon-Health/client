@@ -3,7 +3,7 @@ import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { types } from '@photonhealth/sdk';
 import jwtDecode from 'jwt-decode';
 import { customElement } from 'solid-element';
-import { createSignal, onMount } from 'solid-js';
+import { createMemo, createSignal, onMount } from 'solid-js';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
 import { PatientStore } from '../stores/patient';
 
@@ -72,7 +72,8 @@ const Component = (props: {
   const [continueSaveOnly, setContinueSaveOnly] = createSignal<boolean>(false);
   const [triggerSubmit, setTriggerSubmit] = createSignal<boolean>(false);
   const { actions: patientActions } = PatientStore;
-  const [hideOrderButton, setHideOrderButton] = createSignal<boolean>(true);
+  const [attestationAgreed, setAttestationAgreed] = createSignal<boolean>(false);
+  const [draftPrescriptionCount, setDraftPrescriptionCount] = createSignal<number>(0);
 
   onMount(async () => {
     const token = await client!.getSDK().authentication.getAccessToken();
@@ -178,6 +179,8 @@ const Component = (props: {
     // create the prescriptions
     setContinueSaveOnly(true);
   };
+
+  const hideOrderButton = createMemo(() => !attestationAgreed() || draftPrescriptionCount() < 1);
 
   return (
     <div ref={ref}>
@@ -296,6 +299,12 @@ const Component = (props: {
                 setCanSubmit(e.detail.canSubmit);
                 setForm(e.detail.form);
               }}
+              on:photon-draft-prescription-created={() => {
+                setDraftPrescriptionCount((prev) => prev + 1);
+              }}
+              on:photon-draft-prescription-deleted={() => {
+                setDraftPrescriptionCount((prev) => prev - 1);
+              }}
               on:photon-prescriptions-created={(e: any) => {
                 e.stopPropagation();
                 if (!props.enableOrder) {
@@ -315,7 +324,7 @@ const Component = (props: {
                 setTriggerSubmit(false);
               }}
               on:photon-signature-attestation-agreed={() => {
-                setHideOrderButton(false);
+                setAttestationAgreed(true);
               }}
               on:photon-signature-attestation-canceled={() => {
                 dispatchClosed();
