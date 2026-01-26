@@ -11,17 +11,12 @@ vi.mock('../../utils/text', () => ({
 }));
 
 describe('OfferInfo', () => {
-  const mockPharmacy = {
-    id: 'test-pharmacy-id',
-    name: 'Test Pharmacy',
-    logo: 'https://example.com/logo.png'
-  };
-
   const baseOffer: Offer = {
     pharmacy: {
       id: 'test-pharmacy-id',
       name: 'Test Pharmacy',
-      fulfillmentTypes: ['MAIL_ORDER']
+      fulfillmentTypes: ['MAIL_ORDER'],
+      logo: 'https://example.com/logo.png'
     },
     deliveryEstimate: 'Delivers in 2-3 days',
     costType: 'INSURANCE_ESTIMATE',
@@ -35,7 +30,7 @@ describe('OfferInfo', () => {
   test('renders pharmacy name and logo', () => {
     render(
       <OfferInfo
-        pharmacy={mockPharmacy}
+        pharmacy={baseOffer.pharmacy}
         offer={baseOffer}
         isCurrentPharmacy={false}
         isPreferred={false}
@@ -47,7 +42,7 @@ describe('OfferInfo', () => {
   });
 
   test('renders without logo when not provided', () => {
-    const pharmacyWithoutLogo = { ...mockPharmacy, logo: undefined };
+    const pharmacyWithoutLogo = { ...baseOffer.pharmacy, logo: undefined };
 
     render(
       <OfferInfo
@@ -65,7 +60,7 @@ describe('OfferInfo', () => {
   test('renders cost information when available', () => {
     render(
       <OfferInfo
-        pharmacy={mockPharmacy}
+        pharmacy={baseOffer.pharmacy}
         offer={baseOffer}
         isCurrentPharmacy={false}
         isPreferred={false}
@@ -81,7 +76,7 @@ describe('OfferInfo', () => {
   test('shows retail price with strikethrough when different from cost', () => {
     render(
       <OfferInfo
-        pharmacy={mockPharmacy}
+        pharmacy={baseOffer.pharmacy}
         offer={baseOffer}
         isCurrentPharmacy={false}
         isPreferred={false}
@@ -102,7 +97,7 @@ describe('OfferInfo', () => {
 
     render(
       <OfferInfo
-        pharmacy={mockPharmacy}
+        pharmacy={baseOffer.pharmacy}
         offer={offerWithSameCost}
         isCurrentPharmacy={false}
         isPreferred={false}
@@ -116,7 +111,7 @@ describe('OfferInfo', () => {
   test('renders delivery estimate', () => {
     render(
       <OfferInfo
-        pharmacy={mockPharmacy}
+        pharmacy={baseOffer.pharmacy}
         offer={baseOffer}
         isCurrentPharmacy={false}
         isPreferred={false}
@@ -129,7 +124,7 @@ describe('OfferInfo', () => {
   test('renders offer tags', () => {
     render(
       <OfferInfo
-        pharmacy={mockPharmacy}
+        pharmacy={baseOffer.pharmacy}
         offer={baseOffer}
         isCurrentPharmacy={false}
         isPreferred={false}
@@ -143,7 +138,7 @@ describe('OfferInfo', () => {
   test('shows preferred tag when isPreferred is true', () => {
     render(
       <OfferInfo
-        pharmacy={mockPharmacy}
+        pharmacy={baseOffer.pharmacy}
         offer={baseOffer}
         isCurrentPharmacy={false}
         isPreferred={true}
@@ -156,7 +151,7 @@ describe('OfferInfo', () => {
   test('shows current pharmacy tag when isCurrentPharmacy is true', () => {
     render(
       <OfferInfo
-        pharmacy={mockPharmacy}
+        pharmacy={baseOffer.pharmacy}
         offer={baseOffer}
         isCurrentPharmacy={true}
         isPreferred={false}
@@ -177,7 +172,7 @@ describe('OfferInfo', () => {
 
     render(
       <OfferInfo
-        pharmacy={mockPharmacy}
+        pharmacy={baseOffer.pharmacy}
         offer={offerWithoutCost}
         isCurrentPharmacy={false}
         isPreferred={false}
@@ -200,7 +195,7 @@ describe('OfferInfo', () => {
 
     render(
       <OfferInfo
-        pharmacy={mockPharmacy}
+        pharmacy={baseOffer.pharmacy}
         offer={offerWithOnlyRetail}
         isCurrentPharmacy={false}
         isPreferred={false}
@@ -247,7 +242,7 @@ describe('OfferInfo', () => {
 
     render(
       <OfferInfo
-        pharmacy={mockPharmacy}
+        pharmacy={baseOffer.pharmacy}
         offer={offerWithoutTags}
         isCurrentPharmacy={false}
         isPreferred={false}
@@ -262,7 +257,7 @@ describe('OfferInfo', () => {
   test('combines preferred and current pharmacy tags with offer tags', () => {
     render(
       <OfferInfo
-        pharmacy={mockPharmacy}
+        pharmacy={baseOffer.pharmacy}
         offer={baseOffer}
         isCurrentPharmacy={true}
         isPreferred={true}
