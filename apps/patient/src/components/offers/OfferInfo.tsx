@@ -1,6 +1,5 @@
 import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@chakra-ui/react';
 import { FiStar } from 'react-icons/fi';
-import { EnrichedPharmacy } from '../../utils/models';
 import { text as t } from '../../utils/text';
 
 import { formatPrice } from '../../utils/formatters';
@@ -33,14 +32,16 @@ const CurrentPharmacyTag = () => {
 };
 
 interface OfferInfoProps {
-  pharmacy?: EnrichedPharmacy;
+  pharmacy?: Pick<Offer['pharmacy'], 'id' | 'name' | 'logo'>;
   offer: Offer;
   isCurrentPharmacy?: boolean;
   isPreferred?: boolean;
 }
 
 export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: OfferInfoProps) => {
-  if (!pharmacy) return null;
+  if (!pharmacy) {
+    return null;
+  }
 
   const offerTags = [
     ...offer.tags,
@@ -71,6 +72,8 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
   const retailAmount = costAmount === offer.retailAmount ? undefined : offer.retailAmount;
   const retailAmountTitle = costAmount === offer.retailAmount ? undefined : offer.retailAmountTitle;
 
+  const isAmazonPharmacy = pharmacy.id === process.env.REACT_APP_AMAZON_PHARMACY_ID;
+
   return (
     <VStack data-testid="pharmacy-info" align="start" w="full">
       {offerTags.length > 0 ? (
@@ -81,7 +84,7 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
 
       <HStack w="full" justify="space-between">
         <HStack w="full">
-          {pharmacy?.logo ? (
+          {pharmacy.logo ? (
             <Box boxSize="32px" overflow="hidden">
               <Image
                 src={pharmacy.logo}
@@ -117,9 +120,11 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
         <Text fontSize="sm" fontWeight="semibold">
           {offer.deliveryEstimate}
         </Text>
-        <Text fontSize="sm" color="gray.500">
-          Sponsored
-        </Text>
+        {isAmazonPharmacy && (
+          <Text fontSize="sm" color="gray.500">
+            Sponsored
+          </Text>
+        )}
       </VStack>
     </VStack>
   );
