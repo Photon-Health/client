@@ -10,7 +10,12 @@ import { onCleanup } from 'solid-js';
 import { PatientStore } from '../stores/patient';
 import { PrescribeEventDispatchProvider } from './components/PrescribeEventDispatchProvider';
 
-const Component = (props: PrescribeProps) => {
+interface PrescribeWorkflowComponentProps extends Omit<PrescribeProps, 'initialShowForm'> {
+  templateIds?: string;
+  prescriptionIds?: string;
+}
+
+const Component = (props: PrescribeWorkflowComponentProps) => {
   const { actions: patientActions } = PatientStore;
   const { store, actions } = createFormStore({
     dispenseAsWritten: false,
@@ -40,9 +45,7 @@ const Component = (props: PrescribeProps) => {
           >
             <PrescribeWorkflow
               patientId={props.patientId}
-              templateIds={props.templateIds}
               templateOverrides={props.templateOverrides}
-              prescriptionIds={props.prescriptionIds}
               hideSubmit={props.hideSubmit}
               hideTemplates={props.hideTemplates}
               hidePatientCard={props.hidePatientCard}
@@ -72,6 +75,8 @@ const Component = (props: PrescribeProps) => {
               allowOffCatalogSearch={props.allowOffCatalogSearch}
               disableList={props.disableList}
               groupId={props.groupId}
+              // this logic keeps the rx form closed when refilling a particular template/prescription
+              initialShowForm={!props.templateIds && !props.prescriptionIds}
             />
           </PrescribeProvider>
         </RecentOrders>

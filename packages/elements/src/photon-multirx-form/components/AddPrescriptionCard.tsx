@@ -61,12 +61,7 @@ export const AddPrescriptionCard = (props: {
   enableOrder: boolean;
   disableList?: DisableList;
 }) => {
-  const prescribeContext = usePrescribe();
-  if (!prescribeContext) {
-    throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
-  }
-  const { tryCreatePrescription } = prescribeContext;
-
+  const { tryCreatePrescription } = usePrescribe();
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);

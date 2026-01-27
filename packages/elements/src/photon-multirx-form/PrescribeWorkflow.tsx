@@ -89,9 +89,7 @@ export type DisableList = DisabledItem[];
 
 export type PrescribeProps = {
   patientId?: string;
-  templateIds?: string;
   templateOverrides?: TemplateOverrides;
-  prescriptionIds?: string;
   hideSubmit: boolean;
   hideTemplates: boolean;
   hidePatientCard: boolean;
@@ -122,6 +120,7 @@ export type PrescribeProps = {
   allowOffCatalogSearch?: boolean;
   disableList?: DisableList;
   groupId?: string;
+  initialShowForm: boolean;
 };
 
 export const ScreenDraftedPrescriptionsQuery = gql`
@@ -175,10 +174,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   });
 
   const client = usePhoton();
-  const [showForm, setShowForm] = createSignal<boolean>(
-    // this logic keeps the rx form closed when refilling a particular template/prescription
-    !props.templateIds && !props.prescriptionIds
-  );
+  const [showForm, setShowForm] = createSignal<boolean>(props.initialShowForm);
   const [errors, setErrors] = createSignal<FormError[]>([]);
   const [isLoading, setIsLoading] = createSignal<boolean>(true);
   const [isEditing, setIsEditing] = createSignal<boolean>(false);
