@@ -4,7 +4,7 @@ import { Treatment } from '@photonhealth/sdk/dist/types';
 import { IconButton } from '../../particles/IconButton';
 import clsx from 'clsx';
 import { MedHistoryPrescription } from './index';
-import { usePrescribe } from '../PrescribeProvider';
+import { usePrescribeOptional } from '../PrescribeProvider';
 
 export type MedHistoryRowItem = {
   treatment: Treatment;
@@ -22,7 +22,9 @@ export type PatientMedHistoryTableProps = {
 };
 
 export default function PatientMedHistoryTable(props: PatientMedHistoryTableProps) {
-  const { tryCreatePrescription } = usePrescribe();
+  // Component can be used as a standalone element
+  // so PrescribeProvider is not guaranteed to be rendered
+  const prescribeContext = usePrescribeOptional();
 
   const [isCreatingPrescriptionId, setIsCreatingPrescriptionId] = createSignal<string | undefined>(
     undefined
@@ -46,8 +48,12 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
     if (isCreatingPrescriptionId() === undefined) {
       setIsCreatingPrescriptionId(prescription.id);
 
+      if (!prescribeContext) {
+        throw new Error('Refill requires <PrescribeProvider>');
+      }
+
       try {
-        await tryCreatePrescription({
+        await prescribeContext.tryCreatePrescription({
           ...prescription,
           treatment,
           diagnoseCodes: prescription.diagnoses?.map((diagnosis) => diagnosis.code) || []
