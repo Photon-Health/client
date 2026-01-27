@@ -16,7 +16,7 @@ import {
   TreatmentOption
 } from '@photonhealth/sdk/dist/types';
 import { CatalogStore } from '../stores/catalog';
-import { DisableList } from '../photon-multirx-form/PrescribeWorkflow';
+import { DisableList } from '../photon-multirx-form/components/PrescribeWorkflow';
 
 import { ApolloClient } from '@apollo/client';
 import gql from 'graphql-tag';

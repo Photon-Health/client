@@ -6,9 +6,21 @@ import {
 } from '@photonhealth/components';
 import { customElement } from 'solid-element';
 import { createFormStore } from '../stores/form';
-import { PrescribeProps, PrescribeWorkflow } from './PrescribeWorkflow';
+import { PrescribeProps, PrescribeWorkflow } from './components/PrescribeWorkflow';
 import { onCleanup } from 'solid-js';
 import { PatientStore } from '../stores/patient';
+import tailwind from '../tailwind.css?inline';
+import styles from './style.css?inline';
+import photonStyles from '@photonhealth/components/dist/style.css?inline';
+import '@shoelace-style/shoelace/dist/components/alert/alert';
+import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
+import '@shoelace-style/shoelace/dist/components/icon/icon';
+import '@shoelace-style/shoelace/dist/components/switch/switch';
+import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
+import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
+import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
+
+setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 interface PrescribeWorkflowComponentProps extends Omit<PrescribeProps, 'initialShowForm'> {
   templateIds?: string;
@@ -43,6 +55,11 @@ const Component = (props: PrescribeWorkflowComponentProps) => {
             enableCombineAndDuplicate={props.enableCombineAndDuplicate}
             enableCoverageCheck={props.enableCoverageCheck}
           >
+            <style>{tailwind}</style>
+            <style>{shoelaceDarkStyles}</style>
+            <style>{shoelaceLightStyles}</style>
+            <style>{styles}</style>
+            <style>{photonStyles}</style>
             <PrescribeWorkflow
               patientId={props.patientId}
               templateOverrides={props.templateOverrides}
