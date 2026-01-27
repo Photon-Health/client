@@ -13,12 +13,20 @@ export const SSOLogin = () => {
   const connection = searchParams.get('connection') ?? undefined;
   const returnTo = searchParams.get('returnTo') ?? undefined;
 
+  const alreadyLoggedOut = searchParams.get('loggedOut') === '1';
+
   useEffect(() => {
-    if (isLoading) return;
-    if (isAuthenticated) {
+    if (isLoading) {
+      console.log('SSOLogin -> isLoading, return');
+      return;
+    }
+    if (isAuthenticated && !alreadyLoggedOut) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('loggedOut', '1');
       // logout before attempting a login, in case user has existing session with another org
       // that doesn't use the SSO connection
       logout({ federated: false, returnTo: window.location.href });
+      console.log('SSOLogin -> isAuthenticated, return');
       return;
     }
 
@@ -28,10 +36,11 @@ export const SSOLogin = () => {
       }
     }
 
+    console.log('SSOLogin -> invoking login()');
     login({
       connection
     });
-  }, [isLoading, isAuthenticated, login, logout, connection, returnTo]);
+  }, [isLoading, isAuthenticated, login, logout, connection, returnTo, alreadyLoggedOut]);
 
   return (
     <Container maxW="md" py={{ base: '12', md: '24' }}>
