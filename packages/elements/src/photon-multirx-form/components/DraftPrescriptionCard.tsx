@@ -1,4 +1,4 @@
-import { createSignal, Ref } from 'solid-js';
+import { createSignal } from 'solid-js';
 import {
   Card,
   CoverageOption,
@@ -8,12 +8,11 @@ import {
   ScreeningAlertType,
   Text,
   useDraftPrescriptions,
-  usePrescribe
+  usePrescribe,
+  usePrescribeEventDispatch
 } from '@photonhealth/components';
 import repopulateForm from '../util/repopulateForm';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
 import { PhotonTooltip } from '../../photon-tooltip';
-import { Prescription } from '@photonhealth/sdk/dist/types';
 
 export const DraftPrescriptionCard = (props: {
   prescriptionRef: HTMLDivElement | undefined;
@@ -25,7 +24,7 @@ export const DraftPrescriptionCard = (props: {
   routingConstraints: RoutingConstraint[];
   enableOrder: boolean;
 }) => {
-  let ref: Ref<any> | undefined;
+  const { dispatchDraftPrescriptionDeleted } = usePrescribeEventDispatch();
   const [deleteDialogOpen, setDeleteDialogOpen] = createSignal<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = createSignal<boolean>(false);
   const [editDialogConfirm, setEditDialogConfirm] = createSignal<(() => void) | undefined>();
@@ -33,17 +32,6 @@ export const DraftPrescriptionCard = (props: {
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
   const { prescriptionIds, deletePrescription, selectOtherCoverageOption } = usePrescribe();
   const { draftPrescriptions } = useDraftPrescriptions();
-
-  const dispatchPrescriptionDraftDeleted = (prescription?: Prescription) => {
-    const event = new CustomEvent('photon-draft-prescription-deleted', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        prescription
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
 
   const editPrescription = () => {
     const formData = editDraft();
@@ -105,7 +93,7 @@ export const DraftPrescriptionCard = (props: {
     if (deletedId) {
       const deletedRx = draftPrescriptions().find((rx) => rx.id === deletedId);
       deletePrescription(deletedId);
-      dispatchPrescriptionDraftDeleted(deletedRx);
+      dispatchDraftPrescriptionDeleted(deletedRx);
     }
 
     setDeleteDialogOpen(false);
@@ -124,8 +112,7 @@ export const DraftPrescriptionCard = (props: {
   };
 
   return (
-    <div ref={ref}>
-      <style>{photonStyles}</style>
+    <div>
       <photon-dialog
         open={editDialogOpen()}
         label="Overwrite in progress prescription?"
