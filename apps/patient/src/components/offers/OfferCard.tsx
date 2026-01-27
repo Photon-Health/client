@@ -1,11 +1,10 @@
 import { Card, CardBody } from '@chakra-ui/react';
 
-import { Offer, PHARMACY_BRANDING } from '../pharmacy-card-list';
+import { Offer } from '../pharmacy-card-list';
 import { OfferInfo } from './OfferInfo';
 
 interface Props {
   offer: Offer;
-  pharmacyId: string;
   isPharmacyFulfillingCurrentOrder: boolean;
   selected: boolean;
   isPreferred: boolean;
@@ -13,20 +12,11 @@ interface Props {
 }
 export const OfferCard = ({
   offer,
-  pharmacyId,
   selected,
   handleSelect,
   isPharmacyFulfillingCurrentOrder,
   isPreferred
 }: Props) => {
-  const brand = PHARMACY_BRANDING[pharmacyId];
-
-  const pharmacy = {
-    id: pharmacyId,
-    name: offer.pharmacy.name,
-    logo: brand?.logo ? brand.logo : ''
-  };
-
   return (
     <Card
       // if the pharmacy is fulfilling the current order
@@ -39,7 +29,7 @@ export const OfferCard = ({
       }
       borderRadius="lg"
       shadow={'none'}
-      onClick={() => handleSelect(pharmacyId, offer)}
+      onClick={() => handleSelect(offer.pharmacy.id, offer)}
       mx={{ base: -2, md: undefined }}
       cursor={!isPharmacyFulfillingCurrentOrder ? 'pointer' : undefined}
       pointerEvents={isPharmacyFulfillingCurrentOrder ? 'none' : undefined}
@@ -47,7 +37,7 @@ export const OfferCard = ({
     >
       <CardBody p={3}>
         <OfferInfo
-          pharmacy={pharmacy}
+          pharmacy={offer.pharmacy}
           offer={offer}
           isCurrentPharmacy={isPharmacyFulfillingCurrentOrder}
           isPreferred={isPreferred}

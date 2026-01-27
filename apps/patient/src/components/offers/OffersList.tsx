@@ -33,7 +33,6 @@ export const OffersList = ({
             <OfferCard
               key={offer.pharmacy.id}
               offer={offer}
-              pharmacyId={offer.pharmacy.id || 'Unknown Pharmacy ID'}
               isPharmacyFulfillingCurrentOrder={false}
               selected={selectedPharmacyId === offer.pharmacy.id}
               isPreferred={preferredPharmacyId === offer.pharmacy.id}
