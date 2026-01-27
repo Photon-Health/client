@@ -11,7 +11,7 @@ import {
 import { Treatment } from '@photonhealth/sdk/dist/types';
 import { message } from '../../validators';
 import { PatientStore } from '../../stores/patient';
-import type { Address } from '../photon-prescribe-workflow';
+import type { Address } from '../PrescribeWorkflow';
 const hasUsableAddress = (address?: {
   street1?: string;
   city?: string;

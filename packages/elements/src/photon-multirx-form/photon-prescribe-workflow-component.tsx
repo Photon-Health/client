@@ -5,7 +5,7 @@ import {
 } from '@photonhealth/components';
 import { customElement } from 'solid-element';
 import { createFormStore } from '../stores/form';
-import { PrescribeProps, PrescribeWorkflow } from './photon-prescribe-workflow';
+import { PrescribeProps, PrescribeWorkflow } from './PrescribeWorkflow';
 import { onCleanup } from 'solid-js';
 import { PatientStore } from '../stores/patient';
 

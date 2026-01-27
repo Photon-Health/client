@@ -24,7 +24,7 @@ import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
 import { TryCreatePrescriptionTemplateOptions } from '@photonhealth/components/src/systems/PrescribeProvider';
-import { DisableList } from '../photon-prescribe-workflow';
+import { DisableList } from '../PrescribeWorkflow';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
