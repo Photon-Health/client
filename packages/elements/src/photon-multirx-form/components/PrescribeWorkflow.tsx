@@ -144,6 +144,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     orderFormData
   } = usePrescribe();
   const {
+    dispatchFormValidate,
     dispatchPrescriptionsCreated,
     dispatchPrescriptionsError,
     dispatchOrderCreated,
@@ -322,19 +323,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       screenDraftedPrescriptions();
     }
   });
-
-  const dispatchPrescriptionsFormValidate = (canSubmit: boolean) => {
-    const event = new CustomEvent('photon-form-validate', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        canSubmit: canSubmit,
-        form: props.formStore,
-        actions: props.formActions
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
 
   const displayAlertsWarning = () => {
     setIsScreeningAlertWarningOpen(true);
@@ -524,8 +512,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   });
 
   createEffect(() => {
-    dispatchPrescriptionsFormValidate(
-      Boolean(draftPrescriptions().length > 0 && props.formStore.patient?.value)
+    dispatchFormValidate(
+      Boolean(draftPrescriptions().length > 0 && props.formStore.patient?.value),
+      props.formStore
     );
   });
 

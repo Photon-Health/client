@@ -3,12 +3,13 @@ import { GraphQLFormattedError } from 'graphql';
 import { createContext, JSXElement, useContext } from 'solid-js';
 
 const PrescribeEventDispatchContext = createContext<{
+  dispatchFormValidate: (canSubmit: boolean, form: any) => void;
   dispatchDraftPrescriptionCreated: (draftPrescription: Prescription) => void;
   dispatchDraftPrescriptionDeleted: (prescription?: Prescription) => void;
   dispatchPrescriptionsCreated: (prescriptions: Prescription[]) => void;
-  dispatchPrescriptionsError: (errors: readonly GraphQLFormattedError[]) => void;
+  dispatchPrescriptionsError: (errors: GraphQLFormattedError[]) => void;
   dispatchOrderCreated: (order: Order) => void;
-  dispatchOrderError: (errors: readonly GraphQLFormattedError[]) => void;
+  dispatchOrderError: (errors: GraphQLFormattedError[]) => void;
 }>();
 
 interface DraftPrescriptionProviderProps {
@@ -17,6 +18,18 @@ interface DraftPrescriptionProviderProps {
 
 export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderProps) => {
   let ref!: HTMLDivElement;
+
+  const dispatchFormValidate = (canSubmit: boolean, form: any) => {
+    const event = new CustomEvent('photon-form-validate', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        canSubmit,
+        form
+      }
+    });
+    ref.dispatchEvent(event);
+  };
 
   const dispatchDraftPrescriptionCreated = (draftPrescription: Prescription) => {
     const event = new CustomEvent('photon-draft-prescription-created', {
@@ -51,7 +64,7 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     ref.dispatchEvent(event);
   };
 
-  const dispatchPrescriptionsError = (errors: readonly Error[]) => {
+  const dispatchPrescriptionsError = (errors: GraphQLFormattedError[]) => {
     const event = new CustomEvent('photon-prescriptions-error', {
       composed: true,
       bubbles: true,
@@ -73,7 +86,7 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     ref.dispatchEvent(event);
   };
 
-  const dispatchOrderError = (errors: readonly GraphQLFormattedError[]) => {
+  const dispatchOrderError = (errors: GraphQLFormattedError[]) => {
     const event = new CustomEvent('photon-order-error', {
       composed: true,
       bubbles: true,
@@ -85,6 +98,7 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
   };
 
   const value = {
+    dispatchFormValidate,
     dispatchDraftPrescriptionCreated,
     dispatchDraftPrescriptionDeleted,
     dispatchPrescriptionsCreated,
