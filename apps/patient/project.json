@@ -63,6 +63,28 @@
       },
       "dependsOn": ["^build", "codegen:tau"]
     },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "commands": [
+          "env-cmd -f .env.boson react-app-rewired start",
+          "nx watch --projects=patient --includeDependentProjects -- nx affected -t build --uncommitted=true --exclude=patient"
+        ]
+      },
+      "dependsOn": ["^build", "codegen"]
+    },
+    "dev:tau": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/patient",
+        "commands": [
+          "env-cmd -f .env.tau react-app-rewired start",
+          "nx watch --projects=patient --includeDependentProjects -- nx affected -t build --uncommitted=true --exclude=patient"
+        ]
+      },
+      "dependsOn": ["^build", "codegen:tau"]
+    },
     "build:boson": {
       "executor": "nx:run-commands",
       "options": {

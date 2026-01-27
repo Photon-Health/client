@@ -182,6 +182,8 @@
   "overrides": {
     "@chakra-ui/react": {
       "@zag-js/focus-visible": "^1.18.0"
-    }
+    },
+    "graphql-request": { "form-data": "3.0.4" },
+    "react-scripts": { "form-data": "3.0.4" }
   }
 }
