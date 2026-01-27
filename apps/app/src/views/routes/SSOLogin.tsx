@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { usePhoton } from '@photonhealth/react';
 import { Logo } from '../components/Logo';
 import { useEffect } from 'react';
+import { datadogRum } from '@datadog/browser-rum';
 
 export const SSOLogin = () => {
   const breakpoint = useBreakpointValue({ base: 'xs', md: 'sm' });
@@ -17,16 +18,16 @@ export const SSOLogin = () => {
 
   useEffect(() => {
     if (isLoading) {
-      console.log('SSOLogin -> isLoading, return');
+      datadogRum.addAction('SSOLogin-Debug', { state: 'isLoading' });
       return;
     }
     if (isAuthenticated && !alreadyLoggedOut) {
+      datadogRum.addAction('SSOLogin-Debug', { state: 'isAuthenticated' });
       const url = new URL(window.location.href);
       url.searchParams.set('loggedOut', '1');
       // logout before attempting a login, in case user has existing session with another org
       // that doesn't use the SSO connection
       logout({ federated: false, returnTo: window.location.href });
-      console.log('SSOLogin -> isAuthenticated, return');
       return;
     }
 
@@ -36,7 +37,7 @@ export const SSOLogin = () => {
       }
     }
 
-    console.log('SSOLogin -> invoking login()');
+    datadogRum.addAction('SSOLogin-Debug', { state: 'login' });
     login({
       connection
     });
