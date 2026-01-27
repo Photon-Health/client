@@ -28,7 +28,7 @@ import {
   usePrescribeEventDispatch
 } from '@photonhealth/components';
 import { types } from '@photonhealth/sdk';
-import { Order, Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
+import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
 
@@ -143,7 +143,8 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     isLoadingPrefills,
     orderFormData
   } = usePrescribe();
-  const { dispatchPrescriptionsCreated, dispatchOrderError } = usePrescribeEventDispatch();
+  const { dispatchPrescriptionsCreated, dispatchOrderCreated, dispatchOrderError } =
+    usePrescribeEventDispatch();
 
   const prescriptionIds = createMemo(() =>
     draftPrescriptions().map((prescription) => prescription.id)
@@ -257,17 +258,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     const address = { street2: '', country: 'US', ...filteredPatientAddress };
     return address;
   });
-
-  const dispatchOrderCreated = (order: Order) => {
-    const event = new CustomEvent('photon-order-created', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        order: order
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
 
   const removeDuplicateTreatments = (
     prescriptions: ScreenablePrescription[]

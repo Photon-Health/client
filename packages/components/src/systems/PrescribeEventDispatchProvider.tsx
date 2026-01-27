@@ -1,4 +1,4 @@
-import { Prescription } from '@photonhealth/sdk/dist/types';
+import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createContext, JSXElement, useContext } from 'solid-js';
 
@@ -6,6 +6,7 @@ const PrescribeEventDispatchContext = createContext<{
   dispatchDraftPrescriptionCreated: (draftPrescription: Prescription) => void;
   dispatchDraftPrescriptionDeleted: (prescription?: Prescription) => void;
   dispatchPrescriptionsCreated: (prescriptions: Prescription[]) => void;
+  dispatchOrderCreated: (order: Order) => void;
   dispatchOrderError: (errors: readonly GraphQLFormattedError[]) => void;
 }>();
 
@@ -49,6 +50,17 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     ref.dispatchEvent(event);
   };
 
+  const dispatchOrderCreated = (order: Order) => {
+    const event = new CustomEvent('photon-order-created', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        order: order
+      }
+    });
+    ref.dispatchEvent(event);
+  };
+
   const dispatchOrderError = (errors: readonly GraphQLFormattedError[]) => {
     const event = new CustomEvent('photon-order-error', {
       composed: true,
@@ -64,6 +76,7 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     dispatchDraftPrescriptionCreated,
     dispatchDraftPrescriptionDeleted,
     dispatchPrescriptionsCreated,
+    dispatchOrderCreated,
     dispatchOrderError
   };
 
