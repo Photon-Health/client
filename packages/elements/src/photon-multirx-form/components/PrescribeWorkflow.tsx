@@ -143,8 +143,12 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     isLoadingPrefills,
     orderFormData
   } = usePrescribe();
-  const { dispatchPrescriptionsCreated, dispatchOrderCreated, dispatchOrderError } =
-    usePrescribeEventDispatch();
+  const {
+    dispatchPrescriptionsCreated,
+    dispatchPrescriptionsError,
+    dispatchOrderCreated,
+    dispatchOrderError
+  } = usePrescribeEventDispatch();
 
   const prescriptionIds = createMemo(() =>
     draftPrescriptions().map((prescription) => prescription.id)
@@ -318,17 +322,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       screenDraftedPrescriptions();
     }
   });
-
-  const dispatchPrescriptionsError = (errors: readonly Error[]) => {
-    const event = new CustomEvent('photon-prescriptions-error', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        errors: errors
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
 
   const dispatchPrescriptionsFormValidate = (canSubmit: boolean) => {
     const event = new CustomEvent('photon-form-validate', {

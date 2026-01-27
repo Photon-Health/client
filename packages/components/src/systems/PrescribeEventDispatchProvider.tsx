@@ -6,6 +6,7 @@ const PrescribeEventDispatchContext = createContext<{
   dispatchDraftPrescriptionCreated: (draftPrescription: Prescription) => void;
   dispatchDraftPrescriptionDeleted: (prescription?: Prescription) => void;
   dispatchPrescriptionsCreated: (prescriptions: Prescription[]) => void;
+  dispatchPrescriptionsError: (errors: readonly GraphQLFormattedError[]) => void;
   dispatchOrderCreated: (order: Order) => void;
   dispatchOrderError: (errors: readonly GraphQLFormattedError[]) => void;
 }>();
@@ -50,6 +51,17 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     ref.dispatchEvent(event);
   };
 
+  const dispatchPrescriptionsError = (errors: readonly Error[]) => {
+    const event = new CustomEvent('photon-prescriptions-error', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        errors: errors
+      }
+    });
+    ref.dispatchEvent(event);
+  };
+
   const dispatchOrderCreated = (order: Order) => {
     const event = new CustomEvent('photon-order-created', {
       composed: true,
@@ -76,6 +88,7 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     dispatchDraftPrescriptionCreated,
     dispatchDraftPrescriptionDeleted,
     dispatchPrescriptionsCreated,
+    dispatchPrescriptionsError,
     dispatchOrderCreated,
     dispatchOrderError
   };
