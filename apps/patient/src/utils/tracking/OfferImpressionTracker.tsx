@@ -7,7 +7,7 @@ import { Offer } from '../../components/pharmacy-card-list';
 
 const OfferImpressionTracker = ({
   children,
-  offer,
+  offer = undefined,
   pharmacy,
   ordinalPosition,
   isAlreadySelected,
