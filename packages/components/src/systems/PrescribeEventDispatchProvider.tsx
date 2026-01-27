@@ -5,6 +5,7 @@ import { createContext, JSXElement, useContext } from 'solid-js';
 const PrescribeEventDispatchContext = createContext<{
   dispatchDraftPrescriptionCreated: (draftPrescription: Prescription) => void;
   dispatchDraftPrescriptionDeleted: (prescription?: Prescription) => void;
+  dispatchPrescriptionsCreated: (prescriptions: Prescription[]) => void;
   dispatchOrderError: (errors: readonly GraphQLFormattedError[]) => void;
 }>();
 
@@ -37,6 +38,17 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     ref.dispatchEvent(event);
   };
 
+  const dispatchPrescriptionsCreated = (prescriptions: Prescription[]) => {
+    const event = new CustomEvent('photon-prescriptions-created', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        prescriptions: prescriptions
+      }
+    });
+    ref.dispatchEvent(event);
+  };
+
   const dispatchOrderError = (errors: readonly GraphQLFormattedError[]) => {
     const event = new CustomEvent('photon-order-error', {
       composed: true,
@@ -51,6 +63,7 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
   const value = {
     dispatchDraftPrescriptionCreated,
     dispatchDraftPrescriptionDeleted,
+    dispatchPrescriptionsCreated,
     dispatchOrderError
   };
 

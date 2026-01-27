@@ -143,7 +143,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     isLoadingPrefills,
     orderFormData
   } = usePrescribe();
-  const { dispatchOrderError } = usePrescribeEventDispatch();
+  const { dispatchPrescriptionsCreated, dispatchOrderError } = usePrescribeEventDispatch();
 
   const prescriptionIds = createMemo(() =>
     draftPrescriptions().map((prescription) => prescription.id)
@@ -257,17 +257,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     const address = { street2: '', country: 'US', ...filteredPatientAddress };
     return address;
   });
-
-  const dispatchPrescriptionsCreated = (prescriptions: Prescription[]) => {
-    const event = new CustomEvent('photon-prescriptions-created', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        prescriptions: prescriptions
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
 
   const dispatchOrderCreated = (order: Order) => {
     const event = new CustomEvent('photon-order-created', {
