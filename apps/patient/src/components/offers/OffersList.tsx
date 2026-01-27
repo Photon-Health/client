@@ -29,6 +29,7 @@ export const OffersList = ({
             ordinalPosition={index}
             isAlreadySelected={selectedPharmacyId === offer.pharmacy.id}
             enabled={shouldTrackOfferImpressionsAndSelections}
+            offer={offer}
           >
             <OfferCard
               key={offer.pharmacy.id}

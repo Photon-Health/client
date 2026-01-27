@@ -3,15 +3,18 @@ import { useInView } from 'react-intersection-observer';
 import { patientAnalytics } from '../../configs/analytics';
 import { EnrichedPharmacy } from '../models';
 import { useOrderContext } from '../../views/Main';
+import { Offer } from '../../components/pharmacy-card-list';
 
 const OfferImpressionTracker = ({
   children,
+  offer = undefined,
   pharmacy,
   ordinalPosition,
   isAlreadySelected,
   enabled
 }: {
   children: React.ReactNode;
+  offer: Offer | undefined;
   pharmacy: EnrichedPharmacy;
   ordinalPosition: number;
   isAlreadySelected: boolean;
@@ -34,7 +37,14 @@ const OfferImpressionTracker = ({
           showReadyIn30Min: pharmacy.showReadyIn30Min,
           is24Hr: pharmacy.is24Hr,
           isClosingSoon: pharmacy.isClosingSoon,
-          isAlreadySelected: isAlreadySelected
+          isAlreadySelected: isAlreadySelected,
+          deliveryEstimate: offer?.deliveryEstimate,
+          costType: offer?.costType,
+          costAmount: offer?.costAmount,
+          costAmountTitle: offer?.costAmountTitle,
+          retailAmount: offer?.retailAmount,
+          retailAmountTitle: offer?.retailAmountTitle,
+          tags: offer?.tags
         });
       }
     }
