@@ -1,6 +1,7 @@
 import { Order, Prescription } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createContext, JSXElement, useContext } from 'solid-js';
+import { ScreeningAlertType } from './ScreeningAlerts';
 
 const PrescribeEventDispatchContext = createContext<{
   dispatchFormValidate: (canSubmit: boolean, form: any) => void;
@@ -10,6 +11,8 @@ const PrescribeEventDispatchContext = createContext<{
   dispatchPrescriptionsError: (errors: GraphQLFormattedError[]) => void;
   dispatchOrderCreated: (order: Order) => void;
   dispatchOrderError: (errors: GraphQLFormattedError[]) => void;
+  dispatchClinicalAlertAcknowledge: (alerts: ScreeningAlertType[]) => void;
+  dispatchClinicalAlertCancel: (alerts: ScreeningAlertType[]) => void;
 }>();
 
 interface DraftPrescriptionProviderProps {
@@ -97,6 +100,30 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     ref.dispatchEvent(event);
   };
 
+  const dispatchClinicalAlertAcknowledge = (alerts: ScreeningAlertType[]) => {
+    const event = new CustomEvent('photon-clinical-alert-acknowledge', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        alerts
+      }
+    });
+
+    ref.dispatchEvent(event);
+  };
+
+  const dispatchClinicalAlertCancel = (alerts: ScreeningAlertType[]) => {
+    const event = new CustomEvent('photon-clinical-alert-cancel', {
+      composed: true,
+      bubbles: true,
+      detail: {
+        alerts
+      }
+    });
+
+    ref.dispatchEvent(event);
+  };
+
   const value = {
     dispatchFormValidate,
     dispatchDraftPrescriptionCreated,
@@ -104,7 +131,9 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     dispatchPrescriptionsCreated,
     dispatchPrescriptionsError,
     dispatchOrderCreated,
-    dispatchOrderError
+    dispatchOrderError,
+    dispatchClinicalAlertAcknowledge,
+    dispatchClinicalAlertCancel
   };
 
   return (

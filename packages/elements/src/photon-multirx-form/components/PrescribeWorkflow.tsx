@@ -148,7 +148,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     dispatchPrescriptionsCreated,
     dispatchPrescriptionsError,
     dispatchOrderCreated,
-    dispatchOrderError
+    dispatchOrderError,
+    dispatchClinicalAlertAcknowledge,
+    dispatchClinicalAlertCancel
   } = usePrescribeEventDispatch();
 
   const prescriptionIds = createMemo(() =>
@@ -554,32 +556,13 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             // regardless of the presence of alerts
             setOverrideScreenAlerts(true);
             setIsScreeningAlertWarningOpen(false);
-
-            const event = new CustomEvent('photon-clinical-alert-acknowledge', {
-              composed: true,
-              bubbles: true,
-              detail: {
-                alerts: screeningAlerts()
-              }
-            });
-
             combineOrSubmit();
-
-            ref?.dispatchEvent(event);
+            dispatchClinicalAlertAcknowledge(screeningAlerts());
           }}
           onRevisitPrescriptions={() => {
             setIsLoading(false);
             setIsScreeningAlertWarningOpen(false);
-
-            const event = new CustomEvent('photon-clinical-alert-cancel', {
-              composed: true,
-              bubbles: true,
-              detail: {
-                alerts: screeningAlerts()
-              }
-            });
-
-            ref?.dispatchEvent(event);
+            dispatchClinicalAlertCancel(screeningAlerts());
           }}
         />
       </Show>
