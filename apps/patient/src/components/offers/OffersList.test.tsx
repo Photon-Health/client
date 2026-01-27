@@ -13,12 +13,12 @@ vi.mock('../../utils/tracking/OfferImpressionTracker', () => ({
 
 // Mock the OfferCard component
 vi.mock('./OfferCard', () => ({
-  OfferCard: ({ offer, pharmacyId, selected, isPreferred, handleSelect }: any) => (
+  OfferCard: ({ offer, selected, isPreferred, handleSelect }: any) => (
     <div
-      data-testid={`offer-card-${pharmacyId}`}
+      data-testid={`offer-card-${offer.pharmacy.id}`}
       data-selected={selected}
       data-preferred={isPreferred}
-      onClick={() => handleSelect(pharmacyId, offer)}
+      onClick={() => handleSelect(offer.pharmacy.id, offer)}
     >
       <div data-testid="pharmacy-info">
         <div data-testid="pharmacy-info-name">{offer.pharmacy.name}</div>
