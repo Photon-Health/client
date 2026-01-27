@@ -14,17 +14,13 @@ export const SSOLogin = () => {
   const connection = searchParams.get('connection') ?? undefined;
   const returnTo = searchParams.get('returnTo') ?? undefined;
 
-  const alreadyLoggedOut = searchParams.get('loggedOut') === '1';
-
   useEffect(() => {
     if (isLoading) {
       datadogRum.addAction('SSOLogin-Debug', { state: 'isLoading' });
       return;
     }
-    if (isAuthenticated && !alreadyLoggedOut) {
+    if (isAuthenticated) {
       datadogRum.addAction('SSOLogin-Debug', { state: 'isAuthenticated' });
-      const url = new URL(window.location.href);
-      url.searchParams.set('loggedOut', '1');
       // logout before attempting a login, in case user has existing session with another org
       // that doesn't use the SSO connection
       logout({ federated: false, returnTo: window.location.href });
@@ -41,7 +37,7 @@ export const SSOLogin = () => {
     login({
       connection
     });
-  }, [isLoading, isAuthenticated, login, logout, connection, returnTo, alreadyLoggedOut]);
+  }, [isLoading, isAuthenticated, login, logout, connection, returnTo]);
 
   return (
     <Container maxW="md" py={{ base: '12', md: '24' }}>
