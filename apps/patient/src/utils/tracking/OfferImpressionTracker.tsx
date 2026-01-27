@@ -14,7 +14,7 @@ const OfferImpressionTracker = ({
   enabled
 }: {
   children: React.ReactNode;
-  offer: Offer;
+  offer: Offer | undefined;
   pharmacy: EnrichedPharmacy;
   ordinalPosition: number;
   isAlreadySelected: boolean;
@@ -38,13 +38,13 @@ const OfferImpressionTracker = ({
           is24Hr: pharmacy.is24Hr,
           isClosingSoon: pharmacy.isClosingSoon,
           isAlreadySelected: isAlreadySelected,
-          deliveryEstimate: offer.deliveryEstimate,
-          costType: offer.costType,
-          costAmount: offer.costAmount,
-          costAmountTitle: offer.costAmountTitle,
-          retailAmount: offer.retailAmount,
-          retailAmountTitle: offer.retailAmountTitle,
-          tags: offer.tags
+          deliveryEstimate: offer?.deliveryEstimate,
+          costType: offer?.costType,
+          costAmount: offer?.costAmount,
+          costAmountTitle: offer?.costAmountTitle,
+          retailAmount: offer?.retailAmount,
+          retailAmountTitle: offer?.retailAmountTitle,
+          tags: offer?.tags
         });
       }
     }
