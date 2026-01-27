@@ -1,6 +1,5 @@
 import { Box, HStack, Image, Tag, TagLabel, TagLeftIcon, Text, VStack } from '@chakra-ui/react';
 import { FiStar } from 'react-icons/fi';
-import { EnrichedPharmacy } from '../../utils/models';
 import { text as t } from '../../utils/text';
 
 import { formatPrice } from '../../utils/formatters';
@@ -10,7 +9,7 @@ const PreferredTag = () => {
   return (
     <Tag size="sm" colorScheme="blue">
       <TagLeftIcon boxSize="12px" as={FiStar} />
-      <TagLabel> {t.preferred}</TagLabel>
+      <TagLabel>{t.preferred}</TagLabel>
     </Tag>
   );
 };
@@ -24,7 +23,6 @@ const CurrentPharmacyTag = () => {
       borderColor="red.200"
       borderRadius="full"
       borderWidth="1px"
-      mb={1}
     >
       <TagLabel data-testid="pharmacy-info-current-pharmacy" fontWeight="bold">
         Current Pharmacy
@@ -34,14 +32,16 @@ const CurrentPharmacyTag = () => {
 };
 
 interface OfferInfoProps {
-  pharmacy?: EnrichedPharmacy;
+  pharmacy?: Pick<Offer['pharmacy'], 'id' | 'name' | 'logo'>;
   offer: Offer;
   isCurrentPharmacy?: boolean;
   isPreferred?: boolean;
 }
 
 export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: OfferInfoProps) => {
-  if (!pharmacy) return null;
+  if (!pharmacy) {
+    return null;
+  }
 
   const offerTags = [
     ...offer.tags,
@@ -56,7 +56,7 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
       default:
         return (
           <Tag key={tag} size="sm" colorScheme="blue">
-            <TagLabel> {tag}</TagLabel>
+            <TagLabel>{tag}</TagLabel>
           </Tag>
         );
     }
@@ -72,27 +72,33 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
   const retailAmount = costAmount === offer.retailAmount ? undefined : offer.retailAmount;
   const retailAmountTitle = costAmount === offer.retailAmount ? undefined : offer.retailAmountTitle;
 
+  const isAmazonPharmacy = pharmacy.id === process.env.REACT_APP_AMAZON_PHARMACY_ID;
+
   return (
     <VStack data-testid="pharmacy-info" align="start" w="full">
+      {offerTags.length > 0 ? (
+        <HStack spacing={2} alignItems="start" w="full">
+          {offerTags}
+        </HStack>
+      ) : null}
+
       <HStack w="full" justify="space-between">
-        <VStack w="full">
-          <HStack w="full">
-            {pharmacy?.logo ? (
-              <Box boxSize="32px" overflow="hidden">
-                <Image
-                  src={pharmacy.logo}
-                  width="auto"
-                  height="32px"
-                  boxSize="100%"
-                  objectFit="contain"
-                />
-              </Box>
-            ) : null}
-            <Text data-testid="pharmacy-info-name" fontSize="md" fontWeight={'medium'}>
-              {offer.pharmacy.name}
-            </Text>
-          </HStack>
-        </VStack>
+        <HStack w="full">
+          {pharmacy.logo ? (
+            <Box boxSize="32px" overflow="hidden">
+              <Image
+                src={pharmacy.logo}
+                width="auto"
+                height="32px"
+                boxSize="100%"
+                objectFit="contain"
+              />
+            </Box>
+          ) : null}
+          <Text data-testid="pharmacy-info-name" fontSize="md" fontWeight={'medium'}>
+            {offer.pharmacy.name}
+          </Text>
+        </HStack>
 
         {costAmount ? ( // only show the price if we have one
           <VStack spacing={0} align="flex-end" minW="fit-content">
@@ -110,16 +116,16 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
         ) : null}
       </HStack>
 
-      <VStack direction={'column-reverse'} w="full" alignItems={'start'}>
-        <Text fontSize="sm" color="gray.500">
+      <VStack w="full" alignItems="start">
+        <Text fontSize="sm" fontWeight="semibold">
           {offer.deliveryEstimate}
         </Text>
+        {isAmazonPharmacy && (
+          <Text fontSize="sm" color="gray.500">
+            Sponsored
+          </Text>
+        )}
       </VStack>
-      {offer.tags?.length > 0 ? (
-        <HStack spacing={2} m={0} p={0} alignItems="start" w="full">
-          {offerTags}
-        </HStack>
-      ) : null}
     </VStack>
   );
 };
