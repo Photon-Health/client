@@ -13,7 +13,6 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
   let ref!: HTMLDivElement;
 
   const dispatchDraftPrescriptionCreated = (draftPrescription: Prescription) => {
-    console.log('dispatchDraftPrescriptionCreated called');
     const event = new CustomEvent('photon-draft-prescription-created', {
       composed: true,
       bubbles: true,
@@ -21,7 +20,6 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
         draft: draftPrescription
       }
     });
-    console.log(ref.dispatchEvent);
     ref.dispatchEvent(event);
   };
 
