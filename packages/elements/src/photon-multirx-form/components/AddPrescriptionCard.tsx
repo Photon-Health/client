@@ -54,7 +54,7 @@ export const AddPrescriptionCard = (props: {
   enableCombineAndDuplicate?: boolean;
   screenDraftedPrescriptions: () => void;
   draftedPrescriptionChanged: () => void;
-  onDraftPrescriptionCreated: (draft: Prescription) => void;
+  onDraftPrescriptionCreated: () => void;
   screeningAlerts: ScreeningAlertType[];
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
@@ -133,7 +133,7 @@ export const AddPrescriptionCard = (props: {
       };
       createdPrescription = await tryCreatePrescription(prescriptionFormData, options);
       if (createdPrescription) {
-        props.onDraftPrescriptionCreated(createdPrescription);
+        props.onDraftPrescriptionCreated();
       }
     } catch (err) {
       dispatchOrderError([err as GraphQLFormattedError]);

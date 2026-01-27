@@ -1,14 +1,14 @@
 import {
   DraftPrescriptionsProvider,
   PrescribeProvider,
-  RecentOrders
+  RecentOrders,
+  PrescribeEventDispatchProvider
 } from '@photonhealth/components';
 import { customElement } from 'solid-element';
 import { createFormStore } from '../stores/form';
 import { PrescribeProps, PrescribeWorkflow } from './PrescribeWorkflow';
 import { onCleanup } from 'solid-js';
 import { PatientStore } from '../stores/patient';
-import { PrescribeEventDispatchProvider } from './components/PrescribeEventDispatchProvider';
 
 interface PrescribeWorkflowComponentProps extends Omit<PrescribeProps, 'initialShowForm'> {
   templateIds?: string;

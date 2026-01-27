@@ -53,6 +53,11 @@ import {
 
 import { GoogleServiceProvider, useGoogleService } from './systems/GoogleServiceProvider';
 
+import {
+  PrescribeEventDispatchProvider,
+  usePrescribeEventDispatch
+} from './systems/PrescribeEventDispatchProvider';
+
 export {
   AddressForm,
   Alert,
@@ -91,7 +96,9 @@ export {
   GoogleServiceProvider,
   usePrescribe,
   useGoogleService,
-  CALENDAR_DATE_FORMAT
+  CALENDAR_DATE_FORMAT,
+  PrescribeEventDispatchProvider,
+  usePrescribeEventDispatch
 };
 
 // Export types

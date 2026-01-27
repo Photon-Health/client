@@ -67,7 +67,6 @@ import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
-import { usePrescribeEventDispatch } from './components/PrescribeEventDispatchProvider';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -146,7 +145,6 @@ export const ScreenDraftedPrescriptionsQuery = gql`
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
 
-  const { dispatchDraftPrescriptionCreated } = usePrescribeEventDispatch();
   const { draftPrescriptions } = useDraftPrescriptions();
   const {
     routingConstraints,
@@ -591,8 +589,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     );
   });
 
-  const handleDraftPrescriptionCreated = (draft: Prescription) => {
-    dispatchDraftPrescriptionCreated(draft);
+  const handleDraftPrescriptionCreated = () => {
     if (isEditing()) {
       setIsEditing(false);
     }

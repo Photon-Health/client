@@ -18,7 +18,7 @@ vi.mock('../SDKProvider', () => ({
 
 vi.mock('../PrescribeProvider', () => {
   return {
-    usePrescribeOptional: () => useContext(MockPrescribeContext)
+    usePrescribe: () => useContext(MockPrescribeContext)
   };
 });
 
