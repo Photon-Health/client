@@ -613,31 +613,20 @@ export type PrescriptionFilter = {
 
 export type PrescriptionInput = {
   templateId?: InputMaybe<Scalars['ID']>;
-  /** Number of days a single fill lasts */
-  daysSupply?: InputMaybe<Scalars['Int']>;
-  /** ICD10 codes for patient diagnosises */
-  diagnoses?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
-  /** True if substitutes are not allowed at the pharmacy */
-  dispenseAsWritten?: InputMaybe<Scalars['Boolean']>;
-  /** Amount of a `dispenseUnit` per fill */
-  dispenseQuantity?: InputMaybe<Scalars['Float']>;
-  /** Unit to dispense treatment in */
-  dispenseUnit?: InputMaybe<Scalars['String']>;
-  /** Pharmacy cannot fill prescription before this date */
-  doNotFillBeforeDate?: InputMaybe<Scalars['AWSDate']>;
-  /** Reference ID for linking to external objects */
   externalId?: InputMaybe<Scalars['ID']>;
-  /** Prescriber instructions for patient */
-  instructions?: InputMaybe<Scalars['String']>;
-  /** Prescriber notes, available to pharmacist */
-  notes?: InputMaybe<Scalars['String']>;
-  /** ID of the patient that this prescription belongs to */
   patientId: Scalars['ID'];
-  /** Number of fills allowed before expiration of script */
-  fillsAllowed?: InputMaybe<Scalars['Int']>;
-  refillsAllowed?: InputMaybe<Scalars['Int']>;
-  /** ID of the treatment being prescribed */
   treatmentId?: InputMaybe<Scalars['ID']>;
+  dispenseAsWritten?: InputMaybe<Scalars['Boolean']>;
+  dispenseQuantity?: InputMaybe<Scalars['Float']>;
+  dispenseUnit?: InputMaybe<Scalars['String']>;
+  refillsAllowed?: InputMaybe<Scalars['Int']>;
+  fillsAllowed?: InputMaybe<Scalars['Int']>;
+  daysSupply?: InputMaybe<Scalars['Int']>;
+  instructions?: InputMaybe<Scalars['String']>;
+  notes?: InputMaybe<Scalars['String']>;
+  effectiveDate?: InputMaybe<Scalars['AWSDate']>;
+  doNotFillBeforeDate?: InputMaybe<Scalars['AWSDate']>;
+  diagnoses?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
 };
 
 export enum PrescriptionState {

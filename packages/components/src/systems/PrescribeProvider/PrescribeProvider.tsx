@@ -314,11 +314,11 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
               query: GetPrescription,
               variables: { id: prescriptionId }
             });
-            return data?.prescription;
+            return transformPrescriptionFormData(data?.prescription, props.patientId);
           })
         );
 
-        createPrescriptionsOnApi(fetchedPrescriptions);
+        await createPrescriptionsOnApi(fetchedPrescriptions);
       }
     } catch (error) {
       console.error('Error while trying to create prescriptions from prefill IDs', { error });
