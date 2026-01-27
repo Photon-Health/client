@@ -70,7 +70,7 @@ type VariablesCreateOrder = {
 export default function RecentOrdersCombineDialog() {
   let ref: Ref<any> | undefined;
   const { draftPrescriptions } = useDraftPrescriptions();
-  const { dispatchOrderCreated } = usePrescribeEventDispatch();
+  const { dispatchOrderCreated, dispatchOrderCombined } = usePrescribeEventDispatch();
 
   const client = usePhotonClient();
   const [state, actions] = useRecentOrders();
@@ -90,15 +90,6 @@ export default function RecentOrdersCombineDialog() {
       client: client.apollo
     }
   );
-
-  const dispatchCombineOrderUpdated = (order: Order) => {
-    const event = new CustomEvent('photon-order-combined', {
-      composed: true,
-      bubbles: true,
-      detail: { order }
-    });
-    ref?.dispatchEvent(event);
-  };
 
   createEffect(() => {
     if (state.isCombineDialogOpen) {
@@ -138,7 +129,7 @@ export default function RecentOrdersCombineDialog() {
       });
 
       // Trigger message to redirect to order page
-      dispatchCombineOrderUpdated(updatedOrder.updateOrder as Order);
+      dispatchOrderCombined(updatedOrder.updateOrder as Order);
 
       setIsCombiningOrders(false);
       actions.setIsCombineDialogOpen(false);

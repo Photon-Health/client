@@ -10,9 +10,13 @@ const PrescribeEventDispatchContext = createContext<{
   dispatchPrescriptionsCreated: (prescriptions: Prescription[]) => void;
   dispatchPrescriptionsError: (errors: GraphQLFormattedError[]) => void;
   dispatchOrderCreated: (order: Order) => void;
-  dispatchOrderError: (errors: GraphQLFormattedError[]) => void;
+  dispatchOrderCombined: (order: Order) => void;
+  dispatchOrderError: (errors: readonly GraphQLFormattedError[]) => void;
+  dispatchTicketCreatedDuplicate: () => void;
   dispatchClinicalAlertAcknowledge: (alerts: ScreeningAlertType[]) => void;
   dispatchClinicalAlertCancel: (alerts: ScreeningAlertType[]) => void;
+  dispatchSignatureAttestationAgreed: () => void;
+  dispatchSignatureAttestationCanceled: () => void;
 }>();
 
 interface DraftPrescriptionProviderProps {
@@ -83,13 +87,22 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
       composed: true,
       bubbles: true,
       detail: {
-        order: order
+        order
       }
     });
     ref.dispatchEvent(event);
   };
 
-  const dispatchOrderError = (errors: GraphQLFormattedError[]) => {
+  const dispatchOrderCombined = (order: Order) => {
+    const event = new CustomEvent('photon-order-combined', {
+      composed: true,
+      bubbles: true,
+      detail: { order }
+    });
+    ref.dispatchEvent(event);
+  };
+
+  const dispatchOrderError = (errors: readonly GraphQLFormattedError[]) => {
     const event = new CustomEvent('photon-order-error', {
       composed: true,
       bubbles: true,
@@ -97,6 +110,17 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
         errors: errors
       }
     });
+    ref.dispatchEvent(event);
+  };
+
+  const dispatchTicketCreatedDuplicate = () => {
+    // triggers the parent flow to clears the add prescription form
+    const event = new CustomEvent('photon-ticket-created-duplicate', {
+      composed: true,
+      bubbles: true,
+      detail: {}
+    });
+
     ref.dispatchEvent(event);
   };
 
@@ -124,6 +148,24 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     ref.dispatchEvent(event);
   };
 
+  const dispatchSignatureAttestationAgreed = () => {
+    const event = new CustomEvent('photon-signature-attestation-agreed', {
+      composed: true,
+      bubbles: true,
+      detail: {}
+    });
+    ref?.dispatchEvent(event);
+  };
+
+  const dispatchSignatureAttestationCanceled = () => {
+    const event = new CustomEvent('photon-signature-attestation-canceled', {
+      composed: true,
+      bubbles: true,
+      detail: {}
+    });
+    ref?.dispatchEvent(event);
+  };
+
   const value = {
     dispatchFormValidate,
     dispatchDraftPrescriptionCreated,
@@ -131,9 +173,13 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
     dispatchPrescriptionsCreated,
     dispatchPrescriptionsError,
     dispatchOrderCreated,
+    dispatchOrderCombined,
     dispatchOrderError,
+    dispatchTicketCreatedDuplicate,
     dispatchClinicalAlertAcknowledge,
-    dispatchClinicalAlertCancel
+    dispatchClinicalAlertCancel,
+    dispatchSignatureAttestationAgreed,
+    dispatchSignatureAttestationCanceled
   };
 
   return (

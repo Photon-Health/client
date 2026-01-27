@@ -14,6 +14,7 @@ import uniqueFills from '../../utils/uniqueFills';
 import { usePhotonClient } from '../SDKProvider';
 import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 import { createMutation } from '../../utils/createMutation';
+import { usePrescribeEventDispatch } from '../PrescribeEventDispatchProvider';
 
 const ticketSchema = zod.object({
   description: zod.string().min(1, { message: 'A description is required' })
@@ -94,6 +95,7 @@ const formName = 'prescribe-flow-duplicate';
 export default function RecentOrdersIssueDialog() {
   let ref: Ref<any> | undefined;
   const [state, actions] = useRecentOrders();
+  const { dispatchTicketCreatedDuplicate } = usePrescribeEventDispatch();
   const client = usePhotonClient();
 
   const [createTicketMutation, data] = createMutation<{ id: string }, InputValues>(CREATE_TICKET, {
@@ -105,17 +107,6 @@ export default function RecentOrdersIssueDialog() {
       dispatchDatadogAction('prescribe-issue-dialog-open', {}, ref);
     }
   });
-
-  const dispatchTicketCreatedDuplicate = () => {
-    // triggers the parent flow to clears the add prescription form
-    const event = new CustomEvent('photon-ticket-created-duplicate', {
-      composed: true,
-      bubbles: true,
-      detail: {}
-    });
-
-    ref?.dispatchEvent(event);
-  };
 
   const fills = createMemo(() => {
     if (state?.orderWithIssue) {

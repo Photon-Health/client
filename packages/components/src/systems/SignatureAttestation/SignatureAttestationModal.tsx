@@ -1,12 +1,13 @@
 import { ApolloClient } from '@apollo/client';
 import gql from 'graphql-tag';
 import { Maybe } from 'graphql/jsutils/Maybe';
-import { createEffect, createSignal, JSXElement, Match, Ref, Switch } from 'solid-js';
+import { createEffect, createSignal, JSXElement, Match, Switch } from 'solid-js';
 import Button from '../../particles/Button';
 import Card from '../../particles/Card';
 import Icon from '../../particles/Icon';
 import Spinner from '../../particles/Spinner';
 import Text from '../../particles/Text';
+import { usePrescribeEventDispatch } from '../PrescribeEventDispatchProvider';
 
 const GetCurrentUserSignatureAttestationStatus = gql`
   query GetCurrentUserSignatureAttestationStatus {
@@ -115,7 +116,8 @@ type Status =
   | { status: 'ERROR'; errors: any[] };
 
 export const SignatureAttestationModal = (props: SignatureAttestationModalProps) => {
-  let ref: Ref<any> | undefined;
+  const { dispatchSignatureAttestationAgreed, dispatchSignatureAttestationCanceled } =
+    usePrescribeEventDispatch();
   const [status, setStatus] = createSignal<Status>({ status: 'LOADING' });
   const [submitting, setSubmitting] = createSignal(false);
 
@@ -144,24 +146,6 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
         status: 'NEEDS ATTESTATION',
         version: req.data.me.signatureAttestationStatus.version
       });
-  };
-
-  const dispatchSignatureAttestationAgreed = () => {
-    const event = new CustomEvent('photon-signature-attestation-agreed', {
-      composed: true,
-      bubbles: true,
-      detail: {}
-    });
-    ref?.dispatchEvent(event);
-  };
-
-  const dispatchSignatureAttestationCanceled = () => {
-    const event = new CustomEvent('photon-signature-attestation-canceled', {
-      composed: true,
-      bubbles: true,
-      detail: {}
-    });
-    ref?.dispatchEvent(event);
   };
 
   createEffect(() => {
@@ -201,7 +185,7 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
   return (
     <>
       {/* This span is needed so we can easily dispatch events */}
-      <span ref={ref} hidden />
+      <span hidden />
       <Switch>
         <Match when={status().status === 'LOADING'}>
           <div class="flex justify-center w-full">
