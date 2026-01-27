@@ -8,7 +8,11 @@ import {
   useContext
 } from 'solid-js';
 import { usePhotonClient } from '../SDKProvider';
-import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
+import {
+  MutationCreatePrescriptionsArgs,
+  Prescription,
+  PrescriptionState
+} from '@photonhealth/sdk/dist/types';
 import {
   CreatePrescription,
   CreatePrescriptions,
@@ -299,12 +303,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
           templateId
         }));
 
-        const res = await client.apollo.mutate({
-          mutation: CreatePrescriptions,
-          variables: { prescriptions: templatedCreateRxList }
-        });
-        const newRxs = res.data.createPrescriptions as Prescription[];
-        setDraftPrescriptions((prev) => [...prev, ...newRxs]);
+        await createPrescriptionsOnApi(templatedCreateRxList);
       }
 
       // Fetch prescriptions if needed
@@ -319,20 +318,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
           })
         );
 
-        // const res = await client.apollo.mutate({
-        //   mutation: CreatePrescriptions,
-        //   variables: { prescriptions: fetchedPrescriptions }
-        // });
-        // const newRxs = res.data.createPrescriptions as Prescription[];
-        // setDraftPrescriptions((prev) => [...prev, ...newRxs]);
-
-        // create prescriptions from template and prescription ids
-        // todo: error handling
-        await Promise.all(
-          fetchedPrescriptions.map(async (prescription: PrescriptionFormData) =>
-            tryCreatePrescription(prescription, { showSuccessToast: false })
-          )
-        );
+        createPrescriptionsOnApi(fetchedPrescriptions);
       }
     } catch (error) {
       console.error('Error while trying to create prescriptions from prefill IDs', { error });
@@ -490,6 +476,18 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     }
 
     return createdPrescription;
+  };
+
+  const createPrescriptionsOnApi = async (
+    prescriptions: MutationCreatePrescriptionsArgs['prescriptions']
+  ) => {
+    const res = await client.apollo.mutate({
+      mutation: CreatePrescriptions,
+      variables: { prescriptions }
+    });
+    const newRxs = res.data.createPrescriptions as Prescription[];
+    setDraftPrescriptions((prev) => [...prev, ...newRxs]);
+    newRxs.map((rx) => dispatchDraftPrescriptionCreated(rx));
   };
 
   const deletePrescription = (toDeleteId: string) => {
