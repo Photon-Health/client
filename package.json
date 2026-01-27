@@ -201,6 +201,7 @@
     "jsdom": { "form-data": "4.0.4" },
     "nx": { "form-data": "4.0.4" },
     "react-scripts": { "form-data": "3.0.4" },
-    "storybook": { "form-data": "4.0.4" }
+    "storybook": { "form-data": "4.0.4" },
+    "cypress": { "form-data": "2.5.4" }
   }
 }
