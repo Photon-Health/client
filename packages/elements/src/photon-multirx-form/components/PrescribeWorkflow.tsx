@@ -24,7 +24,8 @@ import {
   useDraftPrescriptions,
   usePhoton,
   usePrescribe,
-  useRecentOrders
+  useRecentOrders,
+  usePrescribeEventDispatch
 } from '@photonhealth/components';
 import { types } from '@photonhealth/sdk';
 import { Order, Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
@@ -142,6 +143,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     isLoadingPrefills,
     orderFormData
   } = usePrescribe();
+  const { dispatchOrderError } = usePrescribeEventDispatch();
 
   const prescriptionIds = createMemo(() =>
     draftPrescriptions().map((prescription) => prescription.id)
@@ -340,17 +342,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   const dispatchPrescriptionsError = (errors: readonly Error[]) => {
     const event = new CustomEvent('photon-prescriptions-error', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        errors: errors
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
-
-  const dispatchOrderError = (errors: readonly GraphQLFormattedError[] = []) => {
-    const event = new CustomEvent('photon-order-error', {
       composed: true,
       bubbles: true,
       detail: {
