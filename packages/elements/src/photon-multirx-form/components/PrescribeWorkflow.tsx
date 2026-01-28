@@ -1,16 +1,36 @@
 import { gql } from 'graphql-tag';
-import { PhotonAuthorized } from '../photon-authorized';
-import type { FormError } from '../stores/form';
-import tailwind from '../tailwind.css?inline';
-import { checkHasPermission } from '../utils';
-import { AddPrescriptionCard } from './components/AddPrescriptionCard';
-import { DraftPrescriptionCard } from './components/DraftPrescriptionCard';
-import { OrderCard } from './components/OrderCard';
-import { PatientCard } from './components/PatientCard';
-import { PharmacyCard } from './components/PharmacyCard';
-import styles from './style.css?inline';
-import clearForm from './util/clearForm';
-import { formatPatientWeight } from './util/formatPatientWeight';
+import { PhotonAuthorized } from '../../photon-authorized';
+import type { FormError } from '../../stores/form';
+import { checkHasPermission } from '../../utils';
+import { AddPrescriptionCard } from './AddPrescriptionCard';
+import { DraftPrescriptionCard } from './DraftPrescriptionCard';
+import { OrderCard } from './OrderCard';
+import { PatientCard } from './PatientCard';
+import { PharmacyCard } from './PharmacyCard';
+import clearForm from '../util/clearForm';
+import { formatPatientWeight } from '../util/formatPatientWeight';
+import {
+  Alert,
+  AddressForm,
+  Button,
+  RecentOrders,
+  ScreeningAlertAcknowledgementDialog,
+  ScreeningAlertType,
+  SignatureAttestationModal,
+  Spinner,
+  TemplateOverrides,
+  Toaster,
+  triggerToast,
+  useDraftPrescriptions,
+  usePhoton,
+  usePrescribe,
+  useRecentOrders
+} from '@photonhealth/components';
+import { types } from '@photonhealth/sdk';
+import { Order, Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
+import { GraphQLFormattedError } from 'graphql';
+import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
+
 const hasUsableAddress = (address?: {
   street1?: string;
   city?: string;
@@ -38,37 +58,6 @@ const fulfillmentNeedsAddress = (fulfillmentType?: string) => {
 const shouldBlockOrderWithoutAddress = (fulfillmentType?: string, hasAddress?: boolean) => {
   return fulfillmentNeedsAddress(fulfillmentType) && !hasAddress;
 };
-import {
-  Alert,
-  AddressForm,
-  Button,
-  RecentOrders,
-  ScreeningAlertAcknowledgementDialog,
-  ScreeningAlertType,
-  SignatureAttestationModal,
-  Spinner,
-  TemplateOverrides,
-  Toaster,
-  triggerToast,
-  useDraftPrescriptions,
-  usePhoton,
-  usePrescribe,
-  useRecentOrders
-} from '@photonhealth/components';
-import photonStyles from '@photonhealth/components/dist/style.css?inline';
-import { types } from '@photonhealth/sdk';
-import { Order, Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
-import '@shoelace-style/shoelace/dist/components/alert/alert';
-import '@shoelace-style/shoelace/dist/components/icon-button/icon-button';
-import '@shoelace-style/shoelace/dist/components/icon/icon';
-import '@shoelace-style/shoelace/dist/components/switch/switch';
-import shoelaceDarkStyles from '@shoelace-style/shoelace/dist/themes/dark.css?inline';
-import shoelaceLightStyles from '@shoelace-style/shoelace/dist/themes/light.css?inline';
-import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-import { GraphQLFormattedError } from 'graphql';
-import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
-
-setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
 export type Address = {
   city: string;
@@ -88,9 +77,7 @@ export type DisableList = DisabledItem[];
 
 export type PrescribeProps = {
   patientId?: string;
-  templateIds?: string;
   templateOverrides?: TemplateOverrides;
-  prescriptionIds?: string;
   hideSubmit: boolean;
   hideTemplates: boolean;
   hidePatientCard: boolean;
@@ -121,6 +108,7 @@ export type PrescribeProps = {
   allowOffCatalogSearch?: boolean;
   disableList?: DisableList;
   groupId?: string;
+  initialShowForm: boolean;
 };
 
 export const ScreenDraftedPrescriptionsQuery = gql`
@@ -173,10 +161,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   });
 
   const client = usePhoton();
-  const [showForm, setShowForm] = createSignal<boolean>(
-    // this logic keeps the rx form closed when refilling a particular template/prescription
-    !props.templateIds && !props.prescriptionIds
-  );
+  const [showForm, setShowForm] = createSignal<boolean>(props.initialShowForm);
   const [errors, setErrors] = createSignal<FormError[]>([]);
   const [isLoading, setIsLoading] = createSignal<boolean>(true);
   const [isEditing, setIsEditing] = createSignal<boolean>(false);
@@ -277,17 +262,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       bubbles: true,
       detail: {
         prescriptions: prescriptions
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
-
-  const dispatchDraftPrescriptionCreated = (draftPrescription: Prescription) => {
-    const event = new CustomEvent('photon-draft-prescription-created', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        draft: draftPrescription
       }
     });
     ref?.dispatchEvent(event);
@@ -604,8 +578,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     );
   });
 
-  const handleDraftPrescriptionCreated = (draft: Prescription) => {
-    dispatchDraftPrescriptionCreated(draft);
+  const handleDraftPrescriptionCreated = () => {
     if (isEditing()) {
       setIsEditing(false);
     }
@@ -613,12 +586,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
 
   return (
     <div ref={ref}>
-      <style>{tailwind}</style>
-      <style>{shoelaceDarkStyles}</style>
-      <style>{shoelaceLightStyles}</style>
-      <style>{styles}</style>
-      <style>{photonStyles}</style>
-
       <Show
         when={
           isScreeningAlertWarningOpen() && screeningAlerts().length > 0 && !overrideScreenAlerts()

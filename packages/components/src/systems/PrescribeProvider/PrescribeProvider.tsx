@@ -8,7 +8,11 @@ import {
   useContext
 } from 'solid-js';
 import { usePhotonClient } from '../SDKProvider';
-import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
+import {
+  MutationCreatePrescriptionsArgs,
+  Prescription,
+  PrescriptionState
+} from '@photonhealth/sdk/dist/types';
 import {
   CreatePrescription,
   CreatePrescriptions,
@@ -29,6 +33,7 @@ import {
 import { createStore } from 'solid-js/store';
 import getLocation from '../../utils/getLocations';
 import { useGoogleService } from '../GoogleServiceProvider';
+import { usePrescribeEventDispatch } from '../PrescribeEventDispatchProvider';
 // The order form data will consist of, at least, the list of selected prescription IDs and pharmacy ID.
 // The prescription form data (todo) will consist of a single prescription's data during user input
 // Note: Multiple prescription "sub" forms can be opened/completed within a single order form
@@ -122,6 +127,7 @@ const transformPrescriptionFormData = (prescription: PrescriptionFormData, patie
 
 export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const { googleMapsServices } = useGoogleService();
+  const { dispatchDraftPrescriptionCreated } = usePrescribeEventDispatch();
   const [isLoadingPrefills, setIsLoadingPrefills] = createSignal<boolean>(false);
   const [hasCreatedPrescriptions, setHasCreatedPrescriptions] = createSignal<boolean>(false);
   const [coverageOptions, setCoverageOptions] = createSignal<CoverageOption[]>([]);
@@ -297,12 +303,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
           templateId
         }));
 
-        const res = await client.apollo.mutate({
-          mutation: CreatePrescriptions,
-          variables: { prescriptions: templatedCreateRxList }
-        });
-        const newRxs = res.data.createPrescriptions as Prescription[];
-        setDraftPrescriptions((prev) => [...prev, ...newRxs]);
+        await createPrescriptionsOnApi(templatedCreateRxList);
       }
 
       // Fetch prescriptions if needed
@@ -313,17 +314,11 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
               query: GetPrescription,
               variables: { id: prescriptionId }
             });
-            return data?.prescription;
+            return transformPrescriptionFormData(data?.prescription, props.patientId);
           })
         );
 
-        // create prescriptions from template and prescription ids
-        // todo: error handling
-        await Promise.all(
-          fetchedPrescriptions.map(async (prescription: PrescriptionFormData) =>
-            tryCreatePrescription(prescription, { showSuccessToast: false })
-          )
-        );
+        await createPrescriptionsOnApi(fetchedPrescriptions);
       }
     } catch (error) {
       console.error('Error while trying to create prescriptions from prefill IDs', { error });
@@ -437,6 +432,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     }
   ): Promise<Prescription> => {
     let createdPrescription: Prescription | null = null;
+
     try {
       const res = await client.apollo.mutate({
         mutation: CreatePrescription,
@@ -445,6 +441,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
       const created = res.data.createPrescription as Prescription;
       createdPrescription = created;
       setDraftPrescriptions((prev) => [...prev, created]);
+      dispatchDraftPrescriptionCreated(created);
     } catch (error) {
       console.error('Mutation error:', error);
       triggerToast({
@@ -479,6 +476,18 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     }
 
     return createdPrescription;
+  };
+
+  const createPrescriptionsOnApi = async (
+    prescriptions: MutationCreatePrescriptionsArgs['prescriptions']
+  ) => {
+    const res = await client.apollo.mutate({
+      mutation: CreatePrescriptions,
+      variables: { prescriptions }
+    });
+    const newRxs = res.data.createPrescriptions as Prescription[];
+    setDraftPrescriptions((prev) => [...prev, ...newRxs]);
+    newRxs.map((rx) => dispatchDraftPrescriptionCreated(rx));
   };
 
   const deletePrescription = (toDeleteId: string) => {

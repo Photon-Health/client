@@ -22,6 +22,8 @@ export type PatientMedHistoryTableProps = {
 };
 
 export default function PatientMedHistoryTable(props: PatientMedHistoryTableProps) {
+  // Component can be used as a standalone element
+  // so PrescribeProvider is not guaranteed to be rendered
   const prescribeContext = usePrescribeOptional();
 
   const [isCreatingPrescriptionId, setIsCreatingPrescriptionId] = createSignal<string | undefined>(

@@ -24,7 +24,7 @@ import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
 import { TryCreatePrescriptionTemplateOptions } from '@photonhealth/components/src/systems/PrescribeProvider';
-import { DisableList } from '../photon-prescribe-workflow';
+import { DisableList } from './PrescribeWorkflow';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
 
@@ -54,19 +54,14 @@ export const AddPrescriptionCard = (props: {
   enableCombineAndDuplicate?: boolean;
   screenDraftedPrescriptions: () => void;
   draftedPrescriptionChanged: () => void;
-  onDraftPrescriptionCreated: (draft: Prescription) => void;
+  onDraftPrescriptionCreated: () => void;
   screeningAlerts: ScreeningAlertType[];
   catalogId?: string;
   allowOffCatalogSearch?: boolean;
   enableOrder: boolean;
   disableList?: DisableList;
 }) => {
-  const prescribeContext = usePrescribe();
-  if (!prescribeContext) {
-    throw new Error('PrescribeWorkflow must be wrapped with PrescribeProvider');
-  }
-  const { tryCreatePrescription } = prescribeContext;
-
+  const { tryCreatePrescription } = usePrescribe();
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
   const [openDoseCalculator, setOpenDoseCalculator] = createSignal(false);
@@ -138,7 +133,7 @@ export const AddPrescriptionCard = (props: {
       };
       createdPrescription = await tryCreatePrescription(prescriptionFormData, options);
       if (createdPrescription) {
-        props.onDraftPrescriptionCreated(createdPrescription);
+        props.onDraftPrescriptionCreated();
       }
     } catch (err) {
       dispatchOrderError([err as GraphQLFormattedError]);
