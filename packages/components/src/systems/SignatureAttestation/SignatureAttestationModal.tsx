@@ -183,33 +183,29 @@ export const SignatureAttestationModal = (props: SignatureAttestationModalProps)
   };
 
   return (
-    <>
-      {/* This span is needed so we can easily dispatch events */}
-      <span hidden />
-      <Switch>
-        <Match when={status().status === 'LOADING'}>
-          <div class="flex justify-center w-full">
-            <Spinner color="green" />
-          </div>
-        </Match>
-        <Match when={status().status === 'COMPLETE'}>{props.children}</Match>
-        <Match when={status().status === 'ERROR'}>
-          <div class="text-red-700 font-bold flex space-x-2 items-center justify-center">
-            <Icon name="exclamationCircle" />
-            <span>An error occurred. Please refresh and try again</span>
-          </div>
-        </Match>
-        <Match when={status().status === 'NEEDS ATTESTATION'}>
-          <div class="w-full">
-            <AgreementCard
-              onAgree={onAgree}
-              onCancel={dispatchSignatureAttestationCanceled}
-              disabled={submitting()}
-            />
-          </div>
-        </Match>
-      </Switch>
-    </>
+    <Switch>
+      <Match when={status().status === 'LOADING'}>
+        <div class="flex justify-center w-full">
+          <Spinner color="green" />
+        </div>
+      </Match>
+      <Match when={status().status === 'COMPLETE'}>{props.children}</Match>
+      <Match when={status().status === 'ERROR'}>
+        <div class="text-red-700 font-bold flex space-x-2 items-center justify-center">
+          <Icon name="exclamationCircle" />
+          <span>An error occurred. Please refresh and try again</span>
+        </div>
+      </Match>
+      <Match when={status().status === 'NEEDS ATTESTATION'}>
+        <div class="w-full">
+          <AgreementCard
+            onAgree={onAgree}
+            onCancel={dispatchSignatureAttestationCanceled}
+            disabled={submitting()}
+          />
+        </div>
+      </Match>
+    </Switch>
   );
 };
 
