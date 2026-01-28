@@ -80,6 +80,7 @@ export const PickupPharmacyCardList = ({
               ordinalPosition={i + numberOfBrandedOptions}
               isAlreadySelected={selectedId === pharmacy.id}
               enabled={shouldTrackOfferImpressionsAndSelections}
+              offer={undefined}
             >
               <PharmacyCard
                 pharmacy={pharmacy}

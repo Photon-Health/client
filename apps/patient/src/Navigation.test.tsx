@@ -104,15 +104,15 @@ describe('App', () => {
     renderApp({ order: testOrder });
 
     expect(await screen.findByText('Review your prescription')).toBeInTheDocument();
-    expectTotalPageViewAnalyticsCountToBe(1);
+    await expectTotalPageViewAnalyticsCountToBe(1);
     await userEvent.click(screen.getByRole('button', { name: 'Search for a pharmacy' }));
     expect(await screen.findByText('Select a pharmacy')).toBeInTheDocument();
-    expectTotalPageViewAnalyticsCountToBe(2);
+    await expectTotalPageViewAnalyticsCountToBe(2);
     await userEvent.click(screen.getByText('Test Local Pickup Pharmacy'));
     await userEvent.click(screen.getByText('Select pharmacy'));
     expect(setOrderPharmacyMock).not.toHaveBeenCalled();
     expect(await screen.findByText('When do you need your order ready by?')).toBeInTheDocument();
-    expectTotalPageViewAnalyticsCountToBe(3);
+    await expectTotalPageViewAnalyticsCountToBe(3);
     await userEvent.click(screen.getByText('Urgent'));
     await userEvent.click(screen.getByText('Next'));
     expect(setOrderPharmacyMock).toHaveBeenCalledWith(
@@ -125,7 +125,7 @@ describe('App', () => {
     );
     await waitFor(() => screen.findByText('Preparing order...'), { timeout: 2500 });
     expect(await screen.findByText('Preparing order...')).toBeInTheDocument();
-    expectTotalPageViewAnalyticsCountToBe(4);
+    await expectTotalPageViewAnalyticsCountToBe(4);
   }, 10_000);
 
   test('For Mail Order Pharmacies: skips the readyBy page', async () => {
@@ -177,6 +177,6 @@ const renderApp = (order: Partial<OrderContextType> = {}) => {
   return { render: render(<RouterProvider router={memoryRouter} />), memoryRouter };
 };
 
-function expectTotalPageViewAnalyticsCountToBe(times: number) {
-  expect(patientAnalytics.page).toHaveBeenCalledTimes(times);
+async function expectTotalPageViewAnalyticsCountToBe(times: number) {
+  await waitFor(() => expect(patientAnalytics.page).toHaveBeenCalledTimes(times));
 }

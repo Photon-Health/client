@@ -62,6 +62,7 @@ export const BrandedOptions = ({
             ordinalPosition={index + numberOfOffers}
             isAlreadySelected={selectedId === id}
             enabled={shouldTrackOfferImpressionsAndSelections}
+            offer={undefined}
           >
             <BrandedPharmacyCard
               pharmacyId={id}
