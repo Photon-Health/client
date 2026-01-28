@@ -547,6 +547,10 @@ export const usePrescribe = () => {
   return context;
 };
 
+export const usePrescribeOptional = () => {
+  return useContext(PrescribeContext);
+};
+
 export function isTreatmentInDraftPrescriptions(
   treatmentId: string,
   draftedPrescriptions: { treatment: { id: string } }[]
