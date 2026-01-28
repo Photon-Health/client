@@ -24,10 +24,11 @@ import {
   useDraftPrescriptions,
   usePhoton,
   usePrescribe,
-  useRecentOrders
+  useRecentOrders,
+  usePrescribeEventDispatch
 } from '@photonhealth/components';
 import { types } from '@photonhealth/sdk';
-import { Order, Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
+import { Prescription, PrescriptionState } from '@photonhealth/sdk/dist/types';
 import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createMemo, createSignal, For, onMount, Ref, Show, untrack } from 'solid-js';
 
@@ -133,6 +134,7 @@ export const ScreenDraftedPrescriptionsQuery = gql`
 
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
+  let prescriptionRef: HTMLDivElement | undefined;
 
   const { draftPrescriptions } = useDraftPrescriptions();
   const {
@@ -142,6 +144,15 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     isLoadingPrefills,
     orderFormData
   } = usePrescribe();
+  const {
+    dispatchFormValidate,
+    dispatchPrescriptionsCreated,
+    dispatchPrescriptionsError,
+    dispatchOrderCreated,
+    dispatchOrderError,
+    dispatchClinicalAlertAcknowledge,
+    dispatchClinicalAlertCancel
+  } = usePrescribeEventDispatch();
 
   const prescriptionIds = createMemo(() =>
     draftPrescriptions().map((prescription) => prescription.id)
@@ -256,28 +267,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     return address;
   });
 
-  const dispatchPrescriptionsCreated = (prescriptions: Prescription[]) => {
-    const event = new CustomEvent('photon-prescriptions-created', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        prescriptions: prescriptions
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
-
-  const dispatchOrderCreated = (order: Order) => {
-    const event = new CustomEvent('photon-order-created', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        order: order
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
-
   const removeDuplicateTreatments = (
     prescriptions: ScreenablePrescription[]
   ): ScreenablePrescription[] => {
@@ -337,41 +326,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
       screenDraftedPrescriptions();
     }
   });
-
-  const dispatchPrescriptionsError = (errors: readonly Error[]) => {
-    const event = new CustomEvent('photon-prescriptions-error', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        errors: errors
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
-
-  const dispatchOrderError = (errors: readonly GraphQLFormattedError[] = []) => {
-    const event = new CustomEvent('photon-order-error', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        errors: errors
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
-
-  const dispatchPrescriptionsFormValidate = (canSubmit: boolean) => {
-    const event = new CustomEvent('photon-form-validate', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        canSubmit: canSubmit,
-        form: props.formStore,
-        actions: props.formActions
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
 
   const displayAlertsWarning = () => {
     setIsScreeningAlertWarningOpen(true);
@@ -561,14 +515,13 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   });
 
   createEffect(() => {
-    dispatchPrescriptionsFormValidate(
-      Boolean(draftPrescriptions().length > 0 && props.formStore.patient?.value)
+    dispatchFormValidate(
+      Boolean(draftPrescriptions().length > 0 && props.formStore.patient?.value),
+      props.formStore
     );
   });
 
   const clinicalClient = client.sdk.apolloClinical;
-
-  let prescriptionRef: HTMLDivElement | undefined;
 
   const hasCorrectPatientData = createMemo(() => {
     return (
@@ -602,32 +555,13 @@ export function PrescribeWorkflow(props: PrescribeProps) {
             // regardless of the presence of alerts
             setOverrideScreenAlerts(true);
             setIsScreeningAlertWarningOpen(false);
-
-            const event = new CustomEvent('photon-clinical-alert-acknowledge', {
-              composed: true,
-              bubbles: true,
-              detail: {
-                alerts: screeningAlerts()
-              }
-            });
-
             combineOrSubmit();
-
-            ref?.dispatchEvent(event);
+            dispatchClinicalAlertAcknowledge(screeningAlerts());
           }}
           onRevisitPrescriptions={() => {
             setIsLoading(false);
             setIsScreeningAlertWarningOpen(false);
-
-            const event = new CustomEvent('photon-clinical-alert-cancel', {
-              composed: true,
-              bubbles: true,
-              detail: {
-                alerts: screeningAlerts()
-              }
-            });
-
-            ref?.dispatchEvent(event);
+            dispatchClinicalAlertCancel(screeningAlerts());
           }}
         />
       </Show>
