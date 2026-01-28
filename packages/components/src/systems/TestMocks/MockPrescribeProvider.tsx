@@ -1,31 +1,18 @@
 import { PhotonClient } from '@photonhealth/sdk';
-import { createContext, JSXElement, untrack } from 'solid-js';
+import { createContext, JSXElement } from 'solid-js';
 import { vi } from 'vitest';
 import { PrescribeContextType } from '../PrescribeProvider';
 
 export const MockPrescribeContext = createContext<PrescribeContextType>();
 
-export const mockPrescribeContextValues = () => {
-  return {
-    deletePrescription: vi.fn(),
-    tryCreatePrescription: vi.fn(),
-    tryUpdatePrescriptionStates: vi.fn(),
-    setDidSelectOtherCoverageOption: vi.fn()
-  };
-};
-
 interface MockPrescribeProviderProps {
   client?: PhotonClient;
   children: JSXElement;
-  mockFunctions?: ReturnType<typeof mockPrescribeContextValues>;
 }
 
 export function MockPrescribeProvider(props: MockPrescribeProviderProps) {
-  const mocks = untrack(() => props.mockFunctions || mockPrescribeContextValues());
-
   const mockValues: PrescribeContextType = {
     // mock values
-    isLoadingPrefills: () => false,
     coverageOptions: () => [],
     routingConstraints: () => [],
     combinedRoutingConstraint: () => {
@@ -38,10 +25,7 @@ export function MockPrescribeProvider(props: MockPrescribeProviderProps) {
     unroutablePharmacyIds: () => new Set(),
     selectedCoverageOption: () => undefined,
     // mock actions
-    deletePrescription: mocks.deletePrescription,
-    tryCreatePrescription: mocks.tryCreatePrescription,
-    tryUpdatePrescriptionStates: mocks.tryUpdatePrescriptionStates,
-    selectOtherCoverageOption: mocks.setDidSelectOtherCoverageOption,
+    selectOtherCoverageOption: vi.fn(),
     orderFormData: { pharmacyId: 'test-pharmacy-id' },
     setOrderFormData: () => undefined
   };

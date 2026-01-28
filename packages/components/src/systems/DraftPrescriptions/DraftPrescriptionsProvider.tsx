@@ -25,7 +25,7 @@ import {
 } from '../../fetch';
 import triggerToast from '../../utils/toastTriggers';
 
-const DraftPrescriptionsContext = createContext<{
+export type DraftPrescriptionsContextType = {
   // values
   draftPrescriptions: Accessor<Prescription[]>;
   prescriptionIds: Accessor<string[]>;
@@ -39,7 +39,9 @@ const DraftPrescriptionsContext = createContext<{
   ) => Promise<Prescription>;
   deletePrescription: (id: string) => void;
   tryUpdatePrescriptionStates: (ids: string[], state: PrescriptionState) => Promise<boolean>;
-}>();
+};
+
+const DraftPrescriptionsContext = createContext<DraftPrescriptionsContextType>();
 
 interface DraftPrescriptionProviderProps {
   children: JSXElement;

@@ -3,14 +3,14 @@ import PatientMedHistory, { GetPatientResponse } from './index';
 import { vi } from 'vitest';
 import { MockPhotonClient, MockSDKProvider } from '../TestMocks/MockSDKProvider';
 import { PhotonClient } from '@photonhealth/sdk';
-import {
-  MockPrescribeContext,
-  mockPrescribeContextValues,
-  MockPrescribeProvider
-} from '../TestMocks/MockPrescribeProvider';
 import userEvent from '@testing-library/user-event';
 import { Prescription } from '@photonhealth/sdk/dist/types';
 import { useContext } from 'solid-js';
+import {
+  MockDraftPrescriptionsContext,
+  mockDraftPrescriptionsContextValues,
+  MockDraftPrescriptionsProvider
+} from '../TestMocks/MockDraftPrescriptionsProvider';
 
 vi.mock('../SDKProvider', () => ({
   usePhotonClient: () => new MockPhotonClient()
@@ -18,7 +18,7 @@ vi.mock('../SDKProvider', () => ({
 
 vi.mock('../PrescribeProvider', () => {
   return {
-    usePrescribeOptional: () => useContext(MockPrescribeContext)
+    useDraftPrescriptionsOptional: () => useContext(MockDraftPrescriptionsContext)
   };
 });
 
@@ -60,7 +60,7 @@ test('PatientMedHistory renders without PrescribeContext', async () => {
 test('PatientMedHistory allows refills', async () => {
   const user = userEvent.setup();
   const mockClient = new MockPhotonClient();
-  const mockPrescribeFunctions = mockPrescribeContextValues();
+  const mockContextValues = mockDraftPrescriptionsContextValues();
 
   createQueryMock.mockReturnValueOnce(() =>
     generatePatientMedHistoryResponse([
@@ -73,13 +73,13 @@ test('PatientMedHistory allows refills', async () => {
 
   render(() => (
     <MockSDKProvider client={mockClient as unknown as PhotonClient}>
-      <MockPrescribeProvider mockFunctions={mockPrescribeFunctions}>
+      <MockDraftPrescriptionsProvider mockValues={mockContextValues}>
         <PatientMedHistory
           patientId="test-patient-id"
           enableLinks={false}
           enableRefillButton={true}
         />
-      </MockPrescribeProvider>
+      </MockDraftPrescriptionsProvider>
     </MockSDKProvider>
   ));
 
@@ -87,13 +87,13 @@ test('PatientMedHistory allows refills', async () => {
   expect(refillButton).not.toBeDisabled();
   await user.click(refillButton);
 
-  expect(mockPrescribeFunctions.tryCreatePrescription).toHaveBeenCalledTimes(1);
+  expect(mockContextValues.tryCreatePrescription).toHaveBeenCalledTimes(1);
 });
 
 test('PatientMedHistory disables External Medication refill button', async () => {
   const user = userEvent.setup();
   const mockClient = new MockPhotonClient();
-  const mockPrescribeFunctions = mockPrescribeContextValues();
+  const mockContextValues = mockDraftPrescriptionsContextValues();
 
   createQueryMock.mockReturnValueOnce(() =>
     generatePatientMedHistoryResponse([
@@ -110,13 +110,13 @@ test('PatientMedHistory disables External Medication refill button', async () =>
 
   render(() => (
     <MockSDKProvider client={mockClient as unknown as PhotonClient}>
-      <MockPrescribeProvider mockFunctions={mockPrescribeFunctions}>
+      <MockDraftPrescriptionsProvider mockValues={mockContextValues}>
         <PatientMedHistory
           patientId="test-patient-id"
           enableLinks={false}
           enableRefillButton={true}
         />
-      </MockPrescribeProvider>
+      </MockDraftPrescriptionsProvider>
     </MockSDKProvider>
   ));
 
@@ -124,7 +124,7 @@ test('PatientMedHistory disables External Medication refill button', async () =>
   expect(refillButton).toBeDisabled();
   expect(refillButton).not.toHaveTextContent('Loading...');
   await user.click(refillButton);
-  expect(mockPrescribeFunctions.tryCreatePrescription).not.toHaveBeenCalled();
+  expect(mockContextValues.tryCreatePrescription).not.toHaveBeenCalled();
 });
 
 function createPrescription(): Prescription {
