@@ -16,7 +16,7 @@ vi.mock('../SDKProvider', () => ({
   usePhotonClient: () => new MockPhotonClient()
 }));
 
-vi.mock('../PrescribeProvider', () => {
+vi.mock('../DraftPrescriptions', () => {
   return {
     useDraftPrescriptionsOptional: () => useContext(MockDraftPrescriptionsContext)
   };
