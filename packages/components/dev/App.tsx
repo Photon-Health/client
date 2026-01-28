@@ -83,16 +83,15 @@ const App = () => {
           />
         </div>
         <PrescribeEventDispatchProvider>
-          <DraftPrescriptionsProvider>
-            <RecentOrders patientId={patientId}>
-              <PrescribeProvider
-                templateIdsPrefill={[]}
-                templateOverrides={{}}
-                prescriptionIdsPrefill={prescriptionIds()}
-                patientId={patientId}
-                enableCombineAndDuplicate={true}
-                enableCoverageCheck={true}
-              >
+          <RecentOrders patientId={patientId}>
+            <DraftPrescriptionsProvider
+              patientId={patientId}
+              templateIdsPrefill={[]}
+              templateOverrides={{}}
+              prescriptionIdsPrefill={prescriptionIds()}
+              enableCombineAndDuplicate={true}
+            >
+              <PrescribeProvider patientId={patientId} enableCoverageCheck={true}>
                 <div class="mb-10">
                   <h2>Patient Info</h2>
                   <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
@@ -113,8 +112,8 @@ const App = () => {
                   routingConstraints={[]}
                 />
               </PrescribeProvider>
-            </RecentOrders>
-          </DraftPrescriptionsProvider>
+            </DraftPrescriptionsProvider>
+          </RecentOrders>
         </PrescribeEventDispatchProvider>
 
         <div class="mb-10">

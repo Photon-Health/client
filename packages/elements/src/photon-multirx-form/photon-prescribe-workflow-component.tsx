@@ -45,14 +45,16 @@ const Component = (props: PrescribeWorkflowComponentProps) => {
 
   return (
     <PrescribeEventDispatchProvider>
-      <DraftPrescriptionsProvider>
-        <RecentOrders patientId={store.patient?.value?.id}>
+      <RecentOrders patientId={store.patient?.value?.id}>
+        <DraftPrescriptionsProvider
+          patientId={store.patient?.value?.id}
+          templateIdsPrefill={props.templateIds?.split(',').map((id) => id.trim()) || []}
+          templateOverrides={props.templateOverrides || {}}
+          prescriptionIdsPrefill={props.prescriptionIds?.split(',').map((id) => id.trim()) || []}
+          enableCombineAndDuplicate={props.enableCombineAndDuplicate}
+        >
           <PrescribeProvider
-            templateIdsPrefill={props.templateIds?.split(',').map((id) => id.trim()) || []}
-            templateOverrides={props.templateOverrides || {}}
-            prescriptionIdsPrefill={props.prescriptionIds?.split(',').map((id) => id.trim()) || []}
             patientId={store.patient?.value?.id}
-            enableCombineAndDuplicate={props.enableCombineAndDuplicate}
             enableCoverageCheck={props.enableCoverageCheck}
           >
             <style>{tailwind}</style>
@@ -96,8 +98,8 @@ const Component = (props: PrescribeWorkflowComponentProps) => {
               initialShowForm={!props.templateIds && !props.prescriptionIds}
             />
           </PrescribeProvider>
-        </RecentOrders>
-      </DraftPrescriptionsProvider>
+        </DraftPrescriptionsProvider>
+      </RecentOrders>
     </PrescribeEventDispatchProvider>
   );
 };

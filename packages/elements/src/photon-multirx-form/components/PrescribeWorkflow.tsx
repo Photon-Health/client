@@ -136,14 +136,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
   let prescriptionRef: HTMLDivElement | undefined;
 
-  const { draftPrescriptions } = useDraftPrescriptions();
-  const {
-    routingConstraints,
-    combinedRoutingConstraint,
-    tryUpdatePrescriptionStates,
-    isLoadingPrefills,
-    orderFormData
-  } = usePrescribe();
+  const { draftPrescriptions, prescriptionIds, tryUpdatePrescriptionStates, isLoadingPrefills } =
+    useDraftPrescriptions();
+  const { routingConstraints, combinedRoutingConstraint, orderFormData } = usePrescribe();
   const {
     dispatchFormValidate,
     dispatchPrescriptionsCreated,
@@ -153,10 +148,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     dispatchClinicalAlertAcknowledge,
     dispatchClinicalAlertCancel
   } = usePrescribeEventDispatch();
-
-  const prescriptionIds = createMemo(() =>
-    draftPrescriptions().map((prescription) => prescription.id)
-  );
 
   const autoRoutedPharmacyId = createMemo(() => {
     if (props.pharmacyId) {

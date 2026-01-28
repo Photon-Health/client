@@ -5,10 +5,11 @@ import Text from '../../particles/Text';
 import formatRxString from '../../utils/formatRxString';
 import { ScreeningAlerts, ScreeningAlertType } from '../ScreeningAlerts';
 import { RoutingConstraint, PrescriptionRoutingAlert } from '../RoutingConstraints';
-import { CoverageOption, PrescriptionFormData } from '../PrescribeProvider';
+import { CoverageOption } from '../PrescribeProvider';
 import { CoverageOptionSummary } from './CoverageOptions/CoverageOptionSummary';
 import { OtherCoverageOptionsList } from './CoverageOptions/OtherCoverageOptionsList';
 import { toPrescriptionFormData } from './utils/mappers';
+import { PrescriptionFormData } from './DraftPrescriptionsProvider';
 
 interface DraftPrescriptionListItemProps {
   draft: Prescription;
