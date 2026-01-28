@@ -19,8 +19,8 @@ interface DraftPrescriptionsProps {
 }
 
 export function DraftPrescriptionList(props: DraftPrescriptionsProps) {
-  const { draftPrescriptions } = useDraftPrescriptions();
-  const { isLoadingPrefills, prescriptionIds, coverageOptions } = usePrescribe();
+  const { draftPrescriptions, prescriptionIds } = useDraftPrescriptions();
+  const { isLoadingPrefills, coverageOptions } = usePrescribe();
   const prescriptionRoutingConstraints = createMemo((): Map<string, RoutingConstraint> => {
     return getPrescriptionRoutingConstraints(props.routingConstraints);
   });

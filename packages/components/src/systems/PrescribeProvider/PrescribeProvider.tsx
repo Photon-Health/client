@@ -43,7 +43,6 @@ interface PrescribeOrderFormData {
 
 export type PrescribeContextType = {
   // values
-  prescriptionIds: Accessor<string[]>;
   isLoadingPrefills: Accessor<boolean>;
   coverageOptions: Accessor<CoverageOption[]>;
   routingConstraints: Accessor<RoutingConstraint[]>;
@@ -147,10 +146,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
   const client = usePhotonClient();
   const { draftPrescriptions, setDraftPrescriptions } = useDraftPrescriptions();
   const [, recentOrdersActions] = useRecentOrders();
-
-  const prescriptionIds = createMemo(() =>
-    draftPrescriptions().map((prescription) => prescription.id)
-  );
 
   const routingConstraints = createMemo((): RoutingConstraint[] => {
     return draftPrescriptions().map((prescription: Prescription) =>
@@ -519,7 +514,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
 
   const value = {
     // values
-    prescriptionIds,
     isLoadingPrefills,
     coverageOptions,
     routingConstraints,
@@ -529,7 +523,7 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     selectedCoverageOption,
 
     // actions
-    tryCreatePrescription,
+    tryCreatePrescription, // used
     tryUpdatePrescriptionStates,
     deletePrescription,
     selectOtherCoverageOption,

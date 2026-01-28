@@ -136,7 +136,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
   let prescriptionRef: HTMLDivElement | undefined;
 
-  const { draftPrescriptions } = useDraftPrescriptions();
+  const { draftPrescriptions, prescriptionIds } = useDraftPrescriptions();
   const {
     routingConstraints,
     combinedRoutingConstraint,
@@ -153,10 +153,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
     dispatchClinicalAlertAcknowledge,
     dispatchClinicalAlertCancel
   } = usePrescribeEventDispatch();
-
-  const prescriptionIds = createMemo(() =>
-    draftPrescriptions().map((prescription) => prescription.id)
-  );
 
   const autoRoutedPharmacyId = createMemo(() => {
     if (props.pharmacyId) {

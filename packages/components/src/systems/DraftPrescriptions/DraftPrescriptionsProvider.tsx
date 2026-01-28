@@ -1,9 +1,19 @@
-import { Accessor, createContext, createSignal, JSXElement, Setter, useContext } from 'solid-js';
+import {
+  Accessor,
+  createContext,
+  createMemo,
+  createSignal,
+  JSXElement,
+  Setter,
+  useContext
+} from 'solid-js';
 import { Prescription } from '@photonhealth/sdk/dist/types';
 
 const DraftPrescriptionsContext = createContext<{
   // values
   draftPrescriptions: Accessor<Prescription[]>;
+  prescriptionIds: Accessor<string[]>;
+
   // actions
   setDraftPrescriptions: Setter<Prescription[]>;
 }>();
@@ -15,9 +25,14 @@ interface DraftPrescriptionProviderProps {
 export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps) => {
   const [draftPrescriptions, setDraftPrescriptions] = createSignal<Prescription[]>([]);
 
+  const prescriptionIds = createMemo(() =>
+    draftPrescriptions().map((prescription) => prescription.id)
+  );
+
   const value = {
     // values
     draftPrescriptions,
+    prescriptionIds,
     // actions
     setDraftPrescriptions
   };

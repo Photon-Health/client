@@ -30,8 +30,8 @@ export const DraftPrescriptionCard = (props: {
   const [editDialogConfirm, setEditDialogConfirm] = createSignal<(() => void) | undefined>();
   const [editDraft, setEditDraft] = createSignal<PrescriptionFormData | undefined>(undefined);
   const [deleteDraftId, setDeleteDraftId] = createSignal<string | undefined>();
-  const { prescriptionIds, deletePrescription, selectOtherCoverageOption } = usePrescribe();
-  const { draftPrescriptions } = useDraftPrescriptions();
+  const { deletePrescription, selectOtherCoverageOption } = usePrescribe();
+  const { draftPrescriptions, prescriptionIds } = useDraftPrescriptions();
 
   const editPrescription = () => {
     const formData = editDraft();

@@ -25,7 +25,6 @@ export function MockPrescribeProvider(props: MockPrescribeProviderProps) {
 
   const mockValues: PrescribeContextType = {
     // mock values
-    prescriptionIds: () => [],
     isLoadingPrefills: () => false,
     coverageOptions: () => [],
     routingConstraints: () => [],
