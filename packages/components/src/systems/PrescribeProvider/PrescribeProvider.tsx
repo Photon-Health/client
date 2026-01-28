@@ -273,7 +273,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
 
   const value = {
     // values
-
     coverageOptions,
     routingConstraints,
     combinedRoutingConstraint,
@@ -282,7 +281,6 @@ export const PrescribeProvider = (props: PrescribeProviderProps) => {
     selectedCoverageOption,
 
     // actions
-
     selectOtherCoverageOption,
     setOrderFormData
   };
