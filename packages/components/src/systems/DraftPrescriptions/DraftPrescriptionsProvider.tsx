@@ -173,6 +173,10 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
       }
     } catch (error) {
       console.error('Error while trying to create prescriptions from prefill IDs', { error });
+      triggerToast({
+        status: 'error',
+        body: 'There was an issue creating prescriptions from prefill IDs. Please check your configuration.'
+      });
     } finally {
       setIsLoadingPrefills(false);
     }
