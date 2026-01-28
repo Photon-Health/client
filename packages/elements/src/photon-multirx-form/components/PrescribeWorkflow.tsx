@@ -136,14 +136,9 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
   let prescriptionRef: HTMLDivElement | undefined;
 
-  const { draftPrescriptions, prescriptionIds } = useDraftPrescriptions();
-  const {
-    routingConstraints,
-    combinedRoutingConstraint,
-    tryUpdatePrescriptionStates,
-    isLoadingPrefills,
-    orderFormData
-  } = usePrescribe();
+  const { draftPrescriptions, prescriptionIds, tryUpdatePrescriptionStates, isLoadingPrefills } =
+    useDraftPrescriptions();
+  const { routingConstraints, combinedRoutingConstraint, orderFormData } = usePrescribe();
   const {
     dispatchFormValidate,
     dispatchPrescriptionsCreated,

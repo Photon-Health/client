@@ -8,8 +8,9 @@ import {
   ScreeningAlertType,
   Text,
   triggerToast,
-  usePrescribe,
-  usePrescribeEventDispatch
+  usePrescribeEventDispatch,
+  TryCreatePrescriptionTemplateOptions,
+  useDraftPrescriptions
 } from '@photonhealth/components';
 import { DispenseUnit, Medication, Prescription } from '@photonhealth/sdk/dist/types';
 import { any, min, number, optional, record, refine, size, string } from 'superstruct';
@@ -23,7 +24,6 @@ import { GraphQLFormattedError } from 'graphql';
 import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import clearForm from '../util/clearForm';
 import repopulateForm from '../util/repopulateForm';
-import { TryCreatePrescriptionTemplateOptions } from '@photonhealth/components/src/systems/PrescribeProvider';
 import { DisableList } from './PrescribeWorkflow';
 
 setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/');
@@ -61,7 +61,7 @@ export const AddPrescriptionCard = (props: {
   enableOrder: boolean;
   disableList?: DisableList;
 }) => {
-  const { tryCreatePrescription } = usePrescribe();
+  const { tryCreatePrescription } = useDraftPrescriptions();
   const { dispatchOrderError } = usePrescribeEventDispatch();
   const [offCatalog, setOffCatalog] = createSignal<Medication | undefined>(undefined);
   const [dispenseUnit] = createSignal<DispenseUnit | undefined>(undefined);
