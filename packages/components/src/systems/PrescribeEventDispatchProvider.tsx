@@ -114,7 +114,6 @@ export const PrescribeEventDispatchProvider = (props: DraftPrescriptionProviderP
   };
 
   const dispatchTicketCreatedDuplicate = () => {
-    // triggers the parent flow to clears the add prescription form
     const event = new CustomEvent('photon-ticket-created-duplicate', {
       composed: true,
       bubbles: true,

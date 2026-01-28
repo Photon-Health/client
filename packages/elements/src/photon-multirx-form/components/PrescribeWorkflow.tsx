@@ -134,6 +134,7 @@ export const ScreenDraftedPrescriptionsQuery = gql`
 
 export function PrescribeWorkflow(props: PrescribeProps) {
   let ref: Ref<any> | undefined;
+  let prescriptionRef: HTMLDivElement | undefined;
 
   const { draftPrescriptions } = useDraftPrescriptions();
   const {
@@ -521,8 +522,6 @@ export function PrescribeWorkflow(props: PrescribeProps) {
   });
 
   const clinicalClient = client.sdk.apolloClinical;
-
-  let prescriptionRef: HTMLDivElement | undefined;
 
   const hasCorrectPatientData = createMemo(() => {
     return (

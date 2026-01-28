@@ -151,6 +151,7 @@ export default function RecentOrdersIssueDialog() {
       body: 'The customer support team will respond to you shortly.',
       status: 'success'
     });
+    // triggers the parent flow to clears the add prescription form
     dispatchTicketCreatedDuplicate();
     actions.setIsIssueDialogOpen(false);
   };
