@@ -54,7 +54,6 @@ const PrescribeContext = createContext<PrescribeContextType>();
 interface PrescribeProviderProps {
   children: JSXElement;
   patientId: string;
-  enableCombineAndDuplicate: boolean;
   enableCoverageCheck: boolean;
 }
 
