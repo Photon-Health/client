@@ -185,6 +185,7 @@
     },
     "@datadog/datadog-ci": { "form-data": "2.5.4" },
     "@nx/cypress": { "form-data": "4.0.4" },
+    "@types/request": { "form-data": "2.5.4" },
     "@nx/eslint-plugin": { "form-data": "4.0.4" },
     "@nx/jest": { "form-data": "4.0.4" },
     "@nx/js": { "form-data": "4.0.4" },
