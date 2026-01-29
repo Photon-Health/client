@@ -14,6 +14,7 @@ import { dispatchDatadogAction } from '../../utils/dispatchDatadogAction';
 import { createMutation } from '../../utils/createMutation';
 import { Order } from '@photonhealth/sdk/dist/types';
 import { useDraftPrescriptions } from '../DraftPrescriptions';
+import { usePrescribeEventDispatch } from '../PrescribeEventDispatchProvider';
 
 const COMBINE_ORDERS_MUTATION = gql`
   mutation RecentOrdersCombineDialogUpdateOrder($orderId: ID!, $fills: [FillInput!]!) {
@@ -68,9 +69,8 @@ type VariablesCreateOrder = {
 
 export default function RecentOrdersCombineDialog() {
   let ref: Ref<any> | undefined;
-  const draftPrescriptionsContext = useDraftPrescriptions();
-
-  const { draftPrescriptions } = draftPrescriptionsContext;
+  const { draftPrescriptions } = useDraftPrescriptions();
+  const { dispatchOrderCreated, dispatchOrderCombined } = usePrescribeEventDispatch();
 
   const client = usePhotonClient();
   const [state, actions] = useRecentOrders();
@@ -90,26 +90,6 @@ export default function RecentOrdersCombineDialog() {
       client: client.apollo
     }
   );
-
-  const dispatchCombineOrderUpdated = (order: Order) => {
-    const event = new CustomEvent('photon-order-combined', {
-      composed: true,
-      bubbles: true,
-      detail: { order }
-    });
-    ref?.dispatchEvent(event);
-  };
-
-  const dispatchOrderCreated = (order: SuccessResponse) => {
-    const event = new CustomEvent('photon-order-created', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        order: order
-      }
-    });
-    ref?.dispatchEvent(event);
-  };
 
   createEffect(() => {
     if (state.isCombineDialogOpen) {
@@ -149,7 +129,7 @@ export default function RecentOrdersCombineDialog() {
       });
 
       // Trigger message to redirect to order page
-      dispatchCombineOrderUpdated(updatedOrder.updateOrder as Order);
+      dispatchOrderCombined(updatedOrder.updateOrder as Order);
 
       setIsCombiningOrders(false);
       actions.setIsCombineDialogOpen(false);
@@ -170,7 +150,7 @@ export default function RecentOrdersCombineDialog() {
           }
         });
 
-        dispatchOrderCreated(newOrder.createOrder);
+        dispatchOrderCreated(newOrder.createOrder as Order);
         setIsCombiningOrders(false);
       } catch {
         triggerToast({

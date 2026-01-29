@@ -28,6 +28,13 @@
       },
       "dependsOn": ["^build"]
     },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/elements",
+        "command": "vitest run"
+      }
+    },
     "lint:fix": {
       "executor": "nx:run-commands",
       "options": {
