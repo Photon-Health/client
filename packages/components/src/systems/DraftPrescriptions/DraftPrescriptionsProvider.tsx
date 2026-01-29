@@ -24,6 +24,7 @@ import {
   UpdatePrescriptionStates
 } from '../../fetch';
 import triggerToast from '../../utils/toastTriggers';
+import { PhotonClient } from '@photonhealth/sdk';
 
 export type DraftPrescriptionsContextType = {
   // values
@@ -113,13 +114,58 @@ function isTreatmentInDraftPrescriptions(
   return draftedPrescriptions.some((draft) => draft.treatment.id === treatmentId);
 }
 
+const createPrefillPrescriptionsOnApi = async ({
+  client,
+  props
+}: {
+  client: PhotonClient;
+  props: DraftPrescriptionProviderProps;
+}) => {
+  let rxToCreate: MutationCreatePrescriptionsArgs['prescriptions'] = [];
+
+  // Create prescriptions from template ids with a few optional override values
+  if (props.templateIdsPrefill.length > 0) {
+    const dedupedTemplateIds = Array.from(new Set(props.templateIdsPrefill));
+    const templatedCreateRxList = dedupedTemplateIds.map((templateId) => ({
+      ...props.templateOverrides?.[templateId],
+      patientId: props.patientId,
+      templateId
+    }));
+    rxToCreate = rxToCreate.concat(templatedCreateRxList);
+  }
+
+  // Fetch prescriptions if needed
+  if (props.prescriptionIdsPrefill.length > 0) {
+    const fetchedPrescriptions = await Promise.all(
+      props.prescriptionIdsPrefill.map(async (prescriptionId: string) => {
+        const { data } = await client.apollo.query({
+          query: GetPrescription,
+          variables: { id: prescriptionId }
+        });
+        return transformPrescriptionFormData(data?.prescription, props.patientId);
+      })
+    );
+    rxToCreate = rxToCreate.concat(fetchedPrescriptions);
+  }
+
+  if (!rxToCreate.length) {
+    return;
+  }
+
+  const res = await client.apollo.mutate({
+    mutation: CreatePrescriptions,
+    variables: { prescriptions: rxToCreate }
+  });
+  const newRxs = res.data.createPrescriptions as Prescription[];
+  return newRxs;
+};
+
 export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps) => {
   const { dispatchDraftPrescriptionCreated } = usePrescribeEventDispatch();
   const [, recentOrdersActions] = useRecentOrders();
   const client = usePhotonClient();
   const [hasCreatedPrescriptions, setHasCreatedPrescriptions] = createSignal<boolean>(false);
   const [isLoadingPrefills, setIsLoadingPrefills] = createSignal<boolean>(false);
-
   const [draftPrescriptions, setDraftPrescriptions] = createSignal<Prescription[]>([]);
 
   const prescriptionIds = createMemo(() =>
@@ -127,7 +173,7 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
   );
 
   // Prefill new prescriptions based on templateIds or prescriptionIds when we get a patientId
-  createEffect(() => {
+  createEffect(async () => {
     if (
       // must have templateIds or prescriptionIds to create prescriptions
       (props.templateIdsPrefill.length > 0 || props.prescriptionIdsPrefill.length > 0) &&
@@ -136,51 +182,26 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
       // must not have created prescriptions yet
       !hasCreatedPrescriptions()
     ) {
-      createPrescriptionsFromIds();
+      setHasCreatedPrescriptions(true);
+      setIsLoadingPrefills(true);
+
+      try {
+        const newRxs = await createPrefillPrescriptionsOnApi({ client, props });
+        if (newRxs) {
+          setDraftPrescriptions((prev) => [...prev, ...newRxs]);
+          newRxs.map((rx) => dispatchDraftPrescriptionCreated(rx));
+        }
+      } catch (error) {
+        console.error('Error while trying to create prescriptions from prefill IDs', { error });
+        triggerToast({
+          status: 'error',
+          body: 'There was an issue creating prescriptions from prefill IDs. Please check your configuration.'
+        });
+      } finally {
+        setIsLoadingPrefills(false);
+      }
     }
   });
-
-  async function createPrescriptionsFromIds() {
-    setHasCreatedPrescriptions(true);
-    setIsLoadingPrefills(true);
-
-    try {
-      // Create prescriptions from template ids with a few optional override values
-      if (props.templateIdsPrefill.length > 0) {
-        const dedupedTemplateIds = Array.from(new Set(props.templateIdsPrefill));
-        const templatedCreateRxList = dedupedTemplateIds.map((templateId) => ({
-          ...props.templateOverrides?.[templateId],
-          patientId: props.patientId,
-          templateId
-        }));
-
-        await createPrescriptionsOnApi(templatedCreateRxList);
-      }
-
-      // Fetch prescriptions if needed
-      if (props.prescriptionIdsPrefill.length > 0) {
-        const fetchedPrescriptions = await Promise.all(
-          props.prescriptionIdsPrefill.map(async (prescriptionId: string) => {
-            const { data } = await client.apollo.query({
-              query: GetPrescription,
-              variables: { id: prescriptionId }
-            });
-            return transformPrescriptionFormData(data?.prescription, props.patientId);
-          })
-        );
-
-        await createPrescriptionsOnApi(fetchedPrescriptions);
-      }
-    } catch (error) {
-      console.error('Error while trying to create prescriptions from prefill IDs', { error });
-      triggerToast({
-        status: 'error',
-        body: 'There was an issue creating prescriptions from prefill IDs. Please check your configuration.'
-      });
-    } finally {
-      setIsLoadingPrefills(false);
-    }
-  }
 
   const tryCreatePrescription = async (
     prescriptionFormData: PrescriptionFormData,
@@ -266,18 +287,6 @@ export const DraftPrescriptionsProvider = (props: DraftPrescriptionProviderProps
     }
 
     return createdPrescription;
-  };
-
-  const createPrescriptionsOnApi = async (
-    prescriptions: MutationCreatePrescriptionsArgs['prescriptions']
-  ) => {
-    const res = await client.apollo.mutate({
-      mutation: CreatePrescriptions,
-      variables: { prescriptions }
-    });
-    const newRxs = res.data.createPrescriptions as Prescription[];
-    setDraftPrescriptions((prev) => [...prev, ...newRxs]);
-    newRxs.map((rx) => dispatchDraftPrescriptionCreated(rx));
   };
 
   const createPrescriptionTemplateOnApi = async (
