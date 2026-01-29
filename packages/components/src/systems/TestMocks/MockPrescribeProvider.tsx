@@ -1,17 +1,12 @@
 import { PhotonClient } from '@photonhealth/sdk';
-import { createContext, JSXElement } from 'solid-js';
+import { createContext, JSXElement, untrack } from 'solid-js';
 import { vi } from 'vitest';
 import { PrescribeContextType } from '../PrescribeProvider';
 
 export const MockPrescribeContext = createContext<PrescribeContextType>();
 
-interface MockPrescribeProviderProps {
-  client?: PhotonClient;
-  children: JSXElement;
-}
-
-export function MockPrescribeProvider(props: MockPrescribeProviderProps) {
-  const mockValues: PrescribeContextType = {
+export const mockPrescribeContextValues = () => {
+  return {
     // mock values
     coverageOptions: () => [],
     routingConstraints: () => [],
@@ -28,11 +23,18 @@ export function MockPrescribeProvider(props: MockPrescribeProviderProps) {
     selectOtherCoverageOption: vi.fn(),
     orderFormData: { pharmacyId: 'test-pharmacy-id' },
     setOrderFormData: () => undefined
-  };
+  } as PrescribeContextType;
+};
+
+interface MockPrescribeProviderProps {
+  client?: PhotonClient;
+  children: JSXElement;
+}
+
+export function MockPrescribeProvider(props: MockPrescribeProviderProps) {
+  const mocks = untrack(() => mockPrescribeContextValues());
 
   return (
-    <MockPrescribeContext.Provider value={mockValues}>
-      {props.children}
-    </MockPrescribeContext.Provider>
+    <MockPrescribeContext.Provider value={mocks}>{props.children}</MockPrescribeContext.Provider>
   );
 }
