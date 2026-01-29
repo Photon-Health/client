@@ -4,6 +4,7 @@ import {
   DraftPrescriptionList,
   DraftPrescriptionsProvider,
   PharmacySelect,
+  PrescribeEventDispatchProvider,
   PrescribeProvider,
   RecentOrders,
   triggerToast,
@@ -81,36 +82,39 @@ const App = () => {
             enableRefillButton={true}
           />
         </div>
-        <DraftPrescriptionsProvider>
+        <PrescribeEventDispatchProvider>
           <RecentOrders patientId={patientId}>
-            <PrescribeProvider
+            <DraftPrescriptionsProvider
+              patientId={patientId}
               templateIdsPrefill={[]}
               templateOverrides={{}}
               prescriptionIdsPrefill={prescriptionIds()}
-              patientId={patientId}
               enableCombineAndDuplicate={true}
-              enableCoverageCheck={true}
             >
-              <div class="mb-10">
-                <h2>Patient Info</h2>
-                <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
-              </div>
+              <PrescribeProvider patientId={patientId} enableCoverageCheck={true}>
+                <div class="mb-10">
+                  <h2>Patient Info</h2>
+                  <PatientInfo patientId="pat_01JEVF5DWQAQFHTVYK9ABG65JZ" />
+                </div>
 
-              <div class="mb-10">
-                <h2>Draft Prescriptions</h2>
-              </div>
-              <DraftPrescriptionList
-                handleDelete={(id) => setPrescriptionIds(prescriptionIds().filter((p) => p !== id))}
-                handleEdit={(rx) =>
-                  setPrescriptionIds(prescriptionIds().filter((p) => p !== rx.id))
-                }
-                handleSwapToOtherPrescription={(_) => _}
-                screeningAlerts={[]}
-                routingConstraints={[]}
-              />
-            </PrescribeProvider>
+                <div class="mb-10">
+                  <h2>Draft Prescriptions</h2>
+                </div>
+                <DraftPrescriptionList
+                  handleDelete={(id) =>
+                    setPrescriptionIds(prescriptionIds().filter((p) => p !== id))
+                  }
+                  handleEdit={(rx) =>
+                    setPrescriptionIds(prescriptionIds().filter((p) => p !== rx.id))
+                  }
+                  handleSwapToOtherPrescription={(_) => _}
+                  screeningAlerts={[]}
+                  routingConstraints={[]}
+                />
+              </PrescribeProvider>
+            </DraftPrescriptionsProvider>
           </RecentOrders>
-        </DraftPrescriptionsProvider>
+        </PrescribeEventDispatchProvider>
 
         <div class="mb-10">
           <div>
