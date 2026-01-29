@@ -29,110 +29,31 @@ import { formatAddress } from 'apps/app/src/utils';
 import { StyledToast } from 'apps/app/src/views/components/StyledToast';
 import { compact } from 'lodash';
 
-const profileQuery = graphql(/* GraphQL */ `
-  query MeProfileQuery {
-    me {
-      id
-      npi
-      phone
-      fax
-      email
-      address {
-        street1
-        street2
-        state
-        postalCode
-        country
-        city
-      }
-      name {
-        first
-        full
-        last
-        middle
-        title
-      }
-      roles {
-        description
-        id
-        name
-      }
-    }
-    organization {
-      id
-      name
-    }
-  }
-`);
-
 const updateMyProfileMutation = graphql(/* GraphQL */ `
   mutation UpdateMyProfile($updateMyProfileInput: ProfileInput!) {
     updateMyProfile(input: $updateMyProfileInput)
   }
 `);
 
-function mapAndSortRoles(roles: Role[]): { value: string; label: string; description?: string }[] {
-  const mappedRoles = roles.map(({ name, id, description }) => ({
-    value: id,
-    label: name ?? id,
-    description: description ?? undefined
-  }));
-  const sortedRoles = mappedRoles.sort();
-  return sortedRoles;
-}
-
-const EditButtons = ({
-  onSave,
-  onCancel,
-  loading,
-  isInvalid
-}: {
-  onSave: () => void;
-  onCancel: () => void;
-  loading: boolean;
-  isInvalid: boolean;
-}) => (
-  <>
-    <Button
-      size={'sm'}
-      colorScheme={'green'}
-      leftIcon={loading ? <Spinner size={'xs'} /> : <CheckIcon />}
-      isDisabled={loading || isInvalid}
-      disabled={loading || isInvalid}
-      onClick={onSave}
-    >
-      Save
-    </Button>
-    <Button
-      size={'sm'}
-      color="red.400"
-      borderColor={'red.400'}
-      variant="outline"
-      onClick={onCancel}
-      isDisabled={loading}
-      disabled={loading}
-    >
-      Cancel
-    </Button>
-  </>
-);
-
 export const Profile = () => {
   const toast = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const { clinicalClient } = usePhoton();
+
   const { data, loading, error } = useQuery(profileQuery, {
     client: clinicalClient,
     errorPolicy: 'ignore'
   });
+
   const [updateMyProfile, { loading: mutationLoading }] = useMutation(updateMyProfileMutation, {
     refetchQueries: ['MeProfileQuery'],
     client: clinicalClient
   });
 
-  const canEdit = usePermissions(['edit:profile']);
   const user = data?.me;
   const organization = data?.organization;
+
+  const canEdit = usePermissions(['edit:profile']);
 
   const initialValues: yup.InferType<typeof profileFormSchema> = {
     name: {
@@ -163,13 +84,19 @@ export const Profile = () => {
       return undefined;
     }
     return formatAddress(addressData);
-  }, [user?.address?.street1]);
+  }, [user?.address]);
+
+  const orgNameMatchesUserName =
+    user &&
+    organization &&
+    organization?.name.toLowerCase() !==
+      `${user.name?.first.toLowerCase()} ${user.name?.last.toLowerCase()}`;
 
   const rows = useMemo(
     () =>
       compact([
-        { title: 'Full Name', value: user?.name?.full },
-        organization?.name.toLowerCase() !== user?.name?.full.toLowerCase() && {
+        { title: 'Full Name', value: formatName(user?.name) },
+        orgNameMatchesUserName && {
           title: 'Organization',
           value: organization?.name
         },
@@ -188,7 +115,16 @@ export const Profile = () => {
           </Text>
         )
       })),
-    [user, organization, address]
+    [
+      user?.name,
+      user?.email,
+      user?.phone,
+      user?.fax,
+      user?.npi,
+      orgNameMatchesUserName,
+      organization?.name,
+      address
+    ]
   );
 
   const handleSubmit = async (values: yup.InferType<typeof profileFormSchema>) => {
@@ -254,7 +190,7 @@ export const Profile = () => {
                   Profile details
                 </Text>
                 <HStack>
-                  {user && isEditing ? (
+                  {isEditing ? (
                     <EditButtons
                       loading={mutationLoading}
                       isInvalid={!formikProps.isValid}
@@ -283,7 +219,7 @@ export const Profile = () => {
                   There was an error processing your request for profile details.
                 </Alert>
               )}
-              {user && formikProps && isEditing ? (
+              {isEditing ? (
                 <ProfileForm {...formikProps} />
               ) : (
                 rows.map(({ title, value }) => (
@@ -303,3 +239,118 @@ export const Profile = () => {
     </Formik>
   );
 };
+
+const EditButtons = ({
+  onSave,
+  onCancel,
+  loading,
+  isInvalid
+}: {
+  onSave: () => void;
+  onCancel: () => void;
+  loading: boolean;
+  isInvalid: boolean;
+}) => (
+  <>
+    <Button
+      size={'sm'}
+      colorScheme={'green'}
+      leftIcon={loading ? <Spinner size={'xs'} /> : <CheckIcon />}
+      isDisabled={loading || isInvalid}
+      disabled={loading || isInvalid}
+      onClick={onSave}
+    >
+      Save
+    </Button>
+    <Button
+      size={'sm'}
+      color="red.400"
+      borderColor={'red.400'}
+      variant="outline"
+      onClick={onCancel}
+      isDisabled={loading}
+      disabled={loading}
+    >
+      Cancel
+    </Button>
+  </>
+);
+
+function mapAndSortRoles(roles: Role[]): { value: string; label: string; description?: string }[] {
+  const mappedRoles = roles.map(({ name, id, description }) => ({
+    value: id,
+    label: name ?? id,
+    description: description ?? undefined
+  }));
+  const sortedRoles = mappedRoles.sort();
+  return sortedRoles;
+}
+
+function formatName(
+  name:
+    | {
+        __typename?: 'Name';
+        first: string;
+        full: string;
+        last: string;
+        middle?: string | null;
+        title?: string | null;
+      }
+    | null
+    | undefined
+): string {
+  if (!name) return '';
+  const { first, middle, last, title } = name;
+  const parts: string[] = [];
+  if (first) parts.push(first.trim());
+  if (middle) parts.push(middle.trim());
+  if (last) parts.push(last.trim());
+  let fullName = parts.join(' ');
+
+  if (title && title.trim().length <= 4) {
+    const normalized = title.trim().toLowerCase();
+    if (normalized === 'dr' || normalized === 'dr.') {
+      fullName = `Dr. ${fullName}`;
+    } else {
+      fullName += `, ${title.trim().toUpperCase()}`;
+    }
+  }
+
+  return fullName;
+}
+
+const profileQuery = graphql(/* GraphQL */ `
+  query MeProfileQuery {
+    me {
+      id
+      npi
+      phone
+      fax
+      email
+      address {
+        street1
+        street2
+        state
+        postalCode
+        country
+        city
+      }
+      name {
+        first
+        full
+        last
+        middle
+        title
+      }
+      roles {
+        description
+        id
+        name
+      }
+    }
+    organization {
+      id
+      name
+    }
+  }
+`);
