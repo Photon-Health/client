@@ -7,7 +7,10 @@ import ComboBox from './particles/ComboBox';
 import {
   DraftPrescriptionList,
   DraftPrescriptionsProvider,
-  useDraftPrescriptions
+  useDraftPrescriptions,
+  type PrescriptionFormData,
+  type TemplateOverrides,
+  type TryCreatePrescriptionTemplateOptions
 } from './systems/DraftPrescriptions';
 import Icon from './particles/Icon';
 import PatientInfo from './systems/PatientInfo';
@@ -43,15 +46,14 @@ import { PhotonClientStore } from './store';
 
 export { usePhoton, PhotonClientStore, PhotonContext };
 
-import {
-  CoverageOption,
-  PrescribeProvider,
-  usePrescribe,
-  type PrescriptionFormData,
-  type TemplateOverrides
-} from './systems/PrescribeProvider';
+import { CoverageOption, PrescribeProvider, usePrescribe } from './systems/PrescribeProvider';
 
 import { GoogleServiceProvider, useGoogleService } from './systems/GoogleServiceProvider';
+
+import {
+  PrescribeEventDispatchProvider,
+  usePrescribeEventDispatch
+} from './systems/PrescribeEventDispatchProvider';
 
 export {
   AddressForm,
@@ -91,7 +93,9 @@ export {
   GoogleServiceProvider,
   usePrescribe,
   useGoogleService,
-  CALENDAR_DATE_FORMAT
+  CALENDAR_DATE_FORMAT,
+  PrescribeEventDispatchProvider,
+  usePrescribeEventDispatch
 };
 
 // Export types
@@ -100,5 +104,6 @@ export type {
   RoutingConstraint,
   TemplateOverrides,
   PrescriptionFormData,
-  CoverageOption
+  CoverageOption,
+  TryCreatePrescriptionTemplateOptions
 };

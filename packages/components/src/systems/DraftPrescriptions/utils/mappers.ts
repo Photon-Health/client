@@ -1,5 +1,5 @@
 import { Prescription } from '@photonhealth/sdk/dist/types';
-import { PrescriptionFormData } from '../../PrescribeProvider';
+import { PrescriptionFormData } from '../DraftPrescriptionsProvider';
 
 export function toPrescriptionFormData(
   prescription: Prescription,
