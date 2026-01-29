@@ -14,10 +14,9 @@ import {
   useToast
 } from '@chakra-ui/react';
 
-import { ApolloError, useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { CheckIcon, EditIcon } from '@chakra-ui/icons';
 import { graphql } from 'apps/app/src/gql';
-import { MeProfileQueryQuery } from 'apps/app/src/gql/graphql';
 import usePermissions from 'apps/app/src/hooks/usePermissions';
 import InfoGrid from 'apps/app/src/views/components/InfoGrid';
 import { Formik, validateYupSchema, yupToFormErrors } from 'formik';
@@ -30,81 +29,82 @@ import { formatAddress } from 'apps/app/src/utils';
 import { StyledToast } from 'apps/app/src/views/components/StyledToast';
 import { compact } from 'lodash';
 
-type User = NonNullable<MeProfileQueryQuery['me']>;
-
-type Organization = MeProfileQueryQuery['organization'];
-interface ProfileProps {
-  user: User;
-  organization: Organization;
-  loading: boolean;
-  error: ApolloError | undefined;
-}
-
 const updateMyProfileMutation = graphql(/* GraphQL */ `
   mutation UpdateMyProfile($updateMyProfileInput: ProfileInput!) {
     updateMyProfile(input: $updateMyProfileInput)
   }
 `);
 
-export const Profile = ({ user, organization, loading, error }: ProfileProps) => {
+export const Profile = () => {
   const toast = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const { clinicalClient } = usePhoton();
+
+  const { data, loading, error } = useQuery(profileQuery, {
+    client: clinicalClient,
+    errorPolicy: 'ignore'
+  });
+
   const [updateMyProfile, { loading: mutationLoading }] = useMutation(updateMyProfileMutation, {
     refetchQueries: ['MeProfileQuery'],
     client: clinicalClient
   });
 
+  const user = data?.me;
+  const organization = data?.organization;
+
   const canEdit = usePermissions(['edit:profile']);
 
   const initialValues: yup.InferType<typeof profileFormSchema> = {
     name: {
-      title: user.name?.title ?? undefined,
-      first: user.name?.first ?? '',
-      middle: user.name?.middle ?? undefined,
-      last: user.name?.last ?? ''
+      title: user?.name?.title ?? undefined,
+      first: user?.name?.first ?? '',
+      middle: user?.name?.middle ?? undefined,
+      last: user?.name?.last ?? ''
     },
-    email: user.email ?? '',
-    roles: mapAndSortRoles(user.roles ?? []),
-    phone: user.phone ?? '',
-    fax: user.fax ?? '',
-    npi: user.npi ?? '',
+    email: user?.email ?? '',
+    roles: mapAndSortRoles(user?.roles ?? []),
+    phone: user?.phone ?? '',
+    fax: user?.fax ?? '',
+    npi: user?.npi ?? '',
     address: {
-      street1: user.address?.street1 ?? '',
-      street2: user.address?.street2 ?? undefined,
-      city: user.address?.city ?? '',
+      street1: user?.address?.street1 ?? '',
+      street2: user?.address?.street2 ?? undefined,
+      city: user?.address?.city ?? '',
       state: {
-        value: (user.address?.state as string) ?? ''
+        value: (user?.address?.state as string) ?? ''
       },
-      postalCode: user.address?.postalCode ?? ''
+      postalCode: user?.address?.postalCode ?? ''
     }
   };
 
   const address = useMemo(() => {
-    const addressData = user.address;
+    const addressData = user?.address;
     if (!addressData) {
       return undefined;
     }
     return formatAddress(addressData);
-  }, [user.address]);
+  }, [user?.address]);
 
   const orgNameMatchesUserName =
+    user &&
+    organization &&
     organization?.name.toLowerCase() !==
-    `${user.name?.first.toLowerCase()} ${user.name?.last.toLowerCase()}`;
+      `${user.name?.first.toLowerCase()} ${user.name?.last.toLowerCase()}`;
 
   const rows = useMemo(
     () =>
       compact([
-        { title: 'Full Name', value: formatName(user.name) },
+        { title: 'Full Name', value: formatName(user?.name) },
         orgNameMatchesUserName && {
           title: 'Organization',
           value: organization?.name
         },
-        { title: 'Email Address', value: user.email },
-        { title: 'Phone', value: user.phone },
-        { title: 'Fax', value: user.fax },
+        { title: 'Email Address', value: user?.email },
+        { title: 'Phone', value: user?.phone },
+        { title: 'Fax', value: user?.fax },
         { title: 'Address', value: address },
-        { title: 'NPI', value: user.npi }
+        { title: 'NPI', value: user?.npi }
       ]).map(({ title, value }) => ({
         title,
         value: value ? (
@@ -116,11 +116,11 @@ export const Profile = ({ user, organization, loading, error }: ProfileProps) =>
         )
       })),
     [
-      user.name,
-      user.email,
-      user.phone,
-      user.fax,
-      user.npi,
+      user?.name,
+      user?.email,
+      user?.phone,
+      user?.fax,
+      user?.npi,
       orgNameMatchesUserName,
       organization?.name,
       address
@@ -318,3 +318,39 @@ function formatName(
 
   return fullName;
 }
+
+const profileQuery = graphql(/* GraphQL */ `
+  query MeProfileQuery {
+    me {
+      id
+      npi
+      phone
+      fax
+      email
+      address {
+        street1
+        street2
+        state
+        postalCode
+        country
+        city
+      }
+      name {
+        first
+        full
+        last
+        middle
+        title
+      }
+      roles {
+        description
+        id
+        name
+      }
+    }
+    organization {
+      id
+      name
+    }
+  }
+`);
