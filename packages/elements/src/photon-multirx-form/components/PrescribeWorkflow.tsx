@@ -18,7 +18,6 @@ import {
   ScreeningAlertType,
   SignatureAttestationModal,
   Spinner,
-  TemplateOverrides,
   Toaster,
   triggerToast,
   useDraftPrescriptions,
@@ -78,7 +77,6 @@ export type DisableList = DisabledItem[];
 
 export type PrescribeProps = {
   patientId?: string;
-  templateOverrides?: TemplateOverrides;
   hideSubmit: boolean;
   hideTemplates: boolean;
   hidePatientCard: boolean;
@@ -90,17 +88,14 @@ export type PrescribeProps = {
   enableMedHistoryRefillButton: boolean;
   enableCombineAndDuplicate: boolean;
   enableDeliveryPharmacies: boolean;
-  enableCoverageCheck: boolean;
   optionalPatientAddress: boolean;
   mailOrderIds?: string;
   pharmacyId?: string;
-  loading: boolean;
   address?: Address;
   weight?: number;
   weightUnit?: string;
   additionalNotes?: string;
   triggerSubmit: boolean;
-  setTriggerSubmit?: (val: boolean) => void;
   toastBuffer: number;
   formStore?: any;
   formActions?: any;

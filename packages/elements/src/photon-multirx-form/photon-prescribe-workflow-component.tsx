@@ -2,7 +2,8 @@ import {
   DraftPrescriptionsProvider,
   PrescribeProvider,
   RecentOrders,
-  PrescribeEventDispatchProvider
+  PrescribeEventDispatchProvider,
+  TemplateOverrides
 } from '@photonhealth/components';
 import { customElement } from 'solid-element';
 import { createFormStore } from '../stores/form';
@@ -24,7 +25,9 @@ setBasePath('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.4.0/dist/')
 
 interface PrescribeWorkflowComponentProps extends Omit<PrescribeProps, 'initialShowForm'> {
   templateIds?: string;
+  templateOverrides?: TemplateOverrides;
   prescriptionIds?: string;
+  enableCoverageCheck: boolean;
 }
 
 const Component = (props: PrescribeWorkflowComponentProps) => {
@@ -64,7 +67,6 @@ const Component = (props: PrescribeWorkflowComponentProps) => {
             <style>{photonStyles}</style>
             <PrescribeWorkflow
               patientId={props.patientId}
-              templateOverrides={props.templateOverrides}
               hideSubmit={props.hideSubmit}
               hideTemplates={props.hideTemplates}
               hidePatientCard={props.hidePatientCard}
@@ -76,11 +78,9 @@ const Component = (props: PrescribeWorkflowComponentProps) => {
               enableMedHistoryLinks={props.enableMedHistoryLinks}
               enableMedHistoryRefillButton={props.enableMedHistoryRefillButton}
               enableCombineAndDuplicate={props.enableCombineAndDuplicate}
-              enableCoverageCheck={props.enableCoverageCheck}
               optionalPatientAddress={props.optionalPatientAddress}
               mailOrderIds={props.mailOrderIds}
               pharmacyId={props.pharmacyId}
-              loading={props.loading}
               address={props.address}
               weight={props.weight}
               weightUnit={props.weightUnit}
@@ -124,13 +124,11 @@ customElement(
     optionalPatientAddress: false,
     mailOrderIds: undefined,
     pharmacyId: undefined,
-    loading: false,
     address: undefined,
     weight: undefined,
     weightUnit: 'lbs',
     additionalNotes: undefined,
     triggerSubmit: false,
-    setTriggerSubmit: undefined,
     toastBuffer: 0,
     externalOrderId: undefined,
     catalogId: undefined,
