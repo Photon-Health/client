@@ -3,7 +3,7 @@ name: Publish Packages
 on:
   push:
     branches:
-      - boson
+      - photon
 
 permissions:
   id-token: write # Required for OIDC trusted publishing
@@ -18,7 +18,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          ref: boson
+          ref: photon
           fetch-depth: 0
 
       - name: Set up Node.js
@@ -42,8 +42,8 @@ jobs:
         id: check
         run: |
           PACKAGES=""
-          for file in $(git diff --name-only HEAD~5...HEAD | grep '/package.json' | grep 'packages/'); do
-            if git diff HEAD~5...HEAD -- $file | grep '\"version\"'; then
+          for file in $(git diff --name-only HEAD~1...HEAD | grep '/package.json' | grep 'packages/'); do
+            if git diff HEAD~1...HEAD -- $file | grep '\"version\"'; then
               PACKAGE_PATH=$(dirname $file)
               PACKAGES="$PACKAGES $PACKAGE_PATH"
             fi
