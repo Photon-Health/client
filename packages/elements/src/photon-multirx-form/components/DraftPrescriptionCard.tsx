@@ -63,6 +63,7 @@ export const DraftPrescriptionCard = (props: {
       props.setIsEditing(true);
       editPrescription();
       onConfirm?.();
+      dispatchDraftPrescriptionDeleted();
     } else {
       setEditDialogOpen(true);
       setEditDialogConfirm(onConfirm);
@@ -82,6 +83,7 @@ export const DraftPrescriptionCard = (props: {
 
     editDialogConfirm()?.();
     setEditDialogConfirm(undefined);
+    dispatchDraftPrescriptionDeleted();
   };
   const handleEditCancel = () => {
     setEditDialogOpen(false);
