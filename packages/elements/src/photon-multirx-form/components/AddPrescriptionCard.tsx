@@ -445,7 +445,7 @@ export const AddPrescriptionCard = (props: {
                 }
               }}
               loading={isLoading()}
-              variant="secondary"
+              variant="primary"
               color="blue"
             >
               Add to drafts
