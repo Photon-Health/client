@@ -129,13 +129,13 @@ export const PrescriptionForm = () => {
         datadogRum.addAction('photon-medication-search-open', { user });
       });
     }
-  }, [navigate, track, patientId]);
+  }, [navigate, track, patientId, user, onClose]);
 
   useEffect(() => {
     if (patientId && ref.current) {
       ref.current.patientId = patientId;
     }
-  }, [ref.current, patientId]);
+  }, [patientId]);
 
   const enableCoverageCheck = useMemo(() => {
     if (user) {
