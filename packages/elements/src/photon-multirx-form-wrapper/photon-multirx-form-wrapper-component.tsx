@@ -306,7 +306,7 @@ const Component = (props: {
                 setDraftPrescriptionCount((prev) => prev + 1);
               }}
               on:photon-draft-prescription-deleted={() => {
-                setDraftPrescriptionCount((prev) => prev - 1);
+                setDraftPrescriptionCount((prev) => Math.max(0, prev - 1));
               }}
               on:photon-prescriptions-created={(e: any) => {
                 e.stopPropagation();
