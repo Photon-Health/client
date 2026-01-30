@@ -702,10 +702,27 @@ export const Order = () => {
                           isDisabled={!pharmacyId}
                           onClick={async () => {
                             setUpdating(true);
-                            await rerouteOrder({ variables: { id, pharmacyId } });
-                            setPharmacyId('');
-                            setUpdating(false);
-                            onClose();
+                            try {
+                              await rerouteOrder({ variables: { id, pharmacyId } });
+                              setPharmacyId('');
+                              onClose();
+                            } catch (error) {
+                              const message = error instanceof Error ? error.message : `${error}`;
+                              toast({
+                                position: 'top-right',
+                                duration: 4000,
+                                render: ({ onClose: onToastClose }) => (
+                                  <StyledToast
+                                    onClose={onToastClose}
+                                    type="error"
+                                    title="Error Setting Pharmacy"
+                                    description={`There was an error setting the pharmacy: ${message}`}
+                                  />
+                                )
+                              });
+                            } finally {
+                              setUpdating(false);
+                            }
                           }}
                         >
                           Set Pharmacy

@@ -7,17 +7,20 @@ import { createMemo, createSignal, onMount } from 'solid-js';
 import { PhotonFormWrapper } from '../photon-form-wrapper';
 import { PatientStore } from '../stores/patient';
 
-const shouldWarn = (form: any) =>
-  form()['addToTemplates']?.value != false ||
-  form()['daysSupply']?.value ||
-  form()['dispenseAsWritten']?.value != false ||
-  form()['dispenseQuantity']?.value ||
-  form()['dispenseUnit']?.value ||
-  form()['doNotFillBeforeDate']?.value ||
-  form()['instructions']?.value ||
-  form()['notes']?.value ||
-  form()['refillsInput']?.value ||
-  form()['treatment']?.value;
+const shouldWarn = (form: any) => {
+  return (
+    (form()['addToTemplates'] && form()['addToTemplates'].value != false) ||
+    form()['daysSupply']?.value ||
+    (form()['dispenseAsWritten'] && form()['dispenseAsWritten']?.value != false) ||
+    form()['dispenseQuantity']?.value ||
+    form()['dispenseUnit']?.value ||
+    form()['doNotFillBeforeDate']?.value ||
+    form()['instructions']?.value ||
+    form()['notes']?.value ||
+    form()['refillsInput']?.value ||
+    form()['treatment']?.value
+  );
+};
 
 const hasUsableAddress = (address?: { id?: string }) => {
   return Boolean(address?.id);

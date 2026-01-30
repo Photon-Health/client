@@ -4,7 +4,7 @@ import { Treatment } from '@photonhealth/sdk/dist/types';
 import { IconButton } from '../../particles/IconButton';
 import clsx from 'clsx';
 import { MedHistoryPrescription } from './index';
-import { usePrescribeOptional } from '../PrescribeProvider';
+import { useDraftPrescriptionsOptional } from '../DraftPrescriptions';
 
 export type MedHistoryRowItem = {
   treatment: Treatment;
@@ -22,7 +22,9 @@ export type PatientMedHistoryTableProps = {
 };
 
 export default function PatientMedHistoryTable(props: PatientMedHistoryTableProps) {
-  const prescribeContext = usePrescribeOptional();
+  // Component can be used as a standalone element
+  // so PrescribeProvider is not guaranteed to be rendered
+  const draftPrescriptionsContext = useDraftPrescriptionsOptional();
 
   const [isCreatingPrescriptionId, setIsCreatingPrescriptionId] = createSignal<string | undefined>(
     undefined
@@ -46,13 +48,12 @@ export default function PatientMedHistoryTable(props: PatientMedHistoryTableProp
     if (isCreatingPrescriptionId() === undefined) {
       setIsCreatingPrescriptionId(prescription.id);
 
-      if (!prescribeContext) {
-        throw new Error('Refill requires <PrescribeProvider>');
+      if (!draftPrescriptionsContext) {
+        throw new Error('Refill requires <DraftPrescriptionsProvider>');
       }
 
       try {
-        // todo: this does not trigger photon-draft-prescription-created event, but it should!
-        await prescribeContext.tryCreatePrescription({
+        await draftPrescriptionsContext.tryCreatePrescription({
           ...prescription,
           treatment,
           diagnoseCodes: prescription.diagnoses?.map((diagnosis) => diagnosis.code) || []

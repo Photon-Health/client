@@ -28,7 +28,8 @@ export class MockPhotonClient {
 
   // Add any other methods used in your components
   authentication = {
-    getAccessToken: vi.fn().mockImplementation(() => Promise.resolve('mock-token'))
+    getAccessToken: vi.fn().mockImplementation(() => Promise.resolve('mock-token')),
+    state: {}
   };
 
   setOrganization = vi.fn().mockReturnThis();
