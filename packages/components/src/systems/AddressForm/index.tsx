@@ -52,6 +52,7 @@ type AddressFormProps = {
   patientId: string;
   setAddress?: (address: AddressProps) => void;
   showRequiredBanner?: boolean;
+  openStateDropdownUpward?: boolean;
 };
 
 export default function AddressForm(props: AddressFormProps) {
@@ -120,7 +121,12 @@ export default function AddressForm(props: AddressFormProps) {
           </InputGroup>
           <div class="grid grid-cols-1 sm:gap-4 sm:grid-cols-2">
             <InputGroup label="State *" error={errors().state}>
-              <ListSelect list={states} selectMessage="Select a State" name="state" />
+              <ListSelect
+                list={states}
+                selectMessage="Select a State"
+                name="state"
+                openUpward={props.openStateDropdownUpward}
+              />
             </InputGroup>
             <InputGroup label="Zip Code *" error={errors().postalCode}>
               <Input type="text" name="postalCode" />

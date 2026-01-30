@@ -659,6 +659,7 @@ export function PrescribeWorkflow(props: PrescribeProps) {
                   <AddressForm
                     patientId={props.formStore.patient?.value?.id}
                     showRequiredBanner={false}
+                    openStateDropdownUpward={true}
                     setAddress={(address: Address) => {
                       props.formActions.updateFormValue({
                         key: 'address',
