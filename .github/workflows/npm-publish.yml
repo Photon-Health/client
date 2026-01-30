@@ -42,8 +42,8 @@ jobs:
         id: check
         run: |
           PACKAGES=""
-          for file in $(git diff --name-only HEAD~2...HEAD | grep '/package.json' | grep 'packages/'); do
-            if git diff HEAD~2...HEAD -- $file | grep '\"version\"'; then
+          for file in $(git diff --name-only HEAD~1...HEAD | grep '/package.json' | grep 'packages/'); do
+            if git diff HEAD~1...HEAD -- $file | grep '\"version\"'; then
               PACKAGE_PATH=$(dirname $file)
               PACKAGES="$PACKAGES $PACKAGE_PATH"
             fi
