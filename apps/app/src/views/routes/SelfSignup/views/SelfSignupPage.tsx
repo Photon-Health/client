@@ -59,7 +59,6 @@ export const SelfSignupPage = () => {
     email: email || '',
     npi: npi || '',
     phone: phone || '',
-    fax: '',
     street1: '',
     street2: '',
     city: '',
@@ -75,7 +74,6 @@ export const SelfSignupPage = () => {
       {
         hasNpi: !!values.npi,
         hasPhone: !!values.phone,
-        hasFax: !!values.fax,
         hasStreet2: !!values.street2,
         didAgreeToTerms: values.didAgreeToTerms
       },
@@ -130,11 +128,11 @@ export const SelfSignupPage = () => {
                   <Stack spacing="4" textAlign="left">
                     <VStack alignItems="start">
                       <Heading as="h1" size="xs">
-                        Create Your Prescriber Account
+                        Confirm your info
                       </Heading>
                       <Text fontSize="md" color="gray">
-                        Pharmacies use this information to ensure safe and compliant prescription
-                        fulfillment.
+                        This is a one-time setup. We’ll securely save your details so prescribing is
+                        faster next time.
                       </Text>
                       <Text fontSize="md" marginTop="4">
                         Please confirm your details:
@@ -239,41 +237,6 @@ export const SelfSignupPage = () => {
                           maxLength={10}
                         />
                         <ErrorMessage name="phone" component={FormErrorMessage} />
-                      </FormControl>
-
-                      <FormControl isInvalid={!!errors.fax && touched.fax}>
-                        <HStack spacing="0" alignItems="center">
-                          <FormLabel htmlFor="fax" marginRight="0" marginBottom="0">
-                            Fax
-                          </FormLabel>
-                          <Popover placement={'top-start'}>
-                            <PopoverTrigger>
-                              <IconButton
-                                variant="ghost"
-                                color="gray"
-                                size="xs"
-                                aria-label="Why provide my fax?"
-                                icon={<FaInfoCircle />}
-                              />
-                            </PopoverTrigger>
-                            <Portal>
-                              <PopoverContent>
-                                <PopoverBody>
-                                  Pharmacies may use this fax number to reach you if there are
-                                  questions or issues with your prescriptions.
-                                </PopoverBody>
-                              </PopoverContent>
-                            </Portal>
-                          </Popover>
-                        </HStack>
-                        <Field
-                          as={Input}
-                          id="fax"
-                          name="fax"
-                          placeholder="Enter your fax number (optional)"
-                          maxLength={10}
-                        />
-                        <ErrorMessage name="fax" component={FormErrorMessage} />
                       </FormControl>
                     </Stack>
                   </Stack>
@@ -469,10 +432,6 @@ const buildSignupContinueParams = (state: string, formData: SignupFormData): str
 
   if (formData.street2) {
     params.set('street2', formData.street2);
-  }
-
-  if (formData.fax) {
-    params.set('fax', formData.fax);
   }
 
   return params.toString();
