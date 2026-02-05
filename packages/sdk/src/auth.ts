@@ -229,7 +229,7 @@ export class AuthManager {
    */
   public async handleRedirect(url?: string): Promise<RedirectLoginResult<any> | undefined> {
     try {
-      return this.authentication.handleRedirectCallback(url);
+      return this.authentication.handleRedirectCallback(url) as Promise<RedirectLoginResult<any>>;
     } catch (err) {
       console.error(err);
     }
