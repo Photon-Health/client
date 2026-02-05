@@ -130,11 +130,11 @@ export const SelfSignupPage = () => {
                   <Stack spacing="4" textAlign="left">
                     <VStack alignItems="start">
                       <Heading as="h1" size="xs">
-                        Create Your Prescriber Account
+                        Confirm your info
                       </Heading>
                       <Text fontSize="md" color="gray">
-                        Pharmacies use this information to ensure safe and compliant prescription
-                        fulfillment.
+                        This is a one-time setup. We’ll securely save your details so prescribing is
+                        faster next time.
                       </Text>
                       <Text fontSize="md" marginTop="4">
                         Please confirm your details:
