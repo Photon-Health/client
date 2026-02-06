@@ -378,7 +378,7 @@ export type MutationUpdatePatientArgs = {
 };
 
 export type MutationUpdateProfileArgs = {
-  input: ProfileInput;
+  input: ProviderProfileInput;
 };
 
 export type MutationUpdateWebhookConfigArgs = {
@@ -659,7 +659,7 @@ export type ProductFilter = {
   type?: InputMaybe<MedicationType>;
 };
 
-export type ProfileInput = {
+export type ProviderProfileInput = {
   address?: InputMaybe<AddressInput>;
   fax?: InputMaybe<Scalars['AWSPhone']>;
   name?: InputMaybe<NameInput>;
