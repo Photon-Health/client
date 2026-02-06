@@ -67,7 +67,7 @@ interface EditRolesActionProps {
 const UpdateProviderProfileAndSetUserRolesMutation = graphql(/* GraphQL */ `
   mutation UpdateProviderProfileAndSetUserRolesMutation(
     $providerId: ID!
-    $updateProviderProfileInput: UpdateProviderProfileInput!
+    $updateProviderProfileInput: ProviderProfileInput!
     $roles: [ID!]!
   ) {
     updateProviderProfile(providerId: $providerId, input: $updateProviderProfileInput)

@@ -50,7 +50,7 @@ export const SelfSignupPage = () => {
     () => extractTokenData(sessionToken),
     [sessionToken]
   );
-  const canPrefillNpi = npi && npi?.length === 10;
+  const canPrefillNpi = !!(npi && npi?.length === 10);
   const isVerifiedPrescriber = verified && VALID_LICENSES.has(credentials ?? 'none');
 
   const initialFormData: SignupFormData = {
@@ -87,13 +87,16 @@ export const SelfSignupPage = () => {
 
   // Track page view on mount
   useEffect(() => {
+    const hasPrefilledName = !!(firstName && lastName);
     trackSelfSignupEvent(
       'Self Signup Page Viewed',
       {
+        credentials,
+        isExternallyVerified: verified,
         hasPrefilledNpi: canPrefillNpi,
         hasPrefilledEmail: !!email,
-        hasPrefilledName: !!(firstName && lastName),
-        fullName: `${firstName} ${lastName}`
+        hasPrefilledName,
+        fullName: hasPrefilledName ? `${firstName} ${lastName}` : undefined
       },
       sessionToken
     );
