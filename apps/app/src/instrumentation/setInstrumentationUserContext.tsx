@@ -15,3 +15,13 @@ export function setInstrumentationUserContext(user: {
     name: user.name
   });
 }
+
+export function setInstrumentationSelfSignupUserContext(user: { email: string; name: string }) {
+  datadogRum.setGlobalContextProperty('org', {
+    isSelfSignup: true
+  });
+  datadogRum.setUser({
+    email: user.email,
+    name: user.name
+  });
+}

@@ -33,6 +33,8 @@ import { FormikStateSelect } from '../../Settings/components/utils/States';
 import { SignupFormData, signupFormSchema } from './form';
 import { FaInfoCircle } from 'react-icons/fa';
 import { useEffect, useMemo } from 'react';
+import { datadogRum } from '@datadog/browser-rum';
+import { setInstrumentationSelfSignupUserContext } from '../../../../instrumentation/setInstrumentationUserContext';
 
 const VALID_LICENSES = new Set(['MD', 'DO', 'PA', 'NP']);
 
@@ -88,6 +90,8 @@ export const SelfSignupPage = () => {
   // Track page view on mount
   useEffect(() => {
     const hasPrefilledName = !!(firstName && lastName);
+    const fullName = hasPrefilledName ? `${firstName} ${lastName}` : undefined;
+    setInstrumentationSelfSignupUserContext({ email: email ?? '', name: fullName ?? '' });
     trackSelfSignupEvent(
       'Self Signup Page Viewed',
       {
@@ -96,7 +100,7 @@ export const SelfSignupPage = () => {
         hasPrefilledNpi: canPrefillNpi,
         hasPrefilledEmail: !!email,
         hasPrefilledName,
-        fullName: hasPrefilledName ? `${firstName} ${lastName}` : undefined
+        fullName
       },
       sessionToken
     );
@@ -376,6 +380,9 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
   }
   const [, payload] = tosSessionToken.split('.');
   const decodedPayload = JSON.parse(atob(payload));
+
+  datadogRum.setGlobalContextProperty('SelfSignupData', { decodedPayload });
+
   const firstName: string = decodedPayload.first_name;
   const lastName: string = decodedPayload.last_name;
   const email: string = decodedPayload.email;
