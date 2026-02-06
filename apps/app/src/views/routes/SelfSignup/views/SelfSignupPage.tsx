@@ -34,7 +34,7 @@ import { SignupFormData, signupFormSchema } from './form';
 import { FaInfoCircle } from 'react-icons/fa';
 import { useEffect, useMemo } from 'react';
 
-const VALID_LICENSES = new Set(['MD', 'DO', 'PA', 'NP']);
+const VALID_LICENSES = new Set(['MD', 'DO']);
 
 export const SelfSignupPage = () => {
   const [searchParams] = useSearchParams();
