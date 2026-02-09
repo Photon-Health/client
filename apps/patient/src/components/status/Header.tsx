@@ -126,7 +126,7 @@ function subheaderText(props: OrderStatusHeaderProps) {
   // Then just check the status
   if (
     (props.fulfillmentType === 'MAIL_ORDER' || props.integrated) &&
-    (props.status === 'CREATED' || props.status === 'SENT')
+    ['CREATED', 'SENT', 'RECEIVED'].includes(props.status)
   ) {
     return "We've sent your order to the pharmacy. They will reach out shortly.";
   }
