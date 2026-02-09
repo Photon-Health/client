@@ -1,4 +1,4 @@
-import { gql } from 'graphql-request';
+import { gql } from '@apollo/client';
 
 export const MARK_ORDER_AS_PICKED_UP = gql`
   mutation MarkOrderAsPickedUp($markOrderAsPickedUpId: ID!) {
