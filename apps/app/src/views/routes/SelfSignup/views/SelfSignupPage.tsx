@@ -33,8 +33,10 @@ import { FormikStateSelect } from '../../Settings/components/utils/States';
 import { SignupFormData, signupFormSchema } from './form';
 import { FaInfoCircle } from 'react-icons/fa';
 import { useEffect, useMemo } from 'react';
+import { datadogRum } from '@datadog/browser-rum';
+import { setInstrumentationSelfSignupUserContext } from '../../../../instrumentation/setInstrumentationUserContext';
 
-const VALID_LICENSES = new Set(['MD', 'DO']);
+const VALID_LICENSES = new Set(['MD', 'DO', 'PA', 'NP']);
 
 export const SelfSignupPage = () => {
   const [searchParams] = useSearchParams();
@@ -50,7 +52,7 @@ export const SelfSignupPage = () => {
     () => extractTokenData(sessionToken),
     [sessionToken]
   );
-  const canPrefillNpi = npi && npi?.length === 10;
+  const canPrefillNpi = !!(npi && npi?.length === 10);
   const isVerifiedPrescriber = verified && VALID_LICENSES.has(credentials ?? 'none');
 
   const initialFormData: SignupFormData = {
@@ -59,7 +61,6 @@ export const SelfSignupPage = () => {
     email: email || '',
     npi: npi || '',
     phone: phone || '',
-    fax: '',
     street1: '',
     street2: '',
     city: '',
@@ -75,7 +76,6 @@ export const SelfSignupPage = () => {
       {
         hasNpi: !!values.npi,
         hasPhone: !!values.phone,
-        hasFax: !!values.fax,
         hasStreet2: !!values.street2,
         didAgreeToTerms: values.didAgreeToTerms
       },
@@ -89,13 +89,18 @@ export const SelfSignupPage = () => {
 
   // Track page view on mount
   useEffect(() => {
+    const hasPrefilledName = !!(firstName && lastName);
+    const fullName = hasPrefilledName ? `${firstName} ${lastName}` : undefined;
+    setInstrumentationSelfSignupUserContext({ email: email ?? '', name: fullName ?? '' });
     trackSelfSignupEvent(
       'Self Signup Page Viewed',
       {
+        credentials,
+        isExternallyVerified: verified,
         hasPrefilledNpi: canPrefillNpi,
         hasPrefilledEmail: !!email,
-        hasPrefilledName: !!(firstName && lastName),
-        fullName: `${firstName} ${lastName}`
+        hasPrefilledName,
+        fullName
       },
       sessionToken
     );
@@ -130,11 +135,11 @@ export const SelfSignupPage = () => {
                   <Stack spacing="4" textAlign="left">
                     <VStack alignItems="start">
                       <Heading as="h1" size="xs">
-                        Create Your Prescriber Account
+                        Confirm your info
                       </Heading>
                       <Text fontSize="md" color="gray">
-                        Pharmacies use this information to ensure safe and compliant prescription
-                        fulfillment.
+                        This is a one-time setup. We’ll securely save your details so prescribing is
+                        faster next time.
                       </Text>
                       <Text fontSize="md" marginTop="4">
                         Please confirm your details:
@@ -239,41 +244,6 @@ export const SelfSignupPage = () => {
                           maxLength={10}
                         />
                         <ErrorMessage name="phone" component={FormErrorMessage} />
-                      </FormControl>
-
-                      <FormControl isInvalid={!!errors.fax && touched.fax}>
-                        <HStack spacing="0" alignItems="center">
-                          <FormLabel htmlFor="fax" marginRight="0" marginBottom="0">
-                            Fax
-                          </FormLabel>
-                          <Popover placement={'top-start'}>
-                            <PopoverTrigger>
-                              <IconButton
-                                variant="ghost"
-                                color="gray"
-                                size="xs"
-                                aria-label="Why provide my fax?"
-                                icon={<FaInfoCircle />}
-                              />
-                            </PopoverTrigger>
-                            <Portal>
-                              <PopoverContent>
-                                <PopoverBody>
-                                  Pharmacies may use this fax number to reach you if there are
-                                  questions or issues with your prescriptions.
-                                </PopoverBody>
-                              </PopoverContent>
-                            </Portal>
-                          </Popover>
-                        </HStack>
-                        <Field
-                          as={Input}
-                          id="fax"
-                          name="fax"
-                          placeholder="Enter your fax number (optional)"
-                          maxLength={10}
-                        />
-                        <ErrorMessage name="fax" component={FormErrorMessage} />
                       </FormControl>
                     </Stack>
                   </Stack>
@@ -410,6 +380,9 @@ function extractTokenData(tosSessionToken?: string): SelfSignupFormPrefillData {
   }
   const [, payload] = tosSessionToken.split('.');
   const decodedPayload = JSON.parse(atob(payload));
+
+  datadogRum.setGlobalContextProperty('SelfSignupData', { decodedPayload });
+
   const firstName: string = decodedPayload.first_name;
   const lastName: string = decodedPayload.last_name;
   const email: string = decodedPayload.email;
@@ -469,10 +442,6 @@ const buildSignupContinueParams = (state: string, formData: SignupFormData): str
 
   if (formData.street2) {
     params.set('street2', formData.street2);
-  }
-
-  if (formData.fax) {
-    params.set('fax', formData.fax);
   }
 
   return params.toString();

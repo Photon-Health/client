@@ -30,7 +30,7 @@ import { StyledToast } from 'apps/app/src/views/components/StyledToast';
 import { compact } from 'lodash';
 
 const updateMyProfileMutation = graphql(/* GraphQL */ `
-  mutation UpdateMyProfile($updateMyProfileInput: ProfileInput!) {
+  mutation UpdateMyProfile($updateMyProfileInput: ProviderProfileInput!) {
     updateMyProfile(input: $updateMyProfileInput)
   }
 `);
