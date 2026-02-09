@@ -181,58 +181,61 @@
       "@zag-js/focus-visible": "^1.18.0"
     },
     "@datadog/datadog-ci": {
-      "form-data": "2.5.4"
+      "form-data": "2.5.4",
+      "axios": {
+        "form-data": "^4.0.5"
+      }
     },
     "@types/request": {
       "form-data": "2.5.4"
     },
     "@nx/eslint-plugin": {
-      "form-data": "4.0.4"
+      "form-data": "4.0.5"
     },
     "@nx/jest": {
-      "form-data": "4.0.4"
+      "form-data": "4.0.5"
     },
     "@nx/js": {
-      "form-data": "4.0.4"
+      "form-data": "4.0.5"
     },
     "@nx/react": {
-      "form-data": "4.0.4"
+      "form-data": "4.0.5"
     },
     "@nx/webpack": {
-      "form-data": "4.0.4"
+      "form-data": "4.0.5"
     },
     "@nx/workspace": {
-      "form-data": "4.0.4"
+      "form-data": "4.0.5"
     },
     "@storybook/addon-essentials": {
-      "form-data": "4.0.4"
+      "form-data": "4.0.5"
     },
     "@storybook/blocks": {
-      "form-data": "4.0.4"
+      "form-data": "4.0.5"
     },
     "@storybook/html": {
-      "form-data": "4.0.4"
+      "form-data": "4.0.5"
     },
     "@storybook/html-vite": {
-      "form-data": "4.0.4"
+      "form-data": "4.0.5"
     },
     "graphql-request": {
       "form-data": "3.0.4"
     },
     "jest-environment-jsdom": {
-      "form-data": "4.0.4"
+      "form-data": "4.0.5"
     },
     "jsdom": {
-      "form-data": "4.0.4"
+      "form-data": "4.0.5"
     },
     "nx": {
-      "form-data": "4.0.4"
+      "form-data": "4.0.5"
     },
     "react-scripts": {
       "form-data": "3.0.4"
     },
     "storybook": {
-      "form-data": "4.0.4"
+      "form-data": "4.0.5"
     }
   }
 }
