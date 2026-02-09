@@ -1,9 +1,11 @@
 # Add files here to ignore them from prettier formatting
 
-/dist
-/coverage
-/node_modules
-/.nx
+dist
+coverage
+node_modules
+.nx
+playwright-report
+storybook-static
 
 # gql codegen
 /apps/app/src/gql
@@ -30,7 +32,6 @@ __generated__
 *.webp
 
 # Ignore specific file types
-*.json
 *.txt
 
 # Ignore specific directories
@@ -42,10 +43,4 @@ __generated__
 *.yml
 *.yaml
 
-apps/app/coverage
-apps/app/playwright-report
-packages/components/dist
-packages/elements/dist
-packages/sdk/dist
-packages/components/storybook-static
-packages/react/dist
+vite.config.ts.timestamp-*

@@ -9,11 +9,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/react",
-        "commands": [
-          "rimraf dist",
-          "tsc",
-          "vite build"
-        ],
+        "commands": ["rimraf dist", "tsc", "vite build"],
         "parallel": false
       },
       "outputs": ["{workspaceRoot}/dist/packages/sdk"],
