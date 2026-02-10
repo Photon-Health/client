@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@babel/preset-react": "^7.14.5",
+    "@datadog/datadog-ci": "^3.22.2",
     "@graphql-codegen/cli": "^5.0.0",
     "@graphql-codegen/client-preset": "^4.1.0",
     "@graphql-codegen/typescript-graphql-request": "^6.2.0",
@@ -107,7 +108,6 @@
     "@chakra-ui/react": "^2.8.2",
     "@chakra-ui/theme-tools": "^2.1.2",
     "@datadog/browser-rum": "^5.15.0",
-    "@datadog/datadog-ci": "^2.33.1",
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",
     "@felte/solid": "^1.2.11",
