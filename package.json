@@ -179,6 +179,9 @@
   "overrides": {
     "@chakra-ui/react": {
       "@zag-js/focus-visible": "^1.18.0"
+    },
+    "react-scripts": {
+      "form-data": "4.0.5"
     }
   }
 }
