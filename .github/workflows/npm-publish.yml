@@ -3,7 +3,7 @@ name: Publish Packages
 on:
   push:
     branches:
-      - photon
+      - boson
 
 permissions:
   id-token: write # Required for OIDC trusted publishing
@@ -18,7 +18,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          ref: photon
+          ref: boson
           fetch-depth: 0
 
       - name: Set up Node.js
