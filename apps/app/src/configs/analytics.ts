@@ -16,6 +16,10 @@ export async function trackSelfSignupEvent(
   const baseUrl = clinicalApiUrl[environment];
   const url = `${baseUrl}/auth0/track-event`;
 
+  const propertiesWithEnv = {
+    ...properties,
+    environment
+  };
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -24,7 +28,7 @@ export async function trackSelfSignupEvent(
       },
       body: JSON.stringify({
         event,
-        properties,
+        properties: propertiesWithEnv,
         sessionToken
       })
     });
