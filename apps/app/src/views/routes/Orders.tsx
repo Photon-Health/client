@@ -248,7 +248,7 @@ export const Orders = () => {
         columns={columns}
         loading={loading}
         error={error}
-        ctaText="New Order"
+        ctaText="New order"
         ctaColor="blue"
         ctaRoute="/orders/new"
         filterText={filterText}
