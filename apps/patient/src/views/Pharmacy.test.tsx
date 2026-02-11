@@ -473,7 +473,7 @@ describe('Pharmacy page', () => {
       id: 'ord_testId777',
       state: 'ROUTING',
       patient: generatePatient({
-        preferredPharmacies: [{ id: preferredId }]
+        preferredPharmacies: [{ id: preferredId, name: 'Preferred Pharmacy' }]
       }),
       fills: [generateFill('test-treatment')],
       address: {
