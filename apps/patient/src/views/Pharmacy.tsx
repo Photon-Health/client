@@ -180,13 +180,16 @@ export const Pharmacy = () => {
       ...pharmacyResults.filter((p) => !topRankedIds.includes(p.id))
     ];
 
+    // drop pharmacies already present in topRankedPharmacies to avoid duplicates
     const prepared = isDemo
       ? combined
       : combined.map((combinedItem) => preparePharmacy(combinedItem));
     if (preferredPharmacyIds.length === 0) {
+      // no preferred pharmacies: preserve existing ordering
       return prepared;
     }
 
+    // preferred pharmacies should appear first, in the order of preferredPharmacyIds
     const preferredSet = new Set(preferredPharmacyIds);
     const preferred = preferredPharmacyIds
       .map((id) => prepared.find((pharmacy) => pharmacy.id === id))
