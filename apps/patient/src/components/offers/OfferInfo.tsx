@@ -4,6 +4,16 @@ import { text as t } from '../../utils/text';
 
 import { formatPrice } from '../../utils/formatters';
 import { Offer } from '../pharmacy-card-list/BrandedOptions';
+
+const PreferredTag = () => {
+  return (
+    <Tag size="sm" colorScheme="blue">
+      <TagLeftIcon boxSize="12px" as={FiStar} />
+      <TagLabel>{t.preferred}</TagLabel>
+    </Tag>
+  );
+};
+
 const CurrentPharmacyTag = () => {
   return (
     <Tag
@@ -40,12 +50,7 @@ export const OfferInfo = ({ pharmacy, offer, isCurrentPharmacy, isPreferred }: O
   ].map((tag) => {
     switch (tag) {
       case t.preferred:
-        return (
-          <Tag key={tag} size="sm" colorScheme="blue">
-            <TagLeftIcon boxSize="12px" as={FiStar} />
-            <TagLabel>{t.preferred}</TagLabel>
-          </Tag>
-        );
+        return <PreferredTag key={tag} />;
       case 'current':
         return <CurrentPharmacyTag key={tag} />;
       default:
